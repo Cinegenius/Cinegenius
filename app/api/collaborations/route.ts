@@ -31,8 +31,8 @@ export async function GET(req: NextRequest) {
   ]);
 
   const collabs: { friendId: string; label: string }[] = [
-    ...(asSender.data ?? []).map((f) => ({ friendId: f.receiver_id, label: f.sender_collab_label?.trim() || "Vernetzt" })),
-    ...(asReceiver.data ?? []).map((f) => ({ friendId: f.sender_id, label: f.receiver_collab_label?.trim() || "Vernetzt" })),
+    ...(asSender.data ?? []).map((f) => ({ friendId: f.receiver_id, label: f.sender_collab_label?.trim() || tResponse("Contacts.relationship") })),
+    ...(asReceiver.data ?? []).map((f) => ({ friendId: f.sender_id, label: f.receiver_collab_label?.trim() || tResponse("Contacts.relationship") })),
   ];
 
   if (collabs.length === 0) return NextResponse.json({ collaborations: [] });
@@ -54,7 +54,7 @@ export async function GET(req: NextRequest) {
       return {
         user_id: c.friendId,
         label: c.label,
-        display_name: p.display_name ?? "Unbekannt",
+        display_name: p.display_name ?? tResponse("Contacts.member"),
         avatar_url: p.avatar_url ?? null,
         slug: p.slug ?? c.friendId,
         role: p.role ?? (Array.isArray(p.positions) ? p.positions[0] : null) ?? null,

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useLayoutEffect, useRef } from "react";
 import { useTranslations , useLocale } from "next-intl";
 import { useGallerySelection } from "@/lib/use-gallery-selection";
 import Link from "next/link";
@@ -9,7 +9,7 @@ import Image from "@/components/MediaImage";
 import {
   ArrowLeft, MapPin, Star, CheckCircle, Shield,
   MessageSquare, ChevronRight, Users, Loader2,
-  UserPlus, UserCheck, Clock, Check, X, Lock,
+  Lock,
   ExternalLink, Globe, Plane, Play, Quote, Pencil, Trash2,
   AtSign, PlayCircle, Video, Clapperboard, Calendar,
   Camera, Award, DollarSign,
@@ -19,6 +19,8 @@ import ReviewsSection from "@/components/ReviewsSection";
 import FavoriteButton from "@/components/FavoriteButton";
 import Lightbox from "@/components/Lightbox";
 import { uiErrorMessage } from "@/lib/ui-error-message";
+import ConnectButton from "@/components/ConnectButton";
+import { contactId } from "@/lib/contact-connections";
 
 type FilmographyEntry = {
   year: number;
@@ -63,8 +65,8 @@ type Creator = {
   ownerId?: string;
 };
 
-function formatLastSeen(translate: (key: string, values?: Record<string, string | number>) => string, isoDate: string): string {
-  const diff = Date.now() - new Date(isoDate).getTime();
+function formatLastSeen(translate: (key: string, values?: Record<string, string | number>) => string, isoDate: string, now: number): string {
+  const diff = now - new Date(isoDate).getTime();
   const mins = Math.floor(diff / 60000);
   const hours = Math.floor(diff / 3600000);
   const days = Math.floor(diff / 86400000);
@@ -108,8 +110,6 @@ type FriendStatus = "none" | "pending_sent" | "pending_received" | "accepted" | 
 
 export default function CreatorDetail({
   creator,
-  friendshipId,
-  friendStatus = "none",
   canMessage = true,
   isOwnProfile = false,
   currentUserId,
@@ -128,18 +128,22 @@ export default function CreatorDetail({
   const profileText = useTranslations("profile");
   const bookingCopy = useTranslations("BookingRequest");
   const tcr = useTranslations("creators");
+  const [viewTime] = useState(Date.now);
   const [activeSection, setActiveSection] = useState<"inquiry" | "message">("inquiry");
   const [message, setMessage] = useState("");
   const [msgSending, setMsgSending] = useState(false);
   const [msgSent, setMsgSent] = useState(false);
   const [msgError, setMsgError] = useState("");
+  const messageRequest = useRef({ target: "", content: "", key: "" });
+  const messagePending = useRef<object | null>(null);
+  const messageOwner = useRef({ account: currentUserId, target: creator.ownerId });
+  useLayoutEffect(() => {
+    const owner = { account: currentUserId, target: creator.ownerId };
+    messageOwner.current = owner;
+    return () => { messageOwner.current = { account: null, target: undefined }; messagePending.current = null; };
+  }, [currentUserId, creator.ownerId]);
   const [lightboxIdx, setLightboxIdx] = useGallerySelection(creator.portfolio_images ?? []);
   const totalPortfolio = creator.portfolio_images?.length ?? 0;
-
-  const [currentFriendStatus, setCurrentFriendStatus] = useState<FriendStatus>(friendStatus);
-  const [currentFriendshipId, setCurrentFriendshipId] = useState<string | null>(friendshipId ?? null);
-  const [friendLoading, setFriendLoading] = useState(false);
-  const [friendError, setFriendError] = useState("");
 
   type ProjectCredit = {
     id: string; role: string; project_id: string;
@@ -163,19 +167,31 @@ export default function CreatorDetail({
   const [recSent, setRecSent] = useState(false);
 
   const sendMessage = async () => {
-    if (!message.trim() || !creator.ownerId) return;
+    if (!message.trim() || !creator.ownerId || !currentUserId || messagePending.current) return;
+    const pendingToken = {};
+    messagePending.current = pendingToken;
+    const own = messageOwner.current;
+    const content = message.trim();
+    const target = `${currentUserId}:${creator.id}:${creator.ownerId}`;
+    if (messageRequest.current.target !== target || messageRequest.current.content !== content) {
+      messageRequest.current = { target, content, key: crypto.randomUUID() };
+    }
     setMsgSending(true); setMsgError("");
     try {
       const res = await fetch("/api/conversations", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ listing_id: creator.id, listing_title: creator.name, listing_type: "creator", receiver_id: creator.ownerId, content: message.trim() }),
+        cache: "no-store", signal: AbortSignal.timeout(20_000),
+        body: JSON.stringify({ listing_id: creator.id, listing_title: creator.name, listing_type: "creator", receiver_id: creator.ownerId, content, accountId: currentUserId, idempotencyKey: messageRequest.current.key }),
       });
-      const json = await res.json();
+      const json = await res.json().catch(() => ({}));
+      if (messageOwner.current !== own) return;
       if (!res.ok) throw new Error(json.error ?? uiText("Ui.text_3d5d6608b0a99d"));
+      if (!contactId.test(json.conversationId ?? "") || !contactId.test(json.message?.id ?? "")) throw new Error(uiText("Ui.text_3d5d6608b0a99d"));
       setMsgSent(true); setMessage("");
-    } catch (err) { setMsgError(uiErrorMessage(err, uiText("Ui.text_f6cc01cb7edbf0"))); }
-    finally { setMsgSending(false); }
+      messageRequest.current = { target: "", content: "", key: "" };
+    } catch (err) { if (messageOwner.current === own) setMsgError(uiErrorMessage(err, uiText("Ui.text_f6cc01cb7edbf0"))); }
+    finally { if (messagePending.current === pendingToken) messagePending.current = null; if (messageOwner.current === own) setMsgSending(false); }
   };
 
   useEffect(() => {
@@ -209,41 +225,6 @@ export default function CreatorDetail({
 
   const alreadyWroteRec = recommendations.some((r) => r.author_id === currentUserId);
 
-  const sendFriendRequest = async () => {
-    if (!creator.ownerId || !currentUserId) return;
-    setFriendLoading(true); setFriendError("");
-    try {
-      const res = await fetch("/api/friendships", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ receiver_id: creator.ownerId }) });
-      const json = await res.json();
-      if (!res.ok) throw new Error(json.error ?? uiText("Ui.text_f6cc01cb7edbf0"));
-      setCurrentFriendshipId(json.friendship.id); setCurrentFriendStatus("pending_sent");
-    } catch (err) { setFriendError(uiErrorMessage(err, uiText("Ui.text_f6cc01cb7edbf0"))); }
-    finally { setFriendLoading(false); }
-  };
-
-  const respondToRequest = async (status: "accepted" | "rejected") => {
-    if (!currentFriendshipId) return;
-    setFriendLoading(true); setFriendError("");
-    try {
-      const res = await fetch(`/api/friendships/${currentFriendshipId}`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ status }) });
-      const json = await res.json();
-      if (!res.ok) throw new Error(json.error ?? uiText("Ui.text_f6cc01cb7edbf0"));
-      setCurrentFriendStatus(status);
-    } catch (err) { setFriendError(uiErrorMessage(err, uiText("Ui.text_f6cc01cb7edbf0"))); }
-    finally { setFriendLoading(false); }
-  };
-
-  const removeFriend = async () => {
-    if (!currentFriendshipId) return;
-    setFriendLoading(true); setFriendError("");
-    try {
-      const res = await fetch(`/api/friendships/${currentFriendshipId}`, { method: "DELETE" });
-      if (!res.ok) { const j = await res.json(); throw new Error(j.error ?? uiText("Ui.text_f6cc01cb7edbf0")); }
-      setCurrentFriendStatus("none"); setCurrentFriendshipId(null);
-    } catch (err) { setFriendError(uiErrorMessage(err, uiText("Ui.text_f6cc01cb7edbf0"))); }
-    finally { setFriendLoading(false); }
-  };
-
   const positions = (creator.positions?.length ? creator.positions : [creator.role]);
   const allVideos = [creator.reel_url, ...(creator.video_links ?? [])].filter(Boolean) as string[];
   const socialLinks = [
@@ -255,31 +236,6 @@ export default function CreatorDetail({
     { url: creator.website_url,   icon: Globe,         label: uiText("AdminReview.fields.website"),    color: "text-text-secondary" },
   ].filter((s) => s.url);
 
-  const FriendButton = () => {
-  const uiText = useTranslations();
-
-    if (isOwnProfile || !currentUserId) return null;
-    if (currentFriendStatus === "none" || currentFriendStatus === "rejected") return (
-      <button onClick={sendFriendRequest} disabled={friendLoading}
-        className="flex items-center gap-1.5 px-3 py-1.5 bg-gold/10 border border-gold/20 text-gold text-xs font-medium rounded-full hover:bg-gold/20 transition-colors disabled:opacity-50">{uiText.rich("Ui.text_7ace85e5f8b307", { value1: () => (friendLoading ? <Loader2 size={12} className="animate-spin" /> : <UserPlus size={12} />) })}</button>
-    );
-    if (currentFriendStatus === "pending_sent") return (
-      <span className="flex items-center gap-1.5 px-3 py-1.5 bg-bg-secondary border border-border text-text-muted text-xs rounded-full">{uiText.rich("Ui.text_6ef3d8e9ec1014", { part1: () => (<Clock size={12} />) })}</span>
-    );
-    if (currentFriendStatus === "pending_received") return (
-      <div className="flex items-center gap-2">
-        <button onClick={() => respondToRequest("accepted")} disabled={friendLoading}
-          className="flex items-center gap-1 px-3 py-1.5 bg-success/10 border border-success/20 text-success text-xs font-medium rounded-full hover:bg-success/20 transition-colors disabled:opacity-50">{uiText.rich("Ui.text_f595baa92ebad7", { value1: () => (friendLoading ? <Loader2 size={12} className="animate-spin" /> : <Check size={12} />) })}</button>
-        <button onClick={() => respondToRequest("rejected")} disabled={friendLoading}
-          className="flex items-center gap-1 px-3 py-1.5 bg-bg-secondary border border-border text-text-muted text-xs rounded-full hover:border-red-400 hover:text-red-400 transition-colors disabled:opacity-50">{uiText.rich("Ui.text_2424239b7d6d6c", { part1: () => (<X size={12} />) })}</button>
-      </div>
-    );
-    if (currentFriendStatus === "accepted") return (
-      <button onClick={removeFriend} disabled={friendLoading}
-        className="flex items-center gap-1.5 px-3 py-1.5 bg-success/10 border border-success/20 text-success text-xs font-medium rounded-full hover:bg-red-500/10 hover:border-red-400/20 hover:text-red-400 transition-colors disabled:opacity-50">{uiText.rich("Ui.text_1185eeb2a56108", { value1: () => (friendLoading ? <Loader2 size={12} className="animate-spin" /> : <UserCheck size={12} />) })}</button>
-    );
-    return null;
-  };
 
   return (
     <div className="pt-16 min-h-screen bg-bg-primary">
@@ -346,8 +302,8 @@ export default function CreatorDetail({
               )}
               {creator.last_seen_at && (
                 <span className="flex items-center gap-1.5">
-                  <span className={`w-2 h-2 rounded-full ${Date.now() - new Date(creator.last_seen_at).getTime() < 5 * 60000 ? "bg-success" : "bg-text-muted"}`} />
-                  {formatLastSeen(uiText, creator.last_seen_at)}
+                  <span className={`w-2 h-2 rounded-full ${viewTime - new Date(creator.last_seen_at).getTime() < 5 * 60000 ? "bg-success" : "bg-text-muted"}`} />
+                  {formatLastSeen(uiText, creator.last_seen_at, viewTime)}
                 </span>
               )}
             </div>
@@ -358,8 +314,7 @@ export default function CreatorDetail({
         <div className="flex flex-wrap items-center gap-2 mb-8 pb-6 border-b border-border">
 
           {/* Friend button */}
-          <FriendButton />
-          {friendError && <p className="text-xs text-red-400">{friendError}</p>}
+          {!isOwnProfile && creator.ownerId && <ConnectButton targetUserId={creator.ownerId} />}
 
           {/* Social links */}
           {socialLinks.map(({ url, icon: Icon, label, color }) => (

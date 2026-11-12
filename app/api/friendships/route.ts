@@ -1,141 +1,67 @@
-import { localizedNotification } from "@/lib/i18n/notification-copy";
-import { db } from "@/lib/db";
 import { requireAuth } from "@/lib/auth";
-import { clerkClient } from "@clerk/nextjs/server";
+import { db } from "@/lib/db";
+import { rateLimit } from "@/lib/rateLimit";
+import { anyBlockExists } from "@/lib/trust";
+import { blockedMediaOwnerIds, visibleLinkedProfileIds } from "@/lib/linked-profile-access";
+import { canonicalContactConnections, contactUserId, publicContactConnection, type ContactConnection } from "@/lib/contact-connections";
+import { contactJson, mutateContact } from "@/lib/contact-mutations";
 import { NextRequest, NextResponse } from "next/server";
-import { sendFriendRequestEmail } from "@/lib/email";
-import { getTranslations as getResponseTranslations } from "next-intl/server";
+import { getTranslations } from "next-intl/server";
 
-// GET /api/friendships?userId=xxx  → friendship status with that user
-// GET /api/friendships             → all friendships (enriched with profiles)
 export async function GET(req: NextRequest) {
-  const tResponse = await getResponseTranslations();
-  const authResult = await requireAuth();
-  if (authResult instanceof NextResponse) return authResult;
-  const { userId } = authResult;
-
-  const { searchParams } = new URL(req.url);
-  const targetId = searchParams.get("userId");
-
-  if (targetId && !/^[a-zA-Z0-9_-]{1,128}$/.test(targetId)) {
-    return NextResponse.json({ error: tResponse('System.m_8c08f6c37908') }, { status: 400 });
+  const member = await requireAuth();
+  if (member instanceof NextResponse) return member;
+  const t = await getTranslations("Contacts");
+  const actor = member.userId;
+  const target = req.nextUrl.searchParams.get("userId");
+  if (target && !contactUserId.test(target)) return contactJson({ error: t("invalid") }, 400);
+  if (target) {
+    if (await anyBlockExists(actor, target)) return contactJson({ error: t("unavailable") }, 403);
+    const { data, error } = await db.from("friendships").select("id,sender_id,receiver_id,status,created_at")
+      .or(`and(sender_id.eq.${actor},receiver_id.eq.${target}),and(sender_id.eq.${target},receiver_id.eq.${actor})`);
+    if (error) return contactJson({ error: t("error") }, 503);
+    const connection = canonicalContactConnections((data ?? []) as ContactConnection[], actor)[0];
+    return contactJson({ friendship: connection ? publicContactConnection(connection) : null });
   }
-
-  if (targetId) {
-    const { data } = await db
-      .from("friendships")
-      .select("id, sender_id, receiver_id, status")
-      .or(
-        `and(sender_id.eq.${userId},receiver_id.eq.${targetId}),and(sender_id.eq.${targetId},receiver_id.eq.${userId})`
-      )
-      .maybeSingle();
-    return NextResponse.json({ friendship: data ?? null });
-  }
-
-  // All friendships
-  const { data: friendships, error } = await db
-    .from("friendships")
-    .select("id, sender_id, receiver_id, status, created_at, sender_collab_label, sender_collab_public, receiver_collab_label, receiver_collab_public")
-    .or(`sender_id.eq.${userId},receiver_id.eq.${userId}`)
-    .order("created_at", { ascending: false });
-
-  if (error) return NextResponse.json({ error: tResponse('System.requestFailed') }, { status: 500 });
-
-  const list = friendships ?? [];
-
-  // Enrich with profile data
-  const otherIds = list.map((f) => (f.sender_id === userId ? f.receiver_id : f.sender_id));
-  const profileMap: Record<string, { display_name?: string; avatar_url?: string; role?: string; positions?: string[] }> = {};
-
-  if (otherIds.length > 0) {
-    const { data: profiles } = await db
-      .from("profiles")
-      .select("user_id, display_name, avatar_url, role, positions")
-      .in("user_id", otherIds);
-    (profiles ?? []).forEach((p) => { profileMap[p.user_id] = p; });
-  }
-
-  const enrich = (f: { id: string; sender_id: string; receiver_id: string; status: string; created_at: string; sender_collab_label?: string | null; sender_collab_public?: boolean | null; receiver_collab_label?: string | null; receiver_collab_public?: boolean | null }) => {
-    const isSender = f.sender_id === userId;
-    const otherId = isSender ? f.receiver_id : f.sender_id;
-    const p = profileMap[otherId] ?? {};
+  const { data, error } = await db.from("friendships")
+    .select("id,sender_id,receiver_id,status,created_at,sender_collab_label,sender_collab_public,receiver_collab_label,receiver_collab_public")
+    .or(`sender_id.eq.${actor},receiver_id.eq.${actor}`).order("created_at", { ascending: false });
+  if (error) return contactJson({ error: t("error") }, 503);
+  let blocked: Set<string>;
+  try { blocked = new Set(await blockedMediaOwnerIds(actor)); }
+  catch { return contactJson({ error: t("error") }, 503); }
+  const otherId = (row: ContactConnection) => row.sender_id === actor ? row.receiver_id : row.sender_id;
+  const list = canonicalContactConnections((data ?? []) as ContactConnection[], actor).filter(row => !blocked.has(otherId(row)));
+  const ids = list.map(otherId);
+  const visible = await visibleLinkedProfileIds(ids, actor);
+  const { data: profiles, error: profileError } = visible.size
+    ? await db.from("profiles").select("user_id,display_name,avatar_url,role,positions").in("user_id", [...visible])
+    : { data: [], error: null };
+  if (profileError) return contactJson({ error: t("error") }, 503);
+  const profileMap = new Map((profiles ?? []).map(profile => [profile.user_id, profile]));
+  const enrich = (row: ContactConnection) => {
+    const id = otherId(row), profile = profileMap.get(id), sender = row.sender_id === actor;
     return {
-      friendship_id: f.id,
-      user_id: otherId,
-      display_name: p.display_name ?? "Unbekannt",
-      avatar_url: p.avatar_url ?? null,
-      role: p.role ?? p.positions?.[0] ?? "CineGenius Mitglied",
-      created_at: f.created_at,
-      collab_label: (isSender ? f.sender_collab_label : f.receiver_collab_label) ?? null,
-      collab_public: (isSender ? f.sender_collab_public : f.receiver_collab_public) ?? false,
+      friendship_id: row.id, user_id: id, display_name: profile?.display_name || t("member"), avatar_url: profile?.avatar_url ?? null,
+      role: profile?.role || profile?.positions?.[0] || t("member"), created_at: row.created_at,
+      collab_label: (sender ? row.sender_collab_label : row.receiver_collab_label) ?? null,
+      collab_public: (sender ? row.sender_collab_public : row.receiver_collab_public) ?? false,
     };
   };
-
-  return NextResponse.json({
-    friends:  list.filter((f) => f.status === "accepted").map(enrich),
-    incoming: list.filter((f) => f.status === "pending" && f.receiver_id === userId).map(enrich),
-    outgoing: list.filter((f) => f.status === "pending" && f.sender_id  === userId).map(enrich),
-  }, { headers: { "Cache-Control": "private, no-store" } });
+  return contactJson({
+    friends: list.filter(row => row.status === "accepted").map(enrich),
+    incoming: list.filter(row => row.status === "pending" && row.receiver_id === actor).map(enrich),
+    outgoing: list.filter(row => row.status === "pending" && row.sender_id === actor).map(enrich),
+  });
 }
 
-// POST /api/friendships  → send friend request
 export async function POST(req: NextRequest) {
-  const tResponse = await getResponseTranslations();
-  const authResult = await requireAuth();
-  if (authResult instanceof NextResponse) return authResult;
-  const { userId } = authResult;
-
-  const { receiver_id } = await req.json();
-  if (!receiver_id) return NextResponse.json({ error: tResponse('System.m_c7b1c41cee48') }, { status: 400 });
-  if (!/^[a-zA-Z0-9_-]{1,128}$/.test(receiver_id)) return NextResponse.json({ error: tResponse('System.m_673b6b200d92') }, { status: 400 });
-  if (receiver_id === userId) return NextResponse.json({ error: tResponse('System.m_de56307e4c66') }, { status: 400 });
-
-  // Check for existing record
-  const { data: existing } = await db
-    .from("friendships")
-    .select("id, status")
-    .or(
-      `and(sender_id.eq.${userId},receiver_id.eq.${receiver_id}),and(sender_id.eq.${receiver_id},receiver_id.eq.${userId})`
-    )
-    .maybeSingle();
-
-  if (existing) {
-    if (existing.status === "accepted") return NextResponse.json({ error: tResponse('System.m_39eabeb606d8') }, { status: 409 });
-    if (existing.status === "pending")  return NextResponse.json({ error: tResponse('System.m_d3d12a4e01f5') }, { status: 409 });
-    // rejected → delete and re-send
-    await db.from("friendships").delete().eq("id", existing.id);
-  }
-
-  const { data, error } = await db
-    .from("friendships")
-    .insert({ sender_id: userId, receiver_id, status: "pending" })
-    .select()
-    .single();
-
-  if (error) return NextResponse.json({ error: tResponse('System.requestFailed') }, { status: 500 });
-
-  // Notify the receiver (in-app + email) — fire-and-forget
-  const { data: senderProfile } = await db
-    .from("profiles")
-    .select("display_name")
-    .eq("user_id", userId)
-    .maybeSingle();
-  const senderName = senderProfile?.display_name ?? "Jemand";
-
-  await db.from("notifications").insert({
-    user_id: receiver_id,
-    type: "friend_request",
-    ...localizedNotification({ title: { key: "n_cbf93b99dd39" }, body: { key: "n_aa80d88f1a90", values: { value0: String(senderName) } } }),
-
-    href: "/messages",
-  });
-
-  try {
-    const clerk = await clerkClient();
-    const receiverUser = await clerk.users.getUser(receiver_id);
-    const receiverEmail = receiverUser.emailAddresses[0]?.emailAddress;
-    if (receiverEmail) await sendFriendRequestEmail(receiverEmail, senderName);
-  } catch { /* email is best-effort */ }
-
-  return NextResponse.json({ friendship: data });
+  const member = await requireAuth();
+  if (member instanceof NextResponse) return member;
+  const t = await getTranslations("Contacts");
+  if (!(await rateLimit(`contact-request:${member.userId}`, 20, 60)).allowed) return contactJson({ error: t("rateLimited") }, 429);
+  const body = await req.json().catch(() => null);
+  if (body?.accountId !== undefined && body.accountId !== member.userId) return contactJson({ error: t("changed") }, 409);
+  if (typeof body?.receiver_id !== "string" || !contactUserId.test(body.receiver_id) || body.receiver_id === member.userId) return contactJson({ error: t("invalid") }, 400);
+  return mutateContact(member.userId, "request", { target: body.receiver_id });
 }

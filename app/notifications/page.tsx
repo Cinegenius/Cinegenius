@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useEffect, useLayoutEffect, useCallback, useRef } from "react";
 import Link from "next/link";
 import { useAuth } from "@clerk/nextjs";
 import {
@@ -9,6 +9,7 @@ import {
   ArrowLeft, Inbox, ExternalLink, Circle, Check, X, Loader2,
 } from "lucide-react";
 import { timeAgo, notificationMeta, type NotificationType } from "@/lib/notifications";
+import { uiErrorMessage } from "@/lib/ui-error-message";
 import { useTranslations , useLocale } from "next-intl";
 
 
@@ -124,7 +125,7 @@ function NotifRow({
         </div>
 
         {/* Actions */}
-        <div className="flex items-center gap-3 mt-2.5">
+        <div className="flex flex-wrap items-center gap-3 mt-2.5">
           {notif.type === "friend_request" && friendRequest && onAccept && onReject ? (
             isProcessing ? (
               <Loader2 size={14} className="animate-spin text-text-muted" />
@@ -132,12 +133,12 @@ function NotifRow({
               <>
                 <button
                   onClick={() => { onAccept(friendRequest.friendship_id); if (!notif.read) onRead(notif.id); }}
-                  className="flex items-center gap-1 px-3 py-1 bg-success/10 border border-success/20 text-success text-xs font-medium rounded-lg hover:bg-success/20 transition-colors"
-                >{uiText.rich("Ui.text_048edf533fa6f4", { part1: () => (<Check size={11} />) })}</button>
+                  className="flex min-h-11 items-center gap-1 px-3 py-2 bg-success/10 border border-success/20 text-success text-xs font-medium rounded-lg hover:bg-success/20 transition-colors"
+                ><Check size={14} aria-hidden="true" />{uiText("Contacts.accept")}</button>
                 <button
                   onClick={() => { onReject(friendRequest.friendship_id); if (!notif.read) onRead(notif.id); }}
-                  className="flex items-center gap-1 px-3 py-1 border border-border text-text-muted text-xs rounded-lg hover:border-red-400 hover:text-red-400 transition-colors"
-                >{uiText.rich("Ui.text_2424239b7d6d6c", { part1: () => (<X size={11} />) })}</button>
+                  className="flex min-h-11 items-center gap-1 px-3 py-2 border border-border text-text-muted text-xs rounded-lg hover:border-red-400 hover:text-red-400 transition-colors"
+                ><X size={14} aria-hidden="true" />{uiText("Contacts.reject")}</button>
               </>
             )
           ) : (
@@ -175,8 +176,11 @@ export default function NotificationsPage() {
   const locale = useLocale();
   const { isSignedIn, isLoaded, userId, sessionId } = useAuth();
   const requestScope = JSON.stringify([userId, sessionId, locale]);
+  const contactScope = JSON.stringify([userId, sessionId]);
   const currentScope = useRef(requestScope);
-  currentScope.current = requestScope;
+  useLayoutEffect(() => { currentScope.current = requestScope; return () => { currentScope.current = ""; }; }, [requestScope]);
+  const currentContactScope = useRef(contactScope);
+  useLayoutEffect(() => { currentContactScope.current = contactScope; return () => { currentContactScope.current = ""; }; }, [contactScope]);
   const requestGeneration = useRef(0);
   const activeRequest = useRef<AbortController | null>(null);
   const [storedNotifications, setNotifications] = useState<Notification[]>([]);
@@ -186,7 +190,13 @@ export default function NotificationsPage() {
   const loading = notificationsScope !== requestScope || loadingState;
   const [activeFilter, setActiveFilter] = useState<FilterId>("all");
   const [markingAll, setMarkingAll] = useState(false);
-  const [friendRequests, setFriendRequests] = useState<FriendRequest[]>([]);
+  const [storedFriendRequests, setFriendRequests] = useState<FriendRequest[]>([]);
+  const [friendScope, setFriendScope] = useState("");
+  const friendRequests = friendScope === contactScope ? storedFriendRequests : [];
+  const [friendFailure, setFriendFailure] = useState<{ scope: string; text: string; load?: boolean; locale?: string }>({ scope: "", text: "" });
+  const [friendAttempt, setFriendAttempt] = useState(0);
+  const friendOperations = useRef(new Set<string>());
+  const notificationRefresh = useRef<(() => Promise<void>) | null>(null);
   const [processingIds, setProcessingIds] = useState<Set<string>>(new Set());
 
   const fetchNotifications = useCallback(async () => {
@@ -236,10 +246,13 @@ export default function NotificationsPage() {
       }
     }
   }, [requestScope, uiText]);
+  useLayoutEffect(() => { notificationRefresh.current = fetchNotifications; }, [fetchNotifications]);
 
   useEffect(() => {
-    void fetchNotifications();
+    let active = true;
+    queueMicrotask(() => { if (active) void fetchNotifications(); });
     return () => {
+      active = false;
       requestGeneration.current += 1;
       activeRequest.current?.abort();
       activeRequest.current = null;
@@ -247,23 +260,43 @@ export default function NotificationsPage() {
   }, [fetchNotifications]);
 
   useEffect(() => {
-    fetch("/api/friendships")
-      .then(r => r.json())
-      .then(({ incoming }) => setFriendRequests(incoming ?? []))
-      .catch(() => {});
-  }, []);
+    if (!isLoaded || !userId) return;
+    const controller = new AbortController();
+    void fetch("/api/friendships", { cache: "no-store", signal: AbortSignal.any([controller.signal, AbortSignal.timeout(15_000)]) })
+      .then(async response => {
+        const data = await response.json();
+        if (!response.ok || !Array.isArray(data.incoming)) throw new Error("contacts_unavailable");
+        if (!controller.signal.aborted && currentContactScope.current === contactScope) {
+          setFriendRequests(data.incoming); setFriendScope(contactScope); setFriendFailure({ scope: contactScope, text: "" });
+        }
+      }).catch(() => {
+        if (!controller.signal.aborted && currentContactScope.current === contactScope) setFriendFailure({ scope: contactScope, text: "", load: true });
+      });
+    return () => controller.abort();
+  }, [isLoaded, userId, contactScope, friendAttempt]);
 
   const handleFriendRequest = async (friendshipId: string, action: "accepted" | "rejected") => {
+    const key = `${contactScope}:${friendshipId}`;
+    if (!userId || friendOperations.current.has(key)) return;
+    friendOperations.current.add(key);
     setProcessingIds(prev => new Set(prev).add(friendshipId));
+    setFriendFailure({ scope: contactScope, text: "" });
     try {
       const res = await fetch(`/api/friendships/${friendshipId}`, {
-        method: "PATCH",
+        method: "PATCH", cache: "no-store", signal: AbortSignal.timeout(20_000),
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ status: action }),
+        body: JSON.stringify({ status: action, accountId: userId }),
       });
-      if (res.ok) setFriendRequests(prev => prev.filter(r => r.friendship_id !== friendshipId));
+      const data = await res.json().catch(() => ({}));
+      if (currentContactScope.current !== contactScope) return;
+      if (!res.ok || data.success !== true) throw new Error(data.error || uiText("Contacts.error"));
+      setFriendRequests(prev => prev.filter(r => r.friendship_id !== friendshipId));
+      void notificationRefresh.current?.();
+    } catch (cause) {
+      if (currentContactScope.current === contactScope) setFriendFailure({ scope: contactScope, text: uiErrorMessage(cause, uiText("Contacts.error")), locale });
     } finally {
-      setProcessingIds(prev => { const s = new Set(prev); s.delete(friendshipId); return s; });
+      friendOperations.current.delete(key);
+      if (currentContactScope.current === contactScope) setProcessingIds(prev => { const next = new Set(prev); next.delete(friendshipId); return next; });
     }
   };
 
@@ -363,6 +396,9 @@ export default function NotificationsPage() {
           })}
         </div>
 
+        {friendFailure.scope === contactScope && (friendFailure.load || friendFailure.text) && <div role="alert" className="mb-4 rounded-xl border border-red-400/30 p-3 text-sm text-red-400">
+          <p>{friendFailure.load ? uiText("Contacts.loadError") : friendFailure.locale === locale ? friendFailure.text : uiText("Contacts.error")}</p><button type="button" onClick={() => setFriendAttempt(value => value + 1)} className="inline-flex min-h-11 items-center text-gold underline">{uiText("Contacts.retry")}</button>
+        </div>}
         {/* ── List ── */}
         <div className="bg-bg-secondary border border-border rounded-2xl overflow-hidden">
           {loading ? (

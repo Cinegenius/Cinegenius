@@ -1,6 +1,6 @@
 "use client";
 
-import { confirmDialog, dismissNativeDialog } from "@/lib/native-dialog";
+import { dismissNativeDialog } from "@/lib/native-dialog";
 
 import UnoptimizedImage from "@/components/UnoptimizedImage";
 
@@ -8,8 +8,14 @@ import { useEffect, useRef, useState, useCallback } from "react";
 import { useSearchParams } from "next/navigation";
 import { useUser } from "@clerk/nextjs";
 import Link from "next/link";
-import { Send, ArrowLeft, MessageSquare, Loader2, User, UserPlus, Check, X, Users, Pencil, UserMinus, Plus, Trash2 } from "lucide-react";
+import { ArrowLeft, MessageSquare, Loader2, User, Check, Users, Search, SquarePen } from "lucide-react";
 import { Suspense } from "react";
+import MessageComposer from "@/components/messaging/MessageComposer";
+import NewMessageDialog from "@/components/messaging/NewMessageDialog";
+import MessagingDialog from "@/components/messaging/MessagingDialog";
+import GroupInfoDialog from "@/components/messaging/GroupInfoDialog";
+import {useFormNavigation} from "@/contexts/FormDraftContext";
+import type {MessageDestination, ChatMessage} from "@/lib/messaging-ui";
 import { useTranslations , useLocale } from "next-intl";
 import { applyReadReceiptTimestamps, incomingUnreadMessageIds } from "@/lib/message-read-state";
 import { notifyMessagesRead, subscribeToMessageReads } from "@/lib/message-read-sync";
@@ -19,7 +25,7 @@ import {
   ACTIVE_CONVERSATION_FALLBACK_REFRESH_MS,
   CONVERSATION_LIST_FALLBACK_REFRESH_MS,
 } from "@/lib/message-refresh-policy";
-import { findContactConversation, mergeVisibleMessagePage } from "@/lib/message-actions";
+import { mergeVisibleMessagePage } from "@/lib/message-actions";
 import { backFromMessageView, navigateMessageView } from "@/lib/message-navigation";
 import { uiErrorMessage } from "@/lib/ui-error-message";
 
@@ -53,8 +59,6 @@ type Conversation = {
   members?: Array<{ user_id: string; display_name: string; avatar_url: string | null; role: "admin" | "member"; joined_at: string }>;
 };
 
-type SearchableUser = { id: string; name: string; avatar: string | null; role: string | null; location: string | null };
-
 type FriendRequest = {
   friendship_id: string;
   user_id: string;
@@ -76,6 +80,9 @@ function formatTime(locale: string, iso: string) {
 function MessagesContent() {
   useEffect(() => () => dismissNativeDialog(), []);
   const uiText = useTranslations();
+  const t = useTranslations("Messaging");
+  const contactText = useTranslations("Contacts");
+  const {leave} = useFormNavigation();
   const uiLocale = useLocale();
 
   const navigationText = useTranslations("navigationStability");
@@ -105,10 +112,7 @@ function MessagesContent() {
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [activeId, setActiveId] = useState<string | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
-  const [text, setText] = useState("");
   const [newMessagesAvailable, setNewMessagesAvailable] = useState(false);
-  const drafts = useRef(new Map<string, string>());
-  const [sending, setSending] = useState(false);
   const [loading, setLoading] = useState(true);
   const [conversationLoadFailed, setConversationLoadFailed] = useState(false);
   const [loadingMessages, setLoadingMessages] = useState(false);
@@ -117,13 +121,12 @@ function MessagesContent() {
   const [recipientName, setRecipientName] = useState("");
   const [loadingRecipient, setLoadingRecipient] = useState(!!toParam);
   const [sendError, setSendError] = useState("");
-  const [groupModalMode, setGroupModalMode] = useState<"create" | "manage" | null>(null);
-  const [groupName, setGroupName] = useState("");
-  const [groupSearch, setGroupSearch] = useState("");
-  const [groupSearchResults, setGroupSearchResults] = useState<SearchableUser[]>([]);
-  const [selectedGroupUsers, setSelectedGroupUsers] = useState<SearchableUser[]>([]);
-  const [groupSaving, setGroupSaving] = useState(false);
-  const [groupError, setGroupError] = useState("");
+  const [newMessageOpen, setNewMessageOpen] = useState(false);
+  const [groupInfoOpen, setGroupInfoOpen] = useState(false);
+  const [search, setSearch] = useState("");
+  const [requestsOpen, setRequestsOpen] = useState(searchParams.get("requests") === "1");
+  const [requestError, setRequestError] = useState("");
+  const [selectedMessage, setSelectedMessage] = useState<Message | null>(null);
   const [olderLoading, setOlderLoading] = useState(false);
   const [hasOlderMessages, setHasOlderMessages] = useState(false);
   const [keyboardInset, setKeyboardInset] = useState(0);
@@ -138,17 +141,12 @@ function MessagesContent() {
 
   // Friend requests
   const [friendRequests, setFriendRequests] = useState<FriendRequest[]>([]);
-  const [dismissedIds, setDismissedIds] = useState<Set<string>>(new Set());
   const [processingIds, setProcessingIds] = useState<Set<string>>(new Set());
   const [contacts, setContacts] = useState<FriendRequest[]>([]);
   const [contactsLoading, setContactsLoading] = useState(true);
-  const [contactsError, setContactsError] = useState("");
-  const [contactSearch, setContactSearch] = useState("");
-  const [sidebarView, setSidebarView] = useState<"chats" | "contacts">("chats");
-  const [openingContact, setOpeningContact] = useState<string | null>(null);
+  const [contactsError, setContactsError] = useState(false);
   const [deletingMessage, setDeletingMessage] = useState<string | null>(null);
   const [messageNotice, setMessageNotice] = useState("");
-  const contactOpeningRef = useRef(false);
   const deletePendingRef = useRef(false);
   const hiddenMessageIds = useRef(new Set<string>());
   const messageRequestSequence = useRef(0);
@@ -158,12 +156,6 @@ function MessagesContent() {
 
   // Mobile: true = zeige Chat, false = zeige Liste
   const showChat = !!(activeId || newConvRecipient);
-
-  useEffect(() => {
-    setText(drafts.current.get(activeId ?? newConvRecipient ?? "") ?? "");
-    setNewMessagesAvailable(false);
-    atBottomRef.current = true;
-  }, [activeId, newConvRecipient]);
 
   // Keep the conversation fitted to the visible iOS viewport when the keyboard opens.
   useEffect(() => {
@@ -203,7 +195,7 @@ function MessagesContent() {
     const sequence = ++conversationRequestSequence.current;
     try {
       const res = await fetch("/api/conversations", { cache: "no-store" });
-      if (!res.ok) throw new Error(uiText("Ui.text_e2c73a8fd23757"));
+      if (!res.ok) throw new Error();
       const { data } = await res.json();
       if (currentUserRef.current !== owner || sequence !== conversationRequestSequence.current) return;
       if (!Array.isArray(data)) throw new Error();
@@ -231,27 +223,29 @@ function MessagesContent() {
   const loadFriendRequests = useCallback(async () => {
     const owner = currentUserRef.current;
     if (!owner) return;
-    setContactsLoading(true); setContactsError("");
+    setContactsLoading(true); setContactsError(false);
     try {
-      const res = await fetch("/api/friendships", { cache: "no-store" });
-      if (!res.ok) throw new Error(uiText("Ui.text_218b9b6423a6fb"));
+      const res = await fetch("/api/friendships", { cache: "no-store", headers:{"X-Contact-Account":owner} });
+      if (!res.ok) throw new Error();
       const { incoming, friends } = await res.json();
       if (currentUserRef.current !== owner) return;
       if (Array.isArray(incoming)) setFriendRequests(incoming);
-      setContacts(Array.isArray(friends) ? [...new Map((friends as FriendRequest[]).filter(f => f.user_id !== owner).map(f => [f.user_id, f])).values()].sort((a,b) => a.display_name.localeCompare(b.display_name,uiLocale)) : []);
-    } catch { if (currentUserRef.current === owner) setContactsError(uiText("Ui.text_4139ecbefbacc6")); }
+      setContacts(Array.isArray(friends) ? [...new Map((friends as FriendRequest[]).filter(f => f.user_id !== owner).map(f => [f.user_id, f])).values()] : []);
+    } catch { if (currentUserRef.current === owner) setContactsError(true); }
     finally { if (currentUserRef.current === owner) setContactsLoading(false); }
   }, []);
 
   useEffect(() => {
+    // Clear private data immediately when the external authentication account changes.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setConversations([]); setContacts([]); setFriendRequests([]); setMessages([]);
     setActiveId(null); activeIdRef.current = null; messagesRef.current = [];
     setNewConvRecipient(null); setRecipientName(""); setLoadingRecipient(false);
-    hiddenMessageIds.current.clear(); drafts.current.clear(); setMessageNotice(""); setText(""); setNewMessagesAvailable(false);
+    hiddenMessageIds.current.clear(); setMessageNotice(""); setNewMessagesAvailable(false);
     messageRequestSequence.current += 1;
-    setSendError(""); setContactSearch(""); setGroupModalMode(null);
+    setSendError(""); setSearch(""); setGroupInfoOpen(false); setNewMessageOpen(false); setSelectedMessage(null);
     setConversationLoadFailed(false); setMessageLoadFailure(null); setLoadingMessages(false); setOlderLoading(false);
-    setDismissedIds(new Set());
+    setRequestError("");
     setLoading(true); setContactsLoading(true);
     if (!user?.id) return;
     loadConversations();
@@ -271,7 +265,7 @@ function MessagesContent() {
     setHasOlderMessages(false); setNewMessagesAvailable(false);
     setMessageLoadFailure(null); setLoadingMessages(Boolean(id)); setOlderLoading(false);
     setRecipientName(""); setLoadingRecipient(Boolean(recipient));
-    setSendError(""); setMessageNotice(""); setGroupModalMode(null);
+    setSendError(""); setMessageNotice(""); setGroupInfoOpen(false); setSelectedMessage(null);
     atBottomRef.current = true;
   }, [convParam, toParam, user?.id]);
 
@@ -282,39 +276,14 @@ function MessagesContent() {
       .then(r => r.json())
       .then(({ profile }) => {
         if (controller.signal.aborted) return;
-        setRecipientName(profile?.display_name ?? companyLabel ?? "Unbekannt");
+        setRecipientName(profile?.display_name ?? companyLabel ?? t("unknown"));
         setLoadingRecipient(false);
       })
       .catch(() => { if (!controller.signal.aborted) setLoadingRecipient(false); });
     return () => controller.abort();
-  }, [toParam, user?.id, companyLabel]);
+  }, [toParam, user?.id, companyLabel, t]);
 
-  useEffect(() => {
-    if (!toParam || convParam || loading || !user?.id) return;
-    const existing = findContactConversation(conversations, user?.id ?? "", toParam);
-    if (existing) {
-      const draft = drafts.current.get(toParam);
-      if (draft && !drafts.current.has(existing.id)) drafts.current.set(existing.id, draft);
-      navigateMessageView(window, user.id, { conversationId: existing.id, recipientId: requestedCompanySlug ? toParam : null, companySlug: requestedCompanySlug }, true);
-    }
-
-  }, [toParam, convParam, requestedCompanySlug, loading, conversations, user?.id]);
-
-  useEffect(() => {
-    const query = groupSearch.trim();
-    if (query.length < 2) {
-      setGroupSearchResults([]);
-      return;
-    }
-    const controller = new AbortController();
-    const timer = window.setTimeout(() => {
-      fetch(`/api/conversations/users?q=${encodeURIComponent(query)}`, { signal: controller.signal, cache: "no-store" })
-        .then(async (response) => response.ok ? response.json() : { users: [] })
-        .then((payload) => setGroupSearchResults(Array.isArray(payload.users) ? payload.users : []))
-        .catch(() => {});
-    }, 250);
-    return () => { window.clearTimeout(timer); controller.abort(); };
-  }, [groupSearch]);
+  useEffect(() => { if (searchParams.get("requests") === "1") queueMicrotask(() => setRequestsOpen(true)); }, [searchParams]);
 
   const loadMessages = useCallback(async (
     convId: string,
@@ -414,33 +383,33 @@ function MessagesContent() {
   }, [loadConversations, loadFriendRequests]);
 
   function openConversation(conv: Conversation) {
-    if (user?.id) navigateMessageView(window, user.id, { conversationId: conv.id });
+    if (user?.id) leave(() => navigateMessageView(window, user.id, {conversationId:conv.id}));
   }
-
-  async function openContact(contact: FriendRequest) {
-    if (!user?.id || contactOpeningRef.current) return;
-    contactOpeningRef.current = true; setOpeningContact(contact.user_id); setContactsError("");
-    const owner = user.id;
-    const sourceHref = window.location.href;
-    try {
-      const existing = findContactConversation(conversations, owner, contact.user_id);
-      let id = existing?.id;
-      if (!id) {
-        const response = await fetch(`/api/conversations?with_user=${encodeURIComponent(contact.user_id)}`, { cache: "no-store" });
-        const payload = await response.json();
-        if (!response.ok) throw new Error(payload.error ?? uiText("Ui.text_3672a7823ba50f"));
-        id = payload.conversationId;
-      }
-      if (currentUserRef.current !== owner || window.location.href !== sourceHref) return;
-      navigateMessageView(window, owner, id ? { conversationId: id } : { recipientId: contact.user_id });
-    } catch (error) { if (currentUserRef.current === owner) setContactsError(uiErrorMessage(error, uiText("Ui.text_3672a7823ba50f"))); }
-    finally { contactOpeningRef.current = false; setOpeningContact(null); }
+  function openDestination(destination: MessageDestination, commit: () => void) {
+    const account = user?.id;
+    if (!account) return;
+    // Close the native modal before a private-draft navigation guard can appear.
+    setNewMessageOpen(false);
+    window.setTimeout(() => leave(() => {
+      if (currentUserRef.current !== account) return;
+      commit(); navigateMessageView(window, account, destination);
+    }), 0);
+  }
+  function messageSent(message: ChatMessage, conversationId: string) {
+    if (!user?.id || currentUserRef.current !== user.id) return;
+    if (newConvRecipient) {
+      navigateMessageView(window, user.id, {conversationId, recipientId:requestedCompanySlug ? newConvRecipient : null, companySlug:requestedCompanySlug}, true);
+    } else if (activeIdRef.current === conversationId) {
+      messageRequestSequence.current += 1;
+      setMessages(current => mergeMessagesById(current, [message])); atBottomRef.current = true;
+      window.setTimeout(() => { if (activeIdRef.current === conversationId) {const viewport=messagesViewportRef.current; viewport?.scrollTo({top:viewport.scrollHeight,behavior:"smooth"});} }, 30);
+    }
+    void loadConversations();
   }
 
   async function hideOwnMessage(message: Message) {
     if (!activeId || message.sender_id !== user?.id || deletePendingRef.current) return;
     deletePendingRef.current = true;
-    if (!await confirmDialog({ message: uiText("Ui.text_738427dd78faa1"), confirmLabel: uiText("OfferModeration.hide"), cancelLabel: uiText("home.boardCancel") })) { deletePendingRef.current = false; return; }
     const conversationId = activeId;
     const owner = user.id;
     setDeletingMessage(message.id); setSendError(""); setMessageNotice("");
@@ -449,7 +418,7 @@ function MessagesContent() {
       const result = await response.json();
       if (!response.ok || result.hiddenMessageId !== message.id) throw new Error(result.error ?? uiText("Ui.text_ce810a95feef7e"));
       if (currentUserRef.current !== owner) return;
-      hiddenMessageIds.current.add(message.id);
+      hiddenMessageIds.current.add(message.id); setSelectedMessage(null);
       messageRequestSequence.current += 1;
       setMessages(current => current.filter(m => m.id !== message.id));
       setConversations(current => current.map(c => c.id !== conversationId ? c : { ...c, messages: c.messages.filter(m => m.id !== message.id) }));
@@ -460,128 +429,7 @@ function MessagesContent() {
   }
 
   function closeChat() {
-    if (user?.id) backFromMessageView(window, user.id);
-  }
-
-  function openCreateGroup() {
-    setGroupName("");
-    setGroupSearch("");
-    setSelectedGroupUsers([]);
-    setGroupError("");
-    setGroupModalMode("create");
-  }
-
-  function openGroupDetails() {
-    if (!activeConv || activeConv.kind !== "group") return;
-    setGroupName(activeConv.group_name ?? activeConv.otherName ?? "");
-    setGroupSearch("");
-    setSelectedGroupUsers([]);
-    setGroupError("");
-    setGroupModalMode("manage");
-  }
-
-  function toggleSelectedUser(person: SearchableUser) {
-    setSelectedGroupUsers((current) => current.some((selected) => selected.id === person.id)
-      ? current.filter((selected) => selected.id !== person.id)
-      : [...current, person]);
-  }
-
-  async function createGroup() {
-    if (groupSaving) return;
-    setGroupSaving(true);
-    setGroupError("");
-    try {
-      const response = await fetch("/api/conversations/groups", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name: groupName.trim(), member_ids: selectedGroupUsers.map((person) => person.id) }),
-      });
-      const payload = await response.json().catch(() => ({}));
-      if (!response.ok) throw new Error(payload.error ?? uiText("Ui.text_7c70f21f77344c"));
-      const conversationId = payload.conversationId as string;
-      setGroupModalMode(null);
-      if (currentUserRef.current === user?.id && user?.id) navigateMessageView(window, user.id, { conversationId });
-      await loadConversations();
-    } catch (error) {
-      setGroupError(uiErrorMessage(error, uiText("Ui.text_7c70f21f77344c")));
-    } finally {
-      setGroupSaving(false);
-    }
-  }
-
-  async function renameGroup() {
-    if (!activeId || groupSaving) return;
-    setGroupSaving(true);
-    setGroupError("");
-    try {
-      const response = await fetch(`/api/conversations/${activeId}/group`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name: groupName.trim() }),
-      });
-      const payload = await response.json().catch(() => ({}));
-      if (!response.ok) throw new Error(payload.error ?? uiText("Ui.text_f027823ed7d659"));
-      await loadConversations();
-    } catch (error) {
-      setGroupError(uiErrorMessage(error, uiText("Ui.text_f027823ed7d659")));
-    } finally {
-      setGroupSaving(false);
-    }
-  }
-
-  async function updateGroupMembers(action: "add" | "remove" | "leave", targetUserId?: string) {
-    if (!activeId || groupSaving) return;
-    setGroupSaving(true);
-    setGroupError("");
-    try {
-      const response = await fetch(`/api/conversations/${activeId}/members`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ action, user_id: targetUserId }),
-      });
-      const payload = await response.json().catch(() => ({}));
-      if (!response.ok) throw new Error(payload.error ?? uiText("Ui.text_09009df3439617"));
-      setSelectedGroupUsers([]);
-      setGroupSearch("");
-      if (action === "leave") {
-        setGroupModalMode(null);
-        if (user?.id) navigateMessageView(window, user.id, {}, true);
-        await loadConversations();
-      } else {
-        await loadConversations();
-        await loadMessages(activeId);
-      }
-    } catch (error) {
-      setGroupError(uiErrorMessage(error, uiText("Ui.text_09009df3439617")));
-    } finally {
-      setGroupSaving(false);
-    }
-  }
-
-  async function addSelectedMembers() {
-    if (!activeId || selectedGroupUsers.length === 0 || groupSaving) return;
-    setGroupSaving(true);
-    setGroupError("");
-    try {
-      for (const person of selectedGroupUsers) {
-        const response = await fetch(`/api/conversations/${activeId}/members`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ action: "add", user_id: person.id }),
-        });
-        const payload = await response.json().catch(() => ({}));
-        if (!response.ok) throw new Error(payload.error ?? uiText("Ui.text_b938243582c9df", { value1: String(person.name) }));
-      }
-      setSelectedGroupUsers([]);
-      setGroupSearch("");
-      await loadConversations();
-      await loadMessages(activeId);
-    } catch (error) {
-      setGroupError(uiErrorMessage(error, uiText("Ui.text_46796948309b48")));
-      await loadConversations();
-    } finally {
-      setGroupSaving(false);
-    }
+    if (user?.id) leave(() => backFromMessageView(window, user.id));
   }
 
   async function loadOlderMessages() {
@@ -605,323 +453,54 @@ function MessagesContent() {
   }
 
   async function handleFriendRequest(friendshipId: string, action: "accepted" | "rejected") {
-    setProcessingIds(prev => new Set(prev).add(friendshipId));
-    try {
-      const res = await fetch(`/api/friendships/${friendshipId}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ status: action }),
-      });
-      if (!res.ok) {
-        const { error } = await res.json().catch(() => ({ error: "Fehler" }));
-        console.error("[handleFriendRequest]", res.status, error);
-        return;
-      }
-      setFriendRequests(prev => prev.filter(r => r.friendship_id !== friendshipId));
-      await loadFriendRequests();
-    } catch (e) {
-      console.error("[handleFriendRequest] network error", e);
-    } finally {
-      setProcessingIds(prev => { const s = new Set(prev); s.delete(friendshipId); return s; });
-    }
-  }
-
-  function dismissRequest(friendshipId: string) {
-    setDismissedIds(prev => new Set(prev).add(friendshipId));
-  }
-
-  const visibleRequests = friendRequests.filter(r => !dismissedIds.has(r.friendship_id));
-
-  async function sendMessage() {
-    if (!text.trim() || sending) return;
     const owner = currentUserRef.current;
-    if (!owner) return;
-    const conversationAtSend = activeId;
-    const recipientAtSend = newConvRecipient;
-    const sourceHref = window.location.href;
-    const sentText = text;
-    setSending(true);
-    setSendError("");
-
+    if (!owner || processingIds.has(friendshipId)) return;
+    setProcessingIds(previous => new Set(previous).add(friendshipId)); setRequestError("");
     try {
-      if (newConvRecipient) {
-        const res = await fetch("/api/conversations", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ receiver_id: newConvRecipient, content: text.trim() }),
-        });
-        const { conversationId, error } = await res.json().catch(() => ({}));
-        if (!res.ok || error || typeof conversationId !== "string") throw new Error(error ?? uiText("Ui.text_0949dcf4a5790d"));
-        if (currentUserRef.current !== owner) return;
-        if (recipientAtSend && drafts.current.get(recipientAtSend) === sentText) drafts.current.delete(recipientAtSend);
-        if (activeIdRef.current !== conversationAtSend || window.location.href !== sourceHref) { await loadConversations(); return; }
-        const remainingDraft = recipientAtSend ? drafts.current.get(recipientAtSend) : null;
-        if (remainingDraft) drafts.current.set(conversationId, remainingDraft);
-        navigateMessageView(window, owner, { conversationId, recipientId: requestedCompanySlug ? recipientAtSend : null, companySlug: requestedCompanySlug }, true);
-        await loadConversations();
-      } else if (activeId) {
-        const res = await fetch(`/api/conversations/${activeId}`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ content: text.trim() }),
-        });
-        const { message, error } = await res.json().catch(() => ({}));
-        if (!res.ok || error || !message?.id) throw new Error(error ?? uiText("Ui.text_41c85b9f5d2cfc"));
-        if (currentUserRef.current !== owner) return;
-        if (conversationAtSend && drafts.current.get(conversationAtSend) === sentText) drafts.current.delete(conversationAtSend);
-        if (activeIdRef.current !== conversationAtSend) { await loadConversations(); return; }
-        messageRequestSequence.current += 1;
-        setText(current => current === sentText ? "" : current);
-        setMessages(prev => mergeMessagesById(prev, [message]));
-        atBottomRef.current = true;
-        setTimeout(() => {
-          if (currentUserRef.current !== owner || activeIdRef.current !== conversationAtSend) return;
-          const viewport = messagesViewportRef.current;
-          viewport?.scrollTo({ top: viewport.scrollHeight, behavior: "smooth" });
-        }, 50);
-      }
-    } catch (e) {
-      setSendError(uiErrorMessage(e, uiText("Ui.text_60cdf3050ffef0")));
-    } finally {
-      setSending(false);
-    }
+      const response=await fetch(`/api/friendships/${friendshipId}`,{method:"PATCH",headers:{"Content-Type":"application/json"},body:JSON.stringify({status:action,accountId:owner})});
+      const payload=await response.json().catch(()=>({}));
+      if(!response.ok)throw new Error(payload.error??t("requestError"));
+      if(currentUserRef.current!==owner)return;
+      setFriendRequests(previous=>previous.filter(request=>request.friendship_id!==friendshipId)); await loadFriendRequests();
+    }catch(cause){if(currentUserRef.current===owner)setRequestError(uiErrorMessage(cause,t("requestError")));}
+    finally{if(currentUserRef.current===owner)setProcessingIds(previous=>{const next=new Set(previous);next.delete(friendshipId);return next;});}
   }
 
   const activeConv = conversations.find(c => c.id === activeId);
   const isNewConv = !!newConvRecipient && !activeId;
   const peerProfileHref = conversationPeerProfileHref(activeConv, user?.id ?? "", isNewConv ? newConvRecipient : null);
 
-  return (
-    <div
-      className={`fixed inset-x-0 top-16 ${showChat ? "bottom-0" : "bottom-[calc(4rem+env(safe-area-inset-bottom,0px))]"} lg:bottom-0 bg-bg-primary flex overflow-hidden`}
-      style={{
-        ...(visualViewportTop > 0 ? { top: `${64 + visualViewportTop}px` } : {}),
-        ...(keyboardInset > 0 ? { bottom: `${keyboardInset}px` } : {}),
-      }}
-    >
+  const people = [...contacts].sort((a,b) => a.display_name.localeCompare(b.display_name,uiLocale)).map(contact => ({id:contact.user_id, name:contact.display_name, avatar:contact.avatar_url, role:contact.role}));
+  const filteredConversations = conversations.filter(conversation => `${conversation.otherName ?? ""} ${conversation.group_name ?? ""}`.toLocaleLowerCase(uiLocale).includes(search.trim().toLocaleLowerCase(uiLocale)));
 
-      {/* ── KONVERSATIONSLISTE ── */}
-      <div className={`
-        ${showChat ? "hidden sm:flex" : "flex"}
-        flex-col min-w-0 w-full sm:w-80 sm:shrink-0 border-r border-border bg-bg-primary
-      `}>
-        <div className="px-4 py-4 border-b border-border shrink-0 flex items-center justify-between gap-3">
-          <h1 className="font-display text-lg font-bold text-text-primary flex items-center gap-2">{uiText.rich("Ui.text_81d121dfcf2181", { part1: () => (<MessageSquare size={18} className="text-gold" />) })}</h1>
-          <button
-            onClick={openCreateGroup}
-            className="min-h-11 px-3 rounded-xl border border-border text-sm text-text-secondary hover:text-gold hover:border-gold/50 flex items-center gap-2 shrink-0"
-            title={uiText("Ui.text_931b2c0e1d5f93")}
-          >{uiText.rich("Ui.text_242ae238257dd3", { part1: () => (<Users size={16} />), part2: chunks => (<span className="hidden min-[380px]:inline">{chunks}</span>), part3: () => (<Plus size={14} />) })}</button>
-        </div>
-
-        <Link href="/support" className="flex min-h-11 shrink-0 items-center gap-2 border-b border-border px-4 py-2 text-sm font-medium text-gold"><MessageSquare size={16} />{uiText("SupportContact.link")}</Link>
-        <div className="flex shrink-0 gap-2 border-b border-border px-4 py-2" aria-label={uiText("Ui.text_f991b9c56c163e")}>
-          <button type="button" aria-pressed={sidebarView === "chats"} onClick={() => setSidebarView("chats")} className={`min-h-11 flex-1 rounded-lg px-2 text-sm ${sidebarView === "chats" ? "bg-bg-elevated text-gold" : "text-text-muted"}`}>{uiText("Ui.text_6a1722b9c244bf")}</button>
-          <button type="button" aria-pressed={sidebarView === "contacts"} onClick={() => setSidebarView("contacts")} className={`min-h-11 flex-1 rounded-lg px-2 text-sm ${sidebarView === "contacts" ? "bg-bg-elevated text-gold" : "text-text-muted"}`}>{contactsLoading && !contacts.length ? messageNavigationText("contactsLoading") : contactsError && !contacts.length ? messageNavigationText("contacts") : messageNavigationText("contactsCount", { count: contacts.length })}</button>
-        </div>
-
-        {sidebarView === "contacts" ? <div className="min-h-0 flex-1 overflow-y-auto px-4 py-3">
-          <label className="block text-xs text-text-muted">{uiText.rich("Ui.text_96d875d1ff51c6", { part1: () => (<input type="search" value={contactSearch} onChange={event => setContactSearch(event.target.value)} placeholder={uiText("Ui.text_6b6ab641d0b589")} className="my-2 min-h-11 w-full rounded-xl border border-border bg-bg-elevated px-3 text-base text-text-primary sm:text-sm" />) })}</label>
-          {contactsError && <div role="alert" className="mb-3 text-sm text-red-400"><p>{contactsError}</p><button type="button" onClick={() => void loadFriendRequests()} className="min-h-11 text-gold">{uiText("FormDraft.reload")}</button></div>}
-          {contactsLoading ? <p role="status" className="py-4 text-sm text-text-muted">{uiText("Ui.text_732cd3bdf719fc")}</p> : <div className="space-y-1">
-            {contacts.filter(contact => `${contact.display_name} ${contact.role ?? ""}`.toLocaleLowerCase("de").includes(contactSearch.trim().toLocaleLowerCase("de"))).map(contact => <button type="button" key={contact.user_id} disabled={Boolean(openingContact)} onClick={() => void openContact(contact)} className="flex min-h-16 w-full items-center gap-3 rounded-xl px-2 py-3 text-left hover:bg-bg-elevated disabled:opacity-60">
-              <span className="flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-full border border-border bg-bg-elevated">{contact.avatar_url ? <UnoptimizedImage src={contact.avatar_url} alt="" className="h-full w-full object-cover" /> : <User size={18} className="text-text-muted" />}</span>
-              <span className="min-w-0 flex-1"><strong className="block break-words text-sm text-text-primary">{contact.display_name}</strong><span className="block break-words text-xs text-text-muted">{contact.role ?? uiText("Ui.text_51fb8dfa65e81e")}</span></span>
-              {openingContact === contact.user_id ? <Loader2 size={17} className="shrink-0 animate-spin text-gold" /> : <MessageSquare size={17} className="shrink-0 text-gold" />}
-            </button>)}
-            {!contacts.length && <p className="py-4 text-sm text-text-muted">{uiText("Ui.text_ed188537dc9e37")}</p>}
-            {contacts.length > 0 && !contacts.some(contact => `${contact.display_name} ${contact.role ?? ""}`.toLocaleLowerCase("de").includes(contactSearch.trim().toLocaleLowerCase("de"))) && <p className="py-4 text-sm text-text-muted">{uiText("Ui.text_1cb03119bfc5f2")}</p>}
-          </div>}
-        </div> : loading ? (
-          <div className="flex-1 flex items-center justify-center">
-            <Loader2 size={20} className="animate-spin text-text-muted" />
-          </div>
-        ) : (
-          <div className="flex-1 overflow-y-auto">
-
-            {conversationLoadFailed && <div role="alert" className="m-4 text-sm text-red-400">
-              <p>{messageNavigationText("loadError")}</p>
-              <button type="button" onClick={() => { setLoading(conversations.length === 0); void loadConversations(); }} className="min-h-11 text-gold">{messageNavigationText("retry")}</button>
-            </div>}
-
-            {/* ── Freundschaftsanfragen ── */}
-            {visibleRequests.length > 0 && (
-              <div className="border-b border-border">
-                <div className="px-4 py-2 bg-bg-elevated">
-                  <p className="text-[11px] font-semibold text-text-muted uppercase tracking-wider flex items-center gap-1.5">{uiText.rich("Ui.text_32245e7f748f1e", { part1: () => (<UserPlus size={12} />), value2: () => (visibleRequests.length) })}</p>
-                </div>
-                {visibleRequests.map(req => {
-                  const isProcessing = processingIds.has(req.friendship_id);
-                  return (
-                    <div key={req.friendship_id} className="flex items-center gap-3 px-4 py-3 border-b border-border last:border-b-0">
-                      <Link href={`/profile/${req.user_id}`} className="shrink-0">
-                        <div className="w-10 h-10 rounded-full bg-bg-elevated border border-border flex items-center justify-center overflow-hidden">
-                          {req.avatar_url
-                            ? <UnoptimizedImage src={req.avatar_url} alt="" className="w-full h-full object-cover" />
-                            : <User size={16} className="text-text-muted" />}
-                        </div>
-                      </Link>
-                      <div className="flex-1 min-w-0">
-                        <Link href={`/profile/${req.user_id}`}>
-                          <p className="text-sm font-semibold text-text-primary truncate hover:text-gold transition-colors">
-                            {req.display_name}
-                          </p>
-                        </Link>
-                        <p className="text-xs text-text-muted">{uiText("Ui.text_96bc29c3dcd30a")}</p>
-                      </div>
-                      <div className="flex gap-1.5 shrink-0">
-                        {isProcessing ? (
-                          <Loader2 size={16} className="animate-spin text-text-muted" />
-                        ) : (
-                          <>
-                            <button
-                              onClick={() => handleFriendRequest(req.friendship_id, "accepted")}
-                              title={uiText("OrganizationAccess.accept")}
-                              className="min-w-11 min-h-11 rounded-full bg-gold/10 text-gold border border-gold/20 flex items-center justify-center hover:bg-gold hover:text-bg-primary transition-colors"
-                            >
-                              <Check size={14} />
-                            </button>
-                            <button
-                              onClick={() => handleFriendRequest(req.friendship_id, "rejected")}
-                              title={uiText("OfferModeration.reject")}
-                              className="min-w-11 min-h-11 rounded-full bg-bg-elevated border border-border flex items-center justify-center text-text-muted hover:text-red-400 hover:border-red-400/40 transition-colors"
-                            >
-                              <X size={14} />
-                            </button>
-                            <button
-                              onClick={() => dismissRequest(req.friendship_id)}
-                              title={uiText("OfferModeration.hide")}
-                              className="min-w-11 min-h-11 rounded-full bg-bg-elevated border border-border flex items-center justify-center text-text-muted hover:text-text-primary transition-colors text-[10px] font-bold"
-                            >
-                              –
-                            </button>
-                          </>
-                        )}
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            )}
-
-            {/* ── Neue Konversation Placeholder ── */}
-            {isNewConv && (
-              <button className="w-full flex items-center gap-3 p-4 bg-gold/5 border-b border-gold/20 text-left">
-                <div className="w-10 h-10 rounded-full bg-gold/10 border border-gold/20 flex items-center justify-center shrink-0">
-                  <User size={16} className="text-gold" />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-semibold text-text-primary truncate">
-                    {loadingRecipient ? uiText("Ui.text_7a72dd7b9d46f7") : recipientName}
-                  </p>
-                  <p className="text-xs text-gold">{uiText("Ui.text_e8a28a55f6fbf9")}</p>
-                </div>
-              </button>
-            )}
-
-            {/* ── Konversationsliste ── */}
-            {conversations.length === 0 && !conversationLoadFailed && !isNewConv && visibleRequests.length === 0 ? (
-              <div className="flex-1 flex flex-col items-center justify-center p-6 text-center min-h-[200px] gap-4">
-                <div className="w-12 h-12 rounded-2xl bg-bg-elevated border border-border flex items-center justify-center">
-                  <MessageSquare size={20} className="text-text-muted opacity-50" />
-                </div>
-                <div>
-                  <p className="text-sm font-medium text-text-secondary mb-1">{uiText("Ui.text_f1c166d282b5d8")}</p>
-                  <p className="text-xs text-text-muted leading-relaxed">{uiText("Ui.text_221f57b4b804b9")}</p>
-                </div>
-                <Link href="/creators" className="text-xs text-gold hover:text-gold-light transition-colors font-medium">{uiText("Ui.text_b95a90b1761a09")}</Link>
-              </div>
-            ) : (
-              conversations.map(conv => {
-                const lastMsg = conv.messages?.[0];
-                const unread = conv.unread_count ?? 0;
-                return (
-                  <button
-                    key={conv.id}
-                    onClick={() => openConversation(conv)}
-                    className={`w-full flex items-center gap-3 p-4 border-b border-border text-left hover:bg-bg-elevated transition-colors ${activeId === conv.id ? "bg-bg-elevated" : ""}`}
-                  >
-                    <div className="w-10 h-10 rounded-full bg-bg-elevated border border-border flex items-center justify-center shrink-0 overflow-hidden">
-                      {conv.kind === "group"
-                        ? <Users size={17} className="text-gold" />
-                        : conv.kind === "support"
-                        ? <UnoptimizedImage src={SUPPORT_AVATAR_URL} alt={SUPPORT_NAME} className="h-full w-full object-contain p-1" />
-                        : conv.otherAvatar
-                        ? <UnoptimizedImage src={conv.otherAvatar} alt="" className="w-full h-full object-cover" />
-                        : <User size={16} className="text-text-muted" />}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center justify-between">
-                        <p className="flex min-w-0 items-center gap-1.5 text-sm font-semibold text-text-primary"><span className="truncate">{conv.otherName}{conv.kind === "group" && conv.memberCount ? uiText("Ui.text_f6b53f9c8ab3ef", { value1: String(conv.memberCount) }) : ""}</span>{conv.kind === "support" && <span className="shrink-0 rounded-full border border-gold/30 px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-wide text-gold">{uiText("Ui.text_be91940b79f469")}</span>}</p>
-                        {lastMsg && <span className="text-[10px] text-text-muted shrink-0 ml-1">{formatTime(uiLocale, lastMsg.created_at)}</span>}
-                      </div>
-                      <p className="text-xs text-text-muted truncate">{lastMsg?.content ?? uiText("Ui.text_f1c166d282b5d8")}</p>
-                    </div>
-                    {unread > 0 && (
-                      <span className="w-5 h-5 rounded-full bg-gold text-bg-primary text-[10px] font-bold flex items-center justify-center shrink-0">{unread}</span>
-                    )}
-                  </button>
-                );
-              })
-            )}
-          </div>
-        )}
+  return <div className={`fixed inset-x-0 top-16 ${showChat ? "bottom-0" : "bottom-[env(safe-area-inset-bottom,0px)]"} lg:bottom-0 flex overflow-hidden bg-bg-primary`}
+    style={{...(visualViewportTop>0?{top:`${64+visualViewportTop}px`}:{}),...(keyboardInset>0?{bottom:`${keyboardInset}px`}:{})}}>
+    <aside className={`${showChat?"hidden sm:flex":"flex"} min-w-0 w-full flex-col border-r border-border bg-bg-primary sm:w-80 sm:shrink-0`}>
+      <header className="shrink-0 border-b border-border px-4 py-3">
+        <div className="flex min-w-0 items-center justify-between gap-3"><h1 className="min-w-0 break-words font-display text-xl font-bold text-text-primary">{t("title")}</h1><button type="button" onClick={()=>setNewMessageOpen(true)} aria-label={t("newMessage")} title={t("newMessage")} className="flex min-h-11 min-w-11 shrink-0 items-center justify-center gap-2 rounded-xl px-2 text-sm text-gold hover:bg-bg-elevated"><SquarePen size={22}/><span className="hidden min-[400px]:inline">{t("newMessage")}</span></button></div>
+        <label className="mt-2 flex min-h-11 items-center gap-2 rounded-xl border border-border bg-bg-secondary px-3"><Search size={17} className="shrink-0 text-text-muted"/><input type="search" value={search} onChange={event=>setSearch(event.target.value)} placeholder={t("searchChats")} aria-label={t("searchChats")} className="min-h-11 min-w-0 flex-1 bg-transparent text-base text-text-primary outline-none"/></label>
+      </header>
+      <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain">
+        {(friendRequests.length>0||requestsOpen)&&<section className="border-b border-border px-4 py-2"><button type="button" aria-expanded={requestsOpen} onClick={()=>setRequestsOpen(value=>!value)} className="min-h-11 w-full text-left text-sm font-semibold text-gold">{t("requests",{count:friendRequests.length})}</button>{requestsOpen&&<div className="space-y-3 pb-2">{friendRequests.map(request=><article key={request.friendship_id} className="rounded-xl border border-border bg-bg-secondary p-3"><Link href={`/profile/${request.user_id}`} className="flex min-h-11 items-center gap-2 break-words text-sm font-semibold text-text-primary">{request.avatar_url&&<UnoptimizedImage src={request.avatar_url} alt="" className="h-9 w-9 shrink-0 rounded-full object-cover"/>}{request.display_name}</Link><div className="mt-2 flex flex-wrap gap-2"><button type="button" disabled={processingIds.has(request.friendship_id)} onClick={()=>void handleFriendRequest(request.friendship_id,"accepted")} className="min-h-11 flex-1 rounded-xl bg-gold px-3 text-sm font-semibold text-bg-primary disabled:opacity-40">{contactText("accept")}</button><button type="button" disabled={processingIds.has(request.friendship_id)} onClick={()=>void handleFriendRequest(request.friendship_id,"rejected")} className="min-h-11 flex-1 rounded-xl border border-border px-3 text-sm text-text-secondary disabled:opacity-40">{contactText("reject")}</button></div></article>)}{!contactsLoading&&!friendRequests.length&&<p className="text-sm text-text-muted">{t("noRequests")}</p>}{requestError&&<p role="alert" className="text-sm text-red-400 [[data-theme=light]_&]:text-red-700">{requestError}</p>}</div>}</section>}
+        {contactsError&&<div role="alert" className="px-4 py-2 text-sm text-red-400 [[data-theme=light]_&]:text-red-700"><p>{uiText("Ui.text_4139ecbefbacc6")}</p><button type="button" onClick={()=>void loadFriendRequests()} className="min-h-11 text-gold">{t("retry")}</button></div>}
+        {conversationLoadFailed&&<div role="alert" className="px-4 py-3 text-sm text-red-400 [[data-theme=light]_&]:text-red-700"><p>{messageNavigationText("loadError")}</p><button type="button" onClick={()=>{setLoading(conversations.length===0);void loadConversations();}} className="min-h-11 text-gold">{messageNavigationText("retry")}</button></div>}
+        {loading&&conversations.length===0?<p role="status" className="px-4 py-8 text-sm text-text-muted">{t("loading")}</p>:filteredConversations.length===0&&!conversationLoadFailed?<div className="space-y-3 px-5 py-10 text-center"><MessageSquare size={26} className="mx-auto text-text-muted"/><p className="text-sm text-text-muted">{t(search.trim()?"noChats":"emptyInbox")}</p><button type="button" onClick={()=>setNewMessageOpen(true)} className="min-h-11 rounded-xl bg-gold px-4 text-sm font-semibold text-bg-primary">{t("newMessage")}</button></div>:filteredConversations.map(conversation=>{
+          const latest=conversation.messages?.[0];
+          return <button key={conversation.id} type="button" aria-pressed={conversation.id===activeId} onClick={()=>openConversation(conversation)} className={`flex min-h-20 w-full min-w-0 items-center gap-3 border-b border-border px-4 py-3 text-left hover:bg-bg-elevated ${activeId===conversation.id?"bg-bg-elevated":""}`}>
+            <span className="flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-full border border-border bg-bg-elevated">{conversation.kind==="group"?<Users size={19} className="text-gold"/>:conversation.kind==="support"?<UnoptimizedImage src={SUPPORT_AVATAR_URL} alt="" className="h-full w-full object-contain p-1"/>:conversation.otherAvatar?<UnoptimizedImage src={conversation.otherAvatar} alt="" className="h-full w-full object-cover"/>:<User size={19} className="text-text-muted"/>}</span>
+            <span className="min-w-0 flex-1"><span className="flex min-w-0 items-center justify-between gap-2"><strong className="min-w-0 truncate text-sm text-text-primary">{conversation.otherName}</strong>{latest&&<span className="shrink-0 text-[10px] text-text-muted">{formatTime(uiLocale,latest.created_at)}</span>}</span><span className="mt-1 block truncate text-xs text-text-muted">{latest?.content??t("startChat")}</span></span>{(conversation.unread_count??0)>0&&<span className="shrink-0 rounded-full bg-gold px-1.5 py-0.5 text-[10px] font-semibold text-bg-primary">{conversation.unread_count}</span>}
+          </button>;
+        })}
+        <Link href="/support" className="flex min-h-11 items-center gap-2 px-4 py-3 text-sm text-text-secondary hover:text-gold"><MessageSquare size={16}/>{uiText("SupportContact.link")}</Link>
       </div>
-
-      {/* ── CHAT-BEREICH ── */}
-      <div className={`
-        ${showChat ? "flex" : "hidden sm:flex"}
-        relative flex-col flex-1 min-w-0 bg-bg-primary
-      `}>
-        {showChat ? (
-          <>
-            {/* Header */}
-            <div className="px-4 py-3.5 border-b border-border flex items-center gap-3 shrink-0">
-              <button
-                onClick={closeChat}
-                aria-label={messageNavigationText("back")}
-                className="flex min-h-11 min-w-11 -ml-1 items-center justify-center text-text-muted hover:text-text-primary active:scale-95 transition-all"
-              >
-                <ArrowLeft size={20} />
-              </button>
-              <div className="w-9 h-9 rounded-full bg-bg-elevated border border-border flex items-center justify-center overflow-hidden shrink-0">
-                {activeConv?.kind === "group"
-                  ? <Users size={16} className="text-gold" />
-                  : activeConv?.kind === "support"
-                  ? <UnoptimizedImage src={SUPPORT_AVATAR_URL} alt={SUPPORT_NAME} className="h-full w-full object-contain p-1" />
-                  : activeConv?.otherAvatar
-                  ? <UnoptimizedImage src={activeConv.otherAvatar} alt="" className="w-full h-full object-cover" />
-                  : <User size={15} className="text-text-muted" />}
-              </div>
-              <div className="flex-1 min-w-0">
-                <p className="text-sm font-semibold text-text-primary truncate">
-                  {isNewConv ? (loadingRecipient ? uiText("Ui.text_7a72dd7b9d46f7") : recipientName) : (activeConv?.otherName ?? uiText("Ui.text_69c3de31e17ef2"))}
-                </p>
-                {activeConv?.kind === "support" && <p className="text-[11px] text-gold">{uiText("Ui.text_82c40b33b74f44")}</p>}
-              {activeConv?.kind === "group" && (
-                <p className="text-xs text-text-muted truncate">{uiText.rich("Ui.text_e38b461d0cda97", { value1: () => (activeConv.memberCount ?? 0) })}</p>
-              )}
-              {activeConv?.listing_title && (
-                <p className="text-xs text-text-muted truncate">{activeConv.listing_title}</p>
-              )}
-            </div>
-            {activeConv?.kind === "group" && (
-              <button
-                onClick={openGroupDetails}
-                className="min-w-11 min-h-11 px-2 rounded-xl border border-border text-text-muted hover:text-gold hover:border-gold/50 flex items-center justify-center gap-2 shrink-0"
-                aria-label={uiText("Ui.text_9cf1794be03d0e")}
-              >
-                <Users size={17} />
-              </button>
-            )}
-              {peerProfileHref && (
-                <Link
-                  href={peerProfileHref}
-                  className="shrink-0 text-xs text-gold hover:text-gold-light transition-colors"
-                >{uiText("profile.tabProfile")}</Link>
-              )}
-            </div>
-
+    </aside>
+    <section aria-label={t("conversation")} className={`${showChat?"flex":"hidden sm:flex"} relative min-w-0 flex-1 flex-col bg-bg-primary`}>
+      {showChat?<>
+        <header className="flex min-w-0 shrink-0 items-center gap-2 border-b border-border px-3 py-2">
+          <button type="button" onClick={closeChat} aria-label={messageNavigationText("back")} className="flex min-h-11 min-w-11 shrink-0 items-center justify-center rounded-xl text-text-muted"><ArrowLeft size={21}/></button>
+          {activeConv?.kind==="group"?<button type="button" onClick={()=>setGroupInfoOpen(true)} aria-label={t("openGroupInfo")} className="flex min-h-11 min-w-0 flex-1 items-center gap-3 text-left"><span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-bg-elevated"><Users size={18} className="text-gold"/></span><span className="min-w-0"><strong className="block truncate text-sm text-text-primary">{activeConv.otherName}</strong><span className="text-xs text-text-muted">{t("members",{count:activeConv.memberCount??0})}</span></span></button>:<div className="flex min-h-11 min-w-0 flex-1 items-center gap-3"><span className="flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-full bg-bg-elevated">{activeConv?.kind==="support"?<UnoptimizedImage src={SUPPORT_AVATAR_URL} alt="" className="h-full w-full object-contain p-1"/>:activeConv?.otherAvatar?<UnoptimizedImage src={activeConv.otherAvatar} alt="" className="h-full w-full object-cover"/>:<User size={17} className="text-text-muted"/>}</span><span className="min-w-0"><strong className="block truncate text-sm text-text-primary">{isNewConv?(loadingRecipient?t("loading"):recipientName):(activeConv?.otherName??t("conversation"))}</strong>{activeConv?.kind==="support"&&<span className="text-xs text-gold">{SUPPORT_NAME}</span>}</span></div>}
+          {peerProfileHref&&<Link href={peerProfileHref} className="inline-flex min-h-11 shrink-0 items-center px-2 text-xs text-gold">{uiText("profile.tabProfile")}</Link>}
+        </header>
             {/* Nachrichten */}
             {companyLabel && companySlug && <Link href={`/companies/${encodeURIComponent(companySlug)}`} className="shrink-0 border-b border-border px-4 py-2 text-xs text-gold">{companyText("context", { name: companyLabel })}</Link>}
             <div
@@ -934,7 +513,7 @@ function MessagesContent() {
               className="flex-1 min-h-0 min-w-0 overflow-y-auto overscroll-contain px-4 py-4 space-y-1"
             >
               {loadingMessages && messages.length === 0 && <div role="status" aria-label={messageNavigationText("loading")} className="flex justify-center py-6"><Loader2 size={20} className="animate-spin text-text-muted" /></div>}
-              {messageLoadFailure?.conversationId === activeId && <div role="alert" className="mb-3 text-sm text-red-400">
+              {messageLoadFailure?.conversationId === activeId && <div role="alert" className="mb-3 text-sm text-red-400 [[data-theme=light]_&]:text-red-700">
                 <p>{messageNavigationText("messageLoadError")}</p>
                 <button type="button" disabled={loadingMessages || olderLoading} onClick={() => void retryMessageLoad()} className="min-h-11 text-gold disabled:opacity-60">{messageNavigationText("retry")}</button>
               </div>}
@@ -990,7 +569,7 @@ function MessagesContent() {
                             <span className="text-[11px] text-text-muted">{isOwn ? uiText("Ui.text_0b6722a8adfb93") : (msg.senderName ?? uiText("Ui.text_276ffa1fb4f970"))}</span>
                           </div>
                         )}
-                        <div className={`min-w-0 break-words [overflow-wrap:anywhere] px-4 py-2.5 rounded-2xl text-sm leading-relaxed ${
+                        <div role={isOwn ? "button" : undefined} tabIndex={isOwn ? 0 : undefined} aria-description={isOwn ? t("messageOptions") : undefined} onClick={isOwn ? () => { if (!window.getSelection?.()?.toString()) setSelectedMessage(msg); } : undefined} onKeyDown={isOwn ? event => { if (event.key === "Enter" || event.key === " ") {event.preventDefault();setSelectedMessage(msg);} } : undefined} onContextMenu={isOwn ? event => {event.preventDefault();setSelectedMessage(msg);} : undefined} className={`min-h-11 min-w-0 whitespace-pre-wrap break-words [overflow-wrap:anywhere] px-4 py-2.5 rounded-2xl text-sm leading-relaxed focus-visible:outline-2 focus-visible:outline-gold ${
                           isOwn
                             ? "bg-gold text-bg-primary rounded-br-sm"
                             : "bg-bg-elevated border border-border text-text-primary rounded-bl-sm"
@@ -1000,7 +579,7 @@ function MessagesContent() {
                           <p className={`text-[10px] ${isOwn ? "text-bg-primary/60" : "text-text-muted"}`}>
                             {formatTime(uiLocale, msg.created_at)}
                           </p>
-                          {isOwn && <button type="button" title={uiText("Ui.text_ae1d54b526f56d")} aria-label={uiText("Ui.text_5605c428f53c05")} disabled={Boolean(deletingMessage)} onClick={() => void hideOwnMessage(msg)} className="flex min-h-11 min-w-11 shrink-0 items-center justify-center rounded-lg text-bg-primary/70 hover:bg-black/10 disabled:opacity-50">{deletingMessage === msg.id ? <Loader2 size={14} className="animate-spin" /> : <Trash2 size={14} />}</button>}
+
                           </div>
         </div>
       </div>
@@ -1034,222 +613,17 @@ function MessagesContent() {
               setNewMessagesAvailable(false);
             }} className="absolute min-h-11 bottom-24 left-1/2 z-10 -translate-x-1/2 rounded-full border border-gold/40 bg-bg-secondary px-4 py-2 text-sm text-gold shadow-lg">{navigationText("newMessages")}</button>}
 
-            {/* Eingabe */}
-            <div className="px-4 pt-3 pb-[calc(0.75rem+env(safe-area-inset-bottom,0px))] border-t border-border shrink-0">
-              {sendError && <p role="alert" className="text-xs text-red-400 mb-2">{sendError}</p>}
-              {messageNotice && <p role="status" className="mb-2 text-xs text-gold">{messageNotice}</p>}
-              <div className="flex min-w-0 gap-2">
-                <input
-                  type="text"
-                  value={text}
-                  onChange={e => { setText(e.target.value); const key = activeId ?? newConvRecipient; if (key) drafts.current.set(key, e.target.value); }}
-                  onKeyDown={e => e.key === "Enter" && !e.shiftKey && sendMessage()}
-                  placeholder={uiText("Ui.text_b4a3b14d5635d0")}
-                  className="min-w-0 flex-1 bg-bg-elevated border border-border rounded-2xl px-4 py-3 text-base sm:text-sm focus:outline-none focus:border-gold transition-colors"
-                />
-                <button
-                  onClick={sendMessage}
-                  aria-label={uiText("companyMessages.send")}
-                  disabled={!text.trim() || sending}
-                  className="w-11 h-11 bg-gold text-bg-primary rounded-2xl flex items-center justify-center hover:bg-gold-light transition-colors disabled:opacity-40 shrink-0"
-                >
-                  {sending ? <Loader2 size={18} className="animate-spin" /> : <Send size={18} />}
-                </button>
-              </div>
-            </div>
-          </>
-        ) : (
-          /* Desktop: leerer Zustand wenn kein Gespräch offen */
-          <div className="flex-1 hidden sm:flex flex-col items-center justify-center text-center p-8">
-            <div className="max-w-sm">
-              <div className="relative w-20 h-20 mx-auto mb-5">
-                <div className="w-20 h-20 rounded-2xl bg-bg-elevated border border-border flex items-center justify-center">
-                  <MessageSquare size={32} className="text-text-muted opacity-30" />
-                </div>
-                <div className="absolute -top-1 -right-1 w-6 h-6 rounded-full bg-gold/10 border border-gold/20 flex items-center justify-center">
-                  <span className="text-[10px] text-gold font-bold">+</span>
-                </div>
-              </div>
-              <h3 className="font-display text-lg font-bold text-text-secondary mb-2">{uiText("Ui.text_910613d62f2904")}</h3>
-              <p className="text-sm text-text-muted leading-relaxed mb-5">{uiText("Ui.text_3242e5a3eac2db")}</p>
-              <div className="flex flex-wrap gap-2 justify-center">{uiText.rich("Ui.text_2082066c7a5db7", { part1: chunks => (<Link href="/creators" className="px-3 py-1.5 text-xs border border-border rounded-lg text-text-secondary hover:border-gold/40 hover:text-gold transition-all">{chunks}</Link>), part2: chunks => (<Link href="/locations" className="px-3 py-1.5 text-xs border border-border rounded-lg text-text-secondary hover:border-gold/40 hover:text-gold transition-all">{chunks}</Link>), part3: chunks => (<Link href="/jobs" className="px-3 py-1.5 text-xs border border-border rounded-lg text-text-secondary hover:border-gold/40 hover:text-gold transition-all">{chunks}</Link>) })}</div>
-            </div>
-          </div>
-        )}
-      </div>
-      {groupModalMode && (
-        <div
-          className="fixed inset-0 z-[80] bg-black/70 p-3 sm:p-6 flex items-center justify-center"
-          role="presentation"
-          onMouseDown={(event) => { if (event.target === event.currentTarget && !groupSaving) setGroupModalMode(null); }}
-        >
-          <section
-            role="dialog"
-            aria-modal="true"
-            aria-labelledby="group-dialog-title"
-            className="w-full max-w-lg max-h-[88dvh] overflow-y-auto overscroll-contain rounded-2xl border border-border bg-bg-primary shadow-2xl p-4 sm:p-6"
-          >
-            <div className="flex items-center justify-between gap-4 mb-5">
-              <div>
-                <p className="text-xs uppercase tracking-widest text-gold mb-1">{uiText("nav.messages")}</p>
-                <h2 id="group-dialog-title" className="font-display text-xl font-bold text-text-primary">
-                  {groupModalMode === "create" ? uiText("Ui.text_931b2c0e1d5f93") : uiText("Ui.text_be0dc89369314d")}
-                </h2>
-              </div>
-              <button
-                onClick={() => setGroupModalMode(null)}
-                disabled={groupSaving}
-                className="w-11 h-11 rounded-xl border border-border text-text-muted hover:text-text-primary flex items-center justify-center shrink-0"
-                aria-label={uiText("Ui.text_192abd55f1bb32")}
-              ><X size={18} /></button>
-            </div>
 
-            <label className="block text-sm text-text-secondary mb-2" htmlFor="group-name">{uiText("Ui.text_1f155d97469ee1")}</label>
-            <div className="flex gap-2 mb-5">
-              <input
-                id="group-name"
-                value={groupName}
-                onChange={(event) => setGroupName(event.target.value)}
-                maxLength={80}
-                placeholder={uiText("Ui.text_226c0d5b93c799")}
-                readOnly={groupModalMode === "manage" && !activeConv?.isAdmin}
-                className="min-w-0 flex-1 min-h-11 rounded-xl border border-border bg-bg-elevated px-3 text-sm text-text-primary focus:outline-none focus:border-gold read-only:opacity-80"
-              />
-              {groupModalMode === "manage" && activeConv?.isAdmin && (
-                <button
-                  onClick={renameGroup}
-                  disabled={groupSaving || !groupName.trim() || groupName.trim() === activeConv.group_name}
-                  className="min-h-11 px-3 rounded-xl border border-gold/40 text-gold disabled:opacity-40 flex items-center gap-2 shrink-0"
-                >{uiText.rich("Ui.text_991bf31ad459a6", { value1: () => (groupSaving ? <Loader2 size={15} className="animate-spin" /> : <Pencil size={15} />), part2: chunks => (<span className="hidden sm:inline">{chunks}</span>) })}</button>
-              )}
-            </div>
-
-            {groupModalMode === "manage" && (
-              <div className="mb-5">
-                <h3 className="text-sm font-semibold text-text-primary mb-2">{uiText.rich("Ui.text_549e2e70ca6f86", { value1: () => (activeConv?.members?.length ?? 0) })}</h3>
-                <div className="space-y-2">
-                  {(activeConv?.members ?? []).map((member) => (
-                    <div key={member.user_id} className="flex items-center gap-3 rounded-xl border border-border bg-bg-elevated/50 p-2.5">
-                      <div className="w-9 h-9 rounded-full overflow-hidden bg-bg-elevated border border-border flex items-center justify-center shrink-0">
-                        {member.avatar_url
-                          ? <UnoptimizedImage src={member.avatar_url} alt="" className="w-full h-full object-cover" />
-                          : <User size={15} className="text-text-muted" />}
-                      </div>
-                      <div className="min-w-0 flex-1">
-                        <p className="text-sm text-text-primary truncate">{member.user_id === user?.id ? uiText("Ui.text_fa00e41742ee73", { value1: String(member.display_name) }) : member.display_name}</p>
-                        <p className="text-xs text-text-muted">{member.role === "admin" ? uiText("Ui.text_c1c224b03cd9bc") : uiText("Ui.text_4d338cce824968")}</p>
-                      </div>
-                      {activeConv?.isAdmin && member.user_id !== user?.id && (
-                        <button
-                          onClick={() => updateGroupMembers("remove", member.user_id)}
-                          disabled={groupSaving}
-                          className="w-11 h-11 rounded-lg text-text-muted hover:text-red-400 flex items-center justify-center shrink-0"
-                          title={uiText("Ui.text_f10fe7a27ce274", { value1: String(member.display_name) })}
-                          aria-label={uiText("Ui.text_01a8bb17379cb6", { value1: String(member.display_name) })}
-                        ><UserMinus size={17} /></button>
-                      )}
-                    </div>
-                  ))}
-                </div>
-                <p className="text-xs text-text-muted mt-2">{uiText("Ui.text_e803249f3e428b")}</p>
-              </div>
-            )}
-
-            {(groupModalMode === "create" || activeConv?.isAdmin) && (
-              <div className="mb-4">
-                <label className="block text-sm text-text-secondary mb-2" htmlFor="group-member-search">
-                  {groupModalMode === "create" ? uiText("Ui.text_bfabdfe07be7ed") : uiText("Ui.text_e3f4d3a304d53b")}
-                </label>
-                <input
-                  id="group-member-search"
-                  value={groupSearch}
-                  onChange={(event) => setGroupSearch(event.target.value)}
-                  placeholder={uiText("Ui.text_d27bacb487c108")}
-                  autoComplete="off"
-                  className="w-full min-h-11 rounded-xl border border-border bg-bg-elevated px-3 text-sm text-text-primary focus:outline-none focus:border-gold"
-                />
-                {selectedGroupUsers.length > 0 && (
-                  <div className="flex flex-wrap gap-2 mt-3">
-                    {selectedGroupUsers.map((person) => (
-                      <button
-                        key={person.id}
-                        onClick={() => toggleSelectedUser(person)}
-                        className="min-h-10 px-3 rounded-full border border-gold/40 bg-gold/10 text-sm text-gold flex items-center gap-2"
-                        aria-label={uiText("Ui.text_f22b415398b43e", { value1: String(person.name) })}
-                      >{person.name}<X size={14} /></button>
-                    ))}
-                  </div>
-                )}
-                {groupSearch.trim().length >= 2 && (
-                  <div className="mt-2 max-h-48 overflow-y-auto rounded-xl border border-border divide-y divide-border">
-                    {groupSearchResults
-                      .filter((person) => groupModalMode !== "manage" || !(activeConv?.members ?? []).some((member) => member.user_id === person.id))
-                      .map((person) => {
-                        const selected = selectedGroupUsers.some((selectedUser) => selectedUser.id === person.id);
-                        return (
-                          <button
-                            key={person.id}
-                            onClick={() => toggleSelectedUser(person)}
-                            className="w-full min-h-12 px-3 py-2 text-left hover:bg-bg-elevated flex items-center gap-3"
-                          >
-                            <div className="min-w-11 min-h-11 rounded-full overflow-hidden bg-bg-elevated border border-border flex items-center justify-center shrink-0">
-                              {person.avatar ? <UnoptimizedImage src={person.avatar} alt="" className="w-full h-full object-cover" /> : <User size={14} className="text-text-muted" />}
-                            </div>
-                            <span className="min-w-0 flex-1">
-                              <span className="block truncate text-sm text-text-primary">{person.name}</span>
-                              <span className="block truncate text-xs text-text-muted">{[person.role, person.location].filter(Boolean).join(" · ")}</span>
-                            </span>
-                            {selected && <Check size={16} className="text-gold shrink-0" />}
-                          </button>
-                        );
-                      })}
-                    {groupSearchResults.length === 0 && <p className="p-3 text-sm text-text-muted">{uiText("Ui.text_f538201aa5e381")}</p>}
-                  </div>
-                )}
-              </div>
-            )}
-
-            {groupError && <p role="alert" className="text-sm text-red-400 mb-4">{groupError}</p>}
-            <div className="flex flex-col-reverse sm:flex-row sm:justify-between gap-2 pt-2">
-              {groupModalMode === "manage" ? (
-                <button
-                  onClick={() => updateGroupMembers("leave")}
-                  disabled={groupSaving}
-                  className="min-h-11 px-4 rounded-xl border border-red-400/30 text-red-300 hover:bg-red-400/10 disabled:opacity-50"
-                >{uiText("Ui.text_62b25f1eee17d1")}</button>
-              ) : <span />}
-              <div className="flex gap-2 justify-end">
-                <button onClick={() => setGroupModalMode(null)} disabled={groupSaving} className="min-h-11 px-4 rounded-xl border border-border text-text-secondary">{uiText("home.boardCancel")}</button>
-                {groupModalMode === "create" ? (
-                  <button
-                    onClick={createGroup}
-                    disabled={groupSaving || !groupName.trim() || selectedGroupUsers.length === 0}
-                    className="min-h-11 px-4 rounded-xl bg-gold text-bg-primary font-semibold disabled:opacity-50 flex items-center gap-2"
-                  >{uiText.rich("Ui.text_0cc7127c748323", { value1: () => (groupSaving ? <Loader2 size={16} className="animate-spin" /> : <Users size={16} />) })}</button>
-                ) : activeConv?.isAdmin && (
-                  <button
-                    onClick={addSelectedMembers}
-                    disabled={groupSaving || selectedGroupUsers.length === 0}
-                    className="min-h-11 px-4 rounded-xl bg-gold text-bg-primary font-semibold disabled:opacity-50 flex items-center gap-2"
-                  >{uiText.rich("Ui.text_0646f894a42bba", { value1: () => (groupSaving ? <Loader2 size={16} className="animate-spin" /> : <UserPlus size={16} />) })}</button>
-                )}
-              </div>
-            </div>
-            {groupModalMode === "manage" && activeConv?.isAdmin && (
-              <p className="text-xs text-text-muted mt-3">{uiText("Ui.text_14327d28f9bbaa")}</p>
-            )}
-          </section>
-        </div>
-      )}
-
-    </div>
-  );
+        {(sendError||messageNotice)&&<div className="shrink-0 px-3 py-2 text-xs">{sendError&&<p role="alert" className="text-red-400 [[data-theme=light]_&]:text-red-700">{sendError}</p>}{messageNotice&&<p role="status" className="text-gold">{messageNotice}</p>}</div>}
+        {user?.id&&(activeId||newConvRecipient)&&<MessageComposer key={`${user.id}:${activeId?`conversation:${activeId}`:`recipient:${newConvRecipient}`}`} accountId={user.id} destination={{conversationId:activeId,recipientId:newConvRecipient}} onSent={messageSent}/>}
+      </>:<div className="m-auto max-w-sm p-8 text-center"><MessageSquare size={40} className="mx-auto mb-4 text-text-muted"/><h2 className="font-display text-xl text-text-primary">{t("startChat")}</h2><p className="mt-2 text-sm text-text-muted">{t("choosePeople")}</p><button type="button" onClick={()=>setNewMessageOpen(true)} className="mt-5 min-h-11 rounded-xl bg-gold px-4 text-sm font-semibold text-bg-primary">{t("newMessage")}</button></div>}
+    </section>
+    {user?.id&&<NewMessageDialog key={user.id} open={newMessageOpen} accountId={user.id} contacts={people} onClose={()=>setNewMessageOpen(false)} onOpen={openDestination}/>}
+    {user?.id&&activeConv?.kind==="group"&&<GroupInfoDialog key={`${user.id}:${activeConv.id}`} open={groupInfoOpen} accountId={user.id} group={activeConv} contacts={people} onClose={()=>setGroupInfoOpen(false)} onRefresh={async()=>{await loadConversations();if(activeIdRef.current===activeConv.id)await loadMessages(activeConv.id);}} onResume={()=>setGroupInfoOpen(true)} onLeave={()=>{setGroupInfoOpen(false);if(user?.id)navigateMessageView(window,user.id,{},true);void loadConversations();}}/>}
+    <MessagingDialog compact open={!!selectedMessage} title={t("messageOptions")} onClose={()=>setSelectedMessage(null)} busy={!!deletingMessage} footer={<button type="button" disabled={!!deletingMessage} onClick={()=>{if(selectedMessage)void hideOwnMessage(selectedMessage);}} className="min-h-11 w-full rounded-xl border border-crimson/30 px-4 text-sm text-red-400 [[data-theme=light]_&]:text-red-700 disabled:opacity-40">{t("hideForMe")}</button>}><p className="break-words whitespace-pre-wrap rounded-xl border border-border bg-bg-secondary p-3 text-sm [overflow-wrap:anywhere]">{selectedMessage?.content}</p><p className="text-sm text-text-muted">{t("hideHelp")}</p>{sendError&&<p role="alert" className="text-sm text-red-400 [[data-theme=light]_&]:text-red-700">{sendError}</p>}</MessagingDialog>
+  </div>;
 }
 
 export default function MessagesPage() {
-  return (
-    <Suspense>
-      <MessagesContent />
-    </Suspense>
-  );
+  return <Suspense><MessagesContent/></Suspense>;
 }

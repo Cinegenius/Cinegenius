@@ -1,13 +1,13 @@
 import { SUPPORT_ACTOR_ID, SUPPORT_AVATAR_URL, SUPPORT_NAME } from "@/lib/support-identity";
 import { db } from "@/lib/db";
 import { requireAuth } from "@/lib/auth";
-import { anyBlockExists, areAcceptedFriends } from "@/lib/trust";
 import { clerkClient } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from "next/server";
 import { sendNewMessageEmail } from "@/lib/email";
 import { rateLimit } from "@/lib/rateLimit";
 import { applyParticipantReadReceipts } from "@/lib/message-read-state";
 import { getTranslations as getResponseTranslations } from "next-intl/server";
+import { MESSAGING_HEADERS, messagingRequestKey, messagingUuid, messagingRpcFailure } from "@/lib/messaging-backend";
 
 const PAGE_SIZE = 200;
 
@@ -91,7 +91,7 @@ export async function GET(
   const receipts = receiptsResult.data ?? [];
   const members = memberRows.map((member) => ({
     ...member,
-    display_name: profiles.get(member.user_id)?.display_name ?? "Unbekannt",
+    display_name: profiles.get(member.user_id)?.display_name ?? tResponse("Messaging.unknown"),
     avatar_url: profiles.get(member.user_id)?.avatar_url ?? null,
   }));
 
@@ -103,7 +103,7 @@ export async function GET(
         ? null
         : receipts.find((receipt) => receipt.message_id === message.id && receipt.user_id === userId)?.read_at ?? null,
       read_by: receipts.filter((receipt) => receipt.message_id === message.id).map((receipt) => receipt.user_id),
-      senderName: profiles.get(message.sender_id)?.display_name ?? "Unbekannt",
+      senderName: profiles.get(message.sender_id)?.display_name ?? tResponse("Messaging.unknown"),
       senderAvatar: profiles.get(message.sender_id)?.avatar_url ?? null,
     }));
   } else {
@@ -112,7 +112,7 @@ export async function GET(
     if (conversation.kind === "support") {
       messages = messages.map((message) => ({
         ...message,
-        senderName: message.sender_id === SUPPORT_ACTOR_ID ? SUPPORT_NAME : "Du",
+        senderName: message.sender_id === SUPPORT_ACTOR_ID ? SUPPORT_NAME : tResponse("Messaging.you"),
         senderAvatar: message.sender_id === SUPPORT_ACTOR_ID ? SUPPORT_AVATAR_URL : null,
       }));
     }
@@ -122,7 +122,7 @@ export async function GET(
     conversation: {
       ...conversation,
       ...(conversation.kind === "direct" ? {
-        otherName: members.find(member => member.user_id !== userId)?.display_name ?? "Unbekannt",
+        otherName: members.find(member => member.user_id !== userId)?.display_name ?? tResponse("Messaging.unknown"),
         otherAvatar: members.find(member => member.user_id !== userId)?.avatar_url ?? null,
       } : {}),
       ...(conversation.kind === "support" ? { otherName: SUPPORT_NAME, otherAvatar: SUPPORT_AVATAR_URL } : {}),
@@ -154,112 +154,39 @@ export async function DELETE(request: NextRequest, { params }: { params: Promise
   return NextResponse.json({ hiddenMessageId: data }, { headers: { "Cache-Control": "private, no-store" } });
 }
 
-export async function POST(
-  request: NextRequest,
-  { params }: { params: Promise<{ id: string }> },
-) {
-  const tResponse = await getResponseTranslations();
+export async function POST(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const authResult = await requireAuth();
   if (authResult instanceof NextResponse) return authResult;
   const { userId } = authResult;
-  const { allowed } = await rateLimit(`msg:${userId}`, 30, 60);
-  if (!allowed) return NextResponse.json({ error: tResponse('System.m_fed9db832019') }, { status: 429 });
-
-  const { id } = await params;
+  const t = await getResponseTranslations("MessagingBackend");
+  const fail = (key: string, status: number) => NextResponse.json({ error: t(key) }, { status, headers: MESSAGING_HEADERS });
   const body = await request.json().catch(() => null);
-  const content = typeof body?.content === "string" ? body.content.trim() : "";
-  if (!content) return NextResponse.json({ error: tResponse('System.m_34f087ae9fdf') }, { status: 400 });
-  if (content.length > 5000) return NextResponse.json({ error: tResponse('System.m_f65be0fc77aa') }, { status: 400 });
-
-  const { data: conversation, error: conversationError } = await db
-    .from("conversations")
-    .select("id, kind, group_name, sender_id, receiver_id")
-    .eq("id", id)
-    .maybeSingle();
-  if (conversationError) return NextResponse.json({ error: tResponse('System.m_c453f2efc15a') }, { status: 500 });
-  if (!conversation) return NextResponse.json({ error: tResponse('System.m_cd2f7b0a21cd') }, { status: 404 });
-
-  const { data: membership, error: membershipError } = await db
-    .from("conversation_members")
-    .select("user_id, role")
-    .eq("conversation_id", id)
-    .eq("user_id", userId)
-    .is("left_at", null)
-    .maybeSingle();
-  if (membershipError) return NextResponse.json({ error: tResponse('System.m_599c867e2758') }, { status: 500 });
-  if (!membership) return NextResponse.json({ error: tResponse('System.m_cd2f7b0a21cd') }, { status: 404 });
-  if (conversation.kind === "support" && conversation.receiver_id !== userId) {
-    return NextResponse.json({ error: tResponse('System.m_cd2f7b0a21cd') }, { status: 404 });
-  }
-
-  const { data: activeMembers, error: membersError } = await db
-    .from("conversation_members")
-    .select("user_id")
-    .eq("conversation_id", id)
-    .is("left_at", null);
-  if (membersError) return NextResponse.json({ error: tResponse('System.m_378d2a42e006') }, { status: 500 });
-  const recipientIds = (activeMembers ?? []).map((member) => member.user_id).filter((memberId) => memberId !== userId);
-
-  if (conversation.kind !== "group" && conversation.kind !== "support") {
-    const receiverId = recipientIds[0];
-    if (!receiverId) return NextResponse.json({ error: tResponse('System.m_9f73491d8f79') }, { status: 404 });
-    const { data: receiverSettings, error: settingsError } = await db
-      .from("user_settings")
-      .select("message_permission")
-      .eq("user_id", receiverId)
-      .maybeSingle();
-    if (settingsError) return NextResponse.json({ error: tResponse('System.m_44480805a269') }, { status: 500 });
-    if (receiverSettings?.message_permission === "friends_only" && !(await areAcceptedFriends(userId, receiverId))) {
-      return NextResponse.json({ error: tResponse('System.m_3d26f80efc50') }, { status: 403 });
-    }
-    if (await anyBlockExists(userId, receiverId)) return NextResponse.json({ error: tResponse('System.m_0fc7245a4195') }, { status: 403 });
-  }
-
-  // The database function locks the conversation while checking active
-  // membership and inserting, so removal/leave cannot race a send.
-  const { data: inserted, error: sendError } = await db.rpc("send_conversation_message", {
-    p_conversation_id: id,
-    p_sender_id: userId,
-    p_content: content,
+  if (body?.accountId !== userId) return fail("accountChanged", 403);
+  const { id } = await params;
+  const content = typeof body.content === "string" ? body.content.trim() : "";
+  if (!messagingUuid(id) || !content || content.length > 5000 || !messagingRequestKey(body.idempotencyKey)) return fail("invalid", 400);
+  if (!(await rateLimit(`msg:${userId}`, 30, 60)).allowed) return fail("rateLimit", 429);
+  const { data, error } = await db.rpc("send_conversation_message", {
+    p_conversation_id: id, p_sender_id: userId, p_content: content, p_idempotency_key: body.idempotencyKey,
   });
-  if (sendError) {
-    const isMembershipError = sendError.code === "42501" || sendError.code === "P0002"
-      || ((sendError.code === "P0001" || sendError.code === undefined) && sendError.message === "Du bist kein aktives Mitglied dieser Unterhaltung.");
-    return NextResponse.json({ error: isMembershipError ? tResponse("System.conversationMemberInactive") : tResponse("System.m_0949dcf4a579") }, {
-      status: isMembershipError ? 404 : 500,
-    });
-  }
-  const message = Array.isArray(inserted) ? inserted[0] : inserted;
-  if (!message) return NextResponse.json({ error: tResponse('System.m_41c85b9f5d2c') }, { status: 500 });
-
-  if (conversation.kind === "support") {
-    return NextResponse.json({ message: { ...message, senderName: "Du", senderAvatar: null, read_by: [] } });
-  }
-
-  try {
-    // Read recipients again after the atomic insert so a member removed just
-    // before sending cannot receive a stale group notification.
-    const { data: currentMembers } = await db
-      .from("conversation_members")
-      .select("user_id")
-      .eq("conversation_id", id)
-      .is("left_at", null);
-    const currentRecipientIds = (currentMembers ?? []).map((member) => member.user_id).filter((memberId) => memberId !== userId);
-    const { data: senderProfile } = await db.from("profiles").select("display_name, avatar_url").eq("user_id", userId).maybeSingle();
-    const senderName = senderProfile?.display_name ?? "Jemand";
-    if (conversation.kind !== "group" && currentRecipientIds[0]) {
-      const [{ data: emailSettings }] = await Promise.all([
-        db.from("user_settings").select("email_new_message").eq("user_id", currentRecipientIds[0]).maybeSingle(),
-      ]);
-      if (emailSettings?.email_new_message !== false) {
-        const clerk = await clerkClient();
-        const recipient = await clerk.users.getUser(currentRecipientIds[0]);
+  if (error) { const failure = messagingRpcFailure(error); return fail(failure.key, failure.status); }
+  if (!data || data.conversationId !== id || !messagingUuid(data.message?.id) || typeof data.created !== "boolean") return fail("saveError", 503);
+  let senderName = t("senderFallback"); let senderAvatar = null;
+  if (data.created) try {
+    const [{ data: conversation }, { data: sender }] = await Promise.all([
+      db.from("conversations").select("kind,sender_id,receiver_id").eq("id", id).maybeSingle(),
+      db.from("profiles").select("display_name,avatar_url").eq("user_id", userId).maybeSingle(),
+    ]);
+    senderName = sender?.display_name ?? senderName; senderAvatar = sender?.avatar_url ?? null;
+    if (conversation?.kind === "direct") {
+      const receiver = conversation.sender_id === userId ? conversation.receiver_id : conversation.sender_id;
+      const { data: settings } = await db.from("user_settings").select("email_new_message").eq("user_id", receiver).maybeSingle();
+      if (receiver && settings?.email_new_message !== false) {
+        const recipient = await (await clerkClient()).users.getUser(receiver);
         const email = recipient.emailAddresses[0]?.emailAddress;
         if (email) await sendNewMessageEmail(email, senderName, content, id);
       }
     }
-    return NextResponse.json({ message: { ...message, senderName, senderAvatar: senderProfile?.avatar_url ?? null, read_by: [] } });
-  } catch {
-    return NextResponse.json({ message: { ...message, senderName: "Du", senderAvatar: null, read_by: [] } });
-  }
+  } catch { /* No replay may send mail again. */ }
+  return NextResponse.json({ conversationId: id, message: { ...data.message, senderName, senderAvatar, read_by: [] }, replayed: !data.created }, { headers: MESSAGING_HEADERS });
 }

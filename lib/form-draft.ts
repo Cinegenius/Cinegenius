@@ -1,7 +1,8 @@
 /** Private form snapshots only. These keys never publish or change the underlying content. */
 export const FORM_DRAFT_LIMIT = 250_000;
 export function validFormDraftKey(key: unknown): key is string {
-  return typeof key === "string" && /^(profile:edit|setup:quick|setup:profile|guided:(location|equipment)|company:(new|[0-9a-f-]{36})|location-private:[0-9a-f-]{36}|listing:(new|[0-9a-f-]{36})|project:(new|quick|[0-9a-f-]{36})|organization:(new|[0-9a-f-]{36})|organization-entry:(new|[0-9a-f-]{36})|board:compose|support:contact)$/.test(key);
+  if (typeof key === "string" && /^(booking:[A-Za-z0-9_-]{1,128}|inquiry:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}:[A-Za-z0-9_-]{1,128})$/.test(key)) return true;
+  return typeof key === "string" && /^(profile:edit|setup:quick|setup:profile|guided:(location|equipment)|company:(new|[0-9a-f-]{36})|location-private:[0-9a-f-]{36}|listing:(new|[0-9a-f-]{36})|project:(new|quick|[0-9a-f-]{36})|organization:(new|[0-9a-f-]{36})|organization-entry:(new|[0-9a-f-]{36})|board:compose|support:contact|messages:new|message:(conversation|group):[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}|message:recipient:[A-Za-z0-9_-]{1,128})$/.test(key);
 }
 
 export function draftFingerprint(value: unknown): string {

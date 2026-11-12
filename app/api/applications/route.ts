@@ -1,4 +1,5 @@
 import { localizedNotification } from "@/lib/i18n/notification-copy";
+import { createHash } from "node:crypto";
 // Required Supabase table:
 // CREATE TABLE IF NOT EXISTS applications (
 //   id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
@@ -98,53 +99,26 @@ export async function POST(req: NextRequest) {
     href: "/dashboard?tab=messages",
   });
 
-  // Also open a conversation thread so the job poster can reply via messages
-  const { data: existing } = await db
-    .from("conversations")
-    .select("id")
-    .eq("kind", "direct")
-    .eq("listing_id", jobId)
-    .eq("sender_id", userId)
-    .eq("receiver_id", ownerId)
-    .maybeSingle();
-
-  let conversationId = existing?.id;
-  if (!conversationId) {
-    const { data: conv } = await db
-      .from("conversations")
-      .insert({
-        listing_id: jobId,
-        listing_title: jobTitle,
-        listing_type: "job",
-        sender_id: userId,
-        receiver_id: ownerId,
-        kind: "direct",
-        created_by: userId,
-      })
-      .select("id")
-      .single();
-    conversationId = conv?.id;
-    if (conversationId) {
-      await db.from("conversation_members").insert([
-        { conversation_id: conversationId, user_id: userId, role: "member" },
-        { conversation_id: conversationId, user_id: ownerId, role: "member" },
-      ]);
-    }
-  }
-
-  if (conversationId) {
+  // The application is already saved. A chat is an optional, separate channel:
+  // current message consent must never leave an empty chat or undo that success.
+  try {
+    const chatSignal = AbortSignal.timeout(8_000);
+    const { data: application, error: lookupError } = await db.from("applications")
+      .select("id").eq("job_id", job.id).eq("applicant_id", userId).abortSignal(chatSignal).maybeSingle();
     const body = [
       message.trim(),
       portfolioUrl?.trim() ? `Portfolio: ${portfolioUrl.trim()}` : null,
       dayRate?.trim() ? `Tagesgage: ${dayRate.trim()}` : null,
     ].filter(Boolean).join("\n\n");
-
-    await db.rpc("send_conversation_message", {
-      p_conversation_id: conversationId,
-      p_sender_id: userId,
-      p_content: body,
-    });
-  }
+    if (!lookupError && typeof application?.id === "string") {
+      const requestKey = "application_" + createHash("sha256")
+        .update(JSON.stringify({ applicationId: application.id, content: body })).digest("hex");
+      await db.rpc("start_direct_conversation", {
+        p_sender_id: userId, p_receiver_id: ownerId, p_content: body, p_idempotency_key: requestKey,
+        p_listing_id: job.id, p_listing_title: jobTitle, p_listing_type: "job",
+      }).abortSignal(chatSignal);
+    }
+  } catch { /* A saved application remains successful if the optional chat is unavailable. */ }
 
   // Email notification to job owner
   try {

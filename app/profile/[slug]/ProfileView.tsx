@@ -6,12 +6,12 @@ import { marketplaceCategoryLabel } from "@/lib/marketplace-offer";
 import Image from "@/components/MediaImage";
 import Link from "next/link";
 import { useTranslations, useLocale } from "next-intl";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useLayoutEffect, useRef } from "react";
 import { useUser } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
 import {
   MapPin, MessageSquare, Award, ChevronDown, ChevronUp,
-  Pencil, ExternalLink, X, Check, Globe, UserPlus, UserCheck, Clock,
+  Pencil, ExternalLink, X, Check, Globe,
   Ban, Users2, MoreHorizontal, Phone, Mail, Send,
 } from "lucide-react";
 import type { UserProfile, ProfileImage, FilmographyEntry, ProfileAward, ProjectCredit } from "@/lib/profile-types";
@@ -28,6 +28,7 @@ import ProfileCardPhoto from "@/components/ProfileCardPhoto";
 import ResilientPublicImage from "@/components/ResilientPublicImage";
 import { profileCoverStyle } from "@/lib/profile-cover";
 import FloatingPanel from "@/components/FloatingPanel";
+import ConnectButton from "@/components/ConnectButton";
 import { taxonomyLabel } from "@/lib/departments";
 
 
@@ -163,11 +164,19 @@ function normType(t: string | null | undefined): string | null {
 
 function BlockReportBar({ targetId, initialYouBlocked }: { targetId: string; initialYouBlocked: boolean }) {
   const uiText = useTranslations();
+  const { user } = useUser();
+  const router = useRouter();
   const REPORT_REASONS = getLocalizedREPORT_REASONS(uiText);
-
-
+  const blockScope = `${user?.id ?? ""}:${targetId}`;
+  const blockOwner = useRef<string | null>(blockScope);
+  const blockPending = useRef<object | null>(null);
+  useLayoutEffect(() => {
+    blockOwner.current = blockScope;
+    return () => { blockOwner.current = null; blockPending.current = null; };
+  }, [blockScope]);
   const menuTriggerRef = useRef<HTMLButtonElement>(null);
-  const [youBlocked, setYouBlocked] = useState(initialYouBlocked);
+  const [blockState, setBlockState] = useState({ scope: blockScope, blocked: initialYouBlocked });
+  const youBlocked = blockState.scope === blockScope ? blockState.blocked : initialYouBlocked;
   const [blockLoading, setBlockLoading] = useState(false);
   const [blockError, setBlockError] = useState("");
   const [reportOpen, setReportOpen] = useState(false);
@@ -176,24 +185,31 @@ function BlockReportBar({ targetId, initialYouBlocked }: { targetId: string; ini
   const [reportError, setReportError] = useState("");
 
   async function toggleBlock() {
+    if (!user?.id || blockPending.current) return;
+    const own = {};
+    blockPending.current = own;
     setBlockLoading(true);
     setBlockError("");
     try {
       const res = await fetch("/api/blocks", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ blocked_id: targetId }),
+        cache: "no-store", signal: AbortSignal.timeout(20_000),
+        body: JSON.stringify({ blocked_id: targetId, blocked: !youBlocked, accountId: user.id }),
       });
-      if (res.ok) {
-        const data = await res.json();
-        setYouBlocked(data.blocked);
+      const data = await res.json().catch(() => ({}));
+      if (blockOwner.current !== blockScope) return;
+      if (res.ok && typeof data.blocked === "boolean") {
+        setBlockState({ scope: blockScope, blocked: data.blocked });
+        router.refresh();
       } else {
         setBlockError(uiText("Ui.text_37c7cf209c791e"));
       }
     } catch {
-      setBlockError(uiText("Ui.text_e232416aafa1dc"));
+      if (blockOwner.current === blockScope) setBlockError(uiText("Ui.text_e232416aafa1dc"));
     } finally {
-      setBlockLoading(false);
+      if (blockPending.current === own) blockPending.current = null;
+      if (blockOwner.current === blockScope) setBlockLoading(false);
     }
   }
 
@@ -220,7 +236,7 @@ function BlockReportBar({ targetId, initialYouBlocked }: { targetId: string; ini
         type="button"
         aria-expanded={reportOpen}
         onClick={() => setReportOpen((o) => !o)}
-        className="w-8 h-8 flex items-center justify-center rounded-lg bg-white/10 backdrop-blur-md border border-white/20 text-white/70 hover:text-white hover:bg-white/20 transition-all"
+        className="h-11 w-11 flex items-center justify-center rounded-lg bg-white/10 backdrop-blur-md border border-white/20 text-white/70 hover:text-white hover:bg-white/20 transition-all"
         aria-label={uiText("Ui.text_77f6895995c868")}
       >
         <MoreHorizontal size={15} />
@@ -230,8 +246,8 @@ function BlockReportBar({ targetId, initialYouBlocked }: { targetId: string; ini
         <FloatingPanel anchorRef={menuTriggerRef} onClose={() => setReportOpen(false)} className="bg-[#1e2028] border border-white/10 rounded-xl shadow-2xl py-1">
           <button
             onClick={() => { toggleBlock(); setReportOpen(false); }}
-            disabled={blockLoading}
-            className={`w-full flex items-center gap-2 px-3 py-2 text-xs transition-colors disabled:opacity-50 ${
+            disabled={blockLoading || !user?.id}
+            className={`w-full min-h-11 flex items-center gap-2 px-3 py-2 text-xs transition-colors disabled:opacity-50 ${
               youBlocked ? "text-red-400 hover:bg-red-500/10" : "text-white/70 hover:bg-white/5 hover:text-red-400"
             }`}
           >
@@ -247,7 +263,7 @@ function BlockReportBar({ targetId, initialYouBlocked }: { targetId: string; ini
                 <button
                   key={value}
                   onClick={() => setReportReason(value)}
-                  className={`w-full flex items-center gap-2 px-3 py-1.5 text-xs transition-colors ${
+                  className={`w-full min-h-11 flex items-center gap-2 px-3 py-1.5 text-xs transition-colors ${
                     reportReason === value ? "text-gold bg-gold/10" : "text-white/80 hover:bg-white/5"
                   }`}
                 >
@@ -259,16 +275,18 @@ function BlockReportBar({ targetId, initialYouBlocked }: { targetId: string; ini
                 <div className="px-2 pt-1">
                   <button
                     onClick={submitReport}
-                    className="w-full px-3 py-1.5 bg-gold text-bg-primary font-semibold rounded-lg text-xs hover:bg-gold-light transition-colors"
+                    className="min-h-11 w-full px-3 py-2 bg-gold text-bg-primary font-semibold rounded-lg text-xs hover:bg-gold-light transition-colors"
                   >{uiText("Ui.text_8572d639a935e8")}</button>
                 </div>
               )}
             </>
           )}
-          {blockError && <p className="px-3 py-1 text-xs text-red-400">{blockError}</p>}
           {reportError && <p className="px-3 py-1 text-xs text-red-400">{reportError}</p>}
         </FloatingPanel>
       )}
+      {blockError && <div role="alert" className="mt-1 max-w-xs break-words text-xs text-red-400">
+        <p>{blockError}</p><button type="button" disabled={blockLoading} onClick={() => void toggleBlock()} className="inline-flex min-h-11 items-center text-gold underline">{uiText("Contacts.retry")}</button>
+      </div>}
     </div>
   );
 }
@@ -510,61 +528,9 @@ function ActorProfile({ organizationSection, profile, isOwner, projectCredits, c
   const creatorText = useTranslations("creators");
   const travel = profileTravelValue(profile);
   const canContact = !blockStatus?.youBlocked && !blockStatus?.theyBlocked;
-  const { user } = useUser();
   const [lightbox, setLightbox] = useState<string | null>(null);
   const [showAllFilms, setShowAllFilms] = useState(false);
   const [expandedFilm, setExpandedFilm] = useState<number | null>(null);
-  const [friendStatus, setFriendStatus] = useState<null | "pending_sent" | "pending_received" | "friends">(null);
-  const [friendshipId, setFriendshipId] = useState<string | null>(null);
-  const [friendLoading, setFriendLoading] = useState(false);
-
-  // Fetch friendship status
-  useEffect(() => {
-    if (isOwner || !user) return;
-    const controller = new AbortController();
-    fetch(`/api/friendships?userId=${profile.user_id}`, { signal: controller.signal })
-      .then(r => r.ok ? r.json() : null)
-      .then((data) => {
-        const friendship = data?.friendship;
-        if (!friendship) return;
-        setFriendshipId(friendship.id);
-        if (friendship.status === "accepted") {
-          setFriendStatus("friends");
-        } else if (friendship.status === "pending") {
-          setFriendStatus(friendship.sender_id === user.id ? "pending_sent" : "pending_received");
-        }
-      })
-      .catch(() => {});
-    return () => controller.abort();
-  }, [isOwner, user, profile.user_id]);
-
-  async function handleFriendAction() {
-    if (friendLoading) return;
-    setFriendLoading(true);
-    try {
-      if (!friendStatus) {
-        const res = await fetch("/api/friendships", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ receiver_id: profile.user_id }),
-        });
-        if (!res.ok) return;
-        const data = await res.json();
-        setFriendshipId(data.id);
-        setFriendStatus("pending_sent");
-      } else if (friendStatus === "pending_received" && friendshipId) {
-        const res = await fetch(`/api/friendships/${friendshipId}`, {
-          method: "PATCH",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ status: "accepted" }),
-        });
-        if (res.ok) setFriendStatus("friends");
-      }
-    } finally {
-      setFriendLoading(false);
-    }
-  }
-
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const p = (profile.physical ?? {}) as any;
   const roleLabels = displayPositions(profile, getLocalizedProfileTypeLabels(uiText)).map(label => taxonomyLabel(label, uiText));
@@ -700,21 +666,11 @@ function ActorProfile({ organizationSection, profile, isOwner, projectCredits, c
                     <>
                       {canContact && (
                         <>{uiText.rich("Ui.text_6f27c4495b9aa0", { part1: chunks => (<Link href={`/booking?profile=${profile.user_id}`}
-                            className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-gold text-bg-primary font-semibold rounded-lg hover:bg-gold-light transition-colors text-xs">{chunks}</Link>), part3: () => (<MessageSquare size={12} />), part2: chunks => (<Link href={`/messages?to=${profile.user_id}`}
-                            className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-text-primary text-bg-primary font-semibold rounded-lg hover:opacity-90 transition-opacity text-xs">{chunks}</Link>) })}</>
+                            className="inline-flex min-h-11 items-center gap-1.5 px-3 py-2 bg-gold text-bg-primary font-semibold rounded-lg hover:bg-gold-light transition-colors text-xs">{chunks}</Link>), part3: () => (<MessageSquare size={12} />), part2: chunks => (<Link href={`/messages?to=${profile.user_id}`}
+                            className="inline-flex min-h-11 items-center gap-1.5 px-3 py-2 bg-text-primary text-bg-primary font-semibold rounded-lg hover:opacity-90 transition-opacity text-xs">{chunks}</Link>) })}</>
                       )}
                       <BlockReportBar targetId={profile.user_id} initialYouBlocked={blockStatus?.youBlocked ?? false} />
-                      {friendStatus === "friends" ? (
-                        <span className="inline-flex items-center gap-1.5 px-3 py-1.5 border border-emerald-500/30 text-emerald-400 rounded-lg text-xs font-medium">{uiText.rich("Ui.text_11dd18df7dd792", { part1: () => (<UserCheck size={12} />) })}</span>
-                      ) : friendStatus === "pending_sent" ? (
-                        <span className="inline-flex items-center gap-1.5 px-3 py-1.5 border border-border text-text-muted rounded-lg text-xs">{uiText.rich("Ui.text_6ef3d8e9ec1014", { part1: () => (<Clock size={12} />) })}</span>
-                      ) : friendStatus === "pending_received" ? (
-                        <button onClick={handleFriendAction} disabled={friendLoading}
-                          className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-gold text-bg-primary font-semibold rounded-lg hover:bg-gold-light transition-colors text-xs disabled:opacity-50">{uiText.rich("Ui.text_048edf533fa6f4", { part1: () => (<Check size={12} />) })}</button>
-                      ) : (
-                        <button onClick={handleFriendAction} disabled={friendLoading}
-                          className="inline-flex items-center gap-1.5 px-3 py-1.5 border border-border text-text-secondary rounded-lg hover:border-gold/50 hover:text-gold transition-all text-xs disabled:opacity-50">{uiText.rich("Ui.text_854dd7f9f69b35", { part1: () => (<UserPlus size={12} />) })}</button>
-                      )}
+                      <ConnectButton targetUserId={profile.user_id} disabled={!canContact} />
                     </>
                   ) : (
                     <Link href="/profile" className="flex items-center gap-1 text-xs text-text-muted hover:text-gold transition-colors">{uiText.rich("Ui.text_603ead2ae843f0", { part1: () => (<Pencil size={11} />) })}</Link>
@@ -1317,46 +1273,8 @@ function GenericProfile({ organizationSection, profile, isOwner, projectCredits,
   const travel = profileTravelValue(profile);
   const tHeader = useTranslations("profileHeader");
   const canContact = !blockStatus?.youBlocked && !blockStatus?.theyBlocked;
-  const { user } = useUser();
   const [lightbox, setLightbox] = useState<string | null>(null);
   const [expandedFilm, setExpandedFilm] = useState<number | null>(null);
-  const [friendStatus, setFriendStatus] = useState<null | "pending_sent" | "pending_received" | "friends">(null);
-  const [friendshipId, setFriendshipId] = useState<string | null>(null);
-  const [friendLoading, setFriendLoading] = useState(false);
-
-  useEffect(() => {
-    if (isOwner || !user) return;
-    const controller = new AbortController();
-    fetch(`/api/friendships?userId=${profile.user_id}`, { signal: controller.signal })
-      .then(r => r.ok ? r.json() : null)
-      .then((data) => {
-        const friendship = data?.friendship;
-        if (!friendship) return;
-        setFriendshipId(friendship.id);
-        if (friendship.status === "accepted") setFriendStatus("friends");
-        else if (friendship.status === "pending")
-          setFriendStatus(friendship.sender_id === user.id ? "pending_sent" : "pending_received");
-      }).catch(() => {});
-    return () => controller.abort();
-  }, [isOwner, user, profile.user_id]);
-
-  async function handleFriendAction() {
-    if (friendLoading) return;
-    setFriendLoading(true);
-    try {
-      if (!friendStatus) {
-        const res = await fetch("/api/friendships", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ receiver_id: profile.user_id }) });
-        if (!res.ok) return;
-        const data = await res.json();
-        setFriendshipId(data.id);
-        setFriendStatus("pending_sent");
-      } else if (friendStatus === "pending_received" && friendshipId) {
-        const res = await fetch(`/api/friendships/${friendshipId}`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ status: "accepted" }) });
-        if (res.ok) setFriendStatus("friends");
-      }
-    } finally { setFriendLoading(false); }
-  }
-
   const images: ProfileImage[] = profile.profile_images ?? [];
   const reelUrl = profile.showreel_url ?? profile.reel_url;
   const reelEmbed = reelUrl ? getVideoEmbed(reelUrl) : null;
@@ -1434,10 +1352,7 @@ function GenericProfile({ organizationSection, profile, isOwner, projectCredits,
                     <>
                       <Link href={`/messages?to=${profile.user_id}`}
                         className="inline-flex min-h-11 items-center gap-1.5 px-3 py-2 bg-black/60 backdrop-blur-md border border-white/25 text-white font-medium rounded-lg hover:bg-white/25 transition-colors text-xs">{uiText.rich("Ui.text_e670272347a032", { part1: () => (<MessageSquare size={11} />) })}</Link>
-                      <button onClick={handleFriendAction} disabled={friendLoading}
-                        className="inline-flex min-h-11 items-center gap-1.5 px-3 py-2 bg-black/60 backdrop-blur-md border border-white/25 text-white font-medium rounded-lg hover:bg-white/25 transition-colors text-xs disabled:opacity-50">
-                        {friendStatus === "friends" ? <>{uiText.rich("Ui.text_11dd18df7dd792", { part1: () => (<Check size={11} />) })}</> : friendStatus === "pending_sent" ? uiText("Ui.text_4b6a7afab7b4c4") : friendStatus === "pending_received" ? <>{uiText.rich("Ui.text_048edf533fa6f4", { part1: () => (<UserPlus size={11} />) })}</> : <>{uiText.rich("Ui.text_854dd7f9f69b35", { part1: () => (<UserPlus size={11} />) })}</>}
-                      </button>
+                      <ConnectButton targetUserId={profile.user_id} disabled={!canContact} />
                       <Link href={`/booking?profile=${profile.user_id}`}
                         className="inline-flex min-h-11 items-center gap-1.5 px-3 py-2 bg-black/60 backdrop-blur-md border border-white/25 text-white font-medium rounded-lg hover:bg-white/25 transition-colors text-xs">{uiText.rich("Ui.text_9855da52a3b061", { part1: () => (<ExternalLink size={11} />) })}</Link>
                     </>

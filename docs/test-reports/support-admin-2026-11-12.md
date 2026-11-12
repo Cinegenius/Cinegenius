@@ -84,3 +84,18 @@ Supportthread zeigte Verlauf und Antwortfeld. Kein Text wurde versendet und kein
 Verifizierung entschieden. Ein freigegebenes Testmitglied für den abschließenden
 Liveaustausch fehlt. Zustellung echter E-Mails und tatsächliche Smartphone-/
 WebView-Nutzung bleiben offen.
+
+Veröffentlicht als Commit `cb7b6816605fe674df34d780e91c2d7e2bcf50f9`,
+Vercel `dpl_FbLhAaMPuzJ5R8Mqz6C7w5pbLbDL` (READY). Sowohl `www.cinegenius.co`
+als auch die übrigen bestehenden Produktionsdomains zeigen auf diesen Stand.
+Nachprüfung in der tatsächlichen Adminanmeldung: Standardfilter ohne offene
+Anträge; unter „Alle Anfragen“ die fünf bereits bestätigten Anträge mit Status,
+ohne neue Genehmigen-/Ablehnenaktionen und ohne rohe Dokumentverweise.
+Das neue Supportformular lädt mit beschriftetem Nachrichtenfeld und deaktiviertem
+leeren Sendeknopf; kein Liveversand. Öffentliche Hilfeseite enthält den Supportlink,
+Gäste werden für `/support` zur Anmeldung derselben Domain geleitet und der
+Adminzähler verweigert Gästen den Zugriff.
+
+Erweiterter Profil-/Benachrichtigungs-/Anmeldetest: 131/131 bestanden. Eine veraltete
+Testannahme zur festen Anzahl der Benachrichtigungsvorlagen wurde durch den
+strengeren Abgleich der tatsächlichen Index- und Katalogschlüssel ersetzt.

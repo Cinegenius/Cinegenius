@@ -1,7 +1,12 @@
 "use client";
 
-import { useState, useEffect, Suspense } from "react";
-import { useSearchParams, useRouter } from "next/navigation";
+import { useState, useEffect, useLayoutEffect, useRef, Suspense } from "react";
+import { flushSync } from "react-dom";
+import { useFormDraft } from "@/lib/use-form-draft";
+import FormDraftStatus from "@/components/FormDraftStatus";
+import { prepareMessageSend, restoredSendAttempt, type MessageSendAttempt } from "@/lib/message-send-attempt";
+import { useSearchParams } from "next/navigation";
+import { useFormRouter as useRouter } from "@/lib/use-form-router";
 import { useUser } from "@clerk/nextjs";
 import Link from "next/link";
 import {
@@ -52,6 +57,21 @@ function BookingContent() {
       .catch(() => setLoadingProfile(false));
   }, [profileId]);
 
+  const [attempt, setAttempt] = useState<MessageSendAttempt | null>(null);
+  const [posting, setPosting] = useState(false);
+  const pending = useRef(false), owner = useRef(user?.id);
+  useLayoutEffect(() => { owner.current = user?.id; return () => { owner.current = undefined; }; }, [user?.id]);
+  const destination = `booking:${profileId ?? ""}`;
+  const draft = useFormDraft({ formKey: destination, value: { destination, projectTitle, projectType, startDate, endDate, budget, description, attempt },
+    enabled: isLoaded && !!user && !!profileId && !sent, busy: posting,
+    restore: saved => {
+      if (saved.destination !== destination) { setError(uiText("MessagingBackend.saveError")); return; }
+      for (const [field, setter] of [["projectTitle", setProjectTitle], ["projectType", setProjectType], ["startDate", setStartDate], ["endDate", setEndDate], ["budget", setBudget], ["description", setDescription]] as const) {
+        if (typeof saved[field] === "string") setter(saved[field] as string);
+      }
+      setAttempt(restoredSendAttempt(saved.attempt));
+    },
+  });
   const canSubmit =
     projectTitle.trim() &&
     description.trim() &&
@@ -59,7 +79,8 @@ function BookingContent() {
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (!canSubmit || !profileId || !user) return;
+    if (!canSubmit || !profileId || !user || !draft.loaded || pending.current) return;
+    const accountId = user.id; pending.current = true;
     setSending(true);
     setError("");
 
@@ -75,21 +96,30 @@ function BookingContent() {
       .filter((l) => l !== null)
       .join("\n");
 
+    const prepared = prepareMessageSend(attempt, JSON.stringify({ destination, projectTitle, projectType, startDate, endDate, budget, description }), lines);
     try {
+      if (prepared !== attempt) flushSync(() => setAttempt(prepared));
+      if (!await draft.flush()) throw new Error(uiText("MessagingBackend.saveError"));
+      if (owner.current !== accountId) return;
+      setPosting(true);
       const res = await fetch("/api/conversations", {
-        method: "POST",
+        method: "POST", signal: AbortSignal.timeout(20_000),
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ receiver_id: profileId, content: lines }),
+        body: JSON.stringify({ receiver_id: profileId, content: prepared.content, idempotencyKey: prepared.key, accountId }),
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error ?? uiText("Ui.text_f6cc01cb7edbf0"));
+      if (owner.current !== accountId) return;
+      if (!res.ok || typeof data.conversationId !== "string" || !data.message?.id) throw new Error(data.error ?? uiText("Ui.text_f6cc01cb7edbf0"));
+      await draft.complete();
+      if (owner.current !== accountId) return;
       setSent(true);
       setTimeout(() => {
-        router.push(`/messages`);
+        if (owner.current === accountId) router.push(`/messages?conv=${encodeURIComponent(data.conversationId)}`);
       }, 2500);
     } catch (err) {
-      setError(uiErrorMessage(err, uiText("profile.unknownError")));
-      setSending(false);
+      if (owner.current === accountId) setError(uiErrorMessage(err, uiText("profile.unknownError")));
+    } finally {
+      pending.current = false; if (owner.current === accountId) { setSending(false); setPosting(false); }
     }
   }
 
@@ -148,7 +178,7 @@ function BookingContent() {
         <div className="flex items-center gap-3 mb-8">
           <button
             onClick={() => router.back()}
-            className="w-9 h-9 rounded-lg border border-border flex items-center justify-center text-text-secondary hover:border-gold hover:text-gold transition-all"
+            className="min-w-11 min-h-11 rounded-lg border border-border flex items-center justify-center text-text-secondary hover:border-gold hover:text-gold transition-all"
           >
             <ArrowLeft size={16} />
           </button>
@@ -183,10 +213,10 @@ function BookingContent() {
               <FileText size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-text-muted" />
               <input
                 type="text"
-                value={projectTitle}
+                disabled={sending} value={projectTitle}
                 onChange={(e) => setProjectTitle(e.target.value)}
                 placeholder={uiText("Ui.text_5f14ed0f4b7f5a")}
-                className="w-full pl-9 pr-4 py-3 bg-bg-elevated border border-border rounded-xl text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:border-gold transition-colors"
+                className="w-full pl-9 pr-4 py-3 bg-bg-elevated border border-border rounded-xl text-base sm:text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:border-gold transition-colors"
                 required
               />
             </div>
@@ -195,9 +225,9 @@ function BookingContent() {
           <div>
             <label className="block text-xs uppercase tracking-widest text-text-muted font-semibold mb-1.5">{uiText("jobs.filterProjectType")}</label>
             <select
-              value={projectType}
+              disabled={sending} value={projectType}
               onChange={(e) => setProjectType(e.target.value)}
-              className="w-full px-4 py-3 bg-bg-elevated border border-border rounded-xl text-sm text-text-primary focus:outline-none focus:border-gold transition-colors"
+              className="w-full px-4 py-3 bg-bg-elevated border border-border rounded-xl text-base sm:text-sm text-text-primary focus:outline-none focus:border-gold transition-colors"
             >
               <option value="">{uiText("Ui.text_5a65d3a10117a6")}</option>
               <option value="Kurzfilm">{uiText("Ui.text_75b346d26e4973")}</option>
@@ -219,9 +249,9 @@ function BookingContent() {
                 <Calendar size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-text-muted" />
                 <input
                   type="date"
-                  value={startDate}
+                  disabled={sending} value={startDate}
                   onChange={(e) => setStartDate(e.target.value)}
-                  className="w-full pl-9 pr-4 py-3 bg-bg-elevated border border-border rounded-xl text-sm text-text-primary focus:outline-none focus:border-gold transition-colors"
+                  className="w-full pl-9 pr-4 py-3 bg-bg-elevated border border-border rounded-xl text-base sm:text-sm text-text-primary focus:outline-none focus:border-gold transition-colors"
                 />
               </div>
             </div>
@@ -231,9 +261,9 @@ function BookingContent() {
                 <Calendar size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-text-muted" />
                 <input
                   type="date"
-                  value={endDate}
+                  disabled={sending} value={endDate}
                   onChange={(e) => setEndDate(e.target.value)}
-                  className="w-full pl-9 pr-4 py-3 bg-bg-elevated border border-border rounded-xl text-sm text-text-primary focus:outline-none focus:border-gold transition-colors"
+                  className="w-full pl-9 pr-4 py-3 bg-bg-elevated border border-border rounded-xl text-base sm:text-sm text-text-primary focus:outline-none focus:border-gold transition-colors"
                 />
               </div>
             </div>
@@ -246,10 +276,10 @@ function BookingContent() {
               <input
                 type="number"
                 min={0}
-                value={budget}
+                disabled={sending} value={budget}
                 onChange={(e) => setBudget(e.target.value)}
                 placeholder="800"
-                className="w-full pl-9 pr-4 py-3 bg-bg-elevated border border-border rounded-xl text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:border-gold transition-colors"
+                className="w-full pl-9 pr-4 py-3 bg-bg-elevated border border-border rounded-xl text-base sm:text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:border-gold transition-colors"
               />
             </div>
           </div>
@@ -257,15 +287,16 @@ function BookingContent() {
           <div>
             <label className="block text-xs uppercase tracking-widest text-text-muted font-semibold mb-1.5">{uiText("Ui.text_a01c894e08ee46")}</label>
             <textarea
-              value={description}
+              disabled={sending} value={description}
               onChange={(e) => setDescription(e.target.value)}
               placeholder={uiText("Ui.text_f22532dbdad4d2")}
               rows={5}
-              className="w-full px-4 py-3 bg-bg-elevated border border-border rounded-xl text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:border-gold transition-colors resize-none"
+              className="w-full px-4 py-3 bg-bg-elevated border border-border rounded-xl text-base sm:text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:border-gold transition-colors resize-none"
               required
             />
           </div>
 
+          <FormDraftStatus draft={draft} />
           {error && (
             <div className="flex items-center gap-2 p-3 bg-red-500/10 border border-red-500/20 rounded-xl text-sm text-red-400">
               <AlertCircle size={14} className="shrink-0" />
@@ -281,7 +312,7 @@ function BookingContent() {
             >{uiText("home.boardCancel")}</button>
             <button
               type="submit"
-              disabled={!canSubmit}
+              disabled={!canSubmit || !draft.loaded}
               className="flex-1 py-3 bg-gold text-bg-primary font-semibold rounded-xl hover:bg-gold-light transition-colors disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-2 text-sm"
             >
               {sending ? (
@@ -299,12 +330,18 @@ function BookingContent() {
   );
 }
 
+function BookingDestination() {
+  const searchParams = useSearchParams();
+  const { user } = useUser();
+  return <BookingContent key={`${user?.id ?? ""}:${searchParams.get("profile") ?? ""}`} />;
+}
+
 export default function BookingPage() {
   const uiText = useTranslations();
 
   return (
     <Suspense fallback={<div className="pt-32 text-center text-text-muted">{uiText("Ui.text_b89b8cdb9d6d6f")}</div>}>
-      <BookingContent />
+      <BookingDestination />
     </Suspense>
   );
 }

@@ -1,5 +1,7 @@
 "use client";
 
+import MessageComposer from "@/components/messaging/MessageComposer";
+import type {ChatMessage} from "@/lib/messaging-ui";
 import GenieWritingAssistant from "@/components/GenieWritingAssistant";
 import { locationRoomLabel } from "@/lib/location-rooms";
 
@@ -29,14 +31,14 @@ import UnoptimizedImage from "@/components/UnoptimizedImage";
 import { useFormDraft } from "@/lib/use-form-draft";
 import { useFormNavigation } from "@/contexts/FormDraftContext";
 import FormDraftStatus from "@/components/FormDraftStatus";
-import React, { useState, useEffect, useRef, useCallback } from "react";
+import React, { useState, useEffect, useLayoutEffect, useRef, useCallback } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import {
   List, Calendar, MessageSquare,
   BarChart2, Plus, Eye,
   Briefcase, CheckCircle, ChevronRight, ExternalLink,
-  User, Send,
+  User,
   Pencil, Save, Loader2, Upload, Heart, MapPin, Car, Package, Trash2,
   Users, UserPlus, Check, X, Globe, Lock, Clock, ShieldCheck,
   Building2, AlertCircle, FileText, ArrowLeft, Search,
@@ -167,10 +169,10 @@ export default function DashboardPage() {
     setActiveTab(VALID_TABS.includes(tabParam) ? tabParam : "overview");
   }, [router, tabParam]);
 
-  const navigateDashboardTab = (tab: string) => {
+  const navigateDashboardTab = (tab: string) => leaveEditor(() => {
     setActiveTab(tab);
     router.replace(`/dashboard?tab=${encodeURIComponent(tab)}`, { scroll: false });
-  };
+  });
 
   useEffect(() => {
     return subscribeToProfileUpdated((detail) => {
@@ -592,57 +594,75 @@ export default function DashboardPage() {
 
   // Friends
   type FriendEntry = { friendship_id: string; user_id: string; display_name: string; avatar_url: string | null; role: string };
-  const [friends, setFriends] = useState<FriendEntry[]>([]);
-  const [friendsIncoming, setFriendsIncoming] = useState<FriendEntry[]>([]);
-  const [friendsOutgoing, setFriendsOutgoing] = useState<FriendEntry[]>([]);
+  const [storedFriends, setFriends] = useState<FriendEntry[]>([]);
+  const [storedIncoming, setFriendsIncoming] = useState<FriendEntry[]>([]);
+  const [storedOutgoing, setFriendsOutgoing] = useState<FriendEntry[]>([]);
   const [friendsLoading, setFriendsLoading] = useState(false);
   const [friendsTab, setFriendsTab] = useState<"friends" | "incoming" | "outgoing">("incoming");
   const [friendSearch, setFriendSearch] = useState("");
 
-  const doLoadFriends = (showSpinner: boolean) => {
+  const [friendsOwner, setFriendsOwner] = useState<string | null>(null);
+  const [friendsFailure, setFriendsFailure] = useState({ account: "", text: "" });
+  const [friendPending, setFriendPending] = useState<Set<string>>(new Set());
+  const friendOperations = useRef(new Set<string>());
+  const friendLoadGeneration = useRef(0);
+  const friendAccount = useRef(user?.id);
+  useLayoutEffect(() => { friendAccount.current = user?.id; return () => { friendAccount.current = undefined; }; }, [user?.id]);
+  const friendsReady = !!user?.id && friendsOwner === user.id;
+  const friends = friendsReady ? storedFriends : [];
+  const friendsIncoming = friendsReady ? storedIncoming : [];
+  const friendsOutgoing = friendsReady ? storedOutgoing : [];
+  const friendsError = friendsFailure.account === user?.id ? friendsFailure.text : "";
+
+  const doLoadFriends = useCallback(async (showSpinner: boolean) => {
+    const actor = user?.id;
+    if (!actor) return;
+    const generation = ++friendLoadGeneration.current;
     if (showSpinner) setFriendsLoading(true);
-    fetch("/api/friendships")
-      .then(r => r.json())
-      .then(({ friends: f, incoming: i, outgoing: o }) => {
-        setFriends(f ?? []);
-        setFriendsIncoming(i ?? []);
-        setFriendsOutgoing(o ?? []);
-      })
-      .catch(() => {})
-      .finally(() => setFriendsLoading(false));
-  };
+    try {
+      const response = await fetch("/api/friendships", { cache: "no-store", signal: AbortSignal.timeout(15_000) });
+      const data = await response.json();
+      if (friendAccount.current !== actor || generation !== friendLoadGeneration.current) return;
+      if (!response.ok || !Array.isArray(data.friends) || !Array.isArray(data.incoming) || !Array.isArray(data.outgoing)) throw new Error(uiText("Contacts.loadError"));
+      setFriends(data.friends); setFriendsIncoming(data.incoming); setFriendsOutgoing(data.outgoing);
+      setFriendsOwner(actor); setFriendsFailure({ account: actor, text: "" });
+    } catch (cause) {
+      if (friendAccount.current === actor && generation === friendLoadGeneration.current) setFriendsFailure({ account: actor, text: uiErrorMessage(cause, uiText("Contacts.loadError")) });
+    } finally { if (friendAccount.current === actor && generation === friendLoadGeneration.current) setFriendsLoading(false); }
+  }, [user?.id, uiText]);
 
-  // Load on mount for sidebar badge
-  useEffect(() => { doLoadFriends(false); }, []);
-
-  // Reload with spinner when the friends tab is opened
+  useEffect(() => { let active = true; queueMicrotask(() => { if (active) void doLoadFriends(false); }); return () => { active = false; }; }, [doLoadFriends]);
   useEffect(() => {
-    if (activeTab !== "friends") return;
-    doLoadFriends(true);
-  }, [activeTab]);
+    let active = true;
+    queueMicrotask(() => { if (active && activeTab === "friends") void doLoadFriends(true); });
+    return () => { active = false; };
+  }, [activeTab, doLoadFriends]);
 
-  const acceptFriend = async (id: string) => {
-    await fetch(`/api/friendships/${id}`, {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ status: "accepted" }),
-    });
-    doLoadFriends(true);
+  const changeFriend = async (id: string, status?: "accepted" | "rejected") => {
+    const actor = user?.id, key = `${actor}:${id}`;
+    if (!actor || friendOperations.current.has(key)) return;
+    friendOperations.current.add(key); setFriendPending(previous => new Set(previous).add(key));
+    setFriendsFailure({ account: actor, text: "" });
+    try {
+      const response = await fetch(`/api/friendships/${id}`, {
+        method: status ? "PATCH" : "DELETE", cache: "no-store", signal: AbortSignal.timeout(20_000),
+        headers: { "Content-Type": "application/json", "X-Contact-Account": actor },
+        ...(status ? { body: JSON.stringify({ status, accountId: actor }) } : {}),
+      });
+      const result = await response.json().catch(() => ({}));
+      if (friendAccount.current !== actor) return;
+      if (!response.ok || result.success !== true) throw new Error(result.error || uiText("Contacts.error"));
+      await doLoadFriends(true);
+    } catch (cause) {
+      if (friendAccount.current === actor) setFriendsFailure({ account: actor, text: uiErrorMessage(cause, uiText("Contacts.error")) });
+    } finally {
+      friendOperations.current.delete(key);
+      setFriendPending(previous => { const next = new Set(previous); next.delete(key); return next; });
+    }
   };
-
-  const rejectFriend = async (id: string) => {
-    await fetch(`/api/friendships/${id}`, {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ status: "rejected" }),
-    });
-    doLoadFriends(true);
-  };
-
-  const removeFriendEntry = async (id: string) => {
-    await fetch(`/api/friendships/${id}`, { method: "DELETE" });
-    doLoadFriends(true);
-  };
+  const acceptFriend = (id: string) => changeFriend(id, "accepted");
+  const rejectFriend = (id: string) => changeFriend(id, "rejected");
+  const removeFriendEntry = (id: string) => { void changeFriend(id); };
 
   // Privacy settings
   const [privacySettings, setPrivacySettings] = useState<{ profile_visibility: string; message_permission: string; email_new_message: boolean; phone_visibility: string; contact_email_visibility: string }>({
@@ -725,13 +745,9 @@ export default function DashboardPage() {
   const [selectedConversation, setSelectedConversation] = useState<string | null>(null);
   const [activeMessages, setActiveMessages] = useState<RealMessage[]>([]);
   const [messagesLoading, setMessagesLoading] = useState(false);
-  const [replyText, setReplyText] = useState("");
-  const [sending, setSending] = useState(false);
-  const [replyError, setReplyError] = useState("");
   const [messageLoadError, setMessageLoadError] = useState("");
   const [messageReloadVersion, setMessageReloadVersion] = useState(0);
   const messageViewRef = useRef<{ userId: string; conversationId: string } | null>(null);
-  const messageSendPendingRef = useRef(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -862,7 +878,6 @@ export default function DashboardPage() {
     const isCurrent = () => !cancelled && messageViewRef.current === view;
     setActiveMessages([]);
     setMessageLoadError("");
-    setReplyError("");
     if (!view || !selectedConversation || !user?.id) {
       setMessagesLoading(false);
       return;
@@ -915,36 +930,12 @@ export default function DashboardPage() {
     return () => { cancelled = true; controller.abort(); };
   }, [selectedConversation, user?.id, messageReloadVersion, dashboardMessageText]);
 
-  const sendReply = async () => {
+  const confirmReply = (message: ChatMessage, conversationId: string, accountId: string) => {
     const view = messageViewRef.current;
-    if (!replyText.trim() || !selectedConversation || !view || view.conversationId !== selectedConversation || view.userId !== user?.id || sending || messageSendPendingRef.current) return;
-    const isCurrent = () => messageViewRef.current === view;
-    const draftAtSend = replyText;
-    messageSendPendingRef.current = true;
-    setSending(true);
-    setReplyError("");
-    try {
-      const response = await fetch(`/api/conversations/${view.conversationId}`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ content: draftAtSend.trim() }),
-      });
-      const payload = await response.json().catch(() => ({}));
-      if (!response.ok || payload.error || !payload.message?.id) {
-        if (isCurrent()) setReplyError(typeof payload.error === "string" && payload.error ? payload.error : dashboardMessageText("sendError"));
-        return;
-      }
-      if (!isCurrent()) { void loadDashboardConversations(); return; }
-      setReplyText(current => current === draftAtSend ? "" : current);
-      setActiveMessages(current => mergeMessagesById(current, [payload.message as RealMessage]));
-      setTimeout(() => { if (isCurrent()) messagesEndRef.current?.scrollIntoView({ behavior: "smooth" }); }, 50);
-      void loadDashboardConversations();
-    } catch {
-      if (isCurrent()) setReplyError(dashboardMessageText("sendError"));
-    } finally {
-      messageSendPendingRef.current = false;
-      setSending(false);
-    }
+    if (!view || view.userId !== accountId || view.conversationId !== conversationId) return;
+    setActiveMessages(current => mergeMessagesById(current, [message]));
+    setTimeout(() => { if (messageViewRef.current === view) messagesEndRef.current?.scrollIntoView({behavior:"smooth"}); }, 50);
+    void loadDashboardConversations();
   };
 
   const formatMsgTime = (iso: string) => {
@@ -974,11 +965,24 @@ export default function DashboardPage() {
       messages: "Nachrichten",
       analytics: "Analysen",
       favorites: "Merkliste",
-      friends: "Freunde",
+      friends: uiText("Contacts.title"),
       settings: "Einstellungen",
     };
     return map[activeTab] ?? activeTab;
   };
+
+  const contactQuery = friendSearch.trim().toLowerCase();
+  const filteredContacts = friends.filter(f =>
+    !contactQuery || f.display_name.toLowerCase().includes(contactQuery) || (f.role ?? "").toLowerCase().includes(contactQuery)
+  );
+  const groupedContacts = filteredContacts.reduce<Record<string, typeof friends>>((acc, f) => {
+    const key = f.role?.trim() || "Sonstige";
+    (acc[key] ??= []).push(f);
+    return acc;
+  }, {});
+  const sortedContactGroups = Object.entries(groupedContacts).sort(([a], [b]) => a.localeCompare(b, uiLocale));
+  sortedContactGroups.forEach(([, members]) => members.sort((a, b) => a.display_name.localeCompare(b.display_name, uiLocale)));
+
 
   return (
     <div className="pt-16 min-h-screen flex w-full min-w-0">
@@ -1930,7 +1934,7 @@ export default function DashboardPage() {
                     return (
                       <button
                         key={conv.id}
-                        onClick={() => setSelectedConversation(conv.id)}
+                        onClick={() => leaveEditor(() => setSelectedConversation(conv.id))}
                         className={`w-full flex items-start gap-3 p-4 text-left hover:bg-bg-elevated transition-colors ${
                           selectedConversation === conv.id ? "bg-bg-elevated border-l-2 border-l-gold" : ""
                         }`}
@@ -1982,8 +1986,9 @@ export default function DashboardPage() {
                     {/* Header */}
                     <div className="px-4 py-3 border-b border-border bg-bg-elevated flex items-center gap-3">
                       <button
-                        onClick={() => setSelectedConversation(null)}
-                        className="sm:hidden flex items-center justify-center w-7 h-7 rounded-lg hover:bg-bg-secondary transition-colors shrink-0"
+                        onClick={() => leaveEditor(() => setSelectedConversation(null))}
+                        aria-label={uiText("messagesNavigation.back")}
+                        className="sm:hidden flex min-h-11 min-w-11 items-center justify-center rounded-lg hover:bg-bg-secondary transition-colors shrink-0"
                       >
                         <ArrowLeft size={16} className="text-text-muted" />
                       </button>
@@ -2015,7 +2020,7 @@ export default function DashboardPage() {
                         const mine = msg.sender_id === user?.id;
                         return (
                           <div key={msg.id} className={`flex ${mine ? "justify-end" : "justify-start"}`}>
-                            <div className={`max-w-[75%] rounded-2xl px-4 py-2.5 ${
+                            <div className={`min-w-0 max-w-[86%] whitespace-pre-wrap break-words [overflow-wrap:anywhere] rounded-2xl px-4 py-2.5 ${
                               mine
                                 ? "bg-gold text-bg-primary rounded-br-sm"
                                 : "bg-bg-elevated border border-border text-text-secondary rounded-bl-sm"
@@ -2031,27 +2036,8 @@ export default function DashboardPage() {
                       <div ref={messagesEndRef} />
                     </div>
 
-                    {/* Reply input */}
-                    <div className="p-3 border-t border-border">
-                      {replyError && <p role="alert" className="mb-2 text-xs text-red-400">{replyError}</p>}
-                      <div className="flex items-end gap-2">
-                      <textarea
-                        rows={2}
-                        value={replyText}
-                        onChange={(e) => setReplyText(e.target.value)}
-                        placeholder={uiText("Ui.text_b43afc27e348f2")}
-                        className="flex-1 bg-bg-elevated border border-border rounded-xl px-3 py-2 text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:border-gold transition-colors resize-none"
-                        onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); sendReply(); } }}
-                      />
-                      <button
-                        onClick={sendReply}
-                        disabled={!replyText.trim() || sending}
-                        className="w-9 h-9 bg-gold rounded-xl flex items-center justify-center hover:bg-gold-light transition-colors shrink-0 disabled:opacity-50 disabled:cursor-not-allowed"
-                      >
-                        <Send size={15} className="text-bg-primary" />
-                      </button>
-                      </div>
-                    </div>
+                    {user?.id && <MessageComposer key={`${user.id}:conversation:${selectedConversation}`} accountId={user.id} destination={{conversationId:selectedConversation}} onSent={(message,conversationId)=>confirmReply(message,conversationId,user.id)}/>}
+
                   </div>
                 );
               })()}
@@ -2573,7 +2559,7 @@ export default function DashboardPage() {
               </div>
 
               {/* Sub-tabs */}
-              <div className="flex gap-1 p-1 bg-bg-secondary border border-border rounded-xl w-fit">
+              <div className="flex w-full flex-wrap gap-1 p-1 bg-bg-secondary border border-border rounded-xl sm:w-fit">
                 {(["incoming", "friends", "outgoing"] as const).map((t) => {
                   const labels = { incoming: uiText("Ui.text_5dfb5bcd667e78"), friends: uiText("Ui.text_f72d71d3376f5f"), outgoing: uiText("Ui.text_4b6a7afab7b4c4") };
                   const counts = { incoming: friendsIncoming.length, friends: friends.length, outgoing: friendsOutgoing.length };
@@ -2581,7 +2567,7 @@ export default function DashboardPage() {
                     <button
                       key={t}
                       onClick={() => setFriendsTab(t)}
-                      className={`px-4 py-1.5 text-xs font-semibold rounded-lg transition-all flex items-center gap-1.5 ${
+                      className={`min-h-11 px-3 py-2 text-xs font-semibold rounded-lg transition-all flex items-center gap-1.5 ${
                         friendsTab === t ? "bg-gold text-bg-primary" : "text-text-secondary hover:text-gold"
                       }`}
                     >
@@ -2596,6 +2582,9 @@ export default function DashboardPage() {
                 })}
               </div>
 
+              {friendsError && <div role="alert" className="rounded-xl border border-red-400/30 p-3 text-sm text-red-400">
+                <p>{friendsError}</p><button type="button" onClick={() => void doLoadFriends(true)} className="mt-1 inline-flex min-h-11 items-center text-gold underline">{uiText("Contacts.retry")}</button>
+              </div>}
               {friendsLoading && (
                 <div className="space-y-3">
                   {[1, 2].map(i => (
@@ -2604,7 +2593,7 @@ export default function DashboardPage() {
                 </div>
               )}
 
-              {!friendsLoading && friendsTab === "incoming" && (
+              {!friendsLoading && friendsReady && friendsTab === "incoming" && (
                 <>
                   {friendsIncoming.length === 0 ? (
                     <div className="text-center py-12 border border-dashed border-border rounded-2xl">
@@ -2614,7 +2603,7 @@ export default function DashboardPage() {
                   ) : (
                     <div className="space-y-3">
                       {friendsIncoming.map(f => (
-                        <div key={f.friendship_id} className="flex items-center gap-4 p-4 rounded-xl border border-border bg-bg-secondary">
+                        <div key={f.friendship_id} className="flex flex-wrap items-center gap-3 p-4 rounded-xl border border-border bg-bg-secondary">
                           <div className="shrink-0">
                             {f.avatar_url ? (
                               <UnoptimizedImage src={f.avatar_url} alt="" className="w-11 h-11 rounded-full object-cover border border-border" />
@@ -2628,11 +2617,11 @@ export default function DashboardPage() {
                             <p className="font-semibold text-text-primary text-sm truncate">{f.display_name}</p>
                             <p className="text-xs text-text-muted truncate">{f.role}</p>
                           </div>
-                          <div className="flex items-center gap-2 shrink-0">
-                            <button onClick={() => acceptFriend(f.friendship_id)}
-                              className="flex items-center gap-1 px-3 py-1.5 bg-success/10 border border-success/20 text-success text-xs font-medium rounded-lg hover:bg-success/20 transition-colors">{uiText.rich("Ui.text_048edf533fa6f4", { part1: () => (<Check size={12} />) })}</button>
-                            <button onClick={() => rejectFriend(f.friendship_id)}
-                              className="flex items-center gap-1 px-3 py-1.5 border border-border text-text-muted text-xs rounded-lg hover:border-red-400 hover:text-red-400 transition-colors">{uiText.rich("Ui.text_2424239b7d6d6c", { part1: () => (<X size={12} />) })}</button>
+                          <div className="flex max-w-full flex-wrap items-center gap-2">
+                            <button disabled={friendPending.has(`${user?.id}:${f.friendship_id}`)} onClick={() => acceptFriend(f.friendship_id)}
+                              className="flex min-h-11 items-center gap-1 px-3 py-2 bg-success/10 border border-success/20 text-success text-xs font-medium rounded-lg hover:bg-success/20 transition-colors">{uiText.rich("Ui.text_048edf533fa6f4", { part1: () => (<Check size={12} />) })}</button>
+                            <button disabled={friendPending.has(`${user?.id}:${f.friendship_id}`)} onClick={() => rejectFriend(f.friendship_id)}
+                              className="flex min-h-11 items-center gap-1 px-3 py-2 border border-border text-text-muted text-xs rounded-lg hover:border-red-400 hover:text-red-400 transition-colors">{uiText.rich("Ui.text_2424239b7d6d6c", { part1: () => (<X size={12} />) })}</button>
                           </div>
                         </div>
                       ))}
@@ -2641,20 +2630,7 @@ export default function DashboardPage() {
                 </>
               )}
 
-              {!friendsLoading && friendsTab === "friends" && (() => {
-                const q = friendSearch.trim().toLowerCase();
-                const filtered = friends.filter(f =>
-                  !q || f.display_name.toLowerCase().includes(q) || (f.role ?? "").toLowerCase().includes(q)
-                );
-                const grouped = filtered.reduce<Record<string, typeof friends>>((acc, f) => {
-                  const key = f.role?.trim() || "Sonstige";
-                  (acc[key] ??= []).push(f);
-                  return acc;
-                }, {});
-                const sortedGroups = Object.entries(grouped).sort(([a], [b]) => a.localeCompare(b, uiLocale));
-                sortedGroups.forEach(([, members]) => members.sort((a, b) => a.display_name.localeCompare(b.display_name, uiLocale)));
-
-                return (
+              {!friendsLoading && friendsReady && friendsTab === "friends" && (
                   <>
                     {friends.length === 0 ? (
                       <div className="text-center py-12 border border-dashed border-border rounded-2xl">
@@ -2673,16 +2649,16 @@ export default function DashboardPage() {
                             className="w-full pl-9 pr-4 py-2 bg-bg-elevated border border-border rounded-xl text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:border-gold/50 transition-colors"
                           />
                         </div>
-                        {filtered.length === 0 ? (
+                        {filteredContacts.length === 0 ? (
                           <p className="text-sm text-text-muted text-center py-8">{uiText.rich("Ui.text_9da7cfdab9c3a6", { value1: () => (friendSearch) })}</p>
                         ) : (
                           <div className="space-y-5">
-                            {sortedGroups.map(([role, members]) => (
+                            {sortedContactGroups.map(([role, members]) => (
                               <div key={role}>
                                 <p className="text-[10px] font-semibold text-text-muted uppercase tracking-wider mb-2 px-1">{role}</p>
                                 <div className="space-y-2">
                                   {members.map(f => (
-                                    <div key={f.friendship_id} className="flex items-center gap-4 p-4 rounded-xl border border-border bg-bg-secondary hover:border-gold/30 transition-colors">
+                                    <div key={f.friendship_id} className="flex flex-wrap items-center gap-3 p-4 rounded-xl border border-border bg-bg-secondary hover:border-gold/30 transition-colors">
                                       <div className="shrink-0">
                                         {f.avatar_url ? (
                                           <UnoptimizedImage src={f.avatar_url} alt="" className="w-11 h-11 rounded-full object-cover border border-border" />
@@ -2696,10 +2672,10 @@ export default function DashboardPage() {
                                         <p className="font-semibold text-text-primary text-sm truncate">{f.display_name}</p>
                                         <p className="text-xs text-text-muted truncate">{f.role}</p>
                                       </div>
-                                      <div className="flex items-center gap-2 shrink-0">
-                                        <Link href={`/profile/${f.user_id}`} className="px-3 py-1.5 text-xs border border-border text-text-secondary rounded-lg hover:border-gold hover:text-gold transition-all">{uiText("profile.tabProfile")}</Link>
-                                        <button onClick={() => removeFriendEntry(f.friendship_id)}
-                                          className="px-3 py-1.5 text-xs border border-border text-text-muted rounded-lg hover:border-red-400 hover:text-red-400 transition-all">{uiText("profile.removePhoto")}</button>
+                                      <div className="flex max-w-full flex-wrap items-center gap-2">
+                                        <Link href={`/profile/${f.user_id}`} className="inline-flex min-h-11 items-center px-3 py-2 text-xs border border-border text-text-secondary rounded-lg hover:border-gold hover:text-gold transition-all">{uiText("profile.tabProfile")}</Link>
+                                        <button disabled={friendPending.has(`${user?.id}:${f.friendship_id}`)} onClick={() => removeFriendEntry(f.friendship_id)}
+                                          className="inline-flex min-h-11 items-center px-3 py-2 text-xs border border-border text-text-muted rounded-lg hover:border-red-400 hover:text-red-400 transition-all">{uiText("Contacts.remove")}</button>
                                       </div>
                                     </div>
                                   ))}
@@ -2711,10 +2687,9 @@ export default function DashboardPage() {
                       </>
                     )}
                   </>
-                );
-              })()}
+              )}
 
-              {!friendsLoading && friendsTab === "outgoing" && (
+              {!friendsLoading && friendsReady && friendsTab === "outgoing" && (
                 <>
                   {friendsOutgoing.length === 0 ? (
                     <div className="text-center py-12 border border-dashed border-border rounded-2xl">
@@ -2724,7 +2699,7 @@ export default function DashboardPage() {
                   ) : (
                     <div className="space-y-3">
                       {friendsOutgoing.map(f => (
-                        <div key={f.friendship_id} className="flex items-center gap-4 p-4 rounded-xl border border-border bg-bg-secondary">
+                        <div key={f.friendship_id} className="flex flex-wrap items-center gap-3 p-4 rounded-xl border border-border bg-bg-secondary">
                           <div className="shrink-0">
                             {f.avatar_url ? (
                               <UnoptimizedImage src={f.avatar_url} alt="" className="w-11 h-11 rounded-full object-cover border border-border" />
@@ -2738,10 +2713,10 @@ export default function DashboardPage() {
                             <p className="font-semibold text-text-primary text-sm truncate">{f.display_name}</p>
                             <p className="text-xs text-text-muted truncate">{f.role}</p>
                           </div>
-                          <div className="flex items-center gap-2 shrink-0">
+                          <div className="flex max-w-full flex-wrap items-center gap-2">
                             <span className="text-xs text-text-muted flex items-center gap-1 px-3 py-1.5 bg-bg-elevated border border-border rounded-lg">{uiText.rich("Ui.text_19b8ad14754fa2", { part1: () => (<Clock size={11} />) })}</span>
-                            <button onClick={() => removeFriendEntry(f.friendship_id)}
-                              className="px-3 py-1.5 text-xs border border-border text-text-muted rounded-lg hover:border-red-400 hover:text-red-400 transition-all">{uiText("OrganizationAccess.withdraw")}</button>
+                            <button disabled={friendPending.has(`${user?.id}:${f.friendship_id}`)} onClick={() => removeFriendEntry(f.friendship_id)}
+                              className="inline-flex min-h-11 items-center px-3 py-2 text-xs border border-border text-text-muted rounded-lg hover:border-red-400 hover:text-red-400 transition-all">{uiText("OrganizationAccess.withdraw")}</button>
                           </div>
                         </div>
                       ))}

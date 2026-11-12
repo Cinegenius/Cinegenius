@@ -1,8 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useLayoutEffect, useRef, useState } from "react";
+import { flushSync } from "react-dom";
+import { useFormDraft } from "@/lib/use-form-draft";
+import FormDraftStatus from "@/components/FormDraftStatus";
+import { prepareMessageSend, restoredSendAttempt, type MessageSendAttempt } from "@/lib/message-send-attempt";
 import { useTranslations } from "next-intl";
-import { useRouter } from "next/navigation";
+import { useFormRouter as useRouter } from "@/lib/use-form-router";
 import { useUser } from "@clerk/nextjs";
 import { Send, CheckCircle, Shield, Clock, ChevronRight, Loader2, LogIn } from "lucide-react";
 import { uiErrorMessage } from "@/lib/ui-error-message";
@@ -15,7 +19,7 @@ type Props = {
   ownerName: string;
 };
 
-export default function InquiryForm({ listingId, listingTitle, listingType, ownerId, ownerName }: Props) {
+export function InquiryFormContent({ listingId, listingTitle, listingType, ownerId, ownerName }: Props) {
   const uiText = useTranslations();
   const uiOptionLabels: Record<string, string> = {
     "Spielfilm": uiText("Ui.text_031b1c1fc4b241"),
@@ -47,13 +51,30 @@ export default function InquiryForm({ listingId, listingTitle, listingType, owne
   const [projectType, setProjectType] = useState(isMarketplace ? "" : "Spielfilm");
   const [message, setMessage] = useState("");
 
+  const [attempt, setAttempt] = useState<MessageSendAttempt | null>(null);
+  const [posting, setPosting] = useState(false);
+  const [sentConversation, setSentConversation] = useState("");
+  const pending = useRef(false), owner = useRef(user?.id);
+  useLayoutEffect(() => { owner.current = user?.id; return () => { owner.current = undefined; }; }, [user?.id]);
+  const destination = `inquiry:${listingId}:${ownerId}`;
+  const draft = useFormDraft({ formKey: destination, value: { destination, projectTitle, projectType, message, attempt },
+    enabled: isLoaded && !!user && step === "form", busy: posting,
+    restore: saved => {
+      if (saved.destination !== destination) { setError(uiText("MessagingBackend.saveError")); return; }
+      if (typeof saved.projectTitle === "string") setProjectTitle(saved.projectTitle);
+      if (typeof saved.projectType === "string") setProjectType(saved.projectType);
+      if (typeof saved.message === "string") setMessage(saved.message);
+      setAttempt(restoredSendAttempt(saved.attempt));
+    },
+  });
   const firstName = ownerName.split(" ")[0];
   const fieldPrefix = `inquiry-${listingType}-${listingId}`;
   const canSubmit = (isMarketplace || projectTitle.trim().length >= 2) && message.trim().length >= 10;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!canSubmit) return;
+    if (!canSubmit || !user || !draft.loaded || pending.current) return;
+    const accountId = user.id; pending.current = true;
 
     setSending(true);
     setError("");
@@ -65,27 +86,34 @@ export default function InquiryForm({ listingId, listingTitle, listingType, owne
       message.trim(),
     ].join("\n");
 
+    const prepared = prepareMessageSend(attempt, JSON.stringify({ destination, projectTitle, projectType, message }), body);
     try {
+      if (prepared !== attempt) flushSync(() => setAttempt(prepared));
+      if (!await draft.flush()) throw new Error(uiText("MessagingBackend.saveError"));
+      if (owner.current !== accountId) return;
+      setPosting(true);
       const res = await fetch("/api/conversations", {
-        method: "POST",
+        method: "POST", signal: AbortSignal.timeout(20_000),
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           listing_id: listingId,
           listing_title: listingTitle,
           listing_type: listingType,
           receiver_id: ownerId,
-          content: body,
+          content: prepared.content, accountId, idempotencyKey: prepared.key,
         }),
       });
 
       const json = await res.json();
-      if (!res.ok) throw new Error(json.error ?? uiText("Ui.text_3d5d6608b0a99d"));
-
-      setStep("sent");
+      if (owner.current !== accountId) return;
+      if (!res.ok || typeof json.conversationId !== "string" || !json.message?.id) throw new Error(json.error ?? uiText("Ui.text_3d5d6608b0a99d"));
+      await draft.complete();
+      if (owner.current !== accountId) return;
+      setSentConversation(json.conversationId); setStep("sent");
     } catch (err) {
-      setError(uiErrorMessage(err, uiText("Ui.text_3d5d6608b0a99d")));
+      if (owner.current === accountId) setError(uiErrorMessage(err, uiText("Ui.text_3d5d6608b0a99d")));
     } finally {
-      setSending(false);
+      pending.current = false; if (owner.current === accountId) { setSending(false); setPosting(false); }
     }
   };
 
@@ -103,7 +131,7 @@ export default function InquiryForm({ listingId, listingTitle, listingType, owne
             const destination = `${window.location.pathname}${window.location.search}`;
             router.push(`/sign-in?redirect_url=${encodeURIComponent(destination)}`);
           }}
-          className="block w-full py-2.5 bg-gold text-bg-primary text-sm font-semibold rounded-lg hover:bg-gold-light transition-colors text-center"
+          className="block min-h-11 w-full py-2.5 bg-gold text-bg-primary text-sm font-semibold rounded-lg hover:bg-gold-light transition-colors text-center"
         >{uiText("nav.signIn")}</button>
       </div>
     );
@@ -122,11 +150,11 @@ export default function InquiryForm({ listingId, listingTitle, listingType, owne
           <p>{uiText("Ui.text_6966ffcd9cb0f2")}</p>
         </div>}
         <button
-          onClick={() => router.push("/dashboard?tab=messages")}
-          className="w-full py-2.5 bg-gold text-bg-primary text-sm font-semibold rounded-lg hover:bg-gold-light transition-colors"
+          onClick={() => router.push(`/messages?conv=${encodeURIComponent(sentConversation)}`)}
+          className="min-h-11 w-full py-2.5 bg-gold text-bg-primary text-sm font-semibold rounded-lg hover:bg-gold-light transition-colors"
         >{uiText("Ui.text_58cc26037bfb14")}</button>
         <button
-          onClick={() => { setStep("form"); setProjectTitle(""); setMessage(""); }}
+          onClick={() => { draft.resume(); setStep("form"); setProjectTitle(""); setMessage(""); setAttempt(null); }}
           className="text-xs text-text-muted hover:text-gold transition-colors"
         >{uiText("Ui.text_856b904fe4d314")}</button>
       </div>
@@ -139,10 +167,11 @@ export default function InquiryForm({ listingId, listingTitle, listingType, owne
           <input
             type="text"
             id={`${fieldPrefix}-project-title`}
+            disabled={sending}
             value={projectTitle}
             onChange={(e) => setProjectTitle(e.target.value)}
             placeholder={uiText("Ui.text_226852491cb014")}
-            className="w-full bg-bg-elevated border border-border rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-gold transition-colors"
+            className="w-full bg-bg-elevated border border-border rounded-lg px-3 py-2.5 text-base sm:text-sm focus:outline-none focus:border-gold transition-colors"
           />
         </div>
 
@@ -150,9 +179,10 @@ export default function InquiryForm({ listingId, listingTitle, listingType, owne
           <label htmlFor={`${fieldPrefix}-project-type`} className="text-xs uppercase tracking-widest text-text-muted font-semibold block mb-1.5">{isMarketplace ? marketplaceText("projectTypeOptional") : uiText("jobs.filterProjectType")}</label>
           <select
             id={`${fieldPrefix}-project-type`}
+            disabled={sending}
             value={projectType}
             onChange={(e) => setProjectType(e.target.value)}
-            className="w-full bg-bg-elevated border border-border rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-gold transition-colors"
+            className="w-full bg-bg-elevated border border-border rounded-lg px-3 py-2.5 text-base sm:text-sm focus:outline-none focus:border-gold transition-colors"
           >
             {isMarketplace && <option value="">{marketplaceText("noProjectType")}</option>}
             {["Spielfilm", "Kurzfilm", "Werbung", "Musikvideo", "Dokumentarfilm", "Corporate", "TV / Episodic", "Sonstiges"].map((t) => (
@@ -176,22 +206,24 @@ export default function InquiryForm({ listingId, listingTitle, listingType, owne
           <textarea
             rows={4}
             id={`${fieldPrefix}-message`}
+            disabled={sending}
             value={message}
             onChange={(e) => setMessage(e.target.value)}
             placeholder={uiText("Ui.text_a553f27db747b9", { value1: String(firstName) })}
-            className="w-full bg-bg-elevated border border-border rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-gold transition-colors resize-none"
+            className="w-full bg-bg-elevated border border-border rounded-lg px-3 py-2.5 text-base sm:text-sm focus:outline-none focus:border-gold transition-colors resize-none"
           />
         </div>
 
         {isMarketplace && <details className="rounded-xl border border-border p-3"><summary className="min-h-11 cursor-pointer content-center text-sm font-medium">{marketplaceText("projectDetailsOptional")}</summary><div className="mt-3 space-y-4">{projectFields}</div></details>}
 
+        <FormDraftStatus draft={draft} />
         {error && (
           <p className="text-xs text-red-400 bg-red-500/10 border border-red-500/20 rounded-lg px-3 py-2">{error}</p>
         )}
 
         <button
           type="submit"
-          disabled={!canSubmit || sending}
+          disabled={!canSubmit || sending || !draft.loaded}
           className={`w-full py-3 font-semibold rounded-lg flex items-center justify-center gap-2 transition-colors ${
             canSubmit && !sending
               ? "bg-gold text-bg-primary hover:bg-gold-light"
@@ -216,4 +248,8 @@ export default function InquiryForm({ listingId, listingTitle, listingType, owne
       </div>}
     </div>
   );
+}
+
+export default function InquiryForm(props: Props) {
+  return <InquiryFormContent key={`${props.ownerId}:${props.listingId}`} {...props} />;
 }

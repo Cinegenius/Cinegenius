@@ -1,39 +1,28 @@
-import { groupRpcFailure } from "@/lib/conversation-rpc-errors";
 import { db } from "@/lib/db";
 import { requireAuth } from "@/lib/auth";
 import { rateLimit } from "@/lib/rateLimit";
-import { getPrivateProfileIds } from "@/lib/trust";
 import { normalizeMemberIds } from "@/lib/conversation-logic";
+import { MESSAGING_HEADERS, messagingAccountId, messagingRequestKey, messagingUuid, messagingRpcFailure } from "@/lib/messaging-backend";
 import { NextRequest, NextResponse } from "next/server";
-import { getTranslations as getResponseTranslations } from "next-intl/server";
+import { getTranslations } from "next-intl/server";
 
 export async function POST(request: NextRequest) {
-  const tResponse = await getResponseTranslations();
   const authResult = await requireAuth();
   if (authResult instanceof NextResponse) return authResult;
   const { userId } = authResult;
-  const { allowed } = await rateLimit(`group-create:${userId}`, 5, 60);
-  if (!allowed) return NextResponse.json({ error: tResponse('System.m_58e100f983d5') }, { status: 429 });
-
+  const t = await getTranslations("MessagingBackend");
+  const fail = (key: string, status: number) => NextResponse.json({ error: t(key) }, { status, headers: MESSAGING_HEADERS });
   const body = await request.json().catch(() => null);
-  const name = typeof body?.name === "string" ? body.name.trim() : "";
-  const memberIds = normalizeMemberIds(userId, body?.member_ids);
-  if (name.length < 1 || name.length > 80) return NextResponse.json({ error: tResponse('System.m_027e01fb54de') }, { status: 400 });
-  if (!memberIds || memberIds.length < 1 || memberIds.length > 49) return NextResponse.json({ error: tResponse('System.m_286903b7c95b') }, { status: 400 });
-
-  const privateIds = await getPrivateProfileIds(memberIds);
-  if (memberIds.some((memberId) => privateIds.has(memberId))) {
-    return NextResponse.json({ error: tResponse('System.m_c720b974c036') }, { status: 404 });
-  }
-
+  if (body?.accountId !== userId) return fail("accountChanged", 403);
+  const name = typeof body.name === "string" ? body.name.trim() : "";
+  const members = normalizeMemberIds(userId, body.member_ids);
+  if (!name || name.length > 80 || !members || members.length < 1 || members.length > 49
+    || members.some(id => !messagingAccountId(id) || id === "cinegenius-support") || !messagingRequestKey(body.idempotencyKey)) return fail("invalid", 400);
+  if (!(await rateLimit(`group-create:${userId}`, 5, 60)).allowed) return fail("rateLimit", 429);
   const { data, error } = await db.rpc("create_group_conversation", {
-    p_creator_id: userId,
-    p_name: name,
-    p_member_ids: memberIds,
+    p_creator_id: userId, p_name: name, p_member_ids: members, p_idempotency_key: body.idempotencyKey,
   });
-  if (error) {
-    const failure = groupRpcFailure(error, "create");
-    return NextResponse.json({ error: tResponse(failure.key) }, { status: failure.status });
-  }
-  return NextResponse.json({ conversationId: data });
+  if (error) { const failure = messagingRpcFailure(error); return fail(failure.key, failure.status); }
+  if (!data || !messagingUuid(data.conversationId) || typeof data.created !== "boolean") return fail("saveError", 503);
+  return NextResponse.json({ conversationId: data.conversationId, replayed: !data.created }, { headers: MESSAGING_HEADERS });
 }

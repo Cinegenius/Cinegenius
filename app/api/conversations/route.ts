@@ -1,7 +1,6 @@
 import { SUPPORT_ACTOR_ID, SUPPORT_AVATAR_URL, SUPPORT_NAME } from "@/lib/support-identity";
 import { db } from "@/lib/db";
 import { requireAuth } from "@/lib/auth";
-import { anyBlockExists, areAcceptedFriends } from "@/lib/trust";
 import { rateLimit } from "@/lib/rateLimit";
 import { clerkClient } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from "next/server";
@@ -9,6 +8,7 @@ import { sendNewMessageEmail } from "@/lib/email";
 import { applyParticipantReadReceipts } from "@/lib/message-read-state";
 import { getUnreadMessageCounts } from "@/lib/unread-message-counts";
 import { getTranslations as getResponseTranslations } from "next-intl/server";
+import { MESSAGING_HEADERS, messagingAccountId, messagingRequestKey, messagingUuid, messagingRpcFailure } from "@/lib/messaging-backend";
 
 
 // The membership table is the access-control source for both direct and group
@@ -114,20 +114,20 @@ export async function GET(request: NextRequest) {
         .filter((member) => member.conversation_id === conversation.id)
         .map((member) => ({
           ...member,
-          display_name: profileMap[member.user_id]?.display_name ?? "Unbekannt",
+          display_name: profileMap[member.user_id]?.display_name ?? tResponse("Messaging.unknown"),
           avatar_url: profileMap[member.user_id]?.avatar_url ?? null,
         }));
       const enrichedMessages = messages.map((message) => ({
         ...message,
         read_by: receipts.filter((receipt) => receipt.message_id === message.id).map((receipt) => receipt.user_id),
-        senderName: profileMap[message.sender_id]?.display_name ?? "Unbekannt",
+        senderName: profileMap[message.sender_id]?.display_name ?? tResponse("Messaging.unknown"),
         senderAvatar: profileMap[message.sender_id]?.avatar_url ?? null,
       }));
       return {
         ...conversation,
         messages: enrichedMessages,
         unread_count: unreadCount,
-        otherName: conversation.group_name ?? "Gruppe",
+        otherName: conversation.group_name ?? tResponse("Messaging.groupFallback"),
         otherAvatar: null,
         members,
         memberCount: members.length,
@@ -140,7 +140,7 @@ export async function GET(request: NextRequest) {
         ...conversation,
         messages: applyParticipantReadReceipts(messages, receipts, userId, SUPPORT_ACTOR_ID).map((message) => ({
           ...message,
-          senderName: message.sender_id === SUPPORT_ACTOR_ID ? SUPPORT_NAME : profileMap[message.sender_id]?.display_name ?? "Du",
+          senderName: message.sender_id === SUPPORT_ACTOR_ID ? SUPPORT_NAME : profileMap[message.sender_id]?.display_name ?? tResponse("Messaging.you"),
           senderAvatar: message.sender_id === SUPPORT_ACTOR_ID ? SUPPORT_AVATAR_URL : profileMap[message.sender_id]?.avatar_url ?? null,
         })),
         unread_count: unreadCount,
@@ -158,7 +158,7 @@ export async function GET(request: NextRequest) {
       ...conversation,
       messages: applyParticipantReadReceipts(messages, receipts, userId, otherId ?? ""),
       unread_count: unreadCount,
-      otherName: profile.display_name ?? "Unbekannt",
+      otherName: profile.display_name ?? tResponse("Messaging.unknown"),
       otherAvatar: profile.avatar_url ?? null,
       members: [],
       memberCount: 2,
@@ -171,83 +171,41 @@ export async function GET(request: NextRequest) {
   });
 }
 
-// Start or reuse a one-to-one conversation and send a message.
+// The transaction reuses one active direct chat and confirms a stable send key.
 export async function POST(req: NextRequest) {
-  const tResponse = await getResponseTranslations();
   const authResult = await requireAuth();
   if (authResult instanceof NextResponse) return authResult;
   const { userId } = authResult;
-
-  const { allowed } = await rateLimit(`conv:${userId}`, 20, 60);
-  if (!allowed) return NextResponse.json({ error: tResponse('System.m_35bd89251439') }, { status: 429 });
-
+  const t = await getResponseTranslations("MessagingBackend");
+  const fail = (key: string, status: number) => NextResponse.json({ error: t(key) }, { status, headers: MESSAGING_HEADERS });
   const body = await req.json().catch(() => null);
-  const { listing_id, listing_title, listing_type, receiver_id, content } = body ?? {};
-  if (typeof receiver_id !== "string" || !receiver_id || typeof content !== "string" || !content.trim()) {
-    return NextResponse.json({ error: tResponse('System.m_4e9578946ba1') }, { status: 400 });
-  }
-  if (content.length > 5000) return NextResponse.json({ error: tResponse('System.m_f65be0fc77aa') }, { status: 400 });
-  if (userId === receiver_id) return NextResponse.json({ error: tResponse('System.m_bc535cf61b1f') }, { status: 400 });
-  if (receiver_id === SUPPORT_ACTOR_ID) return NextResponse.json({ error: tResponse('System.m_e1e12ad810ee') }, { status: 403 });
-
-  const { data: receiverSettings, error: settingsError } = await db
-    .from("user_settings")
-    .select("message_permission")
-    .eq("user_id", receiver_id)
-    .maybeSingle();
-  if (settingsError) return NextResponse.json({ error: tResponse('System.m_44480805a269') }, { status: 500 });
-  if (receiverSettings?.message_permission === "friends_only" && !(await areAcceptedFriends(userId, receiver_id))) {
-    return NextResponse.json({ error: tResponse('System.m_3d26f80efc50') }, { status: 403 });
-  }
-  if (await anyBlockExists(userId, receiver_id)) return NextResponse.json({ error: tResponse('System.m_0fc7245a4195') }, { status: 403 });
-
-  const directPair = listing_id
-    ? `and(sender_id.eq.${userId},receiver_id.eq.${receiver_id},listing_id.eq.${listing_id}),and(sender_id.eq.${receiver_id},receiver_id.eq.${userId},listing_id.eq.${listing_id})`
-    : `and(sender_id.eq.${userId},receiver_id.eq.${receiver_id}),and(sender_id.eq.${receiver_id},receiver_id.eq.${userId})`;
-  let existingQuery = db.from("conversations").select("id").eq("kind", "direct").or(directPair);
-  if (!listing_id) existingQuery = existingQuery.is("listing_id", null);
-  const { data: existing, error: existingError } = await existingQuery.maybeSingle();
-  if (existingError) return NextResponse.json({ error: tResponse('System.m_c453f2efc15a') }, { status: 500 });
-
-  let conversationId = existing?.id;
-  if (!conversationId) {
-    const { data: conversation, error: conversationError } = await db
-      .from("conversations")
-      .insert({ listing_id, listing_title, listing_type, sender_id: userId, receiver_id, kind: "direct", created_by: userId })
-      .select("id")
-      .single();
-    if (conversationError) return NextResponse.json({ error: tResponse('System.m_e4a5f92c24fe') }, { status: 500 });
-    conversationId = conversation.id;
-    const { error: membersError } = await db.from("conversation_members").insert([
-      { conversation_id: conversationId, user_id: userId, role: "member" },
-      { conversation_id: conversationId, user_id: receiver_id, role: "member" },
-    ]);
-    if (membersError) {
-      await db.from("conversations").delete().eq("id", conversationId);
-      return NextResponse.json({ error: tResponse('System.m_19e5ad79b203') }, { status: 500 });
-    }
-  }
-
-  const { data: message, error: messageError } = await db.rpc("send_conversation_message", {
-    p_conversation_id: conversationId,
-    p_sender_id: userId,
-    p_content: content.trim(),
+  if (body?.accountId !== userId) return fail("accountChanged", 403);
+  const { receiver_id, listing_id = null, listing_title = null, listing_type = null, idempotencyKey } = body;
+  const content = typeof body.content === "string" ? body.content.trim() : "";
+  if (!messagingAccountId(receiver_id) || receiver_id === userId || receiver_id === SUPPORT_ACTOR_ID
+    || !content || content.length > 5000 || !messagingRequestKey(idempotencyKey)
+    || listing_id !== null && !messagingUuid(listing_id)
+    || listing_title !== null && (typeof listing_title !== "string" || listing_title.length > 300)
+    || listing_type !== null && (typeof listing_type !== "string" || listing_type.length > 80)) return fail("invalid", 400);
+  if (!(await rateLimit(`conv:${userId}`, 20, 60)).allowed) return fail("rateLimit", 429);
+  const { data, error } = await db.rpc("start_direct_conversation", {
+    p_sender_id: userId, p_receiver_id: receiver_id, p_content: content, p_idempotency_key: idempotencyKey,
+    p_listing_id: listing_id, p_listing_title: listing_title, p_listing_type: listing_type,
   });
-  if (messageError) return NextResponse.json({ error: tResponse('System.m_0949dcf4a579') }, { status: 500 });
-
-  try {
+  if (error) { const failure = messagingRpcFailure(error); return fail(failure.key, failure.status); }
+  if (!data || !messagingUuid(data.conversationId) || !messagingUuid(data.message?.id) || typeof data.created !== "boolean") return fail("saveError", 503);
+  // Only the request that inserted the message may notify. A replay confirms
+  // persisted content without repeating mail, even after a lost HTTP response.
+  if (data.created) try {
     const [{ data: senderProfile }, { data: emailSettings }] = await Promise.all([
       db.from("profiles").select("display_name").eq("user_id", userId).maybeSingle(),
       db.from("user_settings").select("email_new_message").eq("user_id", receiver_id).maybeSingle(),
     ]);
-    const senderName = senderProfile?.display_name ?? "Jemand";
     if (emailSettings?.email_new_message !== false) {
-      const clerk = await clerkClient();
-      const recipient = await clerk.users.getUser(receiver_id);
+      const recipient = await (await clerkClient()).users.getUser(receiver_id);
       const email = recipient.emailAddresses[0]?.emailAddress;
-      if (email) await sendNewMessageEmail(email, senderName, content.trim(), conversationId);
+      if (email) await sendNewMessageEmail(email, senderProfile?.display_name ?? t("senderFallback"), content, data.conversationId);
     }
-  } catch { /* best effort; the persisted message remains authoritative */ }
-
-  return NextResponse.json({ conversationId, message: Array.isArray(message) ? message[0] : message });
+  } catch { /* The durable message remains authoritative; mail is best effort. */ }
+  return NextResponse.json({ conversationId: data.conversationId, message: data.message, replayed: !data.created }, { headers: MESSAGING_HEADERS });
 }

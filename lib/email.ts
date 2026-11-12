@@ -88,7 +88,7 @@ export async function sendFriendRequestEmail(to: string, fromName: string, selec
   await send(to, t("friendRequestSubject", {name: normalizedEmailText(fromName)}), wrap(`
     ${h1(escapeHtml(t("friendRequestHeading")))}
     ${p(t.markup("friendRequestBody", {name: escapeHtml(fromName), person: chunks => `<strong style="color:#f0f0f0">${chunks}</strong>`}))}
-    ${btn(escapeHtml(t("viewRequest")), `${BASE}/dashboard?tab=friends`)}
+    ${btn(escapeHtml(t("viewRequest")), `${BASE}/messages?requests=1`)}
   `, locale, t("footer")));
 }
 
@@ -99,7 +99,7 @@ export async function sendFriendAcceptedEmail(to: string, accepterName: string, 
   await send(to, t("friendAcceptedSubject", {name: normalizedEmailText(accepterName)}), wrap(`
     ${h1(escapeHtml(t("friendAcceptedHeading")))}
     ${p(t.markup("friendAcceptedBody", {name: escapeHtml(accepterName), person: chunks => `<strong style="color:#f0f0f0">${chunks}</strong>`}))}
-    ${btn(escapeHtml(t("viewProfile")), `${BASE}/dashboard?tab=friends`)}
+    ${btn(escapeHtml(t("friendAcceptedAction")), `${BASE}/dashboard?tab=friends`)}
   `, locale, t("footer")));
 }
 
