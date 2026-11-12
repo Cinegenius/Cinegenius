@@ -1,5 +1,7 @@
 "use client";
 
+import "leaflet/dist/leaflet.css";
+
 import { useEffect, useRef, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import Link from "next/link";
@@ -83,13 +85,6 @@ export default function LocationMap({ readOnly = false, locations, activeId, onH
     }
     void initialize();
     return () => { cancelled = true; observer.disconnect(); instance?.remove(); mapRef.current = null; };
-  }, []);
-
-  useEffect(() => {
-    if (document.getElementById("leaflet-css")) return;
-    const link = document.createElement("link");
-    link.id = "leaflet-css"; link.rel = "stylesheet"; link.href = "/leaflet.css";
-    document.head.prepend(link);
   }, []);
 
   // Hover only changes marker styling; it never destroys an open touch preview.
