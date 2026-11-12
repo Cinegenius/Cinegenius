@@ -7492,5 +7492,17 @@
     "priceHint": "Belopp i euro",
     "categoryOverview": "Utforska kategorier",
     "draftCleanupFailed": "Din annons har sparats. Det gick inte att markera dina tidigare framsteg i guiden som slutförda."
+  },
+  "AnalyticsPrivacy": {
+    "settings": "Analysinställningar",
+    "banner": "Nödvändiga funktioner är alltid aktiva. Med ditt samtycke analyserar PostHog (EU) besök på offentliga översiktssidor. Inga sessionsinspelningar. Du kan ändra ditt val när som helst i analysinställningarna.",
+    "reject": "Endast nödvändiga funktioner",
+    "accept": "Tillåt analys",
+    "close": "Stäng",
+    "privacy": "Integritet",
+    "storageError": "Ditt val kunde inte sparas. Analysen förblir avstängd.",
+    "title": "Frivillig användningsanalys med PostHog",
+    "disclosure": "Endast med ditt samtycke använder vi PostHog, Inc. och dess EU Cloud-projekt för att analysera offentliga översiktssidor. Vi skickar sidkategorin och en slumpmässig identifierare som bara finns i flikens minne. Sökord, URL-parametrar, innehåll, namn, e-postadresser, privata områden och formulär utesluts. Automatisk klickregistrering, personprofiler och sessionsinspelningar är avstängda. IP-adressen behandlas tekniskt för anslutningen; lagring som analysuppgift är avstängd. Ditt val sparas lokalt tills du ändrar det eller raderar webbläsardata. Du kan alltid avvisa eller återkalla samtycket; inga fler händelser registreras då. Händelser som redan skickats raderas inte automatiskt.",
+    "providerPrivacy": "PostHogs integritetspolicy"
   }
 }

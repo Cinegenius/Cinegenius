@@ -7492,5 +7492,17 @@
     "priceHint": "Částka v eurech",
     "categoryOverview": "Prohlédnout kategorie",
     "draftCleanupFailed": "Tvoje nabídka byla uložena. Dosavadní postup v průvodci se nepodařilo označit jako dokončený."
+  },
+  "AnalyticsPrivacy": {
+    "settings": "Nastavení analytiky",
+    "banner": "Nezbytné funkce jsou vždy aktivní. S vaším souhlasem PostHog (EU) analyzuje návštěvy veřejných přehledových stránek. Bez záznamu relací. Volbu můžete kdykoli změnit v nastavení analytiky.",
+    "reject": "Jen nezbytné funkce",
+    "accept": "Povolit analytiku",
+    "close": "Zavřít",
+    "privacy": "Ochrana soukromí",
+    "storageError": "Volbu se nepodařilo uložit. Analytika zůstává vypnutá.",
+    "title": "Volitelná analytika s PostHog",
+    "disclosure": "Pouze s vaším souhlasem používáme PostHog, Inc. a projekt EU Cloud k analýze veřejných přehledových stránek. Odesíláme kategorii stránky a náhodný identifikátor uložený jen v paměti této karty. Vyhledávání, parametry URL, obsah, jména, e-maily, soukromé části a formuláře jsou vyloučeny. Automatický sběr kliknutí, osobní profily a záznam relací jsou vypnuty. IP adresa se technicky zpracovává pro připojení; její ukládání jako analytického údaje je vypnuto. Volbu ukládáme místně, dokud ji nezměníte nebo nesmažete data prohlížeče. Souhlas můžete kdykoli odmítnout či odvolat; další události se nebudou zaznamenávat. Již odeslané události se tím automaticky nevymažou.",
+    "providerPrivacy": "Ochrana soukromí PostHog"
   }
 }

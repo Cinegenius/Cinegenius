@@ -7492,5 +7492,17 @@
     "priceHint": "Amount in euros",
     "categoryOverview": "Explore categories",
     "draftCleanupFailed": "Your listing has been saved. Your existing setup progress could not be marked as complete."
+  },
+  "AnalyticsPrivacy": {
+    "settings": "Analytics settings",
+    "banner": "Essential features are always active. With your consent, PostHog (EU) analyzes visits to public directory pages. No session recordings. You can change your choice at any time in analytics settings.",
+    "reject": "Essential features only",
+    "accept": "Allow analytics",
+    "close": "Close",
+    "privacy": "Privacy",
+    "storageError": "Your choice could not be saved. Analytics remains off.",
+    "title": "Optional usage analytics with PostHog",
+    "disclosure": "Only with your consent, we use PostHog, Inc. and its EU Cloud project to analyze public directory pages. We send the page category and a random identifier held only in this tab’s memory. Search terms, URL parameters, page content, names, email addresses, private areas and forms are excluded. Automatic click capture, person profiles and session recordings are disabled. The IP address is technically processed for the connection; storing it as an analytics property is disabled. Your choice is stored locally in your browser until you change it or clear browser data. You can decline or withdraw at any time; no further analytics events will then be captured. This does not automatically delete events already sent.",
+    "providerPrivacy": "PostHog privacy notice"
   }
 }

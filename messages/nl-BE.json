@@ -7492,5 +7492,17 @@
     "priceHint": "Bedrag in euro",
     "categoryOverview": "Categorieën ontdekken",
     "draftCleanupFailed": "Je advertentie is opgeslagen. Je eerdere voortgang in de assistent kon niet als afgerond worden gemarkeerd."
+  },
+  "AnalyticsPrivacy": {
+    "settings": "Analyse-instellingen",
+    "banner": "Noodzakelijke functies zijn altijd actief. Met je toestemming analyseert PostHog (EU) bezoeken aan openbare overzichtspagina’s. Geen sessieopnames. Je kunt je keuze altijd wijzigen via de analyse-instellingen.",
+    "reject": "Alleen noodzakelijke functies",
+    "accept": "Analyse toestaan",
+    "close": "Sluiten",
+    "privacy": "Privacy",
+    "storageError": "Je keuze kon niet worden opgeslagen. Analyse blijft uitgeschakeld.",
+    "title": "Vrijwillige gebruiksanalyse met PostHog",
+    "disclosure": "Alleen met je toestemming gebruiken we PostHog, Inc. en het EU Cloud-project om openbare overzichtspagina’s te analyseren. We verzenden de paginacategorie en een willekeurige identificatie die alleen in het geheugen van dit tabblad staat. Zoektermen, URL-parameters, inhoud, namen, e-mailadressen, privézones en formulieren zijn uitgesloten. Automatische klikregistratie, persoonsprofielen en sessieopnames zijn uitgeschakeld. Het IP-adres wordt technisch verwerkt voor de verbinding; opslag als analysegegeven is uitgeschakeld. Je keuze wordt lokaal bewaard totdat je deze wijzigt of browsergegevens wist. Je kunt altijd weigeren of je toestemming intrekken; verdere gebeurtenissen worden dan niet geregistreerd. Eerder verzonden gebeurtenissen worden hierdoor niet automatisch verwijderd.",
+    "providerPrivacy": "Privacyverklaring van PostHog"
   }
 }

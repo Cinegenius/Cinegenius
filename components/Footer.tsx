@@ -5,6 +5,7 @@ import { Logo } from "./Logo";
 import { usePathname } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { NewsletterSignup } from "@/components/NewsletterSignup";
+import AnalyticsSettingsButton from "@/components/AnalyticsSettingsButton";
 
 export default function Footer() {
   const uiText = useTranslations();
@@ -101,6 +102,7 @@ export default function Footer() {
             <Link href="/ki-transparenz" prefetch={false} className="mt-1 inline-flex min-h-9 items-center hover:text-text-secondary">{ai("footerNote")}</Link>
           </div>
           <div className="flex max-w-full flex-wrap justify-center gap-x-6 gap-y-2">
+            <AnalyticsSettingsButton />
             <Link href="/bildrechte" prefetch={false} className="inline-flex min-h-11 items-center text-sm text-text-muted hover:text-text-secondary">{rights("pageTitle")}</Link>
             {[
               { labelKey: "links_privacy", href: "/datenschutz" },

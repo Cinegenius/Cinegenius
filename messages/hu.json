@@ -7492,5 +7492,17 @@
     "priceHint": "Összeg euróban",
     "categoryOverview": "Kategóriák felfedezése",
     "draftCleanupFailed": "A hirdetésedet elmentettük. A beállítási segédben eddig elért haladást nem sikerült befejezettként megjelölni."
+  },
+  "AnalyticsPrivacy": {
+    "settings": "Analitikai beállítások",
+    "banner": "Az alapvető funkciók mindig aktívak. Hozzájárulásoddal a PostHog (EU) elemzi a nyilvános áttekintőoldalak látogatását. Nincs munkamenetrögzítés. Döntésedet bármikor módosíthatod az analitikai beállításokban.",
+    "reject": "Csak alapvető funkciók",
+    "accept": "Analitika engedélyezése",
+    "close": "Bezárás",
+    "privacy": "Adatvédelem",
+    "storageError": "A választás nem menthető. Az analitika kikapcsolva marad.",
+    "title": "Opcionális használatelemzés a PostHoggal",
+    "disclosure": "Csak hozzájárulásoddal használjuk a PostHog, Inc. EU Cloud projektjét a nyilvános áttekintőoldalak elemzésére. Az oldal kategóriáját és egy kizárólag e lap memóriájában tárolt véletlen azonosítót küldünk. Keresések, URL-paraméterek, tartalmak, nevek, e-mail-címek, privát részek és űrlapok nem kerülnek rögzítésre. Az automatikus kattintásgyűjtés, személyprofilok és munkamenetrögzítés ki vannak kapcsolva. Az IP-cím a kapcsolathoz technikailag feldolgozásra kerül; analitikai adatként nem tároljuk. Döntésedet helyben tároljuk, amíg meg nem változtatod vagy törlöd a böngészőadatokat. Bármikor elutasíthatod vagy visszavonhatod a hozzájárulást; további eseményeket nem rögzítünk. Ez a már elküldött eseményeket nem törli automatikusan.",
+    "providerPrivacy": "A PostHog adatvédelmi tájékoztatója"
   }
 }

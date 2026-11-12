@@ -14,6 +14,7 @@ import { ThemeProvider } from "@/components/ThemeProvider";
 import GlobalEffects from "@/components/GlobalEffects";
 import PresencePing from "@/components/PresencePing";
 import CookieBanner from "@/components/CookieBanner";
+import ProductAnalytics from "@/components/ProductAnalytics";
 import { ToastProvider } from "@/contexts/ToastContext";
 import GlobalSearch from "@/components/GlobalSearch";
 import FormDraftProvider from "@/contexts/FormDraftContext";
@@ -150,6 +151,7 @@ export default async function RootLayout({
                 <GlobalSearch />
                 <AppChrome initialIsSignedIn={!!userId} initialAdminUserId={isConfiguredAdmin(userId, process.env.ADMIN_USER_IDS) ? userId : null}>{children}</AppChrome>
                 <CookieBanner />
+                <ProductAnalytics />
                 <Genie />
                 <Analytics />
                 <SpeedInsights />

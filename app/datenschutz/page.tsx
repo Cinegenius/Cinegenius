@@ -1,5 +1,6 @@
 import {getTranslations} from "next-intl/server";
 import Link from "next/link";
+import AnalyticsSettingsButton from "@/components/AnalyticsSettingsButton";
 import type { Metadata } from "next";
 import { getTranslations as getMetadataTranslations } from "next-intl/server";
 
@@ -169,6 +170,13 @@ export default async function DatenschutzPage() {
           <section>
             <h2 className="text-base font-semibold text-text-primary mb-3">{uiText("Ui.text_3cd4554dd7ab2f")}</h2>
             <p>{uiText.rich("Ui.text_fb3764d3dac6f5", { part1: chunks => (<strong className="text-text-primary">{chunks}</strong>), part2: chunks => (<strong className="text-text-primary">{chunks}</strong>), part3: chunks => (<strong className="text-text-primary">{chunks}</strong>), part4: () => (<br />), part5: chunks => (<a href="https://vercel.com/docs/analytics/privacy-policy" target="_blank" rel="noopener noreferrer" className="text-gold hover:underline">{chunks}</a>) })}</p>
+          </section>
+
+          <section>
+            <h2 className="mb-3 text-base font-semibold text-text-primary">{uiText("AnalyticsPrivacy.title")}</h2>
+            <p>{uiText("AnalyticsPrivacy.disclosure")}</p>
+            <a href="https://posthog.com/privacy" target="_blank" rel="noopener noreferrer" className="inline-flex min-h-11 items-center text-gold underline">{uiText("AnalyticsPrivacy.providerPrivacy")}</a>
+            <div><AnalyticsSettingsButton /></div>
           </section>
 
           <section>

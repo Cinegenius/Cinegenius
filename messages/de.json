@@ -7492,5 +7492,17 @@
     "priceHint": "Betrag in Euro",
     "categoryOverview": "Kategorien entdecken",
     "draftCleanupFailed": "Dein Angebot wurde gespeichert. Der bisherige Assistenten-Fortschritt konnte nicht abgeschlossen werden."
+  },
+  "AnalyticsPrivacy": {
+    "settings": "Analyse-Einstellungen",
+    "banner": "Notwendige Funktionen sind immer aktiv. Mit deiner Zustimmung analysiert PostHog (EU) Aufrufe öffentlicher Übersichtsseiten. Keine Sitzungsaufzeichnungen. Du kannst deine Wahl jederzeit über die Analyse-Einstellungen ändern.",
+    "reject": "Nur notwendige Funktionen",
+    "accept": "Analyse erlauben",
+    "close": "Schließen",
+    "privacy": "Datenschutz",
+    "storageError": "Deine Auswahl konnte nicht gespeichert werden. Die Analyse bleibt ausgeschaltet.",
+    "title": "Freiwillige Nutzungsanalyse mit PostHog",
+    "disclosure": "Nur nach deiner Einwilligung verwenden wir PostHog, Inc. mit dem EU-Cloud-Projekt zur Auswertung öffentlicher Übersichtsseiten. Wir senden die Seitenkategorie und eine zufällige Kennung, die nur im Arbeitsspeicher dieses Tabs besteht. Suchbegriffe, URL-Parameter, Seiteninhalte, Namen, E-Mail-Adressen, private Bereiche und Formulare werden nicht erfasst. Automatische Klickerfassung, Personenprofile und Sitzungsaufzeichnungen sind deaktiviert. Die IP-Adresse wird technisch zur Verbindung verarbeitet; die Speicherung als Analysemerkmal ist deaktiviert. Deine Auswahl speichern wir lokal im Browser, bis du sie änderst oder die Browserdaten löschst. Du kannst jederzeit ablehnen oder widerrufen; dann werden keine weiteren Analyseereignisse erfasst. Bereits übertragene Ereignisse werden dadurch nicht automatisch gelöscht.",
+    "providerPrivacy": "Datenschutzhinweise von PostHog"
   }
 }

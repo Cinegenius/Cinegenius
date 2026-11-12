@@ -7492,5 +7492,17 @@
     "priceHint": "Importe en euros",
     "categoryOverview": "Explorar categorías",
     "draftCleanupFailed": "Tu anuncio se ha guardado. No se ha podido marcar como completado el progreso anterior del asistente."
+  },
+  "AnalyticsPrivacy": {
+    "settings": "Ajustes de análisis",
+    "banner": "Las funciones esenciales están siempre activas. Con tu consentimiento, PostHog (UE) analiza visitas a páginas públicas de directorios. Sin grabaciones de sesiones. Puedes cambiar tu elección en los ajustes de análisis.",
+    "reject": "Solo funciones esenciales",
+    "accept": "Permitir análisis",
+    "close": "Cerrar",
+    "privacy": "Privacidad",
+    "storageError": "No se pudo guardar tu elección. El análisis sigue desactivado.",
+    "title": "Análisis de uso opcional con PostHog",
+    "disclosure": "Solo con tu consentimiento usamos PostHog, Inc. y su proyecto EU Cloud para analizar páginas públicas de directorios. Enviamos la categoría de página y un identificador aleatorio guardado únicamente en la memoria de esta pestaña. Se excluyen búsquedas, parámetros URL, contenidos, nombres, correos, áreas privadas y formularios. La captura automática de clics, los perfiles personales y las grabaciones están desactivados. La dirección IP se procesa técnicamente para la conexión; su almacenamiento como dato analítico está desactivado. Tu elección se guarda localmente hasta que la cambies o borres los datos del navegador. Puedes rechazar o retirar el consentimiento en cualquier momento; no se capturarán más eventos. Esto no elimina automáticamente los eventos ya enviados.",
+    "providerPrivacy": "Privacidad de PostHog"
   }
 }

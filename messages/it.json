@@ -7492,5 +7492,17 @@
     "priceHint": "Importo in euro",
     "categoryOverview": "Esplora le categorie",
     "draftCleanupFailed": "Il tuo annuncio è stato salvato. Non è stato possibile contrassegnare come completati i progressi precedenti nella procedura guidata."
+  },
+  "AnalyticsPrivacy": {
+    "settings": "Impostazioni di analisi",
+    "banner": "Le funzioni essenziali sono sempre attive. Con il tuo consenso, PostHog (UE) analizza le visite alle pagine pubbliche degli elenchi. Nessuna registrazione delle sessioni. Puoi cambiare scelta nelle impostazioni di analisi.",
+    "reject": "Solo funzioni essenziali",
+    "accept": "Consenti analisi",
+    "close": "Chiudi",
+    "privacy": "Privacy",
+    "storageError": "Impossibile salvare la scelta. L’analisi resta disattivata.",
+    "title": "Analisi facoltativa con PostHog",
+    "disclosure": "Solo con il tuo consenso utilizziamo PostHog, Inc. e il suo progetto EU Cloud per analizzare le pagine pubbliche degli elenchi. Inviamo la categoria della pagina e un identificatore casuale conservato solo nella memoria di questa scheda. Sono esclusi ricerche, parametri URL, contenuti, nomi, email, aree private e moduli. Acquisizione automatica dei clic, profili personali e registrazioni sono disattivati. L’indirizzo IP viene tecnicamente elaborato per la connessione; la sua memorizzazione come dato analitico è disattivata. La scelta è salvata localmente finché non la cambi o cancelli i dati del browser. Puoi rifiutare o revocare il consenso in qualsiasi momento; non saranno raccolti altri eventi. Gli eventi già inviati non vengono eliminati automaticamente.",
+    "providerPrivacy": "Informativa privacy di PostHog"
   }
 }
