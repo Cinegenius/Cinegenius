@@ -28,7 +28,7 @@ export const revalidate = 60;
 
 import {
   MapPin, Briefcase, ArrowRight, CheckCircle,
-  Clock, Package2, Film, Building2, UsersRound,
+  Clock, Package2, Film, Building2, UsersRound, Newspaper,
 } from "lucide-react";
 import HeroSearch from "@/components/HeroSearch";
 import HomeCommunityBoard from "@/components/HomeCommunityBoard";
@@ -387,7 +387,7 @@ export default async function HomePage() {
             <p className="text-xs uppercase tracking-widest text-gold font-semibold mb-1">{t("findLabel")}</p>
             <h2 id="home-find-title" className="font-display text-xl sm:text-2xl font-bold text-text-primary">{t("findTitle")}</h2>
           </div>
-          <div className="grid grid-cols-2 gap-3 lg:grid-cols-5">
+          <div className="grid grid-cols-2 gap-3 lg:grid-cols-6">
             {findCards.map(({ title, description, href, icon: Icon }) => (
               <Link key={href} href={href} className="group min-w-0 rounded-xl border border-border bg-bg-secondary/90 p-3.5 transition-colors hover:border-gold/40 sm:p-4">
                 <Icon size={18} className="mb-2 text-gold" />
@@ -395,15 +395,20 @@ export default async function HomePage() {
                 <p className="mt-1 text-xs leading-relaxed text-text-muted">{description}</p>
               </Link>
             ))}
-            <div className="col-span-2 min-w-0 rounded-xl border border-border bg-bg-secondary/90 p-3.5 sm:p-4 lg:col-span-1">
+            <div className="min-w-0 rounded-xl border border-border bg-bg-secondary/90 p-3.5 sm:p-4">
               <Film size={18} className="mb-2 text-gold" />
               <h3 className="text-sm font-semibold leading-snug text-text-primary">{t("findJobsTitle")}</h3>
               <p className="mt-1 text-xs leading-relaxed text-text-muted">{t("findJobsDescription")}</p>
-              <div className="mt-3 flex flex-wrap gap-x-4 gap-y-2 text-xs font-semibold lg:flex-nowrap lg:gap-x-2">
+              <div className="mt-3 flex flex-wrap gap-x-4 gap-y-2 text-xs font-semibold lg:gap-x-2">
                 <Link href="/jobs" className="inline-flex min-h-11 items-center gap-1 text-gold hover:text-gold-light">{t("findJobsLink")} <ArrowRight size={12} /></Link>
                 <Link href="/projects/alle" className="inline-flex min-h-11 items-center gap-1 text-gold hover:text-gold-light">{t("findProjectsLink")} <ArrowRight size={12} /></Link>
               </div>
             </div>
+            <Link href="/news" className="group min-w-0 rounded-xl border border-border bg-bg-secondary/90 p-3.5 transition-colors hover:border-gold/40 sm:p-4">
+              <Newspaper size={18} className="mb-2 text-gold" aria-hidden="true" />
+              <h3 className="text-sm font-semibold leading-snug text-text-primary group-hover:text-gold">{t("newsShortcut")}</h3>
+              <p className="mt-1 text-xs leading-relaxed text-text-muted">{t("newsShortcutDescription")}</p>
+            </Link>
           </div>
         </div>
       </section>

@@ -25,6 +25,15 @@
     "accountSettings": "Kontoeinstellungen",
     "analytics": "Analysen",
     "more": "Mehr",
+    "allAreas": "Alle Bereiche",
+    "discover": "Entdecken",
+    "helpAndInfo": "Hilfe & Infos",
+    "contacts": "Kontakte",
+    "home": "Startseite",
+    "news": "News",
+    "organizations": "Organisationen",
+    "help": "Hilfe & FAQ",
+    "support": "Support",
     "closeMenu": "Menü schließen",
     "additionalAreas": "Weitere Bereiche",
     "securityAndSignIn": "Sicherheit & Anmeldung",
@@ -243,6 +252,8 @@
     "translationUnavailable": "Text derzeit nicht verfügbar."
   },
   "home": {
+    "newsShortcut": "News",
+    "newsShortcutDescription": "Aktuelles aus der Branche.",
     "badgeHero": "Film · Foto · Content · Werbung",
     "heroTitle1": "Locations, Crew &",
     "heroTitle2": "Equipment finden.",
@@ -2381,7 +2392,7 @@
   },
   "OrganizationDiscovery": {
     "eyebrow": "Aus der Branche",
-    "title": "Organisationen & Neuigkeiten",
+    "title": "News",
     "allEntries": "Alle Beiträge ansehen",
     "organizations": "Organisationen",
     "allOrganizations": "Alle Organisationen ansehen",

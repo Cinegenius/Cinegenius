@@ -1,7 +1,7 @@
 .launcher, .panel {
   position: fixed;
   right: max(1rem, env(safe-area-inset-right, 0px));
-  bottom: calc(4.5rem + env(safe-area-inset-bottom, 0px));
+  bottom: calc(var(--mobile-nav-clearance) + .5rem);
   z-index: 45;
   color: var(--color-text-primary);
   background: var(--color-bg-secondary);
@@ -40,7 +40,7 @@
 }
 
 .panel {
-  --genie-resting-bottom: calc(4.5rem + env(safe-area-inset-bottom, 0px));
+  --genie-resting-bottom: calc(var(--mobile-nav-clearance) + .5rem);
   --genie-top-gap: 1rem;
   --genie-keyboard-gap: .75rem;
   display: flex;

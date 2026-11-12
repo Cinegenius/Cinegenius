@@ -25,6 +25,15 @@
     "accountSettings": "Nastavení účtu",
     "analytics": "Analýzy",
     "more": "Více",
+    "allAreas": "Všechny oblasti",
+    "discover": "Objevovat",
+    "helpAndInfo": "Pomoc a informace",
+    "contacts": "Kontakty",
+    "home": "Úvod",
+    "news": "Novinky",
+    "organizations": "Organizace",
+    "help": "Nápověda a časté dotazy",
+    "support": "Podpora",
     "closeMenu": "Zavřít nabídku",
     "additionalAreas": "Další oblasti",
     "securityAndSignIn": "Zabezpečení a přihlášení",
@@ -243,6 +252,8 @@
     "translationUnavailable": "Text momentálně není dostupný."
   },
   "home": {
+    "newsShortcut": "Novinky",
+    "newsShortcutDescription": "Aktuální dění v oboru.",
     "badgeHero": "Film · Foto · Obsah · Reklama",
     "heroTitle1": "Najdi Lokace, Štáb &",
     "heroTitle2": "Vybavení.",
@@ -2381,7 +2392,7 @@
   },
   "OrganizationDiscovery": {
     "eyebrow": "Novinky z oboru",
-    "title": "Organizace a novinky",
+    "title": "Novinky",
     "allEntries": "Zobrazit všechny příspěvky",
     "organizations": "Organizace",
     "allOrganizations": "Zobrazit všechny organizace",

@@ -25,6 +25,15 @@
     "accountSettings": "Account settings",
     "analytics": "Analytics",
     "more": "More",
+    "allAreas": "All areas",
+    "discover": "Discover",
+    "helpAndInfo": "Help & information",
+    "contacts": "Contacts",
+    "home": "Home",
+    "news": "News",
+    "organizations": "Organizations",
+    "help": "Help & FAQ",
+    "support": "Support",
     "closeMenu": "Close menu",
     "additionalAreas": "More areas",
     "securityAndSignIn": "Security & sign-in",
@@ -243,6 +252,8 @@
     "translationUnavailable": "Text currently unavailable."
   },
   "home": {
+    "newsShortcut": "News",
+    "newsShortcutDescription": "The latest from the industry.",
     "badgeHero": "Film · Photo · Content · Advertising",
     "heroTitle1": "Find Locations, Crew &",
     "heroTitle2": "Equipment.",
@@ -2381,7 +2392,7 @@
   },
   "OrganizationDiscovery": {
     "eyebrow": "Industry updates",
-    "title": "Organizations & news",
+    "title": "News",
     "allEntries": "View all posts",
     "organizations": "Organizations",
     "allOrganizations": "View all organizations",

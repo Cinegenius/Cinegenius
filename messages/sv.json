@@ -25,6 +25,15 @@
     "accountSettings": "Kontoinställningar",
     "analytics": "Statistik",
     "more": "Mer",
+    "allAreas": "Alla områden",
+    "discover": "Upptäck",
+    "helpAndInfo": "Hjälp och information",
+    "contacts": "Kontakter",
+    "home": "Start",
+    "news": "Nyheter",
+    "organizations": "Organisationer",
+    "help": "Hjälp och vanliga frågor",
+    "support": "Support",
     "closeMenu": "Stäng menyn",
     "additionalAreas": "Fler områden",
     "securityAndSignIn": "Säkerhet och inloggning",
@@ -243,6 +252,8 @@
     "translationUnavailable": "Texten är inte tillgänglig just nu."
   },
   "home": {
+    "newsShortcut": "Nyheter",
+    "newsShortcutDescription": "Det senaste från branschen.",
     "badgeHero": "Film · Foto · Innehåll · Reklam",
     "heroTitle1": "Hitta inspelningsplatser, filmteam och",
     "heroTitle2": "utrustning.",
@@ -2381,7 +2392,7 @@
   },
   "OrganizationDiscovery": {
     "eyebrow": "Från branschen",
-    "title": "Organisationer och nyheter",
+    "title": "Nyheter",
     "allEntries": "Visa alla inlägg",
     "organizations": "Organisationer",
     "allOrganizations": "Visa alla organisationer",

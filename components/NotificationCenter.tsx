@@ -62,7 +62,7 @@ export default function NotificationCenter({ inbox }: { inbox: AuthenticatedInbo
     <div className="relative" ref={ref}>
       <button
         onClick={handleOpen}
-        className="relative w-8 h-8 flex items-center justify-center rounded-md text-text-muted hover:text-gold hover:bg-bg-elevated transition-all"
+        className="relative min-w-11 min-h-11 flex items-center justify-center rounded-md text-text-muted hover:text-gold hover:bg-bg-elevated transition-all"
         aria-label={tn("ariaLabel")}
         title={failed ? tn(inbox.status === "expired" ? "sessionExpired" : "loadError") : tn("ariaLabel")}
       >

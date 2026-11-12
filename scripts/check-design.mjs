@@ -41,21 +41,40 @@ if (!read("app/locations/LocationsLanding.tsx").includes("mobile-bottom-nav-clea
 
 const navbar = read("components/Navbar.tsx");
 const bottomNav = read("components/BottomNav.tsx");
-const expectedDestinations = ["/locations", "/creators", "/jobs", "/props", "/projects", "/companies"];
-const extractDestinations = (source, start, end) => {
-  const from = source.indexOf(start);
-  const to = source.indexOf(end, from);
-  if (from < 0 || to < 0) return [];
-  return [...source.slice(from, to).matchAll(/href:\s*"([^"]+)"/g)].map((match) => match[1]);
-};
-
-const desktopDestinations = extractDestinations(navbar, "const desktopNavHrefs = [", "] as const;");
-const mobileDestinations = extractDestinations(bottomNav, "const items = [", "] as const;");
-if (JSON.stringify(desktopDestinations) !== JSON.stringify(expectedDestinations)) {
-  failures.push(`Desktop navigation order differs: ${desktopDestinations.join(", ")}`);
+const navigation = await import("../lib/site-navigation.ts");
+const primaryItems = navigation.PRIMARY_NAV_ITEMS;
+const expectedPrimary = [
+  ["crew", "link", "/creators"],
+  ["marketplace", "link", "/props"],
+  ["messages", "link", "/messages"],
+  ["news", "link", "/news"],
+  ["account", "link", "/dashboard"],
+  ["more", "menu", null],
+];
+const primaryShape = primaryItems.map(({ id, kind, href }) => [id, kind, href ?? null]);
+if (JSON.stringify(primaryShape) !== JSON.stringify(expectedPrimary)) {
+  failures.push("Primary navigation must keep Crew, Marketplace, Messages, News, My area and More in the shared order");
 }
-if (JSON.stringify(mobileDestinations) !== JSON.stringify(expectedDestinations)) {
-  failures.push(`Mobile navigation order differs: ${mobileDestinations.join(", ")}`);
+for (const [name, source] of [["Desktop", navbar], ["Mobile", bottomNav]]) {
+  if (!source.includes("PRIMARY_NAV_ITEMS") || !source.includes("@/lib/site-navigation")) {
+    failures.push(`${name} navigation must consume the shared primary navigation model`);
+  }
+}
+const browseDestinations = new Set(navigation.BROWSE_NAV_ITEMS.map(({ href }) => href));
+for (const href of ["/", "/creators", "/locations", "/props", "/jobs", "/companies", "/projects", "/news", "/organizations"]) {
+  if (!browseDestinations.has(href)) failures.push(`The shared menu must retain ${href}`);
+}
+const accountDestinations = new Set(navigation.ACCOUNT_NAV_ITEMS.map(({ href }) => href));
+for (const href of ["/profile", "/dashboard?tab=listings", "/dashboard?tab=favorites", "/dashboard?tab=friends", "/dashboard?tab=bookings", "/company-dashboard", "/notifications", "/dashboard?tab=settings", "/dashboard?tab=analytics", "/profile?tab=security"]) {
+  if (!accountDestinations.has(href)) failures.push(`The shared account menu must retain ${href}`);
+}
+const appChrome = read("components/AppChrome.tsx");
+if ([...appChrome.matchAll(/<BottomNav\b/g)].length !== 1) {
+  failures.push("AppChrome must mount the mobile bottom navigation exactly once");
+}
+const personalNavigation = read("components/PersonalAreaNavigation.tsx");
+if (/<nav\b[^>]*className=[^>]*\bfixed\b[^>]*\bbottom-0\b/.test(personalNavigation)) {
+  failures.push("Personal navigation must not render a second fixed mobile bottom bar");
 }
 
 const styles = read("app/globals.css");
@@ -86,6 +105,13 @@ const collectUiFiles = (directory) =>
   });
 
 const adUiFiles = [...collectUiFiles("app"), ...collectUiFiles("components")];
+const menuOwners = adUiFiles.filter((path) => {
+  const source = read(path);
+  return source.includes("BROWSE_NAV_ITEMS") && source.includes("ACCOUNT_NAV_ITEMS");
+});
+if (menuOwners.length !== 1) {
+  failures.push("One shared menu must render the public and personal navigation models");
+}
 const forbiddenAdvertisingPatterns = [
   ["ad placeholder component", /\bAdPlaceholder\b/],
   ["reserved ad layout", /\bad-side-reserved\b/],
@@ -124,4 +150,4 @@ if (failures.length) {
   process.exit(1);
 }
 
-console.log("Shared design checks passed: six page headers and mobile controls, nav order, common layout rules, removed hero variant, and no public ad surfaces.");
+console.log("Shared design checks passed: six page headers and mobile controls, shared six-item navigation and menu, one mobile bar, common layout rules, removed hero variant, and no public ad surfaces.");

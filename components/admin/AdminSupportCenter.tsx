@@ -227,7 +227,7 @@ export function AdminSupportCenter() {
   }
 
   const unreadTotal = useMemo(() => threads.reduce((sum, thread) => sum + thread.unreadCount, 0), [threads]);
-  const viewportStyle = { "--support-top": `${viewportTop}px`, "--support-bottom": `max(calc(3.5rem + env(safe-area-inset-bottom, 0px)), ${keyboardInset}px)` } as CSSProperties;
+  const viewportStyle = { "--support-top": `${viewportTop}px`, "--support-bottom": `max(var(--mobile-nav-offset), ${keyboardInset}px)` } as CSSProperties;
   return <div className="min-w-0 space-y-4">
     <div className="flex min-w-0 flex-wrap items-center justify-between gap-3">
       <div className="min-w-0"><h2 className="text-lg font-semibold text-text-primary">{uiText("Ui.text_7ea8a1343a4e0c")}</h2><p className="mt-1 text-sm text-text-muted">{uiText("Ui.text_d985cd9358090b")}</p></div>

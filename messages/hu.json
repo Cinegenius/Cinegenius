@@ -25,6 +25,15 @@
     "accountSettings": "Fiókbeállítások",
     "analytics": "Elemzések",
     "more": "Több",
+    "allAreas": "Minden terület",
+    "discover": "Felfedezés",
+    "helpAndInfo": "Súgó és információk",
+    "contacts": "Kapcsolatok",
+    "home": "Kezdőlap",
+    "news": "Hírek",
+    "organizations": "Szervezetek",
+    "help": "Súgó és GYIK",
+    "support": "Ügyfélszolgálat",
     "closeMenu": "Menü bezárása",
     "additionalAreas": "További területek",
     "securityAndSignIn": "Biztonság és bejelentkezés",
@@ -243,6 +252,8 @@
     "translationUnavailable": "A szöveg jelenleg nem érhető el."
   },
   "home": {
+    "newsShortcut": "Hírek",
+    "newsShortcutDescription": "Friss hírek a szakmából.",
     "badgeHero": "Film · Fotó · Tartalom · Reklám",
     "heroTitle1": "Találj Helyszíneket, Stábot &",
     "heroTitle2": "Felszerelést.",
@@ -2381,7 +2392,7 @@
   },
   "OrganizationDiscovery": {
     "eyebrow": "Ágazati hírek",
-    "title": "Szervezetek és hírek",
+    "title": "Hírek",
     "allEntries": "Összes bejegyzés",
     "organizations": "Szervezetek",
     "allOrganizations": "Összes szervezet",

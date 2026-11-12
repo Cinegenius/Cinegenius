@@ -25,6 +25,15 @@
     "accountSettings": "Impostazioni account",
     "analytics": "Analisi",
     "more": "Altro",
+    "allAreas": "Tutte le sezioni",
+    "discover": "Scopri",
+    "helpAndInfo": "Aiuto e informazioni",
+    "contacts": "Contatti",
+    "home": "Inizio",
+    "news": "Notizie",
+    "organizations": "Organizzazioni",
+    "help": "Aiuto e FAQ",
+    "support": "Assistenza",
     "closeMenu": "Chiudi menu",
     "additionalAreas": "Altre sezioni",
     "securityAndSignIn": "Sicurezza e accesso",
@@ -243,6 +252,8 @@
     "translationUnavailable": "Testo non disponibile."
   },
   "home": {
+    "newsShortcut": "Notizie",
+    "newsShortcutDescription": "Le ultime novità del settore.",
     "badgeHero": "Film · Foto · Contenuto · Pubblicità",
     "heroTitle1": "Trova Location, Crew &",
     "heroTitle2": "Attrezzatura.",
@@ -2381,7 +2392,7 @@
   },
   "OrganizationDiscovery": {
     "eyebrow": "Novità del settore",
-    "title": "Organizzazioni e novità",
+    "title": "Notizie",
     "allEntries": "Tutti i contributi",
     "organizations": "Organizzazioni",
     "allOrganizations": "Tutte le organizzazioni",

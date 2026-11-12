@@ -25,6 +25,15 @@
     "accountSettings": "Accountinstellingen",
     "analytics": "Statistieken",
     "more": "Meer",
+    "allAreas": "Alle onderdelen",
+    "discover": "Ontdekken",
+    "helpAndInfo": "Hulp en informatie",
+    "contacts": "Contacten",
+    "home": "Start",
+    "news": "Nieuws",
+    "organizations": "Organisaties",
+    "help": "Hulp en veelgestelde vragen",
+    "support": "Ondersteuning",
     "closeMenu": "Menu sluiten",
     "additionalAreas": "Andere onderdelen",
     "securityAndSignIn": "Beveiliging en inloggen",
@@ -243,6 +252,8 @@
     "translationUnavailable": "Tekst momenteel niet beschikbaar."
   },
   "home": {
+    "newsShortcut": "Nieuws",
+    "newsShortcutDescription": "Het laatste nieuws uit de sector.",
     "badgeHero": "Film · Foto · Content · Reclame",
     "heroTitle1": "Locaties, crew en",
     "heroTitle2": "apparatuur vinden.",
@@ -2381,7 +2392,7 @@
   },
   "OrganizationDiscovery": {
     "eyebrow": "Uit de branche",
-    "title": "Organisaties en nieuws",
+    "title": "Nieuws",
     "allEntries": "Alle berichten bekijken",
     "organizations": "Organisaties",
     "allOrganizations": "Alle organisaties bekijken",

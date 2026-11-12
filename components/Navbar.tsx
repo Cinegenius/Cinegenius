@@ -1,14 +1,13 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useLayoutEffect, useRef } from "react";
 import type React from "react";
 import Link from "next/link";
-import Image from "@/components/MediaImage";
 import { usePathname } from "next/navigation";
 import { useAuth, useUser, useClerk } from "@clerk/nextjs";
 import {
-  Menu, X, Film, ChevronDown, Search, Loader2, User,
-  LayoutDashboard, LogOut, MessageSquare, Bell, ShieldCheck,
+  Menu, ChevronDown, Search, Loader2, User,
+  LayoutDashboard, LogOut, MessageSquare, ShieldCheck,
 } from "lucide-react";
 import NotificationCenter from "@/components/NotificationCenter";
 import { Logo } from "@/components/Logo";
@@ -18,31 +17,22 @@ import { useTranslations } from "next-intl";
 import { useToast } from "@/contexts/ToastContext";
 import { useAuthenticatedInbox } from "@/lib/use-authenticated-inbox";
 import { subscribeToProfileUpdated } from "@/lib/profile-update-events";
+import { PRIMARY_NAV_ITEMS, activeNavigationId, SITE_NAV_MENU_ID, SITE_NAV_SIGN_OUT_EVENT } from "@/lib/site-navigation";
+import { useSiteNavigation } from "@/contexts/SiteNavigationContext";
 import { useAdminSupportUnread } from "@/lib/use-admin-support-unread";
-
-const desktopNavHrefs = [
-  { href: "/locations", key: "locations" },
-  { href: "/creators", key: "crew" },
-  { href: "/jobs", key: "jobs" },
-  { href: "/props", key: "marketplace" },
-  { href: "/projects", key: "projects" },
-  { href: "/companies", key: "companies" },
-] as const;
 
 export default function Navbar({ initialIsSignedIn = false, initialAdminUserId = null }: { initialIsSignedIn?: boolean; initialAdminUserId?: string | null }) {
   const uiText = useTranslations();
 
   const t = useTranslations("nav");
   const { leave } = useFormNavigation();
-  const [open, setOpen] = useState(false);
+  const {menuOpen, openMenu, closeMenu} = useSiteNavigation();
   const [scrolled, setScrolled] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const [profileData, setProfileData] = useState<{
     userId: string;
     displayName: string;
-    avatarUrl: string;
   } | null>(null);
-  const profileUpdateRevision = useRef(0);
   const [signingOut, setSigningOut] = useState(false);
   const signingOutRef = useRef(false);
   const inbox = useAuthenticatedInbox();
@@ -53,6 +43,7 @@ export default function Navbar({ initialIsSignedIn = false, initialAdminUserId =
   const { signOut } = useClerk();
   const { addToast } = useToast();
   const userMenuRef = useRef<HTMLDivElement>(null);
+  const accountButton = useRef<HTMLButtonElement>(null);
   const activeUserId = isSignedIn ? user?.id : null;
   const showAdminLink = !!initialAdminUserId && initialAdminUserId === activeUserId;
   const supportUnread = useAdminSupportUnread(showAdminLink ? activeUserId : null);
@@ -60,7 +51,6 @@ export default function Navbar({ initialIsSignedIn = false, initialAdminUserId =
   const supportUnreadLabel = uiText("SupportContact.unreadLabel", { count: supportUnreadCount });
   const hasSignedInSession = inbox.status === "expired" ? false : isLoaded ? !!isSignedIn : initialIsSignedIn;
   const profileDisplayName = profileData?.userId === activeUserId ? profileData?.displayName ?? "" : "";
-  const profileAvatarUrl = profileData?.userId === activeUserId ? profileData?.avatarUrl ?? "" : "";
   const unreadMessages = inbox.status === "ready" ? inbox.count ?? 0 : 0;
   const supportBadge = supportUnreadCount > 0 ? <span title={supportUnreadLabel} aria-label={supportUnreadLabel} className="ml-auto inline-flex h-5 min-w-5 shrink-0 items-center justify-center rounded-full bg-gold px-1 text-[10px] font-bold text-bg-primary">{supportUnreadCount > 99 ? "99+" : supportUnreadCount}</span> : null;
 
@@ -70,7 +60,6 @@ export default function Navbar({ initialIsSignedIn = false, initialAdminUserId =
     // Route changes must close transient menus, including browser back/forward navigation.
     // eslint-disable-next-line react-hooks/set-state-in-effect
     closeAll();
-    setOpen(false);
   }, [pathname]);
 
   useEffect(() => {
@@ -81,53 +70,16 @@ export default function Navbar({ initialIsSignedIn = false, initialAdminUserId =
 
   useEffect(() => {
     if (!isLoaded) return;
-
     try {
-      // Remove the old account-agnostic cache written by previous releases.
       localStorage.removeItem("cg_profile_name");
       localStorage.removeItem("cg_profile_avatar");
-    } catch { /* storage can be disabled */ }
+    } catch { /* Retired account-agnostic caches may be unavailable. */ }
+  }, [isLoaded]);
 
-    if (!activeUserId) {
-      return;
-    }
-
-    const controller = new AbortController();
-    const { signal } = controller;
-    let current = true;
-    const initialProfileRevision = profileUpdateRevision.current;
-
-    fetch("/api/profile", { signal, cache: "no-store" })
-      .then(r => r.ok ? r.json() : null)
-      .then((json) => {
-        if (!current || !json || initialProfileRevision !== profileUpdateRevision.current) return;
-        setProfileData({
-          userId: activeUserId,
-          displayName: json.profile?.display_name ?? "",
-          avatarUrl: json.profile?.avatar_url ?? "",
-        });
-      })
-      .catch(() => {});
-
-    return () => {
-      current = false;
-      controller.abort();
-    };
-  }, [isLoaded, activeUserId]);
-
-  useEffect(() => {
-    return subscribeToProfileUpdated((detail) => {
-      if (!activeUserId || detail?.userId !== activeUserId) return;
-      profileUpdateRevision.current += 1;
-      setProfileData((current) => ({
-        userId: activeUserId,
-        displayName: detail.displayName ?? (current?.userId === activeUserId ? current.displayName : ""),
-        avatarUrl: detail.avatarUrl !== undefined
-          ? detail.avatarUrl ?? ""
-          : current?.userId === activeUserId ? current.avatarUrl : "",
-      }));
-    });
-  }, [activeUserId]);
+  useEffect(() => subscribeToProfileUpdated((detail) => {
+    if (!activeUserId || detail?.userId !== activeUserId || detail.displayName === undefined) return;
+    setProfileData({userId:activeUserId,displayName:detail.displayName});
+  }), [activeUserId]);
 
   const handleSignOut = async () => {
     if (signingOutRef.current) return;
@@ -154,16 +106,29 @@ export default function Navbar({ initialIsSignedIn = false, initialAdminUserId =
     const handler = (e: MouseEvent) => {
       if (userMenuRef.current && !userMenuRef.current.contains(e.target as Node)) setUserMenuOpen(false);
     };
-    document.addEventListener("mousedown", handler);
-    return () => document.removeEventListener("mousedown", handler);
+    const escape = (event: KeyboardEvent) => {
+      if (event.key !== "Escape" || !userMenuOpen) return;
+      event.preventDefault(); setUserMenuOpen(false); accountButton.current?.focus();
+    };
+    document.addEventListener("mousedown", handler); document.addEventListener("keydown", escape);
+    return () => {document.removeEventListener("mousedown", handler);document.removeEventListener("keydown", escape);};
+  }, [userMenuOpen]);
+
+  const requestSignOut = useRef<() => void>(() => {});
+  useLayoutEffect(() => {
+    requestSignOut.current = () => {
+      if (!hasSignedInSession || signingOutRef.current) return;
+      setUserMenuOpen(false); closeMenu();
+      leave(() => void handleSignOut());
+    };
+  });
+  useEffect(() => {
+    const request = () => requestSignOut.current();
+    document.addEventListener(SITE_NAV_SIGN_OUT_EVENT, request);
+    return () => document.removeEventListener(SITE_NAV_SIGN_OUT_EVENT, request);
   }, []);
 
-  useEffect(() => {
-    document.body.style.overflow = open ? "hidden" : "";
-    return () => { document.body.style.overflow = ""; };
-  }, [open]);
-
-  const isActive = (href: string) => pathname === href || pathname.startsWith(href.split("?")[0] + "/");
+  const activeId = activeNavigationId(pathname);
   // When not scrolled (over hero), use white text for contrast against dark image overlay
   const navBase   = scrolled ? "text-text-secondary hover:text-gold" : "text-white/80 hover:text-white";
   const navActive = scrolled ? "text-gold" : "text-white";
@@ -183,19 +148,13 @@ export default function Navbar({ initialIsSignedIn = false, initialAdminUserId =
 
             {/* Desktop nav */}
             <nav className="hidden lg:flex items-center gap-1">
-              {desktopNavHrefs.map(({ href, key }) => {
-                const basePath = href.split("?")[0] ?? href;
-                return (
-                  <Link
-                    key={href}
-                    href={href}
-                    prefetch={authRoute || signingOut ? false : null}
-                    className={`px-3 py-2 text-sm font-medium transition-colors uppercase tracking-widest rounded-md ${isActive(basePath) ? navActive : navBase}`}
-                  >
-                    {t(key)}
-                  </Link>
-                );
-              })}
+              {PRIMARY_NAV_ITEMS.map(item => item.kind === "menu" ? <button
+                key={item.id} type="button" onClick={event => {event.currentTarget.focus({preventScroll:true});openMenu();}} aria-expanded={menuOpen} aria-controls={SITE_NAV_MENU_ID} aria-haspopup="dialog"
+                className={`inline-flex min-h-11 items-center rounded-md px-2 text-xs font-medium uppercase tracking-wide transition-colors xl:px-3 xl:text-sm ${menuOpen || activeId === item.id ? navActive : navBase}`}
+              >{t(item.key)}</button> : <Link
+                key={item.id} href={item.href} prefetch={authRoute || signingOut ? false : null} aria-current={activeId === item.id ? "page" : undefined}
+                className={`inline-flex min-h-11 items-center rounded-md px-2 text-xs font-medium uppercase tracking-wide transition-colors xl:px-3 xl:text-sm ${activeId === item.id ? navActive : navBase}`}
+              >{t(item.key)}{item.id === "messages" && unreadMessages > 0 && <span className="ml-1 inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-crimson px-1 text-[10px] font-bold text-white">{unreadMessages > 9 ? "9+" : unreadMessages}</span>}</Link>)}
             </nav>
 
             {/* Desktop CTA */}
@@ -214,14 +173,14 @@ export default function Navbar({ initialIsSignedIn = false, initialAdminUserId =
                   <Link
                     href="/sign-in"
                     prefetch
-                    className="px-4 py-2 text-sm font-semibold border border-border text-text-secondary hover:border-gold hover:text-gold rounded-md transition-all"
+                    className="inline-flex min-h-11 items-center px-3 py-2 text-sm font-semibold border border-border text-text-secondary hover:border-gold hover:text-gold rounded-md transition-all"
                   >
                     {t("signIn")}
                   </Link>
                   <Link
                     href="/sign-up"
                     prefetch
-                    className="px-4 py-2 text-sm font-semibold bg-gold text-bg-primary rounded-md hover:bg-gold-light transition-colors"
+                    className="inline-flex min-h-11 items-center px-3 py-2 text-sm font-semibold bg-gold text-bg-primary rounded-md hover:bg-gold-light transition-colors"
                   >
                     {t("signUp")}
                   </Link>
@@ -233,13 +192,13 @@ export default function Navbar({ initialIsSignedIn = false, initialAdminUserId =
                 return (
                   <div className="relative" ref={userMenuRef}>
                     <button
+                      ref={accountButton}
+                      aria-label={t("personalArea")} aria-expanded={userMenuOpen} aria-controls="header-account-menu"
                       onClick={() => setUserMenuOpen(v => !v)}
                       className="relative flex min-h-11 items-center gap-2 pl-1 pr-2.5 py-1 rounded-full border border-border hover:border-gold/50 hover:bg-bg-elevated transition-all group"
                     >
                       <span className="relative w-7 h-7 rounded-full bg-gold/10 border border-gold/20 flex items-center justify-center overflow-hidden" aria-hidden="true">
-                        {profileAvatarUrl
-                          ? <Image src={profileAvatarUrl} alt="" width={28} height={28} unoptimized className="h-full w-full object-cover" />
-                          : <User size={15} className="text-gold" />}
+                        <User size={15} className="text-gold" />
                       </span>
                       <span className="text-sm font-medium text-text-secondary group-hover:text-text-primary transition-colors max-w-[100px] truncate hidden xl:block">
                         {displayName}
@@ -249,13 +208,11 @@ export default function Navbar({ initialIsSignedIn = false, initialAdminUserId =
                     </button>
 
                     {userMenuOpen && (
-                      <div className="absolute top-full right-0 mt-2 w-56 bg-bg-elevated border border-border rounded-2xl shadow-2xl overflow-hidden animate-fade-in z-50">
+                      <div id="header-account-menu" className="absolute top-full right-0 mt-2 w-56 bg-bg-elevated border border-border rounded-2xl shadow-2xl overflow-hidden animate-fade-in z-50">
                         {/* Identity */}
                         <div className="px-4 py-3.5 border-b border-border flex items-center gap-3">
-                          <span className="relative w-9 h-9 rounded-full bg-gold/10 border border-gold/20 flex items-center justify-center shrink-0 overflow-hidden" aria-hidden="true">
-                            {profileAvatarUrl
-                              ? <Image src={profileAvatarUrl} alt="" width={36} height={36} unoptimized className="h-full w-full object-cover" />
-                              : <User size={18} className="text-gold" />}
+                          <span className="relative min-w-11 min-h-11 rounded-full bg-gold/10 border border-gold/20 flex items-center justify-center shrink-0 overflow-hidden" aria-hidden="true">
+                            <User size={18} className="text-gold" />
                           </span>
                           <div className="min-w-0">
                             <p className="text-sm font-semibold text-text-primary truncate leading-tight">{displayName}</p>
@@ -268,14 +225,14 @@ export default function Navbar({ initialIsSignedIn = false, initialAdminUserId =
                           <Link
                             href="/dashboard"
                             onClick={() => setUserMenuOpen(false)}
-                            className="flex items-center gap-3 px-4 py-2.5 text-sm text-text-secondary hover:text-text-primary hover:bg-bg-hover transition-colors"
+                            className="flex min-h-11 items-center gap-3 px-4 py-2.5 text-sm text-text-secondary hover:text-text-primary hover:bg-bg-hover transition-colors"
                           >
                             <LayoutDashboard size={15} className="text-text-muted shrink-0" /> {t("personalArea")}
                           </Link>
                           <Link
                             href="/messages"
                             onClick={() => setUserMenuOpen(false)}
-                            className="flex items-center gap-3 px-4 py-2.5 text-sm text-text-secondary hover:text-text-primary hover:bg-bg-hover transition-colors"
+                            className="flex min-h-11 items-center gap-3 px-4 py-2.5 text-sm text-text-secondary hover:text-text-primary hover:bg-bg-hover transition-colors"
                           >
                             <MessageSquare size={15} className="text-text-muted shrink-0" />
                             <span>{t("messages")}</span>
@@ -288,7 +245,7 @@ export default function Navbar({ initialIsSignedIn = false, initialAdminUserId =
                           <Link
                             href={user?.id ? `/profile/${user.id}` : "/profile"}
                             onClick={() => setUserMenuOpen(false)}
-                            className="flex items-center gap-3 px-4 py-2.5 text-sm text-text-secondary hover:text-text-primary hover:bg-bg-hover transition-colors"
+                            className="flex min-h-11 items-center gap-3 px-4 py-2.5 text-sm text-text-secondary hover:text-text-primary hover:bg-bg-hover transition-colors"
                           >
                             <User size={15} className="text-text-muted shrink-0" /> {t("publicProfile")}
                           </Link>
@@ -298,7 +255,7 @@ export default function Navbar({ initialIsSignedIn = false, initialAdminUserId =
                         {/* Sign out */}
                         <div className="border-t border-border py-1.5">
                           <button
-                            onClick={() => { setUserMenuOpen(false); leave(() => void handleSignOut()); }}
+                            onClick={() => requestSignOut.current()}
                             disabled={signingOut}
                             aria-busy={signingOut}
                             className="w-full min-h-11 flex items-center gap-3 px-4 py-2.5 text-sm text-text-secondary hover:text-red-400 hover:bg-red-500/5 transition-colors disabled:opacity-60"
@@ -320,7 +277,7 @@ export default function Navbar({ initialIsSignedIn = false, initialAdminUserId =
                 <button
                   type="button"
                   onClick={() => document.dispatchEvent(new Event("cg:opensearch"))}
-                  className="w-9 h-9 flex items-center justify-center text-text-secondary hover:text-gold transition-colors"
+                  className="hidden min-[360px]:flex min-w-11 min-h-11 items-center justify-center text-text-secondary hover:text-gold transition-colors"
                   aria-label={uiText("Ui.text_9f6d74e0a12b67")}
                 >
                   <Search size={20} />
@@ -335,13 +292,11 @@ export default function Navbar({ initialIsSignedIn = false, initialAdminUserId =
                     <NotificationCenter inbox={inbox} />
                     <Link
                       href="/dashboard"
-                      className="relative w-9 h-9 rounded-full border border-gold/30 shrink-0 flex items-center justify-center bg-gold/10"
+                      className="relative hidden min-[420px]:flex min-w-11 min-h-11 rounded-full border border-gold/30 shrink-0 items-center justify-center bg-gold/10"
                       title={t("personalArea")}
                       aria-label={t("personalArea")}
                     >
-                      {profileAvatarUrl
-                        ? <Image src={profileAvatarUrl} alt="" width={36} height={36} unoptimized className="h-full w-full rounded-full object-cover" />
-                        : <User size={18} className="text-gold" aria-hidden="true" />}
+                      <User size={18} className="text-gold" aria-hidden="true" />
                       {supportBadge && <span className="absolute -right-1 -top-1">{supportBadge}</span>}
                     </Link>
                   </>
@@ -349,113 +304,20 @@ export default function Navbar({ initialIsSignedIn = false, initialAdminUserId =
               })()}
               {hasSignedInSession && <LanguageSwitcher />}
               <button
-                className="w-11 h-11 flex items-center justify-center text-text-secondary hover:text-gold transition-colors"
-                onClick={() => setOpen(!open)}
+                className="relative w-11 h-11 flex items-center justify-center text-text-secondary hover:text-gold transition-colors"
+                onClick={event => {event.currentTarget.focus({preventScroll:true});openMenu();}}
                 aria-label={t("openMenu")}
+                aria-expanded={menuOpen}
+                aria-controls={SITE_NAV_MENU_ID} aria-haspopup="dialog"
               >
-                {open ? <X size={22} /> : <Menu size={22} />}
+                <Menu size={22} />
+                {supportBadge && <span className="absolute -right-1 -top-1 min-[420px]:hidden">{supportBadge}</span>}
               </button>
             </div>
           </div>
         </div>
       </header>
 
-      {open && (
-        <div className="lg:hidden fixed inset-0 z-40 bg-black/60 backdrop-blur-sm" onClick={() => setOpen(false)} />
-      )}
-
-      {/* Mobile panel */}
-      <div
-        className={`lg:hidden fixed top-0 right-0 bottom-0 z-50 w-80 bg-bg-secondary border-l border-border shadow-2xl transform transition-transform duration-300 ease-out ${
-          open ? "translate-x-0" : "translate-x-full"
-        }`}
-      >
-        <div className="flex items-center justify-between px-5 h-16 border-b border-border">
-          <Logo onClick={() => setOpen(false)} />
-          <button type="button" onClick={() => setOpen(false)} aria-label={t("closeMenu")} className="-m-3 inline-flex min-h-11 min-w-11 items-center justify-center text-text-muted hover:text-gold transition-colors">
-            <X size={20} />
-          </button>
-        </div>
-
-        <nav className="px-4 py-5 overflow-y-auto h-[calc(100%-4rem)] flex flex-col gap-4">
-
-          {!hasSignedInSession && (
-            <div className="flex items-center justify-between gap-3 px-4 py-3.5 text-sm text-text-secondary">
-              <span>{uiText("language.choose")}</span>
-              <LanguageSwitcher />
-            </div>
-          )}
-
-          {hasSignedInSession ? (
-            <>
-              {/* Account links */}
-              <div className="space-y-1">
-                {[
-                  { href: "/dashboard",     icon: LayoutDashboard, label: t("personalArea")    },
-                  ...(showAdminLink ? [{ href: "/admin", icon: ShieldCheck, label: t("adminArea") }] : []),
-                  { href: "/dashboard?tab=listings", icon: Film,    label: t("myOffers")        },
-                  { href: "/messages",      icon: MessageSquare,   label: t("messages")        },
-                  { href: "/notifications", icon: Bell,            label: t("notifications")   },
-                  { href: user?.id ? `/profile/${user.id}` : "/profile", icon: User, label: t("publicProfile") },
-                ].map(({ href, icon: Icon, label }) => (
-                  <Link
-                    key={label}
-                    href={href}
-                    onClick={() => setOpen(false)}
-                    className={`flex items-center gap-4 px-4 py-3.5 rounded-xl text-base font-medium transition-all ${
-                      isActive(href)
-                        ? "bg-gold/10 text-gold border border-gold/20"
-                        : "text-text-secondary hover:bg-bg-elevated hover:text-text-primary"
-                    }`}
-                  >
-                    <Icon size={18} className={isActive(href) ? "text-gold" : "text-text-muted"} />
-                    <span>{label}</span>
-                    {href === "/admin" && supportBadge}
-                    {href === "/messages" && unreadMessages > 0 && (
-                      <span className="ml-auto min-w-[20px] h-5 bg-crimson text-white text-[10px] font-bold rounded-full flex items-center justify-center px-1">
-                        {unreadMessages > 9 ? "9+" : unreadMessages}
-                      </span>
-                    )}
-                  </Link>
-                ))}
-              </div>
-
-              {/* CTA */}
-              <div className="pt-2 border-t border-border">
-                <Link
-                  href="/inserat"
-                  onClick={() => setOpen(false)}
-                  className="block w-full py-3 px-4 text-sm text-center font-semibold bg-gold text-bg-primary rounded-xl hover:bg-gold-light transition-colors"
-                >
-                  + {t("createListing")}
-                </Link>
-              </div>
-
-              {/* Sign out */}
-              <div className="pt-2 border-t border-border">
-                <button
-                  onClick={() => { setOpen(false); leave(() => void handleSignOut()); }}
-                  disabled={signingOut}
-                  aria-busy={signingOut}
-                  className="w-full min-h-11 flex items-center gap-2 px-3 py-2.5 text-sm text-text-secondary hover:text-red-400 rounded-lg transition-colors disabled:opacity-60"
-                >
-                  {signingOut ? <Loader2 size={14} className="animate-spin" /> : <LogOut size={14} />}
-                  {signingOut ? t("signingOut") : t("signOut")}
-                </button>
-              </div>
-            </>
-          ) : (
-            <div className="mt-auto pt-4 border-t border-border space-y-2">
-              <Link href="/sign-in" onClick={() => setOpen(false)} className="block w-full py-2.5 px-3 text-sm text-center font-medium border border-border text-text-secondary hover:border-gold hover:text-gold rounded-lg transition-all">
-                {t("signIn")}
-              </Link>
-              <Link href="/sign-up" onClick={() => setOpen(false)} className="block w-full py-2.5 px-3 text-sm text-center font-semibold bg-gold text-bg-primary rounded-lg hover:bg-gold-light transition-colors">
-                {t("signUp")}
-              </Link>
-            </div>
-          )}
-        </nav>
-      </div>
     </>
   );
 }

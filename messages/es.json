@@ -25,6 +25,15 @@
     "accountSettings": "Configuración de la cuenta",
     "analytics": "Analíticas",
     "more": "Más",
+    "allAreas": "Todas las áreas",
+    "discover": "Descubrir",
+    "helpAndInfo": "Ayuda e información",
+    "contacts": "Contactos",
+    "home": "Inicio",
+    "news": "Noticias",
+    "organizations": "Organizaciones",
+    "help": "Ayuda y preguntas frecuentes",
+    "support": "Soporte",
     "closeMenu": "Cerrar menú",
     "additionalAreas": "Otras áreas",
     "securityAndSignIn": "Seguridad e inicio de sesión",
@@ -243,6 +252,8 @@
     "translationUnavailable": "Texto no disponible."
   },
   "home": {
+    "newsShortcut": "Noticias",
+    "newsShortcutDescription": "Las novedades del sector.",
     "badgeHero": "Film · Foto · Contenido · Publicidad",
     "heroTitle1": "Encuentra Locaciones, Equipo &",
     "heroTitle2": "Personal.",
@@ -2381,7 +2392,7 @@
   },
   "OrganizationDiscovery": {
     "eyebrow": "Actualidad del sector",
-    "title": "Organizaciones y novedades",
+    "title": "Noticias",
     "allEntries": "Ver todas las publicaciones",
     "organizations": "Organizaciones",
     "allOrganizations": "Ver todas las organizaciones",

@@ -29,7 +29,7 @@ Reserve enough safe-area-aware space for the fixed bottom navigation so the last
 
 The homepage keeps `/hero-bg.jpg` as a full-page backdrop using the shared `PageBackdrop` component. Its slightly brighter dark overlay must retain readable copy and clear card surfaces while allowing the image to continue behind homepage sections.
 
-Desktop and mobile navigation use the same order: Locations, Crew, Jobs, Marktplatz, Projekte, Firmen. Keep `components/Navbar.tsx` and `components/BottomNav.tsx` aligned when editing navigation.
+Desktop and mobile primary navigation use one shared model in `lib/site-navigation.ts`, in this order: Crew, Marktplatz, Nachrichten, News, Mein Bereich, Mehr. Keep those six positions stable across public and personal pages. `components/BottomNav.tsx` owns the only mobile bottom bar; personal-area controls may add a desktop row without replacing it. The shared Mehr menu keeps Locations, Jobs, Firmen, Projects, Organizations and all account pages reachable. Projects belongs in the menu. Add future AI tools to that model only when their destination exists.
 
 ## Authentication entry points
 
@@ -41,9 +41,11 @@ New users continue from verified registration to the shared `/profile-setup` ass
 
 ## Design regression checks
 
-Run `npm run check:design` before each release. It verifies that all six public areas still use `PageHeader`, the desktop and mobile navigation have the same destinations in the same order, the shared page-width and solid-toolbar styles remain present, and the removed `CategoryHero` layout has not returned. The production release script runs this check automatically.
+Run `npm run check:design` before each release. It verifies that all six public areas still use `PageHeader`, desktop and mobile primary navigation use the shared six-item model, one component owns the mobile bottom bar, the shared menu retains its public and personal destinations, the shared page-width and solid-toolbar styles remain present, and the removed `CategoryHero` layout has not returned. The production release script runs this check automatically.
 
 For visual review, capture `/projects`, `/locations`, `/props`, `/creators`, `/companies`, and `/jobs` at identical 320×740, 375×812, 390×844, 430×932, 768×1024, 1024×768, and 1366×900 viewports. Compare each area beside `/projects` at that same size, checking the header, page width, search/filter stack, first result row, and fixed mobile navigation. Exercise search, category and sort selects, filter combinations, reset/apply, long labels, empty results, orientation, and the keyboard-open filter panel. Check for horizontal overflow. Open each route directly, reload it, then navigate across areas. Review signed-out and signed-in navigation when an authenticated test session is available; production data must not be altered for these checks.
+
+At 320 CSS px, check all nine supported languages in the real shared application shell. Follow the six primary positions between a public directory, the personal overview and the message list; one bottom bar must remain in the same order with the current area and account-scoped unread badge. Open Mehr from the header and bottom bar, reach Projects and the other public and account areas, close with Escape or the backdrop, and verify focus return and actual browser Back. Check the open chat and software keyboard separately, where the message composer uses the available viewport. Verify that the homepage News shortcut reaches `/news` and its short section heading fits. An isolated browser fixture must import the real shell and navigation components; handwritten header or footer substitutes do not verify their integration. Record browser simulations separately from physical-device checks.
 
 ## Production source and release
 

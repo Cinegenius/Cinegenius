@@ -21,7 +21,7 @@ export default function CookieBanner() {
   }
   if (consent !== null && !editing) return null;
   return (
-    <section aria-label={t("settings")} className="fixed bottom-[calc(3.5rem+env(safe-area-inset-bottom,0px))] lg:bottom-0 left-0 right-0 z-[70] max-h-[60dvh] overflow-y-auto border-t border-border bg-bg-elevated px-4 py-3 shadow-2xl">
+    <section aria-label={t("settings")} className="fixed bottom-[var(--mobile-nav-offset)] left-0 right-0 z-[70] max-h-[60dvh] overflow-y-auto border-t border-border bg-bg-elevated px-4 py-3 shadow-2xl">
       <div className="mx-auto flex max-w-7xl flex-col gap-3 sm:flex-row sm:items-center sm:gap-6">
         <div className="min-w-0 flex-1 text-sm leading-relaxed text-text-secondary">
           <p>{t("banner")} <Link href="/datenschutz" className="text-gold underline">{t("privacy")}</Link></p>

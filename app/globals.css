@@ -47,6 +47,9 @@
 }
 
 :root {
+  --mobile-nav-height: 4rem;
+  --mobile-nav-clearance: calc(var(--mobile-nav-height) + 1px + env(safe-area-inset-bottom, 0px));
+  --mobile-nav-offset: var(--mobile-nav-clearance);
   --site-content-max: 80rem;
   --site-gutter: 1rem;
   --site-gutter-tablet: 1.5rem;
@@ -109,7 +112,7 @@ body {
 /* One mobile search/filter pattern shared by all six directory pages. */
 .mobile-browse-controls { border-bottom: 1px solid color-mix(in srgb, var(--color-border) 55%, transparent); background: var(--color-bg-primary); }
 .mobile-browse-controls__inner { display: grid; gap: 10px; padding-block: 12px; }
-.mobile-bottom-nav-clear { padding-bottom: calc(56px + env(safe-area-inset-bottom, 0px)); }
+.mobile-bottom-nav-clear { padding-bottom: var(--mobile-nav-offset); }
 .mobile-browse-search, .mobile-browse-action, .mobile-browse-sort, .mobile-browse-category {
   min-height: 46px; border: 1px solid var(--color-border); border-radius: 12px; background: var(--color-bg-elevated); color: var(--color-text-secondary);
 }
@@ -162,8 +165,8 @@ body {
   .mobile-browse-category > span { overflow: visible; white-space: normal; }
 }
 
-@media (min-width: 1280px) {
-  .mobile-bottom-nav-clear { padding-bottom: 0; }
+@media (min-width: 1024px) {
+  :root { --mobile-nav-offset: 0px; }
 }
 
 @media (min-width: 640px) {

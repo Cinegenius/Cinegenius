@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { createPortal } from "react-dom";
 import { Loader2 } from "lucide-react";
+import { announceFormNavigation } from "@/lib/form-navigation-events";
 
 export type FormProtection = { unsafe: () => boolean; flush?: () => Promise<boolean>; discard?: () => Promise<void> };
 const Context = createContext<{ register: (id: symbol, protection: FormProtection) => () => void; leave: (action: () => void) => void; notify: () => void } | null>(null);
@@ -39,6 +40,7 @@ export default function FormDraftProvider({ children }: { children: ReactNode })
   }, [unsafe]);
   const leave = useCallback((action: () => void) => {
     if (pending.current || working.current) return;
+    announceFormNavigation();
     if (!unsafe().length) { action(); return; }
     pending.current = action;
     setCanSave(unsafe().every(entry => !!entry.flush));
