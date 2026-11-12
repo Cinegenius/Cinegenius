@@ -4,7 +4,7 @@ import { dismissNativeDialog } from "@/lib/native-dialog";
 
 import UnoptimizedImage from "@/components/UnoptimizedImage";
 
-import { useEffect, useRef, useState, useCallback } from "react";
+import { useEffect, useRef, useState, useCallback, type CSSProperties } from "react";
 import { useSearchParams } from "next/navigation";
 import { useUser } from "@clerk/nextjs";
 import Link from "next/link";
@@ -473,8 +473,8 @@ function MessagesContent() {
   const people = [...contacts].sort((a,b) => a.display_name.localeCompare(b.display_name,uiLocale)).map(contact => ({id:contact.user_id, name:contact.display_name, avatar:contact.avatar_url, role:contact.role}));
   const filteredConversations = conversations.filter(conversation => `${conversation.otherName ?? ""} ${conversation.group_name ?? ""}`.toLocaleLowerCase(uiLocale).includes(search.trim().toLocaleLowerCase(uiLocale)));
 
-  return <div className={`fixed inset-x-0 top-16 ${showChat ? "bottom-0" : "bottom-[env(safe-area-inset-bottom,0px)]"} lg:bottom-0 flex overflow-hidden bg-bg-primary`}
-    style={{...(visualViewportTop>0?{top:`${64+visualViewportTop}px`}:{}),...(keyboardInset>0?{bottom:`${keyboardInset}px`}:{})}}>
+  return <div className={`fixed inset-x-0 top-[calc(4rem+var(--messages-viewport-offset,0px))] lg:top-[calc(7.25rem+1px+var(--messages-viewport-offset,0px))] ${showChat ? "bottom-0" : "bottom-[calc(4rem+env(safe-area-inset-bottom,0px)+1px)]"} lg:bottom-0 flex overflow-hidden bg-bg-primary`}
+    style={{"--messages-viewport-offset":`${visualViewportTop}px`,...(keyboardInset>0?{bottom:`${keyboardInset}px`}:{})} as CSSProperties}>
     <aside className={`${showChat?"hidden sm:flex":"flex"} min-w-0 w-full flex-col border-r border-border bg-bg-primary sm:w-80 sm:shrink-0`}>
       <header className="shrink-0 border-b border-border px-4 py-3">
         <div className="flex min-w-0 items-center justify-between gap-3"><h1 className="min-w-0 break-words font-display text-xl font-bold text-text-primary">{t("title")}</h1><button type="button" onClick={()=>setNewMessageOpen(true)} aria-label={t("newMessage")} title={t("newMessage")} className="flex min-h-11 min-w-11 shrink-0 items-center justify-center gap-2 rounded-xl px-2 text-sm text-gold hover:bg-bg-elevated"><SquarePen size={22}/><span className="hidden min-[400px]:inline">{t("newMessage")}</span></button></div>

@@ -1,6 +1,7 @@
 "use client";
 
 import dynamic from "next/dynamic";
+import { usePathname } from "next/navigation";
 import { useSession } from "@clerk/nextjs";
 import { X } from "lucide-react";
 import { useTranslations } from "next-intl";
@@ -45,8 +46,20 @@ function cookieNoticeVisible() {
   }
 }
 
+function subscribeToMessageChat(onChange: () => void) {
+  window.addEventListener("cinegenius:messages-chat-state", onChange);
+  return () => window.removeEventListener("cinegenius:messages-chat-state", onChange);
+}
+
+function messageChatOpen() {
+  return document.body.dataset.messagesChatOpen === "true";
+}
+
 function AvailableGenie({ memoryScope }: { memoryScope: string | null }) {
   const t = useTranslations("Genie");
+  const pathname = usePathname();
+  const chatOpen = useSyncExternalStore(subscribeToMessageChat, messageChatOpen, () => false);
+  const hideLauncher = pathname === "/messages" && chatOpen;
   const [open, setOpen] = useState(false);
   const [hasOpened, setHasOpened] = useState(false);
   const launcher = useRef<HTMLButtonElement>(null);
@@ -142,7 +155,7 @@ function AvailableGenie({ memoryScope }: { memoryScope: string | null }) {
 
   return (
     <>
-      {!open && (
+      {!open && !hideLauncher && (
         <button
           ref={launcher}
           type="button"

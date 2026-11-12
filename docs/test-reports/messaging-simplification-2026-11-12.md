@@ -171,3 +171,32 @@ Chats oder automatische Administratorvergabe. Erneutes Anwenden, Rechte und
 Altdatenbewahrung sind in PGlite getestet. Der Rückbau wurde nicht produktiv
 probeweise ausgeführt. Veröffentlichung erfolgt anschließend über den
 vorgeschriebenen sauberen GitHub-Desktop-/Produktionspfad.
+
+## Lesender Live-Abgleich und Navigationsnachtrag
+
+Der erste Produktionsstand wurde erfolgreich gebaut und auf den bestehenden
+Domains bereitgestellt. Im angemeldeten Safari-Postfach waren vorhandene
+Gespräche sichtbar; der neue Personenwahldialog lud die Kontakte und ließ sich
+schließen, ohne eine Person auszuwählen oder eine Nachricht zu senden.
+
+Dabei wurde eine Lücke der isolierten Vorschau gefunden: Die zusätzliche
+persönliche Navigation war dort zunächst nicht enthalten. Sie benötigt mobil
+64 px plus Rahmen/Safe-Area unter der Liste und auf Desktop 53 px zusätzlich
+unter dem 64-px-Seitenkopf. Der vorher entfernte Listenabstand war deshalb
+falsch. Die minimale Nachkorrektur berücksichtigt die tatsächliche
+`PersonalAreaNavigation`; aktive Chats blenden deren mobile Leiste weiterhin aus
+und behalten das Nachrichtenfeld am sichtbaren unteren Rand. Der Vorschauaufbau
+enthält diese echte Navigation nun ebenfalls. 78 gezielte Navigations-,
+Nachrichten- und Dialogtests bestanden nach der Korrektur. Die mobile
+Fußnavigation und die Desktopzeile werden ausdrücklich als Integrationsvertrag
+geprüft, damit ein isolierter Seitenaufbau diesen Platzbedarf nicht übersehen
+kann. Für diese reine Layoutnachkorrektur ist keine weitere Datenmigration nötig.
+
+Die ergänzende Prüfung der globalen Bedienelemente fand außerdem eine
+Überlagerung des Sendenknopfs durch den geschlossenen Genie-Launcher. Dieser
+schwebende Knopf wird deshalb nur während eines aktiven Nachrichtenchats
+unterdrückt. Im Postfach und anderen Bereichen bleibt er vorhanden; eine
+bereits geöffnete Genie-Unterhaltung behält ihren Verlauf und laufenden Aufruf.
+28 Genie-Verhaltenstests einschließlich der zwei neuen Launcherfälle bestanden.
+Es wurden weder Genie-Funktionen verändert noch persönliche Nachrichten an
+Genie übertragen.
