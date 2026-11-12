@@ -656,7 +656,12 @@ export default function DashboardPage() {
   const [privacyError, setPrivacyError] = useState("");
 
   // Verification request state
-  const [verifStatus, setVerifStatus] = useState<"none" | "pending" | "approved">("none");
+  const [verifStatus, setVerifStatus] = useState<"none" | "pending" | "approved" | "rejected">("none");
+  const [verifError, setVerifError] = useState("");
+  const [verifReason, setVerifReason] = useState("");
+  const [verifReload, setVerifReload] = useState(0);
+  const verifLock = useRef(false);
+  const verificationText = useTranslations("VerificationReview");
   const [verifLoading, setVerifLoading] = useState(false);
   const [verifSubmitting, setVerifSubmitting] = useState(false);
 
@@ -676,20 +681,19 @@ export default function DashboardPage() {
         if (!cancelled) setPrivacyError(uiText("Ui.text_a71e57dc22fe15", { value1: String(uiErrorMessage(err, uiText("Ui.text_0504c98fd2caa9"))) }));
       })
       .finally(() => { if (!cancelled) setPrivacyLoading(false); });
-    // Load verification status
-    setVerifLoading(true);
-    fetch("/api/verification-requests")
-      .then(r => r.json())
-      .then(({ data }) => {
-        const latest = data?.[0];
-        if (!latest) setVerifStatus("none");
-        else if (latest.status === "approved") setVerifStatus("approved");
-        else setVerifStatus("pending");
+    // A failed lookup must never appear as an unverified account or a fresh application.
+    setVerifLoading(true); setVerifError("");
+    fetch("/api/verification-requests", { cache: "no-store" })
+      .then(async response => {
+        const result = await response.json();
+        if (!response.ok || !["none", "pending", "approved", "rejected"].includes(result.status)) throw new Error(result.error || verificationText("statusError"));
+        return result;
       })
-      .catch(() => {})
-      .finally(() => setVerifLoading(false));
+      .then(result => { if (!cancelled) { setVerifStatus(result.status); setVerifReason(result.data?.[0]?.review_reason ?? ""); } })
+      .catch(error => { if (!cancelled) setVerifError(uiErrorMessage(error, verificationText("statusError"))); })
+      .finally(() => { if (!cancelled) setVerifLoading(false); });
     return () => { cancelled = true; };
-  }, [activeTab]);
+  }, [activeTab, verifReload]);
 
   const updatePrivacy = async (key: string, value: string | boolean) => {
     const previousSettings = privacySettings;
@@ -2505,24 +2509,33 @@ export default function DashboardPage() {
                 <p className="text-xs text-text-muted mb-4 leading-relaxed">{uiText("Ui.text_b35d9de7e46840")}</p>
                 {verifLoading ? (
                   <Loader2 size={16} className="animate-spin text-text-muted" />
+                ) : verifError ? (
+                  <div role="alert" className="text-sm text-crimson-light"><p>{verifError}</p><button onClick={() => setVerifReload(value => value + 1)} className="mt-2 min-h-11 rounded-lg border border-border px-4 py-2 text-text-secondary">{verificationText("retry")}</button></div>
                 ) : verifStatus === "approved" ? (
                   <div className="flex items-center gap-2 text-success text-sm font-medium">{uiText.rich("Ui.text_6280e60d3e6b8b", { part1: () => (<CheckCircle size={16} />) })}</div>
                 ) : verifStatus === "pending" ? (
                   <div className="flex items-center gap-2 text-gold text-sm">{uiText.rich("Ui.text_f04af96360a699", { part1: () => (<Clock size={16} />) })}</div>
                 ) : (
+                  <div>{verifStatus === "rejected" && <p className="mb-3 text-sm leading-6 text-text-secondary">{verificationText("rejectionHelp")}</p>}
+                  {verifReason && <p className="mb-3 whitespace-pre-wrap break-words text-sm text-text-secondary [overflow-wrap:anywhere]">{verifReason}</p>}
                   <button
                     disabled={verifSubmitting}
                     onClick={async () => {
-                      setVerifSubmitting(true);
+                      if (verifLock.current) return;
+                      verifLock.current = true; setVerifSubmitting(true); setVerifError("");
                       try {
-                        const res = await fetch("/api/verification-requests", { method: "POST" });
-                        if (res.ok) setVerifStatus("pending");
-                      } finally {
-                        setVerifSubmitting(false);
-                      }
+                        const response = await fetch("/api/verification-requests", { method: "POST" });
+                        const result = await response.json();
+                        if (!response.ok) {
+                          if (["approved", "pending"].includes(result.status)) { setVerifStatus(result.status); return; }
+                          throw new Error(result.error || verificationText("requestFailed"));
+                        }
+                        setVerifStatus("pending"); setVerifReason("");
+                      } catch (error) { setVerifError(uiErrorMessage(error, verificationText("requestFailed"))); }
+                      finally { verifLock.current = false; setVerifSubmitting(false); }
                     }}
-                    className="px-4 py-2 text-xs font-semibold border border-border text-text-secondary rounded-lg hover:border-gold hover:text-gold transition-colors flex items-center gap-1.5 disabled:opacity-40"
-                  >{uiText.rich("Ui.text_425e143ec6d501", { value1: () => (verifSubmitting ? <Loader2 size={13} className="animate-spin" /> : <ShieldCheck size={13} />) })}</button>
+                    className="min-h-11 px-4 py-2 text-sm font-semibold border border-border text-text-secondary rounded-lg hover:border-gold hover:text-gold transition-colors flex items-center gap-1.5 disabled:opacity-40"
+                  >{verifSubmitting ? <Loader2 size={13} className="animate-spin" /> : <ShieldCheck size={13} />}{verificationText(verifStatus === "rejected" ? "reapply" : "submit")}</button></div>
                 )}
               </div>
 

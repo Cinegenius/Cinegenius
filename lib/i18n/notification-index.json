@@ -559,5 +559,38 @@
       "„{title}”: Elutasítva. A részleteket az ajánlataidnál találod."
     ],
     "template": "„{title}“: Abgelehnt. Details findest du bei deinen Angeboten."
+  },
+  "verificationResultTitle": {
+    "field": "title",
+    "types": [
+      "verification_approved",
+      "verification_pending"
+    ],
+    "legacy": "Deine Profilverifizierung",
+    "template": "Deine Profilverifizierung"
+  },
+  "verificationApprovedBody": {
+    "field": "body",
+    "types": [
+      "verification_approved"
+    ],
+    "legacy": "Deine Profilverifizierung wurde bestätigt.",
+    "template": "Deine Profilverifizierung wurde bestätigt."
+  },
+  "verificationRejectedBody": {
+    "field": "body",
+    "types": [
+      "verification_pending"
+    ],
+    "legacy": "Deine Anfrage wurde abgelehnt. Die Einzelheiten und eine neue Anfrage findest du in deinem Profil.",
+    "template": "Deine Anfrage wurde abgelehnt. Die Einzelheiten und eine neue Anfrage findest du in deinem Profil."
+  },
+  "verificationRevokedBody": {
+    "field": "body",
+    "types": [
+      "verification_pending"
+    ],
+    "legacy": "Deine Profilverifizierung wurde entfernt. Einzelheiten findest du in deinem Profil.",
+    "template": "Deine Profilverifizierung wurde entfernt. Einzelheiten findest du in deinem Profil."
   }
 }

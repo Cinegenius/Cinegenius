@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useLocale, useTranslations } from "next-intl";
 import { Building2, CalendarDays, ExternalLink, RefreshCw, Search } from "lucide-react";
 import MediaImage from "@/components/MediaImage";
+import { confirmDialog, promptDialog, dismissNativeDialog } from "@/lib/native-dialog";
 
 type ModerationStatus = "draft" | "submitted" | "approved" | "changes_requested" | "rejected" | "hidden" | "ended";
 
@@ -84,6 +85,7 @@ function responsibleName(value: Record<string, unknown> | null) {
 }
 
 export function AdminOrganizations() {
+  useEffect(() => () => dismissNativeDialog(), []);
   const uiText = useTranslations();
 
   const t = useTranslations("AdminOrganizations");
@@ -109,7 +111,7 @@ export function AdminOrganizations() {
       const params = new URLSearchParams({ submittedOnly: String(submittedOnly) });
       if (search.trim()) params.set("search", search.trim());
       setPayload(await loadJson<Payload>(`/api/admin/organizations?${params}`, { signal: controller.signal }));
-    } catch (loadError) {
+    } catch {
       if (!controller.signal.aborted) setError(t("loadError"));
     } finally {
       if (!controller.signal.aborted) setLoading(false);
@@ -124,13 +126,9 @@ export function AdminOrganizations() {
   async function changeStatus(kind: ItemKind, id: string, status: ModerationStatus) {
     const item = (kind === "organization" ? payload.organizations : payload.entries).find(item => item.id === id);
     if (!item || acting) return;
-    if (status === "approved" && !window.confirm(t("approveConfirm"))) return;
-    const reason = status === "approved" ? "" : window.prompt(t("reasonPrompt"));
+    if (status === "approved" && !await confirmDialog({ message: t("approveConfirm"), confirmLabel: t("approve"), cancelLabel: uiText("home.boardCancel") })) return;
+    const reason = status === "approved" ? "" : await promptDialog({ message: t("reasonPrompt"), confirmLabel: uiText("profile.save"), cancelLabel: uiText("home.boardCancel"), minLength: 5, maxLength: 500, validationMessage: t("reasonShort") });
     if (reason === null) return;
-    if (status !== "approved" && reason.trim().length < 5) {
-      window.alert(t("reasonShort"));
-      return;
-    }
     setActing(`${kind}:${id}`);
     setMessage(null);
     try {
@@ -152,11 +150,11 @@ export function AdminOrganizations() {
     const disabled = acting === `${kind}:${id}`;
     return (
       <div className="flex flex-wrap gap-2">
-        {status !== "approved" && <button disabled={disabled} onClick={() => changeStatus(kind, id, "approved")} className="rounded-lg border border-success/30 px-3 py-2 text-xs font-semibold text-success disabled:opacity-50">{t("approve")}</button>}
-        <button disabled={disabled} onClick={() => changeStatus(kind, id, "changes_requested")} className="rounded-lg border border-gold/30 px-3 py-2 text-xs font-semibold text-gold disabled:opacity-50">{t("requestChanges")}</button>
-        <button disabled={disabled} onClick={() => changeStatus(kind, id, "rejected")} className="rounded-lg border border-crimson/30 px-3 py-2 text-xs font-semibold text-crimson-light disabled:opacity-50">{t("reject")}</button>
-        {status !== "hidden" && <button disabled={disabled} onClick={() => changeStatus(kind, id, "hidden")} className="rounded-lg border border-border px-3 py-2 text-xs text-text-muted disabled:opacity-50">{t("hide")}</button>}
-        {kind === "entry" && status === "approved" && <button disabled={disabled} onClick={() => changeStatus(kind, id, "ended")} className="rounded-lg border border-border px-3 py-2 text-xs text-text-muted disabled:opacity-50">{t("end")}</button>}
+        {status !== "approved" && <button disabled={disabled} onClick={() => changeStatus(kind, id, "approved")} className="min-h-11 rounded-lg border border-success/30 px-3 py-2 text-xs font-semibold text-success disabled:opacity-50">{t("approve")}</button>}
+        <button disabled={disabled} onClick={() => changeStatus(kind, id, "changes_requested")} className="min-h-11 rounded-lg border border-gold/30 px-3 py-2 text-xs font-semibold text-gold disabled:opacity-50">{t("requestChanges")}</button>
+        <button disabled={disabled} onClick={() => changeStatus(kind, id, "rejected")} className="min-h-11 rounded-lg border border-crimson/30 px-3 py-2 text-xs font-semibold text-crimson-light disabled:opacity-50">{t("reject")}</button>
+        {status !== "hidden" && <button disabled={disabled} onClick={() => changeStatus(kind, id, "hidden")} className="min-h-11 rounded-lg border border-border px-3 py-2 text-xs text-text-muted disabled:opacity-50">{t("hide")}</button>}
+        {kind === "entry" && status === "approved" && <button disabled={disabled} onClick={() => changeStatus(kind, id, "ended")} className="min-h-11 rounded-lg border border-border px-3 py-2 text-xs text-text-muted disabled:opacity-50">{t("end")}</button>}
       </div>
     );
   };
@@ -169,7 +167,7 @@ export function AdminOrganizations() {
       <div className="flex flex-wrap items-center gap-3">
         <label className="relative min-w-0 flex-1 sm:max-w-md">
           <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-text-muted" />
-          <input value={search} onChange={(event) => setSearch(event.target.value)} placeholder={t("search")} className="w-full rounded-xl border border-border bg-bg-secondary py-2.5 pl-9 pr-3 text-sm text-text-primary placeholder:text-text-muted" />
+          <input value={search} onChange={(event) => setSearch(event.target.value)} placeholder={t("search")} className="min-h-11 w-full rounded-xl border border-border bg-bg-secondary py-2.5 pl-9 pr-3 text-base sm:text-sm text-text-primary placeholder:text-text-muted" />
         </label>
         <label className="inline-flex min-h-11 items-center gap-2 rounded-xl border border-border bg-bg-secondary px-3 text-sm text-text-secondary">
           <input type="checkbox" checked={submittedOnly} onChange={(event) => setSubmittedOnly(event.target.checked)} className="accent-gold" />

@@ -15,7 +15,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
   if (admin instanceof NextResponse) return admin;
   const { id } = await params;
   const { data: thread, error } = await db.from("conversations")
-    .select("id, support_user_id, support_target_type, support_target_id, support_target_label, support_edit_url, created_at, updated_at")
+    .select("id, support_user_id, member_support_contact, support_target_type, support_target_id, support_target_label, support_edit_url, created_at, updated_at")
     .eq("id", id).eq("kind", "support").maybeSingle();
   if (error) return NextResponse.json({ error: tResponse('System.m_046a38993569') }, { status: 500 });
   if (!thread) return NextResponse.json({ error: tResponse('System.m_0eaf1e833b5a') }, { status: 404 });
@@ -50,7 +50,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
     thread: {
       id: thread.id, targetType: thread.support_target_type, targetId: thread.support_target_id,
       targetLabel: thread.support_target_label, editUrl: thread.support_edit_url,
-      userId: thread.support_user_id, userName: participant?.display_name ?? "Mitglied",
+      userId: thread.support_user_id, userName: participant?.display_name ?? "Mitglied", memberInitiated: thread.member_support_contact === true,
       userProfileUrl: profile?.slug || profile?.user_id ? "/profile/" + encodeURIComponent(profile.slug || profile.user_id) : null,
       userAvatarUrl: profile?.avatar_url ?? null, createdAt: thread.created_at,
     },

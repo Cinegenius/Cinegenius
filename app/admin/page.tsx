@@ -15,6 +15,8 @@ import { useViewState } from "@/lib/use-view-state";
 import { useCallback, useContext, useEffect, useRef, useState } from "react";
 import dynamic from "next/dynamic";
 import { ServerAdminContext } from "@/lib/server-admin-context";
+import { useAdminSupportUnread } from "@/lib/use-admin-support-unread";
+import { useFormNavigation } from "@/contexts/FormDraftContext";
 import Image from "@/components/MediaImage";
 import {
   Activity, BadgeCheck, Building2, CalendarDays, Check, ChevronDown, ChevronLeft,
@@ -23,6 +25,7 @@ import {
 } from "lucide-react";
 import { SupportMessageAction } from "@/components/admin/SupportMessageAction";
 import { uiErrorMessage } from "@/lib/ui-error-message";
+import { confirmDialog, promptDialog, dismissNativeDialog } from "@/lib/native-dialog";
 
 const AdminSupportCenter = dynamic(() => import("@/components/admin/AdminSupportCenter").then(module => module.AdminSupportCenter));
 const AdminReviewQueue = dynamic(() => import("@/components/admin/AdminReviewQueue"));
@@ -35,11 +38,11 @@ type TabId = "reviews" | "overview" | "reports" | "verifications" | "users" | "a
 
 
 type Listing = { moderation_status?: string; moderation_reason?: string | null; responsible_person?: StoredResponsiblePerson | null; id: string; user_id: string | null; company_id: string | null; company_slug: string | null; type: string; title: string; city: string | null; price: number | null; priceLabel?: string; published: boolean; created_at: string; provider_name: string; provider_href: string | null; provider_image: string | null; provider_missing: boolean; detail_href: string | null };
-type AdminProfile = { user_id: string; display_name: string | null; slug: string | null; location: string | null; avatar_url: string | null; profile_types: string[] | null; verified: boolean; created_at: string; tagline: string | null };
+type AdminProfile = { user_id: string; display_name: string | null; slug: string | null; location: string | null; avatar_url: string | null; profile_types: string[] | null; verified: boolean; verification_revision: number; created_at: string; tagline: string | null };
 type AdminProject = { id: string; title: string; year: number | null; type: string | null; verified: boolean; created_at: string; director: string | null; crew_count: number };
 type AdminCredit = { id: string; project_id: string; user_id: string | null; unclaimed_profile_id: string | null; role: string; created_at: string; name: string; type: "user" | "ghost" };
 type Report = { id: string; reporter_id: string; reporter_name: string | null; target_type: string; target_id: string; target_name: string | null; target_href: string | null; target_excerpt: string | null; reason: string; details: string | null; status: string; created_at: string };
-type Verification = { id: string; user_id: string; display_name: string | null; status: string; notes: string | null; submitted_at: string; reviewed_at: string | null };
+type Verification = { id: string; user_id: string; display_name: string | null; status: string; notes: string | null; submitted_at: string; reviewed_at: string | null; review_version: number; profile_revision: number | null; profile_verified: boolean | null; review_reason: string | null; has_document: boolean };
 type Company = { responsible_person?: StoredResponsiblePerson | null; id: string; slug: string; owner_user_id: string; owner_name: string | null; owner_profile_missing: boolean; name: string; logo_url: string | null; city: string; categories: string[]; services: string[]; verified: boolean; published: boolean; created_at: string; member_count: number; pending_request_count: number };
 type Clarification = { id: string; company_id: string; user_id: string; title: string | null; public_titles: string[]; request_message: string; created_at: string; company_name: string; company_slug: string; owner_user_id: string; requester_name: string | null; owner_name: string | null };
 type Booking = { id: string; ref: string; user_id: string; listing_id: string | null; listing_title: string; listing_type: string; start_date: string; end_date: string; days: number; daily_rate: number; subtotal: number; platform_fee: number; total: number; status: string; created_at: string; requester_name: string | null };
@@ -88,18 +91,30 @@ async function fetchJson<T>(translate: (key: string, values?: Record<string, str
   return body as T;
 }
 
-function adminReason(translate: (key: string, values?: Record<string, string | number>) => string, label: string): string | null {
-  const reason = window.prompt(translate("Ui.text_4e08a632d52cde", { value1: String(label) }));
-  if (reason === null) return null;
-  if (reason.trim().length < 5) {
-    window.alert(translate("Ui.text_5a74d7bcf38f7d"));
-    return null;
-  }
-  return reason.trim().slice(0, 500);
+function adminReason(translate: (key: string, values?: Record<string, string | number>) => string, label: string): Promise<string | null> {
+  return promptDialog({
+    message: translate("Ui.text_4e08a632d52cde", { value1: String(label) }),
+    confirmLabel: translate("profile.save"), cancelLabel: translate("home.boardCancel"),
+    minLength: 5, maxLength: 500, validationMessage: translate("Ui.text_5a74d7bcf38f7d"),
+  });
 }
 
 function Panel({ children, className = "" }: { children: React.ReactNode; className?: string }) {
   return <section className={`rounded-xl border border-border bg-bg-secondary ${className}`}>{children}</section>;
+}
+
+function VerificationDecision({ title, optional, saving, onSave, onCancel }: { title: string; optional: boolean; saving: boolean; onSave: (reason: string) => void; onCancel: () => void }) {
+  const t = useTranslations("VerificationReview");
+  const [reason, setReason] = useState("");
+  const validReason = reason.trim().length >= 5 || optional && reason.trim().length === 0;
+  const fieldId = "verification-decision-reason";
+  return <form onSubmit={event => { event.preventDefault(); onSave(reason.trim()); }} className="mt-4 w-full min-w-0 rounded-xl border border-gold/30 bg-bg-primary p-4">
+    <h3 className="break-words text-sm font-semibold text-text-primary [overflow-wrap:anywhere]">{title}</h3>
+    <label htmlFor={fieldId} className="mt-3 block text-sm text-text-secondary">{t(optional ? "reasonOptional" : "reason")}</label>
+    <p id="verification-reason-notice" className="mt-1 text-xs leading-5 text-text-muted">{t("reasonVisible")}</p>
+    <textarea id={fieldId} aria-describedby="verification-reason-notice" autoFocus value={reason} onChange={event => setReason(event.target.value)} required={!optional} minLength={5} maxLength={500} rows={3} disabled={saving} className="mt-2 w-full rounded-lg border border-border bg-bg-secondary p-3 text-base text-text-primary" />
+    <div className="mt-3 flex flex-wrap gap-2"><button type="submit" disabled={saving || !validReason} className="inline-flex min-h-11 items-center rounded-lg bg-gold px-4 py-2 text-sm font-semibold text-bg-primary disabled:opacity-40">{t(saving ? "saving" : "save")}</button><button type="button" disabled={saving} onClick={onCancel} className="min-h-11 rounded-lg border border-border px-4 py-2 text-sm text-text-secondary">{t("cancel")}</button></div>
+  </form>;
 }
 
 function Empty({ title, detail }: { title: string; detail?: string }) {
@@ -117,7 +132,7 @@ function Pager({ page, total, pageSize, onPage }: { page: number; total: number;
 
   const pages = Math.max(1, Math.ceil(total / pageSize));
   if (pages < 2) return null;
-  return <div className="flex items-center justify-between gap-3 pt-2"><button onClick={() => onPage(page - 1)} disabled={page <= 1} className="inline-flex items-center gap-1 rounded-lg border border-border px-3 py-2 text-xs text-text-secondary disabled:opacity-40">{uiText.rich("Ui.text_3c9cbf8b79d036", { part1: () => (<ChevronLeft size={13} />) })}</button><span className="text-xs text-text-muted">{uiText.rich("Ui.text_715f960af986a8", { value1: () => (page), value2: () => (pages), value3: () => (total) })}</span><button onClick={() => onPage(page + 1)} disabled={page >= pages} className="inline-flex items-center gap-1 rounded-lg border border-border px-3 py-2 text-xs text-text-secondary disabled:opacity-40">{uiText.rich("Ui.text_71f09a8b7c811b", { part1: () => (<ChevronRight size={13} />) })}</button></div>;
+  return <div className="flex items-center justify-between gap-3 pt-2"><button onClick={() => onPage(page - 1)} disabled={page <= 1} className="inline-flex min-h-11 items-center gap-1 rounded-lg border border-border px-3 py-2 text-xs text-text-secondary disabled:opacity-40">{uiText.rich("Ui.text_3c9cbf8b79d036", { part1: () => (<ChevronLeft size={13} />) })}</button><span className="text-xs text-text-muted">{uiText.rich("Ui.text_715f960af986a8", { value1: () => (page), value2: () => (pages), value3: () => (total) })}</span><button onClick={() => onPage(page + 1)} disabled={page >= pages} className="inline-flex min-h-11 items-center gap-1 rounded-lg border border-border px-3 py-2 text-xs text-text-secondary disabled:opacity-40">{uiText.rich("Ui.text_71f09a8b7c811b", { part1: () => (<ChevronRight size={13} />) })}</button></div>;
 }
 
 function StatusBadge({ children, tone = "muted" }: { children: React.ReactNode; tone?: "muted" | "success" | "warning" | "danger" }) {
@@ -158,7 +173,7 @@ function ListingProviderControls({ listing, onSaved, onError }: { listing: Listi
   }, [editing, kind, search]);
 
   async function choose(option: ProviderOption) {
-    const reason = adminReason(uiText, uiText("Ui.text_5c42b727708a10", { value1: String(listing.title), value2: String(option.label) }));
+    const reason = await adminReason(uiText, uiText("Ui.text_5c42b727708a10", { value1: String(listing.title), value2: String(option.label) }));
     if (!reason) return;
     setSaving(true);
     try {
@@ -188,6 +203,7 @@ function ListingProviderControls({ listing, onSaved, onError }: { listing: Listi
 }
 
 function AdminContent() {
+  useEffect(() => () => dismissNativeDialog(), []);
   const uiText = useTranslations();
   const reasonLabels = getLocalizedReasonLabels(uiText);
 
@@ -220,6 +236,9 @@ function AdminContent() {
 
   const { userId: reviewUserId } = useAuth();
   const reviewOwner = useContext(ServerAdminContext);
+  const supportUnread = useAdminSupportUnread(reviewOwner);
+  const supportText = useTranslations("SupportContact");
+  const { leave: leaveAdminTab } = useFormNavigation();
   const market=useTranslations("MarketplaceOffer"),catalog=useTranslations("MarketplaceCatalog");
   const marketDepartments=localizedMarketplaceDepartments(catalog);
   const [listingDepartment,setListingDepartment]=useState("");
@@ -230,6 +249,26 @@ function AdminContent() {
   const startedText = useTranslations("AdminStartedOffers");
   const organizationAdminText = useTranslations("AdminOrganizations");
   const [activeTab, setActiveTab] = useViewState<TabId>("admin.activeTab", "overview");
+  useEffect(() => {
+    const restoreSupportLink = () => {
+      const params = new URL(window.location.href).searchParams;
+      const tab = params.get("tab");
+      if (params.has("supportThread")) setActiveTab("support");
+      else if (tab && getLocalizedNavItems(key => key).some(item => item.id === tab)) setActiveTab(tab as TabId);
+      else if (!tab) setActiveTab("overview");
+    };
+    restoreSupportLink();
+    window.addEventListener("popstate", restoreSupportLink);
+    return () => window.removeEventListener("popstate", restoreSupportLink);
+  }, [setActiveTab]);
+  const selectAdminTab = (id: TabId) => leaveAdminTab(() => {
+    if (id === activeTab) return;
+    const url = new URL(window.location.href);
+    url.searchParams.set("tab", id);
+    url.searchParams.delete("supportThread");
+    window.history.pushState(window.history.state, "", url.pathname + url.search + url.hash);
+    setActiveTab(id);
+  });
   const [refreshKey, setRefreshKey] = useState(0);
   const [overview, setOverview] = useState<Overview | null>(null);
   const [overviewLoading, setOverviewLoading] = useState(true);
@@ -258,6 +297,10 @@ function AdminContent() {
   const [verificationsTotal, setVerificationsTotal] = useState(0);
   const [verificationsPage, setVerificationsPage] = useViewState("admin.verificationsPage", 1);
   const [verificationActing, setVerificationActing] = useState<string | null>(null);
+  const [verificationsStatus, setVerificationsStatus] = useViewState("admin.verificationsStatus", "pending");
+  const [verificationDecision, setVerificationDecision] = useState<{ kind: "request"; request: Verification; action: "approve" | "reject" } | { kind: "profile"; profile: AdminProfile; verified: boolean } | null>(null);
+  const verificationLock = useRef(false);
+  const verificationText = useTranslations("VerificationReview");
 
   const [profiles, setProfiles] = useState<AdminProfile[]>([]);
   const [profilesTotal, setProfilesTotal] = useState(0);
@@ -377,12 +420,12 @@ function AdminContent() {
     let active = true;
     if (activeTab !== "verifications") return;
     setVerificationsLoading(true); setVerificationsError("");
-    fetchJson<{ data: Verification[]; total: number }>(uiText, `/api/verification-requests?page=${verificationsPage}`)
+    fetchJson<{ data: Verification[]; total: number }>(uiText, `/api/verification-requests?scope=admin&page=${verificationsPage}&status=${verificationsStatus}`)
       .then((data) => { if (!active) return;  setVerifications(data.data); setVerificationsTotal(data.total); })
       .catch((error: Error) => { if (active) setVerificationsError(uiErrorMessage(error, uiText("System.requestFailed"))); })
       .finally(() => { if (active) setVerificationsLoading(false); });
       return () => { active = false; };
-  }, [activeTab, verificationsPage, refreshKey]);
+  }, [activeTab, verificationsPage, verificationsStatus, refreshKey]);
 
   useEffect(() => {
     let active = true;
@@ -476,7 +519,7 @@ function AdminContent() {
 
   async function changeReport(report: Report, status: "reviewed" | "resolved" | "dismissed") {
     const labels = { reviewed: uiText("Ui.text_c6eaa909e2f52f"), resolved: uiText("Ui.text_35475af80cfcae"), dismissed: uiText("Ui.text_66743be2739c89") };
-    const reason = adminReason(uiText, uiText("Ui.text_efae3eb968ceb3", { value1: String(labels[status]), value2: String(report.target_name ?? report.target_id) }));
+    const reason = await adminReason(uiText, uiText("Ui.text_efae3eb968ceb3", { value1: String(labels[status]), value2: String(report.target_name ?? report.target_id) }));
     if (!reason) return;
     try {
       await mutate("/api/reports", { id: report.id, status, reason });
@@ -485,34 +528,34 @@ function AdminContent() {
     } catch (error) { setActionMessage({ text: uiErrorMessage(error, uiText("System.requestFailed")), error: true }); }
   }
 
-  async function changeVerification(request: Verification, action: "approve" | "reject") {
-    const label = action === "approve" ? uiText("Ui.text_8e47addb5f2756") : uiText("Ui.text_14b784e6bb4840");
-    const reason = adminReason(uiText, uiText("Ui.text_efae3eb968ceb3", { value1: String(label), value2: String(request.display_name ?? request.user_id) }));
-    if (!reason) return;
-    setVerificationActing(request.id);
-    try {
-      await mutate("/api/verification-requests", { requestId: request.id, action, reason });
-      setVerifications((items) => items.filter((item) => item.id !== request.id));
-      setVerificationsTotal((total) => Math.max(0, total - 1));
-    } catch (error) { setActionMessage({ text: uiErrorMessage(error, uiText("System.requestFailed")), error: true }); }
-    finally { setVerificationActing(null); }
+  function changeVerification(request: Verification, action: "approve" | "reject") {
+    if (!verificationLock.current) setVerificationDecision({ kind: "request", request, action });
   }
-
-  async function toggleProfile(profile: AdminProfile) {
-    const nextValue = !profile.verified;
-    const reason = adminReason(uiText, uiText("Ui.text_efae3eb968ceb3", { value1: String(nextValue ? uiText("Ui.text_7ac969869ce750") : uiText("Ui.text_43277c4204c895")), value2: String(profile.display_name ?? profile.user_id) }));
-    if (!reason) return;
-    setProfileActing(profile.user_id);
+  function toggleProfile(profile: AdminProfile) {
+    if (!verificationLock.current) setVerificationDecision({ kind: "profile", profile, verified: !profile.verified });
+  }
+  async function saveVerificationDecision(reason: string) {
+    const decision = verificationDecision;
+    if (!decision || verificationLock.current) return;
+    verificationLock.current = true;
+    const targetId = decision.kind === "request" ? decision.request.id : decision.profile.user_id;
+    if (decision.kind === "request") setVerificationActing(targetId); else setProfileActing(targetId);
     try {
-      await mutate("/api/admin/users", { targetUserId: profile.user_id, verified: nextValue, reason });
-      setProfiles((items) => items.map((item) => item.user_id === profile.user_id ? { ...item, verified: nextValue } : item));
-    } catch (error) { setActionMessage({ text: uiErrorMessage(error, uiText("System.requestFailed")), error: true }); }
-    finally { setProfileActing(null); }
+      if (decision.kind === "request") {
+        await mutate("/api/verification-requests", { requestId: decision.request.id, version: decision.request.review_version, profileRevision: decision.request.profile_revision, action: decision.action, reason });
+      } else {
+        await mutate("/api/admin/users", { targetUserId: decision.profile.user_id, verified: decision.verified, revision: decision.profile.verification_revision, reason });
+      }
+      setVerificationDecision(null);
+      setActionMessage({ text: verificationText("saved") });
+      setRefreshKey(key => key + 1);
+    } catch (error) { setActionMessage({ text: uiErrorMessage(error, verificationText("saveError")), error: true }); }
+    finally { verificationLock.current = false; setVerificationActing(null); setProfileActing(null); }
   }
 
   async function toggleProject(project: AdminProject) {
     const nextValue = !project.verified;
-    const reason = adminReason(uiText, uiText("Ui.text_efae3eb968ceb3", { value1: String(nextValue ? uiText("Ui.text_2ac56fc7125285") : uiText("Ui.text_e96f6634a59db7")), value2: String(project.title) }));
+    const reason = await adminReason(uiText, uiText("Ui.text_efae3eb968ceb3", { value1: String(nextValue ? uiText("Ui.text_2ac56fc7125285") : uiText("Ui.text_e96f6634a59db7")), value2: String(project.title) }));
     if (!reason) return;
     setProjectActing(project.id);
     try {
@@ -534,7 +577,7 @@ function AdminContent() {
   }
 
   async function saveCredit(credit: AdminCredit) {
-    const reason = adminReason(uiText, uiText("Ui.text_b88e154a15c813", { value1: String(credit.name) }));
+    const reason = await adminReason(uiText, uiText("Ui.text_b88e154a15c813", { value1: String(credit.name) }));
     if (!reason) return;
     setCreditActing(credit.id);
     try {
@@ -546,8 +589,8 @@ function AdminContent() {
   }
 
   async function deleteCredit(credit: AdminCredit) {
-    if (!window.confirm(uiText("Ui.text_3aed5b680210ac", { value1: String(credit.name) }))) return;
-    const reason = adminReason(uiText, uiText("Ui.text_efb5b3435924e1", { value1: String(credit.name) }));
+    if (!await confirmDialog({ message: uiText("Ui.text_3aed5b680210ac", { value1: String(credit.name) }), confirmLabel: uiText("home.boardDelete"), cancelLabel: uiText("home.boardCancel") })) return;
+    const reason = await adminReason(uiText, uiText("Ui.text_efb5b3435924e1", { value1: String(credit.name) }));
     if (!reason) return;
     setCreditActing(credit.id);
     try {
@@ -587,8 +630,8 @@ function AdminContent() {
           <a href="/admin/listing-freshness" className="flex min-h-11 items-center rounded-lg px-3 py-2.5 text-sm text-text-secondary hover:bg-bg-elevated">{freshnessText("title")}</a>
           {navItems.map(({ icon: Icon, label: originalLabel, id }) => {
             const label = id === "reviews" ? reviewT("queueTitle") : id === "accounts" ? accountsText("title") : id === "started-offers" ? startedText("title") : id === "organizations" ? organizationAdminText("title") : id === "newsletter" ? newsletterText("title") : originalLabel;
-            const badge = id === "reports" ? pendingReports : id === "verifications" ? pendingVerifications : id === "companies" ? companyClarificationsCount : 0;
-            return <button key={id} onClick={() => setActiveTab(id)} className={`flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors ${activeTab === id ? "border-l-2 border-crimson bg-crimson/10 pl-2.5 text-crimson-light" : "text-text-secondary hover:bg-bg-elevated hover:text-text-primary"}`}><Icon size={15} /><span className="flex-1 text-left">{label}</span>{badge > 0 && <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-gold px-1 text-[10px] font-bold text-bg-primary">{badge}</span>}</button>;
+            const badge = id === "support" ? supportUnread.count ?? 0 : id === "reports" ? pendingReports : id === "verifications" ? pendingVerifications : id === "companies" ? companyClarificationsCount : 0;
+            return <button key={id} onClick={() => selectAdminTab(id)} className={`flex min-h-11 w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors ${activeTab === id ? "border-l-2 border-crimson bg-crimson/10 pl-2.5 text-crimson-light" : "text-text-secondary hover:bg-bg-elevated hover:text-text-primary"}`}><Icon size={15} /><span className="flex-1 text-left">{label}</span>{badge > 0 && <span aria-label={id === "support" ? supportText("unreadLabel", { count: badge }) : undefined} className="flex h-5 min-w-5 items-center justify-center rounded-full bg-gold px-1 text-[10px] font-bold text-bg-primary">{badge}</span>}{id === "support" && supportUnread.status === "error" && <CircleAlert size={15} aria-label={supportText("unreadError")} />}</button>;
           })}
         </nav>
         <div className="border-t border-border p-3"><p className="px-3 text-xs text-text-muted">{uiText("Ui.text_ecbb4568b854da")}</p></div>
@@ -597,12 +640,12 @@ function AdminContent() {
       <main className="min-w-0 flex-1 lg:ml-56">
         <header className="sticky top-16 z-30 border-b border-border bg-bg-primary/90 px-4 py-3 backdrop-blur-nav sm:px-6"><h1 className="font-display text-lg font-bold text-text-primary">{labels}</h1></header>
         <nav className="flex gap-2 overflow-x-auto border-b border-border bg-bg-primary px-4 py-2 lg:hidden">
-          <a href="/admin/places" className="shrink-0 rounded-lg border border-border px-3 py-2 text-xs">{placeText("reviewTitle")}</a>
+          <a href="/admin/places" className="inline-flex min-h-11 shrink-0 items-center rounded-lg border border-border px-3 py-2 text-xs">{placeText("reviewTitle")}</a>
           <a href="/admin/listing-freshness" className="flex min-h-11 shrink-0 items-center rounded-lg border border-border px-3 py-2 text-xs">{freshnessText("title")}</a>
-          {navItems.map(({ label, id }) => <button key={id} onClick={() => setActiveTab(id)} className={`shrink-0 rounded-lg border px-3 py-2 text-xs font-medium ${activeTab === id ? "border-crimson/40 bg-crimson/10 text-crimson-light" : "border-border text-text-secondary"}`}>{id === "reviews" ? reviewT("queueTitle") : id === "accounts" ? accountsText("title") : id === "started-offers" ? startedText("title") : id === "organizations" ? organizationAdminText("title") : id === "newsletter" ? newsletterText("title") : label}</button>)}
+          {navItems.map(({ label, id }) => <button key={id} onClick={() => selectAdminTab(id)} className={`inline-flex min-h-11 shrink-0 items-center gap-2 rounded-lg border px-3 py-2 text-xs font-medium ${activeTab === id ? "border-crimson/40 bg-crimson/10 text-crimson-light" : "border-border text-text-secondary"}`}>{id === "reviews" ? reviewT("queueTitle") : id === "accounts" ? accountsText("title") : id === "started-offers" ? startedText("title") : id === "organizations" ? organizationAdminText("title") : id === "newsletter" ? newsletterText("title") : label}{id === "support" && (supportUnread.count ?? 0) > 0 && <span aria-label={supportText("unreadLabel", { count: supportUnread.count! })} className="rounded-full bg-gold px-1.5 py-0.5 text-[10px] font-bold text-bg-primary">{supportUnread.count}</span>}{id === "support" && supportUnread.status === "error" && <CircleAlert size={14} aria-label={supportText("unreadError")} />}</button>)}
         </nav>
-        <div className="space-y-5 p-4 sm:p-6">
-          {actionMessage && <div role={actionMessage.error ? "alert" : "status"} className={`flex items-start justify-between gap-3 rounded-xl border px-4 py-3 text-sm ${actionMessage.error ? "border-gold/30 bg-gold/10 text-gold" : "border-success/30 bg-success/10 text-success"}`}><span>{actionMessage.text}</span><button aria-label={uiText("Ui.text_91b884fe922674")} onClick={() => setActionMessage(null)}><X size={15} /></button></div>}
+        <div className="min-w-0 space-y-5 p-4 pb-[calc(7rem+env(safe-area-inset-bottom))] sm:p-6 sm:pb-28 lg:pb-6">
+          {actionMessage && <div role={actionMessage.error ? "alert" : "status"} className={`flex items-start justify-between gap-3 rounded-xl border px-4 py-3 text-sm ${actionMessage.error ? "border-gold/30 bg-gold/10 text-gold" : "border-success/30 bg-success/10 text-success"}`}><span className="min-w-0 break-words [overflow-wrap:anywhere]">{actionMessage.text}</span><button className="flex min-h-11 min-w-11 shrink-0 items-center justify-center" aria-label={uiText("Ui.text_91b884fe922674")} onClick={() => setActionMessage(null)}><X size={15} /></button></div>}
 
           {activeTab === "overview" && <div className="space-y-5">
             {overviewError && <ErrorBox text={overviewError} onRetry={() => setRefreshKey((key) => key + 1)} />}
@@ -629,14 +672,23 @@ function AdminContent() {
           {activeTab === "reports" && <div className="space-y-4">
             <div className="flex flex-wrap items-center justify-between gap-3"><p className="text-sm text-text-muted">{uiText("Ui.text_5ea63691e37e72")}</p><select value={reportsStatus} onChange={(e) => { setReportsStatus(e.target.value); setReportsPage(1); }} className="rounded-lg border border-border bg-bg-secondary px-3 py-2 text-sm text-text-primary"><option value="pending">{uiText("Ui.text_64509e1af49cd9")}</option><option value="reviewed">{uiText("Ui.text_db2c6cfa22deb2")}</option><option value="resolved">{uiText("Ui.text_38ee859a969e3a")}</option><option value="dismissed">{uiText("Ui.text_54730c6647cb8c")}</option></select></div>
             {reportsError && <ErrorBox text={reportsError} onRetry={() => setRefreshKey((key) => key + 1)} />}
-            {reportsLoading && !reports.length ? <p className="py-10 text-center text-sm text-text-muted">{uiText("Ui.text_b0fe418761c1fa")}</p> : reports.length === 0 ? <Empty title={uiText("Ui.text_172e00587f952d")} /> : <div className="space-y-3">{reports.map((report) => <Panel key={report.id} className="p-4"><div className="flex flex-wrap items-start justify-between gap-3"><div className="min-w-0 flex-1"><div className="flex flex-wrap items-center gap-2"><h2 className="font-semibold text-text-primary">{report.target_name ?? uiText("Ui.text_e7cfcd79c0fe62", { value1: String(report.target_id) })}</h2><StatusBadge tone="warning">{reasonLabels[report.reason] ?? report.reason}</StatusBadge><StatusBadge>{report.target_type}</StatusBadge></div><p className="mt-1 text-xs text-text-muted">{uiText.rich("Ui.text_fe62daada33ea6", { value1: () => (report.reporter_name ?? report.reporter_id), value2: () => (new Date(report.created_at).toLocaleString(uiLocale)) })}</p>{report.target_excerpt && <p className="mt-3 rounded-lg border border-border bg-bg-elevated p-3 text-sm text-text-secondary">{report.target_excerpt}</p>}{report.details && <p className="mt-2 whitespace-pre-wrap break-words text-sm text-text-secondary">{uiText.rich("Ui.text_e7320eb5d26ede", { value1: () => (report.details) })}</p>}<p className="mt-2 break-all text-[11px] text-text-muted">{uiText.rich("Ui.text_e288d86c1edda1", { value1: () => (report.id) })}</p></div>{(reportReviewPath(report.target_type, report.target_id) || report.target_href) && <a href={reportReviewPath(report.target_type, report.target_id) || report.target_href || "/admin"} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 rounded-lg border border-border px-3 py-2 text-xs text-text-secondary hover:border-gold hover:text-gold">{uiText.rich("Ui.text_fe5c837a483733", { part1: () => (<Eye size={12} />) })}</a>}</div>{reportsStatus === "pending" && <div className="mt-4 flex flex-wrap gap-2"><button onClick={() => changeReport(report, "reviewed")} className="rounded-lg border border-gold/30 px-3 py-2 text-xs font-semibold text-gold">{uiText("Ui.text_c6eaa909e2f52f")}</button><button onClick={() => changeReport(report, "resolved")} className="rounded-lg border border-success/30 px-3 py-2 text-xs font-semibold text-success">{uiText("Ui.text_32001c12e8aade")}</button><button onClick={() => changeReport(report, "dismissed")} className="rounded-lg border border-border px-3 py-2 text-xs text-text-muted">{uiText("Ui.text_594ca889c4421b")}</button></div>}</Panel>)}</div>}
+            {reportsLoading && !reports.length ? <p className="py-10 text-center text-sm text-text-muted">{uiText("Ui.text_b0fe418761c1fa")}</p> : reports.length === 0 ? <Empty title={uiText("Ui.text_172e00587f952d")} /> : <div className="space-y-3">{reports.map((report) => <Panel key={report.id} className="p-4"><div className="flex flex-wrap items-start justify-between gap-3"><div className="min-w-0 flex-1"><div className="flex flex-wrap items-center gap-2"><h2 className="font-semibold text-text-primary">{report.target_name ?? uiText("Ui.text_e7cfcd79c0fe62", { value1: String(report.target_id) })}</h2><StatusBadge tone="warning">{reasonLabels[report.reason] ?? report.reason}</StatusBadge><StatusBadge>{report.target_type}</StatusBadge></div><p className="mt-1 text-xs text-text-muted">{uiText.rich("Ui.text_fe62daada33ea6", { value1: () => (report.reporter_name ?? report.reporter_id), value2: () => (new Date(report.created_at).toLocaleString(uiLocale)) })}</p>{report.target_excerpt && <p className="mt-3 rounded-lg border border-border bg-bg-elevated p-3 text-sm text-text-secondary">{report.target_excerpt}</p>}{report.details && <p className="mt-2 whitespace-pre-wrap break-words text-sm text-text-secondary">{uiText.rich("Ui.text_e7320eb5d26ede", { value1: () => (report.details) })}</p>}<p className="mt-2 break-all text-[11px] text-text-muted">{uiText.rich("Ui.text_e288d86c1edda1", { value1: () => (report.id) })}</p></div>{(reportReviewPath(report.target_type, report.target_id) || report.target_href) && <a href={reportReviewPath(report.target_type, report.target_id) || report.target_href || "/admin"} target="_blank" rel="noreferrer" className="inline-flex min-h-11 items-center gap-1 rounded-lg border border-border px-3 py-2 text-xs text-text-secondary hover:border-gold hover:text-gold">{uiText.rich("Ui.text_fe5c837a483733", { part1: () => (<Eye size={12} />) })}</a>}</div>{reportsStatus === "pending" && <div className="mt-4 flex flex-wrap gap-2"><button onClick={() => changeReport(report, "reviewed")} className="rounded-lg border border-gold/30 px-3 py-2 text-xs font-semibold text-gold">{uiText("Ui.text_c6eaa909e2f52f")}</button><button onClick={() => changeReport(report, "resolved")} className="rounded-lg border border-success/30 px-3 py-2 text-xs font-semibold text-success">{uiText("Ui.text_32001c12e8aade")}</button><button onClick={() => changeReport(report, "dismissed")} className="rounded-lg border border-border px-3 py-2 text-xs text-text-muted">{uiText("Ui.text_594ca889c4421b")}</button></div>}</Panel>)}</div>}
             <Pager page={reportsPage} total={reportsTotal} pageSize={50} onPage={setReportsPage} />
           </div>}
 
-          {activeTab === "verifications" && <div className="space-y-4">
+          {activeTab === "verifications" && <div className="min-w-0 space-y-4">
             <div className="rounded-xl border border-border bg-bg-elevated p-4 text-sm text-text-secondary">{uiText("Ui.text_4766acadcd2c41")}</div>
-            {verificationsError && <ErrorBox text={verificationsError} onRetry={() => setRefreshKey((key) => key + 1)} />}
-            {verificationsLoading && !verifications.length ? <p className="py-10 text-center text-sm text-text-muted">{uiText("Ui.text_f37cdca9b23b05")}</p> : !verifications.length ? <Empty title={uiText("Ui.text_4f05e290726542")} /> : <div className="space-y-2">{verifications.map((request) => <Panel key={request.id} className="flex flex-wrap items-center justify-between gap-3 p-4"><div><a href={`/profile/${request.user_id}`} target="_blank" rel="noreferrer" className="font-medium text-text-primary hover:text-gold">{request.display_name ?? request.user_id}</a><p className="mt-1 text-xs text-text-muted">{uiText.rich("Ui.text_cf78447a0978b7", { value1: () => (new Date(request.submitted_at).toLocaleString(uiLocale)), value2: () => (request.user_id) })}</p>{request.notes && <p className="mt-2 max-w-3xl whitespace-pre-wrap break-words text-sm text-text-secondary">{request.notes}</p>}</div><div className="flex gap-2"><button disabled={verificationActing === request.id} onClick={() => changeVerification(request, "approve")} className="rounded-lg border border-success/30 px-3 py-2 text-xs font-semibold text-success disabled:opacity-50">{uiText("Ui.text_0c78fbbf4d1de8")}</button><button disabled={verificationActing === request.id} onClick={() => changeVerification(request, "reject")} className="rounded-lg border border-crimson/30 px-3 py-2 text-xs font-semibold text-crimson-light disabled:opacity-50">{uiText("OfferModeration.reject")}</button></div></Panel>)}</div>}
+            <label className="block max-w-sm text-sm text-text-secondary">{verificationText("filterLabel")}<select value={verificationsStatus} onChange={event => { setVerificationsStatus(event.target.value); setVerificationsPage(1); setVerificationDecision(null); }} className="mt-2 min-h-11 w-full rounded-lg border border-border bg-bg-secondary p-3 text-base">{["pending", "approved", "rejected", "all"].map(status => <option key={status} value={status}>{verificationText(status)}</option>)}</select></label>
+            {verificationsError && <ErrorBox text={verificationsError} onRetry={() => setRefreshKey(key => key + 1)} />}
+            {verificationsLoading ? <p role="status" className="py-10 text-center text-sm text-text-muted">{uiText("Ui.text_f37cdca9b23b05")}</p> : !verifications.length ? <Empty title={uiText("Ui.text_4f05e290726542")} /> : <div className="space-y-3">{verifications.map(request => <Panel key={request.id} className="min-w-0 p-4">
+              <div className="flex min-w-0 flex-wrap items-start justify-between gap-3"><div className="min-w-0 flex-1 basis-48"><a href={`/admin/review/profile/${encodeURIComponent(request.user_id)}`} className="inline-flex min-h-11 items-center break-words font-medium text-text-primary hover:text-gold [overflow-wrap:anywhere]">{request.display_name ?? request.user_id}</a><p className="mt-1 break-words text-xs text-text-muted [overflow-wrap:anywhere]">{new Date(request.submitted_at).toLocaleString(uiLocale)} · {request.user_id}</p><div className="mt-2"><StatusBadge tone={request.status === "approved" ? "success" : request.status === "rejected" ? "danger" : "warning"}>{verificationText(request.status)}</StatusBadge></div></div>
+              {request.status === "pending" && <div className="flex flex-wrap gap-2"><button disabled={verificationActing !== null || request.profile_revision === null} onClick={() => changeVerification(request, "approve")} className="min-h-11 rounded-lg border border-success/30 px-4 py-2 text-sm font-semibold text-success disabled:opacity-50">{verificationText("approve")}</button><button disabled={verificationActing !== null || request.profile_revision === null} onClick={() => changeVerification(request, "reject")} className="min-h-11 rounded-lg border border-crimson/30 px-4 py-2 text-sm font-semibold text-crimson-light disabled:opacity-50">{verificationText("reject")}</button></div>}</div>
+              {request.profile_revision === null && <p role="alert" className="mt-3 text-sm text-gold">{verificationText("profileMissing")}</p>}
+              {request.notes && <p className="mt-3 whitespace-pre-wrap break-words text-sm text-text-secondary [overflow-wrap:anywhere]">{request.notes}</p>}
+              {request.has_document ? <a href={`/api/verification-requests/${encodeURIComponent(request.id)}/document?version=${request.review_version}`} target="_blank" rel="noreferrer" className="mt-3 inline-flex min-h-11 items-center break-words text-sm text-gold">{verificationText("document")}</a> : request.status === "pending" && <p className="mt-3 text-sm text-text-muted">{verificationText("evidenceMissing")}</p>}
+              {request.review_reason && <p className="mt-3 whitespace-pre-wrap break-words text-sm text-text-secondary [overflow-wrap:anywhere]">{request.review_reason}</p>}
+              {verificationDecision?.kind === "request" && verificationDecision.request.id === request.id && <VerificationDecision key={`${request.id}-${verificationDecision.action}`} title={verificationText(verificationDecision.action === "approve" ? "decisionApprove" : "decisionReject", { name: request.display_name ?? request.user_id })} optional={verificationDecision.action === "approve"} saving={verificationActing === request.id} onSave={reason => void saveVerificationDecision(reason)} onCancel={() => setVerificationDecision(null)} />}
+            </Panel>)}</div>}
             <Pager page={verificationsPage} total={verificationsTotal} pageSize={50} onPage={setVerificationsPage} />
           </div>}
 
@@ -646,7 +698,7 @@ function AdminContent() {
             <div className="rounded-xl border border-border bg-bg-elevated p-4 text-sm text-text-secondary">{uiText("Ui.text_3823abad969698")}</div>
             <div className="flex flex-wrap items-center gap-3"><div className="relative w-full max-w-md"><Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-text-muted" /><input value={profilesSearch} onChange={(e) => { setProfilesSearch(e.target.value); setProfilesPage(1); }} placeholder={uiText("Ui.text_013e9a01e583be")} className="w-full rounded-xl border border-border bg-bg-secondary py-2.5 pl-9 pr-3 text-sm text-text-primary placeholder:text-text-muted" /></div><span className="text-sm text-text-muted">{uiText.rich("Ui.text_25b5b77e727a77", { value1: () => (profilesTotal) })}</span></div>
             {profilesError && <ErrorBox text={profilesError} onRetry={() => setRefreshKey((key) => key + 1)} />}
-            {profilesLoading && !profiles.length ? <p className="py-10 text-center text-sm text-text-muted">{uiText("Ui.text_8ba3fe49fe080d")}</p> : !profiles.length ? <Empty title={uiText("creators.emptyTitleFiltered")} /> : <div className="space-y-2">{profiles.map((profile) => <Panel key={profile.user_id} className="flex flex-wrap items-center gap-3 p-4">{profile.avatar_url ? <Image src={profile.avatar_url} alt="" width={40} height={40} unoptimized className="h-10 w-10 shrink-0 rounded-full border border-border object-cover" /> : <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-bg-elevated"><Users size={15} className="text-text-muted" /></div>}<div className="min-w-0 flex-1"><div className="flex flex-wrap items-center gap-2"><p className="truncate text-sm font-medium text-text-primary">{profile.display_name ?? uiText("Ui.text_396469a46c076c")}</p>{profile.verified && <BadgeCheck size={14} className="text-gold" />}</div><p className="truncate text-xs text-text-muted">{profile.location ?? uiText("AdminOrganizations.noLocation")}{profile.profile_types?.length ? uiText("Ui.text_f6b53f9c8ab3ef", { value1: String(profile.profile_types.join(", ")) }) : ""}</p><p className="truncate font-mono text-[10px] text-text-muted">{uiText.rich("Ui.text_2a612a18e465f9", { value1: () => (profile.user_id) })}</p></div><a href={`/profile/${profile.slug ?? profile.user_id}`} target="_blank" rel="noreferrer" className="rounded-lg border border-border px-3 py-2 text-xs text-text-secondary hover:border-gold hover:text-gold">{uiText.rich("Ui.text_16acd53b1dcdf2", { part1: () => (<Eye className="mr-1 inline" size={12} />) })}</a><AdminReviewLink kind="profile" id={profile.user_id} /><SupportMessageAction targetType="profile" targetId={profile.user_id} /><button disabled={profileActing === profile.user_id} onClick={() => toggleProfile(profile)} className={`rounded-lg border px-3 py-2 text-xs font-medium disabled:opacity-50 ${profile.verified ? "border-gold/30 text-gold" : "border-border text-text-muted hover:border-gold hover:text-gold"}`}>{profileActing === profile.user_id ? uiText("Ui.text_4f696a99f9c9e4") : profile.verified ? uiText("Ui.text_c9bc0de967fe95") : uiText("Ui.text_33347561b7ed6b")}</button></Panel>)}</div>}
+            {profilesLoading && !profiles.length ? <p className="py-10 text-center text-sm text-text-muted">{uiText("Ui.text_8ba3fe49fe080d")}</p> : !profiles.length ? <Empty title={uiText("creators.emptyTitleFiltered")} /> : <div className="space-y-2">{profiles.map((profile) => <Panel key={profile.user_id} className="flex flex-wrap items-center gap-3 p-4">{profile.avatar_url ? <Image src={profile.avatar_url} alt="" width={40} height={40} unoptimized className="h-10 w-10 shrink-0 rounded-full border border-border object-cover" /> : <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-bg-elevated"><Users size={15} className="text-text-muted" /></div>}<div className="min-w-0 flex-1"><div className="flex flex-wrap items-center gap-2"><p className="truncate text-sm font-medium text-text-primary">{profile.display_name ?? uiText("Ui.text_396469a46c076c")}</p>{profile.verified && <BadgeCheck size={14} className="text-gold" />}</div><p className="truncate text-xs text-text-muted">{profile.location ?? uiText("AdminOrganizations.noLocation")}{profile.profile_types?.length ? uiText("Ui.text_f6b53f9c8ab3ef", { value1: String(profile.profile_types.join(", ")) }) : ""}</p><p className="truncate font-mono text-[10px] text-text-muted">{uiText.rich("Ui.text_2a612a18e465f9", { value1: () => (profile.user_id) })}</p></div><a href={`/profile/${profile.slug ?? profile.user_id}`} target="_blank" rel="noreferrer" className="rounded-lg border border-border px-3 py-2 text-xs text-text-secondary hover:border-gold hover:text-gold">{uiText.rich("Ui.text_16acd53b1dcdf2", { part1: () => (<Eye className="mr-1 inline" size={12} />) })}</a><AdminReviewLink kind="profile" id={profile.user_id} /><SupportMessageAction targetType="profile" targetId={profile.user_id} /><button disabled={profileActing === profile.user_id} onClick={() => toggleProfile(profile)} className={`min-h-11 rounded-lg border px-3 py-2 text-xs font-medium disabled:opacity-50 ${profile.verified ? "border-gold/30 text-gold" : "border-border text-text-muted hover:border-gold hover:text-gold"}`}>{profileActing === profile.user_id ? uiText("Ui.text_4f696a99f9c9e4") : profile.verified ? uiText("Ui.text_c9bc0de967fe95") : uiText("Ui.text_33347561b7ed6b")}</button>{verificationDecision?.kind === "profile" && verificationDecision.profile.user_id === profile.user_id && <VerificationDecision key={profile.user_id} title={verificationText(verificationDecision.verified ? "decisionApprove" : "decisionRevoke", { name: profile.display_name ?? profile.user_id })} optional={verificationDecision.verified} saving={profileActing === profile.user_id} onSave={reason => void saveVerificationDecision(reason)} onCancel={() => setVerificationDecision(null)} />}</Panel>)}</div>}
             <Pager page={profilesPage} total={profilesTotal} pageSize={50} onPage={setProfilesPage} />
           </div>}
 

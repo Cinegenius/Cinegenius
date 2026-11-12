@@ -284,6 +284,7 @@ export default function HelpPage() {
         {/* Contact */}
         <div className="mt-16 p-8 bg-bg-secondary border border-border rounded-2xl text-center">
           <h2 className="font-display text-2xl font-bold text-text-primary mb-2">{uiText("Ui.text_28881025f27160")}</h2>
+          <Link href="/support" className="mb-3 inline-flex min-h-11 items-center justify-center gap-2 rounded-lg border border-border px-5 py-3 text-sm font-semibold text-gold hover:border-gold"><MessageSquare size={16} aria-hidden="true" />{uiText("SupportContact.link")}</Link>
           <p className="text-text-muted mb-6 text-sm">{uiText("Ui.text_eb2f0ea66d2081")}</p>
           <p className="text-text-muted text-sm leading-relaxed">{uiText("SupportMediation.agreement")}</p>
           <Link href="/pricing#support-mediation" className="inline-flex min-h-11 items-center text-sm text-gold hover:underline mb-4">{uiText("SupportMediation.readMore")}</Link>

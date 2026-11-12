@@ -10,9 +10,10 @@ import { useFormRouter as useRouter } from "@/lib/use-form-router";
 
 import { useFormDraft } from "@/lib/use-form-draft";
 import FormDraftStatus from "@/components/FormDraftStatus";
-import { useCallback, useState, useEffect, useRef } from "react";
+import { Suspense, useCallback, useState, useEffect, useRef } from "react";
 
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { useUser } from "@clerk/nextjs";
 import { useLocale, useTranslations } from "next-intl";
 import { compressImage, compressAvatar, MAX_FUNCTION_UPLOAD_BYTES, safeObjectURL } from "@/lib/compressImage";
@@ -337,12 +338,14 @@ function UploadZone({
     <div>
       <p className="text-sm font-semibold text-text-primary mb-2">{label}</p>
       <div
+        role="button" tabIndex={uploading ? -1 : 0} aria-disabled={uploading} aria-label={label}
         onClick={() => !uploading && ref.current?.click()}
-        className={`relative border-2 border-dashed rounded-xl p-6 text-center cursor-pointer transition-all ${
+        onKeyDown={event => { if (!uploading && (event.key === "Enter" || event.key === " ")) { event.preventDefault(); ref.current?.click(); } }}
+        className={`relative min-h-11 border-2 border-dashed rounded-xl p-6 text-center cursor-pointer transition-all ${
           file ? "border-success/40 bg-success/5" : "border-border hover:border-gold/40"
         }`}
       >
-        <input ref={ref} type="file" accept={accept} className="hidden" onChange={(e) => { const f = e.target.files?.[0]; if (f) onFile(f); }} />
+        <input ref={ref} type="file" accept={accept} disabled={uploading} className="hidden" onChange={(e) => { const f = e.target.files?.[0]; e.currentTarget.value = ""; if (f) onFile(f); }} />
         {uploading ? (
           <><Loader2 size={24} className="animate-spin text-gold mx-auto mb-2" /><p className="text-sm text-text-muted">{uiText("Ui.text_57c7dba7e17bc8")}</p></>
         ) : file ? (
@@ -364,17 +367,25 @@ function VerificationTab() {
   const [submitting, setSubmitting] = useState(false);
   const [idFile, setIdFile] = useState<{ name: string; url: string } | null>(null);
   const [idUploading, setIdUploading] = useState(false);
+  const [loadError, setLoadError] = useState("");
+  const [reviewReason, setReviewReason] = useState("");
+  const [reload, setReload] = useState(0);
+  const submitLock = useRef(false);
+  const verificationText = useTranslations("VerificationReview");
 
   useEffect(() => {
-    fetch("/api/verification-requests")
-      .then(r => r.json())
-      .then(({ data }) => {
-        if (!data || data.length === 0) { setStatus("none"); return; }
-        const own = Array.isArray(data) ? data[0] : data;
-        setStatus((own?.status as VerifStatus) ?? "none");
+    let active = true;
+    setStatus("loading"); setLoadError("");
+    fetch("/api/verification-requests", { cache: "no-store" })
+      .then(async response => {
+        const result = await response.json();
+        if (!response.ok || !["none", "pending", "approved", "rejected"].includes(result.status)) throw new Error(result.error || verificationText("statusError"));
+        return result;
       })
-      .catch(() => setStatus("none"));
-  }, []);
+      .then(result => { if (active) { setStatus(result.status); setReviewReason(result.data?.[0]?.review_reason ?? ""); } })
+      .catch(error => { if (active) setLoadError(uiErrorMessage(error, verificationText("statusError"))); });
+    return () => { active = false; };
+  }, [reload, verificationText]);
 
   async function handleIdFile(file: File) {
     setIdUploading(true);
@@ -385,14 +396,15 @@ function VerificationTab() {
       const { url, error } = await res.json();
       if (!res.ok || !url) { addToast(error ?? tV("uploadFailed"), "error"); return; }
       setIdFile({ name: file.name, url });
-    } finally {
+    } catch { addToast(tV("uploadFailed"), "error"); }
+    finally {
       setIdUploading(false);
     }
   }
 
   async function handleSubmit() {
-    if (!idFile) return;
-    setSubmitting(true);
+    if (!idFile || idUploading || submitLock.current) return;
+    submitLock.current = true; setSubmitting(true);
     try {
       const notes = JSON.stringify({ id_doc: idFile.url });
       const res = await fetch("/api/verification-requests", {
@@ -401,16 +413,20 @@ function VerificationTab() {
         body: JSON.stringify({ notes }),
       });
       const data = await res.json();
-      if (!res.ok) { addToast(data.error ?? uiText("Ui.text_f720e2ca2c2d9a"), "error"); return; }
+      if (!res.ok) {
+        if (data.status === "approved" || data.status === "pending") { setStatus(data.status); return; }
+        addToast(data.error ?? verificationText("requestFailed"), "error"); return;
+      }
       setStatus("pending");
       addToast(tV("verifSubmit"), "success");
     } catch {
       addToast(tV("unknownError"), "error");
     } finally {
-      setSubmitting(false);
+      submitLock.current = false; setSubmitting(false);
     }
   }
 
+  if (loadError) return <div role="alert" className="min-w-0 rounded-xl border border-crimson/30 p-4 text-sm text-crimson-light"><p className="break-words">{loadError}</p><button onClick={() => setReload(value => value + 1)} className="mt-3 min-h-11 rounded-lg border border-border px-4 py-2 text-text-secondary">{verificationText("retry")}</button></div>;
   if (status === "loading") {
     return <div className="py-12 flex items-center justify-center"><Loader2 size={22} className="animate-spin text-gold" /></div>;
   }
@@ -458,10 +474,11 @@ function VerificationTab() {
           <p className="text-sm text-text-muted max-w-sm mx-auto">
             {tV("verifRejectedDesc")}
           </p>
+          {reviewReason && <p className="whitespace-pre-wrap break-words text-sm text-text-secondary [overflow-wrap:anywhere]">{reviewReason}</p>}
         </div>
         <button
           onClick={() => setStatus("none")}
-          className="w-full py-2.5 bg-gold text-bg-primary text-sm font-semibold rounded-lg hover:bg-gold-light transition-colors"
+          className="min-h-11 w-full py-3 bg-gold text-bg-primary text-sm font-semibold rounded-lg hover:bg-gold-light transition-colors"
         >
           {tV("verifRetry")}
         </button>
@@ -490,13 +507,21 @@ function VerificationTab() {
 
       <button
         onClick={handleSubmit}
-        disabled={submitting || !idFile}
-        className="w-full py-2.5 bg-gold text-bg-primary text-sm font-semibold rounded-lg hover:bg-gold-light transition-colors disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+        disabled={submitting || idUploading || !idFile}
+        className="min-h-11 w-full py-3 bg-gold text-bg-primary text-sm font-semibold rounded-lg hover:bg-gold-light transition-colors disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-2"
       >
         {submitting ? <><Loader2 size={15} className="animate-spin" /> {tV("verifSubmitting")}</> : <><ShieldCheck size={15} /> {tV("verifSubmit")}</>}
       </button>
     </div>
   );
+}
+
+function ProfileTabFromUrl({ onChange }: { onChange: (tab: string) => void }) {
+  const searchParams = useSearchParams();
+  const requested = searchParams.get("tab");
+  const tab = requested && TAB_IDS.some(({ id }) => id === requested) ? requested : "profile";
+  useEffect(() => { onChange(tab); }, [onChange, tab]);
+  return null;
 }
 
 type FilmEntry = { year: number | string; title: string; role: string; type: string; director?: string; imdb_url?: string };
@@ -536,12 +561,7 @@ export default function ProfilePage() {
   const fileRef = useRef<HTMLInputElement>(null);
 
   const [activeTab, setActiveTab] = useState("profile");
-  useEffect(() => {
-    const requestedTab = new URLSearchParams(window.location.search).get("tab");
-    if (requestedTab && TAB_IDS.some(({ id }) => id === requestedTab)) setActiveTab(requestedTab);
-  }, []);
   const selectProfileTab = (tab: string) => {
-    setActiveTab(tab);
     router.replace(`/profile?tab=${encodeURIComponent(tab)}`, { scroll: false });
   };
   const [profileLoading, setProfileLoading] = useState(true);
@@ -1527,6 +1547,7 @@ export default function ProfilePage() {
 
   return (
     <>
+    <Suspense fallback={null}><ProfileTabFromUrl onChange={setActiveTab} /></Suspense>
     {focalPickerImage && (
       <FocalPointPicker
         imageUrl={focalPickerImage}

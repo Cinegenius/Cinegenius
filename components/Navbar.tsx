@@ -18,6 +18,7 @@ import { useTranslations } from "next-intl";
 import { useToast } from "@/contexts/ToastContext";
 import { useAuthenticatedInbox } from "@/lib/use-authenticated-inbox";
 import { subscribeToProfileUpdated } from "@/lib/profile-update-events";
+import { useAdminSupportUnread } from "@/lib/use-admin-support-unread";
 
 const desktopNavHrefs = [
   { href: "/locations", key: "locations" },
@@ -54,10 +55,14 @@ export default function Navbar({ initialIsSignedIn = false, initialAdminUserId =
   const userMenuRef = useRef<HTMLDivElement>(null);
   const activeUserId = isSignedIn ? user?.id : null;
   const showAdminLink = !!initialAdminUserId && initialAdminUserId === activeUserId;
+  const supportUnread = useAdminSupportUnread(showAdminLink ? activeUserId : null);
+  const supportUnreadCount = supportUnread.count ?? 0;
+  const supportUnreadLabel = uiText("SupportContact.unreadLabel", { count: supportUnreadCount });
   const hasSignedInSession = inbox.status === "expired" ? false : isLoaded ? !!isSignedIn : initialIsSignedIn;
   const profileDisplayName = profileData?.userId === activeUserId ? profileData?.displayName ?? "" : "";
   const profileAvatarUrl = profileData?.userId === activeUserId ? profileData?.avatarUrl ?? "" : "";
   const unreadMessages = inbox.status === "ready" ? inbox.count ?? 0 : 0;
+  const supportBadge = supportUnreadCount > 0 ? <span title={supportUnreadLabel} aria-label={supportUnreadLabel} className="ml-auto inline-flex h-5 min-w-5 shrink-0 items-center justify-center rounded-full bg-gold px-1 text-[10px] font-bold text-bg-primary">{supportUnreadCount > 99 ? "99+" : supportUnreadCount}</span> : null;
 
   const closeAll = () => { setUserMenuOpen(false); };
 
@@ -229,7 +234,7 @@ export default function Navbar({ initialIsSignedIn = false, initialAdminUserId =
                   <div className="relative" ref={userMenuRef}>
                     <button
                       onClick={() => setUserMenuOpen(v => !v)}
-                      className="flex items-center gap-2 pl-1 pr-2.5 py-1 rounded-full border border-border hover:border-gold/50 hover:bg-bg-elevated transition-all group"
+                      className="relative flex min-h-11 items-center gap-2 pl-1 pr-2.5 py-1 rounded-full border border-border hover:border-gold/50 hover:bg-bg-elevated transition-all group"
                     >
                       <span className="relative w-7 h-7 rounded-full bg-gold/10 border border-gold/20 flex items-center justify-center overflow-hidden" aria-hidden="true">
                         {profileAvatarUrl
@@ -240,6 +245,7 @@ export default function Navbar({ initialIsSignedIn = false, initialAdminUserId =
                         {displayName}
                       </span>
                       <ChevronDown size={12} className={`text-text-muted transition-transform duration-200 ${userMenuOpen ? "rotate-180" : ""}`} />
+                      {supportBadge && <span className="absolute -right-1 -top-1">{supportBadge}</span>}
                     </button>
 
                     {userMenuOpen && (
@@ -286,7 +292,7 @@ export default function Navbar({ initialIsSignedIn = false, initialAdminUserId =
                           >
                             <User size={15} className="text-text-muted shrink-0" /> {t("publicProfile")}
                           </Link>
-                          {showAdminLink && <Link href="/admin" onClick={() => setUserMenuOpen(false)} className="flex min-h-11 items-center gap-3 px-4 py-2.5 text-sm text-text-secondary hover:text-text-primary hover:bg-bg-hover transition-colors"><ShieldCheck size={15} className="text-text-muted shrink-0" />{t("adminArea")}</Link>}
+                          {showAdminLink && <Link href="/admin" onClick={() => setUserMenuOpen(false)} className="flex min-h-11 items-center gap-3 px-4 py-2.5 text-sm text-text-secondary hover:text-text-primary hover:bg-bg-hover transition-colors"><ShieldCheck size={15} className="text-text-muted shrink-0" />{t("adminArea")}{supportBadge}</Link>}
                         </div>
 
                         {/* Sign out */}
@@ -329,13 +335,14 @@ export default function Navbar({ initialIsSignedIn = false, initialAdminUserId =
                     <NotificationCenter inbox={inbox} />
                     <Link
                       href="/dashboard"
-                      className="relative w-9 h-9 rounded-full border border-gold/30 shrink-0 flex items-center justify-center bg-gold/10 overflow-hidden"
+                      className="relative w-9 h-9 rounded-full border border-gold/30 shrink-0 flex items-center justify-center bg-gold/10"
                       title={t("personalArea")}
                       aria-label={t("personalArea")}
                     >
                       {profileAvatarUrl
-                        ? <Image src={profileAvatarUrl} alt="" width={36} height={36} unoptimized className="h-full w-full object-cover" />
+                        ? <Image src={profileAvatarUrl} alt="" width={36} height={36} unoptimized className="h-full w-full rounded-full object-cover" />
                         : <User size={18} className="text-gold" aria-hidden="true" />}
+                      {supportBadge && <span className="absolute -right-1 -top-1">{supportBadge}</span>}
                     </Link>
                   </>
                 );
@@ -403,6 +410,7 @@ export default function Navbar({ initialIsSignedIn = false, initialAdminUserId =
                   >
                     <Icon size={18} className={isActive(href) ? "text-gold" : "text-text-muted"} />
                     <span>{label}</span>
+                    {href === "/admin" && supportBadge}
                     {href === "/messages" && unreadMessages > 0 && (
                       <span className="ml-auto min-w-[20px] h-5 bg-crimson text-white text-[10px] font-bold rounded-full flex items-center justify-center px-1">
                         {unreadMessages > 9 ? "9+" : unreadMessages}

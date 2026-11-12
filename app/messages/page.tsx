@@ -1,5 +1,7 @@
 "use client";
 
+import { confirmDialog, dismissNativeDialog } from "@/lib/native-dialog";
+
 import UnoptimizedImage from "@/components/UnoptimizedImage";
 
 import { useEffect, useRef, useState, useCallback } from "react";
@@ -72,6 +74,7 @@ function formatTime(locale: string, iso: string) {
 }
 
 function MessagesContent() {
+  useEffect(() => () => dismissNativeDialog(), []);
   const uiText = useTranslations();
   const uiLocale = useLocale();
 
@@ -437,7 +440,7 @@ function MessagesContent() {
   async function hideOwnMessage(message: Message) {
     if (!activeId || message.sender_id !== user?.id || deletePendingRef.current) return;
     deletePendingRef.current = true;
-    if (!window.confirm(uiText("Ui.text_738427dd78faa1"))) { deletePendingRef.current = false; return; }
+    if (!await confirmDialog({ message: uiText("Ui.text_738427dd78faa1"), confirmLabel: uiText("OfferModeration.hide"), cancelLabel: uiText("home.boardCancel") })) { deletePendingRef.current = false; return; }
     const conversationId = activeId;
     const owner = user.id;
     setDeletingMessage(message.id); setSendError(""); setMessageNotice("");
@@ -690,7 +693,7 @@ function MessagesContent() {
 
   return (
     <div
-      className={`fixed inset-x-0 top-16 ${showChat ? "bottom-0" : "bottom-14"} lg:bottom-0 bg-bg-primary flex overflow-hidden`}
+      className={`fixed inset-x-0 top-16 ${showChat ? "bottom-0" : "bottom-[calc(4rem+env(safe-area-inset-bottom,0px))]"} lg:bottom-0 bg-bg-primary flex overflow-hidden`}
       style={{
         ...(visualViewportTop > 0 ? { top: `${64 + visualViewportTop}px` } : {}),
         ...(keyboardInset > 0 ? { bottom: `${keyboardInset}px` } : {}),
@@ -711,6 +714,7 @@ function MessagesContent() {
           >{uiText.rich("Ui.text_242ae238257dd3", { part1: () => (<Users size={16} />), part2: chunks => (<span className="hidden min-[380px]:inline">{chunks}</span>), part3: () => (<Plus size={14} />) })}</button>
         </div>
 
+        <Link href="/support" className="flex min-h-11 shrink-0 items-center gap-2 border-b border-border px-4 py-2 text-sm font-medium text-gold"><MessageSquare size={16} />{uiText("SupportContact.link")}</Link>
         <div className="flex shrink-0 gap-2 border-b border-border px-4 py-2" aria-label={uiText("Ui.text_f991b9c56c163e")}>
           <button type="button" aria-pressed={sidebarView === "chats"} onClick={() => setSidebarView("chats")} className={`min-h-11 flex-1 rounded-lg px-2 text-sm ${sidebarView === "chats" ? "bg-bg-elevated text-gold" : "text-text-muted"}`}>{uiText("Ui.text_6a1722b9c244bf")}</button>
           <button type="button" aria-pressed={sidebarView === "contacts"} onClick={() => setSidebarView("contacts")} className={`min-h-11 flex-1 rounded-lg px-2 text-sm ${sidebarView === "contacts" ? "bg-bg-elevated text-gold" : "text-text-muted"}`}>{contactsLoading && !contacts.length ? messageNavigationText("contactsLoading") : contactsError && !contacts.length ? messageNavigationText("contacts") : messageNavigationText("contactsCount", { count: contacts.length })}</button>
@@ -773,21 +777,21 @@ function MessagesContent() {
                             <button
                               onClick={() => handleFriendRequest(req.friendship_id, "accepted")}
                               title={uiText("OrganizationAccess.accept")}
-                              className="w-8 h-8 rounded-full bg-gold/10 text-gold border border-gold/20 flex items-center justify-center hover:bg-gold hover:text-bg-primary transition-colors"
+                              className="min-w-11 min-h-11 rounded-full bg-gold/10 text-gold border border-gold/20 flex items-center justify-center hover:bg-gold hover:text-bg-primary transition-colors"
                             >
                               <Check size={14} />
                             </button>
                             <button
                               onClick={() => handleFriendRequest(req.friendship_id, "rejected")}
                               title={uiText("OfferModeration.reject")}
-                              className="w-8 h-8 rounded-full bg-bg-elevated border border-border flex items-center justify-center text-text-muted hover:text-red-400 hover:border-red-400/40 transition-colors"
+                              className="min-w-11 min-h-11 rounded-full bg-bg-elevated border border-border flex items-center justify-center text-text-muted hover:text-red-400 hover:border-red-400/40 transition-colors"
                             >
                               <X size={14} />
                             </button>
                             <button
                               onClick={() => dismissRequest(req.friendship_id)}
                               title={uiText("OfferModeration.hide")}
-                              className="w-8 h-8 rounded-full bg-bg-elevated border border-border flex items-center justify-center text-text-muted hover:text-text-primary transition-colors text-[10px] font-bold"
+                              className="min-w-11 min-h-11 rounded-full bg-bg-elevated border border-border flex items-center justify-center text-text-muted hover:text-text-primary transition-colors text-[10px] font-bold"
                             >
                               –
                             </button>
@@ -1028,10 +1032,10 @@ function MessagesContent() {
               const viewport = messagesViewportRef.current;
               viewport?.scrollTo({ top: viewport.scrollHeight, behavior: "smooth" });
               setNewMessagesAvailable(false);
-            }} className="absolute bottom-24 left-1/2 z-10 -translate-x-1/2 rounded-full border border-gold/40 bg-bg-secondary px-4 py-2 text-sm text-gold shadow-lg">{navigationText("newMessages")}</button>}
+            }} className="absolute min-h-11 bottom-24 left-1/2 z-10 -translate-x-1/2 rounded-full border border-gold/40 bg-bg-secondary px-4 py-2 text-sm text-gold shadow-lg">{navigationText("newMessages")}</button>}
 
             {/* Eingabe */}
-            <div className="px-4 py-3 border-t border-border shrink-0 safe-area-pb">
+            <div className="px-4 pt-3 pb-[calc(0.75rem+env(safe-area-inset-bottom,0px))] border-t border-border shrink-0">
               {sendError && <p role="alert" className="text-xs text-red-400 mb-2">{sendError}</p>}
               {messageNotice && <p role="status" className="mb-2 text-xs text-gold">{messageNotice}</p>}
               <div className="flex min-w-0 gap-2">
@@ -1188,7 +1192,7 @@ function MessagesContent() {
                             onClick={() => toggleSelectedUser(person)}
                             className="w-full min-h-12 px-3 py-2 text-left hover:bg-bg-elevated flex items-center gap-3"
                           >
-                            <div className="w-8 h-8 rounded-full overflow-hidden bg-bg-elevated border border-border flex items-center justify-center shrink-0">
+                            <div className="min-w-11 min-h-11 rounded-full overflow-hidden bg-bg-elevated border border-border flex items-center justify-center shrink-0">
                               {person.avatar ? <UnoptimizedImage src={person.avatar} alt="" className="w-full h-full object-cover" /> : <User size={14} className="text-text-muted" />}
                             </div>
                             <span className="min-w-0 flex-1">

@@ -20,7 +20,7 @@ export async function GET(request: NextRequest) {
   if (admin instanceof NextResponse) return admin;
   const page = Math.max(1, Number.parseInt(request.nextUrl.searchParams.get("page") ?? "1", 10) || 1);
   const { data, error, count } = await db.from("conversations")
-    .select("id, support_user_id, support_target_type, support_target_id, support_target_label, support_edit_url, created_by, created_at, updated_at, messages(id, sender_id, content, created_at)", { count: "exact" })
+    .select("id, support_user_id, member_support_contact, support_target_type, support_target_id, support_target_label, support_edit_url, created_by, created_at, updated_at, messages(id, sender_id, content, created_at)", { count: "exact" })
     .eq("kind", "support").order("updated_at", { ascending: false })
     .order("created_at", { ascending: false, referencedTable: "messages" })
     .limit(1, { referencedTable: "messages" })
@@ -39,7 +39,7 @@ export async function GET(request: NextRequest) {
   try { profileMap = await adminSupportParticipants(userIds, profiles ?? []); }
   catch { return NextResponse.json({ error: tResponse('System.m_3fad376bd8ef') }, { status: 503 }); }
   const profileIds = new Set((profiles ?? []).map(profile => profile.user_id));
-  const unreadMap = new Map((unread ?? []).map((row: { conversation_id: string; unread_count: number }) => [row.conversation_id, Number(row.unread_count)]));
+  const unreadMap = new Map<string, number>((unread ?? []).map((row: { conversation_id: string; unread_count: number }) => [row.conversation_id, Number(row.unread_count)]));
   return NextResponse.json({
     threads: rows.map((thread) => {
       const user = profileMap.get(thread.support_user_id ?? "");
@@ -47,7 +47,7 @@ export async function GET(request: NextRequest) {
       return {
         id: thread.id, targetType: thread.support_target_type, targetId: thread.support_target_id,
         targetLabel: thread.support_target_label, editUrl: thread.support_edit_url,
-        userId: thread.support_user_id, userName: user?.display_name ?? "Mitglied",
+        userId: thread.support_user_id, userName: user?.display_name ?? "Mitglied", memberInitiated: thread.member_support_contact === true,
         userProfileUrl: user && profileIds.has(user.user_id) ? "/profile/" + encodeURIComponent(user.slug || user.user_id) : null,
         userAvatarUrl: user?.avatar_url ?? null, createdAt: thread.created_at, updatedAt: thread.updated_at,
         unreadCount: unreadMap.get(thread.id) ?? 0,
@@ -59,6 +59,7 @@ export async function GET(request: NextRequest) {
       };
     }),
     total: count ?? 0, page, pageSize: PAGE_SIZE,
+    unreadCount: [...unreadMap.values()].reduce((sum, value) => sum + value, 0),
   }, { headers: { "Cache-Control": "private, no-store, max-age=0" } });
 }
 

@@ -1,5 +1,23 @@
 # CineGenius shared design and production release path
 
+## Support and verification update, 12 November 2026
+
+The member contact entry is `/support`, using a private account-bound recovery
+snapshot and stable send key before the service-only `contact_support` function.
+Do not permit direct messages impersonating the shared support actor. Admin
+support badges share one session-scoped request owner and never acknowledge reads.
+Verification decisions must use the atomic version-checked RPCs, including the
+profile badge switch. Keep identity documents private and outside image optimizers.
+`20261112190000_member_support_contact.sql` and
+`20261112191000_verification_review_atomic.sql` were applied and permission-checked
+on production before the matching application release. Existing record counts
+and verification-status fingerprints remained unchanged. See
+`docs/test-reports/support-admin-2026-11-12.md` for evidence and live-test limits.
+
+Every future change also checks suitability for the planned app: narrow screens,
+touch, keyboard, safe areas, accessible dialogs, real Back navigation and recovery.
+Keep the shared design and label actual device checks separately from simulations.
+
 ## Design reference
 
 The current `/projects` page is the source of truth for public directory design. Its cinematic backdrop, compact header, lime emphasis, dark surfaces, restrained borders, centered content width, and primary navigation order should carry across Locations, Marktplatz, Crew, Firmen, and Jobs. Page-specific filters, listings, map controls, and empty states remain specific to their purpose.
