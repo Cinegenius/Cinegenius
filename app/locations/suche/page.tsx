@@ -1,5 +1,6 @@
+import { readPublicLocationArea } from "@/lib/location-privacy";
+import { hasCoordinates } from "@/lib/location-map";
 import { placeReadFields } from "@/lib/places/catalog";
-import type { Metadata } from "next";
 import { db } from "@/lib/db";
 import { fetchRatings } from "@/lib/ratings";
 import LocationsContent from "../LocationsContent";
@@ -28,7 +29,10 @@ async function geocodeCities(cities: string[]): Promise<Record<string, { lat: nu
           { headers: { "User-Agent": "CineGenius/1.0 (contact@cinegenius.de)" }, next: { revalidate: 86400 } }
         );
         const data = await res.json();
-        if (data[0]) result[city] = { lat: parseFloat(data[0].lat), lng: parseFloat(data[0].lon) };
+        if (data[0]) {
+          const point = { lat: parseFloat(data[0].lat), lng: parseFloat(data[0].lon) };
+          if (hasCoordinates(point)) result[city] = point;
+        }
       } catch { /* fallback below */ }
     })
   );
@@ -59,14 +63,15 @@ export default async function LocationsSuchePage({searchParams}:{searchParams:Pr
     geocodeCities(rows.map((l) => l.city ?? "")),
   ]);
 
-  const FALLBACK = { lat: 48.1351, lng: 11.5820 };
+  // Unknown city coordinates stay unknown; never place an unrelated listing in Munich.
+  const FALLBACK = { lat: null, lng: null };
 
   const serverListings = rows.map((l: {
     id: string; user_id: string; title: string; city: string; price: number; description: string;
     category: string | null; image_url: string | null;
     metadata?: Record<string, unknown> | null; created_at?: string | null;
   }) => {
-    const { lat, lng } = coords[l.city] ?? FALLBACK;
+    const { lat, lng } = readPublicLocationArea(l.metadata) ?? coords[l.city] ?? FALLBACK;
     return {
       id: l.id,
     ...placeReadFields(l.city ?? "", l, locale), ownerId: l.user_id, title: l.title, type: l.category ?? "Speziallocation",

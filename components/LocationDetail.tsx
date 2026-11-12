@@ -1,4 +1,6 @@
 "use client";
+import dynamic from "next/dynamic";
+import { readPublicLocationArea } from "@/lib/location-privacy";
 import { listingPriceLabel } from "@/lib/listing-price";
 import { locationRoomLabel } from "@/lib/location-rooms";
 
@@ -47,8 +49,12 @@ interface LocationMeta {
   production_credits?: unknown;
 }
 
+const LocationAreaMap = dynamic(() => import("@/components/LocationMap"), { ssr: false });
+const ignoreMapChange = () => {};
+
 type Location = {
   id: string; title: string; type: string; city: string;
+  lat: number | null; lng: number | null;
   price: number; priceUnit: string; rating: number; reviews: number;
   image: string; tags: string[]; instantBook: boolean; verified: boolean;
   description?: string;
@@ -233,6 +239,10 @@ export default function LocationDetail({ location }: { location: Location }) {
               )}
             </div>
 
+            {readPublicLocationArea(location.metadata) && <section className="mb-8 space-y-3">
+              <h2 className="text-lg font-semibold text-text-primary">{uiText("locationPrivacy.publicArea")}</h2>
+              <div className="h-80"><LocationAreaMap readOnly locations={[{ ...location, metadata: location.metadata as Record<string, unknown> }]} activeId={null} onHover={ignoreMapChange} userLocation={null} radiusKm={0} appliedBounds={null} onApplyBounds={ignoreMapChange} /></div>
+            </section>}
             {/* Key specs */}
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-8">
               {(() => {

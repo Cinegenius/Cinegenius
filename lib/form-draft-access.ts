@@ -15,7 +15,7 @@ export async function canUseFormDraft(userId: string, key: string) {
     return !!data && canManageOrganization(data.organization_id, userId);
   }
   if (kind === "company") return hasCompanyCapability(id, userId, "edit_company");
-  if (kind === "listing") {
+  if (kind === "listing" || kind === "location-private") {
     const { data, error } = await db.from("listings").select("user_id, company_id").eq("id", id).maybeSingle();
     if (error) throw new Error("draft_access_unavailable");
     return !!data && canEditListing(userId, data);

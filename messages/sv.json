@@ -7504,5 +7504,36 @@
     "title": "Frivillig användningsanalys med PostHog",
     "disclosure": "Endast med ditt samtycke använder vi PostHog, Inc. och dess EU Cloud-projekt för att analysera offentliga översiktssidor. Vi skickar sidkategorin och en slumpmässig identifierare som bara finns i flikens minne. Sökord, URL-parametrar, innehåll, namn, e-postadresser, privata områden och formulär utesluts. Automatisk klickregistrering, personprofiler och sessionsinspelningar är avstängda. IP-adressen behandlas tekniskt för anslutningen; lagring som analysuppgift är avstängd. Ditt val sparas lokalt tills du ändrar det eller raderar webbläsardata. Du kan alltid avvisa eller återkalla samtycket; inga fler händelser registreras då. Händelser som redan skickats raderas inte automatiskt.",
     "providerPrivacy": "PostHogs integritetspolicy"
-  }
+  },
+  "locationMap": {
+    "searchArea": "Sök i det här området",
+    "resetArea": "Återställ kartområdet",
+    "areaActive": "Kartområde aktivt",
+    "unknownCoordinates": "Vissa platser saknar en känd position på kartan.",
+
+    "label": "Platskarta",
+    "cluster": "{count} platser – välj för att zooma in",
+    "yourLocation": "Din position",
+    "closePreview": "Stäng förhandsvisning",
+    "details": "Visa detaljer",
+    "empty": "Inga platser matchar dessa filter. Ändra filtren eller byt till listan.",
+    "error": "Kartan kunde inte laddas. Du kan fortfarande se platserna i listan."
+  },
+  "locationPrivacy": {
+    "title": "Privat plats",
+    "notice": "Endast behöriga redigerare ser den exakta positionen och adressen. Offentligt visas ett ungefärligt område med 500 m radie. Ändringar kräver en ny granskning.",
+    "address": "Adress (valfri, privat)",
+    "lat": "Latitud",
+    "lng": "Longitud",
+    "coordinatesHelp": "Ange exakta koordinater. Adresser skickas inte till externa geokodningstjänster. Skriv inte exakta adresser i offentliga beskrivningar.",
+    "save": "Spara privat plats",
+    "clear": "Ta bort privat plats",
+    "loading": "Läser in plats …",
+    "saved": "Platsen har sparats. Ett befintligt godkännande behöver granskas på nytt.",
+    "unavailable": "Privat plats är inte tillgänglig just nu. Inget har sparats.",
+    "invalid": "Ange giltiga koordinater och en adress på högst 500 tecken.",
+    "conflict": "Platsen har ändrats. Läs in den igen.",
+    "reload": "Läs in igen",
+    "publicArea": "Ungefärligt läge · 500 m radie"
+}
 }

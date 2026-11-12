@@ -1,3 +1,4 @@
+import { readPublicLocationArea } from "@/lib/location-privacy";
 import { getTranslations as getPageTranslations } from "next-intl/server";
 import {getLocale, getTranslations } from "next-intl/server";
 import {placeReadFields} from "@/lib/places/catalog";
@@ -13,7 +14,7 @@ import { fetchRatingSummaries } from "@/lib/ratings";
 import { getListingProvider } from "@/lib/listing-provider";
 import { auth } from "@clerk/nextjs/server";
 
-async function geocodeCity(city: string): Promise<{ lat: number; lng: number }> {
+async function geocodeCity(city: string): Promise<{ lat: number | null; lng: number | null }> {
   try {
     const res = await fetch(
       `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(city)}&format=json&limit=1`,
@@ -25,7 +26,7 @@ async function geocodeCity(city: string): Promise<{ lat: number; lng: number }> 
     const data = await res.json();
     if (data[0]) return { lat: parseFloat(data[0].lat), lng: parseFloat(data[0].lon) };
   } catch {}
-  return { lat: 48.1351, lng: 11.5820 };
+  return { lat: null, lng: null };
 }
 
 async function getLocation(slug: string, viewerId: string | null = null) {
@@ -42,7 +43,7 @@ async function getLocation(slug: string, viewerId: string | null = null) {
   if (data.published !== true && (!viewerId || !await canEditListing(viewerId, data))) return null;
 
   const [{ lat, lng }, provider, ratingMap] = await Promise.all([
-    geocodeCity(data.city ?? ""),
+    Promise.resolve(readPublicLocationArea(data.metadata)).then(area => area ?? geocodeCity(data.city ?? "")),
     getListingProvider(data.user_id, data.company_id, viewerId, data.responsible_person),
     fetchRatingSummaries([data.id], "listing"),
   ]);
@@ -51,9 +52,9 @@ async function getLocation(slug: string, viewerId: string | null = null) {
     ? data.metadata as Record<string, unknown>
     : {};
   const publicMetadata = Object.fromEntries(
-    ["sqm", "ceiling_height_m", "max_crew", "indoor_outdoor", "power_available", "power_details", "parking_spots", "amenities", "rooms", "natural_light", "blackout_possible", "loading_access", "access_notes", "shooting_hours", "availability_notes", "price_on_request", "price_negotiable", "production_credits"]
+    ["location_area", "sqm", "ceiling_height_m", "max_crew", "indoor_outdoor", "power_available", "power_details", "parking_spots", "amenities", "rooms", "natural_light", "blackout_possible", "loading_access", "access_notes", "shooting_hours", "availability_notes", "price_on_request", "price_negotiable", "production_credits"]
       .filter((key) => key in rawMetadata)
-      .map((key) => [key, key === "production_credits" && Array.isArray(rawMetadata[key])
+      .map((key) => [key, key === "location_area" ? readPublicLocationArea(rawMetadata) : key === "production_credits" && Array.isArray(rawMetadata[key])
         ? rawMetadata[key].filter((entry: unknown) => !entry || typeof entry !== "object" || ((entry as { visibility?: string }).visibility !== "private" && (entry as { public?: boolean }).public !== false))
         : rawMetadata[key]])
   );

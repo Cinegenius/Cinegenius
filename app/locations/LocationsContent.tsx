@@ -1,5 +1,6 @@
 "use client";
 
+import { hasCoordinates, inMapBounds, type MapBounds } from "@/lib/location-map";
 import PlaceFilters, { EMPTY_PLACE_FILTERS } from "@/components/PlaceFilters";
 import { placeSearchMatches, matchesPlace, placeDisplay, placeOptions } from "@/lib/places/core";
 
@@ -49,7 +50,7 @@ type Location = {
   id: string; title: string; type: string; city: string; price: number;
   priceUnit: string; rating: number; reviews: number; image: string;
   tags: string[]; instantBook: boolean; verified: boolean;
-  sqft: number; capacity: number; lat: number; lng: number; isReal?: boolean;
+  sqft: number; capacity: number; lat: number | null; lng: number | null; isReal?: boolean;
   focalPoint?: { x: number; y: number } | null; description?: string;
   ownerId?: string;
   metadata?: Record<string, unknown>;
@@ -201,6 +202,7 @@ function LocationsInner({ serverListings }: { serverListings: Location[] }) {
   const [activeId, setActiveId] = useViewState<string | null>("locations.activeId", null);
   const [userLocation, setUserLocation] = useState<[number, number] | null>(null);
   const [radiusKm, setRadiusKm] = useViewState("locations.radiusKm", 50);
+  const [mapBounds, setMapBounds] = useViewState<MapBounds | null>("locations.mapBounds", null);
   const [copied, setCopied] = useState(false);
   const [locating, setLocating] = useState(false);
   const [locationError, setLocationError] = useState("");
@@ -260,17 +262,19 @@ function LocationsInner({ serverListings }: { serverListings: Location[] }) {
 
     if (userLocation) {
       result = result.filter((l) => {
-        if (!l.lat || !l.lng) return false;
+        if (!hasCoordinates(l)) return false;
         return getDistanceKm(userLocation[0], userLocation[1], l.lat, l.lng) <= radiusKm;
       });
     }
+
+    if (mapBounds) result = result.filter(row => inMapBounds(row, mapBounds));
 
     if (sortKey === "price-asc") result.sort((a, b) => a.price - b.price);
     if (sortKey === "price-desc") result.sort((a, b) => b.price - a.price);
     if (sortKey === "rating") result.sort((a, b) => b.rating - a.rating);
 
     return result;
-  }, [allLocations, placeFilters, cityText, query, activeType, instantOnly, verifiedOnly, minPrice, maxPrice, lageFilter, powerOnly, sortKey, userLocation, radiusKm]);
+  }, [allLocations, placeFilters, cityText, query, activeType, instantOnly, verifiedOnly, minPrice, maxPrice, lageFilter, powerOnly, sortKey, userLocation, radiusKm, mapBounds]);
 
   const handleLocateMe = () => {
     if (!navigator.geolocation) {
@@ -302,7 +306,7 @@ function LocationsInner({ serverListings }: { serverListings: Location[] }) {
     el?.scrollIntoView({ behavior: "smooth", block: "nearest" });
   }, [activeId, effectiveView]);
 
-  const filterKey = JSON.stringify([placeFilters, cityText, query, activeType, instantOnly, verifiedOnly, minPrice, maxPrice, lageFilter, powerOnly, sortKey, userLocation, radiusKm]);
+  const filterKey = JSON.stringify([placeFilters, cityText, query, activeType, instantOnly, verifiedOnly, minPrice, maxPrice, lageFilter, powerOnly, sortKey, userLocation, radiusKm, mapBounds]);
   const visibleCount = pagination.filterKey === filterKey ? pagination.visibleCount : PAGE_SIZE;
   const showMore = () => setPagination({ filterKey, visibleCount: visibleCount + PAGE_SIZE });
 
@@ -315,6 +319,7 @@ function LocationsInner({ serverListings }: { serverListings: Location[] }) {
     setLageFilter("Alle"); setPowerOnly(false);
     setSortKey("featured");
     setUserLocation(null);
+    setMapBounds(null);
     router.replace(pathname, { scroll: false });
   };
 
@@ -332,8 +337,9 @@ function LocationsInner({ serverListings }: { serverListings: Location[] }) {
   for (const kind of ['country','region','city'] as const) if(placeFilters[kind])filterParams.set(kind,placeFilters[kind]);
   useViewUrl(filterParams.size ? `${pathname}?${filterParams}` : pathname);
 
-  const hasActiveFilters = Object.values(placeFilters).some(Boolean) || cityText || query || activeType !== "All Types" || instantOnly || verifiedOnly || minPrice || maxPrice || userLocation || lageFilter !== "Alle" || powerOnly;
+  const hasActiveFilters = Object.values(placeFilters).some(Boolean) || cityText || query || activeType !== "All Types" || instantOnly || verifiedOnly || minPrice || maxPrice || userLocation || lageFilter !== "Alle" || powerOnly || mapBounds;
   const mobileChips: BrowseChip[] = [
+    ...(mapBounds ? [{ id: "map-area", label: uiText("locationMap.areaActive"), onRemove: () => setMapBounds(null) }] : []),
     ...(cityText ? [{ id: "city-text", label: `${uiText("Places.city")}: ${cityText}`, onRemove: () => setCityText("") }] : []),
     ...(['country','region','city'] as const).flatMap(kind => placeFilters[kind] ? [{id:`place-${kind}`,label:placeOptions(allLocations,kind,locale).find(option=>option.value===placeFilters[kind])?.label??placeFilters[kind],onRemove:()=>setPlaceFilters({...placeFilters,[kind]:''})}] : []),
     ...(activeType !== "All Types" ? [{ id: "type", label: categoryLabel(activeType), onRemove: () => setActiveType("All Types") }] : []),
@@ -433,6 +439,7 @@ function LocationsInner({ serverListings }: { serverListings: Location[] }) {
                   key={mode}
                   onClick={() => setViewMode(mode)}
                   title={label}
+                  aria-pressed={viewMode === mode}
                   className={`${hideOnMobile ? "hidden sm:flex" : "flex"} items-center gap-1.5 h-9 px-2.5 text-xs font-medium transition-all border-r border-border last:border-r-0 ${
                     viewMode === mode
                       ? "bg-gold text-bg-primary"
@@ -768,6 +775,8 @@ function LocationsInner({ serverListings }: { serverListings: Location[] }) {
           <div className={`min-w-0 p-3 bg-bg-primary xl:min-h-0 xl:flex-1 ${effectiveView === "map" ? "h-[65dvh] min-h-[24rem] pb-[calc(56px+env(safe-area-inset-bottom,0px))] xl:h-auto xl:pb-3" : ""}`}>
             <LocationMap
               locations={filtered}
+              appliedBounds={mapBounds}
+              onApplyBounds={setMapBounds}
               activeId={activeId}
               onHover={setActiveId}
               userLocation={userLocation}

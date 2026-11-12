@@ -7504,5 +7504,36 @@
     "title": "Volitelná analytika s PostHog",
     "disclosure": "Pouze s vaším souhlasem používáme PostHog, Inc. a projekt EU Cloud k analýze veřejných přehledových stránek. Odesíláme kategorii stránky a náhodný identifikátor uložený jen v paměti této karty. Vyhledávání, parametry URL, obsah, jména, e-maily, soukromé části a formuláře jsou vyloučeny. Automatický sběr kliknutí, osobní profily a záznam relací jsou vypnuty. IP adresa se technicky zpracovává pro připojení; její ukládání jako analytického údaje je vypnuto. Volbu ukládáme místně, dokud ji nezměníte nebo nesmažete data prohlížeče. Souhlas můžete kdykoli odmítnout či odvolat; další události se nebudou zaznamenávat. Již odeslané události se tím automaticky nevymažou.",
     "providerPrivacy": "Ochrana soukromí PostHog"
-  }
+  },
+  "locationMap": {
+    "searchArea": "Hledat v této oblasti",
+    "resetArea": "Zrušit oblast mapy",
+    "areaActive": "Oblast mapy je aktivní",
+    "unknownCoordinates": "Některé lokace nemají známou polohu na mapě.",
+
+    "label": "Mapa lokací",
+    "cluster": "{count} lokací – výběrem přiblížíte",
+    "yourLocation": "Vaše poloha",
+    "closePreview": "Zavřít náhled",
+    "details": "Zobrazit podrobnosti",
+    "empty": "Těmto filtrům neodpovídá žádná lokace. Upravte filtry nebo přepněte na seznam.",
+    "error": "Mapu se nepodařilo načíst. Lokace si můžete nadále prohlížet v seznamu."
+  },
+  "locationPrivacy": {
+    "title": "Soukromá poloha",
+    "notice": "Přesnou polohu a adresu vidí pouze oprávnění editoři. Veřejně se zobrazuje přibližná oblast s poloměrem 500 m. Změny vyžadují nové posouzení.",
+    "address": "Adresa (nepovinná, soukromá)",
+    "lat": "Zeměpisná šířka",
+    "lng": "Zeměpisná délka",
+    "coordinatesHelp": "Zadejte přesné souřadnice. Adresy neposíláme externím geokódovacím službám. Přesné adresy neuvádějte ve veřejných popisech.",
+    "save": "Uložit soukromou polohu",
+    "clear": "Odstranit soukromou polohu",
+    "loading": "Načítání polohy …",
+    "saved": "Poloha uložena. Případné schválení vyžaduje nové posouzení.",
+    "unavailable": "Soukromá poloha není dostupná. Nic nebylo uloženo.",
+    "invalid": "Zadejte platné souřadnice a adresu s nejvýše 500 znaky.",
+    "conflict": "Poloha se mezitím změnila. Načtěte ji znovu.",
+    "reload": "Načíst znovu",
+    "publicArea": "Přibližná poloha · poloměr 500 m"
+}
 }

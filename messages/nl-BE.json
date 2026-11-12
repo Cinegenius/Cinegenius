@@ -7504,5 +7504,36 @@
     "title": "Vrijwillige gebruiksanalyse met PostHog",
     "disclosure": "Alleen met je toestemming gebruiken we PostHog, Inc. en het EU Cloud-project om openbare overzichtspagina’s te analyseren. We verzenden de paginacategorie en een willekeurige identificatie die alleen in het geheugen van dit tabblad staat. Zoektermen, URL-parameters, inhoud, namen, e-mailadressen, privézones en formulieren zijn uitgesloten. Automatische klikregistratie, persoonsprofielen en sessieopnames zijn uitgeschakeld. Het IP-adres wordt technisch verwerkt voor de verbinding; opslag als analysegegeven is uitgeschakeld. Je keuze wordt lokaal bewaard totdat je deze wijzigt of browsergegevens wist. Je kunt altijd weigeren of je toestemming intrekken; verdere gebeurtenissen worden dan niet geregistreerd. Eerder verzonden gebeurtenissen worden hierdoor niet automatisch verwijderd.",
     "providerPrivacy": "Privacyverklaring van PostHog"
-  }
+  },
+  "locationMap": {
+    "searchArea": "In dit gebied zoeken",
+    "resetArea": "Kaartgebied herstellen",
+    "areaActive": "Kaartgebied actief",
+    "unknownCoordinates": "Sommige locaties hebben geen bekende positie op de kaart.",
+
+    "label": "Locatiekaart",
+    "cluster": "{count} locaties – selecteer om in te zoomen",
+    "yourLocation": "Je locatie",
+    "closePreview": "Voorbeeld sluiten",
+    "details": "Details bekijken",
+    "empty": "Geen locaties voor deze filters. Pas de filters aan of ga naar de lijst.",
+    "error": "De kaart kon niet worden geladen. Je kunt de locaties nog steeds in de lijst bekijken."
+  },
+  "locationPrivacy": {
+    "title": "Privélocatie",
+    "notice": "Alleen bevoegde bewerkers zien de exacte positie en het adres. Publiek wordt een geschat gebied met een straal van 500 m getoond. Wijzigingen vereisen een nieuwe beoordeling.",
+    "address": "Adres (optioneel, privé)",
+    "lat": "Breedtegraad",
+    "lng": "Lengtegraad",
+    "coordinatesHelp": "Voer de exacte coördinaten in. Adressen worden niet naar externe geocodeerdiensten gestuurd. Zet geen exacte adressen in openbare beschrijvingen.",
+    "save": "Privélocatie opslaan",
+    "clear": "Privélocatie verwijderen",
+    "loading": "Locatie laden …",
+    "saved": "Locatie opgeslagen. Een bestaande goedkeuring moet opnieuw worden beoordeeld.",
+    "unavailable": "Privélocatie is momenteel niet beschikbaar. Er is niets opgeslagen.",
+    "invalid": "Voer geldige coördinaten en een adres van maximaal 500 tekens in.",
+    "conflict": "De locatie is intussen gewijzigd. Laad opnieuw.",
+    "reload": "Opnieuw laden",
+    "publicArea": "Geschatte ligging · straal van 500 m"
+}
 }

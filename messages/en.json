@@ -7504,5 +7504,36 @@
     "title": "Optional usage analytics with PostHog",
     "disclosure": "Only with your consent, we use PostHog, Inc. and its EU Cloud project to analyze public directory pages. We send the page category and a random identifier held only in this tab’s memory. Search terms, URL parameters, page content, names, email addresses, private areas and forms are excluded. Automatic click capture, person profiles and session recordings are disabled. The IP address is technically processed for the connection; storing it as an analytics property is disabled. Your choice is stored locally in your browser until you change it or clear browser data. You can decline or withdraw at any time; no further analytics events will then be captured. This does not automatically delete events already sent.",
     "providerPrivacy": "PostHog privacy notice"
-  }
+  },
+  "locationMap": {
+    "searchArea": "Search this area",
+    "resetArea": "Reset map area",
+    "areaActive": "Map area active",
+    "unknownCoordinates": "Some locations have no known map position.",
+
+    "label": "Location map",
+    "cluster": "{count} locations – select to zoom in",
+    "yourLocation": "Your location",
+    "closePreview": "Close preview",
+    "details": "View details",
+    "empty": "No locations match these filters. Adjust the filters or switch to the list.",
+    "error": "The map could not be loaded. You can still view the locations in the list."
+  },
+  "locationPrivacy": {
+    "title": "Private location",
+    "notice": "Only authorized editors can see the exact position and address. The public sees an approximate area with a 500 m radius. Changes require another review.",
+    "address": "Address (optional, private)",
+    "lat": "Latitude",
+    "lng": "Longitude",
+    "coordinatesHelp": "Enter exact coordinates. Addresses are not sent to external geocoding services. Keep exact addresses out of public descriptions.",
+    "save": "Save private location",
+    "clear": "Remove private location",
+    "loading": "Loading location …",
+    "saved": "Location saved. Any existing approval needs another review.",
+    "unavailable": "Private location is currently unavailable. Nothing was saved.",
+    "invalid": "Enter valid coordinates and an address of at most 500 characters.",
+    "conflict": "The location has changed since you opened it. Please reload.",
+    "reload": "Reload",
+    "publicArea": "Approximate location · 500 m radius"
+}
 }

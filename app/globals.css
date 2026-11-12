@@ -783,3 +783,11 @@ input:-webkit-autofill:active {
 @media (min-width: 1280px) {
   .cat-sidebar      { display: block; }
 }
+
+/* Location map markers share the directory palette and a full touch target. */
+.location-map .leaflet-container { background: var(--color-bg-secondary); font: inherit; }
+.location-map-marker { display: flex; align-items: center; justify-content: center; background: transparent; border: 0; }
+.location-map-marker__dot { display: flex; align-items: center; justify-content: center; width: 14px; height: 14px; border: 2px solid var(--color-bg-primary); border-radius: 50%; background: var(--color-gold); box-shadow: 0 2px 8px #0006; }
+.location-map-marker__cluster { width: 40px; height: 40px; border: 2px solid var(--color-gold); background: var(--color-bg-secondary); color: var(--color-gold); font-size: 13px; font-weight: 700; }
+.location-map-marker--active .location-map-marker__dot, .location-map-marker:focus-visible .location-map-marker__dot { box-shadow: 0 0 0 5px color-mix(in srgb, var(--color-gold) 35%, transparent); }
+.location-map .leaflet-bar a { min-width: 44px; min-height: 44px; line-height: 44px; background: var(--color-bg-secondary); color: var(--color-text-primary); }

@@ -7504,5 +7504,36 @@
     "title": "Análisis de uso opcional con PostHog",
     "disclosure": "Solo con tu consentimiento usamos PostHog, Inc. y su proyecto EU Cloud para analizar páginas públicas de directorios. Enviamos la categoría de página y un identificador aleatorio guardado únicamente en la memoria de esta pestaña. Se excluyen búsquedas, parámetros URL, contenidos, nombres, correos, áreas privadas y formularios. La captura automática de clics, los perfiles personales y las grabaciones están desactivados. La dirección IP se procesa técnicamente para la conexión; su almacenamiento como dato analítico está desactivado. Tu elección se guarda localmente hasta que la cambies o borres los datos del navegador. Puedes rechazar o retirar el consentimiento en cualquier momento; no se capturarán más eventos. Esto no elimina automáticamente los eventos ya enviados.",
     "providerPrivacy": "Privacidad de PostHog"
-  }
+  },
+  "locationMap": {
+    "searchArea": "Buscar en esta zona",
+    "resetArea": "Restablecer zona del mapa",
+    "areaActive": "Zona del mapa activa",
+    "unknownCoordinates": "Algunas localizaciones no tienen una posición conocida en el mapa.",
+
+    "label": "Mapa de localizaciones",
+    "cluster": "{count} localizaciones – selecciona para ampliar",
+    "yourLocation": "Tu ubicación",
+    "closePreview": "Cerrar vista previa",
+    "details": "Ver detalles",
+    "empty": "Ninguna localización coincide con estos filtros. Ajusta los filtros o cambia a la lista.",
+    "error": "No se pudo cargar el mapa. Puedes seguir viendo las localizaciones en la lista."
+  },
+  "locationPrivacy": {
+    "title": "Ubicación privada",
+    "notice": "Solo los editores autorizados pueden ver la posición y dirección exactas. Se muestra públicamente una zona aproximada con un radio de 500 m. Los cambios requieren otra revisión.",
+    "address": "Dirección (opcional, privada)",
+    "lat": "Latitud",
+    "lng": "Longitud",
+    "coordinatesHelp": "Introduce las coordenadas exactas. Las direcciones no se envían a servicios externos de geocodificación. No incluyas direcciones exactas en descripciones públicas.",
+    "save": "Guardar ubicación privada",
+    "clear": "Eliminar ubicación privada",
+    "loading": "Cargando ubicación …",
+    "saved": "Ubicación guardada. Cualquier aprobación existente requiere otra revisión.",
+    "unavailable": "La ubicación privada no está disponible. No se ha guardado nada.",
+    "invalid": "Introduce coordenadas válidas y una dirección de hasta 500 caracteres.",
+    "conflict": "La ubicación ha cambiado. Vuelve a cargarla.",
+    "reload": "Volver a cargar",
+    "publicArea": "Ubicación aproximada · radio de 500 m"
+}
 }

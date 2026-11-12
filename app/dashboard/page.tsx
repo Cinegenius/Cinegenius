@@ -6,6 +6,7 @@ import { locationRoomLabel } from "@/lib/location-rooms";
 import { placeInputValue } from "@/lib/places/core";
 import { listingPlaceEditFields } from "@/lib/listing-place-edit";
 
+import PrivateLocationEditor from "@/components/PrivateLocationEditor";
 import PlaceField from "@/components/PlaceField";
 import ContentUsageNotice from "@/components/ContentUsageNotice";
 import DashboardDate from "@/components/DashboardDate";
@@ -1763,6 +1764,7 @@ export default function DashboardPage() {
                     {editError && (
                       <p className="text-xs text-red-400 bg-red-500/10 border border-red-500/20 rounded-lg px-3 py-2">{editError}</p>
                     )}
+                    {l.type === "location" && <PrivateLocationEditor key={l.id} id={l.id} onSaved={() => { void fetch("/api/listings?mine=true", { cache: "no-store" }).then(r => r.json()).then(body => { if (Array.isArray(body.data)) setMyListings(body.data); }).catch(() => {}); }} />}
                     {/* Image upload */}
                     {l.type === "prop" || l.type === "vehicle" || l.type === "animal" || l.type === "location" ? (
                       <ListingImageManager

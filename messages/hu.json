@@ -7504,5 +7504,36 @@
     "title": "Opcionális használatelemzés a PostHoggal",
     "disclosure": "Csak hozzájárulásoddal használjuk a PostHog, Inc. EU Cloud projektjét a nyilvános áttekintőoldalak elemzésére. Az oldal kategóriáját és egy kizárólag e lap memóriájában tárolt véletlen azonosítót küldünk. Keresések, URL-paraméterek, tartalmak, nevek, e-mail-címek, privát részek és űrlapok nem kerülnek rögzítésre. Az automatikus kattintásgyűjtés, személyprofilok és munkamenetrögzítés ki vannak kapcsolva. Az IP-cím a kapcsolathoz technikailag feldolgozásra kerül; analitikai adatként nem tároljuk. Döntésedet helyben tároljuk, amíg meg nem változtatod vagy törlöd a böngészőadatokat. Bármikor elutasíthatod vagy visszavonhatod a hozzájárulást; további eseményeket nem rögzítünk. Ez a már elküldött eseményeket nem törli automatikusan.",
     "providerPrivacy": "A PostHog adatvédelmi tájékoztatója"
-  }
+  },
+  "locationMap": {
+    "searchArea": "Keresés ezen a területen",
+    "resetArea": "Térképterület visszaállítása",
+    "areaActive": "Térképterület aktív",
+    "unknownCoordinates": "Néhány helyszín térképes helyzete nem ismert.",
+
+    "label": "Helyszíntérkép",
+    "cluster": "{count} helyszín – válaszd ki a nagyításhoz",
+    "yourLocation": "A tartózkodási helyed",
+    "closePreview": "Előnézet bezárása",
+    "details": "Részletek megtekintése",
+    "empty": "Egyetlen helyszín sem felel meg ezeknek a szűrőknek. Módosítsd a szűrőket, vagy válts a listára.",
+    "error": "A térkép nem tölthető be. A helyszíneket továbbra is megtekintheted a listában."
+  },
+  "locationPrivacy": {
+    "title": "Privát helyszín",
+    "notice": "A pontos helyzetet és címet csak jogosult szerkesztők láthatják. Nyilvánosan egy hozzávetőleges, 500 m sugarú terület jelenik meg. A módosítások új ellenőrzést igényelnek.",
+    "address": "Cím (nem kötelező, privát)",
+    "lat": "Szélesség",
+    "lng": "Hosszúság",
+    "coordinatesHelp": "Add meg a pontos koordinátákat. A címeket nem küldjük külső geokódoló szolgáltatásoknak. Ne írj pontos címeket nyilvános leírásokba.",
+    "save": "Privát helyszín mentése",
+    "clear": "Privát helyszín eltávolítása",
+    "loading": "Helyszín betöltése …",
+    "saved": "Helyszín mentve. A korábbi jóváhagyás új ellenőrzést igényel.",
+    "unavailable": "A privát helyszín jelenleg nem érhető el. Nem történt mentés.",
+    "invalid": "Adj meg érvényes koordinátákat és legfeljebb 500 karakteres címet.",
+    "conflict": "A helyszín időközben megváltozott. Töltsd be újra.",
+    "reload": "Újratöltés",
+    "publicArea": "Hozzávetőleges helyzet · 500 m sugár"
+}
 }
