@@ -111,13 +111,16 @@ export default function LocationMap({ readOnly = false, locations, activeId, onH
             && point.distanceTo(map!.latLngToLayerPoint([other.lat, other.lng])) <= 44);
           members.forEach(member => used.add(member.id));
           const clustered = members.length > 1;
+          const priceLabel = listingPriceLabel(location.price, location.metadata, "/Tag", locale, key => priceText(key));
+          const safePriceLabel = priceLabel.replace(/[&<>"']/g, character => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[character]!));
+          const priceMarker = !clustered && !readOnly;
           const marker = L.marker([
             members.reduce((sum, member) => sum + member.lat, 0) / members.length,
             members.reduce((sum, member) => sum + member.lng, 0) / members.length,
           ], {
             title: clustered ? t("cluster", { count: members.length }) : location.title,
-            icon: L.divIcon({ className: "location-map-marker", iconSize: [44, 44], iconAnchor: [22, 22],
-              html: `<span class="location-map-marker__dot${clustered ? " location-map-marker__cluster" : ""}">${clustered ? members.length : ""}</span>` }),
+            icon: L.divIcon({ className: "location-map-marker", iconSize: [priceMarker ? 132 : 44, 44], iconAnchor: [priceMarker ? 66 : 22, 22],
+              html: priceMarker ? `<span class="location-map-marker__price">${safePriceLabel}</span>` : `<span class="location-map-marker__dot${clustered ? " location-map-marker__cluster" : ""}">${clustered ? members.length : ""}</span>` }),
           }).addTo(group!);
           marker.on("click", () => {
             if (readOnly) return;
@@ -141,7 +144,7 @@ export default function LocationMap({ readOnly = false, locations, activeId, onH
     let cleanupRender = () => {};
     void initializeMarkers();
     return () => { cancelled = true; cleanupRender(); group?.remove(); };
-  }, [map, locations, t, readOnly]);
+  }, [map, locations, t, readOnly, locale, priceText]);
 
   useEffect(() => {
     if (!map) return;

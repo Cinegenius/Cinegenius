@@ -1,5 +1,5 @@
-import { readPublicLocationArea } from "@/lib/location-privacy";
-import { hasCoordinates } from "@/lib/location-map";
+import { readPublicLocationArea, publicLocationBrowseMetadata, publicLocationFocalPoint } from "@/lib/location-privacy";
+import { geocodeLocationCities } from "@/lib/location-map-geocoding";
 import { placeReadFields } from "@/lib/places/catalog";
 import { db } from "@/lib/db";
 import { fetchRatings } from "@/lib/ratings";
@@ -16,27 +16,6 @@ export async function generateMetadata(): Promise<import("next").Metadata> {
   title: tMetadata('m_b33aecdb6128'),
   description: tMetadata('m_457f6cc0d6a8'),
 };
-}
-
-async function geocodeCities(cities: string[]): Promise<Record<string, { lat: number; lng: number }>> {
-  const unique = [...new Set(cities.filter(Boolean))];
-  const result: Record<string, { lat: number; lng: number }> = {};
-  await Promise.all(
-    unique.map(async (city) => {
-      try {
-        const res = await fetch(
-          `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(city)}&format=json&limit=1`,
-          { headers: { "User-Agent": "CineGenius/1.0 (contact@cinegenius.de)" }, next: { revalidate: 86400 } }
-        );
-        const data = await res.json();
-        if (data[0]) {
-          const point = { lat: parseFloat(data[0].lat), lng: parseFloat(data[0].lon) };
-          if (hasCoordinates(point)) result[city] = point;
-        }
-      } catch { /* fallback below */ }
-    })
-  );
-  return result;
 }
 
 export default async function LocationsSuchePage({searchParams}:{searchParams:Promise<Record<string,string|string[]|undefined>>}) {
@@ -60,7 +39,7 @@ export default async function LocationsSuchePage({searchParams}:{searchParams:Pr
   const rows = data ?? [];
   const [ratingsMap, coords] = await Promise.all([
     fetchRatings(rows.map((l) => l.id), "listing"),
-    geocodeCities(rows.map((l) => l.city ?? "")),
+    geocodeLocationCities(rows.map((l) => l.city ?? "")),
   ]);
 
   // Unknown city coordinates stay unknown; never place an unrelated listing in Munich.
@@ -80,8 +59,8 @@ export default async function LocationsSuchePage({searchParams}:{searchParams:Pr
       image: l.image_url ?? "",
       tags: l.created_at && (new Date().getTime() - new Date(l.created_at).getTime() < 3 * 24 * 60 * 60 * 1000) ? ["Neu"] : [],
       instantBook: false, verified: false, sqft: 0, capacity: 0, lat, lng,
-      focalPoint: ((l.metadata ?? {}) as Record<string, unknown>).focal_point as { x: number; y: number } | null ?? null,
-      isReal: true, description: l.description ?? "", metadata: l.metadata ?? {},
+      focalPoint: publicLocationFocalPoint(l.metadata),
+      isReal: true, description: l.description ?? "", metadata: publicLocationBrowseMetadata(l.metadata),
     };
   });
 

@@ -1,3 +1,5 @@
+import { geocodeLocationCities } from "@/lib/location-map-geocoding";
+import { readPublicLocationArea, publicLocationBrowseMetadata, publicLocationFocalPoint } from "@/lib/location-privacy";
 import {getLocale, getTranslations} from "next-intl/server";
 import { placeReadFields } from "@/lib/places/catalog";
 import { placeDisplay } from "@/lib/places/core";
@@ -42,7 +44,10 @@ export default async function LocationsPage({ searchParams }: { searchParams: Pr
 
   const rows = data ?? [];
 
-  const ratingsMap = await fetchRatings(rows.map((l) => l.id), "listing");
+  const [ratingsMap, cityCoordinates] = await Promise.all([
+    fetchRatings(rows.map((l) => l.id), "listing"),
+    geocodeLocationCities(rows.filter(l => !readPublicLocationArea(l.metadata)).map(l => l.city ?? "")),
+  ]);
 
   // Place verification controls canonical filters, never publication visibility.
   const allLocations: LocationCard[] = (rows as {
@@ -50,6 +55,9 @@ export default async function LocationsPage({ searchParams }: { searchParams: Pr
     image_url: string | null; category: string | null;
     metadata?: Record<string, unknown> | null;
   }[]).map(l => {
+    const area = readPublicLocationArea(l.metadata);
+    const publicMetadata = publicLocationBrowseMetadata(l.metadata);
+    const coordinates = area ?? cityCoordinates[l.city ?? ""] ?? { lat: null, lng: null };
     const place = placeReadFields(l.city ?? "", l, locale);
     return {
       id: l.id,
@@ -58,12 +66,15 @@ export default async function LocationsPage({ searchParams }: { searchParams: Pr
       type: l.category ?? "",
       city: placeDisplay(place, l.city ?? "", locale),
       price: l.price,
-      priceLabel: listingPriceLabel(l.price, l.metadata, "/Tag", locale, priceText),
+      lat: coordinates.lat, lng: coordinates.lng,
+      // Project only public map/pricing fields, never arbitrary or private metadata.
+      metadata: publicMetadata,
+      priceLabel: listingPriceLabel(l.price, publicMetadata, "/Tag", locale, priceText),
       priceOnRequest: ((l.metadata ?? {}) as Record<string, unknown>).price_on_request === true || l.price <= 0,
       image: l.image_url ?? "",
       rating: ratingsMap[l.id]?.rating ?? 0,
       reviews: ratingsMap[l.id]?.reviews ?? 0,
-      focalPoint: ((l.metadata ?? {}) as Record<string, unknown>).focal_point as { x: number; y: number } | null ?? null,
+      focalPoint: publicLocationFocalPoint(l.metadata),
     };
   });
 

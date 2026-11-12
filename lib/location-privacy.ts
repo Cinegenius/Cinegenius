@@ -26,3 +26,22 @@ export function readPublicLocationArea(metadata: unknown): PublicLocationArea | 
   if (row.radius_meters !== 500 || !hasCoordinates(row as {lat:number;lng:number})) return null;
   return {lat:row.lat as number,lng:row.lng as number,radius_meters:500};
 }
+
+/** Public discovery needs pricing/filter flags and the derived area, never arbitrary metadata. */
+export function publicLocationBrowseMetadata(value: unknown): Record<string, unknown> {
+  const source = value && typeof value === 'object' && !Array.isArray(value) ? value as Record<string, unknown> : {};
+  const result: Record<string, unknown> = {};
+  for (const key of ['price_on_request', 'price_negotiable', 'power_available']) if (typeof source[key] === 'boolean') result[key] = source[key];
+  if (['miete', 'kauf', 'beides'].includes(String(source.rental_type))) result.rental_type = source.rental_type;
+  if (['innen', 'außen', 'beides'].includes(String(source.indoor_outdoor))) result.indoor_outdoor = source.indoor_outdoor;
+  const area = readPublicLocationArea(source);
+  if (area) result.location_area = area;
+  return result;
+}
+export function publicLocationFocalPoint(value: unknown): {x:number;y:number} | null {
+  if (!value || typeof value !== 'object') return null;
+  const point = (value as Record<string,unknown>).focal_point;
+  if (!point || typeof point !== 'object' || Array.isArray(point)) return null;
+  const {x,y} = point as Record<string,unknown>;
+  return typeof x === 'number' && Number.isFinite(x) && x >= 0 && x <= 100 && typeof y === 'number' && Number.isFinite(y) && y >= 0 && y <= 100 ? {x,y} : null;
+}

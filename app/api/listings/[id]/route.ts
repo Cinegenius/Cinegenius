@@ -25,7 +25,7 @@ export async function PATCH(
 
   const { id } = await params;
   const { data: current, error: currentError } = await db.from("listings")
-    .select("id, user_id, company_id, type, category, city, place_country_code, place_region_id, place_status, image_url, extra_images, metadata, blocked_dates, responsible_person, published")
+    .select("id, user_id, company_id, type, category, city, place_country_code, place_region_id, place_status, image_url, extra_images, metadata, blocked_dates, responsible_person, published, content_revision")
     .eq("id", id).maybeSingle();
   if (currentError) return NextResponse.json({ error: tResponse('System.m_f219f6f443ff') }, { status: 500 });
   if (!current) return NextResponse.json({ error: tResponse('System.m_6031a8e7b450') }, { status: 404 });
@@ -180,12 +180,14 @@ export async function PATCH(
   if (Object.keys(updates).length === 0)
     return NextResponse.json({ error: tResponse('System.m_e6c5344cca41') }, { status: 400 });
 
-  const { data, error } = await db
-    .from("listings")
-    .update({ ...updates, last_editor_id: userId })
-    .eq("id", id)
-    .select("*")
-    .single();
+  let mutation = db.from("listings").update({ ...updates, last_editor_id: userId }).eq("id", id);
+  // The private-position writer increments this same revision atomically. A
+  // concurrent editor must not overwrite its fresh public area with stale metadata.
+  if (current.type === "location") mutation = mutation.eq("content_revision", current.content_revision);
+  const { data, error } = await mutation.select("*").single();
+  if (current.type === "location" && (error?.code === "PGRST116" || (!error && !data))) {
+    return NextResponse.json({ error: tResponse("locationPrivacy.conflict") }, { status: 409, headers: { "Cache-Control": "private, no-store" } });
+  }
 
   if (error) {
     console.error("[listings PATCH]", error);
