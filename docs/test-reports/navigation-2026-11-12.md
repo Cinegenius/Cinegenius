@@ -1,8 +1,30 @@
 # Shared navigation and News, 12 November 2026
 
+## Follow-up: direct Locations and Firmen links
+
+The later user correction removes Mehr from the mobile bottom bar and appends
+Locations and Firmen. The seven mobile destinations are Crew, Marktplatz,
+Nachrichten, News, Mein Bereich, Locations, Firmen, consistently on public and
+personal pages. The existing header and its menu remain available. Both surfaces
+derive destinations from the same model, with separate active-state projection
+for the new mobile links.
+
+Touch targets retain a 44px minimum in each direction (seven adjacent targets
+need 308px). Labels wrap within the existing 64px bar; language-aware hyphenation
+preserves readable words. The account label wraps at its word boundary. Extreme
+widths scroll inside the bar rather than shrinking targets or widening the page.
+All nine catalog labels are reused. No migration or member-data change is needed.
+
+Verification: TypeScript, scoped lint, design and translation checks passed;
+131 affected navigation/header/message-shell tests passed. Safari at 320px with
+the real shell and synthetic data showed all seven destinations, correct direct
+Locations/Firmen navigation and retained header-menu open/Escape/focus behavior.
+The original broader review below remains applicable; no new physical-device
+or native-WebView check was performed.
+
 ## Result
 
-The final requested order is Crew, Marktplatz, Nachrichten, News, Mein Bereich,
+The initial requested order was Crew, Marktplatz, Nachrichten, News, Mein Bereich,
 Mehr. Desktop and mobile consume `lib/site-navigation.ts`; AppChrome mounts one
 mobile bottom bar across public and personal areas. The account row is desktop
 only. Locations, Jobs, Firmen, Projects and Organizations remain in the shared

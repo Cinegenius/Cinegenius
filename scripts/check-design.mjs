@@ -55,9 +55,17 @@ const primaryShape = primaryItems.map(({ id, kind, href }) => [id, kind, href ??
 if (JSON.stringify(primaryShape) !== JSON.stringify(expectedPrimary)) {
   failures.push("Primary navigation must keep Crew, Marketplace, Messages, News, My area and More in the shared order");
 }
-for (const [name, source] of [["Desktop", navbar], ["Mobile", bottomNav]]) {
-  if (!source.includes("PRIMARY_NAV_ITEMS") || !source.includes("@/lib/site-navigation")) {
-    failures.push(`${name} navigation must consume the shared primary navigation model`);
+const expectedMobile = [
+  ["crew", "/creators"], ["marketplace", "/props"], ["messages", "/messages"],
+  ["news", "/news"], ["account", "/dashboard"], ["locations", "/locations"], ["companies", "/companies"],
+];
+const mobileShape = navigation.MOBILE_NAV_ITEMS.map(({ id, href }) => [id, href]);
+if (JSON.stringify(mobileShape) !== JSON.stringify(expectedMobile)) {
+  failures.push("Mobile navigation must keep its seven direct links, with Locations and Companies after My area and no More button");
+}
+for (const [name, source, model] of [["Header", navbar, "PRIMARY_NAV_ITEMS"], ["Mobile", bottomNav, "MOBILE_NAV_ITEMS"]]) {
+  if (!source.includes(model) || !source.includes("@/lib/site-navigation")) {
+    failures.push(`${name} navigation must consume its shared ${model} model`);
   }
 }
 const browseDestinations = new Set(navigation.BROWSE_NAV_ITEMS.map(({ href }) => href));
@@ -150,4 +158,4 @@ if (failures.length) {
   process.exit(1);
 }
 
-console.log("Shared design checks passed: six page headers and mobile controls, shared six-item navigation and menu, one mobile bar, common layout rules, removed hero variant, and no public ad surfaces.");
+console.log("Shared design checks passed: six page headers and mobile controls, six header items and seven direct bottom links, shared menu, one mobile bar, common layout rules, removed hero variant, and no public ad surfaces.");

@@ -6,7 +6,7 @@ export type PrimaryNavigationId = "crew" | "marketplace" | "messages" | "news" |
 type NavigationLink = { readonly id: string; readonly href: string; readonly key: string; readonly icon: SiteNavigationIcon };
 type PrimaryNavigationItem = { readonly id: PrimaryNavigationId; readonly key: string; readonly icon: SiteNavigationIcon } & ({ readonly kind: "link"; readonly href: string } | { readonly kind: "menu"; readonly href?: never });
 
-/** The same destinations and order on public pages, in the account and in the app shell. */
+/** Stable header destinations; the mobile bar uses direct links without a second menu. */
 export const PRIMARY_NAV_ITEMS: readonly PrimaryNavigationItem[] = [
   { id: "crew", kind: "link", href: "/creators", key: "crew", icon: "crew" },
   { id: "marketplace", kind: "link", href: "/props", key: "marketplace", icon: "marketplace" },
@@ -26,6 +26,11 @@ export const BROWSE_NAV_ITEMS: readonly NavigationLink[] = [
   { id: "news", href: "/news", key: "news", icon: "news" },
   { id: "organizations", href: "/organizations", key: "organizations", icon: "organizations" },
   { id: "projects", href: "/projects", key: "projects", icon: "projects" },
+];
+
+export const MOBILE_NAV_ITEMS: readonly NavigationLink[] = [
+  ...PRIMARY_NAV_ITEMS.filter(item => item.kind === "link"),
+  ...BROWSE_NAV_ITEMS.filter(item => item.id === "locations" || item.id === "companies"),
 ];
 
 export const ACCOUNT_NAV_ITEMS: readonly NavigationLink[] = [
@@ -54,6 +59,12 @@ export function activeNavigationId(pathname: string): PrimaryNavigationId {
   if (routeMatches(pathname, "/news")) return "news";
   if (["/dashboard", "/profile", "/favorites", "/notifications", "/invoices", "/company-dashboard", "/organization-dashboard", "/inserat", "/admin"].some(route => routeMatches(pathname, route))) return "account";
   return "more";
+}
+
+export function activeMobileNavigationId(pathname: string) {
+  if (routeMatches(pathname, "/locations")) return "locations";
+  if (routeMatches(pathname, "/companies")) return "companies";
+  return activeNavigationId(pathname);
 }
 
 export function hideMobileNavigation(pathname: string, chatOpen: boolean) {
