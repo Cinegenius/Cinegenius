@@ -290,7 +290,10 @@ export async function sendNewsletterTestEmail(to: string, copy: NewsletterTestCo
 }
 
 export async function sendNewsletterConfirmationEmail(to: string, confirmationUrl: string, copy: NewsletterConfirmationCopy, locale = "de") {
-  if (!resend) return false;
+  if (!resend) {
+    console.error("[newsletter-confirmation] email provider unavailable");
+    return false;
+  }
   try {
     const { data, error } = await resend.emails.send({
       from: FROM,

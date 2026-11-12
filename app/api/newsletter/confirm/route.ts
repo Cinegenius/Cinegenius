@@ -11,15 +11,25 @@ export async function POST(request: NextRequest) {
   const ip = request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "unknown";
   const identity = createHash("sha256").update(ip).digest("hex").slice(0, 24);
   const limit = await rateLimit(`newsletter-confirm:${identity}`, 10, 600);
-  if (!limit.allowed) return NextResponse.json({ error: t("confirmInvalid") }, { status: 429 });
+  if (!limit.allowed) return NextResponse.json({ error: t("actionRateLimited") }, { status: 429, headers: { "Cache-Control": "no-store" } });
   let payload: unknown;
   try { payload = await request.json(); } catch { return NextResponse.json({ error: t("confirmInvalid") }, { status: 400 }); }
   const token = (payload as { token?: unknown } | null)?.token;
   if (typeof token !== "string" || token.length < 32 || token.length > 128) return NextResponse.json({ error: t("confirmInvalid") }, { status: 400 });
-  const { data, error } = await db.from("newsletter_subscriptions").update({
-    status: "confirmed", confirmation_token_hash: null, confirmation_expires_at: null, confirmed_at: new Date().toISOString(),
-  }).eq("status", "pending").eq("confirmation_token_hash", hashNewsletterToken(token))
-    .gt("confirmation_expires_at", new Date().toISOString()).select("id").maybeSingle();
-  if (error || !data) return NextResponse.json({ error: t("confirmInvalid") }, { status: 400 });
+  try {
+    const { data, error } = await db.from("newsletter_subscriptions").update({
+      status: "confirmed", confirmation_token_hash: null, confirmation_expires_at: null, confirmed_at: new Date().toISOString(),
+    }).eq("status", "pending").eq("confirmation_token_hash", hashNewsletterToken(token))
+      .gt("confirmation_expires_at", new Date().toISOString()).select("id").maybeSingle();
+    if (error !== null) return NextResponse.json({ error: t("actionError") }, { status: 503, headers: { "Cache-Control": "no-store" } });
+    if (data === null) return NextResponse.json({ error: t("confirmInvalid") }, { status: 400, headers: { "Cache-Control": "no-store" } });
+    if (typeof data.id !== "string" || !data.id) {
+      console.error("[newsletter-confirm] unexpected confirmation response");
+      return NextResponse.json({ error: t("actionError") }, { status: 503, headers: { "Cache-Control": "no-store" } });
+    }
+  } catch {
+    console.error("[newsletter-confirm] confirmation request unavailable");
+    return NextResponse.json({ error: t("actionError") }, { status: 503, headers: { "Cache-Control": "no-store" } });
+  }
   return NextResponse.json({ message: t("confirmed") }, { headers: { "Cache-Control": "no-store" } });
 }

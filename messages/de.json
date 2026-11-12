@@ -2195,6 +2195,12 @@
     "unsubscribeInvalid": "Dieser Abmeldelink ist ungültig. Bitte nutze den Link aus deiner Newsletter-E-Mail.",
     "unsubscribed": "Die Adresse wurde vom Newsletter abgemeldet.",
     "rateLimited": "Bitte warte eine Stunde, bevor du eine neue Anmeldung anforderst.",
+    "emailRequired": "Bitte gib deine E-Mail-Adresse ein.",
+    "emailInvalid": "Bitte gib eine gültige E-Mail-Adresse ein.",
+    "consentRequired": "Bitte willige vor der Anmeldung in den Erhalt des Newsletters ein.",
+    "retry": "Erneut versuchen",
+    "actionError": "Die Anfrage konnte gerade nicht verarbeitet werden. Bitte versuche es erneut.",
+    "actionRateLimited": "Zu viele Bestätigungsversuche. Bitte warte zehn Minuten und versuche es erneut.",
     "privacyLink": "Datenschutzhinweise"
   },
   "Organizations": {

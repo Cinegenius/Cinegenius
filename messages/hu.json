@@ -2195,6 +2195,12 @@
     "unsubscribeInvalid": "A leiratkozó link érvénytelen. Használd a hírlevélben található linket.",
     "unsubscribed": "A cím lekerült a hírlevél-listáról.",
     "rateLimited": "Várj egy órát, mielőtt újabb feliratkozási e-mailt kérsz.",
+    "emailRequired": "Add meg az e-mail-címedet.",
+    "emailInvalid": "Adj meg érvényes e-mail-címet.",
+    "consentRequired": "A feliratkozás előtt járulj hozzá a hírlevél fogadásához.",
+    "retry": "Újrapróbálás",
+    "actionError": "A kérést most nem sikerült feldolgozni. Próbáld újra.",
+    "actionRateLimited": "Túl sok megerősítési kísérlet. Várj tíz percet, majd próbáld újra.",
     "privacyLink": "Adatvédelmi tájékoztató"
   },
   "Organizations": {

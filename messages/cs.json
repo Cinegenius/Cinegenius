@@ -2195,6 +2195,12 @@
     "unsubscribeInvalid": "Tento odhlašovací odkaz není platný. Použijte odkaz v e-mailu newsletteru.",
     "unsubscribed": "Adresa byla odhlášena.",
     "rateLimited": "Před další žádostí o potvrzovací e-mail počkejte jednu hodinu.",
+    "emailRequired": "Zadejte svou e-mailovou adresu.",
+    "emailInvalid": "Zadejte platnou e-mailovou adresu.",
+    "consentRequired": "Před přihlášením potvrďte souhlas se zasíláním newsletteru.",
+    "retry": "Zkusit znovu",
+    "actionError": "Požadavek nyní nelze zpracovat. Zkuste to prosím znovu.",
+    "actionRateLimited": "Příliš mnoho pokusů o potvrzení. Počkejte deset minut a zkuste to znovu.",
     "privacyLink": "Informace o ochraně soukromí"
   },
   "Organizations": {

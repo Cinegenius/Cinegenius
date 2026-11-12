@@ -2195,6 +2195,12 @@
     "unsubscribeInvalid": "Il link di disiscrizione non è valido. Usa quello presente nella newsletter.",
     "unsubscribed": "L’indirizzo è stato disiscritto.",
     "rateLimited": "Attendi un’ora prima di richiedere un’altra email di iscrizione.",
+    "emailRequired": "Inserisci il tuo indirizzo email.",
+    "emailInvalid": "Inserisci un indirizzo email valido.",
+    "consentRequired": "Acconsenti a ricevere la newsletter prima di iscriverti.",
+    "retry": "Riprova",
+    "actionError": "Al momento non è stato possibile elaborare la richiesta. Riprova.",
+    "actionRateLimited": "Troppi tentativi di conferma. Attendi dieci minuti e riprova.",
     "privacyLink": "Informativa sulla privacy"
   },
   "Organizations": {

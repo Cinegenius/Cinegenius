@@ -180,6 +180,8 @@ const isPublicRoute = createRouteMatcher([
   "/ki-transparenz",
   "/bildrechte",
   "/marketplace(.*)",
+  "/newsletter/confirm",
+  "/newsletter/unsubscribe",
 ]);
 
 // A single profile slug is public. The profile editor at /profile and any
@@ -247,6 +249,9 @@ export default clerkMiddleware(async (auth, request) => {
   }
 
   const isApi = request.nextUrl.pathname.startsWith("/api/");
+  const isPublicNewsletterAction = request.method === "POST" && [
+    "/api/newsletter/subscribe", "/api/newsletter/confirm", "/api/newsletter/unsubscribe",
+  ].includes(request.nextUrl.pathname);
 
   // 2. Admin route guard — enforces both session + admin role
   //    This runs BEFORE the generic auth.protect() so non-admin authenticated
@@ -278,6 +283,10 @@ export default clerkMiddleware(async (auth, request) => {
     // This exact endpoint already required authentication before its IP limit.
     // Origin protection above and the handler's own session/quota checks still
     // apply. No other method/path skips the normal auth.protect() rules.
+  } else if (isPublicNewsletterAction) {
+    // Newsletter opt-in and signed confirmation/unsubscribe links also serve
+    // visitors without a member account. Origin checks above still apply;
+    // handlers validate consent/tokens and retain their durable rate limits.
   } else if (isApi && !isPublicApiGet(request)) {
     // Private fetch endpoints must not follow Clerk's hosted sign-in redirect
     // after logout/session expiry. Keep the existing authenticated-session

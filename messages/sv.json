@@ -2195,6 +2195,12 @@
     "unsubscribeInvalid": "Avregistreringslänken är ogiltig. Använd länken i mejlet med nyhetsbrevet.",
     "unsubscribed": "Adressen har avregistrerats från nyhetsbrevet.",
     "rateLimited": "Vänta en timme innan du begär en ny anmälan.",
+    "emailRequired": "Ange din e-postadress.",
+    "emailInvalid": "Ange en giltig e-postadress.",
+    "consentRequired": "Samtyck till att få nyhetsbrevet innan du anmäler dig.",
+    "retry": "Försök igen",
+    "actionError": "Din begäran kunde inte behandlas just nu. Försök igen.",
+    "actionRateLimited": "För många bekräftelseförsök. Vänta tio minuter och försök igen.",
     "privacyLink": "Information om dataskydd"
   },
   "Organizations": {

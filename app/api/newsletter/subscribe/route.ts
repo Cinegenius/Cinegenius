@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getLocale, getTranslations } from "next-intl/server";
 import { db } from "@/lib/db";
 import { sendNewsletterConfirmationEmail } from "@/lib/email";
-import { hashNewsletterToken, normalizeNewsletterEmail } from "@/lib/newsletter";
+import { hashNewsletterToken, NEWSLETTER_CONSENT_VERSION, normalizeNewsletterEmail } from "@/lib/newsletter";
 import { rateLimit } from "@/lib/rateLimit";
 
 export async function POST(request: NextRequest) {
@@ -23,16 +23,20 @@ export async function POST(request: NextRequest) {
   // Never look up or import Clerk users here. Only the address explicitly typed into this form is used.
   const token = randomBytes(32).toString("base64url");
   const expiresAt = new Date(Date.now() + 48 * 60 * 60 * 1000).toISOString();
-  const { data: requestStatus, error } = await db.rpc("newsletter_request_confirmation", {
-    p_email: email,
-    p_confirmation_token_hash: hashNewsletterToken(token),
-    p_confirmation_expires_at: expiresAt,
-    p_consent_version: "2026-11-02",
-    p_consent_at: new Date().toISOString(),
-  });
-  if (error) return NextResponse.json({ error: t("submitError") }, { status: 503, headers: { "Cache-Control": "no-store" } });
-  if (requestStatus === "confirmed") return NextResponse.json({ message: t("genericResponse") }, { headers: { "Cache-Control": "no-store" } });
-  {
+  try {
+    const { data: requestStatus, error } = await db.rpc("newsletter_request_confirmation", {
+      p_email: email,
+      p_confirmation_token_hash: hashNewsletterToken(token),
+      p_confirmation_expires_at: expiresAt,
+      p_consent_version: NEWSLETTER_CONSENT_VERSION,
+      p_consent_at: new Date().toISOString(),
+    });
+    if (error !== null) return NextResponse.json({ error: t("submitError") }, { status: 503, headers: { "Cache-Control": "no-store" } });
+    if (requestStatus === "confirmed") return NextResponse.json({ message: t("genericResponse") }, { headers: { "Cache-Control": "no-store" } });
+    if (requestStatus !== "pending") {
+      console.error("[newsletter-subscribe] unexpected confirmation status");
+      return NextResponse.json({ error: t("submitError") }, { status: 503, headers: { "Cache-Control": "no-store" } });
+    }
     const base = process.env.NEXT_PUBLIC_APP_URL ?? "https://www.cinegenius.co";
     const confirmationUrl = new URL("/newsletter/confirm", base);
     confirmationUrl.searchParams.set("token", token);
@@ -40,7 +44,10 @@ export async function POST(request: NextRequest) {
       subject: t("confirmSubject"), heading: t("confirmHeading"), body: t("confirmBody"),
       button: t("confirmButton"), ignore: t("confirmIgnore"),
     }, locale);
-    if (!sent) return NextResponse.json({ error: t("submitError") }, { status: 503, headers: { "Cache-Control": "no-store" } });
+    if (sent !== true) return NextResponse.json({ error: t("submitError") }, { status: 503, headers: { "Cache-Control": "no-store" } });
+  } catch {
+    console.error("[newsletter-subscribe] confirmation request unavailable");
+    return NextResponse.json({ error: t("submitError") }, { status: 503, headers: { "Cache-Control": "no-store" } });
   }
   // Same answer whether the address exists in the newsletter list or not.
   return NextResponse.json({ message: t("genericResponse") }, { headers: { "Cache-Control": "no-store" } });

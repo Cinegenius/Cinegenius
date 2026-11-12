@@ -2195,6 +2195,12 @@
     "unsubscribeInvalid": "El enlace para cancelar no es válido. Usa el enlace del correo del boletín.",
     "unsubscribed": "La dirección se ha dado de baja.",
     "rateLimited": "Espera una hora antes de solicitar otro correo de confirmación.",
+    "emailRequired": "Introduce tu dirección de correo electrónico.",
+    "emailInvalid": "Introduce una dirección de correo electrónico válida.",
+    "consentRequired": "Acepta recibir el boletín antes de suscribirte.",
+    "retry": "Volver a intentar",
+    "actionError": "No se pudo procesar la solicitud ahora. Vuelve a intentarlo.",
+    "actionRateLimited": "Demasiados intentos de confirmación. Espera diez minutos y vuelve a intentarlo.",
     "privacyLink": "Aviso de privacidad"
   },
   "Organizations": {

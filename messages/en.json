@@ -2195,6 +2195,12 @@
     "unsubscribeInvalid": "This unsubscribe link is invalid. Use the link in your newsletter email.",
     "unsubscribed": "This address has been unsubscribed.",
     "rateLimited": "Please wait an hour before requesting another signup email.",
+    "emailRequired": "Enter your email address.",
+    "emailInvalid": "Enter a valid email address.",
+    "consentRequired": "Please agree to receive the newsletter before signing up.",
+    "retry": "Try again",
+    "actionError": "Your request could not be processed right now. Please try again.",
+    "actionRateLimited": "Too many confirmation attempts. Please wait ten minutes and try again.",
     "privacyLink": "Privacy notice"
   },
   "Organizations": {

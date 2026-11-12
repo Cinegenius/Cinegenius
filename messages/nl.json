@@ -2195,6 +2195,12 @@
     "unsubscribeInvalid": "Deze afmeldlink is ongeldig. Gebruik de link uit je nieuwsbrief-e-mail.",
     "unsubscribed": "Het adres is afgemeld voor de nieuwsbrief.",
     "rateLimited": "Wacht een uur voordat je een nieuwe aanmelding aanvraagt.",
+    "emailRequired": "Vul je e-mailadres in.",
+    "emailInvalid": "Vul een geldig e-mailadres in.",
+    "consentRequired": "Geef toestemming om de nieuwsbrief te ontvangen voordat je je aanmeldt.",
+    "retry": "Opnieuw proberen",
+    "actionError": "Je verzoek kon nu niet worden verwerkt. Probeer het opnieuw.",
+    "actionRateLimited": "Te veel bevestigingspogingen. Wacht tien minuten en probeer het opnieuw.",
     "privacyLink": "Privacy-informatie"
   },
   "Organizations": {
