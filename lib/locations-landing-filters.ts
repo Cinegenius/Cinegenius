@@ -3,13 +3,14 @@ import { matchesPlace, placeKey, placeSearchMatches } from "./places/core";
 export type LocationLandingFilters = {
   q: string; cityText: string; country: string; region: string; city: string;
   type: string; min: string; max: string; sort: string;
+  lage: string; power: string; instant: string; verified: string;
 };
 
 export const DEFAULT_LOCATION_LANDING_FILTERS: LocationLandingFilters = Object.freeze({
-  q: "", cityText: "", country: "", region: "", city: "", type: "", min: "", max: "", sort: "featured",
+  q: "", cityText: "", country: "", region: "", city: "", type: "", min: "", max: "", sort: "featured", lage: "", power: "", instant: "", verified: "",
 });
 
-const PARAMS = ["q", "cityText", "country", "region", "city", "type", "min", "max", "sort"] as const;
+const PARAMS = ["q", "cityText", "country", "region", "city", "type", "min", "max", "sort", "lage", "power", "instant", "verified"] as const;
 const SORTS = new Set(["featured", "price-asc", "price-desc", "rating"]);
 const KNOWN_TYPES = ["Wohnen", "Villa", "Büro", "Industrie", "Natur", "Gastronomie", "Studio", "Fotostudio", "Speziallocation"];
 const textKey = (value: string) => value.normalize("NFKC").toLowerCase();
@@ -50,6 +51,10 @@ export function readLocationLandingFilters(params: Record<string, string | strin
     country: identifier(params.country), region: identifier(params.region), city: identifier(params.city),
     type: category(params.type), min: price(params.min), max: price(params.max),
     sort: SORTS.has(sort) ? sort : "featured",
+    lage: ["Innen", "Außen", "Innen & Außen"].includes(first(params.lage)) ? first(params.lage) : "",
+    power: first(params.power) === "1" ? "1" : "",
+    instant: first(params.instant) === "1" ? "1" : "",
+    verified: first(params.verified) === "1" ? "1" : "",
   };
 }
 
@@ -59,7 +64,7 @@ export function locationLandingParams(filters: LocationLandingFilters): URLSearc
   return params;
 }
 
-type FilterableLocation = { title: string; city: string; type: string; price: number; priceOnRequest: boolean; rating: number };
+type FilterableLocation = { title: string; city: string; type: string; price: number; priceOnRequest: boolean; rating: number; metadata?: Record<string, unknown>; instantBook?: boolean; verified?: boolean };
 function hasKnownPrice(row: FilterableLocation): boolean {
   return !row.priceOnRequest && Number.isFinite(row.price) && row.price > 0;
 }
@@ -72,6 +77,12 @@ export function filterLandingLocations<T extends FilterableLocation>(rows: T[], 
   const f = readLocationLandingFilters(filters), query = textKey(f.q), categoryKey = textKey(f.type);
   const result = rows.filter(row => {
     if (!matchesPlace(row, "country", f.country) || !matchesPlace(row, "region", f.region) || !matchesPlace(row, "city", f.city)) return false;
+    const indoorOutdoor = row.metadata?.indoor_outdoor;
+    if (f.lage && indoorOutdoor && !(indoorOutdoor === "beides" || (f.lage === "Innen" && indoorOutdoor === "innen") || (f.lage === "Außen" && indoorOutdoor === "außen"))) return false;
+    if (f.lage === "Innen & Außen" && indoorOutdoor && indoorOutdoor !== "beides") return false;
+    if (f.power && row.metadata?.power_available !== true) return false;
+    if (f.instant && !row.instantBook) return false;
+    if (f.verified && !row.verified) return false;
     if (f.cityText && !locationMatches(row, f.cityText)) return false;
     if (categoryKey && textKey(category(row.type)) !== categoryKey) return false;
     if (f.min || f.max) {

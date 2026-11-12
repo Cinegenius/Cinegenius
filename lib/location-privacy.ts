@@ -28,12 +28,19 @@ export function readPublicLocationArea(metadata: unknown): PublicLocationArea | 
 }
 
 /** Public discovery needs pricing/filter flags and the derived area, never arbitrary metadata. */
-export function publicLocationBrowseMetadata(value: unknown): Record<string, unknown> {
+export function publicLocationBrowseMetadata(value: unknown, description = ""): Record<string, unknown> {
   const source = value && typeof value === 'object' && !Array.isArray(value) ? value as Record<string, unknown> : {};
   const result: Record<string, unknown> = {};
   for (const key of ['price_on_request', 'price_negotiable', 'power_available']) if (typeof source[key] === 'boolean') result[key] = source[key];
   if (['miete', 'kauf', 'beides'].includes(String(source.rental_type))) result.rental_type = source.rental_type;
   if (['innen', 'außen', 'beides'].includes(String(source.indoor_outdoor))) result.indoor_outdoor = source.indoor_outdoor;
+  // Older public descriptions used these exact labels before structured fields.
+  if (!result.indoor_outdoor) {
+    const legacy = description.match(/Lage: ([^·\n]+)/)?.[1]?.trim();
+    const normalized = legacy === 'Innen' ? 'innen' : legacy === 'Außen' ? 'außen' : legacy === 'Innen & Außen' ? 'beides' : null;
+    if (normalized) result.indoor_outdoor = normalized;
+  }
+  if (typeof result.power_available !== 'boolean' && description.includes('Stromanschluss vorhanden')) result.power_available = true;
   const area = readPublicLocationArea(source);
   if (area) result.location_area = area;
   return result;

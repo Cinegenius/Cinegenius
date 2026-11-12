@@ -19,7 +19,7 @@ async function handle(req: Request, context: {params:Promise<{id:string}>}, writ
  if(data?.status==='missing')return response({error:t('unavailable')},404);
  if(data?.status==='conflict')return response({error:t('conflict')},409);
  if(!['ok','saved'].includes(data?.status))return response({error:t('unavailable')},503);
- if(write){revalidatePath('/locations');revalidatePath('/locations/suche');revalidatePath(`/locations/${id}`);}
+ if(write){revalidatePath('/locations');revalidatePath(`/locations/${id}`);}
  return response(data);
 }
 export const GET=(req:Request,context:{params:Promise<{id:string}>})=>handle(req,context,false);

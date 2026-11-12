@@ -34,11 +34,11 @@ export default async function LocationsPage({ searchParams }: { searchParams: Pr
   const priceText = await getTranslations("MarketplaceOffer");
   const { data, error } = await db
     .from("listings")
-    .select("place_country_code,place_region_id,place_city_id,place_city_name,place_region_name,place_status,id, title, city, price, image_url, category, metadata, created_at")
+    .select("place_country_code,place_region_id,place_city_id,place_city_name,place_region_name,place_status,id, title, city, price, image_url, category, description, metadata, created_at")
     .eq("published", true)
     .eq("type", "location")
     .order("created_at", { ascending: false })
-    .limit(200);
+    .limit(300);
 
   if (error) throw new Error(uiText("Ui.text_2a7079785185c8", { value1: String(error.message) }));
 
@@ -52,11 +52,11 @@ export default async function LocationsPage({ searchParams }: { searchParams: Pr
   // Place verification controls canonical filters, never publication visibility.
   const allLocations: LocationCard[] = (rows as {
     id: string; title: string; city: string | null; price: number;
-    image_url: string | null; category: string | null;
+    image_url: string | null; category: string | null; description?: string | null;
     metadata?: Record<string, unknown> | null;
   }[]).map(l => {
     const area = readPublicLocationArea(l.metadata);
-    const publicMetadata = publicLocationBrowseMetadata(l.metadata);
+    const publicMetadata = publicLocationBrowseMetadata(l.metadata, l.description ?? "");
     const coordinates = area ?? cityCoordinates[l.city ?? ""] ?? { lat: null, lng: null };
     const place = placeReadFields(l.city ?? "", l, locale);
     return {

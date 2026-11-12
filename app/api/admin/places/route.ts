@@ -50,7 +50,7 @@ export async function POST(req:NextRequest){
  const result=await db.rpc('apply_place_mapping',{p_table:body.table,p_id:body.id,p_expected_raw:body.raw,p_expected:body.expected,p_fields:{...fields,place_original:body.raw},p_run:randomUUID()});
  if(result.error)return json({error:(await getTranslations('Places'))('unavailable')},503);
  if(result.data!=='applied'&&result.data!=='unchanged')return json({error:(await getTranslations('Places'))('conflict')},409);
- for(const path of ['/creators','/companies','/locations','/locations/suche','/props','/jobs'])revalidatePath(path);
+ for(const path of ['/creators','/companies','/locations','/props','/jobs'])revalidatePath(path);
  for(const tag of ['profiles','listings','companies','creator-directory'])revalidateTag(tag,{expire:0});
  return json({ok:true});
 }

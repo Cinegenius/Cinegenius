@@ -10,3 +10,11 @@ export function inMapBounds(row: { lat: number | null; lng: number | null }, bou
   const east = ((bounds.east + 180) % 360 + 360) % 360 - 180;
   return west <= east ? row.lng >= west && row.lng <= east : row.lng >= west || row.lng <= east;
 }
+
+/** Distance is calculated locally; a visitor's coordinates are never put in the URL. */
+export function locationDistanceKm(a: [number, number], b: [number, number]): number {
+  const radians = Math.PI / 180;
+  const dLat = (b[0] - a[0]) * radians, dLng = (b[1] - a[1]) * radians;
+  const value = Math.sin(dLat / 2) ** 2 + Math.cos(a[0] * radians) * Math.cos(b[0] * radians) * Math.sin(dLng / 2) ** 2;
+  return 6371 * 2 * Math.asin(Math.sqrt(Math.min(1, Math.max(0, value))));
+}

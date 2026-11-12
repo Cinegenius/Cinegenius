@@ -1,18 +1,20 @@
 "use client";
-import { useRef, useState, useMemo, useSyncExternalStore, type FormEvent } from "react";
+import { useRef, useState, useEffect, useMemo, useSyncExternalStore, type FormEvent } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import Image from "@/components/MediaImage";
 import Link from "next/link";
 import dynamic from "next/dynamic";
-import { inMapBounds, type MapBounds } from "@/lib/location-map";
-import { Search, Map, LayoutList, MapPin, Star, ArrowRight, Plus, ChevronDown, X } from "lucide-react";
+import { hasCoordinates, inMapBounds, locationDistanceKm, type MapBounds } from "@/lib/location-map";
+import { Search, Map, LayoutList, MapPin, Star, ArrowRight, Plus, ChevronDown, X, Navigation, Share2 } from "lucide-react";
 import PageHeader from "@/components/PageHeader";
+import FavoriteButton from "@/components/FavoriteButton";
 import EmptyState from "@/components/EmptyState";
 import PlaceFilters, { EMPTY_PLACE_FILTERS, type PlaceFilterValue } from "@/components/PlaceFilters";
-import MobileBrowseControls, { MobileFilterField, type BrowseChip } from "@/components/MobileBrowseControls";
+import MobileBrowseControls, { MobileFilterField, MobileFilterSelect, type BrowseChip } from "@/components/MobileBrowseControls";
 import { locationCategoryLabel } from "@/lib/location-category-labels";
 import { placeOptions } from "@/lib/places/core";
 import { useViewState } from "@/lib/use-view-state";
+import { useNearbyLocation } from "@/lib/use-nearby-location";
 import { useViewUrl } from "@/lib/use-view-url";
 import {
   DEFAULT_LOCATION_LANDING_FILTERS, filterLandingLocations, locationLandingCategoryOptions,
@@ -22,6 +24,7 @@ import {
 export type LocationCard = {
   id: string; title: string; type: string; city: string; price: number;
   priceOnRequest: boolean; priceLabel: string;
+  instantBook?: boolean; verified?: boolean;
   lat: number | null; lng: number | null; metadata?: Record<string, unknown>;
   image: string; rating: number; reviews: number;
   focalPoint?: { x: number; y: number } | null;
@@ -56,17 +59,32 @@ export default function LocationsLanding({ allLocations, totalCount, initialFilt
   const effectiveView = viewMode === "split" && !wide ? "list" : viewMode;
   const [mapBounds, setMapBounds] = useViewState<MapBounds | null>("locations.landing.bounds", null);
   const [activeId, setActiveId] = useState<string | null>(null);
+  const nearby = useNearbyLocation();
+  const clearLocation = nearby.clear;
+  const locateMe = nearby.locate;
+  const [radiusKm, setRadiusKm] = useViewState("locations.landing.radius", 50);
+  const [copied, setCopied] = useState(false);
+  const copyTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  useEffect(() => () => { if (copyTimer.current) clearTimeout(copyTimer.current); }, []);
+  const shareSearch = async () => {
+    try {
+      await navigator.clipboard.writeText(window.location.href);
+      setCopied(true);
+      if (copyTimer.current) clearTimeout(copyTimer.current);
+      copyTimer.current = setTimeout(() => setCopied(false), 2000);
+    } catch { setCopied(false); }
+  };
   const resultsRef = useRef<HTMLDivElement>(null);
   const updateFilters = (patch: Partial<LocationLandingFilters>) => setFilters(current => ({ ...current, ...patch }));
-  const resetFilters = () => { setFilters({ ...DEFAULT_LOCATION_LANDING_FILTERS }); setMapBounds(null); };
+  const resetFilters = () => { setFilters({ ...DEFAULT_LOCATION_LANDING_FILTERS }); setMapBounds(null); clearLocation(); };
   const changePlaces = (next: PlaceFilterValue) => updateFilters({ ...next, ...(next.city ? { cityText: "" } : {}) });
   const categoryLabel = (value: string) => locationCategoryLabel(value, categoryText);
   const categories = locationLandingCategoryOptions(allLocations, categoryLabel, locale, filters.type);
   const matching = useMemo(() => filterLandingLocations(allLocations, filters, value => locationCategoryLabel(value, categoryText)), [allLocations, filters, categoryText]);
-  const filtered = useMemo(() => mapBounds ? matching.filter(row => inMapBounds(row, mapBounds)) : matching, [matching, mapBounds]);
+  const filtered = useMemo(() => matching.filter(row => (!mapBounds || inMapBounds(row, mapBounds)) && (!nearby.coordinates || (hasCoordinates(row) && locationDistanceKm(nearby.coordinates, [row.lat, row.lng]) <= radiusKm))), [matching, mapBounds, nearby.coordinates, radiusKm]);
   const params = locationLandingParams(filters);
   const urlParams = params.toString();
-  const filterKey = JSON.stringify([urlParams, mapBounds]);
+  const filterKey = JSON.stringify([urlParams, mapBounds, nearby.coordinates ? nearby.session : null, radiusKm]);
   const visibleCount = pagination.filterKey === filterKey ? pagination.visibleCount : 24;
   const locations = filtered.slice(0, visibleCount);
   useViewUrl(urlParams ? `/locations?${urlParams}` : "/locations");
@@ -75,6 +93,9 @@ export default function LocationsLanding({ allLocations, totalCount, initialFilt
     { value: "price-desc", label: t("sortPriceDesc") }, { value: "rating", label: t("sortRating") },
   ];
   const chips: BrowseChip[] = [
+    ...(nearby.coordinates ? [{id: "nearby", label: `${t("locateActive")} · ${t("inRadius", {radius: radiusKm})}`, onRemove: () => clearLocation()}] : []),
+    ...(filters.lage ? [{id: "lage", label: t(filters.lage === "Innen" ? "filterInnen" : filters.lage === "Außen" ? "filterAussen" : "filterInnenAussen"), onRemove: () => updateFilters({lage: ""})}] : []),
+    ...([['power', 'filterPower'], ['instant', 'filterInstant'], ['verified', 'filterVerified']] as const).flatMap(([key,label]) => filters[key] ? [{id: key, label: t(label), onRemove: () => updateFilters({[key]: ""})}] : []),
     ...(mapBounds ? [{ id: "map-area", label: uiText("locationMap.areaActive"), onRemove: () => setMapBounds(null) }] : []),
     ...(filters.type ? [{ id: "type", label: categoryLabel(filters.type), onRemove: () => updateFilters({ type: "" }) }] : []),
     ...(["country", "region", "city"] as const).flatMap(kind => filters[kind] ? [{
@@ -96,6 +117,21 @@ export default function LocationsLanding({ allLocations, totalCount, initialFilt
   const viewControls = (desktop = false) => <div role="group" aria-label={t("viewLabel")} className="inline-flex rounded-xl border border-border bg-bg-secondary p-1">
     {([{ mode: "list", label: t("viewList"), icon: LayoutList }, ...(desktop ? [{ mode: "split" as const, label: t("viewSplit"), icon: Map }] : []), { mode: "map", label: t("viewMap"), icon: Map }] as const).map(({mode,label,icon: Icon}) => <button type="button" key={mode} aria-pressed={effectiveView === mode} onClick={() => chooseView(mode)} className={`inline-flex min-h-11 items-center gap-2 rounded-lg px-3 text-sm font-medium ${effectiveView === mode ? "bg-gold text-bg-primary" : "text-text-secondary hover:text-text-primary"}`}><Icon size={16} aria-hidden="true" />{label}</button>)}
   </div>;
+
+  const additionalFilters = () => <>
+    <MobileFilterField label={uiText("Ui.text_295029201d603e")}>
+      <MobileFilterSelect value={filters.lage} onChange={value => updateFilters({lage: value})} placeholder={t("filterAll")} options={[{value: "Innen", label: t("filterInnen")}, {value: "Außen", label: t("filterAussen")}, {value: "Innen & Außen", label: t("filterInnenAussen")}]} />
+    </MobileFilterField>
+    <div className="flex flex-wrap gap-x-5 gap-y-1">
+      {([['power', 'filterPower'], ['instant', 'filterInstant'], ['verified', 'filterVerified']] as const).map(([key,label]) => <label key={key} className="flex min-h-11 items-center gap-3 text-sm text-text-secondary"><input type="checkbox" className="size-4 accent-gold" checked={filters[key] === "1"} onChange={event => updateFilters({[key]: event.target.checked ? "1" : ""})} />{t(label)}</label>)}
+    </div>
+    <div className="flex flex-wrap items-end gap-3">
+      <button type="button" disabled={nearby.locating} onClick={nearby.coordinates ? clearLocation : locateMe} className="inline-flex min-h-11 items-center gap-2 rounded-lg border border-border px-3 text-sm text-text-secondary disabled:opacity-60"><Navigation size={16} aria-hidden="true" />{t(nearby.locating ? "locating" : nearby.coordinates ? "locateActive" : "locateMe")}</button>
+      {nearby.coordinates && <MobileFilterField label={t("radiusLabel")}><select aria-label={t("radiusLabel")} value={radiusKm} onChange={event => setRadiusKm(Number(event.target.value))}>{[10,25,50,100,200,500].map(value => <option key={value} value={value}>{uiText.rich("Ui.text_6b06beb2a825c0", {value1: () => value})}</option>)}</select></MobileFilterField>}
+      <button type="button" onClick={shareSearch} className="inline-flex min-h-11 items-center gap-2 rounded-lg border border-border px-3 text-sm text-text-secondary"><Share2 size={16} aria-hidden="true" />{t(copied ? "copied" : "shareBtn")}</button>
+    </div>
+    {nearby.error && <p role="alert" className="text-sm text-text-secondary">{t(nearby.error)}</p>}
+  </>;
 
   function handleSearch(event: FormEvent) {
     event.preventDefault();
@@ -153,6 +189,7 @@ export default function LocationsLanding({ allLocations, totalCount, initialFilt
           <MobileFilterField label={uiText("Ui.text_84381d6fa4d29d")}><input aria-label={uiText("Ui.text_84381d6fa4d29d")} type="number" inputMode="decimal" min="0" step="0.01" value={filters.min} onChange={event => updateFilters({ min: event.target.value })} placeholder={uiText("Ui.text_d0c50fd56cbce3")} /></MobileFilterField>
           <MobileFilterField label={uiText("Ui.text_f7abc502297a74")}><input aria-label={uiText("Ui.text_f7abc502297a74")} type="number" inputMode="decimal" min="0" step="0.01" value={filters.max} onChange={event => updateFilters({ max: event.target.value })} placeholder={uiText("Ui.text_d0c50fd56cbce3")} /></MobileFilterField>
         </div>
+        {additionalFilters()}
       </MobileBrowseControls>
 
       <div className="hidden xl:block browse-toolbar">
@@ -162,6 +199,7 @@ export default function LocationsLanding({ allLocations, totalCount, initialFilt
             <div className="col-span-3 min-w-0"><PlaceFilters rows={allLocations} value={filters} onChange={changePlaces} scope="locations" /></div>
             <label className="relative flex min-w-0 flex-col gap-1 text-xs text-text-muted"><span>{uiText("creators.sort")}</span><select className={selectClass} value={filters.sort} onChange={event => updateFilters({ sort: event.target.value })}>{sortOptions.map(option => <option key={option.value} value={option.value}>{option.label}</option>)}</select><ChevronDown size={16} aria-hidden="true" className="pointer-events-none absolute bottom-3.5 right-3" /></label>
           </div>
+          <div className="flex flex-wrap items-end gap-x-5 gap-y-3">{additionalFilters()}</div>
           <div className="flex flex-wrap items-end gap-3">
             <label className="flex w-40 min-w-0 flex-col gap-1 text-xs text-text-muted"><span>{uiText("Ui.text_84381d6fa4d29d")}</span><input className={priceClass} type="number" inputMode="decimal" min="0" step="0.01" value={filters.min} onChange={event => updateFilters({ min: event.target.value })} placeholder={uiText("Ui.text_d0c50fd56cbce3")} /></label>
             <label className="flex w-40 min-w-0 flex-col gap-1 text-xs text-text-muted"><span>{uiText("Ui.text_f7abc502297a74")}</span><input className={priceClass} type="number" inputMode="decimal" min="0" step="0.01" value={filters.max} onChange={event => updateFilters({ max: event.target.value })} placeholder={uiText("Ui.text_d0c50fd56cbce3")} /></label>
@@ -185,7 +223,8 @@ export default function LocationsLanding({ allLocations, totalCount, initialFilt
           <section aria-label={t("landingDiscover")} className="min-w-0">
             {filtered.length === 0 ? <EmptyState icon={MapPin} title={t("emptyTitleFiltered")} description={t("emptyDescFiltered")} action={{ label: t("emptyActionReset"), onClick: resetFilters }} /> : <div className={`grid grid-cols-1 gap-5 sm:grid-cols-2 ${effectiveView === "split" ? "xl:grid-cols-2" : "lg:grid-cols-3"}`}>
               {locations.map(location => (
-                <Link key={location.id} data-id={location.id} href={`/locations/${location.id}`} onMouseEnter={() => setActiveId(location.id)} onMouseLeave={() => setActiveId(null)} onFocus={() => setActiveId(location.id)} onBlur={() => setActiveId(null)} className={`browse-card group flex min-w-0 flex-col transition-colors hover:border-gold/50 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-gold ${activeId === location.id ? "border-gold ring-1 ring-gold" : ""}`}>
+                <article key={location.id} data-id={location.id} className="relative min-w-0">
+                <Link href={`/locations/${location.id}`} onMouseEnter={() => setActiveId(location.id)} onMouseLeave={() => setActiveId(null)} onFocus={() => setActiveId(location.id)} onBlur={() => setActiveId(null)} className={`browse-card group flex h-full min-w-0 flex-col transition-colors hover:border-gold/50 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-gold ${activeId === location.id ? "border-gold ring-1 ring-gold" : ""}`}>
                   <div className="relative aspect-video w-full overflow-hidden bg-bg-elevated">
                     {location.image ? (
                       <Image
@@ -215,6 +254,8 @@ export default function LocationsLanding({ allLocations, totalCount, initialFilt
                     </div>
                   </div>
                 </Link>
+                <FavoriteButton listingId={location.id} listingType="location" listingTitle={location.title} listingCity={location.city} listingPrice={location.price} listingImage={location.image} className="absolute right-2 top-2 min-h-11 min-w-11" />
+                </article>
               ))}
             </div>}
             {filtered.length > locations.length && (
@@ -223,7 +264,7 @@ export default function LocationsLanding({ allLocations, totalCount, initialFilt
           </section>
         ))}
         {effectiveView !== "list" && <aside aria-label={t("viewMap")} className={`locations-discovery-map min-w-0 ${effectiveView === "split" ? "xl:sticky xl:top-24 xl:h-[calc(100dvh-7rem)]" : "h-[calc(100dvh-12rem)] min-h-96 pb-20 xl:h-[calc(100dvh-9rem)] xl:pb-0"}`}>
-          <LocationMap locations={filtered} activeId={activeId} onHover={setActiveId} userLocation={null} radiusKm={0} appliedBounds={mapBounds} onApplyBounds={setMapBounds} />
+          <LocationMap locations={filtered} activeId={activeId} onHover={setActiveId} userLocation={nearby.coordinates} radiusKm={radiusKm} appliedBounds={mapBounds} onApplyBounds={setMapBounds} />
         </aside>}
         </div>
 

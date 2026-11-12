@@ -7,7 +7,7 @@ import { useTranslations } from "next-intl";
 
 function getLocalizedTabs(translate: (key: string) => string) {
   return ([
-  { id: "locations", label: translate("nav.locations"), placeholder: translate("Ui.text_64869d31081bb8"),    href: "/locations/suche" },
+  { id: "locations", label: translate("nav.locations"), placeholder: translate("Ui.text_64869d31081bb8"),    href: "/locations" },
   { id: "crew",      label: translate("nav.crew"),      placeholder: translate("Ui.text_323d7dd4417e20"), href: "/creators" },
   { id: "equipment", label: translate("companies.groupAusstattung"), placeholder: translate("Ui.text_debf8074d5b54f"),   href: "/props" },
   { id: "jobs",      label: translate("nav.jobs"),      placeholder: translate("Ui.text_73c2890fe0d243"),      href: "/jobs" },

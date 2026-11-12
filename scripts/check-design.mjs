@@ -20,7 +20,7 @@ for (const [label, path] of sharedPages) {
 
 const mobileBrowsePages = [
   ["Projects", "app/projects/ProjectsContent.tsx"],
-  ["Locations", "app/locations/LocationsContent.tsx"],
+  ["Locations", "app/locations/LocationsLanding.tsx"],
   ["Marktplatz", "app/props/PropsContent.tsx"],
   ["Crew", "app/creators/CreatorsContent.tsx"],
   ["Firmen", "app/companies/CompaniesContent.tsx"],
@@ -34,9 +34,6 @@ for (const [label, path] of mobileBrowsePages) {
   if (label !== "Locations" && !source.includes("mobile-bottom-nav-clear")) {
     failures.push(`${label} content must clear the fixed mobile navigation (${path})`);
   }
-}
-if (!read("app/locations/LocationsContent.tsx").includes("pb-[calc(56px+env(safe-area-inset-bottom,0px))]")) {
-  failures.push("Location results must clear the fixed mobile navigation while scrolling");
 }
 if (!read("app/locations/LocationsLanding.tsx").includes("mobile-bottom-nav-clear")) {
   failures.push("Location landing content must clear the fixed mobile navigation");
