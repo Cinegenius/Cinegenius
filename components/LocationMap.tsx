@@ -11,7 +11,7 @@ import { listingPriceLabel } from "@/lib/listing-price";
 import { placeDisplay } from "@/lib/places/core";
 import { locationCategoryLabel } from "@/lib/location-category-labels";
 import { readPublicLocationArea } from "@/lib/location-privacy";
-import { hasCoordinates, type MapBounds } from "@/lib/location-map";
+import { hasCoordinates, inMapBounds, type MapBounds } from "@/lib/location-map";
 import type * as Leaflet from "leaflet";
 
 type Location = {
@@ -22,6 +22,8 @@ type Location = {
 };
 type Props = {
   readOnly?: boolean;
+  onBoundsChange?: (bounds: MapBounds) => void;
+  visibleCount?: number;
   locations: Location[];
   activeId: string | null;
   onHover: (id: string | null) => void;
@@ -31,7 +33,7 @@ type Props = {
   onApplyBounds: (bounds: MapBounds | null) => void;
 };
 
-export default function LocationMap({ readOnly = false, locations, activeId, onHover, userLocation, radiusKm, appliedBounds, onApplyBounds }: Props) {
+export default function LocationMap({ readOnly = false, locations, activeId, onHover, userLocation, radiusKm, appliedBounds, onApplyBounds, onBoundsChange, visibleCount }: Props) {
   const t = useTranslations("locationMap");
   const privacyText = useTranslations("locationPrivacy");
   const priceText = useTranslations("MarketplaceOffer");
@@ -47,6 +49,9 @@ export default function LocationMap({ readOnly = false, locations, activeId, onH
   const [selection, setSelection] = useState<{ scope: string; id: string | null; cluster: string[] }>({ scope: selectionKey, id: null, cluster: [] });
   if (selection.scope !== selectionKey) setSelection({ scope: selectionKey, id: null, cluster: [] });
   const hoverRef = useRef(onHover);
+  const boundsChangeRef = useRef(onBoundsChange);
+  const automaticBounds = Boolean(onBoundsChange);
+  useEffect(() => { boundsChangeRef.current = onBoundsChange; }, [onBoundsChange]);
   const initialBounds = useRef(appliedBounds);
   useEffect(() => { hoverRef.current = onHover; }, [onHover]);
   const selected = selection.scope === selectionKey ? locations.find(location => location.id === selection.id) : undefined;
@@ -58,10 +63,21 @@ export default function LocationMap({ readOnly = false, locations, activeId, onH
 
   useEffect(() => {
     if (!map) return;
-    const offerSearch = () => setMoved(true);
-    map.on("moveend", offerSearch);
-    return () => { map.off("moveend", offerSearch); };
-  }, [map]);
+    const updateBounds = () => {
+      if (!automaticBounds) { setMoved(true); return; }
+      const bounds = map.getBounds();
+      boundsChangeRef.current?.({south: bounds.getSouth(), north: bounds.getNorth(), west: bounds.getWest(), east: bounds.getEast()});
+      setSelection(current => current.id || current.cluster.length ? {...current, id: null, cluster: []} : current);
+      hoverRef.current(null);
+    };
+    map.on("moveend", updateBounds);
+    if (automaticBounds) {
+      map.on("zoomend", updateBounds);
+      map.on("resize", updateBounds);
+      updateBounds();
+    }
+    return () => { map.off("moveend", updateBounds); map.off("zoomend", updateBounds); map.off("resize", updateBounds); };
+  }, [map, automaticBounds]);
 
   useEffect(() => {
     let cancelled = false;
@@ -98,7 +114,9 @@ export default function LocationMap({ readOnly = false, locations, activeId, onH
       group = L.layerGroup().addTo(map!);
       const render = () => {
         group!.clearLayers();
-        const pending = locations.filter(hasCoordinates);
+        const bounds = map!.getBounds();
+        const viewport = {south: bounds.getSouth(), north: bounds.getNorth(), west: bounds.getWest(), east: bounds.getEast()};
+        const pending = locations.filter(hasCoordinates).filter(location => !automaticBounds || inMapBounds(location, viewport));
         for (const location of pending) {
           const area = readPublicLocationArea(location.metadata);
           if (area) L.circle([area.lat, area.lng], { radius: area.radius_meters, color: "#C2F135", fillOpacity: 0.07, weight: 1.5, interactive: false }).addTo(group!);
@@ -136,12 +154,13 @@ export default function LocationMap({ readOnly = false, locations, activeId, onH
         }
       };
       render(); map!.on("zoomend", render);
-      cleanupRender = () => map!.off("zoomend", render);
+      if (automaticBounds) map!.on("moveend", render);
+      cleanupRender = () => { map!.off("zoomend", render); map!.off("moveend", render); };
     }
     let cleanupRender = () => {};
     void initializeMarkers();
     return () => { cancelled = true; cleanupRender(); group?.remove(); };
-  }, [map, locations, t, readOnly]);
+  }, [map, locations, t, readOnly, automaticBounds]);
 
   useEffect(() => {
     if (!map) return;
@@ -183,14 +202,14 @@ export default function LocationMap({ readOnly = false, locations, activeId, onH
   return (
     <div className="location-map relative isolate h-full min-h-80 w-full overflow-hidden rounded-xl border border-border bg-bg-secondary" aria-label={t("label")}>
       <div ref={containerRef} className="h-full w-full" />
-      <p role="status" aria-live="polite" className="pointer-events-none absolute left-3 top-3 z-[500] max-w-[calc(100%-5rem)] rounded-lg border border-border bg-bg-primary/95 px-3 py-2 text-xs font-medium text-text-primary">{locationsText("results", { count: locations.length })}</p>
-      {!readOnly && <div className="absolute left-3 top-16 z-[500] flex max-w-[calc(100%-5rem)] flex-wrap gap-2">
+      <p role="status" aria-live="polite" className="pointer-events-none absolute left-3 top-3 z-[500] max-w-[calc(100%-5rem)] rounded-lg border border-border bg-bg-primary/95 px-3 py-2 text-xs font-medium text-text-primary">{locationsText("results", { count: visibleCount ?? locations.length })}</p>
+      {!readOnly && !automaticBounds && <div className="absolute left-3 top-16 z-[500] flex max-w-[calc(100%-5rem)] flex-wrap gap-2">
         {moved && <button type="button" onClick={() => { if (!map) return; const b = map.getBounds(); onApplyBounds({ south: b.getSouth(), north: b.getNorth(), west: b.getWest(), east: b.getEast() }); setMoved(false); }} className="min-h-11 rounded-lg border border-border bg-bg-primary px-3 text-sm text-text-primary">{t("searchArea")}</button>}
         {appliedBounds && <button type="button" onClick={() => { onApplyBounds(null); setMoved(false); }} className="min-h-11 rounded-lg border border-border bg-bg-primary px-3 text-sm text-text-primary">{t("resetArea")}</button>}
       </div>}
       {locations.some(location => !hasCoordinates(location)) && <p className="absolute bottom-8 left-3 z-[400] rounded bg-bg-primary px-2 py-1 text-xs text-text-muted">{t("unknownCoordinates")}</p>}
       {failed && <p role="alert" className="absolute inset-0 flex items-center justify-center bg-bg-secondary p-6 text-center text-sm text-text-secondary">{t("error")}</p>}
-      {locations.length === 0 && <p role="status" className="absolute inset-x-3 top-3 z-[500] rounded-lg border border-border bg-bg-primary p-4 text-sm text-text-secondary">{t("empty")}</p>}
+      {(visibleCount ?? locations.length) === 0 && <p role="status" className="absolute inset-x-3 top-3 z-[500] rounded-lg border border-border bg-bg-primary p-4 text-sm text-text-secondary">{t("empty")}</p>}
       {(selected || clusterLocations.length > 0) && (
         <div className="location-map-preview absolute inset-x-3 bottom-8 z-[500] mx-auto max-h-[calc(100%-6rem)] max-w-sm overflow-y-auto rounded-xl border border-border bg-bg-secondary shadow-xl">
           <button type="button" aria-label={t("closePreview")} onClick={() => { select(null); }} className="absolute right-0 top-0 z-10 flex size-11 items-center justify-center rounded-full bg-bg-primary/90 text-text-primary"><X size={18} /></button>

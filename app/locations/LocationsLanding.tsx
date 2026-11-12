@@ -57,10 +57,14 @@ export default function LocationsLanding({ allLocations, totalCount, initialFilt
   const [viewMode, setViewMode] = useViewState<"split" | "list" | "map">("locations.landing.view", "split");
   const wide = useSyncExternalStore(subscribeWideLayout, readWideLayout, serverWideLayout);
   const effectiveView = viewMode === "split" && !wide ? "list" : viewMode;
-  const [mapBounds, setMapBounds] = useViewState<MapBounds | null>("locations.landing.bounds", null);
+  const [browseBounds, setBrowseBounds] = useViewState<MapBounds | null>("locations.landing.bounds", null);
   const [activeId, setActiveId] = useState<string | null>(null);
   const nearby = useNearbyLocation();
-  const clearLocation = nearby.clear;
+  const [nearbyBounds, setNearbyBounds] = useState<MapBounds | null>(null);
+  const [nearbyViewportRevision, setNearbyViewportRevision] = useState(0);
+  const mapBounds = nearby.coordinates ? nearbyBounds : browseBounds;
+  const setMapBounds = nearby.coordinates ? setNearbyBounds : setBrowseBounds;
+  const clearLocation = () => { nearby.clear(); setNearbyBounds(null); setBrowseBounds(null); };
   const locateMe = nearby.locate;
   const [radiusKm, setRadiusKm] = useViewState("locations.landing.radius", 50);
   const [copied, setCopied] = useState(false);
@@ -81,10 +85,16 @@ export default function LocationsLanding({ allLocations, totalCount, initialFilt
   const categoryLabel = (value: string) => locationCategoryLabel(value, categoryText);
   const categories = locationLandingCategoryOptions(allLocations, categoryLabel, locale, filters.type);
   const matching = useMemo(() => filterLandingLocations(allLocations, filters, value => locationCategoryLabel(value, categoryText)), [allLocations, filters, categoryText]);
-  const filtered = useMemo(() => matching.filter(row => (!mapBounds || inMapBounds(row, mapBounds)) && (!nearby.coordinates || (hasCoordinates(row) && locationDistanceKm(nearby.coordinates, [row.lat, row.lng]) <= radiusKm))), [matching, mapBounds, nearby.coordinates, radiusKm]);
+  const mapLocations = useMemo(() => matching.filter(row => !nearby.coordinates || (hasCoordinates(row) && locationDistanceKm(nearby.coordinates, [row.lat, row.lng]) <= radiusKm)), [matching, nearby.coordinates, radiusKm]);
+  const filtered = useMemo(() => mapBounds ? mapLocations.filter(row => inMapBounds(row, mapBounds)) : mapLocations, [mapLocations, mapBounds]);
+  const updateMapBounds = (next: MapBounds) => {
+    if (mapBounds && mapBounds.south === next.south && mapBounds.north === next.north && mapBounds.west === next.west && mapBounds.east === next.east) return;
+    setMapBounds(next);
+    if (nearby.coordinates) setNearbyViewportRevision(current => current + 1);
+  };
   const params = locationLandingParams(filters);
   const urlParams = params.toString();
-  const filterKey = JSON.stringify([urlParams, mapBounds, nearby.coordinates ? nearby.session : null, radiusKm]);
+  const filterKey = JSON.stringify([urlParams, nearby.coordinates ? nearbyViewportRevision : mapBounds, nearby.coordinates ? nearby.session : null, radiusKm]);
   const visibleCount = pagination.filterKey === filterKey ? pagination.visibleCount : 24;
   const locations = filtered.slice(0, visibleCount);
   useViewUrl(urlParams ? `/locations?${urlParams}` : "/locations");
@@ -132,6 +142,10 @@ export default function LocationsLanding({ allLocations, totalCount, initialFilt
     </div>
     {nearby.error && <p role="alert" className="text-sm text-text-secondary">{t(nearby.error)}</p>}
   </>;
+
+  const mapPanel = <aside aria-label={t("viewMap")} className={`locations-discovery-map min-w-0 ${effectiveView === "split" ? "xl:sticky xl:top-24 xl:h-[calc(100dvh-7rem)]" : "h-[calc(100dvh-12rem)] min-h-96 pb-20 xl:h-[calc(100dvh-9rem)] xl:pb-0"}`}>
+          <LocationMap locations={mapLocations} visibleCount={filtered.length} onBoundsChange={updateMapBounds} activeId={activeId} onHover={setActiveId} userLocation={nearby.coordinates} radiusKm={radiusKm} appliedBounds={mapBounds} onApplyBounds={setMapBounds} />
+        </aside>;
 
   function handleSearch(event: FormEvent) {
     event.preventDefault();
@@ -211,8 +225,9 @@ export default function LocationsLanding({ allLocations, totalCount, initialFilt
 
       <div id="locations-discover" ref={resultsRef} className="site-container mobile-bottom-nav-clear scroll-mt-24 space-y-10 py-6 sm:space-y-10">
         <div className="hidden items-center justify-between gap-4 xl:flex"><h2 id="locations-discover-title" className="text-xl font-bold text-text-primary">{t("landingDiscover")}</h2><div className="flex items-center gap-4"><span className="text-sm text-text-muted">{t("results", { count: filtered.length })}</span>{viewControls(true)}</div></div>
-        <div className={`locations-discovery-layout ${effectiveView === "split" ? "xl:grid xl:grid-cols-[minmax(0,1.05fr)_minmax(0,1fr)] xl:items-start xl:gap-6" : ""}`}>
-        {effectiveView !== "map" && (allLocations.length === 0 ? (
+        <div className={`locations-discovery-layout ${effectiveView === "split" ? "xl:grid xl:grid-cols-[minmax(0,1.05fr)_minmax(0,1fr)] xl:items-start xl:gap-6" : "space-y-6"}`}>
+        {effectiveView === "map" && mapPanel}
+        {(allLocations.length === 0 ? (
           <div className="px-4 py-16 text-center">
             <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl border border-border bg-bg-elevated"><MapPin size={24} aria-hidden="true" className="text-text-muted" /></div>
             <p className="mb-1 font-semibold text-text-primary">{t("emptyTitle")}</p>
@@ -221,6 +236,7 @@ export default function LocationsLanding({ allLocations, totalCount, initialFilt
           </div>
         ) : (
           <section aria-label={t("landingDiscover")} className="min-w-0">
+            {effectiveView === "map" && <div className="mb-4 flex flex-wrap items-center justify-between gap-3"><h2 className="text-xl font-bold text-text-primary">{t("landingDiscover")}</h2><p role="status" aria-live="polite" className="text-sm text-text-muted">{t("results", {count: filtered.length})}</p></div>}
             {filtered.length === 0 ? <EmptyState icon={MapPin} title={t("emptyTitleFiltered")} description={t("emptyDescFiltered")} action={{ label: t("emptyActionReset"), onClick: resetFilters }} /> : <div className={`grid grid-cols-1 gap-5 sm:grid-cols-2 ${effectiveView === "split" ? "xl:grid-cols-2" : "lg:grid-cols-3"}`}>
               {locations.map(location => (
                 <article key={location.id} data-id={location.id} className="relative min-w-0">
@@ -263,9 +279,7 @@ export default function LocationsLanding({ allLocations, totalCount, initialFilt
             )}
           </section>
         ))}
-        {effectiveView !== "list" && <aside aria-label={t("viewMap")} className={`locations-discovery-map min-w-0 ${effectiveView === "split" ? "xl:sticky xl:top-24 xl:h-[calc(100dvh-7rem)]" : "h-[calc(100dvh-12rem)] min-h-96 pb-20 xl:h-[calc(100dvh-9rem)] xl:pb-0"}`}>
-          <LocationMap locations={filtered} activeId={activeId} onHover={setActiveId} userLocation={nearby.coordinates} radiusKm={radiusKm} appliedBounds={mapBounds} onApplyBounds={setMapBounds} />
-        </aside>}
+        {effectiveView === "split" && mapPanel}
         </div>
 
         {allLocations.length > 0 && (
