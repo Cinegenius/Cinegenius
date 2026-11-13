@@ -1,5 +1,6 @@
 {
   "nav": {
+    "ai": "AI",
     "adminArea": "Administrace",
     "locations": "Lokace",
     "crew": "Štáb",
@@ -252,6 +253,7 @@
     "translationUnavailable": "Text momentálně není dostupný."
   },
   "home": {
+    "railPage": "Zobrazení {page} z {total}",
     "newsShortcut": "Novinky",
     "newsShortcutDescription": "Aktuální dění v oboru.",
     "badgeHero": "Film · Foto · Obsah · Reklama",
@@ -7730,5 +7732,19 @@
     "hideHelp": "Zpráva se skryje pouze ve tvém zobrazení. Ostatní členové ji stále uvidí.",
     "unknown": "Jméno není dostupné",
     "availablePlaces": "Zbývající místa: {count}"
+  },
+  "MobilePreview": {
+    "unavailableTitle": "CineGenius je momentálně nedostupný",
+    "unavailableDescription": "Zkontroluj připojení k internetu a zkus to znovu. Potvrzená uložení zůstávají zachována. Neuložené údaje nebo probíhající nahrávání mohou chybět.",
+    "retry": "Zkusit znovu"
+  },
+  "AiTools": {
+    "title": "Nástroje AI",
+    "description": "Tvoje nástroje pro nápady, texty a přípravu na natáčení.",
+    "genieDescription": "Prober nápady, připrav texty a najdi vhodné sekce na CineGenius.",
+    "planned": "Připravujeme",
+    "roomScanTitle": "Nativní skener místností a půdorysy",
+    "roomScanDescription": "Skenuj místnosti přímo v aplikaci a vytvářej půdorysy pro svůj projekt. Tato funkce zatím není dostupná a vyžaduje podporované zařízení.",
+    "noticeFirst": "Nejprve zavři oznámení o cookies. Potom můžeš otevřít Genie."
   }
 }

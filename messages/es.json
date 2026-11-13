@@ -1,5 +1,6 @@
 {
   "nav": {
+    "ai": "IA",
     "adminArea": "Administración",
     "locations": "Locaciones",
     "crew": "Equipo",
@@ -252,6 +253,7 @@
     "translationUnavailable": "Texto no disponible."
   },
   "home": {
+    "railPage": "Vista {page} de {total}",
     "newsShortcut": "Noticias",
     "newsShortcutDescription": "Las novedades del sector.",
     "badgeHero": "Film · Foto · Contenido · Publicidad",
@@ -7730,5 +7732,19 @@
     "hideHelp": "El mensaje solo se ocultará en tu vista. Los demás miembros podrán seguir viéndolo.",
     "unknown": "Nombre no disponible",
     "availablePlaces": "Plazas disponibles: {count}"
+  },
+  "MobilePreview": {
+    "unavailableTitle": "CineGenius no está disponible en este momento",
+    "unavailableDescription": "Comprueba tu conexión a internet e inténtalo de nuevo. Los datos cuyo guardado se ha confirmado se conservan. Es posible que falten los datos sin guardar o las cargas en curso.",
+    "retry": "Volver a intentar"
+  },
+  "AiTools": {
+    "title": "Herramientas de IA",
+    "description": "Tus herramientas para ideas, textos y la preparación del rodaje.",
+    "genieDescription": "Comenta ideas, prepara textos y encuentra las secciones adecuadas en CineGenius.",
+    "planned": "En desarrollo",
+    "roomScanTitle": "Escáner nativo de habitaciones y planos",
+    "roomScanDescription": "Escanea habitaciones directamente con la app y crea planos para tu proyecto. Esta función aún no está disponible y requiere un dispositivo compatible.",
+    "noticeFirst": "Cierra primero el aviso de cookies. Después podrás abrir Genie."
   }
 }

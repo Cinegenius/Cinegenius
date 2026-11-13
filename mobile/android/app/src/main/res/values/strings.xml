@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">CineGenius Preview</string>
+    <string name="title_activity_main">CineGenius Preview</string>
+    <string name="package_name">co.cinegenius.app.preview</string>
+    <string name="custom_url_scheme">co.cinegenius.app.preview</string>
+</resources>

@@ -1,5 +1,6 @@
 {
   "nav": {
+    "ai": "KI",
     "adminArea": "Adminbereich",
     "locations": "Locations",
     "crew": "Crew",
@@ -252,6 +253,7 @@
     "translationUnavailable": "Text derzeit nicht verfügbar."
   },
   "home": {
+    "railPage": "Ansicht {page} von {total}",
     "newsShortcut": "News",
     "newsShortcutDescription": "Aktuelles aus der Branche.",
     "badgeHero": "Film · Foto · Content · Werbung",
@@ -7730,5 +7732,19 @@
     "hideHelp": "Die Nachricht wird nur in deiner Ansicht ausgeblendet. Andere Mitglieder sehen sie weiterhin.",
     "unknown": "Name nicht verfügbar",
     "availablePlaces": "Noch freie Plätze: {count}"
+  },
+  "MobilePreview": {
+    "unavailableTitle": "CineGenius ist gerade nicht erreichbar",
+    "unavailableDescription": "Prüfe deine Internetverbindung und versuche es erneut. Bereits bestätigte Speicherungen bleiben erhalten. Noch nicht gespeicherte Eingaben oder laufende Uploads können fehlen.",
+    "retry": "Erneut versuchen"
+  },
+  "AiTools": {
+    "title": "KI-Werkzeuge",
+    "description": "Deine Werkzeuge für Ideen, Texte und die Vorbereitung am Set.",
+    "genieDescription": "Ideen besprechen, Texte vorbereiten und passende Bereiche auf CineGenius finden.",
+    "planned": "In Vorbereitung",
+    "roomScanTitle": "Nativer Raumscanner & Grundrisse",
+    "roomScanDescription": "Räume direkt mit der App erfassen und Grundrisse für dein Projekt erstellen. Diese Funktion ist noch nicht verfügbar und benötigt ein unterstütztes Gerät.",
+    "noticeFirst": "Bitte schließe zuerst den Cookie-Hinweis. Danach kannst du Genie öffnen."
   }
 }

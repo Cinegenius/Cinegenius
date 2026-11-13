@@ -1,5 +1,6 @@
 {
   "nav": {
+    "ai": "AI",
     "adminArea": "Beheer",
     "locations": "Locaties",
     "crew": "Crew",
@@ -252,6 +253,7 @@
     "translationUnavailable": "Tekst momenteel niet beschikbaar."
   },
   "home": {
+    "railPage": "Weergave {page} van {total}",
     "newsShortcut": "Nieuws",
     "newsShortcutDescription": "Het laatste nieuws uit de sector.",
     "badgeHero": "Film · Foto · Content · Reclame",
@@ -7730,5 +7732,19 @@
     "hideHelp": "Het bericht wordt alleen voor jou verborgen. Andere leden kunnen het nog zien.",
     "unknown": "Naam niet beschikbaar",
     "availablePlaces": "Nog beschikbare plaatsen: {count}"
+  },
+  "MobilePreview": {
+    "unavailableTitle": "CineGenius is momenteel niet bereikbaar",
+    "unavailableDescription": "Controleer je internetverbinding en probeer het opnieuw. Bevestigde opgeslagen gegevens blijven behouden. Niet-opgeslagen invoer of lopende uploads kunnen ontbreken.",
+    "retry": "Opnieuw proberen"
+  },
+  "AiTools": {
+    "title": "AI-tools",
+    "description": "Je tools voor ideeën, teksten en voorbereiding op de set.",
+    "genieDescription": "Bespreek ideeën, bereid teksten voor en vind de juiste onderdelen op CineGenius.",
+    "planned": "In ontwikkeling",
+    "roomScanTitle": "Native ruimtescanner en plattegronden",
+    "roomScanDescription": "Scan ruimtes rechtstreeks met de app en maak plattegronden voor je project. Deze functie is nog niet beschikbaar en vereist een ondersteund apparaat.",
+    "noticeFirst": "Sluit eerst de cookiemelding. Daarna kun je Genie openen."
   }
 }

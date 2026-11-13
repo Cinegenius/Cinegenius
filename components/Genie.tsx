@@ -55,8 +55,9 @@ function messageChatOpen() {
   return document.body.dataset.messagesChatOpen === "true";
 }
 
-function AvailableGenie({ memoryScope }: { memoryScope: string | null }) {
+function AvailableGenie({ memoryScope, mode }: { memoryScope: string | null; mode: "floating" | "tool" }) {
   const t = useTranslations("Genie");
+  const tools = useTranslations("AiTools");
   const pathname = usePathname();
   const chatOpen = useSyncExternalStore(subscribeToMessageChat, messageChatOpen, () => false);
   const hideLauncher = pathname === "/messages" && chatOpen;
@@ -159,7 +160,7 @@ function AvailableGenie({ memoryScope }: { memoryScope: string | null }) {
         <button
           ref={launcher}
           type="button"
-          className={styles.launcher}
+          className={mode === "tool" ? styles.toolLauncher : styles.launcher}
           aria-label={t("open")}
           aria-controls={hasOpened ? `${id}-panel` : undefined}
           aria-expanded={false}
@@ -167,7 +168,7 @@ function AvailableGenie({ memoryScope }: { memoryScope: string | null }) {
           onClick={() => { setHasOpened(true); setOpen(true); }}
         >
           <GenieMark />
-          <span>{t("name")}</span>
+          {mode === "tool" ? <span className={styles.toolCopy}><strong>{t("name")}</strong><span>{tools("genieDescription")}</span></span> : <span>{t("name")}</span>}
         </button>
       )}
       {hasOpened && (
@@ -198,7 +199,10 @@ function AvailableGenie({ memoryScope }: { memoryScope: string | null }) {
   );
 }
 
-export default function Genie() {
+export default function Genie({ mode = "floating" }: { mode?: "floating" | "tool" }) {
+  const pathname = usePathname();
+  const t = useTranslations("Genie");
+  const tools = useTranslations("AiTools");
   const { isLoaded, session } = useSession();
   const memoryScope = session?.id ?? null;
   const cookieVisible = useSyncExternalStore(subscribeToCookieNotice, cookieNoticeVisible, () => true);
@@ -212,5 +216,10 @@ export default function Genie() {
     }
   }, [isLoaded, memoryScope]);
   // Unmounting also aborts and clears the chat if the cookie notice returns.
-  return !isLoaded || cookieVisible ? null : <AvailableGenie key={memoryScope ?? "guest"} memoryScope={memoryScope} />;
+  const replacedByTool = mode === "floating" && (pathname === "/tools" || pathname.startsWith("/tools/"));
+  if (mode === "tool" && (!isLoaded || cookieVisible)) return <div className={styles.toolLauncher}>
+    <GenieMark />
+    <div className={styles.toolCopy}><strong>{t("name")}</strong><span>{tools("genieDescription")}</span><span role="status">{isLoaded ? tools("noticeFirst") : t("loading")}</span></div>
+  </div>;
+  return !isLoaded || cookieVisible || replacedByTool ? null : <AvailableGenie key={memoryScope ?? "guest"} memoryScope={memoryScope} mode={mode} />;
 }

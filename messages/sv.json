@@ -1,5 +1,6 @@
 {
   "nav": {
+    "ai": "AI",
     "adminArea": "Administration",
     "locations": "Inspelningsplatser",
     "crew": "Filmteam",
@@ -252,6 +253,7 @@
     "translationUnavailable": "Texten är inte tillgänglig just nu."
   },
   "home": {
+    "railPage": "Vy {page} av {total}",
     "newsShortcut": "Nyheter",
     "newsShortcutDescription": "Det senaste från branschen.",
     "badgeHero": "Film · Foto · Innehåll · Reklam",
@@ -7730,5 +7732,19 @@
     "hideHelp": "Meddelandet döljs bara i din vy. Andra medlemmar kan fortfarande se det.",
     "unknown": "Namnet är inte tillgängligt",
     "availablePlaces": "Lediga platser: {count}"
+  },
+  "MobilePreview": {
+    "unavailableTitle": "CineGenius är inte tillgängligt just nu",
+    "unavailableDescription": "Kontrollera din internetanslutning och försök igen. Bekräftade sparningar finns kvar. Osparade uppgifter eller pågående uppladdningar kan saknas.",
+    "retry": "Försök igen"
+  },
+  "AiTools": {
+    "title": "AI-verktyg",
+    "description": "Dina verktyg för idéer, texter och förberedelser på inspelningsplatsen.",
+    "genieDescription": "Diskutera idéer, förbered texter och hitta rätt delar av CineGenius.",
+    "planned": "Under utveckling",
+    "roomScanTitle": "Inbyggd rumsskanner och planritningar",
+    "roomScanDescription": "Skanna rum direkt i appen och skapa planritningar för ditt projekt. Funktionen är ännu inte tillgänglig och kräver en enhet som stöds.",
+    "noticeFirst": "Stäng först cookiemeddelandet. Sedan kan du öppna Genie."
   }
 }

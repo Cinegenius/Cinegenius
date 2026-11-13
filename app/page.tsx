@@ -204,7 +204,7 @@ async function HomeLocations({ dataPromise }: { dataPromise: HomeDataPromise }) 
   if (!data?.liveLocations.length) return null;
   return <section className="min-w-0" aria-labelledby="home-locations-title">
     <div className="mb-3 flex flex-wrap items-center justify-between gap-x-3"><h2 id="home-locations-title" className="font-display text-xl font-bold text-text-primary sm:text-2xl">{t("locationsTitle")}</h2><Link href="/locations" className="inline-flex min-h-11 items-center gap-1 text-xs font-medium text-gold hover:text-gold-light sm:text-sm">{tc("viewAll")} <ArrowRight size={13} /></Link></div>
-    <HomeCardRail id="home-locations-rail" labelledBy="home-locations-title" hint={t("locationScrollHint")} previousLabel={t("railPrevious")} nextLabel={t("railNext")} itemCount={data.liveLocations.length} variant="location" wide>
+    <HomeCardRail id="home-locations-rail" labelledBy="home-locations-title" hint={t("locationScrollHint")} itemCount={data.liveLocations.length} variant="location" wide>
       {data.liveLocations.map(loc => <Link key={loc.id} href={`/locations/${loc.id}`} className="group relative isolate block aspect-[4/3] min-h-11 min-w-0 overflow-hidden rounded-2xl border border-border bg-bg-elevated sm:aspect-[3/2]">
         {loc.image ? <Image src={loc.image} alt={loc.title} fill mediaSize="thumbnail" className="object-cover transition-transform duration-300 motion-safe:group-hover:scale-105" style={{ objectPosition: loc.focalPoint ? `${loc.focalPoint.x}% ${loc.focalPoint.y}%` : "50% 50%" }} sizes="(min-width:1024px) 33vw,(min-width:640px) 60vw,72vw" /> : <div className="absolute inset-0 flex items-center justify-center text-text-muted/30"><MapPin size={32} aria-hidden="true" /></div>}
         <div className="absolute inset-0 bg-gradient-to-t from-bg-primary via-bg-primary/30 to-transparent" />
@@ -276,7 +276,7 @@ async function HomeRecommendations({ dataPromise }: { dataPromise: HomeDataPromi
     </section>}
     {newCrew.length > 0 && <section className="min-w-0" aria-labelledby="home-crew-title">
       <div className="mb-3 flex flex-wrap items-center justify-between gap-x-3"><h2 id="home-crew-title" className="font-display text-xl font-bold text-text-primary sm:text-2xl">{t("newCrewTitle")}</h2><Link href="/creators" className="inline-flex min-h-11 items-center gap-1 text-xs font-medium text-gold hover:text-gold-light sm:text-sm">{tc("viewAll")} <ArrowRight size={13} /></Link></div>
-      <HomeCardRail id="home-crew-rail" labelledBy="home-crew-title" hint={t("crewScrollHint")} previousLabel={t("railPrevious")} nextLabel={t("railNext")} itemCount={newCrew.length} variant="crew" wide>
+      <HomeCardRail id="home-crew-rail" labelledBy="home-crew-title" hint={t("crewScrollHint")} itemCount={newCrew.length} variant="crew" wide>
         {newCrew.map((c) => (
                 <Link
                   key={c.id}

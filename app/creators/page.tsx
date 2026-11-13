@@ -9,6 +9,7 @@ import { getPrivateProfileIds } from "@/lib/trust";
 import CreatorsContent, { type ServerCreator } from "./CreatorsContent";
 import { primaryOccupationForPositions, occupationReference } from "@/lib/primary-occupation";
 import PageHeader from "@/components/PageHeader";
+import DirectoryPage from "@/components/DirectoryPage";
 import { PROFILE_CATEGORY_MAP, PROFILE_TYPE_LABELS, type ProfileType } from "@/lib/profile-types";
 import { getProfileDisplayPositions, normalizeProfileTypes } from "@/lib/profile-display";
 import { getTranslations, getLocale } from "next-intl/server";
@@ -260,8 +261,9 @@ export default async function CreatorsPage({
   ];
 
   return (
-    <div className="min-h-screen bg-bg-primary">
+    <DirectoryPage area="crew">
       <PageHeader
+        withBackdrop={false}
         badge={uiText("nav.crew")}
         title={t("heroTitle")}
         titleHighlight={t("heroTitleHighlight")}
@@ -280,6 +282,6 @@ export default async function CreatorsPage({
           sort: Array.isArray(params.sort) ? params.sort[0] ?? "" : params.sort ?? "",
         }}
       />
-    </div>
+    </DirectoryPage>
   );
 }

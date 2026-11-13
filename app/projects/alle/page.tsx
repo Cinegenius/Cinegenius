@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { db } from "@/lib/db";
 import ProjectsContent from "@/app/projects/ProjectsContent";
 import PageHeader from "@/components/PageHeader";
+import DirectoryPage from "@/components/DirectoryPage";
 import { getTranslations } from "next-intl/server";
 import { getTranslations as getMetadataTranslations } from "next-intl/server";
 
@@ -51,8 +52,9 @@ export default async function AlleProjectsPage() {
   );
 
   return (
-    <div className="min-h-screen bg-bg-primary">
+    <DirectoryPage area="projects">
       <PageHeader
+        withBackdrop={false}
         badge={uiText("common.allProjects")}
         title={uiText("Ui.text_1a37db69ee45a0")}
         titleHighlight="& Produktionen"
@@ -63,6 +65,6 @@ export default async function AlleProjectsPage() {
       <div className="site-container py-4 sm:py-8">
         <ProjectsContent projects={projectsWithCount} />
       </div>
-    </div>
+    </DirectoryPage>
   );
 }

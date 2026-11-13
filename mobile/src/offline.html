@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="color-scheme" content="dark">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; connect-src 'self'; img-src 'self'; base-uri 'none'; form-action 'none'">
+  <title>CineGenius</title>
+  <link rel="stylesheet" href="offline.css">
+  <script type="module" src="offline.js"></script>
+</head>
+<body>
+  <main>
+    <div class="brand" aria-label="CineGenius">
+      <svg aria-hidden="true" viewBox="0 0 32 32"><path d="M9 6 23 16 9 26"/></svg>
+      <span>Cine<span class="accent">Genius</span></span>
+    </div>
+    <section aria-labelledby="unavailableTitle">
+      <h1 id="unavailableTitle">{{unavailableTitle}}</h1>
+      <p id="unavailableDescription">{{unavailableDescription}}</p>
+      <a id="retry" href="{{url}}">{{retry}}</a>
+    </section>
+  </main>
+</body>
+</html>

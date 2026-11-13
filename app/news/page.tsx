@@ -3,6 +3,7 @@ import Form from "next/form";
 import { Search } from "lucide-react";
 import { getTranslations, getLocale } from "next-intl/server";
 import PageHeader from "@/components/PageHeader";
+import DirectoryPage from "@/components/DirectoryPage";
 import Image from "@/components/MediaImage";
 import { approvedEntries } from "@/lib/organization-data";
 import { ORGANIZATION_ENTRY_TYPES, ORGANIZATION_TOPICS, isOrganizationEntryType, isOrganizationTopic } from "@/lib/organization-taxonomy";
@@ -27,8 +28,8 @@ export default async function NewsPage({ searchParams }: { searchParams: Promise
     return `/news?${query}`;
   };
 
-  return <main className="min-h-screen bg-bg-primary">
-    <PageHeader badge={t("eyebrow")} title={t("newsTitle")} description={t("newsDescription")} />
+  return <DirectoryPage area="news"><main className="min-h-screen">
+    <PageHeader withBackdrop={false} badge={t("eyebrow")} title={t("newsTitle")} description={t("newsDescription")} />
     <section className="site-container py-5 pb-28 sm:py-7 sm:pb-28 xl:pb-10">
       <Form action="/news" scroll={false} className="browse-toolbar mb-5 grid grid-cols-2 items-end gap-3 pb-5 xl:grid-cols-[minmax(0,2fr)_minmax(0,1fr)_minmax(0,1fr)_auto]" key={`${filters.q}:${filters.type}:${filters.topic}`}>
         <div className="col-span-2 min-w-0 xl:col-span-1">
@@ -75,5 +76,5 @@ export default async function NewsPage({ searchParams }: { searchParams: Promise
         {hasMore && <Link className="min-h-11 rounded-xl border border-border px-4 py-3 text-text-secondary" href={href({ page: page + 1 })}>{t("next")} →</Link>}
       </nav>
     </section>
-  </main>;
+  </main></DirectoryPage>;
 }

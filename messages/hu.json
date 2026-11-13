@@ -1,5 +1,6 @@
 {
   "nav": {
+    "ai": "MI",
     "adminArea": "Adminisztráció",
     "locations": "Helyszínek",
     "crew": "Stáb",
@@ -252,6 +253,7 @@
     "translationUnavailable": "A szöveg jelenleg nem érhető el."
   },
   "home": {
+    "railPage": "{page}. nézet, összesen {total}",
     "newsShortcut": "Hírek",
     "newsShortcutDescription": "Friss hírek a szakmából.",
     "badgeHero": "Film · Fotó · Tartalom · Reklám",
@@ -7730,5 +7732,19 @@
     "hideHelp": "Az üzenet csak a te nézetedből tűnik el. A többi tag továbbra is láthatja.",
     "unknown": "A név nem érhető el",
     "availablePlaces": "Szabad helyek: {count}"
+  },
+  "MobilePreview": {
+    "unavailableTitle": "A CineGenius jelenleg nem érhető el",
+    "unavailableDescription": "Ellenőrizd az internetkapcsolatot, és próbáld újra. A visszaigazolt mentések megmaradnak. A nem mentett adatok vagy a folyamatban lévő feltöltések hiányozhatnak.",
+    "retry": "Újrapróbálkozás"
+  },
+  "AiTools": {
+    "title": "MI-eszközök",
+    "description": "Eszközeid ötletekhez, szövegekhez és a forgatás előkészítéséhez.",
+    "genieDescription": "Beszélj meg ötleteket, készíts szövegeket, és találd meg a megfelelő részeket a CineGeniuson.",
+    "planned": "Fejlesztés alatt",
+    "roomScanTitle": "Natív szobaszkenner és alaprajzok",
+    "roomScanDescription": "Szkennelj helyiségeket közvetlenül az alkalmazással, és készíts alaprajzokat a projektedhez. Ez a funkció még nem érhető el, és támogatott készüléket igényel.",
+    "noticeFirst": "Először zárd be a sütikről szóló tájékoztatót. Ezután megnyithatod Genie-t."
   }
 }

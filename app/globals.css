@@ -1,5 +1,12 @@
 @import "tailwindcss";
 
+/* The approved directory background keeps the homepage's darkness. A small crop
+   also makes left/right framing visible on wide screens without changing home. */
+.directory-page-backdrop img {
+  transform: scale(1.08);
+  transform-origin: var(--directory-image-position, center 42%);
+}
+
 /* ═══════════════════════════════════════════════════════════════════════════
    CINEGENIUS — Design Tokens
    Cinematic · Premium · Minimal

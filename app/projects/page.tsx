@@ -5,7 +5,8 @@ import { getTranslations } from "next-intl/server";
 import {
   Film, Tv, Camera, Zap, Music, FileVideo, Building2, Radio, ArrowRight,
 } from "lucide-react";
-import PageHeader, { PageBackdrop, PROJECTS_BACKDROP_IMAGE } from "@/components/PageHeader";
+import PageHeader from "@/components/PageHeader";
+import DirectoryPage from "@/components/DirectoryPage";
 import { getTranslations as getMetadataTranslations } from "next-intl/server";
 
 export const revalidate = 300;
@@ -38,8 +39,7 @@ export default async function ProjectsPage() {
     desc: t(c.descKey),
   }));
   return (
-    <div className="relative isolate min-h-screen overflow-hidden bg-bg-primary">
-      <PageBackdrop image={PROJECTS_BACKDROP_IMAGE} className="absolute inset-0 z-0" />
+    <DirectoryPage area="projects">
       <PageHeader
         badge={t("badge")}
         title={t("titleLead")}
@@ -102,6 +102,6 @@ export default async function ProjectsPage() {
           ))}
         </div>
       </div>
-    </div>
+    </DirectoryPage>
   );
 }

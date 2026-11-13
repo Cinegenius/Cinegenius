@@ -57,12 +57,12 @@ if (JSON.stringify(primaryShape) !== JSON.stringify(expectedPrimary)) {
   failures.push("Primary navigation must keep Crew, Locations, Marketplace, Jobs, Companies, News and More in the shared order");
 }
 const expectedMobile = [
-  ["crew", "/creators"], ["marketplace", "/props"], ["news", "/news"],
+  ["crew", "/creators"], ["marketplace", "/props"], ["ai", "/tools"],
   ["locations", "/locations"], ["companies", "/companies"],
 ];
 const mobileShape = navigation.MOBILE_NAV_ITEMS.map(({ id, href }) => [id, href]);
 if (JSON.stringify(mobileShape) !== JSON.stringify(expectedMobile)) {
-  failures.push("Mobile navigation must keep Crew, Marketplace, News, Locations and Companies; messages and account belong in the header");
+  failures.push("Mobile navigation must keep Crew, Marketplace, AI, Locations and Companies; messages and account belong in the header");
 }
 for (const [name, source, model] of [["Header", navbar, "PRIMARY_NAV_ITEMS"], ["Mobile", bottomNav, "MOBILE_NAV_ITEMS"]]) {
   if (!source.includes(model) || !source.includes("@/lib/site-navigation")) {

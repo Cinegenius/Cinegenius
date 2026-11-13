@@ -210,7 +210,7 @@ export default function ProjectsContent({ projects: allProjects }: { projects: P
   ];
 
   return (
-    <div className="min-h-screen bg-bg-primary mobile-bottom-nav-clear">
+    <div className="min-h-screen mobile-bottom-nav-clear">
 
       <MobileBrowseControls
         query={query}

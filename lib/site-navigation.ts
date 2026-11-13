@@ -1,7 +1,7 @@
 export const SITE_NAV_MENU_ID = "site-navigation-menu";
 export const SITE_NAV_SIGN_OUT_EVENT = "cinegenius:request-sign-out";
 
-export type SiteNavigationIcon = "crew" | "locations" | "messages" | "account" | "more" | "home" | "marketplace" | "jobs" | "companies" | "projects" | "news" | "organizations" | "profile" | "offers" | "saved" | "contacts" | "bookings" | "notifications" | "payments" | "settings" | "analytics" | "security" | "help" | "support";
+export type SiteNavigationIcon = "crew" | "locations" | "messages" | "account" | "more" | "home" | "marketplace" | "jobs" | "companies" | "projects" | "news" | "ai" | "organizations" | "profile" | "offers" | "saved" | "contacts" | "bookings" | "notifications" | "payments" | "settings" | "analytics" | "security" | "help" | "support";
 export type PrimaryNavigationId = "crew" | "locations" | "marketplace" | "jobs" | "companies" | "messages" | "news" | "account" | "more";
 type NavigationLink = { readonly id: string; readonly href: string; readonly key: string; readonly icon: SiteNavigationIcon };
 type PrimaryNavigationItem = { readonly id: PrimaryNavigationId; readonly key: string; readonly icon: SiteNavigationIcon } & ({ readonly kind: "link"; readonly href: string } | { readonly kind: "menu"; readonly href?: never });
@@ -27,12 +27,13 @@ export const BROWSE_NAV_ITEMS: readonly NavigationLink[] = [
   { id: "news", href: "/news", key: "news", icon: "news" },
   { id: "organizations", href: "/organizations", key: "organizations", icon: "organizations" },
   { id: "projects", href: "/projects", key: "projects", icon: "projects" },
+  { id: "ai", href: "/tools", key: "ai", icon: "ai" },
 ];
 
 export const MOBILE_NAV_ITEMS: readonly NavigationLink[] = [
   { id: "crew", href: "/creators", key: "crew", icon: "crew" },
   { id: "marketplace", href: "/props", key: "marketplace", icon: "marketplace" },
-  { id: "news", href: "/news", key: "news", icon: "news" },
+  { id: "ai", href: "/tools", key: "ai", icon: "ai" },
   { id: "locations", href: "/locations", key: "locations", icon: "locations" },
   { id: "companies", href: "/companies", key: "companies", icon: "companies" },
 ];
@@ -74,6 +75,7 @@ export function activeNavigationId(pathname: string): PrimaryNavigationId {
 }
 
 export function activeMobileNavigationId(pathname: string) {
+  if (routeMatches(pathname, "/tools")) return "ai";
   if (routeMatches(pathname, "/jobs")) return "more";
   return activeNavigationId(pathname);
 }

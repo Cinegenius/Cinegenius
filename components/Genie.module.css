@@ -21,6 +21,16 @@
   font-weight: 600;
 }
 
+.toolLauncher { display: flex; align-items: center; gap: 16px; width: 100%; min-height: 88px; padding: 20px; border: 1px solid var(--color-border-light); border-radius: 16px; background: var(--color-bg-secondary); color: var(--color-text-primary); text-align: left; cursor: pointer; }
+.toolLauncher:hover { border-color: var(--color-gold); }
+.toolLauncher:focus-visible { outline: 2px solid var(--color-gold); outline-offset: 3px; }
+.toolCopy { display: flex; min-width: 0; flex-direction: column; gap: 6px; }
+.toolCopy strong { font-size: 17px; }
+.toolCopy > span { color: var(--color-text-secondary); font-size: 14px; line-height: 1.5; overflow-wrap: anywhere; }
+
+/* The mobile KI destination owns tool discovery; avoid a second floating entry. */
+@media (max-width: 1023px) { .launcher { display: none; } }
+
 .mark { display: block; width: 26px; height: 26px; flex: 0 0 auto; color: var(--color-gold); }
 .brandIcon { display: inline-flex; width: 28px; height: 28px; flex: 0 0 28px; align-items: center; justify-content: center; }
 .launcher:hover { border-color: var(--color-gold); }

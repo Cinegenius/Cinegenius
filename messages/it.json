@@ -1,5 +1,6 @@
 {
   "nav": {
+    "ai": "IA",
     "adminArea": "Area amministrativa",
     "locations": "Location",
     "crew": "Crew",
@@ -252,6 +253,7 @@
     "translationUnavailable": "Testo non disponibile."
   },
   "home": {
+    "railPage": "Vista {page} di {total}",
     "newsShortcut": "Notizie",
     "newsShortcutDescription": "Le ultime novità del settore.",
     "badgeHero": "Film · Foto · Contenuto · Pubblicità",
@@ -7730,5 +7732,19 @@
     "hideHelp": "Il messaggio sarà nascosto solo nella tua vista. Gli altri membri potranno ancora vederlo.",
     "unknown": "Nome non disponibile",
     "availablePlaces": "Posti disponibili: {count}"
+  },
+  "MobilePreview": {
+    "unavailableTitle": "CineGenius non è al momento raggiungibile",
+    "unavailableDescription": "Controlla la connessione a internet e riprova. I salvataggi confermati vengono conservati. I dati non salvati o i caricamenti in corso potrebbero non essere disponibili.",
+    "retry": "Riprova"
+  },
+  "AiTools": {
+    "title": "Strumenti IA",
+    "description": "I tuoi strumenti per idee, testi e preparazione sul set.",
+    "genieDescription": "Discuti idee, prepara testi e trova le sezioni giuste su CineGenius.",
+    "planned": "In preparazione",
+    "roomScanTitle": "Scanner nativo di ambienti e planimetrie",
+    "roomScanDescription": "Scansiona gli ambienti direttamente con l’app e crea planimetrie per il tuo progetto. Questa funzione non è ancora disponibile e richiede un dispositivo compatibile.",
+    "noticeFirst": "Chiudi prima l’avviso sui cookie. Poi potrai aprire Genie."
   }
 }

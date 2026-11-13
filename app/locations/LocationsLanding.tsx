@@ -7,6 +7,7 @@ import dynamic from "next/dynamic";
 import { hasCoordinates, inMapBounds, locationDistanceKm, type MapBounds } from "@/lib/location-map";
 import { Search, Map, LayoutList, MapPin, Star, ArrowRight, Plus, ChevronDown, X, Navigation, Share2 } from "lucide-react";
 import PageHeader from "@/components/PageHeader";
+import DirectoryPage from "@/components/DirectoryPage";
 import FavoriteButton from "@/components/FavoriteButton";
 import EmptyState from "@/components/EmptyState";
 import PlaceFilters, { EMPTY_PLACE_FILTERS, type PlaceFilterValue } from "@/components/PlaceFilters";
@@ -153,8 +154,9 @@ export default function LocationsLanding({ allLocations, totalCount, initialFilt
   }
 
   return (
-    <div className="min-h-screen bg-bg-primary">
+    <DirectoryPage area="locations">
       <PageHeader
+        withBackdrop={false}
         optimizeImage
         badge={t("landingBadge")}
         title={t("heroTitle")}
@@ -292,6 +294,6 @@ export default function LocationsLanding({ allLocations, totalCount, initialFilt
       <button type="button" onClick={() => chooseView(effectiveView === "map" ? "list" : "map")} className="fixed bottom-[calc(76px+env(safe-area-inset-bottom,0px))] left-1/2 z-[60] inline-flex min-h-12 -translate-x-1/2 items-center gap-2 rounded-full border border-border bg-text-primary px-5 text-sm font-semibold text-bg-primary shadow-xl xl:hidden">
         {effectiveView === "map" ? <LayoutList size={18} aria-hidden="true" /> : <Map size={18} aria-hidden="true" />}{t(effectiveView === "map" ? "viewList" : "viewMap")}
       </button>
-    </div>
+    </DirectoryPage>
   );
 }

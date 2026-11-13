@@ -2,6 +2,7 @@ import { projectTypeLabel } from "@/lib/project-type-labels";
 import { publicProjectMedia } from "@/lib/project-media-rights";
 import { db } from "@/lib/db";
 import Image from "@/components/MediaImage";
+import DirectoryPage from "@/components/DirectoryPage";
 import Link from "next/link";
 import { ArrowLeft, ArrowRight, Clapperboard } from "lucide-react";
 import { getTranslations } from "next-intl/server";
@@ -53,27 +54,9 @@ export default async function ProjectCategoryPage({ config }: { config: Category
   );
 
   return (
-    <div className="pt-16 min-h-screen">
-
-      {/* ── Fixed background image ── */}
-      <div className="fixed inset-0 z-0 pointer-events-none">
-        <Image
-          src={config.image}
-          alt=""
-          fill
-          priority
-          unoptimized
-          className="object-cover"
-          style={{ objectPosition: config.imagePosition ?? "center center" }}
-          sizes="100vw"
-        />
-        {/* Dark overlay — heavier at bottom so cards are readable */}
-        <div className="absolute inset-0 bg-bg-primary/55" />
-        <div className="absolute inset-0 bg-gradient-to-b from-bg-primary/30 via-transparent to-bg-primary/80" />
-      </div>
-
+    <DirectoryPage area="projects">
       {/* ── Scrollable content ── */}
-      <div className="relative z-10">
+      <div className="relative z-10 pt-16">
 
         {/* ── Compact header ── */}
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 pb-6">
@@ -160,6 +143,6 @@ export default async function ProjectCategoryPage({ config }: { config: Category
           )}
         </div>
       </div>
-    </div>
+    </DirectoryPage>
   );
 }
