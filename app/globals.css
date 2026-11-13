@@ -843,3 +843,40 @@ input:-webkit-autofill:active {
 
 /* Leave a readable strip for the map credits below open previews. */
 .location-map .leaflet-control-attribution { max-width: 100%; font-size: 10px; line-height: 16px; }
+
+/* Shared Crew and marketplace map: bounded height leaves page navigation reachable. */
+.directory-map-frame { height: clamp(20rem, 60dvh, 42rem); min-width: 0; }
+
+/* One brand treatment for all mobile directory map actions, alongside Genie. */
+.browse-map-toggle {
+  position: fixed;
+  left: max(1rem, env(safe-area-inset-left, 0px));
+  bottom: calc(var(--mobile-nav-clearance) + .75rem);
+  z-index: 40;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: .5rem;
+  min-width: 44px;
+  min-height: 48px;
+  max-width: calc(100% - 14rem);
+  padding: .625rem 1rem;
+  border: 1px solid var(--color-border-light);
+  border-radius: 999px;
+  background: var(--color-bg-secondary);
+  color: var(--color-text-secondary);
+  box-shadow: 0 2px 8px #0003;
+  font-size: .8125rem;
+  font-weight: 500;
+}
+.browse-map-toggle:hover { border-color: var(--color-text-muted); background: var(--color-bg-elevated); }
+.browse-map-toggle:focus-visible { outline: 2px solid var(--color-gold); outline-offset: 3px; }
+@media (max-width: 374px) {
+  .browse-map-toggle { flex-direction: column; gap: .125rem; padding: .5rem .75rem; font-size: .75rem; line-height: 1.1; }
+}
+@media (min-width: 1024px) {
+  .browse-map-toggle { bottom: max(1.25rem, env(safe-area-inset-bottom, 0px)); }
+}
+@media (min-width: 1280px) {
+  .browse-map-toggle { display: none; }
+}

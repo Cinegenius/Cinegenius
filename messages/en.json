@@ -7739,5 +7739,20 @@
     "hideHelp": "This message will only be hidden from your view. Other members can still see it.",
     "unknown": "Name unavailable",
     "availablePlaces": "Places remaining: {count}"
+  },
+  "directoryMap": {
+    "crew": "Crew on the map",
+    "marketplace": "Marketplace on the map",
+    "cityNotice": "Markers show the approximate location within the stated city.",
+    "mapped": "Results in this map area: {count, number}",
+    "empty": "No mapped places in this map area.",
+    "unmapped": "Without a map position: {count, number}. These entries remain available in list view.",
+    "source": "Place data: <provider>GeoNames</provider> (<license>CC BY 4.0</license>)",
+    "profile": "View profile",
+    "offer": "View offer",
+    "zoomIn": "Zoom in",
+    "zoomOut": "Zoom out",
+    "cluster": "{count} results – select to zoom in",
+    "error": "The map could not be loaded. List view is still available."
   }
 }

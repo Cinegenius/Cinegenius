@@ -25,7 +25,7 @@ export function readMarketplaceBrowseState(params: Pick<URLSearchParams, "get">)
     query: params.get("q") ?? "",
     offer: (offer === "miete" || offer === "kauf" ? offer : "alle") as MarketplaceOfferFilter,
     sort: (sort === "price-asc" || sort === "price-desc" ? sort : "featured") as MarketplaceSort,
-    view: params.get("view") === "list" ? "list" as const : "grid" as const,
+    view: params.get("view") === "map" ? "map" as const : params.get("view") === "list" ? "list" as const : "grid" as const,
   };
 }
 
@@ -44,6 +44,7 @@ export function marketplaceCardData(row: Record<string, unknown>) {
   const focal = meta.focal_point;
   return {
     ...row,
+    lat: typeof row.lat === "number" ? row.lat : null, lng: typeof row.lng === "number" ? row.lng : null,
     id: String(row.id), title: String(row.title ?? ""), type: String(row.type ?? "prop"),
     category: String(row.category ?? ""), location: String(row.city ?? ""),
     dailyRate: Number(row.price) || 0, image: String(row.image_url ?? ""),

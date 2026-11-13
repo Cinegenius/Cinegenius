@@ -7739,5 +7739,20 @@
     "hideHelp": "El mensaje solo se ocultará en tu vista. Los demás miembros podrán seguir viéndolo.",
     "unknown": "Nombre no disponible",
     "availablePlaces": "Plazas disponibles: {count}"
+  },
+  "directoryMap": {
+    "crew": "Equipo en el mapa",
+    "marketplace": "Mercado en el mapa",
+    "cityNotice": "Los marcadores muestran la ubicación aproximada en la localidad indicada.",
+    "mapped": "Resultados en esta zona del mapa: {count, number}",
+    "empty": "No hay lugares asignados en esta zona del mapa.",
+    "unmapped": "Sin posición en el mapa: {count, number}. Estas entradas siguen disponibles en la vista de lista.",
+    "source": "Datos de lugares: <provider>GeoNames</provider> (<license>CC BY 4.0</license>)",
+    "profile": "Ver perfil",
+    "offer": "Ver oferta",
+    "zoomIn": "Acercar",
+    "zoomOut": "Alejar",
+    "cluster": "{count} resultados: selecciona para acercar",
+    "error": "No se ha podido cargar el mapa. La vista de lista sigue disponible."
   }
 }

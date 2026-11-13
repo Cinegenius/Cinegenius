@@ -7739,5 +7739,20 @@
     "hideHelp": "Die Nachricht wird nur in deiner Ansicht ausgeblendet. Andere Mitglieder sehen sie weiterhin.",
     "unknown": "Name nicht verfügbar",
     "availablePlaces": "Noch freie Plätze: {count}"
+  },
+  "directoryMap": {
+    "crew": "Crew auf der Karte",
+    "marketplace": "Marktplatz auf der Karte",
+    "cityNotice": "Die Markierungen zeigen die ungefähre Lage im angegebenen Ort.",
+    "mapped": "Treffer im Kartenausschnitt: {count, number}",
+    "empty": "Keine zugeordneten Orte in diesem Kartenausschnitt.",
+    "unmapped": "Ohne Kartenposition: {count, number}. Diese Einträge findest du weiterhin in der Listenansicht.",
+    "source": "Ortsdaten: <provider>GeoNames</provider> (<license>CC BY 4.0</license>)",
+    "profile": "Profil ansehen",
+    "offer": "Angebot ansehen",
+    "zoomIn": "Vergrößern",
+    "zoomOut": "Verkleinern",
+    "cluster": "{count} Treffer – zum Vergrößern auswählen",
+    "error": "Die Karte konnte nicht geladen werden. Die Listenansicht ist weiterhin verfügbar."
   }
 }

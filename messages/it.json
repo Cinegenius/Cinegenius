@@ -7739,5 +7739,20 @@
     "hideHelp": "Il messaggio sarà nascosto solo nella tua vista. Gli altri membri potranno ancora vederlo.",
     "unknown": "Nome non disponibile",
     "availablePlaces": "Posti disponibili: {count}"
+  },
+  "directoryMap": {
+    "crew": "Crew sulla mappa",
+    "marketplace": "Mercato sulla mappa",
+    "cityNotice": "I segnaposto mostrano la posizione approssimativa nella località indicata.",
+    "mapped": "Risultati in questa area della mappa: {count, number}",
+    "empty": "Nessun luogo associato in questa area della mappa.",
+    "unmapped": "Senza posizione sulla mappa: {count, number}. Queste voci restano disponibili nella vista elenco.",
+    "source": "Dati dei luoghi: <provider>GeoNames</provider> (<license>CC BY 4.0</license>)",
+    "profile": "Vedi profilo",
+    "offer": "Vedi offerta",
+    "zoomIn": "Ingrandisci",
+    "zoomOut": "Riduci",
+    "cluster": "{count} risultati: seleziona per ingrandire",
+    "error": "Impossibile caricare la mappa. La vista elenco è ancora disponibile."
   }
 }

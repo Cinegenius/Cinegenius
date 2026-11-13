@@ -7739,5 +7739,20 @@
     "hideHelp": "Meddelandet döljs bara i din vy. Andra medlemmar kan fortfarande se det.",
     "unknown": "Namnet är inte tillgängligt",
     "availablePlaces": "Lediga platser: {count}"
+  },
+  "directoryMap": {
+    "crew": "Filmteam på kartan",
+    "marketplace": "Marknadsplats på kartan",
+    "cityNotice": "Markörerna visar det ungefärliga läget inom den angivna orten.",
+    "mapped": "Träffar i detta kartområde: {count, number}",
+    "empty": "Inga kopplade platser i detta kartområde.",
+    "unmapped": "Utan kartposition: {count, number}. Dessa poster finns fortfarande i listvyn.",
+    "source": "Ortsdata: <provider>GeoNames</provider> (<license>CC BY 4.0</license>)",
+    "profile": "Visa profil",
+    "offer": "Visa erbjudande",
+    "zoomIn": "Zooma in",
+    "zoomOut": "Zooma ut",
+    "cluster": "{count} träffar – välj för att zooma in",
+    "error": "Kartan kunde inte laddas. Listvyn är fortfarande tillgänglig."
   }
 }

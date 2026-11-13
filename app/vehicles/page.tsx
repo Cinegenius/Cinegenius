@@ -1,5 +1,6 @@
 import { getLocale, getTranslations } from "next-intl/server";
 import {placeReadFields} from "@/lib/places/catalog";
+import {publicMapPoint} from "@/lib/places/public-map-point";
 import { db } from "@/lib/db";
 import PropsContent from "@/app/props/PropsContent";
 import PageHeader from "@/components/PageHeader";
@@ -36,6 +37,7 @@ export default async function VehiclesPage() {
   if (!error) rows = (data ?? []).map(row => ({
     ...marketplaceCardData(row),
     ...placeReadFields(String(row.city ?? ""), row, locale),
+    ...publicMapPoint(row),
   }));
   } catch {
     serverError = true;

@@ -1,3 +1,4 @@
+import { publicMapPoint } from "@/lib/places/public-map-point";
 import { cityWriteFields, placeReadFields, placeSearchFilter } from "@/lib/places/catalog";
 import { placeCitySearchAliases } from "@/lib/places/core";
 import { DEPARTMENTS, deptValues, groupValues, marketplaceCategory, marketplaceSearchCategories } from "@/lib/marketplaceCategories";
@@ -120,7 +121,7 @@ export async function GET(req: NextRequest) {
   const {data,error,count}=await query.range(from,to);
   if(error){console.error("[listings GET]",error);return NextResponse.json({error:(await getTranslations("OfferModeration"))("saveError")},{status:503});}
   const priceText=await getTranslations("MarketplaceOffer"),locale=await getLocale();
-  return NextResponse.json({data:(data??[]).map((listing:Record<string,unknown>)=>({...listing,...placeReadFields(String(listing.city??""),listing,locale),priceLabel:listingPriceLabel(Number(listing.price),listing,'/Tag',locale,priceText)})),page,limit,count:count??0},{headers:{"Cache-Control":"private, no-store, max-age=0"}});
+  return NextResponse.json({data:(data??[]).map((listing:Record<string,unknown>)=>({...listing,...placeReadFields(String(listing.city??""),listing,locale),...publicMapPoint(listing),priceLabel:listingPriceLabel(Number(listing.price),listing,'/Tag',locale,priceText)})),page,limit,count:count??0},{headers:{"Cache-Control":"private, no-store, max-age=0"}});
 
 }
 

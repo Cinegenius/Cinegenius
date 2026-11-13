@@ -1,3 +1,4 @@
+import { publicMapPoint } from "@/lib/places/public-map-point";
 import { placeReadFields } from "@/lib/places/catalog";
 import { db } from "@/lib/db";
 import { marketplaceCardData } from "@/lib/marketplace-browse";
@@ -39,6 +40,7 @@ export default async function PropsPage() {
     if (!error) serverListings = (data ?? []).map((row: Record<string, unknown>) => ({
       ...marketplaceCardData(row),
       ...placeReadFields(String(row.city ?? ""), row, locale),
+      ...publicMapPoint(row),
       vendor: t("vendorPrivate"),
     }));
   } catch {

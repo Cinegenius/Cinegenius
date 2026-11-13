@@ -7739,5 +7739,20 @@
     "hideHelp": "Het bericht wordt alleen voor jou verborgen. Andere leden kunnen het nog zien.",
     "unknown": "Naam niet beschikbaar",
     "availablePlaces": "Nog beschikbare plaatsen: {count}"
+  },
+  "directoryMap": {
+    "crew": "Crew op de kaart",
+    "marketplace": "Marktplaats op de kaart",
+    "cityNotice": "Markeringen tonen de globale locatie binnen de opgegeven plaats.",
+    "mapped": "Resultaten in dit kaartgebied: {count, number}",
+    "empty": "Geen gekoppelde plaatsen in dit kaartgebied.",
+    "unmapped": "Zonder kaartpositie: {count, number}. Deze vermeldingen blijven beschikbaar in de lijstweergave.",
+    "source": "Plaatsgegevens: <provider>GeoNames</provider> (<license>CC BY 4.0</license>)",
+    "profile": "Profiel bekijken",
+    "offer": "Aanbod bekijken",
+    "zoomIn": "Inzoomen",
+    "zoomOut": "Uitzoomen",
+    "cluster": "{count} resultaten – selecteer om in te zoomen",
+    "error": "De kaart kon niet worden geladen. De lijstweergave is nog beschikbaar."
   }
 }

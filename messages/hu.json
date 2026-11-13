@@ -7739,5 +7739,20 @@
     "hideHelp": "Az üzenet csak a te nézetedből tűnik el. A többi tag továbbra is láthatja.",
     "unknown": "A név nem érhető el",
     "availablePlaces": "Szabad helyek: {count}"
+  },
+  "directoryMap": {
+    "crew": "Stáb a térképen",
+    "marketplace": "Piactér a térképen",
+    "cityNotice": "A jelölők a megadott településen belüli hozzávetőleges helyet mutatják.",
+    "mapped": "Találatok ezen a térképrészleten: {count, number}",
+    "empty": "Nincsenek hozzárendelt helyek ezen a térképrészleten.",
+    "unmapped": "Térképes hely nélkül: {count, number}. Ezek a bejegyzések továbbra is elérhetők a listanézetben.",
+    "source": "Helyadatok: <provider>GeoNames</provider> (<license>CC BY 4.0</license>)",
+    "profile": "Profil megtekintése",
+    "offer": "Ajánlat megtekintése",
+    "zoomIn": "Nagyítás",
+    "zoomOut": "Kicsinyítés",
+    "cluster": "{count} találat – válaszd ki a nagyításhoz",
+    "error": "A térképet nem sikerült betölteni. A listanézet továbbra is elérhető."
   }
 }
