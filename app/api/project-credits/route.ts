@@ -24,7 +24,7 @@ export async function POST(req: NextRequest) {
   if (!body) return NextResponse.json({ error: tResponse('System.m_0e4698bf4051') }, { status: 400 });
   const { project_id, role, unclaimed_profile_id } = body;
 
-  if (!project_id || !role?.trim()) {
+  if (typeof project_id !== "string" || typeof role !== "string" || !role.trim() || role.length > 500) {
     return NextResponse.json({ error: tResponse('System.m_e646adc1f282') }, { status: 400 });
   }
 
@@ -97,8 +97,8 @@ export async function PATCH(req: NextRequest) {
 
   const body = await req.json().catch(() => null);
   if (!body) return NextResponse.json({ error: tResponse('System.m_0e4698bf4051') }, { status: 400 });
-  const { id, collaborator } = body;
-  if (!id) return NextResponse.json({ error: tResponse('System.m_4b8591045313') }, { status: 400 });
+  const { id, collaborator, role } = body;
+  if (typeof id !== "string" || (role !== undefined && (typeof role !== "string" || !role.trim() || role.length > 500)) || (collaborator !== undefined && typeof collaborator !== "string")) return NextResponse.json({ error: tResponse('System.m_0e4698bf4051') }, { status: 400 });
 
   // Fetch the current credit to verify ownership and get existing role
   const { data: existing } = await db
@@ -112,7 +112,7 @@ export async function PATCH(req: NextRequest) {
 
   // Keep the role part, replace or remove the collaborator part
   const baseRole = existing.role.split("||")[0].trim();
-  const newRole = collaborator?.trim() ? `${baseRole}||${collaborator.trim()}` : baseRole;
+  const newRole = typeof role === "string" ? role.trim() : collaborator?.trim() ? `${baseRole}||${collaborator.trim()}` : baseRole;
 
   const { error } = await db
     .from("project_credits")

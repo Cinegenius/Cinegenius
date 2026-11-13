@@ -1,7 +1,9 @@
 import { db } from "@/lib/db";
 import { requireAdmin } from "@/lib/guards";
 import { NextRequest, NextResponse } from "next/server";
-import { finishAdminAudit, startAdminAudit, validateAdminReason } from "@/lib/admin-audit";
+import { validateAdminReason } from "@/lib/admin-audit";
+import { setProjectVerification } from "@/lib/project-verification-server";
+import { revalidatePath, revalidateTag } from "next/cache";
 import { projectRecordWithDetails } from "@/lib/project-record";
 import { getTranslations as getResponseTranslations } from "next-intl/server";
 
@@ -19,7 +21,7 @@ export async function GET(req: NextRequest) {
 
   let query = db
     .from("projects")
-    .select("id, title, year, type, created_at, created_by, director, metadata", { count: "exact" })
+    .select("id, title, year, type, created_at, updated_at, created_by, director, metadata", { count: "exact" })
     .order("created_at", { ascending: false })
     .range(offset, offset + limit - 1);
 
@@ -50,6 +52,7 @@ export async function GET(req: NextRequest) {
       type: p.type,
       verified: details.verified === true,
       created_at: p.created_at,
+      updated_at: p.updated_at,
       created_by: p.created_by,
       director: p.director,
       crew_count: crewCounts[p.id as string] ?? 0,
@@ -71,31 +74,10 @@ export async function PATCH(req: NextRequest) {
     return NextResponse.json({ error: tResponse('System.m_55aca4e2b3ab') }, { status: 400 });
   }
 
-  const audit = await startAdminAudit({ actorUserId: adminResult.userId, action: body.verified ? "project_verify" : "project_unverify", entityType: "project", entityId: body.projectId, reason });
-  if (!audit) return NextResponse.json({ error: tResponse('System.m_8f517d75e467') }, { status: 503 });
-  const { data: current, error: currentError } = await db
-    .from("projects")
-    .select("id, metadata")
-    .eq("id", body.projectId)
-    .maybeSingle();
-
-  if (currentError) { await finishAdminAudit(audit, "failed"); return NextResponse.json({ error: tResponse('System.requestFailed') }, { status: 500 }); }
-  if (!current) { await finishAdminAudit(audit, "failed"); return NextResponse.json({ error: tResponse('System.m_bfbc36f441fc') }, { status: 404 }); }
-
-  const currentMetadata = current.metadata && typeof current.metadata === "object" && !Array.isArray(current.metadata)
-    ? current.metadata as Record<string, unknown>
-    : {};
-  const currentDetails = currentMetadata.project_details && typeof currentMetadata.project_details === "object" && !Array.isArray(currentMetadata.project_details)
-    ? currentMetadata.project_details as Record<string, unknown>
-    : {};
-  const metadata = { ...currentMetadata, project_details: { ...currentDetails, verified: body.verified } };
-  const { data, error } = await db.from("projects")
-    .update({ metadata, updated_at: new Date().toISOString() })
-    .eq("id", body.projectId)
-    .select("id")
-    .maybeSingle();
-  if (error) { await finishAdminAudit(audit, "failed"); return NextResponse.json({ error: tResponse('System.requestFailed') }, { status: 500 }); }
-  if (!data) { await finishAdminAudit(audit, "failed"); return NextResponse.json({ error: tResponse('System.m_9df36bfde46c') }, { status: 404 }); }
-  const auditLogged = await finishAdminAudit(audit, "succeeded");
-  return NextResponse.json({ success: true, auditLogged });
+  if (!(typeof body.expectedUpdatedAt === "string" || body.expectedUpdatedAt === null)) return NextResponse.json({ error: tResponse("projects.reviewChanged") }, { status: 409 });
+  const result = await setProjectVerification({ projectId: body.projectId, actorUserId: adminResult.userId, verified: body.verified, reason, expectedUpdatedAt: body.expectedUpdatedAt });
+  if (result.kind !== "success") return NextResponse.json({ error: tResponse(result.kind === "conflict" ? "projects.reviewChanged" : "System.requestFailed") }, { status: result.kind === "conflict" ? 409 : result.kind === "missing" ? 404 : 503 });
+  revalidatePath(`/projects/${body.projectId}`);
+  revalidateTag("projects", { expire: 0 });
+  return NextResponse.json({ ...result, success: true });
 }

@@ -1,4 +1,5 @@
 "use client";
+import MediaImage from "@/components/MediaImage";
 import { projectTypeLabel } from "@/lib/project-type-labels";
 import { useFormRouter as useRouter } from "@/lib/use-form-router";
 import { uiErrorMessage } from "@/lib/ui-error-message";
@@ -59,8 +60,10 @@ import { useAuth } from "@clerk/nextjs";
 
 import Link from "next/link";
 import ContextBackLink from "@/components/ContextBackLink";
+import { splitProjectCreditRole } from "@/lib/project-credit-roles";
+import ProjectCredits from "@/components/ProjectCredits";
 import {
-  ArrowLeft, Clapperboard, Calendar, Users, Upload,
+  ArrowLeft, Calendar, Users,
   Plus, X, Check, Loader2, Pencil, Save, ImageIcon, Trash2, ShieldCheck, ShieldAlert,
   Film, Info, ExternalLink, Trophy, Award,
   UserRound, Megaphone, BookOpen, Briefcase, Video,
@@ -106,6 +109,7 @@ type TvRelease = {
 };
 
 type Project = {
+  updated_at?: string | null;
   id: string;
   title: string;
   alt_title?: string | null;
@@ -158,36 +162,6 @@ type FestivalEntry = {
   notes: string | null;
 };
 
-function CreditProfileLink({ href, className, children }: { href: string | null; className: string; children: React.ReactNode }) {
-  return href
-    ? <Link href={href} className={className}>{children}</Link>
-    : <span className={className}>{children}</span>;
-}
-
-// ─── Department mapping ───────────────────────────────────────────────────────
-const DEPT_ORDER = [
-  "Besetzung", "Regie", "Drehbuch", "Produktion", "Kamera", "Licht", "Ton",
-  "Schnitt & Post", "Kostüm & Maske", "Szenenbild", "Stunts", "Musik",
-  "Foto & Making-of", "Catering & Logistik", "Sonstiges",
-];
-
-const DEPT_MATCHERS: { id: string; regex: RegExp }[] = [
-  { id: "Besetzung",          regex: /darstell|actor|actrice|schauspiel|hauptrolle|nebenrolle|statist|sprecher|synchron|cast/i },
-  { id: "Regie",              regex: /regisseur|^regie$|regie[^a]|director(?!\s+of\s+photo)|1\.\s*ad|2\.\s*ad|assistenzregie|continuity|script\s+superv/i },
-  { id: "Drehbuch",           regex: /drehbuch|autor|autorin|screenwriter|story|storyboard/i },
-  { id: "Produktion",         regex: /produz|producer|produktionsleitung|produktionsassistenz|aufnahmeleitung|line\s*prod|koordinat|casting(?!\s+darstell)/i },
-  { id: "Kamera",             regex: /kamera|camera|director\s+of\s+photo|dop|^dp$|focus\s*pull|dit|steadicam|drohn|crane\s*op/i },
-  { id: "Licht",              regex: /licht|gaffer|beleuchter|best\s*boy|oberbeleuchter|lichtassistenz|rigging/i },
-  { id: "Ton",                regex: /ton(?!set)|sound|audio|boom|mischer|tonmeister|tonassistenz/i },
-  { id: "Schnitt & Post",     regex: /editor|schnitt|cutter|colorist|farb|vfx|composit|motion\s*graph|postprod|post\s+prod|grading/i },
-  { id: "Kostüm & Maske",     regex: /kostüm|kostuen|costume|garderob|maske|makeup|make.up|haare?stylist/i },
-  { id: "Szenenbild",         regex: /szenenbild|ausstatt|set\s*design|requisi|props|art\s*direct|dekorat|bühnenbild/i },
-  { id: "Stunts",             regex: /stunt|action\s*coord|kampfchoreograf/i },
-  { id: "Musik",              regex: /musik|komponist|composer|music\s*superv/i },
-  { id: "Foto & Making-of",   regex: /still\s*photo|making.of|behind\s*the\s*scene|set\s*photo|epk/i },
-  { id: "Catering & Logistik",regex: /catering|fahrer|transport|logistik|location\s*scout/i },
-];
-
 const DEPT_STYLES: Record<string, { bar: string; label: string; bg: string; icon: LucideIcon }> = {
   "Besetzung":           { bar: "bg-rose-400",    label: "text-rose-300",    bg: "bg-rose-500/8",    icon: UserRound },
   "Regie":               { bar: "bg-purple-400",  label: "text-purple-300",  bg: "bg-purple-500/8",  icon: Megaphone },
@@ -225,25 +199,6 @@ const TYPE_COLORS: Record<string, string> = {
   Musikvideo:    "bg-red-500/15 text-red-300 border-red-500/30",
   Corporate:     "bg-cyan-500/15 text-cyan-300 border-cyan-500/30",
 };
-
-function getDepartment(role: string): string {
-  for (const m of DEPT_MATCHERS) {
-    if (m.regex.test(role)) return m.id;
-  }
-  return "Sonstiges";
-}
-
-function groupCredits(credits: Credit[]): { dept: string; members: Credit[] }[] {
-  const map = new Map<string, Credit[]>();
-  for (const c of credits) {
-    const dept = getDepartment(c.role);
-    if (!map.has(dept)) map.set(dept, []);
-    map.get(dept)!.push(c);
-  }
-  return [...map.entries()]
-    .sort(([a], [b]) => DEPT_ORDER.indexOf(a) - DEPT_ORDER.indexOf(b))
-    .map(([dept, members]) => ({ dept, members }));
-}
 
 function formatDate(locale: string, d: string | null | undefined) {
   if (!d) return null;
@@ -328,6 +283,8 @@ export default function ProjectDetail({
   const [joinNote, setJoinNote] = useState("");
   const [joining, setJoining] = useState(false);
   const [joinError, setJoinError] = useState("");
+  const [verificationBusy, setVerificationBusy] = useState(false);
+  const [verificationError, setVerificationError] = useState("");
   const [showJoin, setShowJoin] = useState(false);
 
   // Header edit
@@ -383,7 +340,6 @@ export default function ProjectDetail({
   const isLoggedIn = !!liveUserId;
   const typeColor = project.type ? (TYPE_COLORS[project.type] ?? "bg-gold/10 text-gold border-gold/20") : "";
   const statusMeta = project.status ? STATUS_META[project.status] : null;
-  const grouped = groupCredits(credits);
   const wonCount = festivals.filter((f) => f.status === "gewonnen").length;
   const currentPhaseIdx = project.status ? (PHASE_INDEX[project.status] ?? -1) : -1;
   const streamingList: StreamingRelease[] = project.release_streaming ?? [];
@@ -412,21 +368,17 @@ export default function ProjectDetail({
 
   const saveDraftPatch = async (patch: Partial<Project>) => {
     setDraftError("");
-    const res = await fetch(`/api/projects/${project.id}`, {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(patch),
-    });
-    const data = await res.json();
-    if (!res.ok) {
-      setDraftError(data.error ?? uiText("Ui.text_46dbd7a67ff42c"));
+    try {
+      const res = await fetch(`/api/projects/${project.id}`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify(patch) });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || uiText("System.requestFailed"));
+      setDraftId(data.draftId);
+      return true;
+    } catch (reason) {
+      setDraftError(uiErrorMessage(reason, uiText("System.requestFailed")));
       return false;
     }
-    setDraftId(data.draftId);
-    return true;
   };
-
-
 
   const handleJoin = async () => {
     if (!joinRole.trim()) return;
@@ -436,19 +388,19 @@ export default function ProjectDetail({
         joinCharacter.trim() ? `${joinRole.trim()} — ${joinCharacter.trim()}` : joinRole.trim(),
         joinNote.trim() ? `||${joinNote.trim()}` : "",
       ].join("");
-      const res = await fetch("/api/project-credits", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ project_id: project.id, role: roleValue }) });
+      const res = await fetch("/api/project-credits", { method: myCredit ? "PATCH" : "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(myCredit ? { id: myCredit.id, role: roleValue } : { project_id: project.id, role: roleValue }) });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error);
       // Add the new credit directly to local state — no second fetch needed
       const newCredit: Credit = {
-        id: data.credit.id,
+        id: myCredit?.id ?? data.credit.id,
         isCurrentUser: true,
         role: roleValue,
-        created_at: data.credit.created_at,
+        created_at: myCredit?.created_at ?? data.credit.created_at,
         profile: userProfile ? { display_name: userProfile.display_name ?? "", avatar_url: userProfile.avatar_url, role: null, slug: null } : null,
         ghost: null,
       };
-      setCredits((prev) => [...prev, newCredit]);
+      setCredits((prev) => myCredit ? prev.map(credit => credit.id === myCredit.id ? { ...credit, role: roleValue } : credit) : [...prev, newCredit]);
       setMyCredit(newCredit);
       setShowJoin(false); setJoinRole(""); setJoinCharacter(""); setJoinNote("");
     } catch (e: unknown) { setJoinError(uiErrorMessage(e, uiText("Ui.text_f6cc01cb7edbf0"))); }
@@ -457,9 +409,15 @@ export default function ProjectDetail({
 
   const handleLeave = async () => {
     if (!confirm(uiText("Ui.text_d5f604b675d0f3"))) return;
-    await fetch(`/api/project-credits?project_id=${project.id}`, { method: "DELETE" });
-    setMyCredit(null);
-    setCredits((prev) => prev.filter((c) => !c.isCurrentUser));
+    setJoining(true); setJoinError("");
+    try {
+      const response = await fetch(`/api/project-credits?project_id=${project.id}`, { method: "DELETE" });
+      if (!response.ok) throw new Error("remove_failed");
+      setMyCredit(null);
+      setCredits(previous => previous.filter(credit => !credit.isCurrentUser));
+      setShowJoin(false);
+    } catch { setJoinError(uiText("System.requestFailed")); }
+    finally { setJoining(false); }
   };
 
   const handleSaveEdit = async () => {
@@ -524,7 +482,9 @@ export default function ProjectDetail({
   };
 
   const patchDistribution = async (patch: Partial<Project>) => {
-    if (await saveDraftPatch(patch)) setProject((p) => ({ ...p, ...patch }));
+    if (!await saveDraftPatch(patch)) return false;
+    setProject((p) => ({ ...p, ...patch }));
+    return true;
   };
 
   const handleAddStreaming = async () => {
@@ -532,8 +492,7 @@ export default function ProjectDetail({
     setSavingStreaming(true);
     const entry: StreamingRelease = { platform: streamingForm.platform, date: streamingForm.date, url: streamingForm.url || null, territory: streamingForm.territory || null };
     const updated = [...streamingList, entry];
-    await patchDistribution({ release_streaming: updated });
-    setShowStreamingForm(false); setStreamingForm(EMPTY_STREAMING_FORM);
+    if (await patchDistribution({ release_streaming: updated })) { setShowStreamingForm(false); setStreamingForm(EMPTY_STREAMING_FORM); }
     setSavingStreaming(false);
   };
 
@@ -547,8 +506,7 @@ export default function ProjectDetail({
     setSavingTv(true);
     const entry: TvRelease = { channel: tvForm.channel, date: tvForm.date, territory: tvForm.territory || null, notes: tvForm.notes || null };
     const updated = [...tvList, entry];
-    await patchDistribution({ release_tv: updated });
-    setShowTvForm(false); setTvForm(EMPTY_TV_FORM);
+    if (await patchDistribution({ release_tv: updated })) { setShowTvForm(false); setTvForm(EMPTY_TV_FORM); }
     setSavingTv(false);
   };
 
@@ -566,10 +524,10 @@ export default function ProjectDetail({
   );
 
   return (
-    <div className="pt-16 min-h-screen bg-bg-primary">
-      <div className="max-w-6xl mx-auto px-4 py-10">
+    <div className="pt-16 min-h-screen bg-bg-primary mobile-bottom-nav-clear">
+      <div className="site-container py-8 sm:py-10">
 
-        <ContextBackLink href="/projects" className="inline-flex items-center gap-1.5 text-xs text-text-muted hover:text-gold transition-colors mb-8">{uiText.rich("Ui.text_6537e36e485dda", { part1: () => (<ArrowLeft size={13} />) })}</ContextBackLink>
+        <ContextBackLink href="/projects" className="inline-flex min-h-11 items-center gap-1.5 text-xs text-text-muted hover:text-gold transition-colors mb-6">{uiText.rich("Ui.text_6537e36e485dda", { part1: () => (<ArrowLeft size={13} />) })}</ContextBackLink>
 
         {draftId && (
           <div className="mb-6 rounded-xl border border-gold/25 bg-gold/5 px-4 py-3 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
@@ -581,28 +539,19 @@ export default function ProjectDetail({
 
         {/* ════════ HEADER ════════ */}
         <div className="flex gap-8 mb-10 flex-col sm:flex-row">
-          {/* Poster */}
-          <div className="shrink-0 w-40 sm:w-48">
-            <div className="aspect-[2/3] rounded-2xl overflow-hidden bg-bg-secondary border border-border shadow-2xl shadow-black/40 flex items-center justify-center">
-              {project.poster_url
-                // eslint-disable-next-line @next/next/no-img-element
-                ? <img src={project.poster_url} alt={project.title} className="w-full h-full object-cover object-top" />
-                : isCreator
-                  ? <div className="flex flex-col items-center gap-2 text-text-muted w-full h-full justify-center px-4 text-center">{uiText.rich("Ui.text_d10645df5e4d45", { part1: () => (<Upload size={24} />), part2: chunks => (<span className="text-[10px]">{chunks}</span>) })}</div>
-                  : <div className="flex flex-col items-center gap-2 text-text-muted"><Clapperboard size={32} /></div>
-              }
-            </div>
+          {project.poster_url && <div className="w-24 shrink-0 sm:w-40">
+            <MediaImage src={project.poster_url} alt={project.title} width={160} height={240} className="aspect-[2/3] w-full rounded-xl border border-border object-cover object-top" />
             {project.image_credit && <p className="mt-2 break-words text-xs text-text-muted">{project.image_credit}</p>}
-          </div>
+          </div>}
 
           {/* Info */}
           <div className="flex-1 min-w-0 pt-1">
-            <div className="flex items-start justify-between gap-3">
+            <div className="flex flex-col gap-3">
               <div className="flex-1 min-w-0">
                 {editing
                   ? <input value={editForm.title} onChange={(e) => setEditForm((p) => ({ ...p, title: e.target.value }))}
                       className="font-display text-3xl sm:text-4xl font-bold bg-bg-secondary border border-gold rounded-xl px-4 py-2 w-full focus:outline-none mb-3" />
-                  : <h1 className="font-display text-3xl sm:text-4xl font-bold text-text-primary mb-3 leading-tight">{project.title}</h1>
+                  : <h1 className="break-words font-display text-3xl sm:text-4xl font-bold text-text-primary mb-3 leading-tight">{project.title}</h1>
                 }
                 <div className="flex items-center gap-2.5 flex-wrap mb-4">
                   {project.type && <span className={`px-3 py-1 text-xs font-semibold rounded-full border ${typeColor}`}>{projectTypeLabel(project.type, uiText)}</span>}
@@ -616,43 +565,50 @@ export default function ProjectDetail({
                   {wonCount > 0 && (
                     <span className="flex items-center gap-1 px-2.5 py-1 text-xs font-semibold rounded-full border bg-gold/15 text-gold border-gold/30">{uiText.rich("Ui.text_91ee9368b5fe4d", { part1: () => (<Trophy size={11} />), value2: () => (wonCount), count3: wonCount })}</span>
                   )}
-                  {project.verified
-                    ? <span className="flex items-center gap-1 px-2.5 py-1 text-xs font-semibold rounded-full border bg-emerald-500/10 text-emerald-400 border-emerald-500/20">{uiText.rich("Ui.text_712de43869af36", { part1: () => (<ShieldCheck size={11} />) })}</span>
+                  {project.verified && !draftId
+                    ? <span className="flex items-center gap-1 px-2.5 py-1 text-xs font-semibold rounded-full border bg-gold/10 text-gold border-gold/20">{uiText.rich("Ui.text_712de43869af36", { part1: () => (<ShieldCheck size={11} />) })}</span>
                     : <span className="flex items-center gap-1 px-2.5 py-1 text-xs rounded-full border bg-bg-elevated text-text-muted border-border">{uiText.rich("Ui.text_1bc7b76197852e", { part1: () => (<ShieldAlert size={11} />) })}</span>
                   }
                 </div>
               </div>
               {(isCreator || isAdmin) && !editing && (
-                <div className="flex items-center gap-1 shrink-0">
+                <div className="flex max-w-full flex-wrap items-center gap-1">
                   {isCreator && (
-                    <button onClick={() => setEditing(true)} className="p-2 text-text-muted hover:text-gold transition-colors">
+                    <button onClick={() => setEditing(true)} aria-label={uiText("projects.editProject")} className="flex min-h-11 min-w-11 items-center justify-center p-2 text-text-muted hover:text-gold transition-colors">
                       <Pencil size={15} />
                     </button>
                   )}
                   {isAdmin && (
                     <button
                       title={project.verified ? uiText("Ui.text_43277c4204c895") : uiText("Ui.text_33347561b7ed6b")}
+                      disabled={verificationBusy || !!draftId}
                       onClick={async () => {
-                        const res = await fetch(`/api/projects/${project.id}/verify`, {
-                          method: "POST",
-                          headers: { "Content-Type": "application/json" },
-                          body: JSON.stringify({ verified: !project.verified }),
-                        });
-                        if (res.ok) setProject((p) => ({ ...p, verified: !p.verified }));
+                        if (!confirm(uiText(project.verified ? "projects.unverifyPrompt" : "projects.verifyPrompt"))) return;
+                        setVerificationBusy(true); setVerificationError("");
+                        try {
+                          const res = await fetch(`/api/projects/${project.id}/verify`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ verified: !project.verified, expectedUpdatedAt: project.updated_at ?? null }) });
+                          const result = await res.json();
+                          if (!res.ok) throw new Error(result.error);
+                          setProject(previous => ({ ...previous, verified: result.verified, updated_at: result.updatedAt }));
+                        } catch (error) { setVerificationError(uiErrorMessage(error, uiText("System.requestFailed"))); }
+                        finally { setVerificationBusy(false); }
                       }}
-                      className={`p-2 transition-colors ${project.verified ? "text-emerald-400 hover:text-text-muted" : "text-text-muted hover:text-emerald-400"}`}
+                      className="inline-flex min-h-11 min-w-11 items-center justify-center gap-2 rounded-lg border border-border px-3 text-xs text-text-secondary hover:text-gold disabled:opacity-50"
                     >
-                      <ShieldCheck size={15} />
+                      <ShieldCheck size={15} />{uiText(project.verified ? "projects.unverifyAction" : "projects.verifyAction")}
                     </button>
                   )}
                   {isCreator && (
-                    <button onClick={deleteProject} className="p-2 text-text-muted hover:text-red-400 transition-colors">
+                    <button onClick={deleteProject} aria-label={uiText("projects.deleteProject")} className="flex min-h-11 min-w-11 items-center justify-center p-2 text-text-muted hover:text-red-400 transition-colors">
                       <Trash2 size={15} />
                     </button>
                   )}
                 </div>
               )}
             </div>
+
+            {verificationError && <p role="alert" className="mb-4 text-sm text-crimson-light">{verificationError}</p>}
+            <p className="mb-4 text-xs leading-relaxed text-text-muted">{uiText(draftId ? "projects.draftNotice" : project.verified ? "projects.verifiedExplanation" : "projects.unverifiedExplanation")}</p>
 
             {/* Meta */}
             <div className="space-y-2 mb-5">
@@ -678,7 +634,7 @@ export default function ProjectDetail({
             {editing && (
               <div className="space-y-3 mt-3 pt-3 border-t border-border">
                 <div className="grid grid-cols-2 gap-3">
-                  <div>{label(uiText("projects.filterYear"))}<input type="number" value={editForm.year} onChange={(e) => setEditForm((p) => ({ ...p, year: e.target.value }))} placeholder="2024" className="w-full bg-bg-secondary border border-border rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-gold" /></div>
+                  <div>{label(uiText("projects.filterYear"))}<input type="number" value={editForm.year} onChange={(e) => setEditForm((p) => ({ ...p, year: e.target.value }))} placeholder={String(new Date().getFullYear())} className="w-full bg-bg-secondary border border-border rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-gold" /></div>
                   <div>{label(uiText("projects.colType"))}<select value={editForm.type} onChange={(e) => setEditForm((p) => ({ ...p, type: e.target.value }))} className="w-full bg-bg-secondary border border-border rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-gold"><option value="">—</option>{["Spielfilm","Kurzfilm","Serie","Dokumentation","Werbefilm","Musikvideo","Corporate"].map((t) => <option key={t} value={t}>{(uiOptionLabels[t] ?? t)}</option>)}</select></div>
                   <div>{label(uiText("Places.status"))}<select value={editForm.status} onChange={(e) => setEditForm((p) => ({ ...p, status: e.target.value }))} className="w-full bg-bg-secondary border border-border rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-gold"><option value="">—</option>{Object.entries(STATUS_META).map(([k, v]) => <option key={k} value={k}>{v.label}</option>)}</select></div>
                   <div>{label(uiText("menu.crewDirection"))}<input type="text" value={editForm.director} onChange={(e) => setEditForm((p) => ({ ...p, director: e.target.value }))} className="w-full bg-bg-secondary border border-border rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-gold" /></div>
@@ -690,8 +646,8 @@ export default function ProjectDetail({
                   <div>{label(uiText("Ui.text_2b55006332bb93"))}<input type="url" value={editForm.trailer_url} onChange={(e) => setEditForm((p) => ({ ...p, trailer_url: e.target.value }))} placeholder={uiText("Ui.text_f167e87e1066c3")} className="w-full bg-bg-secondary border border-border rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-gold" /></div>
                 </div>
                 <div className="flex gap-2">
-                  <button onClick={handleSaveEdit} disabled={saving} className="flex items-center gap-2 px-4 py-2 bg-gold text-bg-primary text-xs font-semibold rounded-lg hover:bg-gold-light transition-colors disabled:opacity-60">{uiText.rich("Ui.text_74c465184b036f", { value1: () => (saving ? <Loader2 size={13} className="animate-spin" /> : <Save size={13} />) })}</button>
-                  <button onClick={() => leaveProjectForm(() => setEditing(false))} className="px-4 py-2 border border-border text-text-secondary text-xs rounded-lg hover:border-gold hover:text-gold transition-colors">{uiText("home.boardCancel")}</button>
+                  <button onClick={handleSaveEdit} disabled={saving} className="min-h-11 flex items-center gap-2 px-4 py-2 bg-gold text-bg-primary text-xs font-semibold rounded-lg hover:bg-gold-light transition-colors disabled:opacity-60">{uiText.rich("Ui.text_74c465184b036f", { value1: () => (saving ? <Loader2 size={13} className="animate-spin" /> : <Save size={13} />) })}</button>
+                  <button onClick={() => leaveProjectForm(() => setEditing(false))} className="min-h-11 px-4 py-2 border border-border text-text-secondary text-xs rounded-lg hover:border-gold hover:text-gold transition-colors">{uiText("home.boardCancel")}</button>
                 </div>
               </div>
             )}
@@ -703,10 +659,11 @@ export default function ProjectDetail({
                   <button onClick={() => setShowJoin(true)} className="flex items-center gap-2 px-5 py-2.5 bg-gold text-bg-primary text-sm font-semibold rounded-xl hover:bg-gold-light transition-colors">{uiText.rich("Ui.text_b30ce2b7455d16", { part1: () => (<Plus size={14} />) })}</button>
                 )}
                 {myCredit && (
-                  <div className="flex items-center gap-3 px-4 py-2.5 bg-gold/10 border border-gold/20 rounded-xl">
+                  <div className="flex flex-wrap items-center gap-3 px-4 py-2.5 bg-gold/10 border border-gold/20 rounded-xl">
                     <Check size={14} className="text-gold" />
                     <span className="text-sm text-gold font-medium">{uiText.rich("Ui.text_912cd007084dc6", { value2: () => (myCredit.role), part1: chunks => (<strong>{chunks}</strong>) })}</span>
-                    <button onClick={handleLeave} className="text-xs text-text-muted hover:text-crimson-light transition-colors ml-2">{uiText("Ui.text_ff1f4de2c978d7")}</button>
+                    <button onClick={() => { const parsed = splitProjectCreditRole(myCredit.role); setJoinRole(parsed.role); setJoinCharacter(parsed.character); setJoinNote(parsed.note); setShowJoin(true); }} className="min-h-11 text-xs text-text-secondary hover:text-gold">{uiText("projects.editCredit")}</button>
+                    <button onClick={handleLeave} disabled={joining} className="min-h-11 text-xs text-text-muted hover:text-crimson-light transition-colors ml-2 disabled:opacity-50">{uiText("Ui.text_ff1f4de2c978d7")}</button>
                   </div>
                 )}
               </div>
@@ -714,8 +671,9 @@ export default function ProjectDetail({
           </div>
         </div>
 
+        {joinError && !showJoin && <p role="alert" className="mb-4 text-sm text-crimson-light">{joinError}</p>}
         {/* Join form */}
-        {showJoin && !myCredit && (
+        {showJoin && (
           <div className="mb-8 p-5 bg-bg-secondary border border-gold/20 rounded-2xl space-y-3">
             <p className="text-sm font-semibold text-text-primary">{uiText.rich("Ui.text_4eda27feac6362", { value1: () => (project.title) })}</p>
             <div className="grid sm:grid-cols-3 gap-3">
@@ -725,10 +683,11 @@ export default function ProjectDetail({
               <div>{label(uiText("Ui.text_446cb1828991ea"), true)}<input type="text" value={joinCharacter} onChange={(e) => setJoinCharacter(e.target.value)} onKeyDown={(e) => e.key === "Enter" && handleJoin()} placeholder={uiText("Ui.text_a02b3f65d99c52")} className={inp} /></div>
               <div>{label(uiText("Ui.text_c5939cb300d228"), true)}<input type="text" value={joinNote} onChange={(e) => setJoinNote(e.target.value)} onKeyDown={(e) => e.key === "Enter" && handleJoin()} placeholder={uiText("Ui.text_0e46502c0c4be8")} className={inp} /></div>
             </div>
-            {joinError && <p className="text-xs text-crimson-light">{joinError}</p>}
+            <p className="text-xs leading-relaxed text-text-muted">{uiText("projects.creditsNotice")}</p>
+            {joinError && <p role="alert" className="text-xs text-crimson-light">{joinError}</p>}
             <div className="flex gap-2">
-              <button onClick={handleJoin} disabled={joining || !joinRole.trim()} className="flex items-center gap-2 px-5 py-2.5 bg-gold text-bg-primary text-sm font-semibold rounded-xl hover:bg-gold-light transition-colors disabled:opacity-60">{uiText.rich("Ui.text_436b4c755f2731", { value1: () => (joining ? <Loader2 size={14} className="animate-spin" /> : <Check size={14} />) })}</button>
-              <button onClick={() => { setShowJoin(false); setJoinRole(""); setJoinCharacter(""); setJoinNote(""); }} className="px-5 py-2.5 border border-border text-text-secondary text-sm rounded-xl hover:border-gold hover:text-gold transition-colors">{uiText("home.boardCancel")}</button>
+              <button onClick={handleJoin} disabled={joining || !joinRole.trim()} className="flex items-center gap-2 px-5 py-2.5 bg-gold text-bg-primary text-sm font-semibold rounded-xl hover:bg-gold-light transition-colors disabled:opacity-60">{uiText.rich(myCredit ? "Ui.text_74c465184b036f" : "Ui.text_436b4c755f2731", { value1: () => (joining ? <Loader2 size={14} className="animate-spin" /> : <Check size={14} />) })}</button>
+              <button onClick={() => leaveProjectForm(() => { setShowJoin(false); setJoinRole(""); setJoinCharacter(""); setJoinNote(""); })} className="px-5 py-2.5 border border-border text-text-secondary text-sm rounded-xl hover:border-gold hover:text-gold transition-colors">{uiText("home.boardCancel")}</button>
             </div>
           </div>
         )}
@@ -758,107 +717,7 @@ export default function ProjectDetail({
           </div>
         </div>
 
-        {/* ════════ TAB: BESETZUNG & STAB ════════ */}
-        {activeTab === "stab" && (
-          <div>
-            {credits.length === 0 ? (
-              <div className="text-center py-20 text-text-muted">
-                <Users size={40} className="mx-auto mb-4 opacity-20" />
-                <p className="text-sm mb-1">{uiText("Ui.text_a95fd3e3a2c975")}</p>
-                <p className="text-xs opacity-60">{uiText("Ui.text_88cfb0708819b8")}</p>
-              </div>
-            ) : (
-              <div className="space-y-6">
-                {grouped.filter(({ dept }) => dept === "Besetzung").map(({ members }) => (
-                  <div key="besetzung" className="rounded-2xl border border-rose-500/15 overflow-hidden">
-                    <div className="flex items-center gap-2.5 px-5 py-2 bg-rose-500/8 border-b border-rose-500/15">{uiText.rich("Ui.text_926afbb2fd9b38", { part1: () => (<span className="w-1 h-4 rounded-full bg-rose-400 shrink-0" />), part2: () => (<UserRound size={12} className="text-rose-300" />), part3: chunks => (<span className="text-xs font-bold uppercase tracking-widest text-rose-300">{chunks}</span>), value5: () => (members.length), part4: chunks => (<span className="ml-1 text-[10px] text-text-muted bg-bg-secondary border border-border/60 px-1.5 py-0.5 rounded-full">{chunks}</span>) })}</div>
-                    {members.map((credit) => {
-                      const [roleAndChar, note] = credit.role.split("||");
-                      const [roleLabel, characterName] = (roleAndChar ?? "").split(" — ");
-                      const badge = /hauptdarstell|hauptrolle/i.test(roleLabel) ? { text: uiText("Ui.text_15e68b1f46577e"), cls: "bg-gold/15 text-gold border-gold/30" }
-                        : /nebendarstell|nebenrolle/i.test(roleLabel) ? { text: uiText("Ui.text_fbcebae39bd769"), cls: "bg-sky-500/15 text-sky-300 border-sky-500/30" }
-                        : /statist|komparse|extra/i.test(roleLabel) ? { text: uiText("Ui.text_bb1e6c76c178da"), cls: "bg-slate-500/15 text-slate-300 border-slate-500/30" }
-                        : /stunt/i.test(roleLabel) ? { text: uiText("Ui.text_9a581e14467065"), cls: "bg-red-500/15 text-red-300 border-red-500/30" }
-                        : /sprecher|voice/i.test(roleLabel) ? { text: uiText("Ui.text_d94f25c29e1564"), cls: "bg-violet-500/15 text-violet-300 border-violet-500/30" }
-                        : null;
-                      return (
-                        <div key={credit.id} className="flex items-center gap-3 px-5 py-2.5 border-t border-border/30 hover:bg-rose-500/4 transition-colors">
-                          {badge
-                            ? <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded border shrink-0 w-8 text-center ${badge.cls}`}>{badge.text}</span>
-                            : <span className="text-[10px] text-text-muted shrink-0 w-8 truncate text-center" title={roleLabel}>{roleLabel?.substring(0, 3).toUpperCase()}</span>
-                          }
-                          <CreditProfileLink
-                            href={credit.ghost ? `/person/${credit.ghost.slug}` : credit.profile?.slug ? `/profile/${credit.profile.slug}` : null}
-                            className="flex items-center gap-2 min-w-0 flex-1 group/link"
-                          >
-                            <div className="w-6 h-6 rounded-full overflow-hidden bg-bg-elevated border border-border shrink-0">
-                              {(credit.profile?.avatar_url ?? credit.ghost?.avatar_url)
-                                // eslint-disable-next-line @next/next/no-img-element
-                                ? <img src={credit.profile?.avatar_url ?? credit.ghost?.avatar_url ?? ""} alt="" className="w-full h-full object-cover" />
-                                : <div className="w-full h-full flex items-center justify-center bg-rose-500/10"><span className="text-[8px] font-bold text-rose-300">{(credit.profile?.display_name ?? credit.ghost?.name ?? "?").charAt(0).toUpperCase()}</span></div>
-                              }
-                            </div>
-                            <span className="text-sm text-text-primary group-hover/link:text-rose-300 transition-colors truncate">{credit.profile?.display_name ?? credit.ghost?.name ?? uiText("Ui.text_276ffa1fb4f970")}</span>
-                            {credit.ghost && <span className="text-[9px] text-text-muted border border-border rounded px-1 shrink-0">{uiText("Ui.text_dfb13797d10629")}</span>}
-                            <ExternalLink size={10} className="text-text-muted shrink-0 opacity-0 group-hover/link:opacity-100 transition-opacity" />
-                          </CreditProfileLink>
-                          {characterName
-                            ? <span className="text-xs text-rose-400/80 shrink-0 truncate max-w-[140px]">{uiText.rich("Ui.text_73510addd3802a", { value1: () => (characterName) })}</span>
-                            : <span className="w-[140px] shrink-0" />
-                          }
-                          <span className="text-xs text-text-muted shrink-0 truncate max-w-[120px] text-right">{note ?? ""}</span>
-                        </div>
-                      );
-                    })}
-                  </div>
-                ))}
-                {grouped.filter(({ dept }) => dept !== "Besetzung").length > 0 && (
-                  <div className="rounded-2xl border border-border overflow-hidden">
-                    <div className="grid grid-cols-[1fr_1.5fr_1fr] px-5 py-2.5 bg-bg-elevated border-b border-border">{uiText.rich("Ui.text_20de640ff838bc", { part1: chunks => (<span className="text-[10px] uppercase tracking-widest font-semibold text-text-secondary">{chunks}</span>), part2: chunks => (<span className="text-[10px] uppercase tracking-widest font-semibold text-text-secondary">{chunks}</span>), part3: chunks => (<span className="text-[10px] uppercase tracking-widest font-semibold text-text-secondary">{chunks}</span>) })}</div>
-                    {grouped.filter(({ dept }) => dept !== "Besetzung").map(({ dept, members }) => {
-                      const s = DEPT_STYLES[dept] ?? DEPT_STYLES["Sonstiges"];
-                      const Icon = s.icon;
-                      return (
-                        <div key={uiDisplayLabels[dept] ?? dept}>
-                          <div className={`flex items-center gap-2.5 px-5 py-2 border-t border-border ${s.bg}`}>
-                            <span className={`w-1 h-4 rounded-full shrink-0 ${s.bar}`} />
-                            <Icon size={12} className={s.label} />
-                            <span className={`text-xs font-bold uppercase tracking-widest ${s.label}`}>{uiDisplayLabels[dept] ?? dept}</span>
-                            <span className="ml-1 text-[10px] text-text-muted bg-bg-secondary border border-border/60 px-1.5 py-0.5 rounded-full">{members.length}</span>
-                          </div>
-                          {members.map((credit) => {
-                            const [roleLabel, note] = credit.role.split("||");
-                            return (
-                              <div key={credit.id} className="grid grid-cols-[1fr_1.5fr_1fr] px-5 py-2.5 border-t border-border/30 hover:bg-bg-elevated/40 transition-colors items-center">
-                                <span className="text-xs text-text-secondary truncate pr-4">{roleLabel}</span>
-                                <CreditProfileLink
-                                  href={credit.ghost ? `/person/${credit.ghost.slug}` : credit.profile?.slug ? `/profile/${credit.profile.slug}` : null}
-                                  className="flex items-center gap-2.5 min-w-0 group/link"
-                                >
-                                  <div className="w-6 h-6 rounded-full overflow-hidden bg-bg-elevated border border-border shrink-0">
-                                    {(credit.profile?.avatar_url ?? credit.ghost?.avatar_url)
-                                      // eslint-disable-next-line @next/next/no-img-element
-                                      ? <img src={credit.profile?.avatar_url ?? credit.ghost?.avatar_url ?? ""} alt="" className="w-full h-full object-cover" />
-                                      : <div className="w-full h-full flex items-center justify-center bg-gold/10"><span className="text-[8px] font-bold text-gold">{(credit.profile?.display_name ?? credit.ghost?.name ?? "?").charAt(0).toUpperCase()}</span></div>
-                                    }
-                                  </div>
-                                  <span className="text-sm text-text-primary group-hover/link:text-gold transition-colors truncate">{credit.profile?.display_name ?? credit.ghost?.name ?? uiText("Ui.text_276ffa1fb4f970")}</span>
-                                  {credit.ghost && <span className="text-[9px] text-text-muted border border-border rounded px-1 shrink-0 ml-0.5">{uiText("Ui.text_dfb13797d10629")}</span>}
-                                  <ExternalLink size={10} className="text-text-muted shrink-0 opacity-0 group-hover/link:opacity-100 transition-opacity ml-0.5" />
-                                </CreditProfileLink>
-                                <span className="text-xs text-text-secondary truncate pl-2">{note ? uiText("Ui.text_9a062c761836c7", { value1: String(note) }) : ""}</span>
-                              </div>
-                            );
-                          })}
-                        </div>
-                      );
-                    })}
-                  </div>
-                )}
-              </div>
-            )}
-          </div>
-        )}
+        {activeTab === "stab" && <ProjectCredits credits={credits} />}
 
         {/* ════════ TAB: FOTOS ════════ */}
         {activeTab === "fotos" && (
@@ -875,13 +734,12 @@ export default function ProjectDetail({
             ) : (
               <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
                 {project.images.map((url, i) => (
-                  <div key={url} className="relative group aspect-video rounded-xl overflow-hidden border border-border cursor-pointer" onClick={() => setLightboxIndex(i)}>
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img src={url} alt={uiText("Ui.text_31b5322f7aaa57", { value1: String(i + 1) })} className="w-full h-full object-cover" />
-                    <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center"><ImageIcon size={20} className="text-white" /></div>
+                  <div key={url} className="relative group aspect-video rounded-xl overflow-hidden border border-border">
+                    <button type="button" onClick={() => setLightboxIndex(i)} className="h-full w-full min-h-11" aria-label={uiText("Ui.text_31b5322f7aaa57", { value1: String(i + 1) })}><MediaImage width={320} height={180} src={url} alt={uiText("Ui.text_31b5322f7aaa57", { value1: String(i + 1) })} className="w-full h-full object-cover" /></button>
+                    <div className="pointer-events-none absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center"><ImageIcon size={20} className="text-white" /></div>
                     {isCreator && (
                       <button type="button" onClick={(e) => { e.stopPropagation(); removePhoto(url); }}
-                        className="absolute top-2 right-2 w-7 h-7 bg-black/70 rounded-full flex items-center justify-center text-white opacity-0 group-hover:opacity-100 transition-opacity hover:bg-crimson-light">
+                        aria-label={uiText("Ui.text_e1d7608e0a6d0a")} className="absolute top-1 right-1 w-11 h-11 bg-black/70 rounded-full flex items-center justify-center text-white transition-colors hover:bg-crimson-light">
                         <X size={12} />
                       </button>
                     )}
@@ -1116,7 +974,7 @@ export default function ProjectDetail({
                             }
                           </div>
                           {isCreator && (
-                            <button onClick={() => handleDeleteFestival(entry.id)} className="w-6 h-6 flex items-center justify-center text-text-muted hover:text-crimson-light transition-colors rounded-lg hover:bg-crimson-light/10">
+                            <button onClick={() => handleDeleteFestival(entry.id)} className="w-11 h-11 flex items-center justify-center text-text-muted hover:text-crimson-light transition-colors rounded-lg hover:bg-crimson-light/10">
                               <X size={12} />
                             </button>
                           )}
@@ -1168,8 +1026,8 @@ export default function ProjectDetail({
                     <div>{label(uiText("Ui.text_a6a32dbc5618ea"), true)}<input type="url" value={streamingForm.url} onChange={(e) => setStreamingForm((p) => ({ ...p, url: e.target.value }))} placeholder={uiText("Ui.text_e98a62ef23bb46")} className={inp} /></div>
                   </div>
                   <div className="flex gap-2">
-                    <button onClick={handleAddStreaming} disabled={savingStreaming || !streamingForm.date} className="flex items-center gap-2 px-4 py-2 bg-gold text-bg-primary text-xs font-semibold rounded-lg hover:bg-gold-light transition-colors disabled:opacity-60">{uiText.rich("Ui.text_74c465184b036f", { value1: () => (savingStreaming ? <Loader2 size={12} className="animate-spin" /> : <Check size={12} />) })}</button>
-                    <button onClick={() => { setShowStreamingForm(false); setStreamingForm(EMPTY_STREAMING_FORM); }} className="px-4 py-2 border border-border text-text-secondary text-xs rounded-lg hover:border-gold hover:text-gold transition-colors">{uiText("home.boardCancel")}</button>
+                    <button onClick={handleAddStreaming} disabled={savingStreaming || !streamingForm.date} className="min-h-11 flex items-center gap-2 px-4 py-2 bg-gold text-bg-primary text-xs font-semibold rounded-lg hover:bg-gold-light transition-colors disabled:opacity-60">{uiText.rich("Ui.text_74c465184b036f", { value1: () => (savingStreaming ? <Loader2 size={12} className="animate-spin" /> : <Check size={12} />) })}</button>
+                    <button onClick={() => { setShowStreamingForm(false); setStreamingForm(EMPTY_STREAMING_FORM); }} className="min-h-11 px-4 py-2 border border-border text-text-secondary text-xs rounded-lg hover:border-gold hover:text-gold transition-colors">{uiText("home.boardCancel")}</button>
                   </div>
                 </div>
               )}
@@ -1188,7 +1046,7 @@ export default function ProjectDetail({
                         <a href={safeLink(s.url)!} target="_blank" rel="noopener noreferrer" className="text-text-muted hover:text-gold transition-colors"><ExternalLink size={13} /></a>
                       )}
                       {isCreator && (
-                        <button onClick={() => handleRemoveStreaming(i)} className="text-text-muted hover:text-crimson-light transition-colors opacity-0 group-hover:opacity-100"><X size={13} /></button>
+                        <button onClick={() => handleRemoveStreaming(i)} className="min-h-11 min-w-11 flex items-center justify-center text-text-muted hover:text-crimson-light transition-colors"><X size={13} /></button>
                       )}
                     </div>
                   ))}
@@ -1213,8 +1071,8 @@ export default function ProjectDetail({
                     <div>{label(uiText("Ui.text_c5939cb300d228"), true)}<input type="text" value={tvForm.notes} onChange={(e) => setTvForm((p) => ({ ...p, notes: e.target.value }))} placeholder={uiText("Ui.text_7ab41874303696")} className={inp} /></div>
                   </div>
                   <div className="flex gap-2">
-                    <button onClick={handleAddTv} disabled={savingTv || !tvForm.channel || !tvForm.date} className="flex items-center gap-2 px-4 py-2 bg-gold text-bg-primary text-xs font-semibold rounded-lg hover:bg-gold-light transition-colors disabled:opacity-60">{uiText.rich("Ui.text_74c465184b036f", { value1: () => (savingTv ? <Loader2 size={12} className="animate-spin" /> : <Check size={12} />) })}</button>
-                    <button onClick={() => { setShowTvForm(false); setTvForm(EMPTY_TV_FORM); }} className="px-4 py-2 border border-border text-text-secondary text-xs rounded-lg hover:border-gold hover:text-gold transition-colors">{uiText("home.boardCancel")}</button>
+                    <button onClick={handleAddTv} disabled={savingTv || !tvForm.channel || !tvForm.date} className="min-h-11 flex items-center gap-2 px-4 py-2 bg-gold text-bg-primary text-xs font-semibold rounded-lg hover:bg-gold-light transition-colors disabled:opacity-60">{uiText.rich("Ui.text_74c465184b036f", { value1: () => (savingTv ? <Loader2 size={12} className="animate-spin" /> : <Check size={12} />) })}</button>
+                    <button onClick={() => { setShowTvForm(false); setTvForm(EMPTY_TV_FORM); }} className="min-h-11 px-4 py-2 border border-border text-text-secondary text-xs rounded-lg hover:border-gold hover:text-gold transition-colors">{uiText("home.boardCancel")}</button>
                   </div>
                 </div>
               )}
@@ -1230,7 +1088,7 @@ export default function ProjectDetail({
                         <p className="text-xs text-text-muted">{t.date}{t.territory && uiText("Ui.text_f6b53f9c8ab3ef", { value1: String(t.territory) })}{t.notes && uiText("Ui.text_f6b53f9c8ab3ef", { value1: String(t.notes) })}</p>
                       </div>
                       {isCreator && (
-                        <button onClick={() => handleRemoveTv(i)} className="text-text-muted hover:text-crimson-light transition-colors opacity-0 group-hover:opacity-100"><X size={13} /></button>
+                        <button onClick={() => handleRemoveTv(i)} className="min-h-11 min-w-11 flex items-center justify-center text-text-muted hover:text-crimson-light transition-colors"><X size={13} /></button>
                       )}
                     </div>
                   ))}

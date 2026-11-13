@@ -54,8 +54,12 @@ export function projectDraftMetadata(data: Record<string, unknown>, draftId: str
     ? { ...(metadata.project_details as Record<string, unknown>) }
     : {};
   for (const field of PROJECT_DETAIL_METADATA_FIELDS) {
-    if (field in data) projectDetails[field] = data[field];
+    if (field !== "verified" && field in data) projectDetails[field] = data[field];
   }
+  // A published revision needs its own administrative review. Never carry a
+  // prior review into member-edited content or accept it from a legacy draft.
+  delete metadata.verified;
+  if ("verified" in projectDetails || data.verified !== undefined) projectDetails.verified = false;
   if (Object.keys(projectDetails).length > 0) metadata.project_details = projectDetails;
 
   metadata.draft_id = draftId;

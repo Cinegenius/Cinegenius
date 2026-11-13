@@ -252,8 +252,9 @@ export default function NewProjectPage() {
   const [linkedLocations, setLinkedLocations] = useState<LinkedItem[]>([]);
   const [crew, setCrew] = useState<CrewEntry[]>([]);
 
-  const projectDraft = useFormDraft({ formKey: "project:new", value: { form, linkedCompanies, linkedLocations, crew },
-    restore: (draft) => { setForm(draft.form); setLinkedCompanies(draft.linkedCompanies); setLinkedLocations(draft.linkedLocations); setCrew(draft.crew); },
+  const [requestKey, setRequestKey] = useState(() => crypto.randomUUID());
+  const projectDraft = useFormDraft({ formKey: "project:new", value: { form, linkedCompanies, linkedLocations, crew, requestKey },
+    restore: (draft) => { if (draft.requestKey) setRequestKey(draft.requestKey); setForm(draft.form); setLinkedCompanies(draft.linkedCompanies); setLinkedLocations(draft.linkedLocations); setCrew(draft.crew); },
   });
 
   // Search state
@@ -332,6 +333,7 @@ export default function NewProjectPage() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
+          requestKey,
           title: form.title,
           type: form.type || null,
           year: form.year || null,
@@ -422,7 +424,7 @@ export default function NewProjectPage() {
             </div>
             <div>
               <label className="block text-xs font-semibold text-text-secondary mb-1.5 uppercase tracking-wide">{uiText("projects.filterYear")}</label>
-              <input type="number" placeholder="2024" min="1900" max="2030" value={form.year} onChange={(e) => set("year", e.target.value)} className={inputCls} />
+              <input type="number" placeholder={String(new Date().getFullYear())} min="1900" max={new Date().getFullYear() + 5} value={form.year} onChange={(e) => set("year", e.target.value)} className={inputCls} />
             </div>
           </div>
 

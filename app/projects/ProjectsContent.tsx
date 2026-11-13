@@ -1,478 +1,113 @@
 "use client";
 
-import { useViewState } from "@/lib/use-view-state";
-import { canonicalProjectCategoryId } from "@/lib/project-category-filter";
-import { projectTypeLabel, projectTypeOptions, normalizedCatalogueSearch } from "@/lib/project-type-labels";
-
-import { useState, useMemo, useEffect, useRef } from "react";
+import { useMemo } from "react";
 import Link from "next/link";
-import { useTranslations , useLocale } from "next-intl";
+import { useRouter } from "next/navigation";
+import { useLocale, useTranslations } from "next-intl";
+import { Clapperboard, LayoutGrid, LayoutList, Search, Users, X } from "lucide-react";
+import MediaImage from "@/components/MediaImage";
 import MobileBrowseControls, { MobileFilterField, MobileFilterSelect, type BrowseChip } from "@/components/MobileBrowseControls";
-import {
-  Search, Clapperboard, Calendar, Users, X, ChevronDown,
-  LayoutList, LayoutGrid, Film, MapPin, ArrowUpDown,
-  Camera, Zap, Music, FileVideo, Building2, Radio, Tv,
-} from "lucide-react";
+import { useViewState } from "@/lib/use-view-state";
+import { PROJECT_CATEGORIES, projectCategoryForType, type ProjectCategoryId } from "@/lib/project-category-filter";
+import { normalizedCatalogueSearch, projectTypeLabel, projectTypeOptions } from "@/lib/project-type-labels";
+import { sortProjects, type BrowseProject, type ProjectSort } from "@/lib/projects-browse";
 
-
-
-type Project = {
-  id: string;
-  title: string;
-  year: number | null;
-  type: string | null;
-  director: string | null;
-  poster_url: string | null;
-  crew_count: number;
-};
-
-const TYPE_COLORS: Record<string, string> = {
-  Spielfilm:     "bg-purple-500/15 text-purple-300 border-purple-500/30",
-  Kurzfilm:      "bg-blue-500/15 text-blue-300 border-blue-500/30",
-  Serie:         "bg-green-500/15 text-green-300 border-green-500/30",
-  Dokumentation: "bg-amber-500/15 text-amber-300 border-amber-500/30",
-  Werbefilm:     "bg-pink-500/15 text-pink-300 border-pink-500/30",
-  Musikvideo:    "bg-red-500/15 text-red-300 border-red-500/30",
-  Corporate:     "bg-cyan-500/15 text-cyan-300 border-cyan-500/30",
-};
-
-type SortKey = "year_desc" | "year_asc" | "title_asc" | "crew_desc";
-
-// ─── SortDropdown ────────────────────────────────────────────────
-
-function getLocalizedCATEGORY_CHIPS(translate: (key: string) => string) {
-  return ([
-  { id: "film", label: translate("projects.catFilmSerie"),    keywords: ["spielfilm", "kurzfilm", "serie", "film"],                                               icon: Film },
-  { id: "werbung", label: translate("home.showcaseAds"),         keywords: ["werbefilm", "werbung", "commercial", "spot", "imagefilm"],                              icon: Tv },
-  { id: "foto", label: translate("projects.catFoto"), keywords: ["foto", "shooting", "fotografie", "editorial", "portrait", "kampagne"],                 icon: Camera },
-  { id: "social-media", label: translate("home.showcaseSocial"),    keywords: ["social", "tiktok", "instagram", "reel", "youtube", "content", "podcast", "influencer"],icon: Zap },
-  { id: "musikvideo", label: translate("projects.catMusikvideo"),      keywords: ["musikvideo", "musik", "konzert", "band", "artist"],                                    icon: Music },
-  { id: "dokumentation", label: translate("projects.catDokumentation"),   keywords: ["dokumentation", "dokumentar", "reportage", "doku"],                                    icon: FileVideo },
-  { id: "corporate", label: translate("projects.catCorporate"),       keywords: ["corporate", "business", "imagevideo", "erklärvideo", "employer", "unternehmen"],       icon: Building2 },
-  { id: "event", label: translate("projects.catEvent"),    keywords: ["event", "live", "festival", "sport", "konferenz", "messe"],                            icon: Radio },
-]);
-}
-
-function SortDropdown({ value, options, onChange }: {
-  value: string; options: { value: string; label: string }[]; onChange: (v: string) => void;
-}) {
-  const [open, setOpen] = useState(false);
-  const ref = useRef<HTMLDivElement>(null);
-  useEffect(() => {
-    if (!open) return;
-    const h = (e: MouseEvent) => { if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false); };
-    document.addEventListener("mousedown", h);
-    return () => document.removeEventListener("mousedown", h);
-  }, [open]);
-  // label resolved from options array passed in
-  const label = options.find((o) => o.value === value)?.label ?? options[0]?.label ?? "";
-  return (
-    <div ref={ref} className="relative shrink-0">
-      <button onClick={() => setOpen((v) => !v)}
-        className="flex items-center gap-2 h-9 px-3 rounded-lg text-xs font-medium border border-border text-text-muted hover:text-text-secondary transition-all bg-bg-elevated">
-        <ArrowUpDown size={11} />
-        {label}
-        <ChevronDown size={11} className={`transition-transform ${open ? "rotate-180" : ""}`} />
-      </button>
-      {open && (
-        <div className="absolute top-full left-0 mt-1 z-50 bg-bg-elevated border border-border rounded-xl shadow-xl overflow-hidden min-w-[160px]">
-          {options.map((o) => (
-            <button key={o.value} onClick={() => { onChange(o.value); setOpen(false); }}
-              className={`w-full text-left px-3 py-2 text-xs transition-colors hover:bg-white/[0.04] ${value === o.value ? "text-gold font-medium" : "text-text-secondary"}`}>
-              {o.label}
-            </button>
-          ))}
-        </div>
-      )}
-    </div>
-  );
-}
-
-// ─── FilterDropdown ───────────────────────────────────────────────
-function FilterDropdown({
-  icon: Icon, label, value, options, onChange, optionLabel = (value: string) => value,
-}: {
-  icon: React.ElementType; label: string; value: string;
-  options: string[]; onChange: (v: string) => void; optionLabel?: (value: string) => string;
-}) {
-  const [open, setOpen] = useState(false);
-  const ref = useRef<HTMLDivElement>(null);
-  useEffect(() => {
-    if (!open) return;
-    const h = (e: MouseEvent) => { if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false); };
-    document.addEventListener("mousedown", h);
-    return () => document.removeEventListener("mousedown", h);
-  }, [open]);
-  const active = !!value;
-  return (
-    <div ref={ref} className="relative shrink-0">
-      <button onClick={() => setOpen((v) => !v)}
-        className={`flex items-center gap-2 h-9 px-3 rounded-lg text-xs font-medium border transition-all ${
-          active ? "bg-gold/12 border-gold/30 text-gold" : open ? "bg-bg-elevated border-border text-text-secondary" : "border-border text-text-muted hover:text-text-secondary"
-        }`}>
-        <Icon size={11} />
-        {active ? optionLabel(value) : label}
-        {active
-          ? <span onClick={(e) => { e.stopPropagation(); onChange(""); setOpen(false); }} className="hover:text-red-400 transition-colors ml-0.5"><X size={10} /></span>
-          : <ChevronDown size={11} className={`transition-transform ${open ? "rotate-180" : ""}`} />}
-      </button>
-      {open && (
-        <div className="absolute top-full left-0 mt-1 z-50 bg-bg-elevated border border-border rounded-xl shadow-xl overflow-hidden min-w-[150px] max-h-64 overflow-y-auto">
-          {options.map((opt) => (
-            <button key={opt} onClick={() => { onChange(opt); setOpen(false); }}
-              className={`w-full text-left px-3 py-2 text-xs transition-colors hover:bg-white/[0.04] ${value === opt ? "text-gold font-medium" : "text-text-secondary"}`}>
-              {optionLabel(opt)}
-            </button>
-          ))}
-        </div>
-      )}
-    </div>
-  );
-}
-
-// ─── Main ─────────────────────────────────────────────────────────
-export default function ProjectsContent({ projects: allProjects }: { projects: Project[] }) {
-  const uiPriceLocale = useLocale();
-
-  const uiText = useTranslations();
-  const CATEGORY_CHIPS = getLocalizedCATEGORY_CHIPS(uiText);
-
-
+export default function ProjectsContent({ projects, category = null }: { projects: BrowseProject[]; category?: ProjectCategoryId | null }) {
   const t = useTranslations("projects");
+  const ui = useTranslations();
+  const locale = useLocale();
+  const router = useRouter();
   const [query, setQuery] = useViewState("projects.query", "");
-  const [storedCategoryChip, setCategoryChip] = useViewState<string | null>("projects.categoryChip", null);
-  const categoryChip = canonicalProjectCategoryId(storedCategoryChip);
-  const activeCategoryChip = CATEGORY_CHIPS.find((chip) => chip.id === categoryChip);
-  useEffect(() => {
-    // Retain the selected category when recovering the original German view state.
-    // Unrecognized saved text is not guessed or rewritten.
-    if (categoryChip && storedCategoryChip !== categoryChip) setCategoryChip(categoryChip);
-  }, [categoryChip, storedCategoryChip, setCategoryChip]);
   const [typeFilter, setTypeFilter] = useViewState("projects.typeFilter", "");
   const [yearFilter, setYearFilter] = useViewState("projects.yearFilter", "");
   const [directorFilter, setDirectorFilter] = useViewState("projects.directorFilter", "");
-  const [sort, setSort] = useViewState<SortKey>("projects.sort", "year_desc");
-  const [view, setView] = useViewState<"list" | "grid">("projects.view", "list");
-
-  // Derive available filter options from data
-  const availableTypes = useMemo(() => {
-    const types = allProjects.map((p) => p.type).filter(Boolean) as string[];
-    return [...new Set(types)].sort();
-  }, [allProjects]);
-
-  const typeOptions = projectTypeOptions(availableTypes, uiText, uiPriceLocale);
-
-  const availableYears = useMemo(() => {
-    const years = allProjects.map((p) => p.year).filter(Boolean) as number[];
-    return [...new Set(years)].sort((a, b) => b - a).map(String);
-  }, [allProjects]);
-
-  const availableDirectors = useMemo(() => {
-    const dirs = allProjects.map((p) => p.director).filter(Boolean) as string[];
-    return [...new Set(dirs)].sort();
-  }, [allProjects]);
-
+  const [sort, setSort] = useViewState<ProjectSort>("projects.sort", "recent");
+  const [view, setView] = useViewState<"list" | "grid">("projects.view", "grid");
+  const categories = PROJECT_CATEGORIES.map(item => ({ value: item.id, label: t(item.labelKey) }));
+  const categoryProjects = useMemo(() => category ? projects.filter(project => projectCategoryForType(project.type) === category) : projects, [projects, category]);
+  const types = projectTypeOptions(categoryProjects.flatMap(project => project.type ? [project.type] : []), ui, locale);
+  const years = [...new Set(categoryProjects.flatMap(project => project.year === null ? [] : [project.year]))].sort((a, b) => b - a).map(value => ({ value: String(value), label: String(value) }));
+  const directors = [...new Set(categoryProjects.flatMap(project => project.director ? [project.director] : []))].sort((a, b) => a.localeCompare(b, locale)).map(value => ({ value, label: value }));
+  const sortOptions = [
+    { value: "recent", label: t("sortRecent") },
+    { value: "year_desc", label: t("sortNewest") },
+    { value: "year_asc", label: t("sortOldest") },
+    { value: "title_asc", label: t("sortAlpha") },
+    { value: "crew_desc", label: t("sortCrew") },
+  ];
   const filtered = useMemo(() => {
-    let list = allProjects;
-    if (categoryChip) {
-      const chip = CATEGORY_CHIPS.find((c) => c.id === categoryChip);
-      if (chip) {
-        list = list.filter((p) =>
-          chip.keywords.some((kw) => (p.type ?? "").toLowerCase().includes(kw))
-        );
-      }
-    }
-    if (query.trim()) {
-      const q = normalizedCatalogueSearch(query, uiPriceLocale);
-      list = list.filter((p) => [p.title, p.director ?? "", p.type ?? "", projectTypeLabel(p.type ?? "", uiText)]
-        .some(value => normalizedCatalogueSearch(value, uiPriceLocale).includes(q)));
-    }
-    if (typeFilter) list = list.filter((p) => p.type === typeFilter);
-    if (yearFilter) list = list.filter((p) => String(p.year) === yearFilter);
-    if (directorFilter) list = list.filter((p) => p.director === directorFilter);
-    list = [...list].sort((a, b) => {
-      if (sort === "year_desc") return (b.year ?? 0) - (a.year ?? 0);
-      if (sort === "year_asc")  return (a.year ?? 0) - (b.year ?? 0);
-      if (sort === "title_asc") return a.title.localeCompare(b.title, uiPriceLocale);
-      if (sort === "crew_desc") return b.crew_count - a.crew_count;
-      return 0;
-    });
-    return list;
-  }, [allProjects, query, categoryChip, typeFilter, yearFilter, directorFilter, sort, uiPriceLocale, uiText]);
+    const needle = normalizedCatalogueSearch(query, locale);
+    return sortProjects(categoryProjects.filter(project =>
+      (!needle || [project.title, project.director ?? "", project.type ?? "", projectTypeLabel(project.type ?? "", ui)].some(value => normalizedCatalogueSearch(value, locale).includes(needle)))
+      && (!typeFilter || project.type === typeFilter)
+      && (!yearFilter || String(project.year) === yearFilter)
+      && (!directorFilter || project.director === directorFilter)), sort, locale);
+  }, [categoryProjects, query, typeFilter, yearFilter, directorFilter, sort, locale, ui]);
 
-  const clearAll = () => { setQuery(""); setCategoryChip(null); setTypeFilter(""); setYearFilter(""); setDirectorFilter(""); };
-  const hasAnyFilter = Boolean(query || categoryChip || typeFilter || yearFilter || directorFilter);
-  const mobileChips: BrowseChip[] = [
-    ...(activeCategoryChip ? [{ id: "category", label: activeCategoryChip.label, onRemove: () => setCategoryChip(null) }] : []),
-    ...(typeFilter ? [{ id: "type", label: projectTypeLabel(typeFilter, uiText), onRemove: () => setTypeFilter("") }] : []),
+  const changeCategory = (value: string) => router.push(value ? `/projects/${value}` : "/projects", { scroll: false });
+  const reset = () => { setQuery(""); setTypeFilter(""); setYearFilter(""); setDirectorFilter(""); };
+  const chips: BrowseChip[] = [
+    ...(typeFilter ? [{ id: "type", label: projectTypeLabel(typeFilter, ui), onRemove: () => setTypeFilter("") }] : []),
     ...(yearFilter ? [{ id: "year", label: yearFilter, onRemove: () => setYearFilter("") }] : []),
     ...(directorFilter ? [{ id: "director", label: directorFilter, onRemove: () => setDirectorFilter("") }] : []),
   ];
+  const hasFilters = Boolean(query || chips.length);
+  const views = <div className="flex shrink-0 rounded-xl border border-border bg-bg-elevated p-1" role="group" aria-label={ui("locations.viewLabel")}>
+    {([{ value: "grid", icon: LayoutGrid, label: ui("Ui.text_2cc48b15f4ffeb") }, { value: "list", icon: LayoutList, label: ui("locations.viewList") }] as const).map(({ value, icon: Icon, label }) => <button type="button" key={value} aria-label={label} title={label} aria-pressed={view === value} onClick={() => setView(value)} className={`flex h-11 w-11 items-center justify-center rounded-lg transition-colors ${view === value ? "bg-gold/10 text-gold" : "text-text-muted hover:text-text-primary"}`}><Icon size={18} aria-hidden="true" /></button>)}
+  </div>;
+  const fields = [{ label: t("filterType"), value: typeFilter, options: types, onChange: setTypeFilter }, { label: t("filterYear"), value: yearFilter, options: years, onChange: setYearFilter }, { label: t("filterDirector"), value: directorFilter, options: directors, onChange: setDirectorFilter }];
 
-  return (
-    <div className="min-h-screen bg-bg-primary mobile-bottom-nav-clear">
+  return <div className="mobile-bottom-nav-clear bg-bg-primary">
+    <MobileBrowseControls query={query} onQueryChange={setQuery} searchPlaceholder={t("searchPlaceholder")}
+      sortValue={sort} sortOptions={sortOptions} onSortChange={value => setSort(value as ProjectSort)}
+      categoryLabel={ui("props.categoryBtn")} allCategoryLabel={ui("common.allProjects")} categories={categories} categoryValue={category ?? ""} onCategoryChange={changeCategory}
+      resultSummary={t("resultsCount", { count: filtered.length })} viewControls={views} filterCount={chips.length} chips={chips} onReset={reset} resetLabel={t("resetFilters")} showResultsLabel={ui("Ui.text_52ca04e867ebdc", { value1: String(filtered.length) })}>
+      {fields.map(field => <MobileFilterField key={field.label} label={field.label}><MobileFilterSelect value={field.value} onChange={field.onChange} options={field.options} placeholder={ui("common.all")} label={field.label} /></MobileFilterField>)}
+    </MobileBrowseControls>
 
-      <MobileBrowseControls
-        query={query}
-        onQueryChange={setQuery}
-        searchPlaceholder={t("searchPlaceholder")}
-        sortValue={sort}
-        sortOptions={[
-          { value: "year_desc", label: t("sortNewest") },
-          { value: "year_asc", label: t("sortOldest") },
-          { value: "title_asc", label: t("sortAlpha") },
-          { value: "crew_desc", label: t("sortCrew") },
-        ]}
-        onSortChange={(value) => setSort(value as SortKey)}
-        categoryLabel={uiText("setup.copy78")}
-        allCategoryLabel={uiText("common.allProjects")}
-        categories={CATEGORY_CHIPS.map((chip) => ({ value: chip.id, label: chip.label }))}
-        categoryValue={categoryChip ?? ""}
-        onCategoryChange={(value) => setCategoryChip(canonicalProjectCategoryId(value))}
-        resultSummary={t("resultsCount", { count: filtered.length })}
-        filterCount={mobileChips.length}
-        chips={mobileChips}
-        onReset={clearAll}
-        resetLabel={t("clearAllFilters")}
-        showResultsLabel={uiText("Ui.text_52ca04e867ebdc", { value1: String(filtered.length) })}
-      >
-        <MobileFilterField label={t("filterType")}>
-          <MobileFilterSelect value={typeFilter} onChange={setTypeFilter} placeholder={uiText("Ui.text_afba0b3e7b5f22")} options={typeOptions} />
-        </MobileFilterField>
-        <MobileFilterField label={t("filterYear")}>
-          <MobileFilterSelect value={yearFilter} onChange={setYearFilter} placeholder={uiText("Ui.text_ccaefee239e05c")} options={availableYears.map((value) => ({ value, label: value }))} />
-        </MobileFilterField>
-        <MobileFilterField label={t("filterDirector")}>
-          <MobileFilterSelect value={directorFilter} onChange={setDirectorFilter} placeholder={uiText("Ui.text_f45f1b1bbf47eb")} options={availableDirectors.map((value) => ({ value, label: value }))} />
-        </MobileFilterField>
-        <div className="mobile-filter-field">
-          <span>{uiText("locations.viewLabel")}</span>
-          <div className="grid grid-cols-2 gap-2">
-            <button type="button" onClick={() => setView("list")} className={`min-h-11 rounded-lg border text-sm ${view === "list" ? "border-gold bg-gold/10 text-gold" : "border-border text-text-secondary"}`}>{uiText("locations.viewList")}</button>
-            <button type="button" onClick={() => setView("grid")} className={`min-h-11 rounded-lg border text-sm ${view === "grid" ? "border-gold bg-gold/10 text-gold" : "border-border text-text-secondary"}`}>{uiText("Ui.text_2cc48b15f4ffeb")}</button>
-          </div>
+    <div className="site-container pb-8 pt-4 sm:pb-12">
+      <div className="browse-toolbar mb-6 hidden space-y-4 p-4 xl:block">
+        <div className="flex items-center gap-3">
+          <label className="flex min-h-12 min-w-0 flex-1 items-center gap-3 rounded-xl border border-border bg-bg-elevated px-3">
+            <Search size={18} className="shrink-0 text-text-muted" aria-hidden="true" />
+            <span className="sr-only">{t("searchPlaceholder")}</span>
+            <input className="min-w-0 flex-1 bg-transparent py-3 text-sm outline-none placeholder:text-text-muted" placeholder={t("searchPlaceholder")} value={query} onChange={event => setQuery(event.target.value)} />
+            {query && <button type="button" className="flex h-11 w-11 shrink-0 items-center justify-center text-text-muted" aria-label={ui("locations.landingClear")} onClick={() => setQuery("")}><X size={18} /></button>}
+          </label>
+          <label className="flex min-h-12 items-center gap-3 rounded-xl border border-border bg-bg-elevated px-3 text-sm">
+            <span className="sr-only">{t("sortLabel")}</span><select className="min-h-11 bg-transparent outline-none" value={sort} onChange={event => setSort(event.target.value as ProjectSort)}>{sortOptions.map(option => <option key={option.value} value={option.value}>{option.label}</option>)}</select>
+          </label>
+          {views}
         </div>
-      </MobileBrowseControls>
-
-
-      {/* ── Filter Bar ───────────────────────────────────── */}
-      <div className="hidden xl:block bg-transparent border-b border-border/30">
-        <div className="px-4 py-2 space-y-2">
-
-          {/* Row 1: Search + View toggle */}
-          <div className="flex items-center gap-2">
-            <div className="flex-1 flex items-center gap-2 bg-bg-elevated border border-border rounded-lg px-3 focus-within:border-gold/50 transition-colors">
-              <Search size={14} className="text-text-muted shrink-0" />
-              <input type="text" value={query} onChange={(e) => setQuery(e.target.value)}
-                placeholder={t("searchPlaceholder")}
-                className="bg-transparent border-none py-2 text-sm w-full focus:outline-none" />
-              {query && <button onClick={() => setQuery("")} className="text-text-muted hover:text-text-primary transition-colors"><X size={12} /></button>}
-            </div>
-            <div className="flex bg-bg-elevated border border-border rounded-lg overflow-hidden shrink-0">
-              <button onClick={() => setView("list")} className={`flex items-center justify-center w-9 h-9 transition-colors ${view === "list" ? "bg-gold text-bg-primary" : "text-text-muted hover:text-text-primary"}`}><LayoutList size={14} /></button>
-              <button onClick={() => setView("grid")} className={`flex items-center justify-center w-9 h-9 transition-colors border-l border-border ${view === "grid" ? "bg-gold text-bg-primary" : "text-text-muted hover:text-text-primary"}`}><LayoutGrid size={14} /></button>
-            </div>
-          </div>
-
-          {/* Row 2: Filters */}
-          <div className="flex items-center gap-2 overflow-x-auto lg:overflow-visible pb-0.5" style={{ scrollbarWidth: "none" }}>
-            <SortDropdown
-              value={sort}
-              options={[
-                { value: "year_desc", label: t("sortNewest") },
-                { value: "year_asc",  label: t("sortOldest") },
-                { value: "title_asc", label: t("sortAlpha") },
-                { value: "crew_desc", label: t("sortCrew") },
-              ]}
-              onChange={(v) => setSort(v as SortKey)}
-            />
-            <Link href="/dashboard/projects/new" className="hidden sm:flex items-center h-9 px-3 bg-gold text-bg-primary text-xs font-semibold rounded-lg hover:bg-gold-light transition-colors whitespace-nowrap shrink-0">
-              {t("createProject")}
-            </Link>
-
-            <div className="w-px h-6 bg-border shrink-0" />
-
-            {availableTypes.length > 0 && (
-              <FilterDropdown icon={Film} label={t("filterType")} value={typeFilter} options={typeOptions.map(option => option.value)} onChange={setTypeFilter} optionLabel={value => projectTypeLabel(value, uiText)} />
-            )}
-            {availableYears.length > 0 && (
-              <FilterDropdown icon={Calendar} label={t("filterYear")} value={yearFilter} options={availableYears} onChange={setYearFilter} />
-            )}
-            {availableDirectors.length > 0 && (
-              <FilterDropdown icon={MapPin} label={t("filterDirector")} value={directorFilter} options={availableDirectors} onChange={setDirectorFilter} />
-            )}
-            {hasAnyFilter && (
-              <button onClick={clearAll} className="h-9 px-3 text-xs text-text-muted hover:text-red-400 transition-colors whitespace-nowrap border border-border rounded-lg hover:border-red-400/40 shrink-0">
-                {t("clearFilter")}
-              </button>
-            )}
-          </div>
-
-          {/* Active chips */}
-          {(typeFilter || yearFilter || directorFilter) && (
-            <div className="flex flex-wrap gap-1.5 items-center">
-              {typeFilter && (
-                <span className={`inline-flex items-center gap-1.5 text-[11px] px-2.5 py-1 rounded-full border font-medium ${TYPE_COLORS[typeFilter] ?? "bg-gold/10 border-gold/30 text-gold"}`}>
-                  {projectTypeLabel(typeFilter, uiText)}
-                  <button onClick={() => setTypeFilter("")} className="hover:opacity-70 ml-0.5"><X size={9} /></button>
-                </span>
-              )}
-              {yearFilter && (
-                <span className="inline-flex items-center gap-1.5 text-[11px] px-2.5 py-1 rounded-full border font-medium bg-bg-elevated border-border text-text-secondary">
-                  <Calendar size={9} /> {yearFilter}
-                  <button onClick={() => setYearFilter("")} className="hover:opacity-70 ml-0.5"><X size={9} /></button>
-                </span>
-              )}
-              {directorFilter && (
-                <span className="inline-flex items-center gap-1.5 text-[11px] px-2.5 py-1 rounded-full border font-medium bg-bg-elevated border-border text-text-secondary">
-                  {directorFilter}
-                  <button onClick={() => setDirectorFilter("")} className="hover:opacity-70 ml-0.5"><X size={9} /></button>
-                </span>
-              )}
-              <button onClick={clearAll} className="text-[11px] text-text-muted hover:text-red-400 transition-colors underline underline-offset-2 ml-1">
-                {t("clearAllFilters")}
-              </button>
-            </div>
-          )}
+        <div className="grid grid-cols-4 gap-3">
+          <label className="min-w-0 text-xs text-text-muted">{ui("props.categoryBtn")}<select className="mt-1 block min-h-11 w-full rounded-xl border border-border bg-bg-elevated px-3 text-sm text-text-secondary" value={category ?? ""} onChange={event => changeCategory(event.target.value)}><option value="">{ui("common.allProjects")}</option>{categories.map(item => <option key={item.value} value={item.value}>{item.label}</option>)}</select></label>
+          {fields.map(field => <label key={field.label} className="min-w-0 text-xs text-text-muted">{field.label}<select className="mt-1 block min-h-11 w-full rounded-xl border border-border bg-bg-elevated px-3 text-sm text-text-secondary" value={field.value} onChange={event => field.onChange(event.target.value)}><option value="">{ui("common.all")}</option>{field.options.map(option => <option key={option.value} value={option.value}>{option.label}</option>)}</select></label>)}
         </div>
+        {hasFilters && <button type="button" className="min-h-11 text-sm text-gold hover:underline" onClick={reset}>{t("resetFilters")}</button>}
       </div>
-
-      {/* ── Results ──────────────────────────────────────── */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-        <p className="hidden xl:block text-sm text-text-muted mb-5">
-          {t("resultsCount", { count: filtered.length })}
-        </p>
-
-        {filtered.length === 0 && (
-          <div className="text-center py-20">
-            <Clapperboard size={32} className="mx-auto mb-3 text-text-muted opacity-30" />
-            <p className="text-text-muted mb-3">{t("emptyTitle")}</p>
-            {hasAnyFilter && (
-              <button onClick={clearAll} className="text-xs text-gold hover:underline">{t("resetFilters")}</button>
-            )}
+      <div className="mb-4 hidden items-center justify-between gap-3 xl:flex"><p className="text-sm text-text-muted tabular-nums" role="status">{t("resultsCount", { count: filtered.length })}</p></div>
+      {filtered.length === 0 ? <div className="browse-card px-5 py-10 text-center">
+        <Clapperboard size={30} className="mx-auto mb-3 text-text-muted" aria-hidden="true" />
+        <h2 className="text-lg font-semibold">{t("emptyTitle")}</h2>
+        <p className="mx-auto mt-2 max-w-md text-sm text-text-muted">{hasFilters ? t("emptyFiltered") : t("emptyCategory")}</p>
+        <div className="mt-5 flex flex-wrap justify-center gap-3">
+          {hasFilters ? <button type="button" onClick={reset} className="min-h-11 rounded-xl border border-border px-4 text-sm text-gold">{t("resetFilters")}</button> : <Link className="inline-flex min-h-11 items-center rounded-xl border border-border px-4 text-sm text-gold" href="/projects">{ui("common.allProjects")}</Link>}
+          <Link className="inline-flex min-h-11 items-center rounded-xl bg-gold px-4 text-sm font-semibold text-bg-primary" href="/projects/neu">{t("addProject")}</Link>
+        </div>
+      </div> : <div className={view === "grid" ? "grid gap-3 sm:grid-cols-2 xl:grid-cols-3" : "grid gap-2"}>
+        {filtered.map(project => <Link href={`/projects/${project.id}`} key={project.id} className={`browse-card group flex min-w-0 items-start gap-3 p-3 transition-colors hover:border-gold/40 focus-visible:outline-2 focus-visible:outline-gold sm:gap-4 sm:p-4 ${view === "list" ? "sm:items-center" : ""}`}>
+          <div className="flex h-[76px] w-14 shrink-0 items-center justify-center overflow-hidden rounded-lg border border-border bg-bg-elevated text-text-muted">
+            {project.poster_url ? <MediaImage src={project.poster_url} alt="" width={56} height={76} className="h-full w-full object-cover" /> : <Clapperboard size={23} aria-hidden="true" />}
           </div>
-        )}
-
-        {/* List view */}
-        {view === "list" && filtered.length > 0 && (
-          <>
-            {/* Mobile: simple card list */}
-            <div className="sm:hidden space-y-2">
-              {filtered.map((project) => (
-                <Link key={project.id} href={`/projects/${project.id}`}
-                  className="flex items-center gap-3 p-4 bg-bg-secondary border border-border rounded-xl hover:border-gold/40 transition-colors group">
-                  <div className="w-10 h-13 rounded shrink-0 bg-bg-elevated border border-border overflow-hidden flex items-center justify-center">
-                    {project.poster_url
-                      // eslint-disable-next-line @next/next/no-img-element
-                      ? <img src={project.poster_url} alt="" className="w-full h-full object-cover" />
-                      : <Clapperboard size={14} className="text-text-muted" />
-                    }
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-semibold text-text-primary group-hover:text-gold transition-colors truncate">{project.title}</p>
-                    <div className="flex items-center gap-2 mt-1 flex-wrap">
-                      {project.type && (
-                        <span className={`px-2 py-0.5 text-[10px] font-semibold rounded-full border ${TYPE_COLORS[project.type] ?? "bg-gold/10 text-gold border-gold/20"}`}>{projectTypeLabel(project.type, uiText)}</span>
-                      )}
-                      {project.year && <span className="text-xs text-text-muted flex items-center gap-1"><Calendar size={10} />{project.year}</span>}
-                    </div>
-                    {project.director && <p className="text-xs text-text-muted mt-0.5 truncate">{project.director}</p>}
-                  </div>
-                  <div className="shrink-0 text-right">
-                    <span className="text-xs text-text-muted flex items-center gap-1"><Users size={11} />{project.crew_count}</span>
-                  </div>
-                </Link>
-              ))}
+          <div className={`min-w-0 flex-1 ${view === "list" ? "sm:grid sm:grid-cols-[minmax(0,2fr)_minmax(0,1fr)_auto] sm:items-center sm:gap-5" : ""}`}>
+            <div className="min-w-0"><h2 className="break-words text-sm font-semibold leading-snug text-text-primary group-hover:text-gold sm:text-base">{project.title}</h2>
+              <p className="mt-1 flex flex-wrap gap-x-2 text-xs leading-relaxed text-text-muted">{project.type && <span>{projectTypeLabel(project.type, ui)}</span>}{project.year !== null && <span>{project.year}</span>}</p>
             </div>
-
-            {/* Desktop: full table */}
-            <div className="hidden sm:block bg-bg-secondary border border-border rounded-2xl overflow-hidden">
-              <div className="grid grid-cols-[2fr_80px_120px_1fr_64px] gap-4 px-5 py-3 border-b border-border bg-bg-elevated">
-                {[
-                  { label: t("colTitle"),    key: "title_asc" as SortKey },
-                  { label: t("colYear"),     key: "year_desc" as SortKey },
-                  { label: t("colType"),     key: null },
-                  { label: t("colDirector"), key: null },
-                  { label: t("colCrew"),     key: "crew_desc" as SortKey },
-                ].map(({ label, key }) => (
-                  <button key={label} onClick={() => key && setSort(key)}
-                    className={`text-[10px] uppercase tracking-widest font-semibold text-left transition-colors flex items-center gap-1 ${
-                      key && sort === key ? "text-gold" : "text-text-muted hover:text-text-secondary"
-                    } ${!key ? "cursor-default" : ""}`}>
-                    {label}
-                    {key && sort === key && (sort.endsWith("asc") ? <ChevronDown size={10} className="rotate-180" /> : <ChevronDown size={10} />)}
-                  </button>
-                ))}
-              </div>
-              <div className="divide-y divide-border">
-                {filtered.map((project) => (
-                  <Link key={project.id} href={`/projects/${project.id}`}
-                    className="grid grid-cols-[2fr_80px_120px_1fr_64px] gap-4 px-5 py-3.5 hover:bg-bg-elevated transition-colors group items-center">
-                    <div className="flex items-center gap-3 min-w-0">
-                      <div className="w-8 h-10 rounded shrink-0 bg-bg-elevated border border-border overflow-hidden flex items-center justify-center">
-                        {project.poster_url
-                          // eslint-disable-next-line @next/next/no-img-element
-                          ? <img src={project.poster_url} alt="" className="w-full h-full object-cover" />
-                          : <Clapperboard size={13} className="text-text-muted" />
-                        }
-                      </div>
-                      <span className="text-sm font-semibold text-text-primary group-hover:text-gold transition-colors truncate">{project.title}</span>
-                    </div>
-                    <span className="text-sm text-text-secondary flex items-center gap-1">
-                      <Calendar size={12} className="text-text-muted shrink-0" />{project.year ?? "—"}
-                    </span>
-                    <div>
-                      {project.type
-                        ? <span className={`px-2 py-0.5 text-[10px] font-semibold rounded-full border ${TYPE_COLORS[project.type] ?? "bg-gold/10 text-gold border-gold/20"}`}>{projectTypeLabel(project.type, uiText)}</span>
-                        : <span className="text-text-muted text-xs">—</span>
-                      }
-                    </div>
-                    <span className="text-sm text-text-secondary truncate">{project.director ?? "—"}</span>
-                    <span className="text-sm text-text-secondary flex items-center gap-1">
-                      <Users size={12} className="text-text-muted shrink-0" />{project.crew_count}
-                    </span>
-                  </Link>
-                ))}
-              </div>
-            </div>
-          </>
-        )}
-
-        {/* Grid view */}
-        {view === "grid" && filtered.length > 0 && (
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-            {filtered.map((project) => (
-              <Link key={project.id} href={`/projects/${project.id}`}
-                className="card-hover group p-5 bg-bg-secondary border border-border rounded-2xl">
-                <div className="flex items-start gap-3 mb-3">
-                  <div className="w-12 h-16 rounded-lg overflow-hidden bg-bg-elevated border border-border shrink-0 flex items-center justify-center">
-                    {project.poster_url
-                      // eslint-disable-next-line @next/next/no-img-element
-                      ? <img src={project.poster_url} alt={project.title} className="w-full h-full object-cover object-top" />
-                      : <Clapperboard size={18} className="text-text-muted" />
-                    }
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <h2 className="font-semibold text-text-primary group-hover:text-gold transition-colors leading-tight mb-1.5 line-clamp-2">{project.title}</h2>
-                    <div className="flex items-center gap-2 flex-wrap">
-                      {project.type && (
-                        <span className={`px-2 py-0.5 text-[10px] font-semibold rounded-full border ${TYPE_COLORS[project.type] ?? ""}`}>{projectTypeLabel(project.type, uiText)}</span>
-                      )}
-                      {project.year && (
-                        <span className="flex items-center gap-1 text-xs text-text-muted"><Calendar size={10} /> {project.year}</span>
-                      )}
-                    </div>
-                  </div>
-                </div>
-                {project.director && <p className="text-xs text-text-muted mb-2">{t("directorPrefix", { name: project.director })}</p>}
-                <div className="flex items-center gap-1 text-xs text-text-muted">
-                  <Users size={11} /> {t("personCount", { count: project.crew_count })}
-                </div>
-              </Link>
-            ))}
+            {project.director ? <p className={`break-words text-xs leading-relaxed text-text-secondary ${view === "grid" ? "mt-3" : "mt-2 sm:mt-0"}`}>{t("directorPrefix", { name: project.director })}</p> : <span />}
+            {project.crew_count > 0 && <p className={`flex items-center gap-1.5 text-xs text-text-muted ${view === "grid" ? "mt-3" : "mt-2 sm:mt-0"}`}><Users size={14} className="shrink-0" aria-hidden="true" />{t("personCount", { count: project.crew_count })}</p>}
           </div>
-        )}
-      </div>
+        </Link>)}
+      </div>}
     </div>
-  );
+  </div>;
 }

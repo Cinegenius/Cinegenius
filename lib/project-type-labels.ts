@@ -12,6 +12,8 @@ const PROJECT_TYPE_KEYS: Readonly<Record<string, string>> = {
   Dokumentation: "projects.catDokumentation",
   Dokumentarfilm: "Ui.text_e2dec20c086399",
   Werbung: "home.showcaseAds",
+  "Werbefilm / Commercial": "Ui.text_9bf2221daf841f",
+  "Social Media Content": "Ui.text_130e3fc256922c",
   Werbefilm: "Ui.text_5c634ccc3ba66d",
   Imagefilm: "Ui.text_411e73c2f310f4",
   Musikvideo: "projects.catMusikvideo",

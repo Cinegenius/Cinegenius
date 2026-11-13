@@ -5,9 +5,15 @@ import { PROJECT_RECORD_COLUMNS, projectRecordWithDetails } from "@/lib/project-
 
 export async function saveProjectDraft(userId: string, input: {
   sourceProjectId?: string | null;
+  requestKey?: string;
   draftData: unknown;
 }) {
   const translate = await getTranslations();
+  if (input.requestKey && !input.sourceProjectId) {
+    const prior = await db.from("project_drafts").select("id, draft_data, source_project_id, created_at, updated_at").eq("id", input.requestKey).eq("user_id", userId).maybeSingle();
+    if (prior.error) return { error: translate("System.requestFailed"), status: 503 as const };
+    if (prior.data) return { draft: prior.data };
+  }
   const patch = sanitizeProjectDraftData(input.draftData);
   const serialized = JSON.stringify(patch);
   if (serialized.length > 250_000) return { error: translate("System.draftTooLarge"), status: 413 as const };
@@ -22,10 +28,10 @@ export async function saveProjectDraft(userId: string, input: {
     sourceProject = projectRecordWithDetails(data as Record<string, unknown>);
   }
 
-  let existingDraft: { id: string; draft_data: Record<string, unknown> | null } | null = null;
+  let existingDraft: { id: string; draft_data: Record<string, unknown> | null; updated_at: string } | null = null;
   if (input.sourceProjectId) {
     const { data, error } = await db.from("project_drafts")
-      .select("id, draft_data")
+      .select("id, draft_data, updated_at")
       .eq("user_id", userId)
       .eq("source_project_id", input.sourceProjectId)
       .is("published_project_id", null)
@@ -55,9 +61,10 @@ export async function saveProjectDraft(userId: string, input: {
     updated_at: new Date().toISOString(),
   };
   const result = existingDraft
-    ? await db.from("project_drafts").update(values).eq("id", existingDraft.id).eq("user_id", userId).select("id, draft_data, source_project_id, created_at, updated_at").single()
-    : await db.from("project_drafts").insert(values).select("id, draft_data, source_project_id, created_at, updated_at").single();
+    ? await db.from("project_drafts").update(values).eq("id", existingDraft.id).eq("user_id", userId).eq("updated_at", existingDraft.updated_at).is("published_project_id", null).select("id, draft_data, source_project_id, created_at, updated_at").single()
+    : await db.from("project_drafts").insert({ ...values, ...(input.requestKey && !input.sourceProjectId ? { id: input.requestKey } : {}) }).select("id, draft_data, source_project_id, created_at, updated_at").single();
 
+  if (existingDraft && result.error?.code === "PGRST116") return { error: translate("projects.publishConflict"), status: 409 as const };
   if (result.error || !result.data) return { error: translate("System.m_6a45e8145d0e"), status: 500 as const };
   return { draft: result.data };
 }

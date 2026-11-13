@@ -8,41 +8,6 @@ import { getTranslations } from "next-intl/server";
 import { projectMediaGrant, projectMediaUrls } from "@/lib/project-media-rights";
 import { getTranslations as getResponseTranslations } from "next-intl/server";
 
-function slugifyName(name: string) {
-  return name.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "")
-    .replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "").slice(0, 50);
-}
-
-async function findOrCreateUnclaimedProfile(name: string, role: string, userId: string) {
-  const escapedName = name.replace(/[\\%_]/g, "\\$&");
-  const existing = await db.from("unclaimed_profiles").select("id")
-    .ilike("name", escapedName).is("claimed_by", null).maybeSingle();
-  if (existing.error) return { id: null, error: existing.error };
-  if (existing.data) return { id: existing.data.id as string, error: null };
-
-  const baseSlug = slugifyName(name);
-  if (!baseSlug) return { id: null, error: new Error("Ungültiger Name") };
-  for (let suffix = 1; suffix <= 40; suffix++) {
-    const slug = suffix === 1 ? baseSlug : `${baseSlug}-${suffix}`;
-    const taken = await db.from("unclaimed_profiles").select("id").eq("slug", slug).maybeSingle();
-    if (taken.error) return { id: null, error: taken.error };
-    if (taken.data) continue;
-    const inserted = await db.from("unclaimed_profiles")
-      .insert({ name, slug, primary_role: role, created_by: userId })
-      .select("id").single();
-    if (!inserted.error && inserted.data) return { id: inserted.data.id as string, error: null };
-    if (inserted.error?.code === "23505") {
-      const retry = await db.from("unclaimed_profiles").select("id")
-        .ilike("name", escapedName).is("claimed_by", null).maybeSingle();
-      if (retry.error) return { id: null, error: retry.error };
-      if (retry.data) return { id: retry.data.id as string, error: null };
-      continue;
-    }
-    return { id: null, error: inserted.error ?? new Error("Profil konnte nicht angelegt werden") };
-  }
-  return { id: null, error: new Error("Kein eindeutiger Profilname verfügbar") };
-}
-
 export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const tResponse = await getResponseTranslations();
   const authResult = await requireAuth();
@@ -51,7 +16,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
   const { id } = await params;
 
   const { data: draft, error: draftError } = await db.from("project_drafts")
-    .select("id, user_id, source_project_id, published_project_id, draft_data")
+    .select("id, user_id, source_project_id, published_project_id, draft_data, updated_at")
     .eq("id", id).eq("user_id", userId).maybeSingle();
   if (draftError) return NextResponse.json({ error: tResponse('System.m_4bb7a67aea1b') }, { status: 500 });
   if (!draft) return NextResponse.json({ error: tResponse('System.m_36ae6da39735') }, { status: 404 });
@@ -69,7 +34,6 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
   if (typeof data.type !== "string" || !data.type.trim()) {
     return NextResponse.json({ error: tResponse('System.m_af547b8a0b13') }, { status: 400 });
   }
-  let projectId: string | null = null;
   const parsedYear = data.year == null || data.year === "" ? null : Number.parseInt(String(data.year), 10);
   const baseProjectFields = {
     ...placeWriteFields(typeof data.location==="string"&&data.location.trim()?data.location:typeof data.country==="string"?data.country:"",data.selected_place_city_id),
@@ -82,84 +46,18 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     images: Array.isArray(data.images) ? data.images.filter((image): image is string => typeof image === "string") : [],
   };
 
-  if (draft.source_project_id) {
-    const updates: Record<string, unknown> = { ...baseProjectFields, updated_at: new Date().toISOString() };
-    updates.metadata = publicationMetadata;
-    delete (updates.metadata as Record<string, unknown>).draft_id;
-    const { data: project, error } = await db.from("projects").update(updates)
-      .eq("id", draft.source_project_id).eq("created_by", userId)
-      .select("id").maybeSingle();
-    if (error) return NextResponse.json({ error: tResponse('System.m_3eff693c5cd9') }, { status: 500 });
-    if (!project) return NextResponse.json({ error: tResponse('System.m_248ba736f0b3') }, { status: 404 });
-    projectId = project.id;
-  } else {
-    const { data: existing } = await db.from("projects").select("id")
-      .eq("created_by", userId).contains("metadata", { draft_id: id }).maybeSingle();
-    if (existing) projectId = existing.id;
-
-    if (!projectId) {
-      const insert: Record<string, unknown> = {
-        ...baseProjectFields,
-        created_by: userId,
-        metadata: publicationMetadata,
-      };
-      const { data: created, error } = await db.from("projects").insert(insert).select("id").single();
-      if (created) projectId = created.id;
-      if (error && error.code === "23505") {
-        const { data: retryExisting } = await db.from("projects").select("id")
-          .eq("created_by", userId).contains("metadata", { draft_id: id }).maybeSingle();
-        if (retryExisting) projectId = retryExisting.id;
-      } else if (error) {
-        return NextResponse.json({ error: tResponse('System.m_f29e5bd28fab') }, { status: 500 });
-      }
-    }
-
-    if (!projectId) return NextResponse.json({ error: tResponse('System.m_4e39778ae531') }, { status: 500 });
+  if (typeof body?.expectedUpdatedAt !== "string" || body.expectedUpdatedAt !== draft.updated_at) {
+    return NextResponse.json({ error: tResponse("projects.publishConflict") }, { status: 409 });
   }
-
-  if (typeof data.myRole === "string" && data.myRole.trim()) {
-    const { error: creditError } = await db.from("project_credits").upsert(
-      { project_id: projectId, user_id: userId, role: data.myRole.trim() },
-      { onConflict: "project_id,user_id" },
-    );
-    if (creditError) return NextResponse.json({ error: tResponse('System.m_4e309c756a39') }, { status: 500 });
+  const { data: projectId, error } = await db.rpc("publish_project_draft", {
+    p_actor: userId, p_draft_id: id, p_expected_updated_at: draft.updated_at,
+    p_fields: baseProjectFields, p_metadata: publicationMetadata,
+  });
+  if (error || typeof projectId !== "string") {
+    const conflict = error?.code === "PT409";
+    return NextResponse.json({ error: tResponse(conflict ? "projects.publishConflict" : "System.requestFailed") },
+      { status: conflict ? 409 : error?.code === "PT404" ? 404 : 503 });
   }
-
-  const crewEntries = Array.isArray(data.crew_entries)
-    ? data.crew_entries.filter((entry): entry is { name: string; role: string } =>
-      !!entry && typeof entry === "object" && typeof (entry as { name?: unknown }).name === "string" && typeof (entry as { role?: unknown }).role === "string",
-    ).slice(0, 40)
-    : [];
-  for (const entry of crewEntries) {
-    const name = entry.name.trim().slice(0, 100);
-    const role = entry.role.trim().slice(0, 100);
-    if (!name || !role) continue;
-    const profile = await findOrCreateUnclaimedProfile(name, role, userId);
-    if (profile.error || !profile.id) {
-      return NextResponse.json({ error: tResponse('System.m_eb8f17c231f9') }, { status: 500 });
-    }
-    const existingCredit = await db.from("project_credits").select("id")
-      .eq("project_id", projectId).eq("unclaimed_profile_id", profile.id).maybeSingle();
-    if (existingCredit.error) {
-      return NextResponse.json({ error: tResponse('System.m_5cc323e1e295') }, { status: 500 });
-    }
-    if (!existingCredit.data) {
-      const credit = await db.from("project_credits").insert({
-        project_id: projectId,
-        unclaimed_profile_id: profile.id,
-        role,
-      });
-      if (credit.error && credit.error.code !== "23505") {
-        return NextResponse.json({ error: tResponse('System.m_eb8f17c231f9') }, { status: 500 });
-      }
-    }
-  }
-
-  const { error: markError } = await db.from("project_drafts").update({
-    published_project_id: projectId,
-    updated_at: new Date().toISOString(),
-  }).eq("id", id).eq("user_id", userId).is("published_project_id", null);
-  if (markError) return NextResponse.json({ error: tResponse('System.m_4adae6f6b02b') }, { status: 500 });
 
   revalidatePath("/projects");
   revalidatePath(`/projects/${projectId}`);

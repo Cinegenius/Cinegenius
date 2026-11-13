@@ -59,7 +59,7 @@ export async function POST(req: NextRequest) {
   if (!body || typeof body !== "object" || Array.isArray(body)) {
     return NextResponse.json({ error: tResponse('System.m_0e4698bf4051') }, { status: 400 });
   }
-  const result = await saveProjectDraft(userId, { draftData: body });
+  const result = await saveProjectDraft(userId, { draftData: body, requestKey: typeof body.requestKey === "string" && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(body.requestKey) ? body.requestKey : undefined });
   if (result.error) return privateNoStoreJson({ error: result.error }, result.status);
   return privateNoStoreJson({ draft: result.draft, status: "draft" }, 201);
 }

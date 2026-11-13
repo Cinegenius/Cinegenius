@@ -21,3 +21,33 @@ export function canonicalProjectCategoryId(value: unknown): ProjectCategoryId | 
     ? LEGACY_PROJECT_CATEGORY_IDS[value as keyof typeof LEGACY_PROJECT_CATEGORY_IDS]
     : null;
 }
+
+export const PROJECT_CATEGORIES = [
+  { id: "film", labelKey: "catFilmSerie" },
+  { id: "werbung", labelKey: "catWerbung" },
+  { id: "foto", labelKey: "catFoto" },
+  { id: "social-media", labelKey: "catSocialMedia" },
+  { id: "musikvideo", labelKey: "catMusikvideo" },
+  { id: "dokumentation", labelKey: "catDokumentation" },
+  { id: "corporate", labelKey: "catCorporate" },
+  { id: "event", labelKey: "catEvent" },
+] as const;
+
+// The two existing project forms use different labels for the same formats.
+// Match those known values consistently without rewriting member content.
+const PROJECT_CATEGORY_TYPES: Record<ProjectCategoryId, readonly string[]> = {
+  film: ["Spielfilm", "Kurzfilm", "Film", "Serie", "TV / Serie", "TV / Episodic", "Serie / TV"],
+  werbung: ["Werbung", "Werbefilm", "Werbefilm / Commercial", "Commercial", "Spot"],
+  foto: ["Foto", "Foto / Shooting", "Fotografie", "Fashion Shooting", "Produkt-Shooting", "Event-Fotografie", "Hochzeits-Fotografie", "Portrait-Shooting", "Werbe-Fotografie"],
+  "social-media": ["Social Media", "Social Media Content", "Instagram / Reels", "TikTok", "YouTube", "UGC Content", "Brand Content"],
+  musikvideo: ["Musikvideo"],
+  dokumentation: ["Dokumentation", "Dokumentarfilm", "Reportage"],
+  corporate: ["Corporate", "Corporate Film", "Corporate Video", "Imagefilm"],
+  event: ["Event", "Event / Live"],
+};
+const categoryByType = new Map(Object.entries(PROJECT_CATEGORY_TYPES).flatMap(([category, types]) =>
+  types.map(type => [type.toLowerCase(), category as ProjectCategoryId] as const)));
+
+export function projectCategoryForType(type: string | null | undefined): ProjectCategoryId | null {
+  return categoryByType.get(type?.trim().toLowerCase() ?? "") ?? null;
+}
