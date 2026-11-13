@@ -7782,6 +7782,12 @@
     "zoomIn": "Ingrandisci",
     "zoomOut": "Riduci",
     "cluster": "{count} risultati: seleziona per ingrandire",
-    "error": "Impossibile caricare la mappa. La vista elenco è ancora disponibile."
+    "error": "Impossibile caricare la mappa. La vista elenco è ancora disponibile.",
+    "companies": "Mappa delle aziende",
+    "company": "Vedi azienda",
+    "loading": "Caricamento della mappa …",
+    "providerPurpose": "Mappe interattive",
+    "providerRegion": "Ungheria / CDN",
+    "providerNotice": "Quando apri una mappa, il browser carica il materiale cartografico da OpenFreeMap. Il tuo indirizzo IP e i dati tecnici della richiesta vengono trasmessi al fornitore della mappa. Nomi, profili e messaggi non vengono inviati come dati della mappa. <provider>Informazioni sul fornitore</provider>."
   }
 }

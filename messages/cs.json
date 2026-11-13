@@ -7782,6 +7782,12 @@
     "zoomIn": "Přiblížit",
     "zoomOut": "Oddálit",
     "cluster": "{count} výsledků – vyber pro přiblížení",
-    "error": "Mapu se nepodařilo načíst. Zobrazení seznamu je nadále dostupné."
+    "error": "Mapu se nepodařilo načíst. Zobrazení seznamu je nadále dostupné.",
+    "companies": "Mapa firem",
+    "company": "Zobrazit firmu",
+    "loading": "Načítání mapy …",
+    "providerPurpose": "Interaktivní mapy",
+    "providerRegion": "Maďarsko / CDN",
+    "providerNotice": "Při otevření mapy načte prohlížeč mapové podklady z OpenFreeMap. Poskytovateli mapy se předá vaše IP adresa a technické údaje požadavku. Jména, profily a zprávy se jako mapová data neodesílají. <provider>Informace o poskytovateli</provider>."
   }
 }

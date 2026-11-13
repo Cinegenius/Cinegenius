@@ -7782,6 +7782,12 @@
     "zoomIn": "Vergrößern",
     "zoomOut": "Verkleinern",
     "cluster": "{count} Treffer – zum Vergrößern auswählen",
-    "error": "Die Karte konnte nicht geladen werden. Die Listenansicht ist weiterhin verfügbar."
+    "error": "Die Karte konnte nicht geladen werden. Die Listenansicht ist weiterhin verfügbar.",
+    "companies": "Firmenkarte",
+    "company": "Firma ansehen",
+    "loading": "Karte wird geladen …",
+    "providerPurpose": "Interaktive Karten",
+    "providerRegion": "Ungarn / CDN",
+    "providerNotice": "Beim Öffnen einer Karte lädt dein Browser Kartenmaterial von OpenFreeMap. Dabei werden deine IP-Adresse und technische Anfragedaten an den Kartenanbieter übermittelt. Namen, Profile und Nachrichten werden nicht als Kartendaten gesendet. <provider>Informationen zum Anbieter</provider>."
   }
 }

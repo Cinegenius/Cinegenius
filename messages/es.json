@@ -7782,6 +7782,12 @@
     "zoomIn": "Acercar",
     "zoomOut": "Alejar",
     "cluster": "{count} resultados: selecciona para acercar",
-    "error": "No se ha podido cargar el mapa. La vista de lista sigue disponible."
+    "error": "No se ha podido cargar el mapa. La vista de lista sigue disponible.",
+    "companies": "Mapa de empresas",
+    "company": "Ver empresa",
+    "loading": "Cargando mapa …",
+    "providerPurpose": "Mapas interactivos",
+    "providerRegion": "Hungría / CDN",
+    "providerNotice": "Al abrir un mapa, tu navegador carga material cartográfico de OpenFreeMap. Tu dirección IP y los datos técnicos de la solicitud se transmiten al proveedor del mapa. Los nombres, perfiles y mensajes no se envían como datos del mapa. <provider>Información del proveedor</provider>."
   }
 }

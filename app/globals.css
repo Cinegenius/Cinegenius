@@ -885,18 +885,25 @@ input:-webkit-autofill:active {
   .cat-sidebar      { display: block; }
 }
 
-/* Location map markers share the directory palette and a full touch target. */
-.location-map .leaflet-container { background: var(--color-bg-secondary); font: inherit; }
+/* The same quiet, dark map surface and touch controls across all directories. */
+.location-map .leaflet-container { background: #1b222d; font: inherit; }
 .location-map .location-map-marker { display: flex; align-items: center; justify-content: center; background: transparent; border: 0; }
 .location-map-marker__dot { display: flex; align-items: center; justify-content: center; width: 14px; height: 14px; border: 2px solid var(--color-bg-primary); border-radius: 50%; background: var(--color-gold); box-shadow: 0 2px 8px #0006; }
-.location-map-marker__cluster { width: 40px; height: 40px; border: 2px solid var(--color-gold); background: var(--color-bg-secondary); color: var(--color-gold); font-size: 13px; font-weight: 700; }
-.location-map-marker--active .location-map-marker__dot, .location-map-marker:focus-visible .location-map-marker__dot { box-shadow: 0 0 0 5px color-mix(in srgb, var(--color-gold) 35%, transparent); }
-.location-map .leaflet-bar a { min-width: 44px; min-height: 44px; line-height: 44px; background: var(--color-bg-secondary); color: var(--color-text-primary); }
+.location-map-marker__cluster { width: 36px; height: 36px; border: 1px solid var(--color-gold); background: var(--color-bg-secondary); color: var(--color-gold); font-size: 12px; font-weight: 600; font-variant-numeric: tabular-nums; }
+.location-map-marker--active .location-map-marker__dot, .location-map-marker:focus-visible .location-map-marker__dot { box-shadow: 0 0 0 5px color-mix(in srgb, var(--color-gold) 25%, transparent); }
+.location-map .leaflet-control-zoom.leaflet-bar { overflow: hidden; border: 1px solid var(--color-border); border-radius: 12px; box-shadow: 0 4px 18px #0003; }
+.location-map .leaflet-control-zoom a { width: 44px; height: 44px; min-width: 44px; min-height: 44px; line-height: 44px; border-color: var(--color-border); background: var(--color-bg-secondary); color: var(--color-text-secondary); font-size: 24px; font-family: inherit; }
+.location-map .leaflet-control-zoom a:hover, .location-map .leaflet-control-zoom a:focus-visible { background: var(--color-bg-elevated); color: var(--color-gold); }
+.location-map .leaflet-control-zoom a.leaflet-disabled { color: var(--color-text-muted); opacity: .6; }
+.location-map .leaflet-top .leaflet-control { margin-top: 12px; }
+.location-map .leaflet-right .leaflet-control { margin-right: 12px; }
 
-/* Leave a readable strip for the map credits below open previews. */
-.location-map .leaflet-control-attribution { max-width: 100%; font-size: 10px; line-height: 16px; }
+/* Visible, usable source credits are part of the map, including below open previews. */
+.location-map .leaflet-bottom.leaflet-right { width: 100%; }
+.location-map .leaflet-container .leaflet-bottom.leaflet-right .leaflet-control-attribution { display: flex; flex-wrap: wrap; justify-content: center; gap: 0 8px; width: 100%; max-width: 100%; margin: 0; padding: 0 6px; border-top: 1px solid var(--color-border); background: var(--color-bg-secondary); color: var(--color-text-secondary); font-size: 10px; line-height: 16px; }
+.location-map .leaflet-container .leaflet-control-attribution a { display: inline-flex; align-items: center; min-height: 44px; color: var(--color-text-secondary); }
+.location-map .leaflet-container .leaflet-control-attribution a:hover { color: var(--color-gold); }
 
-/* Shared Crew and marketplace map: bounded height leaves page navigation reachable. */
 .directory-map-frame { height: clamp(20rem, 60dvh, 42rem); min-width: 0; }
 
 /* One brand treatment for all mobile directory map actions, alongside Genie. */

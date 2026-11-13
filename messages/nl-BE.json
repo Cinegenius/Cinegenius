@@ -7782,6 +7782,12 @@
     "zoomIn": "Inzoomen",
     "zoomOut": "Uitzoomen",
     "cluster": "{count} resultaten – selecteer om in te zoomen",
-    "error": "De kaart kon niet worden geladen. De lijstweergave is nog beschikbaar."
+    "error": "De kaart kon niet worden geladen. De lijstweergave is nog beschikbaar.",
+    "companies": "Bedrijvenkaart",
+    "company": "Bedrijf bekijken",
+    "loading": "Kaart laden …",
+    "providerPurpose": "Interactieve kaarten",
+    "providerRegion": "Hongarije / CDN",
+    "providerNotice": "Wanneer je een kaart opent, laadt je browser kaartmateriaal van OpenFreeMap. Je IP-adres en technische aanvraaggegevens worden naar de kaartaanbieder verstuurd. Namen, profielen en berichten worden niet als kaartgegevens verzonden. <provider>Informatie over de aanbieder</provider>."
   }
 }

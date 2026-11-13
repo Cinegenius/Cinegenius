@@ -7782,6 +7782,12 @@
     "zoomIn": "Zoom in",
     "zoomOut": "Zoom out",
     "cluster": "{count} results – select to zoom in",
-    "error": "The map could not be loaded. List view is still available."
+    "error": "The map could not be loaded. List view is still available.",
+    "companies": "Company map",
+    "company": "View company",
+    "loading": "Loading map …",
+    "providerPurpose": "Interactive maps",
+    "providerRegion": "Hungary / CDN",
+    "providerNotice": "When you open a map, your browser loads map material from OpenFreeMap. Your IP address and technical request data are transmitted to the map provider. Names, profiles and messages are not sent as map data. <provider>Provider information</provider>."
   }
 }

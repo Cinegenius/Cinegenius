@@ -7782,6 +7782,12 @@
     "zoomIn": "Zooma in",
     "zoomOut": "Zooma ut",
     "cluster": "{count} träffar – välj för att zooma in",
-    "error": "Kartan kunde inte laddas. Listvyn är fortfarande tillgänglig."
+    "error": "Kartan kunde inte laddas. Listvyn är fortfarande tillgänglig.",
+    "companies": "Företagskarta",
+    "company": "Visa företag",
+    "loading": "Laddar karta …",
+    "providerPurpose": "Interaktiva kartor",
+    "providerRegion": "Ungern / CDN",
+    "providerNotice": "När du öppnar en karta hämtar webbläsaren kartmaterial från OpenFreeMap. Din IP-adress och tekniska uppgifter om förfrågan skickas till kartleverantören. Namn, profiler och meddelanden skickas inte som kartdata. <provider>Information om leverantören</provider>."
   }
 }

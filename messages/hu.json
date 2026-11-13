@@ -7782,6 +7782,12 @@
     "zoomIn": "Nagyítás",
     "zoomOut": "Kicsinyítés",
     "cluster": "{count} találat – válaszd ki a nagyításhoz",
-    "error": "A térképet nem sikerült betölteni. A listanézet továbbra is elérhető."
+    "error": "A térképet nem sikerült betölteni. A listanézet továbbra is elérhető.",
+    "companies": "Cégtérkép",
+    "company": "Cég megtekintése",
+    "loading": "Térkép betöltése …",
+    "providerPurpose": "Interaktív térképek",
+    "providerRegion": "Magyarország / CDN",
+    "providerNotice": "Térkép megnyitásakor a böngésző az OpenFreeMap szolgáltatástól tölti be a térképadatokat. A térképszolgáltató megkapja az IP-címedet és a kérés technikai adatait. Neveket, profilokat és üzeneteket nem küldünk térképadatként. <provider>A szolgáltató adatai</provider>."
   }
 }
