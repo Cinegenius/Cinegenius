@@ -7653,7 +7653,14 @@
     "description": "Håll kontakten med de personer du vill arbeta med.",
     "search": "Sök kontakter …",
     "empty": "Inga kontakter ännu",
-    "openContacts": "Visa kontakter"
+    "openContacts": "Visa kontakter",
+    "message": "Meddelande",
+    "messageLabel": "Skriv ett meddelande till {name}",
+    "removeShort": "Ta bort",
+    "removeLabel": "Ta bort {name} från kontakter",
+    "confirmRemove": "Vill du ta bort {name} från dina kontakter?",
+    "cancel": "Avbryt",
+    "removing": "Tar bort …"
   },
   "MessagingBackend": {
     "invalid": "Kontrollera meddelandet och de valda personerna.",

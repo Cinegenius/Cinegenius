@@ -7653,7 +7653,14 @@
     "description": "Behalte die Menschen im Blick, mit denen du zusammenarbeiten möchtest.",
     "search": "Kontakte suchen …",
     "empty": "Noch keine Kontakte",
-    "openContacts": "Kontakte ansehen"
+    "openContacts": "Kontakte ansehen",
+    "message": "Nachricht",
+    "messageLabel": "Nachricht an {name} schreiben",
+    "removeShort": "Entfernen",
+    "removeLabel": "{name} aus Kontakten entfernen",
+    "confirmRemove": "Möchtest du {name} aus deinen Kontakten entfernen?",
+    "cancel": "Abbrechen",
+    "removing": "Wird entfernt …"
   },
   "MessagingBackend": {
     "invalid": "Bitte prüfe die Nachricht und die ausgewählten Personen.",

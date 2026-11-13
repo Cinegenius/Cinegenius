@@ -7653,7 +7653,14 @@
     "description": "Zůstaň v kontaktu s lidmi, se kterými chceš spolupracovat.",
     "search": "Hledat kontakty …",
     "empty": "Zatím žádné kontakty",
-    "openContacts": "Zobrazit kontakty"
+    "openContacts": "Zobrazit kontakty",
+    "message": "Zpráva",
+    "messageLabel": "Napsat zprávu uživateli {name}",
+    "removeShort": "Odebrat",
+    "removeLabel": "Odebrat {name} z kontaktů",
+    "confirmRemove": "Chceš odebrat {name} ze svých kontaktů?",
+    "cancel": "Zrušit",
+    "removing": "Odebírání …"
   },
   "MessagingBackend": {
     "invalid": "Zkontrolujte zprávu a vybrané osoby.",

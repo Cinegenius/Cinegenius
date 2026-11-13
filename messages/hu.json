@@ -7653,7 +7653,14 @@
     "description": "Maradj kapcsolatban azokkal, akikkel szívesen dolgoznál együtt.",
     "search": "Kapcsolatok keresése …",
     "empty": "Még nincsenek kapcsolataid",
-    "openContacts": "Kapcsolatok megtekintése"
+    "openContacts": "Kapcsolatok megtekintése",
+    "message": "Üzenet",
+    "messageLabel": "Üzenet írása neki: {name}",
+    "removeShort": "Eltávolítás",
+    "removeLabel": "{name} eltávolítása a kapcsolatok közül",
+    "confirmRemove": "Eltávolítod őt a kapcsolataid közül: {name}?",
+    "cancel": "Mégse",
+    "removing": "Eltávolítás …"
   },
   "MessagingBackend": {
     "invalid": "Ellenőrizd az üzenetet és a kiválasztott személyeket.",

@@ -7653,7 +7653,14 @@
     "description": "Blijf in contact met de mensen met wie je wilt samenwerken.",
     "search": "Contacten zoeken …",
     "empty": "Nog geen contacten",
-    "openContacts": "Contacten bekijken"
+    "openContacts": "Contacten bekijken",
+    "message": "Bericht",
+    "messageLabel": "Een bericht sturen naar {name}",
+    "removeShort": "Verwijderen",
+    "removeLabel": "{name} uit contacten verwijderen",
+    "confirmRemove": "Wil je {name} uit je contacten verwijderen?",
+    "cancel": "Annuleren",
+    "removing": "Verwijderen …"
   },
   "MessagingBackend": {
     "invalid": "Controleer het bericht en de geselecteerde personen.",

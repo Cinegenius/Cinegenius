@@ -1,6 +1,7 @@
 "use client";
 
 import MessageComposer from "@/components/messaging/MessageComposer";
+import ContactCard from "@/components/ContactCard";
 import type {ChatMessage} from "@/lib/messaging-ui";
 import GenieWritingAssistant from "@/components/GenieWritingAssistant";
 import { locationRoomLabel } from "@/lib/location-rooms";
@@ -607,6 +608,7 @@ export default function DashboardPage() {
   const friendOperations = useRef(new Set<string>());
   const friendLoadGeneration = useRef(0);
   const friendAccount = useRef(user?.id);
+  const friendsRegion = useRef<HTMLDivElement>(null);
   useLayoutEffect(() => { friendAccount.current = user?.id; return () => { friendAccount.current = undefined; }; }, [user?.id]);
   const friendsReady = !!user?.id && friendsOwner === user.id;
   const friends = friendsReady ? storedFriends : [];
@@ -640,7 +642,7 @@ export default function DashboardPage() {
 
   const changeFriend = async (id: string, status?: "accepted" | "rejected") => {
     const actor = user?.id, key = `${actor}:${id}`;
-    if (!actor || friendOperations.current.has(key)) return;
+    if (!actor || friendOperations.current.has(key)) return false;
     friendOperations.current.add(key); setFriendPending(previous => new Set(previous).add(key));
     setFriendsFailure({ account: actor, text: "" });
     try {
@@ -650,11 +652,13 @@ export default function DashboardPage() {
         ...(status ? { body: JSON.stringify({ status, accountId: actor }) } : {}),
       });
       const result = await response.json().catch(() => ({}));
-      if (friendAccount.current !== actor) return;
+      if (friendAccount.current !== actor) return false;
       if (!response.ok || result.success !== true) throw new Error(result.error || uiText("Contacts.error"));
       await doLoadFriends(true);
+      return friendAccount.current === actor;
     } catch (cause) {
       if (friendAccount.current === actor) setFriendsFailure({ account: actor, text: uiErrorMessage(cause, uiText("Contacts.error")) });
+      return false;
     } finally {
       friendOperations.current.delete(key);
       setFriendPending(previous => { const next = new Set(previous); next.delete(key); return next; });
@@ -2550,7 +2554,7 @@ export default function DashboardPage() {
           )}
           {/* ── FREUNDE ── */}
           {activeTab === "friends" && (
-            <div className="space-y-5 max-w-2xl">
+            <div ref={friendsRegion} tabIndex={-1} role="region" aria-label={uiText("Contacts.title")} className="space-y-5 max-w-2xl">
               <div className="flex items-center justify-between">
                 <div>
                   <h2 className="font-display text-lg font-bold text-text-primary flex items-center gap-2">{uiText.rich("Ui.text_d1d7a8f9a56576", { part1: () => (<Users size={18} className="text-gold" />) })}</h2>
@@ -2658,26 +2662,16 @@ export default function DashboardPage() {
                                 <p className="text-[10px] font-semibold text-text-muted uppercase tracking-wider mb-2 px-1">{role}</p>
                                 <div className="space-y-2">
                                   {members.map(f => (
-                                    <div key={f.friendship_id} className="flex flex-wrap items-center gap-3 p-4 rounded-xl border border-border bg-bg-secondary hover:border-gold/30 transition-colors">
-                                      <div className="shrink-0">
-                                        {f.avatar_url ? (
-                                          <UnoptimizedImage src={f.avatar_url} alt="" className="w-11 h-11 rounded-full object-cover border border-border" />
-                                        ) : (
-                                          <div className="w-11 h-11 rounded-full bg-gold/15 border border-gold/20 flex items-center justify-center">
-                                            <span className="text-gold font-bold text-base">{f.display_name[0]?.toUpperCase()}</span>
-                                          </div>
-                                        )}
-                                      </div>
-                                      <div className="flex-1 min-w-0">
-                                        <p className="font-semibold text-text-primary text-sm truncate">{f.display_name}</p>
-                                        <p className="text-xs text-text-muted truncate">{f.role}</p>
-                                      </div>
-                                      <div className="flex max-w-full flex-wrap items-center gap-2">
-                                        <Link href={`/profile/${f.user_id}`} className="inline-flex min-h-11 items-center px-3 py-2 text-xs border border-border text-text-secondary rounded-lg hover:border-gold hover:text-gold transition-all">{uiText("profile.tabProfile")}</Link>
-                                        <button disabled={friendPending.has(`${user?.id}:${f.friendship_id}`)} onClick={() => removeFriendEntry(f.friendship_id)}
-                                          className="inline-flex min-h-11 items-center px-3 py-2 text-xs border border-border text-text-muted rounded-lg hover:border-red-400 hover:text-red-400 transition-all">{uiText("Contacts.remove")}</button>
-                                      </div>
-                                    </div>
+                                    <ContactCard key={`${user?.id}:${f.friendship_id}`} contact={f}
+                                      pending={friendPending.has(`${user?.id}:${f.friendship_id}`)} error={friendsError}
+                                      onRemove={async id => {
+                                        const actor = user?.id;
+                                        const removed = await changeFriend(id);
+                                        if (removed && friendAccount.current === actor) requestAnimationFrame(() => {
+                                          if (friendAccount.current === actor) friendsRegion.current?.focus({ preventScroll: true });
+                                        });
+                                        return removed;
+                                      }} />
                                   ))}
                                 </div>
                               </div>

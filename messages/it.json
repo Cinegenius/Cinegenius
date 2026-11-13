@@ -7653,7 +7653,14 @@
     "description": "Resta in contatto con le persone con cui vorresti lavorare.",
     "search": "Cerca contatti …",
     "empty": "Ancora nessun contatto",
-    "openContacts": "Vedi contatti"
+    "openContacts": "Vedi contatti",
+    "message": "Messaggio",
+    "messageLabel": "Scrivi un messaggio a {name}",
+    "removeShort": "Rimuovi",
+    "removeLabel": "Rimuovi {name} dai contatti",
+    "confirmRemove": "Vuoi rimuovere {name} dai tuoi contatti?",
+    "cancel": "Annulla",
+    "removing": "Rimozione in corso …"
   },
   "MessagingBackend": {
     "invalid": "Controlla il messaggio e le persone selezionate.",
