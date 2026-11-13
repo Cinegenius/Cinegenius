@@ -58,6 +58,7 @@ export default function LocationMap({ readOnly = false, locations, activeId, onH
   const hoverRef = useRef(onHover);
   const boundsChangeRef = useRef(onBoundsChange);
   const automaticBounds = Boolean(onBoundsChange);
+  const hasMapPoints = locations.some(hasCoordinates);
   useEffect(() => { boundsChangeRef.current = onBoundsChange; }, [onBoundsChange]);
   const initialBounds = useRef(appliedBounds);
   useEffect(() => { initialBounds.current = appliedBounds; }, [appliedBounds]);
@@ -80,6 +81,8 @@ export default function LocationMap({ readOnly = false, locations, activeId, onH
     if (!map) return;
     const updateBounds = () => {
       if (!automaticBounds) { setMoved(true); return; }
+      // Do not lock an empty initial map before asynchronously loaded results can fit.
+      if (!hasMapPoints) return;
       const bounds = map.getBounds();
       boundsChangeRef.current?.({south: bounds.getSouth(), north: bounds.getNorth(), west: bounds.getWest(), east: bounds.getEast()});
       setSelection(current => current.id || current.cluster.length ? {...current, id: null, cluster: []} : current);
@@ -92,7 +95,7 @@ export default function LocationMap({ readOnly = false, locations, activeId, onH
       updateBounds();
     }
     return () => { map.off("moveend", updateBounds); map.off("zoomend", updateBounds); map.off("resize", updateBounds); };
-  }, [map, automaticBounds]);
+  }, [map, automaticBounds, hasMapPoints]);
 
   useEffect(() => {
     let cancelled = false;
