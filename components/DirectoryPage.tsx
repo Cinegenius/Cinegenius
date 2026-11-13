@@ -9,6 +9,8 @@ const positions = {
   locations: "60% 42%",
   companies: "80% 42%",
   projects: "100% 42%",
+  jobs: "80% 42%",
+  animals: "80% 42%",
 } as const;
 
 /** One shared image and darkness, with a stable crop for each public directory. */

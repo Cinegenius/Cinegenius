@@ -96,6 +96,7 @@ export default function MobileBrowseControls({
               {sortOptions.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}
             </select>
           </label>
+          {preference}
         </div>
 
         {categoryPlacement === "toolbar" && <label className="mobile-browse-category">
@@ -107,7 +108,6 @@ export default function MobileBrowseControls({
           </select>
         </label>}
 
-        {preference}
         <div className="mobile-browse-summary">
           {viewControls ? <div className="mobile-browse-summary-row"><p role="status" title={typeof resultSummary === "string" ? resultSummary : undefined}>{resultSummary}</p>{viewControls}</div> : <p role="status">{resultSummary}</p>}
           {chips.length > 0 && (

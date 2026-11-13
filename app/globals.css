@@ -210,10 +210,14 @@ body {
   .browse-directory--grid .browse-directory__items { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 }
 
-/* One mobile search/filter pattern shared by all six directory pages. */
-.mobile-browse-controls { border-bottom: 1px solid color-mix(in srgb, var(--color-border) 55%, transparent); background: var(--color-bg-primary); }
+/* Shared directory controls leave the cinematic page backdrop visible. */
+.mobile-browse-controls { border-bottom: 1px solid color-mix(in srgb, var(--color-border) 55%, transparent); background: transparent; }
 .mobile-browse-controls__inner { display: grid; gap: 10px; padding-block: 12px; }
-.browse-preference { min-width: 0; }
+.browse-preference { display: flex; flex: 0 0 auto; align-items: center; }
+.browse-preference-toggle { display: inline-flex; width: 44px; min-height: 44px; flex: 0 0 44px; align-items: center; justify-content: center; border-radius: 12px; color: var(--color-text-secondary); }
+.browse-preference-toggle[data-active="true"] { color: var(--color-gold); }
+.browse-preference-toggle:hover { background: var(--color-bg-elevated); }
+.browse-preference-toggle:focus-visible { outline: 2px solid var(--color-gold); outline-offset: 2px; }
 
 .mobile-bottom-nav-clear { padding-bottom: var(--mobile-nav-offset); }
 .mobile-browse-search, .mobile-browse-action, .mobile-browse-sort, .mobile-browse-category {
@@ -236,7 +240,7 @@ body {
 .mobile-browse-sort select { overflow: hidden; appearance: none; text-overflow: ellipsis; white-space: nowrap; }
 .mobile-browse-category { display: grid; grid-template-columns: minmax(112px, 0.42fr) minmax(0, 1fr); align-items: center; gap: 8px; padding: 0 12px; }
 .mobile-browse-category > span, .mobile-filter-field > span { overflow: hidden; color: var(--color-text-muted); font-size: 12px; font-weight: 600; text-overflow: ellipsis; white-space: nowrap; }
-.mobile-browse-summary { display: grid; gap: 8px; min-width: 0; color: var(--color-text-muted); font-size: 13px; }
+.mobile-browse-summary { display: grid; gap: 8px; min-width: 0; color: var(--color-text-primary); font-size: 13px; }
 .mobile-browse-summary p { min-width: 0; margin: 0; }
 .mobile-browse-summary-row { display: grid; grid-template-columns: minmax(0, 1fr) max-content; align-items: center; gap: 8px; min-width: 0; min-height: 54px; }
 .mobile-browse-summary-row > p { display: -webkit-box; overflow: hidden; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow-wrap: anywhere; line-height: 20px; font-variant-numeric: tabular-nums; }
@@ -952,7 +956,7 @@ input:-webkit-autofill:active {
 
 @media (min-width: 1280px) {
   .mobile-browse-controls__inner { grid-template-columns: minmax(0, 1fr) minmax(300px, 0.65fr); gap: 12px 20px; padding-block: 20px; }
-  .mobile-browse-summary, .browse-preference { grid-column: 1 / -1; }
+  .mobile-browse-summary { grid-column: 1 / -1; }
   .mobile-filter-dialog { align-items: center; }
   .mobile-filter-panel { border-bottom: 1px solid var(--color-border); border-radius: 22px; }
 }

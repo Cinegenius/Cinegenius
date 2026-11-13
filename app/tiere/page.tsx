@@ -1,4 +1,5 @@
 import PageHeader from "@/components/PageHeader";
+import DirectoryPage from "@/components/DirectoryPage";
 import { collectFacetRows } from "@/lib/browse-facets";
 import { db } from "@/lib/db";
 import { placeReadFields } from "@/lib/places/catalog";
@@ -43,14 +44,15 @@ export default async function TierePage() {
   }); });
 
   return (
-    <div className="min-h-screen bg-bg-primary">
+    <DirectoryPage area="animals">
       <PageHeader
+        withBackdrop={false}
         badge={t("department")}
         title={t("browse")}
         description={t("description")}
         cta={{label:t("addPortfolio"),href:"/inserat?animal=1"}}
       />
       <TiereContent serverListings={serverListings} />
-    </div>
+    </DirectoryPage>
   );
 }

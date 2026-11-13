@@ -100,8 +100,8 @@ function JobsInner({ serverJobs }: { serverJobs: Job[] }) {
   const urgentField = (urgentOnly || allJobs.some(job => job.facts.urgent)) && <label className="flex min-h-11 items-center gap-3 text-sm text-text-secondary"><input type="checkbox" className="size-4 accent-gold" checked={urgentOnly} onChange={event => setUrgentOnly(event.target.checked)} />{t("filterUrgentLabel")}</label>;
   const filterKey = `${url}:${geography.key}`, visibleCount = pagination.filterKey === filterKey ? pagination.visibleCount : PAGE_SIZE;
 
-  return <main className="min-h-screen bg-bg-primary mobile-bottom-nav-clear">
-    <PageHeader badge={t("heroBadge")} title={t("heroTitle")} titleHighlight={t("heroTitleHighlight")} description={copy("intro")} cta={{ label: t("postJobBtn"), href: "/inserat?group=jobs" }} />
+  return <main className="min-h-screen mobile-bottom-nav-clear">
+    <PageHeader withBackdrop={false} badge={t("heroBadge")} title={t("heroTitle")} titleHighlight={t("heroTitleHighlight")} description={copy("intro")} cta={{ label: t("postJobBtn"), href: "/inserat?group=jobs" }} />
     <MobileBrowseControls preference={<BrowseGeography geography={geography} />} query={query} onQueryChange={setQuery} searchPlaceholder={t("searchPlaceholder")} sortValue={sortKey} sortOptions={sorts} onSortChange={value => { geography.setEnabled(false); setSortKey(value); }}
       categoryLabel={t("filterDeptRole")} allCategoryLabel={ui("Ui.text_bc0b501bb3186b")} categories={departments} categoryValue={selectedDeptId ?? ""} onCategoryChange={changeDepartment}
       resultSummary={t("results", { count: filtered.length })} filterCount={chips.length} chips={chips} onReset={clearAll} resetLabel={t("emptyReset")} showResultsLabel={t("results", { count: filtered.length })}>

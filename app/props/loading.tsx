@@ -1,1 +1,5 @@
-export { default } from "@/app/loading";
+import DirectoryLoading from "@/components/DirectoryLoading";
+
+export default function Loading() {
+  return <DirectoryLoading area="marketplace" />;
+}

@@ -2,6 +2,7 @@ import { jobRecord } from "@/lib/job-metadata";
 import { placeReadFields } from "@/lib/places/catalog";
 import { db } from "@/lib/db";
 import JobsContent from "./JobsContent";
+import DirectoryPage from "@/components/DirectoryPage";
 import { getLocale } from "next-intl/server";
 import { getTranslations as getMetadataTranslations } from "next-intl/server";
 
@@ -35,5 +36,5 @@ export default async function JobsPage() {
     if (!data || data.length < 250) break;
   }
 
-  return <JobsContent serverJobs={serverJobs} />;
+  return <DirectoryPage area="jobs"><JobsContent serverJobs={serverJobs} /></DirectoryPage>;
 }

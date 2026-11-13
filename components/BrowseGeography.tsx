@@ -1,7 +1,8 @@
 "use client";
 import { COUNTRY_CODES } from "@/lib/places/countries";
 import type { useBrowseGeography } from "@/lib/use-browse-geography";
-import { Globe2,Navigation } from "lucide-react";
+import { Globe2,Navigation,RotateCw } from "lucide-react";
+import Link from "next/link";
 import { useLocale,useTranslations } from "next-intl";
 import { useId,useMemo } from "react";
 
@@ -18,14 +19,28 @@ export function CountrySelect({ value, onChange, name, defaultValue, emptyLabel,
   </label>;
 }
 
+type BrowsePreferenceControlProps = {
+  label: string;
+  active?: boolean;
+  retry?: boolean;
+} & ({ href: string; onClick?: never } | { href?: never; onClick: () => void });
+
+/** The same quiet location action for client filters and server-rendered News. */
+export function BrowsePreferenceControl({ label, active = false, retry = false, href, onClick }: BrowsePreferenceControlProps) {
+  const icon = retry ? <RotateCw size={16} aria-hidden="true" /> : <Navigation size={16} aria-hidden="true" />;
+  const props = { className: "browse-preference-toggle", "aria-label": label, title: label, "data-active": active };
+  return href !== undefined
+    ? <Link {...props} href={href}>{icon}</Link>
+    : <button {...props} type="button" aria-pressed={retry ? undefined : active} onClick={onClick}>{icon}</button>;
+}
+
 export default function BrowseGeography({ geography }: { geography: ReturnType<typeof useBrowseGeography> }) {
   const t = useTranslations("BrowseGeography"), countries = useTranslations("CountryNames");
   if (!geography.error && !(geography.place && geography.eligible)) return null;
   return <div className="browse-preference">
-    {geography.place && geography.eligible && <button type="button" aria-pressed={geography.enabled} onClick={() => geography.setEnabled(!geography.enabled)} className="inline-flex min-h-11 items-center gap-2 text-left text-xs text-text-secondary">
-      <Navigation size={14} aria-hidden="true" className={geography.enabled ? "shrink-0 text-gold" : "shrink-0 text-text-muted"} />
-      {t(geography.enabled ? "preferred" : "prefer", { country: countries(geography.place.country) })}
-    </button>}
-    {geography.error && <button type="button" onClick={geography.retry} className="min-h-11 text-left text-xs text-text-muted">{t("retry")}</button>}
+    {geography.place && geography.eligible && <BrowsePreferenceControl active={geography.enabled}
+      label={t("prefer", { country: countries(geography.place.country) })}
+      onClick={() => geography.setEnabled(!geography.enabled)} />}
+    {geography.error && <BrowsePreferenceControl retry label={t("retry")} onClick={geography.retry} />}
   </div>;
 }

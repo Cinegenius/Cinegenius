@@ -101,8 +101,8 @@ const nativeFilterDialog = /<dialog\b[^>]*aria-modal="true"/.test(mobileFilters)
 if (!nativeFilterDialog && !mobileFilters.includes('role="dialog" aria-modal="true"')) {
   failures.push("Mobile filters must remain an accessible dialog");
 }
-if (!styles.includes("background: var(--color-bg-primary)")) {
-  failures.push("Browse filters must keep the solid page background");
+if (!/\.mobile-browse-controls\s*\{[^}]*background:\s*transparent\s*;/.test(styles)) {
+  failures.push("The shared browse toolbar must leave the directory backdrop visible");
 }
 if (existsSync("components/CategoryHero.tsx")) {
   failures.push("The superseded CategoryHero layout has returned");

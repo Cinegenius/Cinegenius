@@ -1,6 +1,7 @@
 import Image from "@/components/MediaImage";
 import PageHeader from "@/components/PageHeader";
 import DirectoryPage from "@/components/DirectoryPage";
+import { BrowsePreferenceControl } from "@/components/BrowseGeography";
 import { ownBrowsePlace } from "@/lib/browse-geography-server";
 import { approvedEntries,newsFacetRows } from "@/lib/organization-data";
 import { isOrganizationEntryType,isOrganizationTopic } from "@/lib/organization-taxonomy";
@@ -35,8 +36,8 @@ export default async function NewsPage({ searchParams }: { searchParams: Promise
   return <DirectoryPage area="news"><main className="min-h-screen">
     <PageHeader withBackdrop={false} badge={t("eyebrow")} title={t("newsTitle")} description={t("newsDescription")} />
     <NewsBrowseControls key={`${filters.q}:${filters.type}:${filters.topic}:${filters.country}:${filters.geo}`} filters={filters} facets={facets} count={count} preference={<>
-      {preferred && <p className="browse-preference  flex flex-wrap items-center gap-x-4 text-xs text-text-secondary">{geoText("preferred", { country: countryName(preferred.country, locale) })}<Link className="inline-flex min-h-11 items-center underline" href={href({ geo: "off", page: 1 })}>{geoText("everywhere")}</Link></p>}
-      {filters.geo === "off" && <Link className=" inline-flex min-h-11 items-center text-xs text-text-secondary underline" href={href({ geo: "", page: 1 })}>{geoText("useProfile")}</Link>}
+      {preferred && <BrowsePreferenceControl active label={`${geoText("preferred", { country: countryName(preferred.country, locale) })}. ${geoText("everywhere")}`} href={href({ geo: "off", page: 1 })} />}
+      {filters.geo === "off" && <BrowsePreferenceControl label={geoText("useProfile")} href={href({ geo: "", page: 1 })} />}
     </>} />
     <section className="site-container py-5 pb-28 sm:py-7 sm:pb-28 xl:pb-10">
       <div className="mb-5 flex flex-wrap items-center justify-between gap-x-5 gap-y-1 text-sm">
