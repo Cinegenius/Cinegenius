@@ -252,11 +252,11 @@ export default function Navbar({ initialIsSignedIn = false, initialAdminUserId =
           scrolled ? "backdrop-blur-nav border-b border-border" : "bg-black/30 backdrop-blur-sm"
         }`}
       >
-        <div className="site-header-container mx-auto px-4 max-[360px]:px-2 sm:px-6 lg:px-8">
-          <div className="flex h-16 min-w-0 items-center justify-between gap-1 sm:gap-3">
+        <div className="site-header-container mx-auto px-4 max-[479px]:px-2 sm:px-6 lg:px-8">
+          <div className="flex h-16 min-w-0 items-center justify-between gap-1 max-[479px]:gap-0 sm:gap-3">
 
             {/* Logo */}
-            <Logo compact={hasSignedInSession} />
+            <Logo />
 
             {/* Desktop nav */}
             <nav aria-label={t("discover")} className="site-header-primary hidden xl:flex min-w-0 items-center">
@@ -319,7 +319,7 @@ export default function Navbar({ initialIsSignedIn = false, initialAdminUserId =
             </div>
 
             {/* Mobile: keep both auth destinations visible outside the menu. */}
-            <div className="xl:hidden flex shrink-0 items-center gap-1">
+            <div className="xl:hidden flex shrink-0 items-center gap-1 max-[479px]:gap-0">
               {hasSignedInSession && <Link href="/messages" prefetch={false} aria-label={messageLabel} title={messageLabel} aria-current={activeId === "messages" ? "page" : undefined} className="relative flex h-11 w-11 shrink-0 items-center justify-center rounded-lg text-text-muted hover:bg-bg-elevated hover:text-gold">
                 <MessageSquare size={19} aria-hidden="true" />
                 {unreadMessages > 0 && <span aria-hidden="true" className="absolute right-0.5 top-0.5 inline-flex h-4 min-w-4 items-center justify-center rounded-full bg-crimson px-1 text-[9px] font-bold text-white">{unreadMessages > 9 ? "9+" : unreadMessages}</span>}

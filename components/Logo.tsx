@@ -28,7 +28,7 @@ function ChevronMark({ size = 28 }: { size?: number }) {
   );
 }
 
-export function Logo({ href = "/", onClick, compact = false }: { href?: string; onClick?: () => void; compact?: boolean }) {
+export function Logo({ href = "/", onClick }: { href?: string; onClick?: () => void }) {
   const uiText = useTranslations();
 
   const pathname = usePathname();
@@ -44,7 +44,7 @@ export function Logo({ href = "/", onClick, compact = false }: { href?: string; 
     <Link
       href={href}
       onClick={handleClick}
-      className={`flex min-h-11 items-center gap-2.5 max-[420px]:gap-1 shrink-0 group ${compact ? "max-[479px]:min-w-11 max-[479px]:justify-center max-[479px]:gap-0 max-[479px]:[&>span]:hidden" : ""}`}
+      className="flex min-h-11 items-center gap-2.5 max-[420px]:gap-1 shrink-0 group"
       aria-label={uiText("AdminNewsletter.brandName")}
     >{uiText.rich("Ui.text_44b6b8362d2bfa", { part1: () => (<ChevronMark size={28} />), part3: chunks => (<span className="font-medium text-text-primary">{chunks}</span>), part4: chunks => (<span className="font-bold" style={{ color: "var(--color-gold)" }}>{chunks}</span>), part2: chunks => (<span className="font-sans text-[16px] max-[420px]:text-[14px] max-[360px]:text-[13px] leading-none select-none tracking-[-0.035em]">{chunks}</span>) })}</Link>
   );

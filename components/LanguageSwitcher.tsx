@@ -52,7 +52,7 @@ export default function LanguageSwitcher() {
       <button
         type="button"
         onClick={() => setOpen((v) => !v)}
-        className="flex min-h-11 min-w-11 items-center gap-1.5 px-2 py-1.5 rounded-md text-text-muted hover:text-gold hover:bg-bg-elevated transition-all text-sm"
+        className="flex min-h-11 min-w-11 items-center gap-1.5 px-2 py-1.5 max-[479px]:gap-1 max-[479px]:px-0 rounded-md text-text-muted hover:text-gold hover:bg-bg-elevated transition-all text-sm"
         aria-label={t("choose")}
         aria-expanded={open}
         aria-busy={pending}
