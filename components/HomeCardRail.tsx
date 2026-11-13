@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowLeft, ArrowRight, MoveHorizontal } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import styles from "./HomeCardRail.module.css";
 
@@ -8,8 +8,6 @@ type Props = {
   id: string;
   labelledBy: string;
   hint: string;
-  previousLabel: string;
-  nextLabel: string;
   itemCount: number;
   variant: "crew" | "location";
   wide?: boolean;
@@ -17,18 +15,25 @@ type Props = {
 };
 
 /** Only the scroll controls hydrate; the permission-checked cards stay server rendered. */
-export default function HomeCardRail({ id, labelledBy, hint, previousLabel, nextLabel, itemCount, variant, wide = false, children }: Props) {
+export default function HomeCardRail({ id, labelledBy, hint, itemCount, variant, wide = false, children }: Props) {
+  const t = useTranslations("home");
   const trackRef = useRef<HTMLDivElement>(null);
-  const [position, setPosition] = useState({ previous: false, next: itemCount > 1, overflow: itemCount > 1 });
+  const stopsRef = useRef<number[]>([]);
+  const [position, setPosition] = useState({ active: 0, pages: Math.max(1, itemCount) });
 
   useEffect(() => {
     const track = trackRef.current;
     if (!track) return;
     function update() {
       if (!track) return;
-      const maximum = track.scrollWidth - track.clientWidth;
-      const next = { previous: track.scrollLeft > 2, next: track.scrollLeft < maximum - 2, overflow: maximum > 2 };
-      setPosition(current => current.previous === next.previous && current.next === next.next && current.overflow === next.overflow ? current : next);
+      const maximum = Math.max(0, track.scrollWidth - track.clientWidth);
+      const first = track.firstElementChild as HTMLElement | null;
+      const gap = Number.parseFloat(getComputedStyle(track).columnGap) || 0;
+      const step = Math.max(1, first ? first.getBoundingClientRect().width + gap : track.clientWidth);
+      const stops = maximum <= 2 ? [0] : Array.from({ length: Math.ceil(maximum / step) + 1 }, (_, index) => Math.min(index * step, maximum));
+      stopsRef.current = stops;
+      const active = stops.reduce((nearest, offset, index) => Math.abs(offset - track.scrollLeft) < Math.abs(stops[nearest] - track.scrollLeft) ? index : nearest, 0);
+      setPosition(current => current.active === active && current.pages === stops.length ? current : { active, pages: stops.length });
     }
     update();
     track.addEventListener("scroll", update, { passive: true });
@@ -40,27 +45,26 @@ export default function HomeCardRail({ id, labelledBy, hint, previousLabel, next
     };
   }, [itemCount]);
 
-  function move(direction: number) {
+  function move(page: number) {
     const track = trackRef.current;
     if (!track) return;
-    // A whole-card step keeps the next member or location fully visible.
-    const first = track.firstElementChild as HTMLElement | null;
-    const gap = Number.parseFloat(getComputedStyle(track).columnGap) || 0;
-    const step = first ? first.getBoundingClientRect().width + gap : track.clientWidth;
     const behavior = window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "instant" : "smooth";
-    track.scrollBy({ left: direction * step, behavior });
+    track.scrollTo({ left: stopsRef.current[page] ?? 0, behavior });
   }
 
+  // A sliding window keeps the real page positions reachable within 320px.
+  const firstDot = Math.max(0, Math.min(position.active - 2, position.pages - 5));
+  const dots = Array.from({ length: Math.min(position.pages, 5) }, (_, index) => firstDot + index);
+
   return <div className={`${styles.root} ${styles[variant]} ${wide ? styles.wide : ""}`}>
-    <div ref={trackRef} id={id} role="region" aria-labelledby={labelledBy} aria-describedby={position.overflow ? `${id}-hint` : undefined} tabIndex={0} className={styles.track}>
+    <div ref={trackRef} id={id} role="region" aria-labelledby={labelledBy} aria-describedby={position.pages > 1 ? `${id}-hint` : undefined} tabIndex={0} className={styles.track}>
       {children}
     </div>
-    {position.overflow && <div className={styles.controls}>
-      <p id={`${id}-hint`} className={styles.hint}><MoveHorizontal size={16} aria-hidden="true" /><span>{hint}</span></p>
-      <div className={styles.buttons}>
-        <button type="button" aria-label={previousLabel} aria-controls={id} disabled={!position.previous} onClick={() => move(-1)} className={styles.button}><ArrowLeft size={18} aria-hidden="true" /></button>
-        <button type="button" aria-label={nextLabel} aria-controls={id} disabled={!position.next} onClick={() => move(1)} className={styles.button}><ArrowRight size={18} aria-hidden="true" /></button>
-      </div>
+    {position.pages > 1 && <div className={styles.controls}>
+      <p id={`${id}-hint`} className="sr-only">{hint}</p>
+      {dots.map(page => <button key={page} type="button" aria-label={t("railPage", { page: page + 1, total: position.pages })} aria-controls={id} aria-current={page === position.active ? "step" : undefined} onClick={() => move(page)} className={styles.button}>
+        <span aria-hidden="true" className={styles.dot} data-active={page === position.active} />
+      </button>)}
     </div>}
   </div>;
 }

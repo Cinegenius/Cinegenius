@@ -1,4 +1,5 @@
 import PageHeader from "@/components/PageHeader";
+import DirectoryPage from "@/components/DirectoryPage";
 import { db } from "@/lib/db";
 import { marketplaceCardData } from "@/lib/marketplace-browse";
 import { marketplaceFacetRows } from "@/lib/marketplace-facets";
@@ -49,8 +50,9 @@ export default async function PropsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-bg-primary">
+    <DirectoryPage area="marketplace">
       <PageHeader
+        withBackdrop={false}
         badge={t("heroBadge")}
         title={t("heroTitle")}
         titleHighlight={t("heroTitleHighlight")}
@@ -58,6 +60,6 @@ export default async function PropsPage() {
         cta={{ label: t("heroCta"), href: "/inserat?group=marktplatz" }}
       />
       <PropsContent facetRows={facetRows} serverListings={serverListings} serverError={serverError} />
-    </div>
+    </DirectoryPage>
   );
 }

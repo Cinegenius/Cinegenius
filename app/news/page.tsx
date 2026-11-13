@@ -1,5 +1,6 @@
 import Image from "@/components/MediaImage";
 import PageHeader from "@/components/PageHeader";
+import DirectoryPage from "@/components/DirectoryPage";
 import { ownBrowsePlace } from "@/lib/browse-geography-server";
 import { approvedEntries,newsFacetRows } from "@/lib/organization-data";
 import { isOrganizationEntryType,isOrganizationTopic } from "@/lib/organization-taxonomy";
@@ -31,8 +32,8 @@ export default async function NewsPage({ searchParams }: { searchParams: Promise
     return `/news?${query}`;
   };
 
-  return <main className="min-h-screen bg-bg-primary">
-    <PageHeader badge={t("eyebrow")} title={t("newsTitle")} description={t("newsDescription")} />
+  return <DirectoryPage area="news"><main className="min-h-screen">
+    <PageHeader withBackdrop={false} badge={t("eyebrow")} title={t("newsTitle")} description={t("newsDescription")} />
     <NewsBrowseControls key={`${filters.q}:${filters.type}:${filters.topic}:${filters.country}:${filters.geo}`} filters={filters} facets={facets} count={count} preference={<>
       {preferred && <p className="browse-preference  flex flex-wrap items-center gap-x-4 text-xs text-text-secondary">{geoText("preferred", { country: countryName(preferred.country, locale) })}<Link className="inline-flex min-h-11 items-center underline" href={href({ geo: "off", page: 1 })}>{geoText("everywhere")}</Link></p>}
       {filters.geo === "off" && <Link className=" inline-flex min-h-11 items-center text-xs text-text-secondary underline" href={href({ geo: "", page: 1 })}>{geoText("useProfile")}</Link>}
@@ -61,5 +62,5 @@ export default async function NewsPage({ searchParams }: { searchParams: Promise
         {hasMore && <Link className="min-h-11 rounded-xl border border-border px-4 py-3 text-text-secondary" href={href({ page: page + 1 })}>{t("next")} →</Link>}
       </nav>
     </section>
-  </main>;
+  </main></DirectoryPage>;
 }

@@ -43,7 +43,9 @@
     "signOutSlow": "Odhlášení trvá déle, než se očekávalo. Nechte tuto stránku otevřenou.",
     "signOutError": "Odhlášení se nezdařilo. Zkontrolujte připojení a zkuste to znovu.",
     "createListing": "Vytvořit inzerát",
-    "openMenu": "Otevřít menu"
+    "openMenu": "Otevřít menu",
+    "ai": "AI",
+    "comingSoon": "Již brzy"
   },
   "footer": {
     "tagline": "Komplexní tržiště pro filmovou a mediální produkci. Lokace, štáb, rekvizity, vybavení — vše na jednom místě.",
@@ -334,7 +336,8 @@
     "findCompaniesDescription": "Catering, půjčovny a produkční podpora.",
     "findJobsTitle": "Práce",
     "findJobsDescription": "Najdi práci nebo podporu pro svůj projekt.",
-    "findJobsLink": "Prohlédnout zakázky"
+    "findJobsLink": "Prohlédnout zakázky",
+    "railPage": "Zobrazení {page} z {total}"
   },
   "locations": {
     "heroTitle": "Perfektní lokace",
@@ -8071,5 +8074,19 @@
     "trainingBasic": "Základní poslušnost",
     "trainingNone": "Nevycvičený",
     "results": "{count} výsledků"
+  },
+  "MobilePreview": {
+    "unavailableTitle": "CineGenius je momentálně nedostupný",
+    "unavailableDescription": "Zkontroluj připojení k internetu a zkus to znovu. Potvrzená uložení zůstávají zachována. Neuložené údaje nebo probíhající nahrávání mohou chybět.",
+    "retry": "Zkusit znovu"
+  },
+  "AiTools": {
+    "title": "Nástroje AI",
+    "description": "Zde připravujeme nástroje AI pro nápady, texty a přípravu natáčení. Zatím nejsou k dispozici.",
+    "genieDescription": "Prober nápady, připrav texty a najdi vhodné sekce na CineGenius.",
+    "planned": "Připravujeme",
+    "roomScanTitle": "Nativní skener místností a půdorysy",
+    "roomScanDescription": "Skenuj místnosti přímo v aplikaci a vytvářej půdorysy pro svůj projekt. Tato funkce zatím není dostupná a vyžaduje podporované zařízení.",
+    "noticeFirst": "Nejprve zavři oznámení o cookies. Potom můžeš otevřít Genie."
   }
 }

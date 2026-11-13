@@ -141,7 +141,7 @@ export default function CompaniesContent({ initialCompanies }: { initialCompanie
   ];
 
   return (
-    <div className="min-h-screen bg-bg-primary mobile-bottom-nav-clear">
+    <div className="min-h-screen mobile-bottom-nav-clear">
 
       <FloatingMapToggle mapActive={viewMode === "map"} onToggle={() => {
         setViewMode(viewMode === "map" ? "list" : "map");

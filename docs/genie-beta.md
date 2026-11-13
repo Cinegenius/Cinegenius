@@ -8,6 +8,14 @@ After the origin check, the route rejects missing or expired sessions with `401 
 
 ## Configuration
 
+Mobile navigation now opens `/tools` through the middle KI tab (operator decision,
+13 November 2026). The existing Genie panel opens from its tool card on that page;
+there is no floating duplicate on mobile or on the tools page. Desktop retains
+the contextual launcher elsewhere. Opening a tool still makes no generation
+request, and the existing cookie notice, session scope and authentication guards
+remain in effect. The native room scanner is a separate planned tool, not a new
+capability of the Genie endpoint.
+
 Set `OPENAI_API_KEY` as a server-only **Secret** in the correct Vercel project's environment settings, scoped to the intended environments. Never use `NEXT_PUBLIC_`, commit the value, or expose it in commands, screenshots, logs or chat. Do not copy production credentials into previews merely to test the UI.
 
 | Variable | Implemented behavior |

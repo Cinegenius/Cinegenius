@@ -9,6 +9,7 @@ import FloatingMapToggle from "@/components/FloatingMapToggle";
 import Image from "@/components/MediaImage";
 import MobileBrowseControls,{ MobileFilterField,MobileFilterSelect,type BrowseChip } from "@/components/MobileBrowseControls";
 import PageHeader from "@/components/PageHeader";
+import DirectoryPage from "@/components/DirectoryPage";
 import PlaceFilters,{ EMPTY_PLACE_FILTERS,type PlaceFilterValue } from "@/components/PlaceFilters";
 import { locationCategoryLabel } from "@/lib/location-category-labels";
 import { hasCoordinates,inMapBounds,locationDistanceKm,type MapBounds } from "@/lib/location-map";
@@ -151,8 +152,9 @@ export default function LocationsLanding({ allLocations, totalCount, initialFilt
         </aside>;
 
   return (
-    <div className="min-h-screen bg-bg-primary">
+    <DirectoryPage area="locations">
       <PageHeader
+        withBackdrop={false}
         optimizeImage
         badge={t("landingBadge")}
         title={t("heroTitle")}
@@ -248,6 +250,6 @@ export default function LocationsLanding({ allLocations, totalCount, initialFilt
         )}
       </div>
       <FloatingMapToggle mapActive={effectiveView === "map"} onToggle={() => chooseView(effectiveView === "map" ? "list" : "map")} />
-    </div>
+    </DirectoryPage>
   );
 }

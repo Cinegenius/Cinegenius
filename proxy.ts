@@ -155,6 +155,7 @@ const isPublicRoute = createRouteMatcher([
   "/sign-up(.*)",
   "/companies(.*)",
   "/news",
+  "/tools",
   "/organizations",
   /^\/news\/[^/]+\/[^/]+$/,
   /^\/organizations\/[^/]+$/,

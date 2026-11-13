@@ -43,7 +43,9 @@
     "signOutSlow": "Utloggningen tar längre tid än väntat. Låt den här sidan vara öppen.",
     "signOutError": "Det gick inte att logga ut. Kontrollera anslutningen och försök igen.",
     "createListing": "Skapa annons",
-    "openMenu": "Öppna menyn"
+    "openMenu": "Öppna menyn",
+    "ai": "AI",
+    "comingSoon": "Kommer snart"
   },
   "footer": {
     "tagline": "Den kompletta marknadsplatsen för film- och medieproduktion. Inspelningsplatser, filmteam, rekvisita och utrustning – allt på ett ställe.",
@@ -334,7 +336,8 @@
     "findCompaniesDescription": "Catering, uthyrning och stöd till produktioner.",
     "findJobsTitle": "Jobb",
     "findJobsDescription": "Hitta uppdrag eller sök stöd till din idé.",
-    "findJobsLink": "Visa jobb"
+    "findJobsLink": "Visa jobb",
+    "railPage": "Vy {page} av {total}"
   },
   "locations": {
     "heroTitle": "Den perfekta inspelningsplatsen",
@@ -8071,5 +8074,19 @@
     "trainingBasic": "Grundläggande lydnad",
     "trainingNone": "Otränad",
     "results": "{count} resultat"
+  },
+  "MobilePreview": {
+    "unavailableTitle": "CineGenius är inte tillgängligt just nu",
+    "unavailableDescription": "Kontrollera din internetanslutning och försök igen. Bekräftade sparningar finns kvar. Osparade uppgifter eller pågående uppladdningar kan saknas.",
+    "retry": "Försök igen"
+  },
+  "AiTools": {
+    "title": "AI-verktyg",
+    "description": "Här utvecklar vi dina AI-verktyg för idéer, texter och förberedelser inför inspelningen. De är inte tillgängliga ännu.",
+    "genieDescription": "Diskutera idéer, förbered texter och hitta rätt delar av CineGenius.",
+    "planned": "Under utveckling",
+    "roomScanTitle": "Inbyggd rumsskanner och planritningar",
+    "roomScanDescription": "Skanna rum direkt i appen och skapa planritningar för ditt projekt. Funktionen är ännu inte tillgänglig och kräver en enhet som stöds.",
+    "noticeFirst": "Stäng först cookiemeddelandet. Sedan kan du öppna Genie."
   }
 }

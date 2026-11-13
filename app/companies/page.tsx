@@ -1,6 +1,7 @@
 import { getDirectoryCompanies } from "@/lib/company-directory";
 import CompaniesContent from "./CompaniesContent";
 import PageHeader from "@/components/PageHeader";
+import DirectoryPage from "@/components/DirectoryPage";
 import { getTranslations, getLocale } from "next-intl/server";
 import { getTranslations as getMetadataTranslations } from "next-intl/server";
 
@@ -26,8 +27,9 @@ export default async function CompaniesPage() {
   const companies = await getDirectoryCompanies(locale);
 
   return (
-    <div className="min-h-screen bg-bg-primary">
+    <DirectoryPage area="companies">
       <PageHeader
+        withBackdrop={false}
         badge={t("badge")}
         title={t("title")}
         titleHighlight={t("titleHighlight")}
@@ -35,6 +37,6 @@ export default async function CompaniesPage() {
         cta={{ label: t("addCompany"), href: "/company-setup" }}
       />
       <CompaniesContent initialCompanies={companies} />
-    </div>
+    </DirectoryPage>
   );
 }

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 import PageHeader from "@/components/PageHeader";
+import DirectoryPage from "@/components/DirectoryPage";
 import ProjectsContent from "@/app/projects/ProjectsContent";
 import { getBrowseProjects } from "@/lib/projects-browse-server";
 
@@ -14,8 +15,8 @@ export default async function ProjectsPage() {
   const projectsPromise = getBrowseProjects();
   const t = await getTranslations("projects");
   const projects = await projectsPromise;
-  return <div className="min-h-screen bg-bg-primary">
-    <PageHeader badge={t("badge")} title={t("titleLead")} titleHighlight={t("titleHighlight")} description={t("browseIntro")} cta={{ label: t("addProject"), href: "/projects/neu" }} />
+  return <DirectoryPage area="projects">
+    <PageHeader withBackdrop={false} badge={t("badge")} title={t("titleLead")} titleHighlight={t("titleHighlight")} description={t("browseIntro")} cta={{ label: t("addProject"), href: "/projects/neu" }} />
     <ProjectsContent projects={projects} />
-  </div>;
+  </DirectoryPage>;
 }

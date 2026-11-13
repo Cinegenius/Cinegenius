@@ -25,6 +25,13 @@
   box-shadow: 0 8px 26px rgb(0 0 0 / 30%), 0 0 18px rgb(195 243 36 / 16%);
 }
 
+.toolLauncher { display: flex; align-items: center; gap: 16px; width: 100%; min-height: 88px; padding: 20px; border: 1px solid var(--color-border-light); border-radius: 16px; background: var(--color-bg-secondary); color: var(--color-text-primary); text-align: left; cursor: pointer; }
+.toolLauncher:hover { border-color: var(--color-gold); }
+.toolLauncher:focus-visible { outline: 2px solid var(--color-gold); outline-offset: 3px; }
+.toolCopy { display: flex; min-width: 0; flex-direction: column; gap: 6px; }
+.toolCopy strong { font-size: 17px; }
+.toolCopy > span { color: var(--color-text-secondary); font-size: 14px; line-height: 1.5; overflow-wrap: anywhere; }
+
 .launcherCopy { display: flex; flex-direction: column; gap: 2px; min-width: 0; text-align: left; }
 .launcherName { font-size: 15px; font-weight: 700; line-height: 1.15; color: var(--color-text-primary); }
 .launcherLabel { font-size: 11px; line-height: 1.2; color: var(--color-gold); overflow-wrap: anywhere; }

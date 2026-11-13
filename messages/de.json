@@ -43,7 +43,9 @@
     "signOutSlow": "Die Abmeldung dauert länger als erwartet. Bitte lass diese Seite geöffnet.",
     "signOutError": "Abmelden hat nicht geklappt. Prüfe die Verbindung und versuche es erneut.",
     "createListing": "Inserat erstellen",
-    "openMenu": "Menü öffnen"
+    "openMenu": "Menü öffnen",
+    "ai": "KI",
+    "comingSoon": "Demnächst verfügbar"
   },
   "footer": {
     "tagline": "Der All-in-One-Marktplatz für Film- und Medienproduktion. Locations, Crew, Requisiten, Equipment — alles an einem Ort.",
@@ -334,7 +336,8 @@
     "findCompaniesDescription": "Catering, Verleih und Unterstützung für Produktionen.",
     "findJobsTitle": "Jobs",
     "findJobsDescription": "Aufträge finden oder Unterstützung für dein Vorhaben suchen.",
-    "findJobsLink": "Jobs ansehen"
+    "findJobsLink": "Jobs ansehen",
+    "railPage": "Ansicht {page} von {total}"
   },
   "locations": {
     "heroTitle": "Die perfekte Location",
@@ -8071,5 +8074,19 @@
     "trainingBasic": "Grundgehorsam",
     "trainingNone": "Ungeübt",
     "results": "{count} Ergebnisse"
+  },
+  "MobilePreview": {
+    "unavailableTitle": "CineGenius ist gerade nicht erreichbar",
+    "unavailableDescription": "Prüfe deine Internetverbindung und versuche es erneut. Bereits bestätigte Speicherungen bleiben erhalten. Noch nicht gespeicherte Eingaben oder laufende Uploads können fehlen.",
+    "retry": "Erneut versuchen"
+  },
+  "AiTools": {
+    "title": "KI-Werkzeuge",
+    "description": "Hier entstehen deine KI-Werkzeuge für Ideen, Texte und die Vorbereitung am Set. Sie sind noch nicht verfügbar.",
+    "genieDescription": "Ideen besprechen, Texte vorbereiten und passende Bereiche auf CineGenius finden.",
+    "planned": "In Vorbereitung",
+    "roomScanTitle": "Nativer Raumscanner & Grundrisse",
+    "roomScanDescription": "Räume direkt mit der App erfassen und Grundrisse für dein Projekt erstellen. Diese Funktion ist noch nicht verfügbar und benötigt ein unterstütztes Gerät.",
+    "noticeFirst": "Bitte schließe zuerst den Cookie-Hinweis. Danach kannst du Genie öffnen."
   }
 }

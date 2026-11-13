@@ -43,7 +43,9 @@
     "signOutSlow": "A kijelentkezés a vártnál tovább tart. Hagyd nyitva ezt az oldalt.",
     "signOutError": "A kijelentkezés nem sikerült. Ellenőrizd a kapcsolatot, majd próbáld újra.",
     "createListing": "Hirdetés létrehozása",
-    "openMenu": "Menü megnyitása"
+    "openMenu": "Menü megnyitása",
+    "ai": "MI",
+    "comingSoon": "Hamarosan elérhető"
   },
   "footer": {
     "tagline": "Az all-in-one piactér film- és médiaprodukcióhoz. Helyszínek, stáb, kellékek, felszerelés — minden egy helyen.",
@@ -334,7 +336,8 @@
     "findCompaniesDescription": "Catering, kölcsönzés és produkciós segítség.",
     "findJobsTitle": "Állások",
     "findJobsDescription": "Találj megbízást vagy segítséget a projektedhez.",
-    "findJobsLink": "Állások böngészése"
+    "findJobsLink": "Állások böngészése",
+    "railPage": "{page}. nézet, összesen {total}"
   },
   "locations": {
     "heroTitle": "A tökéletes helyszín",
@@ -8071,5 +8074,19 @@
     "trainingBasic": "Alapengedelmesség",
     "trainingNone": "Képzetlen",
     "results": "{count} találat"
+  },
+  "MobilePreview": {
+    "unavailableTitle": "A CineGenius jelenleg nem érhető el",
+    "unavailableDescription": "Ellenőrizd az internetkapcsolatot, és próbáld újra. A visszaigazolt mentések megmaradnak. A nem mentett adatok vagy a folyamatban lévő feltöltések hiányozhatnak.",
+    "retry": "Újrapróbálkozás"
+  },
+  "AiTools": {
+    "title": "MI-eszközök",
+    "description": "Itt készülnek az ötleteléshez, szövegíráshoz és forgatási előkészületekhez használható MI-eszközök. Még nem érhetők el.",
+    "genieDescription": "Beszélj meg ötleteket, készíts szövegeket, és találd meg a megfelelő részeket a CineGeniuson.",
+    "planned": "Fejlesztés alatt",
+    "roomScanTitle": "Natív szobaszkenner és alaprajzok",
+    "roomScanDescription": "Szkennelj helyiségeket közvetlenül az alkalmazással, és készíts alaprajzokat a projektedhez. Ez a funkció még nem érhető el, és támogatott készüléket igényel.",
+    "noticeFirst": "Először zárd be a sütikről szóló tájékoztatót. Ezután megnyithatod Genie-t."
   }
 }

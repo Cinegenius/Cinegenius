@@ -43,7 +43,9 @@
     "signOutSlow": "Het uitloggen duurt langer dan verwacht. Houd deze pagina open.",
     "signOutError": "Uitloggen is niet gelukt. Controleer je verbinding en probeer het opnieuw.",
     "createListing": "Advertentie plaatsen",
-    "openMenu": "Menu openen"
+    "openMenu": "Menu openen",
+    "ai": "AI",
+    "comingSoon": "Binnenkort beschikbaar"
   },
   "footer": {
     "tagline": "De alles-in-éénmarktplaats voor film- en mediaproductie. Locaties, crew, rekwisieten, apparatuur — alles op één plek.",
@@ -334,7 +336,8 @@
     "findCompaniesDescription": "Catering, verhuur en ondersteuning voor producties.",
     "findJobsTitle": "Vacatures",
     "findJobsDescription": "Vind opdrachten of zoek ondersteuning voor je project.",
-    "findJobsLink": "Vacatures bekijken"
+    "findJobsLink": "Vacatures bekijken",
+    "railPage": "Weergave {page} van {total}"
   },
   "locations": {
     "heroTitle": "De perfecte locatie",
@@ -8071,5 +8074,19 @@
     "trainingBasic": "Basisgehoorzaamheid",
     "trainingNone": "Ongetraind",
     "results": "{count} resultaten"
+  },
+  "MobilePreview": {
+    "unavailableTitle": "CineGenius is momenteel niet bereikbaar",
+    "unavailableDescription": "Controleer je internetverbinding en probeer het opnieuw. Bevestigde opgeslagen gegevens blijven behouden. Niet-opgeslagen invoer of lopende uploads kunnen ontbreken.",
+    "retry": "Opnieuw proberen"
+  },
+  "AiTools": {
+    "title": "AI-tools",
+    "description": "Hier werken we aan je AI-tools voor ideeën, teksten en voorbereiding op de set. Ze zijn nog niet beschikbaar.",
+    "genieDescription": "Bespreek ideeën, bereid teksten voor en vind de juiste onderdelen op CineGenius.",
+    "planned": "In ontwikkeling",
+    "roomScanTitle": "Native ruimtescanner en grondplannen",
+    "roomScanDescription": "Scan ruimtes rechtstreeks met de app en maak grondplannen voor je project. Deze functie is nog niet beschikbaar en vereist een ondersteund toestel.",
+    "noticeFirst": "Sluit eerst de cookiemelding. Daarna kan je Genie openen."
   }
 }

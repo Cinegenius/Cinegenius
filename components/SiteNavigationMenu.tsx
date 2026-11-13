@@ -3,7 +3,7 @@
 import NavigationIcon from "@/components/NavigationIcon";
 import { useSiteNavigation } from "@/contexts/SiteNavigationContext";
 import { BEFORE_FORM_NAVIGATION_EVENT } from "@/lib/form-navigation-events";
-import { BROWSE_NAV_ITEMS,SITE_NAV_MENU_ID,isPrimaryBrowseItem,routeMatches } from "@/lib/site-navigation";
+import { BROWSE_NAV_ITEMS, UPCOMING_NAV_ITEMS,SITE_NAV_MENU_ID,isPrimaryBrowseItem,routeMatches } from "@/lib/site-navigation";
 import { useAuth } from "@clerk/nextjs";
 import { Search,X } from "lucide-react";
 import { useTranslations } from "next-intl";
@@ -77,6 +77,10 @@ function MenuContent() {
             <h3 className="mb-2 px-3 text-xs font-semibold uppercase tracking-wider text-text-muted">{t("discover")}</h3>
             <div className="grid grid-cols-2 gap-1">
               {BROWSE_NAV_ITEMS.map(item => <Link key={item.id} href={item.href} prefetch={false} onClick={dismiss} aria-current={routeMatches(pathname, item.href) ? "page" : undefined} className={`${linkClass} ${isPrimaryBrowseItem(item.id) ? "xl:hidden" : ""} ${routeMatches(pathname, item.href) ? "bg-gold/10 text-gold" : ""}`}><NavigationIcon name={item.icon} className="shrink-0 text-gold" /><span className="min-w-0 break-words">{t(item.key)}</span></Link>)}
+              {UPCOMING_NAV_ITEMS.map(item => <button key={item.id} type="button" disabled className="flex min-h-12 min-w-0 cursor-default items-center gap-2 rounded-xl px-2 py-2.5 text-left text-sm text-text-muted">
+                <NavigationIcon name={item.icon} className="shrink-0" />
+                <span className="min-w-0 break-words"><span className="block">{t(item.key)}</span><span className="block text-xs leading-relaxed">{t("comingSoon")}</span></span>
+              </button>)}
             </div>
           </nav>
           {!isSignedIn && <nav aria-label={t("personalArea")} className="mt-5 grid grid-cols-1 gap-2 border-t border-border pt-4 sm:grid-cols-2 xl:hidden">

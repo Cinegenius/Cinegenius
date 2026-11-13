@@ -43,7 +43,9 @@
     "signOutSlow": "La disconnessione sta richiedendo più tempo del previsto. Lascia aperta questa pagina.",
     "signOutError": "Disconnessione non riuscita. Controlla la connessione e riprova.",
     "createListing": "Crea annuncio",
-    "openMenu": "Apri menu"
+    "openMenu": "Apri menu",
+    "ai": "IA",
+    "comingSoon": "In arrivo"
   },
   "footer": {
     "tagline": "Il marketplace all-in-one per la produzione cinematografica e multimediale. Location, crew, attrezzatura — tutto in un posto.",
@@ -334,7 +336,8 @@
     "findCompaniesDescription": "Catering, noleggio e supporto alla produzione.",
     "findJobsTitle": "Lavori",
     "findJobsDescription": "Trova incarichi o persone per supportare il tuo progetto.",
-    "findJobsLink": "Vedi i lavori"
+    "findJobsLink": "Vedi i lavori",
+    "railPage": "Vista {page} di {total}"
   },
   "locations": {
     "heroTitle": "La location perfetta",
@@ -8071,5 +8074,19 @@
     "trainingBasic": "Obbedienza di base",
     "trainingNone": "Non addestrato",
     "results": "{count} risultati"
+  },
+  "MobilePreview": {
+    "unavailableTitle": "CineGenius non è al momento raggiungibile",
+    "unavailableDescription": "Controlla la connessione a internet e riprova. I salvataggi confermati vengono conservati. I dati non salvati o i caricamenti in corso potrebbero non essere disponibili.",
+    "retry": "Riprova"
+  },
+  "AiTools": {
+    "title": "Strumenti IA",
+    "description": "Qui stiamo preparando i tuoi strumenti di IA per idee, testi e la preparazione sul set. Non sono ancora disponibili.",
+    "genieDescription": "Discuti idee, prepara testi e trova le sezioni giuste su CineGenius.",
+    "planned": "In preparazione",
+    "roomScanTitle": "Scanner nativo di ambienti e planimetrie",
+    "roomScanDescription": "Scansiona gli ambienti direttamente con l’app e crea planimetrie per il tuo progetto. Questa funzione non è ancora disponibile e richiede un dispositivo compatibile.",
+    "noticeFirst": "Chiudi prima l’avviso sui cookie. Poi potrai aprire Genie."
   }
 }

@@ -43,7 +43,9 @@
     "signOutSlow": "Sign out is taking longer than expected. Please keep this page open.",
     "signOutError": "Sign out failed. Check your connection and try again.",
     "createListing": "Create listing",
-    "openMenu": "Open menu"
+    "openMenu": "Open menu",
+    "ai": "AI",
+    "comingSoon": "Coming soon"
   },
   "footer": {
     "tagline": "The all-in-one marketplace for film and media production. Locations, crew, props, equipment — all in one place.",
@@ -334,7 +336,8 @@
     "findCompaniesDescription": "Catering, rentals and production support.",
     "findJobsTitle": "Jobs",
     "findJobsDescription": "Find assignments or people to support your project.",
-    "findJobsLink": "Browse jobs"
+    "findJobsLink": "Browse jobs",
+    "railPage": "View {page} of {total}"
   },
   "locations": {
     "heroTitle": "The perfect location",
@@ -8071,5 +8074,19 @@
     "trainingBasic": "Basic obedience",
     "trainingNone": "Untrained",
     "results": "{count} results"
+  },
+  "MobilePreview": {
+    "unavailableTitle": "CineGenius is currently unavailable",
+    "unavailableDescription": "Check your internet connection and try again. Confirmed saves are retained. Unsaved entries or uploads in progress may be missing.",
+    "retry": "Try again"
+  },
+  "AiTools": {
+    "title": "AI tools",
+    "description": "Your AI tools for ideas, writing and on-set preparation are being developed here. They are not available yet.",
+    "genieDescription": "Discuss ideas, draft text and find the right areas on CineGenius.",
+    "planned": "In development",
+    "roomScanTitle": "Native room scanner & floor plans",
+    "roomScanDescription": "Scan rooms directly in the app and create floor plans for your project. This feature is not yet available and requires a supported device.",
+    "noticeFirst": "Please close the cookie notice first. You can then open Genie."
   }
 }
