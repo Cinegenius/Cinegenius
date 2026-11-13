@@ -362,15 +362,18 @@ function CreatorsInner({
 
   // allCreators muss VOR den useMemo-Aufrufen deklariert sein
   const [allCreators, setAllCreators] = useState<ServerCreator[]>(serverCreators);
-  const [apiPage, setApiPage] = useState(1);
   const [hasMoreFromApi, setHasMoreFromApi] = useState(hasMoreProfiles);
   const [loadingMore, setLoadingMore] = useState(false);
   const [loadError, setLoadError] = useState(false);
+  const directoryRequest = useRef<{ source: ServerCreator[]; page: number; hasMore: boolean; active: boolean; controller: AbortController | null }>({ source: serverCreators, page: 1, hasMore: hasMoreProfiles, active: true, controller: null });
   useEffect(() => {
+    const scope = { source: serverCreators, page: 1, hasMore: hasMoreProfiles, active: true, controller: null as AbortController | null };
+    directoryRequest.current = scope;
     setAllCreators(serverCreators);
-    setApiPage(1);
     setHasMoreFromApi(hasMoreProfiles);
+    setLoadingMore(false);
     setLoadError(false);
+    return () => { scope.active = false; scope.controller?.abort(); };
   }, [serverCreators, hasMoreProfiles]);
 
   useEffect(() => subscribeToProfileUpdated(({ userId, avatarUrl, previousAvatarUrl, focalPoint }) => {
@@ -387,21 +390,30 @@ function CreatorsInner({
   }), []);
 
   const loadMoreFromApi = useCallback(async () => {
-    if (loadingMore || !hasMoreFromApi) return;
+    const scope = directoryRequest.current;
+    if (!scope.active || scope.source !== serverCreators || scope.controller || !scope.hasMore) return;
+    const controller = new AbortController();
+    scope.controller = controller;
     setLoadingMore(true);
     try {
-      const res = await fetch(`/api/creators?page=${apiPage}`);
+      const res = await fetch(`/api/creators?page=${scope.page}`, { signal: controller.signal });
       if (!res.ok) throw new Error(uiText("Ui.text_3246f5de17bad7"));
       const { creators, hasMore } = await res.json();
+      // A URL/session refresh replaces the first page. Older requests cannot finish that new sequence.
+      if (!scope.active || directoryRequest.current !== scope) return;
       if (creators?.length) {
-        setAllCreators(prev => [...new Map([...prev.filter(creator => !creator.id.startsWith("listing_") || !creators.some((profile: ServerCreator) => profile.id === creator.ownerId)), ...creators].map(creator => [creator.id, creator])).values()]);
+        setAllCreators(prev => scope.active && directoryRequest.current === scope
+          ? [...new Map([...prev.filter(creator => !creator.id.startsWith("listing_") || !creators.some((profile: ServerCreator) => profile.id === creator.ownerId)), ...creators].map(creator => [creator.id, creator])).values()] : prev);
       }
-      setApiPage(p => p + 1);
-      setHasMoreFromApi(!!hasMore);
-    } catch { setLoadError(true); } finally {
-      setLoadingMore(false);
+      scope.page += 1;
+      scope.hasMore = !!hasMore;
+      setHasMoreFromApi(scope.hasMore);
+    } catch {
+      if (scope.active && directoryRequest.current === scope && !controller.signal.aborted) setLoadError(true);
+    } finally {
+      if (scope.active && directoryRequest.current === scope) { scope.controller = null; setLoadingMore(false); }
     }
-  }, [apiPage, hasMoreFromApi, loadingMore]);
+  }, [serverCreators, uiText]);
 
   // Fetch bounded pages so filters also see profiles beyond the initial page.
   useEffect(() => {

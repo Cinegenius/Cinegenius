@@ -79,12 +79,17 @@ export default function LocationMap({ readOnly = false, locations, activeId, onH
 
   useEffect(() => {
     if (!map) return;
+    let previousBounds = "";
     const updateBounds = () => {
       if (!automaticBounds) { setMoved(true); return; }
       // Do not lock an empty initial map before asynchronously loaded results can fit.
       if (!hasMapPoints) return;
       const bounds = map.getBounds();
-      boundsChangeRef.current?.({south: bounds.getSouth(), north: bounds.getNorth(), west: bounds.getWest(), east: bounds.getEast()});
+      const next = {south: bounds.getSouth(), north: bounds.getNorth(), west: bounds.getWest(), east: bounds.getEast()};
+      const key = JSON.stringify(next);
+      if (key === previousBounds) return;
+      previousBounds = key;
+      boundsChangeRef.current?.(next);
       setSelection(current => current.id || current.cluster.length ? {...current, id: null, cluster: []} : current);
       hoverRef.current(null);
     };
@@ -105,8 +110,8 @@ export default function LocationMap({ readOnly = false, locations, activeId, onH
       try {
         const L = (await import("leaflet")).default;
         if (cancelled || !containerRef.current) return;
-        // Leaflet's delayed zoom transition can outlive a map removed by navigation or retry.
-        instance = L.map(containerRef.current, { center: [51, 10], zoom: 6, zoomControl: false, zoomAnimation: false });
+        const animate = !(typeof matchMedia === "function" && matchMedia("(prefers-reduced-motion: reduce)").matches);
+        instance = L.map(containerRef.current, { center: [51, 10], zoom: 6, zoomControl: false, zoomAnimation: animate, fadeAnimation: animate });
         mapRef.current = instance;
         const bounds = initialBounds.current;
         if (bounds) instance.fitBounds([[bounds.south, bounds.west], [bounds.north, bounds.east]], { animate: false });
@@ -121,7 +126,18 @@ export default function LocationMap({ readOnly = false, locations, activeId, onH
       } catch { if (!cancelled) setFailed(true); }
     }
     void initialize();
-    return () => { cancelled = true; observer.disconnect(); instance?.remove(); mapRef.current = null; zoom.current = null; };
+    return () => {
+      cancelled = true;
+      observer.disconnect();
+      if (instance) {
+        // Leaflet 1.9.4 leaves a 250ms zoom-end timer alive after remove(). Its
+        // callback checks this flag before touching panes that no longer exist.
+        (instance as Leaflet.Map & { _animatingZoom?: boolean })._animatingZoom = false;
+        instance.remove();
+      }
+      mapRef.current = null;
+      zoom.current = null;
+    };
   }, [attempt]);
 
   // Hover only changes marker styling; it never destroys an open touch preview.
@@ -133,11 +149,17 @@ export default function LocationMap({ readOnly = false, locations, activeId, onH
       const L = (await import("leaflet")).default;
       if (cancelled) return;
       group = L.layerGroup().addTo(map!);
+      let renderedViewport = "";
       const render = () => {
-        group!.clearLayers();
         const bounds = map!.getBounds();
         const viewport = {south: bounds.getSouth(), north: bounds.getNorth(), west: bounds.getWest(), east: bounds.getEast()};
+        const key = JSON.stringify([map!.getZoom(), viewport]);
+        // A completed zoom emits both zoomend and moveend for the same view.
+        if (key === renderedViewport) return;
+        renderedViewport = key;
+        group!.clearLayers();
         const pending = locations.filter(hasCoordinates).filter(location => !automaticBounds || inMapBounds(location, viewport));
+        const projected = new Map(pending.map(location => [location.id, map!.latLngToLayerPoint([location.lat, location.lng])]));
         for (const location of pending) {
           const area = readPublicLocationArea(location.metadata);
           if (area) L.circle([area.lat, area.lng], { radius: area.radius_meters, color: "#C2F135", fillOpacity: 0.07, weight: 1.5, interactive: false }).addTo(group!);
@@ -145,9 +167,9 @@ export default function LocationMap({ readOnly = false, locations, activeId, onH
         const used = new Set<string>();
         for (const location of pending) {
           if (used.has(location.id)) continue;
-          const point = map!.latLngToLayerPoint([location.lat, location.lng]);
+          const point = projected.get(location.id)!;
           const members = pending.filter(other => !used.has(other.id)
-            && point.distanceTo(map!.latLngToLayerPoint([other.lat, other.lng])) <= 44);
+            && point.distanceTo(projected.get(other.id)!) <= 44);
           members.forEach(member => used.add(member.id));
           const clustered = members.length > 1;
           const marker = L.marker([
