@@ -3,7 +3,7 @@
 import { useCallback, useMemo, useState } from "react";
 import dynamic from "next/dynamic";
 import Link from "next/link";
-import { MapPin } from "lucide-react";
+import { MapPin, UserRound } from "lucide-react";
 import { useTranslations } from "next-intl";
 import MediaImage from "./MediaImage";
 import { hasCoordinates, inMapBounds, type MapBounds } from "@/lib/location-map";
@@ -41,15 +41,17 @@ export default function DirectoryMap({ items, kind, bounds, onBoundsChange }: {
         renderPreview={selected => {
           const item = items.find(row => row.id === selected.id);
           if (!item) return null;
-          return <Link href={item.href} className="block overflow-hidden rounded-xl focus-visible:outline-2 focus-visible:outline-gold">
-            <div className="relative h-32 bg-bg-elevated">{item.image ? <MediaImage src={item.image} alt="" fill mediaSize="thumbnail" sizes="384px" className="object-cover" style={{ objectPosition: item.focalPoint ? `${item.focalPoint.x}% ${item.focalPoint.y}%` : "50% 50%" }} /> : <div className="flex h-full items-center justify-center text-text-muted"><MapPin size={30} aria-hidden="true" /></div>}</div>
-            <div className="space-y-1 p-3 [overflow-wrap:anywhere]">
-              <h3 className="text-sm font-semibold text-text-primary">{item.title}</h3>
-              <p className="text-xs text-text-muted">{item.subtitle}</p>
-              <p className="text-xs text-text-secondary">{item.city}</p>
-              {item.priceLabel && <p className="text-sm font-bold text-gold">{item.priceLabel}</p>}
-              <span className="flex min-h-11 items-center text-sm font-medium text-gold">{t(kind === "crew" ? "profile" : "offer")} →</span>
+          return <Link href={item.href} className="block overflow-hidden rounded-xl p-3 focus-visible:outline-2 focus-visible:outline-gold">
+            <div className="flex min-w-0 items-start gap-3">
+              <div className="relative size-12 shrink-0 overflow-hidden rounded-lg bg-bg-elevated">{item.image ? <MediaImage src={item.image} alt="" fill mediaSize="thumbnail" sizes="48px" className="object-cover" style={{ objectPosition: item.focalPoint ? `${item.focalPoint.x}% ${item.focalPoint.y}%` : "50% 50%" }} /> : <div className="flex h-full items-center justify-center text-text-muted">{kind === "crew" ? <UserRound size={22} aria-hidden="true" /> : <MapPin size={22} aria-hidden="true" />}</div>}</div>
+              <div className="min-w-0 flex-1 space-y-1 [overflow-wrap:anywhere]">
+                <h3 className="line-clamp-2 pr-8 text-sm font-semibold text-text-primary" title={item.title}>{item.title}</h3>
+                <p className="line-clamp-2 text-xs text-text-muted" title={item.subtitle}>{item.subtitle}</p>
+                <p className="truncate text-xs text-text-secondary" title={item.city}>{item.city}</p>
+              </div>
             </div>
+            {item.priceLabel && <p className="mt-2 line-clamp-2 text-sm font-bold text-gold">{item.priceLabel}</p>}
+            <span className="flex min-h-11 items-center text-sm font-medium text-gold">{t(kind === "crew" ? "profile" : "offer")} →</span>
           </Link>;
         }} />
     </div>

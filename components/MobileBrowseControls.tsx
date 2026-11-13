@@ -85,7 +85,7 @@ export default function MobileBrowseControls({
         </label>}
 
         <div className="mobile-browse-summary">
-          {viewControls ? <div className="flex min-w-0 flex-wrap items-center justify-between gap-2"><p>{resultSummary}</p>{viewControls}</div> : <p>{resultSummary}</p>}
+          {viewControls ? <div className="mobile-browse-summary-row"><p title={typeof resultSummary === "string" ? resultSummary : undefined}>{resultSummary}</p>{viewControls}</div> : <p>{resultSummary}</p>}
           {chips.length > 0 && (
             <div className="mobile-browse-chips" aria-label={uiText("Ui.text_75e581194056a5")}>
               {chips.slice(0, 3).map((chip) => (

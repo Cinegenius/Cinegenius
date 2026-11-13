@@ -35,6 +35,11 @@ export function aliases(city:typeof data.cities[number]) {return [city.name,...c
 type CityRecord=typeof data.cities[number];
 const exactIndex=new Map<string,CityRecord[]>();
 for(const city of data.cities)for(const alias of new Set(aliases(city).map(placeKey))){const key=city.country+":"+alias;const existing=exactIndex.get(key);if(existing)existing.push(city);else exactIndex.set(key,[city]);}
+/** Candidates only: a label match is not a verified or persisted place identity. */
+export function placeCandidatesForLabel(label: string, country = "") {
+ const key=placeKey(label);
+ return key?(country?[country]:data.countries).flatMap(code=>exactIndex.get(code+":"+key)??[]):[];
+}
 // This is a subset, not a complete gazetteer. A single catalogue match is not
 // evidence that smaller namesakes do not exist. Only these reviewed variants
 // may be normalized without an explicit selection of a catalogue ID.

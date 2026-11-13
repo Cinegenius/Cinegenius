@@ -229,7 +229,7 @@ export default function LocationMap({ readOnly = false, locations, activeId, onH
       {failed && <div role="alert" className="absolute inset-x-3 top-16 z-[600] flex flex-wrap items-center gap-2 rounded-xl border border-border bg-bg-secondary p-3 text-sm text-text-secondary"><p className="min-w-0 flex-1">{labels?.error ?? t("error")}</p><button type="button" onClick={() => { setFailed(false); setMap(null); setAttempt(value => value + 1); }} className="min-h-11 rounded-lg border border-border px-3 text-gold">{commonUi("retry")}</button></div>}
       {(visibleCount ?? locations.length) === 0 && <p role="status" className="absolute inset-x-3 top-3 z-[500] rounded-lg border border-border bg-bg-primary p-4 text-sm text-text-secondary">{labels?.empty ?? t("empty")}</p>}
       {(selected || clusterLocations.length > 0) && (
-        <div className="location-map-preview absolute inset-x-3 bottom-8 z-[500] mx-auto max-h-[calc(100%-6rem)] max-w-sm overflow-y-auto rounded-xl border border-border bg-bg-secondary shadow-xl">
+        <div className="location-map-preview absolute inset-x-3 bottom-8 z-[1100] mx-auto max-h-[calc(100%-6rem)] max-w-sm overflow-y-auto rounded-xl border border-border bg-bg-secondary shadow-xl">
           <button type="button" aria-label={t("closePreview")} onClick={() => { select(null); }} className="absolute right-0 top-0 z-10 flex size-11 items-center justify-center rounded-full bg-bg-primary/90 text-text-primary"><X size={18} /></button>
           {selected ? (renderPreview ? renderPreview(selected) : (
             <Link href={`/locations/${selected.id}`} className="block overflow-hidden rounded-xl focus-visible:outline-2 focus-visible:outline-gold">
