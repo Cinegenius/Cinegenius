@@ -68,9 +68,9 @@ export default function ConnectButton({ targetUserId, disabled = false }: { targ
     } finally { if (pending.current === controller) pending.current = null; }
   }
 
-  const button = "inline-flex min-h-11 min-w-11 max-w-full items-center justify-center gap-1.5 rounded-lg border border-border bg-bg-secondary px-3 py-2 text-xs font-medium text-text-primary transition-colors hover:border-gold/50 disabled:opacity-50";
+  const button = "profile-action-button inline-flex min-h-11 min-w-11 max-w-full items-center justify-center gap-1.5 rounded-lg border px-3 py-2 text-xs font-medium disabled:opacity-50";
   if (account === targetUserId || disabled) return null;
-  if (isLoaded && !account) return <Link href={`/sign-in?redirect_url=${encodeURIComponent(pathname)}`} className={button}><UserPlus size={14} aria-hidden="true" />{t("add")}</Link>;
+  if (isLoaded && !account) return <Link href={`/sign-in?redirect_url=${encodeURIComponent(pathname)}`} className={button} aria-label={t("addLabel")} title={t("addLabel")}><UserPlus size={14} className="shrink-0" aria-hidden="true" /><span className="min-w-0 [overflow-wrap:anywhere]">{t("add")}</span></Link>;
   if (!own?.ready) return <div className="min-w-0 max-w-full">
     {own?.error ? <><p role="alert" className="mb-1 max-w-xs text-xs text-red-400">{own.error}</p><button type="button" onClick={() => setAttempt(value => value + 1)} className={button}>{t("retry")}</button></>
       : <button type="button" disabled className={button}><Loader2 size={14} className="animate-spin" aria-hidden="true" />{t("loading")}</button>}
@@ -78,14 +78,14 @@ export default function ConnectButton({ targetUserId, disabled = false }: { targ
   const connection = own.connection;
   return <div className="min-w-0 max-w-full">
     <div className="flex max-w-full flex-wrap items-center gap-2">
-      {connection?.status === "accepted" ? <Link href="/dashboard?tab=friends" className={button}><UserCheck size={14} aria-hidden="true" />{t("inContacts")}</Link>
+      {connection?.status === "accepted" ? <Link href="/dashboard?tab=friends" className={button} data-connected="true" aria-label={t("inContactsLabel")} title={t("inContactsLabel")}><UserCheck size={14} className="shrink-0" aria-hidden="true" /><span className="min-w-0 [overflow-wrap:anywhere]">{t("inContacts")}</span></Link>
         : connection?.status === "pending" && connection.sender_id === account ? <>
           <span role="status" className="inline-flex min-h-11 items-center gap-1.5 text-xs text-text-secondary"><Clock size={14} aria-hidden="true" />{t("requestSent")}</span>
           <button type="button" disabled={own.busy} onClick={() => void change("remove")} className={button}>{t("cancelRequest")}</button>
         </> : connection?.status === "pending" ? <>
           <button type="button" disabled={own.busy} onClick={() => void change("accepted")} className={button}>{own.busy ? <Loader2 size={14} className="animate-spin" aria-hidden="true" /> : <Check size={14} aria-hidden="true" />}{t("accept")}</button>
           <button type="button" disabled={own.busy} onClick={() => void change("rejected")} className={button}><X size={14} aria-hidden="true" />{t("reject")}</button>
-        </> : <button type="button" disabled={own.busy} onClick={() => void change("request")} className={button}>{own.busy ? <Loader2 size={14} className="animate-spin" aria-hidden="true" /> : <UserPlus size={14} aria-hidden="true" />}{t("add")}</button>}
+        </> : <button type="button" disabled={own.busy} aria-busy={own.busy} onClick={() => void change("request")} className={button} aria-label={t("addLabel")} title={t("addLabel")}>{own.busy ? <Loader2 size={14} className="shrink-0 animate-spin" aria-hidden="true" /> : <UserPlus size={14} className="shrink-0" aria-hidden="true" />}<span className="min-w-0 [overflow-wrap:anywhere]">{t("add")}</span></button>}
     </div>
     {own.error && <p role="alert" className="mt-1 max-w-xs break-words text-xs text-red-400">{own.error}</p>}
   </div>;

@@ -304,7 +304,7 @@ export default async function ProfilePage(
     ...contactFields,
     visibility: { ...profile.visibility, ...contactVisibility },
   };
-  const [projectCredits, companyMembership, externalProfiles, listings, blockStatus, collaborations, imageLikesData, similarProfiles] = await Promise.all([
+  const [projectCredits, companyMembership, externalProfiles, listings, blockStatus, collaborations, imageLikesData, similarProfiles, organizationSection] = await Promise.all([
     getProjectCredits(profile.user_id),
     getCompanyMembership(profile.user_id),
     getExternalProfiles(profile.user_id),
@@ -346,6 +346,9 @@ export default async function ProfilePage(
       const others = visibleRows.filter(r => !city || placeReadFields(r.location??"",r,locale).place_city_id!==city);
       return [...sameCity, ...others].slice(0, 6);
     })(),
+    // Resolve the optional slot before the client decides whether details exist.
+    // An element wrapping an async component is truthy even when it renders null.
+    PublicOrganizationLinks({ userId: visibleProfile.user_id }),
   ]);
 
   // Track profile view — awaited so serverless doesn't drop it before .then() runs
@@ -365,7 +368,7 @@ export default async function ProfilePage(
   return (
     <>
       <JsonLd data={jsonLd} />
-      <ProfileView organizationSection={<PublicOrganizationLinks userId={visibleProfile.user_id} />}
+      <ProfileView organizationSection={organizationSection}
         profile={visibleProfile}
         isOwner={isOwner}
         projectCredits={projectCredits}

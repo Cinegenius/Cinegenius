@@ -332,7 +332,7 @@
     "findCrewDescription": "Emberek a kamera előtt és mögött.",
     "findEquipmentDescription": "Technika, járművek és kellékek.",
     "findCompaniesDescription": "Catering, kölcsönzés és produkciós segítség.",
-    "findJobsTitle": "Állások és projektek",
+    "findJobsTitle": "Állások",
     "findJobsDescription": "Találj megbízást vagy segítséget a projektedhez.",
     "findJobsLink": "Állások böngészése"
   },
@@ -7629,8 +7629,10 @@
   "Contacts": {
     "relationship": "Kapcsolat",
     "title": "Kapcsolatok",
-    "add": "Kapcsolat hozzáadása",
-    "inContacts": "A kapcsolataid között",
+    "add": "Hozzáadás",
+    "addLabel": "Kapcsolat hozzáadása",
+    "inContacts": "Kapcsolat",
+    "inContactsLabel": "A kapcsolataid között",
     "requestSent": "Felkérés elküldve",
     "accept": "Elfogadás",
     "reject": "Elutasítás",

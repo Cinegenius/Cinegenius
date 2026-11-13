@@ -152,10 +152,10 @@ export default function Navbar({ initialIsSignedIn = false, initialAdminUserId =
             <nav aria-label={t("discover")} className="site-header-primary hidden xl:flex min-w-0 items-center">
               {PRIMARY_NAV_ITEMS.map(item => item.kind === "menu" ? <button
                 key={item.id} type="button" onClick={event => {event.currentTarget.focus({preventScroll:true});openMenu();}} aria-expanded={menuOpen} aria-controls={SITE_NAV_MENU_ID} aria-haspopup="dialog"
-                className={`inline-flex min-h-11 min-w-11 shrink-0 items-center justify-center rounded-md px-2 text-xs font-medium uppercase tracking-wide transition-colors ${menuOpen || activeId === item.id ? navActive : navBase}`}
+                className={`inline-flex min-h-11 min-w-11 shrink-0 items-center justify-center rounded-md px-2 text-sm font-medium uppercase tracking-wide transition-colors ${menuOpen || activeId === item.id ? navActive : navBase}`}
               >{t(item.key)}</button> : <Link
                 key={item.id} href={item.href} prefetch={authRoute || signingOut ? false : null} aria-current={activeId === item.id ? "page" : undefined}
-                className={`inline-flex min-h-11 min-w-11 shrink-0 items-center justify-center rounded-md px-2 text-xs font-medium uppercase tracking-wide transition-colors ${activeId === item.id ? navActive : navBase}`}
+                className={`inline-flex min-h-11 min-w-11 shrink-0 items-center justify-center rounded-md px-2 text-sm font-medium uppercase tracking-wide transition-colors ${activeId === item.id ? navActive : navBase}`}
               >{t(item.key)}</Link>)}
             </nav>
 

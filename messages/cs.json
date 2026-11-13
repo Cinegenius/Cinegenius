@@ -332,7 +332,7 @@
     "findCrewDescription": "Lidé před kamerou i za ní.",
     "findEquipmentDescription": "Technika, vozidla a rekvizity.",
     "findCompaniesDescription": "Catering, půjčovny a produkční podpora.",
-    "findJobsTitle": "Zakázky a projekty",
+    "findJobsTitle": "Práce",
     "findJobsDescription": "Najdi práci nebo podporu pro svůj projekt.",
     "findJobsLink": "Prohlédnout zakázky"
   },
@@ -7629,8 +7629,10 @@
   "Contacts": {
     "relationship": "Kontakt",
     "title": "Kontakty",
-    "add": "Přidat kontakt",
-    "inContacts": "Ve tvých kontaktech",
+    "add": "Přidat",
+    "addLabel": "Přidat kontakt",
+    "inContacts": "Kontakt",
+    "inContactsLabel": "Ve tvých kontaktech",
     "requestSent": "Žádost odeslána",
     "accept": "Přijmout",
     "reject": "Odmítnout",

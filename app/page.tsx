@@ -369,6 +369,8 @@ export default async function HomePage() {
     { title: t("findCrewTitle"), description: t("findCrewDescription"), href: "/creators", icon: UsersRound },
     { title: t("findEquipmentTitle"), description: t("findEquipmentDescription"), href: "/props", icon: Package2 },
     { title: t("findCompaniesTitle"), description: t("findCompaniesDescription"), href: "/companies", icon: Building2 },
+    { title: t("findJobsTitle"), description: t("findJobsDescription"), href: "/jobs", icon: Briefcase },
+    { title: t("newsShortcut"), description: t("newsShortcutDescription"), href: "/news", icon: Newspaper },
   ];
   return <main className="relative isolate min-h-screen">
     <PageBackdrop optimizeImage image="/hero-bg-v2.jpg" imagePosition="center 42%" imageOpacity={100} overlayClassName="absolute inset-0 bg-bg-primary/72" className="pointer-events-none fixed inset-0 z-[-1]" />
@@ -387,28 +389,14 @@ export default async function HomePage() {
             <p className="text-xs uppercase tracking-widest text-gold font-semibold mb-1">{t("findLabel")}</p>
             <h2 id="home-find-title" className="font-display text-xl sm:text-2xl font-bold text-text-primary">{t("findTitle")}</h2>
           </div>
-          <div className="grid grid-cols-2 gap-3 lg:grid-cols-6">
+          <div className="grid grid-cols-2 items-start gap-3 md:grid-cols-3 xl:grid-cols-6">
             {findCards.map(({ title, description, href, icon: Icon }) => (
-              <Link key={href} href={href} className="group min-w-0 rounded-xl border border-border bg-bg-secondary/90 p-3.5 transition-colors hover:border-gold/40 sm:p-4">
-                <Icon size={18} className="mb-2 text-gold" />
+              <Link key={href} href={href} className="group min-h-11 min-w-0 rounded-xl border border-border bg-bg-secondary/90 p-3.5 transition-colors hover:border-gold/40 sm:p-4">
+                <Icon size={18} className="mb-2 text-gold" aria-hidden="true" />
                 <h3 className="text-sm font-semibold leading-snug text-text-primary group-hover:text-gold">{title}</h3>
                 <p className="mt-1 text-xs leading-relaxed text-text-muted">{description}</p>
               </Link>
             ))}
-            <div className="min-w-0 rounded-xl border border-border bg-bg-secondary/90 p-3.5 sm:p-4">
-              <Film size={18} className="mb-2 text-gold" />
-              <h3 className="text-sm font-semibold leading-snug text-text-primary">{t("findJobsTitle")}</h3>
-              <p className="mt-1 text-xs leading-relaxed text-text-muted">{t("findJobsDescription")}</p>
-              <div className="mt-3 flex flex-wrap gap-x-4 gap-y-2 text-xs font-semibold lg:gap-x-2">
-                <Link href="/jobs" className="inline-flex min-h-11 items-center gap-1 text-gold hover:text-gold-light">{t("findJobsLink")} <ArrowRight size={12} /></Link>
-                <Link href="/projects/alle" className="inline-flex min-h-11 items-center gap-1 text-gold hover:text-gold-light">{t("findProjectsLink")} <ArrowRight size={12} /></Link>
-              </div>
-            </div>
-            <Link href="/news" className="group min-w-0 rounded-xl border border-border bg-bg-secondary/90 p-3.5 transition-colors hover:border-gold/40 sm:p-4">
-              <Newspaper size={18} className="mb-2 text-gold" aria-hidden="true" />
-              <h3 className="text-sm font-semibold leading-snug text-text-primary group-hover:text-gold">{t("newsShortcut")}</h3>
-              <p className="mt-1 text-xs leading-relaxed text-text-muted">{t("newsShortcutDescription")}</p>
-            </Link>
           </div>
         </div>
       </section>

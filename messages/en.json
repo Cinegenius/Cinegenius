@@ -332,7 +332,7 @@
     "findCrewDescription": "People in front of and behind the camera.",
     "findEquipmentDescription": "Production gear, vehicles and props.",
     "findCompaniesDescription": "Catering, rentals and production support.",
-    "findJobsTitle": "Jobs & projects",
+    "findJobsTitle": "Jobs",
     "findJobsDescription": "Find assignments or people to support your project.",
     "findJobsLink": "Browse jobs"
   },
@@ -7629,8 +7629,10 @@
   "Contacts": {
     "relationship": "Contact",
     "title": "Contacts",
-    "add": "Add contact",
-    "inContacts": "In your contacts",
+    "add": "Add",
+    "addLabel": "Add contact",
+    "inContacts": "Contact",
+    "inContactsLabel": "In your contacts",
     "requestSent": "Request sent",
     "accept": "Accept",
     "reject": "Decline",

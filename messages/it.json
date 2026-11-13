@@ -332,7 +332,7 @@
     "findCrewDescription": "Persone davanti e dietro la macchina da presa.",
     "findEquipmentDescription": "Attrezzatura, veicoli e oggetti di scena.",
     "findCompaniesDescription": "Catering, noleggio e supporto alla produzione.",
-    "findJobsTitle": "Lavori e progetti",
+    "findJobsTitle": "Lavori",
     "findJobsDescription": "Trova incarichi o persone per supportare il tuo progetto.",
     "findJobsLink": "Vedi i lavori"
   },
@@ -7629,8 +7629,10 @@
   "Contacts": {
     "relationship": "Contatto",
     "title": "Contatti",
-    "add": "Aggiungi contatto",
-    "inContacts": "Nei tuoi contatti",
+    "add": "Aggiungi",
+    "addLabel": "Aggiungi contatto",
+    "inContacts": "Contatto",
+    "inContactsLabel": "Contatto presente nei tuoi contatti",
     "requestSent": "Richiesta inviata",
     "accept": "Accetta",
     "reject": "Rifiuta",

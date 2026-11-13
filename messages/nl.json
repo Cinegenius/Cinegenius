@@ -332,7 +332,7 @@
     "findCrewDescription": "Mensen voor en achter de camera.",
     "findEquipmentDescription": "Techniek, voertuigen en rekwisieten.",
     "findCompaniesDescription": "Catering, verhuur en ondersteuning voor producties.",
-    "findJobsTitle": "Vacatures en projecten",
+    "findJobsTitle": "Vacatures",
     "findJobsDescription": "Vind opdrachten of zoek ondersteuning voor je project.",
     "findJobsLink": "Vacatures bekijken"
   },
@@ -7629,8 +7629,10 @@
   "Contacts": {
     "relationship": "Contact",
     "title": "Contacten",
-    "add": "Contact toevoegen",
-    "inContacts": "In je contacten",
+    "add": "Toevoegen",
+    "addLabel": "Contact toevoegen",
+    "inContacts": "Contact",
+    "inContactsLabel": "In je contacten",
     "requestSent": "Verzoek verzonden",
     "accept": "Accepteren",
     "reject": "Afwijzen",

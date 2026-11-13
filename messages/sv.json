@@ -332,7 +332,7 @@
     "findCrewDescription": "Människor framför och bakom kameran.",
     "findEquipmentDescription": "Teknik, fordon och rekvisita.",
     "findCompaniesDescription": "Catering, uthyrning och stöd till produktioner.",
-    "findJobsTitle": "Jobb och projekt",
+    "findJobsTitle": "Jobb",
     "findJobsDescription": "Hitta uppdrag eller sök stöd till din idé.",
     "findJobsLink": "Visa jobb"
   },
@@ -7629,8 +7629,10 @@
   "Contacts": {
     "relationship": "Kontakt",
     "title": "Kontakter",
-    "add": "Lägg till kontakt",
-    "inContacts": "I dina kontakter",
+    "add": "Lägg till",
+    "addLabel": "Lägg till kontakt",
+    "inContacts": "Kontakt",
+    "inContactsLabel": "I dina kontakter",
     "requestSent": "Förfrågan skickad",
     "accept": "Acceptera",
     "reject": "Avböj",

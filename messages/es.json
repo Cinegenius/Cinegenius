@@ -332,7 +332,7 @@
     "findCrewDescription": "Personas delante y detrás de la cámara.",
     "findEquipmentDescription": "Material técnico, vehículos y utilería.",
     "findCompaniesDescription": "Catering, alquiler y apoyo a la producción.",
-    "findJobsTitle": "Empleos y proyectos",
+    "findJobsTitle": "Empleos",
     "findJobsDescription": "Encuentra encargos o personas que apoyen tu proyecto.",
     "findJobsLink": "Ver empleos"
   },
@@ -7629,8 +7629,10 @@
   "Contacts": {
     "relationship": "Contacto",
     "title": "Contactos",
-    "add": "Añadir contacto",
-    "inContacts": "En tus contactos",
+    "add": "Añadir",
+    "addLabel": "Añadir contacto",
+    "inContacts": "Contacto",
+    "inContactsLabel": "En tus contactos",
     "requestSent": "Solicitud enviada",
     "accept": "Aceptar",
     "reject": "Rechazar",

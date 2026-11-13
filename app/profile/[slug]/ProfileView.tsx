@@ -19,10 +19,9 @@ import ReviewsSection from "@/components/ReviewsSection";
 import { PROFILE_CATEGORY_MAP, PROFILE_TYPE_LABELS } from "@/lib/profile-types";
 import { cleanProfileBio, getProfileDisplayPositions, normalizeProfileTypes } from "@/lib/profile-display";
 import { getPlatform, type ExternalProfileRow } from "@/lib/external-platforms";
-import { COMPANY_CATEGORIES } from "@/lib/companyCategories";
 import PhotoLikeButton from "@/components/PhotoLikeButton";
 import { markPhotoNavigation, photoHref } from "@/lib/photo-link";
-import CompanyLogo from "@/components/CompanyLogo";
+import CompanyBadge, { type CompanyMemberships } from "@/components/ProfileCompanyLinks";
 import ProfileRoles from "./ProfileRoles";
 import ProfileCardPhoto from "@/components/ProfileCardPhoto";
 import ResilientPublicImage from "@/components/ResilientPublicImage";
@@ -473,49 +472,6 @@ function ExternalProfilesDisplay({ profiles }: { profiles: ExternalProfileRow[] 
 
 // ─── Company badge ────────────────────────────────────────────────────────────
 
-type CompanyMembership = {
-  id: string;
-  title: string | null;
-  public_titles: string[];
-  is_company_owner: boolean;
-  companies: { id: string; slug: string; name: string; logo_url: string | null; categories: string[] | null };
-};
-type CompanyMemberships = CompanyMembership[] | null;
-
-function CompanyBadge({ membership }: { membership: CompanyMemberships }) {
-  const uiText = useTranslations();
-
-  if (!membership?.length) return null;
-  return (
-    <div>
-      <div className="flex items-center gap-2 mb-2.5">
-        <span className="w-1 h-1 rounded-full bg-gold shrink-0" />
-        <p className="text-[10px] uppercase tracking-widest text-gold font-bold">{uiText("footer.col3")}</p>
-      </div>
-      <div className="space-y-2.5">
-        {membership.map((entry) => {
-          const co = entry.companies;
-          const roleLabel = entry.public_titles.join(" · ") || (entry.is_company_owner ? "Inhaber/in" : uiText("Ui.text_46a19d00aadaa0"));
-          const categoryLabel = co.categories?.[0]
-            ? COMPANY_CATEGORIES.find(c => c.id === co.categories![0])?.label ?? null
-            : null;
-          return (
-            <Link key={entry.id} href={`/companies/${co.slug}`} className="block bg-bg-elevated border border-border rounded-xl overflow-hidden hover:border-gold/40 transition-all group">
-              <CompanyLogo src={co.logo_url} name={co.name} className="h-28 w-full" />
-              <div className="space-y-1 px-4 py-3 text-center">
-                <p className="break-words text-sm font-semibold text-text-primary group-hover:text-gold [overflow-wrap:anywhere]">{co.name}</p>
-                {categoryLabel && <p className="text-[11px] text-gold/70">{categoryLabel}</p>}
-                <p className="break-words text-xs leading-relaxed text-text-muted [overflow-wrap:anywhere]">{roleLabel}</p>
-                <p className="flex items-center justify-center gap-1 pt-1 text-[10px] text-gold/70">{uiText.rich("Ui.text_f797cb26e674d2", { part1: () => (<ExternalLink size={10} />) })}</p>
-              </div>
-            </Link>
-          );
-        })}
-      </div>
-    </div>
-  );
-}
-
 // ═══════════════════════════════════════════════════════════════════════════════
 // ACTOR PROFILE
 // ═══════════════════════════════════════════════════════════════════════════════
@@ -666,8 +622,8 @@ function ActorProfile({ organizationSection, profile, isOwner, projectCredits, c
                     <>
                       {canContact && (
                         <>{uiText.rich("Ui.text_6f27c4495b9aa0", { part1: chunks => (<Link href={`/booking?profile=${profile.user_id}`}
-                            className="inline-flex min-h-11 items-center gap-1.5 px-3 py-2 bg-gold text-bg-primary font-semibold rounded-lg hover:bg-gold-light transition-colors text-xs">{chunks}</Link>), part3: () => (<MessageSquare size={12} />), part2: chunks => (<Link href={`/messages?to=${profile.user_id}`}
-                            className="inline-flex min-h-11 items-center gap-1.5 px-3 py-2 bg-text-primary text-bg-primary font-semibold rounded-lg hover:opacity-90 transition-opacity text-xs">{chunks}</Link>) })}</>
+                            className="profile-action-button profile-action-button--solid inline-flex min-h-11 min-w-11 max-w-full items-center gap-1.5 px-3 py-2 font-semibold rounded-lg text-xs">{chunks}</Link>), part3: () => (<MessageSquare size={12} />), part2: chunks => (<Link href={`/messages?to=${profile.user_id}`}
+                            className="profile-action-button inline-flex min-h-11 min-w-11 max-w-full items-center gap-1.5 px-3 py-2 font-semibold rounded-lg text-xs">{chunks}</Link>) })}</>
                       )}
                       <BlockReportBar targetId={profile.user_id} initialYouBlocked={blockStatus?.youBlocked ?? false} />
                       <ConnectButton targetUserId={profile.user_id} disabled={!canContact} />
@@ -1297,33 +1253,39 @@ function GenericProfile({ organizationSection, profile, isOwner, projectCredits,
     .filter((f) => !creditTitles.has(f.title.toLowerCase().trim()))
     .sort((a, b) => (b.year ?? 0) - (a.year ?? 0));
 
+  const contactDetails = profile as UserProfile & { phone?: string; contact_email?: string; tiktok_url?: string; vimeo_url?: string };
+  const hasProfileDetails = Boolean(companyMembership?.length || organizationSection || cleanProfileBio(profile.bio)
+    || languages.length || profile.day_rate || travel || profile.crew?.experience_years || skills.length || memberships.length
+    || externalProfiles.length || software.length || certificates.length || profile.contact_requires_sign_in
+    || [profile.instagram_url, profile.youtube_url, profile.linkedin_url, profile.website_url, contactDetails.tiktok_url, contactDetails.vimeo_url].some(safeLink)
+    || contactDetails.phone?.trim() || contactDetails.contact_email?.trim());
+  const hasPortfolioSections = Boolean(projectCredits.some(credit => credit.projects) || reelEmbed || filmRows.length || awards.length || collaborations.length || listings.length);
+
   return (
     <div className="pt-16 min-h-screen min-w-0 max-w-full bg-bg-primary text-text-primary [overflow-wrap:anywhere]">
       {lightbox && <Lightbox src={lightbox} onClose={() => setLightbox(null)} />}
 
       {/* Hero */}
-      <section className={`relative isolate flex items-end ${bgImage ? "min-h-[300px] sm:min-h-[340px]" : ""}`}>
+      <section data-profile-header={bgImage ? "banner" : "compact"} className={`relative isolate flex items-end ${bgImage ? "min-h-[300px] sm:min-h-[340px]" : "profile-hero--compact"}`}>
         {bgImage ? (
           <>
             <ResilientPublicImage src={bgImage} alt="" className="absolute inset-0" imageClassName="h-full w-full object-cover" imageStyle={profileCoverStyle(profile.focal_point)} loading="eager" />
             <div aria-hidden="true" className="pointer-events-none absolute inset-x-0 bottom-0 z-[1] h-[65px] bg-gradient-to-b from-transparent to-bg-primary" />
           </>
-        ) : (
-          <div className="absolute inset-0 bg-gradient-to-b from-bg-elevated to-bg-primary" />
-        )}
+        ) : null}
 
         <div className={`relative z-10 mx-auto w-full min-w-0 max-w-5xl px-4 sm:px-6 lg:px-8 pb-5 sm:pb-6 ${bgImage ? "pt-40 sm:pt-44" : "pt-6 sm:pt-8"}`}>
-          <div className="flex w-fit min-w-0 max-w-[min(100%,36rem)] items-center gap-3 rounded-2xl bg-bg-primary/95 p-3 sm:gap-4 sm:p-4">
+          <div className={bgImage ? "flex w-fit min-w-0 max-w-[min(100%,36rem)] items-center gap-3 rounded-2xl bg-bg-primary/95 p-3 sm:gap-4 sm:p-4" : "profile-identity--compact flex w-full min-w-0 items-center gap-4 rounded-2xl p-4 sm:gap-5 sm:p-6"}>
             {profile.avatar_url ? (
               <button type="button" onClick={() => setLightbox(profile.avatar_url!)} aria-label={tHeader("openPhoto")}
                 className="shrink-0 rounded-xl focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-gold">
-                <ProfileCardPhoto src={profile.avatar_url ?? ""} name={profile.display_name ?? ""} focalPoint={profile.focal_point} className="h-16 w-16 rounded-xl sm:h-20 sm:w-20" sizes="(max-width: 640px) 64px, 80px" />
+                <ProfileCardPhoto src={profile.avatar_url ?? ""} name={profile.display_name ?? ""} focalPoint={profile.focal_point} className={bgImage ? "h-16 w-16 rounded-xl sm:h-20 sm:w-20" : "h-20 w-20 rounded-xl sm:h-24 sm:w-24"} sizes={bgImage ? "(max-width: 640px) 64px, 80px" : "(max-width: 640px) 80px, 96px"} />
               </button>
             ) : (
-              <ProfileCardPhoto src={profile.avatar_url ?? ""} name={profile.display_name ?? ""} focalPoint={profile.focal_point} className="h-16 w-16 rounded-xl sm:h-20 sm:w-20" sizes="(max-width: 640px) 64px, 80px" />
+              <ProfileCardPhoto src={profile.avatar_url ?? ""} name={profile.display_name ?? ""} focalPoint={profile.focal_point} className={bgImage ? "h-16 w-16 rounded-xl sm:h-20 sm:w-20" : "h-20 w-20 rounded-xl sm:h-24 sm:w-24"} sizes={bgImage ? "(max-width: 640px) 64px, 80px" : "(max-width: 640px) 80px, 96px"} />
             )}
             <div className="flex-1 min-w-0 w-full max-w-full [overflow-wrap:anywhere]">
-              <h1 className="min-w-0 max-w-full break-words font-display text-xl sm:text-3xl font-bold tracking-tight text-white leading-tight [overflow-wrap:anywhere]" style={{ textShadow: "0 2px 4px #000, 0 0 22px rgba(0,0,0,0.7)" }}>
+              <h1 className="min-w-0 max-w-full break-words font-display text-xl sm:text-3xl font-bold tracking-tight text-white leading-tight [overflow-wrap:anywhere]" style={bgImage ? { textShadow: "0 2px 4px #000, 0 0 22px rgba(0,0,0,0.7)" } : undefined}>
                 {profile.display_name ?? uiText("Ui.text_276ffa1fb4f970")}
                 <span className="block h-0.5 w-12 bg-gold mt-2 rounded-full" />
               </h1>
@@ -1345,16 +1307,16 @@ function GenericProfile({ organizationSection, profile, isOwner, projectCredits,
           </span>
         </div>
         <ProfileRoles positions={roleLabels.slice(1)} secondaryOnly />
-            <div className={`flex min-w-0 max-w-full items-center gap-2 flex-wrap ${isOwner ? "sm:shrink-0" : ""}`}>
+            <div className={`profile-actions flex min-w-0 max-w-full items-center gap-2 flex-wrap ${isOwner ? "sm:shrink-0" : ""}`}>
               {!isOwner ? (
                 <>
                   {canContact && (
                     <>
                       <Link href={`/messages?to=${profile.user_id}`}
-                        className="inline-flex min-h-11 items-center gap-1.5 px-3 py-2 bg-black/60 backdrop-blur-md border border-white/25 text-white font-medium rounded-lg hover:bg-white/25 transition-colors text-xs">{uiText.rich("Ui.text_e670272347a032", { part1: () => (<MessageSquare size={11} />) })}</Link>
+                        className="profile-action-button inline-flex min-h-11 min-w-11 max-w-full items-center justify-center gap-1.5 px-3 py-2 font-medium rounded-lg text-xs">{uiText.rich("Ui.text_e670272347a032", { part1: () => (<MessageSquare size={11} />) })}</Link>
                       <ConnectButton targetUserId={profile.user_id} disabled={!canContact} />
                       <Link href={`/booking?profile=${profile.user_id}`}
-                        className="inline-flex min-h-11 items-center gap-1.5 px-3 py-2 bg-black/60 backdrop-blur-md border border-white/25 text-white font-medium rounded-lg hover:bg-white/25 transition-colors text-xs">{uiText.rich("Ui.text_9855da52a3b061", { part1: () => (<ExternalLink size={11} />) })}</Link>
+                        className="profile-action-button inline-flex min-h-11 min-w-11 max-w-full items-center justify-center gap-1.5 px-3 py-2 font-medium rounded-lg text-xs">{uiText.rich("Ui.text_9855da52a3b061", { part1: () => (<ExternalLink size={11} />) })}</Link>
                     </>
                   )}
                   <BlockReportBar targetId={profile.user_id} initialYouBlocked={blockStatus?.youBlocked ?? false} />
@@ -1365,10 +1327,10 @@ function GenericProfile({ organizationSection, profile, isOwner, projectCredits,
             </div>
       </div>
 
-      <div className="mx-auto w-full min-w-0 max-w-5xl px-4 sm:px-6 lg:px-8 pt-6 sm:pt-8 pb-16">
+      <div className={`mx-auto w-full min-w-0 max-w-5xl px-4 sm:px-6 lg:px-8 pb-10 ${hasProfileDetails || hasPortfolioSections ? "pt-6 sm:pt-8" : "pt-2 sm:pt-3"}`}>
 
         {/* Only affiliations occupy the sidebar; the portrait appears once in the header. */}
-        <div className="grid min-w-0 max-w-full grid-cols-1 md:has-[>aside:not(:empty)]:grid-cols-[200px_minmax(0,1fr)] lg:has-[>aside:not(:empty)]:grid-cols-[220px_minmax(0,1fr)] gap-6 md:gap-8 lg:gap-10 mb-6 sm:mb-10">
+        {hasProfileDetails && <div className="grid min-w-0 max-w-full grid-cols-1 md:has-[>aside:not(:empty)]:grid-cols-[200px_minmax(0,1fr)] lg:has-[>aside:not(:empty)]:grid-cols-[220px_minmax(0,1fr)] gap-6 md:gap-8 lg:gap-10 mb-6 sm:mb-10">
           <aside className="min-w-0 max-w-full space-y-6 sm:space-y-8 empty:hidden">
             {(companyMembership?.length ?? 0) > 0 && (
               <CompanyBadge membership={companyMembership} />
@@ -1499,9 +1461,9 @@ function GenericProfile({ organizationSection, profile, isOwner, projectCredits,
 
             </div>
           </div>
-        </div>
+        </div>}
 
-        <Divider />
+        {hasProfileDetails && hasPortfolioSections && <Divider />}
 
         {/* Projekte — grouped by profile position, rest in Weitere */}
         {projectCredits.filter(c => c.projects).length > 0 && (() => {
@@ -1635,7 +1597,7 @@ function GenericProfile({ organizationSection, profile, isOwner, projectCredits,
 
         <ListingsSection listings={listings} />
 
-        <div className="mt-12 mb-8">
+        <div className={hasProfileDetails || hasPortfolioSections ? "mt-8 mb-8" : "mt-2 mb-8"}>
           <ReviewsSection
             targetId={profile.user_id}
             targetType="profile"
