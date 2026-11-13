@@ -7442,7 +7442,9 @@
     "errorNetwork": "La connessione è stata interrotta. Controlla la connessione e riprova.",
     "cancelled": "Risposta interrotta. Puoi inviare un altro messaggio.",
     "empty": "Inizia con una domanda sulla registrazione, sui profili o sulle offerte.",
-    "keyboardHint": "Invio invia · Maiusc+Invio: nuova riga"
+    "keyboardHint": "Invio invia · Maiusc+Invio: nuova riga",
+    "assistantLabel": "Assistente IA",
+    "dismissWelcome": "Chiudi il saluto"
   },
   "GenieWriting": {
     "open": "Scrivi con Genie",

@@ -7442,7 +7442,9 @@
     "errorNetwork": "Se ha interrumpido la conexión. Comprueba tu conexión e inténtalo de nuevo.",
     "cancelled": "Respuesta detenida. Puedes enviar otro mensaje.",
     "empty": "Empieza con una pregunta sobre el registro, los perfiles o las ofertas.",
-    "keyboardHint": "Intro envía · Mayús+Intro: nueva línea"
+    "keyboardHint": "Intro envía · Mayús+Intro: nueva línea",
+    "assistantLabel": "Asistente de IA",
+    "dismissWelcome": "Cerrar saludo"
   },
   "GenieWriting": {
     "open": "Redactar con Genie",

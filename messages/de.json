@@ -7442,7 +7442,9 @@
     "errorNetwork": "Die Verbindung wurde unterbrochen. Bitte prüfe deine Verbindung und versuche es erneut.",
     "cancelled": "Antwort gestoppt. Du kannst eine weitere Nachricht senden.",
     "empty": "Beginne mit einer Frage zur Registrierung, zu Profilen oder Angeboten.",
-    "keyboardHint": "Enter sendet · Umschalt+Enter: neue Zeile"
+    "keyboardHint": "Enter sendet · Umschalt+Enter: neue Zeile",
+    "assistantLabel": "KI-Assistent",
+    "dismissWelcome": "Begrüßung schließen"
   },
   "GenieWriting": {
     "open": "Mit Genie formulieren",

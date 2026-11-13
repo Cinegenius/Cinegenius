@@ -7442,7 +7442,9 @@
     "errorNetwork": "De verbinding is onderbroken. Controleer je verbinding en probeer het opnieuw.",
     "cancelled": "Antwoord gestopt. Je kan een nieuw bericht versturen.",
     "empty": "Begin met een vraag over registratie, profielen of aanbiedingen.",
-    "keyboardHint": "Enter verzendt · Shift+Enter: nieuwe regel"
+    "keyboardHint": "Enter verzendt · Shift+Enter: nieuwe regel",
+    "assistantLabel": "AI-assistent",
+    "dismissWelcome": "Begroeting sluiten"
   },
   "GenieWriting": {
     "open": "Schrijven met Genie",

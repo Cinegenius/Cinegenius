@@ -7442,7 +7442,9 @@
     "errorNetwork": "Anslutningen bröts. Kontrollera din anslutning och försök igen.",
     "cancelled": "Svaret stoppades. Du kan skicka ett nytt meddelande.",
     "empty": "Börja med en fråga om registrering, profiler eller erbjudanden.",
-    "keyboardHint": "Enter skickar · Skift+Enter: ny rad"
+    "keyboardHint": "Enter skickar · Skift+Enter: ny rad",
+    "assistantLabel": "AI-assistent",
+    "dismissWelcome": "Stäng hälsningen"
   },
   "GenieWriting": {
     "open": "Skriv med Genie",

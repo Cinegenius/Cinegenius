@@ -11,7 +11,7 @@
 
 .launcher {
   display: inline-flex;
-  min-height: 48px;
+  min-height: 56px;
   align-items: center;
   justify-content: center;
   gap: 8px;
@@ -19,12 +19,40 @@
   border-radius: 16px;
   font-size: 14px;
   font-weight: 600;
+  max-width: calc(100vw - 2rem - env(safe-area-inset-right, 0px) - env(safe-area-inset-left, 0px));
+  border-color: var(--color-gold);
+  background: linear-gradient(125deg, rgb(195 243 36 / 16%), transparent 78%), var(--color-bg-secondary);
+  box-shadow: 0 8px 26px rgb(0 0 0 / 30%), 0 0 18px rgb(195 243 36 / 16%);
 }
+
+.launcherCopy { display: flex; flex-direction: column; gap: 2px; min-width: 0; text-align: left; }
+.launcherName { font-size: 15px; font-weight: 700; line-height: 1.15; color: var(--color-text-primary); }
+.launcherLabel { font-size: 11px; line-height: 1.2; color: var(--color-gold); overflow-wrap: anywhere; }
+
+.welcome {
+  position: fixed;
+  right: max(1rem, env(safe-area-inset-right, 0px));
+  bottom: calc(var(--mobile-nav-clearance) + .5rem + 56px + 12px);
+  z-index: 45;
+  width: min(19rem, calc(100vw - 2rem - env(safe-area-inset-right, 0px) - env(safe-area-inset-left, 0px)));
+  max-height: calc(100dvh - var(--mobile-nav-clearance) - 7rem - env(safe-area-inset-top, 0px));
+  overflow-y: auto;
+  padding: 16px 12px 10px 16px;
+  border: 1px solid rgb(195 243 36 / 60%);
+  border-radius: 18px 18px 6px 18px;
+  color: var(--color-text-primary);
+  background: var(--color-bg-secondary);
+  box-shadow: 0 10px 32px rgb(0 0 0 / 28%);
+  animation: genieAppear 320ms ease-out;
+}
+.welcomeClose { position: absolute; top: 2px; right: 2px; }
+.welcomeText { margin: 0; padding-right: 32px; font-size: 14px; line-height: 1.5; overflow-wrap: anywhere; }
+.welcomeAction { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; margin-top: 8px; padding: 6px 12px; border: 1px solid var(--color-gold); border-radius: 10px; color: var(--color-bg-primary); background: var(--color-gold); font-size: 13px; font-weight: 600; }
 
 .mark { display: block; width: 26px; height: 26px; flex: 0 0 auto; color: var(--color-gold); }
 .brandIcon { display: inline-flex; width: 28px; height: 28px; flex: 0 0 28px; align-items: center; justify-content: center; }
 .launcher:hover { border-color: var(--color-gold); }
-.launcher:focus-visible, .iconButton:focus-visible, .sendButton:focus-visible, .panel a:focus-visible {
+.launcher:focus-visible, .welcomeAction:focus-visible, .iconButton:focus-visible, .sendButton:focus-visible, .panel a:focus-visible {
   outline: 2px solid var(--color-gold);
   outline-offset: 3px;
 }
@@ -103,10 +131,11 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .panel:not([hidden]) { animation: none; }
+  .panel:not([hidden]), .welcome { animation: none; }
 }
 
 @media (min-width: 1024px) {
+  .welcome { bottom: calc(max(1.25rem, env(safe-area-inset-bottom, 0px)) + 56px + 12px); right: max(1.25rem, env(safe-area-inset-right, 0px)); }
   .launcher, .panel { bottom: max(1.25rem, env(safe-area-inset-bottom, 0px)); right: max(1.25rem, env(safe-area-inset-right, 0px)); }
   .panel { --genie-resting-bottom: max(1.25rem, env(safe-area-inset-bottom, 0px)); --genie-top-gap: 1.25rem; --genie-keyboard-gap: 1.25rem; bottom: max(var(--genie-resting-bottom), calc(var(--genie-keyboard-offset, 0px) + var(--genie-keyboard-gap))); }
 }

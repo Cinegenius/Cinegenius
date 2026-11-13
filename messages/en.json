@@ -7442,7 +7442,9 @@
     "errorNetwork": "The connection was interrupted. Please check your connection and try again.",
     "cancelled": "Reply stopped. You can send another message.",
     "empty": "Start with a question about registration, profiles or offers.",
-    "keyboardHint": "Enter sends · Shift+Enter: new line"
+    "keyboardHint": "Enter sends · Shift+Enter: new line",
+    "assistantLabel": "AI assistant",
+    "dismissWelcome": "Dismiss greeting"
   },
   "GenieWriting": {
     "open": "Write with Genie",

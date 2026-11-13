@@ -7442,7 +7442,9 @@
     "errorNetwork": "A kapcsolat megszakadt. Ellenőrizd a kapcsolatot, és próbáld újra.",
     "cancelled": "A válasz leállt. Küldhetsz egy újabb üzenetet.",
     "empty": "Kezdd egy kérdéssel a regisztrációról, a profilokról vagy az ajánlatokról.",
-    "keyboardHint": "Enter: küldés · Shift+Enter: új sor"
+    "keyboardHint": "Enter: küldés · Shift+Enter: új sor",
+    "assistantLabel": "AI-asszisztens",
+    "dismissWelcome": "Üdvözlés bezárása"
   },
   "GenieWriting": {
     "open": "Fogalmazás Genie-vel",

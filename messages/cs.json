@@ -7442,7 +7442,9 @@
     "errorNetwork": "Připojení bylo přerušeno. Zkontroluj připojení a zkus to znovu.",
     "cancelled": "Odpověď byla zastavena. Můžeš poslat další zprávu.",
     "empty": "Začni otázkou ohledně registrace, profilů nebo nabídek.",
-    "keyboardHint": "Enter odešle · Shift+Enter: nový řádek"
+    "keyboardHint": "Enter odešle · Shift+Enter: nový řádek",
+    "assistantLabel": "AI asistent",
+    "dismissWelcome": "Zavřít uvítání"
   },
   "GenieWriting": {
     "open": "Napsat s Genie",
