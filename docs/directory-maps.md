@@ -7,8 +7,10 @@ boundary. Private companies, responsible-person snapshots and street addresses a
 not part of this projection. Coordinates are approximate public city centres from
 the existing canonical place resolver, not inferred private addresses.
 
-The original CineGenius style in `lib/map-style.ts` uses soft blue water, sage green
-land cover and pale neutral land, with dark brand controls and green markers. It uses OpenFreeMap vector tiles
+The original CineGenius style in `lib/map-style.ts` uses muted blue water and warm
+sage land, with distinct natural colors for forests, meadows, fields, sand and rock.
+Built-up areas use subdued warm tones; larger nature areas are visible from the
+overview zoom. Dark brand controls and green markers remain recognizable. It uses OpenFreeMap vector tiles
 with the documented OpenMapTiles schema. It is not a copy of a proprietary map
 style. OpenFreeMap explicitly allows commercial website/app use and currently
 requires neither a subscription nor an API key. Its public service has no SLA.
