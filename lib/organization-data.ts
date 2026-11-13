@@ -1,3 +1,4 @@
+import { geographicPage, type BrowsePlace } from "@/lib/browse-geography";
 import "server-only";
 import { db } from "@/lib/db";
 
@@ -11,19 +12,23 @@ export async function approvedOrganizations() {
   return data ?? [];
 }
 
-export async function approvedEntries(filters: { type?: string; topic?: string; q?: string; page?: number } = {}) {
+export async function approvedEntries(filters: { type?: string; topic?: string; q?: string; page?: number; country?: string; preferred?: BrowsePlace | null } = {}) {
   const page = Math.max(1, Math.min(10000, Math.floor(filters.page || 1)));
   const pageSize = 24;
+  const { data, error } = await geographicPage<Record<string, unknown>>((clause, range) => {
   let query = db.from("organization_entries")
-    .select(`${ORGANIZATION_ENTRY_SELECT},organization:organizations!inner(id,slug,name,logo_url,moderation_status)`)
+    .select(`${ORGANIZATION_ENTRY_SELECT},organization:organizations!inner(id,slug,name,logo_url,moderation_status)`, { count: "exact", head: !range })
     .in("moderation_status", ["approved", "ended"]).eq("organization.moderation_status", "approved")
     .order("created_at", { ascending: false }).order("id", { ascending: true });
   if (filters.type) query = query.eq("entry_type", filters.type);
   if (filters.topic) query = query.eq("topic", filters.topic);
   if (filters.q) query = query.ilike("title", `%${filters.q.slice(0, 120).replace(/[\\%_]/g, " ")}%`);
-  const { data, error } = await query.range((page - 1) * pageSize, page * pageSize);
+  if (filters.country) query = query.eq("place_country_code", filters.country);
+  if (clause) query = query.or(clause);
+  return range ? query.range(range.from, range.to) : query;
+  }, (page - 1) * pageSize, page * pageSize, filters.country ? null : filters.preferred ?? null);
   if (error) throw new Error("organization_entries_read_failed", { cause: error.code });
-  const rows = data ?? [];
+  const rows = (data ?? []) as unknown as OrganizationNewsEntry[];
   return { entries: rows.slice(0, pageSize), hasMore: rows.length > pageSize, page };
 }
 
@@ -65,3 +70,5 @@ export async function organizationWorkspace(userId: string) {
   if (entriesError) throw new Error("organization_workspace_read_failed");
   return { organizations: organizations ?? [], entries: entries ?? [] };
 }
+
+export type OrganizationNewsEntry = { id: string; slug: string; entry_type: string; title: string; summary: string | null; topic: string | null; city: string | null; starts_at: string | null; ends_at: string | null; image_url: string | null; moderation_status: string; organization: { name: string; slug: string } | { name: string; slug: string }[] };

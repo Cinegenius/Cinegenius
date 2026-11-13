@@ -30,6 +30,11 @@ export async function canUseFormDraft(userId: string, key: string) {
   }
   const [kind, id] = key.split(":");
   if (!/^[0-9a-f-]{36}$/.test(id)) return true;
+  if (kind === "application") {
+    const { data, error } = await db.from("listings").select("user_id,type,published").eq("id", id).maybeSingle();
+    if (error) throw new Error("draft_access_unavailable");
+    return !!data && data.type === "job" && data.published === true && data.user_id !== userId;
+  }
   if (kind === "organization") return canManageOrganization(id, userId);
   if (kind === "organization-entry") {
     const { data, error } = await db.from("organization_entries").select("organization_id").eq("id", id).maybeSingle();

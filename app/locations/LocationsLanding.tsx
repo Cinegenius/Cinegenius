@@ -1,4 +1,8 @@
 "use client";
+import BrowseGeography from "@/components/BrowseGeography";
+import { useBrowseGeography } from "@/lib/use-browse-geography";
+import { prioritizeGeographically } from "@/lib/browse-geography";
+
 import { useRef, useState, useEffect, useMemo, useSyncExternalStore, type FormEvent } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import Image from "@/components/MediaImage";
@@ -85,7 +89,8 @@ export default function LocationsLanding({ allLocations, totalCount, initialFilt
   const changePlaces = (next: PlaceFilterValue) => updateFilters({ ...next, ...(next.city ? { cityText: "" } : {}) });
   const categoryLabel = (value: string) => locationCategoryLabel(value, categoryText);
   const categories = locationLandingCategoryOptions(allLocations, categoryLabel, locale, filters.type);
-  const matching = useMemo(() => filterLandingLocations(allLocations, filters, value => locationCategoryLabel(value, categoryText)), [allLocations, filters, categoryText]);
+  const geography = useBrowseGeography(filters.sort === "featured" && !filters.country && !filters.region && !filters.city && !filters.cityText && !nearby.coordinates);
+  const matching = useMemo(() => prioritizeGeographically(filterLandingLocations(allLocations, filters, value => locationCategoryLabel(value, categoryText)), geography.preferred), [allLocations, filters, categoryText, geography.preferred]);
   const mapLocations = useMemo(() => matching.filter(row => !nearby.coordinates || (hasCoordinates(row) && locationDistanceKm(nearby.coordinates, [row.lat, row.lng]) <= radiusKm)), [matching, nearby.coordinates, radiusKm]);
   const filtered = useMemo(() => mapBounds ? mapLocations.filter(row => inMapBounds(row, mapBounds)) : mapLocations, [mapLocations, mapBounds]);
   const updateMapBounds = (next: MapBounds) => {
@@ -95,12 +100,12 @@ export default function LocationsLanding({ allLocations, totalCount, initialFilt
   };
   const params = locationLandingParams(filters);
   const urlParams = params.toString();
-  const filterKey = JSON.stringify([urlParams, nearby.coordinates ? nearbyViewportRevision : mapBounds, nearby.coordinates ? nearby.session : null, radiusKm]);
+  const filterKey = JSON.stringify([urlParams, nearby.coordinates ? nearbyViewportRevision : mapBounds, nearby.coordinates ? nearby.session : null, radiusKm, geography.key]);
   const visibleCount = pagination.filterKey === filterKey ? pagination.visibleCount : 24;
   const locations = filtered.slice(0, visibleCount);
   useViewUrl(urlParams ? `/locations?${urlParams}` : "/locations");
   const sortOptions = [
-    { value: "featured", label: t("sortFeatured") }, { value: "price-asc", label: t("sortPriceAsc") },
+    { value: "featured", label: geography.preferred ? uiText("BrowseGeography.recommended") : t("sortFeatured") }, { value: "price-asc", label: t("sortPriceAsc") },
     { value: "price-desc", label: t("sortPriceDesc") }, { value: "rating", label: t("sortRating") },
   ];
   const chips: BrowseChip[] = [
@@ -190,9 +195,10 @@ export default function LocationsLanding({ allLocations, totalCount, initialFilt
         </form>
       </PageHeader>
 
+      <BrowseGeography hasDesktopCountryFilter country={filters.country} onCountryChange={value => changePlaces({ country: value, region: "", city: "" })} geography={geography} />
       <MobileBrowseControls
         query={filters.q} onQueryChange={value => updateFilters({ q: value })} searchPlaceholder={t("searchPlaceholder")}
-        sortValue={filters.sort} sortOptions={sortOptions} onSortChange={value => updateFilters({ sort: value })}
+        sortValue={filters.sort} sortOptions={sortOptions} onSortChange={value => { geography.setEnabled(false); updateFilters({ sort: value }); }}
         categoryLabel={t("categoryLabel")} allCategoryLabel={t("allLocations")} categories={categories}
         categoryValue={filters.type} onCategoryChange={value => updateFilters({ type: value })}
         viewControls={viewControls()}
@@ -212,7 +218,7 @@ export default function LocationsLanding({ allLocations, totalCount, initialFilt
           <div className="grid min-w-0 grid-cols-5 items-end gap-3">
             <label className="relative flex min-w-0 flex-col gap-1 text-xs text-text-muted"><span>{t("categoryLabel")}</span><select className={selectClass} value={filters.type} onChange={event => updateFilters({ type: event.target.value })}><option value="">{t("allLocations")}</option>{categories.map(option => <option key={option.value} value={option.value}>{option.label}</option>)}</select><ChevronDown size={16} aria-hidden="true" className="pointer-events-none absolute bottom-3.5 right-3" /></label>
             <div className="col-span-3 min-w-0"><PlaceFilters rows={allLocations} value={filters} onChange={changePlaces} scope="locations" /></div>
-            <label className="relative flex min-w-0 flex-col gap-1 text-xs text-text-muted"><span>{uiText("creators.sort")}</span><select className={selectClass} value={filters.sort} onChange={event => updateFilters({ sort: event.target.value })}>{sortOptions.map(option => <option key={option.value} value={option.value}>{option.label}</option>)}</select><ChevronDown size={16} aria-hidden="true" className="pointer-events-none absolute bottom-3.5 right-3" /></label>
+            <label className="relative flex min-w-0 flex-col gap-1 text-xs text-text-muted"><span>{uiText("creators.sort")}</span><select className={selectClass} value={filters.sort} onChange={event => { geography.setEnabled(false); updateFilters({ sort: event.target.value }); }}>{sortOptions.map(option => <option key={option.value} value={option.value}>{option.label}</option>)}</select><ChevronDown size={16} aria-hidden="true" className="pointer-events-none absolute bottom-3.5 right-3" /></label>
           </div>
           <div className="flex flex-wrap items-end gap-x-5 gap-y-3">{additionalFilters()}</div>
           <div className="flex flex-wrap items-end gap-3">

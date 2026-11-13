@@ -1,9 +1,8 @@
-import { parseJobDescription } from "@/lib/job-metadata";
+import { jobRecord } from "@/lib/job-metadata";
 import { placeReadFields } from "@/lib/places/catalog";
-import type { Metadata } from "next";
 import { db } from "@/lib/db";
 import JobsContent from "./JobsContent";
-import { getTranslations, getLocale } from "next-intl/server";
+import { getLocale } from "next-intl/server";
 import { getTranslations as getMetadataTranslations } from "next-intl/server";
 
 export const revalidate = 60;
@@ -24,37 +23,17 @@ export async function generateMetadata(): Promise<import("next").Metadata> {
 
 export default async function JobsPage() {
   const locale = await getLocale();
-  const tc = await getTranslations("common");
-
-  const { data } = await db
-    .from("listings")
-    .select("place_country_code,place_region_id,place_city_id,place_city_name,place_region_name,place_status,id, title, city, price, description, created_at")
-    .eq("published", true)
-    .eq("type", "job")
-    .order("created_at", { ascending: false })
-    .limit(200);
-
-  const serverJobs = (data ?? []).map((l: {
-    id: string; title: string; city: string;
-    price: number; description: string; created_at: string;
-    job_type?: string | null;
-  }) => ({
-    id: l.id,
-    title: l.title,
-    company: "",
-    projectType: parseJobDescription(l.description ?? "").projectType ?? "",
-    location: l.city ?? "",
-    ...placeReadFields(l.city ?? "", l, locale),
-    rate: l.price > 0 ? `${l.price} €${tc("perDay")}` : tc("onRequest"),
-    union: "Non-Union",
-    shootDates: tc("onRequest"),
-    urgent: false,
-    tags: [tc("newBadge")],
-    posted: tc("today"),
-    description: l.description ?? "",
-    isReal: true,
-    jobType: (l.job_type ?? "freelance") as "freelance" | "festanstellung" | "praktikum",
-  }));
+  const serverJobs = [];
+  // Read complete bounded pages before applying client filters or geographic ordering.
+  for (let offset = 0; ; offset += 250) {
+    const { data, error } = await db.from("listings")
+      .select("place_country_code,place_region_id,place_city_id,place_city_name,place_region_name,place_status,id,title,category,city,price,description,created_at,job:metadata->job")
+      .eq("published", true).eq("type", "job").order("created_at", { ascending: false }).order("id")
+      .range(offset, offset + 249);
+    if (error) throw new Error("jobs_read_failed");
+    serverJobs.push(...(data ?? []).map(row => ({ ...jobRecord(row), ...placeReadFields(row.city ?? "", row, locale) })));
+    if (!data || data.length < 250) break;
+  }
 
   return <JobsContent serverJobs={serverJobs} />;
 }

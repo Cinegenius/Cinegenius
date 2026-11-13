@@ -1,3 +1,5 @@
+import { countryCode } from "@/lib/places/core";
+import { projectRecordWithDetails } from "@/lib/project-record";
 import { db } from "@/lib/db";
 import { publicProjectMedia } from "@/lib/project-media-rights";
 import type { BrowseProject } from "@/lib/projects-browse";
@@ -13,7 +15,8 @@ export async function getBrowseProjects(): Promise<BrowseProject[]> {
     if (error) throw new Error("Unable to load the public project directory.");
     for (const raw of data ?? []) {
       const project = publicProjectMedia(raw);
-      projects.push({ id: project.id, title: project.title, year: project.year, type: project.type,
+      const country = projectRecordWithDetails(raw).country;
+      projects.push({ place_country_code: countryCode(typeof country === "string" ? country : ""), id: project.id, title: project.title, year: project.year, type: project.type,
         director: project.director, poster_url: project.poster_url, created_at: project.created_at,
         updated_at: project.updated_at, crew_count: 0 });
     }

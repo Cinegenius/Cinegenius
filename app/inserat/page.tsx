@@ -452,8 +452,9 @@ export default function InseratPage() {
   const [selected, setSelected] = useState<CategoryItem | null>(null);
   const [activeGroup, setActiveGroup] = useState<string | null>(null); // null = main view
   useEffect(() => {
-    if (new URLSearchParams(window.location.search).get("group") === "marktplatz") {
-      setActiveGroup(current => current ?? "marktplatz");
+    const group = new URLSearchParams(window.location.search).get("group");
+    if (group === "marktplatz" || group === "jobs") {
+      setActiveGroup(current => current ?? group);
     }
   }, []);
   // Category-specific metadata (dynamic per prop category)
@@ -528,6 +529,7 @@ export default function InseratPage() {
     // job
     company: "",
     projectType: "",
+    employment_type: "",
     shoot_start: "",
     shoot_end: "",
     pay_type: "",
@@ -750,7 +752,7 @@ export default function InseratPage() {
       const dateRange = form.shoot_start
         ? form.shoot_end
           ? `${new Date(form.shoot_start).toLocaleDateString(uiLocale, { day: "numeric", month: "long" })} – ${new Date(form.shoot_end).toLocaleDateString(uiLocale, { day: "numeric", month: "long", year: "numeric" })}`
-          : `Ab ${new Date(form.shoot_start).toLocaleDateString(uiLocale, { day: "numeric", month: "long", year: "numeric" })}`
+          : new Date(form.shoot_start).toLocaleDateString(uiLocale, { day: "numeric", month: "long", year: "numeric", timeZone: "UTC" })
         : "";
       const contentWarnings = [
         form.content_nudity && "⚠ Nacktheit",
@@ -773,6 +775,7 @@ export default function InseratPage() {
         description: meta ? uiText("Ui.text_c53dfd5c59507b", { value1: String(meta), value2: String(form.description) }) : form.description,
         price: parseFloat(form.price) || 0,
         city: form.city,
+        metadata: { job: { employmentType: form.employment_type, startDate: form.shoot_start, endDate: form.shoot_end } },
       };
     }
 
@@ -1506,6 +1509,13 @@ export default function InseratPage() {
                       className="w-full px-4 py-3 bg-bg-elevated border border-border rounded-xl text-text-primary placeholder:text-text-muted focus:outline-none focus:border-gold transition-colors text-sm" />
                   </div>
                   <div>
+                    <label htmlFor="job-employment-type" className="mb-2 block text-xs font-semibold text-text-muted">{uiText("JobsRefresh.employment")}</label>
+                    <select id="job-employment-type" value={form.employment_type} onChange={event => f("employment_type", event.target.value)} className="min-h-11 w-full rounded-xl border border-border bg-bg-elevated px-3 text-sm text-text-primary">
+                      <option value="">{uiText("JobsRefresh.unspecified")}</option>
+                      <option value="freelance">{uiText("jobs.filterFreelance")}</option><option value="festanstellung">{uiText("jobs.filterFulltime")}</option><option value="praktikum">{uiText("jobs.filterInternship")}</option>
+                    </select>
+                  </div>
+                  <div>
                     <label className="block text-xs font-semibold text-text-muted uppercase tracking-widest mb-2">{uiText("jobs.filterProjectType")}</label>
                     <FormSelect value={form.projectType} onChange={(v) => f("projectType", v)}
                       placeholder={uiText("Ui.text_5a65d3a10117a6")}
@@ -1534,7 +1544,7 @@ export default function InseratPage() {
                   <div className="flex flex-wrap gap-2">
                     {["Bezahlt", "Deferred Pay", "Spesen & Reise", "Ehrenamtlich / Übung"].map((opt) => (
                       <button key={opt} onClick={() => f("pay_type", opt)}
-                        className={`px-3 py-1.5 rounded-lg text-sm border transition-all ${form.pay_type === opt ? "bg-gold text-bg-primary border-gold" : "border-border text-text-secondary hover:border-gold/40"}`}>
+                        className={`min-h-11 px-3 py-1.5 rounded-lg text-sm border transition-all ${form.pay_type === opt ? "bg-gold text-bg-primary border-gold" : "border-border text-text-secondary hover:border-gold/40"}`}>
                         {(uiOptionLabels[opt] ?? opt)}
                       </button>
                     ))}
@@ -1911,7 +1921,7 @@ export default function InseratPage() {
               setPendingImageFile(null);
               setCreatedId(null);
               setCreatedIsDraft(false); setCreatedPublished(false);
-              setForm({ title: "", description: "", price: "", city: "", selected_place_city_id: "", make: "", model: "", year: "", fuel_type: "", license_class: "", condition: "", vehicle_subtype: "", sqm: "", ceiling_height: "", max_crew: "", indoor_outdoor: "innen", power_available: false, power_details: "", parking_spots: "", natural_light: false, blackout_possible: false, loading_access: false, access_notes: "", shooting_hours: "", availability_notes: "", company: "", projectType: "", shoot_start: "", shoot_end: "", pay_type: "", role_label: "", urgent: false, content_nudity: false, content_violence: false, content_stunts: false, delivery: false, rental_type: "miete", dimensions: "", safety_note: "", skills: "", experience: "", animal_training: "", animal_handler: true, animal_count: "1", animal_skills: "" });
+              setForm({ title: "", description: "", price: "", city: "", selected_place_city_id: "", make: "", model: "", year: "", fuel_type: "", license_class: "", condition: "", vehicle_subtype: "", sqm: "", ceiling_height: "", max_crew: "", indoor_outdoor: "innen", power_available: false, power_details: "", parking_spots: "", natural_light: false, blackout_possible: false, loading_access: false, access_notes: "", shooting_hours: "", availability_notes: "", company: "", projectType: "", employment_type: "", shoot_start: "", shoot_end: "", pay_type: "", role_label: "", urgent: false, content_nudity: false, content_violence: false, content_stunts: false, delivery: false, rental_type: "miete", dimensions: "", safety_note: "", skills: "", experience: "", animal_training: "", animal_handler: true, animal_count: "1", animal_skills: "" });
               setLocAmenities([]); setLocBlockedDates([]); setLocExtraImages([]); setLocFloorPlanUrl(null); setLocFloorPlanPreview(null);
               setLocRooms([]); setLocPriceOnRequest(true); setPriceNegotiable(false); setSelectedCompanyId(""); setFocalPoint(null);
               setArticleImages([]); setLocationGalleryState({ uploading: false, failed: 0 }); setArticleGalleryState({ uploading: false, failed: 0 });

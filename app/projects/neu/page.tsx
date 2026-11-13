@@ -1,4 +1,5 @@
 "use client";
+import { CountrySelect } from "@/components/BrowseGeography";
 import { projectTypeLabel } from "@/lib/project-type-labels";
 import { useFormRouter as useRouter } from "@/lib/use-form-router";
 
@@ -128,6 +129,7 @@ export default function NeuesProjektPage() {
     description: "",
     myRole: "",
     productionCompany: "",
+    country: "",
   });
 
   // Team members (ghost profiles)
@@ -176,6 +178,7 @@ export default function NeuesProjektPage() {
           description: form.description.trim() || null,
           myRole: form.myRole.trim() || null,
           productionCompany: form.productionCompany.trim() || null,
+          country: form.country || null,
           crew_entries: teamMembers.map((member) => ({
             name: member.name,
             role: member.role,
@@ -418,6 +421,7 @@ export default function NeuesProjektPage() {
                 </div>
 
                 <div>
+                  <div className="mb-4"><CountrySelect emptyLabel={uiText("Places.chooseCountry")} value={form.country} onChange={value => setForm(current => ({ ...current, country: value }))} /></div>
                   <label className="block text-xs font-semibold text-text-secondary uppercase tracking-widest mb-2">{uiText("setup.description")}</label>
                   <textarea
                     value={form.description}

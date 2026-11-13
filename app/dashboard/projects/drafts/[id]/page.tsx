@@ -8,6 +8,8 @@ import RoleDropdown from "@/components/RoleDropdown";
 import FormDraftStatus from "@/components/FormDraftStatus";
 import { useExistingDraftProtection, type FormDraftStatus as DraftStatus } from "@/lib/use-form-draft";
 import { normalizeProjectMediaRights, projectMediaUrls } from "@/lib/project-media-rights";
+import { CountrySelect } from "@/components/BrowseGeography";
+import { countryCode } from "@/lib/places/core";
 import { projectTypeLabel } from "@/lib/project-type-labels";
 import { departments } from "@/lib/departments";
 import { useCallback, useEffect, useRef, useState } from "react";
@@ -153,6 +155,7 @@ function ProjectDraftPreview({ id }: { id: string }) {
               <label key={key} className="min-w-0 text-sm text-text-secondary">{t(label)}<input className={`${inputClass} mt-1`} value={key === "productionCompany" ? text("production_company") || text(key) : text(key)} type={key === "year" ? "number" : "text"} min={key === "year" ? 1900 : undefined} max={key === "year" ? new Date().getFullYear() + 5 : undefined} onChange={event => change(key, event.target.value)} /></label>)}
             <label className="min-w-0 text-sm text-text-secondary">{t("projects.colType")}<select value={text("type")} onChange={event => change("type", event.target.value)} className={`${inputClass} mt-1`}><option value="">—</option>{types.map(type => <option key={type} value={type}>{projectTypeLabel(type, t)}</option>)}</select></label>
             <div className="min-w-0 text-sm text-text-secondary"><p className="mb-1">{t("Ui.text_c5d70daa002cac")}</p><RoleDropdown value={text("myRole")} onChange={value => change("myRole", value)} options={ROLES} /></div>
+            <CountrySelect emptyLabel={t("Places.chooseCountry")} value={countryCode(text("country"))} onChange={value => change("country", value)} />
             <label className="min-w-0 text-sm text-text-secondary sm:col-span-2">{t("Ui.text_76caf76da0cfb2")}<textarea rows={5} value={text("description")} onChange={event => change("description", event.target.value)} className={`${inputClass} mt-1`} /></label>
           </fieldset> : text("description") && <p className="mt-5 whitespace-pre-wrap break-words text-sm leading-relaxed text-text-secondary">{text("description")}</p>}
           {crew.length > 0 && <section className="mt-6"><h2 className="mb-3 text-sm font-semibold text-text-primary">{t("projects.colCrew")}</h2><ul className="space-y-3">{crew.map((entry, index) => <li key={index} className="min-w-0 text-sm text-text-secondary">

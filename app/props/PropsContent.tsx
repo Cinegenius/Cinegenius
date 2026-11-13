@@ -1,4 +1,8 @@
 "use client";
+import BrowseGeography from "@/components/BrowseGeography";
+import { useBrowseGeography } from "@/lib/use-browse-geography";
+import { prioritizeGeographically } from "@/lib/browse-geography";
+
 
 import FloatingMapToggle from "@/components/FloatingMapToggle";
 import DirectoryMap from "@/components/DirectoryMap";
@@ -173,6 +177,7 @@ function PropsInner({ serverListings, serverError = false, initialDepartment }: 
   const selectedSub = String(selected.subcategory);
   const rentalTypeFilter = offer === "miete" || offer === "kauf" ? offer : "alle";
   const sortKey = sort === "price-asc" || sort === "price-desc" ? sort : "featured";
+  const geography = useBrowseGeography(sortKey === "featured" && !placeFilters.country && !placeFilters.region && !placeFilters.city && !cityText);
   const viewMode = view === "map" ? "map" : view === "list" ? "list" : "grid";
   const changeCategory = (nextDepartment: string | null, nextSubcategory?: string) => {
     const next = marketplaceCategorySelection(nextDepartment, nextSubcategory ?? "");
@@ -181,8 +186,8 @@ function PropsInner({ serverListings, serverError = false, initialDepartment }: 
   const updatePlaceFilters = (next: typeof placeFilters) => { setPlaceFilters(next); if (next.city) setCityText(""); };
   const activeDepartment = departments.find(row => row.id === selectedDept);
   const activeSubcategory = activeDepartment?.groups.find(row => row.id === selectedSub);
-  const sortOptions = [{ value: "featured", label: navigation("newest") }, { value: "price-asc", label: t("sortPriceAsc") }, { value: "price-desc", label: t("sortPriceDesc") }];
-  const filterKey = JSON.stringify([placeFilters.country, placeFilters.region, placeFilters.city, cityText.trim(), selectedDept, selectedSub, query.trim(), rentalTypeFilter, sortKey]);
+  const sortOptions = [{ value: "featured", label: geography.preferred ? uiText("BrowseGeography.recommended") : navigation("newest") }, { value: "price-asc", label: t("sortPriceAsc") }, { value: "price-desc", label: t("sortPriceDesc") }];
+  const filterKey = JSON.stringify([placeFilters.country, placeFilters.region, placeFilters.city, cityText.trim(), selectedDept, selectedSub, query.trim(), rentalTypeFilter, sortKey, geography.key]);
   const requestKey = JSON.stringify([filterKey, locale]);
   const visibleCount = pagination.filterKey === filterKey ? pagination.visibleCount : MARKETPLACE_PAGE_SIZE;
   const currentPage = Math.max(1, Math.ceil(visibleCount / MARKETPLACE_PAGE_SIZE));
@@ -214,8 +219,8 @@ function PropsInner({ serverListings, serverError = false, initialDepartment }: 
     });
     if (sortKey === "price-asc") rows.sort((a, b) => a.dailyRate - b.dailyRate);
     if (sortKey === "price-desc") rows.sort((a, b) => b.dailyRate - a.dailyRate);
-    return rows;
-  }, [serverListings, query, locale, catalog, departments, selectedDept, selectedSub, placeFilters, cityText, rentalTypeFilter, sortKey]);
+    return prioritizeGeographically(rows, geography.preferred);
+  }, [serverListings, query, locale, catalog, departments, selectedDept, selectedSub, placeFilters, cityText, rentalTypeFilter, sortKey, geography.preferred]);
   const [remote, setRemote] = useState<{ key: string; rows: Prop[]; count: number; pages: number; complete?: boolean } | null>(null);
   const remoteRef = useRef(remote);
   useEffect(() => { remoteRef.current = remote; }, [remote]);
@@ -229,6 +234,7 @@ function PropsInner({ serverListings, serverError = false, initialDepartment }: 
       const previous = remoteRef.current;
       const pages = previous?.key === requestKey && previous.pages >= currentPage - 1 && currentPage > 1 ? [currentPage] : Array.from({ length: currentPage }, (_, index) => index + 1);
       const base = new URLSearchParams({ marketplace: "1", limit: String(MARKETPLACE_PAGE_SIZE), sort: sortKey });
+      if (geography.preferred) base.set("nearby", "1");
       for (const kind of ["country", "region", "city"] as const) if (placeFilters[kind]) base.set(kind, placeFilters[kind]);
       if (cityText) base.set("cityText", cityText);
       if (selectedDept) base.set("dept", selectedDept);
@@ -270,7 +276,7 @@ function PropsInner({ serverListings, serverError = false, initialDepartment }: 
       }).catch(() => { if (!controller.signal.aborted && serial === requestSerial.current) setBrowseError(requestKey); });
     }, 250);
     return () => { window.clearTimeout(timer); controller.abort(); };
-  }, [requestKey, currentPage, retry, sortKey, placeFilters, cityText, selectedDept, selectedSub, query, rentalTypeFilter, privateVendor, viewMode]);
+  }, [requestKey, currentPage, retry, sortKey, placeFilters, cityText, selectedDept, selectedSub, query, rentalTypeFilter, privateVendor, viewMode, geography.preferred]);
   const hasRemote = remote?.key === requestKey;
   const failed = browseError === requestKey;
   const browseLoading = !failed && (!hasRemote || (viewMode === "map" ? !remote.complete : remote.pages < currentPage));
@@ -390,7 +396,8 @@ function PropsInner({ serverListings, serverError = false, initialDepartment }: 
   const viewControls = <DirectoryViewControls value={viewMode} onChange={setView} />;
   return <div className="min-h-screen mobile-bottom-nav-clear">
     <FloatingMapToggle mapActive={viewMode === "map"} onToggle={() => { setView(viewMode === "map" ? "list" : "map"); requestAnimationFrame(() => resultsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" })); }} />
-    <MobileBrowseControls query={query} onQueryChange={setQuery} searchPlaceholder={t("searchPlaceholder")} sortValue={sortKey} sortOptions={sortOptions} onSortChange={value => setSort(value as MarketplaceSort)} categoryLabel={navigation("category")} allCategoryLabel={navigation("allCategories")} categories={departments.map(row => ({ value: row.id, label: row.label }))} categoryValue={selectedDept ?? ""} onCategoryChange={value => changeCategory(value || null)} categoryPlacement="filters" resultSummary={t("results", { count: resultCount })} viewControls={viewControls} filterCount={chips.length} chips={chips} onReset={clearAll} resetLabel={t("clearAllFilters")} showResultsLabel={t("results", { count: resultCount })}>
+    <BrowseGeography hasDesktopCountryFilter country={placeFilters.country} onCountryChange={value => updatePlaceFilters({ country: value, region: "", city: "" })} geography={geography} />
+      <MobileBrowseControls query={query} onQueryChange={setQuery} searchPlaceholder={t("searchPlaceholder")} sortValue={sortKey} sortOptions={sortOptions} onSortChange={value => { geography.setEnabled(false); setSort(value as MarketplaceSort); }} categoryLabel={navigation("category")} allCategoryLabel={navigation("allCategories")} categories={departments.map(row => ({ value: row.id, label: row.label }))} categoryValue={selectedDept ?? ""} onCategoryChange={value => changeCategory(value || null)} categoryPlacement="filters" resultSummary={t("results", { count: resultCount })} viewControls={viewControls} filterCount={chips.length} chips={chips} onReset={clearAll} resetLabel={t("clearAllFilters")} showResultsLabel={t("results", { count: resultCount })}>
       {activeDepartment && <MobileFilterField label={navigation("subcategory")}><MobileFilterSelect value={selectedSub} onChange={value => changeCategory(selectedDept, value)} placeholder={navigation("allInCategory", { category: activeDepartment.label })} options={activeDepartment.groups.map(row => ({ value: row.id, label: row.label }))} /></MobileFilterField>}
       <PlaceFilters rows={serverListings} value={placeFilters} onChange={updatePlaceFilters} scope="marketplace" />
       <MobileFilterField label={navigation("offerType")}><MobileFilterSelect value={rentalTypeFilter === "alle" ? "" : rentalTypeFilter} onChange={value => setOffer(value === "miete" || value === "kauf" ? value : "alle")} placeholder={uiText("common.all")} options={[{ value: "miete", label: navigation("rent") }, { value: "kauf", label: navigation("buy") }]} /></MobileFilterField>
@@ -399,7 +406,7 @@ function PropsInner({ serverListings, serverError = false, initialDepartment }: 
       <div className="flex flex-wrap items-end gap-3">
         <label className="min-w-0 flex-1"><span className="sr-only">{t("searchPlaceholder")}</span><span className="flex min-h-11 items-center gap-2 rounded-xl border border-border bg-bg-elevated px-3 focus-within:border-gold/50"><Search size={17} aria-hidden="true" className="shrink-0 text-text-muted" /><input type="search" value={query} onChange={event => setQuery(event.target.value)} placeholder={t("searchPlaceholder")} className="min-h-11 w-full min-w-0 bg-transparent text-sm outline-none" />{query && <button type="button" aria-label={uiText("locations.landingClear")} onClick={() => setQuery("")} className="flex min-h-11 min-w-11 items-center justify-center text-text-muted hover:text-text-primary"><X size={16} /></button>}</span></label>
         <label className="relative flex min-w-0 flex-col gap-1 text-xs text-text-secondary"><span>{navigation("offerType")}</span><select value={rentalTypeFilter} onChange={event => setOffer(event.target.value as MarketplaceOfferFilter)} className="min-h-11 appearance-none rounded-lg border border-border bg-bg-elevated pl-3 pr-9 text-sm"><option value="alle">{uiText("common.all")}</option><option value="miete">{navigation("rent")}</option><option value="kauf">{navigation("buy")}</option></select><ChevronDown size={15} aria-hidden="true" className="pointer-events-none absolute bottom-3.5 right-3 text-text-muted" /></label>
-        <label className="relative flex min-w-0 flex-col gap-1 text-xs text-text-secondary"><span>{t("sortLabel")}</span><select value={sortKey} onChange={event => setSort(event.target.value as MarketplaceSort)} className="min-h-11 appearance-none rounded-lg border border-border bg-bg-elevated pl-3 pr-9 text-sm">{sortOptions.map(option => <option key={option.value} value={option.value}>{option.label}</option>)}</select><ChevronDown size={15} aria-hidden="true" className="pointer-events-none absolute bottom-3.5 right-3 text-text-muted" /></label>
+        <label className="relative flex min-w-0 flex-col gap-1 text-xs text-text-secondary"><span>{t("sortLabel")}</span><select value={sortKey} onChange={event => { geography.setEnabled(false); setSort(event.target.value as MarketplaceSort); }} className="min-h-11 appearance-none rounded-lg border border-border bg-bg-elevated pl-3 pr-9 text-sm">{sortOptions.map(option => <option key={option.value} value={option.value}>{option.label}</option>)}</select><ChevronDown size={15} aria-hidden="true" className="pointer-events-none absolute bottom-3.5 right-3 text-text-muted" /></label>
         {viewControls}
       </div>
       <PlaceFilters rows={serverListings} value={placeFilters} onChange={updatePlaceFilters} scope="marketplace" />

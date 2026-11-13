@@ -1,4 +1,8 @@
 "use client";
+import BrowseGeography from "@/components/BrowseGeography";
+import { useBrowseGeography } from "@/lib/use-browse-geography";
+import { prioritizeGeographically } from "@/lib/browse-geography";
+
 
 import { useMemo } from "react";
 import Link from "next/link";
@@ -10,6 +14,7 @@ import MobileBrowseControls, { MobileFilterField, MobileFilterSelect, type Brows
 import { useViewState } from "@/lib/use-view-state";
 import { PROJECT_CATEGORIES, projectCategoryForType, type ProjectCategoryId } from "@/lib/project-category-filter";
 import { normalizedCatalogueSearch, projectTypeLabel, projectTypeOptions } from "@/lib/project-type-labels";
+import { matchesPlace } from "@/lib/places/core";
 import { sortProjects, type BrowseProject, type ProjectSort } from "@/lib/projects-browse";
 
 export default function ProjectsContent({ projects, category = null }: { projects: BrowseProject[]; category?: ProjectCategoryId | null }) {
@@ -22,6 +27,8 @@ export default function ProjectsContent({ projects, category = null }: { project
   const [yearFilter, setYearFilter] = useViewState("projects.yearFilter", "");
   const [directorFilter, setDirectorFilter] = useViewState("projects.directorFilter", "");
   const [sort, setSort] = useViewState<ProjectSort>("projects.sort", "year_desc");
+  const [country, setCountry] = useViewState("projects.country", "");
+  const geography = useBrowseGeography(sort === "year_desc" && !country);
   const [view, setView] = useViewState<"list" | "grid">("projects.view", "list");
   const categories = PROJECT_CATEGORIES.map(item => ({ value: item.id, label: t(item.labelKey) }));
   const categoryProjects = useMemo(() => category ? projects.filter(project => projectCategoryForType(project.type) === category) : projects, [projects, category]);
@@ -30,23 +37,25 @@ export default function ProjectsContent({ projects, category = null }: { project
   const directors = [...new Set(categoryProjects.flatMap(project => project.director ? [project.director] : []))].sort((a, b) => a.localeCompare(b, locale)).map(value => ({ value, label: value }));
   const sortOptions = [
     { value: "recent", label: t("sortRecent") },
-    { value: "year_desc", label: t("sortNewest") },
+    { value: "year_desc", label: geography.preferred ? ui("BrowseGeography.recommended") : t("sortNewest") },
     { value: "year_asc", label: t("sortOldest") },
     { value: "title_asc", label: t("sortAlpha") },
     { value: "crew_desc", label: t("sortCrew") },
   ];
   const filtered = useMemo(() => {
     const needle = normalizedCatalogueSearch(query, locale);
-    return sortProjects(categoryProjects.filter(project =>
+    return prioritizeGeographically(sortProjects(categoryProjects.filter(project =>
+      matchesPlace(project, "country", country) &&
       (!needle || [project.title, project.director ?? "", project.type ?? "", projectTypeLabel(project.type ?? "", ui)].some(value => normalizedCatalogueSearch(value, locale).includes(needle)))
       && (!typeFilter || project.type === typeFilter)
       && (!yearFilter || String(project.year) === yearFilter)
-      && (!directorFilter || project.director === directorFilter)), sort, locale);
-  }, [categoryProjects, query, typeFilter, yearFilter, directorFilter, sort, locale, ui]);
+      && (!directorFilter || project.director === directorFilter)), sort, locale), geography.preferred);
+  }, [categoryProjects, query, typeFilter, yearFilter, directorFilter, sort, locale, ui, country, geography.preferred]);
 
   const changeCategory = (value: string) => router.push(value ? `/projects/${value}` : "/projects", { scroll: false });
-  const reset = () => { setQuery(""); setTypeFilter(""); setYearFilter(""); setDirectorFilter(""); };
+  const reset = () => { setQuery(""); setTypeFilter(""); setYearFilter(""); setDirectorFilter(""); setCountry(""); };
   const chips: BrowseChip[] = [
+    ...(country ? [{ id: "country", label: (ui.has(`CountryNames.${country}`) ? ui(`CountryNames.${country}`) : country), onRemove: () => setCountry("") }] : []),
     ...(typeFilter ? [{ id: "type", label: projectTypeLabel(typeFilter, ui), onRemove: () => setTypeFilter("") }] : []),
     ...(yearFilter ? [{ id: "year", label: yearFilter, onRemove: () => setYearFilter("") }] : []),
     ...(directorFilter ? [{ id: "director", label: directorFilter, onRemove: () => setDirectorFilter("") }] : []),
@@ -58,8 +67,9 @@ export default function ProjectsContent({ projects, category = null }: { project
   const fields = [{ label: t("filterType"), value: typeFilter, options: types, onChange: setTypeFilter }, { label: t("filterYear"), value: yearFilter, options: years, onChange: setYearFilter }, { label: t("filterDirector"), value: directorFilter, options: directors, onChange: setDirectorFilter }];
 
   return <div className="mobile-bottom-nav-clear bg-bg-primary">
-    <MobileBrowseControls query={query} onQueryChange={setQuery} searchPlaceholder={t("searchPlaceholder")}
-      sortValue={sort} sortOptions={sortOptions} onSortChange={value => setSort(value as ProjectSort)}
+    <BrowseGeography country={country} onCountryChange={setCountry} geography={geography} />
+      <MobileBrowseControls query={query} onQueryChange={setQuery} searchPlaceholder={t("searchPlaceholder")}
+      sortValue={sort} sortOptions={sortOptions} onSortChange={value => { geography.setEnabled(false); setSort(value as ProjectSort); }}
       categoryLabel={ui("props.categoryBtn")} allCategoryLabel={ui("common.allProjects")} categories={categories} categoryValue={category ?? ""} onCategoryChange={changeCategory}
       resultSummary={t("resultsCount", { count: filtered.length })} viewControls={views} filterCount={chips.length} chips={chips} onReset={reset} resetLabel={t("resetFilters")} showResultsLabel={ui("Ui.text_52ca04e867ebdc", { value1: String(filtered.length) })}>
       {fields.map(field => <MobileFilterField key={field.label} label={field.label}><MobileFilterSelect value={field.value} onChange={field.onChange} options={field.options} placeholder={ui("common.all")} label={field.label} /></MobileFilterField>)}
@@ -75,7 +85,7 @@ export default function ProjectsContent({ projects, category = null }: { project
             {query && <button type="button" className="flex h-11 w-11 shrink-0 items-center justify-center text-text-muted" aria-label={ui("locations.landingClear")} onClick={() => setQuery("")}><X size={18} /></button>}
           </label>
           <label className="flex min-h-12 items-center gap-3 rounded-xl border border-border bg-bg-elevated px-3 text-sm">
-            <span className="sr-only">{t("sortLabel")}</span><select className="min-h-11 bg-transparent outline-none" value={sort} onChange={event => setSort(event.target.value as ProjectSort)}>{sortOptions.map(option => <option key={option.value} value={option.value}>{option.label}</option>)}</select>
+            <span className="sr-only">{t("sortLabel")}</span><select className="min-h-11 bg-transparent outline-none" value={sort} onChange={event => { geography.setEnabled(false); setSort(event.target.value as ProjectSort); }}>{sortOptions.map(option => <option key={option.value} value={option.value}>{option.label}</option>)}</select>
           </label>
           {views}
         </div>

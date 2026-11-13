@@ -37,7 +37,12 @@ export async function POST(req: NextRequest) {
 
   // NOTE: jobTitle and ownerId from the client body are intentionally ignored below.
   // We fetch the authoritative values from the DB to prevent spoofing.
-  const { jobId, message, portfolioUrl, dayRate } = await req.json();
+  const body = await req.json().catch(() => null);
+  if (!body || typeof body !== "object" || Array.isArray(body)) return NextResponse.json({ error: tResponse("System.requestFailed") }, { status: 400 });
+  const { jobId, message, portfolioUrl, dayRate, accountId } = body;
+  if (accountId !== undefined && accountId !== userId) return NextResponse.json({ error: tResponse("System.requestFailed") }, { status: 409 });
+  if (typeof jobId !== "string" || !/^[0-9a-f-]{36}$/i.test(jobId) || typeof message !== "string" || message.length > 5000 || (portfolioUrl !== undefined && (typeof portfolioUrl !== "string" || portfolioUrl.length > 2000)) || (dayRate !== undefined && (typeof dayRate !== "string" || dayRate.length > 100))) return NextResponse.json({ error: tResponse("System.requestFailed") }, { status: 400 });
+  if (portfolioUrl) { try { const url = new URL(portfolioUrl); if (!["http:", "https:"].includes(url.protocol)) throw new Error("invalid_url"); } catch { return NextResponse.json({ error: tResponse("System.requestFailed") }, { status: 400 }); } }
 
   if (!jobId || !message?.trim()) {
     return NextResponse.json({ error: tResponse('System.m_3b85b95ef017') }, { status: 400 });

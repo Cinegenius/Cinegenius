@@ -786,7 +786,7 @@ export default function ProjectDetail({
                   { lbl: uiText("Places.status"),           val: project.status ? STATUS_META[project.status]?.label : null },
                   { lbl: uiText("Ui.text_3561abfe8067f3"),           val: project.genres?.join(", ") },
                   { lbl: uiText("creators.filterLanguage"),          val: project.language },
-                  { lbl: uiText("creators.filterCountry"),             val: project.country },
+                  { lbl: uiText("creators.filterCountry"),             val: project.country && uiText.has(`CountryNames.${project.country}`) ? uiText(`CountryNames.${project.country}`) : project.country },
                   { lbl: uiText("Ui.text_956ba2f5f97188"),         val: project.runtime_minutes ? uiText("Ui.text_34943731be3062", { value1: String(project.runtime_minutes) }) : null },
                   { lbl: uiText("menu.crewDirection"),            val: project.director },
                   { lbl: uiText("profile.labelProductionCompany"), val: project.production_company },

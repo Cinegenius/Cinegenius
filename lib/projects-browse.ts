@@ -1,4 +1,5 @@
 export type BrowseProject = {
+  place_country_code?: string | null;
   id: string;
   title: string;
   year: number | null;

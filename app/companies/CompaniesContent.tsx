@@ -1,4 +1,8 @@
 "use client";
+import BrowseGeography from "@/components/BrowseGeography";
+import { useBrowseGeography } from "@/lib/use-browse-geography";
+import { prioritizeGeographically } from "@/lib/browse-geography";
+
 
 import DirectoryMap from "@/components/DirectoryMap";
 import DirectoryViewControls, { type DirectoryView } from "@/components/DirectoryViewControls";
@@ -120,6 +124,7 @@ export default function CompaniesContent({ initialCompanies }: { initialCompanie
   const [regionFilter, setRegionFilter] = useViewState("companies.regionFilter", "");
   const [verifiedOnly, setVerifiedOnly] = useViewState("companies.verifiedOnly", false);
   const [sortKey, setSortKey] = useViewState("companies.sortKey", "newest");
+  const geography = useBrowseGeography(sortKey === "newest" && !countryFilter && !regionFilter && !cityFilter);
   const [viewMode, setViewMode] = useViewState<DirectoryView>("companies.viewMode", "grid");
   const [pageState, setPageState] = useViewState("companies.pageState", { filterKey: "", page: 1 });
 
@@ -156,10 +161,10 @@ export default function CompaniesContent({ initialCompanies }: { initialCompanie
     if (verifiedOnly) result = result.filter((c) => c.verified);
     if (sortKey === "newest") result = [...result].sort((a, b) => b.created_at.localeCompare(a.created_at));
     if (sortKey === "name") result = [...result].sort((a, b) => a.name.localeCompare(b.name, locale));
-    return result;
-  }, [initialCompanies, search, selectedCategory, cityFilter, countryFilter, regionFilter, verifiedOnly, sortKey, locale]);
+    return prioritizeGeographically(result, geography.preferred);
+  }, [initialCompanies, search, selectedCategory, cityFilter, countryFilter, regionFilter, verifiedOnly, sortKey, locale, geography.preferred]);
 
-  const filterKey = JSON.stringify([search, selectedCategory, cityFilter, countryFilter, regionFilter, verifiedOnly, sortKey]);
+  const filterKey = JSON.stringify([search, selectedCategory, cityFilter, countryFilter, regionFilter, verifiedOnly, sortKey, geography.key]);
   const map = useDirectoryMap("companies", filterKey, filtered, viewMode === "map");
   const resultsRef = useRef<HTMLDivElement>(null);
   const mapItems = useMemo(() => filtered.map(company => ({
@@ -199,13 +204,14 @@ export default function CompaniesContent({ initialCompanies }: { initialCompanie
         setViewMode(viewMode === "map" ? "list" : "map");
         requestAnimationFrame(() => resultsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }));
       }} />
+      <BrowseGeography hasDesktopCountryFilter country={countryFilter} onCountryChange={value => { setCountryFilter(value); setRegionFilter(""); setCityFilter(""); }} geography={geography} />
       <MobileBrowseControls
         query={search}
         onQueryChange={setSearch}
         searchPlaceholder={t("searchPlaceholder")}
         sortValue={sortKey}
-        sortOptions={[{ value: "newest", label: uiText("jobs.sortNewest") }, { value: "name", label: uiText("Ui.text_7ed96629073e83") }]}
-        onSortChange={setSortKey}
+        sortOptions={[{ value: "newest", label: geography.preferred ? uiText("BrowseGeography.recommended") : uiText("jobs.sortNewest") }, { value: "name", label: uiText("Ui.text_7ed96629073e83") }]}
+        onSortChange={value => { geography.setEnabled(false); setSortKey(value); }}
         categoryLabel={t("filterCategory")}
         allCategoryLabel={uiText("Ui.text_aecf68fa0908cc")}
         categories={COMPANY_CATEGORIES.map((category) => ({ value: category.id, label: taxonomyLabel(companyCategoryLabel(category.id, category.label), uiText) }))}

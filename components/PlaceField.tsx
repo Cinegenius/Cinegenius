@@ -4,7 +4,7 @@ import { useEffect, useId, useMemo, useRef, useState, type KeyboardEvent } from 
 import { useLocale, useTranslations } from 'next-intl';
 import { Check, ChevronDown } from 'lucide-react';
 import { COUNTRY_CODES } from '@/lib/places/countries';
-import { countryCode, countryName, placeKey } from '@/lib/places/core';
+import { countryCode, placeKey } from '@/lib/places/core';
 
 type RegionOption = { id: string; name: string; aliases: string[] };
 type CityOption = { id: string; name: string; canonicalName: string; regionId: string; region: string; district?: string };
@@ -22,7 +22,7 @@ type PlaceFieldProps = {
  * remain server-validated; typing a place never silently creates an identity. */
 export default function PlaceField({ value, onChange, id, required = false, selectedCityId, onSelection }: PlaceFieldProps) {
   const generated = useId(), base = id ?? generated;
-  const t = useTranslations('Places'), locale = useLocale();
+  const t = useTranslations('Places'), locale = useLocale(), countryText = useTranslations('CountryNames');
   const parts = value.split(',').map(part => part.trim()), code = countryCode(parts.at(-1) ?? '');
   const city = code && parts.length === 1 ? '' : parts[0] ?? '';
   const region = code ? parts.slice(1, -1).join(', ') : '';
@@ -43,10 +43,10 @@ export default function PlaceField({ value, onChange, id, required = false, sele
   const active = showSuggestions && activeIndex >= 0 && activeIndex < cities.length ? activeIndex : -1;
   const listId = `${base}-suggestions`;
   const optionId = (index: number) => `${base}-suggestion-${index}`;
-  const countries = useMemo(() => COUNTRY_CODES.map(country => ({ value: country, label: countryName(country, locale) }))
-    .sort((a, b) => a.label.localeCompare(b.label, locale)), [locale]);
+  const countries = useMemo(() => COUNTRY_CODES.map(country => ({ value: country, label: countryText(country) }))
+    .sort((a, b) => a.label.localeCompare(b.label, locale)), [locale, countryText]);
   const ambiguousSelection = selectedCity && cities.filter(option => option.name === selectedCity.name && option.regionId === selectedCity.regionId).length > 1;
-  const selectionLabel = [selectedCity?.name ?? city, ambiguousSelection ? selectedCity?.district : '', selectedCity?.region ?? selectedRegion?.name ?? region, code ? countryName(code, locale) : ''].filter(Boolean).join(', ');
+  const selectionLabel = [selectedCity?.name ?? city, ambiguousSelection ? selectedCity?.district : '', selectedCity?.region ?? selectedRegion?.name ?? region, code ? countryText(code) : ''].filter(Boolean).join(', ');
 
   function emit(country: string, nextRegion: string, nextCity: string) {
     setPicked(null);

@@ -1,4 +1,8 @@
 "use client";
+import BrowseGeography from "@/components/BrowseGeography";
+import { useBrowseGeography } from "@/lib/use-browse-geography";
+import { prioritizeGeographically } from "@/lib/browse-geography";
+
 
 import FloatingMapToggle from "@/components/FloatingMapToggle";
 import DirectoryMap from "@/components/DirectoryMap";
@@ -435,6 +439,7 @@ function CreatorsInner({
   const countryLabel = (value: string) => countryOptions.find(o => o.value === value)?.label ?? value;
   const regionLabel = (value: string) => regionOptions.find(option => option.value === value)?.label ?? value;
   const [sortKey, setSortKey] = useViewState("crew.sortKey", () => ["rating", "reviews"].includes(initialFilters.sort) ? initialFilters.sort : "featured");
+  const geography = useBrowseGeography(sortKey === "featured" && !countryFilter && !regionFilter && !cityFilter && !cityText);
   const [viewMode, setViewMode] = useViewState<DirectoryView>("crew.viewMode", () => initialFilters.view === "map" ? "map" : initialFilters.view === "list" ? "list" : "grid");
 
   // Neue Casting-Filter
@@ -611,14 +616,14 @@ function CreatorsInner({
       result.sort((a, b) => compareCreatorNames(a, b, locale));
     }
 
-    return result;
+    return prioritizeGeographically(result, geography.preferred);
   }, [query, selectedRoles, sidebarDept, availableOnly, vendorOnly, cityText, cityFilter, countryFilter, regionFilter, languageFilter,
       profileTypeFilter, hairFilter, eyeFilter, bodyFilter, travelFilter, ageMinFilter, ageMaxFilter,
-      sortKey, allCreators, isTopMode, locale, uiText]);
+      sortKey, allCreators, isTopMode, locale, uiText, geography.preferred]);
 
   const filterKey = JSON.stringify([query, [...selectedRoles].sort(), sidebarDept, availableOnly, vendorOnly,
     cityText, cityFilter, countryFilter, regionFilter, languageFilter, profileTypeFilter, hairFilter, eyeFilter, bodyFilter,
-    travelFilter, ageMinFilter, ageMaxFilter, sortKey]);
+    travelFilter, ageMinFilter, ageMaxFilter, sortKey, geography.key]);
   const map = useDirectoryMap("crew", filterKey, matching, viewMode === "map");
   const filtered = map.rows;
   const mapItems = useMemo(() => matching.map(creator => ({
@@ -686,7 +691,7 @@ function CreatorsInner({
   const viewControls = <DirectoryViewControls value={viewMode} onChange={setViewMode} />;
 
   const SORT_OPTIONS = [
-    { value: "featured", label: t("sortAlphabetical") },
+    { value: "featured", label: geography.preferred ? uiText("BrowseGeography.recommended") : t("sortAlphabetical") },
     { value: "rating",   label: t("sortRating") },
     { value: "reviews",  label: t("sortRatingCount") },
   ];
@@ -695,13 +700,14 @@ function CreatorsInner({
     <div className="min-h-screen mobile-bottom-nav-clear">
       <FloatingMapToggle mapActive={viewMode === "map"} onToggle={() => { setViewMode(viewMode === "map" ? "list" : "map"); requestAnimationFrame(() => resultsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" })); }} />
 
+      <BrowseGeography hasDesktopCountryFilter country={countryFilter} onCountryChange={value => changePlaceFilters({ country: value, region: "", city: "" })} geography={geography} />
       <MobileBrowseControls
         query={query}
         onQueryChange={setQuery}
         searchPlaceholder={t("searchPlaceholder")}
         sortValue={sortKey}
         sortOptions={SORT_OPTIONS}
-        onSortChange={setSortKey}
+        onSortChange={value => { geography.setEnabled(false); setSortKey(value); }}
         categoryLabel={t("deptFilter")}
         allCategoryLabel={uiText("Ui.text_bc0b501bb3186b")}
         categories={[
@@ -841,7 +847,7 @@ function CreatorsInner({
             {query && <span className="text-gold">{uiText.rich("Ui.text_58e2efda5da487", { value1: () => (query) })}</span>}
           </p>
           <div className="relative">
-            <select value={sortKey} onChange={(e) => setSortKey(e.target.value)}
+            <select value={sortKey} onChange={(e) => { geography.setEnabled(false); setSortKey(e.target.value); }}
               className="appearance-none pl-2.5 pr-6 py-1.5 bg-bg-elevated border border-border rounded-lg text-xs text-text-muted focus:outline-none focus:border-gold/50 transition-colors cursor-pointer">
               {SORT_OPTIONS.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
             </select>
@@ -1061,7 +1067,7 @@ function CreatorsInner({
             <SortDropdown
               value={sortKey}
               options={SORT_OPTIONS}
-              onChange={setSortKey}
+              onChange={value => { geography.setEnabled(false); setSortKey(value); }}
             />
             {viewControls}
           </div>

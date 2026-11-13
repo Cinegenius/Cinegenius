@@ -1,4 +1,7 @@
 "use client";
+import JobEditorFields from "@/components/JobEditorFields";
+import { jobEditValue, jobEditDescription } from "@/lib/job-editor";
+import { parseJobDescription, jobSchedule } from "@/lib/job-metadata";
 
 import MessageComposer from "@/components/messaging/MessageComposer";
 import ContactCard from "@/components/ContactCard";
@@ -296,6 +299,7 @@ export default function DashboardPage() {
   const [editAnimalMeta, setEditAnimalMeta] = useState({ training_level: "", special_skills: "", count: "1", handler_included: true });
   const [editMarketplace,setEditMarketplace]=useState(()=>marketplaceDraft());
   const marketText=useTranslations("MarketplaceOffer"),marketLocale=useLocale();
+  const [editJob, setEditJob] = useState(() => jobEditValue(""));
   const [editForm, setEditForm] = useState({ title: "", description: "", price: "", city: "", selected_place_city_id: "", image_url: "" });
   const [editGallery, setEditGallery] = useState<string[]>([]);
   const [editBlockedDates, setEditBlockedDates] = useState<string[]>([]);
@@ -313,9 +317,15 @@ export default function DashboardPage() {
 
   const { leave: leaveEditor } = useFormNavigation();
   const editDraft = useFormDraft({ formKey: `listing:${editingId ?? "new"}`, enabled: !!editingId,
-    value: { marketplace:editMarketplace, form: editForm, responsible: editResponsible, gallery: editGallery, blockedDates: editBlockedDates, locationMeta: editLocationMeta, animalMeta: editAnimalMeta, newBlockedDate },
+    value: { job: editJob, marketplace:editMarketplace, form: editForm, responsible: editResponsible, gallery: editGallery, blockedDates: editBlockedDates, locationMeta: editLocationMeta, animalMeta: editAnimalMeta, newBlockedDate },
     busy: editUploading || editGalleryState.uploading || editGalleryState.failed > 0 || editSaving,
-    restore: draft => { setEditForm(draft.form);if(draft.marketplace)setEditMarketplace(draft.marketplace); setEditResponsible(draft.responsible); setEditGallery(draft.gallery); setEditBlockedDates(draft.blockedDates); setEditLocationMeta(draft.locationMeta);
+    restore: draft => {
+      const listing = myListings.find(item => item.id === editingId);
+      if (listing?.type === "job") {
+        setEditJob(draft.job ?? jobEditValue(draft.form.description, listing.metadata));
+        setEditForm({ ...draft.form, description: draft.job ? draft.form.description : parseJobDescription(draft.form.description).description });
+      } else setEditForm(draft.form);
+      if(draft.marketplace)setEditMarketplace(draft.marketplace); setEditResponsible(draft.responsible); setEditGallery(draft.gallery); setEditBlockedDates(draft.blockedDates); setEditLocationMeta(draft.locationMeta);
       if (draft.animalMeta) setEditAnimalMeta(draft.animalMeta); setNewBlockedDate(draft.newBlockedDate); },
   });
 
@@ -323,7 +333,8 @@ export default function DashboardPage() {
     setEditingId(l.id);
     setEditResponsible(responsiblePersonDraft(l.responsible_person));
     setEditResponsibleErrors({});
-    setEditForm({ title: l.title, description: l.description ?? "", price: String(l.price), city: placeInputValue(l, l.city), selected_place_city_id: (l as {place_city_id?: string}).place_city_id || "", image_url: l.image_url ?? "" });
+    setEditJob(jobEditValue(l.description ?? "", l.metadata));
+    setEditForm({ title: l.title, description: l.type === "job" ? parseJobDescription(l.description ?? "").description : l.description ?? "", price: String(l.price), city: placeInputValue(l, l.city), selected_place_city_id: (l as {place_city_id?: string}).place_city_id || "", image_url: l.image_url ?? "" });
     setEditGallery([l.image_url, ...(l.extra_images ?? [])].filter((url): url is string => typeof url === "string" && !!url));
     setEditBlockedDates(Array.isArray(l.blocked_dates) ? l.blocked_dates.filter((date): date is string => typeof date === "string") : []);
     setNewBlockedDate("");
@@ -351,7 +362,7 @@ export default function DashboardPage() {
     });
     setEditGalleryState({ uploading: false, failed: 0 });
     setEditError("");
-  }, []);
+  }, [setEditingId, setEditResponsible, setEditResponsibleErrors, setEditJob, setEditForm, setEditGallery, setEditBlockedDates, setNewBlockedDate, setEditMarketplace, setEditAnimalMeta, setEditLocationMeta, setEditGalleryState, setEditError]);
 
   useEffect(() => {
     if (!editListingParam || activeTab !== "listings" || listingsLoading || editingId) return;
@@ -393,6 +404,8 @@ export default function DashboardPage() {
     if (Object.keys(personErrors).length && myListings.find(item => item.id === editingId)?.published) { focusResponsiblePerson(); return; }
     const editingListing = myListings.find(item=>item.id===editingId);
     const placeEdit = listingPlaceEditFields(editingListing, editForm.city, editForm.selected_place_city_id);
+    if (editingListing?.type === "job" && !jobSchedule({ employmentType: editJob.employmentType, startDate: editJob.startDate, endDate: editJob.endDate })) { setEditError(uiText("System.requestFailed")); return; }
+    const savedDescription = editingListing?.type === "job" ? jobEditDescription(editJob, editForm.description, uiLocale) : editForm.description;
     if(editingListing?.type === "prop" || editingListing?.type === "vehicle"){
       const issue=validateMarketplaceOffer(editMarketplace.category,editingListing.type,serializeMarketplaceDraft(editMarketplace),editingListing.published);
       if(issue && (JSON.stringify(editMarketplace)!==JSON.stringify(marketplaceDraft(editingListing.category??"",editingListing.price,editingListing.metadata)) || !!editingListing.metadata?.marketplace)){setEditError(marketText(issue));return;}
@@ -411,7 +424,7 @@ export default function DashboardPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           title: editForm.title.trim(),
-          description: editForm.description,
+          description: savedDescription,
           price: ["location", "prop", "vehicle"].includes(editingListing?.type ?? "") && editLocationMeta.price_on_request ? 0 : parseFloat(editForm.price) || 0,
           ...placeEdit,
           responsible_person: editResponsible,
@@ -436,7 +449,7 @@ export default function DashboardPage() {
             price_negotiable: editLocationMeta.price_negotiable,
             rooms: editLocationMeta.rooms,
             amenities: editLocationMeta.amenities,
-          } } : editingListing?.type === "animal" ? {metadata:editAnimalMeta} : usesGallery ? (validateMarketplaceOffer(editMarketplace.category,editingListing?.type??"",serializeMarketplaceDraft(editMarketplace),editingListing?.published) ? {} : {category:editMarketplace.category,metadata:marketplaceMetadataPatch(editMarketplace)}) : {}),
+          } } : editingListing?.type === "job" ? { metadata: { job: { employmentType: editJob.employmentType, startDate: editJob.startDate, endDate: editJob.endDate } } } : editingListing?.type === "animal" ? {metadata:editAnimalMeta} : usesGallery ? (validateMarketplaceOffer(editMarketplace.category,editingListing?.type??"",serializeMarketplaceDraft(editMarketplace),editingListing?.published) ? {} : {category:editMarketplace.category,metadata:marketplaceMetadataPatch(editMarketplace)}) : {}),
         }),
       });
       const { error, publicationError, data: savedListing } = await res.json();
@@ -450,7 +463,7 @@ export default function DashboardPage() {
               moderation_status: savedListing?.moderation_status ?? l.moderation_status,
               moderation_reason: savedListing?.moderation_reason ?? null,
               title: editForm.title.trim(),
-              description: editForm.description,
+              description: savedDescription,
               city: savedListing?.city ?? placeEdit.city ?? l.city,
               price: ["location", "prop", "vehicle"].includes(l.type) && editLocationMeta.price_on_request ? 0 : parseFloat(editForm.price) || 0,
               ...(l.type === "location" ? { metadata: {
@@ -537,7 +550,7 @@ export default function DashboardPage() {
   }, []);
 
   // My posted jobs
-  const [myJobs, setMyJobs] = useState<{ id: string; title: string; published: boolean; moderation_status?: string; moderation_reason?: string | null; role: string | null; location: string | null; employment_type: string | null; created_at: string }[]>([]);
+  const [myJobs, setMyJobs] = useState<{ id: string; title: string; published: boolean; moderation_status?: string; moderation_reason?: string | null; city: string | null; created_at: string }[]>([]);
   const [myJobsLoading, setMyJobsLoading] = useState(false);
 
   useEffect(() => {
@@ -1592,7 +1605,7 @@ export default function DashboardPage() {
                     <>{uiText.rich("Ui.text_dadac5c68780b4", { value2: () => (myJobs.length), part1: chunks => (<span className="text-text-primary font-semibold">{chunks}</span>), value3: () => (myJobs.length === 1 ? uiText("AdminAccounts.contentKinds.job") : uiText("nav.jobs")) })}</>
                   )}
                 </p>
-                <a href="/inserat" className="px-3 py-1.5 bg-gold text-bg-primary text-xs font-semibold rounded-lg flex items-center gap-1.5 hover:bg-gold-light transition-colors">{uiText.rich("Ui.text_cdb4a69a5b9f1f", { part1: () => (<Plus size={12} />) })}</a>
+                <a href="/inserat?group=jobs" className="min-h-11 px-3 py-2 bg-gold text-bg-primary text-xs font-semibold rounded-lg flex items-center gap-1.5 hover:bg-gold-light transition-colors">{uiText.rich("Ui.text_cdb4a69a5b9f1f", { part1: () => (<Plus size={12} />) })}</a>
               </div>
 
               {myJobsLoading && (
@@ -1608,7 +1621,7 @@ export default function DashboardPage() {
                     <p className="text-sm font-medium text-text-secondary">{uiText("jobs.emptyTitle")}</p>
                     <p className="text-xs text-text-muted mt-1">{uiText("Ui.text_3cf15f201498d9")}</p>
                   </div>
-                  <a href="/inserat" className="inline-flex items-center gap-2 px-5 py-2.5 bg-gold text-bg-primary text-xs font-semibold rounded-lg hover:bg-gold-light transition-colors">{uiText.rich("Ui.text_cdb4a69a5b9f1f", { part1: () => (<Plus size={13} />) })}</a>
+                  <a href="/inserat?group=jobs" className="inline-flex items-center gap-2 px-5 py-2.5 bg-gold text-bg-primary text-xs font-semibold rounded-lg hover:bg-gold-light transition-colors">{uiText.rich("Ui.text_cdb4a69a5b9f1f", { part1: () => (<Plus size={13} />) })}</a>
                 </div>
               )}
 
@@ -1623,12 +1636,12 @@ export default function DashboardPage() {
                       <OfferModerationStatus item={job} />
                     </div>
                     <p className="text-xs text-text-muted">
-                      {[job.role, job.location].filter(Boolean).join(" · ")} · {new Date(job.created_at).toLocaleDateString(uiLocale)}
+                      {[job.city].filter(Boolean).join(" · ")} · {new Date(job.created_at).toLocaleDateString(uiLocale)}
                     </p>
                   </div>
-                  <div className="flex flex-col gap-1.5 shrink-0">{uiText.rich("Ui.text_d960f86ce558e1", { part1: chunks => (<a href={`/jobs/${job.id}`} target="_blank" rel="noopener noreferrer"
-                      className="px-3 py-1.5 text-xs border border-border text-text-secondary rounded-lg hover:border-gold hover:text-gold transition-all text-center">{chunks}</a>), part3: () => (<Pencil size={10} />), part2: chunks => (<a href={`/jobs/${job.id}/edit`}
-                      className="px-3 py-1.5 text-xs border border-border text-text-secondary rounded-lg hover:border-gold hover:text-gold transition-all text-center flex items-center gap-1 justify-center">{chunks}</a>) })}</div>
+                  <div className="flex flex-col gap-1.5 shrink-0">{uiText.rich("Ui.text_d960f86ce558e1", { part1: chunks => (<a href={`/jobs/${job.id}${job.published ? "" : "?preview=1"}`} target="_blank" rel="noopener noreferrer"
+                      className="min-h-11 px-3 py-2 text-xs border border-border text-text-secondary rounded-lg hover:border-gold hover:text-gold transition-all text-center">{chunks}</a>), part3: () => (<Pencil size={10} />), part2: chunks => (<a href={`/dashboard?tab=listings&editListing=${job.id}`}
+                      className="min-h-11 px-3 py-2 text-xs border border-border text-text-secondary rounded-lg hover:border-gold hover:text-gold transition-all text-center flex items-center gap-1 justify-center">{chunks}</a>) })}</div>
                 </div>
               ))}
 
@@ -1882,6 +1895,7 @@ export default function DashboardPage() {
                         <input type="number" min="0" value={editForm.price} onChange={(e) => { setEditLocationMeta((current) => ({ ...current, price_on_request: false })); setEditForm((p) => ({ ...p, price: e.target.value })); }} className="w-full rounded-lg border border-border bg-bg-elevated px-3 py-2 text-sm transition-colors focus:border-gold focus:outline-none" placeholder="500" />
                       </> : <p className="text-xs text-text-muted">{uiText("Ui.text_aabd03635f4100")}</p>}
                     </div>
+                    {l.type === "job" && <JobEditorFields value={editJob} onChange={setEditJob} />}
                     <div>
                       <label className="text-xs uppercase tracking-widest text-text-muted font-semibold block mb-1">{uiText("setup.description")}</label>
                       <textarea
