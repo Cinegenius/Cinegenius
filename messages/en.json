@@ -255,7 +255,7 @@
   },
   "home": {
     "newsShortcut": "News",
-    "newsShortcutDescription": "The latest from the industry.",
+    "newsShortcutDescription": "Industry news.",
     "badgeHero": "Film · Photo · Content · Advertising",
     "heroTitle1": "Find Locations, Crew &",
     "heroTitle2": "Equipment.",
@@ -263,8 +263,8 @@
     "heroSearchAction": "Find for my project",
     "heroPresentAction": "Get started free",
     "heroManageAction": "Go to Dashboard",
-    "findEquipmentTitle": "Equipment & marketplace",
-    "findCompaniesTitle": "Companies & services",
+    "findEquipmentTitle": "Marketplace",
+    "findCompaniesTitle": "Companies",
     "findProjectsLink": "Browse projects",
     "offerLocationAction": "Offer a location",
     "newCrewTitle": "New crew members",
@@ -329,13 +329,13 @@
     "findLabel": "DISCOVER",
     "findTitle": "What are you looking for?",
     "findLocationsTitle": "Locations",
-    "findLocationsDescription": "Filming locations, studios and unique spaces.",
+    "findLocationsDescription": "Locations and studios.",
     "findCrewTitle": "Crew & talent",
-    "findCrewDescription": "People in front of and behind the camera.",
-    "findEquipmentDescription": "Production gear, vehicles and props.",
-    "findCompaniesDescription": "Catering, rentals and production support.",
+    "findCrewDescription": "On screen and behind the camera.",
+    "findEquipmentDescription": "Equipment, vehicles and props.",
+    "findCompaniesDescription": "Rentals, catering and services.",
     "findJobsTitle": "Jobs",
-    "findJobsDescription": "Find assignments or people to support your project.",
+    "findJobsDescription": "Jobs and assignments.",
     "findJobsLink": "Browse jobs",
     "railPage": "View {page} of {total}"
   },
@@ -2238,6 +2238,8 @@
   "Organizations": {
     "eyebrow": "From the industry",
     "newsTitle": "News, workshops & events",
+    "newsTitleLead": "News,",
+    "newsTitleHighlight": "workshops & events",
     "newsDescription": "Public news and dates from independent industry organizations.",
     "all": "All",
     "empty": "There are currently no approved posts.",
@@ -8088,5 +8090,11 @@
     "roomScanTitle": "Native room scanner & floor plans",
     "roomScanDescription": "Scan rooms directly in the app and create floor plans for your project. This feature is not yet available and requires a supported device.",
     "noticeFirst": "Please close the cookie notice first. You can then open Genie."
+  },
+  "InboxNavigation": {
+    "chats": "Chats",
+    "notices": "Notifications",
+    "unread": "Messages: {chats} unread chat messages, {notices} notifications",
+    "readError": "Could not mark as read. Please try again."
   }
 }

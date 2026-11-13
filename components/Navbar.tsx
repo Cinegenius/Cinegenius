@@ -10,7 +10,6 @@ import {
   LogOut, MessageSquare, ShieldCheck,
 } from "lucide-react";
 import NavigationIcon from "@/components/NavigationIcon";
-import NotificationCenter from "@/components/NotificationCenter";
 import { Logo } from "@/components/Logo";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
 import MediaImage from "@/components/MediaImage";
@@ -59,7 +58,10 @@ export default function Navbar({ initialIsSignedIn = false, initialAdminUserId =
   const hasSignedInSession = inbox.status === "expired" ? false : isLoaded ? !!isSignedIn : initialIsSignedIn;
   const profileDisplayName = profileData?.userId === activeUserId ? profileData?.displayName ?? "" : "";
   const unreadMessages = inbox.status === "ready" ? inbox.count ?? 0 : 0;
-  const messageLabel = unreadMessages > 0 ? `${t("messages")}, ${uiText(unreadMessages === 1 ? "notifications.newMessage" : "notifications.newMessages", { count: unreadMessages })}` : t("messages");
+  const unreadNotices = inbox.status === "ready" ? inbox.notifications.filter(notice => !notice.read && notice.type !== "new_message").length : 0;
+  const unreadTotal = unreadMessages + unreadNotices;
+  const inboxFailed = inbox.status === "error";
+  const messageLabel = inboxFailed ? `${t("messages")}: ${uiText("notifications.loadError")}` : unreadTotal > 0 ? uiText("InboxNavigation.unread", { chats: unreadMessages, notices: unreadNotices }) : t("messages");
   const supportBadge = supportUnreadCount > 0 ? <span title={supportUnreadLabel} aria-label={supportUnreadLabel} className="ml-auto inline-flex h-5 min-w-5 shrink-0 items-center justify-center rounded-full bg-gold px-1 text-[10px] font-bold text-bg-primary">{supportUnreadCount > 99 ? "99+" : supportUnreadCount}</span> : null;
   const displayName = activeUserId ? profileDisplayName || user?.firstName || user?.emailAddresses?.[0]?.emailAddress?.split("@")[0] || "" : "";
   const email = activeUserId ? user?.primaryEmailAddress?.emailAddress ?? "" : "";
@@ -203,7 +205,7 @@ export default function Navbar({ initialIsSignedIn = false, initialAdminUserId =
     <div
       ref={accountMenuRef}
       id="header-account-menu"
-      className="fixed right-2 top-16 z-50 mt-2 w-[26rem] max-w-[calc(100vw-1rem)] max-h-[calc(100dvh-5rem)] overflow-y-auto overscroll-contain rounded-2xl border border-border bg-bg-elevated shadow-2xl animate-fade-in sm:right-4"
+      className="fixed right-2 top-16 z-50 mt-2 w-[26rem] max-w-[calc(100vw-1rem)] max-h-[calc(100dvh-5rem-var(--mobile-nav-clearance))] lg:max-h-[calc(100dvh-5rem-env(safe-area-inset-bottom,0px))] overflow-y-auto overscroll-contain rounded-2xl border border-border bg-bg-elevated shadow-2xl animate-fade-in sm:right-4"
     >
       {/* Identity */}
       <div className="px-4 py-3.5 border-b border-border flex items-center gap-3">
@@ -231,7 +233,7 @@ export default function Navbar({ initialIsSignedIn = false, initialAdminUserId =
       </div>
 
       {/* Sign out */}
-      <div className="border-t border-border py-1.5">
+      <div className="sticky bottom-0 border-t border-border bg-bg-elevated py-1.5">
         <button
           onClick={() => requestSignOut.current()}
           disabled={signingOut}
@@ -281,10 +283,10 @@ export default function Navbar({ initialIsSignedIn = false, initialAdminUserId =
               ><Search size={18} aria-hidden="true" /></button>
               {hasSignedInSession && <Link href="/messages" prefetch={authRoute || signingOut ? false : null} aria-label={messageLabel} title={messageLabel} aria-current={activeId === "messages" ? "page" : undefined} className={`relative flex h-11 w-11 shrink-0 items-center justify-center rounded-lg transition-colors hover:bg-bg-elevated hover:text-gold ${activeId === "messages" ? "text-gold" : "text-text-muted"}`}>
                 <MessageSquare size={19} aria-hidden="true" />
-                {unreadMessages > 0 && <span aria-hidden="true" className="absolute right-0.5 top-0.5 inline-flex h-4 min-w-4 items-center justify-center rounded-full bg-crimson px-1 text-[9px] font-bold text-white">{unreadMessages > 9 ? "9+" : unreadMessages}</span>}
+                {inboxFailed && <span aria-hidden="true" className="absolute right-1 top-1 h-1.5 w-1.5 rounded-full bg-gold" />}
+                {unreadTotal > 0 && <span aria-hidden="true" className="absolute right-0.5 top-0.5 inline-flex h-4 min-w-4 items-center justify-center rounded-full bg-crimson px-1 text-[9px] font-bold text-white">{unreadTotal > 9 ? "9+" : unreadTotal}</span>}
               </Link>}
               <LanguageSwitcher />
-              {hasSignedInSession && <NotificationCenter inbox={inbox} includeMessages={false} />}
               {!hasSignedInSession && (
                 <>
                   <Link
@@ -322,12 +324,12 @@ export default function Navbar({ initialIsSignedIn = false, initialAdminUserId =
             <div className="xl:hidden flex shrink-0 items-center gap-1 max-[479px]:gap-0">
               {hasSignedInSession && <Link href="/messages" prefetch={false} aria-label={messageLabel} title={messageLabel} aria-current={activeId === "messages" ? "page" : undefined} className="relative flex h-11 w-11 shrink-0 items-center justify-center rounded-lg text-text-muted hover:bg-bg-elevated hover:text-gold">
                 <MessageSquare size={19} aria-hidden="true" />
-                {unreadMessages > 0 && <span aria-hidden="true" className="absolute right-0.5 top-0.5 inline-flex h-4 min-w-4 items-center justify-center rounded-full bg-crimson px-1 text-[9px] font-bold text-white">{unreadMessages > 9 ? "9+" : unreadMessages}</span>}
+                {inboxFailed && <span aria-hidden="true" className="absolute right-1 top-1 h-1.5 w-1.5 rounded-full bg-gold" />}
+                {unreadTotal > 0 && <span aria-hidden="true" className="absolute right-0.5 top-0.5 inline-flex h-4 min-w-4 items-center justify-center rounded-full bg-crimson px-1 text-[9px] font-bold text-white">{unreadTotal > 9 ? "9+" : unreadTotal}</span>}
               </Link>}
               {!hasSignedInSession && (
                 <div className="flex items-center gap-1">{uiText.rich("Ui.text_49b372e77a7a76", { value2: () => (t("signIn")), part1: chunks => (<Link href="/sign-in" prefetch className="min-h-11 inline-flex items-center justify-center whitespace-nowrap rounded-lg border border-border px-2.5 max-[360px]:px-1.5 text-[11px] max-[360px]:text-[10px] font-semibold text-text-primary hover:border-gold hover:text-gold">{chunks}</Link>), value5: () => (t("signUp")), part4: chunks => (<span className="max-[420px]:hidden">{chunks}</span>), part6: chunks => (<span className="min-[421px]:hidden">{chunks}</span>), part3: chunks => (<Link href="/sign-up" prefetch className="min-h-11 inline-flex items-center justify-center whitespace-nowrap rounded-lg bg-gold px-2.5 max-[360px]:px-1.5 text-[11px] max-[360px]:text-[10px] font-bold text-bg-primary hover:bg-gold-light">{chunks}</Link>) })}</div>
               )}
-              {hasSignedInSession && <div className="hidden min-[360px]:block"><NotificationCenter inbox={inbox} includeMessages={false} /></div>}
               {hasSignedInSession && (
                 <button
                   ref={mobileAccountButton}

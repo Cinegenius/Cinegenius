@@ -255,7 +255,7 @@
   },
   "home": {
     "newsShortcut": "Hírek",
-    "newsShortcutDescription": "Friss hírek a szakmából.",
+    "newsShortcutDescription": "Hírek a szakmából.",
     "badgeHero": "Film · Fotó · Tartalom · Reklám",
     "heroTitle1": "Találj Helyszíneket, Stábot &",
     "heroTitle2": "Felszerelést.",
@@ -263,8 +263,8 @@
     "heroSearchAction": "Keresés a projektemhez",
     "heroPresentAction": "Kezdj ingyen",
     "heroManageAction": "Az irányítópultra",
-    "findEquipmentTitle": "Felszerelés és piactér",
-    "findCompaniesTitle": "Cégek és szolgáltatók",
+    "findEquipmentTitle": "Piactér",
+    "findCompaniesTitle": "Cégek",
     "findProjectsLink": "Projektek böngészése",
     "offerLocationAction": "Helyszín felajánlása",
     "newCrewTitle": "Új stábtagok",
@@ -329,13 +329,13 @@
     "findLabel": "FEDEZD FEL",
     "findTitle": "Mit szeretnél megtalálni?",
     "findLocationsTitle": "Helyszínek",
-    "findLocationsDescription": "Forgatási helyszínek, stúdiók és különleges terek.",
+    "findLocationsDescription": "Helyszínek és stúdiók.",
     "findCrewTitle": "Stáb és tehetségek",
-    "findCrewDescription": "Emberek a kamera előtt és mögött.",
-    "findEquipmentDescription": "Technika, járművek és kellékek.",
-    "findCompaniesDescription": "Catering, kölcsönzés és produkciós segítség.",
+    "findCrewDescription": "A kamera előtt és mögött.",
+    "findEquipmentDescription": "Technika, járművek, kellékek.",
+    "findCompaniesDescription": "Bérlés, catering, szolgáltatók.",
     "findJobsTitle": "Állások",
-    "findJobsDescription": "Találj megbízást vagy segítséget a projektedhez.",
+    "findJobsDescription": "Állások és megbízások.",
     "findJobsLink": "Állások böngészése",
     "railPage": "{page}. nézet, összesen {total}"
   },
@@ -2238,6 +2238,8 @@
   "Organizations": {
     "eyebrow": "Az iparágból",
     "newsTitle": "Hírek, workshopok és események",
+    "newsTitleLead": "Hírek,",
+    "newsTitleHighlight": "workshopok és események",
     "newsDescription": "Független szakmai szervezetek nyilvános hírei és időpontjai.",
     "all": "Összes",
     "empty": "Jelenleg nincs jóváhagyott bejegyzés.",
@@ -8088,5 +8090,11 @@
     "roomScanTitle": "Natív szobaszkenner és alaprajzok",
     "roomScanDescription": "Szkennelj helyiségeket közvetlenül az alkalmazással, és készíts alaprajzokat a projektedhez. Ez a funkció még nem érhető el, és támogatott készüléket igényel.",
     "noticeFirst": "Először zárd be a sütikről szóló tájékoztatót. Ezután megnyithatod Genie-t."
+  },
+  "InboxNavigation": {
+    "chats": "Csevegések",
+    "notices": "Értesítések",
+    "unread": "Üzenetek: {chats} olvasatlan csevegőüzenet, {notices} értesítés",
+    "readError": "Nem sikerült olvasottként megjelölni. Próbáld újra."
   }
 }

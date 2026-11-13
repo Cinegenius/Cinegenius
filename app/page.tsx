@@ -7,7 +7,7 @@ import { auth } from "@clerk/nextjs/server";
 import Link from "next/link";
 import Image from "@/components/MediaImage";
 import { getTranslations, getLocale } from "next-intl/server";
-import { Suspense } from "react";
+import { Fragment, Suspense } from "react";
 import { SkeletonBox } from "@/components/Skeleton";
 
 export async function generateMetadata(): Promise<import("next").Metadata> {
@@ -332,7 +332,7 @@ async function HomeRecommendations({ dataPromise }: { dataPromise: HomeDataPromi
     {liveJobs.length > 0 && <section className="min-w-0 border-t border-border/60 pt-4" aria-labelledby="home-jobs-title">
       <div className="mb-2 flex flex-wrap items-center justify-between gap-x-3"><h2 id="home-jobs-title" className="font-display text-lg font-bold text-text-primary">{t("jobsTitle")}</h2><Link href="/jobs" className="inline-flex min-h-11 items-center gap-1 text-xs font-medium text-gold hover:text-gold-light">{tc("viewAll")} <ArrowRight size={12} /></Link></div>
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-        {liveJobs.map(job => <Link key={job.id} href={`/jobs/${job.id}`} className="group flex min-h-11 min-w-0 items-start gap-2 rounded-lg px-1 py-2 transition-colors hover:bg-bg-secondary/60">
+        {liveJobs.map(job => <Link key={job.id} href={`/jobs/${job.id}`} className="group flex min-h-11 min-w-0 items-start gap-2 rounded-xl border border-border/70 px-3 py-3 transition-colors hover:bg-bg-secondary/60">
           <Briefcase size={15} className="mt-0.5 shrink-0 text-gold" />
           <div className="min-w-0 flex-1"><h3 className="truncate text-sm font-semibold text-text-primary group-hover:text-gold">{job.title}</h3><p className="mt-0.5 truncate text-xs text-text-muted">{job.location}</p><p className="mt-1 flex items-center gap-1 text-[10px] text-text-muted"><Clock size={9} />{formatDate(job.created_at)}</p></div>
           <span className="shrink-0 text-right text-xs font-semibold text-gold">{job.rawPrice ? uiText("Ui.text_8ae8849cdb3aaa", { value1: String(job.rawPrice.toLocaleString(uiLocale)), value2: String(tc("perDay")) }) : tc("onRequest")}</span>
@@ -363,7 +363,6 @@ export default async function HomePage() {
   });
   const [{ userId }, t] = await Promise.all([auth(), getTranslations("home")]);
   const isLoggedIn = !!userId;
-  const ctaHref = isLoggedIn ? "/dashboard" : "/sign-up";
   const findCards = [
     { title: t("findLocationsTitle"), description: t("findLocationsDescription"), href: "/locations", icon: MapPin },
     { title: t("findCrewTitle"), description: t("findCrewDescription"), href: "/creators", icon: UsersRound },
@@ -377,7 +376,12 @@ export default async function HomePage() {
     <section className="relative isolate pt-16">
       <div className="site-container grid items-start gap-5 py-6 sm:py-8 lg:gap-9">
         <div className="min-w-0">
-          <div className="mb-2 flex flex-wrap items-center justify-between gap-x-3"><p className="text-xs font-semibold uppercase tracking-widest text-gold">{t("badgeHero")}</p><Link href={ctaHref} prefetch className="inline-flex min-h-11 items-center gap-1 text-xs font-semibold text-gold hover:text-gold-light">{isLoggedIn ? t("heroManageAction") : t("heroPresentAction")} <ArrowRight size={12} /></Link></div>
+          <p className="mb-2 flex w-full items-center justify-between gap-1 text-xs font-semibold uppercase tracking-widest text-gold">
+            {t("badgeHero").split(" · ").map((topic, index) => <Fragment key={topic}>
+              {index > 0 && <span aria-hidden="true">·</span>}
+              <span>{topic}</span>
+            </Fragment>)}
+          </p>
           <h1 className="font-display text-4xl font-bold leading-tight tracking-tight text-text-primary lg:text-5xl">{t("heroTitle1")} <span className="text-gradient-gold">{t("heroTitle2")}</span></h1>
           <p className="mb-4 mt-3 max-w-xl text-sm leading-relaxed text-text-secondary">{t("homepageDescription")}</p>
           <HeroSearch />
@@ -389,11 +393,11 @@ export default async function HomePage() {
             <p className="text-xs uppercase tracking-widest text-gold font-semibold mb-1">{t("findLabel")}</p>
             <h2 id="home-find-title" className="font-display text-xl sm:text-2xl font-bold text-text-primary">{t("findTitle")}</h2>
           </div>
-          <div className="grid grid-cols-2 items-start gap-3 md:grid-cols-3 xl:grid-cols-6">
+          <div className="grid auto-rows-fr grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-6">
             {findCards.map(({ title, description, href, icon: Icon }) => (
-              <Link key={href} href={href} className="group min-h-11 min-w-0 rounded-xl border border-border bg-bg-secondary/90 p-3.5 transition-colors hover:border-gold/40 sm:p-4">
+              <Link key={href} href={href} className="group h-full min-h-11 min-w-0 rounded-xl border border-border bg-bg-secondary/90 p-3.5 transition-colors hover:border-gold/40 sm:p-4">
                 <Icon size={18} className="mb-2 text-gold" aria-hidden="true" />
-                <h3 className="text-sm font-semibold leading-snug text-text-primary group-hover:text-gold">{title}</h3>
+                <h3 className="break-words text-sm font-semibold leading-snug text-text-primary group-hover:text-gold">{title}</h3>
                 <p className="mt-1 text-xs leading-relaxed text-text-muted">{description}</p>
               </Link>
             ))}

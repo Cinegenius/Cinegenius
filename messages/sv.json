@@ -255,7 +255,7 @@
   },
   "home": {
     "newsShortcut": "Nyheter",
-    "newsShortcutDescription": "Det senaste från branschen.",
+    "newsShortcutDescription": "Nyheter från branschen.",
     "badgeHero": "Film · Foto · Innehåll · Reklam",
     "heroTitle1": "Hitta inspelningsplatser, filmteam och",
     "heroTitle2": "utrustning.",
@@ -263,8 +263,8 @@
     "heroSearchAction": "Sök till mitt projekt",
     "heroPresentAction": "Kom igång gratis",
     "heroManageAction": "Till kontrollpanelen",
-    "findEquipmentTitle": "Utrustning och marknadsplats",
-    "findCompaniesTitle": "Företag och tjänsteleverantörer",
+    "findEquipmentTitle": "Marknadsplats",
+    "findCompaniesTitle": "Företag",
     "findProjectsLink": "Visa projekt",
     "offerLocationAction": "Erbjud en inspelningsplats",
     "newCrewTitle": "Nya medlemmar i filmteamet",
@@ -329,13 +329,13 @@
     "findLabel": "UPPTÄCK",
     "findTitle": "Vad vill du hitta?",
     "findLocationsTitle": "Inspelningsplatser",
-    "findLocationsDescription": "Inspelningsmiljöer, studior och unika rum.",
+    "findLocationsDescription": "Platser och studior.",
     "findCrewTitle": "Filmteam och talanger",
-    "findCrewDescription": "Människor framför och bakom kameran.",
+    "findCrewDescription": "Framför och bakom kameran.",
     "findEquipmentDescription": "Teknik, fordon och rekvisita.",
-    "findCompaniesDescription": "Catering, uthyrning och stöd till produktioner.",
+    "findCompaniesDescription": "Uthyrning, catering och service.",
     "findJobsTitle": "Jobb",
-    "findJobsDescription": "Hitta uppdrag eller sök stöd till din idé.",
+    "findJobsDescription": "Jobb och uppdrag.",
     "findJobsLink": "Visa jobb",
     "railPage": "Vy {page} av {total}"
   },
@@ -2238,6 +2238,8 @@
   "Organizations": {
     "eyebrow": "Från branschen",
     "newsTitle": "Nyheter, workshoppar och evenemang",
+    "newsTitleLead": "Nyheter,",
+    "newsTitleHighlight": "workshoppar och evenemang",
     "newsDescription": "Offentliga nyheter och datum från oberoende branschorganisationer.",
     "all": "Alla",
     "empty": "Det finns inga godkända inlägg just nu.",
@@ -8088,5 +8090,11 @@
     "roomScanTitle": "Inbyggd rumsskanner och planritningar",
     "roomScanDescription": "Skanna rum direkt i appen och skapa planritningar för ditt projekt. Funktionen är ännu inte tillgänglig och kräver en enhet som stöds.",
     "noticeFirst": "Stäng först cookiemeddelandet. Sedan kan du öppna Genie."
+  },
+  "InboxNavigation": {
+    "chats": "Chattar",
+    "notices": "Aviseringar",
+    "unread": "Meddelanden: {chats} olästa chattmeddelanden, {notices} aviseringar",
+    "readError": "Kunde inte markera som läst. Försök igen."
   }
 }

@@ -15,9 +15,11 @@
   scrollbar-color: var(--color-border) var(--color-bg-primary);
 }
 .track > * { min-width: 0; scroll-snap-align: start; }
+.track[data-scrubbing="true"] { scroll-snap-type: none; }
 .track::-webkit-scrollbar { height: 5px; }
 .track:focus-visible { outline: 2px solid var(--color-gold); outline-offset: 3px; }
-.controls { display: flex; align-items: center; justify-content: center; margin-top: 4px; }
+.controls { display: flex; align-items: center; justify-content: center; margin-top: 4px; touch-action: pan-y pinch-zoom; user-select: none; }
+.controls[data-scrubbing="true"], .controls[data-scrubbing="true"] .button { cursor: grabbing; }
 .button {
   display: flex;
   align-items: center;
@@ -30,10 +32,11 @@
   background: transparent;
   cursor: pointer;
 }
-.dot { width: 7px; height: 7px; border-radius: 50%; background: var(--color-text-muted); }
+.dot { width: 7px; height: 7px; border-radius: 50%; background: var(--color-text-muted); transition: background-color 120ms ease; }
 .dot[data-active="true"] { background: var(--color-gold); }
 .button:hover .dot { background: var(--color-gold); }
 .button:focus-visible { outline: 2px solid var(--color-gold); outline-offset: 2px; }
+@media (prefers-reduced-motion: reduce) { .dot { transition: none; } }
 @media (min-width: 640px) {
   .crew { --rail-card-width: 180px; }
   .location { --rail-card-width: 60%; }

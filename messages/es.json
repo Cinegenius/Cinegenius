@@ -255,7 +255,7 @@
   },
   "home": {
     "newsShortcut": "Noticias",
-    "newsShortcutDescription": "Las novedades del sector.",
+    "newsShortcutDescription": "Noticias del sector.",
     "badgeHero": "Film · Foto · Contenido · Publicidad",
     "heroTitle1": "Encuentra Locaciones, Equipo &",
     "heroTitle2": "Personal.",
@@ -263,8 +263,8 @@
     "heroSearchAction": "Buscar para mi proyecto",
     "heroPresentAction": "Comenzar gratis",
     "heroManageAction": "Ir al Panel",
-    "findEquipmentTitle": "Equipamiento y mercado",
-    "findCompaniesTitle": "Empresas y servicios",
+    "findEquipmentTitle": "Mercado",
+    "findCompaniesTitle": "Empresas",
     "findProjectsLink": "Ver proyectos",
     "offerLocationAction": "Ofrecer localización",
     "newCrewTitle": "Nuevos miembros del equipo",
@@ -329,13 +329,13 @@
     "findLabel": "DESCUBRIR",
     "findTitle": "¿Qué quieres encontrar?",
     "findLocationsTitle": "Localizaciones",
-    "findLocationsDescription": "Lugares de rodaje, estudios y espacios especiales.",
+    "findLocationsDescription": "Espacios y estudios.",
     "findCrewTitle": "Equipo y talento",
-    "findCrewDescription": "Personas delante y detrás de la cámara.",
-    "findEquipmentDescription": "Material técnico, vehículos y utilería.",
-    "findCompaniesDescription": "Catering, alquiler y apoyo a la producción.",
+    "findCrewDescription": "Delante y detrás de cámara.",
+    "findEquipmentDescription": "Equipo, vehículos y atrezzo.",
+    "findCompaniesDescription": "Alquiler, catering y servicios.",
     "findJobsTitle": "Empleos",
-    "findJobsDescription": "Encuentra encargos o personas que apoyen tu proyecto.",
+    "findJobsDescription": "Empleos y encargos.",
     "findJobsLink": "Ver empleos",
     "railPage": "Vista {page} de {total}"
   },
@@ -2238,6 +2238,8 @@
   "Organizations": {
     "eyebrow": "Del sector",
     "newsTitle": "Noticias, talleres y eventos",
+    "newsTitleLead": "Noticias,",
+    "newsTitleHighlight": "talleres y eventos",
     "newsDescription": "Noticias y fechas públicas de organizaciones independientes del sector.",
     "all": "Todo",
     "empty": "Actualmente no hay publicaciones aprobadas.",
@@ -8088,5 +8090,11 @@
     "roomScanTitle": "Escáner nativo de habitaciones y planos",
     "roomScanDescription": "Escanea habitaciones directamente con la app y crea planos para tu proyecto. Esta función aún no está disponible y requiere un dispositivo compatible.",
     "noticeFirst": "Cierra primero el aviso de cookies. Después podrás abrir Genie."
+  },
+  "InboxNavigation": {
+    "chats": "Chats",
+    "notices": "Notificaciones",
+    "unread": "Mensajes: {chats} mensajes de chat sin leer, {notices} notificaciones",
+    "readError": "No se pudo marcar como leído. Inténtalo de nuevo."
   }
 }

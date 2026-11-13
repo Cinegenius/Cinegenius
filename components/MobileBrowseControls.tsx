@@ -22,6 +22,7 @@ type MobileBrowseControlsProps = {
   onCategoryChange: (value: string) => void;
   categoryPlacement?: "toolbar" | "filters";
   resultSummary: ReactNode;
+  resultActions?: ReactNode;
   viewControls?: ReactNode;
   filterCount: number;
   chips?: BrowseChip[];
@@ -37,7 +38,7 @@ type MobileBrowseControlsProps = {
 export default function MobileBrowseControls({
   query, onQueryChange, searchPlaceholder, sortValue, sortOptions, onSortChange,
   categoryLabel, allCategoryLabel, categories, categoryValue, onCategoryChange, categoryPlacement = "filters",
-  resultSummary, viewControls, filterCount, chips = [], onReset, resetLabel, showResultsLabel, preference, onSearch, children,
+  resultSummary, resultActions, viewControls, filterCount, chips = [], onReset, resetLabel, showResultsLabel, preference, onSearch, children,
 }: MobileBrowseControlsProps) {
   const uiText = useTranslations();
 
@@ -109,7 +110,7 @@ export default function MobileBrowseControls({
         </label>}
 
         <div className="mobile-browse-summary">
-          {viewControls ? <div className="mobile-browse-summary-row"><p role="status" title={typeof resultSummary === "string" ? resultSummary : undefined}>{resultSummary}</p>{viewControls}</div> : <p role="status">{resultSummary}</p>}
+          {viewControls ? <div className="mobile-browse-summary-row">{resultActions ? <div className="mobile-browse-summary-with-actions"><p role="status">{resultSummary}</p>{resultActions}</div> : <p role="status" title={typeof resultSummary === "string" ? resultSummary : undefined}>{resultSummary}</p>}{viewControls}</div> : <p role="status">{resultSummary}</p>}
           {chips.length > 0 && (
             <div className="mobile-browse-chips" aria-label={uiText("Ui.text_75e581194056a5")}>
               <button type="button" className="min-h-11 px-2 text-xs underline" onClick={onReset}>{resetLabel}</button>

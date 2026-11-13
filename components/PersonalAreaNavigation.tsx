@@ -29,7 +29,7 @@ function isPersonalArea(pathname: string) {
 
 function navAreaForPath(pathname: string, tab: string): string {
   if (pathname === "/profile") return "profile";
-  if (pathname === "/messages") return "messages";
+  if (pathname === "/messages" || pathname === "/notifications") return "messages";
   if (pathname === "/dashboard") {
     if (tab === "listings" || tab === "jobs") return "offers";
     if (tab === "messages") return "messages";

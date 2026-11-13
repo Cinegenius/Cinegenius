@@ -72,7 +72,7 @@ export function activeNavigationId(pathname: string): PrimaryNavigationId {
   if (routeMatches(pathname, "/locations")) return "locations";
   if (routeMatches(pathname, "/jobs")) return "jobs";
   if (routeMatches(pathname, "/companies")) return "companies";
-  if (routeMatches(pathname, "/messages")) return "messages";
+  if (routeMatches(pathname, "/messages") || routeMatches(pathname, "/notifications")) return "messages";
   if (routeMatches(pathname, "/news")) return "news";
   if (["/dashboard", "/profile", "/favorites", "/notifications", "/invoices", "/company-dashboard", "/organization-dashboard", "/inserat", "/admin"].some(route => routeMatches(pathname, route))) return "account";
   return "more";

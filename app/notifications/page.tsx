@@ -2,6 +2,8 @@
 
 import { useState, useEffect, useLayoutEffect, useCallback, useRef } from "react";
 import Link from "next/link";
+import InboxNavigation from "@/components/InboxNavigation";
+import { notifyMessagesRead } from "@/lib/message-read-sync";
 import { useAuth } from "@clerk/nextjs";
 import {
   Bell, CheckCheck, BookOpen, MessageSquare, Star,
@@ -23,7 +25,6 @@ type Notification = {
   href: string;
   read: boolean;
   created_at: string;
-  chatUnread?: boolean;
 };
 
 // ─── Config ────────────────────────────────────────────────────────────────────
@@ -43,13 +44,12 @@ const typeIcons: Record<NotificationType, React.ComponentType<{ size?: number; c
   friend_accepted:       Users,
 };
 
-type FilterId = "all" | "booking" | "message" | "job" | "money" | "social" | "system";
+type FilterId = "all" | "booking" | "job" | "money" | "social" | "system";
 
 function getLocalizedFILTER_TABS(translate: (key: string) => string) {
   return ([
   { id: "all",      label: translate("common.all") },
   { id: "booking",  label: translate("nav.bookings") },
-  { id: "message",  label: translate("nav.messages") },
   { id: "job",      label: translate("nav.jobs") },
   { id: "money",    label: translate("nav.payments") },
   { id: "social",   label: translate("nav.network") },
@@ -60,7 +60,6 @@ function getLocalizedFILTER_TABS(translate: (key: string) => string) {
 function matchesFilter(type: NotificationType, filter: FilterId): boolean {
   if (filter === "all") return true;
   if (filter === "booking") return type === "booking_confirmed" || type === "booking_request" || type === "booking_rejected";
-  if (filter === "message") return type === "new_message";
   if (filter === "job") return type === "new_application" || type === "application_sent";
   if (filter === "money") return type === "payout_ready";
   if (filter === "social") return type === "friend_request" || type === "friend_accepted";
@@ -147,15 +146,15 @@ function NotifRow({
                 <Link
                   href={notif.href}
                   onClick={() => { if (!notif.read) onRead(notif.id); }}
-                  className="flex items-center gap-1 text-xs text-gold hover:text-gold-light font-medium transition-colors"
+                  className="flex min-h-11 items-center gap-1 text-xs text-gold hover:text-gold-light font-medium transition-colors"
                 >{uiText.rich("Ui.text_1ee06198abe18c", { part1: () => (<ExternalLink size={10} />) })}</Link>
               )}
             </>
           )}
-          {!notif.read && !notif.chatUnread && (
+          {!notif.read && (
             <button
               onClick={() => onRead(notif.id)}
-              className="flex items-center gap-1 text-xs text-text-muted hover:text-text-secondary transition-colors"
+              className="flex min-h-11 items-center gap-1 text-xs text-text-muted hover:text-text-secondary transition-colors"
             >{uiText.rich("Ui.text_ccd4999556ee96", { part1: () => (<Circle size={10} />) })}</button>
           )}
         </div>
@@ -190,6 +189,7 @@ export default function NotificationsPage() {
   const loading = notificationsScope !== requestScope || loadingState;
   const [activeFilter, setActiveFilter] = useState<FilterId>("all");
   const [markingAll, setMarkingAll] = useState(false);
+  const [noticeError, setNoticeError] = useState<{ scope: string; kind: "load" | "read" } | null>(null);
   const [storedFriendRequests, setFriendRequests] = useState<FriendRequest[]>([]);
   const [friendScope, setFriendScope] = useState("");
   const friendRequests = friendScope === contactScope ? storedFriendRequests : [];
@@ -210,42 +210,25 @@ export default function NotificationsPage() {
     setNotifications([]);
     setNotificationsScope(requestScope);
     try {
-      const [notificationResponse, conversationsResponse] = await Promise.all([
-        fetch("/api/notifications", { cache: "no-store", signal: controller.signal }),
-        fetch("/api/conversations", { cache: "no-store", signal: controller.signal }),
-      ]);
+      const response = await fetch("/api/notifications", { cache: "no-store", signal: AbortSignal.any([controller.signal, AbortSignal.timeout(15_000)]) });
       if (!isCurrent()) return;
-      if (notificationResponse.status === 401) return;
-      if (!notificationResponse.ok || !conversationsResponse.ok) return;
-      const [{ notifications: notificationData }, { data: conversations }] = await Promise.all([
-        notificationResponse.json(),
-        conversationsResponse.json(),
-      ]);
+      if (!response.ok) throw new Error("notifications_unavailable");
+      const { notifications: rows } = await response.json();
       if (!isCurrent()) return;
-      const unreadChats: Notification[] = (conversations ?? [])
-        .filter((conversation: { unread_count?: number }) => Number(conversation.unread_count) > 0)
-        .map((conversation: { id: string; kind?: string; group_name?: string | null; otherName?: string; unread_count: number; updated_at: string }) => ({
-          id: `chat-unread:${conversation.id}`,
-          type: "new_message",
-          title: conversation.kind === "group" ? (conversation.group_name ?? uiText("Ui.text_d96e55720c85b8")) : (conversation.otherName ?? uiText("Ui.text_e8a28a55f6fbf9")),
-          body: uiText("Ui.text_f6d5879b399536", { value1: String(conversation.unread_count), value2: String(conversation.unread_count === 1 ? uiText("creators.sendMessage") : uiText("nav.messages")) }),
-          href: `/messages?conv=${conversation.id}`,
-          read: false,
-          created_at: conversation.updated_at,
-          chatUnread: true,
-        }));
-      setNotifications([...(notificationData ?? []), ...unreadChats].sort(
+      if (!Array.isArray(rows)) throw new Error("notifications_unavailable");
+      setNotifications(rows.filter((notice: Notification) => notice.type !== "new_message").sort(
         (a: Notification, b: Notification) => b.created_at.localeCompare(a.created_at),
       ));
+      setNoticeError(null);
     } catch {
-      // Cancelled or failed loads keep the existing empty-list fallback.
+      if (isCurrent()) setNoticeError({ scope: requestScope, kind: "load" });
     } finally {
       if (isCurrent()) {
         activeRequest.current = null;
         setLoading(false);
       }
     }
-  }, [requestScope, uiText]);
+  }, [requestScope]);
   useLayoutEffect(() => { notificationRefresh.current = fetchNotifications; }, [fetchNotifications]);
 
   useEffect(() => {
@@ -300,22 +283,29 @@ export default function NotificationsPage() {
     }
   };
 
-  const markAsRead = async (id: string) => {
-    if (id.startsWith("chat-unread:")) return;
-    setNotifications((prev) => prev.map((n) => n.id === id ? { ...n, read: true } : n));
-    await fetch("/api/notifications", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ id }),
-    });
+  const acknowledge = async (id?: string) => {
+    const owner = userId;
+    if (!owner) return;
+    if (!id) setMarkingAll(true);
+    try {
+      const response = await fetch("/api/notifications", {
+        method: id ? "POST" : "PATCH", cache: "no-store", signal: AbortSignal.timeout(15_000),
+        ...(id ? { headers: { "Content-Type": "application/json" }, body: JSON.stringify({ id }) } : {}),
+      });
+      if (currentContactScope.current !== contactScope) return;
+      if (!response.ok) throw new Error("notification_read_failed");
+      setNotifications(previous => previous.map(notice => !id || notice.id === id ? { ...notice, read: true } : notice));
+      setNoticeError(null);
+      // Refresh the same account-bound inbox snapshot used by the shared header.
+      notifyMessagesRead(owner);
+    } catch {
+      if (currentContactScope.current === contactScope) setNoticeError({ scope: requestScope, kind: "read" });
+    } finally {
+      if (currentContactScope.current === contactScope) setMarkingAll(false);
+    }
   };
-
-  const markAllRead = async () => {
-    setMarkingAll(true);
-    setNotifications((prev) => prev.map((n) => n.chatUnread ? n : ({ ...n, read: true })));
-    await fetch("/api/notifications", { method: "PATCH" });
-    setMarkingAll(false);
-  };
+  const markAsRead = (id: string) => acknowledge(id);
+  const markAllRead = () => acknowledge();
 
   const filtered = notifications.filter((n) => matchesFilter(n.type, activeFilter));
   const unreadCount = notifications.filter((n) => !n.read).length;
@@ -337,39 +327,42 @@ export default function NotificationsPage() {
 
   return (
     <div className="pt-16 min-h-screen">
-      <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8 mobile-bottom-nav-clear">
 
         {/* ── Header ── */}
-        <div className="flex items-start justify-between gap-4 mb-6">
+        <div className="flex flex-wrap items-start justify-between gap-4 mb-3">
           <div className="flex items-center gap-3">
             <Link
               href="/dashboard"
-              className="w-9 h-9 rounded-lg border border-border flex items-center justify-center text-text-secondary hover:border-gold hover:text-gold transition-all shrink-0"
+              aria-label={uiText("nav.accountOverview")}
+              className="w-11 h-11 rounded-lg border border-border flex items-center justify-center text-text-secondary hover:border-gold hover:text-gold transition-all shrink-0"
             >
               <ArrowLeft size={16} />
             </Link>
             <div>
               <div className="flex items-center gap-2.5">
-                <h1 className="font-display text-2xl font-bold text-text-primary">{uiText("nav.notifications")}</h1>
+                <h1 className="font-display text-2xl font-bold text-text-primary">{uiText("nav.messages")}</h1>
                 {unreadCount > 0 && (
                   <span className="px-2 py-0.5 bg-gold/15 border border-gold/30 text-gold text-xs font-bold rounded-full">{uiText.rich("Ui.text_488b93937e6625", { value1: () => (unreadCount) })}</span>
                 )}
               </div>
-              <p className="text-xs text-text-muted mt-0.5">{uiText("Ui.text_40d091dae1995d")}</p>
+              <p className="text-xs text-text-muted mt-0.5">{uiText("InboxNavigation.notices")}</p>
             </div>
           </div>
 
-          {notifications.some((notification) => !notification.read && !notification.chatUnread) && (
+          {notifications.some((notification) => !notification.read) && (
             <button
               onClick={markAllRead}
               disabled={markingAll}
-              className="flex items-center gap-1.5 text-xs text-text-muted hover:text-gold transition-colors px-3 py-2 rounded-lg border border-border hover:border-gold/30 shrink-0"
+              className="flex min-h-11 items-center gap-1.5 text-xs text-text-muted hover:text-gold transition-colors px-3 py-2 rounded-lg border border-border hover:border-gold/30 shrink-0"
             >{uiText.rich("Ui.text_110bf3daa72f97", { part1: () => (<CheckCheck size={13} />) })}</button>
           )}
         </div>
 
+        <InboxNavigation active="notices" />
+
         {/* ── Filter Tabs ── */}
-        <div className="flex gap-1 overflow-x-auto pb-1 mb-6 no-scrollbar">
+        <div className="mt-4 flex flex-wrap gap-1 pb-1 mb-6">
           {FILTER_TABS.map(({ id, label }) => {
             const count = id === "all"
               ? notifications.filter((n) => !n.read).length
@@ -379,7 +372,7 @@ export default function NotificationsPage() {
               <button
                 key={id}
                 onClick={() => setActiveFilter(id)}
-                className={`flex items-center gap-1.5 px-3.5 py-2 text-xs font-medium rounded-lg whitespace-nowrap transition-all ${
+                className={`flex min-h-11 items-center gap-1.5 px-3.5 py-2 text-xs font-medium rounded-lg whitespace-nowrap transition-all ${
                   isActive
                     ? "bg-gold/10 border border-gold/20 text-gold"
                     : "border border-border text-text-muted hover:border-gold/30 hover:text-text-secondary"
@@ -399,6 +392,7 @@ export default function NotificationsPage() {
         {friendFailure.scope === contactScope && (friendFailure.load || friendFailure.text) && <div role="alert" className="mb-4 rounded-xl border border-red-400/30 p-3 text-sm text-red-400">
           <p>{friendFailure.load ? uiText("Contacts.loadError") : friendFailure.locale === locale ? friendFailure.text : uiText("Contacts.error")}</p><button type="button" onClick={() => setFriendAttempt(value => value + 1)} className="inline-flex min-h-11 items-center text-gold underline">{uiText("Contacts.retry")}</button>
         </div>}
+        {noticeError?.scope === requestScope && noticeError.kind === "read" && <p role="alert" className="mb-3 text-sm text-text-muted">{uiText("InboxNavigation.readError")}</p>}
         {/* ── List ── */}
         <div className="bg-bg-secondary border border-border rounded-2xl overflow-hidden">
           {loading ? (
@@ -408,6 +402,8 @@ export default function NotificationsPage() {
                 <p className="text-xs text-text-muted">{uiText("Ui.text_ba8a3775a261b9")}</p>
               </div>
             </div>
+          ) : noticeError?.scope === requestScope && noticeError.kind === "load" ? (
+            <div role="alert" className="p-5 text-sm text-text-muted"><p>{uiText("notifications.loadError")}</p><button type="button" onClick={() => void fetchNotifications()} className="min-h-11 text-gold">{uiText("notifications.retry")}</button></div>
           ) : filtered.length === 0 ? (
             <div className="py-16 flex flex-col items-center justify-center gap-3 text-center px-6">
               <div className="w-14 h-14 rounded-2xl bg-bg-elevated border border-border flex items-center justify-center">

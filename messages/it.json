@@ -255,7 +255,7 @@
   },
   "home": {
     "newsShortcut": "Notizie",
-    "newsShortcutDescription": "Le ultime novità del settore.",
+    "newsShortcutDescription": "Novità dal settore.",
     "badgeHero": "Film · Foto · Contenuto · Pubblicità",
     "heroTitle1": "Trova Location, Crew &",
     "heroTitle2": "Attrezzatura.",
@@ -263,8 +263,8 @@
     "heroSearchAction": "Cerca per il mio progetto",
     "heroPresentAction": "Inizia gratis",
     "heroManageAction": "Vai alla Dashboard",
-    "findEquipmentTitle": "Attrezzatura e marketplace",
-    "findCompaniesTitle": "Aziende e servizi",
+    "findEquipmentTitle": "Mercatino",
+    "findCompaniesTitle": "Aziende",
     "findProjectsLink": "Vedi i progetti",
     "offerLocationAction": "Proponi una location",
     "newCrewTitle": "Nuovi membri della troupe",
@@ -329,13 +329,13 @@
     "findLabel": "SCOPRI",
     "findTitle": "Che cosa vuoi trovare?",
     "findLocationsTitle": "Location",
-    "findLocationsDescription": "Luoghi per riprese, studi e spazi speciali.",
+    "findLocationsDescription": "Location e studi.",
     "findCrewTitle": "Troupe e talenti",
-    "findCrewDescription": "Persone davanti e dietro la macchina da presa.",
-    "findEquipmentDescription": "Attrezzatura, veicoli e oggetti di scena.",
-    "findCompaniesDescription": "Catering, noleggio e supporto alla produzione.",
+    "findCrewDescription": "Davanti e dietro la camera.",
+    "findEquipmentDescription": "Attrezzature, veicoli e oggetti.",
+    "findCompaniesDescription": "Noleggio, catering e servizi.",
     "findJobsTitle": "Lavori",
-    "findJobsDescription": "Trova incarichi o persone per supportare il tuo progetto.",
+    "findJobsDescription": "Lavori e incarichi.",
     "findJobsLink": "Vedi i lavori",
     "railPage": "Vista {page} di {total}"
   },
@@ -2238,6 +2238,8 @@
   "Organizations": {
     "eyebrow": "Dal settore",
     "newsTitle": "Notizie, workshop ed eventi",
+    "newsTitleLead": "Notizie,",
+    "newsTitleHighlight": "workshop ed eventi",
     "newsDescription": "Notizie e appuntamenti pubblici di organizzazioni indipendenti del settore.",
     "all": "Tutti",
     "empty": "Al momento non ci sono pubblicazioni approvate.",
@@ -8088,5 +8090,11 @@
     "roomScanTitle": "Scanner nativo di ambienti e planimetrie",
     "roomScanDescription": "Scansiona gli ambienti direttamente con l’app e crea planimetrie per il tuo progetto. Questa funzione non è ancora disponibile e richiede un dispositivo compatibile.",
     "noticeFirst": "Chiudi prima l’avviso sui cookie. Poi potrai aprire Genie."
+  },
+  "InboxNavigation": {
+    "chats": "Chat",
+    "notices": "Notifiche",
+    "unread": "Messaggi: {chats} messaggi di chat non letti, {notices} notifiche",
+    "readError": "Impossibile segnare come letto. Riprova."
   }
 }

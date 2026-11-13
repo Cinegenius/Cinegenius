@@ -255,7 +255,7 @@
   },
   "home": {
     "newsShortcut": "Nieuws",
-    "newsShortcutDescription": "Het laatste nieuws uit de sector.",
+    "newsShortcutDescription": "Nieuws uit de sector.",
     "badgeHero": "Film · Foto · Content · Reclame",
     "heroTitle1": "Locaties, crew en",
     "heroTitle2": "apparatuur vinden.",
@@ -263,8 +263,8 @@
     "heroSearchAction": "Zoeken voor mijn project",
     "heroPresentAction": "Gratis beginnen",
     "heroManageAction": "Naar het dashboard",
-    "findEquipmentTitle": "Apparatuur en marktplaats",
-    "findCompaniesTitle": "Bedrijven en dienstverleners",
+    "findEquipmentTitle": "Marktplaats",
+    "findCompaniesTitle": "Bedrijven",
     "findProjectsLink": "Projecten bekijken",
     "offerLocationAction": "Locatie aanbieden",
     "newCrewTitle": "Nieuwe crewleden",
@@ -329,13 +329,13 @@
     "findLabel": "ONTDEKKEN",
     "findTitle": "Wat wil je vinden?",
     "findLocationsTitle": "Locaties",
-    "findLocationsDescription": "Draailocaties, studio's en bijzondere ruimtes.",
+    "findLocationsDescription": "Locaties en studio’s.",
     "findCrewTitle": "Crew en talent",
-    "findCrewDescription": "Mensen voor en achter de camera.",
-    "findEquipmentDescription": "Techniek, voertuigen en rekwisieten.",
-    "findCompaniesDescription": "Catering, verhuur en ondersteuning voor producties.",
+    "findCrewDescription": "Voor en achter de camera.",
+    "findEquipmentDescription": "Materiaal, voertuigen, rekwisieten.",
+    "findCompaniesDescription": "Verhuur, catering en diensten.",
     "findJobsTitle": "Vacatures",
-    "findJobsDescription": "Vind opdrachten of zoek ondersteuning voor je project.",
+    "findJobsDescription": "Jobs en opdrachten.",
     "findJobsLink": "Vacatures bekijken",
     "railPage": "Weergave {page} van {total}"
   },
@@ -2238,6 +2238,8 @@
   "Organizations": {
     "eyebrow": "Uit de branche",
     "newsTitle": "Nieuws, workshops en evenementen",
+    "newsTitleLead": "Nieuws,",
+    "newsTitleHighlight": "workshops en evenementen",
     "newsDescription": "Openbaar nieuws en activiteiten van onafhankelijke brancheorganisaties.",
     "all": "Alle",
     "empty": "Er zijn momenteel geen goedgekeurde berichten.",
@@ -8088,5 +8090,11 @@
     "roomScanTitle": "Native ruimtescanner en grondplannen",
     "roomScanDescription": "Scan ruimtes rechtstreeks met de app en maak grondplannen voor je project. Deze functie is nog niet beschikbaar en vereist een ondersteund toestel.",
     "noticeFirst": "Sluit eerst de cookiemelding. Daarna kan je Genie openen."
+  },
+  "InboxNavigation": {
+    "chats": "Chats",
+    "notices": "Meldingen",
+    "unread": "Berichten: {chats} ongelezen chatberichten, {notices} meldingen",
+    "readError": "Markeren als gelezen is niet gelukt. Probeer het opnieuw."
   }
 }

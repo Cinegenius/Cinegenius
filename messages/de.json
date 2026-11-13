@@ -263,8 +263,8 @@
     "heroSearchAction": "Für mein Projekt suchen",
     "heroPresentAction": "Kostenlos starten",
     "heroManageAction": "Zum Dashboard",
-    "findEquipmentTitle": "Equipment & Marktplatz",
-    "findCompaniesTitle": "Firmen & Dienstleister",
+    "findEquipmentTitle": "Marktplatz",
+    "findCompaniesTitle": "Firmen",
     "findProjectsLink": "Projekte ansehen",
     "offerLocationAction": "Location anbieten",
     "newCrewTitle": "Neue Crew Mitglieder",
@@ -329,13 +329,13 @@
     "findLabel": "ENTDECKEN",
     "findTitle": "Was möchtest du finden?",
     "findLocationsTitle": "Locations",
-    "findLocationsDescription": "Drehorte, Studios und besondere Räume.",
+    "findLocationsDescription": "Drehorte und Studios.",
     "findCrewTitle": "Crew & Talente",
-    "findCrewDescription": "Menschen vor und hinter der Kamera.",
-    "findEquipmentDescription": "Technik, Fahrzeuge und Requisiten.",
-    "findCompaniesDescription": "Catering, Verleih und Unterstützung für Produktionen.",
+    "findCrewDescription": "Vor und hinter der Kamera.",
+    "findEquipmentDescription": "Technik, Fahrzeuge, Requisiten.",
+    "findCompaniesDescription": "Verleih, Catering und Service.",
     "findJobsTitle": "Jobs",
-    "findJobsDescription": "Aufträge finden oder Unterstützung für dein Vorhaben suchen.",
+    "findJobsDescription": "Jobs und Aufträge.",
     "findJobsLink": "Jobs ansehen",
     "railPage": "Ansicht {page} von {total}"
   },
@@ -2238,6 +2238,8 @@
   "Organizations": {
     "eyebrow": "Aus der Branche",
     "newsTitle": "News, Workshops & Veranstaltungen",
+    "newsTitleLead": "News,",
+    "newsTitleHighlight": "Workshops & Veranstaltungen",
     "newsDescription": "Öffentliche Neuigkeiten und Termine unabhängiger Branchenorganisationen.",
     "all": "Alle",
     "empty": "Aktuell sind keine freigegebenen Beiträge vorhanden.",
@@ -8088,5 +8090,11 @@
     "roomScanTitle": "Nativer Raumscanner & Grundrisse",
     "roomScanDescription": "Räume direkt mit der App erfassen und Grundrisse für dein Projekt erstellen. Diese Funktion ist noch nicht verfügbar und benötigt ein unterstütztes Gerät.",
     "noticeFirst": "Bitte schließe zuerst den Cookie-Hinweis. Danach kannst du Genie öffnen."
+  },
+  "InboxNavigation": {
+    "chats": "Chats",
+    "notices": "Mitteilungen",
+    "unread": "Nachrichten: {chats} ungelesene Chatnachrichten, {notices} Mitteilungen",
+    "readError": "Nicht als gelesen gespeichert. Bitte erneut versuchen."
   }
 }

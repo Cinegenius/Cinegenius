@@ -24,6 +24,7 @@ import { filterProviderProfiles,isProviderFilter,LOCATION_PROVIDER_FILTER,MARKET
 import EmptyState from "@/components/EmptyState";
 import MobileBrowseControls,{ BrowseRoleFilter,MobileFilterField,MobileFilterSelect,type BrowseChip } from "@/components/MobileBrowseControls";
 import ProfileCardPhoto from "@/components/ProfileCardPhoto";
+import ProviderQuickFilters from "@/components/ProviderQuickFilters";
 import { compareCreatorNames } from "@/lib/creator-directory-order";
 import { departments,getDepartmentRoleLabel,getDeptLabel,getOccupationSearchTerms,taxonomyLabel } from "@/lib/departments";
 import { gripSearchTerms,isGripDepartmentSearch,isGripOccupation,normalizeOccupation } from "@/lib/gripTaxonomy";
@@ -450,7 +451,11 @@ function CreatorsInner({
         ]}
         categoryValue={sidebarDept ?? ""}
         onCategoryChange={(value) => { setSelectedRoles(new Set()); chooseSidebarDept(value || null); }}
-        resultSummary={hasMoreFromApi ? (loadError ? t("resultsLoadFailed") : t("resultsLoading")) : t("results", { count: filtered.length })}
+        resultSummary={hasMoreFromApi ? (loadError ? t("resultsLoadFailed") : t("resultsLoading")) : t("results", { count: isProviderFilter(sidebarDept) ? allCreators.length : filtered.length })}
+        resultActions={<ProviderQuickFilters value={sidebarDept}
+          locations={filterProviderProfiles(allCreators, LOCATION_PROVIDER_FILTER).length > 0}
+          marketplace={filterProviderProfiles(allCreators, MARKETPLACE_PROVIDER_FILTER).length > 0}
+          onChange={value => { setSelectedRoles(new Set()); chooseSidebarDept(value); }} />}
         viewControls={viewControls}
         filterCount={secondaryFilterCount + (sidebarDept ? 1 : 0)}
         chips={mobileChips}

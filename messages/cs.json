@@ -255,7 +255,7 @@
   },
   "home": {
     "newsShortcut": "Novinky",
-    "newsShortcutDescription": "Aktuální dění v oboru.",
+    "newsShortcutDescription": "Novinky z oboru.",
     "badgeHero": "Film · Foto · Obsah · Reklama",
     "heroTitle1": "Najdi Lokace, Štáb &",
     "heroTitle2": "Vybavení.",
@@ -263,8 +263,8 @@
     "heroSearchAction": "Hledat pro můj projekt",
     "heroPresentAction": "Začít zdarma",
     "heroManageAction": "Přejít na Přehled",
-    "findEquipmentTitle": "Vybavení a tržiště",
-    "findCompaniesTitle": "Firmy a služby",
+    "findEquipmentTitle": "Tržiště",
+    "findCompaniesTitle": "Firmy",
     "findProjectsLink": "Prohlédnout projekty",
     "offerLocationAction": "Nabídnout lokaci",
     "newCrewTitle": "Noví členové štábu",
@@ -329,13 +329,13 @@
     "findLabel": "OBJEVUJ",
     "findTitle": "Co chceš najít?",
     "findLocationsTitle": "Lokace",
-    "findLocationsDescription": "Místa pro natáčení, studia a výjimečné prostory.",
+    "findLocationsDescription": "Lokace a studia.",
     "findCrewTitle": "Štáb a talenty",
-    "findCrewDescription": "Lidé před kamerou i za ní.",
+    "findCrewDescription": "Před kamerou i za ní.",
     "findEquipmentDescription": "Technika, vozidla a rekvizity.",
-    "findCompaniesDescription": "Catering, půjčovny a produkční podpora.",
+    "findCompaniesDescription": "Pronájem, catering a služby.",
     "findJobsTitle": "Práce",
-    "findJobsDescription": "Najdi práci nebo podporu pro svůj projekt.",
+    "findJobsDescription": "Práce a zakázky.",
     "findJobsLink": "Prohlédnout zakázky",
     "railPage": "Zobrazení {page} z {total}"
   },
@@ -2238,6 +2238,8 @@
   "Organizations": {
     "eyebrow": "Z oboru",
     "newsTitle": "Novinky, workshopy a události",
+    "newsTitleLead": "Novinky,",
+    "newsTitleHighlight": "workshopy a události",
     "newsDescription": "Veřejné novinky a termíny nezávislých oborových organizací.",
     "all": "Vše",
     "empty": "Momentálně nejsou žádné schválené příspěvky.",
@@ -8088,5 +8090,11 @@
     "roomScanTitle": "Nativní skener místností a půdorysy",
     "roomScanDescription": "Skenuj místnosti přímo v aplikaci a vytvářej půdorysy pro svůj projekt. Tato funkce zatím není dostupná a vyžaduje podporované zařízení.",
     "noticeFirst": "Nejprve zavři oznámení o cookies. Potom můžeš otevřít Genie."
+  },
+  "InboxNavigation": {
+    "chats": "Chaty",
+    "notices": "Oznámení",
+    "unread": "Zprávy: {chats} nepřečtených zpráv v chatu, {notices} oznámení",
+    "readError": "Označení jako přečtené se nezdařilo. Zkuste to znovu."
   }
 }

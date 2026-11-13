@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import Image from '@/components/MediaImage';
+import {Building2} from 'lucide-react';
 import {getLocale, getTranslations} from 'next-intl/server';
 import {organizationDiscovery, latestOrganizationEntries} from '@/lib/organization-discovery';
 
@@ -27,7 +28,7 @@ export default async function HomeOrganizations() {
   <div className={`grid min-w-0 items-start gap-6 lg:gap-9 ${paired ? 'lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]' : ''}`}>
    {entries.length > 0 && <div className="min-w-0 space-y-2">
     {entries.map(entry => {
-     const org = (Array.isArray(entry.organization) ? entry.organization[0] : entry.organization) as unknown as {slug:string;name:string};
+     const org = (Array.isArray(entry.organization) ? entry.organization[0] : entry.organization) as unknown as {slug:string;name:string;logo_url:string|null};
      const date = entry.entry_type === 'news' ? entry.created_at : entry.starts_at;
      return <article key={entry.id} className="grid min-w-0 grid-cols-[minmax(0,1fr)_6rem] items-start gap-x-3 rounded-xl border border-border bg-bg-secondary px-3 py-1 sm:grid-cols-[minmax(0,1fr)_8rem] lg:grid-cols-[minmax(0,1fr)_9rem]">
       <Link href={`/news/${org.slug}/${entry.slug}`} className="group flex min-h-11 min-w-0 items-start gap-3 py-1">
@@ -38,16 +39,20 @@ export default async function HomeOrganizations() {
         {entry.summary && <p className="mt-1 line-clamp-1 break-words text-xs leading-relaxed text-text-secondary">{entry.summary}</p>}
        </div>
       </Link>
-      <Link href={`/organizations/${org.slug}`} className="inline-flex min-h-11 min-w-0 items-center py-1 text-xs leading-snug text-text-muted hover:text-gold"><span className="line-clamp-2 min-w-0 break-words [overflow-wrap:anywhere]">{org.name}</span></Link>
+      <Link href={`/organizations/${org.slug}`} aria-label={org.name} title={org.name} className="inline-flex min-h-11 min-w-0 items-center justify-center self-center py-1 text-xs leading-snug text-text-muted hover:text-gold">
+       {org.logo_url ? <Image src={org.logo_url} alt="" width={64} height={48} sizes="64px" className="h-12 w-16 shrink-0 object-contain"/> : <span className="line-clamp-2 min-w-0 break-words [overflow-wrap:anywhere]">{org.name}</span>}
+      </Link>
      </article>;
     })}
    </div>}
    {organizations.length > 0 && <div className="min-w-0">
     <div className="mb-1 flex min-w-0 flex-wrap items-center justify-between gap-x-3 gap-y-1"><h3 className="font-serif text-lg text-text-primary">{t('organizations')}</h3><Link href="/organizations" className="inline-flex min-h-11 min-w-0 items-center text-xs text-gold hover:text-gold-light"><span className="break-words">{t('allOrganizations')}</span><span className="ml-1" aria-hidden="true">→</span></Link></div>
-    <ul className={`grid min-w-0 grid-cols-2 gap-2 ${paired ? '' : 'sm:grid-cols-3'}`}>
+    <ul className={`grid min-w-0 auto-rows-fr grid-cols-2 gap-2 ${paired ? '' : 'sm:grid-cols-3'}`}>
      {organizations.map(org => <li key={org.id} className="min-w-0">
-      <Link href={`/organizations/${org.slug}`} className="group flex min-h-11 min-w-0 items-start gap-2 rounded-xl border border-border bg-bg-secondary px-2 py-2 transition-colors hover:border-gold/40 hover:bg-bg-elevated">
-       {org.logo_url && <Image src={org.logo_url} alt="" width={28} height={28} className="mt-0.5 h-7 w-7 shrink-0 object-contain"/>}
+      <Link href={`/organizations/${org.slug}`} className="group flex h-full min-h-11 min-w-0 items-center gap-2 rounded-xl border border-border bg-bg-secondary px-2 py-3 transition-colors hover:border-gold/40 hover:bg-bg-elevated">
+       <span className="flex h-11 w-11 shrink-0 items-center justify-center">
+        {org.logo_url ? <Image src={org.logo_url} alt="" width={44} height={44} sizes="44px" className="h-11 w-11 object-contain"/> : <Building2 size={22} aria-hidden="true" className="text-text-muted"/>}
+       </span>
        <span className="min-w-0 flex-1"><span className="line-clamp-2 break-words text-sm font-semibold leading-snug text-text-secondary transition-colors group-hover:text-gold [overflow-wrap:anywhere]">{org.name}</span>{org.city && <span className="mt-0.5 line-clamp-1 break-words text-xs leading-snug text-text-muted">{org.city}</span>}</span>
       </Link>
      </li>)}

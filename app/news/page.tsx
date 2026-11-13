@@ -34,7 +34,7 @@ export default async function NewsPage({ searchParams }: { searchParams: Promise
   };
 
   return <DirectoryPage area="news"><main className="min-h-screen">
-    <PageHeader withBackdrop={false} badge={t("eyebrow")} title={t("newsTitle")} description={t("newsDescription")} />
+    <PageHeader withBackdrop={false} badge={t("eyebrow")} title={t("newsTitleLead")} titleHighlight={t("newsTitleHighlight")} description={t("newsDescription")} />
     <NewsBrowseControls key={`${filters.q}:${filters.type}:${filters.topic}:${filters.country}:${filters.geo}`} filters={filters} facets={facets} count={count} preference={<>
       {preferred && <BrowsePreferenceControl active label={`${geoText("preferred", { country: countryName(preferred.country, locale) })}. ${geoText("everywhere")}`} href={href({ geo: "off", page: 1 })} />}
       {filters.geo === "off" && <BrowsePreferenceControl label={geoText("useProfile")} href={href({ geo: "", page: 1 })} />}

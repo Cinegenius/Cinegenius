@@ -128,8 +128,8 @@ export default function LocationsLanding({ allLocations, totalCount, initialFilt
     setViewMode(mode);
     resultsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
   };
-  const viewControls = <div role="group" aria-label={t("viewLabel")} className="inline-flex rounded-xl border border-border bg-bg-secondary p-1">
-    {([{ mode: "list", label: t("viewList"), icon: LayoutList }, ...(wide ? [{ mode: "split" as const, label: t("viewSplit"), icon: Map }] : []), { mode: "map", label: t("viewMap"), icon: Map }] as const).map(({mode,label,icon: Icon}) => <button type="button" key={mode} aria-pressed={effectiveView === mode} onClick={() => chooseView(mode)} className={`inline-flex min-h-11 items-center gap-2 rounded-lg px-3 text-sm font-medium ${effectiveView === mode ? "bg-gold text-bg-primary" : "text-text-secondary hover:text-text-primary"}`}><Icon size={16} aria-hidden="true" />{label}</button>)}
+  const viewControls = <div role="group" aria-label={t("viewLabel")} className="directory-view-controls">
+    {([{ mode: "list", label: t("viewList"), icon: LayoutList }, ...(wide ? [{ mode: "split" as const, label: t("viewSplit"), icon: Map }] : []), { mode: "map", label: t("viewMap"), icon: Map }] as const).map(({mode,label,icon: Icon}) => <button type="button" key={mode} aria-label={label} aria-pressed={effectiveView === mode} onClick={() => chooseView(mode)} className="directory-view-button"><Icon size={17} aria-hidden="true" />{label}</button>)}
   </div>;
 
   const additionalFilters = () => <>
@@ -160,7 +160,6 @@ export default function LocationsLanding({ allLocations, totalCount, initialFilt
         title={t("heroTitle")}
         titleHighlight={t("heroTitleHighlight")}
         description={totalCount > 0 ? uiText("Ui.text_7c639bc99b8569", { value1: String(t("results", { count: totalCount })), value2: String(t("heroDesc")) }) : t("heroDesc")}
-        ctaSecondary={{ label: t("landingAll"), href: "#locations-discover" }}
         cta={{ label: t("heroCta"), href: "/inserat?group=drehorte" }}
       >
 

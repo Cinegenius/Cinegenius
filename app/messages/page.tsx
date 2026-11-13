@@ -8,6 +8,7 @@ import { useEffect, useRef, useState, useCallback, type CSSProperties } from "re
 import { useSearchParams } from "next/navigation";
 import { useUser } from "@clerk/nextjs";
 import Link from "next/link";
+import InboxNavigation from "@/components/InboxNavigation";
 import { ArrowLeft, MessageSquare, Loader2, User, Check, Users, Search, SquarePen } from "lucide-react";
 import { Suspense } from "react";
 import MessageComposer from "@/components/messaging/MessageComposer";
@@ -478,6 +479,7 @@ function MessagesContent() {
     <aside className={`${showChat?"hidden sm:flex":"flex"} min-w-0 w-full flex-col border-r border-border bg-bg-primary sm:w-80 sm:shrink-0`}>
       <header className="shrink-0 border-b border-border px-4 py-3">
         <div className="flex min-w-0 items-center justify-between gap-3"><h1 className="min-w-0 break-words font-display text-xl font-bold text-text-primary">{t("title")}</h1><button type="button" onClick={()=>setNewMessageOpen(true)} aria-label={t("newMessage")} title={t("newMessage")} className="flex min-h-11 min-w-11 shrink-0 items-center justify-center gap-2 rounded-xl px-2 text-sm text-gold hover:bg-bg-elevated"><SquarePen size={22}/><span className="hidden min-[400px]:inline">{t("newMessage")}</span></button></div>
+        <InboxNavigation active="chats" />
         <label className="mt-2 flex min-h-11 items-center gap-2 rounded-xl border border-border bg-bg-secondary px-3"><Search size={17} className="shrink-0 text-text-muted"/><input type="search" value={search} onChange={event=>setSearch(event.target.value)} placeholder={t("searchChats")} aria-label={t("searchChats")} className="min-h-11 min-w-0 flex-1 bg-transparent text-base text-text-primary outline-none"/></label>
       </header>
       <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain">

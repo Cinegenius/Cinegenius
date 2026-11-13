@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect, useTransition } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
-import { Globe, Check } from "lucide-react";
+import { Check } from "lucide-react";
 import { LANGUAGE_OPTIONS } from "@/lib/i18n/locales";
 
 const LANGUAGES = LANGUAGE_OPTIONS;
@@ -52,14 +52,13 @@ export default function LanguageSwitcher() {
       <button
         type="button"
         onClick={() => setOpen((v) => !v)}
-        className="flex min-h-11 min-w-11 items-center gap-1.5 px-2 py-1.5 max-[479px]:gap-1 max-[479px]:px-0 rounded-md text-text-muted hover:text-gold hover:bg-bg-elevated transition-all text-sm"
+        className="flex h-11 w-11 shrink-0 items-center justify-center rounded-md text-text-muted hover:text-gold hover:bg-bg-elevated transition-all text-lg"
         aria-label={t("choose")}
         aria-expanded={open}
         aria-busy={pending}
         disabled={pending}
       >
-        <Globe size={15} />
-        <span>{currentLang?.flag}</span>
+        <span aria-hidden="true">{currentLang?.flag}</span>
       </button>
 
       {open && (
