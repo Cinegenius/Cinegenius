@@ -1,11 +1,11 @@
-import { getLocale, getTranslations } from "next-intl/server";
-import {placeReadFields} from "@/lib/places/catalog";
-import {publicMapPoint} from "@/lib/places/public-map-point";
-import { db } from "@/lib/db";
 import PropsContent from "@/app/props/PropsContent";
 import PageHeader from "@/components/PageHeader";
+import { db } from "@/lib/db";
 import { marketplaceCardData } from "@/lib/marketplace-browse";
-import { getTranslations as getMetadataTranslations } from "next-intl/server";
+import { marketplaceFacetRows } from "@/lib/marketplace-facets";
+import { placeReadFields } from "@/lib/places/catalog";
+import { publicMapPoint } from "@/lib/places/public-map-point";
+import { getLocale,getTranslations as getMetadataTranslations,getTranslations } from "next-intl/server";
 
 export const revalidate = 60;
 
@@ -28,6 +28,7 @@ export default async function VehiclesPage() {
   const t = await getTranslations();
   let rows: ReturnType<typeof marketplaceCardData>[] = [];
   let serverError = false;
+  const facetRows = await marketplaceFacetRows(locale);
   try {
   const { data, error } = await db.from("listings")
     .select("place_country_code,place_region_id,place_city_id,place_city_name,place_region_name,place_status,id,type,title,category,city,price,image_url,description,created_at,marketplace:metadata->marketplace,rental_type:metadata->>rental_type,price_on_request:metadata->price_on_request,price_negotiable:metadata->price_negotiable,condition:metadata->>condition,delivery:metadata->delivery,focal_point:metadata->focal_point")
@@ -46,6 +47,6 @@ export default async function VehiclesPage() {
     <PageHeader badge={t("props.heroBadge")} title={t("props.heroTitle")} titleHighlight={t("props.heroTitleHighlight")}
       description={t("props.heroDesc")}
       cta={{ label: t("props.heroCta"), href: "/inserat?group=marktplatz" }} />
-    <PropsContent serverListings={rows} serverError={serverError} initialDepartment="fahrzeuge" />
+    <PropsContent facetRows={facetRows} serverListings={rows} serverError={serverError} initialDepartment="fahrzeuge" />
   </div>;
 }

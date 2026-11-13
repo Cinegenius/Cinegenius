@@ -1,9 +1,10 @@
-import {placeReadFields} from "@/lib/places/catalog";
-import {placeDisplay} from "@/lib/places/core";
-import {getLocale, getTranslations} from "next-intl/server";
-import type { Metadata } from "next";
-import { db } from "@/lib/db";
 import PageHeader from "@/components/PageHeader";
+import { collectFacetRows } from "@/lib/browse-facets";
+import { db } from "@/lib/db";
+import { placeReadFields } from "@/lib/places/catalog";
+import { placeDisplay } from "@/lib/places/core";
+import type { Metadata } from "next";
+import { getLocale,getTranslations } from "next-intl/server";
 import TiereContent from "./TiereContent";
 
 export const revalidate = 60;
@@ -13,20 +14,17 @@ export async function generateMetadata():Promise<Metadata> { const t=await getTr
 export default async function TierePage() {
   const locale=await getLocale();
   const t = await getTranslations("FilmAnimals");
-  const { data } = await db
+  const data = await collectFacetRows<Record<string, unknown>>((from, to) => db
     .from("listings")
     .select("place_country_code,place_region_id,place_city_id,place_city_name,place_region_name,place_status,id, user_id, type, title, category, city, price, image_url, description, metadata")
     .eq("published", true)
     .eq("type", "animal")
-    .order("created_at", { ascending: false })
-    .limit(300);
+    .order("created_at", { ascending: false }).order("id")
+    .range(from, to));
 
-  const serverListings = (data ?? []).map((l: {
-    id: string; title: string; city: string | null; price: number;
-    category: string | null; image_url: string | null; type: string;
-    user_id?: string | null;
-    metadata?: Record<string, unknown> | null;
-  }) => ({
+  const serverListings = (data ?? []).map(raw => { const l = raw as unknown as {
+    id: string; title: string; city: string | null; price: number; category: string | null; image_url: string | null; type: string; user_id?: string | null; metadata?: Record<string, unknown> | null;
+  }; return ({
     id: l.id,
     title: l.title,
     category: l.category ?? "Sonstige Tiere",
@@ -42,7 +40,7 @@ export default async function TierePage() {
     focalPoint: (l.metadata?.focal_point as { x: number; y: number } | null) ?? null,
     description: "",
     ownerId: l.user_id ?? undefined,
-  }));
+  }); });
 
   return (
     <div className="min-h-screen bg-bg-primary">
@@ -52,9 +50,7 @@ export default async function TierePage() {
         description={t("description")}
         cta={{label:t("addPortfolio"),href:"/inserat?animal=1"}}
       />
-      <div className="site-container py-4 sm:py-8">
-        <TiereContent serverListings={serverListings} />
-      </div>
+      <TiereContent serverListings={serverListings} />
     </div>
   );
 }

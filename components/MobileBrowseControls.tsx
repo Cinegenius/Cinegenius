@@ -1,8 +1,8 @@
 "use client";
 
-import { useEffect, useRef, useState, type ReactNode } from "react";
-import { Search, SlidersHorizontal, ArrowUpDown, X } from "lucide-react";
+import { ArrowUpDown,Search,SlidersHorizontal,X } from "lucide-react";
 import { useTranslations } from "next-intl";
+import { isValidElement,useEffect,useRef,useState,type ReactNode } from "react";
 
 
 export type BrowseOption = { value: string; label: string };
@@ -28,14 +28,16 @@ type MobileBrowseControlsProps = {
   onReset: () => void;
   resetLabel: string;
   showResultsLabel: string;
+  preference?: ReactNode;
+  onSearch?: () => void;
   children?: ReactNode;
 };
 
 /** Shared compact search, sorting, category and filter panel for directory pages. */
 export default function MobileBrowseControls({
   query, onQueryChange, searchPlaceholder, sortValue, sortOptions, onSortChange,
-  categoryLabel, allCategoryLabel, categories, categoryValue, onCategoryChange, categoryPlacement = "toolbar",
-  resultSummary, viewControls, filterCount, chips = [], onReset, resetLabel, showResultsLabel, children,
+  categoryLabel, allCategoryLabel, categories, categoryValue, onCategoryChange, categoryPlacement = "filters",
+  resultSummary, viewControls, filterCount, chips = [], onReset, resetLabel, showResultsLabel, preference, onSearch, children,
 }: MobileBrowseControlsProps) {
   const uiText = useTranslations();
 
@@ -75,12 +77,13 @@ export default function MobileBrowseControls({
   }, [open]);
 
   return (
-    <section className="mobile-browse-controls xl:hidden" aria-label={uiText("Ui.text_18e437adcea246")}>
+    <section className="mobile-browse-controls" aria-label={uiText("Ui.text_18e437adcea246")}>
       <div className="site-container mobile-browse-controls__inner">
         <label className="mobile-browse-search">
           <Search size={18} aria-hidden="true" />
           <span className="sr-only">{searchPlaceholder}</span>
-          <input value={query} onChange={(event) => onQueryChange(event.target.value)} placeholder={searchPlaceholder} />
+          <input type="search" value={query} onChange={(event) => onQueryChange(event.target.value)} placeholder={searchPlaceholder} onKeyDown={event => { if (event.key === "Enter" && onSearch) { event.preventDefault(); onSearch(); } }} />
+          {onSearch && <button type="button" aria-label={uiText("Organizations.search")} onClick={onSearch}><Search size={18} /></button>}
           {query && <button type="button" aria-label={uiText("locations.landingClear")} onClick={() => onQueryChange("")}><X size={17} /></button>}
         </label>
 
@@ -99,14 +102,17 @@ export default function MobileBrowseControls({
           <span>{categoryLabel}</span>
           <select value={categoryValue} onChange={(event) => onCategoryChange(event.target.value)}>
             <option value="">{allCategoryLabel}</option>
+            {categoryValue && !categories.some(option => option.value === categoryValue) && <option value={categoryValue} disabled>{categoryValue}</option>}
             {categories.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}
           </select>
         </label>}
 
+        {preference}
         <div className="mobile-browse-summary">
-          {viewControls ? <div className="mobile-browse-summary-row"><p title={typeof resultSummary === "string" ? resultSummary : undefined}>{resultSummary}</p>{viewControls}</div> : <p>{resultSummary}</p>}
+          {viewControls ? <div className="mobile-browse-summary-row"><p role="status" title={typeof resultSummary === "string" ? resultSummary : undefined}>{resultSummary}</p>{viewControls}</div> : <p role="status">{resultSummary}</p>}
           {chips.length > 0 && (
             <div className="mobile-browse-chips" aria-label={uiText("Ui.text_75e581194056a5")}>
+              <button type="button" className="min-h-11 px-2 text-xs underline" onClick={onReset}>{resetLabel}</button>
               {chips.slice(0, 3).map((chip) => (
                 <span key={chip.id} className="mobile-browse-chip">
                   <span className="truncate">{chip.label}</span>
@@ -141,18 +147,19 @@ export default function MobileBrowseControls({
               <button data-filter-close type="button" aria-label={uiText("ProfilePhotoCrop.close")} onClick={() => setOpen(false)}><X size={20} /></button>
             </header>
             <div className="mobile-filter-panel__content">
-              <label className="mobile-filter-field">
+              {(categories.length > 0 || categoryValue) && <label className="mobile-filter-field">
                 <span>{categoryLabel}</span>
                 <select value={categoryValue} onChange={(event) => onCategoryChange(event.target.value)}>
                   <option value="">{allCategoryLabel}</option>
-                  {categories.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}
+                  {categoryValue && !categories.some(option => option.value === categoryValue) && <option value={categoryValue} disabled>{categoryValue}</option>}
+            {categories.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}
                 </select>
-              </label>
+              </label>}
               {children}
             </div>
             <footer className="mobile-filter-panel__footer">
               <button type="button" className="mobile-filter-reset" onClick={onReset}>{resetLabel}</button>
-              <button type="button" className="mobile-filter-apply" onClick={() => setOpen(false)}>{showResultsLabel}</button>
+              <button type="button" className="mobile-filter-apply" onClick={() => { setOpen(false); onSearch?.(); }}>{showResultsLabel}</button>
             </footer>
           </section>
         </dialog>
@@ -162,7 +169,8 @@ export default function MobileBrowseControls({
 }
 
 export function MobileFilterField({ label, children }: { label: string; children: ReactNode }) {
-  return <div className="mobile-filter-field"><span>{label}</span>{children}</div>;
+  if (isValidElement<{ options?: BrowseOption[]; value?: string }>(children) && children.type === MobileFilterSelect && !children.props.value && !children.props.options?.length) return null;
+  return <label className="mobile-filter-field"><span>{label}</span>{children}</label>;
 }
 
 export function MobileFilterSelect({ value, onChange, options, placeholder, label }: {
@@ -175,7 +183,31 @@ export function MobileFilterSelect({ value, onChange, options, placeholder, labe
   return (
     <select aria-label={label} value={value} onChange={(event) => onChange(event.target.value)}>
       <option value="">{placeholder}</option>
+      {value && !options.some(option => option.value === value) && <option value={value} disabled>{value}</option>}
       {options.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}
     </select>
   );
+}
+
+export function BrowseRoleFilter({ label, placeholder, options, selected, onChange }: { label: string; placeholder: string; options: BrowseOption[]; selected: Set<string>; onChange: (values: Set<string>) => void }) {
+  const [query, setQuery] = useState("");
+  const t = useTranslations("creators");
+  if (!options.length && !selected.size) return null;
+  const visible = options.filter(option => option.label.toLocaleLowerCase().includes(query.toLocaleLowerCase()));
+  return <fieldset className="mobile-filter-field">
+    <legend className="mb-2 text-xs text-text-muted">{label}</legend>
+    <details className="rounded-xl border border-border bg-bg-primary">
+      <summary className="min-h-11 cursor-pointer px-3 py-3 text-sm text-text-secondary">{label}{selected.size > 0 && ` (${selected.size})`}</summary>
+      <div className="space-y-2 px-3 pb-3">
+        <input aria-label={placeholder} placeholder={placeholder} type="search" value={query} onChange={event => setQuery(event.target.value)} />
+        <div className="max-h-64 overflow-y-auto overscroll-contain">
+          {!visible.length && <p role="status" className="py-3 text-sm text-text-muted">{t("noRolesFound")}</p>}
+          {visible.map(option => <label key={option.value} className="flex min-h-11 items-center gap-3 py-2 text-sm text-text-secondary">
+            <input type="checkbox" className="browse-role-checkbox" checked={selected.has(option.value)} onChange={event => { const next = new Set(selected); if (event.target.checked) next.add(option.value); else next.delete(option.value); onChange(next); }} />
+            <span>{option.label}</span>
+          </label>)}
+        </div>
+      </div>
+    </details>
+  </fieldset>;
 }

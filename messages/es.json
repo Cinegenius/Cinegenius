@@ -8064,5 +8064,12 @@
     "ZA": "Sudáfrica",
     "ZM": "Zambia",
     "ZW": "Zimbabue"
+  },
+  "BrowseFilters": {
+    "trainingPro": "Profesional de cine",
+    "trainingExperienced": "Con experiencia",
+    "trainingBasic": "Obediencia básica",
+    "trainingNone": "Sin entrenamiento",
+    "results": "{count} resultados"
   }
 }

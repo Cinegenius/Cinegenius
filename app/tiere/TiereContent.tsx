@@ -1,16 +1,20 @@
 "use client";
 
+import BrowseGeography from "@/components/BrowseGeography";
 import MediaImage from "@/components/MediaImage";
+import MobileBrowseControls,{ MobileFilterField,MobileFilterSelect } from "@/components/MobileBrowseControls";
+import PlaceFilters,{ EMPTY_PLACE_FILTERS } from "@/components/PlaceFilters";
+import { prioritizeGeographically } from "@/lib/browse-geography";
+import { matchesPlace,placeOptions } from "@/lib/places/core";
+import { useBrowseGeography } from "@/lib/use-browse-geography";
+import { useViewState } from "@/lib/use-view-state";
 
-import { useTranslations } from "next-intl";
 import { animalSpecies } from "@/lib/animal-taxonomy";
-import { useState, useMemo, useEffect, useRef } from "react";
-import Link from "next/link";
-import { Search, PawPrint, X, Truck, MapPin, Users, Heart, ChevronDown } from "lucide-react";
 import { useAuth } from "@clerk/nextjs";
-
-const SPECIES = ["Alle", "Hunde", "Pferde & Ponys", "Katzen", "Vögel", "Reptilien", "Nutztiere", "Exoten", "Sonstige Tiere"];
-const TRAINING = ["Alle", "Kinoprofi", "Erfahren", "Grundgehorsam", "Ungeübt"];
+import { Heart,MapPin,PawPrint,Truck,Users } from "lucide-react";
+import { useLocale,useTranslations } from "next-intl";
+import Link from "next/link";
+import { useEffect,useMemo,useState } from "react";
 
 type Animal = {
   id: string;
@@ -29,42 +33,6 @@ type Animal = {
   ownerId?: string;
 };
 
-function FilterDropdown({ value, options, onChange, placeholder }: {
-  value: string; options: string[]; onChange: (v: string) => void; placeholder?: string;
-}) {
-  const animals = useTranslations("FilmAnimals");
-  const display = (item: string) => animalSpecies(item) ? animals(`species.${animalSpecies(item)!.id}`) : item === "Alle" && options === SPECIES ? animals("allSpecies") : item;
-  const [open, setOpen] = useState(false);
-  const ref = useRef<HTMLDivElement>(null);
-  useEffect(() => {
-    if (!open) return;
-    const h = (e: MouseEvent) => { if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false); };
-    document.addEventListener("mousedown", h);
-    return () => document.removeEventListener("mousedown", h);
-  }, [open]);
-  return (
-    <div ref={ref} className="relative shrink-0">
-      <button onClick={() => setOpen(v => !v)}
-        className={`flex items-center gap-2 h-10 px-3 rounded-xl text-sm font-medium border transition-all bg-bg-elevated ${
-          value !== options[0] ? "border-gold/40 text-gold" : "border-border text-text-secondary hover:border-gold/30 hover:text-text-primary"
-        }`}>
-        {value ? display(value) : placeholder}
-        <ChevronDown size={13} className={`transition-transform ${open ? "rotate-180" : ""}`} />
-      </button>
-      {open && (
-        <div className="absolute top-full left-0 mt-1 z-50 bg-bg-elevated border border-border rounded-xl shadow-xl overflow-hidden min-w-[160px]">
-          {options.map((o) => (
-            <button key={o} onClick={() => { onChange(o); setOpen(false); }}
-              className={`w-full text-left px-3 py-2 text-sm transition-colors hover:bg-white/[0.04] ${value === o ? "text-gold font-medium" : "text-text-secondary"}`}>
-              {display(o)}
-            </button>
-          ))}
-        </div>
-      )}
-    </div>
-  );
-}
-
 const TRAINING_COLORS: Record<string, string> = {
   "Kinoprofi": "text-gold border-gold/30 bg-gold-subtle",
   "Erfahren": "text-success border-success/30 bg-success/10",
@@ -77,37 +45,21 @@ export default function TiereContent({ serverListings }: { serverListings: Anima
 
   const { isSignedIn } = useAuth();
   const animals = useTranslations("FilmAnimals");
-  const [search, setSearch] = useState("");
-  const [species, setSpecies] = useState("Alle");
-  const [training, setTraining] = useState("Alle");
-  const [deliveryOnly, setDeliveryOnly] = useState(false);
+  const locale = useLocale();
+  const [search, setSearch] = useViewState("animals.search", "");
+  const [place, setPlace] = useViewState("animals.place", EMPTY_PLACE_FILTERS);
+  const [sort, setSort] = useViewState("animals.sort", "newest");
+  const geography = useBrowseGeography(sort === "newest" && !place.country && !place.region && !place.city);
+  const speciesLabel = (value: string) => animalSpecies(value) ? animals(`species.${animalSpecies(value)!.id}`) : value;
+  const trainingLabel = (value: string) => ({ "Kinoprofi": uiText("BrowseFilters.trainingPro"), "Erfahren": uiText("BrowseFilters.trainingExperienced"), "Grundgehorsam": uiText("BrowseFilters.trainingBasic"), "Ungeübt": uiText("BrowseFilters.trainingNone") })[value] ?? value;
+
+  const [species, setSpecies] = useViewState("animals.species", "Alle");
+  const [training, setTraining] = useViewState("animals.training", "Alle");
+  const [deliveryOnly, setDeliveryOnly] = useViewState("animals.delivery", false);
   const [liveRatings, setLiveRatings] = useState<Record<string, { avg: number; count: number }>>({});
   const [myRatings, setMyRatings] = useState<Record<string, number>>({});
   const [eligible, setEligible] = useState<Set<string>>(new Set());
   const [favorites, setFavorites] = useState<Set<string>>(new Set());
-
-  useEffect(() => {
-    const ids = serverListings.map(l => l.id).join(",");
-    if (!ids) return;
-    fetch(`/api/listing-ratings?ids=${ids}`)
-      .then(r => r.json())
-      .then(({ ratings, myRatings: my, eligible: elig }) => {
-        setLiveRatings(ratings ?? {});
-        setMyRatings(my ?? {});
-        setEligible(new Set(elig ?? []));
-      })
-      .catch(() => {});
-  }, [serverListings]);
-
-  useEffect(() => {
-    if (!isSignedIn) return;
-    const ids = serverListings.map(l => l.id).join(",");
-    if (!ids) return;
-    fetch(`/api/favorites?ids=${ids}`)
-      .then(r => r.json())
-      .then(({ favorited }) => setFavorites(new Set(favorited ?? [])))
-      .catch(() => {});
-  }, [serverListings, isSignedIn]);
 
   const handleFavorite = async (e: React.MouseEvent, listingId: string) => {
     e.preventDefault(); e.stopPropagation();
@@ -156,66 +108,68 @@ export default function TiereContent({ serverListings }: { serverListings: Anima
   };
 
   const filtered = useMemo(() => {
-    return serverListings.filter((a) => {
+    const rows = serverListings.filter((a) => {
+      if (!matchesPlace(a, "country", place.country) || !matchesPlace(a, "region", place.region) || !matchesPlace(a, "city", place.city)) return false;
       if (search && !a.title.toLowerCase().includes(search.toLowerCase()) &&
           !a.category.toLowerCase().includes(search.toLowerCase())) return false;
-      if (species !== "Alle" && animalSpecies(a.category)?.id !== animalSpecies(species)?.id) return false;
+      if (species !== "Alle" && (animalSpecies(a.category)?.id ?? a.category) !== (animalSpecies(species)?.id ?? species)) return false;
       if (training !== "Alle" && a.trainingLevel !== training) return false;
       if (deliveryOnly && !a.delivery) return false;
       return true;
     });
-  }, [serverListings, search, species, training, deliveryOnly]);
+    if (sort === "name") rows.sort((a,b) => a.title.localeCompare(b.title,locale));
+    return prioritizeGeographically(rows, geography.preferred);
+  }, [serverListings, search, species, training, deliveryOnly, place, sort, locale, geography.preferred]);
 
-  const activeFilters = [
-    species !== "Alle" && species,
-    training !== "Alle" && training,
-    deliveryOnly && "Lieferung",
-  ].filter(Boolean) as string[];
+  const [pageState, setPageState] = useViewState("animals.page", { key: "", count: 24 });
+  const filterKey = JSON.stringify([search, place, sort, species, training, deliveryOnly, geography.preferred]);
+  const visibleCount = pageState.key === filterKey ? pageState.count : 24;
+  const visible = filtered.slice(0, visibleCount);
+  const visibleIds = visible.map(row => row.id).join(",");
 
-  return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-      {/* Search + filters */}
-      <div className="flex flex-col sm:flex-row gap-3 mb-6">
-        <div className="relative flex-1">
-          <Search size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-text-muted" />
-          <input
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            placeholder={uiText("Ui.text_daec3cc1690074")}
-            className="w-full pl-9 pr-4 py-2.5 bg-bg-elevated border border-border rounded-xl text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:border-gold transition-colors"
-          />
-        </div>
+  useEffect(() => {
+    if (!visibleIds) return;
+    const abort = new AbortController();
+    const ids = visibleIds.split(",");
+    const batches = Array.from({ length: Math.ceil(ids.length / 24) }, (_, index) => ids.slice(index * 24, index * 24 + 24).join(","));
+    Promise.all(batches.map(ids => fetch(`/api/listing-ratings?ids=${ids}`, { signal: abort.signal }).then(r => r.ok ? r.json() : Promise.reject())))
+      .then(rows => {
+        if (abort.signal.aborted) return;
+        setLiveRatings(Object.assign({}, ...rows.map(row => row.ratings ?? {})));
+        setMyRatings(Object.assign({}, ...rows.map(row => row.myRatings ?? {})));
+        setEligible(new Set(rows.flatMap(row => row.eligible ?? [])));
+      }).catch(() => {});
+    return () => abort.abort();
+  }, [visibleIds, isSignedIn]);
 
-        <FilterDropdown value={species} options={SPECIES} onChange={setSpecies} />
-        <FilterDropdown value={training} options={TRAINING} onChange={setTraining} />
+  useEffect(() => {
+    if (!isSignedIn || !visibleIds) return;
+    const abort = new AbortController();
+    const ids = visibleIds.split(",");
+    const batches = Array.from({ length: Math.ceil(ids.length / 24) }, (_, index) => ids.slice(index * 24, index * 24 + 24).join(","));
+    Promise.all(batches.map(ids => fetch(`/api/favorites?ids=${ids}`, { signal: abort.signal }).then(r => r.ok ? r.json() : Promise.reject())))
+      .then(rows => { if (!abort.signal.aborted) setFavorites(new Set(rows.flatMap(row => row.favorited ?? []))); }).catch(() => {});
+    return () => abort.abort();
+  }, [visibleIds, isSignedIn]);
 
-        <button onClick={() => setDeliveryOnly((v) => !v)}
-          className={`flex items-center gap-2 px-3 py-2.5 rounded-xl text-sm border transition-colors ${
-            deliveryOnly ? "bg-gold/10 border-gold/30 text-gold" : "bg-bg-elevated border-border text-text-muted hover:text-text-secondary"
-          }`}>{uiText.rich("Ui.text_b1074837744a9d", { part1: () => (<Truck size={14} />) })}</button>
-      </div>
-
-      {/* Active filters */}
-      {activeFilters.length > 0 && (
-        <div className="flex flex-wrap gap-2 mb-5">
-          {activeFilters.map((f) => (
-            <span key={f} className="flex items-center gap-1.5 px-2.5 py-1 bg-gold/10 border border-gold/20 text-gold text-xs rounded-full">
-              {f}
-              <button onClick={() => {
-                if (f === species) setSpecies("Alle");
-                if (f === training) setTraining("Alle");
-                if (f === "Lieferung") setDeliveryOnly(false);
-              }}><X size={11} /></button>
-            </span>
-          ))}
-          <button onClick={() => { setSpecies("Alle"); setTraining("Alle"); setDeliveryOnly(false); setSearch(""); }}
-            className="text-xs text-text-muted hover:text-gold transition-colors px-2">{uiText("Ui.text_0b6db8b5a95799")}</button>
-        </div>
-      )}
-
-      {/* Count */}
-      <p className="text-xs text-text-muted mb-6">{uiText.rich("Ui.text_7d362f03fc64a9", { value1: () => (filtered.length), value2: () => (filtered.length === 1 ? uiText("Ui.text_cb9e8664edea8c") : uiText("Ui.text_d9609c949e931a")) })}</p>
-
+  const reset = () => { setSearch(""); setSpecies("Alle"); setTraining("Alle"); setDeliveryOnly(false); setPlace(EMPTY_PLACE_FILTERS); };
+  const chips = [
+    ...(species !== "Alle" ? [{ id: "species", label: speciesLabel(species), onRemove: () => setSpecies("Alle") }] : []),
+    ...(training !== "Alle" ? [{ id: "training", label: trainingLabel(training), onRemove: () => setTraining("Alle") }] : []),
+    ...(deliveryOnly ? [{ id: "delivery", label: animals("delivery"), onRemove: () => setDeliveryOnly(false) }] : []),
+    ...(["country", "region", "city"] as const).flatMap(kind => place[kind] ? [{ id: kind, label: placeOptions(serverListings, kind, locale).find(option => option.value === place[kind])?.label ?? place[kind], onRemove: () => setPlace(kind === "country" ? EMPTY_PLACE_FILTERS : kind === "region" ? { ...place, region: "", city: "" } : { ...place, city: "" }) }] : []),
+  ];
+  return <div className="mobile-bottom-nav-clear">
+    <MobileBrowseControls preference={<BrowseGeography geography={geography} />} query={search} onQueryChange={setSearch} searchPlaceholder={uiText("Ui.text_daec3cc1690074")}
+      sortValue={sort} onSortChange={value => { geography.setEnabled(false); setSort(value); }} sortOptions={[{ value: "newest", label: geography.preferred ? uiText("BrowseGeography.recommended") : uiText("jobs.sortNewest") }, { value: "name", label: uiText("Ui.text_7ed96629073e83") }]}
+      categoryLabel={animals("speciesField")} allCategoryLabel={animals("allSpecies")} categoryValue={species === "Alle" ? "" : species} onCategoryChange={value => setSpecies(value || "Alle")}
+      categories={[...new Set(serverListings.map(row => animalSpecies(row.category)?.id ?? row.category))].map(value => ({ value, label: speciesLabel(value) }))}
+      resultSummary={uiText("BrowseFilters.results", { count: filtered.length })} filterCount={chips.length} chips={chips} onReset={reset} resetLabel={uiText("projects.resetFilters")} showResultsLabel={uiText("Ui.text_52ca04e867ebdc", { value1: String(filtered.length) })}>
+      <PlaceFilters rows={serverListings} value={place} onChange={setPlace} />
+      <MobileFilterField label={animals("training")}><MobileFilterSelect value={training === "Alle" ? "" : training} onChange={value => setTraining(value || "Alle")} placeholder={uiText("common.all")} options={[...new Set(serverListings.flatMap(row => row.trainingLevel ? [row.trainingLevel] : []))].map(value => ({ value, label: trainingLabel(value) }))} /></MobileFilterField>
+      {(deliveryOnly || serverListings.some(row => row.delivery)) && <label className="flex min-h-11 items-center gap-3 text-sm"><input type="checkbox" checked={deliveryOnly} onChange={event => setDeliveryOnly(event.target.checked)} />{animals("delivery")}</label>}
+    </MobileBrowseControls>
+    <div className="site-container py-6">
       {filtered.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-20 px-6 text-center">
           <div className="w-16 h-16 bg-bg-secondary border border-border rounded-2xl flex items-center justify-center mb-5">
@@ -229,7 +183,7 @@ export default function TiereContent({ serverListings }: { serverListings: Anima
         </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
-          {filtered.map((animal) => (
+          {visible.map((animal) => (
             <Link key={animal.id} href={`/tiere/${animal.id}`}
               className="group bg-bg-secondary border border-border rounded-2xl overflow-hidden hover:border-gold/40 transition-all hover:shadow-lg hover:shadow-gold/5">
               <div className="relative h-48 overflow-hidden bg-bg-elevated">
@@ -264,7 +218,7 @@ export default function TiereContent({ serverListings }: { serverListings: Anima
                   <span className="px-2 py-0.5 bg-bg-elevated border border-border text-text-muted text-[10px] rounded">{animalSpecies(animal.category) ? animals(`species.${animalSpecies(animal.category)!.id}`) : animal.category}</span>
                   {animal.trainingLevel && (
                     <span className={`px-2 py-0.5 border text-[10px] rounded font-medium ${TRAINING_COLORS[animal.trainingLevel] ?? TRAINING_COLORS["Grundgehorsam"]}`}>
-                      {animal.trainingLevel}
+                      {trainingLabel(animal.trainingLevel)}
                     </span>
                   )}
                 </div>
@@ -322,6 +276,7 @@ export default function TiereContent({ serverListings }: { serverListings: Anima
           ))}
         </div>
       )}
-    </div>
-  );
+      {visibleCount < filtered.length && <div className="mt-7 flex justify-center"><button type="button" className="min-h-11 rounded-xl border border-border px-5 py-3 text-sm text-text-secondary hover:border-gold" onClick={() => setPageState({ key: filterKey, count: visibleCount + 24 })}>{uiText("creators.loadMore", { count: filtered.length - visibleCount })}</button></div>}
+    </div></div>
+  ;
 }

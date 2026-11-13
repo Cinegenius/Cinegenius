@@ -1,14 +1,12 @@
-import { CountrySelect } from "@/components/BrowseGeography";
-import { ownBrowsePlace } from "@/lib/browse-geography-server";
-import { countryCode, countryName } from "@/lib/places/core";
-import Link from "next/link";
-import Form from "next/form";
-import { Search } from "lucide-react";
-import { getTranslations, getLocale } from "next-intl/server";
-import PageHeader from "@/components/PageHeader";
 import Image from "@/components/MediaImage";
-import { approvedEntries } from "@/lib/organization-data";
-import { ORGANIZATION_ENTRY_TYPES, ORGANIZATION_TOPICS, isOrganizationEntryType, isOrganizationTopic } from "@/lib/organization-taxonomy";
+import PageHeader from "@/components/PageHeader";
+import { ownBrowsePlace } from "@/lib/browse-geography-server";
+import { approvedEntries,newsFacetRows } from "@/lib/organization-data";
+import { isOrganizationEntryType,isOrganizationTopic } from "@/lib/organization-taxonomy";
+import { countryCode,countryName } from "@/lib/places/core";
+import { getLocale,getTranslations } from "next-intl/server";
+import Link from "next/link";
+import NewsBrowseControls from "./NewsBrowseControls";
 
 export const dynamic = "force-dynamic";
 
@@ -25,7 +23,7 @@ export default async function NewsPage({ searchParams }: { searchParams: Promise
   const geoText = await getTranslations("BrowseGeography");
   const filters = { country: countryCode(params.country ?? ""), geo: params.geo === "off" ? "off" : "", type: isOrganizationEntryType(params.type) ? params.type : undefined,
     topic: isOrganizationTopic(params.topic) ? params.topic : undefined, q: params.q?.trim().slice(0, 120) || "" };
-  const { entries: filtered, hasMore, page } = await approvedEntries({ ...filters, preferred, page: Number(params.page) || 1 });
+  const [{ entries: filtered, hasMore, page, count }, facets] = await Promise.all([approvedEntries({ ...filters, preferred, page: Number(params.page) || 1 }), newsFacetRows()]);
   const href = (change: { type?: string; topic?: string; page?: number; country?: string; geo?: string } = {}) => {
     const values = { ...filters, ...change };
     const query = new URLSearchParams();
@@ -35,33 +33,11 @@ export default async function NewsPage({ searchParams }: { searchParams: Promise
 
   return <main className="min-h-screen bg-bg-primary">
     <PageHeader badge={t("eyebrow")} title={t("newsTitle")} description={t("newsDescription")} />
+    <NewsBrowseControls key={`${filters.q}:${filters.type}:${filters.topic}:${filters.country}:${filters.geo}`} filters={filters} facets={facets} count={count} preference={<>
+      {preferred && <p className="browse-preference  flex flex-wrap items-center gap-x-4 text-xs text-text-secondary">{geoText("preferred", { country: countryName(preferred.country, locale) })}<Link className="inline-flex min-h-11 items-center underline" href={href({ geo: "off", page: 1 })}>{geoText("everywhere")}</Link></p>}
+      {filters.geo === "off" && <Link className=" inline-flex min-h-11 items-center text-xs text-text-secondary underline" href={href({ geo: "", page: 1 })}>{geoText("useProfile")}</Link>}
+    </>} />
     <section className="site-container py-5 pb-28 sm:py-7 sm:pb-28 xl:pb-10">
-      <Form action="/news" scroll={false} className="browse-toolbar mb-5 grid grid-cols-2 items-end gap-3 pb-5 xl:grid-cols-[minmax(0,2fr)_repeat(3,minmax(0,1fr))_auto]" key={`${filters.q}:${filters.type}:${filters.topic}:${filters.country}:${filters.geo}`}>
-        <div className="col-span-2 min-w-0 xl:col-span-1">
-          <label htmlFor="news-search" className="sr-only">{t("searchLabel")}</label>
-          <div className="relative">
-            <Search size={18} aria-hidden="true" className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-text-muted" />
-            <input id="news-search" type="search" name="q" defaultValue={filters.q} placeholder={t("searchLabel")} maxLength={120} className="min-h-11 w-full min-w-0 rounded-xl border border-border bg-bg-secondary py-2.5 pl-10 pr-3 text-sm text-text-primary" />
-          </div>
-        </div>
-        <label htmlFor="news-type" className="min-w-0 text-xs text-text-secondary">{t("type")}
-          <select id="news-type" name="type" defaultValue={filters.type || ""} className="mt-1.5 min-h-11 w-full min-w-0 rounded-xl border border-border bg-bg-secondary px-3 py-2 text-sm text-text-primary">
-            <option value="">{t("all")}</option>
-            {ORGANIZATION_ENTRY_TYPES.map(type => <option key={type} value={type}>{t(`entryType.${type}`)}</option>)}
-          </select>
-        </label>
-        <label htmlFor="news-topic" className="min-w-0 text-xs text-text-secondary">{t("topicLabel")}
-          <select id="news-topic" name="topic" defaultValue={filters.topic || ""} className="mt-1.5 min-h-11 w-full min-w-0 rounded-xl border border-border bg-bg-secondary px-3 py-2 text-sm text-text-primary">
-            <option value="">{t("all")}</option>
-            {ORGANIZATION_TOPICS.map(topic => <option key={topic} value={topic}>{t(`topic.${topic}`)}</option>)}
-          </select>
-        </label>
-        <div className="col-span-2 min-w-0 xl:col-span-1"><CountrySelect name="country" defaultValue={filters.country} /></div>
-        {filters.geo && <input type="hidden" name="geo" value={filters.geo} />}
-        <button type="submit" className="col-span-2 inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-gold px-5 py-2.5 text-sm font-semibold text-bg-primary xl:col-span-1"><Search size={16} aria-hidden="true" />{t("search")}</button>
-      </Form>
-      {preferred && <p className="mb-3 flex flex-wrap items-center gap-x-4 text-xs text-text-secondary">{geoText("preferred", { country: countryName(preferred.country, locale) })}<Link className="inline-flex min-h-11 items-center underline" href={href({ geo: "off", page: 1 })}>{geoText("everywhere")}</Link></p>}
-      {filters.geo === "off" && <Link className="mb-3 inline-flex min-h-11 items-center text-xs text-text-secondary underline" href={href({ geo: "", page: 1 })}>{geoText("useProfile")}</Link>}
       <div className="mb-5 flex flex-wrap items-center justify-between gap-x-5 gap-y-1 text-sm">
         <Link href="/organizations" className="inline-flex min-h-11 items-center text-gold">{discoveryT("allOrganizations")} →</Link>
         <Link href="/organization-dashboard" className="inline-flex min-h-11 items-center text-text-secondary hover:text-gold">{t("manageOrganization")} →</Link>

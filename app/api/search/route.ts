@@ -1,22 +1,35 @@
-import {placeSearchFilter,placeReadFields} from "@/lib/places/catalog";
-import {placeDisplay} from "@/lib/places/core";
-import { getTranslations, getLocale } from "next-intl/server";
-import { marketplaceSearchCategories } from "@/lib/marketplaceCategories";
-import { animalProfileSearchValues, animalCompanySearchFilter } from "@/lib/animal-taxonomy";
-import { listingPriceLabel } from "@/lib/listing-price";
-import { db } from "@/lib/db";
-import { getPrivateProfileIds } from "@/lib/trust";
-import { NextRequest, NextResponse } from "next/server";
+import { animalCompanySearchFilter,animalProfileSearchValues } from "@/lib/animal-taxonomy";
 import {
-  CATERING_COMPANY_CATEGORY,
-  getCateringProfileSearchValues,
-  isCateringSearchQuery,
+CATERING_COMPANY_CATEGORY,
+getCateringProfileSearchValues,
+isCateringSearchQuery,
 } from "@/lib/catering-taxonomy";
+import { db } from "@/lib/db";
+import { listingPriceLabel } from "@/lib/listing-price";
+import { marketplaceSearchCategories } from "@/lib/marketplaceCategories";
+import { placeReadFields,placeSearchFilter } from "@/lib/places/catalog";
+import { placeDisplay } from "@/lib/places/core";
 import {
-  SAFETY_MEDICAL_COMPANY_CATEGORY_ID,
-  safetyMedicalProfileValues,
-  safetyMedicalSearchTerms,
+SAFETY_MEDICAL_COMPANY_CATEGORY_ID,
+safetyMedicalProfileValues,
+safetyMedicalSearchTerms,
 } from "@/lib/safety-medical-taxonomy";
+import { getPrivateProfileIds } from "@/lib/trust";
+import { getLocale,getTranslations } from "next-intl/server";
+import { NextRequest,NextResponse } from "next/server";
+
+async function publicProfileMatches(read: (from: number, to: number) => PromiseLike<{ data: Record<string, unknown>[] | null; error: unknown }>) {
+  const visible: Record<string, unknown>[] = [];
+  for (let from = 0; visible.length < 24; from += 100) {
+    const result = await read(from, from + 99);
+    if (result.error) throw new Error("search_unavailable");
+    const rows = result.data ?? [];
+    const privateIds = await getPrivateProfileIds(rows.map(row => String(row.user_id)));
+    visible.push(...rows.filter(row => row.display_name && !privateIds.has(String(row.user_id))));
+    if (rows.length < 100) break;
+  }
+  return { data: visible.slice(0, 24) };
+}
 
 export async function GET(req: NextRequest) {
   const raw  = req.nextUrl.searchParams.get("q")?.trim() ?? "";
@@ -31,9 +44,9 @@ export async function GET(req: NextRequest) {
   const geoFilter=placeSearchFilter(raw);
   const categoryCandidates=marketplaceSearchCategories(q,catalog).map(value=>`"${value.replace(/["\\]/g,'')}"`).join(",");
 
-  const wantListings = type === "all" || ["location", "vehicle", "prop", "job", "creator", "animal"].includes(type);
-  const wantProfiles = type === "all" || type === "profile";
-  const wantCompanies = type === "all" || type === "company";
+  const wantListings = true;
+  const wantProfiles = true;
+  const wantCompanies = true;
   const cateringProfileValues = wantProfiles ? getCateringProfileSearchValues(raw) : [];
   const animalValues = wantProfiles ? animalProfileSearchValues(raw) : [];
   const searchCateringCompanies = wantCompanies && isCateringSearchQuery(raw);
@@ -42,26 +55,21 @@ export async function GET(req: NextRequest) {
 
   const [listingsRes, profilesRes, companiesRes, cateringProfileResults, cateringCompaniesRes, animalProfilesRes, animalRoleProfilesRes, animalCompaniesRes, safetyMedicalProfilesRes, safetyMedicalRoleProfilesRes, safetyMedicalCompaniesRes] = await Promise.all([
     wantListings
-      ? (() => {
-          let q2 = db
-            .from("listings")
-            .select("place_country_code,place_region_id,place_city_id,place_city_name,place_region_name,place_status,id, title, city, type, category, price, image_url, price_negotiable:metadata->price_negotiable, price_on_request:metadata->price_on_request, rental_type:metadata->>rental_type, marketplace:metadata->marketplace")
-            .eq("published", true)
-            .or(`title.ilike.${like},city.ilike.${like},category.ilike.${like},description.ilike.${like}${categoryCandidates?`,and(type.in.(prop,vehicle),category.in.(${categoryCandidates}))`:""}${geoFilter?`,${geoFilter}`:""}`)
-            .order("created_at", { ascending: false });
-          if (type !== "all") q2 = q2.eq("type", type);
-          return q2.limit(type === "all" ? 12 : 24);
-        })()
+      ? Promise.all(["location", "vehicle", "prop", "job", "creator", "animal"].map(kind => db.from("listings")
+          .select("place_country_code,place_region_id,place_city_id,place_city_name,place_region_name,place_status,id,title,city,type,category,price,image_url,price_negotiable:metadata->price_negotiable,price_on_request:metadata->price_on_request,rental_type:metadata->>rental_type,marketplace:metadata->marketplace")
+          .eq("published", true).eq("type", kind)
+          .or(`title.ilike.${like},city.ilike.${like},category.ilike.${like},description.ilike.${like}${categoryCandidates?`,and(type.in.(prop,vehicle),category.in.(${categoryCandidates}))`:""}${geoFilter?`,${geoFilter}`:""}`)
+          .order("created_at", { ascending: false }).order("id").limit(type === kind || (type === "profile" && kind === "creator") ? 24 : 6)))
+        .then(results => { if (results.some(result => result.error)) throw new Error("search_unavailable"); return { data: results.flatMap(result => result.data ?? []) }; })
       : Promise.resolve({ data: [] }),
 
     wantProfiles
-      ? db
+      ? publicProfileMatches((from, to) => db
           .from("profiles")
           .select("place_country_code,place_region_id,place_city_id,place_city_name,place_region_name,place_status,user_id, display_name, location, role, positions, avatar_url, available")
           .or(`display_name.ilike.${like},role.ilike.${like},location.ilike.${like},bio.ilike.${like}${geoFilter?`,${geoFilter}`:""}`)
           .not("display_name", "is", null)
-          .neq("display_name", "")
-          .limit(type === "all" ? 8 : 24)
+          .neq("display_name", "").order("user_id").range(from, to))
       : Promise.resolve({ data: [] }),
 
     wantCompanies
@@ -74,13 +82,12 @@ export async function GET(req: NextRequest) {
       : Promise.resolve({ data: [] }),
 
     cateringProfileValues.length
-      ? Promise.all(cateringProfileValues.map((position) => db
+      ? Promise.all(cateringProfileValues.map((position) => publicProfileMatches((from, to) => db
           .from("profiles")
           .select("place_country_code,place_region_id,place_city_id,place_city_name,place_region_name,place_status,user_id, display_name, location, role, positions, avatar_url, available")
           .contains("positions", [position])
           .not("display_name", "is", null)
-          .neq("display_name", "")
-          .limit(type === "all" ? 8 : 24)))
+          .neq("display_name", "").order("user_id").range(from, to))))
       : Promise.resolve([]),
 
     searchCateringCompanies
@@ -90,13 +97,17 @@ export async function GET(req: NextRequest) {
           .contains("categories", [CATERING_COMPANY_CATEGORY.id])
           .limit(type === "all" ? 8 : 24)
       : Promise.resolve({ data: [] }),
-    animalValues.length ? db.from("profiles").select("place_country_code,place_region_id,place_city_id,place_city_name,place_region_name,place_status,user_id, display_name, location, role, positions, avatar_url, available").overlaps("positions", animalValues).limit(24) : Promise.resolve({data: []}),
-    animalValues.length ? db.from("profiles").select("place_country_code,place_region_id,place_city_id,place_city_name,place_region_name,place_status,user_id, display_name, location, role, positions, avatar_url, available").in("role", animalValues).limit(24) : Promise.resolve({data: []}),
+    animalValues.length ? publicProfileMatches((from, to) => db.from("profiles").select("place_country_code,place_region_id,place_city_id,place_city_name,place_region_name,place_status,user_id, display_name, location, role, positions, avatar_url, available").overlaps("positions", animalValues).order("user_id").range(from, to)) : Promise.resolve({data: []}),
+    animalValues.length ? publicProfileMatches((from, to) => db.from("profiles").select("place_country_code,place_region_id,place_city_id,place_city_name,place_region_name,place_status,user_id, display_name, location, role, positions, avatar_url, available").in("role", animalValues).order("user_id").range(from, to)) : Promise.resolve({data: []}),
     wantCompanies && animalCompanySearchFilter(raw) ? db.from("companies").select("place_country_code,place_region_id,place_city_id,place_city_name,place_region_name,place_status,id, slug, name, city, logo_url, categories").eq("published",true).or(animalCompanySearchFilter(raw)).limit(24) : Promise.resolve({data: []}),
-    safetyMedicalValues.length ? db.from("profiles").select("place_country_code,place_region_id,place_city_id,place_city_name,place_region_name,place_status,user_id, display_name, location, role, positions, avatar_url, available").overlaps("positions", safetyMedicalValues).limit(24) : Promise.resolve({data: []}),
-    safetyMedicalValues.length ? db.from("profiles").select("place_country_code,place_region_id,place_city_id,place_city_name,place_region_name,place_status,user_id, display_name, location, role, positions, avatar_url, available").in("role", safetyMedicalValues).limit(24) : Promise.resolve({data: []}),
+    safetyMedicalValues.length ? publicProfileMatches((from, to) => db.from("profiles").select("place_country_code,place_region_id,place_city_id,place_city_name,place_region_name,place_status,user_id, display_name, location, role, positions, avatar_url, available").overlaps("positions", safetyMedicalValues).order("user_id").range(from, to)) : Promise.resolve({data: []}),
+    safetyMedicalValues.length ? publicProfileMatches((from, to) => db.from("profiles").select("place_country_code,place_region_id,place_city_id,place_city_name,place_region_name,place_status,user_id, display_name, location, role, positions, avatar_url, available").in("role", safetyMedicalValues).order("user_id").range(from, to)) : Promise.resolve({data: []}),
     searchSafetyMedicalCompanies ? db.from("companies").select("place_country_code,place_region_id,place_city_id,place_city_name,place_region_name,place_status,id, slug, name, city, logo_url, categories").eq("published", true).contains("categories", [SAFETY_MEDICAL_COMPANY_CATEGORY_ID]).limit(24) : Promise.resolve({data: []}),
   ]);
+
+  for (const result of [companiesRes, cateringCompaniesRes, animalCompaniesRes, safetyMedicalCompaniesRes]) {
+    if ("error" in result && result.error) throw new Error("search_unavailable");
+  }
 
   const listings = (listingsRes.data ?? []).map((l: Record<string, unknown>) => ({
     id: l.id as string,
@@ -144,5 +155,8 @@ export async function GET(req: NextRequest) {
     available: null as boolean | null,
   }));
 
-  return NextResponse.json({ results: [...listings, ...profiles, ...companies] });
+  const allResults = [...listings, ...profiles, ...companies];
+  const availableTypes = [...new Set(allResults.map(row => row.type === "creator" ? "profile" : row.type))];
+  const results = type === "all" ? allResults : allResults.filter(row => row.type === type || (type === "profile" && row.type === "creator"));
+  return NextResponse.json({ results, availableTypes }, { headers: { "Cache-Control": "private, no-store" } });
 }

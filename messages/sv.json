@@ -8064,5 +8064,12 @@
     "ZA": "Sydafrika",
     "ZM": "Zambia",
     "ZW": "Zimbabwe"
+  },
+  "BrowseFilters": {
+    "trainingPro": "Filmproffs",
+    "trainingExperienced": "Erfaren",
+    "trainingBasic": "Grundläggande lydnad",
+    "trainingNone": "Otränad",
+    "results": "{count} resultat"
   }
 }

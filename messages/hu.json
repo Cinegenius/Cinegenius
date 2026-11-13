@@ -8064,5 +8064,12 @@
     "ZA": "Dél-afrikai Köztársaság",
     "ZM": "Zambia",
     "ZW": "Zimbabwe"
+  },
+  "BrowseFilters": {
+    "trainingPro": "Filmes profi",
+    "trainingExperienced": "Tapasztalt",
+    "trainingBasic": "Alapengedelmesség",
+    "trainingNone": "Képzetlen",
+    "results": "{count} találat"
   }
 }

@@ -1,21 +1,21 @@
 "use client";
-import BrowseGeography from "@/components/BrowseGeography";
-import { useBrowseGeography } from "@/lib/use-browse-geography";
+import BrowseGeography,{ CountrySelect } from "@/components/BrowseGeography";
 import { prioritizeGeographically } from "@/lib/browse-geography";
+import { useBrowseGeography } from "@/lib/use-browse-geography";
 
 
-import { useMemo } from "react";
+import MobileBrowseControls,{ MobileFilterField,MobileFilterSelect,type BrowseChip } from "@/components/MobileBrowseControls";
+import ProjectBrowseResults from "@/components/ProjectBrowseResults";
+import { matchesPlace,placeOptions } from "@/lib/places/core";
+import { PROJECT_CATEGORIES,projectCategoryForType,type ProjectCategoryId } from "@/lib/project-category-filter";
+import { normalizedCatalogueSearch,projectTypeLabel,projectTypeOptions } from "@/lib/project-type-labels";
+import { sortProjects,type BrowseProject,type ProjectSort } from "@/lib/projects-browse";
+import { useViewState } from "@/lib/use-view-state";
+import { Clapperboard,LayoutGrid,LayoutList } from "lucide-react";
+import { useLocale,useTranslations } from "next-intl";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useLocale, useTranslations } from "next-intl";
-import { Clapperboard, LayoutGrid, LayoutList, Search, X } from "lucide-react";
-import ProjectBrowseResults from "@/components/ProjectBrowseResults";
-import MobileBrowseControls, { MobileFilterField, MobileFilterSelect, type BrowseChip } from "@/components/MobileBrowseControls";
-import { useViewState } from "@/lib/use-view-state";
-import { PROJECT_CATEGORIES, projectCategoryForType, type ProjectCategoryId } from "@/lib/project-category-filter";
-import { normalizedCatalogueSearch, projectTypeLabel, projectTypeOptions } from "@/lib/project-type-labels";
-import { matchesPlace } from "@/lib/places/core";
-import { sortProjects, type BrowseProject, type ProjectSort } from "@/lib/projects-browse";
+import { useMemo } from "react";
 
 export default function ProjectsContent({ projects, category = null }: { projects: BrowseProject[]; category?: ProjectCategoryId | null }) {
   const t = useTranslations("projects");
@@ -30,7 +30,7 @@ export default function ProjectsContent({ projects, category = null }: { project
   const [country, setCountry] = useViewState("projects.country", "");
   const geography = useBrowseGeography(sort === "year_desc" && !country);
   const [view, setView] = useViewState<"list" | "grid">("projects.view", "list");
-  const categories = PROJECT_CATEGORIES.map(item => ({ value: item.id, label: t(item.labelKey) }));
+  const categories = PROJECT_CATEGORIES.filter(item => projects.some(project => projectCategoryForType(project.type) === item.id)).map(item => ({ value: item.id, label: t(item.labelKey) }));
   const categoryProjects = useMemo(() => category ? projects.filter(project => projectCategoryForType(project.type) === category) : projects, [projects, category]);
   const types = projectTypeOptions(categoryProjects.flatMap(project => project.type ? [project.type] : []), ui, locale);
   const years = [...new Set(categoryProjects.flatMap(project => project.year === null ? [] : [project.year]))].sort((a, b) => b - a).map(value => ({ value: String(value), label: String(value) }));
@@ -52,9 +52,10 @@ export default function ProjectsContent({ projects, category = null }: { project
       && (!directorFilter || project.director === directorFilter)), sort, locale), geography.preferred);
   }, [categoryProjects, query, typeFilter, yearFilter, directorFilter, sort, locale, ui, country, geography.preferred]);
 
-  const changeCategory = (value: string) => router.push(value ? `/projects/${value}` : "/projects", { scroll: false });
-  const reset = () => { setQuery(""); setTypeFilter(""); setYearFilter(""); setDirectorFilter(""); setCountry(""); };
+  const changeCategory = (value: string) => { setTypeFilter(""); setYearFilter(""); setDirectorFilter(""); router.push(value ? `/projects/${value}` : "/projects/alle", { scroll: false }); };
+  const reset = () => { setQuery(""); setTypeFilter(""); setYearFilter(""); setDirectorFilter(""); setCountry(""); if (category) router.push("/projects/alle", { scroll: false }); };
   const chips: BrowseChip[] = [
+    ...(category ? [{ id: "category", label: categories.find(item => item.value === category)?.label ?? category, onRemove: () => changeCategory("") }] : []),
     ...(country ? [{ id: "country", label: (ui.has(`CountryNames.${country}`) ? ui(`CountryNames.${country}`) : country), onRemove: () => setCountry("") }] : []),
     ...(typeFilter ? [{ id: "type", label: projectTypeLabel(typeFilter, ui), onRemove: () => setTypeFilter("") }] : []),
     ...(yearFilter ? [{ id: "year", label: yearFilter, onRemove: () => setYearFilter("") }] : []),
@@ -67,35 +68,17 @@ export default function ProjectsContent({ projects, category = null }: { project
   const fields = [{ label: t("filterType"), value: typeFilter, options: types, onChange: setTypeFilter }, { label: t("filterYear"), value: yearFilter, options: years, onChange: setYearFilter }, { label: t("filterDirector"), value: directorFilter, options: directors, onChange: setDirectorFilter }];
 
   return <div className="mobile-bottom-nav-clear bg-bg-primary">
-    <BrowseGeography country={country} onCountryChange={setCountry} geography={geography} />
-      <MobileBrowseControls query={query} onQueryChange={setQuery} searchPlaceholder={t("searchPlaceholder")}
+      <MobileBrowseControls preference={<BrowseGeography geography={geography} />} query={query} onQueryChange={setQuery} searchPlaceholder={t("searchPlaceholder")}
       sortValue={sort} sortOptions={sortOptions} onSortChange={value => { geography.setEnabled(false); setSort(value as ProjectSort); }}
       categoryLabel={ui("props.categoryBtn")} allCategoryLabel={ui("common.allProjects")} categories={categories} categoryValue={category ?? ""} onCategoryChange={changeCategory}
       resultSummary={t("resultsCount", { count: filtered.length })} viewControls={views} filterCount={chips.length} chips={chips} onReset={reset} resetLabel={t("resetFilters")} showResultsLabel={ui("Ui.text_52ca04e867ebdc", { value1: String(filtered.length) })}>
+      <CountrySelect value={country} onChange={setCountry} codes={placeOptions(categoryProjects, "country", locale).map(option => option.value)} />
       {fields.map(field => <MobileFilterField key={field.label} label={field.label}><MobileFilterSelect value={field.value} onChange={field.onChange} options={field.options} placeholder={ui("common.all")} label={field.label} /></MobileFilterField>)}
     </MobileBrowseControls>
 
     <div className="site-container pb-8 pt-4 sm:pb-12">
-      <div className="browse-toolbar mb-6 hidden space-y-4 p-4 xl:block">
-        <div className="flex items-center gap-3">
-          <label className="flex min-h-12 min-w-0 flex-1 items-center gap-3 rounded-xl border border-border bg-bg-elevated px-3">
-            <Search size={18} className="shrink-0 text-text-muted" aria-hidden="true" />
-            <span className="sr-only">{t("searchPlaceholder")}</span>
-            <input className="min-w-0 flex-1 bg-transparent py-3 text-sm outline-none placeholder:text-text-muted" placeholder={t("searchPlaceholder")} value={query} onChange={event => setQuery(event.target.value)} />
-            {query && <button type="button" className="flex h-11 w-11 shrink-0 items-center justify-center text-text-muted" aria-label={ui("locations.landingClear")} onClick={() => setQuery("")}><X size={18} /></button>}
-          </label>
-          <label className="flex min-h-12 items-center gap-3 rounded-xl border border-border bg-bg-elevated px-3 text-sm">
-            <span className="sr-only">{t("sortLabel")}</span><select className="min-h-11 bg-transparent outline-none" value={sort} onChange={event => { geography.setEnabled(false); setSort(event.target.value as ProjectSort); }}>{sortOptions.map(option => <option key={option.value} value={option.value}>{option.label}</option>)}</select>
-          </label>
-          {views}
-        </div>
-        <div className="grid grid-cols-4 gap-3">
-          <label className="min-w-0 text-xs text-text-muted">{ui("props.categoryBtn")}<select className="mt-1 block min-h-11 w-full rounded-xl border border-border bg-bg-elevated px-3 text-sm text-text-secondary" value={category ?? ""} onChange={event => changeCategory(event.target.value)}><option value="">{ui("common.allProjects")}</option>{categories.map(item => <option key={item.value} value={item.value}>{item.label}</option>)}</select></label>
-          {fields.map(field => <label key={field.label} className="min-w-0 text-xs text-text-muted">{field.label}<select className="mt-1 block min-h-11 w-full rounded-xl border border-border bg-bg-elevated px-3 text-sm text-text-secondary" value={field.value} onChange={event => field.onChange(event.target.value)}><option value="">{ui("common.all")}</option>{field.options.map(option => <option key={option.value} value={option.value}>{option.label}</option>)}</select></label>)}
-        </div>
-        {hasFilters && <button type="button" className="min-h-11 text-sm text-gold hover:underline" onClick={reset}>{t("resetFilters")}</button>}
-      </div>
-      <div className="mb-4 hidden items-center justify-between gap-3 xl:flex"><p className="text-sm text-text-muted tabular-nums" role="status">{t("resultsCount", { count: filtered.length })}</p></div>
+
+
       {filtered.length === 0 ? <div className="browse-card px-5 py-10 text-center">
         <Clapperboard size={30} className="mx-auto mb-3 text-text-muted" aria-hidden="true" />
         <h2 className="text-lg font-semibold">{t("emptyTitle")}</h2>

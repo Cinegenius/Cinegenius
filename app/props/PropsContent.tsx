@@ -1,37 +1,36 @@
 "use client";
+import { marketplaceBrowseDepartments } from "@/lib/browse-facets";
 import BrowseGeography from "@/components/BrowseGeography";
-import { useBrowseGeography } from "@/lib/use-browse-geography";
 import { prioritizeGeographically } from "@/lib/browse-geography";
+import { useBrowseGeography } from "@/lib/use-browse-geography";
 
 
-import FloatingMapToggle from "@/components/FloatingMapToggle";
 import DirectoryMap from "@/components/DirectoryMap";
-import DirectoryViewControls, { type DirectoryView } from "@/components/DirectoryViewControls";
+import DirectoryViewControls,{ type DirectoryView } from "@/components/DirectoryViewControls";
+import FloatingMapToggle from "@/components/FloatingMapToggle";
 import { useDirectoryMap } from "@/lib/use-directory-map";
 
-import PlaceFilters, { EMPTY_PLACE_FILTERS } from "@/components/PlaceFilters";
-import { placeSearchMatches, matchesPlace, placeOptions } from "@/lib/places/core";
+import PlaceFilters,{ EMPTY_PLACE_FILTERS } from "@/components/PlaceFilters";
+import { matchesPlace,placeOptions,placeSearchMatches } from "@/lib/places/core";
 
-import { useViewUrl } from "@/lib/use-view-url";
-import { useViewState } from "@/lib/use-view-state";
-import { marketplaceCategoryLabel } from "@/lib/marketplace-offer";
 import { listingPriceLabel } from "@/lib/listing-price";
+import { marketplaceCategoryLabel } from "@/lib/marketplace-offer";
+import { useViewState } from "@/lib/use-view-state";
+import { useViewUrl } from "@/lib/use-view-url";
 
 
 import MediaImage from "@/components/MediaImage";
 
-import React, { useState, useMemo, useEffect, useRef, Suspense } from "react";
-import { useUser, useAuth } from "@clerk/nextjs";
-import { Heart } from "lucide-react";
-import Link from "next/link";
-import { usePathname, useSearchParams } from "next/navigation";
-import { Search, Package, X, Truck, MapPin, ChevronDown } from "lucide-react";
-import { useTranslations, useLocale } from "next-intl";
 import EmptyState from "@/components/EmptyState";
-import { localizedMarketplaceDepartments, marketplaceMatches, marketplaceSearchCategories, marketplaceSearchTerms } from "@/lib/marketplaceCategories";
-import MarketplaceCategoryNavigation from "@/components/MarketplaceCategoryNavigation";
-import { readMarketplaceBrowseState, marketplaceCategorySelection, marketplaceCardData, MARKETPLACE_PAGE_SIZE, type MarketplaceSort, type MarketplaceOfferFilter } from "@/lib/marketplace-browse";
-import MobileBrowseControls, { MobileFilterField, MobileFilterSelect, type BrowseChip } from "@/components/MobileBrowseControls";
+import MobileBrowseControls,{ MobileFilterField,MobileFilterSelect,type BrowseChip } from "@/components/MobileBrowseControls";
+import { MARKETPLACE_PAGE_SIZE,marketplaceCardData,marketplaceCategorySelection,readMarketplaceBrowseState,type MarketplaceOfferFilter,type MarketplaceSort } from "@/lib/marketplace-browse";
+import { localizedMarketplaceDepartments,marketplaceMatches,marketplaceSearchCategories,marketplaceSearchTerms } from "@/lib/marketplaceCategories";
+import { useAuth,useUser } from "@clerk/nextjs";
+import { Heart,MapPin,Package,Truck } from "lucide-react";
+import { useLocale,useTranslations } from "next-intl";
+import Link from "next/link";
+import { usePathname,useSearchParams } from "next/navigation";
+import React,{ Suspense,useEffect,useMemo,useRef,useState } from "react";
 
 type Prop = {
   [key: string]: unknown;
@@ -148,10 +147,10 @@ function PropCard({ p, list, ratingData, myRating, onRate, canRate, isFavorited,
   );
 }
 
-type PropsContentProps = { serverListings: Prop[]; serverError?: boolean; initialDepartment?: string };
+type PropsContentProps = { serverListings: Prop[]; serverError?: boolean; facetRows: Array<{ category: string; type: string; rentalType: string }>; initialDepartment?: string };
 type RatingState = { owner: string; ratings: Record<string, { avg: number; count: number }>; mine: Record<string, number>; eligible: Set<string> };
 
-function PropsInner({ serverListings, serverError = false, initialDepartment }: PropsContentProps) {
+function PropsInner({ serverListings, serverError = false, facetRows, initialDepartment }: PropsContentProps) {
   const uiText = useTranslations(), locale = useLocale(), t = useTranslations("props");
   const navigation = useTranslations("MarketplaceNavigation"), catalog = useTranslations("MarketplaceCatalog");
   const pathname = usePathname(), searchParams = useSearchParams();
@@ -159,7 +158,7 @@ function PropsInner({ serverListings, serverError = false, initialDepartment }: 
   const resultsRef = useRef<HTMLDivElement>(null);
   const owner = isSignedIn && user?.id ? user.id : "guest";
   const privateVendor = t("vendorPrivate");
-  const departments = useMemo(() => localizedMarketplaceDepartments(catalog), [catalog]);
+  const departments = useMemo(() => marketplaceBrowseDepartments(localizedMarketplaceDepartments(catalog), facetRows), [catalog, facetRows]);
   const initialParameters = new URLSearchParams(searchParams.toString());
   if (!initialParameters.get("dept") && !initialParameters.get("sub") && initialDepartment) initialParameters.set("dept", initialDepartment);
   const initial = readMarketplaceBrowseState(initialParameters);
@@ -390,31 +389,20 @@ function PropsInner({ serverListings, serverError = false, initialDepartment }: 
     ...(activeDepartment ? [{ id: "category", label: activeDepartment.label, onRemove: () => changeCategory(null) }] : []),
     ...(activeSubcategory ? [{ id: "subcategory", label: activeSubcategory.label, onRemove: () => changeCategory(null) }] : []),
     ...(cityText ? [{ id: "city-text", label: `${uiText("Places.city")}: ${cityText}`, onRemove: () => setCityText("") }] : []),
-    ...(["country", "region", "city"] as const).flatMap(kind => placeFilters[kind] ? [{ id: `place-${kind}`, label: placeOptions(serverListings, kind, locale).find(option => option.value === placeFilters[kind])?.label ?? placeFilters[kind], onRemove: () => setPlaceFilters({ ...placeFilters, [kind]: "" }) }] : []),
+    ...(["country", "region", "city"] as const).flatMap(kind => placeFilters[kind] ? [{ id: `place-${kind}`, label: placeOptions(facetRows, kind, locale).find(option => option.value === placeFilters[kind])?.label ?? placeFilters[kind], onRemove: () => updatePlaceFilters(kind === "country" ? EMPTY_PLACE_FILTERS : kind === "region" ? { ...placeFilters, region: "", city: "" } : { ...placeFilters, city: "" }) }] : []),
     ...(rentalTypeFilter !== "alle" ? [{ id: "offer", label: navigation(rentalTypeFilter === "miete" ? "rent" : "buy"), onRemove: () => setOffer("alle") }] : []),
   ];
   const viewControls = <DirectoryViewControls value={viewMode} onChange={setView} />;
   return <div className="min-h-screen mobile-bottom-nav-clear">
     <FloatingMapToggle mapActive={viewMode === "map"} onToggle={() => { setView(viewMode === "map" ? "list" : "map"); requestAnimationFrame(() => resultsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" })); }} />
-    <BrowseGeography hasDesktopCountryFilter country={placeFilters.country} onCountryChange={value => updatePlaceFilters({ country: value, region: "", city: "" })} geography={geography} />
-      <MobileBrowseControls query={query} onQueryChange={setQuery} searchPlaceholder={t("searchPlaceholder")} sortValue={sortKey} sortOptions={sortOptions} onSortChange={value => { geography.setEnabled(false); setSort(value as MarketplaceSort); }} categoryLabel={navigation("category")} allCategoryLabel={navigation("allCategories")} categories={departments.map(row => ({ value: row.id, label: row.label }))} categoryValue={selectedDept ?? ""} onCategoryChange={value => changeCategory(value || null)} categoryPlacement="filters" resultSummary={t("results", { count: resultCount })} viewControls={viewControls} filterCount={chips.length} chips={chips} onReset={clearAll} resetLabel={t("clearAllFilters")} showResultsLabel={t("results", { count: resultCount })}>
+      <MobileBrowseControls preference={<BrowseGeography geography={geography} />} query={query} onQueryChange={setQuery} searchPlaceholder={t("searchPlaceholder")} sortValue={sortKey} sortOptions={sortOptions} onSortChange={value => { geography.setEnabled(false); setSort(value as MarketplaceSort); }} categoryLabel={navigation("category")} allCategoryLabel={navigation("allCategories")} categories={departments.map(row => ({ value: row.id, label: row.label }))} categoryValue={selectedDept ?? ""} onCategoryChange={value => changeCategory(value || null)} categoryPlacement="filters" resultSummary={t("results", { count: resultCount })} viewControls={viewControls} filterCount={chips.length} chips={chips} onReset={clearAll} resetLabel={t("clearAllFilters")} showResultsLabel={t("results", { count: resultCount })}>
+      <PlaceFilters rows={facetRows} value={placeFilters} onChange={updatePlaceFilters} />
       {activeDepartment && <MobileFilterField label={navigation("subcategory")}><MobileFilterSelect value={selectedSub} onChange={value => changeCategory(selectedDept, value)} placeholder={navigation("allInCategory", { category: activeDepartment.label })} options={activeDepartment.groups.map(row => ({ value: row.id, label: row.label }))} /></MobileFilterField>}
-      <PlaceFilters rows={serverListings} value={placeFilters} onChange={updatePlaceFilters} scope="marketplace" />
-      <MobileFilterField label={navigation("offerType")}><MobileFilterSelect value={rentalTypeFilter === "alle" ? "" : rentalTypeFilter} onChange={value => setOffer(value === "miete" || value === "kauf" ? value : "alle")} placeholder={uiText("common.all")} options={[{ value: "miete", label: navigation("rent") }, { value: "kauf", label: navigation("buy") }]} /></MobileFilterField>
+      <MobileFilterField label={navigation("offerType")}><MobileFilterSelect value={rentalTypeFilter === "alle" ? "" : rentalTypeFilter} onChange={value => setOffer(value === "miete" || value === "kauf" ? value : "alle")} placeholder={uiText("common.all")} options={[{ value: "miete", label: navigation("rent") }, { value: "kauf", label: navigation("buy") }].filter(option => facetRows.some(row => row.rentalType === option.value || row.rentalType === "beides"))} /></MobileFilterField>
     </MobileBrowseControls>
-    <div className="hidden xl:block browse-toolbar"><div className="site-container space-y-3 py-3">
-      <div className="flex flex-wrap items-end gap-3">
-        <label className="min-w-0 flex-1"><span className="sr-only">{t("searchPlaceholder")}</span><span className="flex min-h-11 items-center gap-2 rounded-xl border border-border bg-bg-elevated px-3 focus-within:border-gold/50"><Search size={17} aria-hidden="true" className="shrink-0 text-text-muted" /><input type="search" value={query} onChange={event => setQuery(event.target.value)} placeholder={t("searchPlaceholder")} className="min-h-11 w-full min-w-0 bg-transparent text-sm outline-none" />{query && <button type="button" aria-label={uiText("locations.landingClear")} onClick={() => setQuery("")} className="flex min-h-11 min-w-11 items-center justify-center text-text-muted hover:text-text-primary"><X size={16} /></button>}</span></label>
-        <label className="relative flex min-w-0 flex-col gap-1 text-xs text-text-secondary"><span>{navigation("offerType")}</span><select value={rentalTypeFilter} onChange={event => setOffer(event.target.value as MarketplaceOfferFilter)} className="min-h-11 appearance-none rounded-lg border border-border bg-bg-elevated pl-3 pr-9 text-sm"><option value="alle">{uiText("common.all")}</option><option value="miete">{navigation("rent")}</option><option value="kauf">{navigation("buy")}</option></select><ChevronDown size={15} aria-hidden="true" className="pointer-events-none absolute bottom-3.5 right-3 text-text-muted" /></label>
-        <label className="relative flex min-w-0 flex-col gap-1 text-xs text-text-secondary"><span>{t("sortLabel")}</span><select value={sortKey} onChange={event => { geography.setEnabled(false); setSort(event.target.value as MarketplaceSort); }} className="min-h-11 appearance-none rounded-lg border border-border bg-bg-elevated pl-3 pr-9 text-sm">{sortOptions.map(option => <option key={option.value} value={option.value}>{option.label}</option>)}</select><ChevronDown size={15} aria-hidden="true" className="pointer-events-none absolute bottom-3.5 right-3 text-text-muted" /></label>
-        {viewControls}
-      </div>
-      <PlaceFilters rows={serverListings} value={placeFilters} onChange={updatePlaceFilters} scope="marketplace" />
-      {(chips.length > 0 || query) && <div className="flex flex-wrap items-center gap-2">{chips.map(chip => <span key={chip.id} className="inline-flex min-w-0 items-center gap-1 rounded-full border border-border bg-bg-secondary pl-3 text-xs text-text-secondary"><span className="min-w-0 break-words">{chip.label}</span><button type="button" aria-label={uiText("Ui.text_f10fe7a27ce274", { value1: chip.label })} onClick={chip.onRemove} className="flex min-h-11 min-w-11 shrink-0 items-center justify-center"><X size={14} /></button></span>)}<button type="button" onClick={clearAll} className="min-h-11 px-2 text-xs text-text-muted underline hover:text-text-primary">{t("clearAllFilters")}</button></div>}
-    </div></div>
+
     <div ref={resultsRef} className="site-container scroll-mt-24 py-4 sm:py-6">
-      <div className="mb-5"><MarketplaceCategoryNavigation key={`${selectedDept ?? "all"}:${selectedSub}`} department={selectedDept} subcategory={selectedSub} onChange={changeCategory} /></div>
-      <p className="mb-4 hidden text-sm text-text-secondary xl:block">{t("results", { count: resultCount })}</p>
+
       {actionError && <p role="alert" className="mb-4 text-sm text-red-400">{uiText("System.requestFailed")}</p>}
       {failed && <div role="alert" className="mb-4 flex flex-wrap items-center gap-3 rounded-xl border border-border bg-bg-secondary p-4 text-sm text-text-secondary"><span>{navigation("filterError")}</span><button type="button" onClick={() => { setBrowseError(null); setRetry(value => value + 1); }} className="min-h-11 rounded-lg border border-border px-4 font-medium text-gold hover:border-gold">{navigation("retry")}</button></div>}
       {browseLoading && <p role="status" className="mb-4 text-sm text-text-muted">{navigation("loading")}</p>}

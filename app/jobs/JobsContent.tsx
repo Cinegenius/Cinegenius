@@ -1,28 +1,28 @@
 "use client";
 
-import { Suspense, useMemo } from "react";
-import Link from "next/link";
-import { useSearchParams } from "next/navigation";
-import { useLocale, useTranslations } from "next-intl";
-import { Briefcase, Calendar, MapPin, Search, X, ArrowUpRight } from "lucide-react";
+import BrowseGeography from "@/components/BrowseGeography";
+import MobileBrowseControls,{ MobileFilterField,MobileFilterSelect,type BrowseChip } from "@/components/MobileBrowseControls";
 import PageHeader from "@/components/PageHeader";
 import PlaceFilters from "@/components/PlaceFilters";
-import BrowseGeography from "@/components/BrowseGeography";
-import MobileBrowseControls, { MobileFilterField, MobileFilterSelect, type BrowseChip } from "@/components/MobileBrowseControls";
-import { useBrowseGeography } from "@/lib/use-browse-geography";
 import { prioritizeGeographically } from "@/lib/browse-geography";
+import { taxonomyLabel } from "@/lib/departments";
+import { FILM_DEPARTMENTS } from "@/lib/filmRoles";
+import { normalizeGripDepartmentId,normalizeGripRoleId } from "@/lib/gripTaxonomy";
+import { canonicalJobPayType,jobDateLabel,jobFacts,jobPayLabel,jobRateLabel,type BrowseJob as Job } from "@/lib/job-metadata";
+import { jobOccupation } from "@/lib/job-occupation";
+import { matchesPlace,placeDisplay,placeOptions,placeSearchMatches } from "@/lib/places/core";
+import { normalizedCatalogueSearch,projectTypeLabel } from "@/lib/project-type-labels";
+import { useBrowseGeography } from "@/lib/use-browse-geography";
 import { useViewState } from "@/lib/use-view-state";
 import { useViewUrl } from "@/lib/use-view-url";
-import { matchesPlace, placeDisplay, placeOptions, placeSearchMatches } from "@/lib/places/core";
-import { jobFacts, jobRateLabel, jobDateLabel, canonicalJobPayType, jobPayLabel, JOB_PAY_FILTER_VALUES, type BrowseJob as Job } from "@/lib/job-metadata";
-import { jobOccupation } from "@/lib/job-occupation";
-import { projectTypeLabel, normalizedCatalogueSearch } from "@/lib/project-type-labels";
-import { FILM_DEPARTMENTS } from "@/lib/filmRoles";
-import { taxonomyLabel } from "@/lib/departments";
-import { normalizeGripDepartmentId, normalizeGripRoleId } from "@/lib/gripTaxonomy";
+import { ArrowUpRight,Briefcase,Calendar,MapPin } from "lucide-react";
+import { useLocale,useTranslations } from "next-intl";
+import Link from "next/link";
+import { useSearchParams } from "next/navigation";
+import { Suspense,useMemo } from "react";
 
 const PAGE_SIZE = 24;
-const PROJECT_TYPES = ["Spielfilm", "Kurzfilm", "Werbung", "Musikvideo", "TV / Serie", "Dokumentarfilm", "Corporate", "Instagram / Reels", "TikTok", "YouTube", "UGC Content", "Brand Content", "Fashion Shooting", "Produkt-Shooting", "Event-Fotografie", "Hochzeits-Fotografie", "Portrait-Shooting", "Werbe-Fotografie", "Sonstiges"];
+
 
 function JobsInner({ serverJobs }: { serverJobs: Job[] }) {
   const ui = useTranslations(), t = useTranslations("jobs"), copy = useTranslations("JobsRefresh"), locale = useLocale();
@@ -44,10 +44,10 @@ function JobsInner({ serverJobs }: { serverJobs: Job[] }) {
   const geography = useBrowseGeography(sortKey === "newest" && !countryFilter && !regionFilter && !cityFilter && !cityText);
   const allJobs = useMemo(() => serverJobs.map(job => ({ ...job, facts: jobFacts(job), occupation: jobOccupation(job) })), [serverJobs]);
   const selectedDepartment = FILM_DEPARTMENTS.find(row => row.id === selectedDeptId);
-  const departments = FILM_DEPARTMENTS.map(row => ({ value: row.id, label: taxonomyLabel(row.label, ui) })).sort((a, b) => a.label.localeCompare(b.label, locale));
-  const roles = [...new Map((selectedDepartment ? selectedDepartment.roles : FILM_DEPARTMENTS.flatMap(row => row.roles)).map(role => [role.id, { value: role.id, label: taxonomyLabel(role.label, ui) }])).values()];
-  const types = [...new Set([...PROJECT_TYPES, ...allJobs.map(job => job.facts.projectType).filter(Boolean)])].map(value => ({ value, label: projectTypeLabel(value, ui) }));
-  const payTypes = [...new Set<string>([...JOB_PAY_FILTER_VALUES, ...allJobs.map(job => canonicalJobPayType(job.facts.payType)).filter(Boolean)])].map(value => ({ value, label: jobPayLabel(value, ui) }));
+  const departments = FILM_DEPARTMENTS.filter(row => allJobs.some(job => job.occupation?.department === row.id || job.category === row.label)).map(row => ({ value: row.id, label: taxonomyLabel(row.label, ui) })).sort((a, b) => a.label.localeCompare(b.label, locale));
+  const roles = [...new Map((selectedDepartment ? selectedDepartment.roles : FILM_DEPARTMENTS.flatMap(row => row.roles)).map(role => [role.id, { value: role.id, label: taxonomyLabel(role.label, ui) }])).values()].filter(role => allJobs.some(job => job.occupation?.role === role.value));
+  const types = [...new Set(allJobs.map(job => job.facts.projectType).filter(Boolean))].map(value => ({ value, label: projectTypeLabel(value, ui) }));
+  const payTypes = [...new Set<string>(allJobs.map(job => canonicalJobPayType(job.facts.payType)).filter(Boolean))].map(value => ({ value, label: jobPayLabel(value, ui) }));
   const employments = [{ value: "freelance", label: t("filterFreelance") }, { value: "festanstellung", label: t("filterFulltime") }, { value: "praktikum", label: t("filterInternship") }];
   const sorts = [{ value: "newest", label: geography.preferred ? ui("BrowseGeography.recommended") : t("sortNewest") }, { value: "rate", label: t("sortRateDesc") }, { value: "urgent", label: t("sortUrgent") }];
   const updatePlaceFilters = (value: { country: string; region: string; city: string }) => { setCountryFilter(value.country); setRegionFilter(value.region); setCityFilter(value.city); if (value.city) setCityText(""); };
@@ -95,31 +95,23 @@ function JobsInner({ serverJobs }: { serverJobs: Job[] }) {
   const fields = [{ label: copy("role"), value: selectedRoleId ?? "", onChange: (value: string) => setSelectedRoleId(value || null), options: roles },
     { label: t("filterProjectType"), value: activeType, onChange: setActiveType, options: types },
     { label: t("filterPay"), value: payTypeFilter, onChange: setPayTypeFilter, options: payTypes },
-    { label: copy("employment"), value: jobTypeFilter === "alle" ? "" : jobTypeFilter, onChange: (value: string) => setJobTypeFilter(value || "alle"), options: employments }];
+    { label: copy("employment"), value: jobTypeFilter === "alle" ? "" : jobTypeFilter, onChange: (value: string) => setJobTypeFilter(value || "alle"), options: employments.filter(option => allJobs.some(job => job.facts.jobType === option.value)) }];
   const placeFields = <PlaceFilters rows={allJobs} value={{ country: countryFilter, region: regionFilter, city: cityFilter }} onChange={updatePlaceFilters} />;
-  const urgentField = <label className="flex min-h-11 items-center gap-3 text-sm text-text-secondary"><input type="checkbox" className="size-4 accent-gold" checked={urgentOnly} onChange={event => setUrgentOnly(event.target.checked)} />{t("filterUrgentLabel")}</label>;
+  const urgentField = (urgentOnly || allJobs.some(job => job.facts.urgent)) && <label className="flex min-h-11 items-center gap-3 text-sm text-text-secondary"><input type="checkbox" className="size-4 accent-gold" checked={urgentOnly} onChange={event => setUrgentOnly(event.target.checked)} />{t("filterUrgentLabel")}</label>;
   const filterKey = `${url}:${geography.key}`, visibleCount = pagination.filterKey === filterKey ? pagination.visibleCount : PAGE_SIZE;
 
   return <main className="min-h-screen bg-bg-primary mobile-bottom-nav-clear">
     <PageHeader badge={t("heroBadge")} title={t("heroTitle")} titleHighlight={t("heroTitleHighlight")} description={copy("intro")} cta={{ label: t("postJobBtn"), href: "/inserat?group=jobs" }} />
-    <BrowseGeography hasDesktopCountryFilter country={countryFilter} onCountryChange={value => updatePlaceFilters({ country: value, region: "", city: "" })} geography={geography} />
-    <MobileBrowseControls query={query} onQueryChange={setQuery} searchPlaceholder={t("searchPlaceholder")} sortValue={sortKey} sortOptions={sorts} onSortChange={value => { geography.setEnabled(false); setSortKey(value); }}
+    <MobileBrowseControls preference={<BrowseGeography geography={geography} />} query={query} onQueryChange={setQuery} searchPlaceholder={t("searchPlaceholder")} sortValue={sortKey} sortOptions={sorts} onSortChange={value => { geography.setEnabled(false); setSortKey(value); }}
       categoryLabel={t("filterDeptRole")} allCategoryLabel={ui("Ui.text_bc0b501bb3186b")} categories={departments} categoryValue={selectedDeptId ?? ""} onCategoryChange={changeDepartment}
       resultSummary={t("results", { count: filtered.length })} filterCount={chips.length} chips={chips} onReset={clearAll} resetLabel={t("emptyReset")} showResultsLabel={t("results", { count: filtered.length })}>
+      {placeFields}
       {fields.map(field => <MobileFilterField key={field.label} label={field.label}><MobileFilterSelect {...field} placeholder={ui("common.all")} /></MobileFilterField>)}
-      {placeFields}{urgentField}
+      {urgentField}
     </MobileBrowseControls>
     <section className="site-container py-4 sm:py-6">
-      <div className="browse-toolbar mb-6 hidden space-y-4 pb-5 xl:block">
-        <div className="flex items-center gap-3">
-          <label className="flex min-h-12 min-w-0 flex-1 items-center gap-3 rounded-xl border border-border bg-bg-secondary px-3"><Search size={18} aria-hidden="true" className="shrink-0 text-text-muted" /><span className="sr-only">{t("searchPlaceholder")}</span><input type="search" value={query} onChange={event => setQuery(event.target.value)} placeholder={t("searchPlaceholder")} className="min-h-11 min-w-0 flex-1 bg-transparent text-sm outline-none" />{query && <button type="button" onClick={() => setQuery("")} aria-label={t("clearFilter")} className="flex size-11 shrink-0 items-center justify-center"><X size={18} /></button>}</label>
-          <MobileFilterSelect placeholder={t("sortNewest")} label={t("sort")} value={sortKey} options={sorts} onChange={value => { geography.setEnabled(false); setSortKey(value); }} />
-        </div>
-        <div className="grid grid-cols-5 gap-3"><MobileFilterField label={t("filterDeptRole")}><MobileFilterSelect label={t("filterDeptRole")} value={selectedDeptId ?? ""} onChange={changeDepartment} options={departments} placeholder={ui("common.all")} /></MobileFilterField>{fields.map(field => <MobileFilterField key={field.label} label={field.label}><MobileFilterSelect {...field} placeholder={ui("common.all")} /></MobileFilterField>)}</div>
-        <div className="grid grid-cols-[1fr_auto] items-end gap-5">{placeFields}{urgentField}</div>
-        {!!(chips.length || query) && <button className="min-h-11 text-sm text-gold" onClick={clearAll}>{t("emptyReset")}</button>}
-      </div>
-      <p role="status" className="mb-4 hidden text-sm text-text-muted tabular-nums xl:block">{t("results", { count: filtered.length })}</p>
+
+
       {filtered.length === 0 ? <div className="browse-card p-6 text-center sm:p-10"><Briefcase size={28} className="mx-auto mb-3 text-text-muted" aria-hidden="true" /><h2 className="text-lg font-semibold">{allJobs.length ? t("emptyTitleFiltered") : t("emptyTitle")}</h2><p className="mt-2 text-sm text-text-secondary">{allJobs.length ? t("emptyDescFiltered") : t("emptyDesc")}</p><div className="mt-5 flex flex-wrap justify-center gap-3">{(chips.length > 0 || query) && <button className="min-h-11 rounded-xl border border-border px-4 text-sm" onClick={clearAll}>{t("emptyReset")}</button>}<Link className="inline-flex min-h-11 items-center rounded-xl bg-gold px-4 text-sm font-semibold text-bg-primary" href="/inserat?group=jobs">{t("postJobBtn")}</Link></div></div> : <div className="space-y-3">
         {filtered.slice(0, visibleCount).map(job => {
           const facts = job.facts, dates = jobDateLabel(job, locale);

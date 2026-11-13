@@ -8064,5 +8064,12 @@
     "ZA": "Jihoafrická republika",
     "ZM": "Zambie",
     "ZW": "Zimbabwe"
+  },
+  "BrowseFilters": {
+    "trainingPro": "Filmový profesionál",
+    "trainingExperienced": "Zkušený",
+    "trainingBasic": "Základní poslušnost",
+    "trainingNone": "Nevycvičený",
+    "results": "{count} výsledků"
   }
 }

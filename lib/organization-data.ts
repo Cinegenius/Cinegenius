@@ -1,6 +1,18 @@
-import { geographicPage, type BrowsePlace } from "@/lib/browse-geography";
-import "server-only";
+import { collectFacetRows } from "@/lib/browse-facets";
+import { geographicPage,type BrowsePlace } from "@/lib/browse-geography";
 import { db } from "@/lib/db";
+import "server-only";
+
+export async function newsFacetRows() {
+  const rows = await collectFacetRows<Record<string, unknown>>((from, to) => db.from("organization_entries")
+    .select("entry_type,topic,place_country_code,organization:organizations!inner(moderation_status)")
+    .in("moderation_status", ["approved", "ended"]).eq("organization.moderation_status", "approved")
+    .order("id").range(from, to));
+  return [...new Map(rows.map(row => {
+    const facet = { type: String(row.entry_type), topic: String(row.topic ?? ""), country: String(row.place_country_code ?? "") };
+    return [JSON.stringify(facet), facet];
+  })).values()];
+}
 
 export const ORGANIZATION_SELECT = "place_country_code,place_region_id,place_city_id,place_city_name,place_region_name,place_status,id,slug,name,description,logo_url,topics,city,region,website_url,public_contact_email,moderation_status,created_at,updated_at";
 export const ORGANIZATION_ENTRY_SELECT = "place_country_code,place_region_id,place_city_id,place_city_name,place_region_name,place_status,id,organization_id,slug,entry_type,title,summary,description,topic,format,city,venue,starts_at,ends_at,registration_url,external_url,image_url,moderation_status,created_at,updated_at";
@@ -15,7 +27,7 @@ export async function approvedOrganizations() {
 export async function approvedEntries(filters: { type?: string; topic?: string; q?: string; page?: number; country?: string; preferred?: BrowsePlace | null } = {}) {
   const page = Math.max(1, Math.min(10000, Math.floor(filters.page || 1)));
   const pageSize = 24;
-  const { data, error } = await geographicPage<Record<string, unknown>>((clause, range) => {
+  const { data, error, count } = await geographicPage<Record<string, unknown>>((clause, range) => {
   let query = db.from("organization_entries")
     .select(`${ORGANIZATION_ENTRY_SELECT},organization:organizations!inner(id,slug,name,logo_url,moderation_status)`, { count: "exact", head: !range })
     .in("moderation_status", ["approved", "ended"]).eq("organization.moderation_status", "approved")
@@ -29,7 +41,7 @@ export async function approvedEntries(filters: { type?: string; topic?: string; 
   }, (page - 1) * pageSize, page * pageSize, filters.country ? null : filters.preferred ?? null);
   if (error) throw new Error("organization_entries_read_failed", { cause: error.code });
   const rows = (data ?? []) as unknown as OrganizationNewsEntry[];
-  return { entries: rows.slice(0, pageSize), hasMore: rows.length > pageSize, page };
+  return { entries: rows.slice(0, pageSize), hasMore: rows.length > pageSize, page, count: count ?? rows.length };
 }
 
 export async function approvedOrganizationBySlug(slug: string) {

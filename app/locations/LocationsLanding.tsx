@@ -1,30 +1,30 @@
 "use client";
 import BrowseGeography from "@/components/BrowseGeography";
-import { useBrowseGeography } from "@/lib/use-browse-geography";
 import { prioritizeGeographically } from "@/lib/browse-geography";
+import { useBrowseGeography } from "@/lib/use-browse-geography";
 
-import { useRef, useState, useEffect, useMemo, useSyncExternalStore, type FormEvent } from "react";
-import { useLocale, useTranslations } from "next-intl";
-import Image from "@/components/MediaImage";
-import Link from "next/link";
-import dynamic from "next/dynamic";
-import { hasCoordinates, inMapBounds, locationDistanceKm, type MapBounds } from "@/lib/location-map";
-import { Search, Map, LayoutList, MapPin, Star, ArrowRight, Plus, ChevronDown, X, Navigation, Share2 } from "lucide-react";
-import FloatingMapToggle from "@/components/FloatingMapToggle";
-import PageHeader from "@/components/PageHeader";
-import FavoriteButton from "@/components/FavoriteButton";
 import EmptyState from "@/components/EmptyState";
-import PlaceFilters, { EMPTY_PLACE_FILTERS, type PlaceFilterValue } from "@/components/PlaceFilters";
-import MobileBrowseControls, { MobileFilterField, MobileFilterSelect, type BrowseChip } from "@/components/MobileBrowseControls";
+import FavoriteButton from "@/components/FavoriteButton";
+import FloatingMapToggle from "@/components/FloatingMapToggle";
+import Image from "@/components/MediaImage";
+import MobileBrowseControls,{ MobileFilterField,MobileFilterSelect,type BrowseChip } from "@/components/MobileBrowseControls";
+import PageHeader from "@/components/PageHeader";
+import PlaceFilters,{ EMPTY_PLACE_FILTERS,type PlaceFilterValue } from "@/components/PlaceFilters";
 import { locationCategoryLabel } from "@/lib/location-category-labels";
-import { placeOptions } from "@/lib/places/core";
-import { useViewState } from "@/lib/use-view-state";
-import { useNearbyLocation } from "@/lib/use-nearby-location";
-import { useViewUrl } from "@/lib/use-view-url";
+import { hasCoordinates,inMapBounds,locationDistanceKm,type MapBounds } from "@/lib/location-map";
 import {
-  DEFAULT_LOCATION_LANDING_FILTERS, filterLandingLocations, locationLandingCategoryOptions,
-  locationLandingParams, type LocationLandingFilters,
+DEFAULT_LOCATION_LANDING_FILTERS,filterLandingLocations,locationLandingCategoryOptions,
+locationLandingParams,type LocationLandingFilters,
 } from "@/lib/locations-landing-filters";
+import { placeOptions } from "@/lib/places/core";
+import { useNearbyLocation } from "@/lib/use-nearby-location";
+import { useViewState } from "@/lib/use-view-state";
+import { useViewUrl } from "@/lib/use-view-url";
+import { ArrowRight,ChevronDown,LayoutList,Map,MapPin,Navigation,Plus,Share2,Star } from "lucide-react";
+import { useLocale,useTranslations } from "next-intl";
+import dynamic from "next/dynamic";
+import Link from "next/link";
+import { useEffect,useMemo,useRef,useState,useSyncExternalStore } from "react";
 
 export type LocationCard = {
   id: string; title: string; type: string; city: string; price: number;
@@ -88,7 +88,7 @@ export default function LocationsLanding({ allLocations, totalCount, initialFilt
   const resetFilters = () => { setFilters({ ...DEFAULT_LOCATION_LANDING_FILTERS }); setMapBounds(null); clearLocation(); };
   const changePlaces = (next: PlaceFilterValue) => updateFilters({ ...next, ...(next.city ? { cityText: "" } : {}) });
   const categoryLabel = (value: string) => locationCategoryLabel(value, categoryText);
-  const categories = locationLandingCategoryOptions(allLocations, categoryLabel, locale, filters.type);
+  const categories = locationLandingCategoryOptions(allLocations, categoryLabel, locale);
   const geography = useBrowseGeography(filters.sort === "featured" && !filters.country && !filters.region && !filters.city && !filters.cityText && !nearby.coordinates);
   const matching = useMemo(() => prioritizeGeographically(filterLandingLocations(allLocations, filters, value => locationCategoryLabel(value, categoryText)), geography.preferred), [allLocations, filters, categoryText, geography.preferred]);
   const mapLocations = useMemo(() => matching.filter(row => !nearby.coordinates || (hasCoordinates(row) && locationDistanceKm(nearby.coordinates, [row.lat, row.lng]) <= radiusKm)), [matching, nearby.coordinates, radiusKm]);
@@ -122,24 +122,21 @@ export default function LocationsLanding({ allLocations, totalCount, initialFilt
     ...(filters.min ? [{ id: "min", label: uiText("Ui.text_c6e3466f40cb9d", { value1: filters.min }), onRemove: () => updateFilters({ min: "" }) }] : []),
     ...(filters.max ? [{ id: "max", label: uiText("Ui.text_f47e415aff7a38", { value1: filters.max }), onRemove: () => updateFilters({ max: "" }) }] : []),
   ];
-  const hasFilters = chips.length > 0 || !!filters.q;
-  const selectClass = "min-h-11 w-full min-w-0 appearance-none rounded-lg border border-border bg-bg-primary pl-3 pr-9 text-sm text-text-primary focus:border-gold focus:outline-none";
-  const priceClass = "min-h-11 w-full min-w-0 rounded-lg border border-border bg-bg-primary px-3 text-sm text-text-primary focus:border-gold focus:outline-none";
 
   const chooseView = (mode: "list" | "map" | "split") => {
     setViewMode(mode);
     resultsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
   };
-  const viewControls = (desktop = false) => <div role="group" aria-label={t("viewLabel")} className="inline-flex rounded-xl border border-border bg-bg-secondary p-1">
-    {([{ mode: "list", label: t("viewList"), icon: LayoutList }, ...(desktop ? [{ mode: "split" as const, label: t("viewSplit"), icon: Map }] : []), { mode: "map", label: t("viewMap"), icon: Map }] as const).map(({mode,label,icon: Icon}) => <button type="button" key={mode} aria-pressed={effectiveView === mode} onClick={() => chooseView(mode)} className={`inline-flex min-h-11 items-center gap-2 rounded-lg px-3 text-sm font-medium ${effectiveView === mode ? "bg-gold text-bg-primary" : "text-text-secondary hover:text-text-primary"}`}><Icon size={16} aria-hidden="true" />{label}</button>)}
+  const viewControls = <div role="group" aria-label={t("viewLabel")} className="inline-flex rounded-xl border border-border bg-bg-secondary p-1">
+    {([{ mode: "list", label: t("viewList"), icon: LayoutList }, ...(wide ? [{ mode: "split" as const, label: t("viewSplit"), icon: Map }] : []), { mode: "map", label: t("viewMap"), icon: Map }] as const).map(({mode,label,icon: Icon}) => <button type="button" key={mode} aria-pressed={effectiveView === mode} onClick={() => chooseView(mode)} className={`inline-flex min-h-11 items-center gap-2 rounded-lg px-3 text-sm font-medium ${effectiveView === mode ? "bg-gold text-bg-primary" : "text-text-secondary hover:text-text-primary"}`}><Icon size={16} aria-hidden="true" />{label}</button>)}
   </div>;
 
   const additionalFilters = () => <>
     <MobileFilterField label={uiText("Ui.text_295029201d603e")}>
-      <MobileFilterSelect label={uiText("Ui.text_295029201d603e")} value={filters.lage} onChange={value => updateFilters({lage: value})} placeholder={t("filterAll")} options={[{value: "Innen", label: t("filterInnen")}, {value: "Außen", label: t("filterAussen")}, {value: "Innen & Außen", label: t("filterInnenAussen")}]} />
+      <MobileFilterSelect label={uiText("Ui.text_295029201d603e")} value={filters.lage} onChange={value => updateFilters({lage: value})} placeholder={t("filterAll")} options={[{value: "Innen", label: t("filterInnen")}, {value: "Außen", label: t("filterAussen")}, {value: "Innen & Außen", label: t("filterInnenAussen")}].filter(option => filterLandingLocations(allLocations, { ...DEFAULT_LOCATION_LANDING_FILTERS, lage: option.value }, categoryLabel).length > 0)} />
     </MobileFilterField>
     <div className="flex flex-wrap gap-x-5 gap-y-1">
-      {([['power', 'filterPower'], ['instant', 'filterInstant'], ['verified', 'filterVerified']] as const).map(([key,label]) => <label key={key} className="flex min-h-11 items-center gap-3 text-sm text-text-secondary"><input type="checkbox" className="size-4 accent-gold" checked={filters[key] === "1"} onChange={event => updateFilters({[key]: event.target.checked ? "1" : ""})} />{t(label)}</label>)}
+      {([['power', 'filterPower'], ['instant', 'filterInstant'], ['verified', 'filterVerified']] as const).filter(([key]) => filters[key] || filterLandingLocations(allLocations, { ...DEFAULT_LOCATION_LANDING_FILTERS, [key]: '1' }, categoryLabel).length > 0).map(([key,label]) => <label key={key} className="flex min-h-11 items-center gap-3 text-sm text-text-secondary"><input type="checkbox" className="size-4 accent-gold" checked={filters[key] === "1"} onChange={event => updateFilters({[key]: event.target.checked ? "1" : ""})} />{t(label)}</label>)}
     </div>
     <div className="flex flex-wrap items-end gap-3">
       <button type="button" disabled={nearby.locating} onClick={nearby.coordinates ? clearLocation : locateMe} className="inline-flex min-h-11 items-center gap-2 rounded-lg border border-border px-3 text-sm text-text-secondary disabled:opacity-60"><Navigation size={16} aria-hidden="true" />{t(nearby.locating ? "locating" : nearby.coordinates ? "locateActive" : "locateMe")}</button>
@@ -153,11 +150,6 @@ export default function LocationsLanding({ allLocations, totalCount, initialFilt
           <LocationMap locations={mapLocations} visibleCount={filtered.length} onBoundsChange={updateMapBounds} activeId={activeId} onHover={setActiveId} userLocation={nearby.coordinates} radiusKm={radiusKm} appliedBounds={mapBounds} onApplyBounds={setMapBounds} />
         </aside>;
 
-  function handleSearch(event: FormEvent) {
-    event.preventDefault();
-    resultsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
-  }
-
   return (
     <div className="min-h-screen bg-bg-primary">
       <PageHeader
@@ -169,43 +161,19 @@ export default function LocationsLanding({ allLocations, totalCount, initialFilt
         ctaSecondary={{ label: t("landingAll"), href: "#locations-discover" }}
         cta={{ label: t("heroCta"), href: "/inserat?group=drehorte" }}
       >
-        <form action="/locations" method="get" onSubmit={handleSearch} className="hidden max-w-2xl xl:block">
-          {[...params].filter(([key]) => key !== "q").map(([key, value]) => <input key={key} type="hidden" name={key} value={value} />)}
-          <div className="flex items-center gap-2 rounded-xl border border-border bg-bg-elevated p-1.5 transition-colors focus-within:border-gold/50">
-            <div className="flex min-w-0 flex-1 items-center gap-2 px-3">
-              <Search size={15} aria-hidden="true" className="shrink-0 text-text-muted" />
-              <input
-                type="search"
-                name="q"
-                aria-label={t("searchPlaceholder")}
-                placeholder={t("searchPlaceholder")}
-                value={filters.q}
-                onChange={event => updateFilters({ q: event.target.value })}
-                className="min-h-11 min-w-0 flex-1 bg-transparent py-2 text-sm text-text-primary outline-none placeholder:text-text-muted"
-                autoComplete="off"
-              />
-              {filters.q && (
-                <button type="button" onClick={() => updateFilters({ q: "" })} aria-label={t("landingClear")} className="min-h-11 min-w-11 text-text-muted transition-colors hover:text-text-primary">×</button>
-              )}
-            </div>
-            <button type="submit" className="min-h-11 shrink-0 rounded-lg bg-gold px-4 py-2.5 text-sm font-bold text-bg-primary transition-colors hover:bg-gold-light">
-              {t("landingSearch")} <ArrowRight size={14} aria-hidden="true" className="ml-1 inline" />
-            </button>
-          </div>
-        </form>
+
       </PageHeader>
 
-      <BrowseGeography hasDesktopCountryFilter country={filters.country} onCountryChange={value => changePlaces({ country: value, region: "", city: "" })} geography={geography} />
-      <MobileBrowseControls
+      <MobileBrowseControls preference={<BrowseGeography geography={geography} />}
         query={filters.q} onQueryChange={value => updateFilters({ q: value })} searchPlaceholder={t("searchPlaceholder")}
         sortValue={filters.sort} sortOptions={sortOptions} onSortChange={value => { geography.setEnabled(false); updateFilters({ sort: value }); }}
         categoryLabel={t("categoryLabel")} allCategoryLabel={t("allLocations")} categories={categories}
         categoryValue={filters.type} onCategoryChange={value => updateFilters({ type: value })}
-        viewControls={viewControls()}
+        viewControls={viewControls}
         resultSummary={t("results", { count: filtered.length })} filterCount={chips.length + (filters.q ? 1 : 0)} chips={chips}
         onReset={resetFilters} resetLabel={t("resetFilters")} showResultsLabel={t("showResults", { count: filtered.length })}
       >
-        <PlaceFilters rows={allLocations} value={filters} onChange={changePlaces} scope="locations" />
+        <PlaceFilters rows={allLocations} value={filters} onChange={changePlaces} />
         <div className="grid grid-cols-2 gap-3">
           <MobileFilterField label={uiText("Ui.text_84381d6fa4d29d")}><input aria-label={uiText("Ui.text_84381d6fa4d29d")} type="number" inputMode="decimal" min="0" step="0.01" value={filters.min} onChange={event => updateFilters({ min: event.target.value })} placeholder={uiText("Ui.text_d0c50fd56cbce3")} /></MobileFilterField>
           <MobileFilterField label={uiText("Ui.text_f7abc502297a74")}><input aria-label={uiText("Ui.text_f7abc502297a74")} type="number" inputMode="decimal" min="0" step="0.01" value={filters.max} onChange={event => updateFilters({ max: event.target.value })} placeholder={uiText("Ui.text_d0c50fd56cbce3")} /></MobileFilterField>
@@ -213,25 +181,8 @@ export default function LocationsLanding({ allLocations, totalCount, initialFilt
         {additionalFilters()}
       </MobileBrowseControls>
 
-      <div className="hidden xl:block browse-toolbar">
-        <div className="site-container space-y-3 py-4">
-          <div className="grid min-w-0 grid-cols-5 items-end gap-3">
-            <label className="relative flex min-w-0 flex-col gap-1 text-xs text-text-muted"><span>{t("categoryLabel")}</span><select className={selectClass} value={filters.type} onChange={event => updateFilters({ type: event.target.value })}><option value="">{t("allLocations")}</option>{categories.map(option => <option key={option.value} value={option.value}>{option.label}</option>)}</select><ChevronDown size={16} aria-hidden="true" className="pointer-events-none absolute bottom-3.5 right-3" /></label>
-            <div className="col-span-3 min-w-0"><PlaceFilters rows={allLocations} value={filters} onChange={changePlaces} scope="locations" /></div>
-            <label className="relative flex min-w-0 flex-col gap-1 text-xs text-text-muted"><span>{uiText("creators.sort")}</span><select className={selectClass} value={filters.sort} onChange={event => { geography.setEnabled(false); updateFilters({ sort: event.target.value }); }}>{sortOptions.map(option => <option key={option.value} value={option.value}>{option.label}</option>)}</select><ChevronDown size={16} aria-hidden="true" className="pointer-events-none absolute bottom-3.5 right-3" /></label>
-          </div>
-          <div className="flex flex-wrap items-end gap-x-5 gap-y-3">{additionalFilters()}</div>
-          <div className="flex flex-wrap items-end gap-3">
-            <label className="flex w-40 min-w-0 flex-col gap-1 text-xs text-text-muted"><span>{uiText("Ui.text_84381d6fa4d29d")}</span><input className={priceClass} type="number" inputMode="decimal" min="0" step="0.01" value={filters.min} onChange={event => updateFilters({ min: event.target.value })} placeholder={uiText("Ui.text_d0c50fd56cbce3")} /></label>
-            <label className="flex w-40 min-w-0 flex-col gap-1 text-xs text-text-muted"><span>{uiText("Ui.text_f7abc502297a74")}</span><input className={priceClass} type="number" inputMode="decimal" min="0" step="0.01" value={filters.max} onChange={event => updateFilters({ max: event.target.value })} placeholder={uiText("Ui.text_d0c50fd56cbce3")} /></label>
-            {hasFilters && <button type="button" onClick={resetFilters} className="min-h-11 rounded-lg border border-border px-4 text-sm text-text-secondary hover:border-gold hover:text-gold">{t("resetFilters")}</button>}
-            {chips.map(chip => <span key={chip.id} className="inline-flex min-w-0 items-center gap-1 rounded-full border border-border bg-bg-secondary pl-3 text-xs text-text-secondary"><span className="min-w-0 break-words">{chip.label}</span><button type="button" aria-label={uiText("Ui.text_f10fe7a27ce274", { value1: chip.label })} onClick={chip.onRemove} className="flex min-h-11 min-w-11 shrink-0 items-center justify-center"><X size={14} /></button></span>)}
-          </div>
-        </div>
-      </div>
-
       <div id="locations-discover" ref={resultsRef} className="site-container mobile-bottom-nav-clear scroll-mt-24 space-y-10 py-6 sm:space-y-10">
-        <div className="hidden items-center justify-between gap-4 xl:flex"><h2 id="locations-discover-title" className="text-xl font-bold text-text-primary">{t("landingDiscover")}</h2><div className="flex items-center gap-4"><span className="text-sm text-text-muted">{t("results", { count: filtered.length })}</span>{viewControls(true)}</div></div>
+
         <div className={`locations-discovery-layout ${effectiveView === "split" ? "xl:grid xl:grid-cols-[minmax(0,1.05fr)_minmax(0,1fr)] xl:items-start xl:gap-6" : "space-y-6"}`}>
         {effectiveView === "map" && mapPanel}
         {(allLocations.length === 0 ? (

@@ -1,16 +1,26 @@
 "use client";
 
-import { useState, useEffect, useCallback, useRef, Suspense } from "react";
-import { useTranslations , useLocale } from "next-intl";
-import { ANIMAL_DEPARTMENT_LABEL } from "@/lib/animal-taxonomy";
 import MediaImage from "@/components/MediaImage";
-import { useSearchParams } from "next/navigation";
-import Link from "next/link";
+import { ANIMAL_DEPARTMENT_LABEL } from "@/lib/animal-taxonomy";
 import { useViewUrl } from "@/lib/use-view-url";
 import {
-  Search, X, MapPin, Car, Package, Briefcase, Users, User,
-  Loader2, ArrowRight, Building2, PawPrint,
+ArrowRight,
+Briefcase,
+Building2,
+Car,
+Loader2,
+MapPin,
+Package,
+PawPrint,
+Search,
+User,
+Users,
+X,
 } from "lucide-react";
+import { useLocale,useTranslations } from "next-intl";
+import Link from "next/link";
+import { useSearchParams } from "next/navigation";
+import { Suspense,useCallback,useEffect,useRef,useState } from "react";
 
 // ─── Types ─────────────────────────────────────────────────────────────────────
 
@@ -27,13 +37,7 @@ type Result = {
 
 // ─── Config ────────────────────────────────────────────────────────────────────
 
-
-
-
-
 // ─── Suggestion chips ──────────────────────────────────────────────────────────
-
-
 
 // ─── Result Card ───────────────────────────────────────────────────────────────
 
@@ -188,10 +192,6 @@ function SearchContent() {
     "Fotostudio Hamburg": uiText("Ui.text_ae6b424c00c367"),
   };
 
-
-
-
-
   const typeConfig = getLocalizedTypeConfig(uiText);
   const TABS = getLocalizedTABS(uiText);
 
@@ -207,24 +207,31 @@ function SearchContent() {
   const [inputValue, setInputValue] = useState(initialQ);
   const [activeTab, setActiveTab] = useState(initialType);
   const [results, setResults] = useState<Result[]>([]);
+  const [availableTypes, setAvailableTypes] = useState<string[]>([]);
+  const searchSerial = useRef(0);
+  const [searchError, setSearchError] = useState(false);
   const [loading, setLoading] = useState(false);
   const [hasSearched, setHasSearched] = useState(!!initialQ);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
   const doSearch = useCallback(async (q: string, tab?: string) => {
-    if (q.length < 2) { setResults([]); setLoading(false); return; }
+    const serial = ++searchSerial.current;
+    if (q.length < 2) { setResults([]); setAvailableTypes([]); setLoading(false); return; }
+    setSearchError(false);
     setLoading(true);
     setHasSearched(true);
     const t = tab ?? activeTab;
     try {
       const res = await fetch(`/api/search?q=${encodeURIComponent(q)}${t !== "all" ? `&type=${t}` : ""}`);
-      const { results: data } = await res.json();
-      setResults(data ?? []);
+      if (!res.ok) throw new Error("search_unavailable");
+      const { results: data, availableTypes: types } = await res.json();
+      if (serial !== searchSerial.current) return;
+      setResults(data ?? []); setAvailableTypes(types ?? []);
     } catch {
-      setResults([]);
+      if (serial === searchSerial.current) { setResults([]); setSearchError(true); }
     } finally {
-      setLoading(false);
+      if (serial === searchSerial.current) setLoading(false);
     }
   }, [activeTab]);
 
@@ -238,6 +245,7 @@ function SearchContent() {
   useEffect(() => {
     if (debounceRef.current) clearTimeout(debounceRef.current);
     if (!inputValue.trim()) {
+      ++searchSerial.current; setAvailableTypes([]); setLoading(false);
       setResults([]);
       setQuery("");
       setHasSearched(false);
@@ -342,8 +350,9 @@ function SearchContent() {
 
         {/* ── Category Tabs ── */}
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex gap-1 overflow-x-auto pb-px no-scrollbar">
-            {TABS.map(({ id, label, icon: Icon }) => {
+          {searchError && <p role="alert" className="flex items-center gap-3 text-sm text-text-secondary">{uiText("System.requestFailed")}<button type="button" className="min-h-11 underline" onClick={() => doSearch(query)}>{uiText("MarketplaceNavigation.retry")}</button></p>}
+          <div className="flex flex-wrap gap-1 pb-px">
+            {TABS.filter(tab => tab.id === "all" || tab.id === activeTab || availableTypes.includes(tab.id)).map(({ id, label, icon: Icon }) => {
               const count = countFor(id);
               const isActive = activeTab === id;
               return (
@@ -399,7 +408,7 @@ function SearchContent() {
           </div>
         )}
 
-        {!loading && hasSearched && filtered.length === 0 && (
+        {!loading && !searchError && hasSearched && filtered.length === 0 && (
           <EmptyState query={query} />
         )}
 

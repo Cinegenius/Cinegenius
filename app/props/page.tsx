@@ -1,11 +1,11 @@
-import { publicMapPoint } from "@/lib/places/public-map-point";
-import { placeReadFields } from "@/lib/places/catalog";
+import PageHeader from "@/components/PageHeader";
 import { db } from "@/lib/db";
 import { marketplaceCardData } from "@/lib/marketplace-browse";
+import { marketplaceFacetRows } from "@/lib/marketplace-facets";
+import { placeReadFields } from "@/lib/places/catalog";
+import { publicMapPoint } from "@/lib/places/public-map-point";
+import { getLocale,getTranslations as getMetadataTranslations,getTranslations } from "next-intl/server";
 import PropsContent from "./PropsContent";
-import PageHeader from "@/components/PageHeader";
-import { getTranslations, getLocale } from "next-intl/server";
-import { getTranslations as getMetadataTranslations } from "next-intl/server";
 
 export const revalidate = 60;
 
@@ -28,6 +28,7 @@ export default async function PropsPage() {
   const t = await getTranslations("props");
   let serverListings: ReturnType<typeof marketplaceCardData>[] = [];
   let serverError = false;
+  const facetRows = await marketplaceFacetRows(locale);
   try {
     const { data, error } = await db
       .from("listings")
@@ -56,7 +57,7 @@ export default async function PropsPage() {
         description={t("heroDesc")}
         cta={{ label: t("heroCta"), href: "/inserat?group=marktplatz" }}
       />
-      <PropsContent serverListings={serverListings} serverError={serverError} />
+      <PropsContent facetRows={facetRows} serverListings={serverListings} serverError={serverError} />
     </div>
   );
 }

@@ -8064,5 +8064,12 @@
     "ZA": "Zuid-Afrika",
     "ZM": "Zambia",
     "ZW": "Zimbabwe"
+  },
+  "BrowseFilters": {
+    "trainingPro": "Filmprofessional",
+    "trainingExperienced": "Ervaren",
+    "trainingBasic": "Basisgehoorzaamheid",
+    "trainingNone": "Ongetraind",
+    "results": "{count} resultaten"
   }
 }

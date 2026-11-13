@@ -8064,5 +8064,12 @@
     "ZA": "Südafrika",
     "ZM": "Sambia",
     "ZW": "Simbabwe"
+  },
+  "BrowseFilters": {
+    "trainingPro": "Kinoprofi",
+    "trainingExperienced": "Erfahren",
+    "trainingBasic": "Grundgehorsam",
+    "trainingNone": "Ungeübt",
+    "results": "{count} Ergebnisse"
   }
 }

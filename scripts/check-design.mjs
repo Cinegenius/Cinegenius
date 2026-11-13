@@ -118,10 +118,15 @@ const collectUiFiles = (directory) =>
 const adUiFiles = [...collectUiFiles("app"), ...collectUiFiles("components")];
 const menuOwners = adUiFiles.filter((path) => {
   const source = read(path);
-  return source.includes("BROWSE_NAV_ITEMS") && source.includes("ACCOUNT_NAV_ITEMS");
+  return source.includes("BROWSE_NAV_ITEMS");
 });
 if (menuOwners.length !== 1) {
-  failures.push("One shared menu must render the public and personal navigation models");
+  failures.push("One shared menu must render the public navigation model");
+}
+const publicMenu = readFileSync("components/SiteNavigationMenu.tsx", "utf8");
+const accountMenu = readFileSync("components/Navbar.tsx", "utf8");
+if (publicMenu.includes("ACCOUNT_NAV_ITEMS") || publicMenu.includes("SITE_NAV_SIGN_OUT_EVENT") || !accountMenu.includes("ACCOUNT_NAV_ITEMS.map")) {
+  failures.push("Personal destinations and sign-out belong only in the portrait account menu");
 }
 const forbiddenAdvertisingPatterns = [
   ["ad placeholder component", /\bAdPlaceholder\b/],

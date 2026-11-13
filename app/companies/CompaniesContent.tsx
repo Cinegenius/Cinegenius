@@ -1,60 +1,42 @@
 "use client";
 import BrowseGeography from "@/components/BrowseGeography";
-import { useBrowseGeography } from "@/lib/use-browse-geography";
 import { prioritizeGeographically } from "@/lib/browse-geography";
+import { useBrowseGeography } from "@/lib/use-browse-geography";
 
 
 import DirectoryMap from "@/components/DirectoryMap";
-import DirectoryViewControls, { type DirectoryView } from "@/components/DirectoryViewControls";
+import DirectoryViewControls,{ type DirectoryView } from "@/components/DirectoryViewControls";
 import FloatingMapToggle from "@/components/FloatingMapToggle";
-import { useDirectoryMap } from "@/lib/use-directory-map";
-import type { DirectoryCompany as Company } from "@/lib/company-directory";
 import PlaceFilters from "@/components/PlaceFilters";
+import type { DirectoryCompany as Company } from "@/lib/company-directory";
+import { useDirectoryMap } from "@/lib/use-directory-map";
 
-import { placeSearchMatches, placeOptions, matchesPlace, placeDisplay, canonicalFilterValue } from "@/lib/places/core";
-import { animalCategoryLabel, animalCompanySearchText, isAnimalCompany } from "@/lib/animal-taxonomy";
+import { animalCategoryLabel,animalCompanySearchText,isAnimalCompany } from "@/lib/animal-taxonomy";
+import { canonicalFilterValue,matchesPlace,placeDisplay,placeOptions,placeSearchMatches } from "@/lib/places/core";
 
 import { useViewState } from "@/lib/use-view-state";
 
-import { useState, useMemo, useEffect, useRef, useCallback } from "react";
-import Link from "next/link";
 import CompanyLogo from "@/components/CompanyLogo";
-import { useTranslations, useLocale } from "next-intl";
-import type { LucideIcon } from "lucide-react";
-import {
-  Building2, MapPin, Search, CheckCircle,
-  ChevronRight, X, Camera, Volume2, Wrench, Shirt,
-  Package, Film, Monitor, Users, Sparkles, Megaphone, Car,
-  Lightbulb, Globe, Zap, ChevronDown, Utensils,
-} from "lucide-react";
-import { COMPANY_CATEGORIES, COMPANY_CATEGORY_BY_ID } from "@/lib/companyCategories";
-import { CATERING_COMPANY_CATEGORY, getCateringCompanySearchTerms, normalizeCateringCompanyDetails } from "@/lib/catering-taxonomy";
-import { safetyMedicalCompanyCategoryLabel } from "@/lib/safety-medical-taxonomy";
-import MobileBrowseControls, { MobileFilterField, MobileFilterSelect, type BrowseChip } from "@/components/MobileBrowseControls";
+import MobileBrowseControls,{ type BrowseChip } from "@/components/MobileBrowseControls";
+import { CATERING_COMPANY_CATEGORY,getCateringCompanySearchTerms,normalizeCateringCompanyDetails } from "@/lib/catering-taxonomy";
+import { COMPANY_CATEGORIES,COMPANY_CATEGORY_BY_ID } from "@/lib/companyCategories";
 import { taxonomyLabel } from "@/lib/departments";
+import { safetyMedicalCompanyCategoryLabel } from "@/lib/safety-medical-taxonomy";
+import {
+Building2,
+CheckCircle,
+ChevronRight,
+MapPin
+} from "lucide-react";
+import { useLocale,useTranslations } from "next-intl";
+import Link from "next/link";
+import { useCallback,useEffect,useMemo,useRef } from "react";
 
 
 const PAGE_SIZE = 24;
 
 // ── Category icons ────────────────────────────────────────────────
-const CATEGORY_ICONS: Record<string, LucideIcon> = {
-  "lichtverleih":     Lightbulb,
-  "kameraverleih":    Camera,
-  "tonverleih":       Volume2,
-  "grip-verleih":     Wrench,
-  "tonstudio":        Volume2,
-  "kostumfundus":     Shirt,
-  "requisite":        Package,
-  "filmproduktion":   Film,
-  "postproduktion":   Monitor,
-  "casting-agentur":  Users,
-  "location-agentur": MapPin,
-  "vfx-studio":       Sparkles,
-  "fotostudio":       Camera,
-  "werbeagentur":     Megaphone,
-  "fahrzeugverleih":  Car,
-  [CATERING_COMPANY_CATEGORY.id]: Utensils,
-};
+
 
 function cateringSearchText(company: Company): string {
   const details = normalizeCateringCompanyDetails(company.catering_details);
@@ -66,46 +48,7 @@ function cateringSearchText(company: Company): string {
 }
 
 // ─── FilterDropdown ───────────────────────────────────────────────
-function FilterDropdown({
-  icon: Icon, label, value, options, onChange, optionLabel = (value: string) => value,
-}: {
-  icon: React.ElementType; label: string; value: string;
-  options: string[]; onChange: (v: string) => void; optionLabel?: (value: string) => string;
-}) {
-  const [open, setOpen] = useState(false);
-  const ref = useRef<HTMLDivElement>(null);
-  useEffect(() => {
-    if (!open) return;
-    const h = (e: MouseEvent) => { if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false); };
-    document.addEventListener("mousedown", h);
-    return () => document.removeEventListener("mousedown", h);
-  }, [open]);
-  const active = !!value;
-  return (
-    <div ref={ref} className="relative shrink-0">
-      <button onClick={() => setOpen((v) => !v)}
-        className={`flex items-center gap-2 h-9 px-3 rounded-lg text-xs font-medium border transition-all ${
-          active ? "bg-gold/10 border-gold/30 text-gold" : open ? "bg-bg-elevated border-border text-text-secondary" : "border-border text-text-muted hover:text-text-secondary"
-        }`}>
-        <Icon size={11} />
-        {active ? optionLabel(value) : label}
-        {active
-          ? <span onClick={(e) => { e.stopPropagation(); onChange(""); setOpen(false); }} className="hover:text-red-400 transition-colors ml-0.5"><X size={10} /></span>
-          : <ChevronDown size={11} className={`transition-transform ${open ? "rotate-180" : ""}`} />}
-      </button>
-      {open && (
-        <div className="absolute top-full left-0 mt-1 z-50 bg-bg-elevated border border-border rounded-xl shadow-xl overflow-hidden min-w-[160px] max-h-64 overflow-y-auto">
-          {options.map((opt) => (
-            <button key={opt} onClick={() => { onChange(opt); setOpen(false); }}
-              className={`w-full text-left px-3 py-2 text-xs transition-colors hover:bg-white/[0.04] ${value === opt ? "text-gold font-medium" : "text-text-secondary"}`}>
-              {optionLabel(opt)}
-            </button>
-          ))}
-        </div>
-      )}
-    </div>
-  );
-}
+
 
 // ─── Main ─────────────────────────────────────────────────────────
 export default function CompaniesContent({ initialCompanies }: { initialCompanies: Company[] }) {
@@ -135,8 +78,8 @@ export default function CompaniesContent({ initialCompanies }: { initialCompanie
   const cityOptions = useMemo(() => placeOptions(initialCompanies, "city", locale, countryFilter), [initialCompanies,locale,countryFilter]);
   const countryOptions = useMemo(() => placeOptions(initialCompanies, "country", locale), [initialCompanies,locale]);
   const regionOptions = useMemo(() => placeOptions(initialCompanies, "region", locale), [initialCompanies,locale]);
-  const availableCities = cityOptions.map(o => o.value);
-  const availableCountries = countryOptions.map(o => o.value);
+
+
   const cityLabel = (value: string) => cityOptions.find(o => o.value === value)?.label ?? value;
   const countryLabel = (value: string) => countryOptions.find(o => o.value === value)?.label ?? value;
   const regionLabel = (value: string) => regionOptions.find(option => option.value === value)?.label ?? value;
@@ -188,12 +131,12 @@ export default function CompaniesContent({ initialCompanies }: { initialCompanie
 
   const selectedCat = selectedCategory ? COMPANY_CATEGORY_BY_ID[selectedCategory] : null;
   const hasAnyFilter = Boolean(regionFilter || search || selectedCategory || cityFilter || countryFilter || verifiedOnly || (viewMode === "map" && map.bounds));
-  const hasCatFilter = Boolean(selectedCategory);
+
   const mobileChips: BrowseChip[] = [
     ...(selectedCat ? [{ id: "category", label: taxonomyLabel(companyCategoryLabel(selectedCat.id, selectedCat.label), uiText), onRemove: () => setSelectedCategory(null) }] : []),
     ...(cityFilter ? [{ id: "city", label: cityLabel(cityFilter), onRemove: () => setCityFilter("") }] : []),
-    ...(countryFilter ? [{ id: "country", label: countryLabel(countryFilter), onRemove: () => setCountryFilter("") }] : []),
-    ...(regionFilter ? [{ id: "region", label: regionLabel(regionFilter), onRemove: () => setRegionFilter("") }] : []),
+    ...(countryFilter ? [{ id: "country", label: countryLabel(countryFilter), onRemove: () => { setCountryFilter(""); setRegionFilter(""); setCityFilter(""); } }] : []),
+    ...(regionFilter ? [{ id: "region", label: regionLabel(regionFilter), onRemove: () => { setRegionFilter(""); setCityFilter(""); } }] : []),
     ...(verifiedOnly ? [{ id: "verified", label: t("filterVerified"), onRemove: () => setVerifiedOnly(false) }] : []),
   ];
 
@@ -204,8 +147,7 @@ export default function CompaniesContent({ initialCompanies }: { initialCompanie
         setViewMode(viewMode === "map" ? "list" : "map");
         requestAnimationFrame(() => resultsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }));
       }} />
-      <BrowseGeography hasDesktopCountryFilter country={countryFilter} onCountryChange={value => { setCountryFilter(value); setRegionFilter(""); setCityFilter(""); }} geography={geography} />
-      <MobileBrowseControls
+      <MobileBrowseControls preference={<BrowseGeography geography={geography} />}
         query={search}
         onQueryChange={setSearch}
         searchPlaceholder={t("searchPlaceholder")}
@@ -214,7 +156,7 @@ export default function CompaniesContent({ initialCompanies }: { initialCompanie
         onSortChange={value => { geography.setEnabled(false); setSortKey(value); }}
         categoryLabel={t("filterCategory")}
         allCategoryLabel={uiText("Ui.text_aecf68fa0908cc")}
-        categories={COMPANY_CATEGORIES.map((category) => ({ value: category.id, label: taxonomyLabel(companyCategoryLabel(category.id, category.label), uiText) }))}
+        categories={COMPANY_CATEGORIES.filter(category => initialCompanies.some(company => company.categories.includes(category.id))).map((category) => ({ value: category.id, label: taxonomyLabel(companyCategoryLabel(category.id, category.label), uiText) }))}
         categoryValue={selectedCategory ?? ""}
         onCategoryChange={(value) => setSelectedCategory(value || null)}
         resultSummary={`${map.rows.length} ${t("resultsCount")}`}
@@ -226,167 +168,23 @@ export default function CompaniesContent({ initialCompanies }: { initialCompanie
         showResultsLabel={uiText("Ui.text_4d89b095821660", { value1: String(map.rows.length) })}
       >
         <PlaceFilters rows={initialCompanies} value={{country:countryFilter,region:regionFilter,city:cityFilter}} onChange={value => {setCountryFilter(value.country);setRegionFilter(value.region);setCityFilter(value.city);}} />
-        <label className="flex min-h-11 items-center gap-3 text-sm text-text-secondary"><input type="checkbox" className="size-4 accent-gold" checked={verifiedOnly} onChange={(event) => setVerifiedOnly(event.target.checked)} />{t("filterVerified")}</label>
+        {(verifiedOnly || initialCompanies.some(company => company.verified)) && <label className="flex min-h-11 items-center gap-3 text-sm text-text-secondary"><input type="checkbox" className="size-4 accent-gold" checked={verifiedOnly} onChange={(event) => setVerifiedOnly(event.target.checked)} />{t("filterVerified")}</label>}
       </MobileBrowseControls>
 
       {/* ── Filter Bar ───────────────────────────────────── */}
-      <div className="hidden xl:block browse-toolbar">
-        <div className="site-container py-2 space-y-2">
 
-          {/* Row 1: Search + View toggle */}
-          <div className="flex items-center gap-2">
-            <div className="flex-1 flex items-center gap-2 bg-bg-elevated border border-border rounded-lg px-3 focus-within:border-gold/50 transition-colors">
-              <Search size={14} className="text-text-muted shrink-0" />
-              <input type="text" value={search} onChange={(e) => setSearch(e.target.value)}
-                placeholder={t("searchPlaceholder")}
-                className="bg-transparent border-none py-2.5 text-sm w-full focus:outline-none" />
-              {search && <button onClick={() => setSearch("")} className="text-text-muted hover:text-text-primary transition-colors"><X size={12} /></button>}
-            </div>
-            <DirectoryViewControls value={viewMode} onChange={setViewMode} />
-          </div>
-
-          {/* Row 2: Filters */}
-          <div className="flex items-center gap-2 overflow-x-auto lg:overflow-visible pb-0.5" style={{ scrollbarWidth: "none" }}>
-
-            {/* Verifiziert toggle */}
-            <button
-              onClick={() => setVerifiedOnly((v) => !v)}
-              className={`flex items-center gap-2 h-9 px-3 rounded-lg text-xs font-medium border transition-all shrink-0 ${
-                verifiedOnly ? "bg-gold/10 border-gold/30 text-gold" : "border-border text-text-muted hover:text-text-secondary"
-              }`}
-            >
-              <div className={`w-7 h-4 rounded-full transition-colors relative shrink-0 ${verifiedOnly ? "bg-gold" : "bg-border"}`}>
-                <span className={`absolute top-0.5 w-3 h-3 rounded-full bg-white transition-all ${verifiedOnly ? "left-3.5" : "left-0.5"}`} />
-              </div>
-              <Zap size={11} />
-              {t("filterVerified")}
-            </button>
-
-            <div className="w-px h-6 bg-border shrink-0" />
-
-            {/* Stadt */}
-            {(availableCities.length > 0 || availableCountries.length > 0) && (
-              <PlaceFilters rows={initialCompanies} value={{country:countryFilter,region:regionFilter,city:cityFilter}} onChange={value => {setCountryFilter(value.country);setRegionFilter(value.region);setCityFilter(value.city);}} />
-            )}
-
-            {/* Land */}
-
-
-            {hasAnyFilter && (
-              <>
-                <div className="w-px h-6 bg-border shrink-0" />
-                <button onClick={clearAll} className="h-9 px-3 text-xs text-text-muted hover:text-red-400 transition-colors whitespace-nowrap shrink-0 border border-border rounded-lg hover:border-red-400/40">
-                  {t("clearFilter")}
-                </button>
-              </>
-            )}
-
-          </div>
-
-          {/* Active chips */}
-          {(hasCatFilter || cityFilter || countryFilter || regionFilter || verifiedOnly) && (
-            <div className="flex flex-wrap gap-1.5 items-center">
-              {selectedCat && (
-                <span className={`inline-flex items-center gap-1.5 text-[11px] px-2.5 py-1 rounded-full border font-medium ${selectedCat.bg} ${selectedCat.color}`}>
-                  {taxonomyLabel(selectedCat.label, uiText)}
-                  <button onClick={() => setSelectedCategory(null)} className="hover:opacity-70 ml-0.5"><X size={9} /></button>
-                </span>
-              )}
-              {cityFilter && (
-                <span className="inline-flex items-center gap-1.5 text-[11px] px-2.5 py-1 rounded-full border font-medium bg-bg-elevated border-border text-text-secondary">
-                  <MapPin size={9} /> {cityLabel(cityFilter)}
-                  <button onClick={() => setCityFilter("")} className="hover:opacity-70 ml-0.5"><X size={9} /></button>
-                </span>
-              )}
-              {countryFilter && (
-                <span className="inline-flex items-center gap-1.5 text-[11px] px-2.5 py-1 rounded-full border font-medium bg-bg-elevated border-border text-text-secondary">
-                  <Globe size={9} /> {countryLabel(countryFilter)}
-                  <button onClick={() => setCountryFilter("")} className="hover:opacity-70 ml-0.5"><X size={9} /></button>
-                </span>
-              )}
-              {regionFilter && <span className="inline-flex items-center gap-1.5 text-[11px] px-2.5 py-1 rounded-full border font-medium bg-bg-elevated border-border text-text-secondary"><MapPin size={9} />{regionLabel(regionFilter)}<button type="button" aria-label={uiText("Ui.text_efae3eb968ceb3", { value1: String(t("clearFilter")), value2: String(regionLabel(regionFilter)) })} onClick={() => setRegionFilter("")} className="hover:opacity-70 ml-0.5"><X size={9} /></button></span>}
-              {verifiedOnly && (
-                <span className="inline-flex items-center gap-1.5 text-[11px] px-2.5 py-1 rounded-full border font-medium bg-gold/10 border-gold/30 text-gold">
-                  <CheckCircle size={9} /> {t("filterVerified")}
-                  <button onClick={() => setVerifiedOnly(false)} className="hover:opacity-70 ml-0.5"><X size={9} /></button>
-                </span>
-              )}
-              <button onClick={clearAll} className="text-[11px] text-text-muted hover:text-red-400 transition-colors underline underline-offset-2 ml-1">
-                {t("clearAllFilters")}
-              </button>
-            </div>
-          )}
-        </div>
-      </div>
 
       {/* ── Results ──────────────────────────────────────── */}
       <div className="site-container py-3 sm:py-6">
         <div className="flex gap-8 items-start">
 
           {/* Sidebar */}
-          <aside className="cat-sidebar w-44 shrink-0 sticky top-20">
-            <p className="text-[11px] uppercase tracking-widest text-text-muted font-semibold mb-3 px-2">{uiText("props.categoryBtn")}</p>
-            <nav className="space-y-0.5">
-              <button
-                onClick={() => { setSelectedCategory(null); resetPage(); }}
-                className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm transition-all text-left ${
-                  !selectedCategory
-                    ? "bg-gold/10 text-gold font-semibold border-l-2 border-gold pl-[10px]"
-                    : "text-text-secondary hover:text-text-primary hover:bg-bg-secondary"
-                }`}
-              >{uiText.rich("Ui.text_532c17f15dfbaf", { part1: () => (<Building2 size={14} className={!selectedCategory ? "text-gold" : "text-text-muted"} />) })}</button>
-              {[...COMPANY_CATEGORIES].sort((a, b) => a.label.localeCompare(b.label, locale)).map((cat) => {
-                const Icon = CATEGORY_ICONS[cat.id] ?? Building2;
-                const isActive = selectedCategory === cat.id;
-                return (
-                  <button
-                    key={cat.id}
-                    onClick={() => { setSelectedCategory(isActive ? null : cat.id); resetPage(); }}
-                    className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm transition-all text-left ${
-                      isActive
-                        ? "bg-gold/10 text-gold font-semibold border-l-2 border-gold pl-[10px]"
-                        : "text-text-secondary hover:text-text-primary hover:bg-bg-secondary"
-                    }`}
-                  >
-                    <Icon size={14} className={isActive ? "text-gold" : "text-text-muted"} />
-                    <span className="min-w-0 break-words leading-snug">{taxonomyLabel(companyCategoryLabel(cat.id, cat.label), uiText)}</span>
-                  </button>
-                );
-              })}
-            </nav>
-          </aside>
+
 
           {/* Main content */}
           <div ref={resultsRef} className="flex-1 min-w-0 scroll-mt-24">
 
             {/* Mobile category pills */}
-            <div className="cat-pills gap-2 overflow-x-auto pb-3 mb-4" style={{ scrollbarWidth: "none" }}>
-              <button
-                onClick={() => { setSelectedCategory(null); resetPage(); }}
-                className={`px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap shrink-0 border transition-all ${
-                  !selectedCategory ? "bg-gold/10 text-gold border-gold/40" : "border-border text-text-muted hover:border-gold/30 hover:text-text-primary"
-                }`}
-              >{uiText("common.all")}</button>
-              {[...COMPANY_CATEGORIES].sort((a, b) => a.label.localeCompare(b.label, locale)).map((cat) => {
-                const isActive = selectedCategory === cat.id;
-                return (
-                  <button
-                    key={cat.id}
-                    onClick={() => { setSelectedCategory(isActive ? null : cat.id); resetPage(); }}
-                    className={`px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap shrink-0 border transition-all ${
-                      isActive ? "bg-gold/10 text-gold border-gold/40" : "border-border text-text-muted hover:border-gold/30 hover:text-text-primary"
-                    }`}
-                  >
-                    {taxonomyLabel(companyCategoryLabel(cat.id, cat.label), uiText)}
-                  </button>
-                );
-              })}
-            </div>
-
-            <p className="hidden xl:block text-sm text-text-muted mb-5">
-              <span className="font-semibold text-text-primary">{map.rows.length}</span> {t("resultsCount", { count: map.rows.length })}
-              {selectedCat && <>{uiText.rich("Ui.text_3aa0bce7c8c5d4", { value2: () => (taxonomyLabel(companyCategoryLabel(selectedCat.id, selectedCat.label), uiText)), part1: chunks => (<span className={`font-semibold ${selectedCat.color}`}>{chunks}</span>) })}</>}
-            </p>
 
             {viewMode === "map" && <DirectoryMap kind="companies" items={mapItems} bounds={map.bounds} onBoundsChange={map.setBounds} />}
             {paginated.length === 0 ? (
