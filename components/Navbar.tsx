@@ -13,6 +13,7 @@ import NavigationIcon from "@/components/NavigationIcon";
 import NotificationCenter from "@/components/NotificationCenter";
 import { Logo } from "@/components/Logo";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
+import MediaImage from "@/components/MediaImage";
 import { useFormNavigation } from "@/contexts/FormDraftContext";
 import { useTranslations } from "next-intl";
 import { useToast } from "@/contexts/ToastContext";
@@ -33,19 +34,24 @@ export default function Navbar({ initialIsSignedIn = false, initialAdminUserId =
   const [profileData, setProfileData] = useState<{
     userId: string;
     displayName: string;
+    avatarUrl: string | null;
   } | null>(null);
   const [signingOut, setSigningOut] = useState(false);
   const signingOutRef = useRef(false);
   const inbox = useAuthenticatedInbox();
   const pathname = usePathname();
   const authRoute = pathname.startsWith("/sign-in") || pathname.startsWith("/sign-up");
-  const { isSignedIn, isLoaded } = useAuth();
+  const { isSignedIn, isLoaded, userId: authenticatedUserId, sessionId: authenticatedSessionId } = useAuth();
   const { user } = useUser();
   const { signOut } = useClerk();
   const { addToast } = useToast();
-  const userMenuRef = useRef<HTMLDivElement>(null);
+  const accountMenuRef = useRef<HTMLDivElement>(null);
   const accountButton = useRef<HTMLButtonElement>(null);
-  const activeUserId = isSignedIn ? user?.id : null;
+  const mobileAccountButton = useRef<HTMLButtonElement>(null);
+  const activeAccountButton = useRef<HTMLButtonElement | null>(null);
+  const [failedAccountImageUrl, setFailedAccountImageUrl] = useState("");
+  const profileRevision = useRef(0);
+  const activeUserId = isLoaded && isSignedIn && user?.id === authenticatedUserId ? authenticatedUserId : null;
   const showAdminLink = !!initialAdminUserId && initialAdminUserId === activeUserId;
   const supportUnread = useAdminSupportUnread(showAdminLink ? activeUserId : null);
   const supportUnreadCount = supportUnread.count ?? 0;
@@ -55,14 +61,19 @@ export default function Navbar({ initialIsSignedIn = false, initialAdminUserId =
   const unreadMessages = inbox.status === "ready" ? inbox.count ?? 0 : 0;
   const messageLabel = unreadMessages > 0 ? `${t("messages")}, ${uiText(unreadMessages === 1 ? "notifications.newMessage" : "notifications.newMessages", { count: unreadMessages })}` : t("messages");
   const supportBadge = supportUnreadCount > 0 ? <span title={supportUnreadLabel} aria-label={supportUnreadLabel} className="ml-auto inline-flex h-5 min-w-5 shrink-0 items-center justify-center rounded-full bg-gold px-1 text-[10px] font-bold text-bg-primary">{supportUnreadCount > 99 ? "99+" : supportUnreadCount}</span> : null;
+  const displayName = activeUserId ? profileDisplayName || user?.firstName || user?.emailAddresses?.[0]?.emailAddress?.split("@")[0] || "" : "";
+  const email = activeUserId ? user?.primaryEmailAddress?.emailAddress ?? "" : "";
+  const currentProfile = activeUserId && profileData?.userId === activeUserId ? profileData : null;
+  const candidateImageUrl = currentProfile ? currentProfile.avatarUrl ?? "" : (activeUserId && user?.hasImage ? user.imageUrl : "") || "";
+  const accountImageUrl = failedAccountImageUrl !== candidateImageUrl ? candidateImageUrl : "";
 
   const closeAll = () => { setUserMenuOpen(false); };
 
   useEffect(() => {
-    // Route changes must close transient menus, including browser back/forward navigation.
+    // A route or account/session transition must not retain another identity's open menu.
     // eslint-disable-next-line react-hooks/set-state-in-effect
     closeAll();
-  }, [pathname]);
+  }, [pathname, authenticatedUserId, authenticatedSessionId, activeUserId, hasSignedInSession]);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 20);
@@ -78,9 +89,36 @@ export default function Navbar({ initialIsSignedIn = false, initialAdminUserId =
     } catch { /* Retired account-agnostic caches may be unavailable. */ }
   }, [isLoaded]);
 
+  useEffect(() => {
+    if (!activeUserId || !hasSignedInSession) return;
+    const controller = new AbortController();
+    const revision = ++profileRevision.current;
+    const timeout = window.setTimeout(() => controller.abort(), 8000);
+    void fetch(`/api/profile/by-id?id=${encodeURIComponent(activeUserId)}`, { cache: "no-store", signal: controller.signal })
+      .then(async response => {
+        if (!response.ok) return;
+        const { profile } = await response.json();
+        if (controller.signal.aborted || revision !== profileRevision.current || profile?.user_id !== activeUserId) return;
+        setProfileData({
+          userId: activeUserId,
+          displayName: typeof profile.display_name === "string" ? profile.display_name : "",
+          avatarUrl: typeof profile.avatar_url === "string" ? profile.avatar_url : null,
+        });
+      })
+      .catch(() => { /* Keep the account control usable when the photo cannot load. */ })
+      .finally(() => window.clearTimeout(timeout));
+    return () => { controller.abort(); window.clearTimeout(timeout); };
+  }, [activeUserId, hasSignedInSession]);
+
   useEffect(() => subscribeToProfileUpdated((detail) => {
-    if (!activeUserId || detail?.userId !== activeUserId || detail.displayName === undefined) return;
-    setProfileData({userId:activeUserId,displayName:detail.displayName});
+    if (!activeUserId || detail?.userId !== activeUserId) return;
+    ++profileRevision.current;
+    setProfileData(previous => ({
+      userId: activeUserId,
+      displayName: detail.displayName ?? (previous?.userId === activeUserId ? previous.displayName : ""),
+      avatarUrl: detail.avatarUrl !== undefined ? detail.avatarUrl : previous?.userId === activeUserId ? previous.avatarUrl : null,
+    }));
+    if (detail.avatarUrl !== undefined) setFailedAccountImageUrl("");
   }), [activeUserId]);
 
   const handleSignOut = async () => {
@@ -106,11 +144,17 @@ export default function Navbar({ initialIsSignedIn = false, initialAdminUserId =
 
   useEffect(() => {
     const handler = (e: MouseEvent) => {
-      if (userMenuRef.current && !userMenuRef.current.contains(e.target as Node)) setUserMenuOpen(false);
+      const target = e.target as Node;
+      if (
+        accountMenuRef.current?.contains(target) ||
+        accountButton.current?.contains(target) ||
+        mobileAccountButton.current?.contains(target)
+      ) return;
+      setUserMenuOpen(false);
     };
     const escape = (event: KeyboardEvent) => {
       if (event.key !== "Escape" || !userMenuOpen) return;
-      event.preventDefault(); setUserMenuOpen(false); accountButton.current?.focus();
+      event.preventDefault(); setUserMenuOpen(false); (activeAccountButton.current ?? accountButton.current ?? mobileAccountButton.current)?.focus();
     };
     document.addEventListener("mousedown", handler); document.addEventListener("keydown", escape);
     return () => {document.removeEventListener("mousedown", handler);document.removeEventListener("keydown", escape);};
@@ -134,6 +178,72 @@ export default function Navbar({ initialIsSignedIn = false, initialAdminUserId =
   // When not scrolled (over hero), use white text for contrast against dark image overlay
   const navBase   = scrolled ? "text-text-secondary hover:text-gold" : "text-white/80 hover:text-white";
   const navActive = scrolled ? "text-gold" : "text-white";
+  const accountAvatar = (className: string, iconSize: number) => (
+    <span className={`relative flex items-center justify-center overflow-hidden rounded-full bg-gold/10 border border-gold/20 ${className}`} aria-hidden="true">
+      {accountImageUrl ? (
+        <MediaImage
+          key={`${activeUserId}:${accountImageUrl}`}
+          src={accountImageUrl}
+          alt=""
+          width={44}
+          height={44}
+          unoptimized
+          className="h-full w-full object-cover"
+          loading="eager"
+          decoding="async"
+          referrerPolicy="no-referrer"
+          onError={() => setFailedAccountImageUrl(accountImageUrl)}
+        />
+      ) : (
+        <User size={iconSize} className="text-gold" />
+      )}
+    </span>
+  );
+  const accountMenu = hasSignedInSession && activeUserId && userMenuOpen ? (
+    <div
+      ref={accountMenuRef}
+      id="header-account-menu"
+      className="fixed right-2 top-16 z-50 mt-2 w-[26rem] max-w-[calc(100vw-1rem)] max-h-[calc(100dvh-5rem)] overflow-y-auto overscroll-contain rounded-2xl border border-border bg-bg-elevated shadow-2xl animate-fade-in sm:right-4"
+    >
+      {/* Identity */}
+      <div className="px-4 py-3.5 border-b border-border flex items-center gap-3">
+        {accountAvatar("h-11 w-11 min-h-11 min-w-11 shrink-0", 18)}
+        <div className="min-w-0">
+          <p className="text-sm font-semibold text-text-primary truncate leading-tight">{displayName}</p>
+          <p className="text-[11px] text-text-muted truncate mt-0.5">{email}</p>
+        </div>
+      </div>
+
+      {/* Links */}
+      <div className="grid grid-cols-1 gap-1 py-1.5 min-[480px]:grid-cols-2">
+        {ACCOUNT_NAV_ITEMS.map(item => <Link
+          key={item.id} href={item.href} prefetch={false} onClick={() => setUserMenuOpen(false)}
+          className="flex min-h-11 items-center gap-3 px-4 py-2.5 text-sm text-text-secondary hover:text-text-primary hover:bg-bg-hover transition-colors"
+        ><NavigationIcon name={item.icon} size={15} className="text-text-muted shrink-0" /><span className="min-w-0 break-words">{t(item.id === "overview" ? "personalArea" : item.key)}</span></Link>)}
+        <Link
+          href={user?.id ? `/profile/${user.id}` : "/profile"}
+          onClick={() => setUserMenuOpen(false)}
+          className="flex min-h-11 items-center gap-3 px-4 py-2.5 text-sm text-text-secondary hover:text-text-primary hover:bg-bg-hover transition-colors"
+        >
+          <User size={15} className="text-text-muted shrink-0" /> {t("publicProfile")}
+        </Link>
+        {showAdminLink && <Link href="/admin" onClick={() => setUserMenuOpen(false)} className="flex min-h-11 items-center gap-3 px-4 py-2.5 text-sm text-text-secondary hover:text-text-primary hover:bg-bg-hover transition-colors"><ShieldCheck size={15} className="text-text-muted shrink-0" />{t("adminArea")}{supportBadge}</Link>}
+      </div>
+
+      {/* Sign out */}
+      <div className="border-t border-border py-1.5">
+        <button
+          onClick={() => requestSignOut.current()}
+          disabled={signingOut}
+          aria-busy={signingOut}
+          className="w-full min-h-11 flex items-center gap-3 px-4 py-2.5 text-sm text-text-secondary hover:text-red-400 hover:bg-red-500/5 transition-colors disabled:opacity-60"
+        >
+          {signingOut ? <Loader2 size={15} className="shrink-0 animate-spin" /> : <LogOut size={15} className="shrink-0" />}
+          {signingOut ? t("signingOut") : t("signOut")}
+        </button>
+      </div>
+    </div>
+  ) : null;
 
   return (
     <>
@@ -146,7 +256,7 @@ export default function Navbar({ initialIsSignedIn = false, initialAdminUserId =
           <div className="flex h-16 min-w-0 items-center justify-between gap-1 sm:gap-3">
 
             {/* Logo */}
-            <Logo />
+            <Logo compact={hasSignedInSession} />
 
             {/* Desktop nav */}
             <nav aria-label={t("discover")} className="site-header-primary hidden xl:flex min-w-0 items-center">
@@ -193,70 +303,19 @@ export default function Navbar({ initialIsSignedIn = false, initialAdminUserId =
                   </Link>
                 </>
               )}
-              {hasSignedInSession && (() => {
-                const displayName = profileDisplayName || user?.firstName || user?.emailAddresses?.[0]?.emailAddress?.split("@")[0] || "";
-                const email = user?.primaryEmailAddress?.emailAddress ?? "";
-                return (
-                  <div className="relative" ref={userMenuRef}>
+              {hasSignedInSession && (
+                  <div className="relative">
                     <button
                       ref={accountButton}
                       aria-label={t("personalArea")} title={t("personalArea")} aria-expanded={userMenuOpen} aria-controls="header-account-menu"
-                      onClick={() => setUserMenuOpen(v => !v)}
+                      onClick={(event) => { activeAccountButton.current = event.currentTarget; setUserMenuOpen(v => !v); }}
                       className="relative flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-border hover:border-gold/50 hover:bg-bg-elevated transition-all group"
                     >
-                      <span className="relative w-7 h-7 rounded-full bg-gold/10 border border-gold/20 flex items-center justify-center overflow-hidden" aria-hidden="true">
-                        <User size={15} className="text-gold" />
-                      </span>
-
+                      {accountAvatar("h-7 w-7", 15)}
                       {supportBadge && <span className="absolute -right-1 -top-1">{supportBadge}</span>}
                     </button>
-
-                    {userMenuOpen && (
-                      <div id="header-account-menu" className="absolute top-full right-0 mt-2 w-[26rem] max-w-[calc(100vw-2rem)] max-h-[calc(100dvh-5rem)] overflow-y-auto overscroll-contain bg-bg-elevated border border-border rounded-2xl shadow-2xl animate-fade-in z-50">
-                        {/* Identity */}
-                        <div className="px-4 py-3.5 border-b border-border flex items-center gap-3">
-                          <span className="relative min-w-11 min-h-11 rounded-full bg-gold/10 border border-gold/20 flex items-center justify-center shrink-0 overflow-hidden" aria-hidden="true">
-                            <User size={18} className="text-gold" />
-                          </span>
-                          <div className="min-w-0">
-                            <p className="text-sm font-semibold text-text-primary truncate leading-tight">{displayName}</p>
-                            <p className="text-[11px] text-text-muted truncate mt-0.5">{email}</p>
-                          </div>
-                        </div>
-
-                        {/* Links */}
-                        <div className="grid grid-cols-2 gap-1 py-1.5">
-                          {ACCOUNT_NAV_ITEMS.map(item => <Link
-                            key={item.id} href={item.href} prefetch={false} onClick={() => setUserMenuOpen(false)}
-                            className="flex min-h-11 items-center gap-3 px-4 py-2.5 text-sm text-text-secondary hover:text-text-primary hover:bg-bg-hover transition-colors"
-                          ><NavigationIcon name={item.icon} size={15} className="text-text-muted shrink-0" /><span className="min-w-0 break-words">{t(item.id === "overview" ? "personalArea" : item.key)}</span></Link>)}
-                          <Link
-                            href={user?.id ? `/profile/${user.id}` : "/profile"}
-                            onClick={() => setUserMenuOpen(false)}
-                            className="flex min-h-11 items-center gap-3 px-4 py-2.5 text-sm text-text-secondary hover:text-text-primary hover:bg-bg-hover transition-colors"
-                          >
-                            <User size={15} className="text-text-muted shrink-0" /> {t("publicProfile")}
-                          </Link>
-                          {showAdminLink && <Link href="/admin" onClick={() => setUserMenuOpen(false)} className="flex min-h-11 items-center gap-3 px-4 py-2.5 text-sm text-text-secondary hover:text-text-primary hover:bg-bg-hover transition-colors"><ShieldCheck size={15} className="text-text-muted shrink-0" />{t("adminArea")}{supportBadge}</Link>}
-                        </div>
-
-                        {/* Sign out */}
-                        <div className="border-t border-border py-1.5">
-                          <button
-                            onClick={() => requestSignOut.current()}
-                            disabled={signingOut}
-                            aria-busy={signingOut}
-                            className="w-full min-h-11 flex items-center gap-3 px-4 py-2.5 text-sm text-text-secondary hover:text-red-400 hover:bg-red-500/5 transition-colors disabled:opacity-60"
-                          >
-                            {signingOut ? <Loader2 size={15} className="shrink-0 animate-spin" /> : <LogOut size={15} className="shrink-0" />}
-                            {signingOut ? t("signingOut") : t("signOut")}
-                          </button>
-                        </div>
-                      </div>
-                    )}
                   </div>
-                );
-              })()}
+              )}
             </div>
 
             {/* Mobile: keep both auth destinations visible outside the menu. */}
@@ -269,6 +328,20 @@ export default function Navbar({ initialIsSignedIn = false, initialAdminUserId =
                 <div className="flex items-center gap-1">{uiText.rich("Ui.text_49b372e77a7a76", { value2: () => (t("signIn")), part1: chunks => (<Link href="/sign-in" prefetch className="min-h-11 inline-flex items-center justify-center whitespace-nowrap rounded-lg border border-border px-2.5 max-[360px]:px-1.5 text-[11px] max-[360px]:text-[10px] font-semibold text-text-primary hover:border-gold hover:text-gold">{chunks}</Link>), value5: () => (t("signUp")), part4: chunks => (<span className="max-[420px]:hidden">{chunks}</span>), part6: chunks => (<span className="min-[421px]:hidden">{chunks}</span>), part3: chunks => (<Link href="/sign-up" prefetch className="min-h-11 inline-flex items-center justify-center whitespace-nowrap rounded-lg bg-gold px-2.5 max-[360px]:px-1.5 text-[11px] max-[360px]:text-[10px] font-bold text-bg-primary hover:bg-gold-light">{chunks}</Link>) })}</div>
               )}
               {hasSignedInSession && <div className="hidden min-[360px]:block"><NotificationCenter inbox={inbox} includeMessages={false} /></div>}
+              {hasSignedInSession && (
+                <button
+                  ref={mobileAccountButton}
+                  aria-label={t("personalArea")}
+                  title={t("personalArea")}
+                  aria-expanded={userMenuOpen}
+                  aria-controls="header-account-menu"
+                  onClick={(event) => { activeAccountButton.current = event.currentTarget; setUserMenuOpen(v => !v); }}
+                  className="relative flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-border hover:border-gold/50 hover:bg-bg-elevated transition-all"
+                >
+                  {accountAvatar("h-8 w-8", 16)}
+                  {supportBadge && <span className="absolute -right-1 -top-1">{supportBadge}</span>}
+                </button>
+              )}
               {hasSignedInSession && <LanguageSwitcher />}
               <button
                 className="relative w-11 h-11 flex items-center justify-center text-text-secondary hover:text-gold transition-colors"
@@ -283,6 +356,7 @@ export default function Navbar({ initialIsSignedIn = false, initialAdminUserId =
             </div>
           </div>
         </div>
+        {accountMenu}
       </header>
 
     </>
