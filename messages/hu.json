@@ -44,7 +44,8 @@
     "signOutError": "A kijelentkezés nem sikerült. Ellenőrizd a kapcsolatot, majd próbáld újra.",
     "createListing": "Hirdetés létrehozása",
     "openMenu": "Menü megnyitása",
-    "ai": "MI"
+    "ai": "MI",
+    "comingSoon": "Hamarosan elérhető"
   },
   "footer": {
     "tagline": "Az all-in-one piactér film- és médiaprodukcióhoz. Helyszínek, stáb, kellékek, felszerelés — minden egy helyen.",
@@ -8074,7 +8075,7 @@
   },
   "AiTools": {
     "title": "MI-eszközök",
-    "description": "Eszközeid ötletekhez, szövegekhez és a forgatás előkészítéséhez.",
+    "description": "Itt készülnek az ötleteléshez, szövegíráshoz és forgatási előkészületekhez használható MI-eszközök. Még nem érhetők el.",
     "genieDescription": "Beszélj meg ötleteket, készíts szövegeket, és találd meg a megfelelő részeket a CineGeniuson.",
     "planned": "Fejlesztés alatt",
     "roomScanTitle": "Natív szobaszkenner és alaprajzok",

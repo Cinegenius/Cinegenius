@@ -44,7 +44,8 @@
     "signOutError": "Abmelden hat nicht geklappt. Prüfe die Verbindung und versuche es erneut.",
     "createListing": "Inserat erstellen",
     "openMenu": "Menü öffnen",
-    "ai": "KI"
+    "ai": "KI",
+    "comingSoon": "Demnächst verfügbar"
   },
   "footer": {
     "tagline": "Der All-in-One-Marktplatz für Film- und Medienproduktion. Locations, Crew, Requisiten, Equipment — alles an einem Ort.",
@@ -8074,7 +8075,7 @@
   },
   "AiTools": {
     "title": "KI-Werkzeuge",
-    "description": "Deine Werkzeuge für Ideen, Texte und die Vorbereitung am Set.",
+    "description": "Hier entstehen deine KI-Werkzeuge für Ideen, Texte und die Vorbereitung am Set. Sie sind noch nicht verfügbar.",
     "genieDescription": "Ideen besprechen, Texte vorbereiten und passende Bereiche auf CineGenius finden.",
     "planned": "In Vorbereitung",
     "roomScanTitle": "Nativer Raumscanner & Grundrisse",

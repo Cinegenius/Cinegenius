@@ -44,7 +44,8 @@
     "signOutError": "No se pudo cerrar la sesión. Comprueba la conexión e inténtalo de nuevo.",
     "createListing": "Crear anuncio",
     "openMenu": "Abrir menú",
-    "ai": "IA"
+    "ai": "IA",
+    "comingSoon": "Próximamente"
   },
   "footer": {
     "tagline": "El mercado todo en uno para producción de cine y medios. Locaciones, equipo, utilería — todo en un lugar.",
@@ -8074,7 +8075,7 @@
   },
   "AiTools": {
     "title": "Herramientas de IA",
-    "description": "Tus herramientas para ideas, textos y la preparación del rodaje.",
+    "description": "Aquí estamos preparando tus herramientas de IA para ideas, textos y la preparación del rodaje. Aún no están disponibles.",
     "genieDescription": "Comenta ideas, prepara textos y encuentra las secciones adecuadas en CineGenius.",
     "planned": "En desarrollo",
     "roomScanTitle": "Escáner nativo de habitaciones y planos",

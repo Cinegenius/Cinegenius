@@ -27,13 +27,17 @@ export const BROWSE_NAV_ITEMS: readonly NavigationLink[] = [
   { id: "news", href: "/news", key: "news", icon: "news" },
   { id: "organizations", href: "/organizations", key: "organizations", icon: "organizations" },
   { id: "projects", href: "/projects", key: "projects", icon: "projects" },
-  { id: "ai", href: "/tools", key: "ai", icon: "ai" },
+];
+
+/** Planned areas have no destination until they are ready to use. */
+export const UPCOMING_NAV_ITEMS: readonly Omit<NavigationLink, "href">[] = [
+  { id: "ai", key: "ai", icon: "ai" },
 ];
 
 export const MOBILE_NAV_ITEMS: readonly NavigationLink[] = [
   { id: "crew", href: "/creators", key: "crew", icon: "crew" },
   { id: "marketplace", href: "/props", key: "marketplace", icon: "marketplace" },
-  { id: "ai", href: "/tools", key: "ai", icon: "ai" },
+  { id: "news", href: "/news", key: "news", icon: "news" },
   { id: "locations", href: "/locations", key: "locations", icon: "locations" },
   { id: "companies", href: "/companies", key: "companies", icon: "companies" },
 ];
@@ -75,7 +79,6 @@ export function activeNavigationId(pathname: string): PrimaryNavigationId {
 }
 
 export function activeMobileNavigationId(pathname: string) {
-  if (routeMatches(pathname, "/tools")) return "ai";
   if (routeMatches(pathname, "/jobs")) return "more";
   return activeNavigationId(pathname);
 }

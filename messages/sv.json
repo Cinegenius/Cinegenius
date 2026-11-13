@@ -44,7 +44,8 @@
     "signOutError": "Det gick inte att logga ut. Kontrollera anslutningen och försök igen.",
     "createListing": "Skapa annons",
     "openMenu": "Öppna menyn",
-    "ai": "AI"
+    "ai": "AI",
+    "comingSoon": "Kommer snart"
   },
   "footer": {
     "tagline": "Den kompletta marknadsplatsen för film- och medieproduktion. Inspelningsplatser, filmteam, rekvisita och utrustning – allt på ett ställe.",
@@ -8074,7 +8075,7 @@
   },
   "AiTools": {
     "title": "AI-verktyg",
-    "description": "Dina verktyg för idéer, texter och förberedelser på inspelningsplatsen.",
+    "description": "Här utvecklar vi dina AI-verktyg för idéer, texter och förberedelser inför inspelningen. De är inte tillgängliga ännu.",
     "genieDescription": "Diskutera idéer, förbered texter och hitta rätt delar av CineGenius.",
     "planned": "Under utveckling",
     "roomScanTitle": "Inbyggd rumsskanner och planritningar",

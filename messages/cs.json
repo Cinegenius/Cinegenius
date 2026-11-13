@@ -44,7 +44,8 @@
     "signOutError": "Odhlášení se nezdařilo. Zkontrolujte připojení a zkuste to znovu.",
     "createListing": "Vytvořit inzerát",
     "openMenu": "Otevřít menu",
-    "ai": "AI"
+    "ai": "AI",
+    "comingSoon": "Již brzy"
   },
   "footer": {
     "tagline": "Komplexní tržiště pro filmovou a mediální produkci. Lokace, štáb, rekvizity, vybavení — vše na jednom místě.",
@@ -8074,7 +8075,7 @@
   },
   "AiTools": {
     "title": "Nástroje AI",
-    "description": "Tvoje nástroje pro nápady, texty a přípravu na natáčení.",
+    "description": "Zde připravujeme nástroje AI pro nápady, texty a přípravu natáčení. Zatím nejsou k dispozici.",
     "genieDescription": "Prober nápady, připrav texty a najdi vhodné sekce na CineGenius.",
     "planned": "Připravujeme",
     "roomScanTitle": "Nativní skener místností a půdorysy",

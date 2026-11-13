@@ -44,7 +44,8 @@
     "signOutError": "Sign out failed. Check your connection and try again.",
     "createListing": "Create listing",
     "openMenu": "Open menu",
-    "ai": "AI"
+    "ai": "AI",
+    "comingSoon": "Coming soon"
   },
   "footer": {
     "tagline": "The all-in-one marketplace for film and media production. Locations, crew, props, equipment — all in one place.",
@@ -8074,7 +8075,7 @@
   },
   "AiTools": {
     "title": "AI tools",
-    "description": "Your tools for ideas, writing and preparing for the set.",
+    "description": "Your AI tools for ideas, writing and on-set preparation are being developed here. They are not available yet.",
     "genieDescription": "Discuss ideas, draft text and find the right areas on CineGenius.",
     "planned": "In development",
     "roomScanTitle": "Native room scanner & floor plans",

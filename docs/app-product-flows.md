@@ -39,10 +39,12 @@ Kataloge und bestehenden Veröffentlichungsregeln.
   sind direkt erreichbar, seltene Einstellungen im passenden Untermenü. Die
   Kompaktansicht muss alle Ziele erhalten, ohne Desktop- und Mobilmenüs gleichzeitig
   zu stapeln. Kontextaktionen am betreffenden Angebot bleiben sinnvoll erreichbar.
-- Markus ersetzt ausdrücklich den mittleren News-Platz der unteren Fünferleiste
-  durch **KI**: Crew, Marktplatz, KI, Locations, Firmen. News bleibt im Kopfmenü
-  erreichbar. KI öffnet eine eigene Werkzeugübersicht, zunächst mit dem vorhandenen
-  Genie. Das ist die gezielte Ausnahme zur früheren Reihenfolge, kein zweites Menü.
+- Korrektur von Markus am 13. November: KI kommt erst später. Die untere Leiste
+  bleibt bei **Crew, Marktplatz, News, Locations, Firmen**. KI steht vorerst nur
+  deaktiviert im gemeinsamen Kopfmenü mit „Demnächst verfügbar“, ohne Werkzeugstart.
+  Direkte Aufrufe von `/tools` zeigen ebenfalls nur die Ankündigung. Diese Vorgabe
+  ersetzt den früheren Beschluss für KI in der Leistenmitte und wird zunächst nur
+  im App-Entwicklungsstand umgesetzt; die Hauptseite braucht einen neuen Auftrag.
 - Der Raumscanner soll ausdrücklich **nativ in der App** neu umgesetzt werden;
   den früher gebauten Scanner nicht übernehmen oder nur einbetten. Unterstützte
   Kamera-/Gerätesensoren verwenden, Grundrisse erzeugen und privat einem Projekt

@@ -98,3 +98,26 @@ marketplace fixture for the already existing geography dependencies; five
 geographic-order cases also passed. All nine catalogs now have 7,780 keys.
 Release validation and the guarded deployment receipt
 are stored under the same handoff directory’s `release/` folder.
+
+## App-only navigation correction after the release
+
+Markus postponed the KI bottom tab. The app development branch now restores News
+between Marketplace and Locations, shows KI once as a disabled coming-soon item
+in the shared header menu, and makes direct `/tools` visits announcement-only.
+This correction has not been transferred to the public website.
+
+- 48 focused navigation, route-access and Genie regression cases passed.
+- Build/TypeScript, changed-code lint, shared design and localization checks passed
+  (nine catalogs, 7,781 keys).
+- Private Chromium preview: all nine languages at 320 px passed the menu's
+  disabled state, unchanged URL/history on tapping KI, Escape/focus restoration,
+  News navigation/active state and actual browser Back. German menu checks also
+  passed at 768 and 1366 px. No horizontal overflow, undersized touch areas,
+  framework overlays or browser console/page errors were observed. Screenshots
+  of the 320 px menu and News bottom bar were visually checked.
+- The server logged an `ENVIRONMENT_FALLBACK` translation warning while serving
+  the existing News surface; no browser errors were recorded. No native build or
+  physical-device check was repeated for this correction.
+
+Evidence and coordination notes for the separate website filter/menu work are in
+`/srv/cinegenius/handoffs/app-preview-20261113/navigation-correction/`.

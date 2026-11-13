@@ -44,7 +44,8 @@
     "signOutError": "Disconnessione non riuscita. Controlla la connessione e riprova.",
     "createListing": "Crea annuncio",
     "openMenu": "Apri menu",
-    "ai": "IA"
+    "ai": "IA",
+    "comingSoon": "In arrivo"
   },
   "footer": {
     "tagline": "Il marketplace all-in-one per la produzione cinematografica e multimediale. Location, crew, attrezzatura — tutto in un posto.",
@@ -8074,7 +8075,7 @@
   },
   "AiTools": {
     "title": "Strumenti IA",
-    "description": "I tuoi strumenti per idee, testi e preparazione sul set.",
+    "description": "Qui stiamo preparando i tuoi strumenti di IA per idee, testi e la preparazione sul set. Non sono ancora disponibili.",
     "genieDescription": "Discuti idee, prepara testi e trova le sezioni giuste su CineGenius.",
     "planned": "In preparazione",
     "roomScanTitle": "Scanner nativo di ambienti e planimetrie",

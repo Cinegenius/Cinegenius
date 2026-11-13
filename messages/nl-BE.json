@@ -44,7 +44,8 @@
     "signOutError": "Uitloggen is niet gelukt. Controleer je verbinding en probeer het opnieuw.",
     "createListing": "Advertentie plaatsen",
     "openMenu": "Menu openen",
-    "ai": "AI"
+    "ai": "AI",
+    "comingSoon": "Binnenkort beschikbaar"
   },
   "footer": {
     "tagline": "De alles-in-éénmarktplaats voor film- en mediaproductie. Locaties, crew, rekwisieten, apparatuur — alles op één plek.",
@@ -8074,7 +8075,7 @@
   },
   "AiTools": {
     "title": "AI-tools",
-    "description": "Je tools voor ideeën, teksten en voorbereiding op de set.",
+    "description": "Hier werken we aan je AI-tools voor ideeën, teksten en voorbereiding op de set. Ze zijn nog niet beschikbaar.",
     "genieDescription": "Bespreek ideeën, bereid teksten voor en vind de juiste onderdelen op CineGenius.",
     "planned": "In ontwikkeling",
     "roomScanTitle": "Native ruimtescanner en grondplannen",
