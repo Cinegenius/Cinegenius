@@ -154,6 +154,55 @@ body {
   background: var(--color-bg-secondary);
 }
 
+/* Compact directory rows: shared surfaces, aligned facts, natural mobile reflow. */
+.browse-directory__head { display: none; }
+.browse-directory__items { margin: 0; padding: 0; list-style: none; }
+.browse-directory__row {
+  display: block; min-width: 0; min-height: 44px; padding: 14px 16px;
+  color: var(--color-text-secondary); transition: background-color 150ms ease;
+}
+.browse-directory__row:hover { background: var(--color-bg-elevated); }
+.browse-directory__row:focus-visible { outline: 2px solid var(--color-gold); outline-offset: -3px; }
+.browse-directory__identity { display: flex; align-items: center; gap: 12px; min-width: 0; }
+.browse-directory__poster {
+  display: flex; align-items: center; justify-content: center; flex: 0 0 42px;
+  width: 42px; height: 60px; overflow: hidden; border-radius: 5px;
+  background: var(--color-bg-elevated); color: var(--color-text-muted);
+}
+.browse-directory__poster--empty { height: 40px; background: transparent; }
+.browse-directory__title { color: var(--color-text-primary); font-size: 15px; font-weight: 600; line-height: 1.4; overflow-wrap: anywhere; }
+.browse-directory__row:hover .browse-directory__title { color: var(--color-gold); }
+.browse-directory__facts { display: flex; flex-wrap: wrap; gap: 2px 8px; margin-top: 4px; color: var(--color-text-muted); font-size: 12px; line-height: 1.5; }
+.browse-directory__facts > span { min-width: 0; overflow-wrap: anywhere; }
+.browse-directory__facts > span + span::before { content: "·"; margin-right: 8px; }
+.browse-directory__details { display: flex; flex-wrap: wrap; gap: 4px 12px; margin-top: 6px; padding-left: 54px; font-size: 12px; line-height: 1.5; }
+.browse-directory__director { overflow-wrap: anywhere; }
+.browse-directory__director-label { color: var(--color-text-muted); }
+.browse-directory__credits { min-width: 0; color: var(--color-text-muted); font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+.browse-directory__director--empty, .browse-directory__credits--empty, .browse-directory__year, .browse-directory__type { display: none; }
+.browse-directory--list .browse-directory__items > li + li { border-top: 1px solid color-mix(in srgb, var(--color-border) 65%, transparent); }
+.browse-directory--grid .browse-directory__items { display: grid; gap: 12px; }
+.browse-directory--grid .browse-directory__row { height: 100%; }
+@media (min-width: 640px) {
+  .browse-directory--grid .browse-directory__items { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (min-width: 1024px) {
+  .browse-directory--list .browse-directory__head,
+  .browse-directory--list .browse-directory__row { display: grid; grid-template-columns: 4rem minmax(0, 2fr) minmax(0, 1fr) minmax(0, 1.25fr) minmax(0, .8fr); align-items: center; gap: 20px; padding: 14px 20px; }
+  .browse-directory__head { color: var(--color-text-muted); background: var(--color-bg-primary); border-bottom: 1px solid var(--color-border); font-size: 12px; line-height: 1.5; }
+  .browse-directory--list .browse-directory__year,
+  .browse-directory--list .browse-directory__type { display: block; min-width: 0; font-size: 13px; line-height: 1.5; overflow-wrap: anywhere; }
+  .browse-directory--list .browse-directory__year { color: var(--color-text-muted); font-variant-numeric: tabular-nums; }
+  .browse-directory--list .browse-directory__details { display: contents; }
+  .browse-directory--list .browse-directory__director,
+  .browse-directory--list .browse-directory__credits { display: block; min-width: 0; font-size: 13px; line-height: 1.5; }
+  .browse-directory--list .browse-directory__facts { display: none; }
+  .browse-directory--list .browse-directory__director-label { position: absolute; width: 1px; height: 1px; padding: 0; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+}
+@media (min-width: 1280px) {
+  .browse-directory--grid .browse-directory__items { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+
 /* One mobile search/filter pattern shared by all six directory pages. */
 .mobile-browse-controls { border-bottom: 1px solid color-mix(in srgb, var(--color-border) 55%, transparent); background: var(--color-bg-primary); }
 .mobile-browse-controls__inner { display: grid; gap: 10px; padding-block: 12px; }

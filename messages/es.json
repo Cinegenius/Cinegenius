@@ -681,7 +681,10 @@
     "publishConflict": "El borrador o el proyecto publicado ha cambiado. Tus datos se conservan. Carga la versión actual antes de continuar.",
     "viewPublished": "Abrir proyecto publicado",
     "verifyAuditReason": "Verificar datos",
-    "unverifyAuditReason": "Retirar verificación"
+    "unverifyAuditReason": "Retirar verificación",
+    "colCredits": "Participaciones",
+    "creditCount": "{count} {count, plural, one {participación} other {participaciones}}",
+    "creditsCountHint": "Participaciones registradas en CineGenius."
   },
   "companies": {
     "badge": "Empresas & Proveedores",

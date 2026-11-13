@@ -681,7 +681,10 @@
     "publishConflict": "Koncept nebo zveřejněný projekt se změnil. Vaše zadání zůstává zachováno. Před pokračováním načtěte aktuální verzi.",
     "viewPublished": "Otevřít zveřejněný projekt",
     "verifyAuditReason": "Ověřit údaje",
-    "unverifyAuditReason": "Zrušit ověření"
+    "unverifyAuditReason": "Zrušit ověření",
+    "colCredits": "Účasti",
+    "creditCount": "{count} {count, plural, one {účast} few {účasti} other {účastí}}",
+    "creditsCountHint": "Účasti zaznamenané na CineGenius."
   },
   "companies": {
     "badge": "Firmy & Poskytovatelé",

@@ -681,7 +681,10 @@
     "publishConflict": "La bozza o il progetto pubblicato è cambiato. I tuoi dati sono conservati. Carica la versione attuale prima di continuare.",
     "viewPublished": "Apri il progetto pubblicato",
     "verifyAuditReason": "Verifica i dati",
-    "unverifyAuditReason": "Revoca verifica"
+    "unverifyAuditReason": "Revoca verifica",
+    "colCredits": "Partecipazioni",
+    "creditCount": "{count} {count, plural, one {partecipazione} other {partecipazioni}}",
+    "creditsCountHint": "Partecipazioni registrate su CineGenius."
   },
   "companies": {
     "badge": "Aziende & Fornitori",

@@ -681,7 +681,10 @@
     "publishConflict": "Utkastet eller det publicerade projektet har ändrats. Dina uppgifter finns kvar. Läs in den aktuella versionen innan du fortsätter.",
     "viewPublished": "Öppna publicerat projekt",
     "verifyAuditReason": "Verifiera uppgifter",
-    "unverifyAuditReason": "Ta bort verifiering"
+    "unverifyAuditReason": "Ta bort verifiering",
+    "colCredits": "Medverkan",
+    "creditCount": "{count} {count, plural, one {insats} other {insatser}}",
+    "creditsCountHint": "Insatser registrerade på CineGenius."
   },
   "companies": {
     "badge": "Företag och tjänsteleverantörer",

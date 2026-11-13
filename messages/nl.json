@@ -681,7 +681,10 @@
     "publishConflict": "Het concept of gepubliceerde project is gewijzigd. Je invoer blijft behouden. Laad de huidige versie voordat je verdergaat.",
     "viewPublished": "Gepubliceerd project openen",
     "verifyAuditReason": "Gegevens verifiëren",
-    "unverifyAuditReason": "Verificatie intrekken"
+    "unverifyAuditReason": "Verificatie intrekken",
+    "colCredits": "Bijdragen",
+    "creditCount": "{count} {count, plural, one {bijdrage} other {bijdragen}}",
+    "creditsCountHint": "Op CineGenius geregistreerde bijdragen."
   },
   "companies": {
     "badge": "Bedrijven en dienstverleners",

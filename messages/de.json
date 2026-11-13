@@ -681,7 +681,10 @@
     "publishConflict": "Der Entwurf oder das veröffentlichte Projekt wurde inzwischen geändert. Deine Eingaben bleiben erhalten. Lade den aktuellen Stand, bevor du weiterarbeitest.",
     "viewPublished": "Veröffentlichtes Projekt öffnen",
     "verifyAuditReason": "Angaben verifizieren",
-    "unverifyAuditReason": "Verifizierung zurücknehmen"
+    "unverifyAuditReason": "Verifizierung zurücknehmen",
+    "colCredits": "Mitwirkungen",
+    "creditCount": "{count} {count, plural, one {Mitwirkung} other {Mitwirkungen}}",
+    "creditsCountHint": "Auf CineGenius eingetragene Mitwirkungen."
   },
   "companies": {
     "badge": "Firmen & Dienstleister",

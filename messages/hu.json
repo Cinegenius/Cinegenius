@@ -681,7 +681,10 @@
     "publishConflict": "A piszkozat vagy a közzétett projekt megváltozott. A beírt adatok megmaradnak. A folytatás előtt töltsd be az aktuális verziót.",
     "viewPublished": "Közzétett projekt megnyitása",
     "verifyAuditReason": "Adatok ellenőrzése",
-    "unverifyAuditReason": "Ellenőrzés visszavonása"
+    "unverifyAuditReason": "Ellenőrzés visszavonása",
+    "colCredits": "Közreműködések",
+    "creditCount": "{count} közreműködés",
+    "creditsCountHint": "A CineGeniuson rögzített közreműködések."
   },
   "companies": {
     "badge": "Cégek & Szolgáltatók",

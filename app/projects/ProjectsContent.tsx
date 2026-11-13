@@ -4,8 +4,8 @@ import { useMemo } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useLocale, useTranslations } from "next-intl";
-import { Clapperboard, LayoutGrid, LayoutList, Search, Users, X } from "lucide-react";
-import MediaImage from "@/components/MediaImage";
+import { Clapperboard, LayoutGrid, LayoutList, Search, X } from "lucide-react";
+import ProjectBrowseResults from "@/components/ProjectBrowseResults";
 import MobileBrowseControls, { MobileFilterField, MobileFilterSelect, type BrowseChip } from "@/components/MobileBrowseControls";
 import { useViewState } from "@/lib/use-view-state";
 import { PROJECT_CATEGORIES, projectCategoryForType, type ProjectCategoryId } from "@/lib/project-category-filter";
@@ -21,8 +21,8 @@ export default function ProjectsContent({ projects, category = null }: { project
   const [typeFilter, setTypeFilter] = useViewState("projects.typeFilter", "");
   const [yearFilter, setYearFilter] = useViewState("projects.yearFilter", "");
   const [directorFilter, setDirectorFilter] = useViewState("projects.directorFilter", "");
-  const [sort, setSort] = useViewState<ProjectSort>("projects.sort", "recent");
-  const [view, setView] = useViewState<"list" | "grid">("projects.view", "grid");
+  const [sort, setSort] = useViewState<ProjectSort>("projects.sort", "year_desc");
+  const [view, setView] = useViewState<"list" | "grid">("projects.view", "list");
   const categories = PROJECT_CATEGORIES.map(item => ({ value: item.id, label: t(item.labelKey) }));
   const categoryProjects = useMemo(() => category ? projects.filter(project => projectCategoryForType(project.type) === category) : projects, [projects, category]);
   const types = projectTypeOptions(categoryProjects.flatMap(project => project.type ? [project.type] : []), ui, locale);
@@ -53,7 +53,7 @@ export default function ProjectsContent({ projects, category = null }: { project
   ];
   const hasFilters = Boolean(query || chips.length);
   const views = <div className="flex shrink-0 rounded-xl border border-border bg-bg-elevated p-1" role="group" aria-label={ui("locations.viewLabel")}>
-    {([{ value: "grid", icon: LayoutGrid, label: ui("Ui.text_2cc48b15f4ffeb") }, { value: "list", icon: LayoutList, label: ui("locations.viewList") }] as const).map(({ value, icon: Icon, label }) => <button type="button" key={value} aria-label={label} title={label} aria-pressed={view === value} onClick={() => setView(value)} className={`flex h-11 w-11 items-center justify-center rounded-lg transition-colors ${view === value ? "bg-gold/10 text-gold" : "text-text-muted hover:text-text-primary"}`}><Icon size={18} aria-hidden="true" /></button>)}
+    {([{ value: "list", icon: LayoutList, label: ui("locations.viewList") }, { value: "grid", icon: LayoutGrid, label: ui("Ui.text_2cc48b15f4ffeb") }] as const).map(({ value, icon: Icon, label }) => <button type="button" key={value} aria-label={label} title={label} aria-pressed={view === value} onClick={() => setView(value)} className={`flex h-11 w-11 items-center justify-center rounded-lg transition-colors ${view === value ? "bg-gold/10 text-gold" : "text-text-muted hover:text-text-primary"}`}><Icon size={18} aria-hidden="true" /></button>)}
   </div>;
   const fields = [{ label: t("filterType"), value: typeFilter, options: types, onChange: setTypeFilter }, { label: t("filterYear"), value: yearFilter, options: years, onChange: setYearFilter }, { label: t("filterDirector"), value: directorFilter, options: directors, onChange: setDirectorFilter }];
 
@@ -94,20 +94,7 @@ export default function ProjectsContent({ projects, category = null }: { project
           {hasFilters ? <button type="button" onClick={reset} className="min-h-11 rounded-xl border border-border px-4 text-sm text-gold">{t("resetFilters")}</button> : <Link className="inline-flex min-h-11 items-center rounded-xl border border-border px-4 text-sm text-gold" href="/projects">{ui("common.allProjects")}</Link>}
           <Link className="inline-flex min-h-11 items-center rounded-xl bg-gold px-4 text-sm font-semibold text-bg-primary" href="/projects/neu">{t("addProject")}</Link>
         </div>
-      </div> : <div className={view === "grid" ? "grid gap-3 sm:grid-cols-2 xl:grid-cols-3" : "grid gap-2"}>
-        {filtered.map(project => <Link href={`/projects/${project.id}`} key={project.id} className={`browse-card group flex min-w-0 items-start gap-3 p-3 transition-colors hover:border-gold/40 focus-visible:outline-2 focus-visible:outline-gold sm:gap-4 sm:p-4 ${view === "list" ? "sm:items-center" : ""}`}>
-          <div className="flex h-[76px] w-14 shrink-0 items-center justify-center overflow-hidden rounded-lg border border-border bg-bg-elevated text-text-muted">
-            {project.poster_url ? <MediaImage src={project.poster_url} alt="" width={56} height={76} className="h-full w-full object-cover" /> : <Clapperboard size={23} aria-hidden="true" />}
-          </div>
-          <div className={`min-w-0 flex-1 ${view === "list" ? "sm:grid sm:grid-cols-[minmax(0,2fr)_minmax(0,1fr)_auto] sm:items-center sm:gap-5" : ""}`}>
-            <div className="min-w-0"><h2 className="break-words text-sm font-semibold leading-snug text-text-primary group-hover:text-gold sm:text-base">{project.title}</h2>
-              <p className="mt-1 flex flex-wrap gap-x-2 text-xs leading-relaxed text-text-muted">{project.type && <span>{projectTypeLabel(project.type, ui)}</span>}{project.year !== null && <span>{project.year}</span>}</p>
-            </div>
-            {project.director ? <p className={`break-words text-xs leading-relaxed text-text-secondary ${view === "grid" ? "mt-3" : "mt-2 sm:mt-0"}`}>{t("directorPrefix", { name: project.director })}</p> : <span />}
-            {project.crew_count > 0 && <p className={`flex items-center gap-1.5 text-xs text-text-muted ${view === "grid" ? "mt-3" : "mt-2 sm:mt-0"}`}><Users size={14} className="shrink-0" aria-hidden="true" />{t("personCount", { count: project.crew_count })}</p>}
-          </div>
-        </Link>)}
-      </div>}
+      </div> : <ProjectBrowseResults projects={filtered} view={view} />}
     </div>
   </div>;
 }

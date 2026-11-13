@@ -681,7 +681,10 @@
     "publishConflict": "The draft or published project has changed. Your input is retained. Load the current version before continuing.",
     "viewPublished": "Open published project",
     "verifyAuditReason": "Verify details",
-    "unverifyAuditReason": "Remove verification"
+    "unverifyAuditReason": "Remove verification",
+    "colCredits": "Credits",
+    "creditCount": "{count} {count, plural, one {credit} other {credits}}",
+    "creditsCountHint": "Credits recorded on CineGenius."
   },
   "companies": {
     "badge": "Companies & Service Providers",
