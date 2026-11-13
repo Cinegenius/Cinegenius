@@ -50,7 +50,7 @@ export default function RoleDropdown({
         type="button"
         aria-expanded={open}
         onClick={() => setOpen(o => !o)}
-        className="w-full flex items-center justify-between gap-2 px-3 py-2 bg-bg-elevated border border-border rounded-lg text-sm hover:border-gold/50 focus:outline-none focus:border-gold transition-colors"
+        className="min-h-11 w-full flex items-center justify-between gap-2 px-3 py-2 bg-bg-elevated border border-border rounded-lg text-sm hover:border-gold/50 focus:outline-none focus:border-gold transition-colors"
       >
         <span className={value ? "text-text-primary" : "text-text-muted"}>{value ? roleLabel(value) : placeholder}</span>
         <ChevronDown size={13} className={`shrink-0 text-text-muted transition-transform ${open ? "rotate-180" : ""}`} />
@@ -75,7 +75,7 @@ export default function RoleDropdown({
                 key={o}
                 type="button"
                 onClick={() => { onChange(o); setOpen(false); setQuery(""); }}
-                className={`w-full text-left px-3 py-2 text-sm transition-colors hover:bg-bg-secondary ${value === o ? "text-gold font-semibold" : "text-text-primary"}`}
+                className={`min-h-11 w-full text-left px-3 py-2 text-sm transition-colors hover:bg-bg-secondary ${value === o ? "text-gold font-semibold" : "text-text-primary"}`}
               >
                 {roleLabel(o)}
               </button>

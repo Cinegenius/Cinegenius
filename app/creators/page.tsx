@@ -1,3 +1,4 @@
+import { publicMapPoint } from "@/lib/places/public-map-point";
 import { placeReadFields } from "@/lib/places/catalog";
 import { isPeopleDirectoryProfile } from "@/lib/profile-provider-filters";
 import { crewOccupationIds } from "@/lib/crew-occupations";
@@ -174,6 +175,7 @@ export default async function CreatorsPage({
       occupationIds: crewOccupationIds({positions: l.category ? [l.category] : []}),
       location: l.city ?? "",
         ...placeReadFields(l.city ?? "", l, locale),
+      ...publicMapPoint(l),
       image: l.image_url ?? "",
       avatar: l.image_url ?? "",
       rating: 0,
@@ -217,6 +219,7 @@ export default async function CreatorsPage({
         occupationIds: crewOccupationIds(p),
         location: p.location ?? "",
         ...placeReadFields(p.location ?? "", p, locale),
+        ...publicMapPoint(p),
         // cover: prefer first portfolio image, fall back to avatar
         image: (Array.isArray(p.portfolio_images) && p.portfolio_images.length > 0)
           ? p.portfolio_images[0]
@@ -274,6 +277,7 @@ export default async function CreatorsPage({
         serverCreators={serverCreators}
         hasMoreProfiles={profiles.length >= 96}
         initialFilters={{
+          view: Array.isArray(params.view) ? params.view[0] ?? "" : params.view ?? "",
           query: Array.isArray(params.q) ? params.q[0] ?? "" : params.q ?? "",
           city: Array.isArray(params.city) ? params.city[0] ?? "" : params.city ?? "",
           cityText: Array.isArray(params.cityText) ? params.cityText[0] ?? "" : params.cityText ?? "",

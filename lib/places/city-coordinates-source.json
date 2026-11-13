@@ -1,0 +1,12 @@
+{
+  "source": "https://download.geonames.org/export/dump/cities15000.zip",
+  "format": "https://download.geonames.org/export/dump/readme.txt",
+  "license": "https://creativecommons.org/licenses/by/4.0/",
+  "generatedUtc": "2026-11-13T14:35:54.718626+00:00",
+  "inputSha256": "50ef2f0cf7a1dd6d67123aaa6cdd45a8cf48ff5d23b3677e896f009ccce768d7",
+  "catalogSha256": "ffba04c7e7da769102b6a4c62fd6623ff1c3888dd9225dc562f1570ef65a8330",
+  "coordinateSha256": "b0291e4e24b8ba4b6a285a7e4192edc5b449702d09861e28375874877586de2a",
+  "matchedCities": 31793,
+  "catalogCities": 31793,
+  "selection": "Exact existing GeoNames ID and matching country only; populated places; no name matching, private addresses or catalogue ID changes."
+}

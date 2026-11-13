@@ -1,4 +1,13 @@
 "use client";
+import BrowseGeography from "@/components/BrowseGeography";
+import { useBrowseGeography } from "@/lib/use-browse-geography";
+import { prioritizeGeographically } from "@/lib/browse-geography";
+
+
+import FloatingMapToggle from "@/components/FloatingMapToggle";
+import DirectoryMap from "@/components/DirectoryMap";
+import DirectoryViewControls, { type DirectoryView } from "@/components/DirectoryViewControls";
+import { useDirectoryMap } from "@/lib/use-directory-map";
 
 import PlaceFilters, { EMPTY_PLACE_FILTERS } from "@/components/PlaceFilters";
 import { placeSearchMatches, matchesPlace, placeOptions } from "@/lib/places/core";
@@ -16,7 +25,7 @@ import { useUser, useAuth } from "@clerk/nextjs";
 import { Heart } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
-import { Search, Package, X, Truck, MapPin, LayoutGrid, List, ChevronDown } from "lucide-react";
+import { Search, Package, X, Truck, MapPin, ChevronDown } from "lucide-react";
 import { useTranslations, useLocale } from "next-intl";
 import EmptyState from "@/components/EmptyState";
 import { localizedMarketplaceDepartments, marketplaceMatches, marketplaceSearchCategories, marketplaceSearchTerms } from "@/lib/marketplaceCategories";
@@ -31,6 +40,7 @@ type Prop = {
   delivery: boolean; rentalType?: "miete" | "kauf" | "beides"; focalPoint?: { x: number; y: number } | null;
   description?: string; isReal?: boolean; type?: string; meta?: Record<string, unknown> | null;
   ownerId?: string;
+  lat?: number | null; lng?: number | null;
 };
 
 type RatingData = { avg: number; count: number } | undefined;
@@ -49,36 +59,26 @@ function PropCard({ p, list, ratingData, myRating, onRate, canRate, isFavorited,
   const navigation = useTranslations("MarketplaceNavigation");
   const market=useTranslations("MarketplaceOffer"),catalog=useTranslations("MarketplaceCatalog"),locale=useLocale();
   const href = p.type === "vehicle" ? `/vehicles/${p.id}` : `/props/${p.id}`;
-  const favorite = onFavorite && <button type="button" onClick={onFavorite} aria-label={navigation(isFavorited ? "removeFavorite" : "saveFavorite")} aria-pressed={!!isFavorited} className={`${list ? "shrink-0" : "absolute right-2.5 top-2.5 z-10"} flex min-h-11 min-w-11 items-center justify-center rounded-full border backdrop-blur-sm transition-colors ${isFavorited ? "border-crimson/50 bg-crimson/20 text-crimson-light" : "border-border bg-bg-primary/80 text-text-secondary hover:text-crimson-light"}`}><Heart size={16} className={isFavorited ? "fill-current" : ""} /></button>;
+  const favorite = onFavorite && <button type="button" onClick={onFavorite} aria-label={navigation(isFavorited ? "removeFavorite" : "saveFavorite")} aria-pressed={!!isFavorited} className={`flex min-h-11 min-w-11 items-center justify-center rounded-full transition-colors ${list ? `shrink-0 ${isFavorited ? "text-crimson-light" : "text-text-muted hover:text-crimson-light"}` : `absolute right-2.5 top-2.5 z-10 border backdrop-blur-sm ${isFavorited ? "border-crimson/50 bg-crimson/20 text-crimson-light" : "border-border bg-bg-primary/80 text-text-secondary hover:text-crimson-light"}`}`}><Heart size={16} className={isFavorited ? "fill-current" : ""} /></button>;
 
 
   if (list) {
     return (
-      <article className="browse-card card-hover group flex min-w-0 items-center gap-3 p-3" data-visible>
-      <Link href={href} className="flex min-w-0 flex-1 items-center gap-4">
-        <div className="relative w-20 h-20 rounded-lg overflow-hidden shrink-0 bg-bg-elevated border border-border">
-          {p.image
-            ? <MediaImage mediaSize="thumbnail" src={p.image} alt={p.title} fill sizes="(max-width: 768px) 50vw, 400px" loading="lazy" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" style={{ objectPosition: p.focalPoint ? `${p.focalPoint.x}% ${p.focalPoint.y}%` : "50% 66%" }} />
-            : <div className="w-full h-full flex items-center justify-center text-text-muted/30"><svg viewBox="0 0 24 24" fill="currentColor" className="w-8 h-8"><path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/></svg></div>
-          }
-        </div>
-        <div className="flex-1 min-w-0">
-          <h3 className="font-semibold text-text-primary text-sm mb-1 line-clamp-2">{p.title}</h3>
-          <div className="flex items-center gap-2 flex-wrap">
-            <span className="text-[10px] text-text-muted flex items-center gap-1"><MapPin size={9} />{p.location || p.vendor}</span>
-            <span className="text-[10px] px-2 py-0.5 bg-bg-elevated border border-border text-text-muted rounded-full">{marketplaceCategoryLabel(p.category,catalog)}</span>
-            <span className="text-[10px] font-medium text-gold">{navigation(p.rentalType === "beides" ? "both" : p.rentalType === "kauf" ? "buy" : "rent")}</span>
-            {p.delivery && <span className="text-[10px] text-teal-400 flex items-center gap-0.5"><Truck size={9} /> {tp("deliveryBadge")}</span>}
+      <article className="browse-card group flex min-w-0 items-center gap-1 p-2 sm:gap-2 sm:p-3" data-visible>
+        <Link href={href} className="flex min-w-0 flex-1 items-center gap-3 rounded-lg focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold">
+          <div className="relative h-14 w-14 shrink-0 overflow-hidden rounded-lg border border-border bg-bg-elevated sm:h-16 sm:w-16">
+            {p.image ? <MediaImage mediaSize="thumbnail" src={p.image} alt="" fill sizes="64px" loading="lazy" className="object-cover" style={{ objectPosition: p.focalPoint ? `${p.focalPoint.x}% ${p.focalPoint.y}%` : "50% 66%" }} /> : <div className="flex h-full items-center justify-center text-text-muted"><Package size={22} aria-hidden="true" /></div>}
           </div>
-        </div>
-        <div className="max-w-[45%] text-right">
-          <p className="break-words text-sm font-bold text-gold">
-            {listingPriceLabel(p.dailyRate,{...p.meta,rental_type:p.rentalType},"/Tag",locale,market)}
-          </p>
-          <p className="text-[10px] text-text-muted mt-0.5">{p.condition}</p>
-        </div>
-      </Link>
-      {favorite}
+          <div className="min-w-0 flex-1 py-0.5">
+            <h3 className="line-clamp-2 text-sm font-semibold leading-5 text-text-primary [overflow-wrap:anywhere]">{p.title}</h3>
+            <p className="mt-0.5 flex min-w-0 items-center gap-1 text-xs text-text-muted"><MapPin size={11} className="shrink-0" aria-hidden="true" /><span className="truncate">{p.location || p.vendor}</span></p>
+            <div className="mt-1 flex min-w-0 flex-wrap items-baseline gap-x-2 gap-y-0.5">
+              <p className="text-xs font-semibold text-gold [overflow-wrap:anywhere]">{listingPriceLabel(p.dailyRate, { ...p.meta, rental_type: p.rentalType }, "/Tag", locale, market)}</p>
+              <span className="text-[11px] text-text-muted">{navigation(p.rentalType === "beides" ? "both" : p.rentalType === "kauf" ? "buy" : "rent")}</span>
+            </div>
+          </div>
+        </Link>
+        {favorite}
       </article>
     );
   }
@@ -156,6 +156,7 @@ function PropsInner({ serverListings, serverError = false, initialDepartment }: 
   const navigation = useTranslations("MarketplaceNavigation"), catalog = useTranslations("MarketplaceCatalog");
   const pathname = usePathname(), searchParams = useSearchParams();
   const { user } = useUser(), { isSignedIn } = useAuth();
+  const resultsRef = useRef<HTMLDivElement>(null);
   const owner = isSignedIn && user?.id ? user.id : "guest";
   const privateVendor = t("vendorPrivate");
   const departments = useMemo(() => localizedMarketplaceDepartments(catalog), [catalog]);
@@ -169,14 +170,15 @@ function PropsInner({ serverListings, serverError = false, initialDepartment }: 
   const [subcategory, setSubcategory] = useViewState("marketplace.subcategory", initial.subcategory);
   const [offer, setOffer] = useViewState<MarketplaceOfferFilter>("marketplace.rentalTypeFilter", initial.offer);
   const [sort, setSort] = useViewState<MarketplaceSort>("marketplace.sortKey", initial.sort);
-  const [view, setView] = useViewState<"grid" | "list">("marketplace.viewMode", initial.view);
+  const [view, setView] = useViewState<DirectoryView>("marketplace.viewMode", initial.view);
   const [pagination, setPagination] = useViewState("marketplace.pagination", { filterKey: "", visibleCount: MARKETPLACE_PAGE_SIZE });
   const selected = marketplaceCategorySelection(department, subcategory);
   const selectedDept = selected.department ? String(selected.department) : null;
   const selectedSub = String(selected.subcategory);
   const rentalTypeFilter = offer === "miete" || offer === "kauf" ? offer : "alle";
   const sortKey = sort === "price-asc" || sort === "price-desc" ? sort : "featured";
-  const viewMode = view === "list" ? "list" : "grid";
+  const geography = useBrowseGeography(sortKey === "featured" && !placeFilters.country && !placeFilters.region && !placeFilters.city && !cityText);
+  const viewMode = view === "map" ? "map" : view === "list" ? "list" : "grid";
   const changeCategory = (nextDepartment: string | null, nextSubcategory?: string) => {
     const next = marketplaceCategorySelection(nextDepartment, nextSubcategory ?? "");
     setDepartment(next.department); setSubcategory(next.subcategory);
@@ -184,8 +186,8 @@ function PropsInner({ serverListings, serverError = false, initialDepartment }: 
   const updatePlaceFilters = (next: typeof placeFilters) => { setPlaceFilters(next); if (next.city) setCityText(""); };
   const activeDepartment = departments.find(row => row.id === selectedDept);
   const activeSubcategory = activeDepartment?.groups.find(row => row.id === selectedSub);
-  const sortOptions = [{ value: "featured", label: navigation("newest") }, { value: "price-asc", label: t("sortPriceAsc") }, { value: "price-desc", label: t("sortPriceDesc") }];
-  const filterKey = JSON.stringify([placeFilters.country, placeFilters.region, placeFilters.city, cityText.trim(), selectedDept, selectedSub, query.trim(), rentalTypeFilter, sortKey]);
+  const sortOptions = [{ value: "featured", label: geography.preferred ? uiText("BrowseGeography.recommended") : navigation("newest") }, { value: "price-asc", label: t("sortPriceAsc") }, { value: "price-desc", label: t("sortPriceDesc") }];
+  const filterKey = JSON.stringify([placeFilters.country, placeFilters.region, placeFilters.city, cityText.trim(), selectedDept, selectedSub, query.trim(), rentalTypeFilter, sortKey, geography.key]);
   const requestKey = JSON.stringify([filterKey, locale]);
   const visibleCount = pagination.filterKey === filterKey ? pagination.visibleCount : MARKETPLACE_PAGE_SIZE;
   const currentPage = Math.max(1, Math.ceil(visibleCount / MARKETPLACE_PAGE_SIZE));
@@ -217,9 +219,9 @@ function PropsInner({ serverListings, serverError = false, initialDepartment }: 
     });
     if (sortKey === "price-asc") rows.sort((a, b) => a.dailyRate - b.dailyRate);
     if (sortKey === "price-desc") rows.sort((a, b) => b.dailyRate - a.dailyRate);
-    return rows;
-  }, [serverListings, query, locale, catalog, departments, selectedDept, selectedSub, placeFilters, cityText, rentalTypeFilter, sortKey]);
-  const [remote, setRemote] = useState<{ key: string; rows: Prop[]; count: number; pages: number } | null>(null);
+    return prioritizeGeographically(rows, geography.preferred);
+  }, [serverListings, query, locale, catalog, departments, selectedDept, selectedSub, placeFilters, cityText, rentalTypeFilter, sortKey, geography.preferred]);
+  const [remote, setRemote] = useState<{ key: string; rows: Prop[]; count: number; pages: number; complete?: boolean } | null>(null);
   const remoteRef = useRef(remote);
   useEffect(() => { remoteRef.current = remote; }, [remote]);
   const requestSerial = useRef(0);
@@ -232,12 +234,33 @@ function PropsInner({ serverListings, serverError = false, initialDepartment }: 
       const previous = remoteRef.current;
       const pages = previous?.key === requestKey && previous.pages >= currentPage - 1 && currentPage > 1 ? [currentPage] : Array.from({ length: currentPage }, (_, index) => index + 1);
       const base = new URLSearchParams({ marketplace: "1", limit: String(MARKETPLACE_PAGE_SIZE), sort: sortKey });
+      if (geography.preferred) base.set("nearby", "1");
       for (const kind of ["country", "region", "city"] as const) if (placeFilters[kind]) base.set(kind, placeFilters[kind]);
       if (cityText) base.set("cityText", cityText);
       if (selectedDept) base.set("dept", selectedDept);
       if (selectedSub) base.set("sub", selectedSub);
       if (query.trim()) base.set("q", query.trim());
       if (rentalTypeFilter !== "alle") base.set("offer", rentalTypeFilter);
+      if (viewMode === "map") {
+        if (previous?.key === requestKey && previous.complete) return;
+        base.set("limit", "100");
+        void (async () => {
+          const rows: Prop[] = [];
+          for (let page = 1; ; page++) {
+            const params = new URLSearchParams(base); params.set("page", String(page));
+            const response = await fetch(`/api/listings?${params}`, { signal: controller.signal });
+            if (!response.ok) throw new Error("listing_request_failed");
+            const result = await response.json();
+            if (!Array.isArray(result.data) || !Number.isSafeInteger(result.count) || result.count < 0) throw new Error("invalid_listing_response");
+            if (controller.signal.aborted || serial !== requestSerial.current) return;
+            rows.push(...result.data.map((row: Record<string, unknown>) => ({ ...marketplaceCardData(row), vendor: privateVendor })));
+            const complete = result.data.length < 100 || page * 100 >= result.count;
+            setRemote({ key: requestKey, rows: [...new Map(rows.map(row => [row.id, row])).values()], count: result.count, pages: Math.ceil(rows.length / MARKETPLACE_PAGE_SIZE), complete });
+            if (complete) break;
+          }
+        })().catch(() => { if (!controller.signal.aborted && serial === requestSerial.current) setBrowseError(requestKey); });
+        return;
+      }
       void Promise.all(pages.map(async page => {
         const params = new URLSearchParams(base); params.set("page", String(page));
         const response = await fetch(`/api/listings?${params}`, { signal: controller.signal });
@@ -253,13 +276,20 @@ function PropsInner({ serverListings, serverError = false, initialDepartment }: 
       }).catch(() => { if (!controller.signal.aborted && serial === requestSerial.current) setBrowseError(requestKey); });
     }, 250);
     return () => { window.clearTimeout(timer); controller.abort(); };
-  }, [requestKey, currentPage, retry, sortKey, placeFilters, cityText, selectedDept, selectedSub, query, rentalTypeFilter, privateVendor]);
+  }, [requestKey, currentPage, retry, sortKey, placeFilters, cityText, selectedDept, selectedSub, query, rentalTypeFilter, privateVendor, viewMode, geography.preferred]);
   const hasRemote = remote?.key === requestKey;
   const failed = browseError === requestKey;
-  const browseLoading = !failed && (!hasRemote || remote.pages < currentPage);
+  const browseLoading = !failed && (!hasRemote || (viewMode === "map" ? !remote.complete : remote.pages < currentPage));
   const resultRows = hasRemote ? remote.rows : filtered;
-  const resultCount = hasRemote ? remote.count : filtered.length;
-  const visibleRows = resultRows.slice(0, visibleCount);
+  const map = useDirectoryMap("marketplace", filterKey, resultRows, viewMode === "map");
+  const resultCount = viewMode === "map" ? map.rows.length : hasRemote ? remote.count : filtered.length;
+  const visibleRows = map.rows.slice(0, visibleCount);
+  const mapItems = useMemo(() => resultRows.map(row => ({
+    id: row.id, title: row.title, city: row.location, subtitle: marketplaceCategoryLabel(row.category, catalog),
+    href: row.type === "vehicle" ? `/vehicles/${encodeURIComponent(row.id)}` : `/props/${encodeURIComponent(row.id)}`,
+    image: row.image, focalPoint: row.focalPoint, lat: row.lat, lng: row.lng,
+    priceLabel: listingPriceLabel(row.dailyRate, { ...row.meta, rental_type: row.rentalType }, "/Tag", locale, key => uiText(`MarketplaceOffer.${key}`)),
+  })), [resultRows, catalog, locale, uiText]);
   const visibleIds = visibleRows.map(row => row.id).sort().join(",");
   const [ratingState, setRatingState] = useState<RatingState>({ owner, ratings: {}, mine: {}, eligible: new Set() });
   const [favoriteState, setFavoriteState] = useState<{ owner: string; ids: Set<string> }>({ owner, ids: new Set() });
@@ -363,12 +393,11 @@ function PropsInner({ serverListings, serverError = false, initialDepartment }: 
     ...(["country", "region", "city"] as const).flatMap(kind => placeFilters[kind] ? [{ id: `place-${kind}`, label: placeOptions(serverListings, kind, locale).find(option => option.value === placeFilters[kind])?.label ?? placeFilters[kind], onRemove: () => setPlaceFilters({ ...placeFilters, [kind]: "" }) }] : []),
     ...(rentalTypeFilter !== "alle" ? [{ id: "offer", label: navigation(rentalTypeFilter === "miete" ? "rent" : "buy"), onRemove: () => setOffer("alle") }] : []),
   ];
-  const viewControls = <div className="inline-flex shrink-0 overflow-hidden rounded-lg border border-border bg-bg-elevated">
-    <button type="button" aria-label={navigation("viewGrid")} aria-pressed={viewMode === "grid"} onClick={() => setView("grid")} className={`flex min-h-11 min-w-11 items-center justify-center ${viewMode === "grid" ? "bg-gold text-bg-primary" : "text-text-muted hover:text-text-primary"}`}><LayoutGrid size={17} /></button>
-    <button type="button" aria-label={navigation("viewList")} aria-pressed={viewMode === "list"} onClick={() => setView("list")} className={`flex min-h-11 min-w-11 items-center justify-center border-l border-border ${viewMode === "list" ? "bg-gold text-bg-primary" : "text-text-muted hover:text-text-primary"}`}><List size={17} /></button>
-  </div>;
+  const viewControls = <DirectoryViewControls value={viewMode} onChange={setView} />;
   return <div className="min-h-screen mobile-bottom-nav-clear">
-    <MobileBrowseControls query={query} onQueryChange={setQuery} searchPlaceholder={t("searchPlaceholder")} sortValue={sortKey} sortOptions={sortOptions} onSortChange={value => setSort(value as MarketplaceSort)} categoryLabel={navigation("category")} allCategoryLabel={navigation("allCategories")} categories={departments.map(row => ({ value: row.id, label: row.label }))} categoryValue={selectedDept ?? ""} onCategoryChange={value => changeCategory(value || null)} categoryPlacement="filters" resultSummary={t("results", { count: resultCount })} viewControls={viewControls} filterCount={chips.length} chips={chips} onReset={clearAll} resetLabel={t("clearAllFilters")} showResultsLabel={t("results", { count: resultCount })}>
+    <FloatingMapToggle mapActive={viewMode === "map"} onToggle={() => { setView(viewMode === "map" ? "list" : "map"); requestAnimationFrame(() => resultsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" })); }} />
+    <BrowseGeography hasDesktopCountryFilter country={placeFilters.country} onCountryChange={value => updatePlaceFilters({ country: value, region: "", city: "" })} geography={geography} />
+      <MobileBrowseControls query={query} onQueryChange={setQuery} searchPlaceholder={t("searchPlaceholder")} sortValue={sortKey} sortOptions={sortOptions} onSortChange={value => { geography.setEnabled(false); setSort(value as MarketplaceSort); }} categoryLabel={navigation("category")} allCategoryLabel={navigation("allCategories")} categories={departments.map(row => ({ value: row.id, label: row.label }))} categoryValue={selectedDept ?? ""} onCategoryChange={value => changeCategory(value || null)} categoryPlacement="filters" resultSummary={t("results", { count: resultCount })} viewControls={viewControls} filterCount={chips.length} chips={chips} onReset={clearAll} resetLabel={t("clearAllFilters")} showResultsLabel={t("results", { count: resultCount })}>
       {activeDepartment && <MobileFilterField label={navigation("subcategory")}><MobileFilterSelect value={selectedSub} onChange={value => changeCategory(selectedDept, value)} placeholder={navigation("allInCategory", { category: activeDepartment.label })} options={activeDepartment.groups.map(row => ({ value: row.id, label: row.label }))} /></MobileFilterField>}
       <PlaceFilters rows={serverListings} value={placeFilters} onChange={updatePlaceFilters} scope="marketplace" />
       <MobileFilterField label={navigation("offerType")}><MobileFilterSelect value={rentalTypeFilter === "alle" ? "" : rentalTypeFilter} onChange={value => setOffer(value === "miete" || value === "kauf" ? value : "alle")} placeholder={uiText("common.all")} options={[{ value: "miete", label: navigation("rent") }, { value: "kauf", label: navigation("buy") }]} /></MobileFilterField>
@@ -377,21 +406,22 @@ function PropsInner({ serverListings, serverError = false, initialDepartment }: 
       <div className="flex flex-wrap items-end gap-3">
         <label className="min-w-0 flex-1"><span className="sr-only">{t("searchPlaceholder")}</span><span className="flex min-h-11 items-center gap-2 rounded-xl border border-border bg-bg-elevated px-3 focus-within:border-gold/50"><Search size={17} aria-hidden="true" className="shrink-0 text-text-muted" /><input type="search" value={query} onChange={event => setQuery(event.target.value)} placeholder={t("searchPlaceholder")} className="min-h-11 w-full min-w-0 bg-transparent text-sm outline-none" />{query && <button type="button" aria-label={uiText("locations.landingClear")} onClick={() => setQuery("")} className="flex min-h-11 min-w-11 items-center justify-center text-text-muted hover:text-text-primary"><X size={16} /></button>}</span></label>
         <label className="relative flex min-w-0 flex-col gap-1 text-xs text-text-secondary"><span>{navigation("offerType")}</span><select value={rentalTypeFilter} onChange={event => setOffer(event.target.value as MarketplaceOfferFilter)} className="min-h-11 appearance-none rounded-lg border border-border bg-bg-elevated pl-3 pr-9 text-sm"><option value="alle">{uiText("common.all")}</option><option value="miete">{navigation("rent")}</option><option value="kauf">{navigation("buy")}</option></select><ChevronDown size={15} aria-hidden="true" className="pointer-events-none absolute bottom-3.5 right-3 text-text-muted" /></label>
-        <label className="relative flex min-w-0 flex-col gap-1 text-xs text-text-secondary"><span>{t("sortLabel")}</span><select value={sortKey} onChange={event => setSort(event.target.value as MarketplaceSort)} className="min-h-11 appearance-none rounded-lg border border-border bg-bg-elevated pl-3 pr-9 text-sm">{sortOptions.map(option => <option key={option.value} value={option.value}>{option.label}</option>)}</select><ChevronDown size={15} aria-hidden="true" className="pointer-events-none absolute bottom-3.5 right-3 text-text-muted" /></label>
+        <label className="relative flex min-w-0 flex-col gap-1 text-xs text-text-secondary"><span>{t("sortLabel")}</span><select value={sortKey} onChange={event => { geography.setEnabled(false); setSort(event.target.value as MarketplaceSort); }} className="min-h-11 appearance-none rounded-lg border border-border bg-bg-elevated pl-3 pr-9 text-sm">{sortOptions.map(option => <option key={option.value} value={option.value}>{option.label}</option>)}</select><ChevronDown size={15} aria-hidden="true" className="pointer-events-none absolute bottom-3.5 right-3 text-text-muted" /></label>
         {viewControls}
       </div>
       <PlaceFilters rows={serverListings} value={placeFilters} onChange={updatePlaceFilters} scope="marketplace" />
       {(chips.length > 0 || query) && <div className="flex flex-wrap items-center gap-2">{chips.map(chip => <span key={chip.id} className="inline-flex min-w-0 items-center gap-1 rounded-full border border-border bg-bg-secondary pl-3 text-xs text-text-secondary"><span className="min-w-0 break-words">{chip.label}</span><button type="button" aria-label={uiText("Ui.text_f10fe7a27ce274", { value1: chip.label })} onClick={chip.onRemove} className="flex min-h-11 min-w-11 shrink-0 items-center justify-center"><X size={14} /></button></span>)}<button type="button" onClick={clearAll} className="min-h-11 px-2 text-xs text-text-muted underline hover:text-text-primary">{t("clearAllFilters")}</button></div>}
     </div></div>
-    <div className="site-container py-4 sm:py-6">
+    <div ref={resultsRef} className="site-container scroll-mt-24 py-4 sm:py-6">
       <div className="mb-5"><MarketplaceCategoryNavigation key={`${selectedDept ?? "all"}:${selectedSub}`} department={selectedDept} subcategory={selectedSub} onChange={changeCategory} /></div>
       <p className="mb-4 hidden text-sm text-text-secondary xl:block">{t("results", { count: resultCount })}</p>
       {actionError && <p role="alert" className="mb-4 text-sm text-red-400">{uiText("System.requestFailed")}</p>}
       {failed && <div role="alert" className="mb-4 flex flex-wrap items-center gap-3 rounded-xl border border-border bg-bg-secondary p-4 text-sm text-text-secondary"><span>{navigation("filterError")}</span><button type="button" onClick={() => { setBrowseError(null); setRetry(value => value + 1); }} className="min-h-11 rounded-lg border border-border px-4 font-medium text-gold hover:border-gold">{navigation("retry")}</button></div>}
       {browseLoading && <p role="status" className="mb-4 text-sm text-text-muted">{navigation("loading")}</p>}
+      {viewMode === "map" && <DirectoryMap kind="marketplace" items={mapItems} bounds={map.bounds} onBoundsChange={map.setBounds} />}
       <div aria-busy={browseLoading}>
         {visibleRows.length > 0 ? <>
-          <div className={viewMode === "grid" ? "grid grid-cols-2 gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4" : "space-y-2"}>{visibleRows.map(row => <PropCard key={row.id} p={row} list={viewMode === "list"} ratingData={liveRatings[row.id]} myRating={myRatings[row.id]} canRate={!!isSignedIn && !!user && user.id !== row.ownerId && eligible.has(row.id)} onRate={star => handleRate(row.id, row.ownerId, star)} isFavorited={favorites.has(row.id)} onFavorite={isSignedIn ? event => { void handleFavorite(event, row.id); } : undefined} />)}</div>
+          <div className={viewMode === "grid" ? "grid grid-cols-2 gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4" : "space-y-2"}>{visibleRows.map(row => <PropCard key={row.id} p={row} list={viewMode !== "grid"} ratingData={liveRatings[row.id]} myRating={myRatings[row.id]} canRate={!!isSignedIn && !!user && user.id !== row.ownerId && eligible.has(row.id)} onRate={star => handleRate(row.id, row.ownerId, star)} isFavorited={favorites.has(row.id)} onFavorite={isSignedIn ? event => { void handleFavorite(event, row.id); } : undefined} />)}</div>
           {resultCount > visibleCount && <div className="mt-8 text-center"><button type="button" disabled={browseLoading} onClick={() => setPagination({ filterKey, visibleCount: visibleCount + MARKETPLACE_PAGE_SIZE })} className="min-h-11 rounded-xl border border-border px-8 py-3 text-sm font-semibold text-text-secondary transition-colors hover:border-gold hover:text-gold disabled:opacity-50">{t("loadMore", { count: resultCount - visibleCount })}</button></div>}
         </> : !failed && !browseLoading ? <EmptyState icon={Package} title={serverListings.length === 0 ? t("emptyTitle") : t("emptyTitleFiltered")} description={serverListings.length === 0 ? t("emptyDesc") : t("emptyDescFiltered")} action={chips.length || query ? { label: t("emptyReset"), onClick: clearAll } : undefined} /> : null}
       </div>

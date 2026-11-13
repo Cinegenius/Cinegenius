@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, type ReactNode } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import { Search, SlidersHorizontal, ArrowUpDown, X } from "lucide-react";
 import { useTranslations } from "next-intl";
 
@@ -40,18 +40,37 @@ export default function MobileBrowseControls({
   const uiText = useTranslations();
 
   const [open, setOpen] = useState(false);
+  const dialog = useRef<HTMLDialogElement>(null);
 
   useEffect(() => {
-    if (!open) return;
+    const element = dialog.current;
+    if (!open || !element) return;
     const previous = document.body.style.overflow;
+    const previousFocus = document.activeElement;
     document.body.style.overflow = "hidden";
-    const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Escape") setOpen(false);
+    element.showModal();
+    element.querySelector<HTMLButtonElement>("[data-filter-close]")?.focus();
+    const viewport = window.visualViewport;
+    const resize = () => {
+      const height = viewport?.height ?? window.innerHeight;
+      element.style.top = `${viewport?.offsetTop ?? 0}px`;
+      element.style.height = `${height}px`;
+      element.style.setProperty("--browse-panel-height", `${height * 0.88}px`);
     };
-    window.addEventListener("keydown", onKeyDown);
+    const back = () => setOpen(false);
+    resize();
+    viewport?.addEventListener("resize", resize);
+    viewport?.addEventListener("scroll", resize);
+    window.addEventListener("resize", resize);
+    window.addEventListener("popstate", back);
     return () => {
+      if (element.open) element.close();
       document.body.style.overflow = previous;
-      window.removeEventListener("keydown", onKeyDown);
+      viewport?.removeEventListener("resize", resize);
+      viewport?.removeEventListener("scroll", resize);
+      window.removeEventListener("resize", resize);
+      window.removeEventListener("popstate", back);
+      if (previousFocus instanceof HTMLElement && previousFocus.isConnected) previousFocus.focus();
     };
   }, [open]);
 
@@ -85,7 +104,7 @@ export default function MobileBrowseControls({
         </label>}
 
         <div className="mobile-browse-summary">
-          {viewControls ? <div className="flex min-w-0 flex-wrap items-center justify-between gap-2"><p>{resultSummary}</p>{viewControls}</div> : <p>{resultSummary}</p>}
+          {viewControls ? <div className="mobile-browse-summary-row"><p title={typeof resultSummary === "string" ? resultSummary : undefined}>{resultSummary}</p>{viewControls}</div> : <p>{resultSummary}</p>}
           {chips.length > 0 && (
             <div className="mobile-browse-chips" aria-label={uiText("Ui.text_75e581194056a5")}>
               {chips.slice(0, 3).map((chip) => (
@@ -113,13 +132,13 @@ export default function MobileBrowseControls({
       </div>
 
       {open && (
-        <div className="mobile-filter-dialog" role="presentation">
-          <button className="mobile-filter-dialog__backdrop" aria-label={uiText("Ui.text_5f423bd7da0e95")} onClick={() => setOpen(false)} />
-          <section className="mobile-filter-panel" role="dialog" aria-modal="true" aria-label={uiText("locations.filterBtn")}>
+        <dialog ref={dialog} className="mobile-filter-dialog" aria-modal="true" aria-label={uiText("locations.filterBtn")} onCancel={event => { event.preventDefault(); setOpen(false); }}>
+          <button tabIndex={-1} className="mobile-filter-dialog__backdrop" aria-label={uiText("Ui.text_5f423bd7da0e95")} onClick={() => setOpen(false)} />
+          <section className="mobile-filter-panel">
             <div className="mobile-filter-panel__handle" />
             <header className="mobile-filter-panel__header">
               <h2>{uiText("locations.filterBtn")}</h2>
-              <button type="button" aria-label={uiText("ProfilePhotoCrop.close")} onClick={() => setOpen(false)}><X size={20} /></button>
+              <button data-filter-close type="button" aria-label={uiText("ProfilePhotoCrop.close")} onClick={() => setOpen(false)}><X size={20} /></button>
             </header>
             <div className="mobile-filter-panel__content">
               <label className="mobile-filter-field">
@@ -136,7 +155,7 @@ export default function MobileBrowseControls({
               <button type="button" className="mobile-filter-apply" onClick={() => setOpen(false)}>{showResultsLabel}</button>
             </footer>
           </section>
-        </div>
+        </dialog>
       )}
     </section>
   );

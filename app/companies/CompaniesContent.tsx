@@ -1,5 +1,14 @@
 "use client";
+import BrowseGeography from "@/components/BrowseGeography";
+import { useBrowseGeography } from "@/lib/use-browse-geography";
+import { prioritizeGeographically } from "@/lib/browse-geography";
 
+
+import DirectoryMap from "@/components/DirectoryMap";
+import DirectoryViewControls, { type DirectoryView } from "@/components/DirectoryViewControls";
+import FloatingMapToggle from "@/components/FloatingMapToggle";
+import { useDirectoryMap } from "@/lib/use-directory-map";
+import type { DirectoryCompany as Company } from "@/lib/company-directory";
 import PlaceFilters from "@/components/PlaceFilters";
 
 import { placeSearchMatches, placeOptions, matchesPlace, placeDisplay, canonicalFilterValue } from "@/lib/places/core";
@@ -7,13 +16,13 @@ import { animalCategoryLabel, animalCompanySearchText, isAnimalCompany } from "@
 
 import { useViewState } from "@/lib/use-view-state";
 
-import { useState, useMemo, useEffect, useRef } from "react";
+import { useState, useMemo, useEffect, useRef, useCallback } from "react";
 import Link from "next/link";
 import CompanyLogo from "@/components/CompanyLogo";
 import { useTranslations, useLocale } from "next-intl";
 import type { LucideIcon } from "lucide-react";
 import {
-  Building2, MapPin, Search, CheckCircle, LayoutGrid, LayoutList,
+  Building2, MapPin, Search, CheckCircle,
   ChevronRight, X, Camera, Volume2, Wrench, Shirt,
   Package, Film, Monitor, Users, Sparkles, Megaphone, Car,
   Lightbulb, Globe, Zap, ChevronDown, Utensils,
@@ -26,21 +35,6 @@ import { taxonomyLabel } from "@/lib/departments";
 
 
 const PAGE_SIZE = 24;
-
-type Company = {
-  id: string;
-  slug: string;
-  name: string;
-  logo_url: string | null;
-  description: string;
-  city: string;
-  categories: string[];
-  services: string[];
-  catering_details?: unknown;
-  animal_details?: unknown;
-  verified: boolean;
-  created_at: string;
-};
 
 // ── Category icons ────────────────────────────────────────────────
 const CATEGORY_ICONS: Record<string, LucideIcon> = {
@@ -121,7 +115,7 @@ export default function CompaniesContent({ initialCompanies }: { initialCompanie
   const t = useTranslations("companies");
   const animals = useTranslations("FilmAnimals");
   const safetyMedical = useTranslations("SafetyMedical");
-  const companyCategoryLabel = (id: string, fallback: string) => safetyMedicalCompanyCategoryLabel(id, animalCategoryLabel(id, fallback, animals), safetyMedical);
+  const companyCategoryLabel = useCallback((id: string, fallback: string) => safetyMedicalCompanyCategoryLabel(id, animalCategoryLabel(id, fallback, animals), safetyMedical), [animals, safetyMedical]);
 
   const [search, setSearch] = useViewState("companies.search", "");
   const [selectedCategory, setSelectedCategory] = useViewState<string | null>("companies.selectedCategory", null);
@@ -130,7 +124,8 @@ export default function CompaniesContent({ initialCompanies }: { initialCompanie
   const [regionFilter, setRegionFilter] = useViewState("companies.regionFilter", "");
   const [verifiedOnly, setVerifiedOnly] = useViewState("companies.verifiedOnly", false);
   const [sortKey, setSortKey] = useViewState("companies.sortKey", "newest");
-  const [viewMode, setViewMode] = useViewState<"grid" | "list">("companies.viewMode", "grid");
+  const geography = useBrowseGeography(sortKey === "newest" && !countryFilter && !regionFilter && !cityFilter);
+  const [viewMode, setViewMode] = useViewState<DirectoryView>("companies.viewMode", "grid");
   const [pageState, setPageState] = useViewState("companies.pageState", { filterKey: "", page: 1 });
 
   useEffect(() => {
@@ -166,25 +161,33 @@ export default function CompaniesContent({ initialCompanies }: { initialCompanie
     if (verifiedOnly) result = result.filter((c) => c.verified);
     if (sortKey === "newest") result = [...result].sort((a, b) => b.created_at.localeCompare(a.created_at));
     if (sortKey === "name") result = [...result].sort((a, b) => a.name.localeCompare(b.name, locale));
-    return result;
-  }, [initialCompanies, search, selectedCategory, cityFilter, countryFilter, regionFilter, verifiedOnly, sortKey]);
+    return prioritizeGeographically(result, geography.preferred);
+  }, [initialCompanies, search, selectedCategory, cityFilter, countryFilter, regionFilter, verifiedOnly, sortKey, locale, geography.preferred]);
 
-  const filterKey = JSON.stringify([search, selectedCategory, cityFilter, countryFilter, regionFilter, verifiedOnly, sortKey]);
-  const page = pageState.filterKey === filterKey ? pageState.page : 1;
-  const resetPage = () => setPageState({ filterKey, page: 1 });
+  const filterKey = JSON.stringify([search, selectedCategory, cityFilter, countryFilter, regionFilter, verifiedOnly, sortKey, geography.key]);
+  const map = useDirectoryMap("companies", filterKey, filtered, viewMode === "map");
+  const resultsRef = useRef<HTMLDivElement>(null);
+  const mapItems = useMemo(() => filtered.map(company => ({
+    id: company.id, title: company.name, city: placeDisplay(company, company.city, locale),
+    subtitle: company.categories.map(id => taxonomyLabel(companyCategoryLabel(id, COMPANY_CATEGORY_BY_ID[id]?.label ?? id), uiText)).join(" · "),
+    href: `/companies/${company.slug}`, image: company.logo_url ?? "", lat: company.lat, lng: company.lng,
+  })), [filtered, locale, companyCategoryLabel, uiText]);
+  const resultKey = JSON.stringify([filterKey, viewMode === "map" ? map.bounds : null]);
+  const page = pageState.filterKey === resultKey ? pageState.page : 1;
+  const resetPage = () => setPageState({ filterKey: resultKey, page: 1 });
   const changePage = (next: number | ((current: number) => number)) =>
-    setPageState({ filterKey, page: typeof next === "function" ? next(page) : next });
+    setPageState({ filterKey: resultKey, page: typeof next === "function" ? next(page) : next });
 
-  const paginated = filtered.slice(0, page * PAGE_SIZE);
-  const hasMore = paginated.length < filtered.length;
+  const paginated = map.rows.slice(0, page * PAGE_SIZE);
+  const hasMore = paginated.length < map.rows.length;
 
   const clearAll = () => {
     setSearch(""); setSelectedCategory(null); setCityFilter("");
-    setCountryFilter(""); setRegionFilter(""); setVerifiedOnly(false); setSortKey("newest"); resetPage();
+    setCountryFilter(""); setRegionFilter(""); setVerifiedOnly(false); setSortKey("newest"); map.setBounds(null); resetPage();
   };
 
   const selectedCat = selectedCategory ? COMPANY_CATEGORY_BY_ID[selectedCategory] : null;
-  const hasAnyFilter = Boolean(regionFilter || search || selectedCategory || cityFilter || countryFilter || verifiedOnly);
+  const hasAnyFilter = Boolean(regionFilter || search || selectedCategory || cityFilter || countryFilter || verifiedOnly || (viewMode === "map" && map.bounds));
   const hasCatFilter = Boolean(selectedCategory);
   const mobileChips: BrowseChip[] = [
     ...(selectedCat ? [{ id: "category", label: taxonomyLabel(companyCategoryLabel(selectedCat.id, selectedCat.label), uiText), onRemove: () => setSelectedCategory(null) }] : []),
@@ -197,34 +200,33 @@ export default function CompaniesContent({ initialCompanies }: { initialCompanie
   return (
     <div className="min-h-screen mobile-bottom-nav-clear">
 
+      <FloatingMapToggle mapActive={viewMode === "map"} onToggle={() => {
+        setViewMode(viewMode === "map" ? "list" : "map");
+        requestAnimationFrame(() => resultsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }));
+      }} />
+      <BrowseGeography hasDesktopCountryFilter country={countryFilter} onCountryChange={value => { setCountryFilter(value); setRegionFilter(""); setCityFilter(""); }} geography={geography} />
       <MobileBrowseControls
         query={search}
         onQueryChange={setSearch}
         searchPlaceholder={t("searchPlaceholder")}
         sortValue={sortKey}
-        sortOptions={[{ value: "newest", label: uiText("jobs.sortNewest") }, { value: "name", label: uiText("Ui.text_7ed96629073e83") }]}
-        onSortChange={setSortKey}
+        sortOptions={[{ value: "newest", label: geography.preferred ? uiText("BrowseGeography.recommended") : uiText("jobs.sortNewest") }, { value: "name", label: uiText("Ui.text_7ed96629073e83") }]}
+        onSortChange={value => { geography.setEnabled(false); setSortKey(value); }}
         categoryLabel={t("filterCategory")}
         allCategoryLabel={uiText("Ui.text_aecf68fa0908cc")}
         categories={COMPANY_CATEGORIES.map((category) => ({ value: category.id, label: taxonomyLabel(companyCategoryLabel(category.id, category.label), uiText) }))}
         categoryValue={selectedCategory ?? ""}
         onCategoryChange={(value) => setSelectedCategory(value || null)}
-        resultSummary={`${filtered.length} ${t("resultsCount")}`}
+        resultSummary={`${map.rows.length} ${t("resultsCount")}`}
+        viewControls={<DirectoryViewControls value={viewMode} onChange={setViewMode} />}
         filterCount={mobileChips.length}
         chips={mobileChips}
         onReset={clearAll}
         resetLabel={t("resetFilters")}
-        showResultsLabel={uiText("Ui.text_4d89b095821660", { value1: String(filtered.length) })}
+        showResultsLabel={uiText("Ui.text_4d89b095821660", { value1: String(map.rows.length) })}
       >
         <PlaceFilters rows={initialCompanies} value={{country:countryFilter,region:regionFilter,city:cityFilter}} onChange={value => {setCountryFilter(value.country);setRegionFilter(value.region);setCityFilter(value.city);}} />
         <label className="flex min-h-11 items-center gap-3 text-sm text-text-secondary"><input type="checkbox" className="size-4 accent-gold" checked={verifiedOnly} onChange={(event) => setVerifiedOnly(event.target.checked)} />{t("filterVerified")}</label>
-        <div className="mobile-filter-field">
-          <span>{uiText("locations.viewLabel")}</span>
-          <div className="grid grid-cols-2 gap-2">
-            <button type="button" onClick={() => setViewMode("grid")} className={`min-h-11 rounded-lg border text-sm ${viewMode === "grid" ? "border-gold bg-gold/10 text-gold" : "border-border text-text-secondary"}`}>{uiText("Ui.text_2cc48b15f4ffeb")}</button>
-            <button type="button" onClick={() => setViewMode("list")} className={`min-h-11 rounded-lg border text-sm ${viewMode === "list" ? "border-gold bg-gold/10 text-gold" : "border-border text-text-secondary"}`}>{uiText("locations.viewList")}</button>
-          </div>
-        </div>
       </MobileBrowseControls>
 
       {/* ── Filter Bar ───────────────────────────────────── */}
@@ -240,16 +242,7 @@ export default function CompaniesContent({ initialCompanies }: { initialCompanie
                 className="bg-transparent border-none py-2.5 text-sm w-full focus:outline-none" />
               {search && <button onClick={() => setSearch("")} className="text-text-muted hover:text-text-primary transition-colors"><X size={12} /></button>}
             </div>
-            <div className="flex bg-bg-elevated border border-border rounded-lg overflow-hidden shrink-0">
-              <button onClick={() => setViewMode("grid")}
-                className={`flex items-center justify-center w-9 h-9 transition-colors ${viewMode === "grid" ? "bg-gold text-bg-primary" : "text-text-muted hover:text-text-primary"}`}>
-                <LayoutGrid size={14} />
-              </button>
-              <button onClick={() => setViewMode("list")}
-                className={`flex items-center justify-center w-9 h-9 transition-colors border-l border-border ${viewMode === "list" ? "bg-gold text-bg-primary" : "text-text-muted hover:text-text-primary"}`}>
-                <LayoutList size={14} />
-              </button>
-            </div>
+            <DirectoryViewControls value={viewMode} onChange={setViewMode} />
           </div>
 
           {/* Row 2: Filters */}
@@ -364,7 +357,7 @@ export default function CompaniesContent({ initialCompanies }: { initialCompanie
           </aside>
 
           {/* Main content */}
-          <div className="flex-1 min-w-0">
+          <div ref={resultsRef} className="flex-1 min-w-0 scroll-mt-24">
 
             {/* Mobile category pills */}
             <div className="cat-pills gap-2 overflow-x-auto pb-3 mb-4" style={{ scrollbarWidth: "none" }}>
@@ -391,10 +384,11 @@ export default function CompaniesContent({ initialCompanies }: { initialCompanie
             </div>
 
             <p className="hidden xl:block text-sm text-text-muted mb-5">
-              <span className="font-semibold text-text-primary">{filtered.length}</span> {t("resultsCount", { count: filtered.length })}
+              <span className="font-semibold text-text-primary">{map.rows.length}</span> {t("resultsCount", { count: map.rows.length })}
               {selectedCat && <>{uiText.rich("Ui.text_3aa0bce7c8c5d4", { value2: () => (taxonomyLabel(companyCategoryLabel(selectedCat.id, selectedCat.label), uiText)), part1: chunks => (<span className={`font-semibold ${selectedCat.color}`}>{chunks}</span>) })}</>}
             </p>
 
+            {viewMode === "map" && <DirectoryMap kind="companies" items={mapItems} bounds={map.bounds} onBoundsChange={map.setBounds} />}
             {paginated.length === 0 ? (
               <div className="py-16 text-center">
                 <div className="w-16 h-16 rounded-2xl bg-bg-secondary border border-border flex items-center justify-center mx-auto mb-5">
@@ -431,7 +425,7 @@ export default function CompaniesContent({ initialCompanies }: { initialCompanie
               <div className="mt-8 text-center">
                 <button onClick={() => changePage((p) => p + 1)}
                   className="px-6 py-2.5 border border-border rounded-xl text-sm text-text-secondary hover:border-gold hover:text-gold transition-colors">
-                  {t("loadMore", { count: filtered.length - paginated.length })}
+                  {t("loadMore", { count: map.rows.length - paginated.length })}
                 </button>
               </div>
             )}

@@ -1,6 +1,4 @@
-import { placeReadFields } from "@/lib/places/catalog";
-import type { Metadata } from "next";
-import { db } from "@/lib/db";
+import { getDirectoryCompanies } from "@/lib/company-directory";
 import CompaniesContent from "./CompaniesContent";
 import PageHeader from "@/components/PageHeader";
 import DirectoryPage from "@/components/DirectoryPage";
@@ -26,12 +24,7 @@ export const revalidate = 60;
 export default async function CompaniesPage() {
   const locale = await getLocale();
   const t = await getTranslations("companies");
-  const { data } = await db
-    .from("companies")
-    .select("place_country_code,place_region_id,place_city_id,place_city_name,place_region_name,place_status,id, slug, name, logo_url, description, city, categories, services, catering_details, animal_details, verified, created_at")
-    .eq("published", true)
-    .order("created_at", { ascending: false })
-    .limit(200);
+  const companies = await getDirectoryCompanies(locale);
 
   return (
     <DirectoryPage area="companies">
@@ -43,7 +36,7 @@ export default async function CompaniesPage() {
         description={t("description")}
         cta={{ label: t("addCompany"), href: "/company-setup" }}
       />
-      <CompaniesContent initialCompanies={(data ?? []).map(row => ({ ...row, ...placeReadFields(row.city ?? "", row, locale) }))} />
+      <CompaniesContent initialCompanies={companies} />
     </DirectoryPage>
   );
 }

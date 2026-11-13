@@ -1,854 +1,143 @@
 "use client";
 
-import PlaceFilters from "@/components/PlaceFilters";
-import { projectTypeLabel, normalizedCatalogueSearch } from "@/lib/project-type-labels";
-import { parseJobDescription, canonicalJobPayType, jobPayLabel, JOB_PAY_FILTER_VALUES } from "@/lib/job-metadata";
-
-import { placeSearchMatches, placeOptions, matchesPlace, placeDisplay, canonicalFilterValue } from "@/lib/places/core";
-
-import { useViewUrl } from "@/lib/use-view-url";
-import { useViewState } from "@/lib/use-view-state";
-
-import { useState, useMemo, useEffect, useRef, Suspense } from "react";
+import { Suspense, useMemo } from "react";
 import Link from "next/link";
-import { useRouter, useSearchParams } from "next/navigation";
-import type { LucideIcon } from "lucide-react";
-import {
-  MapPin, Briefcase, Clock, Search, ChevronRight, Zap,
-  ChevronDown, X, Users2, Clapperboard, Video, Lightbulb, Wrench, Mic,
-  Sparkles, Shirt, Palette, Monitor, Share2, Play, Camera, Scissors,
-  Film, Smartphone, Aperture, Globe, ArrowUpDown,
-} from "lucide-react";
-import EmptyState from "@/components/EmptyState";
-import { ANIMAL_DEPARTMENT_ID, animalRoleLabel, animalOccupation } from "@/lib/animal-taxonomy";
-import { FILM_DEPARTMENTS, DEPT_KEYWORDS, ALL_ROLES } from "@/lib/filmRoles";
-import { matchesGripOccupation, normalizeGripDepartmentId, normalizeGripRoleId } from "@/lib/gripTaxonomy";
-import { useTranslations, useLocale } from "next-intl";
+import { useSearchParams } from "next/navigation";
+import { useLocale, useTranslations } from "next-intl";
+import { Briefcase, Calendar, MapPin, Search, X, ArrowUpRight } from "lucide-react";
 import PageHeader from "@/components/PageHeader";
+import PlaceFilters from "@/components/PlaceFilters";
+import BrowseGeography from "@/components/BrowseGeography";
 import MobileBrowseControls, { MobileFilterField, MobileFilterSelect, type BrowseChip } from "@/components/MobileBrowseControls";
+import { useBrowseGeography } from "@/lib/use-browse-geography";
+import { prioritizeGeographically } from "@/lib/browse-geography";
+import { useViewState } from "@/lib/use-view-state";
+import { useViewUrl } from "@/lib/use-view-url";
+import { matchesPlace, placeDisplay, placeOptions, placeSearchMatches } from "@/lib/places/core";
+import { jobFacts, jobRateLabel, jobDateLabel, canonicalJobPayType, jobPayLabel, JOB_PAY_FILTER_VALUES, type BrowseJob as Job } from "@/lib/job-metadata";
+import { jobOccupation } from "@/lib/job-occupation";
+import { projectTypeLabel, normalizedCatalogueSearch } from "@/lib/project-type-labels";
+import { FILM_DEPARTMENTS } from "@/lib/filmRoles";
 import { taxonomyLabel } from "@/lib/departments";
-
-
-// ── Department icon map ───────────────────────────────────────────
-const DEPT_ICON_MAP: Record<string, LucideIcon> = {
-  "vor-der-kamera":  Users2,
-  "regie":           Clapperboard,
-  "kamera":          Video,
-  "licht":           Lightbulb,
-  "grip":            Wrench,
-  "ton":             Mic,
-  "maske":           Sparkles,
-  "kostuem":         Shirt,
-  "szenenbild":      Palette,
-  "produktion":      Briefcase,
-  "post":            Monitor,
-  "content-creation":Share2,
-  "social-video":    Play,
-  "fotografie":      Camera,
-  "foto-post":       Scissors,
-};
-
-
-
-const PROJECT_TYPES = [
-  "Spielfilm", "Kurzfilm", "Werbung", "Musikvideo", "TV / Serie", "Dokumentarfilm", "Corporate",
-  "Instagram / Reels", "TikTok", "YouTube", "UGC Content", "Brand Content",
-  "Fashion Shooting", "Produkt-Shooting", "Event-Fotografie", "Hochzeits-Fotografie", "Portrait-Shooting", "Werbe-Fotografie", "Sonstiges",
-];
-
-const PAY_TYPES = [...JOB_PAY_FILTER_VALUES];
+import { normalizeGripDepartmentId, normalizeGripRoleId } from "@/lib/gripTaxonomy";
 
 const PAGE_SIZE = 24;
+const PROJECT_TYPES = ["Spielfilm", "Kurzfilm", "Werbung", "Musikvideo", "TV / Serie", "Dokumentarfilm", "Corporate", "Instagram / Reels", "TikTok", "YouTube", "UGC Content", "Brand Content", "Fashion Shooting", "Produkt-Shooting", "Event-Fotografie", "Hochzeits-Fotografie", "Portrait-Shooting", "Werbe-Fotografie", "Sonstiges"];
 
-type Job = {
-  id: string; title: string; company?: string; projectType?: string;
-  location: string; rate: string; union?: string; shootDates?: string;
-  urgent?: boolean; tags: string[]; posted?: string;
-  description?: string; isReal?: boolean; jobType?: "freelance" | "festanstellung" | "praktikum";
-};
-
-
-function getLocalizedPLATFORM_META(translate: (key: string) => string): { id: string; label: string; Icon: LucideIcon }[] {
-  return ([
-  { id: "film",   label: translate("Ui.text_021d311367f182"),      Icon: Film },
-  { id: "social", label: translate("home.showcaseSocial"),   Icon: Smartphone },
-  { id: "photo",  label: translate("menu.jobPhotography"),     Icon: Aperture },
-]);
-}
-
-// ─── SortDropdown ────────────────────────────────────────────────
-function SortDropdown({ value, options, onChange }: {
-  value: string; options: { value: string; label: string }[]; onChange: (v: string) => void;
-}) {
-  const uiText = useTranslations();
-
-  const [open, setOpen] = useState(false);
-  const ref = useRef<HTMLDivElement>(null);
-  useEffect(() => {
-    if (!open) return;
-    const h = (e: MouseEvent) => { if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false); };
-    document.addEventListener("mousedown", h);
-    return () => document.removeEventListener("mousedown", h);
-  }, [open]);
-  const label = options.find((o) => o.value === value)?.label ?? uiText("creators.sort");
-  return (
-    <div ref={ref} className="relative shrink-0">
-      <button onClick={() => setOpen((v) => !v)}
-        className="flex items-center gap-2 h-9 px-3 rounded-lg text-xs font-medium border border-border text-text-muted hover:text-text-secondary transition-all bg-bg-elevated">
-        <ArrowUpDown size={11} />
-        {label}
-        <ChevronDown size={11} className={`transition-transform ${open ? "rotate-180" : ""}`} />
-      </button>
-      {open && (
-        <div className="absolute top-full left-0 mt-1 z-50 bg-bg-elevated border border-border rounded-xl shadow-xl overflow-hidden min-w-[180px]">
-          {options.map((o) => (
-            <button key={o.value} onClick={() => { onChange(o.value); setOpen(false); }}
-              className={`w-full text-left px-3 py-2 text-xs transition-colors hover:bg-white/[0.04] ${value === o.value ? "text-gold font-medium" : "text-text-secondary"}`}>
-              {taxonomyLabel(o.label, uiText)}
-            </button>
-          ))}
-        </div>
-      )}
-    </div>
-  );
-}
-
-// ─── FilterDropdown ───────────────────────────────────────────────
-function FilterDropdown({
-  icon: Icon, label, value, options, onChange, optionLabel = (value: string) => value,
-}: {
-  icon: React.ElementType; label: string; value: string;
-  options: string[]; onChange: (v: string) => void; optionLabel?: (value: string) => string;
-}) {
-  const [open, setOpen] = useState(false);
-  const ref = useRef<HTMLDivElement>(null);
-  useEffect(() => {
-    if (!open) return;
-    const h = (e: MouseEvent) => { if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false); };
-    document.addEventListener("mousedown", h);
-    return () => document.removeEventListener("mousedown", h);
-  }, [open]);
-  const active = !!value;
-  return (
-    <div ref={ref} className="relative shrink-0">
-      <button onClick={() => setOpen((v) => !v)}
-        className={`flex items-center gap-2 h-9 px-3 rounded-lg text-xs font-medium border transition-all ${
-          active ? "bg-gold/12 border-gold/30 text-gold" : open ? "bg-bg-elevated border-border text-text-secondary" : "border-border text-text-muted hover:border-gold/40 hover:text-gold"
-        }`}>
-        <Icon size={11} />
-        {active ? optionLabel(value) : label}
-        {active
-          ? <span onClick={(e) => { e.stopPropagation(); onChange(""); setOpen(false); }} className="hover:text-red-400 transition-colors ml-0.5"><X size={10} /></span>
-          : <ChevronDown size={11} className={`transition-transform ${open ? "rotate-180" : ""}`} />}
-      </button>
-      {open && (
-        <div className="absolute top-full left-0 mt-1 z-50 bg-bg-elevated border border-border rounded-xl shadow-xl overflow-hidden min-w-[160px] max-h-64 overflow-y-auto">
-          {options.map((opt) => (
-            <button key={opt} onClick={() => { onChange(opt); setOpen(false); }}
-              className={`w-full text-left px-3 py-2 text-xs transition-colors hover:bg-white/[0.04] ${value === opt ? "text-gold font-medium" : "text-text-secondary"}`}>
-              {optionLabel(opt)}
-            </button>
-          ))}
-        </div>
-      )}
-    </div>
-  );
-}
-
-// ─── Two-panel dept/role picker ───────────────────────────────────
-function JobDeptPanel({
-  activeDeptId, setActiveDeptId,
-  selectedDeptId, selectedRoleId,
-  onSelectDept, onSelectRole, onClose,
-  clearLabel, clearSelectionLabel,
-}: {
-  activeDeptId: string; setActiveDeptId: (id: string) => void;
-  selectedDeptId: string | null; selectedRoleId: string | null;
-  onSelectDept: (deptId: string) => void;
-  onSelectRole: (deptId: string, roleId: string | null) => void;
-  onClose: () => void;
-  clearLabel: string; clearSelectionLabel: string;
-}) {
-  const uiConfigText = useTranslations();
-  const PLATFORM_META = getLocalizedPLATFORM_META(uiConfigText);
-
-  const animals = useTranslations("FilmAnimals");
-  const activeDept = FILM_DEPARTMENTS.find((d) => d.id === activeDeptId) ?? FILM_DEPARTMENTS[0];
-
-  return (
-    <div className="border border-border rounded-xl overflow-hidden bg-bg-elevated">
-      {/* Mobile: horizontal dept scroll + roles below */}
-      <div className="sm:hidden">
-        <div className="flex overflow-x-auto gap-1.5 p-3 border-b border-border bg-bg-secondary scrollbar-hide">
-          {FILM_DEPARTMENTS.map((dept) => {
-            const Icon = DEPT_ICON_MAP[dept.id] ?? Briefcase;
-            const isActive = dept.id === activeDeptId;
-            const isSelected = selectedDeptId === dept.id;
-            return (
-              <button key={dept.id}
-                onClick={() => { setActiveDeptId(dept.id); onSelectDept(dept.id); }}
-                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium border shrink-0 transition-all ${
-                  isActive ? `${dept.bg} ${dept.color} border-transparent` : "border-border text-text-muted"
-                }`}>
-                <Icon size={11} className={isActive ? dept.color : "text-text-muted"} />
-                {dept.id === ANIMAL_DEPARTMENT_ID ? animals("department") : taxonomyLabel(dept.label, uiConfigText)}
-                {isSelected && <span className="w-3.5 h-3.5 rounded-full bg-gold text-bg-primary text-[8px] font-bold flex items-center justify-center">✓</span>}
-              </button>
-            );
-          })}
-        </div>
-        <div className="p-3">
-          <div className="flex items-center justify-between mb-1.5">
-            <h3 className={`text-sm font-semibold ${activeDept.color}`}>{taxonomyLabel(activeDept.label, uiConfigText)}</h3>
-            {selectedDeptId === activeDeptId && (
-              <button onClick={() => onSelectRole(activeDeptId, null)} className="text-[10px] text-text-muted hover:text-red-400 transition-colors">{clearLabel}</button>
-            )}
-          </div>
-          <div className="grid grid-cols-2 gap-1.5">
-            {activeDept.roles.map((role) => {
-              const isSelected = selectedDeptId === activeDeptId && selectedRoleId === role.id;
-              return (
-                <button key={role.id}
-                  onClick={() => { onSelectRole(activeDeptId, isSelected ? null : role.id); onClose(); }}
-                  className={`text-left px-3 py-2.5 rounded-lg text-xs border transition-all ${
-                    isSelected ? `${activeDept.bg} ${activeDept.color} font-semibold` : "border-border/60 text-text-muted"
-                  }`}>
-                  <div className="font-medium leading-tight">{animalRoleLabel(role.id, animals) === role.id ? taxonomyLabel(role.label, uiConfigText) : animalRoleLabel(role.id, animals)}</div>
-                  {role.labelEn && <div className="mt-0.5 text-[10px] opacity-50">{role.labelEn}</div>}
-                  {role.description && <div className="mt-1 text-[10px] leading-4 opacity-70">{role.description}</div>}
-                </button>
-              );
-            })}
-          </div>
-        </div>
-      </div>
-
-      {/* Desktop: two-panel */}
-      <div className="hidden sm:flex" style={{ minHeight: 300 }}>
-        <div className="w-52 shrink-0 border-r border-border overflow-y-auto bg-bg-secondary">
-          {PLATFORM_META.map(({ id: platform, label: platformLabel, Icon: PlatformIcon }) => {
-            const depts = FILM_DEPARTMENTS.filter((d) => d.platform === platform);
-            return (
-              <div key={platform}>
-                <div className="flex items-center gap-1.5 px-3 py-1.5 bg-bg-primary/40 border-b border-border/50">
-                  <PlatformIcon size={10} className="text-text-muted shrink-0" />
-                  <span className="text-[9px] uppercase tracking-widest text-text-muted font-semibold">{platformLabel}</span>
-                </div>
-                {depts.map((dept) => {
-                  const Icon = DEPT_ICON_MAP[dept.id] ?? Briefcase;
-                  const isActive = dept.id === activeDeptId;
-                  const isSelected = selectedDeptId === dept.id;
-                  return (
-                    <button key={dept.id}
-                      onMouseEnter={() => setActiveDeptId(dept.id)}
-                      onClick={() => onSelectDept(dept.id)}
-                      className={`w-full flex items-center justify-between px-3 py-2 text-left text-xs transition-colors border-b border-border/30 last:border-0 ${
-                        isActive ? `${dept.bg} font-semibold` : "text-text-muted hover:text-text-secondary hover:bg-white/[0.02]"
-                      }`}>
-                      <div className="flex items-center gap-2 min-w-0">
-                        <span className={`w-5 h-5 rounded flex items-center justify-center shrink-0 border ${isActive ? dept.bg : "bg-bg-elevated border-border"}`}>
-                          <Icon size={10} className={isActive ? dept.color : "text-text-muted"} />
-                        </span>
-                        <span className={`truncate ${isActive ? dept.color : ""}`}>{dept.id === ANIMAL_DEPARTMENT_ID ? animals("department") : taxonomyLabel(dept.label, uiConfigText)}</span>
-                      </div>
-                      {isSelected && <span className="w-3.5 h-3.5 rounded-full bg-gold text-bg-primary text-[8px] font-bold flex items-center justify-center shrink-0">✓</span>}
-                    </button>
-                  );
-                })}
-              </div>
-            );
-          })}
-        </div>
-        <div className="flex-1 p-4 overflow-y-auto">
-          <div className="flex items-center justify-between mb-1.5">
-            <h3 className={`text-sm font-semibold ${activeDept.color}`}>{taxonomyLabel(activeDept.label, uiConfigText)}</h3>
-            {selectedDeptId === activeDeptId && (
-              <button onClick={() => onSelectRole(activeDeptId, null)} className="text-[10px] text-text-muted hover:text-red-400 transition-colors">{clearSelectionLabel}</button>
-            )}
-          </div>
-          <div className="grid grid-cols-2 gap-1.5">
-            {activeDept.roles.map((role) => {
-              const isSelected = selectedDeptId === activeDeptId && selectedRoleId === role.id;
-              return (
-                <button key={role.id}
-                  onClick={() => { onSelectRole(activeDeptId, isSelected ? null : role.id); onClose(); }}
-                  className={`text-left px-3 py-2 rounded-lg text-xs border transition-all ${
-                    isSelected ? `${activeDept.bg} ${activeDept.color} font-semibold` : "border-border/60 text-text-muted hover:text-text-secondary hover:border-border hover:bg-white/[0.02]"
-                  }`}>
-                  <div className="font-medium leading-tight">{animalRoleLabel(role.id, animals) === role.id ? taxonomyLabel(role.label, uiConfigText) : animalRoleLabel(role.id, animals)}</div>
-                  {role.labelEn && <div className="text-[10px] opacity-50 mt-0.5">{role.labelEn}</div>}
-                  {role.description && <div className="mt-1 text-[10px] leading-4 opacity-70">{role.description}</div>}
-                </button>
-              );
-            })}
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-// ─── Main ─────────────────────────────────────────────────────────
 function JobsInner({ serverJobs }: { serverJobs: Job[] }) {
-  const uiText = useTranslations();
-
-  const locale = useLocale();
-  const router = useRouter();
-  const searchParams = useSearchParams();
-  const t = useTranslations("jobs");
-  const animals = useTranslations("FilmAnimals");
-
-  const allJobs = useMemo(() => serverJobs.map(job => {
-    if (!job.isReal) return job;
-    const metadata = parseJobDescription(job.description ?? "");
-    return { ...job, projectType: metadata.projectType ?? job.projectType, urgent: metadata.urgent ?? job.urgent };
-  }), [serverJobs]);
-  const availableProjectTypes = useMemo(() => [...new Set([...PROJECT_TYPES, ...allJobs.map(job => job.projectType ?? "").filter(Boolean)])], [allJobs]);
-  const availablePayTypes = useMemo(() => [...new Set<string>([...PAY_TYPES, ...allJobs
-    .filter(job => job.isReal).map(job => canonicalJobPayType(parseJobDescription(job.description ?? "").payType ?? "")).filter(Boolean)])], [allJobs]);
-
-  const [query, setQuery] = useViewState("jobs.query", () => searchParams.get("q") ?? "");
-  const [selectedDeptId, setSelectedDeptId] = useViewState<string | null>("jobs.selectedDeptId", () => normalizeGripDepartmentId(searchParams.get("dept")));
-  const [selectedRoleId, setSelectedRoleId] = useViewState<string | null>("jobs.selectedRoleId", () => normalizeGripRoleId(searchParams.get("role")));
-  const [activePanelDept, setActivePanelDept] = useViewState("jobs.activePanelDept", FILM_DEPARTMENTS[0].id);
-  const [panelOpen, setPanelOpen] = useState(false);
-  const [activeType, setActiveType] = useViewState("jobs.activeType", () => searchParams.get("type") ?? "");
-  const [urgentOnly, setUrgentOnly] = useViewState("jobs.urgentOnly", () => searchParams.get("urgent") === "1");
-  const [storedPayTypeFilter, setPayTypeFilter] = useViewState("jobs.payTypeFilter", () => searchParams.get("pay") ?? "");
-  const payTypeFilter = canonicalJobPayType(storedPayTypeFilter);
-  const [jobTypeFilter, setJobTypeFilter] = useViewState<"alle" | "freelance" | "festanstellung" | "praktikum">("jobs.jobTypeFilter", "alle");
-  const [cityFilter, setCityFilter] = useViewState("jobs.cityFilter", () => searchParams.get("city") ?? "");
-  const [cityText, setCityText] = useViewState("jobs.cityText", () => searchParams.get("cityText")?.trim() ?? "");
-  const [countryFilter, setCountryFilter] = useViewState("jobs.countryFilter", () => searchParams.get("country") ?? "");
-  const [regionFilter, setRegionFilter] = useViewState("jobs.regionFilter", () => searchParams.get("region") ?? "");
-  const updatePlaceFilters = (value: { country: string; region: string; city: string }) => {
-    setCountryFilter(value.country); setRegionFilter(value.region); setCityFilter(value.city);
-    if (value.city) setCityText("");
-  };
-  const [sortKey, setSortKey] = useViewState("jobs.sortKey", () => searchParams.get("sort") ?? "newest");
+  const ui = useTranslations(), t = useTranslations("jobs"), copy = useTranslations("JobsRefresh"), locale = useLocale();
+  const params = useSearchParams();
+  const [query, setQuery] = useViewState("jobs.query", () => params.get("q") ?? "");
+  const [selectedDeptId, setSelectedDeptId] = useViewState<string | null>("jobs.selectedDeptId", () => normalizeGripDepartmentId(params.get("dept")));
+  const [selectedRoleId, setSelectedRoleId] = useViewState<string | null>("jobs.selectedRoleId", () => normalizeGripRoleId(params.get("role")));
+  const [activeType, setActiveType] = useViewState("jobs.activeType", () => params.get("type") ?? "");
+  const [urgentOnly, setUrgentOnly] = useViewState("jobs.urgentOnly", () => params.get("urgent") === "1");
+  const [storedPay, setPayTypeFilter] = useViewState("jobs.payTypeFilter", () => params.get("pay") ?? "");
+  const payTypeFilter = String(canonicalJobPayType(storedPay));
+  const [jobTypeFilter, setJobTypeFilter] = useViewState("jobs.jobTypeFilter", () => params.get("employment") ?? "alle");
+  const [cityFilter, setCityFilter] = useViewState("jobs.cityFilter", () => params.get("city") ?? "");
+  const [cityText, setCityText] = useViewState("jobs.cityText", () => params.get("cityText") ?? "");
+  const [countryFilter, setCountryFilter] = useViewState("jobs.countryFilter", () => params.get("country") ?? "");
+  const [regionFilter, setRegionFilter] = useViewState("jobs.regionFilter", () => params.get("region") ?? "");
+  const [sortKey, setSortKey] = useViewState("jobs.sortKey", () => params.get("sort") ?? "newest");
   const [pagination, setPagination] = useViewState("jobs.pagination", { filterKey: "", visibleCount: PAGE_SIZE });
-  const panelRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    if (!panelOpen) return;
-    const h = (e: MouseEvent) => { if (panelRef.current && !panelRef.current.contains(e.target as Node)) setPanelOpen(false); };
-    document.addEventListener("mousedown", h);
-    return () => document.removeEventListener("mousedown", h);
-  }, [panelOpen]);
-
-  const filterParams = new URLSearchParams();
-  if (query) filterParams.set("q", query);
-  if (selectedDeptId) filterParams.set("dept", selectedDeptId);
-  if (selectedRoleId) filterParams.set("role", selectedRoleId);
-  if (activeType) filterParams.set("type", activeType);
-  if (urgentOnly) filterParams.set("urgent", "1");
-  if (payTypeFilter) filterParams.set("pay", payTypeFilter);
-  if (cityFilter) filterParams.set("city", cityFilter);
-  if (cityText) filterParams.set("cityText", cityText);
-  if (regionFilter) filterParams.set("region", regionFilter);
-  if (countryFilter) filterParams.set("country", countryFilter);
-  if (sortKey !== "newest") filterParams.set("sort", sortKey);
-  useViewUrl(filterParams.size ? `/jobs?${filterParams}` : "/jobs");
-
-  useEffect(() => {
-    const country=canonicalFilterValue(countryFilter,allJobs,"country"),city=canonicalFilterValue(cityFilter,allJobs,"city");
-    if(country!==countryFilter||city!==cityFilter)queueMicrotask(()=>{setCountryFilter(country);setCityFilter(city);});
-  },[countryFilter,cityFilter,allJobs,setCountryFilter,setCityFilter]);
-  const cityOptions = useMemo(() => placeOptions(allJobs, "city", locale, countryFilter), [allJobs,locale,countryFilter]);
-  const countryOptions = useMemo(() => placeOptions(allJobs, "country", locale), [allJobs,locale]);
-  const regionOptions = useMemo(() => placeOptions(allJobs, "region", locale), [allJobs,locale]);
-  const availableCities = cityOptions.map(o => o.value);
-  const availableCountries = countryOptions.map(o => o.value);
-  const cityLabel = (value: string) => cityOptions.find(o => o.value === value)?.label ?? value;
-  const countryLabel = (value: string) => countryOptions.find(o => o.value === value)?.label ?? value;
-  const regionLabel = (value: string) => regionOptions.find(option => option.value === value)?.label ?? value;
-
+  const geography = useBrowseGeography(sortKey === "newest" && !countryFilter && !regionFilter && !cityFilter && !cityText);
+  const allJobs = useMemo(() => serverJobs.map(job => ({ ...job, facts: jobFacts(job), occupation: jobOccupation(job) })), [serverJobs]);
+  const selectedDepartment = FILM_DEPARTMENTS.find(row => row.id === selectedDeptId);
+  const departments = FILM_DEPARTMENTS.map(row => ({ value: row.id, label: taxonomyLabel(row.label, ui) })).sort((a, b) => a.label.localeCompare(b.label, locale));
+  const roles = [...new Map((selectedDepartment ? selectedDepartment.roles : FILM_DEPARTMENTS.flatMap(row => row.roles)).map(role => [role.id, { value: role.id, label: taxonomyLabel(role.label, ui) }])).values()];
+  const types = [...new Set([...PROJECT_TYPES, ...allJobs.map(job => job.facts.projectType).filter(Boolean)])].map(value => ({ value, label: projectTypeLabel(value, ui) }));
+  const payTypes = [...new Set<string>([...JOB_PAY_FILTER_VALUES, ...allJobs.map(job => canonicalJobPayType(job.facts.payType)).filter(Boolean)])].map(value => ({ value, label: jobPayLabel(value, ui) }));
+  const employments = [{ value: "freelance", label: t("filterFreelance") }, { value: "festanstellung", label: t("filterFulltime") }, { value: "praktikum", label: t("filterInternship") }];
+  const sorts = [{ value: "newest", label: geography.preferred ? ui("BrowseGeography.recommended") : t("sortNewest") }, { value: "rate", label: t("sortRateDesc") }, { value: "urgent", label: t("sortUrgent") }];
+  const updatePlaceFilters = (value: { country: string; region: string; city: string }) => { setCountryFilter(value.country); setRegionFilter(value.region); setCityFilter(value.city); if (value.city) setCityText(""); };
+  const changeDepartment = (value: string) => { setSelectedDeptId(value || null); setSelectedRoleId(null); };
+  const url = new URLSearchParams();
+  for (const [key, value] of Object.entries({ q: query, dept: selectedDeptId, role: selectedRoleId, type: activeType, pay: payTypeFilter, employment: jobTypeFilter === "alle" ? "" : jobTypeFilter, city: cityFilter, cityText, country: countryFilter, region: regionFilter, sort: sortKey === "newest" ? "" : sortKey, urgent: urgentOnly ? "1" : "" })) if (value) url.set(key, value);
+  useViewUrl(url.size ? `/jobs?${url}` : "/jobs");
+  const preferred = geography.preferred, selectedDepartmentLabel = selectedDepartment?.label;
   const filtered = useMemo(() => {
-    let result = [...allJobs];
-
-    // Dept / role filter
-    if (selectedRoleId && selectedDeptId) {
-      const role = ALL_ROLES.find((r) => r.id === selectedRoleId);
-      if (role) {
-        const roleLabels = [role.label, role.labelEn, ...(role.aliases ?? [])].filter(Boolean).map((label) => label!.toLowerCase());
-        result = result.filter((j) => {
-          const t = j.title.toLowerCase();
-          if (roleLabels.some((label) => t.includes(label))) return true;
-          if (j.description) {
-            const meta = j.description.split("\n\n")[0] ?? "";
-            const roleMeta = meta.match(/Rolle: ([^·\n]+)/)?.[1]?.toLowerCase() ?? "";
-            if (roleMeta && (role.aliases?.length
-              ? (selectedDeptId === ANIMAL_DEPARTMENT_ID ? animalOccupation(roleMeta)?.id === role.id : matchesGripOccupation(roleMeta, role.label))
-              : roleLabels.some((label) => roleMeta.includes(label)))) return true;
-          }
-          return false;
-        });
+    const needle = normalizedCatalogueSearch(query, locale);
+    const rows = allJobs.filter(job => {
+      const facts = job.facts;
+      if (selectedDeptId && job.occupation?.department !== selectedDeptId && job.category !== selectedDepartmentLabel) return false;
+      if (selectedRoleId && job.occupation?.role !== selectedRoleId) return false;
+      if (activeType && facts.projectType !== activeType) return false;
+      if (urgentOnly && !facts.urgent) return false;
+      if (payTypeFilter && canonicalJobPayType(facts.payType) !== payTypeFilter) return false;
+      if (jobTypeFilter !== "alle" && facts.jobType !== jobTypeFilter) return false;
+      if (!matchesPlace(job, "country", countryFilter) || !matchesPlace(job, "region", regionFilter) || !matchesPlace(job, "city", cityFilter)) return false;
+      if (cityText && !placeSearchMatches(job, cityText) && !normalizedCatalogueSearch(job.location, locale).includes(normalizedCatalogueSearch(cityText, locale))) return false;
+      return !needle || [job.title, facts.company, facts.roleLabel, taxonomyLabel(facts.roleLabel, ui), facts.projectType, projectTypeLabel(facts.projectType, ui), facts.description, job.location].some(value => normalizedCatalogueSearch(value, locale).includes(needle)) || placeSearchMatches(job, query);
+    });
+    rows.sort((a, b) => {
+      const time = (Date.parse(b.createdAt ?? "") || 0) - (Date.parse(a.createdAt ?? "") || 0);
+      if (sortKey === "urgent") return Number(b.facts.urgent) - Number(a.facts.urgent) || time;
+      if (sortKey === "rate" || sortKey === "rate-desc") {
+        const amount = (job: typeof a) => (!job.facts.payType || canonicalJobPayType(job.facts.payType) === "Paid") && job.price ? job.price : -1;
+        return amount(b) - amount(a) || time;
       }
-    } else if (selectedDeptId) {
-      const keys = DEPT_KEYWORDS[selectedDeptId] ?? [];
-      if (keys.length > 0) {
-        result = result.filter((j) => {
-          const t = j.title.toLowerCase();
-          if (keys.some((k) => t.includes(k))) return true;
-          if (j.description) {
-            const meta = j.description.split("\n\n")[0] ?? "";
-            const roleMeta = meta.match(/Rolle: ([^·\n]+)/)?.[1]?.toLowerCase() ?? "";
-            if (roleMeta && keys.some((k) => roleMeta.includes(k))) return true;
-          }
-          return false;
-        });
-      }
-    }
-
-    if (query.trim()) {
-      const q = normalizedCatalogueSearch(query, locale);
-      result = result.filter((j) => {
-        const metadata = j.isReal ? parseJobDescription(j.description ?? "") : null;
-        const terms = [j.title, j.company ?? "", j.location, ...j.tags, j.description ?? "",
-          projectTypeLabel(j.projectType ?? "", uiText), taxonomyLabel(metadata?.roleLabel ?? "", uiText)];
-        return terms.some(value => normalizedCatalogueSearch(value, locale).includes(q)) || placeSearchMatches(j, q);
-      });
-    }
-    if (activeType) result = result.filter((j) => j.projectType === activeType || (j.projectType ?? "").includes(activeType));
-    if (urgentOnly) result = result.filter((j) => j.urgent);
-    if (payTypeFilter) {
-      result = result.filter((j) => {
-        if (!j.isReal) return true;
-        const parsed = parseJobDescription(j.description ?? "");
-        return canonicalJobPayType(parsed.payType ?? "") === canonicalJobPayType(payTypeFilter);
-      });
-    }
-    if (jobTypeFilter !== "alle") result = result.filter((j) => (j.jobType ?? "freelance") === jobTypeFilter);
-    if (cityFilter) result = result.filter(j => matchesPlace(j, "city", cityFilter));
-    if (cityText) result = result.filter(j => placeSearchMatches(j, cityText) || j.location.toLowerCase().includes(cityText.toLowerCase()));
-    if (regionFilter) result = result.filter(row => matchesPlace(row, "region", regionFilter));
-    if (countryFilter) result = result.filter(j => matchesPlace(j, "country", countryFilter));
-    if (sortKey === "rate-desc") result = [...result].sort((a, b) => parseInt(b.rate) - parseInt(a.rate));
-    if (sortKey === "urgent") result = [...result].sort((a, b) => (b.urgent ? 1 : 0) - (a.urgent ? 1 : 0));
-    return result;
-  }, [allJobs, query, selectedDeptId, selectedRoleId, activeType, urgentOnly, payTypeFilter, jobTypeFilter, cityFilter, cityText, countryFilter, regionFilter, sortKey, locale, uiText]);
-
-  const filterKey = JSON.stringify([query, selectedDeptId, selectedRoleId, activeType, urgentOnly, payTypeFilter, jobTypeFilter, cityFilter, cityText, countryFilter, regionFilter, sortKey]);
-  const visibleCount = pagination.filterKey === filterKey ? pagination.visibleCount : PAGE_SIZE;
-  const showMore = () => setPagination({ filterKey, visibleCount: visibleCount + PAGE_SIZE });
-
-  const handleSelectDept = (deptId: string) => {
-    setSelectedDeptId(deptId);
-    setSelectedRoleId(null);
-    setPanelOpen(false);
-  };
-  const handleSelectRole = (deptId: string, roleId: string | null) => {
-    if (roleId === null) { setSelectedRoleId(null); setSelectedDeptId(deptId); }
-    else { setSelectedDeptId(deptId); setSelectedRoleId(roleId); }
-  };
-
-  const clearAll = () => {
-    setSelectedDeptId(null); setSelectedRoleId(null);
-    setQuery(""); setActiveType(""); setUrgentOnly(false);
-    setPayTypeFilter(""); setJobTypeFilter("alle");
-    setCityFilter(""); setCityText(""); setCountryFilter(""); setRegionFilter(""); setSortKey("newest");
-    router.replace("/jobs", { scroll: false });
-  };
-
-  const hasAnyFilter = Boolean(regionFilter || selectedDeptId || selectedRoleId || query || activeType || urgentOnly || payTypeFilter || jobTypeFilter !== "alle" || cityFilter || cityText || countryFilter);
-  const hasDeptFilter = Boolean(selectedDeptId || selectedRoleId);
-
-  const activeDeptData = selectedDeptId ? FILM_DEPARTMENTS.find((d) => d.id === selectedDeptId) : null;
-  const activeRoleData = selectedRoleId ? ALL_ROLES.find((r) => r.id === selectedRoleId) : null;
-  const mobileChips: BrowseChip[] = [
-    ...(cityText ? [{ id: "city-text", label: `${uiText("Places.city")}: ${cityText}`, onRemove: () => setCityText("") }] : []),
-    ...(activeDeptData ? [{ id: "dept", label: activeRoleData ? uiText("Ui.text_7c639bc99b8569", { value1: String(taxonomyLabel(activeDeptData.label, uiText)), value2: String(taxonomyLabel(activeRoleData.label, uiText)) }) : taxonomyLabel(activeDeptData.label, uiText), onRemove: () => { setSelectedDeptId(null); setSelectedRoleId(null); } }] : []),
-    ...(activeType ? [{ id: "project", label: projectTypeLabel(activeType, uiText), onRemove: () => setActiveType("") }] : []),
-    ...(payTypeFilter ? [{ id: "pay", label: jobPayLabel(payTypeFilter, uiText), onRemove: () => setPayTypeFilter("") }] : []),
-    ...(cityFilter ? [{ id: "city", label: cityLabel(cityFilter), onRemove: () => setCityFilter("") }] : []),
-    ...(countryFilter ? [{ id: "country", label: countryLabel(countryFilter), onRemove: () => setCountryFilter("") }] : []),
-    ...(regionFilter ? [{ id: "region", label: regionLabel(regionFilter), onRemove: () => setRegionFilter("") }] : []),
+      return time;
+    });
+    return prioritizeGeographically(rows, preferred);
+  }, [allJobs, query, locale, selectedDeptId, selectedDepartmentLabel, selectedRoleId, activeType, urgentOnly, payTypeFilter, jobTypeFilter, countryFilter, regionFilter, cityFilter, cityText, sortKey, ui, preferred]);
+  const clearAll = () => { setQuery(""); setSelectedDeptId(null); setSelectedRoleId(null); setActiveType(""); setUrgentOnly(false); setPayTypeFilter(""); setJobTypeFilter("alle"); setCityText(""); updatePlaceFilters({ country: "", region: "", city: "" }); };
+  const chips: BrowseChip[] = [
+    ...(selectedDeptId ? [{ id: "department", label: departments.find(row => row.value === selectedDeptId)?.label ?? selectedDeptId, onRemove: () => changeDepartment("") }] : []),
+    ...(selectedRoleId ? [{ id: "role", label: roles.find(row => row.value === selectedRoleId)?.label ?? selectedRoleId, onRemove: () => setSelectedRoleId(null) }] : []),
+    ...(activeType ? [{ id: "type", label: projectTypeLabel(activeType, ui), onRemove: () => setActiveType("") }] : []),
+    ...(payTypeFilter ? [{ id: "pay", label: jobPayLabel(payTypeFilter, ui), onRemove: () => setPayTypeFilter("") }] : []),
+    ...(jobTypeFilter !== "alle" ? [{ id: "employment", label: employments.find(row => row.value === jobTypeFilter)?.label ?? jobTypeFilter, onRemove: () => setJobTypeFilter("alle") }] : []),
     ...(urgentOnly ? [{ id: "urgent", label: t("filterUrgentLabel"), onRemove: () => setUrgentOnly(false) }] : []),
-    ...(jobTypeFilter !== "alle" ? [{ id: "jobtype", label: jobTypeFilter, onRemove: () => setJobTypeFilter("alle") }] : []),
+    ...(cityText ? [{ id: "cityText", label: cityText, onRemove: () => setCityText("") }] : []),
+    ...(["country", "region", "city"] as const).flatMap(kind => { const value = { country: countryFilter, region: regionFilter, city: cityFilter }[kind]; return value ? [{ id: kind, label: kind === "country" ? (ui.has(`CountryNames.${value}`) ? ui(`CountryNames.${value}`) : value) : placeOptions(allJobs, kind, locale).find(row => row.value === value)?.label ?? value, onRemove: () => kind === "country" ? updatePlaceFilters({ country: "", region: "", city: "" }) : kind === "region" ? updatePlaceFilters({ country: countryFilter, region: "", city: "" }) : setCityFilter("") }] : []; }),
   ];
+  const fields = [{ label: copy("role"), value: selectedRoleId ?? "", onChange: (value: string) => setSelectedRoleId(value || null), options: roles },
+    { label: t("filterProjectType"), value: activeType, onChange: setActiveType, options: types },
+    { label: t("filterPay"), value: payTypeFilter, onChange: setPayTypeFilter, options: payTypes },
+    { label: copy("employment"), value: jobTypeFilter === "alle" ? "" : jobTypeFilter, onChange: (value: string) => setJobTypeFilter(value || "alle"), options: employments }];
+  const placeFields = <PlaceFilters rows={allJobs} value={{ country: countryFilter, region: regionFilter, city: cityFilter }} onChange={updatePlaceFilters} />;
+  const urgentField = <label className="flex min-h-11 items-center gap-3 text-sm text-text-secondary"><input type="checkbox" className="size-4 accent-gold" checked={urgentOnly} onChange={event => setUrgentOnly(event.target.checked)} />{t("filterUrgentLabel")}</label>;
+  const filterKey = `${url}:${geography.key}`, visibleCount = pagination.filterKey === filterKey ? pagination.visibleCount : PAGE_SIZE;
 
-  return (
-    <div className="min-h-screen bg-bg-primary mobile-bottom-nav-clear">
-      <PageHeader
-        badge={t("heroBadge")}
-        title={t("heroTitle")}
-        titleHighlight={t("heroTitleHighlight")}
-        description={allJobs.length > 0 ? t("heroDesc", { count: allJobs.length }) : t("heroDescEmpty")}
-        cta={{ label: t("postJobBtn"), href: "/inserat" }}
-      />
-
-      <MobileBrowseControls
-        query={query}
-        onQueryChange={setQuery}
-        searchPlaceholder={t("searchPlaceholder")}
-        sortValue={sortKey}
-        sortOptions={[
-          { value: "newest", label: t("sortNewest") },
-          { value: "rate-desc", label: t("sortRateDesc") },
-          { value: "urgent", label: t("sortUrgent") },
-        ]}
-        onSortChange={setSortKey}
-        categoryLabel={t("filterDeptRole")}
-        allCategoryLabel={t("filterAll") + uiText("Ui.text_7b3886f5485e90")}
-        categories={FILM_DEPARTMENTS.map((dept) => ({ value: dept.id, label: dept.id === ANIMAL_DEPARTMENT_ID ? animals("department") : taxonomyLabel(dept.label, uiText) }))}
-        categoryValue={selectedDeptId ?? ""}
-        onCategoryChange={(value) => { setSelectedDeptId(value || null); setSelectedRoleId(null); }}
-        resultSummary={t("results", { count: filtered.length })}
-        filterCount={mobileChips.length}
-        chips={mobileChips}
-        onReset={clearAll}
-        resetLabel={t("clearAll")}
-        showResultsLabel={t("results", { count: filtered.length })}
-      >
-        <MobileFilterField label={t("filterDeptRole")}>
-          <MobileFilterSelect
-            value={selectedRoleId ? `${selectedDeptId}:${selectedRoleId}` : ""}
-            onChange={(value) => {
-              if (!value) { setSelectedRoleId(null); return; }
-              const [deptId, roleId] = value.split(":");
-              setSelectedDeptId(deptId);
-              setSelectedRoleId(roleId);
-            }}
-            placeholder={uiText("Ui.text_903f372337ed95")}
-            options={FILM_DEPARTMENTS.flatMap((dept) => dept.roles.map((role) => ({ value: `${dept.id}:${role.id}`, label: uiText("Ui.text_7c639bc99b8569", { value1: String(dept.id === ANIMAL_DEPARTMENT_ID ? animals("department") : taxonomyLabel(dept.label, uiText)), value2: String(animalRoleLabel(role.id, animals) === role.id ? taxonomyLabel(role.label, uiText) : animalRoleLabel(role.id, animals)) }) })))}
-          />
-        </MobileFilterField>
-        <MobileFilterField label={t("filterProjectType")}>
-          <MobileFilterSelect value={activeType} onChange={setActiveType} placeholder={uiText("Ui.text_afba0b3e7b5f22")} options={availableProjectTypes.map((value) => ({ value, label: projectTypeLabel(value, uiText) }))} />
-        </MobileFilterField>
-        <MobileFilterField label={t("filterPay")}>
-          <MobileFilterSelect value={payTypeFilter} onChange={setPayTypeFilter} placeholder={uiText("Ui.text_8f7f9d1fdbe006")} options={availablePayTypes.map((value) => ({ value, label: jobPayLabel(value, uiText) }))} />
-        </MobileFilterField>
-        <PlaceFilters rows={allJobs} value={{country:countryFilter,region:regionFilter,city:cityFilter}} onChange={updatePlaceFilters} />
-        <MobileFilterField label={uiText("Ui.text_ee0789bf07d3b9")}>
-          <MobileFilterSelect value={jobTypeFilter === "alle" ? "" : jobTypeFilter} onChange={(value) => setJobTypeFilter((value || "alle") as typeof jobTypeFilter)} placeholder={uiText("common.all")} options={[{ value: "freelance", label: t("filterFreelance") }, { value: "festanstellung", label: t("filterFulltime") }, { value: "praktikum", label: t("filterInternship") }]} />
-        </MobileFilterField>
-        <label className="flex min-h-11 items-center gap-3 text-sm text-text-secondary"><input type="checkbox" className="size-4 accent-gold" checked={urgentOnly} onChange={(event) => setUrgentOnly(event.target.checked)} />{t("filterUrgentLabel")}</label>
-      </MobileBrowseControls>
-
-      {/* ── Filter Bar ───────────────────────────────────── */}
-      <div className="hidden xl:block browse-toolbar">
-        <div className="site-container py-2 space-y-2">
-
-          {/* Row 1: Search + Sort */}
-          <div className="flex items-center gap-2">
-            <div className="flex-1 flex items-center gap-2 bg-bg-elevated border border-border rounded-lg px-3 focus-within:border-gold/50 transition-colors">
-              <Search size={14} className="text-text-muted shrink-0" />
-              <input type="text" value={query} onChange={(e) => setQuery(e.target.value)}
-                placeholder={t("searchPlaceholder")}
-                className="bg-transparent border-none py-2.5 text-sm w-full focus:outline-none" />
-              {query && <button onClick={() => setQuery("")} className="text-text-muted hover:text-text-primary transition-colors"><X size={12} /></button>}
-            </div>
-            <SortDropdown
-              value={sortKey}
-              options={[
-                { value: "newest",    label: t("sortNewest") },
-                { value: "rate-desc", label: t("sortRateDesc") },
-                { value: "urgent",    label: t("sortUrgent") },
-              ]}
-              onChange={setSortKey}
-            />
-          </div>
-
-          {/* Row 2: Filters */}
-          <div className="flex items-center gap-2 overflow-x-auto lg:overflow-visible pb-0.5" style={{ scrollbarWidth: "none" }}>
-            <div className="w-px h-6 bg-border shrink-0" />
-
-            {/* Projekttyp */}
-            <FilterDropdown icon={Film} label={t("filterProjectType")} value={activeType} options={availableProjectTypes} onChange={setActiveType} optionLabel={value => projectTypeLabel(value, uiText)} />
-
-            {/* Vergütung */}
-            <FilterDropdown icon={Briefcase} label={t("filterPay")} value={payTypeFilter} options={availablePayTypes} onChange={setPayTypeFilter} optionLabel={value => jobPayLabel(value, uiText)} />
-
-            {/* Stadt */}
-            {(availableCities.length > 0 || availableCountries.length > 0) && (
-              <PlaceFilters rows={allJobs} value={{country:countryFilter,region:regionFilter,city:cityFilter}} onChange={updatePlaceFilters} />
-            )}
-
-            {/* Land */}
-
-
-            {/* Dringend toggle */}
-            <label className="flex items-center gap-1.5 text-xs text-text-muted cursor-pointer hover:text-text-secondary transition-colors select-none shrink-0">
-              <div onClick={() => setUrgentOnly((v) => !v)}
-                className={`w-7 h-4 rounded-full transition-colors relative cursor-pointer ${urgentOnly ? "bg-gold" : "bg-border"}`}>
-                <span className={`absolute top-0.5 w-3 h-3 rounded-full bg-white transition-all ${urgentOnly ? "left-3.5" : "left-0.5"}`} />
-              </div>
-              <Zap size={10} className={urgentOnly ? "text-gold" : ""} />
-              {t("filterUrgentLabel")}
-            </label>
-
-            {/* Job type toggle */}
-            <div className="flex bg-bg-elevated border border-border rounded-lg overflow-hidden shrink-0">
-              {(["alle", "freelance", "festanstellung", "praktikum"] as const).map((jt) => (
-                <button key={jt} onClick={() => setJobTypeFilter(jt)}
-                  className={`h-9 px-2.5 text-[11px] font-medium transition-all border-r border-border last:border-r-0 ${
-                    jobTypeFilter === jt ? "bg-gold text-bg-primary" : "text-text-muted hover:text-text-secondary"
-                  }`}>
-                  {jt === "alle" ? t("filterAll") : jt === "freelance" ? t("filterFreelance") : jt === "festanstellung" ? t("filterFulltime") : t("filterInternship")}
-                </button>
-              ))}
-            </div>
-
-            {hasAnyFilter && (
-              <button onClick={clearAll} className="h-9 px-3 text-xs text-text-muted hover:text-red-400 transition-colors whitespace-nowrap border border-border rounded-lg hover:border-red-400/40 shrink-0">
-                {t("clearFilter")}
-              </button>
-            )}
-
-          </div>
-
-          {/* Dept panel */}
-          {panelOpen && (
-            <JobDeptPanel
-              activeDeptId={activePanelDept}
-              setActiveDeptId={setActivePanelDept}
-              selectedDeptId={selectedDeptId}
-              selectedRoleId={selectedRoleId}
-              onSelectDept={handleSelectDept}
-              onSelectRole={handleSelectRole}
-              onClose={() => setPanelOpen(false)}
-              clearLabel={t("clearFilter")}
-              clearSelectionLabel={t("clearSelection")}
-            />
-          )}
-
-          {/* Row 4: Active chips */}
-          {(hasDeptFilter || activeType || urgentOnly || payTypeFilter || jobTypeFilter !== "alle" || cityFilter || cityText || countryFilter || regionFilter) && (
-            <div className="flex flex-wrap gap-1.5 items-center">
-              {activeDeptData && (
-                <span className={`inline-flex items-center gap-1.5 text-[11px] px-2.5 py-1 rounded-full border font-medium ${activeDeptData.bg} ${activeDeptData.color}`}>
-                  {activeRoleData ? uiText("Ui.text_b5767757f96fbd", { value1: String(taxonomyLabel(activeDeptData.label, uiText)), value2: String(taxonomyLabel(activeRoleData.label, uiText)) }) : taxonomyLabel(activeDeptData.label, uiText)}
-                  <button onClick={() => { setSelectedDeptId(null); setSelectedRoleId(null); }} className="hover:opacity-70 transition-opacity ml-0.5"><X size={9} /></button>
-                </span>
-              )}
-              {activeType && (
-                <span className="inline-flex items-center gap-1.5 text-[11px] px-2.5 py-1 rounded-full border font-medium bg-bg-elevated border-border text-text-secondary">
-                  {projectTypeLabel(activeType, uiText)}
-                  <button onClick={() => setActiveType("")} className="hover:opacity-70 ml-0.5"><X size={9} /></button>
-                </span>
-              )}
-              {payTypeFilter && (
-                <span className="inline-flex items-center gap-1.5 text-[11px] px-2.5 py-1 rounded-full border font-medium bg-bg-elevated border-border text-text-secondary">
-                  {jobPayLabel(payTypeFilter, uiText)}
-                  <button onClick={() => setPayTypeFilter("")} className="hover:opacity-70 ml-0.5"><X size={9} /></button>
-                </span>
-              )}
-              {urgentOnly && (
-                <span className="inline-flex items-center gap-1.5 text-[11px] px-2.5 py-1 rounded-full border font-medium bg-gold/10 border-gold/30 text-gold">
-                  <Zap size={9} /> {t("urgentBadge")}
-                  <button onClick={() => setUrgentOnly(false)} className="hover:opacity-70 ml-0.5"><X size={9} /></button>
-                </span>
-              )}
-              {jobTypeFilter !== "alle" && (
-                <span className="inline-flex items-center gap-1.5 text-[11px] px-2.5 py-1 rounded-full border font-medium bg-bg-elevated border-border text-text-secondary">
-                  {jobTypeFilter === "freelance" ? t("filterFreelance") : jobTypeFilter === "festanstellung" ? t("filterFulltime") : t("filterInternship")}
-                  <button onClick={() => setJobTypeFilter("alle")} className="hover:opacity-70 ml-0.5"><X size={9} /></button>
-                </span>
-              )}
-              {cityText && <span className="mobile-browse-chip"><span className="truncate">{uiText("Places.city")}: {cityText}</span><button type="button" aria-label={uiText("Ui.text_f10fe7a27ce274", { value1: cityText })} onClick={() => setCityText("")}><X size={13} /></button></span>}
-              {cityFilter && (
-                <span className="inline-flex items-center gap-1.5 text-[11px] px-2.5 py-1 rounded-full border font-medium bg-bg-elevated border-border text-text-secondary">
-                  <MapPin size={9} /> {cityLabel(cityFilter)}
-                  <button onClick={() => setCityFilter("")} className="hover:opacity-70 ml-0.5"><X size={9} /></button>
-                </span>
-              )}
-              {countryFilter && (
-                <span className="inline-flex items-center gap-1.5 text-[11px] px-2.5 py-1 rounded-full border font-medium bg-bg-elevated border-border text-text-secondary">
-                  <Globe size={9} /> {countryLabel(countryFilter)}
-                  <button onClick={() => setCountryFilter("")} className="hover:opacity-70 ml-0.5"><X size={9} /></button>
-                </span>
-              )}
-              {regionFilter && <span className="inline-flex items-center gap-1.5 text-[11px] px-2.5 py-1 rounded-full border font-medium bg-bg-elevated border-border text-text-secondary"><MapPin size={9} />{regionLabel(regionFilter)}<button type="button" aria-label={uiText("Ui.text_efae3eb968ceb3", { value1: String(t("clearFilter")), value2: String(regionLabel(regionFilter)) })} onClick={() => setRegionFilter("")} className="hover:opacity-70 ml-0.5"><X size={9} /></button></span>}
-              <button onClick={clearAll} className="text-[11px] text-text-muted hover:text-red-400 transition-colors underline underline-offset-2 ml-1">
-                {t("clearAll")}
-              </button>
-            </div>
-          )}
+  return <main className="min-h-screen bg-bg-primary mobile-bottom-nav-clear">
+    <PageHeader badge={t("heroBadge")} title={t("heroTitle")} titleHighlight={t("heroTitleHighlight")} description={copy("intro")} cta={{ label: t("postJobBtn"), href: "/inserat?group=jobs" }} />
+    <BrowseGeography hasDesktopCountryFilter country={countryFilter} onCountryChange={value => updatePlaceFilters({ country: value, region: "", city: "" })} geography={geography} />
+    <MobileBrowseControls query={query} onQueryChange={setQuery} searchPlaceholder={t("searchPlaceholder")} sortValue={sortKey} sortOptions={sorts} onSortChange={value => { geography.setEnabled(false); setSortKey(value); }}
+      categoryLabel={t("filterDeptRole")} allCategoryLabel={ui("Ui.text_bc0b501bb3186b")} categories={departments} categoryValue={selectedDeptId ?? ""} onCategoryChange={changeDepartment}
+      resultSummary={t("results", { count: filtered.length })} filterCount={chips.length} chips={chips} onReset={clearAll} resetLabel={t("emptyReset")} showResultsLabel={t("results", { count: filtered.length })}>
+      {fields.map(field => <MobileFilterField key={field.label} label={field.label}><MobileFilterSelect {...field} placeholder={ui("common.all")} /></MobileFilterField>)}
+      {placeFields}{urgentField}
+    </MobileBrowseControls>
+    <section className="site-container py-4 sm:py-6">
+      <div className="browse-toolbar mb-6 hidden space-y-4 pb-5 xl:block">
+        <div className="flex items-center gap-3">
+          <label className="flex min-h-12 min-w-0 flex-1 items-center gap-3 rounded-xl border border-border bg-bg-secondary px-3"><Search size={18} aria-hidden="true" className="shrink-0 text-text-muted" /><span className="sr-only">{t("searchPlaceholder")}</span><input type="search" value={query} onChange={event => setQuery(event.target.value)} placeholder={t("searchPlaceholder")} className="min-h-11 min-w-0 flex-1 bg-transparent text-sm outline-none" />{query && <button type="button" onClick={() => setQuery("")} aria-label={t("clearFilter")} className="flex size-11 shrink-0 items-center justify-center"><X size={18} /></button>}</label>
+          <MobileFilterSelect placeholder={t("sortNewest")} label={t("sort")} value={sortKey} options={sorts} onChange={value => { geography.setEnabled(false); setSortKey(value); }} />
         </div>
+        <div className="grid grid-cols-5 gap-3"><MobileFilterField label={t("filterDeptRole")}><MobileFilterSelect label={t("filterDeptRole")} value={selectedDeptId ?? ""} onChange={changeDepartment} options={departments} placeholder={ui("common.all")} /></MobileFilterField>{fields.map(field => <MobileFilterField key={field.label} label={field.label}><MobileFilterSelect {...field} placeholder={ui("common.all")} /></MobileFilterField>)}</div>
+        <div className="grid grid-cols-[1fr_auto] items-end gap-5">{placeFields}{urgentField}</div>
+        {!!(chips.length || query) && <button className="min-h-11 text-sm text-gold" onClick={clearAll}>{t("emptyReset")}</button>}
       </div>
-
-      {/* ── Results ──────────────────────────────────────── */}
-      <div className="site-container py-4 sm:py-8">
-        <div className="flex gap-8 items-start">
-
-          {/* Left sidebar */}
-          <aside className="cat-sidebar w-44 shrink-0 sticky top-20">
-            <p className="text-[11px] uppercase tracking-widest text-text-muted font-semibold mb-3 px-2">{uiText("Ui.text_7b40d8db4ebc62")}</p>
-            <nav className="space-y-0.5">
-              <button
-                onClick={() => { setSelectedDeptId(null); setSelectedRoleId(null); }}
-                className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm transition-all text-left ${
-                  !selectedDeptId
-                    ? "bg-gold/10 text-gold font-semibold border-l-2 border-gold pl-[10px]"
-                    : "text-text-secondary hover:text-text-primary hover:bg-bg-secondary"
-                }`}
-              >{uiText.rich("Ui.text_059ad29af9ea26", { part1: () => (<Briefcase size={14} className={!selectedDeptId ? "text-gold" : "text-text-muted"} />) })}</button>
-              {FILM_DEPARTMENTS.map((dept) => {
-                const Icon = DEPT_ICON_MAP[dept.id] ?? Briefcase;
-                const isActive = selectedDeptId === dept.id;
-                return (
-                  <button
-                    key={dept.id}
-                    onClick={() => handleSelectDept(dept.id)}
-                    className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm transition-all text-left ${
-                      isActive
-                        ? "bg-gold/10 text-gold font-semibold border-l-2 border-gold pl-[10px]"
-                        : "text-text-secondary hover:text-text-primary hover:bg-bg-secondary"
-                    }`}
-                  >
-                    <Icon size={14} className={isActive ? "text-gold" : "text-text-muted"} />
-                    {dept.id === ANIMAL_DEPARTMENT_ID ? animals("department") : taxonomyLabel(dept.label, uiText)}
-                  </button>
-                );
-              })}
-            </nav>
-          </aside>
-
-          {/* Main content */}
-          <div className="flex-1 min-w-0">
-
-            {/* Mobile dept pills */}
-            <div className="cat-pills gap-2 overflow-x-auto pb-3 mb-4" style={{ scrollbarWidth: "none" }}>
-              <button
-                onClick={() => { setSelectedDeptId(null); setSelectedRoleId(null); }}
-                className={`px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap shrink-0 border transition-all ${
-                  !selectedDeptId
-                    ? "bg-gold/10 text-gold border-gold/40"
-                    : "border-border text-text-muted hover:border-gold/30 hover:text-text-primary"
-                }`}
-              >{uiText("Ui.text_bc0b501bb3186b")}</button>
-              {[...FILM_DEPARTMENTS].sort((a, b) => a.label.localeCompare(b.label, locale)).map((dept) => {
-                const isActive = selectedDeptId === dept.id;
-                return (
-                  <button
-                    key={dept.id}
-                    onClick={() => handleSelectDept(dept.id)}
-                    className={`px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap shrink-0 border transition-all ${
-                      isActive
-                        ? "bg-gold/10 text-gold border-gold/40"
-                        : "border-border text-text-muted hover:border-gold/30 hover:text-text-primary"
-                    }`}
-                  >
-                    {dept.id === ANIMAL_DEPARTMENT_ID ? animals("department") : taxonomyLabel(dept.label, uiText)}
-                  </button>
-                );
-              })}
-            </div>
-
-            {/* Count */}
-            <div className="hidden xl:flex items-center justify-between mb-4">
-              <p className="text-sm text-text-muted">
-                <span className="text-text-primary font-semibold">{t("results", { count: filtered.length })}</span>
-                {query && <span className="text-gold">{uiText.rich("Ui.text_58e2efda5da487", { value1: () => (query) })}</span>}
-              </p>
-            </div>
-
-        {filtered.length === 0 && (
-          <EmptyState
-            icon={Briefcase}
-            title={allJobs.length === 0 ? t("emptyTitle") : t("emptyTitleFiltered")}
-            description={allJobs.length === 0 ? t("emptyDesc") : t("emptyDescFiltered")}
-            action={allJobs.length === 0 ? undefined : { label: t("emptyReset"), onClick: clearAll }}
-          />
-        )}
-
-        <div className="space-y-2">
-          {filtered.slice(0, visibleCount).map((job) => {
-            const parsed = job.isReal ? parseJobDescription(job.description ?? "") : null;
-            const roleLabel = parsed?.roleLabel;
-            const company = parsed?.company ?? job.company;
-            const projectType = parsed?.projectType ?? job.projectType;
-            const shootDates = parsed?.shootDates ?? job.shootDates;
-            const urgent = parsed?.urgent ?? job.urgent;
-            const descPreview = (parsed?.description ?? job.description ?? "").replace(/\n+/g, " ").trim().slice(0, 120);
-            const rateDisplay = !job.rate || job.rate === "0 €/Tag" || job.rate === "0" ? null : job.rate;
-
-            const jobTypeMeta: Record<string, { label: string; cls: string }> = {
-              festanstellung: { label: t("badgeFulltime"),   cls: "bg-violet-500/10 border-violet-500/20 text-violet-400" },
-              praktikum:      { label: t("badgeInternship"), cls: "bg-sky-500/10 border-sky-500/20 text-sky-400" },
-              freelance:      { label: t("badgeFreelance"),  cls: "bg-emerald-500/10 border-emerald-500/20 text-emerald-400" },
-            };
-            const jobTypeBadge = job.jobType ? jobTypeMeta[job.jobType] : jobTypeMeta.freelance;
-
-            return (
-              <Link key={job.id} href={`/jobs/${job.id}`}
-                suppressHydrationWarning
-                className="browse-card card-hover group flex gap-4 p-4 hover:bg-bg-elevated transition-colors block">
-
-                {/* Icon */}
-                <div className="w-10 h-10 rounded-lg bg-bg-elevated border border-border flex items-center justify-center shrink-0 mt-0.5">
-                  <Briefcase size={16} className="text-text-muted group-hover:text-gold transition-colors" />
-                </div>
-
-                <div className="flex-1 min-w-0">
-                  {/* Row 1: title + urgent + rate */}
-                  <div className="flex items-start justify-between gap-2 mb-1">
-                    <div className="flex items-center gap-2 min-w-0 flex-wrap">
-                      <h3 className="font-semibold text-sm text-text-primary group-hover:text-gold transition-colors leading-snug">{job.title}</h3>
-                      {urgent && (
-                        <span className="px-1.5 py-0.5 bg-crimson/15 border border-crimson/30 text-crimson-light text-[10px] rounded font-semibold shrink-0">{t("urgentBadge")}</span>
-                      )}
-                    </div>
-                    {rateDisplay && (
-                      <span className="text-gold font-semibold text-xs shrink-0">{rateDisplay}</span>
-                    )}
-                  </div>
-
-                  {/* Row 2: badges */}
-                  <div className="flex flex-wrap items-center gap-1.5 mb-1.5">
-                    <span className={`px-2 py-0.5 text-[10px] font-semibold rounded border ${jobTypeBadge.cls}`}>
-                      {taxonomyLabel(jobTypeBadge.label, uiText)}
-                    </span>
-                    {roleLabel && (
-                      <span className="px-2 py-0.5 bg-bg-elevated border border-border text-text-muted text-[10px] rounded font-medium">{taxonomyLabel(roleLabel, uiText)}</span>
-                    )}
-                    {projectType && (
-                      <span className="px-2 py-0.5 bg-bg-elevated border border-border text-text-muted text-[10px] rounded">{projectTypeLabel(projectType, uiText)}</span>
-                    )}
-                    {company && (
-                      <span className="text-[11px] text-text-muted">{company}</span>
-                    )}
-                  </div>
-
-                  {/* Row 3: description preview */}
-                  {descPreview && (
-                    <p className="text-[11px] text-text-muted leading-relaxed line-clamp-1 mb-1.5">{descPreview}{descPreview.length === 120 ? "…" : ""}</p>
-                  )}
-
-                  {/* Row 4: meta */}
-                  <div className="flex flex-wrap items-center gap-3 text-[11px] text-text-muted">
-                    {job.location && <span className="flex items-center gap-1"><MapPin size={10} />{placeDisplay(job, job.location, locale)}</span>}
-                    {shootDates && <span className="flex items-center gap-1"><Clock size={10} />{shootDates}</span>}
-                    <span className="ml-auto">{job.posted}</span>
-                  </div>
-                </div>
-
-                <ChevronRight size={14} className="text-text-muted group-hover:text-gold transition-colors shrink-0 self-center" />
-              </Link>
-            );
-          })}
-        </div>
-
-        {visibleCount < filtered.length && (
-          <div className="mt-6 text-center">
-            <button onClick={showMore}
-              className="px-6 py-2.5 bg-bg-secondary border border-border rounded-lg text-sm text-text-secondary hover:border-gold hover:text-gold transition-colors">
-              {t("loadMore", { count: filtered.length - visibleCount })}
-            </button>
-          </div>
-        )}
-          </div>{/* end main content */}
-        </div>{/* end flex gap-8 */}
-      </div>
-    </div>
-  );
+      <p role="status" className="mb-4 hidden text-sm text-text-muted tabular-nums xl:block">{t("results", { count: filtered.length })}</p>
+      {filtered.length === 0 ? <div className="browse-card p-6 text-center sm:p-10"><Briefcase size={28} className="mx-auto mb-3 text-text-muted" aria-hidden="true" /><h2 className="text-lg font-semibold">{allJobs.length ? t("emptyTitleFiltered") : t("emptyTitle")}</h2><p className="mt-2 text-sm text-text-secondary">{allJobs.length ? t("emptyDescFiltered") : t("emptyDesc")}</p><div className="mt-5 flex flex-wrap justify-center gap-3">{(chips.length > 0 || query) && <button className="min-h-11 rounded-xl border border-border px-4 text-sm" onClick={clearAll}>{t("emptyReset")}</button>}<Link className="inline-flex min-h-11 items-center rounded-xl bg-gold px-4 text-sm font-semibold text-bg-primary" href="/inserat?group=jobs">{t("postJobBtn")}</Link></div></div> : <div className="space-y-3">
+        {filtered.slice(0, visibleCount).map(job => {
+          const facts = job.facts, dates = jobDateLabel(job, locale);
+          return <article key={job.id} className="browse-card group"><Link href={`/jobs/${job.id}`} className="block p-4 sm:p-5">
+            <div className="flex items-start gap-3"><div className="hidden size-11 shrink-0 items-center justify-center rounded-xl border border-border bg-bg-elevated sm:flex"><Briefcase size={18} className="text-text-muted" aria-hidden="true" /></div><div className="min-w-0 flex-1">
+              <div className="flex items-start justify-between gap-3"><h2 className="break-words text-base font-semibold leading-snug text-text-primary group-hover:text-gold sm:text-lg">{job.title}</h2><ArrowUpRight size={18} aria-hidden="true" className="mt-0.5 shrink-0 text-text-muted" /></div>
+              <p className="mt-1 flex flex-wrap gap-x-2 text-xs text-text-secondary sm:text-sm">{[facts.company, facts.roleLabel && facts.roleLabel !== job.title && taxonomyLabel(facts.roleLabel, ui), facts.projectType && projectTypeLabel(facts.projectType, ui), facts.jobType && employments.find(row => row.value === facts.jobType)?.label].filter(Boolean).join(" · ")}</p>
+              <div className="mt-3 flex flex-wrap gap-x-5 gap-y-2 text-xs text-text-secondary sm:text-sm">{job.location && <span className="inline-flex min-w-0 items-center gap-1.5"><MapPin size={14} aria-hidden="true" className="shrink-0 text-text-muted" />{placeDisplay(job, job.location, locale)}</span>}{dates && <span className="inline-flex min-w-0 items-center gap-1.5"><Calendar size={14} aria-hidden="true" className="shrink-0 text-text-muted" />{dates}</span>}</div>
+              <div className="mt-3 flex flex-wrap items-center justify-between gap-2 border-t border-border/60 pt-3 text-xs sm:text-sm"><span className="font-medium text-gold">{jobRateLabel(job, ui, locale)}</span><div className="flex flex-wrap items-center gap-3">{facts.urgent && <span className="text-text-secondary">{t("urgentBadge")}</span>}{job.createdAt && Number.isFinite(Date.parse(job.createdAt)) && <time dateTime={job.createdAt} className="text-xs text-text-muted">{new Intl.DateTimeFormat(locale, { dateStyle: "medium", timeZone: "UTC" }).format(new Date(job.createdAt))}</time>}</div></div>
+            </div></div>
+          </Link></article>;
+        })}
+      </div>}
+      {visibleCount < filtered.length && <div className="mt-6 text-center"><button type="button" className="min-h-11 rounded-xl border border-border px-5 text-sm text-text-secondary" onClick={() => setPagination({ filterKey, visibleCount: visibleCount + PAGE_SIZE })}>{t("loadMore", { count: filtered.length - visibleCount })}</button></div>}
+    </section>
+  </main>;
 }
 
 export default function JobsContent({ serverJobs }: { serverJobs: Job[] }) {
-  return (
-    <Suspense fallback={<div className="pt-16 min-h-screen flex items-center justify-center"><div className="w-8 h-8 border-2 border-gold border-t-transparent rounded-full animate-spin" /></div>}>
-      <JobsInner serverJobs={serverJobs} />
-    </Suspense>
-  );
+  return <Suspense><JobsInner serverJobs={serverJobs} /></Suspense>;
 }

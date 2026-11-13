@@ -92,6 +92,7 @@ export default async function DatenschutzPage() {
                     ["Vercel Analytics", "Nutzungsstatistiken (cookielos)", "USA"],
                     ["Vercel Speed Insights", "Performance-Messung (cookielos)", "USA"],
                     ["OpenStreetMap Nominatim", "Geocoding von Städtenamen", "UK / EU"],
+                    ["OpenFreeMap", uiText("directoryMap.providerPurpose"), uiText("directoryMap.providerRegion")],
                   ].map(([d, z, s]) => (
                     <tr key={d}>
                       <td className="py-2 pr-4 font-medium text-text-primary">{(uiOptionLabels[d] ?? d)}</td>
@@ -102,6 +103,7 @@ export default async function DatenschutzPage() {
                 </tbody>
               </table>
             </div>
+            <p className="mt-3 text-text-muted text-xs">{uiText.rich("directoryMap.providerNotice", { provider: chunks => <a href="https://openfreemap.org/privacy/" target="_blank" rel="noopener noreferrer" className="underline">{chunks}</a> })}</p>
             <p className="mt-3 text-text-muted text-xs">{uiText("Ui.text_f0d2ffad706599")}</p>
           </section>
 

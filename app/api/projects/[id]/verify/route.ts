@@ -1,46 +1,23 @@
-import { db } from "@/lib/db";
 import { requireAdmin } from "@/lib/guards";
 import { NextRequest, NextResponse } from "next/server";
-import { revalidateTag } from "next/cache";
-import { getTranslations as getResponseTranslations } from "next-intl/server";
+import { revalidatePath, revalidateTag } from "next/cache";
+import { getTranslations } from "next-intl/server";
+import { isProjectId } from "@/lib/project-record";
+import { setProjectVerification } from "@/lib/project-verification-server";
 
-// POST /api/projects/[id]/verify — admin only, toggles verified flag
-export async function POST(
-  req: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
-  const tResponse = await getResponseTranslations();
-  const adminResult = await requireAdmin();
-  if (adminResult instanceof NextResponse) return adminResult;
-
+export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  const admin = await requireAdmin();
+  if (admin instanceof NextResponse) return admin;
+  const t = await getTranslations();
   const { id } = await params;
-  const body = await req.json().catch(() => ({}));
-  const verified = body.verified !== false; // default true
-
-  const { data: current, error: currentError } = await db
-    .from("projects")
-    .select("id, metadata")
-    .eq("id", id)
-    .maybeSingle();
-
-  if (currentError) return NextResponse.json({ error: tResponse('System.m_2ca35ef7b5b2') }, { status: 500 });
-  if (!current) return NextResponse.json({ error: tResponse('System.m_bfbc36f441fc') }, { status: 404 });
-
-  const currentMetadata = current.metadata && typeof current.metadata === "object" && !Array.isArray(current.metadata)
-    ? current.metadata as Record<string, unknown>
-    : {};
-  const currentDetails = currentMetadata.project_details && typeof currentMetadata.project_details === "object" && !Array.isArray(currentMetadata.project_details)
-    ? currentMetadata.project_details as Record<string, unknown>
-    : {};
-  const { data, error } = await db.from("projects")
-    .update({ metadata: { ...currentMetadata, project_details: { ...currentDetails, verified } }, updated_at: new Date().toISOString() })
-    .eq("id", id)
-    .select("id")
-    .maybeSingle();
-
-  if (error) return NextResponse.json({ error: tResponse('System.requestFailed') }, { status: 500 });
-  if (!data) return NextResponse.json({ error: tResponse('System.m_9df36bfde46c') }, { status: 404 });
-  revalidateTag("profiles", "max");
-  revalidateTag("projects", "max");
-  return NextResponse.json({ success: true, verified });
+  const body = await req.json().catch(() => null);
+  if (!isProjectId(id) || typeof body?.verified !== "boolean" || !(typeof body.expectedUpdatedAt === "string" || body.expectedUpdatedAt === null)) {
+    return NextResponse.json({ error: t("System.m_0e4698bf4051") }, { status: 400 });
+  }
+  const result = await setProjectVerification({ projectId: id, actorUserId: admin.userId, verified: body.verified,
+    expectedUpdatedAt: body.expectedUpdatedAt, reason: t(body.verified ? "projects.verifyAuditReason" : "projects.unverifyAuditReason") });
+  if (result.kind !== "success") return NextResponse.json({ error: t(result.kind === "conflict" ? "projects.reviewChanged" : "System.requestFailed") }, { status: result.kind === "conflict" ? 409 : result.kind === "missing" ? 404 : 503 });
+  revalidatePath(`/projects/${id}`);
+  revalidateTag("projects", { expire: 0 });
+  return NextResponse.json(result, { headers: { "Cache-Control": "private, no-store" } });
 }

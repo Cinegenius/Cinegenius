@@ -1,3 +1,7 @@
+import { jobSchedule } from "@/lib/job-metadata";
+import { geographicPage } from "@/lib/browse-geography";
+import { ownBrowsePlace } from "@/lib/browse-geography-server";
+import { publicMapPoint } from "@/lib/places/public-map-point";
 import { cityWriteFields, placeReadFields, placeSearchFilter } from "@/lib/places/catalog";
 import { placeCitySearchAliases } from "@/lib/places/core";
 import { DEPARTMENTS, deptValues, groupValues, marketplaceCategory, marketplaceSearchCategories } from "@/lib/marketplaceCategories";
@@ -90,7 +94,14 @@ export async function GET(req: NextRequest) {
   const group=subcategory?DEPARTMENTS.flatMap(d=>d.groups).find(g=>g.id===subcategory):null;
   const text=(req.nextUrl.searchParams.get("q")??"").trim().slice(0,100).replace(/[(),%*\\]/g," ");
   if(marketplaceOnly&&((department&&!selected)||(subcategory&&(!group||(selected&&!selected.groups.some(g=>g.id===subcategory))))))return NextResponse.json({error:(await getTranslations("MarketplaceOffer"))("invalidCategory")},{status:400});
-  let query = db.from("listings").select(LISTING_COLS_PUBLIC,{count:"exact"}).eq("published",true);
+  const catalog = await getTranslations("MarketplaceCatalog");
+  const sort=req.nextUrl.searchParams.get("sort");
+  let preferred = null;
+  if (req.nextUrl.searchParams.get("nearby") === "1" && !["country","region","city","cityText"].some(key => req.nextUrl.searchParams.get(key)) && sort !== "price-asc" && sort !== "price-desc") {
+    try { preferred = (await ownBrowsePlace()).place; } catch { /* The ordinary directory remains available. */ }
+  }
+  const {data,error,count} = await geographicPage<Record<string, unknown>>((clause, range) => {
+  let query = db.from("listings").select(LISTING_COLS_PUBLIC,{count:"exact", head: !range}).eq("published",true);
   if(marketplaceOnly)query=query.in("type",["prop","vehicle"]);
   else if(type)query=query.eq("type",type);
   if(marketplaceOnly){
@@ -99,7 +110,7 @@ export async function GET(req: NextRequest) {
     else if(selected)query=query.in("category",deptValues(selected));
     const offer=req.nextUrl.searchParams.get("offer");
     if(offer==="miete"||offer==="kauf")query=query.or(`metadata->>rental_type.eq.${offer},metadata->>rental_type.eq.beides${offer==='miete'?',metadata->>rental_type.is.null':''}`);
-    if(text){const placeFilter=placeSearchFilter(text);const catalog=await getTranslations("MarketplaceCatalog");const values=marketplaceSearchCategories(text,catalog);const cats=values.map(v=>`"${v.replace(/["\\]/g,'')}"`).join(',');query=query.or(`title.ilike.%${text}%,description.ilike.%${text}%,city.ilike.%${text}%,category.ilike.%${text}%${cats?`,category.in.(${cats})`:''}${placeFilter?`,${placeFilter}`:''}`);}
+    if(text){const placeFilter=placeSearchFilter(text);const values=marketplaceSearchCategories(text,catalog);const cats=values.map(v=>`"${v.replace(/["\\]/g,'')}"`).join(',');query=query.or(`title.ilike.%${text}%,description.ilike.%${text}%,city.ilike.%${text}%,category.ilike.%${text}%${cats?`,category.in.(${cats})`:''}${placeFilter?`,${placeFilter}`:''}`);}
   }
   // A homepage place query remains text; canonical filters below stay authoritative.
   // Apply it to the database before the exact count and page range are calculated.
@@ -115,12 +126,13 @@ export async function GET(req: NextRequest) {
     query = query.or(`city.ilike.${pattern},place_city_name.ilike.${pattern},place_region_name.ilike.${pattern}${aliases ? `,${aliases}` : ""}${legacyAliases ? `,${legacyAliases}` : ""}`);
   }
   for(const [param,column] of [['country','place_country_code'],['region','place_region_id'],['city','place_city_id']] as const){const value=req.nextUrl.searchParams.get(param);if(value)query=query.eq(column,value.slice(0,100));}
-  const sort=req.nextUrl.searchParams.get("sort");
   query=sort==='price-asc'||sort==='price-desc'?query.order("price",{ascending:sort==='price-asc'}).order("id"):query.order("created_at",{ascending:false}).order("id");
-  const {data,error,count}=await query.range(from,to);
+  if (clause) query = query.or(clause);
+  return range ? query.range(range.from, range.to) : query;
+  }, from, to, preferred);
   if(error){console.error("[listings GET]",error);return NextResponse.json({error:(await getTranslations("OfferModeration"))("saveError")},{status:503});}
   const priceText=await getTranslations("MarketplaceOffer"),locale=await getLocale();
-  return NextResponse.json({data:(data??[]).map((listing:Record<string,unknown>)=>({...listing,...placeReadFields(String(listing.city??""),listing,locale),priceLabel:listingPriceLabel(Number(listing.price),listing,'/Tag',locale,priceText)})),page,limit,count:count??0},{headers:{"Cache-Control":"private, no-store, max-age=0"}});
+  return NextResponse.json({data:(data??[]).map((listing:Record<string,unknown>)=>({...listing,...placeReadFields(String(listing.city??""),listing,locale),...publicMapPoint(listing),priceLabel:listingPriceLabel(Number(listing.price),listing,'/Tag',locale,priceText)})),page,limit,count:count??0},{headers:{"Cache-Control":"private, no-store, max-age=0"}});
 
 }
 
@@ -181,6 +193,7 @@ export async function POST(req: Request) {
     }
   }
 
+  if (type === "job" && metadata?.job !== undefined && !jobSchedule(metadata.job)) return privateNoStoreJson({ error: tResponse("System.requestFailed") }, 400);
   const marketplace = type === "prop" || type === "vehicle";
   if(marketplace){const issue=validateMarketplaceOffer(category,type,metadata?.marketplace,draft!==true);if(issue)return privateNoStoreJson({error:(await getTranslations("MarketplaceOffer"))(issue),field:"marketplace"},400);}
   else if(metadata?.marketplace !== undefined)return privateNoStoreJson({error:(await getTranslations("MarketplaceOffer"))("invalidCategory")},400);

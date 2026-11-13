@@ -1,30 +1,7 @@
 export default function ProjectsLoading() {
-  return (
-    <div className="pt-16 min-h-screen animate-pulse">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-        <div className="h-8 w-40 bg-bg-secondary rounded mb-2" />
-        <div className="h-4 w-64 bg-bg-secondary rounded mb-8" />
-        <div className="flex gap-2 mb-8 overflow-hidden">
-          {Array.from({ length: 7 }).map((_, i) => (
-            <div key={i} className="h-9 w-28 bg-bg-secondary rounded-full shrink-0" />
-          ))}
-        </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {Array.from({ length: 6 }).map((_, i) => (
-            <div key={i} className="rounded-xl border border-border bg-bg-secondary overflow-hidden">
-              <div className="h-48 bg-bg-elevated" />
-              <div className="p-5 space-y-2.5">
-                <div className="h-5 w-3/4 bg-bg-elevated rounded" />
-                <div className="h-3 w-1/2 bg-bg-elevated rounded" />
-                <div className="flex gap-2 mt-3">
-                  <div className="h-5 w-16 bg-bg-elevated rounded-full" />
-                  <div className="h-5 w-14 bg-bg-elevated rounded-full" />
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-    </div>
-  );
+  return <div className="min-h-screen pt-20 mobile-bottom-nav-clear" aria-hidden="true"><div className="site-container animate-pulse py-10">
+    <div className="mb-3 h-8 w-3/4 max-w-lg rounded bg-bg-secondary" /><div className="mb-8 h-4 w-2/3 rounded bg-bg-secondary" />
+    <div className="mb-6 h-28 rounded-2xl bg-bg-secondary" />
+    <div className="browse-card divide-y divide-border">{Array.from({ length: 9 }, (_, index) => <div key={index} className="flex items-center gap-5 px-4 py-4 lg:px-5"><div className="hidden h-3 w-16 shrink-0 rounded bg-bg-elevated lg:block" /><div className="h-9 w-10 shrink-0 rounded bg-bg-elevated" /><div className="flex-1 space-y-3"><div className="h-4 w-3/4 max-w-xs rounded bg-bg-elevated" /><div className="h-3 w-1/2 max-w-40 rounded bg-bg-elevated" /></div><div className="hidden h-3 w-32 rounded bg-bg-elevated lg:block" /></div>)}</div>
+  </div></div>;
 }

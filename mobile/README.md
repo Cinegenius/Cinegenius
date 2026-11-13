@@ -101,3 +101,10 @@ References:
 From the repository root, run `npm run check:i18n` for all nine catalogs.
 Browser rendering checks are separate from iOS simulator and Android build checks;
 none of those alone establishes physical-device or authenticated-flow compatibility.
+
+## Scope of this app task
+
+After the explicitly requested current website release, this chat works on the
+app only. Future app changes reach the public website only after a new explicit
+request from Markus. Keep app development and website publication separate;
+see [the recorded decision](../docs/app-product-flows.md#arbeitsbereich-dieses-app-chats).

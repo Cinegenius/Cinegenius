@@ -1,16 +1,19 @@
 "use client";
+import { CountrySelect } from "@/components/BrowseGeography";
 import { projectTypeLabel } from "@/lib/project-type-labels";
 import { useFormRouter as useRouter } from "@/lib/use-form-router";
 
 import { useFormDraft } from "@/lib/use-form-draft";
 import FormDraftStatus from "@/components/FormDraftStatus";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 
 import Link from "next/link";
 import {
   ArrowLeft, Clapperboard, Loader2, Check, Search, Plus, X,
   ChevronRight, ShieldCheck, AlertCircle,
 } from "lucide-react";
+import ProjectFlowSteps from "@/components/ProjectFlowSteps";
+import MediaImage from "@/components/MediaImage";
 import ProfileGuard from "@/components/ProfileGuard";
 import RoleDropdown from "@/components/RoleDropdown";
 import { departments } from "@/lib/departments";
@@ -26,7 +29,7 @@ const PROJECT_TYPES = [
 ];
 
 const CURRENT_YEAR = new Date().getFullYear();
-const YEARS = Array.from({ length: 40 }, (_, i) => CURRENT_YEAR - i);
+const YEARS = Array.from({ length: CURRENT_YEAR + 6 - 1900 }, (_, i) => CURRENT_YEAR + 5 - i);
 
 type ExistingProject = {
   id: string;
@@ -67,23 +70,25 @@ export default function NeuesProjektPage() {
   const [results, setResults] = useState<ExistingProject[]>([]);
   const [searching, setSearching] = useState(false);
   const [searched, setSearched] = useState(false);
-  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const [searchError, setSearchError] = useState("");
+  const [searchAttempt, setSearchAttempt] = useState(0);
 
   useEffect(() => {
-    if (debounceRef.current) clearTimeout(debounceRef.current);
-    if (query.trim().length < 2) { setResults([]); setSearched(false); return; }
-    debounceRef.current = setTimeout(async () => {
+    const controller = new AbortController();
+    if (query.trim().length < 2) return;
+    const timer = setTimeout(async () => {
       setSearching(true);
       try {
-        const res = await fetch(`/api/projects?q=${encodeURIComponent(query.trim())}&limit=8`);
+        const res = await fetch(`/api/projects?q=${encodeURIComponent(query.trim())}&limit=8`, { signal: controller.signal });
         const json = await res.json();
-        setResults(json.projects ?? []);
-        setSearched(true);
-      } finally {
-        setSearching(false);
-      }
+        if (!res.ok) throw new Error("search_failed");
+        if (!controller.signal.aborted) { setResults(json.projects ?? []); setSearched(true); }
+      } catch {
+        if (!controller.signal.aborted) setSearchError(uiText("System.requestFailed"));
+      } finally { if (!controller.signal.aborted) setSearching(false); }
     }, 350);
-  }, [query]);
+    return () => { clearTimeout(timer); controller.abort(); };
+  }, [query, searchAttempt, uiText]);
 
   // ── Join existing ─────────────────────────────────────────────────────────────
   const [joining, setJoining] = useState<string | null>(null);
@@ -103,12 +108,15 @@ export default function NeuesProjektPage() {
       });
       if (!res.ok) { const j = await res.json(); setJoinError(j.error ?? uiText("Ui.text_f6cc01cb7edbf0")); return; }
       router.push(`/projects/${joinTarget.id}`);
+    } catch {
+      setJoinError(uiText("System.requestFailed"));
     } finally {
       setJoinSaving(false);
     }
   }
 
   // ── Step 2: create new ────────────────────────────────────────────────────────
+  const [requestKey, setRequestKey] = useState(() => crypto.randomUUID());
   const [showCreate, setShowCreate] = useState(false);
   const [saving, setSaving] = useState(false);
   const [createError, setCreateError] = useState("");
@@ -121,6 +129,7 @@ export default function NeuesProjektPage() {
     description: "",
     myRole: "",
     productionCompany: "",
+    country: "",
   });
 
   // Team members (ghost profiles)
@@ -147,8 +156,8 @@ export default function NeuesProjektPage() {
     setShowCreate(true);
   }
 
-  const projectDraft = useFormDraft({ formKey: "project:quick", value: { form, teamMembers, memberName, memberRole },
-    restore: (draft) => { setForm(draft.form); setTeamMembers(draft.teamMembers); setMemberName(draft.memberName); setMemberRole(draft.memberRole); setShowCreate(true); },
+  const projectDraft = useFormDraft({ formKey: "project:quick", value: { form, teamMembers, memberName, memberRole, requestKey },
+    restore: (draft) => { if (draft.requestKey) setRequestKey(draft.requestKey); setForm(draft.form); setTeamMembers(draft.teamMembers); setMemberName(draft.memberName); setMemberRole(draft.memberRole); setShowCreate(true); },
   });
 
   async function handleSubmit(e: React.FormEvent) {
@@ -161,6 +170,7 @@ export default function NeuesProjektPage() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
+          requestKey,
           title: form.title.trim(),
           year: form.year || null,
           type: form.type || null,
@@ -168,6 +178,7 @@ export default function NeuesProjektPage() {
           description: form.description.trim() || null,
           myRole: form.myRole.trim() || null,
           productionCompany: form.productionCompany.trim() || null,
+          country: form.country || null,
           crew_entries: teamMembers.map((member) => ({
             name: member.name,
             role: member.role,
@@ -188,7 +199,7 @@ export default function NeuesProjektPage() {
 
   return (
     <ProfileGuard>
-      <div className="pt-16 min-h-screen bg-bg-primary">
+      <div className="pt-16 min-h-screen bg-bg-primary mobile-bottom-nav-clear">
         <div className="max-w-2xl mx-auto px-4 sm:px-6 py-10">
 
           <Link href="/projects" className="inline-flex items-center gap-1.5 text-sm text-text-muted hover:text-gold transition-colors mb-8">{uiText.rich("Ui.text_3613d87ef6ba76", { part1: () => (<ArrowLeft size={14} />) })}</Link>
@@ -201,6 +212,9 @@ export default function NeuesProjektPage() {
             <p className="text-sm text-text-muted mt-1">{uiText("Ui.text_50c0a8ba7046f3")}</p>
           </div>
 
+          <ProjectFlowSteps current={showCreate ? 1 : 0} />
+          <p className="mb-6 text-sm leading-relaxed text-text-muted">{uiText("projects.publishingRules")}</p>
+
           {/* ── SUCHE ─────────────────────────────────────────────────────── */}
           {!showCreate && (
             <>
@@ -208,7 +222,7 @@ export default function NeuesProjektPage() {
                 <Search size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-text-muted pointer-events-none" />
                 <input
                   value={query}
-                  onChange={(e) => setQuery(e.target.value)}
+                  onChange={(e) => { setQuery(e.target.value); setResults([]); setSearched(false); setSearchError(""); setSearching(false); }}
                   placeholder={uiText("Ui.text_2df366bc58aa2c")}
                   className="w-full pl-10 pr-4 py-3.5 bg-bg-secondary border border-border rounded-xl text-text-primary placeholder-text-muted focus:outline-none focus:border-gold transition-colors"
                   autoFocus
@@ -218,6 +232,7 @@ export default function NeuesProjektPage() {
                 )}
               </div>
 
+              {searchError && <div role="alert" className="mb-4 rounded-xl border border-border p-4 text-sm text-text-secondary"><p>{searchError}</p><button type="button" className="mt-2 min-h-11 text-gold" onClick={() => setSearchAttempt(value => value + 1)}>{uiText("setup.copy49")}</button></div>}
               {/* Results */}
               {searched && results.length > 0 && !joining && (
                 <div className="border border-border rounded-xl overflow-hidden bg-bg-secondary mb-6">
@@ -230,8 +245,7 @@ export default function NeuesProjektPage() {
                     >
                       <div className="w-8 h-12 rounded bg-bg-elevated border border-border shrink-0 flex items-center justify-center overflow-hidden">
                         {p.poster_url
-                          // eslint-disable-next-line @next/next/no-img-element
-                          ? <img src={p.poster_url} alt="" className="w-full h-full object-cover" />
+                          ? <MediaImage src={p.poster_url} width={32} height={48} alt="" className="w-full h-full object-cover" />
                           : <Clapperboard size={14} className="text-text-muted" />
                         }
                       </div>
@@ -270,6 +284,7 @@ export default function NeuesProjektPage() {
                       placeholder={uiText("Ui.text_050e4c4db66fb2")}
                     />
                   </div>
+                  <p className="mb-3 text-xs leading-relaxed text-text-muted">{uiText("projects.creditsNotice")}</p>
                   {joinError && (
                     <p className="text-xs text-red-400 mb-3 flex items-center gap-1.5">
                       <AlertCircle size={12} /> {joinError}
@@ -303,19 +318,19 @@ export default function NeuesProjektPage() {
                         <p className="text-xs text-text-muted mb-4">{uiText("Ui.text_ab401a4bdbf122")}</p>
                         <button
                           onClick={openCreate}
-                          className="inline-flex items-center gap-2 px-4 py-2 bg-gold text-bg-primary font-semibold rounded-lg text-sm hover:bg-gold-light transition-colors"
+                          className="inline-flex min-h-11 items-center gap-2 px-4 py-2 bg-gold text-bg-primary font-semibold rounded-lg text-sm hover:bg-gold-light transition-colors"
                         >{uiText.rich("Ui.text_bfc831b36e6f61", { part1: () => (<Plus size={14} />) })}</button>
                       </div>
                     </div>
                   ) : (
-                    <div className="flex items-center justify-between">
+                    <div className="flex flex-wrap items-center justify-between gap-4">
                       <div>
                         <p className="text-sm font-medium text-text-primary">{uiText("Ui.text_dbd4e52434c787")}</p>
                         <p className="text-xs text-text-muted mt-0.5">{uiText("Ui.text_1b35653109e48d")}</p>
                       </div>
                       <button
                         onClick={openCreate}
-                        disabled={!searched}
+                        disabled={!searched || searching || Boolean(searchError)}
                         className="inline-flex items-center gap-1.5 px-4 py-2 border border-border text-text-secondary text-sm rounded-lg hover:border-gold hover:text-gold transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
                       >{uiText.rich("Ui.text_3d70e5d8e24436", { part1: () => (<Plus size={14} />) })}</button>
                     </div>
@@ -406,6 +421,7 @@ export default function NeuesProjektPage() {
                 </div>
 
                 <div>
+                  <div className="mb-4"><CountrySelect emptyLabel={uiText("Places.chooseCountry")} value={form.country} onChange={value => setForm(current => ({ ...current, country: value }))} /></div>
                   <label className="block text-xs font-semibold text-text-secondary uppercase tracking-widest mb-2">{uiText("setup.description")}</label>
                   <textarea
                     value={form.description}

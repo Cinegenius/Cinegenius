@@ -1,3 +1,4 @@
+import { jobSchedule } from "@/lib/job-metadata";
 import { cityWriteFields } from "@/lib/places/catalog";
 import { validateMarketplaceOffer } from "@/lib/marketplace-offer";
 import { attemptedApproval } from "@/lib/offer-moderation";
@@ -124,6 +125,9 @@ export async function PATCH(
       const animalData = (await import("@/lib/animal-taxonomy")).animalPortfolioMetadata(currentCategory.data?.category, { ...(current.metadata as Record<string,unknown> ?? {}), ...(metadata && typeof metadata === "object" && !Array.isArray(metadata) ? metadata : {}) });
       if (!animalData) return NextResponse.json({error:(await getTranslations("FilmAnimals"))("portfolioHelp")},{status:400});
       updates.metadata = {...(current.metadata as Record<string,unknown> ?? {}), ...animalData};
+    } else if (current.type === "job" && metadata !== undefined) {
+      if (!metadata || typeof metadata !== "object" || Array.isArray(metadata) || Object.keys(metadata).some(key => key !== "job") || !jobSchedule((metadata as Record<string, unknown>).job)) return NextResponse.json({ error: tResponse("System.requestFailed") }, { status: 400 });
+      updates.metadata = { ...(current.metadata as Record<string, unknown> ?? {}), job: jobSchedule((metadata as Record<string, unknown>).job) };
     } else if (metadata !== undefined) {
       if (!["location", "prop", "vehicle"].includes(current.type)) return NextResponse.json({ error: tResponse('System.m_16aada756674') }, { status: 400 });
       const pricingError = listingPriceMetadataError(metadata,tResponse);

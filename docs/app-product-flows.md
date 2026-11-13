@@ -5,6 +5,16 @@ Filmwerkzeuge-Roadmap. Die Entwicklung beginnt jetzt, nicht erst am Folgetag.
 Diese Vorgaben beschreiben den weiteren Ausbau; die erste startbare App-Vorschau
 implementiert noch kein neues Medienarchiv und keine Tagesposts.
 
+## Arbeitsbereich dieses App-Chats
+
+Markus hat am 13. November 2026 festgelegt: Nach der ausdrücklich beauftragten
+Veröffentlichung der aktuellen Hintergrund-, Punkte- und KI-Menüänderungen wird
+in diesem Chat ausschließlich an der App gearbeitet. Weitere App-Änderungen
+werden nur nach einer neuen ausdrücklichen Anweisung auf die öffentliche
+Hauptseite übertragen. App-Vorschauen und App-spezifische Funktionen getrennt
+weiterentwickeln; eine App-Freigabe ist keine Website-Veröffentlichungsfreigabe.
+Diese Entscheidung gilt für den App-Auftrag, nicht pauschal für andere Website-Aufträge.
+
 ## Bedienung
 
 Instagram, Facebook, Kleinanzeigen/eBay und Airbnb dienen als Orientierung für

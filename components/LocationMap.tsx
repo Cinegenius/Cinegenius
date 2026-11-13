@@ -1,8 +1,9 @@
 "use client";
 
 import "leaflet/dist/leaflet.css";
+import "maplibre-gl/dist/maplibre-gl.css";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import Link from "next/link";
 import { MapPin, X } from "lucide-react";
@@ -12,6 +13,8 @@ import { placeDisplay } from "@/lib/places/core";
 import { locationCategoryLabel } from "@/lib/location-category-labels";
 import { readPublicLocationArea } from "@/lib/location-privacy";
 import { hasCoordinates, inMapBounds, type MapBounds } from "@/lib/location-map";
+import { mapLabelExpression } from "@/lib/map-style";
+import type { Map as VectorMap } from "maplibre-gl";
 import type * as Leaflet from "leaflet";
 
 type Location = {
@@ -21,6 +24,8 @@ type Location = {
   focalPoint?: { x: number; y: number } | null;
 };
 type Props = {
+  labels?: { label: string; results: string; empty: string; unknownCoordinates: string; cluster?: (count: number) => string; error?: string };
+  renderPreview?: (location: Location) => ReactNode;
   readOnly?: boolean;
   onBoundsChange?: (bounds: MapBounds) => void;
   visibleCount?: number;
@@ -33,8 +38,12 @@ type Props = {
   onApplyBounds: (bounds: MapBounds | null) => void;
 };
 
-export default function LocationMap({ readOnly = false, locations, activeId, onHover, userLocation, radiusKm, appliedBounds, onApplyBounds, onBoundsChange, visibleCount }: Props) {
+export default function LocationMap({ readOnly = false, locations, activeId, onHover, userLocation, radiusKm, appliedBounds, onApplyBounds, onBoundsChange, visibleCount, labels, renderPreview }: Props) {
+  const clusterLabel = labels?.cluster;
   const t = useTranslations("locationMap");
+  const mapUi = useTranslations("directoryMap"), commonUi = useTranslations("notifications");
+  const zoom = useRef<Leaflet.Control.Zoom | null>(null);
+  const zoomLabels = useRef({ zoomInTitle: mapUi("zoomIn"), zoomOutTitle: mapUi("zoomOut") });
   const privacyText = useTranslations("locationPrivacy");
   const priceText = useTranslations("MarketplaceOffer");
   const locale = useLocale();
@@ -44,15 +53,35 @@ export default function LocationMap({ readOnly = false, locations, activeId, onH
   const mapRef = useRef<Leaflet.Map | null>(null);
   const [map, setMap] = useState<Leaflet.Map | null>(null);
   const [moved, setMoved] = useState(false);
+  const [basemapReady, setBasemapReady] = useState(false);
+  const initialLocale = useRef(locale);
+  const vectorMap = useRef<VectorMap | null>(null);
+  useEffect(() => {
+    initialLocale.current = locale;
+    if (!basemapReady || !vectorMap.current) return;
+    for (const layer of vectorMap.current.getStyle().layers) {
+      if (layer.type === "symbol") vectorMap.current.setLayoutProperty(layer.id, "text-field", mapLabelExpression(locale));
+    }
+  }, [locale, basemapReady]);
   const [failed, setFailed] = useState(false);
+  const [attempt, setAttempt] = useState(0);
   const selectionKey = locations.map(location => location.id).join(",");
   const [selection, setSelection] = useState<{ scope: string; id: string | null; cluster: string[] }>({ scope: selectionKey, id: null, cluster: [] });
   if (selection.scope !== selectionKey) setSelection({ scope: selectionKey, id: null, cluster: [] });
   const hoverRef = useRef(onHover);
   const boundsChangeRef = useRef(onBoundsChange);
   const automaticBounds = Boolean(onBoundsChange);
+  const hasMapPoints = locations.some(hasCoordinates);
   useEffect(() => { boundsChangeRef.current = onBoundsChange; }, [onBoundsChange]);
   const initialBounds = useRef(appliedBounds);
+  useEffect(() => { initialBounds.current = appliedBounds; }, [appliedBounds]);
+  useEffect(() => {
+    const container = zoom.current?.getContainer();
+    for (const [selector, label] of [[".leaflet-control-zoom-in", mapUi("zoomIn")], [".leaflet-control-zoom-out", mapUi("zoomOut")]]) {
+      const control = container?.querySelector(selector);
+      control?.setAttribute("title", label); control?.setAttribute("aria-label", label);
+    }
+  }, [map, mapUi]);
   useEffect(() => { hoverRef.current = onHover; }, [onHover]);
   const selected = selection.scope === selectionKey ? locations.find(location => location.id === selection.id) : undefined;
   const clusterLocations = selection.scope === selectionKey ? locations.filter(location => selection.cluster.includes(location.id)) : [];
@@ -63,10 +92,17 @@ export default function LocationMap({ readOnly = false, locations, activeId, onH
 
   useEffect(() => {
     if (!map) return;
+    let previousBounds = "";
     const updateBounds = () => {
       if (!automaticBounds) { setMoved(true); return; }
+      // Do not lock an empty initial map before asynchronously loaded results can fit.
+      if (!hasMapPoints) return;
       const bounds = map.getBounds();
-      boundsChangeRef.current?.({south: bounds.getSouth(), north: bounds.getNorth(), west: bounds.getWest(), east: bounds.getEast()});
+      const next = {south: bounds.getSouth(), north: bounds.getNorth(), west: bounds.getWest(), east: bounds.getEast()};
+      const key = JSON.stringify(next);
+      if (key === previousBounds) return;
+      previousBounds = key;
+      boundsChangeRef.current?.(next);
       setSelection(current => current.id || current.cluster.length ? {...current, id: null, cluster: []} : current);
       hoverRef.current(null);
     };
@@ -77,7 +113,7 @@ export default function LocationMap({ readOnly = false, locations, activeId, onH
       updateBounds();
     }
     return () => { map.off("moveend", updateBounds); map.off("zoomend", updateBounds); map.off("resize", updateBounds); };
-  }, [map, automaticBounds]);
+  }, [map, automaticBounds, hasMapPoints]);
 
   useEffect(() => {
     let cancelled = false;
@@ -85,23 +121,41 @@ export default function LocationMap({ readOnly = false, locations, activeId, onH
     const observer = new ResizeObserver(() => instance?.invalidateSize());
     async function initialize() {
       try {
-        const L = (await import("leaflet")).default;
+        const [leaflet, { createBasemap }] = await Promise.all([import("leaflet"), import("@/lib/map-basemap")]);
+        const L = leaflet.default;
         if (cancelled || !containerRef.current) return;
-        instance = L.map(containerRef.current, { center: [51, 10], zoom: 6, zoomControl: false });
+        const animate = !(typeof matchMedia === "function" && matchMedia("(prefers-reduced-motion: reduce)").matches);
+        instance = L.map(containerRef.current, { center: [51, 10], zoom: 6, minZoom: 2, maxZoom: 19, maxBounds: [[-85, -Infinity], [85, Infinity]], maxBoundsViscosity: 1, zoomControl: false, zoomAnimation: animate, fadeAnimation: animate });
         mapRef.current = instance;
         const bounds = initialBounds.current;
         if (bounds) instance.fitBounds([[bounds.south, bounds.west], [bounds.north, bounds.east]], { animate: false });
-        L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
-          attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors', maxZoom: 19,
-        }).addTo(instance);
-        L.control.zoom({ position: "topright" }).addTo(instance);
+        instance.attributionControl.setPrefix(false);
+        const basemap = createBasemap(initialLocale.current).addTo(instance);
+        vectorMap.current = basemap.getMaplibreMap();
+        basemap.getMaplibreMap().on("load", () => { if (!cancelled) setBasemapReady(true); });
+        basemap.getMaplibreMap().on("error", () => { if (!cancelled) setFailed(true); });
+        zoom.current = L.control.zoom({ position: "topright", ...zoomLabels.current }).addTo(instance);
         observer.observe(containerRef.current);
         setMap(instance);
-      } catch { if (!cancelled) setFailed(true); }
+      } catch (error) {
+        if (!cancelled) { console.error("Map initialization failed", error); setFailed(true); }
+      }
     }
     void initialize();
-    return () => { cancelled = true; observer.disconnect(); instance?.remove(); mapRef.current = null; };
-  }, []);
+    return () => {
+      cancelled = true;
+      observer.disconnect();
+      if (instance) {
+        // Leaflet 1.9.4 leaves a 250ms zoom-end timer alive after remove(). Its
+        // callback checks this flag before touching panes that no longer exist.
+        (instance as Leaflet.Map & { _animatingZoom?: boolean })._animatingZoom = false;
+        instance.remove();
+      }
+      mapRef.current = null;
+      vectorMap.current = null;
+      zoom.current = null;
+    };
+  }, [attempt]);
 
   // Hover only changes marker styling; it never destroys an open touch preview.
   useEffect(() => {
@@ -112,11 +166,17 @@ export default function LocationMap({ readOnly = false, locations, activeId, onH
       const L = (await import("leaflet")).default;
       if (cancelled) return;
       group = L.layerGroup().addTo(map!);
+      let renderedViewport = "";
       const render = () => {
-        group!.clearLayers();
         const bounds = map!.getBounds();
         const viewport = {south: bounds.getSouth(), north: bounds.getNorth(), west: bounds.getWest(), east: bounds.getEast()};
+        const key = JSON.stringify([map!.getZoom(), viewport]);
+        // A completed zoom emits both zoomend and moveend for the same view.
+        if (key === renderedViewport) return;
+        renderedViewport = key;
+        group!.clearLayers();
         const pending = locations.filter(hasCoordinates).filter(location => !automaticBounds || inMapBounds(location, viewport));
+        const projected = new Map(pending.map(location => [location.id, map!.latLngToLayerPoint([location.lat, location.lng])]));
         for (const location of pending) {
           const area = readPublicLocationArea(location.metadata);
           if (area) L.circle([area.lat, area.lng], { radius: area.radius_meters, color: "#C2F135", fillOpacity: 0.07, weight: 1.5, interactive: false }).addTo(group!);
@@ -124,16 +184,16 @@ export default function LocationMap({ readOnly = false, locations, activeId, onH
         const used = new Set<string>();
         for (const location of pending) {
           if (used.has(location.id)) continue;
-          const point = map!.latLngToLayerPoint([location.lat, location.lng]);
+          const point = projected.get(location.id)!;
           const members = pending.filter(other => !used.has(other.id)
-            && point.distanceTo(map!.latLngToLayerPoint([other.lat, other.lng])) <= 44);
+            && point.distanceTo(projected.get(other.id)!) <= 44);
           members.forEach(member => used.add(member.id));
           const clustered = members.length > 1;
           const marker = L.marker([
             members.reduce((sum, member) => sum + member.lat, 0) / members.length,
             members.reduce((sum, member) => sum + member.lng, 0) / members.length,
           ], {
-            title: clustered ? t("cluster", { count: members.length }) : location.title,
+            title: clustered ? (clusterLabel?.(members.length) ?? t("cluster", { count: members.length })) : location.title,
             icon: L.divIcon({ className: "location-map-marker", iconSize: [44, 44], iconAnchor: [22, 22],
               html: `<span class="location-map-marker__dot${clustered ? " location-map-marker__cluster" : ""}">${clustered ? members.length : ""}</span>` }),
           }).addTo(group!);
@@ -160,7 +220,7 @@ export default function LocationMap({ readOnly = false, locations, activeId, onH
     let cleanupRender = () => {};
     void initializeMarkers();
     return () => { cancelled = true; cleanupRender(); group?.remove(); };
-  }, [map, locations, t, readOnly, automaticBounds]);
+  }, [map, locations, t, readOnly, automaticBounds, clusterLabel]);
 
   useEffect(() => {
     if (!map) return;
@@ -200,20 +260,20 @@ export default function LocationMap({ readOnly = false, locations, activeId, onH
   }, [map, userLocation, radiusKm, t, appliedBounds]);
 
   return (
-    <div className="location-map relative isolate h-full min-h-80 w-full overflow-hidden rounded-xl border border-border bg-bg-secondary" aria-label={t("label")}>
+    <div className="location-map relative isolate h-full min-h-80 w-full overflow-hidden rounded-xl border border-border bg-bg-secondary" aria-label={labels?.label ?? t("label")}>
       <div ref={containerRef} className="h-full w-full" />
-      <p role="status" aria-live="polite" className="pointer-events-none absolute left-3 top-3 z-[500] max-w-[calc(100%-5rem)] rounded-lg border border-border bg-bg-primary/95 px-3 py-2 text-xs font-medium text-text-primary">{locationsText("results", { count: visibleCount ?? locations.length })}</p>
+      <p role="status" aria-live="polite" className="pointer-events-none absolute left-3 top-3 z-[500] max-w-[calc(100%-5rem)] rounded-lg border border-border bg-bg-primary/95 px-3 py-2 text-xs font-medium text-text-primary">{!basemapReady && !failed ? mapUi("loading") : labels?.results ?? locationsText("results", { count: visibleCount ?? locations.length })}</p>
       {!readOnly && !automaticBounds && <div className="absolute left-3 top-16 z-[500] flex max-w-[calc(100%-5rem)] flex-wrap gap-2">
         {moved && <button type="button" onClick={() => { if (!map) return; const b = map.getBounds(); onApplyBounds({ south: b.getSouth(), north: b.getNorth(), west: b.getWest(), east: b.getEast() }); setMoved(false); }} className="min-h-11 rounded-lg border border-border bg-bg-primary px-3 text-sm text-text-primary">{t("searchArea")}</button>}
         {appliedBounds && <button type="button" onClick={() => { onApplyBounds(null); setMoved(false); }} className="min-h-11 rounded-lg border border-border bg-bg-primary px-3 text-sm text-text-primary">{t("resetArea")}</button>}
       </div>}
-      {locations.some(location => !hasCoordinates(location)) && <p className="absolute bottom-8 left-3 z-[400] rounded bg-bg-primary px-2 py-1 text-xs text-text-muted">{t("unknownCoordinates")}</p>}
-      {failed && <p role="alert" className="absolute inset-0 flex items-center justify-center bg-bg-secondary p-6 text-center text-sm text-text-secondary">{t("error")}</p>}
-      {(visibleCount ?? locations.length) === 0 && <p role="status" className="absolute inset-x-3 top-3 z-[500] rounded-lg border border-border bg-bg-primary p-4 text-sm text-text-secondary">{t("empty")}</p>}
+      {(labels?.unknownCoordinates ?? true) && locations.some(location => !hasCoordinates(location)) && <p className="absolute bottom-8 left-3 z-[400] rounded bg-bg-primary px-2 py-1 text-xs text-text-muted">{labels?.unknownCoordinates ?? t("unknownCoordinates")}</p>}
+      {failed && <div role="alert" className="absolute inset-x-3 top-16 z-[600] flex flex-wrap items-center gap-2 rounded-xl border border-border bg-bg-secondary p-3 text-sm text-text-secondary"><p className="min-w-0 flex-1">{labels?.error ?? t("error")}</p><button type="button" onClick={() => { setFailed(false); setBasemapReady(false); setMap(null); setAttempt(value => value + 1); }} className="min-h-11 rounded-lg border border-border px-3 text-gold">{commonUi("retry")}</button></div>}
+      {(visibleCount ?? locations.length) === 0 && <p role="status" className="absolute inset-x-3 top-3 z-[500] rounded-lg border border-border bg-bg-primary p-4 text-sm text-text-secondary">{labels?.empty ?? t("empty")}</p>}
       {(selected || clusterLocations.length > 0) && (
-        <div className="location-map-preview absolute inset-x-3 bottom-8 z-[500] mx-auto max-h-[calc(100%-6rem)] max-w-sm overflow-y-auto rounded-xl border border-border bg-bg-secondary shadow-xl">
+        <div className="location-map-preview absolute inset-x-3 bottom-16 z-[1100] mx-auto max-h-[calc(100%-9rem)] max-w-sm overflow-y-auto rounded-xl border border-border bg-bg-secondary shadow-xl">
           <button type="button" aria-label={t("closePreview")} onClick={() => { select(null); }} className="absolute right-0 top-0 z-10 flex size-11 items-center justify-center rounded-full bg-bg-primary/90 text-text-primary"><X size={18} /></button>
-          {selected ? (
+          {selected ? (renderPreview ? renderPreview(selected) : (
             <Link href={`/locations/${selected.id}`} className="block overflow-hidden rounded-xl focus-visible:outline-2 focus-visible:outline-gold">
               <div className="relative h-32 bg-bg-elevated">
                 {selected.image ? <Image src={selected.image} alt={selected.title} fill mediaSize="thumbnail" sizes="384px" className="object-cover" style={{ objectPosition: selected.focalPoint ? `${selected.focalPoint.x}% ${selected.focalPoint.y}%` : "50% 50%" }} /> : <div className="flex h-full items-center justify-center text-text-muted"><MapPin size={30} /></div>}
@@ -226,7 +286,7 @@ export default function LocationMap({ readOnly = false, locations, activeId, onH
                 <span className="flex min-h-11 items-center text-sm font-medium text-gold">{t("details")} →</span>
               </div>
             </Link>
-          ) : <div className="max-h-60 overflow-y-auto p-3 pt-12">{clusterLocations.map(location => <button type="button" key={location.id} onClick={() => { select(location.id); }} className="block min-h-11 w-full border-b border-border p-2 text-left text-sm text-text-primary">{location.title}</button>)}</div>}
+          )) : <div className="max-h-60 overflow-y-auto p-3 pt-12">{clusterLocations.map(location => <button type="button" key={location.id} onClick={() => { select(location.id); }} className="block min-h-11 w-full border-b border-border p-2 text-left text-sm text-text-primary">{location.title}</button>)}</div>}
         </div>
       )}
     </div>

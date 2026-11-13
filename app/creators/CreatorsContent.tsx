@@ -1,4 +1,13 @@
 "use client";
+import BrowseGeography from "@/components/BrowseGeography";
+import { useBrowseGeography } from "@/lib/use-browse-geography";
+import { prioritizeGeographically } from "@/lib/browse-geography";
+
+
+import FloatingMapToggle from "@/components/FloatingMapToggle";
+import DirectoryMap from "@/components/DirectoryMap";
+import DirectoryViewControls, { type DirectoryView } from "@/components/DirectoryViewControls";
+import { useDirectoryMap } from "@/lib/use-directory-map";
 
 import PlaceFilters from "@/components/PlaceFilters";
 
@@ -19,7 +28,7 @@ import { crewPhotoInput } from "@/lib/profile-photo";
 import type { ProfileFocalPoint } from "@/lib/profile-cover";
 import { useTranslations, useLocale } from "next-intl";
 import {
-  MapPin, CheckCircle, Search, X, LayoutGrid, List, SlidersHorizontal, ChevronDown, Users, Globe, Languages, ArrowUpDown, Plus, ShoppingBag,
+  MapPin, CheckCircle, Search, X, SlidersHorizontal, ChevronDown, Users, Globe, Languages, ArrowUpDown, Plus, ShoppingBag,
   Clapperboard, Video, Lightbulb, Wrench, Mic, Palette, Shirt, Sparkles, Scissors, Music, Truck, Star, Zap, Tv, MonitorPlay, FileText, Smartphone, Camera, Bot,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
@@ -66,6 +75,8 @@ export type ServerCreator = {
   primaryOccupation?: PrimaryOccupation | null;
   occupationIds?: string[];
   location: string;
+  lat?: number | null;
+  lng?: number | null;
   image: string;       // cover image (portfolio or avatar)
   avatar: string;      // circular avatar (always avatar_url)
   rating: number;
@@ -328,7 +339,7 @@ function CreatorsInner({
 }: {
   serverCreators: ServerCreator[];
   hasMoreProfiles?: boolean;
-  initialFilters: { query: string; city: string; sort: string; cityText?: string; country?: string; region?: string };
+  initialFilters: { query: string; city: string; sort: string; cityText?: string; country?: string; region?: string; view?: string };
 }) {
   const taxonomyText = useTranslations("Taxonomy");
 
@@ -339,6 +350,7 @@ function CreatorsInner({
   const profileText = useTranslations("profile");
   const animals = useTranslations("FilmAnimals");
   const locale = useLocale();
+  const resultsRef = useRef<HTMLDivElement>(null);
 
   const [query, setQuery] = useViewState("crew.query", () => initialFilters.query);
   const [cityFilter, setCityFilter] = useViewState("crew.cityFilter", () => initialFilters.city);
@@ -354,15 +366,18 @@ function CreatorsInner({
 
   // allCreators muss VOR den useMemo-Aufrufen deklariert sein
   const [allCreators, setAllCreators] = useState<ServerCreator[]>(serverCreators);
-  const [apiPage, setApiPage] = useState(1);
   const [hasMoreFromApi, setHasMoreFromApi] = useState(hasMoreProfiles);
   const [loadingMore, setLoadingMore] = useState(false);
   const [loadError, setLoadError] = useState(false);
+  const directoryRequest = useRef<{ source: ServerCreator[]; page: number; hasMore: boolean; active: boolean; controller: AbortController | null }>({ source: serverCreators, page: 1, hasMore: hasMoreProfiles, active: true, controller: null });
   useEffect(() => {
+    const scope = { source: serverCreators, page: 1, hasMore: hasMoreProfiles, active: true, controller: null as AbortController | null };
+    directoryRequest.current = scope;
     setAllCreators(serverCreators);
-    setApiPage(1);
     setHasMoreFromApi(hasMoreProfiles);
+    setLoadingMore(false);
     setLoadError(false);
+    return () => { scope.active = false; scope.controller?.abort(); };
   }, [serverCreators, hasMoreProfiles]);
 
   useEffect(() => subscribeToProfileUpdated(({ userId, avatarUrl, previousAvatarUrl, focalPoint }) => {
@@ -379,21 +394,30 @@ function CreatorsInner({
   }), []);
 
   const loadMoreFromApi = useCallback(async () => {
-    if (loadingMore || !hasMoreFromApi) return;
+    const scope = directoryRequest.current;
+    if (!scope.active || scope.source !== serverCreators || scope.controller || !scope.hasMore) return;
+    const controller = new AbortController();
+    scope.controller = controller;
     setLoadingMore(true);
     try {
-      const res = await fetch(`/api/creators?page=${apiPage}`);
+      const res = await fetch(`/api/creators?page=${scope.page}`, { signal: controller.signal });
       if (!res.ok) throw new Error(uiText("Ui.text_3246f5de17bad7"));
       const { creators, hasMore } = await res.json();
+      // A URL/session refresh replaces the first page. Older requests cannot finish that new sequence.
+      if (!scope.active || directoryRequest.current !== scope) return;
       if (creators?.length) {
-        setAllCreators(prev => [...new Map([...prev.filter(creator => !creator.id.startsWith("listing_") || !creators.some((profile: ServerCreator) => profile.id === creator.ownerId)), ...creators].map(creator => [creator.id, creator])).values()]);
+        setAllCreators(prev => scope.active && directoryRequest.current === scope
+          ? [...new Map([...prev.filter(creator => !creator.id.startsWith("listing_") || !creators.some((profile: ServerCreator) => profile.id === creator.ownerId)), ...creators].map(creator => [creator.id, creator])).values()] : prev);
       }
-      setApiPage(p => p + 1);
-      setHasMoreFromApi(!!hasMore);
-    } catch { setLoadError(true); } finally {
-      setLoadingMore(false);
+      scope.page += 1;
+      scope.hasMore = !!hasMore;
+      setHasMoreFromApi(scope.hasMore);
+    } catch {
+      if (scope.active && directoryRequest.current === scope && !controller.signal.aborted) setLoadError(true);
+    } finally {
+      if (scope.active && directoryRequest.current === scope) { scope.controller = null; setLoadingMore(false); }
     }
-  }, [apiPage, hasMoreFromApi, loadingMore]);
+  }, [serverCreators, uiText]);
 
   // Fetch bounded pages so filters also see profiles beyond the initial page.
   useEffect(() => {
@@ -415,7 +439,8 @@ function CreatorsInner({
   const countryLabel = (value: string) => countryOptions.find(o => o.value === value)?.label ?? value;
   const regionLabel = (value: string) => regionOptions.find(option => option.value === value)?.label ?? value;
   const [sortKey, setSortKey] = useViewState("crew.sortKey", () => ["rating", "reviews"].includes(initialFilters.sort) ? initialFilters.sort : "featured");
-  const [viewMode, setViewMode] = useViewState<"grid" | "list">("crew.viewMode", "grid");
+  const geography = useBrowseGeography(sortKey === "featured" && !countryFilter && !regionFilter && !cityFilter && !cityText);
+  const [viewMode, setViewMode] = useViewState<DirectoryView>("crew.viewMode", () => initialFilters.view === "map" ? "map" : initialFilters.view === "list" ? "list" : "grid");
 
   // Neue Casting-Filter
   const [profileTypeFilter, setProfileTypeFilter] = useViewState("crew.profileTypeFilter", "");
@@ -492,7 +517,7 @@ function CreatorsInner({
     setSidebarDept(deptId);
     if (deptId && !isProviderFilter(deptId)) setActiveDept(deptId);
     if (isProviderFilter(deptId)) setFilterOpen(false);
-    if (deptId === null) setViewMode("grid");
+    if (deptId === null && viewMode !== "map") setViewMode("grid");
   };
 
   const removeRole = (role: string) =>
@@ -509,6 +534,7 @@ function CreatorsInner({
   if (countryFilter) filterParams.set("country", countryFilter);
   if (regionFilter) filterParams.set("region", regionFilter);
   if (sortKey !== "featured") filterParams.set("sort", sortKey);
+  if (viewMode !== "grid") filterParams.set("view", viewMode);
   useViewUrl(filterParams.size ? `/creators?${filterParams}` : "/creators");
 
   // Filtered results
@@ -517,7 +543,7 @@ function CreatorsInner({
     && !profileTypeFilter && !hairFilter && !eyeFilter && !bodyFilter && !travelFilter
     && !ageMinFilter && !ageMaxFilter;
 
-  const filtered = useMemo(() => {
+  const matching = useMemo(() => {
     let result = [...allCreators];
 
     if (query.trim()) {
@@ -590,17 +616,26 @@ function CreatorsInner({
       result.sort((a, b) => compareCreatorNames(a, b, locale));
     }
 
-    return result;
+    return prioritizeGeographically(result, geography.preferred);
   }, [query, selectedRoles, sidebarDept, availableOnly, vendorOnly, cityText, cityFilter, countryFilter, regionFilter, languageFilter,
       profileTypeFilter, hairFilter, eyeFilter, bodyFilter, travelFilter, ageMinFilter, ageMaxFilter,
-      sortKey, allCreators, isTopMode, locale, uiText]);
+      sortKey, allCreators, isTopMode, locale, uiText, geography.preferred]);
 
   const filterKey = JSON.stringify([query, [...selectedRoles].sort(), sidebarDept, availableOnly, vendorOnly,
     cityText, cityFilter, countryFilter, regionFilter, languageFilter, profileTypeFilter, hairFilter, eyeFilter, bodyFilter,
-    travelFilter, ageMinFilter, ageMaxFilter, sortKey]);
-  const visibleCount = pagination.filterKey === filterKey ? pagination.visibleCount : PAGE_SIZE;
+    travelFilter, ageMinFilter, ageMaxFilter, sortKey, geography.key]);
+  const map = useDirectoryMap("crew", filterKey, matching, viewMode === "map");
+  const filtered = map.rows;
+  const mapItems = useMemo(() => matching.map(creator => ({
+    id: creator.id, title: creator.name, city: creator.location,
+    subtitle: getPositions(creator).map(label => taxonomyLabel(label, uiText)).join(" · "),
+    href: creator.id.startsWith("listing_") ? `/creators/${encodeURIComponent(creator.id.slice(8))}` : `/profile/${encodeURIComponent(creator.id)}`,
+    image: creator.image, focalPoint: creator.focal_point, lat: creator.lat, lng: creator.lng,
+  })), [matching, uiText]);
+  const resultKey = JSON.stringify([filterKey, viewMode === "map" ? map.bounds : null]);
+  const visibleCount = pagination.filterKey === resultKey ? pagination.visibleCount : PAGE_SIZE;
   const setVisibleCount = (next: number | ((value: number) => number)) =>
-    setPagination({ filterKey, visibleCount: typeof next === "function" ? next(visibleCount) : next });
+    setPagination({ filterKey: resultKey, visibleCount: typeof next === "function" ? next(visibleCount) : next });
 
   // Active filter chips: group by dept for context
   const activeChips = useMemo(() =>
@@ -653,22 +688,26 @@ function CreatorsInner({
     setAgeMinFilter(""); setAgeMaxFilter(""); setTravelFilter(""); setSortKey("featured");
   };
 
+  const viewControls = <DirectoryViewControls value={viewMode} onChange={setViewMode} />;
+
   const SORT_OPTIONS = [
-    { value: "featured", label: t("sortAlphabetical") },
+    { value: "featured", label: geography.preferred ? uiText("BrowseGeography.recommended") : t("sortAlphabetical") },
     { value: "rating",   label: t("sortRating") },
     { value: "reviews",  label: t("sortRatingCount") },
   ];
 
   return (
     <div className="min-h-screen mobile-bottom-nav-clear">
+      <FloatingMapToggle mapActive={viewMode === "map"} onToggle={() => { setViewMode(viewMode === "map" ? "list" : "map"); requestAnimationFrame(() => resultsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" })); }} />
 
+      <BrowseGeography hasDesktopCountryFilter country={countryFilter} onCountryChange={value => changePlaceFilters({ country: value, region: "", city: "" })} geography={geography} />
       <MobileBrowseControls
         query={query}
         onQueryChange={setQuery}
         searchPlaceholder={t("searchPlaceholder")}
         sortValue={sortKey}
         sortOptions={SORT_OPTIONS}
-        onSortChange={setSortKey}
+        onSortChange={value => { geography.setEnabled(false); setSortKey(value); }}
         categoryLabel={t("deptFilter")}
         allCategoryLabel={uiText("Ui.text_bc0b501bb3186b")}
         categories={[
@@ -679,6 +718,7 @@ function CreatorsInner({
         categoryValue={sidebarDept ?? ""}
         onCategoryChange={(value) => { setSelectedRoles(new Set()); chooseSidebarDept(value || null); }}
         resultSummary={hasMoreFromApi ? (loadError ? t("resultsLoadFailed") : t("resultsLoading")) : t("results", { count: filtered.length })}
+        viewControls={viewControls}
         filterCount={secondaryFilterCount + (sidebarDept ? 1 : 0)}
         chips={mobileChips}
         onReset={resetMobileFilters}
@@ -741,16 +781,7 @@ function CreatorsInner({
               </button>
             )}
           </div>
-          <div className="flex bg-bg-elevated border border-border rounded-xl overflow-hidden shrink-0">
-            <button onClick={() => setViewMode("grid")}
-              className={`flex items-center justify-center w-9 h-9 transition-colors ${viewMode === "grid" ? "bg-gold text-bg-primary" : "text-text-muted"}`}>
-              <LayoutGrid size={14} />
-            </button>
-            <button onClick={() => setViewMode("list")}
-              className={`flex items-center justify-center w-9 h-9 transition-colors border-l border-border ${viewMode === "list" ? "bg-gold text-bg-primary" : "text-text-muted"}`}>
-              <List size={14} />
-            </button>
-          </div>
+          {viewControls}
         </div>
 
         {/* Row 2 — Verfügbar + Rollen-Chips + Filter-Button (eine scrollbare Zeile) */}
@@ -816,7 +847,7 @@ function CreatorsInner({
             {query && <span className="text-gold">{uiText.rich("Ui.text_58e2efda5da487", { value1: () => (query) })}</span>}
           </p>
           <div className="relative">
-            <select value={sortKey} onChange={(e) => setSortKey(e.target.value)}
+            <select value={sortKey} onChange={(e) => { geography.setEnabled(false); setSortKey(e.target.value); }}
               className="appearance-none pl-2.5 pr-6 py-1.5 bg-bg-elevated border border-border rounded-lg text-xs text-text-muted focus:outline-none focus:border-gold/50 transition-colors cursor-pointer">
               {SORT_OPTIONS.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
             </select>
@@ -1036,16 +1067,9 @@ function CreatorsInner({
             <SortDropdown
               value={sortKey}
               options={SORT_OPTIONS}
-              onChange={setSortKey}
+              onChange={value => { geography.setEnabled(false); setSortKey(value); }}
             />
-            <div className="flex bg-bg-elevated border border-border rounded-lg overflow-hidden shrink-0">
-              <button onClick={() => setViewMode("grid")} className={`flex items-center justify-center w-9 h-9 transition-colors ${viewMode === "grid" ? "bg-gold text-bg-primary" : "text-text-muted hover:text-text-primary"}`}>
-                <LayoutGrid size={14} />
-              </button>
-              <button onClick={() => setViewMode("list")} className={`flex items-center justify-center w-9 h-9 transition-colors border-l border-border ${viewMode === "list" ? "bg-gold text-bg-primary" : "text-text-muted hover:text-text-primary"}`}>
-                <List size={14} />
-              </button>
-            </div>
+            {viewControls}
           </div>
 
           {/* Row 2: Filters */}
@@ -1236,7 +1260,7 @@ function CreatorsInner({
         const crewVisible  = filteredCrew.slice(0, visibleCount);
 
         return (
-          <div className="site-container py-3 pb-24 sm:py-6 lg:pb-8">
+          <div ref={resultsRef} className="site-container scroll-mt-24 py-3 pb-24 sm:py-6 lg:pb-8">
             <div className="flex gap-8 items-start">
 
             {/* Left sidebar */}
@@ -1356,6 +1380,8 @@ function CreatorsInner({
               {query && <span className="text-gold">{uiText.rich("Ui.text_58e2efda5da487", { value1: () => (query) })}</span>}
             </p>
 
+            {viewMode === "map" && <DirectoryMap kind="crew" items={mapItems} bounds={map.bounds} onBoundsChange={map.setBounds} />}
+
             {/* Empty */}
             {filteredCrew.length === 0 && (
               <EmptyState
@@ -1373,7 +1399,7 @@ function CreatorsInner({
             {filteredCrew.length > 0 && (
               <>
               {/* List: compact directory table */}
-              {viewMode === "list" && (
+              {(viewMode === "list" || viewMode === "map") && (
                 <div className="border border-border rounded-xl overflow-hidden bg-bg-secondary divide-y divide-border/50">
                   {crewVisible.map((c) => {
                     const displayPositions = getPositions(c).map(label => taxonomyLabel(label, uiText));
@@ -1491,7 +1517,7 @@ export default function CreatorsContent({
 }: {
   serverCreators: ServerCreator[];
   hasMoreProfiles?: boolean;
-  initialFilters: { query: string; city: string; sort: string; cityText?: string; country?: string; region?: string };
+  initialFilters: { query: string; city: string; sort: string; cityText?: string; country?: string; region?: string; view?: string };
 }) {
   return <CreatorsInner serverCreators={serverCreators} hasMoreProfiles={hasMoreProfiles} initialFilters={initialFilters} />;
 }

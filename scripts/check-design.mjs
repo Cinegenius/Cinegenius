@@ -96,7 +96,9 @@ for (const selector of [".mobile-browse-controls", ".mobile-filter-panel", ".mob
 if (!styles.includes("min-height: 46px") || !styles.includes("min-height: 48px")) {
   failures.push("Mobile browsing controls must keep 44px or larger touch targets");
 }
-if (!read("components/MobileBrowseControls.tsx").includes('role="dialog" aria-modal="true"')) {
+const mobileFilters = read("components/MobileBrowseControls.tsx");
+const nativeFilterDialog = /<dialog\b[^>]*aria-modal="true"/.test(mobileFilters) && mobileFilters.includes(".showModal()");
+if (!nativeFilterDialog && !mobileFilters.includes('role="dialog" aria-modal="true"')) {
   failures.push("Mobile filters must remain an accessible dialog");
 }
 if (!styles.includes("background: var(--color-bg-primary)")) {

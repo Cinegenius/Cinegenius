@@ -39,7 +39,7 @@ type TabId = "reviews" | "overview" | "reports" | "verifications" | "users" | "a
 
 type Listing = { moderation_status?: string; moderation_reason?: string | null; responsible_person?: StoredResponsiblePerson | null; id: string; user_id: string | null; company_id: string | null; company_slug: string | null; type: string; title: string; city: string | null; price: number | null; priceLabel?: string; published: boolean; created_at: string; provider_name: string; provider_href: string | null; provider_image: string | null; provider_missing: boolean; detail_href: string | null };
 type AdminProfile = { user_id: string; display_name: string | null; slug: string | null; location: string | null; avatar_url: string | null; profile_types: string[] | null; verified: boolean; verification_revision: number; created_at: string; tagline: string | null };
-type AdminProject = { id: string; title: string; year: number | null; type: string | null; verified: boolean; created_at: string; director: string | null; crew_count: number };
+type AdminProject = { updated_at: string | null; id: string; title: string; year: number | null; type: string | null; verified: boolean; created_at: string; director: string | null; crew_count: number };
 type AdminCredit = { id: string; project_id: string; user_id: string | null; unclaimed_profile_id: string | null; role: string; created_at: string; name: string; type: "user" | "ghost" };
 type Report = { id: string; reporter_id: string; reporter_name: string | null; target_type: string; target_id: string; target_name: string | null; target_href: string | null; target_excerpt: string | null; reason: string; details: string | null; status: string; created_at: string };
 type Verification = { id: string; user_id: string; display_name: string | null; status: string; notes: string | null; submitted_at: string; reviewed_at: string | null; review_version: number; profile_revision: number | null; profile_verified: boolean | null; review_reason: string | null; has_document: boolean };
@@ -559,7 +559,8 @@ function AdminContent() {
     if (!reason) return;
     setProjectActing(project.id);
     try {
-      await mutate("/api/admin/projects", { projectId: project.id, verified: nextValue, reason });
+      await mutate("/api/admin/projects", { projectId: project.id, verified: nextValue, reason, expectedUpdatedAt: project.updated_at });
+      setRefreshKey(key => key + 1);
       setProjects((items) => items.map((item) => item.id === project.id ? { ...item, verified: nextValue } : item));
     } catch (error) { setActionMessage({ text: uiErrorMessage(error, uiText("System.requestFailed")), error: true }); }
     finally { setProjectActing(null); }

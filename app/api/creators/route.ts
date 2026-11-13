@@ -1,3 +1,4 @@
+import { publicMapPoint } from "@/lib/places/public-map-point";
 import { getTranslations as getResponseTranslations } from "next-intl/server";
 import { getLocale } from "next-intl/server";
 import { placeReadFields } from "@/lib/places/catalog";
@@ -56,6 +57,7 @@ export async function GET(req: NextRequest) {
       occupationIds: crewOccupationIds(p),
       location: p.location ?? "",
         ...placeReadFields(p.location ?? "", p, locale),
+        ...publicMapPoint(p),
       image: (Array.isArray(p.portfolio_images) && p.portfolio_images.length > 0) ? p.portfolio_images[0] : (p.avatar_url ?? ""),
       avatar: p.avatar_url ?? "",
       rating: 0, reviews: 0,

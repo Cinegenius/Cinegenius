@@ -7,6 +7,7 @@ import { X } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useCallback, useEffect, useId, useRef, useState, useSyncExternalStore } from "react";
 import { clearConversation, readConversation } from "@/lib/genie-conversation";
+import GenieWelcome from "./GenieWelcome";
 import styles from "./Genie.module.css";
 
 function GenieMark() {
@@ -156,6 +157,13 @@ function AvailableGenie({ memoryScope, mode }: { memoryScope: string | null; mod
 
   return (
     <>
+      <GenieWelcome
+        key={pathname}
+        memoryScope={memoryScope}
+        enabled={!open && !hasOpened && !hideLauncher}
+        onOpen={() => { setHasOpened(true); setOpen(true); }}
+        onDismiss={() => launcher.current?.focus({ preventScroll: true })}
+      />
       {!open && !hideLauncher && (
         <button
           ref={launcher}
@@ -168,7 +176,12 @@ function AvailableGenie({ memoryScope, mode }: { memoryScope: string | null; mod
           onClick={() => { setHasOpened(true); setOpen(true); }}
         >
           <GenieMark />
-          {mode === "tool" ? <span className={styles.toolCopy}><strong>{t("name")}</strong><span>{tools("genieDescription")}</span></span> : <span>{t("name")}</span>}
+          {mode === "tool" ? <span className={styles.toolCopy}><strong>{t("name")}</strong><span>{tools("genieDescription")}</span></span> : (
+          <span className={styles.launcherCopy}>
+            <span className={styles.launcherName}>{t("name")}</span>
+            <span className={styles.launcherLabel}>{t("assistantLabel")}</span>
+          </span>
+          )}
         </button>
       )}
       {hasOpened && (

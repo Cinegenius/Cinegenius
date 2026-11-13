@@ -161,6 +161,55 @@ body {
   background: var(--color-bg-secondary);
 }
 
+/* Compact directory rows: shared surfaces, aligned facts, natural mobile reflow. */
+.browse-directory__head { display: none; }
+.browse-directory__items { margin: 0; padding: 0; list-style: none; }
+.browse-directory__row {
+  display: block; min-width: 0; min-height: 44px; padding: 14px 16px;
+  color: var(--color-text-secondary); transition: background-color 150ms ease;
+}
+.browse-directory__row:hover { background: var(--color-bg-elevated); }
+.browse-directory__row:focus-visible { outline: 2px solid var(--color-gold); outline-offset: -3px; }
+.browse-directory__identity { display: flex; align-items: center; gap: 12px; min-width: 0; }
+.browse-directory__poster {
+  display: flex; align-items: center; justify-content: center; flex: 0 0 42px;
+  width: 42px; height: 60px; overflow: hidden; border-radius: 5px;
+  background: var(--color-bg-elevated); color: var(--color-text-muted);
+}
+.browse-directory__poster--empty { height: 40px; background: transparent; }
+.browse-directory__title { color: var(--color-text-primary); font-size: 15px; font-weight: 600; line-height: 1.4; overflow-wrap: anywhere; }
+.browse-directory__row:hover .browse-directory__title { color: var(--color-gold); }
+.browse-directory__facts { display: flex; flex-wrap: wrap; gap: 2px 8px; margin-top: 4px; color: var(--color-text-muted); font-size: 12px; line-height: 1.5; }
+.browse-directory__facts > span { min-width: 0; overflow-wrap: anywhere; }
+.browse-directory__facts > span + span::before { content: "·"; margin-right: 8px; }
+.browse-directory__details { display: flex; flex-wrap: wrap; gap: 4px 12px; margin-top: 6px; padding-left: 54px; font-size: 12px; line-height: 1.5; }
+.browse-directory__director { overflow-wrap: anywhere; }
+.browse-directory__director-label { color: var(--color-text-muted); }
+.browse-directory__credits { min-width: 0; color: var(--color-text-muted); font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+.browse-directory__director--empty, .browse-directory__credits--empty, .browse-directory__year, .browse-directory__type { display: none; }
+.browse-directory--list .browse-directory__items > li + li { border-top: 1px solid color-mix(in srgb, var(--color-border) 65%, transparent); }
+.browse-directory--grid .browse-directory__items { display: grid; gap: 12px; }
+.browse-directory--grid .browse-directory__row { height: 100%; }
+@media (min-width: 640px) {
+  .browse-directory--grid .browse-directory__items { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (min-width: 1024px) {
+  .browse-directory--list .browse-directory__head,
+  .browse-directory--list .browse-directory__row { display: grid; grid-template-columns: 4rem minmax(0, 2fr) minmax(0, 1fr) minmax(0, 1.25fr) minmax(0, .8fr); align-items: center; gap: 20px; padding: 14px 20px; }
+  .browse-directory__head { color: var(--color-text-muted); background: var(--color-bg-primary); border-bottom: 1px solid var(--color-border); font-size: 12px; line-height: 1.5; }
+  .browse-directory--list .browse-directory__year,
+  .browse-directory--list .browse-directory__type { display: block; min-width: 0; font-size: 13px; line-height: 1.5; overflow-wrap: anywhere; }
+  .browse-directory--list .browse-directory__year { color: var(--color-text-muted); font-variant-numeric: tabular-nums; }
+  .browse-directory--list .browse-directory__details { display: contents; }
+  .browse-directory--list .browse-directory__director,
+  .browse-directory--list .browse-directory__credits { display: block; min-width: 0; font-size: 13px; line-height: 1.5; }
+  .browse-directory--list .browse-directory__facts { display: none; }
+  .browse-directory--list .browse-directory__director-label { position: absolute; width: 1px; height: 1px; padding: 0; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+}
+@media (min-width: 1280px) {
+  .browse-directory--grid .browse-directory__items { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+
 /* One mobile search/filter pattern shared by all six directory pages. */
 .mobile-browse-controls { border-bottom: 1px solid color-mix(in srgb, var(--color-border) 55%, transparent); background: var(--color-bg-primary); }
 .mobile-browse-controls__inner { display: grid; gap: 10px; padding-block: 12px; }
@@ -187,6 +236,9 @@ body {
 .mobile-browse-category > span, .mobile-filter-field > span { overflow: hidden; color: var(--color-text-muted); font-size: 12px; font-weight: 600; text-overflow: ellipsis; white-space: nowrap; }
 .mobile-browse-summary { display: grid; gap: 8px; min-width: 0; color: var(--color-text-muted); font-size: 13px; }
 .mobile-browse-summary p { min-width: 0; margin: 0; }
+.mobile-browse-summary-row { display: grid; grid-template-columns: minmax(0, 1fr) max-content; align-items: center; gap: 8px; min-width: 0; min-height: 54px; }
+.mobile-browse-summary-row > p { display: -webkit-box; overflow: hidden; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow-wrap: anywhere; line-height: 20px; font-variant-numeric: tabular-nums; }
+.mobile-browse-summary-row > :last-child { justify-self: end; }
 .mobile-browse-chips { display: flex; flex-wrap: wrap; gap: 6px; min-width: 0; }
 .mobile-browse-chip { display: inline-flex; min-width: 0; max-width: 100%; min-height: 44px; align-items: center; gap: 3px; padding: 2px 5px 2px 10px; border: 1px solid color-mix(in srgb, var(--color-gold) 35%, var(--color-border)); border-radius: 999px; background: color-mix(in srgb, var(--color-gold) 9%, var(--color-bg-secondary)); color: var(--color-text-secondary); font-size: 12px; }
 .mobile-browse-chip button { display: inline-flex; flex: 0 0 44px; width: 44px; height: 44px; align-items: center; justify-content: center; color: var(--color-text-muted); }
@@ -195,9 +247,10 @@ body {
 .mobile-browse-chip-more > summary::-webkit-details-marker { display: none; }
 .mobile-browse-chip-more[open] { display: grid; flex: 1 0 100%; }
 .mobile-browse-chips--extra { padding-block: 6px; }
-.mobile-filter-dialog { position: fixed; z-index: 100; inset: 0; display: flex; align-items: flex-end; justify-content: center; }
+.mobile-filter-dialog { position: fixed; z-index: 100; inset: 0; display: flex; width: 100%; height: 100%; max-width: none; max-height: none; margin: 0; padding: 0; border: 0; background: transparent; color: inherit; align-items: flex-end; justify-content: center; }
+.mobile-filter-dialog::backdrop { background: transparent; }
 .mobile-filter-dialog__backdrop { position: absolute; inset: 0; background: rgb(0 0 0 / 68%); }
-.mobile-filter-panel { position: relative; display: flex; width: 100%; max-width: 42rem; max-height: min(88dvh, 760px); flex-direction: column; overflow: hidden; border: 1px solid var(--color-border); border-bottom: 0; border-radius: 22px 22px 0 0; background: var(--color-bg-secondary); box-shadow: 0 -12px 40px rgb(0 0 0 / 30%); padding-bottom: env(safe-area-inset-bottom); }
+.mobile-filter-panel { position: relative; display: flex; width: 100%; max-width: 42rem; max-height: min(88dvh, var(--browse-panel-height, 760px), 760px); flex-direction: column; overflow: hidden; border: 1px solid var(--color-border); border-bottom: 0; border-radius: 22px 22px 0 0; background: var(--color-bg-secondary); box-shadow: 0 -12px 40px rgb(0 0 0 / 30%); padding-bottom: env(safe-area-inset-bottom); }
 .mobile-filter-panel__handle { width: 38px; height: 4px; flex: 0 0 auto; align-self: center; margin: 10px auto 2px; border-radius: 999px; background: var(--color-border); }
 .mobile-filter-panel__header { display: flex; min-height: 54px; flex: 0 0 auto; align-items: center; justify-content: space-between; padding: 0 16px; border-bottom: 1px solid var(--color-border); }
 .mobile-filter-panel__header h2 { margin: 0; color: var(--color-text-primary); font-size: 17px; font-weight: 700; }
@@ -840,13 +893,57 @@ input:-webkit-autofill:active {
   .cat-sidebar      { display: block; }
 }
 
-/* Location map markers share the directory palette and a full touch target. */
-.location-map .leaflet-container { background: var(--color-bg-secondary); font: inherit; }
+/* Soft map colors and restrained brand controls across all directories. */
+.location-map .leaflet-container { background: #cdd0bd; font: inherit; }
 .location-map .location-map-marker { display: flex; align-items: center; justify-content: center; background: transparent; border: 0; }
 .location-map-marker__dot { display: flex; align-items: center; justify-content: center; width: 14px; height: 14px; border: 2px solid var(--color-bg-primary); border-radius: 50%; background: var(--color-gold); box-shadow: 0 2px 8px #0006; }
-.location-map-marker__cluster { width: 40px; height: 40px; border: 2px solid var(--color-gold); background: var(--color-bg-secondary); color: var(--color-gold); font-size: 13px; font-weight: 700; }
-.location-map-marker--active .location-map-marker__dot, .location-map-marker:focus-visible .location-map-marker__dot { box-shadow: 0 0 0 5px color-mix(in srgb, var(--color-gold) 35%, transparent); }
-.location-map .leaflet-bar a { min-width: 44px; min-height: 44px; line-height: 44px; background: var(--color-bg-secondary); color: var(--color-text-primary); }
+.location-map-marker__cluster { width: 36px; height: 36px; border: 1px solid var(--color-gold); background: var(--color-bg-secondary); color: var(--color-gold); font-size: 12px; font-weight: 600; font-variant-numeric: tabular-nums; }
+.location-map-marker--active .location-map-marker__dot, .location-map-marker:focus-visible .location-map-marker__dot { box-shadow: 0 0 0 5px color-mix(in srgb, var(--color-gold) 25%, transparent); }
+.location-map .leaflet-control-zoom.leaflet-bar { overflow: hidden; border: 1px solid var(--color-border); border-radius: 12px; box-shadow: 0 4px 18px #0003; }
+.location-map .leaflet-control-zoom a { width: 44px; height: 44px; min-width: 44px; min-height: 44px; line-height: 44px; border-color: var(--color-border); background: var(--color-bg-secondary); color: var(--color-text-secondary); font-size: 24px; font-family: inherit; }
+.location-map .leaflet-control-zoom a:hover, .location-map .leaflet-control-zoom a:focus-visible { background: var(--color-bg-elevated); color: var(--color-gold); }
+.location-map .leaflet-control-zoom a.leaflet-disabled { color: var(--color-text-muted); opacity: .6; }
+.location-map .leaflet-top .leaflet-control { margin-top: 12px; }
+.location-map .leaflet-right .leaflet-control { margin-right: 12px; }
 
-/* Leave a readable strip for the map credits below open previews. */
-.location-map .leaflet-control-attribution { max-width: 100%; font-size: 10px; line-height: 16px; }
+/* Visible, usable source credits are part of the map, including below open previews. */
+.location-map .leaflet-bottom.leaflet-right { width: 100%; }
+.location-map .leaflet-container .leaflet-bottom.leaflet-right .leaflet-control-attribution { display: flex; flex-wrap: wrap; justify-content: center; gap: 0 8px; width: 100%; max-width: 100%; margin: 0; padding: 0 6px; border-top: 1px solid var(--color-border); background: var(--color-bg-secondary); color: var(--color-text-secondary); font-size: 10px; line-height: 16px; }
+.location-map .leaflet-container .leaflet-control-attribution a { display: inline-flex; align-items: center; min-height: 44px; color: var(--color-text-secondary); }
+.location-map .leaflet-container .leaflet-control-attribution a:hover { color: var(--color-gold); }
+
+.directory-map-frame { height: clamp(20rem, 60dvh, 42rem); min-width: 0; }
+
+/* One brand treatment for all mobile directory map actions, alongside Genie. */
+.browse-map-toggle {
+  position: fixed;
+  left: max(1rem, env(safe-area-inset-left, 0px));
+  bottom: calc(var(--mobile-nav-clearance) + .75rem);
+  z-index: 40;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: .5rem;
+  min-width: 44px;
+  min-height: 48px;
+  max-width: calc(100% - 14rem);
+  padding: .625rem 1rem;
+  border: 1px solid var(--color-border-light);
+  border-radius: 999px;
+  background: var(--color-bg-secondary);
+  color: var(--color-text-secondary);
+  box-shadow: 0 2px 8px #0003;
+  font-size: .8125rem;
+  font-weight: 500;
+}
+.browse-map-toggle:hover { border-color: var(--color-text-muted); background: var(--color-bg-elevated); }
+.browse-map-toggle:focus-visible { outline: 2px solid var(--color-gold); outline-offset: 3px; }
+@media (max-width: 374px) {
+  .browse-map-toggle { flex-direction: column; gap: .125rem; padding: .5rem .75rem; font-size: .75rem; line-height: 1.1; }
+}
+@media (min-width: 1024px) {
+  .browse-map-toggle { bottom: max(1.25rem, env(safe-area-inset-bottom, 0px)); }
+}
+@media (min-width: 1280px) {
+  .browse-map-toggle { display: none; }
+}

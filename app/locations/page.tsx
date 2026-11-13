@@ -32,20 +32,33 @@ export default async function LocationsPage({ searchParams }: { searchParams: Pr
   const locale = await getLocale();
   const initialFilters = readLocationLandingFilters(await searchParams);
   const priceText = await getTranslations("MarketplaceOffer");
-  const { data, error } = await db
+  const pageSize = 250;
+  const readPage = (offset: number) => db
     .from("listings")
     .select("place_country_code,place_region_id,place_city_id,place_city_name,place_region_name,place_status,id, title, city, price, image_url, category, description, metadata, created_at")
     .eq("published", true)
     .eq("type", "location")
     .order("created_at", { ascending: false })
-    .limit(300);
+    .order("id")
+    .range(offset, offset + pageSize - 1);
 
-  if (error) throw new Error(uiText("Ui.text_2a7079785185c8", { value1: String(error.message) }));
-
-  const rows = data ?? [];
+  const rows: NonNullable<Awaited<ReturnType<typeof readPage>>["data"]> = [];
+  for (let offset = 0; ; offset += pageSize) {
+    const { data, error } = await readPage(offset);
+    if (error) throw new Error(uiText("Ui.text_2a7079785185c8", { value1: String(error.message) }));
+    rows.push(...data ?? []);
+    if (!data || data.length < pageSize) break;
+  }
+  const readRatings = async () => {
+    const result: Awaited<ReturnType<typeof fetchRatings>> = {};
+    for (let offset = 0; offset < rows.length; offset += 100) {
+      Object.assign(result, await fetchRatings(rows.slice(offset, offset + 100).map(row => row.id), "listing"));
+    }
+    return result;
+  };
 
   const [ratingsMap, cityCoordinates] = await Promise.all([
-    fetchRatings(rows.map((l) => l.id), "listing"),
+    readRatings(),
     geocodeLocationCities(rows.filter(l => !readPublicLocationArea(l.metadata)).map(l => l.city ?? "")),
   ]);
 

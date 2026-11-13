@@ -74,9 +74,27 @@ password fields were focused and the software keyboard shown without submitting
 anything. The iOS preview currently loads the published website, so these native
 checks do **not** claim to test the new un-published KI/dot/background changes.
 
-Native Back, iPad orientation and a separate native offline fixture are being
-recorded in the Mac report. Physical devices, account login/logout/MFA, private
-uploads, account switching and native scanner measurements are not verified here.
+The iPad A16 / iPadOS 26.5 simulator also built and launched successfully;
+portrait and landscape homepage views kept the header below the status bar.
+After an incremental device switch, the local Debug bundle needed ad hoc signing
+again; both the local and installed copies then passed strict signature checks.
+Native Back was not conclusively demonstrated through remote gestures, and no
+native offline fixture was executed. These remain open checks. Physical devices,
+account login/logout/MFA, private uploads, account switching and native scanner
+measurements are not verified here. See `mac-review/MAC-REVIEW-final.md`.
 
 Detailed logs and public screenshots are retained on the server under
 `/srv/cinegenius/handoffs/app-preview-20261113/`, including `checks/` and `mac-review/`.
+
+## Release integration
+
+On the user’s explicit publication request, the approved UI changes were merged
+with current `origin/main` (`7bc244d`). The existing project list layout, public
+project query, map controls, geographic sorting, Genie branding/welcome, and all
+newer catalogs were retained. Only the shared directory background and KI entry
+are applied to those newer views. The optional auth draft in the original server
+checkout remains separate. The integration suite validated 292 selected cases after refreshing the
+marketplace fixture for the already existing geography dependencies; five
+geographic-order cases also passed. All nine catalogs now have 7,780 keys.
+Release validation and the guarded deployment receipt
+are stored under the same handoff directory’s `release/` folder.
