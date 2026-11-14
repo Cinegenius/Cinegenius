@@ -1,5 +1,19 @@
 # Optional support-mediated rentals
 
+## Operator clarification, 14 November 2026
+
+Genie's general cost answer must distinguish currently free self-service use from
+the previously agreed, successful rental mediation handled fully by Support (5%
+included in the agreed total). An ordinary support enquiry is not a paid mandate.
+Profiles remain permanently free so networking and visibility do not depend on
+budget. Optional future extensions may become paid; no prices or dates are set.
+Describe the start-up and its community-first purpose professionally, without
+asserting a legal nonprofit or tax-exempt status.
+
+The nine-language approved answer is `SupportMediation.genieSummary`. Genie receives
+it with the existing localized settlement terms and may link to `/pricing#support-mediation`.
+This updates advice only, not payment processing, existing agreements or fees.
+
 User-confirmed policy, 11 November 2026:
 
 - Ordinary self-service registration, profiles, listings, search and direct contact remain currently free.
