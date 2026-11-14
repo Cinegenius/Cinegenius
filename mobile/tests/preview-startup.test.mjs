@@ -22,6 +22,12 @@ test('prepared remote sign-in entry satisfies the native local-start-file requir
     const entry = join(fixture, 'mobile/www', config.server.appStartPath);
     assert.equal((await stat(entry)).isFile(), true);
     assert.equal(await readFile(entry, 'utf8'), await readFile(join(fixture, 'mobile/www/offline.html'), 'utf8'));
+    const viewportAdapter = await readFile(join(fixture, 'mobile/www/app-viewport.js'), 'utf8');
+    assert.ok(viewportAdapter.includes(JSON.stringify({
+      origin: new URL(config.server.url).origin,
+      css: await readFile(join(fixture, 'mobile/src/app-viewport.css'), 'utf8'),
+    })), 'the native bundle must include the exact configured origin and viewport styles');
+    assert.equal(config.ios.contentInset, 'never', 'CSS must be the only safe-area inset owner');
   } finally {
     await rm(fixture, { recursive: true, force: true });
   }

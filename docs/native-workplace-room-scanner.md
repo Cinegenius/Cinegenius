@@ -123,8 +123,16 @@ der normale Kaltstart blieb nach 5 und 20 Sekunden aktiv. Eine vorhandene Sitzun
 wurde wiederverwendet und die deutsche Locations-Ansicht geöffnet.
 
 Eine frische Anmeldung ist damit nicht geprüft und von Markus weiterhin als
-fehlerhaft gemeldet. Die vollständige Anmeldung beim Appstart und die zu kleine
-Webansicht werden separat auf dem Mac bearbeitet. Echter Legacy-Import, eigene
+fehlerhaft gemeldet. Markus hat die freien Ränder auf den normalen CineGenius-Seiten
+eingegrenzt. Der App-Branch enthält dafür eine vollflächige native Webansicht mit
+gebündelter, ausschließlich app-eigener Safe-Area-Anpassung. Die frühere native
+Einrückung wird durch Abstände an den tatsächlichen Bedienelementen ersetzt;
+Startpfad und persistenter Sitzungsspeicher bleiben erhalten. Vor einer Übernahme
+auf dem Mac die gezielte Änderung mit dessen neueren nativen Arbeitsplatzdateien
+abgleichen und Ressourcen neu erzeugen/synchronisieren. Xcode-Kompilierung,
+Installation, echte Bildschirmränder und frische Anmeldung sind für diese
+Korrektur noch offen. Die Browserprüfung ersetzt diese Nachweise nicht.
+Echter Legacy-Import, eigene
 Location-Auswahl, Multitouch, Kameraaufnahme, Export und alle Sprachlayouts bleiben
 offen. Die gespeicherten Originalpläne wurden weder geöffnet noch hochgeladen.
 Belege: `/srv/cinegenius/handoffs/20261114-floorplan-editor/mac-validation/`

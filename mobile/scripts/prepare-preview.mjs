@@ -43,4 +43,12 @@ const localeSource = await readFile(new URL('lib/i18n/locales.ts', repository), 
 await writeFile(new URL('locale.js', output), stripTypeScriptTypes(localeSource));
 await writeFile(new URL('capacitor.config.json', root), JSON.stringify(config, null, 2) + '\n');
 await prepareNativeResources(repository, root, output, config.server.url);
+const viewportSource = await readFile(new URL('src/app-viewport.js', root), 'utf8');
+const viewportCSS = await readFile(new URL('src/app-viewport.css', root), 'utf8');
+const viewportMarker = 'null /* CINEGENIUS_VIEWPORT_CONFIG */';
+if (viewportSource.split(viewportMarker).length !== 2) throw new Error('Expected exactly one viewport configuration marker');
+await writeFile(new URL('app-viewport.js', output), viewportSource.replace(viewportMarker, JSON.stringify({
+  origin: new URL(config.server.url).origin,
+  css: viewportCSS,
+})));
 console.log(`Prepared development preview for ${config.server.url} in ${fileURLToPath(root)}`);

@@ -103,6 +103,20 @@ release architecture; the current non-Debug build guard remains in place.
 
 ## Why this is explicitly a preview
 
+The iOS web viewport uses the whole window. The bundled `app-viewport.js` adapter
+applies `app-viewport.css` only to the configured main-frame origin, in WebKit's
+isolated client world. It keeps the public header, content, menus and controls
+clear of the device's safe areas, while backgrounds reach the screen edges.
+The shared bottom bar and public menu already handle their own insets; do not
+add a second native inset. `prepare:preview` generates this resource and `sync`
+copies it into Xcode. Without the bundled adapter the native container falls
+back to its previous safe-area bounds. No published web source is modified.
+
+The header adapter follows the shared 4rem/6rem header rules. Review it whenever
+the shared header layout changes. Its browser layout checks use modeled safe
+areas; an Xcode build and real WebKit/keyboard/rotation check remain necessary.
+The sign-in start path and persistent WebKit session store are retained.
+
 The current Next application needs server cookies, Proxy, dynamic routes and APIs.
 It cannot simply be statically exported into an app without replacing those flows.
 Capacitor documents `server.url` as a **development** facility, not a production

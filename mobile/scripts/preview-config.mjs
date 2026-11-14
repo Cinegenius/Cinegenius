@@ -27,7 +27,7 @@ export function previewConfig(input = 'https://www.cinegenius.co') {
       errorPath: 'offline.html',
       allowNavigation: [],
     },
-    ios: { contentInset: 'automatic', preferredContentMode: 'mobile' },
+    ios: { contentInset: 'never', preferredContentMode: 'mobile' },
     android: { allowMixedContent: false },
     plugins: {
       CapacitorHttp: { enabled: false },

@@ -9,6 +9,7 @@ import WebKit
 class CineGeniusViewController: CAPBridgeViewController {
     private var loadingObservation: NSKeyValueObservation?
     private var urlObservation: NSKeyValueObservation?
+    private var hasViewportAdapter = false
     var suspendedWorkplaces: [String:UIViewController] = [:]
     var isOpeningWorkplace = false
     private var accountNavigationDelegate: CineGeniusNavigationDelegate?
@@ -26,6 +27,19 @@ class CineGeniusViewController: CAPBridgeViewController {
         return configuration
     }
 
+    private func installViewportAdapter() {
+        guard !hasViewportAdapter, let webView,
+              let url = Bundle.main.resourceURL?.appendingPathComponent("public/app-viewport.js"),
+              let source = try? String(contentsOf: url, encoding: .utf8) else { return }
+        // Install on the actual view before its first load: Capacitor replaces
+        // the content controller after webViewConfiguration returns.
+        webView.configuration.userContentController.addUserScript(WKUserScript(
+            source: source, injectionTime: .atDocumentStart, forMainFrameOnly: true,
+            in: .defaultClient
+        ))
+        hasViewportAdapter = true
+    }
+
     func resumeRequestedWorkplace() {
         guard requestsWorkplace, !isOpeningWorkplace, let webView, !webView.isLoading,
               let url = webView.url, url.host == bridge?.config.serverURL.host,
@@ -33,7 +47,7 @@ class CineGeniusViewController: CAPBridgeViewController {
         requestsWorkplace = false; openWorkplace()
     }
 
-    private func placeWebViewInsideSafeArea() {
+    private func placeWebView() {
         guard let webView, view === webView else { return }
 
         let container = UIView()
@@ -43,19 +57,22 @@ class CineGeniusViewController: CAPBridgeViewController {
         webView.translatesAutoresizingMaskIntoConstraints = false
         container.addSubview(webView)
         let safeArea = container.safeAreaLayoutGuide
+        // The bundled adapter protects controls, while the page background fills
+        // the screen. An incomplete local bundle retains the safe legacy layout.
         NSLayoutConstraint.activate([
-            webView.topAnchor.constraint(equalTo: safeArea.topAnchor),
-            webView.bottomAnchor.constraint(equalTo: safeArea.bottomAnchor),
-            webView.leadingAnchor.constraint(equalTo: safeArea.leadingAnchor),
-            webView.trailingAnchor.constraint(equalTo: safeArea.trailingAnchor)
+            webView.topAnchor.constraint(equalTo: hasViewportAdapter ? container.topAnchor : safeArea.topAnchor),
+            webView.bottomAnchor.constraint(equalTo: hasViewportAdapter ? container.bottomAnchor : safeArea.bottomAnchor),
+            webView.leadingAnchor.constraint(equalTo: hasViewportAdapter ? container.leadingAnchor : safeArea.leadingAnchor),
+            webView.trailingAnchor.constraint(equalTo: hasViewportAdapter ? container.trailingAnchor : safeArea.trailingAnchor)
         ])
-        // The native container already accounts for the safe area.
+        // Web CSS owns safe-area spacing. Do not also inset the whole viewport.
         webView.scrollView.contentInsetAdjustmentBehavior = .never
     }
 
     override func capacitorDidLoad() {
         super.capacitorDidLoad()
-        placeWebViewInsideSafeArea()
+        installViewportAdapter()
+        placeWebView()
         installWorkplaceMenu()
         if let original = webView?.navigationDelegate {
             let delegate = CineGeniusNavigationDelegate(original: original)
