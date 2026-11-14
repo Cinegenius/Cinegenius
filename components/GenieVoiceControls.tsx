@@ -10,7 +10,7 @@ import styles from "./Genie.module.css";
 export default function GenieVoiceControls({ active, pending, locale, resetKey, onText, onUnauthorized, onInterrupt, reply, routeKey }: {
   active: boolean; pending: boolean; locale: string; resetKey: number; routeKey: string;
   onText: (text: string) => void; onUnauthorized: () => void; onInterrupt: () => void;
-  reply: { id: number; text: string; locale: string; spoken: boolean; route?: string } | null;
+  reply: { id: number; text: string; locale: string; spoken: boolean; route?: string; fromRoute?: string } | null;
 }) {
   const t = useTranslations("Genie.voice");
   const [state, setState] = useState<RecordingState>("idle");
@@ -21,6 +21,7 @@ export default function GenieVoiceControls({ active, pending, locale, resetKey, 
   const latest = useRef({ onText, onUnauthorized, onInterrupt });
   latest.current = { onText, onUnauthorized, onInterrupt };
   const spokenId = useRef(0);
+  const navigation = useRef<{ id: number; started: boolean } | null>(null);
   const speechGeneration = useRef(0);
   const stopSpeech = () => {
     speechGeneration.current++;
@@ -75,8 +76,18 @@ export default function GenieVoiceControls({ active, pending, locale, resetKey, 
     spokenId.current = Math.max(spokenId.current, reply?.id ?? 0);
   }, [resetKey, locale]);
   useEffect(() => {
-    if (!reply || !reply.spoken || spokenId.current >= reply.id) return;
+    // Expired conversation content must stop playing without interrupting a new
+    // request or discarding a separate unsent recording/draft.
+    if (!reply) { navigation.current = null; stopSpeech(); return; }
+    if (!reply.spoken || spokenId.current >= reply.id) return;
     if (!active || document.visibilityState !== "visible") { spokenId.current = reply.id; return; }
+    if (reply.route && reply.fromRoute !== undefined) {
+      // Repeating the current search still applies its filters through a launch
+      // URL. Wait for that navigation rather than speaking on the old matching URL.
+      if (navigation.current?.id !== reply.id) navigation.current = { id: reply.id, started: routeKey !== reply.fromRoute };
+      else if (routeKey !== reply.fromRoute) navigation.current.started = true;
+      if (!navigation.current.started) return;
+    }
     if (pending || (reply.route && !genieSpeechRouteReady(reply.route, routeKey))) return;
     spokenId.current = reply.id;
     speak(reply.text, reply.locale);

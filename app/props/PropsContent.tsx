@@ -202,7 +202,7 @@ function PropsInner({ serverListings, serverError = false, facetRows, initialDep
   if (sortKey !== "featured") parameters.set("sort", sortKey);
   if (viewMode !== "grid") parameters.set("view", viewMode);
   for (const kind of ["country", "region", "city"] as const) if (placeFilters[kind]) parameters.set(kind, placeFilters[kind]);
-  useViewUrl(parameters.size ? `${pathname}?${parameters}` : pathname);
+  useViewUrl(parameters.size ? `${pathname}?${parameters}` : pathname, 300, genieLaunch);
 
   const filtered = useMemo(() => {
     const search = query.trim().toLocaleLowerCase(locale);

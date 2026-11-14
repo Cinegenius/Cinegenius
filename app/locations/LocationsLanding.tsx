@@ -117,7 +117,7 @@ export default function LocationsLanding({ allLocations, totalCount, initialFilt
   const filterKey = JSON.stringify([urlParams, nearby.coordinates ? nearbyViewportRevision : mapBounds, nearby.coordinates ? nearby.session : null, radiusKm, geography.key]);
   const visibleCount = pagination.filterKey === filterKey ? pagination.visibleCount : 24;
   const locations = filtered.slice(0, visibleCount);
-  useViewUrl(urlParams ? `/locations?${urlParams}` : "/locations");
+  useViewUrl(urlParams ? `/locations?${urlParams}` : "/locations", 300, genieLaunch);
   const sortOptions = [
     { value: "featured", label: geography.preferred ? uiText("BrowseGeography.recommended") : t("sortFeatured") }, { value: "price-asc", label: t("sortPriceAsc") },
     { value: "price-desc", label: t("sortPriceDesc") }, { value: "rating", label: t("sortRating") },

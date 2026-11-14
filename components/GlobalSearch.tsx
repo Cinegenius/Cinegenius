@@ -1,12 +1,12 @@
 "use client";
 
-import { readRecentSearches, saveRecentSearch, removeRecentSearches } from "@/lib/recent-searches";
+import { removeRecentSearches } from "@/lib/recent-searches";
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslations , useLocale } from "next-intl";
 import {
   Search, X, MapPin, Car, Package, Briefcase, Users,
-  Loader2, Clock, ArrowRight, User, Building2, PawPrint,
+  Loader2, ArrowRight, User, Building2, PawPrint,
 } from "lucide-react";
 import MediaImage from "@/components/MediaImage";
 import ListingImage from "@/components/ListingImage";
@@ -26,12 +26,6 @@ type Result = {
 // Type order for display
 const TYPE_ORDER = ["profile", "creator", "job", "location", "vehicle", "prop", "company", "animal"];
 
-function getRecentSearches(): string[] {
-  try { return readRecentSearches(window.localStorage); } catch { return []; }
-}
-function addRecentSearch(query: string) {
-  try { saveRecentSearch(window.localStorage, query); } catch { /* Storage can be unavailable. */ }
-}
 function clearRecentSearches() {
   try { removeRecentSearches(window.localStorage); } catch { /* Storage can be unavailable. */ }
 }
@@ -46,7 +40,6 @@ export default function GlobalSearch() {
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<Result[]>([]);
   const [loading, setLoading] = useState(false);
-  const [recent, setRecent] = useState<string[]>([]);
   const [selectedIdx, setSelectedIdx] = useState(-1);
   const inputRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
@@ -71,9 +64,10 @@ export default function GlobalSearch() {
 
   // Cmd+K / Ctrl+K + custom event from mobile nav button
   useEffect(() => {
+    clearRecentSearches();
     const openFromEvent = () => {
       setQuery(""); setResults([]); setSelectedIdx(-1);
-      setFailed(false); setLoading(false); setRecent(getRecentSearches()); setOpen(true);
+      setFailed(false); setLoading(false); clearRecentSearches(); setOpen(true);
     };
     const handler = (e: KeyboardEvent) => {
       if ((e.metaKey || e.ctrlKey) && e.key === "k") { e.preventDefault(); openFromEvent(); }
@@ -118,7 +112,6 @@ export default function GlobalSearch() {
   const navigate = (result: Result) => {
     const config = typeConfig[result.type];
     if (!config) return;
-    addRecentSearch(query || result.title);
     setOpen(false);
     router.push(config.href(result.id));
   };
@@ -131,10 +124,10 @@ export default function GlobalSearch() {
       e.preventDefault();
       setSelectedIdx((i) => Math.max(i - 1, -1));
     } else if (e.key === "Enter") {
+      e.preventDefault();
       if (selectedIdx >= 0 && results[selectedIdx]) {
         navigate(results[selectedIdx]);
       } else if (query.trim()) {
-        addRecentSearch(query);
         setOpen(false);
         router.push(`/search?q=${encodeURIComponent(query.trim())}`);
       }
@@ -185,29 +178,8 @@ export default function GlobalSearch() {
         {/* Results */}
         <div>
 
-          {/* Recent searches */}
-          {!query && recent.length > 0 && (
-            <div className="px-4 py-3">
-              <div className="flex items-center justify-between mb-2">
-                <p className="text-[10px] uppercase tracking-widest text-text-muted font-semibold">{t("recent")}</p>
-                <button onClick={() => { clearRecentSearches(); setRecent([]); }} className="min-h-11 min-w-11 text-[10px] text-text-muted hover:text-gold transition-colors">
-                  {t("clear")}
-                </button>
-              </div>
-              <div className="space-y-0.5">
-                {recent.map((r) => (
-                  <button key={r} onClick={() => updateQuery(r)}
-                    className="flex min-h-11 items-center gap-3 w-full px-3 py-2 rounded-lg hover:bg-bg-secondary transition-colors text-left">
-                    <Clock size={13} className="text-text-muted shrink-0" />
-                    <span className="text-sm text-text-secondary">{r}</span>
-                  </button>
-                ))}
-              </div>
-            </div>
-          )}
-
           {/* Empty suggestion chips */}
-          {!query && recent.length === 0 && (
+          {!query && (
             <div className="px-4 py-8 text-center space-y-4">
               <p className="text-xs text-text-muted">{t("hint")}</p>
               <div className="flex flex-wrap justify-center gap-2">
@@ -293,7 +265,7 @@ export default function GlobalSearch() {
             <div className="px-4 py-3 border-t border-border flex items-center justify-between">
               <p className="text-xs text-text-muted">{t("resultCount", { count: results.length })}</p>
               <button
-                onClick={() => { addRecentSearch(query); setOpen(false); router.push(`/search?q=${encodeURIComponent(query.trim())}`); }}
+                onClick={() => { setOpen(false); router.push(`/search?q=${encodeURIComponent(query.trim())}`); }}
                 className="flex min-h-11 items-center gap-1.5 text-xs font-medium text-gold hover:text-gold-light transition-colors"
               >
                 {t("viewAll")} <ArrowRight size={11} />

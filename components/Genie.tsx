@@ -6,7 +6,7 @@ import { useSession } from "@clerk/nextjs";
 import { X } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useCallback, useEffect, useId, useRef, useState, useSyncExternalStore, type RefObject } from "react";
-import { clearConversation, readConversation } from "@/lib/genie-conversation";
+import { clearConversation, GENIE_IDLE_MS, GENIE_MEMORY_ACTIVITY, readConversationSnapshot } from "@/lib/genie-conversation";
 import GenieWelcome from "./GenieWelcome";
 import GenieLauncher, { type GeniePosition } from "./GenieLauncher";
 import styles from "./Genie.module.css";
@@ -243,12 +243,25 @@ export default function Genie({ mode = "floating" }: { mode?: "floating" | "tool
   const cookieVisible = useSyncExternalStore(subscribeToCookieNotice, cookieNoticeVisible, () => true);
   useEffect(() => {
     if (!isLoaded) return;
-    try {
-      if (memoryScope) readConversation(window.sessionStorage, memoryScope);
-      else clearConversation(window.sessionStorage);
-    } catch {
-      // A blocked browser store must not prevent using the in-memory chat.
-    }
+    let timer: number | undefined;
+    const checkStoredHistory = () => {
+      window.clearTimeout(timer);
+      try {
+        if (!memoryScope) { clearConversation(window.sessionStorage); return; }
+        const snapshot = readConversationSnapshot(window.sessionStorage, memoryScope, Date.now());
+        if (snapshot) timer = window.setTimeout(checkStoredHistory, Math.max(0, snapshot.updatedAt + GENIE_IDLE_MS - Date.now()));
+      } catch { /* A blocked store must not prevent using the in-memory chat. */ }
+    };
+    // Remains active before the lazy panel opens and while the launcher is hidden.
+    checkStoredHistory();
+    const events = [GENIE_MEMORY_ACTIVITY, "pageshow", "focus", "cinegenius:app-resume"];
+    events.forEach(event => window.addEventListener(event, checkStoredHistory));
+    document.addEventListener("visibilitychange", checkStoredHistory);
+    return () => {
+      window.clearTimeout(timer);
+      events.forEach(event => window.removeEventListener(event, checkStoredHistory));
+      document.removeEventListener("visibilitychange", checkStoredHistory);
+    };
   }, [isLoaded, memoryScope]);
   // Unmounting also aborts and clears the chat if the cookie notice returns.
   const replacedByTool = mode === "floating" && (pathname === "/tools" || pathname.startsWith("/tools/"));

@@ -5,7 +5,9 @@ export type SafeLink = { label: string; href: string };
 export type Exchange = { id: number; user: string; reply: string; links: SafeLink[] };
 
 const STORAGE_KEY = "cg_genie_conversation_v1";
-const MAX_AGE_MS = 24 * 60 * 60 * 1000;
+export const GENIE_IDLE_MS = 10 * 60 * 1000;
+export const GENIE_MEMORY_ACTIVITY = "cg:genie-memory-activity";
+export type ConversationSnapshot = { exchanges: Exchange[]; updatedAt: number };
 const MAX_STORED_BYTES = 32 * 1024;
 const MAX_EXCHANGES = Math.floor(GENIE_MAX_MESSAGES / 2);
 
@@ -80,36 +82,40 @@ export function clearConversation(storage: Pick<Storage, "removeItem">): void {
   }
 }
 
-export function readConversation(storage: Pick<Storage, "getItem" | "removeItem">, scope: string, now = Date.now()): Exchange[] {
+export function readConversationSnapshot(storage: Pick<Storage, "getItem" | "removeItem">, scope: string, now = Date.now()): ConversationSnapshot | null {
   try {
     if (!validScope(scope) || !validTime(now)) {
       clearConversation(storage);
-      return [];
+      return null;
     }
     const raw = storage.getItem(STORAGE_KEY);
-    if (raw === null) return [];
+    if (raw === null) return null;
     if (!fitsStorage(raw)) {
       clearConversation(storage);
-      return [];
+      return null;
     }
     const value: unknown = JSON.parse(raw);
     if (!record(value) || !hasOnlyKeys(value, ["version", "scope", "updatedAt", "exchanges"])
       || value.version !== 1 || value.scope !== scope || !validTime(value.updatedAt)
-      || value.updatedAt > now || now - value.updatedAt >= MAX_AGE_MS
+      || value.updatedAt > now || now - value.updatedAt >= GENIE_IDLE_MS
       || !Array.isArray(value.exchanges) || !value.exchanges.length || value.exchanges.length > MAX_EXCHANGES) {
       clearConversation(storage);
-      return [];
+      return null;
     }
     const exchanges = readExchanges(value.exchanges);
     if (!exchanges || trimExchanges(exchanges).length !== exchanges.length) {
       clearConversation(storage);
-      return [];
+      return null;
     }
-    return exchanges;
+    return { exchanges, updatedAt: value.updatedAt };
   } catch {
     clearConversation(storage);
-    return [];
+    return null;
   }
+}
+
+export function readConversation(storage: Pick<Storage, "getItem" | "removeItem">, scope: string, now = Date.now()): Exchange[] {
+  return readConversationSnapshot(storage, scope, now)?.exchanges ?? [];
 }
 
 /** Persist completed pairs only; request state and draft text have no storage path. */

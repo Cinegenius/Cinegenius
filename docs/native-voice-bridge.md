@@ -69,6 +69,12 @@ and the directory has consumed its `genie=1` launch marker before calling
 `speak`; the native navigation cancellation would otherwise cut
 off the answer. Closing, changing language or backgrounding also cancels the
 pending spoken Genie request, so its late reply cannot navigate or start audio.
+Track the originating route for each automatic spoken navigation: when a search
+is repeated on its own result page, the old matching URL is not evidence that
+the new launch/normalization has completed. The three supported directory
+views pass their launch key to shared URL normalization even if the requested
+filters are identical; normalization continues to replace only the current
+entry and yields to real Back/navigation.
 Native navigation checks invalidate only operations belonging to an older URL;
 a queued old navigation observation must not cancel speech begun on the new URL.
 
@@ -113,11 +119,12 @@ a parallel transcript cache. The existing native voice adapter and iOS/Android
 implementations keep only bounded active speech requests, clear them on
 completion/cancellation and have no conversation-history persistence.
 
-The shared WebView Genie conversation currently still uses the earlier web
-storage implementation. Its reviewed ten-minute retention commit is pending
-handoff from WEB CODEX; this native-source audit does not claim that expiry is
-implemented or live. Reconcile the reviewed web implementation with the app's
-route-aware speech, interruption handling and legacy-host microphone guard.
+The shared WebView implementation from reviewed WEB commit `235b1d7` has been
+integrated into the app branch, preserving route-aware speech, interruption
+handling and the legacy-host microphone guard. Expiry also stops playback of
+the discarded reply without cancelling a new request or deleting unsent input.
+This source integration is separate from website/native publication and a real
+iPhone lifecycle test.
 Use a narrowly scoped conversation expiry, never a broad WebView/storage purge:
 account sessions, locale choice, current browse state and private plan archives
 are separate. Background suspension must not revive expired conversation state

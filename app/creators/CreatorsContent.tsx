@@ -298,7 +298,7 @@ function CreatorsInner({
   if (regionFilter) filterParams.set("region", regionFilter);
   if (sortKey !== "featured") filterParams.set("sort", sortKey);
   if (viewMode !== "grid") filterParams.set("view", viewMode);
-  useViewUrl(filterParams.size ? `/creators?${filterParams}` : "/creators");
+  useViewUrl(filterParams.size ? `/creators?${filterParams}` : "/creators", 300, launchKey);
 
   // Filtered results
   const isTopMode = !query.trim() && selectedRoles.size === 0 && !sidebarDept
