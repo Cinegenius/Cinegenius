@@ -4,9 +4,9 @@ import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
 import { Send, Trash2 } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
-import { useEffect, useId, useRef, useState, type FormEvent, type RefObject } from "react";
+import { useCallback, useEffect, useId, useRef, useState, type FormEvent, type RefObject } from "react";
 import { GENIE_MAX_MESSAGE_CHARS, genieAreaForPath } from "@/lib/genie";
-import { clearConversation, readConversation, safeLinks, saveConversation, trimExchanges, type Exchange } from "@/lib/genie-conversation";
+import { clearConversation, GENIE_IDLE_MS, GENIE_MEMORY_ACTIVITY, readConversationSnapshot, safeLinks, saveConversation, trimExchanges, type ConversationSnapshot, type Exchange } from "@/lib/genie-conversation";
 import styles from "./Genie.module.css";
 import { nativeGenieVoice } from "@/lib/genie-voice";
 import { isGenieSearchHref } from "@/lib/genie-search";
@@ -36,11 +36,14 @@ export default function GeniePanel({ active, requestRef, memoryScope }: { active
   const canUse = Boolean(memoryScope) && !loginRequired;
   const query = searchParams.toString();
   const returnTo = `${pathname || "/"}${query ? `?${query}` : ""}`;
-  const [exchanges, setExchanges] = useState<Exchange[]>(() => {
-    if (!memoryScope) return [];
-    try { return readConversation(window.sessionStorage, memoryScope); }
-    catch { return []; }
+  const [memory, setMemory] = useState<ConversationSnapshot>(() => {
+    const empty = { exchanges: [], updatedAt: Date.now() };
+    if (!memoryScope) return empty;
+    try { return readConversationSnapshot(window.sessionStorage, memoryScope, Date.now()) ?? empty; }
+    catch { return empty; }
   });
+  const memoryRef = useRef(memory);
+  const { exchanges } = memory;
   const [draft, setDraft] = useState("");
   const [pendingUser, setPendingUser] = useState<string | null>(null);
   const [status, setStatus] = useState<Status | null>(null);
@@ -51,6 +54,47 @@ export default function GeniePanel({ active, requestRef, memoryScope }: { active
   const pending = pendingUser !== null;
   const [voiceReset, setVoiceReset] = useState(0);
   const [voiceReply, setVoiceReply] = useState<{ id: number; text: string; locale: string; spoken: boolean } | null>(null);
+
+  const setExchanges = useCallback((next: Exchange[], updatedAt = Date.now()) => {
+    memoryRef.current = { exchanges: next, updatedAt };
+    setMemory(memoryRef.current);
+  }, []);
+
+  const expireIfIdle = useCallback(() => {
+    const age = Date.now() - memoryRef.current.updatedAt;
+    if (age >= 0 && age < GENIE_IDLE_MS) return;
+    setExchanges([]);
+    try { clearConversation(window.sessionStorage); } catch { /* Private storage can be blocked. */ }
+    // A suspended request must restore its unsent text, never revive old context.
+    requestRef.current?.abort();
+    setVoiceReply(null);
+  }, [requestRef, setExchanges]);
+
+  const recordActivity = useCallback(() => {
+    expireIfIdle();
+    const next = memoryRef.current.exchanges;
+    const now = Date.now();
+    setExchanges(next, now);
+    if (memoryScope && next.length) {
+      try { saveConversation(window.sessionStorage, memoryScope, next, now); } catch { /* In-memory chat remains usable. */ }
+      window.dispatchEvent(new Event(GENIE_MEMORY_ACTIVITY));
+    }
+  }, [expireIfIdle, memoryScope, setExchanges]);
+
+  useEffect(() => {
+    // Also check on resume: mobile browsers can suspend timers in the background.
+    const events = ["focus", "pageshow", "cinegenius:app-resume"];
+    events.forEach(event => window.addEventListener(event, expireIfIdle));
+    document.addEventListener("visibilitychange", expireIfIdle);
+    const timer = exchanges.length || pending
+      ? window.setTimeout(expireIfIdle, Math.max(0, memory.updatedAt + GENIE_IDLE_MS - Date.now()))
+      : null;
+    return () => {
+      if (timer !== null) window.clearTimeout(timer);
+      events.forEach(event => window.removeEventListener(event, expireIfIdle));
+      document.removeEventListener("visibilitychange", expireIfIdle);
+    };
+  }, [expireIfIdle, exchanges.length, memory.updatedAt, pending]);
 
   useEffect(() => {
     if (!active) requestRef.current?.abort();
@@ -81,7 +125,8 @@ export default function GeniePanel({ active, requestRef, memoryScope }: { active
       return;
     }
 
-    const previous = trimExchanges(exchanges, content);
+    recordActivity();
+    const previous = trimExchanges(memoryRef.current.exchanges, content);
     const messages: Message[] = previous.flatMap(entry => [
       { role: "user" as const, content: entry.user },
       { role: "assistant" as const, content: entry.reply },
@@ -127,6 +172,7 @@ export default function GeniePanel({ active, requestRef, memoryScope }: { active
         return;
       }
       const result: unknown = await response.json();
+      expireIfIdle();
       if (requestRef.current !== controller) return;
       if (controller.signal.aborted) throw new DOMException("", "AbortError");
       if (!response.ok) {
@@ -147,13 +193,10 @@ export default function GeniePanel({ active, requestRef, memoryScope }: { active
         links: safeLinks("links" in result ? result.links : []),
       }]);
       setExchanges(updated);
+      recordActivity();
       const searchLink = updated.at(-1)?.links.find(link => isGenieSearchHref(link.href));
       if (spoken && searchLink) router.push(searchLink.href);
       setVoiceReply({ id: sequence.current, text: result.reply, locale: "language" in result && typeof result.language === "string" ? result.language : locale, spoken });
-      if (memoryScope) {
-        try { saveConversation(window.sessionStorage, memoryScope, updated); }
-        catch { /* Chat stays usable when browser storage is blocked. */ }
-      }
     } catch {
       if (requestRef.current !== controller) return;
       setDraft(content);
@@ -198,7 +241,8 @@ export default function GeniePanel({ active, requestRef, memoryScope }: { active
 
   return (
     <>
-      <div ref={transcript} className={styles.transcript} role="log" aria-live="polite" aria-relevant="additions text" aria-label={t("name")}>
+      <div ref={transcript} className={styles.transcript} role="log" aria-live="polite" aria-relevant="additions text" aria-label={t("name")}
+        onPointerDown={recordActivity} onKeyDown={recordActivity} onWheel={recordActivity} onTouchMove={recordActivity}>
         <div className={styles.greeting}><p>{t("greeting")}</p></div>
         <div className={styles.notice} id={`${id}-notice`}>
           <p>{t("privacy")} <Link href="/datenschutz" prefetch={false}>{t("privacyLink")}</Link></p>
@@ -222,11 +266,12 @@ export default function GeniePanel({ active, requestRef, memoryScope }: { active
         {pending && <p className={styles.status} role="status">{t("sending")}</p>}
         {status && <p className={styles.status} role={status === "cancelled" ? "status" : "alert"}>{t(status)}</p>}
       </div>
-      <form className={styles.composer} onSubmit={send}>
+      <form className={styles.composer} onSubmit={send} onPointerDown={recordActivity} onKeyDownCapture={recordActivity}>
         <GenieVoiceControls active={active} pending={pending} locale={locale} resetKey={voiceReset} reply={voiceReply}
           onUnauthorized={() => { setLoginRequired(true); setExchanges([]); try { clearConversation(window.sessionStorage); } catch {} }}
           onText={text => {
             if (requestRef.current || !active || !canUse) return;
+            recordActivity();
             if (draft.trim()) { setDraft(`${draft.trim()}\n${text}`); return; }
             void sendContent(text, true);
           }} />
@@ -238,7 +283,7 @@ export default function GeniePanel({ active, requestRef, memoryScope }: { active
             name="genie-message"
             className={styles.input}
             value={draft}
-            onChange={event => { if (!requestRef.current) setDraft(event.target.value); }}
+            onChange={event => { recordActivity(); if (!requestRef.current) setDraft(event.target.value); }}
             onKeyDown={event => {
               if (event.key !== "Enter" || event.shiftKey || event.nativeEvent.isComposing || event.nativeEvent.keyCode === 229) return;
               event.preventDefault();
