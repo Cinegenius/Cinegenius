@@ -29,7 +29,7 @@ export function getLocalizedTypeConfig(translate: (key: string) => string): Reco
 });
 }
 
-export default function ResultCard({ result }: { result: Result }) {
+export default function ResultCard({ result, compact = false }: { result: Result; compact?: boolean }) {
   const uiText = useTranslations();
   const typeConfig = getLocalizedTypeConfig(uiText);
 
@@ -45,16 +45,16 @@ export default function ResultCard({ result }: { result: Result }) {
   return (
     <Link
       href={cfg.href(result.id)}
-      className="group flex flex-col bg-bg-secondary border border-border rounded-xl overflow-hidden hover:border-gold/40 transition-all hover:shadow-lg hover:shadow-black/20"
+      className={`group flex min-w-0 bg-bg-secondary border border-border rounded-xl overflow-hidden hover:border-gold/40 transition-colors ${compact ? "items-center gap-3 p-2.5" : "flex-col hover:shadow-lg hover:shadow-black/20"}`}
     >
       {/* Image */}
-      <div className="relative aspect-video bg-bg-elevated overflow-hidden">
+      <div className={`relative bg-bg-elevated overflow-hidden ${compact ? "h-16 w-16 shrink-0 rounded-lg" : "aspect-video"}`}>
         {result.image ? (
           <PreviewImage
-            fill sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 360px" mediaSize="thumbnail"
+            fill sizes={compact ? "64px" : "(max-width: 639px) 50vw, (max-width: 1023px) 33vw, (max-width: 1279px) 25vw, 240px"} mediaSize="thumbnail"
             src={result.image}
             alt={result.title}
-            className={`w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ${isProfile ? "object-top" : "object-center"}`}
+            className="w-full h-full object-contain object-center"
           />
         ) : (
           <div className={`w-full h-full flex items-center justify-center border ${cfg.bgColor}`}>
@@ -62,30 +62,30 @@ export default function ResultCard({ result }: { result: Result }) {
           </div>
         )}
         {/* Type badge */}
-        <div className={`absolute top-2.5 left-2.5 flex items-center gap-1.5 px-2 py-1 rounded-full text-[10px] font-semibold border backdrop-blur-sm ${cfg.bgColor}`}>
+        {!compact && <div className={`absolute top-2.5 left-2.5 flex items-center gap-1.5 px-2 py-1 rounded-full text-[10px] font-semibold border backdrop-blur-sm ${cfg.bgColor}`}>
           <Icon size={10} className={cfg.color} />
           <span className={cfg.color}>{result.type === "animal" ? animals("portfolio") : cfg.label}</span>
-        </div>
+        </div>}
         {/* Availability dot for profiles */}
-        {isProfile && result.available !== null && (
+        {!compact && isProfile && result.available !== null && (
           <div className={`absolute top-2.5 right-2.5 w-2.5 h-2.5 rounded-full border-2 border-bg-secondary ${result.available ? "bg-success" : "bg-text-muted"}`}
             title={result.available ? uiText("common.available") : uiText("common.booked")} />
         )}
       </div>
 
       {/* Content */}
-      <div className="p-4 flex-1 flex flex-col">
+      <div className={`min-w-0 flex-1 flex flex-col ${compact ? "py-0.5" : "p-4"}`}>
         <h3 className="font-semibold text-sm text-text-primary mb-1 leading-tight line-clamp-2 group-hover:text-gold transition-colors">
           {result.title}
         </h3>
         <p className="text-xs text-text-muted line-clamp-1 flex-1">{result.subtitle}</p>
         {!isProfile && result.type !== "animal" && (result.priceLabel || result.price > 0) && (
-          <p className="mt-2 text-sm font-semibold font-mono text-gold">
+          <p className={`${compact ? "mt-1" : "mt-2"} text-sm font-semibold font-mono text-gold`}>
             {result.priceLabel ?? uiText("Ui.text_4519fabedb2cbd", { value1: String(result.price.toLocaleString(uiLocale)) })}
           </p>
         )}
         {isProfile && result.available !== null && (
-          <div className="mt-2 flex items-center gap-1">
+          <div className={`${compact ? "mt-1" : "mt-2"} flex items-center gap-1`}>
             <span className={`w-1.5 h-1.5 rounded-full ${result.available ? "bg-success" : "bg-text-muted"}`} />
             <span className="text-xs text-text-muted">{result.available ? uiText("common.available") : uiText("creators.currentlyBooked")}</span>
           </div>

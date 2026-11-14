@@ -164,7 +164,7 @@ export default function UnifiedSearchResults() {
           <div className="space-y-7">{visible.map(group => <section key={groupKey(group)} aria-label={group.label}>
             <h3 className="mb-3 break-words text-sm font-semibold text-gold">{group.label}</h3>
             {!group.results.length && <p className="text-sm text-text-muted">{group.nextOffset !== null ? t("continueSearch") : t("emptyGroup")}</p>}
-            <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">{group.results.map(result => <ResultCard key={`${result.type}:${result.id}`} result={result} />)}</div>
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3">{group.results.map(result => <ResultCard key={`${result.type}:${result.id}`} result={result} compact />)}</div>
             {moreErrors.includes(groupKey(group)) && <p role="alert" className="mt-3 text-sm text-text-secondary">{t("error")}</p>}
             {group.nextOffset !== null && <button type="button" disabled={morePending.includes(groupKey(group))} onClick={() => more(group)} className="mt-3 min-h-11 rounded-lg border border-border px-4 text-sm text-text-secondary hover:text-gold disabled:opacity-50">{morePending.includes(groupKey(group)) ? t("loading") : t("more")}</button>}
           </section>)}</div>
