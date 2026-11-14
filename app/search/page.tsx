@@ -1,4 +1,5 @@
 "use client";
+import BrowseResultCount from "@/components/BrowseResultCount";
 
 import MediaImage from "@/components/MediaImage";
 import ListingImage from "@/components/ListingImage";
@@ -382,6 +383,11 @@ function SearchContent() {
 
       {/* ── Results ── */}
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {(hasSearched || loading) && (
+            <div className="flex items-center justify-between mb-6">
+              <BrowseResultCount count={loading ? null : filtered.length} label={uiText.rich("Ui.text_a225506f79fe9e", { count: filtered.length, part1: chunks => (<span className="font-semibold text-text-primary">{chunks}</span>), value4: () => (activeTab !== "all" && uiText("Ui.text_935a17e04ee5cc", { value1: String(TABS.find((t) => t.id === activeTab)?.label) })) })} />
+            </div>
+        )}
         {loading && (
           <div className="flex items-center justify-center py-20">
             <div className="flex items-center gap-3 text-text-muted">{uiText.rich("Ui.text_96a278ec9c0db8", { part1: () => (<Loader2 size={20} className="animate-spin text-gold" />), part2: chunks => (<span className="text-sm">{chunks}</span>) })}</div>
@@ -415,9 +421,7 @@ function SearchContent() {
 
         {!loading && filtered.length > 0 && (
           <>
-            <div className="flex items-center justify-between mb-6">
-              <p className="text-sm text-text-muted">{uiText.rich("Ui.text_a225506f79fe9e", { count: filtered.length, part1: chunks => (<span className="font-semibold text-text-primary">{chunks}</span>), value4: () => (activeTab !== "all" && uiText("Ui.text_935a17e04ee5cc", { value1: String(TABS.find((t) => t.id === activeTab)?.label) })) })}</p>
-            </div>
+
 
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
               {filtered.map((r) => (

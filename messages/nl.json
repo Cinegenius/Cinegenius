@@ -8113,5 +8113,8 @@
     "notices": "Meldingen",
     "unread": "Berichten: {chats} ongelezen chatberichten, {notices} meldingen",
     "readError": "Markeren als gelezen is niet gelukt. Probeer het opnieuw."
+  },
+  "companyTeam": {
+    "leadership": "Oprichters en leiding"
   }
 }

@@ -8113,5 +8113,8 @@
     "notices": "Mitteilungen",
     "unread": "Nachrichten: {chats} ungelesene Chatnachrichten, {notices} Mitteilungen",
     "readError": "Nicht als gelesen gespeichert. Bitte erneut versuchen."
+  },
+  "companyTeam": {
+    "leadership": "Gründung & Leitung"
   }
 }

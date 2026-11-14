@@ -8113,5 +8113,8 @@
     "notices": "Oznámení",
     "unread": "Zprávy: {chats} nepřečtených zpráv v chatu, {notices} oznámení",
     "readError": "Označení jako přečtené se nezdařilo. Zkuste to znovu."
+  },
+  "companyTeam": {
+    "leadership": "Zakladatelé a vedení"
   }
 }

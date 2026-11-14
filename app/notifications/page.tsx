@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useLayoutEffect, useCallback, useRef } from "react";
 import Link from "next/link";
-import InboxNavigation from "@/components/InboxNavigation";
+import InboxPaneHeader from "@/components/InboxPaneHeader";
 import { notifyMessagesRead } from "@/lib/message-read-sync";
 import { useAuth } from "@clerk/nextjs";
 import {
@@ -326,40 +326,16 @@ export default function NotificationsPage() {
   }
 
   return (
-    <div className="pt-16 min-h-screen">
-      <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8 mobile-bottom-nav-clear">
-
-        {/* ── Header ── */}
-        <div className="flex flex-wrap items-start justify-between gap-4 mb-3">
-          <div className="flex items-center gap-3">
-            <Link
-              href="/dashboard"
-              aria-label={uiText("nav.accountOverview")}
-              className="w-11 h-11 rounded-lg border border-border flex items-center justify-center text-text-secondary hover:border-gold hover:text-gold transition-all shrink-0"
-            >
-              <ArrowLeft size={16} />
-            </Link>
-            <div>
-              <div className="flex items-center gap-2.5">
-                <h1 className="font-display text-2xl font-bold text-text-primary">{uiText("nav.messages")}</h1>
-                {unreadCount > 0 && (
-                  <span className="px-2 py-0.5 bg-gold/15 border border-gold/30 text-gold text-xs font-bold rounded-full">{uiText.rich("Ui.text_488b93937e6625", { value1: () => (unreadCount) })}</span>
-                )}
-              </div>
-              <p className="text-xs text-text-muted mt-0.5">{uiText("InboxNavigation.notices")}</p>
-            </div>
-          </div>
-
-          {notifications.some((notification) => !notification.read) && (
-            <button
-              onClick={markAllRead}
-              disabled={markingAll}
-              className="flex min-h-11 items-center gap-1.5 text-xs text-text-muted hover:text-gold transition-colors px-3 py-2 rounded-lg border border-border hover:border-gold/30 shrink-0"
-            >{uiText.rich("Ui.text_110bf3daa72f97", { part1: () => (<CheckCheck size={13} />) })}</button>
-          )}
-        </div>
-
-        <InboxNavigation active="notices" />
+    <div className="inbox-shell bottom-[var(--mobile-nav-clearance)] flex-col lg:bottom-0 sm:flex-row">
+      <aside className="flex min-w-0 w-full shrink-0 flex-col border-r border-border sm:w-80">
+        <InboxPaneHeader active="notices" action={<Link href="/dashboard" aria-label={uiText("nav.accountOverview")} title={uiText("nav.accountOverview")} className="flex size-11 items-center justify-center rounded-xl text-text-muted hover:bg-bg-elevated hover:text-gold"><ArrowLeft size={20} /></Link>} />
+      </aside>
+      <div className="min-h-0 min-w-0 flex-1 overflow-y-auto overscroll-contain">
+      <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+        {unreadCount > 0 && <div className="mb-3 flex min-h-11 flex-wrap items-center justify-between gap-3">
+          <span className="rounded-full border border-gold/30 bg-gold/15 px-2 py-0.5 text-xs font-bold text-gold">{uiText.rich("Ui.text_488b93937e6625", { value1: () => (unreadCount) })}</span>
+          <button onClick={markAllRead} disabled={markingAll} className="flex min-h-11 items-center gap-1.5 rounded-lg border border-border px-3 py-2 text-xs text-text-muted hover:text-gold">{uiText.rich("Ui.text_110bf3daa72f97", { part1: () => (<CheckCheck size={13} />) })}</button>
+        </div>}
 
         {/* ── Filter Tabs ── */}
         <div className="mt-4 flex flex-wrap gap-1 pb-1 mb-6">
@@ -477,6 +453,7 @@ export default function NotificationsPage() {
         {!loading && notifications.length >= 30 && (
           <p className="text-center text-xs text-text-muted mt-4">{uiText("Ui.text_563c43496d39ff")}</p>
         )}
+      </div>
       </div>
     </div>
   );

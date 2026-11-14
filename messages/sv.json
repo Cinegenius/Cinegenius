@@ -8113,5 +8113,8 @@
     "notices": "Aviseringar",
     "unread": "Meddelanden: {chats} olästa chattmeddelanden, {notices} aviseringar",
     "readError": "Kunde inte markera som läst. Försök igen."
+  },
+  "companyTeam": {
+    "leadership": "Grundare och ledning"
   }
 }

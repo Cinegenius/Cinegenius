@@ -373,15 +373,17 @@ function ListingsSection({ listings }: { listings: PublicListing[] }) {
                           src={l.image_url!}
                           alt={l.title}
                           className="w-24 h-16 rounded object-cover shrink-0 border border-border/50"
-                          style={l.focal_point ? { objectPosition: `${l.focal_point.x * 100}% ${l.focal_point.y * 100}%` } : undefined}
+                          style={l.focal_point ? { objectPosition: `${l.focal_point.x}% ${l.focal_point.y}%` } : undefined}
                         />
                       )}
-                      <span className="text-xs text-text-primary truncate flex-1 group-hover:text-gold transition-colors">{l.title}</span>
+                      <div className="flex min-w-0 flex-1 flex-wrap items-center gap-x-3 gap-y-1">
+                      <span className="basis-full truncate text-xs text-text-primary group-hover:text-gold transition-colors sm:basis-auto sm:flex-1">{l.title}</span>
                       {l.category && <span className="text-[10px] text-text-primary shrink-0 hidden sm:inline">{["prop","vehicle"].includes(l.type)?marketplaceCategoryLabel(l.category,catalog):l.category}</span>}
                       {l.city && <span className="text-[10px] text-text-primary shrink-0">{l.city}</span>}
                       {l.type !== "animal" && (l.price != null || l.pricing) && (
                         <span className="max-w-full break-words text-[10px] font-semibold text-gold">{listingPriceLabel(l.price,l.pricing,"/Tag",locale,market)}</span>
                       )}
+                      </div>
                     </Link>
                   );
                 })}

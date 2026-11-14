@@ -8113,5 +8113,8 @@
     "notices": "Notificaciones",
     "unread": "Mensajes: {chats} mensajes de chat sin leer, {notices} notificaciones",
     "readError": "No se pudo marcar como leído. Inténtalo de nuevo."
+  },
+  "companyTeam": {
+    "leadership": "Fundación y dirección"
   }
 }

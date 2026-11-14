@@ -8113,5 +8113,8 @@
     "notices": "Értesítések",
     "unread": "Üzenetek: {chats} olvasatlan csevegőüzenet, {notices} értesítés",
     "readError": "Nem sikerült olvasottként megjelölni. Próbáld újra."
+  },
+  "companyTeam": {
+    "leadership": "Alapítók és vezetőség"
   }
 }
