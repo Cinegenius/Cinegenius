@@ -13,7 +13,7 @@ import {
   MapPin, Globe, Mail, Phone, CheckCircle,
   Package, Briefcase, Car, Home, Clapperboard, X,
   Pencil, Users, UserPlus, Clock, Check,
-  Crown, ChevronRight, ExternalLink, MoreHorizontal,
+  ChevronRight, ExternalLink, MoreHorizontal,
   Calendar, Scale, Globe2, Quote, MessageSquare,
 } from "lucide-react";
 import { COMPANY_CATEGORY_BY_ID } from "@/lib/companyCategories";
@@ -25,6 +25,7 @@ import {
   EQUIPMENT_CATEGORY_BY_ID, CONDITION_LABELS, CONDITION_COLORS, SERVICE_TYPE_BY_ID,
 } from "@/lib/equipment-categories";
 import { COMPANY_PUBLIC_TITLE_SUGGESTIONS, normalizeCompanyPublicTitles } from "@/lib/company-roles";
+import { groupPublicCompanyTeam } from "@/lib/company-team";
 import ListingImage from "@/components/ListingImage";
 import CompanyLogo from "@/components/CompanyLogo";
 import Lightbox from "@/components/Lightbox";
@@ -138,6 +139,7 @@ export default function CompanyDetail({
   const { user, isLoaded } = useUser();
   const market=useTranslations("MarketplaceOffer"),marketLocale=useLocale();
   const messageText = useTranslations("companyMessages");
+  const teamText = useTranslations("companyTeam");
   const animals = useTranslations("FilmAnimals");
   const safetyMedical = useTranslations("SafetyMedical");
   const categoryLabel = (id: string, fallback: string) => safetyMedicalCompanyCategoryLabel(id, animalCategoryLabel(id, fallback, animals), safetyMedical);
@@ -190,8 +192,7 @@ export default function CompanyDetail({
   }, [joinDialogMode]);
 
   const acceptedMembers = localMembers.filter((m) => m.status === "accepted");
-  const managementMembers = acceptedMembers.filter((m) => m.is_company_owner);
-  const regularMembers = acceptedMembers.filter((m) => !m.is_company_owner);
+  const { leadership: managementMembers, team: regularMembers } = groupPublicCompanyTeam(acceptedMembers, marketLocale);
 
   function selectedJoinTitles() {
     return normalizeCompanyPublicTitles([...joinTitles, ...joinCustomTitle.split(",")]);
@@ -346,7 +347,7 @@ export default function CompanyDetail({
               {cats.length > 0 && (
                 <div className="flex flex-wrap gap-1 mb-1.5">
                   {cats.map((cat) => (
-                    <span key={cat.id} className={`px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide rounded-full border ${cat.bg} ${cat.color}`}>
+                    <span key={cat.id} className={`px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide rounded-full border border-border bg-bg-elevated text-text-secondary`}>
                       {categoryLabel(cat.id, cat.label)}
                     </span>
                   ))}
@@ -579,15 +580,13 @@ export default function CompanyDetail({
                   {/* Management */}
                   {managementMembers.length > 0 && (
                     <div className="bg-bg-secondary border border-border rounded-2xl overflow-hidden">
-                      <div className="px-5 py-2.5 border-b border-border bg-bg-elevated flex items-center gap-2">{uiText.rich("Ui.text_f74f3d2a9788d2", { part1: () => (<Crown size={10} className="text-gold" />), part2: chunks => (<span className="text-[10px] uppercase tracking-widest font-semibold text-gold">{chunks}</span>) })}</div>
+                      <div className="px-5 py-2.5 border-b border-border bg-bg-elevated text-[10px] uppercase tracking-widest font-semibold text-text-muted">{teamText("leadership")}</div>
                       <div className="grid min-w-0 divide-y divide-border">
                         {managementMembers.map((member) => <CompanyPersonCard key={member.id} member={member} />)}
                       </div>
                     </div>
                   )}
 
-                  {organizationSection}
-            {/* Team */}
                   {regularMembers.length > 0 && (
                     <div className="bg-bg-secondary border border-border rounded-2xl overflow-hidden">
                       <div className="px-5 py-2.5 border-b border-border bg-bg-elevated flex items-center gap-2">{uiText.rich("Ui.text_7d08fc9f0374ee", { part1: () => (<Users size={10} className="text-text-muted" />), part2: chunks => (<span className="text-[10px] uppercase tracking-widest font-semibold text-text-muted">{chunks}</span>) })}</div>
@@ -870,9 +869,10 @@ function DetailLine({ label, value }: { label: string; value: string }) {
 }
 
 function CompanyPersonCard({ member }: { member: Member }) {
-  const name = member.profile?.display_name || "Teammitglied";
+  const uiText = useTranslations();
+  const name = member.profile?.display_name || uiText("Ui.text_46a19d00aadaa0");
   const destination = member.profile?.slug || member.profile?.user_id;
-  const titles = member.public_titles?.filter(Boolean).join(" · ") || member.title || (member.is_company_owner ? "Inhaber/in" : "Teammitglied");
+  const titles = member.public_titles?.filter(Boolean).join(" · ") || member.title || uiText("Ui.text_46a19d00aadaa0");
   const content = <>
     <Avatar member={member} size={32} />
     <div className="min-w-0 flex-1 space-y-0.5">

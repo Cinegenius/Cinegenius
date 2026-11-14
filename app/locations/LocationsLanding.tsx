@@ -8,6 +8,7 @@ import FavoriteButton from "@/components/FavoriteButton";
 import FloatingMapToggle from "@/components/FloatingMapToggle";
 import ListingImage from "@/components/ListingImage";
 import MobileBrowseControls,{ MobileFilterField,MobileFilterSelect,type BrowseChip } from "@/components/MobileBrowseControls";
+import BrowseResultCount from "@/components/BrowseResultCount";
 import PageHeader from "@/components/PageHeader";
 import DirectoryPage from "@/components/DirectoryPage";
 import PlaceFilters,{ EMPTY_PLACE_FILTERS,type PlaceFilterValue } from "@/components/PlaceFilters";
@@ -147,7 +148,7 @@ export default function LocationsLanding({ allLocations, totalCount, initialFilt
     {nearby.error && <p role="alert" className="text-sm text-text-secondary">{t(nearby.error)}</p>}
   </>;
 
-  const mapPanel = <aside aria-label={t("viewMap")} className={`locations-discovery-map min-w-0 ${effectiveView === "split" ? "xl:sticky xl:top-24 xl:h-[calc(100dvh-7rem)]" : "h-[calc(100dvh-12rem)] min-h-96 pb-20 xl:h-[calc(100dvh-9rem)] xl:pb-0"}`}>
+  const mapPanel = <aside aria-label={t("viewMap")} className={`locations-discovery-map directory-map-frame ${effectiveView === "split" ? "xl:sticky xl:top-24" : ""}`}>
           <LocationMap locations={mapLocations} visibleCount={filtered.length} onBoundsChange={updateMapBounds} activeId={activeId} onHover={setActiveId} userLocation={nearby.coordinates} radiusKm={radiusKm} appliedBounds={mapBounds} onApplyBounds={setMapBounds} />
         </aside>;
 
@@ -171,7 +172,7 @@ export default function LocationsLanding({ allLocations, totalCount, initialFilt
         categoryLabel={t("categoryLabel")} allCategoryLabel={t("allLocations")} categories={categories}
         categoryValue={filters.type} onCategoryChange={value => updateFilters({ type: value })}
         viewControls={viewControls}
-        resultSummary={t("results", { count: filtered.length })} filterCount={chips.length + (filters.q ? 1 : 0)} chips={chips}
+        resultCount={filtered.length} resultSummary={t("results", { count: filtered.length })} filterCount={chips.length + (filters.q ? 1 : 0)} chips={chips}
         onReset={resetFilters} resetLabel={t("resetFilters")} showResultsLabel={t("showResults", { count: filtered.length })}
       >
         <PlaceFilters rows={allLocations} value={filters} onChange={changePlaces} />
@@ -195,7 +196,7 @@ export default function LocationsLanding({ allLocations, totalCount, initialFilt
           </div>
         ) : (
           <section aria-label={t("landingDiscover")} className="min-w-0">
-            {effectiveView === "map" && <div className="mb-4 flex flex-wrap items-center justify-between gap-3"><h2 className="text-xl font-bold text-text-primary">{t("landingDiscover")}</h2><p role="status" aria-live="polite" className="text-sm text-text-muted">{t("results", {count: filtered.length})}</p></div>}
+            {effectiveView === "map" && <div className="mb-4 flex flex-wrap items-center justify-between gap-3"><h2 className="text-xl font-bold text-text-primary">{t("landingDiscover")}</h2><BrowseResultCount count={filtered.length} label={t("results", {count: filtered.length})} /></div>}
             {filtered.length === 0 ? <EmptyState icon={MapPin} title={t("emptyTitleFiltered")} description={t("emptyDescFiltered")} action={{ label: t("emptyActionReset"), onClick: resetFilters }} /> : <div className={`grid grid-cols-1 gap-5 sm:grid-cols-2 ${effectiveView === "split" ? "xl:grid-cols-2" : "lg:grid-cols-3"}`}>
               {locations.map(location => (
                 <article key={location.id} data-id={location.id} className="relative min-w-0">

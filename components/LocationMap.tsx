@@ -8,6 +8,7 @@ import { useLocale, useTranslations } from "next-intl";
 import Link from "next/link";
 import { MapPin, X } from "lucide-react";
 import ListingImage from "@/components/ListingImage";
+import BrowseResultCount from "@/components/BrowseResultCount";
 import { listingPriceLabel } from "@/lib/listing-price";
 import { placeDisplay } from "@/lib/places/core";
 import { locationCategoryLabel } from "@/lib/location-category-labels";
@@ -260,9 +261,12 @@ export default function LocationMap({ readOnly = false, locations, activeId, onH
   }, [map, userLocation, radiusKm, t, appliedBounds]);
 
   return (
-    <div className="location-map relative isolate h-full min-h-80 w-full overflow-hidden rounded-xl border border-border bg-bg-secondary" aria-label={labels?.label ?? t("label")}>
+    <div className="location-map relative isolate h-full min-h-0 w-full overflow-hidden rounded-xl border border-border bg-bg-secondary" aria-label={labels?.label ?? t("label")}>
       <div ref={containerRef} className="h-full w-full" />
-      <p role="status" aria-live="polite" className="pointer-events-none absolute left-3 top-3 z-[500] max-w-[calc(100%-5rem)] rounded-lg border border-border bg-bg-primary/95 px-3 py-2 text-xs font-medium text-text-primary">{!basemapReady && !failed ? mapUi("loading") : labels?.results ?? locationsText("results", { count: visibleCount ?? locations.length })}</p>
+      <div className="location-map-count pointer-events-none absolute left-3 top-3 z-[500] text-xs font-medium">
+        <BrowseResultCount count={!basemapReady && !failed ? null : visibleCount ?? locations.length}
+          label={!basemapReady && !failed ? mapUi("loading") : labels?.results ?? locationsText("results", { count: visibleCount ?? locations.length })} />
+      </div>
       {!readOnly && !automaticBounds && <div className="absolute left-3 top-16 z-[500] flex max-w-[calc(100%-5rem)] flex-wrap gap-2">
         {moved && <button type="button" onClick={() => { if (!map) return; const b = map.getBounds(); onApplyBounds({ south: b.getSouth(), north: b.getNorth(), west: b.getWest(), east: b.getEast() }); setMoved(false); }} className="min-h-11 rounded-lg border border-border bg-bg-primary px-3 text-sm text-text-primary">{t("searchArea")}</button>}
         {appliedBounds && <button type="button" onClick={() => { onApplyBounds(null); setMoved(false); }} className="min-h-11 rounded-lg border border-border bg-bg-primary px-3 text-sm text-text-primary">{t("resetArea")}</button>}
@@ -274,17 +278,19 @@ export default function LocationMap({ readOnly = false, locations, activeId, onH
         <div className="location-map-preview absolute inset-x-3 bottom-16 z-[1100] mx-auto max-h-[calc(100%-9rem)] max-w-sm overflow-y-auto rounded-xl border border-border bg-bg-secondary shadow-xl">
           <button type="button" aria-label={t("closePreview")} onClick={() => { select(null); }} className="absolute right-0 top-0 z-10 flex size-11 items-center justify-center rounded-full bg-bg-primary/90 text-text-primary"><X size={18} /></button>
           {selected ? (renderPreview ? renderPreview(selected) : (
-            <Link href={`/locations/${selected.id}`} className="block overflow-hidden rounded-xl focus-visible:outline-2 focus-visible:outline-gold">
-              <div className="relative h-32 bg-bg-elevated">
-                {selected.image ? <ListingImage src={selected.image} alt={selected.title} fill mediaSize="thumbnail" sizes="384px" className="object-cover" style={{ objectPosition: selected.focalPoint ? `${selected.focalPoint.x}% ${selected.focalPoint.y}%` : "50% 50%" }} /> : <div className="flex h-full items-center justify-center text-text-muted"><MapPin size={30} /></div>}
+            <Link href={`/locations/${selected.id}`} className="block overflow-hidden rounded-xl p-3 focus-visible:outline-2 focus-visible:outline-gold">
+              <div className="flex min-w-0 items-start gap-3">
+                <div className="relative size-12 shrink-0 overflow-hidden rounded-lg bg-bg-elevated">
+                  {selected.image ? <ListingImage src={selected.image} alt="" fill mediaSize="thumbnail" sizes="48px" className="object-cover" style={{ objectPosition: selected.focalPoint ? `${selected.focalPoint.x}% ${selected.focalPoint.y}%` : "50% 50%" }} /> : <div className="flex h-full items-center justify-center text-text-muted"><MapPin size={22} aria-hidden="true" /></div>}
+                </div>
+                <div className="min-w-0 flex-1 space-y-1 [overflow-wrap:anywhere]">
+                  <h3 className="line-clamp-2 pr-8 text-sm font-semibold text-text-primary" title={selected.title}>{selected.title}</h3>
+                  <p className="line-clamp-2 text-xs text-text-muted">{placeDisplay(selected, selected.city, locale)} · {locationCategoryLabel(selected.type, categoryText)}</p>
+                </div>
               </div>
-              <div className="space-y-1 p-3">
-                <h3 className="text-sm font-semibold text-text-primary">{selected.title}</h3>
-                {readPublicLocationArea(selected.metadata) && <p className="text-xs text-text-muted">{privacyText("publicArea")}</p>}
-                <p className="text-xs text-text-muted">{placeDisplay(selected, selected.city, locale)} · {locationCategoryLabel(selected.type, categoryText)}</p>
-                <p className="text-sm font-bold text-gold">{listingPriceLabel(selected.price, selected.metadata, "/Tag", locale, key => priceText(key))}</p>
-                <span className="flex min-h-11 items-center text-sm font-medium text-gold">{t("details")} →</span>
-              </div>
+              {readPublicLocationArea(selected.metadata) && <p className="mt-2 text-xs text-text-muted">{privacyText("publicArea")}</p>}
+              <p className="mt-2 text-sm font-bold text-gold">{listingPriceLabel(selected.price, selected.metadata, "/Tag", locale, key => priceText(key))}</p>
+              <span className="flex min-h-11 items-center text-sm font-medium text-gold">{t("details")} →</span>
             </Link>
           )) : <div className="max-h-60 overflow-y-auto p-3 pt-12">{clusterLocations.map(location => <button type="button" key={location.id} onClick={() => { select(location.id); }} className="block min-h-11 w-full border-b border-border p-2 text-left text-sm text-text-primary">{location.title}</button>)}</div>}
         </div>

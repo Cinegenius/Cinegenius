@@ -52,7 +52,7 @@ export const ACCOUNT_NAV_ITEMS: readonly NavigationLink[] = [
   { id: "profile", href: "/profile", key: "myProfile", icon: "profile" },
   { id: "offers", href: "/dashboard?tab=listings", key: "myOffers", icon: "offers" },
   { id: "saved", href: "/dashboard?tab=favorites", key: "savedItems", icon: "saved" },
-  { id: "contacts", href: "/dashboard?tab=friends", key: "contacts", icon: "contacts" },
+  { id: "contacts", href: "/messages?view=friends", key: "contacts", icon: "contacts" },
   { id: "bookings", href: "/dashboard?tab=bookings", key: "bookings", icon: "bookings" },
   { id: "company", href: "/company-dashboard", key: "manageCompany", icon: "companies" },
   { id: "notifications", href: "/notifications", key: "notifications", icon: "notifications" },

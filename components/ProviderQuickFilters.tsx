@@ -12,8 +12,8 @@ export default function ProviderQuickFilters({ value, crew, locations, marketpla
   return <span role="group" aria-label={t("creators.deptFilter")} className="inline-flex shrink-0">
     {[
       { value: CREW_PROVIDER_FILTER, available: crew, label: t("nav.crew"), icon: Users },
-      { value: MARKETPLACE_PROVIDER_FILTER, available: marketplace, label: t("Ui.text_47ce00e52d872a"), icon: ShoppingBag },
       { value: LOCATION_PROVIDER_FILTER, available: locations, label: t("Ui.text_e05308bad64468"), icon: MapPin },
+      { value: MARKETPLACE_PROVIDER_FILTER, available: marketplace, label: t("Ui.text_47ce00e52d872a"), icon: ShoppingBag },
     ].filter(option => option.available).map(option => <button
       key={option.value} type="button" title={option.label} aria-label={option.label} aria-pressed={value === option.value}
       onClick={() => onChange(value === option.value ? null : option.value)}

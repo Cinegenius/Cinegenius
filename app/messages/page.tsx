@@ -10,9 +10,12 @@ import { useEffect, useRef, useState, useCallback, type CSSProperties } from "re
 import { useSearchParams } from "next/navigation";
 import { useUser } from "@clerk/nextjs";
 import Link from "next/link";
-import InboxNavigation from "@/components/InboxNavigation";
+import InboxPaneHeader from "@/components/InboxPaneHeader";
+import InboxLoading from "@/components/InboxLoading";
+import InboxFriends from "@/components/messaging/InboxFriends";
+import InboxNotices from "@/components/messaging/InboxNotices";
 import { ArrowLeft, MessageSquare, Loader2, User, Check, Users, Search, SquarePen } from "lucide-react";
-import { Suspense } from "react";
+import { Activity, Suspense } from "react";
 import MessageComposer from "@/components/messaging/MessageComposer";
 import NewMessageDialog from "@/components/messaging/NewMessageDialog";
 import MessagingDialog from "@/components/messaging/MessagingDialog";
@@ -29,7 +32,7 @@ import {
   CONVERSATION_LIST_FALLBACK_REFRESH_MS,
 } from "@/lib/message-refresh-policy";
 import { mergeVisibleMessagePage } from "@/lib/message-actions";
-import { backFromMessageView, navigateMessageView } from "@/lib/message-navigation";
+import { backFromMessageView, navigateMessageView, inboxView } from "@/lib/message-navigation";
 import { uiErrorMessage } from "@/lib/ui-error-message";
 
 type Message = {
@@ -85,7 +88,6 @@ function MessagesContent() {
   useEffect(() => () => dismissNativeDialog(), []);
   const uiText = useTranslations();
   const t = useTranslations("Messaging");
-  const contactText = useTranslations("Contacts");
   const {leave} = useFormNavigation();
   const uiLocale = useLocale();
 
@@ -96,7 +98,10 @@ function MessagesContent() {
   const searchParams = useSearchParams();
   const toParam = searchParams.get("to");
   const convParam = searchParams.get("conv");
-  const groupsOnly = searchParams.get("view") === "groups";
+  const view = inboxView(searchParams);
+  const groupsOnly = view === "groups";
+  const friendsOnly = view === "friends";
+  const noticesOnly = view === "notices";
   const requestedCompanySlug = toParam ? searchParams.get("company_slug")?.slice(0, 200) : null;
   const [companyContact, setCompanyContact] = useState<{ name: string; slug: string; recipient: string } | null>(null);
   const verifiedCompany = companyContact?.recipient === toParam && companyContact?.slug === requestedCompanySlug ? companyContact : null;
@@ -129,8 +134,6 @@ function MessagesContent() {
   const [newMessageOpen, setNewMessageOpen] = useState(false);
   const [groupInfoOpen, setGroupInfoOpen] = useState(false);
   const [search, setSearch] = useState("");
-  const [requestsOpen, setRequestsOpen] = useState(searchParams.get("requests") === "1");
-  const [requestError, setRequestError] = useState("");
   const [selectedMessage, setSelectedMessage] = useState<Message | null>(null);
   const [olderLoading, setOlderLoading] = useState(false);
   const [hasOlderMessages, setHasOlderMessages] = useState(false);
@@ -144,11 +147,8 @@ function MessagesContent() {
   useEffect(() => { activeIdRef.current = activeId; }, [activeId]);
   useEffect(() => { messagesRef.current = messages; }, [messages]);
 
-  // Friend requests
-  const [friendRequests, setFriendRequests] = useState<FriendRequest[]>([]);
-  const [processingIds, setProcessingIds] = useState<Set<string>>(new Set());
+  // Confirmed contacts for composing messages and groups.
   const [contacts, setContacts] = useState<FriendRequest[]>([]);
-  const [contactsLoading, setContactsLoading] = useState(true);
   const [contactsError, setContactsError] = useState(false);
   const [deletingMessage, setDeletingMessage] = useState<string | null>(null);
   const [messageNotice, setMessageNotice] = useState("");
@@ -156,11 +156,12 @@ function MessagesContent() {
   const hiddenMessageIds = useRef(new Set<string>());
   const messageRequestSequence = useRef(0);
   const conversationRequestSequence = useRef(0);
+  const contactRequestSequence = useRef(0);
   const currentUserRef = useRef(user?.id);
   useEffect(() => { currentUserRef.current = user?.id; }, [user?.id]);
 
   // Mobile: true = zeige Chat, false = zeige Liste
-  const showChat = !!(activeId || newConvRecipient);
+  const showChat = !noticesOnly && !!(activeId || newConvRecipient);
 
   // Keep the conversation fitted to the visible iOS viewport when the keyboard opens.
   useEffect(() => {
@@ -225,37 +226,35 @@ function MessagesContent() {
     };
   }, [user?.id, loadConversations]);
 
-  const loadFriendRequests = useCallback(async () => {
+  const loadContacts = useCallback(async () => {
     const owner = currentUserRef.current;
     if (!owner) return;
-    setContactsLoading(true); setContactsError(false);
+    const sequence = ++contactRequestSequence.current;
+    setContactsError(false);
     try {
-      const res = await fetch("/api/friendships", { cache: "no-store", headers:{"X-Contact-Account":owner} });
+      const res = await fetch("/api/friendships", { cache: "no-store", headers:{"X-Contact-Account":owner}, signal: AbortSignal.timeout(15_000) });
       if (!res.ok) throw new Error();
-      const { incoming, friends } = await res.json();
-      if (currentUserRef.current !== owner) return;
-      if (Array.isArray(incoming)) setFriendRequests(incoming);
+      const { friends } = await res.json();
+      if (currentUserRef.current !== owner || sequence !== contactRequestSequence.current) return;
       setContacts(Array.isArray(friends) ? [...new Map((friends as FriendRequest[]).filter(f => f.user_id !== owner).map(f => [f.user_id, f])).values()] : []);
-    } catch { if (currentUserRef.current === owner) setContactsError(true); }
-    finally { if (currentUserRef.current === owner) setContactsLoading(false); }
+    } catch { if (currentUserRef.current === owner && sequence === contactRequestSequence.current) setContactsError(true); }
   }, []);
 
   useEffect(() => {
     // Clear private data immediately when the external authentication account changes.
     // eslint-disable-next-line react-hooks/set-state-in-effect
-    setConversations([]); setContacts([]); setFriendRequests([]); setMessages([]);
+    setConversations([]); setContacts([]); setMessages([]);
     setActiveId(null); activeIdRef.current = null; messagesRef.current = [];
     setNewConvRecipient(null); setRecipientName(""); setLoadingRecipient(false);
     hiddenMessageIds.current.clear(); setMessageNotice(""); setNewMessagesAvailable(false);
     messageRequestSequence.current += 1;
     setSendError(""); setSearch(""); setGroupInfoOpen(false); setNewMessageOpen(false); setSelectedMessage(null);
     setConversationLoadFailed(false); setMessageLoadFailure(null); setLoadingMessages(false); setOlderLoading(false);
-    setRequestError("");
-    setLoading(true); setContactsLoading(true);
+    setLoading(true); setContactsError(false);
+    contactRequestSequence.current += 1;
     if (!user?.id) return;
     loadConversations();
-    loadFriendRequests();
-  }, [user?.id, loadConversations, loadFriendRequests]);
+  }, [user?.id, loadConversations]);
 
   // The URL is the selection, including browser Back/Forward and native swipe.
   // Changing a chat must not clear the account's contacts or unsent text drafts.
@@ -288,7 +287,6 @@ function MessagesContent() {
     return () => controller.abort();
   }, [toParam, user?.id, companyLabel, t]);
 
-  useEffect(() => { if (searchParams.get("requests") === "1") queueMicrotask(() => setRequestsOpen(true)); }, [searchParams]);
 
   const loadMessages = useCallback(async (
     convId: string,
@@ -382,10 +380,16 @@ function MessagesContent() {
 
   // Refresh beim Window-Focus (Tab-Wechsel)
   useEffect(() => {
-    const onFocus = () => { loadConversations(); loadFriendRequests(); };
+    const onFocus = () => { loadConversations(); if (newMessageOpen || groupInfoOpen) void loadContacts(); };
     window.addEventListener("focus", onFocus);
     return () => window.removeEventListener("focus", onFocus);
-  }, [loadConversations, loadFriendRequests]);
+  }, [loadConversations, loadContacts, newMessageOpen, groupInfoOpen]);
+
+  useEffect(() => {
+    let active = true;
+    if (newMessageOpen || groupInfoOpen) queueMicrotask(() => { if (active) void loadContacts(); });
+    return () => { active = false; };
+  }, [newMessageOpen, groupInfoOpen, loadContacts]);
 
   function openConversation(conv: Conversation) {
     if (user?.id) leave(() => navigateMessageView(window, user.id, {conversationId:conv.id}));
@@ -457,20 +461,6 @@ function MessagesContent() {
     if (currentUserRef.current === owner && activeIdRef.current === conversationId) setOlderLoading(false);
   }
 
-  async function handleFriendRequest(friendshipId: string, action: "accepted" | "rejected") {
-    const owner = currentUserRef.current;
-    if (!owner || processingIds.has(friendshipId)) return;
-    setProcessingIds(previous => new Set(previous).add(friendshipId)); setRequestError("");
-    try {
-      const response=await fetch(`/api/friendships/${friendshipId}`,{method:"PATCH",headers:{"Content-Type":"application/json"},body:JSON.stringify({status:action,accountId:owner})});
-      const payload=await response.json().catch(()=>({}));
-      if(!response.ok)throw new Error(payload.error??t("requestError"));
-      if(currentUserRef.current!==owner)return;
-      setFriendRequests(previous=>previous.filter(request=>request.friendship_id!==friendshipId)); await loadFriendRequests();
-    }catch(cause){if(currentUserRef.current===owner)setRequestError(uiErrorMessage(cause,t("requestError")));}
-    finally{if(currentUserRef.current===owner)setProcessingIds(previous=>{const next=new Set(previous);next.delete(friendshipId);return next;});}
-  }
-
   const activeConv = conversations.find(c => c.id === activeId);
   const isNewConv = !!newConvRecipient && !activeId;
   const peerProfileHref = conversationPeerProfileHref(activeConv, user?.id ?? "", isNewConv ? newConvRecipient : null);
@@ -478,17 +468,14 @@ function MessagesContent() {
   const people = [...contacts].sort((a,b) => a.display_name.localeCompare(b.display_name,uiLocale)).map(contact => ({id:contact.user_id, name:contact.display_name, avatar:contact.avatar_url, role:contact.role}));
   const filteredConversations = conversations.filter(conversation => (!groupsOnly || conversation.kind === "group") && `${conversation.otherName ?? ""} ${conversation.group_name ?? ""}`.toLocaleLowerCase(uiLocale).includes(search.trim().toLocaleLowerCase(uiLocale)));
 
-  return <div className={`fixed inset-x-0 top-[calc(var(--site-header-height)+var(--messages-viewport-offset,0px))] lg:top-[calc(7.25rem+1px+var(--messages-viewport-offset,0px))] ${showChat ? "bottom-0" : "bottom-[var(--mobile-nav-clearance)]"} lg:bottom-0 flex overflow-hidden bg-bg-primary`}
+  return <div className={`inbox-shell flex-col sm:flex-row ${showChat ? "bottom-0" : "bottom-[var(--mobile-nav-clearance)]"} lg:bottom-0`}
     style={{"--messages-viewport-offset":`${visualViewportTop}px`,...(keyboardInset>0?{bottom:`${keyboardInset}px`}:{})} as CSSProperties}>
-    <aside className={`${showChat?"hidden sm:flex":"flex"} min-w-0 w-full flex-col border-r border-border bg-bg-primary sm:w-80 sm:shrink-0`}>
-      <header className="shrink-0 border-b border-border px-4 py-3">
-        <div className="flex min-w-0 items-center justify-between gap-3"><h1 className="min-w-0 break-words font-display text-xl font-bold text-text-primary">{t("title")}</h1><button type="button" onClick={()=>setNewMessageOpen(true)} aria-label={t(groupsOnly ? "createGroup" : "newMessage")} title={t(groupsOnly ? "createGroup" : "newMessage")} className="flex min-h-11 min-w-11 shrink-0 items-center justify-center gap-2 rounded-xl px-2 text-sm text-gold hover:bg-bg-elevated"><SquarePen size={22}/><span className="hidden min-[400px]:inline">{t(groupsOnly ? "createGroup" : "newMessage")}</span></button></div>
-        <InboxNavigation active={groupsOnly ? "groups" : "chats"} />
-        <label className="mt-2 flex min-h-11 items-center gap-2 rounded-xl border border-border bg-bg-secondary px-3"><Search size={17} className="shrink-0 text-text-muted"/><input type="search" value={search} onChange={event=>setSearch(event.target.value)} placeholder={t("searchChats")} aria-label={t("searchChats")} className="min-h-11 min-w-0 flex-1 bg-transparent text-base text-text-primary outline-none"/></label>
-      </header>
-      <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain">
-        {(friendRequests.length>0||requestsOpen)&&<section className="border-b border-border px-4 py-2"><button type="button" aria-expanded={requestsOpen} onClick={()=>setRequestsOpen(value=>!value)} className="min-h-11 w-full text-left text-sm font-semibold text-gold">{t("requests",{count:friendRequests.length})}</button>{requestsOpen&&<div className="space-y-3 pb-2">{friendRequests.map(request=><article key={request.friendship_id} className="rounded-xl border border-border bg-bg-secondary p-3"><Link href={`/profile/${request.user_id}`} className="flex min-h-11 items-center gap-2 break-words text-sm font-semibold text-text-primary">{request.avatar_url&&<UnoptimizedImage src={request.avatar_url} alt="" className="h-9 w-9 shrink-0 rounded-full object-cover"/>}{request.display_name}</Link><div className="mt-2 flex flex-wrap gap-2"><button type="button" disabled={processingIds.has(request.friendship_id)} onClick={()=>void handleFriendRequest(request.friendship_id,"accepted")} className="min-h-11 flex-1 rounded-xl bg-gold px-3 text-sm font-semibold text-bg-primary disabled:opacity-40">{contactText("accept")}</button><button type="button" disabled={processingIds.has(request.friendship_id)} onClick={()=>void handleFriendRequest(request.friendship_id,"rejected")} className="min-h-11 flex-1 rounded-xl border border-border px-3 text-sm text-text-secondary disabled:opacity-40">{contactText("reject")}</button></div></article>)}{!contactsLoading&&!friendRequests.length&&<p className="text-sm text-text-muted">{t("noRequests")}</p>}{requestError&&<p role="alert" className="text-sm text-red-400 [[data-theme=light]_&]:text-red-700">{requestError}</p>}</div>}</section>}
-        {contactsError&&<div role="alert" className="px-4 py-2 text-sm text-red-400 [[data-theme=light]_&]:text-red-700"><p>{uiText("Ui.text_4139ecbefbacc6")}</p><button type="button" onClick={()=>void loadFriendRequests()} className="min-h-11 text-gold">{t("retry")}</button></div>}
+    <aside className={`${showChat?"hidden sm:flex":"flex"} min-h-0 min-w-0 w-full flex-col border-r border-border bg-bg-primary sm:w-80 ${friendsOnly || noticesOnly ? "shrink-0" : "flex-1 sm:flex-none"}`}>
+      <InboxPaneHeader active={view} action={<button type="button" onClick={()=>setNewMessageOpen(true)} aria-label={t(groupsOnly ? "createGroup" : "newMessage")} title={t(groupsOnly ? "createGroup" : "newMessage")} className="flex size-11 shrink-0 items-center justify-center rounded-xl text-gold hover:bg-bg-elevated"><SquarePen size={22}/></button>}>
+        {!friendsOnly && !noticesOnly && <label className="mt-2 flex min-h-11 items-center gap-2 rounded-xl border border-border bg-bg-secondary px-3"><Search size={17} className="shrink-0 text-text-muted"/><input type="search" value={search} onChange={event=>setSearch(event.target.value)} placeholder={t("searchChats")} aria-label={t("searchChats")} className="min-h-11 min-w-0 flex-1 bg-transparent text-base text-text-primary outline-none"/></label>}
+      </InboxPaneHeader>
+      {!friendsOnly && !noticesOnly && <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain">
+        {contactsError&&<div role="alert" className="px-4 py-2 text-sm text-red-400 [[data-theme=light]_&]:text-red-700"><p>{uiText("Ui.text_4139ecbefbacc6")}</p><button type="button" onClick={()=>void loadContacts()} className="min-h-11 text-gold">{t("retry")}</button></div>}
         {conversationLoadFailed&&<div role="alert" className="px-4 py-3 text-sm text-red-400 [[data-theme=light]_&]:text-red-700"><p>{messageNavigationText("loadError")}</p><button type="button" onClick={()=>{setLoading(conversations.length===0);void loadConversations();}} className="min-h-11 text-gold">{messageNavigationText("retry")}</button></div>}
         {loading&&conversations.length===0?<p role="status" className="px-4 py-8 text-sm text-text-muted">{t("loading")}</p>:filteredConversations.length===0&&!conversationLoadFailed?<div className="space-y-3 px-5 py-10 text-center"><MessageSquare size={26} className="mx-auto text-text-muted"/><p className="text-sm text-text-muted">{t(search.trim()?"noChats":"emptyInbox")}</p><button type="button" onClick={()=>setNewMessageOpen(true)} className="min-h-11 rounded-xl bg-gold px-4 text-sm font-semibold text-bg-primary">{t(groupsOnly ? "createGroup" : "newMessage")}</button></div>:filteredConversations.map(conversation=>{
           const latest=conversation.messages?.[0];
@@ -498,9 +485,11 @@ function MessagesContent() {
           </button>;
         })}
         <Link href="/support" className="flex min-h-11 items-center gap-2 px-4 py-3 text-sm text-text-secondary hover:text-gold"><MessageSquare size={16}/>{uiText("SupportContact.link")}</Link>
-      </div>
+      </div>}
     </aside>
-    <section aria-label={t("conversation")} className={`${showChat?"flex":"hidden sm:flex"} relative min-w-0 flex-1 flex-col bg-bg-primary`}>
+    <Activity mode={noticesOnly ? "visible" : "hidden"}><InboxNotices /></Activity>
+    <Activity mode={friendsOnly && !showChat ? "visible" : "hidden"}><InboxFriends key={user?.id ?? "signed-out"} /></Activity>
+    {!noticesOnly && (!friendsOnly || showChat) && <section aria-label={t("conversation")} className={`${showChat?"flex":"hidden sm:flex"} relative min-w-0 flex-1 flex-col bg-bg-primary`}>
       {showChat?<>
         <header className="flex min-w-0 shrink-0 items-center gap-2 border-b border-border px-3 py-2">
           <button type="button" onClick={closeChat} aria-label={messageNavigationText("back")} className="flex min-h-11 min-w-11 shrink-0 items-center justify-center rounded-xl text-text-muted"><ArrowLeft size={21}/></button>
@@ -624,7 +613,7 @@ function MessagesContent() {
         {(sendError||messageNotice)&&<div className="shrink-0 px-3 py-2 text-xs">{sendError&&<p role="alert" className="text-red-400 [[data-theme=light]_&]:text-red-700">{sendError}</p>}{messageNotice&&<p role="status" className="text-gold">{messageNotice}</p>}</div>}
         {user?.id&&(activeId||newConvRecipient)&&<MessageComposer key={`${user.id}:${activeId?`conversation:${activeId}`:`recipient:${newConvRecipient}`}`} accountId={user.id} destination={{conversationId:activeId,recipientId:newConvRecipient}} onSent={messageSent}/>}
       </>:<div className="m-auto max-w-sm p-8 text-center"><MessageSquare size={40} className="mx-auto mb-4 text-text-muted"/><h2 className="font-display text-xl text-text-primary">{t("startChat")}</h2><p className="mt-2 text-sm text-text-muted">{t("choosePeople")}</p><button type="button" onClick={()=>setNewMessageOpen(true)} className="mt-5 min-h-11 rounded-xl bg-gold px-4 text-sm font-semibold text-bg-primary">{t("newMessage")}</button></div>}
-    </section>
+    </section>}
     {user?.id&&<NewMessageDialog key={user.id} open={newMessageOpen} forceGroup={groupsOnly} accountId={user.id} contacts={people} onClose={()=>setNewMessageOpen(false)} onOpen={openDestination}/>}
     {user?.id&&activeConv?.kind==="group"&&<GroupInfoDialog key={`${user.id}:${activeConv.id}`} open={groupInfoOpen} accountId={user.id} group={activeConv} contacts={people} onClose={()=>setGroupInfoOpen(false)} onRefresh={async()=>{await loadConversations();if(activeIdRef.current===activeConv.id)await loadMessages(activeConv.id);}} onResume={()=>setGroupInfoOpen(true)} onLeave={()=>{setGroupInfoOpen(false);if(user?.id)navigateMessageView(window,user.id,{},true);void loadConversations();}}/>}
     <MessagingDialog compact open={!!selectedMessage} title={t("messageOptions")} onClose={()=>setSelectedMessage(null)} busy={!!deletingMessage} footer={<button type="button" disabled={!!deletingMessage} onClick={()=>{if(selectedMessage)void hideOwnMessage(selectedMessage);}} className="min-h-11 w-full rounded-xl border border-crimson/30 px-4 text-sm text-red-400 [[data-theme=light]_&]:text-red-700 disabled:opacity-40">{t("hideForMe")}</button>}><p className="break-words whitespace-pre-wrap rounded-xl border border-border bg-bg-secondary p-3 text-sm [overflow-wrap:anywhere]">{selectedMessage?.content}</p><MessageAttachments attachments={selectedMessage?.attachments}/><p className="text-sm text-text-muted">{t("hideHelp")}</p>{sendError&&<p role="alert" className="text-sm text-red-400 [[data-theme=light]_&]:text-red-700">{sendError}</p>}</MessagingDialog>
@@ -632,5 +621,5 @@ function MessagesContent() {
 }
 
 export default function MessagesPage() {
-  return <Suspense><MessagesContent/></Suspense>;
+  return <Suspense fallback={<InboxLoading active="chats" />}><MessagesContent/></Suspense>;
 }
