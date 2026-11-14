@@ -78,7 +78,7 @@ export default function ConnectButton({ targetUserId, disabled = false }: { targ
   const connection = own.connection;
   return <div className="min-w-0 max-w-full">
     <div className="flex max-w-full flex-wrap items-center gap-2">
-      {connection?.status === "accepted" ? <Link href="/dashboard?tab=friends" className={button} data-connected="true" aria-label={t("inContactsLabel")} title={t("inContactsLabel")}><UserCheck size={14} className="shrink-0" aria-hidden="true" /><span className="min-w-0 [overflow-wrap:anywhere]">{t("inContacts")}</span></Link>
+      {connection?.status === "accepted" ? <Link href="/messages?view=friends" className={button} data-connected="true" aria-label={t("inContactsLabel")} title={t("inContactsLabel")}><UserCheck size={14} className="shrink-0" aria-hidden="true" /><span className="min-w-0 [overflow-wrap:anywhere]">{t("inContacts")}</span></Link>
         : connection?.status === "pending" && connection.sender_id === account ? <>
           <span role="status" className="inline-flex min-h-11 items-center gap-1.5 text-xs text-text-secondary"><Clock size={14} aria-hidden="true" />{t("requestSent")}</span>
           <button type="button" disabled={own.busy} onClick={() => void change("remove")} className={button}>{t("cancelRequest")}</button>

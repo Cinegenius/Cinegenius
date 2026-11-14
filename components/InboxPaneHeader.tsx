@@ -6,7 +6,7 @@ import InboxNavigation from "@/components/InboxNavigation";
 
 /** The same title and navigation geometry for chats, notices and loading. */
 export default function InboxPaneHeader({ active, action, children }: {
-  active: "chats" | "groups" | "notices";
+  active: "chats" | "groups" | "notices" | "friends";
   action?: ReactNode;
   children?: ReactNode;
 }) {

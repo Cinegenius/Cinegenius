@@ -6,6 +6,7 @@ import { jobEditValue, jobEditDescription } from "@/lib/job-editor";
 import { parseJobDescription, jobSchedule } from "@/lib/job-metadata";
 
 import MessageComposer from "@/components/messaging/MessageComposer";
+import InboxLoading from "@/components/InboxLoading";
 import ContactCard from "@/components/ContactCard";
 import type {ChatMessage} from "@/lib/messaging-ui";
 import GenieWritingAssistant from "@/components/GenieWritingAssistant";
@@ -146,6 +147,9 @@ export default function DashboardPage() {
   const searchParams = useSearchParams();
 
   const tabParam = searchParams.get("tab") ?? "";
+  useEffect(() => {
+    if (tabParam === "friends") router.replace("/messages?view=friends");
+  }, [tabParam, router]);
   const editListingParam = searchParams.get("editListing");
   const [activeTab, setActiveTab] = useState(VALID_TABS.includes(tabParam) ? tabParam : "overview");
 
@@ -177,6 +181,7 @@ export default function DashboardPage() {
   }, [router, tabParam]);
 
   const navigateDashboardTab = (tab: string) => leaveEditor(() => {
+    if (tab === "friends") { router.push("/messages?view=friends"); return; }
     setActiveTab(tab);
     router.replace(`/dashboard?tab=${encodeURIComponent(tab)}`, { scroll: false });
   });
@@ -1003,6 +1008,8 @@ export default function DashboardPage() {
   const sortedContactGroups = Object.entries(groupedContacts).sort(([a], [b]) => a.localeCompare(b, uiLocale));
   sortedContactGroups.forEach(([, members]) => members.sort((a, b) => a.display_name.localeCompare(b.display_name, uiLocale)));
 
+
+  if (tabParam === "friends") return <InboxLoading active="friends" />;
 
   return (
     <div className="pt-16 min-h-screen flex w-full min-w-0">

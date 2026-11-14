@@ -74,7 +74,7 @@ for (const href of ["/", "/creators", "/locations", "/props", "/jobs", "/compani
   if (!browseDestinations.has(href)) failures.push(`The shared menu must retain ${href}`);
 }
 const accountDestinations = new Set(navigation.ACCOUNT_NAV_ITEMS.map(({ href }) => href));
-for (const href of ["/profile", "/dashboard?tab=listings", "/dashboard?tab=favorites", "/dashboard?tab=friends", "/dashboard?tab=bookings", "/company-dashboard", "/notifications", "/dashboard?tab=settings", "/dashboard?tab=analytics", "/profile?tab=security"]) {
+for (const href of ["/profile", "/dashboard?tab=listings", "/dashboard?tab=favorites", "/messages?view=friends", "/dashboard?tab=bookings", "/company-dashboard", "/notifications", "/dashboard?tab=settings", "/dashboard?tab=analytics", "/profile?tab=security"]) {
   if (!accountDestinations.has(href)) failures.push(`The shared account menu must retain ${href}`);
 }
 const appChrome = read("components/AppChrome.tsx");

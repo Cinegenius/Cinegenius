@@ -3,7 +3,7 @@
 import { useTranslations } from "next-intl";
 import InboxPaneHeader from "@/components/InboxPaneHeader";
 
-export default function InboxLoading({ active }: { active: "chats" | "notices" }) {
+export default function InboxLoading({ active }: { active: "chats" | "notices" | "friends" | "groups" }) {
   const t = useTranslations();
   return <div className={`inbox-shell bottom-[var(--mobile-nav-clearance)] lg:bottom-0 ${active === "notices" ? "flex-col sm:flex-row" : ""}`}>
     <aside className="flex min-w-0 w-full shrink-0 flex-col border-r border-border sm:w-80">

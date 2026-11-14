@@ -9,6 +9,10 @@ export function navigateMessageView(browser: Window, owner: string, destination:
   if (!owner || browser.location.pathname !== "/messages") return false;
   const target = new URL(browser.location.href);
   for (const key of ["conv", "to", "company_slug"]) target.searchParams.delete(key);
+  if (destination.conversationId || destination.recipientId) {
+    if (inboxView(target.searchParams) === "notices") target.searchParams.delete("view");
+    target.searchParams.delete("requests");
+  }
   if (destination.conversationId) target.searchParams.set("conv", destination.conversationId);
   if (destination.recipientId) target.searchParams.set("to", destination.recipientId);
   if (destination.recipientId && destination.companySlug) target.searchParams.set("company_slug", destination.companySlug);
@@ -33,4 +37,25 @@ export function backFromMessageView(browser: Window, owner: string) {
   const previous = entry?.previous?.startsWith("/messages") ? new URL(entry.previous, browser.location.href) : null;
   if (entry?.owner === owner && entry.current === current && previous?.origin === browser.location.origin && previous.pathname === "/messages") browser.history.back();
   else navigateMessageView(browser, owner, {}, true);
+}
+
+export type InboxView = "chats" | "notices" | "friends" | "groups";
+
+export function inboxView(params: Pick<URLSearchParams, "get">): InboxView {
+  // Saved notification links from earlier releases still lead to requests.
+  if (params.get("requests") === "1") return "notices";
+  const view = params.get("view");
+  return view === "notices" || view === "friends" || view === "groups" ? view : "chats";
+}
+
+/** Switch just the inbox content, retaining the mounted navigation and real Back entries. */
+export function navigateInboxView(browser: Window, view: InboxView): boolean {
+  if (browser.location.pathname !== "/messages") return false;
+  const target = new URL(browser.location.href);
+  for (const key of ["conv", "to", "company_slug", "requests", "view"]) target.searchParams.delete(key);
+  if (view !== "chats") target.searchParams.set("view", view);
+  const next = localHref(target);
+  if (next === localHref(new URL(browser.location.href))) return false;
+  browser.history.pushState({}, "", next);
+  return true;
 }
