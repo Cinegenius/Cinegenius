@@ -339,7 +339,8 @@
     "findJobsTitle": "Vacatures",
     "findJobsDescription": "Jobs en opdrachten.",
     "findJobsLink": "Vacatures bekijken",
-    "railPage": "Weergave {page} van {total}"
+    "railPage": "Weergave {page} van {total}",
+    "appComingSoon": "CineGenius binnenkort ook als app."
   },
   "locations": {
     "heroTitle": "De perfecte locatie",
@@ -7481,7 +7482,9 @@
     "empty": "Begin met een vraag over registratie, profielen of aanbiedingen.",
     "keyboardHint": "Enter verzendt · Shift+Enter: nieuwe regel",
     "assistantLabel": "AI-assistent",
-    "dismissWelcome": "Begroeting sluiten"
+    "dismissWelcome": "Begroeting sluiten",
+    "hideLauncher": "Genie voor dit bezoek verbergen",
+    "moveLauncher": "Sleep om te verplaatsen. Met het toetsenbord: Alt en de pijltjestoetsen."
   },
   "GenieWriting": {
     "open": "Schrijven met Genie",
