@@ -36,6 +36,17 @@ Zusätzliche Abnahmekriterien für die fertige Übergabe:
 
 Der ältere App-Anwendungsstand `8eac132` enthielt diese Mitgliedersperre noch nicht. Dessen Browserprüfungen mit anonymen, simulierten Smart-Ergebnissen bleiben historische Integrationsbelege. Die aktuelle Übernahme nutzt authentifizierte Testgrenzen für Mitgliederfälle und gesonderte Gast-, Sitzungswechsel- und Anmelde-Rückkehrprüfungen. Authentifizierung und Antwortdaten in Komponentenprüfungen sind simuliert; ein echter Login oder iPhone-Test wird daraus nicht abgeleitet.
 
+## Neuer Startseiteneinstieg mit Locations
+
+WEB übergibt am 14. November 2026 den geprüften Commit `60f17e76e7f67385c9ec1df13e14433551ad3373` auf `codex/home-search-member-hint`. Dieser folgende App-Abgleich ergänzt ausschließlich den Einstieg und seine Texte; Plan v1, serverseitige Mitgliedersperre, Kontingente und native Quellen bleiben erhalten. Laut Übergabe ist diese Ergänzung noch nicht veröffentlicht, während `3604ba4` die veröffentlichte Grundlage bleibt. Beleg des WEB-Standes: `/srv/cinegenius/audits/20261114-home-search-member-hint/receipt.json`.
+
+- Beim Betreten der Startseite ist Locations ausgewählt. Smart bleibt ein gewöhnlicher Reiter ohne vorher sichtbares Mitgliederlabel, Schloss oder Hover-/Fokushinweis.
+- Erst Klick oder Tastaturaktivierung durch Gäste zeigt am Reiter die kleine Sprechblase „Nur für Mitglieder“. Bei noch ungeklärter Anmeldung steht dort stattdessen der vorhandene Ladehinweis. Keine Navigation zur Suche oder Anmeldung und kein Positionssprung; die vorherige öffentliche Auswahl sowie Suchtext und Stadt bleiben erhalten.
+- Erneuter Klick, Klick außerhalb, Fokuswechsel oder Escape schließen den Hinweis. Mitglieder können Smart normal auswählen; beim Absenden nach Sitzungsablauf bleibt die Eingabe erhalten und der Zugriff gesperrt.
+- Der neutrale Platzhalter lautet „Was suchst du?“ in allen neun bestehenden Katalogen. Der native Arbeitsplatz verwendet später denselben gemeinsamen Einstieg und keine abweichenden Gastrechte.
+
+Der aktuelle App-Prüfbeleg liegt unter `/srv/cinegenius/handoffs/20261114-app-home-member-hint/`. 13 gezielte Suchziel-/Feldprüfungen, 36 Sprach-/Breitenfälle, ein simulierter Anmelde-/Sitzungswechsel, zusätzliche Enter-/Leertaste-/Fokus-/Escape-Prüfungen bei 320 und 1440 CSS px sowie die tatsächliche gebaute Next-Anwendung als Gast bei vier Breiten sind erfolgreich. Build, TypeScript, i18n mit 8.073 Schlüsseln in neun Katalogen, Lint und Design bestanden. Die 123 nativen Dateien und zehn geprüften App-/Berechtigungsdateien sind unverändert. Browserprüfungen und simulierte Sitzungswechsel sind weiterhin kein Nachweis einer neuen Xcode-/iPhone-Installation oder echter Sprachausgabe.
+
 ## Bestätigter Bedienablauf
 
 - Haupteinstieg auf der **Startseite**, über die bestehende Suche und Genie.
