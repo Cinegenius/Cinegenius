@@ -187,10 +187,17 @@ keine Speicherung. Die letzte bestätigte Auswahl bleibt bei einem Schreibfehler
 erhalten; Fehler/Wiederholen verwenden die vorhandenen neun Sprachkataloge.
 Antworten eines vorherigen Kontos werden verworfen.
 
-Diese Integration ist noch nicht veröffentlicht und führt die Migration
-`20261114180242_profile_privacy_controls.sql` nicht aus. Vor einem abhängigen
-Web-/App-Livegang sind die ausdrückliche Freigabe, bestätigte Migration und die
-zugehörigen Serverprüfungen erforderlich. Die reguläre entfernte App-URL bleibt
-bis dahin beim veröffentlichten Webstand. Tests mit simulierten Konten/API-Antworten
-belegen keine echte iPhone-/iPad-Bedienung; neuere Mac-Quellen und gespeicherte
-Pläne bleiben beim späteren Xcode-Abgleich erhalten.
+WEB hat den Basisstand `dff44d3` am 14. November nach Markus’ ausdrücklicher
+Freigabe veröffentlicht. Die Privatsphäre-Migration und
+`20261114182622_direct_message_listing_compatibility.sql` sind laut geprüftem
+Releasebeleg angewandt. Die reguläre entfernte App-URL erhält damit die gemeinsamen
+Privatsphäre-Einstellungen und die zentrale Chat-Korrektur. Der Nachrichtenvertrag
+bleibt gleich: Bei einer Wiederholung bleiben Originalentwurf und Sendeschlüssel
+erhalten. Ein neuer Schlüssel darf eine unklare Antwort nicht als neue Nachricht
+umgehen. APP führt keine zweite Migration oder Website-Veröffentlichung aus.
+
+Die strengere Bestätigung von Speicherantworten und die früheren zusätzlichen
+App-Sprachkorrekturen sind weiterhin nur im App-Zweig vorbereitet, nicht Teil
+dieses Web-Livegangs. Tests mit simulierten Konten/API-Antworten belegen keine echte
+iPhone-/iPad-Bedienung; neuere Mac-Quellen und gespeicherte Pläne bleiben beim
+späteren Xcode-Abgleich erhalten.
