@@ -8219,7 +8219,7 @@
     "more": "Mostrar más",
     "error": "No se pudo cargar la búsqueda. Tu texto se ha conservado.",
     "retry": "Reintentar",
-    "signInRequired": "Inicia sesión para combinar búsquedas con Genie.",
+    "signInRequired": "Smart está disponible para miembros. Inicia sesión para buscar en varias categorías y ver los resultados.",
     "withinRadius": "{place} · radio de {radius} km",
     "areas": {
       "crew": "Equipo",

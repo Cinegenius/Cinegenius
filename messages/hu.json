@@ -8219,7 +8219,7 @@
     "more": "Továbbiak",
     "error": "A keresés nem tölthető be. A beírt szöveg megmaradt.",
     "retry": "Újrapróbálkozás",
-    "signInRequired": "Jelentkezz be a keresések Genie-vel való kombinálásához.",
+    "signInRequired": "A Smart a tagok számára érhető el. Jelentkezz be a kategóriák közötti kereséshez és a találatok megtekintéséhez.",
     "withinRadius": "{place} · {radius} km-es körzet",
     "areas": {
       "crew": "Stáb",

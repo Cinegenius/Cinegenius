@@ -211,7 +211,7 @@ Do not rotate it or claim that the model's interpretation passed a real test.
   visible results per group, up to 180 candidate rows per request; an empty page
   with a continuation does not mean there are no matches. At most four DB reads
   run concurrently. Cursor limits/area/indices are checked again on the server.
-- Read-only results permit guests; AI interpretation still requires sign-in.
+- Smart interpretation and read-only results both require a signed-in member, including shared plan URLs. Guest access is rejected before quota, body parsing or database reads; the ordinary public directory search remains available.
   Current viewer permissions precede profile projection and geographic matching.
   Ghost profiles, hidden location/activity and personal-offer visibility remain
   enforced. Companies/public projects/approved news and organizations reuse their

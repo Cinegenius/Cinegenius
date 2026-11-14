@@ -12,7 +12,7 @@ The following search/quality release keeps those limits and adds personal GPT-6 
 
 - Strict versioned plan: at most six wishes, four places each; separate area/query/department/place fields; no arbitrary model URLs or tools.
 - `/search?plan=…` uses `POST /api/search/unified`. Existing single-directory links remain valid. Typed interpretation and spoken interpretation converge on the same plan.
-- A read-only future entitlement boundary exists without charging or gating existing search results.
+- A shared entitlement boundary exists without charging. Markus subsequently restricted Smart interpretation and results to signed-in members, including shared plan links; ordinary public directories remain public.
 - Profile privacy is projected before geographic matching and counting. Personal offers come from `privacy_visible_listings`; only published companies, public projects and approved organization content are considered.
 - Bounded scans and explicit continuation preserve existing results when loading more fails. Project geography uses primary place/production country, not guessed shooting locations.
 - No saved search history. Existing Genie inactivity expiry remains. `store: false`, no conversation IDs, no automatic paid retries. Account/locale changes cancel late work and require explicit retry.
@@ -33,6 +33,25 @@ Evidence directory on the server: `/srv/cinegenius/audits/20261114-unified-searc
 - `public-query-results.json`: real read-only database queries succeeded across the nine domains. At test time, Fahrer München/Berlin returned 11, Studio Schweiz returned 2, and Boot Berlin/Auto Afrika had no public matches. These are test-time observations, not fixed product counts.
 
 Two existing homepage destination fixture assumptions were corrected: the current public privacy view was absent from the fixture and the current radius resolver import was missing. The same failures reproduced on the pre-change homepage (`home-baseline.log`); production destination behavior was not altered to satisfy the fixture.
+
+## Smart repair and membership follow-up
+
+Markus confirmed the short name **Smart**, a single row above the homepage search input, and access only for signed-in members. The row keeps 44px controls and scrolls horizontally when the available width or translated labels require it. Other design surfaces and the existing daily AI quotas are unchanged.
+
+The matching repair prefers exact catalogue roles before whole-word expansion, distinguishes models from model makers, resolves camera-person plurals and feminine occupation forms, and excludes Dolly Grip from generic driver expansion. Narrow marketplace terms no longer include every sibling vehicle category; public structured vehicle and equipment fields participate in matching. Company services and categories are searchable. Stored occupation IDs and member content are unchanged.
+
+Evidence directory: `/srv/cinegenius/audits/20261114-genie-search-repair`.
+
+- `member-tests.log`: 64 search, server, API and proxy cases passed. Anonymous Smart reads fail before quota checks, body parsing or database work, including forged account claims; authentication failure fails closed.
+- `proxy-final.log`: 10 final proxy/localization cases passed. Guest Smart requests return private, non-cacheable JSON 401; member and origin boundaries remain enforced.
+- `member-browser.json`: actual components with simulated authentication/API boundaries exercise guest interpretation and shared-plan entry without requests, preserved sign-in return plans, member results, and result removal on expired sessions/account changes.
+- `homepage-tabs.json`: all nine locales at 320/393/834/1440 CSS px remain in one row, with 44px targets, usable tab selection and no page overflow. At narrow widths, the complete row can require horizontal scrolling. These are browser checks, not native-device checks.
+- `full-app-browser.json`: the actual optimized Next application at 320/393/834/1440 CSS px passed homepage layout, Enter submission, membership notice, retained query and real browser Back checks without page errors. The 393px screenshot was visually inspected.
+- `member-http.json`: the running optimized application rejected guest Smart requests and forged account claims with private, non-cacheable JSON 401. Signed-out `/dashboard` retained the correct same-host sign-in redirect.
+- `public-query-results.json`: read-only queries against actual public data verified equivalent camera and lighting role forms, two structured motorcycle matches, Swiss studios and catering companies. Exact counts are observations at test time. These queries used supplied structured plans; they do not prove live model interpretation of spoken requests.
+- `member-build.log`, `member-final-lint.log`, `member-design.log`: optimized build, TypeScript, localization, targeted lint and shared design checks passed; no new hard-coded string exemptions were added.
+
+The repair and membership follow-up are prepared separately from the earlier `ce37ab6` production release. A passing test report does not mean these changes have been published.
 
 ## Remaining production/device verification
 

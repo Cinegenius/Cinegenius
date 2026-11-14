@@ -56,9 +56,10 @@ Kataloge und bestehenden Veröffentlichungsregeln.
   Gelände und aktuelle Bewölkung unterscheiden. Keine pauschale Zusage für Wetter
   oder sichtbares Sonnenlicht. Private Location-Adressen bleiben berechtigungsgeschützt.
 
-## Übergreifende Suche (14. November 2026)
+## Smart-Suche (14. November 2026)
 
-**Status: Website und gemeinsame Schnittstelle implementiert, noch nicht live.**
+**Status: Grundfunktion mit `ce37ab6` veröffentlicht; Trefferkorrekturen, Name Smart
+und der nachträglich beauftragte Mitgliederzugang sind noch nicht veröffentlicht.**
 Markus hat den früheren Aufschub mit „ok dann setzen wir das um“ aufgehoben.
 Die technische Prüfung ist im Bericht `test-reports/genie-unified-search-2026-11-14.md`
 dokumentiert. Der echte KI-Sprachverständnistest steht noch aus: Der vorhandene
@@ -68,6 +69,13 @@ verfügbar. Native Xcode-Arbeit bleibt bei APP Entwicklung.
 - Bestätigter Haupteinstieg: **Startseite**, über die bestehende Suche und Genie.
   Das gemeinsame Ergebnisziel und die Suchlogik sollen später auch im Arbeitsplatz
   nutzbar sein; kein zweites, abweichendes Suchsystem bauen. Das Design bleibt erhalten.
+- Der bestätigte kurze Name des Reiters ist **Smart**. Die Auswahl oberhalb der
+  Startseiten-Suchleiste bleibt einzeilig, bei Platzmangel horizontal bedienbar.
+- Smart ist **nur für angemeldete Mitglieder** zugänglich, einschließlich geteilter
+  Ergebnislinks. Website und App prüfen die Sitzung serverseitig; Gäste bekommen
+  weder KI-Verarbeitung noch Smart-Ergebnisse. Die Anmeldung erhält den gesamten
+  Suchplan als Rückkehrziel. Bei Sitzungsende Ergebnisse ausblenden; die übrigen
+  öffentlichen Verzeichnisse bleiben erreichbar.
 - Betreiberentscheidung zur späteren Finanzierung: die Funktion so vorbereiten,
   dass daraus später ein kostenpflichtiges Angebot bzw. eine bezahlte Anwendung
   werden kann. Der genaue kostenpflichtige Umfang, kostenlose Funktionen, Preise,

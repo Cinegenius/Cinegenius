@@ -8219,7 +8219,7 @@
     "more": "Show more",
     "error": "The search could not load. Your input has been kept.",
     "retry": "Try again",
-    "signInRequired": "Sign in to combine searches with Genie.",
+    "signInRequired": "Smart is available to members. Sign in to search across categories and view the results.",
     "withinRadius": "{place} · within {radius} km",
     "areas": {
       "crew": "Crew",

@@ -8219,7 +8219,7 @@
     "more": "Zobrazit další",
     "error": "Hledání se nepodařilo načíst. Zadaný text zůstal zachován.",
     "retry": "Zkusit znovu",
-    "signInRequired": "Přihlaste se a kombinujte hledání pomocí Genie.",
+    "signInRequired": "Smart je dostupné pro členy. Přihlaste se pro hledání napříč kategoriemi a zobrazení výsledků.",
     "withinRadius": "{place} · v okruhu {radius} km",
     "areas": {
       "crew": "Štáb",

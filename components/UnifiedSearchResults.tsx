@@ -11,7 +11,7 @@ import { decodeSearchPlan, searchPlanFromHref, SEARCH_AREAS, type SearchPlan, ty
 import ResultCard from "@/components/SearchResultCard";
 
 const groupKey = (group: SearchGroup) => `${group.area}:${group.wishIndex}`;
-const SEARCH_ERROR = { invalid: "invalid", unavailable: "unavailable" } as const;
+const SEARCH_ERROR = { invalid: "invalid", unavailable: "unavailable", unauthorized: "unauthorized" } as const;
 
 export default function UnifiedSearchResults() {
   const t = useTranslations("UnifiedSearch");
@@ -68,7 +68,9 @@ export default function UnifiedSearchResults() {
         }).join("; ");
         setInput(requestText || summary || "");
       }
-      if (!isLoaded || (!encodedPlan && !requestText.trim())) { setLoading(false); return; }
+      if (!isLoaded) { setLoading(false); return; }
+      if (!userId) { setError(SEARCH_ERROR.unauthorized); setLoading(false); return; }
+      if (!encodedPlan && !requestText.trim()) { setLoading(false); return; }
       if (encodedPlan && !decoded) { setError(SEARCH_ERROR.invalid); setLoading(false); return; }
       setLoading(true);
       try {
@@ -76,7 +78,7 @@ export default function UnifiedSearchResults() {
           interpretationAttempt.current = null;
           const response = await fetch("/api/search/unified", { method: "POST", headers: { "Content-Type": "application/json" }, cache: "no-store", signal: controller.signal, body: JSON.stringify({ plan: decoded }) });
           const data = await response.json();
-          if (!response.ok) throw new Error(data.error || SEARCH_ERROR.unavailable);
+          if (!response.ok) throw new Error(response.status === 401 ? "unauthorized" : data.error || SEARCH_ERROR.unavailable);
           if (!controller.signal.aborted) setGroups(data.groups);
         } else {
           // Locale/account changes may cancel a request, but never repeat paid
@@ -89,7 +91,7 @@ export default function UnifiedSearchResults() {
           const response = await fetch("/api/genie", { method: "POST", headers: { "Content-Type": "application/json" }, cache: "no-store", signal: controller.signal,
             body: JSON.stringify({ area: "general", locale, messages: [{ role: "user", content: requestText }] }) });
           const data = await response.json();
-          if (!response.ok) throw new Error(data.error || SEARCH_ERROR.unavailable);
+          if (!response.ok) throw new Error(response.status === 401 ? "unauthorized" : data.error || SEARCH_ERROR.unavailable);
           if (controller.signal.aborted) return;
           const link = Array.isArray(data.links) ? data.links.find((item: { href?: unknown }) => typeof item?.href === "string" && searchPlanFromHref(item.href)) : null;
           if (link) navigation.current.replace(link.href, { scroll: false });
@@ -110,6 +112,10 @@ export default function UnifiedSearchResults() {
       const response = await fetch("/api/search/unified", { method: "POST", headers: { "Content-Type": "application/json" }, cache: "no-store", signal: controller.signal,
         body: JSON.stringify({ plan, cursor: { wishIndex: group.wishIndex, area: group.area, offset: group.nextOffset } }) });
       const data = await response.json();
+      if (response.status === 401) {
+        if (!controller.signal.aborted) { setGroups([]); setError(SEARCH_ERROR.unauthorized); }
+        return;
+      }
       if (!response.ok) throw new Error("unavailable");
       if (!controller.signal.aborted) setGroups(values => values.map(current => {
         if (groupKey(current) !== key) return current;
@@ -122,7 +128,7 @@ export default function UnifiedSearchResults() {
   }
 
   const errorText = error === "unauthorized" ? t("signInRequired") : error === "rate_limited" ? genie("errorRateLimited") : error === "invalid" || error === "search_unresolved" ? genie("errorSearch") : t("error");
-  const returnTo = `/search?${new URLSearchParams({ smart: "1", q: input })}`;
+  const returnTo = `/search?${new URLSearchParams(plan && encodedPlan ? { plan: encodedPlan } : { smart: "1", q: input })}`;
   return <main className="min-h-screen pt-16 pb-28 xl:pb-12">
     <div className="border-b border-border bg-bg-secondary/50">
       <div className="site-container py-7 sm:py-10">
