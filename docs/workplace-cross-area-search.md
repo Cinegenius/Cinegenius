@@ -1,8 +1,8 @@
-# Übergreifende Suche: Startseite und Arbeitsplatz — für später vorgemerkt
+# Übergreifende Suche: Startseite und Arbeitsplatz
 
-Status vom 14. November 2026: **aufgeschoben, keine Umsetzung und keine Veröffentlichung beauftragt**. WEB CODEX hat Markus' abschließende Entscheidung „lass das merken und dann später bauen“ an APP Entwicklung übermittelt. Die vorherige Vorbereitung dieser Funktion ist damit zurückgestellt. Andere bereits beauftragte App-Arbeiten bleiben davon unberührt.
+Aktueller Status vom 14. November 2026: **zur Umsetzung freigegeben, noch keine Veröffentlichung beauftragt**. WEB CODEX hat Markus' neue ausdrückliche Entscheidung „ok dann setzen wir das um“ an APP Entwicklung übermittelt. Sie ersetzt den vorherigen Aufschub. WEB CODEX bearbeitet Website und gemeinsame Suchlogik auf `codex/genie-unified-search`; die konkrete geprüfte Schnittstelle und der Implementierungs-Commit stehen für die App-Übernahme noch aus. Andere bereits beauftragte App-Arbeiten bleiben erhalten.
 
-## Vorgemerkter Bedienablauf
+## Bestätigter Bedienablauf
 
 - Haupteinstieg auf der **Startseite**, über die bestehende Suche und Genie.
 - Die gemeinsame Suchlogik und das gemeinsame Ergebnisziel später zusätzlich als Werkzeug **Übergreifende Suche** im nativen Arbeitsplatz nutzen. Website und App erhalten kein zweites, abweichendes Suchsystem.
@@ -18,16 +18,20 @@ Status vom 14. November 2026: **aufgeschoben, keine Umsetzung und keine Veröffe
 
 ## Spätere kostenpflichtige Nutzung
 
-Markus möchte die Funktion später zu einem kostenpflichtigen Angebot beziehungsweise einer bezahlten Anwendung ausbauen können. Kostenpflichtiger Umfang, kostenlose Funktionen, Preise, Abrechnung, Zahlungsweg und Einführung sind noch offen. Diese Planungsentscheidung hebt den Aufschub nicht auf und beauftragt weder Zahlungen noch eine aktuelle Bezahlschranke.
+Markus möchte die Funktion später zu einem kostenpflichtigen Angebot beziehungsweise einer bezahlten Anwendung ausbauen können. Kostenpflichtiger Umfang, kostenlose Funktionen, Preise, Abrechnung, Zahlungsweg und Einführung sind noch offen. Die jetzige Umsetzungsfreigabe gilt für die Suche und beauftragt weder Zahlungen noch eine aktuelle Bezahlschranke.
 
 Beim späteren Bau gemeinsame Suchlogik, Darstellung und Tarifzugriff trennen. Tarifrechte und etwaige Nutzungsgrenzen serverseitig, kontobezogen und einheitlich für Website und App prüfen. Nutzungszählung darf keine dauerhafte Speicherung von Suchtexten oder Genie-Gesprächen voraussetzen. Privatsphäre und Inhaltsberechtigungen bleiben unabhängig vom Tarif wirksam. Zahlungsanbieter und native Kaufabwicklung erst anhand des tatsächlich beschlossenen Bezahlmodells abstimmen.
 
-## Spätere Abstimmung
+## App-Integration und Übergabe
 
-WEB CODEX verantwortet die gemeinsame Suchlogik und die bestehende `/search`-Ergebnisseite. APP Entwicklung übernimmt nach einem erneuten Umsetzungsauftrag den nativen Arbeitsplatz-Einstieg und die Abstimmung mit Xcode. Eine verbindliche neue Schnittstelle oder ein geprüfter Implementierungs-Commit liegt für diese Funktion noch nicht vor.
+WEB CODEX verantwortet die gemeinsame Suchlogik und die bestehende `/search`-Ergebnisseite. APP Entwicklung koordiniert den nativen Arbeitsplatz-Einstieg und Xcode mit dem geprüften Web-Stand. Eine verbindliche neue Schnittstelle oder ein geprüfter Implementierungs-Commit liegt für diese Funktion noch nicht vor; noch keine native Suchintegration als fertig melden.
 
-Die spätere Präzisierung zu Startseite und kostenpflichtiger Nutzung wurde ebenfalls am 14. November 2026 über WEB CODEX übermittelt. Die korrespondierende Web-Planung steht in dessen `docs/app-product-flows.md`, Abschnitt „Vorgemerkt: Übergreifende Suche“; es handelt sich um eine Planungsnotiz, nicht um veröffentlichten Anwendungscode.
+Für die Übergabe benötigt APP Entwicklung den geprüften Commit, das tatsächliche Eingabe-/Navigationsformat, Ergebnismodell und Fehlerverhalten, Sprachänderungen sowie Test- und Veröffentlichungsstatus. App-Annahmefälle sind die oben festgehaltenen getrennten Suchteile und Ortsmengen, identische erneute Suchaufträge, reale Zurück-Navigation, unterbrochene Eingaben sowie die gemeinsame Genie-Navigation und Sprachausgabe.
+
+Der native Einstieg nutzt die gemeinsame Suche im bestehenden erlaubten CineGenius-Ursprung und die vorhandene Sitzung. Kein zweiter Suchparser, keine separate Anmeldung und keine Kopie von Sitzungstokens oder Suchtexten in native Archive. Die Suche benötigt keine Scanner-/Location-Auswahl oder Kameraberechtigung. Beim Wechsel zur Suche bleiben offene Arbeitsplatz-Entwürfe und die bestehende Abbruch-/Speicherbehandlung erhalten. Neue WebView-Handler oder Rücksprungformate erst auf Grundlage der geprüften Schnittstelle festlegen.
+
+Die Präzisierungen zu Startseite, kostenpflichtiger Nutzung und Ortszuordnung wurden ebenfalls am 14. November 2026 über WEB CODEX übermittelt. Die korrespondierende Web-Planung steht in dessen `docs/app-product-flows.md`; ältere dortige Aufschubformulierungen sind durch die neuere ausdrückliche Umsetzungsfreigabe ersetzt. Planung und Freigabe sind kein Nachweis von veröffentlichtem Anwendungscode.
 
 Beim späteren Abgleich bleiben laufende native Änderungen, Grundrisse, Fotos, PDF- und Drehplan-/Dispo-Arbeit erhalten. Den tatsächlichen Mac-Stand vor Änderungen prüfen; die Serverfassung der nativen Oberfläche darf neuere Mac-Arbeit nicht überschreiben. Die bestehende kontogebundene Sichtbarkeit und Bildberechtigung gelten auch für gemeinsame Ergebnisse. Neue Bedienoberflächen und Texte gehören dann gleichzeitig in alle neun bestehenden Sprachen.
 
-Diese Notiz aktiviert kein Werkzeug, erweitert keinen Sprach-/WebView-Handler, verändert keine Suche und enthält keine Veröffentlichungsfreigabe. Konkrete Schnittstellen und Geräteprüfungen werden erst mit dem späteren Auftrag festgelegt.
+Diese Notiz aktiviert kein Werkzeug, erweitert keinen Sprach-/WebView-Handler, verändert keine Suche und enthält keine Veröffentlichungsfreigabe. Schnittstellen und Geräteprüfungen werden mit der geprüften Web-Übergabe konkretisiert. Der aktuelle Mac-Auftrag bearbeitet native Dokumentvorlagen und Symbole; sein neuerer Quellstand muss vor der tatsächlichen Integration abgeglichen werden.
