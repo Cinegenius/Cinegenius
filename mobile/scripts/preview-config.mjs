@@ -21,6 +21,8 @@ export function previewConfig(input = 'https://www.cinegenius.co') {
     server: {
       // The trailing slash also prevents prefix matches with lookalike hostnames.
       url: url.href,
+      // The existing server page restores a valid session or shows the form.
+      appStartPath: 'sign-in',
       cleartext: loopback,
       errorPath: 'offline.html',
       allowNavigation: [],

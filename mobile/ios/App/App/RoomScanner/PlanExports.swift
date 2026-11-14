@@ -12,9 +12,9 @@ enum PlanExports {
         try PrivatePlanFiles.directory(directory)
         return directory.appendingPathComponent(name)
     }
-    static func pdf(_ record: SavedFloorPlan, strings: ScannerStrings) throws -> PlanShare {
+    static func pdf(_ record: SavedFloorPlan, strings: ScannerStrings, locationTitle: String = "") throws -> PlanShare {
         let url = try destination(record.plan.source == .example ? "example-floor-plan.pdf" : "floor-plan.pdf")
-        do { try PrivatePlanFiles.write(PlanPDF.data(record:record,strings:strings),to:url); return PlanShare(url:url) }
+        do { try PrivatePlanFiles.write(PlanPDF.data(record:record,strings:strings,locationTitle:locationTitle),to:url); return PlanShare(url:url) }
         catch { try? FileManager.default.removeItem(at:url.deletingLastPathComponent()); throw error }
     }
     @available(iOS 16.0, *) static func model(_ room: CapturedRoom) throws -> PlanShare {

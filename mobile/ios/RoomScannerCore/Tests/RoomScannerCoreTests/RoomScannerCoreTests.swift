@@ -85,8 +85,10 @@ final class RoomScannerCoreTests: XCTestCase {
         let root = try directory();let store = PlanArchive(root:root)
         let p = try SavedFloorPlan(name:"Private example",localProject:"",plan:.example);try await store.save(p)
         let file = root.appendingPathComponent(p.id.uuidString+".json")
+        #if !os(Linux) // Linux Foundation has no Apple backup-exclusion metadata.
         XCTAssertEqual(try root.resourceValues(forKeys:[.isExcludedFromBackupKey]).isExcludedFromBackup,true)
         XCTAssertEqual(try file.resourceValues(forKeys:[.isExcludedFromBackupKey]).isExcludedFromBackup,true)
+        #endif
         XCTAssertEqual((try FileManager.default.attributesOfItem(atPath:file.path)[.posixPermissions] as? NSNumber)?.intValue,0o600)
         XCTAssertEqual((try FileManager.default.attributesOfItem(atPath:root.path)[.posixPermissions] as? NSNumber)?.intValue,0o700)
     }

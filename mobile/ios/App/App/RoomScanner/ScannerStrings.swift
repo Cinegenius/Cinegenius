@@ -30,6 +30,14 @@ final class ScannerStrings: ObservableObject {
         let formatter = NumberFormatter(); formatter.locale = Locale(identifier: locale); formatter.maximumFractionDigits = 2
         return formatter.string(from: NSNumber(value: value)) ?? "—"
     }
+    func parseNumber(_ text: String) -> Double? {
+        let value = text.trimmingCharacters(in:.whitespacesAndNewlines)
+        let formatter = NumberFormatter(); formatter.locale = Locale(identifier:locale); formatter.numberStyle = .decimal; formatter.isLenient = false
+        let separator = formatter.decimalSeparator ?? "."
+        let pattern = "^-?[0-9]+(?:" + NSRegularExpression.escapedPattern(for:separator) + "[0-9]+)?$"
+        guard value.range(of:pattern,options:.regularExpression) != nil else { return nil }
+        return formatter.number(from:value)?.doubleValue
+    }
     func summary(_ plan: FloorPlan) -> String {
         let counts = [("walls", PlanSegment.Kind.wall), ("doors", .door), ("windows", .window), ("openings", .opening)].map { key, kind in (key, String(plan.segments.filter { $0.kind == kind }.count)) }
         return text("planSummary", Dictionary(uniqueKeysWithValues: counts))

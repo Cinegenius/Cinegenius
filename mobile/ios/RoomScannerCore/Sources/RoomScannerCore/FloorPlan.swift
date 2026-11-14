@@ -11,6 +11,12 @@ public struct PlanPoint: Codable, Equatable, Sendable {
     public var x: Double
     public var z: Double
     public init(_ x: Double, _ z: Double) { self.x = x; self.z = z }
+    public func rotated(_ angle: Double) -> PlanPoint {
+        let c: Double = cos(angle), s: Double = sin(angle)
+        let px: Double = x*c - z*s
+        let pz: Double = x*s + z*c
+        return PlanPoint(px,pz)
+    }
     public var valid: Bool { x.isFinite && z.isFinite && abs(x) <= 10_000 && abs(z) <= 10_000 }
 }
 public struct PlanSegment: Codable, Equatable, Identifiable, Sendable {
@@ -30,7 +36,7 @@ public struct PlanSegment: Codable, Equatable, Identifiable, Sendable {
     public var valid: Bool { start.valid && end.valid && length.isFinite && length >= 0.01 && length <= 1000 }
 }
 public struct FloorPlan: Codable, Equatable, Sendable {
-    public enum Source: String, Codable, Sendable { case sensor, example }
+    public enum Source: String, Codable, Sendable { case sensor, example, manual }
     public let source: Source
     public let segments: [PlanSegment]
     public init(source: Source, segments: [PlanSegment]) throws { self.source = source; self.segments = segments; try validate() }
@@ -40,7 +46,8 @@ public struct FloorPlan: Codable, Equatable, Sendable {
     }
     // Bounds are drawing bounds only. No area or closed-room claim is inferred.
     public func drawingPoints(rotation: Double = 0) -> [PlanPoint] {
-        segments.flatMap { [$0.start, $0.end] }.map { p in PlanPoint(p.x * cos(rotation) - p.z * sin(rotation), p.x * sin(rotation) + p.z * cos(rotation)) }
+        let points: [PlanPoint] = segments.flatMap { [$0.start, $0.end] }
+        return points.map { $0.rotated(rotation) }
     }
     public static var example: FloorPlan {
         let points = [PlanPoint(0,0), PlanPoint(4.5,0), PlanPoint(4.5,3.2), PlanPoint(2.7,4.4), PlanPoint(0,4.4)]
@@ -57,14 +64,39 @@ public struct SavedFloorPlan: Codable, Equatable, Identifiable, Sendable {
     public let localProject: String
     public let plan: FloorPlan
     public let capturedRoomData: Data?
-    public init(id: UUID = UUID(), createdAt: Date = Date(), name: String, localProject: String, plan: FloorPlan, capturedRoomData: Data? = nil) throws {
-        self.schemaVersion = 1; self.id = id; self.createdAt = createdAt; self.name = name.trimmingCharacters(in: .whitespacesAndNewlines); self.localProject = localProject.trimmingCharacters(in: .whitespacesAndNewlines); self.plan = plan; self.capturedRoomData = capturedRoomData
+    public let ownerID: String?
+    public let locationID: UUID?
+    public let revision: Int
+    public let objects: [PlanObject]
+    public init(id: UUID = UUID(), createdAt: Date = Date(), name: String, localProject: String, plan: FloorPlan, capturedRoomData: Data? = nil, ownerID: String? = nil, locationID: UUID? = nil, revision: Int = 0, objects: [PlanObject] = []) throws {
+        schemaVersion = 2; self.id = id; self.createdAt = createdAt
+        self.name = name.trimmingCharacters(in: .whitespacesAndNewlines)
+        self.localProject = localProject.trimmingCharacters(in: .whitespacesAndNewlines)
+        self.plan = plan; self.capturedRoomData = capturedRoomData
+        self.ownerID = ownerID; self.locationID = locationID; self.revision = revision; self.objects = objects
+        try validate()
+    }
+    private enum CodingKeys: String, CodingKey { case schemaVersion, id, createdAt, name, localProject, plan, capturedRoomData, ownerID, locationID, revision, objects }
+    public init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        schemaVersion = try c.decode(Int.self, forKey: .schemaVersion)
+        id = try c.decode(UUID.self, forKey: .id); createdAt = try c.decode(Date.self, forKey: .createdAt)
+        name = try c.decode(String.self, forKey: .name); localProject = try c.decode(String.self, forKey: .localProject)
+        plan = try c.decode(FloorPlan.self, forKey: .plan); capturedRoomData = try c.decodeIfPresent(Data.self, forKey: .capturedRoomData)
+        ownerID = try c.decodeIfPresent(String.self, forKey: .ownerID); locationID = try c.decodeIfPresent(UUID.self, forKey: .locationID)
+        revision = schemaVersion == 1 ? 0 : try c.decode(Int.self, forKey: .revision)
+        objects = schemaVersion == 1 ? [] : try c.decode([PlanObject].self, forKey: .objects)
         try validate()
     }
     public func validate() throws {
-        guard schemaVersion == 1, createdAt.timeIntervalSince1970.isFinite else { throw PlanError.invalidArchive }
+        guard [1,2].contains(schemaVersion), createdAt.timeIntervalSince1970.isFinite, revision >= 0, revision < Int.max else { throw PlanError.invalidArchive }
         guard !name.isEmpty, name.count <= 100, localProject.count <= 100 else { throw PlanError.invalidName }
+        guard (ownerID == nil) == (locationID == nil), ownerID == nil || ownerID!.range(of: "^user_[a-zA-Z0-9]{1,128}$", options: .regularExpression) != nil else { throw PlanError.invalidArchive }
+        guard objects.count <= 200, objects.allSatisfy(\.valid), Set(objects.map(\.id)).count == objects.count else { throw PlanError.invalidGeometry }
         if let data = capturedRoomData { guard plan.source == .sensor, !data.isEmpty, data.count <= 32_000_000 else { throw PlanError.invalidArchive } }
         try plan.validate()
+    }
+    public func hasSameSource(as other: SavedFloorPlan) -> Bool {
+        id == other.id && createdAt == other.createdAt && plan == other.plan && capturedRoomData == other.capturedRoomData && ownerID == other.ownerID && locationID == other.locationID
     }
 }

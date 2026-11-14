@@ -5,6 +5,7 @@ import { previewConfig } from '../scripts/preview-config.mjs';
 test('public preview stays HTTPS, with no wildcard navigation or native HTTP override', () => {
   const config = previewConfig();
   assert.equal(config.server.url, 'https://www.cinegenius.co/');
+  assert.equal(config.server.appStartPath, 'sign-in');
   assert.equal(config.server.cleartext, false);
   assert.deepEqual(config.server.allowNavigation, []);
   assert.equal(config.plugins.CapacitorHttp.enabled, false);

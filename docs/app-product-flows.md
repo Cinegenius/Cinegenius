@@ -148,3 +148,17 @@ Abnahme umfasst 320 CSS px, alle neun Sprachen, 44×44-Touchflächen, Tastatur,
 Safe Areas, echtes Zurück, Offline-/Fehlerfälle, Kontowechsel, Entzug von Rechten,
 Blockierungen und Ablauf an der 24-Stunden-Grenze. Produktivschaltung folgt erst
 auf einen eigenen Auftrag und die bestehenden Release-Prüfungen.
+
+## Konkretisierung: eigene Locations und einfacher Grundriss-Editor (14. November)
+
+Beim Öffnen startet die App am Anmeldeeinstieg; eine gültige Sitzung führt direkt
+weiter. Im Arbeitsplatz wählt man zuerst eine eigene bereits angelegte Location,
+dann einen Raum. Der Baukasten ergänzt Möbel, Strom, Wasser und Filmtechnik;
+zwei Finger bewegen/zoomen die Ansicht. Ein Finger bewegt Objekte. Maße, Drehung,
+Beschriftung und Notizen sind einfach bearbeitbar, Änderungen rückgängig machbar.
+Die Grundrisse bleiben lokal, aber an Konto und Location gebunden. Originalscans
+werden nicht überschrieben; 3D exportiert den Originalscan, PDF auch Ergänzungen.
+Die ältere kontounabhängige Bibliothek bleibt geschützt erhalten, wird jedoch
+nicht automatisch als Eigentum des aktuell angemeldeten Kontos übernommen.
+Umsetzung, Grenze der bestehenden Inseratsschnittstelle und Prüfstatus stehen in
+`docs/native-workplace-room-scanner.md`.

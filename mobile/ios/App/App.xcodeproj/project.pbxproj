@@ -27,6 +27,10 @@ FAA07A679618F1C39710D260 /* FloorPlan.swift in Sources */ = {isa = PBXBuildFile;
 256826E1CF4E0D3017A70A4A /* PlanArchive.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10FE1CE26C0871C21B85DA01; };
 1E720F6F297D2E1963DD2EA2 /* WorkplaceOriginPolicy.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8F5E52049C684138C1F9B0A8; };
 30B5F9DF6731CB4F42C10F4A = {isa = PBXBuildFile; fileRef = D1D4957F9F1EE1F401E7A795; };
+846372CB65C020075AA234A3 /* WorkplaceAccount.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51113553878448F50B6691CA; };
+70B793664957208A0ADDC079 /* PlanEditorCanvas.swift in Sources */ = {isa = PBXBuildFile; fileRef = 55F11FDC1CD45AB6FE83102A; };
+098E0D8C8AF874CFEE7BC262 /* PlanEditorViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BD8D8408539E2DFF1D4E90F; };
+4FB30EB370D5CC952DCC5413 /* PlanEditor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F4D83E513F672B221E4B3EC; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -60,6 +64,10 @@ BD8945379451B85F66B68DB0 = {isa = PBXFileReference; lastKnownFileType = text.pli
 F7D966A6331BF9A077C33C2E = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "nl"; path = "NativeStrings/nl.lproj/InfoPlist.strings"; sourceTree = "<group>"; };
 EE914327559CB62C95291B94 = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "nl-BE"; path = "NativeStrings/nl-BE.lproj/InfoPlist.strings"; sourceTree = "<group>"; };
 10C8C0315C2E71425AAC0FD9 = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "sv"; path = "NativeStrings/sv.lproj/InfoPlist.strings"; sourceTree = "<group>"; };
+51113553878448F50B6691CA /* WorkplaceAccount.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkplaceAccount.swift; sourceTree = "<group>"; };
+55F11FDC1CD45AB6FE83102A /* PlanEditorCanvas.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlanEditorCanvas.swift; sourceTree = "<group>"; };
+4BD8D8408539E2DFF1D4E90F /* PlanEditorViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlanEditorViews.swift; sourceTree = "<group>"; };
+7F4D83E513F672B221E4B3EC /* PlanEditor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlanEditor.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -110,14 +118,18 @@ D1D4957F9F1EE1F401E7A795,
 			path = App;
 			sourceTree = "<group>";
 		};
-CE7AFE3FBD3FF3961FD9C8CF = {isa = PBXGroup; children = (49B995C9B43CBD64C6E6AF0E /* PlanDrawing.swift */,
+CE7AFE3FBD3FF3961FD9C8CF = {isa = PBXGroup; children = (4BD8D8408539E2DFF1D4E90F,
+55F11FDC1CD45AB6FE83102A,
+51113553878448F50B6691CA,
+49B995C9B43CBD64C6E6AF0E /* PlanDrawing.swift */,
 195A161BBC16A26AD054662C /* PlanExports.swift */,
 3FB2ABFDDBD8A0DC6D8E9006 /* RoomCaptureController.swift */,
 E5666FD479473D90FAEF3EAA /* ScannerModel.swift */,
 9C104B73114686B17CC2333D /* ScannerStrings.swift */,
 82257E21E1E863ED75B6B79F /* WorkplaceEntry.swift */,
 27426F36F1C059B53BA566FD /* WorkplaceViews.swift */,); path = "RoomScanner"; sourceTree = "<group>"; };
-ADE3BB19191D0A33987FAE93 = {isa = PBXGroup; children = (F1AE8FE603570B9376B7599C /* FloorPlan.swift */,
+ADE3BB19191D0A33987FAE93 = {isa = PBXGroup; children = (7F4D83E513F672B221E4B3EC,
+F1AE8FE603570B9376B7599C /* FloorPlan.swift */,
 10FE1CE26C0871C21B85DA01 /* PlanArchive.swift */,
 8F5E52049C684138C1F9B0A8 /* WorkplaceOriginPolicy.swift */,); path = "../../RoomScannerCore/Sources/RoomScannerCore"; sourceTree = "<group>"; };
 /* End PBXGroup section */
@@ -202,6 +214,10 @@ ADE3BB19191D0A33987FAE93 = {isa = PBXGroup; children = (F1AE8FE603570B9376B7599C
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+4FB30EB370D5CC952DCC5413,
+098E0D8C8AF874CFEE7BC262,
+70B793664957208A0ADDC079,
+846372CB65C020075AA234A3,
 				504EC3081FED79650016851F /* AppDelegate.swift in Sources */,
 				9582B6832FE993A70072D4E8 /* SceneDelegate.swift in Sources */,
 07BF482F4FF948B37C3EEF6B /* PlanDrawing.swift in Sources */,

@@ -8,13 +8,29 @@ import WebKit
 
 class CineGeniusViewController: CAPBridgeViewController {
     private var loadingObservation: NSKeyValueObservation?
+    private var urlObservation: NSKeyValueObservation?
+    var suspendedWorkplaces: [String:UIViewController] = [:]
     var isOpeningWorkplace = false
+    private var accountNavigationDelegate: CineGeniusNavigationDelegate?
     weak var workplaceContentController: WKUserContentController?
     var requestsWorkplace = ProcessInfo.processInfo.arguments.contains("--cinegenius-workplace") || ProcessInfo.processInfo.arguments.contains("--cinegenius-room-scanner")
 
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-        if requestsWorkplace { requestsWorkplace = false; openWorkplace() }
+        if requestsWorkplace, webView?.isLoading == false, webView?.url != nil { requestsWorkplace = false; openWorkplace() }
+    }
+
+    override func webViewConfiguration(for instanceConfiguration: InstanceConfiguration) -> WKWebViewConfiguration {
+        let configuration = super.webViewConfiguration(for: instanceConfiguration)
+        configuration.websiteDataStore = .default()
+        return configuration
+    }
+
+    func resumeRequestedWorkplace() {
+        guard requestsWorkplace, !isOpeningWorkplace, let webView, !webView.isLoading,
+              let url = webView.url, url.host == bridge?.config.serverURL.host,
+              !url.path.hasPrefix("/sign-in"), !url.path.hasPrefix("/sign-up"), url.path != "/offline.html" else { return }
+        requestsWorkplace = false; openWorkplace()
     }
 
     private func placeWebViewInsideSafeArea() {
@@ -41,9 +57,17 @@ class CineGeniusViewController: CAPBridgeViewController {
         super.capacitorDidLoad()
         placeWebViewInsideSafeArea()
         installWorkplaceMenu()
+        if let original = webView?.navigationDelegate {
+            let delegate = CineGeniusNavigationDelegate(original: original)
+            accountNavigationDelegate = delegate; webView?.navigationDelegate = delegate
+        }
+        urlObservation = webView?.observe(\.url, options:[.new]) { [weak self] _,_ in
+            DispatchQueue.main.async { self?.resumeRequestedWorkplace() }
+        }
         webView?.allowsBackForwardNavigationGestures = true
         statusBarStyle = .lightContent
         loadingObservation = webView?.observe(\.isLoading, options: [.new]) { [weak self] view, _ in
+            if !view.isLoading { self?.resumeRequestedWorkplace() }
             guard !view.isLoading, let self,
                   let local = self.bridge?.config.localURL,
                   let url = view.url,

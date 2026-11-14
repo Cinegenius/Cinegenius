@@ -21,12 +21,12 @@ final class WorkplaceScriptHandler: NSObject, WKScriptMessageHandler {
 @available(iOS 16.0, *)
 final class WorkplaceHostingController: UIHostingController<NativeWorkplaceView> {
     let model: ScannerModel
-    init(strings: ScannerStrings) {
-        model = ScannerModel(strings:strings)
+    init(strings: ScannerStrings, account: WorkplaceAccount, access: @escaping () async throws -> WorkplaceAccount) {
+        model = ScannerModel(strings:strings, account:account, access:access)
         super.init(rootView:NativeWorkplaceView(model:model,strings:strings))
         overrideUserInterfaceStyle = .dark
         modalPresentationStyle = .fullScreen; isModalInPresentation = true
-        model.onClose = { [weak self] in self?.dismiss(animated:true) }
+        model.onClose = { [weak self] in self?.presentingViewController?.dismiss(animated:true) }
     }
     required init?(coder: NSCoder) { return nil }
     override var preferredStatusBarStyle: UIStatusBarStyle { .lightContent }
@@ -45,22 +45,55 @@ extension CineGeniusViewController {
         guard !isOpeningWorkplace, presentedViewController == nil, viewIfLoaded?.window != nil else { return }
         isOpeningWorkplace = true
         let strings = ScannerStrings(preference:locale)
-        func present() {
-            self.isOpeningWorkplace = false
-            guard self.presentedViewController == nil, self.viewIfLoaded?.window != nil else { return }
-            if #available(iOS 16.0, *) { self.present(WorkplaceHostingController(strings:strings),animated:true) }
-            else {
-                let alert = UIAlertController(title:strings.text("title"),message:strings.text("iosRequired"),preferredStyle:.alert)
-                alert.addAction(UIAlertAction(title:strings.text("done"),style:.cancel)); self.present(alert,animated:true)
-            }
-        }
-        guard locale == nil, let webView, let configured = bridge?.config.serverURL, let policy = WorkplaceOriginPolicy(configured:configured),
-              policy.permits(mainFrame:true,request:webView.url,current:webView.url,securityScheme:configured.scheme ?? "",securityHost:configured.host ?? "",securityPort:configured.port ?? 0) else { present(); return }
-        // CookieStore.get reads only this named public preference. No session cookie enumeration.
+        let progress = UIActivityIndicatorView(style:.large)
+        progress.color = UIColor(Color.lime); progress.translatesAutoresizingMaskIntoConstraints = false
+        progress.accessibilityLabel = strings.text("accountLoading")
+        progress.backgroundColor = UIColor.black.withAlphaComponent(0.8); progress.layer.cornerRadius = 16
+        view.addSubview(progress)
+        NSLayoutConstraint.activate([progress.centerXAnchor.constraint(equalTo:view.centerXAnchor), progress.centerYAnchor.constraint(equalTo:view.centerYAnchor), progress.widthAnchor.constraint(equalToConstant:80), progress.heightAnchor.constraint(equalToConstant:80)])
+        progress.startAnimating()
         Task { @MainActor in
-            let value = try? await webView.callAsyncJavaScript("if (!window.cookieStore) return null; const item = await window.cookieStore.get('cg_locale'); return item ? item.value : null;",arguments:[:],in:nil,contentWorld:.page)
-            if let locale = value as? String, strings.valid(locale) != nil { strings.select(preference:locale) }
-            present()
+            defer { isOpeningWorkplace = false; progress.removeFromSuperview() }
+            do {
+                let account = try await fetchWorkplaceAccount()
+                if locale == nil, let webView {
+                    let preference = try? await webView.callAsyncJavaScript("if (!window.cookieStore) return null; const item = await window.cookieStore.get('cg_locale'); return item ? item.value : null;",arguments:[:],in:nil,contentWorld:.world(name:"CineGeniusPrivateAccount"))
+                    if let preference = preference as? String, strings.valid(preference) != nil { strings.select(preference:preference) }
+                }
+                guard presentedViewController == nil, viewIfLoaded?.window != nil else { return }
+                if #available(iOS 16.0, *) {
+                    if let suspended = suspendedWorkplaces.removeValue(forKey:account.accountID) as? WorkplaceHostingController {
+                        present(suspended,animated:true)
+                        return
+                    }
+                    let host = WorkplaceHostingController(strings:strings,account:account) { [weak self] in
+                        guard let self else { throw WorkplaceAccessError.accountUnavailable }
+                        return try await self.fetchWorkplaceAccount()
+                    }
+                    host.model.onSignIn = { [weak self, weak host] in
+                        guard let self, let host else { return }
+                        self.suspendedWorkplaces[host.model.accountID] = host; self.requestsWorkplace = true
+                        self.dismiss(animated:true) { self.showSignIn() }
+                    }
+                    host.model.onSuspend = { [weak self, weak host] in
+                        guard let self, let host else { return }
+                        self.suspendedWorkplaces[host.model.accountID] = host; self.requestsWorkplace = false
+                        self.dismiss(animated:true)
+                    }
+                    present(host,animated:true)
+                } else {
+                    let alert = UIAlertController(title:strings.text("workplaceTitle"),message:strings.text("iosRequired"),preferredStyle:.alert)
+                    alert.addAction(UIAlertAction(title:strings.text("done"),style:.cancel)); present(alert,animated:true)
+                }
+            } catch {
+                if error as? WorkplaceAccessError == .signInRequired {
+                    requestsWorkplace = true; showSignIn(); return
+                }
+                let alert = UIAlertController(title:strings.text("workplaceTitle"),message:strings.text((error as? WorkplaceAccessError)?.rawValue ?? "accountUnavailable"),preferredStyle:.alert)
+                alert.addAction(UIAlertAction(title:strings.text("retry"),style:.default) { [weak self] _ in self?.openWorkplace(locale:locale) })
+                alert.addAction(UIAlertAction(title:strings.text("cancel"),style:.cancel))
+                if presentedViewController == nil { present(alert,animated:true) }
+            }
         }
     }
     func lockWorkplace() {

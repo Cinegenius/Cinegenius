@@ -29,7 +29,7 @@ for (const locale of SUPPORTED_LOCALES) {
 
 let html = await readFile(new URL('src/offline.html', root), 'utf8');
 for (const [key, value] of Object.entries(fallback)) html = html.replaceAll(`{{${key}}}`, escapeHtml(value));
-html = html.replaceAll('{{url}}', escapeHtml(config.server.url));
+html = html.replaceAll('{{url}}', escapeHtml(new URL(config.server.appStartPath, config.server.url).href));
 await writeFile(new URL('offline.html', output), html);
 await writeFile(new URL('index.html', output), html);
 for (const name of ['offline.css', 'offline.js']) {

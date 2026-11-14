@@ -136,3 +136,14 @@ After the explicitly requested current website release, this chat works on the
 app only. Future app changes reach the public website only after a new explicit
 request from Markus. Keep app development and website publication separate;
 see [the recorded decision](../docs/app-product-flows.md#arbeitsbereich-dieses-app-chats).
+
+## Current app-only extension (14 November 2026)
+
+The new draft starts at `/sign-in`, restores valid WebKit sessions and binds
+workplace rooms to existing locations owned by the signed-in account. The native
+editor adds two-finger pan/pinch, an object/utility catalog, dimensions, notes,
+undo/redo and PDF annotations. The original scan remains unchanged.
+The earlier account-independent archive description applies to v1 only; those
+files remain untouched. See `../docs/native-workplace-room-scanner.md` for current
+behavior and `../docs/test-reports/native-floorplan-editor-2026-11-14.md` for checks
+and the outstanding Xcode/device update. Never uninstall the current app to sync.

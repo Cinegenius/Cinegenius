@@ -20,3 +20,11 @@ public struct WorkplaceOriginPolicy {
         return mainFrame && matches(request) && matches(current) && securityScheme == scheme && securityHost == host && (securityPort == 0 ? (scheme == "https" ? 443 : 80) : securityPort) == port
     }
 }
+
+public enum AppAuthenticationPolicy {
+    public static func permitsClerkHandshake(_ url: URL, mainFrame: Bool) -> Bool {
+        mainFrame && url.scheme == "https" && url.host == "clerk.cinegenius.co"
+            && (url.port == nil || url.port == 443) && url.user == nil && url.password == nil
+            && url.path == "/v1/client/handshake"
+    }
+}

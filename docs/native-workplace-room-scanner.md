@@ -1,126 +1,110 @@
-# Nativer Arbeitsplatz: Locations und Grundrisse
+# Nativer Arbeitsplatz: Anmeldung, Locations und Grundrisse
 
-Auftrag vom 14. November 2026: Der App-Bereich heißt **Arbeitsplatz** und enthält
-Werkzeuge nach Abteilungen. Die erste Abteilung ist **Locations**, ihr erstes
-Werkzeug sind **Grundrisse** mit einem neu entwickelten nativen Raumscanner.
-Das vorgesehene reale Aufnahmegerät ist Markus' iPhone 15 Pro.
+App-Auftrag, 14. November 2026: **Arbeitsplatz → Locations → eigene angelegte
+Location → Räume/Grundrisse**. Markus möchte einfache Raumplanung, zwei Finger
+zum Verschieben, einen Bausteinkatalog und markierbare Strom-/Wasseranschlüsse
+sowie Sicherungskästen. Nur eigene bereits angelegte Locations sind bearbeitbar.
+Die App soll beim Start die Anmeldung zeigen und gültige Sitzungen wiederverwenden.
+Die Website wird durch diesen Auftrag nicht veröffentlicht oder umgestaltet.
 
-## Bedienung und Grenzen
+## Anmeldung und Kontogrenze
 
-Arbeitsplatz → Locations → Grundrisse führt zur lokalen Planübersicht. Von dort
-werden ein Raum gescannt, die erkannten Wände und Maße geprüft, ein Name und
-optional ein lokales Projekt-/Location-Label angegeben und der Plan gespeichert.
-Ein ausdrücklich gekennzeichneter Beispielraum erlaubt die Ansicht auch im
-Simulator. Dieses Beispiel darf weder in der Bibliothek noch im PDF als echte
-Aufnahme erscheinen. Weitere Abteilungen werden erst mit nutzbaren Funktionen
-ergänzt. Die fünf öffentlichen Links unten und der vorhandene Genie bleiben.
+Die Debug-App startet über `server.appStartPath` auf `/sign-in`. Die vorhandene
+Serverseite leitet eine gültige Sitzung direkt weiter, sonst erscheint das
+vorhandene Anmeldeformular inklusive Wiederherstellung und echter MFA. WebKit
+verwendet seinen dauerhaften Datenspeicher; Passwörter oder Sitzungstokens werden
+nicht in App-Dateien, UserDefaults oder eine eigene JavaScript-Speicherung kopiert.
+Abmeldung, Widerruf und Ablauf der Sitzung bleiben wirksam.
 
-Die Erfassung verwendet Apples **RoomPlan** mit Kamera und LiDAR, ohne den alten
-Webscanner. Vor einer Aufnahme werden OS-Version, `RoomCaptureSession.isSupported`
-und Kameraberechtigung geprüft. Kamera und Sensorerfassung starten erst auf
-ausdrücklichen Aufruf. Ein Simulator kann Bedienung und Geometrieverarbeitung,
-aber keine tatsächliche Raumerfassung oder Messgenauigkeit nachweisen.
+Der bisherige Capacitor-Standard öffnet fremde Hauptframe-Ziele im Systembrowser.
+Eine enge Ausnahme hält ausschließlich HTTPS `clerk.cinegenius.co`, Standardport,
+Pfad `/v1/client/handshake`, ohne URL-Zugangsdaten, im selben WebView. Alle anderen
+Entscheidungen und Navigationsereignisse gehen an den ursprünglichen Delegate.
+Die Ausnahme erweitert nicht den Origin-Schutz des Arbeitsplatz-Handlers. Der
+Handshake ist eine im Quellcode belegte mögliche Fehlerursache; der konkrete
+Anmeldefehler auf Markus' iPhone ist damit noch nicht als behoben nachgewiesen.
 
-Wände werden anhand ihrer räumlichen Lage und Länge in die X/Z-Ebene projiziert;
-Türen, Fenster und Öffnungen bleiben unterscheidbar. Ein Begrenzungsrechteck ist
-keine Raumfläche. Maße sind Sensorschätzungen, kein vermessungstechnischer
-Nachweis. Für wichtige Produktionsmaße ist die Kontrolle vor Ort erforderlich.
+Alle nativen Einstiege einschließlich Xcode-Startargument und Schnellaktion
+prüfen nun das CineGenius-Konto. `workplace-account.js` wird nur nativ in einem
+isolierten `WKContentWorld` ausgeführt. Es liest über gleichursprüngliche,
+authentifizierte GETs `/api/responsible-person`, `/api/listings?mine=true` und
+erneut die Kontoidentität. Nur `type=location` mit `user_id` der bestätigten
+Identität wird projiziert. Firmenangebote anderer Ersteller werden auch bei
+allgemeiner Bearbeitungsrolle nicht als eigene übernommen. Fremde Kontoangaben
+in einer Webnachricht werden nicht angenommen. Raumdaten gelangen niemals ins
+WebView. Fehler, Weiterleitungen, Kontowechsel und ungültige Antworten sperren
+Zugriff; ein Fehler ist keine leere oder erfolgreich geladene Bibliothek.
 
-## Private Speicherung
+Die bestehende Inserats-Schnittstelle liefert maximal 200 Datensätze. Bei dieser
+Grenze zeigt die App ausdrücklich an, dass ältere Locations fehlen können. Ein
+späterer vollständiger, paginierter Eigentümer-Endpunkt gehört in eine mit WEB
+CODEX abgestimmte Backendänderung. Diese Fassung behauptet keine Vollständigkeit
+für Konten oberhalb des bestehenden Limits.
 
-Die erste native Fassung arbeitet **lokal auf dem Gerät und unabhängig vom
-CineGenius-Konto**. Es gibt keine automatische Veröffentlichung, keinen Upload,
-keine Kontosynchronisierung und kein Cloudbackup. Ein lokales Projektlabel
-stellt keine Verbindung zu einem Online-Projekt her. Die private Bibliothek
-erfordert die Geräteentsperrung; bei einem Hintergrundwechsel wird sie gesperrt.
+## Bedienung
 
-Gespeicherte Pläne und vorhandene erfasste Quelldaten gehören in atomar
-geschriebene, geschützte Dateien außerhalb einer öffentlichen Dateifreigabe und
-werden von Gerätesicherungen ausgeschlossen. Lade- oder Schreibfehler dürfen
-bestehende Daten nicht überschreiben. Löschen braucht eine ausdrückliche
-Bestätigung. Export ist eine eigene Aktion und erstellt eine vom Nutzer
-weitergegebene Kopie; bereits exportierte Kopien werden durch lokales Löschen
-nicht zurückgerufen. Die App zu löschen entfernt auch ihre lokalen Daten.
+- Eigene Location auswählen, darin einen Raum scannen oder ein Rechteck anhand
+  eigener Maße anlegen. Beispiele und manuelle Räume behalten eigene Kennzeichen.
+- Im großen Editor bewegen genau zwei Finger den Plan; Pinch zoomt. Ein Finger
+  wählt und verschiebt einen Baustein. Die Ansicht verändert keine Raummaße.
+- Katalog: Möbel, Strom, Wasser, Filmtechnik. Enthalten sind unter anderem
+  Steckdosen, Drehstromanschluss, Schalter, Sicherungskasten, Warm-/Kaltwasser,
+  Abfluss, Waschbecken, Toilette, Kamera und Filmleuchte.
+- Breite/Tiefe, X/Z-Position, Drehung, Beschriftung und Notiz lassen sich bearbeiten.
+  Eine Objektliste ermöglicht die Auswahl ohne präzises Treffen kleiner Symbole.
+  Duplizieren, Drehen, Entfernen und 50 Schritte Rückgängig/Wiederholen sind lokal.
+- Originalwände und RoomPlan-Quelldaten werden durch den Baukasten nicht verändert.
+  Manuelle Raumgeometrie ist zunächst ein Rechteck; beliebige Wandbearbeitung und
+  das räumliche Zusammenfügen mehrerer Scans sind nicht implementiert.
+- PDF enthält die Bausteine, Location-Bezeichnung und eine Liste mit Maßen/Notizen.
+  Der 3D-Export ist ausdrücklich der **Originalscan**, ohne die 2D-Ergänzungen.
 
-## Native Einbindung während der Entwicklung
+Standardgrößen sind anpassbare Planungshilfen. Anschlüsse sind Positionsmarker,
+keine Schalt-, Leitungs- oder Sicherheitsberechnung. Reale Maße/Anschlüsse müssen
+vor Ort geprüft werden. Es wird keine Fläche aus einem Begrenzungsrechteck erfunden.
 
-Die bestehende App ist weiterhin eine Debug-Vorschau, deren Webansicht die
-veröffentlichte Website lädt. Die neue native Funktion ist über das eigene
-Xcode-Schema **CineGenius Arbeitsplatz**, den Startparameter
-`--cinegenius-workplace` und die native Schnellaktion am App-Symbol erreichbar.
+## Private Dateien und Wiederherstellung
 
-Für den gewünschten Einstieg im bisherigen Menü wird **nur in dieser App**
-`mobile/src/workplace-menu.js` als gebündeltes Hauptframe-Skript geladen. Es
-ersetzt ausschließlich die erkannte deaktivierte KI-Zeile innerhalb
-`#site-navigation-menu` durch **Arbeitsplatz / Locations**. Ohne Native-Handler,
-bei unbekannter Origin, in eingebetteten Frames und bei nicht passender
-Menüstruktur bleibt die Seite unverändert. Die native Seite überprüft Frame und
-Origin unabhängig. Die Nachricht enthält nur Aktion und Sprachcode; keine
-Scan-Daten, Dateipfade, Sitzungsinformationen oder Kamera-Erlaubnisse.
+Pläne bleiben ausschließlich lokal, ohne Upload oder Cloudbackup. Neue Dateien
+liegen in `CineGeniusAccountFloorPlans/<SHA256(accountID)>/<UUID>.json` und enthalten
+explizit Eigentümer und Location-ID. Vor Öffnen, Aufnahme, Speichern, Löschen und
+Export werden Konto/Location erneut geprüft. Geräteauthentifizierung und
+FileProtection.complete bleiben zusätzliche Schutzschichten. Beim Hintergrund-
+wechsel werden Listen verborgen und Pläne samt Editorzustand hinter der Sperre
+gehalten. Während einer erneuten Anmeldung kann der laufende Entwurf kontogebunden
+im Speicher bleiben; das ist keine Wiederherstellungsgarantie nach Prozessende.
 
-Ein Tap öffnet den nativen Bereich. `dialog.close()` nutzt das vorhandene
-React-Cleanup, ohne künstliche Browser-History. Die native Schnellaktion bleibt
-ein zusätzlicher Einstieg, falls eine zukünftige Website-Struktur nicht mehr
-zum begrenzten Adapter passt. Dieser Adapter ist eine Übergangslösung der
-Remote-Vorschau und muss beim endgültigen App-Verpackungskonzept neu bewertet
-werden. Er ist keine Website-Veröffentlichung.
+Schema 2 enthält Bausteine und Revisionsnummer. Updates sind atomar und prüfen
+den erwarteten bisherigen Datensatz. Wiederholung desselben Ergebnisses ist
+idempotent, konkurrierende Änderungen schlagen fehl. Quelle, Eigentümer,
+Location und Erstellungszeit dürfen durch einen Editor-Update nicht wechseln.
 
-## Sprachen und Vorbereitung
+Schema 1 bleibt lesbar. Alte ungebundene Dateien in
+`CineGeniusPrivateFloorPlans` bleiben unangetastet und werden keinem gerade
+angemeldeten Konto automatisch zugewiesen. Die neue Kontobibliothek zeigt sie
+nicht als eigene an. Eine bewusst bestätigte Zuordnung/Wiederherstellungsfunktion
+für diese Altdateien ist noch offen. Die App niemals zur Aktualisierung löschen.
 
-Alle Texte kommen aus `NativeRoomScanner` in den vorhandenen neun
-`messages/*.json`-Katalogen. `mobile/scripts/native-resources.mjs` erzeugt beim
-üblichen `prepare:preview`:
+## Design und Quellen
 
-- `www/native-room-scanner/{locale}.json` sowie die zentrale Sprachliste;
-- das auf die konfigurierte Origin begrenzte `www/workplace-menu.js`;
-- native `InfoPlist.strings` für Kamera- und Face-ID-Berechtigung.
+CineGenius-Dunkelgestaltung und Lime-Akzent, mindestens 44pt Bedienflächen,
+sichere Bereiche, normale Navigation, scrollbare Formulare und zentrale neun
+Sprachkataloge bleiben maßgeblich. Es entsteht keine zweite öffentliche Fußleiste.
+Der Menüadapter bleibt auf die vorhandene KI-Zeile beschränkt, Genie bleibt erhalten.
 
-Diese Dateien werden generiert; es gibt keine separat gepflegten Übersetzungen
-im Swift-Code. Die bestätigte App-Sprachwahl hat Vorrang vor der Gerätesprache.
-Änderungen im Web-Chat werden mit geprüftem Commit und Live-Status an diesen
-App-Stand weitergegeben; native Quellen und Sprachschlüssel bleiben erhalten.
+Orientierung: [magicplan-Menüstruktur](https://help.magicplan.app/the-magicplan-menu-structure),
+[magicplan-Objekte](https://help.magicplan.app/add-furniture-objects),
+[RoomSketcher-Anschlussplanung](https://help.roomsketcher.com/hc/en-us/articles/12794506158493-How-Do-I-Create-an-Electrical-Plan-in-RoomSketcher).
+Eigene Gestaltung und Vektorsymbole; keine kopierten Produktassets.
 
-## Prüfungen
+Technische Referenzen: [Apple-Pan-Gesten](https://developer.apple.com/documentation/uikit/handling-pan-gestures),
+[Apple-RoomPlan](https://developer.apple.com/augmented-reality/roomplan/),
+[Clerk-Cookies](https://clerk.com/docs/guides/how-clerk-works/cookies).
 
-Die fünf Node-Konfigurations-/Katalogtests und die allgemeine Katalogprüfung
-sichern vorhandene Origins und identische native Texte/Platzhalter ab.
-`mobile/tests/workplace-menu.browser.mjs` läuft mit der bestehenden Playwright-
-Werkzeugkette (`PLAYWRIGHT_MODULE` kann deren Modulpfad angeben). Es prüft die
-neun Sprachen, Tastatur/Tap, Sprachwechsel, fehlende native Fähigkeiten,
-Origin-Verwechslungen, Subframes und die unveränderte History.
+## Prüfstatus
 
-Zusätzlich wurden die tatsächlichen öffentlichen Menüansichten bei 320 px in
-neun abgemeldeten Browserkontexten mit dem App-Adapter geprüft. Dabei wurden nur
-öffentliche Seiten gelesen; App-Starts wurden als Bridge-Aufrufe aufgezeichnet.
-Das ersetzt keine native WKWebView-Prüfung. Der native Build, Geometrie-/Archiv-
-Tests und Simulator-Ergebnisse werden im zugehörigen Mac-Prüfbericht festgehalten.
-Echte LiDAR-Erfassung, Kameraerlaubnis und Messvergleich auf dem iPhone 15 Pro
-bleiben bis zu einem tatsächlichen Gerätetest ausdrücklich offen.
-
-Artefakte: `/srv/cinegenius/handoffs/20261114-native-room-scanner/`.
-
-## Installation auf dem Test-iPhone
-
-Markus möchte die Funktion auf seinem iPhone 15 Pro testen. Auf seine Nachfrage
-zu TestFlight wurde die bestehende Mitgliedschaft geprüft; er hat ausdrücklich
-bestätigt, dass noch keine Apple-Developer-Program-Mitgliedschaft besteht. Es
-wird keine kostenpflichtige Anmeldung begonnen. Der aktuelle Weg bleibt die
-kostenlose Geräteinstallation mit Xcodes Personal Team. Dafür sind die Anmeldung
-mit der bestehenden Apple-ID in Xcode, ein verbundenes/vertrautes iPhone und
-gegebenenfalls die vom iPhone verlangte Entwicklermodus-Freigabe erforderlich.
-Diese persönlichen Anmeldungen/Gerätebestätigungen nimmt Markus selbst vor.
-
-Apple begrenzt kostenlose Geräteprofile auf sieben Tage; danach muss die Test-App
-erneut gebaut und installiert werden. Den Datencontainer dabei erhalten, keine
-App oder gespeicherten Pläne zur Behebung von Signierproblemen löschen.
-Ein künftiger TestFlight-Upload braucht eine aktive Mitgliedschaft, passende
-App-Store-Connect-Rechte und eine überprüfte Release-Architektur. Die bestehende
-Sperre gegen Veröffentlichung der Remote-Content-Debug-Vorschau bleibt erhalten.
-
-[Apple: Personal Team und Gerätetests](https://developer.apple.com/help/account/basics/about-your-developer-account)
-
-Apple-Quellen:
-
-- [RoomPlan](https://developer.apple.com/augmented-reality/roomplan/)
-- [Geräteunterstützung](https://developer.apple.com/documentation/RoomPlan/RoomCaptureSession/isSupported)
-- [RoomCaptureView](https://developer.apple.com/documentation/RoomPlan/RoomCaptureView)
+Siehe `docs/test-reports/native-floorplan-editor-2026-11-14.md`.
+Die zuvor installierte Version auf Markus' iPhone 15 Pro ist bestätigt; diese
+Erweiterung ist noch nicht als Xcode-Build oder Geräteupdate bestätigt. Linux-
+Kernprüfungen und Swift-Syntaxprüfung ersetzen keine UIKit-/SwiftUI-Kompilierung,
+kein echtes Multitouch und keine Anmeldung im iPhone-WebView.

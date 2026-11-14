@@ -20,10 +20,18 @@ struct NativeWorkplaceView: View {
             .navigationDestination(for:Route.self) { route in
                 switch route {
                 case .locations:
-                    ScrollView { VStack(alignment:.leading,spacing:24) {
-                        Text(strings.text("locationsDescription")).font(.title2)
-                        NavigationLink(value:Route.floorPlans) { card("floorPlansTitle","floorPlansDescription",icon:"square.dashed") }
-                    }.padding(20) }.navigationTitle(strings.text("locationsTitle"))
+                    List {
+                        Text(strings.text("chooseOwnLocation")).foregroundColor(.secondary)
+                        if model.locations.isEmpty { Text(strings.text("noOwnLocations")) }
+                        ForEach(model.locations) { location in
+                            Button { Task { if await model.selectLocation(location) { path.append(.floorPlans) } } } label: {
+                                VStack(alignment:.leading,spacing:6) { Text(location.title).font(.headline); if !location.city.isEmpty { Text(location.city).font(.subheadline).foregroundColor(.secondary) } }.frame(minHeight:44)
+                            }.disabled(model.busy)
+                        }
+                        if model.locationsLimited { Text(strings.text("locationsLimited")).font(.footnote) }
+                        if model.legacyArchiveExists { Text(strings.text("legacyPlansPreserved")).font(.footnote).foregroundColor(.secondary) }
+                        Button(strings.text("retry")) { Task { _ = await model.refreshAccount() } }.frame(minHeight:44)
+                    }.navigationTitle(strings.text("locationsTitle"))
                         .toolbar { ToolbarItem(placement:.navigationBarTrailing) { Button(strings.text("close")) { model.request(.close) }.frame(minWidth:44,minHeight:44).disabled(model.busy) } }
                 case .floorPlans:
                     FloorPlansScreen(model:model,strings:strings).navigationTitle(strings.text("floorPlansTitle"))
@@ -44,14 +52,14 @@ struct NativeWorkplaceView: View {
             Button(strings.text("discard"),role:.destructive) { if let pending = model.pending { model.perform(pending) } }
             Button(strings.text("keepEditing"),role:.cancel) { model.pending = nil }
         } message: { Text(strings.text("discardBody")) }
-        .alert(strings.text(model.notice == "saveSuccess" ? "saveSuccess" : "errorTitle"),isPresented:Binding(get:{model.notice != nil},set:{if !$0 {model.notice = nil}})) {
+        .alert(strings.text(model.notice == "saveSuccess" ? "saveSuccess" : "errorTitle"),isPresented:Binding(get:{model.notice != nil && !model.editorPresented},set:{if !$0 {model.notice = nil}})) {
             if model.cameraDenied { Button(strings.text("openSettings")) { if let url = URL(string:UIApplication.openSettingsURLString) { UIApplication.shared.open(url) } } }
             Button(strings.text("done"),role:.cancel) { model.notice = nil }
         } message: { Text(strings.text(model.notice == "saveSuccess" ? "localPrivacy" : model.notice ?? "errorTitle")) }
         .sheet(item:$model.share,onDismiss:{model.finishedSharing()}) { share in
             PlanShareSheet(share:share) { model.finishedSharing() }
         }
-        .overlay { if model.covered { Color.black.ignoresSafeArea().accessibilityLabel(strings.text("locked")) } }
+        .overlay { WorkplaceLockCover(model:model,strings:strings) }
     }
     private func card(_ title: String, _ description: String, icon: String) -> some View {
         HStack(alignment:.top,spacing:18) {
@@ -69,6 +77,8 @@ struct FloorPlansScreen: View {
     @State private var exportNotice = false
     @State private var exportModel = false
     @State private var deletion: SavedFloorPlan?
+    @State private var manual = false
+    @State private var viewport = PlanViewport()
     var body: some View {
         ScrollView {
             VStack(alignment:.leading,spacing:20) {
@@ -90,13 +100,15 @@ struct FloorPlansScreen: View {
             }.padding(20)
         }.scrollDismissesKeyboard(.interactively)
         .confirmationDialog(strings.text("exportNotice"),isPresented:$exportNotice,titleVisibility:.visible) {
-            Button(strings.text("confirmExport")) { model.export(model:exportModel) }
+            Button(strings.text("confirmExport")) { Task { await model.export(model:exportModel) } }
             Button(strings.text("cancel"),role:.cancel) {}
         }
         .alert(strings.text("deleteTitle"),isPresented:Binding(get:{deletion != nil},set:{if !$0 {deletion = nil}}),presenting:deletion) { record in
             Button(strings.text("confirmDelete"),role:.destructive) { Task { await model.deleteConfirmed(record) } }
             Button(strings.text("cancel"),role:.cancel) {}
         } message: { _ in Text(strings.text("deleteBody")) }
+        .fullScreenCover(isPresented:$model.editorPresented) { PlanEditorView(model:model,strings:strings) }
+        .sheet(isPresented:$manual) { ManualRoomForm(model:model,strings:strings) }
         .toolbar { ToolbarItemGroup(placement:.keyboard) { Spacer(); Button(strings.text("done")) { UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder),to:nil,from:nil,for:nil) } } }
     }
     private var landing: some View {
@@ -106,6 +118,7 @@ struct FloorPlansScreen: View {
                 action(model.captureState == .requesting ? "loading" : "startScan") { Task { await model.startCapture() } }.disabled(model.captureState != .idle)
                 if model.cameraDenied { Button(strings.text("openSettings")) { if let url = URL(string:UIApplication.openSettingsURLString) { UIApplication.shared.open(url) } }.frame(minWidth:44,minHeight:44) }
             } else { Text(strings.text("unsupportedBody")).foregroundColor(.secondary) }
+            action("manualRoom") { manual = true }
             action("showSample") { model.example() }
             Divider()
             Text(strings.text("savedPlans")).font(.title2.bold())
@@ -117,7 +130,7 @@ struct FloorPlansScreen: View {
                 if model.plans.isEmpty { Text(strings.text("emptyTitle")).font(.headline); Text(strings.text("emptyBody")).foregroundColor(.secondary) }
                 ForEach(model.plans) { plan in
                     HStack {
-                        Button { model.viewSaved(plan) } label: {
+                        Button { Task { if await model.refreshAccount() { model.viewSaved(plan) } } } label: {
                             VStack(alignment:.leading,spacing:6) {
                                 Text(plan.name).font(.headline)
                                 if plan.plan.source == .example { Text(strings.text("sampleBadge")).font(.caption.bold()).foregroundColor(.lime) }
@@ -139,19 +152,25 @@ struct FloorPlansScreen: View {
                 Text(strings.text("sampleBadge")).font(.headline).foregroundColor(.lime)
                 Text(strings.text("sampleBody")).foregroundColor(.secondary)
             }
-            Text(strings.text("measurementNotice")).font(.footnote).foregroundColor(.secondary)
-            FloorPlanCanvas(plan:record.plan,strings:strings)
+            Text(strings.text(record.plan.source == .sensor ? "measurementNotice" : "objectPlanningNotice")).font(.footnote).foregroundColor(.secondary)
+            if record.plan.source == .manual { Text(strings.text("manualBadge")).font(.headline).foregroundColor(.lime) }
+            PlanEditorCanvas(plan:record.plan,objects:model.history.objects,viewport:$viewport,selection:$model.selectedObjectID,strings:strings,editable:false,commit:{ _ in }).frame(height:300)
+            action("editPlan") { model.editorPresented = true }
+            ForEach(model.history.objects) { object in
+                Text(object.label.isEmpty ? strings.text(object.kind.rawValue) : object.label).font(.caption)
+            }
             Text(strings.summary(record.plan)).font(.subheadline)
             Group {
                 Text(strings.text("roomName")).font(.headline)
                 TextField(strings.text("roomNamePlaceholder"),text:$model.name).textFieldStyle(.roundedBorder).accessibilityLabel(strings.text("roomName"))
                 Text(strings.text("projectName")).font(.headline)
                 TextField(strings.text("projectNamePlaceholder"),text:$model.project).textFieldStyle(.roundedBorder).accessibilityLabel(strings.text("projectName"))
-            }.disabled(model.saved || model.busy)
+            }.disabled(model.busy)
+            Text(model.selectedLocation?.title ?? "").font(.headline)
             Text(strings.text("localProjectNote")).font(.footnote).foregroundColor(.secondary)
             if !model.saved { action(model.busy ? "saving" : record.plan.source == .example ? "sampleSave" : "save") { Task { await model.save() } }.disabled(model.busy) }
             action("exportPDF") { exportModel = false; exportNotice = true }
-            if model.canExportModel { action("exportModel") { exportModel = true; exportNotice = true } }
+            if model.canExportModel { action("exportOriginalModel") { exportModel = true; exportNotice = true } }
             Text(strings.text("measurements")).font(.headline)
             ForEach(Array(record.plan.walls.enumerated()),id:\.element.id) { i,wall in
                 Text(strings.text("wallDimension",["number":String(i+1),"length":strings.number(wall.length)]))
@@ -161,5 +180,39 @@ struct FloorPlansScreen: View {
     }
     private func action(_ key: String, run: @escaping () -> Void) -> some View {
         Button(action:run) { Text(strings.text(key)).frame(maxWidth:.infinity,minHeight:44) }.buttonStyle(.bordered).tint(.lime).disabled(model.busy)
+    }
+}
+
+@available(iOS 16.0, *)
+struct ManualRoomForm: View {
+    @ObservedObject var model: ScannerModel
+    @ObservedObject var strings: ScannerStrings
+    @Environment(\.dismiss) private var dismiss
+    @State private var width = ""
+    @State private var depth = ""
+    @State private var invalid = false
+    @State private var discard = false
+    var body: some View {
+        NavigationStack {
+            Form {
+                Text(strings.text("manualRoomHelp"))
+                TextField(strings.text("objectWidth"),text:$width).keyboardType(.decimalPad).frame(minHeight:44)
+                TextField(strings.text("objectDepth"),text:$depth).keyboardType(.decimalPad).frame(minHeight:44)
+                Text(strings.text("dimensionsMetres")).font(.footnote)
+                if invalid { Text(strings.text("invalidDimensions")).foregroundColor(.red) }
+            }.navigationTitle(strings.text("manualRoom"))
+            .toolbar {
+                ToolbarItem(placement:.navigationBarLeading) { Button(strings.text("cancel")) { if width.isEmpty && depth.isEmpty { dismiss() } else { discard = true } }.frame(minHeight:44) }
+                ToolbarItem(placement:.navigationBarTrailing) { Button(strings.text("createRoom")) {
+                    guard let w = strings.parseNumber(width), let d = strings.parseNumber(depth), (0.5...100).contains(w), (0.5...100).contains(d) else { invalid = true; return }
+                    model.manualRoom(width:w,depth:d); if model.draft != nil { dismiss() }
+                }.frame(minHeight:44).disabled(model.busy || !model.accountReady) }
+            }
+            .confirmationDialog(strings.text("discardTitle"),isPresented:$discard) {
+                Button(strings.text("discard"),role:.destructive) { dismiss() }
+                Button(strings.text("keepEditing"),role:.cancel) {}
+            }
+            .overlay { WorkplaceLockCover(model:model,strings:strings) }
+        }.interactiveDismissDisabled()
     }
 }

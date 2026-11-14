@@ -42,4 +42,5 @@ export async function prepareNativeResources(repository, mobile, output, origin)
   const marker = 'null /* CINEGENIUS_WORKPLACE_CONFIG */';
   if (adapter.split(marker).length !== 2) throw new Error('Expected exactly one workplace configuration marker');
   await writeFile(new URL('workplace-menu.js', output), adapter.replace(marker, JSON.stringify(menu)));
+  await writeFile(new URL('workplace-account.js', output), await readFile(new URL('src/workplace-account.js', mobile), 'utf8'));
 }
