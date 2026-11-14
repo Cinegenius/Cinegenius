@@ -1261,8 +1261,9 @@
     "s9"
   ],
   "LegalOperators": [
-    "coOperator",
     "coOperatorEmail",
-    "dsaContact"
+    "dsaContact",
+    "providers",
+    "sharedAddress"
   ]
 }

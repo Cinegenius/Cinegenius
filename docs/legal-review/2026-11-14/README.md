@@ -7,12 +7,12 @@
 - Markus Müller; Plinganserstraße 19, 81369 München; cinegenius.co@gmail.com; +49 171 3866624. Bisherige Angaben am 14.11.2026 bestätigt.
 - Mathias Schmidt ist laut Markus Mitbetreiber; m.schmidt.d@hotmail.com.
 - Laut Markus ist noch keine Rechtsform ausdrücklich festgelegt, keine weiteren Register-/Steuerkennungen wurden geliefert. Keine solche Nummer erfunden, keine private Steuernummer veröffentlicht.
-- Die angegebene Anschrift ist bisher nur für Markus bestätigt. Keine Telefonnummer für Mathias geliefert. Seine zusätzliche Telefonnummer ist nicht erforderlich, um den bereits vorhandenen Telefonkontakt nutzbar zu halten; eine ladungsfähige Betreiberanschrift ist dagegen zu klären.
+- Markus hat am 14.11.2026 ausdrücklich bestätigt, dass Plinganserstraße 19, 81369 München auch für Mathias die gemeinsame Geschäftsanschrift ist, unter der er für CineGenius tatsächlich erreichbar ist. Diese Anschrift ist jetzt im Impressums-, AGB- und Datenschutzentwurf beiden Betreibern zugeordnet. Keine Telefonnummer für Mathias geliefert; der bereits vorhandene Telefonkontakt bleibt erhalten.
 - Keine automatische Annahme „GbR“, „GmbH“, „eGbR“ oder „rein privat“. Gemeinsamer Betrieb ist anhand tatsächlicher Vereinbarungen und Auftreten einzuordnen; fehlende Registrierung allein entscheidet dies nicht.
 
 ## Vor Abschluss der Betreibertexte erforderlich
 
-1. Wer ist genau Vertragspartner und Diensteanbieter: beide natürlichen Personen oder eine durch den gemeinsamen Betrieb entstandene Gesellschaft? Vollständige Bezeichnung und für diesen Anbieter zustellfähige Geschäftsanschrift bestätigen. Mathias' E-Mail ist eingearbeitet; ihm wurde keine nicht bestätigte Anschrift zugewiesen.
+1. Wer ist genau Vertragspartner und Diensteanbieter: beide natürlichen Personen oder eine durch den gemeinsamen Betrieb entstandene Gesellschaft? Die genaue Anbieterbezeichnung ist noch einzuordnen. Die gemeinsame zustellfähige Geschäftsanschrift für Markus und Mathias ist inzwischen bestätigt; die Anschrift ist keine offene Rückfrage mehr. Mathias' E-Mail ist eingearbeitet. Die Adressbestätigung allein bestimmt weder eine Gesellschaftsform noch die datenschutzrechtliche Aufgabenverteilung.
 2. Festlegen, wer Zwecke und Mittel der Datenverarbeitung bestimmt. Bei gemeinsamer Verantwortung die tatsächliche Aufgabenverteilung nach Art. 26 DSGVO dokumentieren und deren wesentlichen Inhalt verfügbar machen. Es wurde keine bereits abgeschlossene Vereinbarung behauptet oder fingiert. Bei Verantwortung einer Gesellschaft müssen die Texte entsprechend auf diese ausgerichtet werden.
 3. Konkrete Auftragsverarbeitungsverträge, internationale Garantien, Datenresidenz außerhalb der primären DB und Speicher-/Sicherungsfristen anhand der verwendeten Anbieteraccounts nachweisen. Anbieter-Websites ersetzen die tatsächlich abgeschlossenen Verträge nicht.
 
@@ -54,7 +54,7 @@ Quellen: [quellen.md](quellen.md). Technischer Funktionsabgleich: [technik.md](t
 Laufprotokolle und Browserbilder: `/srv/cinegenius/audits/20261114-legal-update/`.
 Ergebnisse werden nach den Prüfungen ergänzt. Ein bestandener Build bestätigt keine rechtliche Vollständigkeit.
 
-### Verifikation abgeschlossen
+### Verifikation der ursprünglichen Arbeitsfassung vor dem späteren Website-Abgleich
 
 - Produktionsbuild erfolgreich, inklusive TypeScript und `check:i18n` (9 Kataloge).
 - 105 gezielte Rechts-/Render-/Lokalisierungs-/Nachrichtenprüfungen und 15 bestehende Analyse-/Einwilligungsprüfungen bestanden.

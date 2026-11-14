@@ -8124,7 +8124,7 @@
     "badge": "Rechtliches",
     "s1": {
       "title": "§ 1 Betreiber und Geltung",
-      "p1": "CineGenius wird von Markus Müller und Mathias Schmidt betrieben. Kontakt Markus Müller: Plinganserstraße 19, 81369 München, Deutschland; <contact>cinegenius.co@gmail.com</contact>. Kontakt Mathias Schmidt: <coContact>m.schmidt.d@hotmail.com</coContact>.",
+      "p1": "CineGenius wird von Markus Müller und Mathias Schmidt betrieben. Gemeinsame Geschäftsanschrift: Plinganserstraße 19, 81369 München, Deutschland. Kontakt Markus Müller: <contact>cinegenius.co@gmail.com</contact>. Kontakt Mathias Schmidt: <coContact>m.schmidt.d@hotmail.com</coContact>.",
       "p2": "Diese Bedingungen regeln den Nutzungsvertrag für CineGenius. Vor der Registrierung sind sie über den Hinweis am Registrierungsformular abrufbar. Mit dem Erstellen des Kontos stimmst du den dort verlinkten Bedingungen zu. Der bloße Besuch der Website ist keine Zustimmung. Für bestehende Verträge gelten Änderungen nur, soweit sie wirksam vereinbart werden; die Veröffentlichung einer neuen Fassung ersetzt keine erforderliche Zustimmung."
     },
     "s2": {
@@ -8249,7 +8249,7 @@
     "ai": "KI & Transparenz →",
     "s1": {
       "title": "1. Verantwortliche und Kontakt",
-      "p1": "Betreiber von CineGenius sind Markus Müller und Mathias Schmidt. Kontakt Markus Müller: Plinganserstraße 19, 81369 München, Deutschland; <contact>cinegenius.co@gmail.com</contact>; Telefon <phone>+49 171 3866624</phone>. Kontakt Mathias Schmidt: <coContact>m.schmidt.d@hotmail.com</coContact>. Datenschutzanfragen und Betroffenenrechte kannst du an beide genannten Kontakte richten."
+      "p1": "Betreiber von CineGenius sind Markus Müller und Mathias Schmidt. Gemeinsame Geschäftsanschrift: Plinganserstraße 19, 81369 München, Deutschland. Kontakt Markus Müller: <contact>cinegenius.co@gmail.com</contact>; Telefon <phone>+49 171 3866624</phone>. Kontakt Mathias Schmidt: <coContact>m.schmidt.d@hotmail.com</coContact>. Datenschutzanfragen und Betroffenenrechte kannst du an beide genannten Kontakte richten."
     },
     "s2": {
       "title": "2. Zwecke, Rechtsgrundlagen und Datenquellen",
@@ -8391,9 +8391,10 @@
     }
   },
   "LegalOperators": {
-    "coOperator": "Mitbetreiber: Mathias Schmidt",
     "coOperatorEmail": "Mathias Schmidt: m.schmidt.d@hotmail.com",
-    "dsaContact": "Kontaktstelle für Nutzer und Behörden nach dem Digital Services Act: cinegenius.co@gmail.com. Die Kommunikation ist auf Deutsch oder Englisch möglich; die Kontaktaufnahme ist nicht auf einen automatisierten Chat beschränkt."
+    "dsaContact": "Kontaktstelle für Nutzer und Behörden nach dem Digital Services Act: cinegenius.co@gmail.com. Die Kommunikation ist auf Deutsch oder Englisch möglich; die Kontaktaufnahme ist nicht auf einen automatisierten Chat beschränkt.",
+    "providers": "Markus Müller und Mathias Schmidt",
+    "sharedAddress": "Gemeinsame Geschäftsanschrift: Plinganserstraße 19, 81369 München, Deutschland."
   },
   "companyTeam": {
     "leadership": "Gründung & Leitung"

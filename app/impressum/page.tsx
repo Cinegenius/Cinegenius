@@ -29,8 +29,8 @@ export default async function ImpressumPage() {
 
           <section>
             <h2 className="text-base font-semibold text-text-primary mb-2">{uiText("profile.catAnbieterLabel")}</h2>
-            <p className="text-sm leading-relaxed">{uiText.rich("Ui.text_59953c926d89a1", { part1: () => (<br />), part2: () => (<br />), part3: () => (<br />) })}</p>
-            <p className="text-sm leading-relaxed mt-3">{uiText("LegalOperators.coOperator")}</p>
+            <p className="text-sm leading-relaxed">{uiText("LegalOperators.providers")}</p>
+            <p className="text-sm leading-relaxed mt-3">{uiText("LegalOperators.sharedAddress")}</p>
           </section>
 
           <section>
