@@ -177,9 +177,13 @@ No news-country or account information is sent through the native message bridge
 
 Regenerate local resources and sync after merging the shared resolver. Preserve
 newer Mac-only native source and `NativeRoomScanner` keys when reconciling catalogs.
-The regional-news web commit is unpublished; importing its source does not change
-the published website loaded by the default remote app preview. Browser checks
-with app presentation scripts do not prove WKWebView persistence or device Back.
+WEB CODEX published regional-news commit `a36bc59` (including Work and the Genie
+controls/app announcement) on 14 November 2026 after Markus's explicit release
+request. The default remote app preview now loads that website version. The
+app-only presentation and resume scripts still require an updated native bundle;
+a website release does not install them on an existing iPhone. Browser checks
+with these scripts do not prove WKWebView persistence, native lifecycle or device
+Back. Release evidence: `/srv/cinegenius/audits/20261114-regional-news/release.md`.
 
 `npm test` exercises origin restrictions and unchanged cookie/HTTP behavior.
 From the repository root, run `npm run check:i18n` for all nine catalogs.

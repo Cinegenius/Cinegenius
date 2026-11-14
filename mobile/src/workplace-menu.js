@@ -7,8 +7,8 @@
   window.__cinegeniusWorkplaceInstalled = true;
 
   const registered = new WeakSet();
-  // Recognition-only tokens from the previously shipped nav.ai labels. The
-  // reviewed Work rename is not live yet; never render these legacy tokens.
+  // Recognition-only tokens from older nav.ai labels; keep compatibility with
+  // older documents, but never render these legacy tokens.
   const previousToolsLabels = new Set(['KI', 'AI', 'IA', 'MI']);
   const supported = Object.keys(configuration.locales);
   const resolveLocale = () => {
