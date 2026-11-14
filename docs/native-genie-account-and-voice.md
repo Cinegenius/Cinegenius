@@ -4,8 +4,9 @@ Abstimmung mit WEB CODEX, 14. November 2026. Nach der vorgezogenen Kontolimit-Ve
 
 ## Übernommene Kosteninformation, 14. November 2026
 
-Der geprüfte WEB-Stand `fb7602af6d2379166a901595f3f7f962cbcaec72` ist in den
-App-Quellstand übernommen: aktuelle Selbstbedienung kostenlos, Profile dauerhaft
+Der geprüfte und veröffentlichte WEB-Stand `c70e73c56b41ab4eeb635bd44ff00d09c242cd1a`
+ist mit Markus' bestätigter Kurzfassung in den App-Quellstand übernommen:
+Selbstbedienung kostenlos, Profile dauerhaft
 kostenlos, 5 % ausschließlich bei vorher vereinbarter, erfolgreicher vollständiger
 Mietvermittlung durch Support und bereits im vereinbarten Gesamtmietpreis enthalten.
 Eine normale Supportanfrage löst keine Gebühr aus. Optionale spätere Erweiterungen
@@ -16,10 +17,13 @@ Sprachen; sie gelangen nicht in die Prompts für Beschreibungsentwürfe.
 Genie kann den vorhandenen Abschnitt `/pricing#support-mediation` verlinken.
 Die exakte Katalogfreigabe und kontogebundene Wiederherstellung verwenden den
 bestehenden gemeinsamen Linkvertrag. Keine native Kopie von Preisen, Kontingenten
-oder Berechtigungen. Der WEB-Beleg meldet diesen Stand ausdrücklich noch nicht
-als veröffentlicht; letzter bestätigter Live-Stand bleibt `60f17e7`.
+oder Berechtigungen. Der WEB-Produktionsbeleg bestätigt die freigegebene
+Veröffentlichung `dpl_FHd6cHgoedFBXZ2oA1PZJa1bFx58` (READY) aus diesem Commit.
+Die ausführlichen Bedingungen bleiben im serverseitigen Kontext erhalten;
+gewöhnliche Supportfragen lösen weiterhin keine Gebühr aus.
 Eine echte Modellantwort und ein iPhone-/Android-Gerätetest sind damit nicht belegt.
-Prüf- und Übergabebelege: `/srv/cinegenius/handoffs/20261114-app-genie-pricing/`.
+Prüf- und Übergabebelege: `/srv/cinegenius/handoffs/20261114-app-genie-pricing/`,
+abschließender Kurztext-Abgleich im Unterordner `final-short-copy/`.
 
 ## Gemeinsame Kontoregel
 

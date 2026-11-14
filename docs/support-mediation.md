@@ -5,6 +5,8 @@
 Genie's general cost answer must distinguish currently free self-service use from
 the previously agreed, successful rental mediation handled fully by Support (5%
 included in the agreed total). An ordinary support enquiry is not a paid mandate.
+Explicitly state that organising everything independently incurs no CineGenius
+fees; this does not make the provider's own rental, sale or service prices free.
 Profiles remain permanently free so networking and visibility do not depend on
 budget. Optional future extensions may become paid; no prices or dates are set.
 Describe the start-up and its community-first purpose professionally, without
