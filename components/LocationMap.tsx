@@ -263,7 +263,7 @@ export default function LocationMap({ readOnly = false, locations, activeId, onH
   return (
     <div className="location-map relative isolate h-full min-h-0 w-full overflow-hidden rounded-xl border border-border bg-bg-secondary" aria-label={labels?.label ?? t("label")}>
       <div ref={containerRef} className="h-full w-full" />
-      <div className="pointer-events-none absolute left-3 top-3 z-[500] rounded-lg border border-border bg-bg-primary/95 px-3 text-xs font-medium text-text-primary">
+      <div className="location-map-count pointer-events-none absolute left-3 top-3 z-[500] text-xs font-medium">
         <BrowseResultCount count={!basemapReady && !failed ? null : visibleCount ?? locations.length}
           label={!basemapReady && !failed ? mapUi("loading") : labels?.results ?? locationsText("results", { count: visibleCount ?? locations.length })} />
       </div>
