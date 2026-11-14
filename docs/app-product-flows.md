@@ -291,7 +291,7 @@ Ansicht von `https://www.cinegenius.co/`. Eine neue native Installation oder ein
 angemeldete Live-/iPhone-Prüfung ist dadurch nicht belegt.
 Prüfbelege und Grenzen: `/srv/cinegenius/handoffs/20261114-app-smart-compact-previews/`.
 
-Die neuere vorbereitete Korrektur `327a78a3c703e6077dfdcbb435b065b51cb84865`
+Die inzwischen veröffentlichte Korrektur `327a78a3c703e6077dfdcbb435b065b51cb84865`
 verkleinert im App-Quellstand die Smart-Vorschau auf 48 × 48 px mit intrinsischen
 Bildmaßen und die Ergebniszeilen weiter. Vollständige Bilder, Detailziele und
 Medienrechte bleiben erhalten. Bekannte Stichwortlisten wie „Beleuchter Kostüm“
@@ -301,6 +301,9 @@ Die App erhält genau den gefilterten Smart-Link im bestehenden Plan-v1-Vertrag,
 ohne eigenen nativen Parser oder zweite Suchlogik. Mitgliedschaft, Kontingente,
 Datenschutz und komplexe freie Interpretation bleiben bestehen. Ein neuer
 Sprachschlüssel `UnifiedSearch.ready` und die verkürzte Kosteninformation sind
-in allen neun Katalogen enthalten. Dieser neuere Stand ist bei Übergabe noch
-nicht veröffentlicht; live bleibt zunächst `d158099`.
+in allen neun Katalogen enthalten. Markus hat diese Korrekturen und den kurzen
+Kostentext gemeinsam freigegeben. Deployment `dpl_HWg1QpWxe9ZoggkdskXaok5ts5dd`
+ist READY; Produktionsbeleg, Domainzuordnung und `origin/main` sind abgeglichen.
+Der App-Quellstand enthält die geprüfte Änderung bereits. Eine angemeldete
+Live-Mehrfachsuche oder native Geräteabnahme ist damit weiterhin nicht belegt.
 Belege: `/srv/cinegenius/handoffs/20261114-app-smart-matching-rows/`.

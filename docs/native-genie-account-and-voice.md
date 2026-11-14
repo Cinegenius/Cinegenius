@@ -25,13 +25,15 @@ Eine echte Modellantwort und ein iPhone-/Android-Gerätetest sind damit nicht be
 Prüf- und Übergabebelege: `/srv/cinegenius/handoffs/20261114-app-genie-pricing/`,
 abschließender Kurztext-Abgleich im Unterordner `final-short-copy/`.
 
-Die anschließend vorbereitete Fassung `327a78a` verkürzt die Zusammenfassung
+Die anschließend veröffentlichte Fassung `327a78a` verkürzt die Zusammenfassung
 erneut: Registrierung/Basisfunktionen bleiben für die Community kostenlos;
 Provision nur nach vereinbarter erfolgreicher Support-Vermittlung und vorheriger
 Mitteilung, optionale Extras möglicherweise später kostenpflichtig. Die
 ausführliche bestehende 5%-Regel bleibt im Serverprompt. Alle neun Kataloge sind
-abgeglichen; dieser weitere Kurztext ist bei Übergabe noch nicht live. Keine
-Änderung an Kontingenten, Rechtsdokumenten oder tatsächlicher Abrechnung.
+abgeglichen. Markus hat diesen Kurztext gemeinsam mit den Smart-Korrekturen
+freigegeben; Deployment `dpl_HWg1QpWxe9ZoggkdskXaok5ts5dd` ist READY. Keine
+Änderung an Kontingenten, Rechtsdokumenten oder tatsächlicher Abrechnung und
+kein neuer Beleg für eine angemeldete Live-Modell- oder Geräteprüfung.
 
 ## Gemeinsame Kontoregel
 
