@@ -8,6 +8,8 @@ Der App-Abgleich dieses veröffentlichten Standes ist in `8eac132ce6c4d6ffba6d58
 
 WEB meldet am 14. November 2026 Markus' Bestätigung des kurzen Namens **Smart** statt „Übergreifend“. Dieser Name gilt auch für den geplanten nativen Sucheinstieg. Die Homepage-Auswahl soll wieder genau eine Reihe belegen; Bedienflächen und Lesbarkeit in allen neun Sprachen weiterhin prüfen. WEB bearbeitet die Korrektur auf `codex/genie-search-repair`; ein geprüfter Commit, genaue Tests und Veröffentlichungsstatus stehen noch aus. Diese Ankündigung ist keine bereits übernommene oder veröffentlichte App-Oberfläche.
 
+WEB meldet inzwischen den ersten Treffer-/Tab-Fix `87c3dee` als auf diesem Branch gesichert. Die zusätzliche Mitgliedersperre befindet sich noch in Prüfung und gehört nicht zu einer bereits vollständig übergebenen oder neu veröffentlichten Korrektur. Für den App-Abgleich den geprüften Gesamtstand einschließlich der folgenden Zugangsregel abwarten.
+
 Beim nächsten Abgleich zusätzlich prüfen:
 
 - „Model“ darf nicht zu „Modellbauer“ erweitert werden.
@@ -17,9 +19,25 @@ Beim nächsten Abgleich zusätzlich prüfen:
 
 Nach WEB-Angabe bleiben `POST /api/search/unified` und Plan-Version 1 kompatibel. Kontoregeln bleiben unverändert: 30 Aufrufe pro UTC-Tag für gewöhnliche Konten, die bestehende verifizierte Markus-Ausnahme, kein globales Tageslimit und unveränderte Minutenbegrenzungen. App-Navigation, Sprachwiederholung, Kontotrennung, aktuelle Inhaltsrechte und laufende native Arbeit bei der späteren Übernahme erhalten. Keine zweite native Matching-Logik und keine vorgezogene Übernahme unfertiger WEB-Dateien.
 
+## Smart ausschließlich für angemeldete Mitglieder
+
+Markus' zusätzliche Entscheidung vom 14. November 2026, über WEB CODEX übermittelt: **Smart darf nur von angemeldeten Mitgliedern genutzt werden**, auch beim Öffnen eines geteilten `/search?plan=…`-Links. Diese Regel ersetzt die bisherige anonyme Lesbarkeit von Smart-Ergebnisplänen. Sie ist keine kostenpflichtige Mitgliedschaft oder Bezahlschranke. Gewöhnliche öffentliche Verzeichnisse und die gewöhnliche öffentliche Suche bleiben separat zugänglich.
+
+WEB bereitet folgende gemeinsame Durchsetzung vor: Proxy und API-Handler prüfen die Sitzung. `POST /api/search/unified` antwortet Gästen mit `401` und privaten No-store-Headern, bevor Body, Kontingent oder Datenbank bearbeitet werden. Der Client wartet auf die geklärte Sitzung, ruft als Gast weder Interpretation noch Ergebnisse ab und zeigt die Anmeldung. `/api/genie` war bereits angemeldeten Konten vorbehalten. Die App verwendet dieselbe Sitzung und Serverentscheidung; keinen nativen Gastzugang, zweiten Anmeldeablauf oder lokalen Berechtigungsersatz ergänzen.
+
+Zusätzliche Abnahmekriterien für die fertige Übergabe:
+
+- Angemeldete und abgemeldete Direktaufrufe einschließlich geteilter Plan-Links, ablaufender Sitzung und erneuter Anmeldung prüfen. Gast-Anfragen dürfen keine Interpretation, Kontingentbelastung oder Ergebnis-Datenbankabfrage auslösen.
+- Das gleichursprüngliche Rückkehrziel erhält den vollständigen validierten Plan mit allen Suchteilen, Orten, Ländern, Kontinenten und Radien. Einen Plan nicht durch seine sichtbare Kurzbeschreibung ersetzen oder nach der Anmeldung erneut kostenpflichtig interpretieren. Auch den maximalen unterstützten Plan prüfen.
+- Noch nicht geklärte Anmeldung, Fehler und Kontowechsel dürfen weder kurzzeitig vorherige Ergebnisse anzeigen noch verspätete Antworten oder Sprachausgaben eines vorherigen Kontos übernehmen. Abbruch und ungesendete Eingaben weiter korrekt behandeln.
+- Gewöhnliche öffentliche Suche und Verzeichnisse bleiben auch als Gast nutzbar. Anmeldung, Rückkehr, Sprachwechsel und Bedienung in allen neun Sprachen prüfen; echte Browser-Zurück-Navigation erhalten.
+
+Der App-Anwendungsstand `8eac132` enthält diese neue Mitgliedersperre noch nicht. Dessen frühere Browserprüfungen mit anonymen, simulierten Smart-Ergebnissen sind historische Integrationsbelege und kein Nachweis dieser neuen Zugangsregel. Nach der geprüften WEB-Übernahme die Browserfälle auf authentifizierte Testgrenzen umstellen und die oben genannten Gastfälle gesondert verifizieren.
+
 ## Bestätigter Bedienablauf
 
 - Haupteinstieg auf der **Startseite**, über die bestehende Suche und Genie.
+- Smart setzt eine gültige Mitgliedersitzung voraus; ein Anmeldehinweis erhält die vollständige gewünschte Suche als Rückkehrziel, einschließlich geteilter Plan-Links.
 - Die gemeinsame Suchlogik und das gemeinsame Ergebnisziel später zusätzlich als Werkzeug **Smart** im nativen Arbeitsplatz nutzen. Website und App erhalten kein zweites, abweichendes Suchsystem.
 - Eingabe als freier Text sowie über Genie.
 - Mehrere Suchteile gemeinsam verarbeiten: Crew, Marktplatz, Locations, Firmen und weitere tatsächlich unterstützte öffentliche Bereiche.
