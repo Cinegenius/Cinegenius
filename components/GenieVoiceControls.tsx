@@ -81,13 +81,15 @@ export default function GenieVoiceControls({ active, pending, locale, resetKey, 
     if (!reply) { navigation.current = null; stopSpeech(); return; }
     if (!reply.spoken || spokenId.current >= reply.id) return;
     if (!active || document.visibilityState !== "visible") { spokenId.current = reply.id; return; }
-    if (reply.route && reply.fromRoute !== undefined) {
+    if (reply.route && reply.fromRoute !== undefined && reply.route !== reply.fromRoute) {
       // Repeating the current search still applies its filters through a launch
       // URL. Wait for that navigation rather than speaking on the old matching URL.
       if (navigation.current?.id !== reply.id) navigation.current = { id: reply.id, started: routeKey !== reply.fromRoute };
       else if (routeKey !== reply.fromRoute) navigation.current.started = true;
       if (!navigation.current.started) return;
     }
+    // An identical resolved plan URL has no temporary directory launch marker:
+    // the current page is already the destination, so no URL change is required.
     if (pending || (reply.route && !genieSpeechRouteReady(reply.route, routeKey))) return;
     spokenId.current = reply.id;
     speak(reply.text, reply.locale);

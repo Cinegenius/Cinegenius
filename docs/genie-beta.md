@@ -1,6 +1,6 @@
 # Genie — configuration, voice and release notes
 
-Genie remains visible to guests, but chat advice and inline description assistance through `POST /api/genie` require a valid signed-in account. The server uses the verified Clerk identity; a client-supplied user ID, cookie string or authorization header cannot replace that verification. It can prepare validated, read-only Crew search links. It has no private-data lookup, publishing, messaging or shared-plan mutation. OpenAI is called only after an explicit chat send, writing request or completed browser recording.
+Genie remains visible to guests, but chat advice and inline description assistance through `POST /api/genie` require a valid signed-in account. The server uses the verified Clerk identity; a client-supplied user ID, cookie string or authorization header cannot replace that verification. It can prepare validated, read-only cross-directory search links. It has no private-data lookup, publishing, messaging or shared-plan mutation. OpenAI is called only after an explicit search/chat send, writing request or completed browser recording.
 
 After the origin check, the route rejects missing or expired sessions with `401 {"error":"unauthorized"}` before reading the body, inspecting provider configuration, reserving durable quota or calling OpenAI. The same gate covers both chat and the writing assistant. Authentication service errors fail closed with the sanitized `503 unavailable` response; they never fall back to guest access. Responses remain private and uncached, with no automatic redirect.
 
@@ -20,7 +20,8 @@ Set `OPENAI_API_KEY` as a server-only **Secret** in the correct Vercel project's
 | --- | --- |
 | `OPENAI_API_KEY` | Required. After authentication, missing/blank values return `503 unavailable` before durable quota or provider work. |
 | `GENIE_ENABLED` | Optional. A trimmed, case-insensitive value of `false` disables the endpoint. Unset or other values do not disable it. This does not hide the chat or inline writing controls. |
-| `GENIE_DAILY_REQUEST_LIMIT` | Optional global daily request ceiling. Unset or blank means **200**. Accepts only decimal integers **1–1000**; invalid nonblank values make the endpoint unavailable. |
+| `GENIE_DAILY_REQUEST_LIMIT` | Retired and ignored. There is no shared daily Genie ceiling (operator decision, 14 November 2026). |
+| `GENIE_UNLIMITED_USER_ID` | Optional single server-configured verified account exempt from daily Genie ceilings and using the personal quality model below. Minute guards remain. Never a client-provided claim or an automatic privilege for all admins. |
 
 No new schema or migration is required. Genie reuses `rate_limit_buckets` and atomic `upsert_rate_limit`; existing service-only permissions must remain intact. Missing, failed or malformed limiter responses deny provider access.
 
@@ -32,15 +33,15 @@ Select the CineGenius project identified by the checkout's ignored `.vercel/proj
 | --- | --- | --- | --- |
 | `OPENAI_API_KEY` | The actual OpenAI project workload key, entered directly in the secret field | **Secret** | Required by the server's direct OpenAI connection. |
 | `GENIE_ENABLED` | `true` for activation, or `false` to keep the endpoint disabled | **Config** | Optional; only the literal `false`, ignoring case and surrounding whitespace, disables it. Setting `0` does not disable it. |
-| `GENIE_DAILY_REQUEST_LIMIT` | `200` for the default, or the chosen integer from `1` through `1000` | **Config** | Optional shared daily request ceiling, not a currency budget. |
+| `GENIE_UNLIMITED_USER_ID` | The verified account ID selected by Markus, entered privately | **Secret** | Personal unlimited daily usage and quality processing; never inferred from a client name or admin role. |
 
 Use **Preview** for the intended test branch, with its own test credential. Use **Production** for the live site's credential and activation values. Preview success does not establish the Production configuration. Branch-specific Preview values override general Preview values. **Development** is the separate scope for running the full app locally. [Vercel environment scopes](https://vercel.com/docs/environment-variables)
 
 Click **Save** after adding or updating each variable. A new deployment of the relevant environment is required before changed values take effect; the existing deployment retains its configuration. Production activation and later disabling therefore both require the repository's guarded production release process. [Vercel environment updates](https://vercel.com/docs/environment-variables/managing-environment-variables)
 
-For the deployed application, use an OpenAI project service account and its workload key with the permissions needed for the implemented `POST /v1/responses` and browser-only `POST /v1/audio/transcriptions` requests. The project must permit the configured `gpt-4.1-mini` model and have available API usage capacity. Store the key directly in Vercel; its existence, permissions and successful model access must be confirmed separately. [OpenAI API keys and service accounts](https://developers.openai.com/api/docs/guides/api-keys)
+For the deployed application, use an OpenAI project service account and its workload key with the permissions needed for the implemented `POST /v1/responses` and browser-only `POST /v1/audio/transcriptions` requests. The project must permit `gpt-4.1-mini`, `gpt-transcribe`, and, for the selected personal account, `gpt-6-astra` with `ultrafast` processing, and have available API usage capacity. Store the key directly in Vercel; its existence, permissions and successful model access must be confirmed separately. [OpenAI API keys and service accounts](https://developers.openai.com/api/docs/guides/api-keys)
 
-The source reads only the three Genie variables listed above. It calls OpenAI directly with fixed endpoints/models for conversation and browser transcription; native recognition uses the device bridge. There is no separate public activation flag. With a nonempty key, an enabled endpoint and a valid daily limit, requests still depend on the app's existing Clerk setup and working Supabase quota service. The visible launcher alone does not confirm any of those connections.
+The source reads the Genie variables listed above. It calls OpenAI directly with fixed endpoints/models for conversation and browser transcription; native recognition uses the device bridge. There is no separate public activation flag. With a nonempty key, an enabled endpoint, requests still depend on the app's existing Clerk setup and working Supabase quota service. The visible launcher alone does not confirm any of those connections.
 
 ### Local fixture versus a connected app
 
@@ -52,15 +53,26 @@ Live local verification must run this repository's full Next.js application (`np
 
 | Scope | Requests per fixed 60-second window | Requests per UTC calendar day |
 | --- | ---: | ---: |
-| Verified Clerk member | 10 | 60 |
-| IP, shared by signed-in accounts | 20 | 100 |
-| All Genie requests sharing the database | — | 200 by default; configurable as above |
+| Verified Clerk member | 10 | 30 |
+| IP, shared by signed-in accounts | 20 | None |
+| Whole website | — | None |
+| The single operator-selected unlimited account | 10/account and 20/IP | No account, IP or shared daily ceiling |
 
-All five counters are reserved for authenticated requests before the single provider call. Guests have no API allowance and their rejected requests do not reserve durable counters. Later denial, upstream failure or cancellation does not refund earlier reservations; there is no automatic retry. IP headers are trusted only on Vercel; other runtimes share a fallback bucket. IP/member identifiers are HMAC-hashed with the server key. Key rotation changes identity buckets but not the global bucket; deployments sharing a database share that ceiling.
+Ordinary authenticated requests reserve three counters before the single provider call. The operator-selected unlimited account reserves the two unchanged minute counters only, for both chat/writing and transcription. Markus explicitly selected **Markus Müller only**, superseding the earlier proposal for all admins and the intermediate 120-call proposal. The later operator decision removes the global and shared-IP daily ceilings for everyone and sets the ordinary personal allowance to 30. Browser voice search uses two provider calls (transcription plus interpretation), so it can consume two of these 30 calls; native device recognition does not consume a server transcription call. The identity is configured privately in the Production environment; it is not committed, accepted from the client or inferred from a display name at request time. Removing the setting restores ordinary policy and does not delete prior counters.
+
+Guests have no API allowance and their rejected requests do not reserve durable counters. Later denial, upstream failure or cancellation does not refund earlier reservations; there is no automatic retry. IP headers are trusted only on Vercel; other runtimes share a fallback bucket. IP/member identifiers are HMAC-hashed with the server key. Key rotation changes identity buckets. No global daily bucket or shared-IP daily bucket is reserved; existing rows are not reset or deleted.
 
 For the exact `POST /api/genie` and `POST /api/genie/transcribe` endpoints, the proxy verifies the session before its best-effort, per-instance IP limit of 20 requests per minute. Signed-out requests return `401` even if the IP bucket is already exhausted; authentication service errors return sanitized `503` failures. Neither consumes that IP allowance. The limiter supplements, rather than replaces, the durable quotas. Rate-limit rejections for authenticated requests return `429`, `Retry-After` and private/no-store headers. Other proxy routes retain their existing ordering and protection.
 
-The fixed model is `gpt-4.1-mini` through Responses, with **600 maximum output tokens**. Chat requests allow **nine** alternating user/assistant messages, beginning/ending with user, **2,000 characters each**, **8,000 total** (JavaScript string length). Writing requests allow exactly **one user message**, containing at most **2,000 characters** of explicit notes, and a bounded output-length limit. Writing and chat share all existing endpoint quotas, timeouts and provider configuration; writing has no separate allowance.
+The ordinary model is `gpt-4.1-mini` through Responses, with **2,400 maximum output tokens for chat/search plans**, so six wishes with multiple places fit, and **600 for writing**. Chat requests allow **nine** alternating user/assistant messages, beginning/ending with user, **2,000 characters each**, **8,000 total** (JavaScript string length). Writing requests allow exactly **one user message**, containing at most **2,000 characters** of explicit notes, and a bounded output-length limit. Writing and chat share all existing endpoint quotas, timeouts and provider configuration; writing has no separate allowance.
+
+### Personal quality configuration
+
+Only the same verified account selected by `GENIE_UNLIMITED_USER_ID` uses **GPT-6 Astra**, **Ultrafast** request-level processing, `reasoning.effort: low`, and 8,192 maximum output tokens including reasoning. This selects OpenAI's current most capable text model and fastest offered processing tier while bounding time and output; it does not guarantee a faster internet connection or a measured latency improvement. Other accounts retain the existing model. The server derives this choice from the verified session, never request headers, names, admin status or client options. Reasoning metadata is discarded; only the validated final JSON can create read-only search links. Provider failures are not retried automatically or silently downgraded to another paid call. No new tools or private-data permissions are granted.
+
+Official model and tier references checked 14 November 2026: [GPT-6 Astra](https://developers.openai.com/api/docs/models/gpt-6-astra), [Ultrafast including HTTP](https://developers.openai.com/api/docs/guides/ultrafast-mode), [reasoning token limits](https://developers.openai.com/api/docs/guides/reasoning). Personal quality can incur higher provider costs. Model/tier access and actual spoken interpretation must be verified with the real production account; the locally pulled protected key is a placeholder, not evidence of an invalid production credential.
+
+Browser recognition already uses `gpt-transcribe`. Spoken replies still use the best matching installed device voice with the existing gentler rate/volume; this change does not install voices or add a cloud speech session. Native voice choice and device downloads are coordinated with APP Entwicklung. No claim of measured native voice quality is made from browser fixtures.
 
 Streamed input is capped at **40 KiB**, with strict UTF-8 decoding. Replies allow at most **2,000 characters**, provider bodies **64 KiB**, and chat catalogue links **four**. A writing reply must also fit its destination field's shorter limit and contain no navigation links. Overlong provider replies are rejected rather than silently truncated. Provider timeout: **25 seconds**; route/browser ceiling: **35 seconds**. Cancellation propagates to the provider fetch.
 
@@ -132,16 +144,14 @@ local test setup. No real OpenAI call was used in the checks below.
   locale as fallback. Speech does not overwrite the chosen interface language
   or translate member-written content.
 
-The model returns at most three structured crew search proposals. The server
-resolves occupation IDs from the existing taxonomy and places from the existing
-public place catalogue. It rejects unsupported/ambiguous resolutions instead of
-inventing coordinates, people or counts. Only validated `/creators` parameters
-can be emitted; model URLs and mutation paths are not accepted. A spoken request
-opens the first search; additional searches remain accessible in the reply.
-Typed requests retain clickable links. Navigation uses the form-leave guard.
+The current extension returns at most six structured search wishes in one
+validated `/search?plan=…` link; see the shared contract below. A spoken request
+opens that common result page, preserving every wish. Typed requests retain the
+clickable common link. Legacy validated directory links still restore safely.
+Model URLs and mutation paths are not accepted. Navigation uses the form-leave guard.
 
 For “near Munich”, 50 km is the default unless the request specifies 1–200 km.
-The selected radius is visible and removable in the filter chips. Coordinates
+The selected radius is visible in the result-group label and editable search. Coordinates
 are approximate public city positions; entries without a resolvable location
 are excluded from radius matches. Genie does not inspect actual profiles or
 prove compatibility/availability. Existing user/account privacy and public
@@ -163,6 +173,61 @@ References checked on 14 November 2026:
 [OpenAI transcription](https://developers.openai.com/api/docs/guides/speech-to-text),
 [OpenAI data controls](https://developers.openai.com/api/docs/guides/your-data).
 `store: false` on conversation requests does not promise zero provider retention.
+
+## Unified search contract — website and native consumers (14 November 2026)
+
+Status: implemented and checked on the feature branch; not yet published. The
+live OpenAI credential already exists. Pulling Vercel Production variables yields
+a protected placeholder, not a usable local credential. The attempted local
+provider call failed for that reason; it is not evidence of a broken live key.
+Do not rotate it or claim that the model's interpretation passed a real test.
+
+- Homepage's existing search gains an `Übergreifend` tab (localized in all nine
+  languages). Explicit submit navigates to `/search?smart=1&q=…`; that page calls
+  the existing authenticated `POST /api/genie` once, then replaces the temporary
+  URL with the validated plan URL. No AI request on typing, account/locale change,
+  pagination or Back/Forward to resolved results. Retry is explicit.
+- `lib/unified-search.ts` is the shared version-1 contract. A plan contains 1–6
+  `searches`, each `{area,query,department,places}`. `area` is `crew`,
+  `marketplace`, `locations`, `companies`, `jobs`, `animals`, `projects`, `news`,
+  `organizations`, or `all`. Department IDs are stable catalogue IDs, only for
+  Crew. Empty query is accepted only with a valid department.
+- Each `places` array contains 0–4 OR alternatives. A place is
+  `{city,country,continent,radiusKm}`. Country is ISO 3166-1 alpha-2 or empty;
+  continent is UN M49 `002/019/142/150/009/010` or empty. Continent cannot accompany
+  city/country. Within a place constraints are AND; never cross-product separate
+  wishes. Crew radius is 1–200 km around an unambiguously resolved public city;
+  zero means exact city. No places means unrestricted public geography.
+- `/api/genie` retains `{reply,language,links}` for native callers. One link now
+  encodes all wishes. Accept only `searchPlanFromHref`-validated relative links;
+  no additional native provider key or parallel parser is needed.
+- Read results with same-origin `POST /api/search/unified`, JSON `{plan}` or
+  `{plan,cursor:{wishIndex,area,offset}}`. Response is `{groups}`; each group has
+  `{area,wishIndex,label,results,nextOffset}`. Result cards keep the existing
+  `{id,title,subtitle,type,price,priceLabel?,image,available}` contract. `nextOffset`
+  is null on exhaustion, otherwise continue only on explicit request. Twelve
+  visible results per group, up to 180 candidate rows per request; an empty page
+  with a continuation does not mean there are no matches. At most four DB reads
+  run concurrently. Cursor limits/area/indices are checked again on the server.
+- Read-only results permit guests; AI interpretation still requires sign-in.
+  Current viewer permissions precede profile projection and geographic matching.
+  Ghost profiles, hidden location/activity and personal-offer visibility remain
+  enforced. Companies/public projects/approved news and organizations reuse their
+  public eligibility rules. Project geography uses its recorded primary place or
+  production country, not guessed cities from its shooting-location list.
+- Origin checks, the existing flood guard and additional read quotas remain.
+  Errors are sanitized (`invalid_request`, `search_unresolved`, `rate_limited`,
+  `unavailable`); all results are private/no-store. Missing authorization data
+  fails closed. No new database schema, search-history write or provider-data
+  lookup. `unifiedSearchAccess` is the single future entitlement boundary;
+  currently included, with no paywall or payment activation.
+- Existing account-scoped 10-minute Genie retention is unchanged. Search plans
+  are ordinary URL filters and can appear in browser-managed history; the app
+  does not store a recent-search list. Unsent input survives language changes and
+  errors. Account changes hide old results immediately and abort old requests.
+
+See `test-reports/genie-unified-search-2026-11-14.md` for evidence and remaining
+real-model/native-device checks. Shared workplace mutations are still unavailable.
 
 ## Verification status
 

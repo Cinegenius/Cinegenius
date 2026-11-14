@@ -8368,5 +8368,33 @@
       "friends": "Alleen bevestigde vrienden",
       "hidden": "Alleen ik"
     }
+  },
+  "UnifiedSearch": {
+    "title": "Zoeken in alle rubrieken",
+    "tab": "Alle rubrieken",
+    "intro": "Zoek tegelijk naar crew, aanbiedingen en locaties.",
+    "placeholder": "Model in Berlijn en boot in Hamburg …",
+    "submit": "Zoeken",
+    "showResults": "Gezamenlijke resultaten tonen",
+    "understanding": "Je zoekopdrachten worden verwerkt …",
+    "loading": "Resultaten laden …",
+    "emptyGroup": "Geen passende zichtbare vermeldingen voor dit deel van de zoekopdracht.",
+    "continueSearch": "Er kunnen nog meer vermeldingen worden doorzocht.",
+    "more": "Meer tonen",
+    "error": "De zoekopdracht kon niet worden geladen. Je invoer is bewaard.",
+    "retry": "Opnieuw proberen",
+    "signInRequired": "Meld je aan om zoekopdrachten met Genie te combineren.",
+    "withinRadius": "{place} · binnen {radius} km",
+    "areas": {
+      "crew": "Crew",
+      "marketplace": "Marktplaats",
+      "locations": "Locaties",
+      "companies": "Bedrijven",
+      "jobs": "Vacatures",
+      "projects": "Projecten",
+      "news": "Nieuws",
+      "organizations": "Organisaties",
+      "animals": "Filmdieren"
+    }
   }
 }

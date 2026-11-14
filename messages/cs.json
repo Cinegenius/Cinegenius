@@ -8368,5 +8368,33 @@
       "friends": "Pouze potvrzení přátelé",
       "hidden": "Pouze já"
     }
+  },
+  "UnifiedSearch": {
+    "title": "Hledání napříč sekcemi",
+    "tab": "Všechny sekce",
+    "intro": "Hledejte společně štáb, nabídky a místa.",
+    "placeholder": "Modelka v Berlíně a loď v Hamburku …",
+    "submit": "Hledat",
+    "showResults": "Zobrazit společné výsledky",
+    "understanding": "Zpracovávání požadavků …",
+    "loading": "Načítání výsledků …",
+    "emptyGroup": "Pro tuto část hledání nejsou žádné odpovídající viditelné záznamy.",
+    "continueSearch": "Lze prohledat další záznamy.",
+    "more": "Zobrazit další",
+    "error": "Hledání se nepodařilo načíst. Zadaný text zůstal zachován.",
+    "retry": "Zkusit znovu",
+    "signInRequired": "Přihlaste se a kombinujte hledání pomocí Genie.",
+    "withinRadius": "{place} · v okruhu {radius} km",
+    "areas": {
+      "crew": "Štáb",
+      "marketplace": "Tržiště",
+      "locations": "Lokace",
+      "companies": "Firmy",
+      "jobs": "Práce",
+      "projects": "Projekty",
+      "news": "Novinky",
+      "organizations": "Organizace",
+      "animals": "Filmová zvířata"
+    }
   }
 }

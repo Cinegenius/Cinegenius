@@ -8368,5 +8368,33 @@
       "friends": "Bara bekräftade vänner",
       "hidden": "Bara jag"
     }
+  },
+  "UnifiedSearch": {
+    "title": "Sök i alla områden",
+    "tab": "Alla områden",
+    "intro": "Sök efter filmteam, erbjudanden och platser tillsammans.",
+    "placeholder": "Modell i Berlin och båt i Hamburg …",
+    "submit": "Sök",
+    "showResults": "Visa samlade resultat",
+    "understanding": "Tolkar din sökning …",
+    "loading": "Laddar resultat …",
+    "emptyGroup": "Inga matchande synliga poster för den här delen av sökningen.",
+    "continueSearch": "Fler poster kan fortfarande sökas igenom.",
+    "more": "Visa fler",
+    "error": "Sökningen kunde inte laddas. Din text finns kvar.",
+    "retry": "Försök igen",
+    "signInRequired": "Logga in för att kombinera sökningar med Genie.",
+    "withinRadius": "{place} · inom {radius} km",
+    "areas": {
+      "crew": "Filmteam",
+      "marketplace": "Marknadsplats",
+      "locations": "Inspelningsplatser",
+      "companies": "Företag",
+      "jobs": "Jobb",
+      "projects": "Projekt",
+      "news": "Nyheter",
+      "organizations": "Organisationer",
+      "animals": "Filmdjur"
+    }
   }
 }

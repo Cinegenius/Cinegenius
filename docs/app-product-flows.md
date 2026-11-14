@@ -79,6 +79,61 @@ Kataloge und bestehenden Veröffentlichungsregeln.
   Gelände und aktuelle Bewölkung unterscheiden. Keine pauschale Zusage für Wetter
   oder sichtbares Sonnenlicht. Private Location-Adressen bleiben berechtigungsgeschützt.
 
+## Übergreifende Suche (14. November 2026)
+
+**Status: Website und gemeinsame Schnittstelle implementiert, noch nicht live.**
+Markus hat den früheren Aufschub mit „ok dann setzen wir das um“ aufgehoben.
+Die technische Prüfung ist im Bericht `test-reports/genie-unified-search-2026-11-14.md`
+dokumentiert. Der echte KI-Sprachverständnistest steht noch aus: Der vorhandene
+Live-Schlüssel bleibt unverändert und ist lokal nur als geschützter Platzhalter
+verfügbar. Native Xcode-Arbeit bleibt bei APP Entwicklung.
+
+- Bestätigter Haupteinstieg: **Startseite**, über die bestehende Suche und Genie.
+  Das gemeinsame Ergebnisziel und die Suchlogik sollen später auch im Arbeitsplatz
+  nutzbar sein; kein zweites, abweichendes Suchsystem bauen. Das Design bleibt erhalten.
+- Betreiberentscheidung zur späteren Finanzierung: die Funktion so vorbereiten,
+  dass daraus später ein kostenpflichtiges Angebot bzw. eine bezahlte Anwendung
+  werden kann. Der genaue kostenpflichtige Umfang, kostenlose Funktionen, Preise,
+  Abrechnung und Einführung sind noch nicht beschlossen. Keine Freigabe für
+  Zahlungen oder eine aktuelle Bezahlschranke.
+- Gemeinsame Suchlogik ist von Darstellung und Tarifzugriff getrennt.
+  Künftige Zugangsrechte und etwaige Nutzungsgrenzen serverseitig und
+  kontobezogen prüfen, einheitlich für Website und App; private Inhalte bleiben
+  unabhängig von einem Tarif geschützt. Nutzungszählung darf keine dauerhafte
+  Speicherung von Suchtexten oder Gesprächen voraussetzen. Zahlungsanbieter und
+  native Kaufabwicklung erst mit dem tatsächlichen Bezahlmodell abstimmen.
+- Freie Stichwörter und mehrere Wünsche in einer Anfrage sollen bereichsübergreifend
+  Crew, Marktplatz, Locations, Firmen und die weiteren passenden öffentlichen
+  Verzeichnisse durchsuchen. Gemeinsame Ergebnisse werden **nach Bereich getrennt**
+  angezeigt; nicht nur den ersten Suchwunsch öffnen oder die übrigen verwerfen.
+- Jeder Suchteil behält seine eigenen Orts-/Länderangaben. Beispiel:
+  „Fahrer in München und Fahrer in Berlin“ sind zwei getrennte Suchteile.
+  Ein gemeinsamer nachgestellter Ort kann für mehrere passende Suchteile gelten.
+- Ein Suchwunsch kann mehrere Orte umfassen: „Beleuchter in Berlin und Hamburg“
+  findet Beleuchter in Berlin **oder** Hamburg. Ein Treffer muss nicht beide Orte
+  erfüllen. Auch vorangestellte Ortsangaben korrekt zuordnen: „Model in Berlin
+  und in Hamburg Beleuchter“ findet Models in Berlin sowie Beleuchter in Hamburg;
+  daraus nicht automatisch Models in Hamburg oder Beleuchter in Berlin machen.
+  Beruf/Gegenstand und die dazugehörigen Orte bleiben in der Ergebnisdarstellung
+  erkennbar, auch wenn beide Suchteile im gleichen Bereich liegen.
+- Bereichs- und Ortswechsel kombinieren: „Model in Berlin und ein Auto in Afrika“
+  bedeutet Crew/Models in Berlin plus Marktplatz/Fahrzeuge in Afrika. Kontinente
+  als größere Suchgebiete berücksichtigen; Länder und Städte erlauben eine
+  genauere Eingrenzung. Kontinente verwenden die Ländergruppen aus Unicode CLDR;
+  Einträge ohne entsprechend zuordenbaren öffentlichen Ort werden nicht geraten.
+- Zu prüfende Beispiele: „Oberbeleuchter und Produktionsfahrer in München“,
+  „OB und Fahrer in München“, „jemand vom Kostüm in der Schweiz“ sowie
+  „eine vom Kostüm und ein Boot in Berlin“. Kurzformen und Schreibvarianten
+  berücksichtigen, ohne Berufe, Treffer oder Orte zu erfinden. Unklare Wünsche
+  müssen verständlich geklärt werden; „alles funktioniert“ ist keine geprüfte Zusage.
+- Gemeinsames Ergebnisziel ist die erweiterte `/search`-Seite.
+  Einen späteren Arbeitsplatz-Einstieg mit APP Entwicklung abstimmen;
+  bestehendes Design, aktuelle Sichtbarkeitsrechte und kurzlebige Suchdaten erhalten.
+- WEB CODEX übernimmt Website und gemeinsame Suchschnittstelle;
+  APP Entwicklung koordiniert den nativen Arbeitsplatz und Xcode. Der gemeinsame
+  Vertrag und die Testgrenzen stehen in `genie-beta.md`. Dies veröffentlicht die
+  Funktion nicht automatisch und bestätigt keine echte iPhone-/Android-Prüfung.
+
 ## Bildsprache und horizontale Karten
 
 - Auf Crew, Marktplatz, News, Locations, Firmen und Projekte steht das vorhandene

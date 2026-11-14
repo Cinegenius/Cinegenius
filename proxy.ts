@@ -253,6 +253,7 @@ export default clerkMiddleware(async (auth, request) => {
   const isPublicNewsletterAction = request.method === "POST" && [
     "/api/newsletter/subscribe", "/api/newsletter/confirm", "/api/newsletter/unsubscribe",
   ].includes(request.nextUrl.pathname);
+  const isPublicSearchRead = request.method === "POST" && request.nextUrl.pathname === "/api/search/unified";
 
   // 2. Admin route guard — enforces both session + admin role
   //    This runs BEFORE the generic auth.protect() so non-admin authenticated
@@ -288,6 +289,9 @@ export default clerkMiddleware(async (auth, request) => {
     // Newsletter opt-in and signed confirmation/unsubscribe links also serve
     // visitors without a member account. Origin checks above still apply;
     // handlers validate consent/tokens and retain their durable rate limits.
+  } else if (isPublicSearchRead) {
+    // Exact read-only search endpoint. Origin/flood checks above still apply;
+    // its handler validates the bounded plan and current visibility per request.
   } else if (isApi && !isPublicApiGet(request)) {
     // Private fetch endpoints must not follow Clerk's hosted sign-in redirect
     // after logout/session expiry. Keep the existing authenticated-session

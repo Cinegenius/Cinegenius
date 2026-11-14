@@ -78,7 +78,10 @@ is repeated on its own result page, the old matching URL is not evidence that
 the new launch/normalization has completed. The three supported directory
 views pass their launch key to shared URL normalization even if the requested
 filters are identical; normalization continues to replace only the current
-entry and yields to real Back/navigation.
+entry and yields to real Back/navigation. The unified `/search?plan=…` destination
+has no temporary directory marker; repeating its identical resolved URL may
+speak immediately once the request completes. Different plans still wait for
+their own route. All plan links pass the shared `searchPlanFromHref` validator.
 Native navigation checks invalidate only operations belonging to an older URL;
 a queued old navigation observation must not cancel speech begun on the new URL.
 

@@ -1,6 +1,6 @@
 # Übergreifende Suche: Startseite und Arbeitsplatz
 
-Aktueller Status vom 14. November 2026: **zur Umsetzung freigegeben, noch keine Veröffentlichung beauftragt**. WEB CODEX hat Markus' neue ausdrückliche Entscheidung „ok dann setzen wir das um“ an APP Entwicklung übermittelt. Sie ersetzt den vorherigen Aufschub. WEB CODEX bearbeitet Website und gemeinsame Suchlogik auf `codex/genie-unified-search`; die konkrete geprüfte Schnittstelle und der Implementierungs-Commit stehen für die App-Übernahme noch aus. Andere bereits beauftragte App-Arbeiten bleiben erhalten.
+Aktueller Status vom 14. November 2026: **gemeinsamer Suchstand zur App-Integration übergeben und von WEB veröffentlicht**. WEB CODEX hat den geprüften Commit `ce37ab6548fbeb3e021db52424da0977c682abab` geliefert; der Mergebaum entspricht dem geprüften `b094f29`. Nach der vorgezogenen Limits-Veröffentlichung `83a3dc1` ist nun auch `ce37ab6` auf beiden CineGenius-Domains live, Vercel `dpl_8z1GdsEiHEwXUvkt2etix1KqqWjH` READY. Diese Übergabe beauftragt keine App-Veröffentlichung. Andere bereits beauftragte App-Arbeiten bleiben erhalten; reale native Sprach- und persönliche Modellprüfungen sind davon getrennt.
 
 ## Bestätigter Bedienablauf
 
@@ -13,7 +13,7 @@ Aktueller Status vom 14. November 2026: **zur Umsetzung freigegeben, noch keine 
 - Jeder Suchteil behält seine eigenen Angaben, insbesondere seinen Ort. „Fahrer in München UND Fahrer in Berlin“ enthält zwei eigenständige Suchteile. Nicht allein nach Beruf zusammenfassen oder einen gemeinsamen Ort über alle Suchteile legen.
 - Ein Suchteil kann mehrere Orte umfassen. „Beleuchter in Berlin und Hamburg“ bedeutet Beleuchter in **Berlin ODER Hamburg**; ein einzelner Treffer muss nicht beide Städte erfüllen.
 - Vorangestellte Ortsangaben gehören zum jeweiligen Suchteil: „Model in Berlin und in Hamburg Beleuchter“ bedeutet ausschließlich Models in Berlin sowie Beleuchter in Hamburg. Nicht alle Berufe mit allen genannten Orten kombinieren.
-- Bereichswechsel und unterschiedliche Gebietsgrößen bleiben möglich: „Model in Berlin und ein Auto in Afrika“ bedeutet Crew/Models in Berlin plus Marktplatz/Fahrzeuge in Afrika. Kontinente als spätere Suchgebiete berücksichtigen, mit Ländern und Städten zur genaueren Eingrenzung. Die geografische Auflösung ist beim späteren Bau zu prüfen; eine Kontinentsuche ist derzeit nicht implementiert.
+- Bereichswechsel und unterschiedliche Gebietsgrößen bleiben möglich: „Model in Berlin und ein Auto in Afrika“ bedeutet Crew/Models in Berlin plus Marktplatz/Fahrzeuge in Afrika. Kontinent-, Länder- und Stadtfilter sind Teil des übergebenen gemeinsamen Suchvertrags; bestehende Sichtbarkeitsrechte gelten vor geografischem Abgleich. Das ist keine Zusage vorhandener Treffer oder eines bereits erfolgten Livegangs.
 - Innerhalb der nach Bereichen gruppierten Ergebnisse bleiben Suchteil und zugehörige Orte erkennbar, auch wenn mehrere Suchteile zum selben Bereich gehören. Ein gemeinsamer nachgestellter Ort kann mehreren passenden Suchteilen zugeordnet werden; unklare Zuordnungen verständlich klären.
 
 ## Spätere kostenpflichtige Nutzung
@@ -24,9 +24,9 @@ Beim späteren Bau gemeinsame Suchlogik, Darstellung und Tarifzugriff trennen. T
 
 ## App-Integration und Übergabe
 
-WEB CODEX verantwortet die gemeinsame Suchlogik und die bestehende `/search`-Ergebnisseite. APP Entwicklung koordiniert den nativen Arbeitsplatz-Einstieg und Xcode mit dem geprüften Web-Stand. Eine verbindliche neue Schnittstelle oder ein geprüfter Implementierungs-Commit liegt für diese Funktion noch nicht vor; noch keine native Suchintegration als fertig melden.
+WEB CODEX verantwortet die gemeinsame Suchlogik und die bestehende `/search`-Ergebnisseite. APP Entwicklung integriert den geprüften Web-Stand unter Erhalt der App-Erweiterungen. Der native Arbeitsplatz-Einstieg benötigt weiterhin den Abgleich mit den neueren Mac-Quellen; Quellcodeübernahme nicht als fertigen Xcode-/iPhone-Stand melden.
 
-Für die Übergabe benötigt APP Entwicklung den geprüften Commit, das tatsächliche Eingabe-/Navigationsformat, Ergebnismodell und Fehlerverhalten, Sprachänderungen sowie Test- und Veröffentlichungsstatus. App-Annahmefälle sind die oben festgehaltenen getrennten Suchteile und Ortsmengen, identische erneute Suchaufträge, reale Zurück-Navigation, unterbrochene Eingaben sowie die gemeinsame Genie-Navigation und Sprachausgabe.
+Der Vertrag steht in `lib/unified-search.ts` und `docs/genie-beta.md`: Version 1, ein bis sechs Suchteile und bis zu vier ODER-Orte pro Teil. `/search?smart=1&q=…` interpretiert eine ausdrücklich gesendete Eingabe; `/search?plan=…` öffnet den streng geprüften Plan direkt. `POST /api/search/unified` liefert lesende, nach Bereich und Suchteil gruppierte Ergebnisse samt expliziter Fortsetzung. Genie behält `{reply,language,links}` und liefert einen validierten Link für alle Suchteile. Keine zusätzlichen nativen Provider-Schlüssel oder parallelen Parser. App-Annahmefälle sind die oben festgehaltenen getrennten Suchteile und Ortsmengen, identische erneute Suchaufträge, reale Zurück-Navigation, unterbrochene Eingaben sowie die gemeinsame Genie-Navigation und Sprachausgabe.
 
 Der native Einstieg nutzt die gemeinsame Suche im bestehenden erlaubten CineGenius-Ursprung und die vorhandene Sitzung. Kein zweiter Suchparser, keine separate Anmeldung und keine Kopie von Sitzungstokens oder Suchtexten in native Archive. Die Suche benötigt keine Scanner-/Location-Auswahl oder Kameraberechtigung. Beim Wechsel zur Suche bleiben offene Arbeitsplatz-Entwürfe und die bestehende Abbruch-/Speicherbehandlung erhalten. Neue WebView-Handler oder Rücksprungformate erst auf Grundlage der geprüften Schnittstelle festlegen.
 
@@ -34,4 +34,4 @@ Die Präzisierungen zu Startseite, kostenpflichtiger Nutzung und Ortszuordnung w
 
 Beim späteren Abgleich bleiben laufende native Änderungen, Grundrisse, Fotos, PDF- und Drehplan-/Dispo-Arbeit erhalten. Den tatsächlichen Mac-Stand vor Änderungen prüfen; die Serverfassung der nativen Oberfläche darf neuere Mac-Arbeit nicht überschreiben. Die bestehende kontogebundene Sichtbarkeit und Bildberechtigung gelten auch für gemeinsame Ergebnisse. Neue Bedienoberflächen und Texte gehören dann gleichzeitig in alle neun bestehenden Sprachen.
 
-Diese Notiz aktiviert kein Werkzeug, erweitert keinen Sprach-/WebView-Handler, verändert keine Suche und enthält keine Veröffentlichungsfreigabe. Schnittstellen und Geräteprüfungen werden mit der geprüften Web-Übergabe konkretisiert. Der aktuelle Mac-Auftrag bearbeitet native Dokumentvorlagen und Symbole; sein neuerer Quellstand muss vor der tatsächlichen Integration abgeglichen werden.
+Diese Notiz aktiviert keinen nativen Werkzeug-Einstieg und enthält keine Veröffentlichungsfreigabe. Ein realer iPhone-/Xcode-Test steht zusätzlich zur Server-/Browserprüfung aus. Der aktuelle Mac-Auftrag bearbeitet native Dokumentvorlagen und Symbole; sein neuerer Quellstand muss vor der nativen Integration abgeglichen werden.

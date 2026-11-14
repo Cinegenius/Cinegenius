@@ -1,6 +1,6 @@
 # Genie: Kontolimits und native Sprachqualität
 
-Abstimmung mit WEB CODEX, 14. November 2026. Die neue Kontoregel ist beauftragt; die geprüfte Implementierungs-/Veröffentlichungsübergabe an APP steht noch aus. Diese Notiz ändert weder Serverkonfiguration noch native Berechtigungen. Die bestehende App-Sprachausgabe wurde im Quellcode geprüft; ein aktueller Hörtest auf dem iPhone liegt nicht vor.
+Abstimmung mit WEB CODEX, 14. November 2026. Nach der vorgezogenen Kontolimit-Veröffentlichung `83a3dc1` ist der geprüfte Gesamtstand `ce37ab6548fbeb3e021db52424da0977c682abab` einschließlich Mehrfachsuche und persönlichem Modellprofil auf beiden CineGenius-Domains live, Vercel `dpl_8z1GdsEiHEwXUvkt2etix1KqqWjH` READY. Die erfolgreiche persönliche Modellnutzung und tatsächliche Latenz sind dadurch nicht gemessen; dieser Live-Test steht mit Markus' Konto aus. Diese Notiz ändert weder Serverkonfiguration noch native Berechtigungen. Die bestehende App-Sprachausgabe wurde im Quellcode geprüft; ein aktueller Hörtest auf dem iPhone liegt nicht vor.
 
 ## Gemeinsame Kontoregel
 
@@ -8,10 +8,11 @@ Abstimmung mit WEB CODEX, 14. November 2026. Die neue Kontoregel ist beauftragt;
 - Ausschließlich Markus' verifiziertes Konto erhält kein Tageslimit. Die serverseitige Konfiguration `GENIE_UNLIMITED_USER_ID` muss dessen bestätigte Konto-ID enthalten. Weder Anzeigename noch Admin-Rolle oder Client-Parameter begründen die Ausnahme.
 - Der bestehende Schutz pro Minute bleibt auch für dieses Konto wirksam. Kein unbegrenzter Zugriff auf andere Konten, Inhalte oder geschützte Medien.
 - Website und App verwenden dieselbe Serverentscheidung. Keine native Kopie von Zählern oder Sonderrechten; keine neue Account-ID im Sprachhandler und keine zusätzliche Speicherung von Sitzungsmaterial.
+- Browser-Transkription plus Interpretation zählen aktuell als zwei KI-Aufrufe. Native Geräteerkennung verwendet keinen Server-Transkriptionsaufruf; die nachfolgende Genie-Interpretation zählt regulär.
 - Besseres Sprachverständnis und schnelle Verarbeitung für Markus werden serverseitig abgestimmt. WEB hat dafür „GPT-6 Astra“, „Ultrafast“ und begrenztes Reasoning angekündigt. Konkrete API-Modellkennung, unterstützte Parameter, Verfügbarkeit, Verhalten und tatsächlicher Rollout müssen mit dem geprüften Web-Commit belegt werden. Die App darf daraus keine Modellverfügbarkeit, garantierte Antwortzeit oder Inhaltsrechte ableiten. Normale Konten sollen beim bisherigen Modell bleiben.
 - Browser-Transkription, native Spracherkennung, serverseitiges Textmodell und native Sprachausgabe bleiben getrennte Funktionen. Ein anderes Textmodell installiert keine Stimme auf dem iPhone.
 
-Markus hat die Veröffentlichung der Kontolimits inzwischen in WEB CODEX ausdrücklich angefordert. Den tatsächlichen Live-Stand erst nach dessen geprüftem Veröffentlichungsbeleg übernehmen. Das ist kein Auftrag, ungeprüfte Mehrfachsuche oder zusätzliche native Änderungen zu veröffentlichen.
+WEB CODEX meldet für die separate Limits-Veröffentlichung 36 bestandene API-Regressionen sowie öffentliche HTTP-200- und signed-out-401/private-no-store-Prüfungen. Der veröffentlichte Kontolimit-Stand ist von noch ausstehenden persönlichen Modell-/Latenztests und nativen Geräteprüfungen zu unterscheiden. Das ist kein Auftrag, zusätzliche native Änderungen zu veröffentlichen.
 
 ## Bereits vorhandene native Auswahl
 
