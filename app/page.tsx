@@ -1,3 +1,5 @@
+import { profileAccessFor } from "@/lib/profile-privacy-server";
+import { projectProfilePrivacy } from "@/lib/profile-privacy";
 import { homeMarketplaceOffers } from "@/lib/home-marketplace";
 import HomeOrganizations from "@/components/organizations/HomeOrganizations";
 import { listingPriceLabel } from "@/lib/listing-price";
@@ -92,8 +94,8 @@ async function getHomeData() {
   }
 
   const results = await Promise.all([
-    db.from("listings").select("id,title,city,price,image_url,metadata,created_at").eq("type", "location").eq("published", true).order("created_at", { ascending: false }).limit(10),
-    db.from("listings").select("id,title,city,price,created_at").eq("type", "job").eq("published", true).order("created_at", { ascending: false }).limit(4),
+    db.from("privacy_visible_listings").select("id,title,city,price,image_url,metadata,created_at").eq("type", "location").eq("published", true).order("created_at", { ascending: false }).limit(10),
+    db.from("privacy_visible_listings").select("id,title,city,price,created_at").eq("type", "job").eq("published", true).order("created_at", { ascending: false }).limit(4),
     homeMarketplaceOffers(currentTime),
     db.from("companies").select("id,slug,name,logo_url,city,categories").eq("published", true).order("created_at", { ascending: false }).limit(6),
     db.from("profiles").select("user_id,slug,display_name,tagline,avatar_url,location,verified,role,positions,profile_type,profile_types,created_at").not("display_name", "is", null).neq("display_name", "").order("created_at", { ascending: false }).limit(300),
@@ -110,11 +112,11 @@ async function getHomeData() {
   const profileRows = (profilesRaw ?? []) as HomeProfileRow[];
   // Independent permission-aware lookups run together; private profiles are
   // still excluded before any card is constructed. Never cache these results.
-  const [privateIds, propProviders] = await Promise.all([
-    getPrivateProfileIds(profileRows.map((profile) => profile.user_id)),
+  const [privacy, propProviders] = await Promise.all([
+    profileAccessFor(profileRows.map(profile => profile.user_id)),
     getListingProviders((recentProps ?? []).map((p) => ({ user_id: p.user_id, company_id: p.company_id, responsible_person: p.responsible_person }))),
   ]);
-  const publicProfiles = profileRows.filter((profile) => !privateIds.has(profile.user_id));
+  const publicProfiles = profileRows.filter(profile => privacy.get(profile.user_id)?.profile).map(profile => projectProfilePrivacy(profile, privacy.get(profile.user_id)));
 
   // Use the same eligibility rule as the people directory. Location and
   // marketplace providers are people too, even when they do not also choose

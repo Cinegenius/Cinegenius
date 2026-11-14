@@ -1,3 +1,6 @@
+import { auth } from "@clerk/nextjs/server";
+import { profileAccessFor } from "@/lib/profile-privacy-server";
+import { projectProfilePrivacy } from "@/lib/profile-privacy";
 import { publicMapPoint } from "@/lib/places/public-map-point";
 import { getTranslations as getResponseTranslations } from "next-intl/server";
 import { getLocale } from "next-intl/server";
@@ -32,10 +35,12 @@ export async function GET(req: NextRequest) {
 
   if (error) return NextResponse.json({ error: tResponse('System.requestFailed') }, { status: 500 });
 
-  const privateProfileIds = await getPrivateProfileIds((profiles ?? []).map((profile) => profile.user_id));
+  const { userId } = await auth();
+  const privacy = await profileAccessFor((profiles ?? []).map(profile => profile.user_id), userId);
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const creators = (profiles ?? []).filter((profile) => !privateProfileIds.has(profile.user_id) && isPeopleDirectoryProfile(profile)).map((p: any) => {
+  const creators = (profiles ?? []).filter((profile) => privacy.get(profile.user_id)?.profile && isPeopleDirectoryProfile(profile)).map((raw: any) => {
+    const p = projectProfilePrivacy(raw, privacy.get(raw.user_id));
     const phys = p.physical ?? {};
     const avail = p.availability_config ?? {};
     const types = normalizeProfileTypes(p.profile_types, p.profile_type);
@@ -80,5 +85,5 @@ export async function GET(req: NextRequest) {
     };
   }).filter(Boolean);
 
-  return NextResponse.json({ creators, hasMore: (profiles ?? []).length === PAGE_SIZE });
+  return NextResponse.json({ creators, hasMore: (profiles ?? []).length === PAGE_SIZE }, {headers:{"Cache-Control":"private, no-store"}});
 }

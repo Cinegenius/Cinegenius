@@ -8338,5 +8338,35 @@
     "saveError": "No se pudo guardar tu selección. Permite las cookies de preferencias e inténtalo de nuevo.",
     "loadError": "No se pudieron cargar las publicaciones.",
     "retry": "Reintentar"
+  },
+  "PrivacySettings": {
+    "title": "Privacidad",
+    "intro": "Elige quién puede ver tus datos. Los cambios se guardan al momento.",
+    "ghost": "Modo fantasma",
+    "ghostHelp": "Oculta tu perfil personal, ubicación, estado de actividad y anuncios personales, también a tus amigos.",
+    "limits": "Los mensajes existentes se conservan. Las imágenes que antes eran públicas pueden seguir accesibles mediante enlaces conocidos o copias. Las páginas de empresas tienen su propia visibilidad.",
+    "ghostActive": "Modo fantasma activado. Se conservan tus opciones anteriores.",
+    "visibility": "Visibilidad",
+    "profile": "Mi perfil",
+    "location_visibility": "Ubicación",
+    "map_visibility": "Mapa y búsqueda cercana",
+    "activity_visibility": "Estado de actividad",
+    "phone_visibility": "Teléfono",
+    "contact_email_visibility": "Correo de contacto",
+    "locationHelp": "El mapa muestra el lugar indicado en tu perfil, no tu ubicación en tiempo real. Los lugares ocultos del perfil no se usan en mapas ni búsquedas cercanas. Tus anuncios tienen sus propios datos de ubicación. Elimina por tu cuenta los lugares mencionados en tus textos o fotos.",
+    "messages": "¿Quién puede escribirme?",
+    "email": "Correo para mensajes nuevos",
+    "loading": "Cargando ajustes…",
+    "unavailable": "Los ajustes aún no están disponibles.",
+    "saving": "Guardando…",
+    "saved": "Guardado.",
+    "error": "No se pudo confirmar el ajuste. Recarga y compruébalo.",
+    "retry": "Recargar",
+    "audience": {
+      "public": "Todos",
+      "members": "Miembros conectados",
+      "friends": "Solo amigos confirmados",
+      "hidden": "Solo yo"
+    }
   }
 }

@@ -1,3 +1,4 @@
+import { ghostProfileIds } from "@/lib/profile-privacy-server";
 import { db } from "@/lib/db";
 import { requireAuth } from "@/lib/auth";
 import { rateLimit } from "@/lib/rateLimit";
@@ -10,11 +11,11 @@ export async function GET(_request: NextRequest, context: { params: Promise<{ id
   const { id } = await context.params;
   const { userId } = await auth();
   const { data: post } = await db.from("community_posts")
-    .select("id")
+    .select("id,author_id")
     .eq("id", id)
     .gt("expires_at", new Date().toISOString())
     .maybeSingle();
-  if (!post) return NextResponse.json({ replies: [] }, { headers: { "Cache-Control": "private, no-store, max-age=0" } });
+  if (!post || (post.author_id !== userId && (await ghostProfileIds([post.author_id])).has(post.author_id))) return NextResponse.json({ replies: [] }, { headers: { "Cache-Control": "private, no-store, max-age=0" } });
 
   const { data, error } = await db
     .from("community_replies")
@@ -25,11 +26,13 @@ export async function GET(_request: NextRequest, context: { params: Promise<{ id
   if (error) return NextResponse.json({ error: tResponse('System.m_43e5618b2a88') }, { status: 500 });
   if (!data?.length) return NextResponse.json({ replies: [] }, { headers: { "Cache-Control": "private, no-store, max-age=0" } });
 
-  const authorIds = [...new Set(data.map((reply) => reply.author_id))];
+  const hidden = await ghostProfileIds(data.map(reply => reply.author_id));
+  const visibleReplies = data.filter(reply => reply.author_id === userId || !hidden.has(reply.author_id));
+  const authorIds = [...new Set(visibleReplies.map((reply) => reply.author_id))];
   const { data: profiles } = await db.from("profiles").select("user_id,display_name,avatar_url").in("user_id", authorIds);
   const profileById = new Map((profiles ?? []).map((profile) => [profile.user_id, profile]));
   return NextResponse.json({
-    replies: data.map((reply) => {
+    replies: visibleReplies.map((reply) => {
       const profile = profileById.get(reply.author_id);
       return {
         id: reply.id,
@@ -62,8 +65,8 @@ export async function POST(request: NextRequest, context: { params: Promise<{ id
   if (!body || body.length > 1000) return NextResponse.json({ error: tResponse('System.m_89721873a772') }, { status: 400 });
 
   const { id } = await context.params;
-  const { data: post } = await db.from("community_posts").select("id").eq("id", id).gt("expires_at", new Date().toISOString()).maybeSingle();
-  if (!post) return NextResponse.json({ error: tResponse('System.m_b50fa7ea9061') }, { status: 404 });
+  const { data: post } = await db.from("community_posts").select("id,author_id").eq("id", id).gt("expires_at", new Date().toISOString()).maybeSingle();
+  if (!post || (post.author_id !== userId && (await ghostProfileIds([post.author_id])).has(post.author_id))) return NextResponse.json({ error: tResponse('System.m_b50fa7ea9061') }, { status: 404 });
 
   const { data, error } = await db
     .from("community_replies")

@@ -1,6 +1,8 @@
 import type { MetadataRoute } from "next";
 import { db } from "@/lib/db";
 
+export const dynamic = "force-dynamic";
+
 const BASE = "https://www.cinegenius.co";
 
 const typeToPath: Record<string, string> = {
@@ -55,7 +57,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       { data: companies },
       { data: projects },
     ] = await Promise.all([
-      db.from("listings")
+      db.from("privacy_visible_listings")
         .select("id, type, created_at")
         .eq("published", true),
 

@@ -8338,5 +8338,35 @@
     "saveError": "Die Auswahl konnte nicht gespeichert werden. Bitte erlaube Cookies für Einstellungen und versuche es erneut.",
     "loadError": "Die Beiträge konnten nicht geladen werden.",
     "retry": "Erneut versuchen"
+  },
+  "PrivacySettings": {
+    "title": "Privatsphäre",
+    "intro": "Du bestimmst, wer deine Angaben sehen darf. Änderungen werden direkt gespeichert.",
+    "ghost": "Ghost-Modus",
+    "ghostHelp": "Verbirgt dein persönliches Profil, deinen Ort, Aktivitätsstatus und deine persönlichen Angebote – auch vor Freunden.",
+    "limits": "Bestehende Nachrichten bleiben bestehen. Früher öffentlich gespeicherte Bilder können über bekannte Links oder Kopien weiter erreichbar sein. Firmenseiten haben eigene Sichtbarkeit.",
+    "ghostActive": "Ghost-Modus aktiv. Deine bisherige Auswahl bleibt gespeichert.",
+    "visibility": "Sichtbarkeit",
+    "profile": "Mein Profil",
+    "location_visibility": "Ortsangabe",
+    "map_visibility": "Karte und Umkreissuche",
+    "activity_visibility": "Aktivitätsstatus",
+    "phone_visibility": "Telefonnummer",
+    "contact_email_visibility": "Kontakt-E-Mail",
+    "locationHelp": "Die Karte zeigt den im Profil angegebenen Ort, keinen Live-Standort. Verborgene Profilorte werden auch nicht für Karte oder Umkreissuche verwendet. Eigene Angebote haben separate Ortsangaben. Orte in eigenen Texten oder Fotos bitte selbst entfernen.",
+    "messages": "Wer darf mir schreiben?",
+    "email": "E-Mail bei neuen Nachrichten",
+    "loading": "Einstellungen werden geladen…",
+    "unavailable": "Einstellungen sind noch nicht verfügbar.",
+    "saving": "Wird gespeichert…",
+    "saved": "Gespeichert.",
+    "error": "Die Einstellung konnte nicht bestätigt werden. Bitte neu laden und prüfen.",
+    "retry": "Erneut laden",
+    "audience": {
+      "public": "Alle",
+      "members": "Angemeldete Mitglieder",
+      "friends": "Nur bestätigte Freunde",
+      "hidden": "Nur ich"
+    }
   }
 }

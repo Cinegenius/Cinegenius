@@ -35,6 +35,7 @@ function legacyCityPoint(row: Record<string, unknown>) {
 /** Server-side public projection. A city centre is never a member's address. */
 export function publicMapPoint(record: object): { lat: number | null; lng: number | null } {
   const row = record as Record<string, unknown>;
+  if (row.map_visible === false) return { lat: null, lng: null };
   if (row.place_city_id) {
     const point = typeof row.place_city_id === 'string' && Object.hasOwn(points, row.place_city_id)
       ? points[row.place_city_id] : undefined;

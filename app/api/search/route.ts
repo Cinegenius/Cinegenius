@@ -1,3 +1,5 @@
+import { profileAccessFor } from "@/lib/profile-privacy-server";
+import { projectProfilePrivacy } from "@/lib/profile-privacy";
 import { animalCompanySearchFilter,animalProfileSearchValues } from "@/lib/animal-taxonomy";
 import {
 CATERING_COMPANY_CATEGORY,
@@ -18,14 +20,17 @@ import { getPrivateProfileIds } from "@/lib/trust";
 import { getLocale,getTranslations } from "next-intl/server";
 import { NextRequest,NextResponse } from "next/server";
 
-async function publicProfileMatches(read: (from: number, to: number) => PromiseLike<{ data: Record<string, unknown>[] | null; error: unknown }>) {
+async function publicProfileMatches(read: (from: number, to: number) => PromiseLike<{ data: Record<string, unknown>[] | null; error: unknown }>, queryText?: string) {
   const visible: Record<string, unknown>[] = [];
   for (let from = 0; visible.length < 24; from += 100) {
     const result = await read(from, from + 99);
     if (result.error) throw new Error("search_unavailable");
     const rows = result.data ?? [];
-    const privateIds = await getPrivateProfileIds(rows.map(row => String(row.user_id)));
-    visible.push(...rows.filter(row => row.display_name && !privateIds.has(String(row.user_id))));
+    const privacy = await profileAccessFor(rows.map(row => String(row.user_id)));
+    const key = (value: unknown) => String(value ?? "").normalize("NFKD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+    visible.push(...rows.filter(row => row.display_name && privacy.get(String(row.user_id))?.profile)
+      .filter(row => !queryText || privacy.get(String(row.user_id))?.location || key([row.display_name,row.role,row.bio,...(Array.isArray(row.positions)?row.positions:[])]).includes(key(queryText)))
+      .map(row => projectProfilePrivacy(row,privacy.get(String(row.user_id)))));
     if (rows.length < 100) break;
   }
   return { data: visible.slice(0, 24) };
@@ -55,8 +60,8 @@ export async function GET(req: NextRequest) {
 
   const [listingsRes, profilesRes, companiesRes, cateringProfileResults, cateringCompaniesRes, animalProfilesRes, animalRoleProfilesRes, animalCompaniesRes, safetyMedicalProfilesRes, safetyMedicalRoleProfilesRes, safetyMedicalCompaniesRes] = await Promise.all([
     wantListings
-      ? Promise.all(["location", "vehicle", "prop", "job", "creator", "animal"].map(kind => db.from("listings")
-          .select("place_country_code,place_region_id,place_city_id,place_city_name,place_region_name,place_status,id,title,city,type,category,price,image_url,price_negotiable:metadata->price_negotiable,price_on_request:metadata->price_on_request,rental_type:metadata->>rental_type,marketplace:metadata->marketplace")
+      ? Promise.all(["location", "vehicle", "prop", "job", "creator", "animal"].map(kind => db.from("privacy_visible_listings")
+          .select("place_country_code,place_region_id,place_city_id,place_city_name,place_region_name,place_status,user_id,id,title,city,type,category,price,image_url,price_negotiable:metadata->price_negotiable,price_on_request:metadata->price_on_request,rental_type:metadata->>rental_type,marketplace:metadata->marketplace")
           .eq("published", true).eq("type", kind)
           .or(`title.ilike.${like},city.ilike.${like},category.ilike.${like},description.ilike.${like}${categoryCandidates?`,and(type.in.(prop,vehicle),category.in.(${categoryCandidates}))`:""}${geoFilter?`,${geoFilter}`:""}`)
           .order("created_at", { ascending: false }).order("id").limit(type === kind || (type === "profile" && kind === "creator") ? 24 : 6)))
@@ -66,10 +71,10 @@ export async function GET(req: NextRequest) {
     wantProfiles
       ? publicProfileMatches((from, to) => db
           .from("profiles")
-          .select("place_country_code,place_region_id,place_city_id,place_city_name,place_region_name,place_status,user_id, display_name, location, role, positions, avatar_url, available")
+          .select("place_country_code,place_region_id,place_city_id,place_city_name,place_region_name,place_status,user_id, display_name, location, bio, role, positions, avatar_url, available")
           .or(`display_name.ilike.${like},role.ilike.${like},location.ilike.${like},bio.ilike.${like}${geoFilter?`,${geoFilter}`:""}`)
           .not("display_name", "is", null)
-          .neq("display_name", "").order("user_id").range(from, to))
+          .neq("display_name", "").order("user_id").range(from, to), q)
       : Promise.resolve({ data: [] }),
 
     wantCompanies
@@ -84,7 +89,7 @@ export async function GET(req: NextRequest) {
     cateringProfileValues.length
       ? Promise.all(cateringProfileValues.map((position) => publicProfileMatches((from, to) => db
           .from("profiles")
-          .select("place_country_code,place_region_id,place_city_id,place_city_name,place_region_name,place_status,user_id, display_name, location, role, positions, avatar_url, available")
+          .select("place_country_code,place_region_id,place_city_id,place_city_name,place_region_name,place_status,user_id, display_name, location, bio, role, positions, avatar_url, available")
           .contains("positions", [position])
           .not("display_name", "is", null)
           .neq("display_name", "").order("user_id").range(from, to))))
@@ -97,11 +102,11 @@ export async function GET(req: NextRequest) {
           .contains("categories", [CATERING_COMPANY_CATEGORY.id])
           .limit(type === "all" ? 8 : 24)
       : Promise.resolve({ data: [] }),
-    animalValues.length ? publicProfileMatches((from, to) => db.from("profiles").select("place_country_code,place_region_id,place_city_id,place_city_name,place_region_name,place_status,user_id, display_name, location, role, positions, avatar_url, available").overlaps("positions", animalValues).order("user_id").range(from, to)) : Promise.resolve({data: []}),
-    animalValues.length ? publicProfileMatches((from, to) => db.from("profiles").select("place_country_code,place_region_id,place_city_id,place_city_name,place_region_name,place_status,user_id, display_name, location, role, positions, avatar_url, available").in("role", animalValues).order("user_id").range(from, to)) : Promise.resolve({data: []}),
+    animalValues.length ? publicProfileMatches((from, to) => db.from("profiles").select("place_country_code,place_region_id,place_city_id,place_city_name,place_region_name,place_status,user_id, display_name, location, bio, role, positions, avatar_url, available").overlaps("positions", animalValues).order("user_id").range(from, to)) : Promise.resolve({data: []}),
+    animalValues.length ? publicProfileMatches((from, to) => db.from("profiles").select("place_country_code,place_region_id,place_city_id,place_city_name,place_region_name,place_status,user_id, display_name, location, bio, role, positions, avatar_url, available").in("role", animalValues).order("user_id").range(from, to)) : Promise.resolve({data: []}),
     wantCompanies && animalCompanySearchFilter(raw) ? db.from("companies").select("place_country_code,place_region_id,place_city_id,place_city_name,place_region_name,place_status,id, slug, name, city, logo_url, categories").eq("published",true).or(animalCompanySearchFilter(raw)).limit(24) : Promise.resolve({data: []}),
-    safetyMedicalValues.length ? publicProfileMatches((from, to) => db.from("profiles").select("place_country_code,place_region_id,place_city_id,place_city_name,place_region_name,place_status,user_id, display_name, location, role, positions, avatar_url, available").overlaps("positions", safetyMedicalValues).order("user_id").range(from, to)) : Promise.resolve({data: []}),
-    safetyMedicalValues.length ? publicProfileMatches((from, to) => db.from("profiles").select("place_country_code,place_region_id,place_city_id,place_city_name,place_region_name,place_status,user_id, display_name, location, role, positions, avatar_url, available").in("role", safetyMedicalValues).order("user_id").range(from, to)) : Promise.resolve({data: []}),
+    safetyMedicalValues.length ? publicProfileMatches((from, to) => db.from("profiles").select("place_country_code,place_region_id,place_city_id,place_city_name,place_region_name,place_status,user_id, display_name, location, bio, role, positions, avatar_url, available").overlaps("positions", safetyMedicalValues).order("user_id").range(from, to)) : Promise.resolve({data: []}),
+    safetyMedicalValues.length ? publicProfileMatches((from, to) => db.from("profiles").select("place_country_code,place_region_id,place_city_id,place_city_name,place_region_name,place_status,user_id, display_name, location, bio, role, positions, avatar_url, available").in("role", safetyMedicalValues).order("user_id").range(from, to)) : Promise.resolve({data: []}),
     searchSafetyMedicalCompanies ? db.from("companies").select("place_country_code,place_region_id,place_city_id,place_city_name,place_region_name,place_status,id, slug, name, city, logo_url, categories").eq("published", true).contains("categories", [SAFETY_MEDICAL_COMPANY_CATEGORY_ID]).limit(24) : Promise.resolve({data: []}),
   ]);
 
@@ -109,7 +114,12 @@ export async function GET(req: NextRequest) {
     if ("error" in result && result.error) throw new Error("search_unavailable");
   }
 
-  const listings = (listingsRes.data ?? []).map((l: Record<string, unknown>) => ({
+  const listingRows = listingsRes.data ?? [];
+  const creatorPrivacy = await profileAccessFor(listingRows.filter(row => row.type === "creator").map(row => String(row.user_id)));
+  const listings = listingRows.filter(row => row.type !== "creator" || (creatorPrivacy.get(String(row.user_id))?.profile
+    && (creatorPrivacy.get(String(row.user_id))?.location || `${row.title ?? ""} ${row.category ?? ""}`.toLowerCase().includes(q.toLowerCase()))))
+    .map(row => row.type === "creator" ? projectProfilePrivacy(row, creatorPrivacy.get(String(row.user_id))) : row)
+    .map((l: Record<string, unknown>) => ({
     id: l.id as string,
     title: l.title as string,
     subtitle: placeDisplay(placeReadFields(String(l.city??""),l,locale),String(l.city??""),locale),

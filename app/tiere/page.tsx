@@ -16,7 +16,7 @@ export default async function TierePage() {
   const locale=await getLocale();
   const t = await getTranslations("FilmAnimals");
   const data = await collectFacetRows<Record<string, unknown>>((from, to) => db
-    .from("listings")
+    .from("privacy_visible_listings")
     .select("place_country_code,place_region_id,place_city_id,place_city_name,place_region_name,place_status,id, user_id, type, title, category, city, price, image_url, description, metadata")
     .eq("published", true)
     .eq("type", "animal")

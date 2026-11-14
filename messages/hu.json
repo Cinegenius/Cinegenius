@@ -8338,5 +8338,35 @@
     "saveError": "A választást nem sikerült menteni. Engedélyezd a beállítási sütiket, és próbáld újra.",
     "loadError": "A bejegyzéseket nem sikerült betölteni.",
     "retry": "Újrapróbálkozás"
+  },
+  "PrivacySettings": {
+    "title": "Adatvédelem",
+    "intro": "Te döntöd el, ki láthatja az adataidat. A módosításokat azonnal mentjük.",
+    "ghost": "Szellemmód",
+    "ghostHelp": "Elrejti a személyes profilodat, helyedet, aktivitásodat és személyes hirdetéseidet, még az ismerőseid elől is.",
+    "limits": "A meglévő üzenetek megmaradnak. A korábban nyilvános képek ismert hivatkozásokon vagy másolatokon keresztül továbbra is elérhetők lehetnek. A céges oldalak láthatósága külön szabályozható.",
+    "ghostActive": "A szellemmód aktív. A korábbi beállításaid megmaradnak.",
+    "visibility": "Láthatóság",
+    "profile": "Saját profil",
+    "location_visibility": "Hely",
+    "map_visibility": "Térkép és közeli keresés",
+    "activity_visibility": "Aktivitási állapot",
+    "phone_visibility": "Telefonszám",
+    "contact_email_visibility": "Kapcsolattartási e-mail",
+    "locationHelp": "A térkép a profilban megadott helyet mutatja, nem az élő tartózkodási helyet. A rejtett profilhely nem jelenik meg a térképen vagy a közeli keresésekben. A hirdetések külön helyadatokkal rendelkeznek. A saját szövegekben vagy képeken szereplő helyeket magad távolítsd el.",
+    "messages": "Ki írhat nekem?",
+    "email": "E-mail új üzenetekről",
+    "loading": "Beállítások betöltése…",
+    "unavailable": "A beállítások még nem érhetők el.",
+    "saving": "Mentés…",
+    "saved": "Mentve.",
+    "error": "A beállítást nem sikerült megerősíteni. Töltsd be újra és ellenőrizd.",
+    "retry": "Újratöltés",
+    "audience": {
+      "public": "Mindenki",
+      "members": "Bejelentkezett tagok",
+      "friends": "Csak visszaigazolt ismerősök",
+      "hidden": "Csak én"
+    }
   }
 }

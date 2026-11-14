@@ -8338,5 +8338,35 @@
     "saveError": "Your selection could not be saved. Please allow preference cookies and try again.",
     "loadError": "The posts could not be loaded.",
     "retry": "Try again"
+  },
+  "PrivacySettings": {
+    "title": "Privacy",
+    "intro": "Choose who can see your information. Changes are saved immediately.",
+    "ghost": "Ghost mode",
+    "ghostHelp": "Hides your personal profile, location, activity status and personal listings, including from friends.",
+    "limits": "Existing messages remain. Previously public images may still be accessible through known links or copies. Company pages have independent visibility.",
+    "ghostActive": "Ghost mode is on. Your previous choices are kept.",
+    "visibility": "Visibility",
+    "profile": "My profile",
+    "location_visibility": "Location",
+    "map_visibility": "Map and nearby search",
+    "activity_visibility": "Activity status",
+    "phone_visibility": "Phone number",
+    "contact_email_visibility": "Contact email",
+    "locationHelp": "The map shows the place entered in your profile, not your live location. Hidden profile locations are excluded from maps and nearby searches. Your offers have separate location details. Please remove places mentioned in your own text or photos yourself.",
+    "messages": "Who can message me?",
+    "email": "Email for new messages",
+    "loading": "Loading settings…",
+    "unavailable": "Settings are not available yet.",
+    "saving": "Saving…",
+    "saved": "Saved.",
+    "error": "The setting could not be confirmed. Reload and check it.",
+    "retry": "Reload",
+    "audience": {
+      "public": "Everyone",
+      "members": "Signed-in members",
+      "friends": "Accepted friends only",
+      "hidden": "Only me"
+    }
   }
 }

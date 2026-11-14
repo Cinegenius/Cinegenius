@@ -30,7 +30,7 @@ export default async function VehiclesPage() {
   let serverError = false;
   const facetRows = await marketplaceFacetRows(locale);
   try {
-  const { data, error } = await db.from("listings")
+  const { data, error } = await db.from("privacy_visible_listings")
     .select("place_country_code,place_region_id,place_city_id,place_city_name,place_region_name,place_status,id,type,title,category,city,price,image_url,description,created_at,marketplace:metadata->marketplace,rental_type:metadata->>rental_type,price_on_request:metadata->price_on_request,price_negotiable:metadata->price_negotiable,condition:metadata->>condition,delivery:metadata->delivery,focal_point:metadata->focal_point")
     .eq("published", true).eq("type", "vehicle")
     .order("created_at", { ascending: false }).limit(300);

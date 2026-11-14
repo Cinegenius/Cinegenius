@@ -1874,6 +1874,7 @@ function SimilarProfilesSection({ profiles }: { profiles: SimilarProfile[] }) {
 export default function ProfileView({
   profile,
   isOwner,
+  privacyViewerId = null,
   projectCredits = [],
   companyMembership = null,
   externalProfiles = [],
@@ -1887,6 +1888,7 @@ export default function ProfileView({
 }: {
   profile: UserProfile;
   isOwner: boolean;
+  privacyViewerId?: string | null;
   projectCredits?: ProjectCredit[];
   companyMembership?: CompanyMemberships;
   externalProfiles?: ExternalProfileRow[];
@@ -1914,10 +1916,12 @@ export default function ProfileView({
     if (previous !== undefined && previous !== activeViewerId) router.refresh();
   }, [activeViewerId, isLoaded, router]);
 
+  if (isLoaded && privacyViewerId && activeViewerId !== privacyViewerId) return null;
+
   const phoneVisibility = profile.visibility?.phone ?? "hidden";
   const emailVisibility = profile.visibility?.contact_email ?? "hidden";
-  const canSeePhone = phoneVisibility === "public" || (phoneVisibility === "members" && !!activeViewerId) || effectiveOwner;
-  const canSeeEmail = emailVisibility === "public" || (emailVisibility === "members" && !!activeViewerId) || effectiveOwner;
+  const canSeePhone = phoneVisibility === "public" || (phoneVisibility === "members" && !!activeViewerId) || (phoneVisibility === "friends" && !!activeViewerId && activeViewerId === privacyViewerId) || effectiveOwner;
+  const canSeeEmail = emailVisibility === "public" || (emailVisibility === "members" && !!activeViewerId) || (emailVisibility === "friends" && !!activeViewerId && activeViewerId === privacyViewerId) || effectiveOwner;
   const visibleProfile: UserProfile = {
     ...profile,
     phone: canSeePhone ? profile.phone ?? null : null,

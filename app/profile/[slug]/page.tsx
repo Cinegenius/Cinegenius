@@ -1,3 +1,5 @@
+import { profileAccessFor, filterPublicListings } from "@/lib/profile-privacy-server";
+import { projectProfilePrivacy } from "@/lib/profile-privacy";
 import { getTranslations as getPageTranslations } from "next-intl/server";
 import {getLocale} from "next-intl/server";
 import {placeReadFields} from "@/lib/places/catalog";
@@ -268,17 +270,21 @@ export default async function ProfilePage(
 ) {
   const messages = await getMetadataTranslations();
   const { slug } = await params;
-  const [profile, { userId }] = await Promise.all([
+  const [rawProfile, { userId }] = await Promise.all([
     getProfile(slug),
     auth(),
   ]);
 
-  if (!profile) notFound();
+  if (!rawProfile) notFound();
+  const privacy = (await profileAccessFor([rawProfile.user_id],userId)).get(rawProfile.user_id);
+  if (!privacy?.profile) notFound();
+  const profile = projectProfilePrivacy(rawProfile,privacy);
 
   const isOwner = userId === profile.user_id;
   if (!isOwner && !(await canViewProfile(profile.user_id, userId))) notFound();
   const contactVisibility = await getProfileContactVisibility(profile.user_id);
-  const contactColumns = visibleProfileContactFields(contactVisibility, userId, isOwner);
+  const allowedContactVisibility = { phone: privacy.phone ? "public" : "hidden", contact_email: privacy.email ? "public" : "hidden" } as const;
+  const contactColumns = visibleProfileContactFields(allowedContactVisibility, userId, isOwner);
   let contactData: { phone?: string | null; contact_email?: string | null } = {};
   if (contactColumns.length > 0) {
     const { data: visibleContacts, error } = await db
@@ -292,7 +298,7 @@ export default async function ProfilePage(
       contactData = visibleContacts as typeof contactData;
     }
   }
-  const contactFields = projectProfileContacts(contactData, contactVisibility, userId, isOwner);
+  const contactFields = projectProfileContacts(contactData, allowedContactVisibility, userId, isOwner);
   const locale=await getLocale();
   const visibleProfile: UserProfile = {
     ...profile,
@@ -308,7 +314,7 @@ export default async function ProfilePage(
     getProjectCredits(profile.user_id),
     getCompanyMembership(profile.user_id),
     getExternalProfiles(profile.user_id),
-    getPublicListings(profile.user_id),
+    getPublicListings(profile.user_id).then(filterPublicListings),
     userId && !isOwner ? getBlockStatus(userId, profile.user_id) : Promise.resolve(null),
     getPublicCollaborations(profile.user_id, userId),
     // Fetch image likes (binary: liked vs not)
@@ -340,7 +346,8 @@ export default async function ProfilePage(
         .limit(20);
       const rows = (data ?? []) as Array<{ user_id: string; display_name: string; avatar_url: string | null; slug: string; role: string | null; profile_type: string; location: string | null; tagline: string | null; verified: boolean; day_rate: number | null }>;
       const visibleIds = await visibleLinkedProfileIds(rows.map((row) => row.user_id), userId);
-      const visibleRows = rows.filter((row) => visibleIds.has(row.user_id));
+      const fieldPrivacy = await profileAccessFor(rows.map(row => row.user_id),userId);
+      const visibleRows = rows.filter(row => visibleIds.has(row.user_id)).map(row => projectProfilePrivacy(row,fieldPrivacy.get(row.user_id)));
       // Prioritize same city, then fill with others, cap at 6
       const sameCity = city ? visibleRows.filter(r => placeReadFields(r.location??"",r,locale).place_city_id===city) : [];
       const others = visibleRows.filter(r => !city || placeReadFields(r.location??"",r,locale).place_city_id!==city);
@@ -368,7 +375,7 @@ export default async function ProfilePage(
   return (
     <>
       <JsonLd data={jsonLd} />
-      <ProfileView organizationSection={organizationSection}
+      <ProfileView privacyViewerId={userId} organizationSection={organizationSection}
         profile={visibleProfile}
         isOwner={isOwner}
         projectCredits={projectCredits}

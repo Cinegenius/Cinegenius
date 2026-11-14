@@ -1,3 +1,4 @@
+import { publicListingIds } from "@/lib/profile-privacy-server";
 import { jobFacts, jobRecord, jobRateLabel } from "@/lib/job-metadata";
 import { projectTypeLabel } from "@/lib/project-type-labels";
 import { getTranslations as getPageTranslations } from "next-intl/server";
@@ -24,7 +25,7 @@ async function getJob(slug: string, previewOwnerId?: string) {
     : query.eq("published", true);
   const { data, error } = await query.maybeSingle();
   if (error) throw new Error(`Job konnte nicht geladen werden: ${error.message}`);
-  if (!data) return null;
+  if (!data || (!previewOwnerId && !(await publicListingIds([data.id])).has(data.id))) return null;
 
   const record = jobRecord(data);
   const parsed = jobFacts(record);

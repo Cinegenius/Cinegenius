@@ -8338,5 +8338,35 @@
     "saveError": "Impossibile salvare la selezione. Consenti i cookie delle preferenze e riprova.",
     "loadError": "Impossibile caricare i contenuti.",
     "retry": "Riprova"
+  },
+  "PrivacySettings": {
+    "title": "Privacy",
+    "intro": "Scegli chi può vedere i tuoi dati. Le modifiche vengono salvate subito.",
+    "ghost": "Modalità fantasma",
+    "ghostHelp": "Nasconde il tuo profilo personale, la località, lo stato di attività e gli annunci personali, anche agli amici.",
+    "limits": "I messaggi esistenti restano. Le immagini precedentemente pubbliche possono rimanere accessibili tramite link noti o copie. Le pagine aziendali hanno una visibilità indipendente.",
+    "ghostActive": "Modalità fantasma attiva. Le scelte precedenti vengono conservate.",
+    "visibility": "Visibilità",
+    "profile": "Il mio profilo",
+    "location_visibility": "Località",
+    "map_visibility": "Mappa e ricerca nelle vicinanze",
+    "activity_visibility": "Stato di attività",
+    "phone_visibility": "Numero di telefono",
+    "contact_email_visibility": "Email di contatto",
+    "locationHelp": "La mappa mostra il luogo indicato nel profilo, non la posizione in tempo reale. I luoghi nascosti del profilo sono esclusi da mappe e ricerche nelle vicinanze. Gli annunci hanno indicazioni di luogo separate. Rimuovi personalmente i luoghi indicati nei tuoi testi o nelle foto.",
+    "messages": "Chi può scrivermi?",
+    "email": "Email per nuovi messaggi",
+    "loading": "Caricamento impostazioni…",
+    "unavailable": "Le impostazioni non sono ancora disponibili.",
+    "saving": "Salvataggio…",
+    "saved": "Salvato.",
+    "error": "Non è stato possibile confermare questa impostazione. Ricarica e controlla.",
+    "retry": "Ricarica",
+    "audience": {
+      "public": "Tutti",
+      "members": "Membri con accesso effettuato",
+      "friends": "Solo amici confermati",
+      "hidden": "Solo io"
+    }
   }
 }

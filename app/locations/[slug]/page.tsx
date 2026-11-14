@@ -1,3 +1,4 @@
+import { publicListingIds } from "@/lib/profile-privacy-server";
 import { readPublicLocationArea } from "@/lib/location-privacy";
 import { getTranslations as getPageTranslations } from "next-intl/server";
 import {getLocale, getTranslations } from "next-intl/server";
@@ -40,7 +41,7 @@ async function getLocation(slug: string, viewerId: string | null = null) {
 
   if (error) throw new Error(`Location konnte nicht geladen werden: ${error.message}`);
   if (!data) return null;
-  if (data.published !== true && (!viewerId || !await canEditListing(viewerId, data))) return null;
+  if (!(await publicListingIds([data.id])).has(data.id) && (!viewerId || !await canEditListing(viewerId, data))) return null;
 
   const [{ lat, lng }, provider, ratingMap] = await Promise.all([
     Promise.resolve(readPublicLocationArea(data.metadata)).then(area => area ?? geocodeCity(data.city ?? "")),

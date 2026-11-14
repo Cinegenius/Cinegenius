@@ -102,7 +102,7 @@ export async function GET(req: NextRequest) {
     try { preferred = (await ownBrowsePlace()).place; } catch { /* The ordinary directory remains available. */ }
   }
   const {data,error,count} = await geographicPage<Record<string, unknown>>((clause, range) => {
-  let query = db.from("listings").select(LISTING_COLS_PUBLIC,{count:"exact", head: !range}).eq("published",true);
+  let query = db.from("privacy_visible_listings").select(LISTING_COLS_PUBLIC,{count:"exact", head: !range}).eq("published",true);
   if(marketplaceOnly)query=query.in("type",["prop","vehicle"]);
   else if(type)query=query.eq("type",type);
   if(marketplaceOnly){

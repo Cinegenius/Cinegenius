@@ -62,7 +62,7 @@ export async function GET(req: NextRequest) {
     .limit(200);
 
   const idsToResolve = (data ?? []).map(row => row.listing_id);
-  const current = idsToResolve.length ? await db.from("listings").select(`id,type,title,city,price,image_url,price_negotiable:metadata->price_negotiable,price_on_request:metadata->price_on_request,rental_type:metadata->>rental_type,marketplace:metadata->marketplace,${PLACE_COLUMNS}`).in("id", idsToResolve).eq("published", true) : { data: [], error: null };
+  const current = idsToResolve.length ? await db.from("privacy_visible_listings").select(`id,type,title,city,price,image_url,price_negotiable:metadata->price_negotiable,price_on_request:metadata->price_on_request,rental_type:metadata->>rental_type,marketplace:metadata->marketplace,${PLACE_COLUMNS}`).in("id", idsToResolve).eq("published", true) : { data: [], error: null };
   if (current.error) return NextResponse.json({ error: (await getTranslations("OfferModeration"))("saveError") }, { status: 503 });
   const market=await getTranslations("MarketplaceOffer"),locale=await getLocale();
   const visible = new Map((current.data ?? []).map(row => [row.id, row]));
@@ -106,7 +106,7 @@ export async function POST(req: NextRequest) {
 
   // Fetch listing data from DB — never trust client-supplied metadata
   const { data: listing } = await db
-    .from("listings")
+    .from("privacy_visible_listings")
     .select("type, title, city, price, image_url")
     .eq("published", true)
     .eq("id", listing_id)

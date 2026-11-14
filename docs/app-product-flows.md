@@ -162,3 +162,35 @@ Die ältere kontounabhängige Bibliothek bleibt geschützt erhalten, wird jedoch
 nicht automatisch als Eigentum des aktuell angemeldeten Kontos übernommen.
 Umsetzung, Grenze der bestehenden Inseratsschnittstelle und Prüfstatus stehen in
 `docs/native-workplace-room-scanner.md`.
+
+## App-Abgleich: Ghost und gemeinsame Privatsphäre (14. November)
+
+Der geprüfte WEB-Stand `6953db5` wird im App-Entwicklungszweig übernommen.
+Die entfernte App-Vorschau nutzt die gemeinsamen Kontoeinstellungen unter
+`/dashboard?tab=settings` mit `PrivacySettings` und `/api/user-settings`;
+es entsteht kein zweiter Schalter mit eigener Speicherung oder anderen Regeln.
+Der vollständige Vertrag und die Releasefolge stehen in `docs/profile-privacy.md`.
+
+Ghost verbirgt persönliche Profile, strukturierte Orts-/Aktivitätsdaten und alle
+persönlichen öffentlichen Angebote auch vor bestätigten Freunden. Firmen bleiben
+separat. Gespeicherte Zielgruppen und Angebots-Publikationsstände werden nicht
+gelöscht. Die eigene Verwaltung und private native Grundrisse bleiben zugänglich;
+der Arbeitsplatz verwendet weiterhin die authentifizierte Eigentümerabfrage.
+Bestehende Chats sowie berechtigte historische Vorgänge bleiben erhalten.
+Frühere öffentliche Bildlinks und gespeicherte Kopien können weiter erreichbar
+sein; Ghost ist keine rückwirkende Löschung solcher Inhalte.
+
+Die App-Prüfung akzeptiert nur vollständige Einstellungen mit gültigen Werten.
+Eine Speicherantwort muss zusätzlich genau die gewählte Änderung bestätigen.
+Fehlende Felder, ungültige Antworten oder eine alte Serverversion bestätigen
+keine Speicherung. Die letzte bestätigte Auswahl bleibt bei einem Schreibfehler
+erhalten; Fehler/Wiederholen verwenden die vorhandenen neun Sprachkataloge.
+Antworten eines vorherigen Kontos werden verworfen.
+
+Diese Integration ist noch nicht veröffentlicht und führt die Migration
+`20261114180242_profile_privacy_controls.sql` nicht aus. Vor einem abhängigen
+Web-/App-Livegang sind die ausdrückliche Freigabe, bestätigte Migration und die
+zugehörigen Serverprüfungen erforderlich. Die reguläre entfernte App-URL bleibt
+bis dahin beim veröffentlichten Webstand. Tests mit simulierten Konten/API-Antworten
+belegen keine echte iPhone-/iPad-Bedienung; neuere Mac-Quellen und gespeicherte
+Pläne bleiben beim späteren Xcode-Abgleich erhalten.

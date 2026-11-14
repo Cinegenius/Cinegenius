@@ -34,7 +34,7 @@ export default async function LocationsPage({ searchParams }: { searchParams: Pr
   const priceText = await getTranslations("MarketplaceOffer");
   const pageSize = 250;
   const readPage = (offset: number) => db
-    .from("listings")
+    .from("privacy_visible_listings")
     .select("place_country_code,place_region_id,place_city_id,place_city_name,place_region_name,place_status,id, title, city, price, image_url, category, description, metadata, created_at")
     .eq("published", true)
     .eq("type", "location")

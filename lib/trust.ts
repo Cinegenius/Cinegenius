@@ -74,7 +74,7 @@ export async function getPrivateProfileIds(userIds: string[]): Promise<Set<strin
 
   const { data, error } = await db
     .from("user_settings")
-    .select("user_id, profile_visibility")
+    .select("user_id, profile_visibility, ghost_mode")
     .in("user_id", uniqueIds);
 
 
@@ -83,7 +83,7 @@ export async function getPrivateProfileIds(userIds: string[]): Promise<Set<strin
     return new Set(uniqueIds);
   }
 
-  return new Set((data ?? []).filter((setting) => setting.profile_visibility === "private").map((setting) => setting.user_id));
+  return new Set((data ?? []).filter((setting) => setting.profile_visibility === "private" || setting.ghost_mode).map((setting) => setting.user_id));
 }
 
 /**
