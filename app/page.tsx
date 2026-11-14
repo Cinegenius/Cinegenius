@@ -216,11 +216,65 @@ async function HomeLocations({ dataPromise }: { dataPromise: HomeDataPromise }) 
   </section>;
 }
 
+async function HomeCrew({ dataPromise }: { dataPromise: HomeDataPromise }) {
+  const [data, t, tc] = await Promise.all([dataPromise, getTranslations("home"), getTranslations("common")]);
+  if (!data?.newCrew.length) return null;
+  const { newCrew } = data;
+  return <section className="min-w-0" aria-labelledby="home-crew-title">
+      <div className="mb-3 flex flex-wrap items-center justify-between gap-x-3"><h2 id="home-crew-title" className="font-display text-xl font-bold text-text-primary sm:text-2xl">{t("newCrewTitle")}</h2><Link href="/creators" className="inline-flex min-h-11 items-center gap-1 text-xs font-medium text-gold hover:text-gold-light sm:text-sm">{tc("viewAll")} <ArrowRight size={13} /></Link></div>
+      <HomeCardRail id="home-crew-rail" labelledBy="home-crew-title" hint={t("crewScrollHint")} itemCount={newCrew.length} variant="crew" wide>
+        {newCrew.map((c) => (
+                <Link
+                  key={c.id}
+                  href={`/profile/${c.slug}`}
+                  className="group rounded-2xl border border-border bg-bg-secondary hover:border-gold/30 transition-colors overflow-hidden flex flex-col"
+                >
+                  <div className="relative aspect-square bg-bg-elevated overflow-hidden">
+                    {c.avatar ? (
+                      <Image
+                        src={c.avatar}
+                        alt={c.name}
+                        fill
+                        mediaSize="thumbnail"
+                        className="object-cover group-hover:scale-105 transition-transform duration-500 ease-out"
+                        sizes="(max-width:640px) 50vw,25vw"
+                      />
+                    ) : (
+                      <div className="absolute inset-0 bg-gradient-to-br from-gold/10 to-bg-elevated flex items-center justify-center">
+                        <span className="text-4xl font-display font-bold text-gold/40">
+                          {c.name.slice(0, 2).toUpperCase()}
+                        </span>
+                      </div>
+                    )}
+                    {c.verified && (
+                      <div className="absolute top-2 right-2 w-5 h-5 rounded-full bg-gold flex items-center justify-center">
+                        <CheckCircle size={11} className="text-bg-primary" />
+                      </div>
+                    )}
+                  </div>
+                  <div className="p-3 flex flex-col flex-1">
+                    <h3 className="font-semibold text-text-primary text-sm leading-snug mb-0.5">{c.name}</h3>
+                    {c.positions.length > 0 && <p className="mb-1 line-clamp-2 text-[11px] leading-snug text-gold">{c.positions.join(" · ")}</p>}
+                    {c.city && (
+                      <p className="text-[11px] text-text-muted flex items-center gap-1 mb-1.5">
+                        <MapPin size={9} /> {c.city}
+                      </p>
+                    )}
+                    {c.tagline && (
+                      <p className="text-xs text-text-secondary leading-relaxed line-clamp-2 flex-1 mb-2">{c.tagline}</p>
+                    )}
+                  </div>
+                </Link>
+              ))}
+      </HomeCardRail>
+    </section>;
+}
+
 async function HomeRecommendations({ dataPromise }: { dataPromise: HomeDataPromise }) {
   const [uiText, uiLocale, t, tc, data] = await Promise.all([getTranslations(), getLocale(), getTranslations("home"), getTranslations("common"), dataPromise]);
   if (!data) return <section className="site-container py-7"><p role="status" className="rounded-xl border border-border bg-bg-secondary px-4 py-6 text-sm text-text-muted">{t("recommendationsUnavailable")}</p></section>;
-  const { liveJobs, liveProps, companies, newCrew, currentTime } = data;
-  if (!liveJobs.length && !liveProps.length && !companies.length && !newCrew.length) return null;
+  const { liveJobs, liveProps, currentTime } = data;
+  if (!liveJobs.length && !liveProps.length) return null;
   function formatDate(iso: string): string {
     if (!iso) return "";
     const diff = Math.floor((currentTime - new Date(iso).getTime()) / 86400000);
@@ -276,61 +330,6 @@ async function HomeRecommendations({ dataPromise }: { dataPromise: HomeDataPromi
               ))}
       </div>
     </section>}
-    {newCrew.length > 0 && <section className="min-w-0" aria-labelledby="home-crew-title">
-      <div className="mb-3 flex flex-wrap items-center justify-between gap-x-3"><h2 id="home-crew-title" className="font-display text-xl font-bold text-text-primary sm:text-2xl">{t("newCrewTitle")}</h2><Link href="/creators" className="inline-flex min-h-11 items-center gap-1 text-xs font-medium text-gold hover:text-gold-light sm:text-sm">{tc("viewAll")} <ArrowRight size={13} /></Link></div>
-      <HomeCardRail id="home-crew-rail" labelledBy="home-crew-title" hint={t("crewScrollHint")} itemCount={newCrew.length} variant="crew" wide>
-        {newCrew.map((c) => (
-                <Link
-                  key={c.id}
-                  href={`/profile/${c.slug}`}
-                  className="group rounded-2xl border border-border bg-bg-secondary hover:border-gold/30 transition-colors overflow-hidden flex flex-col"
-                >
-                  <div className="relative aspect-square bg-bg-elevated overflow-hidden">
-                    {c.avatar ? (
-                      <Image
-                        src={c.avatar}
-                        alt={c.name}
-                        fill
-                        mediaSize="thumbnail"
-                        className="object-cover group-hover:scale-105 transition-transform duration-500 ease-out"
-                        sizes="(max-width:640px) 50vw,25vw"
-                      />
-                    ) : (
-                      <div className="absolute inset-0 bg-gradient-to-br from-gold/10 to-bg-elevated flex items-center justify-center">
-                        <span className="text-4xl font-display font-bold text-gold/40">
-                          {c.name.slice(0, 2).toUpperCase()}
-                        </span>
-                      </div>
-                    )}
-                    {c.verified && (
-                      <div className="absolute top-2 right-2 w-5 h-5 rounded-full bg-gold flex items-center justify-center">
-                        <CheckCircle size={11} className="text-bg-primary" />
-                      </div>
-                    )}
-                  </div>
-                  <div className="p-3 flex flex-col flex-1">
-                    <h3 className="font-semibold text-text-primary text-sm leading-snug mb-0.5">{c.name}</h3>
-                    {c.positions.length > 0 && <p className="mb-1 line-clamp-2 text-[11px] leading-snug text-gold">{c.positions.join(" · ")}</p>}
-                    {c.city && (
-                      <p className="text-[11px] text-text-muted flex items-center gap-1 mb-1.5">
-                        <MapPin size={9} /> {c.city}
-                      </p>
-                    )}
-                    {c.tagline && (
-                      <p className="text-xs text-text-secondary leading-relaxed line-clamp-2 flex-1 mb-2">{c.tagline}</p>
-                    )}
-                  </div>
-                </Link>
-              ))}
-      </HomeCardRail>
-    </section>}
-    {companies.length > 0 && <section className="min-w-0" aria-labelledby="home-companies-title">
-      <div className="mb-3 flex flex-wrap items-center justify-between gap-x-3"><div><p className="mb-1 text-xs font-semibold uppercase tracking-widest text-gold">{t("companiesLabel")}</p><h2 id="home-companies-title" className="font-display text-xl font-bold text-text-primary sm:text-2xl">{t("companiesTitle")}</h2></div><Link href="/companies" className="inline-flex min-h-11 items-center gap-1 text-xs font-medium text-gold hover:text-gold-light sm:text-sm">{tc("viewAll")} <ArrowRight size={13} /></Link></div>
-      <HomeCompanyPartners companies={companies.map(c => ({
-        id: c.id, href: `/companies/${c.slug ?? c.id}`, name: c.name, logo: c.logo, city: c.city,
-        category: taxonomyLabel(COMPANY_CATEGORIES.find(category => category.id === c.category)?.label ?? "", uiText) || undefined,
-      }))} />
-    </section>}
     {liveJobs.length > 0 && <section className="min-w-0 border-t border-border/60 pt-4" aria-labelledby="home-jobs-title">
       <div className="mb-2 flex flex-wrap items-center justify-between gap-x-3"><h2 id="home-jobs-title" className="font-display text-lg font-bold text-text-primary">{t("jobsTitle")}</h2><Link href="/jobs" className="inline-flex min-h-11 items-center gap-1 text-xs font-medium text-gold hover:text-gold-light">{tc("viewAll")} <ArrowRight size={12} /></Link></div>
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
@@ -341,6 +340,22 @@ async function HomeRecommendations({ dataPromise }: { dataPromise: HomeDataPromi
         </Link>)}
       </div>
     </section>}
+  </div>;
+}
+
+async function HomePartnersAndLocations({ dataPromise }: { dataPromise: HomeDataPromise }) {
+  const [data, uiText, t, tc] = await Promise.all([dataPromise, getTranslations(), getTranslations("home"), getTranslations("common")]);
+  if (!data || (!data.companies.length && !data.liveLocations.length)) return null;
+  const { companies } = data;
+  return <div className="site-container grid items-start gap-7 py-7 sm:gap-8 sm:py-9">
+    {companies.length > 0 && <section className="min-w-0" aria-labelledby="home-companies-title">
+      <div className="mb-3 flex flex-wrap items-center justify-between gap-x-3"><div><p className="mb-1 text-xs font-semibold uppercase tracking-widest text-gold">{t("companiesLabel")}</p><h2 id="home-companies-title" className="font-display text-xl font-bold text-text-primary sm:text-2xl">{t("companiesTitle")}</h2></div><Link href="/companies" className="inline-flex min-h-11 items-center gap-1 text-xs font-medium text-gold hover:text-gold-light sm:text-sm">{tc("viewAll")} <ArrowRight size={13} /></Link></div>
+      <HomeCompanyPartners companies={companies.map(c => ({
+        id: c.id, href: `/companies/${c.slug ?? c.id}`, name: c.name, logo: c.logo, city: c.city,
+        category: taxonomyLabel(COMPANY_CATEGORIES.find(category => category.id === c.category)?.label ?? "", uiText) || undefined,
+      }))} />
+    </section>}
+    <HomeLocations dataPromise={dataPromise} />
   </div>;
 }
 
@@ -406,13 +421,14 @@ export default async function HomePage() {
           </div>
         </div>
       </section>
-        <Suspense fallback={null}><HomeLocations dataPromise={dataPromise} /></Suspense>
+        <Suspense fallback={null}><HomeCrew dataPromise={dataPromise} /></Suspense>
       </div>
       <AiDisclosureBadge source="/hero-bg-v2.jpg" subtle className="absolute bottom-0.5 right-4 z-10 sm:right-6 lg:right-8" />
     </section>
-    <Suspense fallback={<div aria-hidden="true" className="site-container py-5"><SkeletonBox className="mb-3 h-6 w-48" /><SkeletonBox className="h-28 w-full" /></div>}><HomeRecommendations dataPromise={dataPromise} /></Suspense>
     <Suspense fallback={null}><HomeOrganizations /></Suspense>
+    <Suspense fallback={<div aria-hidden="true" className="site-container py-5"><SkeletonBox className="mb-3 h-6 w-48" /><SkeletonBox className="h-28 w-full" /></div>}><HomeRecommendations dataPromise={dataPromise} /></Suspense>
     <Suspense fallback={null}><HomePhotoRecommendations viewerId={userId} /></Suspense>
+    <Suspense fallback={null}><HomePartnersAndLocations dataPromise={dataPromise} /></Suspense>
     <HomeCommunityBoard loggedIn={isLoggedIn} />
     <section className="site-container py-5 sm:py-7" aria-labelledby="home-projects-title"><div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-1 border-t border-border pt-4"><h2 id="home-projects-title" className="flex items-center gap-2 text-sm font-medium text-text-muted"><Film size={15} aria-hidden="true" />{t("projectsTitle")}</h2><Link href="/projects/alle" className="inline-flex min-h-11 items-center gap-1 text-sm text-text-secondary hover:text-gold">{t("findProjectsLink")} <ArrowRight size={13} /></Link></div></section>
   </main>;
