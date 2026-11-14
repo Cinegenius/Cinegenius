@@ -1,11 +1,26 @@
-# Übergreifende Suche: Startseite und Arbeitsplatz
+# Smart-Suche: Startseite und Arbeitsplatz
 
 Aktueller Status vom 14. November 2026: **gemeinsamer Suchstand zur App-Integration übergeben und von WEB veröffentlicht**. WEB CODEX hat den geprüften Commit `ce37ab6548fbeb3e021db52424da0977c682abab` geliefert; der Mergebaum entspricht dem geprüften `b094f29`. Nach der vorgezogenen Limits-Veröffentlichung `83a3dc1` ist nun auch `ce37ab6` auf beiden CineGenius-Domains live, Vercel `dpl_8z1GdsEiHEwXUvkt2etix1KqqWjH` READY. Diese Übergabe beauftragt keine App-Veröffentlichung. Andere bereits beauftragte App-Arbeiten bleiben erhalten; reale native Sprach- und persönliche Modellprüfungen sind davon getrennt.
+
+Der App-Abgleich dieses veröffentlichten Standes ist in `8eac132ce6c4d6ffba6d58bdff1377cb27d9ca3f` gesichert. 215 gezielte Fälle, Build, Übersetzungs- und Designprüfung sowie Browserprüfungen in neun Sprachen und 16 simulierte native Sprachantworten bestanden; die 123 nativen Dateien blieben unverändert. Der Beleg unter `/srv/cinegenius/handoffs/20261114-app-unified-search/receipt.json` unterscheidet diese Prüfungen von noch offenen echten Geräteprüfungen und bestehenden Lint-Befunden.
+
+## Angekündigte Korrektur von WEB CODEX
+
+WEB meldet am 14. November 2026 Markus' Bestätigung des kurzen Namens **Smart** statt „Übergreifend“. Dieser Name gilt auch für den geplanten nativen Sucheinstieg. Die Homepage-Auswahl soll wieder genau eine Reihe belegen; Bedienflächen und Lesbarkeit in allen neun Sprachen weiterhin prüfen. WEB bearbeitet die Korrektur auf `codex/genie-search-repair`; ein geprüfter Commit, genaue Tests und Veröffentlichungsstatus stehen noch aus. Diese Ankündigung ist keine bereits übernommene oder veröffentlichte App-Oberfläche.
+
+Beim nächsten Abgleich zusätzlich prüfen:
+
+- „Model“ darf nicht zu „Modellbauer“ erweitert werden.
+- „Kameramänner“ sowie entsprechende Berufsbezeichnungen und Sprachvarianten müssen zum richtigen Beruf führen.
+- Spezielle Fahrzeuge dürfen nicht über eine grobe Oberkategorie mit unpassenden anderen Fahrzeugtypen vermischt werden. Fahrzeug-Untertyp, Marke und Modell müssen durchsuchbar sein.
+- Firmenkategorien und angebotene Leistungen müssen bei der Firmensuche berücksichtigt werden.
+
+Nach WEB-Angabe bleiben `POST /api/search/unified` und Plan-Version 1 kompatibel. Kontoregeln bleiben unverändert: 30 Aufrufe pro UTC-Tag für gewöhnliche Konten, die bestehende verifizierte Markus-Ausnahme, kein globales Tageslimit und unveränderte Minutenbegrenzungen. App-Navigation, Sprachwiederholung, Kontotrennung, aktuelle Inhaltsrechte und laufende native Arbeit bei der späteren Übernahme erhalten. Keine zweite native Matching-Logik und keine vorgezogene Übernahme unfertiger WEB-Dateien.
 
 ## Bestätigter Bedienablauf
 
 - Haupteinstieg auf der **Startseite**, über die bestehende Suche und Genie.
-- Die gemeinsame Suchlogik und das gemeinsame Ergebnisziel später zusätzlich als Werkzeug **Übergreifende Suche** im nativen Arbeitsplatz nutzen. Website und App erhalten kein zweites, abweichendes Suchsystem.
+- Die gemeinsame Suchlogik und das gemeinsame Ergebnisziel später zusätzlich als Werkzeug **Smart** im nativen Arbeitsplatz nutzen. Website und App erhalten kein zweites, abweichendes Suchsystem.
 - Eingabe als freier Text sowie über Genie.
 - Mehrere Suchteile gemeinsam verarbeiten: Crew, Marktplatz, Locations, Firmen und weitere tatsächlich unterstützte öffentliche Bereiche.
 - Ergebnisse gemeinsam anzeigen und klar nach Bereich gruppieren; das bestehende CineGenius-Design verwenden.
