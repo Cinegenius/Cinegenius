@@ -8370,8 +8370,8 @@
     }
   },
   "UnifiedSearch": {
-    "title": "Sök i alla områden",
-    "tab": "Alla områden",
+    "title": "Smart-sökning",
+    "tab": "Smart",
     "intro": "Sök efter filmteam, erbjudanden och platser tillsammans.",
     "placeholder": "Modell i Berlin och båt i Hamburg …",
     "submit": "Sök",
@@ -8383,7 +8383,7 @@
     "more": "Visa fler",
     "error": "Sökningen kunde inte laddas. Din text finns kvar.",
     "retry": "Försök igen",
-    "signInRequired": "Logga in för att kombinera sökningar med Genie.",
+    "signInRequired": "Smart är tillgängligt för medlemmar. Logga in för att söka i flera kategorier och se resultaten.",
     "withinRadius": "{place} · inom {radius} km",
     "areas": {
       "crew": "Filmteam",

@@ -8370,8 +8370,8 @@
     }
   },
   "UnifiedSearch": {
-    "title": "Hledání napříč sekcemi",
-    "tab": "Všechny sekce",
+    "title": "Hledání Smart",
+    "tab": "Smart",
     "intro": "Hledejte společně štáb, nabídky a místa.",
     "placeholder": "Modelka v Berlíně a loď v Hamburku …",
     "submit": "Hledat",
@@ -8383,7 +8383,7 @@
     "more": "Zobrazit další",
     "error": "Hledání se nepodařilo načíst. Zadaný text zůstal zachován.",
     "retry": "Zkusit znovu",
-    "signInRequired": "Přihlaste se a kombinujte hledání pomocí Genie.",
+    "signInRequired": "Smart je dostupné pro členy. Přihlaste se pro hledání napříč kategoriemi a zobrazení výsledků.",
     "withinRadius": "{place} · v okruhu {radius} km",
     "areas": {
       "crew": "Štáb",

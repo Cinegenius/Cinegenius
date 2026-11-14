@@ -4,6 +4,7 @@ import { placeCandidatesForLabel, placeReadFields } from "./places/catalog";
 import { countryCode, placeKey, placeCitySearchAliases } from "./places/core";
 import { publicMapPoint } from "./places/public-map-point";
 import { withinCrewRadius } from "./genie-search";
+import { DEPARTMENTS as marketplaceDepartments, deptValues, groupValues, SEARCH_SYNONYMS } from "./marketplaceCategories";
 import continents from "./places/continents.json" with { type: "json" };
 import type { SearchPlace, SearchWish } from "./unified-search";
 
@@ -23,21 +24,59 @@ const synonyms: Record<string, string[]> = {
   studio: ["Studio"], kostum: ["Kostüm", "Costume"],
 };
 
+const cameraPeople = ["Director of Photography (DoP)", "Kameramann", "Camera Operator"];
+const crewSynonyms: Record<string, string[]> = {
+  kameramann: cameraPeople, kameramanner: cameraPeople, kamerafrau: cameraPeople, kamerafrauen: cameraPeople,
+  cameraman: cameraPeople, cameramen: cameraPeople, camerawoman: cameraPeople, cinematographer: cameraPeople,
+};
+// Gender punctuation is not part of an occupation. Keep the original labels in
+// returned terms so stored IDs/positions and member-written text are untouched.
+const occupationKey = (value: string) => searchKey(value.replace(/(?:\*|:|\/)innen\b/giu, "").replace(/(?:\*|:|\/)in\b/giu, "").replace(/\*frau\b/giu, ""));
+const occupationKeys = (value: string) => {
+  const key = occupationKey(value);
+  return [key, ...(key.endsWith("innen") ? [key.slice(0, -5)] : key.endsWith("in") ? [key.slice(0, -2)] : [])];
+};
+
 export function wishSearchTerms(wish: SearchWish, locale = "de", taxonomy?: (key: string) => string): string[] {
-  const terms = wish.query ? [...(synonyms[searchKey(wish.query)] ?? [wish.query])] : [];
+  const crew = wish.area === "crew" || wish.area === "all";
+  const terms = wish.query ? [...((crew && crewSynonyms[searchKey(wish.query)]) || synonyms[searchKey(wish.query)] || [wish.query])] : [];
   const requested = [...terms];
-  if (wish.area === "crew" || wish.area === "all") {
+  if (crew) {
     const dept = departments.find(d => d.id === wish.department);
-    for (const role of occupationCatalogue) {
-      if (dept && role.departmentId !== dept.id) continue;
+    const roles = occupationCatalogue.filter(role => !dept || role.departmentId === dept.id).map(role => {
       const department = departments.find(d => d.id === role.departmentId)!;
       const label = getDepartmentRoleLabel(department.id, role.label, locale, undefined, taxonomy);
-      if ((!requested.length && dept) || [...role.aliases, label].some(alias => requested.some(term => searchKey(alias).includes(searchKey(term))))) {
-        terms.push(...role.aliases);
-      }
+      return { ...role, aliases: [...new Set([...role.aliases, label])] };
+    });
+    if (!requested.length && dept) terms.push(...roles.flatMap(role => role.aliases));
+    for (const term of requested) {
+      const keys = occupationKeys(term);
+      // An exact occupation wins: Model must never expand to Model Maker or 3D Modeler.
+      const exact = roles.filter(role => role.aliases.some(alias => keys.includes(occupationKey(alias))));
+      const matches = exact.length ? exact : roles.filter(role => role.aliases.some(alias => {
+        const key = occupationKey(alias);
+        // Generic drivers refer to vehicles, not the unrelated dolly-grip craft.
+        if (["fahrer", "driver"].includes(searchKey(term))) return role.departmentId !== "grip" && /fahrer|\bdrivers?\b/.test(key);
+        return keys.some(needle => (` ${key} `).includes(` ${needle} `));
+      }));
+      terms.push(...matches.flatMap(role => role.aliases));
     }
   }
   return [...new Set(terms.filter(Boolean))];
+}
+
+/** Expand a requested category, never all siblings of a particular object.
+ * A motorcycle keyword must not match every car stored under picture vehicles. */
+export function wishMarketplaceCategories(query: string, t: (key: string) => string): string[] {
+  const key = searchKey(query);
+  const values: string[] = [...(SEARCH_SYNONYMS[query.trim().toLowerCase()] ?? [])];
+  for (const department of marketplaceDepartments) {
+    if ([department.id, department.label, t(`categories.${department.id}`)].some(label => searchKey(label) === key)) values.push(...deptValues(department));
+    for (const group of department.groups) {
+      if ([group.id, group.label, t(`subcategories.${group.id}`)].some(label => searchKey(label) === key)) values.push(...groupValues(group));
+    }
+  }
+  return [...new Set(values)];
 }
 
 export function isOccupationWish(wish: SearchWish, terms: string[]) {
@@ -71,4 +110,5 @@ export function matchesWishPlaces(row: Record<string, unknown>, wish: SearchWish
 
 /** Escape filter literals, including wildcard syntax. Never concatenate a raw query. */
 export const filterLiteral = (value: string) => JSON.stringify(value);
+export const exactLiteral = (value: string) => filterLiteral(value.replace(/[\\%_*]/g, "\\$&"));
 export const containsLiteral = (value: string) => filterLiteral(`%${value.replace(/[\\%_*]/g, "\\$&")}%`);

@@ -8370,8 +8370,8 @@
     }
   },
   "UnifiedSearch": {
-    "title": "Ricerca trasversale",
-    "tab": "Tutte le sezioni",
+    "title": "Ricerca Smart",
+    "tab": "Smart",
     "intro": "Cerca insieme professionisti, annunci e luoghi.",
     "placeholder": "Modella a Berlino e barca ad Amburgo …",
     "submit": "Cerca",
@@ -8383,7 +8383,7 @@
     "more": "Mostra altro",
     "error": "Impossibile caricare la ricerca. Il testo è stato conservato.",
     "retry": "Riprova",
-    "signInRequired": "Accedi per combinare le ricerche con Genie.",
+    "signInRequired": "Smart è disponibile per i membri. Accedi per cercare in più categorie e vedere i risultati.",
     "withinRadius": "{place} · entro {radius} km",
     "areas": {
       "crew": "Crew",

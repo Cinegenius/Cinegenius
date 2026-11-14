@@ -1,16 +1,18 @@
 # Smart-Suche: Startseite und Arbeitsplatz
 
-Aktueller Status vom 14. November 2026: **gemeinsamer Suchstand zur App-Integration übergeben und von WEB veröffentlicht**. WEB CODEX hat den geprüften Commit `ce37ab6548fbeb3e021db52424da0977c682abab` geliefert; der Mergebaum entspricht dem geprüften `b094f29`. Nach der vorgezogenen Limits-Veröffentlichung `83a3dc1` ist nun auch `ce37ab6` auf beiden CineGenius-Domains live, Vercel `dpl_8z1GdsEiHEwXUvkt2etix1KqqWjH` READY. Diese Übergabe beauftragt keine App-Veröffentlichung. Andere bereits beauftragte App-Arbeiten bleiben erhalten; reale native Sprach- und persönliche Modellprüfungen sind davon getrennt.
+Aktueller Status vom 14. November 2026: **geprüfte Smart-Korrektur einschließlich Mitgliedersperre zur App-Integration übergeben**. WEB CODEX liefert `3604ba46de1a3486696121ff6786cca9fd5861e9` auf `origin/codex/genie-search-repair`; dieser Quellstand wurde in den App-Zweig übernommen. Nach der letzten WEB-Meldung ist er noch nicht live. Produktion bleibt beim zuvor veröffentlichten `ce37ab6548fbeb3e021db52424da0977c682abab`, Vercel `dpl_8z1GdsEiHEwXUvkt2etix1KqqWjH` READY. Diese Übernahme beauftragt keine App- oder Website-Veröffentlichung. Andere App-Arbeiten bleiben erhalten; reale native Sprach- und persönliche Modellprüfungen sind davon getrennt.
 
-Der App-Abgleich dieses veröffentlichten Standes ist in `8eac132ce6c4d6ffba6d58bdff1377cb27d9ca3f` gesichert. 215 gezielte Fälle, Build, Übersetzungs- und Designprüfung sowie Browserprüfungen in neun Sprachen und 16 simulierte native Sprachantworten bestanden; die 123 nativen Dateien blieben unverändert. Der Beleg unter `/srv/cinegenius/handoffs/20261114-app-unified-search/receipt.json` unterscheidet diese Prüfungen von noch offenen echten Geräteprüfungen und bestehenden Lint-Befunden.
+Der vorherige App-Abgleich des veröffentlichten `ce37ab6` ist in `8eac132ce6c4d6ffba6d58bdff1377cb27d9ca3f` gesichert. 215 gezielte Fälle, Build, Übersetzungs- und Designprüfung sowie Browserprüfungen in neun Sprachen und 16 simulierte native Sprachantworten bestanden; die 123 nativen Dateien blieben unverändert. Der Beleg unter `/srv/cinegenius/handoffs/20261114-app-unified-search/receipt.json` unterscheidet diese Prüfungen von noch offenen echten Geräteprüfungen und bestehenden Lint-Befunden.
 
-## Angekündigte Korrektur von WEB CODEX
+## Geprüfte Smart-Korrektur von WEB CODEX
 
-WEB meldet am 14. November 2026 Markus' Bestätigung des kurzen Namens **Smart** statt „Übergreifend“. Dieser Name gilt auch für den geplanten nativen Sucheinstieg. Die Homepage-Auswahl soll wieder genau eine Reihe belegen; Bedienflächen und Lesbarkeit in allen neun Sprachen weiterhin prüfen. WEB bearbeitet die Korrektur auf `codex/genie-search-repair`; ein geprüfter Commit, genaue Tests und Veröffentlichungsstatus stehen noch aus. Diese Ankündigung ist keine bereits übernommene oder veröffentlichte App-Oberfläche.
+WEB meldet am 14. November 2026 Markus' Bestätigung des kurzen Namens **Smart** statt „Übergreifend“. Dieser Name gilt auch für den geplanten nativen Sucheinstieg. Die Homepage-Auswahl belegt wieder genau eine Reihe und bleibt bei schmalen Breiten oder langen Übersetzungen horizontal bedienbar. Mindestens 44px große Bedienflächen und Lesbarkeit in allen neun Sprachen erhalten. WEB hat die Korrektur auf `codex/genie-search-repair` mit Commit, Prüfbericht und dem Status „noch nicht live“ übergeben.
 
-WEB meldet inzwischen den ersten Treffer-/Tab-Fix `87c3dee` als auf diesem Branch gesichert. Die zusätzliche Mitgliedersperre befindet sich noch in Prüfung und gehört nicht zu einer bereits vollständig übergebenen oder neu veröffentlichten Korrektur. Für den App-Abgleich den geprüften Gesamtstand einschließlich der folgenden Zugangsregel abwarten.
+Der übergebene Gesamtstand `3604ba4` enthält den Treffer-/Tab-Fix `87c3dee` und die zusätzliche Mitgliedersperre. Der aktuelle App-Prüfbeleg liegt unter `/srv/cinegenius/handoffs/20261114-app-smart-member/`; der WEB-Bericht unter `docs/test-reports/genie-unified-search-2026-11-14.md` unterscheidet Komponenten-/Browserprüfungen von echten Konto-/Modell- und Geräteprüfungen.
 
-Beim nächsten Abgleich zusätzlich prüfen:
+Die App-Abnahme bestätigt 241 gezielte Fälle: Nach dem ersten Lauf wurden ausschließlich fehlende Klickereignisse in der bestehenden Homepage-Testumgebung ergänzt; alle zwölf Fälle dieser Datei bestanden im Nachlauf. Build, TypeScript, Übersetzungen, gezieltes Lint und Design sind erfolgreich. Tatsächliche Gast-Browserprüfung in neun Sprachen, vollständige Anmelde-/Registrierungs-Rückkehrlinks mit sechs Suchteilen und vier Orten je Teil, 36 Reiter-/Breitenfälle, simulierte Mitglied-/Sitzungswechsel und 16 simulierte native Sprachantworten bestanden. Die 123 nativen Dateien und vorhandenen App-Schutzkorrekturen sind unverändert. Diese Belege ersetzen keinen echten Mitglieder-Login, Hörtest oder Xcode-/iPhone-Test.
+
+Beim Abgleich und bei späteren Änderungen prüfen:
 
 - „Model“ darf nicht zu „Modellbauer“ erweitert werden.
 - „Kameramänner“ sowie entsprechende Berufsbezeichnungen und Sprachvarianten müssen zum richtigen Beruf führen.
@@ -23,7 +25,7 @@ Nach WEB-Angabe bleiben `POST /api/search/unified` und Plan-Version 1 kompatibel
 
 Markus' zusätzliche Entscheidung vom 14. November 2026, über WEB CODEX übermittelt: **Smart darf nur von angemeldeten Mitgliedern genutzt werden**, auch beim Öffnen eines geteilten `/search?plan=…`-Links. Diese Regel ersetzt die bisherige anonyme Lesbarkeit von Smart-Ergebnisplänen. Sie ist keine kostenpflichtige Mitgliedschaft oder Bezahlschranke. Gewöhnliche öffentliche Verzeichnisse und die gewöhnliche öffentliche Suche bleiben separat zugänglich.
 
-WEB bereitet folgende gemeinsame Durchsetzung vor: Proxy und API-Handler prüfen die Sitzung. `POST /api/search/unified` antwortet Gästen mit `401` und privaten No-store-Headern, bevor Body, Kontingent oder Datenbank bearbeitet werden. Der Client wartet auf die geklärte Sitzung, ruft als Gast weder Interpretation noch Ergebnisse ab und zeigt die Anmeldung. `/api/genie` war bereits angemeldeten Konten vorbehalten. Die App verwendet dieselbe Sitzung und Serverentscheidung; keinen nativen Gastzugang, zweiten Anmeldeablauf oder lokalen Berechtigungsersatz ergänzen.
+Der übernommene WEB-Stand setzt folgende gemeinsame Durchsetzung um: Proxy und API-Handler prüfen die Sitzung. `POST /api/search/unified` antwortet Gästen mit `401` und privaten No-store-Headern, bevor Body, Kontingent oder Datenbank bearbeitet werden. Der Client wartet auf die geklärte Sitzung, ruft als Gast weder Interpretation noch Ergebnisse ab und zeigt die Anmeldung. `/api/genie` war bereits angemeldeten Konten vorbehalten. Die App verwendet dieselbe Sitzung und Serverentscheidung; keinen nativen Gastzugang, zweiten Anmeldeablauf oder lokalen Berechtigungsersatz ergänzen.
 
 Zusätzliche Abnahmekriterien für die fertige Übergabe:
 
@@ -32,7 +34,7 @@ Zusätzliche Abnahmekriterien für die fertige Übergabe:
 - Noch nicht geklärte Anmeldung, Fehler und Kontowechsel dürfen weder kurzzeitig vorherige Ergebnisse anzeigen noch verspätete Antworten oder Sprachausgaben eines vorherigen Kontos übernehmen. Abbruch und ungesendete Eingaben weiter korrekt behandeln.
 - Gewöhnliche öffentliche Suche und Verzeichnisse bleiben auch als Gast nutzbar. Anmeldung, Rückkehr, Sprachwechsel und Bedienung in allen neun Sprachen prüfen; echte Browser-Zurück-Navigation erhalten.
 
-Der App-Anwendungsstand `8eac132` enthält diese neue Mitgliedersperre noch nicht. Dessen frühere Browserprüfungen mit anonymen, simulierten Smart-Ergebnissen sind historische Integrationsbelege und kein Nachweis dieser neuen Zugangsregel. Nach der geprüften WEB-Übernahme die Browserfälle auf authentifizierte Testgrenzen umstellen und die oben genannten Gastfälle gesondert verifizieren.
+Der ältere App-Anwendungsstand `8eac132` enthielt diese Mitgliedersperre noch nicht. Dessen Browserprüfungen mit anonymen, simulierten Smart-Ergebnissen bleiben historische Integrationsbelege. Die aktuelle Übernahme nutzt authentifizierte Testgrenzen für Mitgliederfälle und gesonderte Gast-, Sitzungswechsel- und Anmelde-Rückkehrprüfungen. Authentifizierung und Antwortdaten in Komponentenprüfungen sind simuliert; ein echter Login oder iPhone-Test wird daraus nicht abgeleitet.
 
 ## Bestätigter Bedienablauf
 

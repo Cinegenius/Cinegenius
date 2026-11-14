@@ -8370,8 +8370,8 @@
     }
   },
   "UnifiedSearch": {
-    "title": "Keresés több területen",
-    "tab": "Minden terület",
+    "title": "Smart-keresés",
+    "tab": "Smart",
     "intro": "Keress együtt stábot, ajánlatokat és helyszíneket.",
     "placeholder": "Modell Berlinben és hajó Hamburgban …",
     "submit": "Keresés",
@@ -8383,7 +8383,7 @@
     "more": "Továbbiak",
     "error": "A keresés nem tölthető be. A beírt szöveg megmaradt.",
     "retry": "Újrapróbálkozás",
-    "signInRequired": "Jelentkezz be a keresések Genie-vel való kombinálásához.",
+    "signInRequired": "A Smart a tagok számára érhető el. Jelentkezz be a kategóriák közötti kereséshez és a találatok megtekintéséhez.",
     "withinRadius": "{place} · {radius} km-es körzet",
     "areas": {
       "crew": "Stáb",

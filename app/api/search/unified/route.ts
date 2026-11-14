@@ -19,8 +19,8 @@ export async function POST(request: NextRequest) {
   try {
     const user = await getCurrentUser();
     const userId = user?.userId ?? null;
-    if (!unifiedSearchAccess(userId).canReadResults) return json({ error: "unauthorized" }, 403);
-    if (!(await rateLimit(`unified-search:${userId || "public"}`, userId ? 40 : 120, 60)).allowed) return json({ error: "rate_limited" }, 429);
+    if (!userId || !unifiedSearchAccess(userId).canReadResults) return json({ error: "unauthorized" }, 401);
+    if (!(await rateLimit(`unified-search:${userId}`, 40, 60)).allowed) return json({ error: "rate_limited" }, 429);
     const body = await readGenieBody(request);
     if (!body || typeof body !== "object" || Array.isArray(body) || Object.keys(body).some(key => !["plan", "cursor"].includes(key))) return json({ error: "invalid_request" }, 400);
     const { plan: rawPlan, cursor } = body as { plan: unknown; cursor?: SearchCursor };
