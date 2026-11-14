@@ -8206,8 +8206,8 @@
     }
   },
   "UnifiedSearch": {
-    "title": "Zoeken in alle rubrieken",
-    "tab": "Alle rubrieken",
+    "title": "Smart-zoeken",
+    "tab": "Smart",
     "intro": "Zoek tegelijk naar crew, aanbiedingen en locaties.",
     "placeholder": "Model in Berlijn en boot in Hamburg …",
     "submit": "Zoeken",

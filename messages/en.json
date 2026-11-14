@@ -8206,8 +8206,8 @@
     }
   },
   "UnifiedSearch": {
-    "title": "Cross-directory search",
-    "tab": "All areas",
+    "title": "Smart Search",
+    "tab": "Smart",
     "intro": "Search for crew, offers and places together.",
     "placeholder": "Model in Berlin and boat in Hamburg …",
     "submit": "Search",

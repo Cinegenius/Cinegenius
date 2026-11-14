@@ -8206,8 +8206,8 @@
     }
   },
   "UnifiedSearch": {
-    "title": "Keresés több területen",
-    "tab": "Minden terület",
+    "title": "Smart-keresés",
+    "tab": "Smart",
     "intro": "Keress együtt stábot, ajánlatokat és helyszíneket.",
     "placeholder": "Modell Berlinben és hajó Hamburgban …",
     "submit": "Keresés",

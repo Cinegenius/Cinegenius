@@ -3,13 +3,13 @@ import { db } from "@/lib/db";
 import { getTranslations } from "next-intl/server";
 import { profileAccessFor } from "@/lib/profile-privacy-server";
 import { projectProfilePrivacy } from "@/lib/profile-privacy";
-import { getDeptLabel, departments } from "@/lib/departments";
+import { getDeptLabel, departments, taxonomyLabel } from "@/lib/departments";
 import { placeReadFields } from "@/lib/places/catalog";
 import { countryCode, PLACE_COLUMNS, placeDisplay } from "@/lib/places/core";
 import { publicProjectMedia } from "@/lib/project-media-rights";
 import { listingPriceLabel } from "@/lib/listing-price";
-import { marketplaceSearchCategories } from "@/lib/marketplaceCategories";
-import { containsLiteral, filterLiteral, isOccupationWish, matchesWishPlaces, wishSearchTerms } from "@/lib/unified-search-matching";
+import { COMPANY_CATEGORIES } from "@/lib/companyCategories";
+import { containsLiteral, exactLiteral, filterLiteral, isOccupationWish, matchesWishPlaces, searchKey, wishMarketplaceCategories, wishSearchTerms } from "@/lib/unified-search-matching";
 import { SEARCH_AREAS, type SearchArea, type SearchGroup, type SearchPlan, type SearchResult, type SearchWish } from "@/lib/unified-search";
 
 type Row = Record<string, unknown>;
@@ -35,19 +35,27 @@ function queryFor(area: SearchArea, wish: SearchWish, terms: string[], categorie
   const patterns = (columns: string[]) => terms.flatMap(term => columns.map(column => `${column}.ilike.${containsLiteral(term)}`));
   const kinds = LISTING_AREAS[area];
   if (kinds) {
-    const filters = patterns(["title", "description", "category"]);
+    const filters = patterns(["title", "description", "category", ...(area === "marketplace"
+      ? ["metadata->>vehicle_subtype", "metadata->>make", "metadata->>model", "metadata->marketplace->>brand", "metadata->marketplace->>model"] : [])]);
     if (area === "marketplace" && categories.length) filters.push(`category.in.(${categories.map(filterLiteral).join(",")})`);
     return db.from("privacy_visible_listings").select(`${PLACE_COLUMNS},id,user_id,title,city,type,category,price,image_url,price_negotiable:metadata->price_negotiable,price_on_request:metadata->price_on_request,rental_type:metadata->>rental_type,marketplace:metadata->marketplace`)
       .eq("published", true).in("type", kinds).or(filters.join(",")).order("id");
   }
   if (area === "crew") {
-    const filters = patterns(isOccupationWish(wish, terms) ? ["role"] : ["display_name", "role", "bio"]);
+    const filters = isOccupationWish(wish, terms)
+      ? terms.map(term => `role.ilike.${exactLiteral(term)}`)
+      : patterns(["display_name", "role", "bio"]);
     if (terms.length) filters.push(`positions.ov.{${terms.map(filterLiteral).join(",")}}`);
     return db.from("profiles").select(`${PLACE_COLUMNS},user_id,display_name,role,positions,bio,location,avatar_url,available`)
       .not("display_name", "is", null).neq("display_name", "").or(filters.join(",")).order("user_id");
   }
-  if (area === "companies") return db.from("companies").select(`${PLACE_COLUMNS},id,slug,name,city,logo_url`)
-    .eq("published", true).or(patterns(["name", "description"]).join(",")).order("id");
+  if (area === "companies") {
+    const filters = patterns(["name", "description"]);
+    if (categories.length) filters.push(`categories.ov.{${categories.map(filterLiteral).join(",")}}`);
+    if (terms.length) filters.push(`services.ov.{${terms.map(filterLiteral).join(",")}}`);
+    return db.from("companies").select(`${PLACE_COLUMNS},id,slug,name,city,logo_url`)
+      .eq("published", true).or(filters.join(",")).order("id");
+  }
   // Published projects and private working copies are separate tables.
   if (area === "projects") return db.from("projects").select(`${PLACE_COLUMNS},id,title,description,poster_url,metadata,created_by`)
     .or(patterns(["title", "description", "director"]).join(",")).order("id");
@@ -77,7 +85,9 @@ async function readGroup(plan: SearchPlan, wishIndex: number, area: SearchArea, 
   const terms = wishSearchTerms({ ...wish, area }, locale, taxonomy);
   const catalog = await getTranslations({ locale, namespace: "MarketplaceCatalog" });
   const market = await getTranslations({ locale, namespace: "MarketplaceOffer" });
-  const categories = area === "marketplace" ? marketplaceSearchCategories(wish.query, catalog) : [];
+  const ui = await getTranslations({ locale });
+  const categories = area === "marketplace" ? wishMarketplaceCategories(wish.query, catalog) : area === "companies"
+    ? COMPANY_CATEGORIES.filter(category => [category.id, category.label, taxonomyLabel(category.label, ui)].some(label => searchKey(label).includes(searchKey(wish.query)))).map(category => category.id) : [];
   const group: SearchGroup = { area, wishIndex, label: await searchWishLabel(wish, locale), results: [], nextOffset: null };
   for (let pass = 0; pass < 3; pass++) {
     signal.throwIfAborted();

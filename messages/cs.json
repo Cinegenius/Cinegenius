@@ -8206,8 +8206,8 @@
     }
   },
   "UnifiedSearch": {
-    "title": "Hledání napříč sekcemi",
-    "tab": "Všechny sekce",
+    "title": "Hledání Smart",
+    "tab": "Smart",
     "intro": "Hledejte společně štáb, nabídky a místa.",
     "placeholder": "Modelka v Berlíně a loď v Hamburku …",
     "submit": "Hledat",

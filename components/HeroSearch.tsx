@@ -39,14 +39,17 @@ export default function HeroSearch() {
 
   return (
     <div className="w-full rounded-2xl border border-border bg-bg-primary/85 p-2 shadow-lg shadow-black/15 sm:p-3">
-      <div role="group" aria-label={uiText("home.heroSearchAction")} className="mb-2 flex flex-wrap gap-1 px-1">
+      <div role="group" aria-label={uiText("home.heroSearchAction")} className="mb-2 flex flex-nowrap overflow-x-auto overscroll-x-contain [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
         {tabs.map((t) => (
           <button
             key={t.id}
             type="button"
             aria-pressed={activeTab === t.id}
-            onClick={() => setActiveTab(t.id)}
-            className={`relative min-h-11 min-w-0 max-w-full rounded-lg px-3 py-2 text-xs font-semibold transition-colors ${
+            onClick={(event) => {
+              setActiveTab(t.id);
+              event.currentTarget.scrollIntoView({ block: "nearest", inline: "nearest" });
+            }}
+            className={`relative min-h-11 min-w-11 shrink-0 whitespace-nowrap rounded-lg px-2 py-2 text-xs font-semibold transition-colors sm:px-3 ${
               activeTab === t.id
                 ? "bg-gold-subtle text-gold after:absolute after:inset-x-3 after:bottom-0 after:h-0.5 after:rounded-full after:bg-gold"
                 : "text-text-secondary hover:bg-bg-elevated hover:text-text-primary"

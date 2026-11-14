@@ -8206,8 +8206,8 @@
     }
   },
   "UnifiedSearch": {
-    "title": "Búsqueda conjunta",
-    "tab": "Todas las áreas",
+    "title": "Búsqueda Smart",
+    "tab": "Smart",
     "intro": "Busca profesionales, anuncios y lugares a la vez.",
     "placeholder": "Modelo en Berlín y barco en Hamburgo …",
     "submit": "Buscar",

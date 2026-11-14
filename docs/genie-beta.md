@@ -182,8 +182,10 @@ a protected placeholder, not a usable local credential. The attempted local
 provider call failed for that reason; it is not evidence of a broken live key.
 Do not rotate it or claim that the model's interpretation passed a real test.
 
-- Homepage's existing search gains an `Übergreifend` tab (localized in all nine
-  languages). Explicit submit navigates to `/search?smart=1&q=…`; that page calls
+- Homepage's existing search uses a `Smart` tab, with localized search-page titles
+  in all nine languages. The tabs stay on one row, with horizontal overflow only
+  when their labels cannot fit at the minimum touch size. Explicit submit navigates
+  to `/search?smart=1&q=…`; that page calls
   the existing authenticated `POST /api/genie` once, then replaces the temporary
   URL with the validated plan URL. No AI request on typing, account/locale change,
   pagination or Back/Forward to resolved results. Retry is explicit.
@@ -215,6 +217,12 @@ Do not rotate it or claim that the model's interpretation passed a real test.
   enforced. Companies/public projects/approved news and organizations reuse their
   public eligibility rules. Project geography uses its recorded primary place or
   production country, not guessed cities from its shooting-location list.
+- Occupation matches prefer exact catalogue roles and their aliases: Model does
+  not expand to model makers, generic drivers exclude dolly grips, and camera
+  people include DoP. Gender/plural search aliases never rewrite saved occupations.
+  Marketplace matching includes public vehicle subtype, make/model and offer
+  brand/model. Specific objects do not admit every sibling in a broad category.
+  Company categories and declared services participate in company searches.
 - Origin checks, the existing flood guard and additional read quotas remain.
   Errors are sanitized (`invalid_request`, `search_unresolved`, `rate_limited`,
   `unavailable`); all results are private/no-store. Missing authorization data

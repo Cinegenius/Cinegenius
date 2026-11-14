@@ -8206,8 +8206,8 @@
     }
   },
   "UnifiedSearch": {
-    "title": "Sök i alla områden",
-    "tab": "Alla områden",
+    "title": "Smart-sökning",
+    "tab": "Smart",
     "intro": "Sök efter filmteam, erbjudanden och platser tillsammans.",
     "placeholder": "Modell i Berlin och båt i Hamburg …",
     "submit": "Sök",
