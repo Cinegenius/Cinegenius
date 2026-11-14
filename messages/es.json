@@ -7439,7 +7439,7 @@
     }
   },
   "SupportMediation": {
-    "genieSummary": "Organizarlo por tu cuenta es gratis. Si acuerdas que nuestro equipo de soporte gestione el alquiler, el 5 % está incluido en el precio total. Los extras opcionales pueden ser de pago más adelante. Los perfiles seguirán siendo gratuitos siempre, para una comunidad abierta.",
+    "genieSummary": "El registro y las funciones básicas seguirán siendo gratuitos, para una comunidad fuerte. Solo las intermediaciones acordadas y exitosas del equipo de soporte conllevan una comisión comunicada de antemano. Los extras opcionales podrán ser de pago en el futuro.",
     "heading": "Intermediación de CineGenius Support",
     "startup": "CineGenius se encuentra actualmente en su fase inicial. Desarrollamos nuestra plataforma y nuestros servicios paso a paso y agradecemos tus comentarios.",
     "free": "El registro, los perfiles, los anuncios, las búsquedas y el contacto directo a través de la plataforma son actualmente gratuitos.",
@@ -8379,6 +8379,7 @@
     "membersOnly": "Solo para miembros",
     "submit": "Buscar",
     "showResults": "Ver resultados conjuntos",
+    "ready": "Tu búsqueda está lista. Consulta los resultados agrupados por área.",
     "understanding": "Interpretando tu búsqueda …",
     "loading": "Cargando resultados …",
     "emptyGroup": "No hay entradas visibles que coincidan con esta parte de la búsqueda.",

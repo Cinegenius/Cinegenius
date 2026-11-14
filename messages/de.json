@@ -7439,7 +7439,7 @@
     }
   },
   "SupportMediation": {
-    "genieSummary": "Selbst organisieren ist kostenlos. Bei vereinbarter Abwicklung über unser Support-Team sind 5 % im Gesamtmietpreis enthalten. Optionale Extras können später kostenpflichtig werden. Profile bleiben dauerhaft kostenlos – für eine offene Community.",
+    "genieSummary": "Registrierung und Basisfunktionen bleiben kostenlos – für eine starke Community. Nur bei vereinbarter, erfolgreicher Support-Vermittlung fällt eine vorab mitgeteilte Provision an. Optionale Extras können künftig kostenpflichtig sein.",
     "heading": "Vermittlung durch CineGenius Support",
     "startup": "CineGenius befindet sich derzeit in der Aufbauphase. Wir entwickeln unsere Plattform und Leistungen schrittweise weiter und freuen uns über dein Feedback.",
     "free": "Registrierung, Profile, Inserate, Suche und direkte Kontaktaufnahme über die Plattform sind derzeit kostenlos.",
@@ -8379,6 +8379,7 @@
     "membersOnly": "Nur für Mitglieder",
     "submit": "Suchen",
     "showResults": "Gemeinsame Ergebnisse anzeigen",
+    "ready": "Deine Suche ist vorbereitet. Hier findest du die Ergebnisse nach Bereichen.",
     "understanding": "Suchwünsche werden zugeordnet …",
     "loading": "Treffer werden geladen …",
     "emptyGroup": "Keine passenden sichtbaren Einträge für diesen Suchteil.",

@@ -25,6 +25,14 @@ Eine echte Modellantwort und ein iPhone-/Android-Gerätetest sind damit nicht be
 Prüf- und Übergabebelege: `/srv/cinegenius/handoffs/20261114-app-genie-pricing/`,
 abschließender Kurztext-Abgleich im Unterordner `final-short-copy/`.
 
+Die anschließend vorbereitete Fassung `327a78a` verkürzt die Zusammenfassung
+erneut: Registrierung/Basisfunktionen bleiben für die Community kostenlos;
+Provision nur nach vereinbarter erfolgreicher Support-Vermittlung und vorheriger
+Mitteilung, optionale Extras möglicherweise später kostenpflichtig. Die
+ausführliche bestehende 5%-Regel bleibt im Serverprompt. Alle neun Kataloge sind
+abgeglichen; dieser weitere Kurztext ist bei Übergabe noch nicht live. Keine
+Änderung an Kontingenten, Rechtsdokumenten oder tatsächlicher Abrechnung.
+
 ## Gemeinsame Kontoregel
 
 - Normale Konten: 30 KI-Aufrufe je UTC-Tag. Keine gemeinsame tägliche Obergrenze für die gesamte Website.

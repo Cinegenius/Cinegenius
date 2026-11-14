@@ -1,4 +1,4 @@
-import { departments, getDepartmentRoleLabel } from "./departments";
+import { departments, getDepartmentRoleLabel, getDeptLabel } from "./departments";
 import { occupationCatalogue } from "./primary-occupation";
 import { placeCandidatesForLabel, placeReadFields } from "./places/catalog";
 import { countryCode, placeKey, placeCitySearchAliases } from "./places/core";
@@ -21,7 +21,7 @@ const synonyms: Record<string, string[]> = {
   beleuchter: ["Beleuchter", "Electrician", "Lighting Technician"],
   boot: ["Boot", "Boat", "Schiff", "Yacht"], boat: ["Boat", "Boot", "Yacht"],
   auto: ["Auto", "PKW", "Car"], car: ["Car", "Auto", "PKW"],
-  studio: ["Studio"], kostum: ["Kostüm", "Costume"],
+  studio: ["Studio"], kostum: ["Kostüm", "Costume"], kostuem: ["Kostüm", "Costume"], costume: ["Costume", "Kostüm"],
 };
 
 const cameraPeople = ["Director of Photography (DoP)", "Kameramann", "Camera Operator"];
@@ -31,24 +31,31 @@ const crewSynonyms: Record<string, string[]> = {
 };
 // Gender punctuation is not part of an occupation. Keep the original labels in
 // returned terms so stored IDs/positions and member-written text are untouched.
-const occupationKey = (value: string) => searchKey(value.replace(/(?:\*|:|\/)innen\b/giu, "").replace(/(?:\*|:|\/)in\b/giu, "").replace(/\*frau\b/giu, ""));
+export const occupationKey = (value: string) => searchKey(value.replace(/(?:\*|:|\/)innen\b/giu, "").replace(/(?:\*|:|\/)in\b/giu, "").replace(/\*frau\b/giu, ""));
 const occupationKeys = (value: string) => {
   const key = occupationKey(value);
   return [key, ...(key.endsWith("innen") ? [key.slice(0, -5)] : key.endsWith("in") ? [key.slice(0, -2)] : [])];
 };
+
+/** Exact department names only: a specific job must retain its specialization. */
+export function searchDepartment(query: string, locale = "de", taxonomy?: (key: string) => string) {
+  const key = searchKey(query);
+  return key ? departments.find(dept => [dept.id, dept.label, ...Object.values(dept.labels), getDeptLabel(dept, locale, undefined, taxonomy)]
+    .some(label => searchKey(label) === key)) : undefined;
+}
 
 export function wishSearchTerms(wish: SearchWish, locale = "de", taxonomy?: (key: string) => string): string[] {
   const crew = wish.area === "crew" || wish.area === "all";
   const terms = wish.query ? [...((crew && crewSynonyms[searchKey(wish.query)]) || synonyms[searchKey(wish.query)] || [wish.query])] : [];
   const requested = [...terms];
   if (crew) {
-    const dept = departments.find(d => d.id === wish.department);
+    const dept = departments.find(d => d.id === wish.department) ?? searchDepartment(wish.query, locale, taxonomy);
     const roles = occupationCatalogue.filter(role => !dept || role.departmentId === dept.id).map(role => {
       const department = departments.find(d => d.id === role.departmentId)!;
       const label = getDepartmentRoleLabel(department.id, role.label, locale, undefined, taxonomy);
       return { ...role, aliases: [...new Set([...role.aliases, label])] };
     });
-    if (!requested.length && dept) terms.push(...roles.flatMap(role => role.aliases));
+    if (dept && (!requested.length || searchDepartment(wish.query, locale, taxonomy)?.id === dept.id)) terms.push(...roles.flatMap(role => role.aliases));
     for (const term of requested) {
       const keys = occupationKeys(term);
       // An exact occupation wins: Model must never expand to Model Maker or 3D Modeler.
@@ -69,7 +76,13 @@ export function wishSearchTerms(wish: SearchWish, locale = "de", taxonomy?: (key
  * A motorcycle keyword must not match every car stored under picture vehicles. */
 export function wishMarketplaceCategories(query: string, t: (key: string) => string): string[] {
   const key = searchKey(query);
-  const values: string[] = [...(SEARCH_SYNONYMS[query.trim().toLowerCase()] ?? [])];
+  const values: string[] = Object.entries(SEARCH_SYNONYMS).filter(([alias]) => searchKey(alias) === key).flatMap(([, values]) => values);
+  // A broad costume request includes the current clothing group. A particular
+  // hat, camera brand or vehicle must not expand to every sibling in its group.
+  if (["kostum", "kostuem", "costume"].includes(key)) {
+    const clothing = marketplaceDepartments.find(dept => dept.id === "kostuem")?.groups.find(group => group.id === "kostuem-kleidung");
+    if (clothing) values.push(...groupValues(clothing));
+  }
   for (const department of marketplaceDepartments) {
     if ([department.id, department.label, t(`categories.${department.id}`)].some(label => searchKey(label) === key)) values.push(...deptValues(department));
     for (const group of department.groups) {

@@ -87,7 +87,7 @@ async function readGroup(plan: SearchPlan, wishIndex: number, area: SearchArea, 
   const market = await getTranslations({ locale, namespace: "MarketplaceOffer" });
   const ui = await getTranslations({ locale });
   const categories = area === "marketplace" ? wishMarketplaceCategories(wish.query, catalog) : area === "companies"
-    ? COMPANY_CATEGORIES.filter(category => [category.id, category.label, taxonomyLabel(category.label, ui)].some(label => searchKey(label).includes(searchKey(wish.query)))).map(category => category.id) : [];
+    ? COMPANY_CATEGORIES.filter(category => [category.id, category.label, taxonomyLabel(category.label, ui)].some(label => terms.some(term => searchKey(label).includes(searchKey(term))))).map(category => category.id) : [];
   const group: SearchGroup = { area, wishIndex, label: await searchWishLabel(wish, locale), results: [], nextOffset: null };
   for (let pass = 0; pass < 3; pass++) {
     signal.throwIfAborted();

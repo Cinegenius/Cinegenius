@@ -4,10 +4,12 @@ import { departments } from "./departments";
 import { placeCandidatesForLabel } from "./places/catalog";
 import { readSearchPlan, unifiedSearchHref, type SearchPlan } from "./unified-search";
 import { GenieError } from "./genie-error";
+import { keywordSearchPlan, normalizeKeywordPlan } from "./unified-search-intent";
 
 export const UNIFIED_SEARCH_INSTRUCTIONS = `Prepare read-only cross-directory searches in searches, one wish per object/occupation with its own places array. Output [] for non-search requests or when clarification is needed. Never claim actual results were found, inspected or available. These are search filters only.
 area is crew (people/occupations/departments), marketplace (objects, vehicles, props, equipment), locations (spaces, photo/film studios), companies (businesses), jobs (vacancies), animals (animal portfolios), projects, news, organizations, or all for genuinely unrestricted keywords. Never turn a person request into a goods request: 'jemand vom Kostüm' is crew; 'ein Kostüm mieten' is marketplace. A generic word without clear area can use all.
 query is a short singular noun, occupation or keyword in the user's language, without command words, articles, gender/plural inflections or locations. Keep meaningful specializations and proper names. Never join different occupations or objects in one query. For crew, OB means Oberbeleuchter/Gaffer. Generic Fahrer covers driving roles; Produktionsfahrer is narrower. Kameramann/Kamerafrau/Kameramänner means camera people (DoP or camera operator), not camera equipment. Model means a person when asked as crew, never a model maker. department is empty unless a whole crew department was requested (e.g. 'jemand vom kostum' => department kostuem, query empty); valid department IDs: ${departments.map(d => `${d.id} (${d.label})`).join("; ")}.
+Treat bare keyword lists as search requests, even without commas, conjunctions or a sentence: 'Beleuchter Kostüm' means two wishes (crew Beleuchter; crew department kostuem). 'Beleuchter Kostüm in Berlin' gives both wishes Berlin. 'OB Fahrer München' also means two crew wishes in Munich. A single 'Kostüm', 'kostum', 'kostuem' or 'costume' without a person/rental qualifier searches all areas for Kostüm. Never require punctuation. Preserve multi-word occupations such as Assistant Costume Designer as one wish. Do not put two independent keywords into one query or silently omit one. Recognize the spoken keyword first, then choose directories; existing platform records use German canonical occupation aliases even when the request is in another language.
 places=[] means no geographic restriction. Each place has city (town only), country (explicit ISO code or empty), continent (UN M49: Africa 002, Americas 019, Asia 142, Europe 150, Oceania 009, Antarctica 010, otherwise empty), radiusKm (0 for exact city; crew 'near' defaults to 50, explicit 1–200). A continent has empty city and country. Multiple places for ONE wish are OR alternatives. All constraints within one place are AND. Do not infer private/GPS location. If 'near me' lacks a stated location, ask where. Radius is currently supported only for crew; explain this and ask before substituting a different scope.
 Preserve grammatical attachment of places. Examples (all omitted place strings are empty, radiusKm=0):
 'Beleuchter in Berlin und Hamburg' => ONE crew wish Beleuchter, places Berlin AND Hamburg as alternatives.
@@ -33,9 +35,14 @@ export function validateResolvedSearchPlan(value: unknown): SearchPlan {
   return plan;
 }
 
-export async function unifiedSearchLinks(value: unknown, locale: string) {
-  if (Array.isArray(value) && !value.length) return [];
-  const plan = validateResolvedSearchPlan({ version: 1, searches: value });
+export async function unifiedSearchLinks(value: unknown, locale: string, requestText = "") {
+  const empty = Array.isArray(value) && !value.length;
+  const provided = empty ? null : validateResolvedSearchPlan({ version: 1, searches: value });
+  const taxonomy = await getTranslations({ locale, namespace: "Taxonomy" });
+  const literal = keywordSearchPlan(requestText, locale, taxonomy);
+  if (!provided && !literal) return [];
+  const plan = literal ?? normalizeKeywordPlan(provided!, locale, taxonomy);
+  if (!plan) throw new GenieError("search_unresolved", 422);
   const t = await getTranslations({ locale, namespace: "UnifiedSearch" });
   return [{ href: unifiedSearchHref(plan), label: t("showResults") }];
 }

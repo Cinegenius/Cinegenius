@@ -7439,7 +7439,7 @@
     }
   },
   "SupportMediation": {
-    "genieSummary": "Alles zelf regelen is gratis. Als je afspreekt dat ons supportteam de verhuur afhandelt, is 5% inbegrepen in de totale huurprijs. Optionele extra’s kunnen later betalend worden. Profielen blijven altijd gratis, voor een open community.",
+    "genieSummary": "Registratie en basisfuncties blijven gratis – voor een sterke community. Alleen bij afgesproken, succesvolle bemiddeling door ons supportteam geldt een vooraf meegedeelde commissie. Optionele extra’s kunnen later betalend worden.",
     "heading": "Bemiddeling door CineGenius Support",
     "startup": "CineGenius bevindt zich momenteel in de opstartfase. We ontwikkelen ons platform en onze diensten stap voor stap en ontvangen graag je feedback.",
     "free": "Registratie, profielen, zoekertjes, zoeken en rechtstreeks contact via het platform zijn momenteel gratis.",
@@ -8379,6 +8379,7 @@
     "membersOnly": "Alleen voor leden",
     "submit": "Zoeken",
     "showResults": "Gezamenlijke resultaten tonen",
+    "ready": "Je zoekopdracht is klaar. Bekijk de resultaten per onderdeel.",
     "understanding": "Je zoekopdrachten worden verwerkt …",
     "loading": "Resultaten laden …",
     "emptyGroup": "Geen passende zichtbare vermeldingen voor dit deel van de zoekopdracht.",

@@ -45,20 +45,21 @@ export default function ResultCard({ result, compact = false }: { result: Result
   return (
     <Link
       href={cfg.href(result.id)}
-      className={`group flex min-w-0 bg-bg-secondary border border-border rounded-xl overflow-hidden hover:border-gold/40 transition-colors ${compact ? "items-center gap-3 p-2.5" : "flex-col hover:shadow-lg hover:shadow-black/20"}`}
+      className={`group flex min-w-0 bg-bg-secondary border border-border rounded-xl overflow-hidden hover:border-gold/40 transition-colors ${compact ? "items-center gap-2.5 p-2" : "flex-col hover:shadow-lg hover:shadow-black/20"}`}
     >
       {/* Image */}
-      <div className={`relative bg-bg-elevated overflow-hidden ${compact ? "h-16 w-16 shrink-0 rounded-lg" : "aspect-video"}`}>
+      <div className={`relative bg-bg-elevated overflow-hidden ${compact ? "flex h-12 w-12 shrink-0 items-center justify-center rounded-md" : "aspect-video"}`}>
         {result.image ? (
           <PreviewImage
-            fill sizes={compact ? "64px" : "(max-width: 639px) 50vw, (max-width: 1023px) 33vw, (max-width: 1279px) 25vw, 240px"} mediaSize="thumbnail"
+            {...(compact ? { width: 48, height: 48 } : { fill: true })}
+            sizes={compact ? "48px" : "(max-width: 639px) 50vw, (max-width: 1023px) 33vw, (max-width: 1279px) 25vw, 240px"} mediaSize="thumbnail"
             src={result.image}
             alt={result.title}
             className="w-full h-full object-contain object-center"
           />
         ) : (
           <div className={`w-full h-full flex items-center justify-center border ${cfg.bgColor}`}>
-            <Icon size={32} className={`${cfg.color} opacity-40`} />
+            <Icon size={compact ? 22 : 32} className={`${cfg.color} opacity-40`} />
           </div>
         )}
         {/* Type badge */}
@@ -74,23 +75,27 @@ export default function ResultCard({ result, compact = false }: { result: Result
       </div>
 
       {/* Content */}
-      <div className={`min-w-0 flex-1 flex flex-col ${compact ? "py-0.5" : "p-4"}`}>
-        <h3 className="font-semibold text-sm text-text-primary mb-1 leading-tight line-clamp-2 group-hover:text-gold transition-colors">
+      <div className={`min-w-0 flex-1 flex flex-col ${compact ? "" : "p-4"}`}>
+        <h3 title={result.title} className={`font-semibold text-sm text-text-primary leading-tight group-hover:text-gold transition-colors ${compact ? "truncate" : "mb-1 line-clamp-2"}`}>
           {result.title}
         </h3>
-        <p className="text-xs text-text-muted line-clamp-1 flex-1">{result.subtitle}</p>
+        <p title={result.subtitle} className="text-xs text-text-muted line-clamp-1 flex-1">{result.subtitle}</p>
         {!isProfile && result.type !== "animal" && (result.priceLabel || result.price > 0) && (
-          <p className={`${compact ? "mt-1" : "mt-2"} text-sm font-semibold font-mono text-gold`}>
+          <p className={`${compact ? "text-xs" : "mt-2 text-sm"} font-semibold font-mono text-gold`}>
             {result.priceLabel ?? uiText("Ui.text_4519fabedb2cbd", { value1: String(result.price.toLocaleString(uiLocale)) })}
           </p>
         )}
-        {isProfile && result.available !== null && (
+        {!compact && isProfile && result.available !== null && (
           <div className={`${compact ? "mt-1" : "mt-2"} flex items-center gap-1`}>
             <span className={`w-1.5 h-1.5 rounded-full ${result.available ? "bg-success" : "bg-text-muted"}`} />
             <span className="text-xs text-text-muted">{result.available ? uiText("common.available") : uiText("creators.currentlyBooked")}</span>
           </div>
         )}
       </div>
+      {compact && isProfile && result.available !== null && <span role="img"
+        aria-label={result.available ? uiText("common.available") : uiText("common.booked")}
+        title={result.available ? uiText("common.available") : uiText("common.booked")}
+        className={`h-1.5 w-1.5 shrink-0 rounded-full ${result.available ? "bg-success" : "bg-text-muted"}`} />}
     </Link>
   );
 }
