@@ -59,4 +59,8 @@ const resumeSource = await readFile(new URL('src/app-resume.js', root), 'utf8');
 const resumeMarker = 'null /* CINEGENIUS_RESUME_ORIGIN */';
 if (resumeSource.split(resumeMarker).length !== 2) throw new Error('Expected exactly one resume origin marker');
 await writeFile(new URL('app-resume.js', output), resumeSource.replace(resumeMarker, () => JSON.stringify(origin)));
+const voiceSource = await readFile(new URL('src/voice.js', root), 'utf8');
+const voiceMarker = 'null /* CINEGENIUS_VOICE_CONFIG */';
+if (voiceSource.split(voiceMarker).length !== 2) throw new Error('Expected exactly one voice configuration marker');
+await writeFile(new URL('voice.js', output), voiceSource.replace(voiceMarker, () => JSON.stringify({origin, locales: SUPPORTED_LOCALES})));
 console.log(`Prepared development preview for ${config.server.url} in ${fileURLToPath(root)}`);

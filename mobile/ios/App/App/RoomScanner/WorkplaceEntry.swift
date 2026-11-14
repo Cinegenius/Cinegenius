@@ -43,6 +43,7 @@ extension CineGeniusViewController {
     }
     func openWorkplace(locale: String? = nil) {
         guard !isOpeningWorkplace, presentedViewController == nil, viewIfLoaded?.window != nil else { return }
+        nativeVoice?.cancelAll()
         isOpeningWorkplace = true
         let strings = ScannerStrings(preference:locale)
         let progress = UIActivityIndicatorView(style:.large)

@@ -8132,6 +8132,8 @@
     "cameraTitle": "Povolit přístup ke kameře",
     "cameraBody": "Ke skenování místnosti je potřeba kamera. Povol přístup v Nastavení a zkus to znovu.",
     "cameraUsage": "CineGenius používá kameru a LiDAR k zachycení místností a vytvoření půdorysů v tomto zařízení.",
+    "microphoneUsage": "CineGenius používá mikrofon pouze při spuštění hlasového zadávání v Genie. Nahrávání končí, když ho zastavíš nebo opustíš aplikaci.",
+    "speechRecognitionUsage": "CineGenius převádí tvůj hlas na text pro Genie. Pokud není rozpoznávání v zařízení dostupné, může zvuk zpracovat Apple. CineGenius zvukové nahrávky neukládá.",
     "openSettings": "Otevřít Nastavení",
     "cancel": "Zrušit",
     "close": "Zavřít",

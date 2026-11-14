@@ -10,6 +10,7 @@ class CineGeniusViewController: CAPBridgeViewController {
     private var loadingObservation: NSKeyValueObservation?
     private var urlObservation: NSKeyValueObservation?
     private var hasViewportAdapter = false
+    var nativeVoice: NativeVoice?
     var suspendedWorkplaces: [String:UIViewController] = [:]
     var isOpeningWorkplace = false
     private var accountNavigationDelegate: CineGeniusNavigationDelegate?
@@ -86,16 +87,18 @@ class CineGeniusViewController: CAPBridgeViewController {
         installViewportAdapter()
         placeWebView()
         installWorkplaceMenu()
+        nativeVoice = NativeVoice(owner: self)
         if let original = webView?.navigationDelegate {
             let delegate = CineGeniusNavigationDelegate(original: original)
             accountNavigationDelegate = delegate; webView?.navigationDelegate = delegate
         }
         urlObservation = webView?.observe(\.url, options:[.new]) { [weak self] _,_ in
-            DispatchQueue.main.async { self?.resumeRequestedWorkplace() }
+            DispatchQueue.main.async { self?.nativeVoice?.cancelAll(); self?.resumeRequestedWorkplace() }
         }
         webView?.allowsBackForwardNavigationGestures = true
         statusBarStyle = .lightContent
         loadingObservation = webView?.observe(\.isLoading, options: [.new]) { [weak self] view, _ in
+            if view.isLoading { self?.nativeVoice?.cancelAll() }
             if !view.isLoading { self?.resumeRequestedWorkplace() }
             guard !view.isLoading, let self,
                   let local = self.bridge?.config.localURL,

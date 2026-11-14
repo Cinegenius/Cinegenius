@@ -70,6 +70,10 @@
 	<string>CineGenius uses the camera and LiDAR to capture rooms and create floor plans on this device.</string>
 	<key>NSFaceIDUsageDescription</key>
 	<string>Unlock your locally saved CineGenius floor plans.</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>CineGenius uses your microphone only when you start voice input in Genie. Recording ends when you stop or leave the app.</string>
+	<key>NSSpeechRecognitionUsageDescription</key>
+	<string>CineGenius converts your spoken input into text for Genie. Apple may process the audio when on-device recognition is unavailable. CineGenius does not save audio recordings.</string>
 	<key>UIFileSharingEnabled</key>
 	<false/>
 	<key>LSSupportsOpeningDocumentsInPlace</key>

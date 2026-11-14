@@ -7,7 +7,7 @@ export function nativeStrings(catalog, expectedKeys) {
   const keys = Object.keys(strings).sort();
   if (expectedKeys && JSON.stringify(keys) !== JSON.stringify(expectedKeys)) throw new Error('NativeRoomScanner catalogue keys differ');
   for (const key of keys) if (typeof strings[key] !== 'string' || !strings[key].trim()) throw new Error(`Missing NativeRoomScanner.${key}`);
-  for (const key of ['cameraUsage', 'localAuthReason', 'workplaceTitle', 'locationsTitle']) {
+  for (const key of ['cameraUsage', 'localAuthReason', 'microphoneUsage', 'speechRecognitionUsage', 'workplaceTitle', 'locationsTitle']) {
     if (!strings[key]) throw new Error(`Missing NativeRoomScanner.${key}`);
   }
   return strings;
@@ -29,7 +29,8 @@ export async function prepareNativeResources(repository, mobile, output, origin)
     const permissionFolder = new URL(`ios/App/App/NativeStrings/${locale}.lproj/`, mobile);
     await mkdir(permissionFolder, { recursive: true });
     await writeFile(new URL('InfoPlist.strings', permissionFolder),
-      `"NSCameraUsageDescription" = ${stringsLiteral(copy.cameraUsage)};\n"NSFaceIDUsageDescription" = ${stringsLiteral(copy.localAuthReason)};\n`);
+      `"NSCameraUsageDescription" = ${stringsLiteral(copy.cameraUsage)};\n"NSFaceIDUsageDescription" = ${stringsLiteral(copy.localAuthReason)};\n`
+      + `"NSMicrophoneUsageDescription" = ${stringsLiteral(copy.microphoneUsage)};\n"NSSpeechRecognitionUsageDescription" = ${stringsLiteral(copy.speechRecognitionUsage)};\n`);
     menu.locales[locale] = {
       legacyLabel: catalog.nav.ai,
       legacyBadge: catalog.nav.comingSoon,

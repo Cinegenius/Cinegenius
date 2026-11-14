@@ -33,6 +33,15 @@ test('prepared remote sign-in entry satisfies the native local-start-file requir
     const resume = await readFile(join(fixture, 'mobile/www/app-resume.js'), 'utf8');
     assert.ok(resume.includes(JSON.stringify(new URL(config.server.url).origin)));
     assert.ok(resume.includes("new Event('cinegenius:app-resume')"));
+    const voice = await readFile(join(fixture, 'mobile/www/voice.js'), 'utf8');
+    assert.ok(voice.includes(JSON.stringify(new URL(config.server.url).origin)));
+    assert.ok(!voice.includes('CINEGENIUS_VOICE_CONFIG'));
+    for (const locale of ['de','en','es','it','cs','hu','nl','nl-BE','sv']) {
+      const catalog = JSON.parse(await readFile(join(fixture, 'messages', `${locale}.json`), 'utf8'));
+      const permissions = await readFile(join(fixture, 'mobile/ios/App/App/NativeStrings', `${locale}.lproj/InfoPlist.strings`), 'utf8');
+      assert.ok(permissions.includes(`"NSMicrophoneUsageDescription" = ${JSON.stringify(catalog.NativeRoomScanner.microphoneUsage)};`));
+      assert.ok(permissions.includes(`"NSSpeechRecognitionUsageDescription" = ${JSON.stringify(catalog.NativeRoomScanner.speechRecognitionUsage)};`));
+    }
     const localeSource = await readFile(join(fixture, 'mobile/www/locale.js'), 'utf8');
     const { resolveLocale } = await import(`data:text/javascript;base64,${Buffer.from(localeSource).toString('base64')}`);
     assert.equal(resolveLocale('nl-BE', 'it-IT', 'DE'), 'nl-BE', 'the packaged resolver preserves a manual language');

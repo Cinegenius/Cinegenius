@@ -8132,6 +8132,8 @@
     "cameraTitle": "Consenti accesso alla fotocamera",
     "cameraBody": "La fotocamera serve per scansionare la stanza. Consenti l'accesso nelle Impostazioni e riprova.",
     "cameraUsage": "CineGenius usa fotocamera e LiDAR per acquisire stanze e creare planimetrie su questo dispositivo.",
+    "microphoneUsage": "CineGenius usa il microfono solo quando avvii l’inserimento vocale in Genie. La registrazione termina quando la interrompi o esci dall’app.",
+    "speechRecognitionUsage": "CineGenius converte la tua voce in testo per Genie. Apple può elaborare l’audio se il riconoscimento sul dispositivo non è disponibile. CineGenius non salva registrazioni audio.",
     "openSettings": "Apri Impostazioni",
     "cancel": "Annulla",
     "close": "Chiudi",

@@ -8132,6 +8132,8 @@
     "cameraTitle": "Allow camera access",
     "cameraBody": "The camera is needed to scan the room. Allow access in Settings, then try again.",
     "cameraUsage": "CineGenius uses the camera and LiDAR to capture rooms and create floor plans on this device.",
+    "microphoneUsage": "CineGenius uses your microphone only when you start voice input in Genie. Recording ends when you stop or leave the app.",
+    "speechRecognitionUsage": "CineGenius converts your spoken input into text for Genie. Apple may process the audio when on-device recognition is unavailable. CineGenius does not save audio recordings.",
     "openSettings": "Open Settings",
     "cancel": "Cancel",
     "close": "Close",

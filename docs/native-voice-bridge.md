@@ -1,0 +1,104 @@
+# Native Genie voice bridge, version 1
+
+Status: v1 contract accepted by WEB CODEX; native sources integrated, 14 November 2026.
+Website UI is owned by WEB CODEX. Android build and adapter tests are separate
+from the still-required Xcode build, actual audio tests and website integration.
+No voice release or device validation yet.
+
+The bundled, main-frame adapter exposes `window.CineGeniusVoice` only on the
+configured CineGenius origin and when a native transport is installed. Its
+presence takes precedence over browser Web Speech. A native permission denial
+must not trigger another microphone implementation as a workaround.
+
+```ts
+interface CineGeniusVoice {
+  readonly version: 1;
+  capabilities(options: {locale: string}): Promise<{
+    recognition: boolean; synthesis: boolean;
+    systemServiceMayProcessAudio: boolean;
+  }>;
+  start(options: {locale: string}): Promise<{text: string}>;
+  stop(): void;   // End audio capture and finalize the current transcription.
+  cancel(): void; // Discard the pending transcription; reject with cancelled.
+  speak(options: {locale: string; text: string}): Promise<void>;
+  stopSpeaking(): void;
+}
+```
+
+Supported app locale identifiers are `de/en/es/it/cs/hu/nl/nl-BE/sv`. Native
+recognition/voice availability is checked separately; never silently switch to
+another language. `start` requires a current user activation in a visible page.
+An explicit microphone action may request OS permissions. There is no automatic
+recording, background recording or restart after an interruption. Capture lasts
+at most 30 seconds. Native `speak` uses an available local system voice, accepts
+at most 6,000 characters, and stops recording before playback.
+
+Subscribe before calling a method:
+
+```ts
+window.addEventListener('cinegenius:voice-state', event => {
+  // event.detail = {requestId, state, partialText?, code?}
+});
+```
+
+States are `requesting-permission`, `listening`, `processing`, `speaking`,
+`idle`, and `error`. Partial text is a preview only. `start` resolves only with a
+final transcript. No bridge method itself sends a Genie message, navigates,
+edits a record, publishes or contacts another person. WEB owns the explicit
+“finish recording and send” interaction: with an empty composer it may send
+the final transcript to Genie, speak the reply and open a server-validated
+read-only Crew search link. With an existing unsent draft it appends the text
+without sending. WEB limits a transcript to 2,000 characters and must not
+truncate and silently send a longer one. Content edits still require a separate
+explicit confirmation and current server authorization. Cancel never sends.
+Spoken replies are an explicit web UI option.
+
+Rejected promises have a stable `code`: `permission-denied`, `unavailable`,
+`language-unavailable`, `no-speech`, `network`, `busy`, `cancelled`, `interrupted`,
+`audio`, `invalid-request`, `gesture-required`, or `timeout`. Translate all UI
+states/errors through the existing nine catalogs; retain text input on failure.
+
+The web UI must call `cancel()` and `stopSpeaking()` when Genie closes, its
+account or language changes, or it unmounts. The native shell also cancels on
+navigation/backgrounding and audio interruption. The adapter invalidates pending
+operations on pagehide/hidden visibility. Results are bound to the initiating
+document and request; late permission/recognition callbacks are discarded.
+The web close/account/language cancellation hooks are required, including during
+pending permission prompts; a native document cannot infer an account change
+without those hooks. The bridge never handles account identifiers or sessions.
+
+Native recognition can use the OS speech service where on-device recognition is
+unavailable. Disclose this next to the microphone in all nine UI languages;
+availability is not a promise of offline recognition. No audio files, transcript
+logs, credentials or plan data are stored or transmitted through this bridge.
+Only the recognized text returns to the initiating CineGenius page. The existing
+Genie message endpoint is used only by the normal explicit web send action.
+
+The adapter dispatches `cinegenius:voice-ready` on installation. Check for the
+API immediately as well as listening to that event, since native injection can
+precede web hydration. Capability queries never prompt for permission or start
+audio. Android speech synthesis initialization is asynchronous; query again
+when opening Genie if the first query reports synthesis unavailable.
+
+The native path uses OS speech recognition and returns text; it does not call
+the web audio transcription endpoint. WEB's browser-only recorder may call
+`POST /api/genie/transcribe` with the existing authenticated server access.
+Neither native bundle contains an AI key or writes audio/transcripts to files.
+
+Transport is internal: `cinegeniusVoice` WKScriptMessageHandler on iOS;
+origin-scoped AndroidX WebMessageListener on Android. Do not use a wildcard
+origin or the unrestricted Android `addJavascriptInterface` fallback. Native
+code independently checks the main frame/current origin, foreground state,
+operation/locale/text limits, and request/document IDs. Unsupported Android
+WebView providers do not advertise this native bridge.
+
+Real iPhone/iPad/Android microphone, permissions, audio interruptions, speech
+services/languages and lifecycle checks remain required. Linux builds and mock
+browser transport tests cannot establish those checks. Preserve newer Mac
+workplace sources, catalog keys and saved plans during targeted Xcode merging.
+
+Implementation references: [Apple Speech](https://developer.apple.com/documentation/speech/sfspeechrecognizer),
+[Apple device speech voices](https://developer.apple.com/documentation/avfaudio/avspeechsynthesisvoice),
+[Android SpeechRecognizer](https://developer.android.com/reference/android/speech/SpeechRecognizer),
+[Android TextToSpeech](https://developer.android.com/reference/android/speech/tts/TextToSpeech),
+[AndroidX origin-scoped web messages](https://developer.android.com/reference/androidx/webkit/WebViewCompat).

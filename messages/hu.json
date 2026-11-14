@@ -8132,6 +8132,8 @@
     "cameraTitle": "Kamerahozzáférés engedélyezése",
     "cameraBody": "A helyiség szkenneléséhez kamera szükséges. Engedélyezd a hozzáférést a Beállításokban, majd próbáld újra.",
     "cameraUsage": "A CineGenius a kamerát és a LiDAR-érzékelőt használja a helyiségek felméréséhez és alaprajzok készítéséhez ezen az eszközön.",
+    "microphoneUsage": "A CineGenius csak akkor használja a mikrofont, amikor elindítod a hangbevitelt a Genie-ben. A felvétel leáll, ha leállítod vagy kilépsz az alkalmazásból.",
+    "speechRecognitionUsage": "A CineGenius szöveggé alakítja a beszédedet a Genie számára. Ha az eszközön végzett felismerés nem érhető el, az Apple feldolgozhatja a hangot. A CineGenius nem ment hangfelvételeket.",
     "openSettings": "Beállítások megnyitása",
     "cancel": "Mégse",
     "close": "Bezárás",

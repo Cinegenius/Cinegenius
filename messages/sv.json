@@ -8132,6 +8132,8 @@
     "cameraTitle": "Tillåt kameraåtkomst",
     "cameraBody": "Kameran behövs för att skanna rummet. Tillåt åtkomst i Inställningar och försök igen.",
     "cameraUsage": "CineGenius använder kameran och LiDAR för att fånga rum och skapa planritningar på den här enheten.",
+    "microphoneUsage": "CineGenius använder mikrofonen bara när du startar röstinmatning i Genie. Inspelningen avslutas när du stoppar den eller lämnar appen.",
+    "speechRecognitionUsage": "CineGenius omvandlar ditt tal till text för Genie. Apple kan behandla ljudet om taligenkänning på enheten inte är tillgänglig. CineGenius sparar inga ljudinspelningar.",
     "openSettings": "Öppna Inställningar",
     "cancel": "Avbryt",
     "close": "Stäng",

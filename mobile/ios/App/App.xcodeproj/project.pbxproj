@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		A1169B3B3DDE445CA763A401 /* NativeVoice.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1169B3B3DDE445CA763A400 /* NativeVoice.swift */; };
 		2FAD9763203C412B000D30F8 /* config.xml in Resources */ = {isa = PBXBuildFile; fileRef = 2FAD9762203C412B000D30F8 /* config.xml */; };
 		4D22ABE92AF431CB00220026 /* CapApp-SPM in Frameworks */ = {isa = PBXBuildFile; productRef = 4D22ABE82AF431CB00220026 /* CapApp-SPM */; };
 		50379B232058CBB4000EE86E /* capacitor.config.json in Resources */ = {isa = PBXBuildFile; fileRef = 50379B222058CBB4000EE86E /* capacitor.config.json */; };
@@ -34,6 +35,7 @@ FAA07A679618F1C39710D260 /* FloorPlan.swift in Sources */ = {isa = PBXBuildFile;
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		A1169B3B3DDE445CA763A400 /* NativeVoice.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NativeVoice.swift; sourceTree = "<group>"; };
 		2FAD9762203C412B000D30F8 /* config.xml */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = config.xml; sourceTree = "<group>"; };
 		50379B222058CBB4000EE86E /* capacitor.config.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = capacitor.config.json; sourceTree = "<group>"; };
 		504EC3041FED79650016851F /* App.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = App.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -108,6 +110,7 @@ D1D4957F9F1EE1F401E7A795,
 9582B6822FE993A50072D4E8 /* SceneDelegate.swift */,
 				50379B222058CBB4000EE86E /* capacitor.config.json */,
 				504EC3071FED79650016851F /* AppDelegate.swift */,
+				A1169B3B3DDE445CA763A400 /* NativeVoice.swift */,
 				504EC30B1FED79650016851F /* Main.storyboard */,
 				504EC30E1FED79650016851F /* Assets.xcassets */,
 				504EC3101FED79650016851F /* LaunchScreen.storyboard */,
@@ -219,6 +222,7 @@ F1AE8FE603570B9376B7599C /* FloorPlan.swift */,
 70B793664957208A0ADDC079,
 846372CB65C020075AA234A3,
 				504EC3081FED79650016851F /* AppDelegate.swift in Sources */,
+				A1169B3B3DDE445CA763A401 /* NativeVoice.swift in Sources */,
 				9582B6832FE993A70072D4E8 /* SceneDelegate.swift in Sources */,
 07BF482F4FF948B37C3EEF6B /* PlanDrawing.swift in Sources */,
 CC2E07F52D86A71D9A5D6420 /* PlanExports.swift in Sources */,

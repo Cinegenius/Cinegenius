@@ -20,6 +20,7 @@ public class MainActivity extends BridgeActivity {
     private String resumeScript;
     private boolean presentationAtDocumentStart;
     private boolean wasInBackground;
+    private NativeVoice nativeVoice;
 
     @Override
     protected void load() {
@@ -39,6 +40,7 @@ public class MainActivity extends BridgeActivity {
                 // Older/inconsistent WebView providers use the guarded callback.
             }
         }
+        if (nativeVoice != null) nativeVoice.install(view, origin, bundledScript("voice.js"));
         super.load();
     }
 
@@ -60,7 +62,10 @@ public class MainActivity extends BridgeActivity {
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
+        nativeVoice = new NativeVoice(this);
         bridgeBuilder.addWebViewListener(new WebViewListener() {
+            @Override public void onPageStarted(WebView view) { nativeVoice.cancelAll("interrupted"); }
+
             @Override
             public void onPageCommitVisible(WebView view, String url) {
                 applyPresentation(view);
@@ -98,6 +103,7 @@ public class MainActivity extends BridgeActivity {
 
     @Override
     public void onStop() {
+        nativeVoice.suspend();
         wasInBackground = !isChangingConfigurations();
         super.onStop();
     }
@@ -105,6 +111,7 @@ public class MainActivity extends BridgeActivity {
     @Override
     public void onResume() {
         super.onResume();
+        nativeVoice.resume();
         if (!wasInBackground) return;
         wasInBackground = false;
         if (resumeScript != null && getBridge() != null) {
@@ -113,5 +120,15 @@ public class MainActivity extends BridgeActivity {
                 view.evaluateJavascript(resumeScript, null);
             }
         }
+    }
+
+    @Override public void onPause() {
+        nativeVoice.pauseAudio();
+        super.onPause();
+    }
+
+    @Override public void onDestroy() {
+        nativeVoice.destroy();
+        super.onDestroy();
     }
 }

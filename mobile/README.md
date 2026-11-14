@@ -217,3 +217,24 @@ behavior and the current Mac build/device evidence. The earlier
 before that update. A normal iPhone restart and reuse of an existing session are
 verified; fresh sign-in, full-screen web layout and editor gestures still need
 separate device checks. Never uninstall the current app to sync.
+
+## Native Genie voice bridge
+
+`../docs/native-voice-bridge.md` defines the shared `CineGeniusVoice` v1 contract.
+The native shells use OS speech recognition and device speech synthesis. They
+return text to the existing Genie UI; no AI key, project data or raw audio file
+crosses this bridge. WEB owns sending/search navigation and explicit action
+confirmation. Native audio stops after 30 seconds or on cancellation, navigation,
+backgrounding or interruption. Recognition may use the operating system's speech
+service when device recognition is unavailable; the web UI must disclose this.
+
+Run `npm test` for adapter/lifecycle/packaging tests. `tests/voice.browser.mjs`
+checks trusted browser input with mocked native transports, not a microphone;
+provide Playwright via `CINEGENIUS_PLAYWRIGHT_PATH` if it is installed externally.
+Android checks: `./gradlew :app:testDebugUnitTest :app:assembleDebug :app:lintDebug`.
+iOS still requires Xcode compilation and actual device speech/permission tests.
+Regenerate resources and sync on the Mac after carefully merging its newer
+Recce/workplace files and native catalog keys. Never overwrite or uninstall the
+existing app or saved plans. This bridge does not implement shared project-plan
+synchronization, nor does its server validation prove iPhone login or full-screen
+rendering. No website release is part of this change.

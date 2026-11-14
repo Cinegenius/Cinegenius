@@ -21,3 +21,13 @@ test('missing permission text or inconsistent native catalogues fail preparation
   assert.throws(() => nativeStrings({ NativeRoomScanner: { cameraUsage: '' } }));
   assert.throws(() => nativeStrings({ NativeRoomScanner: { cameraUsage: 'camera', localAuthReason: 'unlock', workplaceTitle: 'Workspace', locationsTitle: 'Locations' } }, ['cameraUsage']));
 });
+
+test('voice permission descriptions are required and match the iOS fallback language', async () => {
+  const catalog = JSON.parse(await readFile(new URL('../../messages/en.json', import.meta.url)));
+  const plist = await readFile(new URL('../ios/App/App/Info.plist', import.meta.url), 'utf8');
+  for (const key of ['microphoneUsage', 'speechRecognitionUsage']) {
+    const copy = structuredClone(catalog); delete copy.NativeRoomScanner[key];
+    assert.throws(() => nativeStrings(copy), new RegExp(key));
+    assert.ok(plist.includes(`<string>${catalog.NativeRoomScanner[key]}</string>`));
+  }
+});

@@ -8132,6 +8132,8 @@
     "cameraTitle": "Cameratoegang toestaan",
     "cameraBody": "De camera is nodig om de ruimte te scannen. Sta toegang toe in Instellingen en probeer opnieuw.",
     "cameraUsage": "CineGenius gebruikt de camera en LiDAR om ruimtes vast te leggen en plattegronden op dit apparaat te maken.",
+    "microphoneUsage": "CineGenius gebruikt je microfoon alleen wanneer je spraakinvoer in Genie start. De opname stopt wanneer je deze beëindigt of de app verlaat.",
+    "speechRecognitionUsage": "CineGenius zet je gesproken invoer om in tekst voor Genie. Apple kan de audio verwerken als herkenning op het toestel niet beschikbaar is. CineGenius bewaart geen geluidsopnamen.",
     "openSettings": "Instellingen openen",
     "cancel": "Annuleren",
     "close": "Sluiten",

@@ -8132,6 +8132,8 @@
     "cameraTitle": "Kamerazugriff erlauben",
     "cameraBody": "Zum Scannen wird die Kamera benötigt. Erlaube den Zugriff in den Einstellungen und versuche es erneut.",
     "cameraUsage": "CineGenius verwendet Kamera und LiDAR, um Räume zu erfassen und Grundrisse auf diesem Gerät zu erstellen.",
+    "microphoneUsage": "CineGenius verwendet dein Mikrofon nur, wenn du die Spracheingabe in Genie startest. Die Aufnahme endet beim Stoppen oder Verlassen der App.",
+    "speechRecognitionUsage": "CineGenius wandelt deine Spracheingabe in Text für Genie um. Wenn die Erkennung auf dem Gerät nicht verfügbar ist, kann Apple das Audio verarbeiten. CineGenius speichert keine Tonaufnahmen.",
     "openSettings": "Einstellungen öffnen",
     "cancel": "Abbrechen",
     "close": "Schließen",
