@@ -3,6 +3,8 @@ import { requireAuth } from "@/lib/auth";
 import { MESSAGING_HEADERS } from "@/lib/messaging-backend";
 import { NextRequest, NextResponse } from "next/server";
 import { getTranslations } from "next-intl/server";
+import { profileAccessFor } from "@/lib/profile-privacy-server";
+import { projectProfilePrivacy } from "@/lib/profile-privacy";
 
 /** Search public profiles only; account IDs and email addresses are not a directory. */
 export async function GET(request: NextRequest) {
@@ -20,10 +22,9 @@ export async function GET(request: NextRequest) {
     if (result.error) return fail();
     const profiles = result.data ?? [];
     if (!profiles.length) return NextResponse.json({ users: [] }, { headers: MESSAGING_HEADERS });
-    const settings = await db.from("user_settings").select("user_id,profile_visibility").in("user_id", profiles.map(profile => profile.user_id)).abortSignal(signal);
-    if (settings.error) return fail();
-    const privateIds = new Set((settings.data ?? []).filter(setting => setting.profile_visibility === "private").map(setting => setting.user_id));
-    const publicProfiles = profiles.filter(profile => !privateIds.has(profile.user_id));
+    const privacy = await profileAccessFor(profiles.map(profile => profile.user_id), authResult.userId, { signal, throwOnError: true });
+    const publicProfiles = profiles.filter(profile => privacy.get(profile.user_id)?.profile)
+      .map(profile => projectProfilePrivacy(profile, privacy.get(profile.user_id)));
     const eligible = await db.rpc("messaging_available_recipients", { p_sender: authResult.userId, p_recipients: publicProfiles.map(profile => profile.user_id) }).abortSignal(signal);
     if (eligible.error || !Array.isArray(eligible.data)) return fail();
     const allowed = new Set(eligible.data.map((item: { user_id: string }) => item.user_id));

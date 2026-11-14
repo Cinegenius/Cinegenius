@@ -1,3 +1,5 @@
+import { canViewProfile } from "@/lib/trust";
+import { visibleLinkedProfileIds } from "@/lib/linked-profile-access";
 import { db } from "@/lib/db";
 import { auth } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from "next/server";
@@ -9,6 +11,9 @@ export async function GET(req: NextRequest) {
   const imageUrl = req.nextUrl.searchParams.get("image_url");
   if (!profileId || !imageUrl) return NextResponse.json({ comments: [] });
 
+  const { userId } = await auth();
+  if (!await canViewProfile(profileId,userId)) return NextResponse.json({ comments: [] },{headers:{"Cache-Control":"private, no-store"}});
+
   const { data, error } = await db
     .from("profile_image_comments")
     .select("id, author_id, text, created_at, profiles(display_name, avatar_url)")
@@ -19,8 +24,9 @@ export async function GET(req: NextRequest) {
 
   if (error) return NextResponse.json({ comments: [] });
 
+  const visible = await visibleLinkedProfileIds((data ?? []).map(row => row.author_id),userId);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const comments = (data ?? []).map((row: any) => ({
+  const comments = (data ?? []).filter(row => visible.has(row.author_id)).map((row: any) => ({
     id: row.id as string,
     author_id: row.author_id as string,
     author_name: (Array.isArray(row.profiles) ? row.profiles[0]?.display_name : row.profiles?.display_name) ?? "Nutzer",
@@ -29,7 +35,7 @@ export async function GET(req: NextRequest) {
     created_at: row.created_at as string,
   }));
 
-  return NextResponse.json({ comments });
+  return NextResponse.json({ comments },{headers:{"Cache-Control":"private, no-store"}});
 }
 
 // POST /api/profile-image-comments  { profile_id, image_url, text }
@@ -41,6 +47,8 @@ export async function POST(req: NextRequest) {
   const { profile_id, image_url, text } = await req.json().catch(() => ({}));
   if (!profile_id || !image_url || !text?.trim())
     return NextResponse.json({ error: tResponse('System.m_07b82fec11ca') }, { status: 400 });
+
+  if (!await canViewProfile(profile_id,userId)) return NextResponse.json({ error: tResponse("System.requestFailed") },{status:404});
 
   const { data: inserted, error } = await db
     .from("profile_image_comments")

@@ -120,6 +120,13 @@ export default async function DatenschutzPage() {
           </section>
 
           <section>
+            <h2 className="text-base font-semibold text-text-primary mb-3">{uiText("PrivacySettings.title")}</h2>
+            <p>{uiText("PrivacySettings.ghostHelp")}</p>
+            <p className="mt-2">{uiText("PrivacySettings.locationHelp")}</p>
+            <p className="mt-2">{uiText("PrivacySettings.limits")}</p>
+          </section>
+
+          <section>
             <h2 className="text-base font-semibold text-text-primary mb-3">{uiText("Ui.text_7e7d30e65a87d8")}</h2>
             <p>{uiText("Ui.text_c6f3386a6e0579")}</p>
           </section>

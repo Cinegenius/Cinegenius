@@ -8174,5 +8174,35 @@
     "saveError": "Je keuze kon niet worden opgeslagen. Sta voorkeurcookies toe en probeer het opnieuw.",
     "loadError": "De berichten konden niet worden geladen.",
     "retry": "Opnieuw proberen"
+  },
+  "PrivacySettings": {
+    "title": "Privacy",
+    "intro": "Kies wie je gegevens mag zien. Wijzigingen worden direct opgeslagen.",
+    "ghost": "Ghostmodus",
+    "ghostHelp": "Verbergt je persoonlijke profiel, locatie, activiteitsstatus en persoonlijke advertenties, ook voor vrienden.",
+    "limits": "Bestaande berichten blijven bewaard. Eerder openbare afbeeldingen kunnen via bekende links of kopieën bereikbaar blijven. Bedrijfspagina’s hebben hun eigen zichtbaarheid.",
+    "ghostActive": "Ghostmodus is actief. Je eerdere keuzes blijven bewaard.",
+    "visibility": "Zichtbaarheid",
+    "profile": "Mijn profiel",
+    "location_visibility": "Locatie",
+    "map_visibility": "Kaart en zoeken in de buurt",
+    "activity_visibility": "Activiteitsstatus",
+    "phone_visibility": "Telefoonnummer",
+    "contact_email_visibility": "Contact-e-mail",
+    "locationHelp": "De kaart toont de plaats in je profiel, niet je actuele locatie. Verborgen profiellocaties worden niet gebruikt op de kaart of bij zoeken in de buurt. Je advertenties hebben aparte locatiegegevens. Verwijder plaatsen in je eigen teksten of foto’s zelf.",
+    "messages": "Wie mag mij berichten sturen?",
+    "email": "E-mail bij nieuwe berichten",
+    "loading": "Instellingen laden…",
+    "unavailable": "Instellingen zijn nog niet beschikbaar.",
+    "saving": "Opslaan…",
+    "saved": "Opgeslagen.",
+    "error": "De instelling kon niet worden bevestigd. Laad opnieuw en controleer deze.",
+    "retry": "Opnieuw laden",
+    "audience": {
+      "public": "Iedereen",
+      "members": "Ingelogde leden",
+      "friends": "Alleen bevestigde vrienden",
+      "hidden": "Alleen ik"
+    }
   }
 }

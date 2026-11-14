@@ -197,7 +197,7 @@ export default function ProfileSetupWizard() {
       fetch("/api/user-settings", { cache: "no-store" }).then(response => response.ok ? response.json() : null).catch(() => null),
     ]).then(([saved, profile, settings]) => {
       if (!active) return;
-      setProfileIsPrivate(settings?.settings?.profile_visibility === "private");
+      setProfileIsPrivate(settings?.settings?.profile_visibility === "private" || settings?.settings?.ghost_mode === true);
       setProfileExists(profile?.exists === true);
       savedProfile.current = profile?.profile ?? null;
       const profileComplete = hasProfileBasics(profile?.profile);
@@ -449,7 +449,7 @@ export default function ProfileSetupWizard() {
       try {
         const settingsResponse = await fetch("/api/user-settings", { cache: "no-store" });
         const settingsBody = await settingsResponse.json().catch(() => ({}));
-        setProfilePublic(settingsResponse.ok && settingsBody.settings?.profile_visibility === "public");
+        setProfilePublic(settingsResponse.ok && settingsBody.settings?.profile_visibility === "public" && !settingsBody.settings?.ghost_mode);
       } catch { setProfilePublic(false); }
     }
     draftProtection.complete();

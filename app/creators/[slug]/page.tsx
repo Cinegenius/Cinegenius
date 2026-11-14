@@ -1,3 +1,5 @@
+import { publicListingIds, profileAccessFor } from "@/lib/profile-privacy-server";
+import { projectProfilePrivacy } from "@/lib/profile-privacy";
 import { taxonomyLabel } from "@/lib/departments";
 import { getTranslations as getPageTranslations } from "next-intl/server";
 import { canViewProfile } from "@/lib/trust";
@@ -9,7 +11,7 @@ import { unstable_cache } from "next/cache";
 import type { Metadata } from "next";
 import { auth } from "@clerk/nextjs/server";
 import Link from "next/link";
-import { Lock, ArrowLeft } from "lucide-react";
+
 import CreatorDetail from "@/components/CreatorDetail";
 import { getTranslations } from "next-intl/server";
 
@@ -86,7 +88,7 @@ async function _getCreator(slug: string) {
 const getCreatorData = unstable_cache(_getCreator, ["creator"], { revalidate: 300, tags: ["listings", "profiles"] });
 async function getCreator(slug: string) {
   const creator = await getCreatorData(slug);
-  if (!creator) return null;
+  if (!creator || !(await publicListingIds([creator.id])).has(creator.id)) return null;
   const translate = await getTranslations();
   return { ...creator, name: creator.name || translate("Ui.text_88447b83090cde"), role: creator.role ? taxonomyLabel(creator.role, translate) : translate("creators.defaultRole") };
 }
@@ -98,7 +100,8 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const pageCopy = await getPageTranslations("PageCopy");
   const { slug } = await params;
-  const creator = await getCreator(slug);
+  const rawCreator = await getCreator(slug);
+  const creator = rawCreator ? projectProfilePrivacy(rawCreator,(await profileAccessFor([rawCreator.ownerId])).get(rawCreator.ownerId)) : null;
   if (!creator || !await canViewProfile(creator.ownerId, null)) return {};
   return {
     title: `${creator.name} — ${creator.role}`,
@@ -120,10 +123,10 @@ export default async function CreatorProfilePage({
   const uiText = await getTranslations();
 
   const { slug } = await params;
-  const creator = await getCreator(slug);
-  if (!creator) notFound();
-
+  const rawCreator = await getCreator(slug);
   const { userId } = await auth();
+  const creator = rawCreator ? projectProfilePrivacy(rawCreator,(await profileAccessFor([rawCreator.ownerId],userId)).get(rawCreator.ownerId)) : null;
+  if (!creator) notFound();
 
   // Profilaufruf tracken (nicht eigenes Profil, fire-and-forget)
   if (creator.ownerId) await recordProfileView(creator.ownerId, userId);
@@ -154,27 +157,8 @@ export default async function CreatorProfilePage({
   const isFriend = friendshipData?.status === "accepted";
   const isOwn   = userId === creator.ownerId;
 
-  // Private profile check
-  const canView = await canViewProfile(creator.ownerId, userId);
-  if (!canView) {
-    return (
-      <div className="pt-16 min-h-screen flex items-center justify-center px-4">
-        <div className="text-center max-w-sm space-y-5">
-          <div className="w-16 h-16 mx-auto bg-bg-secondary border border-border rounded-full flex items-center justify-center">
-            <Lock size={24} className="text-text-muted" />
-          </div>
-          <div>
-            <h1 className="font-display text-2xl font-bold text-text-primary mb-2">{uiText("Ui.text_07dc97aeb97819")}</h1>
-            <p className="text-sm text-text-muted">{uiText.rich("Ui.text_c70c2a9f1232e3", { value1: () => (creator.name) })}</p>
-          </div>
-          <Link
-            href="/creators"
-            className="inline-flex items-center gap-2 text-gold hover:text-gold-light text-sm font-medium transition-colors"
-          >{uiText.rich("Ui.text_290a371c03a78e", { part1: () => (<ArrowLeft size={14} />) })}</Link>
-        </div>
-      </div>
-    );
-  }
+  // A known legacy URL does not reveal a hidden identity.
+  if (!await canViewProfile(creator.ownerId, userId)) notFound();
 
   // Message permission
   const canMessage = isOwn || messagePermission === "everyone" || isFriend;

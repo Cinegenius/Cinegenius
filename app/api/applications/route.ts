@@ -50,7 +50,7 @@ export async function POST(req: NextRequest) {
 
   // Fetch job from DB — never trust client-supplied title or ownerId
   const { data: job } = await db
-    .from("listings")
+    .from("privacy_visible_listings")
     .select("id, title, user_id, published, type")
     .eq("id", jobId)
     .eq("type", "job")

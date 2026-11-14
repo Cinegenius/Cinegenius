@@ -1,3 +1,4 @@
+import { ghostProfileIds } from "@/lib/profile-privacy-server";
 import "server-only";
 import { clerkClient } from "@clerk/nextjs/server";
 import { getTranslations } from "next-intl/server";
@@ -70,6 +71,7 @@ export type PublicResponsiblePerson = { name: string; function: string; customFu
 export async function publicResponsiblePerson(value: unknown, viewerId: string | null): Promise<PublicResponsiblePerson | null> {
   const v = value as StoredResponsiblePerson | null;
   if (!v?.public || !v.userId || (!v.profileName && Object.keys(responsiblePersonErrors(v, true)).some(key => key !== "function"))) return null;
+  if (viewerId !== v.userId && (await ghostProfileIds([v.userId])).has(v.userId)) return null;
   const visible = await visibleLinkedProfileIds([v.userId], viewerId);
   const { data: profile } = visible.has(v.userId)
     ? await db.from("profiles").select("slug, user_id").eq("user_id", v.userId).maybeSingle()

@@ -8174,5 +8174,35 @@
     "saveError": "Ditt val kunde inte sparas. Tillåt inställningscookies och försök igen.",
     "loadError": "Inläggen kunde inte laddas.",
     "retry": "Försök igen"
+  },
+  "PrivacySettings": {
+    "title": "Integritet",
+    "intro": "Välj vem som får se dina uppgifter. Ändringar sparas direkt.",
+    "ghost": "Spökläge",
+    "ghostHelp": "Döljer din personliga profil, plats, aktivitetsstatus och dina personliga annonser, även för vänner.",
+    "limits": "Befintliga meddelanden finns kvar. Tidigare offentliga bilder kan fortfarande nås via kända länkar eller kopior. Företagssidor har egna synlighetsinställningar.",
+    "ghostActive": "Spökläget är på. Dina tidigare val sparas.",
+    "visibility": "Synlighet",
+    "profile": "Min profil",
+    "location_visibility": "Plats",
+    "map_visibility": "Karta och sökning i närheten",
+    "activity_visibility": "Aktivitetsstatus",
+    "phone_visibility": "Telefonnummer",
+    "contact_email_visibility": "Kontaktmejl",
+    "locationHelp": "Kartan visar platsen i din profil, inte din position i realtid. Dolda profilplatser används inte på kartan eller i sökningar i närheten. Dina annonser har separata platsuppgifter. Ta själv bort platser som nämns i dina texter eller bilder.",
+    "messages": "Vem får skriva till mig?",
+    "email": "Mejl vid nya meddelanden",
+    "loading": "Läser in inställningar…",
+    "unavailable": "Inställningarna är inte tillgängliga än.",
+    "saving": "Sparar…",
+    "saved": "Sparat.",
+    "error": "Inställningen kunde inte bekräftas. Läs in igen och kontrollera den.",
+    "retry": "Läs in igen",
+    "audience": {
+      "public": "Alla",
+      "members": "Inloggade medlemmar",
+      "friends": "Bara bekräftade vänner",
+      "hidden": "Bara jag"
+    }
   }
 }

@@ -1,3 +1,4 @@
+import { ghostProfileIds } from "@/lib/profile-privacy-server";
 import { publicResponsiblePerson, responsibleForCompany, type PublicResponsiblePerson } from "@/lib/responsible-person-server";
 import "server-only";
 import { db } from "@/lib/db";
@@ -46,7 +47,7 @@ export async function getListingProvider(
     };
   }
 
-  if (!userId) return UNASSIGNED_PROVIDER;
+  if (!userId || (viewerId !== userId && (await ghostProfileIds([userId])).has(userId))) return UNASSIGNED_PROVIDER;
   const { data: profile, error } = await db
     .from("profiles")
     .select("user_id, display_name, slug, avatar_url")

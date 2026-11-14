@@ -104,3 +104,11 @@ Desktop und kompakter Header haben einen gemeinsamen Nachrichten-Einstieg mit Ch
 - Keep saved `/notifications`, `/messages?requests=1` and `/dashboard?tab=friends` links usable through the corresponding inbox section. Retain direct messages, group creation, confirmed contact removal, retries and interrupted-action recovery.
 
 Crew result row correction, 14 November 2026: Keep the compact count, Crew, Locations providers, Marketplace providers and the grid/list/map controls together in that order on one row, including phones. Use icon-only view controls where space requires it, retaining localized accessible labels, fixed count width and 44px touch targets. Do not restore a second shortcut row.
+
+
+## Personal privacy and Ghost mode (operator decision, 14 November 2026)
+
+- Ghost hides a member's personal profile, structured location/activity and all personal public offers, including from accepted friends. Preserve content, stored publication states and saved audience choices; company visibility remains independent. Never use a public company or project mirror to reveal a hidden linked person.
+- Reuse `lib/profile-privacy.ts`, `lib/profile-privacy-server.ts` and `visibleLinkedProfileIds` for current request-scoped permissions. Project protected fields before serialization/geocoding/filtering. Public offer reads use `privacy_visible_listings` before counts and pagination; cached content/direct links require a fresh visibility check. Never share authorization decisions between requests.
+- Apply and verify `20261114180242_profile_privacy_controls.sql` before dependent Web/native releases. Settings are own-account only through `/api/user-settings`; errors or missing capability fields must not look like saved privacy choices. Native settings use the same contract in `docs/profile-privacy.md`.
+- Ghost is visibility control, not deletion or a promise to recall previously public Storage URLs/copies. Keep this limit explicit; retiring legacy originals requires the existing reviewed, journaled media cutover and cache retirement. Existing shared messages and participant transaction records remain accessible under their existing rules.

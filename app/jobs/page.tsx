@@ -27,7 +27,7 @@ export default async function JobsPage() {
   const serverJobs = [];
   // Read complete bounded pages before applying client filters or geographic ordering.
   for (let offset = 0; ; offset += 250) {
-    const { data, error } = await db.from("listings")
+    const { data, error } = await db.from("privacy_visible_listings")
       .select("place_country_code,place_region_id,place_city_id,place_city_name,place_region_name,place_status,id,title,category,city,price,description,created_at,job:metadata->job")
       .eq("published", true).eq("type", "job").order("created_at", { ascending: false }).order("id")
       .range(offset, offset + 249);

@@ -1,3 +1,5 @@
+import { profileAccessFor, filterPublicListings } from "@/lib/profile-privacy-server";
+import { projectProfilePrivacy } from "@/lib/profile-privacy";
 import { resolveCrewNear } from "@/lib/genie-search-server";
 import { occupationById } from "@/lib/primary-occupation";
 import { departments } from "@/lib/departments";
@@ -148,13 +150,14 @@ export default async function CreatorsPage({
     getCreatorDirectoryData(),
     searchParams,
   ]);
-  const { listings, profiles, listingRatings, profileRatings } = directoryData;
+  const { listings: cachedListings, profiles, listingRatings, profileRatings } = directoryData;
+  const listings = await filterPublicListings(cachedListings);
 
   const profileQuery = userId
     ? db.from("profiles").select("display_name").eq("user_id", userId).maybeSingle()
     : Promise.resolve({ data: null, error: null });
-  const [privateProfileIds, ownProfile] = await Promise.all([
-    getPrivateProfileIds(profiles.map((profile) => profile.user_id)),
+  const [privacy, ownProfile] = await Promise.all([
+    profileAccessFor([...profiles.map(profile => profile.user_id), ...listings.map(listing => listing.user_id ?? "")], userId),
     profileQuery,
   ]);
   const hasProfile = !!ownProfile.data?.display_name;
@@ -163,10 +166,12 @@ export default async function CreatorsPage({
   const seenListingOwners = new Set<string>();
   const fromListings: ServerCreator[] = listings.filter(listing => {
     if (!listing.user_id) return true;
+    if (!privacy.get(listing.user_id)?.profile) return false;
     if (profileOwnerIds.has(listing.user_id) || seenListingOwners.has(listing.user_id)) return false;
     seenListingOwners.add(listing.user_id);
     return true;
-  }).map((l) => {
+  }).map((raw) => {
+    const l = projectProfilePrivacy(raw, privacy.get(raw.user_id ?? ""));
     const { skills, credits } = parseCreatorDescription(l.description ?? "");
     return {
       id: `listing_${l.id}`,        // prefix to avoid collision with user IDs
@@ -194,12 +199,13 @@ export default async function CreatorsPage({
 
   const fromProfiles: ServerCreator[] = profiles
     .filter((p) => {
-      if (privateProfileIds.has(p.user_id)) return false;
+      if (!privacy.get(p.user_id)?.profile) return false;
       // Don't show a second card for users who already have a creator listing
 
       return isPeopleDirectoryProfile(p);
     })
-    .map((p) => {
+    .map((raw) => {
+      const p = projectProfilePrivacy(raw, privacy.get(raw.user_id));
       const phys = p.physical ?? {};
       const avail = p.availability_config ?? {};
       const types = normalizeProfileTypes(p.profile_types, p.profile_type);

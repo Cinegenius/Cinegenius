@@ -21,15 +21,16 @@ export async function visibleLinkedProfileIds(ids: Array<string | null>, viewerI
   const own = new Set(unique.filter((id) => id === viewerId));
   const empty = { data: [], error: null };
   const [settings, blockedBy, blocks, friendsFrom, friendsTo] = await Promise.all([
-    db.from("user_settings").select("user_id, profile_visibility").in("user_id", unique),
+    db.from("user_settings").select("user_id, profile_visibility, ghost_mode").in("user_id", unique),
     viewerId ? db.from("blocks").select("blocker_id").in("blocker_id", unique).eq("blocked_id", viewerId) : empty,
     viewerId ? db.from("blocks").select("blocked_id").in("blocked_id", unique).eq("blocker_id", viewerId) : empty,
     viewerId ? db.from("friendships").select("receiver_id").eq("sender_id", viewerId).eq("status", "accepted").in("receiver_id", unique) : empty,
     viewerId ? db.from("friendships").select("sender_id").eq("receiver_id", viewerId).eq("status", "accepted").in("sender_id", unique) : empty,
   ]);
   if ([settings, blockedBy, blocks, friendsFrom, friendsTo].some((result) => result.error)) return own;
+  const ghostIds = new Set((settings.data ?? []).filter(row => row.ghost_mode).map(row => row.user_id));
   const privateIds = new Set((settings.data ?? []).filter((row) => row.profile_visibility === "private").map((row) => row.user_id));
   const blocked = new Set([...(blockedBy.data ?? []).map((row) => row.blocker_id), ...(blocks.data ?? []).map((row) => row.blocked_id)]);
   const friends = new Set([...(friendsFrom.data ?? []).map((row) => row.receiver_id), ...(friendsTo.data ?? []).map((row) => row.sender_id)]);
-  return new Set(unique.filter((id) => id === viewerId || (!blocked.has(id) && (!privateIds.has(id) || friends.has(id)))));
+  return new Set(unique.filter((id) => id === viewerId || (!ghostIds.has(id) && !blocked.has(id) && (!privateIds.has(id) || friends.has(id)))));
 }

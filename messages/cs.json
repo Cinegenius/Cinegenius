@@ -8174,5 +8174,35 @@
     "saveError": "Výběr se nepodařilo uložit. Povol cookies pro nastavení a zkus to znovu.",
     "loadError": "Příspěvky se nepodařilo načíst.",
     "retry": "Zkusit znovu"
+  },
+  "PrivacySettings": {
+    "title": "Soukromí",
+    "intro": "Vyber, kdo může vidět tvé údaje. Změny se ukládají ihned.",
+    "ghost": "Režim ducha",
+    "ghostHelp": "Skryje tvůj osobní profil, místo, stav aktivity a osobní nabídky, a to i před přáteli.",
+    "limits": "Stávající zprávy zůstávají zachovány. Dříve veřejné obrázky mohou být nadále dostupné přes známé odkazy nebo kopie. Firemní stránky mají vlastní nastavení viditelnosti.",
+    "ghostActive": "Režim ducha je zapnutý. Tvé předchozí volby zůstávají uložené.",
+    "visibility": "Viditelnost",
+    "profile": "Můj profil",
+    "location_visibility": "Místo",
+    "map_visibility": "Mapa a hledání v okolí",
+    "activity_visibility": "Stav aktivity",
+    "phone_visibility": "Telefonní číslo",
+    "contact_email_visibility": "Kontaktní e-mail",
+    "locationHelp": "Mapa zobrazuje místo uvedené v profilu, nikoli aktuální polohu. Skryté místo profilu se nepoužívá na mapě ani při hledání v okolí. Nabídky mají samostatné údaje o místě. Místa ve vlastních textech nebo fotografiích odstraň sami.",
+    "messages": "Kdo mi může psát?",
+    "email": "E-mail při nové zprávě",
+    "loading": "Načítání nastavení…",
+    "unavailable": "Nastavení zatím nejsou dostupná.",
+    "saving": "Ukládání…",
+    "saved": "Uloženo.",
+    "error": "Nastavení se nepodařilo potvrdit. Načti je znovu a zkontroluj.",
+    "retry": "Načíst znovu",
+    "audience": {
+      "public": "Všichni",
+      "members": "Přihlášení členové",
+      "friends": "Pouze potvrzení přátelé",
+      "hidden": "Pouze já"
+    }
   }
 }

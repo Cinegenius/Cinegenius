@@ -1,4 +1,5 @@
-import { revalidateTag } from "next/cache";
+import { DEFAULT_PRIVACY, PRIVACY_AUDIENCES, PRIVACY_COLUMNS } from "@/lib/profile-privacy";
+import { revalidatePath, revalidateTag } from "next/cache";
 import { db } from "@/lib/db";
 import { requireAuth } from "@/lib/auth";
 import { NextRequest, NextResponse } from "next/server";
@@ -13,20 +14,15 @@ export async function GET() {
 
   const { data, error } = await db
     .from("user_settings")
-    .select("profile_visibility, message_permission, email_new_message, phone_visibility, contact_email_visibility")
+    .select(PRIVACY_COLUMNS)
     .eq("user_id", userId)
+    .abortSignal(AbortSignal.timeout(8000))
     .maybeSingle();
 
   if (error) return NextResponse.json({ error: tResponse('System.requestFailed') }, { status: 500 });
 
   return NextResponse.json({
-    settings: data ?? {
-      profile_visibility: "public",
-      message_permission: "everyone",
-      email_new_message: true,
-      phone_visibility: "hidden",
-      contact_email_visibility: "hidden",
-    },
+    settings: { ...DEFAULT_PRIVACY, ...data },
   }, { headers: { "Cache-Control": "private, no-store, max-age=0" } });
 }
 
@@ -41,6 +37,8 @@ export async function PATCH(req: NextRequest) {
   if (!body || typeof body !== "object" || Array.isArray(body)) {
     return NextResponse.json({ error: tResponse('System.m_436f7cd0980c') }, { status: 400 });
   }
+  if (body.accountId !== undefined && body.accountId !== userId) return NextResponse.json({ error: tResponse('System.requestFailed') }, { status: 409 });
+  if (Object.keys(body).some(key => key !== 'accountId' && !Object.hasOwn(DEFAULT_PRIVACY,key))) return NextResponse.json({ error: tResponse('System.m_436f7cd0980c') }, { status: 400 });
   const update: Record<string, unknown> = { user_id: userId, updated_at: new Date().toISOString() };
 
   if (body.profile_visibility !== undefined) {
@@ -55,15 +53,17 @@ export async function PATCH(req: NextRequest) {
     }
     update.message_permission = body.message_permission;
   }
-  if (body.email_new_message !== undefined) {
-    if (typeof body.email_new_message !== "boolean") {
+  for (const key of ["ghost_mode", "email_new_message"] as const) {
+  if (body[key] !== undefined) {
+    if (typeof body[key] !== "boolean") {
       return NextResponse.json({ error: tResponse('System.m_813f3fe986af') }, { status: 400 });
     }
-    update.email_new_message = body.email_new_message;
+    update[key] = body[key];
   }
-  for (const field of ["phone_visibility", "contact_email_visibility"] as const) {
+  }
+  for (const field of ["phone_visibility", "contact_email_visibility", "location_visibility", "map_visibility", "activity_visibility"] as const) {
     if (body[field] !== undefined) {
-      if (!["public", "members", "hidden"].includes(body[field])) {
+      if (!(PRIVACY_AUDIENCES as readonly unknown[]).includes(body[field])) {
         return NextResponse.json({ error: tResponse('System.m_3deca245a321') }, { status: 400 });
       }
       update[field] = body[field];
@@ -76,15 +76,13 @@ export async function PATCH(req: NextRequest) {
   const { data: saved, error } = await db
     .from("user_settings")
     .upsert(update, { onConflict: "user_id" })
-    .select("profile_visibility, message_permission, email_new_message, phone_visibility, contact_email_visibility")
+    .select(PRIVACY_COLUMNS)
+    .abortSignal(AbortSignal.any([req.signal, AbortSignal.timeout(8000)]))
     .single();
 
   if (error) return NextResponse.json({ error: tResponse('System.requestFailed') }, { status: 500 });
-  if (body.profile_visibility !== undefined) {
-    revalidateTag("profiles", { expire: 0 });
-    revalidateTag("creator-directory", { expire: 0 });
-    revalidateTag("companies", { expire: 0 });
-    revalidateTag("projects", { expire: 0 });
-  }
+  // Privacy withdrawal must expire, never stale-while-revalidate, every public projection.
+  for (const tag of ["profiles", "creator-directory", "companies", "projects", "listings", "community-media"]) revalidateTag(tag, { expire: 0 });
+  revalidatePath("/sitemap.xml");
   return NextResponse.json({ success: true, settings: saved }, { headers: { "Cache-Control": "private, no-store, max-age=0" } });
 }

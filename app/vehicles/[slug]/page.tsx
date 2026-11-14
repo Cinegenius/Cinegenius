@@ -1,3 +1,4 @@
+import { publicListingIds } from "@/lib/profile-privacy-server";
 import { getTranslations as getPageTranslations } from "next-intl/server";
 import {placeReadFields} from "@/lib/places/catalog";
 import {placeDisplay} from "@/lib/places/core";
@@ -36,7 +37,7 @@ async function getVehicle(slug: string, viewerId?: string | null) {
 
     if (error) throw new Error(`Fahrzeug konnte nicht geladen werden: ${error.message}`);
     if (!data) { console.error("[getVehicle] no listing found for slug:", slug); return null; }
-    if (data.published !== true) {
+    if (!(await publicListingIds([data.id])).has(data.id)) {
       const ownsPersonalListing = !!viewerId && !data.company_id && data.user_id === viewerId;
       const hasCompanyAccess = !!viewerId && !!data.company_id && !!(await getCompanyAccess(data.company_id, viewerId));
       if (!ownsPersonalListing && !hasCompanyAccess) return null;

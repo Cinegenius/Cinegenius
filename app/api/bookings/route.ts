@@ -50,7 +50,7 @@ export async function POST(req: NextRequest) {
 
   // SECURITY: read price and title server-side from DB — never trust client
   const { data: listing } = await db
-    .from("listings")
+    .from("privacy_visible_listings")
     .select("id, title, type, price, user_id, published")
     .eq("id", listingId)
     .eq("published", true)

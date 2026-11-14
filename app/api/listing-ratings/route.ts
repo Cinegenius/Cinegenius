@@ -15,7 +15,7 @@ function json(body: unknown, status = 200) {
 
 /** Resolve current public providers internally; no account IDs enter the response. */
 async function publicRatingListings(ids: string[]): Promise<RatingListing[]> {
-  const { data, error } = await db.from("listings")
+  const { data, error } = await db.from("privacy_visible_listings")
     .select("id,user_id,company_id,title,type,published").in("id", ids).eq("published", true);
   if (error) throw new Error("rating_listing_lookup_failed");
   const companyIds = [...new Set((data ?? []).map(row => row.company_id).filter((id): id is string => typeof id === "string" && Boolean(id)))];

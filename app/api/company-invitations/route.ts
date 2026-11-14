@@ -1,3 +1,5 @@
+import { profileAccessFor } from "@/lib/profile-privacy-server";
+import { projectProfilePrivacy } from "@/lib/profile-privacy";
 import { createHash, randomBytes } from "node:crypto";
 import { db } from "@/lib/db";
 import { requireAuth } from "@/lib/auth";
@@ -72,7 +74,8 @@ export async function GET(req: NextRequest) {
   if (error) return privateJson({ error: tResponse('System.m_b77995ad4e9f') }, 500);
   const ids = [...new Set((data ?? []).map((item) => item.recipient_user_id))];
   const { data: profiles } = ids.length ? await db.from("profiles").select("user_id,display_name,slug,avatar_url,role,location").in("user_id", ids) : { data: [] };
-  const people = new Map((profiles ?? []).map((p) => [p.user_id, p]));
+  const privacy = await profileAccessFor(ids, caller.userId);
+  const people = new Map((profiles ?? []).filter(p => privacy.get(p.user_id)?.profile).map(p => [p.user_id, projectProfilePrivacy(p, privacy.get(p.user_id))]));
   return privateJson({ total: count ?? 0, page, data: (data ?? []).map((item) => ({ ...item, profile: people.get(item.recipient_user_id) ?? null })) });
 }
 export async function PATCH(req: NextRequest) {

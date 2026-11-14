@@ -394,8 +394,8 @@ export interface ProfileDownload {
 export interface VisibilitySettings {
   weight?: "public" | "hidden";
   day_rate?: "public" | "on_request" | "hidden";
-  phone?: "public" | "members" | "hidden";
-  contact_email?: "public" | "members" | "hidden";
+  phone?: "public" | "members" | "friends" | "hidden";
+  contact_email?: "public" | "members" | "friends" | "hidden";
   exact_location?: "public" | "city_only" | "hidden";
 }
 

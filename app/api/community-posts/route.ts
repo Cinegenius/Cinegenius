@@ -1,3 +1,4 @@
+import { ghostProfileIds } from "@/lib/profile-privacy-server";
 import {getLocale} from "next-intl/server";
 import {cityWriteFields,placeReadFields,placeSearchFilter} from "@/lib/places/catalog";
 import { db } from "@/lib/db";
@@ -39,8 +40,10 @@ export async function GET(request: NextRequest) {
   if (error) return NextResponse.json({ error: tResponse('System.m_2863c53106dd') }, { status: 500 });
   if (!data?.length) return NextResponse.json({ posts: [] });
 
-  const authorIds = [...new Set(data.map((post) => post.author_id))];
-  const postIds = data.map((post) => post.id);
+  const hidden = await ghostProfileIds(data.map(post => post.author_id));
+  const visiblePosts = data.filter(post => post.author_id === userId || !hidden.has(post.author_id));
+  const authorIds = [...new Set(visiblePosts.map((post) => post.author_id))];
+  const postIds = visiblePosts.map((post) => post.id);
   const [{ data: profiles }, { data: replies }] = await Promise.all([
     db.from("profiles").select("user_id,display_name,avatar_url").in("user_id", authorIds),
     db.from("community_replies").select("post_id").in("post_id", postIds),
@@ -50,7 +53,7 @@ export async function GET(request: NextRequest) {
   for (const reply of replies ?? []) replyCounts.set(reply.post_id, (replyCounts.get(reply.post_id) ?? 0) + 1);
 
   const response = NextResponse.json({
-    posts: data.map((post) => {
+    posts: visiblePosts.map((post) => {
       const profile = profileById.get(post.author_id);
       return {
         id: post.id,

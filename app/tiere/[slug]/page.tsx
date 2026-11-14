@@ -1,3 +1,4 @@
+import { publicListingIds } from "@/lib/profile-privacy-server";
 import {placeReadFields} from "@/lib/places/catalog";
 import {placeDisplay} from "@/lib/places/core";
 import JsonLd from "@/components/JsonLd";
@@ -19,14 +20,15 @@ async function getAnimal(slug: string, viewerId: string | null = null, preview =
   if (error) throw new Error("Animal portfolio could not be loaded");
   if (!data) return null;
   const canEdit = viewerId ? await canEditListing(viewerId,data) : false;
-  if (!data.published && !(preview && canEdit)) return null;
+  const isPublic = (await publicListingIds([data.id])).has(data.id);
+  if (!isPublic && !(preview && canEdit)) return null;
   const provider = await getListingProvider(data.user_id,data.company_id,viewerId,data.responsible_person);
   const meta = (data.metadata ?? {}) as Record<string,unknown>;
   return { id:data.id,title:data.title,category:data.category ?? "",location:placeDisplay(placeReadFields(data.city??"",data,locale),data.city??"",locale),dailyRate:data.price ?? 0,image:data.image_url ?? "",
     trainingLevel:typeof meta.training_level === "string" ? meta.training_level : null,handlerIncluded:meta.handler_included === true,
     count:String(meta.count ?? "1"),specialSkills:typeof meta.special_skills === "string" ? meta.special_skills : null,delivery:meta.delivery === true,
     focalPoint:meta.focal_point as {x:number;y:number}|null,description:data.description ?? "",extra_images:data.extra_images ?? [],
-    ownerId:provider.contactUserId ?? undefined,ownerName:provider.name,ownerAvatar:provider.imageUrl,ownerHref:provider.href,canEdit,privatePreview:!data.published };
+    ownerId:provider.contactUserId ?? undefined,ownerName:provider.name,ownerAvatar:provider.imageUrl,ownerHref:provider.href,canEdit,privatePreview:!isPublic };
 }
 export async function generateMetadata({params}:{params:Promise<{slug:string}>}):Promise<Metadata> {
   const { slug } = await params;

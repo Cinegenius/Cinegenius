@@ -1,3 +1,4 @@
+import { publicListingIds } from "@/lib/profile-privacy-server";
 import { getTranslations as getPageTranslations } from "next-intl/server";
 import {getLocale, getTranslations } from "next-intl/server";
 import {placeReadFields} from "@/lib/places/catalog";
@@ -27,7 +28,7 @@ async function getProp(slug: string, viewerId?: string | null) {
 
     if (!data) return null;
 
-    if (data.published !== true) {
+    if (!(await publicListingIds([data.id])).has(data.id)) {
       const ownsPersonalListing = !!viewerId && !data.company_id && data.user_id === viewerId;
       const hasCompanyAccess = !!viewerId && !!data.company_id && !!(await getCompanyAccess(data.company_id, viewerId));
       if (!ownsPersonalListing && !hasCompanyAccess) return null;

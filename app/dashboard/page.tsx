@@ -1,4 +1,5 @@
 "use client";
+import PrivacySettings from "@/components/PrivacySettings";
 import MessageAttachments from "@/components/messaging/MessageAttachments";
 import type {MessageAttachment} from "@/lib/message-attachments";
 import JobEditorFields from "@/components/JobEditorFields";
@@ -689,17 +690,6 @@ export default function DashboardPage() {
   const rejectFriend = (id: string) => changeFriend(id, "rejected");
   const removeFriendEntry = (id: string) => { void changeFriend(id); };
 
-  // Privacy settings
-  const [privacySettings, setPrivacySettings] = useState<{ profile_visibility: string; message_permission: string; email_new_message: boolean; phone_visibility: string; contact_email_visibility: string }>({
-    profile_visibility: "public",
-    message_permission: "everyone",
-    email_new_message: true,
-    phone_visibility: "hidden",
-    contact_email_visibility: "hidden",
-  });
-  const [privacyLoading, setPrivacyLoading] = useState(false);
-  const [privacyError, setPrivacyError] = useState("");
-
   // Verification request state
   const [verifStatus, setVerifStatus] = useState<"none" | "pending" | "approved" | "rejected">("none");
   const [verifError, setVerifError] = useState("");
@@ -713,19 +703,6 @@ export default function DashboardPage() {
   useEffect(() => {
     if (activeTab !== "settings") return;
     let cancelled = false;
-    setPrivacyLoading(true);
-    setPrivacyError("");
-    fetch("/api/user-settings")
-      .then(async r => {
-        const result = await r.json().catch(() => ({}));
-        if (!r.ok) throw new Error(result.error ?? uiText("Ui.text_2669fecc698980", { value1: String(r.status) }));
-        return result;
-      })
-      .then(({ settings }) => { if (!cancelled && settings) setPrivacySettings(settings); })
-      .catch((err) => {
-        if (!cancelled) setPrivacyError(uiText("Ui.text_a71e57dc22fe15", { value1: String(uiErrorMessage(err, uiText("Ui.text_0504c98fd2caa9"))) }));
-      })
-      .finally(() => { if (!cancelled) setPrivacyLoading(false); });
     // A failed lookup must never appear as an unverified account or a fresh application.
     setVerifLoading(true); setVerifError("");
     fetch("/api/verification-requests", { cache: "no-store" })
@@ -739,27 +716,6 @@ export default function DashboardPage() {
       .finally(() => { if (!cancelled) setVerifLoading(false); });
     return () => { cancelled = true; };
   }, [activeTab, verifReload]);
-
-  const updatePrivacy = async (key: string, value: string | boolean) => {
-    const previousSettings = privacySettings;
-    setPrivacyError("");
-    setPrivacySettings(prev => ({ ...prev, [key]: value }));
-    setPrivacyLoading(true);
-    try {
-      const response = await fetch("/api/user-settings", {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ [key]: value }),
-      });
-      const result = await response.json().catch(() => ({}));
-      if (!response.ok || result.error) throw new Error(result.error ?? uiText("Ui.text_2669fecc698980", { value1: String(response.status) }));
-    } catch (err) {
-      setPrivacySettings(previousSettings);
-      setPrivacyError(uiText("Ui.text_7d80e16f8158c3", { value1: String(uiErrorMessage(err, uiText("Ui.text_8760d6e61c65fe"))) }));
-    } finally {
-      setPrivacyLoading(false);
-    }
-  };
 
   const [conversations, setConversations] = useState<RealConversation[]>([]);
   const [convsLoading, setConvsLoading] = useState(false);
@@ -2351,11 +2307,7 @@ export default function DashboardPage() {
           {/* ── EINSTELLUNGEN ── */}
           {activeTab === "settings" && (
             <div className="max-w-xl space-y-5">
-              {privacyError && (
-                <p role="alert" className="rounded-lg border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-300">
-                  {privacyError}
-                </p>
-              )}
+
 
               {/* Öffentliches Profil */}
               {(() => {
@@ -2405,117 +2357,7 @@ export default function DashboardPage() {
                 </div>
               </div>
 
-              {/* Privatsphäre */}
-              <div className="p-5 rounded-xl border border-border bg-bg-secondary">
-                <h3 className="font-semibold text-text-primary mb-1">{uiText("Ui.text_e1a0d1dd340a2b")}</h3>
-                <p className="text-xs text-text-muted mb-4">{uiText("Ui.text_2eaccd2ccb08f9")}</p>
-                <div className="space-y-4">
-                  <label className="flex items-start justify-between gap-4 cursor-pointer">
-                    <div className="flex items-start gap-3">
-                      <div className="mt-0.5">
-                        {privacySettings.profile_visibility === "private"
-                          ? <Lock size={16} className="text-gold" />
-                          : <Globe size={16} className="text-text-muted" />}
-                      </div>
-                      <div>
-                        <p className="text-sm text-text-secondary font-medium">{uiText("AdminAccounts.profileStatus.private")}</p>
-                        <p className="text-xs text-text-muted mt-0.5">
-                          {privacySettings.profile_visibility === "private"
-                            ? uiText("Ui.text_319df907eec5c4")
-                            : uiText("Ui.text_f00642ae07a01e")}
-                        </p>
-                      </div>
-                    </div>
-                    <button
-                      onClick={() => updatePrivacy("profile_visibility", privacySettings.profile_visibility === "private" ? "public" : "private")}
-                      disabled={privacyLoading}
-                      className={`relative shrink-0 w-10 h-6 rounded-full transition-colors ${privacySettings.profile_visibility === "private" ? "bg-gold" : "bg-bg-elevated border border-border"}`}
-                    >
-                      <span className={`absolute top-1 w-4 h-4 rounded-full bg-white shadow transition-transform ${privacySettings.profile_visibility === "private" ? "translate-x-5" : "translate-x-1"}`} />
-                    </button>
-                  </label>
-                  <div className="border-t border-border" />
-                  <label className="flex items-start justify-between gap-4 cursor-pointer">
-                    <div className="flex items-start gap-3">
-                      <div className="mt-0.5">
-                        {privacySettings.message_permission === "friends_only"
-                          ? <Lock size={16} className="text-gold" />
-                          : <Globe size={16} className="text-text-muted" />}
-                      </div>
-                      <div>
-                        <p className="text-sm text-text-secondary font-medium">{uiText("Ui.text_ea78c6f63ee699")}</p>
-                        <p className="text-xs text-text-muted mt-0.5">
-                          {privacySettings.message_permission === "friends_only"
-                            ? uiText("Ui.text_64706adaeb4ba9")
-                            : uiText("Ui.text_6a99309250cc5b")}
-                        </p>
-                      </div>
-                    </div>
-                    <button
-                      onClick={() => updatePrivacy("message_permission", privacySettings.message_permission === "friends_only" ? "everyone" : "friends_only")}
-                      disabled={privacyLoading}
-                      className={`relative shrink-0 w-10 h-6 rounded-full transition-colors ${privacySettings.message_permission === "friends_only" ? "bg-gold" : "bg-bg-elevated border border-border"}`}
-                    >
-                      <span className={`absolute top-1 w-4 h-4 rounded-full bg-white shadow transition-transform ${privacySettings.message_permission === "friends_only" ? "translate-x-5" : "translate-x-1"}`} />
-                    </button>
-                  </label>
-                  <div className="border-t border-border" />
-                  <div>
-                    <p className="text-sm text-text-secondary font-medium">{uiText("Ui.text_362c64c73e26ee")}</p>
-                    <p className="mt-1 text-xs leading-relaxed text-text-muted">{uiText("Ui.text_b0700c88f48c24")}</p>
-                    <div className="mt-3 grid gap-3 sm:grid-cols-2">
-                      {([
-                        ["contact_email_visibility", "Kontakt-E-Mail"],
-                        ["phone_visibility", "Telefonnummer"],
-                      ] as const).map(([key, label]) => (
-                        <label key={key} className="block text-xs text-text-muted">
-                          <span className="mb-1.5 block">{(uiOptionLabels[label] ?? label)}</span>
-                          <select
-                            value={privacySettings[key]}
-                            onChange={(event) => updatePrivacy(key, event.target.value)}
-                            disabled={privacyLoading}
-                            className="min-h-11 w-full rounded-lg border border-border bg-bg-primary px-3 text-sm text-text-primary outline-none focus:border-gold/60 disabled:opacity-60"
-                          >
-                            <option value="hidden">{uiText("Ui.text_6720edc12a568c")}</option>
-                            <option value="members">{uiText("Ui.text_dbb65504ccd522")}</option>
-                            <option value="public">{uiText("Ui.text_a010b3180a613f")}</option>
-                          </select>
-                        </label>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Benachrichtigungen */}
-              <div className="p-5 rounded-xl border border-border bg-bg-secondary">
-                <h3 className="font-semibold text-text-primary mb-1">{uiText("Ui.text_2687f5bbc0624e")}</h3>
-                <p className="text-xs text-text-muted mb-4">{uiText("Ui.text_069c81016363a4")}</p>
-                <div className="space-y-4">
-                  <label className="flex items-start justify-between gap-4 cursor-pointer">
-                    <div className="flex items-start gap-3">
-                      <div className="mt-0.5">
-                        <MessageSquare size={16} className={privacySettings.email_new_message ? "text-gold" : "text-text-muted"} />
-                      </div>
-                      <div>
-                        <p className="text-sm text-text-secondary font-medium">{uiText("Ui.text_4aadfb7b596d7b")}</p>
-                        <p className="text-xs text-text-muted mt-0.5">
-                          {privacySettings.email_new_message
-                            ? uiText("Ui.text_1d9fa328e47307")
-                            : uiText("Ui.text_4c30935ebf9103")}
-                        </p>
-                      </div>
-                    </div>
-                    <button
-                      onClick={() => updatePrivacy("email_new_message", !privacySettings.email_new_message)}
-                      disabled={privacyLoading}
-                      className={`relative shrink-0 w-10 h-6 rounded-full transition-colors ${privacySettings.email_new_message ? "bg-gold" : "bg-bg-elevated border border-border"}`}
-                    >
-                      <span className={`absolute top-1 w-4 h-4 rounded-full bg-white shadow transition-transform ${privacySettings.email_new_message ? "translate-x-5" : "translate-x-1"}`} />
-                    </button>
-                  </label>
-                </div>
-              </div>
+              <PrivacySettings accountId={user?.id ?? null} />
 
               {/* Verifizierung */}
               <div className="p-5 rounded-xl border border-border bg-bg-secondary">
