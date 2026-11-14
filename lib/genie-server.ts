@@ -2,8 +2,12 @@ import "server-only";
 
 import { createHmac } from "node:crypto";
 import { isIP } from "node:net";
-import { GENIE_LINKS, GENIE_MAX_MESSAGE_CHARS, buildGenieInstructions, type validateGenieRequest } from "@/lib/genie";
+import { GENIE_LINKS, GENIE_LOCALES, GENIE_MAX_MESSAGE_CHARS, buildGenieInstructions, type validateGenieRequest } from "@/lib/genie";
+import { getTranslations } from "next-intl/server";
+import { CREW_SEARCH_INSTRUCTIONS, CREW_SEARCH_SCHEMA, crewSearchLinks } from "@/lib/genie-search-server";
 import { rateLimit } from "@/lib/rateLimit";
+import { GenieError } from "@/lib/genie-error";
+export { GenieError } from "@/lib/genie-error";
 
 export const GENIE_BODY_MAX_BYTES = 40 * 1024;
 const PROVIDER_BODY_MAX_BYTES = 64 * 1024;
@@ -11,11 +15,7 @@ const PROVIDER_TIMEOUT_MS = 25_000;
 const PROVIDER_URL = "https://api.openai.com/v1/responses";
 
 type GenieRequest = Extract<ReturnType<typeof validateGenieRequest>, { ok: true }>["value"];
-type GenieErrorCode = "invalid_request" | "unsafe_input" | "rate_limited" | "unavailable" | "timeout" | "failed";
-export class GenieError extends Error {
-  constructor(readonly code: GenieErrorCode, readonly status: number) { super(code); }
-}
-type GenieConfiguration = { apiKey: string; dailyLimit: number };
+export type GenieConfiguration = { apiKey: string; dailyLimit: number };
 
 export function genieConfiguration(): GenieConfiguration {
   const apiKey = process.env.OPENAI_API_KEY?.trim();
@@ -26,7 +26,7 @@ export function genieConfiguration(): GenieConfiguration {
 }
 
 /** Bound actual streamed bytes, including requests without Content-Length. */
-async function readBoundedJson(source: Request | Response, maxBytes: number, error: GenieError): Promise<unknown> {
+export async function readBoundedBytes(source: Request | Response, maxBytes: number, error: GenieError): Promise<Uint8Array<ArrayBuffer>> {
   if (Number(source.headers.get("content-length")) > maxBytes || !source.body) throw error;
   const reader = source.body.getReader();
   const chunks: Uint8Array[] = [];
@@ -43,7 +43,11 @@ async function readBoundedJson(source: Request | Response, maxBytes: number, err
   const bytes = new Uint8Array(size);
   let offset = 0;
   for (const chunk of chunks) { bytes.set(chunk, offset); offset += chunk.byteLength; }
-  return JSON.parse(new TextDecoder("utf-8", { fatal: true }).decode(bytes));
+  return bytes;
+}
+
+export async function readBoundedJson(source: Request | Response, maxBytes: number, error: GenieError): Promise<unknown> {
+  return JSON.parse(new TextDecoder("utf-8", { fatal: true }).decode(await readBoundedBytes(source, maxBytes, error)));
 }
 
 export async function readGenieBody(request: Request): Promise<unknown> {
@@ -91,7 +95,7 @@ function record(value: unknown): value is Record<string, unknown> {
   return value !== null && typeof value === "object" && !Array.isArray(value);
 }
 
-function safeAdvice(value: unknown, input: GenieRequest) {
+async function safeAdvice(value: unknown, input: GenieRequest) {
   if (!record(value) || value.status !== "completed" || value.error || !Array.isArray(value.output)) throw new GenieError("failed", 502);
   const text: string[] = [];
   for (const message of value.output) {
@@ -102,23 +106,26 @@ function safeAdvice(value: unknown, input: GenieRequest) {
     }
   }
   const advice: unknown = JSON.parse(text.join(""));
-  if (!record(advice) || Object.keys(advice).some(key => !["reply", "linkIds", "language"].includes(key))
+  if (!record(advice) || Object.keys(advice).some(key => !["reply", "linkIds", "language", ...(input.writing ? [] : ["crewSearches"])].includes(key))
     || typeof advice.reply !== "string" || !advice.reply.trim() || advice.reply.length > GENIE_MAX_MESSAGE_CHARS
     || !Array.isArray(advice.linkIds) || advice.linkIds.some(id => typeof id !== "string")
-    || (input.writing ? advice.language !== input.locale : advice.language !== "de" && advice.language !== "en")) throw new GenieError("failed", 502);
+    || (input.writing ? advice.language !== input.locale : typeof advice.language !== "string" || !GENIE_LOCALES.includes(advice.language))) throw new GenieError("failed", 502);
   if (input.writing) {
     // Reject an unusable suggestion instead of silently changing or truncating it.
     if (advice.reply.length > input.writing.maxLength || advice.reply.includes("\0") || advice.linkIds.length
       || /(?:https?:\/\/|www\.|\[[^\]]*\]\s*\([^)]*\)|<\/?[a-z][^>]*>)/i.test(advice.reply)) throw new GenieError("failed", 502);
     return { reply: advice.reply.trim(), links: [] };
   }
+  const language = advice.language as string;
+  const t = await getTranslations({ locale: language, namespace: "Genie.destinations" });
+  const searches = await crewSearchLinks(advice.crewSearches ?? [], language);
   const ids = [...new Set(advice.linkIds as string[])].slice(0, 4);
   // Labels and destinations always come from our catalogue, never model URLs.
   const links = ids.flatMap(id => {
     const link = GENIE_LINKS.find(candidate => candidate.id === id);
-    return link ? [{ href: link.href, label: advice.language === "de" ? link.labelDe : link.labelEn }] : [];
+    return link ? [{ href: link.href, label: t(link.id) }] : [];
   });
-  return { reply: advice.reply.trim(), links };
+  return { reply: advice.reply.trim(), links: [...searches, ...links].slice(0, 4), language };
 }
 
 export async function generateGenieAdvice(request: Request, input: GenieRequest, config: GenieConfiguration) {
@@ -138,7 +145,7 @@ export async function generateGenieAdvice(request: Request, input: GenieRequest,
         max_output_tokens: 600,
         instructions: input.writing
           ? buildGenieInstructions(input.area, input.locale, input.writing)
-          : `${buildGenieInstructions(input.area, input.locale)}\nReturn plain JSON matching the provided schema. Keep reply below ${GENIE_MAX_MESSAGE_CHARS} characters. Follow the German/English language guidance above, prioritizing the latest user message. Set language to de for a German answer and en for an English answer. Select only catalogue linkIds; never put URLs or Markdown links in reply.`,
+          : `${buildGenieInstructions(input.area, input.locale)}\nReturn plain JSON matching the provided schema. Keep reply below ${GENIE_MAX_MESSAGE_CHARS} characters. ${CREW_SEARCH_INSTRUCTIONS} Follow the supported language guidance above, prioritizing the latest user message. Select only catalogue linkIds; never put URLs or Markdown links in reply.`,
         input: input.messages.map(message => ({ role: message.role, content: message.content })),
         text: { format: {
           type: "json_schema", name: "genie_advice", strict: true,
@@ -147,9 +154,10 @@ export async function generateGenieAdvice(request: Request, input: GenieRequest,
             properties: {
               reply: { type: "string" },
               linkIds: { type: "array", ...(input.writing ? { maxItems: 0 } : {}), items: { type: "string", enum: GENIE_LINKS.map(link => link.id) } },
-              language: { type: "string", enum: input.writing ? [input.locale] : ["de", "en"] },
+              ...(!input.writing ? { crewSearches: CREW_SEARCH_SCHEMA } : {}),
+              language: { type: "string", enum: input.writing ? [input.locale] : GENIE_LOCALES },
             },
-            required: ["reply", "linkIds", "language"],
+            required: ["reply", "linkIds", "language", ...(!input.writing ? ["crewSearches"] : [])],
           },
         } },
       }),

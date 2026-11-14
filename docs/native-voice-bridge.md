@@ -53,6 +53,13 @@ truncate and silently send a longer one. Content edits still require a separate
 explicit confirmation and current server authorization. Cancel never sends.
 Spoken replies are an explicit web UI option.
 
+For an automatic spoken search, wait until the selected result route is active
+before calling `speak`; the native navigation cancellation would otherwise cut
+off the answer. Closing, changing language or backgrounding also cancels the
+pending spoken Genie request, so its late reply cannot navigate or start audio.
+Native navigation checks invalidate only operations belonging to an older URL;
+a queued old navigation observation must not cancel speech begun on the new URL.
+
 Rejected promises have a stable `code`: `permission-denied`, `unavailable`,
 `language-unavailable`, `no-speech`, `network`, `busy`, `cancelled`, `interrupted`,
 `audio`, `invalid-request`, `gesture-required`, or `timeout`. Translate all UI

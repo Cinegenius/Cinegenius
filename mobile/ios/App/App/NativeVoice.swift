@@ -298,4 +298,9 @@ final class NativeVoice: NSObject, WKScriptMessageHandler, AVSpeechSynthesizerDe
         finishRecording(code: "interrupted"); finishSpeaking(code: "interrupted")
         watchdog?.invalidate(); watchdog = nil
     }
+    func navigationChanged() {
+        // A queued URL observation must not cancel speech already started on
+        // the new page. Each pending request still checks its initiating URL.
+        tick()
+    }
 }

@@ -39,6 +39,11 @@
       cancelOperation(id, entry.action === 'speak' ? 'stopSpeaking' : 'cancel', 'interrupted');
     }
   }
+  function cancelNavigatedRequests() {
+    for (const [id, entry] of [...pending]) {
+      if (entry.href !== location.href) cancelOperation(id, entry.action === 'speak' ? 'stopSpeaking' : 'cancel', 'interrupted');
+    }
+  }
   function request(action, values) {
     if (document.visibilityState !== 'visible' || location.origin !== configuration.origin) return Promise.reject(error('interrupted'));
     if (!values || !locales.has(values.locale)) return Promise.reject(error('language-unavailable'));
@@ -55,9 +60,7 @@
       pending.set(requestId, {resolve, reject, timer, action, href});
       if (action === 'start') listening = requestId;
       if (action === 'speak') speaking = requestId;
-      if (navigationWatch === null) navigationWatch = setInterval(() => {
-        if ([...pending.values()].some(entry => entry.href !== location.href)) interrupt();
-      }, 250);
+      if (navigationWatch === null) navigationWatch = setInterval(cancelNavigatedRequests, 250);
       try { send(action, requestId, action === 'speak' ? {locale: values.locale, text: values.text} : {locale: values.locale}); }
       catch { finish(requestId, 'unavailable'); }
     });
@@ -66,7 +69,8 @@
     if (!message || message.v !== 1 || message.documentId !== documentId) return;
     const entry = pending.get(message.requestId);
     if (!entry) return;
-    if (document.visibilityState !== 'visible' || location.href !== entry.href) { interrupt(); return; }
+    if (document.visibilityState !== 'visible') { interrupt(); return; }
+    if (location.href !== entry.href) { cancelNavigatedRequests(); return; }
     if (message.type === 'state' && states.has(message.state)) {
       const extra = typeof message.partialText === 'string' ? {partialText: message.partialText.slice(0, 6000)} : {};
       state(message.requestId, message.state, extra);

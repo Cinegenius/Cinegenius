@@ -93,7 +93,7 @@ class CineGeniusViewController: CAPBridgeViewController {
             accountNavigationDelegate = delegate; webView?.navigationDelegate = delegate
         }
         urlObservation = webView?.observe(\.url, options:[.new]) { [weak self] _,_ in
-            DispatchQueue.main.async { self?.nativeVoice?.cancelAll(); self?.resumeRequestedWorkplace() }
+            DispatchQueue.main.async { self?.nativeVoice?.navigationChanged(); self?.resumeRequestedWorkplace() }
         }
         webView?.allowsBackForwardNavigationGestures = true
         statusBarStyle = .lightContent

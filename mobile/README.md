@@ -238,3 +238,11 @@ Recce/workplace files and native catalog keys. Never overwrite or uninstall the
 existing app or saved plans. This bridge does not implement shared project-plan
 synchronization, nor does its server validation prove iPhone login or full-screen
 rendering. No website release is part of this change.
+
+The app development branch also includes reviewed WEB commit `26b47a2` and the
+integration correction that starts spoken search replies after result navigation.
+This website feature is still unpublished: the default remote preview URL does
+not yet display its new voice controls. Use an explicitly configured private
+preview to test the combined source; generating a native bundle is not a website
+release. Newer Mac Recce/workplace changes and native translations still need a
+targeted merge. Handoff: `/srv/cinegenius/handoffs/20261114-app-web-voice/`.

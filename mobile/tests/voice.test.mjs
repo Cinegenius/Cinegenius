@@ -159,3 +159,14 @@ test('transport failure and bounded pending requests fail promptly', async () =>
   await rejects(g.api.capabilities({locale:'de'}), 'busy');
   const checks = pending.map(p => rejects(p, 'timeout')); g.timeout(); await Promise.all(checks);
 });
+
+test('a stale request from the previous route cannot cancel speech begun on the new route', async () => {
+  const f = fixture(), old = f.api.capabilities({locale:'de'}), request = f.sent[0];
+  f.location.href += '/creators';
+  const speech = f.api.speak({locale:'de',text:'Suchergebnisse'}), speechRequest = f.sent.at(-1);
+  const cancelled = rejects(old, 'interrupted');
+  f.reply(request, {type:'result',result:{recognition:true,synthesis:true,systemServiceMayProcessAudio:true}});
+  await cancelled; f.tick();
+  assert.equal(f.sent.filter(message => message.action === 'stopSpeaking').length, 0);
+  f.reply(speechRequest, {type:'result',result:{}}); await speech;
+});
