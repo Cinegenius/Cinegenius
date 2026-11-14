@@ -2103,7 +2103,8 @@
     "resendDisclosure": "Transaktionsmeddelanden via e-post, till exempel bokningsbekräftelser, aviseringar och systemmeddelanden, skickas via Resend Inc. (USA). Då överförs din e-postadress och eventuellt ditt namn till Resend. CineGenius nyhetsbrev: du kan anmäla dig frivilligt via formuläret i sidfoten. E-postadresser från befintliga konton förs inte över. Anmälan aktiveras först via bekräftelselänken. För detta lagrar vi den angivna e-postadressen, tidpunkten för samtycket och den använda samtyckesversionen. Utskicken görs via Resend. Du kan avregistrera dig när som helst via avregistreringslänken i varje nyhetsbrev. Informationen ingår i den tyskspråkiga integritetspolicyn.",
     "sentryPrepared": "Konfigurationsfiler för Sentry (Functional Software Inc., San Francisco, USA) har förberetts för feldiagnostik. Dessa filer aktiverar inte i sig någon överföring; i den nuvarande applikationen har ingen Sentry-initialisering integrerats.",
     "replayDisabled": "Session Replay är avstängt även i den förberedda konfigurationen. Därför skapas inga sessionsinspelningar eller föregående replaybuffertar. En senare aktivering kräver först en prövning av syftet, den rättsliga grunden och vid behov ett giltigt samtycke. Denna dataskyddsinformation ersätter inte ett samtycke.",
-    "sentryPurpose": "Feldiagnostik förberedd; Session Replay avstängt (se avsnitt 12)"
+    "sentryPurpose": "Feldiagnostik förberedd; Session Replay avstängt (se avsnitt 12)",
+    "newsRegionDisclosure": "Regionale Branchennews: Ohne eigene Länderauswahl verwenden wir vorrangig das Land aus deinem Profil, sonst das vom Hosting-Anbieter übermittelte ungefähre Land deiner Verbindung. Dafür fragen wir keinen GPS-Standort ab. Deine ausdrücklich gewählte Einstellung speichern wir für bis zu ein Jahr in einem Cookie mit dem Präfix cg_news_country_, getrennt für Gäste und angemeldete Konten. Du kannst jederzeit ein anderes Land, „Alle Länder“ oder „Automatisch“ wählen. Die automatische Ländererkennung wird nicht in diesem Cookie gespeichert. Die Oberflächensprache folgt deiner gespeicherten Sprachwahl, sonst einer unterstützten Browsersprache; fehlt diese, dient das ungefähre Land als Rückfall. Originalbeiträge werden nicht automatisch übersetzt."
   },
   "SetupOffers": {
     "accountReady": "Ditt leverantörskonto är färdigt.",
@@ -8280,5 +8281,14 @@
   },
   "companyTeam": {
     "leadership": "Grundare och ledning"
+  },
+  "NewsRegion": {
+    "countryLabel": "Land för branschnyheter",
+    "automatic": "Automatiskt",
+    "automaticCountry": "Automatiskt · {country}",
+    "empty": "Det finns ännu inga aktuella inlägg för det här urvalet.",
+    "saveError": "Ditt val kunde inte sparas. Tillåt inställningscookies och försök igen.",
+    "loadError": "Inläggen kunde inte laddas.",
+    "retry": "Försök igen"
   }
 }

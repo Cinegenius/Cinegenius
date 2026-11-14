@@ -33,6 +33,13 @@ test('prepared remote sign-in entry satisfies the native local-start-file requir
     const resume = await readFile(join(fixture, 'mobile/www/app-resume.js'), 'utf8');
     assert.ok(resume.includes(JSON.stringify(new URL(config.server.url).origin)));
     assert.ok(resume.includes("new Event('cinegenius:app-resume')"));
+    const localeSource = await readFile(join(fixture, 'mobile/www/locale.js'), 'utf8');
+    const { resolveLocale } = await import(`data:text/javascript;base64,${Buffer.from(localeSource).toString('base64')}`);
+    assert.equal(resolveLocale('nl-BE', 'it-IT', 'DE'), 'nl-BE', 'the packaged resolver preserves a manual language');
+    assert.equal(resolveLocale(undefined, 'it-IT', 'DE'), 'it', 'browser language wins over country');
+    assert.equal(resolveLocale(undefined, 'fr', 'IT'), 'it', 'country is only the last available fallback');
+    assert.equal(resolveLocale(undefined, 'fr', 'CH'), 'de', 'multilingual countries do not imply a language');
+    assert.equal(resolveLocale(undefined, 'fr'), 'de', 'offline rendering does not invent a request country');
   } finally {
     await rm(fixture, { recursive: true, force: true });
   }

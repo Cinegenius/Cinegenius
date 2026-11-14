@@ -159,6 +159,28 @@ References:
 
 ## Checks
 
+### Regional news and language preferences
+
+The remote homepage and News directory use the shared `lib/news-region*` logic.
+An explicit News URL country wins, followed by the current guest/account's
+manual country cookie. Automatic uses the current profile country, then the
+coarse request country, otherwise all countries. Keep those preferences in the
+existing web cookie store; do not mirror them into a device-wide native setting
+or request GPS permission. Country filtering does not translate original posts.
+
+UI language remains `cg_locale`, then a supported browser/device language, then
+the request-country fallback where unambiguous. `prepare:preview` packages the
+same locale resolver for offline rendering. Offline has no request geography;
+it keeps the manual/browser priorities without guessing a country. The existing
+workplace menu passes the rendered document language to the native screen.
+No news-country or account information is sent through the native message bridge.
+
+Regenerate local resources and sync after merging the shared resolver. Preserve
+newer Mac-only native source and `NativeRoomScanner` keys when reconciling catalogs.
+The regional-news web commit is unpublished; importing its source does not change
+the published website loaded by the default remote app preview. Browser checks
+with app presentation scripts do not prove WKWebView persistence or device Back.
+
 `npm test` exercises origin restrictions and unchanged cookie/HTTP behavior.
 From the repository root, run `npm run check:i18n` for all nine catalogs.
 Browser rendering checks are separate from iOS simulator and Android build checks;

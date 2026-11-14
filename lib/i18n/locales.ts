@@ -20,7 +20,7 @@ export function appLocale(value: unknown): AppLocale | undefined {
     ?? SUPPORTED_LOCALES.find(locale => locale === tag.split('-')[0]);
 }
 /** An explicit choice wins; browser preferences apply only before that choice. */
-export function resolveLocale(saved: unknown, acceptLanguage = ''): AppLocale {
+export function resolveLocale(saved: unknown, acceptLanguage = '', requestCountry = ''): AppLocale {
   const selected = appLocale(saved);
   if (selected) return selected;
   const preferred = acceptLanguage.split(',').map((item, index) => {
@@ -30,5 +30,8 @@ export function resolveLocale(saved: unknown, acceptLanguage = ''): AppLocale {
     return {locale: appLocale(tag), quality, index};
   }).filter(item => item.locale && Number.isFinite(item.quality) && item.quality > 0 && item.quality <= 1)
     .sort((a, b) => b.quality - a.quality || a.index - b.index);
-  return preferred[0]?.locale ?? DEFAULT_LOCALE;
+  // A coarse country is only a last resort. Residence must never override an
+  // explicit choice or a supported browser language (including multilingual countries).
+  const countryFallback: Record<string, AppLocale> = {DE:'de',AT:'de',IT:'it',ES:'es',CZ:'cs',HU:'hu',NL:'nl',SE:'sv',GB:'en',IE:'en',US:'en',AU:'en',NZ:'en'};
+  return preferred[0]?.locale ?? countryFallback[requestCountry.toUpperCase()] ?? DEFAULT_LOCALE;
 }

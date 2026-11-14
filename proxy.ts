@@ -8,7 +8,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { isProtectedCreatePath, isPublicProfilePath } from "@/lib/public-access";
 
 async function localizedProxyError(request: NextRequest, key: string, init: ResponseInit): Promise<NextResponse> {
-  const locale = resolveLocale(request.cookies.get("cg_locale")?.value, request.headers.get("accept-language") ?? "");
+  const locale = resolveLocale(request.cookies.get("cg_locale")?.value, request.headers.get("accept-language") ?? "", request.headers.get('x-vercel-ip-country') ?? '');
   const messages = await loadMessages(locale);
   const system = messages.System as Record<string, string>;
   const copy = createTranslator({locale, messages: {System: system}, namespace: "System"});

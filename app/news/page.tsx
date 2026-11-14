@@ -1,12 +1,10 @@
 import Image from "@/components/MediaImage";
 import PageHeader from "@/components/PageHeader";
 import DirectoryPage from "@/components/DirectoryPage";
-import { BrowsePreferenceControl } from "@/components/BrowseGeography";
-import { ownBrowsePlace } from "@/lib/browse-geography-server";
+import { newsRegion } from '@/lib/news-region-server';
 import { approvedEntries,newsFacetRows } from "@/lib/organization-data";
 import { isOrganizationEntryType,isOrganizationTopic } from "@/lib/organization-taxonomy";
-import { countryCode,countryName,UNASSIGNED_COUNTRY } from "@/lib/places/core";
-import { getLocale,getTranslations } from "next-intl/server";
+import { getLocale,getNow,getTranslations } from "next-intl/server";
 import Link from "next/link";
 import NewsBrowseControls from "./NewsBrowseControls";
 
@@ -18,14 +16,13 @@ export default async function NewsPage({ searchParams }: { searchParams: Promise
   const t = await getTranslations("Organizations");
   const discoveryT = await getTranslations("OrganizationDiscovery");
   const locale = await getLocale();
+  const now = await getNow();
   const dates = new Intl.DateTimeFormat(locale, { dateStyle: "medium", timeStyle: "short", timeZone: "Europe/Berlin" });
   const params = await searchParams;
-  let preferred = null;
-  if (!params.country && params.geo !== "off") { try { preferred = (await ownBrowsePlace()).place; } catch { /* Show all ordinary results on preference failure. */ } }
-  const geoText = await getTranslations("BrowseGeography");
-  const filters = { country: params.country === UNASSIGNED_COUNTRY ? UNASSIGNED_COUNTRY : countryCode(params.country ?? ""), geo: params.geo === "off" ? "off" : "", type: isOrganizationEntryType(params.type) ? params.type : undefined,
+  const region = await newsRegion(params.country || (params.geo === 'off' ? 'all' : undefined));
+  const filters = { country: region.selection, type: isOrganizationEntryType(params.type) ? params.type : undefined,
     topic: isOrganizationTopic(params.topic) ? params.topic : undefined, q: params.q?.trim().slice(0, 120) || "" };
-  const [{ entries: filtered, hasMore, page, count }, facets] = await Promise.all([approvedEntries({ ...filters, preferred, page: Number(params.page) || 1 }), newsFacetRows()]);
+  const [{ entries: filtered, hasMore, page, count }, facets] = await Promise.all([approvedEntries({ ...filters, country: region.country, page: Number(params.page) || 1 }), newsFacetRows()]);
   const href = (change: { type?: string; topic?: string; page?: number; country?: string; geo?: string } = {}) => {
     const values = { ...filters, ...change };
     const query = new URLSearchParams();
@@ -35,10 +32,7 @@ export default async function NewsPage({ searchParams }: { searchParams: Promise
 
   return <DirectoryPage area="news"><main className="min-h-screen">
     <PageHeader withBackdrop={false} badge={t("eyebrow")} title={t("newsTitleLead")} titleHighlight={t("newsTitleHighlight")} description={t("newsDescription")} />
-    <NewsBrowseControls key={`${filters.q}:${filters.type}:${filters.topic}:${filters.country}:${filters.geo}`} filters={filters} facets={facets} count={count} preference={<>
-      {preferred && <BrowsePreferenceControl active label={`${geoText("preferred", { country: countryName(preferred.country, locale) })}. ${geoText("everywhere")}`} href={href({ geo: "off", page: 1 })} />}
-      {filters.geo === "off" && <BrowsePreferenceControl label={geoText("useProfile")} href={href({ geo: "", page: 1 })} />}
-    </>} />
+    <NewsBrowseControls key={`${filters.q}:${filters.type}:${filters.topic}:${filters.country}:${region.country}`} filters={filters} facets={facets} count={count} region={region} />
     <section className="site-container py-5 pb-28 sm:py-7 sm:pb-28 xl:pb-10">
       <div className="mb-5 flex flex-wrap items-center justify-between gap-x-5 gap-y-1 text-sm">
         <Link href="/organizations" className="inline-flex min-h-11 items-center text-gold">{discoveryT("allOrganizations")} →</Link>
@@ -51,7 +45,7 @@ export default async function NewsPage({ searchParams }: { searchParams: Promise
             <div className="mb-3 flex flex-wrap gap-2 text-xs text-gold"><span>{t(`entryType.${entry.entry_type}`)}</span>{entry.topic && <><span>·</span><span>{t(`topic.${entry.topic}`)}</span></>}</div>
             <h2 className="break-words font-serif text-2xl text-text-primary">{entry.title}</h2>
             {entry.entry_type !== "news" && entry.starts_at && <p className="mt-2 text-sm text-text-secondary"><time dateTime={entry.starts_at}>{dates.format(new Date(entry.starts_at))}</time></p>}
-            {(entry.moderation_status === "ended" || (entry.ends_at && new Date(entry.ends_at).getTime() < Date.now())) && <p className="mt-2 text-sm text-gold">{t("status.ended")}</p>}
+            {(entry.moderation_status === "ended" || (entry.ends_at && new Date(entry.ends_at).getTime() < now.getTime())) && <p className="mt-2 text-sm text-gold">{t("status.ended")}</p>}
             {entry.summary && <p className="mt-2 line-clamp-3 text-sm leading-relaxed text-text-secondary">{entry.summary}</p>}
             <p className="mt-4 text-sm text-text-muted">{(Array.isArray(entry.organization) ? entry.organization[0] : entry.organization).name}{entry.city ? uiText("Ui.text_f6b53f9c8ab3ef", { value1: String(entry.city) }) : ""}</p>
             <Link className="mt-5 inline-flex min-h-11 items-center font-semibold text-gold" href={`/news/${(Array.isArray(entry.organization) ? entry.organization[0] : entry.organization).slug}/${entry.slug}`}>{t("openEntry")} →</Link>

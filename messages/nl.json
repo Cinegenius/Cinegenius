@@ -2103,7 +2103,8 @@
     "resendDisclosure": "Transactionele e-mails (bijv. boekingsbevestigingen, meldingen, systeemberichten) worden verstuurd via Resend Inc. (VS). Daarbij worden je e-mailadres en eventueel je naam aan Resend doorgegeven. CineGenius-nieuwsbrief: je kunt je vrijwillig aanmelden via het formulier onderaan de website. E-mailadressen uit bestaande accounts worden niet overgenomen. De aanmelding wordt pas actief na het klikken op de bevestigingslink. Hiervoor slaan we het opgegeven e-mailadres, het tijdstip van toestemming en de gebruikte toestemmingsversie op. Verzending verloopt via Resend. Je kunt je op elk moment afmelden via de afmeldlink in elke nieuwsbrief. Deze informatie maakt deel uit van de Duitstalige privacyverklaring.",
     "sentryPrepared": "Voor foutdiagnose zijn configuratiebestanden voor Sentry (Functional Software Inc., San Francisco, VS) voorbereid. Alleen deze bestanden activeren nog geen gegevensoverdracht; in de huidige toepassing is geen Sentry-initialisatie opgenomen.",
     "replayDisabled": "Session Replay is ook in de voorbereide configuratie uitgeschakeld. Hierdoor worden geen sessieopnames of voorafgaande replaybuffers aangemaakt. Voor een latere activering moeten eerst het doel en de rechtsgrondslag worden beoordeeld en is eventueel geldige toestemming nodig. Deze privacy-informatie vervangt geen toestemming.",
-    "sentryPurpose": "Foutdiagnose voorbereid; Session Replay uitgeschakeld (zie onderdeel 12)"
+    "sentryPurpose": "Foutdiagnose voorbereid; Session Replay uitgeschakeld (zie onderdeel 12)",
+    "newsRegionDisclosure": "Regionale Branchennews: Ohne eigene Länderauswahl verwenden wir vorrangig das Land aus deinem Profil, sonst das vom Hosting-Anbieter übermittelte ungefähre Land deiner Verbindung. Dafür fragen wir keinen GPS-Standort ab. Deine ausdrücklich gewählte Einstellung speichern wir für bis zu ein Jahr in einem Cookie mit dem Präfix cg_news_country_, getrennt für Gäste und angemeldete Konten. Du kannst jederzeit ein anderes Land, „Alle Länder“ oder „Automatisch“ wählen. Die automatische Ländererkennung wird nicht in diesem Cookie gespeichert. Die Oberflächensprache folgt deiner gespeicherten Sprachwahl, sonst einer unterstützten Browsersprache; fehlt diese, dient das ungefähre Land als Rückfall. Originalbeiträge werden nicht automatisch übersetzt."
   },
   "SetupOffers": {
     "accountReady": "Je aanbiedersaccount is ingesteld.",
@@ -8280,5 +8281,14 @@
   },
   "companyTeam": {
     "leadership": "Oprichters en leiding"
+  },
+  "NewsRegion": {
+    "countryLabel": "Land voor branchenieuws",
+    "automatic": "Automatisch",
+    "automaticCountry": "Automatisch · {country}",
+    "empty": "Er zijn nog geen actuele berichten voor deze selectie.",
+    "saveError": "Je keuze kon niet worden opgeslagen. Sta voorkeurcookies toe en probeer het opnieuw.",
+    "loadError": "De berichten konden niet worden geladen.",
+    "retry": "Opnieuw proberen"
   }
 }
