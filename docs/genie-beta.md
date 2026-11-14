@@ -20,7 +20,8 @@ Set `OPENAI_API_KEY` as a server-only **Secret** in the correct Vercel project's
 | --- | --- |
 | `OPENAI_API_KEY` | Required. After authentication, missing/blank values return `503 unavailable` before durable quota or provider work. |
 | `GENIE_ENABLED` | Optional. A trimmed, case-insensitive value of `false` disables the endpoint. Unset or other values do not disable it. This does not hide the chat or inline writing controls. |
-| `GENIE_DAILY_REQUEST_LIMIT` | Optional global daily request ceiling. Unset or blank means **200**. Accepts only decimal integers **1–1000**; invalid nonblank values make the endpoint unavailable. |
+| `GENIE_DAILY_REQUEST_LIMIT` | Retired and ignored: no shared daily Genie ceiling. |
+| `GENIE_UNLIMITED_USER_ID` | Optional single verified account exempt from daily quotas. Minute protection remains; never a client claim or automatic admin privilege. |
 
 No new schema or migration is required. Genie reuses `rate_limit_buckets` and atomic `upsert_rate_limit`; existing service-only permissions must remain intact. Missing, failed or malformed limiter responses deny provider access.
 
@@ -32,7 +33,7 @@ Select the CineGenius project identified by the checkout's ignored `.vercel/proj
 | --- | --- | --- | --- |
 | `OPENAI_API_KEY` | The actual OpenAI project workload key, entered directly in the secret field | **Secret** | Required by the server's direct OpenAI connection. |
 | `GENIE_ENABLED` | `true` for activation, or `false` to keep the endpoint disabled | **Config** | Optional; only the literal `false`, ignoring case and surrounding whitespace, disables it. Setting `0` does not disable it. |
-| `GENIE_DAILY_REQUEST_LIMIT` | `200` for the default, or the chosen integer from `1` through `1000` | **Config** | Optional shared daily request ceiling, not a currency budget. |
+| `GENIE_UNLIMITED_USER_ID` | Operator-selected verified account ID, entered privately | **Secret** | No daily quota for this account; all others have 30 calls/day. |
 
 Use **Preview** for the intended test branch, with its own test credential. Use **Production** for the live site's credential and activation values. Preview success does not establish the Production configuration. Branch-specific Preview values override general Preview values. **Development** is the separate scope for running the full app locally. [Vercel environment scopes](https://vercel.com/docs/environment-variables)
 
@@ -40,7 +41,7 @@ Click **Save** after adding or updating each variable. A new deployment of the r
 
 For the deployed application, use an OpenAI project service account and its workload key with the permissions needed for the implemented `POST /v1/responses` and browser-only `POST /v1/audio/transcriptions` requests. The project must permit the configured `gpt-4.1-mini` model and have available API usage capacity. Store the key directly in Vercel; its existence, permissions and successful model access must be confirmed separately. [OpenAI API keys and service accounts](https://developers.openai.com/api/docs/guides/api-keys)
 
-The source reads only the three Genie variables listed above. It calls OpenAI directly with fixed endpoints/models for conversation and browser transcription; native recognition uses the device bridge. There is no separate public activation flag. With a nonempty key, an enabled endpoint and a valid daily limit, requests still depend on the app's existing Clerk setup and working Supabase quota service. The visible launcher alone does not confirm any of those connections.
+The source reads only the three Genie variables listed above. It calls OpenAI directly with fixed endpoints/models for conversation and browser transcription; native recognition uses the device bridge. There is no separate public activation flag. With a nonempty key, an enabled endpoint, requests still depend on the app's existing Clerk setup and working Supabase quota service. The visible launcher alone does not confirm any of those connections.
 
 ### Local fixture versus a connected app
 
@@ -52,11 +53,14 @@ Live local verification must run this repository's full Next.js application (`np
 
 | Scope | Requests per fixed 60-second window | Requests per UTC calendar day |
 | --- | ---: | ---: |
-| Verified Clerk member | 10 | 60 |
-| IP, shared by signed-in accounts | 20 | 100 |
-| All Genie requests sharing the database | — | 200 by default; configurable as above |
+| Verified Clerk member | 10 | 30 |
+| IP, shared by signed-in accounts | 20 | None |
+| Whole website | — | None |
+| The single operator-selected unlimited account | 10/account and 20/IP | No account, IP or shared daily ceiling |
 
-All five counters are reserved for authenticated requests before the single provider call. Guests have no API allowance and their rejected requests do not reserve durable counters. Later denial, upstream failure or cancellation does not refund earlier reservations; there is no automatic retry. IP headers are trusted only on Vercel; other runtimes share a fallback bucket. IP/member identifiers are HMAC-hashed with the server key. Key rotation changes identity buckets but not the global bucket; deployments sharing a database share that ceiling.
+Ordinary authenticated requests reserve three counters before the single provider call. The operator-selected unlimited account reserves the two unchanged minute counters only, for both chat/writing and transcription. Markus explicitly selected **Markus Müller only**, superseding the earlier proposal for all admins and the intermediate 120-call proposal. The later operator decision removes the global and shared-IP daily ceilings for everyone and sets the ordinary personal allowance to 30. Browser voice search uses two provider calls (transcription plus interpretation), so it can consume two of these 30 calls; native device recognition does not consume a server transcription call. The identity is configured privately in the Production environment; it is not committed, accepted from the client or inferred from a display name at request time. Removing the setting restores ordinary policy and does not delete prior counters.
+
+Guests have no API allowance and their rejected requests do not reserve durable counters. Later denial, upstream failure or cancellation does not refund earlier reservations; there is no automatic retry. IP headers are trusted only on Vercel; other runtimes share a fallback bucket. IP/member identifiers are HMAC-hashed with the server key. Key rotation changes identity buckets. No global daily bucket or shared-IP daily bucket is reserved; existing rows are not reset or deleted.
 
 For the exact `POST /api/genie` and `POST /api/genie/transcribe` endpoints, the proxy verifies the session before its best-effort, per-instance IP limit of 20 requests per minute. Signed-out requests return `401` even if the IP bucket is already exhausted; authentication service errors return sanitized `503` failures. Neither consumes that IP allowance. The limiter supplements, rather than replaces, the durable quotas. Rate-limit rejections for authenticated requests return `429`, `Retry-After` and private/no-store headers. Other proxy routes retain their existing ordering and protection.
 

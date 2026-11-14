@@ -15,14 +15,12 @@ const PROVIDER_TIMEOUT_MS = 25_000;
 const PROVIDER_URL = "https://api.openai.com/v1/responses";
 
 type GenieRequest = Extract<ReturnType<typeof validateGenieRequest>, { ok: true }>["value"];
-export type GenieConfiguration = { apiKey: string; dailyLimit: number };
+export type GenieConfiguration = { apiKey: string };
 
 export function genieConfiguration(): GenieConfiguration {
   const apiKey = process.env.OPENAI_API_KEY?.trim();
   if (!apiKey || process.env.GENIE_ENABLED?.trim().toLowerCase() === "false") throw new GenieError("unavailable", 503);
-  const configuredLimit = process.env.GENIE_DAILY_REQUEST_LIMIT?.trim();
-  if (configuredLimit && !/^(?:[1-9]\d{0,2}|1000)$/.test(configuredLimit)) throw new GenieError("unavailable", 503);
-  return { apiKey, dailyLimit: configuredLimit ? Number(configuredLimit) : 200 };
+  return { apiKey };
 }
 
 /** Bound actual streamed bytes, including requests without Content-Length. */
@@ -75,12 +73,16 @@ export async function reserveGenieUsage(request: Request, userId: string | null,
   const identity = userId ? digest(`genie:user:${userId}`) : ip;
   const actor = userId ? "member" : "guest";
   const day = new Date().toISOString().slice(0, 10);
-  const reservations: [string, number, number][] = [
+  // Only the operator-selected, verified account is exempt from daily ceilings.
+  // Minute guards remain; neither admin status nor client claims grant this.
+  const unlimited = !!userId && userId === process.env.GENIE_UNLIMITED_USER_ID?.trim();
+  const reservations: [string, number, number][] = unlimited ? [
     [`genie:ip:minute:${ip}`, 20, 60],
-    [`genie:ip:day:${day}:${ip}`, 100, 86400],
+    [`genie:member:minute:${identity}`, 10, 60],
+  ] : [
+    [`genie:ip:minute:${ip}`, 20, 60],
     [`genie:${actor}:minute:${identity}`, userId ? 10 : 5, 60],
-    [`genie:${actor}:day:${day}:${identity}`, userId ? 60 : 20, 86400],
-    [`genie:global:day:${day}`, config.dailyLimit, 86400],
+    [`genie:${actor}:day:${day}:${identity}`, userId ? 30 : 20, 86400],
   ];
   for (const [key, limit, window] of reservations) {
     request.signal.throwIfAborted();
