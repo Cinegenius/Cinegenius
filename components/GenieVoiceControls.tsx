@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { Mic, Square, Volume2, VolumeX, X } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { createGenieRecorder, type RecordingState, type VoiceError } from "@/lib/genie-recorder";
-import { nativeGenieVoice } from "@/lib/genie-voice";
+import { nativeGenieVoice, selectGenieSpeechVoice, GENIE_SPEECH_RATE, GENIE_SPEECH_VOLUME } from "@/lib/genie-voice";
 import styles from "./Genie.module.css";
 
 export default function GenieVoiceControls({ active, pending, locale, resetKey, onText, onUnauthorized, reply }: {
@@ -42,11 +42,11 @@ export default function GenieVoiceControls({ active, pending, locale, resetKey, 
     if (!window.speechSynthesis || typeof SpeechSynthesisUtterance === "undefined") { setVoiceErrorCode("unsupported"); return; }
     const output = new SpeechSynthesisUtterance(text);
     output.lang = language;
-    // Prefer an installed voice; never silently choose an unrelated language.
     const installed = window.speechSynthesis.getVoices();
-    const voices = installed.filter(voice => voice.lang.split("-")[0] === language.split("-")[0]);
-    if (installed.length && !voices.length) { setVoiceErrorCode("unsupported"); return; }
-    output.voice = voices.find(voice => voice.localService) ?? voices[0] ?? null;
+    output.voice = selectGenieSpeechVoice(installed, language);
+    if (installed.length && !output.voice) { setVoiceErrorCode("unsupported"); return; }
+    output.rate = GENIE_SPEECH_RATE;
+    output.volume = GENIE_SPEECH_VOLUME;
     output.onend = () => { if (utterance.current === output) { utterance.current = null; setSpeaking(false); } };
     output.onerror = () => { if (utterance.current === output) { utterance.current = null; setSpeaking(false); setVoiceErrorCode("failed"); } };
     utterance.current = output; setSpeaking(true); window.speechSynthesis.speak(output);
