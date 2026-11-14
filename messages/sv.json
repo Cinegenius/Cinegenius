@@ -7504,7 +7504,8 @@
         "failed": "Det fungerade inte. Tala igen eller skriv ditt meddelande.",
         "timeout": "Taligenkänningen tog för lång tid. Försök igen.",
         "rate_limited": "Användningsgränsen har nåtts. Försök igen senare.",
-        "unavailable": "Taligenkänning är inte tillgänglig just nu. Du kan fortsätta skriva."
+        "unavailable": "Taligenkänning är inte tillgänglig just nu. Du kan fortsätta skriva.",
+        "app_unavailable": "Röstinmatning är ännu inte tillgänglig i den här appversionen. Du kan fortsätta skriva."
       },
       "notice": "Tala i upp till 30 sekunder. När du avslutar skickas inspelningen till OpenAI för igenkänning och texten till Genie. Befintlig text kompletteras bara. Svaren läses upp med en konstgjord enhetsröst.",
       "noticeNative": "Tala i upp till 30 sekunder. Enhetens taltjänst kan behandla inspelningen. När du avslutar går den tolkade texten till Genie; befintlig text kompletteras bara. Svaren använder en konstgjord enhetsröst."

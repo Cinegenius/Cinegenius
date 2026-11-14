@@ -7504,7 +7504,8 @@
         "failed": "Dat lukte niet. Spreek opnieuw of typ je bericht.",
         "timeout": "Spraakherkenning duurde te lang. Probeer het opnieuw.",
         "rate_limited": "De gebruikslimiet is bereikt. Probeer het later opnieuw.",
-        "unavailable": "Spraakherkenning is nu niet beschikbaar. Je kunt blijven typen."
+        "unavailable": "Spraakherkenning is nu niet beschikbaar. Je kunt blijven typen.",
+        "app_unavailable": "Spraakinvoer is nog niet beschikbaar in deze versie van de app. Je kunt blijven typen."
       },
       "notice": "Spreek maximaal 30 seconden. Na afloop gaat je opname naar OpenAI voor herkenning en de herkende tekst naar Genie. Bestaande tekst wordt alleen aangevuld. Antwoorden worden met een kunstmatige apparaatstem voorgelezen.",
       "noticeNative": "Spreek maximaal 30 seconden. De spraakdienst van je apparaat kan de opname verwerken. Na afloop gaat de herkende tekst naar Genie; bestaande tekst wordt alleen aangevuld. Antwoorden gebruiken een kunstmatige apparaatstem."

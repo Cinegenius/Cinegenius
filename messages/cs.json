@@ -7504,7 +7504,8 @@
         "failed": "To se nepodařilo. Zkus promluvit znovu nebo napiš zprávu.",
         "timeout": "Rozpoznávání řeči trvalo příliš dlouho. Zkus to znovu.",
         "rate_limited": "Byl dosažen limit použití. Zkus to později.",
-        "unavailable": "Rozpoznávání řeči nyní není dostupné. Můžeš dál psát."
+        "unavailable": "Rozpoznávání řeči nyní není dostupné. Můžeš dál psát.",
+        "app_unavailable": "Hlasové zadávání v této verzi aplikace zatím není dostupné. Můžeš dál psát."
       },
       "notice": "Mluv až 30 sekund. Po ukončení se nahrávka odešle do OpenAI k rozpoznání a rozpoznaný text do Genie. Existující text se pouze doplní. Odpovědi čte umělý hlas zařízení.",
       "noticeNative": "Mluv až 30 sekund. Nahrávku může zpracovat hlasová služba zařízení. Po ukončení se rozpoznaný text odešle do Genie; existující text se pouze doplní. Odpovědi čte umělý hlas zařízení."

@@ -7504,7 +7504,8 @@
         "failed": "No ha funcionado. Vuelve a hablar o escribe.",
         "timeout": "El reconocimiento ha tardado demasiado. Inténtalo de nuevo.",
         "rate_limited": "Se ha alcanzado el límite de uso. Inténtalo más tarde.",
-        "unavailable": "El reconocimiento no está disponible ahora. Puedes seguir escribiendo."
+        "unavailable": "El reconocimiento no está disponible ahora. Puedes seguir escribiendo.",
+        "app_unavailable": "La entrada de voz aún no está disponible en esta versión de la aplicación. Puedes seguir escribiendo."
       },
       "notice": "Habla hasta 30 segundos. Al terminar, la grabación se envía a OpenAI para reconocerla y el texto a Genie. Si ya hay texto, solo se añade el dictado. Las respuestas usan una voz artificial del dispositivo.",
       "noticeNative": "Habla hasta 30 segundos. El servicio de voz del dispositivo puede procesar la grabación. Al terminar, el texto reconocido se envía a Genie; si ya hay texto, solo se añade el dictado. Las respuestas usan una voz artificial del dispositivo."

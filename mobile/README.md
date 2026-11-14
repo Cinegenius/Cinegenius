@@ -241,8 +241,14 @@ rendering. No website release is part of this change.
 
 The app development branch also includes reviewed WEB commit `26b47a2` and the
 integration correction that starts spoken search replies after result navigation.
-This website feature is still unpublished: the default remote preview URL does
-not yet display its new voice controls. Use an explicitly configured private
-preview to test the combined source; generating a native bundle is not a website
-release. Newer Mac Recce/workplace changes and native translations still need a
-targeted merge. Handoff: `/srv/cinegenius/handoffs/20261114-app-web-voice/`.
+WEB published that base commit on 14 November 2026, so the default remote preview
+now receives its voice controls. The later app integration corrections are not
+part of that website release. Use an explicitly configured private preview to test
+the corrected combined source; generating a native bundle is not a website release.
+Older native shells without the supported voice bridge must show the localized
+app-version notice instead of falling back to a browser microphone. Their native
+permission declarations cannot be added by a remote website update. Normal browser
+recording and supported native v1 recording remain available.
+Newer Mac Recce/workplace changes and native translations still need a targeted
+merge. Handoffs: `/srv/cinegenius/handoffs/20261114-app-web-voice/` and
+`/srv/cinegenius/handoffs/20261114-legacy-app-voice/`.

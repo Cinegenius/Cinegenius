@@ -7504,7 +7504,8 @@
         "failed": "Ez nem sikerült. Próbálj újra beszélni, vagy gépelj.",
         "timeout": "A beszédfelismerés túl sokáig tartott. Próbáld újra.",
         "rate_limited": "Elérted a használati korlátot. Próbáld újra később.",
-        "unavailable": "A beszédfelismerés most nem érhető el. Továbbra is gépelhetsz."
+        "unavailable": "A beszédfelismerés most nem érhető el. Továbbra is gépelhetsz.",
+        "app_unavailable": "A hangbevitel az alkalmazás ezen verziójában még nem érhető el. Továbbra is gépelhetsz."
       },
       "notice": "Legfeljebb 30 másodpercig beszélhetsz. Befejezéskor a felvételt az OpenAI felismeri, a szöveget pedig Genie kapja meg. A meglévő szöveghez csak hozzáfűzzük a diktálást. A válaszokat az eszköz mesterséges hangja olvassa fel.",
       "noticeNative": "Legfeljebb 30 másodpercig beszélhetsz. Az eszköz beszédszolgáltatása feldolgozhatja a felvételt. Befejezéskor a felismert szöveg Genie-hez kerül; a meglévő szöveget csak kiegészítjük. A válaszokat az eszköz mesterséges hangja olvassa fel."

@@ -7504,7 +7504,8 @@
         "failed": "Das hat nicht geklappt. Bitte erneut sprechen oder tippen.",
         "timeout": "Die Spracherkennung dauert zu lange. Bitte erneut versuchen.",
         "rate_limited": "Das Nutzungslimit ist erreicht. Bitte später erneut versuchen.",
-        "unavailable": "Die Spracherkennung ist gerade nicht verfügbar. Du kannst weiter tippen."
+        "unavailable": "Die Spracherkennung ist gerade nicht verfügbar. Du kannst weiter tippen.",
+        "app_unavailable": "Die Spracheingabe ist in dieser App-Version noch nicht verfügbar. Du kannst weiter tippen."
       },
       "notice": "Bis zu 30 Sekunden sprechen. Beim Beenden wird deine Aufnahme zur Erkennung an OpenAI gesendet; der erkannte Text geht an Genie. Vorhandener Text wird nur ergänzt. Antworten werden mit künstlicher Gerätestimme vorgelesen.",
       "noticeNative": "Bis zu 30 Sekunden sprechen. Der Sprachdienst deines Geräts kann die Aufnahme verarbeiten. Beim Beenden geht der erkannte Text an Genie; vorhandener Text wird nur ergänzt. Antworten nutzen eine künstliche Gerätestimme."

@@ -17,6 +17,26 @@ export function nativeGenieVoice(): NativeGenieVoice | null {
   return bridge?.version === 1 ? bridge : null;
 }
 
+/** Remote web updates also reach older native shells without microphone support. */
+export function isNativeGenieHost(): boolean {
+  if (typeof window === "undefined") return false;
+  const host = window as Window & {
+    CineGeniusVoice?: unknown;
+    Capacitor?: { isNativePlatform?: () => boolean };
+    webkit?: { messageHandlers?: Record<string, { postMessage?: unknown }> };
+    cinegeniusVoiceNative?: { postMessage?: unknown };
+  };
+  try {
+    return host.CineGeniusVoice != null || host.Capacitor?.isNativePlatform?.() === true
+      || typeof host.webkit?.messageHandlers?.cinegeniusWorkplace?.postMessage === "function"
+      || typeof host.webkit?.messageHandlers?.cinegeniusVoice?.postMessage === "function"
+      || typeof host.cinegeniusVoiceNative?.postMessage === "function";
+  } catch {
+    // A broken native platform probe is not permission to open a browser microphone.
+    return true;
+  }
+}
+
 /** Wait for the selected search route before speaking; navigation cancels native audio. */
 export function genieSpeechRouteReady(target: string, current: string): boolean {
   const key = (href: string) => {

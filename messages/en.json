@@ -7504,7 +7504,8 @@
         "failed": "That did not work. Please speak again or type.",
         "timeout": "Speech recognition took too long. Please try again.",
         "rate_limited": "The usage limit has been reached. Please try again later.",
-        "unavailable": "Speech recognition is currently unavailable. You can still type."
+        "unavailable": "Speech recognition is currently unavailable. You can still type.",
+        "app_unavailable": "Voice input is not yet available in this version of the app. You can keep typing."
       },
       "notice": "Speak for up to 30 seconds. When you finish, your recording is sent to OpenAI for recognition and the recognized text to Genie. Existing text is only appended to. Replies use an artificial device voice.",
       "noticeNative": "Speak for up to 30 seconds. Your device’s speech service may process the recording. When you finish, the recognized text goes to Genie; existing text is only appended to. Replies use an artificial device voice."

@@ -1,8 +1,8 @@
-import { GENIE_AUDIO_MAX_BYTES, GENIE_RECORDING_MAX_MS, genieAudioType, nativeGenieVoice } from "./genie-voice";
+import { GENIE_AUDIO_MAX_BYTES, GENIE_RECORDING_MAX_MS, genieAudioType, isNativeGenieHost, nativeGenieVoice } from "./genie-voice";
 import { GENIE_MAX_MESSAGE_CHARS } from "./genie";
 
 export type RecordingState = "idle" | "requesting" | "recording" | "transcribing";
-export type VoiceError = "unsupported" | "permission" | "failed" | "timeout" | "rate_limited" | "unauthorized" | "unavailable";
+export type VoiceError = "unsupported" | "permission" | "failed" | "timeout" | "rate_limited" | "unauthorized" | "unavailable" | "app_unavailable";
 type Callbacks = { state: (state: RecordingState) => void; text: (text: string) => void; error: (error: VoiceError) => void };
 
 /** One explicit recording at a time. Cancel invalidates even a late permission result. */
@@ -72,6 +72,7 @@ export function createGenieRecorder(callbacks: Callbacks) {
       }
       return; // Never bypass a native permission denial with web recording.
     }
+    if (isNativeGenieHost()) { callbacks.error("app_unavailable"); return; }
     if (!navigator.mediaDevices?.getUserMedia || typeof MediaRecorder === "undefined") { callbacks.error("unsupported"); return; }
     const mimeType = ["audio/webm;codecs=opus", "audio/mp4", "audio/ogg;codecs=opus", "audio/webm"].find(type => MediaRecorder.isTypeSupported(type));
     if (!mimeType) { callbacks.error("unsupported"); return; }
