@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
+import { useAuth } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
 import { Search, MapPin } from "lucide-react";
 import { useTranslations } from "next-intl";
@@ -20,15 +21,43 @@ export default function HeroSearch() {
   const tabs = getLocalizedTabs(uiText);
 
   const router = useRouter();
-  const [activeTab, setActiveTab] = useState("all");
+  const { isLoaded, userId } = useAuth();
+  const [activeTab, setActiveTab] = useState("locations");
   const [query, setQuery] = useState("");
   const [city, setCity] = useState("");
+  const [memberHintOpen, setMemberHintOpen] = useState(false);
+  const smartButton = useRef<HTMLButtonElement>(null);
+  const memberHintId = useId();
+  const canUseSmart = isLoaded && !!userId;
+  const showMemberHint = memberHintOpen && !canUseSmart;
+
+  useEffect(() => {
+    if (!showMemberHint) return;
+    const dismissOutside = (event: Event) => {
+      if (!smartButton.current?.contains(event.target as Node)) setMemberHintOpen(false);
+    };
+    const dismissEscape = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setMemberHintOpen(false);
+    };
+    document.addEventListener("pointerdown", dismissOutside);
+    document.addEventListener("focusin", dismissOutside);
+    document.addEventListener("keydown", dismissEscape);
+    return () => {
+      document.removeEventListener("pointerdown", dismissOutside);
+      document.removeEventListener("focusin", dismissOutside);
+      document.removeEventListener("keydown", dismissEscape);
+    };
+  }, [showMemberHint]);
 
   const tab = tabs.find((t) => t.id === activeTab)!;
   const cityParam = "cityText";
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
+    if (activeTab === "all" && !canUseSmart) {
+      setMemberHintOpen(true);
+      return;
+    }
     const params = new URLSearchParams();
     if (activeTab === "all") params.set("smart", "1");
     if (query.trim()) params.set("q", query.trim());
@@ -39,25 +68,37 @@ export default function HeroSearch() {
 
   return (
     <div className="w-full rounded-2xl border border-border bg-bg-primary/85 p-2 shadow-lg shadow-black/15 sm:p-3">
-      <div role="group" aria-label={uiText("home.heroSearchAction")} className="mb-2 flex flex-nowrap overflow-x-auto overscroll-x-contain [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-        {tabs.map((t) => (
-          <button
-            key={t.id}
-            type="button"
-            aria-pressed={activeTab === t.id}
-            onClick={(event) => {
-              setActiveTab(t.id);
-              event.currentTarget.scrollIntoView({ block: "nearest", inline: "nearest" });
-            }}
-            className={`relative min-h-11 min-w-11 shrink-0 whitespace-nowrap rounded-lg px-2 py-2 text-xs font-semibold transition-colors sm:px-3 ${
-              activeTab === t.id
-                ? "bg-gold-subtle text-gold after:absolute after:inset-x-3 after:bottom-0 after:h-0.5 after:rounded-full after:bg-gold"
-                : "text-text-secondary hover:bg-bg-elevated hover:text-text-primary"
-            }`}
-          >
-            {t.label}
-          </button>
-        ))}
+      <div className="relative">
+        {showMemberHint && <div id={memberHintId} role="status" className="pointer-events-none motion-safe:animate-[fadeIn_150ms_ease-out] absolute bottom-full left-0 z-20 mb-2 max-w-full rounded-xl border border-border bg-bg-secondary px-3 py-2 text-xs font-medium text-text-primary shadow-lg shadow-black/15 after:absolute after:-bottom-1 after:left-6 after:size-2 after:rotate-45 after:border-r after:border-b after:border-border after:bg-bg-secondary">
+          {uiText(isLoaded ? "UnifiedSearch.membersOnly" : "common.loading")}
+        </div>}
+        <div role="group" aria-label={uiText("home.heroSearchAction")} className="mb-2 flex flex-nowrap overflow-x-auto overscroll-x-contain [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+          {tabs.map((t) => (
+            <button
+              key={t.id}
+              type="button"
+              ref={t.id === "all" ? smartButton : undefined}
+              aria-pressed={activeTab === t.id}
+              aria-describedby={t.id === "all" && showMemberHint ? memberHintId : undefined}
+              onClick={(event) => {
+                if (t.id === "all" && !canUseSmart) {
+                  setMemberHintOpen(open => !open);
+                  return;
+                }
+                setMemberHintOpen(false);
+                setActiveTab(t.id);
+                event.currentTarget.scrollIntoView({ block: "nearest", inline: "nearest" });
+              }}
+              className={`relative min-h-11 min-w-11 shrink-0 whitespace-nowrap rounded-lg px-2 py-2 text-xs font-semibold transition-colors sm:px-3 ${
+                activeTab === t.id
+                  ? "bg-gold-subtle text-gold after:absolute after:inset-x-3 after:bottom-0 after:h-0.5 after:rounded-full after:bg-gold"
+                  : "text-text-secondary hover:bg-bg-elevated hover:text-text-primary"
+              }`}
+            >
+              {t.label}
+            </button>
+          ))}
+        </div>
       </div>
 
       {/* Search bar */}

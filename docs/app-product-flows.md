@@ -58,8 +58,9 @@ Kataloge und bestehenden Veröffentlichungsregeln.
 
 ## Smart-Suche (14. November 2026)
 
-**Status: Grundfunktion mit `ce37ab6` veröffentlicht; Trefferkorrekturen, Name Smart
-und der nachträglich beauftragte Mitgliederzugang sind noch nicht veröffentlicht.**
+**Status: Grundfunktion mit `ce37ab6`, Trefferkorrekturen, Name Smart und
+Mitgliederzugang mit `3604ba4` veröffentlicht. Der nachfolgend beschriebene
+Start mit Locations und der dezente Hinweis beim Smart-Klick sind noch nicht live.**
 Markus hat den früheren Aufschub mit „ok dann setzen wir das um“ aufgehoben.
 Die technische Prüfung ist im Bericht `test-reports/genie-unified-search-2026-11-14.md`
 dokumentiert. Der echte KI-Sprachverständnistest steht noch aus: Der vorhandene
@@ -71,6 +72,12 @@ verfügbar. Native Xcode-Arbeit bleibt bei APP Entwicklung.
   nutzbar sein; kein zweites, abweichendes Suchsystem bauen. Das Design bleibt erhalten.
 - Der bestätigte kurze Name des Reiters ist **Smart**. Die Auswahl oberhalb der
   Startseiten-Suchleiste bleibt einzeilig, bei Platzmangel horizontal bedienbar.
+- Beim Einstieg ist **Locations** ausgewählt. Smart sieht für Gäste zunächst wie
+  jeder andere Reiter aus; erst Klick oder Tastaturaktivierung zeigt die kleine
+  Sprechblase „Nur für Mitglieder“. Kein Hinweis bei Hover/Fokus, kein automatischer
+  Seitenwechsel und kein Verlust eingegebener Suchfelder. Tippen außerhalb,
+  erneuter Klick oder Escape schließt den Hinweis. Mitglieder wechseln normal zu
+  Smart; der neutrale Suchhinweis lautet lokalisiert „Was suchst du?“.
 - Smart ist **nur für angemeldete Mitglieder** zugänglich, einschließlich geteilter
   Ergebnislinks. Website und App prüfen die Sitzung serverseitig; Gäste bekommen
   weder KI-Verarbeitung noch Smart-Ergebnisse. Die Anmeldung erhält den gesamten
