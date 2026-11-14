@@ -117,6 +117,22 @@ the shared header layout changes. Its browser layout checks use modeled safe
 areas; an Xcode build and real WebKit/keyboard/rotation check remain necessary.
 The sign-in start path and persistent WebKit session store are retained.
 
+The shared `app-presentation.css` hides only the website's
+`data-home-app-notice` inside the installed preview. iOS includes it in the
+viewport adapter; Android installs the same presentation script before the
+first document via AndroidX WebKit. Older WebView providers use guarded
+page-commit/load callbacks. Ordinary website visits retain the announcement.
+
+Both native shells send the existing `cinegenius:app-resume` browser event only
+after a genuine background-to-foreground cycle. iOS uses the scene callbacks;
+Android uses stop/resume and ignores configuration replacement. Initial launch,
+internal navigation and brief inactive/paused interruptions do not send it.
+The bundled `app-resume.js` rechecks the exact main-frame origin and carries no
+payload. Genie restores its launcher using its existing visit-only state;
+no new persistence, API request or analytics is added by the native bridge.
+Verify these lifecycle transitions on real iPhone/iPad/Android devices before
+claiming native coverage. Browser event injection is only an integration check.
+
 The current Next application needs server cookies, Proxy, dynamic routes and APIs.
 It cannot simply be statically exported into an app without replacing those flows.
 Capacitor documents `server.url` as a **development** facility, not a production

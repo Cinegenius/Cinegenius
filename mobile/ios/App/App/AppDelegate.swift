@@ -47,6 +47,18 @@ class CineGeniusViewController: CAPBridgeViewController {
         requestsWorkplace = false; openWorkplace()
     }
 
+    func notifyWebAppResume() {
+        guard let webView, let configured = bridge?.config.serverURL,
+              let policy = WorkplaceOriginPolicy(configured: configured), let url = webView.url,
+              policy.permits(mainFrame: true, request: url, current: url,
+                  securityScheme: url.scheme ?? "", securityHost: url.host ?? "", securityPort: url.port ?? 0),
+              let scriptURL = Bundle.main.resourceURL?.appendingPathComponent("public/app-resume.js"),
+              let source = try? String(contentsOf: scriptURL, encoding: .utf8) else { return }
+        // The script rechecks the main frame's origin at execution time. It
+        // dispatches the shared website event without exposing native data.
+        webView.evaluateJavaScript(source, completionHandler: nil)
+    }
+
     private func placeWebView() {
         guard let webView, view === webView else { return }
 

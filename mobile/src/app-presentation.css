@@ -1,0 +1,3 @@
+/* The installed app never advertises its own future download. CSS also covers
+   later streamed content and internal navigation without changing React's DOM. */
+[data-home-app-notice] { display: none !important; }

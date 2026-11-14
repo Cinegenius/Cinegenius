@@ -6,7 +6,7 @@ import vm from 'node:vm';
 const template = readFileSync(new URL('../src/app-viewport.js', import.meta.url), 'utf8');
 const css = readFileSync(new URL('../src/app-viewport.css', import.meta.url), 'utf8');
 const origin = 'https://www.cinegenius.co';
-const script = template.replace('null /* CINEGENIUS_VIEWPORT_CONFIG */', JSON.stringify({origin, css}));
+const script = template.replace('null /* CINEGENIUS_VIEWPORT_CONFIG */', () => JSON.stringify({origin, css, styleId:'cinegenius-app-viewport'}));
 
 function fixture({url = origin, subframe = false, headReady = true} = {}) {
   const styles = [];

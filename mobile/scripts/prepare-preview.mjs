@@ -45,10 +45,18 @@ await writeFile(new URL('capacitor.config.json', root), JSON.stringify(config, n
 await prepareNativeResources(repository, root, output, config.server.url);
 const viewportSource = await readFile(new URL('src/app-viewport.js', root), 'utf8');
 const viewportCSS = await readFile(new URL('src/app-viewport.css', root), 'utf8');
+const presentationCSS = await readFile(new URL('src/app-presentation.css', root), 'utf8');
 const viewportMarker = 'null /* CINEGENIUS_VIEWPORT_CONFIG */';
 if (viewportSource.split(viewportMarker).length !== 2) throw new Error('Expected exactly one viewport configuration marker');
-await writeFile(new URL('app-viewport.js', output), viewportSource.replace(viewportMarker, JSON.stringify({
-  origin: new URL(config.server.url).origin,
-  css: viewportCSS,
-})));
+const origin = new URL(config.server.url).origin;
+for (const [file, styleId, css] of [
+  ['app-viewport.js', 'cinegenius-app-viewport', `${viewportCSS}\n${presentationCSS}`],
+  ['app-presentation.js', 'cinegenius-app-presentation', presentationCSS],
+]) {
+  await writeFile(new URL(file, output), viewportSource.replace(viewportMarker, () => JSON.stringify({ origin, css, styleId })));
+}
+const resumeSource = await readFile(new URL('src/app-resume.js', root), 'utf8');
+const resumeMarker = 'null /* CINEGENIUS_RESUME_ORIGIN */';
+if (resumeSource.split(resumeMarker).length !== 2) throw new Error('Expected exactly one resume origin marker');
+await writeFile(new URL('app-resume.js', output), resumeSource.replace(resumeMarker, () => JSON.stringify(origin)));
 console.log(`Prepared development preview for ${config.server.url} in ${fileURLToPath(root)}`);

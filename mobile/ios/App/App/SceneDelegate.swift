@@ -4,6 +4,7 @@ import Capacitor
 class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     var window: UIWindow?
     private var workplacePrivacyWindow: UIWindow?
+    private var wasInBackground = false
 
     func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
         guard let windowScene = scene as? UIWindowScene else { return }
@@ -41,6 +42,15 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         cover.rootViewController = controller; cover.isUserInteractionEnabled = false
         cover.isHidden = false; workplacePrivacyWindow = cover
     }
-    func sceneDidEnterBackground(_ scene: UIScene) { (window?.rootViewController as? CineGeniusViewController)?.lockWorkplace() }
-    func sceneDidBecomeActive(_ scene: UIScene) { workplacePrivacyWindow?.isHidden = true; workplacePrivacyWindow = nil }
+    func sceneDidEnterBackground(_ scene: UIScene) {
+        wasInBackground = true
+        (window?.rootViewController as? CineGeniusViewController)?.lockWorkplace()
+    }
+    func sceneDidBecomeActive(_ scene: UIScene) {
+        workplacePrivacyWindow?.isHidden = true; workplacePrivacyWindow = nil
+        // A permissions sheet or short inactive interruption is not a new visit.
+        guard wasInBackground else { return }
+        wasInBackground = false
+        (window?.rootViewController as? CineGeniusViewController)?.notifyWebAppResume()
+    }
 }

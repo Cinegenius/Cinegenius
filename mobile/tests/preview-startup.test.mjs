@@ -25,9 +25,14 @@ test('prepared remote sign-in entry satisfies the native local-start-file requir
     const viewportAdapter = await readFile(join(fixture, 'mobile/www/app-viewport.js'), 'utf8');
     assert.ok(viewportAdapter.includes(JSON.stringify({
       origin: new URL(config.server.url).origin,
-      css: await readFile(join(fixture, 'mobile/src/app-viewport.css'), 'utf8'),
+      css: `${await readFile(join(fixture, 'mobile/src/app-viewport.css'), 'utf8')}\n${await readFile(join(fixture, 'mobile/src/app-presentation.css'), 'utf8')}`,
+      styleId: 'cinegenius-app-viewport',
     })), 'the native bundle must include the exact configured origin and viewport styles');
     assert.equal(config.ios.contentInset, 'never', 'CSS must be the only safe-area inset owner');
+    assert.ok((await readFile(join(fixture, 'mobile/www/app-presentation.js'), 'utf8')).includes('data-home-app-notice'));
+    const resume = await readFile(join(fixture, 'mobile/www/app-resume.js'), 'utf8');
+    assert.ok(resume.includes(JSON.stringify(new URL(config.server.url).origin)));
+    assert.ok(resume.includes("new Event('cinegenius:app-resume')"));
   } finally {
     await rm(fixture, { recursive: true, force: true });
   }

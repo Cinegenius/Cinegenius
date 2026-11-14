@@ -1,15 +1,15 @@
 (function installAppViewport(configuration) {
   'use strict';
-  // Bundled iOS presentation adapter, executed in an isolated WebKit world.
+  // Bundled presentation adapter; iOS executes it in an isolated WebKit world.
   // No account, cookie, storage or native-message access is needed.
   if (!configuration || window.top !== window.self
       || window.location.origin !== configuration.origin) return;
 
   function install() {
     if (!document.head) return false;
-    if (!document.getElementById('cinegenius-app-viewport')) {
+    if (!document.getElementById(configuration.styleId)) {
       const style = document.createElement('style');
-      style.id = 'cinegenius-app-viewport';
+      style.id = configuration.styleId;
       style.textContent = configuration.css;
       document.head.append(style);
     }
