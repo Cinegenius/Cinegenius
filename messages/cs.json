@@ -339,7 +339,8 @@
     "findJobsTitle": "Práce",
     "findJobsDescription": "Práce a zakázky.",
     "findJobsLink": "Prohlédnout zakázky",
-    "railPage": "Zobrazení {page} z {total}"
+    "railPage": "Zobrazení {page} z {total}",
+    "appComingSoon": "CineGenius brzy také jako aplikace."
   },
   "locations": {
     "heroTitle": "Perfektní lokace",
@@ -7481,7 +7482,9 @@
     "empty": "Začni otázkou ohledně registrace, profilů nebo nabídek.",
     "keyboardHint": "Enter odešle · Shift+Enter: nový řádek",
     "assistantLabel": "AI asistent",
-    "dismissWelcome": "Zavřít uvítání"
+    "dismissWelcome": "Zavřít uvítání",
+    "hideLauncher": "Skrýt Genie pro tuto návštěvu",
+    "moveLauncher": "Přetažením přesunete. Na klávesnici: Alt a šipky."
   },
   "GenieWriting": {
     "open": "Napsat s Genie",

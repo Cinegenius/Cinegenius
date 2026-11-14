@@ -339,7 +339,8 @@
     "findJobsTitle": "Jobs",
     "findJobsDescription": "Jobs and assignments.",
     "findJobsLink": "Browse jobs",
-    "railPage": "View {page} of {total}"
+    "railPage": "View {page} of {total}",
+    "appComingSoon": "The CineGenius app is coming soon."
   },
   "locations": {
     "heroTitle": "The perfect location",
@@ -7481,7 +7482,9 @@
     "empty": "Start with a question about registration, profiles or offers.",
     "keyboardHint": "Enter sends · Shift+Enter: new line",
     "assistantLabel": "AI assistant",
-    "dismissWelcome": "Dismiss greeting"
+    "dismissWelcome": "Dismiss greeting",
+    "hideLauncher": "Hide Genie for this visit",
+    "moveLauncher": "Drag to move. With a keyboard: Alt and arrow keys."
   },
   "GenieWriting": {
     "open": "Write with Genie",

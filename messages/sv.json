@@ -339,7 +339,8 @@
     "findJobsTitle": "Jobb",
     "findJobsDescription": "Jobb och uppdrag.",
     "findJobsLink": "Visa jobb",
-    "railPage": "Vy {page} av {total}"
+    "railPage": "Vy {page} av {total}",
+    "appComingSoon": "CineGenius kommer snart som app."
   },
   "locations": {
     "heroTitle": "Den perfekta inspelningsplatsen",
@@ -7481,7 +7482,9 @@
     "empty": "Börja med en fråga om registrering, profiler eller erbjudanden.",
     "keyboardHint": "Enter skickar · Skift+Enter: ny rad",
     "assistantLabel": "AI-assistent",
-    "dismissWelcome": "Stäng hälsningen"
+    "dismissWelcome": "Stäng hälsningen",
+    "hideLauncher": "Dölj Genie under det här besöket",
+    "moveLauncher": "Dra för att flytta. Med tangentbord: Alt och piltangenterna."
   },
   "GenieWriting": {
     "open": "Skriv med Genie",

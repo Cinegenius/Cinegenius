@@ -5,9 +5,10 @@ import { usePathname } from "next/navigation";
 import { useSession } from "@clerk/nextjs";
 import { X } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { useCallback, useEffect, useId, useRef, useState, useSyncExternalStore } from "react";
+import { useCallback, useEffect, useId, useRef, useState, useSyncExternalStore, type RefObject } from "react";
 import { clearConversation, readConversation } from "@/lib/genie-conversation";
 import GenieWelcome from "./GenieWelcome";
+import GenieLauncher, { type GeniePosition } from "./GenieLauncher";
 import styles from "./Genie.module.css";
 
 function GenieMark() {
@@ -56,7 +57,7 @@ function messageChatOpen() {
   return document.body.dataset.messagesChatOpen === "true";
 }
 
-function AvailableGenie({ memoryScope, mode }: { memoryScope: string | null; mode: "floating" | "tool" }) {
+function AvailableGenie({ memoryScope, mode, dismissed, position, onHide, onPositionChange }: { memoryScope: string | null; mode: "floating" | "tool"; dismissed: boolean; position: RefObject<GeniePosition | null>; onHide: () => void; onPositionChange: (point: GeniePosition) => void }) {
   const t = useTranslations("Genie");
   const tools = useTranslations("AiTools");
   const pathname = usePathname();
@@ -64,10 +65,12 @@ function AvailableGenie({ memoryScope, mode }: { memoryScope: string | null; mod
   const hideLauncher = pathname === "/messages" && chatOpen;
   const [open, setOpen] = useState(false);
   const [hasOpened, setHasOpened] = useState(false);
+  const [hasMoved, setHasMoved] = useState(false);
   const launcher = useRef<HTMLButtonElement>(null);
   const panel = useRef<HTMLElement>(null);
   const request = useRef<AbortController | null>(null);
   const id = useId();
+  const launcherVisible = !open && !hideLauncher && (mode === "tool" || !dismissed);
 
   const close = useCallback((restoreFocus = true) => {
     request.current?.abort();
@@ -160,30 +163,36 @@ function AvailableGenie({ memoryScope, mode }: { memoryScope: string | null; mod
       <GenieWelcome
         key={pathname}
         memoryScope={memoryScope}
-        enabled={!open && !hasOpened && !hideLauncher}
+        enabled={!open && !hasOpened && !hasMoved && !hideLauncher && !dismissed}
         onOpen={() => { setHasOpened(true); setOpen(true); }}
         onDismiss={() => launcher.current?.focus({ preventScroll: true })}
       />
-      {!open && !hideLauncher && (
+      {mode === "floating" && <span id={`${id}-move-hint`} className={styles.inputLabel}>{t("moveLauncher")}</span>}
+      <GenieLauncher position={position} visible={mode === "floating" && launcherVisible} onHide={onHide} onMoveStart={() => setHasMoved(true)} onPositionChange={onPositionChange}>
+      {mode === "floating" && launcherVisible && (
         <button
           ref={launcher}
           type="button"
-          className={mode === "tool" ? styles.toolLauncher : styles.launcher}
+          data-genie-open=""
+          className={styles.launcher}
           aria-label={t("open")}
+          aria-describedby={`${id}-move-hint`}
           aria-controls={hasOpened ? `${id}-panel` : undefined}
           aria-expanded={false}
           aria-haspopup="dialog"
           onClick={() => { setHasOpened(true); setOpen(true); }}
         >
           <GenieMark />
-          {mode === "tool" ? <span className={styles.toolCopy}><strong>{t("name")}</strong><span>{tools("genieDescription")}</span></span> : (
           <span className={styles.launcherCopy}>
             <span className={styles.launcherName}>{t("name")}</span>
             <span className={styles.launcherLabel}>{t("assistantLabel")}</span>
           </span>
-          )}
         </button>
       )}
+      </GenieLauncher>
+      {mode === "tool" && launcherVisible && <button ref={launcher} type="button" className={styles.toolLauncher} aria-label={t("open")} aria-haspopup="dialog" aria-expanded={false} aria-controls={hasOpened ? `${id}-panel` : undefined} onClick={() => { setHasOpened(true); setOpen(true); }}>
+        <GenieMark /><span className={styles.toolCopy}><strong>{t("name")}</strong><span>{tools("genieDescription")}</span></span>
+      </button>}
       {hasOpened && (
         <section
           ref={panel}
@@ -218,6 +227,19 @@ export default function Genie({ mode = "floating" }: { mode?: "floating" | "tool
   const tools = useTranslations("AiTools");
   const { isLoaded, session } = useSession();
   const memoryScope = session?.id ?? null;
+  const [dismissed, setDismissed] = useState(false);
+  const position = useRef<GeniePosition | null>(null);
+  const rememberPosition = useCallback((point: GeniePosition) => { position.current = point; }, []);
+  useEffect(() => {
+    const reopen = () => setDismissed(false);
+    const pageShow = (event: PageTransitionEvent) => { if (event.persisted) reopen(); };
+    window.addEventListener("pageshow", pageShow);
+    window.addEventListener("cinegenius:app-resume", reopen);
+    return () => {
+      window.removeEventListener("pageshow", pageShow);
+      window.removeEventListener("cinegenius:app-resume", reopen);
+    };
+  }, []);
   const cookieVisible = useSyncExternalStore(subscribeToCookieNotice, cookieNoticeVisible, () => true);
   useEffect(() => {
     if (!isLoaded) return;
@@ -234,5 +256,5 @@ export default function Genie({ mode = "floating" }: { mode?: "floating" | "tool
     <GenieMark />
     <div className={styles.toolCopy}><strong>{t("name")}</strong><span>{tools("genieDescription")}</span><span role="status">{isLoaded ? tools("noticeFirst") : t("loading")}</span></div>
   </div>;
-  return !isLoaded || cookieVisible || replacedByTool ? null : <AvailableGenie key={memoryScope ?? "guest"} memoryScope={memoryScope} mode={mode} />;
+  return !isLoaded || cookieVisible || replacedByTool ? null : <AvailableGenie key={memoryScope ?? "guest"} memoryScope={memoryScope} mode={mode} dismissed={dismissed} position={position} onHide={() => setDismissed(true)} onPositionChange={rememberPosition} />;
 }

@@ -30,7 +30,7 @@ export const revalidate = 60;
 
 import {
   MapPin, Briefcase, ArrowRight, CheckCircle,
-  Clock, Package2, Film, Building2, UsersRound, Newspaper,
+  Clock, Package2, Film, Building2, UsersRound, Newspaper, Smartphone,
 } from "lucide-react";
 import HeroSearch from "@/components/HeroSearch";
 import HomeCommunityBoard from "@/components/HomeCommunityBoard";
@@ -401,6 +401,7 @@ export default async function HomePage() {
           </p>
           <h1 className="font-display text-4xl font-bold leading-tight tracking-tight text-text-primary lg:text-5xl">{t("heroTitle1")} <span className="text-gradient-gold">{t("heroTitle2")}</span></h1>
           <p className="mb-4 mt-3 max-w-xl text-sm leading-relaxed text-text-secondary">{t("homepageDescription")}</p>
+          <p data-home-app-notice className="mb-4 flex items-center gap-2 text-sm text-gold"><Smartphone size={18} className="shrink-0" aria-hidden="true" /><span>{t("appComingSoon")}</span></p>
           <HeroSearch />
         </div>
       {/* Finden: kompakte, direkte Einstiege in die bestehenden Verzeichnisse */}

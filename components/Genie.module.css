@@ -25,6 +25,16 @@
   box-shadow: 0 8px 26px rgb(0 0 0 / 30%), 0 0 18px rgb(195 243 36 / 16%);
 }
 
+.launcherDock { display: flex; position: fixed; right: max(1rem, env(safe-area-inset-right, 0px)); bottom: calc(var(--mobile-nav-clearance) + .5rem); z-index: 45; }
+.launcherDock[hidden] { display: none; }
+.launcherDock .launcher { position: relative; right: auto; bottom: auto; touch-action: none; user-select: none; -webkit-user-select: none; cursor: grab; }
+.launcherDock[data-dragging] .launcher { cursor: grabbing; }
+.launcherBounds { position: fixed; pointer-events: none; visibility: hidden; top: calc(var(--site-header-height, 64px) + 40px); right: max(8px, env(safe-area-inset-right, 0px)); bottom: calc(var(--mobile-nav-clearance) + 8px); left: max(8px, env(safe-area-inset-left, 0px)); }
+.hideLauncher { position: absolute; z-index: 46; top: -40px; right: -8px; display: flex; align-items: center; justify-content: center; width: 44px; height: 44px; color: var(--color-text-secondary); background: transparent; border: 0; cursor: pointer; }
+.hideLauncher svg { padding: 3px; box-sizing: content-box; border: 1px solid var(--color-border-light); border-radius: 50%; background: var(--color-bg-secondary); }
+.hideLauncher:hover { color: var(--color-gold); }
+.hideLauncher:focus-visible { outline: 2px solid var(--color-gold); border-radius: 10px; }
+
 .toolLauncher { display: flex; align-items: center; gap: 16px; width: 100%; min-height: 88px; padding: 20px; border: 1px solid var(--color-border-light); border-radius: 16px; background: var(--color-bg-secondary); color: var(--color-text-primary); text-align: left; cursor: pointer; }
 .toolLauncher:hover { border-color: var(--color-gold); }
 .toolLauncher:focus-visible { outline: 2px solid var(--color-gold); outline-offset: 3px; }
@@ -142,6 +152,8 @@
 }
 
 @media (min-width: 1024px) {
+  .launcherDock { bottom: max(1.25rem, env(safe-area-inset-bottom, 0px)); right: max(1.25rem, env(safe-area-inset-right, 0px)); }
+  .launcherBounds { bottom: max(8px, env(safe-area-inset-bottom, 0px)); }
   .welcome { bottom: calc(max(1.25rem, env(safe-area-inset-bottom, 0px)) + 56px + 12px); right: max(1.25rem, env(safe-area-inset-right, 0px)); }
   .launcher, .panel { bottom: max(1.25rem, env(safe-area-inset-bottom, 0px)); right: max(1.25rem, env(safe-area-inset-right, 0px)); }
   .panel { --genie-resting-bottom: max(1.25rem, env(safe-area-inset-bottom, 0px)); --genie-top-gap: 1.25rem; --genie-keyboard-gap: 1.25rem; bottom: max(var(--genie-resting-bottom), calc(var(--genie-keyboard-offset, 0px) + var(--genie-keyboard-gap))); }

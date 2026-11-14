@@ -339,7 +339,8 @@
     "findJobsTitle": "Állások",
     "findJobsDescription": "Állások és megbízások.",
     "findJobsLink": "Állások böngészése",
-    "railPage": "{page}. nézet, összesen {total}"
+    "railPage": "{page}. nézet, összesen {total}",
+    "appComingSoon": "A CineGenius hamarosan alkalmazásként is elérhető."
   },
   "locations": {
     "heroTitle": "A tökéletes helyszín",
@@ -7481,7 +7482,9 @@
     "empty": "Kezdd egy kérdéssel a regisztrációról, a profilokról vagy az ajánlatokról.",
     "keyboardHint": "Enter: küldés · Shift+Enter: új sor",
     "assistantLabel": "AI-asszisztens",
-    "dismissWelcome": "Üdvözlés bezárása"
+    "dismissWelcome": "Üdvözlés bezárása",
+    "hideLauncher": "Genie elrejtése erre a látogatásra",
+    "moveLauncher": "Húzd a mozgatáshoz. Billentyűzettel: Alt és nyílbillentyűk."
   },
   "GenieWriting": {
     "open": "Fogalmazás Genie-vel",
