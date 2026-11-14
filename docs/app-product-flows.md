@@ -15,6 +15,29 @@ Hauptseite übertragen. App-Vorschauen und App-spezifische Funktionen getrennt
 weiterentwickeln; eine App-Freigabe ist keine Website-Veröffentlichungsfreigabe.
 Diese Entscheidung gilt für den App-Auftrag, nicht pauschal für andere Website-Aufträge.
 
+Am 14. November hat Markus die laufende Abstimmung ausdrücklich festgelegt:
+WEB CODEX bearbeitet die Website und gibt jeden fertig geprüften Stand mit Commit,
+Prüfungen und Veröffentlichungsstatus an APP Entwicklung weiter. Hier erfolgen
+der App-/Xcode-Abgleich und die nativen Zusatzfunktionen. Unfertige Webänderungen
+und nicht freigegebene Rechtstexte werden nicht als fertiger Stand übernommen.
+App-Quellen und eigene Sprachschlüssel bleiben beim Abgleich erhalten.
+
+## Arbeitsplatz: erste native Abteilung
+
+Aktuelle Betreiberentscheidung vom 14. November: Der bisher als KI geplante
+App-Bereich heißt **Arbeitsplatz**. Er wird nach Abteilungen gegliedert. Wir starten
+mit **Locations → Grundrisse** und dem neuen nativen Raumscanner. Das bestätigte
+Gerät für echte Aufnahmen ist ein **iPhone 15 Pro**. Weitere Abteilungen folgen
+mit tatsächlich nutzbaren Funktionen, ohne zusätzliche leere Menüs.
+
+Diese Entscheidung ersetzt die unten dokumentierte frühere Zurückstellung des
+KI-Einstiegs für die App. Die fünf öffentlichen Links unten bleiben erhalten.
+Die erste native Fassung speichert Pläne mit optionalem lokalem Projekt-/Location-
+Namen geschützt auf dem Gerät. Sie behauptet keine Kontosynchronisierung oder
+Verknüpfung mit Online-Projekten. Erfasste Quelldaten bleiben bei gespeicherten
+Plänen erhalten; Weitergabe geschieht ausschließlich durch ausdrücklichen Export.
+Beispiele sind auch nach Speicherung und Export eindeutig als Beispiele markiert.
+
 ## Bedienung
 
 Instagram, Facebook, Kleinanzeigen/eBay und Airbnb dienen als Orientierung für

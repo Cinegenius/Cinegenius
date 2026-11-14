@@ -4,6 +4,7 @@ import { parseArgs } from 'node:util';
 import { fileURLToPath } from 'node:url';
 import { SUPPORTED_LOCALES, DEFAULT_LOCALE } from '../../lib/i18n/locales.ts';
 import { previewConfig } from './preview-config.mjs';
+import { prepareNativeResources } from './native-resources.mjs';
 
 const root = new URL('../', import.meta.url);
 const repository = new URL('../', root);
@@ -38,4 +39,5 @@ for (const name of ['offline.css', 'offline.js']) {
 const localeSource = await readFile(new URL('lib/i18n/locales.ts', repository), 'utf8');
 await writeFile(new URL('locale.js', output), stripTypeScriptTypes(localeSource));
 await writeFile(new URL('capacitor.config.json', root), JSON.stringify(config, null, 2) + '\n');
+await prepareNativeResources(repository, root, output, config.server.url);
 console.log(`Prepared development preview for ${config.server.url} in ${fileURLToPath(root)}`);

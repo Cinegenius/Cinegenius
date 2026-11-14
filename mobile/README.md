@@ -1,6 +1,6 @@
 # CineGenius mobile preview
 
-First development increment, 13 November 2026. This is an isolated Capacitor 8.6.2
+Development preview started 13 November 2026. This is an isolated Capacitor 8.6.2
 package with real iOS and Android projects. It loads the existing CineGenius site,
 including its server-rendered routes, shared design, nine languages and Clerk
 account flows. There is no second backend or duplicated product UI.
@@ -63,8 +63,9 @@ canonical app source is the server branch; build copies are not replacement sour
   the existing shared locale resolver is compiled for the local page. Only the
   selected local translation file loads. Native hosts forward the site's public
   `cg_locale` preference to the error page; session cookies are never forwarded.
-- No wildcard navigation, native HTTP/cookie overrides, extra plugins, new service
-  credentials, permissions for sensors, background upload or public media caches.
+- No wildcard navigation, native HTTP/cookie overrides, new service credentials,
+  background upload or public media caches. The iOS workplace uses Apple's native
+  RoomPlan, camera permission and device-owner authentication as described below.
   External top-level links use Capacitor's system-browser behavior. Cross-domain
   auth handoffs, MFA and return links still require dedicated signed-in testing.
 - Native files are versioned; generated web assets/config, dependencies, signing
@@ -72,6 +73,33 @@ canonical app source is the server branch; build copies are not replacement sour
 - New social/media requirements are recorded in
   [`docs/app-product-flows.md`](../docs/app-product-flows.md); they are not yet
   implemented by this first preview.
+
+## Native workplace and floor plans
+
+The iOS-only **Arbeitsplatz → Locations → Grundrisse** area adds a new RoomPlan
+scanner for supported LiDAR devices, including the intended iPhone 15 Pro. Select
+the **CineGenius Arbeitsplatz** Xcode scheme to open it directly, or use the app
+icon's quick action. The bundled app-only menu adapter also opens it from the
+existing tools row in the public menu. The five bottom links remain unchanged.
+
+Plans stay in protected local storage, independent of the CineGenius account and
+excluded from backups. Opening the private library requires device-owner
+authentication. Sharing PDF/available USDZ files and deleting plans are explicit
+actions. Example plans are labelled throughout and do not establish real scan
+accuracy. All UI and permission text is generated from the existing nine message
+catalogs by `prepare:preview`; run `sync` after changes.
+
+See [the scanner's design and test boundaries](../docs/native-workplace-room-scanner.md).
+Native core tests run on macOS with:
+
+```sh
+swift test --package-path ios/RoomScannerCore
+```
+
+For a free direct iPhone test, use the existing Apple Account's Personal Team in
+Xcode, connect and trust the device, and enable Developer Mode when requested.
+TestFlight requires paid Apple Developer Program membership and a reviewed
+release architecture; the current non-Debug build guard remains in place.
 
 ## Why this is explicitly a preview
 
