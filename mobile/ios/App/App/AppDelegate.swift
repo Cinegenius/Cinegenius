@@ -8,6 +8,14 @@ import WebKit
 
 class CineGeniusViewController: CAPBridgeViewController {
     private var loadingObservation: NSKeyValueObservation?
+    var isOpeningWorkplace = false
+    weak var workplaceContentController: WKUserContentController?
+    var requestsWorkplace = ProcessInfo.processInfo.arguments.contains("--cinegenius-workplace") || ProcessInfo.processInfo.arguments.contains("--cinegenius-room-scanner")
+
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        if requestsWorkplace { requestsWorkplace = false; openWorkplace() }
+    }
 
     private func placeWebViewInsideSafeArea() {
         guard let webView, view === webView else { return }
@@ -32,6 +40,7 @@ class CineGeniusViewController: CAPBridgeViewController {
     override func capacitorDidLoad() {
         super.capacitorDidLoad()
         placeWebViewInsideSafeArea()
+        installWorkplaceMenu()
         webView?.allowsBackForwardNavigationGestures = true
         statusBarStyle = .lightContent
         loadingObservation = webView?.observe(\.isLoading, options: [.new]) { [weak self] view, _ in
@@ -66,7 +75,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     var window: UIWindow?
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
-        // Override point for customization after application launch.
+        application.shortcutItems = [UIApplicationShortcutItem(type: "co.cinegenius.app.preview.workplace", localizedTitle: ScannerStrings().text("workplaceTitle"), localizedSubtitle: nil, icon: UIApplicationShortcutIcon(systemImageName: "square.grid.2x2"), userInfo: nil)]
         return true
     }
 
