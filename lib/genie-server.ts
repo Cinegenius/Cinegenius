@@ -4,7 +4,9 @@ import { createHmac } from "node:crypto";
 import { isIP } from "node:net";
 import { GENIE_LINKS, GENIE_LOCALES, GENIE_MAX_MESSAGE_CHARS, buildGenieInstructions, type validateGenieRequest } from "@/lib/genie";
 import { getTranslations } from "next-intl/server";
-import { CREW_SEARCH_INSTRUCTIONS, CREW_SEARCH_SCHEMA, crewSearchLinks, DIRECTORY_SEARCH_INSTRUCTIONS, DIRECTORY_SEARCH_SCHEMA, directorySearchLinks } from "@/lib/genie-search-server";
+import { crewSearchLinks, directorySearchLinks } from "@/lib/genie-search-server";
+import { SEARCH_WISH_SCHEMA } from "@/lib/unified-search";
+import { UNIFIED_SEARCH_INSTRUCTIONS, unifiedSearchLinks } from "@/lib/unified-search-plan-server";
 import { rateLimit } from "@/lib/rateLimit";
 import { GenieError } from "@/lib/genie-error";
 export { GenieError } from "@/lib/genie-error";
@@ -15,14 +17,16 @@ const PROVIDER_TIMEOUT_MS = 25_000;
 const PROVIDER_URL = "https://api.openai.com/v1/responses";
 
 type GenieRequest = Extract<ReturnType<typeof validateGenieRequest>, { ok: true }>["value"];
-export type GenieConfiguration = { apiKey: string; dailyLimit: number };
+export type GenieConfiguration = { apiKey: string; personalQuality: boolean };
 
-export function genieConfiguration(): GenieConfiguration {
+function isPersonalGenieAccount(userId: string | null): boolean {
+  return !!userId && userId === process.env.GENIE_UNLIMITED_USER_ID?.trim();
+}
+
+export function genieConfiguration(userId: string | null = null): GenieConfiguration {
   const apiKey = process.env.OPENAI_API_KEY?.trim();
   if (!apiKey || process.env.GENIE_ENABLED?.trim().toLowerCase() === "false") throw new GenieError("unavailable", 503);
-  const configuredLimit = process.env.GENIE_DAILY_REQUEST_LIMIT?.trim();
-  if (configuredLimit && !/^(?:[1-9]\d{0,2}|1000)$/.test(configuredLimit)) throw new GenieError("unavailable", 503);
-  return { apiKey, dailyLimit: configuredLimit ? Number(configuredLimit) : 200 };
+  return { apiKey, personalQuality: isPersonalGenieAccount(userId) };
 }
 
 /** Bound actual streamed bytes, including requests without Content-Length. */
@@ -75,12 +79,16 @@ export async function reserveGenieUsage(request: Request, userId: string | null,
   const identity = userId ? digest(`genie:user:${userId}`) : ip;
   const actor = userId ? "member" : "guest";
   const day = new Date().toISOString().slice(0, 10);
-  const reservations: [string, number, number][] = [
+  // Only the operator-selected, verified account is exempt from daily ceilings.
+  // Minute guards remain; neither admin status nor client claims grant this.
+  const unlimited = isPersonalGenieAccount(userId);
+  const reservations: [string, number, number][] = unlimited ? [
     [`genie:ip:minute:${ip}`, 20, 60],
-    [`genie:ip:day:${day}:${ip}`, 100, 86400],
+    [`genie:member:minute:${identity}`, 10, 60],
+  ] : [
+    [`genie:ip:minute:${ip}`, 20, 60],
     [`genie:${actor}:minute:${identity}`, userId ? 10 : 5, 60],
-    [`genie:${actor}:day:${day}:${identity}`, userId ? 60 : 20, 86400],
-    [`genie:global:day:${day}`, config.dailyLimit, 86400],
+    [`genie:${actor}:day:${day}:${identity}`, userId ? 30 : 20, 86400],
   ];
   for (const [key, limit, window] of reservations) {
     request.signal.throwIfAborted();
@@ -99,6 +107,9 @@ async function safeAdvice(value: unknown, input: GenieRequest) {
   if (!record(value) || value.status !== "completed" || value.error || !Array.isArray(value.output)) throw new GenieError("failed", 502);
   const text: string[] = [];
   for (const message of value.output) {
+    // Reasoning models may return metadata before their final message. Never
+    // expose or replay that metadata; only validated final JSON is actionable.
+    if (record(message) && message.type === "reasoning") continue;
     if (!record(message) || message.type !== "message" || message.role !== "assistant" || !Array.isArray(message.content)) throw new GenieError("failed", 502);
     for (const content of message.content) {
       if (!record(content) || content.type !== "output_text" || typeof content.text !== "string") throw new GenieError("failed", 502);
@@ -106,7 +117,7 @@ async function safeAdvice(value: unknown, input: GenieRequest) {
     }
   }
   const advice: unknown = JSON.parse(text.join(""));
-  if (!record(advice) || Object.keys(advice).some(key => !["reply", "linkIds", "language", ...(input.writing ? [] : ["crewSearches", "directorySearches"])].includes(key))
+  if (!record(advice) || Object.keys(advice).some(key => !["reply", "linkIds", "language", ...(input.writing ? [] : ["searches", "crewSearches", "directorySearches"])].includes(key))
     || typeof advice.reply !== "string" || !advice.reply.trim() || advice.reply.length > GENIE_MAX_MESSAGE_CHARS
     || !Array.isArray(advice.linkIds) || advice.linkIds.some(id => typeof id !== "string")
     || (input.writing ? advice.language !== input.locale : typeof advice.language !== "string" || !GENIE_LOCALES.includes(advice.language))) throw new GenieError("failed", 502);
@@ -118,7 +129,9 @@ async function safeAdvice(value: unknown, input: GenieRequest) {
   }
   const language = advice.language as string;
   const t = await getTranslations({ locale: language, namespace: "Genie.destinations" });
-  const searches = [...await crewSearchLinks(advice.crewSearches ?? [], language), ...await directorySearchLinks(advice.directorySearches ?? [], language)];
+  const searches = advice.searches !== undefined
+    ? await unifiedSearchLinks(advice.searches, language)
+    : [...await crewSearchLinks(advice.crewSearches ?? [], language), ...await directorySearchLinks(advice.directorySearches ?? [], language)];
   if (searches.length > 3) throw new GenieError("failed", 502);
   const ids = [...new Set(advice.linkIds as string[])].slice(0, 4);
   // Labels and destinations always come from our catalogue, never model URLs.
@@ -141,12 +154,13 @@ export async function generateGenieAdvice(request: Request, input: GenieRequest,
       redirect: "error",
       signal,
       body: JSON.stringify({
-        model: "gpt-4.1-mini",
+        model: config.personalQuality ? "gpt-6-astra" : "gpt-4.1-mini",
         store: false,
-        max_output_tokens: 600,
+        max_output_tokens: config.personalQuality ? 8192 : input.writing ? 600 : 2400,
+        ...(config.personalQuality ? { service_tier: "ultrafast", reasoning: { effort: "low" } } : {}),
         instructions: input.writing
           ? buildGenieInstructions(input.area, input.locale, input.writing)
-          : `${buildGenieInstructions(input.area, input.locale)}\nReturn plain JSON matching the provided schema. Keep reply below ${GENIE_MAX_MESSAGE_CHARS} characters. ${CREW_SEARCH_INSTRUCTIONS}\n${DIRECTORY_SEARCH_INSTRUCTIONS} Follow the supported language guidance above, prioritizing the latest user message. Select only catalogue linkIds; never put URLs or Markdown links in reply.`,
+          : `${buildGenieInstructions(input.area, input.locale)}\nReturn plain JSON matching the provided schema. Keep reply below ${GENIE_MAX_MESSAGE_CHARS} characters. ${UNIFIED_SEARCH_INSTRUCTIONS} Follow the supported language guidance above, prioritizing the latest user message. Select only catalogue linkIds; never put URLs or Markdown links in reply.`,
         input: input.messages.map(message => ({ role: message.role, content: message.content })),
         text: { format: {
           type: "json_schema", name: "genie_advice", strict: true,
@@ -155,10 +169,10 @@ export async function generateGenieAdvice(request: Request, input: GenieRequest,
             properties: {
               reply: { type: "string" },
               linkIds: { type: "array", ...(input.writing ? { maxItems: 0 } : {}), items: { type: "string", enum: GENIE_LINKS.map(link => link.id) } },
-              ...(!input.writing ? { crewSearches: CREW_SEARCH_SCHEMA, directorySearches: DIRECTORY_SEARCH_SCHEMA } : {}),
+              ...(!input.writing ? { searches: SEARCH_WISH_SCHEMA } : {}),
               language: { type: "string", enum: input.writing ? [input.locale] : GENIE_LOCALES },
             },
-            required: ["reply", "linkIds", "language", ...(!input.writing ? ["crewSearches", "directorySearches"] : [])],
+            required: ["reply", "linkIds", "language", ...(!input.writing ? ["searches"] : [])],
           },
         } },
       }),

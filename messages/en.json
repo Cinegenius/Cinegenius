@@ -8204,5 +8204,33 @@
       "friends": "Accepted friends only",
       "hidden": "Only me"
     }
+  },
+  "UnifiedSearch": {
+    "title": "Cross-directory search",
+    "tab": "All areas",
+    "intro": "Search for crew, offers and places together.",
+    "placeholder": "Model in Berlin and boat in Hamburg …",
+    "submit": "Search",
+    "showResults": "Show combined results",
+    "understanding": "Interpreting your search …",
+    "loading": "Loading results …",
+    "emptyGroup": "No matching visible entries for this part of the search.",
+    "continueSearch": "More entries can still be searched.",
+    "more": "Show more",
+    "error": "The search could not load. Your input has been kept.",
+    "retry": "Try again",
+    "signInRequired": "Sign in to combine searches with Genie.",
+    "withinRadius": "{place} · within {radius} km",
+    "areas": {
+      "crew": "Crew",
+      "marketplace": "Marketplace",
+      "locations": "Locations",
+      "companies": "Companies",
+      "jobs": "Jobs",
+      "projects": "Projects",
+      "news": "News",
+      "organizations": "Organizations",
+      "animals": "Film animals"
+    }
   }
 }

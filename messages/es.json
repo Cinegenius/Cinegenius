@@ -8204,5 +8204,33 @@
       "friends": "Solo amigos confirmados",
       "hidden": "Solo yo"
     }
+  },
+  "UnifiedSearch": {
+    "title": "Búsqueda conjunta",
+    "tab": "Todas las áreas",
+    "intro": "Busca profesionales, anuncios y lugares a la vez.",
+    "placeholder": "Modelo en Berlín y barco en Hamburgo …",
+    "submit": "Buscar",
+    "showResults": "Ver resultados conjuntos",
+    "understanding": "Interpretando tu búsqueda …",
+    "loading": "Cargando resultados …",
+    "emptyGroup": "No hay entradas visibles que coincidan con esta parte de la búsqueda.",
+    "continueSearch": "Aún se pueden buscar más entradas.",
+    "more": "Mostrar más",
+    "error": "No se pudo cargar la búsqueda. Tu texto se ha conservado.",
+    "retry": "Reintentar",
+    "signInRequired": "Inicia sesión para combinar búsquedas con Genie.",
+    "withinRadius": "{place} · radio de {radius} km",
+    "areas": {
+      "crew": "Equipo",
+      "marketplace": "Mercado",
+      "locations": "Locaciones",
+      "companies": "Empresas",
+      "jobs": "Empleos",
+      "projects": "Proyectos",
+      "news": "Noticias",
+      "organizations": "Organizaciones",
+      "animals": "Animales de rodaje"
+    }
   }
 }

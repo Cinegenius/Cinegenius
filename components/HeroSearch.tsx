@@ -7,6 +7,7 @@ import { useTranslations } from "next-intl";
 
 function getLocalizedTabs(translate: (key: string) => string) {
   return ([
+  { id: "all", label: translate("UnifiedSearch.tab"), placeholder: translate("UnifiedSearch.placeholder"), href: "/search" },
   { id: "locations", label: translate("nav.locations"), placeholder: translate("Ui.text_64869d31081bb8"),    href: "/locations" },
   { id: "crew",      label: translate("nav.crew"),      placeholder: translate("Ui.text_323d7dd4417e20"), href: "/creators" },
   { id: "equipment", label: translate("companies.groupAusstattung"), placeholder: translate("Ui.text_debf8074d5b54f"),   href: "/props" },
@@ -19,7 +20,7 @@ export default function HeroSearch() {
   const tabs = getLocalizedTabs(uiText);
 
   const router = useRouter();
-  const [activeTab, setActiveTab] = useState("locations");
+  const [activeTab, setActiveTab] = useState("all");
   const [query, setQuery] = useState("");
   const [city, setCity] = useState("");
 
@@ -29,8 +30,9 @@ export default function HeroSearch() {
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     const params = new URLSearchParams();
+    if (activeTab === "all") params.set("smart", "1");
     if (query.trim()) params.set("q", query.trim());
-    if (city.trim()) params.set(cityParam, city.trim());
+    if (activeTab !== "all" && city.trim()) params.set(cityParam, city.trim());
     const qs = params.toString();
     router.push(`${tab.href}${qs ? `?${qs}` : ""}`);
   };
@@ -62,12 +64,14 @@ export default function HeroSearch() {
         method="get"
         className="flex min-h-[52px] items-center overflow-hidden rounded-xl border border-border bg-bg-secondary shadow-sm transition-colors focus-within:border-gold"
       >
+        {activeTab === "all" && <input type="hidden" name="smart" value="1" />}
         {/* Query */}
         <div className="flex items-center gap-2 flex-1 px-4">
           <Search size={15} className="text-text-muted shrink-0" />
           <input
             type="text"
             name="q"
+            maxLength={2000}
             aria-label={tab.placeholder}
             value={query}
             onChange={(e) => setQuery(e.target.value)}
@@ -77,7 +81,7 @@ export default function HeroSearch() {
         </div>
 
         {/* City — hidden on mobile */}
-        <div className="hidden sm:flex items-center gap-2 px-4 w-40 border-l border-border/60">
+        {activeTab !== "all" && <div className="hidden sm:flex items-center gap-2 px-4 w-40 border-l border-border/60">
           <MapPin size={14} className="text-text-muted shrink-0" />
           <input
             type="text"
@@ -88,7 +92,7 @@ export default function HeroSearch() {
             placeholder={uiText("creators.filterCity")}
             className="w-full py-4 text-sm bg-transparent focus:outline-none placeholder:text-text-muted text-text-primary"
           />
-        </div>
+        </div>}
 
         {/* Button */}
         <button

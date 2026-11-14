@@ -8204,5 +8204,33 @@
       "friends": "Nur bestätigte Freunde",
       "hidden": "Nur ich"
     }
+  },
+  "UnifiedSearch": {
+    "title": "Übergreifende Suche",
+    "tab": "Übergreifend",
+    "intro": "Crew, Angebote und Orte gemeinsam suchen.",
+    "placeholder": "Model in Berlin und Boot in Hamburg …",
+    "submit": "Suchen",
+    "showResults": "Gemeinsame Ergebnisse anzeigen",
+    "understanding": "Suchwünsche werden zugeordnet …",
+    "loading": "Treffer werden geladen …",
+    "emptyGroup": "Keine passenden sichtbaren Einträge für diesen Suchteil.",
+    "continueSearch": "Weitere Einträge können noch durchsucht werden.",
+    "more": "Mehr anzeigen",
+    "error": "Die Suche konnte nicht geladen werden. Deine Eingabe bleibt erhalten.",
+    "retry": "Erneut versuchen",
+    "signInRequired": "Melde dich an, um Suchwünsche mit Genie zu kombinieren.",
+    "withinRadius": "{place} · {radius} km Umkreis",
+    "areas": {
+      "crew": "Crew",
+      "marketplace": "Marktplatz",
+      "locations": "Locations",
+      "companies": "Firmen",
+      "jobs": "Jobs",
+      "projects": "Projekte",
+      "news": "News",
+      "organizations": "Organisationen",
+      "animals": "Filmtiere"
+    }
   }
 }

@@ -1,7 +1,9 @@
 import { COUNTRY_CODES } from "./places/countries";
+import { searchPlanFromHref } from "./unified-search";
 
 /** Read-only links only. Never accept model-generated URLs, paths or write endpoints. */
 export function isGenieSearchHref(href: string): boolean {
+  if (searchPlanFromHref(href)) return true;
   if (isGenieCrewSearchHref(href)) return true;
   const path = href.split("?", 1)[0];
   if (!["/props", "/locations"].includes(path) || !href.includes("?") || href.length > 1800 || /[\\\u0000-\u001f#]/.test(href)) return false;

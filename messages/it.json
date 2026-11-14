@@ -8204,5 +8204,33 @@
       "friends": "Solo amici confermati",
       "hidden": "Solo io"
     }
+  },
+  "UnifiedSearch": {
+    "title": "Ricerca trasversale",
+    "tab": "Tutte le sezioni",
+    "intro": "Cerca insieme professionisti, annunci e luoghi.",
+    "placeholder": "Modella a Berlino e barca ad Amburgo …",
+    "submit": "Cerca",
+    "showResults": "Mostra i risultati insieme",
+    "understanding": "Interpretazione della ricerca …",
+    "loading": "Caricamento dei risultati …",
+    "emptyGroup": "Nessuna voce visibile corrisponde a questa parte della ricerca.",
+    "continueSearch": "È ancora possibile cercare altre voci.",
+    "more": "Mostra altro",
+    "error": "Impossibile caricare la ricerca. Il testo è stato conservato.",
+    "retry": "Riprova",
+    "signInRequired": "Accedi per combinare le ricerche con Genie.",
+    "withinRadius": "{place} · entro {radius} km",
+    "areas": {
+      "crew": "Crew",
+      "marketplace": "Mercato",
+      "locations": "Location",
+      "companies": "Aziende",
+      "jobs": "Lavori",
+      "projects": "Progetti",
+      "news": "Notizie",
+      "organizations": "Organizzazioni",
+      "animals": "Animali da set"
+    }
   }
 }

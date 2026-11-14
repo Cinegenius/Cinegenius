@@ -8204,5 +8204,33 @@
       "friends": "Csak visszaigazolt ismerősök",
       "hidden": "Csak én"
     }
+  },
+  "UnifiedSearch": {
+    "title": "Keresés több területen",
+    "tab": "Minden terület",
+    "intro": "Keress együtt stábot, ajánlatokat és helyszíneket.",
+    "placeholder": "Modell Berlinben és hajó Hamburgban …",
+    "submit": "Keresés",
+    "showResults": "Összesített találatok megtekintése",
+    "understanding": "Keresési kérések értelmezése …",
+    "loading": "Találatok betöltése …",
+    "emptyGroup": "Ehhez a keresési részhez nincs megfelelő látható bejegyzés.",
+    "continueSearch": "További bejegyzések kereshetők.",
+    "more": "Továbbiak",
+    "error": "A keresés nem tölthető be. A beírt szöveg megmaradt.",
+    "retry": "Újrapróbálkozás",
+    "signInRequired": "Jelentkezz be a keresések Genie-vel való kombinálásához.",
+    "withinRadius": "{place} · {radius} km-es körzet",
+    "areas": {
+      "crew": "Stáb",
+      "marketplace": "Piac",
+      "locations": "Helyszínek",
+      "companies": "Cégek",
+      "jobs": "Állások",
+      "projects": "Projektek",
+      "news": "Hírek",
+      "organizations": "Szervezetek",
+      "animals": "Filmes állatok"
+    }
   }
 }

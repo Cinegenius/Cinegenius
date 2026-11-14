@@ -1,8 +1,9 @@
 "use client";
 import BrowseResultCount from "@/components/BrowseResultCount";
 
-import MediaImage from "@/components/MediaImage";
-import ListingImage from "@/components/ListingImage";
+import ResultCard, { getLocalizedTypeConfig } from "@/components/SearchResultCard";
+import dynamic from "next/dynamic";
+
 import { ANIMAL_DEPARTMENT_LABEL } from "@/lib/animal-taxonomy";
 import { useViewUrl } from "@/lib/use-view-url";
 import {
@@ -15,11 +16,10 @@ MapPin,
 Package,
 PawPrint,
 Search,
-User,
 Users,
 X,
 } from "lucide-react";
-import { useLocale,useTranslations } from "next-intl";
+import { useTranslations } from "next-intl";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { Suspense,useCallback,useEffect,useRef,useState } from "react";
@@ -55,27 +55,6 @@ function getLocalizedSUGGESTIONS(translate: (key: string) => string) { return ([
   translate("Ui.text_ae6b424c00c367"),
 ]); }
 
-function getLocalizedTypeConfig(translate: (key: string) => string): Record<string, {
-  label: string;
-  pluralLabel: string;
-  icon: React.ComponentType<{ size?: number; className?: string }>;
-  href: (id: string) => string;
-  color: string;
-  bgColor: string;
-}> {
-  return ({
-  profile:  { label: translate("nav.crew"),        pluralLabel: translate("nav.crew"),        icon: User,      href: (id) => `/profile/${id}`,   color: "text-gold",          bgColor: "bg-gold/10 border-gold/20"      },
-  creator:  { label: translate("nav.crew"),        pluralLabel: translate("nav.crew"),        icon: Users,     href: (id) => `/profile/${id}`,   color: "text-gold",          bgColor: "bg-gold/10 border-gold/20"      },
-  location: { label: translate("profile.labelLocation"),     pluralLabel: translate("nav.locations"),    icon: MapPin,    href: (id) => `/locations/${id}`, color: "text-sky-400",        bgColor: "bg-sky-500/10 border-sky-500/20"   },
-  vehicle:  { label: translate("AdminAccounts.contentKinds.vehicle"),    pluralLabel: translate("footer.links_vehicles"),   icon: Car,       href: (id) => `/vehicles/${id}`,  color: "text-orange-400",    bgColor: "bg-orange-500/10 border-orange-500/20" },
-  prop:     { label: translate("Ui.text_27c673e10176f0"),   pluralLabel: translate("search.typeProps"),  icon: Package,   href: (id) => `/props/${id}`,     color: "text-violet-400",    bgColor: "bg-violet-500/10 border-violet-500/20" },
-  job:      { label: translate("AdminAccounts.contentKinds.job"),         pluralLabel: translate("nav.jobs"),        icon: Briefcase, href: (id) => `/jobs/${id}`,      color: "text-emerald-400",   bgColor: "bg-emerald-500/10 border-emerald-500/20" },
-  animal: {label: ANIMAL_DEPARTMENT_LABEL, pluralLabel: ANIMAL_DEPARTMENT_LABEL, icon: PawPrint, href: id => `/tiere/${id}`, color: "text-amber-400", bgColor: "bg-amber-500/10 border-amber-500/20"},
-  company:  { label: translate("AdminReview.types.company"),       pluralLabel: translate("nav.companies"),      icon: Building2, href: (id) => `/companies/${id}`, color: "text-blue-400",      bgColor: "bg-blue-500/10 border-blue-500/20" },
-});
-}
-
-
 function getLocalizedTABS(translate: (key: string) => string) {
   return ([
   { id: "all",      label: translate("common.all"),       icon: Search   },
@@ -87,72 +66,6 @@ function getLocalizedTABS(translate: (key: string) => string) {
   { id: "company",  label: translate("nav.companies"),     icon: Building2 },
   {id:"animal", label:ANIMAL_DEPARTMENT_LABEL, icon:PawPrint},
 ] as const);
-}
-
-function ResultCard({ result }: { result: Result }) {
-  const uiText = useTranslations();
-  const typeConfig = getLocalizedTypeConfig(uiText);
-
-  const uiLocale = useLocale();
-
-  const animals = useTranslations("FilmAnimals");
-  const cfg = typeConfig[result.type];
-  if (!cfg) return null;
-  const Icon = cfg.icon;
-  const isProfile = result.type === "profile" || result.type === "creator";
-  const PreviewImage = ["location", "vehicle", "prop", "animal"].includes(result.type) ? ListingImage : MediaImage;
-
-  return (
-    <Link
-      href={cfg.href(result.id)}
-      className="group flex flex-col bg-bg-secondary border border-border rounded-xl overflow-hidden hover:border-gold/40 transition-all hover:shadow-lg hover:shadow-black/20"
-    >
-      {/* Image */}
-      <div className="relative aspect-video bg-bg-elevated overflow-hidden">
-        {result.image ? (
-          <PreviewImage
-            fill sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 360px" mediaSize="thumbnail"
-            src={result.image}
-            alt={result.title}
-            className={`w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ${isProfile ? "object-top" : "object-center"}`}
-          />
-        ) : (
-          <div className={`w-full h-full flex items-center justify-center border ${cfg.bgColor}`}>
-            <Icon size={32} className={`${cfg.color} opacity-40`} />
-          </div>
-        )}
-        {/* Type badge */}
-        <div className={`absolute top-2.5 left-2.5 flex items-center gap-1.5 px-2 py-1 rounded-full text-[10px] font-semibold border backdrop-blur-sm ${cfg.bgColor}`}>
-          <Icon size={10} className={cfg.color} />
-          <span className={cfg.color}>{result.type === "animal" ? animals("portfolio") : cfg.label}</span>
-        </div>
-        {/* Availability dot for profiles */}
-        {isProfile && result.available !== null && (
-          <div className={`absolute top-2.5 right-2.5 w-2.5 h-2.5 rounded-full border-2 border-bg-secondary ${result.available ? "bg-success" : "bg-text-muted"}`}
-            title={result.available ? uiText("common.available") : uiText("common.booked")} />
-        )}
-      </div>
-
-      {/* Content */}
-      <div className="p-4 flex-1 flex flex-col">
-        <h3 className="font-semibold text-sm text-text-primary mb-1 leading-tight line-clamp-2 group-hover:text-gold transition-colors">
-          {result.title}
-        </h3>
-        <p className="text-xs text-text-muted line-clamp-1 flex-1">{result.subtitle}</p>
-        {!isProfile && result.type !== "animal" && (result.priceLabel || result.price > 0) && (
-          <p className="mt-2 text-sm font-semibold font-mono text-gold">
-            {result.priceLabel ?? uiText("Ui.text_4519fabedb2cbd", { value1: String(result.price.toLocaleString(uiLocale)) })}
-          </p>
-        )}
-        {isProfile && (
-          <div className="mt-2 flex items-center gap-1">
-            <span className={`w-1.5 h-1.5 rounded-full ${result.available ? "bg-success" : "bg-text-muted"}`} />
-            <span className="text-xs text-text-muted">{result.available ? uiText("common.available") : uiText("creators.currentlyBooked")}</span>
-          </div>
-        )}
-      </div>
-    </Link>
-  );
 }
 
 // ─── Empty State ───────────────────────────────────────────────────────────────
@@ -210,7 +123,7 @@ function SearchContent() {
   const [activeTab, setActiveTab] = useState(initialType);
   const [results, setResults] = useState<Result[]>([]);
   const [availableTypes, setAvailableTypes] = useState<string[]>([]);
-  const searchSerial = useRef(0);
+  const searchSerial = useRef({ value: 0 });
   const [searchError, setSearchError] = useState(false);
   const [loading, setLoading] = useState(false);
   const [hasSearched, setHasSearched] = useState(!!initialQ);
@@ -218,7 +131,7 @@ function SearchContent() {
   const inputRef = useRef<HTMLInputElement>(null);
 
   const doSearch = useCallback(async (q: string, tab?: string) => {
-    const serial = ++searchSerial.current;
+    const serial = ++searchSerial.current.value;
     if (q.length < 2) { setResults([]); setAvailableTypes([]); setLoading(false); return; }
     setSearchError(false);
     setLoading(true);
@@ -228,45 +141,29 @@ function SearchContent() {
       const res = await fetch(`/api/search?q=${encodeURIComponent(q)}${t !== "all" ? `&type=${t}` : ""}`);
       if (!res.ok) throw new Error("search_unavailable");
       const { results: data, availableTypes: types } = await res.json();
-      if (serial !== searchSerial.current) return;
+      if (serial !== searchSerial.current.value) return;
       setResults(data ?? []); setAvailableTypes(types ?? []);
     } catch {
-      if (serial === searchSerial.current) { setResults([]); setSearchError(true); }
+      if (serial === searchSerial.current.value) { setResults([]); setSearchError(true); }
     } finally {
-      if (serial === searchSerial.current) setLoading(false);
+      if (serial === searchSerial.current.value) setLoading(false);
     }
   }, [activeTab]);
 
-  // Run initial search if query from URL
+  // One debounced request per input/tab change, including the initial URL.
   useEffect(() => {
-    if (initialQ) doSearch(initialQ);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  // Debounced search on input
-  useEffect(() => {
-    if (debounceRef.current) clearTimeout(debounceRef.current);
-    if (!inputValue.trim()) {
-      ++searchSerial.current; setAvailableTypes([]); setLoading(false);
-      setResults([]);
-      setQuery("");
-      setHasSearched(false);
-      return;
-    }
-    setLoading(true);
+    const counter = searchSerial.current;
+    ++counter.value;
     debounceRef.current = setTimeout(() => {
+      if (!inputValue.trim()) {
+        setAvailableTypes([]); setLoading(false); setResults([]); setQuery(""); setHasSearched(false);
+        return;
+      }
       setQuery(inputValue.trim());
-      doSearch(inputValue.trim());
+      doSearch(inputValue.trim(), activeTab);
     }, 250);
-    return () => { if (debounceRef.current) clearTimeout(debounceRef.current); };
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [inputValue]);
-
-  // Re-search on tab change; URL updates are navigation-guarded below.
-  useEffect(() => {
-    if (query.length >= 2) doSearch(query, activeTab);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [activeTab]);
+    return () => { if (debounceRef.current) clearTimeout(debounceRef.current); ++counter.value; };
+  }, [inputValue, activeTab, doSearch]);
 
   const filterParams = new URLSearchParams();
   if (inputValue.trim()) filterParams.set("q", inputValue.trim());
@@ -340,7 +237,7 @@ function SearchContent() {
               {SUGGESTIONS.map((s) => (
                 <button
                   key={s}
-                  onClick={() => { setInputValue(s); doSearch(s); setQuery(s); setHasSearched(true); }}
+                  onClick={() => { setInputValue(s); }}
                   className="px-3 py-1.5 text-xs border border-border text-text-secondary rounded-full hover:border-gold/50 hover:text-gold transition-all"
                 >
                   {(uiOptionLabels[s] ?? s)}
@@ -402,7 +299,7 @@ function SearchContent() {
                 return (
                   <Link
                     key={key}
-                    href={cfg.href("").replace("/", "") || "#"}
+                    href={key === "profile" ? "/creators" : cfg.href("")}
                     className={`flex flex-col items-center gap-2 p-3 rounded-xl border ${cfg.bgColor} hover:scale-105 transition-transform`}
                   >
                     <Icon size={18} className={cfg.color} />
@@ -459,6 +356,12 @@ function SearchContent() {
   );
 }
 
+const UnifiedSearchResults = dynamic(() => import("@/components/UnifiedSearchResults"));
+function SearchRoute() {
+  const params = useSearchParams();
+  return params.has("plan") || params.get("smart") === "1" ? <UnifiedSearchResults /> : <SearchContent />;
+}
+
 export default function SearchPage() {
   return (
     <Suspense fallback={
@@ -466,7 +369,7 @@ export default function SearchPage() {
         <Loader2 size={24} className="animate-spin text-gold" />
       </div>
     }>
-      <SearchContent />
+      <SearchRoute />
     </Suspense>
   );
 }
