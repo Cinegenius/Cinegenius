@@ -7439,7 +7439,7 @@
     }
   },
   "SupportMediation": {
-    "genieSummary": "Az önálló szervezés ingyenes. Ha megállapodás alapján ügyfélszolgálatunk intézi a bérlést, az 5%-os részesedést a teljes bérleti díj már tartalmazza. A választható extrák később fizetőssé válhatnak. A profilok mindig ingyenesek maradnak, a nyitott közösségért.",
+    "genieSummary": "A regisztráció és az alapfunkciók ingyenesek maradnak – egy erős közösségért. Előre közölt jutalék csak a támogatói csapattal egyeztetett, sikeres közvetítés esetén fizetendő. Az opcionális extrák a jövőben díjkötelesek lehetnek.",
     "heading": "Közvetítés a CineGenius Support segítségével",
     "startup": "A CineGenius jelenleg az indulási szakaszban van. Platformunkat és szolgáltatásainkat lépésről lépésre fejlesztjük, és örömmel fogadjuk visszajelzéseidet.",
     "free": "A regisztráció, a profilok, a hirdetések, a keresés és a platformon keresztüli közvetlen kapcsolatfelvétel jelenleg ingyenes.",
@@ -8215,6 +8215,7 @@
     "membersOnly": "Csak tagoknak",
     "submit": "Keresés",
     "showResults": "Összesített találatok megtekintése",
+    "ready": "A keresés elkészült. Az eredményeket területenként találod.",
     "understanding": "Keresési kérések értelmezése …",
     "loading": "Találatok betöltése …",
     "emptyGroup": "Ehhez a keresési részhez nincs megfelelő látható bejegyzés.",

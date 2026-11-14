@@ -155,16 +155,16 @@ export default function UnifiedSearchResults() {
         </div>}
       </div>
     </div>
-    {resultScope === scope && !loading && !error && <div className="site-container space-y-10 py-7">
+    {resultScope === scope && !loading && !error && <div className="site-container space-y-7 py-5">
       {SEARCH_AREAS.map(area => {
         const visible = groups.filter(group => group.area === area && (group.results.length || group.nextOffset !== null || plan?.searches[group.wishIndex].area !== "all"));
         if (!visible.length) return null;
         return <section key={area} aria-label={t(`areas.${area}`)}>
-          <h2 className="mb-4 font-serif text-2xl text-text-primary">{t(`areas.${area}`)}</h2>
-          <div className="space-y-7">{visible.map(group => <section key={groupKey(group)} aria-label={group.label}>
-            <h3 className="mb-3 break-words text-sm font-semibold text-gold">{group.label}</h3>
+          <h2 className="mb-3 font-serif text-2xl text-text-primary">{t(`areas.${area}`)}</h2>
+          <div className="space-y-5">{visible.map(group => <section key={groupKey(group)} aria-label={group.label}>
+            <h3 className="mb-2 break-words text-sm font-semibold text-gold">{group.label}</h3>
             {!group.results.length && <p className="text-sm text-text-muted">{group.nextOffset !== null ? t("continueSearch") : t("emptyGroup")}</p>}
-            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3">{group.results.map(result => <ResultCard key={`${result.type}:${result.id}`} result={result} compact />)}</div>
+            <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 xl:grid-cols-3">{group.results.map(result => <ResultCard key={`${result.type}:${result.id}`} result={result} compact />)}</div>
             {moreErrors.includes(groupKey(group)) && <p role="alert" className="mt-3 text-sm text-text-secondary">{t("error")}</p>}
             {group.nextOffset !== null && <button type="button" disabled={morePending.includes(groupKey(group))} onClick={() => more(group)} className="mt-3 min-h-11 rounded-lg border border-border px-4 text-sm text-text-secondary hover:text-gold disabled:opacity-50">{morePending.includes(groupKey(group)) ? t("loading") : t("more")}</button>}
           </section>)}</div>

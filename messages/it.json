@@ -7439,7 +7439,7 @@
     }
   },
   "SupportMediation": {
-    "genieSummary": "Organizzare tutto in autonomia è gratuito. Se concordi la gestione del noleggio con il nostro team di supporto, il 5% è incluso nel prezzo totale. Gli extra facoltativi potranno essere a pagamento in futuro. I profili resteranno sempre gratuiti, per una community aperta.",
+    "genieSummary": "La registrazione e le funzioni di base restano gratuite, per una community forte. Solo le intermediazioni concordate e concluse con successo dal supporto prevedono una commissione comunicata in anticipo. In futuro, gli extra facoltativi potranno essere a pagamento.",
     "heading": "Intermediazione di CineGenius Support",
     "startup": "CineGenius è attualmente nella fase iniziale di sviluppo. Ampliamo gradualmente la piattaforma e i nostri servizi e accogliamo volentieri i tuoi suggerimenti.",
     "free": "La registrazione, i profili, gli annunci, le ricerche e il contatto diretto tramite la piattaforma sono attualmente gratuiti.",
@@ -8215,6 +8215,7 @@
     "membersOnly": "Solo per i membri",
     "submit": "Cerca",
     "showResults": "Mostra i risultati insieme",
+    "ready": "La ricerca è pronta. Consulta i risultati suddivisi per area.",
     "understanding": "Interpretazione della ricerca …",
     "loading": "Caricamento dei risultati …",
     "emptyGroup": "Nessuna voce visibile corrisponde a questa parte della ricerca.",

@@ -7439,7 +7439,7 @@
     }
   },
   "SupportMediation": {
-    "genieSummary": "Organising things yourself is free. When agreed rental handling goes through our support team, 5% is included in the total rental price. Optional extras may become paid features later. Profiles will always be free — for an open community.",
+    "genieSummary": "Registration and basic features remain free – for a strong community. A commission disclosed in advance applies only to agreed, successful support-mediated arrangements. Optional extras may carry a charge in future.",
     "heading": "Rental brokerage by CineGenius Support",
     "startup": "CineGenius is currently in its start-up phase. We are developing our platform and services step by step and welcome your feedback.",
     "free": "Registration, profiles, listings, searches and direct contact through the platform are currently free.",
@@ -8215,6 +8215,7 @@
     "membersOnly": "Members only",
     "submit": "Search",
     "showResults": "Show combined results",
+    "ready": "Your search is ready. View the results grouped by area.",
     "understanding": "Interpreting your search …",
     "loading": "Loading results …",
     "emptyGroup": "No matching visible entries for this part of the search.",

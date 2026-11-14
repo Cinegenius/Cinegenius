@@ -7439,7 +7439,7 @@
     }
   },
   "SupportMediation": {
-    "genieSummary": "Att ordna allt själv är gratis. Vid avtalad uthyrningshantering genom vårt supportteam ingår 5 % i det totala hyrespriset. Valfria tillägg kan bli avgiftsbelagda senare. Profiler förblir alltid gratis, för en öppen community.",
+    "genieSummary": "Registrering och grundfunktioner förblir gratis – för en stark gemenskap. En provision som meddelats i förväg gäller endast vid avtalad, framgångsrik förmedling via supporten. Valfria tillägg kan bli avgiftsbelagda i framtiden.",
     "heading": "Förmedling genom CineGenius Support",
     "startup": "CineGenius befinner sig för närvarande i uppstartsfasen. Vi utvecklar vår plattform och våra tjänster steg för steg och tar gärna emot dina synpunkter.",
     "free": "Registrering, profiler, annonser, sökning och direktkontakt via plattformen är för närvarande kostnadsfria.",
@@ -8215,6 +8215,7 @@
     "membersOnly": "Endast för medlemmar",
     "submit": "Sök",
     "showResults": "Visa samlade resultat",
+    "ready": "Din sökning är klar. Visa resultaten grupperade efter område.",
     "understanding": "Tolkar din sökning …",
     "loading": "Laddar resultat …",
     "emptyGroup": "Inga matchande synliga poster för den här delen av sökningen.",

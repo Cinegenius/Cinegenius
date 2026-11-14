@@ -130,7 +130,7 @@ async function safeAdvice(value: unknown, input: GenieRequest) {
   const language = advice.language as string;
   const t = await getTranslations({ locale: language, namespace: "Genie.destinations" });
   const searches = advice.searches !== undefined
-    ? await unifiedSearchLinks(advice.searches, language)
+    ? await unifiedSearchLinks(advice.searches, language, input.messages.filter(message => message.role === "user").at(-1)?.content)
     : [...await crewSearchLinks(advice.crewSearches ?? [], language), ...await directorySearchLinks(advice.directorySearches ?? [], language)];
   if (searches.length > 3) throw new GenieError("failed", 502);
   const ids = [...new Set(advice.linkIds as string[])].slice(0, 4);
@@ -139,6 +139,12 @@ async function safeAdvice(value: unknown, input: GenieRequest) {
     const link = GENIE_LINKS.find(candidate => candidate.id === id);
     return link ? [{ href: link.href, label: t(link.id) }] : [];
   });
+  // A structured search is the single results entry point. Broad catalogue
+  // shortcuts can otherwise lose every interpreted keyword and place.
+  if (advice.searches !== undefined && searches.length) {
+    const searchText = await getTranslations({ locale: language, namespace: "UnifiedSearch" });
+    return { reply: searchText("ready"), links: searches, language };
+  }
   return { reply: advice.reply.trim(), links: [...searches, ...links].slice(0, 4), language };
 }
 
@@ -147,6 +153,16 @@ export async function generateGenieAdvice(request: Request, input: GenieRequest,
   const signal = AbortSignal.any([request.signal, timeout]);
   try {
     signal.throwIfAborted();
+    if (!input.writing) {
+      const lastRequest = input.messages.filter(message => message.role === "user").at(-1)?.content ?? "";
+      // Complete catalogue keyword requests need no paid interpretation. Auth,
+      // membership and quota checks still happen at the normal route boundary.
+      const links = await unifiedSearchLinks([], input.locale, lastRequest);
+      if (links.length) {
+        const t = await getTranslations({ locale: input.locale, namespace: "UnifiedSearch" });
+        return { reply: t("ready"), links, language: input.locale };
+      }
+    }
     // Reuse the confirmed, localized support terms instead of asking the model
     // to infer a marketplace business model. Keep this out of member-written drafts.
     let pricingInstructions = "";

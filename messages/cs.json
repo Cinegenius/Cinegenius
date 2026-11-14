@@ -7439,7 +7439,7 @@
     }
   },
   "SupportMediation": {
-    "genieSummary": "Samostatné vyřízení je zdarma. Při dohodnutém vyřízení pronájmu přes náš tým podpory je 5 % zahrnuto v celkové ceně. Volitelné doplňky mohou být později placené. Profily zůstanou vždy zdarma, aby komunita zůstala otevřená.",
+    "genieSummary": "Registrace a základní funkce zůstávají zdarma – pro silnou komunitu. Předem oznámená provize se účtuje pouze za dohodnuté a úspěšné zprostředkování týmem podpory. Volitelné doplňky mohou být v budoucnu zpoplatněny.",
     "heading": "Zprostředkování přes CineGenius Support",
     "startup": "CineGenius je nyní v počáteční fázi rozvoje. Naši platformu a služby postupně rozvíjíme a uvítáme vaši zpětnou vazbu.",
     "free": "Registrace, profily, inzeráty, vyhledávání a přímý kontakt prostřednictvím platformy jsou nyní zdarma.",
@@ -8215,6 +8215,7 @@
     "membersOnly": "Pouze pro členy",
     "submit": "Hledat",
     "showResults": "Zobrazit společné výsledky",
+    "ready": "Vyhledávání je připraveno. Zobrazte výsledky podle oblastí.",
     "understanding": "Zpracovávání požadavků …",
     "loading": "Načítání výsledků …",
     "emptyGroup": "Pro tuto část hledání nejsou žádné odpovídající viditelné záznamy.",
