@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { useTranslations } from "next-intl";
+import { getTranslations } from "next-intl/server";
 import { getTranslations as getMetadataTranslations } from "next-intl/server";
 
 
@@ -12,11 +12,11 @@ export async function generateMetadata(): Promise<import("next").Metadata> {
 };
 }
 
-export default function ImpressumPage() {
-  const uiText = useTranslations();
+export default async function ImpressumPage() {
+  const uiText = await getTranslations({ locale: "de" });
 
   return (
-    <div className="pt-16 min-h-screen min-w-0 bg-bg-primary [overflow-wrap:anywhere]">
+    <div lang="de" className="pt-16 min-h-screen min-w-0 bg-bg-primary [overflow-wrap:anywhere]">
       <div className="max-w-2xl mx-auto px-4 py-16">
 
         <div className="mb-10">
@@ -30,11 +30,14 @@ export default function ImpressumPage() {
           <section>
             <h2 className="text-base font-semibold text-text-primary mb-2">{uiText("profile.catAnbieterLabel")}</h2>
             <p className="text-sm leading-relaxed">{uiText.rich("Ui.text_59953c926d89a1", { part1: () => (<br />), part2: () => (<br />), part3: () => (<br />) })}</p>
+            <p className="text-sm leading-relaxed mt-3">{uiText("LegalOperators.coOperator")}</p>
           </section>
 
           <section>
             <h2 className="text-base font-semibold text-text-primary mb-2">{uiText("Organizations.contact")}</h2>
             <p className="text-sm leading-relaxed">{uiText.rich("Ui.text_8b69039703389c", { part1: chunks => (<a href="tel:+491713866624" className="text-gold hover:underline">{chunks}</a>), part2: () => (<br />), part3: chunks => (<a href="mailto:cinegenius.co@gmail.com" className="text-gold hover:underline">{chunks}</a>) })}</p>
+            <p className="text-sm leading-relaxed mt-3"><a href="mailto:m.schmidt.d@hotmail.com" className="text-gold hover:underline">{uiText("LegalOperators.coOperatorEmail")}</a></p>
+            <p className="text-sm leading-relaxed mt-3">{uiText("LegalOperators.dsaContact")}</p>
           </section>
 
           <section>

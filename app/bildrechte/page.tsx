@@ -6,8 +6,8 @@ export async function generateMetadata() {
   return { alternates: { canonical: "https://www.cinegenius.co/bildrechte" }, title: t("pageTitle"), description: t("pageDescription") };
 }
 export default async function ImageRightsPage() {
-  const t = await getTranslations("ProjectMediaRights");
-  return <main className="min-h-screen pb-12">
+  const t = await getTranslations({ locale: "de", namespace: "ProjectMediaRights" });
+  return <main lang="de" className="min-h-screen pb-12">
     <PageHeader badge={t("pageTitle")} title={t("pageHeading")} description={t("pageDescription")} />
     <div className="site-container space-y-5 py-6 sm:py-9">
       <p className="max-w-3xl text-sm leading-7 text-text-secondary">{t("pageBody")}</p>

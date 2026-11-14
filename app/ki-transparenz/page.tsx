@@ -9,10 +9,16 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function AiTransparencyPage() {
-  const t = await getTranslations("AiTransparency");
-  return <main className="min-h-screen pb-12">
+  const t = await getTranslations({ locale: "de", namespace: "AiTransparency" });
+  return <main lang="de" className="min-h-screen pb-12">
     <PageHeader badge={t("badge")} title={t("title")} description={t("description")} />
     <div className="site-container space-y-6 py-6 sm:py-9">
+      <section aria-labelledby="ai-genie" className="rounded-xl border border-border bg-bg-secondary p-5 sm:p-6">
+        <h2 id="ai-genie" className="font-display text-xl font-bold text-text-primary">{t("genieTitle")}</h2>
+        <p className="mt-3 max-w-3xl text-sm leading-7 text-text-secondary">{t("genieBody")}</p>
+        <p className="mt-3 max-w-3xl text-sm leading-7 text-text-secondary">{t("genieData")}</p>
+        <Link href="/datenschutz#section-9" className="mt-2 inline-flex min-h-11 items-center text-sm text-gold hover:underline">{t("privacyLink")}</Link>
+      </section>
       <section aria-labelledby="ai-development" className="rounded-xl border border-border bg-bg-secondary p-5 sm:p-6">
         <h2 id="ai-development" className="font-display text-xl font-bold text-text-primary">{t("developmentTitle")}</h2>
         <p className="mt-3 max-w-3xl text-sm leading-7 text-text-secondary">{t("developmentBody")}</p>

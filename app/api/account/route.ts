@@ -2,15 +2,18 @@ import { db } from "@/lib/db";
 import { requireAuth } from "@/lib/auth";
 import { clerkClient } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
+import { getTranslations } from "next-intl/server";
 
-// DELETE /api/account — delete all user data and Clerk account
+// DELETE /api/account — current account deletion steps, not an exhaustive erasure ledger.
 export async function DELETE() {
   const authResult = await requireAuth();
   if (authResult instanceof NextResponse) return authResult;
   const { userId } = authResult;
 
-  // Delete all Supabase data for this user in parallel
-  await Promise.allSettled([
+  const t = await getTranslations("System");
+  // Supabase resolves SQL failures as { error }; allSettled alone hides them.
+  // Never destroy the login if any of the current data-deletion steps failed.
+  const results = await Promise.allSettled([
     db.from("profiles").delete().eq("user_id", userId),
     db.from("listings").delete().eq("user_id", userId),
     db.from("conversations").delete().or(`sender_id.eq.${userId},receiver_id.eq.${userId}`),
@@ -25,9 +28,17 @@ export async function DELETE() {
     db.from("user_settings").delete().eq("user_id", userId),
   ]);
 
+  if (results.some(result => result.status === "rejected" || result.value.error)) {
+    return NextResponse.json({ error: t("requestFailed") }, { status: 503 });
+  }
+
   // Delete Clerk user last (invalidates the session)
-  const clerk = await clerkClient();
-  await clerk.users.deleteUser(userId);
+  try {
+    const clerk = await clerkClient();
+    await clerk.users.deleteUser(userId);
+  } catch {
+    return NextResponse.json({ error: t("requestFailed") }, { status: 503 });
+  }
 
   return NextResponse.json({ success: true });
 }

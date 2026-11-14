@@ -32,6 +32,13 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 - See `docs/design-and-release.md` for the reference rules, deployment project and release procedure.
 - Message read state is per-user in `message_reads`; unread counts must be derived from `unread_message_counts`, never reset at login. Group chat access and membership must remain server-checked, with join-time history boundaries and admin-only management. Apply and verify the production Supabase migration before releasing dependent app code; see `docs/design-and-release.md`.
 
+## Ongoing legal maintenance (operator request, 14 November 2026)
+
+- Markus explicitly requests that legal information be kept up to date whenever functionality is added or changed. Review the affected terms, privacy, imprint, image-rights and AI-transparency pages as part of every feature, integration and release, and update them in the same change when their statements change. This is an ongoing development rule, not permission to enable the disabled daily agent or create a scheduled legal monitor.
+- Match statements to actual production data flows, recipients, storage, visibility, ranking, moderation, payments and consent behavior. Verify legal changes against current primary sources. Do not invent operator details, contract terms, processing agreements, certifications, consent, retention periods or exemptions. Keep a dated evidence/review note and disclose unresolved operational or legal dependencies before claiming completion.
+- Preserve the design unless separately requested. Keep one German legal original until reviewed translations exist; localize the language notice and ordinary controls. New purposes or materially changed terms may require separate information, agreement or consent; editing the page never supplies that consent retroactively.
+- Markus confirmed Mathias Schmidt as a co-operator on 14 November 2026, contact m.schmidt.d@hotmail.com, and said no formal legal form or registration is currently established. Do not invent a registered entity or assume this excludes a civil-law partnership. The serviceable business address for Mathias/the joint operation and allocation of data-protection responsibility remain unconfirmed; see docs/legal-review/2026-11-14/README.md. No additional tax/register identifiers have been supplied.
+
 ## Mandatory localization for all changes
 
 - Use the existing next-intl catalogs in `messages/{de,en,es,it,cs,hu,nl,nl-BE,sv}.json` for all new or changed interface and system copy: pages, buttons, accessible labels, validation, errors, statuses, categories, notifications, and application-generated email. Update every supported language in the same change. Never add a parallel translation system or hard-coded German UI copy.

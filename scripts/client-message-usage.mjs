@@ -3,9 +3,9 @@ import path from 'node:path';
 import {fileURLToPath} from 'node:url';
 import ts from 'typescript';
 
-// These flat, statically named namespaces contain substantial server-only copy.
+// These statically named namespaces contain substantial server-only copy.
 // Keep every other namespace intact, including all dynamic taxonomy labels.
-const namespaces = ['Ui', 'System', 'Metadata', 'TransactionalEmail', 'NotificationCopy'];
+const namespaces = ['Ui', 'System', 'Metadata', 'TransactionalEmail', 'NotificationCopy', 'LegalTerms', 'LegalPrivacy', 'LegalOperators'];
 export function clientMessageOmissions(root = process.cwd()) {
   const files = new Map();
   const walk = dir => { if (!existsSync(dir)) return; for (const entry of readdirSync(dir, {withFileTypes:true})) {

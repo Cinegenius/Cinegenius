@@ -1244,7 +1244,7 @@
     "empty": "Kies voor de koppeling een werkzaamheid uit de beroepencatalogus. Je bestaande gegevens blijven behouden."
   },
   "legalLanguage": {
-    "original": "De oorspronkelijke Duitse versie van deze juridische teksten is bepalend. De vertalingen zijn bedoeld om de tekst begrijpelijker te maken."
+    "original": "Deze juridische documenten zijn momenteel beschikbaar in het Duitse origineel. Gecontroleerde vertalingen zijn nog niet beschikbaar."
   },
   "navigationStability": {
     "newMessages": "Nieuwe berichten tonen"
@@ -1988,7 +1988,11 @@
     "backHome": "Naar de startpagina",
     "imageLabel": "AI-gegenereerd",
     "imageLabelAccessible": "Door AI gegenereerd websitebeeld — informatie over AI-gebruik openen",
-    "contactEmail": "cinegenius.co@gmail.com"
+    "contactEmail": "cinegenius.co@gmail.com",
+    "genieTitle": "Genie und die KI-Schreibhilfe",
+    "genieBody": "Genie antwortet als künstliche Intelligenz, nicht als Mensch. Auch Textvorschläge der Schreibhilfe werden durch KI erstellt. Die Nutzung ist freiwillig. Antworten können falsch oder unvollständig sein und sollten vor der Verwendung geprüft werden. Sie sind keine Buchungs-, Zahlungs- oder Veröffentlichungsbestätigung und ersetzen keine fachliche Prüfung.",
+    "genieData": "Erst beim Absenden werden dein eingegebener Text und ein begrenzter Kontext zur Beantwortung an die OpenAI-API übermittelt. Genie liest nicht automatisch private Chats oder Dokumente und trifft keine Moderationsentscheidungen. Bitte keine Passwörter oder vertraulichen Daten eingeben. Die Datenschutzerklärung erläutert Verarbeitung, lokale Speicherung und Anbieterprotokolle.",
+    "privacyLink": "Datenverarbeitung bei Genie"
   },
   "ProjectMediaRights": {
     "title": "Beeldrechten voor dit project",
@@ -2008,12 +2012,12 @@
       "license": "Licentie / contractuele toestemming"
     },
     "pageTitle": "Beeldrechten en meldingen",
-    "pageDescription": "Informatie over projectbeelden en het melden van ontbrekende rechten.",
-    "pageHeading": "Voor projectbeelden is een gebruiksgrondslag nodig",
-    "pageBody": "Projectposters en projectfoto's worden pas openbaar getoond nadat een verantwoordelijke persoon de bevoegdheid voor de specifieke afbeeldingen heeft bevestigd. Zo'n bevestiging is geen controle door een overheidsinstantie en vervangt geen daadwerkelijk vereiste toestemming.",
+    "pageDescription": "Hinweise zu Fotos, Logos, Plakaten und anderen Uploads auf CineGenius.",
+    "pageHeading": "Bilder brauchen eine passende Nutzungsgrundlage",
+    "pageBody": "Lade nur Bilder hoch, die du für den vorgesehenen Zweck verwenden darfst. Neben Urheberrechten können insbesondere Persönlichkeitsrechte abgebildeter Menschen, Markenrechte und Vertraulichkeitsvereinbarungen betroffen sein. Ein Bild auf IMDb, Crew United oder einer anderen Website ist dadurch nicht frei nutzbar. Projektbilder benötigen die Bestätigung einer berechtigten Person; diese ersetzt keine tatsächlich erforderliche Erlaubnis. Fotos und Logos bleiben freiwillig.",
     "reportTitle": "Een afbeelding melden",
-    "reportBody": "Stuur ons de projectlink, een aanduiding van de betreffende afbeelding en een beschrijving van het probleem. Als je zelf rechten claimt, licht dan toe wie de rechthebbende is en hoe we je kunnen bereiken. We beoordelen de melding en kunnen de weergave tijdens het onderzoek opschorten.",
-    "limitBody": "Een download of beeldvermelding alleen verleent geen gebruiksrechten. De persoon die publiceert, blijft verantwoordelijk voor een juiste bevestiging.",
+    "reportBody": "Bitte sende uns die genaue Internetadresse und Bezeichnung des betroffenen Bildes, die nachvollziehbare Begründung der vermuteten Rechtsverletzung sowie deinen Namen und deine E-Mail-Adresse. Erkläre bitte, dass die Angaben nach bestem Wissen richtig und vollständig sind. Wenn du eigene Rechte geltend machst, erläutere deine Berechtigung. Gesetzliche Ausnahmen von Namens- und E-Mail-Angaben bleiben unberührt. Bitte keine rechtswidrigen Dateien erneut senden. Mit elektronischen Kontaktdaten erhältst du eine Eingangsbestätigung und die Entscheidung mit Hinweisen zu verfügbaren Rechtsbehelfen.",
+    "limitBody": "Deine Rechte bleiben bei dir beziehungsweise den Rechteinhabern. Die Nutzungsbefugnis von CineGenius ist auf den Plattformbetrieb und die von dir verwendeten Sichtbarkeiten beschränkt. Sie umfasst notwendige Vorschaubilder und Formatumwandlungen, aber keine allgemeine externe Werbung oder KI-Trainingslizenz. Erforderliche Urheberangaben sind zu erhalten. Die Einzelheiten regeln die AGB.",
     "reportLink": "Beeldrechten verduidelijken of melden",
     "email": "cinegenius.co@gmail.com"
   },
@@ -3828,13 +3832,13 @@
     "text_392f82517d6087": "Verantwoordelijk voor de inhoud (§ 18 lid 2 MStV)",
     "text_3a79768b0c5e34": "Markus Müller<part1></part1>Plinganserstrasse 19<part2></part2>81369 München",
     "text_0e0f042ca4ca20": "Consumentengeschillenbeslechting",
-    "text_6fb5eb1d0c3729": "We zijn niet bereid en niet verplicht deel te nemen aan geschillenbeslechting voor een consumentengeschillencommissie.",
+    "text_6fb5eb1d0c3729": "Wir sind nicht bereit, freiwillig an Streitbeilegungsverfahren vor einer Verbraucherschlichtungsstelle teilzunehmen. Eine bestehende gesetzliche Pflicht bleibt unberührt. Besondere Rechte nach dem Digital Services Act und der Rechtsweg bleiben ebenfalls unberührt.",
     "text_22e92ec30d50b7": "Aansprakelijkheid voor inhoud",
-    "text_d93309c5419122": "Voor eigen inhoud gelden de algemene wettelijke voorschriften. Inhoud van leden wordt door hen aangeleverd. Meldingen over onrechtmatige inhoud kunnen met de link naar die inhoud naar cinegenius.co@gmail.com worden gestuurd. We beoordelen zulke meldingen en nemen de noodzakelijke maatregelen volgens de toepasselijke voorschriften.",
+    "text_d93309c5419122": "Für eigene Inhalte gelten die allgemeinen gesetzlichen Vorschriften. Inhalte von Mitgliedern werden von diesen bereitgestellt. Meldungen vermuteter Rechtsverletzungen können ohne Konto an cinegenius.co@gmail.com gerichtet werden. Bitte nenne die genaue Fundstelle, die Begründung, deinen Namen und eine erreichbare E-Mail-Adresse und erkläre, dass die Angaben nach bestem Wissen richtig und vollständig sind. Gesetzliche Ausnahmen von der Namens- und E-Mail-Angabe, insbesondere bei bestimmten Sexualstraftaten gegen Kinder, bleiben bestehen. Bitte keine rechtswidrigen Dateien erneut zusenden. Mit elektronischen Kontaktdaten erhältst du eine Eingangsbestätigung und die Entscheidung mit Hinweisen zu verfügbaren Rechtsbehelfen.",
     "text_34f4597f12bd1b": "Aansprakelijkheid voor links",
-    "text_0e63af6cbe9e76": "Ons aanbod bevat links naar externe websites van derden waarop we inhoudelijk geen invloed hebben. Daarom kunnen we voor deze externe inhoud ook geen garantie geven. De aanbieder of beheerder van de gelinkte pagina's is steeds verantwoordelijk voor de inhoud. De gelinkte pagina's zijn bij het plaatsen van de link gecontroleerd op mogelijke rechtsschendingen. Op dat moment was geen onrechtmatige inhoud herkenbaar.",
+    "text_0e63af6cbe9e76": "Externe Links führen zu Angeboten anderer Verantwortlicher. Ein Link übernimmt deren Inhalte nicht pauschal als eigene. Eigene gesetzliche Prüf- und Handlungspflichten bleiben bestehen; konkrete Hinweise auf rechtswidrige Verlinkungen kannst du an den genannten Kontakt senden.",
     "text_afdd5134162384": "Auteursrecht",
-    "text_16ad6355c1b7ce": "De inhoud en werken die de websitebeheerder op deze pagina's heeft gemaakt, vallen onder het Duitse auteursrecht. Verveelvoudiging, bewerking, verspreiding en elke vorm van exploitatie buiten de grenzen van het auteursrecht vereisen schriftelijke toestemming van de betreffende auteur of maker. Downloads en kopieën van deze website zijn uitsluitend toegestaan voor privégebruik zonder commercieel doel.",
+    "text_16ad6355c1b7ce": "Soweit Inhalte urheberrechtlich geschützt sind, liegen die Rechte bei den jeweiligen Rechteinhabern. Ihre Verwendung richtet sich nach erteilten Lizenzen und gesetzlichen Erlaubnissen. Ein öffentlicher Abruf ist keine allgemeine Weiterverwendungserlaubnis. Gesetzlich zulässige Nutzungen werden durch diesen Hinweis nicht ausgeschlossen.",
     "text_c49fae8449f318": "<part1>Privacyverklaring →</part1><part2>Algemene voorwaarden →</part2>",
     "text_cf1be3c121724a": "Afdeling of functie zoeken …",
     "text_83c7721f81c99b": "Afdeling of functie zoeken",
@@ -8113,5 +8117,282 @@
     "notices": "Meldingen",
     "unread": "Berichten: {chats} ongelezen chatberichten, {notices} meldingen",
     "readError": "Markeren als gelezen is niet gelukt. Probeer het opnieuw."
+  },
+  "LegalTerms": {
+    "title": "Allgemeine Geschäftsbedingungen",
+    "date": "Stand: 14. November 2026",
+    "badge": "Rechtliches",
+    "s1": {
+      "title": "§ 1 Betreiber und Geltung",
+      "p1": "CineGenius wird von Markus Müller und Mathias Schmidt betrieben. Kontakt Markus Müller: Plinganserstraße 19, 81369 München, Deutschland; <contact>cinegenius.co@gmail.com</contact>. Kontakt Mathias Schmidt: <coContact>m.schmidt.d@hotmail.com</coContact>.",
+      "p2": "Diese Bedingungen regeln den Nutzungsvertrag für CineGenius. Vor der Registrierung sind sie über den Hinweis am Registrierungsformular abrufbar. Mit dem Erstellen des Kontos stimmst du den dort verlinkten Bedingungen zu. Der bloße Besuch der Website ist keine Zustimmung. Für bestehende Verträge gelten Änderungen nur, soweit sie wirksam vereinbart werden; die Veröffentlichung einer neuen Fassung ersetzt keine erforderliche Zustimmung."
+    },
+    "s2": {
+      "title": "§ 2 Was CineGenius anbietet",
+      "p1": "CineGenius ermöglicht, Personen, Firmen, Drehorte, Equipment, Fahrzeuge, Requisiten, Dienstleistungen und weitere unterstützte Angebote zu entdecken und zu präsentieren. Dazu gehören Crew- und Talentprofile, Firmen und Teams, Projekte und Referenzen, Jobs, Schwarzes Brett, Medien, Favoriten, Bewertungen sowie Nachrichten und Support.",
+      "p2": "CineGenius stellt die technischen Funktionen zur Verfügung. Ein Konto, ein öffentliches Personenprofil, ein Firmenprofil und ein einzelnes Inserat sind unterschiedliche Einträge. Die Einrichtung eines Kontos veröffentlicht nicht automatisch sämtliche dazugehörigen Inhalte."
+    },
+    "s3": {
+      "title": "§ 3 Konto und Vertretung",
+      "p1": "Ein eigenes Konto setzt Volljährigkeit voraus. Halte die für dein Konto und Angebot erforderlichen Angaben richtig und aktuell. Schütze deine Zugangsdaten und melde einen vermuteten unberechtigten Zugriff an den Support. Pro Person ist grundsätzlich ein Konto vorgesehen; Ausnahmen bedürfen einer Vereinbarung mit CineGenius. Firmen und Angebote können innerhalb der vorgesehenen Verwaltungsfunktionen zugeordnet werden.",
+      "p2": "Wenn du für eine Firma oder eine andere Person handelst, benötigst du die entsprechende Berechtigung. Die technische Erstellung eines Eintrags macht dich nicht automatisch zum tatsächlichen Anbieter. Die Zuordnung der verantwortlichen Person und des Anbieters muss stimmen.",
+      "p3": "Eine öffentliche Funktion wie „Geschäftsführer/in“ oder „Inhaber/in“ verleiht keine technischen Verwaltungsrechte. Firmenzugehörigkeiten werden erst nach der vorgesehenen Bestätigung öffentlich angezeigt. Anfragen, Einladungen und Verwaltungsrechte dürfen nicht zur ungeprüften Übernahme einer fremden Firma genutzt werden."
+    },
+    "s4": {
+      "title": "§ 4 Entwürfe und Veröffentlichung",
+      "p1": "Du kannst Inhalte im Rahmen der verfügbaren Entwurfsfunktionen privat vorbereiten. Die jeweiligen Schritte zeigen, ob du nur speicherst, zur Prüfung einreichst oder veröffentlichst. Fotos und Logos sind freiwillig. Fehlende freiwillige Angaben allein begründen keine allgemeine Veröffentlichungssperre.",
+      "p2": "Eine technische Adminfreigabe allein ersetzt keine erforderliche Veröffentlichungsgrundlage. Ein nur privat gespeicherter, noch nicht eingereichter Entwurf darf nicht allein deshalb öffentlich werden, weil ein Admin Zugriff darauf hat. Eine Freigabe im Auftrag setzt die entsprechende Berechtigung und Veröffentlichungsabsicht voraus.",
+      "p3": "Berechtigte Anbieter können Marktplatzobjekte und Fahrzeuge ausdrücklich selbst veröffentlichen, wenn die erforderlichen persönlichen Anbieterangaben vorliegen. Bestehende Adminsperren bleiben wirksam. Locations, Tierportfolios und andere prüfpflichtige Angebote benötigen eine ausdrückliche Freigabe. Wesentliche Inhalts-, Bild- oder Anbieteränderungen können eine erneute Prüfung erfordern. Projekte beginnen als private Entwürfe; Mitglieder können sie ausdrücklich veröffentlichen, nur CineGenius-Admins können Projektangaben als geprüft kennzeichnen.",
+      "p4": "Ein Firmenprofil wird bei der ausdrücklich angekündigten Speicherung durch eine berechtigte Person öffentlich. Bereits bestehende private Firmen werden nicht allein durch eine neue technische Funktion veröffentlicht. Für persönliche Profile gelten der eigene Abschluss der Einrichtung und die gewählten Sichtbarkeitsregeln.",
+      "p5": "Eine Adminfreigabe ist keine umfassende rechtliche, fachliche oder sicherheitstechnische Prüfung. Auch ein Prüfzeichen bestätigt nur die bei diesem Zeichen ausdrücklich erläuterte Prüfung. Daraus folgen insbesondere keine allgemeine Garantie für Identität, Qualifikation, Bildrechte, Versicherungen oder die Erfüllung eines Angebots."
+    },
+    "s5": {
+      "title": "§ 5 Angaben und zulässige Inhalte",
+      "p1": "Beschreibe Angebote wahrheitsgemäß und so, dass Interessierte die wesentlichen Eigenschaften und Bedingungen verstehen können. Das gilt insbesondere für Kategorie, Verfügbarkeit, Preis, Preiseinheit, Verkauf oder Vermietung, Standort und die tatsächliche Anbieterzuordnung. Kennzeichne eine Verhandlungsbasis oder einen Preis auf Anfrage als solche; daraus folgt kein kostenloses Angebot.",
+      "p2": "Du bist für die von dir angebotenen Waren und Leistungen sowie dafür erforderliche Erlaubnisse verantwortlich. Wenn du gewerblich gegenüber Verbrauchern anbietest, musst du die für dein Angebot geltenden Informations- und Verbraucherpflichten erfüllen. Bezeichne ein gewerbliches Angebot nicht irreführend als privates Angebot.",
+      "p3": "Unzulässig sind insbesondere rechtswidrige Inhalte und Angebote, Betrug, Identitätstäuschung, rechtsverletzende Uploads, Bedrohung, Belästigung, diskriminierende Herabsetzung, verbotene sexuelle Inhalte, Schadsoftware sowie Spam und manipulierte Bewertungen. Gesetzlich geschützte Kritik und zulässige Meinungsäußerungen werden dadurch nicht ausgeschlossen.",
+      "p4": "Die Altersfreigabe eines Films ist keine pauschale Erlaubnis für seine Herstellung oder die Beschäftigung von Mitwirkenden. Die jeweils geltenden Vorschriften zu Jugendschutz, Beschäftigung, Persönlichkeitsrechten und gegebenenfalls Tierhaltung und Tiertraining sind gesondert einzuhalten. Ein Tierportfolio ist keine automatische Freigabe zum Verkauf oder zur Vermietung lebender Tiere."
+    },
+    "s6": {
+      "title": "§ 6 Rechte an Fotos und anderen Inhalten",
+      "p1": "Lade nur Fotos, Logos, Texte, Videos und sonstige Inhalte hoch, die du für den jeweiligen Zweck auf CineGenius verwenden darfst. Dazu können neben dem Urheberrecht insbesondere Rechte abgebildeter Personen, Markenrechte, vertragliche Vertraulichkeit und Rechte an dargestellten Werken gehören. Gesetzliche Ausnahmen sind im jeweiligen Fall zu berücksichtigen.",
+      "p2": "Dass du ein Foto selbst aufgenommen hast, es im Internet gefunden hast oder darauf zu sehen bist, gibt dir nicht automatisch alle erforderlichen Veröffentlichungsrechte. Ein auf einer anderen Plattform veröffentlichtes Filmplakat ist dadurch nicht frei zur Übernahme. Auch eine technische Rechtebestätigung im Formular ersetzt keine tatsächlich erforderliche Erlaubnis.",
+      "p3": "Nenne erforderliche Urheberangaben in den dafür vorgesehenen Feldern. Gib Rechteerklärungen nur ab, soweit du dazu berechtigt bist. Bei konkreten Zweifeln an einer Veröffentlichung kann CineGenius die zur Klärung notwendigen Angaben oder geeignete Nachweise anfordern. Vertrauliche Nachweise dürfen nicht ungeprüft als öffentliche Bildbeschreibung eingestellt werden."
+    },
+    "s7": {
+      "title": "§ 7 Begrenzte Nutzung für den Plattformbetrieb",
+      "p1": "Deine bestehenden Rechte bleiben bei dir beziehungsweise den jeweiligen Rechteinhabern. Du räumst CineGenius ein einfaches, unentgeltliches und auf den Betrieb der von dir verwendeten Plattformfunktionen begrenztes Nutzungsrecht ein. Es umfasst die notwendige Speicherung und Auslieferung, Darstellung, Erstellung von Vorschaubildern, Größenanpassung, Komprimierung und Formatumwandlung. Der Sinn des Inhalts und erforderliche Urheberangaben dürfen dabei nicht verfälscht werden.",
+      "p2": "Bei öffentlich freigegebenen Inhalten umfasst dies die öffentliche Darstellung auf CineGenius, einschließlich passender Übersichten, Suche, Empfehlungen und Startseitenvorschauen. Die weltweite technische Abrufbarkeit einer Internetseite wird damit ermöglicht. Bei privaten oder beschränkt sichtbaren Inhalten gilt das Nutzungsrecht nur für die vorgesehenen Funktionen und berechtigten Betrachter. Es erlaubt keine öffentliche Veröffentlichung privater Entwürfe, Nachrichten oder Anhänge.",
+      "p3": "Technische Dienstleister dürfen nur in dem Umfang einbezogen und mit notwendigen Nutzungsbefugnissen ausgestattet werden, der für diese Funktionen erforderlich ist. Diese Klausel erlaubt weder einen eigenständigen Verkauf deiner Inhalte noch ihre allgemeine Verwendung für externe Werbung oder das Training von KI-Modellen.",
+      "p4": "Technische Dienstleister erhalten nur die für diese Funktionen notwendigen Nutzungsbefugnisse. Diese Klausel erlaubt keinen eigenständigen Verkauf deiner Inhalte, keine allgemeine externe Werbung und kein allgemeines Training von KI-Modellen mit deinen Inhalten. Wenn du die optionale KI-Hilfe ausdrücklich nutzt, wird der dafür eingegebene Text zur Erstellung der Antwort verarbeitet; Einzelheiten stehen in der Datenschutzerklärung.",
+      "p5": "Die Befugnis zur aktiven Anzeige endet, soweit du den Inhalt löschst oder seine Sichtbarkeit einschränkst. Für gesetzlich notwendige Nachweise, die Abwicklung der Löschung oder die befristete Sicherung gegen Datenverlust kann eine weitere zweckgebundene Speicherung zulässig sein; daraus folgt keine Erlaubnis für weitere öffentliche Werbung. Bereits heruntergeladene oder fremd zwischengespeicherte öffentliche Kopien lassen sich nicht zurückrufen. Bei älteren öffentlich gespeicherten Dateien entfernt das Ausblenden einer Karte allein nicht die ursprüngliche Datei; solche Fälle können über den Support zur Dateilöschung gemeldet werden."
+    },
+    "s8": {
+      "title": "§ 8 Frische Einblicke aus der Community",
+      "p1": "Öffentliche Profilfotos, Profilcover und direkt im persönlichen Portfolio hochgeladene Arbeitsproben können in „Frische Einblicke aus der Community“ erscheinen. Dasselbe gilt für öffentliche Firmenlogos, Firmencover und Firmengalerien. Eine zusätzliche Freigabe für diesen internen Fotobereich und eine Mindestanzahl von Likes sind nicht erforderlich.",
+      "p2": "Entscheidend ist die ursprüngliche Zuordnung des Bildes. Bilder eigenständiger Projekte, Locations, Marktplatzartikel und Beiträge am Schwarzen Brett werden nicht dadurch zu Community-Profilbildern, dass sie zusätzlich in einem Anbieterprofil angezeigt werden. Sie können weiterhin in den zu ihrem eigenen Bereich passenden Karten und Vorschauen erscheinen. Private Inhalte, Entwürfe und Nachrichtenanhänge gehören nicht in den Community-Fotobereich.",
+      "p3": "Die Fotoansicht führt zum zugehörigen öffentlichen Inhalt oder Profil. Aktuelle Sichtbarkeit und Zugriffsrechte gelten auch für diese zusätzliche Darstellung. Gelöschte oder nicht mehr öffentliche Inhalte dürfen nicht über die Community-Funktion weiter öffentlich ausgeliefert werden."
+    },
+    "s9": {
+      "title": "§ 9 Externe Werbung",
+      "p1": "Der gewöhnliche Upload und die Veröffentlichung auf CineGenius enthalten keine allgemeine Erlaubnis für externe Anzeigen, Social-Media-Werbung, Newsletter, Drucksachen oder andere Werbekampagnen. Für eine solche Verwendung muss vorher eine gesonderte, hinreichend bestimmte Grundlage bestehen.",
+      "p2": "Eine gegebenenfalls erbetene Marketingfreigabe beschreibt die konkreten Inhalte, Zwecke, Kanäle und Dauer. Sie ist freiwillig; eine Ablehnung hindert die normale Plattformnutzung nicht. Soweit personenbezogene Daten auf Grundlage einer Einwilligung verarbeitet werden, wird über deren Widerruf und dessen Folgen gesondert informiert. Eine Erklärung des hochladenden Mitglieds ersetzt keine fehlenden Rechte von Fotografen oder abgebildeten Personen."
+    },
+    "s10": {
+      "title": "§ 10 Kontakt und Vereinbarungen zwischen Nutzern",
+      "p1": "Du kannst über die jeweils verfügbaren Nachrichten- und Anfragefunktionen Kontakt aufnehmen. Eine von CineGenius gespeicherte Anfrage ist keine Zahlung, keine Zusage des Anbieters und für sich keine Buchungsgarantie. Eine Bestätigung des technischen Eingangs sagt nur, dass die Anfrage gespeichert wurde.",
+      "p2": "Ob und wann ein Vertrag zwischen den Beteiligten zustande kommt, richtet sich nach ihren Erklärungen und den gesetzlichen Vorschriften. CineGenius wird durch die Bereitstellung der Plattform nicht automatisch Partei dieses Vertrags. Beschreibungen, Termine, Nutzungsumfang, Übergabe, Rückgabe, Preise, Stornierung und gegebenenfalls Versicherung müssen die Beteiligten miteinander klären.",
+      "p3": "Es gibt keine allgemeine Zahlungsabwicklung, Treuhand, Rückerstattungs- oder Erfüllungsgarantie durch CineGenius. Gesetzliche Ansprüche gegen den jeweiligen Vertragspartner und die eigene gesetzliche Verantwortung von CineGenius bleiben unberührt."
+    },
+    "s11": {
+      "title": "§ 11 Kosten und Verbraucherrechte",
+      "p1": "Registrierung, Profile, Suche, Inserate und direkte Nachrichten sind derzeit kostenlos. Die gewöhnliche Plattformnutzung und eine allgemeine Supportanfrage lösen keine Provision aus. Künftige kostenpflichtige Plattformleistungen benötigen klare Preis- und Leistungsangaben sowie einen ausdrücklichen Vertragsschluss. Für eine gesondert beauftragte Support-Vermittlung gelten die folgenden Konditionen; der Vermittlungsauftrag muss vorab ausdrücklich vereinbart werden.",
+      "p2": "Verbraucherrechte werden nicht pauschal ausgeschlossen. Ob bei einem Vertrag mit einem Anbieter ein Widerrufsrecht besteht, hängt insbesondere von den Beteiligten und der vereinbarten Leistung ab. Der verantwortliche Unternehmer muss erforderliche Informationen bereitstellen. Für den Nutzungsvertrag mit CineGenius bleiben zwingende Rechte über digitale Leistungen anwendbar, soweit deren Voraussetzungen vorliegen; die Bezeichnung „kostenlos“ ersetzt diese Prüfung nicht."
+    },
+    "s12": {
+      "title": "§ 12 Suche und Bewertungen",
+      "p1": "Ausgewählte Kategorien, Berufe, Suchbegriffe und Standortfilter bestimmen zunächst die passenden Ergebnisse. Bei „Für dich empfohlen“ haben die gespeicherte Region beziehungsweise Nähe und das Profilland Vorrang, soweit passende Ortsdaten verfügbar sind; andere Länder werden dadurch nicht automatisch ausgeschlossen. Ohne passende Standortangaben greift die jeweilige Standardsortierung. Eine ausdrücklich ausgewählte Sortierung nach Datum, Preis, Name oder Bewertung ersetzt die Empfehlung. Bei Bewertungssortierung zählen Höhe und Anzahl der Bewertungen; kleine Bewertungsmengen werden abgeschwächt. Startseitenvorschauen wechseln und mischen Quellen beziehungsweise Kategorien, damit nicht nur die zuletzt eingestellten Angebote erscheinen. Es gibt keine bezahlte Höherplatzierung.",
+      "p2": "Die vorhandenen Bewertungsregeln knüpfen je nach Ziel an bestätigte Buchungsanfragen oder angenommene Bewerbungen innerhalb der Plattform an. Das belegt eine entsprechende Plattforminteraktion, nicht automatisch einen tatsächlichen Kauf, eine abgeschlossene Zusammenarbeit oder eine vor Ort geprüfte Leistung. Foto-Likes sind davon getrennte Reaktionen. Bewertungen müssen sich auf eigene nachvollziehbare Erfahrungen beziehen; gekaufte, erfundene oder verabredet manipulierte Bewertungen sind unzulässig."
+    },
+    "s13": {
+      "title": "§ 13 Nachrichten und Support",
+      "p1": "Nachrichten und Anhänge sind für die berechtigten Gesprächsbeteiligten bestimmt. In Gruppen entscheiden die jeweiligen Verwaltungsrechte über die Mitgliedschaft; neue Mitglieder erhalten Zugriff innerhalb der vorgesehenen Beitrittsgrenzen. Firmenunterhaltungen unterliegen den ausdrücklich vergebenen Berechtigungen. In Supportunterhaltungen antworten berechtigte Supportmitarbeiter als „CineGenius Support“. Die Kommunikation ist nicht Ende-zu-Ende verschlüsselt. Lade nur Dateien hoch, die du den Gesprächsbeteiligten rechtmäßig zur Verfügung stellen darfst.",
+      "p2": "Support erhält keinen pauschalen freien Zugriff auf sämtliche privaten Mitgliedergespräche. Für die Prüfung gemeldeter Inhalte oder die Abwehr konkreter Sicherheitsprobleme darf nur der notwendige und rechtlich zulässige Zugriff erfolgen. Nutze Nachrichten nicht für unerwünschte Werbung oder rechtswidrige Inhalte.",
+      "p3": "Genie ist ein KI-Assistent und kein menschlicher Supportmitarbeiter. Er kann unzutreffende Antworten liefern. Prüfe Vorschläge vor ihrer Verwendung; sie ersetzen keine rechtliche oder sonstige fachliche Prüfung. Genie bestätigt keine Buchungen, Zahlungen oder Veröffentlichungen und trifft keine Moderationsentscheidungen. Die KI-Hilfe ist freiwillig."
+    },
+    "s14": {
+      "title": "§ 14 Meldungen und Moderation",
+      "p1": "Rechtsverletzungen können über die vorhandenen Meldeaktionen oder ohne Konto per E-Mail an <contact>cinegenius.co@gmail.com</contact> gemeldet werden. Gib die genaue Internetadresse beziehungsweise den Speicherort, eine nachvollziehbare Begründung der vermuteten Rechtswidrigkeit, deinen Namen und eine erreichbare E-Mail-Adresse an. Erkläre bitte, dass die Angaben nach bestem Wissen richtig und vollständig sind. Bei Hinweisen auf bestimmte Sexualstraftaten gegen Kinder sind Name und E-Mail-Adresse gesetzlich nicht erforderlich. Sende keine rechtswidrigen Dateien erneut; eine eindeutige Fundstelle genügt. Meldungen und Rückfragen sind auf Deutsch oder Englisch möglich.",
+      "p2": "CineGenius prüft Hinweise sorgfältig und kann weitere Informationen anfordern. Bei berechtigten Einschränkungen kommen abhängig von Anlass und Schwere insbesondere Nachbesserung, Ablehnung, Ausblendung, Zugangsbeschränkung oder eine vorübergehende oder dauerhafte Kontosperre in Betracht. Ein fehlendes freiwilliges Foto allein ist kein Grund für eine pauschale Sperre. Nutzerinhalte werden nicht stillschweigend inhaltlich umgeschrieben.",
+      "p3": "Die Maßnahme soll verhältnismäßig sein und die Interessen der Beteiligten berücksichtigen. Betroffene erhalten die konkrete Maßnahme und ihre Gründe, soweit keine entgegenstehende gesetzliche Pflicht besteht. Bei dringenden Rechts- oder Sicherheitsrisiken kann der Zugriff vor der Anhörung vorläufig beschränkt werden.",
+      "p4": "Wenn elektronische Kontaktdaten vorliegen, erhält die meldende Person eine Eingangsbestätigung und eine Mitteilung über die Entscheidung sowie die verfügbaren Rechtsbehelfe. Über denselben Kontakt kannst du eine Überprüfung einer Entscheidung beantragen. Eine Überprüfung erfolgt durch befugte Personen; Genie trifft diese Entscheidungen nicht. Gesetzliche Melde-, Begründungs-, Beschwerde- und Streitbeilegungsrechte einschließlich ihrer Fristen bleiben unberührt. Der Rechtsweg setzt keine vorherige Supportanfrage voraus."
+    },
+    "s15": {
+      "title": "§ 15 Datenschutz und Beendigung",
+      "p1": "Die Datenschutzerklärung erläutert gesondert Zwecke, Rechtsgrundlagen, Empfänger, Aufbewahrung und Betroffenenrechte. Die Kenntnisnahme dieser Information ist keine pauschale Einwilligung in jede Verarbeitung. Vertragliche Nutzungsrechte ersetzen keine erforderliche datenschutzrechtliche Grundlage.",
+      "p2": "Du kannst die Nutzung beenden und die Kontolöschung über die vorhandene Kontofunktion oder den Support verlangen. Veröffentlichte Inhalte werden dabei nach den geltenden Regeln entfernt oder in ihrer Zuordnung bereinigt. Rechtlich notwendige Aufbewahrung, Rechte anderer Gesprächsbeteiligter und berechtigte Nachweiszwecke sind gesondert zu berücksichtigen und erlauben keine beliebige Weiternutzung.",
+      "p3": "Eine Firmenzugehörigkeit kann getrennt beendet werden, ohne dadurch das persönliche Konto oder die Firma zu löschen. Bei Firmen mit weiteren berechtigten Verantwortlichen muss die Zuständigkeit geklärt werden. Für eine Beendigung durch CineGenius gelten ein sachlicher Grund, angemessene Information und die anwendbaren gesetzlichen Fristen; das Recht zur außerordentlichen Beendigung aus wichtigem Grund bleibt bestehen."
+    },
+    "s16": {
+      "title": "§ 16 Haftung",
+      "p1": "CineGenius haftet unbeschränkt bei Vorsatz und grober Fahrlässigkeit, bei schuldhafter Verletzung von Leben, Körper oder Gesundheit sowie nach zwingenden gesetzlichen Haftungsregeln. Dasselbe gilt im Umfang einer ausdrücklich übernommenen Garantie.",
+      "p2": "Bei einfacher Fahrlässigkeit haftet CineGenius für die Verletzung wesentlicher Vertragspflichten, deren Erfüllung die ordnungsgemäße Nutzung erst ermöglicht und auf deren Einhaltung du regelmäßig vertrauen darfst. Diese Haftung ist auf den bei Vertragsschluss vorhersehbaren, vertragstypischen Schaden begrenzt. Im Übrigen ist die Haftung bei einfacher Fahrlässigkeit ausgeschlossen, soweit gesetzlich zulässig.",
+      "p3": "Die vorstehenden Regeln gelten auch zugunsten gesetzlicher Vertreter und Erfüllungsgehilfen. Sie begründen keine pauschale Freistellung für rechtswidriges eigenes Handeln. Ansprüche wegen mangelhafter digitaler Leistungen und sonstige zwingende Verbraucherrechte werden nicht eingeschränkt. Für Schäden aus Nutzerverträgen haftet CineGenius nicht allein deshalb, weil der Kontakt über die Plattform zustande kam; eine eigene gesetzliche Haftung bleibt bestehen."
+    },
+    "s17": {
+      "title": "§ 17 Änderungen der Plattform und Bedingungen",
+      "p1": "Technische Verbesserungen und erforderliche Sicherheitskorrekturen sind möglich. Wesentliche Einschränkungen vereinbarter Funktionen und Änderungen der Bedingungen müssen einen rechtlich zulässigen Rahmen einhalten. CineGenius erläutert die Änderungen und ihre Folgen vor dem vorgesehenen Wirksamwerden, soweit nicht eine gesetzlich zulässige Ausnahme eine sofortige Maßnahme erfordert.",
+      "p2": "Wird für eine Änderung deine Zustimmung benötigt, wird sie gezielt eingeholt. Schweigen gilt nicht pauschal als Zustimmung zu neuen Preisen, einer erweiterten Werbelizenz oder anderen wesentlichen Vertragsänderungen. Bestehende Uploads erhalten nicht rückwirkend zusätzliche Nutzungsrechte. Besondere zwingende Informations-, Änderungs- und Kündigungsrechte für Verbraucher und gewerbliche Nutzer bleiben erhalten.",
+      "p3": "Soweit die Verordnung (EU) 2019/1150 für gewerbliche Nutzer anwendbar ist, gelten insbesondere deren Informations- und Begründungspflichten sowie grundsätzlich mindestens 15 Tage Vorlauf bei AGB-Änderungen und 30 Tage bei vollständiger Beendigung des Vermittlungsdienstes gegenüber einem gewerblichen Nutzer. Gesetzliche Ausnahmen, insbesondere zwingende rechtliche Anforderungen oder erhebliche Sicherheitsrisiken, bleiben unberührt. Benötigte zusätzliche Anpassungszeit ist zu berücksichtigen."
+    },
+    "s18": {
+      "title": "§ 18 Recht und Streitbeilegung",
+      "p1": "Es gilt deutsches Recht. Für Verbraucher bleiben zwingende Schutzvorschriften des Staates ihres gewöhnlichen Aufenthalts und die gesetzlich vorgesehenen Gerichtsstände unberührt. Ein ausschließlicher Gerichtsstand München gilt nur, soweit eine solche Vereinbarung mit Kaufleuten, juristischen Personen des öffentlichen Rechts oder öffentlich-rechtlichen Sondervermögen gesetzlich zulässig ist.",
+      "p2": "CineGenius ist nicht bereit, freiwillig an Streitbeilegungsverfahren vor einer Verbraucherschlichtungsstelle teilzunehmen. Eine bestehende gesetzliche Pflicht bleibt unberührt. Davon unabhängige Rechte und Verfahren nach dem Digital Services Act und die Zuständigkeit der Gerichte werden nicht eingeschränkt. Die frühere EU-Plattform zur Online-Streitbeilegung wurde eingestellt.",
+      "p3": "Ist eine Bestimmung unwirksam, gelten die gesetzlichen Folgen; an die Stelle einer unwirksamen Klausel tritt nicht automatisch die wirtschaftlich ähnlichste Regelung.",
+      "p4": "Kontakt für Vertragsfragen, Beschwerden und rechtliche Hinweise: <contact>cinegenius.co@gmail.com</contact>. Die vollständigen Betreiber- und Kontaktdaten stehen im Impressum."
+    },
+    "imprint": "Impressum →",
+    "privacy": "Datenschutzerklärung →",
+    "rights": "Bildrechte & Meldung →",
+    "ai": "KI & Transparenz →"
+  },
+  "LegalPrivacy": {
+    "title": "Datenschutzerklärung",
+    "date": "Stand: 14. November 2026",
+    "badge": "Rechtliches",
+    "providerTitle": "Eingesetzte Dienste",
+    "provider": "Dienst / Anbieter",
+    "purpose": "Verarbeitung und Einsatz",
+    "imprint": "Impressum →",
+    "terms": "AGB →",
+    "ai": "KI & Transparenz →",
+    "s1": {
+      "title": "1. Verantwortliche und Kontakt",
+      "p1": "Betreiber von CineGenius sind Markus Müller und Mathias Schmidt. Kontakt Markus Müller: Plinganserstraße 19, 81369 München, Deutschland; <contact>cinegenius.co@gmail.com</contact>; Telefon <phone>+49 171 3866624</phone>. Kontakt Mathias Schmidt: <coContact>m.schmidt.d@hotmail.com</coContact>. Datenschutzanfragen und Betroffenenrechte kannst du an beide genannten Kontakte richten."
+    },
+    "s2": {
+      "title": "2. Zwecke, Rechtsgrundlagen und Datenquellen",
+      "p1": "Wir verarbeiten Daten zur Bereitstellung der von dir angeforderten Konto-, Veröffentlichungs-, Such- und Kommunikationsfunktionen (Art. 6 Abs. 1 lit. b DSGVO), zur Erfüllung gesetzlicher Pflichten (lit. c) und auf Grundlage konkret genannter berechtigter Interessen, insbesondere an Sicherheit, Missbrauchsabwehr und funktionsfähiger Kommunikation (lit. f). Freiwillige Analyse und Newsletter beruhen auf deiner Einwilligung (lit. a). Die Datenschutzerklärung selbst ist keine Einwilligung.",
+      "p2": "Daten stammen regelmäßig von dir und deinen Nutzungshandlungen. Bei Nachrichten, Einladungen, Firmenzugehörigkeiten, Projektcredits, Bewertungen und Meldungen können andere Mitglieder Angaben zu dir machen. Authentifizierungs- und technische Zustelldaten erhalten wir außerdem von den eingesetzten Dienstleistern. Welche Felder erforderlich sind, zeigt die jeweilige Funktion. Fotos und Logos sind freiwillig; ohne notwendige Konto- oder Angebotsdaten lässt sich die betreffende Leistung nicht bereitstellen."
+    },
+    "s3": {
+      "title": "3. Registrierung, Anmeldung und Kontoeinstellungen",
+      "p1": "Clerk verarbeitet die für die Anmeldung verwendeten Kontaktdaten, Anmelde- und Sicherheitsdaten, Sitzung sowie gegebenenfalls Mehrfaktor-Verfahren. Zugangsdaten werden über Clerk verarbeitet; CineGenius führt keine eigene Passwortdatenbank. Ein Passwort wird beim Absenden des Anmeldeformulars an den Anmeldedienst übertragen. Anmelde- und Sicherheitsnachrichten sind Teil dieser Funktion (Art. 6 Abs. 1 lit. b und f DSGVO).",
+      "p2": "Name, Sprache, Einrichtungsschritte und bestimmte private Kontoeinstellungen werden in den zugehörigen Kontometadaten gespeichert. Die Profilsuche ist keine automatische Freigabe aller privaten Kontodaten. Für die Anmeldung notwendige Sitzungsspeicherung fällt unter § 25 Abs. 2 Nr. 2 TDDDG."
+    },
+    "s4": {
+      "title": "4. Profile, Unternehmen, Projekte und Angebote",
+      "p1": "Profildaten, Firmenangaben, Projekte, Inserate, Bewertungen, Bilder und Dateien werden bei Supabase gespeichert. Die konfigurierte primäre Projektregion ist Frankfurt (eu-central-1). Das bedeutet keine Garantie, dass alle Support-, Unterauftrags- oder Auslieferungsvorgänge ausschließlich in Deutschland stattfinden.",
+      "p2": "Öffentlich freigegebene Inhalte können weltweit aufgerufen, gefunden und von Dritten gespeichert werden. Entwürfe und persönliche Kontaktdaten unterliegen eigenen Zugriffsregeln. Firmenkontakte sind von privaten persönlichen Kontakten getrennt. Angenommene Firmenzugehörigkeiten und freigegebene Projektcredits können im jeweiligen öffentlichen Eintrag erscheinen. Rechtsgrundlage ist die Bereitstellung dieser Funktionen (Art. 6 Abs. 1 lit. b DSGVO); für Angaben über Dritte muss zusätzlich eine geeignete Rechtsgrundlage vorliegen.",
+      "p3": "Neue Mitgliederbilder werden zugriffsgeschützt gespeichert und beim Abruf anhand der Berechtigung zum ursprünglichen Inhalt geprüft. Ältere öffentliche Bildadressen können weiterhin direkt erreichbar sein. Das Verbergen eines Eintrags allein widerruft solche öffentlichen Dateiadressen nicht. Bitte melde betroffene Dateien über den Datenschutzkontakt. Bereits heruntergeladene oder fremd zwischengespeicherte öffentliche Kopien können nicht zurückgerufen werden."
+    },
+    "s5": {
+      "title": "5. Private Entwürfe und Wiederherstellung",
+      "p1": "Begonnene Einrichtungsschritte werden privat im Kontosystem gespeichert. Wiederherstellbare Inhaltsformulare nutzen kontogebundene private Entwürfe in der Datenbank. Eine automatische Entwurfssicherung veröffentlicht keine Inhalte. Entwürfe bleiben für die Wiederaufnahme erhalten, bis sie über die vorgesehene Funktion verworfen, nach Abschluss entfernt oder im Rahmen einer Löschanfrage bearbeitet werden (Art. 6 Abs. 1 lit. b DSGVO).",
+      "p2": "Passwörter, lokale Dateivorschauen und noch nicht hochgeladene Dateien gehören nicht in Wiederherstellungssnapshots. Bei einem Speicherfehler kann der zuletzt bestätigte Entwurf erhalten bleiben, während neuere Eingaben noch nicht gesichert sind."
+    },
+    "s6": {
+      "title": "6. Nachrichten, Gruppen, Anhänge und Bewerbungen",
+      "p1": "Für Einzel- und Gruppenchats speichern wir Teilnehmer, Mitgliedschaften, Nachrichten, Anhänge, Zeitpunkte und personenbezogene Lesestände. Berechtigte Gesprächsteilnehmer können auf die vorgesehenen Inhalte zugreifen; bei neuen Gruppenmitgliedern gelten Beitrittsgrenzen. Dateianhänge werden privat gespeichert und nur nach Berechtigungsprüfung ausgeliefert. Empfänger können erhaltene Dateien selbst herunterladen und speichern. Es besteht keine Ende-zu-Ende-Verschlüsselung.",
+      "p2": "Das Ausblenden oder Löschen „für mich“ entfernt nicht automatisch die Kopie für andere Beteiligte. Private Gespräche sind kein frei durchsuchbarer allgemeiner Adminbereich. Notwendige Zugriffe zur Bearbeitung gemeldeter Inhalte, zur Sicherheit oder aufgrund gesetzlicher Pflichten sind auf den jeweiligen Zweck zu beschränken. Berechtigte Supportmitarbeiter bearbeiten an CineGenius Support gerichtete Gespräche. Bewerbungen und beigefügte Angaben erhalten die berechtigten Verantwortlichen der Ausschreibung. Rechtsgrundlagen: Art. 6 Abs. 1 lit. b, bei rechtlichen Pflichten lit. c, bei Missbrauchsabwehr lit. f DSGVO."
+    },
+    "s7": {
+      "title": "7. Profilaufrufe, Online-Status, Kontakte und Reaktionen",
+      "p1": "Bei angemeldeten Profilbesuchen können Zeitpunkt und ein pseudonymisierter Bezug zum Betrachter gespeichert werden, um Aufrufe und deren Verlauf anzuzeigen. Nicht angemeldete Besucher werden über diese Profilaufruffunktion nicht erfasst. Bei sichtbarem Browser-Tab wird ungefähr alle zwei Minuten ein Aktivitätszeitpunkt für den Online-Indikator aktualisiert. Der letzte Zeitpunkt wird beim Abmelden nicht automatisch gelöscht. Rechtsgrundlage ist das berechtigte Interesse an Profilstatistik und funktionierender Kommunikation (Art. 6 Abs. 1 lit. f DSGVO); du kannst aus Gründen deiner besonderen Situation widersprechen.",
+      "p2": "Kontaktbeziehungen, Einladungen, Favoriten, Foto-Likes und Bewertungen speichern den jeweiligen Kontobezug und die Aktion. Sie ermöglichen die von dir genutzten Funktionen (Art. 6 Abs. 1 lit. b DSGVO). Öffentliche Bewertungen und Reaktionszahlen sind von privaten Merklisten und technischen Kontokennungen zu unterscheiden. Du kannst eigene Favoriten und Likes wieder entfernen."
+    },
+    "s8": {
+      "title": "8. Öffentliche Fotos und Empfehlungen",
+      "p1": "Öffentliche Profilfotos, Cover und direkt zugeordnete persönliche Portfoliofotos sowie Firmenlogos, Firmencover und Firmengalerien können in „Frische Einblicke“ erscheinen. Die ursprüngliche Zuordnung und aktuelle Sichtbarkeit bleiben maßgeblich. Bilder eigenständiger Projekte, Angebote, Locations und Beiträge am Schwarzen Brett sowie private Bilder, Entwürfe und Nachrichtenanhänge gehören nicht in diese Sammlung.",
+      "p2": "Suche, Filter und Empfehlungen berücksichtigen unter anderem den gespeicherten Profilort und das Land, soweit du die entsprechende Einstellung nutzt. Das ist keine automatische Erfassung deines GPS-Standorts. Andere Regionen bleiben über die Suche erreichbar. Es findet in diesen Funktionen keine ausschließlich automatisierte Entscheidung mit rechtlicher oder ähnlich erheblicher Wirkung nach Art. 22 DSGVO statt."
+    },
+    "s9": {
+      "title": "9. Genie und die optionale KI-Schreibhilfe",
+      "p1": "Wenn du Genie oder die KI-Schreibhilfe ausdrücklich verwendest, senden wir deinen eingegebenen Text, einen begrenzten Gesprächskontext beziehungsweise den gewählten Textentwurf, Sprache und Funktionskontext serverseitig an die OpenAI-API. Der Assistent erhält dadurch keinen allgemeinen Zugriff auf private Nachrichten, Dokumente oder dein Konto. Deine Konto-ID und die Besucher-IP werden nicht als eigene Felder an OpenAI gesendet; persönliche Angaben können jedoch in deinem selbst eingegebenen Text stehen. Gib keine Passwörter, vertraulichen Unterlagen oder unnötigen personenbezogenen Daten Dritter ein.",
+      "p2": "Die Verarbeitung erfolgt zur Beantwortung deiner angeforderten Anfrage (Art. 6 Abs. 1 lit. b DSGVO). Der Chatverlauf bleibt begrenzt im Sitzungsspeicher des Browsers, kontositzungsbezogen und beim erneuten Lesen höchstens 24 Stunden gültig. Er kann im Chat geleert werden. CineGenius legt dafür kein dauerhaftes Gesprächsarchiv in seiner Datenbank an. Pseudonymisierte Nutzungszähler dienen der Missbrauchsabwehr und Begrenzung des Dienstes (Art. 6 Abs. 1 lit. f DSGVO).",
+      "p3": "Anfragen werden mit deaktivierter Antwortspeicherung (store: false) gesendet. Das ist keine Zusage vollständiger Speicherfreiheit beim Anbieter. OpenAI kann insbesondere Sicherheits- und Missbrauchsprotokolle nach seinen geltenden Bedingungen speichern, standardmäßig bis zu 30 Tage mit den dort genannten Ausnahmen. API-Inhalte werden nach den Anbieterbedingungen standardmäßig nicht zum Modelltraining verwendet; eine davon abweichende vertragliche Konfiguration wird hierdurch nicht behauptet. Genie kann Fehler machen und trifft keine verbindlichen Entscheidungen über Nutzer oder Angebote."
+    },
+    "s10": {
+      "title": "10. Buchungsanfragen und Zahlungsfunktionen",
+      "p1": "Eine Anfrage speichert die angefragte Leistung und Kontaktdaten für die Beteiligten, löst aber keine automatische Zahlung aus. Eine Stripe-Schnittstelle ist technisch vorbereitet. Eine allgemeine Zahlungs- oder Treuhandabwicklung wird derzeit nicht angeboten. Eine später ausdrücklich genutzte Zahlungsfunktion benötigt vorher passende Informationen zu Empfängern, Daten und Rechtsgrundlagen. Für einen gesonderten Support-Vermittlungsauftrag verarbeiten wir die notwendigen Vertrags- und Abrechnungsdaten (Art. 6 Abs. 1 lit. b und c DSGVO)."
+    },
+    "s11": {
+      "title": "11. Betrieb, Sicherheit und Fehlerdiagnose",
+      "p1": "Vercel verarbeitet beim Seitenabruf technisch erforderliche Daten wie IP-Adresse, angeforderte Adresse, Browserangaben, Zeitpunkt und Fehlerstatus für Hosting, Auslieferung und Sicherheit. Rechtsgrundlage ist unser berechtigtes Interesse an einem sicheren, funktionsfähigen Dienst (Art. 6 Abs. 1 lit. f DSGVO). Zugriffsschutz, Berechtigungsprüfungen, verschlüsselte Übertragung und beschränkte administrative Zugriffe dienen der Datensicherheit; sie sind keine Garantie gegen jeden Zugriff oder Datenverlust.",
+      "p2": "Sentry-Konfigurationen sind im Quellcode vorbereitet, aktuell jedoch nicht über eine Initialisierung in die Anwendung eingebunden. Sitzungsaufzeichnungen (Session Replay) sind deaktiviert. Eine bloße Konfigurationsdatei bedeutet keine laufende Übermittlung. Eine spätere Aktivierung muss mit Zweck, tatsächlichen Daten und Rechtsgrundlage abgeglichen werden."
+    },
+    "s12": {
+      "title": "12. E-Mail, Support und Newsletter",
+      "p1": "Resend übermittelt Funktions-, Sicherheits-, Anfrage- und Benachrichtigungsmails. Dafür werden Empfängeradresse und die jeweiligen Mailinhalte verarbeitet, beispielsweise Name und Informationen zur betreffenden Plattformaktion. Erforderliche Nachrichten beruhen auf Art. 6 Abs. 1 lit. b, c oder f DSGVO. Eine Benachrichtigung ist nicht allein wegen ihres technischen Versands automatisch notwendige Kommunikation.",
+      "p2": "Für den freiwilligen Newsletter benötigen wir deine Einwilligung (Art. 6 Abs. 1 lit. a DSGVO). Die Anmeldung wird erst durch den Bestätigungslink aktiviert; Adressen bestehender Konten werden nicht automatisch übernommen. Gespeichert werden Adresse, Bestätigung, Einwilligungszeitpunkt und Version. Du kannst dich jederzeit über den Abmeldelink abmelden. Ein begrenzter Nachweis über Einwilligung und Abmeldung kann zur Erfüllung von Nachweispflichten und Abwehr unzulässiger erneuter Zusendungen erforderlich bleiben.",
+      "p3": "Wenn du direkt an die genannten E-Mail-Adressen schreibst, werden Nachricht, Kontaktdaten und Anlagen außerdem beim jeweiligen Mailanbieter verarbeitet: Google (Gmail) für <contact>cinegenius.co@gmail.com</contact> und Microsoft (Outlook/Hotmail) für <coContact>m.schmidt.d@hotmail.com</coContact>. Sende nur die für dein Anliegen notwendigen Daten. Supportbearbeitung dient deinem Anliegen und gegebenenfalls gesetzlichen Pflichten (Art. 6 Abs. 1 lit. b, c oder f DSGVO)."
+    },
+    "s13": {
+      "title": "13. Freiwillige Nutzungsanalyse",
+      "p1": "Nur nach deiner Einwilligung verwenden wir PostHog im EU-Cloud-Projekt für Aufrufe öffentlicher Übersichtsseiten (Art. 6 Abs. 1 lit. a DSGVO und, soweit erforderlich, § 25 Abs. 1 TDDDG). Übertragen werden Seitenkategorie und eine zufällige Kennung im Arbeitsspeicher des Tabs. Suchbegriffe, URL-Parameter, Namen, Formularinhalte und private Seiten werden nicht als Analysemerkmale erfasst. Automatische Klickerfassung, Personenprofile und Sitzungsaufzeichnungen sind deaktiviert. Die IP-Adresse ist technisch für die Verbindung erforderlich; ihre Speicherung als Analysemerkmal ist ausgeschaltet.",
+      "p2": "Die Auswahl wird unter cg_analytics_consent_v1 lokal gespeichert, bis du sie änderst oder Browserdaten löschst. Du kannst ohne Nachteil für die übrigen Funktionen ablehnen und deine Einwilligung jederzeit über die Analyse-Einstellungen widerrufen. Danach werden keine weiteren Analyseereignisse gesendet; rechtmäßig zuvor verarbeitete Ereignisse werden dadurch nicht automatisch gelöscht. Die freiwillige Analyse ist pseudonymisiert und wird nicht pauschal als technisch vollständig anonym bezeichnet.",
+      "p3": "Die bisherigen zusätzlichen Einbindungen von Vercel Web Analytics und Speed Insights sind entfernt. Sie werden von dieser Fassung der Website nicht parallel geladen. Das technisch erforderliche Hosting bei Vercel ist davon getrennt."
+    },
+    "s14": {
+      "title": "14. Karten und Ortsdaten",
+      "p1": "Beim Anzeigen einer interaktiven Karte lädt der Browser Kartenmaterial und Kartenschriften von OpenFreeMap (Hyperknot Software Kft., Ungarn) und dem eingesetzten Auslieferungsnetz. Dabei werden insbesondere IP-Adresse, technische Anfragedaten und angeforderte Kartenausschnitte übertragen. Profile und Chatnachrichten werden nicht als Karteninhalte an den Kartenanbieter gesendet. Markierungen beruhen auf den für die Veröffentlichung vorgesehenen Ortsangaben; sie sind keine Zusicherung einer exakten Privatadresse. Grundlage ist unser berechtigtes Interesse an der angebotenen räumlichen Suche (Art. 6 Abs. 1 lit. f DSGVO).",
+      "p2": "Ortsauswahl und viele Markierungen verwenden die auf unseren Servern bereitgestellten Ortsdaten. Bei älteren Location-Einträgen ohne passende Koordinaten kann der Server zusätzlich einen Städtenamen über Nominatim der OpenStreetMap Foundation abfragen. Dabei wird die Server-IP übertragen, nicht die Besucher-IP; genaue private Anschriften dürfen in diesen Abruf nicht einfließen. Ergebnisse werden für 24 Stunden wiederverwendet. Eine pauschale Zusage, jeder Ort werde nur einmal abgefragt, besteht nicht."
+    },
+    "s15": {
+      "title": "15. Lokale Speicherung und externe Inhalte",
+      "p1": "Das Cookie cg_locale speichert die gewählte Sprache bis zu einem Jahr. Die gewünschte Sprache, notwendige Anmeldung und zustandsbezogene Bedienhilfen dienen den angeforderten Funktionen (§ 25 Abs. 2 Nr. 2 TDDDG). cg_cookies_ok ist nur ein älterer Anzeigezustand des Hinweises und keine Analyse-Einwilligung.",
+      "p2": "cg_recent_searches enthält die letzten Suchbegriffe lokal im Browser. Die Historienliste wird nicht als solche an den Server geschickt; bei einer tatsächlich ausgeführten Suche wird der Suchbegriff zur Verarbeitung an den Server gesendet. Sitzungsspeicher kann außerdem den begrenzten Genie-Verlauf, bereits gezeigte Hinweise und Rückkehrpositionen der Fotoansicht enthalten. Ein kontogebundenes Signal kann Profiländerungen zwischen offenen Tabs mitteilen. Du kannst lokale Speicher über deine Browsereinstellungen entfernen; dadurch können Komforteinstellungen verloren gehen.",
+      "p3": "Schriftdateien der Website werden lokal ausgeliefert. Öffentlich eingebundene Bilder und Logos können von ihren jeweiligen Speicher- oder Bildanbietern geladen werden. Bei einem direkten externen Abruf erhält der Anbieter die technisch erforderlichen Verbindungsdaten; bei einer serverseitigen Bildauslieferung erfolgt der externe Abruf durch unseren Server. Beim bewussten Öffnen externer Websites gelten zusätzlich deren eigene Datenschutzhinweise."
+    },
+    "s16": {
+      "title": "16. Empfänger und internationale Verarbeitung",
+      "p1": "Neben berechtigten Mitgliedern und von dir gewählten Empfängern können beauftragte Hosting-, Datenbank-, Anmelde-, Kommunikations- und KI-Dienstleister Daten im für ihre Aufgabe erforderlichen Umfang verarbeiten. Gesetzlich erforderliche Weitergaben, etwa an zuständige Behörden, erfolgen auf der jeweiligen Rechtsgrundlage. Wir verkaufen persönliche Nachrichten und private Uploads nicht zu Werbezwecken.",
+      "p2": "Einige Anbieter und deren Unterauftragnehmer verarbeiten Daten außerhalb des Europäischen Wirtschaftsraums, insbesondere in den USA. Die primäre Datenbankregion allein schließt solche Übermittlungen nicht aus. Dafür ist eine Grundlage nach Art. 44 ff. DSGVO erforderlich, etwa ein für den konkreten Empfänger gültiger Angemessenheitsbeschluss oder Standardvertragsklauseln mit gegebenenfalls ergänzenden Maßnahmen. Informationen zu den konkret verwendeten Garantien und eine Kopie erhältst du über unseren Datenschutzkontakt. Es wird keine pauschale Zertifizierung aller Anbieter behauptet."
+    },
+    "s17": {
+      "title": "17. Speicherdauer und Löschung",
+      "p1": "Kontodaten, Inhalte und private Entwürfe werden für die angeforderten Funktionen benötigt, solange das Konto beziehungsweise der Inhalt besteht. Bei Beendigung, Widerruf oder einer Löschanfrage prüfen wir, welche Daten gelöscht, in ihrer Zuordnung bereinigt oder aufgrund konkreter gesetzlicher Pflichten weiter aufbewahrt werden müssen. Für Kommunikation mit anderen Beteiligten, offene Vertragsvorgänge und Rechtsansprüche können gesonderte berechtigte Nachweiszwecke bestehen. Sie erlauben keine beliebige Weiterverwendung.",
+      "p2": "Technische Betriebs- und Sicherheitsdaten werden auf den erforderlichen Zweck begrenzt; bei einem konkreten Vorfall können relevante Nachweise bis zur Klärung erforderlich sein. Vertrags- und Steuerunterlagen unterliegen nur, soweit sie tatsächlich entstehen, der jeweils einschlägigen gesetzlichen Aufbewahrung. Sicherungskopien und rechtmäßig aufzubewahrende Nachweise sind von aktiven öffentlichen Inhalten getrennt zu behandeln. Eine unterschiedslose Löschung sämtlicher Daten binnen 30 Tagen wird nicht zugesagt.",
+      "p3": "Du kannst die Kontolöschung in den Kontoeinstellungen anstoßen oder eine Löschanfrage an <contact>cinegenius.co@gmail.com</contact> senden. Bei einer Fehlermeldung ist die Löschung nicht als abgeschlossen anzusehen. Bestehende externe öffentliche Kopien und Empfängerkopien verschwinden nicht automatisch durch die Kontolöschung."
+    },
+    "s18": {
+      "title": "18. Deine Rechte und Beschwerden",
+      "p1": "Unter den gesetzlichen Voraussetzungen kannst du Auskunft, Berichtigung, Löschung, Einschränkung der Verarbeitung und Datenübertragbarkeit verlangen. Einer Verarbeitung auf Grundlage berechtigter Interessen kannst du aus Gründen deiner besonderen Situation widersprechen. Gegen Direktwerbung ist der Widerspruch jederzeit möglich. Einwilligungen kannst du jederzeit mit Wirkung für die Zukunft widerrufen; die Rechtmäßigkeit der bisherigen Verarbeitung bleibt unberührt.",
+      "p2": "Schreibe an <contact>cinegenius.co@gmail.com</contact>. Zur Vermeidung einer Herausgabe an Unbefugte kann eine angemessene Identitätsprüfung erforderlich sein. Wir beantworten Anträge grundsätzlich innerhalb eines Monats nach Eingang. Eine gesetzlich zulässige Verlängerung um höchstens zwei weitere Monate ist bei Bedarf zu begründen und innerhalb des ersten Monats mitzuteilen.",
+      "p3": "Du kannst dich bei einer Datenschutzaufsichtsbehörde beschweren, insbesondere an deinem Aufenthaltsort, Arbeitsplatz oder dem Ort des vermuteten Verstoßes. Für private Stellen in Bayern ist das Bayerische Landesamt für Datenschutzaufsicht (BayLDA), Promenade 27, 91522 Ansbach, eine Anlaufstelle. Die Kontaktmöglichkeiten stehen unter <authority>https://www.lda.bayern.de</authority>."
+    },
+    "s19": {
+      "title": "19. Minderjährige und Änderungen",
+      "p1": "Ein eigenes CineGenius-Konto setzt Volljährigkeit voraus. Daraus folgt nicht, dass in zulässigen Produktionsangaben niemals Daten Minderjähriger vorkommen können. Solche Angaben benötigen eine geeignete Grundlage und gegebenenfalls die Berechtigung der Sorgeberechtigten. Bitte melde unzulässige Minderjährigenkonten oder Veröffentlichungen an unseren Datenschutzkontakt.",
+      "p2": "Wir aktualisieren diese Hinweise, wenn sich Funktionen oder die Verarbeitung ändern. Eine geänderte Datenschutzerklärung ist keine nachträgliche Einwilligung. Für neue einwilligungspflichtige Zwecke wird die erforderliche Einwilligung gesondert eingeholt. Maßgebliche Änderungen werden in geeigneter Weise mitgeteilt."
+    },
+    "providers": {
+      "clerk": {
+        "name": "Clerk",
+        "purpose": "Konten, Anmeldung und Sicherheit; mögliche Verarbeitung in den USA."
+      },
+      "supabase": {
+        "name": "Supabase",
+        "purpose": "Datenbank und Dateien; primäre Projektregion Frankfurt, internationale Anbieterstruktur."
+      },
+      "vercel": {
+        "name": "Vercel",
+        "purpose": "Hosting, CDN und technische Sicherheitsprotokolle; internationale Infrastruktur."
+      },
+      "resend": {
+        "name": "Resend",
+        "purpose": "Versand von Funktionsmails und gesondert abonnierten Newslettern."
+      },
+      "posthog": {
+        "name": "PostHog",
+        "purpose": "Optionale, einwilligungsabhängige Analyse im EU-Cloud-Projekt."
+      },
+      "openai": {
+        "name": "OpenAI",
+        "purpose": "Nur bei ausdrücklicher Nutzung von Genie beziehungsweise der KI-Schreibhilfe."
+      },
+      "openfreemap": {
+        "name": "OpenFreeMap",
+        "purpose": "Kartenmaterial, Kartenschriften und Auslieferungsnetz."
+      },
+      "osm": {
+        "name": "OpenStreetMap Foundation",
+        "purpose": "Serverseitige Nominatim-Ortsabfragen für bestimmte Locations."
+      },
+      "google": {
+        "name": "Google / Gmail",
+        "purpose": "Direkte E-Mail an die Gmail-Adresse des Betreibers."
+      },
+      "microsoft": {
+        "name": "Microsoft / Outlook",
+        "purpose": "Direkte E-Mail an die Hotmail-Adresse des Mitbetreibers."
+      }
+    }
+  },
+  "LegalOperators": {
+    "coOperator": "Mitbetreiber: Mathias Schmidt",
+    "coOperatorEmail": "Mathias Schmidt: m.schmidt.d@hotmail.com",
+    "dsaContact": "Kontaktstelle für Nutzer und Behörden nach dem Digital Services Act: cinegenius.co@gmail.com. Die Kommunikation ist auf Deutsch oder Englisch möglich; die Kontaktaufnahme ist nicht auf einen automatisierten Chat beschränkt."
   }
 }
