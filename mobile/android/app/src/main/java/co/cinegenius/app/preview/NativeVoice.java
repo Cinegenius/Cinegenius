@@ -196,20 +196,30 @@ final class NativeVoice {
     }
     private Voice localVoice(String tag) {
         if(!ttsReady||synthesizer==null||synthesizer.getVoices()==null)return null;
-        Locale locale=Locale.forLanguageTag(tag);Voice fallback=null;
+        Locale locale=Locale.forLanguageTag(tag);ArrayList<Voice> candidates=new ArrayList<>();
         for(Voice voice:synthesizer.getVoices()) {
             if(voice.isNetworkConnectionRequired()||!voice.getLocale().getLanguage().equals(locale.getLanguage()))continue;
             if(voice.getFeatures()!=null&&voice.getFeatures().contains(TextToSpeech.Engine.KEY_FEATURE_NOT_INSTALLED))continue;
-            if(voice.getLocale().getCountry().equals(locale.getCountry()))return voice;
-            if(fallback==null)fallback=voice;
+            candidates.add(voice);
         }
-        return fallback;
+        Voice defaultVoice=synthesizer.getDefaultVoice();
+        candidates.sort((left,right)->{
+            int region=Boolean.compare(right.getLocale().getCountry().equals(locale.getCountry()),left.getLocale().getCountry().equals(locale.getCountry()));
+            if(region!=0)return region;
+            int quality=Integer.compare(right.getQuality(),left.getQuality());
+            if(quality!=0)return quality;
+            int preferred=Boolean.compare(right.equals(defaultVoice),left.equals(defaultVoice));
+            if(preferred!=0)return preferred;
+            return left.getName().compareTo(right.getName());
+        });
+        return candidates.isEmpty()?null:candidates.get(0);
     }
     private void speak(Request request) {
         Voice voice=localVoice(request.command.languageTag);
         if(voice==null){fail(request,ttsReady?"language-unavailable":"unavailable");return;}
         finishRecording("cancelled",null);finishSpeaking("cancelled");speaking=request;
-        if(!acquireAudioFocus()||synthesizer.setVoice(voice)==TextToSpeech.ERROR){finishSpeaking("audio");return;}
+        if(!acquireAudioFocus()||synthesizer.setVoice(voice)==TextToSpeech.ERROR
+            ||synthesizer.setSpeechRate(0.94f)==TextToSpeech.ERROR){finishSpeaking("audio");return;}
         speechStarted=SystemClock.uptimeMillis();handler.post(watchdog);
         // Respect each engine's input limit without truncating the reply.
         String text=request.command.text;int limit=TextToSpeech.getMaxSpeechInputLength()-1;
@@ -221,8 +231,10 @@ final class NativeVoice {
             chunks.add(text.substring(start,end));start=end;
         }
         lastUtterance=request.command.requestId+":"+(chunks.size()-1);
+        // Per-utterance volume keeps the device's own volume setting unchanged.
+        Bundle speechParameters=new Bundle();speechParameters.putFloat(TextToSpeech.Engine.KEY_PARAM_VOLUME,0.85f);
         for(int index=0;index<chunks.size();index++) {
-            if(synthesizer.speak(chunks.get(index),index==0?TextToSpeech.QUEUE_FLUSH:TextToSpeech.QUEUE_ADD,null,request.command.requestId+":"+index)==TextToSpeech.ERROR){finishSpeaking("audio");break;}
+            if(synthesizer.speak(chunks.get(index),index==0?TextToSpeech.QUEUE_FLUSH:TextToSpeech.QUEUE_ADD,speechParameters,request.command.requestId+":"+index)==TextToSpeech.ERROR){finishSpeaking("audio");break;}
         }
     }
     private void finishSpeaking(String code) {

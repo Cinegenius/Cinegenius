@@ -243,9 +243,19 @@ final class NativeVoice: NSObject, WKScriptMessageHandler, AVSpeechSynthesizerDe
     private func voice(_ tag: String) -> AVSpeechSynthesisVoice? {
         // Restrict synthesis to installed Apple system voices, not an arbitrary
         // third-party voice provider with its own processing behavior.
-        let voices = AVSpeechSynthesisVoice.speechVoices().filter { $0.identifier.hasPrefix("com.apple.") }
-        return voices.first(where: { $0.language.caseInsensitiveCompare(tag) == .orderedSame })
-            ?? voices.first(where: { $0.language.split(separator: "-").first == tag.split(separator: "-").first })
+        let language = tag.lowercased().split(separator: "-").first
+        let voices = AVSpeechSynthesisVoice.speechVoices().filter {
+            $0.identifier.hasPrefix("com.apple.") && $0.language.lowercased().split(separator: "-").first == language
+        }
+        let defaultVoice = AVSpeechSynthesisVoice(language: tag)?.identifier
+        return voices.sorted { left, right in
+            let leftExact = left.language.caseInsensitiveCompare(tag) == .orderedSame
+            let rightExact = right.language.caseInsensitiveCompare(tag) == .orderedSame
+            if leftExact != rightExact { return leftExact }
+            if left.quality != right.quality { return left.quality.rawValue > right.quality.rawValue }
+            if (left.identifier == defaultVoice) != (right.identifier == defaultVoice) { return left.identifier == defaultVoice }
+            return left.identifier < right.identifier
+        }.first
     }
     private func speak(_ request: Request) {
         guard let voice = voice(request.command.language!) else { fail(request, "language-unavailable"); return }
@@ -257,6 +267,9 @@ final class NativeVoice: NSObject, WKScriptMessageHandler, AVSpeechSynthesizerDe
             try session.setActive(true); ownsAudioSession = true
             let utterance = AVSpeechUtterance(string: request.command.text!)
             utterance.voice = voice; self.utterance = utterance
+            // Match the calm web delivery; leave pitch and device volume alone.
+            utterance.rate = AVSpeechUtteranceDefaultSpeechRate * 0.94
+            utterance.volume = 0.85
             state(request, "speaking"); watch(); synthesizer.speak(utterance)
         } catch { finishSpeaking(code: "audio") }
     }

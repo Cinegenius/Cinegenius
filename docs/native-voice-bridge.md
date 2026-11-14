@@ -3,7 +3,7 @@
 Status: v1 contract accepted by WEB CODEX; native sources integrated, 14 November 2026.
 Website UI is owned by WEB CODEX. Android build and adapter tests are separate
 from the still-required Xcode build, actual audio tests and website integration.
-No voice release or device validation yet.
+No native voice release or device validation yet; the separate web voice UI is live.
 
 The bundled, main-frame adapter exposes `window.CineGeniusVoice` only on the
 configured CineGenius origin and when a native transport is installed. Its
@@ -52,6 +52,17 @@ without sending. WEB limits a transcript to 2,000 characters and must not
 truncate and silently send a longer one. Content edits still require a separate
 explicit confirmation and current server authorization. Cancel never sends.
 Spoken replies are an explicit web UI option.
+
+Native speech sets the rate parameter to 0.94 on Android and 0.94 times Apple's
+default rate on iOS, with an utterance volume of 0.85. Device volume and pitch
+remain unchanged. These settings match the agreed calm web style.
+Among available voices in the same language, prefer the requested region, then
+the highest system-reported quality, the matching system default, and finally a
+stable identifier/name tie-breaker.
+Keep the existing Apple-system/installed-local Android restrictions; do not
+download voices or add a network speech provider. This is a configured speaking
+style, not a claim that it has been heard or approved on an actual device.
+These native defaults do not add parameters or change the v1 bridge contract.
 
 For an automatic spoken search, wait until the selected result route is active
 before calling `speak`; the native navigation cancellation would otherwise cut
