@@ -64,6 +64,10 @@ download voices or add a network speech provider. This is a configured speaking
 style, not a claim that it has been heard or approved on an actual device.
 These native defaults do not add parameters or change the v1 bridge contract.
 
+The updated account-scoped Genie quota handoff and the Apple voice-download/device
+verification boundary are recorded in [native-genie-account-and-voice.md](native-genie-account-and-voice.md).
+Server-side account/model decisions never grant native archive or content rights.
+
 For an automatic spoken search, wait until the selected result route is active
 and the directory has consumed its `genie=1` launch marker before calling
 `speak`; the native navigation cancellation would otherwise cut
