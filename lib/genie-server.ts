@@ -4,7 +4,7 @@ import { createHmac } from "node:crypto";
 import { isIP } from "node:net";
 import { GENIE_LINKS, GENIE_LOCALES, GENIE_MAX_MESSAGE_CHARS, buildGenieInstructions, type validateGenieRequest } from "@/lib/genie";
 import { getTranslations } from "next-intl/server";
-import { CREW_SEARCH_INSTRUCTIONS, CREW_SEARCH_SCHEMA, crewSearchLinks } from "@/lib/genie-search-server";
+import { CREW_SEARCH_INSTRUCTIONS, CREW_SEARCH_SCHEMA, crewSearchLinks, DIRECTORY_SEARCH_INSTRUCTIONS, DIRECTORY_SEARCH_SCHEMA, directorySearchLinks } from "@/lib/genie-search-server";
 import { rateLimit } from "@/lib/rateLimit";
 import { GenieError } from "@/lib/genie-error";
 export { GenieError } from "@/lib/genie-error";
@@ -106,7 +106,7 @@ async function safeAdvice(value: unknown, input: GenieRequest) {
     }
   }
   const advice: unknown = JSON.parse(text.join(""));
-  if (!record(advice) || Object.keys(advice).some(key => !["reply", "linkIds", "language", ...(input.writing ? [] : ["crewSearches"])].includes(key))
+  if (!record(advice) || Object.keys(advice).some(key => !["reply", "linkIds", "language", ...(input.writing ? [] : ["crewSearches", "directorySearches"])].includes(key))
     || typeof advice.reply !== "string" || !advice.reply.trim() || advice.reply.length > GENIE_MAX_MESSAGE_CHARS
     || !Array.isArray(advice.linkIds) || advice.linkIds.some(id => typeof id !== "string")
     || (input.writing ? advice.language !== input.locale : typeof advice.language !== "string" || !GENIE_LOCALES.includes(advice.language))) throw new GenieError("failed", 502);
@@ -118,7 +118,8 @@ async function safeAdvice(value: unknown, input: GenieRequest) {
   }
   const language = advice.language as string;
   const t = await getTranslations({ locale: language, namespace: "Genie.destinations" });
-  const searches = await crewSearchLinks(advice.crewSearches ?? [], language);
+  const searches = [...await crewSearchLinks(advice.crewSearches ?? [], language), ...await directorySearchLinks(advice.directorySearches ?? [], language)];
+  if (searches.length > 3) throw new GenieError("failed", 502);
   const ids = [...new Set(advice.linkIds as string[])].slice(0, 4);
   // Labels and destinations always come from our catalogue, never model URLs.
   const links = ids.flatMap(id => {
@@ -145,7 +146,7 @@ export async function generateGenieAdvice(request: Request, input: GenieRequest,
         max_output_tokens: 600,
         instructions: input.writing
           ? buildGenieInstructions(input.area, input.locale, input.writing)
-          : `${buildGenieInstructions(input.area, input.locale)}\nReturn plain JSON matching the provided schema. Keep reply below ${GENIE_MAX_MESSAGE_CHARS} characters. ${CREW_SEARCH_INSTRUCTIONS} Follow the supported language guidance above, prioritizing the latest user message. Select only catalogue linkIds; never put URLs or Markdown links in reply.`,
+          : `${buildGenieInstructions(input.area, input.locale)}\nReturn plain JSON matching the provided schema. Keep reply below ${GENIE_MAX_MESSAGE_CHARS} characters. ${CREW_SEARCH_INSTRUCTIONS}\n${DIRECTORY_SEARCH_INSTRUCTIONS} Follow the supported language guidance above, prioritizing the latest user message. Select only catalogue linkIds; never put URLs or Markdown links in reply.`,
         input: input.messages.map(message => ({ role: message.role, content: message.content })),
         text: { format: {
           type: "json_schema", name: "genie_advice", strict: true,
@@ -154,10 +155,10 @@ export async function generateGenieAdvice(request: Request, input: GenieRequest,
             properties: {
               reply: { type: "string" },
               linkIds: { type: "array", ...(input.writing ? { maxItems: 0 } : {}), items: { type: "string", enum: GENIE_LINKS.map(link => link.id) } },
-              ...(!input.writing ? { crewSearches: CREW_SEARCH_SCHEMA } : {}),
+              ...(!input.writing ? { crewSearches: CREW_SEARCH_SCHEMA, directorySearches: DIRECTORY_SEARCH_SCHEMA } : {}),
               language: { type: "string", enum: input.writing ? [input.locale] : GENIE_LOCALES },
             },
-            required: ["reply", "linkIds", "language", ...(!input.writing ? ["crewSearches"] : [])],
+            required: ["reply", "linkIds", "language", ...(!input.writing ? ["crewSearches", "directorySearches"] : [])],
           },
         } },
       }),

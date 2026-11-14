@@ -1,4 +1,22 @@
+import { COUNTRY_CODES } from "./places/countries";
+
 /** Read-only links only. Never accept model-generated URLs, paths or write endpoints. */
+export function isGenieSearchHref(href: string): boolean {
+  if (isGenieCrewSearchHref(href)) return true;
+  const path = href.split("?", 1)[0];
+  if (!["/props", "/locations"].includes(path) || !href.includes("?") || href.length > 1800 || /[\\\u0000-\u001f#]/.test(href)) return false;
+  const params = new URLSearchParams(href.slice(path.length + 1));
+  if ([...params.keys()].some(key => !["genie", "q", "cityText", "country"].includes(key) || params.getAll(key).length !== 1)) return false;
+  if (params.get("genie") !== "1") return false;
+  for (const [key, limit] of [["q", 150], ["cityText", 120]] as const) {
+    const value = params.get(key);
+    if (value !== null && (!value.trim() || value.length > limit || /[\u0000-\u001f<>\\]/.test(value))) return false;
+  }
+  const country = params.get("country");
+  if (country !== null && !(COUNTRY_CODES as readonly string[]).includes(country)) return false;
+  return !!(params.get("q") || params.get("cityText") || country);
+}
+
 export function isGenieCrewSearchHref(href: string): boolean {
   if (!href.startsWith("/creators?") || href.length > 1800 || /[\\\u0000-\u001f#]/.test(href)) return false;
   const params = new URLSearchParams(href.slice("/creators?".length));

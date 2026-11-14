@@ -171,6 +171,9 @@ function PropsInner({ serverListings, serverError = false, facetRows, initialDep
   const [sort, setSort] = useViewState<MarketplaceSort>("marketplace.sortKey", initial.sort);
   const [view, setView] = useViewState<DirectoryView>("marketplace.viewMode", initial.view);
   const [pagination, setPagination] = useViewState("marketplace.pagination", { filterKey: "", visibleCount: MARKETPLACE_PAGE_SIZE });
+  const genieLaunch = searchParams.get("genie") === "1" ? searchParams.toString() : "";
+  const appliedGenieLaunch = useRef("");
+
   const selected = marketplaceCategorySelection(department, subcategory);
   const selectedDept = selected.department ? String(selected.department) : null;
   const selectedSub = String(selected.subcategory);
@@ -281,6 +284,18 @@ function PropsInner({ serverListings, serverError = false, facetRows, initialDep
   const browseLoading = !failed && (!hasRemote || (viewMode === "map" ? !remote.complete : remote.pages < currentPage));
   const resultRows = hasRemote ? remote.rows : filtered;
   const map = useDirectoryMap("marketplace", filterKey, resultRows, viewMode === "map");
+  useEffect(() => {
+    if (!genieLaunch) { appliedGenieLaunch.current = ""; return; }
+    if (appliedGenieLaunch.current === genieLaunch) return;
+    appliedGenieLaunch.current = genieLaunch;
+    const params = new URLSearchParams(genieLaunch), next = readMarketplaceBrowseState(params);
+    map.setBounds(null);
+    setQuery(next.query); setDepartment(next.department); setSubcategory(next.subcategory);
+    setOffer(next.offer); setSort(next.sort); setView(next.view);
+    setCityText(params.get("cityText") ?? "");
+    setPlaceFilters({ country: params.get("country") ?? "", region: "", city: "" });
+    setPagination({ filterKey: "", visibleCount: MARKETPLACE_PAGE_SIZE });
+  }, [genieLaunch, map.setBounds, setQuery, setDepartment, setSubcategory, setOffer, setSort, setView, setCityText, setPlaceFilters, setPagination]);
   const resultCount = viewMode === "map" ? map.rows.length : hasRemote ? remote.count : filtered.length;
   const visibleRows = map.rows.slice(0, visibleCount);
   const mapItems = useMemo(() => resultRows.map(row => ({

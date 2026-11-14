@@ -16,7 +16,7 @@ import { locationCategoryLabel } from "@/lib/location-category-labels";
 import { hasCoordinates,inMapBounds,locationDistanceKm,type MapBounds } from "@/lib/location-map";
 import {
 DEFAULT_LOCATION_LANDING_FILTERS,filterLandingLocations,locationLandingCategoryOptions,
-locationLandingParams,type LocationLandingFilters,
+locationLandingParams,readLocationLandingFilters,type LocationLandingFilters,
 } from "@/lib/locations-landing-filters";
 import { browsePlaceOptions as placeOptions, UNASSIGNED_COUNTRY } from "@/lib/places/core";
 import { useNearbyLocation } from "@/lib/use-nearby-location";
@@ -26,6 +26,7 @@ import { ArrowRight,ChevronDown,LayoutList,Map,MapPin,Navigation,Plus,Share2,Sta
 import { useLocale,useTranslations } from "next-intl";
 import dynamic from "next/dynamic";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { useEffect,useMemo,useRef,useState,useSyncExternalStore } from "react";
 
 export type LocationCard = {
@@ -67,6 +68,7 @@ export default function LocationsLanding({ allLocations, totalCount, initialFilt
   const [browseBounds, setBrowseBounds] = useViewState<MapBounds | null>("locations.landing.bounds", null);
   const [activeId, setActiveId] = useState<string | null>(null);
   const nearby = useNearbyLocation();
+  const searchParams = useSearchParams();
   const [nearbyBounds, setNearbyBounds] = useState<MapBounds | null>(null);
   const [nearbyViewportRevision, setNearbyViewportRevision] = useState(0);
   const mapBounds = nearby.coordinates ? nearbyBounds : browseBounds;
@@ -74,6 +76,16 @@ export default function LocationsLanding({ allLocations, totalCount, initialFilt
   const clearLocation = () => { nearby.clear(); setNearbyBounds(null); setBrowseBounds(null); };
   const locateMe = nearby.locate;
   const [radiusKm, setRadiusKm] = useViewState("locations.landing.radius", 50);
+  const genieLaunch = searchParams.get("genie") === "1" ? searchParams.toString() : "";
+  const appliedGenieLaunch = useRef("");
+  useEffect(() => {
+    if (!genieLaunch) { appliedGenieLaunch.current = ""; return; }
+    if (appliedGenieLaunch.current === genieLaunch) return;
+    appliedGenieLaunch.current = genieLaunch;
+    setFilters(readLocationLandingFilters(Object.fromEntries(new URLSearchParams(genieLaunch))));
+    setPagination({ filterKey: "", visibleCount: 24 });
+    setBrowseBounds(null); setNearbyBounds(null); nearby.clear(); setActiveId(null);
+  }, [genieLaunch, setFilters, setPagination, setBrowseBounds, nearby.clear]);
   const [copied, setCopied] = useState(false);
   const copyTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   useEffect(() => () => { if (copyTimer.current) clearTimeout(copyTimer.current); }, []);

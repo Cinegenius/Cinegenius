@@ -9,7 +9,7 @@ import { GENIE_MAX_MESSAGE_CHARS, genieAreaForPath } from "@/lib/genie";
 import { clearConversation, readConversation, safeLinks, saveConversation, trimExchanges, type Exchange } from "@/lib/genie-conversation";
 import styles from "./Genie.module.css";
 import { nativeGenieVoice } from "@/lib/genie-voice";
-import { isGenieCrewSearchHref } from "@/lib/genie-search";
+import { isGenieSearchHref } from "@/lib/genie-search";
 import { useFormRouter } from "@/lib/use-form-router";
 import GenieVoiceControls from "./GenieVoiceControls";
 
@@ -149,7 +149,7 @@ export default function GeniePanel({ active, requestRef, memoryScope }: { active
         links: safeLinks("links" in result ? result.links : []),
       }]);
       setExchanges(updated);
-      const searchLink = updated.at(-1)?.links.find(link => isGenieCrewSearchHref(link.href));
+      const searchLink = updated.at(-1)?.links.find(link => isGenieSearchHref(link.href));
       if (spoken && searchLink) router.push(searchLink.href);
       setVoiceReply({ id: sequence.current, text: result.reply, locale: "language" in result && typeof result.language === "string" ? result.language : locale, spoken, route: spoken ? searchLink?.href : undefined });
       if (memoryScope) {
