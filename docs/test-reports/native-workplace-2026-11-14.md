@@ -10,6 +10,11 @@ bleiben erhalten. Die neun Kataloge enthalten unverändert die 96 neuen
 `NativeRoomScanner`-Texte und zusätzlich den Web-Schlüssel `companyTeam.leadership`.
 Der separate Rechtstextentwurf wurde nicht übernommen.
 
+Mit `4a95918c01586065bf33c94cfe1bc3f433331dfb` sind die nativen Quellen ebenfalls
+gesichert. Der anschließende Mac-Abgleich bestand ohne Konflikte: 49 Dateien
+aktualisiert, 23 bereits identisch; Ausgangsdateien wurden separat gesichert.
+Die 18 nativen Dateien wurden dabei nicht ersetzt oder verändert.
+
 WEB CODEX hat die Veröffentlichung von `e47c068` nach Markus' dortiger ausdrücklicher
 Freigabe bestätigt. Die Remote-Vorschau kann diese Version nach frischem Laden
 anzeigen. Das ist keine Veröffentlichung des nativen Arbeitsplatzes oder dieser
@@ -67,8 +72,18 @@ bis zum Ende der Weitergabe. Wände werden mit linearem Aufwand nummeriert;
 Linienarten sind in Ansicht und PDF unterscheidbar. Eine eigene passive
 Abdeckung schützt auch eigene Dialoge beim Wechsel in den Hintergrund.
 
-Noch offen im ersten Mac-Bericht: abschließende Build-Bestätigung nach dem
-Registrierungs-Guard, neun native Sprachansichten, größere Schrift,
+Der anschließende Build nach dem Registrierungs-Guard ist ebenfalls bestätigt:
+`build_run_sim` erfolgreich in 50,7 Sekunden, gestarteter Prozess 59126 im
+iPhone-17-Simulator, ohne gemeldete Buildwarnungen/-fehler.
+Zusätzlich bestand der Debug-Build für das echte iPhone-SDK mit
+`generic/platform=iOS` und `CODE_SIGNING_ALLOWED=NO` (Exit 0). Das prüft die
+Gerätekompilierung, erstellt aber noch keine signierte Installation.
+
+Die englische, spanische und italienische native Bedienung wurde bis zum
+gekennzeichneten Beispielgrundriss geprüft. Die vollständige Sprach-/Layoutprüfung
+ist damit noch nicht abgeschlossen.
+
+Noch offen im ersten Mac-Bericht: neun native Sprachansichten, größere Schrift,
 Arbeitsplatz-Aufruf aus der echten Webansicht/Schnellaktion sowie vollständige
 Abbruch-/Cleanup-Prüfung der Weitergabe. Weitere Mac-Belege ergänzen diesen Stand;
 diese offenen Fälle werden nicht als bestanden gezählt.
@@ -76,8 +91,10 @@ diese offenen Fälle werden nicht als bestanden gezählt.
 ## Physisches iPhone
 
 Das iPhone 15 Pro wird über USB als verbunden und mit dem Mac gekoppelt erkannt.
-Der zuletzt bestätigte Gerätestand zeigte noch ausgeschalteten Entwicklermodus
-und keine nutzbare Entwicklungssignatur. Markus hat keine kostenpflichtige
+Nach Markus' Neustart bestätigt der erneute Gerätecheck eingeschalteten
+Entwicklermodus, verfügbare Entwicklerdienste und die Kabelverbindung. Xcode zeigt
+weiterhin die erforderliche Apple-Account-Anmeldung; es gibt noch keine nutzbare
+Entwicklungssignatur. Markus hat keine kostenpflichtige
 Apple-Developer-Mitgliedschaft; vorgesehen ist die kostenlose direkte Installation
 mit Xcodes Personal Team. Persönliche Anmeldung und Gerätebestätigungen bleiben
 bei Markus. Es wurde kein TestFlight-Upload durchgeführt.
@@ -86,3 +103,12 @@ Echte Raumaufnahme, Kamera-Freigabe, Wiederaufnahme nach Unterbrechung, Vergleic
 der Maße vor Ort und USDZ-Export aus einer echten Aufnahme bleiben bis zum
 vollständigen Gerätetest offen. Keine gespeicherten privaten Nutzerpläne wurden
 für diese Prüfung auf den Server kopiert.
+
+## Unterbrechung bei der Apple-Anmeldung
+
+Markus meldete anschließend ein hängendes Xcode und beauftragte dessen Neustart.
+Gleichzeitig wurde die lokale Mac-Aufgabe als unterbrochen/nicht geladen gemeldet;
+die beiden Neustart-Aufträge konnten wegen einer ausgefallenen Steuerverbindung
+nicht zugestellt werden. Ein Xcode-Neustart wird deshalb nicht als ausgeführt
+behauptet. Die noch offenen nativen Bedienprüfungen und Geräteinstallation bleiben
+offen. Die vollständigen App-Quellen sind bereits auf Server und Mac gesichert.
