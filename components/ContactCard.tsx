@@ -15,11 +15,13 @@ type Contact = {
   role: string;
 };
 
-export default function ContactCard({ contact, pending, error, onRemove }: {
+export default function ContactCard({ contact, pending, error, onRemove, messageHref, onMessage }: {
   contact: Contact;
   pending: boolean;
   error: string;
   onRemove: (id: string) => Promise<boolean>;
+  messageHref?: string;
+  onMessage?: () => void;
 }) {
   const t = useTranslations("Contacts");
   const profile = useTranslations("profile");
@@ -28,7 +30,12 @@ export default function ContactCard({ contact, pending, error, onRemove }: {
   const [failed, setFailed] = useState(false);
   const inFlight = useRef(false);
   const mounted = useRef(false);
-  useEffect(() => { mounted.current = true; return () => { mounted.current = false; }; }, []);
+  useEffect(() => {
+    mounted.current = true;
+    // Activity can hide this pane during Back navigation while a request finishes.
+    queueMicrotask(() => { if (mounted.current && !inFlight.current) setRemoving(false); });
+    return () => { mounted.current = false; };
+  }, []);
   const busy = pending || removing;
   const focusStyle = "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold";
   const close = () => { if (!inFlight.current && !pending) setConfirm(false); };
@@ -69,7 +76,11 @@ export default function ContactCard({ contact, pending, error, onRemove }: {
         </div>
       </div>
       <div className="flex max-w-full flex-wrap items-center gap-x-3 gap-y-1 sm:justify-end">
-        <Link href={`/messages?to=${encodeURIComponent(contact.user_id)}`} aria-label={t("messageLabel", { name: contact.display_name })}
+        <Link href={messageHref ?? `/messages?to=${encodeURIComponent(contact.user_id)}`} aria-label={t("messageLabel", { name: contact.display_name })}
+          onClick={event => {
+            if (!onMessage || event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+            event.preventDefault(); onMessage();
+          }}
           className={`inline-flex min-h-11 max-w-full items-center justify-center gap-2 rounded-lg border border-gold/30 bg-gold/10 px-3 py-2 text-sm font-semibold text-gold transition-colors hover:bg-gold/20 ${focusStyle}`}>
           <MessageSquare size={16} className="shrink-0" aria-hidden="true" /><span className="min-w-0 [overflow-wrap:anywhere]">{t("message")}</span>
         </Link>

@@ -99,7 +99,7 @@ export async function sendFriendAcceptedEmail(to: string, accepterName: string, 
   await send(to, t("friendAcceptedSubject", {name: normalizedEmailText(accepterName)}), wrap(`
     ${h1(escapeHtml(t("friendAcceptedHeading")))}
     ${p(t.markup("friendAcceptedBody", {name: escapeHtml(accepterName), person: chunks => `<strong style="color:#f0f0f0">${chunks}</strong>`}))}
-    ${btn(escapeHtml(t("friendAcceptedAction")), `${BASE}/dashboard?tab=friends`)}
+    ${btn(escapeHtml(t("friendAcceptedAction")), `${BASE}/messages?view=friends`)}
   `, locale, t("footer")));
 }
 
