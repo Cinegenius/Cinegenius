@@ -82,8 +82,11 @@ Kataloge und bestehenden Veröffentlichungsregeln.
 ## Smart-Suche (14. November 2026)
 
 **Status: Grundfunktion mit `ce37ab6`, Trefferkorrekturen, Name Smart und
-Mitgliederzugang mit `3604ba4` veröffentlicht. Der nachfolgend beschriebene
-Start mit Locations und der dezente Hinweis beim Smart-Klick sind noch nicht live.**
+Mitgliederzugang mit `3604ba4` veröffentlicht. Start mit Locations und der dezente
+Hinweis beim Smart-Klick sind mit `60f17e7` ebenfalls veröffentlicht.**
+WEB-Veröffentlichungsbeleg vom 14. November 2026:
+`/srv/cinegenius/audits/20261114-home-search-member-hint/production-receipt.json`,
+Vercel `dpl_Cpc888oapKCCghiwqV5i839WB52e` READY. Kein Nachweis eines neuen nativen Builds.
 Markus hat den früheren Aufschub mit „ok dann setzen wir das um“ aufgehoben.
 Die technische Prüfung ist im Bericht `test-reports/genie-unified-search-2026-11-14.md`
 dokumentiert. Der echte KI-Sprachverständnistest steht noch aus: Der vorhandene

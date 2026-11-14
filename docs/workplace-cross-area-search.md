@@ -38,7 +38,7 @@ Der ältere App-Anwendungsstand `8eac132` enthielt diese Mitgliedersperre noch n
 
 ## Neuer Startseiteneinstieg mit Locations
 
-WEB übergibt am 14. November 2026 den geprüften Commit `60f17e76e7f67385c9ec1df13e14433551ad3373` auf `codex/home-search-member-hint`. Dieser folgende App-Abgleich ergänzt ausschließlich den Einstieg und seine Texte; Plan v1, serverseitige Mitgliedersperre, Kontingente und native Quellen bleiben erhalten. Laut Übergabe ist diese Ergänzung noch nicht veröffentlicht, während `3604ba4` die veröffentlichte Grundlage bleibt. Beleg des WEB-Standes: `/srv/cinegenius/audits/20261114-home-search-member-hint/receipt.json`.
+WEB hat am 14. November 2026 den geprüften Commit `60f17e76e7f67385c9ec1df13e14433551ad3373` übergeben; er ist im App-Commit `51be5fea0bb3312a39c7a80a790bf84d566a9d77` integriert. Der Abgleich ergänzt ausschließlich den Einstieg und seine Texte; Plan v1, serverseitige Mitgliedersperre, Kontingente und native Quellen bleiben erhalten. Nach Markus’ „Ja, live stellen“ hat WEB genau diesen Stand inzwischen veröffentlicht: `origin/main` ist `60f17e7`, Vercel `dpl_Cpc888oapKCCghiwqV5i839WB52e` READY. Der geprüfte Beleg `/srv/cinegenius/audits/20261114-home-search-member-hint/production-receipt.json` ersetzt die ursprüngliche Noch-nicht-live-Angabe. Kein zusätzlicher Livegang oder Gerätebuild durch den App-Abgleich.
 
 - Beim Betreten der Startseite ist Locations ausgewählt. Smart bleibt ein gewöhnlicher Reiter ohne vorher sichtbares Mitgliederlabel, Schloss oder Hover-/Fokushinweis.
 - Erst Klick oder Tastaturaktivierung durch Gäste zeigt am Reiter die kleine Sprechblase „Nur für Mitglieder“. Bei noch ungeklärter Anmeldung steht dort stattdessen der vorhandene Ladehinweis. Keine Navigation zur Suche oder Anmeldung und kein Positionssprung; die vorherige öffentliche Auswahl sowie Suchtext und Stadt bleiben erhalten.
@@ -46,6 +46,8 @@ WEB übergibt am 14. November 2026 den geprüften Commit `60f17e76e7f67385c9ec1d
 - Der neutrale Platzhalter lautet „Was suchst du?“ in allen neun bestehenden Katalogen. Der native Arbeitsplatz verwendet später denselben gemeinsamen Einstieg und keine abweichenden Gastrechte.
 
 Der aktuelle App-Prüfbeleg liegt unter `/srv/cinegenius/handoffs/20261114-app-home-member-hint/`. 13 gezielte Suchziel-/Feldprüfungen, 36 Sprach-/Breitenfälle, ein simulierter Anmelde-/Sitzungswechsel, zusätzliche Enter-/Leertaste-/Fokus-/Escape-Prüfungen bei 320 und 1440 CSS px sowie die tatsächliche gebaute Next-Anwendung als Gast bei vier Breiten sind erfolgreich. Build, TypeScript, i18n mit 8.073 Schlüsseln in neun Katalogen, Lint und Design bestanden. Die 123 nativen Dateien und zehn geprüften App-/Berechtigungsdateien sind unverändert. Browserprüfungen und simulierte Sitzungswechsel sind weiterhin kein Nachweis einer neuen Xcode-/iPhone-Installation oder echter Sprachausgabe.
+
+WEB kündigt anschließend eine separate, von Markus beauftragte Korrektur von Genies Kosteninformation an. Sie ist noch in Arbeit und nicht Bestandteil von `60f17e7`. Erst den geprüften Commit samt Texten, Tests und Veröffentlichungsstatus in die App übernehmen; aus dieser Ankündigung keine geänderten Preise, Kontingente oder bereits korrigierten Antworten ableiten.
 
 ## Bestätigter Bedienablauf
 
