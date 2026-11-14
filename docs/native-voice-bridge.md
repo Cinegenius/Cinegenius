@@ -47,7 +47,7 @@ final transcript. No bridge method itself sends a Genie message, navigates,
 edits a record, publishes or contacts another person. WEB owns the explicit
 “finish recording and send” interaction: with an empty composer it may send
 the final transcript to Genie, speak the reply and open a server-validated
-read-only Crew search link. With an existing unsent draft it appends the text
+read-only Crew, Marketplace or Locations search link. With an existing unsent draft it appends the text
 without sending. WEB limits a transcript to 2,000 characters and must not
 truncate and silently send a longer one. Content edits still require a separate
 explicit confirmation and current server authorization. Cancel never sends.
@@ -65,7 +65,8 @@ style, not a claim that it has been heard or approved on an actual device.
 These native defaults do not add parameters or change the v1 bridge contract.
 
 For an automatic spoken search, wait until the selected result route is active
-before calling `speak`; the native navigation cancellation would otherwise cut
+and the directory has consumed its `genie=1` launch marker before calling
+`speak`; the native navigation cancellation would otherwise cut
 off the answer. Closing, changing language or backgrounding also cancels the
 pending spoken Genie request, so its late reply cannot navigate or start audio.
 Native navigation checks invalidate only operations belonging to an older URL;
@@ -102,6 +103,25 @@ The native path uses OS speech recognition and returns text; it does not call
 the web audio transcription endpoint. WEB's browser-only recorder may call
 `POST /api/genie/transcribe` with the existing authenticated server access.
 Neither native bundle contains an AI key or writes audio/transcripts to files.
+
+Retention coordination, 14 November 2026: WEB CODEX has handed over Markus's
+confirmed requirement to keep no persistent search-history archive and to clear
+the Genie conversation after ten minutes without Genie activity. Current search
+results/filters, unsent input and workplace drafts/plans must survive that expiry.
+Apply the same rule to any future native-owned Genie/search history; do not add
+a parallel transcript cache. The existing native voice adapter and iOS/Android
+implementations keep only bounded active speech requests, clear them on
+completion/cancellation and have no conversation-history persistence.
+
+The shared WebView Genie conversation currently still uses the earlier web
+storage implementation. Its reviewed ten-minute retention commit is pending
+handoff from WEB CODEX; this native-source audit does not claim that expiry is
+implemented or live. Reconcile the reviewed web implementation with the app's
+route-aware speech, interruption handling and legacy-host microphone guard.
+Use a narrowly scoped conversation expiry, never a broad WebView/storage purge:
+account sessions, locale choice, current browse state and private plan archives
+are separate. Background suspension must not revive expired conversation state
+on return. No model selection, provider or cost change is part of this rule.
 
 Transport is internal: `cinegeniusVoice` WKScriptMessageHandler on iOS;
 origin-scoped AndroidX WebMessageListener on Android. Do not use a wildcard
