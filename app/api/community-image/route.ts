@@ -4,7 +4,7 @@ import { auth } from "@clerk/nextjs/server";
 import { blockedMediaOwnerIds } from "@/lib/linked-profile-access";
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
-import { COMMUNITY_ALLOWED_SOURCE_TYPES, isOwnPublicStorageUrl } from "@/lib/community-media";
+import { isOwnPublicStorageUrl } from "@/lib/community-media";
 import { cachedCommunityPreview, readPreviewSource, resizeCommunityPreview } from "@/lib/community-preview-server";
 import { getTranslations as getResponseTranslations } from "next-intl/server";
 
@@ -19,9 +19,8 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: tResponse('System.m_573f1f11c4a9') }, { status: 400, headers });
   }
   // Never turn the resizing service into a proxy for private or excluded media.
-  const { data, error } = await db.from("public_community_media")
-    .select("storage_id,uploaded_at,owner_id").in("source_type", [...COMMUNITY_ALLOWED_SOURCE_TYPES])
-    .eq("image_url", image).limit(1).maybeSingle();
+  const { data: matches, error } = await db.rpc("public_community_image", { p_image: image });
+  const data = Array.isArray(matches) ? matches[0] : null;
   if (error) return NextResponse.json({ error: tResponse('System.m_9a5e91b6061d') }, { status: 503, headers });
   if (!data) return NextResponse.json({ error: tResponse('System.m_e3d2d6e03512') }, { status: 404, headers });
   try {

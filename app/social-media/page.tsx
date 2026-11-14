@@ -1,4 +1,3 @@
-import type { Metadata } from "next";
 import { db } from "@/lib/db";
 import Image from "@/components/MediaImage";
 import Link from "next/link";
@@ -88,7 +87,7 @@ export default async function SocialMediaPage() {
         alt=""
         fill
         priority
-        unoptimized
+        sizes="100vw"
         className="object-cover object-top"
       />
       <div className="absolute inset-0 bg-black/70" />

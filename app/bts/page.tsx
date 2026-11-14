@@ -1,4 +1,3 @@
-import type { Metadata } from "next";
 import { db } from "@/lib/db";
 import Image from "@/components/MediaImage";
 import Link from "next/link";
@@ -7,6 +6,9 @@ import { auth } from "@clerk/nextjs/server";
 import BTSMosaicGrid, { type BTSGridItem } from "./BTSMosaicGrid";
 import PhotoNavigationLink from "./PhotoNavigationLink";
 import { getPrivateProfileIds } from "@/lib/trust";
+import { communityPreviewUrl } from "@/lib/community-preview";
+import { isOwnPublicStorageUrl } from "@/lib/community-media";
+import { collectFacetRows } from "@/lib/browse-facets";
 import { photoHref } from "@/lib/photo-link";
 import { getTranslations } from "next-intl/server";
 import { getTranslations as getMetadataTranslations } from "next-intl/server";
@@ -45,16 +47,24 @@ export default async function BTSPage() {
   const publicProfiles = profileRows.filter((profile) => !privateIds.has(profile.user_id));
   const publicProfileIds = publicProfiles.map((profile) => profile.user_id);
 
-  // Fetch likes only for public profiles, keyed by both owner and image URL.
-  const { data: likeRows } = publicProfileIds.length
-    ? await db.from("profile_image_likes").select("image_url, profile_id, liker_id").in("profile_id", publicProfileIds)
-    : { data: [] as Array<{ image_url: string; profile_id: string; liker_id: string }> };
+  // Discovery eligibility includes protected uploads and excludes foreign/private
+  // canonical parents even when a public profile still mirrors their URL.
+  const [eligibleRows, { data: likeRows }] = await Promise.all([
+    collectFacetRows<{ owner_id: string; image_url: string }>((from, to) => db.from("public_community_media")
+      .select("owner_id,image_url").eq("source_type", "profile").order("storage_id").range(from, to), 500),
+    // Fetch likes only for public profiles, keyed by both owner and image URL.
+    publicProfileIds.length
+    ? db.from("profile_image_likes").select("image_url, profile_id, liker_id").in("profile_id", publicProfileIds)
+    : { data: [] as Array<{ image_url: string; profile_id: string; liker_id: string }> },
+  ]);
+  const eligible = new Set(eligibleRows.map(row => `${row.owner_id}:${row.image_url}`));
 
   const likeCounts: Record<string, number> = {};
   const myLikes: string[] = [];
 
   for (const row of likeRows ?? []) {
     const key = `${row.profile_id}:${row.image_url}`;
+    if (!eligible.has(key)) continue;
     likeCounts[key] = (likeCounts[key] ?? 0) + 1;
     if (userId && row.liker_id === userId) myLikes.push(key);
   }
@@ -85,14 +95,14 @@ export default async function BTSPage() {
       : [];
 
     const btsImgs = images.filter(
-      (img) => img.url?.includes("supabase.co/storage") && BTS_TYPES.has(img.media_type ?? "")
+      (img) => Boolean(img.url && isOwnPublicStorageUrl(img.url, process.env.NEXT_PUBLIC_SUPABASE_URL ?? "") && eligible.has(`${p.user_id}:${img.url}`)) && BTS_TYPES.has(img.media_type ?? "")
     );
 
     const isCrew = [p.profile_type, ...(Array.isArray(p.profile_types) ? p.profile_types : [])]
       .some((t: string) => CREW_TYPES.has(t));
 
     const fallbackImgs = isCrew
-      ? images.filter((img) => img.url?.includes("supabase.co/storage") && img.media_type !== "headshot")
+      ? images.filter((img) => Boolean(img.url && isOwnPublicStorageUrl(img.url, process.env.NEXT_PUBLIC_SUPABASE_URL ?? "") && eligible.has(`${p.user_id}:${img.url}`)) && img.media_type !== "headshot")
       : [];
 
     const toAdd = btsImgs.length > 0 ? btsImgs : fallbackImgs;
@@ -116,7 +126,7 @@ export default async function BTSPage() {
         alt=""
         fill
         priority
-        unoptimized
+        sizes="100vw"
         className="object-cover object-top"
       />
       <div className="absolute inset-0 bg-black/72" />
@@ -148,8 +158,7 @@ export default async function BTSPage() {
             {topRated.map((item, i) => (
               <PhotoNavigationLink key={`${item.profileId}:${item.imageUrl}`} href={photoHref(item.profileId, item.imageUrl)}
                 className="group relative rounded-2xl overflow-hidden aspect-video bg-bg-elevated border border-red-400/20">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={item.imageUrl} alt={item.authorName}
+                <Image src={communityPreviewUrl(item.imageUrl)} alt={item.authorName} fill unoptimized sizes="(min-width: 640px) 33vw, 100vw"
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
                 <div className="absolute top-3 left-3 flex items-center gap-1.5 px-2.5 py-1 bg-red-500/80 rounded-full text-white text-[11px] font-bold backdrop-blur-sm">

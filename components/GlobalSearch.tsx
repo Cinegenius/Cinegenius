@@ -1,5 +1,6 @@
 "use client";
 
+import { readRecentSearches, saveRecentSearch, removeRecentSearches } from "@/lib/recent-searches";
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslations , useLocale } from "next-intl";
@@ -25,18 +26,14 @@ type Result = {
 // Type order for display
 const TYPE_ORDER = ["profile", "creator", "job", "location", "vehicle", "prop", "company", "animal"];
 
-const RECENT_KEY = "cg_recent_searches";
-const MAX_RECENT = 5;
-
 function getRecentSearches(): string[] {
-  try { return JSON.parse(localStorage.getItem(RECENT_KEY) ?? "[]"); } catch { return []; }
+  try { return readRecentSearches(window.localStorage); } catch { return []; }
 }
-function addRecentSearch(q: string) {
-  const prev = getRecentSearches().filter((s) => s !== q);
-  localStorage.setItem(RECENT_KEY, JSON.stringify([q, ...prev].slice(0, MAX_RECENT)));
+function addRecentSearch(query: string) {
+  try { saveRecentSearch(window.localStorage, query); } catch { /* Storage can be unavailable. */ }
 }
 function clearRecentSearches() {
-  localStorage.removeItem(RECENT_KEY);
+  try { removeRecentSearches(window.localStorage); } catch { /* Storage can be unavailable. */ }
 }
 
 export default function GlobalSearch() {

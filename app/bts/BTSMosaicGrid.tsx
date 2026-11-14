@@ -5,6 +5,7 @@ import Link from "next/link";
 import { MapPin } from "lucide-react";
 import { useUser } from "@clerk/nextjs";
 import PhotoLikeButton from "@/components/PhotoLikeButton";
+import { communityPreviewUrl } from "@/lib/community-preview";
 import { markPhotoNavigation, photoHref } from "@/lib/photo-link";
 
 export interface BTSGridItem {
@@ -43,7 +44,9 @@ export default function BTSMosaicGrid({
             {/* Image opens a permalink for this exact photo. */}
             <Link href={photoHref(item.profileId, item.imageUrl)} onClick={markPhotoNavigation} className="absolute inset-0 z-0">
               <Image
-                src={item.imageUrl}
+                src={communityPreviewUrl(item.imageUrl)}
+                unoptimized
+                mediaSize="thumbnail"
                 alt={item.authorName}
                 fill
                 className="object-cover group-hover:scale-105 transition-transform duration-500 ease-out"

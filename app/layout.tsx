@@ -1,4 +1,3 @@
-import type { Metadata } from "next";
 import { Playfair_Display, DM_Sans, JetBrains_Mono } from "next/font/google";
 import { ClerkProvider } from "@clerk/nextjs";
 import { auth } from "@clerk/nextjs/server";
@@ -6,7 +5,8 @@ import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { deDE, enUS, esES, csCZ, huHU, itIT, nlNL, nlBE, svSE } from "@clerk/localizations";
 import AppIntlProvider from "@/components/AppIntlProvider";
-import { getLocale, getMessages, getNow } from "next-intl/server";
+import { getLocale, getMessages, getNow, getTimeZone } from "next-intl/server";
+import { clientMessages } from "@/lib/i18n/client-messages";
 import "./globals.css";
 import AppChrome from "@/components/AppChrome";
 import { isConfiguredAdmin } from "@/lib/admin-policy";
@@ -26,18 +26,21 @@ import { getTranslations as getMetadataTranslations } from "next-intl/server";
 const playfair = Playfair_Display({
   variable: "--font-playfair",
   subsets: ["latin"],
+  preload: false,
   weight: ["400", "600", "700", "800"],
 });
 
 const dmSans = DM_Sans({
   variable: "--font-dm-sans",
   subsets: ["latin"],
+  preload: false,
   weight: ["400", "500", "600", "700"],
 });
 
 const jetbrains = JetBrains_Mono({
   variable: "--font-jetbrains",
   subsets: ["latin"],
+  preload: false,
   weight: ["400", "500"],
 });
 
@@ -114,7 +117,7 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const [locale, messages, now, { userId, sessionId }] = await Promise.all([getLocale(), getMessages(), getNow(), auth()]);
+  const [locale, messages, now, timeZone, { userId, sessionId }] = await Promise.all([getLocale(), getMessages(), getNow(), getTimeZone(), auth()]);
   const clerkLocalization = CLERK_LOCALIZATIONS[locale] ?? deDE;
   const htmlLang = HTML_LANG[locale] ?? "de";
 
@@ -141,7 +144,7 @@ export default async function RootLayout({
           <link rel="dns-prefetch" href="https://clerk.com" />
         </head>
         <body className="min-h-screen flex flex-col bg-bg-primary text-text-primary font-sans">
-          <AppIntlProvider locale={locale} messages={messages} now={now}>
+          <AppIntlProvider locale={locale} messages={clientMessages(messages)} now={now} timeZone={timeZone}>
           <ThemeProvider>
             <ToastProvider>
               <AuthSessionBoundary initialSessionId={sessionId}>
