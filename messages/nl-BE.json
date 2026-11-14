@@ -2104,7 +2104,9 @@
     "sentryPrepared": "Voor foutdiagnose zijn configuratiebestanden voor Sentry (Functional Software Inc., San Francisco, VS) voorbereid. Alleen deze bestanden activeren nog geen gegevensoverdracht; in de huidige toepassing is geen Sentry-initialisatie opgenomen.",
     "replayDisabled": "Session Replay is ook in de voorbereide configuratie uitgeschakeld. Hierdoor worden geen sessieopnames of voorafgaande replaybuffers aangemaakt. Voor een latere activering moeten eerst het doel en de rechtsgrondslag worden beoordeeld en is eventueel geldige toestemming nodig. Deze privacy-informatie vervangt geen toestemming.",
     "sentryPurpose": "Foutdiagnose voorbereid; Session Replay uitgeschakeld (zie onderdeel 12)",
-    "newsRegionDisclosure": "Regionale Branchennews: Ohne eigene Länderauswahl verwenden wir vorrangig das Land aus deinem Profil, sonst das vom Hosting-Anbieter übermittelte ungefähre Land deiner Verbindung. Dafür fragen wir keinen GPS-Standort ab. Deine ausdrücklich gewählte Einstellung speichern wir für bis zu ein Jahr in einem Cookie mit dem Präfix cg_news_country_, getrennt für Gäste und angemeldete Konten. Du kannst jederzeit ein anderes Land, „Alle Länder“ oder „Automatisch“ wählen. Die automatische Ländererkennung wird nicht in diesem Cookie gespeichert. Die Oberflächensprache folgt deiner gespeicherten Sprachwahl, sonst einer unterstützten Browsersprache; fehlt diese, dient das ungefähre Land als Rückfall. Originalbeiträge werden nicht automatisch übersetzt."
+    "newsRegionDisclosure": "Regionale Branchennews: Ohne eigene Länderauswahl verwenden wir vorrangig das Land aus deinem Profil, sonst das vom Hosting-Anbieter übermittelte ungefähre Land deiner Verbindung. Dafür fragen wir keinen GPS-Standort ab. Deine ausdrücklich gewählte Einstellung speichern wir für bis zu ein Jahr in einem Cookie mit dem Präfix cg_news_country_, getrennt für Gäste und angemeldete Konten. Du kannst jederzeit ein anderes Land, „Alle Länder“ oder „Automatisch“ wählen. Die automatische Ländererkennung wird nicht in diesem Cookie gespeichert. Die Oberflächensprache folgt deiner gespeicherten Sprachwahl, sonst einer unterstützten Browsersprache; fehlt diese, dient das ungefähre Land als Rückfall. Originalbeiträge werden nicht automatisch übersetzt.",
+    "genieVoiceTitle": "Genie-Sprachbedienung — deutscher Originaltext, Stand: 14. November 2026",
+    "genieVoiceDisclosure": "Die freiwillige Sprachbedienung startet erst durch deine Mikrofonaktion und eine erforderliche Gerätefreigabe. Im Browser wird die beendete Aufnahme (höchstens 30 Sekunden und 1 MiB) über den CineGenius-Server an OpenAI zur Texterkennung übermittelt. In unterstützten nativen Apps übernimmt der Sprachdienst des Geräts die Erkennung; dabei kann eine Verarbeitung durch dessen Anbieter erforderlich sein. Bei leerem Eingabefeld wird der erkannte Text anschließend an Genie gesendet, andernfalls nur deinem ungesendeten Text hinzugefügt. Der KI-Dienst erhält die gesendeten Nachrichten, die letzten Gesprächsrunden, die Sprache und den groben Seitenbereich. Antworten können über die künstliche Stimme des Browsers oder Geräts vorgelesen werden; je nach gewählter Systemstimme verarbeitet deren Anbieter den Antworttext. CineGenius speichert keine Audiodateien. Abgeschlossene Textgespräche bleiben kontogebunden bis zu 24 Stunden im aktuellen Browser-Tab; du kannst sie über den Papierkorb löschen. Für die Missbrauchsbegrenzung werden Nutzungszähler geführt. Das Löschen des lokalen Verlaufs löscht keine bereits übermittelten Daten beim jeweiligen Dienst. Die Aufbewahrung bei OpenAI richtet sich nach dem verwendeten Dienst und seiner Konfiguration; deaktivierte Gesprächsspeicherung ist keine Zusage, dass keinerlei Sicherheitsprotokolle entstehen. Schließen, Abbrechen, Kontowechsel und der Wechsel in den Hintergrund beenden die aktuelle Aufnahme. Die Suche verwendet nur den von dir genannten Ort und ungefähre öffentliche Ortskoordinaten, keinen GPS-Standort. Sie kann passende Filter öffnen, veröffentlicht aber keine Inhalte und ändert keine gemeinsamen Arbeitspläne. Bitte sprich keine Passwörter oder unnötigen vertraulichen Angaben ein."
   },
   "SetupOffers": {
     "accountReady": "Je aanbiedersaccount is ingesteld.",
@@ -7485,7 +7487,50 @@
     "assistantLabel": "AI-assistent",
     "dismissWelcome": "Begroeting sluiten",
     "hideLauncher": "Genie voor dit bezoek verbergen",
-    "moveLauncher": "Sleep om te verplaatsen. Met het toetsenbord: Alt en de pijltjestoetsen."
+    "moveLauncher": "Sleep om te verplaatsen. Met het toetsenbord: Alt en de pijltjestoetsen.",
+    "voice": {
+      "start": "Praat met Genie",
+      "stop": "Opname stoppen en versturen",
+      "cancel": "Opname annuleren",
+      "speak": "Antwoord voorlezen",
+      "stopSpeaking": "Voorlezen stoppen",
+      "requesting": "Microfoon openen…",
+      "recording": "Ik luister…",
+      "transcribing": "Spraak herkennen…",
+      "speaking": "Genie spreekt…",
+      "error": {
+        "unsupported": "Spraak is hier of voor deze taal niet beschikbaar. Je kunt blijven typen.",
+        "permission": "Sta de microfoon toe in de instellingen van je toestel of browser.",
+        "failed": "Dat lukte niet. Spreek opnieuw of typ je bericht.",
+        "timeout": "Spraakherkenning duurde te lang. Probeer het opnieuw.",
+        "rate_limited": "De gebruikslimiet is bereikt. Probeer het later opnieuw.",
+        "unavailable": "Spraakherkenning is nu niet beschikbaar. Je kunt blijven typen."
+      },
+      "notice": "Spreek maximaal 30 seconden. Na afloop gaat je opname naar OpenAI voor herkenning en de herkende tekst naar Genie. Bestaande tekst wordt alleen aangevuld. Antwoorden worden met een kunstmatige toestelstem voorgelezen.",
+      "noticeNative": "Spreek maximaal 30 seconden. De spraakdienst van je toestel kan de opname verwerken. Na afloop gaat de herkende tekst naar Genie; bestaande tekst wordt alleen aangevuld. Antwoorden gebruiken een kunstmatige toestelstem."
+    },
+    "searchNear": "{city} · binnen {radius} km",
+    "radiusHint": "Afstanden hebben betrekking op de opgegeven plaats. Profielen zonder herkenbare locatie verschijnen niet bij zoeken binnen een straal.",
+    "destinations": {
+      "sign-up": "Account aanmaken",
+      "sign-in": "Aanmelden",
+      "setup": "Profiel instellen",
+      "profile": "Mijn profiel bewerken",
+      "listings": "Mijn advertenties",
+      "create": "Advertentie maken",
+      "marketplace": "Marktplaats",
+      "locations": "Locaties ontdekken",
+      "crew": "Crew en talent",
+      "companies": "Bedrijven ontdekken",
+      "company-setup": "Bedrijf aanmaken",
+      "company-dashboard": "Bedrijven beheren",
+      "jobs": "Jobs",
+      "projects": "Projecten",
+      "messages": "Berichten",
+      "help": "Hulp en contact",
+      "privacy": "Privacy"
+    },
+    "errorSearch": "De plaats of het beroep is niet duidelijk. Geef het beroep, de stad en zo nodig het land preciezer aan."
   },
   "GenieWriting": {
     "open": "Schrijven met Genie",

@@ -2104,7 +2104,9 @@
     "sentryPrepared": "Konfigurationsfiler för Sentry (Functional Software Inc., San Francisco, USA) har förberetts för feldiagnostik. Dessa filer aktiverar inte i sig någon överföring; i den nuvarande applikationen har ingen Sentry-initialisering integrerats.",
     "replayDisabled": "Session Replay är avstängt även i den förberedda konfigurationen. Därför skapas inga sessionsinspelningar eller föregående replaybuffertar. En senare aktivering kräver först en prövning av syftet, den rättsliga grunden och vid behov ett giltigt samtycke. Denna dataskyddsinformation ersätter inte ett samtycke.",
     "sentryPurpose": "Feldiagnostik förberedd; Session Replay avstängt (se avsnitt 12)",
-    "newsRegionDisclosure": "Regionale Branchennews: Ohne eigene Länderauswahl verwenden wir vorrangig das Land aus deinem Profil, sonst das vom Hosting-Anbieter übermittelte ungefähre Land deiner Verbindung. Dafür fragen wir keinen GPS-Standort ab. Deine ausdrücklich gewählte Einstellung speichern wir für bis zu ein Jahr in einem Cookie mit dem Präfix cg_news_country_, getrennt für Gäste und angemeldete Konten. Du kannst jederzeit ein anderes Land, „Alle Länder“ oder „Automatisch“ wählen. Die automatische Ländererkennung wird nicht in diesem Cookie gespeichert. Die Oberflächensprache folgt deiner gespeicherten Sprachwahl, sonst einer unterstützten Browsersprache; fehlt diese, dient das ungefähre Land als Rückfall. Originalbeiträge werden nicht automatisch übersetzt."
+    "newsRegionDisclosure": "Regionale Branchennews: Ohne eigene Länderauswahl verwenden wir vorrangig das Land aus deinem Profil, sonst das vom Hosting-Anbieter übermittelte ungefähre Land deiner Verbindung. Dafür fragen wir keinen GPS-Standort ab. Deine ausdrücklich gewählte Einstellung speichern wir für bis zu ein Jahr in einem Cookie mit dem Präfix cg_news_country_, getrennt für Gäste und angemeldete Konten. Du kannst jederzeit ein anderes Land, „Alle Länder“ oder „Automatisch“ wählen. Die automatische Ländererkennung wird nicht in diesem Cookie gespeichert. Die Oberflächensprache folgt deiner gespeicherten Sprachwahl, sonst einer unterstützten Browsersprache; fehlt diese, dient das ungefähre Land als Rückfall. Originalbeiträge werden nicht automatisch übersetzt.",
+    "genieVoiceTitle": "Genie-Sprachbedienung — deutscher Originaltext, Stand: 14. November 2026",
+    "genieVoiceDisclosure": "Die freiwillige Sprachbedienung startet erst durch deine Mikrofonaktion und eine erforderliche Gerätefreigabe. Im Browser wird die beendete Aufnahme (höchstens 30 Sekunden und 1 MiB) über den CineGenius-Server an OpenAI zur Texterkennung übermittelt. In unterstützten nativen Apps übernimmt der Sprachdienst des Geräts die Erkennung; dabei kann eine Verarbeitung durch dessen Anbieter erforderlich sein. Bei leerem Eingabefeld wird der erkannte Text anschließend an Genie gesendet, andernfalls nur deinem ungesendeten Text hinzugefügt. Der KI-Dienst erhält die gesendeten Nachrichten, die letzten Gesprächsrunden, die Sprache und den groben Seitenbereich. Antworten können über die künstliche Stimme des Browsers oder Geräts vorgelesen werden; je nach gewählter Systemstimme verarbeitet deren Anbieter den Antworttext. CineGenius speichert keine Audiodateien. Abgeschlossene Textgespräche bleiben kontogebunden bis zu 24 Stunden im aktuellen Browser-Tab; du kannst sie über den Papierkorb löschen. Für die Missbrauchsbegrenzung werden Nutzungszähler geführt. Das Löschen des lokalen Verlaufs löscht keine bereits übermittelten Daten beim jeweiligen Dienst. Die Aufbewahrung bei OpenAI richtet sich nach dem verwendeten Dienst und seiner Konfiguration; deaktivierte Gesprächsspeicherung ist keine Zusage, dass keinerlei Sicherheitsprotokolle entstehen. Schließen, Abbrechen, Kontowechsel und der Wechsel in den Hintergrund beenden die aktuelle Aufnahme. Die Suche verwendet nur den von dir genannten Ort und ungefähre öffentliche Ortskoordinaten, keinen GPS-Standort. Sie kann passende Filter öffnen, veröffentlicht aber keine Inhalte und ändert keine gemeinsamen Arbeitspläne. Bitte sprich keine Passwörter oder unnötigen vertraulichen Angaben ein."
   },
   "SetupOffers": {
     "accountReady": "Ditt leverantörskonto är färdigt.",
@@ -7485,7 +7487,50 @@
     "assistantLabel": "AI-assistent",
     "dismissWelcome": "Stäng hälsningen",
     "hideLauncher": "Dölj Genie under det här besöket",
-    "moveLauncher": "Dra för att flytta. Med tangentbord: Alt och piltangenterna."
+    "moveLauncher": "Dra för att flytta. Med tangentbord: Alt och piltangenterna.",
+    "voice": {
+      "start": "Prata med Genie",
+      "stop": "Stoppa inspelning och skicka",
+      "cancel": "Avbryt inspelning",
+      "speak": "Läs upp svaret",
+      "stopSpeaking": "Stoppa uppläsning",
+      "requesting": "Öppnar mikrofonen…",
+      "recording": "Lyssnar…",
+      "transcribing": "Tolkar tal…",
+      "speaking": "Genie talar…",
+      "error": {
+        "unsupported": "Tal är inte tillgängligt här eller för detta språk. Du kan fortsätta skriva.",
+        "permission": "Tillåt mikrofonen i enhetens eller webbläsarens inställningar.",
+        "failed": "Det fungerade inte. Tala igen eller skriv ditt meddelande.",
+        "timeout": "Taligenkänningen tog för lång tid. Försök igen.",
+        "rate_limited": "Användningsgränsen har nåtts. Försök igen senare.",
+        "unavailable": "Taligenkänning är inte tillgänglig just nu. Du kan fortsätta skriva."
+      },
+      "notice": "Tala i upp till 30 sekunder. När du avslutar skickas inspelningen till OpenAI för igenkänning och texten till Genie. Befintlig text kompletteras bara. Svaren läses upp med en konstgjord enhetsröst.",
+      "noticeNative": "Tala i upp till 30 sekunder. Enhetens taltjänst kan behandla inspelningen. När du avslutar går den tolkade texten till Genie; befintlig text kompletteras bara. Svaren använder en konstgjord enhetsröst."
+    },
+    "searchNear": "{city} · inom {radius} km",
+    "radiusHint": "Avstånden avser den angivna orten. Profiler utan identifierbar plats visas inte i radiesökningar.",
+    "destinations": {
+      "sign-up": "Skapa konto",
+      "sign-in": "Logga in",
+      "setup": "Konfigurera profil",
+      "profile": "Redigera min profil",
+      "listings": "Mina annonser",
+      "create": "Skapa annons",
+      "marketplace": "Marknadsplats",
+      "locations": "Upptäck inspelningsplatser",
+      "crew": "Filmteam och talanger",
+      "companies": "Upptäck företag",
+      "company-setup": "Skapa företag",
+      "company-dashboard": "Hantera företag",
+      "jobs": "Jobb",
+      "projects": "Projekt",
+      "messages": "Meddelanden",
+      "help": "Hjälp och kontakt",
+      "privacy": "Integritet"
+    },
+    "errorSearch": "Platsen eller yrket är otydligt. Ange yrket, staden och vid behov landet mer exakt."
   },
   "GenieWriting": {
     "open": "Skriv med Genie",

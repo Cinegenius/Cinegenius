@@ -1,20 +1,18 @@
-# Genie Beta 1.0 — configuration and release notes
+# Genie — configuration, voice and release notes
 
-Genie remains visible to guests, but chat advice and inline description assistance through `POST /api/genie` require a valid signed-in account. The server uses the verified Clerk identity; a client-supplied user ID, cookie string or authorization header cannot replace that verification. It has no tools, private-data lookup, content writer, publishing or messaging action. OpenAI is called only when a signed-in user explicitly sends a chat message or generates a writing suggestion.
+Genie remains visible to guests, but chat advice and inline description assistance through `POST /api/genie` require a valid signed-in account. The server uses the verified Clerk identity; a client-supplied user ID, cookie string or authorization header cannot replace that verification. It can prepare validated, read-only Crew search links. It has no private-data lookup, publishing, messaging or shared-plan mutation. OpenAI is called only after an explicit chat send, writing request or completed browser recording.
 
 After the origin check, the route rejects missing or expired sessions with `401 {"error":"unauthorized"}` before reading the body, inspecting provider configuration, reserving durable quota or calling OpenAI. The same gate covers both chat and the writing assistant. Authentication service errors fail closed with the sanitized `503 unavailable` response; they never fall back to guest access. Responses remain private and uncached, with no automatic redirect.
 
-**Do not deploy without fresh, explicit user approval.** After approval, follow `docs/design-and-release.md`: publish source changes through GitHub Desktop, then use `npm run deploy:production` from clean `main` matching `origin/main` and the correct linked project. Passing checks or configuring credentials does not authorize deployment.
+**Do not deploy without fresh, explicit user approval.** After approval, follow `docs/design-and-release.md`: publish source changes through the approved server Git workflow (GitHub Desktop remains the Mac workflow), then use `npm run deploy:production` from clean `main` matching `origin/main` and the correct linked project. Passing checks or configuring credentials does not authorize deployment.
 
 ## Configuration
 
-Mobile navigation now opens `/tools` through the middle KI tab (operator decision,
-13 November 2026). The existing Genie panel opens from its tool card on that page;
-there is no floating duplicate on mobile or on the tools page. Desktop retains
-the contextual launcher elsewhere. Opening a tool still makes no generation
-request, and the existing cookie notice, session scope and authentication guards
-remain in effect. The native room scanner is a separate planned tool, not a new
-capability of the Genie endpoint.
+The floating Genie assistant is available on phones, tablets and laptops. News
+remains in the middle of the bottom navigation; the separate Work destination is
+still coming soon. The draggable/hideable launcher is independent of voice.
+Opening Genie, moving it or restoring its history makes no generation request.
+The native room scanner and shared workplace remain separate app work.
 
 Set `OPENAI_API_KEY` as a server-only **Secret** in the correct Vercel project's environment settings, scoped to the intended environments. Never use `NEXT_PUBLIC_`, commit the value, or expose it in commands, screenshots, logs or chat. Do not copy production credentials into previews merely to test the UI.
 
@@ -40,9 +38,9 @@ Use **Preview** for the intended test branch, with its own test credential. Use 
 
 Click **Save** after adding or updating each variable. A new deployment of the relevant environment is required before changed values take effect; the existing deployment retains its configuration. Production activation and later disabling therefore both require the repository's guarded production release process. [Vercel environment updates](https://vercel.com/docs/environment-variables/managing-environment-variables)
 
-For the deployed application, use an OpenAI project service account and its workload key with the permissions needed for the implemented `POST /v1/responses` request. The project must permit the configured `gpt-4.1-mini` model and have available API usage capacity. Store the key directly in Vercel; its existence, permissions and successful model access must be confirmed separately. [OpenAI API keys and service accounts](https://developers.openai.com/api/docs/guides/api-keys)
+For the deployed application, use an OpenAI project service account and its workload key with the permissions needed for the implemented `POST /v1/responses` and browser-only `POST /v1/audio/transcriptions` requests. The project must permit the configured `gpt-4.1-mini` model and have available API usage capacity. Store the key directly in Vercel; its existence, permissions and successful model access must be confirmed separately. [OpenAI API keys and service accounts](https://developers.openai.com/api/docs/guides/api-keys)
 
-The source reads only the three Genie variables listed above. It calls OpenAI directly using a fixed endpoint and model. There is no separate public activation flag. With a nonempty key, an enabled endpoint and a valid daily limit, requests still depend on the app's existing Clerk setup and working Supabase quota service. The visible launcher alone does not confirm any of those connections.
+The source reads only the three Genie variables listed above. It calls OpenAI directly with fixed endpoints/models for conversation and browser transcription; native recognition uses the device bridge. There is no separate public activation flag. With a nonempty key, an enabled endpoint and a valid daily limit, requests still depend on the app's existing Clerk setup and working Supabase quota service. The visible launcher alone does not confirm any of those connections.
 
 ### Local fixture versus a connected app
 
@@ -60,7 +58,7 @@ Live local verification must run this repository's full Next.js application (`np
 
 All five counters are reserved for authenticated requests before the single provider call. Guests have no API allowance and their rejected requests do not reserve durable counters. Later denial, upstream failure or cancellation does not refund earlier reservations; there is no automatic retry. IP headers are trusted only on Vercel; other runtimes share a fallback bucket. IP/member identifiers are HMAC-hashed with the server key. Key rotation changes identity buckets but not the global bucket; deployments sharing a database share that ceiling.
 
-For the exact `POST /api/genie` endpoint, the proxy verifies the session before its best-effort, per-instance IP limit of 20 requests per minute. Signed-out requests return `401` even if the IP bucket is already exhausted; authentication service errors return sanitized `503` failures. Neither consumes that IP allowance. The limiter supplements, rather than replaces, the durable quotas. Rate-limit rejections for authenticated requests return `429`, `Retry-After` and private/no-store headers. Other proxy routes retain their existing ordering and protection.
+For the exact `POST /api/genie` and `POST /api/genie/transcribe` endpoints, the proxy verifies the session before its best-effort, per-instance IP limit of 20 requests per minute. Signed-out requests return `401` even if the IP bucket is already exhausted; authentication service errors return sanitized `503` failures. Neither consumes that IP allowance. The limiter supplements, rather than replaces, the durable quotas. Rate-limit rejections for authenticated requests return `429`, `Retry-After` and private/no-store headers. Other proxy routes retain their existing ordering and protection.
 
 The fixed model is `gpt-4.1-mini` through Responses, with **600 maximum output tokens**. Chat requests allow **nine** alternating user/assistant messages, beginning/ending with user, **2,000 characters each**, **8,000 total** (JavaScript string length). Writing requests allow exactly **one user message**, containing at most **2,000 characters** of explicit notes, and a bounded output-length limit. Writing and chat share all existing endpoint quotas, timeouts and provider configuration; writing has no separate allowance.
 
@@ -86,7 +84,7 @@ Local clearing applies only to the browser's history. It does not delete message
 
 **Enter** submits a message; **Shift+Enter** inserts a new line. Input composition must finish before Enter can submit. The send button remains available, and pending requests continue to block duplicate submission. The keyboard hint and privacy notice are localized in all nine supported interface languages.
 
-The close button, Escape and a click outside the bubble close Genie and abort pending work. A click inside the bubble leaves it open. Completed exchanges remain available when it is reopened. Opening or restoring the conversation does not call the AI service; only an explicit send does.
+The close button, Escape and a click outside the bubble close Genie and abort pending work. A click inside the bubble leaves it open. Completed exchanges remain available when it is reopened. Opening or restoring the conversation does not call the AI service; only an explicit send or completed browser recording does.
 
 ## Optional inline writing
 
@@ -100,16 +98,92 @@ Changing or replacing the notes clears the previous preview. If the destination 
 
 Genie does not save, submit or publish content automatically. After the user applies a suggestion, the form's existing private draft recovery may save that edited field normally. Explicit save/submission/publication actions, permissions and moderation rules continue to belong to the form.
 
+## Voice and read-only Crew searches (14 November 2026)
+
+Status: feature branch, not published. Markus approved reusing the existing Genie
+server credential and its additional API usage. No secret was extracted into the
+local test setup. No real OpenAI call was used in the checks below.
+
+- An explicit microphone action starts a capture of at most 30 seconds. Stop
+  finishes recognition. With an empty composer the final text is sent to Genie;
+  with existing unsent notes it is appended without sending. Cancel discards it.
+- In a browser, MediaRecorder sends at most 1 MiB of validated webm/mp4/ogg/wav to
+  the same-origin authenticated transcription route. That route sends only the
+  audio file and model `gpt-transcribe` to OpenAI. It stores no audio files.
+- The origin/auth checks precede quota/body/provider work. Streaming byte limits,
+  container checks, provider deadlines and private/no-store headers apply. The
+  microphone permissions policy allows only this origin; it does not grant
+  microphone permission automatically.
+- Transcription and the subsequent chat each reserve one unit from the same
+  durable quotas. Native recognition reserves no web transcription unit; its
+  submitted Genie message still uses the ordinary quota. No automatic retry.
+- The preferred native integration is `window.CineGeniusVoice.version === 1`.
+  `start({locale})` resolves with final `{text}`; `stop`, `cancel`, `speak` and
+  `stopSpeaking` stay within the native contract. Native permission denial never
+  falls back to browser recording. Stalled native finalization times out.
+- Closing, account/language changes, backgrounding and unmounting cancel capture
+  and speech and discard late results. Native audio permissions, interruption
+  and actual voices still need physical-device checks through APP Entwicklung.
+- Replies may be read by the device/browser speech engine. Available voices
+  depend on that device; a matching local voice is preferred. Device/provider
+  processing is disclosed. No separate OpenAI speech-generation request occurs.
+- All nine interface locales have voice states/errors/actions and search labels.
+  Replies use a supported language inferred from the message, with interface
+  locale as fallback. Speech does not overwrite the chosen interface language
+  or translate member-written content.
+
+The model returns at most three structured crew search proposals. The server
+resolves occupation IDs from the existing taxonomy and places from the existing
+public place catalogue. It rejects unsupported/ambiguous resolutions instead of
+inventing coordinates, people or counts. Only validated `/creators` parameters
+can be emitted; model URLs and mutation paths are not accepted. A spoken request
+opens the first search; additional searches remain accessible in the reply.
+Typed requests retain clickable links. Navigation uses the form-leave guard.
+
+For “near Munich”, 50 km is the default unless the request specifies 1–200 km.
+The selected radius is visible and removable in the filter chips. Coordinates
+are approximate public city positions; entries without a resolvable location
+are excluded from radius matches. Genie does not inspect actual profiles or
+prove compatibility/availability. Existing user/account privacy and public
+profile rules continue to control the directory results.
+
+Shared schedule changes such as moving lunch are **not implemented**. The current
+repository has no shared day-plan store, membership model, revision mechanism or
+subscription. Public project credits are not edit permissions. The permissions
+choice is still awaiting Markus. APP Entwicklung owns the native workplace;
+see the coordinated handoff for the proposed preview → confirmation → authorized
+atomic update → member refresh flow. Do not claim a voice request saved a plan.
+
+The added privacy section is the original German disclosure in every legal
+catalogue, with `lang="de"`; it is not an approved translated legal document.
+The short operational notices are translated in all nine languages. Existing
+unpublished legal/operator amendments remain on their separate branch.
+
+References checked on 14 November 2026:
+[OpenAI transcription](https://developers.openai.com/api/docs/guides/speech-to-text),
+[OpenAI data controls](https://developers.openai.com/api/docs/guides/your-data).
+`store: false` on conversation requests does not promise zero provider retention.
+
 ## Verification status
 
-For this documentation update on 11 November 2026, `npm run check:i18n` passed across all nine catalogs. The repository includes mocked/unit fixtures for request validation, quotas, failures/cancellation, output bounds, chat history and inline writing interactions. Client fixtures exercise handlers and state without a real browser; they do not establish real-browser behavior or live model quality. Reproduction commands for the broader verification suite:
+The targeted API/client/voice/auth/proxy regression suite and all nine language
+catalogues are checked locally. A Chromium fixture renders the actual Genie
+components and records from a synthetic microphone, with mocked provider and
+speech responses. It covers empty-input send/search, draft preservation,
+cancellation, close/account changes, 44px targets and widths 320/834/1440, plus a
+short viewport. These are browser simulations, not physical device verification.
+The actual Next.js Crew directory is checked separately; the completed evidence
+and exact totals are recorded in the handoff, not inferred from fixture success.
+
+Reproduction:
 
 ```sh
-node --experimental-strip-types --import ./scripts/register-test-aliases.mjs --test lib/genie*.test.mjs lib/rate-limit.test.mjs lib/private-api-auth.test.mjs lib/proxy-localization.test.mjs lib/auth-session-transition.test.mjs
-npx tsc --noEmit
+node --experimental-strip-types --import ./scripts/register-test-aliases.mjs --test lib/genie*.test.mjs lib/private-api-auth.test.mjs lib/proxy-localization.test.mjs
 npm run check:i18n
 npm run check:design
-npm run build
+NODE_OPTIONS=--max-old-space-size=4096 npm run build
 ```
 
-**A real OpenAI end-to-end result has not been confirmed. Real-browser testing is currently unavailable because browser control is disabled in this Work environment.** Live model access and fact preservation, production quota permissions, browser account switching, chat storage lifecycle, keyboard interactions, inline preview/application in the actual forms, and mobile keyboard/safe-area layout still need live verification. Live tests must use approved nonsensitive examples and must not publish or send member content. This update records no new test totals, production build or deployment.
+No paid/live OpenAI speech recognition, actual speech quality, iPhone/iPad/
+Android audio, live transcription credential permissions or voice production
+release has been verified by these local checks.

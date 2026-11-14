@@ -201,6 +201,11 @@ export default async function DatenschutzPage() {
             </div>
           </section>
 
+          <section lang="de">
+            <h2 className="text-base font-semibold text-text-primary mb-3">{t("genieVoiceTitle")}</h2>
+            <p>{t("genieVoiceDisclosure")}</p>
+          </section>
+
           <section>
             <h2 className="text-base font-semibold text-text-primary mb-3">{uiText("Ui.text_cc51bf12053029")}</h2>
             <p>{uiText("Ui.text_04763d66b1ef33")}</p>

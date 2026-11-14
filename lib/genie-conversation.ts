@@ -1,4 +1,5 @@
 import { GENIE_LINKS, GENIE_MAX_HISTORY_CHARS, GENIE_MAX_MESSAGE_CHARS, GENIE_MAX_MESSAGES } from "./genie";
+import { isGenieCrewSearchHref } from "./genie-search";
 
 export type SafeLink = { label: string; href: string };
 export type Exchange = { id: number; user: string; reply: string; links: SafeLink[] };
@@ -26,7 +27,7 @@ export function safeLinks(value: unknown): SafeLink[] {
   for (const entry of value) {
     if (!record(entry) || typeof entry.label !== "string" || !entry.label.trim() || entry.label.length > 100
       || entry.label.includes("\0") || typeof entry.href !== "string"
-      || !GENIE_LINKS.some(link => link.href === entry.href) || links.some(link => link.href === entry.href)) continue;
+      || (!GENIE_LINKS.some(link => link.href === entry.href) && !isGenieCrewSearchHref(entry.href)) || links.some(link => link.href === entry.href)) continue;
     links.push({ label: entry.label, href: entry.href });
     if (links.length === 4) break;
   }

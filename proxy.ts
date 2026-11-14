@@ -222,7 +222,7 @@ export default clerkMiddleware(async (auth, request) => {
     return NextResponse.next();
   }
 
-  const isGeniePost = request.method === "POST" && request.nextUrl.pathname === "/api/genie";
+  const isGeniePost = request.method === "POST" && ["/api/genie", "/api/genie/transcribe"].includes(request.nextUrl.pathname);
   if (isGeniePost) {
     // Guests may see Genie, but cannot consume even its early IP allowance.
     // The handler rechecks the verified session before durable quota/provider work.
@@ -241,7 +241,7 @@ export default clerkMiddleware(async (auth, request) => {
   // 1b. CSRF check — reject mutating API requests from unknown origins
   const csrfRes = await csrfCheck(request);
   if (csrfRes) {
-    if (request.nextUrl.pathname === "/api/genie") {
+    if (["/api/genie", "/api/genie/transcribe"].includes(request.nextUrl.pathname)) {
       csrfRes.headers.set("Cache-Control", "private, no-store, max-age=0");
       csrfRes.headers.set("CDN-Cache-Control", "no-store");
       csrfRes.headers.set("Vercel-CDN-Cache-Control", "no-store");
@@ -351,7 +351,7 @@ export default clerkMiddleware(async (auth, request) => {
   res.headers.set("X-Content-Type-Options", "nosniff");
   res.headers.set("X-Frame-Options", "DENY");
   res.headers.set("Referrer-Policy", "strict-origin-when-cross-origin");
-  res.headers.set("Permissions-Policy", "camera=(), microphone=(), geolocation=()");
+  res.headers.set("Permissions-Policy", "camera=(), microphone=(self), geolocation=()");
   res.headers.set("Content-Security-Policy", contentSecurityPolicy);
   return res;
 });

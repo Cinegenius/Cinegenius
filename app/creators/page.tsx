@@ -1,3 +1,6 @@
+import { resolveCrewNear } from "@/lib/genie-search-server";
+import { occupationById } from "@/lib/primary-occupation";
+import { departments } from "@/lib/departments";
 import { publicMapPoint } from "@/lib/places/public-map-point";
 import { placeReadFields } from "@/lib/places/catalog";
 import { isPeopleDirectoryProfile } from "@/lib/profile-provider-filters";
@@ -277,6 +280,10 @@ export default async function CreatorsPage({
         serverCreators={serverCreators}
         hasMoreProfiles={profiles.length >= 96}
         initialFilters={{
+          genie: params.genie === "1",
+          department: typeof params.department === "string" && departments.some(dept => dept.id === params.department) ? params.department : "",
+          role: typeof params.role === "string" ? occupationById(params.role)?.roleId ?? "" : "",
+          near: typeof params.near === "string" && typeof params.radius === "string" ? resolveCrewNear(params.near, params.radius, locale) : null,
           view: Array.isArray(params.view) ? params.view[0] ?? "" : params.view ?? "",
           query: Array.isArray(params.q) ? params.q[0] ?? "" : params.q ?? "",
           city: Array.isArray(params.city) ? params.city[0] ?? "" : params.city ?? "",

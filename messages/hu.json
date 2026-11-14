@@ -2104,7 +2104,9 @@
     "sentryPrepared": "A hibadiagnosztikához előkészítettük a Sentry (Functional Software Inc., San Francisco, USA) konfigurációs fájljait. Ezek a fájlok önmagukban nem indítanak adattovábbítást; a jelenlegi alkalmazásba nincs beépítve Sentry-inicializálás.",
     "replayDisabled": "A Session Replay az előkészített konfigurációban is ki van kapcsolva. Így nem keletkeznek munkamenet-felvételek vagy előzetes visszajátszási pufferek. Későbbi bekapcsolás előtt ellenőrizni kell a célt, a jogalapot és adott esetben érvényes hozzájárulást kell beszerezni. Ez az adatvédelmi tájékoztatás nem helyettesíti a hozzájárulást.",
     "sentryPurpose": "Hibadiagnosztika előkészítve; Session Replay kikapcsolva (lásd a 12. szakaszt)",
-    "newsRegionDisclosure": "Regionale Branchennews: Ohne eigene Länderauswahl verwenden wir vorrangig das Land aus deinem Profil, sonst das vom Hosting-Anbieter übermittelte ungefähre Land deiner Verbindung. Dafür fragen wir keinen GPS-Standort ab. Deine ausdrücklich gewählte Einstellung speichern wir für bis zu ein Jahr in einem Cookie mit dem Präfix cg_news_country_, getrennt für Gäste und angemeldete Konten. Du kannst jederzeit ein anderes Land, „Alle Länder“ oder „Automatisch“ wählen. Die automatische Ländererkennung wird nicht in diesem Cookie gespeichert. Die Oberflächensprache folgt deiner gespeicherten Sprachwahl, sonst einer unterstützten Browsersprache; fehlt diese, dient das ungefähre Land als Rückfall. Originalbeiträge werden nicht automatisch übersetzt."
+    "newsRegionDisclosure": "Regionale Branchennews: Ohne eigene Länderauswahl verwenden wir vorrangig das Land aus deinem Profil, sonst das vom Hosting-Anbieter übermittelte ungefähre Land deiner Verbindung. Dafür fragen wir keinen GPS-Standort ab. Deine ausdrücklich gewählte Einstellung speichern wir für bis zu ein Jahr in einem Cookie mit dem Präfix cg_news_country_, getrennt für Gäste und angemeldete Konten. Du kannst jederzeit ein anderes Land, „Alle Länder“ oder „Automatisch“ wählen. Die automatische Ländererkennung wird nicht in diesem Cookie gespeichert. Die Oberflächensprache folgt deiner gespeicherten Sprachwahl, sonst einer unterstützten Browsersprache; fehlt diese, dient das ungefähre Land als Rückfall. Originalbeiträge werden nicht automatisch übersetzt.",
+    "genieVoiceTitle": "Genie-Sprachbedienung — deutscher Originaltext, Stand: 14. November 2026",
+    "genieVoiceDisclosure": "Die freiwillige Sprachbedienung startet erst durch deine Mikrofonaktion und eine erforderliche Gerätefreigabe. Im Browser wird die beendete Aufnahme (höchstens 30 Sekunden und 1 MiB) über den CineGenius-Server an OpenAI zur Texterkennung übermittelt. In unterstützten nativen Apps übernimmt der Sprachdienst des Geräts die Erkennung; dabei kann eine Verarbeitung durch dessen Anbieter erforderlich sein. Bei leerem Eingabefeld wird der erkannte Text anschließend an Genie gesendet, andernfalls nur deinem ungesendeten Text hinzugefügt. Der KI-Dienst erhält die gesendeten Nachrichten, die letzten Gesprächsrunden, die Sprache und den groben Seitenbereich. Antworten können über die künstliche Stimme des Browsers oder Geräts vorgelesen werden; je nach gewählter Systemstimme verarbeitet deren Anbieter den Antworttext. CineGenius speichert keine Audiodateien. Abgeschlossene Textgespräche bleiben kontogebunden bis zu 24 Stunden im aktuellen Browser-Tab; du kannst sie über den Papierkorb löschen. Für die Missbrauchsbegrenzung werden Nutzungszähler geführt. Das Löschen des lokalen Verlaufs löscht keine bereits übermittelten Daten beim jeweiligen Dienst. Die Aufbewahrung bei OpenAI richtet sich nach dem verwendeten Dienst und seiner Konfiguration; deaktivierte Gesprächsspeicherung ist keine Zusage, dass keinerlei Sicherheitsprotokolle entstehen. Schließen, Abbrechen, Kontowechsel und der Wechsel in den Hintergrund beenden die aktuelle Aufnahme. Die Suche verwendet nur den von dir genannten Ort und ungefähre öffentliche Ortskoordinaten, keinen GPS-Standort. Sie kann passende Filter öffnen, veröffentlicht aber keine Inhalte und ändert keine gemeinsamen Arbeitspläne. Bitte sprich keine Passwörter oder unnötigen vertraulichen Angaben ein."
   },
   "SetupOffers": {
     "accountReady": "A szolgáltatói fiókod beállítása kész.",
@@ -7485,7 +7487,50 @@
     "assistantLabel": "AI-asszisztens",
     "dismissWelcome": "Üdvözlés bezárása",
     "hideLauncher": "Genie elrejtése erre a látogatásra",
-    "moveLauncher": "Húzd a mozgatáshoz. Billentyűzettel: Alt és nyílbillentyűk."
+    "moveLauncher": "Húzd a mozgatáshoz. Billentyűzettel: Alt és nyílbillentyűk.",
+    "voice": {
+      "start": "Beszélj Genie-vel",
+      "stop": "Felvétel befejezése és küldés",
+      "cancel": "Felvétel megszakítása",
+      "speak": "Válasz felolvasása",
+      "stopSpeaking": "Felolvasás leállítása",
+      "requesting": "Mikrofon megnyitása…",
+      "recording": "Hallgatlak…",
+      "transcribing": "Beszédfelismerés…",
+      "speaking": "Genie beszél…",
+      "error": {
+        "unsupported": "A hang itt vagy ezen a nyelven nem érhető el. Továbbra is gépelhetsz.",
+        "permission": "Engedélyezd a mikrofont az eszköz vagy a böngésző beállításaiban.",
+        "failed": "Ez nem sikerült. Próbálj újra beszélni, vagy gépelj.",
+        "timeout": "A beszédfelismerés túl sokáig tartott. Próbáld újra.",
+        "rate_limited": "Elérted a használati korlátot. Próbáld újra később.",
+        "unavailable": "A beszédfelismerés most nem érhető el. Továbbra is gépelhetsz."
+      },
+      "notice": "Legfeljebb 30 másodpercig beszélhetsz. Befejezéskor a felvételt az OpenAI felismeri, a szöveget pedig Genie kapja meg. A meglévő szöveghez csak hozzáfűzzük a diktálást. A válaszokat az eszköz mesterséges hangja olvassa fel.",
+      "noticeNative": "Legfeljebb 30 másodpercig beszélhetsz. Az eszköz beszédszolgáltatása feldolgozhatja a felvételt. Befejezéskor a felismert szöveg Genie-hez kerül; a meglévő szöveget csak kiegészítjük. A válaszokat az eszköz mesterséges hangja olvassa fel."
+    },
+    "searchNear": "{city} · {radius} km-es körzet",
+    "radiusHint": "A távolság a megadott településre vonatkozik. Az azonosítható hely nélküli profilok nem jelennek meg a körzetes keresésben.",
+    "destinations": {
+      "sign-up": "Fiók létrehozása",
+      "sign-in": "Bejelentkezés",
+      "setup": "Profil beállítása",
+      "profile": "Saját profil szerkesztése",
+      "listings": "Hirdetéseim",
+      "create": "Hirdetés létrehozása",
+      "marketplace": "Piactér",
+      "locations": "Helyszínek felfedezése",
+      "crew": "Stáb és tehetségek",
+      "companies": "Cégek felfedezése",
+      "company-setup": "Cég létrehozása",
+      "company-dashboard": "Cégek kezelése",
+      "jobs": "Munkák",
+      "projects": "Projektek",
+      "messages": "Üzenetek",
+      "help": "Súgó és kapcsolat",
+      "privacy": "Adatvédelem"
+    },
+    "errorSearch": "A hely vagy a foglalkozás nem egyértelmű. Add meg pontosabban a foglalkozást, a várost és szükség esetén az országot."
   },
   "GenieWriting": {
     "open": "Fogalmazás Genie-vel",

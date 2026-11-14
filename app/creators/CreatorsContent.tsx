@@ -1,4 +1,5 @@
 "use client";
+import { withinCrewRadius, type CrewNear } from "@/lib/genie-search";
 import BrowseGeography from "@/components/BrowseGeography";
 import { prioritizeGeographically } from "@/lib/browse-geography";
 import { useBrowseGeography } from "@/lib/use-browse-geography";
@@ -44,6 +45,7 @@ import Link from "next/link";
 import { useCallback,useEffect,useMemo,useRef,useState } from "react";
 
 const PAGE_SIZE = 24;
+type CrewInitialFilters = { query: string; city: string; sort: string; cityText?: string; country?: string; region?: string; view?: string; genie?: boolean; department?: string; role?: string; near?: CrewNear | null };
 
 export type ServerCreator = {
   id: string;
@@ -107,7 +109,7 @@ function CreatorsInner({
 }: {
   serverCreators: ServerCreator[];
   hasMoreProfiles?: boolean;
-  initialFilters: { query: string; city: string; sort: string; cityText?: string; country?: string; region?: string; view?: string };
+  initialFilters: CrewInitialFilters;
 }) {
   const taxonomyText = useTranslations("Taxonomy");
 
@@ -130,6 +132,7 @@ function CreatorsInner({
     setCountryFilter(value.country); setRegionFilter(value.region); setCityFilter(value.city);
     if (value.city) setCityText("");
   };
+  const [near, setNear] = useViewState<CrewNear | null>("crew.near", () => initialFilters.near ?? null);
   const [availableOnly, setAvailableOnly] = useViewState("crew.availableOnly", false);
 
   // allCreators muss VOR den useMemo-Aufrufen deklariert sein
@@ -205,7 +208,7 @@ function CreatorsInner({
   const countryLabel = (value: string) => value === UNASSIGNED_COUNTRY ? uiText("Places.countryUnassigned") : countryOptions.find(o => o.value === value)?.label ?? value;
   const regionLabel = (value: string) => regionOptions.find(option => option.value === value)?.label ?? value;
   const [sortKey, setSortKey] = useViewState("crew.sortKey", () => ["rating", "reviews"].includes(initialFilters.sort) ? initialFilters.sort : "featured");
-  const geography = useBrowseGeography(sortKey === "featured" && !countryFilter && !regionFilter && !cityFilter && !cityText);
+  const geography = useBrowseGeography(sortKey === "featured" && !countryFilter && !regionFilter && !cityFilter && !cityText && !near);
   const [viewMode, setViewMode] = useViewState<DirectoryView>("crew.viewMode", () => initialFilters.view === "map" ? "map" : initialFilters.view === "list" ? "list" : "grid");
 
   // Neue Casting-Filter
@@ -252,8 +255,8 @@ function CreatorsInner({
   const [vendorOnly, setVendorOnly] = useViewState("crew.vendorOnly", false);
 
   // Hierarchical filter state
-  const [selectedRoles, setSelectedRoles] = useViewState<Set<string>>("crew.selectedRoles", new Set());
-  const [sidebarDept, setSidebarDept] = useViewState<string | null>("crew.sidebarDept", null);
+  const [selectedRoles, setSelectedRoles] = useViewState<Set<string>>("crew.selectedRoles", () => new Set(initialFilters.role ? [initialFilters.role] : []));
+  const [sidebarDept, setSidebarDept] = useViewState<string | null>("crew.sidebarDept", () => initialFilters.department || null);
 
   // Keep canonical catalogue IDs and order; show only roles represented by public profiles.
   const availableOccupations = useMemo(() => occupationCatalogue.filter(option => filterCrewOccupations(allCreators, null, [option.roleId]).length > 0), [allCreators]);
@@ -270,7 +273,24 @@ function CreatorsInner({
 
   const clearAll = () => { setSelectedRoles(new Set()); };
 
+  // An explicit Genie link overrides restored directory filters, once per navigation.
+  const launchKey = initialFilters.genie ? JSON.stringify(initialFilters) : "";
+  const appliedLaunch = useRef("");
+  useEffect(() => {
+    if (!launchKey) { appliedLaunch.current = ""; return; }
+    if (appliedLaunch.current === launchKey) return;
+    appliedLaunch.current = launchKey;
+    resetMobileFilters();
+    setSidebarDept(initialFilters.department || null);
+    setSelectedRoles(new Set(initialFilters.role ? [initialFilters.role] : []));
+    setCityText(initialFilters.cityText ?? ""); setCountryFilter(initialFilters.country ?? "");
+    setNear(initialFilters.near ?? null);
+  }, [launchKey]);
+
   const filterParams = new URLSearchParams();
+  if (sidebarDept && departments.some(dept => dept.id === sidebarDept)) filterParams.set("department", sidebarDept);
+  if (selectedRoles.size === 1) filterParams.set("role", [...selectedRoles][0]);
+  if (near) { filterParams.set("near", near.id); filterParams.set("radius", String(near.radius)); }
   if (query) filterParams.set("q", query);
   if (cityText) filterParams.set("cityText", cityText);
   if (cityFilter) filterParams.set("city", cityFilter);
@@ -282,7 +302,7 @@ function CreatorsInner({
 
   // Filtered results
   const isTopMode = !query.trim() && selectedRoles.size === 0 && !sidebarDept
-    && !availableOnly && !vendorOnly && !cityText && !cityFilter && !countryFilter && !regionFilter && !languageFilter
+    && !availableOnly && !vendorOnly && !near && !cityText && !cityFilter && !countryFilter && !regionFilter && !languageFilter
     && !profileTypeFilter && !hairFilter && !eyeFilter && !bodyFilter && !travelFilter
     && !ageMinFilter && !ageMaxFilter;
 
@@ -318,6 +338,7 @@ function CreatorsInner({
     if (vendorOnly) result = result.filter((c) => c.isVendor === true);
     if (availableOnly) result = result.filter((c) => c.available);
 
+    if (near) result = result.filter(creator => withinCrewRadius(creator, near));
     if (cityText) result = result.filter(c => placeSearchMatches(c, cityText) || c.location.toLowerCase().includes(cityText.toLowerCase()));
     if (cityFilter) {
       result = result.filter((c) => matchesPlace(c, "city", cityFilter));
@@ -360,12 +381,12 @@ function CreatorsInner({
     }
 
     return prioritizeGeographically(result, geography.preferred);
-  }, [query, selectedRoles, sidebarDept, availableOnly, vendorOnly, cityText, cityFilter, countryFilter, regionFilter, languageFilter,
+  }, [query, selectedRoles, sidebarDept, availableOnly, vendorOnly, near, cityText, cityFilter, countryFilter, regionFilter, languageFilter,
       profileTypeFilter, hairFilter, eyeFilter, bodyFilter, travelFilter, ageMinFilter, ageMaxFilter,
       sortKey, allCreators, isTopMode, locale, uiText, geography.preferred]);
 
   const filterKey = JSON.stringify([query, [...selectedRoles].sort(), sidebarDept, availableOnly, vendorOnly,
-    cityText, cityFilter, countryFilter, regionFilter, languageFilter, profileTypeFilter, hairFilter, eyeFilter, bodyFilter,
+    near, cityText, cityFilter, countryFilter, regionFilter, languageFilter, profileTypeFilter, hairFilter, eyeFilter, bodyFilter,
     travelFilter, ageMinFilter, ageMaxFilter, sortKey, geography.key]);
   const map = useDirectoryMap("crew", filterKey, matching, viewMode === "map");
   const filtered = map.rows;
@@ -387,6 +408,7 @@ function CreatorsInner({
 
   const secondaryFilterCount = [
     availableOnly,
+    !!near,
     !!cityText,
     !!cityFilter,
     !!countryFilter,
@@ -401,6 +423,7 @@ function CreatorsInner({
   ].filter(Boolean).length + selectedRoles.size;
 
   const mobileChips: BrowseChip[] = [
+    ...(near ? [{ id: "near", label: uiText("Genie.searchNear", { city: near.name, radius: near.radius }), onRemove: () => setNear(null) }] : []),
     ...(cityText ? [{ id: "city-text", label: `${uiText("Places.city")}: ${cityText}`, onRemove: () => setCityText("") }] : []),
     ...(sidebarDept ? [{ id: "area", label: sidebarDept === CREW_PROVIDER_FILTER ? uiText("nav.crew") : sidebarDept === "__locations" ? uiText("nav.locations") : sidebarDept === "__marktplatz" ? uiText("nav.marketplace") : getDeptLabel(departments.find((department) => department.id === sidebarDept) ?? departments[0], locale, animals, taxonomyText), onRemove: () => chooseSidebarDept(null) }] : []),
     ...[...selectedRoles].map((role) => ({ id: `role-${role}`, label: taxonomyLabel(occupationById(role)?.label ?? role, uiText), onRemove: () => removeRole(role) })),
@@ -418,6 +441,7 @@ function CreatorsInner({
     ...(vendorOnly ? [{ id: "vendor", label: uiText("profile.catAnbieterLabel"), onRemove: () => setVendorOnly(false) }] : []),
   ];
   const resetMobileFilters = () => {
+    setNear(null);
     setSelectedRoles(new Set()); setSidebarDept(null); setQuery(""); setCityText(""); setCityFilter(""); setCountryFilter(""); setRegionFilter(""); setLanguageFilter("");
     setAvailableOnly(false); setVendorOnly(false); setProfileTypeFilter(""); setHairFilter(""); setEyeFilter(""); setBodyFilter("");
     setAgeMinFilter(""); setAgeMaxFilter(""); setTravelFilter(""); setSortKey("featured");
@@ -433,6 +457,7 @@ function CreatorsInner({
 
   return (
     <div className="min-h-screen mobile-bottom-nav-clear">
+      {near && <p className="site-container text-xs text-text-muted py-2">{uiText("Genie.radiusHint")}</p>}
       <FloatingMapToggle mapActive={viewMode === "map"} onToggle={() => { setViewMode(viewMode === "map" ? "list" : "map"); requestAnimationFrame(() => resultsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" })); }} />
 
       <MobileBrowseControls preference={<BrowseGeography geography={geography} />}
@@ -677,7 +702,7 @@ export default function CreatorsContent({
 }: {
   serverCreators: ServerCreator[];
   hasMoreProfiles?: boolean;
-  initialFilters: { query: string; city: string; sort: string; cityText?: string; country?: string; region?: string; view?: string };
+  initialFilters: CrewInitialFilters;
 }) {
   return <CreatorsInner serverCreators={serverCreators} hasMoreProfiles={hasMoreProfiles} initialFilters={initialFilters} />;
 }

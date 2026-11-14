@@ -135,6 +135,9 @@
 .input:focus { outline: 2px solid var(--color-gold); outline-offset: 1px; }
 .input:disabled { opacity: .65; }
 .actions { display: flex; align-items: center; justify-content: space-between; gap: 7px; min-height: 44px; margin-top: 3px; }
+.voiceActions { display: flex; align-items: center; gap: 4px; min-height: 44px; }
+.voiceActions .iconButton[aria-pressed="true"] { color: var(--color-gold); background: var(--color-bg-hover); }
+.voiceControls { min-width: 0; }
 .count { min-width: 0; flex: 1; color: var(--color-text-muted); font-size: 10px; overflow-wrap: anywhere; }
 .sendButton { border: 0; background: var(--color-gold); color: var(--color-bg-primary); }
 .sendButton:hover:not(:disabled) { background: var(--color-gold-light); }

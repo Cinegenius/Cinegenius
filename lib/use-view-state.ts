@@ -17,8 +17,10 @@ export function useViewState<T>(field: string, initial: T | (() => T)): [T, Disp
   const defaults = useRef(value);
   const skipWrite = useRef(true);
   useLayoutEffect(() => {
-    const restore = () => {
-      const fields = viewRecord(window.history.state, path, owner).fields;
+    const restore = (event?: PopStateEvent) => {
+      // Earlier router listeners can rewrite history.state during this same
+      // traversal. The event retains the destination's original control state.
+      const fields = viewRecord(event ? event.state : window.history.state, path, owner).fields;
       const next = Object.hasOwn(fields, field) ? fields[field] as T : defaults.current;
       current.current = next;
       skipWrite.current = true;

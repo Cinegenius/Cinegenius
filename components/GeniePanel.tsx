@@ -8,12 +8,17 @@ import { useEffect, useId, useRef, useState, type FormEvent, type RefObject } fr
 import { GENIE_MAX_MESSAGE_CHARS, genieAreaForPath } from "@/lib/genie";
 import { clearConversation, readConversation, safeLinks, saveConversation, trimExchanges, type Exchange } from "@/lib/genie-conversation";
 import styles from "./Genie.module.css";
+import { nativeGenieVoice } from "@/lib/genie-voice";
+import { isGenieCrewSearchHref } from "@/lib/genie-search";
+import { useFormRouter } from "@/lib/use-form-router";
+import GenieVoiceControls from "./GenieVoiceControls";
 
 type Message = { role: "user" | "assistant"; content: string };
-type Status = "errorInvalid" | "errorRateLimited" | "errorUnavailable" | "errorTimeout" | "errorFailed" | "errorUnsafe" | "errorNetwork" | "cancelled";
+type Status = "errorSearch" | "errorInvalid" | "errorRateLimited" | "errorUnavailable" | "errorTimeout" | "errorFailed" | "errorUnsafe" | "errorNetwork" | "cancelled";
 
 const SERVER_ERRORS: Record<string, Status> = {
   invalid_request: "errorInvalid",
+  search_unresolved: "errorSearch",
   rate_limited: "errorRateLimited",
   unavailable: "errorUnavailable",
   timeout: "errorTimeout",
@@ -24,6 +29,7 @@ const SERVER_ERRORS: Record<string, Status> = {
 export default function GeniePanel({ active, requestRef, memoryScope }: { active: boolean; requestRef: RefObject<AbortController | null>; memoryScope: string | null }) {
   const t = useTranslations("Genie");
   const locale = useLocale();
+  const router = useFormRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const [loginRequired, setLoginRequired] = useState(!memoryScope);
@@ -43,6 +49,8 @@ export default function GeniePanel({ active, requestRef, memoryScope }: { active
   const input = useRef<HTMLTextAreaElement>(null);
   const id = useId();
   const pending = pendingUser !== null;
+  const [voiceReset, setVoiceReset] = useState(0);
+  const [voiceReply, setVoiceReply] = useState<{ id: number; text: string; locale: string; spoken: boolean } | null>(null);
 
   useEffect(() => {
     if (!active) requestRef.current?.abort();
@@ -62,7 +70,11 @@ export default function GeniePanel({ active, requestRef, memoryScope }: { active
 
   async function send(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    const content = draft.trim();
+    await sendContent(draft);
+  }
+
+  async function sendContent(text: string, spoken = false) {
+    const content = text.trim();
     if (requestRef.current || !content || !active || !canUse) return;
     if (content.length > GENIE_MAX_MESSAGE_CHARS) {
       setStatus("errorInvalid");
@@ -135,6 +147,9 @@ export default function GeniePanel({ active, requestRef, memoryScope }: { active
         links: safeLinks("links" in result ? result.links : []),
       }]);
       setExchanges(updated);
+      const searchLink = updated.at(-1)?.links.find(link => isGenieCrewSearchHref(link.href));
+      if (spoken && searchLink) router.push(searchLink.href);
+      setVoiceReply({ id: sequence.current, text: result.reply, locale: "language" in result && typeof result.language === "string" ? result.language : locale, spoken });
       if (memoryScope) {
         try { saveConversation(window.sessionStorage, memoryScope, updated); }
         catch { /* Chat stays usable when browser storage is blocked. */ }
@@ -163,6 +178,8 @@ export default function GeniePanel({ active, requestRef, memoryScope }: { active
     setDraft("");
     setPendingUser(null);
     setStatus(null);
+    setVoiceReset(value => value + 1);
+    setVoiceReply(null);
     requestAnimationFrame(() => input.current?.focus({ preventScroll: true }));
   }
 
@@ -186,6 +203,7 @@ export default function GeniePanel({ active, requestRef, memoryScope }: { active
         <div className={styles.notice} id={`${id}-notice`}>
           <p>{t("privacy")} <Link href="/datenschutz" prefetch={false}>{t("privacyLink")}</Link></p>
           <p>{t("caution")}</p>
+          <p id="genie-voice-notice">{t(nativeGenieVoice() ? "voice.noticeNative" : "voice.notice")}</p>
         </div>
         {exchanges.map(entry => (
           <div key={entry.id} className={styles.exchange}>
@@ -205,6 +223,13 @@ export default function GeniePanel({ active, requestRef, memoryScope }: { active
         {status && <p className={styles.status} role={status === "cancelled" ? "status" : "alert"}>{t(status)}</p>}
       </div>
       <form className={styles.composer} onSubmit={send}>
+        <GenieVoiceControls active={active} pending={pending} locale={locale} resetKey={voiceReset} reply={voiceReply}
+          onUnauthorized={() => { setLoginRequired(true); setExchanges([]); try { clearConversation(window.sessionStorage); } catch {} }}
+          onText={text => {
+            if (requestRef.current || !active || !canUse) return;
+            if (draft.trim()) { setDraft(`${draft.trim()}\n${text}`); return; }
+            void sendContent(text, true);
+          }} />
         <label className={styles.inputLabel} htmlFor={`${id}-message`}>{t("inputLabel")}</label>
         <div className={styles.inputRow}>
           <textarea

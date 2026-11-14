@@ -2104,7 +2104,9 @@
     "sentryPrepared": "Se han preparado archivos de configuración para Sentry (Functional Software Inc., San Francisco, EE. UU.) con fines de diagnóstico de errores. Estos archivos, por sí solos, no activan ninguna transmisión de datos; la aplicación actual no incorpora la inicialización de Sentry.",
     "replayDisabled": "Session Replay también está desactivado en la configuración preparada. Por tanto, no se generan grabaciones de sesiones ni búferes previos de reproducción. Antes de activarlo en el futuro, deberán revisarse la finalidad, la base jurídica y, cuando corresponda, la obtención de un consentimiento válido. Este aviso de privacidad no sustituye al consentimiento.",
     "sentryPurpose": "Diagnóstico de errores preparado; Session Replay desactivado (véase el apartado 12)",
-    "newsRegionDisclosure": "Regionale Branchennews: Ohne eigene Länderauswahl verwenden wir vorrangig das Land aus deinem Profil, sonst das vom Hosting-Anbieter übermittelte ungefähre Land deiner Verbindung. Dafür fragen wir keinen GPS-Standort ab. Deine ausdrücklich gewählte Einstellung speichern wir für bis zu ein Jahr in einem Cookie mit dem Präfix cg_news_country_, getrennt für Gäste und angemeldete Konten. Du kannst jederzeit ein anderes Land, „Alle Länder“ oder „Automatisch“ wählen. Die automatische Ländererkennung wird nicht in diesem Cookie gespeichert. Die Oberflächensprache folgt deiner gespeicherten Sprachwahl, sonst einer unterstützten Browsersprache; fehlt diese, dient das ungefähre Land als Rückfall. Originalbeiträge werden nicht automatisch übersetzt."
+    "newsRegionDisclosure": "Regionale Branchennews: Ohne eigene Länderauswahl verwenden wir vorrangig das Land aus deinem Profil, sonst das vom Hosting-Anbieter übermittelte ungefähre Land deiner Verbindung. Dafür fragen wir keinen GPS-Standort ab. Deine ausdrücklich gewählte Einstellung speichern wir für bis zu ein Jahr in einem Cookie mit dem Präfix cg_news_country_, getrennt für Gäste und angemeldete Konten. Du kannst jederzeit ein anderes Land, „Alle Länder“ oder „Automatisch“ wählen. Die automatische Ländererkennung wird nicht in diesem Cookie gespeichert. Die Oberflächensprache folgt deiner gespeicherten Sprachwahl, sonst einer unterstützten Browsersprache; fehlt diese, dient das ungefähre Land als Rückfall. Originalbeiträge werden nicht automatisch übersetzt.",
+    "genieVoiceTitle": "Genie-Sprachbedienung — deutscher Originaltext, Stand: 14. November 2026",
+    "genieVoiceDisclosure": "Die freiwillige Sprachbedienung startet erst durch deine Mikrofonaktion und eine erforderliche Gerätefreigabe. Im Browser wird die beendete Aufnahme (höchstens 30 Sekunden und 1 MiB) über den CineGenius-Server an OpenAI zur Texterkennung übermittelt. In unterstützten nativen Apps übernimmt der Sprachdienst des Geräts die Erkennung; dabei kann eine Verarbeitung durch dessen Anbieter erforderlich sein. Bei leerem Eingabefeld wird der erkannte Text anschließend an Genie gesendet, andernfalls nur deinem ungesendeten Text hinzugefügt. Der KI-Dienst erhält die gesendeten Nachrichten, die letzten Gesprächsrunden, die Sprache und den groben Seitenbereich. Antworten können über die künstliche Stimme des Browsers oder Geräts vorgelesen werden; je nach gewählter Systemstimme verarbeitet deren Anbieter den Antworttext. CineGenius speichert keine Audiodateien. Abgeschlossene Textgespräche bleiben kontogebunden bis zu 24 Stunden im aktuellen Browser-Tab; du kannst sie über den Papierkorb löschen. Für die Missbrauchsbegrenzung werden Nutzungszähler geführt. Das Löschen des lokalen Verlaufs löscht keine bereits übermittelten Daten beim jeweiligen Dienst. Die Aufbewahrung bei OpenAI richtet sich nach dem verwendeten Dienst und seiner Konfiguration; deaktivierte Gesprächsspeicherung ist keine Zusage, dass keinerlei Sicherheitsprotokolle entstehen. Schließen, Abbrechen, Kontowechsel und der Wechsel in den Hintergrund beenden die aktuelle Aufnahme. Die Suche verwendet nur den von dir genannten Ort und ungefähre öffentliche Ortskoordinaten, keinen GPS-Standort. Sie kann passende Filter öffnen, veröffentlicht aber keine Inhalte und ändert keine gemeinsamen Arbeitspläne. Bitte sprich keine Passwörter oder unnötigen vertraulichen Angaben ein."
   },
   "SetupOffers": {
     "accountReady": "Tu cuenta de anunciante está configurada.",
@@ -7485,7 +7487,50 @@
     "assistantLabel": "Asistente de IA",
     "dismissWelcome": "Cerrar saludo",
     "hideLauncher": "Ocultar Genie durante esta visita",
-    "moveLauncher": "Arrastra para mover. Con teclado: Alt y las teclas de flecha."
+    "moveLauncher": "Arrastra para mover. Con teclado: Alt y las teclas de flecha.",
+    "voice": {
+      "start": "Hablar con Genie",
+      "stop": "Finalizar grabación y enviar",
+      "cancel": "Cancelar grabación",
+      "speak": "Leer respuesta en voz alta",
+      "stopSpeaking": "Detener lectura",
+      "requesting": "Abriendo micrófono…",
+      "recording": "Escuchando…",
+      "transcribing": "Reconociendo voz…",
+      "speaking": "Genie está hablando…",
+      "error": {
+        "unsupported": "La voz no está disponible aquí o en este idioma. Puedes seguir escribiendo.",
+        "permission": "Permite el micrófono en los ajustes del dispositivo o navegador.",
+        "failed": "No ha funcionado. Vuelve a hablar o escribe.",
+        "timeout": "El reconocimiento ha tardado demasiado. Inténtalo de nuevo.",
+        "rate_limited": "Se ha alcanzado el límite de uso. Inténtalo más tarde.",
+        "unavailable": "El reconocimiento no está disponible ahora. Puedes seguir escribiendo."
+      },
+      "notice": "Habla hasta 30 segundos. Al terminar, la grabación se envía a OpenAI para reconocerla y el texto a Genie. Si ya hay texto, solo se añade el dictado. Las respuestas usan una voz artificial del dispositivo.",
+      "noticeNative": "Habla hasta 30 segundos. El servicio de voz del dispositivo puede procesar la grabación. Al terminar, el texto reconocido se envía a Genie; si ya hay texto, solo se añade el dictado. Las respuestas usan una voz artificial del dispositivo."
+    },
+    "searchNear": "{city} · radio de {radius} km",
+    "radiusHint": "Las distancias se refieren a la localidad indicada. Los perfiles sin ubicación identificable no aparecen en búsquedas por radio.",
+    "destinations": {
+      "sign-up": "Crear cuenta",
+      "sign-in": "Iniciar sesión",
+      "setup": "Configurar perfil",
+      "profile": "Editar mi perfil",
+      "listings": "Mis anuncios",
+      "create": "Crear anuncio",
+      "marketplace": "Mercado",
+      "locations": "Descubrir localizaciones",
+      "crew": "Equipo y talento",
+      "companies": "Descubrir empresas",
+      "company-setup": "Crear empresa",
+      "company-dashboard": "Gestionar empresas",
+      "jobs": "Empleo",
+      "projects": "Proyectos",
+      "messages": "Mensajes",
+      "help": "Ayuda y contacto",
+      "privacy": "Privacidad"
+    },
+    "errorSearch": "El lugar o la profesión no están claros. Indica la profesión, la ciudad y, si hace falta, el país."
   },
   "GenieWriting": {
     "open": "Redactar con Genie",
