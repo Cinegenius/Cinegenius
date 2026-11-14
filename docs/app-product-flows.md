@@ -274,3 +274,15 @@ App-Sprachkorrekturen sind weiterhin nur im App-Zweig vorbereitet, nicht Teil
 dieses Web-Livegangs. Tests mit simulierten Konten/API-Antworten belegen keine echte
 iPhone-/iPad-Bedienung; neuere Mac-Quellen und gespeicherte Pläne bleiben beim
 späteren Xcode-Abgleich erhalten.
+
+## Kompakte Smart-Ergebnisse im App-Stand
+
+Der geprüfte WEB-Commit `d15809994988c1f00d8b9050132960456fbdb64d`
+verwendet auch im gemeinsamen App-Ergebnisfluss horizontale Karten mit 64-px-
+Vorschau: eine Spalte am Handy, zwei ab 640 px und drei ab 1280 px. Crew- und
+Marktplatzbilder bleiben im Originalseitenverhältnis vollständig sichtbar;
+auch die normale Suche verwendet diese vollständigen Vorschaubilder. Gruppen,
+Detailziele, Preis, Verfügbarkeit und geschützte Medienpfade bleiben erhalten.
+Die native Webansicht nutzt diese gemeinsamen Komponenten; keine zweite native
+Kartenimplementierung. Dieser UI-Stand ist bei Übergabe noch nicht veröffentlicht.
+Prüfbelege und Grenzen: `/srv/cinegenius/handoffs/20261114-app-smart-compact-previews/`.
