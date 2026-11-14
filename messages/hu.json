@@ -8211,5 +8211,8 @@
     "modelUnavailable": "Ehhez az alaprajzhoz nem érhető el 3D modell.",
     "captureCancelled": "A szkennelés megszakítva. A mentett alaprajzok változatlanok maradnak.",
     "invalidArchive": "Ez a mentett alaprajz hiányos vagy sérült. A fájl megmaradt."
+  },
+  "companyTeam": {
+    "leadership": "Alapítók és vezetőség"
   }
 }

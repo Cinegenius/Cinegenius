@@ -10,7 +10,8 @@ import { useEffect, useRef, useState, useCallback, type CSSProperties } from "re
 import { useSearchParams } from "next/navigation";
 import { useUser } from "@clerk/nextjs";
 import Link from "next/link";
-import InboxNavigation from "@/components/InboxNavigation";
+import InboxPaneHeader from "@/components/InboxPaneHeader";
+import InboxLoading from "@/components/InboxLoading";
 import { ArrowLeft, MessageSquare, Loader2, User, Check, Users, Search, SquarePen } from "lucide-react";
 import { Suspense } from "react";
 import MessageComposer from "@/components/messaging/MessageComposer";
@@ -478,14 +479,12 @@ function MessagesContent() {
   const people = [...contacts].sort((a,b) => a.display_name.localeCompare(b.display_name,uiLocale)).map(contact => ({id:contact.user_id, name:contact.display_name, avatar:contact.avatar_url, role:contact.role}));
   const filteredConversations = conversations.filter(conversation => (!groupsOnly || conversation.kind === "group") && `${conversation.otherName ?? ""} ${conversation.group_name ?? ""}`.toLocaleLowerCase(uiLocale).includes(search.trim().toLocaleLowerCase(uiLocale)));
 
-  return <div className={`fixed inset-x-0 top-[calc(var(--site-header-height)+var(--messages-viewport-offset,0px))] lg:top-[calc(7.25rem+1px+var(--messages-viewport-offset,0px))] ${showChat ? "bottom-0" : "bottom-[var(--mobile-nav-clearance)]"} lg:bottom-0 flex overflow-hidden bg-bg-primary`}
+  return <div className={`inbox-shell ${showChat ? "bottom-0" : "bottom-[var(--mobile-nav-clearance)]"} lg:bottom-0`}
     style={{"--messages-viewport-offset":`${visualViewportTop}px`,...(keyboardInset>0?{bottom:`${keyboardInset}px`}:{})} as CSSProperties}>
     <aside className={`${showChat?"hidden sm:flex":"flex"} min-w-0 w-full flex-col border-r border-border bg-bg-primary sm:w-80 sm:shrink-0`}>
-      <header className="shrink-0 border-b border-border px-4 py-3">
-        <div className="flex min-w-0 items-center justify-between gap-3"><h1 className="min-w-0 break-words font-display text-xl font-bold text-text-primary">{t("title")}</h1><button type="button" onClick={()=>setNewMessageOpen(true)} aria-label={t(groupsOnly ? "createGroup" : "newMessage")} title={t(groupsOnly ? "createGroup" : "newMessage")} className="flex min-h-11 min-w-11 shrink-0 items-center justify-center gap-2 rounded-xl px-2 text-sm text-gold hover:bg-bg-elevated"><SquarePen size={22}/><span className="hidden min-[400px]:inline">{t(groupsOnly ? "createGroup" : "newMessage")}</span></button></div>
-        <InboxNavigation active={groupsOnly ? "groups" : "chats"} />
+      <InboxPaneHeader active={groupsOnly ? "groups" : "chats"} action={<button type="button" onClick={()=>setNewMessageOpen(true)} aria-label={t(groupsOnly ? "createGroup" : "newMessage")} title={t(groupsOnly ? "createGroup" : "newMessage")} className="flex size-11 shrink-0 items-center justify-center rounded-xl text-gold hover:bg-bg-elevated"><SquarePen size={22}/></button>}>
         <label className="mt-2 flex min-h-11 items-center gap-2 rounded-xl border border-border bg-bg-secondary px-3"><Search size={17} className="shrink-0 text-text-muted"/><input type="search" value={search} onChange={event=>setSearch(event.target.value)} placeholder={t("searchChats")} aria-label={t("searchChats")} className="min-h-11 min-w-0 flex-1 bg-transparent text-base text-text-primary outline-none"/></label>
-      </header>
+      </InboxPaneHeader>
       <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain">
         {(friendRequests.length>0||requestsOpen)&&<section className="border-b border-border px-4 py-2"><button type="button" aria-expanded={requestsOpen} onClick={()=>setRequestsOpen(value=>!value)} className="min-h-11 w-full text-left text-sm font-semibold text-gold">{t("requests",{count:friendRequests.length})}</button>{requestsOpen&&<div className="space-y-3 pb-2">{friendRequests.map(request=><article key={request.friendship_id} className="rounded-xl border border-border bg-bg-secondary p-3"><Link href={`/profile/${request.user_id}`} className="flex min-h-11 items-center gap-2 break-words text-sm font-semibold text-text-primary">{request.avatar_url&&<UnoptimizedImage src={request.avatar_url} alt="" className="h-9 w-9 shrink-0 rounded-full object-cover"/>}{request.display_name}</Link><div className="mt-2 flex flex-wrap gap-2"><button type="button" disabled={processingIds.has(request.friendship_id)} onClick={()=>void handleFriendRequest(request.friendship_id,"accepted")} className="min-h-11 flex-1 rounded-xl bg-gold px-3 text-sm font-semibold text-bg-primary disabled:opacity-40">{contactText("accept")}</button><button type="button" disabled={processingIds.has(request.friendship_id)} onClick={()=>void handleFriendRequest(request.friendship_id,"rejected")} className="min-h-11 flex-1 rounded-xl border border-border px-3 text-sm text-text-secondary disabled:opacity-40">{contactText("reject")}</button></div></article>)}{!contactsLoading&&!friendRequests.length&&<p className="text-sm text-text-muted">{t("noRequests")}</p>}{requestError&&<p role="alert" className="text-sm text-red-400 [[data-theme=light]_&]:text-red-700">{requestError}</p>}</div>}</section>}
         {contactsError&&<div role="alert" className="px-4 py-2 text-sm text-red-400 [[data-theme=light]_&]:text-red-700"><p>{uiText("Ui.text_4139ecbefbacc6")}</p><button type="button" onClick={()=>void loadFriendRequests()} className="min-h-11 text-gold">{t("retry")}</button></div>}
@@ -632,5 +631,5 @@ function MessagesContent() {
 }
 
 export default function MessagesPage() {
-  return <Suspense><MessagesContent/></Suspense>;
+  return <Suspense fallback={<InboxLoading active="chats" />}><MessagesContent/></Suspense>;
 }

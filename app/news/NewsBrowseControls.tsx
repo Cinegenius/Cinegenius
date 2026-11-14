@@ -26,7 +26,7 @@ export default function NewsBrowseControls({ filters, facets, count, preference 
     sortValue="newest" sortOptions={[{ value: "newest", label: ui("jobs.sortNewest") }]} onSortChange={() => {}}
     categoryLabel={t("type")} allCategoryLabel={t("all")} categoryValue={draft.type ?? ""} onCategoryChange={type => change({ type })}
     categories={ORGANIZATION_ENTRY_TYPES.filter(type => facets.some(row => row.type === type)).map(type => ({ value: type, label: t(`entryType.${type}`) }))}
-    resultSummary={pending ? ui("MarketplaceNavigation.loading") : ui("BrowseFilters.results", { count })}
+    resultCount={pending ? null : count} resultSummary={pending ? ui("MarketplaceNavigation.loading") : ui("BrowseFilters.results", { count })}
     filterCount={chips.length} chips={chips} onReset={reset} resetLabel={ui("projects.resetFilters")} showResultsLabel={t("search")} onSearch={() => apply()} preference={preference}>
     <CountrySelect value={draft.country} onChange={country => change({ country })} codes={facets.map(row => row.country || UNASSIGNED_COUNTRY)} />
     <MobileFilterField label={t("topicLabel")}><MobileFilterSelect value={draft.topic ?? ""} onChange={topic => change({ topic })} placeholder={t("all")} options={ORGANIZATION_TOPICS.filter(topic => facets.some(row => row.topic === topic)).map(topic => ({ value: topic, label: t(`topic.${topic}`) }))} /></MobileFilterField>

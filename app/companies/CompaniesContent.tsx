@@ -159,7 +159,7 @@ export default function CompaniesContent({ initialCompanies }: { initialCompanie
         categories={COMPANY_CATEGORIES.filter(category => initialCompanies.some(company => company.categories.includes(category.id))).map((category) => ({ value: category.id, label: taxonomyLabel(companyCategoryLabel(category.id, category.label), uiText) }))}
         categoryValue={selectedCategory ?? ""}
         onCategoryChange={(value) => setSelectedCategory(value || null)}
-        resultSummary={`${map.rows.length} ${t("resultsCount")}`}
+        resultCount={map.rows.length} resultSummary={`${map.rows.length} ${t("resultsCount")}`}
         viewControls={<DirectoryViewControls value={viewMode} onChange={setViewMode} />}
         filterCount={mobileChips.length}
         chips={mobileChips}
@@ -260,7 +260,7 @@ function CompanyCard({ company }: { company: Company }) {
       {/* Categories */}
       <div className="mb-2.5 flex flex-wrap content-start gap-1 overflow-hidden">
         {cats.map((cat) => (
-          <span key={cat.id} title={categoryLabel(cat.id, cat.label)} className={`block max-w-full truncate whitespace-nowrap rounded-full border px-2 py-0.5 text-[10px] font-semibold ${cat.bg} ${cat.color}`}>{categoryLabel(cat.id, cat.label)}</span>
+          <span key={cat.id} title={categoryLabel(cat.id, cat.label)} className={`block max-w-full truncate whitespace-nowrap rounded-full border px-2 py-0.5 text-[10px] font-semibold border-border bg-bg-elevated text-text-secondary`}>{categoryLabel(cat.id, cat.label)}</span>
         ))}
         {company.categories.length > 2 && (
           <span className="shrink-0 rounded-full border border-border px-2 py-0.5 text-[10px] font-medium text-text-muted">+{company.categories.length - 2}</span>
@@ -292,7 +292,7 @@ function CompanyListRow({ company }: { company: Company }) {
       </div>
       <div className="hidden sm:flex items-center gap-1.5 flex-wrap justify-end">
         {cats.map((cat) => (
-          <span key={cat.id} className={`px-2 py-0.5 text-[10px] font-semibold rounded-full border ${cat.bg} ${cat.color}`}>{categoryLabel(cat.id, cat.label)}</span>
+          <span key={cat.id} className={`px-2 py-0.5 text-[10px] font-semibold rounded-full border border-border bg-bg-elevated text-text-secondary`}>{categoryLabel(cat.id, cat.label)}</span>
         ))}
       </div>
       <ChevronRight size={14} className="text-text-muted shrink-0 group-hover:text-gold transition-colors" />

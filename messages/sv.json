@@ -8211,5 +8211,8 @@
     "modelUnavailable": "Ingen 3D-modell finns för den här planritningen.",
     "captureCancelled": "Skanningen avbröts. Sparade ritningar är oförändrade.",
     "invalidArchive": "Den sparade ritningen är ofullständig eller skadad. Filen har behållits."
+  },
+  "companyTeam": {
+    "leadership": "Grundare och ledning"
   }
 }

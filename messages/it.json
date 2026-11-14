@@ -8211,5 +8211,8 @@
     "modelUnavailable": "Non è disponibile un modello 3D per questa planimetria.",
     "captureCancelled": "Scansione annullata. Le planimetrie salvate restano invariate.",
     "invalidArchive": "Questa planimetria salvata è incompleta o danneggiata. Il file è stato conservato."
+  },
+  "companyTeam": {
+    "leadership": "Fondatori e direzione"
   }
 }

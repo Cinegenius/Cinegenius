@@ -8211,5 +8211,8 @@
     "modelUnavailable": "Voor deze plattegrond is geen 3D-model beschikbaar.",
     "captureCancelled": "Scan geannuleerd. Opgeslagen plattegronden blijven ongewijzigd.",
     "invalidArchive": "Deze opgeslagen plattegrond is onvolledig of beschadigd. Het bestand is bewaard."
+  },
+  "companyTeam": {
+    "leadership": "Oprichters en leiding"
   }
 }

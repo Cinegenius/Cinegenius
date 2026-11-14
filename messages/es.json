@@ -8211,5 +8211,8 @@
     "modelUnavailable": "No hay un modelo 3D disponible para este plano.",
     "captureCancelled": "Escaneo cancelado. Los planos guardados no cambian.",
     "invalidArchive": "Este plano guardado está incompleto o dañado. El archivo se ha conservado."
+  },
+  "companyTeam": {
+    "leadership": "Fundación y dirección"
   }
 }

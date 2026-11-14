@@ -8211,5 +8211,8 @@
     "modelUnavailable": "Pro tento půdorys není k dispozici 3D model.",
     "captureCancelled": "Skenování zrušeno. Uložené půdorysy zůstávají nezměněny.",
     "invalidArchive": "Tento uložený půdorys je neúplný nebo poškozený. Soubor zůstal zachován."
+  },
+  "companyTeam": {
+    "leadership": "Zakladatelé a vedení"
   }
 }

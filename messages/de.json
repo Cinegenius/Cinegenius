@@ -8211,5 +8211,8 @@
     "modelUnavailable": "Für diesen Grundriss ist kein 3D-Modell verfügbar.",
     "captureCancelled": "Scan abgebrochen. Gespeicherte Grundrisse bleiben unverändert.",
     "invalidArchive": "Dieser gespeicherte Grundriss ist unvollständig oder beschädigt. Die Datei bleibt erhalten."
+  },
+  "companyTeam": {
+    "leadership": "Gründung & Leitung"
   }
 }

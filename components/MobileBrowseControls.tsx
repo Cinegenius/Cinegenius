@@ -3,6 +3,7 @@
 import { ArrowUpDown,Search,SlidersHorizontal,X } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { isValidElement,useEffect,useRef,useState,type ReactNode } from "react";
+import BrowseResultCount from "@/components/BrowseResultCount";
 
 
 export type BrowseOption = { value: string; label: string };
@@ -22,6 +23,7 @@ type MobileBrowseControlsProps = {
   onCategoryChange: (value: string) => void;
   categoryPlacement?: "toolbar" | "filters";
   resultSummary: ReactNode;
+  resultCount: number | null;
   resultActions?: ReactNode;
   viewControls?: ReactNode;
   filterCount: number;
@@ -38,7 +40,7 @@ type MobileBrowseControlsProps = {
 export default function MobileBrowseControls({
   query, onQueryChange, searchPlaceholder, sortValue, sortOptions, onSortChange,
   categoryLabel, allCategoryLabel, categories, categoryValue, onCategoryChange, categoryPlacement = "filters",
-  resultSummary, resultActions, viewControls, filterCount, chips = [], onReset, resetLabel, showResultsLabel, preference, onSearch, children,
+  resultSummary, resultCount, resultActions, viewControls, filterCount, chips = [], onReset, resetLabel, showResultsLabel, preference, onSearch, children,
 }: MobileBrowseControlsProps) {
   const uiText = useTranslations();
 
@@ -110,7 +112,7 @@ export default function MobileBrowseControls({
         </label>}
 
         <div className="mobile-browse-summary">
-          {viewControls ? <div className="mobile-browse-summary-row">{resultActions ? <div className="mobile-browse-summary-with-actions"><p role="status">{resultSummary}</p>{resultActions}</div> : <p role="status" title={typeof resultSummary === "string" ? resultSummary : undefined}>{resultSummary}</p>}{viewControls}</div> : <p role="status">{resultSummary}</p>}
+          {viewControls ? <div className="mobile-browse-summary-row">{resultActions ? <div className="mobile-browse-summary-with-actions"><BrowseResultCount count={resultCount} label={resultSummary} /><div className="mobile-browse-result-actions">{resultActions}</div></div> : <BrowseResultCount count={resultCount} label={resultSummary} />}{viewControls}</div> : <BrowseResultCount count={resultCount} label={resultSummary} />}
           {chips.length > 0 && (
             <div className="mobile-browse-chips" aria-label={uiText("Ui.text_75e581194056a5")}>
               <button type="button" className="min-h-11 px-2 text-xs underline" onClick={onReset}>{resetLabel}</button>
