@@ -98,7 +98,8 @@ begin
    raise exception using errcode='PT409',message='messaging_busy';end if;
   if not public.messaging_recipient_available(p_actor,p_recipient) then raise exception using errcode='42501',message='messaging_contact_unavailable';end if;
   select c.id into target from conversations c where c.kind='direct'
-   and ((c.sender_id=p_actor and c.receiver_id=p_recipient) or (c.sender_id=p_recipient and c.receiver_id=p_actor)) and c.listing_id is not distinct from p_listing_id
+   -- Existing production conversations retain text listing IDs; newer schemas use uuid.
+   and ((c.sender_id=p_actor and c.receiver_id=p_recipient) or (c.sender_id=p_recipient and c.receiver_id=p_actor)) and c.listing_id::text is not distinct from p_listing_id::text
    and exists(select 1 from conversation_members cm where cm.conversation_id=c.id and cm.user_id=p_actor and cm.left_at is null)
    and exists(select 1 from conversation_members cm where cm.conversation_id=c.id and cm.user_id=p_recipient and cm.left_at is null)
    order by c.created_at,c.id limit 1 for update;
