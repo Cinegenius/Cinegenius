@@ -284,5 +284,9 @@ Marktplatzbilder bleiben im Originalseitenverhältnis vollständig sichtbar;
 auch die normale Suche verwendet diese vollständigen Vorschaubilder. Gruppen,
 Detailziele, Preis, Verfügbarkeit und geschützte Medienpfade bleiben erhalten.
 Die native Webansicht nutzt diese gemeinsamen Komponenten; keine zweite native
-Kartenimplementierung. Dieser UI-Stand ist bei Übergabe noch nicht veröffentlicht.
+Kartenimplementierung. Nach Markus' Freigabe ist dieser Stand mit Deployment
+`dpl_FETzybyyhSGWtjam7K97R2tWLHg8` (READY) veröffentlicht; Produktionsbeleg und
+`origin/main` sind abgeglichen. Die bestehende App-Vorschau lädt diese gemeinsame
+Ansicht von `https://www.cinegenius.co/`. Eine neue native Installation oder eine
+angemeldete Live-/iPhone-Prüfung ist dadurch nicht belegt.
 Prüfbelege und Grenzen: `/srv/cinegenius/handoffs/20261114-app-smart-compact-previews/`.
