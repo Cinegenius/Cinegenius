@@ -102,7 +102,9 @@
     "suggestion3": "Veterán autó",
     "suggestion4": "Rendezőt keresünk",
     "accessibleLabel": "Keresés a webhelyen",
-    "clearSearch": "Keresés törlése"
+    "clearSearch": "Keresés törlése",
+    "loadError": "A keresés nem tölthető be. Próbáld újra.",
+    "retry": "Újrapróbálkozás"
   },
   "notifications": {
     "ariaLabel": "Értesítések",
@@ -2456,6 +2458,7 @@
     "unavailable": "Nem elérhető"
   },
   "Places": {
+    "countryUnassigned": "Ország nincs megadva",
     "location": "Hely",
     "country": "Ország",
     "chooseCountry": "Válassz országot",
@@ -7772,7 +7775,19 @@
     "hideForMe": "Elrejtés nálam",
     "hideHelp": "Az üzenet csak a te nézetedből tűnik el. A többi tag továbbra is láthatja.",
     "unknown": "A név nem érhető el",
-    "availablePlaces": "Szabad helyek: {count}"
+    "availablePlaces": "Szabad helyek: {count}",
+    "chooseGroupPeople": "Válaszd ki a csoporthoz hozzáadni kívánt kapcsolatokat.",
+    "attachFile": "Fájl csatolása",
+    "attachmentHint": "Kép, PDF, DOCX vagy TXT · legfeljebb 4 MB",
+    "attachmentInvalid": "Válassz legfeljebb 4 MB-os képet, PDF-, DOCX- vagy TXT-dokumentumot.",
+    "attachmentUploadError": "A feltöltés sikertelen. Próbáld újra.",
+    "attachmentLoadError": "A mellékletek nem tölthetők be. Próbáld újra.",
+    "attachmentLimit": "Legfeljebb 5 fájlt csatolhatsz.",
+    "attachmentUploading": "Feltöltés: {progress}%",
+    "retryUpload": "Feltöltés újra",
+    "removeAttachment": "{name} eltávolítása",
+    "openAttachment": "{name} megnyitása",
+    "attachmentPreview": "Melléklet"
   },
   "directoryMap": {
     "crew": "Stáb a térképen",
@@ -8092,6 +8107,8 @@
     "noticeFirst": "Először zárd be a sütikről szóló tájékoztatót. Ezután megnyithatod Genie-t."
   },
   "InboxNavigation": {
+    "groups": "Csoportok",
+    "friends": "Barátok",
     "chats": "Csevegések",
     "notices": "Értesítések",
     "unread": "Üzenetek: {chats} olvasatlan csevegőüzenet, {notices} értesítés",

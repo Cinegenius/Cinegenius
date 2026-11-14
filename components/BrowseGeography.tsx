@@ -1,4 +1,5 @@
 "use client";
+import { UNASSIGNED_COUNTRY } from "@/lib/places/core";
 import { COUNTRY_CODES } from "@/lib/places/countries";
 import type { useBrowseGeography } from "@/lib/use-browse-geography";
 import { Globe2,Navigation,RotateCw } from "lucide-react";
@@ -8,7 +9,7 @@ import { useId,useMemo } from "react";
 
 export function CountrySelect({ value, onChange, name, defaultValue, emptyLabel, codes = COUNTRY_CODES }: { value?: string; onChange?: (value: string) => void; name?: string; defaultValue?: string; emptyLabel?: string; codes?: readonly string[] }) {
   const locale = useLocale(), t = useTranslations("Places"), countries = useTranslations("CountryNames"), id = useId();
-  const options = useMemo(() => [...new Set(codes)].map(code => ({ code, label: countries.has(code) ? countries(code) : code })).sort((a, b) => a.label.localeCompare(b.label, locale)), [locale, countries, codes]);
+  const options = useMemo(() => [...new Set(codes)].map(code => ({ code, label: code === UNASSIGNED_COUNTRY ? t("countryUnassigned") : countries.has(code) ? countries(code) : code })).sort((a, b) => a.label.localeCompare(b.label, locale)), [locale, countries, codes, t]);
   if (!options.length && !value && !defaultValue) return null;
   return <label htmlFor={id} className="flex min-h-11 min-w-0 items-center gap-2 rounded-xl border border-border bg-bg-secondary px-3 text-sm text-text-secondary focus-within:border-gold">
     <Globe2 size={16} aria-hidden="true" className="shrink-0 text-text-muted" /><span className="sr-only">{t("country")}</span>

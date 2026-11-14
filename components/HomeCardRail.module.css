@@ -34,7 +34,9 @@
 }
 .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--color-text-muted); transition: background-color 120ms ease; }
 .dot[data-active="true"] { background: var(--color-gold); }
-.button:hover .dot { background: var(--color-gold); }
+@media (hover: hover) and (pointer: fine) {
+  .button:hover { background: rgb(255 255 255 / 6%); }
+}
 .button:focus-visible { outline: 2px solid var(--color-gold); outline-offset: 2px; }
 @media (prefers-reduced-motion: reduce) { .dot { transition: none; } }
 @media (min-width: 640px) {

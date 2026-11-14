@@ -102,7 +102,9 @@
     "suggestion3": "Oldtimer",
     "suggestion4": "Regisseur gezocht",
     "accessibleLabel": "Website doorzoeken",
-    "clearSearch": "Zoekopdracht wissen"
+    "clearSearch": "Zoekopdracht wissen",
+    "loadError": "De zoekresultaten konden niet worden geladen. Probeer het opnieuw.",
+    "retry": "Opnieuw proberen"
   },
   "notifications": {
     "ariaLabel": "Meldingen",
@@ -2456,6 +2458,7 @@
     "unavailable": "Niet beschikbaar"
   },
   "Places": {
+    "countryUnassigned": "Land niet opgegeven",
     "location": "Locatie",
     "country": "Land",
     "chooseCountry": "Land kiezen",
@@ -7772,7 +7775,19 @@
     "hideForMe": "Voor mij verbergen",
     "hideHelp": "Het bericht wordt alleen voor jou verborgen. Andere leden kunnen het nog zien.",
     "unknown": "Naam niet beschikbaar",
-    "availablePlaces": "Nog beschikbare plaatsen: {count}"
+    "availablePlaces": "Nog beschikbare plaatsen: {count}",
+    "chooseGroupPeople": "Kies de contacten die je aan de groep wilt toevoegen.",
+    "attachFile": "Bestand bijvoegen",
+    "attachmentHint": "Afbeeldingen, PDF, DOCX of TXT · tot 4 MB",
+    "attachmentInvalid": "Kies een afbeelding of een PDF-, DOCX- of TXT-document tot 4 MB.",
+    "attachmentUploadError": "Upload mislukt. Probeer het opnieuw.",
+    "attachmentLoadError": "Bijlagen konden niet worden geladen. Probeer het opnieuw.",
+    "attachmentLimit": "Je kunt maximaal 5 bestanden bijvoegen.",
+    "attachmentUploading": "Uploaden: {progress}%",
+    "retryUpload": "Upload opnieuw proberen",
+    "removeAttachment": "{name} verwijderen",
+    "openAttachment": "{name} openen",
+    "attachmentPreview": "Bijlage"
   },
   "directoryMap": {
     "crew": "Crew op de kaart",
@@ -8092,6 +8107,8 @@
     "noticeFirst": "Sluit eerst de cookiemelding. Daarna kun je Genie openen."
   },
   "InboxNavigation": {
+    "groups": "Groepen",
+    "friends": "Vrienden",
     "chats": "Chats",
     "notices": "Meldingen",
     "unread": "Berichten: {chats} ongelezen chatberichten, {notices} meldingen",

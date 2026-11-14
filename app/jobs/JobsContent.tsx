@@ -10,7 +10,7 @@ import { FILM_DEPARTMENTS } from "@/lib/filmRoles";
 import { normalizeGripDepartmentId,normalizeGripRoleId } from "@/lib/gripTaxonomy";
 import { canonicalJobPayType,jobDateLabel,jobFacts,jobPayLabel,jobRateLabel,type BrowseJob as Job } from "@/lib/job-metadata";
 import { jobOccupation } from "@/lib/job-occupation";
-import { matchesPlace,placeDisplay,placeOptions,placeSearchMatches } from "@/lib/places/core";
+import { matchesPlace,placeDisplay,browsePlaceOptions as placeOptions, UNASSIGNED_COUNTRY,placeSearchMatches } from "@/lib/places/core";
 import { normalizedCatalogueSearch,projectTypeLabel } from "@/lib/project-type-labels";
 import { useBrowseGeography } from "@/lib/use-browse-geography";
 import { useViewState } from "@/lib/use-view-state";
@@ -90,7 +90,7 @@ function JobsInner({ serverJobs }: { serverJobs: Job[] }) {
     ...(jobTypeFilter !== "alle" ? [{ id: "employment", label: employments.find(row => row.value === jobTypeFilter)?.label ?? jobTypeFilter, onRemove: () => setJobTypeFilter("alle") }] : []),
     ...(urgentOnly ? [{ id: "urgent", label: t("filterUrgentLabel"), onRemove: () => setUrgentOnly(false) }] : []),
     ...(cityText ? [{ id: "cityText", label: cityText, onRemove: () => setCityText("") }] : []),
-    ...(["country", "region", "city"] as const).flatMap(kind => { const value = { country: countryFilter, region: regionFilter, city: cityFilter }[kind]; return value ? [{ id: kind, label: kind === "country" ? (ui.has(`CountryNames.${value}`) ? ui(`CountryNames.${value}`) : value) : placeOptions(allJobs, kind, locale).find(row => row.value === value)?.label ?? value, onRemove: () => kind === "country" ? updatePlaceFilters({ country: "", region: "", city: "" }) : kind === "region" ? updatePlaceFilters({ country: countryFilter, region: "", city: "" }) : setCityFilter("") }] : []; }),
+    ...(["country", "region", "city"] as const).flatMap(kind => { const value = { country: countryFilter, region: regionFilter, city: cityFilter }[kind]; return value ? [{ id: kind, label: value === UNASSIGNED_COUNTRY ? ui("Places.countryUnassigned") : kind === "country" ? (ui.has(`CountryNames.${value}`) ? ui(`CountryNames.${value}`) : value) : placeOptions(allJobs, kind, locale).find(row => row.value === value)?.label ?? value, onRemove: () => kind === "country" ? updatePlaceFilters({ country: "", region: "", city: "" }) : kind === "region" ? updatePlaceFilters({ country: countryFilter, region: "", city: "" }) : setCityFilter("") }] : []; }),
   ];
   const fields = [{ label: copy("role"), value: selectedRoleId ?? "", onChange: (value: string) => setSelectedRoleId(value || null), options: roles },
     { label: t("filterProjectType"), value: activeType, onChange: setActiveType, options: types },

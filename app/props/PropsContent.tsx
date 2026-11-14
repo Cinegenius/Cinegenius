@@ -11,7 +11,7 @@ import FloatingMapToggle from "@/components/FloatingMapToggle";
 import { useDirectoryMap } from "@/lib/use-directory-map";
 
 import PlaceFilters,{ EMPTY_PLACE_FILTERS } from "@/components/PlaceFilters";
-import { matchesPlace,placeOptions,placeSearchMatches } from "@/lib/places/core";
+import { matchesPlace,browsePlaceOptions as placeOptions, UNASSIGNED_COUNTRY,placeSearchMatches } from "@/lib/places/core";
 
 import { listingPriceLabel } from "@/lib/listing-price";
 import { marketplaceCategoryLabel } from "@/lib/marketplace-offer";
@@ -19,7 +19,7 @@ import { useViewState } from "@/lib/use-view-state";
 import { useViewUrl } from "@/lib/use-view-url";
 
 
-import MediaImage from "@/components/MediaImage";
+import ListingImage from "@/components/ListingImage";
 
 import EmptyState from "@/components/EmptyState";
 import MobileBrowseControls,{ MobileFilterField,MobileFilterSelect,type BrowseChip } from "@/components/MobileBrowseControls";
@@ -66,7 +66,7 @@ function PropCard({ p, list, ratingData, myRating, onRate, canRate, isFavorited,
       <article className="browse-card group flex min-w-0 items-center gap-1 p-2 sm:gap-2 sm:p-3" data-visible>
         <Link href={href} className="flex min-w-0 flex-1 items-center gap-3 rounded-lg focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold">
           <div className="relative h-14 w-14 shrink-0 overflow-hidden rounded-lg border border-border bg-bg-elevated sm:h-16 sm:w-16">
-            {p.image ? <MediaImage mediaSize="thumbnail" src={p.image} alt="" fill sizes="64px" loading="lazy" className="object-cover" style={{ objectPosition: p.focalPoint ? `${p.focalPoint.x}% ${p.focalPoint.y}%` : "50% 66%" }} /> : <div className="flex h-full items-center justify-center text-text-muted"><Package size={22} aria-hidden="true" /></div>}
+            {p.image ? <ListingImage mediaSize="thumbnail" src={p.image} alt="" fill sizes="64px" loading="lazy" className="object-cover" style={{ objectPosition: p.focalPoint ? `${p.focalPoint.x}% ${p.focalPoint.y}%` : "50% 66%" }} /> : <div className="flex h-full items-center justify-center text-text-muted"><Package size={22} aria-hidden="true" /></div>}
           </div>
           <div className="min-w-0 flex-1 py-0.5">
             <h3 className="line-clamp-2 text-sm font-semibold leading-5 text-text-primary [overflow-wrap:anywhere]">{p.title}</h3>
@@ -87,7 +87,7 @@ function PropCard({ p, list, ratingData, myRating, onRate, canRate, isFavorited,
     <Link href={href} className="block">
       <div className="relative aspect-[4/3] overflow-hidden bg-bg-elevated">
         {p.image
-          ? <MediaImage mediaSize="thumbnail" src={p.image} alt={p.title} fill sizes="(max-width: 768px) 50vw, 400px" loading="lazy" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" style={{ objectPosition: p.focalPoint ? `${p.focalPoint.x}% ${p.focalPoint.y}%` : "50% 66%" }} />
+          ? <ListingImage mediaSize="thumbnail" src={p.image} alt={p.title} fill sizes="(max-width: 768px) 50vw, 400px" loading="lazy" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" style={{ objectPosition: p.focalPoint ? `${p.focalPoint.x}% ${p.focalPoint.y}%` : "50% 66%" }} />
           : <div className="w-full h-full flex items-center justify-center text-text-muted/20"><svg viewBox="0 0 24 24" fill="currentColor" className="w-12 h-12"><path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/></svg></div>
         }
         <div className={`absolute top-2.5 left-2.5 right-2.5 flex items-start justify-between gap-1 ${onFavorite ? "pr-12" : ""}`}>
@@ -389,7 +389,7 @@ function PropsInner({ serverListings, serverError = false, facetRows, initialDep
     ...(activeDepartment ? [{ id: "category", label: activeDepartment.label, onRemove: () => changeCategory(null) }] : []),
     ...(activeSubcategory ? [{ id: "subcategory", label: activeSubcategory.label, onRemove: () => changeCategory(null) }] : []),
     ...(cityText ? [{ id: "city-text", label: `${uiText("Places.city")}: ${cityText}`, onRemove: () => setCityText("") }] : []),
-    ...(["country", "region", "city"] as const).flatMap(kind => placeFilters[kind] ? [{ id: `place-${kind}`, label: placeOptions(facetRows, kind, locale).find(option => option.value === placeFilters[kind])?.label ?? placeFilters[kind], onRemove: () => updatePlaceFilters(kind === "country" ? EMPTY_PLACE_FILTERS : kind === "region" ? { ...placeFilters, region: "", city: "" } : { ...placeFilters, city: "" }) }] : []),
+    ...(["country", "region", "city"] as const).flatMap(kind => placeFilters[kind] ? [{ id: `place-${kind}`, label: placeFilters[kind] === UNASSIGNED_COUNTRY ? uiText("Places.countryUnassigned") : placeOptions(facetRows, kind, locale).find(option => option.value === placeFilters[kind])?.label ?? placeFilters[kind], onRemove: () => updatePlaceFilters(kind === "country" ? EMPTY_PLACE_FILTERS : kind === "region" ? { ...placeFilters, region: "", city: "" } : { ...placeFilters, city: "" }) }] : []),
     ...(rentalTypeFilter !== "alle" ? [{ id: "offer", label: navigation(rentalTypeFilter === "miete" ? "rent" : "buy"), onRemove: () => setOffer("alle") }] : []),
   ];
   const viewControls = <DirectoryViewControls value={viewMode} onChange={setView} />;

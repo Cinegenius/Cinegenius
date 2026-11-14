@@ -102,7 +102,9 @@
     "suggestion3": "Veterán",
     "suggestion4": "Hledá se režisér",
     "accessibleLabel": "Prohledat web",
-    "clearSearch": "Vymazat hledání"
+    "clearSearch": "Vymazat hledání",
+    "loadError": "Vyhledávání se nepodařilo načíst. Zkuste to znovu.",
+    "retry": "Zkusit znovu"
   },
   "notifications": {
     "ariaLabel": "Oznámení",
@@ -2456,6 +2458,7 @@
     "unavailable": "Není k dispozici"
   },
   "Places": {
+    "countryUnassigned": "Země neuvedena",
     "location": "Místo",
     "country": "Země",
     "chooseCountry": "Vyberte zemi",
@@ -7772,7 +7775,19 @@
     "hideForMe": "Skrýt pro mě",
     "hideHelp": "Zpráva se skryje pouze ve tvém zobrazení. Ostatní členové ji stále uvidí.",
     "unknown": "Jméno není dostupné",
-    "availablePlaces": "Zbývající místa: {count}"
+    "availablePlaces": "Zbývající místa: {count}",
+    "chooseGroupPeople": "Vyber kontakty, které chceš přidat do skupiny.",
+    "attachFile": "Přiložit soubor",
+    "attachmentHint": "Obrázky, PDF, DOCX nebo TXT · do 4 MB",
+    "attachmentInvalid": "Vyber obrázek nebo dokument PDF, DOCX či TXT do 4 MB.",
+    "attachmentUploadError": "Nahrání se nezdařilo. Zkus to znovu.",
+    "attachmentLoadError": "Přílohy se nepodařilo načíst. Zkus to znovu.",
+    "attachmentLimit": "Můžeš přiložit až 5 souborů.",
+    "attachmentUploading": "Nahrávání: {progress} %",
+    "retryUpload": "Zkusit nahrát znovu",
+    "removeAttachment": "Odebrat {name}",
+    "openAttachment": "Otevřít {name}",
+    "attachmentPreview": "Příloha"
   },
   "directoryMap": {
     "crew": "Štáb na mapě",
@@ -8092,6 +8107,8 @@
     "noticeFirst": "Nejprve zavři oznámení o cookies. Potom můžeš otevřít Genie."
   },
   "InboxNavigation": {
+    "groups": "Skupiny",
+    "friends": "Přátelé",
     "chats": "Chaty",
     "notices": "Oznámení",
     "unread": "Zprávy: {chats} nepřečtených zpráv v chatu, {notices} oznámení",

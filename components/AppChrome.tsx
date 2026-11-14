@@ -24,7 +24,7 @@ export default function AppChrome({ children, initialIsSignedIn, initialAdminUse
     <SiteNavigationProvider>
     <NavigationRestoration />
     <Navbar initialIsSignedIn={initialIsSignedIn} initialAdminUserId={initialAdminUserId} />
-    <main className="flex-1 pb-[var(--mobile-nav-clearance)] lg:pb-0">
+    <main className="site-main flex-1 pb-[var(--mobile-nav-clearance)] lg:pb-0">
       <LegalLanguageNotice />
       <PersonalAreaNavigation>{children}</PersonalAreaNavigation>
     </main>

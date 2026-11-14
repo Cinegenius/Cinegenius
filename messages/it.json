@@ -102,7 +102,9 @@
     "suggestion3": "Auto d'epoca",
     "suggestion4": "Regista cercato",
     "accessibleLabel": "Cerca nel sito",
-    "clearSearch": "Cancella ricerca"
+    "clearSearch": "Cancella ricerca",
+    "loadError": "Impossibile caricare la ricerca. Riprova.",
+    "retry": "Riprova"
   },
   "notifications": {
     "ariaLabel": "Notifiche",
@@ -2456,6 +2458,7 @@
     "unavailable": "Non disponibile"
   },
   "Places": {
+    "countryUnassigned": "Paese non specificato",
     "location": "Località",
     "country": "Paese",
     "chooseCountry": "Seleziona paese",
@@ -7772,7 +7775,19 @@
     "hideForMe": "Nascondi per me",
     "hideHelp": "Il messaggio sarà nascosto solo nella tua vista. Gli altri membri potranno ancora vederlo.",
     "unknown": "Nome non disponibile",
-    "availablePlaces": "Posti disponibili: {count}"
+    "availablePlaces": "Posti disponibili: {count}",
+    "chooseGroupPeople": "Scegli i contatti che vuoi aggiungere al gruppo.",
+    "attachFile": "Allega file",
+    "attachmentHint": "Immagini, PDF, DOCX o TXT · fino a 4 MB",
+    "attachmentInvalid": "Scegli un’immagine o un documento PDF, DOCX o TXT fino a 4 MB.",
+    "attachmentUploadError": "Caricamento non riuscito. Riprova.",
+    "attachmentLoadError": "Impossibile caricare gli allegati. Riprova.",
+    "attachmentLimit": "Puoi allegare fino a 5 file.",
+    "attachmentUploading": "Caricamento: {progress}%",
+    "retryUpload": "Riprova caricamento",
+    "removeAttachment": "Rimuovi {name}",
+    "openAttachment": "Apri {name}",
+    "attachmentPreview": "Allegato"
   },
   "directoryMap": {
     "crew": "Crew sulla mappa",
@@ -8092,6 +8107,8 @@
     "noticeFirst": "Chiudi prima l’avviso sui cookie. Poi potrai aprire Genie."
   },
   "InboxNavigation": {
+    "groups": "Gruppi",
+    "friends": "Amici",
     "chats": "Chat",
     "notices": "Notifiche",
     "unread": "Messaggi: {chats} messaggi di chat non letti, {notices} notifiche",

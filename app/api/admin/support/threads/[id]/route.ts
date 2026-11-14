@@ -1,3 +1,4 @@
+import {attachMessageFiles} from "@/lib/message-attachment-server";
 import { SUPPORT_ACTOR_ID, SUPPORT_AVATAR_URL, SUPPORT_NAME } from "@/lib/support-identity";
 import { NextRequest, NextResponse } from "next/server";
 import { clerkClient } from "@clerk/nextjs/server";
@@ -37,7 +38,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
     catch { return NextResponse.json({ error: tResponse('System.m_ece7dc87613b') }, { status: 503 }); }
   }
   const hasOlder = (rawMessages?.length ?? 0) > 200;
-  const messages = (rawMessages ?? []).slice(0, 200).reverse();
+  let messages;try{messages=await attachMessageFiles((rawMessages ?? []).slice(0, 200).reverse());}catch{return NextResponse.json({error:tResponse("Messaging.attachmentLoadError")},{status:503});}
   const messageIds = (messages ?? []).map((message) => message.id);
   const { data: receipts, error: receiptsError } = messageIds.length
     ? await db.from("message_reads").select("message_id, read_at").eq("user_id", SUPPORT_ACTOR_ID).in("message_id", messageIds)
@@ -55,7 +56,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
       userAvatarUrl: profile?.avatar_url ?? null, createdAt: thread.created_at,
     },
     messages: (messages ?? []).map((message) => ({
-      id: message.id, content: message.content, createdAt: message.created_at,
+      id: message.id, content: message.content, createdAt: message.created_at, attachments:message.attachments,
       senderName: message.sender_id === SUPPORT_ACTOR_ID ? SUPPORT_NAME : (participant?.display_name ?? "Mitglied"),
       senderAvatarUrl: message.sender_id === SUPPORT_ACTOR_ID ? SUPPORT_AVATAR_URL : profile?.avatar_url ?? null,
       fromSupport: message.sender_id === SUPPORT_ACTOR_ID,

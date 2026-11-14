@@ -6,7 +6,7 @@ import { useBrowseGeography } from "@/lib/use-browse-geography";
 
 import MobileBrowseControls,{ MobileFilterField,MobileFilterSelect,type BrowseChip } from "@/components/MobileBrowseControls";
 import ProjectBrowseResults from "@/components/ProjectBrowseResults";
-import { matchesPlace,placeOptions } from "@/lib/places/core";
+import { matchesPlace,browsePlaceOptions as placeOptions, UNASSIGNED_COUNTRY } from "@/lib/places/core";
 import { PROJECT_CATEGORIES,projectCategoryForType,type ProjectCategoryId } from "@/lib/project-category-filter";
 import { normalizedCatalogueSearch,projectTypeLabel,projectTypeOptions } from "@/lib/project-type-labels";
 import { sortProjects,type BrowseProject,type ProjectSort } from "@/lib/projects-browse";
@@ -56,7 +56,7 @@ export default function ProjectsContent({ projects, category = null }: { project
   const reset = () => { setQuery(""); setTypeFilter(""); setYearFilter(""); setDirectorFilter(""); setCountry(""); if (category) router.push("/projects/alle", { scroll: false }); };
   const chips: BrowseChip[] = [
     ...(category ? [{ id: "category", label: categories.find(item => item.value === category)?.label ?? category, onRemove: () => changeCategory("") }] : []),
-    ...(country ? [{ id: "country", label: (ui.has(`CountryNames.${country}`) ? ui(`CountryNames.${country}`) : country), onRemove: () => setCountry("") }] : []),
+    ...(country ? [{ id: "country", label: country === UNASSIGNED_COUNTRY ? ui("Places.countryUnassigned") : (ui.has(`CountryNames.${country}`) ? ui(`CountryNames.${country}`) : country), onRemove: () => setCountry("") }] : []),
     ...(typeFilter ? [{ id: "type", label: projectTypeLabel(typeFilter, ui), onRemove: () => setTypeFilter("") }] : []),
     ...(yearFilter ? [{ id: "year", label: yearFilter, onRemove: () => setYearFilter("") }] : []),
     ...(directorFilter ? [{ id: "director", label: directorFilter, onRemove: () => setDirectorFilter("") }] : []),

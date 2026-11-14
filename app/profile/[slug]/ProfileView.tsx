@@ -4,6 +4,7 @@ import { profileTraitLabel, profileTravelValue } from "@/lib/profile-trait-label
 import { listingPriceLabel } from "@/lib/listing-price";
 import { marketplaceCategoryLabel } from "@/lib/marketplace-offer";
 import Image from "@/components/MediaImage";
+import ListingImage from "@/components/ListingImage";
 import Link from "next/link";
 import { useTranslations, useLocale } from "next-intl";
 import { useState, useEffect, useLayoutEffect, useRef } from "react";
@@ -367,8 +368,8 @@ function ListingsSection({ listings }: { listings: PublicListing[] }) {
                     <Link key={l.id} href={meta.href(l.id)}
                       className="group flex items-center gap-3 px-3 py-2 border-b border-border last:border-b-0 hover:bg-bg-elevated transition-colors">
                       {hasPhoto && (
-                        // eslint-disable-next-line @next/next/no-img-element
-                        <img
+                        <ListingImage
+                          width={96} height={64} mediaSize="thumbnail" loading="lazy"
                           src={l.image_url!}
                           alt={l.title}
                           className="w-24 h-16 rounded object-cover shrink-0 border border-border/50"

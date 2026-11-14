@@ -11,7 +11,7 @@ import { useDirectoryMap } from "@/lib/use-directory-map";
 
 import PlaceFilters from "@/components/PlaceFilters";
 
-import { canonicalFilterValue,matchesPlace,placeOptions,placeSearchMatches } from "@/lib/places/core";
+import { canonicalFilterValue,matchesPlace,browsePlaceOptions as placeOptions, UNASSIGNED_COUNTRY,placeSearchMatches } from "@/lib/places/core";
 
 import { crewLanguageLabel,matchesCrewLanguage,normalizeCrewLanguages } from "@/lib/crew-languages";
 import { profileTraitLabel,profileTraitOptions } from "@/lib/profile-trait-labels";
@@ -19,7 +19,7 @@ import { useViewState } from "@/lib/use-view-state";
 import { useViewUrl } from "@/lib/use-view-url";
 
 import { filterCrewOccupations } from "@/lib/crew-occupations";
-import { filterProviderProfiles,isProviderFilter,LOCATION_PROVIDER_FILTER,MARKETPLACE_PROVIDER_FILTER } from "@/lib/profile-provider-filters";
+import { filterProviderProfiles,isProviderFilter,CREW_PROVIDER_FILTER,LOCATION_PROVIDER_FILTER,MARKETPLACE_PROVIDER_FILTER } from "@/lib/profile-provider-filters";
 
 import EmptyState from "@/components/EmptyState";
 import MobileBrowseControls,{ BrowseRoleFilter,MobileFilterField,MobileFilterSelect,type BrowseChip } from "@/components/MobileBrowseControls";
@@ -202,7 +202,7 @@ function CreatorsInner({
   const regionOptions = useMemo(() => placeOptions(allCreators, "region", locale), [allCreators, locale]);
   const availableLanguages = useMemo(() => [...new Set(allCreators.flatMap(c => normalizeCrewLanguages(c.languages)))].sort((a,b) => crewLanguageLabel(a,locale).localeCompare(crewLanguageLabel(b,locale),locale)), [allCreators,locale]);
   const cityLabel = (value: string) => cityOptions.find(o => o.value === value)?.label ?? value;
-  const countryLabel = (value: string) => countryOptions.find(o => o.value === value)?.label ?? value;
+  const countryLabel = (value: string) => value === UNASSIGNED_COUNTRY ? uiText("Places.countryUnassigned") : countryOptions.find(o => o.value === value)?.label ?? value;
   const regionLabel = (value: string) => regionOptions.find(option => option.value === value)?.label ?? value;
   const [sortKey, setSortKey] = useViewState("crew.sortKey", () => ["rating", "reviews"].includes(initialFilters.sort) ? initialFilters.sort : "featured");
   const geography = useBrowseGeography(sortKey === "featured" && !countryFilter && !regionFilter && !cityFilter && !cityText);
@@ -402,7 +402,7 @@ function CreatorsInner({
 
   const mobileChips: BrowseChip[] = [
     ...(cityText ? [{ id: "city-text", label: `${uiText("Places.city")}: ${cityText}`, onRemove: () => setCityText("") }] : []),
-    ...(sidebarDept ? [{ id: "area", label: sidebarDept === "__locations" ? uiText("nav.locations") : sidebarDept === "__marktplatz" ? uiText("nav.marketplace") : getDeptLabel(departments.find((department) => department.id === sidebarDept) ?? departments[0], locale, animals, taxonomyText), onRemove: () => chooseSidebarDept(null) }] : []),
+    ...(sidebarDept ? [{ id: "area", label: sidebarDept === CREW_PROVIDER_FILTER ? uiText("nav.crew") : sidebarDept === "__locations" ? uiText("nav.locations") : sidebarDept === "__marktplatz" ? uiText("nav.marketplace") : getDeptLabel(departments.find((department) => department.id === sidebarDept) ?? departments[0], locale, animals, taxonomyText), onRemove: () => chooseSidebarDept(null) }] : []),
     ...[...selectedRoles].map((role) => ({ id: `role-${role}`, label: taxonomyLabel(occupationById(role)?.label ?? role, uiText), onRemove: () => removeRole(role) })),
     ...(cityFilter ? [{ id: "city", label: cityLabel(cityFilter), onRemove: () => setCityFilter("") }] : []),
     ...(countryFilter ? [{ id: "country", label: countryLabel(countryFilter), onRemove: () => changePlaceFilters({country:"",region:"",city:""}) }] : []),
@@ -445,6 +445,7 @@ function CreatorsInner({
         categoryLabel={t("deptFilter")}
         allCategoryLabel={uiText("Ui.text_bc0b501bb3186b")}
         categories={[
+          ...(filterProviderProfiles(allCreators, CREW_PROVIDER_FILTER).length ? [{value:CREW_PROVIDER_FILTER,label:uiText("nav.crew")}] : []),
           ...activeDepts.map((department) => ({ value: department.id, label: getDeptLabel(department, locale, animals, taxonomyText) })),
           ...(filterProviderProfiles(allCreators, LOCATION_PROVIDER_FILTER).length ? [{ value: LOCATION_PROVIDER_FILTER, label: uiText("Ui.text_e05308bad64468") }] : []),
           ...(filterProviderProfiles(allCreators, MARKETPLACE_PROVIDER_FILTER).length ? [{ value: MARKETPLACE_PROVIDER_FILTER, label: uiText("Ui.text_47ce00e52d872a") }] : []),
@@ -453,6 +454,7 @@ function CreatorsInner({
         onCategoryChange={(value) => { setSelectedRoles(new Set()); chooseSidebarDept(value || null); }}
         resultSummary={hasMoreFromApi ? (loadError ? t("resultsLoadFailed") : t("resultsLoading")) : t("results", { count: isProviderFilter(sidebarDept) ? allCreators.length : filtered.length })}
         resultActions={<ProviderQuickFilters value={sidebarDept}
+          crew={filterProviderProfiles(allCreators, CREW_PROVIDER_FILTER).length > 0}
           locations={filterProviderProfiles(allCreators, LOCATION_PROVIDER_FILTER).length > 0}
           marketplace={filterProviderProfiles(allCreators, MARKETPLACE_PROVIDER_FILTER).length > 0}
           onChange={value => { setSelectedRoles(new Set()); chooseSidebarDept(value); }} />}
@@ -467,8 +469,8 @@ function CreatorsInner({
         <MobileFilterField label={t("filterProfileType")}>
           <MobileFilterSelect value={profileTypeFilter} onChange={setProfileTypeFilter} placeholder={t("filterAll")} options={availableProfileTypes.map((value) => ({ value, label: PROFILE_TYPE_MAP[value] ?? value }))} />
         </MobileFilterField>
-        {!isProviderFilter(sidebarDept) && <BrowseRoleFilter label={uiText("Ui.text_0038a9cf86613c")} placeholder={t("searchRoles")}
-          selected={selectedRoles} onChange={setSelectedRoles} options={availableOccupations.filter(option => !sidebarDept || option.departmentId === sidebarDept).map(option => ({ value: option.roleId, label: getDepartmentRoleLabel(option.departmentId, option.label, locale, animals, taxonomyText) }))} />}
+        {(!isProviderFilter(sidebarDept)||sidebarDept===CREW_PROVIDER_FILTER) && <BrowseRoleFilter label={uiText("Ui.text_0038a9cf86613c")} placeholder={t("searchRoles")}
+          selected={selectedRoles} onChange={setSelectedRoles} options={availableOccupations.filter(option => !sidebarDept || sidebarDept===CREW_PROVIDER_FILTER || option.departmentId === sidebarDept).map(option => ({ value: option.roleId, label: getDepartmentRoleLabel(option.departmentId, option.label, locale, animals, taxonomyText) }))} />}
         <MobileFilterField label={t("filterLanguage")}>
           <MobileFilterSelect value={languageFilter} onChange={setLanguageFilter} placeholder={t("filterAll")} options={availableLanguages.map((value) => ({ value, label: crewLanguageLabel(value, locale) }))} />
         </MobileFilterField>

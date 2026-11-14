@@ -102,7 +102,9 @@
     "suggestion3": "Coche clásico",
     "suggestion4": "Director buscado",
     "accessibleLabel": "Buscar en el sitio web",
-    "clearSearch": "Borrar búsqueda"
+    "clearSearch": "Borrar búsqueda",
+    "loadError": "No se pudo cargar la búsqueda. Inténtalo de nuevo.",
+    "retry": "Reintentar"
   },
   "notifications": {
     "ariaLabel": "Notificaciones",
@@ -2456,6 +2458,7 @@
     "unavailable": "No disponible"
   },
   "Places": {
+    "countryUnassigned": "País sin especificar",
     "location": "Ubicación",
     "country": "País",
     "chooseCountry": "Seleccionar país",
@@ -7772,7 +7775,19 @@
     "hideForMe": "Ocultar para mí",
     "hideHelp": "El mensaje solo se ocultará en tu vista. Los demás miembros podrán seguir viéndolo.",
     "unknown": "Nombre no disponible",
-    "availablePlaces": "Plazas disponibles: {count}"
+    "availablePlaces": "Plazas disponibles: {count}",
+    "chooseGroupPeople": "Elige los contactos que quieres añadir al grupo.",
+    "attachFile": "Adjuntar archivo",
+    "attachmentHint": "Imágenes, PDF, DOCX o TXT · hasta 4 MB",
+    "attachmentInvalid": "Elige una imagen o un documento PDF, DOCX o TXT de hasta 4 MB.",
+    "attachmentUploadError": "Error al subir. Inténtalo de nuevo.",
+    "attachmentLoadError": "No se pudieron cargar los adjuntos. Inténtalo de nuevo.",
+    "attachmentLimit": "Puedes adjuntar hasta 5 archivos.",
+    "attachmentUploading": "Subiendo: {progress} %",
+    "retryUpload": "Reintentar subida",
+    "removeAttachment": "Quitar {name}",
+    "openAttachment": "Abrir {name}",
+    "attachmentPreview": "Archivo adjunto"
   },
   "directoryMap": {
     "crew": "Equipo en el mapa",
@@ -8092,6 +8107,8 @@
     "noticeFirst": "Cierra primero el aviso de cookies. Después podrás abrir Genie."
   },
   "InboxNavigation": {
+    "groups": "Grupos",
+    "friends": "Amigos",
     "chats": "Chats",
     "notices": "Notificaciones",
     "unread": "Mensajes: {chats} mensajes de chat sin leer, {notices} notificaciones",

@@ -1,5 +1,7 @@
 "use client";
 
+import ListingImage from "@/components/ListingImage";
+
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { Heart, ArrowLeft, MapPin, Car, Package, Briefcase, Users, Trash2 } from "lucide-react";
@@ -130,8 +132,8 @@ export default function FavoritesPage() {
                 {/* Thumbnail */}
                 <Link href={config.href(fav.listing_id)} className="shrink-0">
                   {fav.listing_image ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img
+                    <ListingImage
+                      width={56} height={56} mediaSize="thumbnail"
                       src={fav.listing_image}
                       alt={fav.listing_title ?? ""}
                       className="w-14 h-14 rounded-lg object-cover border border-border hover:opacity-90 transition-opacity"

@@ -1,3 +1,4 @@
+import { homeMarketplaceOffers } from "@/lib/home-marketplace";
 import HomeOrganizations from "@/components/organizations/HomeOrganizations";
 import { listingPriceLabel } from "@/lib/listing-price";
 import { db } from "@/lib/db";
@@ -6,6 +7,7 @@ import { listingDetailPath } from "@/lib/listing-routes";
 import { auth } from "@clerk/nextjs/server";
 import Link from "next/link";
 import Image from "@/components/MediaImage";
+import ListingImage from "@/components/ListingImage";
 import { getTranslations, getLocale } from "next-intl/server";
 import { Fragment, Suspense } from "react";
 import { SkeletonBox } from "@/components/Skeleton";
@@ -92,7 +94,7 @@ async function getHomeData() {
   const results = await Promise.all([
     db.from("listings").select("id,title,city,price,image_url,metadata,created_at").eq("type", "location").eq("published", true).order("created_at", { ascending: false }).limit(10),
     db.from("listings").select("id,title,city,price,created_at").eq("type", "job").eq("published", true).order("created_at", { ascending: false }).limit(4),
-    db.from("listings").select("id,user_id,company_id,responsible_person,title,city,price,image_url,type,metadata,created_at").in("type", ["prop", "vehicle"]).eq("published", true).order("created_at", { ascending: false }).limit(4),
+    homeMarketplaceOffers(currentTime),
     db.from("companies").select("id,slug,name,logo_url,city,categories").eq("published", true).order("created_at", { ascending: false }).limit(6),
     db.from("profiles").select("user_id,slug,display_name,tagline,avatar_url,location,verified,role,positions,profile_type,profile_types,created_at").not("display_name", "is", null).neq("display_name", "").order("created_at", { ascending: false }).limit(300),
   ]);
@@ -206,7 +208,7 @@ async function HomeLocations({ dataPromise }: { dataPromise: HomeDataPromise }) 
     <div className="mb-3 flex flex-wrap items-center justify-between gap-x-3"><h2 id="home-locations-title" className="font-display text-xl font-bold text-text-primary sm:text-2xl">{t("locationsTitle")}</h2><Link href="/locations" className="inline-flex min-h-11 items-center gap-1 text-xs font-medium text-gold hover:text-gold-light sm:text-sm">{tc("viewAll")} <ArrowRight size={13} /></Link></div>
     <HomeCardRail id="home-locations-rail" labelledBy="home-locations-title" hint={t("locationScrollHint")} itemCount={data.liveLocations.length} variant="location" wide>
       {data.liveLocations.map(loc => <Link key={loc.id} href={`/locations/${loc.id}`} className="group relative isolate block aspect-[4/3] min-h-11 min-w-0 overflow-hidden rounded-2xl border border-border bg-bg-elevated sm:aspect-[3/2]">
-        {loc.image ? <Image src={loc.image} alt={loc.title} fill mediaSize="thumbnail" className="object-cover transition-transform duration-300 motion-safe:group-hover:scale-105" style={{ objectPosition: loc.focalPoint ? `${loc.focalPoint.x}% ${loc.focalPoint.y}%` : "50% 50%" }} sizes="(min-width:1024px) 33vw,(min-width:640px) 60vw,72vw" /> : <div className="absolute inset-0 flex items-center justify-center text-text-muted/30"><MapPin size={32} aria-hidden="true" /></div>}
+        {loc.image ? <ListingImage src={loc.image} alt={loc.title} fill mediaSize="thumbnail" className="object-cover transition-transform duration-300 motion-safe:group-hover:scale-105" style={{ objectPosition: loc.focalPoint ? `${loc.focalPoint.x}% ${loc.focalPoint.y}%` : "50% 50%" }} sizes="(min-width:1024px) 33vw,(min-width:640px) 60vw,72vw" /> : <div className="absolute inset-0 flex items-center justify-center text-text-muted/30"><MapPin size={32} aria-hidden="true" /></div>}
         <div className="absolute inset-0 bg-gradient-to-t from-bg-primary via-bg-primary/30 to-transparent" />
         <div className="absolute inset-x-0 bottom-0 p-3 sm:p-3.5"><h3 className="line-clamp-2 text-sm font-semibold leading-snug text-white">{loc.title}</h3><div className="mt-1.5 flex min-w-0 flex-wrap items-center justify-between gap-x-3 gap-y-1 text-xs"><span className="min-w-0 truncate text-white/75">{loc.city}</span><span className="font-semibold text-gold [overflow-wrap:anywhere]">{loc.priceLabel}</span></div></div>
       </Link>)}
@@ -239,7 +241,7 @@ async function HomeRecommendations({ dataPromise }: { dataPromise: HomeDataPromi
                   className="card-hover group block overflow-hidden rounded-2xl border border-border bg-bg-elevated shadow-lg shadow-black/10 transition-colors hover:border-gold/35"
                 >
                   <div className="relative aspect-square overflow-hidden bg-bg-elevated sm:aspect-video">
-                    {prop.image ? <Image
+                    {prop.image ? <ListingImage
                       src={prop.image}
                       alt={prop.title}
                       fill

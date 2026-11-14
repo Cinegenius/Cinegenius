@@ -1,11 +1,11 @@
 "use client";
 
 import BrowseGeography from "@/components/BrowseGeography";
-import MediaImage from "@/components/MediaImage";
+import ListingImage from "@/components/ListingImage";
 import MobileBrowseControls,{ MobileFilterField,MobileFilterSelect } from "@/components/MobileBrowseControls";
 import PlaceFilters,{ EMPTY_PLACE_FILTERS } from "@/components/PlaceFilters";
 import { prioritizeGeographically } from "@/lib/browse-geography";
-import { matchesPlace,placeOptions } from "@/lib/places/core";
+import { matchesPlace,browsePlaceOptions as placeOptions, UNASSIGNED_COUNTRY } from "@/lib/places/core";
 import { useBrowseGeography } from "@/lib/use-browse-geography";
 import { useViewState } from "@/lib/use-view-state";
 
@@ -157,7 +157,7 @@ export default function TiereContent({ serverListings }: { serverListings: Anima
     ...(species !== "Alle" ? [{ id: "species", label: speciesLabel(species), onRemove: () => setSpecies("Alle") }] : []),
     ...(training !== "Alle" ? [{ id: "training", label: trainingLabel(training), onRemove: () => setTraining("Alle") }] : []),
     ...(deliveryOnly ? [{ id: "delivery", label: animals("delivery"), onRemove: () => setDeliveryOnly(false) }] : []),
-    ...(["country", "region", "city"] as const).flatMap(kind => place[kind] ? [{ id: kind, label: placeOptions(serverListings, kind, locale).find(option => option.value === place[kind])?.label ?? place[kind], onRemove: () => setPlace(kind === "country" ? EMPTY_PLACE_FILTERS : kind === "region" ? { ...place, region: "", city: "" } : { ...place, city: "" }) }] : []),
+    ...(["country", "region", "city"] as const).flatMap(kind => place[kind] ? [{ id: kind, label: place[kind] === UNASSIGNED_COUNTRY ? uiText("Places.countryUnassigned") : placeOptions(serverListings, kind, locale).find(option => option.value === place[kind])?.label ?? place[kind], onRemove: () => setPlace(kind === "country" ? EMPTY_PLACE_FILTERS : kind === "region" ? { ...place, region: "", city: "" } : { ...place, city: "" }) }] : []),
   ];
   return <div className="mobile-bottom-nav-clear">
     <MobileBrowseControls preference={<BrowseGeography geography={geography} />} query={search} onQueryChange={setSearch} searchPlaceholder={uiText("Ui.text_daec3cc1690074")}
@@ -188,7 +188,7 @@ export default function TiereContent({ serverListings }: { serverListings: Anima
               className="group bg-bg-secondary border border-border rounded-2xl overflow-hidden hover:border-gold/40 transition-all hover:shadow-lg hover:shadow-gold/5">
               <div className="relative h-48 overflow-hidden bg-bg-elevated">
                 {animal.image ? (
-                  <MediaImage
+                  <ListingImage
                     fill sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 320px" mediaSize="thumbnail"
                     src={animal.image}
                     alt={animal.title}

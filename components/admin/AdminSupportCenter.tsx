@@ -1,4 +1,6 @@
 "use client";
+import MessageAttachments from "@/components/messaging/MessageAttachments";
+import type {MessageAttachment} from "@/lib/message-attachments";
 
 import { useCallback, useContext, useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
 import UnoptimizedImage from "@/components/UnoptimizedImage";
@@ -16,7 +18,7 @@ type Thread = {
   createdAt: string; updatedAt: string; unreadCount: number;
   latest: { id: string; content: string; createdAt: string; senderName: string; fromSupport: boolean } | null;
 };
-type Message = { id: string; content: string; createdAt: string; senderName: string; senderAvatarUrl: string | null; fromSupport: boolean; readAt: string | null };
+type Message = { attachments?:MessageAttachment[]; id: string; content: string; createdAt: string; senderName: string; senderAvatarUrl: string | null; fromSupport: boolean; readAt: string | null };
 type Detail = { thread: Thread; messages: Message[]; hasOlder?: boolean; nextCursor?: { before: string; before_id: string } | null };
 type Template = { template_key: string; label: string; body: string; enabled: boolean; updated_at?: string };
 async function fetchJson<T>(translate: (key: string, values?: Record<string, string | number>) => string, url: string, init?: RequestInit): Promise<T> {
@@ -259,7 +261,7 @@ export function AdminSupportCenter() {
         {error && <div role="alert" className="shrink-0 border-b border-crimson/30 p-3 text-sm text-crimson-light"><p>{error}</p>{activeId && <button type="button" onClick={() => void openThread(activeId)} className="min-h-11 rounded-lg border border-border px-3 text-text-secondary">{uiText("FormDraft.reload")}</button>}</div>}
         <div ref={messagesViewport} onScroll={event => { const viewport = event.currentTarget; atBottom.current = viewport.scrollHeight - viewport.scrollTop - viewport.clientHeight < 80; }} className="min-h-0 min-w-0 flex-1 space-y-3 overflow-y-auto overscroll-contain p-3 sm:p-4">
           {detail?.hasOlder && <button type="button" disabled={olderLoading} onClick={() => void openThread(detail.thread.id, true)} className="min-h-11 rounded-lg border border-border px-3 text-xs text-text-secondary disabled:opacity-50">{olderLoading ? uiText("Ui.text_9767238939207a") : uiText("Ui.text_b15d7a15520819")}</button>}
-          {detail?.messages.map(message => <article key={message.id} className={"max-w-[88%] rounded-xl border p-3 " + (message.fromSupport ? "ml-auto border-gold/30 bg-gold/10" : "border-border bg-bg-primary")}><p className="mb-1 break-words text-[11px] font-semibold text-text-muted [overflow-wrap:anywhere]">{message.senderName}</p><p className="whitespace-pre-wrap break-words text-sm leading-6 text-text-primary [overflow-wrap:anywhere]">{message.content}</p><time className="mt-2 block text-right text-[10px] text-text-muted">{new Date(message.createdAt).toLocaleString(uiLocale)}</time></article>)}
+          {detail?.messages.map(message => <article key={message.id} className={"max-w-[88%] rounded-xl border p-3 " + (message.fromSupport ? "ml-auto border-gold/30 bg-gold/10" : "border-border bg-bg-primary")}><p className="mb-1 break-words text-[11px] font-semibold text-text-muted [overflow-wrap:anywhere]">{message.senderName}</p><p className="whitespace-pre-wrap break-words text-sm leading-6 text-text-primary [overflow-wrap:anywhere]">{message.content}</p><MessageAttachments attachments={message.attachments} supportAccess/><time className="mt-2 block text-right text-[10px] text-text-muted">{new Date(message.createdAt).toLocaleString(uiLocale)}</time></article>)}
         </div>
         {detail && <div className="shrink-0 border-t border-border p-3 sm:p-4">
           {sendSuccess && <p role="status" className="mb-2 text-xs text-success">{sendSuccess}</p>}

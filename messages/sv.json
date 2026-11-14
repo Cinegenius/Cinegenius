@@ -102,7 +102,9 @@
     "suggestion3": "Veteranbil",
     "suggestion4": "Regissör sökes",
     "accessibleLabel": "Sök på webbplatsen",
-    "clearSearch": "Rensa sökningen"
+    "clearSearch": "Rensa sökningen",
+    "loadError": "Sökningen kunde inte laddas. Försök igen.",
+    "retry": "Försök igen"
   },
   "notifications": {
     "ariaLabel": "Aviseringar",
@@ -2456,6 +2458,7 @@
     "unavailable": "Inte tillgänglig"
   },
   "Places": {
+    "countryUnassigned": "Land ej angivet",
     "location": "Plats",
     "country": "Land",
     "chooseCountry": "Välj land",
@@ -7772,7 +7775,19 @@
     "hideForMe": "Dölj för mig",
     "hideHelp": "Meddelandet döljs bara i din vy. Andra medlemmar kan fortfarande se det.",
     "unknown": "Namnet är inte tillgängligt",
-    "availablePlaces": "Lediga platser: {count}"
+    "availablePlaces": "Lediga platser: {count}",
+    "chooseGroupPeople": "Välj de kontakter du vill lägga till i gruppen.",
+    "attachFile": "Bifoga fil",
+    "attachmentHint": "Bilder, PDF, DOCX eller TXT · upp till 4 MB",
+    "attachmentInvalid": "Välj en bild eller ett PDF-, DOCX- eller TXT-dokument på högst 4 MB.",
+    "attachmentUploadError": "Uppladdningen misslyckades. Försök igen.",
+    "attachmentLoadError": "Bilagorna kunde inte laddas. Försök igen.",
+    "attachmentLimit": "Du kan bifoga upp till 5 filer.",
+    "attachmentUploading": "Laddar upp: {progress} %",
+    "retryUpload": "Försök ladda upp igen",
+    "removeAttachment": "Ta bort {name}",
+    "openAttachment": "Öppna {name}",
+    "attachmentPreview": "Bilaga"
   },
   "directoryMap": {
     "crew": "Filmteam på kartan",
@@ -8092,6 +8107,8 @@
     "noticeFirst": "Stäng först cookiemeddelandet. Sedan kan du öppna Genie."
   },
   "InboxNavigation": {
+    "groups": "Grupper",
+    "friends": "Vänner",
     "chats": "Chattar",
     "notices": "Aviseringar",
     "unread": "Meddelanden: {chats} olästa chattmeddelanden, {notices} aviseringar",

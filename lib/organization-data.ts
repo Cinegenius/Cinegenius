@@ -1,3 +1,4 @@
+import { legacyPlaceQuery } from "@/lib/places/core";
 import { collectFacetRows } from "@/lib/browse-facets";
 import { geographicPage,type BrowsePlace } from "@/lib/browse-geography";
 import { db } from "@/lib/db";
@@ -35,7 +36,7 @@ export async function approvedEntries(filters: { type?: string; topic?: string; 
   if (filters.type) query = query.eq("entry_type", filters.type);
   if (filters.topic) query = query.eq("topic", filters.topic);
   if (filters.q) query = query.ilike("title", `%${filters.q.slice(0, 120).replace(/[\\%_]/g, " ")}%`);
-  if (filters.country) query = query.eq("place_country_code", filters.country);
+  if (filters.country) { const expression=legacyPlaceQuery("country", filters.country); query=expression?query.or(expression):query.eq("place_country_code", filters.country); }
   if (clause) query = query.or(clause);
   return range ? query.range(range.from, range.to) : query;
   }, (page - 1) * pageSize, page * pageSize, filters.country ? null : filters.preferred ?? null);

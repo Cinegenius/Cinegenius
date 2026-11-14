@@ -5,7 +5,7 @@ import { BrowsePreferenceControl } from "@/components/BrowseGeography";
 import { ownBrowsePlace } from "@/lib/browse-geography-server";
 import { approvedEntries,newsFacetRows } from "@/lib/organization-data";
 import { isOrganizationEntryType,isOrganizationTopic } from "@/lib/organization-taxonomy";
-import { countryCode,countryName } from "@/lib/places/core";
+import { countryCode,countryName,UNASSIGNED_COUNTRY } from "@/lib/places/core";
 import { getLocale,getTranslations } from "next-intl/server";
 import Link from "next/link";
 import NewsBrowseControls from "./NewsBrowseControls";
@@ -23,7 +23,7 @@ export default async function NewsPage({ searchParams }: { searchParams: Promise
   let preferred = null;
   if (!params.country && params.geo !== "off") { try { preferred = (await ownBrowsePlace()).place; } catch { /* Show all ordinary results on preference failure. */ } }
   const geoText = await getTranslations("BrowseGeography");
-  const filters = { country: countryCode(params.country ?? ""), geo: params.geo === "off" ? "off" : "", type: isOrganizationEntryType(params.type) ? params.type : undefined,
+  const filters = { country: params.country === UNASSIGNED_COUNTRY ? UNASSIGNED_COUNTRY : countryCode(params.country ?? ""), geo: params.geo === "off" ? "off" : "", type: isOrganizationEntryType(params.type) ? params.type : undefined,
     topic: isOrganizationTopic(params.topic) ? params.topic : undefined, q: params.q?.trim().slice(0, 120) || "" };
   const [{ entries: filtered, hasMore, page, count }, facets] = await Promise.all([approvedEntries({ ...filters, preferred, page: Number(params.page) || 1 }), newsFacetRows()]);
   const href = (change: { type?: string; topic?: string; page?: number; country?: string; geo?: string } = {}) => {

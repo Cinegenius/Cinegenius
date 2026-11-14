@@ -1,6 +1,7 @@
 "use client";
 
 import MediaImage from "@/components/MediaImage";
+import ListingImage from "@/components/ListingImage";
 import { ANIMAL_DEPARTMENT_LABEL } from "@/lib/animal-taxonomy";
 import { useViewUrl } from "@/lib/use-view-url";
 import {
@@ -98,6 +99,7 @@ function ResultCard({ result }: { result: Result }) {
   if (!cfg) return null;
   const Icon = cfg.icon;
   const isProfile = result.type === "profile" || result.type === "creator";
+  const PreviewImage = ["location", "vehicle", "prop", "animal"].includes(result.type) ? ListingImage : MediaImage;
 
   return (
     <Link
@@ -107,8 +109,7 @@ function ResultCard({ result }: { result: Result }) {
       {/* Image */}
       <div className="relative aspect-video bg-bg-elevated overflow-hidden">
         {result.image ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <MediaImage
+          <PreviewImage
             fill sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 360px" mediaSize="thumbnail"
             src={result.image}
             alt={result.title}

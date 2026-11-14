@@ -1,3 +1,4 @@
+import {attachmentIds} from "@/lib/message-attachments";
 import { SUPPORT_ACTOR_ID, SUPPORT_AVATAR_URL, SUPPORT_NAME } from "@/lib/support-identity";
 import { db } from "@/lib/db";
 import { requireAuth } from "@/lib/auth";
@@ -182,16 +183,17 @@ export async function POST(req: NextRequest) {
   if (body?.accountId !== userId) return fail("accountChanged", 403);
   const { receiver_id, listing_id = null, listing_title = null, listing_type = null, idempotencyKey } = body;
   const content = typeof body.content === "string" ? body.content.trim() : "";
+  const attachments=attachmentIds(body.attachmentIds);
   if (!messagingAccountId(receiver_id) || receiver_id === userId || receiver_id === SUPPORT_ACTOR_ID
-    || !content || content.length > 5000 || !messagingRequestKey(idempotencyKey)
+    || !attachments || (!content && !attachments.length) || content.length > 5000 || !messagingRequestKey(idempotencyKey)
     || listing_id !== null && !messagingUuid(listing_id)
     || listing_title !== null && (typeof listing_title !== "string" || listing_title.length > 300)
     || listing_type !== null && (typeof listing_type !== "string" || listing_type.length > 80)) return fail("invalid", 400);
   if (!(await rateLimit(`conv:${userId}`, 20, 60)).allowed) return fail("rateLimit", 429);
-  const { data, error } = await db.rpc("start_direct_conversation", {
+  const { data, error } = await (attachments.length ? db.rpc("send_message_with_attachments", {p_actor:userId,p_content:content,p_key:idempotencyKey,p_attachments:attachments,p_recipient:receiver_id,p_listing_id:listing_id,p_listing_title:listing_title,p_listing_type:listing_type}) : db.rpc("start_direct_conversation", {
     p_sender_id: userId, p_receiver_id: receiver_id, p_content: content, p_idempotency_key: idempotencyKey,
     p_listing_id: listing_id, p_listing_title: listing_title, p_listing_type: listing_type,
-  });
+  }));
   if (error) { const failure = messagingRpcFailure(error); return fail(failure.key, failure.status); }
   if (!data || !messagingUuid(data.conversationId) || !messagingUuid(data.message?.id) || typeof data.created !== "boolean") return fail("saveError", 503);
   // Only the request that inserted the message may notify. A replay confirms
@@ -204,7 +206,7 @@ export async function POST(req: NextRequest) {
     if (emailSettings?.email_new_message !== false) {
       const recipient = await (await clerkClient()).users.getUser(receiver_id);
       const email = recipient.emailAddresses[0]?.emailAddress;
-      if (email) await sendNewMessageEmail(email, senderProfile?.display_name ?? t("senderFallback"), content, data.conversationId);
+      if (email) await sendNewMessageEmail(email, senderProfile?.display_name ?? t("senderFallback"), content || (await getResponseTranslations("Messaging"))("attachmentPreview"), data.conversationId);
     }
   } catch { /* The durable message remains authoritative; mail is best effort. */ }
   return NextResponse.json({ conversationId: data.conversationId, message: data.message, replayed: !data.created }, { headers: MESSAGING_HEADERS });

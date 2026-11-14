@@ -1,6 +1,7 @@
 export type MessagePerson = { id: string; name: string; avatar?: string | null; role?: string | null; location?: string | null };
 export type MessageDestination = { conversationId?: string | null; recipientId?: string | null; companySlug?: string | null };
-export type ChatMessage = { id: string; sender_id: string; content: string; created_at: string; read_at: string | null };
+import {restoredAttachments,type MessageAttachment} from './message-attachments';
+export type ChatMessage = { id: string; sender_id: string; content: string; created_at: string; read_at: string | null; attachments?:MessageAttachment[] };
 export const validMessageRequestKey = (value: unknown): value is string => typeof value === "string" && /^[A-Za-z0-9_-]{8,128}$/.test(value);
 export function messageDestinationKey(destination: MessageDestination) {
   return destination.conversationId ? `conversation:${destination.conversationId}` : destination.recipientId ? `recipient:${destination.recipientId}` : "";
@@ -10,7 +11,8 @@ export function suggestedGroupName(people: MessagePerson[], fallback: string) {
 }
 export function restoredMessageValue(value: Record<string, unknown>, destination: string) {
   if (value.destination !== destination || typeof value.content !== "string" || value.content.length > 5000) return null;
-  return { destination, content: value.content, requestKey: validMessageRequestKey(value.requestKey) ? value.requestKey : "" };
+  const attachments=restoredAttachments(value.attachments);if(!attachments)return null;
+  return { destination, content: value.content, requestKey: validMessageRequestKey(value.requestKey) ? value.requestKey : "", attachments };
 }
 export function restoredPeople(value: unknown): MessagePerson[] {
   if (!Array.isArray(value)) return [];
@@ -26,8 +28,9 @@ export function messagingPeople(contacts: MessagePerson[], remote: MessagePerson
   return [...new Map([...local, ...remote].map(person => [person.id, person])).values()].filter(person => !exclude.includes(person.id));
 }
 export const validConversationId = (value: unknown): value is string => typeof value === "string" && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(value);
-export function confirmedChatMessage(value: unknown, accountId: string, content: string): value is ChatMessage {
+export function confirmedChatMessage(value: unknown, accountId: string, content: string, expectedAttachments:string[]=[]): value is ChatMessage {
   if (!value || typeof value !== "object") return false;
   const message = value as Record<string, unknown>;
-  return validConversationId(message.id) && message.sender_id === accountId && message.content === content && typeof message.created_at === "string" && Number.isFinite(Date.parse(message.created_at)) && (message.read_at === null || typeof message.read_at === "string" && Number.isFinite(Date.parse(message.read_at)));
+  const files=restoredAttachments(message.attachments);
+  return !!files && JSON.stringify(files.map(a=>a.id).sort())===JSON.stringify([...expectedAttachments].sort()) && validConversationId(message.id) && message.sender_id === accountId && message.content === content && typeof message.created_at === "string" && Number.isFinite(Date.parse(message.created_at)) && (message.read_at === null || typeof message.read_at === "string" && Number.isFinite(Date.parse(message.read_at)));
 }

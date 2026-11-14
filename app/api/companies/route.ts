@@ -1,3 +1,4 @@
+import { legacyPlaceQuery } from "@/lib/places/core";
 import { cityWriteFields } from "@/lib/places/catalog";
 import { normalizeAnimalCompanyDetails, animalCompanySearchFilter } from "@/lib/animal-taxonomy";
 import { bindResponsiblePerson } from "@/lib/responsible-person";
@@ -95,8 +96,8 @@ export async function GET(req: NextRequest) {
     .range(from, to);
 
   if (category) query = query.contains("categories", [category]);
-  if (city)     query = query.eq("place_city_id", city.slice(0,100));
-  for(const [param,column] of [["country","place_country_code"],["region","place_region_id"]] as const){const value=req.nextUrl.searchParams.get(param);if(value)query=query.eq(column,value.slice(0,100));}
+  if (city) { const expression=legacyPlaceQuery("city",city); query=expression?query.or(expression):query.eq("place_city_id",city.slice(0,100)); }
+  for(const [param,column] of [["country","place_country_code"],["region","place_region_id"]] as const){const value=req.nextUrl.searchParams.get(param);if(value){const expression=legacyPlaceQuery(param,value);query=expression?query.or(expression):query.eq(column,value.slice(0,100));}}
   if (q) {
     const safeQ = q.trim().slice(0, 80).replace(/[%,()]/g, "");
     if (safeQ) query = query.or(`name.ilike.%${safeQ}%,description.ilike.%${safeQ}%,city.ilike.%${safeQ}%${animalCompanySearchFilter(safeQ) ? `,${animalCompanySearchFilter(safeQ)}` : ""}`);
@@ -113,8 +114,8 @@ export async function GET(req: NextRequest) {
       .contains("categories", [CATERING_COMPANY_CATEGORY.id])
       .order("created_at", { ascending: false })
       .range(0, Math.max(to, limit - 1));
-    if (city) cateringQuery = cateringQuery.eq("place_city_id", city.slice(0,100));
-  for(const [param,column] of [["country","place_country_code"],["region","place_region_id"]] as const){const value=req.nextUrl.searchParams.get(param);if(value)cateringQuery=cateringQuery.eq(column,value.slice(0,100));}
+    if (city) { const expression=legacyPlaceQuery("city",city); cateringQuery=expression?cateringQuery.or(expression):cateringQuery.eq("place_city_id",city.slice(0,100)); }
+  for(const [param,column] of [["country","place_country_code"],["region","place_region_id"]] as const){const value=req.nextUrl.searchParams.get(param);if(value){const expression=legacyPlaceQuery(param,value);cateringQuery=expression?cateringQuery.or(expression):cateringQuery.eq(column,value.slice(0,100));}}
     const { data: cateringMatches, error: cateringError } = await cateringQuery;
     if (cateringError) return NextResponse.json({ error: tResponse('System.requestFailed') }, { status: 500 });
     const rows = new Map<string, Record<string, unknown>>();

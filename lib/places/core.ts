@@ -46,12 +46,42 @@ export function placeOptions(rows: object[], kind:'city'|'country'|'region', loc
  if(kind==='city'&&p.status==='verified'&&p.cityId)options.set(p.cityId,[cityName(p.cityId,p.city,locale),p.region,countryName(p.countryCode,locale)].filter(Boolean).join(', '));}
  return [...options].map(([value,label])=>({value,label})).sort((a,b)=>new Intl.Collator(locale,{sensitivity:'base'}).compare(a.label,b.label));
 }
-export function matchesPlace(row: object, kind:'city'|'country'|'region', id:string){const p=placeFromRecord(row);return !id||(kind==='city'?p.cityId:kind==='country'?p.countryCode:p.regionId)===id;}
+export const UNASSIGNED_COUNTRY = 'unassigned';
+const LEGACY_CITY_PREFIX = 'legacy:';
+export function legacyCityFilter(value: string) { return value.startsWith(LEGACY_CITY_PREFIX) ? value.slice(LEGACY_CITY_PREFIX.length) : null; }
+/** Discovery-only text choices do not promote member text to a verified identity. */
+export function browsePlaceOptions(rows: object[], kind:'city'|'country'|'region', locale:string, country='', unassignedLabel='') {
+ const eligible=country ? rows.filter(row=>matchesPlace(row,'country',country)) : rows;
+ const options=new Map(placeOptions(eligible,kind,locale).map(option=>[option.value,option.label]));
+ for(const row of eligible){const p=placeFromRecord(row);
+  if(kind==='country'&&!p.countryCode)options.set(UNASSIGNED_COUNTRY,unassignedLabel);
+  if(kind==='city'&&!p.cityId&&p.city.trim()&&hasPlaceCity(p.city))options.set(LEGACY_CITY_PREFIX+p.city,p.city);
+ }
+ return [...options].map(([value,label])=>({value,label})).sort((a,b)=>new Intl.Collator(locale,{sensitivity:'base'}).compare(a.label,b.label));
+}
+export function matchesPlace(row: object, kind:'city'|'country'|'region', id:string){
+ const p=placeFromRecord(row);
+ if(kind==='country'&&id===UNASSIGNED_COUNTRY)return !p.countryCode;
+ const legacy=kind==='city'?legacyCityFilter(id):null;
+ if(legacy!==null){if(!legacy||legacy.length>320)return false;const record=row as Record<string,unknown>,names=[legacy,...placeCitySearchAliases(legacy)].map(name=>name.toLowerCase());return [p.city,record.city,record.location].some(name=>typeof name==='string'&&names.includes(name.toLowerCase()));}
+ return !id||(kind==='city'?p.cityId:kind==='country'?p.countryCode:p.regionId)===id;
+}
+/** PostgREST expressions for the discovery-only choices; canonical IDs still use eq. */
+export function legacyPlaceQuery(kind:'city'|'country'|'region', value:string, legacyColumn:'city'|'location'='city') {
+ if(kind==='country'&&value===UNASSIGNED_COUNTRY)return 'place_country_code.is.null,place_country_code.eq.""';
+ const legacy=kind==='city'?legacyCityFilter(value):null;
+ if(legacy===null)return null;
+ if(!legacy||legacy.length>320)return 'id.is.null';
+ // Quoted literals plus escaped ILIKE metacharacters keep member text literal.
+ const labels=[...new Set([legacy,...placeCitySearchAliases(legacy)])];
+ return labels.flatMap(label=>['place_city_name',legacyColumn].map(column=>`${column}.${label.includes('*')?'eq':'ilike'}.${JSON.stringify(label.includes('*')?label:label.replace(/[\\%_]/g,'\\$&'))}`)).join(',');
+}
 
 export function hasPlaceCity(value: string) { const first=value.split(",")[0].trim();return !!first && !(value.split(",").length===1 && countryCode(first)); }
 /** Upgrade old saved filters only when the visible records give one unique identity. */
 export function canonicalFilterValue(value:string,rows:object[],kind:'city'|'country'|'region') {
  if(!value)return value;
+ if(kind==='city'&&legacyCityFilter(value)!==null)return value;
  if(kind==='country')return countryCode(value)||value;
  if(kind==='city'&&value.startsWith('geonames:'))return value;
  const candidates=new Set<string>();

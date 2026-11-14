@@ -6,7 +6,7 @@ import { useBrowseGeography } from "@/lib/use-browse-geography";
 import EmptyState from "@/components/EmptyState";
 import FavoriteButton from "@/components/FavoriteButton";
 import FloatingMapToggle from "@/components/FloatingMapToggle";
-import Image from "@/components/MediaImage";
+import ListingImage from "@/components/ListingImage";
 import MobileBrowseControls,{ MobileFilterField,MobileFilterSelect,type BrowseChip } from "@/components/MobileBrowseControls";
 import PageHeader from "@/components/PageHeader";
 import DirectoryPage from "@/components/DirectoryPage";
@@ -17,7 +17,7 @@ import {
 DEFAULT_LOCATION_LANDING_FILTERS,filterLandingLocations,locationLandingCategoryOptions,
 locationLandingParams,type LocationLandingFilters,
 } from "@/lib/locations-landing-filters";
-import { placeOptions } from "@/lib/places/core";
+import { browsePlaceOptions as placeOptions, UNASSIGNED_COUNTRY } from "@/lib/places/core";
 import { useNearbyLocation } from "@/lib/use-nearby-location";
 import { useViewState } from "@/lib/use-view-state";
 import { useViewUrl } from "@/lib/use-view-url";
@@ -116,7 +116,7 @@ export default function LocationsLanding({ allLocations, totalCount, initialFilt
     ...(mapBounds ? [{ id: "map-area", label: uiText("locationMap.areaActive"), onRemove: () => setMapBounds(null) }] : []),
     ...(filters.type ? [{ id: "type", label: categoryLabel(filters.type), onRemove: () => updateFilters({ type: "" }) }] : []),
     ...(["country", "region", "city"] as const).flatMap(kind => filters[kind] ? [{
-      id: kind, label: placeOptions(allLocations, kind, locale).find(option => option.value === filters[kind])?.label ?? filters[kind],
+      id: kind, label: filters[kind] === UNASSIGNED_COUNTRY ? uiText("Places.countryUnassigned") : placeOptions(allLocations, kind, locale).find(option => option.value === filters[kind])?.label ?? filters[kind],
       onRemove: () => updateFilters(kind === "country" ? EMPTY_PLACE_FILTERS : kind === "region" ? { region: "", city: "" } : { city: "" }),
     }] : []),
     ...(filters.cityText ? [{ id: "city-text", label: `${uiText("Places.city")}: ${filters.cityText}`, onRemove: () => updateFilters({ cityText: "" }) }] : []),
@@ -202,7 +202,7 @@ export default function LocationsLanding({ allLocations, totalCount, initialFilt
                 <Link href={`/locations/${location.id}`} onMouseEnter={() => setActiveId(location.id)} onMouseLeave={() => setActiveId(null)} onFocus={() => setActiveId(location.id)} onBlur={() => setActiveId(null)} className={`browse-card group flex h-full min-w-0 flex-col transition-colors hover:border-gold/50 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-gold ${activeId === location.id ? "border-gold ring-1 ring-gold" : ""}`}>
                   <div className="relative aspect-video w-full overflow-hidden bg-bg-elevated">
                     {location.image ? (
-                      <Image
+                      <ListingImage
                         src={location.image}
                         alt={location.title}
                         fill

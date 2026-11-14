@@ -22,6 +22,7 @@ export default function HomeCardRail({ id, labelledBy, hint, itemCount, variant,
   const stepRef = useRef(1);
   const gestureRef = useRef<{ id: number; x: number; y: number; left: number; dragging: boolean } | null>(null);
   const suppressClick = useRef(false);
+  const animationFrame = useRef(0);
   const [position, setPosition] = useState({ active: 0, pages: Math.max(1, itemCount) });
   const [scrubWindow, setScrubWindow] = useState<number | null>(null);
 
@@ -56,16 +57,46 @@ export default function HomeCardRail({ id, labelledBy, hint, itemCount, variant,
     if (track.firstElementChild) observer.observe(track.firstElementChild);
     return () => {
       cancelAnimationFrame(frame);
+      cancelAnimationFrame(animationFrame.current);
       track.removeEventListener("scroll", onScroll);
       observer.disconnect();
     };
   }, [itemCount]);
 
-  function move(page: number) {
+  function settle(left: number, instant = false) {
     const track = trackRef.current;
     if (!track) return;
-    const behavior = window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "instant" : "smooth";
-    track.scrollTo({ left: stopsRef.current[page] ?? 0, behavior });
+    cancelAnimationFrame(animationFrame.current);
+    const from = track.scrollLeft;
+    const target = Math.max(0, Math.min(left, track.scrollWidth - track.clientWidth));
+    // Keep native snapping off until the animated landing is complete. Restoring
+    // it on pointerup makes the browser jump straight to the next card.
+    track.dataset.scrubbing = "true";
+    const finish = () => {
+      track.scrollTo({ left: target, behavior: "instant" });
+      delete track.dataset.scrubbing;
+      animationFrame.current = 0;
+      setScrubWindow(null);
+    };
+    if (instant || window.matchMedia("(prefers-reduced-motion: reduce)").matches || Math.abs(target - from) < 1) {
+      finish();
+      return;
+    }
+    const duration = Math.min(420, Math.max(220, Math.abs(target - from) * 0.3));
+    let started: number | undefined;
+    const animate = (time: number) => {
+      started ??= time;
+      const progress = Math.min(1, (time - started) / duration);
+      track.scrollTo({ left: from + (target - from) * (1 - Math.pow(1 - progress, 3)), behavior: "instant" });
+      if (progress < 1) animationFrame.current = requestAnimationFrame(animate);
+      else finish();
+    };
+    animationFrame.current = requestAnimationFrame(animate);
+  }
+
+  function move(page: number) {
+    setScrubWindow(firstDot);
+    settle(stopsRef.current[page] ?? 0);
   }
 
   // A sliding window keeps the real page positions reachable within 320px.
@@ -87,7 +118,12 @@ export default function HomeCardRail({ id, labelledBy, hint, itemCount, variant,
       // Leave vertical swipes to ordinary page scrolling.
       if (Math.abs(dy) > Math.abs(dx)) { gestureRef.current = null; return; }
       gesture.dragging = true;
+      cancelAnimationFrame(animationFrame.current);
+      animationFrame.current = 0;
       gesture.left = track.scrollLeft;
+      // Discard the intent threshold instead of amplifying its first 8px into
+      // a visible jump. Subsequent motion follows the finger continuously.
+      gesture.x = event.clientX;
       track.dataset.scrubbing = "true";
       event.currentTarget.dataset.scrubbing = "true";
       event.currentTarget.setPointerCapture(event.pointerId);
@@ -96,7 +132,7 @@ export default function HomeCardRail({ id, labelledBy, hint, itemCount, variant,
     event.preventDefault();
     suppressClick.current = true;
     // One dot's touch area corresponds to one card; follow the finger directly.
-    track.scrollTo({ left: gesture.left - dx * stepRef.current / 44, behavior: "instant" });
+    track.scrollTo({ left: gesture.left - (event.clientX - gesture.x) * stepRef.current / 44, behavior: "instant" });
   }
 
   function endScrub(event: PointerEvent<HTMLDivElement>) {
@@ -108,16 +144,19 @@ export default function HomeCardRail({ id, labelledBy, hint, itemCount, variant,
     delete event.currentTarget.dataset.scrubbing;
     if (event.currentTarget.hasPointerCapture(event.pointerId)) event.currentTarget.releasePointerCapture(event.pointerId);
     if (!gesture.dragging || !track) return;
-    delete track.dataset.scrubbing;
-    setScrubWindow(null);
     const stops = stopsRef.current;
     const nearest = stops.reduce((best, stop) => Math.abs(stop - track.scrollLeft) < Math.abs(best - track.scrollLeft) ? stop : best, 0);
-    const instant = event.type !== "pointerup" || window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    track.scrollTo({ left: nearest, behavior: instant ? "instant" : "smooth" });
+    settle(nearest, event.type !== "pointerup");
   }
 
   return <div className={`${styles.root} ${styles[variant]} ${wide ? styles.wide : ""}`}>
-    <div ref={trackRef} id={id} role="region" aria-labelledby={labelledBy} aria-describedby={position.pages > 1 ? `${id}-hint` : undefined} tabIndex={0} className={styles.track}>
+    <div ref={trackRef} id={id} role="region" aria-labelledby={labelledBy} aria-describedby={position.pages > 1 ? `${id}-hint` : undefined} tabIndex={0} className={styles.track}
+      onPointerDown={() => {
+        cancelAnimationFrame(animationFrame.current);
+        animationFrame.current = 0;
+        if (trackRef.current) delete trackRef.current.dataset.scrubbing;
+        setScrubWindow(null);
+      }}>
       {children}
     </div>
     {position.pages > 1 && <div className={styles.controls}

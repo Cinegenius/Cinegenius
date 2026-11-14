@@ -1,4 +1,6 @@
 "use client";
+import MessageAttachments from "@/components/messaging/MessageAttachments";
+import type {MessageAttachment} from "@/lib/message-attachments";
 import JobEditorFields from "@/components/JobEditorFields";
 import { jobEditValue, jobEditDescription } from "@/lib/job-editor";
 import { parseJobDescription, jobSchedule } from "@/lib/job-metadata";
@@ -60,6 +62,7 @@ import { DASHBOARD_MESSAGES_FALLBACK_REFRESH_MS } from "@/lib/message-refresh-po
 import { uiErrorMessage } from "@/lib/ui-error-message";
 
 type RealMessage = {
+  attachments?: MessageAttachment[];
   id: string;
   sender_id: string;
   content: string;
@@ -1982,7 +1985,7 @@ export default function DashboardPage() {
                             </span>
                           )}
                           {lastMsg && (
-                            <p className="text-[11px] text-text-muted truncate">{lastMsg.content}</p>
+                            <p className="text-[11px] text-text-muted truncate">{lastMsg.content||uiText("Messaging.attachmentPreview")}</p>
                           )}
                         </div>
                       </button>
@@ -2043,7 +2046,7 @@ export default function DashboardPage() {
                                 ? "bg-gold text-bg-primary rounded-br-sm"
                                 : "bg-bg-elevated border border-border text-text-secondary rounded-bl-sm"
                             }`}>
-                              <p className="text-sm leading-relaxed">{msg.content}</p>
+                              {msg.content&&<p className="text-sm leading-relaxed">{msg.content}</p>}<MessageAttachments attachments={msg.attachments}/>
                               <p className={`text-[10px] mt-1 ${mine ? "text-bg-primary/60" : "text-text-muted"}`}>
                                 {formatMsgTime(msg.created_at)}
                               </p>

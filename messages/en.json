@@ -102,7 +102,9 @@
     "suggestion3": "Classic car",
     "suggestion4": "Director wanted",
     "accessibleLabel": "Search the website",
-    "clearSearch": "Clear search"
+    "clearSearch": "Clear search",
+    "loadError": "Search could not be loaded. Please try again.",
+    "retry": "Try again"
   },
   "notifications": {
     "ariaLabel": "Notifications",
@@ -2456,6 +2458,7 @@
     "unavailable": "Unavailable"
   },
   "Places": {
+    "countryUnassigned": "Country not specified",
     "location": "Location",
     "country": "Country",
     "chooseCountry": "Choose country",
@@ -7772,7 +7775,19 @@
     "hideForMe": "Hide for me",
     "hideHelp": "This message will only be hidden from your view. Other members can still see it.",
     "unknown": "Name unavailable",
-    "availablePlaces": "Places remaining: {count}"
+    "availablePlaces": "Places remaining: {count}",
+    "chooseGroupPeople": "Choose the contacts you want to add to the group.",
+    "attachFile": "Attach file",
+    "attachmentHint": "Images, PDF, DOCX or TXT · up to 4 MB",
+    "attachmentInvalid": "Choose an image, PDF, DOCX or TXT document up to 4 MB.",
+    "attachmentUploadError": "Upload failed. Please try again.",
+    "attachmentLoadError": "Attachments could not be loaded. Please try again.",
+    "attachmentLimit": "You can attach up to 5 files.",
+    "attachmentUploading": "Uploading: {progress}%",
+    "retryUpload": "Retry upload",
+    "removeAttachment": "Remove {name}",
+    "openAttachment": "Open {name}",
+    "attachmentPreview": "Attachment"
   },
   "directoryMap": {
     "crew": "Crew on the map",
@@ -8092,6 +8107,8 @@
     "noticeFirst": "Please close the cookie notice first. You can then open Genie."
   },
   "InboxNavigation": {
+    "groups": "Groups",
+    "friends": "Friends",
     "chats": "Chats",
     "notices": "Notifications",
     "unread": "Messages: {chats} unread chat messages, {notices} notifications",

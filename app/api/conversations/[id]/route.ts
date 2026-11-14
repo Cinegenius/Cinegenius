@@ -1,3 +1,5 @@
+import {attachMessageFiles} from "@/lib/message-attachment-server";
+import {attachmentIds} from "@/lib/message-attachments";
 import { SUPPORT_ACTOR_ID, SUPPORT_AVATAR_URL, SUPPORT_NAME } from "@/lib/support-identity";
 import { db } from "@/lib/db";
 import { requireAuth } from "@/lib/auth";
@@ -118,6 +120,8 @@ export async function GET(
     }
   }
 
+  try { messages=await attachMessageFiles(messages); } catch { return NextResponse.json({error:tResponse("Messaging.attachmentLoadError")},{status:503,headers:MESSAGING_HEADERS}); }
+
   return NextResponse.json({
     conversation: {
       ...conversation,
@@ -164,11 +168,12 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
   if (body?.accountId !== userId) return fail("accountChanged", 403);
   const { id } = await params;
   const content = typeof body.content === "string" ? body.content.trim() : "";
-  if (!messagingUuid(id) || !content || content.length > 5000 || !messagingRequestKey(body.idempotencyKey)) return fail("invalid", 400);
+  const attachments=attachmentIds(body.attachmentIds);
+  if (!messagingUuid(id) || !attachments || (!content && !attachments.length) || content.length > 5000 || !messagingRequestKey(body.idempotencyKey)) return fail("invalid", 400);
   if (!(await rateLimit(`msg:${userId}`, 30, 60)).allowed) return fail("rateLimit", 429);
-  const { data, error } = await db.rpc("send_conversation_message", {
+  const { data, error } = await (attachments.length ? db.rpc("send_message_with_attachments", {p_actor:userId,p_content:content,p_key:body.idempotencyKey,p_attachments:attachments,p_conversation:id}) : db.rpc("send_conversation_message", {
     p_conversation_id: id, p_sender_id: userId, p_content: content, p_idempotency_key: body.idempotencyKey,
-  });
+  }));
   if (error) { const failure = messagingRpcFailure(error); return fail(failure.key, failure.status); }
   if (!data || data.conversationId !== id || !messagingUuid(data.message?.id) || typeof data.created !== "boolean") return fail("saveError", 503);
   let senderName = t("senderFallback"); let senderAvatar = null;
@@ -184,7 +189,7 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
       if (receiver && settings?.email_new_message !== false) {
         const recipient = await (await clerkClient()).users.getUser(receiver);
         const email = recipient.emailAddresses[0]?.emailAddress;
-        if (email) await sendNewMessageEmail(email, senderName, content, id);
+        if (email) await sendNewMessageEmail(email, senderName, content || (await getResponseTranslations("Messaging"))("attachmentPreview"), id);
       }
     }
   } catch { /* No replay may send mail again. */ }

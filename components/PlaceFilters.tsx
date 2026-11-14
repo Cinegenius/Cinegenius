@@ -3,7 +3,7 @@
 import { useId, useMemo } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { ChevronDown } from "lucide-react";
-import { placeOptions, matchesPlace } from "@/lib/places/core";
+import { browsePlaceOptions as placeOptions, UNASSIGNED_COUNTRY, matchesPlace } from "@/lib/places/core";
 
 export type PlaceFilterValue = { country: string; region: string; city: string };
 export const EMPTY_PLACE_FILTERS: PlaceFilterValue = { country: "", region: "", city: "" };
@@ -14,10 +14,10 @@ export default function PlaceFilters({ rows, value, onChange }: { rows: object[]
   const fields = useMemo(() => (["country", "region", "city"] as const).map(kind => {
     const eligible = kind === "city" && value.region ? rows.filter(row => matchesPlace(row, "region", value.region)) : rows;
     const options = placeOptions(eligible, kind, locale, kind === "country" ? "" : value.country)
-      .map(option => kind === "country" && countries.has(option.value) ? { ...option, label: countries(option.value) } : option);
+      .map(option => option.value === UNASSIGNED_COUNTRY ? { ...option, label: t("countryUnassigned") } : kind === "country" && countries.has(option.value) ? { ...option, label: countries(option.value) } : option);
     if (kind === "country") options.sort((a,b) => a.label.localeCompare(b.label, locale));
     return { kind, options };
-  }), [rows, value.country, value.region, locale, countries]);
+  }), [rows, value.country, value.region, locale, countries, t]);
   return <div className="grid min-w-0 gap-3 sm:grid-cols-3">{fields.map(({ kind, options }) => {
     if (!options.length && !value[kind]) return null;
     const selected = value[kind];

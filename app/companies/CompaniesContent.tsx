@@ -12,7 +12,7 @@ import type { DirectoryCompany as Company } from "@/lib/company-directory";
 import { useDirectoryMap } from "@/lib/use-directory-map";
 
 import { animalCategoryLabel,animalCompanySearchText,isAnimalCompany } from "@/lib/animal-taxonomy";
-import { canonicalFilterValue,matchesPlace,placeDisplay,placeOptions,placeSearchMatches } from "@/lib/places/core";
+import { canonicalFilterValue,matchesPlace,placeDisplay,browsePlaceOptions as placeOptions, UNASSIGNED_COUNTRY,placeSearchMatches } from "@/lib/places/core";
 
 import { useViewState } from "@/lib/use-view-state";
 
@@ -81,7 +81,7 @@ export default function CompaniesContent({ initialCompanies }: { initialCompanie
 
 
   const cityLabel = (value: string) => cityOptions.find(o => o.value === value)?.label ?? value;
-  const countryLabel = (value: string) => countryOptions.find(o => o.value === value)?.label ?? value;
+  const countryLabel = (value: string) => value === UNASSIGNED_COUNTRY ? uiText("Places.countryUnassigned") : countryOptions.find(o => o.value === value)?.label ?? value;
   const regionLabel = (value: string) => regionOptions.find(option => option.value === value)?.label ?? value;
 
   const filtered = useMemo(() => {

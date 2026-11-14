@@ -1,12 +1,15 @@
 "use client";
 
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslations , useLocale } from "next-intl";
 import {
   Search, X, MapPin, Car, Package, Briefcase, Users,
   Loader2, Clock, ArrowRight, User, Building2, PawPrint,
 } from "lucide-react";
+import MediaImage from "@/components/MediaImage";
+import ListingImage from "@/components/ListingImage";
+import MessagingDialog from "@/components/messaging/MessagingDialog";
 
 type Result = {
   id: string;
@@ -50,7 +53,8 @@ export default function GlobalSearch() {
   const [selectedIdx, setSelectedIdx] = useState(-1);
   const inputRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
-  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const [failed, setFailed] = useState(false);
+  const [attempt, setAttempt] = useState(0);
 
   const typeConfig: Record<string, {
     label: string;
@@ -70,11 +74,13 @@ export default function GlobalSearch() {
 
   // Cmd+K / Ctrl+K + custom event from mobile nav button
   useEffect(() => {
-    const handler = (e: KeyboardEvent) => {
-      if ((e.metaKey || e.ctrlKey) && e.key === "k") { e.preventDefault(); setOpen(true); }
-      if (e.key === "Escape") setOpen(false);
+    const openFromEvent = () => {
+      setQuery(""); setResults([]); setSelectedIdx(-1);
+      setFailed(false); setLoading(false); setRecent(getRecentSearches()); setOpen(true);
     };
-    const openFromEvent = () => setOpen(true);
+    const handler = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === "k") { e.preventDefault(); openFromEvent(); }
+    };
     document.addEventListener("keydown", handler);
     document.addEventListener("cg:opensearch", openFromEvent);
     return () => {
@@ -84,37 +90,33 @@ export default function GlobalSearch() {
   }, []);
 
   useEffect(() => {
-    if (open) {
-      setRecent(getRecentSearches());
-      setTimeout(() => inputRef.current?.focus(), 50);
-    } else {
-      setQuery("");
-      setResults([]);
-      setSelectedIdx(-1);
-    }
+    if (!open) return;
+    const timer = setTimeout(() => inputRef.current?.focus(), 50);
+    return () => clearTimeout(timer);
   }, [open]);
 
-  const search = useCallback(async (q: string) => {
-    if (q.length < 2) { setResults([]); setLoading(false); return; }
-    setLoading(true);
-    try {
-      const res = await fetch(`/api/search?q=${encodeURIComponent(q)}`);
-      const { results: data } = await res.json();
-      setResults(data ?? []);
-    } catch {
-      setResults([]);
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+  function updateQuery(value: string) {
+    setQuery(value); setResults([]); setFailed(false); setSelectedIdx(-1);
+    setLoading(value.trim().length >= 2);
+  }
 
   useEffect(() => {
-    if (debounceRef.current) clearTimeout(debounceRef.current);
-    if (!query.trim()) { setResults([]); setLoading(false); return; }
-    setLoading(true);
-    debounceRef.current = setTimeout(() => search(query), 220);
-    return () => { if (debounceRef.current) clearTimeout(debounceRef.current); };
-  }, [query, search]);
+    if (!open || query.trim().length < 2) return;
+    const controller = new AbortController();
+    const timer = setTimeout(async () => {
+      try {
+        const res = await fetch(`/api/search?q=${encodeURIComponent(query.trim())}`, { signal: controller.signal });
+        if (!res.ok) throw new Error("Search unavailable");
+        const { results: data } = await res.json();
+        if (!controller.signal.aborted) setResults(Array.isArray(data) ? data : []);
+      } catch {
+        if (!controller.signal.aborted) setFailed(true);
+      } finally {
+        if (!controller.signal.aborted) setLoading(false);
+      }
+    }, 220);
+    return () => { clearTimeout(timer); controller.abort(); };
+  }, [query, open, attempt]);
 
   const navigate = (result: Result) => {
     const config = typeConfig[result.type];
@@ -156,28 +158,10 @@ export default function GlobalSearch() {
     }
   });
 
-  if (!open) {
-    return (
-      <button
-        onClick={() => setOpen(true)}
-        className="flex items-center gap-2 px-3 py-1.5 text-sm text-text-muted border border-border rounded-lg hover:border-gold/50 hover:text-gold transition-all bg-bg-elevated/50 group"
-        title={t("buttonTitle")}
-      >
-        <Search size={14} />
-        <span className="hidden xl:inline text-xs">{t("buttonLabel")}</span>
-        <kbd className="hidden xl:inline text-[10px] px-1.5 py-0.5 bg-bg-primary border border-border rounded text-text-muted group-hover:border-gold/30 transition-colors">⌘K</kbd>
-      </button>
-    );
-  }
+  if (!open) return null;
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-start justify-center pt-[15vh] px-4" onClick={() => setOpen(false)}>
-      <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
-
-      <div
-        className="relative w-full max-w-2xl bg-bg-elevated border border-border rounded-2xl shadow-2xl overflow-hidden"
-        onClick={(e) => e.stopPropagation()}
-      >
+    <MessagingDialog open={open} title={t("accessibleLabel")} onClose={() => setOpen(false)} compact>
         {/* Input */}
         <div className="flex items-center gap-3 px-4 py-3.5 border-b border-border">
           {loading
@@ -189,34 +173,34 @@ export default function GlobalSearch() {
             ref={inputRef}
             type="text"
             value={query}
-            onChange={(e) => { setQuery(e.target.value); setSelectedIdx(-1); }}
+            onChange={(e) => { updateQuery(e.target.value); }}
             onKeyDown={handleKeyDown}
             placeholder={t("inputPlaceholder")}
             className="min-w-0 flex-1 bg-transparent text-text-primary placeholder:text-text-muted text-base focus:outline-none"
           />
           <div className="flex items-center gap-2 shrink-0">{uiText.rich("Ui.text_0633df8995bbb3", { value1: () => (query && (
-              <button type="button" aria-label={t("clearSearch")} onClick={() => {setQuery(""); inputRef.current?.focus();}} className="min-h-11 min-w-11 flex items-center justify-center text-text-muted hover:text-gold transition-colors">
+              <button type="button" aria-label={t("clearSearch")} onClick={() => {updateQuery(""); inputRef.current?.focus();}} className="min-h-11 min-w-11 flex items-center justify-center text-text-muted hover:text-gold transition-colors">
                 <X size={16} />
               </button>
             )), part2: chunks => (<kbd className="text-[10px] px-1.5 py-0.5 bg-bg-secondary border border-border rounded text-text-muted">{chunks}</kbd>) })}</div>
         </div>
 
         {/* Results */}
-        <div className="max-h-[440px] overflow-y-auto">
+        <div>
 
           {/* Recent searches */}
           {!query && recent.length > 0 && (
             <div className="px-4 py-3">
               <div className="flex items-center justify-between mb-2">
                 <p className="text-[10px] uppercase tracking-widest text-text-muted font-semibold">{t("recent")}</p>
-                <button onClick={() => { clearRecentSearches(); setRecent([]); }} className="text-[10px] text-text-muted hover:text-gold transition-colors">
+                <button onClick={() => { clearRecentSearches(); setRecent([]); }} className="min-h-11 min-w-11 text-[10px] text-text-muted hover:text-gold transition-colors">
                   {t("clear")}
                 </button>
               </div>
               <div className="space-y-0.5">
                 {recent.map((r) => (
-                  <button key={r} onClick={() => setQuery(r)}
-                    className="flex items-center gap-3 w-full px-3 py-2 rounded-lg hover:bg-bg-secondary transition-colors text-left">
+                  <button key={r} onClick={() => updateQuery(r)}
+                    className="flex min-h-11 items-center gap-3 w-full px-3 py-2 rounded-lg hover:bg-bg-secondary transition-colors text-left">
                     <Clock size={13} className="text-text-muted shrink-0" />
                     <span className="text-sm text-text-secondary">{r}</span>
                   </button>
@@ -231,8 +215,8 @@ export default function GlobalSearch() {
               <p className="text-xs text-text-muted">{t("hint")}</p>
               <div className="flex flex-wrap justify-center gap-2">
                 {[t("suggestion1"), t("suggestion2"), t("suggestion3"), t("suggestion4")].map((term) => (
-                  <button key={term} onClick={() => setQuery(term)}
-                    className="px-3 py-1.5 text-xs border border-border rounded-full text-text-secondary hover:border-gold hover:text-gold transition-all">
+                  <button key={term} onClick={() => updateQuery(term)}
+                    className="min-h-11 min-w-11 px-3 py-1.5 text-xs border border-border rounded-full text-text-secondary hover:border-gold hover:text-gold transition-all">
                     {term}
                   </button>
                 ))}
@@ -240,8 +224,13 @@ export default function GlobalSearch() {
             </div>
           )}
 
+          {failed && <div role="alert" className="p-4 text-sm text-text-secondary">
+            <p>{t("loadError")}</p>
+            <button type="button" onClick={() => { setFailed(false); setLoading(true); setAttempt(value => value + 1); }} className="mt-2 min-h-11 rounded-lg border border-border px-3 text-gold">{t("retry")}</button>
+          </div>}
+
           {/* No results */}
-          {query.length >= 2 && !loading && results.length === 0 && (
+          {query.length >= 2 && !loading && !failed && results.length === 0 && (
             <div className="px-4 py-10 text-center">
               <p className="text-text-muted text-sm">{t("noResults", { query })}</p>
               <p className="text-xs text-text-muted mt-1 opacity-70">{t("noResultsHint")}</p>
@@ -265,17 +254,17 @@ export default function GlobalSearch() {
                   const globalIdx = results.indexOf(r);
                   const isSelected = selectedIdx === globalIdx;
                   const isProfile = r.type === "profile" || r.type === "creator";
+                  const PreviewImage = ["location", "vehicle", "prop", "animal"].includes(r.type) ? ListingImage : MediaImage;
                   return (
                     <button
                       key={r.id}
                       onClick={() => navigate(r)}
-                      className={`flex items-center gap-3 w-full px-4 py-2.5 transition-colors text-left ${
+                      className={`flex min-h-11 items-center gap-3 w-full px-4 py-2.5 transition-colors text-left ${
                         isSelected ? "bg-gold/10" : "hover:bg-bg-secondary"
                       }`}
                     >
                       {r.image ? (
-                        // eslint-disable-next-line @next/next/no-img-element
-                        <img src={r.image} alt=""
+                        <PreviewImage src={r.image} alt="" width={36} height={36} mediaSize="thumbnail"
                           className={`w-9 h-9 object-cover shrink-0 border border-border ${isProfile ? "rounded-full" : "rounded-lg"}`}
                         />
                       ) : (
@@ -308,7 +297,7 @@ export default function GlobalSearch() {
               <p className="text-xs text-text-muted">{t("resultCount", { count: results.length })}</p>
               <button
                 onClick={() => { addRecentSearch(query); setOpen(false); router.push(`/search?q=${encodeURIComponent(query.trim())}`); }}
-                className="flex items-center gap-1.5 text-xs font-medium text-gold hover:text-gold-light transition-colors"
+                className="flex min-h-11 items-center gap-1.5 text-xs font-medium text-gold hover:text-gold-light transition-colors"
               >
                 {t("viewAll")} <ArrowRight size={11} />
               </button>
@@ -325,7 +314,6 @@ export default function GlobalSearch() {
             </div>
           )}
         </div>
-      </div>
-    </div>
+    </MessagingDialog>
   );
 }

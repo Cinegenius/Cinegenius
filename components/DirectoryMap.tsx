@@ -6,6 +6,7 @@ import Link from "next/link";
 import { Building2, MapPin, UserRound } from "lucide-react";
 import { useTranslations } from "next-intl";
 import MediaImage from "./MediaImage";
+import ListingImage from "./ListingImage";
 import { hasCoordinates, inMapBounds, type MapBounds } from "@/lib/location-map";
 
 function LoadingMap() {
@@ -27,6 +28,7 @@ export default function DirectoryMap({ items, kind, bounds, onBoundsChange }: {
   const t = useTranslations("directoryMap"), mapText = useTranslations("locationMap");
   const clusterLabel = useCallback((count: number) => t("cluster", { count }), [t]);
   const [activeId, setActiveId] = useState<string | null>(null);
+  const PreviewImage = kind === "marketplace" ? ListingImage : MediaImage;
   const locations = useMemo(() => items.map(item => ({ ...item, type: "", price: 0, lat: item.lat ?? null, lng: item.lng ?? null })), [items]);
   const known = locations.filter(hasCoordinates).length;
   const visible = locations.filter(hasCoordinates).filter(item => !bounds || inMapBounds(item, bounds)).length;
@@ -43,7 +45,7 @@ export default function DirectoryMap({ items, kind, bounds, onBoundsChange }: {
           if (!item) return null;
           return <Link href={item.href} className="block overflow-hidden rounded-xl p-3 focus-visible:outline-2 focus-visible:outline-gold">
             <div className="flex min-w-0 items-start gap-3">
-              <div className="relative size-12 shrink-0 overflow-hidden rounded-lg bg-bg-elevated">{item.image ? <MediaImage src={item.image} alt="" fill mediaSize="thumbnail" sizes="48px" className={kind === "companies" ? "object-contain p-1" : "object-cover"} style={{ objectPosition: item.focalPoint ? `${item.focalPoint.x}% ${item.focalPoint.y}%` : "50% 50%" }} /> : <div className="flex h-full items-center justify-center text-text-muted">{kind === "crew" ? <UserRound size={22} aria-hidden="true" /> : kind === "companies" ? <Building2 size={22} aria-hidden="true" /> : <MapPin size={22} aria-hidden="true" />}</div>}</div>
+              <div className="relative size-12 shrink-0 overflow-hidden rounded-lg bg-bg-elevated">{item.image ? <PreviewImage src={item.image} alt="" fill mediaSize="thumbnail" sizes="48px" className={kind === "companies" ? "object-contain p-1" : "object-cover"} style={{ objectPosition: item.focalPoint ? `${item.focalPoint.x}% ${item.focalPoint.y}%` : "50% 50%" }} /> : <div className="flex h-full items-center justify-center text-text-muted">{kind === "crew" ? <UserRound size={22} aria-hidden="true" /> : kind === "companies" ? <Building2 size={22} aria-hidden="true" /> : <MapPin size={22} aria-hidden="true" />}</div>}</div>
               <div className="min-w-0 flex-1 space-y-1 [overflow-wrap:anywhere]">
                 <h3 className="line-clamp-2 pr-8 text-sm font-semibold text-text-primary" title={item.title}>{item.title}</h3>
                 <p className="line-clamp-2 text-xs text-text-muted" title={item.subtitle}>{item.subtitle}</p>

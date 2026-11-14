@@ -102,7 +102,9 @@
     "suggestion3": "Oldtimer",
     "suggestion4": "Regie gesucht",
     "accessibleLabel": "Website durchsuchen",
-    "clearSearch": "Suche leeren"
+    "clearSearch": "Suche leeren",
+    "loadError": "Die Suche konnte nicht geladen werden. Bitte versuche es erneut.",
+    "retry": "Erneut versuchen"
   },
   "notifications": {
     "ariaLabel": "Benachrichtigungen",
@@ -2456,6 +2458,7 @@
     "unavailable": "Nicht verfügbar"
   },
   "Places": {
+    "countryUnassigned": "Ohne Länderzuordnung",
     "location": "Standort",
     "country": "Land",
     "chooseCountry": "Land auswählen",
@@ -7772,7 +7775,19 @@
     "hideForMe": "Für mich ausblenden",
     "hideHelp": "Die Nachricht wird nur in deiner Ansicht ausgeblendet. Andere Mitglieder sehen sie weiterhin.",
     "unknown": "Name nicht verfügbar",
-    "availablePlaces": "Noch freie Plätze: {count}"
+    "availablePlaces": "Noch freie Plätze: {count}",
+    "chooseGroupPeople": "Wähle die Kontakte aus, die du zur Gruppe hinzufügen möchtest.",
+    "attachFile": "Datei anhängen",
+    "attachmentHint": "Bilder, PDF, DOCX oder TXT · bis 4 MB",
+    "attachmentInvalid": "Bitte wähle ein Bild, PDF-, DOCX- oder TXT-Dokument bis 4 MB.",
+    "attachmentUploadError": "Upload fehlgeschlagen. Bitte erneut versuchen.",
+    "attachmentLoadError": "Anhänge konnten nicht geladen werden. Bitte erneut versuchen.",
+    "attachmentLimit": "Du kannst bis zu 5 Dateien anhängen.",
+    "attachmentUploading": "Wird hochgeladen: {progress} %",
+    "retryUpload": "Upload erneut versuchen",
+    "removeAttachment": "{name} entfernen",
+    "openAttachment": "{name} öffnen",
+    "attachmentPreview": "Dateianhang"
   },
   "directoryMap": {
     "crew": "Crew auf der Karte",
@@ -8092,6 +8107,8 @@
     "noticeFirst": "Bitte schließe zuerst den Cookie-Hinweis. Danach kannst du Genie öffnen."
   },
   "InboxNavigation": {
+    "groups": "Gruppen",
+    "friends": "Freunde",
     "chats": "Chats",
     "notices": "Mitteilungen",
     "unread": "Nachrichten: {chats} ungelesene Chatnachrichten, {notices} Mitteilungen",

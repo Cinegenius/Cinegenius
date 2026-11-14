@@ -1,4 +1,6 @@
 "use client";
+import MessageAttachments from "@/components/messaging/MessageAttachments";
+import type {MessageAttachment} from "@/lib/message-attachments";
 
 import { dismissNativeDialog } from "@/lib/native-dialog";
 
@@ -31,6 +33,7 @@ import { backFromMessageView, navigateMessageView } from "@/lib/message-navigati
 import { uiErrorMessage } from "@/lib/ui-error-message";
 
 type Message = {
+  attachments?: MessageAttachment[];
   id: string;
   sender_id: string;
   content: string;
@@ -93,6 +96,7 @@ function MessagesContent() {
   const searchParams = useSearchParams();
   const toParam = searchParams.get("to");
   const convParam = searchParams.get("conv");
+  const groupsOnly = searchParams.get("view") === "groups";
   const requestedCompanySlug = toParam ? searchParams.get("company_slug")?.slice(0, 200) : null;
   const [companyContact, setCompanyContact] = useState<{ name: string; slug: string; recipient: string } | null>(null);
   const verifiedCompany = companyContact?.recipient === toParam && companyContact?.slug === requestedCompanySlug ? companyContact : null;
@@ -472,25 +476,25 @@ function MessagesContent() {
   const peerProfileHref = conversationPeerProfileHref(activeConv, user?.id ?? "", isNewConv ? newConvRecipient : null);
 
   const people = [...contacts].sort((a,b) => a.display_name.localeCompare(b.display_name,uiLocale)).map(contact => ({id:contact.user_id, name:contact.display_name, avatar:contact.avatar_url, role:contact.role}));
-  const filteredConversations = conversations.filter(conversation => `${conversation.otherName ?? ""} ${conversation.group_name ?? ""}`.toLocaleLowerCase(uiLocale).includes(search.trim().toLocaleLowerCase(uiLocale)));
+  const filteredConversations = conversations.filter(conversation => (!groupsOnly || conversation.kind === "group") && `${conversation.otherName ?? ""} ${conversation.group_name ?? ""}`.toLocaleLowerCase(uiLocale).includes(search.trim().toLocaleLowerCase(uiLocale)));
 
-  return <div className={`fixed inset-x-0 top-[calc(4rem+var(--messages-viewport-offset,0px))] lg:top-[calc(7.25rem+1px+var(--messages-viewport-offset,0px))] ${showChat ? "bottom-0" : "bottom-[var(--mobile-nav-clearance)]"} lg:bottom-0 flex overflow-hidden bg-bg-primary`}
+  return <div className={`fixed inset-x-0 top-[calc(var(--site-header-height)+var(--messages-viewport-offset,0px))] lg:top-[calc(7.25rem+1px+var(--messages-viewport-offset,0px))] ${showChat ? "bottom-0" : "bottom-[var(--mobile-nav-clearance)]"} lg:bottom-0 flex overflow-hidden bg-bg-primary`}
     style={{"--messages-viewport-offset":`${visualViewportTop}px`,...(keyboardInset>0?{bottom:`${keyboardInset}px`}:{})} as CSSProperties}>
     <aside className={`${showChat?"hidden sm:flex":"flex"} min-w-0 w-full flex-col border-r border-border bg-bg-primary sm:w-80 sm:shrink-0`}>
       <header className="shrink-0 border-b border-border px-4 py-3">
-        <div className="flex min-w-0 items-center justify-between gap-3"><h1 className="min-w-0 break-words font-display text-xl font-bold text-text-primary">{t("title")}</h1><button type="button" onClick={()=>setNewMessageOpen(true)} aria-label={t("newMessage")} title={t("newMessage")} className="flex min-h-11 min-w-11 shrink-0 items-center justify-center gap-2 rounded-xl px-2 text-sm text-gold hover:bg-bg-elevated"><SquarePen size={22}/><span className="hidden min-[400px]:inline">{t("newMessage")}</span></button></div>
-        <InboxNavigation active="chats" />
+        <div className="flex min-w-0 items-center justify-between gap-3"><h1 className="min-w-0 break-words font-display text-xl font-bold text-text-primary">{t("title")}</h1><button type="button" onClick={()=>setNewMessageOpen(true)} aria-label={t(groupsOnly ? "createGroup" : "newMessage")} title={t(groupsOnly ? "createGroup" : "newMessage")} className="flex min-h-11 min-w-11 shrink-0 items-center justify-center gap-2 rounded-xl px-2 text-sm text-gold hover:bg-bg-elevated"><SquarePen size={22}/><span className="hidden min-[400px]:inline">{t(groupsOnly ? "createGroup" : "newMessage")}</span></button></div>
+        <InboxNavigation active={groupsOnly ? "groups" : "chats"} />
         <label className="mt-2 flex min-h-11 items-center gap-2 rounded-xl border border-border bg-bg-secondary px-3"><Search size={17} className="shrink-0 text-text-muted"/><input type="search" value={search} onChange={event=>setSearch(event.target.value)} placeholder={t("searchChats")} aria-label={t("searchChats")} className="min-h-11 min-w-0 flex-1 bg-transparent text-base text-text-primary outline-none"/></label>
       </header>
       <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain">
         {(friendRequests.length>0||requestsOpen)&&<section className="border-b border-border px-4 py-2"><button type="button" aria-expanded={requestsOpen} onClick={()=>setRequestsOpen(value=>!value)} className="min-h-11 w-full text-left text-sm font-semibold text-gold">{t("requests",{count:friendRequests.length})}</button>{requestsOpen&&<div className="space-y-3 pb-2">{friendRequests.map(request=><article key={request.friendship_id} className="rounded-xl border border-border bg-bg-secondary p-3"><Link href={`/profile/${request.user_id}`} className="flex min-h-11 items-center gap-2 break-words text-sm font-semibold text-text-primary">{request.avatar_url&&<UnoptimizedImage src={request.avatar_url} alt="" className="h-9 w-9 shrink-0 rounded-full object-cover"/>}{request.display_name}</Link><div className="mt-2 flex flex-wrap gap-2"><button type="button" disabled={processingIds.has(request.friendship_id)} onClick={()=>void handleFriendRequest(request.friendship_id,"accepted")} className="min-h-11 flex-1 rounded-xl bg-gold px-3 text-sm font-semibold text-bg-primary disabled:opacity-40">{contactText("accept")}</button><button type="button" disabled={processingIds.has(request.friendship_id)} onClick={()=>void handleFriendRequest(request.friendship_id,"rejected")} className="min-h-11 flex-1 rounded-xl border border-border px-3 text-sm text-text-secondary disabled:opacity-40">{contactText("reject")}</button></div></article>)}{!contactsLoading&&!friendRequests.length&&<p className="text-sm text-text-muted">{t("noRequests")}</p>}{requestError&&<p role="alert" className="text-sm text-red-400 [[data-theme=light]_&]:text-red-700">{requestError}</p>}</div>}</section>}
         {contactsError&&<div role="alert" className="px-4 py-2 text-sm text-red-400 [[data-theme=light]_&]:text-red-700"><p>{uiText("Ui.text_4139ecbefbacc6")}</p><button type="button" onClick={()=>void loadFriendRequests()} className="min-h-11 text-gold">{t("retry")}</button></div>}
         {conversationLoadFailed&&<div role="alert" className="px-4 py-3 text-sm text-red-400 [[data-theme=light]_&]:text-red-700"><p>{messageNavigationText("loadError")}</p><button type="button" onClick={()=>{setLoading(conversations.length===0);void loadConversations();}} className="min-h-11 text-gold">{messageNavigationText("retry")}</button></div>}
-        {loading&&conversations.length===0?<p role="status" className="px-4 py-8 text-sm text-text-muted">{t("loading")}</p>:filteredConversations.length===0&&!conversationLoadFailed?<div className="space-y-3 px-5 py-10 text-center"><MessageSquare size={26} className="mx-auto text-text-muted"/><p className="text-sm text-text-muted">{t(search.trim()?"noChats":"emptyInbox")}</p><button type="button" onClick={()=>setNewMessageOpen(true)} className="min-h-11 rounded-xl bg-gold px-4 text-sm font-semibold text-bg-primary">{t("newMessage")}</button></div>:filteredConversations.map(conversation=>{
+        {loading&&conversations.length===0?<p role="status" className="px-4 py-8 text-sm text-text-muted">{t("loading")}</p>:filteredConversations.length===0&&!conversationLoadFailed?<div className="space-y-3 px-5 py-10 text-center"><MessageSquare size={26} className="mx-auto text-text-muted"/><p className="text-sm text-text-muted">{t(search.trim()?"noChats":"emptyInbox")}</p><button type="button" onClick={()=>setNewMessageOpen(true)} className="min-h-11 rounded-xl bg-gold px-4 text-sm font-semibold text-bg-primary">{t(groupsOnly ? "createGroup" : "newMessage")}</button></div>:filteredConversations.map(conversation=>{
           const latest=conversation.messages?.[0];
           return <button key={conversation.id} type="button" aria-pressed={conversation.id===activeId} onClick={()=>openConversation(conversation)} className={`flex min-h-20 w-full min-w-0 items-center gap-3 border-b border-border px-4 py-3 text-left hover:bg-bg-elevated ${activeId===conversation.id?"bg-bg-elevated":""}`}>
             <span className="flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-full border border-border bg-bg-elevated">{conversation.kind==="group"?<Users size={19} className="text-gold"/>:conversation.kind==="support"?<UnoptimizedImage src={SUPPORT_AVATAR_URL} alt="" className="h-full w-full object-contain p-1"/>:conversation.otherAvatar?<UnoptimizedImage src={conversation.otherAvatar} alt="" className="h-full w-full object-cover"/>:<User size={19} className="text-text-muted"/>}</span>
-            <span className="min-w-0 flex-1"><span className="flex min-w-0 items-center justify-between gap-2"><strong className="min-w-0 truncate text-sm text-text-primary">{conversation.otherName}</strong>{latest&&<span className="shrink-0 text-[10px] text-text-muted">{formatTime(uiLocale,latest.created_at)}</span>}</span><span className="mt-1 block truncate text-xs text-text-muted">{latest?.content??t("startChat")}</span></span>{(conversation.unread_count??0)>0&&<span className="shrink-0 rounded-full bg-gold px-1.5 py-0.5 text-[10px] font-semibold text-bg-primary">{conversation.unread_count}</span>}
+            <span className="min-w-0 flex-1"><span className="flex min-w-0 items-center justify-between gap-2"><strong className="min-w-0 truncate text-sm text-text-primary">{conversation.otherName}</strong>{latest&&<span className="shrink-0 text-[10px] text-text-muted">{formatTime(uiLocale,latest.created_at)}</span>}</span><span className="mt-1 block truncate text-xs text-text-muted">{latest ? (latest.content||t("attachmentPreview")) : t("startChat")}</span></span>{(conversation.unread_count??0)>0&&<span className="shrink-0 rounded-full bg-gold px-1.5 py-0.5 text-[10px] font-semibold text-bg-primary">{conversation.unread_count}</span>}
           </button>;
         })}
         <Link href="/support" className="flex min-h-11 items-center gap-2 px-4 py-3 text-sm text-text-secondary hover:text-gold"><MessageSquare size={16}/>{uiText("SupportContact.link")}</Link>
@@ -576,7 +580,8 @@ function MessagesContent() {
                             ? "bg-gold text-bg-primary rounded-br-sm"
                             : "bg-bg-elevated border border-border text-text-primary rounded-bl-sm"
                         }`}>
-                          {msg.content}
+                          {msg.content&&<span>{msg.content}</span>}
+                          <MessageAttachments attachments={msg.attachments}/>
                           <div className="mt-1 flex items-center justify-between gap-2">
                           <p className={`text-[10px] ${isOwn ? "text-bg-primary/60" : "text-text-muted"}`}>
                             {formatTime(uiLocale, msg.created_at)}
@@ -620,9 +625,9 @@ function MessagesContent() {
         {user?.id&&(activeId||newConvRecipient)&&<MessageComposer key={`${user.id}:${activeId?`conversation:${activeId}`:`recipient:${newConvRecipient}`}`} accountId={user.id} destination={{conversationId:activeId,recipientId:newConvRecipient}} onSent={messageSent}/>}
       </>:<div className="m-auto max-w-sm p-8 text-center"><MessageSquare size={40} className="mx-auto mb-4 text-text-muted"/><h2 className="font-display text-xl text-text-primary">{t("startChat")}</h2><p className="mt-2 text-sm text-text-muted">{t("choosePeople")}</p><button type="button" onClick={()=>setNewMessageOpen(true)} className="mt-5 min-h-11 rounded-xl bg-gold px-4 text-sm font-semibold text-bg-primary">{t("newMessage")}</button></div>}
     </section>
-    {user?.id&&<NewMessageDialog key={user.id} open={newMessageOpen} accountId={user.id} contacts={people} onClose={()=>setNewMessageOpen(false)} onOpen={openDestination}/>}
+    {user?.id&&<NewMessageDialog key={user.id} open={newMessageOpen} forceGroup={groupsOnly} accountId={user.id} contacts={people} onClose={()=>setNewMessageOpen(false)} onOpen={openDestination}/>}
     {user?.id&&activeConv?.kind==="group"&&<GroupInfoDialog key={`${user.id}:${activeConv.id}`} open={groupInfoOpen} accountId={user.id} group={activeConv} contacts={people} onClose={()=>setGroupInfoOpen(false)} onRefresh={async()=>{await loadConversations();if(activeIdRef.current===activeConv.id)await loadMessages(activeConv.id);}} onResume={()=>setGroupInfoOpen(true)} onLeave={()=>{setGroupInfoOpen(false);if(user?.id)navigateMessageView(window,user.id,{},true);void loadConversations();}}/>}
-    <MessagingDialog compact open={!!selectedMessage} title={t("messageOptions")} onClose={()=>setSelectedMessage(null)} busy={!!deletingMessage} footer={<button type="button" disabled={!!deletingMessage} onClick={()=>{if(selectedMessage)void hideOwnMessage(selectedMessage);}} className="min-h-11 w-full rounded-xl border border-crimson/30 px-4 text-sm text-red-400 [[data-theme=light]_&]:text-red-700 disabled:opacity-40">{t("hideForMe")}</button>}><p className="break-words whitespace-pre-wrap rounded-xl border border-border bg-bg-secondary p-3 text-sm [overflow-wrap:anywhere]">{selectedMessage?.content}</p><p className="text-sm text-text-muted">{t("hideHelp")}</p>{sendError&&<p role="alert" className="text-sm text-red-400 [[data-theme=light]_&]:text-red-700">{sendError}</p>}</MessagingDialog>
+    <MessagingDialog compact open={!!selectedMessage} title={t("messageOptions")} onClose={()=>setSelectedMessage(null)} busy={!!deletingMessage} footer={<button type="button" disabled={!!deletingMessage} onClick={()=>{if(selectedMessage)void hideOwnMessage(selectedMessage);}} className="min-h-11 w-full rounded-xl border border-crimson/30 px-4 text-sm text-red-400 [[data-theme=light]_&]:text-red-700 disabled:opacity-40">{t("hideForMe")}</button>}><p className="break-words whitespace-pre-wrap rounded-xl border border-border bg-bg-secondary p-3 text-sm [overflow-wrap:anywhere]">{selectedMessage?.content}</p><MessageAttachments attachments={selectedMessage?.attachments}/><p className="text-sm text-text-muted">{t("hideHelp")}</p>{sendError&&<p role="alert" className="text-sm text-red-400 [[data-theme=light]_&]:text-red-700">{sendError}</p>}</MessagingDialog>
   </div>;
 }
 

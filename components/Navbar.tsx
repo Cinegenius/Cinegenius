@@ -205,7 +205,7 @@ export default function Navbar({ initialIsSignedIn = false, initialAdminUserId =
     <div
       ref={accountMenuRef}
       id="header-account-menu"
-      className="fixed right-2 top-16 z-50 mt-2 w-[26rem] max-w-[calc(100vw-1rem)] max-h-[calc(100dvh-5rem-var(--mobile-nav-clearance))] lg:max-h-[calc(100dvh-5rem-env(safe-area-inset-bottom,0px))] overflow-y-auto overscroll-contain rounded-2xl border border-border bg-bg-elevated shadow-2xl animate-fade-in sm:right-4"
+      className="fixed right-2 top-[var(--site-header-height)] z-50 mt-2 w-[26rem] max-w-[calc(100vw-1rem)] max-h-[calc(100dvh-var(--site-header-height)-1rem-var(--mobile-nav-clearance))] lg:max-h-[calc(100dvh-5rem-env(safe-area-inset-bottom,0px))] overflow-y-auto overscroll-contain rounded-2xl border border-border bg-bg-elevated shadow-2xl animate-fade-in sm:right-4"
     >
       {/* Identity */}
       <div className="px-4 py-3.5 border-b border-border flex items-center gap-3">
@@ -254,29 +254,29 @@ export default function Navbar({ initialIsSignedIn = false, initialAdminUserId =
           scrolled ? "backdrop-blur-nav border-b border-border" : "bg-black/30 backdrop-blur-sm"
         }`}
       >
-        <div className="site-header-container mx-auto px-4 max-[479px]:px-2 sm:px-6 lg:px-8">
-          <div className="flex h-16 min-w-0 items-center justify-between gap-1 max-[479px]:gap-0 sm:gap-3">
+        <div className="site-header-container mx-auto px-4 max-[479px]:px-2 sm:px-6 lg:px-4 xl:px-8">
+          <div data-guest={!hasSignedInSession || undefined} className="site-header-row flex h-16 min-w-0 items-center justify-between gap-1 max-[479px]:gap-0 sm:gap-3 lg:gap-2 xl:gap-3">
 
             {/* Logo */}
             <Logo />
 
             {/* Desktop nav */}
-            <nav aria-label={t("discover")} className="site-header-primary hidden xl:flex min-w-0 items-center">
+            <nav aria-label={t("discover")} className="site-header-primary hidden lg:flex shrink-0 items-center">
               {PRIMARY_NAV_ITEMS.map(item => item.kind === "menu" ? <button
                 key={item.id} type="button" onClick={event => {event.currentTarget.focus({preventScroll:true});openMenu();}} aria-expanded={menuOpen} aria-controls={SITE_NAV_MENU_ID} aria-haspopup="dialog"
-                className={`inline-flex min-h-11 min-w-11 shrink-0 items-center justify-center rounded-md px-2 text-sm font-medium uppercase tracking-wide transition-colors ${menuOpen || activeId === item.id ? navActive : navBase}`}
+                className={`inline-flex min-h-11 min-w-11 shrink-0 items-center justify-center whitespace-nowrap rounded-md px-1.5 text-xs xl:px-2 xl:text-sm font-medium uppercase tracking-wide transition-colors ${menuOpen || activeId === item.id ? navActive : navBase}`}
               >{t(item.key)}</button> : <Link
                 key={item.id} href={item.href} prefetch={authRoute || signingOut ? false : null} aria-current={activeId === item.id ? "page" : undefined}
-                className={`inline-flex min-h-11 min-w-11 shrink-0 items-center justify-center rounded-md px-2 text-sm font-medium uppercase tracking-wide transition-colors ${activeId === item.id ? navActive : navBase}`}
+                className={`inline-flex min-h-11 min-w-11 shrink-0 items-center justify-center whitespace-nowrap rounded-md px-1.5 text-xs xl:px-2 xl:text-sm font-medium uppercase tracking-wide transition-colors ${activeId === item.id ? navActive : navBase}`}
               >{t(item.key)}</Link>)}
             </nav>
 
             {/* Desktop CTA */}
-            <div className="site-header-actions hidden xl:flex shrink-0 items-center gap-1">
+            <div className="site-header-actions hidden lg:flex shrink-0 items-center gap-1">
               {/* Keep the search footprint identical on the homepage and directory routes. */}
               <button
                 type="button"
-                onClick={() => document.dispatchEvent(new Event("cg:opensearch"))}
+                onClick={event => { event.currentTarget.focus({ preventScroll: true }); document.dispatchEvent(new Event("cg:opensearch")); }}
                 className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg text-text-muted hover:bg-bg-elevated hover:text-gold transition-colors"
                 aria-label={uiText("Ui.text_9f6d74e0a12b67")}
                 title={uiText("Ui.text_9f6d74e0a12b67")}
@@ -292,14 +292,14 @@ export default function Navbar({ initialIsSignedIn = false, initialAdminUserId =
                   <Link
                     href="/sign-in"
                     prefetch
-                    className="inline-flex min-h-11 items-center px-3 py-2 text-xs font-semibold border border-border text-text-secondary hover:border-gold hover:text-gold rounded-md transition-all"
+                    className="inline-flex min-h-11 items-center whitespace-nowrap px-2 py-2 text-[11px] xl:px-3 xl:text-xs font-semibold border border-border text-text-secondary hover:border-gold hover:text-gold rounded-md transition-all"
                   >
                     {t("signIn")}
                   </Link>
                   <Link
                     href="/sign-up"
                     prefetch
-                    className="inline-flex min-h-11 items-center px-3 py-2 text-xs font-semibold bg-gold text-bg-primary rounded-md hover:bg-gold-light transition-colors"
+                    className="inline-flex min-h-11 items-center whitespace-nowrap px-2 py-2 text-[11px] xl:px-3 xl:text-xs font-semibold bg-gold text-bg-primary rounded-md hover:bg-gold-light transition-colors"
                   >
                     {t("signUp")}
                   </Link>
@@ -321,7 +321,13 @@ export default function Navbar({ initialIsSignedIn = false, initialAdminUserId =
             </div>
 
             {/* Mobile: keep both auth destinations visible outside the menu. */}
-            <div className="xl:hidden flex shrink-0 items-center gap-1 max-[479px]:gap-0">
+            <div className="site-header-compact lg:hidden flex shrink-0 items-center gap-1 max-[479px]:gap-0">
+              <button type="button"
+                onClick={event => { event.currentTarget.focus({ preventScroll: true }); document.dispatchEvent(new Event("cg:opensearch")); }}
+                aria-label={uiText("Ui.text_9f6d74e0a12b67")} title={uiText("Ui.text_9f6d74e0a12b67")}
+                className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg text-text-muted hover:bg-bg-elevated hover:text-gold transition-colors">
+                <Search size={19} aria-hidden="true" />
+              </button>
               {hasSignedInSession && <Link href="/messages" prefetch={false} aria-label={messageLabel} title={messageLabel} aria-current={activeId === "messages" ? "page" : undefined} className="relative flex h-11 w-11 shrink-0 items-center justify-center rounded-lg text-text-muted hover:bg-bg-elevated hover:text-gold">
                 <MessageSquare size={19} aria-hidden="true" />
                 {inboxFailed && <span aria-hidden="true" className="absolute right-1 top-1 h-1.5 w-1.5 rounded-full bg-gold" />}
@@ -346,7 +352,7 @@ export default function Navbar({ initialIsSignedIn = false, initialAdminUserId =
               )}
               {hasSignedInSession && <LanguageSwitcher />}
               <button
-                className="relative w-11 h-11 flex items-center justify-center text-text-secondary hover:text-gold transition-colors"
+                className="relative w-11 h-11 flex items-center justify-center rounded-lg text-text-secondary hover:text-gold transition-colors outline-none focus-visible:ring-2 focus-visible:ring-gold/60"
                 onClick={event => {event.currentTarget.focus({preventScroll:true});openMenu();}}
                 aria-label={t("openMenu")}
                 aria-expanded={menuOpen}

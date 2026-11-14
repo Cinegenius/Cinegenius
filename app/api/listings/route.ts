@@ -1,3 +1,4 @@
+import { legacyPlaceQuery } from "@/lib/places/core";
 import { jobSchedule } from "@/lib/job-metadata";
 import { geographicPage } from "@/lib/browse-geography";
 import { ownBrowsePlace } from "@/lib/browse-geography-server";
@@ -125,7 +126,7 @@ export async function GET(req: NextRequest) {
     ).join(",");
     query = query.or(`city.ilike.${pattern},place_city_name.ilike.${pattern},place_region_name.ilike.${pattern}${aliases ? `,${aliases}` : ""}${legacyAliases ? `,${legacyAliases}` : ""}`);
   }
-  for(const [param,column] of [['country','place_country_code'],['region','place_region_id'],['city','place_city_id']] as const){const value=req.nextUrl.searchParams.get(param);if(value)query=query.eq(column,value.slice(0,100));}
+  for(const [param,column] of [['country','place_country_code'],['region','place_region_id'],['city','place_city_id']] as const){const value=req.nextUrl.searchParams.get(param);if(value){const expression=legacyPlaceQuery(param,value);query=expression?query.or(expression):query.eq(column,value.slice(0,100));}}
   query=sort==='price-asc'||sort==='price-desc'?query.order("price",{ascending:sort==='price-asc'}).order("id"):query.order("created_at",{ascending:false}).order("id");
   if (clause) query = query.or(clause);
   return range ? query.range(range.from, range.to) : query;

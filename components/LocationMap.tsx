@@ -7,7 +7,7 @@ import { useEffect, useRef, useState, type ReactNode } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import Link from "next/link";
 import { MapPin, X } from "lucide-react";
-import Image from "@/components/MediaImage";
+import ListingImage from "@/components/ListingImage";
 import { listingPriceLabel } from "@/lib/listing-price";
 import { placeDisplay } from "@/lib/places/core";
 import { locationCategoryLabel } from "@/lib/location-category-labels";
@@ -276,7 +276,7 @@ export default function LocationMap({ readOnly = false, locations, activeId, onH
           {selected ? (renderPreview ? renderPreview(selected) : (
             <Link href={`/locations/${selected.id}`} className="block overflow-hidden rounded-xl focus-visible:outline-2 focus-visible:outline-gold">
               <div className="relative h-32 bg-bg-elevated">
-                {selected.image ? <Image src={selected.image} alt={selected.title} fill mediaSize="thumbnail" sizes="384px" className="object-cover" style={{ objectPosition: selected.focalPoint ? `${selected.focalPoint.x}% ${selected.focalPoint.y}%` : "50% 50%" }} /> : <div className="flex h-full items-center justify-center text-text-muted"><MapPin size={30} /></div>}
+                {selected.image ? <ListingImage src={selected.image} alt={selected.title} fill mediaSize="thumbnail" sizes="384px" className="object-cover" style={{ objectPosition: selected.focalPoint ? `${selected.focalPoint.x}% ${selected.focalPoint.y}%` : "50% 50%" }} /> : <div className="flex h-full items-center justify-center text-text-muted"><MapPin size={30} /></div>}
               </div>
               <div className="space-y-1 p-3">
                 <h3 className="text-sm font-semibold text-text-primary">{selected.title}</h3>

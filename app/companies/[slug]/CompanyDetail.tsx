@@ -25,7 +25,7 @@ import {
   EQUIPMENT_CATEGORY_BY_ID, CONDITION_LABELS, CONDITION_COLORS, SERVICE_TYPE_BY_ID,
 } from "@/lib/equipment-categories";
 import { COMPANY_PUBLIC_TITLE_SUGGESTIONS, normalizeCompanyPublicTitles } from "@/lib/company-roles";
-import MediaImage from "@/components/MediaImage";
+import ListingImage from "@/components/ListingImage";
 import CompanyLogo from "@/components/CompanyLogo";
 import Lightbox from "@/components/Lightbox";
 import { listingPriceLabel } from "@/lib/listing-price";
@@ -732,7 +732,7 @@ export default function CompanyDetail({
                         className="flex items-center gap-3 py-3 group -mx-1 px-1 rounded-lg hover:bg-bg-secondary/60 transition-colors">
                         {listing.image_url
                           // eslint-disable-next-line @next/next/no-img-element
-                          ? <MediaImage src={listing.image_url} width={40} height={40} alt={listing.title} className="w-10 h-10 rounded-lg object-cover shrink-0" />
+                          ? <ListingImage mediaSize="thumbnail" src={listing.image_url} width={40} height={40} alt={listing.title} className="w-10 h-10 rounded-lg object-cover shrink-0" />
                           : <div className="w-10 h-10 rounded-lg bg-bg-elevated flex items-center justify-center shrink-0"><Icon size={16} className="text-text-muted" /></div>
                         }
                         <div className="flex-1 min-w-0">
