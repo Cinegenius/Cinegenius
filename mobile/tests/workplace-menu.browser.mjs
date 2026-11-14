@@ -73,6 +73,24 @@ async function run() {
       await context.close();
     }
 
+    // The app source can move ahead of publication. A new bundle must still
+    // recognize the currently live KI/AI row as well as the reviewed Work row.
+    const previousLabels = { de: 'KI', en: 'AI', es: 'IA', it: 'IA', cs: 'AI', hu: 'MI', nl: 'AI', 'nl-BE': 'AI', sv: 'AI' };
+    for (const locale of locales) {
+      const { context, page } = await fixture(locale);
+      await page.locator('dialog nav button').first().evaluate((button, label) => {
+        button.querySelector('span > span').textContent = label;
+      }, previousLabels[locale]);
+      await page.addScriptTag({ content: script });
+      await page.locator('#show').click();
+      await page.getByRole('button', { name: catalogs[locale].NativeRoomScanner.workplaceTitle, exact: true }).click();
+      assert.deepEqual(await page.evaluate(() => window.nativeCalls), [{ action: 'openWorkplace', locale }]);
+      assert.ok(await page.locator('#outside').isDisabled());
+      assert.ok(await page.locator('#unrelated').isDisabled());
+      results.push({ locale, previousLiveLabel: previousLabels[locale], nativeEntry: 'passed' });
+      await context.close();
+    }
+
     for (const [url, native] of [[origin + '/native-fixture', false], ['https://www.cinegenius.co.evil.example/native-fixture', true], ['http://www.cinegenius.co/native-fixture', true], ['https://www.cinegenius.co:8443/native-fixture', true]]) {
       const { context, page } = await fixture('de', url, native);
       await page.locator('#show').click();

@@ -81,6 +81,10 @@ scanner for supported LiDAR devices, including the intended iPhone 15 Pro. Selec
 the **CineGenius Arbeitsplatz** Xcode scheme to open it directly, or use the app
 icon's quick action. The bundled app-only menu adapter also opens it from the
 existing tools row in the public menu. The five bottom links remain unchanged.
+The adapter recognizes both the previously published KI/AI labels and the
+reviewed Work label until the website publication catches up. Historical label
+tokens are used only for recognition; all displayed native text continues to
+come from `NativeRoomScanner`. Other disabled menu items stay unchanged.
 
 Plans stay in protected local storage, independent of the CineGenius account and
 excluded from backups. Opening the private library requires device-owner

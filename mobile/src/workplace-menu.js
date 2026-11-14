@@ -7,6 +7,9 @@
   window.__cinegeniusWorkplaceInstalled = true;
 
   const registered = new WeakSet();
+  // Recognition-only tokens from the previously shipped nav.ai labels. The
+  // reviewed Work rename is not live yet; never render these legacy tokens.
+  const previousToolsLabels = new Set(['KI', 'AI', 'IA', 'MI']);
   const supported = Object.keys(configuration.locales);
   const resolveLocale = () => {
     const tag = document.documentElement.lang.trim().replaceAll('_', '-').toLowerCase();
@@ -25,7 +28,8 @@
       if (spans.length !== 2) continue;
       const [label, detail] = spans;
       const isLegacyEntry = Object.values(configuration.locales).some(candidate =>
-        label.textContent === candidate.legacyLabel && detail.textContent === candidate.legacyBadge);
+        (label.textContent === candidate.legacyLabel || previousToolsLabels.has(label.textContent))
+          && detail.textContent === candidate.legacyBadge);
       if (!registered.has(button) && !isLegacyEntry) continue;
       if (!registered.has(button)) {
         registered.add(button);
