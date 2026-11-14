@@ -8217,7 +8217,7 @@
     "chooseOwnLocation": "Kies een van je bestaande locaties. Elke kamer hoort bij die locatie.",
     "noOwnLocations": "Je hebt nog geen eigen locatie aangemaakt. Maak er eerst een aan in je CineGenius-account.",
     "locationsLimited": "De dienst geeft maximaal 200 advertenties terug. Oudere locaties kunnen in deze preview ontbreken.",
-    "legacyPlansPreserved": "Eerdere plannen zonder accountkoppeling blijven beschermd op dit apparaat. Ze worden niet automatisch aan een account gekoppeld.",
+    "legacyPlansPreserved": "Je kunt eerdere grondplannen overnemen vanuit een van je eigen locaties. De originelen blijven behouden.",
     "gestureHelp": "Twee vingers: plan verschuiven en zoomen. Eén vinger: object selecteren en verplaatsen.",
     "editPlan": "Plattegrond bewerken",
     "addObject": "Element toevoegen",
@@ -8267,7 +8267,13 @@
     "objectDimensions": "{width} × {depth} m",
     "signInAgain": "Opnieuw aanmelden",
     "saveShort": "Opslaan",
-    "accountLoading": "Account controleren…"
+    "accountLoading": "Account controleren…",
+    "legacyImport": "Eerdere grondplannen overnemen",
+    "legacyImportHelp": "Kies een eerder grondplan voor deze locatie. Pas na je bevestiging wordt een kopie opgeslagen voor het aangemelde account. Het origineel blijft behouden.",
+    "legacyImportConfirm": "Kopie overnemen",
+    "legacyImportBody": "‘{plan}’ kopiëren naar de locatie ‘{location}’ voor het momenteel aangemelde CineGenius-account? Het origineel blijft ongewijzigd.",
+    "legacyImportEmpty": "Geen eerdere niet-toegewezen grondplannen gevonden.",
+    "legacyImportConflict": "Dit grondplan is al overgenomen voor dit account of is intussen gewijzigd. De bestaande kopie blijft behouden."
   },
   "companyTeam": {
     "leadership": "Oprichters en leiding"

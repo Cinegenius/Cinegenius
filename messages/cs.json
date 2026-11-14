@@ -8217,7 +8217,7 @@
     "chooseOwnLocation": "Vyber jednu ze svých vytvořených lokací. Každá místnost patří k této lokaci.",
     "noOwnLocations": "Zatím nemáš vlastní lokaci. Nejdřív ji vytvoř ve svém účtu CineGenius.",
     "locationsLimited": "Služba vrací nejvýše 200 inzerátů. Starší lokace mohou v tomto náhledu chybět.",
-    "legacyPlansPreserved": "Starší plány bez přiřazeného účtu zůstávají chráněné v zařízení. K účtu se nepřiřazují automaticky.",
+    "legacyPlansPreserved": "Dřívější půdorysy můžeš převzít v některé ze svých lokací. Originály zůstanou zachovány.",
     "gestureHelp": "Dva prsty: posun a přiblížení plánu. Jeden prst: výběr a posun objektu.",
     "editPlan": "Upravit půdorys",
     "addObject": "Přidat prvek",
@@ -8267,7 +8267,13 @@
     "objectDimensions": "{width} × {depth} m",
     "signInAgain": "Přihlásit se znovu",
     "saveShort": "Uložit",
-    "accountLoading": "Ověřování účtu…"
+    "accountLoading": "Ověřování účtu…",
+    "legacyImport": "Převzít dřívější půdorysy",
+    "legacyImportHelp": "Vyber dřívější půdorys pro tuto lokaci. Kopie se uloží pro aktuálně přihlášený účet až po tvém potvrzení. Originál zůstane zachován.",
+    "legacyImportConfirm": "Převzít kopii",
+    "legacyImportBody": "Zkopírovat „{plan}“ do lokace „{location}“ pro aktuálně přihlášený účet CineGenius? Originál zůstane beze změny.",
+    "legacyImportEmpty": "Nebyly nalezeny žádné dřívější nepřiřazené půdorysy.",
+    "legacyImportConflict": "Tento půdorys už byl pro tento účet převzat nebo se mezitím změnil. Stávající kopie zůstane zachována."
   },
   "companyTeam": {
     "leadership": "Zakladatelé a vedení"

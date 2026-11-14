@@ -16,6 +16,12 @@ verwendet seinen dauerhaften Datenspeicher; Passwörter oder Sitzungstokens werd
 nicht in App-Dateien, UserDefaults oder eine eigene JavaScript-Speicherung kopiert.
 Abmeldung, Widerruf und Ablauf der Sitzung bleiben wirksam.
 
+Die Vorschau-Vorbereitung erzeugt auch am lokalen `appStartPath` die lokalisierte
+Offline-Datei. Capacitor prüft diese Datei vor jeder entfernten Navigation;
+fehlt sie, beendet es den Prozess mit Exitcode 1. Der mobile Regressionstest
+führt die echte Vorbereitung in einem temporären Projekt aus und prüft diesen
+Startvertrag zusätzlich zur vorhandenen Konfigurationsprüfung.
+
 Der bisherige Capacitor-Standard öffnet fremde Hauptframe-Ziele im Systembrowser.
 Eine enge Ausnahme hält ausschließlich HTTPS `clerk.cinegenius.co`, Standardport,
 Pfad `/v1/client/handshake`, ohne URL-Zugangsdaten, im selben WebView. Alle anderen
@@ -82,8 +88,14 @@ Location und Erstellungszeit dürfen durch einen Editor-Update nicht wechseln.
 Schema 1 bleibt lesbar. Alte ungebundene Dateien in
 `CineGeniusPrivateFloorPlans` bleiben unangetastet und werden keinem gerade
 angemeldeten Konto automatisch zugewiesen. Die neue Kontobibliothek zeigt sie
-nicht als eigene an. Eine bewusst bestätigte Zuordnung/Wiederherstellungsfunktion
-für diese Altdateien ist noch offen. Die App niemals zur Aktualisierung löschen.
+nicht automatisch als eigene an. Innerhalb einer eigenen Location öffnet
+„Bisherige Grundrisse übernehmen“ nach erneuter Konto- und Geräteprüfung die
+Altbibliothek. Erst die ausdrückliche Bestätigung für den ausgewählten Plan und
+die Location speichert eine separate kontogebundene Kopie. Das Original wird
+weder umgeschrieben noch entfernt. Stabile Plan-ID, Erstellungszeit, Geometrie
+und RoomPlan-Quelldaten bleiben erhalten; Wiederholungen erzeugen keine Duplikate
+und überschreiben keine zwischenzeitlich bearbeitete Kopie. Die App niemals zur
+Aktualisierung löschen.
 
 ## Design und Quellen
 
@@ -104,7 +116,16 @@ Technische Referenzen: [Apple-Pan-Gesten](https://developer.apple.com/documentat
 ## Prüfstatus
 
 Siehe `docs/test-reports/native-floorplan-editor-2026-11-14.md`.
-Die zuvor installierte Version auf Markus' iPhone 15 Pro ist bestätigt; diese
-Erweiterung ist noch nicht als Xcode-Build oder Geräteupdate bestätigt. Linux-
-Kernprüfungen und Swift-Syntaxprüfung ersetzen keine UIKit-/SwiftUI-Kompilierung,
-kein echtes Multitouch und keine Anmeldung im iPhone-WebView.
+Der Mac-Beleg vom 14. November 2026, 09:59 UTC, bestätigt nach den zurückgeführten
+Korrekturen 27 Swift-Kernprüfungen, 11 mobile Tests, Simulator-Kompilierung und
+signierten iPhone-Build. Das vorhandene App-Bundle wurde ohne Löschen aktualisiert;
+der normale Kaltstart blieb nach 5 und 20 Sekunden aktiv. Eine vorhandene Sitzung
+wurde wiederverwendet und die deutsche Locations-Ansicht geöffnet.
+
+Eine frische Anmeldung ist damit nicht geprüft und von Markus weiterhin als
+fehlerhaft gemeldet. Die vollständige Anmeldung beim Appstart und die zu kleine
+Webansicht werden separat auf dem Mac bearbeitet. Echter Legacy-Import, eigene
+Location-Auswahl, Multitouch, Kameraaufnahme, Export und alle Sprachlayouts bleiben
+offen. Die gespeicherten Originalpläne wurden weder geöffnet noch hochgeladen.
+Belege: `/srv/cinegenius/handoffs/20261114-floorplan-editor/mac-validation/`
+(`mac-update-validation-v2.json`, `physical-normal-start-verification.json`).

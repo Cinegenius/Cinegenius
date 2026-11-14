@@ -99,4 +99,14 @@ public struct SavedFloorPlan: Codable, Equatable, Identifiable, Sendable {
     public func hasSameSource(as other: SavedFloorPlan) -> Bool {
         id == other.id && createdAt == other.createdAt && plan == other.plan && capturedRoomData == other.capturedRoomData && ownerID == other.ownerID && locationID == other.locationID
     }
+    /// Called only after an explicit on-device choice. Keep identity and source
+    /// bytes stable so a lost acknowledgement can be retried without duplicates.
+    public func assigningLegacy(to account: WorkplaceAccount, locationID: UUID) throws -> SavedFloorPlan {
+        try validate(); try account.validate()
+        guard ownerID == nil, self.locationID == nil,
+              account.locations.contains(where: { $0.id == locationID }) else { throw PlanError.invalidArchive }
+        return try SavedFloorPlan(id:id,createdAt:createdAt,name:name,localProject:localProject,
+                                  plan:plan,capturedRoomData:capturedRoomData,ownerID:account.accountID,
+                                  locationID:locationID,objects:objects)
+    }
 }

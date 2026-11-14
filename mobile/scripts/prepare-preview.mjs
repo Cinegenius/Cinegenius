@@ -32,6 +32,9 @@ for (const [key, value] of Object.entries(fallback)) html = html.replaceAll(`{{$
 html = html.replaceAll('{{url}}', escapeHtml(new URL(config.server.appStartPath, config.server.url).href));
 await writeFile(new URL('offline.html', output), html);
 await writeFile(new URL('index.html', output), html);
+// Capacitor verifies the local start file even when the entry URL is remote.
+// Keep a localized fallback at the configured sign-in path to avoid exit(1).
+if (config.server.appStartPath) await writeFile(new URL(config.server.appStartPath, output), html);
 for (const name of ['offline.css', 'offline.js']) {
   await copyFile(new URL(`src/${name}`, root), new URL(name, output));
 }

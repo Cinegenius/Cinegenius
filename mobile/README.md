@@ -145,5 +145,8 @@ editor adds two-finger pan/pinch, an object/utility catalog, dimensions, notes,
 undo/redo and PDF annotations. The original scan remains unchanged.
 The earlier account-independent archive description applies to v1 only; those
 files remain untouched. See `../docs/native-workplace-room-scanner.md` for current
-behavior and `../docs/test-reports/native-floorplan-editor-2026-11-14.md` for checks
-and the outstanding Xcode/device update. Never uninstall the current app to sync.
+behavior and the current Mac build/device evidence. The earlier
+`../docs/test-reports/native-floorplan-editor-2026-11-14.md` records server checks
+before that update. A normal iPhone restart and reuse of an existing session are
+verified; fresh sign-in, full-screen web layout and editor gestures still need
+separate device checks. Never uninstall the current app to sync.

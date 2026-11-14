@@ -8217,7 +8217,7 @@
     "chooseOwnLocation": "Elige una de tus localizaciones existentes. Cada habitación pertenece a esa localización.",
     "noOwnLocations": "Aún no has creado una localización propia. Créala primero en tu cuenta de CineGenius.",
     "locationsLimited": "El servicio devuelve un máximo de 200 anuncios. Pueden faltar localizaciones antiguas en esta versión de prueba.",
-    "legacyPlansPreserved": "Los planos anteriores sin cuenta asociada siguen protegidos en este dispositivo. No se asignan automáticamente a una cuenta.",
+    "legacyPlansPreserved": "Puedes importar planos anteriores desde una de tus propias localizaciones. Se conservan los originales.",
     "gestureHelp": "Dos dedos: mover y ampliar el plano. Un dedo: seleccionar y mover un objeto.",
     "editPlan": "Editar plano",
     "addObject": "Añadir elemento",
@@ -8267,7 +8267,13 @@
     "objectDimensions": "{width} × {depth} m",
     "signInAgain": "Volver a iniciar sesión",
     "saveShort": "Guardar",
-    "accountLoading": "Comprobando la cuenta…"
+    "accountLoading": "Comprobando la cuenta…",
+    "legacyImport": "Importar planos anteriores",
+    "legacyImportHelp": "Elige un plano anterior para esta localización. Solo se guardará una copia para la cuenta actual después de que lo confirmes. Se conserva el original.",
+    "legacyImportConfirm": "Importar copia",
+    "legacyImportBody": "¿Copiar «{plan}» a la localización «{location}» para la cuenta de CineGenius que tiene la sesión iniciada? El original no se modifica.",
+    "legacyImportEmpty": "No se encontraron planos anteriores sin asignar.",
+    "legacyImportConflict": "Este plano ya se importó para esta cuenta o se ha modificado desde entonces. Se conserva la copia existente."
   },
   "companyTeam": {
     "leadership": "Fundación y dirección"

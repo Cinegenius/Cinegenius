@@ -8217,7 +8217,7 @@
     "chooseOwnLocation": "Wähle eine deiner angelegten Locations. Jeder Raum gehört zu dieser Location.",
     "noOwnLocations": "Du hast noch keine eigene Location angelegt. Lege sie zuerst in deinem CineGenius-Bereich an.",
     "locationsLimited": "Die Schnittstelle liefert höchstens 200 Inserate. Ältere Locations können in dieser Vorschau fehlen.",
-    "legacyPlansPreserved": "Frühere Pläne ohne Kontozuordnung bleiben geschützt auf diesem Gerät erhalten. Sie werden keinem Konto automatisch zugeteilt.",
+    "legacyPlansPreserved": "Bisherige Grundrisse kannst du innerhalb einer eigenen Location übernehmen. Die Originale bleiben erhalten.",
     "gestureHelp": "Zwei Finger: Plan bewegen und zoomen. Ein Finger: Objekt auswählen und verschieben.",
     "editPlan": "Grundriss bearbeiten",
     "addObject": "Baustein hinzufügen",
@@ -8267,7 +8267,13 @@
     "objectDimensions": "{width} × {depth} m",
     "signInAgain": "Erneut anmelden",
     "saveShort": "Speichern",
-    "accountLoading": "Konto wird geprüft …"
+    "accountLoading": "Konto wird geprüft …",
+    "legacyImport": "Bisherige Grundrisse übernehmen",
+    "legacyImportHelp": "Wähle einen bisherigen Grundriss für diese Location aus. Erst nach deiner Bestätigung wird eine Kopie für das aktuell angemeldete Konto gespeichert. Das Original bleibt erhalten.",
+    "legacyImportConfirm": "Kopie übernehmen",
+    "legacyImportBody": "„{plan}“ für die Location „{location}“ und das aktuell angemeldete CineGenius-Konto kopieren? Das Original bleibt unverändert.",
+    "legacyImportEmpty": "Keine bisherigen unzugeordneten Grundrisse gefunden.",
+    "legacyImportConflict": "Dieser Grundriss wurde für dieses Konto bereits übernommen oder inzwischen verändert. Die vorhandene Kopie bleibt erhalten."
   },
   "companyTeam": {
     "leadership": "Gründung & Leitung"

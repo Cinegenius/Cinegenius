@@ -55,6 +55,68 @@ final class PlanEditorTests: XCTestCase {
         XCTAssertNil(legacy.ownerID); XCTAssertNil(legacy.locationID); XCTAssertEqual(legacy.objects,[])
         XCTAssertEqual(legacy.plan,original.plan); XCTAssertEqual(legacy.localProject,"Old label")
     }
+    func testExplicitLegacyCopyPreservesOriginalBytesAndCanRetry() async throws {
+        let root = try directory(), legacyRoot = root.appendingPathComponent("legacy"), destination = root.appendingPathComponent("account")
+        try PrivatePlanFiles.directory(legacyRoot)
+        let sensor = try FloorPlan(source:.sensor,segments:FloorPlan.example.segments)
+        let original = try SavedFloorPlan(createdAt:Date(timeIntervalSince1970:1000),name:"Original",localProject:"Old project",plan:sensor,capturedRoomData:Data([0,1,2,255]))
+        var json = try XCTUnwrap(JSONSerialization.jsonObject(with:JSONEncoder().encode(original)) as? [String:Any])
+        json["schemaVersion"] = 1; json.removeValue(forKey:"revision"); json.removeValue(forKey:"objects")
+        let bytes = try JSONSerialization.data(withJSONObject:json,options:.sortedKeys)
+        let file = legacyRoot.appendingPathComponent(original.id.uuidString+".json")
+        try PrivatePlanFiles.write(bytes,to:file)
+        let legacy = PlanArchive(root:legacyRoot), archive = PlanArchive(root:destination)
+        let source = try await legacy.load(id:original.id)
+        let location = WorkplaceLocation(id:UUID(),title:"Owned",city:"")
+        let account = WorkplaceAccount(accountID:"user_One",locations:[location],limited:false)
+        let copy = try source.assigningLegacy(to:account,locationID:location.id)
+        XCTAssertEqual(copy.id,source.id); XCTAssertEqual(copy.createdAt,source.createdAt)
+        XCTAssertEqual(copy.plan,source.plan); XCTAssertEqual(copy.capturedRoomData,source.capturedRoomData)
+        XCTAssertEqual(copy.name,source.name); XCTAssertEqual(copy.localProject,source.localProject)
+        XCTAssertTrue(account.permits(copy)); XCTAssertEqual(copy.schemaVersion,2)
+        try await archive.save(copy); try await archive.save(copy)
+        let saved = try await archive.list(); XCTAssertEqual(saved,[copy])
+        XCTAssertEqual(try Data(contentsOf:file),bytes)
+        let unchanged = try await legacy.load(id:original.id); XCTAssertNil(unchanged.ownerID); XCTAssertEqual(unchanged.schemaVersion,1)
+    }
+    func testLegacyCopyRequiresUnassignedSourceAndCurrentlyOwnedLocation() throws {
+        let source = try SavedFloorPlan(name:"Old",localProject:"",plan:.example)
+        let location = WorkplaceLocation(id:UUID(),title:"Owned",city:"")
+        let account = WorkplaceAccount(accountID:"user_One",locations:[location],limited:false)
+        XCTAssertThrowsError(try source.assigningLegacy(to:account,locationID:UUID()))
+        XCTAssertThrowsError(try source.assigningLegacy(to:WorkplaceAccount(accountID:"user_One",locations:[],limited:false),locationID:location.id))
+        XCTAssertThrowsError(try source.assigningLegacy(to:WorkplaceAccount(accountID:"../bad",locations:[location],limited:false),locationID:location.id))
+        let claimed = try source.assigningLegacy(to:account,locationID:location.id)
+        XCTAssertThrowsError(try claimed.assigningLegacy(to:account,locationID:location.id))
+        XCTAssertThrowsError(try claimed.assigningLegacy(to:WorkplaceAccount(accountID:"user_Two",locations:[location],limited:false),locationID:location.id))
+    }
+    func testLegacyCopyCannotOverwriteAnEditedOrDifferentlyAssignedCopy() async throws {
+        let root = try directory(), archive = PlanArchive(root:root)
+        let source = try SavedFloorPlan(name:"Old",localProject:"",plan:.example)
+        let first = WorkplaceLocation(id:UUID(),title:"First",city:""), second = WorkplaceLocation(id:UUID(),title:"Second",city:"")
+        let account = WorkplaceAccount(accountID:"user_One",locations:[first,second],limited:false)
+        let copy = try source.assigningLegacy(to:account,locationID:first.id)
+        try await archive.save(copy)
+        let otherLocation = try source.assigningLegacy(to:account,locationID:second.id)
+        do { try await archive.save(otherLocation); XCTFail("must preserve prior assignment") } catch { XCTAssertEqual(error as? PlanError,.conflict) }
+        let edit = try SavedFloorPlan(id:copy.id,createdAt:copy.createdAt,name:"Edited",localProject:copy.localProject,plan:copy.plan,ownerID:copy.ownerID,locationID:copy.locationID,revision:1,objects:[PlanObject(kind:.outlet,center:PlanPoint(1,1))])
+        try await archive.update(edit,replacing:copy)
+        do { try await archive.save(copy); XCTFail("must preserve later edits") } catch { XCTAssertEqual(error as? PlanError,.conflict) }
+        let remaining = try await archive.list(); XCTAssertEqual(remaining,[edit])
+    }
+    func testFailedLegacyCopyLeavesSourceAndDestinationIntact() async throws {
+        let root = try directory(), legacy = PlanArchive(root:root.appendingPathComponent("legacy")), target = root.appendingPathComponent("account")
+        let source = try SavedFloorPlan(name:"Old",localProject:"",plan:.example)
+        try await legacy.save(source)
+        let originalBytes = try Data(contentsOf:root.appendingPathComponent("legacy").appendingPathComponent(source.id.uuidString+".json"))
+        let location = WorkplaceLocation(id:UUID(),title:"Owned",city:"")
+        let copy = try source.assigningLegacy(to:WorkplaceAccount(accountID:"user_One",locations:[location],limited:false),locationID:location.id)
+        let failed = PlanArchive(root:target,writer:{ _,_ in throw CocoaError(.fileWriteOutOfSpace) })
+        do { try await failed.save(copy); XCTFail("must fail") } catch {}
+        let remaining = try await PlanArchive(root:target).list(); XCTAssertTrue(remaining.isEmpty)
+        let preserved = try await legacy.load(id:source.id); XCTAssertEqual(preserved,source)
+        XCTAssertEqual(try Data(contentsOf:root.appendingPathComponent("legacy").appendingPathComponent(source.id.uuidString+".json")),originalBytes)
+    }
     func testOtherAccountOrLocationCannotSelectAPlan() throws {
         let room = try record()
         let location = WorkplaceLocation(id:room.locationID!,title:"Owned",city:"")

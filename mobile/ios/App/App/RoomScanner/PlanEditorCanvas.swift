@@ -49,13 +49,13 @@ final class PlanEditorUIView: UIView, UIGestureRecognizerDelegate {
         isAccessibilityElement = true; accessibilityTraits = .image
     }
     required init?(coder: NSCoder) { nil }
-    private var transform: PlanTransform { PlanTransform(plan:plan,width:bounds.width,height:bounds.height,viewport:viewport) }
+    private var planTransform: PlanTransform { PlanTransform(plan:plan,width:bounds.width,height:bounds.height,viewport:viewport) }
     private func p(_ value: CGPoint) -> PlanPoint { PlanPoint(value.x,value.y) }
     private func cg(_ value: PlanPoint) -> CGPoint { CGPoint(x:value.x,y:value.z) }
     private var displayObjects: [PlanObject] { objects.map { $0.id == dragging?.id ? dragging! : $0 } }
     override func draw(_ rect: CGRect) {
         guard let context = UIGraphicsGetCurrentContext(), let strings else { return }
-        let t = transform
+        let t = planTransform
         let wallNumbers = Dictionary(uniqueKeysWithValues:plan.walls.enumerated().map { ($0.element.id,$0.offset+1) })
         for segment in plan.segments {
             let a = cg(t.screen(segment.start)), b = cg(t.screen(segment.end))
@@ -72,7 +72,7 @@ final class PlanEditorUIView: UIView, UIGestureRecognizerDelegate {
         }
     }
     private func hit(_ point: CGPoint) -> PlanObject? {
-        let t = transform
+        let t = planTransform
         // Reverse paint order. Touch targets remain at least 44pt even for sockets.
         return objects.reversed().first { object in
             let world = t.world(p(point)), r = -object.rotation * .pi/180
@@ -81,7 +81,7 @@ final class PlanEditorUIView: UIView, UIGestureRecognizerDelegate {
                 && abs(x*sin(r)+z*cos(r)) <= max(object.depth/2,22/t.scale)
         }
     }
-    func gestureRecognizerShouldBegin(_ recognizer: UIGestureRecognizer) -> Bool {
+    override func gestureRecognizerShouldBegin(_ recognizer: UIGestureRecognizer) -> Bool {
         if recognizer === objectPan { return recognizer.numberOfTouches == 1 && hit(recognizer.location(in:self)) != nil }
         return true
     }
@@ -97,16 +97,16 @@ final class PlanEditorUIView: UIView, UIGestureRecognizerDelegate {
         onViewport?(viewport); setNeedsDisplay()
     }
     @objc private func zoomView(_ recognizer: UIPinchGestureRecognizer) {
-        let anchor = p(recognizer.location(in:self)), world = transform.world(anchor)
+        let anchor = p(recognizer.location(in:self)), world = planTransform.world(anchor)
         viewport.zoom = min(8,max(0.3,viewport.zoom * recognizer.scale)); recognizer.scale = 1
-        let shifted = transform.screen(world)
+        let shifted = planTransform.screen(world)
         viewport.offset.x += anchor.x-shifted.x; viewport.offset.z += anchor.z-shifted.z
         onViewport?(viewport); setNeedsDisplay()
     }
     @objc private func moveObject(_ recognizer: UIPanGestureRecognizer) {
         switch recognizer.state {
         case .began:
-            dragging = hit(recognizer.location(in:self)); dragOrigin = recognizer.location(in:self); dragTransform = transform
+            dragging = hit(recognizer.location(in:self)); dragOrigin = recognizer.location(in:self); dragTransform = planTransform
             selection = dragging?.id; onSelection?(selection)
         case .changed:
             guard recognizer.numberOfTouches == 1 else {

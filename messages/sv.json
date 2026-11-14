@@ -8217,7 +8217,7 @@
     "chooseOwnLocation": "Välj en av dina befintliga platser. Varje rum tillhör den platsen.",
     "noOwnLocations": "Du har inte skapat någon egen plats än. Skapa en i ditt CineGenius-konto först.",
     "locationsLimited": "Tjänsten returnerar högst 200 annonser. Äldre platser kan saknas i denna förhandsversion.",
-    "legacyPlansPreserved": "Tidigare planer utan kontokoppling finns kvar skyddade på enheten. De tilldelas inte automatiskt något konto.",
+    "legacyPlansPreserved": "Du kan importera tidigare planritningar från en av dina egna platser. Originalen behålls.",
     "gestureHelp": "Två fingrar: flytta och zooma planen. Ett finger: välj och flytta ett objekt.",
     "editPlan": "Redigera planritning",
     "addObject": "Lägg till objekt",
@@ -8267,7 +8267,13 @@
     "objectDimensions": "{width} × {depth} m",
     "signInAgain": "Logga in igen",
     "saveShort": "Spara",
-    "accountLoading": "Kontrollerar konto…"
+    "accountLoading": "Kontrollerar konto…",
+    "legacyImport": "Importera tidigare planritningar",
+    "legacyImportHelp": "Välj en tidigare planritning för den här platsen. En kopia sparas för det inloggade kontot först när du bekräftar. Originalet behålls.",
+    "legacyImportConfirm": "Importera kopia",
+    "legacyImportBody": "Kopiera ”{plan}” till platsen ”{location}” för det CineGenius-konto som är inloggat? Originalet förblir oförändrat.",
+    "legacyImportEmpty": "Inga tidigare planritningar utan koppling hittades.",
+    "legacyImportConflict": "Den här planritningen har redan importerats för kontot eller har ändrats sedan dess. Den befintliga kopian behålls."
   },
   "companyTeam": {
     "leadership": "Grundare och ledning"

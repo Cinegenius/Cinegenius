@@ -31,8 +31,11 @@ import CryptoKit
     @Published var selectedObjectID: UUID?
     @Published var accountReady = true
     @Published var locationsLimited = false
+    @Published var legacyPlans: [SavedFloorPlan] = []
+    @Published var legacyError: String?
     let accountID: String
     let legacyArchiveExists: Bool
+    private let legacyArchive: PlanArchive
     private let access: () async throws -> WorkplaceAccount
     private var baseline: SavedFloorPlan?
     let strings: ScannerStrings
@@ -63,6 +66,7 @@ import CryptoKit
         let appSupport = FileManager.default.urls(for:.applicationSupportDirectory,in:.userDomainMask)[0]
         let legacy = appSupport.appendingPathComponent("CineGeniusPrivateFloorPlans",isDirectory:true)
         legacyArchiveExists = FileManager.default.fileExists(atPath: legacy.path)
+        legacyArchive = PlanArchive(root:legacy)
         let accountKey = SHA256.hash(data: Data(account.accountID.utf8)).map { String(format: "%02x", $0) }.joined()
         archive = PlanArchive(root: appSupport.appendingPathComponent("CineGeniusAccountFloorPlans",isDirectory:true).appendingPathComponent(accountKey,isDirectory:true))
         PlanExports.removeStaleExports()
@@ -76,7 +80,7 @@ import CryptoKit
         covered = true
         needsUnlock = unlocked || draft != nil
         accountReady = false; locations = []
-        unlocked = false; plans = []
+        unlocked = false; plans = []; legacyPlans = []; legacyError = nil
         // Preserve the room and editor state behind the account/device lock.
         authID = nil; authContext?.invalidate(); authContext = nil
         if captureState != .idle { stopCapture(); notice = "interruptedBody" }
@@ -105,6 +109,37 @@ import CryptoKit
         guard await unlock() else { return }
         do { let loaded = try await archive.list(); guard unlocked else { return }; plans = loaded.filter { $0.ownerID == accountID && $0.locationID == selectedLocation?.id } }
         catch { notice = "loadFailed" }
+    }
+    func loadLegacyPlans() async -> Bool {
+        guard !busy, !hasWork, let location = selectedLocation else { return false }
+        busy = true; defer { busy = false }
+        legacyPlans = []; legacyError = nil
+        guard await unlock() else { return false }
+        do {
+            let loaded = try await legacyArchive.list()
+            guard unlocked, accountReady, selectedLocation?.id == location.id else { return false }
+            legacyPlans = loaded.filter { $0.ownerID == nil && $0.locationID == nil }
+            return true
+        } catch { notice = "loadFailed"; return false }
+    }
+    func importLegacyPlan(_ source: SavedFloorPlan) async -> Bool {
+        guard !busy, !hasWork, let location = selectedLocation else { return false }
+        busy = true; defer { busy = false }
+        legacyError = nil
+        guard await unlock() else { return false }
+        do {
+            let original = try await legacyArchive.load(id:source.id)
+            guard original == source else { throw PlanError.conflict }
+            guard await refreshAccount(), unlocked, selectedLocation?.id == location.id else { return false }
+            let account = WorkplaceAccount(accountID:accountID,locations:locations,limited:locationsLimited)
+            let copy = try original.assigningLegacy(to:account,locationID:location.id)
+            // Save a separate account-bound copy. Never write to/delete the old archive.
+            try await archive.save(copy)
+            guard unlocked, accountReady, selectedLocation?.id == location.id else { return false }
+            plans.removeAll { $0.id == copy.id }; plans.insert(copy,at:0)
+            legacyPlans = []; notice = "saveSuccess"
+            return true
+        } catch { legacyError = error as? PlanError == .conflict ? "legacyImportConflict" : "saveFailed"; return false }
     }
     func example() {
         guard accountReady, selectedLocation != nil, !busy else { return }
@@ -230,7 +265,7 @@ import CryptoKit
             locations = current.locations; locationsLimited = current.limited; accountReady = true
             return true
         } catch {
-            accountReady = false; needsUnlock = true; unlocked = false; plans = []; locations = []
+            accountReady = false; needsUnlock = true; unlocked = false; plans = []; locations = []; legacyPlans = []; legacyError = nil
             stopCapture(); notice = (error as? WorkplaceAccessError)?.rawValue ?? "accountUnavailable"
             return false
         }

@@ -78,6 +78,7 @@ struct FloorPlansScreen: View {
     @State private var exportModel = false
     @State private var deletion: SavedFloorPlan?
     @State private var manual = false
+    @State private var legacyImport = false
     @State private var viewport = PlanViewport()
     var body: some View {
         ScrollView {
@@ -109,6 +110,9 @@ struct FloorPlansScreen: View {
         } message: { _ in Text(strings.text("deleteBody")) }
         .fullScreenCover(isPresented:$model.editorPresented) { PlanEditorView(model:model,strings:strings) }
         .sheet(isPresented:$manual) { ManualRoomForm(model:model,strings:strings) }
+        .sheet(isPresented:$legacyImport,onDismiss:{ model.legacyPlans = []; model.legacyError = nil }) {
+            LegacyPlanImportView(model:model,strings:strings)
+        }
         .toolbar { ToolbarItemGroup(placement:.keyboard) { Spacer(); Button(strings.text("done")) { UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder),to:nil,from:nil,for:nil) } } }
     }
     private var landing: some View {
@@ -122,6 +126,9 @@ struct FloorPlansScreen: View {
             action("showSample") { model.example() }
             Divider()
             Text(strings.text("savedPlans")).font(.title2.bold())
+            if model.legacyArchiveExists {
+                action("legacyImport") { Task { if await model.loadLegacyPlans() { legacyImport = true } } }
+            }
             if !model.unlocked {
                 Text(strings.text("locked")).foregroundColor(.secondary)
                 action("unlock") { Task { await model.loadLibrary() } }
@@ -180,6 +187,44 @@ struct FloorPlansScreen: View {
     }
     private func action(_ key: String, run: @escaping () -> Void) -> some View {
         Button(action:run) { Text(strings.text(key)).frame(maxWidth:.infinity,minHeight:44) }.buttonStyle(.bordered).tint(.lime).disabled(model.busy)
+    }
+}
+
+@available(iOS 16.0, *)
+struct LegacyPlanImportView: View {
+    @ObservedObject var model: ScannerModel
+    @ObservedObject var strings: ScannerStrings
+    @Environment(\.dismiss) private var dismiss
+    @State private var selection: SavedFloorPlan?
+    var body: some View {
+        NavigationStack {
+            List {
+                Text(strings.text("legacyImportHelp")).foregroundColor(.secondary)
+                if model.legacyPlans.isEmpty { Text(strings.text("legacyImportEmpty")) }
+                ForEach(model.legacyPlans) { plan in
+                    Button { selection = plan } label: {
+                        VStack(alignment:.leading,spacing:6) {
+                            Text(plan.name).font(.headline)
+                            if plan.plan.source == .example { Text(strings.text("sampleBadge")).font(.caption) }
+                            Text(plan.createdAt,style:.date).font(.caption).foregroundColor(.secondary)
+                        }.frame(maxWidth:.infinity,minHeight:44,alignment:.leading)
+                    }.disabled(model.busy || !model.unlocked || !model.accountReady)
+                }
+            }.navigationTitle(strings.text("legacyImport"))
+            .toolbar { ToolbarItem(placement:.navigationBarLeading) {
+                Button(strings.text("cancel")) { dismiss() }.frame(minHeight:44).disabled(model.busy)
+            } }
+            .confirmationDialog(strings.text("legacyImportConfirm"),isPresented:Binding(get:{selection != nil},set:{if !$0 {selection = nil}}),titleVisibility:.visible,presenting:selection) { plan in
+                Button(strings.text("legacyImportConfirm")) { Task { if await model.importLegacyPlan(plan) { dismiss() }; selection = nil } }
+                Button(strings.text("cancel"),role:.cancel) { selection = nil }
+            } message: { plan in
+                Text(strings.text("legacyImportBody",["plan":plan.name,"location":model.selectedLocation?.title ?? ""]))
+            }
+            .alert(strings.text("errorTitle"),isPresented:Binding(get:{model.legacyError != nil},set:{if !$0 {model.legacyError = nil}})) {
+                Button(strings.text("done"),role:.cancel) { model.legacyError = nil }
+            } message: { Text(strings.text(model.legacyError ?? "saveFailed")) }
+            .overlay { WorkplaceLockCover(model:model,strings:strings) }
+        }.interactiveDismissDisabled().tint(.lime).preferredColorScheme(.dark)
     }
 }
 

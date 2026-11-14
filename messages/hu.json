@@ -8217,7 +8217,7 @@
     "chooseOwnLocation": "Válassz egyet a létrehozott helyszíneid közül. Minden szoba ehhez a helyszínhez tartozik.",
     "noOwnLocations": "Még nem hoztál létre saját helyszínt. Először hozd létre a CineGenius-fiókodban.",
     "locationsLimited": "A szolgáltatás legfeljebb 200 hirdetést ad vissza. A régebbi helyszínek hiányozhatnak ebből az előnézetből.",
-    "legacyPlansPreserved": "A korábbi, fiókhoz nem rendelt tervek védetten megmaradnak az eszközön. Nem rendeljük őket automatikusan egy fiókhoz.",
+    "legacyPlansPreserved": "Korábbi alaprajzaidat a saját helyszíneid egyikében veheted át. Az eredetik megmaradnak.",
     "gestureHelp": "Két ujjal: a terv mozgatása és nagyítása. Egy ujjal: objektum kijelölése és mozgatása.",
     "editPlan": "Alaprajz szerkesztése",
     "addObject": "Elem hozzáadása",
@@ -8267,7 +8267,13 @@
     "objectDimensions": "{width} × {depth} m",
     "signInAgain": "Újbóli bejelentkezés",
     "saveShort": "Mentés",
-    "accountLoading": "Fiók ellenőrzése…"
+    "accountLoading": "Fiók ellenőrzése…",
+    "legacyImport": "Korábbi alaprajzok átvétele",
+    "legacyImportHelp": "Válassz egy korábbi alaprajzot ehhez a helyszínhez. Csak a megerősítésed után készül másolat a jelenleg bejelentkezett fiókhoz. Az eredeti megmarad.",
+    "legacyImportConfirm": "Másolat átvétele",
+    "legacyImportBody": "Átmásolod a(z) „{plan}” alaprajzot a(z) „{location}” helyszínhez, a jelenleg bejelentkezett CineGenius-fiókba? Az eredeti változatlan marad.",
+    "legacyImportEmpty": "Nem található korábbi, még hozzá nem rendelt alaprajz.",
+    "legacyImportConflict": "Ezt az alaprajzot már átvetted ehhez a fiókhoz, vagy időközben megváltozott. A meglévő másolat megmarad."
   },
   "companyTeam": {
     "leadership": "Alapítók és vezetőség"

@@ -46,6 +46,7 @@ public actor PlanArchive {
         guard urls.count <= 10_000 else { throw PlanError.invalidArchive }
         return try urls.map(read).sorted { $0.createdAt > $1.createdAt }
     }
+    public func load(id: UUID) throws -> SavedFloorPlan { try read(file(id)) }
     public func save(_ plan: SavedFloorPlan) throws {
         try plan.validate(); try PrivatePlanFiles.directory(root)
         let url = file(plan.id)

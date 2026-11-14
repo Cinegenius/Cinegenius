@@ -8217,7 +8217,7 @@
     "chooseOwnLocation": "Choose one of your existing locations. Each room belongs to that location.",
     "noOwnLocations": "You have not created a location yet. Create one in your CineGenius account first.",
     "locationsLimited": "The service returns at most 200 listings. Older locations may be missing in this preview.",
-    "legacyPlansPreserved": "Earlier plans without an account association remain protected on this device. They are not automatically assigned to an account.",
+    "legacyPlansPreserved": "You can import earlier floor plans from within one of your own locations. The originals are kept.",
     "gestureHelp": "Two fingers: pan and zoom. One finger: select and move an object.",
     "editPlan": "Edit floor plan",
     "addObject": "Add object",
@@ -8267,7 +8267,13 @@
     "objectDimensions": "{width} × {depth} m",
     "signInAgain": "Sign in again",
     "saveShort": "Save",
-    "accountLoading": "Checking account…"
+    "accountLoading": "Checking account…",
+    "legacyImport": "Import earlier floor plans",
+    "legacyImportHelp": "Choose an earlier floor plan for this location. A copy is saved for the currently signed-in account only after you confirm. The original is kept.",
+    "legacyImportConfirm": "Import copy",
+    "legacyImportBody": "Copy “{plan}” to the location “{location}” for the currently signed-in CineGenius account? The original remains unchanged.",
+    "legacyImportEmpty": "No earlier unassigned floor plans found.",
+    "legacyImportConflict": "This floor plan was already imported for this account or has since changed. The existing copy is kept."
   },
   "companyTeam": {
     "leadership": "Founders & leadership"
