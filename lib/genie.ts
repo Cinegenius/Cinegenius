@@ -23,6 +23,7 @@ export const GENIE_LINKS = [
   { id: "projects", href: "/projects", labelDe: "Projekte", labelEn: "Projects" },
   { id: "messages", href: "/messages", labelDe: "Nachrichten", labelEn: "Messages" },
   { id: "help", href: "/help", labelDe: "Hilfe & Kontakt", labelEn: "Help & contact" },
+  { id: "pricing", href: "/pricing#support-mediation", labelDe: "Preise & Konditionen", labelEn: "Pricing & terms" },
   { id: "privacy", href: "/datenschutz", labelDe: "Datenschutz", labelEn: "Privacy" },
 ] as const;
 

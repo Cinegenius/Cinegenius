@@ -7439,6 +7439,7 @@
     }
   },
   "SupportMediation": {
+    "genieSummary": "CineGenius ist derzeit kostenlos nutzbar: Registrierung, Profile, Inserate, Suche und direkte Kontaktaufnahme sind gebührenfrei. Nur wenn du eine Vermietung vollständig über unser Support-Team vermitteln und abwickeln lässt, erhält CineGenius nach vorheriger ausdrücklicher Vereinbarung 5 % des vereinbarten Gesamtmietpreises. Dieser Anteil ist bereits im Gesamtmietpreis enthalten. Eine normale Supportanfrage löst keine Gebühr aus.\n\nAls junges Start-up entwickeln wir die Plattform gemeinsam mit der Community weiter. Einzelne optionale Erweiterungen können künftig kostenpflichtig werden; konkrete Preise oder Starttermine stehen noch nicht fest.\n\nFür eine offene Community bleiben Profile dauerhaft kostenlos.",
     "heading": "Vermittlung durch CineGenius Support",
     "startup": "CineGenius befindet sich derzeit in der Aufbauphase. Wir entwickeln unsere Plattform und Leistungen schrittweise weiter und freuen uns über dein Feedback.",
     "free": "Registrierung, Profile, Inserate, Suche und direkte Kontaktaufnahme über die Plattform sind derzeit kostenlos.",
@@ -7529,6 +7530,7 @@
       "projects": "Projekte",
       "messages": "Nachrichten",
       "help": "Hilfe & Kontakt",
+      "pricing": "Preise & Konditionen",
       "privacy": "Datenschutz"
     },
     "errorSearch": "Ort oder Beruf sind nicht eindeutig. Bitte nenne den Beruf, die Stadt und gegebenenfalls das Land genauer."

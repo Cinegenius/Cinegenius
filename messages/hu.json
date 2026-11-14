@@ -7439,6 +7439,7 @@
     }
   },
   "SupportMediation": {
+    "genieSummary": "A CineGenius jelenleg ingyenesen használható: a regisztráció, a profilok, a hirdetések, a keresés és a közvetlen kapcsolatfelvétel után nincs platformdíj. Csak akkor illeti meg a CineGeniust a megállapodás szerinti teljes bérleti díj 5%-a, ha a bérlés teljes közvetítését és lebonyolítását az ügyfélszolgálati csapatunk végzi, előzetes, kifejezett megállapodás alapján. Ezt a részesedést a teljes bérleti díj már tartalmazza. Egy szokásos ügyfélszolgálati megkeresés nem jár díjjal.\n\nFiatal induló vállalkozásként a közösséggel együtt fejlesztjük a platformot. Egyes választható bővítmények később fizetőssé válhatnak; konkrét árak és indulási időpontok még nincsenek meghatározva.\n\nA nyitott közösségért a profilok mindig ingyenesek maradnak.",
     "heading": "Közvetítés a CineGenius Support segítségével",
     "startup": "A CineGenius jelenleg az indulási szakaszban van. Platformunkat és szolgáltatásainkat lépésről lépésre fejlesztjük, és örömmel fogadjuk visszajelzéseidet.",
     "free": "A regisztráció, a profilok, a hirdetések, a keresés és a platformon keresztüli közvetlen kapcsolatfelvétel jelenleg ingyenes.",
@@ -7529,6 +7530,7 @@
       "projects": "Projektek",
       "messages": "Üzenetek",
       "help": "Súgó és kapcsolat",
+      "pricing": "Árak és feltételek",
       "privacy": "Adatvédelem"
     },
     "errorSearch": "A hely vagy a foglalkozás nem egyértelmű. Add meg pontosabban a foglalkozást, a várost és szükség esetén az országot."

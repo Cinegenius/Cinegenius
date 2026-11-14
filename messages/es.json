@@ -7439,6 +7439,7 @@
     }
   },
   "SupportMediation": {
+    "genieSummary": "Actualmente puedes usar CineGenius gratis: el registro, los perfiles, los anuncios, la búsqueda y el contacto directo no tienen comisión de plataforma. Solo si nuestro equipo de soporte gestiona íntegramente la intermediación y la tramitación de un alquiler, CineGenius recibe el 5 % del precio total acordado, siempre con un acuerdo expreso previo. Esta parte ya está incluida en el precio total del alquiler. Una consulta habitual al soporte no genera ningún cargo.\n\nComo empresa emergente, desarrollamos la plataforma junto con nuestra comunidad. Algunas ampliaciones opcionales podrían ser de pago en el futuro; aún no hay precios ni fechas de lanzamiento concretos.\n\nPara mantener una comunidad abierta, los perfiles seguirán siendo gratuitos siempre.",
     "heading": "Intermediación de CineGenius Support",
     "startup": "CineGenius se encuentra actualmente en su fase inicial. Desarrollamos nuestra plataforma y nuestros servicios paso a paso y agradecemos tus comentarios.",
     "free": "El registro, los perfiles, los anuncios, las búsquedas y el contacto directo a través de la plataforma son actualmente gratuitos.",
@@ -7529,6 +7530,7 @@
       "projects": "Proyectos",
       "messages": "Mensajes",
       "help": "Ayuda y contacto",
+      "pricing": "Precios y condiciones",
       "privacy": "Privacidad"
     },
     "errorSearch": "El lugar o la profesión no están claros. Indica la profesión, la ciudad y, si hace falta, el país."

@@ -2,6 +2,25 @@
 
 Abstimmung mit WEB CODEX, 14. November 2026. Nach der vorgezogenen Kontolimit-Veröffentlichung `83a3dc1` ist der geprüfte Gesamtstand `ce37ab6548fbeb3e021db52424da0977c682abab` einschließlich Mehrfachsuche und persönlichem Modellprofil auf beiden CineGenius-Domains live, Vercel `dpl_8z1GdsEiHEwXUvkt2etix1KqqWjH` READY. Die erfolgreiche persönliche Modellnutzung und tatsächliche Latenz sind dadurch nicht gemessen; dieser Live-Test steht mit Markus' Konto aus. Diese Notiz ändert weder Serverkonfiguration noch native Berechtigungen. Die bestehende App-Sprachausgabe wurde im Quellcode geprüft; ein aktueller Hörtest auf dem iPhone liegt nicht vor.
 
+## Übernommene Kosteninformation, 14. November 2026
+
+Der geprüfte WEB-Stand `fb7602af6d2379166a901595f3f7f962cbcaec72` ist in den
+App-Quellstand übernommen: aktuelle Selbstbedienung kostenlos, Profile dauerhaft
+kostenlos, 5 % ausschließlich bei vorher vereinbarter, erfolgreicher vollständiger
+Mietvermittlung durch Support und bereits im vereinbarten Gesamtmietpreis enthalten.
+Eine normale Supportanfrage löst keine Gebühr aus. Optionale spätere Erweiterungen
+haben noch keinen festgelegten Preis oder Termin. Die bestätigten Angaben stammen
+aus `SupportMediation.genieSummary` und den bestehenden Bedingungen in allen neun
+Sprachen; sie gelangen nicht in die Prompts für Beschreibungsentwürfe.
+
+Genie kann den vorhandenen Abschnitt `/pricing#support-mediation` verlinken.
+Die exakte Katalogfreigabe und kontogebundene Wiederherstellung verwenden den
+bestehenden gemeinsamen Linkvertrag. Keine native Kopie von Preisen, Kontingenten
+oder Berechtigungen. Der WEB-Beleg meldet diesen Stand ausdrücklich noch nicht
+als veröffentlicht; letzter bestätigter Live-Stand bleibt `60f17e7`.
+Eine echte Modellantwort und ein iPhone-/Android-Gerätetest sind damit nicht belegt.
+Prüf- und Übergabebelege: `/srv/cinegenius/handoffs/20261114-app-genie-pricing/`.
+
 ## Gemeinsame Kontoregel
 
 - Normale Konten: 30 KI-Aufrufe je UTC-Tag. Keine gemeinsame tägliche Obergrenze für die gesamte Website.
