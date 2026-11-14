@@ -1,16 +1,14 @@
-import { legacyPlaceQuery } from "@/lib/places/core";
-import { collectFacetRows } from "@/lib/browse-facets";
+import { UNASSIGNED_COUNTRY } from "@/lib/places/core";
+import { newsDiscoveryIndex, regionalNews } from '@/lib/news-discovery';
+import { newsEntryCountry } from '@/lib/news-region';
 import { geographicPage,type BrowsePlace } from "@/lib/browse-geography";
 import { db } from "@/lib/db";
 import "server-only";
 
 export async function newsFacetRows() {
-  const rows = await collectFacetRows<Record<string, unknown>>((from, to) => db.from("organization_entries")
-    .select("entry_type,topic,place_country_code,organization:organizations!inner(moderation_status)")
-    .in("moderation_status", ["approved", "ended"]).eq("organization.moderation_status", "approved")
-    .order("id").range(from, to));
+  const rows = await newsDiscoveryIndex();
   return [...new Map(rows.map(row => {
-    const facet = { type: String(row.entry_type), topic: String(row.topic ?? ""), country: String(row.place_country_code ?? "") };
+    const facet = { type: row.entry_type, topic: row.topic ?? '', country: newsEntryCountry(row) };
     return [JSON.stringify(facet), facet];
   })).values()];
 }
@@ -28,6 +26,21 @@ export async function approvedOrganizations() {
 export async function approvedEntries(filters: { type?: string; topic?: string; q?: string; page?: number; country?: string; preferred?: BrowsePlace | null } = {}) {
   const page = Math.max(1, Math.min(10000, Math.floor(filters.page || 1)));
   const pageSize = 24;
+  // Use the same effective source/entry country as the facet choices. Pagination
+  // selects at most 24 IDs, then rechecks both approvals before loading content.
+  if (filters.country) {
+    const matching = regionalNews(await (filters.q ? newsDiscoveryIndex(filters.q) : newsDiscoveryIndex()), filters.country)
+      .filter(row => (!filters.type || row.entry_type === filters.type) && (!filters.topic || row.topic === filters.topic));
+    const ids = matching.slice((page - 1) * pageSize, page * pageSize).map(row => row.id);
+    if (!ids.length) return {entries: [], hasMore: false, page, count: matching.length};
+    const {data, error} = await db.from('organization_entries')
+      .select(`${ORGANIZATION_ENTRY_SELECT},organization:organizations!inner(id,slug,name,logo_url,moderation_status,place_country_code,region)`)
+      .in('moderation_status', ['approved', 'ended']).eq('organization.moderation_status', 'approved')
+      .in('id', ids).order('created_at', {ascending: false}).order('id');
+    if (error) throw new Error('organization_entries_read_failed', {cause: error.code});
+    const entries = (data ?? []).filter(row => (newsEntryCountry(row) || UNASSIGNED_COUNTRY) === filters.country) as unknown as OrganizationNewsEntry[];
+    return {entries, hasMore: matching.length > page * pageSize, page, count: matching.length};
+  }
   const { data, error, count } = await geographicPage<Record<string, unknown>>((clause, range) => {
   let query = db.from("organization_entries")
     .select(`${ORGANIZATION_ENTRY_SELECT},organization:organizations!inner(id,slug,name,logo_url,moderation_status)`, { count: "exact", head: !range })
@@ -36,7 +49,6 @@ export async function approvedEntries(filters: { type?: string; topic?: string; 
   if (filters.type) query = query.eq("entry_type", filters.type);
   if (filters.topic) query = query.eq("topic", filters.topic);
   if (filters.q) query = query.ilike("title", `%${filters.q.slice(0, 120).replace(/[\\%_]/g, " ")}%`);
-  if (filters.country) { const expression=legacyPlaceQuery("country", filters.country); query=expression?query.or(expression):query.eq("place_country_code", filters.country); }
   if (clause) query = query.or(clause);
   return range ? query.range(range.from, range.to) : query;
   }, (page - 1) * pageSize, page * pageSize, filters.country ? null : filters.preferred ?? null);

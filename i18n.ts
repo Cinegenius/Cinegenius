@@ -10,7 +10,7 @@ export default getRequestConfig(async ({locale: requestedLocale}) => {
     return {locale: explicit, messages};
   }
   const [cookieStore, requestHeaders] = await Promise.all([cookies(), headers()]);
-  const locale = resolveLocale(cookieStore.get('cg_locale')?.value, requestHeaders.get('accept-language') ?? '');
+  const locale = resolveLocale(cookieStore.get('cg_locale')?.value, requestHeaders.get('accept-language') ?? '', requestHeaders.get('x-vercel-ip-country') ?? '');
   const messages = await loadMessages(locale);
   return {locale, messages, onError: error => console.warn("Translation error", error.code), getMessageFallback: () => String((messages.common as Record<string,unknown>).translationUnavailable)};
 });

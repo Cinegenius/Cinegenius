@@ -1,5 +1,8 @@
 import "server-only";
 import { db } from "@/lib/db";
+import { newsDiscoveryIndex, regionalNews } from '@/lib/news-discovery';
+import { newsEntryCountry } from '@/lib/news-region';
+import { UNASSIGNED_COUNTRY } from '@/lib/places/core';
 
 export type PublicOrganization = {id:string;slug:string;name:string;logo_url:string|null;city:string|null};
 const projection = "id,slug,name,logo_url,city";
@@ -23,12 +26,16 @@ export async function organizationDiscovery(page=1,limit=24) {
  if(result.error) throw new Error('organization_discovery_unavailable');
  return {organizations:(result.data??[]).slice(0,limit) as PublicOrganization[],hasMore:(result.data?.length??0)>limit,page};
 }
-export async function latestOrganizationEntries() {
- const result=await db.from('organization_entries')
- .select('id,slug,title,summary,entry_type,image_url,starts_at,ends_at,created_at,organization:organizations!inner(slug,name,logo_url,moderation_status)')
+export async function latestOrganizationEntries(country = '') {
+ const ids = country ? regionalNews(await newsDiscoveryIndex(), country, true).slice(0, 3).map(row => row.id) : null;
+ if (ids && !ids.length) return [];
+ let query=db.from('organization_entries')
+ .select('id,slug,title,summary,entry_type,image_url,starts_at,ends_at,created_at,place_country_code,city,organization:organizations!inner(slug,name,logo_url,moderation_status,place_country_code,region)')
  .eq('moderation_status','approved').eq('organization.moderation_status','approved')
  .or(`entry_type.eq.news,ends_at.gte.${new Date().toISOString()},and(ends_at.is.null,starts_at.gte.${new Date().toISOString()})`)
  .order('created_at',{ascending:false}).order('id').limit(3);
+ if (ids) query = query.in('id', ids);
+ const result = await query;
  if(result.error) throw new Error('organization_entries_unavailable');
- return result.data??[];
+ return (result.data??[]).filter(row => !country || (newsEntryCountry(row) || UNASSIGNED_COUNTRY) === country);
 }

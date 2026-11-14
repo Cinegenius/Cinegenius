@@ -2103,7 +2103,8 @@
     "resendDisclosure": "A tranzakciós e-maileket, például foglalási visszaigazolásokat, értesítéseket és rendszerüzeneteket a Resend Inc. (USA) küldi. Ennek során az e-mail-címedet és adott esetben a nevedet továbbítjuk a Resendnek. CineGenius-hírlevél: a lábléc űrlapján önként feliratkozhatsz. A meglévő fiókok e-mail-címeit nem vesszük át. A feliratkozás csak a megerősítő link használata után aktiválódik. Ehhez tároljuk a megadott e-mail-címet, a hozzájárulás időpontját és a használt hozzájárulási változatot. A küldés a Resenden keresztül történik. Bármikor leiratkozhatsz az egyes hírlevelekben található leiratkozási linkkel. Ez az információ a német nyelvű adatvédelmi tájékoztató része.",
     "sentryPrepared": "A hibadiagnosztikához előkészítettük a Sentry (Functional Software Inc., San Francisco, USA) konfigurációs fájljait. Ezek a fájlok önmagukban nem indítanak adattovábbítást; a jelenlegi alkalmazásba nincs beépítve Sentry-inicializálás.",
     "replayDisabled": "A Session Replay az előkészített konfigurációban is ki van kapcsolva. Így nem keletkeznek munkamenet-felvételek vagy előzetes visszajátszási pufferek. Későbbi bekapcsolás előtt ellenőrizni kell a célt, a jogalapot és adott esetben érvényes hozzájárulást kell beszerezni. Ez az adatvédelmi tájékoztatás nem helyettesíti a hozzájárulást.",
-    "sentryPurpose": "Hibadiagnosztika előkészítve; Session Replay kikapcsolva (lásd a 12. szakaszt)"
+    "sentryPurpose": "Hibadiagnosztika előkészítve; Session Replay kikapcsolva (lásd a 12. szakaszt)",
+    "newsRegionDisclosure": "Regionale Branchennews: Ohne eigene Länderauswahl verwenden wir vorrangig das Land aus deinem Profil, sonst das vom Hosting-Anbieter übermittelte ungefähre Land deiner Verbindung. Dafür fragen wir keinen GPS-Standort ab. Deine ausdrücklich gewählte Einstellung speichern wir für bis zu ein Jahr in einem Cookie mit dem Präfix cg_news_country_, getrennt für Gäste und angemeldete Konten. Du kannst jederzeit ein anderes Land, „Alle Länder“ oder „Automatisch“ wählen. Die automatische Ländererkennung wird nicht in diesem Cookie gespeichert. Die Oberflächensprache folgt deiner gespeicherten Sprachwahl, sonst einer unterstützten Browsersprache; fehlt diese, dient das ungefähre Land als Rückfall. Originalbeiträge werden nicht automatisch übersetzt."
   },
   "SetupOffers": {
     "accountReady": "A szolgáltatói fiókod beállítása kész.",
@@ -8119,5 +8120,14 @@
   },
   "companyTeam": {
     "leadership": "Alapítók és vezetőség"
+  },
+  "NewsRegion": {
+    "countryLabel": "Az iparági hírek országa",
+    "automatic": "Automatikus",
+    "automaticCountry": "Automatikus · {country}",
+    "empty": "Ehhez a választáshoz még nincsenek aktuális bejegyzések.",
+    "saveError": "A választást nem sikerült menteni. Engedélyezd a beállítási sütiket, és próbáld újra.",
+    "loadError": "A bejegyzéseket nem sikerült betölteni.",
+    "retry": "Újrapróbálkozás"
   }
 }

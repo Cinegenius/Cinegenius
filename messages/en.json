@@ -2103,7 +2103,8 @@
     "resendDisclosure": "Transactional emails (for example, booking confirmations, notifications and system messages) are sent through Resend Inc. (USA). Your email address and, where applicable, your name are transmitted to Resend. CineGenius newsletter: you may subscribe voluntarily using the form in the footer. Email addresses from existing accounts are not imported. The subscription becomes active only after the confirmation link is used. We store the email address supplied, the consent time and the consent version used. Delivery is handled through Resend. You can unsubscribe at any time through the unsubscribe link in each newsletter email. This information forms part of the German-language privacy policy.",
     "sentryPrepared": "Configuration files for Sentry (Functional Software Inc., San Francisco, USA) are prepared for error diagnosis. These files alone do not activate any transmission; the current application does not include Sentry initialisation.",
     "replayDisabled": "Session Replay is disabled in the prepared configuration as well. No session recordings or preliminary replay buffers are created as a result. Any later activation requires prior review of the purpose and legal basis and, where necessary, valid consent. This privacy notice does not replace consent.",
-    "sentryPurpose": "Error diagnosis prepared; Session Replay disabled (see section 12)"
+    "sentryPurpose": "Error diagnosis prepared; Session Replay disabled (see section 12)",
+    "newsRegionDisclosure": "Regionale Branchennews: Ohne eigene Länderauswahl verwenden wir vorrangig das Land aus deinem Profil, sonst das vom Hosting-Anbieter übermittelte ungefähre Land deiner Verbindung. Dafür fragen wir keinen GPS-Standort ab. Deine ausdrücklich gewählte Einstellung speichern wir für bis zu ein Jahr in einem Cookie mit dem Präfix cg_news_country_, getrennt für Gäste und angemeldete Konten. Du kannst jederzeit ein anderes Land, „Alle Länder“ oder „Automatisch“ wählen. Die automatische Ländererkennung wird nicht in diesem Cookie gespeichert. Die Oberflächensprache folgt deiner gespeicherten Sprachwahl, sonst einer unterstützten Browsersprache; fehlt diese, dient das ungefähre Land als Rückfall. Originalbeiträge werden nicht automatisch übersetzt."
   },
   "SetupOffers": {
     "accountReady": "Your provider account is set up.",
@@ -8119,5 +8120,14 @@
   },
   "companyTeam": {
     "leadership": "Founders & leadership"
+  },
+  "NewsRegion": {
+    "countryLabel": "Country for industry news",
+    "automatic": "Automatic",
+    "automaticCountry": "Automatic · {country}",
+    "empty": "There are no current posts for this selection yet.",
+    "saveError": "Your selection could not be saved. Please allow preference cookies and try again.",
+    "loadError": "The posts could not be loaded.",
+    "retry": "Try again"
   }
 }

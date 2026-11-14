@@ -2103,7 +2103,8 @@
     "resendDisclosure": "Transakční e-maily (např. potvrzení rezervací, oznámení a systémové zprávy) se odesílají přes Resend Inc. (USA). Službě Resend se předává vaše e-mailová adresa a případně jméno. Zpravodaj CineGenius: k odběru se můžete dobrovolně přihlásit formulářem v patičce. E-mailové adresy stávajících účtů se nepřebírají. Přihlášení se aktivuje až potvrzovacím odkazem. Ukládáme přitom zadanou e-mailovou adresu, čas udělení souhlasu a použitou verzi souhlasu. Odesílání zajišťuje Resend. Kdykoli se můžete odhlásit odkazem v každém zpravodaji. Tato informace je součástí německých zásad ochrany osobních údajů.",
     "sentryPrepared": "Pro diagnostiku chyb jsou připraveny konfigurační soubory Sentry (Functional Software Inc., San Francisco, USA). Samotné soubory ještě neaktivují předávání údajů; v aktuální aplikaci není zapojena inicializace Sentry.",
     "replayDisabled": "Session Replay je vypnuto i v připravené konfiguraci. Nevytvářejí se tak záznamy relací ani předběžné vyrovnávací paměti přehrávání. Pozdější aktivace vyžaduje předchozí posouzení účelu, právního základu a případně platný souhlas. Tato informace o ochraně osobních údajů souhlas nenahrazuje.",
-    "sentryPurpose": "Diagnostika chyb připravena; Session Replay vypnuto (viz oddíl 12)"
+    "sentryPurpose": "Diagnostika chyb připravena; Session Replay vypnuto (viz oddíl 12)",
+    "newsRegionDisclosure": "Regionale Branchennews: Ohne eigene Länderauswahl verwenden wir vorrangig das Land aus deinem Profil, sonst das vom Hosting-Anbieter übermittelte ungefähre Land deiner Verbindung. Dafür fragen wir keinen GPS-Standort ab. Deine ausdrücklich gewählte Einstellung speichern wir für bis zu ein Jahr in einem Cookie mit dem Präfix cg_news_country_, getrennt für Gäste und angemeldete Konten. Du kannst jederzeit ein anderes Land, „Alle Länder“ oder „Automatisch“ wählen. Die automatische Ländererkennung wird nicht in diesem Cookie gespeichert. Die Oberflächensprache folgt deiner gespeicherten Sprachwahl, sonst einer unterstützten Browsersprache; fehlt diese, dient das ungefähre Land als Rückfall. Originalbeiträge werden nicht automatisch übersetzt."
   },
   "SetupOffers": {
     "accountReady": "Tvůj účet poskytovatele je nastavený.",
@@ -8119,5 +8120,14 @@
   },
   "companyTeam": {
     "leadership": "Zakladatelé a vedení"
+  },
+  "NewsRegion": {
+    "countryLabel": "Země pro novinky z oboru",
+    "automatic": "Automaticky",
+    "automaticCountry": "Automaticky · {country}",
+    "empty": "Pro tento výběr zatím nejsou žádné aktuální příspěvky.",
+    "saveError": "Výběr se nepodařilo uložit. Povol cookies pro nastavení a zkus to znovu.",
+    "loadError": "Příspěvky se nepodařilo načíst.",
+    "retry": "Zkusit znovu"
   }
 }

@@ -2103,7 +2103,8 @@
     "resendDisclosure": "Le e-mail transazionali, ad esempio conferme di prenotazione, notifiche e messaggi di sistema, vengono inviate tramite Resend Inc. (USA). A tal fine vengono trasmessi a Resend il tuo indirizzo e-mail ed eventualmente il tuo nome. Newsletter CineGenius: puoi iscriverti volontariamente tramite il modulo nel piè di pagina. Gli indirizzi e-mail degli account esistenti non vengono acquisiti. L’iscrizione diventa attiva solo dopo aver utilizzato il collegamento di conferma. A questo scopo memorizziamo l’indirizzo e-mail indicato, il momento del consenso e la versione del testo di consenso utilizzata. L’invio avviene tramite Resend. Puoi annullare l’iscrizione in qualsiasi momento tramite il collegamento presente in ogni e-mail della newsletter. Questa informazione fa parte dell’informativa sulla privacy in lingua tedesca.",
     "sentryPrepared": "Per la diagnosi degli errori sono stati predisposti file di configurazione per Sentry (Functional Software Inc., San Francisco, USA). Questi file, da soli, non attivano alcuna trasmissione di dati; nell’applicazione attuale non è integrata l’inizializzazione di Sentry.",
     "replayDisabled": "Session Replay è disattivato anche nella configurazione predisposta. Non vengono quindi create registrazioni delle sessioni né buffer preliminari di riproduzione. Un’eventuale attivazione futura richiede prima la verifica della finalità, della base giuridica e, se necessario, l’acquisizione di un consenso valido. Questa informativa sulla privacy non sostituisce il consenso.",
-    "sentryPurpose": "Diagnosi degli errori predisposta; Session Replay disattivato (vedi sezione 12)"
+    "sentryPurpose": "Diagnosi degli errori predisposta; Session Replay disattivato (vedi sezione 12)",
+    "newsRegionDisclosure": "Regionale Branchennews: Ohne eigene Länderauswahl verwenden wir vorrangig das Land aus deinem Profil, sonst das vom Hosting-Anbieter übermittelte ungefähre Land deiner Verbindung. Dafür fragen wir keinen GPS-Standort ab. Deine ausdrücklich gewählte Einstellung speichern wir für bis zu ein Jahr in einem Cookie mit dem Präfix cg_news_country_, getrennt für Gäste und angemeldete Konten. Du kannst jederzeit ein anderes Land, „Alle Länder“ oder „Automatisch“ wählen. Die automatische Ländererkennung wird nicht in diesem Cookie gespeichert. Die Oberflächensprache folgt deiner gespeicherten Sprachwahl, sonst einer unterstützten Browsersprache; fehlt diese, dient das ungefähre Land als Rückfall. Originalbeiträge werden nicht automatisch übersetzt."
   },
   "SetupOffers": {
     "accountReady": "Il tuo account come fornitore è configurato.",
@@ -8119,5 +8120,14 @@
   },
   "companyTeam": {
     "leadership": "Fondatori e direzione"
+  },
+  "NewsRegion": {
+    "countryLabel": "Paese per le notizie del settore",
+    "automatic": "Automatico",
+    "automaticCountry": "Automatico · {country}",
+    "empty": "Non ci sono ancora contenuti attuali per questa selezione.",
+    "saveError": "Impossibile salvare la selezione. Consenti i cookie delle preferenze e riprova.",
+    "loadError": "Impossibile caricare i contenuti.",
+    "retry": "Riprova"
   }
 }

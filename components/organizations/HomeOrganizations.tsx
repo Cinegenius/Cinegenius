@@ -3,28 +3,33 @@ import Image from '@/components/MediaImage';
 import {Building2} from 'lucide-react';
 import {getLocale, getTranslations} from 'next-intl/server';
 import {organizationDiscovery, latestOrganizationEntries} from '@/lib/organization-discovery';
+import {newsRegion} from '@/lib/news-region-server';
+import {newsCountries} from '@/lib/news-discovery';
+import HomeNewsRegion from './HomeNewsRegion';
 
 export default async function HomeOrganizations() {
- const [t, entryT, locale] = await Promise.all([
-  getTranslations('OrganizationDiscovery'), getTranslations('Organizations'), getLocale(),
+ const [t, entryT, locale, region] = await Promise.all([
+  getTranslations('OrganizationDiscovery'), getTranslations('Organizations'), getLocale(), newsRegion(),
  ]);
- let organizations, entries;
+ let organizations: Awaited<ReturnType<typeof organizationDiscovery>>['organizations'] = [];
+ let entries: Awaited<ReturnType<typeof latestOrganizationEntries>> = [], codes: string[] = [], failed = false;
  try {
-  const results = await Promise.all([organizationDiscovery(1, 6), latestOrganizationEntries()]);
+  const results = await Promise.all([organizationDiscovery(1, 6), latestOrganizationEntries(region.country), newsCountries(true)]);
   organizations = results[0].organizations;
   entries = results[1];
+  codes = results[2];
  } catch {
   console.error('homepage_organization_discovery_unavailable');
-  return null;
+  failed = true;
  }
- if (!organizations.length && !entries.length) return null;
  const dates = new Intl.DateTimeFormat(locale, {dateStyle: 'medium', timeZone: 'Europe/Berlin'});
  const paired = entries.length > 0 && organizations.length > 0;
  return <section className="py-5 sm:py-7" aria-labelledby="home-industry-title"><div className="site-container">
   <div className="mb-3 flex min-w-0 flex-wrap items-end justify-between gap-x-5 gap-y-1">
    <div className="min-w-0"><p className="mb-1 text-xs uppercase tracking-widest text-gold">{t('eyebrow')}</p><h2 id="home-industry-title" className="break-words font-serif text-xl leading-snug text-text-primary sm:text-2xl">{t('title')}</h2></div>
-   <Link href="/news" className="inline-flex min-h-11 min-w-0 items-center gap-1 text-sm text-gold hover:text-gold-light"><span className="break-words">{t('allEntries')}</span><span aria-hidden="true">→</span></Link>
+   <Link href={`/news?country=${region.selection}`} className="inline-flex min-h-11 min-w-0 items-center gap-1 text-sm text-gold hover:text-gold-light"><span className="break-words">{t('allEntries')}</span><span aria-hidden="true">→</span></Link>
   </div>
+  <HomeNewsRegion region={region} codes={codes} empty={!entries.length} failed={failed}/>
   <div className={`grid min-w-0 items-start gap-6 lg:gap-9 ${paired ? 'lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]' : ''}`}>
    {entries.length > 0 && <div className="min-w-0 space-y-2">
     {entries.map(entry => {
