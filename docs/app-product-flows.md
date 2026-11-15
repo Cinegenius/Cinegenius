@@ -446,3 +446,9 @@ Keine Migration, Modell-/Schlüsseländerung, Veröffentlichung oder Geräteinst
 durch diesen Abgleich. Neuere Mac-/Scanner-/Dispo-/PDF-Arbeit bleibt eigenständig
 erhalten. Prüfungen und Grenzen:
 `/srv/cinegenius/handoffs/20261115-app-smart-expanded/`.
+
+Der abschließende WEB-Stand `637f57960a5265e3c29aa2768d25b19e66932b7d` ist
+ebenfalls abgeglichen: Er enthält die bereits an App `104d940` geprüfte
+Sprachwechsel-Korrektur und den ergänzten Prüfbericht. Dieser Nachlauf ändert
+keinen App-Anwendungscode. Er ist weiterhin keine Veröffentlichung oder
+Geräteinstallation; die Prüfgrenzen des genannten Belegs bleiben bestehen.
