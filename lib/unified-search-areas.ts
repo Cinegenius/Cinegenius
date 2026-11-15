@@ -22,9 +22,14 @@ export const DEPARTMENT_HEADS_QUERY = "Heads of Department";
 const headNames = ["heads of department", "head of departments", "headofs", "heads", "abteilungsleitungen", "abteilungsleiter", "gewerkeleitungen", "jefes de departamento", "capi reparto", "vedouci oddeleni", "reszlegvezetok", "afdelingshoofden", "avdelningschefer"];
 export const isDepartmentHeadsQuery = (query: string) => headNames.includes(query.normalize("NFKD").replace(/\p{M}/gu, "").toLowerCase().trim());
 
+export const PRODUCTION_CREW_QUERY = "Production Crew";
+const productionCrewNames = ["production crew", "filmcrew", "film crew", "produktionscrew", "komplette crew", "equipo de rodaje", "troupe cinematografica", "filmovy stab", "forgatocsoport", "filmploeg", "filmteam"];
+export const isProductionCrewQuery = (query: string) => productionCrewNames.includes(query.normalize("NFKD").replace(/\p{M}/gu, "").toLowerCase().trim());
+
 /** Lightweight display mapping for generated semantic queries; member-written
  * names and unknown query text remain unchanged. No catalogue in the client bundle. */
 export function searchQueryTitle(wish: SearchWish, t: (key: string) => string): string {
+  if (wish.area === "crew" && isProductionCrewQuery(wish.query)) return t("productionCrew");
   if (wish.area === "crew" && isDepartmentHeadsQuery(wish.query)) return t("departmentHeads");
   if (isWholeAreaQuery(wish.area, wish.query)) return t(`areas.${wish.area}`);
   if (wish.area === "companies" && wish.query === "Filmproduktion") return t("productionCompanies");

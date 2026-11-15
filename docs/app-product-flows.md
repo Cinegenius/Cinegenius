@@ -464,3 +464,32 @@ Die Live-Gastprüfungen von WEB ersetzen keine angemeldete Live-Modellprüfung
 oder einen physischen iPhone-/Android-Test. Belege:
 `/srv/cinegenius/handoffs/20261115-smart-search-expanded-ready/receipt.json` und
 `/srv/cinegenius/audits/20261115-smart-search-expanded/production-637f579/`.
+
+## Vollständige Gewerkeauswahl für allgemeine Drehvorhaben (15. November 2026)
+
+WEB-Quelle `ad7085d10eea299cc7f163132d5c766660e0e1ca` erweitert eine neue Suche
+wie „ich drehe in münchen“ auf alle 25 gemeinsamen Gewerke sowie Locations,
+Marktplatz, Firmen und Catering. Bei Übergabe noch nicht veröffentlicht;
+bestätigter Live-Stand bleibt `637f579`. Der Abgleich veröffentlicht nichts.
+
+Der kanonische v2-Wunsch `Production Crew` benötigt nur einen Wunschplatz und
+liefert je Gewerk eine eigene `segment`-Gruppe. Primäre und zusätzliche deklarierte
+Berufe einschließlich Assistenzen zählen. `Heads of Department` bleibt eine
+separate, strenge Leitungsabfrage. Explizite kleine Interview-/Rollenwünsche
+und bereits kodierte Drei-Rollen-Pläne werden nicht verbreitert. Für den neuen
+Standard ist eine frische Suche erforderlich.
+
+Die App erhält vollständige Pläne, Mengen und Anforderungen bei Text-/Sprach-
+fortsetzungen und reicht die vorhandenen `segment`-, `rank`- und `nearby`-Werte
+unverändert weiter. Das gilt auch für zusätzliche Gewerke wie Postproduktion
+und Set-Logistik. Liste und Karte starten weiterhin mit einer gemeinsamen
+Abfrage. Die neue Bezeichnung stammt in allen neun Sprachen aus dem gemeinsamen
+Katalog; keine neue Navigation oder Gestaltung.
+
+Profilseiten und Rechte werden nur innerhalb derselben kontogebundenen Anfrage
+für die Gewerke wiederverwendet, mit höchstens vier Seiten im Zwischenspeicher.
+Das begrenzt den Zwischenspeicher, nicht die Ergebnismenge. Aktuelle Sichtbarkeit,
+Orts-/Kartenrechte und explizite Suchgrenzen gelten weiterhin vor der Auswahl.
+Keine Migration, Modelländerung, zusätzliche Speicherung oder native Installation.
+Native und neuere Mac-/Dispo-/PDF-Quellen bleiben erhalten. App-Prüfbelege:
+`/srv/cinegenius/handoffs/20261115-app-production-selection/`.

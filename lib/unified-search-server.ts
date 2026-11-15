@@ -13,7 +13,7 @@ import { listingPriceLabel } from "@/lib/listing-price";
 import { COMPANY_CATEGORIES } from "@/lib/companyCategories";
 import { containsLiteral, exactLiteral, filterLiteral, isOccupationWish, matchesWishPlaces, searchKey, wishMarketplaceCategories, wishSearchTerms } from "@/lib/unified-search-matching";
 import { compareNearby, nearbyDistance, nearbyOrigins } from "@/lib/unified-search-nearby";
-import { isDepartmentHeadsQuery, matchingDepartmentHead, departmentHeadTerms, departmentHeadSegments } from "@/lib/unified-search-production";
+import { isDepartmentHeadsQuery, matchingDepartmentHead, departmentHeadTerms, isProductionCrewQuery, matchingProductionRole, productionCrewTerms, crewSearchSegments } from "@/lib/unified-search-production";
 import { matchesSearchRequirements, searchMatchScore } from "@/lib/unified-search-requirements";
 import { cateringSearch, matchesCateringSearch } from "@/lib/unified-search-catering";
 import { searchQueryTitle } from "@/lib/unified-search-areas";
@@ -88,10 +88,13 @@ function geographyRow(row: Row, area: SearchArea): Row {
 }
 
 type ResultPage = SearchGroup & { listPage?: SearchGroup };
-async function readGroup(plan: SearchPlan, wishIndex: number, area: SearchArea, offset: number, locale: string, viewerId: string | null, signal: AbortSignal, view: "list" | "map" | "combined", nearbyAfter?: NearbyCursor, segment?: string, rankAfter?: SearchRankCursor): Promise<ResultPage> {
+type ProfilePage = { data: Row[]; error: null; privacy: Awaited<ReturnType<typeof profileAccessFor>> };
+type ReadProfilePage = (offset: number) => Promise<ProfilePage>;
+async function readGroup(plan: SearchPlan, wishIndex: number, area: SearchArea, offset: number, locale: string, viewerId: string | null, signal: AbortSignal, view: "list" | "map" | "combined", nearbyAfter?: NearbyCursor, segment?: string, rankAfter?: SearchRankCursor, readProfilePage?: ReadProfilePage): Promise<ResultPage> {
   const wish = plan.searches[wishIndex];
   const taxonomy = await getTranslations({ locale, namespace: "Taxonomy" });
-  const terms = segment ? departmentHeadTerms(locale, taxonomy, segment) : wishSearchTerms({ ...wish, area }, locale, taxonomy);
+  const productionCrew = area === "crew" && !wish.department && isProductionCrewQuery(wish.query);
+  const terms = segment ? productionCrew ? productionCrewTerms(segment, locale, taxonomy) : departmentHeadTerms(locale, taxonomy, segment) : wishSearchTerms({ ...wish, area }, locale, taxonomy);
   const catalog = await getTranslations({ locale, namespace: "MarketplaceCatalog" });
   const market = await getTranslations({ locale, namespace: "MarketplaceOffer" });
   const ui = await getTranslations({ locale });
@@ -121,7 +124,7 @@ async function readGroup(plan: SearchPlan, wishIndex: number, area: SearchArea, 
     if (area === "projects") row = publicProjectMedia(row);
     const place = placeDisplay(placeReadFields(String(row.location ?? row.city ?? ""), row, locale), String(row.location ?? row.city ?? ""), locale);
     const organization = Array.isArray(row.organization) ? row.organization[0] : row.organization;
-    const headRole = heads ? matchingDepartmentHead(row, segment) : undefined;
+    const headRole = heads ? matchingDepartmentHead(row, segment) : productionCrew ? matchingProductionRole(row, segment) : undefined;
     const role = headRole ? getDepartmentRoleLabel(headRole.departmentId, headRole.label, locale, undefined, taxonomy) : row.role;
     const result: SearchResult = {
       id: String(area === "crew" ? row.user_id : area === "news" ? `${(organization as Row)?.slug}/${row.slug}` : row.slug || row.id),
@@ -158,10 +161,11 @@ async function readGroup(plan: SearchPlan, wishIndex: number, area: SearchArea, 
   };
   for (let pass = 0; ; pass++) {
     signal.throwIfAborted();
-    const { data, error } = await queryFor(area, wish, terms, categories, view !== "list").range(offset, offset + PAGE - 1).abortSignal(signal);
+    const shared = productionCrew && readProfilePage ? await readProfilePage(offset) : null;
+    const { data, error } = shared ?? await queryFor(area, wish, productionCrew ? [] : terms, categories, view !== "list").range(offset, offset + PAGE - 1).abortSignal(signal);
     if (error) throw new Error("search_unavailable");
     const rows = (data ?? []) as unknown as Row[];
-    const privacy = area === "crew" ? await profileAccessFor(rows.map(row => String(row.user_id)), viewerId, { signal, throwOnError: true }) : null;
+    const privacy = area === "crew" ? shared?.privacy ?? await profileAccessFor(rows.map(row => String(row.user_id)), viewerId, { signal, throwOnError: true }) : null;
     for (let i = 0; i < rows.length; i++) {
       let row = rows[i];
       if (area === "crew") {
@@ -170,6 +174,7 @@ async function readGroup(plan: SearchPlan, wishIndex: number, area: SearchArea, 
         row = projectProfilePrivacy(row, access);
       }
       if (heads && !matchingDepartmentHead(row, segment)) continue;
+      if (productionCrew && !matchingProductionRole(row, segment)) continue;
       if (catering && !matchesCateringSearch(row, catering)) continue;
       if (!matchesSearchRequirements(row, wish)) continue;
       row = geographyRow(row, area);
@@ -239,8 +244,9 @@ async function readGroup(plan: SearchPlan, wishIndex: number, area: SearchArea, 
 export type SearchCursor = { wishIndex: number; area: SearchArea; offset: number; segment?: string; rank?: SearchRankCursor; nearby?: NearbyCursor };
 export function validSearchCursor(plan: SearchPlan, cursor: SearchCursor) {
   const wish = plan.searches[cursor.wishIndex];
-  if (cursor.segment !== undefined && (plan.version !== 2 || cursor.area !== "crew" || wish.department || !isDepartmentHeadsQuery(wish.query) || !departmentHeadSegments.includes(cursor.segment))) return false;
-  if (plan.version === 2 && cursor.area === "crew" && isDepartmentHeadsQuery(wish.query) && !wish.department && !cursor.segment) return false;
+  const segments = crewSearchSegments(wish);
+  if (cursor.segment !== undefined && (plan.version !== 2 || cursor.area !== "crew" || !segments.includes(cursor.segment))) return false;
+  if (plan.version === 2 && cursor.area === "crew" && segments.length && !cursor.segment) return false;
   if (cursor.rank !== undefined) {
     const rank = cursor.rank;
     if (plan.version !== 2 || cursor.nearby || !rank || typeof rank !== "object" || Array.isArray(rank) || Object.keys(rank).some(key => !["score", "distanceKm", "id"].includes(key))
@@ -250,14 +256,34 @@ export function validSearchCursor(plan: SearchPlan, cursor: SearchCursor) {
 }
 export async function executeUnifiedSearch(plan: SearchPlan, locale: string, viewerId: string | null, signal: AbortSignal, cursor?: SearchCursor, view: "list" | "map" | "combined" = "list") {
   const tasks: SearchCursor[] = cursor ? [cursor] : plan.searches.flatMap((wish, wishIndex) =>
-    (wish.area === "all" ? SEARCH_AREAS : [wish.area]).flatMap(area => plan.version === 2 && area === "crew" && !wish.department && isDepartmentHeadsQuery(wish.query)
-      ? departmentHeadSegments.map(segment => ({ wishIndex, area, offset: 0, segment })) : [{ wishIndex, area, offset: 0 }]));
+    (wish.area === "all" ? SEARCH_AREAS : [wish.area]).flatMap(area => plan.version === 2 && area === "crew" && crewSearchSegments(wish).length
+      ? crewSearchSegments(wish).map(segment => ({ wishIndex, area, offset: 0, segment })) : [{ wishIndex, area, offset: 0 }]));
+  // General production searches share at most four profile pages within this
+  // request. Do not download the same people once per department or send an
+  // unbounded catalogue-alias URL. Rights stay request/account scoped; matching
+  // and place projection still happen only after the privacy check above.
+  const profilePages = new Map<number, Promise<ProfilePage>>();
+  const readProfilePage: ReadProfilePage = offset => {
+    const existing = profilePages.get(offset);
+    if (existing) return existing;
+    const page = (async (): Promise<ProfilePage> => {
+      const { data, error } = await queryFor("crew", { area: "crew", query: "Crew", department: "", places: [] }, [], [])
+        .range(offset, offset + PAGE - 1).abortSignal(signal);
+      if (error) throw new Error("search_unavailable");
+      const rows = (data ?? []) as unknown as Row[];
+      const privacy = await profileAccessFor(rows.map(row => String(row.user_id)), viewerId, { signal, throwOnError: true });
+      return { data: rows, error: null, privacy };
+    })();
+    profilePages.set(offset, page);
+    if (profilePages.size > 4) profilePages.delete(profilePages.keys().next().value!);
+    return page;
+  };
   const pages: ResultPage[] = new Array(tasks.length);
   let next = 0;
   await Promise.all(Array.from({ length: Math.min(tasks.length, 4) }, async () => {
     while (next < tasks.length) {
       const index = next++, task = tasks[index];
-      pages[index] = await readGroup(plan, task.wishIndex, task.area, task.offset, locale, viewerId, signal, view, task.nearby, task.segment, task.rank);
+      pages[index] = await readGroup(plan, task.wishIndex, task.area, task.offset, locale, viewerId, signal, view, task.nearby, task.segment, task.rank, readProfilePage);
     }
   }));
   const groups = pages.map(({ listPage, ...group }) => view === "combined" && listPage ? listPage : group);
