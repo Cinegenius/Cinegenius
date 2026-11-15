@@ -512,11 +512,23 @@ gemeinsame, auf `.home-page` begrenzte Darstellung erhält Abstände, Karten,
 Reihenfolge und Bedienung. Die vorhandenen Homepage-Komponenten sind die
 einzigen betroffenen Oberflächen; keine neuen Texte, Schnittstellen oder Daten.
 
-Dieser App-Abgleich ist noch keine Veröffentlichung. Letzter bestätigter
-Live-Stand ist `ad7085d`. Alle neun Sprachkataloge und 123 nativen Dateien
+Bei der Übernahme war der letzte bestätigte Live-Stand noch `ad7085d`;
+der folgende WEB-Release ist unten dokumentiert. Alle neun Sprachkataloge und 123 nativen Dateien
 bleiben unverändert, ebenso die neuere Mac-Arbeit. Keine Geräteinstallation.
 Die gezielten Bestandstests ergeben vor und nach der Übernahme identisch
 26 erfolgreiche Fälle und 13 bestehende Fehler wegen eines fehlenden
 `profile-privacy-server`-Mocks in der Homepage-Testumgebung. Einzelne Fehler
 werden nicht als bestandene Tests gewertet. Browserbelege, Prüfgrenzen und
 Sicherungsstand: `/srv/cinegenius/handoffs/20261115-app-home-dividers/`.
+
+WEB veröffentlichte `fb4ec8c` anschließend nach Markus' ausdrücklicher Freigabe.
+Deployment `dpl_3GYhr8ZCA4iRZiwrXVEZePE9r8VZ` ist READY; Projekt, beide `.co`-Aliase,
+Quellmetadaten und der Hauptzweig auf GitHub stimmen überein. Der vollständige
+Remote-Produktionsbuild einschließlich Typen, Design und Website-Sprachen bestand.
+Vier Live-Gastprüfungen von WEB bestätigen unveränderte Geometrie und Bedienung,
+ohne Überlauf, Browser-Konsolenfehler oder gleichursprüngliche 5xx-Antworten.
+Der bereits geprüfte App-Anwendungscode `9c5c687` passt unverändert dazu;
+dieser Nachtrag aktualisiert nur den Veröffentlichungsstatus. Die lokalen
+Prüfgrenzen bleiben dokumentiert. Keine neue native Installation oder physische
+Geräteprüfung. Release-Beleg:
+`/srv/cinegenius/handoffs/20261115-home-section-dividers-ready/receipt.json`.
