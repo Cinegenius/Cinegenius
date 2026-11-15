@@ -8399,6 +8399,15 @@
       "news": "Nyheter",
       "organizations": "Organisationer",
       "animals": "Filmdjur"
-    }
+    },
+    "followUpLabel": "Ditt svar",
+    "followUpPlaceholder": "Lägg till dina önskemål …",
+    "followUpSubmit": "Skicka svar",
+    "conversationExpired": "Det här korta samtalet har löpt ut. Starta sökningen igen ovan; din text finns kvar.",
+    "conversationLimit": "Sammanfatta din plan i en ny sökning ovan. Din text finns kvar.",
+    "mapTitle": "Din sökning på kartan",
+    "mapLegend": "Kategorier på kartan",
+    "mapIncomplete": "Fler resultat har ännu inte laddats på kartan.",
+    "mapMore": "Ladda fler kartresultat"
   }
 }

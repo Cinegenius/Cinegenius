@@ -8399,6 +8399,15 @@
       "news": "Novinky",
       "organizations": "Organizace",
       "animals": "Filmová zvířata"
-    }
+    },
+    "followUpLabel": "Tvoje odpověď",
+    "followUpPlaceholder": "Doplň své požadavky …",
+    "followUpSubmit": "Odeslat odpověď",
+    "conversationExpired": "Tato krátká konverzace vypršela. Spusť hledání znovu nahoře; rozepsaný text zůstane zachován.",
+    "conversationLimit": "Shrň svůj záměr v novém hledání nahoře. Rozepsaný text zůstane zachován.",
+    "mapTitle": "Tvoje hledání na mapě",
+    "mapLegend": "Kategorie na mapě",
+    "mapIncomplete": "Další výsledky ještě nejsou na mapě načtené.",
+    "mapMore": "Načíst další výsledky na mapě"
   }
 }

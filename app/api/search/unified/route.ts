@@ -22,15 +22,16 @@ export async function POST(request: NextRequest) {
     if (!userId || !unifiedSearchAccess(userId).canReadResults) return json({ error: "unauthorized" }, 401);
     if (!(await rateLimit(`unified-search:${userId}`, 40, 60)).allowed) return json({ error: "rate_limited" }, 429);
     const body = await readGenieBody(request);
-    if (!body || typeof body !== "object" || Array.isArray(body) || Object.keys(body).some(key => !["plan", "cursor"].includes(key))) return json({ error: "invalid_request" }, 400);
-    const { plan: rawPlan, cursor } = body as { plan: unknown; cursor?: SearchCursor };
+    if (!body || typeof body !== "object" || Array.isArray(body) || Object.keys(body).some(key => !["plan", "cursor", "view"].includes(key))) return json({ error: "invalid_request" }, 400);
+    const { plan: rawPlan, cursor, view } = body as { plan: unknown; cursor?: SearchCursor; view?: unknown };
+    if (view !== undefined && view !== "map") return json({ error: "invalid_request" }, 400);
     const plan = validateResolvedSearchPlan(rawPlan);
     if (cursor !== undefined && (!cursor || typeof cursor !== "object" || Array.isArray(cursor) || Object.keys(cursor).some(key => !["wishIndex", "area", "offset"].includes(key))
       || !Number.isInteger(cursor.wishIndex) || cursor.wishIndex < 0 || cursor.wishIndex >= plan.searches.length
       || !Number.isInteger(cursor.offset) || cursor.offset < 0 || cursor.offset > 1_000_000
       || !SEARCH_AREAS.includes(cursor.area) || !["all", cursor.area].includes(plan.searches[cursor.wishIndex].area))) return json({ error: "invalid_request" }, 400);
     const signal = AbortSignal.any([request.signal, AbortSignal.timeout(20_000)]);
-    return json(await executeUnifiedSearch(plan, await getLocale(), userId, signal, cursor));
+    return json(await executeUnifiedSearch(plan, await getLocale(), userId, signal, cursor, view === "map" ? "map" : "list"));
   } catch (error) {
     return json({ error: error instanceof GenieError ? error.code : "unavailable" }, error instanceof GenieError ? error.status : 503);
   }

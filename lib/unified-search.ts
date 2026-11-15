@@ -57,7 +57,8 @@ export function searchPlanFromHref(href: string): SearchPlan | null {
   return params.size === 1 && params.has("plan") ? decodeSearchPlan(params.get("plan")) : null;
 }
 
-export type SearchResult = { id: string; title: string; subtitle: string; type: string; price: number; priceLabel?: string; image: string | null; available: boolean | null };
+export type SearchResult = { id: string; title: string; subtitle: string; type: string; price: number; priceLabel?: string; image: string | null; available: boolean | null;
+  mapPoint?: { lat: number; lng: number; radiusMeters?: 500 } | null };
 export type SearchGroup = { area: SearchArea; wishIndex: number; label: string; results: SearchResult[]; nextOffset: number | null };
 
 export const SEARCH_WISH_SCHEMA = { type: "array", maxItems: MAX_SEARCHES, items: { type: "object", additionalProperties: false,

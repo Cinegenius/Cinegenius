@@ -15,6 +15,7 @@ import { locationCategoryLabel } from "@/lib/location-category-labels";
 import { readPublicLocationArea } from "@/lib/location-privacy";
 import { hasCoordinates, inMapBounds, type MapBounds } from "@/lib/location-map";
 import { mapLabelExpression } from "@/lib/map-style";
+import { mapMarkerStyle } from "@/lib/smart-search-map";
 import type { Map as VectorMap } from "maplibre-gl";
 import type * as Leaflet from "leaflet";
 
@@ -23,6 +24,7 @@ type Location = {
   price: number; image: string; lat: number | null; lng: number | null;
   metadata?: Record<string, unknown>;
   focalPoint?: { x: number; y: number } | null;
+  markerColor?: string;
 };
 type Props = {
   labels?: { label: string; results: string; empty: string; unknownCoordinates: string; cluster?: (count: number) => string; error?: string };
@@ -190,13 +192,14 @@ export default function LocationMap({ readOnly = false, locations, activeId, onH
             && point.distanceTo(projected.get(other.id)!) <= 44);
           members.forEach(member => used.add(member.id));
           const clustered = members.length > 1;
+          const markerStyle = mapMarkerStyle(members.map(member => member.markerColor), clustered);
           const marker = L.marker([
             members.reduce((sum, member) => sum + member.lat, 0) / members.length,
             members.reduce((sum, member) => sum + member.lng, 0) / members.length,
           ], {
             title: clustered ? (clusterLabel?.(members.length) ?? t("cluster", { count: members.length })) : location.title,
             icon: L.divIcon({ className: "location-map-marker", iconSize: [44, 44], iconAnchor: [22, 22],
-              html: `<span class="location-map-marker__dot${clustered ? " location-map-marker__cluster" : ""}">${clustered ? members.length : ""}</span>` }),
+              html: `<span class="location-map-marker__dot${clustered ? " location-map-marker__cluster" : ""}"${markerStyle ? ` style="${markerStyle}"` : ""}>${clustered ? members.length : ""}</span>` }),
           }).addTo(group!);
           marker.on("click", () => {
             if (readOnly) return;

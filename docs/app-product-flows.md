@@ -307,3 +307,43 @@ ist READY; Produktionsbeleg, Domainzuordnung und `origin/main` sind abgeglichen.
 Der App-Quellstand enthält die geprüfte Änderung bereits. Eine angemeldete
 Live-Mehrfachsuche oder native Geräteabnahme ist damit weiterhin nicht belegt.
 Belege: `/srv/cinegenius/handoffs/20261114-app-smart-matching-rows/`.
+
+## Smart-Ergebnisse zuerst und gemeinsame Karte (15. November 2026)
+
+Der endgültige WEB-Stand `6e28680acc57f0edf5916bd02345771f6a7efe52`
+ersetzt die vorbereitete Fassung `6ce9bb5`. Laut abschließendem WEB-Releasebeleg
+ist er mit `dpl_2724JmLNPdQKtWZLVTWFHis3Bc9z` auf der gemeinsamen Webadresse
+veröffentlicht. Der App-Abgleich übernimmt diesen Stand, ohne neuere Mac-Quellen
+oder native Scanner-/Sprachdateien zu ersetzen.
+
+Breite Produktionswünsche führen zuerst zu einer sinnvollen ersten Auswahl nach
+Bereichen. Budget, Drehtag oder Produktionsumfang sind keine vorgeschalteten
+Pflichtfragen. Ortsrückfragen bleiben möglich, wenn ein verwendbarer Ort fehlt;
+Folgeantworten erhalten den ausdrücklich genannten Ort und Kontext. Wünsche wie
+Hund, zwei Giraffen und Panzer bleiben getrennte Suchwünsche. Gewünschte Mengen
+sind keine Bestands-, Verfügbarkeits- oder Buchungszusage. `plan-v1` bekommt keine
+Mengenfelder; vollständige Produktionsplanung ist eine spätere Funktion.
+
+Die gemeinsame Smart-Karte lädt unabhängig von der Zwölfer-Ergebnisliste über
+denselben Endpunkt mit `view: "map"`. Sie folgt den vorhandenen Seitenzeigern,
+entfernt doppelte Einträge anhand von Typ und ID und zeigt unvollständige sowie
+nicht verortbare Ergebnisse an. Nur aktuell erlaubte ungefähre Ortsangaben
+werden übertragen. Anmeldung, Ghost und Standort-/Kartenrechte gelten auch hier.
+Bereichsfarben, Legende und Rückfragen verwenden die neun gemeinsamen Kataloge.
+
+Notwendige Rückfragen bleiben nur im Arbeitsspeicher, getrennt nach Konto und
+Suchanfrage, mit zehn Minuten Inaktivitätsgrenze. Sprachwechsel und vorübergehende
+Fehler erhalten den Antwortentwurf; Konto- oder Suchwechsel verwerfen alte
+Antworten. Die vorhandene native Genie-Sprachbedienung und ihre getrennte
+Gesprächswiederherstellung bleiben erhalten. `/api/genie` liefert weiterhin
+`reply`, `language` und validierte `links`; `topic` bleibt providerintern.
+
+Plattform-Kostenantworten verwenden ausschließlich die freigegebene kurze
+Übersetzung ohne Beträge, Prozente, Rechenbeispiele oder Preislink. Tatsächliche
+Konditionen, Rechtstexte und die Suche nach Mietpreisen bleiben unverändert.
+
+App-Prüfbelege: `/srv/cinegenius/handoffs/20261115-app-smart-planning-map/`.
+Browserprüfungen mit simulierten Konten, API-Antworten und Betriebssystem-
+Sprachschnittstellen sind keine native Geräteabnahme oder Prüfung freier
+Live-KI-Antworten. Der Serverabgleich installiert keine neue App auf dem iPhone
+und überschreibt keine laufenden Xcode-Änderungen auf dem Mac.

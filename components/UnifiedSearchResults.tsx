@@ -1,17 +1,21 @@
 "use client";
 
 import { useAuth } from "@clerk/nextjs";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
+import dynamic from "next/dynamic";
 import { Loader2, Search } from "lucide-react";
 import { useFormRouter } from "@/lib/use-form-router";
 import { decodeSearchPlan, searchPlanFromHref, SEARCH_AREAS, type SearchPlan, type SearchGroup } from "@/lib/unified-search";
 import ResultCard from "@/components/SearchResultCard";
+import SmartSearchClarification from "@/components/SmartSearchClarification";
 
 const groupKey = (group: SearchGroup) => `${group.area}:${group.wishIndex}`;
 const SEARCH_ERROR = { invalid: "invalid", unavailable: "unavailable", unauthorized: "unauthorized" } as const;
+type Clarification = { question: string; scope: string; retry: number } | null;
+const SmartSearchMap = dynamic(() => import("./SmartSearchMap"), { ssr: false });
 
 export default function UnifiedSearchResults() {
   const t = useTranslations("UnifiedSearch");
@@ -28,7 +32,9 @@ export default function UnifiedSearchResults() {
   const [groups, setGroups] = useState<SearchGroup[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const [clarification, setClarification] = useState("");
+  const [clarification, setClarification] = useState<Clarification>(null);
+  const clarificationRef = useRef<Clarification>(null);
+  const updateClarification = useCallback((value: Clarification) => { clarificationRef.current = value; setClarification(value); }, []);
   const [retry, setRetry] = useState(0);
   const [morePending, setMorePending] = useState<string[]>([]);
   const [moreErrors, setMoreErrors] = useState<string[]>([]);
@@ -40,6 +46,7 @@ export default function UnifiedSearchResults() {
   const navigation = useRef(router);
   useEffect(() => { navigation.current = router; }, [router]);
   const scope = JSON.stringify([encodedPlan, requestText, locale, userId, isLoaded]);
+  const dialogueScope = JSON.stringify([encodedPlan, requestText, userId]);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -50,7 +57,7 @@ export default function UnifiedSearchResults() {
     // A deferred start avoids duplicate paid requests during React's effect replay.
     const timer = setTimeout(async () => {
       setResultScope(scope);
-      setMorePending([]); setMoreErrors([]); setGroups([]); setError(""); setClarification("");
+      setMorePending([]); setMoreErrors([]); setGroups([]); setError("");
       const decoded = decodeSearchPlan(encodedPlan);
       setPlan(decoded);
       const source = JSON.stringify([encodedPlan, requestText]);
@@ -69,9 +76,12 @@ export default function UnifiedSearchResults() {
         setInput(requestText || summary || "");
       }
       if (!isLoaded) { setLoading(false); return; }
-      if (!userId) { setError(SEARCH_ERROR.unauthorized); setLoading(false); return; }
+      if (!userId) { updateClarification(null); setError(SEARCH_ERROR.unauthorized); setLoading(false); return; }
       if (!encodedPlan && !requestText.trim()) { setLoading(false); return; }
       if (encodedPlan && !decoded) { setError(SEARCH_ERROR.invalid); setLoading(false); return; }
+      // Locale changes translate the controls without losing the answer draft or
+      // reinterpreting the initial request. Account/query changes get a new dialogue.
+      if (!encodedPlan && clarificationRef.current?.scope === dialogueScope && clarificationRef.current.retry === retry) { setLoading(false); return; }
       setLoading(true);
       try {
         if (decoded) {
@@ -95,14 +105,14 @@ export default function UnifiedSearchResults() {
           if (controller.signal.aborted) return;
           const link = Array.isArray(data.links) ? data.links.find((item: { href?: unknown }) => typeof item?.href === "string" && searchPlanFromHref(item.href)) : null;
           if (link) navigation.current.replace(link.href, { scroll: false });
-          else setClarification(typeof data.reply === "string" ? data.reply : "");
+          else if (typeof data.reply === "string" && data.reply.trim()) updateClarification({ question: data.reply, scope: dialogueScope, retry });
         }
       } catch (failure) {
         if (!controller.signal.aborted) setError(failure instanceof Error ? failure.message : SEARCH_ERROR.unavailable);
       } finally { if (!controller.signal.aborted) setLoading(false); }
     }, 0);
     return () => { clearTimeout(timer); controller.abort(); for (const pending of pendingPages) pending.abort(); };
-  }, [encodedPlan, requestText, locale, userId, isLoaded, retry, scope, t, taxonomy]);
+  }, [encodedPlan, requestText, locale, userId, isLoaded, retry, scope, dialogueScope, updateClarification, t, taxonomy]);
 
   async function more(group: SearchGroup) {
     if (!plan || group.nextOffset === null || morePending.includes(groupKey(group))) return;
@@ -147,8 +157,9 @@ export default function UnifiedSearchResults() {
         </form>
         <div aria-live="polite" className="mt-3 text-sm text-text-secondary">
           {loading && <p className="flex items-center gap-2"><Loader2 size={18} className="animate-spin text-gold" />{plan ? t("loading") : t("understanding")}</p>}
-          {resultScope === scope && clarification && <p>{clarification}</p>}
         </div>
+        {clarification?.scope === dialogueScope && clarification.retry === retry && !error && userId && <SmartSearchClarification key={`${dialogueScope}:${retry}`}
+          question={clarification.question} requestText={requestText} onUnauthorized={() => { updateClarification(null); setGroups([]); setError(SEARCH_ERROR.unauthorized); }} />}
         {resultScope === scope && error && <div role="alert" className="mt-3 text-sm text-text-secondary"><p>{errorText}</p>
           {error === "unauthorized" ? <Link className="inline-flex min-h-11 items-center text-gold" href={`/sign-in?redirect_url=${encodeURIComponent(returnTo)}`}>{genie("signIn")}</Link>
             : <button type="button" className="min-h-11 text-gold" onClick={() => setRetry(value => value + 1)}>{t("retry")}</button>}
@@ -156,6 +167,7 @@ export default function UnifiedSearchResults() {
       </div>
     </div>
     {resultScope === scope && !loading && !error && <div className="site-container space-y-7 py-5">
+      {plan && userId && <SmartSearchMap key={scope} plan={plan} onUnauthorized={() => { setGroups([]); setError(SEARCH_ERROR.unauthorized); }} />}
       {SEARCH_AREAS.map(area => {
         const visible = groups.filter(group => group.area === area && (group.results.length || group.nextOffset !== null || plan?.searches[group.wishIndex].area !== "all"));
         if (!visible.length) return null;

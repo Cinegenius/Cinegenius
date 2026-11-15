@@ -8399,6 +8399,15 @@
       "news": "News",
       "organizations": "Organizations",
       "animals": "Film animals"
-    }
+    },
+    "followUpLabel": "Your answer",
+    "followUpPlaceholder": "Add your requirements …",
+    "followUpSubmit": "Send answer",
+    "conversationExpired": "This short conversation has expired. Start the search again above; your draft is kept.",
+    "conversationLimit": "Please summarise your plan in a new search above. Your draft is kept.",
+    "mapTitle": "Your search on the map",
+    "mapLegend": "Map categories",
+    "mapIncomplete": "More results have not yet been loaded on the map.",
+    "mapMore": "Load more map results"
   }
 }

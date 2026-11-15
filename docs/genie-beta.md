@@ -237,6 +237,57 @@ Do not rotate it or claim that the model's interpretation passed a real test.
 See `test-reports/genie-unified-search-2026-11-14.md` for evidence and remaining
 real-model/native-device checks. Shared workplace mutations are still unavailable.
 
+## Smart map and planning dialogue (15 November 2026)
+
+- The existing result endpoint additionally accepts `{plan,view:"map"}` and
+  `{plan,view:"map",cursor:{wishIndex,area,offset}}`. Omitting `view` keeps the
+  previous list contract; other values are rejected. Map responses add optional
+  `mapPoint: {lat,lng,radiusMeters?:500} | null` to each result. No migration is
+  required. Authorization, origin checks and private/no-store headers are unchanged.
+- Map pagination is independent of the twelve-item list: at most 180 candidate
+  rows are scanned per group/request. Follow `nextOffset` explicitly, including
+  after an empty page. The UI discloses incomplete results and offers a load-more
+  action, with at most two page requests concurrently. Deduplicate by `type:id`
+  across wishes; do not infer total membership from mapped markers.
+- Crew points honor current profile, location and map permissions. Personal offers
+  use `privacy_visible_listings`. A Location exposes only its validated public
+  500m area or a public city point, never an exact address/coordinate. Other areas
+  use public city points. Entries without a permitted point remain in the list.
+  The combined map makes no additional geocoding request or authorization cache.
+- Smart-only marker colors are centralized in `lib/smart-search-map.ts`: Crew
+  green, Locations orange, Marketplace violet, Companies blue; the remaining
+  areas also have fixed distinct colors and translated legend labels. Mixed
+  clusters show a segmented color ring. Ordinary directory marker styling stays
+  unchanged. The shared Leaflet/MapLibre adapter cancels late resize callbacks
+  after map teardown, including quick navigation and viewport changes.
+- Production requests show an initial role/category selection first, without a
+  budget, date or scale questionnaire (operator clarification, 15 November).
+  Broad genre requests can search across Crew, Locations, Marketplace and
+  Companies; this is a starting selection, not a complete production plan.
+  Vague keywords can search all areas. Quantities are not stock/availability
+  constraints in plan-v1 and must never be represented as confirmed fulfillment.
+  Necessary place clarifications and optional refinements remain supported; keep
+  the original places in subsequent short answers. The server's bare-keyword
+  shortcut only applies to initial
+  one-message requests; it must not discard established conversation context.
+- The web clarification composer uses the existing `/api/genie` contract and
+  validated version-1 search links. Its in-memory history is scoped to account
+  and request, survives locale changes and expires after ten idle minutes. No
+  conversation is persisted or placed in the URL. Interrupted requests retain
+  unsent text, retry only on explicit action, and discard late replies after
+  navigation/account changes. Expired or full context requires a fresh search;
+  never silently omit the original place. Native callers must preserve equivalent
+  behavior without replacing app-specific navigation or microphone handling.
+- Cost replies use only the approved `SupportMediation.genieSummary`, without
+  amounts, percentages, examples or a pricing link. Provider response field
+  `topic` is internal only: platform-cost replies are replaced server-side with
+  that localized summary. `/api/genie` keeps its existing client response shape.
+  Legal/pricing pages and actual provider rental prices are not changed.
+
+See `test-reports/smart-planning-map-and-cost-summary-2026-11-15.md` for completed
+checks, including the distinction between browser fixtures, live guest checks,
+real read-only database checks and the remaining real-model/native tests.
+
 ## Verification status
 
 The targeted API/client/voice/auth/proxy regression suite and all nine language
