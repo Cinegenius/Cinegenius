@@ -422,7 +422,7 @@ Native Scanner-/Dispo-/PDF-Quellen und neuere Mac-Arbeit bleiben unberührt.
 
 Geprüfte WEB-Quelle `67cc5854a697041033d70d35482f060cb90886ab` ist auf Grundlage
 von `516465a` in den App-Stand übernommen. Bei Übergabe noch nicht veröffentlicht;
-letzte bestätigte Live-Quelle bleibt `ad3cb39`. Vollständiger Vertrag:
+damals war `ad3cb39` die bestätigte Live-Quelle. Vollständiger Vertrag:
 [`smart-search-v2.md`](smart-search-v2.md). Alte v1-Links bleiben verwendbar;
 neue v2-Pläne erhalten Mengen, Vorschläge, feste Anforderungen und Ausschlüsse.
 
@@ -452,3 +452,15 @@ ebenfalls abgeglichen: Er enthält die bereits an App `104d940` geprüfte
 Sprachwechsel-Korrektur und den ergänzten Prüfbericht. Dieser Nachlauf ändert
 keinen App-Anwendungscode. Er ist weiterhin keine Veröffentlichung oder
 Geräteinstallation; die Prüfgrenzen des genannten Belegs bleiben bestehen.
+
+WEB hat den abschließenden Stand `637f57960a5265e3c29aa2768d25b19e66932b7d`
+am 15. November 2026 nach Markus' ausdrücklicher Freigabe veröffentlicht.
+Deployment `dpl_12nB8LSjRgCXYuE8LKWmsCUW5Bcx` ist READY, gehört zum verknüpften
+CineGenius-Projekt und ist `www.cinegenius.co` zugeordnet; Quell-SHA und
+`origin/main` stimmen überein. Die App-Vorschau mit entfernten Web-Inhalten
+kann damit den veröffentlichten Smart-v2-Stand laden. Dies aktualisiert den
+Veröffentlichungsstatus, ohne native Quellen oder Geräteinstallationen zu ändern.
+Die Live-Gastprüfungen von WEB ersetzen keine angemeldete Live-Modellprüfung
+oder einen physischen iPhone-/Android-Test. Belege:
+`/srv/cinegenius/handoffs/20261115-smart-search-expanded-ready/receipt.json` und
+`/srv/cinegenius/audits/20261115-smart-search-expanded/production-637f579/`.
