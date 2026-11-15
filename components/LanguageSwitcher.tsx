@@ -9,7 +9,8 @@ import { LANGUAGE_OPTIONS } from "@/lib/i18n/locales";
 const LANGUAGES = LANGUAGE_OPTIONS;
 
 function persistLocaleCookie(code: string) {
-  document.cookie = `cg_locale=${code}; path=/; max-age=31536000; samesite=lax`;
+  const secure = window.location.protocol === "https:" ? "; Secure" : "";
+  document.cookie = `cg_locale=${code}; path=/; max-age=31536000; samesite=lax${secure}`;
 }
 
 export default function LanguageSwitcher() {
