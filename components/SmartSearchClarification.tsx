@@ -5,7 +5,7 @@ import { Send } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import { GENIE_MAX_MESSAGE_CHARS, validateGenieRequest } from "@/lib/genie";
 import { GENIE_IDLE_MS } from "@/lib/genie-conversation";
-import { searchPlanFromHref } from "@/lib/unified-search";
+import { searchPlanFromHref, type SearchPlan } from "@/lib/unified-search";
 import { useFormRouter } from "@/lib/use-form-router";
 
 type Message = { role: "user" | "assistant"; content: string };
@@ -16,8 +16,8 @@ const ERROR = {
 } as const;
 
 /** Short-lived, account-scoped dialogue. Nothing is written to storage or the URL. */
-export default function SmartSearchClarification({ question, requestText, onUnauthorized }: {
-  question: string; requestText: string; onUnauthorized: () => void;
+export default function SmartSearchClarification({ question, requestText, onUnauthorized, searchContext }: {
+  question: string; requestText: string; onUnauthorized: () => void; searchContext?: { plan: SearchPlan; wishIndex?: number };
 }) {
   const t = useTranslations("UnifiedSearch");
   const genie = useTranslations("Genie");
@@ -28,7 +28,7 @@ export default function SmartSearchClarification({ question, requestText, onUnau
   const [pending, setPending] = useState(false);
   const [error, setError] = useState<FollowUpError | null>(null);
   const [activity, setActivity] = useState(() => Date.now());
-  const history = useRef<Message[]>([{ role: "user", content: requestText }, { role: "assistant", content: question }]);
+  const history = useRef<Message[]>(requestText ? [{ role: "user", content: requestText }, { role: "assistant", content: question }] : []);
   const active = useRef<AbortController | null>(null);
   const input = useRef<HTMLInputElement>(null);
   const expired = error === "conversationExpired" || error === "conversationLimit";
@@ -62,7 +62,7 @@ export default function SmartSearchClarification({ question, requestText, onUnau
       history.current = []; setReply(""); setError(ERROR.expired); return;
     }
     const messages: Message[] = [...history.current, { role: "user", content: text }];
-    const validated = validateGenieRequest({ area: "general", locale, messages });
+    const validated = validateGenieRequest({ area: "general", locale, messages, ...(searchContext ? { searchContext } : {}) });
     if (!validated.ok) { setError(validated.error === "unsafe_input" ? ERROR.unsafe : ERROR.limit); return; }
     const controller = new AbortController();
     active.current = controller;
@@ -87,7 +87,7 @@ export default function SmartSearchClarification({ question, requestText, onUnau
       history.current = [...messages, { role: "assistant", content: data.reply }];
       setReply(data.reply); setDraft(""); setActivity(Date.now());
       input.current?.focus({ preventScroll: true });
-    } catch { if (active.current === controller && history.current.length) setError(ERROR.failed); }
+    } catch { if (active.current === controller) setError(ERROR.failed); }
     finally { window.clearTimeout(timer); if (active.current === controller) { active.current = null; setPending(false); } }
   }
 
@@ -110,5 +110,8 @@ export default function SmartSearchClarification({ question, requestText, onUnau
     </form>
     {pending && <p role="status" className="mt-2">{t("understanding")}</p>}
     {error && <p role="alert" className="mt-2">{errorText}</p>}
+    {expired && searchContext && <button type="button" className="min-h-11 text-gold" onClick={() => {
+      history.current = []; setReply(question); setError(null); setPending(false); active.current = null; setActivity(Date.now());
+    }}>{t("restartContext")}</button>}
   </div>;
 }

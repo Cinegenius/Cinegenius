@@ -46,6 +46,11 @@ function keywordIndex(locale: string, taxonomy?: (key: string) => string) {
  * Longest catalogue phrases win, so "Assistant Costume Designer" stays one job.
  * Conjunctions and commas are optional; nothing is silently discarded. */
 function keywords(text: string, locale: string, taxonomy?: (key: string) => string, index = keywordIndex(locale, taxonomy)): Keyword[] | null {
+  const person = /^(?:jemand(?:en)?|eine?|einen)\s+(?:vom|aus\s+dem|aus\s+der)\s+(.+)$/i.exec(text.trim());
+  if (person) {
+    const dept = searchDepartment(person[1], locale, taxonomy);
+    if (dept) return [{ area: "crew", query: "", department: dept.id }];
+  }
   const service = text.trim().replace(/^(?:ein(?:e|en)?|a|an)\s+/i, "");
   if (cateringSearch(service)) return [{ area: "companies", query: service, department: "" }];
   const words = occupationKey(text).split(" ");
@@ -56,13 +61,19 @@ function keywords(text: string, locale: string, taxonomy?: (key: string) => stri
     if (result.length && /^(und|and|et|en|y|e|a|es|och|sowie)$/.test(words[offset])) {
       if (++offset === words.length) return null;
     }
+    const numbers: Record<string, number> = { ein: 1, eine: 1, einen: 1, eins: 1, zwei: 2, drei: 3, vier: 4, funf: 5,
+      one: 1, two: 2, three: 3, four: 4, five: 5, dos: 2, tres: 3, due: 2, tre: 3, twee: 2, drie: 3, tva: 2, dva: 2, harom: 3, ket: 2 };
+    const quantity = /^\d{1,3}$/.test(words[offset]) ? Number(words[offset]) : numbers[words[offset]];
+    if (quantity) offset++;
+    else if (/^(a|an)$/.test(words[offset])) offset++;
+    if (offset >= words.length) return null;
     let found = false;
     for (let end = words.length; end > offset; end--) {
       const phrase = words.slice(offset, end).join(" ");
       const match = isDepartmentHeadsQuery(phrase) ? { area: "crew" as const, query: DEPARTMENT_HEADS_QUERY, department: "" }
         : cateringSearch(phrase) ? { area: "companies" as const, query: phrase, department: "" } : index.get(phrase);
       if (!match) continue;
-      result.push(match); offset = end; found = true; break;
+      result.push({ ...match, ...(quantity ? { quantity } : {}) }); offset = end; found = true; break;
     }
     if (!found || result.length > MAX_SEARCHES) return null;
   }
@@ -70,7 +81,7 @@ function keywords(text: string, locale: string, taxonomy?: (key: string) => stri
   // Beside an explicit crew job, a bare department denotes colleagues there.
   return result.map(wish => {
     const department = wish.area === "all" && result.some(item => item.area === "crew") ? searchDepartment(wish.query, locale, taxonomy) : undefined;
-    return department ? { area: "crew", query: "", department: department.id } : wish;
+    return department ? { ...wish, area: "crew", query: "", department: department.id } : wish;
   });
 }
 
@@ -81,9 +92,10 @@ export function normalizeKeywordPlan(plan: SearchPlan, locale = "de", taxonomy?:
     if (!["crew", "all"].includes(wish.area) || wish.department) return [wish];
     const parts = keywords(wish.query, locale, taxonomy);
     if (!parts || parts.length < 2) return [wish];
-    return parts.map(part => ({ ...part, places: wish.places }));
+    if (wish.quantity || wish.requirements?.length || wish.exclude?.length) return [wish];
+    return parts.map(part => ({ ...wish, ...part, places: wish.places }));
   });
-  return readSearchPlan({ version: 1, searches });
+  return readSearchPlan({ version: plan.version, searches });
 }
 
 /** Complete, unqualified production briefs only. Extra requirements, negation,
@@ -98,18 +110,18 @@ function productionSearchPlan(text: string): SearchPlan | null {
   const theme = /polizei|police|crime|krimi/i.test(german?.[2] ?? english?.[1] ?? "") ? "Polizei"
     : /mittelalter|medieval/i.test(german?.[2] ?? english?.[1] ?? "") ? "Mittelalter" : "";
   const places = [{ city, country: "", continent: "", radiusKm: 0 }];
-  return readSearchPlan({ version: 1, searches: [
+  return readSearchPlan({ version: 2, searches: [
     { area: "crew", query: DEPARTMENT_HEADS_QUERY, department: "", places },
-    ...(theme ? [{ area: "all", query: theme, department: "", places }] : []),
+    ...(theme ? ["marketplace", "locations", "companies"].map(area => ({ area, query: theme, department: "", places })) : []),
     { area: "companies", query: "Filmproduktion", department: "", places },
     { area: "companies", query: "Catering", department: "", places },
-    { area: "locations", query: "Location", department: "", places },
-  ] });
+    ...(!theme ? [{ area: "locations", query: "Location", department: "", places }] : []),
+  ].map(wish => ({ ...wish, recommended: true })) });
 }
 
 /** A complete, simple request can correct an omitted/misclassified model wish.
  * Complex place attachment, negation, refinements and unknown text are never guessed. */
-export function keywordSearchPlan(text: string, locale = "de", taxonomy?: (key: string) => string): SearchPlan | null {
+function simpleSearchPlan(text: string, locale = "de", taxonomy?: (key: string) => string): SearchPlan | null {
   const production = productionSearchPlan(text);
   if (production) return production;
   const index = keywordIndex(locale, taxonomy);
@@ -145,5 +157,43 @@ export function keywordSearchPlan(text: string, locale = "de", taxonomy?: (key: 
       ({ parts, places } = candidates.values().next().value!);
     }
   }
-  return readSearchPlan({ version: 1, searches: parts.map(part => ({ ...part, places })) });
+  return readSearchPlan({ version: 2, searches: parts.map(part => ({ ...part, places })) });
+}
+
+/** Compose only fully recognized clauses. Longest phrases are attempted first;
+ * ambiguous attachments and unknown modifiers still go to the interpreter. */
+export function keywordSearchPlan(text: string, locale = "de", taxonomy?: (key: string) => string): SearchPlan | null {
+  const direct = simpleSearchPlan(text, locale, taxonomy);
+  if (direct) return direct;
+  const request = text.trim().replace(/[.!?]+$/, "").replace(/^(?:(?:ich\s+)?suche|zeig(?:e)?\s+mir|ich\s+brauche|find|show\s+me|i(?:'m|\s+am)\s+looking\s+for)\s+/i, "");
+  const chunks = request.split(/\s+(?:und|and|en|och|y|e|sowie)\s+|\s*[,;]\s*/i);
+  if (chunks.length < 2 || chunks.length > 10) return null;
+  const wishes: SearchWish[] = [];
+  for (let i = 0; i < chunks.length;) {
+    let parsed = false;
+    for (let end = chunks.length; end > i; end--) {
+      const phrase = chunks.slice(i, end).join(" und ");
+      const part = simpleSearchPlan(phrase.replace(/^(?:in|en|v|ve|i)\s+/i, ""), locale, taxonomy);
+      if (part && !part.searches.some(wish => wish.recommended)) {
+        wishes.push(...part.searches); i = end; parsed = true; break;
+      }
+    }
+    if (parsed) continue;
+    const placeText = chunks[i].replace(/^(?:in|en|v|ve|i)\s+(?:(?:der|the|la)\s+)?/i, "");
+    const country = countryCode(placeText);
+    if (!wishes.length || (!country && searchCityCandidates(placeText).length !== 1)) return null;
+    // A place-only continuation belongs to the immediately preceding wish.
+    const previous = wishes[wishes.length - 1];
+    if (!previous.places.length) return null;
+    previous.places.push({ city: country ? "" : placeText, country, continent: "", radiusKm: 0 });
+    i++;
+  }
+  const placed = wishes.filter(wish => wish.places.length);
+  if (placed.length && wishes.some(wish => !wish.places.length)) {
+    // Only an unambiguous trailing shared place can apply backwards.
+    const last = wishes.at(-1)!;
+    if (!last.places.length || placed.some(wish => JSON.stringify(wish.places) !== JSON.stringify(last.places))) return null;
+    wishes.forEach(wish => { if (!wish.places.length) wish.places = last.places; });
+  }
+  return readSearchPlan({ version: 2, searches: wishes });
 }

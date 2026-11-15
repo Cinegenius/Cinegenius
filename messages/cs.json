@@ -8252,6 +8252,27 @@
     "mapMore": "Načíst další výsledky na mapě",
     "nearbyResults": "V požadovaném místě zde nejsou výsledky. Nejbližší odpovídající výsledky:",
     "nearbyMap": "U hledání bez místních výsledků mapa zobrazuje také nejbližší odpovídající výsledky.",
-    "nearbyDistance": "asi {distance} km od {place} · vzdušnou čarou"
+    "nearbyDistance": "asi {distance} km od {place} · vzdušnou čarou",
+    "editQuery": "Hledaný výraz",
+    "editArea": "Oblast",
+    "allAreas": "Všechny oblasti",
+    "quantityLabel": "Požadovaný počet",
+    "editCity": "Město",
+    "editCountry": "Země",
+    "anyCountry": "Všechny země",
+    "removePlace": "Odebrat místo",
+    "addPlace": "Přidat místo",
+    "applyWish": "Použít",
+    "removeWish": "Odebrat požadavek",
+    "editInvalid": "Zkontroluj výraz, počet a místa.",
+    "refineWish": "Doplň nebo změň tento požadavek.",
+    "suggested": "Návrh",
+    "required": "Požadováno: {values}",
+    "excluded": "Bez: {values}",
+    "editWish": "Upravit požadavek",
+    "quantityNotice": "Počet vyjadřuje potřebu, nikoli potvrzenou dostupnost.",
+    "refineSearch": "Upřesnit hledání",
+    "refineHint": "Přidej požadavek nebo změň konkrétní místa a podmínky.",
+    "restartContext": "Pokračovat s těmito filtry"
   }
 }

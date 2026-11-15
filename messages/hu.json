@@ -8252,6 +8252,27 @@
     "mapMore": "További térképes találatok betöltése",
     "nearbyResults": "A kért helyen itt nincs találat. A legközelebbi megfelelő találatok:",
     "nearbyMap": "Helyi találat nélkül a térkép a legközelebbi megfelelő találatokat is megjeleníti.",
-    "nearbyDistance": "kb. {distance} km innen: {place} · légvonalban"
+    "nearbyDistance": "kb. {distance} km innen: {place} · légvonalban",
+    "editQuery": "Keresőkifejezés",
+    "editArea": "Terület",
+    "allAreas": "Minden terület",
+    "quantityLabel": "Kért mennyiség",
+    "editCity": "Település",
+    "editCountry": "Ország",
+    "anyCountry": "Minden ország",
+    "removePlace": "Hely eltávolítása",
+    "addPlace": "Hely hozzáadása",
+    "applyWish": "Alkalmazás",
+    "removeWish": "Keresési igény eltávolítása",
+    "editInvalid": "Ellenőrizd a kifejezést, a mennyiséget és a helyeket.",
+    "refineWish": "Egészítsd ki vagy módosítsd ezt a keresési igényt.",
+    "suggested": "Javaslat",
+    "required": "Szükséges: {values}",
+    "excluded": "Kizárva: {values}",
+    "editWish": "Keresési igény szerkesztése",
+    "quantityNotice": "A mennyiség az igényedet jelzi, nem igazolt rendelkezésre állást.",
+    "refineSearch": "Keresés pontosítása",
+    "refineHint": "Adj hozzá igényt, vagy módosíts konkrét helyeket és feltételeket.",
+    "restartContext": "Folytatás ezekkel a szűrőkkel"
   }
 }

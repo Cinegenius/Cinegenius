@@ -10,6 +10,7 @@ import { clearConversation, GENIE_IDLE_MS, GENIE_MEMORY_ACTIVITY, readConversati
 import styles from "./Genie.module.css";
 import { nativeGenieVoice } from "@/lib/genie-voice";
 import { isGenieSearchHref } from "@/lib/genie-search";
+import { searchPlanFromHref } from "@/lib/unified-search";
 import { useFormRouter } from "@/lib/use-form-router";
 import GenieVoiceControls from "./GenieVoiceControls";
 
@@ -132,6 +133,7 @@ export default function GeniePanel({ active, requestRef, memoryScope }: { active
       { role: "assistant" as const, content: entry.reply },
     ]);
     messages.push({ role: "user", content });
+    const lastPlan = previous.flatMap(entry => entry.links).map(link => searchPlanFromHref(link.href)).filter(plan => plan !== null).at(-1);
     const controller = new AbortController();
     requestRef.current = controller;
     setPendingUser(content);
@@ -157,7 +159,7 @@ export default function GeniePanel({ active, requestRef, memoryScope }: { active
         cache: "no-store",
         referrerPolicy: "no-referrer",
         signal: controller.signal,
-        body: JSON.stringify({ area: genieAreaForPath(pathname), locale, messages }),
+        body: JSON.stringify({ area: genieAreaForPath(pathname), locale, messages, ...(lastPlan ? { searchContext: { plan: lastPlan } } : {}) }),
       });
       if (requestRef.current !== controller) return;
       if (controller.signal.aborted) throw new DOMException("", "AbortError");

@@ -8252,6 +8252,27 @@
     "mapMore": "Meer kaartresultaten laden",
     "nearbyResults": "Geen resultaten hier op de gevraagde locatie. De dichtstbijzijnde passende resultaten:",
     "nearbyMap": "Bij zoekopdrachten zonder lokale resultaten toont de kaart ook de dichtstbijzijnde passende resultaten.",
-    "nearbyDistance": "ca. {distance} km van {place} · hemelsbreed"
+    "nearbyDistance": "ca. {distance} km van {place} · hemelsbreed",
+    "editQuery": "Zoekterm",
+    "editArea": "Onderdeel",
+    "allAreas": "Alle onderdelen",
+    "quantityLabel": "Gewenst aantal",
+    "editCity": "Plaats",
+    "editCountry": "Land",
+    "anyCountry": "Alle landen",
+    "removePlace": "Plaats verwijderen",
+    "addPlace": "Plaats toevoegen",
+    "applyWish": "Toepassen",
+    "removeWish": "Zoekwens verwijderen",
+    "editInvalid": "Controleer de zoekterm, het aantal en de plaatsen.",
+    "refineWish": "Vul deze zoekwens aan of wijzig hem.",
+    "suggested": "Suggestie",
+    "required": "Vereist: {values}",
+    "excluded": "Zonder: {values}",
+    "editWish": "Zoekwens bewerken",
+    "quantityNotice": "Het aantal is je behoefte, geen bevestigde beschikbaarheid.",
+    "refineSearch": "Zoekopdracht verfijnen",
+    "refineHint": "Voeg een wens toe of wijzig specifieke plaatsen en eisen.",
+    "restartContext": "Doorgaan met deze filters"
   }
 }

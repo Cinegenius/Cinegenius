@@ -8252,6 +8252,27 @@
     "mapMore": "Load more map results",
     "nearbyResults": "No matches here in the requested location. The nearest matching results:",
     "nearbyMap": "For searches without local matches, the map also shows the nearest matching results.",
-    "nearbyDistance": "about {distance} km from {place} · straight-line"
+    "nearbyDistance": "about {distance} km from {place} · straight-line",
+    "editQuery": "Search term",
+    "editArea": "Area",
+    "allAreas": "All areas",
+    "quantityLabel": "Requested quantity",
+    "editCity": "City",
+    "editCountry": "Country",
+    "anyCountry": "All countries",
+    "removePlace": "Remove place",
+    "addPlace": "Add place",
+    "applyWish": "Apply",
+    "removeWish": "Remove search wish",
+    "editInvalid": "Please check the term, quantity and places.",
+    "refineWish": "Add to or change this search wish.",
+    "suggested": "Suggestion",
+    "required": "Required: {values}",
+    "excluded": "Without: {values}",
+    "editWish": "Edit search wish",
+    "quantityNotice": "Quantity is your requirement, not confirmed availability.",
+    "refineSearch": "Refine search",
+    "refineHint": "Add a wish or change specific places and requirements.",
+    "restartContext": "Continue with these filters"
   }
 }

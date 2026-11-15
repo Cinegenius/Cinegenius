@@ -8252,6 +8252,27 @@
     "mapMore": "Carica altri risultati sulla mappa",
     "nearbyResults": "Nessun risultato qui nella località richiesta. Ecco i risultati pertinenti più vicini:",
     "nearbyMap": "Per le ricerche senza risultati locali, la mappa mostra anche i risultati pertinenti più vicini.",
-    "nearbyDistance": "circa {distance} km da {place} · in linea d’aria"
+    "nearbyDistance": "circa {distance} km da {place} · in linea d’aria",
+    "editQuery": "Termine di ricerca",
+    "editArea": "Ambito",
+    "allAreas": "Tutti gli ambiti",
+    "quantityLabel": "Quantità richiesta",
+    "editCity": "Località",
+    "editCountry": "Paese",
+    "anyCountry": "Tutti i paesi",
+    "removePlace": "Rimuovi luogo",
+    "addPlace": "Aggiungi luogo",
+    "applyWish": "Applica",
+    "removeWish": "Rimuovi ricerca",
+    "editInvalid": "Controlla termine, quantità e luoghi.",
+    "refineWish": "Integra o modifica questa ricerca.",
+    "suggested": "Suggerimento",
+    "required": "Richiesto: {values}",
+    "excluded": "Senza: {values}",
+    "editWish": "Modifica ricerca",
+    "quantityNotice": "La quantità indica il fabbisogno, non la disponibilità confermata.",
+    "refineSearch": "Affina la ricerca",
+    "refineHint": "Aggiungi una richiesta o modifica luoghi e requisiti specifici.",
+    "restartContext": "Continua con questi filtri"
   }
 }

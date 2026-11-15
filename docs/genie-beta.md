@@ -414,3 +414,14 @@ Global search no longer reads or writes a recent-search list. On mount and searc
   interpretation quality for arbitrary free-form wording, an authenticated
   production session or native-device behavior. This extension is not yet
   published; the preceding nearest-results release is live at ad3cb39.
+
+### Comprehensive Smart expansion, 15 November 2026
+
+The subsequent operator-approved implementation adds v2 search plans,
+quantities, explicit public requirements/exclusions, per-department head
+fallback, stable evidence-ranked pagination, editable wishes and short-lived
+result/Genie follow-up context. Initial list and map results can share one
+permission-checked read. See [Smart search v2](smart-search-v2.md) for the exact
+backward-compatible API, cursor and native contract, tests and limitations.
+This implementation is a prepared source change; publishing it requires its
+own guarded release and an explicit receipt.
