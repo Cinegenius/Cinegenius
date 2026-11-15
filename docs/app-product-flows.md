@@ -350,10 +350,12 @@ und überschreibt keine laufenden Xcode-Änderungen auf dem Mac.
 
 ## Getrennte Wünsche und nächste Treffer (15. November 2026)
 
-Geprüfte Quelle `ad3cb39f75c0183aa6fddad176fd5ece6217f405` ist für den
-App-Abgleich übernommen, bei Übergabe noch nicht auf der Website veröffentlicht.
-Die entfernte App-Vorschau bekommt diese Erweiterung erst nach einer gesondert
-freigegebenen Website-Veröffentlichung; ein Quellenabgleich installiert keine App.
+Geprüfte Quelle `ad3cb39f75c0183aa6fddad176fd5ece6217f405` ist im App-Code
+übernommen und nach Markus’ Freigabe von WEB veröffentlicht. Der Releasebeleg
+bestätigt `dpl_DmFNTnAL2WwZ2X7i9TNdpNG5Gou3` als READY auf beiden CineGenius-
+Domains; `origin/main` stimmt mit der geprüften Quelle überein. Die entfernte
+App-Vorschau lädt diese gemeinsame Weboberfläche. Dieser Abgleich installiert
+keine neue native App und belegt keine angemeldete Live-/iPhone-Prüfung.
 
 „Hamburg Polizei Kostüm“ ergibt unabhängige Wünsche mit Hamburg als gemeinsamem
 Ort. „Berlin Location Polizei“ sucht alle Berliner Locations und unabhängig davon
