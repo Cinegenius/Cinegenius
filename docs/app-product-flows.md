@@ -470,7 +470,8 @@ oder einen physischen iPhone-/Android-Test. Belege:
 WEB-Quelle `ad7085d10eea299cc7f163132d5c766660e0e1ca` erweitert eine neue Suche
 wie „ich drehe in münchen“ auf alle 25 gemeinsamen Gewerke sowie Locations,
 Marktplatz, Firmen und Catering. Bei Übergabe noch nicht veröffentlicht;
-bestätigter Live-Stand bleibt `637f579`. Der Abgleich veröffentlicht nichts.
+damals war `637f579` der bestätigte Live-Stand. Der App-Abgleich selbst
+veröffentlicht nichts; der anschließende WEB-Release ist unten dokumentiert.
 
 Der kanonische v2-Wunsch `Production Crew` benötigt nur einen Wunschplatz und
 liefert je Gewerk eine eigene `segment`-Gruppe. Primäre und zusätzliche deklarierte
@@ -493,3 +494,12 @@ Orts-/Kartenrechte und explizite Suchgrenzen gelten weiterhin vor der Auswahl.
 Keine Migration, Modelländerung, zusätzliche Speicherung oder native Installation.
 Native und neuere Mac-/Dispo-/PDF-Quellen bleiben erhalten. App-Prüfbelege:
 `/srv/cinegenius/handoffs/20261115-app-production-selection/`.
+
+WEB veröffentlichte diese Quelle am 15. November 2026 nach Markus' ausdrücklicher
+Freigabe. Deployment `dpl_9gdXHm4qh4cKj9WQzqAet5Kdf1ct` ist READY; Projekt,
+beide `.co`-Aliase, Quell-SHA `ad7085d` und `origin/main` sind abgeglichen.
+Die App-Vorschau kann die veröffentlichten Web-Inhalte laden. Anwendungscode
+und native Dateien benötigen für diese Statusaktualisierung keine Änderung.
+Live-Gastprüfungen durch WEB bestätigen den Anmeldeschutz, ersetzen jedoch
+keinen angemeldeten Live-Modellablauf oder physischen Gerätetest. Release-Beleg:
+`/srv/cinegenius/handoffs/20261115-smart-production-selection-ready/receipt.json`.
