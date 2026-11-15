@@ -260,9 +260,15 @@ real-model/native-device checks. Shared workplace mutations are still unavailabl
   clusters show a segmented color ring. Ordinary directory marker styling stays
   unchanged. The shared Leaflet/MapLibre adapter cancels late resize callbacks
   after map teardown, including quick navigation and viewport changes.
-- Planning requests can ask one short clarification about production type/scale
-  before resolving a practical role list. Keep the original places in subsequent
-  short answers. The server's bare-keyword shortcut only applies to initial
+- Production requests show an initial role/category selection first, without a
+  budget, date or scale questionnaire (operator clarification, 15 November).
+  Broad genre requests can search across Crew, Locations, Marketplace and
+  Companies; this is a starting selection, not a complete production plan.
+  Vague keywords can search all areas. Quantities are not stock/availability
+  constraints in plan-v1 and must never be represented as confirmed fulfillment.
+  Necessary place clarifications and optional refinements remain supported; keep
+  the original places in subsequent short answers. The server's bare-keyword
+  shortcut only applies to initial
   one-message requests; it must not discard established conversation context.
 - The web clarification composer uses the existing `/api/genie` contract and
   validated version-1 search links. Its in-memory history is scoped to account

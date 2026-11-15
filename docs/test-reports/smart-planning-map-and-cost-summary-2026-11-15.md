@@ -11,8 +11,9 @@ not evidence of its production publication. No database migration is needed.
   server supplies the actual localized platform-cost reply. Existing legal terms
   and provider rental-price answers are unchanged.
 - Existing membership guards cover direct Genie, transcription and Smart results.
-- Crew-planning instructions ask a short production/scale clarification when
-  required and preserve the requested place in follow-up role searches. The new
+- Crew requests show an initial selection without a budget, date or scale
+  questionnaire. Broad production requests can span several result areas. Necessary
+  place clarifications and optional refinements preserve the requested place. The new
   Smart-page answer form keeps context in memory only and retains drafts across
   locale changes and recoverable failures.
 - One combined map displays independently paginated results with a translated
@@ -28,7 +29,7 @@ not evidence of its production publication. No database migration is needed.
 
 - Targeted Genie/API/client/search regression run: 125 passed. Includes approved
   cost summaries in all nine locales, unchanged writing and rental-price behavior,
-  guest rejection before paid work, planning clarification and place-preserving
+  guest rejection before paid work, planning dialogue and place-preserving
   short follow-ups. AI responses in these tests are mocked.
 - Subsequent map/search suite: 32 passed, including privacy projection, opt-out,
   public location areas, independent map/list pagination, safe marker colors,
@@ -58,6 +59,16 @@ not evidence of its production publication. No database migration is needed.
   webpack production build with TypeScript passed.
 
 ## Limits and evidence
+
+During the approved release, the operator clarified that initial results must
+come first; full planning and budgeting are future work. The follow-up prompt
+now handles broad production starter searches without a budget/scale gate,
+obvious spelling errors and distinct animal/vehicle wishes. A subsequent targeted
+Genie/search run passed 83 tests, including the Munich dog/giraffe/tank example
+and a six-wish Hamburg medieval-film selection spanning four areas. These are
+mocked-provider contract tests, not live-model interpretation scores. ESLint,
+catalog validation and diff checks also passed. This supersedes the initial
+prompt's production/scale-question-first behavior; UI and API contracts are unchanged.
 
 Processing/disclosure review: the existing privacy page already describes
 OpenFreeMap tile requests and Genie messages/context, ten-minute local expiry,
