@@ -503,3 +503,20 @@ und native Dateien benötigen für diese Statusaktualisierung keine Änderung.
 Live-Gastprüfungen durch WEB bestätigen den Anmeldeschutz, ersetzen jedoch
 keinen angemeldeten Live-Modellablauf oder physischen Gerätetest. Release-Beleg:
 `/srv/cinegenius/handoffs/20261115-smart-production-selection-ready/receipt.json`.
+
+## Dezente Startseiten-Trennlinien (15. November 2026)
+
+WEB-Quelle `fb4ec8cee48901428989324faaac2609cf8eb177` ergänzt ausschließlich
+dekorative Linien in den bestehenden Zwischenräumen der Startseite. Die
+gemeinsame, auf `.home-page` begrenzte Darstellung erhält Abstände, Karten,
+Reihenfolge und Bedienung. Die vorhandenen Homepage-Komponenten sind die
+einzigen betroffenen Oberflächen; keine neuen Texte, Schnittstellen oder Daten.
+
+Dieser App-Abgleich ist noch keine Veröffentlichung. Letzter bestätigter
+Live-Stand ist `ad7085d`. Alle neun Sprachkataloge und 123 nativen Dateien
+bleiben unverändert, ebenso die neuere Mac-Arbeit. Keine Geräteinstallation.
+Die gezielten Bestandstests ergeben vor und nach der Übernahme identisch
+26 erfolgreiche Fälle und 13 bestehende Fehler wegen eines fehlenden
+`profile-privacy-server`-Mocks in der Homepage-Testumgebung. Einzelne Fehler
+werden nicht als bestandene Tests gewertet. Browserbelege, Prüfgrenzen und
+Sicherungsstand: `/srv/cinegenius/handoffs/20261115-app-home-dividers/`.

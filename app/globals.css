@@ -162,6 +162,38 @@ body {
   margin-inline: auto;
 }
 
+/* Decorative section boundaries use existing gaps, without moving the content. */
+.home-page {
+  --home-divider-color: color-mix(in srgb, var(--color-text-muted) 25%, transparent);
+  --home-divider-gutter: var(--site-gutter);
+}
+.home-page .home-section-divider { position: relative; --home-divider-top: -0.875rem; }
+.home-page .home-section-divider::before {
+  content: "";
+  position: absolute;
+  inset-inline: 0;
+  top: var(--home-divider-top);
+  height: 1px;
+  background: var(--home-divider-color);
+  pointer-events: none;
+}
+.home-page .home-section-divider--intro { --home-divider-top: -0.625rem; }
+.home-page .home-section-divider--wide { --home-divider-top: 0; }
+.home-page .home-section-divider--wide::before {
+  inset-inline: max(var(--home-divider-gutter), calc((100% - var(--site-content-max)) / 2 + var(--home-divider-gutter)));
+}
+.home-page .home-section-divider--border { --home-divider-top: -1px; }
+.home-page .home-section-divider--organizations { --home-divider-top: -0.75rem; }
+@media (min-width: 640px) {
+  .home-page { --home-divider-gutter: var(--site-gutter-tablet); }
+  .home-page .home-section-divider:not(.home-section-divider--intro, .home-section-divider--wide, .home-section-divider--border, .home-section-divider--organizations) { --home-divider-top: -1rem; }
+}
+@media (min-width: 1024px) {
+  .home-page { --home-divider-gutter: var(--site-gutter-desktop); }
+  .home-page .home-section-divider--intro { --home-divider-top: -1.125rem; }
+  .home-page .home-section-divider--organizations::before { inset: 0 auto 0 -1.125rem; width: 1px; height: auto; }
+}
+
 .site-page-hero {
   min-height: 0;
 }

@@ -385,7 +385,7 @@ export function HomePhotoDiscovery({ ratedPhotos, newPhotos }: { ratedPhotos: Di
   };
 
   return (
-    <section ref={sectionRef} className="border-y border-border bg-bg-primary py-6 sm:py-8">
+    <section ref={sectionRef} className="home-section-divider home-section-divider--wide home-section-divider--border border-y border-transparent bg-bg-primary py-6 sm:py-8">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="mb-4 flex flex-wrap items-end justify-between gap-4 sm:mb-5">
           <div className="min-w-0">
