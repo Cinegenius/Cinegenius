@@ -1,7 +1,7 @@
 "use client";
 
 import { useAuth } from "@clerk/nextjs";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
@@ -28,6 +28,7 @@ export default function UnifiedSearchResults() {
   const router = useFormRouter();
   const { userId, isLoaded } = useAuth();
   const encodedPlan = params.get("plan");
+  const editablePlan = useMemo(() => decodeSearchPlan(encodedPlan), [encodedPlan]);
   const requestText = params.get("q") ?? "";
   const [input, setInput] = useState(requestText);
   const [plan, setPlan] = useState<SearchPlan | null>(null);
@@ -158,7 +159,8 @@ export default function UnifiedSearchResults() {
             placeholder={t("placeholder")} className="min-h-11 min-w-0 flex-1 rounded-xl border border-border bg-bg-elevated px-4 py-3 text-base text-text-primary focus:border-gold focus:outline-none" />
           <button type="submit" aria-label={t("submit")} disabled={!input.trim()} className="flex min-h-11 min-w-11 items-center justify-center rounded-xl bg-gold px-3 text-bg-primary disabled:opacity-50"><Search size={20} /></button>
         </form>
-        {plan && userId && resultScope === scope && !error && <SmartSearchWishes key={dialogueScope} plan={plan} onUnauthorized={() => { setGroups([]); setError(SEARCH_ERROR.unauthorized); }} />}
+        {/* Keep unsent edits while locale/results refresh; account and plan changes reset the editor. */}
+        {editablePlan && isLoaded && userId && error !== SEARCH_ERROR.unauthorized && <SmartSearchWishes key={dialogueScope} plan={editablePlan} onUnauthorized={() => { setGroups([]); setError(SEARCH_ERROR.unauthorized); }} />}
         <div aria-live="polite" className="mt-3 text-sm text-text-secondary">
           {loading && <p className="flex items-center gap-2"><Loader2 size={18} className="animate-spin text-gold" />{plan ? t("loading") : t("understanding")}</p>}
         </div>
