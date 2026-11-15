@@ -120,7 +120,7 @@ export default function UnifiedSearchResults() {
     pages.current.add(controller); setMorePending(values => [...values, key]); setMoreErrors(values => values.filter(value => value !== key));
     try {
       const response = await fetch("/api/search/unified", { method: "POST", headers: { "Content-Type": "application/json" }, cache: "no-store", signal: controller.signal,
-        body: JSON.stringify({ plan, cursor: { wishIndex: group.wishIndex, area: group.area, offset: group.nextOffset } }) });
+        body: JSON.stringify({ plan, cursor: { wishIndex: group.wishIndex, area: group.area, offset: group.nextOffset, ...(group.nearbyCursor ? { nearby: group.nearbyCursor } : {}) } }) });
       const data = await response.json();
       if (response.status === 401) {
         if (!controller.signal.aborted) { setGroups([]); setError(SEARCH_ERROR.unauthorized); }
@@ -130,7 +130,7 @@ export default function UnifiedSearchResults() {
       if (!controller.signal.aborted) setGroups(values => values.map(current => {
         if (groupKey(current) !== key) return current;
         const next = data.groups[0] as SearchGroup;
-        const unique = new Map([...current.results, ...next.results].map(result => [`${result.type}:${result.id}`, result]));
+        const unique = new Map([...(!!current.nearby === !!next.nearby ? current.results : []), ...next.results].map(result => [`${result.type}:${result.id}`, result]));
         return { ...next, results: [...unique.values()] };
       }));
     } catch { if (!controller.signal.aborted) setMoreErrors(values => [...values, key]); }
@@ -175,6 +175,7 @@ export default function UnifiedSearchResults() {
           <h2 className="mb-3 font-serif text-2xl text-text-primary">{t(`areas.${area}`)}</h2>
           <div className="space-y-5">{visible.map(group => <section key={groupKey(group)} aria-label={group.label}>
             <h3 className="mb-2 break-words text-sm font-semibold text-gold">{group.label}</h3>
+            {group.nearby && group.results.length > 0 && <p className="mb-2 text-xs text-text-muted">{t("nearbyResults")}</p>}
             {!group.results.length && <p className="text-sm text-text-muted">{group.nextOffset !== null ? t("continueSearch") : t("emptyGroup")}</p>}
             <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 xl:grid-cols-3">{group.results.map(result => <ResultCard key={`${result.type}:${result.id}`} result={result} compact />)}</div>
             {moreErrors.includes(groupKey(group)) && <p role="alert" className="mt-3 text-sm text-text-secondary">{t("error")}</p>}

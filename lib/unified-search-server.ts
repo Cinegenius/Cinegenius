@@ -12,7 +12,8 @@ import { publicProjectMedia } from "@/lib/project-media-rights";
 import { listingPriceLabel } from "@/lib/listing-price";
 import { COMPANY_CATEGORIES } from "@/lib/companyCategories";
 import { containsLiteral, exactLiteral, filterLiteral, isOccupationWish, matchesWishPlaces, searchKey, wishMarketplaceCategories, wishSearchTerms } from "@/lib/unified-search-matching";
-import { SEARCH_AREAS, type SearchArea, type SearchGroup, type SearchPlan, type SearchResult, type SearchWish } from "@/lib/unified-search";
+import { compareNearby, nearbyDistance, nearbyOrigins } from "@/lib/unified-search-nearby";
+import { SEARCH_AREAS, type SearchArea, type SearchGroup, type SearchPlan, type SearchResult, type SearchWish, type NearbyCursor } from "@/lib/unified-search";
 
 type Row = Record<string, unknown>;
 const PAGE = 60;
@@ -36,36 +37,35 @@ export async function searchWishLabel(wish: SearchWish, locale: string) {
 function queryFor(area: SearchArea, wish: SearchWish, terms: string[], categories: string[], map = false) {
   const patterns = (columns: string[]) => terms.flatMap(term => columns.map(column => `${column}.ilike.${containsLiteral(term)}`));
   const kinds = LISTING_AREAS[area];
+  const filtered = <T extends { or: (filters: string) => T }>(query: T, filters: string[]) => filters.length ? query.or(filters.join(",")) : query;
   if (kinds) {
     const filters = patterns(["title", "description", "category", ...(area === "marketplace"
       ? ["metadata->>vehicle_subtype", "metadata->>make", "metadata->>model", "metadata->marketplace->>brand", "metadata->marketplace->>model"] : [])]);
     if (area === "marketplace" && categories.length) filters.push(`category.in.(${categories.map(filterLiteral).join(",")})`);
-    return db.from("privacy_visible_listings").select(`${PLACE_COLUMNS},id,user_id,title,city,type,category,price,image_url,price_negotiable:metadata->price_negotiable,price_on_request:metadata->price_on_request,rental_type:metadata->>rental_type,marketplace:metadata->marketplace${map && area === "locations" ? ",location_area:metadata->location_area" : ""}`)
-      .eq("published", true).in("type", kinds).or(filters.join(",")).order("id");
+    return filtered(db.from("privacy_visible_listings").select(`${PLACE_COLUMNS},id,user_id,title,city,type,category,price,image_url,price_negotiable:metadata->price_negotiable,price_on_request:metadata->price_on_request,rental_type:metadata->>rental_type,marketplace:metadata->marketplace${map && area === "locations" ? ",location_area:metadata->location_area" : ""}`)
+      .eq("published", true).in("type", kinds), filters).order("id");
   }
   if (area === "crew") {
     const filters = isOccupationWish(wish, terms)
       ? terms.map(term => `role.ilike.${exactLiteral(term)}`)
       : patterns(["display_name", "role", "bio"]);
     if (terms.length) filters.push(`positions.ov.{${terms.map(filterLiteral).join(",")}}`);
-    return db.from("profiles").select(`${PLACE_COLUMNS},user_id,display_name,role,positions,bio,location,avatar_url,available`)
-      .not("display_name", "is", null).neq("display_name", "").or(filters.join(",")).order("user_id");
+    return filtered(db.from("profiles").select(`${PLACE_COLUMNS},user_id,display_name,role,positions,bio,location,avatar_url,available`)
+      .not("display_name", "is", null).neq("display_name", ""), filters).order("user_id");
   }
   if (area === "companies") {
     const filters = patterns(["name", "description"]);
     if (categories.length) filters.push(`categories.ov.{${categories.map(filterLiteral).join(",")}}`);
     if (terms.length) filters.push(`services.ov.{${terms.map(filterLiteral).join(",")}}`);
-    return db.from("companies").select(`${PLACE_COLUMNS},id,slug,name,city,logo_url`)
-      .eq("published", true).or(filters.join(",")).order("id");
+    return filtered(db.from("companies").select(`${PLACE_COLUMNS},id,slug,name,city,logo_url`)
+      .eq("published", true), filters).order("id");
   }
   // Published projects and private working copies are separate tables.
-  if (area === "projects") return db.from("projects").select(`${PLACE_COLUMNS},id,title,description,poster_url,metadata,created_by`)
-    .or(patterns(["title", "description", "director"]).join(",")).order("id");
-  if (area === "organizations") return db.from("organizations").select(`${PLACE_COLUMNS},id,slug,name,city,logo_url`)
-    .eq("moderation_status", "approved").or(patterns(["name", "description"]).join(",")).order("id");
-  return db.from("organization_entries").select(`${PLACE_COLUMNS},id,slug,title,city,image_url,organization:organizations!inner(slug,moderation_status)`)
-    .in("moderation_status", ["approved", "ended"]).eq("organization.moderation_status", "approved")
-    .or(patterns(["title", "summary", "description"]).join(",")).order("id");
+  if (area === "projects") return filtered(db.from("projects").select(`${PLACE_COLUMNS},id,title,description,poster_url,metadata,created_by`), patterns(["title", "description", "director"])).order("id");
+  if (area === "organizations") return filtered(db.from("organizations").select(`${PLACE_COLUMNS},id,slug,name,city,logo_url`)
+    .eq("moderation_status", "approved"), patterns(["name", "description"])).order("id");
+  return filtered(db.from("organization_entries").select(`${PLACE_COLUMNS},id,slug,title,city,image_url,organization:organizations!inner(slug,moderation_status)`)
+    .in("moderation_status", ["approved", "ended"]).eq("organization.moderation_status", "approved"), patterns(["title", "summary", "description"])).order("id");
 }
 
 function geographyRow(row: Row, area: SearchArea): Row {
@@ -81,7 +81,7 @@ function geographyRow(row: Row, area: SearchArea): Row {
   };
 }
 
-async function readGroup(plan: SearchPlan, wishIndex: number, area: SearchArea, offset: number, locale: string, viewerId: string | null, signal: AbortSignal, view: "list" | "map"): Promise<SearchGroup> {
+async function readGroup(plan: SearchPlan, wishIndex: number, area: SearchArea, offset: number, locale: string, viewerId: string | null, signal: AbortSignal, view: "list" | "map", nearbyAfter?: NearbyCursor): Promise<SearchGroup> {
   const wish = plan.searches[wishIndex];
   const taxonomy = await getTranslations({ locale, namespace: "Taxonomy" });
   const terms = wishSearchTerms({ ...wish, area }, locale, taxonomy);
@@ -91,7 +91,52 @@ async function readGroup(plan: SearchPlan, wishIndex: number, area: SearchArea, 
   const categories = area === "marketplace" ? wishMarketplaceCategories(wish.query, catalog) : area === "companies"
     ? COMPANY_CATEGORIES.filter(category => [category.id, category.label, taxonomyLabel(category.label, ui)].some(label => terms.some(term => searchKey(label).includes(searchKey(term))))).map(category => category.id) : [];
   const group: SearchGroup = { area, wishIndex, label: await searchWishLabel(wish, locale), results: [], nextOffset: null };
-  for (let pass = 0; pass < 3; pass++) {
+  const limit = view === "map" ? PAGE * 3 : VISIBLE;
+  const origins = nearbyOrigins(wish);
+  const allowNearby = origins.length > 0 && (offset === 0 || !!nearbyAfter);
+  const requestedOffset = offset;
+  if (nearbyAfter) offset = 0;
+  type Candidate = NearbyCursor & { row: Row; origin: string };
+  const nearest: Candidate[] = [];
+  const toResult = (input: Row): SearchResult => {
+    let row = input;
+    if (area === "projects") row = publicProjectMedia(row);
+    const place = placeDisplay(placeReadFields(String(row.location ?? row.city ?? ""), row, locale), String(row.location ?? row.city ?? ""), locale);
+    const organization = Array.isArray(row.organization) ? row.organization[0] : row.organization;
+    const result: SearchResult = {
+      id: String(area === "crew" ? row.user_id : area === "news" ? `${(organization as Row)?.slug}/${row.slug}` : row.slug || row.id),
+      title: String(row.display_name ?? row.name ?? row.title ?? ""),
+      subtitle: area === "crew" ? [row.role, place].filter(Boolean).join(" · ") : place,
+      type: area === "crew" ? "profile" : area === "companies" ? "company" : area === "organizations" ? "organization" : area === "projects" ? "project" : area === "news" ? "news" : String(row.type),
+      price: typeof row.price === "number" ? row.price : 0,
+      image: String(row.avatar_url ?? row.logo_url ?? row.poster_url ?? row.image_url ?? "") || null,
+      available: typeof row.available === "boolean" ? row.available : null,
+    };
+    if (["prop", "vehicle", "location"].includes(result.type)) result.priceLabel = listingPriceLabel(result.price, row, "/Tag", locale, market);
+    if (view === "map") {
+      // Never geocode private fields or use an offer's exact coordinates. Crew
+      // map opt-out is already projected above; locations expose only their area.
+      const areaPoint = area === "locations" ? readPublicLocationArea({ location_area: row.location_area }) : null;
+      const point = areaPoint ?? publicMapPoint(row);
+      result.mapPoint = point.lat !== null && point.lng !== null
+        ? { lat: point.lat, lng: point.lng, ...(areaPoint ? { radiusMeters: areaPoint.radius_meters } : {}) } : null;
+    }
+    return result;
+  };
+  const keepNearest = (candidate: Candidate) => {
+    // One result page plus a lookahead, regardless of the catalogue size. The
+    // city-centre distance + stable ID cursor avoids retaining/skipping N pages.
+    if (nearbyAfter && compareNearby(candidate, nearbyAfter) <= 0) return;
+    let start = 0, end = nearest.length;
+    while (start < end) {
+      const middle = (start + end) >>> 1;
+      if (compareNearby(nearest[middle], candidate) < 0) start = middle + 1;
+      else end = middle;
+    }
+    nearest.splice(start, 0, candidate);
+    if (nearest.length > limit + 1) nearest.pop();
+  };
+  for (let pass = 0; ; pass++) {
     signal.throwIfAborted();
     const { data, error } = await queryFor(area, wish, terms, categories, view === "map").range(offset, offset + PAGE - 1).abortSignal(signal);
     if (error) throw new Error("search_unavailable");
@@ -101,58 +146,54 @@ async function readGroup(plan: SearchPlan, wishIndex: number, area: SearchArea, 
       let row = rows[i];
       if (area === "crew") {
         const access = privacy!.get(String(row.user_id));
-        if (!access?.profile) continue;
-        // Location must be authorized before geographic matching, including counts.
-        if (wish.places.length && !access.location) continue;
+        if (!access?.profile || (wish.places.length && !access.location)) continue;
         row = projectProfilePrivacy(row, access);
       }
       row = geographyRow(row, area);
-      if (!matchesWishPlaces(row, wish)) continue;
-      if (area === "projects") row = publicProjectMedia(row);
-      const place = placeDisplay(placeReadFields(String(row.location ?? row.city ?? ""), row, locale), String(row.location ?? row.city ?? ""), locale);
-      const organization = Array.isArray(row.organization) ? row.organization[0] : row.organization;
-      const result: SearchResult = {
-        id: String(area === "crew" ? row.user_id : area === "news" ? `${(organization as Row)?.slug}/${row.slug}` : row.slug || row.id),
-        title: String(row.display_name ?? row.name ?? row.title ?? ""),
-        subtitle: area === "crew" ? [row.role, place].filter(Boolean).join(" · ") : place,
-        type: area === "crew" ? "profile" : area === "companies" ? "company" : area === "organizations" ? "organization" : area === "projects" ? "project" : area === "news" ? "news" : String(row.type),
-        price: typeof row.price === "number" ? row.price : 0,
-        image: String(row.avatar_url ?? row.logo_url ?? row.poster_url ?? row.image_url ?? "") || null,
-        available: typeof row.available === "boolean" ? row.available : null,
-      };
-      if (["prop", "vehicle", "location"].includes(result.type)) result.priceLabel = listingPriceLabel(result.price, row, "/Tag", locale, market);
-      if (view === "map") {
-        // Never geocode private fields or use an offer's exact coordinates. Crew
-        // map opt-out is already projected above; locations expose only their area.
-        const areaPoint = area === "locations" ? readPublicLocationArea({ location_area: row.location_area }) : null;
-        const point = areaPoint ?? publicMapPoint(row);
-        result.mapPoint = point.lat !== null && point.lng !== null
-          ? { lat: point.lat, lng: point.lng, ...(areaPoint ? { radiusMeters: areaPoint.radius_meters } : {}) } : null;
-      }
-      group.results.push(result);
-      if (group.results.length === (view === "map" ? PAGE * 3 : VISIBLE)) {
-        group.nextOffset = offset + i + 1;
-        return group;
+      if (matchesWishPlaces(row, wish)) {
+        // Local matches always win, even if records changed between nearby pages.
+        nearest.length = 0;
+        group.results.push(toResult(row));
+        if (group.results.length === limit) {
+          group.nextOffset = offset + i + 1;
+          return group;
+        }
+      } else if (allowNearby && !group.results.length) {
+        const distance = nearbyDistance(row, origins);
+        if (distance) keepNearest({ ...distance, id: String(row.user_id && area === "crew" ? row.user_id : row.id), row });
       }
     }
     offset += rows.length;
-    if (rows.length < PAGE) return group;
+    if (rows.length < PAGE) break;
+    // Prove the absence of local results and inspect all eligible candidates
+    // before claiming nearest. A request timeout is an error, never an empty or
+    // arbitrarily ordered fallback. Non-geographic browsing stays bounded.
+    if (!wish.places.length && pass >= 2) { group.nextOffset = offset; return group; }
   }
-  // Continue scanning on explicit request; never pretend a bounded scan is exhaustive.
-  group.nextOffset = offset;
+  if (!group.results.length && allowNearby) {
+    group.nearby = true;
+    group.results = nearest.slice(0, limit).map(candidate => ({ ...toResult(candidate.row), nearby: {
+      distanceKm: Math.round(candidate.distanceKm), origin: candidate.origin,
+    } }));
+    if (nearest.length > limit) {
+      const last = nearest[limit - 1];
+      group.nextOffset = requestedOffset + limit;
+      group.nearbyCursor = { distanceKm: last.distanceKm, id: last.id };
+    }
+  }
   return group;
 }
 
-export type SearchCursor = { wishIndex: number; area: SearchArea; offset: number };
+export type SearchCursor = { wishIndex: number; area: SearchArea; offset: number; nearby?: NearbyCursor };
 export async function executeUnifiedSearch(plan: SearchPlan, locale: string, viewerId: string | null, signal: AbortSignal, cursor?: SearchCursor, view: "list" | "map" = "list") {
-  const tasks = cursor ? [cursor] : plan.searches.flatMap((wish, wishIndex) =>
+  const tasks: SearchCursor[] = cursor ? [cursor] : plan.searches.flatMap((wish, wishIndex) =>
     (wish.area === "all" ? SEARCH_AREAS : [wish.area]).map(area => ({ wishIndex, area, offset: 0 })));
   const groups: SearchGroup[] = new Array(tasks.length);
   let next = 0;
   await Promise.all(Array.from({ length: Math.min(tasks.length, 4) }, async () => {
     while (next < tasks.length) {
       const index = next++, task = tasks[index];
-      groups[index] = await readGroup(plan, task.wishIndex, task.area, task.offset, locale, viewerId, signal, view);
+      groups[index] = await readGroup(plan, task.wishIndex, task.area, task.offset, locale, viewerId, signal, view, task.nearby);
     }
   }));
   return { groups };

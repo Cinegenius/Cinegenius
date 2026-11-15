@@ -8408,6 +8408,9 @@
     "mapTitle": "Tu búsqueda en el mapa",
     "mapLegend": "Categorías del mapa",
     "mapIncomplete": "Aún quedan resultados por cargar en el mapa.",
-    "mapMore": "Cargar más resultados en el mapa"
+    "mapMore": "Cargar más resultados en el mapa",
+    "nearbyResults": "No hay coincidencias aquí en el lugar solicitado. Estos son los resultados coincidentes más cercanos:",
+    "nearbyMap": "Para búsquedas sin coincidencias locales, el mapa también muestra los resultados coincidentes más cercanos.",
+    "nearbyDistance": "aprox. {distance} km de {place} · en línea recta"
   }
 }

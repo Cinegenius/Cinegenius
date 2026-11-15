@@ -7,6 +7,7 @@ import { validateResolvedSearchPlan } from "@/lib/unified-search-plan-server";
 import { executeUnifiedSearch, type SearchCursor } from "@/lib/unified-search-server";
 import { unifiedSearchAccess } from "@/lib/unified-search-access";
 import { SEARCH_AREAS } from "@/lib/unified-search";
+import { validNearbyCursor } from "@/lib/unified-search-nearby";
 import { rateLimit } from "@/lib/rateLimit";
 
 export const dynamic = "force-dynamic";
@@ -26,9 +27,10 @@ export async function POST(request: NextRequest) {
     const { plan: rawPlan, cursor, view } = body as { plan: unknown; cursor?: SearchCursor; view?: unknown };
     if (view !== undefined && view !== "map") return json({ error: "invalid_request" }, 400);
     const plan = validateResolvedSearchPlan(rawPlan);
-    if (cursor !== undefined && (!cursor || typeof cursor !== "object" || Array.isArray(cursor) || Object.keys(cursor).some(key => !["wishIndex", "area", "offset"].includes(key))
+    if (cursor !== undefined && (!cursor || typeof cursor !== "object" || Array.isArray(cursor) || Object.keys(cursor).some(key => !["wishIndex", "area", "offset", "nearby"].includes(key))
       || !Number.isInteger(cursor.wishIndex) || cursor.wishIndex < 0 || cursor.wishIndex >= plan.searches.length
       || !Number.isInteger(cursor.offset) || cursor.offset < 0 || cursor.offset > 1_000_000
+      || !validNearbyCursor(cursor.nearby)
       || !SEARCH_AREAS.includes(cursor.area) || !["all", cursor.area].includes(plan.searches[cursor.wishIndex].area))) return json({ error: "invalid_request" }, 400);
     const signal = AbortSignal.any([request.signal, AbortSignal.timeout(20_000)]);
     return json(await executeUnifiedSearch(plan, await getLocale(), userId, signal, cursor, view === "map" ? "map" : "list"));

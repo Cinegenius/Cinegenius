@@ -58,8 +58,11 @@ export function searchPlanFromHref(href: string): SearchPlan | null {
 }
 
 export type SearchResult = { id: string; title: string; subtitle: string; type: string; price: number; priceLabel?: string; image: string | null; available: boolean | null;
+  nearby?: { distanceKm: number; origin: string };
   mapPoint?: { lat: number; lng: number; radiusMeters?: 500 } | null };
-export type SearchGroup = { area: SearchArea; wishIndex: number; label: string; results: SearchResult[]; nextOffset: number | null };
+export type NearbyCursor = { distanceKm: number; id: string };
+export type SearchGroup = { area: SearchArea; wishIndex: number; label: string; results: SearchResult[]; nextOffset: number | null;
+  nearby?: true; nearbyCursor?: NearbyCursor };
 
 export const SEARCH_WISH_SCHEMA = { type: "array", maxItems: MAX_SEARCHES, items: { type: "object", additionalProperties: false,
   properties: {

@@ -8408,6 +8408,9 @@
     "mapTitle": "La tua ricerca sulla mappa",
     "mapLegend": "Categorie sulla mappa",
     "mapIncomplete": "Altri risultati non sono ancora stati caricati sulla mappa.",
-    "mapMore": "Carica altri risultati sulla mappa"
+    "mapMore": "Carica altri risultati sulla mappa",
+    "nearbyResults": "Nessun risultato qui nella località richiesta. Ecco i risultati pertinenti più vicini:",
+    "nearbyMap": "Per le ricerche senza risultati locali, la mappa mostra anche i risultati pertinenti più vicini.",
+    "nearbyDistance": "circa {distance} km da {place} · in linea d’aria"
   }
 }

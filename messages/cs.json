@@ -8408,6 +8408,9 @@
     "mapTitle": "Tvoje hledání na mapě",
     "mapLegend": "Kategorie na mapě",
     "mapIncomplete": "Další výsledky ještě nejsou na mapě načtené.",
-    "mapMore": "Načíst další výsledky na mapě"
+    "mapMore": "Načíst další výsledky na mapě",
+    "nearbyResults": "V požadovaném místě zde nejsou výsledky. Nejbližší odpovídající výsledky:",
+    "nearbyMap": "U hledání bez místních výsledků mapa zobrazuje také nejbližší odpovídající výsledky.",
+    "nearbyDistance": "asi {distance} km od {place} · vzdušnou čarou"
   }
 }

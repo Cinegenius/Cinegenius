@@ -208,8 +208,9 @@ Do not rotate it or claim that the model's interpretation passed a real test.
   `{area,wishIndex,label,results,nextOffset}`. Result cards keep the existing
   `{id,title,subtitle,type,price,priceLabel?,image,available}` contract. `nextOffset`
   is null on exhaustion, otherwise continue only on explicit request. Twelve
-  visible results per group, up to 180 candidate rows per request; an empty page
-  with a continuation does not mean there are no matches. At most four DB reads
+  visible results per group. Non-geographic requests scan up to 180 candidate rows;
+  geographic requests continue to enough local matches or exhaustion (within the
+  request deadline), so an empty first scan cannot trigger a false fallback. At most four DB reads
   run concurrently. Cursor limits/area/indices are checked again on the server.
 - Smart interpretation and read-only results both require a signed-in member, including shared plan URLs. Guest access is rejected before quota, body parsing or database reads; the ordinary public directory search remains available.
   Current viewer permissions precede profile projection and geographic matching.
@@ -244,8 +245,9 @@ real-model/native-device checks. Shared workplace mutations are still unavailabl
   previous list contract; other values are rejected. Map responses add optional
   `mapPoint: {lat,lng,radiusMeters?:500} | null` to each result. No migration is
   required. Authorization, origin checks and private/no-store headers are unchanged.
-- Map pagination is independent of the twelve-item list: at most 180 candidate
-  rows are scanned per group/request. Follow `nextOffset` explicitly, including
+- Map pagination is independent of the twelve-item list: at most 180 results
+  are returned per group/request. Geographic queries can inspect more candidates
+  to establish local absence and distance order. Follow `nextOffset` explicitly, including
   after an empty page. The UI discloses incomplete results and offers a load-more
   action, with at most two page requests concurrently. Deduplicate by `type:id`
   across wishes; do not infer total membership from mapped markers.
@@ -315,3 +317,53 @@ release has been verified by these local checks.
 ### Search history retirement (14 November 2026)
 
 Global search no longer reads or writes a recent-search list. On mount and search opening it removes only the legacy `cg_recent_searches` key, tolerating blocked storage. Existing suggestion chips, result navigation, retry and keyboard operation remain. Current directory filters, actual browser history, language/cookie choices and private form recovery are not deleted. The search API does not persist queries; Genie provider `store: false` and content-free usage counters are unchanged. This local retention policy does not promise removal of provider/security logs or browser-managed URL history.
+
+
+## Independent keywords and nearest alternatives (15 November 2026, prepared)
+
+- `Berlin Location Polizei` produces two wishes: every public Location in Berlin,
+  plus Polizei across all areas. `Hamburg Polizei Kostüm` produces independent
+  Polizei and Kostüm wishes. A bare directory name is a directory selector, not
+  a required word in a record title. A specifically requested `Polizei-Location`
+  remains a themed location request. Known keywords accept an unambiguous city
+  first or last without punctuation/prepositions; unknown modifiers, multiple
+  differently attached cities, negation and compounds go to the existing Genie
+  interpreter rather than silently losing words. Current city names take priority
+  over historical aliases for search interpretation only; saved places and
+  member identities are never changed.
+- For each wish/area, local matches take precedence. If none of the requested
+  city/radius alternatives have a match, inspect all eligible matching candidates
+  and order alternatives by approximate straight-line distance between public
+  city centres, then stable ID. This is not travel distance, an exact address,
+  availability or a booking. Country/continent restrictions remain binding;
+  country-only searches do not expand abroad. Ambiguous/unknown origin cities
+  and candidates without an authorized resolvable public point do not get a
+  guessed distance. Existing map opt-out is also honored in distance ranking.
+- Before declaring a local absence or returning nearest alternatives, the
+  geographic scan must finish, or find enough local results. The existing
+  20-second request deadline fails explicitly on interruption; it must never
+  return arbitrary candidates as nearest. Candidate reads are batched (60 rows)
+  with at most four groups running concurrently. The nearest accumulator retains
+  only one response page plus one lookahead, independent of catalogue size.
+  Public projections are read live; no authorization or search-history cache.
+- Additive response fields (plan stays v1): `SearchGroup.nearby?: true`,
+  `SearchGroup.nearbyCursor?: {distanceKm:number,id:string}`, and
+  `SearchResult.nearby?: {distanceKm:number,origin:string}`. Result distance is
+  rounded whole kilometres for display; cursor distance is the unchanged
+  city-centre distance for stable ordering. `nextOffset` remains null when done.
+  On a nearby group's continuation send
+  `{plan,cursor:{wishIndex,area,offset:nextOffset,nearby:nearbyCursor}}`; include
+  `view:"map"` for map pages. Always echo the cursor, never derive it from the
+  rounded display distance or a translated name. Without the nearby cursor the
+  old local-only continuation contract remains safe, but cannot complete the
+  new alternative set. Native clients need the additive cursor before adopting
+  the new load-more flow.
+- The list and map disclose alternatives outside the requested place, and cards
+  show the requested origin plus approximate straight-line distance. If the
+  response switches between nearby and local mode (e.g. a newly published local
+  record), replace that group's previous results instead of merging both modes.
+  Unknown fields may be ignored, but do not label nearby results as local.
+- No migration, new provider account, paid tier, schema version, design overhaul
+  or production release is implied by this implementation. Read-only public-data
+  checks and browser simulations are distinct from live AI interpretation and
+  real-device/native testing. See the corresponding test report for status.

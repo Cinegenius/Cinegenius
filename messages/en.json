@@ -8408,6 +8408,9 @@
     "mapTitle": "Your search on the map",
     "mapLegend": "Map categories",
     "mapIncomplete": "More results have not yet been loaded on the map.",
-    "mapMore": "Load more map results"
+    "mapMore": "Load more map results",
+    "nearbyResults": "No matches here in the requested location. The nearest matching results:",
+    "nearbyMap": "For searches without local matches, the map also shows the nearest matching results.",
+    "nearbyDistance": "about {distance} km from {place} · straight-line"
   }
 }

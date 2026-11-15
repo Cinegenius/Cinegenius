@@ -8408,6 +8408,9 @@
     "mapTitle": "A keresésed a térképen",
     "mapLegend": "Térképkategóriák",
     "mapIncomplete": "További találatok még nem töltődtek be a térképre.",
-    "mapMore": "További térképes találatok betöltése"
+    "mapMore": "További térképes találatok betöltése",
+    "nearbyResults": "A kért helyen itt nincs találat. A legközelebbi megfelelő találatok:",
+    "nearbyMap": "Helyi találat nélkül a térkép a legközelebbi megfelelő találatokat is megjeleníti.",
+    "nearbyDistance": "kb. {distance} km innen: {place} · légvonalban"
   }
 }

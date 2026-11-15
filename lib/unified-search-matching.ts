@@ -7,11 +7,20 @@ import { withinCrewRadius } from "./genie-search";
 import { DEPARTMENTS as marketplaceDepartments, deptValues, groupValues, SEARCH_SYNONYMS } from "./marketplaceCategories";
 import continents from "./places/continents.json" with { type: "json" };
 import type { SearchPlace, SearchWish } from "./unified-search";
+import { isWholeAreaQuery } from "./unified-search-areas";
 
 // Country group facts: Unicode CLDR supplemental/territoryContainment.json (UN M49).
 // https://github.com/unicode-org/cldr-json/blob/main/cldr-json/cldr-core/supplemental/territoryContainment.json
 export const continentCountries = (code: string): string[] => continents[code as keyof typeof continents] ?? [];
 export const searchKey = (value: unknown) => String(value ?? "").normalize("NFKD").replace(/\p{M}/gu, "").toLowerCase().replace(/ß/g, "ss").replace(/[^\p{L}\p{N}]+/gu, " ").trim();
+
+/** Search interpretation only, never a stored identity update. Prefer a current
+ * city name to historical aliases (e.g. Berlin vs North Canton's former name). */
+export function searchCityCandidates(label: string, country = "") {
+  const candidates = placeCandidatesForLabel(label, country), key = searchKey(label);
+  const current = candidates.filter(city => [city.name, ...Object.values(city.names)].some(name => searchKey(name) === key));
+  return current.length ? current : candidates;
+}
 
 /** Search aliases only; never rewrite a person's saved occupations. */
 const synonyms: Record<string, string[]> = {
@@ -22,6 +31,7 @@ const synonyms: Record<string, string[]> = {
   boot: ["Boot", "Boat", "Schiff", "Yacht"], boat: ["Boat", "Boot", "Yacht"],
   auto: ["Auto", "PKW", "Car"], car: ["Car", "Auto", "PKW"],
   studio: ["Studio"], kostum: ["Kostüm", "Costume"], kostuem: ["Kostüm", "Costume"], costume: ["Costume", "Kostüm"],
+  polizei: ["Polizei", "Police", "Polizia", "Policía", "Policie", "Rendőrség", "Politie", "Polis", "Streifenwagen", "Streifenpolizist"],
 };
 
 const cameraPeople = ["Director of Photography (DoP)", "Kameramann", "Camera Operator"];
@@ -45,6 +55,7 @@ export function searchDepartment(query: string, locale = "de", taxonomy?: (key: 
 }
 
 export function wishSearchTerms(wish: SearchWish, locale = "de", taxonomy?: (key: string) => string): string[] {
+  if (!wish.department && isWholeAreaQuery(wish.area, wish.query)) return [];
   const crew = wish.area === "crew" || wish.area === "all";
   const terms = wish.query ? [...((crew && crewSynonyms[searchKey(wish.query)]) || synonyms[searchKey(wish.query)] || [wish.query])] : [];
   const requested = [...terms];
@@ -103,7 +114,7 @@ export function matchesSearchPlace(row: Record<string, unknown>, place: SearchPl
   if (place.country && country !== place.country) return false;
   if (place.continent && !continentCountries(place.continent).includes(country)) return false;
   if (!place.city) return true;
-  const candidates = placeCandidatesForLabel(place.city, place.country);
+  const candidates = searchCityCandidates(place.city, place.country);
   if (place.radiusKm) {
     if (candidates.length !== 1) return false;
     const center = publicMapPoint({ place_city_id: candidates[0].id, place_country_code: candidates[0].country, place_status: "verified" });

@@ -347,3 +347,38 @@ Browserprüfungen mit simulierten Konten, API-Antworten und Betriebssystem-
 Sprachschnittstellen sind keine native Geräteabnahme oder Prüfung freier
 Live-KI-Antworten. Der Serverabgleich installiert keine neue App auf dem iPhone
 und überschreibt keine laufenden Xcode-Änderungen auf dem Mac.
+
+## Getrennte Wünsche und nächste Treffer (15. November 2026)
+
+Geprüfte Quelle `ad3cb39f75c0183aa6fddad176fd5ece6217f405` ist für den
+App-Abgleich übernommen, bei Übergabe noch nicht auf der Website veröffentlicht.
+Die entfernte App-Vorschau bekommt diese Erweiterung erst nach einer gesondert
+freigegebenen Website-Veröffentlichung; ein Quellenabgleich installiert keine App.
+
+„Hamburg Polizei Kostüm“ ergibt unabhängige Wünsche mit Hamburg als gemeinsamem
+Ort. „Berlin Location Polizei“ sucht alle Berliner Locations und unabhängig davon
+Polizei über die Bereiche. Die vorhandene gemeinsame Interpretation erkennt beide
+Initialanfragen ohne KI-Aufruf; Plan-v1 und Mitgliederschutz bleiben erhalten.
+Explizite Verknüpfungen wie „Polizei-Location“ werden nicht in getrennte Wünsche
+zerlegt, sondern bleiben bei der semantischen Interpretation.
+
+Nur wenn je Wunsch/Bereich alle lokalen Stadtalternativen ohne Treffer geprüft
+sind, werden passende öffentliche Einträge nach ungefährer Luftlinie zwischen
+öffentlichen Stadtzentren angeboten. Länder-/Kontinentgrenzen, Ghost und
+Standort-/Kartenrechte gelten vor Distanzberechnung und Ausgabe. Unbekannte oder
+mehrdeutige Orte erhalten keine erfundene Entfernung. Zeitüberschreitungen und
+Abfragefehler bleiben sichtbare Fehler, keine vermeintlich leeren Ergebnisse.
+
+Ergebnisse können `nearby: {distanceKm, origin}` enthalten. Die Entfernung zur
+Anzeige ist gerundet. Gruppen liefern `nearby` und gegebenenfalls `nearbyCursor`;
+diesen präzisen Cursor unverändert als `cursor.nearby` mit `nextOffset` zurückgeben,
+niemals aus der angezeigten Entfernung berechnen. Bei einem Wechsel zwischen
+lokalen und nahen Alternativen alte Gruppentreffer ersetzen. Liste und Karte
+behalten eigene Pagination mit 12 beziehungsweise 180 Ergebnissen. Die vollständige
+geografische Kandidatenprüfung bleibt unter der bestehenden 20-Sekunden-Grenze
+und hält nur eine Ergebnisseite plus Lookahead zum Sortieren im Speicher.
+
+Prüfbelege und Xcode-Hinweise: `/srv/cinegenius/handoffs/20261115-app-smart-nearest/`.
+Native Dateien, Übersetzungen und neuere Mac-/Dispo-/PDF-Arbeit bleiben erhalten.
+Browser-, Vertrags- und simulierte Sprachprüfungen ersetzen keine Prüfung mit
+einem echten angemeldeten iPhone oder freien Antworten des tatsächlichen Anbieters.
