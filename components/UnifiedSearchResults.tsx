@@ -11,6 +11,7 @@ import { useFormRouter } from "@/lib/use-form-router";
 import { decodeSearchPlan, searchPlanFromHref, SEARCH_AREAS, type SearchPlan, type SearchGroup } from "@/lib/unified-search";
 import ResultCard from "@/components/SearchResultCard";
 import SmartSearchClarification from "@/components/SmartSearchClarification";
+import { searchQueryTitle } from "@/lib/unified-search-areas";
 
 const groupKey = (group: SearchGroup) => `${group.area}:${group.wishIndex}`;
 const SEARCH_ERROR = { invalid: "invalid", unavailable: "unavailable", unauthorized: "unauthorized" } as const;
@@ -66,7 +67,7 @@ export default function UnifiedSearchResults() {
         const names = new Intl.DisplayNames([locale], { type: "region" });
         const summary = decoded?.searches.map(wish => {
           const key = `departments.${wish.department}`;
-          const title = wish.query || (taxonomy.has(key) ? taxonomy(key) : wish.department);
+          const title = searchQueryTitle(wish, t) || (taxonomy.has(key) ? taxonomy(key) : wish.department);
           const places = wish.places.map(place => {
             const label = [place.city, place.country ? names.of(place.country) : "", place.continent ? names.of(place.continent) : ""].filter(Boolean).join(", ");
             return place.radiusKm ? t("withinRadius", { place: label, radius: place.radiusKm }) : label;

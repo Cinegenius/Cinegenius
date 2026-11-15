@@ -8372,6 +8372,11 @@
     }
   },
   "UnifiedSearch": {
+    "productionCompanies": "Produzione cinematografica",
+    "catering": "Catering",
+    "policeTheme": "Polizia",
+    "medievalTheme": "Medioevo",
+    "departmentHeads": "Capi reparto",
     "title": "Ricerca Smart",
     "tab": "Smart",
     "intro": "Cerca insieme professionisti, annunci e luoghi.",

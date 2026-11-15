@@ -3,7 +3,7 @@ import { db } from "@/lib/db";
 import { getTranslations } from "next-intl/server";
 import { profileAccessFor } from "@/lib/profile-privacy-server";
 import { projectProfilePrivacy } from "@/lib/profile-privacy";
-import { getDeptLabel, departments, taxonomyLabel } from "@/lib/departments";
+import { getDeptLabel, getDepartmentRoleLabel, departments, taxonomyLabel } from "@/lib/departments";
 import { placeReadFields } from "@/lib/places/catalog";
 import { publicMapPoint } from "@/lib/places/public-map-point";
 import { readPublicLocationArea } from "@/lib/location-privacy";
@@ -13,6 +13,9 @@ import { listingPriceLabel } from "@/lib/listing-price";
 import { COMPANY_CATEGORIES } from "@/lib/companyCategories";
 import { containsLiteral, exactLiteral, filterLiteral, isOccupationWish, matchesWishPlaces, searchKey, wishMarketplaceCategories, wishSearchTerms } from "@/lib/unified-search-matching";
 import { compareNearby, nearbyDistance, nearbyOrigins } from "@/lib/unified-search-nearby";
+import { isDepartmentHeadsQuery, matchingDepartmentHead } from "@/lib/unified-search-production";
+import { cateringSearch, matchesCateringSearch } from "@/lib/unified-search-catering";
+import { searchQueryTitle } from "@/lib/unified-search-areas";
 import { SEARCH_AREAS, type SearchArea, type SearchGroup, type SearchPlan, type SearchResult, type SearchWish, type NearbyCursor } from "@/lib/unified-search";
 
 type Row = Record<string, unknown>;
@@ -26,7 +29,7 @@ export async function searchWishLabel(wish: SearchWish, locale: string) {
   const taxonomy = await getTranslations({ locale, namespace: "Taxonomy" });
   const dept = departments.find(d => d.id === wish.department);
   const names = new Intl.DisplayNames([locale], { type: "region" });
-  const title = wish.query || (dept ? getDeptLabel(dept, locale, animals, taxonomy) : "");
+  const title = searchQueryTitle(wish, t) || (dept ? getDeptLabel(dept, locale, animals, taxonomy) : "");
   const places = wish.places.map(p => {
     const label = [p.city, p.country ? names.of(p.country) : "", p.continent ? names.of(p.continent) : ""].filter(Boolean).join(", ");
     return p.radiusKm ? t("withinRadius", { place: label, radius: p.radiusKm }) : label;
@@ -57,7 +60,7 @@ function queryFor(area: SearchArea, wish: SearchWish, terms: string[], categorie
     const filters = patterns(["name", "description"]);
     if (categories.length) filters.push(`categories.ov.{${categories.map(filterLiteral).join(",")}}`);
     if (terms.length) filters.push(`services.ov.{${terms.map(filterLiteral).join(",")}}`);
-    return filtered(db.from("companies").select(`${PLACE_COLUMNS},id,slug,name,city,logo_url`)
+    return filtered(db.from("companies").select(`${PLACE_COLUMNS},id,slug,name,city,logo_url${cateringSearch(wish.query) ? ",description,categories,services,catering_details" : ""}`)
       .eq("published", true), filters).order("id");
   }
   // Published projects and private working copies are separate tables.
@@ -91,6 +94,8 @@ async function readGroup(plan: SearchPlan, wishIndex: number, area: SearchArea, 
   const categories = area === "marketplace" ? wishMarketplaceCategories(wish.query, catalog) : area === "companies"
     ? COMPANY_CATEGORIES.filter(category => [category.id, category.label, taxonomyLabel(category.label, ui)].some(label => terms.some(term => searchKey(label).includes(searchKey(term))))).map(category => category.id) : [];
   const group: SearchGroup = { area, wishIndex, label: await searchWishLabel(wish, locale), results: [], nextOffset: null };
+  const heads = area === "crew" && !wish.department && isDepartmentHeadsQuery(wish.query);
+  const catering = area === "companies" && !wish.department ? cateringSearch(wish.query) : null;
   const limit = view === "map" ? PAGE * 3 : VISIBLE;
   const origins = nearbyOrigins(wish);
   const allowNearby = origins.length > 0 && (offset === 0 || !!nearbyAfter);
@@ -103,10 +108,12 @@ async function readGroup(plan: SearchPlan, wishIndex: number, area: SearchArea, 
     if (area === "projects") row = publicProjectMedia(row);
     const place = placeDisplay(placeReadFields(String(row.location ?? row.city ?? ""), row, locale), String(row.location ?? row.city ?? ""), locale);
     const organization = Array.isArray(row.organization) ? row.organization[0] : row.organization;
+    const headRole = heads ? matchingDepartmentHead(row) : undefined;
+    const role = headRole ? getDepartmentRoleLabel(headRole.departmentId, headRole.label, locale, undefined, taxonomy) : row.role;
     const result: SearchResult = {
       id: String(area === "crew" ? row.user_id : area === "news" ? `${(organization as Row)?.slug}/${row.slug}` : row.slug || row.id),
       title: String(row.display_name ?? row.name ?? row.title ?? ""),
-      subtitle: area === "crew" ? [row.role, place].filter(Boolean).join(" · ") : place,
+      subtitle: area === "crew" ? [role, place].filter(Boolean).join(" · ") : place,
       type: area === "crew" ? "profile" : area === "companies" ? "company" : area === "organizations" ? "organization" : area === "projects" ? "project" : area === "news" ? "news" : String(row.type),
       price: typeof row.price === "number" ? row.price : 0,
       image: String(row.avatar_url ?? row.logo_url ?? row.poster_url ?? row.image_url ?? "") || null,
@@ -149,6 +156,8 @@ async function readGroup(plan: SearchPlan, wishIndex: number, area: SearchArea, 
         if (!access?.profile || (wish.places.length && !access.location)) continue;
         row = projectProfilePrivacy(row, access);
       }
+      if (heads && !matchingDepartmentHead(row)) continue;
+      if (catering && !matchesCateringSearch(row, catering)) continue;
       row = geographyRow(row, area);
       if (matchesWishPlaces(row, wish)) {
         // Local matches always win, even if records changed between nearby pages.

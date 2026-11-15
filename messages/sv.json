@@ -8372,6 +8372,11 @@
     }
   },
   "UnifiedSearch": {
+    "productionCompanies": "Filmproduktion",
+    "catering": "Catering",
+    "policeTheme": "Polis",
+    "medievalTheme": "Medeltid",
+    "departmentHeads": "Avdelningschefer",
     "title": "Smart-sökning",
     "tab": "Smart",
     "intro": "Sök efter filmteam, erbjudanden och platser tillsammans.",

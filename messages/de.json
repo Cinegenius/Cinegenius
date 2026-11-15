@@ -8372,6 +8372,11 @@
     }
   },
   "UnifiedSearch": {
+    "productionCompanies": "Filmproduktion",
+    "catering": "Catering",
+    "policeTheme": "Polizei",
+    "medievalTheme": "Mittelalter",
+    "departmentHeads": "Abteilungsleitungen",
     "title": "Smart-Suche",
     "tab": "Smart",
     "intro": "Crew, Angebote und Orte gemeinsam suchen.",

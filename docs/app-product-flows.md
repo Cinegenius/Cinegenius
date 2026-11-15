@@ -384,3 +384,36 @@ Prüfbelege und Xcode-Hinweise: `/srv/cinegenius/handoffs/20261115-app-smart-nea
 Native Dateien, Übersetzungen und neuere Mac-/Dispo-/PDF-Arbeit bleiben erhalten.
 Browser-, Vertrags- und simulierte Sprachprüfungen ersetzen keine Prüfung mit
 einem echten angemeldeten iPhone oder freien Antworten des tatsächlichen Anbieters.
+
+## Produktionsvorhaben und qualifiziertes Catering (15. November 2026)
+
+Geprüfte Quelle `516465ae50a2545daf3f205f167d5c1f803c8fba` ist im App-Code
+übernommen, bei Übergabe noch nicht veröffentlicht. Live bleibt `ad3cb39`.
+Der neue Abgleich ist keine Veröffentlichungsfreigabe oder native Installation.
+
+Ein vollständiges einfaches Produktionsvorhaben wie „Ich drehe in Berlin einen
+Polizeifilm“ erzeugt eine erste Suche nach ausdrücklich gespeicherten
+Abteilungsleitungen sowie getrennten thematischen Angeboten, Filmproduktion,
+Catering und Locations. Die passende Primärrolle hat in der Ergebnisanzeige
+Vorrang. Ein Genre ist kein Pflichtwort im Crew-Profil; Assistenztitel oder
+Biografietexte begründen keine Leitungsrolle. Es handelt sich um erste Kandidaten,
+nicht um eine bestätigte vollständige Besetzung oder Verfügbarkeit.
+
+Catering ist eine Firmenanfrage. Ernährung und Catering-Art müssen auf derselben
+öffentlichen Firma zutreffen, auch bei Kartenansicht, Pagination und nahen
+Alternativen. „Vegan“ wird nicht zu „vegetarisch“ oder allgemeinem Catering
+abgeschwächt. Öffentliche strukturierte Angaben und ausdrückliche Beschreibungen
+werden geprüft; Negationen bleiben wirksam. Unbekannte zusätzliche Anforderungen
+und komplexe Formulierungen bleiben beim bestehenden Interpreter. Anbieterangaben
+sind keine Zertifizierungs- oder Allergiesicherheitszusage.
+
+Plan-v1, maximal sechs Wünsche/vier Orte und sämtliche bestehenden Ergebnis- und
+Cursorfelder bleiben unverändert. Den kanonischen Suchplan erhalten; ausschließlich
+die Anzeige über `searchQueryTitle` lokalisieren. Fünf neue gemeinsame
+`UnifiedSearch`-Schlüssel sind in allen neun Sprachen vorhanden. Native Clients
+benötigen keinen eigenen Parser. Anmeldung, Privatsphäre und Medienrechte gelten
+weiter; keine Migration und keine neue dauerhafte Suchhistorie.
+
+App-Prüfbelege und spätere Xcode-Hinweise:
+`/srv/cinegenius/handoffs/20261115-app-smart-production-catering/`.
+Native Scanner-/Dispo-/PDF-Quellen und neuere Mac-Arbeit bleiben unberührt.

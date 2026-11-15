@@ -8372,6 +8372,11 @@
     }
   },
   "UnifiedSearch": {
+    "productionCompanies": "Filmproductie",
+    "catering": "Catering",
+    "policeTheme": "Politie",
+    "medievalTheme": "Middeleeuwen",
+    "departmentHeads": "Afdelingshoofden",
     "title": "Smart-zoeken",
     "tab": "Smart",
     "intro": "Zoek tegelijk naar crew, aanbiedingen en locaties.",
