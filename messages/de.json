@@ -8235,6 +8235,15 @@
       "news": "News",
       "organizations": "Organisationen",
       "animals": "Filmtiere"
-    }
+    },
+    "followUpLabel": "Deine Antwort",
+    "followUpPlaceholder": "Ergänze deine Wünsche …",
+    "followUpSubmit": "Antwort senden",
+    "conversationExpired": "Der kurze Verlauf ist abgelaufen. Starte die Suche oben erneut; deine Eingabe bleibt erhalten.",
+    "conversationLimit": "Bitte fasse dein Vorhaben oben in einer neuen Suche zusammen. Deine Eingabe bleibt erhalten.",
+    "mapTitle": "Deine Suche auf der Karte",
+    "mapLegend": "Bereiche auf der Karte",
+    "mapIncomplete": "Weitere Treffer sind noch nicht auf der Karte geladen.",
+    "mapMore": "Weitere Kartentreffer laden"
   }
 }

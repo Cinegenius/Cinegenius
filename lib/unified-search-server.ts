@@ -5,6 +5,8 @@ import { profileAccessFor } from "@/lib/profile-privacy-server";
 import { projectProfilePrivacy } from "@/lib/profile-privacy";
 import { getDeptLabel, departments, taxonomyLabel } from "@/lib/departments";
 import { placeReadFields } from "@/lib/places/catalog";
+import { publicMapPoint } from "@/lib/places/public-map-point";
+import { readPublicLocationArea } from "@/lib/location-privacy";
 import { countryCode, PLACE_COLUMNS, placeDisplay } from "@/lib/places/core";
 import { publicProjectMedia } from "@/lib/project-media-rights";
 import { listingPriceLabel } from "@/lib/listing-price";
@@ -31,14 +33,14 @@ export async function searchWishLabel(wish: SearchWish, locale: string) {
   return [title, places.join(" / ")].filter(Boolean).join(" · ");
 }
 
-function queryFor(area: SearchArea, wish: SearchWish, terms: string[], categories: string[]) {
+function queryFor(area: SearchArea, wish: SearchWish, terms: string[], categories: string[], map = false) {
   const patterns = (columns: string[]) => terms.flatMap(term => columns.map(column => `${column}.ilike.${containsLiteral(term)}`));
   const kinds = LISTING_AREAS[area];
   if (kinds) {
     const filters = patterns(["title", "description", "category", ...(area === "marketplace"
       ? ["metadata->>vehicle_subtype", "metadata->>make", "metadata->>model", "metadata->marketplace->>brand", "metadata->marketplace->>model"] : [])]);
     if (area === "marketplace" && categories.length) filters.push(`category.in.(${categories.map(filterLiteral).join(",")})`);
-    return db.from("privacy_visible_listings").select(`${PLACE_COLUMNS},id,user_id,title,city,type,category,price,image_url,price_negotiable:metadata->price_negotiable,price_on_request:metadata->price_on_request,rental_type:metadata->>rental_type,marketplace:metadata->marketplace`)
+    return db.from("privacy_visible_listings").select(`${PLACE_COLUMNS},id,user_id,title,city,type,category,price,image_url,price_negotiable:metadata->price_negotiable,price_on_request:metadata->price_on_request,rental_type:metadata->>rental_type,marketplace:metadata->marketplace${map && area === "locations" ? ",location_area:metadata->location_area" : ""}`)
       .eq("published", true).in("type", kinds).or(filters.join(",")).order("id");
   }
   if (area === "crew") {
@@ -79,7 +81,7 @@ function geographyRow(row: Row, area: SearchArea): Row {
   };
 }
 
-async function readGroup(plan: SearchPlan, wishIndex: number, area: SearchArea, offset: number, locale: string, viewerId: string | null, signal: AbortSignal): Promise<SearchGroup> {
+async function readGroup(plan: SearchPlan, wishIndex: number, area: SearchArea, offset: number, locale: string, viewerId: string | null, signal: AbortSignal, view: "list" | "map"): Promise<SearchGroup> {
   const wish = plan.searches[wishIndex];
   const taxonomy = await getTranslations({ locale, namespace: "Taxonomy" });
   const terms = wishSearchTerms({ ...wish, area }, locale, taxonomy);
@@ -91,7 +93,7 @@ async function readGroup(plan: SearchPlan, wishIndex: number, area: SearchArea, 
   const group: SearchGroup = { area, wishIndex, label: await searchWishLabel(wish, locale), results: [], nextOffset: null };
   for (let pass = 0; pass < 3; pass++) {
     signal.throwIfAborted();
-    const { data, error } = await queryFor(area, wish, terms, categories).range(offset, offset + PAGE - 1).abortSignal(signal);
+    const { data, error } = await queryFor(area, wish, terms, categories, view === "map").range(offset, offset + PAGE - 1).abortSignal(signal);
     if (error) throw new Error("search_unavailable");
     const rows = (data ?? []) as unknown as Row[];
     const privacy = area === "crew" ? await profileAccessFor(rows.map(row => String(row.user_id)), viewerId, { signal, throwOnError: true }) : null;
@@ -119,8 +121,16 @@ async function readGroup(plan: SearchPlan, wishIndex: number, area: SearchArea, 
         available: typeof row.available === "boolean" ? row.available : null,
       };
       if (["prop", "vehicle", "location"].includes(result.type)) result.priceLabel = listingPriceLabel(result.price, row, "/Tag", locale, market);
+      if (view === "map") {
+        // Never geocode private fields or use an offer's exact coordinates. Crew
+        // map opt-out is already projected above; locations expose only their area.
+        const areaPoint = area === "locations" ? readPublicLocationArea({ location_area: row.location_area }) : null;
+        const point = areaPoint ?? publicMapPoint(row);
+        result.mapPoint = point.lat !== null && point.lng !== null
+          ? { lat: point.lat, lng: point.lng, ...(areaPoint ? { radiusMeters: areaPoint.radius_meters } : {}) } : null;
+      }
       group.results.push(result);
-      if (group.results.length === VISIBLE) {
+      if (group.results.length === (view === "map" ? PAGE * 3 : VISIBLE)) {
         group.nextOffset = offset + i + 1;
         return group;
       }
@@ -134,7 +144,7 @@ async function readGroup(plan: SearchPlan, wishIndex: number, area: SearchArea, 
 }
 
 export type SearchCursor = { wishIndex: number; area: SearchArea; offset: number };
-export async function executeUnifiedSearch(plan: SearchPlan, locale: string, viewerId: string | null, signal: AbortSignal, cursor?: SearchCursor) {
+export async function executeUnifiedSearch(plan: SearchPlan, locale: string, viewerId: string | null, signal: AbortSignal, cursor?: SearchCursor, view: "list" | "map" = "list") {
   const tasks = cursor ? [cursor] : plan.searches.flatMap((wish, wishIndex) =>
     (wish.area === "all" ? SEARCH_AREAS : [wish.area]).map(area => ({ wishIndex, area, offset: 0 })));
   const groups: SearchGroup[] = new Array(tasks.length);
@@ -142,7 +152,7 @@ export async function executeUnifiedSearch(plan: SearchPlan, locale: string, vie
   await Promise.all(Array.from({ length: Math.min(tasks.length, 4) }, async () => {
     while (next < tasks.length) {
       const index = next++, task = tasks[index];
-      groups[index] = await readGroup(plan, task.wishIndex, task.area, task.offset, locale, viewerId, signal);
+      groups[index] = await readGroup(plan, task.wishIndex, task.area, task.offset, locale, viewerId, signal, view);
     }
   }));
   return { groups };

@@ -8235,6 +8235,15 @@
       "news": "Hírek",
       "organizations": "Szervezetek",
       "animals": "Filmes állatok"
-    }
+    },
+    "followUpLabel": "A válaszod",
+    "followUpPlaceholder": "Egészítsd ki az igényeidet …",
+    "followUpSubmit": "Válasz küldése",
+    "conversationExpired": "Ez a rövid beszélgetés lejárt. Indítsd újra a keresést fent; a beírt szöveg megmarad.",
+    "conversationLimit": "Foglald össze a tervedet egy új keresésben fent. A beírt szöveg megmarad.",
+    "mapTitle": "A keresésed a térképen",
+    "mapLegend": "Térképkategóriák",
+    "mapIncomplete": "További találatok még nem töltődtek be a térképre.",
+    "mapMore": "További térképes találatok betöltése"
   }
 }

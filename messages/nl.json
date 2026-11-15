@@ -8235,6 +8235,15 @@
       "news": "Nieuws",
       "organizations": "Organisaties",
       "animals": "Filmdieren"
-    }
+    },
+    "followUpLabel": "Je antwoord",
+    "followUpPlaceholder": "Vul je wensen aan …",
+    "followUpSubmit": "Antwoord versturen",
+    "conversationExpired": "Dit korte gesprek is verlopen. Start de zoekopdracht hierboven opnieuw; je invoer blijft bewaard.",
+    "conversationLimit": "Vat je plan samen in een nieuwe zoekopdracht hierboven. Je invoer blijft bewaard.",
+    "mapTitle": "Je zoekopdracht op de kaart",
+    "mapLegend": "Categorieën op de kaart",
+    "mapIncomplete": "Er zijn nog meer resultaten die niet op de kaart zijn geladen.",
+    "mapMore": "Meer kaartresultaten laden"
   }
 }

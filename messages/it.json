@@ -8235,6 +8235,15 @@
       "news": "Notizie",
       "organizations": "Organizzazioni",
       "animals": "Animali da set"
-    }
+    },
+    "followUpLabel": "La tua risposta",
+    "followUpPlaceholder": "Aggiungi le tue esigenze …",
+    "followUpSubmit": "Invia risposta",
+    "conversationExpired": "Questa breve conversazione è scaduta. Riavvia la ricerca in alto; il testo inserito viene conservato.",
+    "conversationLimit": "Riassumi il tuo progetto in una nuova ricerca in alto. Il testo inserito viene conservato.",
+    "mapTitle": "La tua ricerca sulla mappa",
+    "mapLegend": "Categorie sulla mappa",
+    "mapIncomplete": "Altri risultati non sono ancora stati caricati sulla mappa.",
+    "mapMore": "Carica altri risultati sulla mappa"
   }
 }

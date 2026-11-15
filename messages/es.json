@@ -8235,6 +8235,15 @@
       "news": "Noticias",
       "organizations": "Organizaciones",
       "animals": "Animales de rodaje"
-    }
+    },
+    "followUpLabel": "Tu respuesta",
+    "followUpPlaceholder": "Añade lo que necesitas …",
+    "followUpSubmit": "Enviar respuesta",
+    "conversationExpired": "Esta breve conversación ha caducado. Inicia de nuevo la búsqueda arriba; tu texto se conserva.",
+    "conversationLimit": "Resume tu proyecto en una nueva búsqueda arriba. Tu texto se conserva.",
+    "mapTitle": "Tu búsqueda en el mapa",
+    "mapLegend": "Categorías del mapa",
+    "mapIncomplete": "Aún quedan resultados por cargar en el mapa.",
+    "mapMore": "Cargar más resultados en el mapa"
   }
 }
