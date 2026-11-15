@@ -26,7 +26,7 @@ export default function SmartSearchMap({ plan, onUnauthorized }: { plan: SearchP
   useEffect(() => { unauthorized.current = onUnauthorized; }, [onUnauthorized]);
   const encoded = JSON.stringify(plan);
 
-  const read = useCallback(async (controller: AbortController, cursor?: { area: SearchGroup["area"]; wishIndex: number; offset: number }) => {
+  const read = useCallback(async (controller: AbortController, cursor?: { area: SearchGroup["area"]; wishIndex: number; offset: number; nearby?: SearchGroup["nearbyCursor"] }) => {
     const response = await fetch("/api/search/unified", {
       method: "POST", headers: { "Content-Type": "application/json" }, credentials: "same-origin",
       cache: "no-store", referrerPolicy: "no-referrer", signal: AbortSignal.any([controller.signal, AbortSignal.timeout(35_000)]),
@@ -63,10 +63,10 @@ export default function SmartSearchMap({ plan, onUnauthorized }: { plan: SearchP
       await Promise.all(Array.from({ length: Math.min(2, remaining.length) }, async () => {
         while (next < remaining.length && !controller.signal.aborted) {
           const group = remaining[next++];
-          const [page] = await read(controller, { area: group.area, wishIndex: group.wishIndex, offset: group.nextOffset! });
+          const [page] = await read(controller, { area: group.area, wishIndex: group.wishIndex, offset: group.nextOffset!, ...(group.nearbyCursor ? { nearby: group.nearbyCursor } : {}) });
           if (controller.signal.aborted || !page) return;
           setGroups(current => current.map(existing => groupKey(existing) !== groupKey(group) ? existing : {
-            ...page, results: [...new Map([...existing.results, ...page.results].map(result => [`${result.type}:${result.id}`, result])).values()],
+            ...page, results: [...new Map([...(!!existing.nearby === !!page.nearby ? existing.results : []), ...page.results].map(result => [`${result.type}:${result.id}`, result])).values()],
           }));
         }
       }));
@@ -96,6 +96,7 @@ export default function SmartSearchMap({ plan, onUnauthorized }: { plan: SearchP
       {SEARCH_AREAS.filter(area => entries.some(entry => entry.area === area)).map(area => <li key={area} className="inline-flex items-center gap-2"><span className="size-2.5 rounded-full" style={{ backgroundColor: SMART_MAP_COLORS[area] }} aria-hidden="true" />{t(`areas.${area}`)}</li>)}
     </ul>
     <p className="text-xs text-text-muted">{mapText("cityNotice")}</p>
+    {groups.some(group => group.nearby && group.results.length) && <p className="text-xs text-text-muted">{t("nearbyMap")}</p>}
     <div className="directory-map-frame">
       <LocationMap locations={locations} activeId={activeId} onHover={setActiveId} userLocation={null} radiusKm={50}
         appliedBounds={bounds} onApplyBounds={setBounds} onBoundsChange={setBounds} visibleCount={visible}

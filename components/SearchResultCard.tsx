@@ -80,6 +80,7 @@ export default function ResultCard({ result, compact = false }: { result: Result
           {result.title}
         </h3>
         <p title={result.subtitle} className="text-xs text-text-muted line-clamp-1 flex-1">{result.subtitle}</p>
+        {result.nearby && <p className="text-xs text-text-muted">{uiText("UnifiedSearch.nearbyDistance", { distance: result.nearby.distanceKm.toLocaleString(uiLocale), place: result.nearby.origin })}</p>}
         {!isProfile && result.type !== "animal" && (result.priceLabel || result.price > 0) && (
           <p className={`${compact ? "text-xs" : "mt-2 text-sm"} font-semibold font-mono text-gold`}>
             {result.priceLabel ?? uiText("Ui.text_4519fabedb2cbd", { value1: String(result.price.toLocaleString(uiLocale)) })}

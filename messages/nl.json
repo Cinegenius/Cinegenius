@@ -8244,6 +8244,9 @@
     "mapTitle": "Je zoekopdracht op de kaart",
     "mapLegend": "Categorieën op de kaart",
     "mapIncomplete": "Er zijn nog meer resultaten die niet op de kaart zijn geladen.",
-    "mapMore": "Meer kaartresultaten laden"
+    "mapMore": "Meer kaartresultaten laden",
+    "nearbyResults": "Geen resultaten hier op de gevraagde locatie. De dichtstbijzijnde passende resultaten:",
+    "nearbyMap": "Bij zoekopdrachten zonder lokale resultaten toont de kaart ook de dichtstbijzijnde passende resultaten.",
+    "nearbyDistance": "ca. {distance} km van {place} · hemelsbreed"
   }
 }

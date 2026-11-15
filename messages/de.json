@@ -8244,6 +8244,9 @@
     "mapTitle": "Deine Suche auf der Karte",
     "mapLegend": "Bereiche auf der Karte",
     "mapIncomplete": "Weitere Treffer sind noch nicht auf der Karte geladen.",
-    "mapMore": "Weitere Kartentreffer laden"
+    "mapMore": "Weitere Kartentreffer laden",
+    "nearbyResults": "Am gewünschten Ort gibt es hier keine Treffer. Die nächstgelegenen passenden Ergebnisse:",
+    "nearbyMap": "Für Suchwünsche ohne lokale Treffer zeigt die Karte auch die nächstgelegenen passenden Ergebnisse.",
+    "nearbyDistance": "ca. {distance} km von {place} · Luftlinie"
   }
 }

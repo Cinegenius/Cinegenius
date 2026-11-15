@@ -8244,6 +8244,9 @@
     "mapTitle": "Din sökning på kartan",
     "mapLegend": "Kategorier på kartan",
     "mapIncomplete": "Fler resultat har ännu inte laddats på kartan.",
-    "mapMore": "Ladda fler kartresultat"
+    "mapMore": "Ladda fler kartresultat",
+    "nearbyResults": "Inga träffar här på den önskade orten. De närmaste matchande resultaten:",
+    "nearbyMap": "För sökningar utan lokala träffar visar kartan även de närmaste matchande resultaten.",
+    "nearbyDistance": "cirka {distance} km från {place} · fågelvägen"
   }
 }
