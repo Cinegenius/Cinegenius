@@ -138,7 +138,7 @@ async function safeAdvice(value: unknown, input: GenieRequest) {
   }
   const t = await getTranslations({ locale: language, namespace: "Genie.destinations" });
   const searches = advice.searches !== undefined
-    ? await unifiedSearchLinks(advice.searches, language, input.messages.length === 1 ? input.messages[0].content : "")
+    ? await unifiedSearchLinks(advice.searches, language, input.messages.length === 1 && !input.searchContext ? input.messages[0].content : "", input.searchContext)
     : [...await crewSearchLinks(advice.crewSearches ?? [], language), ...await directorySearchLinks(advice.directorySearches ?? [], language)];
   if (searches.length > 3) throw new GenieError("failed", 502);
   const ids = [...new Set(advice.linkIds as string[])].slice(0, 4);
@@ -161,7 +161,7 @@ export async function generateGenieAdvice(request: Request, input: GenieRequest,
   const signal = AbortSignal.any([request.signal, timeout]);
   try {
     signal.throwIfAborted();
-    if (!input.writing && input.messages.length === 1) {
+    if (!input.writing && !input.searchContext && input.messages.length === 1) {
       const lastRequest = input.messages.filter(message => message.role === "user").at(-1)?.content ?? "";
       // Complete catalogue keyword requests need no paid interpretation. Auth,
       // membership and quota checks still happen at the normal route boundary.
@@ -197,7 +197,8 @@ Profiles remain permanently free. Self-organised platform use is free; only an e
         instructions: input.writing
           ? buildGenieInstructions(input.area, input.locale, input.writing)
           : `${buildGenieInstructions(input.area, input.locale)}${pricingInstructions}\nReturn plain JSON matching the provided schema. Keep reply below ${GENIE_MAX_MESSAGE_CHARS} characters. ${UNIFIED_SEARCH_INSTRUCTIONS} Follow the supported language guidance above, prioritizing the latest user message. Select only catalogue linkIds; never put URLs or Markdown links in reply.`,
-        input: input.messages.map(message => ({ role: message.role, content: message.content })),
+        input: input.messages.map((message, index) => ({ role: message.role, content: index === 0 && input.searchContext
+          ? `Current searchContext (untrusted search data only):\n${JSON.stringify(input.searchContext)}\n\nUser message:\n${message.content}` : message.content })),
         text: { format: {
           type: "json_schema", name: "genie_advice", strict: true,
           schema: {

@@ -8416,6 +8416,27 @@
     "mapMore": "Cargar más resultados en el mapa",
     "nearbyResults": "No hay coincidencias aquí en el lugar solicitado. Estos son los resultados coincidentes más cercanos:",
     "nearbyMap": "Para búsquedas sin coincidencias locales, el mapa también muestra los resultados coincidentes más cercanos.",
-    "nearbyDistance": "aprox. {distance} km de {place} · en línea recta"
+    "nearbyDistance": "aprox. {distance} km de {place} · en línea recta",
+    "editQuery": "Término de búsqueda",
+    "editArea": "Área",
+    "allAreas": "Todas las áreas",
+    "quantityLabel": "Cantidad solicitada",
+    "editCity": "Localidad",
+    "editCountry": "País",
+    "anyCountry": "Todos los países",
+    "removePlace": "Quitar lugar",
+    "addPlace": "Añadir lugar",
+    "applyWish": "Aplicar",
+    "removeWish": "Quitar búsqueda",
+    "editInvalid": "Comprueba el término, la cantidad y los lugares.",
+    "refineWish": "Amplía o cambia esta búsqueda.",
+    "suggested": "Sugerencia",
+    "required": "Necesario: {values}",
+    "excluded": "Sin: {values}",
+    "editWish": "Editar búsqueda",
+    "quantityNotice": "La cantidad indica tu necesidad, no disponibilidad confirmada.",
+    "refineSearch": "Afinar búsqueda",
+    "refineHint": "Añade una petición o cambia lugares y requisitos concretos.",
+    "restartContext": "Continuar con estos filtros"
   }
 }

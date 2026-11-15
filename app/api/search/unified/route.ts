@@ -4,7 +4,7 @@ import { getCurrentUser } from "@/lib/auth";
 import { trustedMutationOrigin } from "@/lib/request-origin";
 import { GenieError, readGenieBody } from "@/lib/genie-server";
 import { validateResolvedSearchPlan } from "@/lib/unified-search-plan-server";
-import { executeUnifiedSearch, type SearchCursor } from "@/lib/unified-search-server";
+import { executeUnifiedSearch, validSearchCursor, type SearchCursor } from "@/lib/unified-search-server";
 import { unifiedSearchAccess } from "@/lib/unified-search-access";
 import { SEARCH_AREAS } from "@/lib/unified-search";
 import { validNearbyCursor } from "@/lib/unified-search-nearby";
@@ -25,15 +25,16 @@ export async function POST(request: NextRequest) {
     const body = await readGenieBody(request);
     if (!body || typeof body !== "object" || Array.isArray(body) || Object.keys(body).some(key => !["plan", "cursor", "view"].includes(key))) return json({ error: "invalid_request" }, 400);
     const { plan: rawPlan, cursor, view } = body as { plan: unknown; cursor?: SearchCursor; view?: unknown };
-    if (view !== undefined && view !== "map") return json({ error: "invalid_request" }, 400);
+    if (view !== undefined && view !== "map" && view !== "combined") return json({ error: "invalid_request" }, 400);
     const plan = validateResolvedSearchPlan(rawPlan);
-    if (cursor !== undefined && (!cursor || typeof cursor !== "object" || Array.isArray(cursor) || Object.keys(cursor).some(key => !["wishIndex", "area", "offset", "nearby"].includes(key))
+    if (view === "combined" && (plan.version !== 2 || cursor !== undefined)) return json({ error: "invalid_request" }, 400);
+    if (cursor !== undefined && (!cursor || typeof cursor !== "object" || Array.isArray(cursor) || Object.keys(cursor).some(key => !["wishIndex", "area", "offset", "nearby", "segment", "rank"].includes(key))
       || !Number.isInteger(cursor.wishIndex) || cursor.wishIndex < 0 || cursor.wishIndex >= plan.searches.length
       || !Number.isInteger(cursor.offset) || cursor.offset < 0 || cursor.offset > 1_000_000
       || !validNearbyCursor(cursor.nearby)
-      || !SEARCH_AREAS.includes(cursor.area) || !["all", cursor.area].includes(plan.searches[cursor.wishIndex].area))) return json({ error: "invalid_request" }, 400);
+      || !SEARCH_AREAS.includes(cursor.area) || !["all", cursor.area].includes(plan.searches[cursor.wishIndex].area) || !validSearchCursor(plan, cursor))) return json({ error: "invalid_request" }, 400);
     const signal = AbortSignal.any([request.signal, AbortSignal.timeout(20_000)]);
-    return json(await executeUnifiedSearch(plan, await getLocale(), userId, signal, cursor, view === "map" ? "map" : "list"));
+    return json(await executeUnifiedSearch(plan, await getLocale(), userId, signal, cursor, view === "combined" ? "combined" : view === "map" ? "map" : "list"));
   } catch (error) {
     return json({ error: error instanceof GenieError ? error.code : "unavailable" }, error instanceof GenieError ? error.status : 503);
   }

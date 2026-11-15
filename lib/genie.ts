@@ -1,3 +1,4 @@
+import { readSearchPlan, type SearchPlan } from "./unified-search";
 /** Shared, public contract. Contains no credentials, account data or database access. */
 export const GENIE_AREAS = ["registration", "profile", "marketplace", "location", "company", "general"] as const;
 export type GenieArea = typeof GENIE_AREAS[number];
@@ -41,7 +42,7 @@ export function genieAreaForPath(pathname: string): GenieArea {
 
 type GenieMessage = { role: "user" | "assistant"; content: string };
 export type GenieWriting = { maxLength: number };
-type GenieRequest = { area: GenieArea; locale: string; messages: GenieMessage[]; writing?: GenieWriting };
+type GenieRequest = { area: GenieArea; locale: string; messages: GenieMessage[]; writing?: GenieWriting; searchContext?: { plan: SearchPlan; wishIndex?: number } };
 type Validation = { ok: true; value: GenieRequest } | { ok: false; error: "invalid_request" | "unsafe_input" };
 function record(value: unknown): value is Record<string, unknown> {
   return value !== null && typeof value === "object" && !Array.isArray(value);
@@ -68,7 +69,7 @@ function containsCredential(text: string) {
 
 export function validateGenieRequest(input: unknown): Validation {
   const invalid: Validation = { ok: false, error: "invalid_request" };
-  if (!record(input) || Object.keys(input).some(key => !["area", "locale", "messages", "writing"].includes(key))) return invalid;
+  if (!record(input) || Object.keys(input).some(key => !["area", "locale", "messages", "writing", "searchContext"].includes(key))) return invalid;
   if (!GENIE_AREAS.includes(input.area as GenieArea) || typeof input.locale !== "string" || !GENIE_LOCALES.includes(input.locale)) return invalid;
   if (!Array.isArray(input.messages) || input.messages.length === 0 || input.messages.length > GENIE_MAX_MESSAGES || input.messages.length % 2 !== 1) return invalid;
   let writing: GenieWriting | undefined;
@@ -81,6 +82,15 @@ export function validateGenieRequest(input: unknown): Validation {
     writing = { maxLength: input.writing.maxLength };
   }
   const messages: GenieMessage[] = [];
+  let searchContext: GenieRequest["searchContext"];
+  if (input.searchContext !== undefined) {
+    const context = input.searchContext;
+    if (writing || !record(context) || Object.keys(context).some(key => !["plan", "wishIndex"].includes(key))) return invalid;
+    const plan = readSearchPlan(context.plan);
+    if (!plan || (context.wishIndex !== undefined && (!Number.isInteger(context.wishIndex) || Number(context.wishIndex) < 0 || Number(context.wishIndex) >= plan.searches.length))) return invalid;
+    if (containsCredential(JSON.stringify(plan))) return { ok: false, error: "unsafe_input" };
+    searchContext = { plan, ...(context.wishIndex !== undefined ? { wishIndex: Number(context.wishIndex) } : {}) };
+  }
   let total = 0;
   for (const [index, message] of input.messages.entries()) {
     const role = index % 2 === 0 ? "user" : "assistant";
@@ -92,7 +102,7 @@ export function validateGenieRequest(input: unknown): Validation {
     if (containsCredential(message.content)) return { ok: false, error: "unsafe_input" };
     messages.push({ role, content: message.content.trim() });
   }
-  return { ok: true, value: { area: input.area as GenieArea, locale: input.locale, messages, ...(writing ? { writing } : {}) } };
+  return { ok: true, value: { area: input.area as GenieArea, locale: input.locale, messages, ...(writing ? { writing } : {}), ...(searchContext ? { searchContext } : {}) } };
 }
 
 const AREA_GUIDANCE: Record<GenieArea, string> = {

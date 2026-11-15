@@ -6,16 +6,16 @@ import { useLocale, useTranslations } from "next-intl";
 import { Loader2, Map as MapIcon } from "lucide-react";
 import { hasCoordinates, inMapBounds, type MapBounds } from "@/lib/location-map";
 import { SMART_MAP_COLORS, smartMapEntries } from "@/lib/smart-search-map";
-import { SEARCH_AREAS, type SearchGroup, type SearchPlan } from "@/lib/unified-search";
+import { SEARCH_AREAS, searchGroupKey, type SearchGroup, type SearchPlan } from "@/lib/unified-search";
 import ResultCard from "./SearchResultCard";
 
 const LocationMap = dynamic(() => import("./LocationMap"), { ssr: false });
-const groupKey = (group: SearchGroup) => `${group.area}:${group.wishIndex}`;
+const groupKey = searchGroupKey;
 
-export default function SmartSearchMap({ plan, onUnauthorized }: { plan: SearchPlan; onUnauthorized: () => void }) {
+export default function SmartSearchMap({ plan, onUnauthorized, initialGroups }: { plan: SearchPlan; onUnauthorized: () => void; initialGroups?: SearchGroup[] }) {
   const t = useTranslations("UnifiedSearch"), mapText = useTranslations("directoryMap"), locationText = useTranslations("locationMap");
   const locale = useLocale();
-  const [groups, setGroups] = useState<SearchGroup[]>([]);
+  const [groups, setGroups] = useState<SearchGroup[]>(initialGroups ?? []);
   const [pending, setPending] = useState(false);
   const [failed, setFailed] = useState(false);
   const [retry, setRetry] = useState(0);
@@ -26,7 +26,7 @@ export default function SmartSearchMap({ plan, onUnauthorized }: { plan: SearchP
   useEffect(() => { unauthorized.current = onUnauthorized; }, [onUnauthorized]);
   const encoded = JSON.stringify(plan);
 
-  const read = useCallback(async (controller: AbortController, cursor?: { area: SearchGroup["area"]; wishIndex: number; offset: number; nearby?: SearchGroup["nearbyCursor"] }) => {
+  const read = useCallback(async (controller: AbortController, cursor?: { area: SearchGroup["area"]; wishIndex: number; offset: number; segment?: string; rank?: SearchGroup["rankCursor"]; nearby?: SearchGroup["nearbyCursor"] }) => {
     const response = await fetch("/api/search/unified", {
       method: "POST", headers: { "Content-Type": "application/json" }, credentials: "same-origin",
       cache: "no-store", referrerPolicy: "no-referrer", signal: AbortSignal.any([controller.signal, AbortSignal.timeout(35_000)]),
@@ -41,6 +41,7 @@ export default function SmartSearchMap({ plan, onUnauthorized }: { plan: SearchP
   }, [encoded]);
 
   useEffect(() => {
+    if (initialGroups && retry === 0) return;
     const controller = new AbortController(); request.current = controller;
     const timer = window.setTimeout(async () => {
       setPending(true); setFailed(false); setGroups([]); setBounds(null);
@@ -49,7 +50,7 @@ export default function SmartSearchMap({ plan, onUnauthorized }: { plan: SearchP
       finally { if (!controller.signal.aborted) { setPending(false); request.current = null; } }
     }, 0);
     return () => { window.clearTimeout(timer); controller.abort(); request.current?.abort(); request.current = null; };
-  }, [read, retry, locale]);
+  }, [read, retry, locale, initialGroups]);
 
   async function more() {
     if (request.current) return;
@@ -63,7 +64,7 @@ export default function SmartSearchMap({ plan, onUnauthorized }: { plan: SearchP
       await Promise.all(Array.from({ length: Math.min(2, remaining.length) }, async () => {
         while (next < remaining.length && !controller.signal.aborted) {
           const group = remaining[next++];
-          const [page] = await read(controller, { area: group.area, wishIndex: group.wishIndex, offset: group.nextOffset!, ...(group.nearbyCursor ? { nearby: group.nearbyCursor } : {}) });
+          const [page] = await read(controller, { area: group.area, wishIndex: group.wishIndex, offset: group.nextOffset!, ...(group.segment ? { segment: group.segment } : {}), ...(group.rankCursor ? { rank: group.rankCursor } : {}), ...(group.nearbyCursor ? { nearby: group.nearbyCursor } : {}) });
           if (controller.signal.aborted || !page) return;
           setGroups(current => current.map(existing => groupKey(existing) !== groupKey(group) ? existing : {
             ...page, results: [...new Map([...(!!existing.nearby === !!page.nearby ? existing.results : []), ...page.results].map(result => [`${result.type}:${result.id}`, result])).values()],

@@ -8416,6 +8416,27 @@
     "mapMore": "Weitere Kartentreffer laden",
     "nearbyResults": "Am gewünschten Ort gibt es hier keine Treffer. Die nächstgelegenen passenden Ergebnisse:",
     "nearbyMap": "Für Suchwünsche ohne lokale Treffer zeigt die Karte auch die nächstgelegenen passenden Ergebnisse.",
-    "nearbyDistance": "ca. {distance} km von {place} · Luftlinie"
+    "nearbyDistance": "ca. {distance} km von {place} · Luftlinie",
+    "editQuery": "Suchbegriff",
+    "editArea": "Bereich",
+    "allAreas": "Alle Bereiche",
+    "quantityLabel": "Gewünschte Anzahl",
+    "editCity": "Ort",
+    "editCountry": "Land",
+    "anyCountry": "Alle Länder",
+    "removePlace": "Ort entfernen",
+    "addPlace": "Ort hinzufügen",
+    "applyWish": "Übernehmen",
+    "removeWish": "Suchwunsch entfernen",
+    "editInvalid": "Bitte Suchbegriff, Anzahl und Orte prüfen.",
+    "refineWish": "Diesen Suchwunsch ergänzen oder ändern.",
+    "suggested": "Vorschlag",
+    "required": "Erforderlich: {values}",
+    "excluded": "Ohne: {values}",
+    "editWish": "Suchwunsch bearbeiten",
+    "quantityNotice": "Die Anzahl ist dein Bedarf, keine bestätigte Verfügbarkeit.",
+    "refineSearch": "Suche verfeinern",
+    "refineHint": "Ergänze einen Wunsch oder ändere gezielt Ort und Anforderungen.",
+    "restartContext": "Mit diesen Filtern fortsetzen"
   }
 }

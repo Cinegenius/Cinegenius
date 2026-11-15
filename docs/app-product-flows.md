@@ -417,3 +417,32 @@ weiter; keine Migration und keine neue dauerhafte Suchhistorie.
 App-Prüfbelege und spätere Xcode-Hinweise:
 `/srv/cinegenius/handoffs/20261115-app-smart-production-catering/`.
 Native Scanner-/Dispo-/PDF-Quellen und neuere Mac-Arbeit bleiben unberührt.
+
+## Smart-Folgeanfragen, Mengen und Anforderungen (15. November 2026)
+
+Geprüfte WEB-Quelle `67cc5854a697041033d70d35482f060cb90886ab` ist auf Grundlage
+von `516465a` in den App-Stand übernommen. Bei Übergabe noch nicht veröffentlicht;
+letzte bestätigte Live-Quelle bleibt `ad3cb39`. Vollständiger Vertrag:
+[`smart-search-v2.md`](smart-search-v2.md). Alte v1-Links bleiben verwendbar;
+neue v2-Pläne erhalten Mengen, Vorschläge, feste Anforderungen und Ausschlüsse.
+
+Text- und Sprachfortsetzungen übergeben den vollständigen validierten Suchplan
+als `searchContext`. Gezielte Änderungen dürfen andere Wünsche nicht ändern.
+Mengen bezeichnen den Bedarf, keine bestätigte Verfügbarkeit. Eingaben bleiben
+bei Fehlern und beim Schließen eines Wunsch-Editors erhalten; abgelaufener Kontext
+benötigt eine ausdrückliche Fortsetzung. Kontoende verwirft verspätete Antworten.
+
+Abteilungsleitungen erscheinen in getrennten Gewerken mit eigener Ortsalternative.
+Gruppen sind durch Bereich, Wunschindex und optionales `segment` bestimmt.
+Für weitere Seiten werden `segment`, `rankCursor` als `rank` beziehungsweise
+`nearbyCursor` als `nearby` unverändert weitergereicht. Liste und Karte erhalten
+ihre erste v2-Antwort gemeinsam über `view: combined`; ihre nachfolgenden Seiten
+bleiben unabhängig. Die alten v1- und Einzelansichtspfade bleiben verfügbar.
+
+Alle neun bestehenden Kataloge enthalten die zusätzlichen Oberflächentexte.
+Native Sprachvermittlung und Scanner-Dateien bleiben erhalten; das gemeinsame
+App-Frontend verwendet den geprüften Vertrag ohne einen zweiten nativen Parser.
+Keine Migration, Modell-/Schlüsseländerung, Veröffentlichung oder Geräteinstallation
+durch diesen Abgleich. Neuere Mac-/Scanner-/Dispo-/PDF-Arbeit bleibt eigenständig
+erhalten. Prüfungen und Grenzen:
+`/srv/cinegenius/handoffs/20261115-app-smart-expanded/`.

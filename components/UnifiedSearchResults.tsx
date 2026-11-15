@@ -8,12 +8,13 @@ import Link from "next/link";
 import dynamic from "next/dynamic";
 import { Loader2, Search } from "lucide-react";
 import { useFormRouter } from "@/lib/use-form-router";
-import { decodeSearchPlan, searchPlanFromHref, SEARCH_AREAS, type SearchPlan, type SearchGroup } from "@/lib/unified-search";
+import { decodeSearchPlan, searchPlanFromHref, SEARCH_AREAS, searchGroupKey, type SearchPlan, type SearchGroup } from "@/lib/unified-search";
 import ResultCard from "@/components/SearchResultCard";
 import SmartSearchClarification from "@/components/SmartSearchClarification";
+import SmartSearchWishes from "@/components/SmartSearchWishes";
 import { searchQueryTitle } from "@/lib/unified-search-areas";
 
-const groupKey = (group: SearchGroup) => `${group.area}:${group.wishIndex}`;
+const groupKey = searchGroupKey;
 const SEARCH_ERROR = { invalid: "invalid", unavailable: "unavailable", unauthorized: "unauthorized" } as const;
 type Clarification = { question: string; scope: string; retry: number } | null;
 const SmartSearchMap = dynamic(() => import("./SmartSearchMap"), { ssr: false });
@@ -31,6 +32,7 @@ export default function UnifiedSearchResults() {
   const [input, setInput] = useState(requestText);
   const [plan, setPlan] = useState<SearchPlan | null>(null);
   const [groups, setGroups] = useState<SearchGroup[]>([]);
+  const [mapGroups, setMapGroups] = useState<SearchGroup[] | undefined>();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [clarification, setClarification] = useState<Clarification>(null);
@@ -58,7 +60,7 @@ export default function UnifiedSearchResults() {
     // A deferred start avoids duplicate paid requests during React's effect replay.
     const timer = setTimeout(async () => {
       setResultScope(scope);
-      setMorePending([]); setMoreErrors([]); setGroups([]); setError("");
+      setMorePending([]); setMoreErrors([]); setGroups([]); setMapGroups(undefined); setError("");
       const decoded = decodeSearchPlan(encodedPlan);
       setPlan(decoded);
       const source = JSON.stringify([encodedPlan, requestText]);
@@ -87,10 +89,10 @@ export default function UnifiedSearchResults() {
       try {
         if (decoded) {
           interpretationAttempt.current = null;
-          const response = await fetch("/api/search/unified", { method: "POST", headers: { "Content-Type": "application/json" }, cache: "no-store", signal: controller.signal, body: JSON.stringify({ plan: decoded }) });
+          const response = await fetch("/api/search/unified", { method: "POST", headers: { "Content-Type": "application/json" }, cache: "no-store", signal: controller.signal, body: JSON.stringify({ plan: decoded, ...(decoded.version === 2 ? { view: "combined" } : {}) }) });
           const data = await response.json();
           if (!response.ok) throw new Error(response.status === 401 ? "unauthorized" : data.error || SEARCH_ERROR.unavailable);
-          if (!controller.signal.aborted) setGroups(data.groups);
+          if (!controller.signal.aborted) { setGroups(data.groups); setMapGroups(data.mapGroups); }
         } else {
           // Locale/account changes may cancel a request, but never repeat paid
           // interpretation of the previous input without another explicit send.
@@ -121,7 +123,7 @@ export default function UnifiedSearchResults() {
     pages.current.add(controller); setMorePending(values => [...values, key]); setMoreErrors(values => values.filter(value => value !== key));
     try {
       const response = await fetch("/api/search/unified", { method: "POST", headers: { "Content-Type": "application/json" }, cache: "no-store", signal: controller.signal,
-        body: JSON.stringify({ plan, cursor: { wishIndex: group.wishIndex, area: group.area, offset: group.nextOffset, ...(group.nearbyCursor ? { nearby: group.nearbyCursor } : {}) } }) });
+        body: JSON.stringify({ plan, cursor: { wishIndex: group.wishIndex, area: group.area, offset: group.nextOffset, ...(group.segment ? { segment: group.segment } : {}), ...(group.rankCursor ? { rank: group.rankCursor } : {}), ...(group.nearbyCursor ? { nearby: group.nearbyCursor } : {}) } }) });
       const data = await response.json();
       if (response.status === 401) {
         if (!controller.signal.aborted) { setGroups([]); setError(SEARCH_ERROR.unauthorized); }
@@ -156,6 +158,7 @@ export default function UnifiedSearchResults() {
             placeholder={t("placeholder")} className="min-h-11 min-w-0 flex-1 rounded-xl border border-border bg-bg-elevated px-4 py-3 text-base text-text-primary focus:border-gold focus:outline-none" />
           <button type="submit" aria-label={t("submit")} disabled={!input.trim()} className="flex min-h-11 min-w-11 items-center justify-center rounded-xl bg-gold px-3 text-bg-primary disabled:opacity-50"><Search size={20} /></button>
         </form>
+        {plan && userId && resultScope === scope && !error && <SmartSearchWishes key={dialogueScope} plan={plan} onUnauthorized={() => { setGroups([]); setError(SEARCH_ERROR.unauthorized); }} />}
         <div aria-live="polite" className="mt-3 text-sm text-text-secondary">
           {loading && <p className="flex items-center gap-2"><Loader2 size={18} className="animate-spin text-gold" />{plan ? t("loading") : t("understanding")}</p>}
         </div>
@@ -168,7 +171,7 @@ export default function UnifiedSearchResults() {
       </div>
     </div>
     {resultScope === scope && !loading && !error && <div className="site-container space-y-7 py-5">
-      {plan && userId && <SmartSearchMap key={scope} plan={plan} onUnauthorized={() => { setGroups([]); setError(SEARCH_ERROR.unauthorized); }} />}
+      {plan && userId && <SmartSearchMap key={scope} plan={plan} initialGroups={mapGroups} onUnauthorized={() => { setGroups([]); setError(SEARCH_ERROR.unauthorized); }} />}
       {SEARCH_AREAS.map(area => {
         const visible = groups.filter(group => group.area === area && (group.results.length || group.nextOffset !== null || plan?.searches[group.wishIndex].area !== "all"));
         if (!visible.length) return null;
@@ -176,6 +179,7 @@ export default function UnifiedSearchResults() {
           <h2 className="mb-3 font-serif text-2xl text-text-primary">{t(`areas.${area}`)}</h2>
           <div className="space-y-5">{visible.map(group => <section key={groupKey(group)} aria-label={group.label}>
             <h3 className="mb-2 break-words text-sm font-semibold text-gold">{group.label}</h3>
+            {plan?.searches[group.wishIndex].recommended && <p className="mb-2 text-xs text-text-muted">{t("suggested")}</p>}
             {group.nearby && group.results.length > 0 && <p className="mb-2 text-xs text-text-muted">{t("nearbyResults")}</p>}
             {!group.results.length && <p className="text-sm text-text-muted">{group.nextOffset !== null ? t("continueSearch") : t("emptyGroup")}</p>}
             <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 xl:grid-cols-3">{group.results.map(result => <ResultCard key={`${result.type}:${result.id}`} result={result} compact />)}</div>

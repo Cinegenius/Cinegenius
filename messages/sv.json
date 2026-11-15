@@ -8416,6 +8416,27 @@
     "mapMore": "Ladda fler kartresultat",
     "nearbyResults": "Inga träffar här på den önskade orten. De närmaste matchande resultaten:",
     "nearbyMap": "För sökningar utan lokala träffar visar kartan även de närmaste matchande resultaten.",
-    "nearbyDistance": "cirka {distance} km från {place} · fågelvägen"
+    "nearbyDistance": "cirka {distance} km från {place} · fågelvägen",
+    "editQuery": "Sökord",
+    "editArea": "Område",
+    "allAreas": "Alla områden",
+    "quantityLabel": "Önskat antal",
+    "editCity": "Ort",
+    "editCountry": "Land",
+    "anyCountry": "Alla länder",
+    "removePlace": "Ta bort plats",
+    "addPlace": "Lägg till plats",
+    "applyWish": "Tillämpa",
+    "removeWish": "Ta bort sökönskemål",
+    "editInvalid": "Kontrollera sökord, antal och platser.",
+    "refineWish": "Komplettera eller ändra detta sökönskemål.",
+    "suggested": "Förslag",
+    "required": "Krävs: {values}",
+    "excluded": "Utan: {values}",
+    "editWish": "Redigera sökönskemål",
+    "quantityNotice": "Antalet är ditt behov, inte bekräftad tillgänglighet.",
+    "refineSearch": "Förfina sökningen",
+    "refineHint": "Lägg till ett önskemål eller ändra specifika platser och krav.",
+    "restartContext": "Fortsätt med dessa filter"
   }
 }
