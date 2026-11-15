@@ -532,3 +532,20 @@ dieser Nachtrag aktualisiert nur den Veröffentlichungsstatus. Die lokalen
 Prüfgrenzen bleiben dokumentiert. Keine neue native Installation oder physische
 Geräteprüfung. Release-Beleg:
 `/srv/cinegenius/handoffs/20261115-home-section-dividers-ready/receipt.json`.
+
+## Keine doppelten Auth-Einstiege über dem Formular (15. November 2026)
+
+WEB-Quelle `4b797875441fd9af8f12b3735c63ec8c9203ab50` entfernt im gemeinsamen
+Header den eigenen Anmelden-Link auf `/sign-in` und den eigenen Registrieren-Link
+auf `/sign-up`, jeweils einschließlich nachgelagerter Auth-Schritte. Desktop
+und kompakter Header behalten das jeweils andere Ziel. Auf der Startseite und
+öffentlichen Verzeichnissen bleiben beide Einstiege direkt verfügbar.
+Formulare, Sitzungen, Berechtigungen, vorhandene Übersetzungen und native Quellen
+bleiben unverändert. Der App-Abgleich veröffentlicht die Korrektur nicht;
+letzter bestätigter Website-Live-Stand ist weiterhin `fb4ec8c`.
+
+Die lokalen Prüfungen der Formulare und Navigation sind keine echte Anmeldung
+oder physische Geräteprüfung: Die Produktionskonfiguration von Clerk akzeptiert
+die localhost-Vorschau nicht, und es wurden keine Zugangsdaten eingegeben.
+Prüfungen, Versionsabgleich und Grenzen:
+`/srv/cinegenius/handoffs/20261115-app-auth-header-self-links/`.
