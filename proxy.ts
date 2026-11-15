@@ -48,6 +48,8 @@ function getAdminIds(): Set<string> {
 // per-instance limit. Per-user limits are enforced in each route handler via
 // lib/rateLimit.ts (Supabase-backed, durable).
 const rateLimitMap = new Map<string, { count: number; resetAt: number }>();
+const MAX_IP_RATE_BUCKETS = 10_000;
+let nextRateLimitCleanupAt = 0;
 
 const RATE_LIMITS: Record<string, { limit: number; windowMs: number }> = {
   "/api/genie": { limit: 20, windowMs: 60_000 },
@@ -83,16 +85,31 @@ async function ipRateLimit(req: NextRequest): Promise<NextResponse | null> {
   // Use matched prefix as key so sub-paths like /api/upload/avatar all count
   // against the same bucket — prevents bypass via different sub-routes
   const prefix = Object.keys(RATE_LIMITS).find((p) => path.startsWith(p))!;
-  const key = `${ip}:${prefix}`;
+  const key = `${ip.slice(0, 64)}:${prefix}`;
   const now = Date.now();
-  const entry = rateLimitMap.get(key);
+  // Expired identities must not accumulate for the lifetime of a warm instance.
+  // Sweep at most once per minute, including while the cache is full.
+  if (now >= nextRateLimitCleanupAt) {
+    for (const [bucketKey, bucket] of rateLimitMap) {
+      if (now >= bucket.resetAt) rateLimitMap.delete(bucketKey);
+    }
+    nextRateLimitCleanupAt = now + 60_000;
+  }
+  let entry = rateLimitMap.get(key);
 
-  if (!entry || now > entry.resetAt) {
-    rateLimitMap.set(key, { count: 1, resetAt: now + rule.windowMs });
-    return null;
+  if (!entry || now >= entry.resetAt) {
+    if (!entry && rateLimitMap.size >= MAX_IP_RATE_BUCKETS) {
+      // Keep active counters: evicting one would reopen an exhausted allowance.
+      // Only an untracked identity waits for the next cleanup; existing users
+      // keep their own allowance. Durable route limits remain authoritative.
+      entry = { count: rule.limit, resetAt: nextRateLimitCleanupAt };
+    } else {
+      rateLimitMap.set(key, { count: 1, resetAt: now + rule.windowMs });
+      return null;
+    }
   }
 
-  entry.count++;
+  entry.count = Math.min(entry.count + 1, rule.limit + 1);
   if (entry.count > rule.limit) {
     if (prefix === "/api/genie") {
       return NextResponse.json({ error: "rate_limited" }, {

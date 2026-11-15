@@ -110,6 +110,7 @@ export async function GET() {
     res.cookies.set("cg_profile_ok", "1", {
       httpOnly: true,
       sameSite: "lax",
+      secure: process.env.NODE_ENV === "production",
       path: "/",
       maxAge: 60 * 60 * 24 * 30,
     });
@@ -258,6 +259,7 @@ export async function POST(req: NextRequest) {
   res.cookies.set("cg_profile_ok", "1", {
     httpOnly: true,
     sameSite: "lax",
+    secure: process.env.NODE_ENV === "production",
     path: "/",
     maxAge: 60 * 60 * 24 * 30, // 30 days
   });

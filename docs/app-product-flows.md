@@ -549,3 +549,27 @@ oder physische Geräteprüfung: Die Produktionskonfiguration von Clerk akzeptier
 die localhost-Vorschau nicht, und es wurden keine Zugangsdaten eingegeben.
 Prüfungen, Versionsabgleich und Grenzen:
 `/srv/cinegenius/handoffs/20261115-app-auth-header-self-links/`.
+
+## Vorbeugende Anfrage- und Cookie-Absicherung (15. November 2026)
+
+WEB-Quelle `c1c6064cc0154bfc502b382e4ef9007614ce3acf` begrenzt die frühen
+IP-/Routenzähler auf 10.000 je Instanz und bereinigt abgelaufene Einträge.
+Aktive Kontingente werden nicht verdrängt; neue Identitäten erhalten bei voller
+Kapazität 429 mit `Retry-After`. Dauerhafte Kontolimits bleiben maßgeblich.
+Produktions-APIs setzen `cg_profile_ok` und `cg_locale` mit `Secure`; der
+Browser-Sprachwechsel verwendet das Attribut auf HTTPS. Bestehende Pfade,
+Laufzeiten, SameSite-/HttpOnly-Eigenschaften und `persistOnly` bleiben erhalten.
+
+Die App-Vorschau verwendet regulär den CineGenius-HTTPS-Ursprung. Ihre native
+Kontoprüfung übernimmt WebKit-Cookies ohne eigene Sitzungskopie. Die lesbare
+Sprachpräferenz bleibt verfügbar. Ein fehlgeschlagener Kontozugriff bestätigt
+keine leere Bibliothek: Der bestehende Fehlerweg bietet eine neue, manuelle
+Prüfung an und startet keine automatische Wiederholungsschleife. Native Quellen,
+Sprachkataloge und die vorherige Auth-Header-Korrektur bleiben erhalten.
+
+Die Prüfungen verwenden synthetische Antworten und Browserfälle; sie ersetzen
+keinen nativen HTTPS-/Cookie-Test, keine echte Anmeldung und keinen vollständigen
+Sicherheitscheck. Keine Migration, Geräteinstallation oder Veröffentlichung.
+Letzter bestätigter Website-Live-Stand bleibt `fb4ec8c`.
+Eine Website-Veröffentlichung wird separat durch WEB koordiniert.
+Belege: `/srv/cinegenius/handoffs/20261115-app-security-hardening/`.

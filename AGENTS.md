@@ -42,6 +42,10 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 - Load only the requested language bundle, merged with the defined default fallback, on the server. Do not fetch all language catalogs on navigation or add external translation requests per page. Format dates and numbers with the active locale without currency conversion.
 - All nine supported locales have complete catalogs and verified critical language flows. Maintain that coverage across public/browse pages, authentication entry forms, profile editing, canonical place filters, taxonomies and generated system copy. If later work introduces partial coverage, disclose it until its legacy UI, system copy, taxonomies and critical flows are verified. Never claim full coverage from catalog key parity alone.
 
+## Preventative security checks
+
+- Apply `docs/security-prevention.md` when changing request counters, cookies, authentication, private data or AI actions. Preserve bounded expiring counters, durable route limits, HTTPS cookie flags and consent-gated analytics. Record actual verification and outstanding gaps; a targeted test run is not a completed deep security scan. Keep the daily website checking agent disabled.
+
 ## Media origin and confidentiality
 
 - New member-uploaded images must go through `storeProtectedMedia` and the private `protected-media` bucket. Persist the stable `/api/media/...` reference, never a local preview URL, a signed URL or a permanent public URL for an unbound/private upload.
