@@ -8208,6 +8208,11 @@
     }
   },
   "UnifiedSearch": {
+    "productionCompanies": "Filmová produkce",
+    "catering": "Catering",
+    "policeTheme": "Policie",
+    "medievalTheme": "Středověk",
+    "departmentHeads": "Vedoucí oddělení",
     "title": "Hledání Smart",
     "tab": "Smart",
     "intro": "Hledejte společně štáb, nabídky a místa.",

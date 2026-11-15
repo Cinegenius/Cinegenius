@@ -8,6 +8,8 @@ import { DEPARTMENTS as marketplaceDepartments, deptValues, groupValues, SEARCH_
 import continents from "./places/continents.json" with { type: "json" };
 import type { SearchPlace, SearchWish } from "./unified-search";
 import { isWholeAreaQuery } from "./unified-search-areas";
+import { departmentHeadTerms, isDepartmentHeadsQuery } from "./unified-search-production";
+import { cateringSearch, CATERING_SEARCH_TERMS } from "./unified-search-catering";
 
 // Country group facts: Unicode CLDR supplemental/territoryContainment.json (UN M49).
 // https://github.com/unicode-org/cldr-json/blob/main/cldr-json/cldr-core/supplemental/territoryContainment.json
@@ -55,6 +57,8 @@ export function searchDepartment(query: string, locale = "de", taxonomy?: (key: 
 }
 
 export function wishSearchTerms(wish: SearchWish, locale = "de", taxonomy?: (key: string) => string): string[] {
+  if (wish.area === "crew" && !wish.department && isDepartmentHeadsQuery(wish.query)) return departmentHeadTerms(locale, taxonomy);
+  if (wish.area === "companies" && !wish.department && cateringSearch(wish.query)) return CATERING_SEARCH_TERMS;
   if (!wish.department && isWholeAreaQuery(wish.area, wish.query)) return [];
   const crew = wish.area === "crew" || wish.area === "all";
   const terms = wish.query ? [...((crew && crewSynonyms[searchKey(wish.query)]) || synonyms[searchKey(wish.query)] || [wish.query])] : [];

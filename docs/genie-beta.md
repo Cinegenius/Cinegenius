@@ -319,7 +319,7 @@ release has been verified by these local checks.
 Global search no longer reads or writes a recent-search list. On mount and search opening it removes only the legacy `cg_recent_searches` key, tolerating blocked storage. Existing suggestion chips, result navigation, retry and keyboard operation remain. Current directory filters, actual browser history, language/cookie choices and private form recovery are not deleted. The search API does not persist queries; Genie provider `store: false` and content-free usage counters are unchanged. This local retention policy does not promise removal of provider/security logs or browser-managed URL history.
 
 
-## Independent keywords and nearest alternatives (15 November 2026, prepared)
+## Independent keywords and nearest alternatives (15 November 2026, published)
 
 - `Berlin Location Polizei` produces two wishes: every public Location in Berlin,
   plus Polizei across all areas. `Hamburg Polizei Kostüm` produces independent
@@ -367,3 +367,50 @@ Global search no longer reads or writes a recent-search list. On mount and searc
   or production release is implied by this implementation. Read-only public-data
   checks and browser simulations are distinct from live AI interpretation and
   real-device/native testing. See the corresponding test report for status.
+
+## Production briefs and qualified catering (15 November 2026, prepared)
+
+- A complete simple brief such as `Ich drehe in Berlin einen Polizeifilm`
+  produces a v1 plan with Crew `Heads of Department`, all-area `Polizei`,
+  companies `Filmproduktion`, companies `Catering`, and locations `Location`.
+  The explicit city stays attached to every wish. Crew jobs do not inherit the
+  genre as a profile keyword. Unknown constraints, multi-city briefs, exclusions
+  and conversation follow-ups remain with the existing interpreter; the
+  deterministic shortcut must not silently discard words.
+- `Heads of Department` resolves to explicit lead occupations in the existing
+  catalogue: production, direction/first AD, DoP, gaffer, key grip, location
+  sound, production design/props, costume, make-up and catering leadership.
+  A matched declared role appears on the existing compact result card. No
+  member role is modified. Assistants, trainees and biographies mentioning
+  department heads are not evidence of leadership. This is an initial pool of
+  candidates, not guaranteed coverage of every department, a booked crew,
+  confirmed availability, verified qualification or genre experience.
+- `veganes Catering in Berlin` is one company wish. Vegan, vegetarian, halal,
+  kosher, gluten-free, lactose-free and allergy-friendly requirements are
+  conjunctive when combined. Catering type can be constrained to set catering,
+  event catering, foodtruck/mobile catering, craft service or mobile kitchens.
+  Queries must be fully understood before special handling; unsupported
+  qualifiers are never silently removed. A catering manager or set cook remains
+  a personal occupation search. Generic Catering searches companies.
+- Candidate companies must be published and declare a catering service. Read
+  existing public `catering_details`, categories/services and descriptions;
+  match structured canonical dietary/service values or explicit public text.
+  Negative dietary statements are conservatively excluded, including a
+  contradiction with a saved dietary option. Do not claim allergy safety or
+  certification from these declarations. Vegetarian alone does not mean vegan.
+- Apply the same predicate before local/nearby decisions, counts, pagination and
+  map projection. Nearby results keep dietary and service constraints; explicit
+  countries and all existing privacy checks remain in force. Existing scans,
+  request deadlines and four-worker concurrency bounds are unchanged. Extra
+  catering fields are selected only for catering searches, not serialized as
+  new public response fields or stored in search history.
+- No schema migration, plan-version change, new endpoint or native contract
+  field. Keep the six-wish/four-place limits, shared membership gates, no-store
+  responses, fixed design, marker colors and compact cards. New generated
+  headings use all nine next-intl catalogs, in both the input summary and result
+  groups. Typed and transcribed text use the same Genie pipeline.
+- Verification: source/mocked API tests, read-only actual public catalogue
+  queries and browser viewport simulations. These do not establish real OpenAI
+  interpretation quality for arbitrary free-form wording, an authenticated
+  production session or native-device behavior. This extension is not yet
+  published; the preceding nearest-results release is live at ad3cb39.

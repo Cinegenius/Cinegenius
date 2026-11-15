@@ -8208,6 +8208,11 @@
     }
   },
   "UnifiedSearch": {
+    "productionCompanies": "Producción cinematográfica",
+    "catering": "Catering",
+    "policeTheme": "Policía",
+    "medievalTheme": "Medieval",
+    "departmentHeads": "Jefaturas de departamento",
     "title": "Búsqueda Smart",
     "tab": "Smart",
     "intro": "Busca profesionales, anuncios y lugares a la vez.",
