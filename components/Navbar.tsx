@@ -18,7 +18,7 @@ import { useTranslations } from "next-intl";
 import { useToast } from "@/contexts/ToastContext";
 import { useAuthenticatedInbox } from "@/lib/use-authenticated-inbox";
 import { subscribeToProfileUpdated } from "@/lib/profile-update-events";
-import { ACCOUNT_NAV_ITEMS, PRIMARY_NAV_ITEMS, activeNavigationId, SITE_NAV_MENU_ID, SITE_NAV_SIGN_OUT_EVENT } from "@/lib/site-navigation";
+import { ACCOUNT_NAV_ITEMS, PRIMARY_NAV_ITEMS, activeNavigationId, routeMatches, SITE_NAV_MENU_ID, SITE_NAV_SIGN_OUT_EVENT } from "@/lib/site-navigation";
 import { useSiteNavigation } from "@/contexts/SiteNavigationContext";
 import { useAdminSupportUnread } from "@/lib/use-admin-support-unread";
 
@@ -39,7 +39,9 @@ export default function Navbar({ initialIsSignedIn = false, initialAdminUserId =
   const signingOutRef = useRef(false);
   const inbox = useAuthenticatedInbox();
   const pathname = usePathname();
-  const authRoute = pathname.startsWith("/sign-in") || pathname.startsWith("/sign-up");
+  const signInRoute = routeMatches(pathname, "/sign-in");
+  const signUpRoute = routeMatches(pathname, "/sign-up");
+  const authRoute = signInRoute || signUpRoute;
   const { isSignedIn, isLoaded, userId: authenticatedUserId, sessionId: authenticatedSessionId } = useAuth();
   const { user } = useUser();
   const { signOut } = useClerk();
@@ -289,20 +291,20 @@ export default function Navbar({ initialIsSignedIn = false, initialAdminUserId =
               <LanguageSwitcher />
               {!hasSignedInSession && (
                 <>
-                  <Link
+                  {!signInRoute && <Link
                     href="/sign-in"
                     prefetch
                     className="inline-flex min-h-11 items-center whitespace-nowrap px-2 py-2 text-[11px] xl:px-3 xl:text-xs font-semibold border border-border text-text-secondary hover:border-gold hover:text-gold rounded-md transition-all"
                   >
                     {t("signIn")}
-                  </Link>
-                  <Link
+                  </Link>}
+                  {!signUpRoute && <Link
                     href="/sign-up"
                     prefetch
                     className="inline-flex min-h-11 items-center whitespace-nowrap px-2 py-2 text-[11px] xl:px-3 xl:text-xs font-semibold bg-gold text-bg-primary rounded-md hover:bg-gold-light transition-colors"
                   >
                     {t("signUp")}
-                  </Link>
+                  </Link>}
                 </>
               )}
               {hasSignedInSession && (
@@ -320,7 +322,7 @@ export default function Navbar({ initialIsSignedIn = false, initialAdminUserId =
               )}
             </div>
 
-            {/* Mobile: keep both auth destinations visible outside the menu. */}
+            {/* Mobile: keep auth destinations outside the menu, excluding the current form. */}
             <div className="site-header-compact lg:hidden flex shrink-0 items-center gap-1 max-[479px]:gap-0">
               <button type="button"
                 onClick={event => { event.currentTarget.focus({ preventScroll: true }); document.dispatchEvent(new Event("cg:opensearch")); }}
@@ -334,7 +336,7 @@ export default function Navbar({ initialIsSignedIn = false, initialAdminUserId =
                 {unreadTotal > 0 && <span aria-hidden="true" className="absolute right-0.5 top-0.5 inline-flex h-4 min-w-4 items-center justify-center rounded-full bg-crimson px-1 text-[9px] font-bold text-white">{unreadTotal > 9 ? "9+" : unreadTotal}</span>}
               </Link>}
               {!hasSignedInSession && (
-                <div className="flex items-center gap-1">{uiText.rich("Ui.text_49b372e77a7a76", { value2: () => (t("signIn")), part1: chunks => (<Link href="/sign-in" prefetch className="min-h-11 inline-flex items-center justify-center whitespace-nowrap rounded-lg border border-border px-2.5 max-[360px]:px-1.5 text-[11px] max-[360px]:text-[10px] font-semibold text-text-primary hover:border-gold hover:text-gold">{chunks}</Link>), value5: () => (t("signUp")), part4: chunks => (<span className="max-[420px]:hidden">{chunks}</span>), part6: chunks => (<span className="min-[421px]:hidden">{chunks}</span>), part3: chunks => (<Link href="/sign-up" prefetch className="min-h-11 inline-flex items-center justify-center whitespace-nowrap rounded-lg bg-gold px-2.5 max-[360px]:px-1.5 text-[11px] max-[360px]:text-[10px] font-bold text-bg-primary hover:bg-gold-light">{chunks}</Link>) })}</div>
+                <div className="flex items-center gap-1">{uiText.rich("Ui.text_49b372e77a7a76", { value2: () => (t("signIn")), part1: chunks => signInRoute ? null : (<Link href="/sign-in" prefetch className="min-h-11 inline-flex items-center justify-center whitespace-nowrap rounded-lg border border-border px-2.5 max-[360px]:px-1.5 text-[11px] max-[360px]:text-[10px] font-semibold text-text-primary hover:border-gold hover:text-gold">{chunks}</Link>), value5: () => (t("signUp")), part4: chunks => (<span className="max-[420px]:hidden">{chunks}</span>), part6: chunks => (<span className="min-[421px]:hidden">{chunks}</span>), part3: chunks => signUpRoute ? null : (<Link href="/sign-up" prefetch className="min-h-11 inline-flex items-center justify-center whitespace-nowrap rounded-lg bg-gold px-2.5 max-[360px]:px-1.5 text-[11px] max-[360px]:text-[10px] font-bold text-bg-primary hover:bg-gold-light">{chunks}</Link>) })}</div>
               )}
               {hasSignedInSession && (
                 <button
