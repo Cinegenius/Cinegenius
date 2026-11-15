@@ -56,6 +56,18 @@ The initial browser rerun encountered a stopped private fixture server, not a
 site regression. The final runner owns its loopback server lifecycle, awaits
 real vector tiles and shuts down only that fixture afterward.
 
+## Follow-up from APP review
+
+APP review reproduced unsaved wish edits being lost on a language change.
+The validated editable plan now stays independent of the result-language
+refresh, while account and plan changes continue to reset the editor.
+The isolated shared fix was adopted from APP commit `104d940`.
+The Web browser regression in `locale-account-results.json` confirms that
+quantity and follow-up drafts survive a German-to-English switch, that an
+account switch clears those drafts, and that a delayed response from the
+previous account cannot restore its results. Authentication and API responses
+are simulated in this browser check; this is not a physical device test.
+
 ## Boundaries and release
 
 Browser viewport tests are not physical iPhone/iPad or native Xcode/Android
