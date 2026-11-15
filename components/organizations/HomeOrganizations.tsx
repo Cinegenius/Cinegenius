@@ -24,7 +24,7 @@ export default async function HomeOrganizations() {
  }
  const dates = new Intl.DateTimeFormat(locale, {dateStyle: 'medium', timeZone: 'Europe/Berlin'});
  const paired = entries.length > 0 && organizations.length > 0;
- return <section className="py-5 sm:py-7" aria-labelledby="home-industry-title"><div className="site-container">
+ return <section className="home-section-divider home-section-divider--wide py-5 sm:py-7" aria-labelledby="home-industry-title"><div className="site-container">
   <div className="mb-3 flex min-w-0 flex-wrap items-end justify-between gap-x-5 gap-y-1">
    <div className="min-w-0"><p className="mb-1 text-xs uppercase tracking-widest text-gold">{t('eyebrow')}</p><h2 id="home-industry-title" className="break-words font-serif text-xl leading-snug text-text-primary sm:text-2xl">{t('title')}</h2></div>
    <Link href={`/news?country=${region.selection}`} className="inline-flex min-h-11 min-w-0 items-center gap-1 text-sm text-gold hover:text-gold-light"><span className="break-words">{t('allEntries')}</span><span aria-hidden="true">→</span></Link>
@@ -50,7 +50,7 @@ export default async function HomeOrganizations() {
      </article>;
     })}
    </div>}
-   {organizations.length > 0 && <div className="min-w-0">
+   {organizations.length > 0 && <div className={`min-w-0 ${paired ? 'home-section-divider home-section-divider--organizations' : ''}`}>
     <div className="mb-1 flex min-w-0 flex-wrap items-center justify-between gap-x-3 gap-y-1"><h3 className="font-serif text-lg text-text-primary">{t('organizations')}</h3><Link href="/organizations" className="inline-flex min-h-11 min-w-0 items-center text-xs text-gold hover:text-gold-light"><span className="break-words">{t('allOrganizations')}</span><span className="ml-1" aria-hidden="true">→</span></Link></div>
     <ul className={`grid min-w-0 auto-rows-fr grid-cols-2 gap-2 ${paired ? '' : 'sm:grid-cols-3'}`}>
      {organizations.map(org => <li key={org.id} className="min-w-0">

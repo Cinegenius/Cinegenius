@@ -29,7 +29,7 @@ export default function HomeCommunityBoard({ loggedIn }: { loggedIn: boolean }) 
     return () => observer.disconnect();
   }, []);
 
-  return <div ref={root}>
+  return <div ref={root} className="home-section-divider home-section-divider--wide">
     {visible ? <CommunityBoard loggedIn={loggedIn} /> : <div className="site-container py-4"><Link href="/community" className="inline-flex min-h-11 items-center text-sm text-gold">{t("boardSeeAll")}</Link></div>}
   </div>;
 }

@@ -206,7 +206,7 @@ type HomeDataPromise = Promise<Awaited<ReturnType<typeof getHomeData>> | null>;
 async function HomeLocations({ dataPromise }: { dataPromise: HomeDataPromise }) {
   const [data, t, tc] = await Promise.all([dataPromise, getTranslations("home"), getTranslations("common")]);
   if (!data?.liveLocations.length) return null;
-  return <section className="min-w-0" aria-labelledby="home-locations-title">
+  return <section className="home-section-divider min-w-0" aria-labelledby="home-locations-title">
     <div className="mb-3 flex flex-wrap items-center justify-between gap-x-3"><h2 id="home-locations-title" className="font-display text-xl font-bold text-text-primary sm:text-2xl">{t("locationsTitle")}</h2><Link href="/locations" className="inline-flex min-h-11 items-center gap-1 text-xs font-medium text-gold hover:text-gold-light sm:text-sm">{tc("viewAll")} <ArrowRight size={13} /></Link></div>
     <HomeCardRail id="home-locations-rail" labelledBy="home-locations-title" hint={t("locationScrollHint")} itemCount={data.liveLocations.length} variant="location" wide>
       {data.liveLocations.map(loc => <Link key={loc.id} href={`/locations/${loc.id}`} className="group relative isolate block aspect-[4/3] min-h-11 min-w-0 overflow-hidden rounded-2xl border border-border bg-bg-elevated sm:aspect-[3/2]">
@@ -222,7 +222,7 @@ async function HomeCrew({ dataPromise }: { dataPromise: HomeDataPromise }) {
   const [data, t, tc] = await Promise.all([dataPromise, getTranslations("home"), getTranslations("common")]);
   if (!data?.newCrew.length) return null;
   const { newCrew } = data;
-  return <section className="min-w-0" aria-labelledby="home-crew-title">
+  return <section className="home-section-divider home-section-divider--intro min-w-0" aria-labelledby="home-crew-title">
       <div className="mb-3 flex flex-wrap items-center justify-between gap-x-3"><h2 id="home-crew-title" className="font-display text-xl font-bold text-text-primary sm:text-2xl">{t("newCrewTitle")}</h2><Link href="/creators" className="inline-flex min-h-11 items-center gap-1 text-xs font-medium text-gold hover:text-gold-light sm:text-sm">{tc("viewAll")} <ArrowRight size={13} /></Link></div>
       <HomeCardRail id="home-crew-rail" labelledBy="home-crew-title" hint={t("crewScrollHint")} itemCount={newCrew.length} variant="crew" wide>
         {newCrew.map((c) => (
@@ -287,7 +287,7 @@ async function HomeRecommendations({ dataPromise }: { dataPromise: HomeDataPromi
     return tc("weeksAgo", { weeks: Math.floor(diff / 7) });
   }
   return <div className="site-container grid items-start gap-7 py-7 sm:gap-8 sm:py-9">
-    {liveProps.length > 0 && <section className="min-w-0" aria-labelledby="home-marketplace-title">
+    {liveProps.length > 0 && <section className="home-section-divider min-w-0" aria-labelledby="home-marketplace-title">
       <div className="mb-3 flex flex-wrap items-center justify-between gap-x-3"><h2 id="home-marketplace-title" className="font-display text-xl font-bold text-text-primary sm:text-2xl">{t("findEquipmentTitle")}</h2><Link href="/marketplace" className="inline-flex min-h-11 items-center gap-1 text-xs font-medium text-gold hover:text-gold-light sm:text-sm">{tc("viewAll")} <ArrowRight size={13} /></Link></div>
       <div className="grid grid-cols-2 gap-2.5 sm:gap-4 lg:grid-cols-4">
         {liveProps.map((prop) => (
@@ -332,7 +332,7 @@ async function HomeRecommendations({ dataPromise }: { dataPromise: HomeDataPromi
               ))}
       </div>
     </section>}
-    {liveJobs.length > 0 && <section className="min-w-0 border-t border-border/60 pt-4" aria-labelledby="home-jobs-title">
+    {liveJobs.length > 0 && <section className="home-section-divider home-section-divider--border min-w-0 border-t border-transparent pt-4" aria-labelledby="home-jobs-title">
       <div className="mb-2 flex flex-wrap items-center justify-between gap-x-3"><h2 id="home-jobs-title" className="font-display text-lg font-bold text-text-primary">{t("jobsTitle")}</h2><Link href="/jobs" className="inline-flex min-h-11 items-center gap-1 text-xs font-medium text-gold hover:text-gold-light">{tc("viewAll")} <ArrowRight size={12} /></Link></div>
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         {liveJobs.map(job => <Link key={job.id} href={`/jobs/${job.id}`} className="group flex min-h-11 min-w-0 items-start gap-2 rounded-xl border border-border/70 px-3 py-3 transition-colors hover:bg-bg-secondary/60">
@@ -350,7 +350,7 @@ async function HomePartnersAndLocations({ dataPromise }: { dataPromise: HomeData
   if (!data || (!data.companies.length && !data.liveLocations.length)) return null;
   const { companies } = data;
   return <div className="site-container grid items-start gap-7 py-7 sm:gap-8 sm:py-9">
-    {companies.length > 0 && <section className="min-w-0" aria-labelledby="home-companies-title">
+    {companies.length > 0 && <section className="home-section-divider min-w-0" aria-labelledby="home-companies-title">
       <div className="mb-3 flex flex-wrap items-center justify-between gap-x-3"><div><p className="mb-1 text-xs font-semibold uppercase tracking-widest text-gold">{t("companiesLabel")}</p><h2 id="home-companies-title" className="font-display text-xl font-bold text-text-primary sm:text-2xl">{t("companiesTitle")}</h2></div><Link href="/companies" className="inline-flex min-h-11 items-center gap-1 text-xs font-medium text-gold hover:text-gold-light sm:text-sm">{tc("viewAll")} <ArrowRight size={13} /></Link></div>
       <HomeCompanyPartners companies={companies.map(c => ({
         id: c.id, href: `/companies/${c.slug ?? c.id}`, name: c.name, logo: c.logo, city: c.city,
@@ -390,7 +390,7 @@ export default async function HomePage() {
     { title: t("findJobsTitle"), description: t("findJobsDescription"), href: "/jobs", icon: Briefcase },
     { title: t("newsShortcut"), description: t("newsShortcutDescription"), href: "/news", icon: Newspaper },
   ];
-  return <main className="relative isolate min-h-screen">
+  return <main className="home-page relative isolate min-h-screen">
     <PageBackdrop optimizeImage image="/hero-bg-v2.jpg" imagePosition="center 42%" imageOpacity={100} overlayClassName="absolute inset-0 bg-bg-primary/72" className="pointer-events-none fixed inset-0 z-[-1]" />
     <section className="relative isolate pt-16">
       <div className="site-container grid items-start gap-5 py-6 sm:py-8 lg:gap-9">
@@ -407,7 +407,7 @@ export default async function HomePage() {
           <HeroSearch />
         </div>
       {/* Finden: kompakte, direkte Einstiege in die bestehenden Verzeichnisse */}
-      <section className="min-w-0" aria-labelledby="home-find-title">
+      <section className="home-section-divider home-section-divider--intro min-w-0" aria-labelledby="home-find-title">
         <div className="min-w-0">
           <div className="mb-4">
             <p className="text-xs uppercase tracking-widest text-gold font-semibold mb-1">{t("findLabel")}</p>
@@ -433,6 +433,6 @@ export default async function HomePage() {
     <Suspense fallback={null}><HomePhotoRecommendations viewerId={userId} /></Suspense>
     <Suspense fallback={null}><HomePartnersAndLocations dataPromise={dataPromise} /></Suspense>
     <HomeCommunityBoard loggedIn={isLoggedIn} />
-    <section className="site-container py-5 sm:py-7" aria-labelledby="home-projects-title"><div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-1 border-t border-border pt-4"><h2 id="home-projects-title" className="flex items-center gap-2 text-sm font-medium text-text-muted"><Film size={15} aria-hidden="true" />{t("projectsTitle")}</h2><Link href="/projects/alle" className="inline-flex min-h-11 items-center gap-1 text-sm text-text-secondary hover:text-gold">{t("findProjectsLink")} <ArrowRight size={13} /></Link></div></section>
+    <section className="site-container py-5 sm:py-7" aria-labelledby="home-projects-title"><div className="home-section-divider home-section-divider--border flex flex-wrap items-center justify-between gap-x-4 gap-y-1 border-t border-transparent pt-4"><h2 id="home-projects-title" className="flex items-center gap-2 text-sm font-medium text-text-muted"><Film size={15} aria-hidden="true" />{t("projectsTitle")}</h2><Link href="/projects/alle" className="inline-flex min-h-11 items-center gap-1 text-sm text-text-secondary hover:text-gold">{t("findProjectsLink")} <ArrowRight size={13} /></Link></div></section>
   </main>;
 }
