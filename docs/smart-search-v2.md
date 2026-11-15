@@ -66,12 +66,20 @@ Genie retention and account-reset boundaries remain in effect.
 
 ## Matching, geography and pagination
 
-V2 `Heads of Department` expands into independent catalogue department
-segments. Exact declared lead roles qualify; assistant status, a biography or
+V2 `Production Crew` expands into every department of the shared catalogue
+(currently 25), matching declared primary and additional occupations. A general
+filming request such as "Ich drehe in München" now selects this complete crew
+choice plus locations, marketplace offers, companies and catering. It does
+not infer a small crew from a short sentence. Explicit small/specialized
+requests remain narrower, and these suggestions are not mandatory staffing.
+The complete crew query consumes one wish, not one wish per department.
+
+Explicit `Heads of Department` still expands into its independent leadership
+department segments. Exact declared lead roles qualify; assistant status, a biography or
 a film genre does not establish leadership. Each segment independently finds
 local results or nearest eligible alternatives. Thematic film starters search
 relevant marketplace, locations and companies; no unrelated jobs/news query.
-Small productions can receive a smaller model-selected starting crew. No
+Only explicitly small or restricted requests receive a smaller starting crew. No
 budget/date questionnaire blocks initial results.
 
 Local results rank by declared role/title evidence (exact title/role, declared
@@ -98,7 +106,7 @@ cursor = {
 ```
 
 Omit absent fields. Rank and nearby are mutually exclusive. Local v2 cursors
-use score 0–3 and a bounded distance/ID; only known head segments can be
+use score 0–3 and a bounded distance/ID; only department segments applicable to the requested crew query can be
 requested. No cursor bypasses current visibility. A change from local to
 nearby (or vice versa) replaces the old group rather than mixing it.
 
@@ -109,7 +117,11 @@ default list and `view: "map"` requests stay available. Combined mode rejects
 v1 plans and cursors. Candidate scans have four-worker concurrency, bounded
 page windows and the existing deadline; a timeout is an error, not zero
 results or an arbitrary nearest claim. Detailed evidence columns are loaded
-only for requests needing them.
+only for requests needing them. Complete crew groups share up to four paged
+profile reads and their privacy decisions within the same request/account;
+no member data or authorization is cached across requests. This also avoids
+oversized catalogue-alias query URLs. Filtering, geo projection and serialized
+results still follow the current privacy decisions.
 
 ## Interface, privacy and native integration
 

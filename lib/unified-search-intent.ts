@@ -5,7 +5,7 @@ import { countryCode } from "./places/core";
 import { MAX_SEARCHES, readSearchPlan, type SearchPlan, type SearchWish } from "./unified-search";
 import { SEARCH_AREA_WORDS } from "./unified-search-areas";
 import { cateringSearch } from "./unified-search-catering";
-import { DEPARTMENT_HEADS_QUERY, isDepartmentHeadsQuery } from "./unified-search-production";
+import { DEPARTMENT_HEADS_QUERY, isDepartmentHeadsQuery, PRODUCTION_CREW_QUERY, isProductionCrewQuery } from "./unified-search-production";
 
 type Keyword = Omit<SearchWish, "places">;
 
@@ -70,7 +70,8 @@ function keywords(text: string, locale: string, taxonomy?: (key: string) => stri
     let found = false;
     for (let end = words.length; end > offset; end--) {
       const phrase = words.slice(offset, end).join(" ");
-      const match = isDepartmentHeadsQuery(phrase) ? { area: "crew" as const, query: DEPARTMENT_HEADS_QUERY, department: "" }
+      const match = isProductionCrewQuery(phrase) ? { area: "crew" as const, query: PRODUCTION_CREW_QUERY, department: "" }
+        : isDepartmentHeadsQuery(phrase) ? { area: "crew" as const, query: DEPARTMENT_HEADS_QUERY, department: "" }
         : cateringSearch(phrase) ? { area: "companies" as const, query: phrase, department: "" } : index.get(phrase);
       if (!match) continue;
       result.push({ ...match, ...(quantity ? { quantity } : {}) }); offset = end; found = true; break;
@@ -87,6 +88,7 @@ function keywords(text: string, locale: string, taxonomy?: (key: string) => stri
 
 export function normalizeKeywordPlan(plan: SearchPlan, locale = "de", taxonomy?: (key: string) => string): SearchPlan | null {
   const searches = plan.searches.flatMap(wish => {
+    if (!wish.department && ["crew", "all"].includes(wish.area) && isProductionCrewQuery(wish.query)) return [{ ...wish, area: "crew" as const, query: PRODUCTION_CREW_QUERY }];
     if (!wish.department && ["crew", "all"].includes(wish.area) && isDepartmentHeadsQuery(wish.query)) return [{ ...wish, area: "crew" as const, query: DEPARTMENT_HEADS_QUERY }];
     if (!wish.department && ["companies", "all"].includes(wish.area) && cateringSearch(wish.query)) return [{ ...wish, area: "companies" as const }];
     if (!["crew", "all"].includes(wish.area) || wish.department) return [wish];
@@ -104,18 +106,29 @@ function productionSearchPlan(text: string): SearchPlan | null {
   const request = text.trim().replace(/[.!?]+$/, "");
   const german = /^ich\s+(?:drehe|plane|produziere)\s+(?:in\s+(.+?)\s+)?(?:einen?\s+)?(polizei[ -]?film|krimi|mittelalter[ -]?film|film)(?:\s+in\s+(.+?))?(?:[,;]\s*(?:dafür|dafuer)\s+brauche\s+ich\s+alles)?$/i.exec(request);
   const english = /^i(?:'m| am)?\s+(?:shooting|filming|making|planning)\s+(?:a\s+)?(police|crime|medieval)?\s*(?:film|movie)\s+in\s+(.+)$/i.exec(request);
-  if (!german && !english) return null;
-  const city = german ? german[1] || german[3] : english![2];
+  const generic = [
+    /^ich\s+(?:drehe|filme|plane\s+einen\s+dreh)\s+in\s+(.+)$/i,
+    /^ich\s+(?:will|möchte|moechte)\s+in\s+(.+?)\s+(?:drehen|filmen)$/i,
+    /^i(?:'m| am)?\s+(?:shooting|filming)\s+in\s+(.+)$/i,
+    /^(?:estoy\s+rodando|voy\s+a\s+rodar|ruedo)\s+en\s+(.+)$/i,
+    /^(?:sto\s+girando|giro|voglio\s+girare)\s+(?:a|in)\s+(.+)$/i,
+    /^(?:natáčím|natacim|chci\s+natáčet)\s+(?:v|ve)\s+(.+)$/i,
+    /^(.+?)(?:ban|ben)\s+forgatok$/i,
+    /^ik\s+(?:film|draai|ga\s+filmen)\s+in\s+(.+)$/i,
+    /^jag\s+(?:filmar|ska\s+filma)\s+i\s+(.+)$/i,
+  ].map(pattern => pattern.exec(request)).find(Boolean);
+  if (!german && !english && !generic) return null;
+  const city = german ? german[1] || german[3] : english ? english[2] : generic![1];
   if (!city || (german?.[1] && german[3]) || searchCityCandidates(city).length !== 1) return null;
   const theme = /polizei|police|crime|krimi/i.test(german?.[2] ?? english?.[1] ?? "") ? "Polizei"
     : /mittelalter|medieval/i.test(german?.[2] ?? english?.[1] ?? "") ? "Mittelalter" : "";
   const places = [{ city, country: "", continent: "", radiusKm: 0 }];
   return readSearchPlan({ version: 2, searches: [
-    { area: "crew", query: DEPARTMENT_HEADS_QUERY, department: "", places },
+    { area: "crew", query: PRODUCTION_CREW_QUERY, department: "", places },
     ...(theme ? ["marketplace", "locations", "companies"].map(area => ({ area, query: theme, department: "", places })) : []),
-    { area: "companies", query: "Filmproduktion", department: "", places },
+    { area: "companies", query: theme ? "Filmproduktion" : "Firma", department: "", places },
     { area: "companies", query: "Catering", department: "", places },
-    ...(!theme ? [{ area: "locations", query: "Location", department: "", places }] : []),
+    ...(!theme ? [{ area: "locations", query: "Location", department: "", places }, { area: "marketplace", query: "Marktplatz", department: "", places }] : []),
   ].map(wish => ({ ...wish, recommended: true })) });
 }
 
