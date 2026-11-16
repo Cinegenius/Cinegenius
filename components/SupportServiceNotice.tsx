@@ -1,21 +1,19 @@
 import { getLocale, getTranslations } from "next-intl/server";
-import { communityPolicyDates } from "@/lib/community-policy";
 
 /** The legal surface keeps the German original; other surfaces use localized copy. */
 export async function SupportServiceNotice({ compact = false, legalOriginal = false }: { compact?: boolean; legalOriginal?: boolean }) {
   const locale = legalOriginal ? "de" : await getLocale();
   const t = await getTranslations({ locale, namespace: "SupportMediation" });
-  const dates = communityPolicyDates(locale);
   const body = (
     <div lang={locale} className="space-y-3 text-sm leading-relaxed text-text-secondary [overflow-wrap:anywhere]">
       {!compact && <p>{t("startup")}</p>}
       <p>{t("free")}</p>
-      <p>{t("period", dates)}</p>
       <p>{t("mediation")}</p>
       <p>{t("providerPrices")}</p>
       <p>{t("additional")}</p>
       <p>{t("agreement")}</p>
-      <p>{t("existingAgreements", { start: dates.start })}</p>
+      <p>{t("existingAgreements")}</p>
+      {!compact && <p>{t("communityClosing")}</p>}
     </div>
   );
   if (compact) return body;
