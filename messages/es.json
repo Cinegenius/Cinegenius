@@ -8275,5 +8275,69 @@
     "refineSearch": "Afinar búsqueda",
     "refineHint": "Añade una petición o cambia lugares y requisitos concretos.",
     "restartContext": "Continuar con estos filtros"
+  },
+  "PublicReport": {
+    "metaTitle": "Denunciar un problema legal",
+    "metaDescription": "Denuncia contenido problemático o presuntamente ilegal en CineGenius.",
+    "badge": "Denuncia",
+    "title": "Denunciar contenido en CineGenius",
+    "description": "Usa este formulario si un contenido público concreto de CineGenius te parece ilegal o problemático.",
+    "formTitle": "Formulario de denuncia",
+    "footerLink": "Denunciar contenido",
+    "submit": "Enviar denuncia",
+    "sending": "Enviando denuncia ...",
+    "success": "Gracias. La denuncia se ha enviado de forma estructurada a CineGenius. Sin dirección de correo no podemos enviar confirmación de recepción.",
+    "successWithReceipt": "Gracias. La denuncia se ha enviado y se ha remitido una confirmación de recepción.",
+    "imprintLink": "Aviso legal y contacto",
+    "fields": {
+      "target": "Ubicación en CineGenius",
+      "category": "Tipo de denuncia",
+      "details": "Motivo",
+      "name": "Nombre",
+      "email": "Correo para consultas"
+    },
+    "placeholders": {
+      "target": "https://www.cinegenius.co/... o /profile/...",
+      "details": "Describe brevemente qué contenido está afectado y por qué lo denuncias."
+    },
+    "hints": {
+      "target": "Indica una URL o ruta concreta de CineGenius. Las consultas generales de soporte van al soporte.",
+      "details": "Al menos 20 caracteres. No vuelvas a subir ni copiar archivos ilegales.",
+      "email": "Opcional. Con correo podemos confirmar la recepción y hacer preguntas."
+    },
+    "goodFaith": "Confirmo que esta denuncia es correcta y completa según mi leal saber y entender.",
+    "categories": {
+      "illegal_content": "Contenido presuntamente ilegal",
+      "rights": "Derechos de autor, imagen o personalidad",
+      "fraud": "Fraude, oferta falsa o suplantación",
+      "harassment": "Acoso, odio o amenazas",
+      "child_safety": "Protección de menores",
+      "other": "Otro problema"
+    },
+    "errors": {
+      "invalid": "No se pudo aceptar esta solicitud.",
+      "rateLimited": "Se han enviado demasiadas denuncias. Inténtalo más tarde.",
+      "target": "Introduce una ubicación válida de CineGenius.",
+      "category": "Elige una categoría válida.",
+      "details": "Describe la denuncia con al menos 20 caracteres.",
+      "email": "Revisa el correo o deja el campo vacío.",
+      "goodFaith": "Confirma la veracidad de tus datos.",
+      "send": "Ahora no se pudo entregar la denuncia. Inténtalo más tarde o usa el correo del aviso legal.",
+      "network": "La conexión se interrumpió. Inténtalo de nuevo."
+    },
+    "side": {
+      "title": "Pequeño y gestionable",
+      "body": "La denuncia llega de forma estructurada al buzón del operador de CineGenius. La revisamos manualmente y respondemos si indicas datos de contacto.",
+      "noFilesTitle": "No redistribuir archivos",
+      "noFilesBody": "No envíes archivos ilegales o confidenciales por el formulario. Para la primera revisión bastan una ubicación precisa y una descripción."
+    }
+  },
+  "PublicReportEmail": {
+    "subject": "Recepción de tu denuncia de CineGenius",
+    "heading": "Hemos recibido tu denuncia",
+    "intro": "Gracias por tu denuncia. Revisaremos manualmente el contenido indicado.",
+    "reference": "Referencia: {reference}",
+    "next": "Si necesitamos preguntas o podemos comunicar una decisión, responderemos a esta dirección de correo.",
+    "footer": "Recibes este correo porque has denunciado contenido a través de CineGenius."
   }
 }

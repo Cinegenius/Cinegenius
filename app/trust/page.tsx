@@ -1,4 +1,3 @@
-import type { Metadata } from "next";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
 
@@ -144,7 +143,7 @@ export default function TrustSafetyPage() {
                 <h3 className="font-semibold text-text-primary mb-1">{uiText("Ui.text_2ff6abcb72740c")}</h3>
                 <p className="text-sm text-text-muted leading-relaxed mb-3">{uiText("Ui.text_afca3743010620")}</p>
                 <Link
-                  href="/help"
+                  href="/melden"
                   className="inline-flex items-center gap-1.5 text-sm text-gold hover:text-gold-light transition-colors font-medium"
                 >{uiText.rich("Ui.text_829d4ef8158c41", { part1: () => (<ArrowRight size={13} />) })}</Link>
               </div>

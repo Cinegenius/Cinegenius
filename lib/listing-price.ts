@@ -31,7 +31,7 @@ export function listingPriceMetadataError(value:unknown,translate?:(key:string)=
 export function listingStructuredOffers(price:number|null|undefined,metadata:unknown):Record<string,unknown>[]|undefined {
   const flags=listingPriceMetadata(metadata),market=flags.marketplace;
   const offer=(amount:number,kind:'rent'|'sale',unit='day')=>({
-    '@type':'Offer',price:amount,priceCurrency:'EUR',
+    '@type':'Offer',price:amount,priceCurrency:'EUR',availability:'https://schema.org/LimitedAvailability',
     businessFunction:kind==='sale'?'http://purl.org/goodrelations/v1#Sell':'http://purl.org/goodrelations/v1#LeaseOut',
     priceSpecification:{'@type':'UnitPriceSpecification',price:amount,priceCurrency:'EUR',...(kind==='rent'?{unitCode:({hour:'HUR',day:'DAY',week:'WEE',month:'MON',project:'C62'} as Record<string,string>)[unit],...(unit==='project'?{unitText:'project'}:{})}:{})},
   });

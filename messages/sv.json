@@ -8275,5 +8275,69 @@
     "refineSearch": "Förfina sökningen",
     "refineHint": "Lägg till ett önskemål eller ändra specifika platser och krav.",
     "restartContext": "Fortsätt med dessa filter"
+  },
+  "PublicReport": {
+    "metaTitle": "Rapportera ett juridiskt problem",
+    "metaDescription": "Rapportera problematiskt eller påstått olagligt innehåll på CineGenius.",
+    "badge": "Rapport",
+    "title": "Rapportera innehåll på CineGenius",
+    "description": "Använd detta formulär om ett konkret offentligt innehåll på CineGenius verkar olagligt eller problematiskt.",
+    "formTitle": "Rapporteringsformulär",
+    "footerLink": "Rapportera innehåll",
+    "submit": "Skicka rapport",
+    "sending": "Rapporten skickas ...",
+    "success": "Tack. Rapporten har skickats strukturerat till CineGenius. Utan e-postadress kan vi inte skicka någon bekräftelse.",
+    "successWithReceipt": "Tack. Rapporten har skickats och en mottagningsbekräftelse har skickats.",
+    "imprintLink": "Juridisk information och kontakt",
+    "fields": {
+      "target": "Plats på CineGenius",
+      "category": "Typ av rapport",
+      "details": "Skäl",
+      "name": "Namn",
+      "email": "E-post för uppföljning"
+    },
+    "placeholders": {
+      "target": "https://www.cinegenius.co/... eller /profile/...",
+      "details": "Beskriv kort vilket innehåll som berörs och varför du rapporterar det."
+    },
+    "hints": {
+      "target": "Ange en konkret CineGenius-URL eller sökväg. Allmänna supportfrågor hör hemma hos supporten.",
+      "details": "Minst 20 tecken. Ladda inte upp eller kopiera olagliga filer igen.",
+      "email": "Valfritt. Med e-post kan vi bekräfta mottagandet och ställa följdfrågor."
+    },
+    "goodFaith": "Jag bekräftar att denna rapport är korrekt och fullständig efter bästa förmåga.",
+    "categories": {
+      "illegal_content": "Påstått olagligt innehåll",
+      "rights": "Upphovsrätt, bildrätt eller personlighetsrätt",
+      "fraud": "Bedrägeri, falskt erbjudande eller identitetsvilseledning",
+      "harassment": "Trakasserier, hat eller hot",
+      "child_safety": "Skydd av minderåriga",
+      "other": "Annat problem"
+    },
+    "errors": {
+      "invalid": "Denna begäran kunde inte accepteras.",
+      "rateLimited": "För många rapporter har skickats. Försök igen senare.",
+      "target": "Ange en giltig CineGenius-plats.",
+      "category": "Välj en giltig kategori.",
+      "details": "Beskriv rapporten med minst 20 tecken.",
+      "email": "Kontrollera e-postadressen eller lämna fältet tomt.",
+      "goodFaith": "Bekräfta att dina uppgifter är korrekta.",
+      "send": "Rapporten kunde inte levereras just nu. Försök senare eller använd e-posten i den juridiska informationen.",
+      "network": "Anslutningen avbröts. Försök igen."
+    },
+    "side": {
+      "title": "Litet och hanterbart",
+      "body": "Rapporten går strukturerat till CineGenius operatörsbrevlåda. Vi granskar den manuellt och svarar om du anger kontaktuppgifter.",
+      "noFilesTitle": "Sprid inte filer vidare",
+      "noFilesBody": "Skicka inte olagliga eller konfidentiella filer via formuläret. En exakt plats och beskrivning räcker för första granskningen."
+    }
+  },
+  "PublicReportEmail": {
+    "subject": "Mottagning av din CineGenius-rapport",
+    "heading": "Vi har tagit emot din rapport",
+    "intro": "Tack för din rapport. Vi granskar det angivna innehållet manuellt.",
+    "reference": "Referens: {reference}",
+    "next": "Om följdfrågor behövs eller vi kan meddela ett beslut svarar vi till denna e-postadress.",
+    "footer": "Du får detta e-postmeddelande eftersom du rapporterade innehåll via CineGenius."
   }
 }
