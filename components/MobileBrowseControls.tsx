@@ -2,7 +2,7 @@
 
 import { ArrowUpDown,Search,SlidersHorizontal,X } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { isValidElement,useEffect,useRef,useState,type ReactNode } from "react";
+import { cloneElement,isValidElement,useEffect,useRef,useState,type ReactNode } from "react";
 import BrowseSelect from "@/components/BrowseSelect";
 import BrowseResultCount from "@/components/BrowseResultCount";
 
@@ -100,11 +100,7 @@ export default function MobileBrowseControls({
 
         {categoryPlacement === "toolbar" && <label className="mobile-browse-category">
           <span>{categoryLabel}</span>
-          <select value={categoryValue} onChange={(event) => onCategoryChange(event.target.value)}>
-            <option value="">{allCategoryLabel}</option>
-            {categoryValue && !categories.some(option => option.value === categoryValue) && <option value={categoryValue} disabled>{categoryValue}</option>}
-            {categories.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}
-          </select>
+          <MobileFilterSelect label={categoryLabel} value={categoryValue} onChange={onCategoryChange} options={categories} placeholder={allCategoryLabel} />
         </label>}
 
         <div className="mobile-browse-summary">
@@ -139,7 +135,7 @@ export default function MobileBrowseControls({
       {open && (
         <dialog ref={dialog} className="mobile-filter-dialog" aria-modal="true" aria-label={uiText("locations.filterBtn")} onCancel={event => { event.preventDefault(); setOpen(false); }}>
           <button tabIndex={-1} className="mobile-filter-dialog__backdrop" aria-label={uiText("Ui.text_5f423bd7da0e95")} onClick={() => setOpen(false)} />
-          <section className="mobile-filter-panel">
+          <section className="mobile-filter-panel browse-popup-surface">
             <div className="mobile-filter-panel__handle" />
             <header className="mobile-filter-panel__header">
               <h2>{uiText("locations.filterBtn")}</h2>
@@ -148,11 +144,7 @@ export default function MobileBrowseControls({
             <div className="mobile-filter-panel__content">
               {(categories.length > 0 || categoryValue) && <label className="mobile-filter-field">
                 <span>{categoryLabel}</span>
-                <select value={categoryValue} onChange={(event) => onCategoryChange(event.target.value)}>
-                  <option value="">{allCategoryLabel}</option>
-                  {categoryValue && !categories.some(option => option.value === categoryValue) && <option value={categoryValue} disabled>{categoryValue}</option>}
-            {categories.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}
-                </select>
+                <MobileFilterSelect label={categoryLabel} value={categoryValue} onChange={onCategoryChange} options={categories} placeholder={allCategoryLabel} />
               </label>}
               {children}
             </div>
@@ -168,7 +160,10 @@ export default function MobileBrowseControls({
 }
 
 export function MobileFilterField({ label, children }: { label: string; children: ReactNode }) {
-  if (isValidElement<{ options?: BrowseOption[]; value?: string }>(children) && children.type === MobileFilterSelect && !children.props.value && !children.props.options?.length) return null;
+  if (isValidElement<{ options?: BrowseOption[]; value?: string; label?: string }>(children) && children.type === MobileFilterSelect) {
+    if (!children.props.value && !children.props.options?.length) return null;
+    children = cloneElement(children, { label: children.props.label ?? label });
+  }
   return <label className="mobile-filter-field"><span>{label}</span>{children}</label>;
 }
 
@@ -179,13 +174,13 @@ export function MobileFilterSelect({ value, onChange, options, placeholder, labe
   placeholder: string;
   label?: string;
 }) {
-  return (
-    <select aria-label={label} value={value} onChange={(event) => onChange(event.target.value)}>
-      <option value="">{placeholder}</option>
-      {value && !options.some(option => option.value === value) && <option value={value} disabled>{value}</option>}
-      {options.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}
-    </select>
-  );
+  return <BrowseSelect label={label ?? placeholder} value={value} onChange={onChange}
+    triggerClassName="browse-filter-select"
+    options={[
+      { value: "", label: placeholder },
+      ...(value && !options.some(option => option.value === value) ? [{ value, label: value, disabled: true }] : []),
+      ...options,
+    ]} />;
 }
 
 export function BrowseRoleFilter({ label, placeholder, options, selected, onChange }: { label: string; placeholder: string; options: BrowseOption[]; selected: Set<string>; onChange: (values: Set<string>) => void }) {

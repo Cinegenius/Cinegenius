@@ -6,11 +6,17 @@ import { Globe2,Navigation,RotateCw } from "lucide-react";
 import Link from "next/link";
 import { useLocale,useTranslations } from "next-intl";
 import { useId,useMemo } from "react";
+import BrowseSelect from "@/components/BrowseSelect";
 
-export function CountrySelect({ value, onChange, name, defaultValue, emptyLabel, codes = COUNTRY_CODES }: { value?: string; onChange?: (value: string) => void; name?: string; defaultValue?: string; emptyLabel?: string; codes?: readonly string[] }) {
+export function CountrySelect({ value, onChange, name, defaultValue, emptyLabel, codes = COUNTRY_CODES, popup = false }: { value?: string; onChange?: (value: string) => void; name?: string; defaultValue?: string; emptyLabel?: string; codes?: readonly string[]; popup?: boolean }) {
   const locale = useLocale(), t = useTranslations("Places"), countries = useTranslations("CountryNames"), id = useId();
   const options = useMemo(() => [...new Set(codes)].map(code => ({ code, label: code === UNASSIGNED_COUNTRY ? t("countryUnassigned") : countries.has(code) ? countries(code) : code })).sort((a, b) => a.label.localeCompare(b.label, locale)), [locale, countries, codes, t]);
   if (!options.length && !value && !defaultValue) return null;
+  if (popup && onChange && value !== undefined) return <BrowseSelect label={t("country")} value={value} onChange={onChange} icon={<Globe2 size={16} />} options={[
+    { value: "", label: emptyLabel ?? t("allCountries") },
+    ...(value && !options.some(option => option.code === value) ? [{ value, label: countries.has(value) ? countries(value) : value, disabled: true }] : []),
+    ...options.map(option => ({ value: option.code, label: option.label })),
+  ]} />;
   return <label htmlFor={id} className="flex min-h-11 min-w-0 items-center gap-2 rounded-xl border border-border bg-bg-secondary px-3 text-sm text-text-secondary focus-within:border-gold">
     <Globe2 size={16} aria-hidden="true" className="shrink-0 text-text-muted" /><span className="sr-only">{t("country")}</span>
     <select id={id} name={name} value={value} defaultValue={defaultValue} onChange={onChange ? event => onChange(event.target.value) : undefined} className="min-h-11 w-full min-w-0 bg-transparent outline-none">

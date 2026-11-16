@@ -151,7 +151,7 @@ export default function GlobalSearch() {
   if (!open) return null;
 
   return (
-    <MessagingDialog open={open} title={t("accessibleLabel")} onClose={() => setOpen(false)} compact>
+    <MessagingDialog open={open} title={t("accessibleLabel")} onClose={() => setOpen(false)} compact surface="browse">
         {/* Input */}
         <div className="flex items-center gap-3 px-4 py-3.5 border-b border-border">
           {loading
@@ -229,7 +229,7 @@ export default function GlobalSearch() {
                       key={r.id}
                       onClick={() => navigate(r)}
                       className={`flex min-h-11 items-center gap-3 w-full px-4 py-2.5 transition-colors text-left ${
-                        isSelected ? "bg-gold/10" : "hover:bg-bg-secondary"
+                        isSelected ? "bg-gold/15" : "hover:bg-gold/10"
                       }`}
                     >
                       {r.image ? (
