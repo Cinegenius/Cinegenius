@@ -501,7 +501,7 @@ export default function CompanyDetail({
                   </div>
                   <button type="button" aria-label={uiText("Ui.text_192abd55f1bb32")} onClick={() => !joining && setJoinDialogMode(null)} className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg text-text-muted hover:bg-bg-elevated hover:text-text-primary"><X size={16} /></button>
                 </div>
-                <p className="mt-3 rounded-lg border border-border bg-bg-primary/60 p-3 text-xs leading-relaxed text-text-muted">{uiText.rich("Ui.text_eb12dcd1639dde", { part1: chunks => (<a className="text-gold underline underline-offset-2" href="mailto:cinegenius.co@gmail.com">{chunks}</a>) })}</p>
+                <p className="mt-3 rounded-lg border border-border bg-bg-primary/60 p-3 text-xs leading-relaxed text-text-muted">{uiText.rich("Ui.text_eb12dcd1639dde", { part1: chunks => (<a className="text-gold underline underline-offset-2" href="mailto:hello@cinegenius.co">{chunks}</a>) })}</p>
                 <div className="mt-5 space-y-4">
                   <div>
                     <p className="mb-2 text-xs font-medium text-text-secondary">{uiText("Ui.text_c147da3a826532")}</p>

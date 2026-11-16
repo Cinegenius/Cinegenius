@@ -289,7 +289,7 @@ export default function HelpPage() {
           <p className="text-text-muted text-sm leading-relaxed">{uiText("SupportMediation.agreement")}</p>
           <Link href="/pricing#support-mediation" className="inline-flex min-h-11 items-center text-sm text-gold hover:underline mb-4">{uiText("SupportMediation.readMore")}</Link>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">{uiText.rich("Ui.text_4f778e3c677bc4", { part2: () => (<Mail size={15} />), part1: chunks => (<a
-              href="mailto:cinegenius.co@gmail.com"
+              href="mailto:hello@cinegenius.co"
               className="px-6 py-3 bg-gold text-bg-primary font-semibold rounded-lg hover:bg-gold-light transition-colors flex items-center justify-center gap-2"
             >{chunks}</a>), part4: () => (<MessageSquare size={15} />), part3: chunks => (<Link
               href="/dashboard"

@@ -61,7 +61,7 @@ export default async function DatenschutzPage() {
 
           <section>
             <h2 className="text-base font-semibold text-text-primary mb-3">{uiText("Ui.text_ebb2bcce0d2b33")}</h2>
-            <p>{uiText.rich("Ui.text_6c75d83671505b", { part1: () => (<br />), part2: () => (<br />), part3: chunks => (<a href="mailto:cinegenius.co@gmail.com" className="text-gold hover:underline">{chunks}</a>), part4: () => (<br />), part5: chunks => (<a href="tel:+491713866624" className="text-gold hover:underline">{chunks}</a>) })}</p>
+            <p>{uiText.rich("Ui.text_6c75d83671505b", { part1: () => (<br />), part2: () => (<br />), part3: chunks => (<a href="mailto:hello@cinegenius.co" className="text-gold hover:underline">{chunks}</a>), part4: () => (<br />), part5: chunks => (<a href="tel:+491713866624" className="text-gold hover:underline">{chunks}</a>) })}</p>
           </section>
 
           <section>
@@ -241,13 +241,13 @@ export default async function DatenschutzPage() {
               <li>{uiText.rich("Ui.text_fc5b657f756222", { part1: chunks => (<strong className="text-text-primary">{chunks}</strong>) })}</li>
               <li>{uiText.rich("Ui.text_351e16f55e9108", { part1: chunks => (<strong className="text-text-primary">{chunks}</strong>) })}</li>
             </ul>
-            <p className="mt-3">{uiText.rich("Ui.text_11ecf3b1603bc3", { part1: chunks => (<strong className="text-text-primary">{chunks}</strong>), part2: () => (<br />), part3: chunks => (<a href="mailto:cinegenius.co@gmail.com" className="text-gold hover:underline">{chunks}</a>) })}</p>
+            <p className="mt-3">{uiText.rich("Ui.text_11ecf3b1603bc3", { part1: chunks => (<strong className="text-text-primary">{chunks}</strong>), part2: () => (<br />), part3: chunks => (<a href="mailto:hello@cinegenius.co" className="text-gold hover:underline">{chunks}</a>) })}</p>
             <p className="mt-3">{uiText.rich("Ui.text_dec738ce27179f", { part1: () => (<br />), part2: chunks => (<strong className="text-text-primary">{chunks}</strong>), part3: () => (<br />), part4: chunks => (<a href="https://www.lda.bayern.de" target="_blank" rel="noopener noreferrer" className="text-gold hover:underline">{chunks}</a>) })}</p>
           </section>
 
           <section>
             <h2 className="text-base font-semibold text-text-primary mb-3">{uiText("Ui.text_3e62bfdd32525c")}</h2>
-            <p>{uiText.rich("Ui.text_7fb3434c1d331e", { part1: chunks => (<a href="mailto:cinegenius.co@gmail.com" className="text-gold hover:underline">{chunks}</a>) })}</p>
+            <p>{uiText.rich("Ui.text_7fb3434c1d331e", { part1: chunks => (<a href="mailto:hello@cinegenius.co" className="text-gold hover:underline">{chunks}</a>) })}</p>
           </section>
 
           <section>
@@ -257,7 +257,7 @@ export default async function DatenschutzPage() {
 
           <section>
             <h2 className="text-base font-semibold text-text-primary mb-3">{uiText("Ui.text_da1aa5f0d7763e")}</h2>
-            <p>{uiText.rich("Ui.text_d47b701f28bc95", { part1: () => (<br />), part2: () => (<br />), part3: chunks => (<a href="mailto:cinegenius.co@gmail.com" className="text-gold hover:underline">{chunks}</a>) })}</p>
+            <p>{uiText.rich("Ui.text_d47b701f28bc95", { part1: () => (<br />), part2: () => (<br />), part3: chunks => (<a href="mailto:hello@cinegenius.co" className="text-gold hover:underline">{chunks}</a>) })}</p>
           </section>
 
         </div>
