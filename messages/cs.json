@@ -8338,6 +8338,17 @@
     "intro": "Děkujeme za hlášení. Uvedený obsah ručně zkontrolujeme.",
     "reference": "Reference: {reference}",
     "next": "Pokud budou potřeba dotazy nebo budeme moci sdělit rozhodnutí, odpovíme na tuto e-mailovou adresu.",
-    "footer": "Tento e-mail dostáváte, protože jste přes CineGenius nahlásili obsah."
+    "footer": "Tento e-mail dostáváte, protože jste přes CineGenius nahlásili obsah.",
+    "operator": {
+      "subject": "Hlášení CineGenius: {category}",
+      "heading": "Nové veřejné hlášení",
+      "reference": "Referenční číslo: {reference}",
+      "target": "Nahlášený obsah: {target}",
+      "category": "Kategorie: {category}",
+      "reporter": "Oznamující osoba: {reporter}",
+      "received": "Přijato: {date}",
+      "anonymous": "Neuvedeno",
+      "footer": "Strukturované hlášení odeslané prostřednictvím CineGenius."
+    }
   }
 }

@@ -8338,6 +8338,17 @@
     "intro": "Tack för din rapport. Vi granskar det angivna innehållet manuellt.",
     "reference": "Referens: {reference}",
     "next": "Om följdfrågor behövs eller vi kan meddela ett beslut svarar vi till denna e-postadress.",
-    "footer": "Du får detta e-postmeddelande eftersom du rapporterade innehåll via CineGenius."
+    "footer": "Du får detta e-postmeddelande eftersom du rapporterade innehåll via CineGenius.",
+    "operator": {
+      "subject": "CineGenius-anmälan: {category}",
+      "heading": "Ny offentlig anmälan",
+      "reference": "Referens: {reference}",
+      "target": "Anmält innehåll: {target}",
+      "category": "Kategori: {category}",
+      "reporter": "Anmälare: {reporter}",
+      "received": "Mottagen: {date}",
+      "anonymous": "Ej angivet",
+      "footer": "Strukturerad anmälan skickad via CineGenius."
+    }
   }
 }

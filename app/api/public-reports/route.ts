@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getTranslations } from "next-intl/server";
 import { sendPublicReportEmails } from "@/lib/email";
 import { isAppLocale, type AppLocale } from "@/lib/i18n/locales";
-import { validatePublicReport, type PublicReportCategory } from "@/lib/public-report";
+import { validatePublicReport } from "@/lib/public-report";
 import { rateLimit } from "@/lib/rateLimit";
 import { trustedMutationOrigin } from "@/lib/request-origin";
 
@@ -55,7 +55,6 @@ export async function POST(request: NextRequest) {
 
   const locale: AppLocale = isAppLocale(body?.locale) ? body.locale : "de";
   const email = await getTranslations({ locale, namespace: "PublicReportEmail" });
-  const categoryLabel = t(`categories.${validated.value.category as PublicReportCategory}`);
   const sent = await sendPublicReportEmails(validated.value, {
     subject: email("subject"),
     heading: email("heading"),
@@ -63,7 +62,7 @@ export async function POST(request: NextRequest) {
     reference: email("reference"),
     next: email("next"),
     footer: email("footer"),
-  }, categoryLabel);
+  }, locale);
 
   if (!sent.operatorSent) return json({ error: t("errors.send") }, 503);
   return json({ ok: true, reference: sent.reference, receiptSent: sent.receiptSent });

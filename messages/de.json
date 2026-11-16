@@ -8338,6 +8338,17 @@
     "intro": "Danke für deine Meldung. Wir prüfen den genannten Inhalt manuell.",
     "reference": "Referenz: {reference}",
     "next": "Falls Rückfragen nötig sind oder wir eine Entscheidung mitteilen können, antworten wir an diese E-Mail-Adresse.",
-    "footer": "Du erhältst diese E-Mail, weil du über CineGenius einen Inhalt gemeldet hast."
+    "footer": "Du erhältst diese E-Mail, weil du über CineGenius einen Inhalt gemeldet hast.",
+    "operator": {
+      "subject": "CineGenius-Meldung: {category}",
+      "heading": "Neue öffentliche Meldung",
+      "reference": "Referenz: {reference}",
+      "target": "Fundstelle: {target}",
+      "category": "Kategorie: {category}",
+      "reporter": "Meldende Person: {reporter}",
+      "received": "Eingegangen: {date}",
+      "anonymous": "Nicht angegeben",
+      "footer": "Strukturierte Meldung über CineGenius."
+    }
   }
 }

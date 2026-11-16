@@ -1,5 +1,5 @@
 import {getTranslations} from "next-intl/server";
-import {type AppLocale} from "@/lib/i18n/locales";
+import {DEFAULT_LOCALE, type AppLocale} from "@/lib/i18n/locales";
 import {recipientEmailLocale} from "@/lib/i18n/email-locale";
 import type { PublicReport } from "@/lib/public-report";
 import { Resend } from "resend";
@@ -129,29 +129,36 @@ export type PublicReportReceiptCopy = {
   footer: string;
 };
 
-export async function sendPublicReportEmails(report: PublicReport, receipt: PublicReportReceiptCopy, categoryLabel: string) {
+export async function sendPublicReportEmails(report: PublicReport, receipt: PublicReportReceiptCopy, locale: AppLocale) {
   if (!resend) return { operatorSent: false, receiptSent: false, reason: "not_configured" as const };
+  // Keep the operator inbox in the existing default language; the receipt uses
+  // the explicitly selected reporting language. Never translate member content.
+  const [operator, categories] = await Promise.all([
+    getTranslations({locale: DEFAULT_LOCALE, namespace: "PublicReportEmail"}),
+    getTranslations({locale: DEFAULT_LOCALE, namespace: "PublicReport"}),
+  ]);
+  const categoryLabel = categories(`categories.${report.category}`);
   const recipient = process.env.CG_LEGAL_REPORT_TO ?? "cinegenius.co@gmail.com";
   const submittedAt = new Date().toISOString();
   const reference = `CG-MELDUNG-${submittedAt.slice(0, 10).replace(/-/g, "")}-${Math.random().toString(36).slice(2, 8).toUpperCase()}`;
   const reporter = [report.reporterName, report.reporterEmail].filter(Boolean).join(" <") + (report.reporterEmail && report.reporterName ? ">" : "");
   const detailHtml = escapeHtml(report.details).replace(/\n/g, "<br />");
   const operatorHtml = wrap(`
-    ${h1("Neue öffentliche Meldung")}
-    ${p(`Referenz: ${reference}`)}
-    ${p(`Fundstelle: ${report.target}`)}
-    ${p(`Kategorie: ${categoryLabel}`)}
-    ${p(`Meldende Person: ${reporter || "Nicht angegeben"}`)}
-    ${p(`Eingegangen: ${submittedAt}`)}
+    ${h1(escapeHtml(operator("operator.heading")))}
+    ${p(escapeHtml(operator("operator.reference", {reference})))}
+    ${p(escapeHtml(operator("operator.target", {target: report.target})))}
+    ${p(escapeHtml(operator("operator.category", {category: categoryLabel})))}
+    ${p(escapeHtml(operator("operator.reporter", {reporter: reporter || operator("operator.anonymous")})))}
+    ${p(escapeHtml(operator("operator.received", {date: submittedAt})))}
     <div style="margin-top:16px;padding:12px 16px;background:#1a1a1a;border:1px solid #222;border-radius:8px;font-size:14px;color:#d0d0d0;line-height:1.6">${detailHtml}</div>
-  `, "de", "Strukturierte Meldung über CineGenius.");
+  `, DEFAULT_LOCALE, operator("operator.footer"));
 
   try {
     const { data, error } = await resend.emails.send({
       from: FROM,
       to: recipient,
       replyTo: report.reporterEmail ?? undefined,
-      subject: `CineGenius Meldung: ${categoryLabel}`,
+      subject: normalizedEmailText(operator("operator.subject", {category: categoryLabel})),
       html: operatorHtml,
     });
     if (error || !data?.id) {
@@ -176,7 +183,7 @@ export async function sendPublicReportEmails(report: PublicReport, receipt: Publ
         ${p(escapeHtml(receipt.intro))}
         ${p(escapeHtml(receipt.reference.replace("{reference}", reference)))}
         ${p(escapeHtml(receipt.next))}
-      `, "de", receipt.footer),
+      `, locale, receipt.footer),
     });
     if (error || !data?.id) {
       console.error("CineGenius: Eingangsbestätigung für öffentliche Meldung wurde nicht bestätigt.", { code: error?.name, statusCode: error?.statusCode });

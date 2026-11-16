@@ -8338,6 +8338,17 @@
     "intro": "Dank je voor je melding. We beoordelen de genoemde inhoud handmatig.",
     "reference": "Referentie: {reference}",
     "next": "Als er vragen nodig zijn of we een beslissing kunnen delen, antwoorden we op dit e-mailadres.",
-    "footer": "Je ontvangt deze e-mail omdat je via CineGenius inhoud hebt gemeld."
+    "footer": "Je ontvangt deze e-mail omdat je via CineGenius inhoud hebt gemeld.",
+    "operator": {
+      "subject": "CineGenius-melding: {category}",
+      "heading": "Nieuwe openbare melding",
+      "reference": "Referentie: {reference}",
+      "target": "Gemelde inhoud: {target}",
+      "category": "Categorie: {category}",
+      "reporter": "Melder: {reporter}",
+      "received": "Ontvangen: {date}",
+      "anonymous": "Niet opgegeven",
+      "footer": "Gestructureerde melding ingediend via CineGenius."
+    }
   }
 }

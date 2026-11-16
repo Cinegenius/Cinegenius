@@ -8338,6 +8338,17 @@
     "intro": "Grazie per la segnalazione. Controlleremo manualmente il contenuto indicato.",
     "reference": "Riferimento: {reference}",
     "next": "Se servono domande o possiamo comunicare una decisione, risponderemo a questo indirizzo email.",
-    "footer": "Ricevi questa email perché hai segnalato un contenuto tramite CineGenius."
+    "footer": "Ricevi questa email perché hai segnalato un contenuto tramite CineGenius.",
+    "operator": {
+      "subject": "Segnalazione CineGenius: {category}",
+      "heading": "Nuova segnalazione pubblica",
+      "reference": "Riferimento: {reference}",
+      "target": "Contenuto segnalato: {target}",
+      "category": "Categoria: {category}",
+      "reporter": "Persona segnalante: {reporter}",
+      "received": "Ricevuta: {date}",
+      "anonymous": "Non indicato",
+      "footer": "Segnalazione strutturata inviata tramite CineGenius."
+    }
   }
 }

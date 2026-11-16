@@ -8338,6 +8338,17 @@
     "intro": "Thank you for your report. We will manually review the named content.",
     "reference": "Reference: {reference}",
     "next": "If follow-up questions are needed or we can share a decision, we will reply to this email address.",
-    "footer": "You receive this email because you reported content through CineGenius."
+    "footer": "You receive this email because you reported content through CineGenius.",
+    "operator": {
+      "subject": "CineGenius report: {category}",
+      "heading": "New public report",
+      "reference": "Reference: {reference}",
+      "target": "Reported content: {target}",
+      "category": "Category: {category}",
+      "reporter": "Reporter: {reporter}",
+      "received": "Received: {date}",
+      "anonymous": "Not provided",
+      "footer": "Structured report submitted through CineGenius."
+    }
   }
 }

@@ -8338,6 +8338,17 @@
     "intro": "Köszönjük a bejelentést. A megadott tartalmat manuálisan ellenőrizzük.",
     "reference": "Hivatkozás: {reference}",
     "next": "Ha további kérdések szükségesek, vagy döntést tudunk közölni, erre az e-mail-címre válaszolunk.",
-    "footer": "Ezt az e-mailt azért kapod, mert tartalmat jelentettél a CineGeniuson."
+    "footer": "Ezt az e-mailt azért kapod, mert tartalmat jelentettél a CineGeniuson.",
+    "operator": {
+      "subject": "CineGenius-bejelentés: {category}",
+      "heading": "Új nyilvános bejelentés",
+      "reference": "Hivatkozás: {reference}",
+      "target": "Bejelentett tartalom: {target}",
+      "category": "Kategória: {category}",
+      "reporter": "Bejelentő: {reporter}",
+      "received": "Beérkezett: {date}",
+      "anonymous": "Nincs megadva",
+      "footer": "A CineGeniuson keresztül beküldött strukturált bejelentés."
+    }
   }
 }
