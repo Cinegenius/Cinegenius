@@ -1246,7 +1246,20 @@
     "choose": "Hoofdwerkzaamheid kiezen",
     "hint": "De hoofdwerkzaamheid wordt op je profiel uitgelicht. In het crewoverzicht ben je te vinden onder alle geselecteerde werkzaamheden en de bijbehorende afdelingen.",
     "legacy": "Voor je bestaande werkzaamheden is nog geen eenduidige hoofdwerkzaamheid vastgesteld. Kies deze hier; je andere werkzaamheden blijven behouden.",
-    "empty": "Kies voor de koppeling een werkzaamheid uit de beroepencatalogus. Je bestaande gegevens blijven behouden."
+    "empty": "Kies voor de koppeling een werkzaamheid uit de beroepencatalogus. Je bestaande gegevens blijven behouden.",
+    "focusExplanation": "Op je kaarten staan 1 hoofdactiviteit en maximaal 2 nevenactiviteiten. 1 extra activiteit blijft zichtbaar in je profiel en bij het zoeken. Later altijd aanpasbaar.",
+    "additional": "Extra activiteit (optioneel)",
+    "secondary": "Nevenactiviteiten",
+    "noAdditional": "Geen extra activiteit",
+    "chooseAdditional": "Kies een extra activiteit",
+    "additionalHint": "Alleen in je profielgegevens en bij het zoeken, niet op je kaarten.",
+    "legacyFocus": "Je bestaande gegevens blijven bewaard. Kies bij het wijzigen maximaal 1 hoofdactiviteit, 2 nevenactiviteiten en 1 extra activiteit.",
+    "limit": "Kies 1 hoofdactiviteit, maximaal 2 nevenactiviteiten en 1 extra activiteit. Verwijder eerst een keuze.",
+    "mainRequired": "Kies een hoofdactiviteit uit je selectie.",
+    "additionalRequired": "Kies welke van de vier activiteiten alleen in je profielgegevens en bij het zoeken verschijnt.",
+    "invalidAdditional": "De extra activiteit moet geselecteerd zijn en verschillen van je hoofdactiviteit.",
+    "invalidSelection": "Kies geldige activiteiten uit de catalogus.",
+    "additionalTitle": "Extra activiteit"
   },
   "legalLanguage": {
     "original": "De oorspronkelijke Duitse versie van deze juridische teksten is leidend. De vertalingen dienen om de tekst begrijpelijker te maken."

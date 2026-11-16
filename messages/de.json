@@ -1246,7 +1246,20 @@
     "choose": "Haupttätigkeit auswählen",
     "hint": "Die Haupttätigkeit wird in deinem Profil hervorgehoben. In der Crewübersicht wirst du unter allen ausgewählten Tätigkeiten und ihren Gewerken gefunden.",
     "legacy": "Für deine bisherigen Tätigkeiten ist noch keine eindeutige Haupttätigkeit festgelegt. Bitte wähle sie hier aus; deine weiteren Tätigkeiten bleiben erhalten.",
-    "empty": "Wähle für die Zuordnung eine Tätigkeit aus dem Berufskatalog. Deine bisherigen Angaben bleiben erhalten."
+    "empty": "Wähle für die Zuordnung eine Tätigkeit aus dem Berufskatalog. Deine bisherigen Angaben bleiben erhalten.",
+    "focusExplanation": "1 Haupttätigkeit + bis zu 2 Nebentätigkeiten erscheinen auf deinen Karten. 1 weitere Tätigkeit bleibt im Profil und für die Suche sichtbar. Alles später änderbar.",
+    "additional": "Weitere Tätigkeit (optional)",
+    "secondary": "Nebentätigkeiten",
+    "noAdditional": "Keine weitere Tätigkeit",
+    "chooseAdditional": "Weitere Tätigkeit auswählen",
+    "additionalHint": "Nur in den Profildetails und für die Suche, nicht auf deinen Karten.",
+    "legacyFocus": "Deine bisherigen Angaben bleiben erhalten. Wenn du deine Tätigkeiten änderst, wähle höchstens 1 Haupt-, 2 Neben- und 1 weitere Tätigkeit.",
+    "limit": "Du kannst 1 Haupttätigkeit, bis zu 2 Nebentätigkeiten und 1 weitere Tätigkeit auswählen. Entferne zuerst eine Auswahl.",
+    "mainRequired": "Wähle eine Haupttätigkeit aus deiner Auswahl.",
+    "additionalRequired": "Wähle, welche der vier Tätigkeiten nur in den Profildetails und für die Suche erscheinen soll.",
+    "invalidAdditional": "Die weitere Tätigkeit muss ausgewählt sein und sich von der Haupttätigkeit unterscheiden.",
+    "invalidSelection": "Bitte wähle gültige Tätigkeiten aus dem Berufskatalog.",
+    "additionalTitle": "Weitere Tätigkeit"
   },
   "legalLanguage": {
     "original": "Für diese Rechtstexte ist das deutsche Original maßgeblich. Die Übersetzungen dienen der Verständlichkeit."

@@ -1,7 +1,7 @@
 import { placeWriteFields } from "@/lib/places/catalog";
 import { PLACE_COLUMNS } from "@/lib/places/core";
 import { getTranslations } from "next-intl/server";
-import { crewOccupationsError } from "@/lib/crew-occupations";
+import { crewOccupationsError, profileOccupationFocusError, profileOccupationsUnchanged, type OccupationProfile } from "@/lib/crew-occupations";
 import { primaryOccupationError } from "@/lib/primary-occupation";
 import { db } from "@/lib/db";
 import { requireAuth } from "@/lib/auth";
@@ -151,8 +151,15 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: tResponse('System.m_61d340f2b8c0') }, { status: 400 });
   }
   const normalizedProfileTypes = normalizeProfileTypes(profile_types ?? [], profile_type ?? null);
-  const primaryError = primaryOccupationError(crew, positions) ?? crewOccupationsError(crew, positions);
-  if (primaryError) fieldErrors.activity = primaryError;
+  const previous = await db.from("profiles").select("positions, crew, role").eq("user_id", userId).maybeSingle();
+  if (previous.error) return privateNoStoreJson({ error: tResponse("System.requestFailed") }, 503);
+  const activity = { positions, crew, role: previous.data?.role };
+  if (!profileOccupationsUnchanged(activity, previous.data)) {
+    const primaryError = primaryOccupationError(crew, positions) ?? crewOccupationsError(crew, positions);
+    if (primaryError) fieldErrors.activity = primaryError;
+  }
+  const focusError = profileOccupationFocusError(activity, previous.data);
+  if (focusError) fieldErrors.activity = tResponse(`occupation.${focusError}`);
   const hasPositions = Array.isArray(positions) && positions.some((position: unknown) => typeof position === "string" && position.trim());
   if (!hasPositions && normalizedProfileTypes.length === 0) fieldErrors.activity = "Bitte wähle mindestens eine Tätigkeit aus.";
   if (Object.keys(fieldErrors).length > 0) {
@@ -323,11 +330,15 @@ export async function PATCH(req: NextRequest) {
     if ("location" in safe && (typeof safe.location !== "string" || !String(place?.fields?.place_city_name ?? '').trim())) {
       fieldErrors.location = "Bitte gib deinen Standort ein.";
     }
-    if ("positions" in safe || "profile_types" in safe || "profile_type" in safe) {
+    let previousActivity: OccupationProfile | null = null;
+    if ("positions" in safe || "crew" in safe || "profile_types" in safe || "profile_type" in safe) {
       // PATCH leaves omitted fields unchanged. Validate the resulting activity
       // selection rather than treating those saved fields as empty.
-      const current = await db.from("profiles").select("positions, profile_type").eq("user_id", userId).maybeSingle();
+      const current = await db.from("profiles").select("positions, profile_type, crew, role").eq("user_id", userId).maybeSingle();
       if (current.error) return privateNoStoreJson({ error: tResponse("System.requestFailed"), code: current.error.code }, 500);
+      previousActivity = current.data;
+      // Omitted occupation fields survive older clients and partial crew edits.
+      if (safe.crew && typeof safe.crew === "object" && !Array.isArray(safe.crew)) safe.crew = { ...current.data?.crew, ...safe.crew };
       const optional = await selectOptionalProfileColumns<Record<string, unknown>>(
         ["profile_types"],
         async (projection) => {
@@ -344,8 +355,15 @@ export async function PATCH(req: NextRequest) {
       );
       if (!hasPositions && types.length === 0) fieldErrors.activity = "Bitte wähle mindestens eine Tätigkeit aus.";
     }
-    const primaryError = primaryOccupationError(safe.crew, safe.positions) ?? crewOccupationsError(safe.crew, safe.positions);
-    if (primaryError) fieldErrors.activity = primaryError;
+    if ("positions" in safe || "crew" in safe) {
+      const activity = { ...previousActivity, ...safe } as OccupationProfile;
+      if (!profileOccupationsUnchanged(activity, previousActivity)) {
+        const primaryError = primaryOccupationError(activity.crew, activity.positions) ?? crewOccupationsError(activity.crew, activity.positions);
+        if (primaryError) fieldErrors.activity = primaryError;
+      }
+      const focusError = profileOccupationFocusError(activity, previousActivity);
+      if (focusError) fieldErrors.activity = tResponse(`occupation.${focusError}`);
+    }
     if (Object.keys(fieldErrors).length > 0) {
       return NextResponse.json({ error: tResponse('System.m_09c9f4d72a9a'), fieldErrors }, { status: 400 });
     }

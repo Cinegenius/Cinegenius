@@ -1246,7 +1246,20 @@
     "choose": "Välj huvudsaklig yrkesroll",
     "hint": "Din huvudsakliga yrkesroll lyfts fram i profilen. I filmteamsöversikten går du att hitta under alla valda yrkesroller och deras avdelningar.",
     "legacy": "Ingen entydig huvudroll har ännu valts för dina befintliga yrkesroller. Välj den här; dina övriga roller behålls.",
-    "empty": "Välj en yrkesroll ur yrkeskatalogen för kopplingen. Dina befintliga uppgifter behålls."
+    "empty": "Välj en yrkesroll ur yrkeskatalogen för kopplingen. Dina befintliga uppgifter behålls.",
+    "focusExplanation": "På dina kort visas 1 huvudsyssla och upp till 2 bisysslor. 1 ytterligare syssla syns i profilen och vid sökning. Du kan ändra allt senare.",
+    "additional": "Ytterligare syssla (valfritt)",
+    "secondary": "Bisysslor",
+    "noAdditional": "Ingen ytterligare syssla",
+    "chooseAdditional": "Välj ytterligare en syssla",
+    "additionalHint": "Bara i profiluppgifter och vid sökning, inte på dina kort.",
+    "legacyFocus": "Dina befintliga uppgifter sparas. När du ändrar dina sysslor väljer du högst 1 huvudsyssla, 2 bisysslor och 1 ytterligare syssla.",
+    "limit": "Välj 1 huvudsyssla, upp till 2 bisysslor och 1 ytterligare syssla. Ta bort ett val först.",
+    "mainRequired": "Välj en huvudsyssla bland dina val.",
+    "additionalRequired": "Välj vilken av de fyra sysslorna som bara ska synas i profiluppgifter och vid sökning.",
+    "invalidAdditional": "Den ytterligare sysslan måste vara vald och skilja sig från huvudsysslan.",
+    "invalidSelection": "Välj giltiga sysslor i katalogen.",
+    "additionalTitle": "Ytterligare yrkesroll"
   },
   "legalLanguage": {
     "original": "Den tyska originalversionen av dessa juridiska texter är gällande. Översättningarna är till för att underlätta förståelsen."

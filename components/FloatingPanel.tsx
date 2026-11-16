@@ -49,7 +49,7 @@ export default function FloatingPanel({ anchorRef, onClose, children, className 
   useLayoutEffect(() => {
     const panel = panelRef.current, anchor = anchorRef.current;
     if (!panel || !anchor) return;
-    panel.querySelector<HTMLElement>("input, button:not(:disabled), a[href], select, textarea")?.focus({ preventScroll: true });
+    panel.querySelector<HTMLElement>('input, button:not(:disabled), a[href], select, textarea, [role="listbox"]')?.focus({ preventScroll: true });
     const outside = (event: Event) => {
       if (event.target instanceof Node && !panel.contains(event.target) && !anchor.contains(event.target)) closeRef.current();
     };

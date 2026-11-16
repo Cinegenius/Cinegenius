@@ -28,7 +28,7 @@ import ExternalProfilesSection from "@/components/ExternalProfilesSection";
 import { useToast } from "@/contexts/ToastContext";
 import FocalPointPicker, { type FocalPoint } from "@/components/FocalPointPicker";
 import PrimaryOccupationPicker from "@/components/PrimaryOccupationPicker";
-import { selectedCrewOccupations } from "@/lib/crew-occupations";
+import { selectedCrewOccupations, additionalCrewOccupation, profileOccupationFocusError, profileOccupationCount, MAX_PROFILE_OCCUPATIONS, type OccupationProfile } from "@/lib/crew-occupations";
 import { removeProfilePosition, toggleProfileOccupation, type ProfileOccupationEdit } from "@/lib/profile-occupation-editor";
 import { occupationId, primaryOccupationForPositions, occupationReference, orderPositionsByPrimary, type PrimaryOccupation } from "@/lib/primary-occupation";
 import ProfileCoverEditor from "@/components/ProfileCoverEditor";
@@ -172,7 +172,11 @@ function TypeChipPicker({
     if (nextTypes.join("|") !== selectedTypes.join("|")) onTypesChange(nextTypes);
   }
 
+  const [occupationLimitReached, setOccupationLimitReached] = useState(false);
   function togglePosition(job: string, deptId: string) {
+    const selected = selectedCrewOccupations(positions, occupationSelections);
+    if (!selected.some(item => item.roleId === occupationId(deptId, job)) && profileOccupationCount({positions, crew: {occupations: occupationSelections}}) >= MAX_PROFILE_OCCUPATIONS) { setOccupationLimitReached(true); return; }
+    setOccupationLimitReached(false);
     applyOccupationEdit(toggleProfileOccupation(positions, occupationSelections, {departmentId: deptId, roleId: occupationId(deptId, job)}));
     setChosenDepartments(current => current.includes(deptId) ? current : [...current, deptId]);
   }
@@ -225,6 +229,8 @@ function TypeChipPicker({
 
   return (
     <div className="space-y-5">
+      <p className="text-sm leading-6 text-text-secondary">{uiText("occupation.focusExplanation")}</p>
+      {occupationLimitReached && <p role="status" className="text-sm text-gold">{uiText("occupation.limit")}</p>}
       {positions.length > 0 && (
         <div>
           <p className="mb-2 text-xs font-semibold text-text-primary">{uiText("Ui.text_c8e0c70f21214e")}</p>
@@ -234,7 +240,7 @@ function TypeChipPicker({
                 {position}
                 <button type="button" onClick={() => {
                   applyOccupationEdit(removeProfilePosition(positions, occupationSelections, position));
-                }} className="inline-flex h-7 w-7 items-center justify-center rounded-full hover:bg-red-500/10" aria-label={uiText("Ui.text_f10fe7a27ce274", { value1: String(position) })}><X size={14} /></button>
+                }} className="inline-flex min-h-11 min-w-11 items-center justify-center rounded-full hover:bg-red-500/10" aria-label={uiText("Ui.text_f10fe7a27ce274", { value1: String(position) })}><X size={14} /></button>
               </span>
             ))}
           </div>
@@ -629,6 +635,8 @@ export default function ProfilePage() {
   const [newMembership, setNewMembership] = useState("");
   const [positions, setPositions] = useState<string[]>([]);
   const [primaryOccupation, setPrimaryOccupation] = useState<PrimaryOccupation | null>(null);
+  const [additionalOccupation, setAdditionalOccupation] = useState<PrimaryOccupation | null>(null);
+  const originalOccupationsRef = useRef<OccupationProfile | null>(null);
   const crewDataRef = useRef<Record<string, unknown>>({});
   const [occupationSelections, setOccupationSelections] = useState<PrimaryOccupation[]>([]);
   const [languages, setLanguages] = useState<string[]>([]);
@@ -833,6 +841,8 @@ export default function ProfilePage() {
           setMemberships(profile.memberships ?? []);
           setPositions(profile.positions ?? []);
           crewDataRef.current = profile.crew ?? {};
+          originalOccupationsRef.current = {positions: profile.positions, role: profile.role, crew: profile.crew};
+          setAdditionalOccupation(additionalCrewOccupation(profile));
           setOccupationSelections(selectedCrewOccupations(profile.positions ?? [], profile.crew?.occupations, profile.role, profile.crew?.primaryOccupation));
           setPrimaryOccupation(occupationReference(primaryOccupationForPositions(profile.crew?.primaryOccupation, profile.positions ?? [], profile.role)));
           setLanguages(profile.languages ?? []);
@@ -1130,7 +1140,8 @@ export default function ProfilePage() {
       positions,
       profileTypes: currentProfileTypes,
     }, uiText);
-    if (positions.length && !primaryOccupationForPositions(primaryOccupation, positions)) validationErrors.activity = uiText("Ui.text_89818eac599e88");
+    const focusError = profileOccupationFocusError({positions, role: originalOccupationsRef.current?.role, crew: {...crewDataRef.current, occupations: occupationSelections, primaryOccupation, additionalOccupation}}, originalOccupationsRef.current);
+    if (focusError) validationErrors.activity = uiText(`occupation.${focusError}`);
     setFieldErrors(validationErrors);
     if (Object.keys(validationErrors).length > 0) {
       const destination = profileEditorStepForErrors(Object.keys(validationErrors) as ("activity" | "name" | "city")[]);
@@ -1210,7 +1221,7 @@ export default function ProfilePage() {
         day_rate:       dayRate ? parseInt(dayRate) : null,
         filmography,
         video_links:    videoLinks,
-        crew: { ...crewDataRef.current, occupations: selectedCrewOccupations(positions, occupationSelections, null, primaryOccupation), certificates: crewCertificates, primaryOccupation: occupationReference(primaryOccupationForPositions(primaryOccupation, positions)) },
+        crew: { ...crewDataRef.current, additionalOccupation, occupations: selectedCrewOccupations(positions, occupationSelections, null, primaryOccupation), certificates: crewCertificates, primaryOccupation: occupationReference(primaryOccupationForPositions(primaryOccupation, positions)) },
       };
 
       // First-time profile creation uses POST; subsequent edits use PATCH
@@ -1266,6 +1277,8 @@ export default function ProfilePage() {
       performanceDataRef.current = performance ?? {};
       availabilityConfigRef.current = commonPayload.availability_config;
       originalTravelReadyRef.current = form.travelReady;
+      crewDataRef.current = commonPayload.crew;
+      originalOccupationsRef.current = {positions: commonPayload.positions, crew: commonPayload.crew, role: originalOccupationsRef.current?.role};
 
       if (unavailableFields.length > 0) {
         addToast(uiText("Ui.text_5a5f71213f5b75", { value1: String(unavailableFields.join(", ")) }), "error");
@@ -1404,6 +1417,7 @@ export default function ProfilePage() {
     videoLinks,
     crewCertificates,
     primaryOccupation,
+    additionalOccupation,
     occupationSelections,
     currentProfileTypes,
     physicalData: physicalDataRef.current,
@@ -1444,6 +1458,7 @@ export default function ProfilePage() {
           if (Array.isArray(saved.filmography)) setFilmography(saved.filmography);
           if (Array.isArray(saved.videoLinks)) setVideoLinks(saved.videoLinks.filter((item: unknown): item is string => typeof item === "string"));
           if (Object.hasOwn(saved, "primaryOccupation")) setPrimaryOccupation(occupationReference(primaryOccupationForPositions(saved.primaryOccupation, Array.isArray(saved.positions) ? saved.positions : [])));
+          if (Object.hasOwn(saved, "additionalOccupation")) setAdditionalOccupation(additionalCrewOccupation({positions: Array.isArray(saved.positions) ? saved.positions : [], crew: {primaryOccupation: saved.primaryOccupation, occupations: saved.occupationSelections, additionalOccupation: saved.additionalOccupation}}));
           if (Array.isArray(saved.crewCertificates)) setCrewCertificates(saved.crewCertificates.filter((item: unknown): item is string => typeof item === "string"));
           if (Array.isArray(saved.occupationSelections)) setOccupationSelections(selectedCrewOccupations(Array.isArray(saved.positions) ? saved.positions : [], saved.occupationSelections));
           if (Array.isArray(saved.currentProfileTypes)) setCurrentProfileTypes(saved.currentProfileTypes.filter((item: unknown): item is string => typeof item === "string"));
@@ -1731,10 +1746,11 @@ export default function ProfilePage() {
                     <p className="mb-1 text-xs font-semibold uppercase tracking-wider text-text-muted">{uiText.rich("Ui.text_bb610c8cae7830", { part1: chunks => (<span className="text-text-muted">{chunks}</span>) })}</p>
                     <TypeChipPicker mode="roles" occupationSelections={occupationSelections} onOccupationsChange={setOccupationSelections} selectedTypes={currentProfileTypes} onTypesChange={setCurrentProfileTypes} positions={positions} onPositionsChange={(next) => {
                       setPositions(next);
+                      setAdditionalOccupation(current => additionalCrewOccupation({positions: next, crew: {additionalOccupation: current, occupations: occupationSelections, primaryOccupation}}));
                       setPrimaryOccupation(current => occupationReference(primaryOccupationForPositions(current, next)));
                       if (next.length > 0 || currentProfileTypes.length > 0) setFieldErrors((previous) => ({ ...previous, activity: undefined }));
                     }} />
-                    <PrimaryOccupationPicker positions={positions} value={primaryOccupation} onChange={value => { setPrimaryOccupation(value); if (value) setOccupationSelections(current => selectedCrewOccupations(positions, [...current, value])); }} />
+                    <PrimaryOccupationPicker showExplanation={false} positions={positions} selections={occupationSelections} additionalValue={additionalOccupation} onAdditionalChange={setAdditionalOccupation} value={primaryOccupation} onChange={value => { setPrimaryOccupation(value); if (value) setOccupationSelections(current => selectedCrewOccupations(positions, [...current, value])); }} />
                     {fieldErrors.activity && <p role="alert" className="mt-3 rounded-lg border border-error/30 bg-error/10 p-3 text-sm text-error">{fieldErrors.activity}</p>}
                   </div>
                 )}

@@ -118,7 +118,17 @@ function displayPositions(profile: UserProfile, labels: typeof PROFILE_TYPE_LABE
     profileTypes: profile.profile_types,
     primaryType: profile.profile_type,
     labels: labels,
+    crew: profile.crew,
+    mode: "summary",
   });
+}
+
+function AdditionalProfileOccupations({profile}: {profile: UserProfile}) {
+  const t = useTranslations();
+  const summary = displayPositions(profile, getLocalizedProfileTypeLabels(t));
+  const additional = (profile.positions ?? []).filter(title => !summary.includes(title));
+  if (!additional.length) return null;
+  return <details className="mt-3 text-sm text-text-secondary"><summary className="flex min-h-11 cursor-pointer items-center font-semibold">{t("occupation.additionalTitle")}</summary><p className="break-words leading-6">{additional.map(title => taxonomyLabel(title, t)).join(" · ")}</p></details>;
 }
 
 function SectionLabel({ children }: { children: React.ReactNode }) {
@@ -608,7 +618,7 @@ function ActorProfile({ organizationSection, profile, isOwner, projectCredits, c
                   <h1 className="min-w-0 max-w-full break-words font-display text-4xl sm:text-5xl font-bold text-text-primary leading-tight tracking-tight [overflow-wrap:anywhere]">
                     {profile.display_name ?? uiText("Ui.text_276ffa1fb4f970")}
                   </h1>
-                  <ProfileRoles positions={roleLabels} />
+                  <ProfileRoles positions={roleLabels} /><AdditionalProfileOccupations profile={profile} />
                   {profile.tagline && (
                     <p className="min-w-0 max-w-full break-words text-text-secondary text-sm mt-1 italic [overflow-wrap:anywhere]">
                       {profile.tagline}
@@ -1027,7 +1037,7 @@ function ModelProfile({ organizationSection, profile, isOwner, projectCredits = 
               </div>
               <div>
                 <h1 className="font-display text-3xl sm:text-4xl font-bold tracking-tight text-text-primary">{profile.display_name ?? uiText("Ui.text_276ffa1fb4f970")}</h1>
-                <ProfileRoles positions={roleLabels} />
+                <ProfileRoles positions={roleLabels} /><AdditionalProfileOccupations profile={profile} />
                 {profile.location && <p className="mt-3 flex items-center gap-1.5 text-sm text-text-muted"><MapPin size={13} /> {profile.location}</p>}
                 {profile.tagline && <p className="mt-2 text-sm italic text-text-secondary">{cleanProfileBio(profile.tagline)}</p>}
               </div>
@@ -1309,7 +1319,7 @@ function GenericProfile({ organizationSection, profile, isOwner, projectCredits,
             {tHeader(profile.available ? "available" : "unavailable")}
           </span>
         </div>
-        <ProfileRoles positions={roleLabels.slice(1)} secondaryOnly />
+        <ProfileRoles positions={roleLabels.slice(1)} secondaryOnly /><AdditionalProfileOccupations profile={profile} />
             <div className={`profile-actions flex min-w-0 max-w-full items-center gap-2 flex-wrap ${isOwner ? "sm:shrink-0" : ""}`}>
               {!isOwner ? (
                 <>

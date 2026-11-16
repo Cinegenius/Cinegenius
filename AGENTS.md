@@ -125,6 +125,22 @@ Crew result row correction, 14 November 2026: Keep the compact count, Crew, Loca
 - Preserve Locations as the homepage default and the existing shared design.
   See `docs/smart-development-preview.md` for the API/native contract and limits.
 
+## Occupation focus and email presentation (operator decisions, 16 November 2026)
+
+- A personal profile selects one main occupation, up to two secondary occupations
+  and at most one additional occupation. Only the first three belong on cards;
+  the additional occupation remains in profile details and search. Reuse
+  `lib/crew-occupations.ts`; never truncate persisted positions or silently reduce
+  older selections during unrelated edits. See `docs/profile-occupation-focus.md`.
+- Directory sort menus and homepage news country/topic selectors use
+  `components/BrowseSelect.tsx`, with the shared subtle translucent lime popup,
+  keyboard support and 44px options. Keep existing page layouts and filter choices.
+- New application emails use `lib/email-layout.ts` and the existing localized
+  content. Preserve token links, unsubscribe choices, recipient language and
+  delivery/idempotency checks. Provider-managed authentication/billing templates
+  require their separate reviewed configuration; a website deployment alone does
+  not update them. See `docs/email-branding.md` for the audit and limits.
+
 ## Zentrale News-Redaktion (Betreiberauftrag, 16. November 2026)
 
 - Alle redaktionellen News-Aufträge einschließlich früherer „Erstelle News“-Aufträge

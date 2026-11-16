@@ -1246,7 +1246,20 @@
     "choose": "Vyberte hlavní profesi",
     "hint": "Hlavní profese se zvýrazní v profilu. V přehledu štábu budete pod všemi vybranými profesemi a odděleními.",
     "legacy": "U dosavadních profesí není určena hlavní. Vyberte ji zde; ostatní profese zůstanou zachovány.",
-    "empty": "Vyberte profesi z katalogu. Dosavadní údaje zůstanou zachovány."
+    "empty": "Vyberte profesi z katalogu. Dosavadní údaje zůstanou zachovány.",
+    "focusExplanation": "Na kartách se zobrazí 1 hlavní a až 2 vedlejší činnosti. 1 další činnost zůstane v profilu a ve vyhledávání. Výběr lze později změnit.",
+    "additional": "Další činnost (volitelná)",
+    "secondary": "Vedlejší činnosti",
+    "noAdditional": "Žádná další činnost",
+    "chooseAdditional": "Vyber další činnost",
+    "additionalHint": "Pouze v podrobnostech profilu a ve vyhledávání, ne na kartách.",
+    "legacyFocus": "Tvé stávající údaje zůstanou zachovány. Při změně vyber nejvýše 1 hlavní, 2 vedlejší a 1 další činnost.",
+    "limit": "Můžeš vybrat 1 hlavní, až 2 vedlejší a 1 další činnost. Nejprve jednu odeber.",
+    "mainRequired": "Ze svého výběru zvol hlavní činnost.",
+    "additionalRequired": "Vyber, která ze čtyř činností se zobrazí pouze v podrobnostech profilu a ve vyhledávání.",
+    "invalidAdditional": "Další činnost musí být vybraná a odlišná od hlavní činnosti.",
+    "invalidSelection": "Vyber platné činnosti z katalogu.",
+    "additionalTitle": "Další činnost"
   },
   "legalLanguage": {
     "original": "Rozhodující je původní německé znění těchto právních textů. Překlady slouží ke snazšímu porozumění."

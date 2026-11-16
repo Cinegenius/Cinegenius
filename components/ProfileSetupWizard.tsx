@@ -25,6 +25,7 @@ import { MarketplaceCategoryPicker } from "@/components/MarketplaceOfferFields";
 import { marketplaceCategoryLabel } from "@/lib/marketplace-offer";
 import { marketplaceCategory } from "@/lib/marketplaceCategories";
 import { listingPriceLabel } from "@/lib/listing-price";
+import { MAX_PROFILE_OCCUPATIONS } from "@/lib/crew-occupations";
 import PrimaryOccupationPicker from "@/components/PrimaryOccupationPicker";
 import {
   ArrowLeft, ArrowRight, Building2, Camera, CheckCircle2, Film, ImagePlus,
@@ -279,12 +280,17 @@ export default function ProfileSetupWizard() {
       : hasOfferIntent ? uiText("setup.draftsFinish") : uiText("setup.searchFinish");
 
   function update<K extends keyof QuickStartDraft>(key: K, value: QuickStartDraft[K]) {
-    setDraft((current) => ({ ...current, [key]: value, ...(["name", "personCity", "personCountry", "talentIntro", "providerImageUrl", "primaryOccupation"].includes(key) ? { completed: { ...current.completed, profile: false } } : {}) }));
+    setDraft((current) => ({ ...current, [key]: value, ...(["name", "personCity", "personCountry", "talentIntro", "providerImageUrl", "primaryOccupation", "additionalOccupation"].includes(key) ? { completed: { ...current.completed, profile: false } } : {}) }));
     setError("");
   }
 
   function updateSection(intent: QuickStartIntent, value: Partial<QuickStartIntentData>) {
-    setDraft((current) => ({ ...current, ...((intent === "crew" || intent === "talent") ? { completed: { ...current.completed, profile: false } } : {}), sections: { ...current.sections, [intent]: { ...createQuickStartIntentData(), ...current.sections[intent], ...value } } }));
+    setDraft((current) => {
+      const next = { ...current, ...((intent === "crew" || intent === "talent") ? { completed: { ...current.completed, profile: false } } : {}), sections: { ...current.sections, [intent]: { ...createQuickStartIntentData(), ...current.sections[intent], ...value } } };
+      // Removing a selected occupation also clears its main/additional slot.
+      // Otherwise an invisible stale reference could block the review step.
+      return value.roles ? normalizeQuickStartDraft(next) : next;
+    });
     setError("");
   }
 
@@ -306,6 +312,8 @@ export default function ProfileSetupWizard() {
   function toggleRole(item: QuickStartRoleSelection, intent: "crew" | "talent") {
     const data = draft.sections[intent] ?? createQuickStartIntentData();
     const alreadySelected = data.roles.some((role) => role.departmentId === item.departmentId && role.role === item.role);
+    const allRoles = [...(draft.sections.crew?.roles ?? []), ...(draft.sections.talent?.roles ?? [])];
+    if (!alreadySelected && new Set(allRoles.map(role => `${role.departmentId}/${role.role}`)).size >= MAX_PROFILE_OCCUPATIONS) { setError(uiText("occupation.limit")); return; }
     const departmentIds = !data.departmentIds.includes(item.departmentId)
       ? [...data.departmentIds, item.departmentId]
       : data.departmentIds;
@@ -616,7 +624,8 @@ export default function ProfileSetupWizard() {
           })}
           {!data.departmentIds.length && <p className="rounded-xl border border-border bg-bg-primary p-3 text-sm text-text-muted">{t("copy7")}</p>}
         </div>}
-        <div className="mt-3 flex flex-wrap gap-2">{data.roles.map((item) => <span key={`${item.departmentId}:${item.role}`} className="inline-flex max-w-full items-center gap-2 rounded-full border border-gold/35 bg-gold/10 px-3 py-2 text-xs text-gold"><span className="break-words">{getDepartmentRoleLabel(item.departmentId, item.role, locale, animals, taxonomyText)}</span><button type="button" aria-label={uiText("Ui.text_f10fe7a27ce274", { value1: String(getDepartmentRoleLabel(item.departmentId, item.role, locale, animals, taxonomyText)) })} onClick={() => toggleRole(item, intent)} className="min-h-6 min-w-6 rounded-full hover:bg-bg-elevated">×</button></span>)}</div>
+        <p className="mt-3 text-sm leading-6 text-text-secondary">{uiText("occupation.focusExplanation")}</p>
+        <div className="mt-3 flex flex-wrap gap-2">{data.roles.map((item) => <span key={`${item.departmentId}:${item.role}`} className="inline-flex max-w-full items-center gap-2 rounded-full border border-gold/35 bg-gold/10 px-3 py-2 text-xs text-gold"><span className="break-words">{getDepartmentRoleLabel(item.departmentId, item.role, locale, animals, taxonomyText)}</span><button type="button" aria-label={uiText("Ui.text_f10fe7a27ce274", { value1: String(getDepartmentRoleLabel(item.departmentId, item.role, locale, animals, taxonomyText)) })} onClick={() => toggleRole(item, intent)} className="min-h-11 min-w-11 rounded-full hover:bg-bg-elevated">×</button></span>)}</div>
       </div>
     </div>;
   }
@@ -751,7 +760,7 @@ export default function ProfileSetupWizard() {
           <ReviewSection title={t("copy84")} onEdit={() => editReview("goals")}><p className="break-words text-sm text-text-primary">{selectedIntentTitles.join(" · ") || "—"}</p></ReviewSection>
           {hasOfferIntent && <ReviewSection title={providerText("title")} onEdit={() => editReview("intro", draft.intents.find(intent => intent === "location" || intent === "equipment"))}><ReviewRow label={t("name")} value={draft.name} /><ReviewRow label={t("place")} value={[draft.personCity, draft.personCountry].filter(Boolean).join(", ")} />{!hasProfileIntent && draft.talentIntro && <ReviewRow label={t("introduction")} value={draft.talentIntro} />}{!hasProfileIntent && draft.providerImageUrl && <Image src={draft.providerImageUrl} alt={t("copy22")} width={160} height={160} className="h-20 w-20 rounded-xl object-cover" />}<p className="rounded-xl border border-border bg-bg-primary p-3 text-xs leading-5 text-text-muted">{providerText(profileIsPrivate ? "privateNotice" : "publicNotice")}</p></ReviewSection>}
           {(draft.intents.includes("crew") || draft.intents.includes("talent")) && <>
-            <ReviewSection title={t("copy85")} onEdit={() => editReview("details", draft.intents.includes("crew") ? "crew" : "talent")}><ReviewRow label={t("occupations")} value={selectedRoles.map((role) => getDepartmentRoleLabel(role.departmentId, role.role, locale, animals, taxonomyText)).join(", ")} /><PrimaryOccupationPicker id="quick-start-primary-occupation" positions={selectedRoles.map(role=>role.role)} value={draft.primaryOccupation ?? null} onChange={value=>update("primaryOccupation", value)} /><ReviewRow label={t("place")} value={[draft.personCity, draft.personCountry].filter(Boolean).join(", ")} /><p className="rounded-xl border border-amber-400/25 bg-amber-500/5 p-3 text-xs leading-5 text-text-muted">{t("copy86")}</p></ReviewSection>
+            <ReviewSection title={t("copy85")} onEdit={() => editReview("details", draft.intents.includes("crew") ? "crew" : "talent")}><ReviewRow label={t("occupations")} value={selectedRoles.map((role) => getDepartmentRoleLabel(role.departmentId, role.role, locale, animals, taxonomyText)).join(", ")} /><PrimaryOccupationPicker id="quick-start-primary-occupation" positions={selectedRoles.map(role=>role.role)} selections={selectedRoles.map(item => ({departmentId: item.departmentId, roleId: `${item.departmentId}/${encodeURIComponent(item.role)}`}))} additionalValue={draft.additionalOccupation ?? null} onAdditionalChange={value=>update("additionalOccupation", value)} value={draft.primaryOccupation ?? null} onChange={value=>update("primaryOccupation", value)} /><ReviewRow label={t("place")} value={[draft.personCity, draft.personCountry].filter(Boolean).join(", ")} /><p className="rounded-xl border border-amber-400/25 bg-amber-500/5 p-3 text-xs leading-5 text-text-muted">{t("copy86")}</p></ReviewSection>
             <ReviewSection title={t("copy87")} onEdit={() => editReview("intro", draft.intents.includes("crew") ? "crew" : "talent")}>{draft.sections.crew?.imageUrl && <Image src={draft.sections.crew.imageUrl} alt={t("copy22")} width={240} height={240} className="h-20 w-20 rounded-xl object-cover" />}{draft.sections.talent?.imageUrl && <Image src={draft.sections.talent.imageUrl} alt={t("copy22")} width={240} height={240} className="h-20 w-20 rounded-xl object-cover" />}<ReviewRow label={t("introduction")} value={draft.talentIntro} /></ReviewSection>
           </>}
           {draft.intents.filter((intent): intent is "location" | "equipment" => (intent === "location" || intent === "equipment") && !draft.sections[intent]?.offerLater).map((intent) => { const data = draft.sections[intent] ?? createQuickStartIntentData(); const categoryName = intent === "equipment" ? marketplaceCategoryLabel(data.category,marketCatalog) : QUICK_START_CATEGORIES[intent].find((item) => item.value === data.category)?.label ?? data.category; return <div key={intent} className="space-y-3"><ReviewSection title={t(`${intent}Intent`)} onEdit={() => editReview("details", intent)}><ReviewRow label={t("kind")} value={taxonomyLabel(categoryName, uiText)} /><ReviewRow label={t("listing")} value={data.title} /><ReviewRow label={t("place")} value={data.city} /></ReviewSection><ReviewSection title={uiText("Ui.text_de70e79498ecb6", { value1: String(t(`${intent}Intent`)) })} onEdit={() => editReview("intro", intent)}>{data.description && <ReviewRow label={t("description")} value={data.description} />}<ReviewRow label={t("copy41")} value={listingPriceLabel(Number(data.price), {price_on_request:data.priceOnRequest,price_negotiable:data.priceNegotiable}, undefined, locale, uiPriceText)} />{data.imageUrl && <Image src={data.imageUrl} alt={t("copy90")} width={720} height={480} sizes="(max-width: 640px) 100vw, 640px" className="max-h-40 w-full rounded-lg object-contain" />}<p className="rounded-xl border border-border bg-bg-primary p-3 text-xs leading-5 text-text-muted">{t("copy91")}</p></ReviewSection></div>; })}

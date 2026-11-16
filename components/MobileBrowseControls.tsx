@@ -3,6 +3,7 @@
 import { ArrowUpDown,Search,SlidersHorizontal,X } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { isValidElement,useEffect,useRef,useState,type ReactNode } from "react";
+import BrowseSelect from "@/components/BrowseSelect";
 import BrowseResultCount from "@/components/BrowseResultCount";
 
 
@@ -92,13 +93,8 @@ export default function MobileBrowseControls({
 
         <div className="mobile-browse-controls__row">
           <button type="button" className="mobile-browse-action" onClick={() => setOpen(true)} aria-haspopup="dialog" aria-expanded={open}>{uiText.rich("Ui.text_91811d44ec1fe7", { part1: () => (<SlidersHorizontal size={16} />), part2: chunks => (<span>{chunks}</span>), value3: () => (filterCount > 0 && <span className="mobile-browse-count">{filterCount}</span>) })}</button>
-          <label className="mobile-browse-sort">
-            <ArrowUpDown size={15} aria-hidden="true" />
-            <span className="sr-only">{uiText("creators.sort")}</span>
-            <select value={sortValue} onChange={(event) => onSortChange(event.target.value)}>
-              {sortOptions.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}
-            </select>
-          </label>
+          <BrowseSelect label={uiText("creators.sort")} value={sortValue} options={sortOptions} onChange={onSortChange}
+            icon={<ArrowUpDown size={15} />} className="flex-1" triggerClassName="mobile-browse-sort w-full text-left" />
           {preference}
         </div>
 

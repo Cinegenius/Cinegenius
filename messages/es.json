@@ -1246,7 +1246,20 @@
     "choose": "Elegir profesión principal",
     "hint": "Tu profesión principal se destaca en tu perfil. Apareces en el directorio en todas las profesiones y departamentos seleccionados.",
     "legacy": "Tus profesiones aún no tienen una principal definida. Elige una aquí; se conservan las demás.",
-    "empty": "Elige una profesión del catálogo. Se conservan tus datos actuales."
+    "empty": "Elige una profesión del catálogo. Se conservan tus datos actuales.",
+    "focusExplanation": "En tus tarjetas aparecen 1 ocupación principal y hasta 2 secundarias. Puedes añadir 1 más para tu perfil y las búsquedas. Todo se puede cambiar después.",
+    "additional": "Ocupación adicional (opcional)",
+    "secondary": "Ocupaciones secundarias",
+    "noAdditional": "Sin ocupación adicional",
+    "chooseAdditional": "Elige una ocupación adicional",
+    "additionalHint": "Solo en los detalles del perfil y las búsquedas, no en tus tarjetas.",
+    "legacyFocus": "Tus datos actuales se conservan. Al cambiar tus ocupaciones, elige como máximo 1 principal, 2 secundarias y 1 adicional.",
+    "limit": "Puedes elegir 1 ocupación principal, hasta 2 secundarias y 1 adicional. Elimina una selección primero.",
+    "mainRequired": "Elige una ocupación principal entre las seleccionadas.",
+    "additionalRequired": "Elige cuál de las cuatro ocupaciones aparecerá solo en los detalles del perfil y las búsquedas.",
+    "invalidAdditional": "La ocupación adicional debe estar seleccionada y ser distinta de la principal.",
+    "invalidSelection": "Elige ocupaciones válidas del catálogo.",
+    "additionalTitle": "Actividad adicional"
   },
   "legalLanguage": {
     "original": "La versión original en alemán de estos textos legales es la vinculante. Las traducciones se facilitan para su comprensión."

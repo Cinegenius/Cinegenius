@@ -53,6 +53,7 @@ export type ServerCreator = {
   name: string;
   role: string;
   positions: string[];
+  displayPositions?: string[];
   primaryOccupation?: PrimaryOccupation | null;
   occupationIds?: string[];
   location: string;
@@ -90,6 +91,10 @@ export type ServerCreator = {
 function getPositions(c: ServerCreator): string[] {
   if (Array.isArray(c.positions) && c.positions.length > 0) return c.positions;
   return [c.role];
+}
+
+function getDisplayPositions(c: ServerCreator): string[] {
+  return (c.displayPositions ?? getPositions(c)).slice(0, 3);
 }
 
 function hasProfileType(c: ServerCreator, ...types: string[]): boolean {
@@ -392,7 +397,7 @@ function CreatorsInner({
   const filtered = map.rows;
   const mapItems = useMemo(() => matching.map(creator => ({
     id: creator.id, title: creator.name, city: creator.location,
-    subtitle: getPositions(creator).map(label => taxonomyLabel(label, uiText)).join(" · "),
+    subtitle: getDisplayPositions(creator).map(label => taxonomyLabel(label, uiText)).join(" · "),
     href: creator.id.startsWith("listing_") ? `/creators/${encodeURIComponent(creator.id.slice(8))}` : `/profile/${encodeURIComponent(creator.id)}`,
     image: creator.image, focalPoint: creator.focal_point, lat: creator.lat, lng: creator.lng,
   })), [matching, uiText]);
@@ -587,7 +592,7 @@ function CreatorsInner({
               {(viewMode === "list" || viewMode === "map") && (
                 <div className="border border-border rounded-xl overflow-hidden bg-bg-secondary divide-y divide-border/50">
                   {crewVisible.map((c) => {
-                    const displayPositions = getPositions(c).map(label => taxonomyLabel(label, uiText));
+                    const displayPositions = getDisplayPositions(c).map(label => taxonomyLabel(label, uiText));
                     const href = c.id.startsWith("listing_") ? `/creators/${c.id.replace("listing_", "")}` : `/profile/${c.id}`;
                     return (
                       <Link key={c.id} href={href} suppressHydrationWarning
@@ -626,7 +631,7 @@ function CreatorsInner({
               {viewMode === "grid" && (
               <div className="grid grid-cols-2 lg:grid-cols-3 gap-2.5 sm:gap-3">
                 {crewVisible.map((c) => {
-                  const displayPositions = getPositions(c).map(label => taxonomyLabel(label, uiText));
+                  const displayPositions = getDisplayPositions(c).map(label => taxonomyLabel(label, uiText));
                   const href = c.id.startsWith("listing_") ? `/creators/${c.id.replace("listing_", "")}` : `/profile/${c.id}`;
                   const photo = crewPhotoInput(c);
                   return (
