@@ -26,7 +26,9 @@ configured CineGenius admins. Signing in or paying does not unlock it.
 ## Presentation
 
 Locations remains the default homepage search tab. Clicking Smart as a guest
-opens only the development notice. Members get a small static map followed by
+opens only the development notice with an invitation to sign in for the preview:
+“Smart ist noch in Entwicklung. Melde dich an und entdecke die Vorschau.”
+Members get a small static map followed by
 three illustrated steps: search wish, matching results, grouping by area. Direct
 Smart URLs show the same access-dependent state. No forced sign-in detour.
 

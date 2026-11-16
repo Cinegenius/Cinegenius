@@ -74,7 +74,7 @@ export default function HeroSearch() {
     <div className="w-full rounded-2xl border border-border bg-bg-primary/85 p-2 shadow-lg shadow-black/15 sm:p-3">
       <div className="relative">
         {showMemberHint && <div ref={hint} id={memberHintId} role="status" className="motion-safe:animate-[fadeIn_150ms_ease-out] absolute top-full left-0 z-20 mt-2 max-h-[min(26rem,60dvh)] w-[min(22rem,calc(100vw-3rem))] max-w-full overflow-y-auto overscroll-contain rounded-xl border border-border bg-bg-secondary px-3 py-3 text-xs font-medium text-text-primary shadow-lg shadow-black/15">
-          {uiText(isLoaded ? "UnifiedSearch.inDevelopment" : "common.loading")}
+          {uiText(!isLoaded ? "common.loading" : userId ? "UnifiedSearch.inDevelopment" : "UnifiedSearch.guestPreviewHint")}
           {isLoaded && userId && <SmartSearchPreview />}
         </div>}
         <div role="group" aria-label={uiText("home.heroSearchAction")} className="mb-2 flex flex-nowrap overflow-x-auto overscroll-x-contain [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">

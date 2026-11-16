@@ -31,7 +31,7 @@ export default function UnifiedSearchResults() {
   if (!isLoaded || !userId || serverAdminId !== userId || deniedUserId === userId) {
     return <main className="min-h-screen pt-16 pb-28 xl:pb-12"><div className="site-container py-7 sm:py-10">
       <h1 className="font-serif text-3xl text-text-primary sm:text-4xl">{t("title")}</h1>
-      <p role="status" className="mt-3 text-sm text-text-secondary">{isLoaded ? t("inDevelopment") : common("loading")}</p>
+      <p role="status" className="mt-3 text-sm text-text-secondary">{!isLoaded ? common("loading") : t(userId ? "inDevelopment" : "guestPreviewHint")}</p>
       {isLoaded && userId && <SmartSearchPreview />}
     </div></main>;
   }
