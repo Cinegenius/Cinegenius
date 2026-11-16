@@ -110,7 +110,7 @@ export default async function PropDetailPage({
   const displayProp={...prop,location:placeDisplay(placeReadFields(prop.location,prop,locale),prop.location,locale)};
   const jsonLd = {
     "@context": "https://schema.org",
-    "@type": "Product",
+    "@type": prop.pricing.marketplace?.mode === "service" ? "Service" : "Product",
     "name": prop.title,
     "description": ("description" in prop && prop.description) ? String(prop.description) : pageCopy("p_64b2907066bb", { value0: String(prop.category), value1: String(prop.condition), value2: String(prop.location) }),
     "image": prop.image || undefined,
@@ -119,7 +119,7 @@ export default async function PropDetailPage({
       "name": prop.vendor,
     },
     offers:listingStructuredOffers(prop.dailyRate,prop.pricing),
-    "itemCondition": prop.condition === "Neuwertig"
+    "itemCondition": prop.pricing.marketplace?.mode === "service" ? undefined : prop.condition === "Neuwertig"
       ? "https://schema.org/NewCondition"
       : "https://schema.org/UsedCondition",
   };

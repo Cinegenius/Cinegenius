@@ -3,7 +3,7 @@ export type ListingPriceMetadata = { marketplace?: MarketplaceOffer; price_negot
 export function listingPriceMetadata(value: unknown): ListingPriceMetadata {
   const data=value && typeof value==='object' && !Array.isArray(value) ? value as Record<string,unknown> : {};
   const market=data.marketplace && typeof data.marketplace==='object'&&!Array.isArray(data.marketplace)?data.marketplace as Record<string,unknown>:null;
-  const valid=market && ['rent','sale','both'].includes(String(market.mode)) && ['hour','day','week','month','project'].includes(String(market.unit)) && ['single','set','package'].includes(String(market.bundle)) && ['rent','sale'].every(kind=>['fixed','negotiable','request'].includes(String(market[`${kind}_mode`]))&&(market[`${kind}_price`]===null||(typeof market[`${kind}_price`]==='number'&&Number.isFinite(market[`${kind}_price`])))) && Array.isArray(market.fulfilment) && market.fulfilment.every(value=>['pickup','shipping','delivery'].includes(String(value))) && market.specs && typeof market.specs==='object'&&!Array.isArray(market.specs);
+  const valid=market && ['rent','sale','both','service'].includes(String(market.mode)) && ['hour','day','week','month','project'].includes(String(market.unit)) && ['single','set','package'].includes(String(market.bundle)) && ['rent','sale'].every(kind=>['fixed','negotiable','request'].includes(String(market[`${kind}_mode`]))&&(market[`${kind}_price`]===null||(typeof market[`${kind}_price`]==='number'&&Number.isFinite(market[`${kind}_price`])))) && Array.isArray(market.fulfilment) && market.fulfilment.every(value=>['pickup','shipping','delivery'].includes(String(value))) && market.specs && typeof market.specs==='object'&&!Array.isArray(market.specs);
   return {...(valid ? {marketplace:market as MarketplaceOffer}:{}),price_negotiable:data.price_negotiable===true,price_on_request:data.price_negotiable!==true && data.price_on_request===true,...(typeof data.rental_type==='string'?{rental_type:data.rental_type}:{})};
 }
 export function listingPriceLabel(price:number|null|undefined, metadata:unknown=null, unit='/Tag',locale='de-DE',translate?:(key:string)=>string):string {
@@ -30,11 +30,12 @@ export function listingPriceMetadataError(value:unknown,translate?:(key:string)=
 /** Search-engine prices describe the actual unit and never invent a zero-euro offer. */
 export function listingStructuredOffers(price:number|null|undefined,metadata:unknown):Record<string,unknown>[]|undefined {
   const flags=listingPriceMetadata(metadata),market=flags.marketplace;
-  const offer=(amount:number,kind:'rent'|'sale',unit='day')=>({
+  const offer=(amount:number,kind:'rent'|'sale'|'service',unit='day')=>({
     '@type':'Offer',price:amount,priceCurrency:'EUR',
-    businessFunction:kind==='sale'?'http://purl.org/goodrelations/v1#Sell':'http://purl.org/goodrelations/v1#LeaseOut',
-    priceSpecification:{'@type':'UnitPriceSpecification',price:amount,priceCurrency:'EUR',...(kind==='rent'?{unitCode:({hour:'HUR',day:'DAY',week:'WEE',month:'MON',project:'C62'} as Record<string,string>)[unit],...(unit==='project'?{unitText:'project'}:{})}:{})},
+    businessFunction:kind==='service'?'http://purl.org/goodrelations/v1#ProvideService':kind==='sale'?'http://purl.org/goodrelations/v1#Sell':'http://purl.org/goodrelations/v1#LeaseOut',
+    priceSpecification:{'@type':'UnitPriceSpecification',price:amount,priceCurrency:'EUR',...(kind!=='sale'?{unitCode:({hour:'HUR',day:'DAY',week:'WEE',month:'MON',project:'C62'} as Record<string,string>)[unit],...(unit==='project'?{unitText:'project'}:{})}:{})},
   });
+  if(market?.mode==='service'){const amount=market.rent_price;return market.rent_mode==='fixed'&&typeof amount==='number'&&amount>0?[offer(amount,'service',market.unit)]:undefined;}
   if(market){const offers=(['rent','sale'] as const).filter(kind=>market.mode===kind||market.mode==='both').flatMap(kind=>{const amount=market[`${kind}_price`];return market[`${kind}_mode`]==='fixed'&&typeof amount==='number'&&amount>0?[offer(amount,kind,market.unit)]:[];});return offers.length?offers:undefined;}
   return typeof price==='number'&&price>0&&!flags.price_negotiable&&!flags.price_on_request?[offer(price,flags.rental_type==='kauf'?'sale':'rent')]:undefined;
 }

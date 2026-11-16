@@ -1687,7 +1687,8 @@
       "catering": "Catering a zásobování",
       "sfx": "SFX a praktické efekty",
       "studio": "Studio, jeviště a pozadí",
-      "fahrzeuge": "Vozidla a mobilní jednotky"
+      "fahrzeuge": "Vozidla a mobilní jednotky",
+      "dienstleistungen": "Služby"
     },
     "subcategories": {
       "licht-quellen": "Světla a svítidla",
@@ -1805,7 +1806,16 @@
       "fahrzeuge-garderobe": "Garderobní a maskérské vozy",
       "fahrzeuge-catering": "Cateringová a zásobovací vozidla",
       "fahrzeuge-anhaenger": "Přívěsy a mobilní jednotky",
-      "fahrzeuge-other": "Další příslušenství"
+      "fahrzeuge-other": "Další příslušenství",
+      "dienstleistungen-kamera": "Kamera, Steadicam a fotografie",
+      "dienstleistungen-licht": "Osvětlení, obsluha pultu a grip",
+      "dienstleistungen-ton": "Zvuk a audio",
+      "dienstleistungen-kostuem-maske": "Kostýmy, masky a styling",
+      "dienstleistungen-handwerk": "Řemesla a stavba dekorací",
+      "dienstleistungen-produktion": "Produkce a služby pro štáb",
+      "dienstleistungen-postproduktion": "Postprodukce a obsah",
+      "dienstleistungen-catering": "Catering a stravování štábu",
+      "dienstleistungen-sonstige": "Další služby"
     }
   },
   "MarketplaceOffer": {
@@ -1888,13 +1898,20 @@
       "aperture": "Světelnost",
       "wheels": "Na kolečkách",
       "folding": "Skládací",
-      "capacity": "Kapacita"
+      "capacity": "Kapacita",
+      "service_equipment": "Vlastní technika a vybavení"
     },
     "loadError": "Nabídky se nepodařilo načíst. Zkuste to znovu.",
     "savingDraft": "Ukládání soukromého konceptu…",
     "privateNotice": "Nabídka zůstává soukromá. Později ji můžete výslovně zveřejnit. S nastaveným profilem není potřeba další schválení správce.",
     "fulfilment": "Předání",
-    "negotiableShort": "dohodou"
+    "negotiableShort": "dohodou",
+    "service": "Služba",
+    "servicePrice": "Honorář",
+    "serviceHint": "Nabídni své služby samostatně nebo prostřednictvím své firmy.",
+    "serviceUnit": "Účtovací jednotka",
+    "serviceOptional": "Volitelné podrobnosti služby",
+    "serviceIncluded": "Zahrnuté služby"
   },
   "OptionalMedia": {
     "optional": "Nepovinné",
@@ -7595,7 +7612,8 @@
     "priceMax": "Cena do",
     "priceHint": "Částka v eurech",
     "categoryOverview": "Prohlédnout kategorie",
-    "draftCleanupFailed": "Tvoje nabídka byla uložena. Dosavadní postup v průvodci se nepodařilo označit jako dokončený."
+    "draftCleanupFailed": "Tvoje nabídka byla uložena. Dosavadní postup v průvodci se nepodařilo označit jako dokončený.",
+    "service": "Služby"
   },
   "AnalyticsPrivacy": {
     "settings": "Nastavení analytiky",

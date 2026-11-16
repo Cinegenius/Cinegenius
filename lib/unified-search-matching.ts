@@ -4,7 +4,7 @@ import { placeCandidatesForLabel, placeReadFields } from "./places/catalog";
 import { countryCode, placeKey, placeCitySearchAliases } from "./places/core";
 import { publicMapPoint } from "./places/public-map-point";
 import { withinCrewRadius } from "./genie-search";
-import { DEPARTMENTS as marketplaceDepartments, deptValues, groupValues, SEARCH_SYNONYMS } from "./marketplaceCategories";
+import { DEPARTMENTS as marketplaceDepartments, deptValues, groupValues, marketplaceCategory, SEARCH_SYNONYMS } from "./marketplaceCategories";
 import continents from "./places/continents.json" with { type: "json" };
 import type { SearchPlace, SearchWish } from "./unified-search";
 import { isWholeAreaQuery } from "./unified-search-areas";
@@ -92,6 +92,11 @@ export function wishSearchTerms(wish: SearchWish, locale = "de", taxonomy?: (key
 export function wishMarketplaceCategories(query: string, t: (key: string) => string): string[] {
   const key = searchKey(query);
   const values: string[] = Object.entries(SEARCH_SYNONYMS).filter(([alias]) => searchKey(alias) === key).flatMap(([, values]) => values);
+  const service = marketplaceCategory(query);
+  if (service?.department === "dienstleistungen" && service.subcategory) {
+    const group = marketplaceDepartments.find(dept => dept.id === service.department)?.groups.find(group => group.id === service.subcategory);
+    if (group) values.push(...groupValues(group));
+  }
   // A broad costume request includes the current clothing group. A particular
   // hat, camera brand or vehicle must not expand to every sibling in its group.
   if (["kostum", "kostuem", "costume"].includes(key)) {

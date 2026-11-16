@@ -77,6 +77,7 @@ function getLocalizedGroups(translate: (key: string) => string): Group[] {
     color: "text-violet-400",
     border: "border-violet-500/30",
     items: [
+      { id: "mk_dienstleistungen", label: translate("MarketplaceOffer.service"), sub: translate("MarketplaceOffer.serviceHint"), icon: Wrench, type: "prop", category: "dienstleistungen", color: "text-gold", bg: "bg-gold/10 border-gold/20" },
       // Film Equipment
       { id: "mk_fahrzeuge",           label: translate("Ui.text_3013f219634d4b"),        sub: translate("Ui.text_bd3383ef531ec9"),       icon: Car,         type: "vehicle", category: "Bild-Fahrzeug",          color: "text-orange-400",  bg: "bg-orange-500/10 border-orange-500/20" },
       { id: "mk_produktionsfahrzeug", label: translate("Ui.text_b1ea23191f1202"), sub: translate("Ui.text_08478634222825"),     icon: Truck,       type: "vehicle", category: "Produktionsfahrzeug",     color: "text-cyan-400",    bg: "bg-cyan-500/10 border-cyan-500/20" },
