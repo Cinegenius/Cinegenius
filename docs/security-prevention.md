@@ -23,6 +23,8 @@ These rules record the lessons from the targeted check of 15 November 2026. They
 
 ## Verification and handoff
 
+- Public notices describe actual data processing and required AI/content disclosures, not inactive diagnostic configuration or development tooling. Before enabling a prepared service such as Sentry, review its data processing, notice and consent requirements. Keep optional framework-identification headers disabled; this does not make the underlying technology unidentifiable or replace access controls.
+
 - Run focused regression tests on the affected behavior. Use disposable synthetic data for destructive or cross-account checks; never silently run those tests against customer data.
 - Check dependencies against current advisories without silently upgrading or applying automatic fixes. Zero published advisories is not a claim that application logic is secure.
 - Record the exact reviewed revision, checks, failures and gaps. Unit tests, an in-memory database, public HTTP checks and actual authenticated device tests provide different evidence; do not describe one as another. A blocked deep scan is not a completed scan.

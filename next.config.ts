@@ -7,6 +7,7 @@ import { staticImagePatterns, PUBLIC_SUPABASE_IMAGE_PATTERNS } from "./lib/image
 const withNextIntl = createNextIntlPlugin("./i18n.ts");
 
 const nextConfig: NextConfig = {
+  poweredByHeader: false,
   redirects: () => [
     { source: "/locations/suche", destination: "/locations", permanent: true },
     ...getPublicIconRedirects(),

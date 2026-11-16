@@ -20,7 +20,6 @@ export default async function DatenschutzPage() {
     "Supabase": uiText("Ui.text_fe7ceb7816ed0e"),
     "Vercel": uiText("Ui.text_68edc75c015e2e"),
     "Stripe": uiText("Ui.text_961a6062ba1ba2"),
-    "Sentry": uiText("Ui.text_5ece526b2e72c2"),
     "Resend": uiText("Ui.text_1f94843777aed8"),
     "Vercel Analytics": uiText("Ui.text_3f1ff89269fcea"),
     "Vercel Speed Insights": uiText("Ui.text_52862c368ba698"),
@@ -87,7 +86,6 @@ export default async function DatenschutzPage() {
                     ["Supabase", "Datenbank & Dateispeicher", "EU (Frankfurt)"],
                     ["Vercel", "Hosting & CDN", "USA"],
                     ["Stripe", "Zahlungsabwicklung", "USA"],
-                    ["Sentry", t("sentryPurpose"), "USA"],
                     ["Resend", "E-Mail-Versand", "USA"],
                     ["Vercel Analytics", "Nutzungsstatistiken (cookielos)", "USA"],
                     ["Vercel Speed Insights", "Performance-Messung (cookielos)", "USA"],
@@ -161,14 +159,6 @@ export default async function DatenschutzPage() {
           <section>
             <h2 className="text-base font-semibold text-text-primary mb-3">{uiText("Ui.text_e8909434900434")}</h2>
             <p>{uiText.rich("Ui.text_e671b124557fc3", { part1: chunks => (<strong className="text-text-primary">{chunks}</strong>), part2: () => (<br />), part3: chunks => (<a href="https://vercel.com/legal/privacy-policy" target="_blank" rel="noopener noreferrer" className="text-gold hover:underline">{chunks}</a>) })}</p>
-          </section>
-
-          <section>
-            <h2 className="text-base font-semibold text-text-primary mb-3">{uiText("Ui.text_65de63aa494e84")}</h2>
-            <p>
-              {t("sentryPrepared")}
-            </p>
-            <p className="mt-2">{uiText.rich("Ui.text_9ea859209bd02b", { value1: () => (t("replayDisabled")), part2: () => (<br />), part3: chunks => (<a href="https://sentry.io/privacy/" target="_blank" rel="noopener noreferrer" className="text-gold hover:underline">{chunks}</a>) })}</p>
           </section>
 
           <section>

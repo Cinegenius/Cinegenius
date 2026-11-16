@@ -13,10 +13,6 @@ export default async function AiTransparencyPage() {
   return <main className="min-h-screen pb-12">
     <PageHeader badge={t("badge")} title={t("title")} description={t("description")} />
     <div className="site-container space-y-6 py-6 sm:py-9">
-      <section aria-labelledby="ai-development" className="rounded-xl border border-border bg-bg-secondary p-5 sm:p-6">
-        <h2 id="ai-development" className="font-display text-xl font-bold text-text-primary">{t("developmentTitle")}</h2>
-        <p className="mt-3 max-w-3xl text-sm leading-7 text-text-secondary">{t("developmentBody")}</p>
-      </section>
       <section id="bilder" aria-labelledby="ai-images" className="scroll-mt-24 rounded-xl border border-border bg-bg-secondary p-5 sm:p-6">
         <h2 id="ai-images" className="font-display text-xl font-bold text-text-primary">{t("imagesTitle")}</h2>
         <p className="mt-3 max-w-3xl text-sm leading-7 text-text-secondary">{t("imagesBody")}</p>
