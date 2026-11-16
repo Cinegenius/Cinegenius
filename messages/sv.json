@@ -8205,6 +8205,7 @@
     "leadership": "Grundare och ledning"
   },
   "NewsRegion": {
+    "unassignedCountry": "Utan land",
     "countryLabel": "Land för branschnyheter",
     "automatic": "Automatiskt",
     "automaticCountry": "Automatiskt · {country}",

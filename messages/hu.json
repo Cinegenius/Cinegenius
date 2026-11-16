@@ -8205,6 +8205,7 @@
     "leadership": "Alapítók és vezetőség"
   },
   "NewsRegion": {
+    "unassignedCountry": "Ország nélkül",
     "countryLabel": "Az iparági hírek országa",
     "automatic": "Automatikus",
     "automaticCountry": "Automatikus · {country}",

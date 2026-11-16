@@ -8205,6 +8205,7 @@
     "leadership": "Gründung & Leitung"
   },
   "NewsRegion": {
+    "unassignedCountry": "Ohne Land",
     "countryLabel": "Land für Branchennews",
     "automatic": "Automatisch",
     "automaticCountry": "Automatisch · {country}",
