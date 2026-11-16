@@ -7532,7 +7532,8 @@
       "pricing": "Prijzen en voorwaarden",
       "privacy": "Privacy"
     },
-    "errorSearch": "De plaats of het beroep is niet duidelijk. Geef het beroep, de stad en zo nodig het land preciezer aan."
+    "errorSearch": "De plaats of het beroep is niet duidelijk. Geef het beroep, de stad en zo nodig het land preciezer aan.",
+    "errorInDevelopment": "Smart is nog in ontwikkeling."
   },
   "GenieWriting": {
     "open": "Schrijven met Genie",
@@ -8274,7 +8275,14 @@
     "quantityNotice": "Het aantal is je behoefte, geen bevestigde beschikbaarheid.",
     "refineSearch": "Zoekopdracht verfijnen",
     "refineHint": "Voeg een wens toe of wijzig specifieke plaatsen en eisen.",
-    "restartContext": "Doorgaan met deze filters"
+    "restartContext": "Doorgaan met deze filters",
+    "inDevelopment": "Smart is nog in ontwikkeling.",
+    "previewLabel": "Voorbeeld · Voorproefje",
+    "previewMapAlt": "Schematische voorbeeldkaart met crew, locaties, marktplaats en bedrijven.",
+    "previewWish": "Je zoekwens",
+    "previewMatches": "Passende resultaten",
+    "previewSorted": "Per onderdeel",
+    "previewNote": "Zo zal Smart je zoekopdracht samenbrengen. De afbeelding toont geen echte advertenties."
   },
   "PublicReport": {
     "metaTitle": "Juridisch probleem melden",

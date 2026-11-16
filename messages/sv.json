@@ -7532,7 +7532,8 @@
       "pricing": "Priser och villkor",
       "privacy": "Integritet"
     },
-    "errorSearch": "Platsen eller yrket är otydligt. Ange yrket, staden och vid behov landet mer exakt."
+    "errorSearch": "Platsen eller yrket är otydligt. Ange yrket, staden och vid behov landet mer exakt.",
+    "errorInDevelopment": "Smart är fortfarande under utveckling."
   },
   "GenieWriting": {
     "open": "Skriv med Genie",
@@ -8274,7 +8275,14 @@
     "quantityNotice": "Antalet är ditt behov, inte bekräftad tillgänglighet.",
     "refineSearch": "Förfina sökningen",
     "refineHint": "Lägg till ett önskemål eller ändra specifika platser och krav.",
-    "restartContext": "Fortsätt med dessa filter"
+    "restartContext": "Fortsätt med dessa filter",
+    "inDevelopment": "Smart är fortfarande under utveckling.",
+    "previewLabel": "Förhandsvisning · Exempel",
+    "previewMapAlt": "Schematisk exempelkarta med team, inspelningsplatser, marknadsplats och företag.",
+    "previewWish": "Din sökning",
+    "previewMatches": "Relevanta träffar",
+    "previewSorted": "Efter område",
+    "previewNote": "Så kommer Smart att samla din sökning. Grafiken visar inga riktiga annonser."
   },
   "PublicReport": {
     "metaTitle": "Rapportera ett juridiskt problem",

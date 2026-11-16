@@ -112,3 +112,15 @@ Crew result row correction, 14 November 2026: Keep the compact count, Crew, Loca
 - Reuse `lib/profile-privacy.ts`, `lib/profile-privacy-server.ts` and `visibleLinkedProfileIds` for current request-scoped permissions. Project protected fields before serialization/geocoding/filtering. Public offer reads use `privacy_visible_listings` before counts and pagination; cached content/direct links require a fresh visibility check. Never share authorization decisions between requests.
 - Apply and verify `20261114180242_profile_privacy_controls.sql` before dependent Web/native releases. Settings are own-account only through `/api/user-settings`; errors or missing capability fields must not look like saved privacy choices. Native settings use the same contract in `docs/profile-privacy.md`.
 - Ghost is visibility control, not deletion or a promise to recall previously public Storage URLs/copies. Keep this limit explicit; retiring legacy originals requires the existing reviewed, journaled media cutover and cache retirement. Existing shared messages and participant transaction records remain accessible under their existing rules.
+
+## Smart development preview (operator decision, 16 November 2026)
+
+- Smart is temporarily admin-only, including Genie search planning, direct links,
+  results, maps and pagination. Enforce the existing server admin allowlist;
+  ordinary membership, personal AI quota and client claims grant no access.
+- Other members see only a clearly labeled static example: a small schematic
+  map and a graphic explanation underneath. Guests see the development notice.
+  Reuse existing Smart area colors; load no real results or map services for the
+  preview. Keep ordinary search and Genie's general help/writing available.
+- Preserve Locations as the homepage default and the existing shared design.
+  See `docs/smart-development-preview.md` for the API/native contract and limits.

@@ -7532,7 +7532,8 @@
       "pricing": "Precios y condiciones",
       "privacy": "Privacidad"
     },
-    "errorSearch": "El lugar o la profesión no están claros. Indica la profesión, la ciudad y, si hace falta, el país."
+    "errorSearch": "El lugar o la profesión no están claros. Indica la profesión, la ciudad y, si hace falta, el país.",
+    "errorInDevelopment": "Smart todavía está en desarrollo."
   },
   "GenieWriting": {
     "open": "Redactar con Genie",
@@ -8274,7 +8275,14 @@
     "quantityNotice": "La cantidad indica tu necesidad, no disponibilidad confirmada.",
     "refineSearch": "Afinar búsqueda",
     "refineHint": "Añade una petición o cambia lugares y requisitos concretos.",
-    "restartContext": "Continuar con estos filtros"
+    "restartContext": "Continuar con estos filtros",
+    "inDevelopment": "Smart todavía está en desarrollo.",
+    "previewLabel": "Vista previa · Ejemplo",
+    "previewMapAlt": "Mapa ilustrativo con equipo, localizaciones, mercado y empresas.",
+    "previewWish": "Tu búsqueda",
+    "previewMatches": "Resultados relevantes",
+    "previewSorted": "Por secciones",
+    "previewNote": "Así reunirá Smart tu búsqueda. El gráfico no muestra anuncios reales."
   },
   "PublicReport": {
     "metaTitle": "Denunciar un problema legal",

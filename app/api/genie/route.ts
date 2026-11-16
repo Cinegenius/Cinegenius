@@ -3,7 +3,6 @@ import { getCurrentUser } from "@/lib/auth";
 import { validateGenieRequest } from "@/lib/genie";
 import { GenieError, genieConfiguration, generateGenieAdvice, readGenieBody, reserveGenieUsage } from "@/lib/genie-server";
 import { trustedMutationOrigin } from "@/lib/request-origin";
-import { unifiedSearchAccess } from "@/lib/unified-search-access";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -23,10 +22,11 @@ export async function POST(request: NextRequest) {
   })) return json({ error: "invalid_request" }, 403);
   try {
     const currentUser = await getCurrentUser();
-    if (!currentUser?.userId || !unifiedSearchAccess(currentUser.userId).canInterpret) return json({ error: "unauthorized" }, 401);
+    if (!currentUser?.userId) return json({ error: "unauthorized" }, 401);
     const config = genieConfiguration(currentUser.userId);
     const validated = validateGenieRequest(await readGenieBody(request));
     if (!validated.ok) return json({ error: validated.error }, 400);
+    if (validated.value.searchContext && !config.smartSearch) return json({ error: "in_development" }, 403);
     await reserveGenieUsage(request, currentUser.userId, config);
     return json(await generateGenieAdvice(request, validated.value, config));
   } catch (error) {

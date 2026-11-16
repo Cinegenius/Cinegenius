@@ -7532,7 +7532,8 @@
       "pricing": "Preise & Konditionen",
       "privacy": "Datenschutz"
     },
-    "errorSearch": "Ort oder Beruf sind nicht eindeutig. Bitte nenne den Beruf, die Stadt und gegebenenfalls das Land genauer."
+    "errorSearch": "Ort oder Beruf sind nicht eindeutig. Bitte nenne den Beruf, die Stadt und gegebenenfalls das Land genauer.",
+    "errorInDevelopment": "Smart ist noch in Entwicklung."
   },
   "GenieWriting": {
     "open": "Mit Genie formulieren",
@@ -8274,7 +8275,14 @@
     "quantityNotice": "Die Anzahl ist dein Bedarf, keine bestätigte Verfügbarkeit.",
     "refineSearch": "Suche verfeinern",
     "refineHint": "Ergänze einen Wunsch oder ändere gezielt Ort und Anforderungen.",
-    "restartContext": "Mit diesen Filtern fortsetzen"
+    "restartContext": "Mit diesen Filtern fortsetzen",
+    "inDevelopment": "Smart ist noch in Entwicklung.",
+    "previewLabel": "Vorschau · Beispiel",
+    "previewMapAlt": "Schematische Beispielkarte mit Crew, Locations, Marktplatz und Firmen.",
+    "previewWish": "Dein Suchwunsch",
+    "previewMatches": "Passende Treffer",
+    "previewSorted": "Nach Bereichen sortiert",
+    "previewNote": "So führt Smart künftig deine Suche zusammen. Die Grafik zeigt keine echten Angebote."
   },
   "PublicReport": {
     "metaTitle": "Rechtsverstoß melden",

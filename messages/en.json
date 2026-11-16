@@ -7532,7 +7532,8 @@
       "pricing": "Pricing & terms",
       "privacy": "Privacy"
     },
-    "errorSearch": "The place or occupation is unclear. Please specify the occupation, city and, if needed, country."
+    "errorSearch": "The place or occupation is unclear. Please specify the occupation, city and, if needed, country.",
+    "errorInDevelopment": "Smart is still in development."
   },
   "GenieWriting": {
     "open": "Write with Genie",
@@ -8274,7 +8275,14 @@
     "quantityNotice": "Quantity is your requirement, not confirmed availability.",
     "refineSearch": "Refine search",
     "refineHint": "Add a wish or change specific places and requirements.",
-    "restartContext": "Continue with these filters"
+    "restartContext": "Continue with these filters",
+    "inDevelopment": "Smart is still in development.",
+    "previewLabel": "Preview · Example",
+    "previewMapAlt": "Illustrative map showing crew, locations, marketplace and companies.",
+    "previewWish": "Your search",
+    "previewMatches": "Matching results",
+    "previewSorted": "Grouped by area",
+    "previewNote": "This is how Smart will bring your search together. The graphic does not show real listings."
   },
   "PublicReport": {
     "metaTitle": "Report a legal issue",
