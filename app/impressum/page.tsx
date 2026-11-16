@@ -40,9 +40,9 @@ export default function ImpressumPage() {
                 { name: uiText("SiteContacts.markusName"), email: "markus@cinegenius.co" },
                 { name: uiText("SiteContacts.mathiasName"), email: "mathias@cinegenius.co" },
               ].map(contact => (
-                <p key={contact.email} className="flex flex-wrap gap-x-2">
+                <p key={contact.email} className="flex flex-wrap items-center gap-x-2">
                   <span>{contact.name}</span>
-                  <a href={`mailto:${contact.email}`} className="text-gold hover:underline">{contact.email}</a>
+                  <a href={`mailto:${contact.email}`} className="inline-flex min-h-11 items-center text-gold hover:underline">{contact.email}</a>
                 </p>
               ))}
             </div>
