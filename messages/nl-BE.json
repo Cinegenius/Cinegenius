@@ -8205,6 +8205,7 @@
     "leadership": "Oprichters en leiding"
   },
   "NewsRegion": {
+    "unassignedCountry": "Geen land",
     "countryLabel": "Land voor sectornieuws",
     "automatic": "Automatisch",
     "automaticCountry": "Automatisch · {country}",

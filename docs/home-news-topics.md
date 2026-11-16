@@ -16,6 +16,13 @@ Organisationen gezeigt, keine Vorschau-Beispiele oder privaten Artikelentwürfe.
   drei Beiträge. Nach dem Indexlesen werden beide Freigaben beim Inhaltsabruf
   erneut geprüft; es gibt keinen requestübergreifenden Berechtigungscache.
 - „Alle Beiträge ansehen“ übernimmt Land und Thema in `/news?country=…&topic=…`.
+- Die gemeinsame Länderwahl auf Startseite und Newsseite zeigt `unassigned`
+  als erste Option mit der kurzen Beschriftung „Ohne Land“ (lokalisiert über
+  `NewsRegion.unassignedCountry`). Danach folgen Automatik, alle Länder und die
+  alphabetisch sortierten Länder. Die Option erscheint nur mit passenden
+  Beiträgen oder deaktiviert als erhaltene, inzwischen leere Auswahl. Der aktive
+  Filter verwendet dieselbe kurze Beschriftung. Der Wert bleibt `unassigned`;
+  er bedeutet keine bestätigte weltweite Verfügbarkeit oder neue Zielregion.
 - Die explizite Themenwahl liegt wie die Länderwahl in einem kontogebundenen
   Einstellungs-Cookie (`cg_news_topic_<scope>`). Gäste haben einen eigenen Scope.
   Es werden keine Suchhistorie, Profilangaben oder Besucherdaten gespeichert.
