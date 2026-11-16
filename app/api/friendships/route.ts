@@ -7,13 +7,19 @@ import { canonicalContactConnections, contactUserId, publicContactConnection, ty
 import { contactJson, mutateContact } from "@/lib/contact-mutations";
 import { NextRequest, NextResponse } from "next/server";
 import { getTranslations } from "next-intl/server";
+import { FRIENDSHIPS_V1, nativeReadGuard, privateNativeResponse } from '@/lib/native-contact-contract';
+import { friendOccupations, readFriendFavorites } from '@/lib/native-friends';
 
 export async function GET(req: NextRequest) {
   const member = await requireAuth();
-  if (member instanceof NextResponse) return member;
+  if (member instanceof NextResponse) return privateNativeResponse(member);
   const t = await getTranslations("Contacts");
   const actor = member.userId;
+  const nativeError = nativeReadGuard(req, actor, FRIENDSHIPS_V1, t);
+  if (nativeError) return nativeError;
+  const native = req.headers.get('X-CineGenius-Native-Contract') === FRIENDSHIPS_V1;
   const target = req.nextUrl.searchParams.get("userId");
+  if (native && target) return contactJson({error: t('invalid'), code: 'invalid'}, 400);
   if (target && !contactUserId.test(target)) return contactJson({ error: t("invalid") }, 400);
   if (target) {
     if (await anyBlockExists(actor, target)) return contactJson({ error: t("unavailable") }, 403);
@@ -35,9 +41,19 @@ export async function GET(req: NextRequest) {
   const ids = list.map(otherId);
   const visible = await visibleLinkedProfileIds(ids, actor);
   const { data: profiles, error: profileError } = visible.size
-    ? await db.from("profiles").select("user_id,display_name,avatar_url,role,positions").in("user_id", [...visible])
+    ? native
+      ? await db.from("profiles").select("user_id,display_name,avatar_url,role,positions,crew").in("user_id", [...visible])
+      : await db.from("profiles").select("user_id,display_name,avatar_url,role,positions").in("user_id", [...visible])
     : { data: [], error: null };
   if (profileError) return contactJson({ error: t("error") }, 503);
+  let favorites: Awaited<ReturnType<typeof readFriendFavorites>> | undefined;
+  if (native) {
+    try {
+      favorites = await readFriendFavorites(actor);
+      // A removal between the two reads must not masquerade as a saved false preference.
+      if (favorites.read && list.some(row => row.status === 'accepted' && !favorites!.values.has(row.id))) throw new Error('contact_changed');
+    } catch { return contactJson({error: t('error'), code: 'unavailable'}, 503); }
+  }
   const profileMap = new Map((profiles ?? []).map(profile => [profile.user_id, profile]));
   const enrich = (row: ContactConnection) => {
     const id = otherId(row), profile = profileMap.get(id), sender = row.sender_id === actor;
@@ -46,9 +62,15 @@ export async function GET(req: NextRequest) {
       role: profile?.role || profile?.positions?.[0] || t("member"), created_at: row.created_at,
       collab_label: (sender ? row.sender_collab_label : row.receiver_collab_label) ?? null,
       collab_public: (sender ? row.sender_collab_public : row.receiver_collab_public) ?? false,
+      ...(native ? {profile_visible: !!profile, ...friendOccupations(profile), ...(row.status === 'accepted' && favorites?.read ? {is_favorite: favorites.values.get(row.id)} : {})} : {}),
     };
   };
   return contactJson({
+    ...(native ? {contract: FRIENDSHIPS_V1, accountId: actor, capabilities: {
+      canonicalOccupations: true, avatarReferences: true,
+      favoriteFriendsRead: favorites?.read === true, favoriteFriendsWrite: favorites?.write === true,
+      messageOpenV1: true, explicitIdempotentMessageSend: true,
+    }} : {}),
     friends: list.filter(row => row.status === "accepted").map(enrich),
     incoming: list.filter(row => row.status === "pending" && row.receiver_id === actor).map(enrich),
     outgoing: list.filter(row => row.status === "pending" && row.sender_id === actor).map(enrich),
