@@ -9,6 +9,7 @@ import FloatingMapToggle from "@/components/FloatingMapToggle";
 import ListingImage from "@/components/ListingImage";
 import MobileBrowseControls,{ MobileFilterField,MobileFilterSelect,type BrowseChip } from "@/components/MobileBrowseControls";
 import BrowseResultCount from "@/components/BrowseResultCount";
+import BrowseSelect from "@/components/BrowseSelect";
 import PageHeader from "@/components/PageHeader";
 import DirectoryPage from "@/components/DirectoryPage";
 import PlaceFilters,{ EMPTY_PLACE_FILTERS,type PlaceFilterValue } from "@/components/PlaceFilters";
@@ -154,7 +155,7 @@ export default function LocationsLanding({ allLocations, totalCount, initialFilt
     </div>
     <div className="flex flex-wrap items-end gap-3">
       <button type="button" disabled={nearby.locating} onClick={nearby.coordinates ? clearLocation : locateMe} className="inline-flex min-h-11 items-center gap-2 rounded-lg border border-border px-3 text-sm text-text-secondary disabled:opacity-60"><Navigation size={16} aria-hidden="true" />{t(nearby.locating ? "locating" : nearby.coordinates ? "locateActive" : "locateMe")}</button>
-      {nearby.coordinates && <MobileFilterField label={t("radiusLabel")}><select aria-label={t("radiusLabel")} value={radiusKm} onChange={event => setRadiusKm(Number(event.target.value))}>{[10,25,50,100,200,500].map(value => <option key={value} value={value}>{uiText.rich("Ui.text_6b06beb2a825c0", {value1: () => value})}</option>)}</select></MobileFilterField>}
+      {nearby.coordinates && <MobileFilterField label={t("radiusLabel")}><BrowseSelect label={t("radiusLabel")} value={String(radiusKm)} onChange={value => setRadiusKm(Number(value))} triggerClassName="browse-filter-select" options={[10,25,50,100,200,500].map(value => ({value: String(value), label: uiText.markup("Ui.text_6b06beb2a825c0", {value1: () => String(value)})}))} /></MobileFilterField>}
       <button type="button" onClick={shareSearch} className="inline-flex min-h-11 items-center gap-2 rounded-lg border border-border px-3 text-sm text-text-secondary"><Share2 size={16} aria-hidden="true" />{t(copied ? "copied" : "shareBtn")}</button>
     </div>
     {nearby.error && <p role="alert" className="text-sm text-text-secondary">{t(nearby.error)}</p>}

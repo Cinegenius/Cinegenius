@@ -4,10 +4,10 @@ import { useLayoutEffect, useRef, type ReactNode, type RefObject } from "react";
 import { createPortal } from "react-dom";
 import { floatingPanelPosition } from "@/lib/floating-panel-position";
 
-/** Body portal escapes clipped and isolated headers while retaining the original trigger. */
-export default function FloatingPanel({ anchorRef, onClose, children, className = "", width = 208, align = "right", matchAnchorWidth = false, id, label }: {
+/** Escape clipped parents, staying inside the active modal's top layer when present. */
+export default function FloatingPanel({ anchorRef, onClose, children, className = "", width = 208, align = "right", matchAnchorWidth = false, id, label, portalRoot }: {
   anchorRef: RefObject<HTMLElement | null>; onClose: () => void; children: ReactNode;
-  className?: string; width?: number; align?: "left" | "right"; matchAnchorWidth?: boolean; id?: string; label?: string;
+  className?: string; width?: number; align?: "left" | "right"; matchAnchorWidth?: boolean; id?: string; label?: string; portalRoot?: HTMLElement | null;
 }) {
   const panelRef = useRef<HTMLDivElement>(null);
   const closeRef = useRef(onClose);
@@ -54,7 +54,7 @@ export default function FloatingPanel({ anchorRef, onClose, children, className 
       if (event.target instanceof Node && !panel.contains(event.target) && !anchor.contains(event.target)) closeRef.current();
     };
     const escape = (event: KeyboardEvent) => {
-      if (event.key === "Escape") { event.preventDefault(); closeRef.current(); anchor.focus({ preventScroll: true }); }
+      if (event.key === "Escape" && !event.defaultPrevented) { event.preventDefault(); closeRef.current(); anchor.focus({ preventScroll: true }); }
     };
     document.addEventListener("pointerdown", outside);
     document.addEventListener("focusin", outside);
@@ -68,7 +68,9 @@ export default function FloatingPanel({ anchorRef, onClose, children, className 
   }, [anchorRef]);
 
   if (typeof document === "undefined") return null;
+  // A body portal is inert behind showModal(). A sibling inside the dialog
+  // remains clickable without being clipped by the filter panel's scroll area.
   return createPortal(<div ref={panelRef} id={id} role={label ? "group" : undefined} aria-label={label}
     style={{ position: "fixed", visibility: "hidden", width }}
-    className={`z-[80] overflow-y-auto overscroll-contain ${className}`}>{children}</div>, document.body);
+    className={`z-[80] overflow-y-auto overscroll-contain ${className}`}>{children}</div>, portalRoot ?? document.body);
 }

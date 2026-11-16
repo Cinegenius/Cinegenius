@@ -135,6 +135,10 @@ Crew result row correction, 14 November 2026: Keep the compact count, Crew, Loca
 - Directory sort menus and homepage news country/topic selectors use
   `components/BrowseSelect.tsx`, with the shared subtle translucent lime popup,
   keyboard support and 44px options. Keep existing page layouts and filter choices.
+  Header search, directory filter dialogs and their category/place/detail choices
+  use the same `browse-popup-surface` treatment. Nested selection popups must stay
+  in the modal's top layer, with Escape closing the selection before the filter
+  dialog. See `docs/browse-selection-menus.md`.
 - New application emails use `lib/email-layout.ts` and the existing localized
   content. Preserve token links, unsubscribe choices, recipient language and
   delivery/idempotency checks. Provider-managed authentication/billing templates
