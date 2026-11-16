@@ -8275,5 +8275,80 @@
     "refineSearch": "Refine search",
     "refineHint": "Add a wish or change specific places and requirements.",
     "restartContext": "Continue with these filters"
+  },
+  "PublicReport": {
+    "metaTitle": "Report a legal issue",
+    "metaDescription": "Report problematic or allegedly illegal content on CineGenius.",
+    "badge": "Report",
+    "title": "Report content on CineGenius",
+    "description": "Use this form when a specific public item on CineGenius appears illegal or problematic.",
+    "formTitle": "Report form",
+    "footerLink": "Report content",
+    "submit": "Send report",
+    "sending": "Sending report ...",
+    "success": "Thank you. The report was sent to CineGenius in a structured form. Without an email address, we cannot send a receipt.",
+    "successWithReceipt": "Thank you. The report was sent and a receipt email has been delivered.",
+    "imprintLink": "Legal notice and contact",
+    "fields": {
+      "target": "CineGenius location",
+      "category": "Report type",
+      "details": "Reason",
+      "name": "Name",
+      "email": "Email for follow-up"
+    },
+    "placeholders": {
+      "target": "https://www.cinegenius.co/... or /profile/...",
+      "details": "Briefly describe which content is affected and why you are reporting it."
+    },
+    "hints": {
+      "target": "Please name a specific CineGenius URL or path. General support questions belong in support.",
+      "details": "At least 20 characters. Please do not upload or copy illegal files again.",
+      "email": "Optional. With an email address, we can confirm receipt and ask follow-up questions."
+    },
+    "goodFaith": "I confirm that this report is correct and complete to the best of my knowledge.",
+    "categories": {
+      "illegal_content": "Allegedly illegal content",
+      "rights": "Copyright, image or personality rights",
+      "fraud": "Fraud, false offer or impersonation",
+      "harassment": "Harassment, hate or threats",
+      "child_safety": "Protection of minors",
+      "other": "Other issue"
+    },
+    "errors": {
+      "invalid": "This request could not be accepted.",
+      "rateLimited": "Too many reports were sent. Please try again later.",
+      "target": "Please enter a valid CineGenius location.",
+      "category": "Please choose a valid category.",
+      "details": "Please describe the report with at least 20 characters.",
+      "email": "Please check the email address or leave the field empty.",
+      "goodFaith": "Please confirm the accuracy of your information.",
+      "send": "The report could not be delivered right now. Please try again later or use the email address in the legal notice.",
+      "network": "The connection was interrupted. Please try again."
+    },
+    "side": {
+      "title": "Small and manageable",
+      "body": "The report goes in structured form to the CineGenius operator mailbox. We review it manually and reply if you provide contact details.",
+      "noFilesTitle": "Do not redistribute files",
+      "noFilesBody": "Please do not send illegal or confidential files through the form. A precise location and description are enough for the first review."
+    }
+  },
+  "PublicReportEmail": {
+    "subject": "Receipt of your CineGenius report",
+    "heading": "We have received your report",
+    "intro": "Thank you for your report. We will manually review the named content.",
+    "reference": "Reference: {reference}",
+    "next": "If follow-up questions are needed or we can share a decision, we will reply to this email address.",
+    "footer": "You receive this email because you reported content through CineGenius.",
+    "operator": {
+      "subject": "CineGenius report: {category}",
+      "heading": "New public report",
+      "reference": "Reference: {reference}",
+      "target": "Reported content: {target}",
+      "category": "Category: {category}",
+      "reporter": "Reporter: {reporter}",
+      "received": "Received: {date}",
+      "anonymous": "Not provided",
+      "footer": "Structured report submitted through CineGenius."
+    }
   }
 }

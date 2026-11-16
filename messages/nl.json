@@ -8275,5 +8275,80 @@
     "refineSearch": "Zoekopdracht verfijnen",
     "refineHint": "Voeg een wens toe of wijzig specifieke plaatsen en eisen.",
     "restartContext": "Doorgaan met deze filters"
+  },
+  "PublicReport": {
+    "metaTitle": "Juridisch probleem melden",
+    "metaDescription": "Meld problematische of vermoedelijk illegale inhoud op CineGenius.",
+    "badge": "Melding",
+    "title": "Inhoud op CineGenius melden",
+    "description": "Gebruik dit formulier als concrete openbare inhoud op CineGenius illegaal of problematisch lijkt.",
+    "formTitle": "Meldformulier",
+    "footerLink": "Inhoud melden",
+    "submit": "Melding verzenden",
+    "sending": "Melding wordt verzonden ...",
+    "success": "Dank je. De melding is gestructureerd naar CineGenius verzonden. Zonder e-mailadres kunnen we geen ontvangstbevestiging sturen.",
+    "successWithReceipt": "Dank je. De melding is verzonden en er is een ontvangstbevestiging gestuurd.",
+    "imprintLink": "Juridische informatie en contact",
+    "fields": {
+      "target": "Plaats op CineGenius",
+      "category": "Soort melding",
+      "details": "Reden",
+      "name": "Naam",
+      "email": "E-mail voor opvolging"
+    },
+    "placeholders": {
+      "target": "https://www.cinegenius.co/... of /profile/...",
+      "details": "Beschrijf kort welke inhoud geraakt wordt en waarom je die meldt."
+    },
+    "hints": {
+      "target": "Noem een concrete CineGenius-URL of een pad. Algemene supportvragen horen bij support.",
+      "details": "Minstens 20 tekens. Upload of kopieer geen illegale bestanden opnieuw.",
+      "email": "Optioneel. Met e-mail kunnen we ontvangst bevestigen en vragen stellen."
+    },
+    "goodFaith": "Ik bevestig dat deze melding naar mijn beste weten juist en volledig is.",
+    "categories": {
+      "illegal_content": "Vermoedelijk illegale inhoud",
+      "rights": "Auteurs-, beeld- of persoonlijkheidsrechten",
+      "fraud": "Fraude, vals aanbod of identiteitsmisleiding",
+      "harassment": "Intimidatie, haat of bedreiging",
+      "child_safety": "Bescherming van minderjarigen",
+      "other": "Ander probleem"
+    },
+    "errors": {
+      "invalid": "Dit verzoek kon niet worden geaccepteerd.",
+      "rateLimited": "Er zijn te veel meldingen verzonden. Probeer het later opnieuw.",
+      "target": "Voer een geldige CineGenius-locatie in.",
+      "category": "Kies een geldige categorie.",
+      "details": "Beschrijf de melding met minstens 20 tekens.",
+      "email": "Controleer het e-mailadres of laat het veld leeg.",
+      "goodFaith": "Bevestig de juistheid van je gegevens.",
+      "send": "De melding kon nu niet worden afgeleverd. Probeer het later opnieuw of gebruik de e-mail in de juridische informatie.",
+      "network": "De verbinding werd onderbroken. Probeer het opnieuw."
+    },
+    "side": {
+      "title": "Klein en behapbaar",
+      "body": "De melding gaat gestructureerd naar de mailbox van de CineGenius-beheerder. We beoordelen handmatig en antwoorden als je contactgegevens opgeeft.",
+      "noFilesTitle": "Geen bestanden verder verspreiden",
+      "noFilesBody": "Stuur geen illegale of vertrouwelijke bestanden via het formulier. Een exacte plaats en beschrijving zijn genoeg voor de eerste beoordeling."
+    }
+  },
+  "PublicReportEmail": {
+    "subject": "Ontvangst van je CineGenius-melding",
+    "heading": "We hebben je melding ontvangen",
+    "intro": "Dank je voor je melding. We beoordelen de genoemde inhoud handmatig.",
+    "reference": "Referentie: {reference}",
+    "next": "Als er vragen nodig zijn of we een beslissing kunnen delen, antwoorden we op dit e-mailadres.",
+    "footer": "Je ontvangt deze e-mail omdat je via CineGenius inhoud hebt gemeld.",
+    "operator": {
+      "subject": "CineGenius-melding: {category}",
+      "heading": "Nieuwe openbare melding",
+      "reference": "Referentie: {reference}",
+      "target": "Gemelde inhoud: {target}",
+      "category": "Categorie: {category}",
+      "reporter": "Melder: {reporter}",
+      "received": "Ontvangen: {date}",
+      "anonymous": "Niet opgegeven",
+      "footer": "Gestructureerde melding ingediend via CineGenius."
+    }
   }
 }

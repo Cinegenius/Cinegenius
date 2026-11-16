@@ -1,8 +1,6 @@
 import { Playfair_Display, DM_Sans, JetBrains_Mono } from "next/font/google";
 import { ClerkProvider } from "@clerk/nextjs";
 import { auth } from "@clerk/nextjs/server";
-import { Analytics } from "@vercel/analytics/next";
-import { SpeedInsights } from "@vercel/speed-insights/next";
 import { deDE, enUS, esES, csCZ, huHU, itIT, nlNL, nlBE, svSE } from "@clerk/localizations";
 import AppIntlProvider from "@/components/AppIntlProvider";
 import { getLocale, getMessages, getNow, getTimeZone } from "next-intl/server";
@@ -156,8 +154,6 @@ export default async function RootLayout({
                 <CookieBanner />
                 <ProductAnalytics />
                 <Genie />
-                <Analytics />
-                <SpeedInsights />
               </FormDraftProvider>
               </AuthSessionBoundary>
             </ToastProvider>

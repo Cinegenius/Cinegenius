@@ -178,6 +178,7 @@ const isPublicRoute = createRouteMatcher([
   "/pricing(.*)",
   "/help(.*)",
   "/trust",
+  "/melden",
   "/ki-transparenz",
   "/bildrechte",
   "/marketplace(.*)",
@@ -254,6 +255,7 @@ export default clerkMiddleware(async (auth, request) => {
     "/api/newsletter/subscribe", "/api/newsletter/confirm", "/api/newsletter/unsubscribe",
   ].includes(request.nextUrl.pathname);
   const isSmartSearchRead = request.method === "POST" && request.nextUrl.pathname === "/api/search/unified";
+  const isPublicReportPost = request.method === "POST" && request.nextUrl.pathname === "/api/public-reports";
 
   // 2. Admin route guard — enforces both session + admin role
   //    This runs BEFORE the generic auth.protect() so non-admin authenticated
@@ -289,6 +291,9 @@ export default clerkMiddleware(async (auth, request) => {
     // Newsletter opt-in and signed confirmation/unsubscribe links also serve
     // visitors without a member account. Origin checks above still apply;
     // handlers validate consent/tokens and retain their durable rate limits.
+  } else if (isPublicReportPost) {
+    // Public reports do not require a member account. Origin protection above
+    // and the handler's validation/durable limits still apply to this exact POST.
   } else if (isSmartSearchRead) {
     // Smart search is members-only, including saved/shared result plans.
     try {

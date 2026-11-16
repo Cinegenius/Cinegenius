@@ -8275,5 +8275,80 @@
     "refineSearch": "Upřesnit hledání",
     "refineHint": "Přidej požadavek nebo změň konkrétní místa a podmínky.",
     "restartContext": "Pokračovat s těmito filtry"
+  },
+  "PublicReport": {
+    "metaTitle": "Nahlásit právní problém",
+    "metaDescription": "Nahlaste problematický nebo údajně nezákonný obsah na CineGenius.",
+    "badge": "Nahlášení",
+    "title": "Nahlásit obsah na CineGenius",
+    "description": "Použijte tento formulář, pokud se konkrétní veřejný obsah na CineGenius jeví jako nezákonný nebo problematický.",
+    "formTitle": "Formulář hlášení",
+    "footerLink": "Nahlásit obsah",
+    "submit": "Odeslat hlášení",
+    "sending": "Odesílání hlášení ...",
+    "success": "Děkujeme. Hlášení bylo strukturovaně odesláno CineGenius. Bez e-mailové adresy nemůžeme poslat potvrzení.",
+    "successWithReceipt": "Děkujeme. Hlášení bylo odesláno a potvrzení bylo zasláno e-mailem.",
+    "imprintLink": "Právní údaje a kontakt",
+    "fields": {
+      "target": "Místo na CineGenius",
+      "category": "Typ hlášení",
+      "details": "Důvod",
+      "name": "Jméno",
+      "email": "E-mail pro dotazy"
+    },
+    "placeholders": {
+      "target": "https://www.cinegenius.co/... nebo /profile/...",
+      "details": "Stručně popište, kterého obsahu se to týká a proč ho hlásíte."
+    },
+    "hints": {
+      "target": "Uveďte konkrétní URL nebo cestu CineGenius. Obecné dotazy patří na podporu.",
+      "details": "Alespoň 20 znaků. Nelegální soubory znovu nenahrávejte ani nekopírujte.",
+      "email": "Volitelné. S e-mailem můžeme potvrdit přijetí a položit doplňující otázky."
+    },
+    "goodFaith": "Potvrzuji, že toto hlášení je podle mého nejlepšího vědomí správné a úplné.",
+    "categories": {
+      "illegal_content": "Údajně nezákonný obsah",
+      "rights": "Autorská, obrazová nebo osobnostní práva",
+      "fraud": "Podvod, falešná nabídka nebo vydávání se za jiného",
+      "harassment": "Obtěžování, nenávist nebo hrozby",
+      "child_safety": "Ochrana nezletilých",
+      "other": "Jiný problém"
+    },
+    "errors": {
+      "invalid": "Tento požadavek nebylo možné přijmout.",
+      "rateLimited": "Bylo odesláno příliš mnoho hlášení. Zkuste to prosím později.",
+      "target": "Zadejte platné místo na CineGenius.",
+      "category": "Vyberte platnou kategorii.",
+      "details": "Popište hlášení alespoň 20 znaky.",
+      "email": "Zkontrolujte e-mailovou adresu nebo pole nechte prázdné.",
+      "goodFaith": "Potvrďte správnost svých údajů.",
+      "send": "Hlášení nyní nelze doručit. Zkuste to později nebo použijte e-mail v právních údajích.",
+      "network": "Spojení bylo přerušeno. Zkuste to znovu."
+    },
+    "side": {
+      "title": "Malé a zvládnutelné",
+      "body": "Hlášení jde strukturovaně do schránky provozovatele CineGenius. Kontrolujeme ho ručně a odpovíme, pokud uvedete kontakt.",
+      "noFilesTitle": "Neposílejte soubory dál",
+      "noFilesBody": "Neposílejte přes formulář nelegální ani důvěrné soubory. Pro první kontrolu stačí přesné místo a popis."
+    }
+  },
+  "PublicReportEmail": {
+    "subject": "Přijetí vašeho hlášení CineGenius",
+    "heading": "Obdrželi jsme vaše hlášení",
+    "intro": "Děkujeme za hlášení. Uvedený obsah ručně zkontrolujeme.",
+    "reference": "Reference: {reference}",
+    "next": "Pokud budou potřeba dotazy nebo budeme moci sdělit rozhodnutí, odpovíme na tuto e-mailovou adresu.",
+    "footer": "Tento e-mail dostáváte, protože jste přes CineGenius nahlásili obsah.",
+    "operator": {
+      "subject": "Hlášení CineGenius: {category}",
+      "heading": "Nové veřejné hlášení",
+      "reference": "Referenční číslo: {reference}",
+      "target": "Nahlášený obsah: {target}",
+      "category": "Kategorie: {category}",
+      "reporter": "Oznamující osoba: {reporter}",
+      "received": "Přijato: {date}",
+      "anonymous": "Neuvedeno",
+      "footer": "Strukturované hlášení odeslané prostřednictvím CineGenius."
+    }
   }
 }

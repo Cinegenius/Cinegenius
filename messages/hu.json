@@ -8275,5 +8275,80 @@
     "refineSearch": "Keresés pontosítása",
     "refineHint": "Adj hozzá igényt, vagy módosíts konkrét helyeket és feltételeket.",
     "restartContext": "Folytatás ezekkel a szűrőkkel"
+  },
+  "PublicReport": {
+    "metaTitle": "Jogi probléma bejelentése",
+    "metaDescription": "Jelents problémás vagy feltételezetten jogellenes tartalmat a CineGeniuson.",
+    "badge": "Bejelentés",
+    "title": "Tartalom bejelentése a CineGeniuson",
+    "description": "Használd ezt az űrlapot, ha egy konkrét nyilvános CineGenius-tartalom jogellenesnek vagy problémásnak tűnik.",
+    "formTitle": "Bejelentő űrlap",
+    "footerLink": "Tartalom bejelentése",
+    "submit": "Bejelentés küldése",
+    "sending": "Bejelentés küldése ...",
+    "success": "Köszönjük. A bejelentést strukturált formában továbbítottuk a CineGeniusnak. E-mail-cím nélkül nem tudunk visszaigazolást küldeni.",
+    "successWithReceipt": "Köszönjük. A bejelentést elküldtük, és visszaigazolást is küldtünk.",
+    "imprintLink": "Jogi adatok és kapcsolat",
+    "fields": {
+      "target": "CineGenius-hely",
+      "category": "Bejelentés típusa",
+      "details": "Indoklás",
+      "name": "Név",
+      "email": "E-mail további kérdésekhez"
+    },
+    "placeholders": {
+      "target": "https://www.cinegenius.co/... vagy /profile/...",
+      "details": "Röviden írd le, melyik tartalom érintett és miért jelented."
+    },
+    "hints": {
+      "target": "Adj meg egy konkrét CineGenius URL-t vagy útvonalat. Az általános támogatási kérdések a támogatáshoz tartoznak.",
+      "details": "Legalább 20 karakter. Ne tölts fel vagy másolj be jogellenes fájlokat újra.",
+      "email": "Nem kötelező. E-maillel visszaigazolhatjuk a beérkezést és kérdezhetünk."
+    },
+    "goodFaith": "Kijelentem, hogy ez a bejelentés legjobb tudomásom szerint helyes és teljes.",
+    "categories": {
+      "illegal_content": "Feltételezetten jogellenes tartalom",
+      "rights": "Szerzői, képmási vagy személyiségi jogok",
+      "fraud": "Csalás, hamis ajánlat vagy személyazonosság megtévesztése",
+      "harassment": "Zaklatás, gyűlölet vagy fenyegetés",
+      "child_safety": "Kiskorúak védelme",
+      "other": "Egyéb probléma"
+    },
+    "errors": {
+      "invalid": "Ezt a kérést nem lehetett elfogadni.",
+      "rateLimited": "Túl sok bejelentés érkezett. Próbáld meg később.",
+      "target": "Adj meg érvényes CineGenius-helyet.",
+      "category": "Válassz érvényes kategóriát.",
+      "details": "Legalább 20 karakterrel írd le a bejelentést.",
+      "email": "Ellenőrizd az e-mail-címet, vagy hagyd üresen a mezőt.",
+      "goodFaith": "Erősítsd meg az adatok pontosságát.",
+      "send": "A bejelentést most nem lehet kézbesíteni. Próbáld újra később, vagy használd a jogi adatoknál szereplő e-mailt.",
+      "network": "A kapcsolat megszakadt. Próbáld újra."
+    },
+    "side": {
+      "title": "Kicsi és kezelhető",
+      "body": "A bejelentés strukturáltan a CineGenius üzemeltetői postafiókjába kerül. Manuálisan ellenőrizzük, és válaszolunk, ha adsz elérhetőséget.",
+      "noFilesTitle": "Ne terjessz fájlokat",
+      "noFilesBody": "Ne küldj jogellenes vagy bizalmas fájlokat az űrlapon. Az első ellenőrzéshez elég a pontos hely és leírás."
+    }
+  },
+  "PublicReportEmail": {
+    "subject": "CineGenius-bejelentésed beérkezett",
+    "heading": "Megkaptuk a bejelentésedet",
+    "intro": "Köszönjük a bejelentést. A megadott tartalmat manuálisan ellenőrizzük.",
+    "reference": "Hivatkozás: {reference}",
+    "next": "Ha további kérdések szükségesek, vagy döntést tudunk közölni, erre az e-mail-címre válaszolunk.",
+    "footer": "Ezt az e-mailt azért kapod, mert tartalmat jelentettél a CineGeniuson.",
+    "operator": {
+      "subject": "CineGenius-bejelentés: {category}",
+      "heading": "Új nyilvános bejelentés",
+      "reference": "Hivatkozás: {reference}",
+      "target": "Bejelentett tartalom: {target}",
+      "category": "Kategória: {category}",
+      "reporter": "Bejelentő: {reporter}",
+      "received": "Beérkezett: {date}",
+      "anonymous": "Nincs megadva",
+      "footer": "A CineGeniuson keresztül beküldött strukturált bejelentés."
+    }
   }
 }
