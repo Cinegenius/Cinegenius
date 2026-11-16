@@ -34,7 +34,18 @@ export default function ImpressumPage() {
 
           <section>
             <h2 className="text-base font-semibold text-text-primary mb-2">{uiText("Organizations.contact")}</h2>
-            <p className="text-sm leading-relaxed">{uiText.rich("Ui.text_8b69039703389c", { part1: chunks => (<a href="tel:+491713866624" className="text-gold hover:underline">{chunks}</a>), part2: () => (<br />), part3: chunks => (<a href="mailto:cinegenius.co@gmail.com" className="text-gold hover:underline">{chunks}</a>) })}</p>
+            <p className="text-sm leading-relaxed">{uiText.rich("Ui.text_8b69039703389c", { part1: chunks => (<a href="tel:+491713866624" className="text-gold hover:underline">{chunks}</a>), part2: () => (<br />), part3: chunks => (<a href="mailto:hello@cinegenius.co" className="text-gold hover:underline">{chunks}</a>) })}</p>
+            <div className="mt-4 space-y-2 text-sm leading-relaxed">
+              {[
+                { name: uiText("SiteContacts.markusName"), email: "markus@cinegenius.co" },
+                { name: uiText("SiteContacts.mathiasName"), email: "mathias@cinegenius.co" },
+              ].map(contact => (
+                <p key={contact.email} className="flex flex-wrap gap-x-2">
+                  <span>{contact.name}</span>
+                  <a href={`mailto:${contact.email}`} className="text-gold hover:underline">{contact.email}</a>
+                </p>
+              ))}
+            </div>
           </section>
 
           <section>

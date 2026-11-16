@@ -25,7 +25,7 @@ export default async function AiTransparencyPage() {
       <section aria-labelledby="ai-contact" className="rounded-xl border border-border bg-bg-secondary p-5 sm:p-6">
         <h2 id="ai-contact" className="font-display text-xl font-bold text-text-primary">{t("contactTitle")}</h2>
         <p className="mt-3 max-w-3xl text-sm leading-7 text-text-secondary">{t("contactBody")}</p>
-        <a href="mailto:cinegenius.co@gmail.com" className="mt-2 inline-flex min-h-11 items-center break-all text-sm font-medium text-gold hover:underline">{t("contactEmail")}</a>
+        <a href="mailto:hello@cinegenius.co" className="mt-2 inline-flex min-h-11 items-center break-all text-sm font-medium text-gold hover:underline">{t("contactEmail")}</a>
       </section>
       <Link href="/" className="inline-flex min-h-11 items-center text-sm font-medium text-gold hover:underline">{t("backHome")}</Link>
     </div>
