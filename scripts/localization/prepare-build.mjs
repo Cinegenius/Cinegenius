@@ -3,13 +3,15 @@
  * become downloadable artifacts, so local review needs no exported credential.
  */
 import {spawn} from 'node:child_process';
-import {mkdir,writeFile} from 'node:fs/promises';
+import {mkdir,writeFile,readFile} from 'node:fs/promises';
 import {resolve} from 'node:path';
 if(process.env.CG_PREPARE_LOCALES !== '1') process.exit(0);
 if(process.env.VERCEL !== '1') throw new Error('Language preparation is restricted to the explicit staged build.');
 const output=resolve('public/_language-drafts');
 await mkdir(output,{recursive:true});
-const locales=['fr','pl','pt-PT','zh-Hans','ja','ko','ru','uk'];
+const allowed=['fr','pl','pt-PT','zh-Hans','ja','ko','ru','uk'];
+let locales=[...allowed];
+try { const plan=JSON.parse(await readFile('scripts/localization/pending-locales.json','utf8')); if(!Array.isArray(plan)||!plan.length||plan.some(locale=>!allowed.includes(locale)))throw new Error('Invalid preparation locale plan'); locales=[...new Set(plan)]; } catch(error) { if(error.code!=='ENOENT')throw error; }
 const statuses=[];
 // Four bounded workers; no key/response body is ever written to a report.
 async function worker(){
