@@ -1,4 +1,7 @@
-/** One entitlement boundary for web and native clients. No paid tier is active. */
-export function unifiedSearchAccess(userId: string | null) {
-  return { canReadResults: !!userId, canInterpret: !!userId, tier: "included" as const };
+import { isConfiguredAdmin } from "./admin-policy";
+
+/** Temporary development access. Only the server supplies configured admin IDs. */
+export function unifiedSearchAccess(userId: string | null, adminUserIds?: string) {
+  const allowed = isConfiguredAdmin(userId, adminUserIds);
+  return { canReadResults: allowed, canInterpret: allowed, tier: "development" as const };
 }

@@ -1,7 +1,9 @@
 "use client";
 
+import SmartSearchPreview from "@/components/SmartSearchPreview";
+import { ServerAdminContext } from "@/lib/server-admin-context";
 import { useAuth } from "@clerk/nextjs";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
@@ -20,6 +22,23 @@ type Clarification = { question: string; scope: string; retry: number } | null;
 const SmartSearchMap = dynamic(() => import("./SmartSearchMap"), { ssr: false });
 
 export default function UnifiedSearchResults() {
+  const t = useTranslations("UnifiedSearch");
+  const common = useTranslations("common");
+  const { userId, isLoaded } = useAuth();
+  const serverAdminId = useContext(ServerAdminContext);
+  const [deniedUserId, setDeniedUserId] = useState<string | null>(null);
+  const denyAccess = useCallback(() => setDeniedUserId(userId ?? null), [userId]);
+  if (!isLoaded || !userId || serverAdminId !== userId || deniedUserId === userId) {
+    return <main className="min-h-screen pt-16 pb-28 xl:pb-12"><div className="site-container py-7 sm:py-10">
+      <h1 className="font-serif text-3xl text-text-primary sm:text-4xl">{t("title")}</h1>
+      <p role="status" className="mt-3 text-sm text-text-secondary">{isLoaded ? t("inDevelopment") : common("loading")}</p>
+      {isLoaded && userId && <SmartSearchPreview />}
+    </div></main>;
+  }
+  return <AccessibleUnifiedSearchResults key={userId} onUnavailable={denyAccess} />;
+}
+
+function AccessibleUnifiedSearchResults({ onUnavailable }: { onUnavailable: () => void }) {
   const t = useTranslations("UnifiedSearch");
   const genie = useTranslations("Genie");
   const taxonomy = useTranslations("Taxonomy");
@@ -92,7 +111,8 @@ export default function UnifiedSearchResults() {
           interpretationAttempt.current = null;
           const response = await fetch("/api/search/unified", { method: "POST", headers: { "Content-Type": "application/json" }, cache: "no-store", signal: controller.signal, body: JSON.stringify({ plan: decoded, ...(decoded.version === 2 ? { view: "combined" } : {}) }) });
           const data = await response.json();
-          if (!response.ok) throw new Error(response.status === 401 ? "unauthorized" : data.error || SEARCH_ERROR.unavailable);
+          if (response.status === 401 || (response.status === 403 && data.error === "in_development")) { if (!controller.signal.aborted) onUnavailable(); return; }
+          if (!response.ok) throw new Error(data.error || SEARCH_ERROR.unavailable);
           if (!controller.signal.aborted) { setGroups(data.groups); setMapGroups(data.mapGroups); }
         } else {
           // Locale/account changes may cancel a request, but never repeat paid
@@ -105,7 +125,8 @@ export default function UnifiedSearchResults() {
           const response = await fetch("/api/genie", { method: "POST", headers: { "Content-Type": "application/json" }, cache: "no-store", signal: controller.signal,
             body: JSON.stringify({ area: "general", locale, messages: [{ role: "user", content: requestText }] }) });
           const data = await response.json();
-          if (!response.ok) throw new Error(response.status === 401 ? "unauthorized" : data.error || SEARCH_ERROR.unavailable);
+          if (response.status === 401 || (response.status === 403 && data.error === "in_development")) { if (!controller.signal.aborted) onUnavailable(); return; }
+          if (!response.ok) throw new Error(data.error || SEARCH_ERROR.unavailable);
           if (controller.signal.aborted) return;
           const link = Array.isArray(data.links) ? data.links.find((item: { href?: unknown }) => typeof item?.href === "string" && searchPlanFromHref(item.href)) : null;
           if (link) navigation.current.replace(link.href, { scroll: false });
@@ -116,7 +137,7 @@ export default function UnifiedSearchResults() {
       } finally { if (!controller.signal.aborted) setLoading(false); }
     }, 0);
     return () => { clearTimeout(timer); controller.abort(); for (const pending of pendingPages) pending.abort(); };
-  }, [encodedPlan, requestText, locale, userId, isLoaded, retry, scope, dialogueScope, updateClarification, t, taxonomy]);
+  }, [encodedPlan, requestText, locale, userId, isLoaded, retry, scope, dialogueScope, updateClarification, t, taxonomy, onUnavailable]);
 
   async function more(group: SearchGroup) {
     if (!plan || group.nextOffset === null || morePending.includes(groupKey(group))) return;
@@ -126,8 +147,8 @@ export default function UnifiedSearchResults() {
       const response = await fetch("/api/search/unified", { method: "POST", headers: { "Content-Type": "application/json" }, cache: "no-store", signal: controller.signal,
         body: JSON.stringify({ plan, cursor: { wishIndex: group.wishIndex, area: group.area, offset: group.nextOffset, ...(group.segment ? { segment: group.segment } : {}), ...(group.rankCursor ? { rank: group.rankCursor } : {}), ...(group.nearbyCursor ? { nearby: group.nearbyCursor } : {}) } }) });
       const data = await response.json();
-      if (response.status === 401) {
-        if (!controller.signal.aborted) { setGroups([]); setError(SEARCH_ERROR.unauthorized); }
+      if (response.status === 401 || (response.status === 403 && data.error === "in_development")) {
+        if (!controller.signal.aborted) onUnavailable();
         return;
       }
       if (!response.ok) throw new Error("unavailable");
@@ -160,12 +181,12 @@ export default function UnifiedSearchResults() {
           <button type="submit" aria-label={t("submit")} disabled={!input.trim()} className="flex min-h-11 min-w-11 items-center justify-center rounded-xl bg-gold px-3 text-bg-primary disabled:opacity-50"><Search size={20} /></button>
         </form>
         {/* Keep unsent edits while locale/results refresh; account and plan changes reset the editor. */}
-        {editablePlan && isLoaded && userId && error !== SEARCH_ERROR.unauthorized && <SmartSearchWishes key={dialogueScope} plan={editablePlan} onUnauthorized={() => { setGroups([]); setError(SEARCH_ERROR.unauthorized); }} />}
+        {editablePlan && isLoaded && userId && error !== SEARCH_ERROR.unauthorized && <SmartSearchWishes key={dialogueScope} plan={editablePlan} onUnauthorized={onUnavailable} />}
         <div aria-live="polite" className="mt-3 text-sm text-text-secondary">
           {loading && <p className="flex items-center gap-2"><Loader2 size={18} className="animate-spin text-gold" />{plan ? t("loading") : t("understanding")}</p>}
         </div>
         {clarification?.scope === dialogueScope && clarification.retry === retry && !error && userId && <SmartSearchClarification key={`${dialogueScope}:${retry}`}
-          question={clarification.question} requestText={requestText} onUnauthorized={() => { updateClarification(null); setGroups([]); setError(SEARCH_ERROR.unauthorized); }} />}
+          question={clarification.question} requestText={requestText} onUnauthorized={onUnavailable} />}
         {resultScope === scope && error && <div role="alert" className="mt-3 text-sm text-text-secondary"><p>{errorText}</p>
           {error === "unauthorized" ? <Link className="inline-flex min-h-11 items-center text-gold" href={`/sign-in?redirect_url=${encodeURIComponent(returnTo)}`}>{genie("signIn")}</Link>
             : <button type="button" className="min-h-11 text-gold" onClick={() => setRetry(value => value + 1)}>{t("retry")}</button>}
@@ -173,7 +194,7 @@ export default function UnifiedSearchResults() {
       </div>
     </div>
     {resultScope === scope && !loading && !error && <div className="site-container space-y-7 py-5">
-      {plan && userId && <SmartSearchMap key={scope} plan={plan} initialGroups={mapGroups} onUnauthorized={() => { setGroups([]); setError(SEARCH_ERROR.unauthorized); }} />}
+      {plan && userId && <SmartSearchMap key={scope} plan={plan} initialGroups={mapGroups} onUnauthorized={onUnavailable} />}
       {SEARCH_AREAS.map(area => {
         const visible = groups.filter(group => group.area === area && (group.results.length || group.nextOffset !== null || plan?.searches[group.wishIndex].area !== "all"));
         if (!visible.length) return null;

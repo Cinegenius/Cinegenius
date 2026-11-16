@@ -1,6 +1,8 @@
 "use client";
 
-import { useEffect, useId, useRef, useState } from "react";
+import { useContext, useEffect, useId, useRef, useState } from "react";
+import SmartSearchPreview from "@/components/SmartSearchPreview";
+import { ServerAdminContext } from "@/lib/server-admin-context";
 import { useAuth } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
 import { Search, MapPin } from "lucide-react";
@@ -28,13 +30,15 @@ export default function HeroSearch() {
   const [memberHintOpen, setMemberHintOpen] = useState(false);
   const smartButton = useRef<HTMLButtonElement>(null);
   const memberHintId = useId();
-  const canUseSmart = isLoaded && !!userId;
+  const hint = useRef<HTMLDivElement>(null);
+  const serverAdminId = useContext(ServerAdminContext);
+  const canUseSmart = isLoaded && !!userId && serverAdminId === userId;
   const showMemberHint = memberHintOpen && !canUseSmart;
 
   useEffect(() => {
     if (!showMemberHint) return;
     const dismissOutside = (event: Event) => {
-      if (!smartButton.current?.contains(event.target as Node)) setMemberHintOpen(false);
+      if (!smartButton.current?.contains(event.target as Node) && !hint.current?.contains(event.target as Node)) setMemberHintOpen(false);
     };
     const dismissEscape = (event: KeyboardEvent) => {
       if (event.key === "Escape") setMemberHintOpen(false);
@@ -69,8 +73,9 @@ export default function HeroSearch() {
   return (
     <div className="w-full rounded-2xl border border-border bg-bg-primary/85 p-2 shadow-lg shadow-black/15 sm:p-3">
       <div className="relative">
-        {showMemberHint && <div id={memberHintId} role="status" className="pointer-events-none motion-safe:animate-[fadeIn_150ms_ease-out] absolute bottom-full left-0 z-20 mb-2 max-w-full rounded-xl border border-border bg-bg-secondary px-3 py-2 text-xs font-medium text-text-primary shadow-lg shadow-black/15 after:absolute after:-bottom-1 after:left-6 after:size-2 after:rotate-45 after:border-r after:border-b after:border-border after:bg-bg-secondary">
-          {uiText(isLoaded ? "UnifiedSearch.membersOnly" : "common.loading")}
+        {showMemberHint && <div ref={hint} id={memberHintId} role="status" className="motion-safe:animate-[fadeIn_150ms_ease-out] absolute top-full left-0 z-20 mt-2 max-h-[min(26rem,60dvh)] w-[min(22rem,calc(100vw-3rem))] max-w-full overflow-y-auto overscroll-contain rounded-xl border border-border bg-bg-secondary px-3 py-3 text-xs font-medium text-text-primary shadow-lg shadow-black/15">
+          {uiText(isLoaded ? "UnifiedSearch.inDevelopment" : "common.loading")}
+          {isLoaded && userId && <SmartSearchPreview />}
         </div>}
         <div role="group" aria-label={uiText("home.heroSearchAction")} className="mb-2 flex flex-nowrap overflow-x-auto overscroll-x-contain [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
           {tabs.map((t) => (

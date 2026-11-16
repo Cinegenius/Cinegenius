@@ -7532,7 +7532,8 @@
       "pricing": "Ceny a podmínky",
       "privacy": "Soukromí"
     },
-    "errorSearch": "Místo nebo profese nejsou jednoznačné. Upřesni profesi, město a případně zemi."
+    "errorSearch": "Místo nebo profese nejsou jednoznačné. Upřesni profesi, město a případně zemi.",
+    "errorInDevelopment": "Smart je zatím ve vývoji."
   },
   "GenieWriting": {
     "open": "Napsat s Genie",
@@ -8274,7 +8275,14 @@
     "quantityNotice": "Počet vyjadřuje potřebu, nikoli potvrzenou dostupnost.",
     "refineSearch": "Upřesnit hledání",
     "refineHint": "Přidej požadavek nebo změň konkrétní místa a podmínky.",
-    "restartContext": "Pokračovat s těmito filtry"
+    "restartContext": "Pokračovat s těmito filtry",
+    "inDevelopment": "Smart je zatím ve vývoji.",
+    "previewLabel": "Náhled · Příklad",
+    "previewMapAlt": "Ilustrační mapa se štábem, lokacemi, tržištěm a firmami.",
+    "previewWish": "Tvoje hledání",
+    "previewMatches": "Vhodné výsledky",
+    "previewSorted": "Podle oblastí",
+    "previewNote": "Takto Smart propojí tvoje hledání. Grafika nezobrazuje skutečné nabídky."
   },
   "PublicReport": {
     "metaTitle": "Nahlásit právní problém",

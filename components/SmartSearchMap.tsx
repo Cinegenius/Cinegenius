@@ -33,7 +33,7 @@ export default function SmartSearchMap({ plan, onUnauthorized, initialGroups }: 
       body: JSON.stringify({ plan: JSON.parse(encoded), view: "map", ...(cursor ? { cursor } : {}) }),
     });
     if (controller.signal.aborted) return [];
-    if (response.status === 401) { controller.abort(); unauthorized.current(); return []; }
+    if (response.status === 401 || response.status === 403) { controller.abort(); unauthorized.current(); return []; }
     if (!response.ok) throw new Error("unavailable");
     const data = await response.json();
     if (!Array.isArray(data.groups)) throw new Error("invalid");

@@ -7532,7 +7532,8 @@
       "pricing": "Árak és feltételek",
       "privacy": "Adatvédelem"
     },
-    "errorSearch": "A hely vagy a foglalkozás nem egyértelmű. Add meg pontosabban a foglalkozást, a várost és szükség esetén az országot."
+    "errorSearch": "A hely vagy a foglalkozás nem egyértelmű. Add meg pontosabban a foglalkozást, a várost és szükség esetén az országot.",
+    "errorInDevelopment": "A Smart még fejlesztés alatt áll."
   },
   "GenieWriting": {
     "open": "Fogalmazás Genie-vel",
@@ -8274,7 +8275,14 @@
     "quantityNotice": "A mennyiség az igényedet jelzi, nem igazolt rendelkezésre állást.",
     "refineSearch": "Keresés pontosítása",
     "refineHint": "Adj hozzá igényt, vagy módosíts konkrét helyeket és feltételeket.",
-    "restartContext": "Folytatás ezekkel a szűrőkkel"
+    "restartContext": "Folytatás ezekkel a szűrőkkel",
+    "inDevelopment": "A Smart még fejlesztés alatt áll.",
+    "previewLabel": "Előnézet · Példa",
+    "previewMapAlt": "Szemléltető térkép stábbal, helyszínekkel, piactérrel és cégekkel.",
+    "previewWish": "A keresésed",
+    "previewMatches": "Illő találatok",
+    "previewSorted": "Területenként",
+    "previewNote": "Így fogja a Smart összekapcsolni a keresésedet. Az ábra nem valós hirdetéseket mutat."
   },
   "PublicReport": {
     "metaTitle": "Jogi probléma bejelentése",
