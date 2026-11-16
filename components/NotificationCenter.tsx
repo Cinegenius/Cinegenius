@@ -12,6 +12,7 @@ import { timeAgo, notificationMeta, type NotificationType } from "@/lib/notifica
 import type { AuthenticatedInbox } from "@/lib/use-authenticated-inbox";
 
 const typeIcons: Record<NotificationType, React.ComponentType<{ size?: number; className?: string }>> = {
+  account_inactivity:    Bell,
   booking_confirmed:     BookOpen,
   booking_request:       BookOpen,
   booking_rejected:      BookOpen,

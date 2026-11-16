@@ -29,6 +29,7 @@ type Notification = {
 // ─── Config ────────────────────────────────────────────────────────────────────
 
 const typeIcons: Record<NotificationType, React.ComponentType<{ size?: number; className?: string }>> = {
+  account_inactivity:    Bell,
   booking_confirmed:     BookOpen,
   booking_request:       BookOpen,
   booking_rejected:      BookOpen,
@@ -62,7 +63,7 @@ function matchesFilter(type: NotificationType, filter: FilterId): boolean {
   if (filter === "job") return type === "new_application" || type === "application_sent";
   if (filter === "money") return type === "payout_ready";
   if (filter === "social") return type === "friend_request" || type === "friend_accepted";
-  if (filter === "system") return type === "verification_approved" || type === "verification_pending" || type === "review_request";
+  if (filter === "system") return type === "verification_approved" || type === "verification_pending" || type === "review_request" || type === "account_inactivity";
   return false;
 }
 
