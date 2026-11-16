@@ -1,4 +1,5 @@
 import "server-only";
+import { profileOccupationPreview, type OccupationProfile } from "@/lib/crew-occupations";
 import { db } from "@/lib/db";
 import { getTranslations } from "next-intl/server";
 import { profileAccessFor } from "@/lib/profile-privacy-server";
@@ -56,7 +57,7 @@ function queryFor(area: SearchArea, wish: SearchWish, terms: string[], categorie
       ? terms.map(term => `role.ilike.${exactLiteral(term)}`)
       : patterns(["display_name", "role", "bio"]);
     if (terms.length) filters.push(`positions.ov.{${terms.map(filterLiteral).join(",")}}`);
-    return filtered(db.from("profiles").select(`${PLACE_COLUMNS},user_id,display_name,role,positions,bio,location,avatar_url,available`)
+    return filtered(db.from("profiles").select(`${PLACE_COLUMNS},user_id,display_name,role,positions,crew,bio,location,avatar_url,available`)
       .not("display_name", "is", null).neq("display_name", ""), filters).order("user_id");
   }
   if (area === "companies") {
@@ -124,8 +125,7 @@ async function readGroup(plan: SearchPlan, wishIndex: number, area: SearchArea, 
     if (area === "projects") row = publicProjectMedia(row);
     const place = placeDisplay(placeReadFields(String(row.location ?? row.city ?? ""), row, locale), String(row.location ?? row.city ?? ""), locale);
     const organization = Array.isArray(row.organization) ? row.organization[0] : row.organization;
-    const headRole = heads ? matchingDepartmentHead(row, segment) : productionCrew ? matchingProductionRole(row, segment) : undefined;
-    const role = headRole ? getDepartmentRoleLabel(headRole.departmentId, headRole.label, locale, undefined, taxonomy) : row.role;
+    const role = area === "crew" ? profileOccupationPreview(row as OccupationProfile).map(title => taxonomyLabel(title, ui)).join(" · ") : row.role;
     const result: SearchResult = {
       id: String(area === "crew" ? row.user_id : area === "news" ? `${(organization as Row)?.slug}/${row.slug}` : row.slug || row.id),
       title: String(row.display_name ?? row.name ?? row.title ?? ""),

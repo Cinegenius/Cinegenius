@@ -1,3 +1,4 @@
+import {emailLayout, emailButton} from "@/lib/email-layout";
 import "server-only";
 
 import { getTranslations } from "next-intl/server";
@@ -68,7 +69,13 @@ export async function buildListingReminderEmail(input: {
   const note = t("privateLinkNote");
   const signature = t("signature");
   const footer = t("footer");
-  const html = `<!doctype html><html lang="${escapeHtml(input.locale)}"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head><body style="margin:0;background:#0e1016;color:#f4f5f7;font-family:Arial,sans-serif;padding:28px 12px"><table role="presentation" width="100%" style="max-width:580px;margin:auto;background:#171b24;border:1px solid #29344a;border-radius:14px"><tr><td style="padding:28px"><p style="color:#c2f135;font-weight:700">CineGenius</p><h1 style="font-size:24px;line-height:1.3">${escapeHtml(heading)}</h1>${lines.map(line => `<p style="font-size:16px;line-height:1.6;color:#d5d9e1">${escapeHtml(line)}</p>`).join("")}<p style="margin:28px 0"><a href="${escapeHtml(href)}" style="display:inline-block;padding:14px 20px;background:#c2f135;color:#10131b;border-radius:9px;font-weight:700;text-decoration:none">${escapeHtml(button)}</a></p><p style="font-size:13px;line-height:1.6;color:#a7afbf">${escapeHtml(note)}</p><p style="font-size:16px;line-height:1.6;white-space:pre-line">${escapeHtml(signature)}</p><p style="border-top:1px solid #29344a;padding-top:20px;font-size:12px;line-height:1.6;color:#a7afbf">${escapeHtml(footer)}</p></td></tr></table></body></html>`;
+  const html = emailLayout(`
+    <h1 style="margin:0 0 20px;font-size:25px;line-height:1.3;color:#f0f2f5">${escapeHtml(heading)}</h1>
+    ${lines.map(line => `<p style="font-size:15px;line-height:1.6;color:#b2bbc8">${escapeHtml(line)}</p>`).join("")}
+    ${emailButton(escapeHtml(button), href)}
+    <p style="margin:22px 0 0;font-size:13px;line-height:1.6;color:#8995a8">${escapeHtml(note)}</p>
+    <p style="font-size:15px;line-height:1.6;white-space:pre-line">${escapeHtml(signature)}</p>
+  `, {locale: input.locale, title: subject, footerHtml: escapeHtml(footer), siteUrl: APP_ORIGIN});
   const payload: FrozenListingReminderEmail = {
     from: FROM, to: input.to, replyTo: REPLY_TO, subject, html,
     text: [heading, ...lines, `${button}: ${href}`, note, signature, footer].join("\n\n"),

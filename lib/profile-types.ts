@@ -214,6 +214,9 @@ export type TargetFormat =
 // ─── Crew / Technik ──────────────────────────────────────────────────────────
 
 export interface CrewData {
+  primaryOccupation?: {departmentId: string; roleId: string} | null;
+  occupations?: {departmentId: string; roleId: string}[];
+  additionalOccupation?: {departmentId: string; roleId: string} | null;
   department?: string;
   positions?: string[];
   experience_years?: number;

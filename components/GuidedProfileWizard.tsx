@@ -1,4 +1,7 @@
 "use client";
+import PrimaryOccupationPicker from "@/components/PrimaryOccupationPicker";
+import { MAX_PROFILE_OCCUPATIONS, profileOccupationFocusError, selectedCrewOccupations } from "@/lib/crew-occupations";
+import { occupationReference, primaryOccupationForPositions, orderPositionsByPrimary } from "@/lib/primary-occupation";
 
 import GenieWritingAssistant from "@/components/GenieWritingAssistant";
 
@@ -139,7 +142,8 @@ export default function GuidedProfileWizard() {
     else removeDepartment(departmentId);
   }
   function togglePosition(department: Department, position: string) {
-    setDraft((current) => ({
+    if (!draft.positions.includes(position) && draft.positions.length >= MAX_PROFILE_OCCUPATIONS) { setError(uiText("occupation.limit")); return; }
+    setDraft((current) => normalizeGuidedProfileDraft({
       ...current,
       departmentIds: [...new Set([...current.departmentIds, department.id])],
       positions: current.positions.includes(position)
@@ -150,13 +154,17 @@ export default function GuidedProfileWizard() {
   }
   async function createProfile() {
     const profileTypes = getGuidedProfileTypes(draft);
+    const primaryOccupation = occupationReference(primaryOccupationForPositions(draft.primaryOccupation, draft.positions));
+    const crew = {primaryOccupation, additionalOccupation: draft.additionalOccupation ?? null, occupations: selectedCrewOccupations(draft.positions)};
+    const focusError = profileOccupationFocusError({positions: draft.positions, crew});
+    if (focusError) { setError(uiText(`occupation.${focusError}`)); return; }
     setSubmitting(true); setError("");
     try {
       if (timer.current) clearTimeout(timer.current);
       await saveQueue.settle();
       const response = await fetch("/api/profile", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({
         display_name: draft.name.trim(), location: draft.city.trim(), selected_place_city_id: draft.selected_place_city_id || undefined, profile_types: profileTypes,
-        profile_type: profileTypes[0] ?? null, positions: draft.positions, bio: draft.bio.trim(), available: true,
+        profile_type: profileTypes[0] ?? null, positions: orderPositionsByPrimary(draft.positions, primaryOccupation), crew, bio: draft.bio.trim(), available: true,
       }) });
       const result = await response.json().catch(() => ({}));
       if (!response.ok) throw new Error(result.error ?? uiText("Ui.text_9794b4e8304d0a"));
@@ -175,7 +183,7 @@ export default function GuidedProfileWizard() {
     <div className="mb-7"><div className="mb-2 flex justify-between text-xs text-text-muted">{uiText.rich("Ui.text_5006f2c2909af0", { value2: () => (draft.step), part1: chunks => (<span>{chunks}</span>), value4: () => (saveState === "saving" ? uiText("setup.copy101") : saveState === "saved" ? uiText("profile.collabSaved") : saveState === "error" ? uiText("setup.saveFailed") : ""), part3: chunks => (<span>{chunks}</span>) })}</div><div className="h-1.5 overflow-hidden rounded-full bg-bg-elevated"><div className="h-full rounded-full bg-gold transition-all" style={{ width: `${draft.step / 4 * 100}%` }} /></div></div>
     <section className="rounded-2xl border border-border bg-bg-secondary p-5 sm:p-7">
       {draft.step === 1 && <div>
-        <p className="mb-4 text-sm leading-6 text-text-muted">{uiText("Ui.text_824aee2d03b416")}</p>
+        <p className="mb-4 text-sm leading-6 text-text-muted">{uiText("Ui.text_824aee2d03b416")}</p><p className="mb-4 text-sm leading-6 text-text-secondary">{uiText("occupation.focusExplanation")}</p>
         <label className="relative mb-4 block"><Search size={16} className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-text-muted" /><input value={search} onChange={(event) => setSearch(event.target.value)} placeholder={uiText("Ui.text_334b4f0aca01f9")} aria-label={uiText("Ui.text_4fef63d5d3224d")} className="min-h-12 w-full rounded-xl border border-border bg-bg-primary pl-10 pr-4 text-sm text-text-primary outline-none focus:border-gold" /></label>
         <div className="mb-5 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
           {visibleDepartments.map(({ department }) => {
@@ -214,7 +222,7 @@ export default function GuidedProfileWizard() {
       </div>}
       {draft.step === 2 && <div className="space-y-5"><p className="text-sm leading-6 text-text-muted">{uiText("Ui.text_0bd6a60fa92705")}</p><div><label htmlFor="display-name" className="mb-2 block text-sm font-medium text-text-primary">{uiText.rich("Ui.text_1c3cd2adb4a719", { part1: chunks => (<span className="text-gold">{chunks}</span>) })}</label><input id="display-name" autoComplete="name" value={draft.name} onChange={(event) => update("name", event.target.value)} className="min-h-12 w-full rounded-xl border border-border bg-bg-primary px-4 text-sm text-text-primary outline-none focus:border-gold" /></div><div><label htmlFor="profile-city" className="mb-2 block text-sm font-medium text-text-primary">{uiText.rich("Ui.text_8006d3d1d105f5", { part1: chunks => (<span className="text-gold">{chunks}</span>) })}</label><PlaceField id="profile-city" selectedCityId={draft.selected_place_city_id} value={draft.city} onChange={(value, cityId) => setDraft(current => ({ ...current, city: value, selected_place_city_id: cityId || "" }))} required /></div></div>}
       {draft.step === 3 && <><p className="mb-4 text-sm leading-6 text-text-muted">{uiText("Ui.text_2e4119cc8ade84")}</p><label htmlFor="bio" className="mb-2 block text-sm font-medium text-text-primary">{uiText.rich("Ui.text_3e6cd4cf1f8212", { part1: chunks => (<span className="text-text-muted">{chunks}</span>) })}</label><textarea id="bio" rows={5} maxLength={1000} value={draft.bio} onChange={(event) => update("bio", event.target.value)} placeholder={uiText("Ui.text_0e62bd42482853")} className="w-full rounded-xl border border-border bg-bg-primary p-4 text-sm text-text-primary outline-none focus:border-gold" /><GenieWritingAssistant area="profile" value={draft.bio} onApply={(text) => update("bio", text)} maxLength={1000} contextKey="guided-profile:bio" disabled={submitting} /></>}
-      {draft.step === 4 && <><p className="mb-5 text-sm leading-6 text-text-muted">{uiText("Ui.text_bd3dc26c94a62b")}</p><div className="space-y-3 rounded-xl border border-border bg-bg-primary p-4 text-sm"><div><span className="text-xs text-text-muted">{uiText("profile.fieldName")}</span><p className="text-text-primary">{draft.name}</p></div><div><span className="text-xs text-text-muted">{uiText("Ui.text_5d0a42d835ca34")}</span><p className="text-text-primary">{selectedDepartments.map((department) => (department ? getDeptLabel(department, locale, animals, taxonomyText) : "")).join(" · ")}</p></div>{draft.positions.length > 0 && <div><span className="text-xs text-text-muted">{uiText("setup.occupations")}</span><p className="text-text-primary">{draft.positions.map(roleLabel).join(" · ")}</p></div>}<div><span className="text-xs text-text-muted">{uiText("setup.place")}</span><p className="text-text-primary">{draft.city}</p></div>{draft.bio && <div><span className="text-xs text-text-muted">{uiText("setup.introduction")}</span><p className="whitespace-pre-wrap text-text-primary">{draft.bio}</p></div>}</div></>}
+      {draft.step === 4 && <><PrimaryOccupationPicker positions={draft.positions} value={draft.primaryOccupation ?? null} onChange={value => update("primaryOccupation", value)} additionalValue={draft.additionalOccupation ?? null} onAdditionalChange={value => update("additionalOccupation", value)} /><p className="mb-5 text-sm leading-6 text-text-muted">{uiText("Ui.text_bd3dc26c94a62b")}</p><div className="space-y-3 rounded-xl border border-border bg-bg-primary p-4 text-sm"><div><span className="text-xs text-text-muted">{uiText("profile.fieldName")}</span><p className="text-text-primary">{draft.name}</p></div><div><span className="text-xs text-text-muted">{uiText("Ui.text_5d0a42d835ca34")}</span><p className="text-text-primary">{selectedDepartments.map((department) => (department ? getDeptLabel(department, locale, animals, taxonomyText) : "")).join(" · ")}</p></div>{draft.positions.length > 0 && <div><span className="text-xs text-text-muted">{uiText("setup.occupations")}</span><p className="text-text-primary">{draft.positions.map(roleLabel).join(" · ")}</p></div>}<div><span className="text-xs text-text-muted">{uiText("setup.place")}</span><p className="text-text-primary">{draft.city}</p></div>{draft.bio && <div><span className="text-xs text-text-muted">{uiText("setup.introduction")}</span><p className="whitespace-pre-wrap text-text-primary">{draft.bio}</p></div>}</div></>}
     </section>
     {error && <p role="alert" className="mt-4 rounded-xl border border-red-400/30 bg-red-500/10 px-4 py-3 text-sm text-red-300">{error}</p>}
     <div className="mt-5 flex items-center justify-between gap-3"><button onClick={() => draft.step === 1 ? router.push("/profile-setup") : void move(draft.step - 1)} className="inline-flex min-h-12 items-center gap-2 rounded-xl border border-border px-4 text-sm text-text-primary">{uiText.rich("Ui.text_3c9cbf8b79d036", { part1: () => (<ArrowLeft size={16} />) })}</button>{draft.step < 4 ? <button onClick={() => void move(draft.step + 1)} className="inline-flex min-h-12 items-center gap-2 rounded-xl bg-gold px-5 text-sm font-semibold text-bg-primary">{uiText.rich("Ui.text_71f09a8b7c811b", { part1: () => (<ArrowRight size={16} />) })}</button> : <button disabled={submitting} onClick={() => void createProfile()} className="inline-flex min-h-12 items-center gap-2 rounded-xl bg-gold px-5 text-sm font-semibold text-bg-primary disabled:opacity-50">{submitting ? <>{uiText.rich("Ui.text_c92ba34c0c3b92", { part1: () => (<Loader2 size={16} className="animate-spin" />) })}</> : <>{uiText.rich("Ui.text_5d63896787f560", { part1: () => (<ArrowRight size={16} />) })}</>}</button>}</div>

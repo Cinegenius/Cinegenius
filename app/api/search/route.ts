@@ -1,3 +1,4 @@
+import { profileOccupationPreview } from "@/lib/crew-occupations";
 import { profileAccessFor } from "@/lib/profile-privacy-server";
 import { projectProfilePrivacy } from "@/lib/profile-privacy";
 import { animalCompanySearchFilter,animalProfileSearchValues } from "@/lib/animal-taxonomy";
@@ -71,7 +72,7 @@ export async function GET(req: NextRequest) {
     wantProfiles
       ? publicProfileMatches((from, to) => db
           .from("profiles")
-          .select("place_country_code,place_region_id,place_city_id,place_city_name,place_region_name,place_status,user_id, display_name, location, bio, role, positions, avatar_url, available")
+          .select("place_country_code,place_region_id,place_city_id,place_city_name,place_region_name,place_status,user_id, display_name, location, bio, role, positions, crew, avatar_url, available")
           .or(`display_name.ilike.${like},role.ilike.${like},location.ilike.${like},bio.ilike.${like}${geoFilter?`,${geoFilter}`:""}`)
           .not("display_name", "is", null)
           .neq("display_name", "").order("user_id").range(from, to), q)
@@ -89,7 +90,7 @@ export async function GET(req: NextRequest) {
     cateringProfileValues.length
       ? Promise.all(cateringProfileValues.map((position) => publicProfileMatches((from, to) => db
           .from("profiles")
-          .select("place_country_code,place_region_id,place_city_id,place_city_name,place_region_name,place_status,user_id, display_name, location, bio, role, positions, avatar_url, available")
+          .select("place_country_code,place_region_id,place_city_id,place_city_name,place_region_name,place_status,user_id, display_name, location, bio, role, positions, crew, avatar_url, available")
           .contains("positions", [position])
           .not("display_name", "is", null)
           .neq("display_name", "").order("user_id").range(from, to))))
@@ -102,11 +103,11 @@ export async function GET(req: NextRequest) {
           .contains("categories", [CATERING_COMPANY_CATEGORY.id])
           .limit(type === "all" ? 8 : 24)
       : Promise.resolve({ data: [] }),
-    animalValues.length ? publicProfileMatches((from, to) => db.from("profiles").select("place_country_code,place_region_id,place_city_id,place_city_name,place_region_name,place_status,user_id, display_name, location, bio, role, positions, avatar_url, available").overlaps("positions", animalValues).order("user_id").range(from, to)) : Promise.resolve({data: []}),
-    animalValues.length ? publicProfileMatches((from, to) => db.from("profiles").select("place_country_code,place_region_id,place_city_id,place_city_name,place_region_name,place_status,user_id, display_name, location, bio, role, positions, avatar_url, available").in("role", animalValues).order("user_id").range(from, to)) : Promise.resolve({data: []}),
+    animalValues.length ? publicProfileMatches((from, to) => db.from("profiles").select("place_country_code,place_region_id,place_city_id,place_city_name,place_region_name,place_status,user_id, display_name, location, bio, role, positions, crew, avatar_url, available").overlaps("positions", animalValues).order("user_id").range(from, to)) : Promise.resolve({data: []}),
+    animalValues.length ? publicProfileMatches((from, to) => db.from("profiles").select("place_country_code,place_region_id,place_city_id,place_city_name,place_region_name,place_status,user_id, display_name, location, bio, role, positions, crew, avatar_url, available").in("role", animalValues).order("user_id").range(from, to)) : Promise.resolve({data: []}),
     wantCompanies && animalCompanySearchFilter(raw) ? db.from("companies").select("place_country_code,place_region_id,place_city_id,place_city_name,place_region_name,place_status,id, slug, name, city, logo_url, categories").eq("published",true).or(animalCompanySearchFilter(raw)).limit(24) : Promise.resolve({data: []}),
-    safetyMedicalValues.length ? publicProfileMatches((from, to) => db.from("profiles").select("place_country_code,place_region_id,place_city_id,place_city_name,place_region_name,place_status,user_id, display_name, location, bio, role, positions, avatar_url, available").overlaps("positions", safetyMedicalValues).order("user_id").range(from, to)) : Promise.resolve({data: []}),
-    safetyMedicalValues.length ? publicProfileMatches((from, to) => db.from("profiles").select("place_country_code,place_region_id,place_city_id,place_city_name,place_region_name,place_status,user_id, display_name, location, bio, role, positions, avatar_url, available").in("role", safetyMedicalValues).order("user_id").range(from, to)) : Promise.resolve({data: []}),
+    safetyMedicalValues.length ? publicProfileMatches((from, to) => db.from("profiles").select("place_country_code,place_region_id,place_city_id,place_city_name,place_region_name,place_status,user_id, display_name, location, bio, role, positions, crew, avatar_url, available").overlaps("positions", safetyMedicalValues).order("user_id").range(from, to)) : Promise.resolve({data: []}),
+    safetyMedicalValues.length ? publicProfileMatches((from, to) => db.from("profiles").select("place_country_code,place_region_id,place_city_id,place_city_name,place_region_name,place_status,user_id, display_name, location, bio, role, positions, crew, avatar_url, available").in("role", safetyMedicalValues).order("user_id").range(from, to)) : Promise.resolve({data: []}),
     searchSafetyMedicalCompanies ? db.from("companies").select("place_country_code,place_region_id,place_city_id,place_city_name,place_region_name,place_status,id, slug, name, city, logo_url, categories").eq("published", true).contains("categories", [SAFETY_MEDICAL_COMPANY_CATEGORY_ID]).limit(24) : Promise.resolve({data: []}),
   ]);
 
@@ -143,7 +144,7 @@ export async function GET(req: NextRequest) {
     .map((p: Record<string, unknown>) => ({
       id: p.user_id as string,
       title: p.display_name as string,
-      subtitle: [(p.role ?? (p.positions as string[])?.[0]), placeDisplay(placeReadFields(String(p.location??""),p,locale),String(p.location??""),locale)].filter(Boolean).join(" · "),
+      subtitle: [profileOccupationPreview(p)[0], placeDisplay(placeReadFields(String(p.location??""),p,locale),String(p.location??""),locale)].filter(Boolean).join(" · "),
       type: "profile",
       price: 0,
       image: p.avatar_url as string | null,

@@ -1246,7 +1246,20 @@
     "choose": "Scegli professione principale",
     "hint": "La professione principale è evidenziata nel profilo. Nell’elenco della troupe appari in tutte le professioni e reparti selezionati.",
     "legacy": "Le professioni esistenti non hanno ancora una principale. Sceglila qui; le altre restano salvate.",
-    "empty": "Scegli una professione dal catalogo. I dati esistenti restano salvati."
+    "empty": "Scegli una professione dal catalogo. I dati esistenti restano salvati.",
+    "focusExplanation": "Sulle tue schede appaiono 1 attività principale e fino a 2 secondarie. Puoi aggiungerne 1 per il profilo e la ricerca. Puoi modificarle in seguito.",
+    "additional": "Attività aggiuntiva (facoltativa)",
+    "secondary": "Attività secondarie",
+    "noAdditional": "Nessuna attività aggiuntiva",
+    "chooseAdditional": "Scegli un’attività aggiuntiva",
+    "additionalHint": "Solo nei dettagli del profilo e nella ricerca, non sulle tue schede.",
+    "legacyFocus": "Le informazioni esistenti vengono conservate. Quando cambi attività, scegli al massimo 1 principale, 2 secondarie e 1 aggiuntiva.",
+    "limit": "Puoi scegliere 1 attività principale, fino a 2 secondarie e 1 aggiuntiva. Rimuovi prima una selezione.",
+    "mainRequired": "Scegli un’attività principale tra quelle selezionate.",
+    "additionalRequired": "Scegli quale delle quattro attività deve apparire solo nei dettagli del profilo e nella ricerca.",
+    "invalidAdditional": "L’attività aggiuntiva deve essere selezionata e diversa da quella principale.",
+    "invalidSelection": "Scegli attività valide dal catalogo.",
+    "additionalTitle": "Altra attività"
   },
   "legalLanguage": {
     "original": "Fa fede la versione originale tedesca di questi testi legali. Le traduzioni sono fornite per facilitarne la comprensione."

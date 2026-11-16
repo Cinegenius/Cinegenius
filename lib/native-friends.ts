@@ -1,7 +1,7 @@
 import 'server-only';
 import { db } from '@/lib/db';
 import { contactId } from '@/lib/contact-connections';
-import { crewOccupationIds } from '@/lib/crew-occupations';
+import { crewOccupationIds, additionalCrewOccupation, profileOccupationPreview } from '@/lib/crew-occupations';
 import { occupationById, occupationReference, primaryOccupationForPositions } from '@/lib/primary-occupation';
 import { FRIENDSHIPS_V1 } from '@/lib/native-contact-contract';
 
@@ -12,6 +12,8 @@ export function friendOccupations(profile?: FriendProfile) {
   return {
     department_ids: [...new Set(ids.flatMap(id => occupationById(id)?.departmentId ?? []))],
     occupation_ids: ids,
+    display_positions: profile ? profileOccupationPreview(profile) : [],
+    additional_occupation: profile ? additionalCrewOccupation(profile) : null,
     primary_occupation: primary && ids.includes(primary.roleId) ? occupationReference(primary) : null,
   };
 }

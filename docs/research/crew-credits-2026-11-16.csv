@@ -1,0 +1,141 @@
+film,source,reference_id,distinct_credit_labels,retrieved_utc,source_sha256
+Oppenheimer,https://watch.afi.com/movie/oppenheimer,872585,100,2026-11-16T14:53:25.490206+00:00,dc444e33bdb0d3ff3d3b9430c458e258275ea14eb153f316d37b59c94fba7ed7
+Dune: Part Two,https://watch.afi.com/movie/dune-part-two,693134,65,2026-11-16T14:53:25.459591+00:00,89d36d957b23429f1125820e6cdc57ae80f61171958e67f517096f2c06f20e57
+Inception,https://watch.afi.com/movie/inception,27205,211,2026-11-16T14:53:26.737236+00:00,4d6a6b506ea34d1f9325b4381bd0e47abb537b3538579edffea36558070f4469
+Interstellar,https://watch.afi.com/movie/interstellar,157336,172,2026-11-16T14:53:26.665010+00:00,09ec1b9abfe692e008b57ff1021ce6bc1f003c3a14eed4760ec59c2b64724004
+Tenet,https://watch.afi.com/movie/tenet,577922,138,2026-11-16T14:53:27.151303+00:00,ab9bd8c841203ceda5a9d5a331b5e650b1e417093c0a001b9986a1433ddf52f3
+The Dark Knight,https://watch.afi.com/movie/the-dark-knight,155,68,2026-11-16T14:53:27.594163+00:00,8cc0d597ed2cdbfe59207439b3e6d0521c7c5a8ef72912ee4497d1f16b708ff1
+The Dark Knight Rises,https://watch.afi.com/movie/the-dark-knight-rises,49026,175,2026-11-16T14:53:27.757776+00:00,c6468fcc121a77fc6e04d8386a23903d87e68d987a19f0f5f37a07a68b4747a0
+Batman Begins,https://watch.afi.com/movie/batman-begins,272,195,2026-11-16T14:53:28.151632+00:00,e7b246b84641916d19780d1104fa8609b6c63b0a3a4e8331e0ef03dea594d6c7
+Dunkirk,https://watch.afi.com/movie/dunkirk,374720,105,2026-11-16T14:53:28.637734+00:00,d775d2f06f8e193f44f46bfb0f0022cccabc860316d050d198cee8789f0ae10b
+The Prestige,https://watch.afi.com/movie/the-prestige,1124,48,2026-11-16T14:53:28.617154+00:00,6925292706ac2cdcd71155d97354056413d24b1c48c0a6746e769540a23624c8
+Memento,https://watch.afi.com/movie/memento,77,39,2026-11-16T14:53:28.716214+00:00,cf20f6138aef0669974b257146444de77f8ccad30ea61edd6545fdcd8dc1a5dd
+Prisoners,https://watch.afi.com/movie/prisoners,146233,132,2026-11-16T14:53:30.141563+00:00,fab573fa6fbde14ade09ba160867c3158596ae97168a8b383f49466b117725f0
+Spectre,https://watch.afi.com/movie/spectre,206647,87,2026-11-16T14:53:30.849984+00:00,80a362f4bcadcbb31962717d89f5b07aabf604827a20ed8a5aaed9af06b3d687
+The Martian,https://watch.afi.com/movie/the-martian,286217,214,2026-11-16T14:53:32.644647+00:00,dd44dfc7684657e9b5a3f7120cba0be2856187cb0febccbda7e0e130ac80ca70
+Avatar,https://watch.afi.com/movie/avatar,19995,204,2026-11-16T14:53:33.938012+00:00,0dcc02b429dd166e520d7ebc9db5c230dcd5ecce3eb4ad5030c6b8b344a6e3a6
+Titanic,https://watch.afi.com/movie/titanic,597,76,2026-11-16T14:53:33.593105+00:00,30caaf1f4a6db4295e804a4b6d01ec079cd17ac896d3472361129dea66959e5d
+Gravity,https://watch.afi.com/movie/gravity,49047,119,2026-11-16T14:53:33.907043+00:00,4c29af8334b326d033794d00f894ba4da6b2fca4c295bf6db7c830751d31b1b1
+Children of Men,https://watch.afi.com/movie/children-of-men,9693,167,2026-11-16T14:53:34.465464+00:00,ffe57094acde13c5954e3ec1bfc12cfb541a3513f2b5929b349e43fe2812284e
+The Revenant,https://watch.afi.com/movie/the-revenant,281957,114,2026-11-16T14:53:34.655986+00:00,4432a50108e231570f90e4c286640e965ba369dd57578acc8dd48d8154a917db
+Black Swan,https://watch.afi.com/movie/black-swan,44214,106,2026-11-16T14:53:35.463270+00:00,28b3b012501283b2ab36d479babbc4d24dbee2022489c2262956c5a3fdb7065d
+The Wrestler,https://watch.afi.com/movie/the-wrestler,12163,59,2026-11-16T14:53:35.338303+00:00,dac6e9d061133ef1fdaa317e2bb3e27687da8ecbefa8aeef4f8cd2daed903dac
+Whiplash,https://watch.afi.com/movie/whiplash,244786,50,2026-11-16T14:53:36.124491+00:00,fa584d84ba83ac6c6c856642b540ad9e9854adf1f63b94b86b95f25421c254c8
+Okja,https://watch.afi.com/movie/okja,387426,55,2026-11-16T14:53:38.567670+00:00,7b927f7e4e54c48b2a24994f686e9c84feff919481f2b556528ca88bf1196bd8
+Oldboy,https://watch.afi.com/movie/oldboy,87516,41,2026-11-16T14:53:38.768050+00:00,4524b6819f5cd16dc206b162f85d663ec011050a63fcea42a9c753f8bdd79d29
+Lady Bird,https://watch.afi.com/movie/lady-bird,391713,72,2026-11-16T14:53:39.590488+00:00,e571d043d36391cab8e5357d98d8a777fd83f547fd1fd35348534beff2d25a3e
+Little Women,https://watch.afi.com/movie/little-women,483347,61,2026-11-16T14:53:40.038775+00:00,b7bf4b597bad1d694cb2da6c415781204ad2b2ba6f845ad658ac90820882e66f
+Killers of the Flower Moon,https://watch.afi.com/movie/killers-of-the-flower-moon,466420,118,2026-11-16T14:53:40.525551+00:00,82c3c577490df9c1b006686f53856c8845a75bd66bec6aff14e31e41911246c7
+Shutter Island,https://watch.afi.com/movie/shutter-island,11324,72,2026-11-16T14:53:40.734562+00:00,694d4ba20fb72026fcef6b0213b7435b34d0a4299e8d3bc9862c5bc764eee148
+Hugo,https://watch.afi.com/movie/hugo,44826,60,2026-11-16T14:53:41.322316+00:00,8e5dd355377ee2d6495753b17a6968fb2057e63ca329397f586a24aa758ac36b
+Django Unchained,https://watch.afi.com/movie/django-unchained,68718,72,2026-11-16T14:53:41.584901+00:00,5ced83bf52cbcdae1dded03925956d632f5a04c3c458146fc3aa1b542c7664de
+Inglourious Basterds,https://watch.afi.com/movie/inglourious-basterds,16869,56,2026-11-16T14:53:41.861395+00:00,97742cd4566eb4979afe4065deeb2b175530c970c5b71862d1b73bae38676ac9
+The Hateful Eight,https://watch.afi.com/movie/the-hateful-eight,273248,60,2026-11-16T14:53:42.161397+00:00,52ca0bf3ba65b0f9adb97ccb3c16646e020dd8520bc24f77bebeec80c132b4e3
+Pulp Fiction,https://watch.afi.com/movie/pulp-fiction,680,106,2026-11-16T14:53:42.309762+00:00,9c204b5f1b516f98bafcaf1d694ff2cb8aaee9fa035cd8dc0881cfd3b248725b
+Fargo,https://watch.afi.com/movie/fargo,275,48,2026-11-16T14:53:43.181458+00:00,9372d840c35b4cfbf6472e7b10556d776c8819b7104122b4c0e8e7829932b6ff
+WALL·E,https://watch.afi.com/movie/wall-e,10681,86,2026-11-16T14:53:46.648424+00:00,321722606c4b498c4d28087375c1f9ab9a801cf699413debea3132a69d4e02d9
+Ratatouille,https://watch.afi.com/movie/ratatouille,2062,104,2026-11-16T14:53:46.826876+00:00,372e419829f4634efb5d9436a91327aaaac87308138cf9fbf09823dcf9c7daba
+Toy Story 3,https://watch.afi.com/movie/toy-story-3,10193,88,2026-11-16T14:53:46.789306+00:00,c498b597360e3429401207364c96c130b7f40b5f3d29be2e1b3ddb6244d403d4
+The Incredibles,https://watch.afi.com/movie/the-incredibles,9806,106,2026-11-16T14:53:47.735056+00:00,89f33ed2a7b976047190fd6016233575265a8f17293bc6c8af70c8a89a3487ad
+How to Train Your Dragon,https://watch.afi.com/movie/how-to-train-your-dragon,10191,81,2026-11-16T14:53:47.918634+00:00,c619a9beffef3cef0d357d57ad182116aac5c6a8057ac8334102e63eef3f545a
+Kubo and the Two Strings,https://watch.afi.com/movie/kubo-and-the-two-strings,313297,71,2026-11-16T14:53:48.699081+00:00,b16dddbff5e3b5826fdd77862927e2f952c175a2d51b3a781f5325956aa2749d
+Coraline,https://watch.afi.com/movie/coraline,14836,85,2026-11-16T14:53:48.633473+00:00,77c8aa0a09698a6cb710ea219fdab07843da6aad791667c63dac3ba61d35ba0b
+Chicken Run,https://watch.afi.com/movie/chicken-run,7443,77,2026-11-16T14:53:49.424865+00:00,445efb9fb672f5f88571acf3cf59f8a6be4f556c54915de2b2d445ccb8b6a3e8
+Barbie (2023),https://www.themoviedb.org/movie/346698-barbie/cast,346698,96,2026-11-16T14:54:54.723993+00:00,2729b78345988a031d9229fed1edcf4b1944840d89d17ce42fceaeb0138d69ca
+Dune (2021),https://www.themoviedb.org/movie/438631-dune/cast,438631,106,2026-11-16T14:54:54.637570+00:00,31aadad4106bae77b61dfa0204a4bfe8cbebee0a75ff308ce5d9298d92eb742f
+Mad Max: Fury Road (2015),https://www.themoviedb.org/movie/76341-mad-max-fury-road/cast,76341,77,2026-11-16T14:54:54.621258+00:00,a2d2ec09a494235bf0fabbabde6d50cfbcc808ee054f500c626d6b4582941b91
+Furiosa: A Mad Max Saga (2024),https://www.themoviedb.org/movie/786892-furiosa-a-mad-max-saga/cast,786892,85,2026-11-16T14:54:55.432938+00:00,c27d566be84498e8a708633bf0008b62fea2f74b54a664ba7c298c5428614422
+Blade Runner 2049 (2017),https://www.themoviedb.org/movie/335984-blade-runner-2049/cast,335984,227,2026-11-16T14:54:56.943989+00:00,2ab3c59740a137ad93c717ab56c3d259e81b1cd828e01415b5460988130d08f9
+Arrival (2016),https://www.themoviedb.org/movie/329865-arrival/cast,329865,177,2026-11-16T14:54:56.350112+00:00,debee214b8e0acaeff6166f0f729bdff8993c1567becb30d7a7127d60f8f420c
+Sicario (2015),https://www.themoviedb.org/movie/273481-sicario/cast,273481,122,2026-11-16T14:54:56.793735+00:00,32a668dab3a3cbee461c467655db086b5afd3cefb15751ff59a039ce287786da
+1917 (2019),https://www.themoviedb.org/movie/530915-1917/cast,530915,125,2026-11-16T14:54:58.112160+00:00,ee8ec3977080e52ee2522484d282bbe4cbe80800e7a6fc6765795132ecd8084c
+Skyfall (2012),https://www.themoviedb.org/movie/37724-skyfall/cast,37724,117,2026-11-16T14:54:58.378093+00:00,3df26e446422467c8ec343d125a300d7d2f430214cef2f26336297d8cd091003
+No Time to Die (2021),https://www.themoviedb.org/movie/370172-no-time-to-die/cast,370172,80,2026-11-16T14:54:58.520581+00:00,ed73e7c9b3bd96959f568ce3f9dcef23c775278684810fbd91a3c1651b98b283
+Casino Royale (2006),https://www.themoviedb.org/movie/36557-casino-royale/cast,36557,164,2026-11-16T14:54:59.839730+00:00,3ba41d799802f40d0d512aab6e44d3c53e703a5ee37e40b87daf6c54d63090f8
+Mission: Impossible - Fallout (2018),https://www.themoviedb.org/movie/353081-mission-impossible-fallout/cast,353081,111,2026-11-16T14:54:59.833138+00:00,28ec62c29d7d5b95d66b9915dcbddf3c60bed1a1364eb68891ea84095ed85640
+Mission: Impossible - Dead Reckoning Part One (2023),https://www.themoviedb.org/movie/575264-mission-impossible-dead-reckoning-part-one/cast,575264,74,2026-11-16T14:54:59.871167+00:00,a6bb4b1cc6f0b8f3e90e8e24a3f403a32cb562ef7c347df92bc0a20372c8e03e
+Top Gun: Maverick (2022),https://www.themoviedb.org/movie/361743-top-gun-maverick/cast,361743,189,2026-11-16T14:55:01.592319+00:00,2cad024d320d3b1176a9e4b88b6c8db96eca42d989f85bbc07207da8c24fe51f
+Gladiator (2000),https://www.themoviedb.org/movie/98-gladiator/cast,98,84,2026-11-16T14:55:01.381136+00:00,f2e70d50ca88570d4bc3e49c77003c97d86fe6ab59afc1e14b869ace8dc017c8
+Kingdom of Heaven (2005),https://www.themoviedb.org/movie/1495-kingdom-of-heaven/cast,1495,177,2026-11-16T14:55:01.281592+00:00,9c08522b39fa9c10dc5a695f3d0a8d8b13fd237efc2812e61a2840e24ead2a89
+Black Hawk Down (2001),https://www.themoviedb.org/movie/855-black-hawk-down/cast,855,159,2026-11-16T14:55:02.243894+00:00,9363966857ea654c2f6a40979617ab9cd184983a2ed6f8fc4b820b522bb54cf4
+Prometheus (2012),https://www.themoviedb.org/movie/70981-prometheus/cast,70981,74,2026-11-16T14:55:02.474363+00:00,2e9ceabae95cb9a40fa32f791d1b0966a2d25a88eec3648fa417c130c649c02a
+Alien: Covenant (2017),https://www.themoviedb.org/movie/126889-alien-covenant/cast,126889,129,2026-11-16T14:55:02.943068+00:00,8e3f34488dc47950ae9b316d72b6b933902aad9d9789f156a0130a184007594d
+Avatar: The Way of Water (2022),https://www.themoviedb.org/movie/76600-avatar-the-way-of-water/cast,76600,76,2026-11-16T14:55:03.577129+00:00,622dde5a503636385f24608b00e06ba4a1dccff6bbde15cee289fd0be7e731dc
+Roma (2018),https://www.themoviedb.org/movie/426426-roma/cast,426426,35,2026-11-16T14:55:03.571065+00:00,517c0d59a14ba1528b0967d90a63fd3eb866b15dcc0163f0d5b39fb8565249d8
+Beauty Shop (2005),https://www.themoviedb.org/movie/14177-beauty-shop/cast,14177,21,2026-11-16T14:55:04.149892+00:00,604fb25d7861deba8a187e9fc4a8aed35f492a98914cde6faaf6b786e6b69ca5
+Requiem for a Dream (2000),https://www.themoviedb.org/movie/641-requiem-for-a-dream/cast,641,76,2026-11-16T14:55:04.886611+00:00,bda0dc849d3a6c8cacd8ab13ff364841eedd4c5bf6dac8cc0e579be03b71b5e8
+La La Land (2016),https://www.themoviedb.org/movie/313369-la-la-land/cast,313369,105,2026-11-16T14:55:05.538267+00:00,6d707d13f718486185371a845cd93b225cba590ab91cc4954df6909c7d722a91
+First Man (2018),https://www.themoviedb.org/movie/369972-first-man/cast,369972,94,2026-11-16T14:55:05.546305+00:00,57ad9042a26e54243a0a1634d5e93774b630ae7208592aed93f65af014d7540a
+Babylon (2022),https://www.themoviedb.org/movie/615777-babylon/cast,615777,129,2026-11-16T14:55:06.390810+00:00,8d257731f581c38ad8c61b7fd12b304828f3e82acaecdbda6f35d5e1addba466
+The Grand Budapest Hotel (2014),https://www.themoviedb.org/movie/120467-the-grand-budapest-hotel/cast,120467,59,2026-11-16T14:55:06.407296+00:00,f948e152bdb365e8ec9d1b8262d37d09ea4ba1da725f7a7bd0b37fded3c5f903
+Moonrise Kingdom (2012),https://www.themoviedb.org/movie/83666-moonrise-kingdom/cast,83666,55,2026-11-16T14:55:06.324064+00:00,d2e943220f6a3223d65edc0b0334b108f5f7cfc266e9ee9ada7e6e9d03ea6122
+"The French Dispatch of the Liberty, Kansas Evening Sun (2021)",https://www.themoviedb.org/movie/542178-the-french-dispatch-of-the-liberty-kansas-evening-sun/cast,542178,60,2026-11-16T14:55:07.955100+00:00,456a9fedea83384a65637343cc0c484420446e20edf56f54c4f63c7104fc4411
+Asteroid City (2023),https://www.themoviedb.org/movie/747188-asteroid-city/cast,747188,147,2026-11-16T14:55:07.747142+00:00,c57dd3bb3fbb69778e53382cb3392118975236c8d2073d26188a63fecdbae21b
+Poor Things (2023),https://www.themoviedb.org/movie/792307-poor-things/cast,792307,123,2026-11-16T14:55:07.914551+00:00,85b8ae67a1557574004c671740419e03f1c10e87c2719d229822ccaa392a7b83
+The Favourite (2018),https://www.themoviedb.org/movie/375262-the-favourite/cast,375262,93,2026-11-16T14:55:08.476436+00:00,39b7c9615a492b378db425d0e6d061b8db96e995987be1d70965316a6b77d8d1
+The Lobster (2015),https://www.themoviedb.org/movie/254320-the-lobster/cast,254320,52,2026-11-16T14:55:08.752893+00:00,08e516893017accc161a9b43af70cf7e0b9a395c8fd553c8ffe7e0f0d6b64b80
+Kinds of Kindness (2024),https://www.themoviedb.org/movie/1029955-kinds-of-kindness/cast,1029955,98,2026-11-16T14:55:08.785654+00:00,140c69eed7ae99f2ff985621dc84add6b71ca54ede25c5385ab9cc56d25209ff
+Everything Everywhere All at Once (2022),https://www.themoviedb.org/movie/545611-everything-everywhere-all-at-once/cast,545611,95,2026-11-16T14:55:09.832870+00:00,ac26c0665c9cd193f530d8839be3844bc5820080629fc85ec3ba51a6d23fcac4
+Swiss Army Man (2016),https://www.themoviedb.org/movie/347031-swiss-army-man/cast,347031,21,2026-11-16T14:55:09.817349+00:00,d06d6a752804098ea8dfe73f5018dc843caf1c835cdeb8b789ccf2ebf49551c3
+Parasite (2019),https://www.themoviedb.org/movie/496243/cast,496243,85,2026-11-16T14:55:10.096901+00:00,85358a35e507d9bef12b936de6173fff78a7e0714696926932725cc45c85be1a
+Memories of Murder (2003),https://www.themoviedb.org/movie/11423/cast,11423,42,2026-11-16T14:55:10.876299+00:00,5f0d5c5125af4888a6b1bac81e11ffb5da4ff146baae171054ff250aeb35aada
+Snowpiercer (2013),https://www.themoviedb.org/movie/110415/cast,110415,111,2026-11-16T14:55:10.887263+00:00,c2adebf5d7d6365f602aaa0f8859907b4cdd7c1cc32e797ba8b602cef0b885da
+Past Lives (2023),https://www.themoviedb.org/movie/666277-past-lives/cast,666277,102,2026-11-16T14:55:11.144796+00:00,9bef6866519d547f0e6c72a5be94391b085b5fc0983473e493093f7b74131b50
+Minari (2020),https://www.themoviedb.org/movie/615643-minari/cast,615643,90,2026-11-16T14:55:11.973670+00:00,ddbf3bb46aa2402aa16ee3280d74ccbfaac8c5705b44ed9e9f838fd5f8823789
+Nomadland (2021),https://www.themoviedb.org/movie/581734-nomadland/cast,581734,54,2026-11-16T14:55:11.648456+00:00,58dfa8ae239864943eca7dff5fe3ca62752ff575910d79f3490421da25b532af
+Moonlight (2016),https://www.themoviedb.org/movie/376867-moonlight/cast,376867,55,2026-11-16T14:55:12.212346+00:00,59a8f4020696f76068c0b083ffc5e6ef25954bc8a7e32fcaee517e1cda4c2fe1
+Marriage Story (2019),https://www.themoviedb.org/movie/492188-marriage-story/cast,492188,75,2026-11-16T14:55:12.575081+00:00,8b0f2a79dc12ed822d94d8a4b491ea51bcf4dd8c31ad4eae6ffd8625501ae0a9
+The Irishman (2019),https://www.themoviedb.org/movie/398978-the-irishman/cast,398978,94,2026-11-16T14:55:12.863721+00:00,b751e8b8e0c4e73b4dd6aeda13840d8da1be08e2b1b6f7f9ebc3c31a0171f354
+The Wolf of Wall Street (2013),https://www.themoviedb.org/movie/106646-the-wolf-of-wall-street/cast,106646,99,2026-11-16T14:55:13.637237+00:00,5cfdca0183802d1530d288c3a9cb30deb539e7cb08e5ce31db9c3cc06430e826
+Slovenian Girl (2009),https://www.themoviedb.org/movie/34989-slovenka/cast,34989,23,2026-11-16T14:55:13.635955+00:00,1c18e81b002c324c60c516fc4d2d15e9e124ed4db798f5f4d778c59e508e22ab
+Once Upon a Time in... Hollywood (2019),https://www.themoviedb.org/movie/466272-once-upon-a-time-in-hollywood/cast,466272,114,2026-11-16T14:55:14.178816+00:00,521165024fa7dcf082eebcbb1fc74079cfbc4a5ed1e6f97ac2cfb628185ea0a5
+No Country for Old Men (2007),https://www.themoviedb.org/movie/6977-no-country-for-old-men/cast,6977,79,2026-11-16T14:55:14.622113+00:00,0289f2f968d79973cac8a8bfe13632f811ee8f01e427e8d8e1e4215f803c5c6d
+True Grit (2010),https://www.themoviedb.org/movie/44264-true-grit/cast,44264,71,2026-11-16T14:55:14.635896+00:00,20a8615996c349145580a666d3ea0f3527f3c8a05fd44a3591518739486dd4da
+Inside Llewyn Davis (2013),https://www.themoviedb.org/movie/86829-inside-llewyn-davis/cast,86829,103,2026-11-16T14:55:15.151958+00:00,8199b3ca987dea5828c5c0d512321cecde19ffc66c930777b73be67fdb5b9a13
+The Big Lebowski (1998),https://www.themoviedb.org/movie/115-the-big-lebowski/cast,115,117,2026-11-16T14:55:15.476372+00:00,1296344c1b3423f1cf002fec148c7f108f168b214cd0bbe333071fe41144a119
+"Three Billboards Outside Ebbing, Missouri (2017)",https://www.themoviedb.org/movie/359940-three-billboards-outside-ebbing-missouri/cast,359940,89,2026-11-16T14:55:16.028595+00:00,2c6920997930f876abc376edbbfe64f24404761e0cd5d0f3b52c522e7e31fae3
+The Banshees of Inisherin (2022),https://www.themoviedb.org/movie/674324-the-banshees-of-inisherin/cast,674324,92,2026-11-16T14:55:15.952854+00:00,9191eb382d2bed47c75cf23e129afcb242ccee98c36ec6b2d703b1b944611fa3
+In Bruges (2008),https://www.themoviedb.org/movie/8321-in-bruges/cast,8321,45,2026-11-16T14:55:16.381578+00:00,1612e1e9b0678b0483b160b181007155180c16b583cf0fb74e0c805e65b1e452
+Seven Psychopaths (2012),https://www.themoviedb.org/movie/86838-seven-psychopaths/cast,86838,61,2026-11-16T14:55:16.650903+00:00,9554335e18d3ac59bdc710aa38b420f0f5277a105f815699dc4c42505005c90e
+The Shape of Water (2017),https://www.themoviedb.org/movie/399055-the-shape-of-water/cast,399055,78,2026-11-16T14:55:16.926782+00:00,6a5550ca1edcbafe05f201316c1e50d8e7518c4ac3082cac51601c66e7440725
+Pan's Labyrinth (2006),https://www.themoviedb.org/movie/1417-el-laberinto-del-fauno/cast,1417,96,2026-11-16T14:55:17.248104+00:00,c29b16d74c7653a167a91d9ebcf188a5ae4636e35e35e2b687715cd274d86433
+Nightmare Alley (2021),https://www.themoviedb.org/movie/597208-nightmare-alley/cast,597208,49,2026-11-16T14:55:17.596714+00:00,4070e913eaff3707589b2ecb792ea9ed4df3f57bf79d1f42e21f51644c0d329d
+Guillermo del Toro's Pinocchio (2022),https://www.themoviedb.org/movie/555604-guillermo-del-toro-s-pinocchio/cast,555604,44,2026-11-16T14:55:17.704760+00:00,418ab05947cce93d9c066fae2b9ac1bf22d65a4756ba3fbeb560b31dc24ffe5f
+Spider-Man: Into the Spider-Verse (2018),https://www.themoviedb.org/movie/324857-spider-man-into-the-spider-verse/cast,324857,65,2026-11-16T14:55:18.717489+00:00,888efa94ba404cce79582860e40819c62b6eff7345164a6384cb110ceb2623ee
+Spider-Man: Across the Spider-Verse (2023),https://www.themoviedb.org/movie/569094-spider-man-across-the-spider-verse/cast,569094,78,2026-11-16T14:55:19.378810+00:00,a042917871b553313a7e13e1d440ce652e3d8b308ed608efe562dfafe20381db
+Soul (2020),https://www.themoviedb.org/movie/508442-soul/cast,508442,45,2026-11-16T14:55:18.755018+00:00,91ed78063a31ce079836b6de0a56c40b2d76e362d6676b50b7a6e70b2c3299bc
+Coco (2017),https://www.themoviedb.org/movie/354912-coco/cast,354912,69,2026-11-16T14:55:20.533601+00:00,86703e291e48fab0db929a5ba91260bb019501ec4aff44a11e8b9d0fccc80da1
+Inside Out (2015),https://www.themoviedb.org/movie/150540-inside-out/cast,150540,84,2026-11-16T14:55:20.640265+00:00,32851d95cd4ed8451ea3070096678c164a4710fbf41f9e37217f604da7a73a99
+Inside Out 2 (2024),https://www.themoviedb.org/movie/1022789-inside-out-2/cast,1022789,49,2026-11-16T14:55:20.252519+00:00,ee0433829075ee106081385b8aa10a52c225afd16966636a93368f423ecfa559
+Up (2009),https://www.themoviedb.org/movie/14160-up/cast,14160,85,2026-11-16T14:55:21.433356+00:00,55d5aa28eaecf501275776acd023a5635336eb57f02000c6405aa24e7a795f26
+The Wild Robot (2024),https://www.themoviedb.org/movie/1184918-the-wild-robot/cast,1184918,43,2026-11-16T14:55:21.390133+00:00,ec576bc841c9f09d634cabf967916fba4d94a1fda6917fc0324f5291a94c1921
+Fantastic Mr. Fox (2009),https://www.themoviedb.org/movie/10315-fantastic-mr-fox/cast,10315,72,2026-11-16T14:55:21.850036+00:00,268d7189aabad28a722fc57e5825202d069b5874385da7d46fd33822fed393e8
+Isle of Dogs (2018),https://www.themoviedb.org/movie/399174-isle-of-dogs/cast,399174,80,2026-11-16T14:55:22.630486+00:00,06c472187a2b7e533ca91222054cb6339615af09879bf5f12858b381b5e888bf
+The Boy and the Heron (2023),https://www.themoviedb.org/movie/508883/cast,508883,28,2026-11-16T14:55:22.538163+00:00,49748d7a4daaf3fd8b05907b1ec3bec2e79009d343beaec99d9d5256f40edfad
+Spirited Away (2001),https://www.themoviedb.org/movie/129/cast,129,23,2026-11-16T14:55:22.634011+00:00,38ed08776e48b2e64da74c9868bf8c1654c0a344244832b5599b8cc2430c93a4
+Princess Mononoke (1997),https://www.themoviedb.org/movie/128/cast,128,20,2026-11-16T14:55:23.290802+00:00,81c1824ac13f4a3fd2f964e958fb81eb046322ca5ce028008f6503de95d52a45
+Friday the 13th (2009),https://www.themoviedb.org/movie/13207-friday-the-13th/cast,13207,44,2026-11-16T14:55:24.000423+00:00,1520f0e24bb12809052dc9264c8cfe66213f674e4d8a2f2ed1720dbbb260591f
+Won't You Be My Neighbor? (2018),https://www.themoviedb.org/movie/490003-won-t-you-be-my-neighbor/cast,490003,23,2026-11-16T14:55:24.202523+00:00,d5ee82251bd72d0021222c2092a1dff0cce07b8f89bad22ecfe50ec96cea35bc
+My Octopus Teacher (2020),https://www.themoviedb.org/movie/682110-my-octopus-teacher/cast,682110,23,2026-11-16T14:55:24.478819+00:00,40147991582c008c7fc83cf6c41dbc2f2555a5b48c4141a0bdc6fd8b7e3b1b47
+All the Beauty and the Bloodshed (2022),https://www.themoviedb.org/movie/1004663-all-the-beauty-and-the-bloodshed/cast,1004663,22,2026-11-16T14:55:25.257755+00:00,63991d74dba481fc3c490f94ffc928ee94ff512709463126d8b685898f2718fc
+Fire of Love (2022),https://www.themoviedb.org/movie/913823-fire-of-love/cast,913823,23,2026-11-16T14:55:25.306381+00:00,bc307031b18865cf7b66306022f76d3d520c707bf6fd12c34484264355db318e
+All Quiet on the Western Front (2022),https://www.themoviedb.org/movie/49046-im-westen-nichts-neues/cast,49046,46,2026-11-16T14:55:25.904637+00:00,b12c467d38fe5d6084877199b3d0b6df8df7718b832a09a2ad23b34cee6a7639
+The Lives of Others (2006),https://www.themoviedb.org/movie/582-das-leben-der-anderen/cast,582,30,2026-11-16T14:55:26.491199+00:00,a0b1aa8183f0d00dad5c93eefe7f7bdb630785aec17faf319b8d301e05419660
+Toni Erdmann (2016),https://www.themoviedb.org/movie/374475-toni-erdmann/cast,374475,22,2026-11-16T14:55:26.744499+00:00,75c3a665390b34ebc74f0c31274fa818f68595f546bb3b9b3348d2f380ec6a7a
+Never Look Away (2018),https://www.themoviedb.org/movie/423612-werk-ohne-autor/cast,423612,21,2026-11-16T14:55:27.019320+00:00,11a449bc851c5b057dfb955ffd2a3a899f469f5303be5442bf7ae13beb797c8c
+The Teachers' Lounge (2023),https://www.themoviedb.org/movie/998022-das-lehrerzimmer/cast,998022,39,2026-11-16T14:55:27.659266+00:00,d0c6d772992cfac14b05352b14288c0f78ba37dc237390a279d77a269d0f5b3f
+Run Lola Run (1998),https://www.themoviedb.org/movie/104-lola-rennt/cast,104,24,2026-11-16T14:55:27.863141+00:00,8f63c229fdb64fc4f61f41202dbc362978ddae902e9419a44da4501b2c1414aa
+"Good Bye, Lenin! (2003)",https://www.themoviedb.org/movie/338-good-bye-lenin/cast,338,30,2026-11-16T14:55:28.166442+00:00,099bd71e7827e84048a2f3a6cfe645b2feceb8febcb29dc8aa7170cfe8f2f6a6
+Downfall (2004),https://www.themoviedb.org/movie/613-der-untergang/cast,613,41,2026-11-16T14:55:28.401320+00:00,d43309b55df81986c578d2a0b2347baf0f5a2416aab55d893f619889d1cb19ce
+Das Boot (1981),https://www.themoviedb.org/movie/387-das-boot/cast,387,39,2026-11-16T14:55:28.534565+00:00,7b44621986e75120c759393e6f84643f04d0b63d7539f31dc947954d48599c82
+Dark Phoenix (2019),https://www.themoviedb.org/movie/320288-dark-phoenix/cast,320288,61,2026-11-16T14:55:29.567436+00:00,91b2eff30117529a1e38ea95b3e8b94b6b73dd9fe35518de9273dbe713725c90
+Afire (2023),https://www.themoviedb.org/movie/900379-roter-himmel/cast,900379,43,2026-11-16T14:55:29.682428+00:00,61984b5f81a5030ecaa0cb6e67e7ab14704b4e2e3322cdfd0144408912719808
+Undine (2020),https://www.themoviedb.org/movie/615761-undine/cast,615761,43,2026-11-16T14:55:30.300352+00:00,960b19214fb083295e6b4327c1ecb5483997538cc246bb8c25c010dcfbec8f5c
+Corsage (2022),https://www.themoviedb.org/movie/888321-corsage/cast,888321,20,2026-11-16T14:55:30.463538+00:00,364b1aa90c88fe3d95c6390dbb39ba49916c74ced55db5c36609853c61f9cca6
+Perfect Days (2023),https://www.themoviedb.org/movie/976893-perfect-days/cast,976893,57,2026-11-16T14:55:30.867589+00:00,956fbc42f8f405c5787dc0c7865902ac68cb85e0b796518094bea9096ab2a3b5
+The Zone of Interest (2023),https://www.themoviedb.org/movie/467244-the-zone-of-interest/cast,467244,86,2026-11-16T14:55:31.597325+00:00,cda14cf2391f5d7e8acf326ddd14e4368201d1e440bf43ef6c0fb5c65c3c13a0
+The Substance (2024),https://www.themoviedb.org/movie/933260-the-substance/cast,933260,93,2026-11-16T14:55:32.428419+00:00,85165cd3db44423f986dcf0e879f849303c441edf7f1df9b15677a826f39b4a0
+Conclave (2024),https://www.themoviedb.org/movie/974576-conclave/cast,974576,134,2026-11-16T14:55:32.724181+00:00,efb8f3f8d7d2d652536f043b4d6ba016bfb96951d289bed5152fc66bed62ad12
+Emilia Pérez (2024),https://www.themoviedb.org/movie/974950-emilia-perez/cast,974950,99,2026-11-16T14:55:33.230101+00:00,9502a1075580ff6c1cf63e99f4570f01a6cbf8281ee873ec0f4802a89082fbf7
+The Baader Meinhof Complex (2008),https://www.themoviedb.org/movie/6968-der-baader-meinhof-komplex/cast,6968,31,2026-11-16T14:55:34.489689+00:00,c5c7d58cc4aa8290a237311d8eed3935fcb87c16a502bfe76b9680d5fa5f4877
+The Lord of the Rings: The Fellowship of the Ring (2001),https://www.themoviedb.org/movie/120-the-lord-of-the-rings-the-fellowship-of-the-ring/cast,120,77,2026-11-16T14:55:36.078133+00:00,2af410da0c7c54ae4e7bad5acd00e02498770cf0a29260c5ed040aae0e83f319

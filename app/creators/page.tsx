@@ -222,8 +222,9 @@ export default async function CreatorsPage({
       return {
         id: p.user_id,
         name: p.display_name ?? uiText("Ui.text_276ffa1fb4f970"),
-        role: p.role ?? displayPositions[0] ?? typeLabel ?? "Filmschaffende/r",
+        role: primaryOccupationForPositions(p.crew?.primaryOccupation, p.positions ?? [], p.role)?.label ?? p.role ?? displayPositions[0] ?? typeLabel ?? "Filmschaffende/r",
         positions: displayPositions,
+        displayPositions: getProfileDisplayPositions({positions: p.positions, role: p.role, crew: p.crew, profileTypes: types, primaryType, labels: PROFILE_TYPE_LABELS, mode: "summary"}),
         primaryOccupation: occupationReference(primaryOccupationForPositions(p.crew?.primaryOccupation, p.positions ?? [], p.role)),
         occupationIds: crewOccupationIds(p),
         location: p.location ?? "",

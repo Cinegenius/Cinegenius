@@ -1246,7 +1246,20 @@
     "choose": "Choose main occupation",
     "hint": "Your main occupation is highlighted on your profile. The crew directory lists you under all selected occupations and their departments.",
     "legacy": "Your existing occupations have no clear main occupation yet. Choose one here; your other occupations are preserved.",
-    "empty": "Choose an occupation from the catalogue. Your existing details are preserved."
+    "empty": "Choose an occupation from the catalogue. Your existing details are preserved.",
+    "focusExplanation": "1 main occupation + up to 2 secondary occupations appear on your cards. 1 additional occupation stays visible in your profile and search. You can change these later.",
+    "additional": "Additional occupation (optional)",
+    "secondary": "Secondary occupations",
+    "noAdditional": "No additional occupation",
+    "chooseAdditional": "Choose an additional occupation",
+    "additionalHint": "Only in profile details and search, not on your cards.",
+    "legacyFocus": "Your existing entries are kept. When changing your occupations, choose at most 1 main, 2 secondary and 1 additional occupation.",
+    "limit": "Choose 1 main occupation, up to 2 secondary occupations and 1 additional occupation. Remove a selection first.",
+    "mainRequired": "Choose a main occupation from your selection.",
+    "additionalRequired": "Choose which of the four occupations should appear only in profile details and search.",
+    "invalidAdditional": "The additional occupation must be selected and different from your main occupation.",
+    "invalidSelection": "Please choose valid occupations from the catalogue.",
+    "additionalTitle": "Additional occupation"
   },
   "legalLanguage": {
     "original": "The original German version of these legal texts is authoritative. Translations are provided for ease of understanding."

@@ -1,4 +1,5 @@
 
+import { additionalCrewOccupation, profileOccupationFocusError, selectedCrewOccupations } from "./crew-occupations";
 import { selectedPlaceId } from "./selected-place-id";
 import { hasPlaceCity } from "@/lib/places/core";
 import { DEPARTMENTS, deptValues } from "@/lib/marketplaceCategories";
@@ -57,6 +58,7 @@ export type QuickStartDraft = {
   talentIntro: string;
   providerImageUrl?: string;
   primaryOccupation?: PrimaryOccupation | null;
+  additionalOccupation?: PrimaryOccupation | null;
   sections: Partial<Record<QuickStartIntent, QuickStartIntentData>>;
   completed: { profile: boolean; listings: Partial<Record<"location" | "equipment", string>>; company?: string };
   requestKeys: Partial<Record<"location" | "equipment" | "company", string>>;
@@ -262,6 +264,7 @@ export function normalizeQuickStartDraft(value: unknown): QuickStartDraft {
     talentIntro: typeof input.talentIntro === "string" ? input.talentIntro.slice(0, 1200) : "",
     sections,
     primaryOccupation: occupationReference(primaryOccupationForPositions(input.primaryOccupation, [...(sections.crew?.roles ?? []), ...(sections.talent?.roles ?? [])].map(item=>item.role))),
+    additionalOccupation: additionalCrewOccupation({positions: [...(sections.crew?.roles ?? []), ...(sections.talent?.roles ?? [])].map(item => item.role), crew: {primaryOccupation: input.primaryOccupation, additionalOccupation: input.additionalOccupation, occupations: [...(sections.crew?.roles ?? []), ...(sections.talent?.roles ?? [])].map(item => ({departmentId: item.departmentId, roleId: `${item.departmentId}/${encodeURIComponent(item.role)}`}))}}),
     completed: {
       profile: completedInput.profile === true,
       listings: {
@@ -406,6 +409,12 @@ export function validateQuickStartDraft(draft: QuickStartDraft, { requirePrimary
   }
   const personalRoles = [...(draft.sections.crew?.roles ?? []), ...(draft.sections.talent?.roles ?? [])];
   if (requirePrimary && personalRoles.length && !primaryOccupationForPositions(draft.primaryOccupation, personalRoles.map(item=>item.role))) return {field: "primaryOccupation", message: (translate ? translate("setup.mainRequired") : "Bitte wähle deine Haupttätigkeit aus.")};
+  if (requirePrimary && personalRoles.length) {
+    const positions = personalRoles.map(item => item.role);
+    const occupations = personalRoles.map(item => ({departmentId: item.departmentId, roleId: `${item.departmentId}/${encodeURIComponent(item.role)}`}));
+    const focusError = profileOccupationFocusError({positions, crew: {primaryOccupation: draft.primaryOccupation, occupations: selectedCrewOccupations(positions, occupations), additionalOccupation: draft.additionalOccupation}});
+    if (focusError) return {field: "primaryOccupation", message: translate ? translate(`occupation.${focusError}`) : `occupation.${focusError}`};
+  }
   const intro = validateQuickStartScreen(draft, "intro", undefined, translate);
   if (intro) return intro;
   return null;

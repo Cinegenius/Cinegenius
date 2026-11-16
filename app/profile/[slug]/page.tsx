@@ -1,5 +1,6 @@
 import { profileAccessFor, filterPublicListings } from "@/lib/profile-privacy-server";
 import { projectProfilePrivacy } from "@/lib/profile-privacy";
+import { profileOccupationPreview } from "@/lib/crew-occupations";
 import { getTranslations as getPageTranslations } from "next-intl/server";
 import {getLocale} from "next-intl/server";
 import {placeReadFields} from "@/lib/places/catalog";
@@ -209,7 +210,7 @@ function getPublicCollaborations(userId: string, viewerId: string | null = null)
       if (!ids.length) return [];
       const { data: profiles } = await db
         .from("profiles")
-        .select("user_id, display_name, avatar_url, slug, role, positions")
+        .select("user_id, display_name, avatar_url, slug, role, positions, crew")
         .in("user_id", ids);
 
       const profileMap = Object.fromEntries((profiles ?? []).map((p) => [p.user_id, p]));
@@ -222,7 +223,7 @@ function getPublicCollaborations(userId: string, viewerId: string | null = null)
           display_name: p.display_name ?? "Unbekannt",
           avatar_url: p.avatar_url ?? null,
           slug: p.slug,
-          role: p.role ?? (Array.isArray(p.positions) ? p.positions[0] : null) ?? null,
+          role: profileOccupationPreview(p)[0] ?? null,
         }];
       });
     })();
@@ -367,7 +368,7 @@ export default async function ProfilePage(
     "name": profile.display_name ?? "",
     "description": profile.bio ?? "",
     "image": profile.avatar_url ?? "",
-    "jobTitle": profile.role ?? (profile.positions?.[0] ?? ""),
+    "jobTitle": profileOccupationPreview(profile)[0] ?? "",
     "address": profile.location ? { "@type": "PostalAddress", "addressLocality": profile.location } : undefined,
     "url": `https://cinegenius.co/profile/${slug}`,
   };

@@ -7,6 +7,7 @@ import { SlidersHorizontal } from 'lucide-react';
 import { rememberNewsCountry, type NewsRegion } from '@/lib/news-region';
 import { rememberNewsTopic, type HomeNewsTopic } from '@/lib/news-topic';
 import { type OrganizationTopic } from '@/lib/organization-taxonomy';
+import BrowseSelect from '@/components/BrowseSelect';
 import NewsCountrySelect from './NewsCountrySelect';
 
 export default function HomeNewsRegion({region, codes, topic, topics, empty = false, failed = false}: {
@@ -25,15 +26,11 @@ export default function HomeNewsRegion({region, codes, topic, topics, empty = fa
   return <div className="mb-3 min-w-0" aria-busy={pending}>
     <div className="grid min-w-0 grid-cols-1 gap-2 min-[380px]:grid-cols-2 sm:max-w-xl">
       <NewsCountrySelect value={region.selection} country={region.country} codes={codes} onChange={value => choose('country', value)} disabled={pending}/>
-      <label className="relative flex min-h-11 min-w-0 items-center rounded-xl border border-border bg-bg-secondary text-sm text-text-secondary">
-        <SlidersHorizontal size={17} aria-hidden="true" className="pointer-events-none absolute left-3 shrink-0 text-text-muted"/>
-        <select aria-label={organizations('topics')} value={topic.selection} onChange={event => choose('topic', event.target.value)} disabled={pending}
-          className="min-h-11 w-full min-w-0 appearance-auto rounded-xl bg-transparent py-2 pl-9 pr-2 outline-none focus-visible:ring-2 focus-visible:ring-gold disabled:opacity-60 [color-scheme:dark]">
-          <option value="all">{t('allTopics')}</option>
-          {topic.selection !== 'all' && !topics.includes(topic.selection) && <option value={topic.selection} disabled>{organizations(`topic.${topic.selection}`)}</option>}
-          {topics.map(value => <option key={value} value={value}>{organizations(`topic.${value}`)}</option>)}
-        </select>
-      </label>
+      <BrowseSelect label={organizations('topics')} value={topic.selection} onChange={value => choose('topic', value)} disabled={pending} icon={<SlidersHorizontal size={17} />} options={[
+        {value: 'all', label: t('allTopics')},
+        ...(topic.selection !== 'all' && !topics.includes(topic.selection) ? [{value: topic.selection, label: organizations(`topic.${topic.selection}`), disabled: true}] : []),
+        ...topics.map(value => ({value, label: organizations(`topic.${value}`)})),
+      ]} />
     </div>
     {error && <p role="alert" className="mt-2 text-sm text-text-secondary">{t('saveError')}</p>}
     {failed ? <div role="status" className="mt-2 text-sm text-text-secondary">{t('loadError')} <button type="button" onClick={() => startTransition(() => router.refresh())} disabled={pending} className="inline-flex min-h-11 items-center px-2 text-gold">{t('retry')}</button></div>

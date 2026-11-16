@@ -1246,7 +1246,20 @@
     "choose": "Fő foglalkozás kiválasztása",
     "hint": "A fő foglalkozásod kiemelten jelenik meg a profilodon. A stábjegyzékben minden kiválasztott foglalkozásod és részleged alatt megtalálható vagy.",
     "legacy": "A meglévő foglalkozásaid közül még nincs kijelölve a fő. Válaszd ki itt; a többi megmarad.",
-    "empty": "Válassz foglalkozást a jegyzékből. A meglévő adataid megmaradnak."
+    "empty": "Válassz foglalkozást a jegyzékből. A meglévő adataid megmaradnak.",
+    "focusExplanation": "A kártyáidon 1 fő és legfeljebb 2 melléktevékenység jelenik meg. 1 további tevékenység a profilban és a keresésben látható. Később mind módosítható.",
+    "additional": "További tevékenység (nem kötelező)",
+    "secondary": "Melléktevékenységek",
+    "noAdditional": "Nincs további tevékenység",
+    "chooseAdditional": "Válassz további tevékenységet",
+    "additionalHint": "Csak a profil részleteiben és a keresésben, a kártyáidon nem.",
+    "legacyFocus": "A meglévő adataid megmaradnak. Módosításkor legfeljebb 1 fő, 2 mellék- és 1 további tevékenységet válassz.",
+    "limit": "1 fő, legfeljebb 2 mellék- és 1 további tevékenységet választhatsz. Előbb távolíts el egyet.",
+    "mainRequired": "Válaszd ki a főtevékenységedet a kijelöltek közül.",
+    "additionalRequired": "Válaszd ki, melyik tevékenység jelenjen meg csak a profil részleteiben és a keresésben.",
+    "invalidAdditional": "A további tevékenységnek kiválasztottnak és a főtevékenységtől eltérőnek kell lennie.",
+    "invalidSelection": "Válassz érvényes tevékenységeket a katalógusból.",
+    "additionalTitle": "További tevékenység"
   },
   "legalLanguage": {
     "original": "E jogi szövegek eredeti német változata az irányadó. A fordítások a megértést segítik."

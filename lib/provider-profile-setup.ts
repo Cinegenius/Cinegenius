@@ -25,7 +25,7 @@ export function setupProfilePayload(draft: QuickStartDraft, existing: { profile_
     location: [draft.personCity.trim(), draft.personCountry.trim()].filter(Boolean).join(", "),
     selected_place_city_id: draft.personPlaceCityId || undefined,
     profile_types: types, profile_type: types[0] ?? null,
-    ...(personal ? { positions, crew: { ...existing?.crew, primaryOccupation: occupationReference(primary), occupations: selectedCrewOccupations(positions, roles.map(item => ({ departmentId: item.departmentId, roleId: `${item.departmentId}/${encodeURIComponent(item.role)}` }))) } } : {}),
+    ...(personal ? { positions, crew: { ...existing?.crew, primaryOccupation: occupationReference(primary), additionalOccupation: draft.additionalOccupation ?? null, occupations: selectedCrewOccupations(positions, roles.map(item => ({ departmentId: item.departmentId, roleId: `${item.departmentId}/${encodeURIComponent(item.role)}` }))) } } : {}),
     ...(!existing ? { bio: draft.talentIntro.trim(), avatar_url: photo || null, available: true } : {
       ...(draft.talentIntro.trim() ? { bio: draft.talentIntro.trim() } : {}),
       ...(photo ? { avatar_url: photo } : {}),

@@ -1,3 +1,4 @@
+import { profileOccupationPreview } from "@/lib/crew-occupations";
 import { requireAuth } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { rateLimit } from "@/lib/rateLimit";
@@ -43,7 +44,7 @@ export async function GET(req: NextRequest) {
   const { data: profiles, error: profileError } = visible.size
     ? native
       ? await db.from("profiles").select("user_id,display_name,avatar_url,role,positions,crew").in("user_id", [...visible])
-      : await db.from("profiles").select("user_id,display_name,avatar_url,role,positions").in("user_id", [...visible])
+      : await db.from("profiles").select("user_id,display_name,avatar_url,role,positions,crew").in("user_id", [...visible])
     : { data: [], error: null };
   if (profileError) return contactJson({ error: t("error") }, 503);
   let favorites: Awaited<ReturnType<typeof readFriendFavorites>> | undefined;
@@ -59,7 +60,7 @@ export async function GET(req: NextRequest) {
     const id = otherId(row), profile = profileMap.get(id), sender = row.sender_id === actor;
     return {
       friendship_id: row.id, user_id: id, display_name: profile?.display_name || t("member"), avatar_url: profile?.avatar_url ?? null,
-      role: profile?.role || profile?.positions?.[0] || t("member"), created_at: row.created_at,
+      role: (profile ? profileOccupationPreview(profile)[0] : null) || t("member"), created_at: row.created_at,
       collab_label: (sender ? row.sender_collab_label : row.receiver_collab_label) ?? null,
       collab_public: (sender ? row.sender_collab_public : row.receiver_collab_public) ?? false,
       ...(native ? {profile_visible: !!profile, ...friendOccupations(profile), ...(row.status === 'accepted' && favorites?.read ? {is_favorite: favorites.values.get(row.id)} : {})} : {}),

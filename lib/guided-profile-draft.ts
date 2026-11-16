@@ -1,3 +1,5 @@
+import { occupationReference, primaryOccupationForPositions, type PrimaryOccupation } from "./primary-occupation";
+import { additionalCrewOccupation } from "./crew-occupations";
 import { selectedPlaceId } from "./selected-place-id";
 import { departments, getProfileTypesForDepartment } from "@/lib/departments";
 import { PROFILE_TYPE_LABELS, type ProfileType } from "@/lib/profile-types";
@@ -11,6 +13,8 @@ export type GuidedProfileDraft = {
   types: string[];
   departmentIds: string[];
   positions: string[];
+  primaryOccupation?: PrimaryOccupation | null;
+  additionalOccupation?: PrimaryOccupation | null;
   bio: string;
 };
 
@@ -63,6 +67,8 @@ export function normalizeGuidedProfileDraft(value: Partial<GuidedProfileDraft> &
     types: [...new Set(types)],
     departmentIds: [...departmentIds].filter((id) => departments.some((department) => department.id === id)),
     positions,
+    primaryOccupation: occupationReference(primaryOccupationForPositions(value.primaryOccupation, positions)),
+    additionalOccupation: additionalCrewOccupation({positions, crew:{primaryOccupation:value.primaryOccupation, additionalOccupation:value.additionalOccupation}}),
   };
 }
 
@@ -73,12 +79,12 @@ export function removeGuidedDepartment(draft: GuidedProfileDraft, departmentId: 
   const remainingRoleLabels = new Set(departmentIds.flatMap((id) => departments.find((item) => item.id === id)?.roles ?? []));
   const positions = draft.positions.filter((position) => !department.roles.includes(position) || remainingRoleLabels.has(position));
   const castTypes: string[] = ["actor", "model", "extra", "stunt", "voiceover", "host"];
-  return {
+  return normalizeGuidedProfileDraft({
     ...draft,
     departmentIds,
     positions,
     types: draft.types.filter((type) => !(departmentId === "cast" && castTypes.includes(type))),
-  };
+  });
 }
 
 export function getGuidedProfileTypes(draft: GuidedProfileDraft): ProfileType[] {
