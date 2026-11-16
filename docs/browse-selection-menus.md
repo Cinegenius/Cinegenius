@@ -12,6 +12,10 @@ The existing page dimensions, layout, results and available filter values remain
 - A selection opened inside a native modal passes that dialog as `FloatingPanel`'s
   portal root. This keeps it in the active top layer and outside the inner scroll
   container. Escape closes the list first and restores focus to its trigger.
+- Touch and wheel scrolling remain native: pointer movement never scrolls an
+  option into view. Only opening or keyboard navigation reveals a choice, and
+  only within the popup. Returning focus must not scroll the surrounding page
+  or filter dialog. Internal option scrolling does not reposition the popup.
 - `MessagingDialog` opts into the browse surface only for `GlobalSearch`.
   Message, contact and group dialogs retain their existing presentation.
 - Filter selection, reset/apply, search retry, current history and private form

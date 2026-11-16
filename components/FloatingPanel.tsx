@@ -31,16 +31,22 @@ export default function FloatingPanel({ anchorRef, onClose, children, className 
       panel.dataset.placement = result.placement;
     };
     position();
+    const scroll = (event: Event) => {
+      // Option-list scrolling does not move the anchor. Avoid repeated layout
+      // reads/writes while a finger or trackpad is moving through the choices.
+      if (event.target instanceof Node && panel.contains(event.target)) return;
+      position();
+    };
     const observer = new ResizeObserver(position);
     observer.observe(panel); observer.observe(anchor);
     window.addEventListener("resize", position);
-    window.addEventListener("scroll", position, true);
+    window.addEventListener("scroll", scroll, true);
     window.visualViewport?.addEventListener("resize", position);
     window.visualViewport?.addEventListener("scroll", position);
     return () => {
       observer.disconnect();
       window.removeEventListener("resize", position);
-      window.removeEventListener("scroll", position, true);
+      window.removeEventListener("scroll", scroll, true);
       window.visualViewport?.removeEventListener("resize", position);
       window.visualViewport?.removeEventListener("scroll", position);
     };

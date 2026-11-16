@@ -12,6 +12,16 @@ export const occupationCatalogue: OccupationOption[] = departments.flatMap(depar
   label, departmentLabel: department.label, aliases: getDepartmentRoleSearchTerms(department, label),
 })));
 const byId = new Map(occupationCatalogue.map(option => [option.roleId, option]));
+// The catalogue is static. Normalize its aliases once instead of rescanning
+// every occupation for every profile, filter change and directory render.
+const catalogueOrder = new Map(occupationCatalogue.map((option, index) => [option, index]));
+const byPosition = new Map<string, Set<OccupationOption>>();
+for (const option of occupationCatalogue) for (const alias of option.aliases) {
+  const key = exactKey(alias);
+  const matches = byPosition.get(key) ?? new Set<OccupationOption>();
+  matches.add(option);
+  byPosition.set(key, matches);
+}
 // Preserve references generated for older catalogue titles now consolidated as synonyms.
 for (const option of occupationCatalogue) {
   for (const alias of option.aliases) {
@@ -44,8 +54,9 @@ export function readPrimaryOccupation(value: unknown): OccupationOption | null {
     || legacySafetyReferences.get(String(record.roleId))?.departmentId === record.departmentId) ? option : null;
 }
 export function occupationChoices(positions: readonly string[]): OccupationOption[] {
-  const keys = new Set(positions.map(exactKey));
-  return occupationCatalogue.filter(option => option.aliases.some(alias => keys.has(exactKey(alias))));
+  const matches = new Set<OccupationOption>();
+  for (const position of positions) for (const option of byPosition.get(exactKey(position)) ?? []) matches.add(option);
+  return [...matches].sort((a, b) => catalogueOrder.get(a)! - catalogueOrder.get(b)!);
 }
 export function primaryOccupationForPositions(value: unknown, positions: readonly string[], legacyPrimaryRole?: string | null): OccupationOption | null {
   const explicit = readPrimaryOccupation(value);
