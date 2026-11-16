@@ -4,6 +4,7 @@ import { db } from '@/lib/db';
 import { collectFacetRows } from '@/lib/browse-facets';
 import { newsEntryCountry } from '@/lib/news-region';
 import { UNASSIGNED_COUNTRY } from '@/lib/places/core';
+import { ORGANIZATION_TOPICS, type OrganizationTopic } from '@/lib/organization-taxonomy';
 
 export type NewsIndexRow = {
   id: string; entry_type: string; topic: string | null; place_country_code: string | null;
@@ -32,4 +33,15 @@ export function regionalNews(rows: NewsIndexRow[], country = '', currentOnly = f
 
 export async function newsCountries(currentOnly = false) {
   return [...new Set(regionalNews(await newsDiscoveryIndex(), '', currentOnly).map(row => newsEntryCountry(row) || UNASSIGNED_COUNTRY))];
+}
+
+/** Each choice has current public content under the other selected filter.
+ * Reuses the metadata scan already used for country selection, never article bodies. */
+export async function homeNewsFacets(country = '', topic: OrganizationTopic | '' = '') {
+  const rows = regionalNews(await newsDiscoveryIndex(), '', true);
+  const regional = regionalNews(rows, country);
+  return {
+    topics: ORGANIZATION_TOPICS.filter(value => regional.some(row => row.topic === value)),
+    codes: [...new Set(rows.filter(row => !topic || row.topic === topic).map(row => newsEntryCountry(row) || UNASSIGNED_COUNTRY))],
+  };
 }
