@@ -5,6 +5,7 @@ import { useTranslations } from "next-intl";
 import { cloneElement,isValidElement,useEffect,useRef,useState,type ReactNode } from "react";
 import BrowseSelect from "@/components/BrowseSelect";
 import BrowseResultCount from "@/components/BrowseResultCount";
+import { useSwipeDismiss } from "@/lib/use-swipe-dismiss";
 
 
 export type BrowseOption = { value: string; label: string };
@@ -47,6 +48,8 @@ export default function MobileBrowseControls({
 
   const [open, setOpen] = useState(false);
   const dialog = useRef<HTMLDialogElement>(null);
+  const panel = useRef<HTMLElement>(null);
+  useSwipeDismiss(panel, open, () => setOpen(false));
 
   useEffect(() => {
     const element = dialog.current;
@@ -55,7 +58,7 @@ export default function MobileBrowseControls({
     const previousFocus = document.activeElement;
     document.body.style.overflow = "hidden";
     element.showModal();
-    element.querySelector<HTMLButtonElement>("[data-filter-close]")?.focus();
+    element.querySelector<HTMLButtonElement>("[data-filter-close]")?.focus({preventScroll: true});
     const viewport = window.visualViewport;
     const resize = () => {
       const height = viewport?.height ?? window.innerHeight;
@@ -76,7 +79,7 @@ export default function MobileBrowseControls({
       viewport?.removeEventListener("scroll", resize);
       window.removeEventListener("resize", resize);
       window.removeEventListener("popstate", back);
-      if (previousFocus instanceof HTMLElement && previousFocus.isConnected) previousFocus.focus();
+      if (previousFocus instanceof HTMLElement && previousFocus.isConnected) previousFocus.focus({preventScroll: true});
     };
   }, [open]);
 
@@ -135,9 +138,9 @@ export default function MobileBrowseControls({
       {open && (
         <dialog ref={dialog} className="mobile-filter-dialog" aria-modal="true" aria-label={uiText("locations.filterBtn")} onCancel={event => { event.preventDefault(); setOpen(false); }}>
           <button tabIndex={-1} className="mobile-filter-dialog__backdrop" aria-label={uiText("Ui.text_5f423bd7da0e95")} onClick={() => setOpen(false)} />
-          <section className="mobile-filter-panel browse-popup-surface">
-            <div className="mobile-filter-panel__handle" />
-            <header className="mobile-filter-panel__header">
+          <section ref={panel} className="mobile-filter-panel browse-popup-surface">
+            <div data-swipe-dismiss-handle className="mobile-filter-panel__handle" />
+            <header data-swipe-dismiss-handle className="mobile-filter-panel__header">
               <h2>{uiText("locations.filterBtn")}</h2>
               <button data-filter-close type="button" aria-label={uiText("ProfilePhotoCrop.close")} onClick={() => setOpen(false)}><X size={20} /></button>
             </header>
