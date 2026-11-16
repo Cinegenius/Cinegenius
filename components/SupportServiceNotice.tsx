@@ -1,16 +1,21 @@
-import { getTranslations } from "next-intl/server";
+import { getLocale, getTranslations } from "next-intl/server";
+import { communityPolicyDates } from "@/lib/community-policy";
 
-/** Informational terms only: rendering this notice never creates a paid mandate. */
-export async function SupportServiceNotice({ compact = false }: { compact?: boolean }) {
-  const t = await getTranslations("SupportMediation");
+/** The legal surface keeps the German original; other surfaces use localized copy. */
+export async function SupportServiceNotice({ compact = false, legalOriginal = false }: { compact?: boolean; legalOriginal?: boolean }) {
+  const locale = legalOriginal ? "de" : await getLocale();
+  const t = await getTranslations({ locale, namespace: "SupportMediation" });
+  const dates = communityPolicyDates(locale);
   const body = (
-    <div className="space-y-3 text-sm leading-relaxed text-text-secondary [overflow-wrap:anywhere]">
+    <div lang={locale} className="space-y-3 text-sm leading-relaxed text-text-secondary [overflow-wrap:anywhere]">
       {!compact && <p>{t("startup")}</p>}
       <p>{t("free")}</p>
+      <p>{t("period", dates)}</p>
       <p>{t("mediation")}</p>
-      <p>{t("example")}</p>
+      <p>{t("providerPrices")}</p>
       <p>{t("additional")}</p>
       <p>{t("agreement")}</p>
+      <p>{t("existingAgreements", { start: dates.start })}</p>
     </div>
   );
   if (compact) return body;

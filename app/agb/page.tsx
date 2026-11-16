@@ -1,6 +1,7 @@
 import {getTranslations} from "next-intl/server";
 import Link from "next/link";
 import { SupportServiceNotice } from "@/components/SupportServiceNotice";
+import { communityPolicyDates } from "@/lib/community-policy";
 import { getTranslations as getMetadataTranslations } from "next-intl/server";
 
 export async function generateMetadata(): Promise<import("next").Metadata> {
@@ -23,7 +24,7 @@ export default async function AgbPage() {
         <div className="mb-10">
           <p className="text-xs uppercase tracking-widest text-text-muted font-semibold mb-3">{uiText("Ui.text_0da5374b4c42ae")}</p>
           <h1 className="font-display text-3xl font-bold text-text-primary mb-2">{uiText("Ui.text_986664fa33f063")}</h1>
-          <p className="text-text-muted text-sm">{t("termsDate")}</p>
+          <p lang="de" className="text-text-muted text-sm">{t("termsDate", { date: communityPolicyDates("de").start })}</p>
         </div>
 
         <div className="space-y-8 text-text-secondary">
@@ -93,14 +94,12 @@ export default async function AgbPage() {
 
           <section>
             <h2 className="text-base font-semibold text-text-primary mb-2">{uiText("Ui.text_487f273bffb92c")}</h2>
-            <p className="text-sm leading-relaxed mt-3">{uiText("Ui.text_d1c77181f5535a")}</p>
-            <p className="text-sm leading-relaxed mt-3">{uiText("Ui.text_abe5b8678ae610")}</p>
-            <SupportServiceNotice compact />
+            <SupportServiceNotice compact legalOriginal />
           </section>
 
           <section>
             <h2 className="text-base font-semibold text-text-primary mb-2">{uiText("Ui.text_112fd2920ee6c6")}</h2>
-            <p className="text-sm leading-relaxed mt-3">{uiText("Ui.text_0cca91f33c7540")}</p>
+            <p lang="de" className="text-sm leading-relaxed mt-3">{t("futureFunctions")}</p>
           </section>
 
           <section>
