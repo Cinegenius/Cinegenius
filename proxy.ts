@@ -12,7 +12,13 @@ async function localizedProxyError(request: NextRequest, key: string, init: Resp
   const messages = await loadMessages(locale);
   const system = messages.System as Record<string, string>;
   const copy = createTranslator({locale, messages: {System: system}, namespace: "System"});
-  return NextResponse.json({error: copy(key)}, init);
+  const headers = new Headers(init.headers);
+  if (request.nextUrl.pathname.startsWith('/api/native/v1/') || request.headers.has('X-CineGenius-Native-Contract')) {
+    headers.set('Cache-Control', 'private, no-store, max-age=0');
+    headers.set('CDN-Cache-Control', 'no-store');
+    headers.set('Vercel-CDN-Cache-Control', 'no-store');
+  }
+  return NextResponse.json({error: copy(key)}, {...init, headers});
 }
 
 function genieAuthFailure(status: 401 | 503): NextResponse {
@@ -71,7 +77,10 @@ const RATE_LIMITS: Record<string, { limit: number; windowMs: number }> = {
 };
 
 async function ipRateLimit(req: NextRequest): Promise<NextResponse | null> {
-  const path = req.nextUrl.pathname;
+  const requestedPath = req.nextUrl.pathname;
+  // Native and Web writes share the existing conversation IP budget.
+  const path = requestedPath === '/api/native/v1/conversations' || requestedPath.startsWith('/api/native/v1/conversations/')
+    ? requestedPath.replace('/api/native/v1/conversations', '/api/conversations') : requestedPath;
   const rule = Object.entries(RATE_LIMITS).find(([prefix]) => path.startsWith(prefix))?.[1];
   if (!rule) return null;
 
