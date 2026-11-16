@@ -195,3 +195,15 @@ Abnahme umfasst 320 CSS px, alle neun Sprachen, 44×44-Touchflächen, Tastatur,
 Safe Areas, echtes Zurück, Offline-/Fehlerfälle, Kontowechsel, Entzug von Rechten,
 Blockierungen und Ablauf an der 24-Stunden-Grenze. Produktivschaltung folgt erst
 auf einen eigenen Auftrag und die bestehenden Release-Prüfungen.
+
+## Gemeinsame Kontonutzung in App und Website (16. November 2026)
+
+Der App-Client verwendet den gemeinsamen `/api/account/activity`-Vertrag:
+Nutzung nur bei bestätigter Sitzung und bewusster Vordergrundnutzung melden,
+Status und Termine ausschließlich vom Server lesen. Der bestehende native
+Resume-Einstieg wird wiederverwendet; keine Hintergrund-Heartbeats, Tokenkopien
+oder lokale Löschlogik. Die vorhandenen Einstellungen erhalten eine gemeinsame
+Statuskarte mit Lade-/Fehler-/Wiederholen-Zustand und kontogebundenen Serverdaten.
+Die neun bestehenden Sprachkataloge enthalten die UI-Texte. Details und offene
+Backend-/Geräteprüfung: `docs/account-activity-client.md`. Diese App-Änderung
+aktiviert oder veröffentlicht den serverseitigen Inaktivitätsablauf nicht.

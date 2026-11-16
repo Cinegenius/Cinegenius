@@ -8407,11 +8407,11 @@
     "preserved": "Aanmelden of actief gebruik van de app of website stopt het proces. Je privacyinstellingen en moderatiebeperkingen blijven gelden. Gedeelde bedrijfsinhoud, berichten en gegevens met een bewaarplicht worden apart beoordeeld.",
     "lastActivity": "Laatste accountactiviteit: {date}",
     "loading": "Status laden…",
-    "error": "De accountstatus kon niet worden geladen. Probeer het opnieuw.",
+    "error": "Je accountstatus is tijdelijk niet beschikbaar. Probeer het opnieuw.",
     "retry": "Opnieuw laden",
     "disabled": "De automatische inactiviteitsregel is nog niet ingeschakeld.",
-    "pending": "Je activiteit wordt tijdens je volgende actieve sessie vastgelegd.",
-    "exempt": "Dit beheerdersaccount is vrijgesteld van het automatische inactiviteitsproces.",
+    "pending": "Er is nog geen bevestigde gebruiksstatus voor je account.",
+    "exempt": "Dit account is vrijgesteld van het automatische inactiviteitsproces.",
     "openAccount": "Account openen",
     "emailNote": "Dit is een servicebericht over je CineGenius-account. Meld je aan via de app of website. Alleen deze e-mail openen telt niet als activiteit.",
     "adminTitle": "Inactieve accounts",
@@ -8425,7 +8425,7 @@
     "states": {
       "active": "Actief",
       "reminder": "Eerste herinnering",
-      "warning": "Tweede herinnering",
+      "warning": "Tweede waarschuwing",
       "paused": "Persoonlijke inhoud verborgen",
       "deletion_pending": "Gemarkeerd voor verwijdering",
       "review": "Beoordeling van verwijdering"
@@ -8459,6 +8459,15 @@
         "title": "Accountactiviteit en herinneringen",
         "body": "Na 12 maanden zonder aanmelding of actief gebruik sturen we een herinnering, gevolgd door een tweede na 15 maanden. Vanaf 18 maanden kunnen we je persoonlijke profiel en persoonlijke aanbiedingen verbergen. Na 24 maanden markeren we het account voor beoordeling van verwijdering, met minstens 30 dagen om te reageren. Aanmelden of actief gebruik van de app of website stopt het proces. Je privacyinstellingen en moderatiebeperkingen blijven gelden. Gedeelde bedrijfsinhoud, berichten en gegevens met een bewaarplicht worden apart beoordeeld."
       }
-    }
+    },
+    "dates": {
+      "lastActivityAt": "Laatste bevestigde gebruik",
+      "reminderAt": "Eerste herinnering vanaf",
+      "warningAt": "Tweede waarschuwing vanaf",
+      "pauseAt": "Verbergen ten vroegste",
+      "deletionNoticeAt": "Aanduiding ten vroegste",
+      "reviewAfter": "Beoordeling ten vroegste"
+    },
+    "dateNotice": "De datums geven de vroegst mogelijke stappen aan. Vereiste waarschuwingen kunnen deze uitstellen. Een aanduiding voor verwijdering leidt tot beoordeling, niet tot automatische definitieve verwijdering."
   }
 }

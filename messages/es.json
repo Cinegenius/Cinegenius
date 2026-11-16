@@ -8407,11 +8407,11 @@
     "preserved": "Iniciar sesión o usar activamente la app o la web detiene el proceso. Se mantienen tus ajustes de privacidad y restricciones de moderación. El contenido compartido de empresas, los mensajes y los datos sujetos a conservación se revisan por separado.",
     "lastActivity": "Última actividad de la cuenta: {date}",
     "loading": "Cargando estado…",
-    "error": "No se pudo cargar el estado de tu cuenta. Inténtalo de nuevo.",
+    "error": "El estado de tu cuenta no está disponible temporalmente. Inténtalo de nuevo.",
     "retry": "Volver a cargar",
     "disabled": "La regla automática de inactividad aún no está activada.",
-    "pending": "Tu actividad se registrará en la próxima sesión activa.",
-    "exempt": "Esta cuenta de operador está exenta del proceso automático de inactividad.",
+    "pending": "Aún no hay un estado de actividad confirmado para tu cuenta.",
+    "exempt": "Esta cuenta está exenta del proceso automático de inactividad.",
     "openAccount": "Abrir cuenta",
     "emailNote": "Este es un aviso de servicio sobre tu cuenta de CineGenius. Inicia sesión en la app o la web. Abrir este correo no cuenta como actividad.",
     "adminTitle": "Cuentas inactivas",
@@ -8425,7 +8425,7 @@
     "states": {
       "active": "Activa",
       "reminder": "Primer recordatorio",
-      "warning": "Segundo recordatorio",
+      "warning": "Segunda advertencia",
       "paused": "Contenido personal oculto",
       "deletion_pending": "Marcada para eliminación",
       "review": "Revisión de eliminación"
@@ -8459,6 +8459,15 @@
         "title": "Actividad de la cuenta y recordatorios",
         "body": "Tras 12 meses sin iniciar sesión ni usar activamente la cuenta, enviamos un recordatorio; a los 15 meses, otro. A partir de los 18 meses podemos ocultar tu perfil personal y tus anuncios personales. A los 24 meses marcamos la cuenta para revisar su eliminación, con al menos 30 días para responder. Iniciar sesión o usar activamente la app o la web detiene el proceso. Se mantienen tus ajustes de privacidad y restricciones de moderación. El contenido compartido de empresas, los mensajes y los datos sujetos a conservación se revisan por separado."
       }
-    }
+    },
+    "dates": {
+      "lastActivityAt": "Último uso confirmado",
+      "reminderAt": "Primer recordatorio a partir de",
+      "warningAt": "Segunda advertencia a partir de",
+      "pauseAt": "Ocultación como pronto el",
+      "deletionNoticeAt": "Marca para eliminación como pronto el",
+      "reviewAfter": "Revisión como pronto el"
+    },
+    "dateNotice": "Las fechas indican el momento más temprano posible. Los avisos obligatorios pueden aplazarlas. Marcar una cuenta para su eliminación da lugar a una revisión, no a su eliminación definitiva automática."
   }
 }

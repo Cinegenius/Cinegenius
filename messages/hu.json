@@ -8407,11 +8407,11 @@
     "preserved": "A bejelentkezés vagy az alkalmazás, illetve a weboldal aktív használata leállítja a folyamatot. Az adatvédelmi beállítások és a moderációs korlátozások megmaradnak. A közös céges tartalmakat, üzeneteket és megőrzendő adatokat külön vizsgáljuk.",
     "lastActivity": "Utolsó fiókaktivitás: {date}",
     "loading": "Állapot betöltése…",
-    "error": "A fiók állapota nem tölthető be. Próbáld újra.",
+    "error": "A fiók állapota átmenetileg nem érhető el. Próbáld újra.",
     "retry": "Újratöltés",
     "disabled": "Az automatikus inaktivitási szabály még nem aktív.",
-    "pending": "Az aktivitást a következő aktív munkamenet során rögzítjük.",
-    "exempt": "Ez az üzemeltetői fiók mentesül az automatikus inaktivitási folyamat alól.",
+    "pending": "A fiókodhoz még nincs megerősített használati állapot.",
+    "exempt": "Ez a fiók mentesül az automatikus inaktivitási folyamat alól.",
     "openAccount": "Fiók megnyitása",
     "emailNote": "Ez a CineGenius-fiókod kezelésével kapcsolatos értesítés. Jelentkezz be az alkalmazásban vagy a weboldalon. Az e-mail puszta megnyitása nem számít aktivitásnak.",
     "adminTitle": "Inaktív fiókok",
@@ -8425,7 +8425,7 @@
     "states": {
       "active": "Aktív",
       "reminder": "Első emlékeztető",
-      "warning": "Második emlékeztető",
+      "warning": "Második figyelmeztetés",
       "paused": "Személyes tartalom elrejtve",
       "deletion_pending": "Törlésre jelölve",
       "review": "Törlési felülvizsgálat"
@@ -8459,6 +8459,15 @@
         "title": "Fiókaktivitás és emlékeztetők",
         "body": "12 hónap bejelentkezés vagy aktív használat nélkül emlékeztetőt küldünk, majd 15 hónapnál újabbat. Legkorábban 18 hónap után elrejtjük a személyes profilt és a személyes hirdetéseket. 24 hónapnál törlési felülvizsgálatra jelöljük a fiókot, legalább 30 napos válaszidővel. A bejelentkezés vagy az alkalmazás, illetve a weboldal aktív használata leállítja a folyamatot. Az adatvédelmi beállítások és a moderációs korlátozások megmaradnak. A közös céges tartalmakat, üzeneteket és megőrzendő adatokat külön vizsgáljuk."
       }
-    }
+    },
+    "dates": {
+      "lastActivityAt": "Utolsó megerősített használat",
+      "reminderAt": "Első emlékeztető ettől",
+      "warningAt": "Második figyelmeztetés ettől",
+      "pauseAt": "Elrejtés legkorábban",
+      "deletionNoticeAt": "Törlésre jelölés legkorábban",
+      "reviewAfter": "Felülvizsgálat legkorábban"
+    },
+    "dateNotice": "A dátumok a lehető legkorábbi időpontokat jelzik. A szükséges figyelmeztetések késleltethetik őket. A törlésre jelölés felülvizsgálatot jelent, nem automatikus végleges törlést."
   }
 }

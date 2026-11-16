@@ -29,6 +29,11 @@ export async function recordAccountActivity(userId: string, at = new Date().toIS
   if (result?.reactivated) invalidate();
   return { reactivated: result?.reactivated === true };
 }
+/** Erase this feature's private data after a verified account deletion, even if
+ * reminders have since been disabled. Outbox payloads cascade with the account. */
+export async function removeAccountActivity(userId: string) {
+  checked(await db.from('account_activity').delete().eq('user_id', userId));
+}
 export async function getAccountActivity(userId: string): Promise<AccountActivityStatus> {
   if (!accountActivityEnabled()) return { enabled: false, state: null };
   const row = checked(await db.from('account_activity').select('stage,last_activity_at,review_after,exempt').eq('user_id', userId).maybeSingle());
@@ -68,13 +73,24 @@ export async function runAccountActivityWorker() {
       if (!hasTime()) break;
       stats.checked += 1;
       try {
-        const user = await clerk.users.getUser(candidate.user_id);
+        const user = await clerk.users.getUser(candidate.user_id).catch(async error => {
+          // Only a confirmed missing Clerk account authorizes cleanup. Temporary
+          // provider failures must never be mistaken for an account deletion.
+          if (error && typeof error === 'object' && 'status' in error && error.status === 404) {
+            await removeAccountActivity(candidate.user_id);
+            return null;
+          }
+          throw error;
+        });
+        if (!user) continue;
         // A real sign-in protects the account even if the client activity request failed.
         // lastActiveAt is an additional conservative guard for older app versions.
         const observed = Math.max(user.lastSignInAt ?? 0, user.lastActiveAt ?? 0);
         if (observed > Date.parse(candidate.last_activity_at) || isConfiguredAdmin(user.id, process.env.ADMIN_USER_IDS)) {
           await recordAccountActivity(user.id, new Date(Math.max(observed, Date.now())).toISOString());
-          continue;
+          // Already-active accounts can still receive their initial policy or
+          // return notice. Recent provider activity must not starve that outbox.
+          if (candidate.stage !== 'active' || isConfiguredAdmin(user.id, process.env.ADMIN_USER_IDS)) continue;
         }
         const primary = user.emailAddresses.find(e => e.id === user.primaryEmailAddressId);
         if (!primary || primary.verification?.status !== 'verified') {
@@ -82,8 +98,9 @@ export async function runAccountActivityWorker() {
           continue;
         }
         // Confirm the current recipient and provider outcome before consequences.
-        const receipts = checked(await db.from('account_activity_outbox').select('*')
-          .eq('user_id', user.id).eq('cycle', candidate.cycle).eq('stage', candidate.stage).in('status', ['sent', 'delivered']));
+        const receipts = ['reminder', 'warning', 'deletion_pending'].includes(candidate.stage)
+          ? checked(await db.from('account_activity_outbox').select('*')
+            .eq('user_id', user.id).eq('cycle', candidate.cycle).eq('stage', candidate.stage).in('status', ['sent', 'delivered'])) : [];
         let verifiedDelivery = false;
         for (const receipt of receipts ?? []) {
           if (!hasTime()) break;
@@ -93,7 +110,7 @@ export async function runAccountActivityWorker() {
           verifiedDelivery = outcome === 'delivered';
         }
         // Unavailable receipt lookups cannot hide or queue deletion of an account.
-        if (!['warning', 'deletion_pending'].includes(candidate.stage) || verifiedDelivery) {
+        if (!['reminder', 'warning', 'deletion_pending'].includes(candidate.stage) || verifiedDelivery) {
           const advanced = checked(await db.rpc('advance_account_activity', { p_user_id: user.id, p_cycle: candidate.cycle }));
           if (advanced?.changed) invalidate();
         } else {

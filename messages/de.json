@@ -8407,11 +8407,11 @@
     "preserved": "Eine erneute Anmeldung oder bewusste Nutzung in App oder Website stoppt den Ablauf. Deine Privatsphäre-Einstellungen und Moderationssperren bleiben erhalten. Gemeinsame Firmeninhalte, Nachrichten und aufbewahrungspflichtige Daten werden gesondert geprüft.",
     "lastActivity": "Letzte Kontonutzung: {date}",
     "loading": "Status wird geladen …",
-    "error": "Der Kontostatus konnte nicht geladen werden. Bitte versuche es erneut.",
+    "error": "Der Kontostatus ist gerade nicht verfügbar. Bitte lade ihn erneut.",
     "retry": "Erneut laden",
     "disabled": "Die automatische Inaktivitätsregel ist noch nicht aktiviert.",
-    "pending": "Deine Nutzung wird bei der nächsten aktiven Sitzung erfasst.",
-    "exempt": "Dieses Betreiberkonto ist vom automatischen Inaktivitätsablauf ausgenommen.",
+    "pending": "Für dein Konto liegt noch kein bestätigter Nutzungsstatus vor.",
+    "exempt": "Dieses Konto ist vom automatischen Inaktivitätsablauf ausgenommen.",
     "openAccount": "Konto öffnen",
     "emailNote": "Dies ist eine Mitteilung zur Verwaltung deines CineGenius-Kontos. Melde dich über App oder Website an. Das bloße Öffnen dieser E-Mail zählt nicht als Nutzung.",
     "adminTitle": "Inaktive Konten",
@@ -8425,7 +8425,7 @@
     "states": {
       "active": "Aktiv",
       "reminder": "Erste Erinnerung",
-      "warning": "Zweite Erinnerung",
+      "warning": "Zweite Warnung",
       "paused": "Persönliche Inhalte ausgeblendet",
       "deletion_pending": "Zur Löschung vorgemerkt",
       "review": "Löschprüfung"
@@ -8459,6 +8459,15 @@
         "title": "Kontonutzung und Erinnerungen",
         "body": "Nach 12 Monaten ohne Anmeldung oder bewusste Nutzung erinnern wir dich, nach 15 Monaten erneut. Frühestens nach 18 Monaten blenden wir dein persönliches Profil und deine persönlichen Angebote aus. Nach 24 Monaten folgt eine Löschvormerkung mit mindestens 30 Tagen Reaktionszeit. Eine erneute Anmeldung oder bewusste Nutzung in App oder Website stoppt den Ablauf. Deine Privatsphäre-Einstellungen und Moderationssperren bleiben erhalten. Gemeinsame Firmeninhalte, Nachrichten und aufbewahrungspflichtige Daten werden gesondert geprüft."
       }
-    }
+    },
+    "dates": {
+      "lastActivityAt": "Letzte bestätigte Nutzung",
+      "reminderAt": "Erste Erinnerung ab",
+      "warningAt": "Zweite Warnung ab",
+      "pauseAt": "Ausblenden frühestens",
+      "deletionNoticeAt": "Löschvormerkung frühestens",
+      "reviewAfter": "Prüfung frühestens"
+    },
+    "dateNotice": "Die Termine zeigen den frühestmöglichen Ablauf. Erforderliche Vorwarnungen können ihn verschieben. Eine Löschvormerkung führt zur Prüfung, nicht zur automatischen endgültigen Löschung."
   }
 }

@@ -8407,11 +8407,11 @@
     "preserved": "Inloggning eller aktiv användning av appen eller webbplatsen stoppar processen. Dina integritetsinställningar och modereringsbegränsningar finns kvar. Delat företagsinnehåll, meddelanden och uppgifter med lagringskrav granskas separat.",
     "lastActivity": "Senaste kontoaktivitet: {date}",
     "loading": "Laddar status…",
-    "error": "Kontostatusen kunde inte hämtas. Försök igen.",
+    "error": "Din kontostatus är tillfälligt otillgänglig. Försök igen.",
     "retry": "Ladda om",
     "disabled": "Den automatiska inaktivitetsregeln är ännu inte aktiverad.",
-    "pending": "Din aktivitet registreras under nästa aktiva session.",
-    "exempt": "Detta operatörskonto är undantaget från den automatiska inaktivitetsprocessen.",
+    "pending": "Det finns ännu ingen bekräftad aktivitetsstatus för ditt konto.",
+    "exempt": "Det här kontot är undantaget från den automatiska inaktivitetsprocessen.",
     "openAccount": "Öppna konto",
     "emailNote": "Detta är ett servicemeddelande om ditt CineGenius-konto. Logga in via appen eller webbplatsen. Att bara öppna detta mejl räknas inte som aktivitet.",
     "adminTitle": "Inaktiva konton",
@@ -8425,7 +8425,7 @@
     "states": {
       "active": "Aktivt",
       "reminder": "Första påminnelsen",
-      "warning": "Andra påminnelsen",
+      "warning": "Andra varningen",
       "paused": "Personligt innehåll dolt",
       "deletion_pending": "Markerat för radering",
       "review": "Granskning inför radering"
@@ -8459,6 +8459,15 @@
         "title": "Kontoaktivitet och påminnelser",
         "body": "Efter 12 månader utan inloggning eller aktiv användning skickar vi en påminnelse, följd av en till efter 15 månader. Tidigast efter 18 månader kan vi dölja din personliga profil och dina personliga annonser. Efter 24 månader markerar vi kontot för granskning inför radering, med minst 30 dagar att svara. Inloggning eller aktiv användning av appen eller webbplatsen stoppar processen. Dina integritetsinställningar och modereringsbegränsningar finns kvar. Delat företagsinnehåll, meddelanden och uppgifter med lagringskrav granskas separat."
       }
-    }
+    },
+    "dates": {
+      "lastActivityAt": "Senaste bekräftade användning",
+      "reminderAt": "Första påminnelsen från",
+      "warningAt": "Andra varningen från",
+      "pauseAt": "Döljs tidigast",
+      "deletionNoticeAt": "Markeras tidigast",
+      "reviewAfter": "Granskning tidigast"
+    },
+    "dateNotice": "Datumen visar de tidigast möjliga stegen. Obligatoriska varningar kan skjuta upp dem. En markering för radering leder till granskning, inte till automatisk permanent radering."
   }
 }

@@ -174,6 +174,7 @@ begin
  if p_outcome in ('bounced','failed','suppressed','complained','canceled','recipient_changed') then
   update account_activity_outbox set status='unknown',payload=null where id=p_id;
   update account_activity set issue=case when p_outcome='recipient_changed' then 'recipient_changed' else 'delivery_unknown' end,
+   reminder_delivered_at=case when o.stage='reminder' then null else reminder_delivered_at end,
    warning_delivered_at=case when o.stage='warning' then null else warning_delivered_at end,
    final_delivered_at=case when o.stage='deletion_pending' then null else final_delivered_at end,
    review_after=case when o.stage='deletion_pending' then null else review_after end where user_id=v_user;

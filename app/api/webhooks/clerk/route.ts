@@ -1,4 +1,4 @@
-import { recordAccountActivity } from "@/lib/account-activity-server";
+import { recordAccountActivity, removeAccountActivity } from "@/lib/account-activity-server";
 import {getTranslations} from "next-intl/server";
 import {recipientEmailLocale} from "@/lib/i18n/email-locale";
 import {appLocale, type AppLocale} from "@/lib/i18n/locales";
@@ -45,6 +45,11 @@ export async function POST(req: Request) {
     }) as typeof event;
   } catch {
     return new Response("Invalid signature", { status: 400 });
+  }
+
+  if (event.type === "user.deleted" && typeof event.data.id === "string") {
+    try { await removeAccountActivity(event.data.id); }
+    catch { return Response.json({ code: "activity_unavailable" }, { status: 503 }); }
   }
 
   // Verified provider events cover sign-ins on both clients, even if their

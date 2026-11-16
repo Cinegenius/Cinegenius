@@ -8407,11 +8407,11 @@
     "preserved": "Accedere o usare attivamente l’app o il sito interrompe il processo. Le impostazioni di privacy e le restrizioni di moderazione restano valide. Contenuti aziendali condivisi, messaggi e dati soggetti a conservazione vengono esaminati separatamente.",
     "lastActivity": "Ultima attività dell’account: {date}",
     "loading": "Caricamento dello stato…",
-    "error": "Impossibile caricare lo stato dell’account. Riprova.",
+    "error": "Lo stato dell’account non è al momento disponibile. Riprova.",
     "retry": "Ricarica",
     "disabled": "La regola automatica di inattività non è ancora attiva.",
-    "pending": "L’attività sarà registrata durante la prossima sessione attiva.",
-    "exempt": "Questo account del gestore è esente dal processo automatico di inattività.",
+    "pending": "Non è ancora disponibile uno stato di utilizzo confermato per il tuo account.",
+    "exempt": "Questo account è escluso dal processo automatico di inattività.",
     "openAccount": "Apri account",
     "emailNote": "Questo è un avviso di servizio relativo al tuo account CineGenius. Accedi tramite app o sito. La sola apertura di questa email non conta come attività.",
     "adminTitle": "Account inattivi",
@@ -8425,7 +8425,7 @@
     "states": {
       "active": "Attivo",
       "reminder": "Primo promemoria",
-      "warning": "Secondo promemoria",
+      "warning": "Secondo avviso",
       "paused": "Contenuti personali nascosti",
       "deletion_pending": "Segnalato per cancellazione",
       "review": "Verifica della cancellazione"
@@ -8459,6 +8459,15 @@
         "title": "Attività dell’account e promemoria",
         "body": "Dopo 12 mesi senza accessi o uso attivo inviamo un promemoria, seguito da un altro a 15 mesi. Dai 18 mesi possiamo nascondere il profilo e gli annunci personali. A 24 mesi segnaliamo l’account per la verifica della cancellazione, con almeno 30 giorni per rispondere. Accedere o usare attivamente l’app o il sito interrompe il processo. Le impostazioni di privacy e le restrizioni di moderazione restano valide. Contenuti aziendali condivisi, messaggi e dati soggetti a conservazione vengono esaminati separatamente."
       }
-    }
+    },
+    "dates": {
+      "lastActivityAt": "Ultimo utilizzo confermato",
+      "reminderAt": "Primo promemoria dal",
+      "warningAt": "Secondo avviso dal",
+      "pauseAt": "Contenuti nascosti non prima del",
+      "deletionNoticeAt": "Segnalazione non prima del",
+      "reviewAfter": "Verifica non prima del"
+    },
+    "dateNotice": "Le date indicano la prima scadenza possibile. I preavvisi necessari possono rinviarla. La segnalazione per la cancellazione comporta una verifica, non una cancellazione definitiva automatica."
   }
 }

@@ -8407,11 +8407,11 @@
     "preserved": "Přihlášení nebo aktivní používání aplikace či webu proces zastaví. Nastavení soukromí a omezení moderace zůstávají zachována. Sdílený firemní obsah, zprávy a údaje podléhající uchovávání posuzujeme samostatně.",
     "lastActivity": "Poslední aktivita účtu: {date}",
     "loading": "Načítání stavu…",
-    "error": "Stav účtu se nepodařilo načíst. Zkuste to znovu.",
+    "error": "Stav účtu je nyní nedostupný. Zkuste jej načíst znovu.",
     "retry": "Načíst znovu",
     "disabled": "Automatické pravidlo neaktivity ještě není zapnuté.",
-    "pending": "Aktivitu zaznamenáme při příští aktivní relaci.",
-    "exempt": "Na tento účet provozovatele se automatický proces neaktivity nevztahuje.",
+    "pending": "Pro váš účet zatím není potvrzený stav používání.",
+    "exempt": "Tento účet je z automatického postupu při neaktivitě vyňat.",
     "openAccount": "Otevřít účet",
     "emailNote": "Toto je provozní oznámení o vašem účtu CineGenius. Přihlaste se přes aplikaci nebo web. Pouhé otevření e-mailu se nepovažuje za aktivitu.",
     "adminTitle": "Neaktivní účty",
@@ -8425,7 +8425,7 @@
     "states": {
       "active": "Aktivní",
       "reminder": "První připomenutí",
-      "warning": "Druhé připomenutí",
+      "warning": "Druhé upozornění",
       "paused": "Osobní obsah skrytý",
       "deletion_pending": "Označeno ke smazání",
       "review": "Posouzení smazání"
@@ -8459,6 +8459,15 @@
         "title": "Aktivita účtu a připomenutí",
         "body": "Po 12 měsících bez přihlášení nebo aktivního používání pošleme připomenutí, po 15 měsících další. Nejdříve po 18 měsících skryjeme osobní profil a osobní nabídky. Po 24 měsících účet označíme k posouzení smazání s nejméně 30 dny na reakci. Přihlášení nebo aktivní používání aplikace či webu proces zastaví. Nastavení soukromí a omezení moderace zůstávají zachována. Sdílený firemní obsah, zprávy a údaje podléhající uchovávání posuzujeme samostatně."
       }
-    }
+    },
+    "dates": {
+      "lastActivityAt": "Poslední potvrzené použití",
+      "reminderAt": "První připomenutí od",
+      "warningAt": "Druhé upozornění od",
+      "pauseAt": "Skrytí nejdříve",
+      "deletionNoticeAt": "Označení ke smazání nejdříve",
+      "reviewAfter": "Posouzení nejdříve"
+    },
+    "dateNotice": "Data uvádějí nejbližší možné termíny. Povinná upozornění je mohou posunout. Označení ke smazání vede k posouzení, nikoli k automatickému trvalému smazání."
   }
 }

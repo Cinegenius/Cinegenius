@@ -8407,11 +8407,11 @@
     "preserved": "Signing in or actively using the app or website stops the process. Your privacy settings and moderation restrictions remain in place. Shared company content, messages and records subject to retention are reviewed separately.",
     "lastActivity": "Last account activity: {date}",
     "loading": "Loading status…",
-    "error": "Your account status could not be loaded. Please try again.",
+    "error": "Your account status is temporarily unavailable. Please try again.",
     "retry": "Reload",
     "disabled": "The automatic inactivity policy is not active yet.",
-    "pending": "Your activity will be recorded during your next active session.",
-    "exempt": "This operator account is exempt from the automatic inactivity process.",
+    "pending": "There is no confirmed activity status for your account yet.",
+    "exempt": "This account is exempt from the automatic inactivity process.",
     "openAccount": "Open account",
     "emailNote": "This is a service notice about your CineGenius account. Sign in through the app or website. Simply opening this email does not count as activity.",
     "adminTitle": "Inactive accounts",
@@ -8425,7 +8425,7 @@
     "states": {
       "active": "Active",
       "reminder": "First reminder",
-      "warning": "Second reminder",
+      "warning": "Second warning",
       "paused": "Personal content hidden",
       "deletion_pending": "Flagged for deletion",
       "review": "Deletion review"
@@ -8459,6 +8459,15 @@
         "title": "Account activity and reminders",
         "body": "After 12 months without signing in or actively using your account, we send a reminder, followed by another at 15 months. From 18 months, your personal profile and personal listings may be hidden. At 24 months, we flag the account for deletion review with at least 30 days to respond. Signing in or actively using the app or website stops the process. Your privacy settings and moderation restrictions remain in place. Shared company content, messages and records subject to retention are reviewed separately."
       }
-    }
+    },
+    "dates": {
+      "lastActivityAt": "Last confirmed activity",
+      "reminderAt": "First reminder from",
+      "warningAt": "Second warning from",
+      "pauseAt": "Hidden no earlier than",
+      "deletionNoticeAt": "Marked for review no earlier than",
+      "reviewAfter": "Review no earlier than"
+    },
+    "dateNotice": "These dates show the earliest possible steps. Required notices may delay them. Being marked for deletion leads to a review, not automatic permanent deletion."
   }
 }
