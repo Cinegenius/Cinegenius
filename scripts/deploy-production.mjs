@@ -23,6 +23,9 @@ if (args.length === 1 && ["--help", "-h"].includes(args[0])) {
   npm run deploy:production -- --stage  Build with production configuration,
                                       without assigning production domains;
                                       listing freshness worker disabled.
+  npm run deploy:production -- --stage --prepare-locales
+                                      Prepare the eight approved language drafts
+                                      using the existing build-only AI access.
 
 Both modes require clean main at origin/main and the established CineGenius project.
 After staged checks, run the normal command again to build with the ordinary
@@ -30,7 +33,8 @@ production configuration. Never promote or alias the worker-disabled staged buil
 No other arguments are accepted.`);
   process.exit(0);
 }
-const stage = args.length === 1 && args[0] === "--stage";
+const prepareLocales = args.length === 2 && args[0] === "--stage" && args[1] === "--prepare-locales";
+const stage = (args.length === 1 && args[0] === "--stage") || prepareLocales;
 if (args.length && !stage) fail("unsupported arguments; use --help for the two supported release modes");
 
 const branch = git("branch", "--show-current");
@@ -68,4 +72,5 @@ execFileSync("npm", ["run", "check:i18n"], { stdio: "inherit" });
 // placeholders instead of the real production configuration.
 const deployArgs = ["vercel", "deploy", "--prod", "--yes", "--logs"];
 if (stage) deployArgs.push("--skip-domain", "--env", "LISTING_FRESHNESS_ENABLED=false");
+if (prepareLocales) deployArgs.push("--build-env", "CG_PREPARE_LOCALES=1");
 execFileSync("npx", deployArgs, { stdio: "inherit" });

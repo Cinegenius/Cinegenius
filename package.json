@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "npm run check:i18n && next build --webpack",
+    "build": "node scripts/localization/prepare-build.mjs && npm run check:i18n && next build --webpack",
     "start": "next start",
     "test": "node --experimental-strip-types --import ./scripts/register-test-aliases.mjs --test lib/*.test.mjs",
     "lint": "eslint",
