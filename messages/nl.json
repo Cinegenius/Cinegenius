@@ -1687,7 +1687,8 @@
       "catering": "Catering en verzorging",
       "sfx": "SFX en praktische effecten",
       "studio": "Studio, podium en achtergronden",
-      "fahrzeuge": "Voertuigen en mobiele units"
+      "fahrzeuge": "Voertuigen en mobiele units",
+      "dienstleistungen": "Diensten"
     },
     "subcategories": {
       "licht-quellen": "Schijnwerpers en lampen",
@@ -1805,7 +1806,16 @@
       "fahrzeuge-garderobe": "Kostuum-, grime- en garderobewagens",
       "fahrzeuge-catering": "Cateringvoertuigen en mobiele verzorging",
       "fahrzeuge-anhaenger": "Aanhangers en mobiele units",
-      "fahrzeuge-other": "Overige accessoires"
+      "fahrzeuge-other": "Overige accessoires",
+      "dienstleistungen-kamera": "Camera, Steadicam en fotografie",
+      "dienstleistungen-licht": "Licht, lichttafelbediening en grip",
+      "dienstleistungen-ton": "Geluid en audio",
+      "dienstleistungen-kostuem-maske": "Kostuum, grime en styling",
+      "dienstleistungen-handwerk": "Vakwerk en decorbouw",
+      "dienstleistungen-produktion": "Productie en crewdiensten",
+      "dienstleistungen-postproduktion": "Postproductie en content",
+      "dienstleistungen-catering": "Crewcatering en maaltijden",
+      "dienstleistungen-sonstige": "Overige diensten"
     }
   },
   "MarketplaceOffer": {
@@ -1888,13 +1898,20 @@
       "aperture": "Lichtsterkte",
       "wheels": "Verrijdbaar",
       "folding": "Inklapbaar",
-      "capacity": "Capaciteit"
+      "capacity": "Capaciteit",
+      "service_equipment": "Apparatuur die je meebrengt"
     },
     "loadError": "Het aanbod kon niet worden geladen. Probeer het opnieuw.",
     "savingDraft": "Privéconcept wordt opgeslagen …",
     "privateNotice": "Je aanbod blijft privé. Je kunt het later uitdrukkelijk publiceren. Met een ingericht profiel is geen extra goedkeuring door een beheerder nodig.",
     "fulfilment": "Overdracht",
-    "negotiableShort": "onderhandelbaar"
+    "negotiableShort": "onderhandelbaar",
+    "service": "Dienst",
+    "servicePrice": "Tarief",
+    "serviceHint": "Bied je diensten zelfstandig of via je bedrijf aan.",
+    "serviceUnit": "Facturatie-eenheid",
+    "serviceOptional": "Optionele dienstgegevens",
+    "serviceIncluded": "Inbegrepen diensten"
   },
   "OptionalMedia": {
     "optional": "Optioneel",
@@ -7604,7 +7621,8 @@
     "priceMax": "Prijs tot",
     "priceHint": "Bedrag in euro",
     "categoryOverview": "Categorieën ontdekken",
-    "draftCleanupFailed": "Je advertentie is opgeslagen. Je eerdere voortgang in de assistent kon niet als afgerond worden gemarkeerd."
+    "draftCleanupFailed": "Je advertentie is opgeslagen. Je eerdere voortgang in de assistent kon niet als afgerond worden gemarkeerd.",
+    "service": "Diensten"
   },
   "AnalyticsPrivacy": {
     "settings": "Analyse-instellingen",

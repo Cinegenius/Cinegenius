@@ -1687,7 +1687,8 @@
       "catering": "Catering & supplies",
       "sfx": "SFX & practical effects",
       "studio": "Studio, stage & backgrounds",
-      "fahrzeuge": "Vehicles & mobile units"
+      "fahrzeuge": "Vehicles & mobile units",
+      "dienstleistungen": "Services"
     },
     "subcategories": {
       "licht-quellen": "Lights and fixtures",
@@ -1805,7 +1806,16 @@
       "fahrzeuge-garderobe": "Wardrobe and make-up vehicles",
       "fahrzeuge-catering": "Catering and mobile supply vehicles",
       "fahrzeuge-anhaenger": "Trailers and mobile units",
-      "fahrzeuge-other": "Other accessories"
+      "fahrzeuge-other": "Other accessories",
+      "dienstleistungen-kamera": "Camera, Steadicam & photography",
+      "dienstleistungen-licht": "Lighting, desk operation & grip",
+      "dienstleistungen-ton": "Sound & audio",
+      "dienstleistungen-kostuem-maske": "Costume, makeup & styling",
+      "dienstleistungen-handwerk": "Trades & set construction",
+      "dienstleistungen-produktion": "Production & crew services",
+      "dienstleistungen-postproduktion": "Post-production & content",
+      "dienstleistungen-catering": "Crew catering & food",
+      "dienstleistungen-sonstige": "Other services"
     }
   },
   "MarketplaceOffer": {
@@ -1888,13 +1898,20 @@
       "aperture": "Maximum aperture",
       "wheels": "Wheeled",
       "folding": "Foldable",
-      "capacity": "Capacity"
+      "capacity": "Capacity",
+      "service_equipment": "Equipment you bring"
     },
     "loadError": "Offers could not be loaded. Please try again.",
     "savingDraft": "Saving private draft …",
     "privateNotice": "Your offer stays private. You can explicitly publish it later. An established profile needs no additional admin approval.",
     "fulfilment": "Handover",
-    "negotiableShort": "negotiable"
+    "negotiableShort": "negotiable",
+    "service": "Service",
+    "servicePrice": "Fee",
+    "serviceHint": "Offer your services personally or through your company.",
+    "serviceUnit": "Billing unit",
+    "serviceOptional": "Optional service details",
+    "serviceIncluded": "Included services"
   },
   "OptionalMedia": {
     "optional": "Optional",
@@ -7604,7 +7621,8 @@
     "priceMax": "Max. price",
     "priceHint": "Amount in euros",
     "categoryOverview": "Explore categories",
-    "draftCleanupFailed": "Your listing has been saved. Your existing setup progress could not be marked as complete."
+    "draftCleanupFailed": "Your listing has been saved. Your existing setup progress could not be marked as complete.",
+    "service": "Services"
   },
   "AnalyticsPrivacy": {
     "settings": "Analytics settings",

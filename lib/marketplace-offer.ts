@@ -1,6 +1,10 @@
 import { DEPARTMENTS, marketplaceCategory } from './marketplaceCategories';
 
-export const MARKETPLACE_COMMON_FIELDS = ['manufacturer','model','quantity','condition','faults','included','excluded','minimum_rental','deposit','fulfilment_costs','availability'] as const;
+export const MARKETPLACE_SERVICE_FIELDS = ['included','excluded','availability','service_equipment'] as const;
+export function isMarketplaceService(category: unknown): boolean { return marketplaceCategory(category)?.department === 'dienstleistungen'; }
+export function marketplaceCommonFields(category: unknown) { return isMarketplaceService(category) ? MARKETPLACE_SERVICE_FIELDS : MARKETPLACE_COMMON_FIELDS.filter(key => key !== 'service_equipment'); }
+
+export const MARKETPLACE_COMMON_FIELDS = ['manufacturer','model','quantity','condition','faults','included','excluded','minimum_rental','deposit','fulfilment_costs','availability','service_equipment'] as const;
 export const MARKETPLACE_SPECS: Record<string, string[]> = {
   licht: ['power','temperature','rgb','connectors','protocols'], strom: ['voltage','current','power','connectors'],
   kamera: ['mount','sensor','formats'], grip: ['dimensions','weight','load','compatibility'],
@@ -17,7 +21,7 @@ export function marketplaceSpecFields(category:string):string[] {
   return MARKETPLACE_SPECS[marketplaceCategory(category)?.department??'']??[];
 }
 export type MarketplaceOffer = {
-  mode:'rent'|'sale'|'both'; rent_mode:'fixed'|'negotiable'|'request'; sale_mode:'fixed'|'negotiable'|'request';
+  mode:'rent'|'sale'|'both'|'service'; rent_mode:'fixed'|'negotiable'|'request'; sale_mode:'fixed'|'negotiable'|'request';
   rent_price:number|null; sale_price:number|null; unit:'hour'|'day'|'week'|'month'|'project';
   bundle:'single'|'set'|'package'; fulfilment:string[]; specs:Record<string,string>;
 } & Partial<Record<typeof MARKETPLACE_COMMON_FIELDS[number],string>>;
@@ -25,7 +29,7 @@ export type MarketplaceDraft = { category:string; values:Record<string,string>; 
 export function marketplaceDraft(category='',price=0,metadata:unknown={}):MarketplaceDraft {
   const meta=metadata && typeof metadata==='object' ? metadata as Record<string,unknown> : {};
   const value=meta.marketplace && typeof meta.marketplace==='object' ? meta.marketplace as Record<string,unknown> : {};
-  const mode=meta.rental_type==='kauf'?'sale':meta.rental_type==='beides'?'both':'rent';
+  const mode=isMarketplaceService(category)?'service':meta.rental_type==='kauf'?'sale':meta.rental_type==='beides'?'both':'rent';
   const priceMode=meta.price_negotiable?'negotiable':meta.price_on_request||price<=0?'request':'fixed';
   const values:Record<string,string>={mode,rent_mode:priceMode,sale_mode:priceMode,rent_price:mode==='sale'?'':String(price||''),sale_price:mode==='sale'?String(price||''):'',unit:'day',bundle:'single',fulfilment:'pickup'};
   for(const [key,item]of Object.entries(value))if(typeof item==='string'||typeof item==='number')values[key]=String(item);
@@ -36,37 +40,40 @@ export function marketplaceDraft(category='',price=0,metadata:unknown={}):Market
   return {category,values,specsByCategory:{[category]:specs}};
 }
 export function serializeMarketplaceDraft(draft:MarketplaceDraft):MarketplaceOffer {
-  const v=draft.values;
+  const v=draft.values, service=isMarketplaceService(draft.category);
   return {
-    mode:(v.mode||'rent') as MarketplaceOffer['mode'], rent_mode:(v.rent_mode||'request') as MarketplaceOffer['rent_mode'],sale_mode:(v.sale_mode||'request') as MarketplaceOffer['sale_mode'],
-    rent_price:v.rent_price?.trim()?Number(v.rent_price):null,sale_price:v.sale_price?.trim()?Number(v.sale_price):null,
-    unit:(v.unit||'day') as MarketplaceOffer['unit'],bundle:(v.bundle||'single') as MarketplaceOffer['bundle'],
-    fulfilment:(v.fulfilment||'').split(',').filter(Boolean),
-    ...Object.fromEntries(MARKETPLACE_COMMON_FIELDS.filter(key=>v[key]?.trim()).map(key=>[key,v[key].trim()])),
+    mode:(service?'service':v.mode==='service'?'rent':v.mode||'rent') as MarketplaceOffer['mode'], rent_mode:(v.rent_mode||'request') as MarketplaceOffer['rent_mode'],sale_mode:(v.sale_mode||'request') as MarketplaceOffer['sale_mode'],
+    rent_price:v.rent_price?.trim()?Number(v.rent_price):null,sale_price:service?null:v.sale_price?.trim()?Number(v.sale_price):null,
+    unit:(v.unit||'day') as MarketplaceOffer['unit'],bundle:(service?'single':v.bundle||'single') as MarketplaceOffer['bundle'],
+    fulfilment:service?[]:(v.fulfilment||'').split(',').filter(Boolean),
+    ...Object.fromEntries(marketplaceCommonFields(draft.category).filter(key=>v[key]?.trim()).map(key=>[key,v[key].trim()])),
     specs:Object.fromEntries(marketplaceSpecFields(draft.category).flatMap(key=>{const value=draft.specsByCategory[draft.category]?.[key]?.trim();return value?[[key,value]]:[];})),
   };
 }
 export function marketplaceMetadataPatch(draft:MarketplaceDraft) {
   const marketplace=serializeMarketplaceDraft(draft);
   const mode=marketplace.mode==='sale'?marketplace.sale_mode:marketplace.rent_mode;
-  return {marketplace,rental_type:marketplace.mode==='sale'?'kauf':marketplace.mode==='both'?'beides':'miete',price_negotiable:mode==='negotiable',price_on_request:mode==='request'};
+  return {marketplace,rental_type:marketplace.mode==='service'?'dienstleistung':marketplace.mode==='sale'?'kauf':marketplace.mode==='both'?'beides':'miete',price_negotiable:mode==='negotiable',price_on_request:mode==='request'};
 }
 export function marketplaceBasePrice(draft:MarketplaceDraft):number {const offer=serializeMarketplaceDraft(draft);return (offer.mode==='sale'?offer.sale_mode==='request'?0:offer.sale_price:offer.rent_mode==='request'?0:offer.rent_price)??0;}
 /** Validate only the new envelope. Existing legacy metadata is preserved, never bulk-converted. */
 export function validateMarketplaceOffer(category:unknown,type:string,value:unknown,complete=true):string|null {
-  if(value===undefined)return null;
+  const service=isMarketplaceService(category);
+  if(value===undefined)return service?'invalidDetails':null;
+  if(service&&type!=='prop')return 'invalidCategory';
   if(!value||typeof value!=='object'||Array.isArray(value)||!marketplaceCategory(category,type)?.subcategory || !DEPARTMENTS.some(d=>d.groups.some(g=>g.id===category)))return 'invalidCategory';
   const data=value as Record<string,unknown>;
   const allowed=new Set(['mode','rent_mode','sale_mode','rent_price','sale_price','unit','bundle','fulfilment','specs',...MARKETPLACE_COMMON_FIELDS]);
   if(Object.keys(data).some(key=>!allowed.has(key)))return 'invalidDetails';
-  if(!['rent','sale','both'].includes(String(data.mode))||!['hour','day','week','month','project'].includes(String(data.unit))||!['single','set','package'].includes(String(data.bundle)))return 'invalidDetails';
+  if(!['rent','sale','both','service'].includes(String(data.mode))||service!==(data.mode==='service')||!['hour','day','week','month','project'].includes(String(data.unit))||!['single','set','package'].includes(String(data.bundle)))return 'invalidDetails';
   for(const kind of ['rent','sale']) {
     if(!['fixed','negotiable','request'].includes(String(data[`${kind}_mode`])))return 'invalidPrice';
     const amount=data[`${kind}_price`];
     if(amount!==null&&(typeof amount!=='number'||!Number.isFinite(amount)||amount<0||amount>1000000))return 'invalidPrice';
-    if(complete&&(data.mode===kind||data.mode==='both')&&data[`${kind}_mode`]==='fixed'&&!(typeof amount==='number'&&amount>0))return 'priceRequired';
+    if(complete&&(data.mode===kind||data.mode==='both'||(service&&kind==='rent'))&&data[`${kind}_mode`]==='fixed'&&!(typeof amount==='number'&&amount>0))return 'priceRequired';
   }
   if(!Array.isArray(data.fulfilment)||data.fulfilment.length>3||new Set(data.fulfilment).size!==data.fulfilment.length||data.fulfilment.some(v=>!['pickup','shipping','delivery'].includes(String(v))))return 'invalidDetails';
+  if(service&&(data.bundle!=='single'||data.fulfilment.length>0||data.sale_price!==null||MARKETPLACE_COMMON_FIELDS.some(key=>!MARKETPLACE_SERVICE_FIELDS.includes(key as typeof MARKETPLACE_SERVICE_FIELDS[number])&&data[key]!==undefined)))return 'invalidDetails';
   for(const key of MARKETPLACE_COMMON_FIELDS)if(data[key]!==undefined&&(typeof data[key]!=='string'||String(data[key]).length>1000))return 'invalidDetails';
   if(data.quantity!==undefined&&(!/^\d+$/.test(String(data.quantity))||Number(data.quantity)<1||Number(data.quantity)>1000000))return 'invalidDetails';
   if(data.deposit!==undefined&&(!/^\d+(\.\d{1,2})?$/.test(String(data.deposit))||Number(data.deposit)>1000000))return 'invalidPrice';

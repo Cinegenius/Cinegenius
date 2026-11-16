@@ -1687,7 +1687,8 @@
       "catering": "Catering och förplägnad",
       "sfx": "SFX och praktiska effekter",
       "studio": "Studio, scen och bakgrunder",
-      "fahrzeuge": "Fordon och mobila enheter"
+      "fahrzeuge": "Fordon och mobila enheter",
+      "dienstleistungen": "Tjänster"
     },
     "subcategories": {
       "licht-quellen": "Strålkastare och lampor",
@@ -1805,7 +1806,16 @@
       "fahrzeuge-garderobe": "Kostym-, mask- och garderobsfordon",
       "fahrzeuge-catering": "Cateringfordon och mobil förplägnad",
       "fahrzeuge-anhaenger": "Släp och mobila enheter",
-      "fahrzeuge-other": "Övriga tillbehör"
+      "fahrzeuge-other": "Övriga tillbehör",
+      "dienstleistungen-kamera": "Kamera, Steadicam och foto",
+      "dienstleistungen-licht": "Ljus, ljusbordsoperatörer och grip",
+      "dienstleistungen-ton": "Ljud och audio",
+      "dienstleistungen-kostuem-maske": "Kostym, mask och styling",
+      "dienstleistungen-handwerk": "Hantverk och scenbygge",
+      "dienstleistungen-produktion": "Produktion och teamtjänster",
+      "dienstleistungen-postproduktion": "Efterbearbetning och innehåll",
+      "dienstleistungen-catering": "Catering och mat till teamet",
+      "dienstleistungen-sonstige": "Övriga tjänster"
     }
   },
   "MarketplaceOffer": {
@@ -1888,13 +1898,20 @@
       "aperture": "Ljusstyrka",
       "wheels": "Kan rullas",
       "folding": "Hopfällbar",
-      "capacity": "Kapacitet"
+      "capacity": "Kapacitet",
+      "service_equipment": "Teknik och utrustning du tar med"
     },
     "loadError": "Det gick inte att läsa in erbjudandena. Försök igen.",
     "savingDraft": "Sparar privat utkast …",
     "privateNotice": "Ditt erbjudande förblir privat. Du kan publicera det uttryckligen senare. Med en färdig profil behövs inget ytterligare administratörsgodkännande.",
     "fulfilment": "Överlämning",
-    "negotiableShort": "förhandlingsbart"
+    "negotiableShort": "förhandlingsbart",
+    "service": "Tjänst",
+    "servicePrice": "Arvode",
+    "serviceHint": "Erbjud dina tjänster självständigt eller genom ditt företag.",
+    "serviceUnit": "Debiteringsenhet",
+    "serviceOptional": "Frivilliga tjänsteuppgifter",
+    "serviceIncluded": "Tjänster som ingår"
   },
   "OptionalMedia": {
     "optional": "Valfritt",
@@ -7604,7 +7621,8 @@
     "priceMax": "Pris till",
     "priceHint": "Belopp i euro",
     "categoryOverview": "Utforska kategorier",
-    "draftCleanupFailed": "Din annons har sparats. Det gick inte att markera dina tidigare framsteg i guiden som slutförda."
+    "draftCleanupFailed": "Din annons har sparats. Det gick inte att markera dina tidigare framsteg i guiden som slutförda.",
+    "service": "Tjänster"
   },
   "AnalyticsPrivacy": {
     "settings": "Analysinställningar",

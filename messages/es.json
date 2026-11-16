@@ -1687,7 +1687,8 @@
       "catering": "Catering y suministros",
       "sfx": "SFX y efectos prácticos",
       "studio": "Estudio, escenario y fondos",
-      "fahrzeuge": "Vehículos y unidades móviles"
+      "fahrzeuge": "Vehículos y unidades móviles",
+      "dienstleistungen": "Servicios"
     },
     "subcategories": {
       "licht-quellen": "Focos y luminarias",
@@ -1805,7 +1806,16 @@
       "fahrzeuge-garderobe": "Vehículos de vestuario y maquillaje",
       "fahrzeuge-catering": "Vehículos de catering y suministro",
       "fahrzeuge-anhaenger": "Remolques y unidades móviles",
-      "fahrzeuge-other": "Otros accesorios"
+      "fahrzeuge-other": "Otros accesorios",
+      "dienstleistungen-kamera": "Cámara, Steadicam y fotografía",
+      "dienstleistungen-licht": "Iluminación, operación de consolas y grip",
+      "dienstleistungen-ton": "Sonido y audio",
+      "dienstleistungen-kostuem-maske": "Vestuario, maquillaje y estilismo",
+      "dienstleistungen-handwerk": "Oficios y construcción de decorados",
+      "dienstleistungen-produktion": "Producción y servicios para equipos",
+      "dienstleistungen-postproduktion": "Posproducción y contenido",
+      "dienstleistungen-catering": "Catering y alimentación del equipo",
+      "dienstleistungen-sonstige": "Otros servicios"
     }
   },
   "MarketplaceOffer": {
@@ -1888,13 +1898,20 @@
       "aperture": "Apertura máxima",
       "wheels": "Con ruedas",
       "folding": "Plegable",
-      "capacity": "Capacidad"
+      "capacity": "Capacidad",
+      "service_equipment": "Equipo y material que aportas"
     },
     "loadError": "No se pudieron cargar las ofertas. Inténtalo de nuevo.",
     "savingDraft": "Guardando borrador privado…",
     "privateNotice": "Tu oferta sigue siendo privada. Puedes publicarla expresamente más tarde. Con un perfil configurado no hace falta aprobación adicional.",
     "fulfilment": "Entrega y recogida",
-    "negotiableShort": "negociable"
+    "negotiableShort": "negociable",
+    "service": "Servicio",
+    "servicePrice": "Honorarios",
+    "serviceHint": "Ofrece tus servicios como profesional o a través de tu empresa.",
+    "serviceUnit": "Unidad de facturación",
+    "serviceOptional": "Datos opcionales del servicio",
+    "serviceIncluded": "Servicios incluidos"
   },
   "OptionalMedia": {
     "optional": "Opcional",
@@ -7604,7 +7621,8 @@
     "priceMax": "Precio hasta",
     "priceHint": "Importe en euros",
     "categoryOverview": "Explorar categorías",
-    "draftCleanupFailed": "Tu anuncio se ha guardado. No se ha podido marcar como completado el progreso anterior del asistente."
+    "draftCleanupFailed": "Tu anuncio se ha guardado. No se ha podido marcar como completado el progreso anterior del asistente.",
+    "service": "Servicios"
   },
   "AnalyticsPrivacy": {
     "settings": "Ajustes de análisis",

@@ -1687,7 +1687,8 @@
       "catering": "Catering e forniture",
       "sfx": "SFX ed effetti pratici",
       "studio": "Studio, palco e fondali",
-      "fahrzeuge": "Veicoli e unità mobili"
+      "fahrzeuge": "Veicoli e unità mobili",
+      "dienstleistungen": "Servizi"
     },
     "subcategories": {
       "licht-quellen": "Fari e luci",
@@ -1805,7 +1806,16 @@
       "fahrzeuge-garderobe": "Veicoli guardaroba e trucco",
       "fahrzeuge-catering": "Veicoli catering e forniture mobili",
       "fahrzeuge-anhaenger": "Rimorchi e unità mobili",
-      "fahrzeuge-other": "Altri accessori"
+      "fahrzeuge-other": "Altri accessori",
+      "dienstleistungen-kamera": "Camera, Steadicam e fotografia",
+      "dienstleistungen-licht": "Luci, operatori console e grip",
+      "dienstleistungen-ton": "Suono e audio",
+      "dienstleistungen-kostuem-maske": "Costumi, trucco e styling",
+      "dienstleistungen-handwerk": "Artigianato e costruzione set",
+      "dienstleistungen-produktion": "Produzione e servizi alla troupe",
+      "dienstleistungen-postproduktion": "Post-produzione e contenuti",
+      "dienstleistungen-catering": "Catering e pasti per la troupe",
+      "dienstleistungen-sonstige": "Altri servizi"
     }
   },
   "MarketplaceOffer": {
@@ -1888,13 +1898,20 @@
       "aperture": "Apertura massima",
       "wheels": "Con ruote",
       "folding": "Pieghevole",
-      "capacity": "Capacità"
+      "capacity": "Capacità",
+      "service_equipment": "Attrezzatura che porti con te"
     },
     "loadError": "Impossibile caricare le offerte. Riprova.",
     "savingDraft": "Salvataggio bozza privata…",
     "privateNotice": "La tua offerta resta privata. Puoi pubblicarla esplicitamente in seguito. Con un profilo configurato non serve un'ulteriore approvazione.",
     "fulfilment": "Consegna e ritiro",
-    "negotiableShort": "trattabile"
+    "negotiableShort": "trattabile",
+    "service": "Servizio",
+    "servicePrice": "Compenso",
+    "serviceHint": "Offri i tuoi servizi come professionista o tramite la tua azienda.",
+    "serviceUnit": "Unità di fatturazione",
+    "serviceOptional": "Dettagli facoltativi del servizio",
+    "serviceIncluded": "Servizi inclusi"
   },
   "OptionalMedia": {
     "optional": "Facoltativo",
@@ -7604,7 +7621,8 @@
     "priceMax": "Prezzo fino a",
     "priceHint": "Importo in euro",
     "categoryOverview": "Esplora le categorie",
-    "draftCleanupFailed": "Il tuo annuncio è stato salvato. Non è stato possibile contrassegnare come completati i progressi precedenti nella procedura guidata."
+    "draftCleanupFailed": "Il tuo annuncio è stato salvato. Non è stato possibile contrassegnare come completati i progressi precedenti nella procedura guidata.",
+    "service": "Servizi"
   },
   "AnalyticsPrivacy": {
     "settings": "Impostazioni di analisi",

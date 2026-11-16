@@ -1687,7 +1687,8 @@
       "catering": "Catering & Versorgung",
       "sfx": "SFX & Praktische Effekte",
       "studio": "Studio, Bühne & Hintergründe",
-      "fahrzeuge": "Fahrzeuge & Mobile Einheiten"
+      "fahrzeuge": "Fahrzeuge & Mobile Einheiten",
+      "dienstleistungen": "Dienstleistungen"
     },
     "subcategories": {
       "licht-quellen": "Scheinwerfer und Leuchten",
@@ -1805,7 +1806,16 @@
       "fahrzeuge-garderobe": "Kostüm-, Masken- und Garderobenmobile",
       "fahrzeuge-catering": "Cateringfahrzeuge und mobile Versorgung",
       "fahrzeuge-anhaenger": "Anhänger und mobile Einheiten",
-      "fahrzeuge-other": "Weiteres Zubehör"
+      "fahrzeuge-other": "Weiteres Zubehör",
+      "dienstleistungen-kamera": "Kamera, Steadicam & Fotografie",
+      "dienstleistungen-licht": "Licht, Pultbedienung & Grip",
+      "dienstleistungen-ton": "Ton & Audio",
+      "dienstleistungen-kostuem-maske": "Kostüm, Maske & Styling",
+      "dienstleistungen-handwerk": "Handwerk & Setbau",
+      "dienstleistungen-produktion": "Produktion & Crew-Service",
+      "dienstleistungen-postproduktion": "Postproduktion & Content",
+      "dienstleistungen-catering": "Crew-Catering & Verpflegung",
+      "dienstleistungen-sonstige": "Weitere Dienstleistungen"
     }
   },
   "MarketplaceOffer": {
@@ -1888,13 +1898,20 @@
       "aperture": "Lichtstärke",
       "wheels": "Rollbar",
       "folding": "Zusammenklappbar",
-      "capacity": "Kapazität"
+      "capacity": "Kapazität",
+      "service_equipment": "Mitgebrachte Technik und Ausstattung"
     },
     "loadError": "Die Angebote konnten nicht geladen werden. Bitte versuche es erneut.",
     "savingDraft": "Privater Entwurf wird gespeichert …",
     "privateNotice": "Dein Angebot bleibt privat. Du kannst es später ausdrücklich veröffentlichen. Mit eingerichtetem Profil ist keine zusätzliche Adminfreigabe erforderlich.",
     "fulfilment": "Übergabe",
-    "negotiableShort": "VB"
+    "negotiableShort": "VB",
+    "service": "Dienstleistung",
+    "servicePrice": "Honorar",
+    "serviceHint": "Biete deine Leistung an – persönlich oder über deine Firma.",
+    "serviceUnit": "Abrechnungseinheit",
+    "serviceOptional": "Freiwillige Angaben zur Leistung",
+    "serviceIncluded": "Enthaltene Leistungen"
   },
   "OptionalMedia": {
     "optional": "Optional",
@@ -7604,7 +7621,8 @@
     "priceMax": "Preis bis",
     "priceHint": "Betrag in Euro",
     "categoryOverview": "Kategorien entdecken",
-    "draftCleanupFailed": "Dein Angebot wurde gespeichert. Der bisherige Assistenten-Fortschritt konnte nicht abgeschlossen werden."
+    "draftCleanupFailed": "Dein Angebot wurde gespeichert. Der bisherige Assistenten-Fortschritt konnte nicht abgeschlossen werden.",
+    "service": "Dienstleistungen"
   },
   "AnalyticsPrivacy": {
     "settings": "Analyse-Einstellungen",

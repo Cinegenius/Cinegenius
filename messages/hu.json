@@ -1687,7 +1687,8 @@
       "catering": "Catering és ellátás",
       "sfx": "SFX és gyakorlati effektek",
       "studio": "Stúdió, színpad és hátterek",
-      "fahrzeuge": "Járművek és mobil egységek"
+      "fahrzeuge": "Járművek és mobil egységek",
+      "dienstleistungen": "Szolgáltatások"
     },
     "subcategories": {
       "licht-quellen": "Lámpák és fényforrások",
@@ -1805,7 +1806,16 @@
       "fahrzeuge-garderobe": "Jelmez-, maszk- és ruhatári járművek",
       "fahrzeuge-catering": "Catering- és ellátójárművek",
       "fahrzeuge-anhaenger": "Utánfutók és mobil egységek",
-      "fahrzeuge-other": "Egyéb tartozékok"
+      "fahrzeuge-other": "Egyéb tartozékok",
+      "dienstleistungen-kamera": "Kamera, Steadicam és fotózás",
+      "dienstleistungen-licht": "Világítás, fényvezérlés és grip",
+      "dienstleistungen-ton": "Hang és audió",
+      "dienstleistungen-kostuem-maske": "Jelmez, smink és styling",
+      "dienstleistungen-handwerk": "Szakipari munkák és díszletépítés",
+      "dienstleistungen-produktion": "Gyártás és stábszolgáltatások",
+      "dienstleistungen-postproduktion": "Utómunka és tartalom",
+      "dienstleistungen-catering": "Stábcatering és étkeztetés",
+      "dienstleistungen-sonstige": "További szolgáltatások"
     }
   },
   "MarketplaceOffer": {
@@ -1888,13 +1898,20 @@
       "aperture": "Fényerő",
       "wheels": "Gurulós",
       "folding": "Összecsukható",
-      "capacity": "Kapacitás"
+      "capacity": "Kapacitás",
+      "service_equipment": "Saját technika és felszerelés"
     },
     "loadError": "Az ajánlatok nem tölthetők be. Próbáld újra.",
     "savingDraft": "Privát vázlat mentése…",
     "privateNotice": "Az ajánlat privát marad. Később kifejezetten közzéteheted. Beállított profillal nem kell további adminisztrátori jóváhagyás.",
     "fulfilment": "Átadás",
-    "negotiableShort": "alkuképes"
+    "negotiableShort": "alkuképes",
+    "service": "Szolgáltatás",
+    "servicePrice": "Munkadíj",
+    "serviceHint": "Kínáld szolgáltatásaidat önállóan vagy a cégeden keresztül.",
+    "serviceUnit": "Elszámolási egység",
+    "serviceOptional": "Opcionális szolgáltatási adatok",
+    "serviceIncluded": "A díjban foglalt szolgáltatások"
   },
   "OptionalMedia": {
     "optional": "Nem kötelező",
@@ -7604,7 +7621,8 @@
     "priceMax": "Maximum ár",
     "priceHint": "Összeg euróban",
     "categoryOverview": "Kategóriák felfedezése",
-    "draftCleanupFailed": "A hirdetésedet elmentettük. A beállítási segédben eddig elért haladást nem sikerült befejezettként megjelölni."
+    "draftCleanupFailed": "A hirdetésedet elmentettük. A beállítási segédben eddig elért haladást nem sikerült befejezettként megjelölni.",
+    "service": "Szolgáltatások"
   },
   "AnalyticsPrivacy": {
     "settings": "Analitikai beállítások",
