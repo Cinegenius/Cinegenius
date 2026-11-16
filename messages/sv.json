@@ -2119,15 +2119,18 @@
   },
   "LegalAuditOriginal": {
     "scope": "Dessa allmänna villkor (nedan ”villkoren”) gäller användningen av onlineplattformen CineGenius på domänen cinegenius.co, som drivs av Markus Müller & Mathias Schmidt, Plinganserstr. 19, 81369 München (nedan ”operatören”). Innan du skapar ditt konto kan du öppna villkoren via informationen i registreringsformuläret. När du skapar kontot godkänner du de villkor som länkas där. Ett besök på webbplatsen i sig innebär inget godkännande. Avvikande användarvillkor gäller inte om operatören inte uttryckligen har godkänt dem skriftligen.",
-    "termsDate": "Stand: 11. November 2026",
-    "privacyDate": "Enligt GDPR, BDSG och TDDDG – version: 31 oktober 2026",
+    "termsDate": "Stand: 16. November 2026",
+    "privacyDate": "Gemäß DSGVO, BDSG und TDDDG — Stand: 16. November 2026",
     "resendDisclosure": "Transaktionsmeddelanden via e-post, till exempel bokningsbekräftelser, aviseringar och systemmeddelanden, skickas via Resend Inc. (USA). Då överförs din e-postadress och eventuellt ditt namn till Resend. CineGenius nyhetsbrev: du kan anmäla dig frivilligt via formuläret i sidfoten. E-postadresser från befintliga konton förs inte över. Anmälan aktiveras först via bekräftelselänken. För detta lagrar vi den angivna e-postadressen, tidpunkten för samtycket och den använda samtyckesversionen. Utskicken görs via Resend. Du kan avregistrera dig när som helst via avregistreringslänken i varje nyhetsbrev. Informationen ingår i den tyskspråkiga integritetspolicyn.",
     "sentryPrepared": "Konfigurationsfiler för Sentry (Functional Software Inc., San Francisco, USA) har förberetts för feldiagnostik. Dessa filer aktiverar inte i sig någon överföring; i den nuvarande applikationen har ingen Sentry-initialisering integrerats.",
     "replayDisabled": "Session Replay är avstängt även i den förberedda konfigurationen. Därför skapas inga sessionsinspelningar eller föregående replaybuffertar. En senare aktivering kräver först en prövning av syftet, den rättsliga grunden och vid behov ett giltigt samtycke. Denna dataskyddsinformation ersätter inte ett samtycke.",
     "sentryPurpose": "Feldiagnostik förberedd; Session Replay avstängt (se avsnitt 12)",
     "newsRegionDisclosure": "Regionale Branchennews: Ohne eigene Länderauswahl verwenden wir vorrangig das Land aus deinem Profil, sonst das vom Hosting-Anbieter übermittelte ungefähre Land deiner Verbindung. Dafür fragen wir keinen GPS-Standort ab. Deine ausdrücklich gewählten Länder- und Themeneinstellungen speichern wir jeweils für bis zu ein Jahr in Cookies mit den Präfixen cg_news_country_ und cg_news_topic_, getrennt für Gäste und angemeldete Konten. Die Themenwahl enthält nur das gewählte Thema, keine Suchverläufe oder Profilangaben. Du kannst jederzeit ein anderes Thema oder Land sowie „Alle Themen“, „Alle Länder“ oder die automatische Länderwahl wählen. Das automatisch erkannte Land wird nicht in diesen Cookies gespeichert. Die Oberflächensprache folgt deiner gespeicherten Sprachwahl, sonst einer unterstützten Browsersprache; fehlt diese, dient das ungefähre Land als Rückfall. Originalbeiträge werden nicht automatisch übersetzt.",
     "genieVoiceTitle": "Genie-Sprachbedienung — deutscher Originaltext, Stand: 14. November 2026",
-    "genieVoiceDisclosure": "Die freiwillige Sprachbedienung startet erst durch deine Mikrofonaktion und eine erforderliche Gerätefreigabe. Im Browser wird die beendete Aufnahme (höchstens 30 Sekunden und 1 MiB) über den CineGenius-Server an OpenAI zur Texterkennung übermittelt. In unterstützten nativen Apps übernimmt der Sprachdienst des Geräts die Erkennung; dabei kann eine Verarbeitung durch dessen Anbieter erforderlich sein. Bei leerem Eingabefeld wird der erkannte Text anschließend an Genie gesendet, andernfalls nur deinem ungesendeten Text hinzugefügt. Der KI-Dienst erhält die gesendeten Nachrichten, die letzten Gesprächsrunden, die Sprache und den groben Seitenbereich. Antworten können über die künstliche Stimme des Browsers oder Geräts vorgelesen werden; je nach gewählter Systemstimme verarbeitet deren Anbieter den Antworttext. CineGenius speichert keine Audiodateien. Abgeschlossene Textgespräche bleiben kurzzeitig kontogebunden im aktuellen Browser-Tab. Nach 10 Minuten ohne Bedienung von Genie wird dieser lokale Verlauf automatisch gelöscht; bei einer vom Gerät pausierten Seite geschieht dies beim Fortsetzen, vor der nächsten Anfrage. Ungesendete Eingaben und aktuelle Suchfilter werden dabei nicht gelöscht. Über den Papierkorb kannst du den Verlauf auch sofort löschen. CineGenius führt keine dauerhaft gespeicherte Suchhistorie; eine früher lokal gespeicherte Liste letzter Suchen wird beim Laden der aktuellen Website entfernt. Suchbegriffe in der aktuellen Seitenadresse und der vom Browser verwaltete Navigationsverlauf bleiben davon unberührt. Für die Missbrauchsbegrenzung werden Nutzungszähler geführt. Das Löschen des lokalen Verlaufs löscht keine bereits übermittelten Daten beim jeweiligen Dienst. Die Aufbewahrung bei OpenAI richtet sich nach dem verwendeten Dienst und seiner Konfiguration; deaktivierte Gesprächsspeicherung ist keine Zusage, dass keinerlei Sicherheitsprotokolle entstehen. Schließen, Abbrechen, Kontowechsel und der Wechsel in den Hintergrund beenden die aktuelle Aufnahme. Die Suche verwendet nur den von dir genannten Ort und ungefähre öffentliche Ortskoordinaten, keinen GPS-Standort. Sie kann passende Filter öffnen, veröffentlicht aber keine Inhalte und ändert keine gemeinsamen Arbeitspläne. Bitte sprich keine Passwörter oder unnötigen vertraulichen Angaben ein."
+    "genieVoiceDisclosure": "Die freiwillige Sprachbedienung startet erst durch deine Mikrofonaktion und eine erforderliche Gerätefreigabe. Im Browser wird die beendete Aufnahme (höchstens 30 Sekunden und 1 MiB) über den CineGenius-Server an OpenAI zur Texterkennung übermittelt. In unterstützten nativen Apps übernimmt der Sprachdienst des Geräts die Erkennung; dabei kann eine Verarbeitung durch dessen Anbieter erforderlich sein. Bei leerem Eingabefeld wird der erkannte Text anschließend an Genie gesendet, andernfalls nur deinem ungesendeten Text hinzugefügt. Der KI-Dienst erhält die gesendeten Nachrichten, die letzten Gesprächsrunden, die Sprache und den groben Seitenbereich. Antworten können über die künstliche Stimme des Browsers oder Geräts vorgelesen werden; je nach gewählter Systemstimme verarbeitet deren Anbieter den Antworttext. CineGenius speichert keine Audiodateien. Abgeschlossene Textgespräche bleiben kurzzeitig kontogebunden im aktuellen Browser-Tab. Nach 10 Minuten ohne Bedienung von Genie wird dieser lokale Verlauf automatisch gelöscht; bei einer vom Gerät pausierten Seite geschieht dies beim Fortsetzen, vor der nächsten Anfrage. Ungesendete Eingaben und aktuelle Suchfilter werden dabei nicht gelöscht. Über den Papierkorb kannst du den Verlauf auch sofort löschen. CineGenius führt keine dauerhaft gespeicherte Suchhistorie; eine früher lokal gespeicherte Liste letzter Suchen wird beim Laden der aktuellen Website entfernt. Suchbegriffe in der aktuellen Seitenadresse und der vom Browser verwaltete Navigationsverlauf bleiben davon unberührt. Für die Missbrauchsbegrenzung werden Nutzungszähler geführt. Das Löschen des lokalen Verlaufs löscht keine bereits übermittelten Daten beim jeweiligen Dienst. Die Aufbewahrung bei OpenAI richtet sich nach dem verwendeten Dienst und seiner Konfiguration; deaktivierte Gesprächsspeicherung ist keine Zusage, dass keinerlei Sicherheitsprotokolle entstehen. Schließen, Abbrechen, Kontowechsel und der Wechsel in den Hintergrund beenden die aktuelle Aufnahme. Die Suche verwendet nur den von dir genannten Ort und ungefähre öffentliche Ortskoordinaten, keinen GPS-Standort. Sie kann passende Filter öffnen, veröffentlicht aber keine Inhalte und ändert keine gemeinsamen Arbeitspläne. Bitte sprich keine Passwörter oder unnötigen vertraulichen Angaben ein.",
+    "inactivityTitle": "Kontoinaktivität und Benachrichtigungen — deutscher Originaltext",
+    "inactivityTerms": "Für den Inaktivitätsablauf zählt eine erfolgreiche Anmeldung oder die bewusste Nutzung einer angemeldeten Sitzung in App oder Website. Nach zwölf Monaten ohne solche Nutzung folgt eine Erinnerung, nach 15 Monaten eine zweite. Frühestens nach 18 Monaten und mindestens 30 Tage nach bestätigter Zustellung der zweiten Warnung werden das persönliche Profil und persönliche Angebote vorübergehend ausgeblendet. Nach 24 Monaten erfolgt eine Löschvormerkung. Nach bestätigter Zustellung der letzten Mitteilung bleiben mindestens 30 Tage zur Rückkehr. Anschließend prüfen die Betreiber die Löschung; eine automatische endgültige Löschung findet nicht statt. Erneute Nutzung hebt die Inaktivität auf, verändert aber keine gespeicherten Privatsphäre-Einstellungen oder Moderationssperren. Firmeninhalte, an denen andere Mitglieder mitwirken, Nachrichten und erforderliche Nachweise werden gesondert beurteilt. Inaktivität allein ist kein Beleg für ein unechtes Konto.",
+    "inactivityPrivacy": "Für diesen Ablauf speichern wir einen kontogebundenen Zeitpunkt der letzten Nutzung, den Verfahrensstand sowie erforderliche Versand- und Zustellnachweise. Der Zeitpunkt wird nicht als öffentlicher Online-Status angezeigt; es wird dafür kein Verlauf besuchter Seiten gespeichert. Die Verarbeitung dient der Verwaltung des Nutzungsverhältnisses und der Aktualität des Verzeichnisses; als Rechtsgrundlagen kommen Art. 6 Abs. 1 Buchst. b und f DSGVO entsprechend dem jeweiligen Zweck in Betracht. Der Versand erfolgt über den bereits beschriebenen E-Mail-Dienst Resend. Die Erinnerungen sind Kontomitteilungen und unabhängig von Marketingeinstellungen. Fehlende oder unbestätigte Zustellung löst keine weitere Einschränkung aus. Beim Neustart eines Verfahrens werden nicht mehr benötigte E-Mail-Inhalte und Empfängeradressen des alten Ablaufs entfernt; die zugehörigen technischen Versanddatensätze werden nach spätestens 90 Tagen gelöscht. Laufende Verfahrensdaten bleiben bis zum Abschluss bzw. einer erforderlichen Prüfung gespeichert. Erforderliche Vertrags-, Abrechnungs- und Nachweisdaten werden anhand ihres jeweiligen Zwecks und anwendbarer Aufbewahrungspflichten gesondert behandelt. Für bestehende Konten beginnt die erste Zwölfmonatsfrist frühestens mit ihrer Aufnahme in den aktivierten Ablauf."
   },
   "SetupOffers": {
     "accountReady": "Ditt leverantörskonto är färdigt.",
@@ -7242,7 +7245,23 @@
     "verificationResultTitle": "Din profilverifiering",
     "verificationApprovedBody": "Din profilverifiering har godkänts.",
     "verificationRejectedBody": "Din ansökan avslogs. Se din profil för information och för att ansöka igen.",
-    "verificationRevokedBody": "Din profilverifiering har återkallats. Se din profil för information."
+    "verificationRevokedBody": "Din profilverifiering har återkallats. Se din profil för information.",
+    "activity_reminder_title": "Ditt CineGenius-konto: påminnelse efter 12 månader",
+    "activity_reminder_body": "Du har inte använt ditt konto på minst tolv månader. Logga in via appen eller webbplatsen för att hålla det aktivt. Vi påminner igen efter 15 månader; personligt offentligt innehåll kan döljas tidigast efter 18 månader.",
+    "activity_warning_title": "Bekräfta att du fortfarande använder ditt konto",
+    "activity_warning_body": "Ingen kontoaktivitet har registrerats på minst 15 månader. Vi kan dölja din personliga profil och dina personliga annonser tidigast efter 18 månader och minst 30 dagar efter bekräftad leverans av denna varning. Inloggning eller aktiv användning stoppar processen.",
+    "activity_paused_title": "Ditt personliga innehåll är tillfälligt dolt",
+    "activity_paused_body": "Efter minst 18 månader utan aktivitet är din personliga profil och dina personliga annonser dolda. Inloggning eller aktiv användning upphäver inaktivitetsbegränsningen. Privat innehåll och modereringsbegränsningar är fortsatt skyddade.",
+    "activity_deletion_pending_title": "Ditt konto är markerat för granskning inför radering",
+    "activity_deletion_pending_body": "Ingen aktivitet har registrerats på minst 24 månader. Du har minst 30 dagar efter bekräftad leverans av detta meddelande att återvända. Därefter granskar vi radering med hänsyn till delat innehåll och lagringskrav. Inloggning eller aktiv användning stoppar processen.",
+    "activity_review_title": "Ditt konto ska granskas inför radering",
+    "activity_review_body": "Den sista svarstiden har löpt ut. Kontot väntar på granskning; det har inte raderats permanent. Delat innehåll, meddelanden och nödvändiga handlingar bedöms separat. Du kan fortfarande stoppa inaktivitetsprocessen genom att logga in.",
+    "activity_reactivated_title": "Ditt konto är aktivt igen",
+    "activity_reactivated_body": "Din återkomst har registrerats. Tidigare inaktivitetsvarningar och markeringen för radering har tagits bort. Dina sparade integritetsinställningar och befintliga modereringsbegränsningar är oförändrade.",
+    "activity_policy_title": "Kontoaktivitet och påminnelser",
+    "activity_policy_body": "Efter 12 månader utan inloggning eller aktiv användning skickar vi en påminnelse, följd av en till efter 15 månader. Tidigast efter 18 månader kan vi dölja din personliga profil och dina personliga annonser. Efter 24 månader markerar vi kontot för granskning inför radering, med minst 30 dagar att svara. Inloggning eller aktiv användning av appen eller webbplatsen stoppar processen. Dina integritetsinställningar och modereringsbegränsningar finns kvar. Delat företagsinnehåll, meddelanden och uppgifter med lagringskrav granskas separat.",
+    "activity_admin_title": "Inaktivt konto behöver granskas",
+    "activity_admin_body": "Konto {accountId} har passerat den sista inaktivitetsfristen. Granska delat innehåll, öppna ärenden och lagringskrav före radering."
   },
   "PageCopy": {
     "p_c2b9b41e4402": "{value0} — {value1} från {value2}. Skicka en förfrågan på CineGenius.",
@@ -8380,6 +8399,66 @@
       "received": "Mottagen: {date}",
       "anonymous": "Ej angivet",
       "footer": "Strukturerad anmälan skickad via CineGenius."
+    }
+  },
+  "AccountActivity": {
+    "title": "Kontoaktivitet och påminnelser",
+    "schedule": "Efter 12 månader utan inloggning eller aktiv användning skickar vi en påminnelse, följd av en till efter 15 månader. Tidigast efter 18 månader kan vi dölja din personliga profil och dina personliga annonser. Efter 24 månader markerar vi kontot för granskning inför radering, med minst 30 dagar att svara.",
+    "preserved": "Inloggning eller aktiv användning av appen eller webbplatsen stoppar processen. Dina integritetsinställningar och modereringsbegränsningar finns kvar. Delat företagsinnehåll, meddelanden och uppgifter med lagringskrav granskas separat.",
+    "lastActivity": "Senaste kontoaktivitet: {date}",
+    "loading": "Laddar status…",
+    "error": "Kontostatusen kunde inte hämtas. Försök igen.",
+    "retry": "Ladda om",
+    "disabled": "Den automatiska inaktivitetsregeln är ännu inte aktiverad.",
+    "pending": "Din aktivitet registreras under nästa aktiva session.",
+    "exempt": "Detta operatörskonto är undantaget från den automatiska inaktivitetsprocessen.",
+    "openAccount": "Öppna konto",
+    "emailNote": "Detta är ett servicemeddelande om ditt CineGenius-konto. Logga in via appen eller webbplatsen. Att bara öppna detta mejl räknas inte som aktivitet.",
+    "adminTitle": "Inaktiva konton",
+    "adminDescription": "Påminnelser och döljning sker automatiskt. Granska delat innehåll, öppna ärenden och lagringskrav före permanent radering. Inaktivitet bevisar inte att ett konto är falskt.",
+    "empty": "Inga väntande inaktivitetsärenden.",
+    "inspect": "Granska konto",
+    "previous": "Föregående",
+    "next": "Nästa",
+    "retentionReview": "Granskning inför radering krävs; ingen automatisk permanent radering.",
+    "deliveryProblem": "Mejl eller leverans måste kontrolleras. Ingen ytterligare begränsning utan en bekräftad varning.",
+    "states": {
+      "active": "Aktivt",
+      "reminder": "Första påminnelsen",
+      "warning": "Andra påminnelsen",
+      "paused": "Personligt innehåll dolt",
+      "deletion_pending": "Markerat för radering",
+      "review": "Granskning inför radering"
+    },
+    "notices": {
+      "reminder": {
+        "title": "Ditt CineGenius-konto: påminnelse efter 12 månader",
+        "body": "Du har inte använt ditt konto på minst tolv månader. Logga in via appen eller webbplatsen för att hålla det aktivt. Vi påminner igen efter 15 månader; personligt offentligt innehåll kan döljas tidigast efter 18 månader."
+      },
+      "warning": {
+        "title": "Bekräfta att du fortfarande använder ditt konto",
+        "body": "Ingen kontoaktivitet har registrerats på minst 15 månader. Vi kan dölja din personliga profil och dina personliga annonser tidigast efter 18 månader och minst 30 dagar efter bekräftad leverans av denna varning. Inloggning eller aktiv användning stoppar processen."
+      },
+      "paused": {
+        "title": "Ditt personliga innehåll är tillfälligt dolt",
+        "body": "Efter minst 18 månader utan aktivitet är din personliga profil och dina personliga annonser dolda. Inloggning eller aktiv användning upphäver inaktivitetsbegränsningen. Privat innehåll och modereringsbegränsningar är fortsatt skyddade."
+      },
+      "deletion_pending": {
+        "title": "Ditt konto är markerat för granskning inför radering",
+        "body": "Ingen aktivitet har registrerats på minst 24 månader. Du har minst 30 dagar efter bekräftad leverans av detta meddelande att återvända. Därefter granskar vi radering med hänsyn till delat innehåll och lagringskrav. Inloggning eller aktiv användning stoppar processen."
+      },
+      "review": {
+        "title": "Ditt konto ska granskas inför radering",
+        "body": "Den sista svarstiden har löpt ut. Kontot väntar på granskning; det har inte raderats permanent. Delat innehåll, meddelanden och nödvändiga handlingar bedöms separat. Du kan fortfarande stoppa inaktivitetsprocessen genom att logga in."
+      },
+      "reactivated": {
+        "title": "Ditt konto är aktivt igen",
+        "body": "Din återkomst har registrerats. Tidigare inaktivitetsvarningar och markeringen för radering har tagits bort. Dina sparade integritetsinställningar och befintliga modereringsbegränsningar är oförändrade."
+      },
+      "policy": {
+        "title": "Kontoaktivitet och påminnelser",
+        "body": "Efter 12 månader utan inloggning eller aktiv användning skickar vi en påminnelse, följd av en till efter 15 månader. Tidigast efter 18 månader kan vi dölja din personliga profil och dina personliga annonser. Efter 24 månader markerar vi kontot för granskning inför radering, med minst 30 dagar att svara. Inloggning eller aktiv användning av appen eller webbplatsen stoppar processen. Dina integritetsinställningar och modereringsbegränsningar finns kvar. Delat företagsinnehåll, meddelanden och uppgifter med lagringskrav granskas separat."
+      }
     }
   }
 }

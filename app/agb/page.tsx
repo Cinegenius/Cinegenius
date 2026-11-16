@@ -28,6 +28,11 @@ export default async function AgbPage() {
 
         <div className="space-y-8 text-text-secondary">
 
+          <section lang="de">
+            <h2 className="text-base font-semibold text-text-primary mb-3">{t("inactivityTitle")}</h2>
+            <p className="text-sm leading-relaxed">{t("inactivityTerms")}</p>
+          </section>
+
           <section>
             <h2 className="text-base font-semibold text-text-primary mb-2">{uiText("Ui.text_75cfed8707d5a4")}</h2>
             <p className="text-sm leading-relaxed">

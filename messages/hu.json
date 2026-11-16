@@ -2119,15 +2119,18 @@
   },
   "LegalAuditOriginal": {
     "scope": "A jelen általános szerződési feltételek (a továbbiakban: „ÁSZF”) a cinegenius.co címen elérhető CineGenius online platform használatára vonatkoznak. A platform üzemeltetője Markus Müller & Mathias Schmidt, Plinganserstr. 19, 81369 München (a továbbiakban: „üzemeltető”). Fiókod létrehozása előtt a regisztrációs űrlapon található hivatkozással megnyithatod az ÁSZF-et. A fiók létrehozásával elfogadod az ott hivatkozott ÁSZF-et. A weboldal puszta meglátogatása nem minősül elfogadásnak. A felhasználók eltérő feltételei nem alkalmazandók, kivéve, ha azokhoz az üzemeltető kifejezetten, írásban hozzájárul.",
-    "termsDate": "Stand: 11. November 2026",
-    "privacyDate": "A GDPR, BDSG és TDDDG szerint — állapot: 2026. október 31.",
+    "termsDate": "Stand: 16. November 2026",
+    "privacyDate": "Gemäß DSGVO, BDSG und TDDDG — Stand: 16. November 2026",
     "resendDisclosure": "A tranzakciós e-maileket, például foglalási visszaigazolásokat, értesítéseket és rendszerüzeneteket a Resend Inc. (USA) küldi. Ennek során az e-mail-címedet és adott esetben a nevedet továbbítjuk a Resendnek. CineGenius-hírlevél: a lábléc űrlapján önként feliratkozhatsz. A meglévő fiókok e-mail-címeit nem vesszük át. A feliratkozás csak a megerősítő link használata után aktiválódik. Ehhez tároljuk a megadott e-mail-címet, a hozzájárulás időpontját és a használt hozzájárulási változatot. A küldés a Resenden keresztül történik. Bármikor leiratkozhatsz az egyes hírlevelekben található leiratkozási linkkel. Ez az információ a német nyelvű adatvédelmi tájékoztató része.",
     "sentryPrepared": "A hibadiagnosztikához előkészítettük a Sentry (Functional Software Inc., San Francisco, USA) konfigurációs fájljait. Ezek a fájlok önmagukban nem indítanak adattovábbítást; a jelenlegi alkalmazásba nincs beépítve Sentry-inicializálás.",
     "replayDisabled": "A Session Replay az előkészített konfigurációban is ki van kapcsolva. Így nem keletkeznek munkamenet-felvételek vagy előzetes visszajátszási pufferek. Későbbi bekapcsolás előtt ellenőrizni kell a célt, a jogalapot és adott esetben érvényes hozzájárulást kell beszerezni. Ez az adatvédelmi tájékoztatás nem helyettesíti a hozzájárulást.",
     "sentryPurpose": "Hibadiagnosztika előkészítve; Session Replay kikapcsolva (lásd a 12. szakaszt)",
     "newsRegionDisclosure": "Regionale Branchennews: Ohne eigene Länderauswahl verwenden wir vorrangig das Land aus deinem Profil, sonst das vom Hosting-Anbieter übermittelte ungefähre Land deiner Verbindung. Dafür fragen wir keinen GPS-Standort ab. Deine ausdrücklich gewählten Länder- und Themeneinstellungen speichern wir jeweils für bis zu ein Jahr in Cookies mit den Präfixen cg_news_country_ und cg_news_topic_, getrennt für Gäste und angemeldete Konten. Die Themenwahl enthält nur das gewählte Thema, keine Suchverläufe oder Profilangaben. Du kannst jederzeit ein anderes Thema oder Land sowie „Alle Themen“, „Alle Länder“ oder die automatische Länderwahl wählen. Das automatisch erkannte Land wird nicht in diesen Cookies gespeichert. Die Oberflächensprache folgt deiner gespeicherten Sprachwahl, sonst einer unterstützten Browsersprache; fehlt diese, dient das ungefähre Land als Rückfall. Originalbeiträge werden nicht automatisch übersetzt.",
     "genieVoiceTitle": "Genie-Sprachbedienung — deutscher Originaltext, Stand: 14. November 2026",
-    "genieVoiceDisclosure": "Die freiwillige Sprachbedienung startet erst durch deine Mikrofonaktion und eine erforderliche Gerätefreigabe. Im Browser wird die beendete Aufnahme (höchstens 30 Sekunden und 1 MiB) über den CineGenius-Server an OpenAI zur Texterkennung übermittelt. In unterstützten nativen Apps übernimmt der Sprachdienst des Geräts die Erkennung; dabei kann eine Verarbeitung durch dessen Anbieter erforderlich sein. Bei leerem Eingabefeld wird der erkannte Text anschließend an Genie gesendet, andernfalls nur deinem ungesendeten Text hinzugefügt. Der KI-Dienst erhält die gesendeten Nachrichten, die letzten Gesprächsrunden, die Sprache und den groben Seitenbereich. Antworten können über die künstliche Stimme des Browsers oder Geräts vorgelesen werden; je nach gewählter Systemstimme verarbeitet deren Anbieter den Antworttext. CineGenius speichert keine Audiodateien. Abgeschlossene Textgespräche bleiben kurzzeitig kontogebunden im aktuellen Browser-Tab. Nach 10 Minuten ohne Bedienung von Genie wird dieser lokale Verlauf automatisch gelöscht; bei einer vom Gerät pausierten Seite geschieht dies beim Fortsetzen, vor der nächsten Anfrage. Ungesendete Eingaben und aktuelle Suchfilter werden dabei nicht gelöscht. Über den Papierkorb kannst du den Verlauf auch sofort löschen. CineGenius führt keine dauerhaft gespeicherte Suchhistorie; eine früher lokal gespeicherte Liste letzter Suchen wird beim Laden der aktuellen Website entfernt. Suchbegriffe in der aktuellen Seitenadresse und der vom Browser verwaltete Navigationsverlauf bleiben davon unberührt. Für die Missbrauchsbegrenzung werden Nutzungszähler geführt. Das Löschen des lokalen Verlaufs löscht keine bereits übermittelten Daten beim jeweiligen Dienst. Die Aufbewahrung bei OpenAI richtet sich nach dem verwendeten Dienst und seiner Konfiguration; deaktivierte Gesprächsspeicherung ist keine Zusage, dass keinerlei Sicherheitsprotokolle entstehen. Schließen, Abbrechen, Kontowechsel und der Wechsel in den Hintergrund beenden die aktuelle Aufnahme. Die Suche verwendet nur den von dir genannten Ort und ungefähre öffentliche Ortskoordinaten, keinen GPS-Standort. Sie kann passende Filter öffnen, veröffentlicht aber keine Inhalte und ändert keine gemeinsamen Arbeitspläne. Bitte sprich keine Passwörter oder unnötigen vertraulichen Angaben ein."
+    "genieVoiceDisclosure": "Die freiwillige Sprachbedienung startet erst durch deine Mikrofonaktion und eine erforderliche Gerätefreigabe. Im Browser wird die beendete Aufnahme (höchstens 30 Sekunden und 1 MiB) über den CineGenius-Server an OpenAI zur Texterkennung übermittelt. In unterstützten nativen Apps übernimmt der Sprachdienst des Geräts die Erkennung; dabei kann eine Verarbeitung durch dessen Anbieter erforderlich sein. Bei leerem Eingabefeld wird der erkannte Text anschließend an Genie gesendet, andernfalls nur deinem ungesendeten Text hinzugefügt. Der KI-Dienst erhält die gesendeten Nachrichten, die letzten Gesprächsrunden, die Sprache und den groben Seitenbereich. Antworten können über die künstliche Stimme des Browsers oder Geräts vorgelesen werden; je nach gewählter Systemstimme verarbeitet deren Anbieter den Antworttext. CineGenius speichert keine Audiodateien. Abgeschlossene Textgespräche bleiben kurzzeitig kontogebunden im aktuellen Browser-Tab. Nach 10 Minuten ohne Bedienung von Genie wird dieser lokale Verlauf automatisch gelöscht; bei einer vom Gerät pausierten Seite geschieht dies beim Fortsetzen, vor der nächsten Anfrage. Ungesendete Eingaben und aktuelle Suchfilter werden dabei nicht gelöscht. Über den Papierkorb kannst du den Verlauf auch sofort löschen. CineGenius führt keine dauerhaft gespeicherte Suchhistorie; eine früher lokal gespeicherte Liste letzter Suchen wird beim Laden der aktuellen Website entfernt. Suchbegriffe in der aktuellen Seitenadresse und der vom Browser verwaltete Navigationsverlauf bleiben davon unberührt. Für die Missbrauchsbegrenzung werden Nutzungszähler geführt. Das Löschen des lokalen Verlaufs löscht keine bereits übermittelten Daten beim jeweiligen Dienst. Die Aufbewahrung bei OpenAI richtet sich nach dem verwendeten Dienst und seiner Konfiguration; deaktivierte Gesprächsspeicherung ist keine Zusage, dass keinerlei Sicherheitsprotokolle entstehen. Schließen, Abbrechen, Kontowechsel und der Wechsel in den Hintergrund beenden die aktuelle Aufnahme. Die Suche verwendet nur den von dir genannten Ort und ungefähre öffentliche Ortskoordinaten, keinen GPS-Standort. Sie kann passende Filter öffnen, veröffentlicht aber keine Inhalte und ändert keine gemeinsamen Arbeitspläne. Bitte sprich keine Passwörter oder unnötigen vertraulichen Angaben ein.",
+    "inactivityTitle": "Kontoinaktivität und Benachrichtigungen — deutscher Originaltext",
+    "inactivityTerms": "Für den Inaktivitätsablauf zählt eine erfolgreiche Anmeldung oder die bewusste Nutzung einer angemeldeten Sitzung in App oder Website. Nach zwölf Monaten ohne solche Nutzung folgt eine Erinnerung, nach 15 Monaten eine zweite. Frühestens nach 18 Monaten und mindestens 30 Tage nach bestätigter Zustellung der zweiten Warnung werden das persönliche Profil und persönliche Angebote vorübergehend ausgeblendet. Nach 24 Monaten erfolgt eine Löschvormerkung. Nach bestätigter Zustellung der letzten Mitteilung bleiben mindestens 30 Tage zur Rückkehr. Anschließend prüfen die Betreiber die Löschung; eine automatische endgültige Löschung findet nicht statt. Erneute Nutzung hebt die Inaktivität auf, verändert aber keine gespeicherten Privatsphäre-Einstellungen oder Moderationssperren. Firmeninhalte, an denen andere Mitglieder mitwirken, Nachrichten und erforderliche Nachweise werden gesondert beurteilt. Inaktivität allein ist kein Beleg für ein unechtes Konto.",
+    "inactivityPrivacy": "Für diesen Ablauf speichern wir einen kontogebundenen Zeitpunkt der letzten Nutzung, den Verfahrensstand sowie erforderliche Versand- und Zustellnachweise. Der Zeitpunkt wird nicht als öffentlicher Online-Status angezeigt; es wird dafür kein Verlauf besuchter Seiten gespeichert. Die Verarbeitung dient der Verwaltung des Nutzungsverhältnisses und der Aktualität des Verzeichnisses; als Rechtsgrundlagen kommen Art. 6 Abs. 1 Buchst. b und f DSGVO entsprechend dem jeweiligen Zweck in Betracht. Der Versand erfolgt über den bereits beschriebenen E-Mail-Dienst Resend. Die Erinnerungen sind Kontomitteilungen und unabhängig von Marketingeinstellungen. Fehlende oder unbestätigte Zustellung löst keine weitere Einschränkung aus. Beim Neustart eines Verfahrens werden nicht mehr benötigte E-Mail-Inhalte und Empfängeradressen des alten Ablaufs entfernt; die zugehörigen technischen Versanddatensätze werden nach spätestens 90 Tagen gelöscht. Laufende Verfahrensdaten bleiben bis zum Abschluss bzw. einer erforderlichen Prüfung gespeichert. Erforderliche Vertrags-, Abrechnungs- und Nachweisdaten werden anhand ihres jeweiligen Zwecks und anwendbarer Aufbewahrungspflichten gesondert behandelt. Für bestehende Konten beginnt die erste Zwölfmonatsfrist frühestens mit ihrer Aufnahme in den aktivierten Ablauf."
   },
   "SetupOffers": {
     "accountReady": "A szolgáltatói fiókod beállítása kész.",
@@ -7242,7 +7245,23 @@
     "verificationResultTitle": "A profilod hitelesítése",
     "verificationApprovedBody": "A profilod hitelesítését jóváhagytuk.",
     "verificationRejectedBody": "A kérelmedet elutasítottuk. A részleteket és az új kérelem lehetőségét a profilodban találod.",
-    "verificationRevokedBody": "A profilod hitelesítését visszavontuk. A részleteket a profilodban találod."
+    "verificationRevokedBody": "A profilod hitelesítését visszavontuk. A részleteket a profilodban találod.",
+    "activity_reminder_title": "CineGenius-fiókod: emlékeztető 12 hónap után",
+    "activity_reminder_body": "Legalább tizenkét hónapja nem használtad a fiókodat. Jelentkezz be az alkalmazásban vagy a weboldalon, hogy aktív maradjon. 15 hónapnál ismét emlékeztetünk; legkorábban 18 hónap után elrejthetjük a személyes nyilvános tartalmakat.",
+    "activity_warning_title": "Erősítsd meg, hogy továbbra is használod a fiókodat",
+    "activity_warning_body": "Legalább 15 hónapja nem rögzítettünk aktivitást. A személyes profilt és hirdetéseket legkorábban 18 hónap után, és e figyelmeztetés megerősített kézbesítésétől legalább 30 nap elteltével rejthetjük el. A bejelentkezés vagy aktív használat leállítja a folyamatot.",
+    "activity_paused_title": "Személyes tartalmaid átmenetileg rejtettek",
+    "activity_paused_body": "Legalább 18 hónap aktivitás nélkül a személyes profilod és hirdetéseid rejtettek. A bejelentkezés vagy az aktív használat feloldja az inaktivitási korlátozást. A privát tartalmak és moderációs korlátozások védettek maradnak.",
+    "activity_deletion_pending_title": "Fiókodat törlési felülvizsgálatra jelöltük",
+    "activity_deletion_pending_body": "Legalább 24 hónapja nem rögzítettünk aktivitást. Az üzenet megerősített kézbesítése után legalább 30 napod van a visszatérésre. Ezután a közös tartalmak és megőrzési kötelezettségek figyelembevételével megvizsgáljuk a törlést. A bejelentkezés vagy aktív használat leállítja a folyamatot.",
+    "activity_review_title": "Fiókod törlési felülvizsgálata esedékes",
+    "activity_review_body": "Lejárt az utolsó válaszadási határidő. Fiókod felülvizsgálatra vár; még nem töröltük véglegesen. A közös tartalmakat, üzeneteket és szükséges iratokat külön kezeljük. Bejelentkezéssel továbbra is leállíthatod az inaktivitási folyamatot.",
+    "activity_reactivated_title": "Fiókod újra aktív",
+    "activity_reactivated_body": "Rögzítettük a visszatérésedet. A korábbi inaktivitási figyelmeztetéseket és a törlési jelölést eltávolítottuk. Mentett adatvédelmi beállításaid és meglévő moderációs korlátozásaid változatlanok.",
+    "activity_policy_title": "Fiókaktivitás és emlékeztetők",
+    "activity_policy_body": "12 hónap bejelentkezés vagy aktív használat nélkül emlékeztetőt küldünk, majd 15 hónapnál újabbat. Legkorábban 18 hónap után elrejtjük a személyes profilt és a személyes hirdetéseket. 24 hónapnál törlési felülvizsgálatra jelöljük a fiókot, legalább 30 napos válaszidővel. A bejelentkezés vagy az alkalmazás, illetve a weboldal aktív használata leállítja a folyamatot. Az adatvédelmi beállítások és a moderációs korlátozások megmaradnak. A közös céges tartalmakat, üzeneteket és megőrzendő adatokat külön vizsgáljuk.",
+    "activity_admin_title": "Inaktív fiók felülvizsgálata szükséges",
+    "activity_admin_body": "A(z) {accountId} fiók túllépte az utolsó inaktivitási határidőt. Törlés előtt vizsgáljátok meg a közös tartalmakat, nyitott ügyeket és megőrzési kötelezettségeket."
   },
   "PageCopy": {
     "p_c2b9b41e4402": "{value0} — {value1}, település: {value2}. Érdeklődj most a CineGeniuson.",
@@ -8380,6 +8399,66 @@
       "received": "Beérkezett: {date}",
       "anonymous": "Nincs megadva",
       "footer": "A CineGeniuson keresztül beküldött strukturált bejelentés."
+    }
+  },
+  "AccountActivity": {
+    "title": "Fiókaktivitás és emlékeztetők",
+    "schedule": "12 hónap bejelentkezés vagy aktív használat nélkül emlékeztetőt küldünk, majd 15 hónapnál újabbat. Legkorábban 18 hónap után elrejtjük a személyes profilt és a személyes hirdetéseket. 24 hónapnál törlési felülvizsgálatra jelöljük a fiókot, legalább 30 napos válaszidővel.",
+    "preserved": "A bejelentkezés vagy az alkalmazás, illetve a weboldal aktív használata leállítja a folyamatot. Az adatvédelmi beállítások és a moderációs korlátozások megmaradnak. A közös céges tartalmakat, üzeneteket és megőrzendő adatokat külön vizsgáljuk.",
+    "lastActivity": "Utolsó fiókaktivitás: {date}",
+    "loading": "Állapot betöltése…",
+    "error": "A fiók állapota nem tölthető be. Próbáld újra.",
+    "retry": "Újratöltés",
+    "disabled": "Az automatikus inaktivitási szabály még nem aktív.",
+    "pending": "Az aktivitást a következő aktív munkamenet során rögzítjük.",
+    "exempt": "Ez az üzemeltetői fiók mentesül az automatikus inaktivitási folyamat alól.",
+    "openAccount": "Fiók megnyitása",
+    "emailNote": "Ez a CineGenius-fiókod kezelésével kapcsolatos értesítés. Jelentkezz be az alkalmazásban vagy a weboldalon. Az e-mail puszta megnyitása nem számít aktivitásnak.",
+    "adminTitle": "Inaktív fiókok",
+    "adminDescription": "Az emlékeztetők és az elrejtés automatikusak. Végleges törlés előtt vizsgáljátok meg a közös tartalmakat, nyitott ügyeket és megőrzési kötelezettségeket. Az inaktivitás nem bizonyítja, hogy egy fiók hamis.",
+    "empty": "Nincs függőben lévő inaktivitási ügy.",
+    "inspect": "Fiók vizsgálata",
+    "previous": "Előző",
+    "next": "Következő",
+    "retentionReview": "Törlési felülvizsgálat szükséges; nincs automatikus végleges törlés.",
+    "deliveryProblem": "Az e-mailt vagy a kézbesítést ellenőrizni kell. Megerősített figyelmeztetés nélkül nincs további korlátozás.",
+    "states": {
+      "active": "Aktív",
+      "reminder": "Első emlékeztető",
+      "warning": "Második emlékeztető",
+      "paused": "Személyes tartalom elrejtve",
+      "deletion_pending": "Törlésre jelölve",
+      "review": "Törlési felülvizsgálat"
+    },
+    "notices": {
+      "reminder": {
+        "title": "CineGenius-fiókod: emlékeztető 12 hónap után",
+        "body": "Legalább tizenkét hónapja nem használtad a fiókodat. Jelentkezz be az alkalmazásban vagy a weboldalon, hogy aktív maradjon. 15 hónapnál ismét emlékeztetünk; legkorábban 18 hónap után elrejthetjük a személyes nyilvános tartalmakat."
+      },
+      "warning": {
+        "title": "Erősítsd meg, hogy továbbra is használod a fiókodat",
+        "body": "Legalább 15 hónapja nem rögzítettünk aktivitást. A személyes profilt és hirdetéseket legkorábban 18 hónap után, és e figyelmeztetés megerősített kézbesítésétől legalább 30 nap elteltével rejthetjük el. A bejelentkezés vagy aktív használat leállítja a folyamatot."
+      },
+      "paused": {
+        "title": "Személyes tartalmaid átmenetileg rejtettek",
+        "body": "Legalább 18 hónap aktivitás nélkül a személyes profilod és hirdetéseid rejtettek. A bejelentkezés vagy az aktív használat feloldja az inaktivitási korlátozást. A privát tartalmak és moderációs korlátozások védettek maradnak."
+      },
+      "deletion_pending": {
+        "title": "Fiókodat törlési felülvizsgálatra jelöltük",
+        "body": "Legalább 24 hónapja nem rögzítettünk aktivitást. Az üzenet megerősített kézbesítése után legalább 30 napod van a visszatérésre. Ezután a közös tartalmak és megőrzési kötelezettségek figyelembevételével megvizsgáljuk a törlést. A bejelentkezés vagy aktív használat leállítja a folyamatot."
+      },
+      "review": {
+        "title": "Fiókod törlési felülvizsgálata esedékes",
+        "body": "Lejárt az utolsó válaszadási határidő. Fiókod felülvizsgálatra vár; még nem töröltük véglegesen. A közös tartalmakat, üzeneteket és szükséges iratokat külön kezeljük. Bejelentkezéssel továbbra is leállíthatod az inaktivitási folyamatot."
+      },
+      "reactivated": {
+        "title": "Fiókod újra aktív",
+        "body": "Rögzítettük a visszatérésedet. A korábbi inaktivitási figyelmeztetéseket és a törlési jelölést eltávolítottuk. Mentett adatvédelmi beállításaid és meglévő moderációs korlátozásaid változatlanok."
+      },
+      "policy": {
+        "title": "Fiókaktivitás és emlékeztetők",
+        "body": "12 hónap bejelentkezés vagy aktív használat nélkül emlékeztetőt küldünk, majd 15 hónapnál újabbat. Legkorábban 18 hónap után elrejtjük a személyes profilt és a személyes hirdetéseket. 24 hónapnál törlési felülvizsgálatra jelöljük a fiókot, legalább 30 napos válaszidővel. A bejelentkezés vagy az alkalmazás, illetve a weboldal aktív használata leállítja a folyamatot. Az adatvédelmi beállítások és a moderációs korlátozások megmaradnak. A közös céges tartalmakat, üzeneteket és megőrzendő adatokat külön vizsgáljuk."
+      }
     }
   }
 }

@@ -1,3 +1,4 @@
+import { recordAccountActivity } from "@/lib/account-activity-server";
 import {getTranslations} from "next-intl/server";
 import {recipientEmailLocale} from "@/lib/i18n/email-locale";
 import {appLocale, type AppLocale} from "@/lib/i18n/locales";
@@ -44,6 +45,17 @@ export async function POST(req: Request) {
     }) as typeof event;
   } catch {
     return new Response("Invalid signature", { status: 400 });
+  }
+
+  // Verified provider events cover sign-ins on both clients, even if their
+  // foreground request is interrupted. Delayed/replayed events keep their time.
+  if (["session.created", "user.created", "user.updated"].includes(event.type)) {
+    const account = event.type === "session.created" ? event.data.user_id : event.data.id;
+    const occurred = event.type === "user.updated" ? event.data.last_sign_in_at : event.data.created_at;
+    if (typeof account === "string" && typeof occurred === "number" && Number.isFinite(occurred) && occurred > 0) {
+      try { await recordAccountActivity(account, new Date(occurred).toISOString()); }
+      catch { return Response.json({ code: "activity_unavailable" }, { status: 503 }); }
+    }
   }
 
   // Clerk verification/invitation emails — fired when "Delivered by Clerk" is OFF

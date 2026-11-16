@@ -1,4 +1,5 @@
 "use client";
+import AdminAccountActivity from "./AdminAccountActivity";
 
 import { useEffect, useState } from "react";
 import { useFormatter, useLocale, useTranslations } from "next-intl";
@@ -57,6 +58,7 @@ export function AdminAccounts() {
   }, [search, page, refresh, requestKey, t]);
   const pages = Math.max(1, Math.ceil((result?.total ?? 0) / (result?.pageSize ?? 50)));
   return <div className="space-y-4">
+    <AdminAccountActivity selectAccount={id => { setSearch(id); setPage(1); }} />
     <p className="rounded-xl border border-border bg-bg-elevated p-4 text-sm leading-6 text-text-secondary">{t("explanation")}</p>
     <div className="flex flex-wrap items-center gap-3">
       <label className="relative w-full max-w-md"><span className="sr-only">{t("search")}</span><Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-text-muted" /><input value={search} onChange={event => { setSearch(event.target.value); setPage(1); }} placeholder={t("search")} className="min-h-11 w-full rounded-xl border border-border bg-bg-secondary py-2.5 pl-9 pr-3 text-sm text-text-primary" /></label>

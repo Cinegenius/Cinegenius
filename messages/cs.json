@@ -2119,15 +2119,18 @@
   },
   "LegalAuditOriginal": {
     "scope": "Tyto všeobecné obchodní podmínky (dále jen „podmínky“) platí pro používání online platformy CineGenius na doméně cinegenius.co, kterou provozuje Markus Müller & Mathias Schmidt, Plinganserstr. 19, 81369 München (dále jen „provozovatel“). Před vytvořením účtu si můžete podmínky otevřít prostřednictvím odkazu v registračním formuláři. Vytvořením účtu souhlasíte s podmínkami, na které formulář odkazuje. Pouhá návštěva webu nepředstavuje souhlas. Odlišné podmínky uživatelů neplatí, pokud s nimi provozovatel výslovně písemně nesouhlasí.",
-    "termsDate": "Stand: 11. November 2026",
-    "privacyDate": "Podle GDPR, BDSG a TDDDG — stav k 31. říjnu 2026",
+    "termsDate": "Stand: 16. November 2026",
+    "privacyDate": "Gemäß DSGVO, BDSG und TDDDG — Stand: 16. November 2026",
     "resendDisclosure": "Transakční e-maily (např. potvrzení rezervací, oznámení a systémové zprávy) se odesílají přes Resend Inc. (USA). Službě Resend se předává vaše e-mailová adresa a případně jméno. Zpravodaj CineGenius: k odběru se můžete dobrovolně přihlásit formulářem v patičce. E-mailové adresy stávajících účtů se nepřebírají. Přihlášení se aktivuje až potvrzovacím odkazem. Ukládáme přitom zadanou e-mailovou adresu, čas udělení souhlasu a použitou verzi souhlasu. Odesílání zajišťuje Resend. Kdykoli se můžete odhlásit odkazem v každém zpravodaji. Tato informace je součástí německých zásad ochrany osobních údajů.",
     "sentryPrepared": "Pro diagnostiku chyb jsou připraveny konfigurační soubory Sentry (Functional Software Inc., San Francisco, USA). Samotné soubory ještě neaktivují předávání údajů; v aktuální aplikaci není zapojena inicializace Sentry.",
     "replayDisabled": "Session Replay je vypnuto i v připravené konfiguraci. Nevytvářejí se tak záznamy relací ani předběžné vyrovnávací paměti přehrávání. Pozdější aktivace vyžaduje předchozí posouzení účelu, právního základu a případně platný souhlas. Tato informace o ochraně osobních údajů souhlas nenahrazuje.",
     "sentryPurpose": "Diagnostika chyb připravena; Session Replay vypnuto (viz oddíl 12)",
     "newsRegionDisclosure": "Regionale Branchennews: Ohne eigene Länderauswahl verwenden wir vorrangig das Land aus deinem Profil, sonst das vom Hosting-Anbieter übermittelte ungefähre Land deiner Verbindung. Dafür fragen wir keinen GPS-Standort ab. Deine ausdrücklich gewählten Länder- und Themeneinstellungen speichern wir jeweils für bis zu ein Jahr in Cookies mit den Präfixen cg_news_country_ und cg_news_topic_, getrennt für Gäste und angemeldete Konten. Die Themenwahl enthält nur das gewählte Thema, keine Suchverläufe oder Profilangaben. Du kannst jederzeit ein anderes Thema oder Land sowie „Alle Themen“, „Alle Länder“ oder die automatische Länderwahl wählen. Das automatisch erkannte Land wird nicht in diesen Cookies gespeichert. Die Oberflächensprache folgt deiner gespeicherten Sprachwahl, sonst einer unterstützten Browsersprache; fehlt diese, dient das ungefähre Land als Rückfall. Originalbeiträge werden nicht automatisch übersetzt.",
     "genieVoiceTitle": "Genie-Sprachbedienung — deutscher Originaltext, Stand: 14. November 2026",
-    "genieVoiceDisclosure": "Die freiwillige Sprachbedienung startet erst durch deine Mikrofonaktion und eine erforderliche Gerätefreigabe. Im Browser wird die beendete Aufnahme (höchstens 30 Sekunden und 1 MiB) über den CineGenius-Server an OpenAI zur Texterkennung übermittelt. In unterstützten nativen Apps übernimmt der Sprachdienst des Geräts die Erkennung; dabei kann eine Verarbeitung durch dessen Anbieter erforderlich sein. Bei leerem Eingabefeld wird der erkannte Text anschließend an Genie gesendet, andernfalls nur deinem ungesendeten Text hinzugefügt. Der KI-Dienst erhält die gesendeten Nachrichten, die letzten Gesprächsrunden, die Sprache und den groben Seitenbereich. Antworten können über die künstliche Stimme des Browsers oder Geräts vorgelesen werden; je nach gewählter Systemstimme verarbeitet deren Anbieter den Antworttext. CineGenius speichert keine Audiodateien. Abgeschlossene Textgespräche bleiben kurzzeitig kontogebunden im aktuellen Browser-Tab. Nach 10 Minuten ohne Bedienung von Genie wird dieser lokale Verlauf automatisch gelöscht; bei einer vom Gerät pausierten Seite geschieht dies beim Fortsetzen, vor der nächsten Anfrage. Ungesendete Eingaben und aktuelle Suchfilter werden dabei nicht gelöscht. Über den Papierkorb kannst du den Verlauf auch sofort löschen. CineGenius führt keine dauerhaft gespeicherte Suchhistorie; eine früher lokal gespeicherte Liste letzter Suchen wird beim Laden der aktuellen Website entfernt. Suchbegriffe in der aktuellen Seitenadresse und der vom Browser verwaltete Navigationsverlauf bleiben davon unberührt. Für die Missbrauchsbegrenzung werden Nutzungszähler geführt. Das Löschen des lokalen Verlaufs löscht keine bereits übermittelten Daten beim jeweiligen Dienst. Die Aufbewahrung bei OpenAI richtet sich nach dem verwendeten Dienst und seiner Konfiguration; deaktivierte Gesprächsspeicherung ist keine Zusage, dass keinerlei Sicherheitsprotokolle entstehen. Schließen, Abbrechen, Kontowechsel und der Wechsel in den Hintergrund beenden die aktuelle Aufnahme. Die Suche verwendet nur den von dir genannten Ort und ungefähre öffentliche Ortskoordinaten, keinen GPS-Standort. Sie kann passende Filter öffnen, veröffentlicht aber keine Inhalte und ändert keine gemeinsamen Arbeitspläne. Bitte sprich keine Passwörter oder unnötigen vertraulichen Angaben ein."
+    "genieVoiceDisclosure": "Die freiwillige Sprachbedienung startet erst durch deine Mikrofonaktion und eine erforderliche Gerätefreigabe. Im Browser wird die beendete Aufnahme (höchstens 30 Sekunden und 1 MiB) über den CineGenius-Server an OpenAI zur Texterkennung übermittelt. In unterstützten nativen Apps übernimmt der Sprachdienst des Geräts die Erkennung; dabei kann eine Verarbeitung durch dessen Anbieter erforderlich sein. Bei leerem Eingabefeld wird der erkannte Text anschließend an Genie gesendet, andernfalls nur deinem ungesendeten Text hinzugefügt. Der KI-Dienst erhält die gesendeten Nachrichten, die letzten Gesprächsrunden, die Sprache und den groben Seitenbereich. Antworten können über die künstliche Stimme des Browsers oder Geräts vorgelesen werden; je nach gewählter Systemstimme verarbeitet deren Anbieter den Antworttext. CineGenius speichert keine Audiodateien. Abgeschlossene Textgespräche bleiben kurzzeitig kontogebunden im aktuellen Browser-Tab. Nach 10 Minuten ohne Bedienung von Genie wird dieser lokale Verlauf automatisch gelöscht; bei einer vom Gerät pausierten Seite geschieht dies beim Fortsetzen, vor der nächsten Anfrage. Ungesendete Eingaben und aktuelle Suchfilter werden dabei nicht gelöscht. Über den Papierkorb kannst du den Verlauf auch sofort löschen. CineGenius führt keine dauerhaft gespeicherte Suchhistorie; eine früher lokal gespeicherte Liste letzter Suchen wird beim Laden der aktuellen Website entfernt. Suchbegriffe in der aktuellen Seitenadresse und der vom Browser verwaltete Navigationsverlauf bleiben davon unberührt. Für die Missbrauchsbegrenzung werden Nutzungszähler geführt. Das Löschen des lokalen Verlaufs löscht keine bereits übermittelten Daten beim jeweiligen Dienst. Die Aufbewahrung bei OpenAI richtet sich nach dem verwendeten Dienst und seiner Konfiguration; deaktivierte Gesprächsspeicherung ist keine Zusage, dass keinerlei Sicherheitsprotokolle entstehen. Schließen, Abbrechen, Kontowechsel und der Wechsel in den Hintergrund beenden die aktuelle Aufnahme. Die Suche verwendet nur den von dir genannten Ort und ungefähre öffentliche Ortskoordinaten, keinen GPS-Standort. Sie kann passende Filter öffnen, veröffentlicht aber keine Inhalte und ändert keine gemeinsamen Arbeitspläne. Bitte sprich keine Passwörter oder unnötigen vertraulichen Angaben ein.",
+    "inactivityTitle": "Kontoinaktivität und Benachrichtigungen — deutscher Originaltext",
+    "inactivityTerms": "Für den Inaktivitätsablauf zählt eine erfolgreiche Anmeldung oder die bewusste Nutzung einer angemeldeten Sitzung in App oder Website. Nach zwölf Monaten ohne solche Nutzung folgt eine Erinnerung, nach 15 Monaten eine zweite. Frühestens nach 18 Monaten und mindestens 30 Tage nach bestätigter Zustellung der zweiten Warnung werden das persönliche Profil und persönliche Angebote vorübergehend ausgeblendet. Nach 24 Monaten erfolgt eine Löschvormerkung. Nach bestätigter Zustellung der letzten Mitteilung bleiben mindestens 30 Tage zur Rückkehr. Anschließend prüfen die Betreiber die Löschung; eine automatische endgültige Löschung findet nicht statt. Erneute Nutzung hebt die Inaktivität auf, verändert aber keine gespeicherten Privatsphäre-Einstellungen oder Moderationssperren. Firmeninhalte, an denen andere Mitglieder mitwirken, Nachrichten und erforderliche Nachweise werden gesondert beurteilt. Inaktivität allein ist kein Beleg für ein unechtes Konto.",
+    "inactivityPrivacy": "Für diesen Ablauf speichern wir einen kontogebundenen Zeitpunkt der letzten Nutzung, den Verfahrensstand sowie erforderliche Versand- und Zustellnachweise. Der Zeitpunkt wird nicht als öffentlicher Online-Status angezeigt; es wird dafür kein Verlauf besuchter Seiten gespeichert. Die Verarbeitung dient der Verwaltung des Nutzungsverhältnisses und der Aktualität des Verzeichnisses; als Rechtsgrundlagen kommen Art. 6 Abs. 1 Buchst. b und f DSGVO entsprechend dem jeweiligen Zweck in Betracht. Der Versand erfolgt über den bereits beschriebenen E-Mail-Dienst Resend. Die Erinnerungen sind Kontomitteilungen und unabhängig von Marketingeinstellungen. Fehlende oder unbestätigte Zustellung löst keine weitere Einschränkung aus. Beim Neustart eines Verfahrens werden nicht mehr benötigte E-Mail-Inhalte und Empfängeradressen des alten Ablaufs entfernt; die zugehörigen technischen Versanddatensätze werden nach spätestens 90 Tagen gelöscht. Laufende Verfahrensdaten bleiben bis zum Abschluss bzw. einer erforderlichen Prüfung gespeichert. Erforderliche Vertrags-, Abrechnungs- und Nachweisdaten werden anhand ihres jeweiligen Zwecks und anwendbarer Aufbewahrungspflichten gesondert behandelt. Für bestehende Konten beginnt die erste Zwölfmonatsfrist frühestens mit ihrer Aufnahme in den aktivierten Ablauf."
   },
   "SetupOffers": {
     "accountReady": "Tvůj účet poskytovatele je nastavený.",
@@ -7242,7 +7245,23 @@
     "verificationResultTitle": "Ověření tvého profilu",
     "verificationApprovedBody": "Ověření tvého profilu bylo schváleno.",
     "verificationRejectedBody": "Tvoje žádost byla zamítnuta. Podrobnosti a možnost nové žádosti najdeš ve svém profilu.",
-    "verificationRevokedBody": "Ověření tvého profilu bylo odebráno. Podrobnosti najdeš ve svém profilu."
+    "verificationRevokedBody": "Ověření tvého profilu bylo odebráno. Podrobnosti najdeš ve svém profilu.",
+    "activity_reminder_title": "Váš účet CineGenius: připomenutí po 12 měsících",
+    "activity_reminder_body": "Účet jste nepoužili nejméně dvanáct měsíců. Přihlaste se v aplikaci nebo na webu, aby zůstal aktivní. Po 15 měsících připomeneme znovu; nejdříve po 18 měsících můžeme skrýt osobní veřejný obsah.",
+    "activity_warning_title": "Potvrďte, že svůj účet nadále používáte",
+    "activity_warning_body": "Nejméně 15 měsíců nebyla zaznamenána aktivita. Osobní profil a osobní nabídky můžeme skrýt nejdříve po 18 měsících a nejméně 30 dní po potvrzeném doručení tohoto varování. Přihlášení nebo aktivní používání proces zastaví.",
+    "activity_paused_title": "Váš osobní obsah je dočasně skrytý",
+    "activity_paused_body": "Po nejméně 18 měsících bez aktivity je osobní profil a osobní nabídky skrytý. Přihlášení nebo aktivní používání účtu zruší omezení pro neaktivitu. Soukromý obsah a omezení moderace zůstávají chráněny.",
+    "activity_deletion_pending_title": "Váš účet je označen k posouzení smazání",
+    "activity_deletion_pending_body": "Nejméně 24 měsíců nebyla zaznamenána aktivita. Od potvrzeného doručení této zprávy máte nejméně 30 dní na návrat. Poté posoudíme smazání s ohledem na sdílený obsah a povinnosti uchovávání. Přihlášení nebo aktivní používání proces zastaví.",
+    "activity_review_title": "Nastal čas posoudit smazání vašeho účtu",
+    "activity_review_body": "Konečná lhůta pro reakci uplynula. Účet čeká na posouzení; nebyl trvale smazán. Sdílený obsah, zprávy a potřebné dokumenty posuzujeme samostatně. Proces neaktivity můžete stále zastavit přihlášením.",
+    "activity_reactivated_title": "Váš účet je opět aktivní",
+    "activity_reactivated_body": "Zaznamenali jsme váš návrat. Předchozí varování před neaktivitou a označení ke smazání byla zrušena. Uložené soukromí a stávající omezení moderace zůstávají beze změny.",
+    "activity_policy_title": "Aktivita účtu a připomenutí",
+    "activity_policy_body": "Po 12 měsících bez přihlášení nebo aktivního používání pošleme připomenutí, po 15 měsících další. Nejdříve po 18 měsících skryjeme osobní profil a osobní nabídky. Po 24 měsících účet označíme k posouzení smazání s nejméně 30 dny na reakci. Přihlášení nebo aktivní používání aplikace či webu proces zastaví. Nastavení soukromí a omezení moderace zůstávají zachována. Sdílený firemní obsah, zprávy a údaje podléhající uchovávání posuzujeme samostatně.",
+    "activity_admin_title": "Neaktivní účet vyžaduje posouzení",
+    "activity_admin_body": "Účet {accountId} překročil konečnou lhůtu neaktivity. Před smazáním posuďte sdílený obsah, otevřené záležitosti a povinnosti uchovávání."
   },
   "PageCopy": {
     "p_c2b9b41e4402": "{value0} — {value1}, lokalita: {value2}. Pošlete poptávku na CineGenius.",
@@ -8380,6 +8399,66 @@
       "received": "Přijato: {date}",
       "anonymous": "Neuvedeno",
       "footer": "Strukturované hlášení odeslané prostřednictvím CineGenius."
+    }
+  },
+  "AccountActivity": {
+    "title": "Aktivita účtu a připomenutí",
+    "schedule": "Po 12 měsících bez přihlášení nebo aktivního používání pošleme připomenutí, po 15 měsících další. Nejdříve po 18 měsících skryjeme osobní profil a osobní nabídky. Po 24 měsících účet označíme k posouzení smazání s nejméně 30 dny na reakci.",
+    "preserved": "Přihlášení nebo aktivní používání aplikace či webu proces zastaví. Nastavení soukromí a omezení moderace zůstávají zachována. Sdílený firemní obsah, zprávy a údaje podléhající uchovávání posuzujeme samostatně.",
+    "lastActivity": "Poslední aktivita účtu: {date}",
+    "loading": "Načítání stavu…",
+    "error": "Stav účtu se nepodařilo načíst. Zkuste to znovu.",
+    "retry": "Načíst znovu",
+    "disabled": "Automatické pravidlo neaktivity ještě není zapnuté.",
+    "pending": "Aktivitu zaznamenáme při příští aktivní relaci.",
+    "exempt": "Na tento účet provozovatele se automatický proces neaktivity nevztahuje.",
+    "openAccount": "Otevřít účet",
+    "emailNote": "Toto je provozní oznámení o vašem účtu CineGenius. Přihlaste se přes aplikaci nebo web. Pouhé otevření e-mailu se nepovažuje za aktivitu.",
+    "adminTitle": "Neaktivní účty",
+    "adminDescription": "Připomenutí a skrytí probíhají automaticky. Před trvalým smazáním posuďte sdílený obsah, otevřené záležitosti a povinnosti uchovávání. Neaktivita nedokazuje, že je účet falešný.",
+    "empty": "Žádné nevyřízené případy neaktivity.",
+    "inspect": "Posoudit účet",
+    "previous": "Předchozí",
+    "next": "Další",
+    "retentionReview": "Nutné posouzení smazání; žádné automatické trvalé smazání.",
+    "deliveryProblem": "Je třeba ověřit e-mail nebo doručení. Bez potvrzeného varování nedojde k dalšímu omezení.",
+    "states": {
+      "active": "Aktivní",
+      "reminder": "První připomenutí",
+      "warning": "Druhé připomenutí",
+      "paused": "Osobní obsah skrytý",
+      "deletion_pending": "Označeno ke smazání",
+      "review": "Posouzení smazání"
+    },
+    "notices": {
+      "reminder": {
+        "title": "Váš účet CineGenius: připomenutí po 12 měsících",
+        "body": "Účet jste nepoužili nejméně dvanáct měsíců. Přihlaste se v aplikaci nebo na webu, aby zůstal aktivní. Po 15 měsících připomeneme znovu; nejdříve po 18 měsících můžeme skrýt osobní veřejný obsah."
+      },
+      "warning": {
+        "title": "Potvrďte, že svůj účet nadále používáte",
+        "body": "Nejméně 15 měsíců nebyla zaznamenána aktivita. Osobní profil a osobní nabídky můžeme skrýt nejdříve po 18 měsících a nejméně 30 dní po potvrzeném doručení tohoto varování. Přihlášení nebo aktivní používání proces zastaví."
+      },
+      "paused": {
+        "title": "Váš osobní obsah je dočasně skrytý",
+        "body": "Po nejméně 18 měsících bez aktivity je osobní profil a osobní nabídky skrytý. Přihlášení nebo aktivní používání účtu zruší omezení pro neaktivitu. Soukromý obsah a omezení moderace zůstávají chráněny."
+      },
+      "deletion_pending": {
+        "title": "Váš účet je označen k posouzení smazání",
+        "body": "Nejméně 24 měsíců nebyla zaznamenána aktivita. Od potvrzeného doručení této zprávy máte nejméně 30 dní na návrat. Poté posoudíme smazání s ohledem na sdílený obsah a povinnosti uchovávání. Přihlášení nebo aktivní používání proces zastaví."
+      },
+      "review": {
+        "title": "Nastal čas posoudit smazání vašeho účtu",
+        "body": "Konečná lhůta pro reakci uplynula. Účet čeká na posouzení; nebyl trvale smazán. Sdílený obsah, zprávy a potřebné dokumenty posuzujeme samostatně. Proces neaktivity můžete stále zastavit přihlášením."
+      },
+      "reactivated": {
+        "title": "Váš účet je opět aktivní",
+        "body": "Zaznamenali jsme váš návrat. Předchozí varování před neaktivitou a označení ke smazání byla zrušena. Uložené soukromí a stávající omezení moderace zůstávají beze změny."
+      },
+      "policy": {
+        "title": "Aktivita účtu a připomenutí",
+        "body": "Po 12 měsících bez přihlášení nebo aktivního používání pošleme připomenutí, po 15 měsících další. Nejdříve po 18 měsících skryjeme osobní profil a osobní nabídky. Po 24 měsících účet označíme k posouzení smazání s nejméně 30 dny na reakci. Přihlášení nebo aktivní používání aplikace či webu proces zastaví. Nastavení soukromí a omezení moderace zůstávají zachována. Sdílený firemní obsah, zprávy a údaje podléhající uchovávání posuzujeme samostatně."
+      }
     }
   }
 }
