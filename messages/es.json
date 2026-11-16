@@ -8439,5 +8439,33 @@
     "refineSearch": "Afinar búsqueda",
     "refineHint": "Añade una petición o cambia lugares y requisitos concretos.",
     "restartContext": "Continuar con estos filtros"
+  },
+  "AccountActivity": {
+    "title": "Uso de la cuenta y recordatorios",
+    "schedule": "Tras 12 meses sin uso se envía un recordatorio y, a los 15 meses, una segunda advertencia. El contenido público personal se oculta como pronto a los 18 meses. A los 24 meses, la cuenta se marca para revisar su eliminación, con un último aviso de al menos 30 días.",
+    "preserved": "Iniciar sesión o usar de forma consciente la aplicación o la web detiene el proceso. Se conservan tus opciones de privacidad y las restricciones de moderación existentes. Este proceso no elimina contenido de empresas ni planos locales.",
+    "loading": "Cargando estado…",
+    "error": "El estado de tu cuenta no está disponible temporalmente. Inténtalo de nuevo.",
+    "retry": "Volver a cargar",
+    "disabled": "La regla automática de inactividad aún no está activada.",
+    "pending": "Aún no hay un estado de actividad confirmado para tu cuenta.",
+    "exempt": "Esta cuenta está exenta del proceso automático de inactividad.",
+    "dateNotice": "Las fechas indican el momento más temprano posible. Los avisos obligatorios pueden aplazarlas. Marcar una cuenta para su eliminación da lugar a una revisión, no a su eliminación definitiva automática.",
+    "states": {
+      "active": "Activa",
+      "reminder": "Primer recordatorio",
+      "warning": "Segunda advertencia",
+      "paused": "Contenido personal oculto",
+      "deletion_pending": "Marcada para revisión de eliminación",
+      "review": "Revisión de eliminación"
+    },
+    "dates": {
+      "lastActivityAt": "Último uso confirmado",
+      "reminderAt": "Primer recordatorio a partir de",
+      "warningAt": "Segunda advertencia a partir de",
+      "pauseAt": "Ocultación como pronto el",
+      "deletionNoticeAt": "Marca para eliminación como pronto el",
+      "reviewAfter": "Revisión como pronto el"
+    }
   }
 }

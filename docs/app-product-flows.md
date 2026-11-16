@@ -573,3 +573,15 @@ Sicherheitscheck. Keine Migration, Geräteinstallation oder Veröffentlichung.
 Letzter bestätigter Website-Live-Stand bleibt `fb4ec8c`.
 Eine Website-Veröffentlichung wird separat durch WEB koordiniert.
 Belege: `/srv/cinegenius/handoffs/20261115-app-security-hardening/`.
+
+## Gemeinsame Kontonutzung in App und Website (16. November 2026)
+
+Der App-Client verwendet den gemeinsamen `/api/account/activity`-Vertrag:
+Nutzung nur bei bestätigter Sitzung und bewusster Vordergrundnutzung melden,
+Status und Termine ausschließlich vom Server lesen. Der bestehende native
+Resume-Einstieg wird wiederverwendet; keine Hintergrund-Heartbeats, Tokenkopien
+oder lokale Löschlogik. Die vorhandenen Einstellungen erhalten eine gemeinsame
+Statuskarte mit Lade-/Fehler-/Wiederholen-Zustand und kontogebundenen Serverdaten.
+Die neun bestehenden Sprachkataloge enthalten die UI-Texte. Details und offene
+Backend-/Geräteprüfung: `docs/account-activity-client.md`. Diese App-Änderung
+aktiviert oder veröffentlicht den serverseitigen Inaktivitätsablauf nicht.

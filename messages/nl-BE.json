@@ -8439,5 +8439,33 @@
     "refineSearch": "Zoekopdracht verfijnen",
     "refineHint": "Voeg een wens toe of wijzig specifieke plaatsen en eisen.",
     "restartContext": "Doorgaan met deze filters"
+  },
+  "AccountActivity": {
+    "title": "Accountgebruik en herinneringen",
+    "schedule": "Na 12 maanden zonder gebruik sturen we een herinnering en na 15 maanden een tweede waarschuwing. Persoonlijke openbare inhoud wordt ten vroegste na 18 maanden verborgen. Na 24 maanden wordt het account aangeduid voor beoordeling van verwijdering, met een laatste waarschuwing van minstens 30 dagen.",
+    "preserved": "Aanmelden of bewust gebruik van de app of website stopt het proces. Je privacykeuzes en bestaande moderatiebeperkingen blijven behouden. Bedrijfsinhoud en lokale grondplannen worden hierdoor niet verwijderd.",
+    "loading": "Status laden…",
+    "error": "Je accountstatus is tijdelijk niet beschikbaar. Probeer het opnieuw.",
+    "retry": "Opnieuw laden",
+    "disabled": "De automatische inactiviteitsregel is nog niet actief.",
+    "pending": "Er is nog geen bevestigde gebruiksstatus voor je account.",
+    "exempt": "Dit account is vrijgesteld van het automatische inactiviteitsproces.",
+    "dateNotice": "De datums geven de vroegst mogelijke stappen aan. Vereiste waarschuwingen kunnen deze uitstellen. Een aanduiding voor verwijdering leidt tot beoordeling, niet tot automatische definitieve verwijdering.",
+    "states": {
+      "active": "Actief",
+      "reminder": "Eerste herinnering",
+      "warning": "Tweede waarschuwing",
+      "paused": "Persoonlijke inhoud verborgen",
+      "deletion_pending": "Aangeduid voor verwijderingsbeoordeling",
+      "review": "Verwijderingsbeoordeling"
+    },
+    "dates": {
+      "lastActivityAt": "Laatste bevestigde gebruik",
+      "reminderAt": "Eerste herinnering vanaf",
+      "warningAt": "Tweede waarschuwing vanaf",
+      "pauseAt": "Verbergen ten vroegste",
+      "deletionNoticeAt": "Aanduiding ten vroegste",
+      "reviewAfter": "Beoordeling ten vroegste"
+    }
   }
 }

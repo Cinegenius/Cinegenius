@@ -8439,5 +8439,33 @@
     "refineSearch": "Affina la ricerca",
     "refineHint": "Aggiungi una richiesta o modifica luoghi e requisiti specifici.",
     "restartContext": "Continua con questi filtri"
+  },
+  "AccountActivity": {
+    "title": "Uso dell’account e promemoria",
+    "schedule": "Dopo 12 mesi senza utilizzo inviamo un promemoria, seguito da un secondo avviso dopo 15 mesi. I contenuti pubblici personali vengono nascosti non prima di 18 mesi. Dopo 24 mesi l’account viene segnalato per la verifica della cancellazione, con un ultimo preavviso di almeno 30 giorni.",
+    "preserved": "Accedere o usare consapevolmente l’app o il sito interrompe il processo. Le scelte sulla privacy e le restrizioni di moderazione restano valide. Il processo non elimina contenuti aziendali né planimetrie locali.",
+    "loading": "Caricamento dello stato…",
+    "error": "Lo stato dell’account non è al momento disponibile. Riprova.",
+    "retry": "Ricarica",
+    "disabled": "La regola automatica di inattività non è ancora attiva.",
+    "pending": "Non è ancora disponibile uno stato di utilizzo confermato per il tuo account.",
+    "exempt": "Questo account è escluso dal processo automatico di inattività.",
+    "dateNotice": "Le date indicano la prima scadenza possibile. I preavvisi necessari possono rinviarla. La segnalazione per la cancellazione comporta una verifica, non una cancellazione definitiva automatica.",
+    "states": {
+      "active": "Attivo",
+      "reminder": "Primo promemoria",
+      "warning": "Secondo avviso",
+      "paused": "Contenuti personali nascosti",
+      "deletion_pending": "Segnalato per verifica della cancellazione",
+      "review": "Verifica della cancellazione"
+    },
+    "dates": {
+      "lastActivityAt": "Ultimo utilizzo confermato",
+      "reminderAt": "Primo promemoria dal",
+      "warningAt": "Secondo avviso dal",
+      "pauseAt": "Contenuti nascosti non prima del",
+      "deletionNoticeAt": "Segnalazione non prima del",
+      "reviewAfter": "Verifica non prima del"
+    }
   }
 }

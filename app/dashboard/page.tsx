@@ -1,5 +1,6 @@
 "use client";
 import PrivacySettings from "@/components/PrivacySettings";
+import AccountActivitySettings from "@/components/AccountActivitySettings";
 import MessageAttachments from "@/components/messaging/MessageAttachments";
 import type {MessageAttachment} from "@/lib/message-attachments";
 import JobEditorFields from "@/components/JobEditorFields";
@@ -2358,6 +2359,7 @@ export default function DashboardPage() {
               </div>
 
               <PrivacySettings accountId={user?.id ?? null} />
+              <AccountActivitySettings accountId={user?.id ?? null} />
 
               {/* Verifizierung */}
               <div className="p-5 rounded-xl border border-border bg-bg-secondary">

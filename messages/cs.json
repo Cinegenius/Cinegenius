@@ -8439,5 +8439,33 @@
     "refineSearch": "Upřesnit hledání",
     "refineHint": "Přidej požadavek nebo změň konkrétní místa a podmínky.",
     "restartContext": "Pokračovat s těmito filtry"
+  },
+  "AccountActivity": {
+    "title": "Používání účtu a připomenutí",
+    "schedule": "Po 12 měsících bez používání přijde připomenutí, po 15 měsících druhé upozornění. Osobní veřejný obsah se skryje nejdříve po 18 měsících. Po 24 měsících bude účet označen k posouzení smazání s posledním upozorněním alespoň 30 dní předem.",
+    "preserved": "Přihlášení nebo vědomé používání aplikace či webu postup zastaví. Nastavení soukromí a stávající omezení moderace zůstávají zachována. Firemní obsah ani místní půdorysy se tímto postupem nemažou.",
+    "loading": "Načítání stavu…",
+    "error": "Stav účtu je nyní nedostupný. Zkuste jej načíst znovu.",
+    "retry": "Načíst znovu",
+    "disabled": "Automatické pravidlo neaktivity ještě není zapnuté.",
+    "pending": "Pro váš účet zatím není potvrzený stav používání.",
+    "exempt": "Tento účet je z automatického postupu při neaktivitě vyňat.",
+    "dateNotice": "Data uvádějí nejbližší možné termíny. Povinná upozornění je mohou posunout. Označení ke smazání vede k posouzení, nikoli k automatickému trvalému smazání.",
+    "states": {
+      "active": "Aktivní",
+      "reminder": "První připomenutí",
+      "warning": "Druhé upozornění",
+      "paused": "Osobní obsah skrytý",
+      "deletion_pending": "Označeno k posouzení smazání",
+      "review": "Posouzení smazání"
+    },
+    "dates": {
+      "lastActivityAt": "Poslední potvrzené použití",
+      "reminderAt": "První připomenutí od",
+      "warningAt": "Druhé upozornění od",
+      "pauseAt": "Skrytí nejdříve",
+      "deletionNoticeAt": "Označení ke smazání nejdříve",
+      "reviewAfter": "Posouzení nejdříve"
+    }
   }
 }

@@ -8439,5 +8439,33 @@
     "refineSearch": "Keresés pontosítása",
     "refineHint": "Adj hozzá igényt, vagy módosíts konkrét helyeket és feltételeket.",
     "restartContext": "Folytatás ezekkel a szűrőkkel"
+  },
+  "AccountActivity": {
+    "title": "Fiókhasználat és emlékeztetők",
+    "schedule": "12 hónap használat nélkül emlékeztetőt, 15 hónap után második figyelmeztetést küldünk. A személyes nyilvános tartalmakat legkorábban 18 hónap után rejtjük el. 24 hónap után a fiókot törlési felülvizsgálatra jelöljük, legalább 30 napos utolsó figyelmeztetéssel.",
+    "preserved": "A bejelentkezés vagy az alkalmazás, illetve a webhely tudatos használata leállítja a folyamatot. Az adatvédelmi beállítások és a meglévő moderációs korlátozások megmaradnak. A céges tartalmakat és a helyi alaprajzokat ez a folyamat nem törli.",
+    "loading": "Állapot betöltése…",
+    "error": "A fiók állapota átmenetileg nem érhető el. Próbáld újra.",
+    "retry": "Újratöltés",
+    "disabled": "Az automatikus inaktivitási szabály még nincs bekapcsolva.",
+    "pending": "A fiókodhoz még nincs megerősített használati állapot.",
+    "exempt": "Ez a fiók mentesül az automatikus inaktivitási folyamat alól.",
+    "dateNotice": "A dátumok a lehető legkorábbi időpontokat jelzik. A szükséges figyelmeztetések késleltethetik őket. A törlésre jelölés felülvizsgálatot jelent, nem automatikus végleges törlést.",
+    "states": {
+      "active": "Aktív",
+      "reminder": "Első emlékeztető",
+      "warning": "Második figyelmeztetés",
+      "paused": "Személyes tartalmak elrejtve",
+      "deletion_pending": "Törlési felülvizsgálatra jelölve",
+      "review": "Törlési felülvizsgálat"
+    },
+    "dates": {
+      "lastActivityAt": "Utolsó megerősített használat",
+      "reminderAt": "Első emlékeztető ettől",
+      "warningAt": "Második figyelmeztetés ettől",
+      "pauseAt": "Elrejtés legkorábban",
+      "deletionNoticeAt": "Törlésre jelölés legkorábban",
+      "reviewAfter": "Felülvizsgálat legkorábban"
+    }
   }
 }

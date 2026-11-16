@@ -8439,5 +8439,33 @@
     "refineSearch": "Förfina sökningen",
     "refineHint": "Lägg till ett önskemål eller ändra specifika platser och krav.",
     "restartContext": "Fortsätt med dessa filter"
+  },
+  "AccountActivity": {
+    "title": "Kontoaktivitet och påminnelser",
+    "schedule": "Efter 12 månader utan användning skickar vi en påminnelse och efter 15 månader en andra varning. Personligt offentligt innehåll döljs tidigast efter 18 månader. Efter 24 månader markeras kontot för granskning inför radering, med minst 30 dagars sista förvarning.",
+    "preserved": "Inloggning eller medveten användning av appen eller webbplatsen stoppar processen. Dina integritetsval och befintliga modereringsbegränsningar finns kvar. Företagsinnehåll och lokala planritningar raderas inte av processen.",
+    "loading": "Laddar status…",
+    "error": "Din kontostatus är tillfälligt otillgänglig. Försök igen.",
+    "retry": "Ladda igen",
+    "disabled": "Den automatiska inaktivitetsregeln är ännu inte aktiverad.",
+    "pending": "Det finns ännu ingen bekräftad aktivitetsstatus för ditt konto.",
+    "exempt": "Det här kontot är undantaget från den automatiska inaktivitetsprocessen.",
+    "dateNotice": "Datumen visar de tidigast möjliga stegen. Obligatoriska varningar kan skjuta upp dem. En markering för radering leder till granskning, inte till automatisk permanent radering.",
+    "states": {
+      "active": "Aktivt",
+      "reminder": "Första påminnelsen",
+      "warning": "Andra varningen",
+      "paused": "Personligt innehåll dolt",
+      "deletion_pending": "Markerat för raderingsgranskning",
+      "review": "Raderingsgranskning"
+    },
+    "dates": {
+      "lastActivityAt": "Senaste bekräftade användning",
+      "reminderAt": "Första påminnelsen från",
+      "warningAt": "Andra varningen från",
+      "pauseAt": "Döljs tidigast",
+      "deletionNoticeAt": "Markeras tidigast",
+      "reviewAfter": "Granskning tidigast"
+    }
   }
 }

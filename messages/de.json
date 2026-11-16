@@ -8439,5 +8439,33 @@
     "refineSearch": "Suche verfeinern",
     "refineHint": "Ergänze einen Wunsch oder ändere gezielt Ort und Anforderungen.",
     "restartContext": "Mit diesen Filtern fortsetzen"
+  },
+  "AccountActivity": {
+    "title": "Kontonutzung und Erinnerungen",
+    "schedule": "Nach 12 Monaten ohne Nutzung folgt eine Erinnerung, nach 15 Monaten eine zweite Warnung. Frühestens nach 18 Monaten werden persönliche öffentliche Inhalte ausgeblendet. Nach 24 Monaten folgt eine Löschvormerkung mit mindestens 30 Tagen letzter Vorwarnung.",
+    "preserved": "Eine Anmeldung oder bewusste Nutzung in App oder Website stoppt den Ablauf. Deine Privatsphäre und bestehende Moderationssperren bleiben erhalten. Firmeninhalte und lokale Grundrisse werden dadurch nicht gelöscht.",
+    "loading": "Status wird geladen …",
+    "error": "Der Kontostatus ist gerade nicht verfügbar. Bitte lade ihn erneut.",
+    "retry": "Erneut laden",
+    "disabled": "Die automatische Inaktivitätsregel ist noch nicht aktiviert.",
+    "pending": "Für dein Konto liegt noch kein bestätigter Nutzungsstatus vor.",
+    "exempt": "Dieses Konto ist vom automatischen Inaktivitätsablauf ausgenommen.",
+    "dateNotice": "Die Termine zeigen den frühestmöglichen Ablauf. Erforderliche Vorwarnungen können ihn verschieben. Eine Löschvormerkung führt zur Prüfung, nicht zur automatischen endgültigen Löschung.",
+    "states": {
+      "active": "Aktiv",
+      "reminder": "Erste Erinnerung",
+      "warning": "Zweite Warnung",
+      "paused": "Persönliche Inhalte ausgeblendet",
+      "deletion_pending": "Zur Löschung vorgemerkt",
+      "review": "Löschprüfung"
+    },
+    "dates": {
+      "lastActivityAt": "Letzte bestätigte Nutzung",
+      "reminderAt": "Erste Erinnerung ab",
+      "warningAt": "Zweite Warnung ab",
+      "pauseAt": "Ausblenden frühestens",
+      "deletionNoticeAt": "Löschvormerkung frühestens",
+      "reviewAfter": "Prüfung frühestens"
+    }
   }
 }

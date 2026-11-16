@@ -19,6 +19,7 @@ import { ToastProvider } from "@/contexts/ToastContext";
 import GlobalSearch from "@/components/GlobalSearch";
 import FormDraftProvider from "@/contexts/FormDraftContext";
 import AuthSessionBoundary from "@/components/AuthSessionBoundary";
+import AccountActivityTracker from "@/components/AccountActivityTracker";
 import { AUTH_TASK_URLS } from "@/lib/auth-session-tasks";
 import Genie from "@/components/Genie";
 import { getTranslations as getMetadataTranslations } from "next-intl/server";
@@ -151,6 +152,7 @@ export default async function RootLayout({
               <FormDraftProvider>
                 <GlobalEffects />
                 <PresencePing />
+                <AccountActivityTracker />
                 <GlobalSearch />
                 <AppChrome initialIsSignedIn={!!userId} initialAdminUserId={isConfiguredAdmin(userId, process.env.ADMIN_USER_IDS) ? userId : null}>{children}</AppChrome>
                 <CookieBanner />

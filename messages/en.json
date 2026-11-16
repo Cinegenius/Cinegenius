@@ -8439,5 +8439,33 @@
     "refineSearch": "Refine search",
     "refineHint": "Add a wish or change specific places and requirements.",
     "restartContext": "Continue with these filters"
+  },
+  "AccountActivity": {
+    "title": "Account activity and reminders",
+    "schedule": "After 12 months without use, we send a reminder, followed by a second warning after 15 months. Personal public content is hidden no earlier than 18 months. After 24 months, the account is marked for deletion review with at least 30 days of final notice.",
+    "preserved": "Signing in or deliberately using the app or website stops the process. Your privacy choices and existing moderation restrictions remain in place. Company content and local floor plans are not deleted by this process.",
+    "loading": "Loading status…",
+    "error": "Your account status is temporarily unavailable. Please try again.",
+    "retry": "Try again",
+    "disabled": "The automatic inactivity policy is not active yet.",
+    "pending": "There is no confirmed activity status for your account yet.",
+    "exempt": "This account is exempt from the automatic inactivity process.",
+    "dateNotice": "These dates show the earliest possible steps. Required notices may delay them. Being marked for deletion leads to a review, not automatic permanent deletion.",
+    "states": {
+      "active": "Active",
+      "reminder": "First reminder",
+      "warning": "Second warning",
+      "paused": "Personal content hidden",
+      "deletion_pending": "Marked for deletion review",
+      "review": "Deletion review"
+    },
+    "dates": {
+      "lastActivityAt": "Last confirmed activity",
+      "reminderAt": "First reminder from",
+      "warningAt": "Second warning from",
+      "pauseAt": "Hidden no earlier than",
+      "deletionNoticeAt": "Marked for review no earlier than",
+      "reviewAfter": "Review no earlier than"
+    }
   }
 }
