@@ -18,6 +18,15 @@ The existing page dimensions, layout, results and available filter values remain
   or filter dialog. Internal option scrolling does not reposition the popup.
 - `MessagingDialog` opts into the browse surface only for `GlobalSearch`.
   Message, contact and group dialogs retain their existing presentation.
+- Filter sheets and header search use `useSwipeDismiss` for touch gestures.
+  Pull down on the existing handle/header, or on noninteractive content already
+  at the top, to move the window with the finger. Releasing beyond 72 CSS px
+  dismisses it; shorter/cancelled gestures return it to its existing position.
+  Upward/horizontal gestures, fields, buttons and nested selection lists remain
+  native. A gesture started in scrolled content never becomes dismissal when
+  it reaches the top. Reduced motion skips the release animation. Existing
+  close buttons, Escape, actual Back history and selected filters remain intact.
+  No gesture is enabled on message/group editing or busy dialogs.
 - Filter selection, reset/apply, search retry, current history and private form
   handling retain their existing behavior. No new API, permissions, storage,
   geolocation request or language keys are introduced.
