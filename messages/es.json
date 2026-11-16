@@ -1691,7 +1691,8 @@
       "catering": "Catering y suministros",
       "sfx": "SFX y efectos prácticos",
       "studio": "Estudio, escenario y fondos",
-      "fahrzeuge": "Vehículos y unidades móviles"
+      "fahrzeuge": "Vehículos y unidades móviles",
+      "dienstleistungen": "Servicios"
     },
     "subcategories": {
       "licht-quellen": "Focos y luminarias",
@@ -1809,7 +1810,16 @@
       "fahrzeuge-garderobe": "Vehículos de vestuario y maquillaje",
       "fahrzeuge-catering": "Vehículos de catering y suministro",
       "fahrzeuge-anhaenger": "Remolques y unidades móviles",
-      "fahrzeuge-other": "Otros accesorios"
+      "fahrzeuge-other": "Otros accesorios",
+      "dienstleistungen-kamera": "Cámara, Steadicam y fotografía",
+      "dienstleistungen-licht": "Iluminación, operación de consolas y grip",
+      "dienstleistungen-ton": "Sonido y audio",
+      "dienstleistungen-kostuem-maske": "Vestuario, maquillaje y estilismo",
+      "dienstleistungen-handwerk": "Oficios y construcción de decorados",
+      "dienstleistungen-produktion": "Producción y servicios para equipos",
+      "dienstleistungen-postproduktion": "Posproducción y contenido",
+      "dienstleistungen-catering": "Catering y alimentación del equipo",
+      "dienstleistungen-sonstige": "Otros servicios"
     }
   },
   "MarketplaceOffer": {
@@ -1892,13 +1902,20 @@
       "aperture": "Apertura máxima",
       "wheels": "Con ruedas",
       "folding": "Plegable",
-      "capacity": "Capacidad"
+      "capacity": "Capacidad",
+      "service_equipment": "Equipo y material que aportas"
     },
     "loadError": "No se pudieron cargar las ofertas. Inténtalo de nuevo.",
     "savingDraft": "Guardando borrador privado…",
     "privateNotice": "Tu oferta sigue siendo privada. Puedes publicarla expresamente más tarde. Con un perfil configurado no hace falta aprobación adicional.",
     "fulfilment": "Entrega y recogida",
-    "negotiableShort": "negociable"
+    "negotiableShort": "negociable",
+    "service": "Servicio",
+    "servicePrice": "Honorarios",
+    "serviceHint": "Ofrece tus servicios como profesional o a través de tu empresa.",
+    "serviceUnit": "Unidad de facturación",
+    "serviceOptional": "Datos opcionales del servicio",
+    "serviceIncluded": "Servicios incluidos"
   },
   "OptionalMedia": {
     "optional": "Opcional",
@@ -2108,7 +2125,7 @@
     "sentryPrepared": "Se han preparado archivos de configuración para Sentry (Functional Software Inc., San Francisco, EE. UU.) con fines de diagnóstico de errores. Estos archivos, por sí solos, no activan ninguna transmisión de datos; la aplicación actual no incorpora la inicialización de Sentry.",
     "replayDisabled": "Session Replay también está desactivado en la configuración preparada. Por tanto, no se generan grabaciones de sesiones ni búferes previos de reproducción. Antes de activarlo en el futuro, deberán revisarse la finalidad, la base jurídica y, cuando corresponda, la obtención de un consentimiento válido. Este aviso de privacidad no sustituye al consentimiento.",
     "sentryPurpose": "Diagnóstico de errores preparado; Session Replay desactivado (véase el apartado 12)",
-    "newsRegionDisclosure": "Regionale Branchennews: Ohne eigene Länderauswahl verwenden wir vorrangig das Land aus deinem Profil, sonst das vom Hosting-Anbieter übermittelte ungefähre Land deiner Verbindung. Dafür fragen wir keinen GPS-Standort ab. Deine ausdrücklich gewählte Einstellung speichern wir für bis zu ein Jahr in einem Cookie mit dem Präfix cg_news_country_, getrennt für Gäste und angemeldete Konten. Du kannst jederzeit ein anderes Land, „Alle Länder“ oder „Automatisch“ wählen. Die automatische Ländererkennung wird nicht in diesem Cookie gespeichert. Die Oberflächensprache folgt deiner gespeicherten Sprachwahl, sonst einer unterstützten Browsersprache; fehlt diese, dient das ungefähre Land als Rückfall. Originalbeiträge werden nicht automatisch übersetzt.",
+    "newsRegionDisclosure": "Regionale Branchennews: Ohne eigene Länderauswahl verwenden wir vorrangig das Land aus deinem Profil, sonst das vom Hosting-Anbieter übermittelte ungefähre Land deiner Verbindung. Dafür fragen wir keinen GPS-Standort ab. Deine ausdrücklich gewählten Länder- und Themeneinstellungen speichern wir jeweils für bis zu ein Jahr in Cookies mit den Präfixen cg_news_country_ und cg_news_topic_, getrennt für Gäste und angemeldete Konten. Die Themenwahl enthält nur das gewählte Thema, keine Suchverläufe oder Profilangaben. Du kannst jederzeit ein anderes Thema oder Land sowie „Alle Themen“, „Alle Länder“ oder die automatische Länderwahl wählen. Das automatisch erkannte Land wird nicht in diesen Cookies gespeichert. Die Oberflächensprache folgt deiner gespeicherten Sprachwahl, sonst einer unterstützten Browsersprache; fehlt diese, dient das ungefähre Land als Rückfall. Originalbeiträge werden nicht automatisch übersetzt.",
     "genieVoiceTitle": "Genie-Sprachbedienung — deutscher Originaltext, Stand: 14. November 2026",
     "genieVoiceDisclosure": "Die freiwillige Sprachbedienung startet erst durch deine Mikrofonaktion und eine erforderliche Gerätefreigabe. Im Browser wird die beendete Aufnahme (höchstens 30 Sekunden und 1 MiB) über den CineGenius-Server an OpenAI zur Texterkennung übermittelt. In unterstützten nativen Apps übernimmt der Sprachdienst des Geräts die Erkennung; dabei kann eine Verarbeitung durch dessen Anbieter erforderlich sein. Bei leerem Eingabefeld wird der erkannte Text anschließend an Genie gesendet, andernfalls nur deinem ungesendeten Text hinzugefügt. Der KI-Dienst erhält die gesendeten Nachrichten, die letzten Gesprächsrunden, die Sprache und den groben Seitenbereich. Antworten können über die künstliche Stimme des Browsers oder Geräts vorgelesen werden; je nach gewählter Systemstimme verarbeitet deren Anbieter den Antworttext. CineGenius speichert keine Audiodateien. Abgeschlossene Textgespräche bleiben kurzzeitig kontogebunden im aktuellen Browser-Tab. Nach 10 Minuten ohne Bedienung von Genie wird dieser lokale Verlauf automatisch gelöscht; bei einer vom Gerät pausierten Seite geschieht dies beim Fortsetzen, vor der nächsten Anfrage. Ungesendete Eingaben und aktuelle Suchfilter werden dabei nicht gelöscht. Über den Papierkorb kannst du den Verlauf auch sofort löschen. CineGenius führt keine dauerhaft gespeicherte Suchhistorie; eine früher lokal gespeicherte Liste letzter Suchen wird beim Laden der aktuellen Website entfernt. Suchbegriffe in der aktuellen Seitenadresse und der vom Browser verwaltete Navigationsverlauf bleiben davon unberührt. Für die Missbrauchsbegrenzung werden Nutzungszähler geführt. Das Löschen des lokalen Verlaufs löscht keine bereits übermittelten Daten beim jeweiligen Dienst. Die Aufbewahrung bei OpenAI richtet sich nach dem verwendeten Dienst und seiner Konfiguration; deaktivierte Gesprächsspeicherung ist keine Zusage, dass keinerlei Sicherheitsprotokolle entstehen. Schließen, Abbrechen, Kontowechsel und der Wechsel in den Hintergrund beenden die aktuelle Aufnahme. Die Suche verwendet nur den von dir genannten Ort und ungefähre öffentliche Ortskoordinaten, keinen GPS-Standort. Sie kann passende Filter öffnen, veröffentlicht aber keine Inhalte und ändert keine gemeinsamen Arbeitspläne. Bitte sprich keine Passwörter oder unnötigen vertraulichen Angaben ein."
   },
@@ -7608,7 +7625,8 @@
     "priceMax": "Precio hasta",
     "priceHint": "Importe en euros",
     "categoryOverview": "Explorar categorías",
-    "draftCleanupFailed": "Tu anuncio se ha guardado. No se ha podido marcar como completado el progreso anterior del asistente."
+    "draftCleanupFailed": "Tu anuncio se ha guardado. No se ha podido marcar como completado el progreso anterior del asistente.",
+    "service": "Servicios"
   },
   "AnalyticsPrivacy": {
     "settings": "Ajustes de análisis",
@@ -8180,7 +8198,8 @@
     "empty": "Todavía no hay publicaciones actuales para esta selección.",
     "saveError": "No se pudo guardar tu selección. Permite las cookies de preferencias e inténtalo de nuevo.",
     "loadError": "No se pudieron cargar las publicaciones.",
-    "retry": "Reintentar"
+    "retry": "Reintentar",
+    "allTopics": "Todos los temas"
   },
   "PrivacySettings": {
     "title": "Privacidad",

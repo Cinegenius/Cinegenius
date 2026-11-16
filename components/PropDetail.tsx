@@ -63,6 +63,7 @@ export default function PropDetail({ prop }: { prop: Prop }) {
 
   const { user } = useUser();
   const market=useTranslations("MarketplaceOffer"),catalog=useTranslations("MarketplaceCatalog"),locale=useLocale();
+  const service = prop.pricing?.marketplace?.mode === "service";
   const isOwner = !!user && user.id === prop.ownerId;
 
   const [liveRating, setLiveRating] = useState<{ avg: number; count: number } | null>(null);
@@ -123,10 +124,10 @@ export default function PropDetail({ prop }: { prop: Prop }) {
                   {prop.era}
                 </span>
               )}
-              <span className={`px-2.5 py-1 border text-xs rounded-full font-medium ${conditionColors[prop.condition] ?? conditionColors["Gut"]}`}>
+              {!service&&prop.condition&&<span className={`px-2.5 py-1 border text-xs rounded-full font-medium ${conditionColors[prop.condition] ?? conditionColors["Gut"]}`}>
                 {prop.condition}
-              </span>
-              {prop.delivery && (
+              </span>}
+              {!service && prop.delivery && (
                 <span className="px-2.5 py-1 bg-success/10 border border-success/20 text-success text-xs rounded-full flex items-center gap-1">{uiText.rich("Ui.text_0ead3d7dc888ff", { part1: () => (<Truck size={11} />) })}</span>
               )}
             </div>
@@ -199,9 +200,9 @@ export default function PropDetail({ prop }: { prop: Prop }) {
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-8">
               {[
                 { label: market("mode"), value: listingPriceLabel(prop.dailyRate,prop.pricing,"/Tag",locale,market) },
-                { label: uiText("props.conditionLabel"), value: prop.condition || "—" },
+                ...(!service ? [{ label: uiText("props.conditionLabel"), value: prop.condition || "—" }] : []),
                 { label: uiText("props.categoryBtn"), value: marketplaceCategoryLabel(prop.category,catalog) },
-                { label: uiText("Ui.text_7847a535dc2e1f"), value: prop.pricing?.marketplace ? prop.pricing.marketplace.fulfilment.map(value=>market(value)).join(" · ") || "—" : prop.delivery ? uiText("Ui.text_a9e5a9a46e2694") : uiText("Ui.text_df2631edf950ad") },
+                ...(!service ? [{ label: uiText("Ui.text_7847a535dc2e1f"), value: prop.pricing?.marketplace ? prop.pricing.marketplace.fulfilment.map(value=>market(value)).join(" · ") || "—" : prop.delivery ? uiText("Ui.text_a9e5a9a46e2694") : uiText("Ui.text_df2631edf950ad") }] : []),
               ].map(({ label, value }) => (
                 <div key={label} className="p-4 bg-bg-secondary border border-border rounded-xl text-center">
                   <div className="text-xs uppercase tracking-widest text-text-muted mb-1">{label}</div>

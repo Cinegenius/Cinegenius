@@ -2,7 +2,7 @@ import { DEPARTMENTS, marketplaceCategory } from "./marketplaceCategories";
 
 export const MARKETPLACE_PAGE_SIZE = 24;
 export type MarketplaceSort = "featured" | "price-asc" | "price-desc";
-export type MarketplaceOfferFilter = "alle" | "miete" | "kauf";
+export type MarketplaceOfferFilter = "alle" | "miete" | "kauf" | "dienstleistung";
 
 /** Keep a child filter visible by resolving its parent, and reject mismatched paths. */
 export function marketplaceCategorySelection(department: string | null, subcategory: string | null) {
@@ -23,7 +23,7 @@ export function readMarketplaceBrowseState(params: Pick<URLSearchParams, "get">)
   return {
     ...category,
     query: params.get("q") ?? "",
-    offer: (offer === "miete" || offer === "kauf" ? offer : "alle") as MarketplaceOfferFilter,
+    offer: (offer === "miete" || offer === "kauf" || offer === "dienstleistung" ? offer : "alle") as MarketplaceOfferFilter,
     sort: (sort === "price-asc" || sort === "price-desc" ? sort : "featured") as MarketplaceSort,
     view: params.get("view") === "map" ? "map" as const : params.get("view") === "list" ? "list" as const : "grid" as const,
   };
@@ -40,7 +40,7 @@ export function marketplaceCardData(row: Record<string, unknown>) {
   const offer = meta.marketplace && typeof meta.marketplace === "object" && !Array.isArray(meta.marketplace)
     ? meta.marketplace as Record<string, unknown> : null;
   const mode = offer?.mode;
-  const rentalType = mode === "both" ? "beides" : mode === "sale" ? "kauf" : mode === "rent" ? "miete" : meta.rental_type;
+  const rentalType = mode === "service" ? "dienstleistung" : mode === "both" ? "beides" : mode === "sale" ? "kauf" : mode === "rent" ? "miete" : meta.rental_type;
   const focal = meta.focal_point;
   return {
     ...row,
@@ -48,9 +48,9 @@ export function marketplaceCardData(row: Record<string, unknown>) {
     id: String(row.id), title: String(row.title ?? ""), type: String(row.type ?? "prop"),
     category: String(row.category ?? ""), location: String(row.city ?? ""),
     dailyRate: Number(row.price) || 0, image: String(row.image_url ?? ""),
-    vendor: "", condition: typeof meta.condition === "string" ? meta.condition : "",
-    era: null, delivery: meta.delivery === true || (Array.isArray(offer?.fulfilment) && offer.fulfilment.includes("delivery")),
-    rentalType: (rentalType === "kauf" || rentalType === "beides" ? rentalType : "miete") as "miete" | "kauf" | "beides",
+    vendor: "", condition: mode !== "service" && typeof meta.condition === "string" ? meta.condition : "",
+    era: null, delivery: mode !== "service" && (meta.delivery === true || (Array.isArray(offer?.fulfilment) && offer.fulfilment.includes("delivery"))),
+    rentalType: (rentalType === "kauf" || rentalType === "beides" || rentalType === "dienstleistung" ? rentalType : "miete") as "miete" | "kauf" | "beides" | "dienstleistung",
     focalPoint: focal && typeof focal === "object" && typeof (focal as { x?: unknown }).x === "number" && typeof (focal as { y?: unknown }).y === "number" ? focal as { x: number; y: number } : null,
     meta, ownerId: typeof row.user_id === "string" ? row.user_id : undefined,
   };

@@ -1,6 +1,6 @@
 import { jobSchedule } from "@/lib/job-metadata";
 import { cityWriteFields } from "@/lib/places/catalog";
-import { validateMarketplaceOffer } from "@/lib/marketplace-offer";
+import { isMarketplaceService, validateMarketplaceOffer } from "@/lib/marketplace-offer";
 import { attemptedApproval } from "@/lib/offer-moderation";
 import { bindResponsiblePerson } from "@/lib/responsible-person";
 import { getTranslations } from "next-intl/server";
@@ -66,7 +66,7 @@ export async function PATCH(
   const marketplace = current.type === "prop" || current.type === "vehicle";
   const nextCategory = body.category ?? current.category;
   if(body.category !== undefined && (!marketplace || metadata?.marketplace === undefined))return NextResponse.json({error:(await getTranslations("MarketplaceOffer"))("invalidCategory")},{status:400});
-  if(marketplace){const issue=validateMarketplaceOffer(nextCategory,current.type,metadata?.marketplace,current.published===true&&published!==false);if(issue)return NextResponse.json({error:(await getTranslations("MarketplaceOffer"))(issue),field:"marketplace"},{status:400});}
+  if(marketplace){const issue=validateMarketplaceOffer(nextCategory,current.type,metadata?.marketplace !== undefined ? metadata.marketplace : isMarketplaceService(nextCategory) ? (current.metadata as Record<string,unknown> | null)?.marketplace : undefined,current.published===true&&published!==false);if(issue)return NextResponse.json({error:(await getTranslations("MarketplaceOffer"))(issue),field:"marketplace"},{status:400});}
   else if(metadata?.marketplace !== undefined)return NextResponse.json({error:(await getTranslations("MarketplaceOffer"))("invalidCategory")},{status:400});
   const updates: Record<string, unknown> = {};
   if(body.category !== undefined)updates.category=nextCategory;
@@ -172,7 +172,7 @@ export async function PATCH(
       if(marketplace && incoming.marketplace !== undefined){
         merged.marketplace=incoming.marketplace;
         const offer=incoming.marketplace as {mode:string;rent_price:number|null;sale_price:number|null;rent_mode:string;sale_mode:string};
-        merged.rental_type=offer.mode==='sale'?'kauf':offer.mode==='both'?'beides':'miete';
+        merged.rental_type=offer.mode==='service'?'dienstleistung':offer.mode==='sale'?'kauf':offer.mode==='both'?'beides':'miete';
         const mode=offer.mode==='sale'?offer.sale_mode:offer.rent_mode;
         merged.price_negotiable=mode==='negotiable';merged.price_on_request=mode==='request';
         updates.price=mode==='request'?0:(offer.mode==='sale'?offer.sale_price:offer.rent_price)??0;

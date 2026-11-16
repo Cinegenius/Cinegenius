@@ -124,3 +124,21 @@ Crew result row correction, 14 November 2026: Keep the compact count, Crew, Loca
   preview. Keep ordinary search and Genie's general help/writing available.
 - Preserve Locations as the homepage default and the existing shared design.
   See `docs/smart-development-preview.md` for the API/native contract and limits.
+
+## Zentrale News-Redaktion (Betreiberauftrag, 16. November 2026)
+
+- Alle redaktionellen News-Aufträge einschließlich früherer „Erstelle News“-Aufträge
+  gehören zu Agent AG DOK. Der Technik-News-Agent betreut Hersteller, Geräte und
+  Firmware; bestehende Rechercheaufträge und Einreichungen übernehmen, nicht
+  duplizieren. Siehe `docs/agents/technology-news.md`.
+- WEB CODEX verantwortet Website-Programmierung und Datenanbindung, APP/APP
+  Entwicklung die native Umsetzung. Laufende App-Arbeit erhalten und Schnittstellen
+  abstimmen. Redaktionelle Quellen und Prüfergebnisse zentral weitergeben.
+- Die Startseiten-Themenwahl verwendet den vorhandenen News-Katalog, tatsächliche
+  freigegebene aktuelle Inhalte und kontogebundene Einstellungen. Keine Beispiel-
+  artikel als echte News, keine Herkunft eines Herstellers als erfundene Zielregion.
+  Siehe `docs/home-news-topics.md`.
+- Lernen bedeutet ein privates, belegbares Korrekturprotokoll. Es erlaubt weder
+  automatische Rechteausweitung noch Selbstfreigabe neuer Artikel. Agenten und
+  Zeitpläne nur nach bestätigter Einrichtung als aktiv melden; eine Anleitung oder
+  Übergabedatei allein aktiviert nichts. Der Website-Prüfagent bleibt deaktiviert.
