@@ -29,9 +29,9 @@ export async function profileAccessFor(ids: string[], viewerId: string | null = 
 export async function ghostProfileIds(ids: string[]): Promise<Set<string>> {
   const unique = [...new Set(ids.filter(Boolean))];
   if (!unique.length) return new Set();
-  const {data,error} = await db.from("user_settings").select("user_id,ghost_mode").in("user_id",unique).abortSignal(AbortSignal.timeout(8000));
+  const {data,error} = await db.from("user_settings").select("user_id,ghost_mode,account_inactive").in("user_id",unique).abortSignal(AbortSignal.timeout(8000));
   if (error) return new Set(unique);
-  return new Set((data ?? []).filter(row => row.ghost_mode).map(row => row.user_id));
+  return new Set((data ?? []).filter(row => row.ghost_mode || row.account_inactive).map(row => row.user_id));
 }
 
 /** Fresh authorization after any cached listing content, including known direct URLs. */

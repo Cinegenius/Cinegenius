@@ -1,4 +1,5 @@
 export type NotificationType =
+  | "account_inactivity"
   | "booking_confirmed"
   | "booking_request"
   | "booking_rejected"
@@ -35,6 +36,7 @@ export function timeAgo(iso: string, locale = "de"): string {
 }
 
 export const notificationMeta: Record<NotificationType, { color: string; dot: string }> = {
+  account_inactivity:   { color: "text-gold", dot: "bg-gold" },
   booking_confirmed:     { color: "text-success",       dot: "bg-success" },
   booking_request:       { color: "text-gold",           dot: "bg-gold" },
   booking_rejected:      { color: "text-crimson-light",  dot: "bg-crimson" },

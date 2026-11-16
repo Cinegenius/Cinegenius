@@ -1,4 +1,5 @@
 import { Playfair_Display, DM_Sans, JetBrains_Mono } from "next/font/google";
+import AccountActivityTracker from "@/components/AccountActivityTracker";
 import { ClerkProvider } from "@clerk/nextjs";
 import { auth } from "@clerk/nextjs/server";
 import { deDE, enUS, esES, csCZ, huHU, itIT, nlNL, nlBE, svSE } from "@clerk/localizations";
@@ -149,6 +150,7 @@ export default async function RootLayout({
               <FormDraftProvider>
                 <GlobalEffects />
                 <PresencePing />
+                <AccountActivityTracker />
                 <GlobalSearch />
                 <AppChrome initialIsSignedIn={!!userId} initialAdminUserId={isConfiguredAdmin(userId, process.env.ADMIN_USER_IDS) ? userId : null}>{children}</AppChrome>
                 <CookieBanner />

@@ -2,6 +2,7 @@ export const PRIVACY_AUDIENCES = ["public", "members", "friends", "hidden"] as c
 export type PrivacyAudience = typeof PRIVACY_AUDIENCES[number];
 export type PrivacySettings = {
   ghost_mode: boolean;
+  account_inactive?: boolean;
   profile_visibility: "public" | "private";
   location_visibility: PrivacyAudience;
   map_visibility: PrivacyAudience;
@@ -16,7 +17,7 @@ export const DEFAULT_PRIVACY: PrivacySettings = {
   map_visibility: "public", activity_visibility: "public", phone_visibility: "hidden",
   contact_email_visibility: "hidden", message_permission: "everyone", email_new_message: true,
 };
-export const PRIVACY_COLUMNS = "ghost_mode,profile_visibility,location_visibility,map_visibility,activity_visibility,phone_visibility,contact_email_visibility,message_permission,email_new_message" as const;
+export const PRIVACY_COLUMNS = "account_inactive,ghost_mode,profile_visibility,location_visibility,map_visibility,activity_visibility,phone_visibility,contact_email_visibility,message_permission,email_new_message" as const;
 export type ProfileAccess = { profile: boolean; location: boolean; map: boolean; activity: boolean; phone: boolean; email: boolean };
 export const HIDDEN_PROFILE_ACCESS: ProfileAccess = { profile: false, location: false, map: false, activity: false, phone: false, email: false };
 
@@ -28,7 +29,7 @@ export function audienceAllows(audience: unknown, viewerId: string | null, frien
 export function profileAccess(settings: Partial<PrivacySettings> | null, ownerId: string, viewerId: string | null, friend = false, blocked = false): ProfileAccess {
   if (ownerId && ownerId === viewerId) return { profile: true, location: true, map: true, activity: true, phone: true, email: true };
   const s = { ...DEFAULT_PRIVACY, ...settings };
-  const profile = !blocked && !s.ghost_mode && (s.profile_visibility === "public" || (s.profile_visibility === "private" && !!viewerId && friend));
+  const profile = !blocked && !s.ghost_mode && !s.account_inactive && (s.profile_visibility === "public" || (s.profile_visibility === "private" && !!viewerId && friend));
   const location = profile && audienceAllows(s.location_visibility, viewerId, friend);
   return { profile, location, map: location && audienceAllows(s.map_visibility, viewerId, friend),
     activity: profile && audienceAllows(s.activity_visibility, viewerId, friend),

@@ -2119,15 +2119,18 @@
   },
   "LegalAuditOriginal": {
     "scope": "Deze algemene voorwaarden (hierna ‘voorwaarden’) zijn van toepassing op het gebruik van het onlineplatform CineGenius op het domein cinegenius.co, beheerd door Markus Müller & Mathias Schmidt, Plinganserstr. 19, 81369 München (hierna ‘beheerder’). Voordat je je account aanmaakt, kun je deze voorwaarden openen via de verwijzing in het registratieformulier. Door je account aan te maken, ga je akkoord met de daar gelinkte voorwaarden. Alleen een bezoek aan de website geldt niet als instemming. Afwijkende voorwaarden van gebruikers zijn niet van toepassing, tenzij de beheerder uitdrukkelijk schriftelijk met de toepassing ervan instemt.",
-    "termsDate": "Stand: 11. November 2026",
-    "privacyDate": "Overeenkomstig de AVG, BDSG en TDDDG — versie: 31 oktober 2026",
+    "termsDate": "Stand: 16. November 2026",
+    "privacyDate": "Gemäß DSGVO, BDSG und TDDDG — Stand: 16. November 2026",
     "resendDisclosure": "Transactionele e-mails (bijv. boekingsbevestigingen, meldingen, systeemberichten) worden verstuurd via Resend Inc. (VS). Daarbij worden je e-mailadres en eventueel je naam aan Resend doorgegeven. CineGenius-nieuwsbrief: je kunt je vrijwillig aanmelden via het formulier onderaan de website. E-mailadressen uit bestaande accounts worden niet overgenomen. De aanmelding wordt pas actief na het klikken op de bevestigingslink. Hiervoor slaan we het opgegeven e-mailadres, het tijdstip van toestemming en de gebruikte toestemmingsversie op. Verzending verloopt via Resend. Je kunt je op elk moment afmelden via de afmeldlink in elke nieuwsbrief. Deze informatie maakt deel uit van de Duitstalige privacyverklaring.",
     "sentryPrepared": "Voor foutdiagnose zijn configuratiebestanden voor Sentry (Functional Software Inc., San Francisco, VS) voorbereid. Alleen deze bestanden activeren nog geen gegevensoverdracht; in de huidige toepassing is geen Sentry-initialisatie opgenomen.",
     "replayDisabled": "Session Replay is ook in de voorbereide configuratie uitgeschakeld. Hierdoor worden geen sessieopnames of voorafgaande replaybuffers aangemaakt. Voor een latere activering moeten eerst het doel en de rechtsgrondslag worden beoordeeld en is eventueel geldige toestemming nodig. Deze privacy-informatie vervangt geen toestemming.",
     "sentryPurpose": "Foutdiagnose voorbereid; Session Replay uitgeschakeld (zie onderdeel 12)",
     "newsRegionDisclosure": "Regionale Branchennews: Ohne eigene Länderauswahl verwenden wir vorrangig das Land aus deinem Profil, sonst das vom Hosting-Anbieter übermittelte ungefähre Land deiner Verbindung. Dafür fragen wir keinen GPS-Standort ab. Deine ausdrücklich gewählten Länder- und Themeneinstellungen speichern wir jeweils für bis zu ein Jahr in Cookies mit den Präfixen cg_news_country_ und cg_news_topic_, getrennt für Gäste und angemeldete Konten. Die Themenwahl enthält nur das gewählte Thema, keine Suchverläufe oder Profilangaben. Du kannst jederzeit ein anderes Thema oder Land sowie „Alle Themen“, „Alle Länder“ oder die automatische Länderwahl wählen. Das automatisch erkannte Land wird nicht in diesen Cookies gespeichert. Die Oberflächensprache folgt deiner gespeicherten Sprachwahl, sonst einer unterstützten Browsersprache; fehlt diese, dient das ungefähre Land als Rückfall. Originalbeiträge werden nicht automatisch übersetzt.",
     "genieVoiceTitle": "Genie-Sprachbedienung — deutscher Originaltext, Stand: 14. November 2026",
-    "genieVoiceDisclosure": "Die freiwillige Sprachbedienung startet erst durch deine Mikrofonaktion und eine erforderliche Gerätefreigabe. Im Browser wird die beendete Aufnahme (höchstens 30 Sekunden und 1 MiB) über den CineGenius-Server an OpenAI zur Texterkennung übermittelt. In unterstützten nativen Apps übernimmt der Sprachdienst des Geräts die Erkennung; dabei kann eine Verarbeitung durch dessen Anbieter erforderlich sein. Bei leerem Eingabefeld wird der erkannte Text anschließend an Genie gesendet, andernfalls nur deinem ungesendeten Text hinzugefügt. Der KI-Dienst erhält die gesendeten Nachrichten, die letzten Gesprächsrunden, die Sprache und den groben Seitenbereich. Antworten können über die künstliche Stimme des Browsers oder Geräts vorgelesen werden; je nach gewählter Systemstimme verarbeitet deren Anbieter den Antworttext. CineGenius speichert keine Audiodateien. Abgeschlossene Textgespräche bleiben kurzzeitig kontogebunden im aktuellen Browser-Tab. Nach 10 Minuten ohne Bedienung von Genie wird dieser lokale Verlauf automatisch gelöscht; bei einer vom Gerät pausierten Seite geschieht dies beim Fortsetzen, vor der nächsten Anfrage. Ungesendete Eingaben und aktuelle Suchfilter werden dabei nicht gelöscht. Über den Papierkorb kannst du den Verlauf auch sofort löschen. CineGenius führt keine dauerhaft gespeicherte Suchhistorie; eine früher lokal gespeicherte Liste letzter Suchen wird beim Laden der aktuellen Website entfernt. Suchbegriffe in der aktuellen Seitenadresse und der vom Browser verwaltete Navigationsverlauf bleiben davon unberührt. Für die Missbrauchsbegrenzung werden Nutzungszähler geführt. Das Löschen des lokalen Verlaufs löscht keine bereits übermittelten Daten beim jeweiligen Dienst. Die Aufbewahrung bei OpenAI richtet sich nach dem verwendeten Dienst und seiner Konfiguration; deaktivierte Gesprächsspeicherung ist keine Zusage, dass keinerlei Sicherheitsprotokolle entstehen. Schließen, Abbrechen, Kontowechsel und der Wechsel in den Hintergrund beenden die aktuelle Aufnahme. Die Suche verwendet nur den von dir genannten Ort und ungefähre öffentliche Ortskoordinaten, keinen GPS-Standort. Sie kann passende Filter öffnen, veröffentlicht aber keine Inhalte und ändert keine gemeinsamen Arbeitspläne. Bitte sprich keine Passwörter oder unnötigen vertraulichen Angaben ein."
+    "genieVoiceDisclosure": "Die freiwillige Sprachbedienung startet erst durch deine Mikrofonaktion und eine erforderliche Gerätefreigabe. Im Browser wird die beendete Aufnahme (höchstens 30 Sekunden und 1 MiB) über den CineGenius-Server an OpenAI zur Texterkennung übermittelt. In unterstützten nativen Apps übernimmt der Sprachdienst des Geräts die Erkennung; dabei kann eine Verarbeitung durch dessen Anbieter erforderlich sein. Bei leerem Eingabefeld wird der erkannte Text anschließend an Genie gesendet, andernfalls nur deinem ungesendeten Text hinzugefügt. Der KI-Dienst erhält die gesendeten Nachrichten, die letzten Gesprächsrunden, die Sprache und den groben Seitenbereich. Antworten können über die künstliche Stimme des Browsers oder Geräts vorgelesen werden; je nach gewählter Systemstimme verarbeitet deren Anbieter den Antworttext. CineGenius speichert keine Audiodateien. Abgeschlossene Textgespräche bleiben kurzzeitig kontogebunden im aktuellen Browser-Tab. Nach 10 Minuten ohne Bedienung von Genie wird dieser lokale Verlauf automatisch gelöscht; bei einer vom Gerät pausierten Seite geschieht dies beim Fortsetzen, vor der nächsten Anfrage. Ungesendete Eingaben und aktuelle Suchfilter werden dabei nicht gelöscht. Über den Papierkorb kannst du den Verlauf auch sofort löschen. CineGenius führt keine dauerhaft gespeicherte Suchhistorie; eine früher lokal gespeicherte Liste letzter Suchen wird beim Laden der aktuellen Website entfernt. Suchbegriffe in der aktuellen Seitenadresse und der vom Browser verwaltete Navigationsverlauf bleiben davon unberührt. Für die Missbrauchsbegrenzung werden Nutzungszähler geführt. Das Löschen des lokalen Verlaufs löscht keine bereits übermittelten Daten beim jeweiligen Dienst. Die Aufbewahrung bei OpenAI richtet sich nach dem verwendeten Dienst und seiner Konfiguration; deaktivierte Gesprächsspeicherung ist keine Zusage, dass keinerlei Sicherheitsprotokolle entstehen. Schließen, Abbrechen, Kontowechsel und der Wechsel in den Hintergrund beenden die aktuelle Aufnahme. Die Suche verwendet nur den von dir genannten Ort und ungefähre öffentliche Ortskoordinaten, keinen GPS-Standort. Sie kann passende Filter öffnen, veröffentlicht aber keine Inhalte und ändert keine gemeinsamen Arbeitspläne. Bitte sprich keine Passwörter oder unnötigen vertraulichen Angaben ein.",
+    "inactivityTitle": "Kontoinaktivität und Benachrichtigungen — deutscher Originaltext",
+    "inactivityTerms": "Für den Inaktivitätsablauf zählt eine erfolgreiche Anmeldung oder die bewusste Nutzung einer angemeldeten Sitzung in App oder Website. Nach zwölf Monaten ohne solche Nutzung folgt eine Erinnerung, nach 15 Monaten eine zweite. Frühestens nach 18 Monaten und mindestens 30 Tage nach bestätigter Zustellung der zweiten Warnung werden das persönliche Profil und persönliche Angebote vorübergehend ausgeblendet. Nach 24 Monaten erfolgt eine Löschvormerkung. Nach bestätigter Zustellung der letzten Mitteilung bleiben mindestens 30 Tage zur Rückkehr. Anschließend prüfen die Betreiber die Löschung; eine automatische endgültige Löschung findet nicht statt. Erneute Nutzung hebt die Inaktivität auf, verändert aber keine gespeicherten Privatsphäre-Einstellungen oder Moderationssperren. Firmeninhalte, an denen andere Mitglieder mitwirken, Nachrichten und erforderliche Nachweise werden gesondert beurteilt. Inaktivität allein ist kein Beleg für ein unechtes Konto.",
+    "inactivityPrivacy": "Für diesen Ablauf speichern wir einen kontogebundenen Zeitpunkt der letzten Nutzung, den Verfahrensstand sowie erforderliche Versand- und Zustellnachweise. Der Zeitpunkt wird nicht als öffentlicher Online-Status angezeigt; es wird dafür kein Verlauf besuchter Seiten gespeichert. Die Verarbeitung dient der Verwaltung des Nutzungsverhältnisses und der Aktualität des Verzeichnisses; als Rechtsgrundlagen kommen Art. 6 Abs. 1 Buchst. b und f DSGVO entsprechend dem jeweiligen Zweck in Betracht. Der Versand erfolgt über den bereits beschriebenen E-Mail-Dienst Resend. Die Erinnerungen sind Kontomitteilungen und unabhängig von Marketingeinstellungen. Fehlende oder unbestätigte Zustellung löst keine weitere Einschränkung aus. Beim Neustart eines Verfahrens werden nicht mehr benötigte E-Mail-Inhalte und Empfängeradressen des alten Ablaufs entfernt; die zugehörigen technischen Versanddatensätze werden beim täglichen Bereinigungslauf nach 90 Tagen gelöscht. Laufende Verfahrensdaten bleiben bis zum Abschluss bzw. einer erforderlichen Prüfung gespeichert. Erforderliche Vertrags-, Abrechnungs- und Nachweisdaten werden anhand ihres jeweiligen Zwecks und anwendbarer Aufbewahrungspflichten gesondert behandelt. Für bestehende Konten beginnt die erste Zwölfmonatsfrist frühestens mit ihrer Aufnahme in den aktivierten Ablauf."
   },
   "SetupOffers": {
     "accountReady": "Je aanbiedersaccount is ingesteld.",
@@ -7242,7 +7245,23 @@
     "verificationResultTitle": "Je profielverificatie",
     "verificationApprovedBody": "Je profielverificatie is goedgekeurd.",
     "verificationRejectedBody": "Je aanvraag is afgewezen. Bekijk je profiel voor de details en een nieuwe aanvraag.",
-    "verificationRevokedBody": "Je profielverificatie is ingetrokken. Bekijk je profiel voor de details."
+    "verificationRevokedBody": "Je profielverificatie is ingetrokken. Bekijk je profiel voor de details.",
+    "activity_reminder_title": "Je CineGenius-account: herinnering na 12 maanden",
+    "activity_reminder_body": "Je hebt je account minstens twaalf maanden niet gebruikt. Meld je aan via de app of website om het actief te houden. Na 15 maanden herinneren we je opnieuw; vanaf 18 maanden kunnen we persoonlijke openbare inhoud verbergen.",
+    "activity_warning_title": "Bevestig dat je je account nog gebruikt",
+    "activity_warning_body": "Er is minstens 15 maanden geen accountactiviteit vastgelegd. Vanaf 18 maanden en minstens 30 dagen na bevestigde bezorging van deze waarschuwing kunnen we je persoonlijke profiel en aanbiedingen verbergen. Aanmelden of actief gebruik stopt het proces.",
+    "activity_paused_title": "Je persoonlijke inhoud is tijdelijk verborgen",
+    "activity_paused_body": "Na minstens 18 maanden zonder activiteit zijn je persoonlijke profiel en aanbiedingen verborgen. Aanmelden of actief gebruik heft de inactiviteitsbeperking op. Privé-inhoud en moderatiebeperkingen blijven beschermd.",
+    "activity_deletion_pending_title": "Je account is gemarkeerd voor beoordeling van verwijdering",
+    "activity_deletion_pending_body": "Er is minstens 24 maanden geen activiteit vastgelegd. Je hebt minstens 30 dagen na bevestigde bezorging van dit bericht om terug te keren. Daarna beoordelen we verwijdering met aandacht voor gedeelde inhoud en bewaarplichten. Aanmelden of actief gebruik stopt het proces.",
+    "activity_review_title": "Je account is toe aan beoordeling van verwijdering",
+    "activity_review_body": "De laatste reactietermijn is verstreken. Je account wacht op beoordeling; het is nog niet definitief verwijderd. Gedeelde inhoud, berichten en noodzakelijke documenten worden apart beoordeeld. Je kunt het inactiviteitsproces nog steeds stoppen door je aan te melden.",
+    "activity_reactivated_title": "Je account is weer actief",
+    "activity_reactivated_body": "Je terugkeer is vastgelegd. Eerdere inactiviteitswaarschuwingen en de verwijderingsmarkering zijn ingetrokken. Je opgeslagen privacyinstellingen en bestaande moderatiebeperkingen blijven ongewijzigd.",
+    "activity_policy_title": "Accountactiviteit en herinneringen",
+    "activity_policy_body": "Na 12 maanden zonder aanmelding of actief gebruik sturen we een herinnering, gevolgd door een tweede na 15 maanden. Vanaf 18 maanden kunnen we je persoonlijke profiel en persoonlijke aanbiedingen verbergen. Na 24 maanden markeren we het account voor beoordeling van verwijdering, met minstens 30 dagen om te reageren. Aanmelden of actief gebruik van de app of website stopt het proces. Je privacyinstellingen en moderatiebeperkingen blijven gelden. Gedeelde bedrijfsinhoud, berichten en gegevens met een bewaarplicht worden apart beoordeeld.",
+    "activity_admin_title": "Inactief account beoordelen",
+    "activity_admin_body": "Account {accountId} heeft de laatste inactiviteitstermijn overschreden. Beoordeel gedeelde inhoud, openstaande zaken en bewaarplichten vóór verwijdering."
   },
   "PageCopy": {
     "p_c2b9b41e4402": "{value0} — {value1} uit {value2}. Vraag nu aan op CineGenius.",
@@ -8381,5 +8400,74 @@
       "anonymous": "Niet opgegeven",
       "footer": "Gestructureerde melding ingediend via CineGenius."
     }
+  },
+  "AccountActivity": {
+    "title": "Accountactiviteit en herinneringen",
+    "schedule": "Na 12 maanden zonder aanmelding of actief gebruik sturen we een herinnering, gevolgd door een tweede na 15 maanden. Vanaf 18 maanden kunnen we je persoonlijke profiel en persoonlijke aanbiedingen verbergen. Na 24 maanden markeren we het account voor beoordeling van verwijdering, met minstens 30 dagen om te reageren.",
+    "preserved": "Aanmelden of actief gebruik van de app of website stopt het proces. Je privacyinstellingen en moderatiebeperkingen blijven gelden. Gedeelde bedrijfsinhoud, berichten en gegevens met een bewaarplicht worden apart beoordeeld.",
+    "lastActivity": "Laatste accountactiviteit: {date}",
+    "loading": "Status laden…",
+    "error": "Je accountstatus is tijdelijk niet beschikbaar. Probeer het opnieuw.",
+    "retry": "Opnieuw laden",
+    "disabled": "De automatische inactiviteitsregel is nog niet ingeschakeld.",
+    "pending": "Er is nog geen bevestigde gebruiksstatus voor je account.",
+    "exempt": "Dit account is vrijgesteld van het automatische inactiviteitsproces.",
+    "openAccount": "Account openen",
+    "emailNote": "Dit is een servicebericht over je CineGenius-account. Meld je aan via de app of website. Alleen deze e-mail openen telt niet als activiteit.",
+    "adminTitle": "Inactieve accounts",
+    "adminDescription": "Herinneringen en verbergen verlopen automatisch. Beoordeel vóór definitieve verwijdering gedeelde inhoud, openstaande zaken en bewaarplichten. Inactiviteit bewijst niet dat een account nep is.",
+    "empty": "Geen openstaande inactiviteitsgevallen.",
+    "inspect": "Account beoordelen",
+    "previous": "Vorige",
+    "next": "Volgende",
+    "retentionReview": "Beoordeling van verwijdering nodig; geen automatische definitieve verwijdering.",
+    "deliveryProblem": "E-mail of bezorging moet worden gecontroleerd. Zonder bevestigde waarschuwing volgt geen verdere beperking.",
+    "states": {
+      "active": "Actief",
+      "reminder": "Eerste herinnering",
+      "warning": "Tweede waarschuwing",
+      "paused": "Persoonlijke inhoud verborgen",
+      "deletion_pending": "Gemarkeerd voor verwijdering",
+      "review": "Beoordeling van verwijdering"
+    },
+    "notices": {
+      "reminder": {
+        "title": "Je CineGenius-account: herinnering na 12 maanden",
+        "body": "Je hebt je account minstens twaalf maanden niet gebruikt. Meld je aan via de app of website om het actief te houden. Na 15 maanden herinneren we je opnieuw; vanaf 18 maanden kunnen we persoonlijke openbare inhoud verbergen."
+      },
+      "warning": {
+        "title": "Bevestig dat je je account nog gebruikt",
+        "body": "Er is minstens 15 maanden geen accountactiviteit vastgelegd. Vanaf 18 maanden en minstens 30 dagen na bevestigde bezorging van deze waarschuwing kunnen we je persoonlijke profiel en aanbiedingen verbergen. Aanmelden of actief gebruik stopt het proces."
+      },
+      "paused": {
+        "title": "Je persoonlijke inhoud is tijdelijk verborgen",
+        "body": "Na minstens 18 maanden zonder activiteit zijn je persoonlijke profiel en aanbiedingen verborgen. Aanmelden of actief gebruik heft de inactiviteitsbeperking op. Privé-inhoud en moderatiebeperkingen blijven beschermd."
+      },
+      "deletion_pending": {
+        "title": "Je account is gemarkeerd voor beoordeling van verwijdering",
+        "body": "Er is minstens 24 maanden geen activiteit vastgelegd. Je hebt minstens 30 dagen na bevestigde bezorging van dit bericht om terug te keren. Daarna beoordelen we verwijdering met aandacht voor gedeelde inhoud en bewaarplichten. Aanmelden of actief gebruik stopt het proces."
+      },
+      "review": {
+        "title": "Je account is toe aan beoordeling van verwijdering",
+        "body": "De laatste reactietermijn is verstreken. Je account wacht op beoordeling; het is nog niet definitief verwijderd. Gedeelde inhoud, berichten en noodzakelijke documenten worden apart beoordeeld. Je kunt het inactiviteitsproces nog steeds stoppen door je aan te melden."
+      },
+      "reactivated": {
+        "title": "Je account is weer actief",
+        "body": "Je terugkeer is vastgelegd. Eerdere inactiviteitswaarschuwingen en de verwijderingsmarkering zijn ingetrokken. Je opgeslagen privacyinstellingen en bestaande moderatiebeperkingen blijven ongewijzigd."
+      },
+      "policy": {
+        "title": "Accountactiviteit en herinneringen",
+        "body": "Na 12 maanden zonder aanmelding of actief gebruik sturen we een herinnering, gevolgd door een tweede na 15 maanden. Vanaf 18 maanden kunnen we je persoonlijke profiel en persoonlijke aanbiedingen verbergen. Na 24 maanden markeren we het account voor beoordeling van verwijdering, met minstens 30 dagen om te reageren. Aanmelden of actief gebruik van de app of website stopt het proces. Je privacyinstellingen en moderatiebeperkingen blijven gelden. Gedeelde bedrijfsinhoud, berichten en gegevens met een bewaarplicht worden apart beoordeeld."
+      }
+    },
+    "dates": {
+      "lastActivityAt": "Laatste bevestigde gebruik",
+      "reminderAt": "Eerste herinnering vanaf",
+      "warningAt": "Tweede waarschuwing vanaf",
+      "pauseAt": "Verbergen ten vroegste",
+      "deletionNoticeAt": "Aanduiding ten vroegste",
+      "reviewAfter": "Beoordeling ten vroegste"
+    },
+    "dateNotice": "De datums geven de vroegst mogelijke stappen aan. Vereiste waarschuwingen kunnen deze uitstellen. Een aanduiding voor verwijdering leidt tot beoordeling, niet tot automatische definitieve verwijdering."
   }
 }

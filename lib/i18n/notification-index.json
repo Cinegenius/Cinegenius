@@ -592,5 +592,133 @@
     ],
     "legacy": "Deine Profilverifizierung wurde entfernt. Einzelheiten findest du in deinem Profil.",
     "template": "Deine Profilverifizierung wurde entfernt. Einzelheiten findest du in deinem Profil."
+  },
+  "activity_reminder_title": {
+    "field": "title",
+    "types": [
+      "account_inactivity"
+    ],
+    "legacy": "Dein CineGenius-Konto: Erinnerung nach 12 Monaten",
+    "template": "Dein CineGenius-Konto: Erinnerung nach 12 Monaten"
+  },
+  "activity_reminder_body": {
+    "field": "body",
+    "types": [
+      "account_inactivity"
+    ],
+    "legacy": "Du hast dein Konto seit mindestens zwölf Monaten nicht genutzt. Melde dich in der App oder auf der Website an, um es aktiv zu halten. Nach 15 Monaten erinnern wir erneut; frühestens nach 18 Monaten werden persönliche öffentliche Inhalte ausgeblendet.",
+    "template": "Du hast dein Konto seit mindestens zwölf Monaten nicht genutzt. Melde dich in der App oder auf der Website an, um es aktiv zu halten. Nach 15 Monaten erinnern wir erneut; frühestens nach 18 Monaten werden persönliche öffentliche Inhalte ausgeblendet."
+  },
+  "activity_warning_title": {
+    "field": "title",
+    "types": [
+      "account_inactivity"
+    ],
+    "legacy": "Bitte bestätige die weitere Nutzung deines Kontos",
+    "template": "Bitte bestätige die weitere Nutzung deines Kontos"
+  },
+  "activity_warning_body": {
+    "field": "body",
+    "types": [
+      "account_inactivity"
+    ],
+    "legacy": "Seit mindestens 15 Monaten wurde keine Kontonutzung erfasst. Frühestens nach 18 Monaten und mindestens 30 Tage nach bestätigter Zustellung dieser Warnung blenden wir dein persönliches Profil und deine persönlichen Angebote aus. Eine Anmeldung oder bewusste Nutzung stoppt den Ablauf.",
+    "template": "Seit mindestens 15 Monaten wurde keine Kontonutzung erfasst. Frühestens nach 18 Monaten und mindestens 30 Tage nach bestätigter Zustellung dieser Warnung blenden wir dein persönliches Profil und deine persönlichen Angebote aus. Eine Anmeldung oder bewusste Nutzung stoppt den Ablauf."
+  },
+  "activity_paused_title": {
+    "field": "title",
+    "types": [
+      "account_inactivity"
+    ],
+    "legacy": "Deine persönlichen Inhalte sind vorübergehend ausgeblendet",
+    "template": "Deine persönlichen Inhalte sind vorübergehend ausgeblendet"
+  },
+  "activity_paused_body": {
+    "field": "body",
+    "types": [
+      "account_inactivity"
+    ],
+    "legacy": "Nach mindestens 18 Monaten ohne Nutzung sind dein persönliches Profil und deine persönlichen Angebote ausgeblendet. Eine erneute Anmeldung oder bewusste Nutzung hebt die Inaktivität auf. Private Inhalte und Moderationssperren bleiben geschützt.",
+    "template": "Nach mindestens 18 Monaten ohne Nutzung sind dein persönliches Profil und deine persönlichen Angebote ausgeblendet. Eine erneute Anmeldung oder bewusste Nutzung hebt die Inaktivität auf. Private Inhalte und Moderationssperren bleiben geschützt."
+  },
+  "activity_deletion_pending_title": {
+    "field": "title",
+    "types": [
+      "account_inactivity"
+    ],
+    "legacy": "Dein Konto ist zur Löschung vorgemerkt",
+    "template": "Dein Konto ist zur Löschung vorgemerkt"
+  },
+  "activity_deletion_pending_body": {
+    "field": "body",
+    "types": [
+      "account_inactivity"
+    ],
+    "legacy": "Seit mindestens 24 Monaten wurde keine Nutzung erfasst. Nach bestätigter Zustellung dieser Nachricht bleiben dir mindestens 30 Tage zur Rückkehr. Danach prüfen wir die Löschung unter Berücksichtigung gemeinsamer Inhalte und Aufbewahrungspflichten. Eine Anmeldung oder bewusste Nutzung stoppt den Ablauf.",
+    "template": "Seit mindestens 24 Monaten wurde keine Nutzung erfasst. Nach bestätigter Zustellung dieser Nachricht bleiben dir mindestens 30 Tage zur Rückkehr. Danach prüfen wir die Löschung unter Berücksichtigung gemeinsamer Inhalte und Aufbewahrungspflichten. Eine Anmeldung oder bewusste Nutzung stoppt den Ablauf."
+  },
+  "activity_review_title": {
+    "field": "title",
+    "types": [
+      "account_inactivity"
+    ],
+    "legacy": "Die Löschprüfung für dein Konto steht an",
+    "template": "Die Löschprüfung für dein Konto steht an"
+  },
+  "activity_review_body": {
+    "field": "body",
+    "types": [
+      "account_inactivity"
+    ],
+    "legacy": "Die letzte Reaktionsfrist ist abgelaufen. Dein Konto wurde zur Prüfung vorgemerkt; es wurde noch nicht endgültig gelöscht. Gemeinsame Inhalte, Nachrichten und erforderliche Unterlagen werden gesondert berücksichtigt. Du kannst den Inaktivitätsablauf weiterhin durch eine Anmeldung stoppen.",
+    "template": "Die letzte Reaktionsfrist ist abgelaufen. Dein Konto wurde zur Prüfung vorgemerkt; es wurde noch nicht endgültig gelöscht. Gemeinsame Inhalte, Nachrichten und erforderliche Unterlagen werden gesondert berücksichtigt. Du kannst den Inaktivitätsablauf weiterhin durch eine Anmeldung stoppen."
+  },
+  "activity_reactivated_title": {
+    "field": "title",
+    "types": [
+      "account_inactivity"
+    ],
+    "legacy": "Dein Konto ist wieder aktiv",
+    "template": "Dein Konto ist wieder aktiv"
+  },
+  "activity_reactivated_body": {
+    "field": "body",
+    "types": [
+      "account_inactivity"
+    ],
+    "legacy": "Deine erneute Nutzung wurde erfasst. Die bisherigen Inaktivitätswarnungen und die Löschvormerkung sind aufgehoben. Deine gespeicherte Privatsphäre und bestehende Moderationssperren bleiben unverändert.",
+    "template": "Deine erneute Nutzung wurde erfasst. Die bisherigen Inaktivitätswarnungen und die Löschvormerkung sind aufgehoben. Deine gespeicherte Privatsphäre und bestehende Moderationssperren bleiben unverändert."
+  },
+  "activity_policy_title": {
+    "field": "title",
+    "types": [
+      "account_inactivity"
+    ],
+    "legacy": "Kontonutzung und Erinnerungen",
+    "template": "Kontonutzung und Erinnerungen"
+  },
+  "activity_policy_body": {
+    "field": "body",
+    "types": [
+      "account_inactivity"
+    ],
+    "legacy": "Nach 12 Monaten ohne Anmeldung oder bewusste Nutzung erinnern wir dich, nach 15 Monaten erneut. Frühestens nach 18 Monaten blenden wir dein persönliches Profil und deine persönlichen Angebote aus. Nach 24 Monaten folgt eine Löschvormerkung mit mindestens 30 Tagen Reaktionszeit. Eine erneute Anmeldung oder bewusste Nutzung in App oder Website stoppt den Ablauf. Deine Privatsphäre-Einstellungen und Moderationssperren bleiben erhalten. Gemeinsame Firmeninhalte, Nachrichten und aufbewahrungspflichtige Daten werden gesondert geprüft.",
+    "template": "Nach 12 Monaten ohne Anmeldung oder bewusste Nutzung erinnern wir dich, nach 15 Monaten erneut. Frühestens nach 18 Monaten blenden wir dein persönliches Profil und deine persönlichen Angebote aus. Nach 24 Monaten folgt eine Löschvormerkung mit mindestens 30 Tagen Reaktionszeit. Eine erneute Anmeldung oder bewusste Nutzung in App oder Website stoppt den Ablauf. Deine Privatsphäre-Einstellungen und Moderationssperren bleiben erhalten. Gemeinsame Firmeninhalte, Nachrichten und aufbewahrungspflichtige Daten werden gesondert geprüft."
+  },
+  "activity_admin_title": {
+    "field": "title",
+    "types": [
+      "account_inactivity"
+    ],
+    "legacy": "Inaktives Konto zur Prüfung",
+    "template": "Inaktives Konto zur Prüfung"
+  },
+  "activity_admin_body": {
+    "field": "body",
+    "types": [
+      "account_inactivity"
+    ],
+    "legacy": "Das Konto {accountId} hat die letzte Inaktivitätsfrist überschritten. Bitte prüft gemeinsame Inhalte, offene Vorgänge und Aufbewahrungspflichten vor einer Löschung.",
+    "template": "Das Konto {accountId} hat die letzte Inaktivitätsfrist überschritten. Bitte prüft gemeinsame Inhalte, offene Vorgänge und Aufbewahrungspflichten vor einer Löschung."
   }
 }

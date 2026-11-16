@@ -2119,15 +2119,18 @@
   },
   "LegalAuditOriginal": {
     "scope": "Diese Allgemeinen Geschäftsbedingungen (nachfolgend „AGB“) gelten für die Nutzung der Online-Plattform CineGenius unter der Domain cinegenius.co, betrieben von Markus Müller & Mathias Schmidt, Plinganserstr. 19, 81369 München (nachfolgend „Betreiber“). Vor dem Erstellen deines Kontos kannst du diese AGB über den Hinweis im Registrierungsformular aufrufen. Mit dem Erstellen des Kontos stimmst du den dort verlinkten AGB zu. Der bloße Besuch der Website gilt nicht als Zustimmung. Abweichende Bedingungen der Nutzer gelten nicht, es sei denn, der Betreiber stimmt ihrer Geltung ausdrücklich schriftlich zu.",
-    "termsDate": "Stand: 11. November 2026",
-    "privacyDate": "Gemäß DSGVO, BDSG und TDDDG — Stand: 31. Oktober 2026",
+    "termsDate": "Stand: 16. November 2026",
+    "privacyDate": "Gemäß DSGVO, BDSG und TDDDG — Stand: 16. November 2026",
     "resendDisclosure": "Transaktions-E-Mails (z. B. Buchungsbestätigungen, Benachrichtigungen, Systemmeldungen) werden über Resend Inc. (USA) versendet. Dabei werden deine E-Mail-Adresse sowie gegebenenfalls dein Name an Resend übermittelt. CineGenius-Newsletter: Du kannst dich freiwillig über das Formular im Seitenfuß anmelden. E-Mail-Adressen aus bestehenden Konten werden nicht übernommen. Die Anmeldung wird erst nach dem Bestätigungslink aktiv. Dafür speichern wir die angegebene E-Mail-Adresse, den Einwilligungszeitpunkt und die verwendete Einwilligungsversion. Der Versand erfolgt über Resend. Du kannst dich über den Abmeldelink in jeder Newsletter-Mail jederzeit abmelden. Diese Information ist Teil der deutschsprachigen Datenschutzerklärung.",
     "sentryPrepared": "Für die Fehlerdiagnose sind Konfigurationsdateien für Sentry (Functional Software Inc., San Francisco, USA) vorbereitet. Diese Dateien allein aktivieren noch keine Übermittlung; in der aktuellen Anwendung ist keine Sentry-Initialisierung eingebunden.",
     "replayDisabled": "Session Replay ist auch in der vorbereiteten Konfiguration deaktiviert. Es werden dadurch keine Sitzungsaufzeichnungen oder vorgelagerten Replay-Puffer erstellt. Eine spätere Aktivierung erfordert zuvor die Prüfung des Zwecks, der Rechtsgrundlage und gegebenenfalls eine wirksame Einwilligung. Dieser Datenschutzhinweis ersetzt keine Einwilligung.",
     "sentryPurpose": "Fehlerdiagnose vorbereitet; Session Replay deaktiviert (siehe Abschnitt 12)",
     "newsRegionDisclosure": "Regionale Branchennews: Ohne eigene Länderauswahl verwenden wir vorrangig das Land aus deinem Profil, sonst das vom Hosting-Anbieter übermittelte ungefähre Land deiner Verbindung. Dafür fragen wir keinen GPS-Standort ab. Deine ausdrücklich gewählten Länder- und Themeneinstellungen speichern wir jeweils für bis zu ein Jahr in Cookies mit den Präfixen cg_news_country_ und cg_news_topic_, getrennt für Gäste und angemeldete Konten. Die Themenwahl enthält nur das gewählte Thema, keine Suchverläufe oder Profilangaben. Du kannst jederzeit ein anderes Thema oder Land sowie „Alle Themen“, „Alle Länder“ oder die automatische Länderwahl wählen. Das automatisch erkannte Land wird nicht in diesen Cookies gespeichert. Die Oberflächensprache folgt deiner gespeicherten Sprachwahl, sonst einer unterstützten Browsersprache; fehlt diese, dient das ungefähre Land als Rückfall. Originalbeiträge werden nicht automatisch übersetzt.",
     "genieVoiceTitle": "Genie-Sprachbedienung — deutscher Originaltext, Stand: 14. November 2026",
-    "genieVoiceDisclosure": "Die freiwillige Sprachbedienung startet erst durch deine Mikrofonaktion und eine erforderliche Gerätefreigabe. Im Browser wird die beendete Aufnahme (höchstens 30 Sekunden und 1 MiB) über den CineGenius-Server an OpenAI zur Texterkennung übermittelt. In unterstützten nativen Apps übernimmt der Sprachdienst des Geräts die Erkennung; dabei kann eine Verarbeitung durch dessen Anbieter erforderlich sein. Bei leerem Eingabefeld wird der erkannte Text anschließend an Genie gesendet, andernfalls nur deinem ungesendeten Text hinzugefügt. Der KI-Dienst erhält die gesendeten Nachrichten, die letzten Gesprächsrunden, die Sprache und den groben Seitenbereich. Antworten können über die künstliche Stimme des Browsers oder Geräts vorgelesen werden; je nach gewählter Systemstimme verarbeitet deren Anbieter den Antworttext. CineGenius speichert keine Audiodateien. Abgeschlossene Textgespräche bleiben kurzzeitig kontogebunden im aktuellen Browser-Tab. Nach 10 Minuten ohne Bedienung von Genie wird dieser lokale Verlauf automatisch gelöscht; bei einer vom Gerät pausierten Seite geschieht dies beim Fortsetzen, vor der nächsten Anfrage. Ungesendete Eingaben und aktuelle Suchfilter werden dabei nicht gelöscht. Über den Papierkorb kannst du den Verlauf auch sofort löschen. CineGenius führt keine dauerhaft gespeicherte Suchhistorie; eine früher lokal gespeicherte Liste letzter Suchen wird beim Laden der aktuellen Website entfernt. Suchbegriffe in der aktuellen Seitenadresse und der vom Browser verwaltete Navigationsverlauf bleiben davon unberührt. Für die Missbrauchsbegrenzung werden Nutzungszähler geführt. Das Löschen des lokalen Verlaufs löscht keine bereits übermittelten Daten beim jeweiligen Dienst. Die Aufbewahrung bei OpenAI richtet sich nach dem verwendeten Dienst und seiner Konfiguration; deaktivierte Gesprächsspeicherung ist keine Zusage, dass keinerlei Sicherheitsprotokolle entstehen. Schließen, Abbrechen, Kontowechsel und der Wechsel in den Hintergrund beenden die aktuelle Aufnahme. Die Suche verwendet nur den von dir genannten Ort und ungefähre öffentliche Ortskoordinaten, keinen GPS-Standort. Sie kann passende Filter öffnen, veröffentlicht aber keine Inhalte und ändert keine gemeinsamen Arbeitspläne. Bitte sprich keine Passwörter oder unnötigen vertraulichen Angaben ein."
+    "genieVoiceDisclosure": "Die freiwillige Sprachbedienung startet erst durch deine Mikrofonaktion und eine erforderliche Gerätefreigabe. Im Browser wird die beendete Aufnahme (höchstens 30 Sekunden und 1 MiB) über den CineGenius-Server an OpenAI zur Texterkennung übermittelt. In unterstützten nativen Apps übernimmt der Sprachdienst des Geräts die Erkennung; dabei kann eine Verarbeitung durch dessen Anbieter erforderlich sein. Bei leerem Eingabefeld wird der erkannte Text anschließend an Genie gesendet, andernfalls nur deinem ungesendeten Text hinzugefügt. Der KI-Dienst erhält die gesendeten Nachrichten, die letzten Gesprächsrunden, die Sprache und den groben Seitenbereich. Antworten können über die künstliche Stimme des Browsers oder Geräts vorgelesen werden; je nach gewählter Systemstimme verarbeitet deren Anbieter den Antworttext. CineGenius speichert keine Audiodateien. Abgeschlossene Textgespräche bleiben kurzzeitig kontogebunden im aktuellen Browser-Tab. Nach 10 Minuten ohne Bedienung von Genie wird dieser lokale Verlauf automatisch gelöscht; bei einer vom Gerät pausierten Seite geschieht dies beim Fortsetzen, vor der nächsten Anfrage. Ungesendete Eingaben und aktuelle Suchfilter werden dabei nicht gelöscht. Über den Papierkorb kannst du den Verlauf auch sofort löschen. CineGenius führt keine dauerhaft gespeicherte Suchhistorie; eine früher lokal gespeicherte Liste letzter Suchen wird beim Laden der aktuellen Website entfernt. Suchbegriffe in der aktuellen Seitenadresse und der vom Browser verwaltete Navigationsverlauf bleiben davon unberührt. Für die Missbrauchsbegrenzung werden Nutzungszähler geführt. Das Löschen des lokalen Verlaufs löscht keine bereits übermittelten Daten beim jeweiligen Dienst. Die Aufbewahrung bei OpenAI richtet sich nach dem verwendeten Dienst und seiner Konfiguration; deaktivierte Gesprächsspeicherung ist keine Zusage, dass keinerlei Sicherheitsprotokolle entstehen. Schließen, Abbrechen, Kontowechsel und der Wechsel in den Hintergrund beenden die aktuelle Aufnahme. Die Suche verwendet nur den von dir genannten Ort und ungefähre öffentliche Ortskoordinaten, keinen GPS-Standort. Sie kann passende Filter öffnen, veröffentlicht aber keine Inhalte und ändert keine gemeinsamen Arbeitspläne. Bitte sprich keine Passwörter oder unnötigen vertraulichen Angaben ein.",
+    "inactivityTitle": "Kontoinaktivität und Benachrichtigungen — deutscher Originaltext",
+    "inactivityTerms": "Für den Inaktivitätsablauf zählt eine erfolgreiche Anmeldung oder die bewusste Nutzung einer angemeldeten Sitzung in App oder Website. Nach zwölf Monaten ohne solche Nutzung folgt eine Erinnerung, nach 15 Monaten eine zweite. Frühestens nach 18 Monaten und mindestens 30 Tage nach bestätigter Zustellung der zweiten Warnung werden das persönliche Profil und persönliche Angebote vorübergehend ausgeblendet. Nach 24 Monaten erfolgt eine Löschvormerkung. Nach bestätigter Zustellung der letzten Mitteilung bleiben mindestens 30 Tage zur Rückkehr. Anschließend prüfen die Betreiber die Löschung; eine automatische endgültige Löschung findet nicht statt. Erneute Nutzung hebt die Inaktivität auf, verändert aber keine gespeicherten Privatsphäre-Einstellungen oder Moderationssperren. Firmeninhalte, an denen andere Mitglieder mitwirken, Nachrichten und erforderliche Nachweise werden gesondert beurteilt. Inaktivität allein ist kein Beleg für ein unechtes Konto.",
+    "inactivityPrivacy": "Für diesen Ablauf speichern wir einen kontogebundenen Zeitpunkt der letzten Nutzung, den Verfahrensstand sowie erforderliche Versand- und Zustellnachweise. Der Zeitpunkt wird nicht als öffentlicher Online-Status angezeigt; es wird dafür kein Verlauf besuchter Seiten gespeichert. Die Verarbeitung dient der Verwaltung des Nutzungsverhältnisses und der Aktualität des Verzeichnisses; als Rechtsgrundlagen kommen Art. 6 Abs. 1 Buchst. b und f DSGVO entsprechend dem jeweiligen Zweck in Betracht. Der Versand erfolgt über den bereits beschriebenen E-Mail-Dienst Resend. Die Erinnerungen sind Kontomitteilungen und unabhängig von Marketingeinstellungen. Fehlende oder unbestätigte Zustellung löst keine weitere Einschränkung aus. Beim Neustart eines Verfahrens werden nicht mehr benötigte E-Mail-Inhalte und Empfängeradressen des alten Ablaufs entfernt; die zugehörigen technischen Versanddatensätze werden beim täglichen Bereinigungslauf nach 90 Tagen gelöscht. Laufende Verfahrensdaten bleiben bis zum Abschluss bzw. einer erforderlichen Prüfung gespeichert. Erforderliche Vertrags-, Abrechnungs- und Nachweisdaten werden anhand ihres jeweiligen Zwecks und anwendbarer Aufbewahrungspflichten gesondert behandelt. Für bestehende Konten beginnt die erste Zwölfmonatsfrist frühestens mit ihrer Aufnahme in den aktivierten Ablauf."
   },
   "SetupOffers": {
     "accountReady": "Dein Anbieterkonto ist eingerichtet.",
@@ -7242,7 +7245,23 @@
     "verificationResultTitle": "Deine Profilverifizierung",
     "verificationApprovedBody": "Deine Profilverifizierung wurde bestätigt.",
     "verificationRejectedBody": "Deine Anfrage wurde abgelehnt. Die Einzelheiten und eine neue Anfrage findest du in deinem Profil.",
-    "verificationRevokedBody": "Deine Profilverifizierung wurde entfernt. Einzelheiten findest du in deinem Profil."
+    "verificationRevokedBody": "Deine Profilverifizierung wurde entfernt. Einzelheiten findest du in deinem Profil.",
+    "activity_reminder_title": "Dein CineGenius-Konto: Erinnerung nach 12 Monaten",
+    "activity_reminder_body": "Du hast dein Konto seit mindestens zwölf Monaten nicht genutzt. Melde dich in der App oder auf der Website an, um es aktiv zu halten. Nach 15 Monaten erinnern wir erneut; frühestens nach 18 Monaten werden persönliche öffentliche Inhalte ausgeblendet.",
+    "activity_warning_title": "Bitte bestätige die weitere Nutzung deines Kontos",
+    "activity_warning_body": "Seit mindestens 15 Monaten wurde keine Kontonutzung erfasst. Frühestens nach 18 Monaten und mindestens 30 Tage nach bestätigter Zustellung dieser Warnung blenden wir dein persönliches Profil und deine persönlichen Angebote aus. Eine Anmeldung oder bewusste Nutzung stoppt den Ablauf.",
+    "activity_paused_title": "Deine persönlichen Inhalte sind vorübergehend ausgeblendet",
+    "activity_paused_body": "Nach mindestens 18 Monaten ohne Nutzung sind dein persönliches Profil und deine persönlichen Angebote ausgeblendet. Eine erneute Anmeldung oder bewusste Nutzung hebt die Inaktivität auf. Private Inhalte und Moderationssperren bleiben geschützt.",
+    "activity_deletion_pending_title": "Dein Konto ist zur Löschung vorgemerkt",
+    "activity_deletion_pending_body": "Seit mindestens 24 Monaten wurde keine Nutzung erfasst. Nach bestätigter Zustellung dieser Nachricht bleiben dir mindestens 30 Tage zur Rückkehr. Danach prüfen wir die Löschung unter Berücksichtigung gemeinsamer Inhalte und Aufbewahrungspflichten. Eine Anmeldung oder bewusste Nutzung stoppt den Ablauf.",
+    "activity_review_title": "Die Löschprüfung für dein Konto steht an",
+    "activity_review_body": "Die letzte Reaktionsfrist ist abgelaufen. Dein Konto wurde zur Prüfung vorgemerkt; es wurde noch nicht endgültig gelöscht. Gemeinsame Inhalte, Nachrichten und erforderliche Unterlagen werden gesondert berücksichtigt. Du kannst den Inaktivitätsablauf weiterhin durch eine Anmeldung stoppen.",
+    "activity_reactivated_title": "Dein Konto ist wieder aktiv",
+    "activity_reactivated_body": "Deine erneute Nutzung wurde erfasst. Die bisherigen Inaktivitätswarnungen und die Löschvormerkung sind aufgehoben. Deine gespeicherte Privatsphäre und bestehende Moderationssperren bleiben unverändert.",
+    "activity_policy_title": "Kontonutzung und Erinnerungen",
+    "activity_policy_body": "Nach 12 Monaten ohne Anmeldung oder bewusste Nutzung erinnern wir dich, nach 15 Monaten erneut. Frühestens nach 18 Monaten blenden wir dein persönliches Profil und deine persönlichen Angebote aus. Nach 24 Monaten folgt eine Löschvormerkung mit mindestens 30 Tagen Reaktionszeit. Eine erneute Anmeldung oder bewusste Nutzung in App oder Website stoppt den Ablauf. Deine Privatsphäre-Einstellungen und Moderationssperren bleiben erhalten. Gemeinsame Firmeninhalte, Nachrichten und aufbewahrungspflichtige Daten werden gesondert geprüft.",
+    "activity_admin_title": "Inaktives Konto zur Prüfung",
+    "activity_admin_body": "Das Konto {accountId} hat die letzte Inaktivitätsfrist überschritten. Bitte prüft gemeinsame Inhalte, offene Vorgänge und Aufbewahrungspflichten vor einer Löschung."
   },
   "PageCopy": {
     "p_c2b9b41e4402": "{value0} ist {value1} aus {value2}. Jetzt auf CineGenius anfragen.",
@@ -8381,5 +8400,74 @@
       "anonymous": "Nicht angegeben",
       "footer": "Strukturierte Meldung über CineGenius."
     }
+  },
+  "AccountActivity": {
+    "title": "Kontonutzung und Erinnerungen",
+    "schedule": "Nach 12 Monaten ohne Anmeldung oder bewusste Nutzung erinnern wir dich, nach 15 Monaten erneut. Frühestens nach 18 Monaten blenden wir dein persönliches Profil und deine persönlichen Angebote aus. Nach 24 Monaten folgt eine Löschvormerkung mit mindestens 30 Tagen Reaktionszeit.",
+    "preserved": "Eine erneute Anmeldung oder bewusste Nutzung in App oder Website stoppt den Ablauf. Deine Privatsphäre-Einstellungen und Moderationssperren bleiben erhalten. Gemeinsame Firmeninhalte, Nachrichten und aufbewahrungspflichtige Daten werden gesondert geprüft.",
+    "lastActivity": "Letzte Kontonutzung: {date}",
+    "loading": "Status wird geladen …",
+    "error": "Der Kontostatus ist gerade nicht verfügbar. Bitte lade ihn erneut.",
+    "retry": "Erneut laden",
+    "disabled": "Die automatische Inaktivitätsregel ist noch nicht aktiviert.",
+    "pending": "Für dein Konto liegt noch kein bestätigter Nutzungsstatus vor.",
+    "exempt": "Dieses Konto ist vom automatischen Inaktivitätsablauf ausgenommen.",
+    "openAccount": "Konto öffnen",
+    "emailNote": "Dies ist eine Mitteilung zur Verwaltung deines CineGenius-Kontos. Melde dich über App oder Website an. Das bloße Öffnen dieser E-Mail zählt nicht als Nutzung.",
+    "adminTitle": "Inaktive Konten",
+    "adminDescription": "Erinnerungen und Ausblenden erfolgen automatisch. Vor einer endgültigen Löschung prüft ihr gemeinsame Inhalte, offene Vorgänge und Aufbewahrungspflichten. Inaktivität ist kein Nachweis für ein Fake-Konto.",
+    "empty": "Keine offenen Inaktivitätsvorgänge.",
+    "inspect": "Konto prüfen",
+    "previous": "Zurück",
+    "next": "Weiter",
+    "retentionReview": "Löschprüfung erforderlich; keine automatische endgültige Löschung.",
+    "deliveryProblem": "E-Mail oder Zustellung muss geprüft werden. Ohne bestätigte Vorwarnung erfolgt keine weitere Einschränkung.",
+    "states": {
+      "active": "Aktiv",
+      "reminder": "Erste Erinnerung",
+      "warning": "Zweite Warnung",
+      "paused": "Persönliche Inhalte ausgeblendet",
+      "deletion_pending": "Zur Löschung vorgemerkt",
+      "review": "Löschprüfung"
+    },
+    "notices": {
+      "reminder": {
+        "title": "Dein CineGenius-Konto: Erinnerung nach 12 Monaten",
+        "body": "Du hast dein Konto seit mindestens zwölf Monaten nicht genutzt. Melde dich in der App oder auf der Website an, um es aktiv zu halten. Nach 15 Monaten erinnern wir erneut; frühestens nach 18 Monaten werden persönliche öffentliche Inhalte ausgeblendet."
+      },
+      "warning": {
+        "title": "Bitte bestätige die weitere Nutzung deines Kontos",
+        "body": "Seit mindestens 15 Monaten wurde keine Kontonutzung erfasst. Frühestens nach 18 Monaten und mindestens 30 Tage nach bestätigter Zustellung dieser Warnung blenden wir dein persönliches Profil und deine persönlichen Angebote aus. Eine Anmeldung oder bewusste Nutzung stoppt den Ablauf."
+      },
+      "paused": {
+        "title": "Deine persönlichen Inhalte sind vorübergehend ausgeblendet",
+        "body": "Nach mindestens 18 Monaten ohne Nutzung sind dein persönliches Profil und deine persönlichen Angebote ausgeblendet. Eine erneute Anmeldung oder bewusste Nutzung hebt die Inaktivität auf. Private Inhalte und Moderationssperren bleiben geschützt."
+      },
+      "deletion_pending": {
+        "title": "Dein Konto ist zur Löschung vorgemerkt",
+        "body": "Seit mindestens 24 Monaten wurde keine Nutzung erfasst. Nach bestätigter Zustellung dieser Nachricht bleiben dir mindestens 30 Tage zur Rückkehr. Danach prüfen wir die Löschung unter Berücksichtigung gemeinsamer Inhalte und Aufbewahrungspflichten. Eine Anmeldung oder bewusste Nutzung stoppt den Ablauf."
+      },
+      "review": {
+        "title": "Die Löschprüfung für dein Konto steht an",
+        "body": "Die letzte Reaktionsfrist ist abgelaufen. Dein Konto wurde zur Prüfung vorgemerkt; es wurde noch nicht endgültig gelöscht. Gemeinsame Inhalte, Nachrichten und erforderliche Unterlagen werden gesondert berücksichtigt. Du kannst den Inaktivitätsablauf weiterhin durch eine Anmeldung stoppen."
+      },
+      "reactivated": {
+        "title": "Dein Konto ist wieder aktiv",
+        "body": "Deine erneute Nutzung wurde erfasst. Die bisherigen Inaktivitätswarnungen und die Löschvormerkung sind aufgehoben. Deine gespeicherte Privatsphäre und bestehende Moderationssperren bleiben unverändert."
+      },
+      "policy": {
+        "title": "Kontonutzung und Erinnerungen",
+        "body": "Nach 12 Monaten ohne Anmeldung oder bewusste Nutzung erinnern wir dich, nach 15 Monaten erneut. Frühestens nach 18 Monaten blenden wir dein persönliches Profil und deine persönlichen Angebote aus. Nach 24 Monaten folgt eine Löschvormerkung mit mindestens 30 Tagen Reaktionszeit. Eine erneute Anmeldung oder bewusste Nutzung in App oder Website stoppt den Ablauf. Deine Privatsphäre-Einstellungen und Moderationssperren bleiben erhalten. Gemeinsame Firmeninhalte, Nachrichten und aufbewahrungspflichtige Daten werden gesondert geprüft."
+      }
+    },
+    "dates": {
+      "lastActivityAt": "Letzte bestätigte Nutzung",
+      "reminderAt": "Erste Erinnerung ab",
+      "warningAt": "Zweite Warnung ab",
+      "pauseAt": "Ausblenden frühestens",
+      "deletionNoticeAt": "Löschvormerkung frühestens",
+      "reviewAfter": "Prüfung frühestens"
+    },
+    "dateNotice": "Die Termine zeigen den frühestmöglichen Ablauf. Erforderliche Vorwarnungen können ihn verschieben. Eine Löschvormerkung führt zur Prüfung, nicht zur automatischen endgültigen Löschung."
   }
 }

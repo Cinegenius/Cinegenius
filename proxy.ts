@@ -70,6 +70,7 @@ const RATE_LIMITS: Record<string, { limit: number; windowMs: number }> = {
   "/api/reports":        { limit: 10, windowMs: 60_000 },
   "/api/blocks":         { limit: 20, windowMs: 60_000 },
   "/api/search":         { limit: 30, windowMs: 60_000 },
+  "/api/account/activity": { limit: 30, windowMs: 60_000 },
   "/api/inbox":          { limit: 60, windowMs: 60_000 },
   "/api/notifications":  { limit: 60, windowMs: 60_000 },
   "/api/unread-count":   { limit: 60, windowMs: 60_000 },
@@ -289,7 +290,7 @@ export default clerkMiddleware(async (auth, request) => {
     // Verified admin — fall through to security headers
   } else if (isWebhookRoute(request)) {
     // 3a. Webhook routes — skip Clerk auth entirely; signature verified per-handler
-  } else if (request.method === "GET" && request.nextUrl.pathname === "/api/cron/listing-freshness") {
+  } else if (request.method === "GET" && ["/api/cron/listing-freshness", "/api/cron/account-inactivity"].includes(request.nextUrl.pathname)) {
     // This exact scheduler route checks CRON_SECRET itself before any work.
     // Other cron paths and methods retain the normal session protection.
   } else if (isGeniePost) {

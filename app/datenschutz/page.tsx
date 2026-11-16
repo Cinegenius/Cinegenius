@@ -59,6 +59,11 @@ export default async function DatenschutzPage() {
 
         <div className="space-y-10 text-text-secondary text-sm leading-relaxed">
 
+          <section lang="de">
+            <h2 className="text-base font-semibold text-text-primary mb-3">{t("inactivityTitle")}</h2>
+            <p className="text-sm leading-relaxed">{t("inactivityPrivacy")}</p>
+          </section>
+
           <section>
             <h2 className="text-base font-semibold text-text-primary mb-3">{uiText("Ui.text_ebb2bcce0d2b33")}</h2>
             <p>{uiText.rich("Ui.text_6c75d83671505b", { part1: () => (<br />), part2: () => (<br />), part3: chunks => (<a href="mailto:hello@cinegenius.co" className="text-gold hover:underline">{chunks}</a>), part4: () => (<br />), part5: chunks => (<a href="tel:+491713866624" className="text-gold hover:underline">{chunks}</a>) })}</p>
