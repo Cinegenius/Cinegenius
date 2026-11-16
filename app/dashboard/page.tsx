@@ -1,4 +1,6 @@
 "use client";
+import CompanySwitcher from "@/components/CompanySwitcher";
+import { companyDashboardUrl, companyEditorUrl, NEW_COMPANY_URL } from "@/lib/company-navigation";
 import PrivacySettings from "@/components/PrivacySettings";
 import MessageAttachments from "@/components/messaging/MessageAttachments";
 import type {MessageAttachment} from "@/lib/message-attachments";
@@ -549,14 +551,34 @@ export default function DashboardPage() {
     tagline: string | null; description: string | null;
     social_links: Record<string, string> | null;
   };
-  const [myCompany, setMyCompany] = useState<MyCompany | null | "loading">("loading");
+  const [companyState, setCompanyState] = useState<{ userId: string; data: MyCompany[]; error: string } | null>(null);
+  const [selectedCompanyId, setSelectedCompanyId] = useState("");
+  const [companyLoadAttempt, setCompanyLoadAttempt] = useState(0);
+  const currentCompanies = companyState?.userId === user?.id ? companyState : null;
+  const myCompanies = currentCompanies?.data ?? [];
+  const companyLoadError = currentCompanies?.error ?? "";
+  const myCompany: MyCompany | null | "loading" = !currentCompanies ? "loading" : myCompanies.find(company => company.id === selectedCompanyId) ?? myCompanies[0] ?? null;
+  const myCompanyUrl = myCompany && myCompany !== "loading" ? companyDashboardUrl(myCompany.id) : "/company-dashboard";
+  const myCompanyEditUrl = myCompany && myCompany !== "loading" ? companyEditorUrl(myCompany.id) : NEW_COMPANY_URL;
 
   useEffect(() => {
-    fetch("/api/companies?mine=true")
-      .then(r => r.json())
-      .then(({ data }) => setMyCompany(data?.[0] ?? null))
-      .catch(() => setMyCompany(null));
-  }, []);
+    const accountId = user?.id;
+    if (!accountId) return;
+    let active = true;
+    fetch("/api/companies?mine=true", { cache: "no-store" })
+      .then(async response => {
+        const result = await response.json();
+        if (!response.ok || !Array.isArray(result.data)) throw new Error(result.error ?? uiText("Ui.text_20679d4c9cd89c"));
+        return result.data as MyCompany[];
+      })
+      .then(data => { if (active) setCompanyState({ userId: accountId, data, error: "" }); })
+      .catch(cause => { if (active) setCompanyState({ userId: accountId, data: [], error: uiErrorMessage(cause, uiText("Ui.text_20679d4c9cd89c")) }); });
+    return () => { active = false; };
+  }, [user?.id, companyLoadAttempt, uiText]);
+
+  const companyControls = companyLoadError ? <div role="alert" className="text-sm text-text-secondary">
+    {companyLoadError}<button type="button" onClick={() => setCompanyLoadAttempt(value => value + 1)} className="ml-3 min-h-11 text-gold">{uiText("setup.copy49")}</button>
+  </div> : myCompany && myCompany !== "loading" ? <CompanySwitcher companies={myCompanies} selectedId={myCompany.id} onSelect={setSelectedCompanyId} /> : null;
 
   // My posted jobs
   const [myJobs, setMyJobs] = useState<{ id: string; title: string; published: boolean; moderation_status?: string; moderation_reason?: string | null; city: string | null; created_at: string }[]>([]);
@@ -981,7 +1003,7 @@ export default function DashboardPage() {
           <div className="flex flex-wrap items-center gap-2 border-b border-border px-4 py-3 sm:px-6">
             <button onClick={() => navigateDashboardTab("listings")} className={`min-h-10 rounded-lg border px-3 text-sm font-medium transition-colors ${activeTab === "listings" ? "border-gold/40 bg-gold/10 text-gold" : "border-border text-text-secondary hover:text-text-primary"}`}>{uiText("profile.tabListings")}</button>
             <button onClick={() => navigateDashboardTab("jobs")} className={`min-h-10 rounded-lg border px-3 text-sm font-medium transition-colors ${activeTab === "jobs" ? "border-gold/40 bg-gold/10 text-gold" : "border-border text-text-secondary hover:text-text-primary"}`}>{uiText("Ui.text_4012fde18eb1f5")}</button>
-            <Link href="/company-dashboard" className="ml-auto inline-flex min-h-10 items-center gap-2 rounded-lg border border-border px-3 text-sm text-text-secondary transition-colors hover:border-gold/40 hover:text-gold">{uiText.rich("Ui.text_70ede6b97ecfb0", { part1: () => (<Building2 size={15} />) })}</Link>
+            <Link href={myCompanyUrl} className="ml-auto inline-flex min-h-10 items-center gap-2 rounded-lg border border-border px-3 text-sm text-text-secondary transition-colors hover:border-gold/40 hover:text-gold">{uiText.rich("Ui.text_70ede6b97ecfb0", { part1: () => (<Building2 size={15} />) })}</Link>
           </div>
         )}
 
@@ -1280,14 +1302,15 @@ export default function DashboardPage() {
               <div>
                 <div className="flex items-center justify-between mb-4">
                   <h3 className="font-display text-lg font-bold text-text-primary">{uiText("Ui.text_92b8b0ccb4a7b1")}</h3>
-                  <Link href="/company-dashboard" className="text-xs text-gold hover:text-gold-light transition-colors flex items-center gap-1">{uiText.rich("Ui.text_5bdc9ba7941520", { part1: () => (<ChevronRight size={12} />) })}</Link>
+                  <Link href={myCompanyUrl} className="text-xs text-gold hover:text-gold-light transition-colors flex items-center gap-1">{uiText.rich("Ui.text_5bdc9ba7941520", { part1: () => (<ChevronRight size={12} />) })}</Link>
                 </div>
                 <Link href="/company-invitations" className="mb-4 inline-flex min-h-11 items-center text-sm text-gold hover:text-gold-light">{uiText("Ui.text_355f8d66616bb0")}</Link>
+                {companyControls}
                 {myCompany === "loading" && (
                   <div className="flex items-center gap-3 text-sm text-text-muted py-4">{uiText.rich("Ui.text_e68bc26b2fc6f2", { part1: () => (<Loader2 size={16} className="animate-spin" />) })}</div>
                 )}
-                {myCompany === null && (
-                  <Link href="/company-setup"
+                {myCompany === null && !companyLoadError && (
+                  <Link href={myCompanyEditUrl}
                     className="group flex items-center gap-4 w-full p-4 rounded-xl border border-dashed border-border hover:border-gold/40 hover:bg-bg-elevated transition-all text-left">
                     <div className="w-10 h-10 rounded-xl bg-bg-elevated border border-border flex items-center justify-center shrink-0">
                       <Building2 size={18} className="text-text-muted group-hover:text-gold transition-colors" />
@@ -1315,7 +1338,7 @@ export default function DashboardPage() {
                       </div>
                       {myCompany.city && <p className="text-xs text-text-muted">{myCompany.city}</p>}
                     </div>
-                    <div className="flex flex-col gap-1.5 shrink-0">{uiText.rich("Ui.text_da9be6811d4742", { part1: chunks => (<Link href="/company-dashboard" className="px-3 py-1.5 text-xs border border-border text-text-secondary rounded-lg hover:border-gold hover:text-gold transition-all">{chunks}</Link>), part3: () => (<ExternalLink size={10} />), part2: chunks => (<a href={`/companies/${myCompany.slug}`} target="_blank" rel="noopener noreferrer" className="px-3 py-1.5 text-xs border border-border text-text-secondary rounded-lg hover:border-gold hover:text-gold transition-all text-center flex items-center gap-1 justify-center">{chunks}</a>) })}</div>
+                    <div className="flex flex-col gap-1.5 shrink-0">{uiText.rich("Ui.text_da9be6811d4742", { part1: chunks => (<Link href={myCompanyUrl} className="px-3 py-1.5 text-xs border border-border text-text-secondary rounded-lg hover:border-gold hover:text-gold transition-all">{chunks}</Link>), part3: () => (<ExternalLink size={10} />), part2: chunks => (<a href={`/companies/${myCompany.slug}`} target="_blank" rel="noopener noreferrer" className="px-3 py-1.5 text-xs border border-border text-text-secondary rounded-lg hover:border-gold hover:text-gold transition-all text-center flex items-center gap-1 justify-center">{chunks}</a>) })}</div>
                   </div>
                 )}
               </div>
@@ -1470,11 +1493,12 @@ export default function DashboardPage() {
           {/* ── FIRMA ── */}
           {activeTab === "firma" && (
             <div className="space-y-6 max-w-2xl">
+              {companyControls}
               {myCompany === "loading" && (
                 <div className="flex items-center gap-3 text-sm text-text-muted py-8">{uiText.rich("Ui.text_e68bc26b2fc6f2", { part1: () => (<Loader2 size={16} className="animate-spin" />) })}</div>
               )}
 
-              {myCompany === null && (
+              {myCompany === null && !companyLoadError && (
                 <div className="text-center py-16 border-2 border-dashed border-border rounded-2xl space-y-4">
                   <div className="w-16 h-16 mx-auto bg-bg-secondary border border-border rounded-2xl flex items-center justify-center">
                     <Building2 size={28} className="text-text-muted opacity-40" />
@@ -1483,7 +1507,7 @@ export default function DashboardPage() {
                     <h3 className="font-display text-lg font-bold text-text-primary mb-2">{uiText("Ui.text_32ae0a5fd4c809")}</h3>
                     <p className="text-sm text-text-muted max-w-sm mx-auto">{uiText("Ui.text_800b9ab4851306")}</p>
                   </div>
-                  <a href="/company-setup"
+                  <a href={myCompanyEditUrl}
                     className="inline-flex items-center gap-2 px-6 py-3 bg-gold text-bg-primary text-sm font-semibold rounded-xl hover:bg-gold-light transition-colors">{uiText.rich("Ui.text_555dba2841672a", { part1: () => (<Plus size={16} />) })}</a>
                 </div>
               )}
@@ -1506,8 +1530,8 @@ export default function DashboardPage() {
                       </div>
                       {myCompany.city && <p className="text-xs text-text-muted mb-3">{myCompany.city}</p>}
                       {myCompany.tagline && <p className="text-sm text-text-secondary italic mb-3">{uiText.rich("Ui.text_df436a1f2b679a", { value1: () => (myCompany.tagline) })}</p>}
-                      <div className="flex flex-wrap gap-2">{uiText.rich("Ui.text_04436355fa8f56", { part2: () => (<Pencil size={12} />), part1: chunks => (<a href="/company-setup"
-                          className="inline-flex items-center gap-1.5 px-4 py-2 bg-gold text-bg-primary text-xs font-semibold rounded-lg hover:bg-gold-light transition-colors">{chunks}</a>), part4: () => (<BarChart2 size={12} />), part3: chunks => (<a href="/company-dashboard"
+                      <div className="flex flex-wrap gap-2">{uiText.rich("Ui.text_04436355fa8f56", { part2: () => (<Pencil size={12} />), part1: chunks => (<a href={myCompanyEditUrl}
+                          className="inline-flex items-center gap-1.5 px-4 py-2 bg-gold text-bg-primary text-xs font-semibold rounded-lg hover:bg-gold-light transition-colors">{chunks}</a>), part4: () => (<BarChart2 size={12} />), part3: chunks => (<a href={myCompanyUrl}
                           className="inline-flex items-center gap-1.5 px-4 py-2 border border-border text-text-secondary text-xs font-medium rounded-lg hover:border-gold hover:text-gold transition-colors">{chunks}</a>), part6: () => (<ExternalLink size={12} />), part5: chunks => (<a href={`/companies/${myCompany.slug}`} target="_blank" rel="noopener noreferrer"
                           className="inline-flex items-center gap-1.5 px-4 py-2 border border-border text-text-secondary text-xs font-medium rounded-lg hover:border-gold hover:text-gold transition-colors">{chunks}</a>) })}</div>
                     </div>
@@ -1529,7 +1553,7 @@ export default function DashboardPage() {
                             : <AlertCircle size={14} className="text-text-muted shrink-0" />}
                           <span className={done ? "text-text-secondary" : "text-text-muted"}>{label}</span>
                           {!done && (
-                            <a href="/company-setup" className="ml-auto text-xs text-gold hover:underline">{uiText("Ui.text_18d4d9168461df")}</a>
+                            <a href={myCompanyEditUrl} className="ml-auto text-xs text-gold hover:underline">{uiText("Ui.text_18d4d9168461df")}</a>
                           )}
                         </div>
                       ))}
@@ -1541,10 +1565,10 @@ export default function DashboardPage() {
                     <p className="text-sm font-semibold text-text-primary mb-3">{uiText("Ui.text_db8644e777eb2e")}</p>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                       {[
-                        { label: uiText("Ui.text_47b6cd91a8fc94"),    href: "/company-dashboard?tab=services",  desc: uiText("Ui.text_d92cf7207c5ce5") },
-                        { label: uiText("Ui.text_866a24cf1da9e0"),   href: "/company-dashboard?tab=equipment", desc: uiText("Ui.text_7bacef8c556d15") },
-                        { label: uiText("Ui.text_a42e219c711da7"),        href: "/company-dashboard?tab=team",      desc: uiText("Ui.text_5c497fa20add72") },
-                        { label: uiText("Ui.text_59d7fcdeacc6d4"), href: "/company-setup",                 desc: uiText("Ui.text_87871d9df9854d") },
+                        { label: uiText("Ui.text_47b6cd91a8fc94"),    href: `${myCompanyUrl}&tab=services`,  desc: uiText("Ui.text_d92cf7207c5ce5") },
+                        { label: uiText("Ui.text_866a24cf1da9e0"),   href: `${myCompanyUrl}&tab=equipment`, desc: uiText("Ui.text_7bacef8c556d15") },
+                        { label: uiText("Ui.text_a42e219c711da7"),        href: `${myCompanyUrl}&tab=team`,      desc: uiText("Ui.text_5c497fa20add72") },
+                        { label: uiText("Ui.text_59d7fcdeacc6d4"), href: myCompanyEditUrl,                 desc: uiText("Ui.text_87871d9df9854d") },
                       ].map(({ label, href, desc }) => (
                         <a key={label} href={href}
                           className="flex items-start gap-3 p-3 rounded-lg border border-border hover:border-gold/40 hover:bg-bg-elevated transition-all group">

@@ -77,7 +77,7 @@ export default function AudienceCards({ pools, isLoggedIn, labels }: Props) {
       title: labels.companyTitle,
       desc: labels.companyDesc,
       cta: labels.companyCta,
-      href: isLoggedIn ? "/company-setup" : "/sign-up?redirect=/company-setup",
+      href: isLoggedIn ? "/company-setup?new=1" : "/sign-up?redirect=%2Fcompany-setup%3Fnew%3D1",
       image: "",
       accent: "#f59e0b",
       logoMode: true,

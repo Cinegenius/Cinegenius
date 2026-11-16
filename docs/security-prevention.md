@@ -20,6 +20,7 @@ These rules record the lessons from the targeted check of 15 November 2026. They
 - Use the existing current-request account, ownership, audience and canonical-media checks before returning or modifying private data. Test unauthenticated access, cross-account access, revoked visibility and retry behavior for the affected surface and equivalent routes.
 - Treat Genie output, member content and uploaded metadata as untrusted input. The server must independently enforce member access, permitted actions and resource ownership; instructions in content cannot grant permissions. Preserve durable limits and explicit confirmation for actions that already require it.
 - Optional product analytics remain consent-gated. Keep message text, drafts, search contents, credentials and private routes out of analytics and diagnostic logs. Do not add tracking or another consent system as part of security maintenance.
+- A company membership is scoped to that company, independently of the member's Crew occupations and other companies. Select only the dashboard fields that the current role needs before serializing server-component props; hiding a private contact in the UI is insufficient. Preserve the explicit company ID across edit links, tabs, draft recovery and return navigation. A missing or unauthorized requested company must never silently fall back to another company. See `docs/company-links-check-20261116.md` for the focused checks and limits.
 
 ## Verification and handoff
 

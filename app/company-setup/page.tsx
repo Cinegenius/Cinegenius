@@ -14,7 +14,8 @@ import { NEW_RESPONSIBLE_PERSON, responsiblePersonDraft, responsiblePersonErrors
 import { useTranslations } from "next-intl";
 import { useFormDraft } from "@/lib/use-form-draft";
 import FormDraftStatus from "@/components/FormDraftStatus";
-import { useState, useRef, useEffect } from "react";
+import { Suspense, useState, useRef, useEffect } from "react";
+import { useSearchParams } from "next/navigation";
 
 import { useUser } from "@clerk/nextjs";
 import {
@@ -77,6 +78,19 @@ async function prepareCompanyImage(translate: (key: string, values?: Record<stri
 }
 
 export default function CompanySetupPage() {
+  return <Suspense fallback={<div className="pt-24 flex justify-center"><Loader2 className="animate-spin text-gold" /></div>}><CompanySetupEntry /></Suspense>;
+}
+
+function CompanySetupEntry() {
+  const params = useSearchParams();
+  const { user } = useUser();
+  const requestedCompany = params.get("company_id");
+  const createNew = !requestedCompany && params.get("new") === "1";
+  const guidedSetup = params.get("onboarding") === "1";
+  return <CompanySetupForm key={`${user?.id ?? "signed-out"}:${requestedCompany ?? (createNew ? "new" : "default")}:${guidedSetup}`} requestedCompany={requestedCompany} createNew={createNew} guidedSetup={guidedSetup} />;
+}
+
+function CompanySetupForm({ requestedCompany, createNew, guidedSetup }: { requestedCompany: string | null; createNew: boolean; guidedSetup: boolean }) {
   const uiText = useTranslations();
   const uiOptionLabels: Record<string, string> = {
     "Film": uiText("Ui.text_113af97940c301"),
@@ -164,11 +178,13 @@ export default function CompanySetupPage() {
 
   // Editing existing company
   const [existingId, setExistingId] = useState<string | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [creationRequestKey, setCreationRequestKey] = useState<string>(() => crypto.randomUUID());
+  const [loading, setLoading] = useState(!createNew);
 
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
-  const [guidedSetup, setGuidedSetup] = useState(false);
+  const [loadFailed, setLoadFailed] = useState(false);
+  const [loadAttempt, setLoadAttempt] = useState(0);
   const [companyDraftLoaded, setCompanyDraftLoaded] = useState(false);
   const [companyStep, setCompanyStep] = useState(1);
 
@@ -192,18 +208,24 @@ export default function CompanySetupPage() {
   // Team management
   const [teamMembers, setTeamMembers] = useState<TeamMember[]>([]);
   const [teamLoading, setTeamLoading] = useState(false);
-  const [companyAccessRole, setCompanyAccessRole] = useState<"owner" | "admin" | "editor" | "member" | null>(null);
+  const [companyAccessRole, setCompanyAccessRole] = useState<"owner" | "admin" | "editor" | "member" | null>(createNew ? "owner" : null);
   const canManageTeam = companyAccessRole === "owner" || companyAccessRole === "admin";
   const isCompanyOwner = companyAccessRole === "owner";
 
   useEffect(() => {
-    const isGuided = new URLSearchParams(window.location.search).get("onboarding") === "1";
-    setGuidedSetup(isGuided);
-    // Editors open their assigned company explicitly; owners keep the legacy shortcut.
-    const requestedCompany = new URLSearchParams(window.location.search).get("company_id");
-    fetch(requestedCompany ? `/api/companies?company_id=${encodeURIComponent(requestedCompany)}` : "/api/companies?mine=true")
-      .then((r) => r.json())
+    if (!isLoaded || !user) return;
+    if (createNew) return;
+    let active = true;
+    // Never infer which of several companies the user intended to edit.
+    fetch(requestedCompany ? `/api/companies?company_id=${encodeURIComponent(requestedCompany)}` : "/api/companies?mine=true", { cache: "no-store" })
+      .then(async (r) => {
+        const result = await r.json();
+        if (!r.ok || !Array.isArray(result.data) || (requestedCompany && !result.data.length)) throw new Error(result.error ?? uiText("Ui.text_20679d4c9cd89c"));
+        return result;
+      })
       .then(({ data, permissionRole }) => {
+        if (!active) return;
+        if (!requestedCompany && data.length > 1) { router.replace("/company-dashboard"); return; }
         if (data && data.length > 0) {
           const c = data[0];
           setCompanyAccessRole(permissionRole ?? (c.owner_user_id ? "owner" : null));
@@ -242,9 +264,13 @@ export default function CompanySetupPage() {
           // Load team members (includes owner's own entry)
           setTeamLoading(true);
           fetch(`/api/company-members?company_id=${c.id}`)
-            .then((r) => r.json())
+            .then(async (r) => {
+              const result = await r.json();
+              if (!r.ok || !Array.isArray(result.data)) throw new Error(uiText("Ui.text_20679d4c9cd89c"));
+              return result;
+            })
             .then(({ data: members }) => {
-              if (members) {
+              if (active && members) {
                 setTeamMembers(members);
                 // Pre-fill owner's own title
                 const ownerEntry = members.find(
@@ -253,12 +279,14 @@ export default function CompanySetupPage() {
                 if (ownerEntry) setOwnerTitle((ownerEntry.public_titles?.length ? ownerEntry.public_titles : ownerEntry.title ? [ownerEntry.title] : []).join(", "));
               }
             })
-            .finally(() => setTeamLoading(false));
+            .catch(() => { if (active) { setLoadFailed(true); setError(uiText("Ui.text_20679d4c9cd89c")); } })
+            .finally(() => { if (active) setTeamLoading(false); });
         }
         setLoading(false);
       })
-      .catch((cause) => { setError(uiErrorMessage(cause, uiText("Ui.text_20679d4c9cd89c"))); setLoading(false); });
-  }, []);
+      .catch((cause) => { if (active) { setLoadFailed(true); setError(uiErrorMessage(cause, uiText("Ui.text_20679d4c9cd89c"))); setLoading(false); } });
+    return () => { active = false; };
+  }, [requestedCompany, createNew, isLoaded, user?.id, loadAttempt]);
 
   useEffect(() => {
     if (!guidedSetup || loading || existingId) return;
@@ -294,10 +322,11 @@ export default function CompanySetupPage() {
 
   const companyDraft = useFormDraft({
     formKey: `company:${existingId ?? "new"}`,
-    value: { responsible, name, city, selectedPlaceCityId, description, website, email, phone, emailPublic, phonePublic, hqAddressPublic, logoUrl, coverUrl, portfolioImages, selectedCategories, services, cateringDetails, animalDetails, tagline, bioShort, usp, foundedYear, legalForm, hqAddress, countries, industryFocus, socialLinks, ownerTitle, step: companyStep },
-    ready: !loading && (!guidedSetup || !!existingId || companyDraftLoaded),
+    value: { creationRequestKey, responsible, name, city, selectedPlaceCityId, description, website, email, phone, emailPublic, phonePublic, hqAddressPublic, logoUrl, coverUrl, portfolioImages, selectedCategories, services, cateringDetails, animalDetails, tagline, bioShort, usp, foundedYear, legalForm, hqAddress, countries, industryFocus, socialLinks, ownerTitle, step: companyStep },
+    ready: !loading && !loadFailed && !teamLoading && (!guidedSetup || !!existingId || companyDraftLoaded),
     busy: uploadingLogo || uploadingCover || uploadingPortfolio || portfolioUploads.some(entry => entry.status === "failed") || saving,
     restore: (draft) => {
+        if (typeof draft.creationRequestKey === "string" && /^[\da-f]{8}-[\da-f]{4}-[\da-f]{4}-[\da-f]{4}-[\da-f]{12}$/i.test(draft.creationRequestKey)) setCreationRequestKey(draft.creationRequestKey);
         setResponsible(responsiblePersonDraft(draft.responsible));
         setName(draft.name ?? ""); setCity(draft.city ?? ""); setSelectedPlaceCityId(draft.selectedPlaceCityId ?? ""); setDescription(draft.description ?? "");
         setWebsite(draft.website ?? ""); setEmail(draft.email ?? ""); setPhone(draft.phone ?? "");
@@ -448,6 +477,7 @@ export default function CompanySetupPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (loading || loadFailed || teamLoading || saving) return;
     setError("");
     const personErrors = responsiblePersonErrors(responsible, true);
     setResponsibleErrors(personErrors);
@@ -462,6 +492,7 @@ export default function CompanySetupPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           id: existingId,
+          ...(!existingId && { onboarding_request_key: creationRequestKey }),
           responsible_person: responsible,
           name, city, selected_place_city_id: selectedPlaceCityId || undefined, description, website, email, phone,
           email_public: emailPublic, phone_public: phonePublic, hq_address_public: hqAddressPublic,
@@ -488,7 +519,7 @@ export default function CompanySetupPage() {
         }),
       });
       const { data, error: apiError } = await res.json();
-      if (apiError) throw new Error(apiError);
+      if (!res.ok || apiError || !data?.slug) throw new Error(apiError ?? uiText("Ui.text_a60ca96232682b"));
       await companyDraft.complete();
       if (guidedSetup) await fetch("/api/onboarding?type=company", { method: "DELETE" });
       router.replace(`/companies/${data.slug}?welcome=1`);
@@ -505,6 +536,11 @@ export default function CompanySetupPage() {
       </div>
     );
   }
+
+  if (loadFailed) return <main className="site-container min-h-screen pt-28">
+    <p role="alert" className="text-sm text-text-secondary">{error}</p>
+    <button type="button" onClick={() => { setLoadFailed(false); setLoading(true); setLoadAttempt(value => value + 1); }} className="mt-4 inline-flex min-h-11 items-center rounded-lg border border-border px-4 text-sm text-gold">{uiText("setup.copy49")}</button>
+  </main>;
 
   return (
       <div className="pt-16 min-h-screen bg-bg-primary">
@@ -527,7 +563,7 @@ export default function CompanySetupPage() {
 
           <FormDraftStatus draft={companyDraft} />
           <form onSubmit={handleSubmit} className="space-y-8">
-          <fieldset disabled={!companyDraft.loaded || saving} className="contents">
+          <fieldset disabled={!companyDraft.loaded || teamLoading || saving} className="contents">
             <datalist id="company-title-suggestions">
               {COMPANY_PUBLIC_TITLE_SUGGESTIONS.map((title) => <option key={title} value={title} />)}
             </datalist>

@@ -23,7 +23,7 @@ export function requiredSetupDestination(profile: SetupProfile, saved: SetupProg
   if (hasProfileBasics(profile)) return null;
   // Preserve older unfinished drafts in their existing editor.
   if (saved?.setupComplete !== true) {
-    if (saved?.intent === "company" && saved.companyDraft) return "/company-setup?onboarding=1&resume=1";
+    if (saved?.intent === "company" && saved.companyDraft) return "/company-setup?onboarding=1&resume=1&new=1";
     if (saved?.intent === "talent" && saved.profileDraft) return "/guided-profile?resume=1";
     if ((saved?.intent === "location" || saved?.intent === "equipment") && (saved.listingDraft || saved.listingDrafts)) return `/guided-listing?type=${saved.intent}&resume=1`;
   }

@@ -34,7 +34,7 @@ export default async function CompaniesPage() {
         title={t("title")}
         titleHighlight={t("titleHighlight")}
         description={t("description")}
-        cta={{ label: t("addCompany"), href: "/company-setup" }}
+        cta={{ label: t("addCompany"), href: "/company-setup?new=1" }}
       />
       <CompaniesContent initialCompanies={companies} />
     </DirectoryPage>
