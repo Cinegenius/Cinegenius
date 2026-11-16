@@ -111,6 +111,7 @@ export async function GET(req: NextRequest) {
     else if(selected)query=query.in("category",deptValues(selected));
     const offer=req.nextUrl.searchParams.get("offer");
     if(offer==="miete"||offer==="kauf")query=query.or(`metadata->>rental_type.eq.${offer},metadata->>rental_type.eq.beides${offer==='miete'?',metadata->>rental_type.is.null':''}`);
+    if(offer==="dienstleistung")query=query.eq("metadata->>rental_type","dienstleistung");
     if(text){const placeFilter=placeSearchFilter(text);const values=marketplaceSearchCategories(text,catalog);const cats=values.map(v=>`"${v.replace(/["\\]/g,'')}"`).join(',');query=query.or(`title.ilike.%${text}%,description.ilike.%${text}%,city.ilike.%${text}%,category.ilike.%${text}%${cats?`,category.in.(${cats})`:''}${placeFilter?`,${placeFilter}`:''}`);}
   }
   // A homepage place query remains text; canonical filters below stay authoritative.
@@ -212,7 +213,7 @@ export async function POST(req: Request) {
     ...(type !== "animal" && rental_type !== undefined && { rental_type }),
   };
 
-  if(marketplace && metadata?.marketplace){const offer=metadata.marketplace;const mode=offer.mode==='sale'?offer.sale_mode:offer.rent_mode;Object.assign(mergedMetadata,{rental_type:offer.mode==='sale'?'kauf':offer.mode==='both'?'beides':'miete',price_negotiable:mode==='negotiable',price_on_request:mode==='request'});}
+  if(marketplace && metadata?.marketplace){const offer=metadata.marketplace;const mode=offer.mode==='sale'?offer.sale_mode:offer.rent_mode;Object.assign(mergedMetadata,{rental_type:offer.mode==='service'?'dienstleistung':offer.mode==='sale'?'kauf':offer.mode==='both'?'beides':'miete',price_negotiable:mode==='negotiable',price_on_request:mode==='request'});}
   // A private setup draft can be retried after a lost browser response. Reuse
   // the first row for the persisted request key instead of creating a duplicate.
   if (typeof onboarding_request_key === "string") {
