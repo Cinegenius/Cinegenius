@@ -16,6 +16,7 @@ import { readPublicLocationArea } from "@/lib/location-privacy";
 import { hasCoordinates, inMapBounds, type MapBounds } from "@/lib/location-map";
 import { mapLabelExpression } from "@/lib/map-style";
 import { mapMarkerStyle } from "@/lib/smart-search-map";
+import { bindMapPinTooltip } from "@/lib/map-pin-tooltip";
 import type { Map as VectorMap } from "maplibre-gl";
 import type * as Leaflet from "leaflet";
 
@@ -25,6 +26,7 @@ type Location = {
   metadata?: Record<string, unknown>;
   focalPoint?: { x: number; y: number } | null;
   markerColor?: string;
+  subtitle?: string;
 };
 type Props = {
   preserveViewport?: boolean;
@@ -44,6 +46,7 @@ type Props = {
 
 export default function LocationMap({ preserveViewport = false, readOnly = false, locations, activeId, onHover, userLocation, radiusKm, appliedBounds, onApplyBounds, onBoundsChange, visibleCount, labels, renderPreview }: Props) {
   const clusterLabel = labels?.cluster;
+  const hasCustomPreview = Boolean(renderPreview);
   const t = useTranslations("locationMap");
   const mapUi = useTranslations("directoryMap"), commonUi = useTranslations("notifications");
   const zoom = useRef<Leaflet.Control.Zoom | null>(null);
@@ -168,6 +171,8 @@ export default function LocationMap({ preserveViewport = false, readOnly = false
     if (!map) return;
     let cancelled = false;
     let group: Leaflet.LayerGroup | undefined;
+    let tooltipMarker: Leaflet.Marker | undefined;
+    let tooltipCleanups: (() => void)[] = [];
     async function initializeMarkers() {
       const L = (await import("leaflet")).default;
       if (cancelled) return;
@@ -180,6 +185,8 @@ export default function LocationMap({ preserveViewport = false, readOnly = false
         // A completed zoom emits both zoomend and moveend for the same view.
         if (key === renderedViewport) return;
         renderedViewport = key;
+        tooltipCleanups.forEach(cleanup => cleanup());
+        tooltipCleanups = [];
         group!.clearLayers();
         const pending = locations.filter(hasCoordinates).filter(location => !automaticBounds || inMapBounds(location, viewport));
         const projected = new Map(pending.map(location => [location.id, map!.latLngToLayerPoint([location.lat, location.lng])]));
@@ -204,7 +211,18 @@ export default function LocationMap({ preserveViewport = false, readOnly = false
             icon: L.divIcon({ className: "location-map-marker", iconSize: [44, 44], iconAnchor: [22, 22],
               html: `<span class="location-map-marker__dot${clustered ? " location-map-marker__cluster" : ""}"${markerStyle ? ` style="${markerStyle}"` : ""}>${clustered ? members.length : ""}</span>` }),
           }).addTo(group!);
+          const title = clustered ? (clusterLabel?.(members.length) ?? t("cluster", { count: members.length })) : location.title;
+          const lines = clustered ? members.slice(0, 3).map(member => member.title) : [
+            location.subtitle ?? (hasCustomPreview ? "" : locationCategoryLabel(location.type, categoryText)),
+            placeDisplay(location, location.city, locale),
+          ];
+          tooltipCleanups.push(bindMapPinTooltip(marker, title, lines));
+          marker.on("tooltipopen", () => {
+            if (tooltipMarker !== marker) tooltipMarker?.closeTooltip();
+            tooltipMarker = marker;
+          });
           marker.on("click", () => {
+            marker.closeTooltip();
             if (readOnly) return;
             if (clustered) {
               if (map!.getZoom() >= 18) {
@@ -226,8 +244,8 @@ export default function LocationMap({ preserveViewport = false, readOnly = false
     }
     let cleanupRender = () => {};
     void initializeMarkers();
-    return () => { cancelled = true; cleanupRender(); group?.remove(); };
-  }, [map, locations, t, readOnly, automaticBounds, clusterLabel]);
+    return () => { cancelled = true; cleanupRender(); tooltipCleanups.forEach(cleanup => cleanup()); group?.remove(); };
+  }, [map, locations, t, readOnly, automaticBounds, clusterLabel, categoryText, locale, hasCustomPreview]);
 
   useEffect(() => {
     if (!map) return;
@@ -269,7 +287,12 @@ export default function LocationMap({ preserveViewport = false, readOnly = false
   }, [map, userLocation, radiusKm, t, appliedBounds]);
 
   return (
-    <div className="location-map relative isolate h-full min-h-0 w-full overflow-hidden rounded-xl border border-border bg-bg-secondary" aria-label={labels?.label ?? t("label")}>
+    <div className="location-map relative isolate h-full min-h-0 w-full overflow-hidden rounded-xl border border-border bg-bg-secondary" aria-label={labels?.label ?? t("label")}
+      onKeyDownCapture={event => {
+        if (event.key !== "Escape") return;
+        map?.eachLayer(layer => { if ("closeTooltip" in layer) layer.closeTooltip(); });
+        select(null);
+      }}>
       <div ref={containerRef} className="h-full w-full" />
       <div className="location-map-count pointer-events-none absolute left-3 top-3 z-[500] text-xs font-medium">
         <BrowseResultCount count={!basemapReady && !failed ? null : visibleCount ?? locations.length}

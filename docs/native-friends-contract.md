@@ -1,6 +1,6 @@
 # Native Freunde, private Favoriten und Textnachrichten – v1
 
-Status: vorbereiteter Serververtrag, **nicht veröffentlicht**, Migration **nicht auf Produktion angewandt**. Die Website-Oberfläche bleibt unverändert. Native Ansichten und Geräteprüfungen gehören zu APP Entwicklung. Das ist keine Freigabe für einen Livegang.
+Status: Serververtrag und Migration seit 16. November 2026 veröffentlicht, Live-Commit `1d211944d9c5084cc5f59d61fb408f0db79fd995`. Nachweis: `/srv/cinegenius/handoffs/20261116-native-friends-contract/APP-LIVE.md` und `receipt.json`. Die neue Web-Oberfläche für Homies vom 17. November ist separat vorbereitet und noch nicht veröffentlicht. Native Ansichten und Geräteprüfungen gehören zu APP Entwicklung. Keine erneute Migration aus diesem Dokument ableiten.
 
 Ausgangspunkt: `origin/main` bei `9009d66edf80eb42992da5308899606d604a64cf`. Separate Smart-, News- und E-Mail-Entwürfe sind nicht Bestandteil dieser Änderung.
 
@@ -11,7 +11,7 @@ Ausgangspunkt: `origin/main` bei `9009d66edf80eb42992da5308899606d604a64cf`. Sep
 - Alle Vertragsergebnisse und Fehler der Handler: `Cache-Control: private, no-store, max-age=0` sowie beide CDN-No-Store-Header. Keine neuen öffentlichen Bild- oder Profilrechte.
 - Browser-/WKWebView-Schreibzugriffe behalten die vorhandene Origin-Prüfung. Native HTTP-Integration muss dieselbe verifizierte Sitzung und den erlaubten Website-Origin verwenden. Keine neue Authentifizierungs-Ausnahme.
 - Keine automatischen Kontaktannahmen, Lesebestätigungen, Sendeaktionen oder künstlichen Browser-History-Einträge beim Öffnen eines Bereichs.
-- Angezeigte Texte kommen aus den vorhandenen Sprachkatalogen. Die kanonischen Berufs- und Gewerk-IDs bleiben sprachunabhängig. APP lokalisiert ihre eigenen neuen Ansichten in allen neun Sprachen.
+- Angezeigte Texte kommen aus den vorhandenen Sprachkatalogen. Die kanonischen Berufs- und Gewerk-IDs bleiben sprachunabhängig. APP lokalisiert ihre eigenen neuen Ansichten in allen 17 unterstützten Sprachen.
 
 ## 1. Freunde lesen
 
@@ -121,10 +121,10 @@ Der Client serialisiert Änderungen je Kontakt, sendet explizite Zielwerte statt
 
 ## Datenbank und Freigabe
 
-Vorbereitet: `supabase/migrations/20261116130826_native_friend_favorites_v1.sql`.
+Bereits angewandt und geprüft: `supabase/migrations/20261116130826_native_friend_favorites_v1.sql` (16. November 2026; Nachweis siehe oben).
 
 Additiv: zwei nicht öffentliche Boolean-Spalten in `friendships`, Rücksetztrigger sowie service-only Lese-/Schreibfunktionen. Kein Backfill von Kontakten, keine Veröffentlichung oder Löschung von Benutzerinhalten. Bestehende RLS und service-only Rechte bleiben erhalten. Der vorhandene gemeinsame Kontaktschlüssel wird für transaktionale Sperren wiederverwendet.
 
-Vor einer späteren Aktivierung: Migration prüfen und gezielt anwenden; Signaturen, service-only Rechte und Accountgrenzen verifizieren; geprüften Serverstand separat freigeben und über den geschützten Veröffentlichungsweg bereitstellen. Anschließend erst Native-Fähigkeiten anhand der tatsächlichen Antwort aktivieren. Kein produktiver Schreibtest mit Mitgliedern ohne passenden Auftrag.
+Signaturen, service-only Rechte und Accountgrenzen wurden für den veröffentlichten Serverstand geprüft. Neue Oberflächen aktivieren Favoriten weiterhin nur anhand der tatsächlichen Vertragsantwort und ihrer Fähigkeiten. Jede neue Veröffentlichung bleibt gesondert freizugeben; kein produktiver Schreibtest mit Mitgliedern ohne passenden Auftrag.
 
 Tests verwenden synthetische Konten, isoliertes PostgreSQL/WASM und abgefangene Datenbank-/E-Mail-Aufrufe. Sie ersetzen keine echten parallelen PostgreSQL-Sitzungen und keinen iPhone-/Xcode-Test. Geräte-, Tastatur-, Offline- und Wiederanmeldungsabläufe bleiben APP-Prüfaufgaben vor der nativen Freigabe.

@@ -344,7 +344,8 @@
     "findJobsDescription": "Práce a zakázky.",
     "findJobsLink": "Prohlédnout zakázky",
     "railPage": "Zobrazení {page} z {total}",
-    "appComingSoon": "CineGenius brzy také jako aplikace."
+    "appComingSoon": "CineGenius brzy také jako aplikace.",
+    "projectScrollHint": "Objev další projekty – přejeď do strany"
   },
   "locations": {
     "heroTitle": "Perfektní lokace",
@@ -3844,7 +3845,7 @@
     "text_13e13e4c86a9ac": "8. Lajky fotografií",
     "text_f36dfccc3e4bc6": "Uživatelé mohou lajkovat profilové fotografie ostatních. Ukládáme, který uživatel (pseudonymizované ID) lajkoval který obrázek (URL), a časové razítko akce. Vlastník profilu vidí počet lajků. Jednotlivé přiřazení, tedy kdo fotografii lajkoval, není veřejné. Právním základem je plnění smlouvy (čl. 6 odst. 1 písm. b GDPR). Lajk lze kdykoli odebrat dalším kliknutím.",
     "text_2d81e07ce7f7f9": "9. Veřejné fotografie, členství ve firmách a koncepty",
-    "text_ac80679995e973": "Veřejně viditelné profilové fotografie, úvodní obrázky a přímo přiřazené osobní fotografie z portfolia, stejně jako firemní loga, úvodní obrázky a galerie, se mohou objevit také v části „Čerstvé pohledy“. Není nutné zvláštní označení. Obrázky samostatných projektů, lokací, nabídek na tržišti a příspěvků na nástěnce, soukromé obrázky, koncepty a přílohy zpráv do této sbírky nepatří. Přiřazení k veřejnému profilu či firmě zůstává zachováno.",
+    "text_ac80679995e973": "Veřejně viditelné profilové fotografie, úvodní obrázky a přímo přiřazené osobní fotografie z portfolia, stejně jako firemní loga, úvodní obrázky a galerie, se mohou objevit také v části „Nové fotografie“. Není nutné zvláštní označení. Obrázky samostatných projektů, lokací, nabídek na tržišti a příspěvků na nástěnce, soukromé obrázky, koncepty a přílohy zpráv do této sbírky nepatří. Přiřazení k veřejnému profilu či firmě zůstává zachováno.",
     "text_ead49c8e2ee161": "Žádosti o členství a firemní pozvánky obsahují vazbu na profil, požadované funkce a případně zprávu. Zpracovávají se pro rozhodnutí příslušné oprávněné protistrany. Členství se veřejně zobrazí až po potvrzení. Veřejná firemní funkce je oddělena od technických oprávnění ke správě.",
     "text_c0370dcbb5d3e0": "Průvodce nastavením a úpravy profilu ukládají rozpracované údaje jako soukromý koncept v existujícím systému účtů. Právním základem je poskytnutí požadované služby platformy (čl. 6 odst. 1 písm. b GDPR).",
     "text_f9a9bed03c18b2": "10. Zpracování plateb (Stripe)",
@@ -4688,8 +4689,8 @@
     "text_9e73c0551842cc": "To nejlepší z CineGenius",
     "text_cc1aa58bac3624": "Objevit něco nového",
     "text_8164423ceb0d22": "Fotografie, které nadchnou",
-    "text_00d91ff46043ce": "Čerstvé pohledy z komunity",
-    "text_9ea95e425aef59": "Náhodně vybrané veřejné obrázky z celé komunity CineGenius.",
+    "text_00d91ff46043ce": "Nové fotografie",
+    "text_9ea95e425aef59": "Objevte fotografie členů.",
     "text_e050882385dd5b": "Spustit pásy fotografií",
     "text_ed9d7fe735c3ea": "Pozastavit pásy fotografií",
     "text_a32e5e57280170": "<value1></value1><part2>Zobrazit všechny snímky <part3></part3></part2>",
@@ -5312,7 +5313,7 @@
     "text_b169cf44e42adb": "Na firemním profilu najdete pod „Další akce“ žádost o členství. Vyberte funkce a případně přidejte zprávu. Členství se zveřejní až po potvrzení. Odpovědné osoby firmy mohou pozvat již registrované členy; i tato pozvánka vyžaduje přijetí.",
     "text_4a610b516161ec": "Kolik fotografií mohu nahrát?",
     "text_e1893e6dffad16": "Na tržišti můžete přidat až 10 fotografií na předmět a u lokací až 20. Příslušné formuláře ukazují podporované formáty a limity velikosti. Osobní a firemní profily mají vlastní pole pro fotografie a galerie.",
-    "text_6799588f07af0d": "Jaké obrázky se zobrazují v části „Čerstvé pohledy“?",
+    "text_6799588f07af0d": "Jaké obrázky se zobrazují v části „Nové fotografie“?",
     "text_620b510d55014a": "Veřejně viditelné profilové fotografie, úvodní obrázky a přímo nahrané osobní fotografie portfolia, stejně jako firemní loga, úvodní obrázky a galerie se mohou zobrazit automaticky. Obrázky projektů, tržiště, lokací a nástěnky, soukromý obsah ani přílohy zpráv sem nepatří.",
     "text_42cae79597c266": "Bezpečnost a důvěra",
     "text_2e5ba026b3573b": "Je CineGenius důvěryhodné?",
@@ -12699,7 +12700,11 @@
     "removeLabel": "Odebrat {name} z kontaktů",
     "confirmRemove": "Chceš odebrat {name} ze svých kontaktů?",
     "cancel": "Zrušit",
-    "removing": "Odebírání …"
+    "removing": "Odebírání …",
+    "homies": "Homies",
+    "homiesHint": "Označte přátele hvězdičkou a přidejte je mezi Homies. Tento výběr vidíte jen vy.",
+    "addHomie": "Přidat {name} mezi Homies",
+    "removeHomie": "Odebrat {name} z Homies"
   },
   "MessagingBackend": {
     "invalid": "Zkontrolujte zprávu a vybrané osoby.",
@@ -13424,7 +13429,8 @@
     "filterType": "Filtrovat podle sekce",
     "noMatches": "V této sekci zatím nemáš nic uloženého.",
     "signInHint": "Pro zobrazení uložených položek se přihlas.",
-    "removeItem": "Odebrat {name} z uložených položek"
+    "removeItem": "Odebrat {name} z uložených položek",
+    "searchEmpty": "Nebyly nalezeny žádné uložené položky."
   },
   "OccupationForm": {
     "title": "Podoba názvů tvých profesí",

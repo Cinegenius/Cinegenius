@@ -22,7 +22,7 @@ export default function SmartSearchMap({ groups, bounds, onApplyBounds }: {
   const locations = useMemo(() => entries.flatMap(entry => {
     const point = entry.result.mapPoint;
     if (!point || !hasCoordinates(point)) return [];
-    return [{ id: entry.key, title: `${t(`areas.${entry.area}`)} · ${entry.result.title}`, city: entry.result.subtitle,
+    return [{ id: entry.key, title: `${t(`areas.${entry.area}`)} · ${entry.result.title}`, city: "", subtitle: entry.result.subtitle,
       type: entry.result.type, price: entry.result.price, image: entry.result.image ?? "", lat: point.lat, lng: point.lng,
       markerColor: SMART_MAP_COLORS[entry.area], ...(point.radiusMeters ? { metadata: { location_area: { lat: point.lat, lng: point.lng, radius_meters: point.radiusMeters } } } : {}),
     }];

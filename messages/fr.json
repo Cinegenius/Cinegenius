@@ -358,7 +358,8 @@
     "findJobsDescription": "Offres d’emploi et missions.",
     "findJobsLink": "Consulter les offres",
     "railPage": "Voir {page} sur {total}",
-    "appComingSoon": "L’application CineGenius arrive bientôt."
+    "appComingSoon": "L’application CineGenius arrive bientôt.",
+    "projectScrollHint": "Découvrez d’autres projets : balayez sur le côté"
   },
   "locations": {
     "heroTitle": "Le lieu idéal",
@@ -3844,7 +3845,7 @@
     "text_13e13e4c86a9ac": "8. Likes sur photos",
     "text_f36dfccc3e4bc6": "Les utilisateurs peuvent aimer les photos de profil d’autres utilisateurs. Nous stockons quel utilisateur (ID pseudonymisé) a aimé quelle image (URL), avec l’horodatage de l’action. Le propriétaire du profil peut voir ce nombre de likes. Les associations individuelles (qui a aimé) ne sont pas visibles publiquement. La base légale est l’exécution du contrat (Art. 6(1)(b) RGPD). Les likes peuvent être retirés à tout moment en cliquant de nouveau.",
     "text_2d81e07ce7f7f9": "9. Photos publiques, appartenance à une entreprise et brouillons",
-    "text_ac80679995e973": "Les photos de profil publiques, images de couverture et photos personnelles directement assignées au portfolio, ainsi que logos, couvertures et galeries d’entreprise, peuvent aussi apparaître dans « Fresh Insights ». Aucune étiquette séparée n’est requise. Les images de projets indépendants, lieux, offres du marketplace et annonces, ainsi que images privées, brouillons et pièces jointes de messages, sont exclus de cette collection. Leur association avec le profil public ou l’entreprise est conservée.",
+    "text_ac80679995e973": "Les photos de profil publiques, images de couverture et photos personnelles directement assignées au portfolio, ainsi que logos, couvertures et galeries d’entreprise, peuvent aussi apparaître dans «Nouvelles photos». Aucune étiquette séparée n’est requise. Les images de projets indépendants, lieux, offres du marketplace et annonces, ainsi que images privées, brouillons et pièces jointes de messages, sont exclus de cette collection. Leur association avec le profil public ou l’entreprise est conservée.",
     "text_ead49c8e2ee161": "Les demandes d’adhésion et invitations d’entreprise contiennent une référence au profil, les rôles souhaités et, le cas échéant, un message. Elles sont traitées pour décision par la partie autorisée. L’adhésion devient publique uniquement après confirmation. Un rôle public en entreprise est distinct des droits techniques de gestion.",
     "text_c0370dcbb5d3e0": "La configuration guidée et l’édition de profil enregistrent les informations commencées comme brouillon privé dans le système de compte existant. La base légale pour ces fonctions est la fourniture du service demandé (Art. 6(1)(b) RGPD).",
     "text_f9a9bed03c18b2": "10. Traitement des paiements (Stripe)",
@@ -4613,8 +4614,8 @@
     "text_9e73c0551842cc": "Le meilleur de CineGenius",
     "text_cc1aa58bac3624": "Découvrez quelque chose de nouveau",
     "text_8164423ceb0d22": "Photos inspirantes",
-    "text_00d91ff46043ce": "Nouveaux aperçus de la communauté",
-    "text_9ea95e425aef59": "Des images publiques choisies au hasard dans toute la communauté CineGenius.",
+    "text_00d91ff46043ce": "Nouvelles photos",
+    "text_9ea95e425aef59": "Découvrez les photos des membres.",
     "text_e050882385dd5b": "Reprendre les bandes photos",
     "text_ed9d7fe735c3ea": "Mettre en pause les bandes photos",
     "text_a32e5e57280170": "<value1></value1><part2>Voir tous les aperçus <part3></part3></part2>",
@@ -5312,7 +5313,7 @@
     "text_b169cf44e42adb": "Sur le profil d’entreprise, trouvez la demande d’adhésion sous « Plus d’actions ». Choisissez les rôles et ajoutez un message si besoin. L’adhésion devient publique après confirmation. Les représentants d’entreprise peuvent inviter des membres enregistrés ; ces invitations doivent aussi être acceptées.",
     "text_4a610b516161ec": "Combien de photos puis-je télécharger ?",
     "text_e1893e6dffad16": "La place de marché autorise jusqu’à 10 photos par article, et jusqu’à 20 pour les lieux. Les formulaires indiquent formats supportés et limites de taille. Les profils personnels et entreprises ont leurs propres champs photo et galerie.",
-    "text_6799588f07af0d": "Quelles images apparaissent dans « Nouveautés » ?",
+    "text_6799588f07af0d": "Quelles images apparaissent dans «Nouvelles photos» ?",
     "text_620b510d55014a": "Photos de profil publiques, couvertures et photos de portfolio personnel téléchargées directement, ainsi que logos, couvertures et galeries d’entreprise, peuvent apparaître automatiquement. Sont exclus images de projets, marketplace, lieux, tableaux d’affichage, contenus privés et pièces jointes de messages.",
     "text_42cae79597c266": "Sécurité et confiance",
     "text_2e5ba026b3573b": "CineGenius est-il fiable ?",
@@ -12625,7 +12626,11 @@
     "removeLabel": "Supprimer {name} des contacts",
     "confirmRemove": "Supprimer {name} de vos contacts ?",
     "cancel": "Annuler",
-    "removing": "Suppression…"
+    "removing": "Suppression…",
+    "homies": "Homies",
+    "homiesHint": "Ajoutez une étoile à vos amis pour les retrouver dans Homies. Vous seul voyez cette sélection.",
+    "addHomie": "Ajouter {name} aux Homies",
+    "removeHomie": "Retirer {name} des Homies"
   },
   "MessagingBackend": {
     "invalid": "Veuillez vérifier le message et les personnes sélectionnées.",
@@ -13424,7 +13429,8 @@
     "filterType": "Filtrer par rubrique",
     "noMatches": "Tu n’as encore rien enregistré dans cette rubrique.",
     "signInHint": "Connecte-toi pour voir tes favoris.",
-    "removeItem": "Retirer {name} des favoris"
+    "removeItem": "Retirer {name} des favoris",
+    "searchEmpty": "Aucun élément enregistré trouvé."
   },
   "OccupationForm": {
     "title": "Forme de tes intitulés professionnels",

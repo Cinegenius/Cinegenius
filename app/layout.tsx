@@ -10,7 +10,6 @@ import AppChrome from "@/components/AppChrome";
 import { isConfiguredAdmin } from "@/lib/admin-policy";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import GlobalEffects from "@/components/GlobalEffects";
-import PresencePing from "@/components/PresencePing";
 import CookieBanner from "@/components/CookieBanner";
 import ProductAnalytics from "@/components/ProductAnalytics";
 import { ToastProvider } from "@/contexts/ToastContext";
@@ -149,7 +148,6 @@ export default async function RootLayout({
               <AuthSessionBoundary initialSessionId={sessionId}>
               <FormDraftProvider>
                 <GlobalEffects />
-                <PresencePing />
                 <AccountActivityTracker />
                 <GlobalSearch />
                 <AppChrome initialIsSignedIn={!!userId} initialAdminUserId={isConfiguredAdmin(userId, process.env.ADMIN_USER_IDS) ? userId : null}>{children}</AppChrome>

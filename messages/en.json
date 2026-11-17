@@ -344,7 +344,8 @@
     "findJobsDescription": "Jobs and assignments.",
     "findJobsLink": "Browse jobs",
     "railPage": "View {page} of {total}",
-    "appComingSoon": "The CineGenius app is coming soon."
+    "appComingSoon": "The CineGenius app is coming soon.",
+    "projectScrollHint": "Discover more projects – swipe sideways"
   },
   "locations": {
     "heroTitle": "The perfect location",
@@ -3844,7 +3845,7 @@
     "text_13e13e4c86a9ac": "8. Photo likes",
     "text_f36dfccc3e4bc6": "Users can like other users' profile pictures. We store which user (pseudonymised ID) liked which image (URL), along with the action timestamp. The profile owner can see this information as a like count. Individual associations (who liked it) are not publicly visible. The legal basis is performance of the contract (Art. 6(1)(b) GDPR). Likes can be removed at any time by clicking again.",
     "text_2d81e07ce7f7f9": "9. Public photos, company membership and drafts",
-    "text_ac80679995e973": "Public profile photos, cover images and directly assigned personal portfolio photos, as well as company logos, covers and galleries, may also appear in ‘Fresh Insights’. No separate label is required. Images from standalone projects, locations, marketplace offers and noticeboard posts, along with private images, drafts and message attachments, are excluded from this collection. Their association with the public profile or company is preserved.",
+    "text_ac80679995e973": "Public profile photos, cover images and directly assigned personal portfolio photos, as well as company logos, covers and galleries, may also appear in ‘New photos’. No separate label is required. Images from standalone projects, locations, marketplace offers and noticeboard posts, along with private images, drafts and message attachments, are excluded from this collection. Their association with the public profile or company is preserved.",
     "text_ead49c8e2ee161": "Membership requests and company invitations contain a profile reference, desired roles and, where applicable, a message. They are processed for a decision by the authorised other party. Membership becomes public only after confirmation. A public company role is separate from technical management rights.",
     "text_c0370dcbb5d3e0": "Guided setup and profile editing store started information as a private draft in the existing account system. The legal basis for these functions is providing the requested platform service (Art. 6(1)(b) GDPR).",
     "text_f9a9bed03c18b2": "10. Payment processing (Stripe)",
@@ -4688,8 +4689,8 @@
     "text_9e73c0551842cc": "Best of CineGenius",
     "text_cc1aa58bac3624": "Discover something new",
     "text_8164423ceb0d22": "Photos that inspire",
-    "text_00d91ff46043ce": "Fresh insights from the community",
-    "text_9ea95e425aef59": "Randomly selected public images from across the CineGenius community.",
+    "text_00d91ff46043ce": "New photos",
+    "text_9ea95e425aef59": "Discover photos from members.",
     "text_e050882385dd5b": "Resume photo strips",
     "text_ed9d7fe735c3ea": "Pause photo strips",
     "text_a32e5e57280170": "<value1></value1><part2>View all insights <part3></part3></part2>",
@@ -5312,7 +5313,7 @@
     "text_b169cf44e42adb": "On the company profile, find the membership request under ‘More actions’. Choose roles and add a message if needed. Membership becomes public only after confirmation. Company representatives can invite registered members; those invitations must also be accepted.",
     "text_4a610b516161ec": "How many photos can I upload?",
     "text_e1893e6dffad16": "The marketplace allows up to 10 photos per item, and locations allow up to 20. The forms show supported formats and size limits. Personal profiles and companies have their own photo and gallery fields.",
-    "text_6799588f07af0d": "Which images appear in ‘Fresh Insights’?",
+    "text_6799588f07af0d": "Which images appear in ‘New photos’?",
     "text_620b510d55014a": "Public profile photos, covers and directly uploaded personal portfolio photos, as well as company logos, covers and galleries, may appear automatically. Project, marketplace, location and noticeboard images, private content and message attachments are excluded.",
     "text_42cae79597c266": "Safety and trust",
     "text_2e5ba026b3573b": "Is CineGenius trustworthy?",
@@ -12699,7 +12700,11 @@
     "removeLabel": "Remove {name} from contacts",
     "confirmRemove": "Remove {name} from your contacts?",
     "cancel": "Cancel",
-    "removing": "Removing …"
+    "removing": "Removing …",
+    "homies": "Homies",
+    "homiesHint": "Star friends to add them to your Homies. Only you can see this selection.",
+    "addHomie": "Add {name} to Homies",
+    "removeHomie": "Remove {name} from Homies"
   },
   "MessagingBackend": {
     "invalid": "Please check the message and selected people.",
@@ -13424,7 +13429,8 @@
     "filterType": "Filter by section",
     "noMatches": "You have not saved anything in this section yet.",
     "signInHint": "Sign in to see your saved items.",
-    "removeItem": "Remove {name} from saved items"
+    "removeItem": "Remove {name} from saved items",
+    "searchEmpty": "No saved items found."
   },
   "OccupationForm": {
     "title": "Wording of your occupations",

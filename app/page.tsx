@@ -1,3 +1,5 @@
+import HomeProjects from "@/components/HomeProjects";
+import { NOTICE_CARD_STYLES } from "@/lib/notice-card-styles";
 import { occupationFormFromCrew } from "@/lib/occupation-form";
 import { profileOccupationPreview, type OccupationProfile } from "@/lib/crew-occupations";
 import { profileAccessFor } from "@/lib/profile-privacy-server";
@@ -34,7 +36,7 @@ export const revalidate = 60;
 
 import {
   MapPin, Briefcase, ArrowRight, CheckCircle,
-  Clock, Package2, Film, Building2, UsersRound, Newspaper, Smartphone,
+  Clock, Package2, Building2, UsersRound, Newspaper, Smartphone,
 } from "lucide-react";
 import HeroSearch from "@/components/HeroSearch";
 import HomeCommunityBoard from "@/components/HomeCommunityBoard";
@@ -46,7 +48,6 @@ import { COMPANY_CATEGORIES } from "@/lib/companyCategories";
 import { HomePhotoDiscovery, type DiscoverPhoto } from "@/components/HomePhotoDiscovery";
 import { PROFILE_TYPE_LABELS, type ProfileType } from "@/lib/profile-types";
 import { isPeopleDirectoryProfile } from "@/lib/profile-provider-filters";
-import { getPrivateProfileIds } from "@/lib/trust";
 import { taxonomyLabel } from "@/lib/departments";
 import { getCommunityMedia } from "@/lib/community-media-server";
 import { discoverySeed } from "@/lib/discovery-order-server";
@@ -338,7 +339,8 @@ async function HomeRecommendations({ dataPromise }: { dataPromise: HomeDataPromi
     {liveJobs.length > 0 && <section className="home-section-divider home-section-divider--border min-w-0 border-t border-transparent pt-4" aria-labelledby="home-jobs-title">
       <div className="mb-2 flex flex-wrap items-center justify-between gap-x-3"><h2 id="home-jobs-title" className="font-display text-lg font-bold text-text-primary">{t("jobsTitle")}</h2><Link href="/jobs" className="inline-flex min-h-11 items-center gap-1 text-xs font-medium text-gold hover:text-gold-light">{tc("viewAll")} <ArrowRight size={12} /></Link></div>
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-        {liveJobs.map(job => <Link key={job.id} href={`/jobs/${job.id}`} className="group flex min-h-11 min-w-0 items-start gap-2 rounded-xl border border-border/70 px-3 py-3 transition-colors hover:bg-bg-secondary/60">
+        {liveJobs.map(job => <Link key={job.id} href={`/jobs/${job.id}`} className={`group relative flex min-h-11 min-w-0 items-start gap-2 overflow-hidden rounded-xl border px-3 py-3 transition-colors ${NOTICE_CARD_STYLES.request.card}`}>
+          <span aria-hidden="true" className={`absolute inset-y-0 left-0 w-1 bg-gradient-to-b ${NOTICE_CARD_STYLES.request.accent}`} />
           <Briefcase size={15} className="mt-0.5 shrink-0 text-gold" />
           <div className="min-w-0 flex-1"><h3 className="truncate text-sm font-semibold text-text-primary group-hover:text-gold">{job.title}</h3><p className="mt-0.5 truncate text-xs text-text-muted">{job.location}</p><p className="mt-1 flex items-center gap-1 text-[10px] text-text-muted"><Clock size={9} />{formatDate(job.created_at)}</p></div>
           <span className="shrink-0 text-right text-xs font-semibold text-gold">{job.rawPrice ? uiText("Ui.text_8ae8849cdb3aaa", { value1: String(job.rawPrice.toLocaleString(uiLocale)), value2: String(tc("perDay")) }) : tc("onRequest")}</span>
@@ -368,8 +370,17 @@ async function HomePhotoRecommendations({ viewerId }: { viewerId: string | null 
   if (process.env.NODE_ENV === "development" && process.env.CINEGENIUS_LOCAL_PREVIEW === "1" && !(process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.SUPABASE_SERVICE_ROLE_KEY)) return null;
   let newPhotos: DiscoverPhoto[];
   try {
-    const { photos } = await getCommunityMedia({ limit: 24, viewerId, randomSeed: discoverySeed(), includeTotal: false, signal: AbortSignal.timeout(4000) });
-    newPhotos = photos.slice(0, 24);
+    const signal = AbortSignal.timeout(4000);
+    const [recent, mixed] = await Promise.all([
+      getCommunityMedia({ limit: 3, viewerId, diverse: true, includeTotal: false, signal }),
+      getCommunityMedia({ limit: 24, viewerId, randomSeed: discoverySeed(), includeTotal: false, signal }),
+    ]);
+    const seen = new Set<string>();
+    newPhotos = [...recent.photos, ...mixed.photos].filter(photo => {
+      if (seen.has(photo.imageUrl)) return false;
+      seen.add(photo.imageUrl);
+      return true;
+    }).slice(0, 24);
   } catch {
     console.error("[homepage] Photo discovery unavailable");
     return null;
@@ -436,6 +447,6 @@ export default async function HomePage() {
     <Suspense fallback={null}><HomePhotoRecommendations viewerId={userId} /></Suspense>
     <Suspense fallback={null}><HomePartnersAndLocations dataPromise={dataPromise} /></Suspense>
     <HomeCommunityBoard loggedIn={isLoggedIn} />
-    <section className="site-container py-5 sm:py-7" aria-labelledby="home-projects-title"><div className="home-section-divider home-section-divider--border flex flex-wrap items-center justify-between gap-x-4 gap-y-1 border-t border-transparent pt-4"><h2 id="home-projects-title" className="flex items-center gap-2 text-sm font-medium text-text-muted"><Film size={15} aria-hidden="true" />{t("projectsTitle")}</h2><Link href="/projects/alle" className="inline-flex min-h-11 items-center gap-1 text-sm text-text-secondary hover:text-gold">{t("findProjectsLink")} <ArrowRight size={13} /></Link></div></section>
+    <Suspense fallback={null}><HomeProjects /></Suspense>
   </main>;
 }

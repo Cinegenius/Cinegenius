@@ -179,7 +179,6 @@ export function HomePhotoDiscovery({ ratedPhotos, newPhotos }: { ratedPhotos: Di
   const [isInView, setIsInView] = useState(false);
   const [tabVisible, setTabVisible] = useState(true);
   const [userPaused, setUserPaused] = useState(false);
-  const [hovered, setHovered] = useState(false);
   const [focused, setFocused] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
   const [cycleDurations, setCycleDurations] = useState<[number, number]>([60, 60]);
@@ -189,7 +188,7 @@ export function HomePhotoDiscovery({ ratedPhotos, newPhotos }: { ratedPhotos: Di
   ]);
   const [failedImages, setFailedImages] = useState<Set<string>>(() => new Set());
   const animated = shouldAnimatePhotoBand(photos.length, reducedMotion);
-  const shouldRun = animated && isInView && tabVisible && !userPaused && !hovered && !focused && !isDragging;
+  const shouldRun = animated && isInView && tabVisible && !userPaused && !focused && !isDragging;
   const staticGallery = !animated;
 
   useEffect(() => {
@@ -304,6 +303,7 @@ export function HomePhotoDiscovery({ ratedPhotos, newPhotos }: { ratedPhotos: Di
   }
 
   function beginPointerDrag(event: ReactPointerEvent<HTMLDivElement>) {
+    setFocused(false);
     if (!animated || !event.isPrimary || event.button !== 0) return;
     if ((event.target as HTMLElement).closest("button, input, textarea, select")) return;
 
@@ -385,7 +385,7 @@ export function HomePhotoDiscovery({ ratedPhotos, newPhotos }: { ratedPhotos: Di
   };
 
   return (
-    <section ref={sectionRef} className="home-section-divider home-section-divider--wide home-section-divider--border border-y border-transparent bg-bg-primary py-6 sm:py-8">
+    <section ref={sectionRef} className="home-section-divider home-section-divider--wide home-section-divider--border border-y border-transparent py-6 sm:py-8">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="mb-4 flex flex-wrap items-end justify-between gap-4 sm:mb-5">
           <div className="min-w-0">
@@ -393,7 +393,7 @@ export function HomePhotoDiscovery({ ratedPhotos, newPhotos }: { ratedPhotos: Di
             <h2 className="font-display text-xl font-bold text-text-primary sm:text-2xl">{isRatedSelection ? uiText("Ui.text_8164423ceb0d22") : uiText("Ui.text_00d91ff46043ce")}</h2>
             {!isRatedSelection && <p className="mt-1 text-xs text-text-muted">{uiText("Ui.text_9ea95e425aef59")}</p>}
           </div>
-          <div className="flex items-center gap-2">{uiText.rich("Ui.text_a32e5e57280170", { value1: () => (animated && <button type="button" onClick={() => setUserPaused((paused) => !paused)} aria-label={userPaused ? uiText("Ui.text_e050882385dd5b") : uiText("Ui.text_ed9d7fe735c3ea")} aria-pressed={userPaused} className="inline-flex min-h-11 min-w-11 items-center justify-center rounded-full border border-border text-text-muted transition-colors hover:border-gold hover:text-gold">{userPaused ? <Play size={16} /> : <Pause size={16} />}</button>), part3: () => (<ArrowRight size={14} />), part2: chunks => (<Link href="/photo" className="inline-flex min-h-11 shrink-0 items-center gap-1 text-sm font-medium text-gold hover:text-gold-light">{chunks}</Link>) })}</div>
+          <div className="flex min-w-0 max-w-full flex-wrap items-center gap-2">{uiText.rich("Ui.text_a32e5e57280170", { value1: () => (animated && <button type="button" onClick={() => setUserPaused((paused) => !paused)} aria-label={userPaused ? uiText("Ui.text_e050882385dd5b") : uiText("Ui.text_ed9d7fe735c3ea")} aria-pressed={userPaused} className="inline-flex min-h-11 min-w-11 items-center justify-center rounded-full border border-border text-text-muted transition-colors hover:border-gold hover:text-gold">{userPaused ? <Play size={16} /> : <Pause size={16} />}</button>), part3: () => (<ArrowRight size={14} className="shrink-0" />), part2: chunks => (<Link href="/photo" className="inline-flex min-h-11 min-w-0 max-w-full items-center gap-1 text-sm font-medium text-gold hover:text-gold-light">{chunks}</Link>) })}</div>
         </div>
         {photos.length > 0 ? <div
           ref={bandViewportRef}
@@ -410,9 +410,8 @@ export function HomePhotoDiscovery({ ratedPhotos, newPhotos }: { ratedPhotos: Di
           onPointerCancel={endPointerDrag}
           onClickCapture={suppressDraggedClick}
           onDragStart={(event) => event.preventDefault()}
-          onMouseEnter={() => setHovered(true)}
-          onMouseLeave={() => setHovered(false)}
-          onFocus={() => setFocused(true)}
+          onFocus={(event) => setFocused(event.target.matches(":focus-visible"))}
+          onKeyDown={() => setFocused(true)}
           onBlur={(event) => { if (!event.currentTarget.contains(event.relatedTarget as Node | null)) setFocused(false); }}
         >
           {staticGallery ? <div className="home-photo-band-static-grid">

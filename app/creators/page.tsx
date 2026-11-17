@@ -12,7 +12,6 @@ import { auth } from "@clerk/nextjs/server";
 import { discoverySeed, discoveryOrder } from "@/lib/discovery-order-server";
 import { db } from "@/lib/db";
 import { fetchRatings } from "@/lib/ratings";
-import { getPrivateProfileIds } from "@/lib/trust";
 import CreatorsContent, { type ServerCreator } from "./CreatorsContent";
 import { primaryOccupationForPositions, occupationReference } from "@/lib/primary-occupation";
 import PageHeader from "@/components/PageHeader";
@@ -51,7 +50,6 @@ type CreatorProfileRow = {
   verified: boolean | null;
   tagline: string | null;
   focal_point: { x: number; y: number } | null;
-  last_seen_at: string | null;
 };
 
 type CreatorListingRow = {
@@ -75,7 +73,7 @@ const getCreatorDirectoryData = async (seed: string) => {
         .limit(300),
       db
         .rpc("random_crew_profiles", { p_seed: seed })
-        .select("place_country_code,place_region_id,place_city_id,place_city_name,place_region_name,place_status,user_id, display_name, location, bio, skills, role, positions, crew, available, avatar_url, portfolio_images, languages, profile_types, profile_type, physical, availability_config, day_rate, travel_ready, verified, tagline, focal_point, last_seen_at")
+        .select("place_country_code,place_region_id,place_city_id,place_city_name,place_region_name,place_status,user_id, display_name, location, bio, skills, role, positions, crew, available, avatar_url, portfolio_images, languages, profile_types, profile_type, physical, availability_config, day_rate, travel_ready, verified, tagline, focal_point")
         .not("display_name", "is", null)
         .neq("display_name", "")
         .limit(96),
@@ -252,7 +250,6 @@ export default async function CreatorsPage({
         height_cm: phys.height_cm ?? null,
         travel: avail.travel ?? (p.travel_ready ? "national" : ""),
         focal_point: p.focal_point ?? undefined,
-        last_seen_at: p.last_seen_at ?? null,
       };
     });
 

@@ -11,6 +11,9 @@ const positions = {
   projects: "100% 42%",
   jobs: "80% 42%",
   animals: "80% 42%",
+  community: "40% 42%",
+  organizations: "80% 42%",
+  help: "40% 42%",
 } as const;
 
 /** One shared image and darkness, with a stable crop for each public directory. */

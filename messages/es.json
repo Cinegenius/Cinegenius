@@ -344,7 +344,8 @@
     "findJobsDescription": "Empleos y encargos.",
     "findJobsLink": "Ver empleos",
     "railPage": "Vista {page} de {total}",
-    "appComingSoon": "CineGenius, pronto también como aplicación."
+    "appComingSoon": "CineGenius, pronto también como aplicación.",
+    "projectScrollHint": "Descubre más proyectos: desliza hacia los lados"
   },
   "locations": {
     "heroTitle": "La locación perfecta",
@@ -3844,7 +3845,7 @@
     "text_13e13e4c86a9ac": "8. Me gusta en fotos",
     "text_f36dfccc3e4bc6": "Los usuarios pueden indicar que les gustan las fotos de perfil de otros usuarios. Guardamos qué usuario (ID seudonimizado) ha marcado qué imagen (URL), junto con la fecha y hora de la acción. El titular del perfil puede ver esta información como número de Me gusta. La asignación individual —quién ha dado Me gusta— no es visible públicamente. La base jurídica es la ejecución del contrato (art. 6, apdo. 1, letra b del RGPD). Los Me gusta pueden retirarse en cualquier momento volviendo a pulsar.",
     "text_2d81e07ce7f7f9": "9. Fotos públicas, vinculación con empresas y borradores",
-    "text_ac80679995e973": "Las fotos de perfil, portadas y fotos personales de portfolio directamente asociadas que sean públicas, así como los logotipos, portadas y galerías de empresas, también pueden aparecer en «Miradas recientes». No es necesario marcarlas por separado. Las imágenes de proyectos independientes, localizaciones, ofertas del mercado y publicaciones del tablón, así como las imágenes privadas, los borradores y los archivos adjuntos de mensajes quedan excluidos de esta colección. Se mantiene la vinculación con el perfil público o la empresa.",
+    "text_ac80679995e973": "Las fotos de perfil, portadas y fotos personales de portfolio directamente asociadas que sean públicas, así como los logotipos, portadas y galerías de empresas, también pueden aparecer en «Nuevas fotos». No es necesario marcarlas por separado. Las imágenes de proyectos independientes, localizaciones, ofertas del mercado y publicaciones del tablón, así como las imágenes privadas, los borradores y los archivos adjuntos de mensajes quedan excluidos de esta colección. Se mantiene la vinculación con el perfil público o la empresa.",
     "text_ead49c8e2ee161": "Las solicitudes de vinculación y las invitaciones de empresa incluyen una referencia al perfil, las funciones solicitadas y, en su caso, un mensaje. Se tratan para que la otra parte autorizada tome una decisión. La vinculación solo se hace pública tras la confirmación. Una función pública en una empresa es independiente de los permisos técnicos administrativos.",
     "text_c0370dcbb5d3e0": "La configuración guiada y la edición del perfil guardan los datos iniciados como borrador privado en el sistema de cuentas existente. La base jurídica de estas funciones es la prestación del servicio de plataforma solicitado (art. 6, apdo. 1, letra b del RGPD).",
     "text_f9a9bed03c18b2": "10. Procesamiento de pagos (Stripe)",
@@ -4688,8 +4689,8 @@
     "text_9e73c0551842cc": "Lo mejor de CineGenius",
     "text_cc1aa58bac3624": "Nuevos descubrimientos",
     "text_8164423ceb0d22": "Fotos que inspiran",
-    "text_00d91ff46043ce": "Nuevas miradas de la comunidad",
-    "text_9ea95e425aef59": "Imágenes públicas elegidas al azar de toda la comunidad CineGenius.",
+    "text_00d91ff46043ce": "Nuevas fotos",
+    "text_9ea95e425aef59": "Descubre fotos de los miembros.",
     "text_e050882385dd5b": "Reanudar tiras de fotos",
     "text_ed9d7fe735c3ea": "Pausar tiras de fotos",
     "text_a32e5e57280170": "<value1></value1><part2>Ver todas las imágenes <part3></part3></part2>",
@@ -5312,7 +5313,7 @@
     "text_b169cf44e42adb": "En el perfil de empresa encontrarás «Solicitar vinculación» en «Más acciones». Selecciona funciones y añade un mensaje si lo necesitas. La vinculación solo se hace pública tras la confirmación. Los responsables de empresa pueden invitar a miembros registrados; la invitación también debe aceptarse.",
     "text_4a610b516161ec": "¿Cuántas fotos puedo subir?",
     "text_e1893e6dffad16": "En el mercado puedes subir hasta 10 fotos por artículo y en las localizaciones hasta 20. Los formularios indican los formatos compatibles y los límites de tamaño. Los perfiles personales y las empresas tienen sus propios campos de fotos y galerías.",
-    "text_6799588f07af0d": "¿Qué imágenes aparecen en «Miradas recientes»?",
+    "text_6799588f07af0d": "¿Qué imágenes aparecen en «Nuevas fotos»?",
     "text_620b510d55014a": "Pueden aparecer automáticamente fotos públicas de perfil, portadas y fotos personales de portfolio subidas directamente, así como logotipos, portadas y galerías de empresas. No se incluyen imágenes de proyectos, mercado, localizaciones o tablón, ni contenidos privados o archivos adjuntos de mensajes.",
     "text_42cae79597c266": "Seguridad y confianza",
     "text_2e5ba026b3573b": "¿CineGenius es fiable?",
@@ -12699,7 +12700,11 @@
     "removeLabel": "Eliminar a {name} de los contactos",
     "confirmRemove": "¿Quieres eliminar a {name} de tus contactos?",
     "cancel": "Cancelar",
-    "removing": "Eliminando …"
+    "removing": "Eliminando …",
+    "homies": "Homies",
+    "homiesHint": "Marca a tus amigos con una estrella para añadirlos a Homies. Solo tú ves esta selección.",
+    "addHomie": "Añadir a {name} a Homies",
+    "removeHomie": "Quitar a {name} de Homies"
   },
   "MessagingBackend": {
     "invalid": "Comprueba el mensaje y las personas seleccionadas.",
@@ -13424,7 +13429,8 @@
     "filterType": "Filtrar por sección",
     "noMatches": "Todavía no has guardado nada en esta sección.",
     "signInHint": "Inicia sesión para ver tus elementos guardados.",
-    "removeItem": "Eliminar {name} de los elementos guardados"
+    "removeItem": "Eliminar {name} de los elementos guardados",
+    "searchEmpty": "No se encontraron elementos guardados."
   },
   "OccupationForm": {
     "title": "Forma de tus profesiones",

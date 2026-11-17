@@ -171,8 +171,8 @@ function BookingContent() {
     : (profile?.display_name ?? uiText("Ui.text_276ffa1fb4f970"));
 
   return (
-    <div className="min-h-screen bg-bg-primary pt-16">
-      <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+    <div className="min-h-screen bg-bg-primary pt-16 mobile-bottom-nav-clear">
+      <div className="max-w-2xl mx-auto px-4 py-6 sm:px-6 sm:py-8">
 
         {/* Back */}
         <div className="flex items-center gap-3 mb-8">
@@ -242,7 +242,7 @@ function BookingContent() {
             </select>
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div>
               <label className="block text-xs uppercase tracking-widest text-text-muted font-semibold mb-1.5">{uiText("Ui.text_4a48ddb0bc0012")}</label>
               <div className="relative">
@@ -304,7 +304,7 @@ function BookingContent() {
             </div>
           )}
 
-          <div className="flex gap-3 pt-2">
+          <div className="flex flex-wrap gap-3 pt-2">
             <button
               type="button"
               onClick={() => router.back()}

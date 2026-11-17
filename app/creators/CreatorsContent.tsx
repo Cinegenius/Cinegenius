@@ -88,7 +88,6 @@ export type ServerCreator = {
   travel?: string;
   focal_point?: ProfileFocalPoint;
   isVendor?: boolean;
-  last_seen_at?: string | null;
 };
 
 
@@ -405,7 +404,7 @@ function CreatorsInner({
     return prioritizeGeographically(result, geography.preferred);
   }, [query, selectedRoles, sidebarDept, availableOnly, vendorOnly, near, cityText, cityFilter, countryFilter, regionFilter, languageFilter,
       profileTypeFilter, hairFilter, eyeFilter, bodyFilter, travelFilter, ageMinFilter, ageMaxFilter,
-      sortKey, allCreators, isTopMode, locale, uiText, geography.preferred]);
+      sortKey, allCreators, locale, uiText, geography.preferred]);
 
   const filterKey = JSON.stringify([query, [...selectedRoles].sort(), sidebarDept, availableOnly, vendorOnly,
     near, cityText, cityFilter, countryFilter, regionFilter, languageFilter, profileTypeFilter, hairFilter, eyeFilter, bodyFilter,
@@ -622,7 +621,6 @@ function CreatorsInner({
                           <div className="flex items-center gap-1.5">
                             <span className="text-sm font-semibold text-text-primary group-hover:text-gold transition-colors truncate">{c.name}</span>
                             {c.verified && <CheckCircle size={11} className="text-gold/60 shrink-0" />}
-                            {c.available && c.last_seen_at && (Date.now() - new Date(c.last_seen_at).getTime() < 14 * 24 * 60 * 60 * 1000) && <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 shrink-0" title={tc("available")} />}
                           </div>
                           <p className="text-[11px] text-text-muted truncate">{displayPositions.slice(0, 2).join(" · ")}</p>
                         </div>
