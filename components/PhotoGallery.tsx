@@ -1,11 +1,12 @@
 "use client";
 
 import Link from "next/link";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { DiscoverPhoto, PhotoDialog } from "@/components/HomePhotoDiscovery";
 import MediaImage from "@/components/MediaImage";
 import { photoHref } from "@/lib/photo-link";
+import { replaceViewUrl } from "@/lib/view-url-sync";
 import PhotoLikeButton from "@/components/PhotoLikeButton";
 import { communityPreviewUrl } from "@/lib/community-preview";
 import { useTranslations } from "next-intl";
@@ -17,14 +18,26 @@ export function PhotoGallery({
   items,
   selectedPhoto,
   resumeLike,
+  discoverySeed,
+  page = 1,
 }: {
   items: GalleryItem[];
   selectedPhoto: DiscoverPhoto | null;
   resumeLike: boolean;
+  discoverySeed?: string;
+  page?: number;
 }) {
   const uiText = useTranslations();
 
   const router = useRouter();
+  const galleryHref = discoverySeed ? `/photo?page=${page}&seed=${discoverySeed}` : "/photo";
+  useEffect(() => {
+    if (!discoverySeed || window.location.pathname !== "/photo") return;
+    const url = new URL(window.location.href);
+    if (url.searchParams.get("seed") === discoverySeed) return;
+    url.searchParams.set("seed", discoverySeed);
+    replaceViewUrl(window, `${url.pathname}${url.search}`);
+  }, [discoverySeed]);
   const [failedImages, setFailedImages] = useState<Set<string>>(new Set());
   const visibleItems = items.filter((item) => !failedImages.has(item.imageUrl));
   const closePhoto = useCallback(() => {
@@ -34,8 +47,8 @@ export function PhotoGallery({
       sessionStorage.removeItem("cinegenius-photo-return");
     } catch { /* Fall back to the gallery route if browser storage is blocked. */ }
     if (cameFromInside && window.history.length > 1) router.back();
-    else router.replace("/photo");
-  }, [router]);
+    else router.replace(galleryHref);
+  }, [router, galleryHref]);
 
   return (
     <>
@@ -46,7 +59,7 @@ export function PhotoGallery({
             {visibleItems.map((item) => (
               <article role="listitem" key={`${item.profileId}-${item.imageUrl}`} className="relative block w-full break-inside-avoid overflow-hidden">
                 <Link
-                  href={photoHref(item.profileId, item.imageUrl)}
+                  href={photoHref(item.profileId, item.imageUrl) + (discoverySeed ? `&page=${page}&seed=${discoverySeed}` : "")}
                   onClick={() => { try { sessionStorage.setItem("cinegenius-photo-return", "1"); } catch {} }}
                   aria-label={uiText("Ui.text_4398dcac9447f8", { value1: String(item.author), value2: String(item.caption ? uiText("Ui.text_92dd63d2f3b4b1", { value1: String(item.caption) }) : "") })}
                   className="relative block overflow-hidden focus-visible:outline focus-visible:outline-2 focus-visible:outline-gold focus-visible:-outline-offset-2"

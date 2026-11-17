@@ -1,3 +1,4 @@
+import HomeProjects from "@/components/HomeProjects";
 import { NOTICE_CARD_STYLES } from "@/lib/notice-card-styles";
 import { occupationFormFromCrew } from "@/lib/occupation-form";
 import { profileOccupationPreview, type OccupationProfile } from "@/lib/crew-occupations";
@@ -35,7 +36,7 @@ export const revalidate = 60;
 
 import {
   MapPin, Briefcase, ArrowRight, CheckCircle,
-  Clock, Package2, Film, Building2, UsersRound, Newspaper, Smartphone,
+  Clock, Package2, Building2, UsersRound, Newspaper, Smartphone,
 } from "lucide-react";
 import HeroSearch from "@/components/HeroSearch";
 import HomeCommunityBoard from "@/components/HomeCommunityBoard";
@@ -47,9 +48,9 @@ import { COMPANY_CATEGORIES } from "@/lib/companyCategories";
 import { HomePhotoDiscovery, type DiscoverPhoto } from "@/components/HomePhotoDiscovery";
 import { PROFILE_TYPE_LABELS, type ProfileType } from "@/lib/profile-types";
 import { isPeopleDirectoryProfile } from "@/lib/profile-provider-filters";
-import { getPrivateProfileIds } from "@/lib/trust";
 import { taxonomyLabel } from "@/lib/departments";
 import { getCommunityMedia } from "@/lib/community-media-server";
+import { discoverySeed } from "@/lib/discovery-order-server";
 import { getTranslations as getMetadataTranslations } from "next-intl/server";
 
 type HomeProfileRow = {
@@ -102,7 +103,7 @@ async function getHomeData() {
     db.from("privacy_visible_listings").select("id,title,city,price,created_at").eq("type", "job").eq("published", true).order("created_at", { ascending: false }).limit(4),
     homeMarketplaceOffers(currentTime),
     db.from("companies").select("id,slug,name,logo_url,city,categories").eq("published", true).order("created_at", { ascending: false }).limit(6),
-    db.from("profiles").select("user_id,slug,display_name,tagline,avatar_url,location,verified,role,positions,crew,profile_type,profile_types,created_at").not("display_name", "is", null).neq("display_name", "").order("created_at", { ascending: false }).limit(300),
+    db.rpc("random_crew_profiles", { p_seed: discoverySeed(), p_limit: 300 }).select("user_id,slug,display_name,tagline,avatar_url,location,verified,role,positions,crew,profile_type,profile_types,created_at").limit(300),
   ]);
   if (results.some(result => result.error)) throw new Error("Homepage recommendations unavailable");
   const [
@@ -147,11 +148,9 @@ async function getHomeData() {
       createdAt: profile.created_at ?? "",
     };
   });
-  // Keep this homepage selection strictly chronological: the latest eligible
-  // public people profiles always occupy the first positions.
-  const newCrew = peopleSummaries
-    .sort((a, b) => b.createdAt.localeCompare(a.createdAt) || a.name.localeCompare(b.name, marketLocale))
-    .slice(0, 10);
+  // The database shuffles the whole candidate set before the bounded fetch.
+  // Privacy and person eligibility still apply before selecting visible cards.
+  const newCrew = peopleSummaries.slice(0, 10);
 
   const liveLocations = (recentLocations ?? []).map((l) => ({
     id: l.id as string,
@@ -371,8 +370,17 @@ async function HomePhotoRecommendations({ viewerId }: { viewerId: string | null 
   if (process.env.NODE_ENV === "development" && process.env.CINEGENIUS_LOCAL_PREVIEW === "1" && !(process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.SUPABASE_SERVICE_ROLE_KEY)) return null;
   let newPhotos: DiscoverPhoto[];
   try {
-    const { photos } = await getCommunityMedia({ limit: 24, viewerId, diverse: true, includeTotal: false, signal: AbortSignal.timeout(4000) });
-    newPhotos = photos.slice(0, 24);
+    const signal = AbortSignal.timeout(4000);
+    const [recent, mixed] = await Promise.all([
+      getCommunityMedia({ limit: 3, viewerId, diverse: true, includeTotal: false, signal }),
+      getCommunityMedia({ limit: 24, viewerId, randomSeed: discoverySeed(), includeTotal: false, signal }),
+    ]);
+    const seen = new Set<string>();
+    newPhotos = [...recent.photos, ...mixed.photos].filter(photo => {
+      if (seen.has(photo.imageUrl)) return false;
+      seen.add(photo.imageUrl);
+      return true;
+    }).slice(0, 24);
   } catch {
     console.error("[homepage] Photo discovery unavailable");
     return null;
@@ -439,6 +447,6 @@ export default async function HomePage() {
     <Suspense fallback={null}><HomePhotoRecommendations viewerId={userId} /></Suspense>
     <Suspense fallback={null}><HomePartnersAndLocations dataPromise={dataPromise} /></Suspense>
     <HomeCommunityBoard loggedIn={isLoggedIn} />
-    <section className="site-container py-5 sm:py-7" aria-labelledby="home-projects-title"><div className="home-section-divider home-section-divider--border flex flex-wrap items-center justify-between gap-x-4 gap-y-1 border-t border-transparent pt-4"><h2 id="home-projects-title" className="flex items-center gap-2 text-sm font-medium text-text-muted"><Film size={15} aria-hidden="true" />{t("projectsTitle")}</h2><Link href="/projects/alle" className="inline-flex min-h-11 items-center gap-1 text-sm text-text-secondary hover:text-gold">{t("findProjectsLink")} <ArrowRight size={13} /></Link></div></section>
+    <Suspense fallback={null}><HomeProjects /></Suspense>
   </main>;
 }

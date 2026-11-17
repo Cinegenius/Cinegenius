@@ -273,7 +273,7 @@
     "findCompaniesTitle": "Empresas",
     "findProjectsLink": "Ver proyectos",
     "offerLocationAction": "Ofrecer localización",
-    "newCrewTitle": "Nuevos miembros del equipo",
+    "newCrewTitle": "Descubre profesionales",
     "crewScrollHint": "Desliza hacia los lados para descubrir más miembros",
     "locationScrollHint": "Desliza hacia los lados para descubrir más localizaciones",
     "railPrevious": "Desplazar hacia atrás",
@@ -344,7 +344,8 @@
     "findJobsDescription": "Empleos y encargos.",
     "findJobsLink": "Ver empleos",
     "railPage": "Vista {page} de {total}",
-    "appComingSoon": "CineGenius, pronto también como aplicación."
+    "appComingSoon": "CineGenius, pronto también como aplicación.",
+    "projectScrollHint": "Descubre más proyectos: desliza hacia los lados"
   },
   "locations": {
     "heroTitle": "La locación perfecta",
@@ -452,7 +453,8 @@
     "filterCountry": "País",
     "loadMoreApi": "Cargar más perfiles",
     "emptyActionCreate": "Crear perfil",
-    "emptyActionReset": "Restablecer filtros"
+    "emptyActionReset": "Restablecer filtros",
+    "sortRandom": "Aleatorio"
   },
   "props": {
     "heroBadge": "Mercado",

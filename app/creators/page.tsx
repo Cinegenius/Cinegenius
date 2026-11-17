@@ -9,10 +9,9 @@ import { placeReadFields } from "@/lib/places/catalog";
 import { isPeopleDirectoryProfile } from "@/lib/profile-provider-filters";
 import { crewOccupationIds } from "@/lib/crew-occupations";
 import { auth } from "@clerk/nextjs/server";
-import { unstable_cache } from "next/cache";
+import { discoverySeed, discoveryOrder } from "@/lib/discovery-order-server";
 import { db } from "@/lib/db";
 import { fetchRatings } from "@/lib/ratings";
-import { getPrivateProfileIds } from "@/lib/trust";
 import CreatorsContent, { type ServerCreator } from "./CreatorsContent";
 import { primaryOccupationForPositions, occupationReference } from "@/lib/primary-occupation";
 import PageHeader from "@/components/PageHeader";
@@ -51,7 +50,6 @@ type CreatorProfileRow = {
   verified: boolean | null;
   tagline: string | null;
   focal_point: { x: number; y: number } | null;
-  last_seen_at: string | null;
 };
 
 type CreatorListingRow = {
@@ -65,23 +63,19 @@ type CreatorListingRow = {
   description: string | null;
 };
 
-const getCreatorDirectoryData = unstable_cache(
-  async () => {
+const getCreatorDirectoryData = async (seed: string) => {
     const [listingResult, profileResult] = await Promise.all([
       db
-        .from("listings")
+        .rpc("random_crew_listings", { p_seed: seed })
         .select("place_country_code,place_region_id,place_city_id,place_city_name,place_region_name,place_status,id, user_id, title, category, city, price, image_url, description")
         .eq("published", true)
         .eq("type", "creator")
-        .order("created_at", { ascending: false })
         .limit(300),
       db
-        .from("profiles")
-        .select("place_country_code,place_region_id,place_city_id,place_city_name,place_region_name,place_status,user_id, display_name, location, bio, skills, role, positions, crew, available, avatar_url, portfolio_images, languages, profile_types, profile_type, physical, availability_config, day_rate, travel_ready, verified, tagline, focal_point, last_seen_at")
+        .rpc("random_crew_profiles", { p_seed: seed })
+        .select("place_country_code,place_region_id,place_city_id,place_city_name,place_region_name,place_status,user_id, display_name, location, bio, skills, role, positions, crew, available, avatar_url, portfolio_images, languages, profile_types, profile_type, physical, availability_config, day_rate, travel_ready, verified, tagline, focal_point")
         .not("display_name", "is", null)
         .neq("display_name", "")
-        .order("display_name", { ascending: true })
-        .order("user_id", { ascending: true })
         .limit(96),
     ]);
 
@@ -96,10 +90,7 @@ const getCreatorDirectoryData = unstable_cache(
     ]);
 
     return { listings, profiles, listingRatings, profileRatings };
-  },
-  ["people-directory-alphabetical-v8"],
-  { revalidate: 60, tags: ["creator-directory", "profiles", "listings"] },
-);
+};
 
 export const revalidate = 60;
 
@@ -144,12 +135,13 @@ export default async function CreatorsPage({
 
 
   const locale = await getLocale();
-  const [t, tCommon, { userId }, directoryData, params] = await Promise.all([
+  const params = await searchParams;
+  const seed = discoverySeed(params.seed);
+  const [t, tCommon, { userId }, directoryData] = await Promise.all([
     getTranslations("creators"),
     getTranslations("common"),
     auth(),
-    getCreatorDirectoryData(),
-    searchParams,
+    getCreatorDirectoryData(seed),
   ]);
   const { listings: cachedListings, profiles, listingRatings, profileRatings } = directoryData;
   const listings = await filterPublicListings(cachedListings);
@@ -258,7 +250,6 @@ export default async function CreatorsPage({
         height_cm: phys.height_cm ?? null,
         travel: avail.travel ?? (p.travel_ready ? "national" : ""),
         focal_point: p.focal_point ?? undefined,
-        last_seen_at: p.last_seen_at ?? null,
       };
     });
 
@@ -286,7 +277,8 @@ export default async function CreatorsPage({
         cta={!hasProfile ? { label: t("heroCta"), href: "/profile" } : undefined}
       />
       <CreatorsContent
-        serverCreators={serverCreators}
+        serverCreators={serverCreators.map(creator => ({ ...creator, discoveryOrder: discoveryOrder(seed, creator.ownerId ?? creator.id) }))}
+        discoverySeed={seed}
         hasMoreProfiles={profiles.length >= 96}
         initialFilters={{
           genie: params.genie === "1",

@@ -273,7 +273,7 @@
     "findCompaniesTitle": "Företag",
     "findProjectsLink": "Visa projekt",
     "offerLocationAction": "Erbjud en inspelningsplats",
-    "newCrewTitle": "Nya medlemmar i filmteamet",
+    "newCrewTitle": "Upptäck filmteam",
     "crewScrollHint": "Svep åt sidan för att upptäcka fler medlemmar",
     "locationScrollHint": "Svep åt sidan för att upptäcka fler inspelningsplatser",
     "railPrevious": "Bläddra bakåt",
@@ -344,7 +344,8 @@
     "findJobsDescription": "Jobb och uppdrag.",
     "findJobsLink": "Visa jobb",
     "railPage": "Vy {page} av {total}",
-    "appComingSoon": "CineGenius kommer snart som app."
+    "appComingSoon": "CineGenius kommer snart som app.",
+    "projectScrollHint": "Upptäck fler projekt – svep åt sidan"
   },
   "locations": {
     "heroTitle": "Den perfekta inspelningsplatsen",
@@ -452,7 +453,8 @@
     "filterCountry": "Land",
     "loadMoreApi": "Läs in fler profiler",
     "emptyActionCreate": "Skapa profil",
-    "emptyActionReset": "Återställ filter"
+    "emptyActionReset": "Återställ filter",
+    "sortRandom": "Slumpmässigt"
   },
   "props": {
     "heroBadge": "Marknadsplats",

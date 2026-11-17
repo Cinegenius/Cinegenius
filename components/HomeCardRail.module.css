@@ -3,6 +3,7 @@
 .location { --rail-card-width: 72%; }
 /* Each news page keeps three compact rows; vertical gestures scroll the page. */
 .news { --rail-card-width: 100%; }
+.project { --rail-card-width: min(82vw, 280px); }
 .track {
   display: grid;
   grid-auto-flow: column;
@@ -51,3 +52,5 @@
   .location.wide { --rail-card-width: calc((100% - 32px) / 3); }
   .track { gap: 16px; }
 }
+
+@media (min-width: 1024px) { .project { --rail-card-width: calc((100% - 48px) / 4); } }

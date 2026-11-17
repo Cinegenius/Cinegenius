@@ -36,6 +36,8 @@ Evidence is kept outside the repository at `/srv/cinegenius/research/20261117-ma
 
 ## Separate pending work
 
+The later discovery follow-up is recorded in `docs/shared-discovery-follow-up-20261118.md`; the list below describes the boundary of commit `b02040d`.
+
 This patch does not restructure Location/Marketplace/other-offer forms, required search metadata or category taxonomies. Also separate: stable random Crew discovery, new-then-mixed photo discovery, company logo enlargement, removing online/activity indicators, the approved alternative public-profile presentation, data-backed organization occupation filters, and physical-device checks. Existing unrelated app proposals must not be reported as implemented or live by this refresh.
 
 Follow-up checks: actual photo-band component with synthetic images passes continuous-hover, pause/resume, keyboard, pointer-drag recovery and reduced-motion checks at 390/834/1440 px. Job styling is checked as an isolated rendering of the source classes with the existing compiled stylesheet at 320/390/834/1440 px, not a fresh production build.

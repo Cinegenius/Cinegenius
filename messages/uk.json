@@ -287,7 +287,7 @@
     "findCompaniesTitle": "Компанії",
     "findProjectsLink": "Переглянути проєкти",
     "offerLocationAction": "Запропонувати локацію",
-    "newCrewTitle": "Нові члени команди",
+    "newCrewTitle": "Відкривайте фахівців",
     "crewScrollHint": "Проведіть вбік, щоб побачити більше учасників",
     "locationScrollHint": "Проведіть вбік, щоб побачити більше локацій",
     "railPrevious": "Прокрутити назад",
@@ -358,7 +358,8 @@
     "findJobsDescription": "Вакансії та завдання.",
     "findJobsLink": "Переглянути вакансії",
     "railPage": "Перегляд {page} з {total}",
-    "appComingSoon": "Додаток CineGenius скоро буде доступний."
+    "appComingSoon": "Додаток CineGenius скоро буде доступний.",
+    "projectScrollHint": "Більше проєктів — гортайте вбік"
   },
   "locations": {
     "heroTitle": "Ідеальна локація",
@@ -466,7 +467,8 @@
     "filterCountry": "Країна",
     "loadMoreApi": "Завантажити більше профілів",
     "emptyActionCreate": "Створити профіль",
-    "emptyActionReset": "Скинути фільтри"
+    "emptyActionReset": "Скинути фільтри",
+    "sortRandom": "Випадковий порядок"
   },
   "props": {
     "heroBadge": "Маркетплейс",

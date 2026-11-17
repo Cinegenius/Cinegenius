@@ -287,7 +287,7 @@
     "findCompaniesTitle": "업체",
     "findProjectsLink": "프로젝트 둘러보기",
     "offerLocationAction": "로케이션 제공",
-    "newCrewTitle": "새로운 크루 멤버",
+    "newCrewTitle": "제작진 둘러보기",
     "crewScrollHint": "옆으로 스와이프하여 더 많은 멤버 보기",
     "locationScrollHint": "옆으로 스와이프하여 더 많은 로케이션 보기",
     "railPrevious": "뒤로 스크롤",
@@ -358,7 +358,8 @@
     "findJobsDescription": "채용 공고 및 과제.",
     "findJobsLink": "채용 공고 보기",
     "railPage": "{total} 중 {page} 페이지 보기",
-    "appComingSoon": "CineGenius 앱이 곧 출시됩니다."
+    "appComingSoon": "CineGenius 앱이 곧 출시됩니다.",
+    "projectScrollHint": "옆으로 밀어 더 많은 프로젝트를 살펴보세요"
   },
   "locations": {
     "landingBadge": "촬영 장소",
@@ -466,7 +467,8 @@
     "filterCountry": "국가",
     "loadMoreApi": "프로필 더 불러오기",
     "emptyActionCreate": "프로필 만들기",
-    "emptyActionReset": "필터 초기화"
+    "emptyActionReset": "필터 초기화",
+    "sortRandom": "무작위"
   },
   "props": {
     "heroBadge": "마켓플레이스",

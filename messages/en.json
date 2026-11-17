@@ -273,7 +273,7 @@
     "findCompaniesTitle": "Companies",
     "findProjectsLink": "Browse projects",
     "offerLocationAction": "Offer a location",
-    "newCrewTitle": "New crew members",
+    "newCrewTitle": "Discover crew",
     "crewScrollHint": "Swipe sideways to discover more members",
     "locationScrollHint": "Swipe sideways to discover more locations",
     "railPrevious": "Scroll back",
@@ -344,7 +344,8 @@
     "findJobsDescription": "Jobs and assignments.",
     "findJobsLink": "Browse jobs",
     "railPage": "View {page} of {total}",
-    "appComingSoon": "The CineGenius app is coming soon."
+    "appComingSoon": "The CineGenius app is coming soon.",
+    "projectScrollHint": "Discover more projects – swipe sideways"
   },
   "locations": {
     "heroTitle": "The perfect location",
@@ -452,7 +453,8 @@
     "filterCountry": "Country",
     "loadMoreApi": "Load more profiles",
     "emptyActionCreate": "Create profile",
-    "emptyActionReset": "Reset filters"
+    "emptyActionReset": "Reset filters",
+    "sortRandom": "Random"
   },
   "props": {
     "heroBadge": "Marketplace",

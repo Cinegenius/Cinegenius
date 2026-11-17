@@ -65,19 +65,6 @@ type Creator = {
   ownerId?: string;
 };
 
-function formatLastSeen(translate: (key: string, values?: Record<string, string | number>) => string, isoDate: string, now: number): string {
-  const diff = now - new Date(isoDate).getTime();
-  const mins = Math.floor(diff / 60000);
-  const hours = Math.floor(diff / 3600000);
-  const days = Math.floor(diff / 86400000);
-  if (mins < 5) return translate("Ui.text_41dd5825403591");
-  if (mins < 60) return translate("Ui.text_40f6da5e688a71", { count: mins });
-  if (hours < 24) return translate("Ui.text_a0e76b0367d9d0", { count: hours });
-  if (days < 7) return translate("Ui.text_7d876c5f235da3", { count: days });
-  if (days < 30) return translate("Ui.text_f82ed0be81f8a3", { count: Math.floor(days / 7) });
-  return translate("Ui.text_439b74405c4d4a");
-}
-
 function getEmbedUrl(url: string): string | null {
   const yt = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&\s]+)/);
   if (yt) return `https://www.youtube.com/embed/${yt[1]}`;
@@ -128,7 +115,6 @@ export default function CreatorDetail({
   const profileText = useTranslations("profile");
   const bookingCopy = useTranslations("BookingRequest");
   const tcr = useTranslations("creators");
-  const [viewTime] = useState(Date.now);
   const [activeSection, setActiveSection] = useState<"inquiry" | "message">("inquiry");
   const [message, setMessage] = useState("");
   const [msgSending, setMsgSending] = useState(false);
@@ -300,12 +286,7 @@ export default function CreatorDetail({
               {creator.travel_ready && (
                 <span className="flex items-center gap-1"><Plane size={13} /> {profileText("fieldTravelReady")}</span>
               )}
-              {creator.last_seen_at && (
-                <span className="flex items-center gap-1.5">
-                  <span className={`w-2 h-2 rounded-full ${viewTime - new Date(creator.last_seen_at).getTime() < 5 * 60000 ? "bg-success" : "bg-text-muted"}`} />
-                  {formatLastSeen(uiText, creator.last_seen_at, viewTime)}
-                </span>
-              )}
+
             </div>
           </div>
         </div>

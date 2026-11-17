@@ -1,3 +1,13 @@
+/** Update the address without refetching lists, retaining real history-entry state. */
+export function replaceViewUrl(browser: Window, href: string): void {
+  const state = { ...browser.history.state };
+  // Next restores these flags itself. Passing them marks this as an internal
+  // router write and would prevent useSearchParams from seeing the new URL.
+  delete state.__NA;
+  delete state._N;
+  browser.history.replaceState(state, "", href);
+}
+
 /** A delayed filter update must never win over a link click or history traversal. */
 export function scheduleViewUrlReplace(
   browser: Window,

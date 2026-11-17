@@ -273,7 +273,7 @@
     "findCompaniesTitle": "Cégek",
     "findProjectsLink": "Projektek böngészése",
     "offerLocationAction": "Helyszín felajánlása",
-    "newCrewTitle": "Új stábtagok",
+    "newCrewTitle": "Fedezd fel a filmes szakembereket",
     "crewScrollHint": "Húzd oldalra a további tagokért",
     "locationScrollHint": "Húzd oldalra a további helyszínekért",
     "railPrevious": "Lapozás vissza",
@@ -344,7 +344,8 @@
     "findJobsDescription": "Állások és megbízások.",
     "findJobsLink": "Állások böngészése",
     "railPage": "{page}. nézet, összesen {total}",
-    "appComingSoon": "A CineGenius hamarosan alkalmazásként is elérhető."
+    "appComingSoon": "A CineGenius hamarosan alkalmazásként is elérhető.",
+    "projectScrollHint": "Fedezz fel további projekteket – lapozz oldalra"
   },
   "locations": {
     "heroTitle": "A tökéletes helyszín",
@@ -452,7 +453,8 @@
     "filterCountry": "Ország",
     "loadMoreApi": "További profilok betöltése",
     "emptyActionCreate": "Profil létrehozása",
-    "emptyActionReset": "Szűrők visszaállítása"
+    "emptyActionReset": "Szűrők visszaállítása",
+    "sortRandom": "Véletlenszerű"
   },
   "props": {
     "heroBadge": "Piac",

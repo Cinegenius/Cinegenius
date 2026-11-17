@@ -273,7 +273,7 @@
     "findCompaniesTitle": "Bedrijven",
     "findProjectsLink": "Projecten bekijken",
     "offerLocationAction": "Locatie aanbieden",
-    "newCrewTitle": "Nieuwe crewleden",
+    "newCrewTitle": "Ontdek crewleden",
     "crewScrollHint": "Veeg opzij om meer leden te ontdekken",
     "locationScrollHint": "Veeg opzij om meer locaties te ontdekken",
     "railPrevious": "Terugbladeren",
@@ -344,7 +344,8 @@
     "findJobsDescription": "Banen en opdrachten.",
     "findJobsLink": "Vacatures bekijken",
     "railPage": "Weergave {page} van {total}",
-    "appComingSoon": "CineGenius binnenkort ook als app."
+    "appComingSoon": "CineGenius binnenkort ook als app.",
+    "projectScrollHint": "Ontdek meer projecten – veeg opzij"
   },
   "locations": {
     "heroTitle": "De perfecte locatie",
@@ -452,7 +453,8 @@
     "filterCountry": "Land",
     "loadMoreApi": "Meer profielen laden",
     "emptyActionCreate": "Profiel aanmaken",
-    "emptyActionReset": "Filters resetten"
+    "emptyActionReset": "Filters resetten",
+    "sortRandom": "Willekeurig"
   },
   "props": {
     "heroBadge": "Marktplaats",

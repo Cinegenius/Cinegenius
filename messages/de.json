@@ -273,7 +273,7 @@
     "findCompaniesTitle": "Firmen",
     "findProjectsLink": "Projekte ansehen",
     "offerLocationAction": "Location anbieten",
-    "newCrewTitle": "Neue Crew Mitglieder",
+    "newCrewTitle": "Crew entdecken",
     "crewScrollHint": "Weitere Mitglieder entdecken – seitlich wischen",
     "locationScrollHint": "Weitere Locations entdecken – seitlich wischen",
     "railPrevious": "Zurückblättern",
@@ -344,7 +344,8 @@
     "findJobsDescription": "Jobs und Aufträge.",
     "findJobsLink": "Jobs ansehen",
     "railPage": "Ansicht {page} von {total}",
-    "appComingSoon": "CineGenius bald auch als App."
+    "appComingSoon": "CineGenius bald auch als App.",
+    "projectScrollHint": "Weitere Projekte entdecken – seitlich wischen"
   },
   "locations": {
     "heroTitle": "Die perfekte Location",
@@ -452,7 +453,8 @@
     "filterCountry": "Land",
     "loadMoreApi": "Weitere Profile laden",
     "emptyActionCreate": "Profil anlegen",
-    "emptyActionReset": "Filter zurücksetzen"
+    "emptyActionReset": "Filter zurücksetzen",
+    "sortRandom": "Zufällig"
   },
   "props": {
     "heroBadge": "Marktplatz",

@@ -287,7 +287,7 @@
     "findCompaniesTitle": "企業",
     "findProjectsLink": "プロジェクトを閲覧",
     "offerLocationAction": "ロケ地を提供する",
-    "newCrewTitle": "新しいクルーメンバー",
+    "newCrewTitle": "制作スタッフを探す",
     "crewScrollHint": "横にスワイプして他のメンバーを探す",
     "locationScrollHint": "横にスワイプして他のロケ地を探す",
     "railPrevious": "前へスクロール",
@@ -358,7 +358,8 @@
     "findJobsDescription": "仕事と案件。",
     "findJobsLink": "仕事を探す",
     "railPage": "{total}中の{page}ページを表示",
-    "appComingSoon": "CineGeniusアプリがまもなく登場します。"
+    "appComingSoon": "CineGeniusアプリがまもなく登場します。",
+    "projectScrollHint": "横にスワイプして、ほかのプロジェクトを見る"
   },
   "locations": {
     "heroTitle": "完璧なロケーション",
@@ -466,7 +467,8 @@
     "filterCountry": "国",
     "loadMoreApi": "プロフィールをさらに読み込む",
     "emptyActionCreate": "プロフィールを作成",
-    "emptyActionReset": "フィルターをリセット"
+    "emptyActionReset": "フィルターをリセット",
+    "sortRandom": "ランダム"
   },
   "props": {
     "heroBadge": "マーケットプレイス",

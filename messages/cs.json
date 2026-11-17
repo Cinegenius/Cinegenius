@@ -273,7 +273,7 @@
     "findCompaniesTitle": "Firmy",
     "findProjectsLink": "Prohlédnout projekty",
     "offerLocationAction": "Nabídnout lokaci",
-    "newCrewTitle": "Noví členové štábu",
+    "newCrewTitle": "Objevte filmové profesionály",
     "crewScrollHint": "Další členy objevíš přejetím do strany",
     "locationScrollHint": "Další lokace objevíš přejetím do strany",
     "railPrevious": "Posunout zpět",
@@ -344,7 +344,8 @@
     "findJobsDescription": "Práce a zakázky.",
     "findJobsLink": "Prohlédnout zakázky",
     "railPage": "Zobrazení {page} z {total}",
-    "appComingSoon": "CineGenius brzy také jako aplikace."
+    "appComingSoon": "CineGenius brzy také jako aplikace.",
+    "projectScrollHint": "Objev další projekty – přejeď do strany"
   },
   "locations": {
     "heroTitle": "Perfektní lokace",
@@ -452,7 +453,8 @@
     "filterCountry": "Země",
     "loadMoreApi": "Načíst další profily",
     "emptyActionCreate": "Vytvořit profil",
-    "emptyActionReset": "Resetovat filtry"
+    "emptyActionReset": "Resetovat filtry",
+    "sortRandom": "Náhodně"
   },
   "props": {
     "heroBadge": "Tržiště",

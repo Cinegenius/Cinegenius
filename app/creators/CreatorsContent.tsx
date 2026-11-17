@@ -51,6 +51,7 @@ type CrewInitialFilters = { query: string; city: string; sort: string; cityText?
 
 export type ServerCreator = {
   id: string;
+  discoveryOrder?: string;
   ownerId?: string;
   name: string;
   role: string;
@@ -87,7 +88,6 @@ export type ServerCreator = {
   travel?: string;
   focal_point?: ProfileFocalPoint;
   isVendor?: boolean;
-  last_seen_at?: string | null;
 };
 
 
@@ -113,10 +113,12 @@ function hasProfileType(c: ServerCreator, ...types: string[]): boolean {
 function CreatorsInner({
   serverCreators,
   hasMoreProfiles = false,
+  discoverySeed,
   initialFilters,
 }: {
   serverCreators: ServerCreator[];
   hasMoreProfiles?: boolean;
+  discoverySeed: string;
   initialFilters: CrewInitialFilters;
 }) {
   const taxonomyText = useTranslations("Taxonomy");
@@ -179,7 +181,7 @@ function CreatorsInner({
     scope.controller = controller;
     setLoadingMore(true);
     try {
-      const res = await fetch(`/api/creators?page=${scope.page}`, { signal: controller.signal });
+      const res = await fetch(`/api/creators?page=${scope.page}&seed=${encodeURIComponent(discoverySeed)}`, { signal: controller.signal, cache: "no-store" });
       if (!res.ok) throw new Error(uiText("Ui.text_3246f5de17bad7"));
       const { creators, hasMore } = await res.json();
       // A URL/session refresh replaces the first page. Older requests cannot finish that new sequence.
@@ -196,7 +198,7 @@ function CreatorsInner({
     } finally {
       if (scope.active && directoryRequest.current === scope) { scope.controller = null; setLoadingMore(false); }
     }
-  }, [serverCreators, uiText]);
+  }, [serverCreators, discoverySeed, uiText]);
 
   // Fetch bounded pages so filters also see profiles beyond the initial page.
   useEffect(() => {
@@ -215,8 +217,9 @@ function CreatorsInner({
   const cityLabel = (value: string) => cityOptions.find(o => o.value === value)?.label ?? value;
   const countryLabel = (value: string) => value === UNASSIGNED_COUNTRY ? uiText("Places.countryUnassigned") : countryOptions.find(o => o.value === value)?.label ?? value;
   const regionLabel = (value: string) => regionOptions.find(option => option.value === value)?.label ?? value;
-  const [sortKey, setSortKey] = useViewState("crew.sortKey", () => ["rating", "reviews"].includes(initialFilters.sort) ? initialFilters.sort : "featured");
-  const geography = useBrowseGeography(sortKey === "featured" && !countryFilter && !regionFilter && !cityFilter && !cityText && !near);
+  const [storedSortKey, setSortKey] = useViewState("crew.sortKey", () => ["rating", "reviews", "alphabetical"].includes(initialFilters.sort) ? initialFilters.sort : "random");
+  const sortKey = storedSortKey === "featured" ? "random" : storedSortKey;
+  const geography = useBrowseGeography(sortKey === "alphabetical" && !countryFilter && !regionFilter && !cityFilter && !cityText && !near);
   const [viewMode, setViewMode] = useViewState<DirectoryView>("crew.viewMode", () => initialFilters.view === "map" ? "map" : initialFilters.view === "list" ? "list" : "grid");
 
   // Neue Casting-Filter
@@ -303,6 +306,7 @@ function CreatorsInner({
   }, [launchKey]);
 
   const filterParams = new URLSearchParams();
+  filterParams.set("seed", discoverySeed);
   if (sidebarDept && departments.some(dept => dept.id === sidebarDept)) filterParams.set("department", sidebarDept);
   if (selectedRoles.size === 1) filterParams.set("role", [...selectedRoles][0]);
   if (near) { filterParams.set("near", near.id); filterParams.set("radius", String(near.radius)); }
@@ -311,7 +315,7 @@ function CreatorsInner({
   if (cityFilter) filterParams.set("city", cityFilter);
   if (countryFilter) filterParams.set("country", countryFilter);
   if (regionFilter) filterParams.set("region", regionFilter);
-  if (sortKey !== "featured") filterParams.set("sort", sortKey);
+  if (sortKey !== "random" && sortKey !== "featured") filterParams.set("sort", sortKey);
   if (viewMode !== "grid") filterParams.set("view", viewMode);
   useViewUrl(filterParams.size ? `/creators?${filterParams}` : "/creators");
 
@@ -391,14 +395,16 @@ function CreatorsInner({
       result = [...rated, ...unrated];
     } else if (sortKey === "reviews") {
       result.sort((a, b) => b.reviews - a.reviews || compareCreatorNames(a, b, locale));
-    } else {
+    } else if (sortKey === "alphabetical") {
       result.sort((a, b) => compareCreatorNames(a, b, locale));
+    } else {
+      result.sort((a, b) => (a.discoveryOrder ?? a.id).localeCompare(b.discoveryOrder ?? b.id) || a.id.localeCompare(b.id));
     }
 
     return prioritizeGeographically(result, geography.preferred);
   }, [query, selectedRoles, sidebarDept, availableOnly, vendorOnly, near, cityText, cityFilter, countryFilter, regionFilter, languageFilter,
       profileTypeFilter, hairFilter, eyeFilter, bodyFilter, travelFilter, ageMinFilter, ageMaxFilter,
-      sortKey, allCreators, isTopMode, locale, uiText, geography.preferred]);
+      sortKey, allCreators, locale, uiText, geography.preferred]);
 
   const filterKey = JSON.stringify([query, [...selectedRoles].sort(), sidebarDept, availableOnly, vendorOnly,
     near, cityText, cityFilter, countryFilter, regionFilter, languageFilter, profileTypeFilter, hairFilter, eyeFilter, bodyFilter,
@@ -459,13 +465,14 @@ function CreatorsInner({
     setNear(null);
     setSelectedRoles(new Set()); setSidebarDept(null); setQuery(""); setCityText(""); setCityFilter(""); setCountryFilter(""); setRegionFilter(""); setLanguageFilter("");
     setAvailableOnly(false); setVendorOnly(false); setProfileTypeFilter(""); setHairFilter(""); setEyeFilter(""); setBodyFilter("");
-    setAgeMinFilter(""); setAgeMaxFilter(""); setTravelFilter(""); setSortKey("featured");
+    setAgeMinFilter(""); setAgeMaxFilter(""); setTravelFilter(""); setSortKey("random");
   };
 
   const viewControls = <DirectoryViewControls value={viewMode} onChange={setViewMode} />;
 
   const SORT_OPTIONS = [
-    { value: "featured", label: geography.preferred ? uiText("BrowseGeography.recommended") : t("sortAlphabetical") },
+    { value: "random", label: t("sortRandom") },
+    { value: "alphabetical", label: geography.preferred ? uiText("BrowseGeography.recommended") : t("sortAlphabetical") },
     { value: "rating",   label: t("sortRating") },
     { value: "reviews",  label: t("sortRatingCount") },
   ];
@@ -492,7 +499,7 @@ function CreatorsInner({
         ]}
         categoryValue={sidebarDept ?? ""}
         onCategoryChange={(value) => { setSelectedRoles(new Set()); chooseSidebarDept(value || null); }}
-        resultCount={hasMoreFromApi ? null : isProviderFilter(sidebarDept) ? allCreators.length : filtered.length} resultSummary={hasMoreFromApi ? (loadError ? t("resultsLoadFailed") : t("resultsLoading")) : t("results", { count: isProviderFilter(sidebarDept) ? allCreators.length : filtered.length })}
+        resultCount={hasMoreFromApi ? null : filtered.length} resultSummary={hasMoreFromApi ? (loadError ? t("resultsLoadFailed") : t("resultsLoading")) : t("results", { count: filtered.length })}
         resultActions={<ProviderQuickFilters value={sidebarDept}
           crew={filterProviderProfiles(allCreators, CREW_PROVIDER_FILTER).length > 0}
           locations={filterProviderProfiles(allCreators, LOCATION_PROVIDER_FILTER).length > 0}
@@ -503,7 +510,7 @@ function CreatorsInner({
         chips={mobileChips}
         onReset={resetMobileFilters}
         resetLabel={t("resetFilters")}
-        showResultsLabel={t("showResults", { count: filtered.length })}
+        showResultsLabel={hasMoreFromApi ? (loadError ? t("resultsLoadFailed") : t("resultsLoading")) : t("showResults", { count: filtered.length })}
       >
         <PlaceFilters rows={allCreators} value={{country:countryFilter,region:regionFilter,city:cityFilter}} onChange={changePlaceFilters} />
         <MobileFilterField label={t("filterProfileType")}>
@@ -614,7 +621,6 @@ function CreatorsInner({
                           <div className="flex items-center gap-1.5">
                             <span className="text-sm font-semibold text-text-primary group-hover:text-gold transition-colors truncate">{c.name}</span>
                             {c.verified && <CheckCircle size={11} className="text-gold/60 shrink-0" />}
-                            {c.available && c.last_seen_at && (Date.now() - new Date(c.last_seen_at).getTime() < 14 * 24 * 60 * 60 * 1000) && <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 shrink-0" title={tc("available")} />}
                           </div>
                           <p className="text-[11px] text-text-muted truncate">{displayPositions.slice(0, 2).join(" · ")}</p>
                         </div>
@@ -713,11 +719,13 @@ function CreatorsInner({
 export default function CreatorsContent({
   serverCreators,
   hasMoreProfiles = false,
+  discoverySeed,
   initialFilters,
 }: {
   serverCreators: ServerCreator[];
   hasMoreProfiles?: boolean;
+  discoverySeed: string;
   initialFilters: CrewInitialFilters;
 }) {
-  return <CreatorsInner serverCreators={serverCreators} hasMoreProfiles={hasMoreProfiles} initialFilters={initialFilters} />;
+  return <CreatorsInner serverCreators={serverCreators} hasMoreProfiles={hasMoreProfiles} discoverySeed={discoverySeed} initialFilters={initialFilters} />;
 }

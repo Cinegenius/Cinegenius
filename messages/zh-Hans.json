@@ -287,7 +287,7 @@
     "findCompaniesTitle": "公司",
     "findProjectsLink": "浏览项目",
     "offerLocationAction": "提供场地",
-    "newCrewTitle": "新成员",
+    "newCrewTitle": "发现影视人才",
     "crewScrollHint": "横向滑动查看更多成员",
     "locationScrollHint": "横向滑动查看更多场地",
     "railPrevious": "向前滚动",
@@ -358,7 +358,8 @@
     "findJobsDescription": "职位和任务。",
     "findJobsLink": "浏览职位",
     "railPage": "查看第 {page} 页，共 {total} 页",
-    "appComingSoon": "CineGenius 应用即将推出。"
+    "appComingSoon": "CineGenius 应用即将推出。",
+    "projectScrollHint": "左右滑动，发现更多项目"
   },
   "locations": {
     "heroTitle": "完美拍摄地点",
@@ -466,7 +467,8 @@
     "filterCountry": "国家",
     "loadMoreApi": "加载更多档案",
     "emptyActionCreate": "创建档案",
-    "emptyActionReset": "重置筛选"
+    "emptyActionReset": "重置筛选",
+    "sortRandom": "随机"
   },
   "props": {
     "heroBadge": "市场",
