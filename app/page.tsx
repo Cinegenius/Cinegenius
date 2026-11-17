@@ -1,3 +1,4 @@
+import { NOTICE_CARD_STYLES } from "@/lib/notice-card-styles";
 import { occupationFormFromCrew } from "@/lib/occupation-form";
 import { profileOccupationPreview, type OccupationProfile } from "@/lib/crew-occupations";
 import { profileAccessFor } from "@/lib/profile-privacy-server";
@@ -339,7 +340,8 @@ async function HomeRecommendations({ dataPromise }: { dataPromise: HomeDataPromi
     {liveJobs.length > 0 && <section className="home-section-divider home-section-divider--border min-w-0 border-t border-transparent pt-4" aria-labelledby="home-jobs-title">
       <div className="mb-2 flex flex-wrap items-center justify-between gap-x-3"><h2 id="home-jobs-title" className="font-display text-lg font-bold text-text-primary">{t("jobsTitle")}</h2><Link href="/jobs" className="inline-flex min-h-11 items-center gap-1 text-xs font-medium text-gold hover:text-gold-light">{tc("viewAll")} <ArrowRight size={12} /></Link></div>
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-        {liveJobs.map(job => <Link key={job.id} href={`/jobs/${job.id}`} className="group flex min-h-11 min-w-0 items-start gap-2 rounded-xl border border-border/70 px-3 py-3 transition-colors hover:bg-bg-secondary/60">
+        {liveJobs.map(job => <Link key={job.id} href={`/jobs/${job.id}`} className={`group relative flex min-h-11 min-w-0 items-start gap-2 overflow-hidden rounded-xl border px-3 py-3 transition-colors ${NOTICE_CARD_STYLES.request.card}`}>
+          <span aria-hidden="true" className={`absolute inset-y-0 left-0 w-1 bg-gradient-to-b ${NOTICE_CARD_STYLES.request.accent}`} />
           <Briefcase size={15} className="mt-0.5 shrink-0 text-gold" />
           <div className="min-w-0 flex-1"><h3 className="truncate text-sm font-semibold text-text-primary group-hover:text-gold">{job.title}</h3><p className="mt-0.5 truncate text-xs text-text-muted">{job.location}</p><p className="mt-1 flex items-center gap-1 text-[10px] text-text-muted"><Clock size={9} />{formatDate(job.created_at)}</p></div>
           <span className="shrink-0 text-right text-xs font-semibold text-gold">{job.rawPrice ? uiText("Ui.text_8ae8849cdb3aaa", { value1: String(job.rawPrice.toLocaleString(uiLocale)), value2: String(tc("perDay")) }) : tc("onRequest")}</span>

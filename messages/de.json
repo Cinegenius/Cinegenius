@@ -2109,11 +2109,11 @@
     "restricted": "Nur die nach deinen Einstellungen berechtigten Personen können diese Inhalte sehen. Sie erscheinen nicht in der öffentlichen Community-Auswahl.",
     "pending": "Deine Einreichung bleibt bis zur Freigabe nicht öffentlich.",
     "public": {
-      "profile": "Öffentliche Profilfotos, Cover und direkt hochgeladene Portfoliofotos können auch in „Frische Einblicke“ erscheinen.",
-      "company": "Öffentliche Firmenlogos, Cover und Galeriefotos können auch in „Frische Einblicke“ erscheinen.",
-      "offer": "Öffentliche Angebotsbilder können in passenden Übersichten und Suchergebnissen erscheinen. Sie gehören nicht in „Frische Einblicke“.",
-      "project": "Öffentliche Projektbilder können in Projektansichten erscheinen. Sie gehören nicht in „Frische Einblicke“.",
-      "board": "Öffentliche Beitragsbilder können beim Beitrag und in passenden Übersichten erscheinen. Sie gehören nicht in „Frische Einblicke“."
+      "profile": "Öffentliche Profilfotos, Cover und direkt hochgeladene Portfoliofotos können auch in „Neue Bilder“ erscheinen.",
+      "company": "Öffentliche Firmenlogos, Cover und Galeriefotos können auch in „Neue Bilder“ erscheinen.",
+      "offer": "Öffentliche Angebotsbilder können in passenden Übersichten und Suchergebnissen erscheinen. Sie gehören nicht in „Neue Bilder“.",
+      "project": "Öffentliche Projektbilder können in Projektansichten erscheinen. Sie gehören nicht in „Neue Bilder“.",
+      "board": "Öffentliche Beitragsbilder können beim Beitrag und in passenden Übersichten erscheinen. Sie gehören nicht in „Neue Bilder“."
     }
   },
   "SessionTransition": {
@@ -3843,7 +3843,7 @@
     "text_13e13e4c86a9ac": "8. Foto-Likes",
     "text_f36dfccc3e4bc6": "Nutzer können Profilbilder anderer Nutzer mit einem Like versehen. Dabei speichern wir, welcher Nutzer (pseudonymisierte ID) welches Bild (URL) geliked hat, sowie den Zeitstempel der Aktion. Diese Information ist für den Profilinhaber einsehbar (Anzahl der Likes). Die individuelle Zuordnung (wer hat geliked) ist nicht öffentlich sichtbar. Rechtsgrundlage ist die Vertragserfüllung (Art. 6 Abs. 1 lit. b DSGVO). Likes können jederzeit durch erneutes Klicken entfernt werden.",
     "text_2d81e07ce7f7f9": "9. Öffentliche Fotos, Firmenzugehörigkeit und Entwürfe",
-    "text_ac80679995e973": "Öffentlich sichtbare Profilfotos, Coverbilder und direkt zugeordnete persönliche Portfoliofotos sowie Firmenlogos, Firmen-Cover und Firmengalerien können auch in „Frische Einblicke“ erscheinen. Dafür ist keine gesonderte Kennzeichnung notwendig. Bilder eigenständiger Projekte, Locations, Marktplatzangebote und Beiträge im Schwarzen Brett sowie private Bilder, Entwürfe und Nachrichtenanhänge sind von dieser Sammlung ausgeschlossen. Die Zuordnung zum öffentlichen Profil oder Unternehmen bleibt erhalten.",
+    "text_ac80679995e973": "Öffentlich sichtbare Profilfotos, Coverbilder und direkt zugeordnete persönliche Portfoliofotos sowie Firmenlogos, Firmen-Cover und Firmengalerien können auch in „Neue Bilder“ erscheinen. Dafür ist keine gesonderte Kennzeichnung notwendig. Bilder eigenständiger Projekte, Locations, Marktplatzangebote und Beiträge im Schwarzen Brett sowie private Bilder, Entwürfe und Nachrichtenanhänge sind von dieser Sammlung ausgeschlossen. Die Zuordnung zum öffentlichen Profil oder Unternehmen bleibt erhalten.",
     "text_ead49c8e2ee161": "Zugehörigkeitsanfragen und Firmeneinladungen enthalten Profilbezug, gewünschte Funktionen und gegebenenfalls eine Nachricht. Sie werden zur Entscheidung durch die jeweils berechtigte Gegenseite verarbeitet. Die Zugehörigkeit erscheint erst nach Bestätigung öffentlich. Eine öffentliche Firmenfunktion ist von technischen Verwaltungsrechten getrennt.",
     "text_c0370dcbb5d3e0": "Die geführte Einrichtung und die Profilbearbeitung speichern begonnene Angaben als privaten Entwurf im bestehenden Kontosystem. Rechtsgrundlage für diese Funktionen ist die Bereitstellung der angeforderten Plattformleistung (Art. 6 Abs. 1 lit. b DSGVO).",
     "text_f9a9bed03c18b2": "10. Zahlungsabwicklung (Stripe)",
@@ -4687,8 +4687,8 @@
     "text_9e73c0551842cc": "Best of CineGenius",
     "text_cc1aa58bac3624": "Neu entdecken",
     "text_8164423ceb0d22": "Fotos, die begeistern",
-    "text_00d91ff46043ce": "Frische Einblicke aus der Community",
-    "text_9ea95e425aef59": "Neue öffentliche Bilder aus der gesamten CineGenius-Community.",
+    "text_00d91ff46043ce": "Neue Bilder",
+    "text_9ea95e425aef59": "Entdecke Bilder von Mitgliedern.",
     "text_e050882385dd5b": "Fotobänder fortsetzen",
     "text_ed9d7fe735c3ea": "Fotobänder pausieren",
     "text_a32e5e57280170": "<value1></value1><part2>Alle Einblicke ansehen <part3></part3></part2>",
@@ -5311,7 +5311,7 @@
     "text_b169cf44e42adb": "Auf dem Firmenprofil findest du unter „Weitere Aktionen“ die Firmenzugehörigkeitsanfrage. Wähle Funktionen und ergänze bei Bedarf eine Nachricht. Erst nach Bestätigung erscheint die Zugehörigkeit öffentlich. Firmenverantwortliche können bereits registrierte Mitglieder einladen; auch diese Einladung muss angenommen werden.",
     "text_4a610b516161ec": "Wie viele Fotos kann ich hochladen?",
     "text_e1893e6dffad16": "Im Marktplatz sind bis zu 10 Fotos pro Artikel und bei Locations bis zu 20 Fotos möglich. Die jeweiligen Formulare zeigen unterstützte Formate und Größenlimits. Persönliche Profile und Firmen haben eigene Foto- und Galerieeingaben.",
-    "text_6799588f07af0d": "Welche Bilder erscheinen in „Frische Einblicke“?",
+    "text_6799588f07af0d": "Welche Bilder erscheinen in „Neue Bilder“?",
     "text_620b510d55014a": "Öffentlich sichtbare Profilfotos, Cover und direkt hochgeladene persönliche Portfoliofotos sowie Firmenlogos, Firmen-Cover und Firmengalerien können automatisch erscheinen. Projekt-, Marktplatz-, Location- und Schwarzes-Brett-Bilder sowie private Inhalte und Nachrichtenanhänge gehören nicht dazu.",
     "text_42cae79597c266": "Sicherheit & Vertrauen",
     "text_2e5ba026b3573b": "Ist CineGenius seriös?",
@@ -12697,7 +12697,11 @@
     "removeLabel": "{name} aus Kontakten entfernen",
     "confirmRemove": "Möchtest du {name} aus deinen Kontakten entfernen?",
     "cancel": "Abbrechen",
-    "removing": "Wird entfernt …"
+    "removing": "Wird entfernt …",
+    "homies": "Homies",
+    "homiesHint": "Mit einem Stern werden Freunde zu deinen Homies. Nur du siehst diese Auswahl.",
+    "addHomie": "{name} zu Homies hinzufügen",
+    "removeHomie": "{name} aus Homies entfernen"
   },
   "MessagingBackend": {
     "invalid": "Bitte prüfe die Nachricht und die ausgewählten Personen.",
@@ -13395,7 +13399,8 @@
     "filterType": "Nach Bereich filtern",
     "noMatches": "In diesem Bereich hast du noch nichts gespeichert.",
     "signInHint": "Melde dich an, um deine Merkliste zu sehen.",
-    "removeItem": "{name} aus der Merkliste entfernen"
+    "removeItem": "{name} aus der Merkliste entfernen",
+    "searchEmpty": "Keine gespeicherten Einträge gefunden."
   },
   "OccupationForm": {
     "title": "Schreibweise deiner Berufe",

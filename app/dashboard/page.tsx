@@ -1,4 +1,5 @@
 "use client";
+import { respondToBooking } from "@/lib/booking-response";
 import PersonalSettings from "@/components/PersonalSettings";
 import PersonalAreaHome from "@/components/PersonalAreaHome";
 import { dashboardLegacyDestination } from "@/lib/personal-area-navigation";
@@ -434,6 +435,12 @@ function DashboardContent() {
 
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [bookingsLoading, setBookingsLoading] = useState(false);
+  const [bookingsError, setBookingsError] = useState(false);
+  const [bookingsReload, setBookingsReload] = useState(0);
+  const [bookingResponseError, setBookingResponseError] = useState<string | null>(null);
+  const bookingResponseLock = useRef(false);
+  const bookingResponseAbort = useRef<AbortController | null>(null);
+  useEffect(() => () => bookingResponseAbort.current?.abort(), []);
   const [incomingBookings, setIncomingBookings] = useState<IncomingBooking[]>([]);
   const [incomingLoading, setIncomingLoading] = useState(false);
   const [incomingError, setIncomingError] = useState(false);
@@ -495,13 +502,15 @@ function DashboardContent() {
 
   useEffect(() => {
     if (legacyDestination || activeTab !== "bookings") return;
-    setBookingsLoading(true);
-    fetch("/api/bookings")
-      .then(r => r.json())
-      .then(({ bookings: data }) => setBookings(data ?? []))
-      .catch(() => {})
-      .finally(() => setBookingsLoading(false));
-  }, [activeTab, legacyDestination]);
+    const controller = new AbortController();
+    queueMicrotask(() => { if (!controller.signal.aborted) { setBookingsLoading(true); setBookingsError(false); } });
+    fetch("/api/bookings", { cache: "no-store", signal: controller.signal })
+      .then(async response => { const result = await response.json(); if (!response.ok || !Array.isArray(result.bookings)) throw new Error(); return result.bookings as Booking[]; })
+      .then(data => { if (!controller.signal.aborted) setBookings(data); })
+      .catch(() => { if (!controller.signal.aborted) setBookingsError(true); })
+      .finally(() => { if (!controller.signal.aborted) setBookingsLoading(false); });
+    return () => controller.abort();
+  }, [activeTab, legacyDestination, bookingsReload]);
 
   useEffect(() => {
     if (legacyDestination || activeTab !== "bookings" && activeTab !== "overview") return;
@@ -520,16 +529,19 @@ function DashboardContent() {
   }, [activeTab, legacyDestination, incomingReload]);
 
   const respondBooking = async (id: string, status: "confirmed" | "rejected") => {
-    setRespondingBooking(id);
+    if (bookingResponseLock.current) return;
+    bookingResponseLock.current = true;
+    const controller = new AbortController();
+    bookingResponseAbort.current = controller;
+    setRespondingBooking(id); setBookingResponseError(null);
     try {
-      await fetch(`/api/bookings/${id}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ status }),
-      });
-      setIncomingBookings(prev => prev.map(b => b.id === id ? { ...b, status } : b));
+      await respondToBooking(id, status, AbortSignal.any([controller.signal, AbortSignal.timeout(20_000)]));
+      if (!controller.signal.aborted) setIncomingBookings(prev => prev.map(b => b.id === id ? { ...b, status } : b));
+    } catch {
+      if (!controller.signal.aborted) { setBookingResponseError(id); setIncomingReload(value => value + 1); }
     } finally {
-      setRespondingBooking(null);
+      bookingResponseLock.current = false;
+      if (!controller.signal.aborted) setRespondingBooking(null);
     }
   };
 
@@ -972,13 +984,15 @@ function DashboardContent() {
           {activeTab === "bookings" && (
             <div className="space-y-6">
               {incomingError && <div role="alert" className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-border bg-bg-secondary p-4 text-sm text-text-secondary"><span>{uiText("common.unavailable")}</span><button type="button" onClick={() => setIncomingReload(value => value + 1)} className="min-h-11 rounded-lg border border-border px-3 text-text-primary">{uiText("PrivacySettings.retry")}</button></div>}
+              {bookingsError && <div role="alert" className="browse-card flex flex-wrap items-center justify-between gap-3 p-4 text-sm text-text-secondary"><span>{uiText("System.requestFailed")}</span><button type="button" onClick={() => setBookingsReload(value => value + 1)} className="min-h-11 rounded-lg border border-border px-3">{uiText("Contacts.retry")}</button></div>}
+              {bookingResponseError && <p role="alert" className="browse-card p-4 text-sm text-text-secondary">{uiText("System.requestFailed")}</p>}
               {/* Stats row */}
-                <div className="grid min-w-0 grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
+                <div className="grid min-w-0 grid-cols-2 xl:grid-cols-4 gap-3">
                 {[
-                  { label: uiText("Ui.text_07b314aaa3295b"), value: bookingsLoading ? "…" : String(bookings.length) },
-                  { label: uiText("Places.verified"), value: bookingsLoading ? "…" : String(bookings.filter(b => b.status === "confirmed").length) },
-                  { label: uiText("Ui.text_f154c270e3bd85"), value: incomingLoading ? "…" : String(incomingBookings.length) },
-                  { label: uiText("profile.verifPendingStatus"), value: incomingLoading ? "…" : String(incomingBookings.filter(b => b.status === "pending").length), highlight: incomingBookings.filter(b => b.status === "pending").length > 0 },
+                  { label: uiText("Ui.text_07b314aaa3295b"), value: bookingsLoading || bookingsError ? "…" : String(bookings.length) },
+                  { label: uiText("Ui.text_5fb36cf9e74bd2"), value: bookingsLoading || bookingsError ? "…" : String(bookings.filter(b => b.status === "confirmed").length) },
+                  { label: uiText("Ui.text_f154c270e3bd85"), value: incomingLoading || incomingError ? "…" : String(incomingBookings.length) },
+                  { label: uiText("profile.verifPendingStatus"), value: incomingLoading || incomingError ? "…" : String(incomingBookings.filter(b => b.status === "pending").length), highlight: incomingBookings.filter(b => b.status === "pending").length > 0 },
                 ].map(({ label, value, highlight }) => (
                   <div key={label} className={`p-4 rounded-xl border bg-bg-secondary ${highlight ? "border-gold/40 bg-gold/5" : "border-border"}`}>
                     <p className="text-xs text-text-muted uppercase tracking-widest mb-1">{label}</p>
@@ -1008,19 +1022,19 @@ function DashboardContent() {
                           <p className="text-xs text-text-muted">{uiText.rich("Ui.text_769af32128cf5d", { value2: () => (b.booker_name), part1: chunks => (<span className="text-text-secondary font-medium">{chunks}</span>), value3: () => (new Date(b.start_date).toLocaleDateString(uiLocale, { day: "numeric", month: "short" })), value4: () => (new Date(b.end_date).toLocaleDateString(uiLocale, { day: "numeric", month: "short", year: "numeric" })), value5: () => (b.days), count6: b.days })}</p>
                           {b.notes && <p className="text-xs text-text-muted mt-1 italic line-clamp-1">„{b.notes}”</p>}
                         </div>
-                        <div className="flex items-center gap-2 shrink-0">
+                        <div className="flex flex-wrap items-center gap-2">
                           <p className="text-sm font-semibold text-text-primary mr-1">{b.total.toLocaleString(uiLocale)} €</p>
                           {b.status === "pending" ? (
                             <>
                               <button
                                 onClick={() => respondBooking(b.id, "confirmed")}
-                                disabled={respondingBooking === b.id}
-                                className="flex items-center gap-1 px-3 py-1.5 text-xs font-semibold rounded-lg bg-success/15 text-success border border-success/30 hover:bg-success/25 transition-colors disabled:opacity-50"
+                                disabled={respondingBooking !== null}
+                                className="flex min-h-11 items-center gap-1 px-3 py-1.5 text-xs font-semibold rounded-lg bg-success/15 text-success border border-success/30 hover:bg-success/25 transition-colors disabled:opacity-50"
                               >{uiText.rich("Ui.text_048edf533fa6f4", { part1: () => (<Check size={12} />) })}</button>
                               <button
                                 onClick={() => respondBooking(b.id, "rejected")}
-                                disabled={respondingBooking === b.id}
-                                className="flex items-center gap-1 px-3 py-1.5 text-xs font-semibold rounded-lg bg-crimson/10 text-crimson-light border border-crimson/30 hover:bg-crimson/20 transition-colors disabled:opacity-50"
+                                disabled={respondingBooking !== null}
+                                className="flex min-h-11 items-center gap-1 px-3 py-1.5 text-xs font-semibold rounded-lg bg-crimson/10 text-crimson-light border border-crimson/30 hover:bg-crimson/20 transition-colors disabled:opacity-50"
                               >{uiText.rich("Ui.text_2424239b7d6d6c", { part1: () => (<X size={12} />) })}</button>
                             </>
                           ) : (
@@ -1047,17 +1061,17 @@ function DashboardContent() {
                 {bookingsLoading && (
                   <div className="p-8 text-center text-xs text-text-muted">{uiText("Ui.text_b89b8cdb9d6d6f")}</div>
                 )}
-                {!bookingsLoading && bookings.length === 0 && (
+                {!bookingsLoading && !bookingsError && bookings.length === 0 && (
                   <div className="text-center py-12 space-y-3">
                     <Calendar size={32} className="mx-auto text-text-muted opacity-20" />
                     <p className="text-text-muted text-sm">{uiText("Ui.text_43bc3914441afe")}</p>
                     <p className="text-xs text-text-muted">{uiText("Ui.text_d9239010d75f1d")}</p>
-                    <div className="flex gap-2 justify-center pt-1">{uiText.rich("Ui.text_1e3a01a7fdd097", { part1: chunks => (<Link href="/locations" className="px-3 py-1.5 text-xs border border-border text-text-secondary rounded-lg hover:border-gold hover:text-gold transition-colors">{chunks}</Link>), part2: chunks => (<Link href="/vehicles" className="px-3 py-1.5 text-xs border border-border text-text-secondary rounded-lg hover:border-gold hover:text-gold transition-colors">{chunks}</Link>), part3: chunks => (<Link href="/props" className="px-3 py-1.5 text-xs border border-border text-text-secondary rounded-lg hover:border-gold hover:text-gold transition-colors">{chunks}</Link>) })}</div>
+                    <div className="flex flex-wrap gap-2 justify-center pt-1">{uiText.rich("Ui.text_1e3a01a7fdd097", { part1: chunks => (<Link href="/locations" className="inline-flex min-h-11 items-center px-3 py-1.5 text-xs border border-border text-text-secondary rounded-lg hover:border-gold hover:text-gold transition-colors">{chunks}</Link>), part2: chunks => (<Link href="/vehicles" className="inline-flex min-h-11 items-center px-3 py-1.5 text-xs border border-border text-text-secondary rounded-lg hover:border-gold hover:text-gold transition-colors">{chunks}</Link>), part3: chunks => (<Link href="/props" className="inline-flex min-h-11 items-center px-3 py-1.5 text-xs border border-border text-text-secondary rounded-lg hover:border-gold hover:text-gold transition-colors">{chunks}</Link>) })}</div>
                   </div>
                 )}
                 <div className="divide-y divide-border">
                   {bookings.map((b) => (
-                    <div key={b.id} className="flex items-center gap-4 px-5 py-4">
+                    <div key={b.id} className="flex flex-wrap items-center gap-3 px-4 py-4 sm:px-5">
                       <div className="w-10 h-10 rounded-lg bg-gold/10 border border-gold/20 flex items-center justify-center shrink-0 text-lg">
                         {b.listing_type === "location" ? "📍" : b.listing_type === "vehicle" ? "🚗" : b.listing_type === "creator" ? "🎬" : b.listing_type === "job" ? "💼" : "📦"}
                       </div>
@@ -1072,7 +1086,7 @@ function DashboardContent() {
                           b.status === "rejected" ? "border-crimson/30 bg-crimson/10 text-crimson-light" :
                           "border-gold/30 bg-gold/10 text-gold"
                         }`}>
-                          {b.status === "confirmed" ? uiText("Places.verified") : b.status === "rejected" ? uiText("OfferModeration.statuses.rejected") : uiText("profile.verifPendingStatus")}
+                          {b.status === "confirmed" ? uiText("Ui.text_5fb36cf9e74bd2") : b.status === "rejected" ? uiText("OfferModeration.statuses.rejected") : uiText("profile.verifPendingStatus")}
                         </span>
                       </div>
                       <p className="text-[10px] text-text-muted font-mono shrink-0 hidden sm:block">{b.ref}</p>

@@ -1,8 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useId, useState } from "react";
+import DirectoryPage from "@/components/DirectoryPage";
+import PageHeader from "@/components/PageHeader";
+import BrowseSelect from "@/components/BrowseSelect";
 import Link from "next/link";
-import { Search, ChevronDown, ChevronUp, MessageSquare, Mail, BookOpen, MapPin, Package, Briefcase, Shield, Car, PawPrint } from "lucide-react";
+import { Search, ChevronDown, ChevronUp, MessageSquare, BookOpen, MapPin, Package, Briefcase, Shield, Car, PawPrint } from "lucide-react";
 import { useTranslations } from "next-intl";
 
 
@@ -39,7 +42,7 @@ function getLocalizedCategories(translate: (key: string) => string) {
     items: [
       {
         q: translate("Ui.text_14262cd693898d"),
-        a: translate("Ui.text_b06c28a3d12af0"),
+        a: `${translate("Ui.text_b06c28a3d12af0")} ${translate("OfferModeration.privateNotice")}`,
       },
       {
         q: translate("Ui.text_44e28c14fa9ae7"),
@@ -123,7 +126,7 @@ function getLocalizedCategories(translate: (key: string) => string) {
       },
       {
         q: translate("Ui.text_9ecf3a88360bb2"),
-        a: translate("Ui.text_d78932ee50b0dd"),
+        a: `${translate("Ui.text_d78932ee50b0dd")} ${translate("occupation.focusExplanation")}`,
       },
     ],
   },
@@ -160,6 +163,7 @@ function getLocalizedCategories(translate: (key: string) => string) {
 
 export default function HelpPage() {
   const uiText = useTranslations();
+  const faqId = useId();
   const categories = getLocalizedCategories(uiText);
 
 
@@ -182,82 +186,52 @@ export default function HelpPage() {
     }))
     .filter(
       (cat) =>
-        (!activeCategory || cat.label === activeCategory) && cat.items.length > 0
+        (query.trim() || !activeCategory || cat.label === activeCategory) && cat.items.length > 0
     );
 
   return (
-    <div className="pt-16 min-h-screen">
-      {/* Header */}
-      <div className="bg-bg-secondary border-b border-border py-16 px-4">
-        <div className="max-w-2xl mx-auto text-center">
-          <h1 className="font-display text-4xl font-bold text-text-primary mb-3">{uiText("Ui.text_0c014891cbffd5")}</h1>
-          <p className="text-text-muted mb-8">{uiText("Ui.text_6c4fc6a65a4166")}</p>
-          <div className="flex items-center gap-2 bg-bg-elevated border border-border rounded-xl px-4 focus-within:border-gold transition-colors">
-            <Search size={16} className="text-text-muted" />
-            <input
-              type="text"
-              placeholder={uiText("Ui.text_1b86a7229ab830")}
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              className="bg-transparent border-none py-3.5 text-sm w-full focus:outline-none"
-            />
+    <DirectoryPage area="help">
+      <PageHeader withBackdrop={false} badge={uiText("footer.links_help")} title={uiText("Ui.text_0c014891cbffd5")} description={uiText("Ui.text_6c4fc6a65a4166")} />
+      <div className="site-container py-6">
+        <div className="mx-auto max-w-4xl">
+          <div className="mb-6 grid gap-3 sm:grid-cols-[minmax(0,1fr)_16rem]">
+            <label className="mobile-browse-search">
+              <Search size={18} aria-hidden="true" />
+              <span className="sr-only">{uiText("Ui.text_1b86a7229ab830")}</span>
+              <input type="search" placeholder={uiText("Ui.text_1b86a7229ab830")} value={query} onChange={event => setQuery(event.target.value)} />
+            </label>
+            <BrowseSelect label={uiText("Ui.text_f5c129c2aab569")} value={activeCategory ?? ""} onChange={value => { setActiveCategory(value || null); setQuery(""); }} options={[{ value: "", label: uiText("Ui.text_f5c129c2aab569") }, ...categories.map(category => ({ value: category.label, label: category.label }))]} />
           </div>
-        </div>
-      </div>
-
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 py-12">
-        {/* Category tabs */}
-        {!query && (
-          <div className="flex flex-wrap gap-2 mb-10 justify-center">
-            <button
-              onClick={() => setActiveCategory(null)}
-              className={`px-4 py-2 rounded-full text-xs font-medium border transition-all ${
-                !activeCategory
-                  ? "bg-gold text-bg-primary border-gold"
-                  : "border-border text-text-secondary hover:border-gold hover:text-gold"
-              }`}
-            >{uiText("Ui.text_f5c129c2aab569")}</button>
-            {categories.map(({ label, icon: Icon }) => (
-              <button
-                key={label}
-                onClick={() => setActiveCategory(activeCategory === label ? null : label)}
-                className={`px-4 py-2 rounded-full text-xs font-medium border transition-all flex items-center gap-1.5 ${
-                  activeCategory === label
-                    ? "bg-gold text-bg-primary border-gold"
-                    : "border-border text-text-secondary hover:border-gold hover:text-gold"
-                }`}
-              >
-                <Icon size={12} /> {label}
-              </button>
-            ))}
-          </div>
-        )}
-
+          <nav aria-label={uiText("nav.personalArea")} className="mb-8 grid grid-cols-2 gap-2 sm:grid-cols-4">
+            {[{ href: "/dashboard", label: uiText("nav.personalArea") }, { href: "/messages", label: uiText("nav.messages") }, { href: "/favorites", label: uiText("nav.savedItems") }, { href: "/dashboard?tab=settings", label: uiText("PersonalArea.settings") }].map(item => <Link key={item.href} href={item.href} className="browse-card flex min-h-11 items-center justify-center px-3 py-3 text-center text-sm text-text-secondary hover:text-gold">{item.label}</Link>)}
+          </nav>
         {/* FAQ Sections */}
         {filtered.length === 0 ? (
           <div className="text-center py-16">
             <p className="text-text-muted mb-2">{uiText.rich("Ui.text_ca4ec38ac19663", { value1: () => (query) })}</p>
             <button
-              onClick={() => setQuery("")}
-              className="text-gold text-sm hover:text-gold-light transition-colors"
+              onClick={() => { setQuery(""); setActiveCategory(null); }}
+              className="min-h-11 text-gold text-sm hover:text-gold-light transition-colors"
             >{uiText("Ui.text_b75f4841525e7a")}</button>
           </div>
         ) : (
           <div className="space-y-10">
-            {filtered.map(({ label, icon: Icon, items }) => (
+            {filtered.map(({ label, icon: Icon, items }, categoryIndex) => (
               <section key={label}>
                 <div className="flex items-center gap-2 mb-4">
                   <Icon size={16} className="text-gold" />
                   <h2 className="font-display text-lg font-bold text-text-primary">{label}</h2>
                 </div>
                 <div className="space-y-2">
-                  {items.map((item) => {
+                  {items.map((item, itemIndex) => {
                     const key = `${label}-${item.q}`;
                     const isOpen = openItems[key];
                     return (
-                      <div key={key} className="border border-border rounded-xl overflow-hidden">
+                      <div key={key} className="browse-card">
                         <button
                           onClick={() => toggle(key)}
+                          aria-expanded={!!isOpen}
+                          aria-controls={`${faqId}-${categoryIndex}-${itemIndex}`}
                           className="w-full flex items-center justify-between gap-4 px-5 py-4 text-left hover:bg-bg-elevated transition-colors"
                         >
                           <span className="text-sm font-medium text-text-primary">{item.q}</span>
@@ -268,7 +242,7 @@ export default function HelpPage() {
                           )}
                         </button>
                         {isOpen && (
-                          <div className="px-5 pb-5 text-sm text-text-secondary leading-relaxed border-t border-border pt-4">
+                          <div id={`${faqId}-${categoryIndex}-${itemIndex}`} className="px-5 pb-5 text-sm text-text-secondary leading-relaxed border-t border-border pt-4">
                             {item.a}
                           </div>
                         )}
@@ -281,22 +255,16 @@ export default function HelpPage() {
           </div>
         )}
 
-        {/* Contact */}
-        <div className="mt-16 p-8 bg-bg-secondary border border-border rounded-2xl text-center">
-          <h2 className="font-display text-2xl font-bold text-text-primary mb-2">{uiText("Ui.text_28881025f27160")}</h2>
-          <Link href="/support" className="mb-3 inline-flex min-h-11 items-center justify-center gap-2 rounded-lg border border-border px-5 py-3 text-sm font-semibold text-gold hover:border-gold"><MessageSquare size={16} aria-hidden="true" />{uiText("SupportContact.link")}</Link>
-          <p className="text-text-muted mb-6 text-sm">{uiText("Ui.text_eb2f0ea66d2081")}</p>
-          <p className="text-text-muted text-sm leading-relaxed">{uiText("SupportMediation.agreement")}</p>
-          <Link href="/pricing#support-mediation" className="inline-flex min-h-11 items-center text-sm text-gold hover:underline mb-4">{uiText("SupportMediation.readMore")}</Link>
-          <div className="flex flex-col sm:flex-row gap-3 justify-center">{uiText.rich("Ui.text_4f778e3c677bc4", { part2: () => (<Mail size={15} />), part1: chunks => (<a
-              href="mailto:hello@cinegenius.co"
-              className="px-6 py-3 bg-gold text-bg-primary font-semibold rounded-lg hover:bg-gold-light transition-colors flex items-center justify-center gap-2"
-            >{chunks}</a>), part4: () => (<MessageSquare size={15} />), part3: chunks => (<Link
-              href="/dashboard"
-              className="px-6 py-3 border border-border text-text-secondary hover:border-gold hover:text-gold rounded-lg transition-colors flex items-center justify-center gap-2"
-            >{chunks}</Link>) })}</div>
+        <section className="browse-card mt-8 p-5 sm:p-6">
+          <h2 className="font-display text-xl font-bold text-text-primary">{uiText("Ui.text_28881025f27160")}</h2>
+          <p className="mt-2 text-sm text-text-secondary">{uiText("Ui.text_eb2f0ea66d2081")}</p>
+          <div className="mt-3 flex flex-wrap gap-3">
+            <Link href="/support" className="inline-flex min-h-11 items-center gap-2 rounded-xl bg-gold px-4 text-sm font-semibold text-bg-primary"><MessageSquare size={16} aria-hidden="true" />{uiText("SupportContact.link")}</Link>
+            <Link href="/pricing#support-mediation" className="inline-flex min-h-11 items-center rounded-xl border border-border px-4 text-sm text-text-secondary">{uiText("SupportMediation.readMore")}</Link>
+          </div>
+        </section>
         </div>
       </div>
-    </div>
+    </DirectoryPage>
   );
 }

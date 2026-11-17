@@ -3843,7 +3843,7 @@
     "text_13e13e4c86a9ac": "8. Mi piace alle foto",
     "text_f36dfccc3e4bc6": "Gli utenti possono mettere Mi piace alle immagini del profilo di altri utenti. Memorizziamo quale utente (ID pseudonimizzato) ha messo Mi piace a quale immagine (URL), insieme alla data e all’ora dell’azione. Il titolare del profilo può vedere questa informazione come numero di Mi piace. L’associazione individuale, cioè chi ha messo Mi piace, non è pubblicamente visibile. La base giuridica è l’esecuzione del contratto (art. 6, par. 1, lett. b GDPR). I Mi piace possono essere rimossi in qualsiasi momento con un nuovo clic.",
     "text_2d81e07ce7f7f9": "9. Foto pubbliche, appartenenze aziendali e bozze",
-    "text_ac80679995e973": "Le foto del profilo, le copertine e le foto del portfolio personale direttamente associate e pubblicamente visibili, nonché i loghi, le copertine e le gallerie aziendali, possono comparire anche in «Nuovi sguardi». Non è necessaria una selezione separata. Le immagini di progetti autonomi, location, offerte del mercato e post in bacheca, così come le immagini private, le bozze e gli allegati ai messaggi, sono escluse da questa raccolta. Il collegamento con il profilo pubblico o l’azienda viene mantenuto.",
+    "text_ac80679995e973": "Le foto del profilo, le copertine e le foto del portfolio personale direttamente associate e pubblicamente visibili, nonché i loghi, le copertine e le gallerie aziendali, possono comparire anche in «Nuove foto». Non è necessaria una selezione separata. Le immagini di progetti autonomi, location, offerte del mercato e post in bacheca, così come le immagini private, le bozze e gli allegati ai messaggi, sono escluse da questa raccolta. Il collegamento con il profilo pubblico o l’azienda viene mantenuto.",
     "text_ead49c8e2ee161": "Le richieste di appartenenza e gli inviti aziendali comprendono il riferimento al profilo, le funzioni desiderate ed eventualmente un messaggio. Vengono trattati per consentire alla controparte autorizzata di decidere. L’appartenenza diventa pubblica soltanto dopo la conferma. Una funzione aziendale pubblica è separata dai diritti tecnici di amministrazione.",
     "text_c0370dcbb5d3e0": "La configurazione guidata e la modifica del profilo salvano i dati iniziati come bozza privata nel sistema di account esistente. La base giuridica di queste funzioni è la fornitura del servizio della piattaforma richiesto (art. 6, par. 1, lett. b GDPR).",
     "text_f9a9bed03c18b2": "10. Gestione dei pagamenti (Stripe)",
@@ -4687,8 +4687,8 @@
     "text_9e73c0551842cc": "Il meglio di CineGenius",
     "text_cc1aa58bac3624": "Nuove scoperte",
     "text_8164423ceb0d22": "Foto che ispirano",
-    "text_00d91ff46043ce": "Nuovi sguardi dalla community",
-    "text_9ea95e425aef59": "Nuove immagini pubbliche da tutta la community CineGenius.",
+    "text_00d91ff46043ce": "Nuove foto",
+    "text_9ea95e425aef59": "Scopri le foto dei membri.",
     "text_e050882385dd5b": "Riprendi le strisce fotografiche",
     "text_ed9d7fe735c3ea": "Metti in pausa le strisce fotografiche",
     "text_a32e5e57280170": "<value1></value1><part2>Visualizza tutti gli scatti <part3></part3></part2>",
@@ -5311,7 +5311,7 @@
     "text_b169cf44e42adb": "Sul profilo aziendale trovi la richiesta di appartenenza in «Altre azioni». Scegli le funzioni e aggiungi eventualmente un messaggio. L’appartenenza diventa pubblica soltanto dopo la conferma. I responsabili aziendali possono invitare membri già registrati; anche questo invito deve essere accettato.",
     "text_4a610b516161ec": "Quante foto posso caricare?",
     "text_e1893e6dffad16": "Nel mercato sono consentite fino a 10 foto per articolo e per le location fino a 20 foto. I moduli indicano i formati supportati e i limiti di dimensione. Profili personali e aziende hanno campi propri per foto e gallerie.",
-    "text_6799588f07af0d": "Quali immagini compaiono in «Nuovi sguardi»?",
+    "text_6799588f07af0d": "Quali immagini compaiono in «Nuove foto»?",
     "text_620b510d55014a": "Possono comparire automaticamente le foto pubbliche dei profili, le copertine e le foto personali dei portfolio caricate direttamente, oltre a loghi, copertine e gallerie aziendali. Non sono comprese immagini di progetti, mercato, location e bacheca, né contenuti privati e allegati ai messaggi.",
     "text_42cae79597c266": "Sicurezza e fiducia",
     "text_2e5ba026b3573b": "CineGenius è affidabile?",
@@ -12697,7 +12697,11 @@
     "removeLabel": "Rimuovi {name} dai contatti",
     "confirmRemove": "Vuoi rimuovere {name} dai tuoi contatti?",
     "cancel": "Annulla",
-    "removing": "Rimozione in corso …"
+    "removing": "Rimozione in corso …",
+    "homies": "Homies",
+    "homiesHint": "Segna gli amici con una stella per aggiungerli agli Homies. Solo tu vedi questa selezione.",
+    "addHomie": "Aggiungi {name} agli Homies",
+    "removeHomie": "Rimuovi {name} dagli Homies"
   },
   "MessagingBackend": {
     "invalid": "Controlla il messaggio e le persone selezionate.",
@@ -13395,7 +13399,8 @@
     "filterType": "Filtra per sezione",
     "noMatches": "Non hai ancora salvato nulla in questa sezione.",
     "signInHint": "Accedi per vedere gli elementi salvati.",
-    "removeItem": "Rimuovi {name} dagli elementi salvati"
+    "removeItem": "Rimuovi {name} dagli elementi salvati",
+    "searchEmpty": "Nessun elemento salvato trovato."
   },
   "OccupationForm": {
     "title": "Forma dei tuoi titoli professionali",

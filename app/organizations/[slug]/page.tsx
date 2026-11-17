@@ -3,6 +3,7 @@ import { db } from "@/lib/db";
 import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import Image from "@/components/MediaImage";
+import DirectoryPage from "@/components/DirectoryPage";
 import PageHeader from "@/components/PageHeader";
 import { approvedOrganizationBySlug } from "@/lib/organization-data";
 
@@ -22,8 +23,9 @@ export default async function OrganizationPage({ params }: { params: Promise<{ s
     .eq("status", "accepted").eq("company.published", true).maybeSingle();
   if (linked.error) throw new Error("organization_company_link_load_failed");
   const company = linked.data?.company as unknown as {name:string;slug:string}|null;
-  return <main className="min-h-screen bg-bg-primary">
+  return <DirectoryPage area="organizations">
     <PageHeader
+      withBackdrop={false}
       badge={t("organization")}
       title={organization.name}
       description={[organization.city, organization.region].filter(Boolean).join(" · ") || t("organizationFallbackDescription")}
@@ -43,14 +45,15 @@ export default async function OrganizationPage({ params }: { params: Promise<{ s
         </div>
     </PageHeader>
     <section className="site-container py-6 sm:py-8">
+      <Link href="/organizations" className="mb-4 inline-flex min-h-11 items-center text-sm text-gold">← {uiText("OrganizationDiscovery.organizations")}</Link>
       {organization.description && (
-        <section className="mb-8 max-w-3xl" aria-labelledby="organization-description">
+        <section className="browse-card mb-6 max-w-3xl p-4 sm:p-5" aria-labelledby="organization-description">
           <h2 id="organization-description" className="mb-3 font-serif text-xl text-text-primary sm:text-2xl">{t("description")}</h2>
           <p className="whitespace-pre-line break-words text-sm leading-7 text-text-secondary sm:text-base">{organization.description}</p>
         </section>
       )}
-      <h2 className="font-serif text-3xl text-text-primary">{t("organizationEntries")}</h2>
-      {entries.length ? <div className="mt-6 grid gap-4 md:grid-cols-2">{entries.map((entry) => <Link key={entry.id} href={`/news/${organization.slug}/${entry.slug}`} className="browse-card p-5"><span className="text-xs text-gold">{t(`entryType.${entry.entry_type}`)}</span><h3 className="mt-2 text-xl font-semibold text-text-primary">{entry.title}</h3>{entry.summary && <p className="mt-2 line-clamp-2 text-sm text-text-secondary">{entry.summary}</p>}</Link>)}</div> : <p className="mt-4 text-text-muted">{t("emptyOrganization")}</p>}
+      <h2 className="font-display text-xl font-bold text-text-primary sm:text-2xl">{t("organizationEntries")}</h2>
+      {entries.length ? <div className="mt-6 grid gap-4 md:grid-cols-2">{entries.map((entry) => <Link key={entry.id} href={`/news/${organization.slug}/${entry.slug}`} className="browse-card p-5"><span className="text-xs text-gold">{t(`entryType.${entry.entry_type}`)}</span><h3 className="mt-2 text-base font-semibold text-text-primary">{entry.title}</h3>{entry.summary && <p className="mt-2 line-clamp-2 text-sm text-text-secondary">{entry.summary}</p>}</Link>)}</div> : <p className="mt-4 text-text-muted">{t("emptyOrganization")}</p>}
     </section>
-  </main>;
+  </DirectoryPage>;
 }

@@ -3918,7 +3918,7 @@
     "text_13e13e4c86a9ac": "8. Gostos em fotos",
     "text_f36dfccc3e4bc6": "Os utilizadores podem gostar das fotos de perfil de outros utilizadores. Armazenamos qual utilizador (ID pseudonimizado) gostou de qual imagem (URL), com o timestamp da ação. O titular do perfil pode ver esta informação como contagem de gostos. As associações individuais (quem gostou) não são visíveis publicamente. A base legal é a execução do contrato (Art. 6(1)(b) RGPD). Os gostos podem ser removidos a qualquer momento clicando novamente.",
     "text_2d81e07ce7f7f9": "9. Fotos públicas, associação a empresa e rascunhos",
-    "text_ac80679995e973": "Fotos públicas de perfil, imagens de capa e fotos pessoais diretamente atribuídas ao portfólio, assim como logótipos, capas e galerias de empresas, podem também aparecer em ‘Novas Perspetivas’. Não é necessária etiqueta separada. Imagens de projetos independentes, localizações, ofertas do mercado e publicações no quadro de avisos, assim como imagens privadas, rascunhos e anexos de mensagens, estão excluídos desta coleção. A associação ao perfil público ou empresa é mantida.",
+    "text_ac80679995e973": "Fotos públicas de perfil, imagens de capa e fotos pessoais diretamente atribuídas ao portfólio, assim como logótipos, capas e galerias de empresas, podem também aparecer em ‘Novas fotografias’. Não é necessária etiqueta separada. Imagens de projetos independentes, localizações, ofertas do mercado e publicações no quadro de avisos, assim como imagens privadas, rascunhos e anexos de mensagens, estão excluídos desta coleção. A associação ao perfil público ou empresa é mantida.",
     "text_ead49c8e2ee161": "Pedidos de associação e convites para empresa contêm referência ao perfil, funções desejadas e, se aplicável, uma mensagem. São processados para decisão pela parte autorizada. A associação torna-se pública apenas após confirmação. Uma função pública na empresa é distinta dos direitos técnicos de gestão.",
     "text_c0370dcbb5d3e0": "Configuração guiada e edição de perfil armazenam informações iniciadas como rascunho privado no sistema de conta existente. A base legal para estas funções é a prestação do serviço solicitado na plataforma (Art. 6(1)(b) RGPD).",
     "text_f9a9bed03c18b2": "10. Processamento de pagamentos (Stripe)",
@@ -4612,8 +4612,8 @@
     "text_9e73c0551842cc": "Melhores do CineGenius",
     "text_cc1aa58bac3624": "Descubra algo novo",
     "text_8164423ceb0d22": "Fotos que inspiram",
-    "text_00d91ff46043ce": "Novas perspetivas da comunidade",
-    "text_9ea95e425aef59": "Novas imagens públicas de toda a comunidade CineGenius.",
+    "text_00d91ff46043ce": "Novas fotografias",
+    "text_9ea95e425aef59": "Descobre fotografias dos membros.",
     "text_e050882385dd5b": "Retomar tiras de fotos",
     "text_ed9d7fe735c3ea": "Pausar tiras de fotos",
     "text_a32e5e57280170": "<value1></value1><part2>Ver todas as análises <part3></part3></part2>",
@@ -5311,7 +5311,7 @@
     "text_b169cf44e42adb": "No perfil da empresa, encontre o pedido de adesão em ‘Mais ações’. Escolha funções e adicione mensagem se necessário. A adesão torna-se pública só após confirmação. Representantes da empresa podem convidar membros registados; esses convites também devem ser aceites.",
     "text_4a610b516161ec": "Quantas fotos posso carregar?",
     "text_e1893e6dffad16": "O mercado permite até 10 fotos por item, e locais até 20. Os formulários mostram formatos suportados e limites de tamanho. Perfis pessoais e empresas têm campos próprios para fotos e galerias.",
-    "text_6799588f07af0d": "Que imagens aparecem em ‘Novas Perspetivas’?",
+    "text_6799588f07af0d": "Que imagens aparecem em ‘Novas fotografias’?",
     "text_620b510d55014a": "Fotos públicas de perfil, capas e fotos pessoais carregadas diretamente, assim como logos, capas e galerias de empresas, podem aparecer automaticamente. Imagens de projetos, mercado, locais e quadro de avisos, conteúdo privado e anexos de mensagens são excluídos.",
     "text_42cae79597c266": "Segurança e confiança",
     "text_2e5ba026b3573b": "O CineGenius é fiável?",
@@ -12697,7 +12697,11 @@
     "removeLabel": "Remover {name} dos contactos",
     "confirmRemove": "Remover {name} dos seus contactos?",
     "cancel": "Cancelar",
-    "removing": "A remover…"
+    "removing": "A remover…",
+    "homies": "Homies",
+    "homiesHint": "Marca os amigos com uma estrela para os adicionares aos teus Homies. Só tu vês esta seleção.",
+    "addHomie": "Adicionar {name} aos Homies",
+    "removeHomie": "Remover {name} dos Homies"
   },
   "MessagingBackend": {
     "invalid": "Por favor, verifique a mensagem e as pessoas selecionadas.",
@@ -13395,7 +13399,8 @@
     "filterType": "Filtrar por secção",
     "noMatches": "Ainda não guardaste nada nesta secção.",
     "signInHint": "Inicia sessão para veres os teus favoritos.",
-    "removeItem": "Remover {name} dos favoritos"
+    "removeItem": "Remover {name} dos favoritos",
+    "searchEmpty": "Não foram encontrados itens guardados."
   },
   "OccupationForm": {
     "title": "Forma das tuas designações profissionais",

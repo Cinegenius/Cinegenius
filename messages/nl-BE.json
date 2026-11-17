@@ -2109,11 +2109,11 @@
     "restricted": "Alleen personen die volgens je instellingen bevoegd zijn, kunnen deze inhoud zien. Deze verschijnt niet in de openbare communityselectie.",
     "pending": "Je inzending blijft niet-openbaar totdat deze is goedgekeurd.",
     "public": {
-      "profile": "Openbare profielfoto's, omslagbeelden en direct geüploade portfoliofoto's kunnen ook in ‘Frisse indrukken’ verschijnen.",
-      "company": "Openbare bedrijfslogo's, omslagbeelden en galerijfoto's kunnen ook in ‘Frisse indrukken’ verschijnen.",
-      "offer": "Openbare aanbodafbeeldingen kunnen in passende overzichten en zoekresultaten verschijnen. Ze horen niet in ‘Frisse indrukken’.",
-      "project": "Openbare projectbeelden kunnen in projectweergaven verschijnen. Ze horen niet in ‘Frisse indrukken’.",
-      "board": "Openbare berichtafbeeldingen kunnen bij het bericht en in passende overzichten verschijnen. Ze horen niet in ‘Frisse indrukken’."
+      "profile": "Openbare profielfoto's, omslagbeelden en direct geüploade portfoliofoto's kunnen ook in ‘Nieuwe foto’s’ verschijnen.",
+      "company": "Openbare bedrijfslogo's, omslagbeelden en galerijfoto's kunnen ook in ‘Nieuwe foto’s’ verschijnen.",
+      "offer": "Openbare aanbodafbeeldingen kunnen in passende overzichten en zoekresultaten verschijnen. Ze horen niet in ‘Nieuwe foto’s’.",
+      "project": "Openbare projectbeelden kunnen in projectweergaven verschijnen. Ze horen niet in ‘Nieuwe foto’s’.",
+      "board": "Openbare berichtafbeeldingen kunnen bij het bericht en in passende overzichten verschijnen. Ze horen niet in ‘Nieuwe foto’s’."
     }
   },
   "SessionTransition": {
@@ -3843,7 +3843,7 @@
     "text_13e13e4c86a9ac": "8. Fotolikes",
     "text_f36dfccc3e4bc6": "Gebruikers kunnen profielfoto's van andere gebruikers liken. We slaan op welke gebruiker (gepseudonimiseerde ID) welke afbeelding (URL) heeft geliket, met het tijdstempel van de actie. De profieleigenaar kan deze informatie inzien (aantal likes). De individuele koppeling (wie heeft geliket) is niet openbaar zichtbaar. De rechtsgrondslag is uitvoering van de overeenkomst (art. 6 lid 1 onder b AVG). Likes kunnen op elk moment door opnieuw te klikken worden verwijderd.",
     "text_2d81e07ce7f7f9": "9. Openbare foto's, bedrijfslidmaatschap en concepten",
-    "text_ac80679995e973": "Openbaar zichtbare profielfoto's, omslagafbeeldingen en rechtstreeks gekoppelde persoonlijke portfoliofoto's, evenals bedrijfslogo's, bedrijfsomslagen en bedrijfsgalerijen, kunnen ook in ‘Frisse indrukken’ verschijnen. Daarvoor is geen afzonderlijk label nodig. Afbeeldingen van afzonderlijke projecten, locaties, marktplaatsaanbod en prikbordberichten, evenals privéafbeeldingen, concepten en berichtbijlagen, zijn uitgesloten van deze verzameling. De koppeling met het openbare profiel of bedrijf blijft behouden.",
+    "text_ac80679995e973": "Openbaar zichtbare profielfoto's, omslagafbeeldingen en rechtstreeks gekoppelde persoonlijke portfoliofoto's, evenals bedrijfslogo's, bedrijfsomslagen en bedrijfsgalerijen, kunnen ook in ‘Nieuwe foto’s’ verschijnen. Daarvoor is geen afzonderlijk label nodig. Afbeeldingen van afzonderlijke projecten, locaties, marktplaatsaanbod en prikbordberichten, evenals privéafbeeldingen, concepten en berichtbijlagen, zijn uitgesloten van deze verzameling. De koppeling met het openbare profiel of bedrijf blijft behouden.",
     "text_ead49c8e2ee161": "Lidmaatschapsaanvragen en bedrijfsuitnodigingen bevatten een profielverwijzing, gewenste functies en eventueel een bericht. Ze worden verwerkt voor een besluit door de bevoegde wederpartij. Het lidmaatschap verschijnt pas na bevestiging openbaar. Een openbare bedrijfsfunctie staat los van technische beheerrechten.",
     "text_c0370dcbb5d3e0": "De begeleide instelling en profielbewerking slaan begonnen gegevens als privéconcept op in het bestaande accountsysteem. De rechtsgrondslag voor deze functies is het leveren van de aangevraagde platformdienst (art. 6 lid 1 onder b AVG).",
     "text_f9a9bed03c18b2": "10. Betalingsafhandeling (Stripe)",
@@ -4687,8 +4687,8 @@
     "text_9e73c0551842cc": "Het beste van CineGenius",
     "text_cc1aa58bac3624": "Nieuw ontdekken",
     "text_8164423ceb0d22": "Foto's die inspireren",
-    "text_00d91ff46043ce": "Frisse indrukken uit de community",
-    "text_9ea95e425aef59": "Nieuwe openbare afbeeldingen uit de hele CineGenius-community.",
+    "text_00d91ff46043ce": "Nieuwe foto’s",
+    "text_9ea95e425aef59": "Ontdek foto’s van leden.",
     "text_e050882385dd5b": "Fotostroken hervatten",
     "text_ed9d7fe735c3ea": "Fotostroken pauzeren",
     "text_a32e5e57280170": "<value1></value1><part2>Alle indrukken bekijken <part3></part3></part2>",
@@ -5311,7 +5311,7 @@
     "text_b169cf44e42adb": "Op het bedrijfsprofiel vind je onder ‘Andere acties’ de aanvraag voor bedrijfslidmaatschap. Kies functies en voeg zo nodig een bericht toe. Pas na bevestiging verschijnt het lidmaatschap openbaar. Bedrijfsverantwoordelijken kunnen al geregistreerde leden uitnodigen; ook die uitnodiging moet worden geaccepteerd.",
     "text_4a610b516161ec": "Hoeveel foto's kan ik uploaden?",
     "text_e1893e6dffad16": "Op de marktplaats zijn maximaal 10 foto's per artikel en bij locaties maximaal 20 foto's mogelijk. De formulieren tonen ondersteunde formaten en groottelimieten. Persoonlijke profielen en bedrijven hebben eigen foto- en galerijvelden.",
-    "text_6799588f07af0d": "Welke afbeeldingen verschijnen in ‘Frisse indrukken’?",
+    "text_6799588f07af0d": "Welke afbeeldingen verschijnen in ‘Nieuwe foto’s’?",
     "text_620b510d55014a": "Openbaar zichtbare profielfoto's, omslagbeelden en direct geüploade persoonlijke portfoliofoto's, plus bedrijfslogo's, bedrijfsomslagen en bedrijfsgalerijen kunnen automatisch verschijnen. Project-, marktplaats-, locatie- en prikbordafbeeldingen, privéinhoud en berichtbijlagen horen daar niet bij.",
     "text_42cae79597c266": "Veiligheid en vertrouwen",
     "text_2e5ba026b3573b": "Is CineGenius betrouwbaar?",
@@ -12697,7 +12697,11 @@
     "removeLabel": "{name} uit contacten verwijderen",
     "confirmRemove": "Wil je {name} uit je contacten verwijderen?",
     "cancel": "Annuleren",
-    "removing": "Verwijderen …"
+    "removing": "Verwijderen …",
+    "homies": "Homies",
+    "homiesHint": "Geef vrienden een ster om ze aan je Homies toe te voegen. Alleen jij ziet deze selectie.",
+    "addHomie": "{name} toevoegen aan Homies",
+    "removeHomie": "{name} verwijderen uit Homies"
   },
   "MessagingBackend": {
     "invalid": "Controleer het bericht en de geselecteerde personen.",
@@ -13395,7 +13399,8 @@
     "filterType": "Filteren op onderdeel",
     "noMatches": "Je hebt in dit onderdeel nog niets opgeslagen.",
     "signInHint": "Meld je aan om je opgeslagen items te bekijken.",
-    "removeItem": "{name} uit opgeslagen items verwijderen"
+    "removeItem": "{name} uit opgeslagen items verwijderen",
+    "searchEmpty": "Geen opgeslagen items gevonden."
   },
   "OccupationForm": {
     "title": "Vorm van je beroepstitels",

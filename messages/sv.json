@@ -2109,11 +2109,11 @@
     "restricted": "Bara personer som är behöriga enligt dina inställningar kan se innehållet. Det visas inte i gemenskapens offentliga urval.",
     "pending": "Det du har skickat in är inte offentligt förrän det har godkänts.",
     "public": {
-      "profile": "Offentliga profilbilder, omslag och direkt uppladdade portfoliofoton kan även visas i ”Nya inblickar”.",
-      "company": "Offentliga företagslogotyper, omslag och gallerifoton kan även visas i ”Nya inblickar”.",
-      "offer": "Offentliga erbjudandebilder kan visas i relevanta översikter och sökresultat. De ingår inte i ”Nya inblickar”.",
-      "project": "Offentliga projektbilder kan visas i projektvyer. De ingår inte i ”Nya inblickar”.",
-      "board": "Offentliga inläggsbilder kan visas vid inlägget och i relevanta översikter. De ingår inte i ”Nya inblickar”."
+      "profile": "Offentliga profilbilder, omslag och direkt uppladdade portfoliofoton kan även visas i ”Nya bilder”.",
+      "company": "Offentliga företagslogotyper, omslag och gallerifoton kan även visas i ”Nya bilder”.",
+      "offer": "Offentliga erbjudandebilder kan visas i relevanta översikter och sökresultat. De ingår inte i ”Nya bilder”.",
+      "project": "Offentliga projektbilder kan visas i projektvyer. De ingår inte i ”Nya bilder”.",
+      "board": "Offentliga inläggsbilder kan visas vid inlägget och i relevanta översikter. De ingår inte i ”Nya bilder”."
     }
   },
   "SessionTransition": {
@@ -3843,7 +3843,7 @@
     "text_13e13e4c86a9ac": "8. Gilla-markeringar på foton",
     "text_f36dfccc3e4bc6": "Användare kan gilla andra användares profilbilder. Vi sparar då vilken användare (pseudonymiserat ID) som har gillat vilken bild (URL), samt åtgärdens tidsstämpel. Profilägaren kan se antalet gilla-markeringar. Den individuella kopplingen, alltså vem som har gillat, visas inte offentligt. Den rättsliga grunden är fullgörande av avtal (artikel 6.1 b i GDPR). Gilla-markeringar kan tas bort när som helst genom att klicka igen.",
     "text_2d81e07ce7f7f9": "9. Offentliga foton, företagsmedlemskap och utkast",
-    "text_ac80679995e973": "Offentligt synliga profilfoton, omslagsbilder och direkt kopplade personliga portfoliofoton samt företagslogotyper, företagsomslag och företagsgallerier kan även visas i ”Nya inblickar”. Ingen särskild märkning behövs för detta. Bilder från fristående projekt, inspelningsplatser, marknadsplatserbjudanden och anslagstavleinlägg samt privata bilder, utkast och meddelandebilagor ingår inte i denna samling. Kopplingen till den offentliga profilen eller företaget behålls.",
+    "text_ac80679995e973": "Offentligt synliga profilfoton, omslagsbilder och direkt kopplade personliga portfoliofoton samt företagslogotyper, företagsomslag och företagsgallerier kan även visas i ”Nya bilder”. Ingen särskild märkning behövs för detta. Bilder från fristående projekt, inspelningsplatser, marknadsplatserbjudanden och anslagstavleinlägg samt privata bilder, utkast och meddelandebilagor ingår inte i denna samling. Kopplingen till den offentliga profilen eller företaget behålls.",
     "text_ead49c8e2ee161": "Medlemskapsförfrågningar och företagsinbjudningar innehåller profilkoppling, önskade funktioner och eventuellt ett meddelande. De behandlas för att den behöriga motparten ska kunna fatta beslut. Medlemskapet visas offentligt först efter bekräftelse. En offentlig företagsfunktion är åtskild från tekniska administratörsbehörigheter.",
     "text_c0370dcbb5d3e0": "Den guidade introduktionen och profilredigeringen sparar påbörjade uppgifter som ett privat utkast i det befintliga kontosystemet. Den rättsliga grunden för dessa funktioner är att tillhandahålla den begärda plattformstjänsten (artikel 6.1 b i GDPR).",
     "text_f9a9bed03c18b2": "10. Betalningshantering (Stripe)",
@@ -4687,8 +4687,8 @@
     "text_9e73c0551842cc": "Det bästa från CineGenius",
     "text_cc1aa58bac3624": "Upptäck nytt",
     "text_8164423ceb0d22": "Foton som inspirerar",
-    "text_00d91ff46043ce": "Nya inblickar från gemenskapen",
-    "text_9ea95e425aef59": "Nya offentliga bilder från hela CineGenius-gemenskapen.",
+    "text_00d91ff46043ce": "Nya bilder",
+    "text_9ea95e425aef59": "Upptäck bilder från medlemmar.",
     "text_e050882385dd5b": "Fortsätt bildremsorna",
     "text_ed9d7fe735c3ea": "Pausa bildremsorna",
     "text_a32e5e57280170": "<value1></value1><part2>Visa alla inblickar <part3></part3></part2>",
@@ -5311,7 +5311,7 @@
     "text_b169cf44e42adb": "Under ”Fler åtgärder” i företagsprofilen kan du begära företagsmedlemskap. Välj funktioner och lägg vid behov till ett meddelande. Medlemskapet visas offentligt först efter bekräftelse. Företagsansvariga kan bjuda in registrerade medlemmar. Även en sådan inbjudan måste accepteras.",
     "text_4a610b516161ec": "Hur många foton kan jag ladda upp?",
     "text_e1893e6dffad16": "På marknadsplatsen tillåts upp till 10 foton per artikel och för inspelningsplatser upp till 20 foton. Formulären visar vilka format och storlekar som stöds. Personprofiler och företag har egna foto- och gallerifält.",
-    "text_6799588f07af0d": "Vilka bilder visas i ”Nya inblickar”?",
+    "text_6799588f07af0d": "Vilka bilder visas i ”Nya bilder”?",
     "text_620b510d55014a": "Offentligt synliga profilfoton, omslag och direkt uppladdade personliga portfoliofoton samt företagslogotyper, företagsomslag och företagsgallerier kan visas automatiskt. Projekt-, marknadsplats-, inspelningsplats- och anslagstavlebilder samt privat innehåll och meddelandebilagor ingår inte.",
     "text_42cae79597c266": "Säkerhet och förtroende",
     "text_2e5ba026b3573b": "Är CineGenius pålitligt?",
@@ -12697,7 +12697,11 @@
     "removeLabel": "Ta bort {name} från kontakter",
     "confirmRemove": "Vill du ta bort {name} från dina kontakter?",
     "cancel": "Avbryt",
-    "removing": "Tar bort …"
+    "removing": "Tar bort …",
+    "homies": "Homies",
+    "homiesHint": "Stjärnmarkera vänner för att lägga till dem bland dina Homies. Bara du ser detta urval.",
+    "addHomie": "Lägg till {name} bland Homies",
+    "removeHomie": "Ta bort {name} från Homies"
   },
   "MessagingBackend": {
     "invalid": "Kontrollera meddelandet och de valda personerna.",
@@ -13395,7 +13399,8 @@
     "filterType": "Filtrera efter område",
     "noMatches": "Du har inte sparat något inom det här området ännu.",
     "signInHint": "Logga in för att se dina sparade objekt.",
-    "removeItem": "Ta bort {name} från sparade objekt"
+    "removeItem": "Ta bort {name} från sparade objekt",
+    "searchEmpty": "Inga sparade objekt hittades."
   },
   "OccupationForm": {
     "title": "Form på dina yrkestitlar",

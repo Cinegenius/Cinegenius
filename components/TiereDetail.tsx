@@ -95,10 +95,10 @@ export default function TiereDetail({ animal }: { animal: Animal }) {
   const images = [animal.image, ...(animal.extra_images ?? [])].filter(Boolean) as string[];
 
   return (
-    <div className="pt-16 min-h-screen">
+    <div className="pt-16 min-h-screen mobile-bottom-nav-clear">
       {animal.privatePreview && <p role="status" className="site-container pt-8 text-sm text-gold">{animals("previewNotice")}</p>}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <Link href="/tiere" className="inline-flex items-center gap-2 text-sm text-text-muted hover:text-gold transition-colors mb-6">
+      <div className="site-container py-6 sm:py-8">
+        <Link href="/tiere" className="inline-flex min-h-11 items-center gap-2 text-sm text-text-muted hover:text-gold transition-colors mb-6">
           <ArrowLeft size={14} /> {animals("back")}
         </Link>
 
@@ -110,7 +110,7 @@ export default function TiereDetail({ animal }: { animal: Animal }) {
           fallback={<PawPrint size={48} className="text-text-muted/20" />}
         />
 
-        <div className="flex gap-10 flex-col lg:flex-row">
+        <div className="flex gap-6 flex-col lg:flex-row">
           {/* LEFT */}
           <div className="flex-1 min-w-0">
             <div className="flex flex-wrap gap-2 mb-3">
@@ -119,7 +119,7 @@ export default function TiereDetail({ animal }: { animal: Animal }) {
               </span>
               {animal.trainingLevel && (
                 <span className={`px-2.5 py-1 border text-xs rounded-full font-medium ${TRAINING_COLORS[animal.trainingLevel] ?? TRAINING_COLORS["Grundgehorsam"]}`}>
-                  {animal.trainingLevel}
+                  {({ "Kinoprofi": uiText("BrowseFilters.trainingPro"), "Erfahren": uiText("BrowseFilters.trainingExperienced"), "Grundgehorsam": uiText("BrowseFilters.trainingBasic"), "Ungeübt": uiText("BrowseFilters.trainingNone") })[animal.trainingLevel] ?? animal.trainingLevel}
                 </span>
               )}
               {animal.delivery && (
@@ -132,12 +132,12 @@ export default function TiereDetail({ animal }: { animal: Animal }) {
               )}
             </div>
 
-            <div className="flex items-start justify-between gap-3 mb-2">
-              <h1 className="font-display text-3xl sm:text-4xl font-bold text-text-primary">{animal.title}</h1>
+            <div className="flex flex-wrap items-start justify-between gap-3 mb-2">
+              <h1 className="min-w-0 break-words font-display text-2xl sm:text-3xl font-bold text-text-primary">{animal.title}</h1>
               <div className="flex items-center gap-1 shrink-0 mt-1">
                 {isOwner && (
                   <Link href="/dashboard?tab=listings"
-                    className="flex items-center gap-1.5 px-3 py-1.5 border border-gold/40 text-gold text-xs font-medium rounded-lg hover:bg-gold/10 transition-colors">{uiText.rich("Ui.text_603ead2ae843f0", { part1: () => (<Pencil size={12} />) })}</Link>
+                    className="flex min-h-11 items-center gap-1.5 px-3 py-1.5 border border-gold/40 text-gold text-xs font-medium rounded-lg hover:bg-gold/10 transition-colors">{uiText.rich("Ui.text_603ead2ae843f0", { part1: () => (<Pencil size={12} />) })}</Link>
                 )}
                 <FavoriteButton listingId={animal.id} listingType="animal"
                   listingTitle={animal.title} listingCity={animal.location}
@@ -151,11 +151,11 @@ export default function TiereDetail({ animal }: { animal: Animal }) {
             </div>
 
             {/* Rating */}
-            <div className="flex items-center gap-3 py-4 border-y border-border mb-6">
+            <div className="flex flex-wrap items-center gap-3 py-4 border-y border-border mb-6">
               <div className="flex gap-0.5">
                 {[1,2,3,4,5].map((s) => (
                   <button key={s} type="button" onClick={() => handleRate(s)} disabled={!canRate}
-                    className={`transition-transform ${canRate ? "hover:scale-110 active:scale-125" : "cursor-default"}`}
+                    className={`flex min-h-11 min-w-11 items-center justify-center transition-transform ${canRate ? "hover:scale-110 active:scale-125" : "cursor-default"}`}
                     title={!user ? uiText("Ui.text_0e87ce8126b5d8") : isOwner ? uiText("Ui.text_288d8b63c75378") : !eligible ? uiText("Ui.text_c05dd8c953b77c") : uiText("Ui.text_8dc8762909a7e9", { value1: String(s), value2: String(s !== 1 ? "e" : "") })}>
                     <Star size={18} className={`transition-colors ${s <= (myRating || Math.round(liveRating?.avg ?? 0)) ? "text-gold fill-gold" : "text-border fill-border"}`} />
                   </button>

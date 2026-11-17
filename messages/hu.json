@@ -3843,7 +3843,7 @@
     "text_13e13e4c86a9ac": "8. Fotókedvelések",
     "text_f36dfccc3e4bc6": "A felhasználók kedvelhetik más felhasználók profilképeit. Rögzítjük, hogy melyik felhasználó (álnevesített azonosító) melyik képet (URL) kedvelte, valamint a művelet időbélyegét. A profil tulajdonosa a kedvelések számát láthatja. Az egyéni hozzárendelés, vagyis hogy ki kedvelte a képet, nem nyilvános. A jogalap a szerződés teljesítése (GDPR 6. cikk (1) bekezdés b) pont). A kedvelések újabb kattintással bármikor visszavonhatók.",
     "text_2d81e07ce7f7f9": "9. Nyilvános fotók, céges kapcsolatok és piszkozatok",
-    "text_ac80679995e973": "A nyilvános profilfotók, borítóképek és közvetlenül hozzárendelt személyes portfóliófotók, valamint céglogók, céges borítóképek és galériák a „Friss pillanatok” között is megjelenhetnek. Ehhez nem szükséges külön megjelölés. Az önálló projektek, helyszínek, piactéri ajánlatok és hirdetőtáblás bejegyzések képei, továbbá a privát képek, piszkozatok és üzenetmellékletek nem részei ennek a gyűjteménynek. A nyilvános profilhoz vagy céghez való hozzárendelés megmarad.",
+    "text_ac80679995e973": "A nyilvános profilfotók, borítóképek és közvetlenül hozzárendelt személyes portfóliófotók, valamint céglogók, céges borítóképek és galériák a „Új képek” között is megjelenhetnek. Ehhez nem szükséges külön megjelölés. Az önálló projektek, helyszínek, piactéri ajánlatok és hirdetőtáblás bejegyzések képei, továbbá a privát képek, piszkozatok és üzenetmellékletek nem részei ennek a gyűjteménynek. A nyilvános profilhoz vagy céghez való hozzárendelés megmarad.",
     "text_ead49c8e2ee161": "A céges kapcsolatra irányuló kérelmek és meghívók profilhivatkozást, kívánt szerepköröket és adott esetben üzenetet tartalmaznak. Ezeket az adott döntésre jogosult másik fél számára kezeljük. A kapcsolat csak jóváhagyás után jelenik meg nyilvánosan. A nyilvános céges szerepkör elkülönül a technikai kezelői jogosultságoktól.",
     "text_c0370dcbb5d3e0": "Az irányított beállítás és a profilszerkesztő a megkezdett adatokat privát piszkozatként menti a meglévő fiókrendszerben. E funkciók jogalapja a kért platformszolgáltatás biztosítása (GDPR 6. cikk (1) bekezdés b) pont).",
     "text_f9a9bed03c18b2": "10. Fizetéskezelés (Stripe)",
@@ -4687,8 +4687,8 @@
     "text_9e73c0551842cc": "A CineGenius legjobbjai",
     "text_cc1aa58bac3624": "Új felfedezések",
     "text_8164423ceb0d22": "Lenyűgöző fotók",
-    "text_00d91ff46043ce": "Friss pillanatok a közösségből",
-    "text_9ea95e425aef59": "Új nyilvános képek a CineGenius teljes közösségéből.",
+    "text_00d91ff46043ce": "Új képek",
+    "text_9ea95e425aef59": "Fedezd fel tagjaink képeit.",
     "text_e050882385dd5b": "Fotósávok folytatása",
     "text_ed9d7fe735c3ea": "Fotósávok szüneteltetése",
     "text_a32e5e57280170": "<value1></value1><part2>Minden pillanat megtekintése <part3></part3></part2>",
@@ -5311,7 +5311,7 @@
     "text_b169cf44e42adb": "A cégprofil „További műveletek” menüjében találod a céges kapcsolat kérelmezését. Válassz szerepköröket, és szükség esetén írj üzenetet. A kapcsolat csak jóváhagyás után jelenik meg nyilvánosan. A cég illetékesei már regisztrált tagokat is meghívhatnak; ezt a meghívást is el kell fogadni.",
     "text_4a610b516161ec": "Hány fotót tölthetek fel?",
     "text_e1893e6dffad16": "A piactéren termékenként legfeljebb 10, helyszínenként legfeljebb 20 fotó adható meg. Az űrlapok mutatják a támogatott formátumokat és méretkorlátokat. A személyes profiloknak és cégeknek saját fotó- és galériamezőik vannak.",
-    "text_6799588f07af0d": "Milyen képek jelennek meg a „Friss pillanatok” között?",
+    "text_6799588f07af0d": "Milyen képek jelennek meg a „Új képek” között?",
     "text_620b510d55014a": "A nyilvános profilfotók, borítóképek és közvetlenül feltöltött személyes portfóliófotók, valamint céglogók, céges borítóképek és galériák automatikusan megjelenhetnek. A projektek, a piactér, a helyszínek és a hirdetőtábla képei, valamint a privát tartalmak és üzenetmellékletek nem tartoznak ide.",
     "text_42cae79597c266": "Biztonság és bizalom",
     "text_2e5ba026b3573b": "Megbízható a CineGenius?",
@@ -12697,7 +12697,11 @@
     "removeLabel": "{name} eltávolítása a kapcsolatok közül",
     "confirmRemove": "Eltávolítod őt a kapcsolataid közül: {name}?",
     "cancel": "Mégse",
-    "removing": "Eltávolítás …"
+    "removing": "Eltávolítás …",
+    "homies": "Homies",
+    "homiesHint": "Csillaggal jelölheted meg a Homies közé tartozó barátaidat. Ezt csak te látod.",
+    "addHomie": "{name} hozzáadása a Homies listához",
+    "removeHomie": "{name} eltávolítása a Homies listáról"
   },
   "MessagingBackend": {
     "invalid": "Ellenőrizd az üzenetet és a kiválasztott személyeket.",
@@ -13395,7 +13399,8 @@
     "filterType": "Szűrés terület szerint",
     "noMatches": "Ezen a területen még nem mentettél semmit.",
     "signInHint": "Jelentkezz be a mentett elemek megtekintéséhez.",
-    "removeItem": "{name} eltávolítása a mentett elemek közül"
+    "removeItem": "{name} eltávolítása a mentett elemek közül",
+    "searchEmpty": "Nem található mentett elem."
   },
   "OccupationForm": {
     "title": "Foglalkozásaid megnevezése",

@@ -3918,7 +3918,7 @@
     "text_13e13e4c86a9ac": "8. Polubienia zdjęć",
     "text_f36dfccc3e4bc6": "Użytkownicy mogą polubić zdjęcia profilowe innych użytkowników. Przechowujemy, który użytkownik (pseudonimizowany ID) polubił które zdjęcie (URL) wraz z czasem akcji. Właściciel profilu widzi tę informację jako liczbę polubień. Pojedyncze powiązania (kto polubił) nie są publicznie widoczne. Podstawą prawną jest wykonanie umowy (art. 6 ust. 1 lit. b RODO). Polubienia można usunąć w dowolnym momencie, klikając ponownie.",
     "text_2d81e07ce7f7f9": "9. Publiczne zdjęcia, członkostwo w firmie i szkice",
-    "text_ac80679995e973": "Publiczne zdjęcia profilowe, zdjęcia okładkowe i bezpośrednio przypisane zdjęcia portfolio osobistego, a także logotypy firm, okładki i galerie mogą również pojawiać się w „Świeżych Wglądach”. Nie jest wymagana osobna etykieta. Obrazy z samodzielnych projektów, lokalizacji, ofert na rynku i ogłoszeń, a także prywatne zdjęcia, szkice i załączniki do wiadomości są wyłączone z tego zbioru. Ich powiązanie z publicznym profilem lub firmą jest zachowane.",
+    "text_ac80679995e973": "Publiczne zdjęcia profilowe, zdjęcia okładkowe i bezpośrednio przypisane zdjęcia portfolio osobistego, a także logotypy firm, okładki i galerie mogą również pojawiać się w „Nowe zdjęcia”. Nie jest wymagana osobna etykieta. Obrazy z samodzielnych projektów, lokalizacji, ofert na rynku i ogłoszeń, a także prywatne zdjęcia, szkice i załączniki do wiadomości są wyłączone z tego zbioru. Ich powiązanie z publicznym profilem lub firmą jest zachowane.",
     "text_ead49c8e2ee161": "Prośby o członkostwo i zaproszenia do firmy zawierają odniesienie do profilu, pożądane role oraz, jeśli dotyczy, wiadomość. Są przetwarzane do decyzji przez upoważnioną drugą stronę. Członkostwo staje się publiczne dopiero po potwierdzeniu. Publiczna rola w firmie jest oddzielona od technicznych praw zarządzania.",
     "text_c0370dcbb5d3e0": "Prowadzona konfiguracja i edycja profilu zapisują rozpoczęte informacje jako prywatny szkic w istniejącym systemie kont. Podstawą prawną tych funkcji jest świadczenie żądanej usługi platformy (art. 6 ust. 1 lit. b RODO).",
     "text_f9a9bed03c18b2": "10. Przetwarzanie płatności (Stripe)",
@@ -4687,8 +4687,8 @@
     "text_9e73c0551842cc": "Najlepsze z CineGenius",
     "text_cc1aa58bac3624": "Odkryj coś nowego",
     "text_8164423ceb0d22": "Zdjęcia, które inspirują",
-    "text_00d91ff46043ce": "Świeże wglądy od społeczności",
-    "text_9ea95e425aef59": "Nowe publiczne zdjęcia od całej społeczności CineGenius.",
+    "text_00d91ff46043ce": "Nowe zdjęcia",
+    "text_9ea95e425aef59": "Odkryj zdjęcia członków.",
     "text_e050882385dd5b": "Wznów przewijanie zdjęć",
     "text_ed9d7fe735c3ea": "Wstrzymaj przewijanie zdjęć",
     "text_a32e5e57280170": "<value1></value1><part2>Zobacz wszystkie wglądy <part3></part3></part2>",
@@ -5386,7 +5386,7 @@
     "text_b169cf44e42adb": "Na profilu firmy znajdź prośbę o członkostwo w „Więcej działań”. Wybierz role i dodaj wiadomość, jeśli chcesz. Członkostwo staje się publiczne po zatwierdzeniu. Przedstawiciele firmy mogą zapraszać zarejestrowanych członków; zaproszenia muszą zostać zaakceptowane.",
     "text_4a610b516161ec": "Ile zdjęć mogę dodać?",
     "text_e1893e6dffad16": "Marketplace pozwala na maksymalnie 10 zdjęć na przedmiot, a lokalizacje do 20. Formularze pokazują obsługiwane formaty i limity rozmiaru. Profile osobiste i firmy mają własne pola na zdjęcia i galerie.",
-    "text_6799588f07af0d": "Jakie obrazy pojawiają się w „Świeżych Wglądach”?",
+    "text_6799588f07af0d": "Jakie obrazy pojawiają się w „Nowe zdjęcia”?",
     "text_620b510d55014a": "Automatycznie mogą pojawiać się publiczne zdjęcia profilowe, okładki i bezpośrednio przesłane zdjęcia portfolio osobistego, a także logotypy firm, okładki i galerie. Wyłączone są zdjęcia projektów, marketplace, lokalizacji, tablic ogłoszeń, treści prywatne i załączniki wiadomości.",
     "text_42cae79597c266": "Bezpieczeństwo i zaufanie",
     "text_2e5ba026b3573b": "Czy CineGenius jest wiarygodny?",
@@ -12697,7 +12697,11 @@
     "removeLabel": "Usuń {name} z kontaktów",
     "confirmRemove": "Usunąć {name} z Twoich kontaktów?",
     "cancel": "Anuluj",
-    "removing": "Usuwanie…"
+    "removing": "Usuwanie…",
+    "homies": "Homies",
+    "homiesHint": "Oznacz znajomych gwiazdką, aby dodać ich do Homies. Tylko Ty widzisz ten wybór.",
+    "addHomie": "Dodaj {name} do Homies",
+    "removeHomie": "Usuń {name} z Homies"
   },
   "MessagingBackend": {
     "invalid": "Proszę sprawdzić wiadomość i wybrane osoby.",
@@ -13395,7 +13399,8 @@
     "filterType": "Filtruj według działu",
     "noMatches": "Nie masz jeszcze nic zapisanego w tym dziale.",
     "signInHint": "Zaloguj się, aby zobaczyć zapisane elementy.",
-    "removeItem": "Usuń {name} z zapisanych elementów"
+    "removeItem": "Usuń {name} z zapisanych elementów",
+    "searchEmpty": "Nie znaleziono zapisanych pozycji."
   },
   "OccupationForm": {
     "title": "Forma nazw Twoich zawodów",
