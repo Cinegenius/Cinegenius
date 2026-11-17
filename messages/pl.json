@@ -13233,7 +13233,39 @@
     "previewWish": "Twoje wyszukiwanie",
     "previewMatches": "Dopasowane wyniki",
     "previewSorted": "Grupowane według obszaru",
-    "previewNote": "Tak Smart połączy Twoje wyszukiwanie. Grafika nie pokazuje rzeczywistych ofert."
+    "previewNote": "Tak Smart połączy Twoje wyszukiwanie. Grafika nie pokazuje rzeczywistych ofert.",
+    "discovery": {
+      "filterTitle": "Co chcesz zobaczyć?",
+      "reset": "Resetuj",
+      "wishes": "Wybierz wyszukiwania",
+      "refine": "Piony i kategorie",
+      "all": "Wszystkie",
+      "activeFilters": "Aktywne filtry",
+      "hidden": "Ukryte: {name}",
+      "removeFilter": "Usuń filtr: {name}",
+      "mapArea": "Obszar mapy",
+      "loaded": "Wyświetlone wyniki: {count}",
+      "requestedPlace": "W wybranym obszarze",
+      "emptyGroup": "Brak wyników w tym wyborze.",
+      "hideMap": "Ukryj mapę",
+      "showMap": "Pokaż mapę",
+      "unmapped": "Wyniki bez pozycji na mapie pozostają na liście: {count}.",
+      "partial": "Załaduj więcej wyników w poszczególnych sekcjach. Filtry dotyczą załadowanego wyboru.",
+      "emptyFilters": "Nic nie pasuje do obecnych filtrów.",
+      "examplesLabel": "Wypróbuj przykład",
+      "understood": "Sprawdź i dostosuj wyszukiwanie",
+      "examples": {
+        "shoot": "Kręcę w Monachium.",
+        "crew": "Kostiumy w Berlinie i oświetleniowiec w Hamburgu.",
+        "studio": "Studio i wegański catering w Zurychu."
+      },
+      "evidence": {
+        "role": "Zawód podany w profilu",
+        "title": "Wyszukiwane słowo w tytule",
+        "requirements": "Wymagania według deklaracji usługodawcy"
+      },
+      "applyMapArea": "Ogranicz do tego obszaru mapy"
+    }
   },
   "PublicReport": {
     "errors": {

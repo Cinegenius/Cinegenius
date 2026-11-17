@@ -13233,7 +13233,39 @@
     "previewWish": "Tvoje hledání",
     "previewMatches": "Vhodné výsledky",
     "previewSorted": "Podle oblastí",
-    "previewNote": "Takto Smart propojí tvoje hledání. Grafika nezobrazuje skutečné nabídky."
+    "previewNote": "Takto Smart propojí tvoje hledání. Grafika nezobrazuje skutečné nabídky.",
+    "discovery": {
+      "filterTitle": "Co chceš zobrazit?",
+      "reset": "Obnovit",
+      "wishes": "Vybrat požadavky",
+      "refine": "Profese a kategorie",
+      "all": "Vše",
+      "activeFilters": "Aktivní filtry",
+      "hidden": "Skryto: {name}",
+      "removeFilter": "Odebrat filtr: {name}",
+      "mapArea": "Oblast mapy",
+      "loaded": "Zobrazené výsledky: {count}",
+      "requestedPlace": "V požadované oblasti",
+      "emptyGroup": "V tomto výběru nejsou žádné výsledky.",
+      "hideMap": "Skrýt mapu",
+      "showMap": "Zobrazit mapu",
+      "unmapped": "Položky bez polohy na mapě zůstávají v seznamu: {count}.",
+      "partial": "Další výsledky načteš v jednotlivých sekcích. Filtry platí pro načtený výběr.",
+      "emptyFilters": "Aktuálním filtrům nic neodpovídá.",
+      "examplesLabel": "Vyzkoušej příklad",
+      "understood": "Zkontrolovat a upravit hledání",
+      "examples": {
+        "shoot": "Natáčím v Mnichově.",
+        "crew": "Kostýmy v Berlíně a osvětlovač v Hamburku.",
+        "studio": "Studio a veganský catering v Curychu."
+      },
+      "evidence": {
+        "role": "Profese uvedená v profilu",
+        "title": "Hledaný výraz v názvu",
+        "requirements": "Požadavky uvedené poskytovatelem"
+      },
+      "applyMapArea": "Omezit na tuto oblast mapy"
+    }
   },
   "PublicReport": {
     "metaTitle": "Nahlásit právní problém",

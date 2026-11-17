@@ -70,6 +70,8 @@ export function searchPlanFromHref(href: string): SearchPlan | null {
 }
 
 export type SearchResult = { id: string; title: string; subtitle: string; type: string; price: number; priceLabel?: string; image: string | null; available: boolean | null;
+  facets?: { departments?: string[]; marketplace?: string };
+  evidence?: "role" | "title" | "requirements";
   nearby?: { distanceKm: number; origin: string };
   mapPoint?: { lat: number; lng: number; radiusMeters?: 500 } | null };
 export type NearbyCursor = { distanceKm: number; id: string };

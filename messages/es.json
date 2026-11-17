@@ -13233,7 +13233,39 @@
     "previewWish": "Tu búsqueda",
     "previewMatches": "Resultados relevantes",
     "previewSorted": "Por secciones",
-    "previewNote": "Así reunirá Smart tu búsqueda. El gráfico no muestra anuncios reales."
+    "previewNote": "Así reunirá Smart tu búsqueda. El gráfico no muestra anuncios reales.",
+    "discovery": {
+      "filterTitle": "¿Qué quieres ver?",
+      "reset": "Restablecer",
+      "wishes": "Elegir búsquedas",
+      "refine": "Departamentos y categorías",
+      "all": "Todos",
+      "activeFilters": "Filtros activos",
+      "hidden": "Oculto: {name}",
+      "removeFilter": "Quitar filtro: {name}",
+      "mapArea": "Área del mapa",
+      "loaded": "Resultados mostrados: {count}",
+      "requestedPlace": "En la zona solicitada",
+      "emptyGroup": "No hay resultados en esta selección.",
+      "hideMap": "Ocultar mapa",
+      "showMap": "Mostrar mapa",
+      "unmapped": "{count} sin posición en el mapa permanecen en la lista.",
+      "partial": "Carga más resultados en cada sección. Los filtros se aplican a la selección cargada.",
+      "emptyFilters": "Nada coincide con tus filtros actuales.",
+      "examplesLabel": "Prueba un ejemplo",
+      "understood": "Revisar y ajustar tu búsqueda",
+      "examples": {
+        "shoot": "Estoy rodando en Múnich.",
+        "crew": "Vestuario en Berlín e iluminación en Hamburgo.",
+        "studio": "Estudio y catering vegano en Zúrich."
+      },
+      "evidence": {
+        "role": "Profesión indicada en el perfil",
+        "title": "Término de búsqueda en el título",
+        "requirements": "Requisitos declarados por el proveedor"
+      },
+      "applyMapArea": "Limitar a esta zona del mapa"
+    }
   },
   "PublicReport": {
     "metaTitle": "Denunciar un problema legal",

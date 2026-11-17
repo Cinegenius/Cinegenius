@@ -13233,7 +13233,39 @@
     "previewWish": "Votre recherche",
     "previewMatches": "Résultats correspondants",
     "previewSorted": "Groupés par zone",
-    "previewNote": "Voici comment Smart regroupera votre recherche. Le graphique ne montre pas d’annonces réelles."
+    "previewNote": "Voici comment Smart regroupera votre recherche. Le graphique ne montre pas d’annonces réelles.",
+    "discovery": {
+      "filterTitle": "Que veux-tu voir ?",
+      "reset": "Réinitialiser",
+      "wishes": "Choisir les recherches",
+      "refine": "Départements et catégories",
+      "all": "Tous",
+      "activeFilters": "Filtres actifs",
+      "hidden": "Masqué : {name}",
+      "removeFilter": "Retirer le filtre : {name}",
+      "mapArea": "Zone de la carte",
+      "loaded": "Résultats affichés : {count}",
+      "requestedPlace": "Dans la zone demandée",
+      "emptyGroup": "Aucun résultat dans cette sélection.",
+      "hideMap": "Masquer la carte",
+      "showMap": "Afficher la carte",
+      "unmapped": "{count} sans position sur la carte restent dans la liste.",
+      "partial": "Charge davantage de résultats dans chaque rubrique. Les filtres concernent la sélection chargée.",
+      "emptyFilters": "Aucun résultat ne correspond aux filtres actuels.",
+      "examplesLabel": "Essaie un exemple",
+      "understood": "Vérifier et ajuster ta recherche",
+      "examples": {
+        "shoot": "Je tourne à Munich.",
+        "crew": "Costumes à Berlin et un éclairagiste à Hambourg.",
+        "studio": "Studio et traiteur végan à Zurich."
+      },
+      "evidence": {
+        "role": "Métier indiqué sur le profil",
+        "title": "Terme recherché dans le titre",
+        "requirements": "Critères déclarés par le prestataire"
+      },
+      "applyMapArea": "Limiter à cette zone de la carte"
+    }
   },
   "PublicReport": {
     "errors": {

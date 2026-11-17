@@ -13233,7 +13233,39 @@
     "previewWish": "Din sökning",
     "previewMatches": "Relevanta träffar",
     "previewSorted": "Efter område",
-    "previewNote": "Så kommer Smart att samla din sökning. Grafiken visar inga riktiga annonser."
+    "previewNote": "Så kommer Smart att samla din sökning. Grafiken visar inga riktiga annonser.",
+    "discovery": {
+      "filterTitle": "Vad vill du se?",
+      "reset": "Återställ",
+      "wishes": "Välj sökönskemål",
+      "refine": "Avdelningar och kategorier",
+      "all": "Alla",
+      "activeFilters": "Aktiva filter",
+      "hidden": "Dolt: {name}",
+      "removeFilter": "Ta bort filter: {name}",
+      "mapArea": "Kartområde",
+      "loaded": "Visade träffar: {count}",
+      "requestedPlace": "I det önskade området",
+      "emptyGroup": "Inga träffar i detta urval.",
+      "hideMap": "Dölj karta",
+      "showMap": "Visa karta",
+      "unmapped": "{count} utan kartposition finns kvar i listan.",
+      "partial": "Ladda fler träffar i varje avsnitt. Filtren gäller det inlästa urvalet.",
+      "emptyFilters": "Inget matchar dina nuvarande filter.",
+      "examplesLabel": "Prova ett exempel",
+      "understood": "Granska och justera din sökning",
+      "examples": {
+        "shoot": "Jag filmar i München.",
+        "crew": "Kostym i Berlin och en ljustekniker i Hamburg.",
+        "studio": "Studio och vegansk catering i Zürich."
+      },
+      "evidence": {
+        "role": "Yrke angivet i profilen",
+        "title": "Sökord i rubriken",
+        "requirements": "Krav enligt leverantörens uppgifter"
+      },
+      "applyMapArea": "Begränsa till detta kartområde"
+    }
   },
   "PublicReport": {
     "metaTitle": "Rapportera ett juridiskt problem",

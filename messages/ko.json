@@ -13233,7 +13233,39 @@
     "previewWish": "검색 내용",
     "previewMatches": "일치하는 결과",
     "previewSorted": "지역별 그룹화",
-    "previewNote": "이것이 Smart가 검색을 통합하는 방식입니다. 그래픽은 실제 목록을 보여주지 않습니다."
+    "previewNote": "이것이 Smart가 검색을 통합하는 방식입니다. 그래픽은 실제 목록을 보여주지 않습니다.",
+    "discovery": {
+      "filterTitle": "무엇을 보고 싶으세요?",
+      "reset": "초기화",
+      "wishes": "검색 요청 선택",
+      "refine": "부서 및 카테고리",
+      "all": "전체",
+      "activeFilters": "적용된 필터",
+      "hidden": "숨김: {name}",
+      "removeFilter": "필터 해제: {name}",
+      "mapArea": "지도 영역",
+      "loaded": "표시된 결과: {count}",
+      "requestedPlace": "요청한 지역 내",
+      "emptyGroup": "이 선택에 해당하는 결과가 없습니다.",
+      "hideMap": "지도 숨기기",
+      "showMap": "지도 보기",
+      "unmapped": "지도 위치가 없는 {count}개 결과는 목록에 남습니다.",
+      "partial": "각 섹션에서 결과를 더 불러올 수 있습니다. 필터는 불러온 결과에 적용됩니다.",
+      "emptyFilters": "현재 필터에 맞는 결과가 없습니다.",
+      "examplesLabel": "예시로 검색해 보기",
+      "understood": "검색 내용 확인 및 수정",
+      "examples": {
+        "shoot": "뮌헨에서 촬영을 계획하고 있어요.",
+        "crew": "베를린의 의상 담당자와 함부르크의 조명 담당자를 찾고 있어요.",
+        "studio": "취리히의 스튜디오와 비건 케이터링을 찾고 있어요."
+      },
+      "evidence": {
+        "role": "프로필에 기재된 직무",
+        "title": "제목에 검색어 포함",
+        "requirements": "제공자가 명시한 조건"
+      },
+      "applyMapArea": "이 지도 영역으로 제한"
+    }
   },
   "PublicReport": {
     "errors": {

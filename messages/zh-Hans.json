@@ -13233,7 +13233,39 @@
     "previewWish": "您的搜索",
     "previewMatches": "匹配结果",
     "previewSorted": "按区域分组",
-    "previewNote": "此图示展示智能搜索的结果汇总，非真实列表。"
+    "previewNote": "此图示展示智能搜索的结果汇总，非真实列表。",
+    "discovery": {
+      "filterTitle": "你想查看哪些内容？",
+      "reset": "重置",
+      "wishes": "选择搜索需求",
+      "refine": "工种与分类",
+      "all": "全部",
+      "activeFilters": "已启用的筛选",
+      "hidden": "已隐藏：{name}",
+      "removeFilter": "移除筛选：{name}",
+      "mapArea": "地图区域",
+      "loaded": "已显示结果：{count}",
+      "requestedPlace": "在指定区域内",
+      "emptyGroup": "此选择下暂无结果。",
+      "hideMap": "隐藏地图",
+      "showMap": "显示地图",
+      "unmapped": "{count} 条没有地图位置的结果仍保留在列表中。",
+      "partial": "可在各部分加载更多结果。筛选适用于已加载的结果。",
+      "emptyFilters": "当前筛选条件下暂无匹配结果。",
+      "examplesLabel": "试试这些示例",
+      "understood": "查看并调整搜索",
+      "examples": {
+        "shoot": "我计划在慕尼黑拍摄。",
+        "crew": "寻找柏林的服装人员和汉堡的灯光师。",
+        "studio": "寻找苏黎世的摄影棚和纯素餐饮服务。"
+      },
+      "evidence": {
+        "role": "资料中注明了该工种",
+        "title": "标题包含搜索词",
+        "requirements": "服务方声明符合要求"
+      },
+      "applyMapArea": "仅显示此地图区域内的结果"
+    }
   },
   "PublicReport": {
     "errors": {

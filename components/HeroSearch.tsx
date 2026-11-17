@@ -2,6 +2,7 @@
 
 import { useContext, useEffect, useId, useRef, useState } from "react";
 import SmartSearchPreview from "@/components/SmartSearchPreview";
+import SmartSearchExamples from "@/components/SmartSearchExamples";
 import { ServerAdminContext } from "@/lib/server-admin-context";
 import { useAuth } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
@@ -29,6 +30,7 @@ export default function HeroSearch() {
   const [city, setCity] = useState("");
   const [memberHintOpen, setMemberHintOpen] = useState(false);
   const smartButton = useRef<HTMLButtonElement>(null);
+  const queryInput = useRef<HTMLInputElement>(null);
   const memberHintId = useId();
   const hint = useRef<HTMLDivElement>(null);
   const serverAdminId = useContext(ServerAdminContext);
@@ -120,6 +122,7 @@ export default function HeroSearch() {
           <input
             type="text"
             name="q"
+            ref={queryInput}
             maxLength={2000}
             aria-label={tab.placeholder}
             value={query}
@@ -150,6 +153,7 @@ export default function HeroSearch() {
           className="m-1 min-h-11 min-w-11 shrink-0 flex items-center justify-center gap-1.5 rounded-lg bg-gold px-3.5 text-sm font-bold text-bg-primary transition-colors hover:bg-gold-light sm:px-4"
         >{uiText.rich("Ui.text_43abcbcce10e6d", { part1: () => (<Search size={15} className="sm:w-3.5 sm:h-3.5" />), part2: chunks => (<span className="hidden sm:inline">{chunks}</span>) })}</button>
       </form>
+      {activeTab === "all" && canUseSmart && <SmartSearchExamples onSelect={value => { setQuery(value); queryInput.current?.focus({ preventScroll: true }); }} />}
     </div>
   );
 }

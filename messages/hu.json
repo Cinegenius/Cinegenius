@@ -13233,7 +13233,39 @@
     "previewWish": "A keresésed",
     "previewMatches": "Illő találatok",
     "previewSorted": "Területenként",
-    "previewNote": "Így fogja a Smart összekapcsolni a keresésedet. Az ábra nem valós hirdetéseket mutat."
+    "previewNote": "Így fogja a Smart összekapcsolni a keresésedet. Az ábra nem valós hirdetéseket mutat.",
+    "discovery": {
+      "filterTitle": "Mit szeretnél látni?",
+      "reset": "Alaphelyzet",
+      "wishes": "Keresési igények kiválasztása",
+      "refine": "Részlegek és kategóriák",
+      "all": "Összes",
+      "activeFilters": "Aktív szűrők",
+      "hidden": "Elrejtve: {name}",
+      "removeFilter": "Szűrő eltávolítása: {name}",
+      "mapArea": "Térképterület",
+      "loaded": "Megjelenített találatok: {count}",
+      "requestedPlace": "A kért területen",
+      "emptyGroup": "Nincs találat ebben a kiválasztásban.",
+      "hideMap": "Térkép elrejtése",
+      "showMap": "Térkép megjelenítése",
+      "unmapped": "{count} térképpozíció nélküli találat a listában marad.",
+      "partial": "Az egyes részeknél további találatokat tölthetsz be. A szűrők a betöltött találatokra vonatkoznak.",
+      "emptyFilters": "A jelenlegi szűrőkhöz nincs találat.",
+      "examplesLabel": "Próbálj ki egy példát",
+      "understood": "Keresés áttekintése és módosítása",
+      "examples": {
+        "shoot": "Münchenben forgatok.",
+        "crew": "Jelmez Berlinben és világosító Hamburgban.",
+        "studio": "Stúdió és vegán catering Zürichben."
+      },
+      "evidence": {
+        "role": "A profilban megadott foglalkozás",
+        "title": "Keresőkifejezés a címben",
+        "requirements": "A szolgáltató által megadott követelmények"
+      },
+      "applyMapArea": "Szűkítés erre a térképterületre"
+    }
   },
   "PublicReport": {
     "metaTitle": "Jogi probléma bejelentése",

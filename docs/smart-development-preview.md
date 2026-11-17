@@ -64,3 +64,12 @@ reported as passing.
 Publication is pending an explicit operator request and the guarded release.
 Native presentation/adoption belongs to APP Entwicklung; do not describe this
 source change as already live or as a verified native implementation.
+
+## Guided discovery extension, 17 November 2026
+
+The admin experience now uses the shared map/list explorer described in
+`docs/smart-discovery.md`, with examples and result-based filters. Access rules and
+the static member/guest preview remain unchanged. New copy covers all 17 currently
+enabled locales. Current verification and limitations are in
+`docs/test-reports/smart-discovery-2026-11-17.md`; the older nine-language test record
+above describes the original preview implementation, not current locale coverage.

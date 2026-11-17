@@ -1,6 +1,7 @@
 import { occupationFormFromCrew } from "@/lib/occupation-form";
 import "server-only";
-import { profileOccupationPreview, type OccupationProfile } from "@/lib/crew-occupations";
+import { profileOccupationPreview, selectedCrewOccupations, type OccupationProfile } from "@/lib/crew-occupations";
+import { marketplaceCategory } from "@/lib/marketplaceCategories";
 import { db } from "@/lib/db";
 import { getTranslations } from "next-intl/server";
 import { profileAccessFor } from "@/lib/profile-privacy-server";
@@ -136,6 +137,18 @@ async function readGroup(plan: SearchPlan, wishIndex: number, area: SearchArea, 
       image: String(row.avatar_url ?? row.logo_url ?? row.poster_url ?? row.image_url ?? "") || null,
       available: typeof row.available === "boolean" ? row.available : null,
     };
+    // Only public, canonical search facts leave the permission-projected row.
+    if (area === "crew") {
+      const profile = row as OccupationProfile;
+      result.facets = { departments: [...new Set(selectedCrewOccupations(profile.positions ?? [], profile.crew?.occupations, profile.role, profile.crew?.primaryOccupation).map(role => role.departmentId))] };
+      if (terms.length && [row.role, ...(Array.isArray(row.positions) ? row.positions : [])]
+        .some(role => typeof role === "string" && terms.some(term => searchKey(term) === searchKey(role)))) result.evidence = "role";
+    } else if (area === "marketplace") {
+      const category = marketplaceCategory(row.category, result.type);
+      if (category) result.facets = { marketplace: category.department };
+    }
+    if (!result.evidence && terms.some(term => [row.title, row.name].some(title => typeof title === "string" && searchKey(title).includes(searchKey(term))))) result.evidence = "title";
+    if (wish.requirements?.length || catering) result.evidence = "requirements";
     if (["prop", "vehicle", "location"].includes(result.type)) result.priceLabel = listingPriceLabel(result.price, row, "/Tag", locale, market);
     if (view !== "list") {
       // Never geocode private fields or use an offer's exact coordinates. Crew

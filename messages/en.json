@@ -13233,7 +13233,39 @@
     "previewWish": "Your search",
     "previewMatches": "Matching results",
     "previewSorted": "Grouped by area",
-    "previewNote": "This is how Smart will bring your search together. The graphic does not show real listings."
+    "previewNote": "This is how Smart will bring your search together. The graphic does not show real listings.",
+    "discovery": {
+      "filterTitle": "What would you like to see?",
+      "reset": "Reset",
+      "wishes": "Choose search wishes",
+      "refine": "Departments & categories",
+      "all": "All",
+      "activeFilters": "Active filters",
+      "hidden": "Hidden: {name}",
+      "removeFilter": "Remove filter: {name}",
+      "mapArea": "Map area",
+      "loaded": "Results shown: {count}",
+      "requestedPlace": "In the requested area",
+      "emptyGroup": "No results in this selection.",
+      "hideMap": "Hide map",
+      "showMap": "Show map",
+      "unmapped": "{count} without a map position remain in the list.",
+      "partial": "Load more results in each section. Filters apply to the loaded selection.",
+      "emptyFilters": "Nothing matches your current filters.",
+      "examplesLabel": "Try an example",
+      "understood": "Review & adjust your search",
+      "examples": {
+        "shoot": "I am filming in Munich.",
+        "crew": "Costume in Berlin and a lighting technician in Hamburg.",
+        "studio": "Studio and vegan catering in Zurich."
+      },
+      "evidence": {
+        "role": "Role stated in the profile",
+        "title": "Search term in the title",
+        "requirements": "Requirements declared by the provider"
+      },
+      "applyMapArea": "Limit to this map area"
+    }
   },
   "PublicReport": {
     "metaTitle": "Report a legal issue",

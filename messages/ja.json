@@ -13233,7 +13233,39 @@
     "previewWish": "あなたの検索",
     "previewMatches": "一致する結果",
     "previewSorted": "エリア別にグループ化",
-    "previewNote": "これはSmartが検索結果をまとめる方法の例です。実際のリストではありません。"
+    "previewNote": "これはSmartが検索結果をまとめる方法の例です。実際のリストではありません。",
+    "discovery": {
+      "filterTitle": "何を表示しますか？",
+      "reset": "リセット",
+      "wishes": "検索条件を選ぶ",
+      "refine": "部門とカテゴリー",
+      "all": "すべて",
+      "activeFilters": "適用中のフィルター",
+      "hidden": "非表示：{name}",
+      "removeFilter": "フィルターを解除：{name}",
+      "mapArea": "地図の範囲",
+      "loaded": "表示中の結果：{count}",
+      "requestedPlace": "指定した地域内",
+      "emptyGroup": "この選択に該当する結果はありません。",
+      "hideMap": "地図を隠す",
+      "showMap": "地図を表示",
+      "unmapped": "地図上の位置がない {count} 件はリストに残ります。",
+      "partial": "各セクションから結果を追加で読み込めます。フィルターは読み込み済みの結果に適用されます。",
+      "emptyFilters": "現在のフィルターに一致する結果はありません。",
+      "examplesLabel": "検索例を試す",
+      "understood": "検索内容を確認・調整",
+      "examples": {
+        "shoot": "ミュンヘンで撮影を計画しています。",
+        "crew": "ベルリンの衣装スタッフとハンブルクの照明スタッフを探しています。",
+        "studio": "チューリッヒのスタジオとヴィーガンのケータリングを探しています。"
+      },
+      "evidence": {
+        "role": "プロフィールに記載された職種",
+        "title": "タイトルに検索語を含む",
+        "requirements": "提供者が申告した条件"
+      },
+      "applyMapArea": "この地図範囲に絞る"
+    }
   },
   "PublicReport": {
     "errors": {

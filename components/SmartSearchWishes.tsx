@@ -58,7 +58,7 @@ export default function SmartSearchWishes({ plan, onUnauthorized }: { plan: Sear
   const [opened, setOpened] = useState<number[]>([]);
   const [refineOpened, setRefineOpened] = useState(false);
   const names = new Intl.DisplayNames([locale], { type: "region" });
-  return <div className="mt-3 space-y-2">
+  return <details className="mt-3 rounded-xl border border-border bg-bg-secondary/70 px-3"><summary className="flex min-h-11 cursor-pointer items-center gap-2 text-sm text-text-primary"><Pencil size={16} aria-hidden="true" />{t("discovery.understood")}</summary><div className="space-y-2 pb-3">
     {plan.searches.map((wish, index) => <details key={index} className="rounded-xl border border-border bg-bg-secondary/70 px-3" onToggle={event => {
       if (event.currentTarget.open) setOpened(values => values.includes(index) ? values : [...values, index]);
     }}>
@@ -76,5 +76,5 @@ export default function SmartSearchWishes({ plan, onUnauthorized }: { plan: Sear
     <details onToggle={event => { if (event.currentTarget.open) setRefineOpened(true); }}><summary className="flex min-h-11 cursor-pointer items-center text-sm text-gold">{t("refineSearch")}</summary>
       {refineOpened && <SmartSearchClarification question={t("refineHint")} requestText="" searchContext={{ plan }} onUnauthorized={onUnauthorized} />}
     </details>
-  </div>;
+  </div></details>;
 }

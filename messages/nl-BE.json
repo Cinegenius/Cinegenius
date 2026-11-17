@@ -13233,7 +13233,39 @@
     "previewWish": "Je zoekwens",
     "previewMatches": "Passende resultaten",
     "previewSorted": "Per onderdeel",
-    "previewNote": "Zo zal Smart je zoekopdracht samenbrengen. De afbeelding toont geen echte advertenties."
+    "previewNote": "Zo zal Smart je zoekopdracht samenbrengen. De afbeelding toont geen echte advertenties.",
+    "discovery": {
+      "filterTitle": "Wat wil je zien?",
+      "reset": "Herstellen",
+      "wishes": "Zoekwensen kiezen",
+      "refine": "Afdelingen en categorieën",
+      "all": "Alles",
+      "activeFilters": "Actieve filters",
+      "hidden": "Verborgen: {name}",
+      "removeFilter": "Filter verwijderen: {name}",
+      "mapArea": "Kaartgebied",
+      "loaded": "Getoonde resultaten: {count}",
+      "requestedPlace": "In het gevraagde gebied",
+      "emptyGroup": "Geen resultaten in deze selectie.",
+      "hideMap": "Kaart verbergen",
+      "showMap": "Kaart tonen",
+      "unmapped": "{count} zonder kaartpositie blijven in de lijst.",
+      "partial": "Laad meer resultaten per onderdeel. Filters gelden voor de geladen selectie.",
+      "emptyFilters": "Niets past bij je huidige filters.",
+      "examplesLabel": "Probeer een voorbeeld",
+      "understood": "Je zoekopdracht bekijken en aanpassen",
+      "examples": {
+        "shoot": "Ik film in München.",
+        "crew": "Kostuum in Berlijn en een belichter in Hamburg.",
+        "studio": "Studio en vegan catering in Zürich."
+      },
+      "evidence": {
+        "role": "Functie vermeld in het profiel",
+        "title": "Zoekterm in de titel",
+        "requirements": "Eisen volgens de aanbieder"
+      },
+      "applyMapArea": "Beperk tot dit kaartgebied"
+    }
   },
   "PublicReport": {
     "metaTitle": "Juridisch probleem melden",

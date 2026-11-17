@@ -13233,7 +13233,39 @@
     "previewWish": "Dein Suchwunsch",
     "previewMatches": "Passende Treffer",
     "previewSorted": "Nach Bereichen sortiert",
-    "previewNote": "So führt Smart künftig deine Suche zusammen. Die Grafik zeigt keine echten Angebote."
+    "previewNote": "So führt Smart künftig deine Suche zusammen. Die Grafik zeigt keine echten Angebote.",
+    "discovery": {
+      "filterTitle": "Was möchtest du sehen?",
+      "reset": "Zurücksetzen",
+      "wishes": "Suchwünsche auswählen",
+      "refine": "Gewerke & Kategorien",
+      "all": "Alle",
+      "activeFilters": "Aktive Filter",
+      "hidden": "Ausgeblendet: {name}",
+      "removeFilter": "Filter entfernen: {name}",
+      "mapArea": "Kartenausschnitt",
+      "loaded": "Angezeigte Treffer: {count}",
+      "requestedPlace": "Im gewünschten Gebiet",
+      "emptyGroup": "Keine Treffer in dieser Auswahl.",
+      "hideMap": "Karte ausblenden",
+      "showMap": "Karte anzeigen",
+      "unmapped": "{count} ohne Kartenposition bleiben in der Liste.",
+      "partial": "Weitere Treffer kannst du im jeweiligen Abschnitt laden. Die Filter gelten für die geladene Auswahl.",
+      "emptyFilters": "Hier passt gerade nichts zu deinen Filtern.",
+      "examplesLabel": "Zum Ausprobieren",
+      "understood": "Deine Suche ansehen & anpassen",
+      "examples": {
+        "shoot": "Ich plane einen Dreh in München.",
+        "crew": "Kostüm in Berlin und Beleuchter in Hamburg.",
+        "studio": "Studio und veganes Catering in Zürich."
+      },
+      "evidence": {
+        "role": "Tätigkeit im Profil angegeben",
+        "title": "Suchbegriff im Titel",
+        "requirements": "Anforderungen laut Anbieter"
+      },
+      "applyMapArea": "Auf diesen Ausschnitt begrenzen"
+    }
   },
   "PublicReport": {
     "metaTitle": "Rechtsverstoß melden",
