@@ -1,6 +1,8 @@
 .root { min-width: 0; }
 .crew { --rail-card-width: 170px; }
 .location { --rail-card-width: 72%; }
+/* Each news page keeps three compact rows; vertical gestures scroll the page. */
+.news { --rail-card-width: 100%; }
 .track {
   display: grid;
   grid-auto-flow: column;

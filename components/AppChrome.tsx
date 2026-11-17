@@ -7,7 +7,6 @@ import NavigationRestoration from "@/components/NavigationRestoration";
 import Navbar from "@/components/Navbar";
 import BottomNav from "@/components/BottomNav";
 import Footer from "@/components/Footer";
-import PersonalAreaNavigation from "@/components/PersonalAreaNavigation";
 import { ServerAdminContext } from "@/lib/server-admin-context";
 import { SiteNavigationProvider } from "@/contexts/SiteNavigationContext";
 import SiteNavigationMenu from "@/components/SiteNavigationMenu";
@@ -26,7 +25,7 @@ export default function AppChrome({ children, initialIsSignedIn, initialAdminUse
     <Navbar initialIsSignedIn={initialIsSignedIn} initialAdminUserId={initialAdminUserId} />
     <main className="site-main flex-1 pb-[var(--mobile-nav-clearance)] lg:pb-0">
       <LegalLanguageNotice />
-      <PersonalAreaNavigation>{children}</PersonalAreaNavigation>
+      {children}
     </main>
     {pathname !== "/messages" && <Footer />}
     <BottomNav />

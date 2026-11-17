@@ -7,7 +7,7 @@ import { usePathname } from "next/navigation";
 import { useAuth, useUser, useClerk } from "@clerk/nextjs";
 import {
   Menu, Search, Loader2, User,
-  LogOut, MessageSquare, ShieldCheck,
+  LogOut, MessageSquare, Bell,
 } from "lucide-react";
 import NavigationIcon from "@/components/NavigationIcon";
 import { Logo } from "@/components/Logo";
@@ -59,9 +59,15 @@ export default function Navbar({ initialIsSignedIn = false, initialAdminUserId =
   const profileDisplayName = profileData?.userId === activeUserId ? profileData?.displayName ?? "" : "";
   const unreadMessages = inbox.status === "ready" ? inbox.count ?? 0 : 0;
   const unreadNotices = inbox.status === "ready" ? inbox.notifications.filter(notice => !notice.read && notice.type !== "new_message").length : 0;
-  const unreadTotal = unreadMessages + unreadNotices;
+
   const inboxFailed = inbox.status === "error";
-  const messageLabel = inboxFailed ? `${t("messages")}: ${uiText("notifications.loadError")}` : unreadTotal > 0 ? uiText("InboxNavigation.unread", { chats: unreadMessages, notices: unreadNotices }) : t("messages");
+  const messageLabel = inboxFailed ? `${t("messages")}: ${uiText("notifications.loadError")}` : unreadMessages > 0 ? uiText(unreadMessages === 1 ? "notifications.newMessage" : "notifications.newMessages", { count: unreadMessages }) : t("messages");
+  const noticeLabel = inboxFailed ? `${t("notifications")}: ${uiText("notifications.loadError")}` : unreadNotices > 0 ? `${t("notifications")} (${unreadNotices})` : t("notifications");
+  const noticeAction = hasSignedInSession ? <Link href="/notifications" prefetch={false} aria-label={noticeLabel} title={noticeLabel}
+    className="relative flex h-11 w-11 shrink-0 items-center justify-center rounded-lg text-text-muted transition-colors hover:bg-bg-elevated hover:text-gold">
+    <Bell size={19} aria-hidden="true" />
+    {unreadNotices > 0 && <span aria-hidden="true" className="absolute right-0.5 top-0.5 inline-flex h-4 min-w-4 items-center justify-center rounded-full bg-gold px-1 text-[9px] font-bold text-bg-primary">{unreadNotices > 9 ? "9+" : unreadNotices}</span>}
+  </Link> : null;
   const supportBadge = supportUnreadCount > 0 ? <span title={supportUnreadLabel} aria-label={supportUnreadLabel} className="ml-auto inline-flex h-5 min-w-5 shrink-0 items-center justify-center rounded-full bg-gold px-1 text-[10px] font-bold text-bg-primary">{supportUnreadCount > 99 ? "99+" : supportUnreadCount}</span> : null;
   const displayName = activeUserId ? profileDisplayName || user?.firstName || user?.emailAddresses?.[0]?.emailAddress?.split("@")[0] || "" : "";
   const email = activeUserId ? user?.primaryEmailAddress?.emailAddress ?? "" : "";
@@ -205,7 +211,7 @@ export default function Navbar({ initialIsSignedIn = false, initialAdminUserId =
     <div
       ref={accountMenuRef}
       id="header-account-menu"
-      className="fixed right-2 top-[var(--site-header-height)] z-50 mt-2 w-[26rem] max-w-[calc(100vw-1rem)] max-h-[calc(100dvh-var(--site-header-height)-1rem-var(--mobile-nav-clearance))] lg:max-h-[calc(100dvh-5rem-env(safe-area-inset-bottom,0px))] overflow-y-auto overscroll-contain rounded-2xl border border-border bg-bg-elevated shadow-2xl animate-fade-in sm:right-4"
+      className="fixed right-2 top-[var(--site-header-height)] z-50 mt-2 w-[19rem] max-w-[calc(100vw-1rem)] max-h-[calc(100dvh-var(--site-header-height)-1rem-var(--mobile-nav-clearance))] lg:max-h-[calc(100dvh-5rem-env(safe-area-inset-bottom,0px))] overflow-y-auto overscroll-contain rounded-2xl border border-border bg-bg-elevated shadow-2xl animate-fade-in sm:right-4"
     >
       {/* Identity */}
       <div className="px-4 py-3.5 border-b border-border flex items-center gap-3">
@@ -217,19 +223,12 @@ export default function Navbar({ initialIsSignedIn = false, initialAdminUserId =
       </div>
 
       {/* Links */}
-      <div className="grid grid-cols-1 gap-1 py-1.5 min-[480px]:grid-cols-2">
+      <div className="flex flex-col gap-1 py-1.5">
         {ACCOUNT_NAV_ITEMS.map(item => <Link
-          key={item.id} href={item.href} prefetch={false} onClick={() => setUserMenuOpen(false)}
+          key={item.id} href={item.id === "public-profile" && user?.id ? `/profile/${user.id}` : item.href} prefetch={false} onClick={() => setUserMenuOpen(false)}
           className="flex min-h-11 items-center gap-3 px-4 py-2.5 text-sm text-text-secondary hover:text-text-primary hover:bg-bg-hover transition-colors"
-        ><NavigationIcon name={item.icon} size={15} className="text-text-muted shrink-0" /><span className="min-w-0 break-words">{t(item.id === "overview" ? "personalArea" : item.key)}</span></Link>)}
-        <Link
-          href={user?.id ? `/profile/${user.id}` : "/profile"}
-          onClick={() => setUserMenuOpen(false)}
-          className="flex min-h-11 items-center gap-3 px-4 py-2.5 text-sm text-text-secondary hover:text-text-primary hover:bg-bg-hover transition-colors"
-        >
-          <User size={15} className="text-text-muted shrink-0" /> {t("publicProfile")}
-        </Link>
-        {showAdminLink && <Link href="/admin" onClick={() => setUserMenuOpen(false)} className="flex min-h-11 items-center gap-3 px-4 py-2.5 text-sm text-text-secondary hover:text-text-primary hover:bg-bg-hover transition-colors"><ShieldCheck size={15} className="text-text-muted shrink-0" />{t("adminArea")}{supportBadge}</Link>}
+        ><NavigationIcon name={item.icon} size={15} className="text-text-muted shrink-0" /><span className="min-w-0 break-words">{item.id === "public-profile" ? uiText("PersonalArea.profileView") : item.id === "settings" ? uiText("PersonalArea.settings") : t(item.key)}{item.id === "overview" && supportBadge}</span></Link>)}
+
       </div>
 
       {/* Sign out */}
@@ -284,8 +283,9 @@ export default function Navbar({ initialIsSignedIn = false, initialAdminUserId =
               {hasSignedInSession && <Link href="/messages" prefetch={authRoute || signingOut ? false : null} aria-label={messageLabel} title={messageLabel} aria-current={activeId === "messages" ? "page" : undefined} className={`relative flex h-11 w-11 shrink-0 items-center justify-center rounded-lg transition-colors hover:bg-bg-elevated hover:text-gold ${activeId === "messages" ? "text-gold" : "text-text-muted"}`}>
                 <MessageSquare size={19} aria-hidden="true" />
                 {inboxFailed && <span aria-hidden="true" className="absolute right-1 top-1 h-1.5 w-1.5 rounded-full bg-gold" />}
-                {unreadTotal > 0 && <span aria-hidden="true" className="absolute right-0.5 top-0.5 inline-flex h-4 min-w-4 items-center justify-center rounded-full bg-crimson px-1 text-[9px] font-bold text-white">{unreadTotal > 9 ? "9+" : unreadTotal}</span>}
+                {unreadMessages > 0 && <span aria-hidden="true" className="absolute right-0.5 top-0.5 inline-flex h-4 min-w-4 items-center justify-center rounded-full bg-crimson px-1 text-[9px] font-bold text-white">{unreadMessages > 9 ? "9+" : unreadMessages}</span>}
               </Link>}
+              {noticeAction}
               <LanguageSwitcher />
               {!hasSignedInSession && (
                 <>
@@ -331,7 +331,7 @@ export default function Navbar({ initialIsSignedIn = false, initialAdminUserId =
               {hasSignedInSession && <Link href="/messages" prefetch={false} aria-label={messageLabel} title={messageLabel} aria-current={activeId === "messages" ? "page" : undefined} className="relative flex h-11 w-11 shrink-0 items-center justify-center rounded-lg text-text-muted hover:bg-bg-elevated hover:text-gold">
                 <MessageSquare size={19} aria-hidden="true" />
                 {inboxFailed && <span aria-hidden="true" className="absolute right-1 top-1 h-1.5 w-1.5 rounded-full bg-gold" />}
-                {unreadTotal > 0 && <span aria-hidden="true" className="absolute right-0.5 top-0.5 inline-flex h-4 min-w-4 items-center justify-center rounded-full bg-crimson px-1 text-[9px] font-bold text-white">{unreadTotal > 9 ? "9+" : unreadTotal}</span>}
+                {unreadMessages > 0 && <span aria-hidden="true" className="absolute right-0.5 top-0.5 inline-flex h-4 min-w-4 items-center justify-center rounded-full bg-crimson px-1 text-[9px] font-bold text-white">{unreadMessages > 9 ? "9+" : unreadMessages}</span>}
               </Link>}
               {!hasSignedInSession && (
                 <div className="flex items-center gap-1">{uiText.rich("Ui.text_49b372e77a7a76", { value2: () => (t("signIn")), part1: chunks => (<Link href="/sign-in" prefetch className="min-h-11 inline-flex items-center justify-center whitespace-nowrap rounded-lg border border-border px-2.5 max-[360px]:px-1.5 text-[11px] max-[360px]:text-[10px] font-semibold text-text-primary hover:border-gold hover:text-gold">{chunks}</Link>), value5: () => (t("signUp")), part4: chunks => (<span className="max-[420px]:hidden">{chunks}</span>), part6: chunks => (<span className="min-[421px]:hidden">{chunks}</span>), part3: chunks => (<Link href="/sign-up" prefetch className="min-h-11 inline-flex items-center justify-center whitespace-nowrap rounded-lg bg-gold px-2.5 max-[360px]:px-1.5 text-[11px] max-[360px]:text-[10px] font-bold text-bg-primary hover:bg-gold-light">{chunks}</Link>) })}</div>
@@ -350,6 +350,7 @@ export default function Navbar({ initialIsSignedIn = false, initialAdminUserId =
                   {supportBadge && <span className="absolute -right-1 -top-1">{supportBadge}</span>}
                 </button>
               )}
+              {noticeAction}
               {hasSignedInSession && <LanguageSwitcher />}
               <button
                 className="relative w-11 h-11 flex items-center justify-center rounded-lg text-text-secondary hover:text-gold transition-colors outline-none focus-visible:ring-2 focus-visible:ring-gold/60"
@@ -359,7 +360,6 @@ export default function Navbar({ initialIsSignedIn = false, initialAdminUserId =
                 aria-controls={SITE_NAV_MENU_ID} aria-haspopup="dialog"
               >
                 <Menu size={22} />
-                {supportBadge && <span className="absolute -right-1 -top-1">{supportBadge}</span>}
               </button>
             </div>
           </div>

@@ -500,7 +500,7 @@ function CreatorsInner({
           <MobileFilterSelect value={profileTypeFilter} onChange={setProfileTypeFilter} placeholder={t("filterAll")} options={availableProfileTypes.map((value) => ({ value, label: PROFILE_TYPE_MAP[value] ?? value }))} />
         </MobileFilterField>
         {(!isProviderFilter(sidebarDept)||sidebarDept===CREW_PROVIDER_FILTER) && <BrowseRoleFilter label={uiText("Ui.text_0038a9cf86613c")} placeholder={t("searchRoles")}
-          selected={selectedRoles} onChange={setSelectedRoles} options={availableOccupations.filter(option => !sidebarDept || sidebarDept===CREW_PROVIDER_FILTER || option.departmentId === sidebarDept).map(option => ({ value: option.roleId, label: getDepartmentRoleLabel(option.departmentId, option.label, locale, animals, taxonomyText) }))} />}
+          selected={selectedRoles} onChange={setSelectedRoles} options={availableOccupations.filter(option => !sidebarDept || sidebarDept===CREW_PROVIDER_FILTER || option.departmentId === sidebarDept).map(option => ({ value: option.roleId, label: getDepartmentRoleLabel(option.departmentId, option.label, locale, animals, taxonomyText), searchTerms: getOccupationSearchTerms(option.label) }))} />}
         <MobileFilterField label={t("filterLanguage")}>
           <MobileFilterSelect value={languageFilter} onChange={setLanguageFilter} placeholder={t("filterAll")} options={availableLanguages.map((value) => ({ value, label: crewLanguageLabel(value, locale) }))} />
         </MobileFilterField>

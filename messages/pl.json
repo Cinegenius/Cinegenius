@@ -156,7 +156,7 @@
     "crewCamera": "Kamera",
     "crewCameraDesc": "Operator zdjęć, operator kamery, asystent kamery",
     "crewLight": "Oświetlenie",
-    "crewLightDesc": "Oświetleniowiec, best boy",
+    "crewLightDesc": "Gaffer, Best Boy / Best Girl",
     "crewSound": "Dźwięk",
     "crewSoundDesc": "Mikser, mikrofonista, projektant dźwięku",
     "crewProduction": "Produkcja",
@@ -760,7 +760,7 @@
     "listingTypeVehicles": "Pojazdy",
     "listingTypeCreator": "Twórca / Talent",
     "newProjectPlaceholderDesc": "O czym jest ten projekt?",
-    "collabRolePlaceholder": "Rola / stanowisko (np. Oświetleniowiec)",
+    "collabRolePlaceholder": "Rola / stanowisko (np. Gaffer)",
     "ageFrom": "od",
     "ageTo": "do",
     "videoLinkPlaceholder": "https://vimeo.com/... lub https://youtube.com/...",
@@ -1645,15 +1645,15 @@
       "tiertraining-film-medien": "Tresura zwierząt dla filmu i mediów"
     },
     "roles": {
-      "tiertrainer": "Treser zwierząt",
-      "filmhundetrainer": "Treser psów filmowych",
-      "tierbetreuer": "Opiekun zwierząt",
-      "tierkoordination": "Koordynator zwierząt",
-      "set-tierbetreuung": "Opieka nad zwierzętami na planie",
-      "horse-master": "Mistrz koni",
-      "assistant-horse-master": "Asystent mistrza koni",
-      "horse-trainer": "Treser koni filmowych",
-      "horse-wrangler": "Opiekun koni"
+      "tiertrainer": "Trener zwierząt filmowych / Trenerka zwierząt filmowych",
+      "filmhundetrainer": "Treser psów filmowych / Treserka psów filmowych",
+      "tierbetreuer": "Opiekun zwierząt / Opiekunka zwierząt (Animal Handler)",
+      "tierkoordination": "Koordynator zwierząt / Koordynatorka zwierząt",
+      "set-tierbetreuung": "Opiekun zwierząt na planie / Opiekunka zwierząt na planie",
+      "horse-master": "Koordynator koni / Koordynatorka koni (Horse Master)",
+      "assistant-horse-master": "Asystent / Asystentka koordynacji koni",
+      "horse-trainer": "Treser koni filmowych / Treserka koni filmowych",
+      "horse-wrangler": "Opiekun koni / Opiekunka koni (Horse Wrangler)"
     },
     "species": {
       "dogs": "Psy",
@@ -3419,7 +3419,7 @@
     "text_bfdc08cfd677d0": "rola nieokreślona",
     "text_d190a2564e3e50": "Aktualnie potwierdzone: <value1></value1>",
     "text_ad102247f94b2b": "Sprawdź lub dostosuj nową rolę(e)<part1></part1>",
-    "text_354d5eb293b0a9": "np. Kierownik techniczny, Oświetleniowiec",
+    "text_354d5eb293b0a9": "np. Osoba kierująca techniką, Gaffer",
     "text_6b9a27efa8e57d": "Rola(e), widoczne publicznie<part1></part1>",
     "text_a9223983e08ec4": "Nie udało się zaakceptować zaproszenia.",
     "text_2f897dc4dd787b": "Twoje zgłoszenie do <value1></value1> zostało wysłane. Firma musi jeszcze potwierdzić Twoje członkostwo.",
@@ -5971,7 +5971,7 @@
         "r_e90f5848bfc3": "Księgowość produkcji",
         "r_c6dc08a47d0d": "Kontroler finansowy filmu",
         "r_2557c22fb3d7": "Konsultant ds. ekologii / Menedżer ds. zrównoważonego rozwoju",
-        "r_2a6c1d42831e": "Praktykant produkcji",
+        "r_2a6c1d42831e": "Stażysta produkcji / Stażystka produkcji",
         "r_ede69642be01": "Praktykant kierownika planu",
         "r_de9ab1a6b55a": "Kierownik produkcji",
         "r_fd701e2c1e86": "Kierownik jednostki produkcyjnej",
@@ -6020,7 +6020,7 @@
         "r_07f0060c8996": "Praktykant producenta"
       },
       "regie": {
-        "r_f59d6991c44a": "Reżyser",
+        "r_f59d6991c44a": "Reżyser / Reżyserka",
         "r_5562e3abbb45": "Współreżyser",
         "r_df7e552a6792": "Reżyser drugiej jednostki",
         "r_0aca88b2853d": "Reżyser studia",
@@ -6145,9 +6145,9 @@
       },
       "licht": {
         "r_222be04dbf00": "Gaffer",
-        "r_1e210e69039a": "Best Boy elektryk",
+        "r_1e210e69039a": "Zastępca / Zastępczyni szefa oświetlenia (Best Boy / Best Girl Electric)",
         "r_14dd174cd76c": "Gaffer instalacji oświetleniowej",
-        "r_92137802b24a": "Best Boy instalacji oświetleniowej",
+        "r_92137802b24a": "Zastępca / Zastępczyni szefa prelightu (Rigging Best Boy / Rigging Best Girl Electric)",
         "r_7fce7d6fcf12": "Elektryk instalacji oświetleniowej",
         "r_1bcf9d8d9b03": "Elektryk / technik oświetlenia",
         "r_d95b919dded9": "Główny technik oświetlenia",
@@ -6167,13 +6167,13 @@
       },
       "grip": {
         "r_470156bd03e4": "Key Grip",
-        "r_cfbf2a22ed6e": "Best Boy Grip / 2. grip kamery",
+        "r_cfbf2a22ed6e": "Zastępca / Zastępczyni szefa gripu (Best Boy / Best Girl Grip)",
         "r_32a6ab31b1a1": "Dolly Grip / operator dolly",
         "r_376dc1f790b8": "Grip",
         "r_dbfaadb8821c": "Asystent gripa",
         "r_46dab52c1995": "Grip instalacji",
         "r_ea7e925bd850": "Key Grip instalacji",
-        "r_fa9d72fc7978": "Best Boy Grip instalacji",
+        "r_fa9d72fc7978": "Zastępca / Zastępczyni szefa montażu gripowego (Rigging Best Boy / Rigging Best Girl Grip)",
         "r_2fa0b44342d7": "Specjalne konstrukcje grip",
         "r_08c07afebb7f": "Operator żurawia kamerowego / jib",
         "r_5ece318b289f": "Technik żurawia kamerowego",
@@ -6580,7 +6580,7 @@
       },
       "set-logistik": {
         "r_06d9aa28368f": "Biegacz planu",
-        "r_51e581b5ea39": "Kierowca (samochód / ciężarówka)",
+        "r_51e581b5ea39": "Kierowca / Kierowczyni (samochód osobowy / ciężarowy)",
         "r_36a599628c2e": "Kierowca lokalizacji",
         "r_9bc1a35535fa": "Kierownik jednostki lokalizacji",
         "r_273f12c52b95": "Asystent kierownika lokalizacji",
@@ -6643,9 +6643,9 @@
         "r_b85e79c1153f": "Badacz (ogólny)"
       },
       "cast": {
-        "r_3d0e76b883b1": "Główna rola",
+        "r_3d0e76b883b1": "Aktor pierwszoplanowy / Aktorka pierwszoplanowa",
         "r_543b99d52c01": "Aktor",
-        "r_aa64ee1fd5d6": "Rola drugoplanowa",
+        "r_aa64ee1fd5d6": "Aktor drugoplanowy / Aktorka drugoplanowa",
         "r_5fea55df03ed": "Statysta",
         "r_912a4dbdd23c": "Statysta wyróżniony",
         "r_130f7a137659": "Model",
@@ -6668,7 +6668,7 @@
         "r_901a1b08f6ba": "Koordynator intymności",
         "r_7a721e572105": "Asystent castingu",
         "r_a1f9ba79ab08": "Pomocnik castingu",
-        "r_84927cc7b2bc": "Aktor/aktorka drugoplanowa",
+        "r_84927cc7b2bc": "Aktor drugoplanowy / Aktorka drugoplanowa",
         "r_97144193d2e9": "Statysta / statystka",
         "r_de130677203b": "Reżyser castingu młodzieżowego",
         "r_27725de30521": "Reżyser castingu dziecięcego",
@@ -6815,7 +6815,7 @@
         "r_ce039c1f951f": "Motion Designer (Social)"
       },
       "foto": {
-        "r_d2c0588cf0d1": "Fotograf",
+        "r_d2c0588cf0d1": "Fotograf / Fotografka",
         "r_d7f7fbf5939c": "Fotograf Mody",
         "r_e0551919b067": "Fotograf Produktowy",
         "r_b06301444ef7": "Fotograf Wydarzeń",
@@ -6901,15 +6901,15 @@
         "r_532adc563b66": "Kierowca cateringu / kuchni mobilnej"
       },
       "filmtiere-tiertraining": {
-        "r_3d8ab6fb2c6a": "Treser zwierząt",
-        "r_654c33dc9c6b": "Treser psów filmowych",
-        "r_40758f075d18": "Opiekun zwierząt",
-        "r_7a1591b96b3a": "Koordynator zwierząt",
-        "r_a63695a566c3": "Opieka nad zwierzętami na planie",
-        "r_9faf951b627e": "Opiekun koni",
-        "r_7c4f137defec": "Asystent opiekuna koni",
-        "r_8e8f21cf0303": "Treser koni",
-        "r_35f9ffa503c4": "Poganiacz koni"
+        "r_3d8ab6fb2c6a": "Trener zwierząt filmowych / Trenerka zwierząt filmowych",
+        "r_654c33dc9c6b": "Treser psów filmowych / Treserka psów filmowych",
+        "r_40758f075d18": "Opiekun zwierząt / Opiekunka zwierząt (Animal Handler)",
+        "r_7a1591b96b3a": "Koordynator zwierząt / Koordynatorka zwierząt",
+        "r_a63695a566c3": "Opiekun zwierząt na planie / Opiekunka zwierząt na planie",
+        "r_9faf951b627e": "Koordynator koni / Koordynatorka koni (Horse Master)",
+        "r_7c4f137defec": "Asystent / Asystentka koordynacji koni",
+        "r_8e8f21cf0303": "Treser koni filmowych / Treserka koni filmowych",
+        "r_35f9ffa503c4": "Opiekun koni / Opiekunka koni (Horse Wrangler)"
       }
     },
     "extra": {
@@ -8209,7 +8209,7 @@
     "leadership": "Założyciele i kierownictwo"
   },
   "NewsRegion": {
-    "unassignedCountry": "Brak kraju",
+    "unassignedCountry": "Neutralne",
     "countryLabel": "Kraj dla wiadomości branżowych",
     "automatic": "Automatycznie",
     "automaticCountry": "Automatycznie · {country}",
@@ -8217,7 +8217,8 @@
     "saveError": "Nie udało się zapisać wyboru. Proszę zezwolić na pliki cookie preferencji i spróbować ponownie.",
     "loadError": "Nie udało się załadować wpisów.",
     "retry": "Spróbuj ponownie",
-    "allTopics": "Wszystkie tematy"
+    "allTopics": "Wszystkie tematy",
+    "railHint": "Przesuń w bok lub użyj kropek, aby zobaczyć więcej wiadomości. Przewijanie w górę i w dół przesuwa stronę."
   },
   "PrivacySettings": {
     "title": "Prywatność",
@@ -8438,5 +8439,20 @@
       "desert": "Pustynia",
       "polar": "Polarny"
     }
+  },
+  "PersonalArea": {
+    "content": "Moje treści",
+    "activity": "Aktywność",
+    "profileView": "Zobacz profil",
+    "settings": "Ustawienia",
+    "editProfile": "Edytuj profil"
+  },
+  "Favorites": {
+    "loadError": "Nie udało się wczytać zapisanych elementów.",
+    "removeError": "Nie udało się usunąć elementu. Spróbuj ponownie.",
+    "filterType": "Filtruj według działu",
+    "noMatches": "Nie masz jeszcze nic zapisanego w tym dziale.",
+    "signInHint": "Zaloguj się, aby zobaczyć zapisane elementy.",
+    "removeItem": "Usuń {name} z zapisanych elementów"
   }
 }

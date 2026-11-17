@@ -23,8 +23,8 @@ export default function HomeNewsRegion({region, codes, topic, topics, empty = fa
     setError(false);
     startTransition(() => router.refresh());
   };
-  return <div className="mb-3 min-w-0" aria-busy={pending}>
-    <div className="grid min-w-0 grid-cols-1 gap-2 min-[380px]:grid-cols-2 sm:max-w-xl">
+  return <div className="mb-3 w-full min-w-0" aria-busy={pending}>
+    <div className="grid w-full min-w-0 grid-cols-1 gap-2 min-[380px]:grid-cols-2 sm:max-w-xl">
       <NewsCountrySelect value={region.selection} country={region.country} codes={codes} onChange={value => choose('country', value)} disabled={pending}/>
       <BrowseSelect label={organizations('topics')} value={topic.selection} onChange={value => choose('topic', value)} disabled={pending} icon={<SlidersHorizontal size={17} />} options={[
         {value: 'all', label: t('allTopics')},

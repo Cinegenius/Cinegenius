@@ -10,18 +10,18 @@ import { useFormRouter as useRouter } from "@/lib/use-form-router";
 
 import { useFormDraft } from "@/lib/use-form-draft";
 import FormDraftStatus from "@/components/FormDraftStatus";
-import { Suspense, useCallback, useState, useEffect, useRef } from "react";
+import { Suspense, useCallback, useState, useEffect, useLayoutEffect, useRef } from "react";
 
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { useUser } from "@clerk/nextjs";
+import { useAuth, useUser } from "@clerk/nextjs";
 import { useLocale, useTranslations } from "next-intl";
 import { compressImage, compressAvatar, MAX_FUNCTION_UPLOAD_BYTES, safeObjectURL } from "@/lib/compressImage";
 import {
   Camera, CheckCircle, User, Lock, Bell, Film,
   Plus, X, Save, Upload, ShieldCheck, Clock, AlertCircle, Loader2,
   Globe, Plane, Video, Euro, Clapperboard, Link2, AtSign, PlayCircle, ExternalLink,
-  Users2, Eye, EyeOff, Pencil, Check, Search, ChevronDown,
+  Users2, Eye, EyeOff, Pencil, Check, Search, ChevronDown, ChevronLeft,
 } from "lucide-react";
 import LicensePicker from "@/components/LicensePicker";
 import ExternalProfilesSection from "@/components/ExternalProfilesSection";
@@ -43,7 +43,7 @@ import ProfileIdentityFields from "@/components/ProfileIdentityFields";
 import ProfileArtPicker from "@/components/ProfileArtPicker";
 import { isAvatarUploadAssociated } from "@/lib/profile-avatar-persistence";
 import { validateProfileSave, type ProfileSaveFieldErrors } from "@/lib/profile-save-validation";
-import { PROFILE_EDITOR_STEPS, profileEditorAvailabilityConfig, profileEditorRequiredMissing, profileEditorStepForErrors, profileEditorStepForHint, shouldResumeProfileEditorDraft, type ProfileEditorStep } from "@/lib/profile-editor-flow";
+import { PROFILE_EDITOR_STEPS, profileEditorAvailabilityConfig, profileEditorRequiredMissing, profileEditorStepForErrors, profileEditorStepForHint, profileEditorDraftStep, profileEditorResumeStep, profileSettingsHref, shouldResumeProfileEditorDraft, type ProfileEditorStep } from "@/lib/profile-editor-flow";
 import { uiErrorMessage } from "@/lib/ui-error-message";
 
 const ALL_CREW_ROLES = departments.flatMap((d) => d.roles);
@@ -526,9 +526,14 @@ function VerificationTab() {
 
 function ProfileTabFromUrl({ onChange }: { onChange: (tab: string) => void }) {
   const searchParams = useSearchParams();
+  const router = useRouter();
   const requested = searchParams.get("tab");
   const tab = requested && TAB_IDS.some(({ id }) => id === requested) ? requested : "profile";
-  useEffect(() => { onChange(tab); }, [onChange, tab]);
+  useEffect(() => {
+    onChange(tab);
+    const destination = profileSettingsHref(tab);
+    if (destination) router.replace(destination);
+  }, [onChange, tab, router]);
   return null;
 }
 
@@ -537,6 +542,22 @@ type FilmEntry = { year: number | string; title: string; role: string; type: str
 // ─── Profile Page ─────────────────────────────────────────────────────────────
 
 export default function ProfilePage() {
+  const uiText = useTranslations();
+  const { user, isLoaded: userLoaded } = useUser();
+  const { userId, sessionId, isLoaded: authLoaded, isSignedIn } = useAuth();
+  if (!userLoaded || !authLoaded || !isSignedIn || !userId || !sessionId || user?.id !== userId) {
+    return <div className="site-container py-24" role="status">{uiText("common.loading")}</div>;
+  }
+  return <ProfileEditorContent key={`${userId}:${sessionId}`} accountId={userId} />;
+}
+
+function ProfileEditorContent({ accountId }: { accountId: string }) {
+  const editorActive = useRef(false);
+  useLayoutEffect(() => {
+    editorActive.current = true;
+    return () => { editorActive.current = false; };
+  }, []);
+  const isCurrentEditor = useCallback(() => editorActive.current, []);
   const uiText = useTranslations();
   const PROFILE_TYPE_LABELS = getLocalizedProfileTypeLabels(uiText);
 
@@ -569,9 +590,6 @@ export default function ProfilePage() {
   const fileRef = useRef<HTMLInputElement>(null);
 
   const [activeTab, setActiveTab] = useState("profile");
-  const selectProfileTab = (tab: string) => {
-    router.replace(`/profile?tab=${encodeURIComponent(tab)}`, { scroll: false });
-  };
   const [profileLoading, setProfileLoading] = useState(true);
   const [profileLoadError, setProfileLoadError] = useState(false);
   const [fieldErrors, setFieldErrors] = useState<ProfileSaveFieldErrors>({});
@@ -590,9 +608,6 @@ export default function ProfilePage() {
   const activityPickerRef = useRef<HTMLDivElement>(null);
   const [saving, setSaving] = useState(false);
   const [avatarUploading, setAvatarUploading] = useState(false);
-  const [messageEmailsEnabled, setMessageEmailsEnabled] = useState(true);
-  const [notificationLoading, setNotificationLoading] = useState(false);
-  const [notificationError, setNotificationError] = useState("");
 
   // My projects & listings
   type MyProject = { id: string; title: string; year: number | null; type: string | null; poster_url: string | null };
@@ -754,59 +769,20 @@ export default function ProfilePage() {
     }
   }, [activeTab]);
 
-  useEffect(() => {
-    if (activeTab !== "notifications") return;
-    let cancelled = false;
-    setNotificationLoading(true);
-    setNotificationError("");
-    fetch("/api/user-settings")
-      .then(async (response) => {
-        const result = await response.json().catch(() => ({}));
-        if (!response.ok) throw new Error(result.error ?? uiText("Ui.text_2669fecc698980", { value1: String(response.status) }));
-        return result;
-      })
-      .then(({ settings }) => {
-        if (!cancelled && settings) setMessageEmailsEnabled(settings.email_new_message !== false);
-      })
-      .catch((err) => {
-        if (!cancelled) setNotificationError(uiText("Ui.text_5ffc3443f37e9f", { value1: String(uiErrorMessage(err, uiText("Ui.text_0504c98fd2caa9"))) }));
-      })
-      .finally(() => { if (!cancelled) setNotificationLoading(false); });
-    return () => { cancelled = true; };
-  }, [activeTab]);
-
-  const updateMessageEmails = async () => {
-    const previous = messageEmailsEnabled;
-    const next = !previous;
-    setNotificationError("");
-    setMessageEmailsEnabled(next);
-    setNotificationLoading(true);
-    try {
-      const response = await fetch("/api/user-settings", {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email_new_message: next }),
-      });
-      const result = await response.json().catch(() => ({}));
-      if (!response.ok || result.error) throw new Error(result.error ?? uiText("Ui.text_2669fecc698980", { value1: String(response.status) }));
-      addToast(uiText("Ui.text_d2a2301c3bb1ed"), "success");
-    } catch (err) {
-      setMessageEmailsEnabled(previous);
-      setNotificationError(uiText("Ui.text_7d80e16f8158c3", { value1: String(uiErrorMessage(err, uiText("Ui.text_8760d6e61c65fe"))) }));
-    } finally {
-      setNotificationLoading(false);
-    }
-  };
-
   // ── Load profile from Supabase ──────────────────────────────────────────────
   useEffect(() => {
-    fetch("/api/profile", { cache: "no-store" })
+    const controller = new AbortController();
+    const current = () => !controller.signal.aborted && isCurrentEditor();
+    fetch("/api/profile", { cache: "no-store", headers: { "X-Profile-Account": accountId }, signal: controller.signal })
       .then(async (r) => {
         const result = await r.json().catch(() => ({}));
-        if (!r.ok) throw new Error(result.error ?? uiText("Ui.text_2669fecc698980", { value1: String(r.status) }));
+        if (!current()) return null;
+        if (!r.ok || typeof result.exists !== "boolean" || (result.exists ? !result.profile || result.profile.user_id !== accountId : result.profile !== null)) throw new Error(result.error ?? uiText("Ui.text_2669fecc698980", { value1: String(r.status) }));
         return result;
       })
-      .then(({ profile, exists, unavailableFields = [] }) => {
+      .then((result) => {
+        if (!current() || !result) return;
+        const { profile, exists, unavailableFields = [] } = result;
         if (unavailableFields.length > 0) {
           addToast(uiText("Ui.text_e7f05d1a09c33f", { value1: String(unavailableFields.join(", ")) }), "error");
         }
@@ -905,13 +881,14 @@ export default function ProfilePage() {
         }
         setProfileLoading(false);
       })
-      .catch((err) => {
-        console.error("[profile page] failed to load profile", err);
+      .catch(() => {
+        if (!current()) return;
         setProfileLoadError(true);
         setProfileLoading(false);
         addToast(uiText("Ui.text_5365725d585528"), "error");
       });
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+    return () => controller.abort();
+  }, [accountId, isCurrentEditor]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Load project credits separately
   useEffect(() => {
@@ -934,6 +911,7 @@ export default function ProfilePage() {
     setAvatarUploading(true);
     try {
       const prepared = await prepareProfileMediaFile(file, (source) => compressAvatar(source, uiText));
+      if (!isCurrentEditor()) return;
       if (!prepared.file) throw new Error(profileMediaErrorText(prepared.error, t));
       let url: string;
       if (profileExists) {
@@ -941,7 +919,7 @@ export default function ProfilePage() {
         body.append("file", prepared.file);
         uploadId = crypto.randomUUID().replace(/-/g, "");
         body.append("uploadId", uploadId);
-        const response = await fetch("/api/profile/avatar", { method: "POST", body, cache: "no-store" });
+        const response = await fetch("/api/profile/avatar", { method: "POST", body, cache: "no-store", headers: { "X-Profile-Account": accountId } });
         const result = await response.json().catch(() => ({}));
         if (!response.ok || !result.url || result.saved !== true) {
           throw new Error(result.error ?? uiText("Ui.text_2669fecc698980", { value1: String(response.status) }));
@@ -950,8 +928,9 @@ export default function ProfilePage() {
       } else {
         // A not-yet-created profile has no row to associate yet. Keep the
         // upload as a draft and persist its URL with the first profile save.
-        url = await sendProfileMediaFile(prepared.file, uiText);
+        url = await sendProfileMediaFile(prepared.file, uiText, accountId);
       }
+      if (!isCurrentEditor()) return;
       setAvatarUrl(url);
       setAvatarPreview(url);
       markEditorChanged();
@@ -964,10 +943,12 @@ export default function ProfilePage() {
       // Fokuspunkt setzen
       setFocalPickerImage(url);
     } catch (err) {
+      if (!isCurrentEditor()) return;
       if (profileExists && uploadId) {
         try {
-          const response = await fetch("/api/profile", { cache: "no-store" });
+          const response = await fetch("/api/profile", { cache: "no-store", headers: { "X-Profile-Account": accountId } });
           const result = await response.json().catch(() => ({}));
+          if (!isCurrentEditor()) return;
           const savedUrl = result?.profile?.avatar_url;
           if (response.ok && isAvatarUploadAssociated(savedUrl, uploadId)) {
             setAvatarUrl(savedUrl);
@@ -982,12 +963,13 @@ export default function ProfilePage() {
           // the previous photo and let the user retry without losing it.
         }
       }
+      if (!isCurrentEditor()) return;
       addToast(uiText("Ui.text_b1195d7a229dd2", { value1: String(uiErrorMessage(err, t("uploadFailed"))) }), "error");
       setAvatarUrl(previousAvatarUrl);
       setAvatarPreview(previousAvatarUrl);
     } finally {
       if (preview) URL.revokeObjectURL(preview);
-      setAvatarUploading(false);
+      if (isCurrentEditor()) setAvatarUploading(false);
       input.value = "";
     }
   };
@@ -1005,8 +987,10 @@ export default function ProfilePage() {
     setCoverUploading(true);
     try {
       const prepared = await prepareProfileMediaFile(file, (source) => compressImage(source, { maxWidth: 1920, maxHeight: 1080, quality: 0.85, maxBytes: MAX_FUNCTION_UPLOAD_BYTES , translate: uiText }));
+      if (!isCurrentEditor()) return;
       if (!prepared.file) throw new Error(profileMediaErrorText(prepared.error, t));
-      const url = await sendProfileMediaFile(prepared.file, uiText);
+      const url = await sendProfileMediaFile(prepared.file, uiText, accountId);
+      if (!isCurrentEditor()) return;
       setCoverImageUrl(url);
       setCoverImagePreview(url);
       markEditorChanged();
@@ -1014,10 +998,11 @@ export default function ProfilePage() {
       // Cover cropping has its own controls; never change the portrait focus.
       setFocalPoint(current => ({ ...current, cover: { x: 50, y: 50 } }));
     } catch (err) {
+      if (!isCurrentEditor()) return;
       addToast(uiText("Ui.text_99e8fcd5af3347", { value1: String(uiErrorMessage(err, t("uploadFailed"))) }), "error");
       setCoverImagePreview(coverImageUrl);
     } finally {
-      setCoverUploading(false);
+      if (isCurrentEditor()) setCoverUploading(false);
       input.value = "";
     }
   };
@@ -1128,6 +1113,7 @@ export default function ProfilePage() {
 
   // ── Save profile ────────────────────────────────────────────────────────────
   const handleSave = async () => {
+    if (!isCurrentEditor()) return;
     if (avatarUploading || coverUploading || profileUploading) {
       addToast(uiText("Ui.text_57b48356540c51"), "error");
       return;
@@ -1151,7 +1137,7 @@ export default function ProfilePage() {
     setFieldErrors(validationErrors);
     if (Object.keys(validationErrors).length > 0) {
       const destination = profileEditorStepForErrors(Object.keys(validationErrors) as ("activity" | "name" | "city")[]);
-      setEditorStep(destination);
+      setEditorStep(profileEditorResumeStep(profileExists, destination));
       focusEditorField(validationErrors.activity ? "activity" : validationErrors.name ? "name" : "city");
       return;
     }
@@ -1161,6 +1147,7 @@ export default function ProfilePage() {
     setSaving(true);
     try {
       await draftQueueRef.current.catch(() => {});
+      if (!isCurrentEditor()) return;
       const location = [form.city.trim(), form.country.trim()].filter(Boolean).join(", ");
       const physicalValues = {
         ...physicalDataRef.current,
@@ -1232,11 +1219,12 @@ export default function ProfilePage() {
         crew: { ...crewDataRef.current, additionalOccupation, occupations: selectedCrewOccupations(positions, occupationSelections, null, primaryOccupation), certificates: crewCertificates, primaryOccupation: occupationReference(primaryOccupationForPositions(primaryOccupation, positions)) },
       };
 
+      if (!isCurrentEditor()) return;
       // First-time profile creation uses POST; subsequent edits use PATCH
       const isNew = !profileExists;
       const res = await fetch("/api/profile", {
         method: isNew ? "POST" : "PATCH",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", "X-Profile-Account": accountId },
         body: JSON.stringify(isNew ? {
           ...commonPayload,
           avatar_url:     avatarUrl || null,
@@ -1249,6 +1237,7 @@ export default function ProfilePage() {
         }),
       });
       const baseResult = await res.json().catch(() => ({}));
+      if (!isCurrentEditor()) return;
       if (!res.ok || baseResult.error) {
         draftPausedRef.current = false;
         const serverFieldErrors = baseResult.fieldErrors;
@@ -1259,7 +1248,7 @@ export default function ProfilePage() {
             activity: serverFieldErrors.activity,
           });
           const destination = profileEditorStepForErrors(Object.keys(serverFieldErrors).flatMap((key) => key === "display_name" ? ["name" as const] : key === "location" ? ["city" as const] : key === "activity" ? ["activity" as const] : []));
-          setEditorStep(destination);
+          setEditorStep(profileEditorResumeStep(profileExists, destination));
           focusEditorField(destination === 1 ? "activity" : serverFieldErrors.display_name ? "name" : "city");
         }
         const msg = baseResult.error ?? `HTTP ${res.status}`;
@@ -1274,11 +1263,13 @@ export default function ProfilePage() {
       publishProfileUpdated({ userId: user?.id, displayName: form.name, avatarUrl: url, focalPoint });
       const unavailableFields: string[] = baseResult.unavailableFields ?? [];
       try {
-        await fetch("/api/onboarding?type=profile-edit", { method: "DELETE" });
+        await fetch("/api/onboarding?type=profile-edit", { method: "DELETE", headers: { "X-Profile-Account": accountId } });
       } catch {
         // The newer public profile timestamp prevents an older private draft from being resumed.
       }
+      if (!isCurrentEditor()) return;
       await profileDraft.complete();
+      if (!isCurrentEditor()) return;
 
 
       physicalDataRef.current = physical ?? {};
@@ -1294,11 +1285,14 @@ export default function ProfilePage() {
         addToast(t("profileSaved"), "success");
       }
     } catch (err) {
+      if (!isCurrentEditor()) return;
       draftPausedRef.current = false;
       addToast(uiText("Ui.text_dc4c94d7d3926e", { value1: String(uiErrorMessage(err, uiText("System.requestFailed"))) }), "error");
     } finally {
-      setSaving(false);
-      if (!draftPausedRef.current) markEditorChanged();
+      if (isCurrentEditor()) {
+        setSaving(false);
+        if (!draftPausedRef.current) markEditorChanged();
+      }
     }
   };
 
@@ -1316,13 +1310,16 @@ export default function ProfilePage() {
         file,
         (source) => compressImage(source, { maxWidth: 1600, quality: 0.82, maxBytes: MAX_FUNCTION_UPLOAD_BYTES , translate: uiText }),
       )));
+      if (!isCurrentEditor()) return;
       const firstFailure = preparedFiles.find((prepared) => !prepared.file);
       if (firstFailure && !firstFailure.file) throw new Error(profileMediaErrorText(firstFailure.error, t));
 
       const uploaded: ProfileImage[] = [];
       for (const prepared of preparedFiles) {
+        if (!isCurrentEditor()) return;
         if (!prepared.file) continue;
-        const url = await sendProfileMediaFile(prepared.file, uiText);
+        const url = await sendProfileMediaFile(prepared.file, uiText, accountId);
+        if (!isCurrentEditor()) return;
         uploaded.push({ url, featured: false });
       }
 
@@ -1334,11 +1331,12 @@ export default function ProfilePage() {
 
       addToast(uiText("Ui.text_76771fbaea1b09", { value1: String(uploaded.length) }), "success");
     } catch (err) {
+      if (!isCurrentEditor()) return;
       const msg = err instanceof Error ? err.message : "";
       const isBrowserBug = !msg || /did not match|pattern/i.test(msg);
       addToast(isBrowserBug ? t("uploadFailed") : uiErrorMessage(err, t("uploadFailed")), "error");
     } finally {
-      setProfileUploading(false);
+      if (isCurrentEditor()) setProfileUploading(false);
       input.value = "";
     }
   };
@@ -1404,7 +1402,7 @@ export default function ProfilePage() {
   }
 
   const buildEditorDraft = () => ({
-    step: editorStep,
+    step: profileEditorDraftStep(profileExists, editorStep),
     form,
     skills,
     memberships,
@@ -1447,6 +1445,7 @@ export default function ProfilePage() {
   });
 
   const restoreEditorDraft = useCallback((saved: ReturnType<typeof buildEditorDraft>) => {
+          if (!isCurrentEditor()) return;
           if (saved.form && typeof saved.form === "object") setForm((current) => ({ ...current, ...(saved.form as Partial<typeof current>), selected_place_city_id: typeof (saved.form as Partial<typeof current>).selected_place_city_id === "string" ? (saved.form as typeof current).selected_place_city_id : "" }));
           if (Array.isArray(saved.skills)) setSkills(saved.skills.filter((item: unknown): item is string => typeof item === "string"));
           if (Array.isArray(saved.memberships)) setMemberships(saved.memberships.filter((item: unknown): item is string => typeof item === "string"));
@@ -1482,30 +1481,31 @@ export default function ProfilePage() {
           if (typeof saved.beard === "boolean") setBeard(saved.beard);
           if (typeof saved.tattoos === "boolean") setTattoos(saved.tattoos);
           if (typeof saved.tattoosCoverable === "boolean") setTattoosCoverable(saved.tattoosCoverable);
-          if ([1, 2, 3, 4, 5, 6].includes(Number(saved.step))) setEditorStep(Number(saved.step) as ProfileEditorStep);
-  }, []);
+          setEditorStep(profileEditorResumeStep(profileExists, saved.step));
+  }, [profileExists, isCurrentEditor]);
 
   const tDraft = useTranslations("FormDraft");
   const profileDraft = useFormDraft({
-    formKey: "profile:edit", value: buildEditorDraft(), ready: !profileLoading && draftLoaded,
+    formKey: "profile:edit", value: buildEditorDraft(), ready: !profileLoading && !profileLoadError && draftLoaded,
     busy: avatarUploading || coverUploading || profileUploading || uploadingPoster || saving,
     restore: restoreEditorDraft,
   });
   async function persistEditorDraft() { await profileDraft.flush(); }
 
   useEffect(() => {
-    if (profileLoading) return;
+    if (profileLoading || profileLoadError) return;
+    const controller = new AbortController();
     let cancelled = false;
     setDraftLoading(true);
     setDraftLoadError("");
-    fetch("/api/onboarding", { cache: "no-store" })
+    fetch("/api/onboarding", { cache: "no-store", headers: { "X-Profile-Account": accountId }, signal: controller.signal })
       .then(async (response) => {
         const result = await response.json().catch(() => ({}));
         if (!response.ok) throw new Error(result.error ?? uiText("Ui.text_2669fecc698980", { value1: String(response.status) }));
         return result;
       })
       .then(({ draft }) => {
-        if (cancelled) return;
+        if (cancelled || !isCurrentEditor()) return;
         const saved = draft?.profileEditorDraft;
         const shouldResume = saved && typeof saved === "object" && shouldResumeProfileEditorDraft({
           profileExists,
@@ -1519,14 +1519,14 @@ export default function ProfilePage() {
         setDraftLoaded(true);
       })
       .catch((error) => {
-        if (cancelled) return;
+        if (cancelled || !isCurrentEditor()) return;
         const message = uiErrorMessage(error, uiText("Ui.text_0504c98fd2caa9"));
         setDraftLoadError(message);
         setDraftLoaded(false);
       })
-      .finally(() => { if (!cancelled) setDraftLoading(false); });
-    return () => { cancelled = true; };
-  }, [profileLoading, profileExists, profileUpdatedAt, restoreEditorDraft]); // profile is loaded once; the private editor draft is then applied over it
+      .finally(() => { if (!cancelled && isCurrentEditor()) setDraftLoading(false); });
+    return () => { cancelled = true; controller.abort(); };
+  }, [profileLoading, profileLoadError, profileExists, profileUpdatedAt, restoreEditorDraft, isCurrentEditor, accountId]); // profile is loaded once; the private editor draft is then applied over it
 
   function focusEditorField(field: "activity" | "name" | "city") {
     window.setTimeout(() => {
@@ -1538,8 +1538,7 @@ export default function ProfilePage() {
 
   function goToEditorStep(step: ProfileEditorStep, focus?: "activity" | "name" | "city") {
     if (step > 0) { draftPausedRef.current = false; profileDraft.resume(); }
-    setEditorStep(step);
-    markEditorChanged();
+    setEditorStep(profileEditorResumeStep(profileExists, step));
     if (focus) focusEditorField(focus);
     else window.scrollTo({ top: 0, behavior: "smooth" });
   }
@@ -1554,7 +1553,7 @@ export default function ProfilePage() {
     setFieldErrors((current) => ({ ...current, ...errors }));
     if (Object.keys(errors).length) {
       const destination = profileEditorStepForErrors(Object.keys(errors) as ("activity" | "name" | "city")[]);
-      setEditorStep(destination);
+      setEditorStep(profileEditorResumeStep(profileExists, destination));
       focusEditorField(errors.activity ? "activity" : errors.name ? "name" : "city");
       return false;
     }
@@ -1567,6 +1566,19 @@ export default function ProfilePage() {
     markEditorChanged();
     addToast(photoCropText("savedDraft"), "success");
   }
+
+  const profileEditorSections = [
+    { step: 3 as ProfileEditorStep, title: uiText("Ui.text_69545035d1a655"), summary: [form.name, form.city, form.country].filter(Boolean).join(" · ") || uiText("Ui.text_07bf85dcf0efa5") },
+    { step: 1 as ProfileEditorStep, title: uiText("creators.filterProfileType"), summary: currentProfileTypes.map((type) => PROFILE_TYPE_LABELS[type as ProfileType] ?? type).join(", ") || uiText("Ui.text_d390a2e6c24904") },
+    { step: 2 as ProfileEditorStep, title: uiText("setup.occupations"), summary: positions.slice(0, 3).join(", ") || uiText("Ui.text_2799d3de20eb93") },
+    { step: 4 as ProfileEditorStep, title: uiText("Ui.text_6ab49b7e8b018e"), summary: uiText("Ui.text_23365f0ff644c2", { value1: String(profileImages.length + (avatarUrl ? 1 : 0)), value2: String(form.bio.trim() ? uiText("Ui.text_55dbf55b89328c") : uiText("Ui.text_82301961452f5b")) }) },
+    { step: 5 as ProfileEditorStep, title: uiText("Ui.text_66fb159b3a4da4"), summary: uiText("Ui.text_da1228a8159999") },
+  ];
+  const profileSaveButton = (
+    <button type="button" data-no-draft onClick={handleSave} disabled={!profileDraft.loaded || saving || profileLoading || profileLoadError || !draftLoaded || avatarUploading || coverUploading || profileUploading} className="inline-flex min-h-11 max-w-full items-center justify-center gap-2 rounded-lg bg-gold px-5 py-2 text-sm font-semibold text-bg-primary hover:bg-gold-light disabled:opacity-60">
+      {saving ? <Loader2 size={15} className="shrink-0 animate-spin" /> : <Save size={15} className="shrink-0" />}<span>{saving ? uiText("setup.copy103") : profileExists ? t("saveChanges") : uiText("setup.publishProfile")}</span>
+    </button>
+  );
 
   return (
     <>
@@ -1590,9 +1602,9 @@ export default function ProfilePage() {
               className="inline-flex items-center gap-1.5 text-xs text-text-muted hover:text-gold transition-colors mb-3"
             >
               <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="15 18 9 12 15 6" /></svg>
-              {t("backToDashboard")}
+              {uiText("nav.personalArea")}
             </Link>
-            <h1 className="font-display text-2xl font-bold text-text-primary">{t("pageTitle")}</h1>
+            <h1 className="font-display text-2xl font-bold text-text-primary">{profileExists ? uiText("Ui.text_4f2308fdddb262") : t("pageTitle")}</h1>
             <p className="text-sm text-text-muted mt-1">{t("pageSubtitle")}</p>
           </div>
           {user?.id && (
@@ -1600,7 +1612,7 @@ export default function ProfilePage() {
               href={`/profile/${user.id}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 px-4 py-2 border border-border text-text-secondary text-sm font-medium rounded-lg hover:border-gold hover:text-gold transition-colors shrink-0"
+              className="inline-flex min-h-11 items-center gap-2 px-4 py-2 border border-border text-text-secondary text-sm font-medium rounded-lg hover:border-gold hover:text-gold transition-colors shrink-0"
             >
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" /><polyline points="15 3 21 3 21 9" /><line x1="10" y1="14" x2="21" y2="3" /></svg>
               {t("viewProfile")}
@@ -1609,29 +1621,15 @@ export default function ProfilePage() {
         </div>
 
         <div className="flex gap-6 flex-col lg:flex-row">
-          {/* Sidebar — vertical on desktop, horizontal scroll on mobile */}
           <aside className="lg:w-56 shrink-0">
-            {/* Mobile: one compact, fully visible selector instead of a clipped tab row */}
-            <label className="mb-4 block lg:hidden">
-              <span className="sr-only">{uiText("Ui.text_0aef2c1fabf0a6")}</span>
-              <select value={activeTab} onChange={(event) => selectProfileTab(event.target.value)}
-                className="min-h-11 w-full rounded-lg border border-border bg-bg-secondary px-3 text-sm text-text-primary focus:border-gold focus:outline-none">
-                {TAB_IDS.map(({ id, labelKey }) => <option key={id} value={id}>{t(labelKey as Parameters<typeof t>[0])}</option>)}
-              </select>
-            </label>
-            {/* Desktop: vertical nav */}
-            <nav aria-label={uiText("Ui.text_4eafea0bf08b1e")} className="hidden lg:block space-y-1">
-              <p className="px-4 pb-2 text-[11px] font-semibold uppercase tracking-widest text-text-muted">{uiText("Ui.text_e59812fd3c9fdc")}</p>
-              {TAB_IDS.map(({ id, labelKey, icon: Icon }) => (
-                <button key={id} onClick={() => selectProfileTab(id)}
-                  className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-all text-left ${
-                    activeTab === id
-                      ? "bg-gold/10 text-gold border border-gold/20"
-                      : "text-text-secondary hover:bg-bg-elevated hover:text-text-primary border border-transparent"
-                  }`}>
-                  <Icon size={15} /> {t(labelKey as Parameters<typeof t>[0])}
-                </button>
-              ))}
+            <nav aria-label={uiText("Ui.text_4eafea0bf08b1e")} className="mb-4 grid grid-cols-2 gap-1 rounded-xl border border-border bg-bg-secondary p-1 lg:grid-cols-1">
+              {[
+                { href: "/profile", label: uiText("Ui.text_4f2308fdddb262"), icon: User, active: activeTab === "profile" },
+                { href: "/dashboard?tab=listings", label: uiText("nav.myOffers"), icon: Film, active: false },
+                { href: "/messages?view=friends", label: uiText("nav.contacts"), icon: Users2, active: false },
+                { href: "/dashboard?tab=settings", label: uiText("nav.accountSettings"), icon: ShieldCheck, active: false },
+              ].map(({ href, label, icon: Icon, active }) => <Link key={href} href={href} aria-current={active ? "page" : undefined}
+                className={`flex min-h-11 min-w-0 items-center gap-2 rounded-lg px-3 py-3 text-left text-sm font-medium transition-colors ${active ? "bg-bg-hover text-text-primary" : "text-text-secondary hover:bg-bg-hover hover:text-text-primary"}`}><Icon size={16} className="shrink-0" aria-hidden="true" /><span className="min-w-0 break-words">{label}</span></Link>)}
             </nav>
           </aside>
 
@@ -1667,21 +1665,18 @@ export default function ProfilePage() {
                       </div>
                       <span className="rounded-full border border-border bg-bg-elevated px-3 py-1 text-xs text-text-secondary">{uiText.rich("Ui.text_1ca75155a0cc55", { value1: () => (completion.score) })}</span>
                     </div>
-                    <div className="mt-4 grid gap-2 sm:grid-cols-2">
-                      {[
-                        { step: 1 as ProfileEditorStep, title: uiText("home.boardKind_offer"), summary: currentProfileTypes.map((type) => PROFILE_TYPE_LABELS[type as ProfileType] ?? type).join(", ") || uiText("Ui.text_d390a2e6c24904") },
-                        { step: 2 as ProfileEditorStep, title: uiText("setup.occupations"), summary: positions.slice(0, 3).join(", ") || uiText("Ui.text_2799d3de20eb93") },
-                        { step: 3 as ProfileEditorStep, title: uiText("Ui.text_69545035d1a655"), summary: [form.name, form.city, form.country].filter(Boolean).join(" · ") || uiText("Ui.text_07bf85dcf0efa5") },
-                        { step: 4 as ProfileEditorStep, title: uiText("Ui.text_6ab49b7e8b018e"), summary: uiText("Ui.text_23365f0ff644c2", { value1: String(profileImages.length + (avatarUrl ? 1 : 0)), value2: String(form.bio.trim() ? uiText("Ui.text_55dbf55b89328c") : uiText("Ui.text_82301961452f5b")) }) },
-                        { step: 5 as ProfileEditorStep, title: uiText("Ui.text_66fb159b3a4da4"), summary: uiText("Ui.text_da1228a8159999") },
-                        { step: 6 as ProfileEditorStep, title: uiText("Ui.text_0a84ee5ec3f752"), summary: uiText("Ui.text_e22dc9b0f94b29") },
-                      ].map((section) => (
+                    <div className="mt-4 overflow-hidden rounded-xl border border-border bg-bg-primary divide-y divide-border">
+                      {profileEditorSections.map((section) => (
                         <button key={section.step} type="button" data-no-draft onClick={() => goToEditorStep(section.step, section.step === 3 && !form.name.trim() ? "name" : undefined)}
-                          className="flex min-h-16 items-center justify-between gap-3 rounded-lg border border-border bg-bg-primary px-4 py-3 text-left hover:border-gold/40">
+                          className="flex min-h-16 w-full items-center justify-between gap-3 px-4 py-3 text-left transition-colors hover:bg-bg-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-gold">
                           <span className="min-w-0"><span className="block text-sm font-medium text-text-primary">{section.title}</span><span className="mt-1 block break-words text-xs text-text-muted">{section.summary}</span></span>
                           <Pencil size={15} className="shrink-0 text-text-muted" />
                         </button>
                       ))}
+                    </div>
+                    <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
+                      <FormDraftStatus draft={profileDraft} />
+                      {profileSaveButton}
                     </div>
                     {completionMissing.length > 0 && (
                       <div className="mt-5 border-t border-border pt-4">
@@ -1724,7 +1719,20 @@ export default function ProfilePage() {
                   </div>
                 )}
 
-                {editorStep > 0 && !draftLoading && !draftLoadError && (
+                {profileExists && editorStep > 0 && !draftLoading && !draftLoadError && (
+                  <section className="rounded-xl border border-border bg-bg-secondary p-4 sm:p-6">
+                    <button type="button" data-no-draft onClick={() => goToEditorStep(0)} className="mb-3 inline-flex min-h-11 items-center gap-2 rounded-lg px-2 text-sm text-text-secondary hover:bg-bg-hover">
+                      <ChevronLeft size={16} />{uiText("Ui.text_f07c0fcf26dc03")}
+                    </button>
+                    <div className="flex flex-wrap items-center justify-between gap-3">
+                      <h2 className="min-w-0 break-words font-display text-xl font-semibold text-text-primary">{profileEditorSections.find(section => section.step === editorStep)?.title ?? t("tabProfile")}</h2>
+                      {profileSaveButton}
+                    </div>
+                    <div className="mt-3"><FormDraftStatus draft={profileDraft} /></div>
+                  </section>
+                )}
+
+                {!profileExists && editorStep > 0 && !draftLoading && !draftLoadError && (
                   <section className="rounded-xl border border-border bg-bg-secondary p-4 sm:p-6">
                     <div className="flex items-start justify-between gap-4">
                       <div><p className="text-xs font-semibold uppercase tracking-wider text-gold">{uiText.rich("Ui.text_97503dc1235f6c", { value1: () => (editorStep), value2: () => (PROFILE_EDITOR_STEPS.length) })}</p><h2 className="mt-1 font-display text-xl font-semibold text-text-primary">{PROFILE_EDITOR_STEPS[editorStep - 1].title}</h2><p className="mt-1 text-sm leading-6 text-text-muted">{PROFILE_EDITOR_STEPS[editorStep - 1].description}</p></div>
@@ -2777,7 +2785,7 @@ export default function ProfilePage() {
                 {!showCrewSections && !showTalentSections && <p className="rounded-xl border border-border bg-bg-secondary p-4 text-sm leading-6 text-text-muted">{uiText("Ui.text_dd891e313e3663")}</p>}
                 </div>}
 
-                {editorStep === 6 && !draftLoading && !draftLoadError && (
+                {!profileExists && editorStep === 6 && !draftLoading && !draftLoadError && (
                   <section className="space-y-4 rounded-xl border border-border bg-bg-secondary p-4 sm:p-6">
                     <div><h2 className="font-semibold text-text-primary">{uiText("Ui.text_ee338d4efbad49")}</h2><p className="mt-1 text-sm text-text-muted">{uiText("Ui.text_c5e8ec1a211bb7")}</p></div>
                     {Object.keys(visibleFieldErrors).length > 0 && <div role="alert" className="rounded-lg border border-error/30 bg-error/10 p-4">
@@ -2801,16 +2809,14 @@ export default function ProfilePage() {
                   <footer className="flex flex-col gap-3 border-t border-border pt-4 sm:flex-row sm:items-center sm:justify-between">
                     <div className="flex flex-wrap gap-2">
                       {profileExists && <button type="button" data-no-draft onClick={() => goToEditorStep(0)} className="min-h-11 rounded-lg border border-border px-4 text-sm text-text-secondary hover:border-gold/40">{uiText("nav.accountOverview")}</button>}
-                      <button type="button" data-no-draft disabled={profileDraft.status === "saving" || !profileDraft.loaded} onClick={() => void persistEditorDraft().catch(() => {})} className="min-h-11 rounded-lg border border-border px-4 text-sm text-text-secondary hover:border-gold/40 disabled:opacity-50">{tDraft("manualSave")}</button>
+                      {!profileExists && <button type="button" data-no-draft disabled={profileDraft.status === "saving" || !profileDraft.loaded} onClick={() => void persistEditorDraft().catch(() => {})} className="min-h-11 rounded-lg border border-border px-4 text-sm text-text-secondary hover:border-gold/40 disabled:opacity-50">{tDraft("manualSave")}</button>}
                     </div>
                     <div className="flex flex-wrap justify-end gap-2">
-                      {editorStep > 1 && <button type="button" data-no-draft onClick={() => goToEditorStep((editorStep - 1) as ProfileEditorStep)} className="min-h-11 rounded-lg border border-border px-5 text-sm text-text-secondary hover:border-gold/40">{uiText("setup.copy99")}</button>}
-                      {editorStep < 6 ? <>
+                      {!profileExists && editorStep > 1 && <button type="button" data-no-draft onClick={() => goToEditorStep((editorStep - 1) as ProfileEditorStep)} className="min-h-11 rounded-lg border border-border px-5 text-sm text-text-secondary hover:border-gold/40">{uiText("setup.copy99")}</button>}
+                      {!profileExists && editorStep < 6 ? <>
                         {(editorStep === 4 || editorStep === 5) && <button type="button" data-no-draft onClick={() => goToEditorStep((editorStep + 1) as ProfileEditorStep)} className="min-h-11 rounded-lg border border-border px-4 text-sm text-text-muted hover:text-text-primary">{uiText("Ui.text_8e463fdd540e0b")}</button>}
                         <button type="button" data-no-draft onClick={() => { if (validateEditorStep(editorStep)) goToEditorStep((editorStep + 1) as ProfileEditorStep); }} className="inline-flex min-h-11 items-center gap-2 rounded-lg bg-gold px-5 text-sm font-semibold text-bg-primary hover:bg-gold-light">{uiText.rich("Ui.text_9b3df3ffb77b5d", { part1: chunks => (<span>{chunks}</span>), part2: chunks => (<span aria-hidden="true">{chunks}</span>) })}</button>
-                      </> : <button type="button" data-no-draft onClick={handleSave} disabled={!profileDraft.loaded || saving || profileLoading || profileLoadError || !draftLoaded || avatarUploading || coverUploading || profileUploading} className="inline-flex min-h-11 items-center justify-center gap-2 rounded-lg bg-gold px-5 text-sm font-semibold text-bg-primary hover:bg-gold-light disabled:opacity-60">
-                        {saving ? <Loader2 size={15} className="animate-spin" /> : <Save size={15} />}{saving ? uiText("setup.copy103") : profileExists ? uiText("profile.saveChanges") : uiText("setup.publishProfile")}
-                      </button>}
+                      </> : profileSaveButton}
                     </div>
                   </footer>
                 )}
@@ -3035,36 +3041,7 @@ export default function ProfilePage() {
             {/* ── VERIFIZIERUNG ── */}
             {activeTab === "verification" && <VerificationTab />}
 
-            {/* ── SICHERHEIT ── */}
-            {activeTab === "security" && (
-              <div className="p-4 sm:p-6 bg-bg-secondary border border-border rounded-xl">
-                <h2 className="font-semibold text-text-primary mb-2">{uiText("Ui.text_963cfc38ed1ec7")}</h2>
-                <p className="text-sm text-text-muted leading-relaxed">{uiText("Ui.text_5ff108d7be9af1")}</p>
-              </div>
-            )}
-
-            {/* ── BENACHRICHTIGUNGEN ── */}
-            {activeTab === "notifications" && (
-              <div className="p-4 sm:p-6 bg-bg-secondary border border-border rounded-xl space-y-4">
-                <div>
-                  <h2 className="font-semibold text-text-primary mb-1">{uiText("Ui.text_bf85ba7a2da053")}</h2>
-                  <p className="text-sm text-text-muted">{uiText("Ui.text_dcc686a995d142")}</p>
-                </div>
-                {notificationError && <p role="alert" className="text-sm text-red-300">{notificationError}</p>}
-                <button
-                  type="button"
-                  role="switch"
-                  aria-checked={messageEmailsEnabled}
-                  aria-label={uiText("Ui.text_bf85ba7a2da053")}
-                  onClick={updateMessageEmails}
-                  disabled={notificationLoading}
-                  className={`relative h-7 w-12 rounded-full transition-colors disabled:opacity-50 ${messageEmailsEnabled ? "bg-gold" : "bg-bg-elevated border border-border"}`}
-                >
-                  <span className={`absolute top-1 h-5 w-5 rounded-full bg-white shadow transition-transform ${messageEmailsEnabled ? "translate-x-6" : "translate-x-1"}`} />
-                </button>
-                <p className="text-xs text-text-muted">{uiText("Ui.text_c4b78c69ae463f")}</p>
-              </div>
-            )}
+            {(activeTab === "security" || activeTab === "notifications") && <p role="status" className="py-8 text-sm text-text-muted">{uiText("PrivacySettings.loading")}</p>}
 
           </div>
         </div>

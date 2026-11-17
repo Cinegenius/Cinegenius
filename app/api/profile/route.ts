@@ -72,11 +72,13 @@ function isValidProfileTypes(value: unknown): value is string[] {
   return Array.isArray(value) && value.every((entry) => typeof entry === "string" && PROFILE_TYPE_VALUES.has(entry));
 }
 
-export async function GET() {
+export async function GET(req: NextRequest) {
   const tResponse = await getResponseTranslations();
   const authResult = await requireAuth();
   if (authResult instanceof NextResponse) return authResult;
   const { userId } = authResult;
+  const expectedAccount = req?.headers.get("X-Profile-Account");
+  if (expectedAccount && expectedAccount !== userId) return privateNoStoreJson({ error: tResponse("System.requestFailed") }, 409);
 
   const { data: base, error: dbError } = await db
     .from("profiles")
@@ -125,6 +127,8 @@ export async function POST(req: NextRequest) {
   const authResult = await requireAuth();
   if (authResult instanceof NextResponse) return authResult;
   const { userId } = authResult;
+  const expectedAccount = req?.headers.get("X-Profile-Account");
+  if (expectedAccount && expectedAccount !== userId) return privateNoStoreJson({ error: tResponse("System.requestFailed") }, 409);
 
   const body = await req.json().catch(() => null);
   if (!body) return NextResponse.json({ error: tResponse('System.m_9c5ea1715bd5') }, { status: 400 });
@@ -300,6 +304,8 @@ export async function PATCH(req: NextRequest) {
     const authResult = await requireAuth();
     if (authResult instanceof NextResponse) return authResult;
     const { userId } = authResult;
+    const expectedAccount = req.headers.get("X-Profile-Account");
+    if (expectedAccount && expectedAccount !== userId) return privateNoStoreJson({ error: tResponse("System.requestFailed") }, 409);
 
     const body = await req.json().catch(() => null);
     if (!body) return NextResponse.json({ error: tResponse('System.m_9c5ea1715bd5') }, { status: 400 });

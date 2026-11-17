@@ -156,7 +156,7 @@
     "crewCamera": "촬영",
     "crewCameraDesc": "촬영감독, 카메라 오퍼레이터, 어시스턴트",
     "crewLight": "조명",
-    "crewLightDesc": "개퍼, 베스트 보이",
+    "crewLightDesc": "Gaffer, Best Boy / Best Girl",
     "crewSound": "음향",
     "crewSoundDesc": "믹서, 붐, 사운드 디자이너",
     "crewProduction": "제작",
@@ -760,7 +760,7 @@
     "listingTypeVehicles": "차량",
     "listingTypeCreator": "크리에이터 / 탈렌트",
     "newProjectPlaceholderDesc": "이 프로젝트는 무엇에 관한 것인가요?",
-    "collabRolePlaceholder": "역할 / 직책 (예: 가퍼)",
+    "collabRolePlaceholder": "역할 / 직책 (예: 조명 감독)",
     "ageFrom": "부터",
     "ageTo": "까지",
     "videoLinkPlaceholder": "https://vimeo.com/... 또는 https://youtube.com/...",
@@ -1645,15 +1645,15 @@
       "tiertraining-film-medien": "영화 및 미디어 동물 훈련"
     },
     "roles": {
-      "tiertrainer": "동물 트레이너",
-      "filmhundetrainer": "영화견 트레이너",
+      "tiertrainer": "영상 촬영용 동물 훈련사",
+      "filmhundetrainer": "영화 촬영용 개 훈련사",
       "tierbetreuer": "동물 핸들러",
       "tierkoordination": "동물 코디네이터",
-      "set-tierbetreuung": "촬영장 동물 관리",
-      "horse-master": "말 마스터",
-      "assistant-horse-master": "보조 말 마스터",
-      "horse-trainer": "영화 말 트레이너",
-      "horse-wrangler": "말 조련사"
+      "set-tierbetreuung": "촬영장 동물 관리 담당자",
+      "horse-master": "말 총괄 (Horse Master)",
+      "assistant-horse-master": "말 총괄 보조",
+      "horse-trainer": "영화 촬영용 말 훈련사",
+      "horse-wrangler": "말 핸들러 (Horse Wrangler)"
     },
     "species": {
       "dogs": "개",
@@ -3419,7 +3419,7 @@
     "text_bfdc08cfd677d0": "지정된 역할 없음",
     "text_d190a2564e3e50": "현재 확인됨: <value1></value1>",
     "text_ad102247f94b2b": "새 역할을 확인하거나 조정하세요<part1></part1>",
-    "text_354d5eb293b0a9": "예: 기술 책임자, 조명감독",
+    "text_354d5eb293b0a9": "예: 기술 책임자, 조명 감독",
     "text_6b9a27efa8e57d": "공개되는 역할<part1></part1>",
     "text_a9223983e08ec4": "초대를 수락할 수 없습니다.",
     "text_2f897dc4dd787b": "<value1></value1> 요청이 전송되었습니다. 회사에서 회원 자격을 확인해야 합니다.",
@@ -5971,7 +5971,7 @@
         "r_e90f5848bfc3": "프로덕션 회계 담당자",
         "r_c6dc08a47d0d": "영화 재무 관리자",
         "r_2557c22fb3d7": "그린 컨설턴트 / 지속 가능성 관리자",
-        "r_2a6c1d42831e": "프로덕션 인턴",
+        "r_2a6c1d42831e": "제작 인턴",
         "r_ede69642be01": "세트 유닛 매니저 인턴",
         "r_de9ab1a6b55a": "프로덕션 매니저",
         "r_fd701e2c1e86": "유닛 프로덕션 매니저",
@@ -6145,9 +6145,9 @@
       },
       "licht": {
         "r_222be04dbf00": "개퍼",
-        "r_1e210e69039a": "베스트 보이 일렉트릭",
+        "r_1e210e69039a": "조명 팀장 보조 (Best Boy / Best Girl Electric)",
         "r_14dd174cd76c": "리깅 개퍼",
-        "r_92137802b24a": "리깅 베스트 보이",
+        "r_92137802b24a": "사전 설치 조명 팀장 보조 (Rigging Best Boy / Rigging Best Girl Electric)",
         "r_7fce7d6fcf12": "리깅 전기 기술자",
         "r_1bcf9d8d9b03": "전기 기술자 / 조명 기술자",
         "r_d95b919dded9": "수석 조명 기술자",
@@ -6167,13 +6167,13 @@
       },
       "grip": {
         "r_470156bd03e4": "키 그립",
-        "r_cfbf2a22ed6e": "베스트 보이 그립 / 2nd 카메라 그립",
+        "r_cfbf2a22ed6e": "그립 팀장 보조 (Best Boy / Best Girl Grip)",
         "r_32a6ab31b1a1": "돌리 그립 / 돌리 운영자",
         "r_376dc1f790b8": "그립",
         "r_dbfaadb8821c": "그립 보조",
         "r_46dab52c1995": "리깅 그립",
         "r_ea7e925bd850": "리깅 키 그립",
-        "r_fa9d72fc7978": "리깅 베스트 보이 그립",
+        "r_fa9d72fc7978": "사전 설치 그립 팀장 보조 (Rigging Best Boy / Rigging Best Girl Grip)",
         "r_2fa0b44342d7": "특수 그립 구조물",
         "r_08c07afebb7f": "카메라 크레인 / 지브 운영자",
         "r_5ece318b289f": "카메라 크레인 기술자",
@@ -6580,7 +6580,7 @@
       },
       "set-logistik": {
         "r_06d9aa28368f": "베이스 러너",
-        "r_51e581b5ea39": "운전사 (차량/트럭)",
+        "r_51e581b5ea39": "운전기사 (승용차 / 트럭)",
         "r_36a599628c2e": "로케이션 운전사",
         "r_9bc1a35535fa": "로케이션 유닛 매니저",
         "r_273f12c52b95": "어시스턴트 로케이션 매니저",
@@ -6901,15 +6901,15 @@
         "r_532adc563b66": "케이터링 / 이동 주방 운전사"
       },
       "filmtiere-tiertraining": {
-        "r_3d8ab6fb2c6a": "동물 트레이너",
-        "r_654c33dc9c6b": "영화용 개 트레이너",
+        "r_3d8ab6fb2c6a": "영상 촬영용 동물 훈련사",
+        "r_654c33dc9c6b": "영화 촬영용 개 훈련사",
         "r_40758f075d18": "동물 핸들러",
         "r_7a1591b96b3a": "동물 코디네이터",
-        "r_a63695a566c3": "현장 동물 관리",
-        "r_9faf951b627e": "말 마스터",
-        "r_7c4f137defec": "조수 말 마스터",
-        "r_8e8f21cf0303": "말 트레이너",
-        "r_35f9ffa503c4": "말 조련사"
+        "r_a63695a566c3": "촬영장 동물 관리 담당자",
+        "r_9faf951b627e": "말 총괄 (Horse Master)",
+        "r_7c4f137defec": "말 총괄 보조",
+        "r_8e8f21cf0303": "영화 촬영용 말 훈련사",
+        "r_35f9ffa503c4": "말 핸들러 (Horse Wrangler)"
       }
     },
     "extra": {
@@ -8209,7 +8209,7 @@
     "leadership": "창립자 및 리더십"
   },
   "NewsRegion": {
-    "unassignedCountry": "국가 없음",
+    "unassignedCountry": "중립",
     "countryLabel": "산업 뉴스 국가",
     "automatic": "자동",
     "automaticCountry": "자동 · {country}",
@@ -8217,7 +8217,8 @@
     "saveError": "선택 사항을 저장할 수 없습니다. 환경설정 쿠키를 허용하고 다시 시도해 주세요.",
     "loadError": "게시물을 불러올 수 없습니다.",
     "retry": "다시 시도",
-    "allTopics": "모든 주제"
+    "allTopics": "모든 주제",
+    "railHint": "옆으로 스와이프하거나 점을 눌러 더 많은 소식을 확인하세요. 위아래로 스크롤하면 페이지가 이동합니다."
   },
   "PrivacySettings": {
     "title": "개인정보",
@@ -8438,5 +8439,20 @@
       "desert": "사막",
       "polar": "극지"
     }
+  },
+  "PersonalArea": {
+    "content": "내 콘텐츠",
+    "activity": "활동",
+    "profileView": "프로필 보기",
+    "settings": "설정",
+    "editProfile": "프로필 수정"
+  },
+  "Favorites": {
+    "loadError": "저장한 항목을 불러오지 못했습니다.",
+    "removeError": "항목을 삭제하지 못했습니다. 다시 시도해 주세요.",
+    "filterType": "분야별 필터",
+    "noMatches": "이 분야에는 아직 저장한 항목이 없습니다.",
+    "signInHint": "저장한 항목을 보려면 로그인하세요.",
+    "removeItem": "저장한 항목에서 {name} 삭제"
   }
 }

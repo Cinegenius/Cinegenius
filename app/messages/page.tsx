@@ -32,7 +32,7 @@ import {
   CONVERSATION_LIST_FALLBACK_REFRESH_MS,
 } from "@/lib/message-refresh-policy";
 import { mergeVisibleMessagePage } from "@/lib/message-actions";
-import { backFromMessageView, navigateMessageView, inboxView } from "@/lib/message-navigation";
+import { backFromMessageView, navigateMessageView, navigateInboxView, inboxView } from "@/lib/message-navigation";
 import { uiErrorMessage } from "@/lib/ui-error-message";
 
 type Message = {
@@ -99,9 +99,9 @@ function MessagesContent() {
   const toParam = searchParams.get("to");
   const convParam = searchParams.get("conv");
   const view = inboxView(searchParams);
-  const groupsOnly = view === "groups";
   const friendsOnly = view === "friends";
   const noticesOnly = view === "notices";
+  const utilityView = friendsOnly || noticesOnly;
   const requestedCompanySlug = toParam ? searchParams.get("company_slug")?.slice(0, 200) : null;
   const [companyContact, setCompanyContact] = useState<{ name: string; slug: string; recipient: string } | null>(null);
   const verifiedCompany = companyContact?.recipient === toParam && companyContact?.slug === requestedCompanySlug ? companyContact : null;
@@ -466,18 +466,18 @@ function MessagesContent() {
   const peerProfileHref = conversationPeerProfileHref(activeConv, user?.id ?? "", isNewConv ? newConvRecipient : null);
 
   const people = [...contacts].sort((a,b) => a.display_name.localeCompare(b.display_name,uiLocale)).map(contact => ({id:contact.user_id, name:contact.display_name, avatar:contact.avatar_url, role:contact.role}));
-  const filteredConversations = conversations.filter(conversation => (!groupsOnly || conversation.kind === "group") && `${conversation.otherName ?? ""} ${conversation.group_name ?? ""}`.toLocaleLowerCase(uiLocale).includes(search.trim().toLocaleLowerCase(uiLocale)));
+  const filteredConversations = conversations.filter(conversation => `${conversation.otherName ?? ""} ${conversation.group_name ?? ""}`.toLocaleLowerCase(uiLocale).includes(search.trim().toLocaleLowerCase(uiLocale)));
 
-  return <div className={`inbox-shell flex-col sm:flex-row ${showChat ? "bottom-0" : "bottom-[var(--mobile-nav-clearance)]"} lg:bottom-0`}
+  return <div className={`inbox-shell ${utilityView ? "flex-col" : "flex-col sm:flex-row"} ${showChat ? "bottom-0" : "bottom-[var(--mobile-nav-clearance)]"} lg:bottom-0`}
     style={{"--messages-viewport-offset":`${visualViewportTop}px`,...(keyboardInset>0?{bottom:`${keyboardInset}px`}:{})} as CSSProperties}>
-    <aside className={`${showChat?"hidden sm:flex":"flex"} min-h-0 min-w-0 w-full flex-col border-r border-border bg-bg-primary sm:w-80 ${friendsOnly || noticesOnly ? "shrink-0" : "flex-1 sm:flex-none"}`}>
-      <InboxPaneHeader active={view} action={<button type="button" onClick={()=>setNewMessageOpen(true)} aria-label={t(groupsOnly ? "createGroup" : "newMessage")} title={t(groupsOnly ? "createGroup" : "newMessage")} className="flex size-11 shrink-0 items-center justify-center rounded-xl text-gold hover:bg-bg-elevated"><SquarePen size={22}/></button>}>
+    <aside className={`${showChat?"hidden sm:flex":"flex"} min-h-0 min-w-0 w-full flex-col border-border bg-bg-primary ${utilityView ? "shrink-0" : "border-r sm:w-80 flex-1 sm:flex-none"}`}>
+      <InboxPaneHeader active={view} action={<button type="button" onClick={()=>setNewMessageOpen(true)} aria-label={t("newMessage")} title={t("newMessage")} className="flex size-11 shrink-0 items-center justify-center rounded-xl text-gold hover:bg-bg-elevated"><SquarePen size={22}/></button>}>
         {!friendsOnly && !noticesOnly && <label className="mt-2 flex min-h-11 items-center gap-2 rounded-xl border border-border bg-bg-secondary px-3"><Search size={17} className="shrink-0 text-text-muted"/><input type="search" value={search} onChange={event=>setSearch(event.target.value)} placeholder={t("searchChats")} aria-label={t("searchChats")} className="min-h-11 min-w-0 flex-1 bg-transparent text-base text-text-primary outline-none"/></label>}
       </InboxPaneHeader>
       {!friendsOnly && !noticesOnly && <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain">
         {contactsError&&<div role="alert" className="px-4 py-2 text-sm text-red-400 [[data-theme=light]_&]:text-red-700"><p>{uiText("Ui.text_4139ecbefbacc6")}</p><button type="button" onClick={()=>void loadContacts()} className="min-h-11 text-gold">{t("retry")}</button></div>}
         {conversationLoadFailed&&<div role="alert" className="px-4 py-3 text-sm text-red-400 [[data-theme=light]_&]:text-red-700"><p>{messageNavigationText("loadError")}</p><button type="button" onClick={()=>{setLoading(conversations.length===0);void loadConversations();}} className="min-h-11 text-gold">{messageNavigationText("retry")}</button></div>}
-        {loading&&conversations.length===0?<p role="status" className="px-4 py-8 text-sm text-text-muted">{t("loading")}</p>:filteredConversations.length===0&&!conversationLoadFailed?<div className="space-y-3 px-5 py-10 text-center"><MessageSquare size={26} className="mx-auto text-text-muted"/><p className="text-sm text-text-muted">{t(search.trim()?"noChats":"emptyInbox")}</p><button type="button" onClick={()=>setNewMessageOpen(true)} className="min-h-11 rounded-xl bg-gold px-4 text-sm font-semibold text-bg-primary">{t(groupsOnly ? "createGroup" : "newMessage")}</button></div>:filteredConversations.map(conversation=>{
+        {loading&&conversations.length===0?<p role="status" className="px-4 py-8 text-sm text-text-muted">{t("loading")}</p>:filteredConversations.length===0&&!conversationLoadFailed?<div className="space-y-3 px-5 py-10 text-center"><MessageSquare size={26} className="mx-auto text-text-muted"/><p className="text-sm text-text-muted">{t(search.trim()?"noChats":"emptyInbox")}</p><button type="button" onClick={()=>setNewMessageOpen(true)} className="min-h-11 rounded-xl bg-gold px-4 text-sm font-semibold text-bg-primary">{t("newMessage")}</button></div>:filteredConversations.map(conversation=>{
           const latest=conversation.messages?.[0];
           return <button key={conversation.id} type="button" aria-pressed={conversation.id===activeId} onClick={()=>openConversation(conversation)} className={`flex min-h-20 w-full min-w-0 items-center gap-3 border-b border-border px-4 py-3 text-left hover:bg-bg-elevated ${activeId===conversation.id?"bg-bg-elevated":""}`}>
             <span className="flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-full border border-border bg-bg-elevated">{conversation.kind==="group"?<Users size={19} className="text-gold"/>:conversation.kind==="support"?<UnoptimizedImage src={SUPPORT_AVATAR_URL} alt="" className="h-full w-full object-contain p-1"/>:conversation.otherAvatar?<UnoptimizedImage src={conversation.otherAvatar} alt="" className="h-full w-full object-cover"/>:<User size={19} className="text-text-muted"/>}</span>
@@ -614,7 +614,7 @@ function MessagesContent() {
         {user?.id&&(activeId||newConvRecipient)&&<MessageComposer key={`${user.id}:${activeId?`conversation:${activeId}`:`recipient:${newConvRecipient}`}`} accountId={user.id} destination={{conversationId:activeId,recipientId:newConvRecipient}} onSent={messageSent}/>}
       </>:<div className="m-auto max-w-sm p-8 text-center"><MessageSquare size={40} className="mx-auto mb-4 text-text-muted"/><h2 className="font-display text-xl text-text-primary">{t("startChat")}</h2><p className="mt-2 text-sm text-text-muted">{t("choosePeople")}</p><button type="button" onClick={()=>setNewMessageOpen(true)} className="mt-5 min-h-11 rounded-xl bg-gold px-4 text-sm font-semibold text-bg-primary">{t("newMessage")}</button></div>}
     </section>}
-    {user?.id&&<NewMessageDialog key={user.id} open={newMessageOpen} forceGroup={groupsOnly} accountId={user.id} contacts={people} onClose={()=>setNewMessageOpen(false)} onOpen={openDestination}/>}
+    {user?.id&&<NewMessageDialog key={user.id} open={newMessageOpen} accountId={user.id} contacts={people} contactsError={contactsError} onRetryContacts={()=>void loadContacts()} onContacts={()=>leave(()=>{setNewMessageOpen(false);navigateInboxView(window,"friends");})} onClose={()=>setNewMessageOpen(false)} onOpen={openDestination}/>}
     {user?.id&&activeConv?.kind==="group"&&<GroupInfoDialog key={`${user.id}:${activeConv.id}`} open={groupInfoOpen} accountId={user.id} group={activeConv} contacts={people} onClose={()=>setGroupInfoOpen(false)} onRefresh={async()=>{await loadConversations();if(activeIdRef.current===activeConv.id)await loadMessages(activeConv.id);}} onResume={()=>setGroupInfoOpen(true)} onLeave={()=>{setGroupInfoOpen(false);if(user?.id)navigateMessageView(window,user.id,{},true);void loadConversations();}}/>}
     <MessagingDialog compact open={!!selectedMessage} title={t("messageOptions")} onClose={()=>setSelectedMessage(null)} busy={!!deletingMessage} footer={<button type="button" disabled={!!deletingMessage} onClick={()=>{if(selectedMessage)void hideOwnMessage(selectedMessage);}} className="min-h-11 w-full rounded-xl border border-crimson/30 px-4 text-sm text-red-400 [[data-theme=light]_&]:text-red-700 disabled:opacity-40">{t("hideForMe")}</button>}><p className="break-words whitespace-pre-wrap rounded-xl border border-border bg-bg-secondary p-3 text-sm [overflow-wrap:anywhere]">{selectedMessage?.content}</p><MessageAttachments attachments={selectedMessage?.attachments}/><p className="text-sm text-text-muted">{t("hideHelp")}</p>{sendError&&<p role="alert" className="text-sm text-red-400 [[data-theme=light]_&]:text-red-700">{sendError}</p>}</MessagingDialog>
   </div>;

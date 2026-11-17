@@ -26,10 +26,12 @@ function json(body: unknown, status = 200) {
   });
 }
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   const tResponse = await getResponseTranslations();
   const authResult = await requireAuth();
   if (authResult instanceof NextResponse) return authResult;
+  const expectedAccount = request?.headers.get("X-Profile-Account");
+  if (expectedAccount && expectedAccount !== authResult.userId) return json({ error: tResponse("System.requestFailed") }, 409);
   try {
     const clerk = await clerkClient();
     const user = await clerk.users.getUser(authResult.userId);
@@ -58,6 +60,8 @@ export async function PUT(request: NextRequest) {
   const tResponse = await getResponseTranslations();
   const authResult = await requireAuth();
   if (authResult instanceof NextResponse) return authResult;
+  const expectedAccount = request?.headers.get("X-Profile-Account");
+  if (expectedAccount && expectedAccount !== authResult.userId) return json({ error: tResponse("System.requestFailed") }, 409);
   const payload = await request.json().catch(() => null);
   const record = payload && typeof payload === "object" ? payload as Record<string, unknown> : null;
   const isProfileEditorDraft = Boolean(record && Object.hasOwn(record, "profileEditorDraft"));
@@ -157,6 +161,8 @@ export async function DELETE(request: NextRequest) {
   const tResponse = await getResponseTranslations();
   const authResult = await requireAuth();
   if (authResult instanceof NextResponse) return authResult;
+  const expectedAccount = request?.headers.get("X-Profile-Account");
+  if (expectedAccount && expectedAccount !== authResult.userId) return json({ error: tResponse("System.requestFailed") }, 409);
   try {
     const clerk = await clerkClient();
     const requestedType = request.nextUrl.searchParams.get("type");

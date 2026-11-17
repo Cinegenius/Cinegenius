@@ -1,15 +1,11 @@
 "use client";
-import PrivacySettings from "@/components/PrivacySettings";
-import MessageAttachments from "@/components/messaging/MessageAttachments";
-import type {MessageAttachment} from "@/lib/message-attachments";
+import PersonalSettings from "@/components/PersonalSettings";
+import PersonalAreaHome from "@/components/PersonalAreaHome";
+import { dashboardLegacyDestination } from "@/lib/personal-area-navigation";
 import JobEditorFields from "@/components/JobEditorFields";
 import { jobEditValue, jobEditDescription } from "@/lib/job-editor";
 import { parseJobDescription, jobSchedule } from "@/lib/job-metadata";
 
-import MessageComposer from "@/components/messaging/MessageComposer";
-import InboxLoading from "@/components/InboxLoading";
-import ContactCard from "@/components/ContactCard";
-import type {ChatMessage} from "@/lib/messaging-ui";
 import GenieWritingAssistant from "@/components/GenieWritingAssistant";
 import { locationRoomLabel } from "@/lib/location-rooms";
 
@@ -39,54 +35,28 @@ import UnoptimizedImage from "@/components/UnoptimizedImage";
 import { useFormDraft } from "@/lib/use-form-draft";
 import { useFormNavigation } from "@/contexts/FormDraftContext";
 import FormDraftStatus from "@/components/FormDraftStatus";
-import React, { useState, useEffect, useLayoutEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import {
-  List, Calendar, MessageSquare,
-  BarChart2, Plus, Eye,
-  Briefcase, CheckCircle, ChevronRight, ExternalLink,
-  User,
-  Pencil, Save, Loader2, Upload, Heart, MapPin, Car, Package, Trash2,
-  Users, UserPlus, Check, X, Globe, Lock, Clock, ShieldCheck,
-  Building2, AlertCircle, FileText, ArrowLeft, Search,
+  Calendar, MessageSquare, BarChart2, Plus, Briefcase, CheckCircle, ChevronRight,
+  ExternalLink, Pencil, Save, Loader2, Upload, Check, X, Clock, ShieldCheck,
+  Building2, AlertCircle, FileText, ArrowLeft,
 } from "lucide-react";
 import { useUser } from "@clerk/nextjs";
-import { calculateProfileCompletion } from "@/lib/profile-completion";
-import { applyReadReceiptTimestamps, incomingUnreadMessageIds } from "@/lib/message-read-state";
-import { mergeMessagesById } from "@/lib/conversation-logic";
-import { notifyMessagesRead, subscribeToMessageReads } from "@/lib/message-read-sync";
 import { compressImage, MAX_FUNCTION_UPLOAD_BYTES } from "@/lib/compressImage";
 import ListingImageManager from "@/components/ListingImageManager";
 import { MAX_LOCATION_IMAGES, MAX_LISTING_IMAGES } from "@/lib/listing-image-gallery";
 import { subscribeToProfileUpdated } from "@/lib/profile-update-events";
-import { DASHBOARD_MESSAGES_FALLBACK_REFRESH_MS } from "@/lib/message-refresh-policy";
 import { uiErrorMessage } from "@/lib/ui-error-message";
+import { useAuthenticatedInbox } from "@/lib/use-authenticated-inbox";
 
-type RealMessage = {
-  attachments?: MessageAttachment[];
-  id: string;
-  sender_id: string;
-  content: string;
-  read_at: string | null;
-  created_at: string;
-};
-
-type RealConversation = {
+type AnalyticsConversation = {
   id: string;
   listing_id: string | null;
   listing_title: string | null;
   listing_type: string | null;
-  kind?: "direct" | "group" | "support";
-  group_name?: string | null;
-  sender_id: string;
-  receiver_id: string | null;
   created_at: string;
-  updated_at: string;
-  messages: RealMessage[];
-  unread_count: number;
-  otherName?: string;
-  otherAvatar?: string | null;
 };
 
 type Booking = {
@@ -110,10 +80,17 @@ type IncomingBooking = Booking & {
   booker_name: string;
 };
 
-const VALID_TABS = ["overview", "listings", "jobs", "favorites", "messages", "bookings", "friends", "firma", "settings", "analytics"];
+const VALID_TABS = ["overview", "listings", "jobs", "bookings", "settings", "analytics"];
 
 
 export default function DashboardPage() {
+  const { user, isLoaded } = useUser();
+  const uiText = useTranslations();
+  if (!isLoaded || !user) return <div className="site-container py-24" role="status">{uiText("common.loading")}</div>;
+  return <DashboardContent key={user.id} />;
+}
+
+function DashboardContent() {
   const uiText = useTranslations();
   const uiOptionLabels: Record<string, string> = {
     "Fläche (m²)": uiText("AdminReview.fields.sqm"),
@@ -143,48 +120,31 @@ export default function DashboardPage() {
   const moderation = useTranslations("OfferModeration");
   const marketplaceText = useTranslations("MarketplacePublishing");
   const animals = useTranslations("FilmAnimals");
-  const dashboardMessageText = useTranslations("messagesNavigation");
   const router = useRouter();
   const searchParams = useSearchParams();
 
   const tabParam = searchParams.get("tab") ?? "";
+  const legacyDestination = dashboardLegacyDestination(searchParams);
   useEffect(() => {
-    if (tabParam === "friends") router.replace("/messages?view=friends");
-  }, [tabParam, router]);
+    if (legacyDestination) router.replace(legacyDestination);
+  }, [legacyDestination, router]);
   const editListingParam = searchParams.get("editListing");
-  const [activeTab, setActiveTab] = useState(VALID_TABS.includes(tabParam) ? tabParam : "overview");
+  const activeTab = VALID_TABS.includes(tabParam) ? tabParam : "overview";
 
   // Real listings from Supabase
   const [myListings, setMyListings] = useState<{ id: string; type: string; category?: string; title: string; city: string; price: number; published: boolean; moderation_status?: string; moderation_reason?: string | null; freshness?: ListingFreshnessPreview | null; responsible_person?: ResponsiblePerson & { userId: string }; created_at: string; image_url: string | null; extra_images?: string[] | null; blocked_dates?: string[] | null; description: string; metadata?: Record<string, unknown> | null }[]>([]);
   const [listingsLoading, setListingsLoading] = useState(false);
   const [listingsError, setListingsError] = useState("");
 
-  // Profile sidebar data
-  const [profileRole, setProfileRole] = useState("");
   const [profileDisplayName, setProfileDisplayName] = useState("");
-  const [profileAvatarUrl, setProfileAvatarUrl] = useState("");
-  const [profileCompleteness, setProfileCompleteness] = useState(0);
-  const [profileMissingFields, setProfileMissingFields] = useState<string[]>([]);
-  const [profileCompletionChecks, setProfileCompletionChecks] = useState<{ label: string; ok: boolean }[]>([]);
   const profileUpdateRevision = useRef(0);
-
-  // Analytics
-  const [viewStats, setViewStats] = useState<{ views7: number; views14: number; trend: number; daily: number[] } | null>(null);
-  const [photoStats, setPhotoStats] = useState<{ total: number; avg: number; best: string | null } | null>(null);
+  const inbox = useAuthenticatedInbox();
   const { user } = useUser();
 
-  useEffect(() => {
-    if (tabParam === "profil") {
-      router.replace("/profile");
-      return;
-    }
-    setActiveTab(VALID_TABS.includes(tabParam) ? tabParam : "overview");
-  }, [router, tabParam]);
-
   const navigateDashboardTab = (tab: string) => leaveEditor(() => {
-    if (tab === "friends") { router.push("/messages?view=friends"); return; }
-    setActiveTab(tab);
-    router.replace(`/dashboard?tab=${encodeURIComponent(tab)}`, { scroll: false });
+    const destination = dashboardLegacyDestination(new URLSearchParams({ tab }));
+    if (destination) { router.push(destination); return; }
+    router.push(`/dashboard?tab=${encodeURIComponent(tab)}`, { scroll: true });
   });
 
   useEffect(() => {
@@ -192,83 +152,25 @@ export default function DashboardPage() {
       if (!user?.id || detail.userId !== user.id) return;
       profileUpdateRevision.current += 1;
       if (typeof detail.displayName === "string") setProfileDisplayName(detail.displayName);
-      if (detail.avatarUrl !== undefined) setProfileAvatarUrl(detail.avatarUrl ?? "");
     });
   }, [user?.id]);
 
   useEffect(() => {
-    // Profile + Completeness
-    const initialProfileUpdateRevision = profileUpdateRevision.current;
-    fetch("/api/profile")
-      .then((r) => r.ok ? r.json() : Promise.reject(new Error(uiText("Ui.text_2669fecc698980", { value1: String(r.status) }))))
-      .then(({ profile, exists }) => {
-        if (initialProfileUpdateRevision !== profileUpdateRevision.current) return;
-        if (!exists) {
-          setProfileDisplayName(user?.fullName ?? "");
-          setProfileCompleteness(0);
-
-          return;
-        }
-        if (profile?.display_name) setProfileDisplayName(profile.display_name);
-        if (profile?.avatar_url) setProfileAvatarUrl(profile.avatar_url);
-        if (profile?.role) setProfileRole(profile.role);
-        else if (profile?.positions?.[0]) setProfileRole(profile.positions[0]);
-
-        const fieldLabels: Record<string, string> = {
-          name: uiText("Ui.text_3ab2eacdba9077"), avatar: uiText("profile.sectionAvatar"), city: uiText("setup.place"), bio: uiText("Ui.text_496d212f59c4b2"),
-          type: uiText("creators.filterProfileType"), photos: uiText("Ui.text_bbbd463cd1d02f"), video: uiText("Ui.text_affe2a4a4bb3f8"), languages: uiText("profile.sectionLanguages"),
-          height: uiText("Ui.text_c9485b2c2af82d"), hair: uiText("creators.filterHairColor"), age: uiText("creators.filterAge"), role: uiText("Ui.text_9289e267f44a90"), credits: uiText("profile.sectionFilmography"),
-        };
-        const profileImages = Array.isArray(profile?.profile_images)
-          ? profile.profile_images.map((image: string | { url?: string | null } | null) => typeof image === "string" ? image : image?.url ?? "")
-          : [];
-        const completion = calculateProfileCompletion({
-          name: profile?.display_name,
-          avatarUrl: profile?.avatar_url,
-          location: profile?.location,
-          bio: profile?.bio,
-          profileType: profile?.profile_type,
-          images: profileImages,
-          videoLinks: [...(Array.isArray(profile?.video_links) ? profile.video_links : []), profile?.reel_url, profile?.showreel_url],
-          languages: profile?.languages,
-          heightCm: profile?.physical?.height_cm,
-          hairColor: profile?.physical?.hair_color,
-          playingAgeMin: profile?.physical?.playing_age_min,
-          positions: profile?.positions,
-          filmography: profile?.filmography,
-        });
-        setProfileCompleteness(completion.score);
-        setProfileMissingFields(completion.missing.map((key) => fieldLabels[key] ?? key));
-        setProfileCompletionChecks(completion.checks.map(({ key, complete }) => ({ label: fieldLabels[key] ?? key, ok: complete })));
+    if (activeTab !== "overview" || legacyDestination) return;
+    const controller = new AbortController();
+    const revision = profileUpdateRevision.current;
+    void fetch("/api/profile", { cache: "no-store", signal: controller.signal })
+      .then(async response => { if (!response.ok) return null; return response.json(); })
+      .then(result => {
+        if (controller.signal.aborted || revision !== profileUpdateRevision.current || !result) return;
+        if (typeof result.profile?.display_name === "string") setProfileDisplayName(result.profile.display_name);
       })
-      .catch(() => {});
-
-    // Profilaufrufe
-    fetch("/api/profile-views")
-      .then((r) => r.json())
-      .then((data) => setViewStats(data))
-      .catch(() => {});
-
-  }, [user?.fullName]);
+      .catch(() => { /* The authenticated account name remains available as a fallback. */ });
+    return () => controller.abort();
+  }, [activeTab, legacyDestination]);
 
   useEffect(() => {
-    if (!user?.id) return;
-    fetch(`/api/profile-image-likes?profile_id=${user.id}`)
-      .then((r) => r.json())
-      .then(({ ratings }: { ratings: Record<string, { avg: number; count: number }> }) => {
-        const entries = Object.entries(ratings ?? {});
-        if (!entries.length) return;
-        const total = entries.reduce((s, [, v]) => s + v.count, 0);
-        const weightedSum = entries.reduce((s, [, v]) => s + v.avg * v.count, 0);
-        const avg = Math.round((weightedSum / total) * 10) / 10;
-        const best = [...entries].sort((a, b) => b[1].avg - a[1].avg)[0]?.[0] ?? null;
-        setPhotoStats({ total, avg, best });
-      })
-      .catch(() => {});
-  }, [user?.id]);
-
-  useEffect(() => {
-    if (activeTab !== "listings" && activeTab !== "overview" && activeTab !== "analytics") return;
+    if (legacyDestination || activeTab !== "listings" && activeTab !== "analytics") return;
     setListingsLoading(true);
     fetch("/api/listings?mine=true")
       .then((r) => r.json())
@@ -278,7 +180,7 @@ export default function DashboardPage() {
       })
       .catch(() => setListingsError(uiText("Ui.text_69f5153e4a2bea")))
       .finally(() => setListingsLoading(false));
-  }, [activeTab]);
+  }, [activeTab, legacyDestination, uiText]);
 
   const togglePublished = async (id: string, current: boolean) => {
     const response = current
@@ -534,6 +436,8 @@ export default function DashboardPage() {
   const [bookingsLoading, setBookingsLoading] = useState(false);
   const [incomingBookings, setIncomingBookings] = useState<IncomingBooking[]>([]);
   const [incomingLoading, setIncomingLoading] = useState(false);
+  const [incomingError, setIncomingError] = useState(false);
+  const [incomingReload, setIncomingReload] = useState(0);
   const [respondingBooking, setRespondingBooking] = useState<string | null>(null);
 
   const [applications, setApplications] = useState<{ id: string; job_id: string; job_title: string; status: string; day_rate: string | null; created_at: string }[]>([]);
@@ -542,153 +446,19 @@ export default function DashboardPage() {
   const [incomingAppsLoading, setIncomingAppsLoading] = useState(false);
   const [respondingApp, setRespondingApp] = useState<string | null>(null);
 
-  // Company
-  type MyCompany = {
-    id: string; slug: string; name: string; logo_url: string | null;
-    published: boolean; categories: string[]; city: string | null;
-    tagline: string | null; description: string | null;
-    social_links: Record<string, string> | null;
-  };
-  const [myCompany, setMyCompany] = useState<MyCompany | null | "loading">("loading");
-
-  useEffect(() => {
-    fetch("/api/companies?mine=true")
-      .then(r => r.json())
-      .then(({ data }) => setMyCompany(data?.[0] ?? null))
-      .catch(() => setMyCompany(null));
-  }, []);
-
   // My posted jobs
   const [myJobs, setMyJobs] = useState<{ id: string; title: string; published: boolean; moderation_status?: string; moderation_reason?: string | null; city: string | null; created_at: string }[]>([]);
   const [myJobsLoading, setMyJobsLoading] = useState(false);
 
   useEffect(() => {
-    if (activeTab !== "jobs" && activeTab !== "overview") return;
+    if (legacyDestination || activeTab !== "jobs") return;
     setMyJobsLoading(true);
     fetch("/api/listings?mine=true")
       .then(r => r.json())
       .then(({ data }) => setMyJobs((data ?? []).filter((l: { type: string }) => l.type === "job")))
       .catch(() => {})
       .finally(() => setMyJobsLoading(false));
-  }, [activeTab]);
-
-  // Favorites
-  type Favorite = {
-    id: string; listing_id: string; listing_type: string;
-    listing_title: string | null; listing_city: string | null;
-    priceLabel?:string; listing_price: number | null; listing_image: string | null; created_at: string;
-  };
-  const [favorites, setFavorites] = useState<Favorite[]>([]);
-  const [favoritesLoading, setFavoritesLoading] = useState(false);
-  const [removingFav, setRemovingFav] = useState<string | null>(null);
-
-  useEffect(() => {
-    if (activeTab !== "favorites" && activeTab !== "overview") return;
-    if (favorites.length > 0) return;
-    setFavoritesLoading(true);
-    fetch("/api/favorites")
-      .then(r => r.json())
-      .then(({ favorites: data }) => setFavorites(data ?? []))
-      .catch(() => {})
-      .finally(() => setFavoritesLoading(false));
-  }, [activeTab, favorites.length]);
-
-  const removeFavorite = async (fav: Favorite) => {
-    setRemovingFav(fav.listing_id);
-    try {
-      await fetch("/api/favorites", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ listing_id: fav.listing_id, listing_type: fav.listing_type }),
-      });
-      setFavorites(prev => prev.filter(f => f.listing_id !== fav.listing_id));
-    } finally {
-      setRemovingFav(null);
-    }
-  };
-
-  const favTypeConfig: Record<string, { label: string; icon: React.ComponentType<{ size?: number; className?: string }>; href: (id: string) => string; color: string }> = {
-    location: { label: uiText("profile.labelLocation"),    icon: MapPin,    href: (id) => `/locations/${id}`, color: "text-sky-400" },
-    vehicle:  { label: uiText("AdminAccounts.contentKinds.vehicle"),   icon: Car,       href: (id) => `/vehicles/${id}`,  color: "text-orange-400" },
-    prop:     { label: uiText("Ui.text_27c673e10176f0"),  icon: Package,   href: (id) => `/props/${id}`,     color: "text-violet-400" },
-    job:      { label: uiText("AdminAccounts.contentKinds.job"),        icon: Briefcase, href: (id) => `/jobs/${id}`,      color: "text-emerald-400" },
-    creator:  { label: uiText("creators.defaultRole"), icon: User, href: (id) => `/profile/${id}`, color: "text-gold" },
-  };
-
-  // Friends
-  type FriendEntry = { friendship_id: string; user_id: string; display_name: string; avatar_url: string | null; role: string };
-  const [storedFriends, setFriends] = useState<FriendEntry[]>([]);
-  const [storedIncoming, setFriendsIncoming] = useState<FriendEntry[]>([]);
-  const [storedOutgoing, setFriendsOutgoing] = useState<FriendEntry[]>([]);
-  const [friendsLoading, setFriendsLoading] = useState(false);
-  const [friendsTab, setFriendsTab] = useState<"friends" | "incoming" | "outgoing">("incoming");
-  const [friendSearch, setFriendSearch] = useState("");
-
-  const [friendsOwner, setFriendsOwner] = useState<string | null>(null);
-  const [friendsFailure, setFriendsFailure] = useState({ account: "", text: "" });
-  const [friendPending, setFriendPending] = useState<Set<string>>(new Set());
-  const friendOperations = useRef(new Set<string>());
-  const friendLoadGeneration = useRef(0);
-  const friendAccount = useRef(user?.id);
-  const friendsRegion = useRef<HTMLDivElement>(null);
-  useLayoutEffect(() => { friendAccount.current = user?.id; return () => { friendAccount.current = undefined; }; }, [user?.id]);
-  const friendsReady = !!user?.id && friendsOwner === user.id;
-  const friends = friendsReady ? storedFriends : [];
-  const friendsIncoming = friendsReady ? storedIncoming : [];
-  const friendsOutgoing = friendsReady ? storedOutgoing : [];
-  const friendsError = friendsFailure.account === user?.id ? friendsFailure.text : "";
-
-  const doLoadFriends = useCallback(async (showSpinner: boolean) => {
-    const actor = user?.id;
-    if (!actor) return;
-    const generation = ++friendLoadGeneration.current;
-    if (showSpinner) setFriendsLoading(true);
-    try {
-      const response = await fetch("/api/friendships", { cache: "no-store", signal: AbortSignal.timeout(15_000) });
-      const data = await response.json();
-      if (friendAccount.current !== actor || generation !== friendLoadGeneration.current) return;
-      if (!response.ok || !Array.isArray(data.friends) || !Array.isArray(data.incoming) || !Array.isArray(data.outgoing)) throw new Error(uiText("Contacts.loadError"));
-      setFriends(data.friends); setFriendsIncoming(data.incoming); setFriendsOutgoing(data.outgoing);
-      setFriendsOwner(actor); setFriendsFailure({ account: actor, text: "" });
-    } catch (cause) {
-      if (friendAccount.current === actor && generation === friendLoadGeneration.current) setFriendsFailure({ account: actor, text: uiErrorMessage(cause, uiText("Contacts.loadError")) });
-    } finally { if (friendAccount.current === actor && generation === friendLoadGeneration.current) setFriendsLoading(false); }
-  }, [user?.id, uiText]);
-
-  useEffect(() => { let active = true; queueMicrotask(() => { if (active) void doLoadFriends(false); }); return () => { active = false; }; }, [doLoadFriends]);
-  useEffect(() => {
-    let active = true;
-    queueMicrotask(() => { if (active && activeTab === "friends") void doLoadFriends(true); });
-    return () => { active = false; };
-  }, [activeTab, doLoadFriends]);
-
-  const changeFriend = async (id: string, status?: "accepted" | "rejected") => {
-    const actor = user?.id, key = `${actor}:${id}`;
-    if (!actor || friendOperations.current.has(key)) return false;
-    friendOperations.current.add(key); setFriendPending(previous => new Set(previous).add(key));
-    setFriendsFailure({ account: actor, text: "" });
-    try {
-      const response = await fetch(`/api/friendships/${id}`, {
-        method: status ? "PATCH" : "DELETE", cache: "no-store", signal: AbortSignal.timeout(20_000),
-        headers: { "Content-Type": "application/json", "X-Contact-Account": actor },
-        ...(status ? { body: JSON.stringify({ status, accountId: actor }) } : {}),
-      });
-      const result = await response.json().catch(() => ({}));
-      if (friendAccount.current !== actor) return false;
-      if (!response.ok || result.success !== true) throw new Error(result.error || uiText("Contacts.error"));
-      await doLoadFriends(true);
-      return friendAccount.current === actor;
-    } catch (cause) {
-      if (friendAccount.current === actor) setFriendsFailure({ account: actor, text: uiErrorMessage(cause, uiText("Contacts.error")) });
-      return false;
-    } finally {
-      friendOperations.current.delete(key);
-      setFriendPending(previous => { const next = new Set(previous); next.delete(key); return next; });
-    }
-  };
-  const acceptFriend = (id: string) => changeFriend(id, "accepted");
-  const rejectFriend = (id: string) => changeFriend(id, "rejected");
-  const removeFriendEntry = (id: string) => { void changeFriend(id); };
+  }, [activeTab, legacyDestination]);
 
   // Verification request state
   const [verifStatus, setVerifStatus] = useState<"none" | "pending" | "approved" | "rejected">("none");
@@ -715,49 +485,39 @@ export default function DashboardPage() {
       .catch(error => { if (!cancelled) setVerifError(uiErrorMessage(error, verificationText("statusError"))); })
       .finally(() => { if (!cancelled) setVerifLoading(false); });
     return () => { cancelled = true; };
-  }, [activeTab, verifReload]);
+  }, [activeTab, verifReload, verificationText]);
 
-  const [conversations, setConversations] = useState<RealConversation[]>([]);
+  const [conversations, setConversations] = useState<AnalyticsConversation[]>([]);
   const [convsLoading, setConvsLoading] = useState(false);
   const [conversationsReady, setConversationsReady] = useState(false);
   const [conversationsLoadError, setConversationsLoadError] = useState(false);
-  const conversationsHasLoadedRef = useRef(false);
-  const [unreadMessagesTotal, setUnreadMessagesTotal] = useState(0);
-  const [selectedConversation, setSelectedConversation] = useState<string | null>(null);
-  const [activeMessages, setActiveMessages] = useState<RealMessage[]>([]);
-  const [messagesLoading, setMessagesLoading] = useState(false);
-  const [messageLoadError, setMessageLoadError] = useState("");
-  const [messageReloadVersion, setMessageReloadVersion] = useState(0);
-  const messageViewRef = useRef<{ userId: string; conversationId: string } | null>(null);
-  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const [analyticsReload, setAnalyticsReload] = useState(0);
 
   useEffect(() => {
-    const view = user?.id && selectedConversation
-      ? { userId: user.id, conversationId: selectedConversation }
-      : null;
-    messageViewRef.current = view;
-    return () => { if (messageViewRef.current === view) messageViewRef.current = null; };
-  }, [selectedConversation, user?.id]);
-
-  useEffect(() => {
-    if (activeTab !== "bookings" && activeTab !== "overview") return;
+    if (legacyDestination || activeTab !== "bookings") return;
     setBookingsLoading(true);
     fetch("/api/bookings")
       .then(r => r.json())
       .then(({ bookings: data }) => setBookings(data ?? []))
       .catch(() => {})
       .finally(() => setBookingsLoading(false));
-  }, [activeTab]);
+  }, [activeTab, legacyDestination]);
 
   useEffect(() => {
-    if (activeTab !== "bookings" && activeTab !== "overview") return;
-    setIncomingLoading(true);
-    fetch("/api/bookings?incoming=true")
-      .then(r => r.json())
-      .then(({ bookings: data }) => setIncomingBookings(data ?? []))
-      .catch(() => {})
-      .finally(() => setIncomingLoading(false));
-  }, [activeTab]);
+    if (legacyDestination || activeTab !== "bookings" && activeTab !== "overview") return;
+    const controller = new AbortController();
+    queueMicrotask(() => { if (!controller.signal.aborted) { setIncomingLoading(true); setIncomingError(false); } });
+    void fetch("/api/bookings?incoming=true", { cache: "no-store", signal: controller.signal })
+      .then(async response => {
+        const result = await response.json();
+        if (!response.ok || !Array.isArray(result.bookings)) throw new Error("unavailable");
+        return result.bookings as IncomingBooking[];
+      })
+      .then(data => { if (!controller.signal.aborted) setIncomingBookings(data); })
+      .catch(() => { if (!controller.signal.aborted) setIncomingError(true); })
+      .finally(() => { if (!controller.signal.aborted) setIncomingLoading(false); });
+    return () => controller.abort();
+  }, [activeTab, legacyDestination, incomingReload]);
 
   const respondBooking = async (id: string, status: "confirmed" | "rejected") => {
     setRespondingBooking(id);
@@ -774,14 +534,14 @@ export default function DashboardPage() {
   };
 
   useEffect(() => {
-    if (activeTab !== "bookings" && activeTab !== "jobs") return;
+    if (legacyDestination || activeTab !== "bookings") return;
     setApplicationsLoading(true);
     fetch("/api/applications")
       .then(r => r.json())
       .then(({ applications: data }) => setApplications(data ?? []))
       .catch(() => {})
       .finally(() => setApplicationsLoading(false));
-  }, [activeTab]);
+  }, [activeTab, legacyDestination]);
 
   useEffect(() => {
     if (activeTab !== "jobs") return;
@@ -807,758 +567,74 @@ export default function DashboardPage() {
     }
   };
 
-  const loadDashboardConversations = useCallback(async () => {
-    if (!conversationsHasLoadedRef.current) {
-      setConvsLoading(true);
-      setConversationsReady(false);
-    }
-    setConversationsLoadError(false);
-    try {
-      const response = await fetch("/api/conversations", { cache: "no-store" });
-      if (!response.ok) throw new Error(uiText("Ui.text_8358f771d24abf"));
-      const { data, unreadCount } = await response.json();
-      setConversations(data ?? []);
-      setUnreadMessagesTotal(Number(unreadCount) || 0);
-      conversationsHasLoadedRef.current = true;
-      setConversationsReady(true);
-    } catch {
-      setConversationsLoadError(true);
-      if (!conversationsHasLoadedRef.current) {
-        setConversations([]);
-        setUnreadMessagesTotal(0);
-      }
-    } finally {
-      setConvsLoading(false);
-    }
-  }, []);
-
   useEffect(() => {
-    if (activeTab !== "messages" && activeTab !== "overview" && activeTab !== "analytics" && activeTab !== "bookings") return;
-    void loadDashboardConversations();
-  }, [activeTab, loadDashboardConversations]);
-
-  useEffect(() => {
-    if (!user?.id) return;
-    return subscribeToMessageReads(user.id, () => { void loadDashboardConversations(); });
-  }, [user?.id, loadDashboardConversations]);
-
-  useEffect(() => {
-    // The overview is already refreshed on entry and by read events. Only the
-    // open messages tab needs a periodic safety refresh.
-    if (!user?.id || activeTab !== "messages") return;
-    const interval = window.setInterval(() => {
-      if (document.visibilityState === "visible") void loadDashboardConversations();
-    }, DASHBOARD_MESSAGES_FALLBACK_REFRESH_MS);
-    return () => window.clearInterval(interval);
-  }, [user?.id, activeTab, loadDashboardConversations]);
-
-  useEffect(() => {
-    const view = messageViewRef.current;
-    let cancelled = false;
+    if (legacyDestination || activeTab !== "analytics") return;
     const controller = new AbortController();
-    const isCurrent = () => !cancelled && messageViewRef.current === view;
-    setActiveMessages([]);
-    setMessageLoadError("");
-    if (!view || !selectedConversation || !user?.id) {
-      setMessagesLoading(false);
-      return;
-    }
-    const { userId: owner, conversationId } = view;
-    setMessagesLoading(true);
-    async function load() {
-      try {
-        const response = await fetch(`/api/conversations/${conversationId}`, { cache: "no-store", signal: controller.signal });
-        if (!response.ok) throw new Error(uiText("Ui.text_e2085ad6e6ac21"));
-        const { messages } = await response.json();
-        if (!isCurrent()) return;
-        if (!Array.isArray(messages)) throw new Error();
-        const loadedMessages = messages as RealMessage[];
-        setActiveMessages(current => mergeMessagesById(loadedMessages, current));
-        const messageIds = incomingUnreadMessageIds(loadedMessages, owner);
-        if (messageIds.length > 0) {
-          try {
-            const readResponse = await fetch(`/api/conversations/${conversationId}/read`, {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              cache: "no-store",
-              signal: controller.signal,
-              body: JSON.stringify({ message_ids: messageIds }),
-            });
-            if (readResponse.ok) {
-              const readState = await readResponse.json();
-              if (!isCurrent()) return;
-              const readMessages = Array.isArray(readState.readMessages) ? readState.readMessages : [];
-              setActiveMessages((current) => applyReadReceiptTimestamps(current, readMessages));
-              setConversations((current) => current.map((conversation) => conversation.id !== conversationId ? conversation : {
-                ...conversation,
-                unread_count: readState.byConversation?.[conversationId] ?? conversation.unread_count,
-                messages: applyReadReceiptTimestamps(conversation.messages, readMessages),
-              }));
-              setUnreadMessagesTotal(Number(readState.count) || 0);
-              setConversationsReady(true);
-              notifyMessagesRead(owner);
-            }
-          } catch { /* read receipts are best effort; keep the loaded messages visible */ }
-        }
-        setTimeout(() => { if (isCurrent()) messagesEndRef.current?.scrollIntoView({ behavior: "smooth" }); }, 50);
-      } catch {
-        if (isCurrent()) setMessageLoadError(dashboardMessageText("messageLoadError"));
-      } finally {
-        if (isCurrent()) setMessagesLoading(false);
-      }
-    }
-    void load();
-    return () => { cancelled = true; controller.abort(); };
-  }, [selectedConversation, user?.id, messageReloadVersion, dashboardMessageText]);
+    queueMicrotask(() => {
+      if (!controller.signal.aborted) { setConvsLoading(true); setConversationsLoadError(false); }
+    });
+    void fetch("/api/conversations", { cache: "no-store", signal: controller.signal })
+      .then(async response => {
+        const result = await response.json();
+        if (!response.ok || !Array.isArray(result.data)) throw new Error("unavailable");
+        return result.data as AnalyticsConversation[];
+      })
+      .then(data => { if (!controller.signal.aborted) { setConversations(data); setConversationsReady(true); } })
+      .catch(() => { if (!controller.signal.aborted) setConversationsLoadError(true); })
+      .finally(() => { if (!controller.signal.aborted) setConvsLoading(false); });
+    return () => controller.abort();
+  }, [activeTab, legacyDestination, analyticsReload]);
 
-  const confirmReply = (message: ChatMessage, conversationId: string, accountId: string) => {
-    const view = messageViewRef.current;
-    if (!view || view.userId !== accountId || view.conversationId !== conversationId) return;
-    setActiveMessages(current => mergeMessagesById(current, [message]));
-    setTimeout(() => { if (messageViewRef.current === view) messagesEndRef.current?.scrollIntoView({behavior:"smooth"}); }, 50);
-    void loadDashboardConversations();
-  };
-
-  const formatMsgTime = (iso: string) => {
-    const d = new Date(iso);
-    const now = new Date();
-    const diffMs = now.getTime() - d.getTime();
-    const diffMin = Math.floor(diffMs / 60000);
-    if (diffMin < 1) return uiText("Ui.text_d5f879f6819f21");
-    if (diffMin < 60) return uiText("Ui.text_675c446178ebb6", { value1: String(diffMin) });
-    const diffH = Math.floor(diffMin / 60);
-    if (diffH < 24) return uiText("Ui.text_d4ade1ff4f04c0", { value1: String(diffH) });
-    const diffD = Math.floor(diffH / 24);
-    if (diffD === 1) return "Gestern";
-    return d.toLocaleDateString(uiLocale, { day: "numeric", month: "short" });
-  };
-
-  const unreadCount = conversationsReady ? unreadMessagesTotal : 0;
+  const unreadCount = inbox.status === "ready" ? inbox.count ?? 0 : 0;
 
   const tabTitle = () => {
-    const map: Record<string, string> = {
-      overview: "Übersicht",
-      profil: "Mein Profil",
-      firma: "Meine Firma",
-      listings: "Meine Angebote",
-      jobs: "Meine Angebote",
-      bookings: "Buchungen",
-      messages: "Nachrichten",
-      analytics: "Analysen",
-      favorites: "Merkliste",
-      friends: uiText("Contacts.title"),
-      settings: "Einstellungen",
+    const keys: Record<string, string> = {
+      overview: "nav.personalArea", listings: "nav.myOffers", jobs: "nav.myOffers",
+      bookings: "nav.bookings", analytics: "nav.analytics", settings: "PersonalArea.settings",
     };
-    return map[activeTab] ?? activeTab;
+    return uiText(keys[activeTab] ?? "nav.personalArea");
   };
 
-  const contactQuery = friendSearch.trim().toLowerCase();
-  const filteredContacts = friends.filter(f =>
-    !contactQuery || f.display_name.toLowerCase().includes(contactQuery) || (f.role ?? "").toLowerCase().includes(contactQuery)
-  );
-  const groupedContacts = filteredContacts.reduce<Record<string, typeof friends>>((acc, f) => {
-    const key = f.role?.trim() || "Sonstige";
-    (acc[key] ??= []).push(f);
-    return acc;
-  }, {});
-  const sortedContactGroups = Object.entries(groupedContacts).sort(([a], [b]) => a.localeCompare(b, uiLocale));
-  sortedContactGroups.forEach(([, members]) => members.sort((a, b) => a.display_name.localeCompare(b.display_name, uiLocale)));
-
-
-  if (tabParam === "friends") return <InboxLoading active="friends" />;
+  if (legacyDestination) return <div className="site-container py-24" role="status">{uiText("common.loading")}</div>;
 
   return (
-    <div className="pt-16 min-h-screen flex w-full min-w-0">
+    <div className="min-h-screen w-full min-w-0 pt-16">
       {/* Hauptinhalt */}
       <div className="min-w-0 flex-1">
         {/* Top-Leiste */}
-        <div className="sticky top-16 z-30 bg-bg-primary/80 backdrop-blur-nav border-b border-border px-4 sm:px-6 py-3 flex items-center justify-between gap-3 lg:top-28">
-          <h1 className="font-display text-sm sm:text-base font-bold text-text-primary truncate">{tabTitle()}</h1>
-          <div className="flex items-center gap-2 shrink-0">{uiText.rich("Ui.text_d4ad4f9e5b7d76", { part2: () => (<Plus size={13} />), part3: chunks => (<span className="hidden sm:inline">{chunks}</span>), part1: chunks => (<Link href="/inserat" className="px-3 py-1.5 bg-gold text-bg-primary text-xs font-semibold rounded-lg flex items-center gap-1.5 hover:bg-gold-light transition-colors whitespace-nowrap">{chunks}</Link>) })}</div>
+        <div className="sticky top-[var(--site-header-height)] z-30 bg-bg-primary/80 backdrop-blur-nav border-b border-border px-4 sm:px-6 py-3 flex items-center justify-between gap-3">
+          <div className="flex min-w-0 items-center gap-2">
+            {activeTab !== "overview" && <Link href="/dashboard" aria-label={uiText("nav.personalArea")} className="flex min-h-11 min-w-11 items-center justify-center rounded-xl text-text-muted hover:bg-bg-elevated"><ArrowLeft size={19} aria-hidden="true" /></Link>}
+            <h1 className="min-w-0 break-words text-base font-semibold text-text-primary">{tabTitle()}</h1>
+          </div>
+          <div className="flex items-center gap-2 shrink-0">{uiText.rich("Ui.text_d4ad4f9e5b7d76", { part2: () => (<Plus size={13} />), part3: chunks => (<span className="hidden sm:inline">{chunks}</span>), part1: chunks => (<Link href="/inserat" className="min-h-11 px-3 py-1.5 bg-gold text-bg-primary text-xs font-semibold rounded-lg flex items-center gap-1.5 hover:bg-gold-light transition-colors whitespace-nowrap">{chunks}</Link>) })}</div>
         </div>
 
         {(activeTab === "listings" || activeTab === "jobs") && (
           <div className="flex flex-wrap items-center gap-2 border-b border-border px-4 py-3 sm:px-6">
-            <button onClick={() => navigateDashboardTab("listings")} className={`min-h-10 rounded-lg border px-3 text-sm font-medium transition-colors ${activeTab === "listings" ? "border-gold/40 bg-gold/10 text-gold" : "border-border text-text-secondary hover:text-text-primary"}`}>{uiText("profile.tabListings")}</button>
-            <button onClick={() => navigateDashboardTab("jobs")} className={`min-h-10 rounded-lg border px-3 text-sm font-medium transition-colors ${activeTab === "jobs" ? "border-gold/40 bg-gold/10 text-gold" : "border-border text-text-secondary hover:text-text-primary"}`}>{uiText("Ui.text_4012fde18eb1f5")}</button>
-            <Link href="/company-dashboard" className="ml-auto inline-flex min-h-10 items-center gap-2 rounded-lg border border-border px-3 text-sm text-text-secondary transition-colors hover:border-gold/40 hover:text-gold">{uiText.rich("Ui.text_70ede6b97ecfb0", { part1: () => (<Building2 size={15} />) })}</Link>
+            <button onClick={() => navigateDashboardTab("listings")} className={`min-h-11 rounded-lg border px-3 text-sm font-medium transition-colors ${activeTab === "listings" ? "border-gold/40 bg-gold/10 text-gold" : "border-border text-text-secondary hover:text-text-primary"}`}>{uiText("profile.tabListings")}</button>
+            <button onClick={() => navigateDashboardTab("jobs")} className={`min-h-11 rounded-lg border px-3 text-sm font-medium transition-colors ${activeTab === "jobs" ? "border-gold/40 bg-gold/10 text-gold" : "border-border text-text-secondary hover:text-text-primary"}`}>{uiText("Ui.text_4012fde18eb1f5")}</button>
+            <Link href="/dashboard?tab=analytics" className="inline-flex min-h-11 items-center gap-2 rounded-lg px-3 text-sm text-text-secondary hover:bg-bg-elevated"><BarChart2 size={16} aria-hidden="true" />{uiText("nav.analytics")}</Link>
+            <Link href="/company-dashboard" className="ml-auto inline-flex min-h-11 items-center gap-2 rounded-lg border border-border px-3 text-sm text-text-secondary transition-colors hover:border-gold/40 hover:text-gold">{uiText.rich("Ui.text_70ede6b97ecfb0", { part1: () => (<Building2 size={15} />) })}</Link>
           </div>
         )}
 
 
         <div className="min-w-0 w-full p-4 sm:p-6 pb-24 lg:pb-6">
-          {/* ── ÜBERSICHT ── */}
           {activeTab === "overview" && (
-            <div className="min-w-0 w-full space-y-8 max-w-4xl">
-
-              {/* ── Begrüßung ── */}
+            <div className="mx-auto w-full max-w-3xl space-y-6">
               <div>
-                <h2 className="font-display text-2xl font-bold text-text-primary">{uiText.rich("Ui.text_9822f89b9cd21d", { value1: () => (profileDisplayName || user?.firstName || user?.emailAddresses[0]?.emailAddress?.split("@")[0] || "") })}</h2>
-                <p className="text-text-muted text-sm mt-1">
-                  <DashboardDate />
-                </p>
+                <h2 className="font-display text-2xl font-bold text-text-primary">{profileDisplayName || user?.firstName || user?.fullName || uiText("nav.personalArea")}</h2>
+                <p className="mt-1 text-sm text-text-muted"><DashboardDate /></p>
               </div>
-
-              {(unreadCount > 0 || incomingBookings.some((booking) => booking.status === "pending") || profileMissingFields.length > 0) && (
-                <section aria-label={uiText("Ui.text_a4ba73300ac027")} className="grid min-w-0 gap-3 sm:grid-cols-2 xl:grid-cols-3">
-                  {unreadCount > 0 && (
-                    <Link href="/messages" className="flex min-h-20 items-center gap-3 rounded-xl border border-gold/30 bg-gold/5 p-4 transition-colors hover:border-gold/60">{uiText.rich("Ui.text_0f50761594768c", { part2: () => (<MessageSquare size={18} />), part1: chunks => (<span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-gold/10 text-gold">{chunks}</span>), value5: () => (unreadCount), count6: unreadCount, part4: chunks => (<span className="block text-sm font-semibold text-text-primary">{chunks}</span>), part7: chunks => (<span className="block text-xs text-text-muted">{chunks}</span>), part3: chunks => (<span className="min-w-0">{chunks}</span>), part8: () => (<ChevronRight size={15} className="ml-auto shrink-0 text-gold" />) })}</Link>
-                  )}
-                  {incomingBookings.some((booking) => booking.status === "pending") && (
-                    <button onClick={() => navigateDashboardTab("bookings")} className="flex min-h-20 items-center gap-3 rounded-xl border border-border bg-bg-secondary p-4 text-left transition-colors hover:border-gold/40">{uiText.rich("Ui.text_5f536500158e21", { part2: () => (<Calendar size={18} />), part1: chunks => (<span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-gold/10 text-gold">{chunks}</span>), part4: chunks => (<span className="block text-sm font-semibold text-text-primary">{chunks}</span>), part5: chunks => (<span className="block text-xs text-text-muted">{chunks}</span>), part3: chunks => (<span className="min-w-0">{chunks}</span>), part6: () => (<ChevronRight size={15} className="ml-auto shrink-0 text-text-muted" />) })}</button>
-                  )}
-                  {profileMissingFields.length > 0 && (
-                    <Link href="/profile" className="flex min-h-20 items-center gap-3 rounded-xl border border-border bg-bg-secondary p-4 transition-colors hover:border-gold/40">{uiText.rich("Ui.text_4986c0991fc326", { part2: () => (<User size={18} />), part1: chunks => (<span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-gold/10 text-gold">{chunks}</span>), part4: chunks => (<span className="block text-sm font-semibold text-text-primary">{chunks}</span>), value6: () => (profileMissingFields[0]), part5: chunks => (<span className="block truncate text-xs text-text-muted">{chunks}</span>), part3: chunks => (<span className="min-w-0">{chunks}</span>), part7: () => (<ChevronRight size={15} className="ml-auto shrink-0 text-text-muted" />) })}</Link>
-                  )}
-                </section>
-              )}
-
+              {(unreadCount > 0 || incomingBookings.some(booking => booking.status === "pending")) && <section aria-label={uiText("Ui.text_a4ba73300ac027")} className="space-y-2">
+                {unreadCount > 0 && <Link href="/messages" className="flex min-h-14 items-center gap-3 rounded-xl border border-border bg-bg-secondary px-4 py-3 text-sm"><MessageSquare size={18} className="shrink-0 text-gold" /><span className="min-w-0 flex-1 break-words">{uiText("notifications.newMessages", { count: unreadCount })}</span><ChevronRight size={16} className="shrink-0 text-text-muted" /></Link>}
+                {incomingBookings.some(booking => booking.status === "pending") && <Link href="/dashboard?tab=bookings" className="flex min-h-14 items-center gap-3 rounded-xl border border-border bg-bg-secondary px-4 py-3 text-sm"><Calendar size={18} className="shrink-0 text-gold" /><span className="min-w-0 flex-1 break-words">{uiText("nav.bookings")}</span><span className="text-gold">{incomingBookings.filter(booking => booking.status === "pending").length}</span><ChevronRight size={16} className="shrink-0 text-text-muted" /></Link>}
+              </section>}
+              {(inbox.status === "error" || inbox.status === "expired") && <Link href="/messages" className="flex min-h-11 flex-wrap items-center justify-between gap-3 rounded-xl border border-border bg-bg-secondary px-4 py-3 text-sm text-text-secondary"><span>{uiText("nav.messages")}</span><span>{uiText("common.unavailable")}</span></Link>}
+              {incomingError && <div role="alert" className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-border bg-bg-secondary px-4 py-3 text-sm text-text-secondary"><span>{uiText("nav.bookings")}: {uiText("common.unavailable")}</span><button type="button" onClick={() => setIncomingReload(value => value + 1)} className="min-h-11 rounded-lg border border-border px-3 text-text-primary">{uiText("PrivacySettings.retry")}</button></div>}
               <SetupStatusNotice />
-
-              {/* ── Stats-Kacheln ── */}
-              {(viewStats || photoStats) && (
-                <div className="grid min-w-0 grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3">
-                  {viewStats && (
-                  <div className="p-4 rounded-xl border border-border bg-bg-secondary">
-                    <p className="text-xs text-text-muted mb-1 flex items-center gap-1.5">{uiText.rich("Ui.text_a854758025488a", { part1: () => (<Eye size={12} />) })}</p>
-                    <p className="text-2xl font-bold font-mono text-text-primary">{viewStats.views7}</p>
-                    <div className="flex items-center gap-1 mt-1">{uiText.rich("Ui.text_e0a31345c2f534", { value2: () => (viewStats.trend > 0 ? uiText("Ui.text_1d732d182540bf", { value1: String(viewStats.trend) }) : viewStats.trend < 0 ? uiText("Ui.text_6a53a571fa6641", { value1: String(viewStats.trend) }) : "—"), part1: chunks => (<span className={`text-xs font-medium ${viewStats.trend > 0 ? "text-success" : viewStats.trend < 0 ? "text-red-400" : "text-text-muted"}`}>{chunks}</span>), part3: chunks => (<span className="text-xs text-text-muted">{chunks}</span>) })}</div>
-                    {/* Sparkline */}
-                    <div className="flex items-end gap-0.5 mt-3 h-8">
-                      {viewStats.daily.map((v, i) => {
-                        const max = Math.max(...viewStats.daily, 1);
-                        return (
-                          <div key={i} className="flex-1 bg-gold/30 rounded-sm transition-all hover:bg-gold/60"
-                            style={{ height: `${Math.max((v / max) * 100, 8)}%` }} />
-                        );
-                      })}
-                    </div>
-                    <p className="text-[10px] text-text-muted mt-1">{uiText("Ui.text_df1140f6b738ec")}</p>
-                  </div>
-                  )}
-                  <div className="p-4 rounded-xl border border-border bg-bg-secondary">
-                    <p className="text-xs text-text-muted mb-1 flex items-center gap-1.5">{uiText.rich("Ui.text_cffd736d7cb60e", { part1: () => (<List size={12} />) })}</p>
-                    <p className="text-2xl font-bold font-mono text-text-primary">
-                      {myListings.filter((l) => l.published).length}
-                    </p>
-                    <p className="text-xs text-text-muted mt-1">{uiText.rich("Ui.text_0a1283e7df1e88", { value1: () => (myListings.length) })}</p>
-                  </div>
-                  <div className="p-4 rounded-xl border border-border bg-bg-secondary">
-                    <p className="text-xs text-text-muted mb-1 flex items-center gap-1.5">{uiText.rich("Ui.text_81d121dfcf2181", { part1: () => (<MessageSquare size={12} />) })}</p>
-                    <p className="text-2xl font-bold font-mono text-text-primary">{conversationsReady ? unreadCount : conversationsLoadError ? "—" : "…"}</p>
-                    <p className="text-xs text-text-muted mt-1">{conversationsReady ? uiText("Ui.text_58d5c21a442c7d") : conversationsLoadError ? uiText("common.unavailable") : uiText("creators.loading")}</p>
-                  </div>
-                  {photoStats && (
-                    <div className="p-4 rounded-xl border border-border bg-bg-secondary">
-                      <p className="text-xs text-text-muted mb-1 flex items-center gap-1.5">{uiText.rich("Ui.text_f658ec20200b90", { part1: chunks => (<span className="text-gold text-xs leading-none">{chunks}</span>) })}</p>
-                      <p className="text-2xl font-bold font-mono text-text-primary">{photoStats.avg.toFixed(1)}</p>
-                      <p className="text-xs text-text-muted mt-1">{uiText.rich("Ui.text_b6b7c6071b1bf8", { value1: () => (photoStats.total), count2: photoStats.total })}</p>
-                    </div>
-                  )}
-                </div>
-              )}
-
-              {/* ── Primäre CTA ── */}
-              {!listingsLoading && myListings.length === 0 ? (
-                <Link
-                  href="/inserat"
-                  className="group flex items-center gap-5 p-6 rounded-2xl border-2 border-gold/40 bg-gold-subtle hover:border-gold hover:bg-gold/10 transition-all"
-                >
-                  <div className="w-14 h-14 rounded-xl bg-gold text-bg-primary flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
-                    <Plus size={26} />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="font-display text-lg font-bold text-text-primary">{uiText("Ui.text_094c838d419299")}</p>
-                    <p className="text-sm text-text-muted mt-0.5">{uiText("Ui.text_a64e52f53b5e58")}</p>
-                  </div>
-                  <ChevronRight size={20} className="text-gold shrink-0 group-hover:translate-x-1 transition-transform" />
-                </Link>
-              ) : !user?.imageUrl ? (
-                <Link
-                  href="/profile"
-                  className="group flex items-center gap-5 p-6 rounded-2xl border-2 border-gold/40 bg-gold-subtle hover:border-gold hover:bg-gold/10 transition-all"
-                >
-                  <div className="w-14 h-14 rounded-xl bg-gold text-bg-primary flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
-                    <User size={26} />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="font-display text-lg font-bold text-text-primary">{uiText("Ui.text_78693b435178f9")}</p>
-                    <p className="text-sm text-text-muted mt-0.5">{uiText("Ui.text_2a6d329003520a")}</p>
-                  </div>
-                  <ChevronRight size={20} className="text-gold shrink-0 group-hover:translate-x-1 transition-transform" />
-                </Link>
-              ) : conversationsReady && unreadCount > 0 ? (
-                <button
-                  onClick={() => navigateDashboardTab("messages")}
-                  className="group w-full flex items-center gap-5 p-6 rounded-2xl border-2 border-gold/40 bg-gold-subtle hover:border-gold hover:bg-gold/10 transition-all text-left"
-                >
-                  <div className="w-14 h-14 rounded-xl bg-gold text-bg-primary flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform relative">
-                    <MessageSquare size={26} />
-                    <span className="absolute -top-1.5 -right-1.5 w-5 h-5 bg-crimson text-white text-xs font-bold rounded-full flex items-center justify-center">
-                      {unreadCount}
-                    </span>
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="font-display text-lg font-bold text-text-primary">{uiText.rich("Ui.text_a7f21b0f74229f", { value1: () => (unreadCount), count2: unreadCount })}</p>
-                    <p className="text-sm text-text-muted mt-0.5">{uiText("Ui.text_0e4ed6d7c34f4d")}</p>
-                  </div>
-                  <ChevronRight size={20} className="text-gold shrink-0 group-hover:translate-x-1 transition-transform" />
-                </button>
-              ) : null}
-
-              {/* ── Profilstärke ── */}
-              {profileCompleteness < 100 && (
-                <div className="p-5 rounded-2xl border border-border bg-bg-secondary">
-                  <div className="flex items-center justify-between mb-3">
-                    <div>
-                      <p className="text-sm font-semibold text-text-primary">{uiText("Ui.text_83e186228760e1")}</p>
-                      <p className="text-xs text-text-muted mt-0.5">{uiText("Ui.text_ee9b8b1c714a68")}</p>
-                    </div>
-                    <span className={`text-lg font-bold font-mono ${profileCompleteness >= 75 ? "text-success" : profileCompleteness >= 50 ? "text-gold" : "text-text-secondary"}`}>
-                      {profileCompleteness}%
-                    </span>
-                  </div>
-                  <div className="w-full h-2 bg-bg-elevated rounded-full overflow-hidden mb-3">
-                    <div
-                      className={`h-full rounded-full transition-all duration-700 ${profileCompleteness >= 75 ? "bg-success" : profileCompleteness >= 50 ? "bg-gold" : "bg-text-muted"}`}
-                      style={{ width: `${profileCompleteness}%` }}
-                    />
-                  </div>
-                  {profileMissingFields.length > 0 && (
-                    <div className="flex flex-wrap gap-1.5 mb-3">
-                      {profileMissingFields.slice(0, 4).map((f) => (
-                        <span key={f} className="px-2 py-0.5 bg-bg-elevated border border-border text-xs text-text-muted rounded-full">
-                          + {f}
-                        </span>
-                      ))}
-                      {profileMissingFields.length > 4 && (
-                        <span className="px-2 py-0.5 text-xs text-text-muted">{uiText.rich("Ui.text_4527b0695b24a0", { value1: () => (profileMissingFields.length - 4) })}</span>
-                      )}
-                    </div>
-                  )}
-                  <Link href="/profile" className="inline-flex items-center gap-1.5 text-xs font-semibold text-gold hover:text-gold-light transition-colors">{uiText.rich("Ui.text_e845088715995b", { part1: () => (<ChevronRight size={12} />) })}</Link>
-                </div>
-              )}
-
-              {/* ── Meine Inserate ── */}
-              <div>
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="font-display text-lg font-bold text-text-primary">{uiText("nav.myOffers")}</h3>
-                  <div className="flex items-center gap-2">
-                    {myListings.length > 0 && (
-                      <button onClick={() => navigateDashboardTab("listings")} className="text-xs text-gold hover:text-gold-light transition-colors flex items-center gap-1">{uiText.rich("Ui.text_8e04f826a45436", { part1: () => (<ChevronRight size={12} />) })}</button>
-                    )}
-                  </div>
-                </div>
-
-                {listingsLoading && (
-                  <div className="flex items-center gap-3 text-sm text-text-muted py-4">{uiText.rich("Ui.text_e68bc26b2fc6f2", { part1: () => (<Loader2 size={16} className="animate-spin" />) })}</div>
-                )}
-
-                {!listingsLoading && myListings.length === 0 && (
-                  <div className="flex flex-col items-center justify-center py-10 rounded-xl border border-dashed border-border text-center gap-3">
-                    <div className="w-12 h-12 rounded-xl bg-bg-elevated border border-border flex items-center justify-center">
-                      <List size={20} className="text-text-muted" />
-                    </div>
-                    <div>
-                      <p className="text-sm font-medium text-text-secondary">{uiText("Ui.text_c9636816421535")}</p>
-                      <p className="text-xs text-text-muted mt-0.5">{uiText("Ui.text_1c1fd85686d901")}</p>
-                    </div>
-                    <Link href="/inserat" className="mt-1 px-4 py-2 bg-gold text-bg-primary text-xs font-semibold rounded-lg hover:bg-gold-light transition-colors flex items-center gap-1.5">{uiText.rich("Ui.text_7ec80552729795", { part1: () => (<Plus size={12} />) })}</Link>
-                  </div>
-                )}
-
-                {!listingsLoading && myListings.length > 0 && (
-                  <div className="space-y-3">
-                    {myListings.slice(0, 4).map((l) => (
-                      <Link key={l.id} href={typeHref(l)} className="group flex items-center gap-4 p-4 rounded-xl border border-border bg-bg-secondary hover:border-gold/40 hover:bg-bg-elevated transition-all">
-                        {/* Bild */}
-                        <div className="w-16 h-16 rounded-lg overflow-hidden shrink-0 bg-bg-elevated border border-border">
-                          {l.image_url ? (
-                            <UnoptimizedImage src={l.image_url} alt={l.title} className="w-full h-full object-cover" />
-                          ) : (
-                            <div className="w-full h-full flex items-center justify-center text-2xl">
-                              {l.type === "location" ? "📍" : l.type === "vehicle" ? "🚗" : l.type === "job" ? "💼" : l.type === "creator" ? "🎬" : "📦"}
-                            </div>
-                          )}
-                        </div>
-                        {/* Info */}
-                        <div className="flex-1 min-w-0">
-                          <div className="flex flex-wrap items-center gap-2 mb-1">
-                            <p className="font-semibold text-text-primary group-hover:text-gold transition-colors truncate">{l.title}</p>
-                            <OfferModerationStatus item={l} />
-                          </div>
-                          <p className="text-xs text-text-muted">{typeLabel[l.type] ?? l.type} · {l.city}</p>
-                          <ListingFreshnessSummary listingId={l.id} state={l.freshness} showLink={false} />
-                        </div>
-                        {/* Preis */}
-                        <div className="text-right shrink-0">
-                          <p className="font-semibold text-gold font-display">
-                            {listingPriceLabel(l.price,l.metadata,"/Tag",marketLocale,marketText)}
-                          </p>
-                          <p className="text-[10px] text-text-muted mt-0.5">{uiText("common.perDay")}</p>
-                        </div>
-                        <ChevronRight size={14} className="text-text-muted group-hover:text-gold transition-colors shrink-0" />
-                      </Link>
-                    ))}
-                    {myListings.length > 4 && (
-                      <button onClick={() => navigateDashboardTab("listings")} className="w-full py-3 rounded-xl border border-dashed border-border text-xs text-text-muted hover:border-gold hover:text-gold transition-colors">{uiText.rich("Ui.text_8801408b7ec682", { value1: () => (myListings.length - 4) })}</button>
-                    )}
-                  </div>
-                )}
-              </div>
-
-              {/* ── Nachrichten & Anfragen (kombiniert) ── */}
-              <div>
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="font-display text-lg font-bold text-text-primary">{uiText.rich("Ui.text_f933a8195fccc6", { value1: () => (conversationsReady && unreadCount > 0 && (
-                      <span className="ml-2 px-2 py-0.5 text-xs bg-gold text-bg-primary font-bold rounded-full">{unreadCount}</span>
-                    )) })}</h3>
-                  {conversations.length > 0 && (
-                    <button onClick={() => navigateDashboardTab("messages")} className="text-xs text-gold hover:text-gold-light transition-colors flex items-center gap-1">{uiText.rich("Ui.text_78a12822c8e85a", { part1: () => (<ChevronRight size={12} />) })}</button>
-                  )}
-                </div>
-
-                {convsLoading && (
-                  <div className="flex items-center gap-3 text-sm text-text-muted py-4">{uiText.rich("Ui.text_e68bc26b2fc6f2", { part1: () => (<Loader2 size={16} className="animate-spin" />) })}</div>
-                )}
-
-                {!convsLoading && conversationsLoadError && (
-                  <div role="status" className="p-5 rounded-xl border border-border bg-bg-secondary text-sm text-text-muted">{uiText("Ui.text_bbd327fb803af8")}</div>
-                )}
-
-                {!convsLoading && conversationsReady && conversations.length === 0 && (
-                  <div className="flex items-center gap-4 p-5 rounded-xl border border-dashed border-border text-text-muted">
-                    <MessageSquare size={20} className="shrink-0 opacity-40" />
-                    <p className="text-sm">{uiText("Ui.text_54d1d23a08ec91")}</p>
-                  </div>
-                )}
-
-                {!convsLoading && conversations.length > 0 && (
-                  <div className="rounded-xl border border-border bg-bg-secondary overflow-hidden divide-y divide-border">
-                    {conversations.slice(0, 5).map((conv) => {
-                      const lastMsg = conv.messages[0];
-                      const hasUnread = conv.unread_count > 0;
-                      return (
-                        <button
-                          key={conv.id}
-                          onClick={() => { navigateDashboardTab("messages"); setSelectedConversation(conv.id); }}
-                          className="w-full flex items-center gap-4 px-5 py-4 hover:bg-bg-elevated transition-colors text-left"
-                        >
-                          <div className="relative shrink-0">
-                            <div className="w-9 h-9 rounded-full bg-gold/15 border border-gold/20 flex items-center justify-center overflow-hidden">
-                              {conv.otherAvatar
-                                ? <UnoptimizedImage src={conv.otherAvatar} alt="" className="w-full h-full object-cover" />
-                                : <User size={15} className="text-gold" />}
-                            </div>
-                            {hasUnread && (
-                              <span className="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 bg-gold rounded-full border-2 border-bg-secondary" />
-                            )}
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <p className={`text-sm font-medium truncate ${hasUnread ? "text-text-primary" : "text-text-secondary"}`}>
-                              {conv.otherName ?? uiText("Ui.text_276ffa1fb4f970")}
-                            </p>
-                            <p className="text-xs text-text-muted truncate mt-0.5">
-                              {conv.listing_title ? uiText("Ui.text_210eac6879f747", { value1: String(conv.listing_title) }) : ""}{lastMsg?.content ?? "…"}
-                            </p>
-                          </div>
-                          <div className="shrink-0 text-right">
-                            {hasUnread && (
-                              <span className="inline-block mb-1 px-1.5 py-0.5 text-[10px] bg-gold text-bg-primary font-bold rounded-full">{uiText("common.newBadge")}</span>
-                            )}
-                            <p className="text-[10px] text-text-muted">{formatMsgTime(conv.updated_at)}</p>
-                          </div>
-                        </button>
-                      );
-                    })}
-                  </div>
-                )}
-              </div>
-
-              {/* ── Firmenprofil ── */}
-              <div>
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="font-display text-lg font-bold text-text-primary">{uiText("Ui.text_92b8b0ccb4a7b1")}</h3>
-                  <Link href="/company-dashboard" className="text-xs text-gold hover:text-gold-light transition-colors flex items-center gap-1">{uiText.rich("Ui.text_5bdc9ba7941520", { part1: () => (<ChevronRight size={12} />) })}</Link>
-                </div>
-                <Link href="/company-invitations" className="mb-4 inline-flex min-h-11 items-center text-sm text-gold hover:text-gold-light">{uiText("Ui.text_355f8d66616bb0")}</Link>
-                {myCompany === "loading" && (
-                  <div className="flex items-center gap-3 text-sm text-text-muted py-4">{uiText.rich("Ui.text_e68bc26b2fc6f2", { part1: () => (<Loader2 size={16} className="animate-spin" />) })}</div>
-                )}
-                {myCompany === null && (
-                  <Link href="/company-setup"
-                    className="group flex items-center gap-4 w-full p-4 rounded-xl border border-dashed border-border hover:border-gold/40 hover:bg-bg-elevated transition-all text-left">
-                    <div className="w-10 h-10 rounded-xl bg-bg-elevated border border-border flex items-center justify-center shrink-0">
-                      <Building2 size={18} className="text-text-muted group-hover:text-gold transition-colors" />
-                    </div>
-                    <div>
-                      <p className="text-sm font-medium text-text-secondary group-hover:text-text-primary transition-colors">{uiText("Ui.text_32ae0a5fd4c809")}</p>
-                      <p className="text-xs text-text-muted mt-0.5">{uiText("Ui.text_826a6da5f6ed29")}</p>
-                    </div>
-                    <ChevronRight size={14} className="text-text-muted group-hover:text-gold transition-colors ml-auto shrink-0" />
-                  </Link>
-                )}
-                {myCompany && myCompany !== "loading" && (
-                  <div className="flex items-center gap-4 p-4 rounded-xl border border-border bg-bg-secondary hover:border-gold/30 hover:bg-bg-elevated transition-all">
-                    <div className="w-12 h-12 rounded-xl bg-bg-elevated border border-border flex items-center justify-center shrink-0 overflow-hidden">
-                      {myCompany.logo_url
-                        ? <UnoptimizedImage src={myCompany.logo_url} alt={myCompany.name} className="w-full h-full object-contain p-1" />
-                        : <Building2 size={20} className="text-text-muted opacity-40" />}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2 mb-0.5">
-                        <p className="font-semibold text-text-primary text-sm truncate">{myCompany.name}</p>
-                        <span className={`text-[10px] px-2 py-0.5 rounded-full border shrink-0 font-semibold ${myCompany.published ? "text-success border-success/30 bg-success/10" : "text-text-muted border-border"}`}>
-                          {myCompany.published ? uiText("Ui.text_8163454f378f08") : uiText("OfferModeration.statuses.draft")}
-                        </span>
-                      </div>
-                      {myCompany.city && <p className="text-xs text-text-muted">{myCompany.city}</p>}
-                    </div>
-                    <div className="flex flex-col gap-1.5 shrink-0">{uiText.rich("Ui.text_da9be6811d4742", { part1: chunks => (<Link href="/company-dashboard" className="px-3 py-1.5 text-xs border border-border text-text-secondary rounded-lg hover:border-gold hover:text-gold transition-all">{chunks}</Link>), part3: () => (<ExternalLink size={10} />), part2: chunks => (<a href={`/companies/${myCompany.slug}`} target="_blank" rel="noopener noreferrer" className="px-3 py-1.5 text-xs border border-border text-text-secondary rounded-lg hover:border-gold hover:text-gold transition-all text-center flex items-center gap-1 justify-center">{chunks}</a>) })}</div>
-                  </div>
-                )}
-              </div>
-
-              {/* ── Schnellzugriff ── */}
-              <div>
-                <h3 className="font-display text-lg font-bold text-text-primary mb-4">{uiText("Ui.text_5c79c2d6162809")}</h3>
-                <div className="grid min-w-0 grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3">
-                  {[
-                    { icon: User,         label: uiText("nav.myProfile"),  sub: uiText("Ui.text_2fa256a0eff196", { value1: String(profileCompleteness) }), id: "profil" },
-                    { icon: Calendar,     label: uiText("nav.bookings"),    sub: bookings.length > 0 ? uiText("Ui.text_888c0247e6c804", { value1: String(bookings.length) }) : uiText("Ui.text_8a572015c49b20"), id: "bookings" },
-                    { icon: MessageSquare,label: uiText("nav.messages"),  sub: conversationsLoadError ? uiText("common.unavailable") : !conversationsReady ? uiText("creators.loading") : unreadCount > 0 ? uiText("Ui.text_f7c1688df1fc46", { value1: String(unreadCount) }) : uiText("notifications.markAllRead"), id: "messages" },
-                    { icon: BarChart2,    label: uiText("nav.analytics"),     sub: uiText("Ui.text_b77f497caa3075", { value1: String(conversations.length) }), id: "analytics" },
-                  ].map(({ icon: Icon, label, sub, id }) => (
-                    <button
-                      key={id}
-                      onClick={() => id === "profil" ? router.push("/profile") : navigateDashboardTab(id)}
-                      className="flex flex-col items-start gap-2 p-4 rounded-xl border border-border bg-bg-secondary hover:border-gold/40 hover:bg-bg-elevated transition-all text-left"
-                    >
-                      <div className="w-8 h-8 rounded-lg bg-gold/10 flex items-center justify-center">
-                        <Icon size={15} className="text-gold" />
-                      </div>
-                      <div>
-                        <p className="text-sm font-medium text-text-primary">{label}</p>
-                        <p className="text-xs text-text-muted mt-0.5">{sub}</p>
-                      </div>
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-            </div>
-          )}
-
-          {/* ── PROFIL ── */}
-          {activeTab === "profil" && (
-            <div className="space-y-6 max-w-2xl">
-              {/* Header */}
-              {(() => {
-                const avatarSrc = profileAvatarUrl || user?.imageUrl || "";
-                const displayName = profileDisplayName || (user ? [user.firstName, user.lastName].filter(Boolean).join(" ") : "") || "—";
-                return (
-                  <div className="flex items-start gap-5 p-6 rounded-2xl border border-border bg-bg-secondary">
-                    <div className="shrink-0">
-                      {avatarSrc ? (
-                        <UnoptimizedImage src={avatarSrc} alt="" className="w-16 h-16 rounded-full object-cover border-2 border-gold/30" />
-                      ) : (
-                        <div className="w-16 h-16 rounded-full bg-gold/20 border-2 border-gold/30 flex items-center justify-center">
-                          <span className="text-gold font-bold text-xl">{displayName[0]?.toUpperCase() ?? "?"}</span>
-                        </div>
-                      )}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="font-display text-lg font-bold text-text-primary leading-tight">{displayName}</p>
-                      <p className="text-sm text-text-muted mt-0.5 mb-4">{profileRole || uiText("Ui.text_51fb8dfa65e81e")}</p>
-                      <div className="flex flex-wrap gap-2">{uiText.rich("Ui.text_e8649d1a41ba68", { part2: () => (<Pencil size={12} />), part1: chunks => (<Link href="/profile" className="inline-flex items-center gap-1.5 px-4 py-2 bg-gold text-bg-primary text-xs font-semibold rounded-lg hover:bg-gold-light transition-colors">{chunks}</Link>), part4: () => (<ExternalLink size={12} />), part3: chunks => (<Link href={user?.id ? `/profile/${user.id}` : "/profile"} target="_blank" rel="noopener noreferrer"
-                          className="inline-flex items-center gap-1.5 px-4 py-2 border border-border text-text-secondary text-xs font-medium rounded-lg hover:border-gold hover:text-gold transition-colors">{chunks}</Link>) })}</div>
-                    </div>
-                  </div>
-                );
-              })()}
-
-              {/* Vollständigkeit */}
-              <div className="p-5 rounded-xl border border-border bg-bg-secondary">
-                <div className="flex items-center justify-between mb-3">
-                  <div>
-                    <p className="text-sm font-semibold text-text-primary">{uiText("Ui.text_83e186228760e1")}</p>
-                    <p className="text-xs text-text-muted mt-0.5">{uiText("Ui.text_25bd3907ad1c76")}</p>
-                  </div>
-                  <span className={`text-xl font-bold font-mono ${profileCompleteness >= 75 ? "text-success" : profileCompleteness >= 50 ? "text-gold" : "text-text-secondary"}`}>
-                    {profileCompleteness}%
-                  </span>
-                </div>
-                <div className="w-full h-2 bg-bg-elevated rounded-full overflow-hidden mb-4">
-                  <div className={`h-full rounded-full transition-all duration-700 ${profileCompleteness >= 75 ? "bg-success" : profileCompleteness >= 50 ? "bg-gold" : "bg-text-muted"}`}
-                    style={{ width: `${profileCompleteness}%` }} />
-                </div>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                  {profileMissingFields.map((f) => (
-                    <Link key={f} href="/profile"
-                      className="flex items-center gap-2 text-xs text-text-muted hover:text-gold transition-colors group">{uiText.rich("Ui.text_bfe5f8c2639704", { part1: () => (<AlertCircle size={12} className="shrink-0 group-hover:text-gold" />), value3: () => (f), part2: chunks => (<span>{chunks}</span>) })}</Link>
-                  ))}
-                  {profileMissingFields.length === 0 && (
-                    <p className="flex items-center gap-2 text-xs text-success col-span-2">{uiText.rich("Ui.text_07f044860551c6", { part1: () => (<CheckCircle size={12} />) })}</p>
-                  )}
-                </div>
-              </div>
-
-              {/* Profilaufrufe */}
-              {viewStats && (
-                <div className="p-5 rounded-xl border border-border bg-bg-secondary">
-                  <p className="text-sm font-semibold text-text-primary mb-3 flex items-center gap-2">{uiText.rich("Ui.text_1ae821d0161836", { part1: () => (<Eye size={15} className="text-gold" />) })}</p>
-                  <div className="flex items-center gap-6">
-                    <div>
-                      <p className="text-3xl font-bold font-display text-text-primary">{viewStats.views7}</p>
-                      <p className={`text-xs font-medium mt-1 ${viewStats.trend > 0 ? "text-success" : viewStats.trend < 0 ? "text-red-400" : "text-text-muted"}`}>{uiText.rich("Ui.text_9facc7b997b7f4", { value1: () => (viewStats.trend > 0 ? uiText("Ui.text_1d732d182540bf", { value1: String(viewStats.trend) }) : viewStats.trend < 0 ? uiText("Ui.text_6a53a571fa6641", { value1: String(viewStats.trend) }) : uiText("Ui.text_353ef7a543290a")) })}</p>
-                    </div>
-                    <div className="flex items-end gap-0.5 h-10 flex-1">
-                      {viewStats.daily.map((v, i) => {
-                        const max = Math.max(...viewStats.daily, 1);
-                        return <div key={i} className="flex-1 bg-gold/30 rounded-sm hover:bg-gold/60" style={{ height: `${Math.max((v / max) * 100, 8)}%` }} />;
-                      })}
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {/* Foto-Bewertungen */}
-              {photoStats && (
-                <div className="p-5 rounded-xl border border-border bg-bg-secondary">
-                  <p className="text-sm font-semibold text-text-primary mb-3 flex items-center gap-2">{uiText.rich("Ui.text_f658ec20200b90", { part1: chunks => (<span className="text-gold text-sm">{chunks}</span>) })}</p>
-                  <div className="flex items-center gap-4">
-                    <div className="flex-1 min-w-0">
-                      <p className="text-3xl font-bold font-display text-text-primary">{photoStats.avg.toFixed(1)}</p>
-                      <div className="flex gap-0.5 mt-1">
-                        {[1,2,3,4,5].map((s) => (
-                          <span key={s} className={`text-sm ${s <= Math.round(photoStats.avg) ? "text-gold" : "text-text-muted/30"}`}>★</span>
-                        ))}
-                      </div>
-                      <p className="text-xs text-text-muted mt-1">{uiText.rich("Ui.text_8c8cd0823c74c4", { value1: () => (photoStats.total), count2: photoStats.total })}</p>
-                    </div>
-                    {photoStats.best && (
-                      <div className="w-16 h-16 rounded-lg overflow-hidden shrink-0 border border-gold/20">
-                        {/* eslint-disable-next-line @next/next/no-img-element */}
-                        <img src={photoStats.best} alt={uiText("Ui.text_d984bbc26c2239")} className="w-full h-full object-cover" />
-                      </div>
-                    )}
-                  </div>
-                </div>
-              )}
-
-              {/* Schnelle Felder-Übersicht */}
-              <div className="p-5 rounded-xl border border-border bg-bg-secondary">
-                <div className="flex items-center justify-between mb-3">
-                  <p className="text-sm font-semibold text-text-primary">{uiText("Ui.text_ab242651b32579")}</p>
-                  <Link href="/profile" className="text-xs text-gold hover:text-gold-light transition-colors flex items-center gap-1">{uiText.rich("Ui.text_9be3200810d234", { part1: () => (<ChevronRight size={11} />) })}</Link>
-                </div>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                  {profileCompletionChecks.map(({ label, ok }) => (
-                    <div key={label} className="flex items-center gap-2 text-xs">
-                      {ok
-                        ? <CheckCircle size={12} className="text-success shrink-0" />
-                        : <AlertCircle size={12} className="text-text-muted shrink-0" />}
-                      <span className={ok ? "text-text-secondary" : "text-text-muted"}>{label}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* ── FIRMA ── */}
-          {activeTab === "firma" && (
-            <div className="space-y-6 max-w-2xl">
-              {myCompany === "loading" && (
-                <div className="flex items-center gap-3 text-sm text-text-muted py-8">{uiText.rich("Ui.text_e68bc26b2fc6f2", { part1: () => (<Loader2 size={16} className="animate-spin" />) })}</div>
-              )}
-
-              {myCompany === null && (
-                <div className="text-center py-16 border-2 border-dashed border-border rounded-2xl space-y-4">
-                  <div className="w-16 h-16 mx-auto bg-bg-secondary border border-border rounded-2xl flex items-center justify-center">
-                    <Building2 size={28} className="text-text-muted opacity-40" />
-                  </div>
-                  <div>
-                    <h3 className="font-display text-lg font-bold text-text-primary mb-2">{uiText("Ui.text_32ae0a5fd4c809")}</h3>
-                    <p className="text-sm text-text-muted max-w-sm mx-auto">{uiText("Ui.text_800b9ab4851306")}</p>
-                  </div>
-                  <a href="/company-setup"
-                    className="inline-flex items-center gap-2 px-6 py-3 bg-gold text-bg-primary text-sm font-semibold rounded-xl hover:bg-gold-light transition-colors">{uiText.rich("Ui.text_555dba2841672a", { part1: () => (<Plus size={16} />) })}</a>
-                </div>
-              )}
-
-              {myCompany && myCompany !== "loading" && (
-                <>
-                  {/* Company Header */}
-                  <div className="flex items-start gap-5 p-6 rounded-2xl border border-border bg-bg-secondary">
-                    <div className="w-16 h-16 rounded-xl bg-bg-elevated border border-border flex items-center justify-center shrink-0 overflow-hidden">
-                      {myCompany.logo_url
-                        ? <UnoptimizedImage src={myCompany.logo_url} alt={myCompany.name} className="w-full h-full object-contain p-1.5" />
-                        : <Building2 size={24} className="text-text-muted opacity-40" />}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2 mb-0.5">
-                        <p className="font-display text-lg font-bold text-text-primary">{myCompany.name}</p>
-                        <span className={`text-[10px] px-2 py-0.5 rounded-full border font-semibold shrink-0 ${myCompany.published ? "text-success border-success/30 bg-success/10" : "text-text-muted border-border"}`}>
-                          {myCompany.published ? uiText("OfferModeration.statuses.owner_published") : uiText("OfferModeration.statuses.draft")}
-                        </span>
-                      </div>
-                      {myCompany.city && <p className="text-xs text-text-muted mb-3">{myCompany.city}</p>}
-                      {myCompany.tagline && <p className="text-sm text-text-secondary italic mb-3">{uiText.rich("Ui.text_df436a1f2b679a", { value1: () => (myCompany.tagline) })}</p>}
-                      <div className="flex flex-wrap gap-2">{uiText.rich("Ui.text_04436355fa8f56", { part2: () => (<Pencil size={12} />), part1: chunks => (<a href="/company-setup"
-                          className="inline-flex items-center gap-1.5 px-4 py-2 bg-gold text-bg-primary text-xs font-semibold rounded-lg hover:bg-gold-light transition-colors">{chunks}</a>), part4: () => (<BarChart2 size={12} />), part3: chunks => (<a href="/company-dashboard"
-                          className="inline-flex items-center gap-1.5 px-4 py-2 border border-border text-text-secondary text-xs font-medium rounded-lg hover:border-gold hover:text-gold transition-colors">{chunks}</a>), part6: () => (<ExternalLink size={12} />), part5: chunks => (<a href={`/companies/${myCompany.slug}`} target="_blank" rel="noopener noreferrer"
-                          className="inline-flex items-center gap-1.5 px-4 py-2 border border-border text-text-secondary text-xs font-medium rounded-lg hover:border-gold hover:text-gold transition-colors">{chunks}</a>) })}</div>
-                    </div>
-                  </div>
-
-                  {/* Checkliste */}
-                  <div className="p-5 rounded-xl border border-border bg-bg-secondary">
-                    <p className="text-sm font-semibold text-text-primary mb-3">{uiText("profile.completionTitle")}</p>
-                    <div className="space-y-2">
-                      {[
-                        { label: uiText("Ui.text_d7188d45e384f6"),          done: !!myCompany.logo_url },
-                        { label: uiText("Ui.text_ca253d14c2ae91"),    done: !!(myCompany.tagline?.trim() || myCompany.description?.trim()) },
-                        { label: uiText("Ui.text_12230e294b2d81"),   done: !!(myCompany.social_links && Object.values(myCompany.social_links).some(v => v?.trim())) },
-                        { label: uiText("Ui.text_0642ef8281f506"),     done: myCompany.published },
-                      ].map(({ label, done }) => (
-                        <div key={label} className="flex items-center gap-2 text-sm">
-                          {done
-                            ? <CheckCircle size={14} className="text-success shrink-0" />
-                            : <AlertCircle size={14} className="text-text-muted shrink-0" />}
-                          <span className={done ? "text-text-secondary" : "text-text-muted"}>{label}</span>
-                          {!done && (
-                            <a href="/company-setup" className="ml-auto text-xs text-gold hover:underline">{uiText("Ui.text_18d4d9168461df")}</a>
-                          )}
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* Links */}
-                  <div className="p-5 rounded-xl border border-border bg-bg-secondary">
-                    <p className="text-sm font-semibold text-text-primary mb-3">{uiText("Ui.text_db8644e777eb2e")}</p>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                      {[
-                        { label: uiText("Ui.text_47b6cd91a8fc94"),    href: "/company-dashboard?tab=services",  desc: uiText("Ui.text_d92cf7207c5ce5") },
-                        { label: uiText("Ui.text_866a24cf1da9e0"),   href: "/company-dashboard?tab=equipment", desc: uiText("Ui.text_7bacef8c556d15") },
-                        { label: uiText("Ui.text_a42e219c711da7"),        href: "/company-dashboard?tab=team",      desc: uiText("Ui.text_5c497fa20add72") },
-                        { label: uiText("Ui.text_59d7fcdeacc6d4"), href: "/company-setup",                 desc: uiText("Ui.text_87871d9df9854d") },
-                      ].map(({ label, href, desc }) => (
-                        <a key={label} href={href}
-                          className="flex items-start gap-3 p-3 rounded-lg border border-border hover:border-gold/40 hover:bg-bg-elevated transition-all group">
-                          <ChevronRight size={14} className="text-text-muted group-hover:text-gold mt-0.5 shrink-0 transition-colors" />
-                          <div>
-                            <p className="text-sm font-medium text-text-secondary group-hover:text-text-primary transition-colors">{label}</p>
-                            <p className="text-xs text-text-muted mt-0.5">{desc}</p>
-                          </div>
-                        </a>
-                      ))}
-                    </div>
-                  </div>
-                </>
-              )}
+              <PersonalAreaHome />
             </div>
           )}
 
@@ -1684,7 +760,7 @@ export default function DashboardPage() {
                     <><span className="text-text-primary font-semibold">{myListings.length}</span> {myListings.length === 1 ? uiText("AdminAccounts.contentKinds.other") : uiText("profile.tabListings")}</>
                   )}
                 </p>
-                <Link href="/inserat" className="px-3 py-1.5 bg-gold text-bg-primary text-xs font-semibold rounded-lg flex items-center gap-1.5 hover:bg-gold-light transition-colors">{uiText.rich("Ui.text_8ba166e3d0597a", { part1: () => (<Plus size={12} />) })}</Link>
+                <Link href="/inserat" className="min-h-11 px-3 py-1.5 bg-gold text-bg-primary text-xs font-semibold rounded-lg flex items-center gap-1.5 hover:bg-gold-light transition-colors">{uiText.rich("Ui.text_8ba166e3d0597a", { part1: () => (<Plus size={12} />) })}</Link>
               </div>
 
               {listingsError && (
@@ -1808,27 +884,27 @@ export default function DashboardPage() {
                             ["power_available", "Stromanschluss"], ["natural_light", "Tageslicht"],
                             ["blackout_possible", "Verdunkelbar"], ["loading_access", "Be-/Entladung"],
                           ] as const).map(([key, label]) => (
-                            <button key={key} type="button" aria-pressed={editLocationMeta[key]} onClick={() => setEditLocationMeta((current) => ({ ...current, [key]: !current[key] }))} className={`min-h-10 rounded-lg border px-3 text-xs ${editLocationMeta[key] ? "border-gold bg-gold/10 text-gold" : "border-border text-text-secondary"}`}>{editLocationMeta[key] ? "✓ " : ""}{(uiOptionLabels[label] ?? label)}</button>
+                            <button key={key} type="button" aria-pressed={editLocationMeta[key]} onClick={() => setEditLocationMeta((current) => ({ ...current, [key]: !current[key] }))} className={`min-h-11 rounded-lg border px-3 text-xs ${editLocationMeta[key] ? "border-gold bg-gold/10 text-gold" : "border-border text-text-secondary"}`}>{editLocationMeta[key] ? "✓ " : ""}{(uiOptionLabels[label] ?? label)}</button>
                           ))}
                         </div>
                         {editLocationMeta.power_available && <input maxLength={160} value={editLocationMeta.power_details} onChange={(event) => setEditLocationMeta((current) => ({ ...current, power_details: event.target.value }))} placeholder={uiText("Ui.text_45387017a0e70b")} className="min-h-10 w-full rounded-lg border border-border bg-bg-elevated px-3 text-sm text-text-primary" />}
                         <div className="grid gap-2 sm:grid-cols-2">
-                          <input maxLength={160} value={editLocationMeta.shooting_hours} onChange={(event) => setEditLocationMeta((current) => ({ ...current, shooting_hours: event.target.value }))} placeholder={uiText("AdminReview.fields.shooting_hours")} className="min-h-10 rounded-lg border border-border bg-bg-elevated px-3 text-sm text-text-primary" />
-                          <input maxLength={240} value={editLocationMeta.access_notes} onChange={(event) => setEditLocationMeta((current) => ({ ...current, access_notes: event.target.value }))} placeholder={uiText("Ui.text_01231d096c526a")} className="min-h-10 rounded-lg border border-border bg-bg-elevated px-3 text-sm text-text-primary" />
+                          <input maxLength={160} value={editLocationMeta.shooting_hours} onChange={(event) => setEditLocationMeta((current) => ({ ...current, shooting_hours: event.target.value }))} placeholder={uiText("AdminReview.fields.shooting_hours")} className="min-h-11 rounded-lg border border-border bg-bg-elevated px-3 text-sm text-text-primary" />
+                          <input maxLength={240} value={editLocationMeta.access_notes} onChange={(event) => setEditLocationMeta((current) => ({ ...current, access_notes: event.target.value }))} placeholder={uiText("Ui.text_01231d096c526a")} className="min-h-11 rounded-lg border border-border bg-bg-elevated px-3 text-sm text-text-primary" />
                         </div>
                         <textarea maxLength={500} rows={2} value={editLocationMeta.availability_notes} onChange={(event) => setEditLocationMeta((current) => ({ ...current, availability_notes: event.target.value }))} placeholder={uiText("Ui.text_e6c48894da484b")} className="w-full rounded-lg border border-border bg-bg-elevated p-3 text-sm text-text-primary" />
                         <div>
                           <label className="mb-2 block text-xs text-text-muted">{uiText("Ui.text_29f202bb606cb9")}</label>
                           <div className="flex flex-wrap gap-2">
-                            <input type="date" value={newBlockedDate} onChange={(event) => setNewBlockedDate(event.target.value)} className="min-h-10 rounded-lg border border-border bg-bg-elevated px-3 text-sm text-text-primary" />
-                            <button type="button" disabled={!newBlockedDate || editBlockedDates.includes(newBlockedDate)} onClick={() => { setEditBlockedDates((dates) => [...dates, newBlockedDate].sort()); setNewBlockedDate(""); }} className="min-h-10 rounded-lg border border-border px-3 text-xs text-text-secondary hover:border-gold hover:text-gold disabled:opacity-50">{uiText("Ui.text_cab5a16e99fc42")}</button>
+                            <input type="date" value={newBlockedDate} onChange={(event) => setNewBlockedDate(event.target.value)} className="min-h-11 rounded-lg border border-border bg-bg-elevated px-3 text-sm text-text-primary" />
+                            <button type="button" disabled={!newBlockedDate || editBlockedDates.includes(newBlockedDate)} onClick={() => { setEditBlockedDates((dates) => [...dates, newBlockedDate].sort()); setNewBlockedDate(""); }} className="min-h-11 rounded-lg border border-border px-3 text-xs text-text-secondary hover:border-gold hover:text-gold disabled:opacity-50">{uiText("Ui.text_cab5a16e99fc42")}</button>
                           </div>
                           {editBlockedDates.length > 0 ? <div className="mt-2 flex flex-wrap gap-2">{editBlockedDates.map((date) => <button key={date} type="button" onClick={() => setEditBlockedDates((dates) => dates.filter((item) => item !== date))} aria-label={uiText("Ui.text_88099c029f3803", { value1: String(date) })} className="min-h-8 rounded-full border border-crimson/30 bg-crimson/10 px-3 text-xs text-crimson-light">{new Date(`${date}T00:00:00`).toLocaleDateString(uiLocale)} ×</button>)}</div> : <p className="mt-2 text-[11px] text-text-muted">{uiText("Ui.text_e7d710d709332d")}</p>}
                         </div>
                         <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
                           {[["restrooms", "WC / Sanitär"], ["green_room", "Aufenthaltsraum"], ["kitchen", "Küche"], ["changing_room", "Umkleide"], ["loading_bay", "Laderampe"], ["wifi", "Wi-Fi"]].map(([key, label]) => {
                             const active = editLocationMeta.amenities.includes(key);
-                            return <button key={key} type="button" aria-pressed={active} onClick={() => setEditLocationMeta((current) => ({ ...current, amenities: active ? current.amenities.filter((item) => item !== key) : [...current.amenities, key] }))} className={`min-h-10 rounded-lg border px-2 text-xs ${active ? "border-gold bg-gold/10 text-gold" : "border-border text-text-secondary"}`}>{active ? "✓ " : ""}{(uiOptionLabels[label] ?? label)}</button>;
+                            return <button key={key} type="button" aria-pressed={active} onClick={() => setEditLocationMeta((current) => ({ ...current, amenities: active ? current.amenities.filter((item) => item !== key) : [...current.amenities, key] }))} className={`min-h-11 rounded-lg border px-2 text-xs ${active ? "border-gold bg-gold/10 text-gold" : "border-border text-text-secondary"}`}>{active ? "✓ " : ""}{(uiOptionLabels[label] ?? label)}</button>;
                           })}
                         </div>
                         {editLocationMeta.rooms.length > 0 && <p className="text-[11px] text-text-muted">{uiText.rich("Ui.text_086e921432683e", { value1: () => (editLocationMeta.rooms.map((room) => locationRoomLabel(room, l.category ?? "", uiText)).join(" · ")) })}</p>}
@@ -1892,145 +968,10 @@ export default function DashboardPage() {
             </div>
           )}
 
-          {/* ── NACHRICHTEN ── */}
-          {activeTab === "messages" && (
-            <div className="rounded-xl border border-border bg-bg-secondary overflow-hidden flex h-[680px]">
-              {/* Conversation list */}
-              <div className={`w-full sm:w-72 shrink-0 border-r border-border flex-col ${selectedConversation ? "hidden sm:flex" : "flex"}`}>
-                <div className="p-3 border-b border-border flex items-center justify-between">
-                  <p className="text-xs uppercase tracking-widest text-text-muted font-semibold">{uiText("nav.messages")}</p>
-                  {conversationsReady && unreadCount > 0 && (
-                    <span className="px-1.5 py-0.5 bg-gold text-bg-primary text-[10px] font-bold rounded-full">
-                      {unreadCount}
-                    </span>
-                  )}
-                </div>
-                <div className="flex-1 overflow-y-auto divide-y divide-border">
-                  {convsLoading && (
-                    <div className="p-4 text-center text-xs text-text-muted">{uiText("Ui.text_b89b8cdb9d6d6f")}</div>
-                  )}
-                  {!convsLoading && conversations.length === 0 && (
-                    <div className="p-6 text-center text-xs text-text-muted">{uiText.rich("Ui.text_ffe16d6d46e013", { part1: () => (<MessageSquare size={24} className="mx-auto mb-2 opacity-30" />) })}</div>
-                  )}
-                  {conversations.map((conv) => {
-                    const lastMsg = conv.messages[0];
-                    const hasUnread = conv.unread_count > 0;
-                    return (
-                      <button
-                        key={conv.id}
-                        onClick={() => leaveEditor(() => setSelectedConversation(conv.id))}
-                        className={`w-full flex items-start gap-3 p-4 text-left hover:bg-bg-elevated transition-colors ${
-                          selectedConversation === conv.id ? "bg-bg-elevated border-l-2 border-l-gold" : ""
-                        }`}
-                      >
-                        <div className="relative shrink-0">
-                          <div className="w-9 h-9 rounded-full bg-gold/20 border border-gold/30 flex items-center justify-center overflow-hidden">
-                            {conv.otherAvatar
-                              ? <UnoptimizedImage src={conv.otherAvatar} alt="" className="w-full h-full object-cover" />
-                              : <User size={16} className="text-gold" />}
-                          </div>
-                          {hasUnread && (
-                            <span className="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 bg-gold rounded-full border-2 border-bg-secondary" />
-                          )}
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center justify-between mb-0.5">
-                            <span className="text-xs font-semibold text-text-primary truncate">
-                              {conv.otherName ?? uiText("Ui.text_276ffa1fb4f970")}
-                            </span>
-                            <span className="text-[10px] text-text-muted shrink-0 ml-1">
-                              {formatMsgTime(conv.updated_at)}
-                            </span>
-                          </div>
-                          {conv.listing_type && (
-                            <span className="inline-block px-1.5 py-0.5 text-[10px] bg-bg-elevated border border-border text-text-muted rounded mb-0.5">
-                              {conv.listing_type}
-                            </span>
-                          )}
-                          {lastMsg && (
-                            <p className="text-[11px] text-text-muted truncate">{lastMsg.content||uiText("Messaging.attachmentPreview")}</p>
-                          )}
-                        </div>
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-
-              {/* Right panel */}
-              {!selectedConversation ? (
-                <div className="flex-1 hidden sm:flex items-center justify-center text-text-muted text-sm">
-                  <div className="text-center">{uiText.rich("Ui.text_e8d7b43e614730", { part1: () => (<MessageSquare size={32} className="mx-auto mb-2 opacity-20" />) })}</div>
-                </div>
-              ) : (() => {
-                const conv = conversations.find(c => c.id === selectedConversation);
-                if (!conv) return null;
-                return (
-                  <div className="flex-1 flex flex-col min-w-0">
-                    {/* Header */}
-                    <div className="px-4 py-3 border-b border-border bg-bg-elevated flex items-center gap-3">
-                      <button
-                        onClick={() => leaveEditor(() => setSelectedConversation(null))}
-                        aria-label={uiText("messagesNavigation.back")}
-                        className="sm:hidden flex min-h-11 min-w-11 items-center justify-center rounded-lg hover:bg-bg-secondary transition-colors shrink-0"
-                      >
-                        <ArrowLeft size={16} className="text-text-muted" />
-                      </button>
-                      <div className="min-w-0">
-                        <p className="text-sm font-semibold text-text-primary leading-tight truncate">
-                          {conv.otherName ?? uiText("Ui.text_276ffa1fb4f970")}
-                        </p>
-                        {(conv.listing_title || conv.listing_type) && (
-                          <p className="text-xs text-text-muted mt-0.5 truncate">
-                            {[conv.listing_type, conv.listing_title].filter(Boolean).join(" · ")}
-                          </p>
-                        )}
-                      </div>
-                    </div>
-
-                    {/* Messages */}
-                    <div className="flex-1 overflow-y-auto px-4 py-4 space-y-3">
-                      {messagesLoading && (
-                        <div className="text-center text-xs text-text-muted py-4">{uiText("Ui.text_bed1a3a89cb15c")}</div>
-                      )}
-                      {messageLoadError && <div role="alert" className="py-3 text-xs text-red-400">
-                        <p>{messageLoadError}</p>
-                        <button type="button" onClick={() => setMessageReloadVersion(value => value + 1)} className="min-h-11 text-gold">{dashboardMessageText("retry")}</button>
-                      </div>}
-                      {!messagesLoading && !messageLoadError && activeMessages.length === 0 && (
-                        <div className="text-center text-xs text-text-muted py-4">{uiText("Ui.text_d7d4b6f053e077")}</div>
-                      )}
-                      {activeMessages.map((msg) => {
-                        const mine = msg.sender_id === user?.id;
-                        return (
-                          <div key={msg.id} className={`flex ${mine ? "justify-end" : "justify-start"}`}>
-                            <div className={`min-w-0 max-w-[86%] whitespace-pre-wrap break-words [overflow-wrap:anywhere] rounded-2xl px-4 py-2.5 ${
-                              mine
-                                ? "bg-gold text-bg-primary rounded-br-sm"
-                                : "bg-bg-elevated border border-border text-text-secondary rounded-bl-sm"
-                            }`}>
-                              {msg.content&&<p className="text-sm leading-relaxed">{msg.content}</p>}<MessageAttachments attachments={msg.attachments}/>
-                              <p className={`text-[10px] mt-1 ${mine ? "text-bg-primary/60" : "text-text-muted"}`}>
-                                {formatMsgTime(msg.created_at)}
-                              </p>
-                            </div>
-                          </div>
-                        );
-                      })}
-                      <div ref={messagesEndRef} />
-                    </div>
-
-                    {user?.id && <MessageComposer key={`${user.id}:conversation:${selectedConversation}`} accountId={user.id} destination={{conversationId:selectedConversation}} onSent={(message,conversationId)=>confirmReply(message,conversationId,user.id)}/>}
-
-                  </div>
-                );
-              })()}
-            </div>
-          )}
-
           {/* ── BUCHUNGEN ── */}
           {activeTab === "bookings" && (
             <div className="space-y-6">
+              {incomingError && <div role="alert" className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-border bg-bg-secondary p-4 text-sm text-text-secondary"><span>{uiText("common.unavailable")}</span><button type="button" onClick={() => setIncomingReload(value => value + 1)} className="min-h-11 rounded-lg border border-border px-3 text-text-primary">{uiText("PrivacySettings.retry")}</button></div>}
               {/* Stats row */}
                 <div className="grid min-w-0 grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
                 {[
@@ -2203,11 +1144,12 @@ export default function DashboardPage() {
 
             return (
               <div className="space-y-6">
+                {conversationsLoadError && <div role="alert" className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-border bg-bg-secondary p-4 text-sm text-text-secondary"><span>{uiText("common.unavailable")}</span><button type="button" onClick={() => setAnalyticsReload(value => value + 1)} className="min-h-11 rounded-lg border border-border px-4 text-text-primary">{uiText("PrivacySettings.retry")}</button></div>}
                 <div className="grid min-w-0 grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
                   {[
                     {
                       label: uiText("Ui.text_3e85ef1a96ad89"),
-                      value: listingsLoading || convsLoading ? "…" : String(conversations.length),
+                      value: convsLoading ? "…" : !conversationsReady ? "—" : String(conversations.length),
                       sub: conversationsLoadError ? uiText("common.unavailable") : !conversationsReady ? uiText("creators.loading") : unreadCount > 0 ? uiText("Ui.text_f7c1688df1fc46", { value1: String(unreadCount) }) : uiText("notifications.markAllRead"),
                     },
                     {
@@ -2217,12 +1159,12 @@ export default function DashboardPage() {
                     },
                     {
                       label: uiText("Ui.text_de005465742f1c"),
-                      value: convsLoading ? "…" : String(listingsWithInquiries),
+                      value: convsLoading ? "…" : !conversationsReady ? "—" : String(listingsWithInquiries),
                       sub: myListings.length > 0 ? uiText("Ui.text_31f02718f6b03e", { value1: String(myListings.length) }) : uiText("Ui.text_c9636816421535"),
                     },
                     {
                       label: uiText("Ui.text_de3a80218e65be"),
-                      value: conversationsReady ? String(unreadCount) : conversationsLoadError ? "—" : "…",
+                      value: inbox.status === "ready" ? String(unreadCount) : inbox.status === "error" || inbox.status === "expired" ? "—" : "…",
                       sub: conversationsLoadError ? uiText("common.unavailable") : !conversationsReady ? uiText("creators.loading") : unreadCount > 0 ? uiText("Ui.text_4aadfb7b596d7b") : uiText("Ui.text_2fa1e634d924d7"),
                     },
                   ].map(({ label, value, sub }) => (
@@ -2304,63 +1246,10 @@ export default function DashboardPage() {
             );
           })()}
 
-          {/* ── EINSTELLUNGEN ── */}
-          {activeTab === "settings" && (
-            <div className="max-w-xl space-y-5">
-
-
-              {/* Öffentliches Profil */}
-              {(() => {
-                const avatarSrc = profileAvatarUrl || user?.imageUrl || "";
-                const displayName = profileDisplayName || (user ? [user.firstName, user.lastName].filter(Boolean).join(" ") : "") || user?.emailAddresses[0]?.emailAddress?.split("@")[0] || "—";
-                return (
-              <div className="flex items-start gap-5 p-6 rounded-2xl border-2 border-gold/30 bg-gold-subtle">
-                <div className="shrink-0">
-                  {avatarSrc ? (
-                    <UnoptimizedImage src={avatarSrc} alt="" className="w-14 h-14 rounded-full object-cover border-2 border-gold/30" />
-                  ) : (
-                    <div className="w-14 h-14 rounded-full bg-gold/20 border-2 border-gold/30 flex items-center justify-center">
-                      <span className="text-gold font-bold text-lg">{displayName[0]?.toUpperCase() ?? "?"}</span>
-                    </div>
-                  )}
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="font-display text-base font-bold text-text-primary leading-tight">{displayName}</p>
-                  <p className="text-xs text-text-muted mt-0.5 mb-4">{profileRole || uiText("Ui.text_51fb8dfa65e81e")}</p>
-                  <div className="flex flex-wrap gap-2">{uiText.rich("Ui.text_e8649d1a41ba68", { part2: () => (<Pencil size={12} />), part1: chunks => (<Link
-                      href="/profile"
-                      className="inline-flex items-center gap-1.5 px-4 py-2 bg-gold text-bg-primary text-xs font-semibold rounded-lg hover:bg-gold-light transition-colors"
-                    >{chunks}</Link>), part4: () => (<ExternalLink size={12} />), part3: chunks => (<Link
-                      href={user?.id ? `/profile/${user.id}` : "/profile"}
-                      className="inline-flex items-center gap-1.5 px-4 py-2 border border-border text-text-secondary text-xs font-medium rounded-lg hover:border-gold hover:text-gold transition-colors"
-                    >{chunks}</Link>) })}</div>
-                </div>
-              </div>
-                );
-              })()}
-
-              {/* Konto-Info (read-only) */}
-              <div className="p-5 rounded-xl border border-border bg-bg-secondary">
-                <h3 className="font-semibold text-text-primary mb-4">{uiText("AdminAccounts.accountOnly")}</h3>
-                <div className="space-y-3">
-                  <div>
-                    <label className="text-[11px] uppercase tracking-widest text-text-muted font-semibold block mb-1">{uiText("profile.fieldEmail")}</label>
-                    <p className="text-sm text-text-secondary">{user?.primaryEmailAddress?.emailAddress ?? "—"}</p>
-                    <p className="text-[11px] text-text-muted mt-0.5">{uiText("Ui.text_20885d30c494f4")}</p>
-                  </div>
-                  <div className="pt-2 border-t border-border">
-                    <label className="text-[11px] uppercase tracking-widest text-text-muted font-semibold block mb-1">{uiText("Ui.text_0c876006fd6261")}</label>
-                    <p className="text-sm text-text-secondary">
-                      {user?.createdAt ? new Date(user.createdAt).toLocaleDateString(uiLocale, { day: "numeric", month: "long", year: "numeric" }) : "—"}
-                    </p>
-                  </div>
-                </div>
-              </div>
-
-              <PrivacySettings accountId={user?.id ?? null} />
-
-              {/* Verifizierung */}
-              <div className="p-5 rounded-xl border border-border bg-bg-secondary">
+          {activeTab === "settings" && <div className="mx-auto max-w-3xl">
+            <PersonalSettings accountId={user?.id ?? null}
+              verification={(
+<div className="p-5 rounded-xl border border-border bg-bg-secondary">
                 <h3 className="font-semibold text-text-primary mb-1 flex items-center gap-2">{uiText.rich("Ui.text_ea23f7824c8628", { part1: () => (<ShieldCheck size={16} className={verifStatus === "approved" ? "text-success" : "text-text-muted"} />) })}</h3>
                 <p className="text-xs text-text-muted mb-4 leading-relaxed">{uiText("Ui.text_b35d9de7e46840")}</p>
                 {verifLoading ? (
@@ -2394,9 +1283,9 @@ export default function DashboardPage() {
                   >{verifSubmitting ? <Loader2 size={13} className="animate-spin" /> : <ShieldCheck size={13} />}{verificationText(verifStatus === "rejected" ? "reapply" : "submit")}</button></div>
                 )}
               </div>
-
-              {/* ── DANGER ZONE ── */}
-              <div className="p-5 rounded-xl border border-red-500/30 bg-red-500/5">
+              )}
+              dangerZone={(
+<div className="p-5 rounded-xl border border-red-500/30 bg-red-500/5">
                 <h3 className="font-semibold text-red-400 mb-1 text-sm flex items-center gap-2">{uiText.rich("Ui.text_206d32a820ac8e", { part1: () => (<AlertCircle size={15} />) })}</h3>
                 <p className="text-xs text-text-muted mb-4 leading-relaxed">{uiText("Ui.text_2d70493dc36394")}</p>
                 <button
@@ -2415,264 +1304,9 @@ export default function DashboardPage() {
                   className="px-4 py-2 text-xs font-semibold border border-red-500/40 text-red-400 hover:bg-red-500/15 rounded-lg transition-colors"
                 >{uiText("Ui.text_73fc53cbf7c175")}</button>
               </div>
-
-            </div>
-          )}
-          {/* ── FREUNDE ── */}
-          {activeTab === "friends" && (
-            <div ref={friendsRegion} tabIndex={-1} role="region" aria-label={uiText("Contacts.title")} className="space-y-5 max-w-2xl">
-              <div className="flex items-center justify-between">
-                <div>
-                  <h2 className="font-display text-lg font-bold text-text-primary flex items-center gap-2">{uiText.rich("Ui.text_d1d7a8f9a56576", { part1: () => (<Users size={18} className="text-gold" />) })}</h2>
-                  <p className="text-xs text-text-muted mt-0.5">{uiText("Ui.text_273e11a42338a7")}</p>
-                </div>
-              </div>
-
-              {/* Sub-tabs */}
-              <div className="flex w-full flex-wrap gap-1 p-1 bg-bg-secondary border border-border rounded-xl sm:w-fit">
-                {(["incoming", "friends", "outgoing"] as const).map((t) => {
-                  const labels = { incoming: uiText("Ui.text_5dfb5bcd667e78"), friends: uiText("Ui.text_f72d71d3376f5f"), outgoing: uiText("Ui.text_4b6a7afab7b4c4") };
-                  const counts = { incoming: friendsIncoming.length, friends: friends.length, outgoing: friendsOutgoing.length };
-                  return (
-                    <button
-                      key={t}
-                      onClick={() => setFriendsTab(t)}
-                      className={`min-h-11 px-3 py-2 text-xs font-semibold rounded-lg transition-all flex items-center gap-1.5 ${
-                        friendsTab === t ? "bg-gold text-bg-primary" : "text-text-secondary hover:text-gold"
-                      }`}
-                    >
-                      {labels[t]}
-                      {counts[t] > 0 && (
-                        <span className={`w-4 h-4 rounded-full text-[10px] flex items-center justify-center font-bold ${friendsTab === t ? "bg-bg-primary/20" : "bg-gold/10 text-gold"}`}>
-                          {counts[t]}
-                        </span>
-                      )}
-                    </button>
-                  );
-                })}
-              </div>
-
-              {friendsError && <div role="alert" className="rounded-xl border border-red-400/30 p-3 text-sm text-red-400">
-                <p>{friendsError}</p><button type="button" onClick={() => void doLoadFriends(true)} className="mt-1 inline-flex min-h-11 items-center text-gold underline">{uiText("Contacts.retry")}</button>
-              </div>}
-              {friendsLoading && (
-                <div className="space-y-3">
-                  {[1, 2].map(i => (
-                    <div key={i} className="h-16 bg-bg-secondary border border-border rounded-xl animate-pulse" />
-                  ))}
-                </div>
               )}
-
-              {!friendsLoading && friendsReady && friendsTab === "incoming" && (
-                <>
-                  {friendsIncoming.length === 0 ? (
-                    <div className="text-center py-12 border border-dashed border-border rounded-2xl">
-                      <UserPlus size={24} className="mx-auto text-text-muted opacity-30 mb-3" />
-                      <p className="text-sm text-text-muted">{uiText("Ui.text_f701875e725fdf")}</p>
-                    </div>
-                  ) : (
-                    <div className="space-y-3">
-                      {friendsIncoming.map(f => (
-                        <div key={f.friendship_id} className="flex flex-wrap items-center gap-3 p-4 rounded-xl border border-border bg-bg-secondary">
-                          <div className="shrink-0">
-                            {f.avatar_url ? (
-                              <UnoptimizedImage src={f.avatar_url} alt="" className="w-11 h-11 rounded-full object-cover border border-border" />
-                            ) : (
-                              <div className="w-11 h-11 rounded-full bg-gold/15 border border-gold/20 flex items-center justify-center">
-                                <span className="text-gold font-bold text-base">{f.display_name[0]?.toUpperCase()}</span>
-                              </div>
-                            )}
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <p className="font-semibold text-text-primary text-sm truncate">{f.display_name}</p>
-                            <p className="text-xs text-text-muted truncate">{f.role}</p>
-                          </div>
-                          <div className="flex max-w-full flex-wrap items-center gap-2">
-                            <button disabled={friendPending.has(`${user?.id}:${f.friendship_id}`)} onClick={() => acceptFriend(f.friendship_id)}
-                              className="flex min-h-11 items-center gap-1 px-3 py-2 bg-success/10 border border-success/20 text-success text-xs font-medium rounded-lg hover:bg-success/20 transition-colors">{uiText.rich("Ui.text_048edf533fa6f4", { part1: () => (<Check size={12} />) })}</button>
-                            <button disabled={friendPending.has(`${user?.id}:${f.friendship_id}`)} onClick={() => rejectFriend(f.friendship_id)}
-                              className="flex min-h-11 items-center gap-1 px-3 py-2 border border-border text-text-muted text-xs rounded-lg hover:border-red-400 hover:text-red-400 transition-colors">{uiText.rich("Ui.text_2424239b7d6d6c", { part1: () => (<X size={12} />) })}</button>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </>
-              )}
-
-              {!friendsLoading && friendsReady && friendsTab === "friends" && (
-                  <>
-                    {friends.length === 0 ? (
-                      <div className="text-center py-12 border border-dashed border-border rounded-2xl">
-                        <Users size={24} className="mx-auto text-text-muted opacity-30 mb-3" />
-                        <p className="text-sm text-text-muted">{uiText("Ui.text_1678f937aa7e48")}</p>
-                        <p className="text-xs text-text-muted mt-1">{uiText("Ui.text_6838f11e8b59bd")}</p>
-                      </div>
-                    ) : (
-                      <>
-                        <div className="relative mb-4">
-                          <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-text-muted" />
-                          <input
-                            value={friendSearch}
-                            onChange={e => setFriendSearch(e.target.value)}
-                            placeholder={uiText("Ui.text_cf85b51103ffa9")}
-                            className="w-full pl-9 pr-4 py-2 bg-bg-elevated border border-border rounded-xl text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:border-gold/50 transition-colors"
-                          />
-                        </div>
-                        {filteredContacts.length === 0 ? (
-                          <p className="text-sm text-text-muted text-center py-8">{uiText.rich("Ui.text_9da7cfdab9c3a6", { value1: () => (friendSearch) })}</p>
-                        ) : (
-                          <div className="space-y-5">
-                            {sortedContactGroups.map(([role, members]) => (
-                              <div key={role}>
-                                <p className="text-[10px] font-semibold text-text-muted uppercase tracking-wider mb-2 px-1">{role}</p>
-                                <div className="space-y-2">
-                                  {members.map(f => (
-                                    <ContactCard key={`${user?.id}:${f.friendship_id}`} contact={f}
-                                      pending={friendPending.has(`${user?.id}:${f.friendship_id}`)} error={friendsError}
-                                      onRemove={async id => {
-                                        const actor = user?.id;
-                                        const removed = await changeFriend(id);
-                                        if (removed && friendAccount.current === actor) requestAnimationFrame(() => {
-                                          if (friendAccount.current === actor) friendsRegion.current?.focus({ preventScroll: true });
-                                        });
-                                        return removed;
-                                      }} />
-                                  ))}
-                                </div>
-                              </div>
-                            ))}
-                          </div>
-                        )}
-                      </>
-                    )}
-                  </>
-              )}
-
-              {!friendsLoading && friendsReady && friendsTab === "outgoing" && (
-                <>
-                  {friendsOutgoing.length === 0 ? (
-                    <div className="text-center py-12 border border-dashed border-border rounded-2xl">
-                      <UserPlus size={24} className="mx-auto text-text-muted opacity-30 mb-3" />
-                      <p className="text-sm text-text-muted">{uiText("Ui.text_ad7ed3b7d627b8")}</p>
-                    </div>
-                  ) : (
-                    <div className="space-y-3">
-                      {friendsOutgoing.map(f => (
-                        <div key={f.friendship_id} className="flex flex-wrap items-center gap-3 p-4 rounded-xl border border-border bg-bg-secondary">
-                          <div className="shrink-0">
-                            {f.avatar_url ? (
-                              <UnoptimizedImage src={f.avatar_url} alt="" className="w-11 h-11 rounded-full object-cover border border-border" />
-                            ) : (
-                              <div className="w-11 h-11 rounded-full bg-gold/15 border border-gold/20 flex items-center justify-center">
-                                <span className="text-gold font-bold text-base">{f.display_name[0]?.toUpperCase()}</span>
-                              </div>
-                            )}
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <p className="font-semibold text-text-primary text-sm truncate">{f.display_name}</p>
-                            <p className="text-xs text-text-muted truncate">{f.role}</p>
-                          </div>
-                          <div className="flex max-w-full flex-wrap items-center gap-2">
-                            <span className="text-xs text-text-muted flex items-center gap-1 px-3 py-1.5 bg-bg-elevated border border-border rounded-lg">{uiText.rich("Ui.text_19b8ad14754fa2", { part1: () => (<Clock size={11} />) })}</span>
-                            <button disabled={friendPending.has(`${user?.id}:${f.friendship_id}`)} onClick={() => removeFriendEntry(f.friendship_id)}
-                              className="inline-flex min-h-11 items-center px-3 py-2 text-xs border border-border text-text-muted rounded-lg hover:border-red-400 hover:text-red-400 transition-all">{uiText("OrganizationAccess.withdraw")}</button>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </>
-              )}
-            </div>
-          )}
-
-          {/* ── MERKLISTE ── */}
-          {activeTab === "favorites" && (
-            <div className="space-y-4 max-w-3xl">
-              <div className="flex items-center justify-between">
-                <div>
-                  <h2 className="font-display text-lg font-bold text-text-primary flex items-center gap-2">{uiText.rich("Ui.text_1e756fbcc73cec", { part1: () => (<Heart size={18} className="text-crimson-light fill-current" />) })}</h2>
-                  <p className="text-xs text-text-muted mt-0.5">{uiText("Ui.text_d788252801aefd")}</p>
-                </div>
-                {!favoritesLoading && favorites.length > 0 && (
-                  <span className="px-3 py-1 bg-bg-secondary border border-border text-text-muted text-xs rounded-full">
-                    {favorites.length} {favorites.length === 1 ? uiText("Ui.text_99b9259f15b10b") : uiText("Ui.text_b46a6b65c674c7")}
-                  </span>
-                )}
-              </div>
-
-              {favoritesLoading && (
-                <div className="space-y-3">
-                  {[1, 2, 3].map(i => (
-                    <div key={i} className="h-20 bg-bg-secondary border border-border rounded-xl animate-pulse" />
-                  ))}
-                </div>
-              )}
-
-              {!favoritesLoading && favorites.length === 0 && (
-                <div className="text-center py-16 border border-dashed border-border rounded-2xl space-y-4">
-                  <div className="w-14 h-14 mx-auto bg-bg-secondary border border-border rounded-full flex items-center justify-center">
-                    <Heart size={22} className="text-text-muted opacity-30" />
-                  </div>
-                  <div>
-                    <h3 className="font-semibold text-text-primary mb-1">{uiText("Ui.text_bf33b5684b2765")}</h3>
-                    <p className="text-sm text-text-muted max-w-xs mx-auto">{uiText("Ui.text_632dbf951dd528")}</p>
-                  </div>
-                  <div className="flex flex-wrap justify-center gap-2 pt-1">{uiText.rich("Ui.text_7788914955afcd", { part1: chunks => (<Link href="/locations" className="px-4 py-2 border border-border text-text-secondary text-xs rounded-lg hover:border-gold hover:text-gold transition-all">{chunks}</Link>), part2: chunks => (<Link href="/creators" className="px-4 py-2 border border-border text-text-secondary text-xs rounded-lg hover:border-gold hover:text-gold transition-all">{chunks}</Link>), part3: chunks => (<Link href="/jobs" className="px-4 py-2 border border-border text-text-secondary text-xs rounded-lg hover:border-gold hover:text-gold transition-all">{chunks}</Link>) })}</div>
-                </div>
-              )}
-
-              {!favoritesLoading && favorites.length > 0 && (
-                <div className="space-y-3">
-                  {favorites.map(fav => {
-                    const config = favTypeConfig[fav.listing_type];
-                    if (!config) return null;
-                    const Icon = config.icon;
-                    const isRemoving = removingFav === fav.listing_id;
-                    return (
-                      <div key={fav.id} className={`flex items-center gap-4 p-4 rounded-xl border border-border bg-bg-secondary hover:border-gold/30 transition-all ${isRemoving ? "opacity-50" : ""}`}>
-                        <Link href={config.href(fav.listing_id)} className="shrink-0">
-                          {fav.listing_image ? (
-                            <UnoptimizedImage src={fav.listing_image} alt={fav.listing_title ?? ""} className="w-14 h-14 rounded-lg object-cover border border-border hover:opacity-90 transition-opacity" />
-                          ) : (
-                            <div className="w-14 h-14 rounded-lg bg-gold/10 border border-gold/20 flex items-center justify-center">
-                              <Icon size={20} className={config.color} />
-                            </div>
-                          )}
-                        </Link>
-                        <div className="flex-1 min-w-0">
-                          <Link href={config.href(fav.listing_id)} className="hover:text-gold transition-colors">
-                            <p className="font-semibold text-text-primary truncate">{fav.listing_title ?? uiText("AdminAccounts.contentKinds.other")}</p>
-                          </Link>
-                          <div className="flex items-center gap-2 mt-0.5 flex-wrap">
-                            <span className={`flex items-center gap-1 text-xs ${config.color}`}>
-                              <Icon size={10} /> {config.label}
-                            </span>
-                            {fav.listing_city && <span className="text-xs text-text-muted">{fav.listing_city}</span>}
-                          </div>
-                        </div>
-                        {(fav.priceLabel || (fav.listing_price != null && fav.listing_price > 0)) && (
-                          <div className="text-right shrink-0 hidden sm:block">
-                            <p className="text-sm font-semibold text-gold font-mono">{fav.priceLabel ?? uiText("Ui.text_4a44946c8fc283", { value1: String(fav.listing_price?.toLocaleString(uiLocale)) })}</p>
-                            <p className="text-xs text-text-muted">{uiText("Ui.text_2bf4c50be2aec3")}</p>
-                          </div>
-                        )}
-                        <div className="flex items-center gap-2 shrink-0">
-                          <Link href={config.href(fav.listing_id)} className="px-3 py-1.5 text-xs border border-border text-text-secondary rounded-lg hover:border-gold hover:text-gold transition-all">{uiText("Ui.text_8e31363947a6c7")}</Link>
-                          <button onClick={() => removeFavorite(fav)} disabled={isRemoving}
-                            className="w-8 h-8 flex items-center justify-center text-text-muted hover:text-crimson-light transition-colors disabled:opacity-40" title={uiText("profile.removePhoto")}>
-                            <Trash2 size={14} />
-                          </button>
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              )}
-            </div>
-          )}
-
+            />
+          </div>}
         </div>
       </div>
 

@@ -1,4 +1,5 @@
 import taxonomyLabelIndex from "./i18n/taxonomy-label-index.json" with { type: "json" };
+import germanOccupationAliases from "./i18n/occupation-aliases.de.json" with { type: "json" };
 import taxonomyIndex from "./i18n/taxonomy-index.json" with { type: "json" };
 const TAXONOMY_INDEX = taxonomyIndex as Record<string, {label: string; roles: Record<string, string>}>;
 import { ANIMAL_DEPARTMENT_ID, ANIMAL_DEPARTMENT_LABEL, animalRoleLabel, type AnimalTranslator } from "@/lib/animal-taxonomy";
@@ -521,7 +522,7 @@ export const departments: Department[] = [
  * folding every job/project title into the profile catalogue at module load.
  * Exact labels and declared aliases resolve to one visible choice.
  */
-const FILM_TO_PROFILE_DEPARTMENT: Record<string, string> = {
+export const FILM_TO_PROFILE_DEPARTMENT: Record<string, string> = {
   "vor-der-kamera": "cast",
   regie: "regie",
   kamera: "kamera",
@@ -624,6 +625,48 @@ for (const filmDepartment of FILM_DEPARTMENTS) {
   }
 }
 
+/** Search aliases never change canonical choices, saved IDs or member-authored text. */
+const curatedRoleAliases = germanOccupationAliases as Record<string, Record<string, string[]>>;
+for (const department of departments) {
+  department.roleAliases ??= {};
+  for (const role of department.roles) {
+    const aliases = curatedRoleAliases[department.id]?.[role] ?? [];
+    department.roleAliases[role] = [...new Set([...(department.roleAliases[role] ?? []), ...aliases])];
+  }
+}
+
+type ResolvedDepartmentOccupation = { department: Department; role: string };
+const canonicalOccupations = new Map<string, ResolvedDepartmentOccupation[]>();
+const aliasedOccupations = new Map<string, ResolvedDepartmentOccupation[]>();
+for (const department of departments) for (const role of department.roles) {
+  const resolved = { department, role };
+  const canonicalKey = roleKey(role);
+  canonicalOccupations.set(canonicalKey, [...(canonicalOccupations.get(canonicalKey) ?? []), resolved]);
+  for (const alias of department.roleAliases?.[role] ?? []) {
+    const aliasKey = roleKey(alias);
+    const current = aliasedOccupations.get(aliasKey) ?? [];
+    if (!current.some(item => item.department.id === department.id && item.role === role)) {
+      aliasedOccupations.set(aliasKey, [...current, resolved]);
+    }
+  }
+}
+
+/** Exact catalogue lookup. A canonical title wins over an alias; ambiguity is never guessed. */
+export function resolveDepartmentOccupation(value: string, departmentId?: string): ResolvedDepartmentOccupation | null {
+  const key = roleKey(value);
+  if (!key) return null;
+  const withinDepartment = (options: ResolvedDepartmentOccupation[]) => departmentId
+    ? options.filter(option => option.department.id === departmentId) : options;
+  const canonical = withinDepartment(canonicalOccupations.get(key) ?? []);
+  if (canonical.length) return canonical.length === 1 ? canonical[0] : null;
+  const aliases = withinDepartment(aliasedOccupations.get(key) ?? []);
+  return aliases.length === 1 ? aliases[0] : null;
+}
+
+export function resolveDepartmentRole(departmentId: string, value: string): string | undefined {
+  return resolveDepartmentOccupation(value, departmentId)?.role;
+}
+
 /** Department -> valid profile type keys, shared by setup and profile editing. */
 export const DEPARTMENT_TO_PROFILE_TYPES: Record<string, ProfileType[]> = {
   kamera: ["camera"], grip: ["camera"], licht: ["lighting"], ton: ["sound"],
@@ -663,7 +706,8 @@ export function getProfileTypesForDepartment(departmentId: string, selectedRoles
 
 /** Add reader-specific display text only for this search; never alter catalogue aliases or stored IDs. */
 export function getDepartmentRoleSearchTerms(department: Department, role: string, displayLabel?: string): string[] {
-  return [...new Set([role, ...(department.roleAliases?.[role] ?? []), ...(displayLabel ? [displayLabel] : [])])];
+  const canonical = department.roles.includes(role) ? role : resolveDepartmentRole(department.id, role) ?? role;
+  return [...new Set([canonical, role, ...(department.roleAliases?.[canonical] ?? []), ...(displayLabel ? [displayLabel] : [])])];
 }
 
 const occupationSearchIndex = new Map<string, string[]>();
@@ -722,15 +766,21 @@ export function deptColors(color: string) {
 
 /** Display only; stored occupation titles and stable role IDs never change. */
 export function getDepartmentRoleLabel(departmentId: string, role: string, locale: string, animals?: AnimalTranslator, taxonomy?: (key: string) => string): string {
-  if (departmentId === ANIMAL_DEPARTMENT_ID && animals) return animalRoleLabel(role, animals);
+  const canonical = resolveDepartmentRole(departmentId, role) ?? role;
+  if (departmentId === ANIMAL_DEPARTMENT_ID && animals) return animalRoleLabel(canonical, animals);
   const index = Object.hasOwn(TAXONOMY_INDEX, departmentId) ? TAXONOMY_INDEX[departmentId] : null;
-  const key = index && Object.hasOwn(index.roles, role) ? index.roles[role] : undefined;
+  const key = index && Object.hasOwn(index.roles, canonical) ? index.roles[canonical] : undefined;
   if (taxonomy && key) return taxonomy(key);
-  return departments.find(department=>department.id===departmentId)?.roleLabels?.[role]?.[locale] ?? role;
+  return departments.find(department=>department.id===departmentId)?.roleLabels?.[canonical]?.[locale] ?? role;
 }
 
 /** Display only curated catalogue labels; unknown member-written values stay unchanged. */
 export function taxonomyLabel(value: string, translate: (key: string) => string): string {
   const index = taxonomyLabelIndex as Record<string, string>;
-  return Object.hasOwn(index, value) ? translate(index[value]) : value;
+  const directKey = Object.hasOwn(index, value) ? index[value] : undefined;
+  // Directory/department names keep their own meaning even when also a role alias.
+  if (directKey?.startsWith("Taxonomy.departments.")) return translate(directKey);
+  const resolved = resolveDepartmentOccupation(value);
+  const roleKey = resolved && TAXONOMY_INDEX[resolved.department.id]?.roles[resolved.role];
+  return roleKey ? translate(`Taxonomy.${roleKey}`) : directKey ? translate(directKey) : value;
 }

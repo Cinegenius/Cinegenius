@@ -22,6 +22,8 @@ export async function POST(req: NextRequest) {
   const authResult = await requireAuth();
   if (authResult instanceof NextResponse) return authResult;
   const { userId } = authResult;
+  const expectedAccount = req.headers.get("X-Profile-Account");
+  if (expectedAccount && expectedAccount !== userId) return json({ error: tResponse("System.requestFailed") }, 409);
   const t = await getTranslations("mediaSecurity");
 
   const limit = await rateLimit(`profile-avatar:${userId}`, 10, 60);

@@ -221,7 +221,7 @@ async function HomeLocations({ dataPromise }: { dataPromise: HomeDataPromise }) 
 }
 
 async function HomeCrew({ dataPromise }: { dataPromise: HomeDataPromise }) {
-  const [data, t, tc] = await Promise.all([dataPromise, getTranslations("home"), getTranslations("common")]);
+  const [data, t, tc, uiText] = await Promise.all([dataPromise, getTranslations("home"), getTranslations("common"), getTranslations()]);
   if (!data?.newCrew.length) return null;
   const { newCrew } = data;
   return <section className="home-section-divider home-section-divider--intro min-w-0" aria-labelledby="home-crew-title">
@@ -258,7 +258,7 @@ async function HomeCrew({ dataPromise }: { dataPromise: HomeDataPromise }) {
                   </div>
                   <div className="p-3 flex flex-col flex-1">
                     <h3 className="font-semibold text-text-primary text-sm leading-snug mb-0.5">{c.name}</h3>
-                    {c.positions.length > 0 && <p className="mb-1 line-clamp-2 text-[11px] leading-snug text-gold">{c.positions.join(" · ")}</p>}
+                    {c.positions.length > 0 && <p className="mb-1 line-clamp-2 text-[11px] leading-snug text-gold">{c.positions.map(label => taxonomyLabel(label, uiText)).join(" · ")}</p>}
                     {c.city && (
                       <p className="text-[11px] text-text-muted flex items-center gap-1 mb-1.5">
                         <MapPin size={9} /> {c.city}

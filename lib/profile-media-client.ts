@@ -18,7 +18,7 @@ export async function prepareProfileMediaFile(
   return { file: compressed, error: null };
 }
 
-export async function sendProfileMediaFile(file: File, translate?: ProfileMediaTranslate): Promise<string> {
+export async function sendProfileMediaFile(file: File, translate?: ProfileMediaTranslate, accountId?: string): Promise<string> {
   if (file.size > PROFILE_MEDIA_MAX_BYTES) throw new Error(translate?.("mediaSecurity.tooLarge") ?? "Das verarbeitete Bild darf höchstens 4 MB groß sein.");
   if (file.type && !PROFILE_MEDIA_MIME_TYPES.has(file.type)) throw new Error(translate?.("mediaSecurity.invalid") ?? "Das Bild konnte nicht sicher verarbeitet werden. Verwende ein gültiges JPG-, PNG- oder WEBP-Bild.");
 
@@ -26,7 +26,7 @@ export async function sendProfileMediaFile(file: File, translate?: ProfileMediaT
   body.append("file", file);
   const fallback = translate?.("mediaSecurity.saveFailed") ?? "Das Bild konnte nicht gespeichert werden. Bitte versuche es erneut.";
   try {
-    const response = await fetch("/api/upload/profile-media", { method: "POST", body });
+    const response = await fetch("/api/upload/profile-media", { method: "POST", body, ...(accountId ? { headers: { "X-Profile-Account": accountId } } : {}) });
     const result = await response.json().catch(() => ({}));
     if (!response.ok || !result.url) throw new Error(result.error ?? `HTTP ${response.status}`);
     return result.url as string;

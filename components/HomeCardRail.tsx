@@ -9,7 +9,7 @@ type Props = {
   labelledBy: string;
   hint: string;
   itemCount: number;
-  variant: "crew" | "location";
+  variant: "crew" | "location" | "news";
   wide?: boolean;
   children: ReactNode;
 };

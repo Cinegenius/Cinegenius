@@ -6,9 +6,10 @@ import { cloneElement,isValidElement,useEffect,useRef,useState,type ReactNode } 
 import BrowseSelect from "@/components/BrowseSelect";
 import BrowseResultCount from "@/components/BrowseResultCount";
 import { useSwipeDismiss } from "@/lib/use-swipe-dismiss";
+import { normalizeOccupation } from "@/lib/gripTaxonomy";
 
 
-export type BrowseOption = { value: string; label: string };
+export type BrowseOption = { value: string; label: string; searchTerms?: readonly string[] };
 export type BrowseChip = { id: string; label: string; onRemove: () => void };
 
 type MobileBrowseControlsProps = {
@@ -190,7 +191,12 @@ export function BrowseRoleFilter({ label, placeholder, options, selected, onChan
   const [query, setQuery] = useState("");
   const t = useTranslations("creators");
   if (!options.length && !selected.size) return null;
-  const visible = options.filter(option => option.label.toLocaleLowerCase().includes(query.toLocaleLowerCase()));
+  const normalizedQuery = normalizeOccupation(query);
+  const compactQuery = normalizedQuery.replaceAll(" ", "");
+  const visible = options.filter(option => !normalizedQuery || [option.label, ...(option.searchTerms ?? [])].some(term => {
+    const normalized = normalizeOccupation(term);
+    return normalized.includes(normalizedQuery) || normalized.replaceAll(" ", "").includes(compactQuery);
+  }));
   return <fieldset className="mobile-filter-field">
     <legend className="mb-2 text-xs text-text-muted">{label}</legend>
     <details className="rounded-xl border border-border bg-bg-primary">

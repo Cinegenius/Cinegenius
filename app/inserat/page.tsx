@@ -4,7 +4,7 @@ import GenieWritingAssistant from "@/components/GenieWritingAssistant";
 
 import PlaceField from "@/components/PlaceField";
 import { LOCATION_ROOMS } from "@/lib/location-rooms";
-import { taxonomyLabel } from "@/lib/departments";
+import { getOccupationSearchTerms, taxonomyLabel } from "@/lib/departments";
 import { projectTypeLabel, roleOptionMatchesSearch } from "@/lib/project-type-labels";
 import ContentUsageNotice from "@/components/ContentUsageNotice";
 import { useTranslations , useLocale } from "next-intl";
@@ -229,8 +229,15 @@ function RoleDropdown({
 
   const selected = options.find((o) => o.label === value);
   const locale = useLocale();
+  const secondaryLabel = (option: RoleOption) => {
+    if (!option.labelEn) return "";
+    const localized = taxonomyLabel(option.labelEn, uiText);
+    // Old English metadata remains searchable; display only a distinct,
+    // translated catalogue label beside the localized main title.
+    return localized !== option.labelEn && localized !== taxonomyLabel(option.label, uiText) ? localized : "";
+  };
   const filteredOptions = options.filter(option =>
-    roleOptionMatchesSearch(option, query, value => taxonomyLabel(value, uiText), locale),
+    roleOptionMatchesSearch(option, query, value => taxonomyLabel(value, uiText), locale, getOccupationSearchTerms(option.label)),
   );
 
   return (
@@ -280,8 +287,8 @@ function RoleDropdown({
               >
                 <span className="min-w-0">{taxonomyLabel(opt.label, uiText)}{opt.description && <span className="mt-0.5 block whitespace-normal text-[10px] leading-4 text-text-muted">{taxonomyLabel(opt.description, uiText)}</span>}</span>
                 <span className="flex items-center gap-2 shrink-0 ml-2">
-                  {opt.labelEn && (
-                    <span className="text-[11px] text-text-muted hidden sm:block">{opt.labelEn}</span>
+                  {secondaryLabel(opt) && (
+                    <span className="text-[11px] text-text-muted hidden sm:block">{secondaryLabel(opt)}</span>
                   )}
                   {opt.label === value && <CheckCircle size={13} className="text-gold" />}
                 </span>

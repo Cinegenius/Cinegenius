@@ -111,7 +111,7 @@ export default function InboxFriends() {
       {error && <div role="alert" className="text-sm text-red-400"><p>{error}</p>{failure?.kind === "load" && <button type="button" onClick={() => void load()} className="min-h-11 text-gold">{t("retry")}</button>}</div>}
       {loading && !ready ? <p role="status" className="py-8 text-sm text-text-muted">{t("loading")}</p> : ready && !visible.length ? <div className="space-y-3 py-8 text-center text-sm text-text-muted"><Users size={26} className="mx-auto" /><p>{query ? messaging("noPeople") : t("empty")}</p></div> : visible.map(contact => <ContactCard
         key={`${scope}:${contact.friendship_id}`} contact={contact} pending={pending.has(`${scope}:${contact.friendship_id}`)} error={error} onRemove={remove}
-        messageHref={`/messages?view=friends&to=${encodeURIComponent(contact.user_id)}`}
+        messageHref={`/messages?to=${encodeURIComponent(contact.user_id)}`}
         onMessage={() => { if (userId) leave(() => navigateMessageView(window, userId, { recipientId: contact.user_id })); }}
       />)}
     </div>

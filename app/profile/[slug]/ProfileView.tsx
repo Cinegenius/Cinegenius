@@ -338,7 +338,7 @@ function CollaborationsSection({ collaborations }: { collaborations: PublicColla
                 {c.display_name}
               </p>
               <p className="text-[10px] text-gold font-medium truncate mt-0.5">{c.label}</p>
-              {c.role && <p className="text-[10px] text-text-muted truncate">{c.role}</p>}
+              {c.role && <p className="text-[10px] text-text-muted truncate">{taxonomyLabel(c.role, uiText)}</p>}
             </div>
           </Link>
         ))}

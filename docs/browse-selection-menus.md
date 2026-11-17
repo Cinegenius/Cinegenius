@@ -1,7 +1,9 @@
 # Shared search and filter menus
 
 The header's ordinary site search, directory filter panels, and their selection
-menus share the subtle translucent lime `browse-popup-surface` in `app/globals.css`.
+menus share the opaque neutral `browse-popup-surface` in `app/globals.css`.
+The 17 November operator update replaces the previous lime/cyan tint; selected
+checkmarks and focus rings retain the existing restrained brand accent.
 The existing page dimensions, layout, results and available filter values remain.
 
 - `BrowseSelect` renders localized choices with 44px targets, type-ahead,
@@ -16,6 +18,10 @@ The existing page dimensions, layout, results and available filter values remain
   option into view. Only opening or keyboard navigation reveals a choice, and
   only within the popup. Returning focus must not scroll the surrounding page
   or filter dialog. Internal option scrolling does not reposition the popup.
+- Homepage country/topic triggers occupy stable grid columns, and selected text
+  stays on one line without changing control height. The full selected value
+  remains available to assistive technology and through the trigger title;
+  expanding choices never changes the surrounding page geometry.
 - `MessagingDialog` opts into the browse surface only for `GlobalSearch`.
   Message, contact and group dialogs retain their existing presentation.
 - Filter sheets and header search use `useSwipeDismiss` for touch gestures.

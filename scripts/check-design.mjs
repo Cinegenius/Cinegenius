@@ -73,17 +73,31 @@ const browseDestinations = new Set(navigation.BROWSE_NAV_ITEMS.map(({ href }) =>
 for (const href of ["/", "/creators", "/locations", "/props", "/jobs", "/companies", "/projects", "/news", "/organizations"]) {
   if (!browseDestinations.has(href)) failures.push(`The shared menu must retain ${href}`);
 }
-const accountDestinations = new Set(navigation.ACCOUNT_NAV_ITEMS.map(({ href }) => href));
-for (const href of ["/profile", "/dashboard?tab=listings", "/dashboard?tab=favorites", "/messages?view=friends", "/dashboard?tab=bookings", "/company-dashboard", "/notifications", "/dashboard?tab=settings", "/dashboard?tab=analytics", "/profile?tab=security"]) {
-  if (!accountDestinations.has(href)) failures.push(`The shared account menu must retain ${href}`);
+const expectedAccount = [
+  ["overview", "/dashboard"], ["public-profile", "/profile"], ["settings", "/dashboard?tab=settings"],
+];
+if (JSON.stringify(navigation.ACCOUNT_NAV_ITEMS.map(({ id, href }) => [id, href])) !== JSON.stringify(expectedAccount)) {
+  failures.push("The portrait menu must keep exactly personal area, public profile and settings; sign-out remains an action");
 }
+const personalDestinations = new Set([...navigation.PERSONAL_CONTENT_ITEMS, ...navigation.PERSONAL_ACTIVITY_ITEMS].map(({ href }) => href));
+for (const href of ["/profile", "/dashboard?tab=listings", "/dashboard?tab=bookings", "/company-dashboard", "/messages", "/messages?view=friends", "/favorites"]) {
+  if (!personalDestinations.has(href)) failures.push(`The central personal area must retain ${href}`);
+}
+const personalHome = read("components/PersonalAreaHome.tsx");
+if (!personalHome.includes("PERSONAL_CONTENT_ITEMS") || !personalHome.includes("PERSONAL_ACTIVITY_ITEMS")) {
+  failures.push("The central personal area must render the shared content and activity destinations");
+}
+const personalSettings = read("components/PersonalSettings.tsx");
+for (const token of ["/invoices", "PrivacySettings", "NotificationPreferences", "openUserProfile"]) {
+  if (!personalSettings.includes(token)) failures.push(`Central account settings must preserve ${token}`);
+}
+if (!navbar.includes('href="/notifications"')) failures.push("Platform notifications must remain directly reachable through the header bell");
 const appChrome = read("components/AppChrome.tsx");
 if ([...appChrome.matchAll(/<BottomNav\b/g)].length !== 1) {
   failures.push("AppChrome must mount the mobile bottom navigation exactly once");
 }
-const personalNavigation = read("components/PersonalAreaNavigation.tsx");
-if (/<nav\b[^>]*className=[^>]*\bfixed\b[^>]*\bbottom-0\b/.test(personalNavigation)) {
-  failures.push("Personal navigation must not render a second fixed mobile bottom bar");
+if (appChrome.includes("PersonalAreaNavigation") || /<nav\b[^>]*className=[^>]*\bfixed\b[^>]*\bbottom-0\b/.test(personalHome)) {
+  failures.push("The central personal home must not reintroduce duplicate desktop or mobile navigation bars");
 }
 
 const styles = read("app/globals.css");
@@ -126,7 +140,7 @@ if (menuOwners.length !== 1) {
 const publicMenu = readFileSync("components/SiteNavigationMenu.tsx", "utf8");
 const accountMenu = readFileSync("components/Navbar.tsx", "utf8");
 if (publicMenu.includes("ACCOUNT_NAV_ITEMS") || publicMenu.includes("SITE_NAV_SIGN_OUT_EVENT") || !accountMenu.includes("ACCOUNT_NAV_ITEMS.map")) {
-  failures.push("Personal destinations and sign-out belong only in the portrait account menu");
+  failures.push("Compact personal entry points and sign-out belong in the portrait menu, never in the public directory menu");
 }
 const forbiddenAdvertisingPatterns = [
   ["ad placeholder component", /\bAdPlaceholder\b/],

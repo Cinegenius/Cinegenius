@@ -142,7 +142,7 @@
     "crewCamera": "Camera",
     "crewCameraDesc": "DP, cameraprofessional, camera-assistent",
     "crewLight": "Licht",
-    "crewLightDesc": "Gaffer, best boy",
+    "crewLightDesc": "Gaffer, Best Boy / Best Girl",
     "crewSound": "Geluid",
     "crewSoundDesc": "Geluidsmixer, boommicrofonist, geluidsontwerper",
     "crewProduction": "Productie",
@@ -746,7 +746,7 @@
     "listingTypeVehicles": "Voertuigen",
     "listingTypeCreator": "Creator / talent",
     "newProjectPlaceholderDesc": "Waar gaat dit project over?",
-    "collabRolePlaceholder": "Functie / benaming (bijv. hoofd belichting)",
+    "collabRolePlaceholder": "Functie / benaming (bijv. Gaffer)",
     "ageFrom": "van",
     "ageTo": "tot",
     "videoLinkPlaceholder": "https://vimeo.com/... of https://youtube.com/...",
@@ -1631,15 +1631,15 @@
       "tiertraining-film-medien": "Dierentraining voor film en media"
     },
     "roles": {
-      "tiertrainer": "Filmdierentrainer",
-      "filmhundetrainer": "Filmhondentrainer",
-      "tierbetreuer": "Dierenbegeleider / animal handler",
-      "tierkoordination": "Dierencoördinatie / animal coordinator",
-      "set-tierbetreuung": "Dierenverzorging op de set",
-      "horse-master": "Horse master / paardencoördinatie",
-      "assistant-horse-master": "Assistent paardencoördinatie",
-      "horse-trainer": "Filmpaardentrainer",
-      "horse-wrangler": "Paardenbegeleider"
+      "tiertrainer": "Trainer van filmdieren / Trainster van filmdieren",
+      "filmhundetrainer": "Trainer van filmhonden / Trainster van filmhonden",
+      "tierbetreuer": "Dierenbegeleider / Dierenbegeleidster (Animal Handler)",
+      "tierkoordination": "Dierencoördinator / Dierencoördinatrice",
+      "set-tierbetreuung": "Dierenverzorger / Dierenverzorgster op de set",
+      "horse-master": "Paardencoördinator / Paardencoördinatrice (Horse Master)",
+      "assistant-horse-master": "Assistent / Assistente van de Horse Master",
+      "horse-trainer": "Trainer van filmpaarden / Trainster van filmpaarden",
+      "horse-wrangler": "Paardenbegeleider / Paardenbegeleidster (Horse Wrangler)"
     },
     "species": {
       "dogs": "Honden",
@@ -3419,7 +3419,7 @@
     "text_bfdc08cfd677d0": "geen functie vastgelegd",
     "text_d190a2564e3e50": "Tot nu toe bevestigd: <value1></value1>",
     "text_ad102247f94b2b": "Nieuwe functie(s) controleren of aanpassen<part1></part1>",
-    "text_354d5eb293b0a9": "Bijv. technische leiding, hoofd belichting",
+    "text_354d5eb293b0a9": "bijv. Technisch verantwoordelijke, Gaffer",
     "text_6b9a27efa8e57d": "Functie(s), openbaar zichtbaar<part1></part1>",
     "text_a9223983e08ec4": "De uitnodiging kon niet worden geaccepteerd.",
     "text_2f897dc4dd787b": "Je aanvraag voor <value1></value1> is verzonden. Het bedrijf moet de toetreding nog bevestigen.",
@@ -5971,7 +5971,7 @@
         "r_e90f5848bfc3": "Financieel productiebeheer",
         "r_c6dc08a47d0d": "Filmcontroller",
         "r_2557c22fb3d7": "Duurzaamheidsadviseur / sustainabilitymanager",
-        "r_2a6c1d42831e": "Productiestagiair",
+        "r_2a6c1d42831e": "Productiestagiair / Productiestagiaire",
         "r_ede69642be01": "Stagiair setopnameleiding",
         "r_de9ab1a6b55a": "Productieleider",
         "r_fd701e2c1e86": "Opnameleider",
@@ -6020,7 +6020,7 @@
         "r_07f0060c8996": "Productiestagiair (producer)"
       },
       "regie": {
-        "r_f59d6991c44a": "Regisseur",
+        "r_f59d6991c44a": "Regisseur / Regisseuse",
         "r_5562e3abbb45": "Coregisseur",
         "r_df7e552a6792": "Second-unitregisseur",
         "r_0aca88b2853d": "Studioregisseur",
@@ -6145,9 +6145,9 @@
       },
       "licht": {
         "r_222be04dbf00": "Gaffer (hoofd belichting)",
-        "r_1e210e69039a": "Best boy electric",
+        "r_1e210e69039a": "Assistent-hoofd belichting (Best Boy / Best Girl Electric)",
         "r_14dd174cd76c": "Rigginggaffer",
-        "r_92137802b24a": "Riggingbestboy",
+        "r_92137802b24a": "Assistent-hoofd voorbelichting (Rigging Best Boy / Rigging Best Girl Electric)",
         "r_7fce7d6fcf12": "Riggingelektricien",
         "r_1bcf9d8d9b03": "Belichter (electrician)",
         "r_d95b919dded9": "Hoofd belichtingstechniek",
@@ -6167,13 +6167,13 @@
       },
       "grip": {
         "r_470156bd03e4": "Key grip",
-        "r_cfbf2a22ed6e": "Best boy grip / tweede grip",
+        "r_cfbf2a22ed6e": "Assistent-hoofd grip (Best Boy / Best Girl Grip)",
         "r_32a6ab31b1a1": "Dollygrip / dollyoperator",
         "r_376dc1f790b8": "Grip",
         "r_dbfaadb8821c": "Gripassistent",
         "r_46dab52c1995": "Rigginggrip",
         "r_ea7e925bd850": "Riggingkeygrip",
-        "r_fa9d72fc7978": "Riggingbestboygrip",
+        "r_fa9d72fc7978": "Assistent-hoofd rigginggrip (Rigging Best Boy / Rigging Best Girl Grip)",
         "r_2fa0b44342d7": "Speciale constructies (grip)",
         "r_08c07afebb7f": "Camerakraan- / jiboperator",
         "r_5ece318b289f": "Camerakraantechnicus",
@@ -6580,7 +6580,7 @@
       },
       "set-logistik": {
         "r_06d9aa28368f": "Runner uitvalsbasis",
-        "r_51e581b5ea39": "Chauffeur (personenauto / vrachtwagen)",
+        "r_51e581b5ea39": "Chauffeur / Chauffeuse (personenauto / vrachtwagen)",
         "r_36a599628c2e": "Locatiechauffeur",
         "r_9bc1a35535fa": "Locatie-opnameleider",
         "r_273f12c52b95": "Assistent locatiemanager",
@@ -6643,9 +6643,9 @@
         "r_b85e79c1153f": "Onderzoek"
       },
       "cast": {
-        "r_3d0e76b883b1": "Hoofdrolspeler",
+        "r_3d0e76b883b1": "Hoofdrolspeler / Hoofdrolspeelster",
         "r_543b99d52c01": "Acteur",
-        "r_aa64ee1fd5d6": "Bijrolspeler",
+        "r_aa64ee1fd5d6": "Bijrolspeler / Bijrolspeelster",
         "r_5fea55df03ed": "Figurant",
         "r_912a4dbdd23c": "Kleine-rolspeler",
         "r_130f7a137659": "Model",
@@ -6668,7 +6668,7 @@
         "r_901a1b08f6ba": "Intimiteitscoördinator",
         "r_7a721e572105": "Castingmedewerker",
         "r_a1f9ba79ab08": "Castingassistent",
-        "r_84927cc7b2bc": "Bijrolspeler",
+        "r_84927cc7b2bc": "Bijrolspeler / Bijrolspeelster",
         "r_97144193d2e9": "Figurant",
         "r_de130677203b": "Castingdirector (jongeren)",
         "r_27725de30521": "Castingdirector (kinderen)",
@@ -6815,7 +6815,7 @@
         "r_ce039c1f951f": "Motiondesigner (sociale media)"
       },
       "foto": {
-        "r_d2c0588cf0d1": "Fotograaf",
+        "r_d2c0588cf0d1": "Fotograaf / Fotografe",
         "r_d7f7fbf5939c": "Modefotograaf",
         "r_e0551919b067": "Productfotograaf",
         "r_b06301444ef7": "Evenementfotograaf",
@@ -6901,15 +6901,15 @@
         "r_532adc563b66": "Chauffeur catering en mobiele keuken"
       },
       "filmtiere-tiertraining": {
-        "r_3d8ab6fb2c6a": "Filmdierentrainer",
-        "r_654c33dc9c6b": "Filmhondentrainer",
-        "r_40758f075d18": "Dierenbegeleider / animal handler",
-        "r_7a1591b96b3a": "Dierencoördinatie / animal coordinator",
-        "r_a63695a566c3": "Dierenverzorging op de set",
-        "r_9faf951b627e": "Horse master",
-        "r_7c4f137defec": "Assistent horse master",
-        "r_8e8f21cf0303": "Paardentrainer",
-        "r_35f9ffa503c4": "Paardenbegeleider"
+        "r_3d8ab6fb2c6a": "Trainer van filmdieren / Trainster van filmdieren",
+        "r_654c33dc9c6b": "Trainer van filmhonden / Trainster van filmhonden",
+        "r_40758f075d18": "Dierenbegeleider / Dierenbegeleidster (Animal Handler)",
+        "r_7a1591b96b3a": "Dierencoördinator / Dierencoördinatrice",
+        "r_a63695a566c3": "Dierenverzorger / Dierenverzorgster op de set",
+        "r_9faf951b627e": "Paardencoördinator / Paardencoördinatrice (Horse Master)",
+        "r_7c4f137defec": "Assistent / Assistente van de Horse Master",
+        "r_8e8f21cf0303": "Trainer van filmpaarden / Trainster van filmpaarden",
+        "r_35f9ffa503c4": "Paardenbegeleider / Paardenbegeleidster (Horse Wrangler)"
       }
     },
     "extra": {
@@ -8209,7 +8209,7 @@
     "leadership": "Oprichters en leiding"
   },
   "NewsRegion": {
-    "unassignedCountry": "Geen land",
+    "unassignedCountry": "Neutraal",
     "countryLabel": "Land voor branchenieuws",
     "automatic": "Automatisch",
     "automaticCountry": "Automatisch · {country}",
@@ -8217,7 +8217,8 @@
     "saveError": "Je keuze kon niet worden opgeslagen. Sta voorkeurcookies toe en probeer het opnieuw.",
     "loadError": "De berichten konden niet worden geladen.",
     "retry": "Opnieuw proberen",
-    "allTopics": "Alle onderwerpen"
+    "allTopics": "Alle onderwerpen",
+    "railHint": "Veeg opzij of gebruik de stippen voor meer nieuws. Omhoog en omlaag scrollen verplaatst de pagina."
   },
   "PrivacySettings": {
     "title": "Privacy",
@@ -8438,5 +8439,20 @@
       "desert": "Woestijn",
       "polar": "Poolgebied"
     }
+  },
+  "PersonalArea": {
+    "content": "Mijn inhoud",
+    "activity": "Activiteit",
+    "profileView": "Profiel bekijken",
+    "settings": "Instellingen",
+    "editProfile": "Profiel bewerken"
+  },
+  "Favorites": {
+    "loadError": "Je opgeslagen items konden niet worden geladen.",
+    "removeError": "Het item kon niet worden verwijderd. Probeer het opnieuw.",
+    "filterType": "Filteren op onderdeel",
+    "noMatches": "Je hebt in dit onderdeel nog niets opgeslagen.",
+    "signInHint": "Log in om je opgeslagen items te bekijken.",
+    "removeItem": "{name} uit opgeslagen items verwijderen"
   }
 }

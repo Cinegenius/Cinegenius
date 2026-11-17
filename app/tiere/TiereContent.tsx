@@ -14,7 +14,7 @@ import { useAuth } from "@clerk/nextjs";
 import { Heart,MapPin,PawPrint,Truck,Users } from "lucide-react";
 import { useLocale,useTranslations } from "next-intl";
 import Link from "next/link";
-import { useEffect,useMemo,useState } from "react";
+import { useEffect,useLayoutEffect,useMemo,useRef,useState } from "react";
 
 type Animal = {
   id: string;
@@ -43,7 +43,7 @@ const TRAINING_COLORS: Record<string, string> = {
 export default function TiereContent({ serverListings }: { serverListings: Animal[] }) {
   const uiText = useTranslations();
 
-  const { isSignedIn } = useAuth();
+  const { isSignedIn, userId, sessionId } = useAuth();
   const animals = useTranslations("FilmAnimals");
   const locale = useLocale();
   const [search, setSearch] = useViewState("animals.search", "");
@@ -59,30 +59,45 @@ export default function TiereContent({ serverListings }: { serverListings: Anima
   const [liveRatings, setLiveRatings] = useState<Record<string, { avg: number; count: number }>>({});
   const [myRatings, setMyRatings] = useState<Record<string, number>>({});
   const [eligible, setEligible] = useState<Set<string>>(new Set());
-  const [favorites, setFavorites] = useState<Set<string>>(new Set());
+  const favoriteScope = JSON.stringify([userId, sessionId]);
+  const currentFavoriteScope = useRef(favoriteScope), favoriteRequestGeneration = useRef(0), pendingFavorites = useRef(new Set<string>());
+  const [favoriteState, setFavoriteState] = useState<{ scope: string; ids: Set<string> }>({ scope: "", ids: new Set() });
+  const [favoriteError, setFavoriteError] = useState("");
+  const [favoritePending, setFavoritePending] = useState(new Set<string>());
+  const favorites = favoriteState.scope === favoriteScope ? favoriteState.ids : new Set<string>();
+  useLayoutEffect(() => {
+    currentFavoriteScope.current = favoriteScope;
+    return () => { currentFavoriteScope.current = ""; favoriteRequestGeneration.current += 1; };
+  }, [favoriteScope]);
 
   const handleFavorite = async (e: React.MouseEvent, listingId: string) => {
     e.preventDefault(); e.stopPropagation();
-    if (!isSignedIn) return;
+    const key = `${favoriteScope}:${listingId}`;
+    if (!isSignedIn || !userId || pendingFavorites.current.has(key)) return;
+    pendingFavorites.current.add(key); favoriteRequestGeneration.current += 1;
+    setFavoritePending(previous => new Set(previous).add(key));
     const wasFav = favorites.has(listingId);
-    setFavorites((prev) => {
-      const next = new Set(prev);
-      if (wasFav) next.delete(listingId);
-      else next.add(listingId);
-      return next;
+    const update = (value: boolean) => setFavoriteState(current => {
+      if (currentFavoriteScope.current !== favoriteScope) return current;
+      const ids = new Set(current.scope === favoriteScope ? current.ids : []);
+      if (value) ids.add(listingId); else ids.delete(listingId);
+      return { scope: favoriteScope, ids };
     });
+    update(!wasFav); setFavoriteError("");
     try {
-      await fetch("/api/favorites", {
-        method: "POST", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ listing_id: listingId }),
+      const response = await fetch("/api/favorites", {
+        method: "POST", cache: "no-store", headers: { "Content-Type": "application/json", "X-Favorites-Account": userId }, signal: AbortSignal.timeout(20_000),
+        body: JSON.stringify({ listing_id: listingId, action: wasFav ? "remove" : "add" }),
       });
+      const result = await response.json();
+      if (currentFavoriteScope.current !== favoriteScope) return;
+      if (!response.ok || typeof result.isFavorited !== "boolean") throw new Error();
+      update(result.isFavorited);
     } catch {
-      setFavorites((prev) => {
-        const next = new Set(prev);
-        if (wasFav) next.add(listingId);
-        else next.delete(listingId);
-        return next;
-      });
+      if (currentFavoriteScope.current === favoriteScope) { update(wasFav); setFavoriteError(favoriteScope); }
+    } finally {
+      pendingFavorites.current.delete(key);
+      if (currentFavoriteScope.current === favoriteScope) setFavoritePending(previous => { const next = new Set(previous); next.delete(key); return next; });
     }
   };
 
@@ -143,14 +158,20 @@ export default function TiereContent({ serverListings }: { serverListings: Anima
   }, [visibleIds, isSignedIn]);
 
   useEffect(() => {
-    if (!isSignedIn || !visibleIds) return;
-    const abort = new AbortController();
+    if (!isSignedIn || !userId || !visibleIds) return;
+    const abort = new AbortController(), version = ++favoriteRequestGeneration.current;
+    const current = () => !abort.signal.aborted && currentFavoriteScope.current === favoriteScope && favoriteRequestGeneration.current === version;
     const ids = visibleIds.split(",");
     const batches = Array.from({ length: Math.ceil(ids.length / 24) }, (_, index) => ids.slice(index * 24, index * 24 + 24).join(","));
-    Promise.all(batches.map(ids => fetch(`/api/favorites?ids=${ids}`, { signal: abort.signal }).then(r => r.ok ? r.json() : Promise.reject())))
-      .then(rows => { if (!abort.signal.aborted) setFavorites(new Set(rows.flatMap(row => row.favorited ?? []))); }).catch(() => {});
+    Promise.all(batches.map(ids => fetch(`/api/favorites?ids=${ids}`, { signal: abort.signal, cache: "no-store", headers: { "X-Favorites-Account": userId } }).then(async response => {
+      const data = await response.json();
+      if (!response.ok || !Array.isArray(data.favorited)) throw new Error();
+      return data;
+    }))).then(rows => {
+      if (current()) { setFavoriteState({ scope: favoriteScope, ids: new Set(rows.flatMap(row => row.favorited)) }); setFavoriteError(""); }
+    }).catch(() => { if (current()) setFavoriteError(favoriteScope); });
     return () => abort.abort();
-  }, [visibleIds, isSignedIn]);
+  }, [visibleIds, isSignedIn, userId, favoriteScope]);
 
   const reset = () => { setSearch(""); setSpecies("Alle"); setTraining("Alle"); setDeliveryOnly(false); setPlace(EMPTY_PLACE_FILTERS); };
   const chips = [
@@ -170,6 +191,7 @@ export default function TiereContent({ serverListings }: { serverListings: Anima
       {(deliveryOnly || serverListings.some(row => row.delivery)) && <label className="flex min-h-11 items-center gap-3 text-sm"><input type="checkbox" checked={deliveryOnly} onChange={event => setDeliveryOnly(event.target.checked)} />{animals("delivery")}</label>}
     </MobileBrowseControls>
     <div className="site-container py-6">
+      {favoriteError === favoriteScope && <p role="alert" className="mb-4 text-sm text-text-secondary">{uiText("System.requestFailed")}</p>}
       {filtered.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-20 px-6 text-center">
           <div className="w-16 h-16 bg-bg-secondary border border-border rounded-2xl flex items-center justify-center mb-5">
@@ -205,9 +227,9 @@ export default function TiereContent({ serverListings }: { serverListings: Anima
                     <span className="px-2 py-0.5 bg-success/90 text-white text-[10px] font-semibold rounded-full flex items-center gap-1">{uiText.rich("Ui.text_b1074837744a9d", { part1: () => (<Truck size={9} />) })}</span>
                   )}
                   {isSignedIn && (
-                    <button type="button" onClick={(e) => handleFavorite(e, animal.id)}
-                      className={`w-6 h-6 flex items-center justify-center rounded-full backdrop-blur-sm border transition-all ${favorites.has(animal.id) ? "bg-crimson/20 border-crimson/50 text-crimson-light" : "bg-bg-primary/60 border-border/50 text-text-muted hover:text-crimson-light"}`}>
-                      <Heart size={11} className={favorites.has(animal.id) ? "fill-current" : ""} />
+                    <button type="button" onClick={(e) => handleFavorite(e, animal.id)} disabled={favoritePending.has(`${favoriteScope}:${animal.id}`)} aria-pressed={favorites.has(animal.id)} aria-label={uiText(favorites.has(animal.id) ? "Ui.text_53968e5832d074" : "Ui.text_9203de1d551aa8")}
+                      className={`min-h-11 min-w-11 flex items-center justify-center rounded-full backdrop-blur-sm border transition-all ${favorites.has(animal.id) ? "bg-crimson/20 border-crimson/50 text-crimson-light" : "bg-bg-primary/60 border-border/50 text-text-muted hover:text-crimson-light"}`}>
+                      <Heart size={16} aria-hidden="true" className={favorites.has(animal.id) ? "fill-current" : ""} />
                     </button>
                   )}
                 </div>

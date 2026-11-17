@@ -52,3 +52,13 @@ funktionsfähige Auswahl erzeugt keine Artikel und aktiviert keinen Zeitplan.
 Technik wird erst auswählbar, wenn dafür ein aktueller freigegebener Beitrag im
 gewählten Land vorliegt. Veröffentlichung von Website und Artikeln bleibt vom
 tatsächlichen freigegebenen Stand abhängig.
+
+
+## Homepage paging (17 November 2026)
+
+The homepage requests at most twelve currently approved entries using the same
+country/topic and current-event filters. Three compact existing news rows form
+one horizontal page in `HomeCardRail`; visible position dots and sideward swipes
+reach later pages. The surrounding page retains native vertical scrolling. There
+is no inner vertical news scroller, automatic rotation, invented content or
+infinite loop. The all-news link retains the selected country and topic.

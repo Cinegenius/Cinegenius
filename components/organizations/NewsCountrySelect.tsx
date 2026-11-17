@@ -13,7 +13,7 @@ export default function NewsCountrySelect({value, country, codes, onChange, disa
   const label = (code: string) => code === UNASSIGNED_COUNTRY ? t('unassignedCountry') : countryName(code, locale);
   const hasUnassigned = codes.includes(UNASSIGNED_COUNTRY);
   const available = [...new Set(codes)].filter(code => code && code !== UNASSIGNED_COUNTRY).sort((a, b) => label(a).localeCompare(label(b), locale));
-  return <BrowseSelect label={t('countryLabel')} value={value} onChange={onChange} disabled={disabled} icon={<Globe2 size={17} />} options={[
+  return <BrowseSelect className="w-full" label={t('countryLabel')} value={value} onChange={onChange} disabled={disabled} icon={<Globe2 size={17} />} options={[
     ...(hasUnassigned || value === UNASSIGNED_COUNTRY ? [{value: UNASSIGNED_COUNTRY, label: label(UNASSIGNED_COUNTRY), disabled: !hasUnassigned}] : []),
     {value: 'auto', label: value === 'auto' && country ? t('automaticCountry', {country: label(country)}) : t('automatic')},
     {value: 'all', label: places('allCountries')},

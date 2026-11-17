@@ -8,10 +8,11 @@ import {homeNewsFacets} from '@/lib/news-discovery';
 import {homeNewsTopic} from '@/lib/news-topic-server';
 import {isOrganizationTopic, type OrganizationTopic} from '@/lib/organization-taxonomy';
 import HomeNewsRegion from './HomeNewsRegion';
+import HomeCardRail from '@/components/HomeCardRail';
 
 export default async function HomeOrganizations() {
- const [t, entryT, locale, region] = await Promise.all([
-  getTranslations('OrganizationDiscovery'), getTranslations('Organizations'), getLocale(), newsRegion(),
+ const [t, entryT, newsT, locale, region] = await Promise.all([
+  getTranslations('OrganizationDiscovery'), getTranslations('Organizations'), getTranslations('NewsRegion'), getLocale(), newsRegion(),
  ]);
  const topic = await homeNewsTopic(region.cookieName);
  const selectedTopic = topic.selection === 'all' ? '' : topic.selection;
@@ -20,7 +21,7 @@ export default async function HomeOrganizations() {
  let entries: Awaited<ReturnType<typeof latestOrganizationEntries>> = [], codes: string[] = [], failed = false;
  let topics: OrganizationTopic[] = [];
  try {
-  const results = await Promise.all([organizationDiscovery(1, 6), latestOrganizationEntries(region.country, selectedTopic), homeNewsFacets(region.country, selectedTopic)]);
+  const results = await Promise.all([organizationDiscovery(1, 6), latestOrganizationEntries(region.country, selectedTopic, 12), homeNewsFacets(region.country, selectedTopic)]);
   organizations = results[0].organizations;
   entries = results[1];
   codes = results[2].codes;
@@ -38,8 +39,9 @@ export default async function HomeOrganizations() {
   </div>
   <HomeNewsRegion key={region.cookieName} region={region} codes={codes} topic={topic} topics={topics} empty={!entries.length} failed={failed}/>
   <div className={`grid min-w-0 items-start gap-6 lg:gap-9 ${paired ? 'lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]' : ''}`}>
-   {entries.length > 0 && <div className="min-w-0 space-y-2">
-    {entries.map(entry => {
+   {entries.length > 0 && <HomeCardRail id="home-news-rail" labelledBy="home-industry-title" hint={newsT('railHint')} itemCount={Math.ceil(entries.length / 3)} variant="news">
+    {Array.from({length: Math.ceil(entries.length / 3)}, (_, page) => <div key={page} className="grid min-w-0 content-start gap-2">
+    {entries.slice(page * 3, page * 3 + 3).map(entry => {
      const org = (Array.isArray(entry.organization) ? entry.organization[0] : entry.organization) as unknown as {slug:string;name:string;logo_url:string|null};
      const date = entry.entry_type === 'news' ? entry.created_at : entry.starts_at;
      return <article key={entry.id} className="grid min-w-0 grid-cols-[minmax(0,1fr)_6rem] items-start gap-x-3 rounded-xl border border-border bg-bg-secondary px-3 py-1 sm:grid-cols-[minmax(0,1fr)_8rem] lg:grid-cols-[minmax(0,1fr)_9rem]">
@@ -56,7 +58,8 @@ export default async function HomeOrganizations() {
       </Link>
      </article>;
     })}
-   </div>}
+    </div>)}
+   </HomeCardRail>}
    {organizations.length > 0 && <div className={`min-w-0 ${paired ? 'home-section-divider home-section-divider--organizations' : ''}`}>
     <div className="mb-1 flex min-w-0 flex-wrap items-center justify-between gap-x-3 gap-y-1"><h3 className="font-serif text-lg text-text-primary">{t('organizations')}</h3><Link href="/organizations" className="inline-flex min-h-11 min-w-0 items-center text-xs text-gold hover:text-gold-light"><span className="break-words">{t('allOrganizations')}</span><span className="ml-1" aria-hidden="true">→</span></Link></div>
     <ul className={`grid min-w-0 auto-rows-fr grid-cols-2 gap-2 ${paired ? '' : 'sm:grid-cols-3'}`}>

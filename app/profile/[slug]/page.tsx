@@ -1,6 +1,7 @@
 import { profileAccessFor, filterPublicListings } from "@/lib/profile-privacy-server";
 import { projectProfilePrivacy } from "@/lib/profile-privacy";
 import { profileOccupationPreview } from "@/lib/crew-occupations";
+import { taxonomyLabel } from "@/lib/departments";
 import { getTranslations as getPageTranslations } from "next-intl/server";
 import {getLocale} from "next-intl/server";
 import {placeReadFields} from "@/lib/places/catalog";
@@ -110,8 +111,9 @@ export async function generateMetadata(
   if (!profile || !(await canViewProfile(profile.user_id, userId))) {
     return { title: tMetadata('m_4b7786bc0e50') };
   }
-  const name = profile.display_name ?? (await getMetadataTranslations())("profile.tabProfile");
-  const role = profile.role ?? "";
+  const profileText = await getMetadataTranslations();
+  const name = profile.display_name ?? profileText("profile.tabProfile");
+  const role = profile.role ? taxonomyLabel(profile.role, profileText) : "";
   return {
     title: `${name}${role ? ` — ${role}` : ""} · CineGenius`,
     description: profile.tagline ?? profile.bio ?? pageCopy("p_630f545a7082", { value0: String(name) }),

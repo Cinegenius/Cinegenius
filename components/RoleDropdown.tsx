@@ -6,7 +6,7 @@ import { useState, useRef } from "react";
 import FloatingPanel from "@/components/FloatingPanel";
 import { ChevronDown, Search } from "lucide-react";
 import { gripSearchTerms, normalizeOccupation } from "@/lib/gripTaxonomy";
-import { departments, getDepartmentRoleLabel } from "@/lib/departments";
+import { getDepartmentRoleLabel, getDepartmentRoleSearchTerms, getOccupationSearchTerms, resolveDepartmentOccupation, taxonomyLabel } from "@/lib/departments";
 
 
 export default function RoleDropdown({
@@ -25,8 +25,8 @@ export default function RoleDropdown({
   const locale = useLocale();
   const taxonomyText = useTranslations("Taxonomy");
   const roleLabel = (role: string) => {
-    const department = departments.find(item => item.roles.includes(role));
-    return department ? getDepartmentRoleLabel(department.id, role, locale, animals, taxonomyText) : animalRoleLabel(role, animals);
+    const occupation = resolveDepartmentOccupation(role);
+    return occupation ? getDepartmentRoleLabel(occupation.department.id, occupation.role, locale, animals, taxonomyText) : animalRoleLabel(taxonomyLabel(role, uiText), animals);
   };
 
   const uiText = useTranslations();
@@ -39,9 +39,19 @@ export default function RoleDropdown({
   const triggerRef = useRef<HTMLButtonElement>(null);
 
   const normalizedQuery = normalizeOccupation(query);
-  const filtered = options.filter((option) =>
-    !normalizedQuery || normalizeOccupation([...gripSearchTerms(option), roleLabel(option), ...((role => role ? [role.labelEn, ...role.aliases] : [])(animalOccupation(option)))].join(" ")).includes(normalizedQuery),
-  );
+  const compactQuery = normalizedQuery.replaceAll(" ", "");
+  const filtered = options.filter((option) => {
+    const occupation = resolveDepartmentOccupation(option);
+    const terms = occupation
+      ? getDepartmentRoleSearchTerms(occupation.department, occupation.role, roleLabel(option))
+      : getOccupationSearchTerms(option);
+    const animal = animalOccupation(option);
+    return !normalizedQuery || [...terms, ...gripSearchTerms(option), roleLabel(option), ...(animal ? [animal.labelEn, ...animal.aliases] : [])]
+      .some(term => {
+        const normalized = normalizeOccupation(term);
+        return normalized.includes(normalizedQuery) || normalized.replaceAll(" ", "").includes(compactQuery);
+      });
+  });
 
   return (
     <div className={`relative ${className}`}>

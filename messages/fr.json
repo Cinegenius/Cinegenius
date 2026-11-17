@@ -156,7 +156,7 @@
     "crewCamera": "Caméra",
     "crewCameraDesc": "Chef opérateur, cadreur, assistant caméra",
     "crewLight": "Éclairage",
-    "crewLightDesc": "Chef électricien, assistant",
+    "crewLightDesc": "Gaffer, Best Boy / Best Girl",
     "crewSound": "Son",
     "crewSoundDesc": "Mixeur, perchman, concepteur sonore",
     "crewProduction": "Production",
@@ -760,7 +760,7 @@
     "listingTypeVehicles": "Véhicules",
     "listingTypeCreator": "Créateur / Talent",
     "newProjectPlaceholderDesc": "De quoi parle ce projet ?",
-    "collabRolePlaceholder": "Rôle / fonction (ex. Chef électricien)",
+    "collabRolePlaceholder": "Fonction / intitulé (p. ex. Gaffer)",
     "ageFrom": "de",
     "ageTo": "à",
     "videoLinkPlaceholder": "https://vimeo.com/... ou https://youtube.com/...",
@@ -1655,15 +1655,15 @@
       "tiertraining-film-medien": "Dressage animal pour cinéma et médias"
     },
     "roles": {
-      "tiertrainer": "Dresseur animalier",
-      "filmhundetrainer": "Dresseur de chiens de cinéma",
-      "tierbetreuer": "Soigneur animalier",
-      "tierkoordination": "Coordinateur animalier",
-      "set-tierbetreuung": "Soins animaliers sur plateau",
-      "horse-master": "Maître d’équitation",
-      "assistant-horse-master": "Assistant maître d’équitation",
-      "horse-trainer": "Dresseur de chevaux de cinéma",
-      "horse-wrangler": "Manieur de chevaux"
+      "tiertrainer": "Dresseur animalier de cinéma / Dresseuse animalière de cinéma",
+      "filmhundetrainer": "Dresseur de chiens de cinéma / Dresseuse de chiens de cinéma",
+      "tierbetreuer": "Soigneur animalier / Soigneuse animalière (Animal Handler)",
+      "tierkoordination": "Responsable de la coordination animalière",
+      "set-tierbetreuung": "Responsable des animaux sur le plateau",
+      "horse-master": "Responsable des chevaux (Horse Master)",
+      "assistant-horse-master": "Assistant / Assistante du Horse Master",
+      "horse-trainer": "Dresseur de chevaux de cinéma / Dresseuse de chevaux de cinéma",
+      "horse-wrangler": "Responsable de la conduite des chevaux (Horse Wrangler)"
     },
     "species": {
       "dogs": "Chiens",
@@ -3419,7 +3419,7 @@
     "text_bfdc08cfd677d0": "aucun rôle spécifié",
     "text_d190a2564e3e50": "Confirmé actuellement : <value1></value1>",
     "text_ad102247f94b2b": "Vérifiez ou ajustez le(s) nouveau(x) rôle(s)<part1></part1>",
-    "text_354d5eb293b0a9": "ex. Responsable technique, Chef électricien",
+    "text_354d5eb293b0a9": "p. ex. Responsable technique, Gaffer",
     "text_6b9a27efa8e57d": "Rôle(s), visible(s) publiquement<part1></part1>",
     "text_a9223983e08ec4": "L’invitation n’a pas pu être acceptée.",
     "text_2f897dc4dd787b": "Votre demande pour <value1></value1> a été envoyée. L’entreprise doit encore confirmer votre adhésion.",
@@ -5971,7 +5971,7 @@
         "r_e90f5848bfc3": "Comptabilité production",
         "r_c6dc08a47d0d": "Contrôleur financier film",
         "r_2557c22fb3d7": "Consultant environnement / Responsable durabilité",
-        "r_2a6c1d42831e": "Stagiaire production",
+        "r_2a6c1d42831e": "Stagiaire de production",
         "r_ede69642be01": "Stagiaire chef d’unité plateau",
         "r_de9ab1a6b55a": "Directeur de production",
         "r_fd701e2c1e86": "Chef d’unité production",
@@ -6040,7 +6040,7 @@
         "r_93f52c1c7000": "Réalisateur 2e unité",
         "r_591d7faf8f5d": "Assistant personnel (du réalisateur)",
         "r_c01dd7739f5a": "Assistant coordinateur figurants",
-        "r_f59d6991c44a": "Réalisateur",
+        "r_f59d6991c44a": "Réalisateur / Réalisatrice",
         "r_5562e3abbb45": "Co-réalisateur",
         "r_df7e552a6792": "Réalisateur seconde équipe",
         "r_0aca88b2853d": "Réalisateur studio",
@@ -6145,9 +6145,9 @@
       },
       "licht": {
         "r_222be04dbf00": "Chef électricien",
-        "r_1e210e69039a": "Second électricien",
+        "r_1e210e69039a": "Second électricien / Seconde électricienne (Best Boy / Best Girl Electric)",
         "r_14dd174cd76c": "Chef électricien de montage",
-        "r_92137802b24a": "Second électricien de montage",
+        "r_92137802b24a": "Second électricien / Seconde électricienne de pré-éclairage (Rigging Best Boy / Rigging Best Girl Electric)",
         "r_7fce7d6fcf12": "Électricien de montage",
         "r_1bcf9d8d9b03": "Électricien / technicien éclairage",
         "r_d95b919dded9": "Chef technicien éclairage",
@@ -6167,13 +6167,13 @@
       },
       "grip": {
         "r_470156bd03e4": "Chef machiniste",
-        "r_cfbf2a22ed6e": "Second machiniste / 2e machiniste caméra",
+        "r_cfbf2a22ed6e": "Second machiniste / Seconde machiniste (Best Boy / Best Girl Grip)",
         "r_32a6ab31b1a1": "Machiniste dolly / opérateur dolly",
         "r_376dc1f790b8": "Machiniste",
         "r_dbfaadb8821c": "Assistant machiniste",
         "r_46dab52c1995": "Machiniste de montage",
         "r_ea7e925bd850": "Chef machiniste de montage",
-        "r_fa9d72fc7978": "Second machiniste de montage",
+        "r_fa9d72fc7978": "Second machiniste / Seconde machiniste de préinstallation (Rigging Best Boy / Rigging Best Girl Grip)",
         "r_2fa0b44342d7": "Constructions spéciales machiniste",
         "r_08c07afebb7f": "Opérateur grue caméra / jib",
         "r_5ece318b289f": "Technicien grue caméra",
@@ -6580,7 +6580,7 @@
       },
       "set-logistik": {
         "r_06d9aa28368f": "Coursier",
-        "r_51e581b5ea39": "Conducteur (voiture / camion)",
+        "r_51e581b5ea39": "Chauffeur / Chauffeuse (voiture / poids lourd)",
         "r_36a599628c2e": "Conducteur de plateau",
         "r_9bc1a35535fa": "Responsable unité de plateau",
         "r_273f12c52b95": "Assistant responsable de plateau",
@@ -6643,9 +6643,9 @@
         "r_b85e79c1153f": "Chercheur (général)"
       },
       "cast": {
-        "r_3d0e76b883b1": "Acteur principal",
+        "r_3d0e76b883b1": "Interprète du rôle principal",
         "r_543b99d52c01": "Acteur",
-        "r_aa64ee1fd5d6": "Acteur secondaire",
+        "r_aa64ee1fd5d6": "Interprète d’un second rôle",
         "r_5fea55df03ed": "Figurant",
         "r_912a4dbdd23c": "Figurant principal",
         "r_130f7a137659": "Mannequin",
@@ -6668,7 +6668,7 @@
         "r_901a1b08f6ba": "Coordinateur·rice d’intimité",
         "r_7a721e572105": "Associé·e au casting",
         "r_a1f9ba79ab08": "Assistant·e casting",
-        "r_84927cc7b2bc": "Acteur·rice secondaire",
+        "r_84927cc7b2bc": "Interprète d’un second rôle",
         "r_97144193d2e9": "Figurant·e",
         "r_de130677203b": "Directeur·rice de casting jeunesse",
         "r_27725de30521": "Directeur·rice de casting enfants",
@@ -6901,15 +6901,15 @@
         "r_532adc563b66": "Conducteur restauration / cuisine mobile"
       },
       "filmtiere-tiertraining": {
-        "r_3d8ab6fb2c6a": "Dresseur d’animaux",
-        "r_654c33dc9c6b": "Dresseur de chiens de cinéma",
-        "r_40758f075d18": "Manieur d’animaux",
-        "r_7a1591b96b3a": "Coordinateur animalier",
-        "r_a63695a566c3": "Soigneur animalier sur plateau",
-        "r_9faf951b627e": "Maître d’équitation",
-        "r_7c4f137defec": "Assistant maître d’équitation",
-        "r_8e8f21cf0303": "Dresseur de chevaux",
-        "r_35f9ffa503c4": "Conducteur de chevaux"
+        "r_3d8ab6fb2c6a": "Dresseur animalier de cinéma / Dresseuse animalière de cinéma",
+        "r_654c33dc9c6b": "Dresseur de chiens de cinéma / Dresseuse de chiens de cinéma",
+        "r_40758f075d18": "Soigneur animalier / Soigneuse animalière (Animal Handler)",
+        "r_7a1591b96b3a": "Responsable de la coordination animalière",
+        "r_a63695a566c3": "Responsable des animaux sur le plateau",
+        "r_9faf951b627e": "Responsable des chevaux (Horse Master)",
+        "r_7c4f137defec": "Assistant / Assistante du Horse Master",
+        "r_8e8f21cf0303": "Dresseur de chevaux de cinéma / Dresseuse de chevaux de cinéma",
+        "r_35f9ffa503c4": "Responsable de la conduite des chevaux (Horse Wrangler)"
       }
     },
     "extra": {
@@ -8209,7 +8209,7 @@
     "leadership": "Fondateurs et direction"
   },
   "NewsRegion": {
-    "unassignedCountry": "Aucun pays",
+    "unassignedCountry": "Neutre",
     "countryLabel": "Pays pour les actualités sectorielles",
     "automatic": "Automatique",
     "automaticCountry": "Automatique · {country}",
@@ -8217,7 +8217,8 @@
     "saveError": "Votre sélection n’a pas pu être enregistrée. Veuillez autoriser les cookies de préférence et réessayer.",
     "loadError": "Les articles n’ont pas pu être chargés.",
     "retry": "Réessayer",
-    "allTopics": "Tous les sujets"
+    "allTopics": "Tous les sujets",
+    "railHint": "Balayez sur le côté ou utilisez les points pour voir plus d’actualités. Faites défiler vers le haut ou le bas pour parcourir la page."
   },
   "PrivacySettings": {
     "title": "Confidentialité",
@@ -8438,5 +8439,20 @@
       "desert": "Désert",
       "polar": "Polaire"
     }
+  },
+  "PersonalArea": {
+    "content": "Mes contenus",
+    "activity": "Activité",
+    "profileView": "Voir le profil",
+    "settings": "Paramètres",
+    "editProfile": "Modifier le profil"
+  },
+  "Favorites": {
+    "loadError": "Impossible de charger tes favoris.",
+    "removeError": "Impossible de retirer cet élément. Réessaie.",
+    "filterType": "Filtrer par rubrique",
+    "noMatches": "Tu n’as encore rien enregistré dans cette rubrique.",
+    "signInHint": "Connecte-toi pour voir tes favoris.",
+    "removeItem": "Retirer {name} des favoris"
   }
 }

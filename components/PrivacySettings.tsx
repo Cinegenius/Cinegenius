@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { PRIVACY_AUDIENCES, type PrivacySettings as Settings } from "@/lib/profile-privacy";
 
-export default function PrivacySettings({ accountId }: { accountId: string | null }) {
+export default function PrivacySettings({ accountId, showEmailPreference = true, embedded = false }: { accountId: string | null; showEmailPreference?: boolean; embedded?: boolean }) {
   const t = useTranslations("PrivacySettings");
   const router = useRouter();
   const [loaded, setLoaded] = useState<{account: string; settings: Settings} | null>(null);
@@ -46,8 +46,8 @@ export default function PrivacySettings({ accountId }: { accountId: string | nul
   }
 
   const control = "min-h-11 w-full min-w-0 rounded-lg border border-border bg-bg-primary px-3 text-sm text-text-primary focus:border-gold/60 disabled:opacity-60";
-  return <section className="p-5 rounded-xl border border-border bg-bg-secondary" aria-busy={busy}>
-    <h3 className="font-semibold text-text-primary mb-1">{t("title")}</h3>
+  return <section className={embedded ? "min-w-0" : "p-5 rounded-xl border border-border bg-bg-secondary"} aria-busy={busy}>
+    {!embedded && <h3 className="font-semibold text-text-primary mb-1">{t("title")}</h3>}
     <p className="text-xs text-text-muted mb-4 leading-relaxed">{t("intro")}</p>
     {error && <div role="alert" className="mb-4 text-sm text-text-secondary"><p>{t("error")}</p><button type="button" className="min-h-11 text-gold underline" disabled={busy} onClick={() => setRetry(value => value + 1)}>{t("retry")}</button></div>}
     {!settings ? <p role="status" className="text-sm text-text-muted">{busy ? t("loading") : t("unavailable")}</p> : <>
@@ -71,7 +71,7 @@ export default function PrivacySettings({ accountId }: { accountId: string | nul
       <p className="mt-3 text-xs leading-relaxed text-text-muted">{t("locationHelp")}</p>
       <div className="mt-5 border-t border-border pt-4 space-y-4">
         <label className="block text-xs text-text-muted"><span className="mb-1.5 block">{t("messages")}</span><select className={control} value={settings.message_permission} disabled={busy} onChange={event => void change("message_permission",event.target.value)}><option value="everyone">{t("audience.members")}</option><option value="friends_only">{t("audience.friends")}</option></select></label>
-        <label className="flex min-h-11 items-center justify-between gap-4 text-sm text-text-secondary"><span>{t("email")}</span><span className="flex h-11 w-11 shrink-0 items-center justify-center"><input type="checkbox" className="h-5 w-5 accent-gold" checked={settings.email_new_message} disabled={busy} onChange={event => void change("email_new_message",event.target.checked)} /></span></label>
+        {showEmailPreference && <label className="flex min-h-11 items-center justify-between gap-4 text-sm text-text-secondary"><span>{t("email")}</span><span className="flex h-11 w-11 shrink-0 items-center justify-center"><input type="checkbox" className="h-5 w-5 accent-gold" checked={settings.email_new_message} disabled={busy} onChange={event => void change("email_new_message",event.target.checked)} /></span></label>}
       </div>
       <p role="status" aria-live="polite" className="mt-3 min-h-5 text-xs text-text-muted">{busy ? t("saving") : saved ? t("saved") : ""}</p>
     </>}

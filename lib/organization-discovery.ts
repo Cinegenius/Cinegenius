@@ -27,19 +27,20 @@ export async function organizationDiscovery(page=1,limit=24) {
  if(result.error) throw new Error('organization_discovery_unavailable');
  return {organizations:(result.data??[]).slice(0,limit) as PublicOrganization[],hasMore:(result.data?.length??0)>limit,page};
 }
-export async function latestOrganizationEntries(country = '', topic: OrganizationTopic | '' = '') {
+export async function latestOrganizationEntries(country = '', topic: OrganizationTopic | '' = '', requestedLimit = 3) {
+ const limit = Number.isFinite(requestedLimit) ? Math.min(12, Math.max(1, Math.floor(requestedLimit))) : 3;
  const selectedTopic = isOrganizationTopic(topic) ? topic : '';
  const ids = country ? regionalNews(await newsDiscoveryIndex(), country, true)
-  .filter(row => !selectedTopic || row.topic === selectedTopic).slice(0, 3).map(row => row.id) : null;
+  .filter(row => !selectedTopic || row.topic === selectedTopic).slice(0, limit).map(row => row.id) : null;
  if (ids && !ids.length) return [];
  let query=db.from('organization_entries')
  .select('id,slug,title,summary,entry_type,topic,image_url,starts_at,ends_at,created_at,place_country_code,city,organization:organizations!inner(slug,name,logo_url,moderation_status,place_country_code,region)')
  .eq('moderation_status','approved').eq('organization.moderation_status','approved')
  .or(`entry_type.eq.news,ends_at.gte.${new Date().toISOString()},and(ends_at.is.null,starts_at.gte.${new Date().toISOString()})`)
- .order('created_at',{ascending:false}).order('id').limit(3);
+ .order('created_at',{ascending:false}).order('id').limit(limit);
  if (ids) query = query.in('id', ids);
  if (selectedTopic) query = query.eq('topic', selectedTopic);
  const result = await query;
  if(result.error) throw new Error('organization_entries_unavailable');
- return (result.data??[]).filter(row => (!selectedTopic || row.topic === selectedTopic) && (!country || (newsEntryCountry(row) || UNASSIGNED_COUNTRY) === country));
+ return (result.data??[]).filter(row => (!selectedTopic || row.topic === selectedTopic) && (!country || (newsEntryCountry(row) || UNASSIGNED_COUNTRY) === country)).slice(0, limit);
 }

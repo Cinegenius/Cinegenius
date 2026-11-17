@@ -364,7 +364,7 @@ function PropsInner({ serverListings, serverError = false, facetRows, initialDep
       return { owner, ids };
     });
     try {
-      const response = await fetch("/api/favorites", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ listing_id: id }) });
+      const response = await fetch("/api/favorites", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ listing_id: id, action: previous ? "remove" : "add" }) });
       if (!response.ok) throw new Error("favorite_save_failed");
       const result = await response.json();
       if (typeof result.isFavorited !== "boolean") throw new Error("invalid_favorite_response");

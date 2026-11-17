@@ -12,6 +12,23 @@ export const PROFILE_EDITOR_STEPS = [
 export type ProfileEditorStep = 0 | 1 | 2 | 3 | 4 | 5 | 6;
 export type ProfileEditorErrorField = "activity" | "name" | "city";
 
+/** Keep saved security/notification links usable after moving them out of profile editing. */
+export function profileSettingsHref(tab: string): string | null {
+  return tab === "security" || tab === "notifications" ? `/dashboard?tab=settings&section=${tab}` : null;
+}
+
+/** Existing profile edits recover content without treating section navigation as an edit. */
+export function profileEditorDraftStep(profileExists: boolean, step: ProfileEditorStep): ProfileEditorStep {
+  return profileExists ? 0 : step;
+}
+
+/** Older private drafts may still point at the former final review step. */
+export function profileEditorResumeStep(profileExists: boolean, savedStep: unknown): ProfileEditorStep {
+  const step = Number(savedStep);
+  if (profileExists) return [1, 2, 3, 4, 5].includes(step) ? step as ProfileEditorStep : 0;
+  return [1, 2, 3, 4, 5, 6].includes(step) ? step as ProfileEditorStep : 1;
+}
+
 export function profileEditorAvailabilityConfig(previous: Record<string, unknown>, input: {
   originalTravelReady: boolean;
   travelReady: boolean;
