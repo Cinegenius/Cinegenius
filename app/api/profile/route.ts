@@ -1,3 +1,4 @@
+import { validPronouns } from "@/lib/profile-identity";
 import { placeWriteFields } from "@/lib/places/catalog";
 import { PLACE_COLUMNS } from "@/lib/places/core";
 import { getTranslations } from "next-intl/server";
@@ -35,9 +36,9 @@ const PROFILE_COLS = [
 // not-yet-applied database migration cannot disable the entire profile editor.
 const PROFILE_OPTIONAL_COLS = [
   "profile_types", "physical", "performance", "model_measurements", "casting",
-  "contact_email", "imdb_url",
+  "contact_email", "imdb_url", "pronouns", "show_pronouns",
 ] as const;
-const PROFILE_OPTIONAL_COLUMN_SET = new Set<string>(PROFILE_OPTIONAL_COLS);
+const PROFILE_OPTIONAL_COLUMN_SET = new Set<string>(PROFILE_OPTIONAL_COLS.filter(key => key !== "pronouns" && key !== "show_pronouns"));
 
 const PROFILE_TYPE_VALUES = new Set(Object.keys(PROFILE_TYPE_LABELS));
 function privateNoStoreJson(body: unknown, status = 200) {
@@ -128,12 +129,16 @@ export async function POST(req: NextRequest) {
   const body = await req.json().catch(() => null);
   if (!body) return NextResponse.json({ error: tResponse('System.m_9c5ea1715bd5') }, { status: 400 });
   const {
-    display_name, bio, location, avatar_url, skills, memberships, portfolio_url, positions,
+    display_name, pronouns, show_pronouns, bio, location, avatar_url, skills, memberships, portfolio_url, positions,
     portfolio_images, profile_images, experience, profile_types, profile_type, slug, phone, contact_email,
     available, available_from, travel_ready, availability_config, languages, reel_url, imdb_url, crew,
     cover_image_url, instagram_url, tiktok_url, youtube_url, vimeo_url, linkedin_url, website_url,
     day_rate, filmography, video_links, focal_point, physical, performance, model_measurements, casting,
   } = body;
+
+  if ((pronouns !== undefined && !validPronouns(pronouns)) || (show_pronouns !== undefined && typeof show_pronouns !== "boolean")) {
+    return privateNoStoreJson({ error: tResponse("ProfileIdentity.invalidPronouns") }, 400);
+  }
 
   if (focal_point !== undefined && !validProfileFocalPoint(focal_point)) {
     return NextResponse.json({ error: tResponse('System.m_a9e61c5f5c7e') }, { status: 400 });
@@ -185,6 +190,8 @@ export async function POST(req: NextRequest) {
   const payload: Record<string, unknown> = {
     user_id: userId,
     display_name: display_name.trim(),
+    ...(pronouns !== undefined ? { pronouns: pronouns?.trim() || null } : {}),
+    ...(show_pronouns !== undefined ? { show_pronouns } : {}),
     bio: bio?.trim() ?? "",
     location: location?.trim() ?? "",
     ...place?.fields,
@@ -274,7 +281,7 @@ export async function POST(req: NextRequest) {
 // All known profile columns — any unknown key from the client is silently dropped
 const ALLOWED_PATCH_KEYS = new Set([
   // SECURITY: "role", "verified", "account_type" excluded — set via admin routes only
-  "display_name", "display_name_alias", "slug", "phone", "contact_email", "location", "bio",
+  "display_name", "display_name_alias", "slug", "phone", "contact_email", "location", "bio", "pronouns", "show_pronouns",
   "available", "available_from", "travel_ready",
   "avatar_url", "cover_image_url", "portfolio_url", "website_url",
   "skills", "memberships", "positions", "languages", "portfolio_images", "profile_images", "experience",
@@ -304,6 +311,10 @@ export async function PATCH(req: NextRequest) {
     if (Object.keys(safe).length === 0) {
       return NextResponse.json({ error: tResponse('System.m_f1389f5a0bd3') }, { status: 400 });
     }
+    if (("pronouns" in safe && !validPronouns(safe.pronouns)) || ("show_pronouns" in safe && typeof safe.show_pronouns !== "boolean")) {
+      return privateNoStoreJson({ error: tResponse("ProfileIdentity.invalidPronouns") }, 400);
+    }
+    if (typeof safe.pronouns === "string") safe.pronouns = safe.pronouns.trim() || null;
     if ("focal_point" in safe && !validProfileFocalPoint(safe.focal_point)) {
       return NextResponse.json({ error: tResponse('System.m_a9e61c5f5c7e') }, { status: 400 });
     }

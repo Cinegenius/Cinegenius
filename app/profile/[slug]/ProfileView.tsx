@@ -1,5 +1,6 @@
 "use client";
 
+import ProfilePronouns from "@/components/ProfilePronouns";
 import { profileTraitLabel, profileTravelValue } from "@/lib/profile-trait-labels";
 import { listingPriceLabel } from "@/lib/listing-price";
 import { marketplaceCategoryLabel } from "@/lib/marketplace-offer";
@@ -618,6 +619,7 @@ function ActorProfile({ organizationSection, profile, isOwner, projectCredits, c
                   <h1 className="min-w-0 max-w-full break-words font-display text-4xl sm:text-5xl font-bold text-text-primary leading-tight tracking-tight [overflow-wrap:anywhere]">
                     {profile.display_name ?? uiText("Ui.text_276ffa1fb4f970")}
                   </h1>
+                  <ProfilePronouns profile={profile} />
                   <ProfileRoles positions={roleLabels} /><AdditionalProfileOccupations profile={profile} />
                   {profile.tagline && (
                     <p className="min-w-0 max-w-full break-words text-text-secondary text-sm mt-1 italic [overflow-wrap:anywhere]">
@@ -1037,6 +1039,7 @@ function ModelProfile({ organizationSection, profile, isOwner, projectCredits = 
               </div>
               <div>
                 <h1 className="font-display text-3xl sm:text-4xl font-bold tracking-tight text-text-primary">{profile.display_name ?? uiText("Ui.text_276ffa1fb4f970")}</h1>
+                <ProfilePronouns profile={profile} />
                 <ProfileRoles positions={roleLabels} /><AdditionalProfileOccupations profile={profile} />
                 {profile.location && <p className="mt-3 flex items-center gap-1.5 text-sm text-text-muted"><MapPin size={13} /> {profile.location}</p>}
                 {profile.tagline && <p className="mt-2 text-sm italic text-text-secondary">{cleanProfileBio(profile.tagline)}</p>}
@@ -1302,6 +1305,7 @@ function GenericProfile({ organizationSection, profile, isOwner, projectCredits,
                 {profile.display_name ?? uiText("Ui.text_276ffa1fb4f970")}
                 <span className="block h-0.5 w-12 bg-gold mt-2 rounded-full" />
               </h1>
+              <ProfilePronouns profile={profile} />
               {roleLabels[0] && <p className="mt-2 text-sm sm:text-base font-semibold text-gold break-words">{roleLabels[0]}</p>}
 
             </div>

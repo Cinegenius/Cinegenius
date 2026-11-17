@@ -117,6 +117,7 @@ export default async function DatenschutzPage() {
             <p>{uiText("PrivacySettings.ghostHelp")}</p>
             <p className="mt-2">{uiText("PrivacySettings.locationHelp")}</p>
             <p className="mt-2">{uiText("PrivacySettings.limits")}</p>
+            <p className="mt-2" lang="de">{t("pronounsDisclosure")}</p>
           </section>
 
           <section>

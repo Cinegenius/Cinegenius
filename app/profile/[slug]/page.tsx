@@ -279,7 +279,13 @@ export default async function ProfilePage(
   if (!rawProfile) notFound();
   const privacy = (await profileAccessFor([rawProfile.user_id],userId)).get(rawProfile.user_id);
   if (!privacy?.profile) notFound();
-  const profile = projectProfilePrivacy(rawProfile,privacy);
+  // Display consent is request-scoped: hiding pronouns must take effect even
+  // while ordinary profile content still has a cached version.
+  const identity = await db.from("profiles").select("pronouns, show_pronouns").eq("user_id", rawProfile.user_id).maybeSingle();
+  const profile = projectProfilePrivacy({ ...rawProfile,
+    pronouns: identity.error ? null : identity.data?.pronouns ?? null,
+    show_pronouns: !identity.error && identity.data?.show_pronouns === true,
+  },privacy);
 
   const isOwner = userId === profile.user_id;
   if (!isOwner && !(await canViewProfile(profile.user_id, userId))) notFound();

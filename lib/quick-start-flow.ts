@@ -317,7 +317,7 @@ export function findQuickStartRoles(query: string, limit = 18, departmentIds?: r
   return roleRecords
     .filter((item) => !allowed || allowed.has(item.departmentId))
     .map((item) => {
-      const terms = termsFor(item, displayLabel).map(normalizeOccupation);
+      const terms = termsFor(item, displayLabel).map(normalizeOccupation).filter(Boolean);
       const exact = terms.some((term) => term === needle);
       const starts = terms.some((term) => term.startsWith(needle));
       const matches = (cateringDepartmentSearch && item.departmentId === CATERING_COMPANY_CATEGORY.id)

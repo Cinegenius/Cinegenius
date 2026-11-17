@@ -408,6 +408,8 @@ export interface UserProfile {
   // Identität
   user_id: string;
   display_name: string | null;
+  pronouns?: string | null;
+  show_pronouns?: boolean;
   first_name?: string | null;
   last_name?: string | null;
   stage_name?: string | null;

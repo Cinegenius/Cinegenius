@@ -3,17 +3,18 @@ import { COUNTRY_CODES } from './countries';
 export type Place = { countryCode: string; regionId: string | null; cityId: string | null; city: string; region: string; status: 'verified' | 'pending' | 'empty' };
 export const PLACE_COLUMNS = 'place_country_code,place_region_id,place_city_id,place_city_name,place_region_name,place_status';
 export function placeKey(value: string) { return value.normalize('NFKD').replace(/\p{M}/gu,'').toLowerCase().replace(/ß/g,'ss').replace(/[^\p{L}\p{N}]/gu,''); }
-export function countryName(code: string, locale = 'de') { return new Intl.DisplayNames([locale], {type:'region'}).of(code) ?? code; }
+const countryLabelers = new Map<string, Intl.DisplayNames>(SUPPORTED_LOCALES.map(locale => [locale, new Intl.DisplayNames([locale], {type:'region'})]));
+export function countryName(code: string, locale = 'de') { return (countryLabelers.get(locale) ?? new Intl.DisplayNames([locale], {type:'region'})).of(code) ?? code; }
 const countryAliases = new Map<string,string>();
 for (const code of COUNTRY_CODES) { countryAliases.set(placeKey(code),code); for (const locale of SUPPORTED_LOCALES) countryAliases.set(placeKey(countryName(code,locale)),code); }
 export function countryCode(value: string) { return countryAliases.get(placeKey(value)) ?? ''; }
 const names: Record<string,Record<string,string>> = {
- 'geonames:2886242': {de:'Köln',en:'Cologne',es:'Colonia',it:'Colonia',cs:'Kolín nad Rýnem',hu:'Köln',nl:'Keulen','nl-BE':'Keulen',sv:'Köln'},
- 'geonames:2925533': {de:'Frankfurt am Main',en:'Frankfurt am Main',es:'Fráncfort del Meno',it:'Francoforte sul Meno',cs:'Frankfurt nad Mohanem',hu:'Frankfurt am Main',nl:'Frankfurt am Main','nl-BE':'Frankfurt am Main',sv:'Frankfurt am Main'},
- 'geonames:2867714': {de:'München',en:'Munich',es:'Múnich',it:'Monaco di Baviera',cs:'Mnichov',hu:'München',nl:'München','nl-BE':'München',sv:'München'},
- 'geonames:2761369': {de:'Wien',en:'Vienna',es:'Viena',it:'Vienna',cs:'Vídeň',hu:'Bécs',nl:'Wenen','nl-BE':'Wenen',sv:'Wien'},
- 'geonames:3067696': {de:'Prag',en:'Prague',es:'Praga',it:'Praga',cs:'Praha',hu:'Prága',nl:'Praag','nl-BE':'Praag',sv:'Prag'},
- 'geonames:2657896': {de:'Zürich',en:'Zurich',es:'Zúrich',it:'Zurigo',cs:'Curych',hu:'Zürich',nl:'Zürich','nl-BE':'Zürich',sv:'Zürich'},
+ 'geonames:2886242': {de:'Köln',en:'Cologne',es:'Colonia',it:'Colonia',cs:'Kolín nad Rýnem',hu:'Köln',nl:'Keulen','nl-BE':'Keulen',sv:'Köln',fr:'Cologne',pl:'Kolonia','pt-PT':'Colónia','zh-Hans':'科隆',ja:'ケルン',ko:'쾰른',ru:'Кёльн',uk:'Кельн'},
+ 'geonames:2925533': {de:'Frankfurt am Main',en:'Frankfurt am Main',es:'Fráncfort del Meno',it:'Francoforte sul Meno',cs:'Frankfurt nad Mohanem',hu:'Frankfurt am Main',nl:'Frankfurt am Main','nl-BE':'Frankfurt am Main',sv:'Frankfurt am Main',fr:'Francfort-sur-le-Main',pl:'Frankfurt nad Menem','pt-PT':'Frankfurt am Main','zh-Hans':'美因河畔法兰克福',ja:'フランクフルト・アム・マイン',ko:'프랑크푸르트암마인',ru:'Франкфурт-на-Майне',uk:'Франкфурт-на-Майні'},
+ 'geonames:2867714': {de:'München',en:'Munich',es:'Múnich',it:'Monaco di Baviera',cs:'Mnichov',hu:'München',nl:'München','nl-BE':'München',sv:'München',fr:'Munich',pl:'Monachium','pt-PT':'Munique','zh-Hans':'慕尼黑',ja:'ミュンヘン',ko:'뮌헨',ru:'Мюнхен',uk:'Мюнхен'},
+ 'geonames:2761369': {de:'Wien',en:'Vienna',es:'Viena',it:'Vienna',cs:'Vídeň',hu:'Bécs',nl:'Wenen','nl-BE':'Wenen',sv:'Wien',fr:'Vienne',pl:'Wiedeń','pt-PT':'Viena','zh-Hans':'维也纳',ja:'ウィーン',ko:'빈',ru:'Вена',uk:'Відень'},
+ 'geonames:3067696': {de:'Prag',en:'Prague',es:'Praga',it:'Praga',cs:'Praha',hu:'Prága',nl:'Praag','nl-BE':'Praag',sv:'Prag',fr:'Prague',pl:'Praga','pt-PT':'Praga','zh-Hans':'布拉格',ja:'プラハ',ko:'프라하',ru:'Прага',uk:'Прага'},
+ 'geonames:2657896': {de:'Zürich',en:'Zurich',es:'Zúrich',it:'Zurigo',cs:'Curych',hu:'Zürich',nl:'Zürich','nl-BE':'Zürich',sv:'Zürich',fr:'Zurich',pl:'Zurych','pt-PT':'Zurique','zh-Hans':'苏黎世',ja:'チューリッヒ',ko:'취리히',ru:'Цюрих',uk:'Цюрих'},
 };
 
 /** Reviewed variant labels shared unchanged by the catalogue and search. */

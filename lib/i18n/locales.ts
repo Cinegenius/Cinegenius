@@ -1,4 +1,4 @@
-export const SUPPORTED_LOCALES = ['de', 'en', 'es', 'it', 'cs', 'hu', 'nl', 'nl-BE', 'sv'] as const;
+export const SUPPORTED_LOCALES = ['de', 'en', 'es', 'it', 'cs', 'hu', 'nl', 'nl-BE', 'sv', 'fr', 'pl', 'pt-PT', 'zh-Hans', 'ja', 'ko', 'ru', 'uk'] as const;
 export type AppLocale = typeof SUPPORTED_LOCALES[number];
 export const DEFAULT_LOCALE: AppLocale = 'de';
 export const LANGUAGE_OPTIONS: readonly {code: AppLocale; label: string; flag: string}[] = [
@@ -8,6 +8,10 @@ export const LANGUAGE_OPTIONS: readonly {code: AppLocale; label: string; flag: s
   {code:'nl',label:'Nederlands',flag:'🇳🇱'},
   {code:'nl-BE',label:'Nederlands (België)',flag:'🇧🇪'},
   {code:'sv',label:'Svenska',flag:'🇸🇪'},
+  {code:'fr',label:'Français',flag:'🇫🇷'}, {code:'pl',label:'Polski',flag:'🇵🇱'},
+  {code:'pt-PT',label:'Português (Portugal)',flag:'🇵🇹'}, {code:'zh-Hans',label:'简体中文',flag:'🇨🇳'},
+  {code:'ja',label:'日本語',flag:'🇯🇵'}, {code:'ko',label:'한국어',flag:'🇰🇷'},
+  {code:'ru',label:'Русский',flag:'🇷🇺'}, {code:'uk',label:'Українська',flag:'🇺🇦'},
 ];
 export function isAppLocale(value: unknown): value is AppLocale {
   return typeof value === 'string' && (SUPPORTED_LOCALES as readonly string[]).includes(value);
@@ -16,6 +20,8 @@ export function isAppLocale(value: unknown): value is AppLocale {
 export function appLocale(value: unknown): AppLocale | undefined {
   if (typeof value !== 'string') return undefined;
   const tag = value.trim().replace(/_/g, '-').toLowerCase();
+  if (tag === 'pt' || tag.startsWith('pt-')) return 'pt-PT';
+  if (tag === 'zh' || tag === 'zh-cn' || tag === 'zh-sg' || tag === 'zh-hans' || tag.startsWith('zh-hans-')) return 'zh-Hans';
   return SUPPORTED_LOCALES.find(locale => locale.toLowerCase() === tag)
     ?? SUPPORTED_LOCALES.find(locale => locale === tag.split('-')[0]);
 }
@@ -32,6 +38,6 @@ export function resolveLocale(saved: unknown, acceptLanguage = '', requestCountr
     .sort((a, b) => b.quality - a.quality || a.index - b.index);
   // A coarse country is only a last resort. Residence must never override an
   // explicit choice or a supported browser language (including multilingual countries).
-  const countryFallback: Record<string, AppLocale> = {DE:'de',AT:'de',IT:'it',ES:'es',CZ:'cs',HU:'hu',NL:'nl',SE:'sv',GB:'en',IE:'en',US:'en',AU:'en',NZ:'en'};
+  const countryFallback: Record<string, AppLocale> = {DE:'de',AT:'de',IT:'it',ES:'es',CZ:'cs',HU:'hu',NL:'nl',SE:'sv',GB:'en',IE:'en',US:'en',AU:'en',NZ:'en',FR:'fr',PL:'pl',PT:'pt-PT',CN:'zh-Hans',JP:'ja',KR:'ko',RU:'ru',UA:'uk'};
   return preferred[0]?.locale ?? countryFallback[requestCountry.toUpperCase()] ?? DEFAULT_LOCALE;
 }

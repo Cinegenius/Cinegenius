@@ -1,7 +1,7 @@
 import { Playfair_Display, DM_Sans, JetBrains_Mono } from "next/font/google";
 import { ClerkProvider } from "@clerk/nextjs";
 import { auth } from "@clerk/nextjs/server";
-import { deDE, enUS, esES, csCZ, huHU, itIT, nlNL, nlBE, svSE } from "@clerk/localizations";
+import { deDE, enUS, esES, csCZ, huHU, itIT, nlNL, nlBE, svSE, frFR, plPL, ptPT, zhCN, jaJP, koKR, ruRU, ukUA } from "@clerk/localizations";
 import AppIntlProvider from "@/components/AppIntlProvider";
 import { getLocale, getMessages, getNow, getTimeZone } from "next-intl/server";
 import { clientMessages } from "@/lib/i18n/client-messages";
@@ -67,7 +67,7 @@ export async function generateMetadata(): Promise<import("next").Metadata> {
   creator: "CineGenius",
   openGraph: {
     type: "website",
-    locale: ({de: "de_DE", en: "en_US", es: "es_ES", it: "it_IT", cs: "cs_CZ", hu: "hu_HU", nl: "nl_NL", "nl-BE": "nl_BE", sv: "sv_SE"} as Record<string, string>)[locale] ?? "de_DE",
+    locale: ({de: "de_DE", en: "en_US", es: "es_ES", it: "it_IT", cs: "cs_CZ", hu: "hu_HU", nl: "nl_NL", "nl-BE": "nl_BE", sv: "sv_SE", fr: "fr_FR", pl: "pl_PL", "pt-PT": "pt_PT", "zh-Hans": "zh_CN", ja: "ja_JP", ko: "ko_KR", ru: "ru_RU", uk: "uk_UA"} as Record<string, string>)[locale] ?? "de_DE",
     siteName: "CineGenius",
     title: tMetadata('m_4cae16b2a04c'),
     description:
@@ -103,11 +103,11 @@ const CLERK_LOCALIZATIONS: Record<string, typeof deDE> = {
   it: itIT,
   nl: nlNL,
   "nl-BE": nlBE,
-  sv: svSE,
+  sv: svSE, fr: frFR, pl: plPL, "pt-PT": ptPT, "zh-Hans": zhCN, ja: jaJP, ko: koKR, ru: ruRU, uk: ukUA,
 };
 
 const HTML_LANG: Record<string, string> = {
-  de: "de", en: "en", es: "es", cs: "cs", hu: "hu", it: "it", nl: "nl", "nl-BE": "nl-BE", sv: "sv",
+  de: "de", en: "en", es: "es", cs: "cs", hu: "hu", it: "it", nl: "nl", "nl-BE": "nl-BE", sv: "sv", fr: "fr", pl: "pl", "pt-PT": "pt-PT", "zh-Hans": "zh-Hans", ja: "ja", ko: "ko", ru: "ru", uk: "uk",
 };
 
 export default async function RootLayout({

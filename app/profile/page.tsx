@@ -39,6 +39,7 @@ import RoleDropdown from "@/components/RoleDropdown";
 import { calculateProfileCompletion } from "@/lib/profile-completion";
 import { prepareProfileMediaFile, sendProfileMediaFile, PROFILE_MEDIA_ACCEPT, PROFILE_MEDIA_MAX_BYTES, PROFILE_MEDIA_SOURCE_MAX_BYTES } from "@/lib/profile-media-client";
 import { publishProfileUpdated } from "@/lib/profile-update-events";
+import ProfileIdentityFields from "@/components/ProfileIdentityFields";
 import { isAvatarUploadAssociated } from "@/lib/profile-avatar-persistence";
 import { validateProfileSave, type ProfileSaveFieldErrors } from "@/lib/profile-save-validation";
 import { PROFILE_EDITOR_STEPS, profileEditorAvailabilityConfig, profileEditorRequiredMissing, profileEditorStepForErrors, profileEditorStepForHint, shouldResumeProfileEditorDraft, type ProfileEditorStep } from "@/lib/profile-editor-flow";
@@ -628,6 +629,8 @@ export default function ProfilePage() {
     slug: "",
     phone: "",
     contactEmail: "",
+    pronouns: "",
+    showPronouns: false,
   });
   const [skills, setSkills] = useState<string[]>([]);
   const [newSkill, setNewSkill] = useState("");
@@ -819,6 +822,8 @@ export default function ProfilePage() {
           availabilityConfigRef.current = profile.availability_config && typeof profile.availability_config === "object" && !Array.isArray(profile.availability_config) ? { ...profile.availability_config } : {};
           originalTravelReadyRef.current = profile.travel_ready ?? false;
           setForm({
+            pronouns: profile.pronouns ?? "",
+            showPronouns: profile.show_pronouns === true,
             name:          profile.display_name        ?? "",
             city:          placeInputValue(profile, profile.location ?? ""),
             country:       "",
@@ -1186,6 +1191,8 @@ export default function ProfilePage() {
       const performance = Object.values(performanceValues).some(hasOptionalValue) ? performanceValues : null;
       const commonPayload = {
         display_name:   form.name,
+        pronouns: (form.pronouns ?? "").trim() || null,
+        show_pronouns: form.showPronouns ?? false,
         avatar_url:     avatarUrl || null,
         location,
         selected_place_city_id: form.selected_place_city_id || undefined,
@@ -1763,6 +1770,7 @@ export default function ProfilePage() {
                   <GenieWritingAssistant area="profile" value={form.bio ?? ""} onApply={(text) => setForm((current) => ({ ...current, bio: text }))} maxLength={500} contextKey={`profile:${user?.id ?? "pending"}:bio`} disabled={saving} />
                   <p className="mt-1 text-right text-xs text-text-muted">{(form.bio ?? "").length} / 500</p>
                 </div>
+                <ProfileIdentityFields value={form.pronouns ?? ""} visible={form.showPronouns ?? false} onChange={(pronouns, showPronouns) => setForm(current => ({ ...current, pronouns, showPronouns }))} />
                 {/* Avatar */}
                 <div className="p-4 sm:p-6 bg-bg-secondary border border-border rounded-xl">
                   <h2 className="font-semibold text-text-primary mb-5">{t("sectionAvatar")} <span className="text-xs font-normal text-text-muted">({optionalMedia("optional")})</span></h2>
@@ -1902,7 +1910,7 @@ export default function ProfilePage() {
                   )}
                 </div>
 
-                {/* Cover Image — only for crew/creative/vendor; talent uses profile_images as hero */}
+                {/* Crew/creative/vendor cover; talent keeps its existing profile-photo hero. */}
                 {!showTalentSections && <div className="p-4 sm:p-6 bg-bg-secondary border border-border rounded-xl">
                   <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                     <div>

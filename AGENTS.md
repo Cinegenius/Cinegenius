@@ -34,13 +34,13 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 
 ## Mandatory localization for all changes
 
-- Use the existing next-intl catalogs in `messages/{de,en,es,it,cs,hu,nl,nl-BE,sv}.json` for all new or changed interface and system copy: pages, buttons, accessible labels, validation, errors, statuses, categories, notifications, and application-generated email. Update every supported language in the same change. Never add a parallel translation system or hard-coded German UI copy.
+- Use the existing next-intl catalogs in `messages/{de,en,es,it,cs,hu,nl,nl-BE,sv,fr,pl,pt-PT,zh-Hans,ja,ko,ru,uk}.json` for all new or changed interface and system copy: pages, buttons, accessible labels, validation, errors, statuses, categories, notifications, and application-generated email. Update every supported language in the same change. Never add a parallel translation system or hard-coded German UI copy.
 - A feature is not complete until its strings, interpolation placeholders, and layout have been checked in all supported locales. Run `npm run check:i18n` before release; it also runs during production builds and deployment. Do not expand `scripts/i18n-legacy-texts.json` to admit new hard-coded text. That file is a frozen inventory of existing localization debt; remove entries as those surfaces are translated.
 - Preserve stable department, occupation, category, and offer IDs. Translate display labels only and reuse the same taxonomy in setup, editing, filters, and public views. Never translate or overwrite personal messages, member-written descriptions, names, or company names automatically.
 - Legal documents need reviewed language versions. Until available, explicitly show that the original German legal text is authoritative; do not publish machine translations as approved legal documents.
 - The manual locale cookie takes priority over browser preferences, persists across authentication, and must not be removed on logout. Use the shared locale resolver for both next-intl and Clerk. Switch with a server-component refresh, never a hard page reload or a locale-keyed form remount. Preserve unsaved fields and ongoing uploads.
 - Load only the requested language bundle, merged with the defined default fallback, on the server. Do not fetch all language catalogs on navigation or add external translation requests per page. Format dates and numbers with the active locale without currency conversion.
-- All nine supported locales have complete catalogs and verified critical language flows. Maintain that coverage across public/browse pages, authentication entry forms, profile editing, canonical place filters, taxonomies and generated system copy. If later work introduces partial coverage, disclose it until its legacy UI, system copy, taxonomies and critical flows are verified. Never claim full coverage from catalog key parity alone.
+- Maintain complete catalogs and verified critical language flows for all seventeen supported locales across public/browse pages, authentication entry forms, profile editing, canonical place filters, taxonomies and generated system copy. If later work introduces partial coverage, disclose it until its legacy UI, system copy, taxonomies and critical flows are verified. Never claim full coverage from catalog key parity alone; distinguish native-only bundles and third-party-owned templates from the website catalogs.
 
 ## Media origin and confidentiality
 
@@ -162,3 +162,16 @@ Crew result row correction, 14 November 2026: Keep the compact count, Crew, Loca
   automatische Rechteausweitung noch Selbstfreigabe neuer Artikel. Agenten und
   Zeitpläne nur nach bestätigter Einrichtung als aktiv melden; eine Anleitung oder
   Übergabedatei allein aktiviert nichts. Der Website-Prüfagent bleibt deaktiviert.
+
+## Profile identity and expanded languages (operator decision, 16 November 2026)
+
+- User-approved target languages: existing de/en/es/it/cs/hu/nl/nl-BE/sv plus fr/pl/pt-PT/zh-Hans/ja/ko/ru/uk. All new and changed interface, validation, accessibility, system and generated email copy must cover every enabled language, with the same target for the native app. Do not declare a new locale complete or enable it with copied fallback text. Preserve locale choice, drafts, authentication and stable taxonomy IDs. Keep member-written content unchanged. Legal language versions require review; retain the clearly labeled authoritative German original until reviewed versions exist.
+- Use gender-neutral display labels without gender asterisks or colons, preserving precise professional meaning and existing stored roles/search aliases. Optional pronouns default to empty, have an explicit display choice, remain editable/removable and are never inferred or used for search/ranking.
+- Provide twelve optional profile avatars: four masculine, four feminine and four neutral. Every choice is available to every member; never derive gender or pronouns from a choice. Preserve existing photographs and protected-media permissions.
+- Markus confirms an existing OpenAI key and explicitly authorizes reusing it for the one-time catalog translations after being informed that API usage can incur additional costs. Prefer that existing credential for authorized API work; never expose it or treat its presence as unlimited spending authorization. Translation outputs are bundled locally; no per-page translation requests. Lack of a locally usable credential is not permission to expose production secrets or bypass access controls.
+
+## Profile identity and language expansion (operator update, 17 November 2026)
+
+- Neutralize occupation display labels while preserving canonical role/department IDs and legacy search aliases. Optional self-described pronouns are private by default, displayed only after explicit consent and current profile visibility checks. Never infer gender/pronouns or use them for ranking, filtering or mandatory completion. Keep consent fresh outside shared profile caches.
+- Approved additional locales: fr, pl, pt-PT, zh-Hans, ja, ko, ru, uk. Update all supported catalogs, locale resolution, Clerk, Genie and generated mail together, with legal originals identified. Incomplete draft catalogs are not enabled in production. Check the full critical language flow, not only key parity.
+- Avatar and cover presets are deferred by Markus. Show twenty paired style previews for selection; do not publish any preset picker or replace existing user uploads. This supersedes earlier avatar/cover draft approvals. See docs/profile-identity-languages.md.
