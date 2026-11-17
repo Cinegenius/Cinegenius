@@ -13,7 +13,8 @@ const allowed=['fr','pl','pt-PT','zh-Hans','ja','ko','ru','uk'];
 let locales=[...allowed];
 try { const plan=JSON.parse(await readFile('scripts/localization/pending-locales.json','utf8')); if(!Array.isArray(plan)||!plan.length||plan.some(locale=>!allowed.includes(locale)))throw new Error('Invalid preparation locale plan'); locales=[...new Set(plan)]; } catch(error) { if(error.code!=='ENOENT')throw error; }
 const statuses=[];
-// Four bounded workers; no key/response body is ever written to a report.
+// Eight independent locales, bounded below the host build timeout.
+// Only valid fragments already persisted by the worker are kept on interruption.
 async function worker(){
  while(locales.length){
   const locale=locales.shift();
@@ -21,12 +22,13 @@ async function worker(){
    const child=spawn(process.execPath,['scripts/localization/translate-catalogs.mjs',locale],{
     env:{...process.env,CG_TRANSLATION_OUTPUT:output,CG_TRANSLATION_MAX_REQUESTS:'180'},stdio:'inherit',
    });
-   child.on('error',()=>resolveExit(1));child.on('exit',code=>resolveExit(code??1));
+   const timer=setTimeout(()=>child.kill('SIGTERM'),26*60*1000);
+   child.on('error',()=>{clearTimeout(timer);resolveExit(1);});child.on('exit',code=>{clearTimeout(timer);resolveExit(code??1);});
   });
   statuses.push({locale,complete:code===0});
   await writeFile(output+'/status.json',JSON.stringify({statuses,activated:false},null,2));
  }
 }
-await Promise.all([worker(),worker(),worker(),worker()]);
+await Promise.all(Array.from({length:Math.min(8,locales.length)},()=>worker()));
 // A failed batch retains its completed progress for review and bounded resumption.
 // These files are never imported by the application's enabled locale resolver.
