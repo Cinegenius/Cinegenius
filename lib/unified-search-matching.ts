@@ -4,7 +4,7 @@ import { placeCandidatesForLabel, placeReadFields } from "./places/catalog";
 import { countryCode, placeKey, placeCitySearchAliases } from "./places/core";
 import { publicMapPoint } from "./places/public-map-point";
 import { withinCrewRadius } from "./genie-search";
-import { DEPARTMENTS as marketplaceDepartments, deptValues, groupValues, marketplaceCategory, SEARCH_SYNONYMS } from "./marketplaceCategories";
+import { DEPARTMENTS as marketplaceDepartments, deptValues, groupValues, marketplaceCategory, marketplaceConceptGroups, SEARCH_SYNONYMS } from "./marketplaceCategories";
 import continents from "./places/continents.json" with { type: "json" };
 import type { SearchPlace, SearchWish } from "./unified-search";
 import { isWholeAreaQuery } from "./unified-search-areas";
@@ -97,11 +97,12 @@ export function wishMarketplaceCategories(query: string, t: (key: string) => str
     const group = marketplaceDepartments.find(dept => dept.id === service.department)?.groups.find(group => group.id === service.subcategory);
     if (group) values.push(...groupValues(group));
   }
-  // A broad costume request includes the current clothing group. A particular
-  // hat, camera brand or vehicle must not expand to every sibling in its group.
-  if (["kostum", "kostuem", "costume"].includes(key)) {
-    const clothing = marketplaceDepartments.find(dept => dept.id === "kostuem")?.groups.find(group => group.id === "kostuem-kleidung");
-    if (clothing) values.push(...groupValues(clothing));
+  // Reuse broad object concepts from ordinary marketplace search. Lamps need
+  // current light-source IDs; costumes include hats and other accessories.
+  // Specific objects (e.g. a hat or motorcycle) keep their narrow aliases.
+  for (const groupId of marketplaceConceptGroups(query)) {
+    const group = marketplaceDepartments.flatMap(dept => dept.groups).find(group => group.id === groupId);
+    if (group) values.push(...groupValues(group));
   }
   for (const department of marketplaceDepartments) {
     if ([department.id, department.label, t(`categories.${department.id}`)].some(label => searchKey(label) === key)) values.push(...deptValues(department));
