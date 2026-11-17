@@ -2,6 +2,7 @@ import Image from "@/components/MediaImage";
 import PageHeader from "@/components/PageHeader";
 import DirectoryPage from "@/components/DirectoryPage";
 import { newsRegion } from '@/lib/news-region-server';
+import { homeNewsTopic } from '@/lib/news-topic-server';
 import { approvedEntries,newsFacetRows } from "@/lib/organization-data";
 import { isOrganizationEntryType,isOrganizationTopic } from "@/lib/organization-taxonomy";
 import { getLocale,getNow,getTranslations } from "next-intl/server";
@@ -20,19 +21,21 @@ export default async function NewsPage({ searchParams }: { searchParams: Promise
   const dates = new Intl.DateTimeFormat(locale, { dateStyle: "medium", timeStyle: "short", timeZone: "Europe/Berlin" });
   const params = await searchParams;
   const region = await newsRegion(params.country || (params.geo === 'off' ? 'all' : undefined));
+  const topic = await homeNewsTopic(region.cookieName, params.topic);
   const filters = { country: region.selection, type: isOrganizationEntryType(params.type) ? params.type : undefined,
-    topic: isOrganizationTopic(params.topic) ? params.topic : undefined, q: params.q?.trim().slice(0, 120) || "" };
+    topic: isOrganizationTopic(topic.selection) ? topic.selection : undefined, q: params.q?.trim().slice(0, 120) || "" };
   const [{ entries: filtered, hasMore, page, count }, facets] = await Promise.all([approvedEntries({ ...filters, country: region.country, page: Number(params.page) || 1 }), newsFacetRows()]);
   const href = (change: { type?: string; topic?: string; page?: number; country?: string; geo?: string } = {}) => {
     const values = { ...filters, ...change };
     const query = new URLSearchParams();
     for (const [key, value] of Object.entries(values)) if (value) query.set(key, String(value));
+    query.set('topic', values.topic || 'all');
     return `/news?${query}`;
   };
 
   return <DirectoryPage area="news"><main className="min-h-screen">
     <PageHeader withBackdrop={false} badge={t("eyebrow")} title={t("newsTitleLead")} titleHighlight={t("newsTitleHighlight")} description={t("newsDescription")} />
-    <NewsBrowseControls key={`${filters.q}:${filters.type}:${filters.topic}:${filters.country}:${region.country}`} filters={filters} facets={facets} count={count} region={region} />
+    <NewsBrowseControls key={`${region.cookieName}:${filters.q}:${filters.type}:${filters.topic}:${filters.country}:${region.country}`} filters={filters} facets={facets} count={count} region={region} topicCookieName={topic.cookieName} />
     <section className="site-container py-5 pb-28 sm:py-7 sm:pb-28 xl:pb-10">
       <div className="mb-5 flex flex-wrap items-center justify-between gap-x-5 gap-y-1 text-sm">
         <Link href="/organizations" className="inline-flex min-h-11 items-center text-gold">{discoveryT("allOrganizations")} →</Link>

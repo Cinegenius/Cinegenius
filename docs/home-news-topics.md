@@ -13,7 +13,7 @@ Organisationen gezeigt, keine Vorschau-Beispiele oder privaten Artikelentwürfe.
   aktuelle Beiträge zum gewählten Thema. Abgelaufene Termine, verborgene und
   beendete Beiträge erzeugen keine Startseitenoptionen.
 - `latestOrganizationEntries(country, topic)` filtert **vor** der Begrenzung auf
-  drei Beiträge. Nach dem Indexlesen werden beide Freigaben beim Inhaltsabruf
+  zwölf Beiträge (je drei pro Rail-Seite). Nach dem Indexlesen werden beide Freigaben beim Inhaltsabruf
   erneut geprüft; es gibt keinen requestübergreifenden Berechtigungscache.
 - „Alle Beiträge ansehen“ übernimmt Land und Thema in `/news?country=…&topic=…`.
 - Die gemeinsame Länderwahl auf Startseite und Newsseite zeigt `unassigned`
@@ -37,10 +37,11 @@ Organisationen gezeigt, keine Vorschau-Beispiele oder privaten Artikelentwürfe.
 Die native App kann dieselben stabilen Themen sowie die vorhandene News-Abfrage
 verwenden. HTML-Cookies sind keine neue native Schnittstelle. Native Einstellungen
 müssen ebenfalls kontogebunden bleiben; echte Geräteprüfungen separat durchführen.
-Die neun vorhandenen Sprachkataloge enthalten die neue Auswahlbeschriftung.
+Die 17 vorhandenen Sprachkataloge enthalten die Auswahlbeschriftungen.
 
-Diese Änderung führt keine automatisch aus dem Beruf abgeleitete Sortierung ein.
-Die Themenwahl bleibt ausdrücklich manuell; „Alle Themen“ ist der Ausgangspunkt.
+Seit dem Auftrag vom 17. November 2026 wird ohne eigene Themenwahl für technische
+Berufsprofile `technology` vorausgewählt, sowohl auf der Startseite als auch beim
+direkten Öffnen von `/news`. Siehe die Regeln unten.
 Hersteller-Herkunft und internationale Zielgruppe sind unterschiedliche Angaben:
 der bestehende Länderresolver bleibt unverändert. Ein ungeklärtes Zielland darf
 vom Redaktionsagenten nicht als weltweite Eignung oder erfundenes Land gespeichert
@@ -49,9 +50,44 @@ abgestimmte Erweiterung des Redaktionsmodells.
 
 Agentenauftrag: [AG DOK – Technik-News](agents/technology-news.md). Eine
 funktionsfähige Auswahl erzeugt keine Artikel und aktiviert keinen Zeitplan.
-Technik wird erst auswählbar, wenn dafür ein aktueller freigegebener Beitrag im
-gewählten Land vorliegt. Veröffentlichung von Website und Artikeln bleibt vom
+Technik wird als neue Auswahl nur angeboten, wenn dafür ein aktueller freigegebener
+Beitrag vorliegt. Eine inzwischen leere oder automatisch vorausgewählte Kategorie
+bleibt beschriftet sichtbar, mit einem Rückweg zu allen Themen. Veröffentlichung von Website und Artikeln bleibt vom
 tatsächlichen freigegebenen Stand abhängig.
+
+## Berufliche Vorauswahl (17. November 2026)
+
+- Reihenfolge: gültiger expliziter `topic`-URL-Wert, eigene gespeicherte Themenwahl,
+  die aktuellen ausgewählten Berufe, zuletzt `all`. `topic=all` ist ausdrücklich
+  „Alle Themen“, kein fehlender Parameter. Seitenwechsel und „Alle Beiträge
+  ansehen“ behalten auch diesen Wert bei.
+- `profileNewsTopic` nutzt den gemeinsamen Berufskatalog und
+  `selectedCrewOccupations`. Technikbereiche: Kamera (`kamera`), Licht (`licht`),
+  Grip (`grip`), Ton (`ton`), Postproduktion (`post`), SFX (`sfx`), Broadcast
+  (`broadcast`), Virtual Production (`virtual`) und Fotografie (`foto`). Eine
+  gewählte Haupt-, Neben- oder weitere Tätigkeit kann die Vorauswahl auslösen.
+  Bekannte eindeutige Altbezeichnungen werden über denselben Katalog aufgelöst.
+  Freitext, Biografie, Profiltyp und unbestätigte/mehrdeutige Berufszuordnungen
+  werden nicht als technische Tätigkeit geraten.
+- Der Server liest nur `positions,role,crew` des aktuell authentifizierten Kontos,
+  und nur wenn weder URL noch eigene Themenwahl vorliegen. Berufsdaten werden
+  nicht an öffentliche Komponenten weitergegeben oder in Cookies geschrieben.
+  Gäste und andere Konten übernehmen diese Vorauswahl nicht. Kein konten- oder
+  requestübergreifender Cache; eine Berufsänderung wirkt beim nächsten Aufruf.
+- Öffnen oder Suchen speichert die abgeleitete Auswahl nicht dauerhaft.
+  Ausdrückliche Themenwahl, Entfernen des Themenfilters und Zurücksetzen in der
+  Newsseite speichern denselben kontogebundenen Themen-Cookie wie die Startseite.
+  Andere Filterwechsel allein machen die Berufsvorauswahl nicht dauerhaft.
+  Bei blockierten Cookies bleiben Eingabe und Wiederholen erhalten.
+- Länderwahl und Freigaben bleiben unverändert. Ohne passende freigegebene
+  Beiträge im ausgewählten Land bleibt der vorhandene Leerzustand mit der
+  Möglichkeit zum Filterwechsel sichtbar; es werden keine Beiträge erfunden
+  oder ungeklärte Länder automatisch zugeordnet.
+- Native Umsetzung: dieselbe Rangfolge, dieselben stabilen Berufs-/Themenwerte,
+  eigene kontogebundene manuelle Wahl und aktuelles eigenes Profil. Die Web-Cookies
+  sind keine neue Synchronisations-API. Native Geräteprüfung bleibt getrennt.
+  Redaktion und Zeitpläne gehören weiterhin zu Agent NEWS; diese Änderung
+  erstellt/veröffentlicht keine Meldungen und aktiviert keinen Prüfagenten.
 
 
 ## Homepage paging (17 November 2026)
