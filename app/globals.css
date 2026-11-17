@@ -991,6 +991,12 @@ input:-webkit-autofill:active {
 .location-map-marker__dot { display: flex; align-items: center; justify-content: center; width: 14px; height: 14px; border: 2px solid var(--color-bg-primary); border-radius: 50%; background: var(--map-marker-color, var(--color-gold)); box-shadow: 0 2px 8px #0006; }
 .location-map-marker__cluster { width: 36px; height: 36px; border: 1px solid var(--map-marker-color, var(--color-gold)); background: var(--color-bg-secondary); color: var(--map-marker-color, var(--color-gold)); font-size: 12px; font-weight: 600; font-variant-numeric: tabular-nums; }
 .location-map-marker--active .location-map-marker__dot, .location-map-marker:focus-visible .location-map-marker__dot { box-shadow: 0 0 0 5px color-mix(in srgb, var(--color-gold) 25%, transparent); }
+.location-map .leaflet-tooltip.location-map-tooltip { width: max-content; max-width: min(240px, 65vw); padding: 10px 12px; border: 1px solid var(--color-border); border-radius: 12px; background: var(--color-bg-secondary); color: var(--color-text-primary); font-size: 12px; line-height: 1.4; white-space: normal; overflow-wrap: anywhere; box-shadow: 0 4px 16px #0003; }
+.location-map-tooltip strong, .location-map-tooltip span { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden; }
+.location-map-tooltip strong { font-size: 13px; font-weight: 600; }
+.location-map-tooltip span { margin-top: 3px; color: var(--color-text-muted); }
+.location-map .leaflet-tooltip-right.location-map-tooltip::before { border-right-color: var(--color-bg-secondary); }
+.location-map .leaflet-tooltip-left.location-map-tooltip::before { border-left-color: var(--color-bg-secondary); }
 .location-map .leaflet-control-zoom.leaflet-bar { border: 0; border-radius: 0; background: transparent; box-shadow: none; }
 .location-map .leaflet-control-zoom a { width: 44px; height: 44px; min-width: 44px; min-height: 44px; line-height: 44px; border: 0; border-radius: 0; background: transparent; color: var(--color-gold); font-size: 24px; font-weight: 600; font-family: inherit; text-shadow: var(--map-control-halo); }
 .location-map .leaflet-control-zoom a:hover, .location-map .leaflet-control-zoom a:focus-visible { background: transparent; color: var(--color-gold); }
