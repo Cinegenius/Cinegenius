@@ -10,7 +10,7 @@ import { useFormRouter as useRouter } from "@/lib/use-form-router";
 
 import { useFormDraft } from "@/lib/use-form-draft";
 import FormDraftStatus from "@/components/FormDraftStatus";
-import { Suspense, useCallback, useState, useEffect, useLayoutEffect, useRef } from "react";
+import { Suspense, useCallback, useState, useEffect, useLayoutEffect, useRef, useMemo } from "react";
 
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
@@ -28,12 +28,14 @@ import ExternalProfilesSection from "@/components/ExternalProfilesSection";
 import { useToast } from "@/contexts/ToastContext";
 import FocalPointPicker, { type FocalPoint } from "@/components/FocalPointPicker";
 import PrimaryOccupationPicker from "@/components/PrimaryOccupationPicker";
+import OccupationFormSelect from "@/components/OccupationFormSelect";
+import { normalizeOccupationForm, occupationFormFromCrew, type OccupationForm } from "@/lib/occupation-form";
 import { selectedCrewOccupations, additionalCrewOccupation, profileOccupationFocusError, profileOccupationCount, MAX_PROFILE_OCCUPATIONS, type OccupationProfile } from "@/lib/crew-occupations";
 import { removeProfilePosition, toggleProfileOccupation, type ProfileOccupationEdit } from "@/lib/profile-occupation-editor";
 import { occupationId, primaryOccupationForPositions, occupationReference, orderPositionsByPrimary, type PrimaryOccupation } from "@/lib/primary-occupation";
 import ProfileCoverEditor from "@/components/ProfileCoverEditor";
 import { profileCoverSettings } from "@/lib/profile-cover";
-import { getDeptLabel, getDepartmentRoleLabel, departments, deptColors, DEPARTMENT_TO_PROFILE_TYPE, getDepartmentRoleSearchTerms } from "@/lib/departments";
+import { getDeptLabel, getDepartmentRoleLabel, departments, deptColors, DEPARTMENT_TO_PROFILE_TYPE, getDepartmentRoleSearchTerms, getDepartmentRoleFormLabels } from "@/lib/departments";
 import { gripSearchTerms, GRIP_OCCUPATIONS, normalizeOccupation } from "@/lib/gripTaxonomy";
 import RoleDropdown from "@/components/RoleDropdown";
 import { calculateProfileCompletion } from "@/lib/profile-completion";
@@ -121,6 +123,7 @@ function TypeChipPicker({
   onPositionsChange,
   occupationSelections,
   onOccupationsChange,
+  occupationForm = "standard",
 }: {
   mode: "types" | "roles";
   selectedTypes: string[];
@@ -129,6 +132,7 @@ function TypeChipPicker({
   onPositionsChange: (p: string[]) => void;
   occupationSelections?: PrimaryOccupation[];
   onOccupationsChange?: (value: PrimaryOccupation[]) => void;
+  occupationForm?: OccupationForm;
 }) {
   const taxonomyText = useTranslations("Taxonomy");
 
@@ -159,6 +163,9 @@ function TypeChipPicker({
   const [roleSearch, setRoleSearch] = useState("");
   const [expandedDepartments, setExpandedDepartments] = useState<Record<string, boolean>>({});
   const [chosenDepartments, setChosenDepartments] = useState<string[]>([]);
+  const localizedRoleForms = useMemo(() => new Map<string, string[]>(mode === "roles" ? departments.flatMap(department => department.roles.map(role => [
+    `${department.id}:${role}`, getDepartmentRoleFormLabels(department.id, role, locale, animals, taxonomyText),
+  ] as [string, string[]])) : []), [mode, locale, animals, taxonomyText]);
 
   function applyOccupationEdit(next: ProfileOccupationEdit) {
     const current = selectedCrewOccupations(positions, occupationSelections);
@@ -193,12 +200,17 @@ function TypeChipPicker({
   const selectedOccupations = occupationSelections ?? selectedCrewOccupations(positions);
   const selectedRoleDepartments = [...new Set(selectedOccupations.map(option => option.departmentId))];
   const activeDepartmentIds = new Set([...chosenDepartments, ...selectedRoleDepartments]);
+  function positionLabel(position: string) {
+    const savedChoice = selectedCrewOccupations([position], occupationSelections)[0];
+    const option = primaryOccupationForPositions(savedChoice, [position]);
+    return option ? getDepartmentRoleLabel(option.departmentId, option.label, locale, animals, taxonomyText, occupationForm) : position;
+  }
   const visibleDepartments = departments
     .map((dept) => ({
       dept,
       roles: dept.roles.filter((role) =>
         !normalizedQuery || [getDeptLabel(dept, locale, animals, taxonomyText), dept.label, ...Object.values(dept.labels)].some((label) => normalizeOccupation(label).includes(normalizeOccupation(normalizedQuery)))
-        || getDepartmentRoleSearchTerms(dept, role, getDepartmentRoleLabel(dept.id, role, locale, animals, taxonomyText)).some((term) => normalizeOccupation(term).includes(normalizeOccupation(normalizedQuery)))
+        || getDepartmentRoleSearchTerms(dept, role, getDepartmentRoleLabel(dept.id, role, locale, animals, taxonomyText, occupationForm), localizedRoleForms.get(`${dept.id}:${role}`)).some((term) => normalizeOccupation(term).includes(normalizeOccupation(normalizedQuery)))
         || (dept.id === "grip" && gripSearchTerms(role).some((term) => normalizeOccupation(term).includes(normalizeOccupation(normalizedQuery)))),
       ),
     }))
@@ -239,7 +251,7 @@ function TypeChipPicker({
           <div className="flex flex-wrap gap-2">
             {positions.map((position) => (
               <span key={position} className="inline-flex min-h-10 items-center gap-2 rounded-full border border-gold/30 bg-gold/10 px-3 text-sm text-gold">
-                {position}
+                {positionLabel(position)}
                 <button type="button" onClick={() => {
                   applyOccupationEdit(removeProfilePosition(positions, occupationSelections, position));
                 }} className="inline-flex min-h-11 min-w-11 items-center justify-center rounded-full hover:bg-red-500/10" aria-label={uiText("Ui.text_f10fe7a27ce274", { value1: String(position) })}><X size={14} /></button>
@@ -286,7 +298,7 @@ function TypeChipPicker({
                   const active = selectedOccupations.some(option => option.roleId === occupationId(dept.id, role));
                   const explanation = GRIP_OCCUPATIONS.find((occupation) => occupation.label === role)?.description;
                   return <button key={role} type="button" aria-pressed={active} title={explanation} onClick={() => togglePosition(role, dept.id)}
-                    className={`min-h-10 rounded-full border px-3 py-2 text-xs font-medium transition-colors ${active ? `${colors.bg} ${colors.border} ${colors.text}` : "border-border text-text-muted hover:border-border-light hover:text-text-secondary"}`}>{getDepartmentRoleLabel(dept.id, role, locale, animals, taxonomyText)}</button>;
+                    className={`min-h-10 rounded-full border px-3 py-2 text-xs font-medium transition-colors ${active ? `${colors.bg} ${colors.border} ${colors.text}` : "border-border text-text-muted hover:border-border-light hover:text-text-secondary"}`}>{getDepartmentRoleLabel(dept.id, role, locale, animals, taxonomyText, occupationForm)}</button>;
                 })}
               </div>}
             </section>
@@ -647,7 +659,9 @@ function ProfileEditorContent({ accountId }: { accountId: string }) {
     contactEmail: "",
     pronouns: "",
     showPronouns: false,
+    occupationForm: "standard" as OccupationForm,
   });
+  const occupationForm = normalizeOccupationForm(form.occupationForm);
   const [skills, setSkills] = useState<string[]>([]);
   const [newSkill, setNewSkill] = useState("");
   const [memberships, setMemberships] = useState<string[]>([]);
@@ -801,6 +815,7 @@ function ProfileEditorContent({ accountId }: { accountId: string }) {
           setForm({
             pronouns: profile.pronouns ?? "",
             showPronouns: profile.show_pronouns === true,
+            occupationForm: occupationFormFromCrew(profile.crew),
             name:          profile.display_name        ?? "",
             city:          placeInputValue(profile, profile.location ?? ""),
             country:       "",
@@ -1216,7 +1231,7 @@ function ProfileEditorContent({ accountId }: { accountId: string }) {
         day_rate:       dayRate ? parseInt(dayRate) : null,
         filmography,
         video_links:    videoLinks,
-        crew: { ...crewDataRef.current, additionalOccupation, occupations: selectedCrewOccupations(positions, occupationSelections, null, primaryOccupation), certificates: crewCertificates, primaryOccupation: occupationReference(primaryOccupationForPositions(primaryOccupation, positions)) },
+        crew: { ...crewDataRef.current, occupationForm, additionalOccupation, occupations: selectedCrewOccupations(positions, occupationSelections, null, primaryOccupation), certificates: crewCertificates, primaryOccupation: occupationReference(primaryOccupationForPositions(primaryOccupation, positions)) },
       };
 
       if (!isCurrentEditor()) return;
@@ -1760,13 +1775,14 @@ function ProfileEditorContent({ accountId }: { accountId: string }) {
                 {editorStep === 2 && !draftLoading && !draftLoadError && (
                   <div ref={activityPickerRef} tabIndex={-1} className="scroll-mt-28 rounded-xl border border-border bg-bg-secondary p-4 sm:p-6 outline-none focus-visible:ring-2 focus-visible:ring-gold">
                     <p className="mb-1 text-xs font-semibold uppercase tracking-wider text-text-muted">{uiText.rich("Ui.text_bb610c8cae7830", { part1: chunks => (<span className="text-text-muted">{chunks}</span>) })}</p>
-                    <TypeChipPicker mode="roles" occupationSelections={occupationSelections} onOccupationsChange={setOccupationSelections} selectedTypes={currentProfileTypes} onTypesChange={setCurrentProfileTypes} positions={positions} onPositionsChange={(next) => {
+                    <OccupationFormSelect value={occupationForm} onChange={value => setForm(current => ({ ...current, occupationForm: value }))} className="mb-5" />
+                    <TypeChipPicker mode="roles" occupationForm={occupationForm} occupationSelections={occupationSelections} onOccupationsChange={setOccupationSelections} selectedTypes={currentProfileTypes} onTypesChange={setCurrentProfileTypes} positions={positions} onPositionsChange={(next) => {
                       setPositions(next);
                       setAdditionalOccupation(current => additionalCrewOccupation({positions: next, crew: {additionalOccupation: current, occupations: occupationSelections, primaryOccupation}}));
                       setPrimaryOccupation(current => occupationReference(primaryOccupationForPositions(current, next)));
                       if (next.length > 0 || currentProfileTypes.length > 0) setFieldErrors((previous) => ({ ...previous, activity: undefined }));
                     }} />
-                    <PrimaryOccupationPicker showExplanation={false} positions={positions} selections={occupationSelections} additionalValue={additionalOccupation} onAdditionalChange={setAdditionalOccupation} value={primaryOccupation} onChange={value => { setPrimaryOccupation(value); if (value) setOccupationSelections(current => selectedCrewOccupations(positions, [...current, value])); }} />
+                    <PrimaryOccupationPicker occupationForm={occupationForm} showExplanation={false} positions={positions} selections={occupationSelections} additionalValue={additionalOccupation} onAdditionalChange={setAdditionalOccupation} value={primaryOccupation} onChange={value => { setPrimaryOccupation(value); if (value) setOccupationSelections(current => selectedCrewOccupations(positions, [...current, value])); }} />
                     {fieldErrors.activity && <p role="alert" className="mt-3 rounded-lg border border-error/30 bg-error/10 p-3 text-sm text-error">{fieldErrors.activity}</p>}
                   </div>
                 )}

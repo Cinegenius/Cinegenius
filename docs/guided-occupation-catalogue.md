@@ -74,3 +74,13 @@ Der resultierende Katalog umfasst 22 Gewerke und 955 sichtbare Tätigkeiten. Die
 - Ältere Entwürfe mit dem vorherigen `gripPositions`-Feld oder der früheren kurzen Rollenliste werden beim Fortsetzen in die gemeinsame Auswahl übernommen.
 - Wird ein Gewerk entfernt, werden seine exklusiven Tätigkeitsauswahlen nach einer sichtbaren Bestätigung entfernt. Eine gleiche Tätigkeit bleibt erhalten, falls ein anderes ausgewähltes Gewerk sie ebenfalls führt.
 - Der Katalogtest kontrolliert, dass alle 30 Job-/Projektbereiche zugeordnet sind, Rollen im gemeinsamen Katalog auffindbar sind und die Zusammenführung innerhalb eines Gewerks keine doppelten sichtbaren Bezeichnungen erzeugt.
+
+## Schreibweise ohne zusätzliche Berufsauswahl — 17. November 2026
+
+Die historische Bestandszählung oben beschreibt den damaligen Katalog. Der aktuelle
+gemeinsame Katalog hat 962 Rollen in 25 Gewerken. Die optionale Schreibweise fügt
+keine Berufs-IDs hinzu: Standard bleibt kompakt, männlich/weiblich/neutral sind
+Darstellungen derselben Auswahl. Profilerstellung und Bearbeitung durchsuchen alle
+lokalisierten Formen, unabhängig von der aktuell gewählten Darstellung. Bestehende
+und fortgesetzte Entwürfe werden nicht anhand persönlicher Merkmale umgestellt.
+Siehe [aktueller Vertrag](occupation-form-preference.md).

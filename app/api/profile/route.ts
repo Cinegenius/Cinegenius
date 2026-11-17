@@ -1,3 +1,4 @@
+import { hasInvalidOccupationForm, preserveOccupationForm } from "@/lib/occupation-form";
 import { validPronouns } from "@/lib/profile-identity";
 import { placeWriteFields } from "@/lib/places/catalog";
 import { PLACE_COLUMNS } from "@/lib/places/core";
@@ -144,6 +145,10 @@ export async function POST(req: NextRequest) {
     return privateNoStoreJson({ error: tResponse("ProfileIdentity.invalidPronouns") }, 400);
   }
 
+  if (hasInvalidOccupationForm(crew)) {
+    return privateNoStoreJson({ error: tResponse("System.requestFailed") }, 400);
+  }
+
   if (focal_point !== undefined && !validProfileFocalPoint(focal_point)) {
     return NextResponse.json({ error: tResponse('System.m_a9e61c5f5c7e') }, { status: 400 });
   }
@@ -224,7 +229,7 @@ export async function POST(req: NextRequest) {
     performance: performance ?? null,
     model_measurements: model_measurements ?? null,
     casting: casting ?? null,
-    crew: crew ?? null,
+    crew: preserveOccupationForm(previous.data?.crew, crew ?? null),
     cover_image_url: cover_image_url ?? null,
     instagram_url: instagram_url ?? null,
     tiktok_url: tiktok_url ?? null,
@@ -320,6 +325,9 @@ export async function PATCH(req: NextRequest) {
     if (("pronouns" in safe && !validPronouns(safe.pronouns)) || ("show_pronouns" in safe && typeof safe.show_pronouns !== "boolean")) {
       return privateNoStoreJson({ error: tResponse("ProfileIdentity.invalidPronouns") }, 400);
     }
+    if (hasInvalidOccupationForm(safe.crew)) {
+      return privateNoStoreJson({ error: tResponse("System.requestFailed") }, 400);
+    }
     if (typeof safe.pronouns === "string") safe.pronouns = safe.pronouns.trim() || null;
     if ("focal_point" in safe && !validProfileFocalPoint(safe.focal_point)) {
       return NextResponse.json({ error: tResponse('System.m_a9e61c5f5c7e') }, { status: 400 });
@@ -356,6 +364,7 @@ export async function PATCH(req: NextRequest) {
       previousActivity = current.data;
       // Omitted occupation fields survive older clients and partial crew edits.
       if (safe.crew && typeof safe.crew === "object" && !Array.isArray(safe.crew)) safe.crew = { ...current.data?.crew, ...safe.crew };
+      if (Object.hasOwn(safe, "crew")) safe.crew = preserveOccupationForm(current.data?.crew, safe.crew);
       const optional = await selectOptionalProfileColumns<Record<string, unknown>>(
         ["profile_types"],
         async (projection) => {

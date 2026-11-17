@@ -1701,7 +1701,54 @@
     "previewNotice": "该动物档案正在等待审批，仅作为受保护预览可见。",
     "count": "动物数量（可选）",
     "handler": "计划有训练师或驯兽师监督",
-    "delivery": "可运输至拍摄现场"
+    "delivery": "可运输至拍摄现场",
+    "roleForms": {
+      "tiertrainer": {
+        "masculine": "影视动物训练师",
+        "feminine": "影视动物训练师",
+        "neutral": "影视动物训练师"
+      },
+      "filmhundetrainer": {
+        "masculine": "影视犬训练师",
+        "feminine": "影视犬训练师",
+        "neutral": "影视犬训练师"
+      },
+      "tierbetreuer": {
+        "masculine": "动物管理员 (Animal Handler)",
+        "feminine": "动物管理员 (Animal Handler)",
+        "neutral": "动物管理员 (Animal Handler)"
+      },
+      "tierkoordination": {
+        "masculine": "动物协调员",
+        "feminine": "动物协调员",
+        "neutral": "动物协调员"
+      },
+      "set-tierbetreuung": {
+        "masculine": "片场动物护理员",
+        "feminine": "片场动物护理员",
+        "neutral": "片场动物护理员"
+      },
+      "horse-master": {
+        "masculine": "马匹主管 (Horse Master)",
+        "feminine": "马匹主管 (Horse Master)",
+        "neutral": "马匹主管 (Horse Master)"
+      },
+      "assistant-horse-master": {
+        "masculine": "马匹主管助理",
+        "feminine": "马匹主管助理",
+        "neutral": "马匹主管助理"
+      },
+      "horse-trainer": {
+        "masculine": "影视马匹训练师",
+        "feminine": "影视马匹训练师",
+        "neutral": "影视马匹训练师"
+      },
+      "horse-wrangler": {
+        "masculine": "马匹管理员 (Horse Wrangler)",
+        "feminine": "马匹管理员 (Horse Wrangler)",
+        "neutral": "马匹管理员 (Horse Wrangler)"
+      }
+    }
   },
   "MarketplaceCatalog": {
     "categories": {
@@ -6145,9 +6192,9 @@
       },
       "licht": {
         "r_222be04dbf00": "灯光师",
-        "r_1e210e69039a": "灯光部门主管助理 (Best Boy / Best Girl Electric)",
+        "r_1e210e69039a": "灯光部门主管助理",
         "r_14dd174cd76c": "布光灯光师",
-        "r_92137802b24a": "预装灯光部门主管助理 (Rigging Best Boy / Rigging Best Girl Electric)",
+        "r_92137802b24a": "预装灯光部门主管助理",
         "r_7fce7d6fcf12": "布光电工",
         "r_1bcf9d8d9b03": "电工 / 灯光技术员",
         "r_d95b919dded9": "首席灯光技术员",
@@ -6167,13 +6214,13 @@
       },
       "grip": {
         "r_470156bd03e4": "首席灯光助理",
-        "r_cfbf2a22ed6e": "器械部门主管助理 (Best Boy / Best Girl Grip)",
+        "r_cfbf2a22ed6e": "器械部门主管助理",
         "r_32a6ab31b1a1": "滑轨助理 / 滑轨操作员",
         "r_376dc1f790b8": "灯光助理",
         "r_dbfaadb8821c": "灯光助理助理",
         "r_46dab52c1995": "布光灯光助理",
         "r_ea7e925bd850": "布光首席灯光助理",
-        "r_fa9d72fc7978": "预装器械部门主管助理 (Rigging Best Boy / Rigging Best Girl Grip)",
+        "r_fa9d72fc7978": "预装器械部门主管助理",
         "r_2fa0b44342d7": "特殊灯光构造",
         "r_08c07afebb7f": "摄像吊臂 / 吊杆操作员",
         "r_5ece318b289f": "摄像吊臂技术员",
@@ -6363,7 +6410,7 @@
         "r_298c04a0eec5": "纺织艺术家",
         "r_2a6b1e3320f5": "服装制作师",
         "r_066dc1f269bb": "服装道具制作师",
-        "r_83db0e1a7bff": "女主管",
+        "r_83db0e1a7bff": "服装制版师",
         "r_fc8d26a01b37": "女装定制裁缝",
         "r_9aaa9c423455": "男装定制裁缝",
         "r_975bb2c38b93": "女帽匠",
@@ -6394,7 +6441,7 @@
         "r_b57d7945c2e1": "服装助理",
         "r_2ac825cfa903": "裁缝",
         "r_f5c79a825c6d": "服装司机",
-        "r_d964234f1385": "缝纫工/女裁缝",
+        "r_d964234f1385": "缝纫工",
         "r_6371bcd4467e": "服装老化/破损处理艺术家",
         "r_93cc3465aeac": "服装绘染师",
         "r_9f631f727b98": "服装刺绣师",
@@ -6979,6 +7026,4868 @@
       "x_907c602b417d": "在线与数字",
       "x_f4581b3b4f89": "网站、平台、流媒体",
       "x_d06f18dfc1af": "其他影视服务"
+    },
+    "roleForms": {
+      "produktion": {
+        "r_d479a6d8637e": {
+          "masculine": "制片人",
+          "feminine": "制片人",
+          "neutral": "制片人"
+        },
+        "r_86ca6f7fac85": {
+          "masculine": "执行制片人",
+          "feminine": "执行制片人",
+          "neutral": "执行制片人"
+        },
+        "r_9b38cf86cffe": {
+          "masculine": "联合制片人",
+          "feminine": "联合制片人",
+          "neutral": "联合制片人"
+        },
+        "r_bd2e1cd12f54": {
+          "masculine": "副制片人",
+          "feminine": "副制片人",
+          "neutral": "副制片人"
+        },
+        "r_bc840a4895a2": {
+          "masculine": "初级制片人",
+          "feminine": "初级制片人",
+          "neutral": "初级制片人"
+        },
+        "r_ebaa595e4927": {
+          "masculine": "制片统筹",
+          "feminine": "制片统筹",
+          "neutral": "制片统筹"
+        },
+        "r_9f722922fe7b": {
+          "masculine": "制片主管",
+          "feminine": "制片主管",
+          "neutral": "制片主管"
+        },
+        "r_7fdd4fd31143": {
+          "masculine": "制片管理助理",
+          "feminine": "制片管理助理",
+          "neutral": "制片管理助理"
+        },
+        "r_c8c7f4cd576e": {
+          "masculine": "制片经理",
+          "feminine": "制片经理",
+          "neutral": "制片经理"
+        },
+        "r_edde7bed564a": {
+          "masculine": "广播制片经理",
+          "feminine": "广播制片经理",
+          "neutral": "广播制片经理"
+        },
+        "r_08532652fb27": {
+          "masculine": "制片经理助理",
+          "feminine": "制片经理助理",
+          "neutral": "制片经理助理"
+        },
+        "r_a8ccedf1c4fc": {
+          "masculine": "制片排期/计划员",
+          "feminine": "制片排期/计划员",
+          "neutral": "制片排期/计划员"
+        },
+        "r_73ab62cc6ea9": {
+          "masculine": "制片预算编制",
+          "feminine": "制片预算编制",
+          "neutral": "制片预算编制"
+        },
+        "r_5e8f13168720": {
+          "masculine": "制片监督",
+          "feminine": "制片监督",
+          "neutral": "制片监督"
+        },
+        "r_a8aaf07776e6": {
+          "masculine": "制片监督助理",
+          "feminine": "制片监督助理",
+          "neutral": "制片监督助理"
+        },
+        "r_86a64b938274": {
+          "masculine": "影棚经理",
+          "feminine": "影棚经理",
+          "neutral": "影棚经理"
+        },
+        "r_1dc3e15735f4": {
+          "masculine": "制片协调员",
+          "feminine": "制片协调员",
+          "neutral": "制片协调员"
+        },
+        "r_3d2828618f01": {
+          "masculine": "制片协调助理",
+          "feminine": "制片协调助理",
+          "neutral": "制片协调助理"
+        },
+        "r_b7b1c24b3218": {
+          "masculine": "制片助理（片场）",
+          "feminine": "制片助理（片场）",
+          "neutral": "制片助理（片场）"
+        },
+        "r_504614327108": {
+          "masculine": "制片助理（办公室）",
+          "feminine": "制片助理（办公室）",
+          "neutral": "制片助理（办公室）"
+        },
+        "r_b1c1be59d3fb": {
+          "masculine": "第二制片助理",
+          "feminine": "第二制片助理",
+          "neutral": "第二制片助理"
+        },
+        "r_e9fe06329d79": {
+          "masculine": "团队助理",
+          "feminine": "团队助理",
+          "neutral": "团队助理"
+        },
+        "r_caad7ad378e8": {
+          "masculine": "个人助理",
+          "feminine": "个人助理",
+          "neutral": "个人助理"
+        },
+        "r_9b9ea0970d1e": {
+          "masculine": "制片个人助理",
+          "feminine": "制片个人助理",
+          "neutral": "制片个人助理"
+        },
+        "r_22ca8fe2e611": {
+          "masculine": "艺人/演员个人助理",
+          "feminine": "艺人/演员个人助理",
+          "neutral": "艺人/演员个人助理"
+        },
+        "r_bdfbe6854805": {
+          "masculine": "制片助理",
+          "feminine": "制片助理",
+          "neutral": "制片助理"
+        },
+        "r_d894e33cd89e": {
+          "masculine": "执行助理",
+          "feminine": "执行助理",
+          "neutral": "执行助理"
+        },
+        "r_bdc2cdf19051": {
+          "masculine": "办公室助理",
+          "feminine": "办公室助理",
+          "neutral": "办公室助理"
+        },
+        "r_328519d70fd2": {
+          "masculine": "住宿协调员",
+          "feminine": "住宿协调员",
+          "neutral": "住宿协调员"
+        },
+        "r_6747956824f3": {
+          "masculine": "差旅协调员",
+          "feminine": "差旅协调员",
+          "neutral": "差旅协调员"
+        },
+        "r_b809fe7525be": {
+          "masculine": "差旅协调助理",
+          "feminine": "差旅协调助理",
+          "neutral": "差旅协调助理"
+        },
+        "r_86c92e0bfce0": {
+          "masculine": "健康与安全协调员",
+          "feminine": "健康与安全协调员",
+          "neutral": "健康与安全协调员"
+        },
+        "r_14cee2575cf1": {
+          "masculine": "ADR协调员",
+          "feminine": "ADR协调员",
+          "neutral": "ADR协调员"
+        },
+        "r_92286a252903": {
+          "masculine": "外景经理",
+          "feminine": "外景经理",
+          "neutral": "外景经理"
+        },
+        "r_fc08fa159e6a": {
+          "masculine": "外景侦察员",
+          "feminine": "外景侦察员",
+          "neutral": "外景侦察员"
+        },
+        "r_e5215fd85f99": {
+          "masculine": "外景侦察员助理",
+          "feminine": "外景侦察员助理",
+          "neutral": "外景侦察员助理"
+        },
+        "r_9454a017e69a": {
+          "masculine": "外景侦察助理",
+          "feminine": "外景侦察助理",
+          "neutral": "外景侦察助理"
+        },
+        "r_0d7a23f6a056": {
+          "masculine": "外景协调员",
+          "feminine": "外景协调员",
+          "neutral": "外景协调员"
+        },
+        "r_11bbfbf26e46": {
+          "masculine": "演员协调员",
+          "feminine": "演员协调员",
+          "neutral": "演员协调员"
+        },
+        "r_155f85cc8157": {
+          "masculine": "单位经理",
+          "feminine": "单位经理",
+          "neutral": "单位经理"
+        },
+        "r_475eba080a17": {
+          "masculine": "疫情协调员",
+          "feminine": "疫情协调员",
+          "neutral": "疫情协调员"
+        },
+        "r_a60ca701fcab": {
+          "masculine": "疫情协调助理",
+          "feminine": "疫情协调助理",
+          "neutral": "疫情协调助理"
+        },
+        "r_87a049b62039": {
+          "masculine": "外景单位经理",
+          "feminine": "外景单位经理",
+          "neutral": "外景单位经理"
+        },
+        "r_5b93948ca9fc": {
+          "masculine": "外景单位经理助理",
+          "feminine": "外景单位经理助理",
+          "neutral": "外景单位经理助理"
+        },
+        "r_8a0cbf242686": {
+          "masculine": "剧组排期员",
+          "feminine": "剧组排期员",
+          "neutral": "剧组排期员"
+        },
+        "r_286fb0baa150": {
+          "masculine": "交通协调员",
+          "feminine": "交通协调员",
+          "neutral": "交通协调员"
+        },
+        "r_8e7b74f8a60b": {
+          "masculine": "交通协调助理",
+          "feminine": "交通协调助理",
+          "neutral": "交通协调助理"
+        },
+        "r_940718151db8": {
+          "masculine": "交通队长",
+          "feminine": "交通队长",
+          "neutral": "交通队长"
+        },
+        "r_34e7de86b42e": {
+          "masculine": "单位经理（第一助理导演）",
+          "feminine": "单位经理（第一助理导演）",
+          "neutral": "单位经理（第一助理导演）"
+        },
+        "r_2492443d2786": {
+          "masculine": "片场单位经理",
+          "feminine": "片场单位经理",
+          "neutral": "片场单位经理"
+        },
+        "r_e9593d0ce404": {
+          "masculine": "第三助理导演/群众助理导演",
+          "feminine": "第三助理导演/群众助理导演",
+          "neutral": "第三助理导演/群众助理导演"
+        },
+        "r_4492528d7f86": {
+          "masculine": "基地单位经理",
+          "feminine": "基地单位经理",
+          "neutral": "基地单位经理"
+        },
+        "r_eaee2c8a1b89": {
+          "masculine": "司机队长",
+          "feminine": "司机队长",
+          "neutral": "司机队长"
+        },
+        "r_1e792192a593": {
+          "masculine": "影棚单位经理",
+          "feminine": "影棚单位经理",
+          "neutral": "影棚单位经理"
+        },
+        "r_453722f35b4e": {
+          "masculine": "锁定经理",
+          "feminine": "锁定经理",
+          "neutral": "锁定经理"
+        },
+        "r_01cf9ccbf27d": {
+          "masculine": "第二单位经理（节目/广播）",
+          "feminine": "第二单位经理（节目/广播）",
+          "neutral": "第二单位经理（节目/广播）"
+        },
+        "r_282e1b7d8f09": {
+          "masculine": "单位搬迁协调员",
+          "feminine": "单位搬迁协调员",
+          "neutral": "单位搬迁协调员"
+        },
+        "r_8016e2e4e662": {
+          "masculine": "单位经理助理",
+          "feminine": "单位经理助理",
+          "neutral": "单位经理助理"
+        },
+        "r_1fb7a2292310": {
+          "masculine": "第一单位经理助理",
+          "feminine": "第一单位经理助理",
+          "neutral": "第一单位经理助理"
+        },
+        "r_366708fdb0b3": {
+          "masculine": "片场单位经理助理",
+          "feminine": "片场单位经理助理",
+          "neutral": "片场单位经理助理"
+        },
+        "r_d73d495c6d75": {
+          "masculine": "停车制片助理",
+          "feminine": "停车制片助理",
+          "neutral": "停车制片助理"
+        },
+        "r_4ed4cafa632a": {
+          "masculine": "外景封锁/人群控制",
+          "feminine": "外景封锁/人群控制",
+          "neutral": "外景封锁/人群控制"
+        },
+        "r_6fbe7d952889": {
+          "masculine": "片场跑腿",
+          "feminine": "片场跑腿",
+          "neutral": "片场跑腿"
+        },
+        "r_c8d2a6e8ca0f": {
+          "masculine": "制片司机",
+          "feminine": "制片司机",
+          "neutral": "制片司机"
+        },
+        "r_0d9b0abd3608": {
+          "masculine": "专职司机",
+          "feminine": "专职司机",
+          "neutral": "专职司机"
+        },
+        "r_ef2266f5ad5d": {
+          "masculine": "设备司机",
+          "feminine": "设备司机",
+          "neutral": "设备司机"
+        },
+        "r_100be7827daf": {
+          "masculine": "办公室制片助理",
+          "feminine": "办公室制片助理",
+          "neutral": "办公室制片助理"
+        },
+        "r_c24ef6245054": {
+          "masculine": "制片预算员",
+          "feminine": "制片预算员",
+          "neutral": "制片预算员"
+        },
+        "r_e90f5848bfc3": {
+          "masculine": "制片会计",
+          "feminine": "制片会计",
+          "neutral": "制片会计"
+        },
+        "r_c6dc08a47d0d": {
+          "masculine": "电影财务主管",
+          "feminine": "电影财务主管",
+          "neutral": "电影财务主管"
+        },
+        "r_2557c22fb3d7": {
+          "masculine": "绿色顾问 / 可持续发展经理",
+          "feminine": "绿色顾问 / 可持续发展经理",
+          "neutral": "绿色顾问 / 可持续发展经理"
+        },
+        "r_2a6c1d42831e": {
+          "masculine": "制片实习生",
+          "feminine": "制片实习生",
+          "neutral": "制片实习生"
+        },
+        "r_ede69642be01": {
+          "masculine": "场务组经理实习生",
+          "feminine": "场务组经理实习生",
+          "neutral": "场务组经理实习生"
+        },
+        "r_de9ab1a6b55a": {
+          "masculine": "制片经理",
+          "feminine": "制片经理",
+          "neutral": "制片经理"
+        },
+        "r_fd701e2c1e86": {
+          "masculine": "单位制片经理",
+          "feminine": "单位制片经理",
+          "neutral": "单位制片经理"
+        },
+        "r_eb2de9d80eb5": {
+          "masculine": "制片协调员",
+          "feminine": "制片协调员",
+          "neutral": "制片协调员"
+        },
+        "r_14ba71897157": {
+          "masculine": "助理制片协调员",
+          "feminine": "助理制片协调员",
+          "neutral": "助理制片协调员"
+        },
+        "r_9a9272ffef87": {
+          "masculine": "制片助理 (PA)",
+          "feminine": "制片助理 (PA)",
+          "neutral": "制片助理 (PA)"
+        },
+        "r_b37de62fa7b6": {
+          "masculine": "第二制片助理",
+          "feminine": "第二制片助理",
+          "neutral": "第二制片助理"
+        },
+        "r_35a318ed734f": {
+          "masculine": "助理差旅协调员",
+          "feminine": "助理差旅协调员",
+          "neutral": "助理差旅协调员"
+        },
+        "r_282f5f19af6e": {
+          "masculine": "场务组经理",
+          "feminine": "场务组经理",
+          "neutral": "场务组经理"
+        },
+        "r_a1888e7923b1": {
+          "masculine": "制片秘书 / 团队助理",
+          "feminine": "制片秘书 / 团队助理",
+          "neutral": "制片秘书 / 团队助理"
+        },
+        "r_079a221fcd0e": {
+          "masculine": "第二组经理（节目/广播）",
+          "feminine": "第二组经理（节目/广播）",
+          "neutral": "第二组经理（节目/广播）"
+        },
+        "r_c74c78be5dc2": {
+          "masculine": "选角导演",
+          "feminine": "选角导演",
+          "neutral": "选角导演"
+        },
+        "r_b6e7722029a2": {
+          "masculine": "制片控制员",
+          "feminine": "制片控制员",
+          "neutral": "制片控制员"
+        },
+        "r_4e9c5d6d7198": {
+          "masculine": "电影业务经理",
+          "feminine": "电影业务经理",
+          "neutral": "电影业务经理"
+        },
+        "r_907eb6829faf": {
+          "masculine": "会计",
+          "feminine": "会计",
+          "neutral": "会计"
+        },
+        "r_9ef806a95399": {
+          "masculine": "助理商务事务",
+          "feminine": "助理商务事务",
+          "neutral": "助理商务事务"
+        },
+        "r_3365c6d66b72": {
+          "masculine": "出纳 / 小额现金管理",
+          "feminine": "出纳 / 小额现金管理",
+          "neutral": "出纳 / 小额现金管理"
+        },
+        "r_354a33db42c7": {
+          "masculine": "工资会计",
+          "feminine": "工资会计",
+          "neutral": "工资会计"
+        },
+        "r_f3b7a4579d13": {
+          "masculine": "商务事务实习生",
+          "feminine": "商务事务实习生",
+          "neutral": "商务事务实习生"
+        },
+        "r_614a09237466": {
+          "masculine": "制片策略主管",
+          "feminine": "制片策略主管",
+          "neutral": "制片策略主管"
+        },
+        "r_ab2bca044ad5": {
+          "masculine": "开发主管",
+          "feminine": "开发主管",
+          "neutral": "开发主管"
+        },
+        "r_4c6443207ff2": {
+          "masculine": "服务制片人",
+          "feminine": "服务制片人",
+          "neutral": "服务制片人"
+        },
+        "r_f43970f8871f": {
+          "masculine": "制片执行",
+          "feminine": "制片执行",
+          "neutral": "制片执行"
+        },
+        "r_b490dba5695d": {
+          "masculine": "助理制片人",
+          "feminine": "助理制片人",
+          "neutral": "助理制片人"
+        },
+        "r_7b68ca0f0fb6": {
+          "masculine": "电视制片人",
+          "feminine": "电视制片人",
+          "neutral": "电视制片人"
+        },
+        "r_564bd1be967c": {
+          "masculine": "宣传制片人",
+          "feminine": "宣传制片人",
+          "neutral": "宣传制片人"
+        },
+        "r_17e75f09bb7a": {
+          "masculine": "监制制片人",
+          "feminine": "监制制片人",
+          "neutral": "监制制片人"
+        },
+        "r_09bdde75b5c6": {
+          "masculine": "故事制片人",
+          "feminine": "故事制片人",
+          "neutral": "故事制片人"
+        },
+        "r_63333ae7406f": {
+          "masculine": "后期故事制片人",
+          "feminine": "后期故事制片人",
+          "neutral": "后期故事制片人"
+        },
+        "r_1c7b4db06402": {
+          "masculine": "代理/电视广告制片人",
+          "feminine": "代理/电视广告制片人",
+          "neutral": "代理/电视广告制片人"
+        },
+        "r_05c4bc7ca840": {
+          "masculine": "3D立体制片人",
+          "feminine": "3D立体制片人",
+          "neutral": "3D立体制片人"
+        },
+        "r_6221ed87ef22": {
+          "masculine": "3D立体监制制片人",
+          "feminine": "3D立体监制制片人",
+          "neutral": "3D立体监制制片人"
+        },
+        "r_7edb24c15dcf": {
+          "masculine": "网络电视制片人",
+          "feminine": "网络电视制片人",
+          "neutral": "网络电视制片人"
+        },
+        "r_3d984a13d7b5": {
+          "masculine": "创意制片人",
+          "feminine": "创意制片人",
+          "neutral": "创意制片人"
+        },
+        "r_ae0c8b90c8d1": {
+          "masculine": "开发制片人",
+          "feminine": "开发制片人",
+          "neutral": "开发制片人"
+        },
+        "r_d297bfadcae2": {
+          "masculine": "开发协调员",
+          "feminine": "开发协调员",
+          "neutral": "开发协调员"
+        },
+        "r_54f1c9f4d11e": {
+          "masculine": "开发执行",
+          "feminine": "开发执行",
+          "neutral": "开发执行"
+        },
+        "r_f42fa61db712": {
+          "masculine": "助理控制室制片人",
+          "feminine": "助理控制室制片人",
+          "neutral": "助理控制室制片人"
+        },
+        "r_9d8ea4e7c7aa": {
+          "masculine": "控制室制片人 / 直播制片人",
+          "feminine": "控制室制片人 / 直播制片人",
+          "neutral": "控制室制片人 / 直播制片人"
+        },
+        "r_b837afb89817": {
+          "masculine": "直播宣传制片人",
+          "feminine": "直播宣传制片人",
+          "neutral": "直播宣传制片人"
+        },
+        "r_bacc7a4ec265": {
+          "masculine": "版权事务",
+          "feminine": "版权事务",
+          "neutral": "版权事务"
+        },
+        "r_7e0ace38e8fc": {
+          "masculine": "商务事务",
+          "feminine": "商务事务",
+          "neutral": "商务事务"
+        },
+        "r_0daf662f57c6": {
+          "masculine": "商务与法律事务",
+          "feminine": "商务与法律事务",
+          "neutral": "商务与法律事务"
+        },
+        "r_a95b977fa84f": {
+          "masculine": "法律事务",
+          "feminine": "法律事务",
+          "neutral": "法律事务"
+        },
+        "r_0433186beb99": {
+          "masculine": "市场营销与发行制片人",
+          "feminine": "市场营销与发行制片人",
+          "neutral": "市场营销与发行制片人"
+        },
+        "r_07f0060c8996": {
+          "masculine": "制片实习生",
+          "feminine": "制片实习生",
+          "neutral": "制片实习生"
+        }
+      },
+      "regie": {
+        "r_f59d6991c44a": {
+          "masculine": "导演",
+          "feminine": "导演",
+          "neutral": "导演"
+        },
+        "r_5562e3abbb45": {
+          "masculine": "联合导演",
+          "feminine": "联合导演",
+          "neutral": "联合导演"
+        },
+        "r_df7e552a6792": {
+          "masculine": "第二组导演",
+          "feminine": "第二组导演",
+          "neutral": "第二组导演"
+        },
+        "r_0aca88b2853d": {
+          "masculine": "录音棚导演",
+          "feminine": "录音棚导演",
+          "neutral": "录音棚导演"
+        },
+        "r_394140e22c16": {
+          "masculine": "配音导演",
+          "feminine": "配音导演",
+          "neutral": "配音导演"
+        },
+        "r_7d2cd6bd3a73": {
+          "masculine": "视觉导演（广播）",
+          "feminine": "视觉导演（广播）",
+          "neutral": "视觉导演（广播）"
+        },
+        "r_988a573b39e7": {
+          "masculine": "广播导演",
+          "feminine": "广播导演",
+          "neutral": "广播导演"
+        },
+        "r_0719ad7a68ec": {
+          "masculine": "对白导演",
+          "feminine": "对白导演",
+          "neutral": "对白导演"
+        },
+        "r_463462fca2ec": {
+          "masculine": "第一助理导演",
+          "feminine": "第一助理导演",
+          "neutral": "第一助理导演"
+        },
+        "r_de1c193ae4d6": {
+          "masculine": "第二助理导演",
+          "feminine": "第二助理导演",
+          "neutral": "第二助理导演"
+        },
+        "r_c37babd28464": {
+          "masculine": "首席第二助理导演",
+          "feminine": "首席第二助理导演",
+          "neutral": "首席第二助理导演"
+        },
+        "r_2b8bbebafa40": {
+          "masculine": "现场第二助理导演",
+          "feminine": "现场第二助理导演",
+          "neutral": "现场第二助理导演"
+        },
+        "r_b0a3c67c20bf": {
+          "masculine": "群众第二助理导演",
+          "feminine": "群众第二助理导演",
+          "neutral": "群众第二助理导演"
+        },
+        "r_b6640a0bf9b6": {
+          "masculine": "第三助理导演",
+          "feminine": "第三助理导演",
+          "neutral": "第三助理导演"
+        },
+        "r_962cb1546148": {
+          "masculine": "第三助理导演（群众）",
+          "feminine": "第三助理导演（群众）",
+          "neutral": "第三助理导演（群众）"
+        },
+        "r_619aa382d108": {
+          "masculine": "基础第三助理导演",
+          "feminine": "基础第三助理导演",
+          "neutral": "基础第三助理导演"
+        },
+        "r_14816f8e2f93": {
+          "masculine": "现场第三助理导演",
+          "feminine": "现场第三助理导演",
+          "neutral": "现场第三助理导演"
+        },
+        "r_00bb63b14962": {
+          "masculine": "助理导演助理",
+          "feminine": "助理导演助理",
+          "neutral": "助理导演助理"
+        },
+        "r_da45564f42a3": {
+          "masculine": "首席助理导演助理",
+          "feminine": "首席助理导演助理",
+          "neutral": "首席助理导演助理"
+        },
+        "r_d4de545cc559": {
+          "masculine": "助理导演实习生",
+          "feminine": "助理导演实习生",
+          "neutral": "助理导演实习生"
+        },
+        "r_b8f3b216cf72": {
+          "masculine": "群众协调员",
+          "feminine": "群众协调员",
+          "neutral": "群众协调员"
+        },
+        "r_7d061a318612": {
+          "masculine": "助理群众协调员",
+          "feminine": "助理群众协调员",
+          "neutral": "助理群众协调员"
+        },
+        "r_dbf51638d5ed": {
+          "masculine": "剧本监督 / 连续性监督",
+          "feminine": "剧本监督 / 连续性监督",
+          "neutral": "剧本监督 / 连续性监督"
+        },
+        "r_db6f57df190b": {
+          "masculine": "助理剧本监督",
+          "feminine": "助理剧本监督",
+          "neutral": "助理剧本监督"
+        },
+        "r_043751863fa5": {
+          "masculine": "现场剧本监督",
+          "feminine": "现场剧本监督",
+          "neutral": "现场剧本监督"
+        },
+        "r_d7e7e0e56ce6": {
+          "masculine": "分镜画师",
+          "feminine": "分镜画师",
+          "neutral": "分镜画师"
+        },
+        "r_d5f343108ed5": {
+          "masculine": "表演指导",
+          "feminine": "表演指导",
+          "neutral": "表演指导"
+        },
+        "r_8ac3532c0c32": {
+          "masculine": "儿童表演指导",
+          "feminine": "儿童表演指导",
+          "neutral": "儿童表演指导"
+        },
+        "r_bf13c927e8eb": {
+          "masculine": "对白指导",
+          "feminine": "对白指导",
+          "neutral": "对白指导"
+        },
+        "r_82fff9096145": {
+          "masculine": "群众演员协调员",
+          "feminine": "群众演员协调员",
+          "neutral": "群众演员协调员"
+        },
+        "r_e57426b6a805": {
+          "masculine": "助理群众演员协调员",
+          "feminine": "助理群众演员协调员",
+          "neutral": "助理群众演员协调员"
+        },
+        "r_c2b6031ad212": {
+          "masculine": "导演助理",
+          "feminine": "导演助理",
+          "neutral": "导演助理"
+        },
+        "r_1ed956774605": {
+          "masculine": "导演助理",
+          "feminine": "导演助理",
+          "neutral": "导演助理"
+        },
+        "r_7d0bc36aabcb": {
+          "masculine": "导演实习生",
+          "feminine": "导演实习生",
+          "neutral": "导演实习生"
+        },
+        "r_bf4aaefa2f9f": {
+          "masculine": "剧本实习生",
+          "feminine": "剧本实习生",
+          "neutral": "剧本实习生"
+        },
+        "r_45bf2bbe37f0": {
+          "masculine": "场务助理 / 跑腿",
+          "feminine": "场务助理 / 跑腿",
+          "neutral": "场务助理 / 跑腿"
+        },
+        "r_9ced64ab6db5": {
+          "masculine": "第一助理导演（1st AD）",
+          "feminine": "第一助理导演（1st AD）",
+          "neutral": "第一助理导演（1st AD）"
+        },
+        "r_b6ac41792b48": {
+          "masculine": "第二助理导演（2nd AD）",
+          "feminine": "第二助理导演（2nd AD）",
+          "neutral": "第二助理导演（2nd AD）"
+        },
+        "r_6b9cabf3cbca": {
+          "masculine": "剧本（现场）",
+          "feminine": "剧本（现场）",
+          "neutral": "剧本（现场）"
+        },
+        "r_93f52c1c7000": {
+          "masculine": "第二单位导演",
+          "feminine": "第二单位导演",
+          "neutral": "第二单位导演"
+        },
+        "r_591d7faf8f5d": {
+          "masculine": "导演私人助理",
+          "feminine": "导演私人助理",
+          "neutral": "导演私人助理"
+        },
+        "r_c01dd7739f5a": {
+          "masculine": "助理群众演员协调员",
+          "feminine": "助理群众演员协调员",
+          "neutral": "助理群众演员协调员"
+        }
+      },
+      "kamera": {
+        "r_9659ff478da5": {
+          "masculine": "摄影指导 / 摄影总监",
+          "feminine": "摄影指导 / 摄影总监",
+          "neutral": "摄影指导 / 摄影总监"
+        },
+        "r_f1286611f452": {
+          "masculine": "影像总监",
+          "feminine": "影像总监",
+          "neutral": "影像总监"
+        },
+        "r_c519de89c832": {
+          "masculine": "A机摄影师",
+          "feminine": "A机摄影师",
+          "neutral": "A机摄影师"
+        },
+        "r_69b451280549": {
+          "masculine": "B机摄影师",
+          "feminine": "B机摄影师",
+          "neutral": "B机摄影师"
+        },
+        "r_147c6db611ab": {
+          "masculine": "C机摄影师",
+          "feminine": "C机摄影师",
+          "neutral": "C机摄影师"
+        },
+        "r_00ec6018a92f": {
+          "masculine": "ENG摄影师（演播室）",
+          "feminine": "ENG摄影师（演播室）",
+          "neutral": "ENG摄影师（演播室）"
+        },
+        "r_15338319dd09": {
+          "masculine": "ENG/EB摄影师",
+          "feminine": "ENG/EB摄影师",
+          "neutral": "ENG/EB摄影师"
+        },
+        "r_3b00f8763d24": {
+          "masculine": "第二单位摄影师",
+          "feminine": "第二单位摄影师",
+          "neutral": "第二单位摄影师"
+        },
+        "r_2815a6f7d251": {
+          "masculine": "第三单位摄影师",
+          "feminine": "第三单位摄影师",
+          "neutral": "第三单位摄影师"
+        },
+        "r_46bfee3f1077": {
+          "masculine": "第一助理摄影师 / 拉焦师",
+          "feminine": "第一助理摄影师 / 拉焦师",
+          "neutral": "第一助理摄影师 / 拉焦师"
+        },
+        "r_4f6a54aa8672": {
+          "masculine": "第二助理摄影师 / 拍板员",
+          "feminine": "第二助理摄影师 / 拍板员",
+          "neutral": "第二助理摄影师 / 拍板员"
+        },
+        "r_a6d3a38613fa": {
+          "masculine": "拍板员",
+          "feminine": "拍板员",
+          "neutral": "拍板员"
+        },
+        "r_4406ae44f8be": {
+          "masculine": "第三摄影助理",
+          "feminine": "第三摄影助理",
+          "neutral": "第三摄影助理"
+        },
+        "r_a29ed25142f3": {
+          "masculine": "数字第二助理摄影师",
+          "feminine": "数字第二助理摄影师",
+          "neutral": "数字第二助理摄影师"
+        },
+        "r_048d538ee34d": {
+          "masculine": "DIT（数字影像技师）",
+          "feminine": "DIT（数字影像技师）",
+          "neutral": "DIT（数字影像技师）"
+        },
+        "r_c48ad1ee75a7": {
+          "masculine": "DIT助理",
+          "feminine": "DIT助理",
+          "neutral": "DIT助理"
+        },
+        "r_0e473a1887e9": {
+          "masculine": "斯坦尼康操作员",
+          "feminine": "斯坦尼康操作员",
+          "neutral": "斯坦尼康操作员"
+        },
+        "r_1d7535202c92": {
+          "masculine": "斯坦尼康助理",
+          "feminine": "斯坦尼康助理",
+          "neutral": "斯坦尼康助理"
+        },
+        "r_baee8ff4a63f": {
+          "masculine": "云台系统操作员",
+          "feminine": "云台系统操作员",
+          "neutral": "云台系统操作员"
+        },
+        "r_569d248c1dfd": {
+          "masculine": "无人机飞手 / 无人机操作员",
+          "feminine": "无人机飞手 / 无人机操作员",
+          "neutral": "无人机飞手 / 无人机操作员"
+        },
+        "r_3ca1ad3e14b2": {
+          "masculine": "摄像无人机操作员",
+          "feminine": "摄像无人机操作员",
+          "neutral": "摄像无人机操作员"
+        },
+        "r_c2ff9d51c86a": {
+          "masculine": "摄像无人机飞手",
+          "feminine": "摄像无人机飞手",
+          "neutral": "摄像无人机飞手"
+        },
+        "r_0502b3c5dec3": {
+          "masculine": "摄像车司机",
+          "feminine": "摄像车司机",
+          "neutral": "摄像车司机"
+        },
+        "r_a3fa606ea916": {
+          "masculine": "飞机飞手（航拍）",
+          "feminine": "飞机飞手（航拍）",
+          "neutral": "飞机飞手（航拍）"
+        },
+        "r_05d7d18da0c4": {
+          "masculine": "直升机飞手（航拍）",
+          "feminine": "直升机飞手（航拍）",
+          "neutral": "直升机飞手（航拍）"
+        },
+        "r_32e8a90fee3b": {
+          "masculine": "蜘蛛摄像机飞手",
+          "feminine": "蜘蛛摄像机飞手",
+          "neutral": "蜘蛛摄像机飞手"
+        },
+        "r_c4b0d3dfb7d8": {
+          "masculine": "摄像无人机助理",
+          "feminine": "摄像无人机助理",
+          "neutral": "摄像无人机助理"
+        },
+        "r_86c7b305ba77": {
+          "masculine": "远程摄像操作员",
+          "feminine": "远程摄像操作员",
+          "neutral": "远程摄像操作员"
+        },
+        "r_386b1f9db2c1": {
+          "masculine": "远程云台操作员",
+          "feminine": "远程云台操作员",
+          "neutral": "远程云台操作员"
+        },
+        "r_1490637c95ed": {
+          "masculine": "航拍摄影师",
+          "feminine": "航拍摄影师",
+          "neutral": "航拍摄影师"
+        },
+        "r_76c05f6fba78": {
+          "masculine": "空对空摄影师",
+          "feminine": "空对空摄影师",
+          "neutral": "空对空摄影师"
+        },
+        "r_b59f3c08153b": {
+          "masculine": "高速摄影师",
+          "feminine": "高速摄影师",
+          "neutral": "高速摄影师"
+        },
+        "r_f6e99ab3d5dd": {
+          "masculine": "ARRI Trinity操作员",
+          "feminine": "ARRI Trinity操作员",
+          "neutral": "ARRI Trinity操作员"
+        },
+        "r_953bc24b7077": {
+          "masculine": "索道摄像操作员",
+          "feminine": "索道摄像操作员",
+          "neutral": "索道摄像操作员"
+        },
+        "r_e834e506e54b": {
+          "masculine": "杆臂摄像操作员",
+          "feminine": "杆臂摄像操作员",
+          "neutral": "杆臂摄像操作员"
+        },
+        "r_b7ea35e3f38d": {
+          "masculine": "杆臂摄像操作员",
+          "feminine": "杆臂摄像操作员",
+          "neutral": "杆臂摄像操作员"
+        },
+        "r_3531de1d9278": {
+          "masculine": "运动控制操作员",
+          "feminine": "运动控制操作员",
+          "neutral": "运动控制操作员"
+        },
+        "r_edf22fe94ff4": {
+          "masculine": "运动控制助理",
+          "feminine": "运动控制助理",
+          "neutral": "运动控制助理"
+        },
+        "r_7be83f893235": {
+          "masculine": "现场摄像操作员",
+          "feminine": "现场摄像操作员",
+          "neutral": "现场摄像操作员"
+        },
+        "r_8d0fa92d5c06": {
+          "masculine": "VR摄影指导",
+          "feminine": "VR摄影指导",
+          "neutral": "VR摄影指导"
+        },
+        "r_e4f1f8410ee1": {
+          "masculine": "VR摄像操作员",
+          "feminine": "VR摄像操作员",
+          "neutral": "VR摄像操作员"
+        },
+        "r_fe4955d24d9d": {
+          "masculine": "3D立体摄像师",
+          "feminine": "3D立体摄像师",
+          "neutral": "3D立体摄像师"
+        },
+        "r_63d8f7ae5c77": {
+          "masculine": "3D立体调节师",
+          "feminine": "3D立体调节师",
+          "neutral": "3D立体调节师"
+        },
+        "r_5d780d27f437": {
+          "masculine": "立体技术员",
+          "feminine": "立体技术员",
+          "neutral": "立体技术员"
+        },
+        "r_0350366ccf64": {
+          "masculine": "立体摄影师",
+          "feminine": "立体摄影师",
+          "neutral": "立体摄影师"
+        },
+        "r_892df5d9ed45": {
+          "masculine": "第二单位立体摄影师",
+          "feminine": "第二单位立体摄影师",
+          "neutral": "第二单位立体摄影师"
+        },
+        "r_87b9b49ccc72": {
+          "masculine": "立体摄影助理",
+          "feminine": "立体摄影助理",
+          "neutral": "立体摄影助理"
+        },
+        "r_503758a49393": {
+          "masculine": "水下摄影师",
+          "feminine": "水下摄影师",
+          "neutral": "水下摄影师"
+        },
+        "r_ad809b37ab32": {
+          "masculine": "水下摄影助理",
+          "feminine": "水下摄影助理",
+          "neutral": "水下摄影助理"
+        },
+        "r_fdaafaca34cb": {
+          "masculine": "自由落体 / 跳伞摄影师",
+          "feminine": "自由落体 / 跳伞摄影师",
+          "neutral": "自由落体 / 跳伞摄影师"
+        },
+        "r_6fd521b70caf": {
+          "masculine": "干技术员",
+          "feminine": "干技术员",
+          "neutral": "干技术员"
+        },
+        "r_7a8573f394c1": {
+          "masculine": "数据管理员",
+          "feminine": "数据管理员",
+          "neutral": "数据管理员"
+        },
+        "r_59c04d8b3609": {
+          "masculine": "数据管理员 / 数字装载员",
+          "feminine": "数据管理员 / 数字装载员",
+          "neutral": "数据管理员 / 数字装载员"
+        },
+        "r_1b6d2deeae11": {
+          "masculine": "媒体管理员",
+          "feminine": "媒体管理员",
+          "neutral": "媒体管理员"
+        },
+        "r_bfd5ad0745cb": {
+          "masculine": "视频辅助操作员",
+          "feminine": "视频辅助操作员",
+          "neutral": "视频辅助操作员"
+        },
+        "r_ab65480d38bf": {
+          "masculine": "视频辅助技术员",
+          "feminine": "视频辅助技术员",
+          "neutral": "视频辅助技术员"
+        },
+        "r_44cbe06f7edd": {
+          "masculine": "撞击箱操作员",
+          "feminine": "撞击箱操作员",
+          "neutral": "撞击箱操作员"
+        },
+        "r_ff391e554ef1": {
+          "masculine": "视频操作员",
+          "feminine": "视频操作员",
+          "neutral": "视频操作员"
+        },
+        "r_04b8806e4aea": {
+          "masculine": "Qtake操作员",
+          "feminine": "Qtake操作员",
+          "neutral": "Qtake操作员"
+        },
+        "r_881fbad171dd": {
+          "masculine": "视频操作助理",
+          "feminine": "视频操作助理",
+          "neutral": "视频操作助理"
+        },
+        "r_e8b3776feee3": {
+          "masculine": "回放操作员",
+          "feminine": "回放操作员",
+          "neutral": "回放操作员"
+        },
+        "r_2cd28c233eb0": {
+          "masculine": "ENG助理（画面与声音）",
+          "feminine": "ENG助理（画面与声音）",
+          "neutral": "ENG助理（画面与声音）"
+        },
+        "r_aaf320fee04d": {
+          "masculine": "ENG技术员（画面与声音）",
+          "feminine": "ENG技术员（画面与声音）",
+          "neutral": "ENG技术员（画面与声音）"
+        },
+        "r_6c484917c545": {
+          "masculine": "摄像助理（非虚构）",
+          "feminine": "摄像助理（非虚构）",
+          "neutral": "摄像助理（非虚构）"
+        },
+        "r_c071a417cdf8": {
+          "masculine": "数据采集工程师",
+          "feminine": "数据采集工程师",
+          "neutral": "数据采集工程师"
+        },
+        "r_ff3821a892d3": {
+          "masculine": "后投影画面操作员",
+          "feminine": "后投影画面操作员",
+          "neutral": "后投影画面操作员"
+        },
+        "r_e160ca78eefe": {
+          "masculine": "摄像技术员",
+          "feminine": "摄像技术员",
+          "neutral": "摄像技术员"
+        },
+        "r_b2a908032997": {
+          "masculine": "摄像实习生",
+          "feminine": "摄像实习生",
+          "neutral": "摄像实习生"
+        },
+        "r_20c91979a5fc": {
+          "masculine": "摄像师",
+          "feminine": "摄像师",
+          "neutral": "摄像师"
+        },
+        "r_3008a154e7ef": {
+          "masculine": "无人机操作员 / 航拍摄影指导",
+          "feminine": "无人机操作员 / 航拍摄影指导",
+          "neutral": "无人机操作员 / 航拍摄影指导"
+        },
+        "r_ee4208621795": {
+          "masculine": "附加摄像师",
+          "feminine": "附加摄像师",
+          "neutral": "附加摄像师"
+        },
+        "r_59f7261be55a": {
+          "masculine": "水下摄像师",
+          "feminine": "水下摄像师",
+          "neutral": "水下摄像师"
+        },
+        "r_6767d1f92822": {
+          "masculine": "运动控制摄像师",
+          "feminine": "运动控制摄像师",
+          "neutral": "运动控制摄像师"
+        },
+        "r_15047c5a622a": {
+          "masculine": "无人机助理/技术员",
+          "feminine": "无人机助理/技术员",
+          "neutral": "无人机助理/技术员"
+        },
+        "r_7b6aa965b572": {
+          "masculine": "一助摄像师",
+          "feminine": "一助摄像师",
+          "neutral": "一助摄像师"
+        },
+        "r_403c761ac7c7": {
+          "masculine": "ENG助理（摄像/声音）",
+          "feminine": "ENG助理（摄像/声音）",
+          "neutral": "ENG助理（摄像/声音）"
+        },
+        "r_6170f09c0f17": {
+          "masculine": "ENG技术员（摄像/声音）",
+          "feminine": "ENG技术员（摄像/声音）",
+          "neutral": "ENG技术员（摄像/声音）"
+        },
+        "r_6a6303b77029": {
+          "masculine": "静态摄影师",
+          "feminine": "静态摄影师",
+          "neutral": "静态摄影师"
+        }
+      },
+      "licht": {
+        "r_222be04dbf00": {
+          "masculine": "灯光师",
+          "feminine": "灯光师",
+          "neutral": "灯光师"
+        },
+        "r_1e210e69039a": {
+          "masculine": "灯光部门主管助理 (Best Boy Electric)",
+          "feminine": "灯光部门主管助理 (Best Girl Electric)",
+          "neutral": "灯光部门主管助理"
+        },
+        "r_14dd174cd76c": {
+          "masculine": "布光灯光师",
+          "feminine": "布光灯光师",
+          "neutral": "布光灯光师"
+        },
+        "r_92137802b24a": {
+          "masculine": "预装灯光部门主管助理 (Rigging Best Boy Electric)",
+          "feminine": "预装灯光部门主管助理 (Rigging Best Girl Electric)",
+          "neutral": "预装灯光部门主管助理"
+        },
+        "r_7fce7d6fcf12": {
+          "masculine": "布光电工",
+          "feminine": "布光电工",
+          "neutral": "布光电工"
+        },
+        "r_1bcf9d8d9b03": {
+          "masculine": "电工 / 灯光技术员",
+          "feminine": "电工 / 灯光技术员",
+          "neutral": "电工 / 灯光技术员"
+        },
+        "r_d95b919dded9": {
+          "masculine": "首席灯光技术员",
+          "feminine": "首席灯光技术员",
+          "neutral": "首席灯光技术员"
+        },
+        "r_de223259b793": {
+          "masculine": "灯光控制台操作员",
+          "feminine": "灯光控制台操作员",
+          "neutral": "灯光控制台操作员"
+        },
+        "r_d927855afff9": {
+          "masculine": "灯光控制台助理",
+          "feminine": "灯光控制台助理",
+          "neutral": "灯光控制台助理"
+        },
+        "r_56ad1c6a1ad4": {
+          "masculine": "灯光编程师（DMX）",
+          "feminine": "灯光编程师（DMX）",
+          "neutral": "灯光编程师（DMX）"
+        },
+        "r_090ac2a092b8": {
+          "masculine": "灯光技术员",
+          "feminine": "灯光技术员",
+          "neutral": "灯光技术员"
+        },
+        "r_d1edcbd50142": {
+          "masculine": "灯光驱动员",
+          "feminine": "灯光驱动员",
+          "neutral": "灯光驱动员"
+        },
+        "r_7d79588c14f3": {
+          "masculine": "附加灯光技术员",
+          "feminine": "附加灯光技术员",
+          "neutral": "附加灯光技术员"
+        },
+        "r_b3d1d585beaa": {
+          "masculine": "发电机操作员",
+          "feminine": "发电机操作员",
+          "neutral": "发电机操作员"
+        },
+        "r_bcd4b312b67e": {
+          "masculine": "电缆管理员",
+          "feminine": "电缆管理员",
+          "neutral": "电缆管理员"
+        },
+        "r_35cca1fe3c5c": {
+          "masculine": "水下灯光技术员",
+          "feminine": "水下灯光技术员",
+          "neutral": "水下灯光技术员"
+        },
+        "r_89058c839b15": {
+          "masculine": "气球灯操作员",
+          "feminine": "气球灯操作员",
+          "neutral": "气球灯操作员"
+        },
+        "r_9bd915bb46a4": {
+          "masculine": "聚光灯 / 桁架聚光灯操作员",
+          "feminine": "聚光灯 / 桁架聚光灯操作员",
+          "neutral": "聚光灯 / 桁架聚光灯操作员"
+        },
+        "r_2c0dd7b64cf3": {
+          "masculine": "灯光助理",
+          "feminine": "灯光助理",
+          "neutral": "灯光助理"
+        },
+        "r_0cc27c01ca07": {
+          "masculine": "灯光实习生",
+          "feminine": "灯光实习生",
+          "neutral": "灯光实习生"
+        }
+      },
+      "grip": {
+        "r_470156bd03e4": {
+          "masculine": "首席灯光助理",
+          "feminine": "首席灯光助理",
+          "neutral": "首席灯光助理"
+        },
+        "r_cfbf2a22ed6e": {
+          "masculine": "器械部门主管助理 (Best Boy Grip)",
+          "feminine": "器械部门主管助理 (Best Girl Grip)",
+          "neutral": "器械部门主管助理"
+        },
+        "r_32a6ab31b1a1": {
+          "masculine": "滑轨助理 / 滑轨操作员",
+          "feminine": "滑轨助理 / 滑轨操作员",
+          "neutral": "滑轨助理 / 滑轨操作员"
+        },
+        "r_376dc1f790b8": {
+          "masculine": "灯光助理",
+          "feminine": "灯光助理",
+          "neutral": "灯光助理"
+        },
+        "r_dbfaadb8821c": {
+          "masculine": "灯光助理助理",
+          "feminine": "灯光助理助理",
+          "neutral": "灯光助理助理"
+        },
+        "r_46dab52c1995": {
+          "masculine": "布光灯光助理",
+          "feminine": "布光灯光助理",
+          "neutral": "布光灯光助理"
+        },
+        "r_ea7e925bd850": {
+          "masculine": "布光首席灯光助理",
+          "feminine": "布光首席灯光助理",
+          "neutral": "布光首席灯光助理"
+        },
+        "r_fa9d72fc7978": {
+          "masculine": "预装器械部门主管助理 (Rigging Best Boy Grip)",
+          "feminine": "预装器械部门主管助理 (Rigging Best Girl Grip)",
+          "neutral": "预装器械部门主管助理"
+        },
+        "r_2fa0b44342d7": {
+          "masculine": "特殊灯光构造",
+          "feminine": "特殊灯光构造",
+          "neutral": "特殊灯光构造"
+        },
+        "r_08c07afebb7f": {
+          "masculine": "摄像吊臂 / 吊杆操作员",
+          "feminine": "摄像吊臂 / 吊杆操作员",
+          "neutral": "摄像吊臂 / 吊杆操作员"
+        },
+        "r_5ece318b289f": {
+          "masculine": "摄像吊臂技术员",
+          "feminine": "摄像吊臂技术员",
+          "neutral": "摄像吊臂技术员"
+        },
+        "r_a5c74e86fb2b": {
+          "masculine": "U型吊臂 / 技术吊臂操作员",
+          "feminine": "U型吊臂 / 技术吊臂操作员",
+          "neutral": "U型吊臂 / 技术吊臂操作员"
+        },
+        "r_819dd64bff9d": {
+          "masculine": "远程头技术员 / 操作员",
+          "feminine": "远程头技术员 / 操作员",
+          "neutral": "远程头技术员 / 操作员"
+        },
+        "r_9c6f674da63a": {
+          "masculine": "灯光实习生",
+          "feminine": "灯光实习生",
+          "neutral": "灯光实习生"
+        }
+      },
+      "ton": {
+        "r_fccf287d8f40": {
+          "masculine": "现场录音师",
+          "feminine": "现场录音师",
+          "neutral": "现场录音师"
+        },
+        "r_54f3d59eb241": {
+          "masculine": "现场录音师",
+          "feminine": "现场录音师",
+          "neutral": "现场录音师"
+        },
+        "r_b0c1942e7358": {
+          "masculine": "电影录音师",
+          "feminine": "电影录音师",
+          "neutral": "电影录音师"
+        },
+        "r_8b1cc700407b": {
+          "masculine": "吊杆操作员",
+          "feminine": "吊杆操作员",
+          "neutral": "吊杆操作员"
+        },
+        "r_fd909904c9c7": {
+          "masculine": "声音助理",
+          "feminine": "声音助理",
+          "neutral": "声音助理"
+        },
+        "r_4c5fe4b3a1f3": {
+          "masculine": "一助声音助理",
+          "feminine": "一助声音助理",
+          "neutral": "一助声音助理"
+        },
+        "r_ab87e9473072": {
+          "masculine": "一助声音助理",
+          "feminine": "一助声音助理",
+          "neutral": "一助声音助理"
+        },
+        "r_d83df9d29ab1": {
+          "masculine": "二助声音助理",
+          "feminine": "二助声音助理",
+          "neutral": "二助声音助理"
+        },
+        "r_8377b0674c5d": {
+          "masculine": "二助声音助理",
+          "feminine": "二助声音助理",
+          "neutral": "二助声音助理"
+        },
+        "r_93302391f02a": {
+          "masculine": "ADR / 循环群组协调员",
+          "feminine": "ADR / 循环群组协调员",
+          "neutral": "ADR / 循环群组协调员"
+        },
+        "r_3e7456f82724": {
+          "masculine": "环绕声录音师",
+          "feminine": "环绕声录音师",
+          "neutral": "环绕声录音师"
+        },
+        "r_352c199bfbc1": {
+          "masculine": "多功能声音技术员",
+          "feminine": "多功能声音技术员",
+          "neutral": "多功能声音技术员"
+        },
+        "r_fdfa14e36d06": {
+          "masculine": "声音设备助理",
+          "feminine": "声音设备助理",
+          "neutral": "声音设备助理"
+        },
+        "r_9615bbb28141": {
+          "masculine": "声音回放操作员",
+          "feminine": "声音回放操作员",
+          "neutral": "声音回放操作员"
+        },
+        "r_13544e0c2d08": {
+          "masculine": "录音师（非虚构）",
+          "feminine": "录音师（非虚构）",
+          "neutral": "录音师（非虚构）"
+        },
+        "r_f804f9794c40": {
+          "masculine": "声音实习生",
+          "feminine": "声音实习生",
+          "neutral": "声音实习生"
+        },
+        "r_26ad417384db": {
+          "masculine": "声音设计师",
+          "feminine": "声音设计师",
+          "neutral": "声音设计师"
+        },
+        "r_e4afa3da823e": {
+          "masculine": "声音编辑主管",
+          "feminine": "声音编辑主管",
+          "neutral": "声音编辑主管"
+        },
+        "r_754377fae1cb": {
+          "masculine": "对白剪辑师",
+          "feminine": "对白剪辑师",
+          "neutral": "对白剪辑师"
+        },
+        "r_a80f60e08e2f": {
+          "masculine": "自动对话替换剪辑师",
+          "feminine": "自动对话替换剪辑师",
+          "neutral": "自动对话替换剪辑师"
+        },
+        "r_65ab3bc0b779": {
+          "masculine": "自动对话替换主管",
+          "feminine": "自动对话替换主管",
+          "neutral": "自动对话替换主管"
+        },
+        "r_927d0ca8e1d9": {
+          "masculine": "拟音师",
+          "feminine": "拟音师",
+          "neutral": "拟音师"
+        },
+        "r_c196984117d7": {
+          "masculine": "拟音剪辑师",
+          "feminine": "拟音剪辑师",
+          "neutral": "拟音剪辑师"
+        },
+        "r_df6ebbcf6038": {
+          "masculine": "混音师",
+          "feminine": "混音师",
+          "neutral": "混音师"
+        },
+        "r_f4776d32d356": {
+          "masculine": "回放操作员",
+          "feminine": "回放操作员",
+          "neutral": "回放操作员"
+        },
+        "r_6abc8617e983": {
+          "masculine": "音效主管",
+          "feminine": "音效主管",
+          "neutral": "音效主管"
+        },
+        "r_0faba800cb95": {
+          "masculine": "音乐混音师",
+          "feminine": "音乐混音师",
+          "neutral": "音乐混音师"
+        },
+        "r_a5fba4295f52": {
+          "masculine": "音乐录音师",
+          "feminine": "音乐录音师",
+          "neutral": "音乐录音师"
+        },
+        "r_f2e629941a7a": {
+          "masculine": "配音混音师",
+          "feminine": "配音混音师",
+          "neutral": "配音混音师"
+        },
+        "r_f73a9a076c95": {
+          "masculine": "音频描述混音师",
+          "feminine": "音频描述混音师",
+          "neutral": "音频描述混音师"
+        },
+        "r_9d583d9712f5": {
+          "masculine": "混音助理",
+          "feminine": "混音助理",
+          "neutral": "混音助理"
+        },
+        "r_c4334fc01411": {
+          "masculine": "音频母带工程师",
+          "feminine": "音频母带工程师",
+          "neutral": "音频母带工程师"
+        },
+        "r_6a7ea11d04ed": {
+          "masculine": "音效设计助理",
+          "feminine": "音效设计助理",
+          "neutral": "音效设计助理"
+        },
+        "r_539e45fc2e6d": {
+          "masculine": "自动对话替换高级剪辑师",
+          "feminine": "自动对话替换高级剪辑师",
+          "neutral": "自动对话替换高级剪辑师"
+        },
+        "r_021e586f6845": {
+          "masculine": "对白及自动对话替换高级剪辑师",
+          "feminine": "对白及自动对话替换高级剪辑师",
+          "neutral": "对白及自动对话替换高级剪辑师"
+        },
+        "r_58f4b9fff63e": {
+          "masculine": "对白高级剪辑师",
+          "feminine": "对白高级剪辑师",
+          "neutral": "对白高级剪辑师"
+        },
+        "r_934c9dff31b6": {
+          "masculine": "特效高级剪辑师",
+          "feminine": "特效高级剪辑师",
+          "neutral": "特效高级剪辑师"
+        },
+        "r_8ffed7b496e8": {
+          "masculine": "后期对白剪辑师",
+          "feminine": "后期对白剪辑师",
+          "neutral": "后期对白剪辑师"
+        },
+        "r_37f0cea40905": {
+          "masculine": "音效剪辑师",
+          "feminine": "音效剪辑师",
+          "neutral": "音效剪辑师"
+        },
+        "r_e22d9239a33f": {
+          "masculine": "配音/配音剪辑师",
+          "feminine": "配音/配音剪辑师",
+          "neutral": "配音/配音剪辑师"
+        },
+        "r_cf36114f7a15": {
+          "masculine": "同步音效剪辑师",
+          "feminine": "同步音效剪辑师",
+          "neutral": "同步音效剪辑师"
+        },
+        "r_7ca65f7a0064": {
+          "masculine": "自动对话替换/同步剪辑师",
+          "feminine": "自动对话替换/同步剪辑师",
+          "neutral": "自动对话替换/同步剪辑师"
+        },
+        "r_944e077953d3": {
+          "masculine": "音效剪辑助理",
+          "feminine": "音效剪辑助理",
+          "neutral": "音效剪辑助理"
+        },
+        "r_9d4ed0bf92ee": {
+          "masculine": "自动对话替换/配音混音师",
+          "feminine": "自动对话替换/配音混音师",
+          "neutral": "自动对话替换/配音混音师"
+        },
+        "r_b3e198ffbf29": {
+          "masculine": "同步音效混音师",
+          "feminine": "同步音效混音师",
+          "neutral": "同步音效混音师"
+        },
+        "r_c41c6bc414c3": {
+          "masculine": "配音制作经理",
+          "feminine": "配音制作经理",
+          "neutral": "配音制作经理"
+        },
+        "r_2b6bc11139d6": {
+          "masculine": "自动对话替换/配音主管",
+          "feminine": "自动对话替换/配音主管",
+          "neutral": "自动对话替换/配音主管"
+        },
+        "r_6645c4583551": {
+          "masculine": "自动对话替换/配音助理主管",
+          "feminine": "自动对话替换/配音助理主管",
+          "neutral": "自动对话替换/配音助理主管"
+        },
+        "r_2f0b82350b59": {
+          "masculine": "拟音助理",
+          "feminine": "拟音助理",
+          "neutral": "拟音助理"
+        },
+        "r_a4171d6359fb": {
+          "masculine": "音效后期制作实习生",
+          "feminine": "音效后期制作实习生",
+          "neutral": "音效后期制作实习生"
+        },
+        "r_9e4b74ecd5ff": {
+          "masculine": "自动对话替换技术主管",
+          "feminine": "自动对话替换技术主管",
+          "neutral": "自动对话替换技术主管"
+        }
+      },
+      "art": {
+        "r_ff29ce0e215c": {
+          "masculine": "美术设计师",
+          "feminine": "美术设计师",
+          "neutral": "美术设计师"
+        },
+        "r_f3db07db6bf4": {
+          "masculine": "美术设计师（德国）",
+          "feminine": "美术设计师（德国）",
+          "neutral": "美术设计师（德国）"
+        },
+        "r_97a0a726b446": {
+          "masculine": "美术指导主管",
+          "feminine": "美术指导主管",
+          "neutral": "美术指导主管"
+        },
+        "r_3f274caf46f5": {
+          "masculine": "美术指导",
+          "feminine": "美术指导",
+          "neutral": "美术指导"
+        },
+        "r_7e93c2713534": {
+          "masculine": "备用美术指导",
+          "feminine": "备用美术指导",
+          "neutral": "备用美术指导"
+        },
+        "r_891f7ee6a391": {
+          "masculine": "助理美术指导",
+          "feminine": "助理美术指导",
+          "neutral": "助理美术指导"
+        },
+        "r_29765953355c": {
+          "masculine": "美术设计助理",
+          "feminine": "美术设计助理",
+          "neutral": "美术设计助理"
+        },
+        "r_8543a5c61931": {
+          "masculine": "美术部门助理",
+          "feminine": "美术部门助理",
+          "neutral": "美术部门助理"
+        },
+        "r_3ffad936200e": {
+          "masculine": "场景设计师",
+          "feminine": "场景设计师",
+          "neutral": "场景设计师"
+        },
+        "r_bce8305a5535": {
+          "masculine": "CAD设计师",
+          "feminine": "CAD设计师",
+          "neutral": "CAD设计师"
+        },
+        "r_b5a1fa9969c7": {
+          "masculine": "概念艺术家",
+          "feminine": "概念艺术家",
+          "neutral": "概念艺术家"
+        },
+        "r_f1dbbb97b010": {
+          "masculine": "概念艺术家（美术部）",
+          "feminine": "概念艺术家（美术部）",
+          "neutral": "概念艺术家（美术部）"
+        },
+        "r_57a4a106cbd6": {
+          "masculine": "插画师",
+          "feminine": "插画师",
+          "neutral": "插画师"
+        },
+        "r_6aa3fecc3ba9": {
+          "masculine": "平面设计师（场景图形）",
+          "feminine": "平面设计师（场景图形）",
+          "neutral": "平面设计师（场景图形）"
+        },
+        "r_6978775ad99b": {
+          "masculine": "首席平面设计师",
+          "feminine": "首席平面设计师",
+          "neutral": "首席平面设计师"
+        },
+        "r_7534f951d040": {
+          "masculine": "平面艺术家",
+          "feminine": "平面艺术家",
+          "neutral": "平面艺术家"
+        },
+        "r_a8e10d0ecc47": {
+          "masculine": "氛围侦察/布局师",
+          "feminine": "氛围侦察/布局师",
+          "neutral": "氛围侦察/布局师"
+        },
+        "r_a1ce9e299c8f": {
+          "masculine": "场景布置师",
+          "feminine": "场景布置师",
+          "neutral": "场景布置师"
+        },
+        "r_420521110dcc": {
+          "masculine": "场景布置协调员",
+          "feminine": "场景布置协调员",
+          "neutral": "场景布置协调员"
+        },
+        "r_d5b7a7d716a2": {
+          "masculine": "助理场景布置师",
+          "feminine": "助理场景布置师",
+          "neutral": "助理场景布置师"
+        },
+        "r_d0964de45366": {
+          "masculine": "场景布置采购员",
+          "feminine": "场景布置采购员",
+          "neutral": "场景布置采购员"
+        },
+        "r_10a8275fbc87": {
+          "masculine": "场景布置仓库经理",
+          "feminine": "场景布置仓库经理",
+          "neutral": "场景布置仓库经理"
+        },
+        "r_1df861fbde16": {
+          "masculine": "助理场景布置协调员",
+          "feminine": "助理场景布置协调员",
+          "neutral": "助理场景布置协调员"
+        },
+        "r_393242957f26": {
+          "masculine": "场景布置员",
+          "feminine": "场景布置员",
+          "neutral": "场景布置员"
+        },
+        "r_e3ce1061c0ff": {
+          "masculine": "领班",
+          "feminine": "领班",
+          "neutral": "领班"
+        },
+        "r_d588cad49b89": {
+          "masculine": "领班场景布置员",
+          "feminine": "领班场景布置员",
+          "neutral": "领班场景布置员"
+        },
+        "r_6cafa4dd814b": {
+          "masculine": "道具主管",
+          "feminine": "道具主管",
+          "neutral": "道具主管"
+        },
+        "r_413221e86652": {
+          "masculine": "道具主管",
+          "feminine": "道具主管",
+          "neutral": "道具主管"
+        },
+        "r_a1e9f4cffb70": {
+          "masculine": "外景道具主管",
+          "feminine": "外景道具主管",
+          "neutral": "外景道具主管"
+        },
+        "r_8f20bee45473": {
+          "masculine": "现场道具",
+          "feminine": "现场道具",
+          "neutral": "现场道具"
+        },
+        "r_7d553f96df87": {
+          "masculine": "现场道具主管",
+          "feminine": "现场道具主管",
+          "neutral": "现场道具主管"
+        },
+        "r_bf9d71b6fdc2": {
+          "masculine": "备用道具",
+          "feminine": "备用道具",
+          "neutral": "备用道具"
+        },
+        "r_a38576fafdab": {
+          "masculine": "道具助理",
+          "feminine": "道具助理",
+          "neutral": "道具助理"
+        },
+        "r_ea2b2fab38f4": {
+          "masculine": "道具助理",
+          "feminine": "道具助理",
+          "neutral": "道具助理"
+        },
+        "r_b685fb4dc943": {
+          "masculine": "外景道具助理",
+          "feminine": "外景道具助理",
+          "neutral": "外景道具助理"
+        },
+        "r_7b9477ba5686": {
+          "masculine": "现场道具助理",
+          "feminine": "现场道具助理",
+          "neutral": "现场道具助理"
+        },
+        "r_541c87622274": {
+          "masculine": "道具采购员",
+          "feminine": "道具采购员",
+          "neutral": "道具采购员"
+        },
+        "r_3c2dae1ec180": {
+          "masculine": "采购员（场景布置）",
+          "feminine": "采购员（场景布置）",
+          "neutral": "采购员（场景布置）"
+        },
+        "r_c17d76240812": {
+          "masculine": "道具仓库经理",
+          "feminine": "道具仓库经理",
+          "neutral": "道具仓库经理"
+        },
+        "r_6a373738f331": {
+          "masculine": "数字道具设计师",
+          "feminine": "数字道具设计师",
+          "neutral": "数字道具设计师"
+        },
+        "r_404bfcb27b87": {
+          "masculine": "数字道具主管",
+          "feminine": "数字道具主管",
+          "neutral": "数字道具主管"
+        },
+        "r_efdc51e3e8eb": {
+          "masculine": "道具制作师",
+          "feminine": "道具制作师",
+          "neutral": "道具制作师"
+        },
+        "r_30872cd93e0c": {
+          "masculine": "道具设计师",
+          "feminine": "道具设计师",
+          "neutral": "道具设计师"
+        },
+        "r_264fc56ea7a5": {
+          "masculine": "武器顾问 / 装备师",
+          "feminine": "武器顾问 / 装备师",
+          "neutral": "武器顾问 / 装备师"
+        },
+        "r_00f9e2afb019": {
+          "masculine": "道具助理",
+          "feminine": "道具助理",
+          "neutral": "道具助理"
+        },
+        "r_ef64ec97e93f": {
+          "masculine": "道具绘制师",
+          "feminine": "道具绘制师",
+          "neutral": "道具绘制师"
+        },
+        "r_8a17379f4cf2": {
+          "masculine": "道具驾驶员",
+          "feminine": "道具驾驶员",
+          "neutral": "道具驾驶员"
+        },
+        "r_fb928031fe07": {
+          "masculine": "特技车 / 车辆协调员",
+          "feminine": "特技车 / 车辆协调员",
+          "neutral": "特技车 / 车辆协调员"
+        },
+        "r_77928b37c49d": {
+          "masculine": "特技车管理员",
+          "feminine": "特技车管理员",
+          "neutral": "特技车管理员"
+        },
+        "r_115e6da0f002": {
+          "masculine": "现场电工",
+          "feminine": "现场电工",
+          "neutral": "现场电工"
+        },
+        "r_857a05036004": {
+          "masculine": "绿化主管 / 绿化工",
+          "feminine": "绿化主管 / 绿化工",
+          "neutral": "绿化主管 / 绿化工"
+        },
+        "r_d8e3dea65e7b": {
+          "masculine": "绿化 / 场景园丁",
+          "feminine": "绿化 / 场景园丁",
+          "neutral": "绿化 / 场景园丁"
+        },
+        "r_aa5ce508ee21": {
+          "masculine": "花艺师",
+          "feminine": "花艺师",
+          "neutral": "花艺师"
+        },
+        "r_36b1709b4159": {
+          "masculine": "食品造型师",
+          "feminine": "食品造型师",
+          "neutral": "食品造型师"
+        },
+        "r_40b095fdeb85": {
+          "masculine": "喷枪艺术家",
+          "feminine": "喷枪艺术家",
+          "neutral": "喷枪艺术家"
+        },
+        "r_afee4f58989a": {
+          "masculine": "布景艺术家 / 美术画家",
+          "feminine": "布景艺术家 / 美术画家",
+          "neutral": "布景艺术家 / 美术画家"
+        },
+        "r_c056e02e39c4": {
+          "masculine": "布景绘画师",
+          "feminine": "布景绘画师",
+          "neutral": "布景绘画师"
+        },
+        "r_e689709eac01": {
+          "masculine": "首席布景绘画师",
+          "feminine": "首席布景绘画师",
+          "neutral": "首席布景绘画师"
+        },
+        "r_70a7586bb774": {
+          "masculine": "招牌书写师 / 字体艺术家",
+          "feminine": "招牌书写师 / 字体艺术家",
+          "neutral": "招牌书写师 / 字体艺术家"
+        },
+        "r_12f20cf536a1": {
+          "masculine": "绘画师 / 布景艺术家",
+          "feminine": "绘画师 / 布景艺术家",
+          "neutral": "绘画师 / 布景艺术家"
+        },
+        "r_dcf49adce47b": {
+          "masculine": "雕塑师 / 模型制作师",
+          "feminine": "雕塑师 / 模型制作师",
+          "neutral": "雕塑师 / 模型制作师"
+        },
+        "r_f4670c7a29a7": {
+          "masculine": "布景石膏师 / 雕塑师",
+          "feminine": "布景石膏师 / 雕塑师",
+          "neutral": "布景石膏师 / 雕塑师"
+        },
+        "r_5fc07d2f3030": {
+          "masculine": "模型制作师",
+          "feminine": "模型制作师",
+          "neutral": "模型制作师"
+        },
+        "r_f545a993cec8": {
+          "masculine": "微缩模型主管",
+          "feminine": "微缩模型主管",
+          "neutral": "微缩模型主管"
+        },
+        "r_d3f5fd4b86c3": {
+          "masculine": "微缩特效主管",
+          "feminine": "微缩特效主管",
+          "neutral": "微缩特效主管"
+        },
+        "r_a6d3fd7eaada": {
+          "masculine": "施工经理",
+          "feminine": "施工经理",
+          "neutral": "施工经理"
+        },
+        "r_ca83b607f08e": {
+          "masculine": "施工协调员",
+          "feminine": "施工协调员",
+          "neutral": "施工协调员"
+        },
+        "r_fbcfd1e1839b": {
+          "masculine": "摄影棚 / 布景施工经理",
+          "feminine": "摄影棚 / 布景施工经理",
+          "neutral": "摄影棚 / 布景施工经理"
+        },
+        "r_0231e128483a": {
+          "masculine": "布景搭建工 / 木工",
+          "feminine": "布景搭建工 / 木工",
+          "neutral": "布景搭建工 / 木工"
+        },
+        "r_62f07946c8f1": {
+          "masculine": "布景施工团队",
+          "feminine": "布景施工团队",
+          "neutral": "布景施工团队"
+        },
+        "r_a3c94f3f3cd1": {
+          "masculine": "舞台 / 施工主管",
+          "feminine": "舞台 / 施工主管",
+          "neutral": "舞台 / 施工主管"
+        },
+        "r_c606af121ce8": {
+          "masculine": "舞台技术员",
+          "feminine": "舞台技术员",
+          "neutral": "舞台技术员"
+        },
+        "r_2017ec503138": {
+          "masculine": "技术绘图员",
+          "feminine": "技术绘图员",
+          "neutral": "技术绘图员"
+        },
+        "r_169af74d49f6": {
+          "masculine": "砌砖工（布景）",
+          "feminine": "砌砖工（布景）",
+          "neutral": "砌砖工（布景）"
+        },
+        "r_578a92348ec6": {
+          "masculine": "金属工",
+          "feminine": "金属工",
+          "neutral": "金属工"
+        },
+        "r_6c7b48200cb3": {
+          "masculine": "金属工（布景）",
+          "feminine": "金属工（布景）",
+          "neutral": "金属工（布景）"
+        },
+        "r_e7f7da33c876": {
+          "masculine": "首席金属工（布景）",
+          "feminine": "首席金属工（布景）",
+          "neutral": "首席金属工（布景）"
+        },
+        "r_027c0b61577d": {
+          "masculine": "石膏艺术家（布景）",
+          "feminine": "石膏艺术家（布景）",
+          "neutral": "石膏艺术家（布景）"
+        },
+        "r_8d5fe63edbd3": {
+          "masculine": "装饰工",
+          "feminine": "装饰工",
+          "neutral": "装饰工"
+        },
+        "r_61ab14bcf2c6": {
+          "masculine": "木工 / 细木工（布景）",
+          "feminine": "木工 / 细木工（布景）",
+          "neutral": "木工 / 细木工（布景）"
+        },
+        "r_3addd9ac0457": {
+          "masculine": "车床工 / 木工（布景）",
+          "feminine": "车床工 / 木工（布景）",
+          "neutral": "车床工 / 木工（布景）"
+        },
+        "r_be99bdf8e0ab": {
+          "masculine": "美术部门协调员",
+          "feminine": "美术部门协调员",
+          "neutral": "美术部门协调员"
+        },
+        "r_9187325e0d84": {
+          "masculine": "美术部门助理协调员",
+          "feminine": "美术部门助理协调员",
+          "neutral": "美术部门助理协调员"
+        },
+        "r_a8af82f5e937": {
+          "masculine": "美术部门助理",
+          "feminine": "美术部门助理",
+          "neutral": "美术部门助理"
+        },
+        "r_8310307922eb": {
+          "masculine": "美术部门实习生",
+          "feminine": "美术部门实习生",
+          "neutral": "美术部门实习生"
+        },
+        "r_f7d87853929b": {
+          "masculine": "布景装饰司机",
+          "feminine": "布景装饰司机",
+          "neutral": "布景装饰司机"
+        },
+        "r_71506d96f350": {
+          "masculine": "美术部门平面设计师",
+          "feminine": "美术部门平面设计师",
+          "neutral": "美术部门平面设计师"
+        },
+        "r_dd224ea66364": {
+          "masculine": "产品维护",
+          "feminine": "产品维护",
+          "neutral": "产品维护"
+        },
+        "r_b2e24af2a895": {
+          "masculine": "艺术作品艺术家",
+          "feminine": "艺术作品艺术家",
+          "neutral": "艺术作品艺术家"
+        },
+        "r_c399668f6f57": {
+          "masculine": "电脑 / 视频回放主管",
+          "feminine": "电脑 / 视频回放主管",
+          "neutral": "电脑 / 视频回放主管"
+        },
+        "r_d278f8dea5ee": {
+          "masculine": "布景搭建 / 施工",
+          "feminine": "布景搭建 / 施工",
+          "neutral": "布景搭建 / 施工"
+        },
+        "r_ed52a3596ba0": {
+          "masculine": "现场施工团队",
+          "feminine": "现场施工团队",
+          "neutral": "现场施工团队"
+        },
+        "r_e3f39e455941": {
+          "masculine": "施工助理",
+          "feminine": "施工助理",
+          "neutral": "施工助理"
+        },
+        "r_74a60171830a": {
+          "masculine": "水下布景施工",
+          "feminine": "水下布景施工",
+          "neutral": "水下布景施工"
+        },
+        "r_18c785ac7bd8": {
+          "masculine": "索具 / 特殊施工",
+          "feminine": "索具 / 特殊施工",
+          "neutral": "索具 / 特殊施工"
+        },
+        "r_8f15fc164b86": {
+          "masculine": "技术绘图助理",
+          "feminine": "技术绘图助理",
+          "neutral": "技术绘图助理"
+        },
+        "r_7e3c819b39ed": {
+          "masculine": "首席石膏艺术家（布景）",
+          "feminine": "首席石膏艺术家（布景）",
+          "neutral": "首席石膏艺术家（布景）"
+        },
+        "r_24a7497a9f06": {
+          "masculine": "布景软垫师",
+          "feminine": "布景软垫师",
+          "neutral": "布景软垫师"
+        },
+        "r_a279ae7e16ec": {
+          "masculine": "首席布景软垫师",
+          "feminine": "首席布景软垫师",
+          "neutral": "首席布景软垫师"
+        },
+        "r_0f2d76b6cc82": {
+          "masculine": "首席木工（布景）",
+          "feminine": "首席木工（布景）",
+          "neutral": "首席木工（布景）"
+        },
+        "r_08876b0452b5": {
+          "masculine": "美术部门实习生",
+          "feminine": "美术部门实习生",
+          "neutral": "美术部门实习生"
+        }
+      },
+      "kostuem": {
+        "r_cfc0491e1daf": {
+          "masculine": "服装设计师",
+          "feminine": "服装设计师",
+          "neutral": "服装设计师"
+        },
+        "r_acbff2b1675d": {
+          "masculine": "服装主管",
+          "feminine": "服装主管",
+          "neutral": "服装主管"
+        },
+        "r_4e5a29f37fde": {
+          "masculine": "助理服装主管",
+          "feminine": "助理服装主管",
+          "neutral": "助理服装主管"
+        },
+        "r_9dacdd987a87": {
+          "masculine": "服装协调员",
+          "feminine": "服装协调员",
+          "neutral": "服装协调员"
+        },
+        "r_3ea2819cc8c4": {
+          "masculine": "助理服装协调员",
+          "feminine": "助理服装协调员",
+          "neutral": "助理服装协调员"
+        },
+        "r_3684af682bde": {
+          "masculine": "助理服装设计师",
+          "feminine": "助理服装设计师",
+          "neutral": "助理服装设计师"
+        },
+        "r_bca9201a3794": {
+          "masculine": "二助服装设计师",
+          "feminine": "二助服装设计师",
+          "neutral": "二助服装设计师"
+        },
+        "r_570a76c15c34": {
+          "masculine": "三助服装设计师",
+          "feminine": "三助服装设计师",
+          "neutral": "三助服装设计师"
+        },
+        "r_75358a18f698": {
+          "masculine": "首席服装师",
+          "feminine": "首席服装师",
+          "neutral": "首席服装师"
+        },
+        "r_df59c1f51566": {
+          "masculine": "现场服装师 / 服装助理",
+          "feminine": "现场服装师 / 服装助理",
+          "neutral": "现场服装师 / 服装助理"
+        },
+        "r_7d1eb3e51b50": {
+          "masculine": "额外现场服装师",
+          "feminine": "额外现场服装师",
+          "neutral": "额外现场服装师"
+        },
+        "r_aa38c8f5acdd": {
+          "masculine": "现场服装助理",
+          "feminine": "现场服装助理",
+          "neutral": "现场服装助理"
+        },
+        "r_85a93499fa51": {
+          "masculine": "群众服装主管",
+          "feminine": "群众服装主管",
+          "neutral": "群众服装主管"
+        },
+        "r_73f373881e68": {
+          "masculine": "群众试衣师",
+          "feminine": "群众试衣师",
+          "neutral": "群众试衣师"
+        },
+        "r_82daef37fafd": {
+          "masculine": "服装运输员",
+          "feminine": "服装运输员",
+          "neutral": "服装运输员"
+        },
+        "r_40f30fffbd6a": {
+          "masculine": "服装采购员",
+          "feminine": "服装采购员",
+          "neutral": "服装采购员"
+        },
+        "r_60a2042cfa65": {
+          "masculine": "服装会计",
+          "feminine": "服装会计",
+          "neutral": "服装会计"
+        },
+        "r_6ece4b3c2f60": {
+          "masculine": "服装主管",
+          "feminine": "服装主管",
+          "neutral": "服装主管"
+        },
+        "r_bb614a4f62e2": {
+          "masculine": "服装助理",
+          "feminine": "服装助理",
+          "neutral": "服装助理"
+        },
+        "r_86f8b66926fc": {
+          "masculine": "服装实习生",
+          "feminine": "服装实习生",
+          "neutral": "服装实习生"
+        },
+        "r_272717911d79": {
+          "masculine": "裁缝",
+          "feminine": "裁缝",
+          "neutral": "裁缝"
+        },
+        "r_3a35662b53a3": {
+          "masculine": "缝纫工",
+          "feminine": "缝纫工",
+          "neutral": "缝纫工"
+        },
+        "r_298c04a0eec5": {
+          "masculine": "纺织艺术家",
+          "feminine": "纺织艺术家",
+          "neutral": "纺织艺术家"
+        },
+        "r_2a6b1e3320f5": {
+          "masculine": "服装制作师",
+          "feminine": "服装制作师",
+          "neutral": "服装制作师"
+        },
+        "r_066dc1f269bb": {
+          "masculine": "服装道具制作师",
+          "feminine": "服装道具制作师",
+          "neutral": "服装道具制作师"
+        },
+        "r_83db0e1a7bff": {
+          "masculine": "服装制版师",
+          "feminine": "服装制版师",
+          "neutral": "服装制版师"
+        },
+        "r_fc8d26a01b37": {
+          "masculine": "女装定制裁缝",
+          "feminine": "女装定制裁缝",
+          "neutral": "女装定制裁缝"
+        },
+        "r_9aaa9c423455": {
+          "masculine": "男装定制裁缝",
+          "feminine": "男装定制裁缝",
+          "neutral": "男装定制裁缝"
+        },
+        "r_975bb2c38b93": {
+          "masculine": "女帽匠",
+          "feminine": "女帽匠",
+          "neutral": "女帽匠"
+        },
+        "r_e5cb00d76add": {
+          "masculine": "束身衣制作师",
+          "feminine": "束身衣制作师",
+          "neutral": "束身衣制作师"
+        },
+        "r_f573123c66c5": {
+          "masculine": "服装插画师",
+          "feminine": "服装插画师",
+          "neutral": "服装插画师"
+        },
+        "r_3218fd13d59c": {
+          "masculine": "服装绘染师",
+          "feminine": "服装绘染师",
+          "neutral": "服装绘染师"
+        },
+        "r_f8c4b94e93de": {
+          "masculine": "服装老化艺术家",
+          "feminine": "服装老化艺术家",
+          "neutral": "服装老化艺术家"
+        },
+        "r_25bf82085577": {
+          "masculine": "服装刺绣师",
+          "feminine": "服装刺绣师",
+          "neutral": "服装刺绣师"
+        },
+        "r_4bd9dd09da1d": {
+          "masculine": "服装研究员",
+          "feminine": "服装研究员",
+          "neutral": "服装研究员"
+        },
+        "r_2efd6bda8664": {
+          "masculine": "服装司机",
+          "feminine": "服装司机",
+          "neutral": "服装司机"
+        },
+        "r_a723a074986b": {
+          "masculine": "破损处理艺术家（老化/磨损）",
+          "feminine": "破损处理艺术家（老化/磨损）",
+          "neutral": "破损处理艺术家（老化/磨损）"
+        },
+        "r_ac01a53c578c": {
+          "masculine": "特效服装",
+          "feminine": "特效服装",
+          "neutral": "特效服装"
+        },
+        "r_bbc01e9dad81": {
+          "masculine": "造型师/造型助理",
+          "feminine": "造型师/造型助理",
+          "neutral": "造型师/造型助理"
+        },
+        "r_0cf394ee7640": {
+          "masculine": "服装设计师（设计）",
+          "feminine": "服装设计师（设计）",
+          "neutral": "服装设计师（设计）"
+        },
+        "r_6e84493aa620": {
+          "masculine": "服装顾问",
+          "feminine": "服装顾问",
+          "neutral": "服装顾问"
+        },
+        "r_7673a5020856": {
+          "masculine": "服装设计助理",
+          "feminine": "服装设计助理",
+          "neutral": "服装设计助理"
+        },
+        "r_1ca2128245c1": {
+          "masculine": "服装部门协调员",
+          "feminine": "服装部门协调员",
+          "neutral": "服装部门协调员"
+        },
+        "r_f707bb1f5992": {
+          "masculine": "现场服装师",
+          "feminine": "现场服装师",
+          "neutral": "现场服装师"
+        },
+        "r_cc15942423ce": {
+          "masculine": "现场服装助理",
+          "feminine": "现场服装助理",
+          "neutral": "现场服装助理"
+        },
+        "r_fa17db9ddd73": {
+          "masculine": "造型师",
+          "feminine": "造型师",
+          "neutral": "造型师"
+        },
+        "r_510b1830a8a9": {
+          "masculine": "造型助理",
+          "feminine": "造型助理",
+          "neutral": "造型助理"
+        },
+        "r_cc5427b5207e": {
+          "masculine": "服装主管",
+          "feminine": "服装主管",
+          "neutral": "服装主管"
+        },
+        "r_51e4b1b69e51": {
+          "masculine": "女装裁缝",
+          "feminine": "女装裁缝",
+          "neutral": "女装裁缝"
+        },
+        "r_c90f0f14aa1d": {
+          "masculine": "男装裁缝",
+          "feminine": "男装裁缝",
+          "neutral": "男装裁缝"
+        },
+        "r_b02e861df06e": {
+          "masculine": "女帽匠/帽子制作师",
+          "feminine": "女帽匠/帽子制作师",
+          "neutral": "女帽匠/帽子制作师"
+        },
+        "r_f4d2f92c7063": {
+          "masculine": "束身衣制作师",
+          "feminine": "束身衣制作师",
+          "neutral": "束身衣制作师"
+        },
+        "r_60b06eb1a3e5": {
+          "masculine": "服装主管",
+          "feminine": "服装主管",
+          "neutral": "服装主管"
+        },
+        "r_b57d7945c2e1": {
+          "masculine": "服装助理",
+          "feminine": "服装助理",
+          "neutral": "服装助理"
+        },
+        "r_2ac825cfa903": {
+          "masculine": "裁缝",
+          "feminine": "裁缝",
+          "neutral": "裁缝"
+        },
+        "r_f5c79a825c6d": {
+          "masculine": "服装司机",
+          "feminine": "服装司机",
+          "neutral": "服装司机"
+        },
+        "r_d964234f1385": {
+          "masculine": "缝纫工",
+          "feminine": "缝纫工",
+          "neutral": "缝纫工"
+        },
+        "r_6371bcd4467e": {
+          "masculine": "服装老化/破损处理艺术家",
+          "feminine": "服装老化/破损处理艺术家",
+          "neutral": "服装老化/破损处理艺术家"
+        },
+        "r_93cc3465aeac": {
+          "masculine": "服装绘染师",
+          "feminine": "服装绘染师",
+          "neutral": "服装绘染师"
+        },
+        "r_9f631f727b98": {
+          "masculine": "服装刺绣师",
+          "feminine": "服装刺绣师",
+          "neutral": "服装刺绣师"
+        },
+        "r_fd593b68c6bd": {
+          "masculine": "服装插画师",
+          "feminine": "服装插画师",
+          "neutral": "服装插画师"
+        },
+        "r_52cc391775b8": {
+          "masculine": "服装设计实习生",
+          "feminine": "服装设计实习生",
+          "neutral": "服装设计实习生"
+        }
+      },
+      "maske": {
+        "r_2cecb5bef109": {
+          "masculine": "化妆与发型主管",
+          "feminine": "化妆与发型主管",
+          "neutral": "化妆与发型主管"
+        },
+        "r_8c46abf33a4b": {
+          "masculine": "发型设计师",
+          "feminine": "发型设计师",
+          "neutral": "发型设计师"
+        },
+        "r_afd55563be09": {
+          "masculine": "发型与化妆设计师",
+          "feminine": "发型与化妆设计师",
+          "neutral": "发型与化妆设计师"
+        },
+        "r_0d2723e6a8cc": {
+          "masculine": "化妆设计师",
+          "feminine": "化妆设计师",
+          "neutral": "化妆设计师"
+        },
+        "r_b73ceeda53dd": {
+          "masculine": "发型与化妆主管",
+          "feminine": "发型与化妆主管",
+          "neutral": "发型与化妆主管"
+        },
+        "r_913e5cf46a02": {
+          "masculine": "首席化妆师",
+          "feminine": "首席化妆师",
+          "neutral": "首席化妆师"
+        },
+        "r_495a42f74fbb": {
+          "masculine": "首席发型师",
+          "feminine": "首席发型师",
+          "neutral": "首席发型师"
+        },
+        "r_ff414fc1a4e8": {
+          "masculine": "化妆师",
+          "feminine": "化妆师",
+          "neutral": "化妆师"
+        },
+        "r_ace166547405": {
+          "masculine": "助理化妆师",
+          "feminine": "助理化妆师",
+          "neutral": "助理化妆师"
+        },
+        "r_96cb48e2539d": {
+          "masculine": "发型师",
+          "feminine": "发型师",
+          "neutral": "发型师"
+        },
+        "r_3a06bbd5516b": {
+          "masculine": "助理发型师",
+          "feminine": "助理发型师",
+          "neutral": "助理发型师"
+        },
+        "r_a8a061642ea1": {
+          "masculine": "化妆部门主管",
+          "feminine": "化妆部门主管",
+          "neutral": "化妆部门主管"
+        },
+        "r_988255c043c0": {
+          "masculine": "身体化妆师",
+          "feminine": "身体化妆师",
+          "neutral": "身体化妆师"
+        },
+        "r_62302b472d3b": {
+          "masculine": "助理化妆师",
+          "feminine": "助理化妆师",
+          "neutral": "助理化妆师"
+        },
+        "r_de6fbe18e529": {
+          "masculine": "化妆助理",
+          "feminine": "化妆助理",
+          "neutral": "化妆助理"
+        },
+        "r_89708da23c7a": {
+          "masculine": "假发制作师",
+          "feminine": "假发制作师",
+          "neutral": "假发制作师"
+        },
+        "r_eb0f745569de": {
+          "masculine": "假体艺术家",
+          "feminine": "假体艺术家",
+          "neutral": "假体艺术家"
+        },
+        "r_bc667775a067": {
+          "masculine": "特效化妆师",
+          "feminine": "特效化妆师",
+          "neutral": "特效化妆师"
+        },
+        "r_a27c177f51ef": {
+          "masculine": "群众发型与化妆主管",
+          "feminine": "群众发型与化妆主管",
+          "neutral": "群众发型与化妆主管"
+        },
+        "r_e46c728a4398": {
+          "masculine": "化妆实习生",
+          "feminine": "化妆实习生",
+          "neutral": "化妆实习生"
+        },
+        "r_3bd74d7ca372": {
+          "masculine": "首席化妆师",
+          "feminine": "首席化妆师",
+          "neutral": "首席化妆师"
+        },
+        "r_1dbe2290254a": {
+          "masculine": "化妆部门主管",
+          "feminine": "化妆部门主管",
+          "neutral": "化妆部门主管"
+        },
+        "r_3e08c4bedcc0": {
+          "masculine": "身体化妆师",
+          "feminine": "身体化妆师",
+          "neutral": "身体化妆师"
+        },
+        "r_24c9ee41124f": {
+          "masculine": "助理化妆师",
+          "feminine": "助理化妆师",
+          "neutral": "助理化妆师"
+        },
+        "r_6373cbbea77f": {
+          "masculine": "假发制作师",
+          "feminine": "假发制作师",
+          "neutral": "假发制作师"
+        },
+        "r_e9a07f599b31": {
+          "masculine": "化妆实习生",
+          "feminine": "化妆实习生",
+          "neutral": "化妆实习生"
+        }
+      },
+      "post": {
+        "r_f88d95239ea1": {
+          "masculine": "后期制作制片人",
+          "feminine": "后期制作制片人",
+          "neutral": "后期制作制片人"
+        },
+        "r_4284177c72b3": {
+          "masculine": "后期制作主管",
+          "feminine": "后期制作主管",
+          "neutral": "后期制作主管"
+        },
+        "r_c2fb80f3e981": {
+          "masculine": "后期制作经理",
+          "feminine": "后期制作经理",
+          "neutral": "后期制作经理"
+        },
+        "r_3021537edab0": {
+          "masculine": "计算机图形主管",
+          "feminine": "计算机图形主管",
+          "neutral": "计算机图形主管"
+        },
+        "r_0d4cd83ac5f0": {
+          "masculine": "CG软件开发员",
+          "feminine": "CG软件开发员",
+          "neutral": "CG软件开发员"
+        },
+        "r_4d7b70afc38f": {
+          "masculine": "概念艺术家（视觉特效）",
+          "feminine": "概念艺术家（视觉特效）",
+          "neutral": "概念艺术家（视觉特效）"
+        },
+        "r_1d77801b6bcb": {
+          "masculine": "角色设计师",
+          "feminine": "角色设计师",
+          "neutral": "角色设计师"
+        },
+        "r_2eeabfb3e033": {
+          "masculine": "角色主管",
+          "feminine": "角色主管",
+          "neutral": "角色主管"
+        },
+        "r_d4054cc011f7": {
+          "masculine": "机动特技主管",
+          "feminine": "机动特技主管",
+          "neutral": "机动特技主管"
+        },
+        "r_27773325d503": {
+          "masculine": "预演主管",
+          "feminine": "预演主管",
+          "neutral": "预演主管"
+        },
+        "r_4e65539d8bde": {
+          "masculine": "预演艺术家",
+          "feminine": "预演艺术家",
+          "neutral": "预演艺术家"
+        },
+        "r_09f34347e5ee": {
+          "masculine": "动作捕捉主管",
+          "feminine": "动作捕捉主管",
+          "neutral": "动作捕捉主管"
+        },
+        "r_96c37e1de0fa": {
+          "masculine": "运动控制主管",
+          "feminine": "运动控制主管",
+          "neutral": "运动控制主管"
+        },
+        "r_733686f9ae97": {
+          "masculine": "每日素材操作员",
+          "feminine": "每日素材操作员",
+          "neutral": "每日素材操作员"
+        },
+        "r_ab703255dec3": {
+          "masculine": "输入输出协调员",
+          "feminine": "输入输出协调员",
+          "neutral": "输入输出协调员"
+        },
+        "r_75540ed9967e": {
+          "masculine": "胶片转录操作员",
+          "feminine": "胶片转录操作员",
+          "neutral": "胶片转录操作员"
+        },
+        "r_6c17929b4f69": {
+          "masculine": "数字匹配师",
+          "feminine": "数字匹配师",
+          "neutral": "数字匹配师"
+        },
+        "r_2646f9b4aadf": {
+          "masculine": "抠像艺术家",
+          "feminine": "抠像艺术家",
+          "neutral": "抠像艺术家"
+        },
+        "r_1abce9757421": {
+          "masculine": "数字资产管理员（DAM）",
+          "feminine": "数字资产管理员（DAM）",
+          "neutral": "数字资产管理员（DAM）"
+        },
+        "r_e28081bd8659": {
+          "masculine": "数字中间片主管",
+          "feminine": "数字中间片主管",
+          "neutral": "数字中间片主管"
+        },
+        "r_3be4ac15eccc": {
+          "masculine": "数字中间片工程师",
+          "feminine": "数字中间片工程师",
+          "neutral": "数字中间片工程师"
+        },
+        "r_ac6763f1d04b": {
+          "masculine": "数字中间片助理",
+          "feminine": "数字中间片助理",
+          "neutral": "数字中间片助理"
+        },
+        "r_68b5ed487d7c": {
+          "masculine": "视觉特效数据管理员",
+          "feminine": "视觉特效数据管理员",
+          "neutral": "视觉特效数据管理员"
+        },
+        "r_98875c546157": {
+          "masculine": "渲染管理员",
+          "feminine": "渲染管理员",
+          "neutral": "渲染管理员"
+        },
+        "r_37de85ee2914": {
+          "masculine": "3D立体主管",
+          "feminine": "3D立体主管",
+          "neutral": "3D立体主管"
+        },
+        "r_138f0f7f11c5": {
+          "masculine": "片场回放操作员",
+          "feminine": "片场回放操作员",
+          "neutral": "片场回放操作员"
+        },
+        "r_6c52a0b17c05": {
+          "masculine": "视觉特效实习生",
+          "feminine": "视觉特效实习生",
+          "neutral": "视觉特效实习生"
+        },
+        "r_1a1b5684e757": {
+          "masculine": "视觉特效制作助理",
+          "feminine": "视觉特效制作助理",
+          "neutral": "视觉特效制作助理"
+        },
+        "r_03863e1fa165": {
+          "masculine": "视觉特效团队经理",
+          "feminine": "视觉特效团队经理",
+          "neutral": "视觉特效团队经理"
+        },
+        "r_0006a71a7050": {
+          "masculine": "3D部门主管",
+          "feminine": "3D部门主管",
+          "neutral": "3D部门主管"
+        },
+        "r_9ad285824801": {
+          "masculine": "3D动画导演",
+          "feminine": "3D动画导演",
+          "neutral": "3D动画导演"
+        },
+        "r_365169e4e39c": {
+          "masculine": "3D首席角色动画师",
+          "feminine": "3D首席角色动画师",
+          "neutral": "3D首席角色动画师"
+        },
+        "r_6dac25e38271": {
+          "masculine": "3D角色动画师",
+          "feminine": "3D角色动画师",
+          "neutral": "3D角色动画师"
+        },
+        "r_18b24b362b8f": {
+          "masculine": "3D绑定师",
+          "feminine": "3D绑定师",
+          "neutral": "3D绑定师"
+        },
+        "r_b6265894c01c": {
+          "masculine": "3D建模师",
+          "feminine": "3D建模师",
+          "neutral": "3D建模师"
+        },
+        "r_401ce457432d": {
+          "masculine": "3D灯光师",
+          "feminine": "3D灯光师",
+          "neutral": "3D灯光师"
+        },
+        "r_d6c0df6758d4": {
+          "masculine": "3D贴图师",
+          "feminine": "3D贴图师",
+          "neutral": "3D贴图师"
+        },
+        "r_aff4837ba039": {
+          "masculine": "3D摄影师",
+          "feminine": "3D摄影师",
+          "neutral": "3D摄影师"
+        },
+        "r_01ea52ed92df": {
+          "masculine": "3D摄影主管",
+          "feminine": "3D摄影主管",
+          "neutral": "3D摄影主管"
+        },
+        "r_1b2a5f055d73": {
+          "masculine": "特效动画师",
+          "feminine": "特效动画师",
+          "neutral": "特效动画师"
+        },
+        "r_25d305ae2181": {
+          "masculine": "粒子动画师",
+          "feminine": "粒子动画师",
+          "neutral": "粒子动画师"
+        },
+        "r_493348eeb5c9": {
+          "masculine": "2D绑定师",
+          "feminine": "2D绑定师",
+          "neutral": "2D绑定师"
+        },
+        "r_50d612c5929c": {
+          "masculine": "2D动画导演",
+          "feminine": "2D动画导演",
+          "neutral": "2D动画导演"
+        },
+        "r_5b75d1dcc3ba": {
+          "masculine": "2D首席角色动画师",
+          "feminine": "2D首席角色动画师",
+          "neutral": "2D首席角色动画师"
+        },
+        "r_d3bed7009009": {
+          "masculine": "2D角色动画师",
+          "feminine": "2D角色动画师",
+          "neutral": "2D角色动画师"
+        },
+        "r_b9b34ba4ee44": {
+          "masculine": "MotionBuilder艺术家",
+          "feminine": "MotionBuilder艺术家",
+          "neutral": "MotionBuilder艺术家"
+        },
+        "r_40ba6442d974": {
+          "masculine": "MotionBuilder操作员",
+          "feminine": "MotionBuilder操作员",
+          "neutral": "MotionBuilder操作员"
+        },
+        "r_78b6f4ddb08c": {
+          "masculine": "后期制作协调员",
+          "feminine": "后期制作协调员",
+          "neutral": "后期制作协调员"
+        },
+        "r_0bb7e59012ae": {
+          "masculine": "后期制作排期员",
+          "feminine": "后期制作排期员",
+          "neutral": "后期制作排期员"
+        },
+        "r_b54fb6f974fa": {
+          "masculine": "助理后期制作主管",
+          "feminine": "助理后期制作主管",
+          "neutral": "助理后期制作主管"
+        },
+        "r_fae43b642354": {
+          "masculine": "交付经理 / 主管",
+          "feminine": "交付经理 / 主管",
+          "neutral": "交付经理 / 主管"
+        },
+        "r_54b281a42495": {
+          "masculine": "剪辑师",
+          "feminine": "剪辑师",
+          "neutral": "剪辑师"
+        },
+        "r_eb67aee95450": {
+          "masculine": "电影剪辑师",
+          "feminine": "电影剪辑师",
+          "neutral": "电影剪辑师"
+        },
+        "r_332deef8530f": {
+          "masculine": "附加剪辑师",
+          "feminine": "附加剪辑师",
+          "neutral": "附加剪辑师"
+        },
+        "r_4b8538db6e6e": {
+          "masculine": "初级剪辑师",
+          "feminine": "初级剪辑师",
+          "neutral": "初级剪辑师"
+        },
+        "r_a000c69c93cd": {
+          "masculine": "第一助理剪辑师",
+          "feminine": "第一助理剪辑师",
+          "neutral": "第一助理剪辑师"
+        },
+        "r_fb53d3bb0ca0": {
+          "masculine": "剪辑助理",
+          "feminine": "剪辑助理",
+          "neutral": "剪辑助理"
+        },
+        "r_58fb452bb25d": {
+          "masculine": "第二助理剪辑师",
+          "feminine": "第二助理剪辑师",
+          "neutral": "第二助理剪辑师"
+        },
+        "r_e73f1067c3d0": {
+          "masculine": "第二剪辑助理",
+          "feminine": "第二剪辑助理",
+          "neutral": "第二剪辑助理"
+        },
+        "r_f40a64b53f4e": {
+          "masculine": "第三剪辑助理",
+          "feminine": "第三剪辑助理",
+          "neutral": "第三剪辑助理"
+        },
+        "r_f034db9da000": {
+          "masculine": "剪辑剧作顾问",
+          "feminine": "剪辑剧作顾问",
+          "neutral": "剪辑剧作顾问"
+        },
+        "r_9d8fc1953afd": {
+          "masculine": "视觉特效剪辑师",
+          "feminine": "视觉特效剪辑师",
+          "neutral": "视觉特效剪辑师"
+        },
+        "r_6742bca7f725": {
+          "masculine": "预告片剪辑师",
+          "feminine": "预告片剪辑师",
+          "neutral": "预告片剪辑师"
+        },
+        "r_0088f1d1581d": {
+          "masculine": "每日剪辑师",
+          "feminine": "每日剪辑师",
+          "neutral": "每日剪辑师"
+        },
+        "r_855df6fe84d9": {
+          "masculine": "同步助理",
+          "feminine": "同步助理",
+          "neutral": "同步助理"
+        },
+        "r_76fe5605aea7": {
+          "masculine": "Avid 操作员",
+          "feminine": "Avid 操作员",
+          "neutral": "Avid 操作员"
+        },
+        "r_9a37f1a2f07c": {
+          "masculine": "Final Cut 操作员",
+          "feminine": "Final Cut 操作员",
+          "neutral": "Final Cut 操作员"
+        },
+        "r_5c291075de55": {
+          "masculine": "调色师 / 数字中间片",
+          "feminine": "调色师 / 数字中间片",
+          "neutral": "调色师 / 数字中间片"
+        },
+        "r_ee3d75537a1f": {
+          "masculine": "在线剪辑师",
+          "feminine": "在线剪辑师",
+          "neutral": "在线剪辑师"
+        },
+        "r_24e3087423e1": {
+          "masculine": "后期制作艺术家",
+          "feminine": "后期制作艺术家",
+          "neutral": "后期制作艺术家"
+        },
+        "r_1b9c5df34287": {
+          "masculine": "银幕设计师",
+          "feminine": "银幕设计师",
+          "neutral": "银幕设计师"
+        },
+        "r_0c866fbdd1b9": {
+          "masculine": "片头设计师",
+          "feminine": "片头设计师",
+          "neutral": "片头设计师"
+        },
+        "r_cac32c0c1a16": {
+          "masculine": "DCP 技术员",
+          "feminine": "DCP 技术员",
+          "neutral": "DCP 技术员"
+        },
+        "r_3bf9436831af": {
+          "masculine": "胶片扫描操作员",
+          "feminine": "胶片扫描操作员",
+          "neutral": "胶片扫描操作员"
+        },
+        "r_0c4887e0a1b6": {
+          "masculine": "胶片扫描主管",
+          "feminine": "胶片扫描主管",
+          "neutral": "胶片扫描主管"
+        },
+        "r_85f36a10ca63": {
+          "masculine": "视觉特效主管",
+          "feminine": "视觉特效主管",
+          "neutral": "视觉特效主管"
+        },
+        "r_3690883b97f2": {
+          "masculine": "视觉特效制片人",
+          "feminine": "视觉特效制片人",
+          "neutral": "视觉特效制片人"
+        },
+        "r_01122a78805d": {
+          "masculine": "视觉特效协调员",
+          "feminine": "视觉特效协调员",
+          "neutral": "视觉特效协调员"
+        },
+        "r_4c1b3c0e7030": {
+          "masculine": "视觉特效制作经理",
+          "feminine": "视觉特效制作经理",
+          "neutral": "视觉特效制作经理"
+        },
+        "r_b11b0566c205": {
+          "masculine": "视觉特效外包制片人",
+          "feminine": "视觉特效外包制片人",
+          "neutral": "视觉特效外包制片人"
+        },
+        "r_061d09311a06": {
+          "masculine": "助理视觉特效制片人",
+          "feminine": "助理视觉特效制片人",
+          "neutral": "助理视觉特效制片人"
+        },
+        "r_c20adc0c544f": {
+          "masculine": "视觉特效动画主管",
+          "feminine": "视觉特效动画主管",
+          "neutral": "视觉特效动画主管"
+        },
+        "r_ef84bdb88ead": {
+          "masculine": "虚拟现实制片人",
+          "feminine": "虚拟现实制片人",
+          "neutral": "虚拟现实制片人"
+        },
+        "r_33a9c6da17ea": {
+          "masculine": "合成师",
+          "feminine": "合成师",
+          "neutral": "合成师"
+        },
+        "r_aca1c9874a93": {
+          "masculine": "合成主管",
+          "feminine": "合成主管",
+          "neutral": "合成主管"
+        },
+        "r_74803d65a47d": {
+          "masculine": "数字合成师",
+          "feminine": "数字合成师",
+          "neutral": "数字合成师"
+        },
+        "r_a61ab2d8897e": {
+          "masculine": "数字特效主管",
+          "feminine": "数字特效主管",
+          "neutral": "数字特效主管"
+        },
+        "r_41f1fab43430": {
+          "masculine": "数字特效设计师",
+          "feminine": "数字特效设计师",
+          "neutral": "数字特效设计师"
+        },
+        "r_09a4c7b8c909": {
+          "masculine": "数字哑光画师",
+          "feminine": "数字哑光画师",
+          "neutral": "数字哑光画师"
+        },
+        "r_1df80b2df510": {
+          "masculine": "二维艺术家",
+          "feminine": "二维艺术家",
+          "neutral": "二维艺术家"
+        },
+        "r_c5222c873ae5": {
+          "masculine": "三维艺术家",
+          "feminine": "三维艺术家",
+          "neutral": "三维艺术家"
+        },
+        "r_f1d016eba483": {
+          "masculine": "灯光艺术家（CG）",
+          "feminine": "灯光艺术家（CG）",
+          "neutral": "灯光艺术家（CG）"
+        },
+        "r_1374d004f892": {
+          "masculine": "纹理艺术家",
+          "feminine": "纹理艺术家",
+          "neutral": "纹理艺术家"
+        },
+        "r_ca0826d47a19": {
+          "masculine": "匹配移动艺术家",
+          "feminine": "匹配移动艺术家",
+          "neutral": "匹配移动艺术家"
+        },
+        "r_272f028d80c7": {
+          "masculine": "抠像艺术家",
+          "feminine": "抠像艺术家",
+          "neutral": "抠像艺术家"
+        },
+        "r_fb2a18a56ba5": {
+          "masculine": "特效艺术家",
+          "feminine": "特效艺术家",
+          "neutral": "特效艺术家"
+        },
+        "r_89c1660cb356": {
+          "masculine": "动画师",
+          "feminine": "动画师",
+          "neutral": "动画师"
+        },
+        "r_2efa5e8c0d5f": {
+          "masculine": "动态设计师",
+          "feminine": "动态设计师",
+          "neutral": "动态设计师"
+        },
+        "r_c2053cb7660f": {
+          "masculine": "角色动画师",
+          "feminine": "角色动画师",
+          "neutral": "角色动画师"
+        },
+        "r_247d43bdfb47": {
+          "masculine": "后期制作助理",
+          "feminine": "后期制作助理",
+          "neutral": "后期制作助理"
+        },
+        "r_e2802de21986": {
+          "masculine": "后期制作技术员",
+          "feminine": "后期制作技术员",
+          "neutral": "后期制作技术员"
+        },
+        "r_1f9c7a9f75a8": {
+          "masculine": "剪辑实习生",
+          "feminine": "剪辑实习生",
+          "neutral": "剪辑实习生"
+        },
+        "r_bf7027763437": {
+          "masculine": "后期制作协调员",
+          "feminine": "后期制作协调员",
+          "neutral": "后期制作协调员"
+        },
+        "r_fc841e10fe4f": {
+          "masculine": "后期主管助理",
+          "feminine": "后期主管助理",
+          "neutral": "后期主管助理"
+        },
+        "r_a79df89d104c": {
+          "masculine": "视觉特效艺术家 / 合成师",
+          "feminine": "视觉特效艺术家 / 合成师",
+          "neutral": "视觉特效艺术家 / 合成师"
+        },
+        "r_2a16dc4c4550": {
+          "masculine": "音效设计师",
+          "feminine": "音效设计师",
+          "neutral": "音效设计师"
+        },
+        "r_b96fddf3696f": {
+          "masculine": "音效剪辑师",
+          "feminine": "音效剪辑师",
+          "neutral": "音效剪辑师"
+        },
+        "r_a903b5656a8c": {
+          "masculine": "DCP 艺术家",
+          "feminine": "DCP 艺术家",
+          "neutral": "DCP 艺术家"
+        },
+        "r_774ffd708e0e": {
+          "masculine": "胶片录制操作员",
+          "feminine": "胶片录制操作员",
+          "neutral": "胶片录制操作员"
+        },
+        "r_8685aa8f2a95": {
+          "masculine": "Mistika 操作员",
+          "feminine": "Mistika 操作员",
+          "neutral": "Mistika 操作员"
+        },
+        "r_9b86e6dde935": {
+          "masculine": "视觉特效技术总监",
+          "feminine": "视觉特效技术总监",
+          "neutral": "视觉特效技术总监"
+        },
+        "r_ab44975f8351": {
+          "masculine": "视觉特效顾问",
+          "feminine": "视觉特效顾问",
+          "neutral": "视觉特效顾问"
+        },
+        "r_6a2814e6546b": {
+          "masculine": "视觉特效灯光主管",
+          "feminine": "视觉特效灯光主管",
+          "neutral": "视觉特效灯光主管"
+        },
+        "r_c043402107e7": {
+          "masculine": "视觉特效场景主管",
+          "feminine": "视觉特效场景主管",
+          "neutral": "视觉特效场景主管"
+        },
+        "r_2d4e2d1e1c2c": {
+          "masculine": "视觉特效制作协调员",
+          "feminine": "视觉特效制作协调员",
+          "neutral": "视觉特效制作协调员"
+        },
+        "r_3a24d45a3a71": {
+          "masculine": "助理视觉特效协调员",
+          "feminine": "助理视觉特效协调员",
+          "neutral": "助理视觉特效协调员"
+        },
+        "r_a2d3fd026c27": {
+          "masculine": "视觉特效执行",
+          "feminine": "视觉特效执行",
+          "neutral": "视觉特效执行"
+        },
+        "r_1d0ffcaee2f8": {
+          "masculine": "视觉特效人力资源经理",
+          "feminine": "视觉特效人力资源经理",
+          "neutral": "视觉特效人力资源经理"
+        },
+        "r_6eb353601a03": {
+          "masculine": "视觉特效IT管理员",
+          "feminine": "视觉特效IT管理员",
+          "neutral": "视觉特效IT管理员"
+        },
+        "r_e70450322709": {
+          "masculine": "视觉特效IT支持",
+          "feminine": "视觉特效IT支持",
+          "neutral": "视觉特效IT支持"
+        },
+        "r_71a68d7195b5": {
+          "masculine": "视觉特效IT系统工程师",
+          "feminine": "视觉特效IT系统工程师",
+          "neutral": "视觉特效IT系统工程师"
+        },
+        "r_30de176c3d86": {
+          "masculine": "管线技术总监",
+          "feminine": "管线技术总监",
+          "neutral": "管线技术总监"
+        }
+      },
+      "musik": {
+        "r_4b516c3014b1": {
+          "masculine": "作曲家",
+          "feminine": "作曲家",
+          "neutral": "作曲家"
+        },
+        "r_78a8b7bafdcf": {
+          "masculine": "附加音乐",
+          "feminine": "附加音乐",
+          "neutral": "附加音乐"
+        },
+        "r_be9c85f652ee": {
+          "masculine": "预告片作曲家",
+          "feminine": "预告片作曲家",
+          "neutral": "预告片作曲家"
+        },
+        "r_d052f25322c5": {
+          "masculine": "音乐导演",
+          "feminine": "音乐导演",
+          "neutral": "音乐导演"
+        },
+        "r_520348654852": {
+          "masculine": "音乐导演",
+          "feminine": "音乐导演",
+          "neutral": "音乐导演"
+        },
+        "r_d614bde7c500": {
+          "masculine": "音乐监督",
+          "feminine": "音乐监督",
+          "neutral": "音乐监督"
+        },
+        "r_1f0d7374bb4c": {
+          "masculine": "配器师",
+          "feminine": "配器师",
+          "neutral": "配器师"
+        },
+        "r_aa4b42f84387": {
+          "masculine": "编曲",
+          "feminine": "编曲",
+          "neutral": "编曲"
+        },
+        "r_8c334f2ac9d3": {
+          "masculine": "编曲",
+          "feminine": "编曲",
+          "neutral": "编曲"
+        },
+        "r_fe19755b0b9e": {
+          "masculine": "指挥",
+          "feminine": "指挥",
+          "neutral": "指挥"
+        },
+        "r_73021f352efb": {
+          "masculine": "指挥",
+          "feminine": "指挥",
+          "neutral": "指挥"
+        },
+        "r_1a95751341fb": {
+          "masculine": "音乐剪辑师",
+          "feminine": "音乐剪辑师",
+          "neutral": "音乐剪辑师"
+        },
+        "r_8fd3dbb18e49": {
+          "masculine": "乐谱抄写员",
+          "feminine": "乐谱抄写员",
+          "neutral": "乐谱抄写员"
+        },
+        "r_d5e57768aab8": {
+          "masculine": "音乐制作人",
+          "feminine": "音乐制作人",
+          "neutral": "音乐制作人"
+        },
+        "r_0e9738be9045": {
+          "masculine": "音乐顾问",
+          "feminine": "音乐顾问",
+          "neutral": "音乐顾问"
+        },
+        "r_82e1a4d8181e": {
+          "masculine": "音乐协调员",
+          "feminine": "音乐协调员",
+          "neutral": "音乐协调员"
+        },
+        "r_00bc34dec4f3": {
+          "masculine": "Logic操作员",
+          "feminine": "Logic操作员",
+          "neutral": "Logic操作员"
+        },
+        "r_0eae67a415cd": {
+          "masculine": "Pro Tools操作员",
+          "feminine": "Pro Tools操作员",
+          "neutral": "Pro Tools操作员"
+        },
+        "r_52aa8c6866dc": {
+          "masculine": "作曲助理",
+          "feminine": "作曲助理",
+          "neutral": "作曲助理"
+        },
+        "r_3e66ad9f45e2": {
+          "masculine": "音乐家",
+          "feminine": "音乐家",
+          "neutral": "音乐家"
+        },
+        "r_ade18645efa3": {
+          "masculine": "音效剪辑师",
+          "feminine": "音效剪辑师",
+          "neutral": "音效剪辑师"
+        },
+        "r_0972afcc1e55": {
+          "masculine": "作曲实习生",
+          "feminine": "作曲实习生",
+          "neutral": "作曲实习生"
+        },
+        "r_801e363423c3": {
+          "masculine": "执行原声带制片人",
+          "feminine": "执行原声带制片人",
+          "neutral": "执行原声带制片人"
+        }
+      },
+      "set-logistik": {
+        "r_06d9aa28368f": {
+          "masculine": "基地跑腿",
+          "feminine": "基地跑腿",
+          "neutral": "基地跑腿"
+        },
+        "r_51e581b5ea39": {
+          "masculine": "司机（小客车 / 货车）",
+          "feminine": "司机（小客车 / 货车）",
+          "neutral": "司机（小客车 / 货车）"
+        },
+        "r_36a599628c2e": {
+          "masculine": "外景司机",
+          "feminine": "外景司机",
+          "neutral": "外景司机"
+        },
+        "r_9bc1a35535fa": {
+          "masculine": "外景组经理",
+          "feminine": "外景组经理",
+          "neutral": "外景组经理"
+        },
+        "r_273f12c52b95": {
+          "masculine": "助理外景经理",
+          "feminine": "助理外景经理",
+          "neutral": "助理外景经理"
+        },
+        "r_ad61df711cdf": {
+          "masculine": "片场保安",
+          "feminine": "片场保安",
+          "neutral": "片场保安"
+        },
+        "r_16476d55e646": {
+          "masculine": "人群控制",
+          "feminine": "人群控制",
+          "neutral": "人群控制"
+        },
+        "r_d4d0eb9a01ad": {
+          "masculine": "动作指导",
+          "feminine": "动作指导",
+          "neutral": "动作指导"
+        },
+        "r_3c6a65ecb046": {
+          "masculine": "动作指导",
+          "feminine": "动作指导",
+          "neutral": "动作指导"
+        },
+        "r_c66e045ffbbf": {
+          "masculine": "亲密场景协调员",
+          "feminine": "亲密场景协调员",
+          "neutral": "亲密场景协调员"
+        },
+        "r_2e9dcd12712e": {
+          "masculine": "编舞",
+          "feminine": "编舞",
+          "neutral": "编舞"
+        },
+        "r_6f899f66fa58": {
+          "masculine": "舞蹈指导",
+          "feminine": "舞蹈指导",
+          "neutral": "舞蹈指导"
+        },
+        "r_f4a45af86f47": {
+          "masculine": "歌唱指导 / 声乐教练",
+          "feminine": "歌唱指导 / 声乐教练",
+          "neutral": "歌唱指导 / 声乐教练"
+        },
+        "r_6e8ad217ef2f": {
+          "masculine": "对白指导",
+          "feminine": "对白指导",
+          "neutral": "对白指导"
+        },
+        "r_63787dc385b1": {
+          "masculine": "方言 / 语言指导",
+          "feminine": "方言 / 语言指导",
+          "neutral": "方言 / 语言指导"
+        },
+        "r_8546ce0263e3": {
+          "masculine": "表演指导（残障 / 神经多样性）",
+          "feminine": "表演指导（残障 / 神经多样性）",
+          "neutral": "表演指导（残障 / 神经多样性）"
+        },
+        "r_969986f76695": {
+          "masculine": "音乐指导",
+          "feminine": "音乐指导",
+          "neutral": "音乐指导"
+        },
+        "r_717c17e3e434": {
+          "masculine": "聋人监督",
+          "feminine": "聋人监督",
+          "neutral": "聋人监督"
+        },
+        "r_e30edc1bd3f8": {
+          "masculine": "多样性顾问",
+          "feminine": "多样性顾问",
+          "neutral": "多样性顾问"
+        },
+        "r_5595cb9aacd1": {
+          "masculine": "敏感性审读员",
+          "feminine": "敏感性审读员",
+          "neutral": "敏感性审读员"
+        },
+        "r_2d5e77118f48": {
+          "masculine": "口译 / 笔译",
+          "feminine": "口译 / 笔译",
+          "neutral": "口译 / 笔译"
+        },
+        "r_48bf6fb54a76": {
+          "masculine": "替身",
+          "feminine": "替身",
+          "neutral": "替身"
+        },
+        "r_5845830d5e82": {
+          "masculine": "片场医护 / 现场急救员",
+          "feminine": "片场医护 / 现场急救员",
+          "neutral": "片场医护 / 现场急救员"
+        },
+        "r_ad72daba923d": {
+          "masculine": "片场教师 / 现场导师",
+          "feminine": "片场教师 / 现场导师",
+          "neutral": "片场教师 / 现场导师"
+        },
+        "r_79e9614b81a6": {
+          "masculine": "儿童看护 / 片场陪护",
+          "feminine": "儿童看护 / 片场陪护",
+          "neutral": "儿童看护 / 片场陪护"
+        },
+        "r_29d48a809858": {
+          "masculine": "儿童福利官",
+          "feminine": "儿童福利官",
+          "neutral": "儿童福利官"
+        },
+        "r_aba4d92c8e69": {
+          "masculine": "艺术家 / 嘉宾 / 贵宾联络",
+          "feminine": "艺术家 / 嘉宾 / 贵宾联络",
+          "neutral": "艺术家 / 嘉宾 / 贵宾联络"
+        },
+        "r_53207f6ae5f4": {
+          "masculine": "心理健康协调员",
+          "feminine": "心理健康协调员",
+          "neutral": "心理健康协调员"
+        },
+        "r_45520abcff27": {
+          "masculine": "健康与福祉官 / 信任联系人",
+          "feminine": "健康与福祉官 / 信任联系人",
+          "neutral": "健康与福祉官 / 信任联系人"
+        },
+        "r_355cbf436694": {
+          "masculine": "健康与安全官",
+          "feminine": "健康与安全官",
+          "neutral": "健康与安全官"
+        },
+        "r_308811767175": {
+          "masculine": "卫生官（新冠）",
+          "feminine": "卫生官（新冠）",
+          "neutral": "卫生官（新冠）"
+        },
+        "r_32790b195d9e": {
+          "masculine": "海洋协调员",
+          "feminine": "海洋协调员",
+          "neutral": "海洋协调员"
+        },
+        "r_c93f3dbba0c2": {
+          "masculine": "水下 / 潜水协调员",
+          "feminine": "水下 / 潜水协调员",
+          "neutral": "水下 / 潜水协调员"
+        },
+        "r_2aed0957c337": {
+          "masculine": "马具 / 绑带师",
+          "feminine": "马具 / 绑带师",
+          "neutral": "马具 / 绑带师"
+        },
+        "r_36f2141e2445": {
+          "masculine": "观众协调员",
+          "feminine": "观众协调员",
+          "neutral": "观众协调员"
+        },
+        "r_dd293d0b7b4b": {
+          "masculine": "顾问导演",
+          "feminine": "顾问导演",
+          "neutral": "顾问导演"
+        },
+        "r_d675b4f70ea4": {
+          "masculine": "创意总监（广告公司）",
+          "feminine": "创意总监（广告公司）",
+          "neutral": "创意总监（广告公司）"
+        },
+        "r_2c01621b03b3": {
+          "masculine": "技术顾问 / 咨询师",
+          "feminine": "技术顾问 / 咨询师",
+          "neutral": "技术顾问 / 咨询师"
+        },
+        "r_777d604a46c7": {
+          "masculine": "专家顾问（制作）",
+          "feminine": "专家顾问（制作）",
+          "neutral": "专家顾问（制作）"
+        },
+        "r_69b1f75394b4": {
+          "masculine": "讲师 / 教练",
+          "feminine": "讲师 / 教练",
+          "neutral": "讲师 / 教练"
+        },
+        "r_9b689ca40dcd": {
+          "masculine": "影响力制片人",
+          "feminine": "影响力制片人",
+          "neutral": "影响力制片人"
+        },
+        "r_b22d32243e5e": {
+          "masculine": "绿色顾问 / 可持续发展顾问",
+          "feminine": "绿色顾问 / 可持续发展顾问",
+          "neutral": "绿色顾问 / 可持续发展顾问"
+        },
+        "r_b7e6bdc7cc1f": {
+          "masculine": "绿色顾问助理",
+          "feminine": "绿色顾问助理",
+          "neutral": "绿色顾问助理"
+        },
+        "r_e84880be1d61": {
+          "masculine": "EPK / 幕后花絮制片主任",
+          "feminine": "EPK / 幕后花絮制片主任",
+          "neutral": "EPK / 幕后花絮制片主任"
+        },
+        "r_715e70975075": {
+          "masculine": "EPK / 幕后花絮制片人",
+          "feminine": "EPK / 幕后花絮制片人",
+          "neutral": "EPK / 幕后花絮制片人"
+        },
+        "r_7028ae82d2e2": {
+          "masculine": "电影修复艺术家",
+          "feminine": "电影修复艺术家",
+          "neutral": "电影修复艺术家"
+        },
+        "r_92791462fbdd": {
+          "masculine": "电影调色师（化学工艺）",
+          "feminine": "电影调色师（化学工艺）",
+          "neutral": "电影调色师（化学工艺）"
+        },
+        "r_e732abed8e31": {
+          "masculine": "光盘媒体制作（DVD / 蓝光）",
+          "feminine": "光盘媒体制作（DVD / 蓝光）",
+          "neutral": "光盘媒体制作（DVD / 蓝光）"
+        },
+        "r_a63ade2d8c7d": {
+          "masculine": "定格动画师",
+          "feminine": "定格动画师",
+          "neutral": "定格动画师"
+        },
+        "r_e56da499fa85": {
+          "masculine": "传统动画师 / 赛璐珞动画师",
+          "feminine": "传统动画师 / 赛璐珞动画师",
+          "neutral": "传统动画师 / 赛璐珞动画师"
+        },
+        "r_868363b4696a": {
+          "masculine": "游戏开发者（节目）",
+          "feminine": "游戏开发者（节目）",
+          "neutral": "游戏开发者（节目）"
+        },
+        "r_776e611a5b6e": {
+          "masculine": "木偶师",
+          "feminine": "木偶师",
+          "neutral": "木偶师"
+        },
+        "r_d3d5008ffded": {
+          "masculine": "VJ / 视觉骑师",
+          "feminine": "VJ / 视觉骑师",
+          "neutral": "VJ / 视觉骑师"
+        },
+        "r_f62082fcf3e6": {
+          "masculine": "播出设计师",
+          "feminine": "播出设计师",
+          "neutral": "播出设计师"
+        },
+        "r_915e8fdeaa84": {
+          "masculine": "字幕校对员",
+          "feminine": "字幕校对员",
+          "neutral": "字幕校对员"
+        },
+        "r_e7b09583174a": {
+          "masculine": "字幕制作员",
+          "feminine": "字幕制作员",
+          "neutral": "字幕制作员"
+        },
+        "r_823099351f18": {
+          "masculine": "导演侦察员",
+          "feminine": "导演侦察员",
+          "neutral": "导演侦察员"
+        },
+        "r_f25ed374ada5": {
+          "masculine": "版权清理",
+          "feminine": "版权清理",
+          "neutral": "版权清理"
+        },
+        "r_bf29b54303ec": {
+          "masculine": "公关摄影师",
+          "feminine": "公关摄影师",
+          "neutral": "公关摄影师"
+        },
+        "r_e2fe82d9e60c": {
+          "masculine": "项目经理（外部）",
+          "feminine": "项目经理（外部）",
+          "neutral": "项目经理（外部）"
+        },
+        "r_3687ead5b451": {
+          "masculine": "个人助理（片场）",
+          "feminine": "个人助理（片场）",
+          "neutral": "个人助理（片场）"
+        },
+        "r_b85e79c1153f": {
+          "masculine": "研究员（综合）",
+          "feminine": "研究员（综合）",
+          "neutral": "研究员（综合）"
+        }
+      },
+      "cast": {
+        "r_3d0e76b883b1": {
+          "masculine": "主演",
+          "feminine": "主演",
+          "neutral": "主演"
+        },
+        "r_543b99d52c01": {
+          "masculine": "演员",
+          "feminine": "演员",
+          "neutral": "演员"
+        },
+        "r_aa64ee1fd5d6": {
+          "masculine": "配角演员",
+          "feminine": "配角演员",
+          "neutral": "配角演员"
+        },
+        "r_5fea55df03ed": {
+          "masculine": "群众演员",
+          "feminine": "群众演员",
+          "neutral": "群众演员"
+        },
+        "r_912a4dbdd23c": {
+          "masculine": "特约群众演员",
+          "feminine": "特约群众演员",
+          "neutral": "特约群众演员"
+        },
+        "r_130f7a137659": {
+          "masculine": "模特",
+          "feminine": "模特",
+          "neutral": "模特"
+        },
+        "r_e1e954da6cbb": {
+          "masculine": "配音演员 / 旁白",
+          "feminine": "配音演员 / 旁白",
+          "neutral": "配音演员 / 旁白"
+        },
+        "r_67da9411185f": {
+          "masculine": "替身",
+          "feminine": "替身",
+          "neutral": "替身"
+        },
+        "r_00100aeac4bb": {
+          "masculine": "特技演员",
+          "feminine": "特技演员",
+          "neutral": "特技演员"
+        },
+        "r_0367b47c9554": {
+          "masculine": "特技替身",
+          "feminine": "特技替身",
+          "neutral": "特技替身"
+        },
+        "r_ca9ccb4b0409": {
+          "masculine": "特技装备师",
+          "feminine": "特技装备师",
+          "neutral": "特技装备师"
+        },
+        "r_418902de8e38": {
+          "masculine": "特技协调员",
+          "feminine": "特技协调员",
+          "neutral": "特技协调员"
+        },
+        "r_7f2d1a7f256f": {
+          "masculine": "助理特技协调员",
+          "feminine": "助理特技协调员",
+          "neutral": "助理特技协调员"
+        },
+        "r_e84ab42c1ded": {
+          "masculine": "特技部门协调员",
+          "feminine": "特技部门协调员",
+          "neutral": "特技部门协调员"
+        },
+        "r_e09f42bb8f68": {
+          "masculine": "打斗编排",
+          "feminine": "打斗编排",
+          "neutral": "打斗编排"
+        },
+        "r_f1b27e4baea8": {
+          "masculine": "动作导演 / 第二单位导演",
+          "feminine": "动作导演 / 第二单位导演",
+          "neutral": "动作导演 / 第二单位导演"
+        },
+        "r_ccdc591d96b4": {
+          "masculine": "空中协调员",
+          "feminine": "空中协调员",
+          "neutral": "空中协调员"
+        },
+        "r_df312d5bf658": {
+          "masculine": "特技骑手",
+          "feminine": "特技骑手",
+          "neutral": "特技骑手"
+        },
+        "r_64fe45905183": {
+          "masculine": "特技技师",
+          "feminine": "特技技师",
+          "neutral": "特技技师"
+        },
+        "r_28088de1cde2": {
+          "masculine": "特技救援潜水员",
+          "feminine": "特技救援潜水员",
+          "neutral": "特技救援潜水员"
+        },
+        "r_f1b818bfac99": {
+          "masculine": "跑酷艺术家",
+          "feminine": "跑酷艺术家",
+          "neutral": "跑酷艺术家"
+        },
+        "r_c9bf4b44628b": {
+          "masculine": "精准驾驶员",
+          "feminine": "精准驾驶员",
+          "neutral": "精准驾驶员"
+        },
+        "r_901a1b08f6ba": {
+          "masculine": "亲密协调员",
+          "feminine": "亲密协调员",
+          "neutral": "亲密协调员"
+        },
+        "r_7a721e572105": {
+          "masculine": "选角助理",
+          "feminine": "选角助理",
+          "neutral": "选角助理"
+        },
+        "r_a1f9ba79ab08": {
+          "masculine": "选角助理",
+          "feminine": "选角助理",
+          "neutral": "选角助理"
+        },
+        "r_84927cc7b2bc": {
+          "masculine": "配角演员",
+          "feminine": "配角演员",
+          "neutral": "配角演员"
+        },
+        "r_97144193d2e9": {
+          "masculine": "群众演员",
+          "feminine": "群众演员",
+          "neutral": "群众演员"
+        },
+        "r_de130677203b": {
+          "masculine": "青少年选角导演",
+          "feminine": "青少年选角导演",
+          "neutral": "青少年选角导演"
+        },
+        "r_27725de30521": {
+          "masculine": "儿童选角导演",
+          "feminine": "儿童选角导演",
+          "neutral": "儿童选角导演"
+        },
+        "r_9e31ceb09d88": {
+          "masculine": "街头选角",
+          "feminine": "街头选角",
+          "neutral": "街头选角"
+        },
+        "r_081340fc2740": {
+          "masculine": "群众/配角选角",
+          "feminine": "群众/配角选角",
+          "neutral": "群众/配角选角"
+        },
+        "r_bff79e6f4b26": {
+          "masculine": "选角实习生",
+          "feminine": "选角实习生",
+          "neutral": "选角实习生"
+        },
+        "r_2f8822fb833a": {
+          "masculine": "特技装备主管",
+          "feminine": "特技装备主管",
+          "neutral": "特技装备主管"
+        },
+        "r_9fadc25f432e": {
+          "masculine": "马车夫",
+          "feminine": "马车夫",
+          "neutral": "马车夫"
+        }
+      },
+      "sfx": {
+        "r_a35d5905e687": {
+          "masculine": "特效主管",
+          "feminine": "特效主管",
+          "neutral": "特效主管"
+        },
+        "r_09c0a67cf5e1": {
+          "masculine": "特效技术员",
+          "feminine": "特效技术员",
+          "neutral": "特效技术员"
+        },
+        "r_881a5efb4c8a": {
+          "masculine": "特效协调员",
+          "feminine": "特效协调员",
+          "neutral": "特效协调员"
+        },
+        "r_a9f1b82c4859": {
+          "masculine": "特效项目经理",
+          "feminine": "特效项目经理",
+          "neutral": "特效项目经理"
+        },
+        "r_cea7226b63f6": {
+          "masculine": "烟火技师",
+          "feminine": "烟火技师",
+          "neutral": "烟火技师"
+        },
+        "r_eb065a9f90c9": {
+          "masculine": "烟火助理",
+          "feminine": "烟火助理",
+          "neutral": "烟火助理"
+        },
+        "r_4d3662b84a22": {
+          "masculine": "微缩特效制片人",
+          "feminine": "微缩特效制片人",
+          "neutral": "微缩特效制片人"
+        },
+        "r_e62650b9e5ae": {
+          "masculine": "生物设计师",
+          "feminine": "生物设计师",
+          "neutral": "生物设计师"
+        },
+        "r_00baca6dc147": {
+          "masculine": "动画机械工程师",
+          "feminine": "动画机械工程师",
+          "neutral": "动画机械工程师"
+        },
+        "r_174ffb787533": {
+          "masculine": "木偶/道具制作师",
+          "feminine": "木偶/道具制作师",
+          "neutral": "木偶/道具制作师"
+        },
+        "r_506a008769b9": {
+          "masculine": "武器师",
+          "feminine": "武器师",
+          "neutral": "武器师"
+        },
+        "r_2409c6266fd3": {
+          "masculine": "武器技术员/军械师",
+          "feminine": "武器技术员/军械师",
+          "neutral": "武器技术员/军械师"
+        },
+        "r_ddb886337a99": {
+          "masculine": "索具师（钢丝）",
+          "feminine": "索具师（钢丝）",
+          "neutral": "索具师（钢丝）"
+        },
+        "r_72a4b7fb935e": {
+          "masculine": "特效索具/特殊结构",
+          "feminine": "特效索具/特殊结构",
+          "neutral": "特效索具/特殊结构"
+        },
+        "r_3628c7df2899": {
+          "masculine": "机械特效技术员",
+          "feminine": "机械特效技术员",
+          "neutral": "机械特效技术员"
+        },
+        "r_41cde5889636": {
+          "masculine": "雪/雨特效技术员",
+          "feminine": "雪/雨特效技术员",
+          "neutral": "雪/雨特效技术员"
+        },
+        "r_ba881d560569": {
+          "masculine": "特效会计",
+          "feminine": "特效会计",
+          "neutral": "特效会计"
+        },
+        "r_c723decf9e2c": {
+          "masculine": "特效技术员",
+          "feminine": "特效技术员",
+          "neutral": "特效技术员"
+        }
+      },
+      "broadcast": {
+        "r_56003554d627": {
+          "masculine": "制作工程师",
+          "feminine": "制作工程师",
+          "neutral": "制作工程师"
+        },
+        "r_a5145362deb9": {
+          "masculine": "广播工程师",
+          "feminine": "广播工程师",
+          "neutral": "广播工程师"
+        },
+        "r_21789a4bd26e": {
+          "masculine": "技术总监",
+          "feminine": "技术总监",
+          "neutral": "技术总监"
+        },
+        "r_ed2861824940": {
+          "masculine": "视频工程师",
+          "feminine": "视频工程师",
+          "neutral": "视频工程师"
+        },
+        "r_f35ad506ce91": {
+          "masculine": "视频混合师",
+          "feminine": "视频混合师",
+          "neutral": "视频混合师"
+        },
+        "r_96549186fbdd": {
+          "masculine": "视频混合师",
+          "feminine": "视频混合师",
+          "neutral": "视频混合师"
+        },
+        "r_b0f32c270502": {
+          "masculine": "着色师",
+          "feminine": "着色师",
+          "neutral": "着色师"
+        },
+        "r_4444caa14211": {
+          "masculine": "摄像机CCU操作员",
+          "feminine": "摄像机CCU操作员",
+          "neutral": "摄像机CCU操作员"
+        },
+        "r_3a845b2c45a4": {
+          "masculine": "DVE操作员",
+          "feminine": "DVE操作员",
+          "neutral": "DVE操作员"
+        },
+        "r_5eb58151f915": {
+          "masculine": "轮廓操作员",
+          "feminine": "轮廓操作员",
+          "neutral": "轮廓操作员"
+        },
+        "r_bc517c79d131": {
+          "masculine": "广播技术员",
+          "feminine": "广播技术员",
+          "neutral": "广播技术员"
+        },
+        "r_d0bc62ba1257": {
+          "masculine": "广播音响主管",
+          "feminine": "广播音响主管",
+          "neutral": "广播音响主管"
+        },
+        "r_6189d7ba75a5": {
+          "masculine": "音响工程师（广播）",
+          "feminine": "音响工程师（广播）",
+          "neutral": "音响工程师（广播）"
+        },
+        "r_9eadf0334fa2": {
+          "masculine": "演播室/活动主管",
+          "feminine": "演播室/活动主管",
+          "neutral": "演播室/活动主管"
+        },
+        "r_da7a6180d72a": {
+          "masculine": "活动经理",
+          "feminine": "活动经理",
+          "neutral": "活动经理"
+        },
+        "r_84e084ee4081": {
+          "masculine": "活动技术员",
+          "feminine": "活动技术员",
+          "neutral": "活动技术员"
+        },
+        "r_2b01c5ebf763": {
+          "masculine": "MAZ操作员",
+          "feminine": "MAZ操作员",
+          "neutral": "MAZ操作员"
+        },
+        "r_d2b49ec6c87b": {
+          "masculine": "VTR/MAZ技术员",
+          "feminine": "VTR/MAZ技术员",
+          "neutral": "VTR/MAZ技术员"
+        },
+        "r_b1e7ad7a4e8d": {
+          "masculine": "EVS操作员",
+          "feminine": "EVS操作员",
+          "neutral": "EVS操作员"
+        },
+        "r_6ce5d1fae4b4": {
+          "masculine": "LSM操作员（慢动作）",
+          "feminine": "LSM操作员（慢动作）",
+          "neutral": "LSM操作员（慢动作）"
+        },
+        "r_23864113991d": {
+          "masculine": "流媒体技术员",
+          "feminine": "流媒体技术员",
+          "neutral": "流媒体技术员"
+        },
+        "r_4e59228ff2bb": {
+          "masculine": "索具师（广播/活动）",
+          "feminine": "索具师（广播/活动）",
+          "neutral": "索具师（广播/活动）"
+        },
+        "r_54aa44e2bc03": {
+          "masculine": "索具助理",
+          "feminine": "索具助理",
+          "neutral": "索具助理"
+        },
+        "r_accbebaa16ce": {
+          "masculine": "视频技术员",
+          "feminine": "视频技术员",
+          "neutral": "视频技术员"
+        },
+        "r_152179bb65ff": {
+          "masculine": "灯光技术员（广播）",
+          "feminine": "灯光技术员（广播）",
+          "neutral": "灯光技术员（广播）"
+        },
+        "r_916b292e3ecc": {
+          "masculine": "音响技术员（广播）",
+          "feminine": "音响技术员（广播）",
+          "neutral": "音响技术员（广播）"
+        },
+        "r_a409aeab8c20": {
+          "masculine": "音频工程师（PA/活动）",
+          "feminine": "音频工程师（PA/活动）",
+          "neutral": "音频工程师（PA/活动）"
+        },
+        "r_894d032abc78": {
+          "masculine": "PA/音响技术员（活动）",
+          "feminine": "PA/音响技术员（活动）",
+          "neutral": "PA/音响技术员（活动）"
+        },
+        "r_87a1930129df": {
+          "masculine": "SNG操作员",
+          "feminine": "SNG操作员",
+          "neutral": "SNG操作员"
+        },
+        "r_0d146769f561": {
+          "masculine": "音响助理（广播）",
+          "feminine": "音响助理（广播）",
+          "neutral": "音响助理（广播）"
+        },
+        "r_4ee86e5361a7": {
+          "masculine": "视频墙操作员",
+          "feminine": "视频墙操作员",
+          "neutral": "视频墙操作员"
+        },
+        "r_7c7bcadca79c": {
+          "masculine": "提词器操作员",
+          "feminine": "提词器操作员",
+          "neutral": "提词器操作员"
+        },
+        "r_e627ebc7d6a6": {
+          "masculine": "技术助理（广播）",
+          "feminine": "技术助理（广播）",
+          "neutral": "技术助理（广播）"
+        },
+        "r_b81926eec6f3": {
+          "masculine": "视频助理",
+          "feminine": "视频助理",
+          "neutral": "视频助理"
+        },
+        "r_45710f001c06": {
+          "masculine": "线缆传送员",
+          "feminine": "线缆传送员",
+          "neutral": "线缆传送员"
+        },
+        "r_34cfe59314f7": {
+          "masculine": "视频混合师/视频切换师",
+          "feminine": "视频混合师/视频切换师",
+          "neutral": "视频混合师/视频切换师"
+        },
+        "r_ba025e1926d2": {
+          "masculine": "LSM操作员（慢动作）",
+          "feminine": "LSM操作员（慢动作）",
+          "neutral": "LSM操作员（慢动作）"
+        },
+        "r_c7e1fa1f7572": {
+          "masculine": "SG操作员",
+          "feminine": "SG操作员",
+          "neutral": "SG操作员"
+        },
+        "r_c0aa2d3b3f9c": {
+          "masculine": "音响助理（广播）",
+          "feminine": "音响助理（广播）",
+          "neutral": "音响助理（广播）"
+        },
+        "r_32ca4217464e": {
+          "masculine": "技术助理（广播）",
+          "feminine": "技术助理（广播）",
+          "neutral": "技术助理（广播）"
+        }
+      },
+      "virtual": {
+        "r_9d90887128a0": {
+          "masculine": "虚拟制作主管",
+          "feminine": "虚拟制作主管",
+          "neutral": "虚拟制作主管"
+        },
+        "r_9c3babb3c638": {
+          "masculine": "虚拟制作制片人",
+          "feminine": "虚拟制作制片人",
+          "neutral": "虚拟制作制片人"
+        },
+        "r_1fee1676270e": {
+          "masculine": "虚拟制作协调员",
+          "feminine": "虚拟制作协调员",
+          "neutral": "虚拟制作协调员"
+        },
+        "r_82e993b4422d": {
+          "masculine": "虚拟制作演播室经理",
+          "feminine": "虚拟制作演播室经理",
+          "neutral": "虚拟制作演播室经理"
+        },
+        "r_14e7e79a9ca8": {
+          "masculine": "虚拟美术部门艺术家",
+          "feminine": "虚拟美术部门艺术家",
+          "neutral": "虚拟美术部门艺术家"
+        },
+        "r_2034a25adda6": {
+          "masculine": "虚拟制作工程师",
+          "feminine": "虚拟制作工程师",
+          "neutral": "虚拟制作工程师"
+        },
+        "r_188b9da491f3": {
+          "masculine": "虚拟制作系统与工具技术总监",
+          "feminine": "虚拟制作系统与工具技术总监",
+          "neutral": "虚拟制作系统与工具技术总监"
+        },
+        "r_93a5c89da775": {
+          "masculine": "LED屏操作员",
+          "feminine": "LED屏操作员",
+          "neutral": "LED屏操作员"
+        },
+        "r_d1415a80bf57": {
+          "masculine": "虚幻引擎操作员",
+          "feminine": "虚幻引擎操作员",
+          "neutral": "虚幻引擎操作员"
+        },
+        "r_1c2e82f4274b": {
+          "masculine": "实时引擎操作员",
+          "feminine": "实时引擎操作员",
+          "neutral": "实时引擎操作员"
+        },
+        "r_247afd3ab3fd": {
+          "masculine": "媒体服务器操作员",
+          "feminine": "媒体服务器操作员",
+          "neutral": "媒体服务器操作员"
+        },
+        "r_8728a8d46ae1": {
+          "masculine": "虚拟制作系统管理员",
+          "feminine": "虚拟制作系统管理员",
+          "neutral": "虚拟制作系统管理员"
+        },
+        "r_e7c27999f9ae": {
+          "masculine": "虚拟制作追踪技术员",
+          "feminine": "虚拟制作追踪技术员",
+          "neutral": "虚拟制作追踪技术员"
+        },
+        "r_bbe66ea7740f": {
+          "masculine": "虚拟制作LED技术员",
+          "feminine": "虚拟制作LED技术员",
+          "neutral": "虚拟制作LED技术员"
+        },
+        "r_ad04846bb2b3": {
+          "masculine": "追踪技术员",
+          "feminine": "追踪技术员",
+          "neutral": "追踪技术员"
+        },
+        "r_c100cb7d8cdf": {
+          "masculine": "实时艺术家",
+          "feminine": "实时艺术家",
+          "neutral": "实时艺术家"
+        },
+        "r_84ae9f742a8c": {
+          "masculine": "虚拟美术部门艺术家",
+          "feminine": "虚拟美术部门艺术家",
+          "neutral": "虚拟美术部门艺术家"
+        }
+      },
+      "redaktion": {
+        "r_67a1c14f27d6": {
+          "masculine": "编辑总监",
+          "feminine": "编辑总监",
+          "neutral": "编辑总监"
+        },
+        "r_fb6f303e781e": {
+          "masculine": "主编",
+          "feminine": "主编",
+          "neutral": "主编"
+        },
+        "r_1d083876d102": {
+          "masculine": "值班编辑",
+          "feminine": "值班编辑",
+          "neutral": "值班编辑"
+        },
+        "r_dba49499f044": {
+          "masculine": "制作主管（广播）",
+          "feminine": "制作主管（广播）",
+          "neutral": "制作主管（广播）"
+        },
+        "r_399d5722db1b": {
+          "masculine": "制作总监（广播）",
+          "feminine": "制作总监（广播）",
+          "neutral": "制作总监（广播）"
+        },
+        "r_97c6fe9db2a1": {
+          "masculine": "节目流程协调员",
+          "feminine": "节目流程协调员",
+          "neutral": "节目流程协调员"
+        },
+        "r_c1f3dd5d125c": {
+          "masculine": "编辑",
+          "feminine": "编辑",
+          "neutral": "编辑"
+        },
+        "r_74db110eed35": {
+          "masculine": "电视编剧/作者",
+          "feminine": "电视编剧/作者",
+          "neutral": "电视编剧/作者"
+        },
+        "r_c68ab8bdf35f": {
+          "masculine": "选角编辑",
+          "feminine": "选角编辑",
+          "neutral": "选角编辑"
+        },
+        "r_db514834619e": {
+          "masculine": "画面编辑",
+          "feminine": "画面编辑",
+          "neutral": "画面编辑"
+        },
+        "r_2d3838a04d2d": {
+          "masculine": "剪辑编辑",
+          "feminine": "剪辑编辑",
+          "neutral": "剪辑编辑"
+        },
+        "r_72b16f73761b": {
+          "masculine": "在线编辑/网页编辑",
+          "feminine": "在线编辑/网页编辑",
+          "neutral": "在线编辑/网页编辑"
+        },
+        "r_1eb2a3ac7a7f": {
+          "masculine": "视频编辑（编辑部）",
+          "feminine": "视频编辑（编辑部）",
+          "neutral": "视频编辑（编辑部）"
+        },
+        "r_fea2147a3023": {
+          "masculine": "电视记者",
+          "feminine": "电视记者",
+          "neutral": "电视记者"
+        },
+        "r_89901fa29127": {
+          "masculine": "记者",
+          "feminine": "记者",
+          "neutral": "记者"
+        },
+        "r_49092803ca90": {
+          "masculine": "导演/节目导演",
+          "feminine": "导演/节目导演",
+          "neutral": "导演/节目导演"
+        },
+        "r_558623ea54e2": {
+          "masculine": "视频制片人",
+          "feminine": "视频制片人",
+          "neutral": "视频制片人"
+        },
+        "r_cd94582e5de3": {
+          "masculine": "视频记者（VJ）",
+          "feminine": "视频记者（VJ）",
+          "neutral": "视频记者（VJ）"
+        },
+        "r_c1632a39db5a": {
+          "masculine": "视频内容创作者（社交媒体）",
+          "feminine": "视频内容创作者（社交媒体）",
+          "neutral": "视频内容创作者（社交媒体）"
+        },
+        "r_48a469f4753e": {
+          "masculine": "主持人",
+          "feminine": "主持人",
+          "neutral": "主持人"
+        },
+        "r_dff0d36f7649": {
+          "masculine": "新闻主播",
+          "feminine": "新闻主播",
+          "neutral": "新闻主播"
+        },
+        "r_d8ae611e8a84": {
+          "masculine": "创意制片人",
+          "feminine": "创意制片人",
+          "neutral": "创意制片人"
+        },
+        "r_52eb2ef13219": {
+          "masculine": "创意总监",
+          "feminine": "创意总监",
+          "neutral": "创意总监"
+        },
+        "r_4741fd392c78": {
+          "masculine": "文案",
+          "feminine": "文案",
+          "neutral": "文案"
+        },
+        "r_7693f0b6836d": {
+          "masculine": "概念开发者",
+          "feminine": "概念开发者",
+          "neutral": "概念开发者"
+        },
+        "r_8ed4467cbce1": {
+          "masculine": "社交媒体制片人",
+          "feminine": "社交媒体制片人",
+          "neutral": "社交媒体制片人"
+        },
+        "r_f3046605ff7d": {
+          "masculine": "编辑助理",
+          "feminine": "编辑助理",
+          "neutral": "编辑助理"
+        },
+        "r_39b32b25eed9": {
+          "masculine": "编辑实习生",
+          "feminine": "编辑实习生",
+          "neutral": "编辑实习生"
+        },
+        "r_7947e117851f": {
+          "masculine": "值班编辑/执行编辑",
+          "feminine": "值班编辑/执行编辑",
+          "neutral": "值班编辑/执行编辑"
+        },
+        "r_9c948261499b": {
+          "masculine": "制作主管（演播室/网络）",
+          "feminine": "制作主管（演播室/网络）",
+          "neutral": "制作主管（演播室/网络）"
+        },
+        "r_844ebb650ef7": {
+          "masculine": "编辑/记者",
+          "feminine": "编辑/记者",
+          "neutral": "编辑/记者"
+        },
+        "r_bac4afc8f929": {
+          "masculine": "剪辑制片人/导演",
+          "feminine": "剪辑制片人/导演",
+          "neutral": "剪辑制片人/导演"
+        },
+        "r_324910e3b0ab": {
+          "masculine": "竞猜编辑",
+          "feminine": "竞猜编辑",
+          "neutral": "竞猜编辑"
+        },
+        "r_363c83ce0934": {
+          "masculine": "暖场艺人",
+          "feminine": "暖场艺人",
+          "neutral": "暖场艺人"
+        },
+        "r_6227b3014b7a": {
+          "masculine": "自由撰稿人/联络员",
+          "feminine": "自由撰稿人/联络员",
+          "neutral": "自由撰稿人/联络员"
+        },
+        "r_dfa579f14095": {
+          "masculine": "日志员/素材日志员",
+          "feminine": "日志员/素材日志员",
+          "neutral": "日志员/素材日志员"
+        },
+        "r_57c0fec76f7d": {
+          "masculine": "转录员",
+          "feminine": "转录员",
+          "neutral": "转录员"
+        },
+        "r_cabe547e084e": {
+          "masculine": "图片研究员",
+          "feminine": "图片研究员",
+          "neutral": "图片研究员"
+        }
+      },
+      "social": {
+        "r_e8a967aad9b7": {
+          "masculine": "内容创作者",
+          "feminine": "内容创作者",
+          "neutral": "内容创作者"
+        },
+        "r_631c65ad8827": {
+          "masculine": "影响者",
+          "feminine": "影响者",
+          "neutral": "影响者"
+        },
+        "r_a9eeb34333bc": {
+          "masculine": "社交媒体经理",
+          "feminine": "社交媒体经理",
+          "neutral": "社交媒体经理"
+        },
+        "r_b510fa57cea0": {
+          "masculine": "用户生成内容创作者",
+          "feminine": "用户生成内容创作者",
+          "neutral": "用户生成内容创作者"
+        },
+        "r_4d66d4dbbf12": {
+          "masculine": "短视频摄像师",
+          "feminine": "短视频摄像师",
+          "neutral": "短视频摄像师"
+        },
+        "r_423ece24b5c2": {
+          "masculine": "抖音创作者",
+          "feminine": "抖音创作者",
+          "neutral": "抖音创作者"
+        },
+        "r_e7483d4ddd6d": {
+          "masculine": "社区经理",
+          "feminine": "社区经理",
+          "neutral": "社区经理"
+        },
+        "r_6f877112cd0a": {
+          "masculine": "社交媒体策略师",
+          "feminine": "社交媒体策略师",
+          "neutral": "社交媒体策略师"
+        },
+        "r_bd90a8429d6f": {
+          "masculine": "影响者/创作者",
+          "feminine": "影响者/创作者",
+          "neutral": "影响者/创作者"
+        },
+        "r_c43ce08ef6e8": {
+          "masculine": "品牌故事讲述者",
+          "feminine": "品牌故事讲述者",
+          "neutral": "品牌故事讲述者"
+        },
+        "r_e75a59be5b02": {
+          "masculine": "社交视频摄像师",
+          "feminine": "社交视频摄像师",
+          "neutral": "社交视频摄像师"
+        },
+        "r_5f522b44dd48": {
+          "masculine": "短视频剪辑师",
+          "feminine": "短视频剪辑师",
+          "neutral": "短视频剪辑师"
+        },
+        "r_ce039c1f951f": {
+          "masculine": "动态图形设计师（社交）",
+          "feminine": "动态图形设计师（社交）",
+          "neutral": "动态图形设计师（社交）"
+        }
+      },
+      "foto": {
+        "r_d2c0588cf0d1": {
+          "masculine": "摄影师",
+          "feminine": "摄影师",
+          "neutral": "摄影师"
+        },
+        "r_d7f7fbf5939c": {
+          "masculine": "时尚摄影师",
+          "feminine": "时尚摄影师",
+          "neutral": "时尚摄影师"
+        },
+        "r_e0551919b067": {
+          "masculine": "产品摄影师",
+          "feminine": "产品摄影师",
+          "neutral": "产品摄影师"
+        },
+        "r_b06301444ef7": {
+          "masculine": "活动摄影师",
+          "feminine": "活动摄影师",
+          "neutral": "活动摄影师"
+        },
+        "r_124df4c664ce": {
+          "masculine": "肖像摄影师",
+          "feminine": "肖像摄影师",
+          "neutral": "肖像摄影师"
+        },
+        "r_2e1fcf07d241": {
+          "masculine": "商业摄影师",
+          "feminine": "商业摄影师",
+          "neutral": "商业摄影师"
+        },
+        "r_02bd21bcff9c": {
+          "masculine": "美食摄影师",
+          "feminine": "美食摄影师",
+          "neutral": "美食摄影师"
+        },
+        "r_8a273a427bd6": {
+          "masculine": "无人机摄影师",
+          "feminine": "无人机摄影师",
+          "neutral": "无人机摄影师"
+        },
+        "r_843b4748146d": {
+          "masculine": "静物摄影师",
+          "feminine": "静物摄影师",
+          "neutral": "静物摄影师"
+        },
+        "r_b622037392fb": {
+          "masculine": "摄影助理",
+          "feminine": "摄影助理",
+          "neutral": "摄影助理"
+        },
+        "r_6a2008f9f2ef": {
+          "masculine": "摄影棚经理",
+          "feminine": "摄影棚经理",
+          "neutral": "摄影棚经理"
+        },
+        "r_341b032b61fc": {
+          "masculine": "修图师",
+          "feminine": "修图师",
+          "neutral": "修图师"
+        },
+        "r_468329a20ba4": {
+          "masculine": "照片编辑",
+          "feminine": "照片编辑",
+          "neutral": "照片编辑"
+        }
+      },
+      "ki": {
+        "r_0af68f26119c": {
+          "masculine": "AI电影制作人",
+          "feminine": "AI电影制作人",
+          "neutral": "AI电影制作人"
+        },
+        "r_7ebc4eeffa63": {
+          "masculine": "AI主管 / AI监督",
+          "feminine": "AI主管 / AI监督",
+          "neutral": "AI主管 / AI监督"
+        },
+        "r_5143bd061069": {
+          "masculine": "AI导演",
+          "feminine": "AI导演",
+          "neutral": "AI导演"
+        },
+        "r_8b38d96f6763": {
+          "masculine": "AI动画师",
+          "feminine": "AI动画师",
+          "neutral": "AI动画师"
+        },
+        "r_addc4afc90e0": {
+          "masculine": "提示工程师（影视与媒体）",
+          "feminine": "提示工程师（影视与媒体）",
+          "neutral": "提示工程师（影视与媒体）"
+        },
+        "r_227b357243e1": {
+          "masculine": "AI编剧",
+          "feminine": "AI编剧",
+          "neutral": "AI编剧"
+        },
+        "r_53ef2619b5af": {
+          "masculine": "AI分镜艺术家",
+          "feminine": "AI分镜艺术家",
+          "neutral": "AI分镜艺术家"
+        },
+        "r_1185b1151f24": {
+          "masculine": "AI图像创作者",
+          "feminine": "AI图像创作者",
+          "neutral": "AI图像创作者"
+        },
+        "r_f551cf191b74": {
+          "masculine": "AI视频创作者",
+          "feminine": "AI视频创作者",
+          "neutral": "AI视频创作者"
+        },
+        "r_b69e1ec80a94": {
+          "masculine": "AI音效设计师",
+          "feminine": "AI音效设计师",
+          "neutral": "AI音效设计师"
+        },
+        "r_237f8a4202e1": {
+          "masculine": "AI调色师",
+          "feminine": "AI调色师",
+          "neutral": "AI调色师"
+        },
+        "r_38b5ef6c319c": {
+          "masculine": "AI工作流程顾问（影视）",
+          "feminine": "AI工作流程顾问（影视）",
+          "neutral": "AI工作流程顾问（影视）"
+        }
+      },
+      "drehbuch": {
+        "r_f63a97948825": {
+          "masculine": "节目统筹",
+          "feminine": "节目统筹",
+          "neutral": "节目统筹"
+        },
+        "r_da4094d01df6": {
+          "masculine": "首席编剧",
+          "feminine": "首席编剧",
+          "neutral": "首席编剧"
+        },
+        "r_48862b016872": {
+          "masculine": "首席编剧助理",
+          "feminine": "首席编剧助理",
+          "neutral": "首席编剧助理"
+        },
+        "r_f0e5da473f57": {
+          "masculine": "节目统筹助理",
+          "feminine": "节目统筹助理",
+          "neutral": "节目统筹助理"
+        },
+        "r_be444be7e73a": {
+          "masculine": "编剧",
+          "feminine": "编剧",
+          "neutral": "编剧"
+        },
+        "r_d1a561dc7125": {
+          "masculine": "联合编剧",
+          "feminine": "联合编剧",
+          "neutral": "联合编剧"
+        },
+        "r_da01eb9b61e7": {
+          "masculine": "重写编剧",
+          "feminine": "重写编剧",
+          "neutral": "重写编剧"
+        },
+        "r_199c194315c9": {
+          "masculine": "剧本医生",
+          "feminine": "剧本医生",
+          "neutral": "剧本医生"
+        },
+        "r_a180812047b1": {
+          "masculine": "故事编辑",
+          "feminine": "故事编辑",
+          "neutral": "故事编辑"
+        },
+        "r_5f9704129182": {
+          "masculine": "故事策划",
+          "feminine": "故事策划",
+          "neutral": "故事策划"
+        },
+        "r_41126a4d581f": {
+          "masculine": "剧本编辑",
+          "feminine": "剧本编辑",
+          "neutral": "剧本编辑"
+        },
+        "r_11bee057c159": {
+          "masculine": "对白编辑",
+          "feminine": "对白编辑",
+          "neutral": "对白编辑"
+        },
+        "r_d578a24e6a6c": {
+          "masculine": "对白编写",
+          "feminine": "对白编写",
+          "neutral": "对白编写"
+        },
+        "r_cbc48ad9850e": {
+          "masculine": "剧本阅读员",
+          "feminine": "剧本阅读员",
+          "neutral": "剧本阅读员"
+        },
+        "r_850bbf550984": {
+          "masculine": "戏剧顾问 / 剧本顾问",
+          "feminine": "戏剧顾问 / 剧本顾问",
+          "neutral": "戏剧顾问 / 剧本顾问"
+        },
+        "r_c33a26535234": {
+          "masculine": "故事开发",
+          "feminine": "故事开发",
+          "neutral": "故事开发"
+        },
+        "r_e439aac0b481": {
+          "masculine": "剧本主管",
+          "feminine": "剧本主管",
+          "neutral": "剧本主管"
+        },
+        "r_a30d0af43af8": {
+          "masculine": "故事主管",
+          "feminine": "故事主管",
+          "neutral": "故事主管"
+        },
+        "r_3aa5851edfa7": {
+          "masculine": "格式开发者",
+          "feminine": "格式开发者",
+          "neutral": "格式开发者"
+        },
+        "r_fc05d4531220": {
+          "masculine": "方案撰写",
+          "feminine": "方案撰写",
+          "neutral": "方案撰写"
+        },
+        "r_601f64f82db2": {
+          "masculine": "配音剧本编写",
+          "feminine": "配音剧本编写",
+          "neutral": "配音剧本编写"
+        },
+        "r_1ddc57dbbeb2": {
+          "masculine": "音频描述编写",
+          "feminine": "音频描述编写",
+          "neutral": "音频描述编写"
+        },
+        "r_9f89ae134497": {
+          "masculine": "电影翻译",
+          "feminine": "电影翻译",
+          "neutral": "电影翻译"
+        },
+        "r_6cc875ec3963": {
+          "masculine": "剧本翻译",
+          "feminine": "剧本翻译",
+          "neutral": "剧本翻译"
+        },
+        "r_5947f173deeb": {
+          "masculine": "字幕翻译",
+          "feminine": "字幕翻译",
+          "neutral": "字幕翻译"
+        },
+        "r_7b6a9a537e9a": {
+          "masculine": "对白翻译",
+          "feminine": "对白翻译",
+          "neutral": "对白翻译"
+        },
+        "r_07f1b8537dbc": {
+          "masculine": "文字记录翻译",
+          "feminine": "文字记录翻译",
+          "neutral": "文字记录翻译"
+        },
+        "r_baf097c29e20": {
+          "masculine": "对白列表转录员",
+          "feminine": "对白列表转录员",
+          "neutral": "对白列表转录员"
+        },
+        "r_84f5505f76e2": {
+          "masculine": "文案撰稿人",
+          "feminine": "文案撰稿人",
+          "neutral": "文案撰稿人"
+        },
+        "r_f38e225361bf": {
+          "masculine": "语言助理",
+          "feminine": "语言助理",
+          "neutral": "语言助理"
+        },
+        "r_eda2531fdadf": {
+          "masculine": "研究员",
+          "feminine": "研究员",
+          "neutral": "研究员"
+        },
+        "r_c6e3b618f79f": {
+          "masculine": "研究助理",
+          "feminine": "研究助理",
+          "neutral": "研究助理"
+        },
+        "r_0434302793dc": {
+          "masculine": "剧本协调员",
+          "feminine": "剧本协调员",
+          "neutral": "剧本协调员"
+        },
+        "r_dae3743c6b89": {
+          "masculine": "剧本实习生",
+          "feminine": "剧本实习生",
+          "neutral": "剧本实习生"
+        }
+      },
+      "public-relations": {
+        "r_1860a572354e": {
+          "masculine": "市场与公关",
+          "feminine": "市场与公关",
+          "neutral": "市场与公关"
+        },
+        "r_201f2da74897": {
+          "masculine": "社交媒体经理（影视）",
+          "feminine": "社交媒体经理（影视）",
+          "neutral": "社交媒体经理（影视）"
+        },
+        "r_041271a6a3ee": {
+          "masculine": "推广协调员",
+          "feminine": "推广协调员",
+          "neutral": "推广协调员"
+        }
+      },
+      "sicherheit-sanitaetsdienst": {
+        "r_972d7ff7233a": {
+          "masculine": "片场医护员",
+          "feminine": "片场医护员",
+          "neutral": "片场医护员"
+        },
+        "r_deefff77f871": {
+          "masculine": "急救医疗技术员",
+          "feminine": "急救医疗技术员",
+          "neutral": "急救医疗技术员"
+        },
+        "r_63a9f32e6a72": {
+          "masculine": "职业急救医护员",
+          "feminine": "职业急救医护员",
+          "neutral": "职业急救医护员"
+        },
+        "r_550de11c2d96": {
+          "masculine": "消防巡查员",
+          "feminine": "消防巡查员",
+          "neutral": "消防巡查员"
+        },
+        "r_427dc70aedd7": {
+          "masculine": "消防助理",
+          "feminine": "消防助理",
+          "neutral": "消防助理"
+        },
+        "r_a3247768d472": {
+          "masculine": "消防官",
+          "feminine": "消防官",
+          "neutral": "消防官"
+        }
+      },
+      "catering-setverpflegung": {
+        "r_330e10f94b8f": {
+          "masculine": "餐饮经理",
+          "feminine": "餐饮经理",
+          "neutral": "餐饮经理"
+        },
+        "r_2fe8f1ac7f90": {
+          "masculine": "片场厨师",
+          "feminine": "片场厨师",
+          "neutral": "片场厨师"
+        },
+        "r_463cca2307e9": {
+          "masculine": "餐饮助理 / 厨房助理",
+          "feminine": "餐饮助理 / 厨房助理",
+          "neutral": "餐饮助理 / 厨房助理"
+        },
+        "r_e114754d9175": {
+          "masculine": "餐饮服务",
+          "feminine": "餐饮服务",
+          "neutral": "餐饮服务"
+        },
+        "r_cb6d56c18bf6": {
+          "masculine": "片场餐饮服务员",
+          "feminine": "片场餐饮服务员",
+          "neutral": "片场餐饮服务员"
+        },
+        "r_532adc563b66": {
+          "masculine": "餐饮 / 流动厨房司机",
+          "feminine": "餐饮 / 流动厨房司机",
+          "neutral": "餐饮 / 流动厨房司机"
+        }
+      },
+      "filmtiere-tiertraining": {
+        "r_3d8ab6fb2c6a": {
+          "masculine": "影视动物训练师",
+          "feminine": "影视动物训练师",
+          "neutral": "影视动物训练师"
+        },
+        "r_654c33dc9c6b": {
+          "masculine": "影视犬训练师",
+          "feminine": "影视犬训练师",
+          "neutral": "影视犬训练师"
+        },
+        "r_40758f075d18": {
+          "masculine": "动物管理员 (Animal Handler)",
+          "feminine": "动物管理员 (Animal Handler)",
+          "neutral": "动物管理员 (Animal Handler)"
+        },
+        "r_7a1591b96b3a": {
+          "masculine": "动物协调员",
+          "feminine": "动物协调员",
+          "neutral": "动物协调员"
+        },
+        "r_a63695a566c3": {
+          "masculine": "片场动物护理员",
+          "feminine": "片场动物护理员",
+          "neutral": "片场动物护理员"
+        },
+        "r_9faf951b627e": {
+          "masculine": "马匹主管 (Horse Master)",
+          "feminine": "马匹主管 (Horse Master)",
+          "neutral": "马匹主管 (Horse Master)"
+        },
+        "r_7c4f137defec": {
+          "masculine": "马匹主管助理",
+          "feminine": "马匹主管助理",
+          "neutral": "马匹主管助理"
+        },
+        "r_8e8f21cf0303": {
+          "masculine": "影视马匹训练师",
+          "feminine": "影视马匹训练师",
+          "neutral": "影视马匹训练师"
+        },
+        "r_35f9ffa503c4": {
+          "masculine": "马匹管理员 (Horse Wrangler)",
+          "feminine": "马匹管理员 (Horse Wrangler)",
+          "neutral": "马匹管理员 (Horse Wrangler)"
+        }
+      }
     }
   },
   "TransactionalEmail": {
@@ -8454,5 +13363,13 @@
     "noMatches": "你尚未收藏此类别的内容。",
     "signInHint": "登录后即可查看收藏内容。",
     "removeItem": "从收藏中移除{name}"
+  },
+  "OccupationForm": {
+    "title": "职业称谓形式",
+    "help": "选择职业称谓的显示形式。你可以随时更改。",
+    "standard": "默认",
+    "masculine": "男性形式",
+    "feminine": "女性形式",
+    "neutral": "中性形式"
   }
 }

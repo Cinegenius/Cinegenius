@@ -1687,7 +1687,54 @@
     "previewNotice": "Den här djurportfolion väntar fortfarande på godkännande och visas bara som en skyddad förhandsvisning.",
     "count": "Antal (valfritt)",
     "handler": "Tränare eller djuransvarig planeras medverka",
-    "delivery": "Transport till inspelningsplatsen är möjlig"
+    "delivery": "Transport till inspelningsplatsen är möjlig",
+    "roleForms": {
+      "tiertrainer": {
+        "masculine": "Filmdjurstränare",
+        "feminine": "Filmdjurstränare",
+        "neutral": "Filmdjurstränare"
+      },
+      "filmhundetrainer": {
+        "masculine": "Filmhundstränare",
+        "feminine": "Filmhundstränare",
+        "neutral": "Filmhundstränare"
+      },
+      "tierbetreuer": {
+        "masculine": "Djuransvarig (Animal Handler)",
+        "feminine": "Djuransvarig (Animal Handler)",
+        "neutral": "Djuransvarig (Animal Handler)"
+      },
+      "tierkoordination": {
+        "masculine": "Djursamordnare (Animal Coordinator)",
+        "feminine": "Djursamordnare (Animal Coordinator)",
+        "neutral": "Djursamordnare (Animal Coordinator)"
+      },
+      "set-tierbetreuung": {
+        "masculine": "Djuransvarig på inspelningsplatsen",
+        "feminine": "Djuransvarig på inspelningsplatsen",
+        "neutral": "Djuransvarig på inspelningsplatsen"
+      },
+      "horse-master": {
+        "masculine": "Hästansvarig (Horse Master)",
+        "feminine": "Hästansvarig (Horse Master)",
+        "neutral": "Hästansvarig (Horse Master)"
+      },
+      "assistant-horse-master": {
+        "masculine": "Assistent till hästansvarig",
+        "feminine": "Assistent till hästansvarig",
+        "neutral": "Assistent till hästansvarig"
+      },
+      "horse-trainer": {
+        "masculine": "Filmhästtränare",
+        "feminine": "Filmhästtränare",
+        "neutral": "Filmhästtränare"
+      },
+      "horse-wrangler": {
+        "masculine": "Hästskötare på inspelning (Horse Wrangler)",
+        "feminine": "Hästskötare på inspelning (Horse Wrangler)",
+        "neutral": "Hästskötare på inspelning (Horse Wrangler)"
+      }
+    }
   },
   "MarketplaceCatalog": {
     "categories": {
@@ -6145,9 +6192,9 @@
       },
       "licht": {
         "r_222be04dbf00": "Gaffer (ljuschef)",
-        "r_1e210e69039a": "Biträdande elchef (Best Boy / Best Girl Electric)",
+        "r_1e210e69039a": "Best boy, el",
         "r_14dd174cd76c": "Riggande gaffer",
-        "r_92137802b24a": "Biträdande elchef för förriggning (Rigging Best Boy / Rigging Best Girl Electric)",
+        "r_92137802b24a": "Riggande best boy",
         "r_7fce7d6fcf12": "Riggelektriker",
         "r_1bcf9d8d9b03": "Belysningstekniker (elektriker)",
         "r_d95b919dded9": "Belysningsmästare",
@@ -6167,13 +6214,13 @@
       },
       "grip": {
         "r_470156bd03e4": "Key grip",
-        "r_cfbf2a22ed6e": "Biträdande gripchef (Best Boy / Best Girl Grip)",
+        "r_cfbf2a22ed6e": "Best boy grip / andre grip",
         "r_32a6ab31b1a1": "Dolly grip / dollyförare",
         "r_376dc1f790b8": "Grip / kamerastöd",
         "r_dbfaadb8821c": "Gripassistent",
         "r_46dab52c1995": "Riggande grip",
         "r_ea7e925bd850": "Riggande key grip",
-        "r_fa9d72fc7978": "Biträdande gripchef för förriggning (Rigging Best Boy / Rigging Best Girl Grip)",
+        "r_fa9d72fc7978": "Riggande best boy grip",
         "r_2fa0b44342d7": "Specialkonstruktioner för kamerastöd",
         "r_08c07afebb7f": "Kamerakran- / jibboperatör",
         "r_5ece318b289f": "Kamerakrantekniker",
@@ -6645,7 +6692,7 @@
       "cast": {
         "r_3d0e76b883b1": "Huvudrollsinnehavare",
         "r_543b99d52c01": "Skådespelare",
-        "r_aa64ee1fd5d6": "Birollsinnehavare",
+        "r_aa64ee1fd5d6": "Birollsskådespelare",
         "r_5fea55df03ed": "Statist",
         "r_912a4dbdd23c": "Smårollsskådespelare",
         "r_130f7a137659": "Modell",
@@ -6668,7 +6715,7 @@
         "r_901a1b08f6ba": "Intimitetskoordinator",
         "r_7a721e572105": "Biträdande rollsättare",
         "r_a1f9ba79ab08": "Castingassistent",
-        "r_84927cc7b2bc": "Birollsinnehavare",
+        "r_84927cc7b2bc": "Birollsskådespelare",
         "r_97144193d2e9": "Statist",
         "r_de130677203b": "Rollsättare för ungdomar",
         "r_27725de30521": "Rollsättare för barn",
@@ -6979,6 +7026,4868 @@
       "x_907c602b417d": "Online och digitalt",
       "x_f4581b3b4f89": "Webbplats, plattform, strömning",
       "x_d06f18dfc1af": "Övriga filmtjänster"
+    },
+    "roleForms": {
+      "produktion": {
+        "r_d479a6d8637e": {
+          "masculine": "Producent",
+          "feminine": "Producent",
+          "neutral": "Producent"
+        },
+        "r_86ca6f7fac85": {
+          "masculine": "Exekutiv producent",
+          "feminine": "Exekutiv producent",
+          "neutral": "Exekutiv producent"
+        },
+        "r_9b38cf86cffe": {
+          "masculine": "Samproducent",
+          "feminine": "Samproducent",
+          "neutral": "Samproducent"
+        },
+        "r_bd2e1cd12f54": {
+          "masculine": "Associerad producent",
+          "feminine": "Associerad producent",
+          "neutral": "Associerad producent"
+        },
+        "r_bc840a4895a2": {
+          "masculine": "Junior producent",
+          "feminine": "Junior producent",
+          "neutral": "Junior producent"
+        },
+        "r_ebaa595e4927": {
+          "masculine": "Linjeproducent",
+          "feminine": "Linjeproducent",
+          "neutral": "Linjeproducent"
+        },
+        "r_9f722922fe7b": {
+          "masculine": "Produktionschef (HL)",
+          "feminine": "Produktionschef (HL)",
+          "neutral": "Produktionschef (HL)"
+        },
+        "r_7fdd4fd31143": {
+          "masculine": "Assistent till produktionschefen",
+          "feminine": "Assistent till produktionschefen",
+          "neutral": "Assistent till produktionschefen"
+        },
+        "r_c8c7f4cd576e": {
+          "masculine": "Produktionsledare (PL)",
+          "feminine": "Produktionsledare (PL)",
+          "neutral": "Produktionsledare (PL)"
+        },
+        "r_edde7bed564a": {
+          "masculine": "Produktionsledare (TV-kanal)",
+          "feminine": "Produktionsledare (TV-kanal)",
+          "neutral": "Produktionsledare (TV-kanal)"
+        },
+        "r_08532652fb27": {
+          "masculine": "Produktionsledarassistent",
+          "feminine": "Produktionsledarassistent",
+          "neutral": "Produktionsledarassistent"
+        },
+        "r_a8ccedf1c4fc": {
+          "masculine": "Produktionsplanerare",
+          "feminine": "Produktionsplanerare",
+          "neutral": "Produktionsplanerare"
+        },
+        "r_73ab62cc6ea9": {
+          "masculine": "Budgetkalkylering",
+          "feminine": "Budgetkalkylering",
+          "neutral": "Budgetkalkylering"
+        },
+        "r_5e8f13168720": {
+          "masculine": "Produktionsövervakare",
+          "feminine": "Produktionsövervakare",
+          "neutral": "Produktionsövervakare"
+        },
+        "r_a8aaf07776e6": {
+          "masculine": "Assistent till produktionsövervakaren",
+          "feminine": "Assistent till produktionsövervakaren",
+          "neutral": "Assistent till produktionsövervakaren"
+        },
+        "r_86a64b938274": {
+          "masculine": "Studiochef",
+          "feminine": "Studiochef",
+          "neutral": "Studiochef"
+        },
+        "r_1dc3e15735f4": {
+          "masculine": "Produktionskoordinator",
+          "feminine": "Produktionskoordinator",
+          "neutral": "Produktionskoordinator"
+        },
+        "r_3d2828618f01": {
+          "masculine": "Assisterande produktionskoordinator",
+          "feminine": "Assisterande produktionskoordinator",
+          "neutral": "Assisterande produktionskoordinator"
+        },
+        "r_b7b1c24b3218": {
+          "masculine": "Produktionsassistent (inspelning)",
+          "feminine": "Produktionsassistent (inspelning)",
+          "neutral": "Produktionsassistent (inspelning)"
+        },
+        "r_504614327108": {
+          "masculine": "Produktionsassistent (kontor)",
+          "feminine": "Produktionsassistent (kontor)",
+          "neutral": "Produktionsassistent (kontor)"
+        },
+        "r_b1c1be59d3fb": {
+          "masculine": "Andre produktionsassistent",
+          "feminine": "Andra produktionsassistent",
+          "neutral": "Andra produktionsassistent"
+        },
+        "r_e9fe06329d79": {
+          "masculine": "Teamassistent",
+          "feminine": "Teamassistent",
+          "neutral": "Teamassistent"
+        },
+        "r_caad7ad378e8": {
+          "masculine": "Personlig assistent",
+          "feminine": "Personlig assistent",
+          "neutral": "Personlig assistent"
+        },
+        "r_9b9ea0970d1e": {
+          "masculine": "Personlig assistent åt produktionen",
+          "feminine": "Personlig assistent åt produktionen",
+          "neutral": "Personlig assistent åt produktionen"
+        },
+        "r_22ca8fe2e611": {
+          "masculine": "Personlig assistent åt skådespelare (talangassistent)",
+          "feminine": "Personlig assistent åt skådespelare (talangassistent)",
+          "neutral": "Personlig assistent åt skådespelare (talangassistent)"
+        },
+        "r_bdfbe6854805": {
+          "masculine": "Producentassistent",
+          "feminine": "Producentassistent",
+          "neutral": "Producentassistent"
+        },
+        "r_d894e33cd89e": {
+          "masculine": "Ledningsassistent",
+          "feminine": "Ledningsassistent",
+          "neutral": "Ledningsassistent"
+        },
+        "r_bdc2cdf19051": {
+          "masculine": "Kontorsassistent",
+          "feminine": "Kontorsassistent",
+          "neutral": "Kontorsassistent"
+        },
+        "r_328519d70fd2": {
+          "masculine": "Boendekoordinator",
+          "feminine": "Boendekoordinator",
+          "neutral": "Boendekoordinator"
+        },
+        "r_6747956824f3": {
+          "masculine": "Resekoordinator",
+          "feminine": "Resekoordinator",
+          "neutral": "Resekoordinator"
+        },
+        "r_b809fe7525be": {
+          "masculine": "Assisterande resekoordinator",
+          "feminine": "Assisterande resekoordinator",
+          "neutral": "Assisterande resekoordinator"
+        },
+        "r_86c92e0bfce0": {
+          "masculine": "Arbetsmiljö- och säkerhetssamordnare",
+          "feminine": "Arbetsmiljö- och säkerhetssamordnare",
+          "neutral": "Arbetsmiljö- och säkerhetssamordnare"
+        },
+        "r_14cee2575cf1": {
+          "masculine": "ADR-koordinator",
+          "feminine": "ADR-koordinator",
+          "neutral": "ADR-koordinator"
+        },
+        "r_92286a252903": {
+          "masculine": "Platschef",
+          "feminine": "Platschef",
+          "neutral": "Platschef"
+        },
+        "r_fc08fa159e6a": {
+          "masculine": "Platsletare",
+          "feminine": "Platsletare",
+          "neutral": "Platsletare"
+        },
+        "r_e5215fd85f99": {
+          "masculine": "Platsletare (extra)",
+          "feminine": "Platsletare (extra)",
+          "neutral": "Platsletare (extra)"
+        },
+        "r_9454a017e69a": {
+          "masculine": "Assisterande platsletare",
+          "feminine": "Assisterande platsletare",
+          "neutral": "Assisterande platsletare"
+        },
+        "r_0d7a23f6a056": {
+          "masculine": "Platskoordinator",
+          "feminine": "Platskoordinator",
+          "neutral": "Platskoordinator"
+        },
+        "r_11bbfbf26e46": {
+          "masculine": "Skådespelarsamordnare",
+          "feminine": "Skådespelarsamordnare",
+          "neutral": "Skådespelarsamordnare"
+        },
+        "r_155f85cc8157": {
+          "masculine": "Enhetschef",
+          "feminine": "Enhetschef",
+          "neutral": "Enhetschef"
+        },
+        "r_475eba080a17": {
+          "masculine": "Covid-samordnare",
+          "feminine": "Covid-samordnare",
+          "neutral": "Covid-samordnare"
+        },
+        "r_a60ca701fcab": {
+          "masculine": "Assisterande covid-samordnare",
+          "feminine": "Assisterande covid-samordnare",
+          "neutral": "Assisterande covid-samordnare"
+        },
+        "r_87a049b62039": {
+          "masculine": "Inspelningsledare för inspelningsmiljö",
+          "feminine": "Inspelningsledare för inspelningsmiljö",
+          "neutral": "Inspelningsledare för inspelningsmiljö"
+        },
+        "r_5b93948ca9fc": {
+          "masculine": "Assistent till inspelningsledaren för inspelningsmiljö",
+          "feminine": "Assistent till inspelningsledaren för inspelningsmiljö",
+          "neutral": "Assistent till inspelningsledaren för inspelningsmiljö"
+        },
+        "r_8a0cbf242686": {
+          "masculine": "Personalplanerare",
+          "feminine": "Personalplanerare",
+          "neutral": "Personalplanerare"
+        },
+        "r_286fb0baa150": {
+          "masculine": "Transportkoordinator",
+          "feminine": "Transportkoordinator",
+          "neutral": "Transportkoordinator"
+        },
+        "r_8e7b74f8a60b": {
+          "masculine": "Assisterande transportkoordinator",
+          "feminine": "Assisterande transportkoordinator",
+          "neutral": "Assisterande transportkoordinator"
+        },
+        "r_940718151db8": {
+          "masculine": "Transportledare",
+          "feminine": "Transportledare",
+          "neutral": "Transportledare"
+        },
+        "r_34e7de86b42e": {
+          "masculine": "Inspelningsledare (1st AD)",
+          "feminine": "Inspelningsledare (1st AD)",
+          "neutral": "Inspelningsledare (1st AD)"
+        },
+        "r_2492443d2786": {
+          "masculine": "Inspelningsledare på plats",
+          "feminine": "Inspelningsledare på plats",
+          "neutral": "Inspelningsledare på plats"
+        },
+        "r_e9593d0ce404": {
+          "masculine": "Tredje regiassistent / statistansvarig",
+          "feminine": "Tredje regiassistent / statistansvarig",
+          "neutral": "Tredje regiassistent / statistansvarig"
+        },
+        "r_4492528d7f86": {
+          "masculine": "Inspelningsledare för basområdet",
+          "feminine": "Inspelningsledare för basområdet",
+          "neutral": "Inspelningsledare för basområdet"
+        },
+        "r_eaee2c8a1b89": {
+          "masculine": "Föraransvarig",
+          "feminine": "Föraransvarig",
+          "neutral": "Föraransvarig"
+        },
+        "r_1e792192a593": {
+          "masculine": "Studioinspelningsledare",
+          "feminine": "Studioinspelningsledare",
+          "neutral": "Studioinspelningsledare"
+        },
+        "r_453722f35b4e": {
+          "masculine": "Avspärrningsansvarig",
+          "feminine": "Avspärrningsansvarig",
+          "neutral": "Avspärrningsansvarig"
+        },
+        "r_01cf9ccbf27d": {
+          "masculine": "Andre inspelningsledare (underhållning / TV)",
+          "feminine": "Andra inspelningsledare (underhållning / TV)",
+          "neutral": "Andra inspelningsledare (underhållning / TV)"
+        },
+        "r_282e1b7d8f09": {
+          "masculine": "Samordnare för förflyttning av inspelningsteam",
+          "feminine": "Samordnare för förflyttning av inspelningsteam",
+          "neutral": "Samordnare för förflyttning av inspelningsteam"
+        },
+        "r_8016e2e4e662": {
+          "masculine": "Inspelningsledarassistent",
+          "feminine": "Inspelningsledarassistent",
+          "neutral": "Inspelningsledarassistent"
+        },
+        "r_1fb7a2292310": {
+          "masculine": "Assistent till förste inspelningsledaren",
+          "feminine": "Assistent till förste inspelningsledaren",
+          "neutral": "Assistent till förste inspelningsledaren"
+        },
+        "r_366708fdb0b3": {
+          "masculine": "Assistent till inspelningsledaren på plats",
+          "feminine": "Assistent till inspelningsledaren på plats",
+          "neutral": "Assistent till inspelningsledaren på plats"
+        },
+        "r_d73d495c6d75": {
+          "masculine": "Produktionsassistent för parkering",
+          "feminine": "Produktionsassistent för parkering",
+          "neutral": "Produktionsassistent för parkering"
+        },
+        "r_4ed4cafa632a": {
+          "masculine": "Avspärrningsassistent",
+          "feminine": "Avspärrningsassistent",
+          "neutral": "Avspärrningsassistent"
+        },
+        "r_6fbe7d952889": {
+          "masculine": "Inspelningsrunner",
+          "feminine": "Inspelningsrunner",
+          "neutral": "Inspelningsrunner"
+        },
+        "r_c8d2a6e8ca0f": {
+          "masculine": "Produktionsförare",
+          "feminine": "Produktionsförare",
+          "neutral": "Produktionsförare"
+        },
+        "r_0d9b0abd3608": {
+          "masculine": "Personlig förare",
+          "feminine": "Personlig förare",
+          "neutral": "Personlig förare"
+        },
+        "r_ef2266f5ad5d": {
+          "masculine": "Utrustningsförare",
+          "feminine": "Utrustningsförare",
+          "neutral": "Utrustningsförare"
+        },
+        "r_100be7827daf": {
+          "masculine": "Produktionsassistent på kontor",
+          "feminine": "Produktionsassistent på kontor",
+          "neutral": "Produktionsassistent på kontor"
+        },
+        "r_c24ef6245054": {
+          "masculine": "Budgetkalkylator",
+          "feminine": "Budgetkalkylator",
+          "neutral": "Budgetkalkylator"
+        },
+        "r_e90f5848bfc3": {
+          "masculine": "Filmproduktionsekonomi",
+          "feminine": "Filmproduktionsekonomi",
+          "neutral": "Filmproduktionsekonomi"
+        },
+        "r_c6dc08a47d0d": {
+          "masculine": "Controller (film)",
+          "feminine": "Controller (film)",
+          "neutral": "Controller (film)"
+        },
+        "r_2557c22fb3d7": {
+          "masculine": "Miljökonsult / hållbarhetsansvarig",
+          "feminine": "Miljökonsult / hållbarhetsansvarig",
+          "neutral": "Miljökonsult / hållbarhetsansvarig"
+        },
+        "r_2a6c1d42831e": {
+          "masculine": "Produktionspraktikant",
+          "feminine": "Produktionspraktikant",
+          "neutral": "Produktionspraktikant"
+        },
+        "r_ede69642be01": {
+          "masculine": "Praktikant hos inspelningsledningen",
+          "feminine": "Praktikant hos inspelningsledningen",
+          "neutral": "Praktikant hos inspelningsledningen"
+        },
+        "r_de9ab1a6b55a": {
+          "masculine": "Produktionsledare",
+          "feminine": "Produktionsledare",
+          "neutral": "Produktionsledare"
+        },
+        "r_fd701e2c1e86": {
+          "masculine": "Inspelningsledare",
+          "feminine": "Inspelningsledare",
+          "neutral": "Inspelningsledare"
+        },
+        "r_eb2de9d80eb5": {
+          "masculine": "Produktionskoordinator",
+          "feminine": "Produktionskoordinator",
+          "neutral": "Produktionskoordinator"
+        },
+        "r_14ba71897157": {
+          "masculine": "Assisterande produktionskoordinator",
+          "feminine": "Assisterande produktionskoordinator",
+          "neutral": "Assisterande produktionskoordinator"
+        },
+        "r_9a9272ffef87": {
+          "masculine": "Produktionsassistent",
+          "feminine": "Produktionsassistent",
+          "neutral": "Produktionsassistent"
+        },
+        "r_b37de62fa7b6": {
+          "masculine": "Andre produktionsassistent",
+          "feminine": "Andra produktionsassistent",
+          "neutral": "Andra produktionsassistent"
+        },
+        "r_35a318ed734f": {
+          "masculine": "Assisterande resekoordinator",
+          "feminine": "Assisterande resekoordinator",
+          "neutral": "Assisterande resekoordinator"
+        },
+        "r_282f5f19af6e": {
+          "masculine": "Inspelningsledare på plats",
+          "feminine": "Inspelningsledare på plats",
+          "neutral": "Inspelningsledare på plats"
+        },
+        "r_a1888e7923b1": {
+          "masculine": "Teamassistent (tidigare produktionssekreterare)",
+          "feminine": "Teamassistent (tidigare produktionssekreterare)",
+          "neutral": "Teamassistent (tidigare produktionssekreterare)"
+        },
+        "r_079a221fcd0e": {
+          "masculine": "Andre inspelningsledare (underhållning / TV)",
+          "feminine": "Andra inspelningsledare (underhållning / TV)",
+          "neutral": "Andra inspelningsledare (underhållning / TV)"
+        },
+        "r_c74c78be5dc2": {
+          "masculine": "Rollsättare",
+          "feminine": "Rollsättare",
+          "neutral": "Rollsättare"
+        },
+        "r_b6e7722029a2": {
+          "masculine": "Produktionscontroller",
+          "feminine": "Produktionscontroller",
+          "neutral": "Produktionscontroller"
+        },
+        "r_4e9c5d6d7198": {
+          "masculine": "Produktionsekonom",
+          "feminine": "Produktionsekonom",
+          "neutral": "Produktionsekonom"
+        },
+        "r_907eb6829faf": {
+          "masculine": "Bokförare",
+          "feminine": "Bokförare",
+          "neutral": "Bokförare"
+        },
+        "r_9ef806a95399": {
+          "masculine": "Assistent inom produktionsekonomi",
+          "feminine": "Assistent inom produktionsekonomi",
+          "neutral": "Assistent inom produktionsekonomi"
+        },
+        "r_3365c6d66b72": {
+          "masculine": "Kassör",
+          "feminine": "Kassör",
+          "neutral": "Kassör"
+        },
+        "r_354a33db42c7": {
+          "masculine": "Löneredovisare",
+          "feminine": "Löneredovisare",
+          "neutral": "Löneredovisare"
+        },
+        "r_f3b7a4579d13": {
+          "masculine": "Praktikant inom produktionsekonomi",
+          "feminine": "Praktikant inom produktionsekonomi",
+          "neutral": "Praktikant inom produktionsekonomi"
+        },
+        "r_614a09237466": {
+          "masculine": "Chef för produktionsstrategi",
+          "feminine": "Chef för produktionsstrategi",
+          "neutral": "Chef för produktionsstrategi"
+        },
+        "r_ab2bca044ad5": {
+          "masculine": "Utvecklingschef",
+          "feminine": "Utvecklingschef",
+          "neutral": "Utvecklingschef"
+        },
+        "r_4c6443207ff2": {
+          "masculine": "Serviceproducent",
+          "feminine": "Serviceproducent",
+          "neutral": "Serviceproducent"
+        },
+        "r_f43970f8871f": {
+          "masculine": "Produktionsansvarig (studio / TV-bolag)",
+          "feminine": "Produktionsansvarig (studio / TV-bolag)",
+          "neutral": "Produktionsansvarig (studio / TV-bolag)"
+        },
+        "r_b490dba5695d": {
+          "masculine": "Assisterande producent",
+          "feminine": "Assisterande producent",
+          "neutral": "Assisterande producent"
+        },
+        "r_7b68ca0f0fb6": {
+          "masculine": "TV-producent",
+          "feminine": "TV-producent",
+          "neutral": "TV-producent"
+        },
+        "r_564bd1be967c": {
+          "masculine": "Promotionsproducent",
+          "feminine": "Promotionsproducent",
+          "neutral": "Promotionsproducent"
+        },
+        "r_17e75f09bb7a": {
+          "masculine": "Övervakande producent",
+          "feminine": "Övervakande producent",
+          "neutral": "Övervakande producent"
+        },
+        "r_09bdde75b5c6": {
+          "masculine": "Berättelseproducent",
+          "feminine": "Berättelseproducent",
+          "neutral": "Berättelseproducent"
+        },
+        "r_63333ae7406f": {
+          "masculine": "Berättelseproducent i efterbearbetning",
+          "feminine": "Berättelseproducent i efterbearbetning",
+          "neutral": "Berättelseproducent i efterbearbetning"
+        },
+        "r_1c7b4db06402": {
+          "masculine": "Producent för byrå och TV-reklam",
+          "feminine": "Producent för byrå och TV-reklam",
+          "neutral": "Producent för byrå och TV-reklam"
+        },
+        "r_05c4bc7ca840": {
+          "masculine": "Producent för stereoskopisk 3D",
+          "feminine": "Producent för stereoskopisk 3D",
+          "neutral": "Producent för stereoskopisk 3D"
+        },
+        "r_6221ed87ef22": {
+          "masculine": "Övervakande producent för stereoskopisk 3D",
+          "feminine": "Övervakande producent för stereoskopisk 3D",
+          "neutral": "Övervakande producent för stereoskopisk 3D"
+        },
+        "r_7edb24c15dcf": {
+          "masculine": "Webb-TV-producent",
+          "feminine": "Webb-TV-producent",
+          "neutral": "Webb-TV-producent"
+        },
+        "r_3d984a13d7b5": {
+          "masculine": "Kreativ producent",
+          "feminine": "Kreativ producent",
+          "neutral": "Kreativ producent"
+        },
+        "r_ae0c8b90c8d1": {
+          "masculine": "Utvecklingsproducent",
+          "feminine": "Utvecklingsproducent",
+          "neutral": "Utvecklingsproducent"
+        },
+        "r_d297bfadcae2": {
+          "masculine": "Utvecklingskoordinator",
+          "feminine": "Utvecklingskoordinator",
+          "neutral": "Utvecklingskoordinator"
+        },
+        "r_54f1c9f4d11e": {
+          "masculine": "Utvecklingsansvarig (studio / TV-bolag)",
+          "feminine": "Utvecklingsansvarig (studio / TV-bolag)",
+          "neutral": "Utvecklingsansvarig (studio / TV-bolag)"
+        },
+        "r_f42fa61db712": {
+          "masculine": "Biträdande kontrollrumsproducent",
+          "feminine": "Biträdande kontrollrumsproducent",
+          "neutral": "Biträdande kontrollrumsproducent"
+        },
+        "r_9d8ea4e7c7aa": {
+          "masculine": "Kontrollrumsproducent / sändningsproducent",
+          "feminine": "Kontrollrumsproducent / sändningsproducent",
+          "neutral": "Kontrollrumsproducent / sändningsproducent"
+        },
+        "r_b837afb89817": {
+          "masculine": "Producent för sändningspromotion",
+          "feminine": "Producent för sändningspromotion",
+          "neutral": "Producent för sändningspromotion"
+        },
+        "r_bacc7a4ec265": {
+          "masculine": "Upphovsrättsfrågor",
+          "feminine": "Upphovsrättsfrågor",
+          "neutral": "Upphovsrättsfrågor"
+        },
+        "r_7e0ace38e8fc": {
+          "masculine": "Affärsfrågor",
+          "feminine": "Affärsfrågor",
+          "neutral": "Affärsfrågor"
+        },
+        "r_0daf662f57c6": {
+          "masculine": "Affärs- och rättsfrågor",
+          "feminine": "Affärs- och rättsfrågor",
+          "neutral": "Affärs- och rättsfrågor"
+        },
+        "r_a95b977fa84f": {
+          "masculine": "Rättsfrågor",
+          "feminine": "Rättsfrågor",
+          "neutral": "Rättsfrågor"
+        },
+        "r_0433186beb99": {
+          "masculine": "Producent för marknadsföring och distribution",
+          "feminine": "Producent för marknadsföring och distribution",
+          "neutral": "Producent för marknadsföring och distribution"
+        },
+        "r_07f0060c8996": {
+          "masculine": "Producentpraktikant",
+          "feminine": "Producentpraktikant",
+          "neutral": "Producentpraktikant"
+        }
+      },
+      "regie": {
+        "r_f59d6991c44a": {
+          "masculine": "Regissör",
+          "feminine": "Regissör",
+          "neutral": "Regissör"
+        },
+        "r_5562e3abbb45": {
+          "masculine": "Medregissör",
+          "feminine": "Medregissör",
+          "neutral": "Medregissör"
+        },
+        "r_df7e552a6792": {
+          "masculine": "Regissör för andra inspelningsenheten",
+          "feminine": "Regissör för andra inspelningsenheten",
+          "neutral": "Regissör för andra inspelningsenheten"
+        },
+        "r_0aca88b2853d": {
+          "masculine": "Studioregissör",
+          "feminine": "Studioregissör",
+          "neutral": "Studioregissör"
+        },
+        "r_394140e22c16": {
+          "masculine": "Dubbningsregissör",
+          "feminine": "Dubbningsregissör",
+          "neutral": "Dubbningsregissör"
+        },
+        "r_7d2cd6bd3a73": {
+          "masculine": "Bildregissör",
+          "feminine": "Bildregissör",
+          "neutral": "Bildregissör"
+        },
+        "r_988a573b39e7": {
+          "masculine": "Sändningsregissör",
+          "feminine": "Sändningsregissör",
+          "neutral": "Sändningsregissör"
+        },
+        "r_0719ad7a68ec": {
+          "masculine": "Dialogregissör",
+          "feminine": "Dialogregissör",
+          "neutral": "Dialogregissör"
+        },
+        "r_463462fca2ec": {
+          "masculine": "Förste regiassistent (1st AD)",
+          "feminine": "Första regiassistent (1st AD)",
+          "neutral": "Första regiassistent (1st AD)"
+        },
+        "r_de1c193ae4d6": {
+          "masculine": "Andre regiassistent (2nd AD)",
+          "feminine": "Andra regiassistent (2nd AD)",
+          "neutral": "Andra regiassistent (2nd AD)"
+        },
+        "r_c37babd28464": {
+          "masculine": "Huvudansvarig andre regiassistent",
+          "feminine": "Huvudansvarig andre regiassistent",
+          "neutral": "Huvudansvarig andre regiassistent"
+        },
+        "r_2b8bbebafa40": {
+          "masculine": "Andre regiassistent på inspelningsplatsen",
+          "feminine": "Andra regiassistent på inspelningsplatsen",
+          "neutral": "Andra regiassistent på inspelningsplatsen"
+        },
+        "r_b0a3c67c20bf": {
+          "masculine": "Andre regiassistent för statister",
+          "feminine": "Andra regiassistent för statister",
+          "neutral": "Andra regiassistent för statister"
+        },
+        "r_b6640a0bf9b6": {
+          "masculine": "Tredje regiassistent (3rd AD)",
+          "feminine": "Tredje regiassistent (3rd AD)",
+          "neutral": "Tredje regiassistent (3rd AD)"
+        },
+        "r_962cb1546148": {
+          "masculine": "Tredje regiassistent för statister",
+          "feminine": "Tredje regiassistent för statister",
+          "neutral": "Tredje regiassistent för statister"
+        },
+        "r_619aa382d108": {
+          "masculine": "Tredje regiassistent för basområdet",
+          "feminine": "Tredje regiassistent för basområdet",
+          "neutral": "Tredje regiassistent för basområdet"
+        },
+        "r_14816f8e2f93": {
+          "masculine": "Tredje regiassistent på inspelningsplatsen",
+          "feminine": "Tredje regiassistent på inspelningsplatsen",
+          "neutral": "Tredje regiassistent på inspelningsplatsen"
+        },
+        "r_00bb63b14962": {
+          "masculine": "Produktionsassistent inom regi",
+          "feminine": "Produktionsassistent inom regi",
+          "neutral": "Produktionsassistent inom regi"
+        },
+        "r_da45564f42a3": {
+          "masculine": "Huvudansvarig produktionsassistent inom regi",
+          "feminine": "Huvudansvarig produktionsassistent inom regi",
+          "neutral": "Huvudansvarig produktionsassistent inom regi"
+        },
+        "r_d4de545cc559": {
+          "masculine": "Regiassistentpraktikant",
+          "feminine": "Regiassistentpraktikant",
+          "neutral": "Regiassistentpraktikant"
+        },
+        "r_b8f3b216cf72": {
+          "masculine": "Statistsamordnare",
+          "feminine": "Statistsamordnare",
+          "neutral": "Statistsamordnare"
+        },
+        "r_7d061a318612": {
+          "masculine": "Assisterande statistsamordnare",
+          "feminine": "Assisterande statistsamordnare",
+          "neutral": "Assisterande statistsamordnare"
+        },
+        "r_dbf51638d5ed": {
+          "masculine": "Scripta (kontinuitet)",
+          "feminine": "Scripta (kontinuitet)",
+          "neutral": "Scripta (kontinuitet)"
+        },
+        "r_db6f57df190b": {
+          "masculine": "Assisterande scripta",
+          "feminine": "Assisterande scripta",
+          "neutral": "Assisterande scripta"
+        },
+        "r_043751863fa5": {
+          "masculine": "Scripta på inspelningsplatsen",
+          "feminine": "Scripta på inspelningsplatsen",
+          "neutral": "Scripta på inspelningsplatsen"
+        },
+        "r_d7e7e0e56ce6": {
+          "masculine": "Storyboardtecknare",
+          "feminine": "Storyboardtecknare",
+          "neutral": "Storyboardtecknare"
+        },
+        "r_d5f343108ed5": {
+          "masculine": "Skådespelarcoach",
+          "feminine": "Skådespelarcoach",
+          "neutral": "Skådespelarcoach"
+        },
+        "r_8ac3532c0c32": {
+          "masculine": "Skådespelarcoach för barn",
+          "feminine": "Skådespelarcoach för barn",
+          "neutral": "Skådespelarcoach för barn"
+        },
+        "r_bf13c927e8eb": {
+          "masculine": "Dialogcoach",
+          "feminine": "Dialogcoach",
+          "neutral": "Dialogcoach"
+        },
+        "r_82fff9096145": {
+          "masculine": "Statistansvarig",
+          "feminine": "Statistansvarig",
+          "neutral": "Statistansvarig"
+        },
+        "r_e57426b6a805": {
+          "masculine": "Assisterande statistansvarig",
+          "feminine": "Assisterande statistansvarig",
+          "neutral": "Assisterande statistansvarig"
+        },
+        "r_c2b6031ad212": {
+          "masculine": "Personlig assistent åt regissören",
+          "feminine": "Personlig assistent åt regissören",
+          "neutral": "Personlig assistent åt regissören"
+        },
+        "r_1ed956774605": {
+          "masculine": "Personlig assistent inom regi",
+          "feminine": "Personlig assistent inom regi",
+          "neutral": "Personlig assistent inom regi"
+        },
+        "r_7d0bc36aabcb": {
+          "masculine": "Regipraktikant",
+          "feminine": "Regipraktikant",
+          "neutral": "Regipraktikant"
+        },
+        "r_bf4aaefa2f9f": {
+          "masculine": "Scriptapraktikant",
+          "feminine": "Scriptapraktikant",
+          "neutral": "Scriptapraktikant"
+        },
+        "r_45bf2bbe37f0": {
+          "masculine": "Regiassistent (inspelningsrunner)",
+          "feminine": "Regiassistent (inspelningsrunner)",
+          "neutral": "Regiassistent (inspelningsrunner)"
+        },
+        "r_9ced64ab6db5": {
+          "masculine": "Förste regiassistent",
+          "feminine": "Första regiassistent",
+          "neutral": "Första regiassistent"
+        },
+        "r_b6ac41792b48": {
+          "masculine": "Andre regiassistent",
+          "feminine": "Andra regiassistent",
+          "neutral": "Andra regiassistent"
+        },
+        "r_6b9cabf3cbca": {
+          "masculine": "Scripta",
+          "feminine": "Scripta",
+          "neutral": "Scripta"
+        },
+        "r_93f52c1c7000": {
+          "masculine": "Regissör för andra inspelningsenheten",
+          "feminine": "Regissör för andra inspelningsenheten",
+          "neutral": "Regissör för andra inspelningsenheten"
+        },
+        "r_591d7faf8f5d": {
+          "masculine": "Personlig assistent",
+          "feminine": "Personlig assistent",
+          "neutral": "Personlig assistent"
+        },
+        "r_c01dd7739f5a": {
+          "masculine": "Assistent till statistansvarig",
+          "feminine": "Assistent till statistansvarig",
+          "neutral": "Assistent till statistansvarig"
+        }
+      },
+      "kamera": {
+        "r_9659ff478da5": {
+          "masculine": "Filmfotograf (DoP)",
+          "feminine": "Filmfotograf (DoP)",
+          "neutral": "Filmfotograf (DoP)"
+        },
+        "r_f1286611f452": {
+          "masculine": "Bildansvarig (DoI)",
+          "feminine": "Bildansvarig (DoI)",
+          "neutral": "Bildansvarig (DoI)"
+        },
+        "r_c519de89c832": {
+          "masculine": "A-kameraoperatör",
+          "feminine": "A-kameraoperatör",
+          "neutral": "A-kameraoperatör"
+        },
+        "r_69b451280549": {
+          "masculine": "B-kameraoperatör",
+          "feminine": "B-kameraoperatör",
+          "neutral": "B-kameraoperatör"
+        },
+        "r_147c6db611ab": {
+          "masculine": "C-kameraoperatör",
+          "feminine": "C-kameraoperatör",
+          "neutral": "C-kameraoperatör"
+        },
+        "r_00ec6018a92f": {
+          "masculine": "Elektronisk fotograf (studio / exteriör)",
+          "feminine": "Elektronisk fotograf (studio / exteriör)",
+          "neutral": "Elektronisk fotograf (studio / exteriör)"
+        },
+        "r_15338319dd09": {
+          "masculine": "Reportagefotograf",
+          "feminine": "Reportagefotograf",
+          "neutral": "Reportagefotograf"
+        },
+        "r_3b00f8763d24": {
+          "masculine": "Fotograf för andra inspelningsenheten",
+          "feminine": "Fotograf för andra inspelningsenheten",
+          "neutral": "Fotograf för andra inspelningsenheten"
+        },
+        "r_2815a6f7d251": {
+          "masculine": "Fotograf för tredje inspelningsenheten",
+          "feminine": "Fotograf för tredje inspelningsenheten",
+          "neutral": "Fotograf för tredje inspelningsenheten"
+        },
+        "r_46bfee3f1077": {
+          "masculine": "Förste kameraassistent (fokusdragare)",
+          "feminine": "Första kameraassistent (fokusdragare)",
+          "neutral": "Första kameraassistent (fokusdragare)"
+        },
+        "r_4f6a54aa8672": {
+          "masculine": "Andre kameraassistent (klappa / laddning)",
+          "feminine": "Andra kameraassistent (klappa / laddning)",
+          "neutral": "Andra kameraassistent (klappa / laddning)"
+        },
+        "r_a6d3a38613fa": {
+          "masculine": "Klappare och filmladdare",
+          "feminine": "Klappare och filmladdare",
+          "neutral": "Klappare och filmladdare"
+        },
+        "r_4406ae44f8be": {
+          "masculine": "Tredje kameraassistent",
+          "feminine": "Tredje kameraassistent",
+          "neutral": "Tredje kameraassistent"
+        },
+        "r_a29ed25142f3": {
+          "masculine": "Andre kameraassistent, digitalt",
+          "feminine": "Andra kameraassistent, digitalt",
+          "neutral": "Andra kameraassistent, digitalt"
+        },
+        "r_048d538ee34d": {
+          "masculine": "DIT",
+          "feminine": "DIT",
+          "neutral": "DIT"
+        },
+        "r_c48ad1ee75a7": {
+          "masculine": "DIT-assistent",
+          "feminine": "DIT-assistent",
+          "neutral": "DIT-assistent"
+        },
+        "r_0e473a1887e9": {
+          "masculine": "Steadicam-operatör",
+          "feminine": "Steadicam-operatör",
+          "neutral": "Steadicam-operatör"
+        },
+        "r_1d7535202c92": {
+          "masculine": "Steadicam-assistent",
+          "feminine": "Steadicam-assistent",
+          "neutral": "Steadicam-assistent"
+        },
+        "r_baee8ff4a63f": {
+          "masculine": "Gimbaloperatör",
+          "feminine": "Gimbaloperatör",
+          "neutral": "Gimbaloperatör"
+        },
+        "r_569d248c1dfd": {
+          "masculine": "Drönarpilot / drönaroperatör",
+          "feminine": "Drönarpilot / drönaroperatör",
+          "neutral": "Drönarpilot / drönaroperatör"
+        },
+        "r_3ca1ad3e14b2": {
+          "masculine": "Kameradrönaroperatör",
+          "feminine": "Kameradrönaroperatör",
+          "neutral": "Kameradrönaroperatör"
+        },
+        "r_c2ff9d51c86a": {
+          "masculine": "Kameradrönarpilot",
+          "feminine": "Kameradrönarpilot",
+          "neutral": "Kameradrönarpilot"
+        },
+        "r_0502b3c5dec3": {
+          "masculine": "Kamerabilsförare",
+          "feminine": "Kamerabilsförare",
+          "neutral": "Kamerabilsförare"
+        },
+        "r_a3fa606ea916": {
+          "masculine": "Flygplanspilot (flygfoto)",
+          "feminine": "Flygplanspilot (flygfoto)",
+          "neutral": "Flygplanspilot (flygfoto)"
+        },
+        "r_05d7d18da0c4": {
+          "masculine": "Helikopterpilot (flygfoto)",
+          "feminine": "Helikopterpilot (flygfoto)",
+          "neutral": "Helikopterpilot (flygfoto)"
+        },
+        "r_32e8a90fee3b": {
+          "masculine": "Spidercam-pilot",
+          "feminine": "Spidercam-pilot",
+          "neutral": "Spidercam-pilot"
+        },
+        "r_c4b0d3dfb7d8": {
+          "masculine": "Kameradrönarassistent",
+          "feminine": "Kameradrönarassistent",
+          "neutral": "Kameradrönarassistent"
+        },
+        "r_86c7b305ba77": {
+          "masculine": "Fjärrkameraoperatör",
+          "feminine": "Fjärrkameraoperatör",
+          "neutral": "Fjärrkameraoperatör"
+        },
+        "r_386b1f9db2c1": {
+          "masculine": "Operatör för fjärrstyrt kamerahuvud",
+          "feminine": "Operatör för fjärrstyrt kamerahuvud",
+          "neutral": "Operatör för fjärrstyrt kamerahuvud"
+        },
+        "r_1490637c95ed": {
+          "masculine": "Flygfotooperatör",
+          "feminine": "Flygfotooperatör",
+          "neutral": "Flygfotooperatör"
+        },
+        "r_76c05f6fba78": {
+          "masculine": "Flygfotooperatör från flygplan",
+          "feminine": "Flygfotooperatör från flygplan",
+          "neutral": "Flygfotooperatör från flygplan"
+        },
+        "r_b59f3c08153b": {
+          "masculine": "Höghastighetskameraoperatör",
+          "feminine": "Höghastighetskameraoperatör",
+          "neutral": "Höghastighetskameraoperatör"
+        },
+        "r_f6e99ab3d5dd": {
+          "masculine": "ARRI Trinity-operatör",
+          "feminine": "ARRI Trinity-operatör",
+          "neutral": "ARRI Trinity-operatör"
+        },
+        "r_953bc24b7077": {
+          "masculine": "Cablecam-operatör",
+          "feminine": "Cablecam-operatör",
+          "neutral": "Cablecam-operatör"
+        },
+        "r_e834e506e54b": {
+          "masculine": "Polecam-operatör",
+          "feminine": "Polecam-operatör",
+          "neutral": "Polecam-operatör"
+        },
+        "r_b7ea35e3f38d": {
+          "masculine": "Rod-Cam-operatör",
+          "feminine": "Rod-Cam-operatör",
+          "neutral": "Rod-Cam-operatör"
+        },
+        "r_3531de1d9278": {
+          "masculine": "Motion control-operatör",
+          "feminine": "Motion control-operatör",
+          "neutral": "Motion control-operatör"
+        },
+        "r_edf22fe94ff4": {
+          "masculine": "Motion control-assistent",
+          "feminine": "Motion control-assistent",
+          "neutral": "Motion control-assistent"
+        },
+        "r_7be83f893235": {
+          "masculine": "Livekameraoperatör",
+          "feminine": "Livekameraoperatör",
+          "neutral": "Livekameraoperatör"
+        },
+        "r_8d0fa92d5c06": {
+          "masculine": "VR-filmfotograf",
+          "feminine": "VR-filmfotograf",
+          "neutral": "VR-filmfotograf"
+        },
+        "r_e4f1f8410ee1": {
+          "masculine": "VR-kameraoperatör",
+          "feminine": "VR-kameraoperatör",
+          "neutral": "VR-kameraoperatör"
+        },
+        "r_fe4955d24d9d": {
+          "masculine": "Fotograf för stereoskopisk 3D",
+          "feminine": "Fotograf för stereoskopisk 3D",
+          "neutral": "Fotograf för stereoskopisk 3D"
+        },
+        "r_63d8f7ae5c77": {
+          "masculine": "Konvergensoperatör för stereoskopisk 3D",
+          "feminine": "Konvergensoperatör för stereoskopisk 3D",
+          "neutral": "Konvergensoperatör för stereoskopisk 3D"
+        },
+        "r_5d780d27f437": {
+          "masculine": "Stereoskopitekniker",
+          "feminine": "Stereoskopitekniker",
+          "neutral": "Stereoskopitekniker"
+        },
+        "r_0350366ccf64": {
+          "masculine": "Stereograf",
+          "feminine": "Stereograf",
+          "neutral": "Stereograf"
+        },
+        "r_892df5d9ed45": {
+          "masculine": "Stereograf för andra inspelningsenheten",
+          "feminine": "Stereograf för andra inspelningsenheten",
+          "neutral": "Stereograf för andra inspelningsenheten"
+        },
+        "r_87b9b49ccc72": {
+          "masculine": "Stereografassistent",
+          "feminine": "Stereografassistent",
+          "neutral": "Stereografassistent"
+        },
+        "r_503758a49393": {
+          "masculine": "Undervattenskameraoperatör",
+          "feminine": "Undervattenskameraoperatör",
+          "neutral": "Undervattenskameraoperatör"
+        },
+        "r_ad809b37ab32": {
+          "masculine": "Undervattenskameraassistent",
+          "feminine": "Undervattenskameraassistent",
+          "neutral": "Undervattenskameraassistent"
+        },
+        "r_fdaafaca34cb": {
+          "masculine": "Fallskärmsfotograf",
+          "feminine": "Fallskärmsfotograf",
+          "neutral": "Fallskärmsfotograf"
+        },
+        "r_6fd521b70caf": {
+          "masculine": "Drytech-tekniker",
+          "feminine": "Drytech-tekniker",
+          "neutral": "Drytech-tekniker"
+        },
+        "r_7a8573f394c1": {
+          "masculine": "Datahanterare",
+          "feminine": "Datahanterare",
+          "neutral": "Datahanterare"
+        },
+        "r_59c04d8b3609": {
+          "masculine": "Datahanterare / digital laddare",
+          "feminine": "Datahanterare / digital laddare",
+          "neutral": "Datahanterare / digital laddare"
+        },
+        "r_1b6d2deeae11": {
+          "masculine": "Medieansvarig",
+          "feminine": "Medieansvarig",
+          "neutral": "Medieansvarig"
+        },
+        "r_bfd5ad0745cb": {
+          "masculine": "Videoassistansoperatör",
+          "feminine": "Videoassistansoperatör",
+          "neutral": "Videoassistansoperatör"
+        },
+        "r_ab65480d38bf": {
+          "masculine": "Videoassistansassistent",
+          "feminine": "Videoassistansassistent",
+          "neutral": "Videoassistansassistent"
+        },
+        "r_44cbe06f7edd": {
+          "masculine": "Crash-box-operatör",
+          "feminine": "Crash-box-operatör",
+          "neutral": "Crash-box-operatör"
+        },
+        "r_ff391e554ef1": {
+          "masculine": "Videooperatör",
+          "feminine": "Videooperatör",
+          "neutral": "Videooperatör"
+        },
+        "r_04b8806e4aea": {
+          "masculine": "Qtake-operatör",
+          "feminine": "Qtake-operatör",
+          "neutral": "Qtake-operatör"
+        },
+        "r_881fbad171dd": {
+          "masculine": "Videooperatörsassistent",
+          "feminine": "Videooperatörsassistent",
+          "neutral": "Videooperatörsassistent"
+        },
+        "r_e8b3776feee3": {
+          "masculine": "Uppspelningsoperatör",
+          "feminine": "Uppspelningsoperatör",
+          "neutral": "Uppspelningsoperatör"
+        },
+        "r_2cd28c233eb0": {
+          "masculine": "Reportageassistent (bild och ljud)",
+          "feminine": "Reportageassistent (bild och ljud)",
+          "neutral": "Reportageassistent (bild och ljud)"
+        },
+        "r_aaf320fee04d": {
+          "masculine": "Reportagetekniker (bild och ljud)",
+          "feminine": "Reportagetekniker (bild och ljud)",
+          "neutral": "Reportagetekniker (bild och ljud)"
+        },
+        "r_6c484917c545": {
+          "masculine": "Kameraassistent (dokumentärt)",
+          "feminine": "Kameraassistent (dokumentärt)",
+          "neutral": "Kameraassistent (dokumentärt)"
+        },
+        "r_c071a417cdf8": {
+          "masculine": "Datainsamlingstekniker (DCE)",
+          "feminine": "Datainsamlingstekniker (DCE)",
+          "neutral": "Datainsamlingstekniker (DCE)"
+        },
+        "r_ff3821a892d3": {
+          "masculine": "Operatör för bakprojektionsbilder",
+          "feminine": "Operatör för bakprojektionsbilder",
+          "neutral": "Operatör för bakprojektionsbilder"
+        },
+        "r_e160ca78eefe": {
+          "masculine": "Kameratekniker",
+          "feminine": "Kameratekniker",
+          "neutral": "Kameratekniker"
+        },
+        "r_b2a908032997": {
+          "masculine": "Kamerapraktikant",
+          "feminine": "Kamerapraktikant",
+          "neutral": "Kamerapraktikant"
+        },
+        "r_20c91979a5fc": {
+          "masculine": "Kameraoperatör",
+          "feminine": "Kameraoperatör",
+          "neutral": "Kameraoperatör"
+        },
+        "r_3008a154e7ef": {
+          "masculine": "Drönarpilot / flygfoto",
+          "feminine": "Drönarpilot / flygfoto",
+          "neutral": "Drönarpilot / flygfoto"
+        },
+        "r_ee4208621795": {
+          "masculine": "Extra kamera",
+          "feminine": "Extra kamera",
+          "neutral": "Extra kamera"
+        },
+        "r_59f7261be55a": {
+          "masculine": "Undervattensfotograf",
+          "feminine": "Undervattensfotograf",
+          "neutral": "Undervattensfotograf"
+        },
+        "r_6767d1f92822": {
+          "masculine": "Motion control-fotograf",
+          "feminine": "Motion control-fotograf",
+          "neutral": "Motion control-fotograf"
+        },
+        "r_15047c5a622a": {
+          "masculine": "Kameradrönarassistent / tekniker",
+          "feminine": "Kameradrönarassistent / tekniker",
+          "neutral": "Kameradrönarassistent / tekniker"
+        },
+        "r_7b6aa965b572": {
+          "masculine": "Förste kameraassistent",
+          "feminine": "Första kameraassistent",
+          "neutral": "Första kameraassistent"
+        },
+        "r_403c761ac7c7": {
+          "masculine": "Reportageassistent för bild och ljud",
+          "feminine": "Reportageassistent för bild och ljud",
+          "neutral": "Reportageassistent för bild och ljud"
+        },
+        "r_6170f09c0f17": {
+          "masculine": "Reportagetekniker för bild och ljud",
+          "feminine": "Reportagetekniker för bild och ljud",
+          "neutral": "Reportagetekniker för bild och ljud"
+        },
+        "r_6a6303b77029": {
+          "masculine": "Stillbildsfotograf",
+          "feminine": "Stillbildsfotograf",
+          "neutral": "Stillbildsfotograf"
+        }
+      },
+      "licht": {
+        "r_222be04dbf00": {
+          "masculine": "Gaffer (ljuschef)",
+          "feminine": "Gaffer (ljuschef)",
+          "neutral": "Gaffer (ljuschef)"
+        },
+        "r_1e210e69039a": {
+          "masculine": "Biträdande elchef (Best Boy Electric)",
+          "feminine": "Biträdande elchef (Best Girl Electric)",
+          "neutral": "Biträdande elchef"
+        },
+        "r_14dd174cd76c": {
+          "masculine": "Riggande gaffer",
+          "feminine": "Riggande gaffer",
+          "neutral": "Riggande gaffer"
+        },
+        "r_92137802b24a": {
+          "masculine": "Biträdande elchef för förriggning (Rigging Best Boy Electric)",
+          "feminine": "Biträdande elchef för förriggning (Rigging Best Girl Electric)",
+          "neutral": "Biträdande elchef för förriggning"
+        },
+        "r_7fce7d6fcf12": {
+          "masculine": "Riggelektriker",
+          "feminine": "Riggelektriker",
+          "neutral": "Riggelektriker"
+        },
+        "r_1bcf9d8d9b03": {
+          "masculine": "Belysningstekniker (elektriker)",
+          "feminine": "Belysningstekniker (elektriker)",
+          "neutral": "Belysningstekniker (elektriker)"
+        },
+        "r_d95b919dded9": {
+          "masculine": "Belysningsmästare",
+          "feminine": "Belysningsmästare",
+          "neutral": "Belysningsmästare"
+        },
+        "r_de223259b793": {
+          "masculine": "Ljusbordsoperatör",
+          "feminine": "Ljusbordsoperatör",
+          "neutral": "Ljusbordsoperatör"
+        },
+        "r_d927855afff9": {
+          "masculine": "Ljusbordsassistent",
+          "feminine": "Ljusbordsassistent",
+          "neutral": "Ljusbordsassistent"
+        },
+        "r_56ad1c6a1ad4": {
+          "masculine": "Ljusprogrammerare (DMX)",
+          "feminine": "Ljusprogrammerare (DMX)",
+          "neutral": "Ljusprogrammerare (DMX)"
+        },
+        "r_090ac2a092b8": {
+          "masculine": "Ljustekniker",
+          "feminine": "Ljustekniker",
+          "neutral": "Ljustekniker"
+        },
+        "r_d1edcbd50142": {
+          "masculine": "Ljusförare",
+          "feminine": "Ljusförare",
+          "neutral": "Ljusförare"
+        },
+        "r_7d79588c14f3": {
+          "masculine": "Extra belysningstekniker",
+          "feminine": "Extra belysningstekniker",
+          "neutral": "Extra belysningstekniker"
+        },
+        "r_b3d1d585beaa": {
+          "masculine": "Generatoroperatör",
+          "feminine": "Generatoroperatör",
+          "neutral": "Generatoroperatör"
+        },
+        "r_bcd4b312b67e": {
+          "masculine": "Kabelansvarig",
+          "feminine": "Kabelansvarig",
+          "neutral": "Kabelansvarig"
+        },
+        "r_35cca1fe3c5c": {
+          "masculine": "Undervattensbelysning",
+          "feminine": "Undervattensbelysning",
+          "neutral": "Undervattensbelysning"
+        },
+        "r_89058c839b15": {
+          "masculine": "Ballongljusoperatör",
+          "feminine": "Ballongljusoperatör",
+          "neutral": "Ballongljusoperatör"
+        },
+        "r_9bd915bb46a4": {
+          "masculine": "Spot- / trosspotoperatör",
+          "feminine": "Spot- / trosspotoperatör",
+          "neutral": "Spot- / trosspotoperatör"
+        },
+        "r_2c0dd7b64cf3": {
+          "masculine": "Ljusassistent",
+          "feminine": "Ljusassistent",
+          "neutral": "Ljusassistent"
+        },
+        "r_0cc27c01ca07": {
+          "masculine": "Ljuspraktikant",
+          "feminine": "Ljuspraktikant",
+          "neutral": "Ljuspraktikant"
+        }
+      },
+      "grip": {
+        "r_470156bd03e4": {
+          "masculine": "Key grip",
+          "feminine": "Key grip",
+          "neutral": "Key grip"
+        },
+        "r_cfbf2a22ed6e": {
+          "masculine": "Biträdande gripchef (Best Boy Grip)",
+          "feminine": "Biträdande gripchef (Best Girl Grip)",
+          "neutral": "Biträdande gripchef"
+        },
+        "r_32a6ab31b1a1": {
+          "masculine": "Dolly grip / dollyförare",
+          "feminine": "Dolly grip / dollyförare",
+          "neutral": "Dolly grip / dollyförare"
+        },
+        "r_376dc1f790b8": {
+          "masculine": "Grip / kamerastöd",
+          "feminine": "Grip / kamerastöd",
+          "neutral": "Grip / kamerastöd"
+        },
+        "r_dbfaadb8821c": {
+          "masculine": "Gripassistent",
+          "feminine": "Gripassistent",
+          "neutral": "Gripassistent"
+        },
+        "r_46dab52c1995": {
+          "masculine": "Riggande grip",
+          "feminine": "Riggande grip",
+          "neutral": "Riggande grip"
+        },
+        "r_ea7e925bd850": {
+          "masculine": "Riggande key grip",
+          "feminine": "Riggande key grip",
+          "neutral": "Riggande key grip"
+        },
+        "r_fa9d72fc7978": {
+          "masculine": "Biträdande gripchef för förriggning (Rigging Best Boy Grip)",
+          "feminine": "Biträdande gripchef för förriggning (Rigging Best Girl Grip)",
+          "neutral": "Biträdande gripchef för förriggning"
+        },
+        "r_2fa0b44342d7": {
+          "masculine": "Specialkonstruktioner för kamerastöd",
+          "feminine": "Specialkonstruktioner för kamerastöd",
+          "neutral": "Specialkonstruktioner för kamerastöd"
+        },
+        "r_08c07afebb7f": {
+          "masculine": "Kamerakran- / jibboperatör",
+          "feminine": "Kamerakran- / jibboperatör",
+          "neutral": "Kamerakran- / jibboperatör"
+        },
+        "r_5ece318b289f": {
+          "masculine": "Kamerakrantekniker",
+          "feminine": "Kamerakrantekniker",
+          "neutral": "Kamerakrantekniker"
+        },
+        "r_a5c74e86fb2b": {
+          "masculine": "U-Crane- / Technocrane-operatör",
+          "feminine": "U-Crane- / Technocrane-operatör",
+          "neutral": "U-Crane- / Technocrane-operatör"
+        },
+        "r_819dd64bff9d": {
+          "masculine": "Tekniker / operatör för fjärrstyrt kamerahuvud",
+          "feminine": "Tekniker / operatör för fjärrstyrt kamerahuvud",
+          "neutral": "Tekniker / operatör för fjärrstyrt kamerahuvud"
+        },
+        "r_9c6f674da63a": {
+          "masculine": "Grippraktikant",
+          "feminine": "Grippraktikant",
+          "neutral": "Grippraktikant"
+        }
+      },
+      "ton": {
+        "r_fccf287d8f40": {
+          "masculine": "Ljudtekniker / ljudmixare",
+          "feminine": "Ljudtekniker / ljudmixare",
+          "neutral": "Ljudtekniker / ljudmixare"
+        },
+        "r_54f3d59eb241": {
+          "masculine": "Inspelningsljudmixare",
+          "feminine": "Inspelningsljudmixare",
+          "neutral": "Inspelningsljudmixare"
+        },
+        "r_b0c1942e7358": {
+          "masculine": "Filmljudtekniker",
+          "feminine": "Filmljudtekniker",
+          "neutral": "Filmljudtekniker"
+        },
+        "r_8b1cc700407b": {
+          "masculine": "Bomoperatör",
+          "feminine": "Bomoperatör",
+          "neutral": "Bomoperatör"
+        },
+        "r_fd909904c9c7": {
+          "masculine": "Ljudassistent",
+          "feminine": "Ljudassistent",
+          "neutral": "Ljudassistent"
+        },
+        "r_4c5fe4b3a1f3": {
+          "masculine": "Förste ljudassistent",
+          "feminine": "Första ljudassistent",
+          "neutral": "Första ljudassistent"
+        },
+        "r_ab87e9473072": {
+          "masculine": "Förste filmljudassistent",
+          "feminine": "Första filmljudassistent",
+          "neutral": "Första filmljudassistent"
+        },
+        "r_d83df9d29ab1": {
+          "masculine": "Andre ljudassistent",
+          "feminine": "Andra ljudassistent",
+          "neutral": "Andra ljudassistent"
+        },
+        "r_8377b0674c5d": {
+          "masculine": "Andre filmljudassistent",
+          "feminine": "Andra filmljudassistent",
+          "neutral": "Andra filmljudassistent"
+        },
+        "r_93302391f02a": {
+          "masculine": "ADR- / dubbningsbomoperatör",
+          "feminine": "ADR- / dubbningsbomoperatör",
+          "neutral": "ADR- / dubbningsbomoperatör"
+        },
+        "r_3e7456f82724": {
+          "masculine": "Surroundljudinspelare",
+          "feminine": "Surroundljudinspelare",
+          "neutral": "Surroundljudinspelare"
+        },
+        "r_352c199bfbc1": {
+          "masculine": "Allmän ljudtekniker",
+          "feminine": "Allmän ljudtekniker",
+          "neutral": "Allmän ljudtekniker"
+        },
+        "r_fdfa14e36d06": {
+          "masculine": "Ljudutrustningsassistent",
+          "feminine": "Ljudutrustningsassistent",
+          "neutral": "Ljudutrustningsassistent"
+        },
+        "r_9615bbb28141": {
+          "masculine": "Ljuduppspelningsoperatör",
+          "feminine": "Ljuduppspelningsoperatör",
+          "neutral": "Ljuduppspelningsoperatör"
+        },
+        "r_13544e0c2d08": {
+          "masculine": "Ljudtekniker (dokumentärt)",
+          "feminine": "Ljudtekniker (dokumentärt)",
+          "neutral": "Ljudtekniker (dokumentärt)"
+        },
+        "r_f804f9794c40": {
+          "masculine": "Ljudpraktikant",
+          "feminine": "Ljudpraktikant",
+          "neutral": "Ljudpraktikant"
+        },
+        "r_26ad417384db": {
+          "masculine": "Ljuddesigner",
+          "feminine": "Ljuddesigner",
+          "neutral": "Ljuddesigner"
+        },
+        "r_e4afa3da823e": {
+          "masculine": "Ansvarig ljudredigerare",
+          "feminine": "Ansvarig ljudredigerare",
+          "neutral": "Ansvarig ljudredigerare"
+        },
+        "r_754377fae1cb": {
+          "masculine": "Dialogredigerare",
+          "feminine": "Dialogredigerare",
+          "neutral": "Dialogredigerare"
+        },
+        "r_a80f60e08e2f": {
+          "masculine": "ADR-redigerare",
+          "feminine": "ADR-redigerare",
+          "neutral": "ADR-redigerare"
+        },
+        "r_65ab3bc0b779": {
+          "masculine": "ADR-ansvarig",
+          "feminine": "ADR-ansvarig",
+          "neutral": "ADR-ansvarig"
+        },
+        "r_927d0ca8e1d9": {
+          "masculine": "Trampare",
+          "feminine": "Trampare",
+          "neutral": "Trampare"
+        },
+        "r_c196984117d7": {
+          "masculine": "Trampljudsredigerare",
+          "feminine": "Trampljudsredigerare",
+          "neutral": "Trampljudsredigerare"
+        },
+        "r_df6ebbcf6038": {
+          "masculine": "Slutmixare",
+          "feminine": "Slutmixare",
+          "neutral": "Slutmixare"
+        },
+        "r_f4776d32d356": {
+          "masculine": "Uppspelningsoperatör",
+          "feminine": "Uppspelningsoperatör",
+          "neutral": "Uppspelningsoperatör"
+        },
+        "r_6abc8617e983": {
+          "masculine": "Ljudansvarig",
+          "feminine": "Ljudansvarig",
+          "neutral": "Ljudansvarig"
+        },
+        "r_0faba800cb95": {
+          "masculine": "Musikmixare",
+          "feminine": "Musikmixare",
+          "neutral": "Musikmixare"
+        },
+        "r_a5fba4295f52": {
+          "masculine": "Musikinspelning",
+          "feminine": "Musikinspelning",
+          "neutral": "Musikinspelning"
+        },
+        "r_f2e629941a7a": {
+          "masculine": "Dubbningsmixare",
+          "feminine": "Dubbningsmixare",
+          "neutral": "Dubbningsmixare"
+        },
+        "r_f73a9a076c95": {
+          "masculine": "Syntolkningsmixare",
+          "feminine": "Syntolkningsmixare",
+          "neutral": "Syntolkningsmixare"
+        },
+        "r_9d583d9712f5": {
+          "masculine": "Mixningsassistent",
+          "feminine": "Mixningsassistent",
+          "neutral": "Mixningsassistent"
+        },
+        "r_c4334fc01411": {
+          "masculine": "Ljudmastringstekniker",
+          "feminine": "Ljudmastringstekniker",
+          "neutral": "Ljudmastringstekniker"
+        },
+        "r_6a7ea11d04ed": {
+          "masculine": "Ljuddesignassistent",
+          "feminine": "Ljuddesignassistent",
+          "neutral": "Ljuddesignassistent"
+        },
+        "r_539e45fc2e6d": {
+          "masculine": "Ansvarig ADR-redigerare",
+          "feminine": "Ansvarig ADR-redigerare",
+          "neutral": "Ansvarig ADR-redigerare"
+        },
+        "r_021e586f6845": {
+          "masculine": "Ansvarig dialog- och ADR-redigerare",
+          "feminine": "Ansvarig dialog- och ADR-redigerare",
+          "neutral": "Ansvarig dialog- och ADR-redigerare"
+        },
+        "r_58f4b9fff63e": {
+          "masculine": "Ansvarig dialogredigerare",
+          "feminine": "Ansvarig dialogredigerare",
+          "neutral": "Ansvarig dialogredigerare"
+        },
+        "r_934c9dff31b6": {
+          "masculine": "Ansvarig trampljudsredigerare",
+          "feminine": "Ansvarig trampljudsredigerare",
+          "neutral": "Ansvarig trampljudsredigerare"
+        },
+        "r_8ffed7b496e8": {
+          "masculine": "Dialogredigerare",
+          "feminine": "Dialogredigerare",
+          "neutral": "Dialogredigerare"
+        },
+        "r_37f0cea40905": {
+          "masculine": "Ljudeffektsredigerare",
+          "feminine": "Ljudeffektsredigerare",
+          "neutral": "Ljudeffektsredigerare"
+        },
+        "r_e22d9239a33f": {
+          "masculine": "Dubbningsdialogredigerare",
+          "feminine": "Dubbningsdialogredigerare",
+          "neutral": "Dubbningsdialogredigerare"
+        },
+        "r_cf36114f7a15": {
+          "masculine": "Trampljudsredigerare",
+          "feminine": "Trampljudsredigerare",
+          "neutral": "Trampljudsredigerare"
+        },
+        "r_7ca65f7a0064": {
+          "masculine": "ADR- / dubbningsredigerare",
+          "feminine": "ADR- / dubbningsredigerare",
+          "neutral": "ADR- / dubbningsredigerare"
+        },
+        "r_944e077953d3": {
+          "masculine": "Ljudredigeringsassistent",
+          "feminine": "Ljudredigeringsassistent",
+          "neutral": "Ljudredigeringsassistent"
+        },
+        "r_9d4ed0bf92ee": {
+          "masculine": "ADR- / dubbningsljudtekniker",
+          "feminine": "ADR- / dubbningsljudtekniker",
+          "neutral": "ADR- / dubbningsljudtekniker"
+        },
+        "r_b3e198ffbf29": {
+          "masculine": "Trampljudstekniker",
+          "feminine": "Trampljudstekniker",
+          "neutral": "Trampljudstekniker"
+        },
+        "r_c41c6bc414c3": {
+          "masculine": "Produktionsledare för dubbning",
+          "feminine": "Produktionsledare för dubbning",
+          "neutral": "Produktionsledare för dubbning"
+        },
+        "r_2b6bc11139d6": {
+          "masculine": "Inspelningsledare för dubbning / ADR-ansvarig",
+          "feminine": "Inspelningsledare för dubbning / ADR-ansvarig",
+          "neutral": "Inspelningsledare för dubbning / ADR-ansvarig"
+        },
+        "r_6645c4583551": {
+          "masculine": "Assistent till inspelningsledare för dubbning / ADR-ansvarig",
+          "feminine": "Assistent till inspelningsledare för dubbning / ADR-ansvarig",
+          "neutral": "Assistent till inspelningsledare för dubbning / ADR-ansvarig"
+        },
+        "r_2f0b82350b59": {
+          "masculine": "Tramparassistent",
+          "feminine": "Tramparassistent",
+          "neutral": "Tramparassistent"
+        },
+        "r_a4171d6359fb": {
+          "masculine": "Praktikant inom ljudefterbearbetning",
+          "feminine": "Praktikant inom ljudefterbearbetning",
+          "neutral": "Praktikant inom ljudefterbearbetning"
+        },
+        "r_9e4b74ecd5ff": {
+          "masculine": "Teknisk ADR-ansvarig",
+          "feminine": "Teknisk ADR-ansvarig",
+          "neutral": "Teknisk ADR-ansvarig"
+        }
+      },
+      "art": {
+        "r_ff29ce0e215c": {
+          "masculine": "Produktionsdesigner",
+          "feminine": "Produktionsdesigner",
+          "neutral": "Produktionsdesigner"
+        },
+        "r_f3db07db6bf4": {
+          "masculine": "Scenograf",
+          "feminine": "Scenograf",
+          "neutral": "Scenograf"
+        },
+        "r_97a0a726b446": {
+          "masculine": "Ansvarig art director",
+          "feminine": "Ansvarig art director",
+          "neutral": "Ansvarig art director"
+        },
+        "r_3f274caf46f5": {
+          "masculine": "Art director",
+          "feminine": "Art director",
+          "neutral": "Art director"
+        },
+        "r_7e93c2713534": {
+          "masculine": "Art director på inspelningsplatsen",
+          "feminine": "Art director på inspelningsplatsen",
+          "neutral": "Art director på inspelningsplatsen"
+        },
+        "r_891f7ee6a391": {
+          "masculine": "Assisterande art director",
+          "feminine": "Assisterande art director",
+          "neutral": "Assisterande art director"
+        },
+        "r_29765953355c": {
+          "masculine": "Scenografiassistent",
+          "feminine": "Scenografiassistent",
+          "neutral": "Scenografiassistent"
+        },
+        "r_8543a5c61931": {
+          "masculine": "Dekorassistent",
+          "feminine": "Dekorassistent",
+          "neutral": "Dekorassistent"
+        },
+        "r_3ffad936200e": {
+          "masculine": "Scendekordesigner",
+          "feminine": "Scendekordesigner",
+          "neutral": "Scendekordesigner"
+        },
+        "r_bce8305a5535": {
+          "masculine": "CAD-designer",
+          "feminine": "CAD-designer",
+          "neutral": "CAD-designer"
+        },
+        "r_b5a1fa9969c7": {
+          "masculine": "Koncepttecknare",
+          "feminine": "Koncepttecknare",
+          "neutral": "Koncepttecknare"
+        },
+        "r_f1dbbb97b010": {
+          "masculine": "Koncepttecknare (scenografi)",
+          "feminine": "Koncepttecknare (scenografi)",
+          "neutral": "Koncepttecknare (scenografi)"
+        },
+        "r_57a4a106cbd6": {
+          "masculine": "Illustratör",
+          "feminine": "Illustratör",
+          "neutral": "Illustratör"
+        },
+        "r_6aa3fecc3ba9": {
+          "masculine": "Grafisk formgivare (scengrafik)",
+          "feminine": "Grafisk formgivare (scengrafik)",
+          "neutral": "Grafisk formgivare (scengrafik)"
+        },
+        "r_6978775ad99b": {
+          "masculine": "Ledande grafisk formgivare",
+          "feminine": "Ledande grafisk formgivare",
+          "neutral": "Ledande grafisk formgivare"
+        },
+        "r_7534f951d040": {
+          "masculine": "Grafiker (scenografi)",
+          "feminine": "Grafiker (scenografi)",
+          "neutral": "Grafiker (scenografi)"
+        },
+        "r_a8e10d0ecc47": {
+          "masculine": "Visuell referensletare / layoutare",
+          "feminine": "Visuell referensletare / layoutare",
+          "neutral": "Visuell referensletare / layoutare"
+        },
+        "r_a1ce9e299c8f": {
+          "masculine": "Scendekoratör",
+          "feminine": "Scendekoratör",
+          "neutral": "Scendekoratör"
+        },
+        "r_420521110dcc": {
+          "masculine": "Scendekorationskoordinator",
+          "feminine": "Scendekorationskoordinator",
+          "neutral": "Scendekorationskoordinator"
+        },
+        "r_d5b7a7d716a2": {
+          "masculine": "Assisterande scendekoratör",
+          "feminine": "Assisterande scendekoratör",
+          "neutral": "Assisterande scendekoratör"
+        },
+        "r_d0964de45366": {
+          "masculine": "Scendekorationsinköpare",
+          "feminine": "Scendekorationsinköpare",
+          "neutral": "Scendekorationsinköpare"
+        },
+        "r_10a8275fbc87": {
+          "masculine": "Lageransvarig för scendekoration",
+          "feminine": "Lageransvarig för scendekoration",
+          "neutral": "Lageransvarig för scendekoration"
+        },
+        "r_1df861fbde16": {
+          "masculine": "Assisterande scendekorationskoordinator",
+          "feminine": "Assisterande scendekorationskoordinator",
+          "neutral": "Assisterande scendekorationskoordinator"
+        },
+        "r_393242957f26": {
+          "masculine": "Dekorbyggare och dekoratör",
+          "feminine": "Dekorbyggare och dekoratör",
+          "neutral": "Dekorbyggare och dekoratör"
+        },
+        "r_e3ce1061c0ff": {
+          "masculine": "Ledande dekoratör",
+          "feminine": "Ledande dekoratör",
+          "neutral": "Ledande dekoratör"
+        },
+        "r_d588cad49b89": {
+          "masculine": "Arbetsledande dekoratör",
+          "feminine": "Arbetsledande dekoratör",
+          "neutral": "Arbetsledande dekoratör"
+        },
+        "r_6cafa4dd814b": {
+          "masculine": "Chefrekvisitör",
+          "feminine": "Chefrekvisitör",
+          "neutral": "Chefrekvisitör"
+        },
+        "r_413221e86652": {
+          "masculine": "Rekvisitör",
+          "feminine": "Rekvisitör",
+          "neutral": "Rekvisitör"
+        },
+        "r_a1e9f4cffb70": {
+          "masculine": "Yttre rekvisitör",
+          "feminine": "Yttre rekvisitör",
+          "neutral": "Yttre rekvisitör"
+        },
+        "r_8f20bee45473": {
+          "masculine": "Rekvisitör på inspelningsplatsen",
+          "feminine": "Rekvisitör på inspelningsplatsen",
+          "neutral": "Rekvisitör på inspelningsplatsen"
+        },
+        "r_7d553f96df87": {
+          "masculine": "Inspelningsrekvisitör",
+          "feminine": "Inspelningsrekvisitör",
+          "neutral": "Inspelningsrekvisitör"
+        },
+        "r_bf9d71b6fdc2": {
+          "masculine": "Jourrekvisitör",
+          "feminine": "Jourrekvisitör",
+          "neutral": "Jourrekvisitör"
+        },
+        "r_a38576fafdab": {
+          "masculine": "Rekvisitaassistent",
+          "feminine": "Rekvisitaassistent",
+          "neutral": "Rekvisitaassistent"
+        },
+        "r_ea2b2fab38f4": {
+          "masculine": "Rekvisitörsassistent",
+          "feminine": "Rekvisitörsassistent",
+          "neutral": "Rekvisitörsassistent"
+        },
+        "r_b685fb4dc943": {
+          "masculine": "Assistent för yttre rekvisita",
+          "feminine": "Assistent för yttre rekvisita",
+          "neutral": "Assistent för yttre rekvisita"
+        },
+        "r_7b9477ba5686": {
+          "masculine": "Inspelningsrekvisitaassistent",
+          "feminine": "Inspelningsrekvisitaassistent",
+          "neutral": "Inspelningsrekvisitaassistent"
+        },
+        "r_541c87622274": {
+          "masculine": "Rekvisitainköpare",
+          "feminine": "Rekvisitainköpare",
+          "neutral": "Rekvisitainköpare"
+        },
+        "r_3c2dae1ec180": {
+          "masculine": "Inköpare för scendekoration",
+          "feminine": "Inköpare för scendekoration",
+          "neutral": "Inköpare för scendekoration"
+        },
+        "r_c17d76240812": {
+          "masculine": "Rekvisitalageransvarig",
+          "feminine": "Rekvisitalageransvarig",
+          "neutral": "Rekvisitalageransvarig"
+        },
+        "r_6a373738f331": {
+          "masculine": "Digital rekvisitadesigner",
+          "feminine": "Digital rekvisitadesigner",
+          "neutral": "Digital rekvisitadesigner"
+        },
+        "r_404bfcb27b87": {
+          "masculine": "Digital chefrekvisitör",
+          "feminine": "Digital chefrekvisitör",
+          "neutral": "Digital chefrekvisitör"
+        },
+        "r_efdc51e3e8eb": {
+          "masculine": "Rekvisitatillverkare",
+          "feminine": "Rekvisitatillverkare",
+          "neutral": "Rekvisitatillverkare"
+        },
+        "r_30872cd93e0c": {
+          "masculine": "Rekvisitadesigner",
+          "feminine": "Rekvisitadesigner",
+          "neutral": "Rekvisitadesigner"
+        },
+        "r_264fc56ea7a5": {
+          "masculine": "Vapenrådgivare",
+          "feminine": "Vapenrådgivare",
+          "neutral": "Vapenrådgivare"
+        },
+        "r_00f9e2afb019": {
+          "masculine": "Rekvisitahjälp",
+          "feminine": "Rekvisitahjälp",
+          "neutral": "Rekvisitahjälp"
+        },
+        "r_ef64ec97e93f": {
+          "masculine": "Rekvisitamålare",
+          "feminine": "Rekvisitamålare",
+          "neutral": "Rekvisitamålare"
+        },
+        "r_8a17379f4cf2": {
+          "masculine": "Rekvisitaförare",
+          "feminine": "Rekvisitaförare",
+          "neutral": "Rekvisitaförare"
+        },
+        "r_fb928031fe07": {
+          "masculine": "Spelfordonskoordinator",
+          "feminine": "Spelfordonskoordinator",
+          "neutral": "Spelfordonskoordinator"
+        },
+        "r_77928b37c49d": {
+          "masculine": "Spelfordonsansvarig",
+          "feminine": "Spelfordonsansvarig",
+          "neutral": "Spelfordonsansvarig"
+        },
+        "r_115e6da0f002": {
+          "masculine": "Elektriker för praktisk scenbelysning",
+          "feminine": "Elektriker för praktisk scenbelysning",
+          "neutral": "Elektriker för praktisk scenbelysning"
+        },
+        "r_857a05036004": {
+          "masculine": "Vegetationsansvarig",
+          "feminine": "Vegetationsansvarig",
+          "neutral": "Vegetationsansvarig"
+        },
+        "r_d8e3dea65e7b": {
+          "masculine": "Växt- och trädgårdsdekoratör",
+          "feminine": "Växt- och trädgårdsdekoratör",
+          "neutral": "Växt- och trädgårdsdekoratör"
+        },
+        "r_aa5ce508ee21": {
+          "masculine": "Blomsterkonstnär",
+          "feminine": "Blomsterkonstnär",
+          "neutral": "Blomsterkonstnär"
+        },
+        "r_36b1709b4159": {
+          "masculine": "Matstylist",
+          "feminine": "Matstylist",
+          "neutral": "Matstylist"
+        },
+        "r_40b095fdeb85": {
+          "masculine": "Airbrushkonstnär",
+          "feminine": "Airbrushkonstnär",
+          "neutral": "Airbrushkonstnär"
+        },
+        "r_afee4f58989a": {
+          "masculine": "Konstmålare",
+          "feminine": "Konstmålare",
+          "neutral": "Konstmålare"
+        },
+        "r_c056e02e39c4": {
+          "masculine": "Dekormålare",
+          "feminine": "Dekormålare",
+          "neutral": "Dekormålare"
+        },
+        "r_e689709eac01": {
+          "masculine": "Ledande dekormålare",
+          "feminine": "Ledande dekormålare",
+          "neutral": "Ledande dekormålare"
+        },
+        "r_70a7586bb774": {
+          "masculine": "Skyltmålare",
+          "feminine": "Skyltmålare",
+          "neutral": "Skyltmålare"
+        },
+        "r_12f20cf536a1": {
+          "masculine": "Målare / dekorationskonstnär",
+          "feminine": "Målare / dekorationskonstnär",
+          "neutral": "Målare / dekorationskonstnär"
+        },
+        "r_dcf49adce47b": {
+          "masculine": "Skulptör / plastiker",
+          "feminine": "Skulptör / plastiker",
+          "neutral": "Skulptör / plastiker"
+        },
+        "r_f4670c7a29a7": {
+          "masculine": "Scenskulptör",
+          "feminine": "Scenskulptör",
+          "neutral": "Scenskulptör"
+        },
+        "r_5fc07d2f3030": {
+          "masculine": "Modellbyggare",
+          "feminine": "Modellbyggare",
+          "neutral": "Modellbyggare"
+        },
+        "r_f545a993cec8": {
+          "masculine": "Miniatyransvarig",
+          "feminine": "Miniatyransvarig",
+          "neutral": "Miniatyransvarig"
+        },
+        "r_d3f5fd4b86c3": {
+          "masculine": "Ansvarig för miniatyreffekter",
+          "feminine": "Ansvarig för miniatyreffekter",
+          "neutral": "Ansvarig för miniatyreffekter"
+        },
+        "r_a6d3fd7eaada": {
+          "masculine": "Byggchef",
+          "feminine": "Byggchef",
+          "neutral": "Byggchef"
+        },
+        "r_ca83b607f08e": {
+          "masculine": "Byggkoordinator",
+          "feminine": "Byggkoordinator",
+          "neutral": "Byggkoordinator"
+        },
+        "r_fbcfd1e1839b": {
+          "masculine": "Byggledare för studiokulisser",
+          "feminine": "Byggledare för studiokulisser",
+          "neutral": "Byggledare för studiokulisser"
+        },
+        "r_0231e128483a": {
+          "masculine": "Dekorbyggare / snickare",
+          "feminine": "Dekorbyggare / snickare",
+          "neutral": "Dekorbyggare / snickare"
+        },
+        "r_62f07946c8f1": {
+          "masculine": "Dekorbygge",
+          "feminine": "Dekorbygge",
+          "neutral": "Dekorbygge"
+        },
+        "r_a3c94f3f3cd1": {
+          "masculine": "Scenmästare",
+          "feminine": "Scenmästare",
+          "neutral": "Scenmästare"
+        },
+        "r_c606af121ce8": {
+          "masculine": "Scentekniker",
+          "feminine": "Scentekniker",
+          "neutral": "Scentekniker"
+        },
+        "r_2017ec503138": {
+          "masculine": "Konstruktionsritare",
+          "feminine": "Konstruktionsritare",
+          "neutral": "Konstruktionsritare"
+        },
+        "r_169af74d49f6": {
+          "masculine": "Murare",
+          "feminine": "Murare",
+          "neutral": "Murare"
+        },
+        "r_578a92348ec6": {
+          "masculine": "Metallarbetare",
+          "feminine": "Metallarbetare",
+          "neutral": "Metallarbetare"
+        },
+        "r_6c7b48200cb3": {
+          "masculine": "Metallsmed",
+          "feminine": "Metallsmed",
+          "neutral": "Metallsmed"
+        },
+        "r_e7f7da33c876": {
+          "masculine": "Ledande metallsmed",
+          "feminine": "Ledande metallsmed",
+          "neutral": "Ledande metallsmed"
+        },
+        "r_027c0b61577d": {
+          "masculine": "Stuckatör",
+          "feminine": "Stuckatör",
+          "neutral": "Stuckatör"
+        },
+        "r_8d5fe63edbd3": {
+          "masculine": "Tapetserare",
+          "feminine": "Tapetserare",
+          "neutral": "Tapetserare"
+        },
+        "r_61ab14bcf2c6": {
+          "masculine": "Snickare",
+          "feminine": "Snickare",
+          "neutral": "Snickare"
+        },
+        "r_3addd9ac0457": {
+          "masculine": "Svarvare",
+          "feminine": "Svarvare",
+          "neutral": "Svarvare"
+        },
+        "r_be99bdf8e0ab": {
+          "masculine": "Scenografikoordinator",
+          "feminine": "Scenografikoordinator",
+          "neutral": "Scenografikoordinator"
+        },
+        "r_9187325e0d84": {
+          "masculine": "Assisterande scenografikoordinator",
+          "feminine": "Assisterande scenografikoordinator",
+          "neutral": "Assisterande scenografikoordinator"
+        },
+        "r_a8af82f5e937": {
+          "masculine": "Scenografirunner",
+          "feminine": "Scenografirunner",
+          "neutral": "Scenografirunner"
+        },
+        "r_8310307922eb": {
+          "masculine": "Scenografipraktikant",
+          "feminine": "Scenografipraktikant",
+          "neutral": "Scenografipraktikant"
+        },
+        "r_f7d87853929b": {
+          "masculine": "Scendekorationsförare",
+          "feminine": "Scendekorationsförare",
+          "neutral": "Scendekorationsförare"
+        },
+        "r_71506d96f350": {
+          "masculine": "Grafisk formgivare",
+          "feminine": "Grafisk formgivare",
+          "neutral": "Grafisk formgivare"
+        },
+        "r_dd224ea66364": {
+          "masculine": "Produktansvarig",
+          "feminine": "Produktansvarig",
+          "neutral": "Produktansvarig"
+        },
+        "r_b2e24af2a895": {
+          "masculine": "Grafiska verk",
+          "feminine": "Grafiska verk",
+          "neutral": "Grafiska verk"
+        },
+        "r_c399668f6f57": {
+          "masculine": "Ansvarig för dator- och videouppspelning",
+          "feminine": "Ansvarig för dator- och videouppspelning",
+          "neutral": "Ansvarig för dator- och videouppspelning"
+        },
+        "r_d278f8dea5ee": {
+          "masculine": "Dekorbyggare",
+          "feminine": "Dekorbyggare",
+          "neutral": "Dekorbyggare"
+        },
+        "r_ed52a3596ba0": {
+          "masculine": "Inspelningsdekorbygge",
+          "feminine": "Inspelningsdekorbygge",
+          "neutral": "Inspelningsdekorbygge"
+        },
+        "r_e3f39e455941": {
+          "masculine": "Dekorbyggarhjälp",
+          "feminine": "Dekorbyggarhjälp",
+          "neutral": "Dekorbyggarhjälp"
+        },
+        "r_74a60171830a": {
+          "masculine": "Undervattensdekorbyggare",
+          "feminine": "Undervattensdekorbyggare",
+          "neutral": "Undervattensdekorbyggare"
+        },
+        "r_18c785ac7bd8": {
+          "masculine": "Riggning och specialkonstruktioner",
+          "feminine": "Riggning och specialkonstruktioner",
+          "neutral": "Riggning och specialkonstruktioner"
+        },
+        "r_8f15fc164b86": {
+          "masculine": "Assisterande konstruktionsritare",
+          "feminine": "Assisterande konstruktionsritare",
+          "neutral": "Assisterande konstruktionsritare"
+        },
+        "r_7e3c819b39ed": {
+          "masculine": "Ledande stuckatör",
+          "feminine": "Ledande stuckatör",
+          "neutral": "Ledande stuckatör"
+        },
+        "r_24a7497a9f06": {
+          "masculine": "Textiltapetserare",
+          "feminine": "Textiltapetserare",
+          "neutral": "Textiltapetserare"
+        },
+        "r_a279ae7e16ec": {
+          "masculine": "Ledande textiltapetserare",
+          "feminine": "Ledande textiltapetserare",
+          "neutral": "Ledande textiltapetserare"
+        },
+        "r_0f2d76b6cc82": {
+          "masculine": "Ledande snickare",
+          "feminine": "Ledande snickare",
+          "neutral": "Ledande snickare"
+        },
+        "r_08876b0452b5": {
+          "masculine": "Dekorpraktikant",
+          "feminine": "Dekorpraktikant",
+          "neutral": "Dekorpraktikant"
+        }
+      },
+      "kostuem": {
+        "r_cfc0491e1daf": {
+          "masculine": "Kostymdesigner",
+          "feminine": "Kostymdesigner",
+          "neutral": "Kostymdesigner"
+        },
+        "r_acbff2b1675d": {
+          "masculine": "Kostymansvarig",
+          "feminine": "Kostymansvarig",
+          "neutral": "Kostymansvarig"
+        },
+        "r_4e5a29f37fde": {
+          "masculine": "Assisterande kostymansvarig",
+          "feminine": "Assisterande kostymansvarig",
+          "neutral": "Assisterande kostymansvarig"
+        },
+        "r_9dacdd987a87": {
+          "masculine": "Kostymkoordinator",
+          "feminine": "Kostymkoordinator",
+          "neutral": "Kostymkoordinator"
+        },
+        "r_3ea2819cc8c4": {
+          "masculine": "Assisterande kostymkoordinator",
+          "feminine": "Assisterande kostymkoordinator",
+          "neutral": "Assisterande kostymkoordinator"
+        },
+        "r_3684af682bde": {
+          "masculine": "Assisterande kostymdesigner",
+          "feminine": "Assisterande kostymdesigner",
+          "neutral": "Assisterande kostymdesigner"
+        },
+        "r_bca9201a3794": {
+          "masculine": "Andre assistent till kostymdesigner",
+          "feminine": "Andra assistent till kostymdesigner",
+          "neutral": "Andra assistent till kostymdesigner"
+        },
+        "r_570a76c15c34": {
+          "masculine": "Tredje assistent till kostymdesigner",
+          "feminine": "Tredje assistent till kostymdesigner",
+          "neutral": "Tredje assistent till kostymdesigner"
+        },
+        "r_75358a18f698": {
+          "masculine": "Huvudansvarig kostymör",
+          "feminine": "Huvudansvarig kostymör",
+          "neutral": "Huvudansvarig kostymör"
+        },
+        "r_df59c1f51566": {
+          "masculine": "Inspelningskostymör / garderobiär",
+          "feminine": "Inspelningskostymör / garderobiär",
+          "neutral": "Inspelningskostymör / garderobiär"
+        },
+        "r_7d1eb3e51b50": {
+          "masculine": "Extra inspelningskostymör",
+          "feminine": "Extra inspelningskostymör",
+          "neutral": "Extra inspelningskostymör"
+        },
+        "r_aa38c8f5acdd": {
+          "masculine": "Inspelningskostymassistent",
+          "feminine": "Inspelningskostymassistent",
+          "neutral": "Inspelningskostymassistent"
+        },
+        "r_85a93499fa51": {
+          "masculine": "Kostymansvarig för statister",
+          "feminine": "Kostymansvarig för statister",
+          "neutral": "Kostymansvarig för statister"
+        },
+        "r_73f373881e68": {
+          "masculine": "Kostymprovare för statister",
+          "feminine": "Kostymprovare för statister",
+          "neutral": "Kostymprovare för statister"
+        },
+        "r_82daef37fafd": {
+          "masculine": "Kostymör för kostymbil",
+          "feminine": "Kostymör för kostymbil",
+          "neutral": "Kostymör för kostymbil"
+        },
+        "r_40f30fffbd6a": {
+          "masculine": "Kostyminköpare",
+          "feminine": "Kostyminköpare",
+          "neutral": "Kostyminköpare"
+        },
+        "r_60a2042cfa65": {
+          "masculine": "Kostymekonom",
+          "feminine": "Kostymekonom",
+          "neutral": "Kostymekonom"
+        },
+        "r_6ece4b3c2f60": {
+          "masculine": "Kostymmästare",
+          "feminine": "Kostymmästare",
+          "neutral": "Kostymmästare"
+        },
+        "r_bb614a4f62e2": {
+          "masculine": "Kostymassistent",
+          "feminine": "Kostymassistent",
+          "neutral": "Kostymassistent"
+        },
+        "r_86f8b66926fc": {
+          "masculine": "Kostympraktikant",
+          "feminine": "Kostympraktikant",
+          "neutral": "Kostympraktikant"
+        },
+        "r_272717911d79": {
+          "masculine": "Skräddare",
+          "feminine": "Skräddare",
+          "neutral": "Skräddare"
+        },
+        "r_3a35662b53a3": {
+          "masculine": "Sömmare",
+          "feminine": "Sömmare",
+          "neutral": "Sömmare"
+        },
+        "r_298c04a0eec5": {
+          "masculine": "Textilkonstnär",
+          "feminine": "Textilkonstnär",
+          "neutral": "Textilkonstnär"
+        },
+        "r_2a6b1e3320f5": {
+          "masculine": "Kostymtillverkare",
+          "feminine": "Kostymtillverkare",
+          "neutral": "Kostymtillverkare"
+        },
+        "r_066dc1f269bb": {
+          "masculine": "Kostymrekvisitatillverkare",
+          "feminine": "Kostymrekvisitatillverkare",
+          "neutral": "Kostymrekvisitatillverkare"
+        },
+        "r_83db0e1a7bff": {
+          "masculine": "Direktris (mönsterkonstruktion)",
+          "feminine": "Direktris (mönsterkonstruktion)",
+          "neutral": "Direktris (mönsterkonstruktion)"
+        },
+        "r_fc8d26a01b37": {
+          "masculine": "Damskräddare",
+          "feminine": "Damskräddare",
+          "neutral": "Damskräddare"
+        },
+        "r_9aaa9c423455": {
+          "masculine": "Herrskräddare",
+          "feminine": "Herrskräddare",
+          "neutral": "Herrskräddare"
+        },
+        "r_975bb2c38b93": {
+          "masculine": "Modist / hattmakare",
+          "feminine": "Modist / hattmakare",
+          "neutral": "Modist / hattmakare"
+        },
+        "r_e5cb00d76add": {
+          "masculine": "Korsettmakare",
+          "feminine": "Korsettmakare",
+          "neutral": "Korsettmakare"
+        },
+        "r_f573123c66c5": {
+          "masculine": "Kostymillustratör",
+          "feminine": "Kostymillustratör",
+          "neutral": "Kostymillustratör"
+        },
+        "r_3218fd13d59c": {
+          "masculine": "Kostymmålare / färgare",
+          "feminine": "Kostymmålare / färgare",
+          "neutral": "Kostymmålare / färgare"
+        },
+        "r_f8c4b94e93de": {
+          "masculine": "Kostympatinerare",
+          "feminine": "Kostympatinerare",
+          "neutral": "Kostympatinerare"
+        },
+        "r_25bf82085577": {
+          "masculine": "Kostymbrodör",
+          "feminine": "Kostymbrodör",
+          "neutral": "Kostymbrodör"
+        },
+        "r_4bd9dd09da1d": {
+          "masculine": "Kostymresearch",
+          "feminine": "Kostymresearch",
+          "neutral": "Kostymresearch"
+        },
+        "r_2efd6bda8664": {
+          "masculine": "Kostymförare",
+          "feminine": "Kostymförare",
+          "neutral": "Kostymförare"
+        },
+        "r_a723a074986b": {
+          "masculine": "Kostympatinerare (åldrande / slitage)",
+          "feminine": "Kostympatinerare (åldrande / slitage)",
+          "neutral": "Kostympatinerare (åldrande / slitage)"
+        },
+        "r_ac01a53c578c": {
+          "masculine": "Specialeffektskostym",
+          "feminine": "Specialeffektskostym",
+          "neutral": "Specialeffektskostym"
+        },
+        "r_bbc01e9dad81": {
+          "masculine": "Stylist / stylingassistent",
+          "feminine": "Stylist / stylingassistent",
+          "neutral": "Stylist / stylingassistent"
+        },
+        "r_0cf394ee7640": {
+          "masculine": "Kostymdesigner (gestaltning)",
+          "feminine": "Kostymdesigner (gestaltning)",
+          "neutral": "Kostymdesigner (gestaltning)"
+        },
+        "r_6e84493aa620": {
+          "masculine": "Kostymrådgivare",
+          "feminine": "Kostymrådgivare",
+          "neutral": "Kostymrådgivare"
+        },
+        "r_7673a5020856": {
+          "masculine": "Assistent till kostymdesigner",
+          "feminine": "Assistent till kostymdesigner",
+          "neutral": "Assistent till kostymdesigner"
+        },
+        "r_1ca2128245c1": {
+          "masculine": "Kostymavdelningskoordinator",
+          "feminine": "Kostymavdelningskoordinator",
+          "neutral": "Kostymavdelningskoordinator"
+        },
+        "r_f707bb1f5992": {
+          "masculine": "Inspelningskostymör (garderobiär)",
+          "feminine": "Inspelningskostymör (garderobiär)",
+          "neutral": "Inspelningskostymör (garderobiär)"
+        },
+        "r_cc15942423ce": {
+          "masculine": "Inspelningskostymassistent",
+          "feminine": "Inspelningskostymassistent",
+          "neutral": "Inspelningskostymassistent"
+        },
+        "r_fa17db9ddd73": {
+          "masculine": "Stylist",
+          "feminine": "Stylist",
+          "neutral": "Stylist"
+        },
+        "r_510b1830a8a9": {
+          "masculine": "Stylingassistent",
+          "feminine": "Stylingassistent",
+          "neutral": "Stylingassistent"
+        },
+        "r_cc5427b5207e": {
+          "masculine": "Kostymmästare",
+          "feminine": "Kostymmästare",
+          "neutral": "Kostymmästare"
+        },
+        "r_51e4b1b69e51": {
+          "masculine": "Damskräddare",
+          "feminine": "Damskräddare",
+          "neutral": "Damskräddare"
+        },
+        "r_c90f0f14aa1d": {
+          "masculine": "Herrskräddare",
+          "feminine": "Herrskräddare",
+          "neutral": "Herrskräddare"
+        },
+        "r_b02e861df06e": {
+          "masculine": "Hattmakare",
+          "feminine": "Hattmakare",
+          "neutral": "Hattmakare"
+        },
+        "r_f4d2f92c7063": {
+          "masculine": "Korsettmakare",
+          "feminine": "Korsettmakare",
+          "neutral": "Korsettmakare"
+        },
+        "r_60b06eb1a3e5": {
+          "masculine": "Garderobiär",
+          "feminine": "Garderobiär",
+          "neutral": "Garderobiär"
+        },
+        "r_b57d7945c2e1": {
+          "masculine": "Kostymassistent",
+          "feminine": "Kostymassistent",
+          "neutral": "Kostymassistent"
+        },
+        "r_2ac825cfa903": {
+          "masculine": "Skräddare",
+          "feminine": "Skräddare",
+          "neutral": "Skräddare"
+        },
+        "r_f5c79a825c6d": {
+          "masculine": "Kostymförare",
+          "feminine": "Kostymförare",
+          "neutral": "Kostymförare"
+        },
+        "r_d964234f1385": {
+          "masculine": "Sömmare",
+          "feminine": "Sömmare",
+          "neutral": "Sömmare"
+        },
+        "r_6371bcd4467e": {
+          "masculine": "Kostympatinerare",
+          "feminine": "Kostympatinerare",
+          "neutral": "Kostympatinerare"
+        },
+        "r_93cc3465aeac": {
+          "masculine": "Kostymmålare / färgare",
+          "feminine": "Kostymmålare / färgare",
+          "neutral": "Kostymmålare / färgare"
+        },
+        "r_9f631f727b98": {
+          "masculine": "Kostymbrodör",
+          "feminine": "Kostymbrodör",
+          "neutral": "Kostymbrodör"
+        },
+        "r_fd593b68c6bd": {
+          "masculine": "Kostymillustratör",
+          "feminine": "Kostymillustratör",
+          "neutral": "Kostymillustratör"
+        },
+        "r_52cc391775b8": {
+          "masculine": "Kostymdesignpraktikant",
+          "feminine": "Kostymdesignpraktikant",
+          "neutral": "Kostymdesignpraktikant"
+        }
+      },
+      "maske": {
+        "r_2cecb5bef109": {
+          "masculine": "Chef för mask och hår",
+          "feminine": "Chef för mask och hår",
+          "neutral": "Chef för mask och hår"
+        },
+        "r_8c46abf33a4b": {
+          "masculine": "Hårdesigner",
+          "feminine": "Hårdesigner",
+          "neutral": "Hårdesigner"
+        },
+        "r_afd55563be09": {
+          "masculine": "Mask- och hårdesigner",
+          "feminine": "Mask- och hårdesigner",
+          "neutral": "Mask- och hårdesigner"
+        },
+        "r_0d2723e6a8cc": {
+          "masculine": "Maskdesigner",
+          "feminine": "Maskdesigner",
+          "neutral": "Maskdesigner"
+        },
+        "r_b73ceeda53dd": {
+          "masculine": "Mask- och håransvarig",
+          "feminine": "Mask- och håransvarig",
+          "neutral": "Mask- och håransvarig"
+        },
+        "r_913e5cf46a02": {
+          "masculine": "Huvudansvarig makeupartist",
+          "feminine": "Huvudansvarig makeupartist",
+          "neutral": "Huvudansvarig makeupartist"
+        },
+        "r_495a42f74fbb": {
+          "masculine": "Huvudansvarig hårstylist",
+          "feminine": "Huvudansvarig hårstylist",
+          "neutral": "Huvudansvarig hårstylist"
+        },
+        "r_ff414fc1a4e8": {
+          "masculine": "Makeupartist",
+          "feminine": "Makeupartist",
+          "neutral": "Makeupartist"
+        },
+        "r_ace166547405": {
+          "masculine": "Extra makeupartist",
+          "feminine": "Extra makeupartist",
+          "neutral": "Extra makeupartist"
+        },
+        "r_96cb48e2539d": {
+          "masculine": "Hårstylist",
+          "feminine": "Hårstylist",
+          "neutral": "Hårstylist"
+        },
+        "r_3a06bbd5516b": {
+          "masculine": "Extra hårstylist",
+          "feminine": "Extra hårstylist",
+          "neutral": "Extra hårstylist"
+        },
+        "r_a8a061642ea1": {
+          "masculine": "Chefsmaskör / maskavdelningschef",
+          "feminine": "Chefsmaskör / maskavdelningschef",
+          "neutral": "Chefsmaskör / maskavdelningschef"
+        },
+        "r_988255c043c0": {
+          "masculine": "Kroppssminkör",
+          "feminine": "Kroppssminkör",
+          "neutral": "Kroppssminkör"
+        },
+        "r_62302b472d3b": {
+          "masculine": "Extra maskör",
+          "feminine": "Extra maskör",
+          "neutral": "Extra maskör"
+        },
+        "r_de6fbe18e529": {
+          "masculine": "Sminkassistent",
+          "feminine": "Sminkassistent",
+          "neutral": "Sminkassistent"
+        },
+        "r_89708da23c7a": {
+          "masculine": "Perukmakare",
+          "feminine": "Perukmakare",
+          "neutral": "Perukmakare"
+        },
+        "r_eb0f745569de": {
+          "masculine": "Protesmaskör",
+          "feminine": "Protesmaskör",
+          "neutral": "Protesmaskör"
+        },
+        "r_bc667775a067": {
+          "masculine": "Specialeffektsmaskör",
+          "feminine": "Specialeffektsmaskör",
+          "neutral": "Specialeffektsmaskör"
+        },
+        "r_a27c177f51ef": {
+          "masculine": "Hår- och sminkansvarig för statister",
+          "feminine": "Hår- och sminkansvarig för statister",
+          "neutral": "Hår- och sminkansvarig för statister"
+        },
+        "r_e46c728a4398": {
+          "masculine": "Maskpraktikant",
+          "feminine": "Maskpraktikant",
+          "neutral": "Maskpraktikant"
+        },
+        "r_3bd74d7ca372": {
+          "masculine": "Huvudansvarig makeupartist",
+          "feminine": "Huvudansvarig makeupartist",
+          "neutral": "Huvudansvarig makeupartist"
+        },
+        "r_1dbe2290254a": {
+          "masculine": "Chefsmaskör",
+          "feminine": "Chefsmaskör",
+          "neutral": "Chefsmaskör"
+        },
+        "r_3e08c4bedcc0": {
+          "masculine": "Kroppssminkör",
+          "feminine": "Kroppssminkör",
+          "neutral": "Kroppssminkör"
+        },
+        "r_24c9ee41124f": {
+          "masculine": "Extra maskör",
+          "feminine": "Extra maskör",
+          "neutral": "Extra maskör"
+        },
+        "r_6373cbbea77f": {
+          "masculine": "Perukmakare",
+          "feminine": "Perukmakare",
+          "neutral": "Perukmakare"
+        },
+        "r_e9a07f599b31": {
+          "masculine": "Maskpraktikant",
+          "feminine": "Maskpraktikant",
+          "neutral": "Maskpraktikant"
+        }
+      },
+      "post": {
+        "r_f88d95239ea1": {
+          "masculine": "Efterbearbetningsproducent",
+          "feminine": "Efterbearbetningsproducent",
+          "neutral": "Efterbearbetningsproducent"
+        },
+        "r_4284177c72b3": {
+          "masculine": "Efterbearbetningsansvarig",
+          "feminine": "Efterbearbetningsansvarig",
+          "neutral": "Efterbearbetningsansvarig"
+        },
+        "r_c2fb80f3e981": {
+          "masculine": "Efterbearbetningsledare",
+          "feminine": "Efterbearbetningsledare",
+          "neutral": "Efterbearbetningsledare"
+        },
+        "r_78b6f4ddb08c": {
+          "masculine": "Efterbearbetningskoordinator",
+          "feminine": "Efterbearbetningskoordinator",
+          "neutral": "Efterbearbetningskoordinator"
+        },
+        "r_0bb7e59012ae": {
+          "masculine": "Efterbearbetningsplanerare",
+          "feminine": "Efterbearbetningsplanerare",
+          "neutral": "Efterbearbetningsplanerare"
+        },
+        "r_b54fb6f974fa": {
+          "masculine": "Assistent till efterbearbetningsansvarig",
+          "feminine": "Assistent till efterbearbetningsansvarig",
+          "neutral": "Assistent till efterbearbetningsansvarig"
+        },
+        "r_fae43b642354": {
+          "masculine": "Leveransansvarig",
+          "feminine": "Leveransansvarig",
+          "neutral": "Leveransansvarig"
+        },
+        "r_54b281a42495": {
+          "masculine": "Klippare",
+          "feminine": "Klippare",
+          "neutral": "Klippare"
+        },
+        "r_eb67aee95450": {
+          "masculine": "Klippare (editor)",
+          "feminine": "Klippare (editor)",
+          "neutral": "Klippare (editor)"
+        },
+        "r_332deef8530f": {
+          "masculine": "Extra klippare",
+          "feminine": "Extra klippare",
+          "neutral": "Extra klippare"
+        },
+        "r_4b8538db6e6e": {
+          "masculine": "Junior klippare",
+          "feminine": "Junior klippare",
+          "neutral": "Junior klippare"
+        },
+        "r_a000c69c93cd": {
+          "masculine": "Förste klippassistent",
+          "feminine": "Första klippassistent",
+          "neutral": "Första klippassistent"
+        },
+        "r_fb53d3bb0ca0": {
+          "masculine": "Klippassistent",
+          "feminine": "Klippassistent",
+          "neutral": "Klippassistent"
+        },
+        "r_58fb452bb25d": {
+          "masculine": "Andre klippassistent",
+          "feminine": "Andra klippassistent",
+          "neutral": "Andra klippassistent"
+        },
+        "r_e73f1067c3d0": {
+          "masculine": "Andre klippassistent",
+          "feminine": "Andra klippassistent",
+          "neutral": "Andra klippassistent"
+        },
+        "r_f40a64b53f4e": {
+          "masculine": "Tredje klippassistent",
+          "feminine": "Tredje klippassistent",
+          "neutral": "Tredje klippassistent"
+        },
+        "r_f034db9da000": {
+          "masculine": "Klippdramaturg",
+          "feminine": "Klippdramaturg",
+          "neutral": "Klippdramaturg"
+        },
+        "r_9d8fc1953afd": {
+          "masculine": "VFX-klippare",
+          "feminine": "VFX-klippare",
+          "neutral": "VFX-klippare"
+        },
+        "r_6742bca7f725": {
+          "masculine": "Trailerklippare",
+          "feminine": "Trailerklippare",
+          "neutral": "Trailerklippare"
+        },
+        "r_0088f1d1581d": {
+          "masculine": "Dagsmaterialklippare",
+          "feminine": "Dagsmaterialklippare",
+          "neutral": "Dagsmaterialklippare"
+        },
+        "r_855df6fe84d9": {
+          "masculine": "Synkassistent",
+          "feminine": "Synkassistent",
+          "neutral": "Synkassistent"
+        },
+        "r_76fe5605aea7": {
+          "masculine": "Avid-operatör",
+          "feminine": "Avid-operatör",
+          "neutral": "Avid-operatör"
+        },
+        "r_9a37f1a2f07c": {
+          "masculine": "Final Cut-operatör",
+          "feminine": "Final Cut-operatör",
+          "neutral": "Final Cut-operatör"
+        },
+        "r_5c291075de55": {
+          "masculine": "Kolorist",
+          "feminine": "Kolorist",
+          "neutral": "Kolorist"
+        },
+        "r_ee3d75537a1f": {
+          "masculine": "Onlineklippare",
+          "feminine": "Onlineklippare",
+          "neutral": "Onlineklippare"
+        },
+        "r_24e3087423e1": {
+          "masculine": "Slutbearbetningsartist",
+          "feminine": "Slutbearbetningsartist",
+          "neutral": "Slutbearbetningsartist"
+        },
+        "r_1b9c5df34287": {
+          "masculine": "Skärmformgivare",
+          "feminine": "Skärmformgivare",
+          "neutral": "Skärmformgivare"
+        },
+        "r_0c866fbdd1b9": {
+          "masculine": "Titeldesigner",
+          "feminine": "Titeldesigner",
+          "neutral": "Titeldesigner"
+        },
+        "r_cac32c0c1a16": {
+          "masculine": "DCP-tekniker",
+          "feminine": "DCP-tekniker",
+          "neutral": "DCP-tekniker"
+        },
+        "r_3bf9436831af": {
+          "masculine": "Filmskanningsoperatör",
+          "feminine": "Filmskanningsoperatör",
+          "neutral": "Filmskanningsoperatör"
+        },
+        "r_0c4887e0a1b6": {
+          "masculine": "Filmskanningsansvarig",
+          "feminine": "Filmskanningsansvarig",
+          "neutral": "Filmskanningsansvarig"
+        },
+        "r_85f36a10ca63": {
+          "masculine": "VFX-ansvarig",
+          "feminine": "VFX-ansvarig",
+          "neutral": "VFX-ansvarig"
+        },
+        "r_3690883b97f2": {
+          "masculine": "VFX-producent",
+          "feminine": "VFX-producent",
+          "neutral": "VFX-producent"
+        },
+        "r_01122a78805d": {
+          "masculine": "VFX-koordinator",
+          "feminine": "VFX-koordinator",
+          "neutral": "VFX-koordinator"
+        },
+        "r_4c1b3c0e7030": {
+          "masculine": "VFX-produktionschef",
+          "feminine": "VFX-produktionschef",
+          "neutral": "VFX-produktionschef"
+        },
+        "r_b11b0566c205": {
+          "masculine": "Producent för extern VFX-produktion",
+          "feminine": "Producent för extern VFX-produktion",
+          "neutral": "Producent för extern VFX-produktion"
+        },
+        "r_061d09311a06": {
+          "masculine": "Assisterande VFX-producent",
+          "feminine": "Assisterande VFX-producent",
+          "neutral": "Assisterande VFX-producent"
+        },
+        "r_c20adc0c544f": {
+          "masculine": "VFX-animationsansvarig",
+          "feminine": "VFX-animationsansvarig",
+          "neutral": "VFX-animationsansvarig"
+        },
+        "r_ef84bdb88ead": {
+          "masculine": "VR-producent",
+          "feminine": "VR-producent",
+          "neutral": "VR-producent"
+        },
+        "r_33a9c6da17ea": {
+          "masculine": "Compositingartist",
+          "feminine": "Compositingartist",
+          "neutral": "Compositingartist"
+        },
+        "r_aca1c9874a93": {
+          "masculine": "Compositingansvarig",
+          "feminine": "Compositingansvarig",
+          "neutral": "Compositingansvarig"
+        },
+        "r_74803d65a47d": {
+          "masculine": "Digital compositingartist",
+          "feminine": "Digital compositingartist",
+          "neutral": "Digital compositingartist"
+        },
+        "r_a61ab2d8897e": {
+          "masculine": "Ansvarig för digitala effekter",
+          "feminine": "Ansvarig för digitala effekter",
+          "neutral": "Ansvarig för digitala effekter"
+        },
+        "r_41f1fab43430": {
+          "masculine": "Digital effektdesigner",
+          "feminine": "Digital effektdesigner",
+          "neutral": "Digital effektdesigner"
+        },
+        "r_09a4c7b8c909": {
+          "masculine": "Digital bakgrundsmålare",
+          "feminine": "Digital bakgrundsmålare",
+          "neutral": "Digital bakgrundsmålare"
+        },
+        "r_1df80b2df510": {
+          "masculine": "2D-artist",
+          "feminine": "2D-artist",
+          "neutral": "2D-artist"
+        },
+        "r_c5222c873ae5": {
+          "masculine": "3D-artist",
+          "feminine": "3D-artist",
+          "neutral": "3D-artist"
+        },
+        "r_f1d016eba483": {
+          "masculine": "CG-ljussättare",
+          "feminine": "CG-ljussättare",
+          "neutral": "CG-ljussättare"
+        },
+        "r_1374d004f892": {
+          "masculine": "Texturartist",
+          "feminine": "Texturartist",
+          "neutral": "Texturartist"
+        },
+        "r_ca0826d47a19": {
+          "masculine": "Matchmove-artist",
+          "feminine": "Matchmove-artist",
+          "neutral": "Matchmove-artist"
+        },
+        "r_272f028d80c7": {
+          "masculine": "Rotoskopiartist",
+          "feminine": "Rotoskopiartist",
+          "neutral": "Rotoskopiartist"
+        },
+        "r_fb2a18a56ba5": {
+          "masculine": "Effektartist",
+          "feminine": "Effektartist",
+          "neutral": "Effektartist"
+        },
+        "r_89c1660cb356": {
+          "masculine": "Animatör",
+          "feminine": "Animatör",
+          "neutral": "Animatör"
+        },
+        "r_2efa5e8c0d5f": {
+          "masculine": "Rörelsedesigner",
+          "feminine": "Rörelsedesigner",
+          "neutral": "Rörelsedesigner"
+        },
+        "r_c2053cb7660f": {
+          "masculine": "Karaktärsanimatör",
+          "feminine": "Karaktärsanimatör",
+          "neutral": "Karaktärsanimatör"
+        },
+        "r_247d43bdfb47": {
+          "masculine": "Efterbearbetningsassistent",
+          "feminine": "Efterbearbetningsassistent",
+          "neutral": "Efterbearbetningsassistent"
+        },
+        "r_e2802de21986": {
+          "masculine": "Efterbearbetningstekniker",
+          "feminine": "Efterbearbetningstekniker",
+          "neutral": "Efterbearbetningstekniker"
+        },
+        "r_1f9c7a9f75a8": {
+          "masculine": "Klippraktikant",
+          "feminine": "Klippraktikant",
+          "neutral": "Klippraktikant"
+        },
+        "r_bf7027763437": {
+          "masculine": "Efterbearbetningskoordinator",
+          "feminine": "Efterbearbetningskoordinator",
+          "neutral": "Efterbearbetningskoordinator"
+        },
+        "r_fc841e10fe4f": {
+          "masculine": "Assistent till efterbearbetningsansvarig",
+          "feminine": "Assistent till efterbearbetningsansvarig",
+          "neutral": "Assistent till efterbearbetningsansvarig"
+        },
+        "r_a79df89d104c": {
+          "masculine": "VFX- / compositingartist",
+          "feminine": "VFX- / compositingartist",
+          "neutral": "VFX- / compositingartist"
+        },
+        "r_2a16dc4c4550": {
+          "masculine": "Ljuddesigner",
+          "feminine": "Ljuddesigner",
+          "neutral": "Ljuddesigner"
+        },
+        "r_b96fddf3696f": {
+          "masculine": "Ljudredigerare / klippare",
+          "feminine": "Ljudredigerare / klippare",
+          "neutral": "Ljudredigerare / klippare"
+        },
+        "r_a903b5656a8c": {
+          "masculine": "DCP-artist",
+          "feminine": "DCP-artist",
+          "neutral": "DCP-artist"
+        },
+        "r_774ffd708e0e": {
+          "masculine": "Filminspelningsoperatör",
+          "feminine": "Filminspelningsoperatör",
+          "neutral": "Filminspelningsoperatör"
+        },
+        "r_8685aa8f2a95": {
+          "masculine": "Mistika-operatör",
+          "feminine": "Mistika-operatör",
+          "neutral": "Mistika-operatör"
+        },
+        "r_9b86e6dde935": {
+          "masculine": "Teknisk VFX-chef",
+          "feminine": "Teknisk VFX-chef",
+          "neutral": "Teknisk VFX-chef"
+        },
+        "r_ab44975f8351": {
+          "masculine": "VFX-konsult",
+          "feminine": "VFX-konsult",
+          "neutral": "VFX-konsult"
+        },
+        "r_6a2814e6546b": {
+          "masculine": "Ansvarig VFX-ljussättare",
+          "feminine": "Ansvarig VFX-ljussättare",
+          "neutral": "Ansvarig VFX-ljussättare"
+        },
+        "r_c043402107e7": {
+          "masculine": "VFX-ansvarig på inspelningsplatsen",
+          "feminine": "VFX-ansvarig på inspelningsplatsen",
+          "neutral": "VFX-ansvarig på inspelningsplatsen"
+        },
+        "r_2d4e2d1e1c2c": {
+          "masculine": "VFX-produktionskoordinator",
+          "feminine": "VFX-produktionskoordinator",
+          "neutral": "VFX-produktionskoordinator"
+        },
+        "r_3a24d45a3a71": {
+          "masculine": "Assisterande VFX-koordinator",
+          "feminine": "Assisterande VFX-koordinator",
+          "neutral": "Assisterande VFX-koordinator"
+        },
+        "r_a2d3fd026c27": {
+          "masculine": "VFX-ledningsansvarig",
+          "feminine": "VFX-ledningsansvarig",
+          "neutral": "VFX-ledningsansvarig"
+        },
+        "r_1d0ffcaee2f8": {
+          "masculine": "VFX-personalchef",
+          "feminine": "VFX-personalchef",
+          "neutral": "VFX-personalchef"
+        },
+        "r_6eb353601a03": {
+          "masculine": "VFX-IT-administratör",
+          "feminine": "VFX-IT-administratör",
+          "neutral": "VFX-IT-administratör"
+        },
+        "r_e70450322709": {
+          "masculine": "VFX-IT-support",
+          "feminine": "VFX-IT-support",
+          "neutral": "VFX-IT-support"
+        },
+        "r_71a68d7195b5": {
+          "masculine": "VFX-systemingenjör / tekniker",
+          "feminine": "VFX-systemingenjör / tekniker",
+          "neutral": "VFX-systemingenjör / tekniker"
+        },
+        "r_30de176c3d86": {
+          "masculine": "Teknisk chef för produktionsflöden",
+          "feminine": "Teknisk chef för produktionsflöden",
+          "neutral": "Teknisk chef för produktionsflöden"
+        },
+        "r_3021537edab0": {
+          "masculine": "CG-ansvarig",
+          "feminine": "CG-ansvarig",
+          "neutral": "CG-ansvarig"
+        },
+        "r_0d4cd83ac5f0": {
+          "masculine": "CG-programutvecklare",
+          "feminine": "CG-programutvecklare",
+          "neutral": "CG-programutvecklare"
+        },
+        "r_4d7b70afc38f": {
+          "masculine": "Koncepttecknare (VFX)",
+          "feminine": "Koncepttecknare (VFX)",
+          "neutral": "Koncepttecknare (VFX)"
+        },
+        "r_1d77801b6bcb": {
+          "masculine": "Karaktärsdesigner",
+          "feminine": "Karaktärsdesigner",
+          "neutral": "Karaktärsdesigner"
+        },
+        "r_2eeabfb3e033": {
+          "masculine": "Karaktärsansvarig",
+          "feminine": "Karaktärsansvarig",
+          "neutral": "Karaktärsansvarig"
+        },
+        "r_d4054cc011f7": {
+          "masculine": "Animatronikansvarig",
+          "feminine": "Animatronikansvarig",
+          "neutral": "Animatronikansvarig"
+        },
+        "r_27773325d503": {
+          "masculine": "Förvisualiseringsansvarig",
+          "feminine": "Förvisualiseringsansvarig",
+          "neutral": "Förvisualiseringsansvarig"
+        },
+        "r_4e65539d8bde": {
+          "masculine": "Förvisualiseringsartist",
+          "feminine": "Förvisualiseringsartist",
+          "neutral": "Förvisualiseringsartist"
+        },
+        "r_09f34347e5ee": {
+          "masculine": "Motion capture-ansvarig",
+          "feminine": "Motion capture-ansvarig",
+          "neutral": "Motion capture-ansvarig"
+        },
+        "r_96c37e1de0fa": {
+          "masculine": "Motion control-ansvarig",
+          "feminine": "Motion control-ansvarig",
+          "neutral": "Motion control-ansvarig"
+        },
+        "r_733686f9ae97": {
+          "masculine": "Dagsmaterialoperatör",
+          "feminine": "Dagsmaterialoperatör",
+          "neutral": "Dagsmaterialoperatör"
+        },
+        "r_ab703255dec3": {
+          "masculine": "In- och utmatningskoordinator",
+          "feminine": "In- och utmatningskoordinator",
+          "neutral": "In- och utmatningskoordinator"
+        },
+        "r_75540ed9967e": {
+          "masculine": "Telecineoperatör",
+          "feminine": "Telecineoperatör",
+          "neutral": "Telecineoperatör"
+        },
+        "r_6c17929b4f69": {
+          "masculine": "Digital matchmove-artist",
+          "feminine": "Digital matchmove-artist",
+          "neutral": "Digital matchmove-artist"
+        },
+        "r_2646f9b4aadf": {
+          "masculine": "Rotoskopiartist",
+          "feminine": "Rotoskopiartist",
+          "neutral": "Rotoskopiartist"
+        },
+        "r_1abce9757421": {
+          "masculine": "Ansvarig för digitala tillgångar (DAM)",
+          "feminine": "Ansvarig för digitala tillgångar (DAM)",
+          "neutral": "Ansvarig för digitala tillgångar (DAM)"
+        },
+        "r_e28081bd8659": {
+          "masculine": "DI-ansvarig",
+          "feminine": "DI-ansvarig",
+          "neutral": "DI-ansvarig"
+        },
+        "r_3be4ac15eccc": {
+          "masculine": "Digital intermediate-tekniker",
+          "feminine": "Digital intermediate-tekniker",
+          "neutral": "Digital intermediate-tekniker"
+        },
+        "r_ac6763f1d04b": {
+          "masculine": "Digital intermediate-assistent",
+          "feminine": "Digital intermediate-assistent",
+          "neutral": "Digital intermediate-assistent"
+        },
+        "r_68b5ed487d7c": {
+          "masculine": "VFX-datahanterare",
+          "feminine": "VFX-datahanterare",
+          "neutral": "VFX-datahanterare"
+        },
+        "r_98875c546157": {
+          "masculine": "Renderingsansvarig",
+          "feminine": "Renderingsansvarig",
+          "neutral": "Renderingsansvarig"
+        },
+        "r_37de85ee2914": {
+          "masculine": "Ansvarig för stereoskopisk 3D",
+          "feminine": "Ansvarig för stereoskopisk 3D",
+          "neutral": "Ansvarig för stereoskopisk 3D"
+        },
+        "r_138f0f7f11c5": {
+          "masculine": "Skärmuppspelning på inspelningsplatsen",
+          "feminine": "Skärmuppspelning på inspelningsplatsen",
+          "neutral": "Skärmuppspelning på inspelningsplatsen"
+        },
+        "r_6c52a0b17c05": {
+          "masculine": "VFX-praktikant",
+          "feminine": "VFX-praktikant",
+          "neutral": "VFX-praktikant"
+        },
+        "r_1a1b5684e757": {
+          "masculine": "VFX-produktionsassistent",
+          "feminine": "VFX-produktionsassistent",
+          "neutral": "VFX-produktionsassistent"
+        },
+        "r_03863e1fa165": {
+          "masculine": "VFX-teamledare",
+          "feminine": "VFX-teamledare",
+          "neutral": "VFX-teamledare"
+        },
+        "r_0006a71a7050": {
+          "masculine": "3D-chef",
+          "feminine": "3D-chef",
+          "neutral": "3D-chef"
+        },
+        "r_9ad285824801": {
+          "masculine": "3D-animationsregissör",
+          "feminine": "3D-animationsregissör",
+          "neutral": "3D-animationsregissör"
+        },
+        "r_365169e4e39c": {
+          "masculine": "Ledande 3D-karaktärsanimatör",
+          "feminine": "Ledande 3D-karaktärsanimatör",
+          "neutral": "Ledande 3D-karaktärsanimatör"
+        },
+        "r_6dac25e38271": {
+          "masculine": "3D-karaktärsanimatör",
+          "feminine": "3D-karaktärsanimatör",
+          "neutral": "3D-karaktärsanimatör"
+        },
+        "r_18b24b362b8f": {
+          "masculine": "3D-riggare",
+          "feminine": "3D-riggare",
+          "neutral": "3D-riggare"
+        },
+        "r_b6265894c01c": {
+          "masculine": "3D-modellerare",
+          "feminine": "3D-modellerare",
+          "neutral": "3D-modellerare"
+        },
+        "r_401ce457432d": {
+          "masculine": "3D-ljussättare",
+          "feminine": "3D-ljussättare",
+          "neutral": "3D-ljussättare"
+        },
+        "r_d6c0df6758d4": {
+          "masculine": "3D-texturerare",
+          "feminine": "3D-texturerare",
+          "neutral": "3D-texturerare"
+        },
+        "r_aff4837ba039": {
+          "masculine": "3D-kameraartist",
+          "feminine": "3D-kameraartist",
+          "neutral": "3D-kameraartist"
+        },
+        "r_01ea52ed92df": {
+          "masculine": "3D-kameraansvarig",
+          "feminine": "3D-kameraansvarig",
+          "neutral": "3D-kameraansvarig"
+        },
+        "r_1b2a5f055d73": {
+          "masculine": "Effektanimatör",
+          "feminine": "Effektanimatör",
+          "neutral": "Effektanimatör"
+        },
+        "r_25d305ae2181": {
+          "masculine": "Partikelanimatör",
+          "feminine": "Partikelanimatör",
+          "neutral": "Partikelanimatör"
+        },
+        "r_493348eeb5c9": {
+          "masculine": "2D-riggare",
+          "feminine": "2D-riggare",
+          "neutral": "2D-riggare"
+        },
+        "r_50d612c5929c": {
+          "masculine": "2D-animationsregissör",
+          "feminine": "2D-animationsregissör",
+          "neutral": "2D-animationsregissör"
+        },
+        "r_5b75d1dcc3ba": {
+          "masculine": "Ledande 2D-karaktärsanimatör",
+          "feminine": "Ledande 2D-karaktärsanimatör",
+          "neutral": "Ledande 2D-karaktärsanimatör"
+        },
+        "r_d3bed7009009": {
+          "masculine": "2D-karaktärsanimatör",
+          "feminine": "2D-karaktärsanimatör",
+          "neutral": "2D-karaktärsanimatör"
+        },
+        "r_b9b34ba4ee44": {
+          "masculine": "MotionBuilder-artist",
+          "feminine": "MotionBuilder-artist",
+          "neutral": "MotionBuilder-artist"
+        },
+        "r_40ba6442d974": {
+          "masculine": "MotionBuilder-operatör",
+          "feminine": "MotionBuilder-operatör",
+          "neutral": "MotionBuilder-operatör"
+        }
+      },
+      "musik": {
+        "r_4b516c3014b1": {
+          "masculine": "Kompositör",
+          "feminine": "Kompositör",
+          "neutral": "Kompositör"
+        },
+        "r_78a8b7bafdcf": {
+          "masculine": "Ytterligare musik",
+          "feminine": "Ytterligare musik",
+          "neutral": "Ytterligare musik"
+        },
+        "r_be9c85f652ee": {
+          "masculine": "Trailerkompositör",
+          "feminine": "Trailerkompositör",
+          "neutral": "Trailerkompositör"
+        },
+        "r_d052f25322c5": {
+          "masculine": "Musikalisk ledare",
+          "feminine": "Musikalisk ledare",
+          "neutral": "Musikalisk ledare"
+        },
+        "r_520348654852": {
+          "masculine": "Musikregissör",
+          "feminine": "Musikregissör",
+          "neutral": "Musikregissör"
+        },
+        "r_d614bde7c500": {
+          "masculine": "Musikansvarig",
+          "feminine": "Musikansvarig",
+          "neutral": "Musikansvarig"
+        },
+        "r_1f0d7374bb4c": {
+          "masculine": "Orkestrerare",
+          "feminine": "Orkestrerare",
+          "neutral": "Orkestrerare"
+        },
+        "r_aa4b42f84387": {
+          "masculine": "Arrangör",
+          "feminine": "Arrangör",
+          "neutral": "Arrangör"
+        },
+        "r_8c334f2ac9d3": {
+          "masculine": "Arrangör",
+          "feminine": "Arrangör",
+          "neutral": "Arrangör"
+        },
+        "r_fe19755b0b9e": {
+          "masculine": "Dirigent",
+          "feminine": "Dirigent",
+          "neutral": "Dirigent"
+        },
+        "r_73021f352efb": {
+          "masculine": "Dirigent",
+          "feminine": "Dirigent",
+          "neutral": "Dirigent"
+        },
+        "r_1a95751341fb": {
+          "masculine": "Musikredigerare",
+          "feminine": "Musikredigerare",
+          "neutral": "Musikredigerare"
+        },
+        "r_8fd3dbb18e49": {
+          "masculine": "Notkopist",
+          "feminine": "Notkopist",
+          "neutral": "Notkopist"
+        },
+        "r_d5e57768aab8": {
+          "masculine": "Musikproducent",
+          "feminine": "Musikproducent",
+          "neutral": "Musikproducent"
+        },
+        "r_0e9738be9045": {
+          "masculine": "Musikkonsult",
+          "feminine": "Musikkonsult",
+          "neutral": "Musikkonsult"
+        },
+        "r_82e1a4d8181e": {
+          "masculine": "Musikkoordinator",
+          "feminine": "Musikkoordinator",
+          "neutral": "Musikkoordinator"
+        },
+        "r_00bc34dec4f3": {
+          "masculine": "Logic-operatör",
+          "feminine": "Logic-operatör",
+          "neutral": "Logic-operatör"
+        },
+        "r_0eae67a415cd": {
+          "masculine": "Pro Tools-operatör",
+          "feminine": "Pro Tools-operatör",
+          "neutral": "Pro Tools-operatör"
+        },
+        "r_52aa8c6866dc": {
+          "masculine": "Kompositörsassistent",
+          "feminine": "Kompositörsassistent",
+          "neutral": "Kompositörsassistent"
+        },
+        "r_3e66ad9f45e2": {
+          "masculine": "Musiker",
+          "feminine": "Musiker",
+          "neutral": "Musiker"
+        },
+        "r_ade18645efa3": {
+          "masculine": "Ljudredigerare",
+          "feminine": "Ljudredigerare",
+          "neutral": "Ljudredigerare"
+        },
+        "r_0972afcc1e55": {
+          "masculine": "Kompositionspraktikant",
+          "feminine": "Kompositionspraktikant",
+          "neutral": "Kompositionspraktikant"
+        },
+        "r_801e363423c3": {
+          "masculine": "Exekutiv soundtrackproducent",
+          "feminine": "Exekutiv soundtrackproducent",
+          "neutral": "Exekutiv soundtrackproducent"
+        }
+      },
+      "set-logistik": {
+        "r_06d9aa28368f": {
+          "masculine": "Runner för basområdet",
+          "feminine": "Runner för basområdet",
+          "neutral": "Runner för basområdet"
+        },
+        "r_51e581b5ea39": {
+          "masculine": "Förare (personbil / lastbil)",
+          "feminine": "Förare (personbil / lastbil)",
+          "neutral": "Förare (personbil / lastbil)"
+        },
+        "r_36a599628c2e": {
+          "masculine": "Platsförare",
+          "feminine": "Platsförare",
+          "neutral": "Platsförare"
+        },
+        "r_9bc1a35535fa": {
+          "masculine": "Platsinspelningsledare",
+          "feminine": "Platsinspelningsledare",
+          "neutral": "Platsinspelningsledare"
+        },
+        "r_273f12c52b95": {
+          "masculine": "Assisterande platschef",
+          "feminine": "Assisterande platschef",
+          "neutral": "Assisterande platschef"
+        },
+        "r_ad61df711cdf": {
+          "masculine": "Inspelningssäkerhet",
+          "feminine": "Inspelningssäkerhet",
+          "neutral": "Inspelningssäkerhet"
+        },
+        "r_16476d55e646": {
+          "masculine": "Publik- och folksamlingskontroll",
+          "feminine": "Publik- och folksamlingskontroll",
+          "neutral": "Publik- och folksamlingskontroll"
+        },
+        "r_d4d0eb9a01ad": {
+          "masculine": "Rörelseregissör",
+          "feminine": "Rörelseregissör",
+          "neutral": "Rörelseregissör"
+        },
+        "r_3c6a65ecb046": {
+          "masculine": "Rörelsecoach",
+          "feminine": "Rörelsecoach",
+          "neutral": "Rörelsecoach"
+        },
+        "r_c66e045ffbbf": {
+          "masculine": "Intimitetskoordinator",
+          "feminine": "Intimitetskoordinator",
+          "neutral": "Intimitetskoordinator"
+        },
+        "r_2e9dcd12712e": {
+          "masculine": "Koreograf",
+          "feminine": "Koreograf",
+          "neutral": "Koreograf"
+        },
+        "r_6f899f66fa58": {
+          "masculine": "Danscoach",
+          "feminine": "Danscoach",
+          "neutral": "Danscoach"
+        },
+        "r_f4a45af86f47": {
+          "masculine": "Sångcoach",
+          "feminine": "Sångcoach",
+          "neutral": "Sångcoach"
+        },
+        "r_6e8ad217ef2f": {
+          "masculine": "Dialogcoach",
+          "feminine": "Dialogcoach",
+          "neutral": "Dialogcoach"
+        },
+        "r_63787dc385b1": {
+          "masculine": "Dialekt- och språkcoach",
+          "feminine": "Dialekt- och språkcoach",
+          "neutral": "Dialekt- och språkcoach"
+        },
+        "r_8546ce0263e3": {
+          "masculine": "Skådespelarcoach för funktionsnedsättning och neurodivergens",
+          "feminine": "Skådespelarcoach för funktionsnedsättning och neurodivergens",
+          "neutral": "Skådespelarcoach för funktionsnedsättning och neurodivergens"
+        },
+        "r_969986f76695": {
+          "masculine": "Musikcoach",
+          "feminine": "Musikcoach",
+          "neutral": "Musikcoach"
+        },
+        "r_717c17e3e434": {
+          "masculine": "Rådgivare för döva och teckenspråk",
+          "feminine": "Rådgivare för döva och teckenspråk",
+          "neutral": "Rådgivare för döva och teckenspråk"
+        },
+        "r_e30edc1bd3f8": {
+          "masculine": "Mångfaldskonsult",
+          "feminine": "Mångfaldskonsult",
+          "neutral": "Mångfaldskonsult"
+        },
+        "r_5595cb9aacd1": {
+          "masculine": "Känslighetsläsare (sensitivity reader)",
+          "feminine": "Känslighetsläsare (sensitivity reader)",
+          "neutral": "Känslighetsläsare (sensitivity reader)"
+        },
+        "r_2d5e77118f48": {
+          "masculine": "Tolk",
+          "feminine": "Tolk",
+          "neutral": "Tolk"
+        },
+        "r_48bf6fb54a76": {
+          "masculine": "Stand-in",
+          "feminine": "Stand-in",
+          "neutral": "Stand-in"
+        },
+        "r_5845830d5e82": {
+          "masculine": "Inspelningssjukvårdare",
+          "feminine": "Inspelningssjukvårdare",
+          "neutral": "Inspelningssjukvårdare"
+        },
+        "r_ad72daba923d": {
+          "masculine": "Lärare på inspelningsplatsen",
+          "feminine": "Lärare på inspelningsplatsen",
+          "neutral": "Lärare på inspelningsplatsen"
+        },
+        "r_79e9614b81a6": {
+          "masculine": "Barnansvarig",
+          "feminine": "Barnansvarig",
+          "neutral": "Barnansvarig"
+        },
+        "r_29d48a809858": {
+          "masculine": "Ansvarig för barns välbefinnande",
+          "feminine": "Ansvarig för barns välbefinnande",
+          "neutral": "Ansvarig för barns välbefinnande"
+        },
+        "r_aba4d92c8e69": {
+          "masculine": "Artist-, gäst- och VIP-ansvarig",
+          "feminine": "Artist-, gäst- och VIP-ansvarig",
+          "neutral": "Artist-, gäst- och VIP-ansvarig"
+        },
+        "r_53207f6ae5f4": {
+          "masculine": "Samordnare för psykisk hälsa",
+          "feminine": "Samordnare för psykisk hälsa",
+          "neutral": "Samordnare för psykisk hälsa"
+        },
+        "r_45520abcff27": {
+          "masculine": "Förtroendeperson",
+          "feminine": "Förtroendeperson",
+          "neutral": "Förtroendeperson"
+        },
+        "r_355cbf436694": {
+          "masculine": "Arbetsmiljöspecialist",
+          "feminine": "Arbetsmiljöspecialist",
+          "neutral": "Arbetsmiljöspecialist"
+        },
+        "r_308811767175": {
+          "masculine": "Hygienansvarig (coronaskydd)",
+          "feminine": "Hygienansvarig (coronaskydd)",
+          "neutral": "Hygienansvarig (coronaskydd)"
+        },
+        "r_32790b195d9e": {
+          "masculine": "Marinsamordnare",
+          "feminine": "Marinsamordnare",
+          "neutral": "Marinsamordnare"
+        },
+        "r_c93f3dbba0c2": {
+          "masculine": "Undervattens- / dyksamordnare",
+          "feminine": "Undervattens- / dyksamordnare",
+          "neutral": "Undervattens- / dyksamordnare"
+        },
+        "r_2aed0957c337": {
+          "masculine": "Sadel- och selmästare",
+          "feminine": "Sadel- och selmästare",
+          "neutral": "Sadel- och selmästare"
+        },
+        "r_36f2141e2445": {
+          "masculine": "Publikvärd",
+          "feminine": "Publikvärd",
+          "neutral": "Publikvärd"
+        },
+        "r_dd293d0b7b4b": {
+          "masculine": "Rådgivande regissör",
+          "feminine": "Rådgivande regissör",
+          "neutral": "Rådgivande regissör"
+        },
+        "r_d675b4f70ea4": {
+          "masculine": "Kreativ chef (reklambyrå)",
+          "feminine": "Kreativ chef (reklambyrå)",
+          "neutral": "Kreativ chef (reklambyrå)"
+        },
+        "r_2c01621b03b3": {
+          "masculine": "Sakkunnig rådgivare",
+          "feminine": "Sakkunnig rådgivare",
+          "neutral": "Sakkunnig rådgivare"
+        },
+        "r_777d604a46c7": {
+          "masculine": "Sakkunnig inom produktion",
+          "feminine": "Sakkunnig inom produktion",
+          "neutral": "Sakkunnig inom produktion"
+        },
+        "r_69b1f75394b4": {
+          "masculine": "Lärare / coach",
+          "feminine": "Lärare / coach",
+          "neutral": "Lärare / coach"
+        },
+        "r_9b689ca40dcd": {
+          "masculine": "Producent för samhällspåverkan",
+          "feminine": "Producent för samhällspåverkan",
+          "neutral": "Producent för samhällspåverkan"
+        },
+        "r_b22d32243e5e": {
+          "masculine": "Miljökonsult",
+          "feminine": "Miljökonsult",
+          "neutral": "Miljökonsult"
+        },
+        "r_b7e6bdc7cc1f": {
+          "masculine": "Miljökonsultassistent",
+          "feminine": "Miljökonsultassistent",
+          "neutral": "Miljökonsultassistent"
+        },
+        "r_e84880be1d61": {
+          "masculine": "Linjeproducent för EPK / bakom kulisserna",
+          "feminine": "Linjeproducent för EPK / bakom kulisserna",
+          "neutral": "Linjeproducent för EPK / bakom kulisserna"
+        },
+        "r_715e70975075": {
+          "masculine": "Producent för EPK / bakom kulisserna",
+          "feminine": "Producent för EPK / bakom kulisserna",
+          "neutral": "Producent för EPK / bakom kulisserna"
+        },
+        "r_7028ae82d2e2": {
+          "masculine": "Filmrestaurerare",
+          "feminine": "Filmrestaurerare",
+          "neutral": "Filmrestaurerare"
+        },
+        "r_92791462fbdd": {
+          "masculine": "Filmkolorist",
+          "feminine": "Filmkolorist",
+          "neutral": "Filmkolorist"
+        },
+        "r_e732abed8e31": {
+          "masculine": "Producent av skivmedier",
+          "feminine": "Producent av skivmedier",
+          "neutral": "Producent av skivmedier"
+        },
+        "r_a63ade2d8c7d": {
+          "masculine": "Stop motion-animatör",
+          "feminine": "Stop motion-animatör",
+          "neutral": "Stop motion-animatör"
+        },
+        "r_e56da499fa85": {
+          "masculine": "Animationstecknare",
+          "feminine": "Animationstecknare",
+          "neutral": "Animationstecknare"
+        },
+        "r_868363b4696a": {
+          "masculine": "Spelutvecklare för underhållningsprogram",
+          "feminine": "Spelutvecklare för underhållningsprogram",
+          "neutral": "Spelutvecklare för underhållningsprogram"
+        },
+        "r_776e611a5b6e": {
+          "masculine": "Dockspelare",
+          "feminine": "Dockspelare",
+          "neutral": "Dockspelare"
+        },
+        "r_d3d5008ffded": {
+          "masculine": "Visual jockey",
+          "feminine": "Visual jockey",
+          "neutral": "Visual jockey"
+        },
+        "r_f62082fcf3e6": {
+          "masculine": "Sändningsgrafiker",
+          "feminine": "Sändningsgrafiker",
+          "neutral": "Sändningsgrafiker"
+        },
+        "r_915e8fdeaa84": {
+          "masculine": "Undertextningssynkroniserare",
+          "feminine": "Undertextningssynkroniserare",
+          "neutral": "Undertextningssynkroniserare"
+        },
+        "r_e7b09583174a": {
+          "masculine": "Undertextare",
+          "feminine": "Undertextare",
+          "neutral": "Undertextare"
+        },
+        "r_823099351f18": {
+          "masculine": "Regiresearcher",
+          "feminine": "Regiresearcher",
+          "neutral": "Regiresearcher"
+        },
+        "r_f25ed374ada5": {
+          "masculine": "Rättighetsklarering",
+          "feminine": "Rättighetsklarering",
+          "neutral": "Rättighetsklarering"
+        },
+        "r_bf29b54303ec": {
+          "masculine": "PR-fotograf",
+          "feminine": "PR-fotograf",
+          "neutral": "PR-fotograf"
+        },
+        "r_e2fe82d9e60c": {
+          "masculine": "Extern projektledare",
+          "feminine": "Extern projektledare",
+          "neutral": "Extern projektledare"
+        },
+        "r_3687ead5b451": {
+          "masculine": "Personlig assistent",
+          "feminine": "Personlig assistent",
+          "neutral": "Personlig assistent"
+        },
+        "r_b85e79c1153f": {
+          "masculine": "Research",
+          "feminine": "Research",
+          "neutral": "Research"
+        }
+      },
+      "cast": {
+        "r_3d0e76b883b1": {
+          "masculine": "Huvudrollsinnehavare",
+          "feminine": "Huvudrollsinnehavare",
+          "neutral": "Huvudrollsinnehavare"
+        },
+        "r_543b99d52c01": {
+          "masculine": "Skådespelare",
+          "feminine": "Skådespelerska",
+          "neutral": "Skådespelare"
+        },
+        "r_aa64ee1fd5d6": {
+          "masculine": "Birollsinnehavare",
+          "feminine": "Birollsinnehavare",
+          "neutral": "Birollsinnehavare"
+        },
+        "r_5fea55df03ed": {
+          "masculine": "Statist",
+          "feminine": "Statist",
+          "neutral": "Statist"
+        },
+        "r_912a4dbdd23c": {
+          "masculine": "Smårollsskådespelare",
+          "feminine": "Smårollsskådespelare",
+          "neutral": "Smårollsskådespelare"
+        },
+        "r_130f7a137659": {
+          "masculine": "Modell",
+          "feminine": "Modell",
+          "neutral": "Modell"
+        },
+        "r_e1e954da6cbb": {
+          "masculine": "Röstskådespelare / berättarröst",
+          "feminine": "Röstskådespelare / berättarröst",
+          "neutral": "Röstskådespelare / berättarröst"
+        },
+        "r_67da9411185f": {
+          "masculine": "Stand-in",
+          "feminine": "Stand-in",
+          "neutral": "Stand-in"
+        },
+        "r_00100aeac4bb": {
+          "masculine": "Stuntutövare",
+          "feminine": "Stuntutövare",
+          "neutral": "Stuntutövare"
+        },
+        "r_0367b47c9554": {
+          "masculine": "Stuntdubbel",
+          "feminine": "Stuntdubbel",
+          "neutral": "Stuntdubbel"
+        },
+        "r_ca9ccb4b0409": {
+          "masculine": "Stuntriggare",
+          "feminine": "Stuntriggare",
+          "neutral": "Stuntriggare"
+        },
+        "r_418902de8e38": {
+          "masculine": "Stuntkoordinator",
+          "feminine": "Stuntkoordinator",
+          "neutral": "Stuntkoordinator"
+        },
+        "r_7f2d1a7f256f": {
+          "masculine": "Assisterande stuntkoordinator",
+          "feminine": "Assisterande stuntkoordinator",
+          "neutral": "Assisterande stuntkoordinator"
+        },
+        "r_e84ab42c1ded": {
+          "masculine": "Stuntavdelningskoordinator",
+          "feminine": "Stuntavdelningskoordinator",
+          "neutral": "Stuntavdelningskoordinator"
+        },
+        "r_e09f42bb8f68": {
+          "masculine": "Stridskoreograf",
+          "feminine": "Stridskoreograf",
+          "neutral": "Stridskoreograf"
+        },
+        "r_f1b27e4baea8": {
+          "masculine": "Actionregissör",
+          "feminine": "Actionregissör",
+          "neutral": "Actionregissör"
+        },
+        "r_ccdc591d96b4": {
+          "masculine": "Flygsamordnare",
+          "feminine": "Flygsamordnare",
+          "neutral": "Flygsamordnare"
+        },
+        "r_df312d5bf658": {
+          "masculine": "Stuntryttare",
+          "feminine": "Stuntryttare",
+          "neutral": "Stuntryttare"
+        },
+        "r_64fe45905183": {
+          "masculine": "Stunttekniker",
+          "feminine": "Stunttekniker",
+          "neutral": "Stunttekniker"
+        },
+        "r_28088de1cde2": {
+          "masculine": "Stunträddningsdykare",
+          "feminine": "Stunträddningsdykare",
+          "neutral": "Stunträddningsdykare"
+        },
+        "r_f1b818bfac99": {
+          "masculine": "Parkourutövare",
+          "feminine": "Parkourutövare",
+          "neutral": "Parkourutövare"
+        },
+        "r_c9bf4b44628b": {
+          "masculine": "Precisionsförare",
+          "feminine": "Precisionsförare",
+          "neutral": "Precisionsförare"
+        },
+        "r_901a1b08f6ba": {
+          "masculine": "Intimitetskoordinator",
+          "feminine": "Intimitetskoordinator",
+          "neutral": "Intimitetskoordinator"
+        },
+        "r_7a721e572105": {
+          "masculine": "Biträdande rollsättare",
+          "feminine": "Biträdande rollsättare",
+          "neutral": "Biträdande rollsättare"
+        },
+        "r_a1f9ba79ab08": {
+          "masculine": "Castingassistent",
+          "feminine": "Castingassistent",
+          "neutral": "Castingassistent"
+        },
+        "r_84927cc7b2bc": {
+          "masculine": "Birollsinnehavare",
+          "feminine": "Birollsinnehavare",
+          "neutral": "Birollsinnehavare"
+        },
+        "r_97144193d2e9": {
+          "masculine": "Statist",
+          "feminine": "Statist",
+          "neutral": "Statist"
+        },
+        "r_de130677203b": {
+          "masculine": "Rollsättare för ungdomar",
+          "feminine": "Rollsättare för ungdomar",
+          "neutral": "Rollsättare för ungdomar"
+        },
+        "r_27725de30521": {
+          "masculine": "Rollsättare för barn",
+          "feminine": "Rollsättare för barn",
+          "neutral": "Rollsättare för barn"
+        },
+        "r_9e31ceb09d88": {
+          "masculine": "Gatucasting",
+          "feminine": "Gatucasting",
+          "neutral": "Gatucasting"
+        },
+        "r_081340fc2740": {
+          "masculine": "Rollsättning av statister och småroller",
+          "feminine": "Rollsättning av statister och småroller",
+          "neutral": "Rollsättning av statister och småroller"
+        },
+        "r_bff79e6f4b26": {
+          "masculine": "Castingpraktikant",
+          "feminine": "Castingpraktikant",
+          "neutral": "Castingpraktikant"
+        },
+        "r_2f8822fb833a": {
+          "masculine": "Chefsstuntriggare",
+          "feminine": "Chefsstuntriggare",
+          "neutral": "Chefsstuntriggare"
+        },
+        "r_9fadc25f432e": {
+          "masculine": "Kusk",
+          "feminine": "Kusk",
+          "neutral": "Kusk"
+        }
+      },
+      "sfx": {
+        "r_a35d5905e687": {
+          "masculine": "Specialeffektsansvarig",
+          "feminine": "Specialeffektsansvarig",
+          "neutral": "Specialeffektsansvarig"
+        },
+        "r_09c0a67cf5e1": {
+          "masculine": "SFX-tekniker",
+          "feminine": "SFX-tekniker",
+          "neutral": "SFX-tekniker"
+        },
+        "r_881a5efb4c8a": {
+          "masculine": "Specialeffektskoordinator",
+          "feminine": "Specialeffektskoordinator",
+          "neutral": "Specialeffektskoordinator"
+        },
+        "r_a9f1b82c4859": {
+          "masculine": "Projektledare för specialeffekter",
+          "feminine": "Projektledare för specialeffekter",
+          "neutral": "Projektledare för specialeffekter"
+        },
+        "r_cea7226b63f6": {
+          "masculine": "Pyrotekniker",
+          "feminine": "Pyrotekniker",
+          "neutral": "Pyrotekniker"
+        },
+        "r_eb065a9f90c9": {
+          "masculine": "Pyroteknikassistent",
+          "feminine": "Pyroteknikassistent",
+          "neutral": "Pyroteknikassistent"
+        },
+        "r_4d3662b84a22": {
+          "masculine": "Producent för miniatyreffekter",
+          "feminine": "Producent för miniatyreffekter",
+          "neutral": "Producent för miniatyreffekter"
+        },
+        "r_e62650b9e5ae": {
+          "masculine": "Varelsedesigner",
+          "feminine": "Varelsedesigner",
+          "neutral": "Varelsedesigner"
+        },
+        "r_00baca6dc147": {
+          "masculine": "Animatronikingenjör",
+          "feminine": "Animatronikingenjör",
+          "neutral": "Animatronikingenjör"
+        },
+        "r_174ffb787533": {
+          "masculine": "Dockbyggare",
+          "feminine": "Dockbyggare",
+          "neutral": "Dockbyggare"
+        },
+        "r_506a008769b9": {
+          "masculine": "Vapenmästare",
+          "feminine": "Vapenmästare",
+          "neutral": "Vapenmästare"
+        },
+        "r_2409c6266fd3": {
+          "masculine": "Vapentekniker",
+          "feminine": "Vapentekniker",
+          "neutral": "Vapentekniker"
+        },
+        "r_ddb886337a99": {
+          "masculine": "Vajerriggare",
+          "feminine": "Vajerriggare",
+          "neutral": "Vajerriggare"
+        },
+        "r_72a4b7fb935e": {
+          "masculine": "SFX-riggning / specialkonstruktioner",
+          "feminine": "SFX-riggning / specialkonstruktioner",
+          "neutral": "SFX-riggning / specialkonstruktioner"
+        },
+        "r_3628c7df2899": {
+          "masculine": "Tekniker för mekaniska effekter",
+          "feminine": "Tekniker för mekaniska effekter",
+          "neutral": "Tekniker för mekaniska effekter"
+        },
+        "r_41cde5889636": {
+          "masculine": "Tekniker för snö- och regneffekter",
+          "feminine": "Tekniker för snö- och regneffekter",
+          "neutral": "Tekniker för snö- och regneffekter"
+        },
+        "r_ba881d560569": {
+          "masculine": "Specialeffektsekonom",
+          "feminine": "Specialeffektsekonom",
+          "neutral": "Specialeffektsekonom"
+        },
+        "r_c723decf9e2c": {
+          "masculine": "SFX-specialeffektstekniker",
+          "feminine": "SFX-specialeffektstekniker",
+          "neutral": "SFX-specialeffektstekniker"
+        }
+      },
+      "broadcast": {
+        "r_56003554d627": {
+          "masculine": "Produktionsingenjör",
+          "feminine": "Produktionsingenjör",
+          "neutral": "Produktionsingenjör"
+        },
+        "r_a5145362deb9": {
+          "masculine": "Sändningsingenjör",
+          "feminine": "Sändningsingenjör",
+          "neutral": "Sändningsingenjör"
+        },
+        "r_21789a4bd26e": {
+          "masculine": "Teknisk chef",
+          "feminine": "Teknisk chef",
+          "neutral": "Teknisk chef"
+        },
+        "r_ed2861824940": {
+          "masculine": "Bildingenjör",
+          "feminine": "Bildingenjör",
+          "neutral": "Bildingenjör"
+        },
+        "r_f35ad506ce91": {
+          "masculine": "Bildmixare",
+          "feminine": "Bildmixare",
+          "neutral": "Bildmixare"
+        },
+        "r_96549186fbdd": {
+          "masculine": "Bildmixare",
+          "feminine": "Bildmixare",
+          "neutral": "Bildmixare"
+        },
+        "r_b0f32c270502": {
+          "masculine": "Bildjusterare (shader)",
+          "feminine": "Bildjusterare (shader)",
+          "neutral": "Bildjusterare (shader)"
+        },
+        "r_4444caa14211": {
+          "masculine": "Kamera-CCU-operatör",
+          "feminine": "Kamera-CCU-operatör",
+          "neutral": "Kamera-CCU-operatör"
+        },
+        "r_3a845b2c45a4": {
+          "masculine": "DVE-operatör",
+          "feminine": "DVE-operatör",
+          "neutral": "DVE-operatör"
+        },
+        "r_5eb58151f915": {
+          "masculine": "Profile-operatör",
+          "feminine": "Profile-operatör",
+          "neutral": "Profile-operatör"
+        },
+        "r_bc517c79d131": {
+          "masculine": "Sändningstekniker",
+          "feminine": "Sändningstekniker",
+          "neutral": "Sändningstekniker"
+        },
+        "r_d0bc62ba1257": {
+          "masculine": "Ljudansvarig (TV-sändning)",
+          "feminine": "Ljudansvarig (TV-sändning)",
+          "neutral": "Ljudansvarig (TV-sändning)"
+        },
+        "r_6189d7ba75a5": {
+          "masculine": "Ljudingenjör",
+          "feminine": "Ljudingenjör",
+          "neutral": "Ljudingenjör"
+        },
+        "r_9eadf0334fa2": {
+          "masculine": "Studio- / evenemangsmästare",
+          "feminine": "Studio- / evenemangsmästare",
+          "neutral": "Studio- / evenemangsmästare"
+        },
+        "r_da7a6180d72a": {
+          "masculine": "Evenemangschef",
+          "feminine": "Evenemangschef",
+          "neutral": "Evenemangschef"
+        },
+        "r_84e084ee4081": {
+          "masculine": "Evenemangstekniker",
+          "feminine": "Evenemangstekniker",
+          "neutral": "Evenemangstekniker"
+        },
+        "r_2b01c5ebf763": {
+          "masculine": "MAZ-operatör",
+          "feminine": "MAZ-operatör",
+          "neutral": "MAZ-operatör"
+        },
+        "r_d2b49ec6c87b": {
+          "masculine": "MAZ-tekniker",
+          "feminine": "MAZ-tekniker",
+          "neutral": "MAZ-tekniker"
+        },
+        "r_b1e7ad7a4e8d": {
+          "masculine": "EVS-operatör",
+          "feminine": "EVS-operatör",
+          "neutral": "EVS-operatör"
+        },
+        "r_6ce5d1fae4b4": {
+          "masculine": "LSM-operatör (slow motion)",
+          "feminine": "LSM-operatör (slow motion)",
+          "neutral": "LSM-operatör (slow motion)"
+        },
+        "r_23864113991d": {
+          "masculine": "Strömningstekniker",
+          "feminine": "Strömningstekniker",
+          "neutral": "Strömningstekniker"
+        },
+        "r_4e59228ff2bb": {
+          "masculine": "Riggare (TV / evenemang)",
+          "feminine": "Riggare (TV / evenemang)",
+          "neutral": "Riggare (TV / evenemang)"
+        },
+        "r_54aa44e2bc03": {
+          "masculine": "Riggningsassistent",
+          "feminine": "Riggningsassistent",
+          "neutral": "Riggningsassistent"
+        },
+        "r_accbebaa16ce": {
+          "masculine": "Bildtekniker",
+          "feminine": "Bildtekniker",
+          "neutral": "Bildtekniker"
+        },
+        "r_152179bb65ff": {
+          "masculine": "Ljustekniker",
+          "feminine": "Ljustekniker",
+          "neutral": "Ljustekniker"
+        },
+        "r_916b292e3ecc": {
+          "masculine": "Ljudtekniker",
+          "feminine": "Ljudtekniker",
+          "neutral": "Ljudtekniker"
+        },
+        "r_a409aeab8c20": {
+          "masculine": "Ljudförstärkningsingenjör",
+          "feminine": "Ljudförstärkningsingenjör",
+          "neutral": "Ljudförstärkningsingenjör"
+        },
+        "r_894d032abc78": {
+          "masculine": "Ljudförstärkningstekniker",
+          "feminine": "Ljudförstärkningstekniker",
+          "neutral": "Ljudförstärkningstekniker"
+        },
+        "r_87a1930129df": {
+          "masculine": "SNG-operatör",
+          "feminine": "SNG-operatör",
+          "neutral": "SNG-operatör"
+        },
+        "r_0d146769f561": {
+          "masculine": "Ljudassistent (TV-sändning)",
+          "feminine": "Ljudassistent (TV-sändning)",
+          "neutral": "Ljudassistent (TV-sändning)"
+        },
+        "r_4ee86e5361a7": {
+          "masculine": "Videoväggsoperatör",
+          "feminine": "Videoväggsoperatör",
+          "neutral": "Videoväggsoperatör"
+        },
+        "r_7c7bcadca79c": {
+          "masculine": "Teleprompteroperatör",
+          "feminine": "Teleprompteroperatör",
+          "neutral": "Teleprompteroperatör"
+        },
+        "r_e627ebc7d6a6": {
+          "masculine": "Teknisk assistent (TV-sändning)",
+          "feminine": "Teknisk assistent (TV-sändning)",
+          "neutral": "Teknisk assistent (TV-sändning)"
+        },
+        "r_b81926eec6f3": {
+          "masculine": "Bildassistent",
+          "feminine": "Bildassistent",
+          "neutral": "Bildassistent"
+        },
+        "r_45710f001c06": {
+          "masculine": "Kabelassistent",
+          "feminine": "Kabelassistent",
+          "neutral": "Kabelassistent"
+        },
+        "r_34cfe59314f7": {
+          "masculine": "Bildmixare",
+          "feminine": "Bildmixare",
+          "neutral": "Bildmixare"
+        },
+        "r_ba025e1926d2": {
+          "masculine": "LSM-operatör (slow motion-höjdpunkter)",
+          "feminine": "LSM-operatör (slow motion-höjdpunkter)",
+          "neutral": "LSM-operatör (slow motion-höjdpunkter)"
+        },
+        "r_c7e1fa1f7572": {
+          "masculine": "Grafikoperatör (SG)",
+          "feminine": "Grafikoperatör (SG)",
+          "neutral": "Grafikoperatör (SG)"
+        },
+        "r_c0aa2d3b3f9c": {
+          "masculine": "Ljudassistent",
+          "feminine": "Ljudassistent",
+          "neutral": "Ljudassistent"
+        },
+        "r_32ca4217464e": {
+          "masculine": "Teknisk assistent",
+          "feminine": "Teknisk assistent",
+          "neutral": "Teknisk assistent"
+        }
+      },
+      "virtual": {
+        "r_9d90887128a0": {
+          "masculine": "Ansvarig för virtuell produktion",
+          "feminine": "Ansvarig för virtuell produktion",
+          "neutral": "Ansvarig för virtuell produktion"
+        },
+        "r_9c3babb3c638": {
+          "masculine": "Producent för virtuell produktion",
+          "feminine": "Producent för virtuell produktion",
+          "neutral": "Producent för virtuell produktion"
+        },
+        "r_1fee1676270e": {
+          "masculine": "Koordinator för virtuell produktion",
+          "feminine": "Koordinator för virtuell produktion",
+          "neutral": "Koordinator för virtuell produktion"
+        },
+        "r_82e993b4422d": {
+          "masculine": "Studiochef för virtuell produktion",
+          "feminine": "Studiochef för virtuell produktion",
+          "neutral": "Studiochef för virtuell produktion"
+        },
+        "r_14e7e79a9ca8": {
+          "masculine": "Artist inom virtuell scenografi (VAD)",
+          "feminine": "Artist inom virtuell scenografi (VAD)",
+          "neutral": "Artist inom virtuell scenografi (VAD)"
+        },
+        "r_2034a25adda6": {
+          "masculine": "Ingenjör för virtuell produktion",
+          "feminine": "Ingenjör för virtuell produktion",
+          "neutral": "Ingenjör för virtuell produktion"
+        },
+        "r_188b9da491f3": {
+          "masculine": "Teknisk chef för VP-system och verktyg",
+          "feminine": "Teknisk chef för VP-system och verktyg",
+          "neutral": "Teknisk chef för VP-system och verktyg"
+        },
+        "r_93a5c89da775": {
+          "masculine": "LED-väggsoperatör",
+          "feminine": "LED-väggsoperatör",
+          "neutral": "LED-väggsoperatör"
+        },
+        "r_d1415a80bf57": {
+          "masculine": "Unreal Engine-operatör",
+          "feminine": "Unreal Engine-operatör",
+          "neutral": "Unreal Engine-operatör"
+        },
+        "r_1c2e82f4274b": {
+          "masculine": "Realtidsmotoroperatör",
+          "feminine": "Realtidsmotoroperatör",
+          "neutral": "Realtidsmotoroperatör"
+        },
+        "r_247afd3ab3fd": {
+          "masculine": "Medieserveroperatör",
+          "feminine": "Medieserveroperatör",
+          "neutral": "Medieserveroperatör"
+        },
+        "r_8728a8d46ae1": {
+          "masculine": "VP-systemadministratör",
+          "feminine": "VP-systemadministratör",
+          "neutral": "VP-systemadministratör"
+        },
+        "r_e7c27999f9ae": {
+          "masculine": "VP-spårningstekniker",
+          "feminine": "VP-spårningstekniker",
+          "neutral": "VP-spårningstekniker"
+        },
+        "r_bbe66ea7740f": {
+          "masculine": "VP-LED-tekniker",
+          "feminine": "VP-LED-tekniker",
+          "neutral": "VP-LED-tekniker"
+        },
+        "r_ad04846bb2b3": {
+          "masculine": "Spårningstekniker",
+          "feminine": "Spårningstekniker",
+          "neutral": "Spårningstekniker"
+        },
+        "r_c100cb7d8cdf": {
+          "masculine": "Realtidsartist",
+          "feminine": "Realtidsartist",
+          "neutral": "Realtidsartist"
+        },
+        "r_84ae9f742a8c": {
+          "masculine": "Artist inom virtuell scenografi (VAD)",
+          "feminine": "Artist inom virtuell scenografi (VAD)",
+          "neutral": "Artist inom virtuell scenografi (VAD)"
+        }
+      },
+      "redaktion": {
+        "r_67a1c14f27d6": {
+          "masculine": "Redaktionschef",
+          "feminine": "Redaktionschef",
+          "neutral": "Redaktionschef"
+        },
+        "r_fb6f303e781e": {
+          "masculine": "Chefredaktör",
+          "feminine": "Chefredaktör",
+          "neutral": "Chefredaktör"
+        },
+        "r_1d083876d102": {
+          "masculine": "Dagredaktör",
+          "feminine": "Dagredaktör",
+          "neutral": "Dagredaktör"
+        },
+        "r_dba49499f044": {
+          "masculine": "Produktionschef (TV-kanal)",
+          "feminine": "Produktionschef (TV-kanal)",
+          "neutral": "Produktionschef (TV-kanal)"
+        },
+        "r_399d5722db1b": {
+          "masculine": "Produktionschef för tillverkning (TV-kanal)",
+          "feminine": "Produktionschef för tillverkning (TV-kanal)",
+          "neutral": "Produktionschef för tillverkning (TV-kanal)"
+        },
+        "r_97c6fe9db2a1": {
+          "masculine": "Körschemakoordinator",
+          "feminine": "Körschemakoordinator",
+          "neutral": "Körschemakoordinator"
+        },
+        "r_c1f3dd5d125c": {
+          "masculine": "Redaktör",
+          "feminine": "Redaktör",
+          "neutral": "Redaktör"
+        },
+        "r_74db110eed35": {
+          "masculine": "TV-författare",
+          "feminine": "TV-författare",
+          "neutral": "TV-författare"
+        },
+        "r_c68ab8bdf35f": {
+          "masculine": "Castingredaktör",
+          "feminine": "Castingredaktör",
+          "neutral": "Castingredaktör"
+        },
+        "r_db514834619e": {
+          "masculine": "Bildredaktör",
+          "feminine": "Bildredaktör",
+          "neutral": "Bildredaktör"
+        },
+        "r_2d3838a04d2d": {
+          "masculine": "Klippredaktör",
+          "feminine": "Klippredaktör",
+          "neutral": "Klippredaktör"
+        },
+        "r_72b16f73761b": {
+          "masculine": "Webbredaktör",
+          "feminine": "Webbredaktör",
+          "neutral": "Webbredaktör"
+        },
+        "r_1eb2a3ac7a7f": {
+          "masculine": "Videoredaktör",
+          "feminine": "Videoredaktör",
+          "neutral": "Videoredaktör"
+        },
+        "r_fea2147a3023": {
+          "masculine": "TV-journalist",
+          "feminine": "TV-journalist",
+          "neutral": "TV-journalist"
+        },
+        "r_89901fa29127": {
+          "masculine": "Reporter",
+          "feminine": "Reporter",
+          "neutral": "Reporter"
+        },
+        "r_49092803ca90": {
+          "masculine": "Programrealiserare",
+          "feminine": "Programrealiserare",
+          "neutral": "Programrealiserare"
+        },
+        "r_558623ea54e2": {
+          "masculine": "Videoproducent",
+          "feminine": "Videoproducent",
+          "neutral": "Videoproducent"
+        },
+        "r_cd94582e5de3": {
+          "masculine": "Videojournalist",
+          "feminine": "Videojournalist",
+          "neutral": "Videojournalist"
+        },
+        "r_c1632a39db5a": {
+          "masculine": "Videoinnehållsskapare (sociala medier)",
+          "feminine": "Videoinnehållsskapare (sociala medier)",
+          "neutral": "Videoinnehållsskapare (sociala medier)"
+        },
+        "r_48a469f4753e": {
+          "masculine": "Programledare",
+          "feminine": "Programledare",
+          "neutral": "Programledare"
+        },
+        "r_dff0d36f7649": {
+          "masculine": "Nyhetsuppläsare",
+          "feminine": "Nyhetsuppläsare",
+          "neutral": "Nyhetsuppläsare"
+        },
+        "r_d8ae611e8a84": {
+          "masculine": "Kreativ producent",
+          "feminine": "Kreativ producent",
+          "neutral": "Kreativ producent"
+        },
+        "r_52eb2ef13219": {
+          "masculine": "Kreativ chef",
+          "feminine": "Kreativ chef",
+          "neutral": "Kreativ chef"
+        },
+        "r_4741fd392c78": {
+          "masculine": "Copywriter",
+          "feminine": "Copywriter",
+          "neutral": "Copywriter"
+        },
+        "r_7693f0b6836d": {
+          "masculine": "Konceptutvecklare",
+          "feminine": "Konceptutvecklare",
+          "neutral": "Konceptutvecklare"
+        },
+        "r_8ed4467cbce1": {
+          "masculine": "Producent för sociala medier",
+          "feminine": "Producent för sociala medier",
+          "neutral": "Producent för sociala medier"
+        },
+        "r_f3046605ff7d": {
+          "masculine": "Redaktionsassistent",
+          "feminine": "Redaktionsassistent",
+          "neutral": "Redaktionsassistent"
+        },
+        "r_39b32b25eed9": {
+          "masculine": "Redaktionspraktikant",
+          "feminine": "Redaktionspraktikant",
+          "neutral": "Redaktionspraktikant"
+        },
+        "r_7947e117851f": {
+          "masculine": "Dagredaktör",
+          "feminine": "Dagredaktör",
+          "neutral": "Dagredaktör"
+        },
+        "r_9c948261499b": {
+          "masculine": "Produktionschef (studio / TV-bolag)",
+          "feminine": "Produktionschef (studio / TV-bolag)",
+          "neutral": "Produktionschef (studio / TV-bolag)"
+        },
+        "r_844ebb650ef7": {
+          "masculine": "Redaktör",
+          "feminine": "Redaktör",
+          "neutral": "Redaktör"
+        },
+        "r_bac4afc8f929": {
+          "masculine": "Klippregissör",
+          "feminine": "Klippregissör",
+          "neutral": "Klippregissör"
+        },
+        "r_324910e3b0ab": {
+          "masculine": "Frågesportsredaktör",
+          "feminine": "Frågesportsredaktör",
+          "neutral": "Frågesportsredaktör"
+        },
+        "r_363c83ce0934": {
+          "masculine": "Publikuppvärmare",
+          "feminine": "Publikuppvärmare",
+          "neutral": "Publikuppvärmare"
+        },
+        "r_6227b3014b7a": {
+          "masculine": "Frilanskorrespondent / fixer",
+          "feminine": "Frilanskorrespondent / fixer",
+          "neutral": "Frilanskorrespondent / fixer"
+        },
+        "r_dfa579f14095": {
+          "masculine": "Materialloggare",
+          "feminine": "Materialloggare",
+          "neutral": "Materialloggare"
+        },
+        "r_57c0fec76f7d": {
+          "masculine": "Transkriberare",
+          "feminine": "Transkriberare",
+          "neutral": "Transkriberare"
+        },
+        "r_cabe547e084e": {
+          "masculine": "Bildresearch",
+          "feminine": "Bildresearch",
+          "neutral": "Bildresearch"
+        }
+      },
+      "social": {
+        "r_e8a967aad9b7": {
+          "masculine": "Innehållsskapare",
+          "feminine": "Innehållsskapare",
+          "neutral": "Innehållsskapare"
+        },
+        "r_631c65ad8827": {
+          "masculine": "Influerare",
+          "feminine": "Influerare",
+          "neutral": "Influerare"
+        },
+        "r_a9eeb34333bc": {
+          "masculine": "Ansvarig för sociala medier",
+          "feminine": "Ansvarig för sociala medier",
+          "neutral": "Ansvarig för sociala medier"
+        },
+        "r_b510fa57cea0": {
+          "masculine": "UGC-skapare",
+          "feminine": "UGC-skapare",
+          "neutral": "UGC-skapare"
+        },
+        "r_4d66d4dbbf12": {
+          "masculine": "Reels-videograf",
+          "feminine": "Reels-videograf",
+          "neutral": "Reels-videograf"
+        },
+        "r_423ece24b5c2": {
+          "masculine": "TikTok-skapare",
+          "feminine": "TikTok-skapare",
+          "neutral": "TikTok-skapare"
+        },
+        "r_e7483d4ddd6d": {
+          "masculine": "Communityansvarig",
+          "feminine": "Communityansvarig",
+          "neutral": "Communityansvarig"
+        },
+        "r_6f877112cd0a": {
+          "masculine": "Strateg för sociala medier",
+          "feminine": "Strateg för sociala medier",
+          "neutral": "Strateg för sociala medier"
+        },
+        "r_bd90a8429d6f": {
+          "masculine": "Influerare / innehållsskapare",
+          "feminine": "Influerare / innehållsskapare",
+          "neutral": "Influerare / innehållsskapare"
+        },
+        "r_c43ce08ef6e8": {
+          "masculine": "Varumärkesberättare",
+          "feminine": "Varumärkesberättare",
+          "neutral": "Varumärkesberättare"
+        },
+        "r_e75a59be5b02": {
+          "masculine": "Videograf (socialt innehåll)",
+          "feminine": "Videograf (socialt innehåll)",
+          "neutral": "Videograf (socialt innehåll)"
+        },
+        "r_5f522b44dd48": {
+          "masculine": "Klippare (Reels / TikTok)",
+          "feminine": "Klippare (Reels / TikTok)",
+          "neutral": "Klippare (Reels / TikTok)"
+        },
+        "r_ce039c1f951f": {
+          "masculine": "Rörelsedesigner (sociala medier)",
+          "feminine": "Rörelsedesigner (sociala medier)",
+          "neutral": "Rörelsedesigner (sociala medier)"
+        }
+      },
+      "foto": {
+        "r_d2c0588cf0d1": {
+          "masculine": "Fotograf",
+          "feminine": "Fotograf",
+          "neutral": "Fotograf"
+        },
+        "r_d7f7fbf5939c": {
+          "masculine": "Modefotograf",
+          "feminine": "Modefotograf",
+          "neutral": "Modefotograf"
+        },
+        "r_e0551919b067": {
+          "masculine": "Produktfotograf",
+          "feminine": "Produktfotograf",
+          "neutral": "Produktfotograf"
+        },
+        "r_b06301444ef7": {
+          "masculine": "Evenemangsfotograf",
+          "feminine": "Evenemangsfotograf",
+          "neutral": "Evenemangsfotograf"
+        },
+        "r_124df4c664ce": {
+          "masculine": "Porträttfotograf",
+          "feminine": "Porträttfotograf",
+          "neutral": "Porträttfotograf"
+        },
+        "r_2e1fcf07d241": {
+          "masculine": "Reklamfotograf",
+          "feminine": "Reklamfotograf",
+          "neutral": "Reklamfotograf"
+        },
+        "r_02bd21bcff9c": {
+          "masculine": "Matfotograf",
+          "feminine": "Matfotograf",
+          "neutral": "Matfotograf"
+        },
+        "r_8a273a427bd6": {
+          "masculine": "Drönarfotograf",
+          "feminine": "Drönarfotograf",
+          "neutral": "Drönarfotograf"
+        },
+        "r_843b4748146d": {
+          "masculine": "Stillbildsfotograf",
+          "feminine": "Stillbildsfotograf",
+          "neutral": "Stillbildsfotograf"
+        },
+        "r_b622037392fb": {
+          "masculine": "Fotoassistent",
+          "feminine": "Fotoassistent",
+          "neutral": "Fotoassistent"
+        },
+        "r_6a2008f9f2ef": {
+          "masculine": "Studiochef",
+          "feminine": "Studiochef",
+          "neutral": "Studiochef"
+        },
+        "r_341b032b61fc": {
+          "masculine": "Retuschör",
+          "feminine": "Retuschör",
+          "neutral": "Retuschör"
+        },
+        "r_468329a20ba4": {
+          "masculine": "Bildredigerare",
+          "feminine": "Bildredigerare",
+          "neutral": "Bildredigerare"
+        }
+      },
+      "ki": {
+        "r_0af68f26119c": {
+          "masculine": "AI-filmskapare",
+          "feminine": "AI-filmskapare",
+          "neutral": "AI-filmskapare"
+        },
+        "r_7ebc4eeffa63": {
+          "masculine": "AI-ansvarig",
+          "feminine": "AI-ansvarig",
+          "neutral": "AI-ansvarig"
+        },
+        "r_5143bd061069": {
+          "masculine": "AI-regissör",
+          "feminine": "AI-regissör",
+          "neutral": "AI-regissör"
+        },
+        "r_8b38d96f6763": {
+          "masculine": "AI-animatör",
+          "feminine": "AI-animatör",
+          "neutral": "AI-animatör"
+        },
+        "r_addc4afc90e0": {
+          "masculine": "Promptingenjör (film och medier)",
+          "feminine": "Promptingenjör (film och medier)",
+          "neutral": "Promptingenjör (film och medier)"
+        },
+        "r_227b357243e1": {
+          "masculine": "AI-manusförfattare",
+          "feminine": "AI-manusförfattare",
+          "neutral": "AI-manusförfattare"
+        },
+        "r_53ef2619b5af": {
+          "masculine": "AI-storyboardtecknare",
+          "feminine": "AI-storyboardtecknare",
+          "neutral": "AI-storyboardtecknare"
+        },
+        "r_1185b1151f24": {
+          "masculine": "AI-bildskapare",
+          "feminine": "AI-bildskapare",
+          "neutral": "AI-bildskapare"
+        },
+        "r_f551cf191b74": {
+          "masculine": "AI-videoskapare",
+          "feminine": "AI-videoskapare",
+          "neutral": "AI-videoskapare"
+        },
+        "r_b69e1ec80a94": {
+          "masculine": "AI-ljuddesigner",
+          "feminine": "AI-ljuddesigner",
+          "neutral": "AI-ljuddesigner"
+        },
+        "r_237f8a4202e1": {
+          "masculine": "AI-kolorist",
+          "feminine": "AI-kolorist",
+          "neutral": "AI-kolorist"
+        },
+        "r_38b5ef6c319c": {
+          "masculine": "AI-arbetsflödeskonsult (film)",
+          "feminine": "AI-arbetsflödeskonsult (film)",
+          "neutral": "AI-arbetsflödeskonsult (film)"
+        }
+      },
+      "drehbuch": {
+        "r_f63a97948825": {
+          "masculine": "Showrunner",
+          "feminine": "Showrunner",
+          "neutral": "Showrunner"
+        },
+        "r_da4094d01df6": {
+          "masculine": "Huvudförfattare",
+          "feminine": "Huvudförfattare",
+          "neutral": "Huvudförfattare"
+        },
+        "r_48862b016872": {
+          "masculine": "Assistent till huvudförfattaren",
+          "feminine": "Assistent till huvudförfattaren",
+          "neutral": "Assistent till huvudförfattaren"
+        },
+        "r_f0e5da473f57": {
+          "masculine": "Assisterande showrunner",
+          "feminine": "Assisterande showrunner",
+          "neutral": "Assisterande showrunner"
+        },
+        "r_be444be7e73a": {
+          "masculine": "Manusförfattare",
+          "feminine": "Manusförfattare",
+          "neutral": "Manusförfattare"
+        },
+        "r_d1a561dc7125": {
+          "masculine": "Medförfattare",
+          "feminine": "Medförfattare",
+          "neutral": "Medförfattare"
+        },
+        "r_da01eb9b61e7": {
+          "masculine": "Manusomarbetare",
+          "feminine": "Manusomarbetare",
+          "neutral": "Manusomarbetare"
+        },
+        "r_199c194315c9": {
+          "masculine": "Manusdoktor",
+          "feminine": "Manusdoktor",
+          "neutral": "Manusdoktor"
+        },
+        "r_a180812047b1": {
+          "masculine": "Berättelseredaktör",
+          "feminine": "Berättelseredaktör",
+          "neutral": "Berättelseredaktör"
+        },
+        "r_5f9704129182": {
+          "masculine": "Storylineförfattare",
+          "feminine": "Storylineförfattare",
+          "neutral": "Storylineförfattare"
+        },
+        "r_41126a4d581f": {
+          "masculine": "Manusredaktör",
+          "feminine": "Manusredaktör",
+          "neutral": "Manusredaktör"
+        },
+        "r_11bee057c159": {
+          "masculine": "Dialogredaktör",
+          "feminine": "Dialogredaktör",
+          "neutral": "Dialogredaktör"
+        },
+        "r_d578a24e6a6c": {
+          "masculine": "Dialogförfattare",
+          "feminine": "Dialogförfattare",
+          "neutral": "Dialogförfattare"
+        },
+        "r_cbc48ad9850e": {
+          "masculine": "Manuslektör",
+          "feminine": "Manuslektör",
+          "neutral": "Manuslektör"
+        },
+        "r_850bbf550984": {
+          "masculine": "Dramaturg / manuskonsult",
+          "feminine": "Dramaturg / manuskonsult",
+          "neutral": "Dramaturg / manuskonsult"
+        },
+        "r_c33a26535234": {
+          "masculine": "Manus- och idéutveckling",
+          "feminine": "Manus- och idéutveckling",
+          "neutral": "Manus- och idéutveckling"
+        },
+        "r_e439aac0b481": {
+          "masculine": "Manuschef",
+          "feminine": "Manuschef",
+          "neutral": "Manuschef"
+        },
+        "r_a30d0af43af8": {
+          "masculine": "Berättelsechef",
+          "feminine": "Berättelsechef",
+          "neutral": "Berättelsechef"
+        },
+        "r_3aa5851edfa7": {
+          "masculine": "Formatutvecklare",
+          "feminine": "Formatutvecklare",
+          "neutral": "Formatutvecklare"
+        },
+        "r_fc05d4531220": {
+          "masculine": "Treatmentförfattare",
+          "feminine": "Treatmentförfattare",
+          "neutral": "Treatmentförfattare"
+        },
+        "r_601f64f82db2": {
+          "masculine": "Dialogmanusförfattare för dubbning",
+          "feminine": "Dialogmanusförfattare för dubbning",
+          "neutral": "Dialogmanusförfattare för dubbning"
+        },
+        "r_1ddc57dbbeb2": {
+          "masculine": "Syntolkningsförfattare",
+          "feminine": "Syntolkningsförfattare",
+          "neutral": "Syntolkningsförfattare"
+        },
+        "r_9f89ae134497": {
+          "masculine": "Filmöversättare",
+          "feminine": "Filmöversättare",
+          "neutral": "Filmöversättare"
+        },
+        "r_6cc875ec3963": {
+          "masculine": "Manusöversättare",
+          "feminine": "Manusöversättare",
+          "neutral": "Manusöversättare"
+        },
+        "r_5947f173deeb": {
+          "masculine": "Undertextöversättning",
+          "feminine": "Undertextöversättning",
+          "neutral": "Undertextöversättning"
+        },
+        "r_7b6a9a537e9a": {
+          "masculine": "Dialogöversättning",
+          "feminine": "Dialogöversättning",
+          "neutral": "Dialogöversättning"
+        },
+        "r_07f1b8537dbc": {
+          "masculine": "Transkriptöversättning",
+          "feminine": "Transkriptöversättning",
+          "neutral": "Transkriptöversättning"
+        },
+        "r_baf097c29e20": {
+          "masculine": "Dialoglistetranskriberare",
+          "feminine": "Dialoglistetranskriberare",
+          "neutral": "Dialoglistetranskriberare"
+        },
+        "r_84f5505f76e2": {
+          "masculine": "Textförfattare / copywriter",
+          "feminine": "Textförfattare / copywriter",
+          "neutral": "Textförfattare / copywriter"
+        },
+        "r_f38e225361bf": {
+          "masculine": "Språkassistent",
+          "feminine": "Språkassistent",
+          "neutral": "Språkassistent"
+        },
+        "r_eda2531fdadf": {
+          "masculine": "Researcher",
+          "feminine": "Researcher",
+          "neutral": "Researcher"
+        },
+        "r_c6e3b618f79f": {
+          "masculine": "Researchassistent",
+          "feminine": "Researchassistent",
+          "neutral": "Researchassistent"
+        },
+        "r_0434302793dc": {
+          "masculine": "Manuskoordinator",
+          "feminine": "Manuskoordinator",
+          "neutral": "Manuskoordinator"
+        },
+        "r_dae3743c6b89": {
+          "masculine": "Manuspraktikant",
+          "feminine": "Manuspraktikant",
+          "neutral": "Manuspraktikant"
+        }
+      },
+      "public-relations": {
+        "r_1860a572354e": {
+          "masculine": "Marknadsföring och PR",
+          "feminine": "Marknadsföring och PR",
+          "neutral": "Marknadsföring och PR"
+        },
+        "r_201f2da74897": {
+          "masculine": "Ansvarig för sociala medier (film / produktion)",
+          "feminine": "Ansvarig för sociala medier (film / produktion)",
+          "neutral": "Ansvarig för sociala medier (film / produktion)"
+        },
+        "r_041271a6a3ee": {
+          "masculine": "Promotionskoordinator",
+          "feminine": "Promotionskoordinator",
+          "neutral": "Promotionskoordinator"
+        }
+      },
+      "sicherheit-sanitaetsdienst": {
+        "r_972d7ff7233a": {
+          "masculine": "Inspelningssjukvårdare",
+          "feminine": "Inspelningssjukvårdare",
+          "neutral": "Inspelningssjukvårdare"
+        },
+        "r_deefff77f871": {
+          "masculine": "Akutsjukvårdare",
+          "feminine": "Akutsjukvårdare",
+          "neutral": "Akutsjukvårdare"
+        },
+        "r_63a9f32e6a72": {
+          "masculine": "Arbetsplatssjukvårdare",
+          "feminine": "Arbetsplatssjukvårdare",
+          "neutral": "Arbetsplatssjukvårdare"
+        },
+        "r_550de11c2d96": {
+          "masculine": "Brandvakt och brandsäkerhetsvakt",
+          "feminine": "Brandvakt och brandsäkerhetsvakt",
+          "neutral": "Brandvakt och brandsäkerhetsvakt"
+        },
+        "r_427dc70aedd7": {
+          "masculine": "Brandskyddsmedhjälpare",
+          "feminine": "Brandskyddsmedhjälpare",
+          "neutral": "Brandskyddsmedhjälpare"
+        },
+        "r_a3247768d472": {
+          "masculine": "Brandskyddsansvarig",
+          "feminine": "Brandskyddsansvarig",
+          "neutral": "Brandskyddsansvarig"
+        }
+      },
+      "catering-setverpflegung": {
+        "r_330e10f94b8f": {
+          "masculine": "Cateringansvarig",
+          "feminine": "Cateringansvarig",
+          "neutral": "Cateringansvarig"
+        },
+        "r_2fe8f1ac7f90": {
+          "masculine": "Inspelningskock",
+          "feminine": "Inspelningskock",
+          "neutral": "Inspelningskock"
+        },
+        "r_463cca2307e9": {
+          "masculine": "Cateringassistent / kökshjälp",
+          "feminine": "Cateringassistent / kökshjälp",
+          "neutral": "Cateringassistent / kökshjälp"
+        },
+        "r_e114754d9175": {
+          "masculine": "Craft service (mellanmål och dryck)",
+          "feminine": "Craft service (mellanmål och dryck)",
+          "neutral": "Craft service (mellanmål och dryck)"
+        },
+        "r_cb6d56c18bf6": {
+          "masculine": "Inspelningsservice / matservering",
+          "feminine": "Inspelningsservice / matservering",
+          "neutral": "Inspelningsservice / matservering"
+        },
+        "r_532adc563b66": {
+          "masculine": "Förare för catering och köksfordon",
+          "feminine": "Förare för catering och köksfordon",
+          "neutral": "Förare för catering och köksfordon"
+        }
+      },
+      "filmtiere-tiertraining": {
+        "r_3d8ab6fb2c6a": {
+          "masculine": "Filmdjurstränare",
+          "feminine": "Filmdjurstränare",
+          "neutral": "Filmdjurstränare"
+        },
+        "r_654c33dc9c6b": {
+          "masculine": "Filmhundstränare",
+          "feminine": "Filmhundstränare",
+          "neutral": "Filmhundstränare"
+        },
+        "r_40758f075d18": {
+          "masculine": "Djuransvarig (Animal Handler)",
+          "feminine": "Djuransvarig (Animal Handler)",
+          "neutral": "Djuransvarig (Animal Handler)"
+        },
+        "r_7a1591b96b3a": {
+          "masculine": "Djursamordnare (Animal Coordinator)",
+          "feminine": "Djursamordnare (Animal Coordinator)",
+          "neutral": "Djursamordnare (Animal Coordinator)"
+        },
+        "r_a63695a566c3": {
+          "masculine": "Djuransvarig på inspelningsplatsen",
+          "feminine": "Djuransvarig på inspelningsplatsen",
+          "neutral": "Djuransvarig på inspelningsplatsen"
+        },
+        "r_9faf951b627e": {
+          "masculine": "Hästansvarig (Horse Master)",
+          "feminine": "Hästansvarig (Horse Master)",
+          "neutral": "Hästansvarig (Horse Master)"
+        },
+        "r_7c4f137defec": {
+          "masculine": "Assistent till hästansvarig",
+          "feminine": "Assistent till hästansvarig",
+          "neutral": "Assistent till hästansvarig"
+        },
+        "r_8e8f21cf0303": {
+          "masculine": "Filmhästtränare",
+          "feminine": "Filmhästtränare",
+          "neutral": "Filmhästtränare"
+        },
+        "r_35f9ffa503c4": {
+          "masculine": "Hästskötare på inspelning (Horse Wrangler)",
+          "feminine": "Hästskötare på inspelning (Horse Wrangler)",
+          "neutral": "Hästskötare på inspelning (Horse Wrangler)"
+        }
+      }
     }
   },
   "TransactionalEmail": {
@@ -8454,5 +13363,13 @@
     "noMatches": "Du har inte sparat något inom det här området ännu.",
     "signInHint": "Logga in för att se dina sparade objekt.",
     "removeItem": "Ta bort {name} från sparade objekt"
+  },
+  "OccupationForm": {
+    "title": "Form på dina yrkestitlar",
+    "help": "Välj hur dina yrkestitlar visas. Du kan ändra detta när som helst.",
+    "standard": "Standard",
+    "masculine": "Maskulin form",
+    "feminine": "Feminin form",
+    "neutral": "Neutral form"
   }
 }

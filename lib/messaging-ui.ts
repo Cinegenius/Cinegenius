@@ -1,4 +1,5 @@
-export type MessagePerson = { id: string; name: string; avatar?: string | null; role?: string | null; location?: string | null };
+import type { OccupationForm } from "./occupation-form";
+export type MessagePerson = { id: string; name: string; avatar?: string | null; role?: string | null; occupationForm?: OccupationForm; location?: string | null };
 export type MessageDestination = { conversationId?: string | null; recipientId?: string | null; companySlug?: string | null };
 import {restoredAttachments,type MessageAttachment} from './message-attachments';
 export type ChatMessage = { id: string; sender_id: string; content: string; created_at: string; read_at: string | null; attachments?:MessageAttachment[] };

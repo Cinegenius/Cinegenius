@@ -1,3 +1,4 @@
+import { occupationFormFromCrew } from "@/lib/occupation-form";
 import { auth } from "@clerk/nextjs/server";
 import { profileAccessFor } from "@/lib/profile-privacy-server";
 import { projectProfilePrivacy } from "@/lib/profile-privacy";
@@ -57,6 +58,7 @@ export async function GET(req: NextRequest) {
       id: p.user_id,
       name: p.display_name ?? "Unbekannt",
       role: primaryOccupationForPositions(p.crew?.primaryOccupation, p.positions ?? [], p.role)?.label ?? p.role ?? displayPositions[0] ?? typeLabel ?? "Filmschaffende/r",
+      occupationForm: occupationFormFromCrew(p.crew),
       positions: displayPositions,
         displayPositions: getProfileDisplayPositions({positions: p.positions, role: p.role, crew: p.crew, profileTypes: types, primaryType, labels: PROFILE_TYPE_LABELS, mode: "summary"}),
       primaryOccupation: occupationReference(primaryOccupationForPositions(p.crew?.primaryOccupation, p.positions ?? [], p.role)),

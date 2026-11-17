@@ -1,3 +1,4 @@
+import { occupationFormFromCrew } from "@/lib/occupation-form";
 import { profileAccessFor, filterPublicListings } from "@/lib/profile-privacy-server";
 import { projectProfilePrivacy } from "@/lib/profile-privacy";
 import { resolveCrewNear } from "@/lib/genie-search-server";
@@ -223,7 +224,8 @@ export default async function CreatorsPage({
         id: p.user_id,
         name: p.display_name ?? uiText("Ui.text_276ffa1fb4f970"),
         role: primaryOccupationForPositions(p.crew?.primaryOccupation, p.positions ?? [], p.role)?.label ?? p.role ?? displayPositions[0] ?? typeLabel ?? "Filmschaffende/r",
-        positions: displayPositions,
+        occupationForm: occupationFormFromCrew(p.crew),
+      positions: displayPositions,
         displayPositions: getProfileDisplayPositions({positions: p.positions, role: p.role, crew: p.crew, profileTypes: types, primaryType, labels: PROFILE_TYPE_LABELS, mode: "summary"}),
         primaryOccupation: occupationReference(primaryOccupationForPositions(p.crew?.primaryOccupation, p.positions ?? [], p.role)),
         occupationIds: crewOccupationIds(p),

@@ -1,3 +1,4 @@
+import { isOccupationForm, normalizeOccupationForm, type OccupationForm } from "./occupation-form";
 
 import { additionalCrewOccupation, profileOccupationFocusError, selectedCrewOccupations } from "./crew-occupations";
 import { selectedPlaceId } from "./selected-place-id";
@@ -59,6 +60,7 @@ export type QuickStartDraft = {
   providerImageUrl?: string;
   profileAvatarUrl?: string;
   profileCoverUrl?: string;
+  occupationForm?: OccupationForm;
   primaryOccupation?: PrimaryOccupation | null;
   additionalOccupation?: PrimaryOccupation | null;
   sections: Partial<Record<QuickStartIntent, QuickStartIntentData>>;
@@ -265,6 +267,7 @@ export function normalizeQuickStartDraft(value: unknown): QuickStartDraft {
     providerImageUrl: typeof input.providerImageUrl === "string" ? input.providerImageUrl.slice(0, 1200) : "",
     ...(typeof input.profileAvatarUrl === "string" ? { profileAvatarUrl: input.profileAvatarUrl.slice(0, 1200) } : {}),
     ...(typeof input.profileCoverUrl === "string" ? { profileCoverUrl: input.profileCoverUrl.slice(0, 1200) } : {}),
+    ...(isOccupationForm(input.occupationForm) ? { occupationForm: input.occupationForm } : {}),
     talentIntro: typeof input.talentIntro === "string" ? input.talentIntro.slice(0, 1200) : "",
     sections,
     primaryOccupation: occupationReference(primaryOccupationForPositions(input.primaryOccupation, [...(sections.crew?.roles ?? []), ...(sections.talent?.roles ?? [])].map(item=>item.role))),
@@ -307,13 +310,15 @@ export function getFirstScreenForIntent(draft: QuickStartDraft, intent: QuickSta
   return draft.intents.includes(intent) ? "details" : "goals";
 }
 
-function termsFor(item: QuickStartRole, displayLabel?: (departmentId: string, role: string) => string): string[] {
+function termsFor(item: QuickStartRole, displayLabel?: (departmentId: string, role: string) => string | readonly string[]): string[] {
   const department = departmentById.get(item.departmentId);
-  const terms = department ? getDepartmentRoleSearchTerms(department, item.role, displayLabel?.(item.departmentId, item.role)) : [item.role];
+  const displayed = displayLabel?.(item.departmentId, item.role);
+  const localizedForms = typeof displayed === "string" ? [displayed] : displayed ?? [];
+  const terms = department ? getDepartmentRoleSearchTerms(department, item.role, localizedForms[0], localizedForms) : [item.role];
   return item.departmentId === "grip" ? [...new Set([...terms, ...gripSearchTerms(item.role)])] : terms;
 }
 
-export function findQuickStartRoles(query: string, limit = 18, departmentIds?: readonly string[], displayLabel?: (departmentId: string, role: string) => string): QuickStartRole[] {
+export function findQuickStartRoles(query: string, limit = 18, departmentIds?: readonly string[], displayLabel?: (departmentId: string, role: string) => string | readonly string[]): QuickStartRole[] {
   const needle = normalizeOccupation(query.trim());
   if (!needle) return [];
   const cateringDepartmentSearch = ["catering", "setverpflegung"].includes(needle);
@@ -433,4 +438,10 @@ export function selectQuickStartIntent(draft: QuickStartDraft, intent: QuickStar
       [intent]: { ...createQuickStartIntentData(), ...((intent === "location" || intent === "equipment") ? { offerLater: true } : {}) },
     },
   };
+}
+
+/** Only an actual presentation change invalidates a saved personal setup. */
+export function selectQuickStartOccupationForm(draft: QuickStartDraft, value: unknown): QuickStartDraft {
+  if (!isOccupationForm(value) || value === normalizeOccupationForm(draft.occupationForm)) return draft;
+  return { ...draft, occupationForm: value, completed: { ...draft.completed, profile: false } };
 }

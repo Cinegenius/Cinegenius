@@ -4,7 +4,7 @@ import GenieWritingAssistant from "@/components/GenieWritingAssistant";
 
 import PlaceField from "@/components/PlaceField";
 import { LOCATION_ROOMS } from "@/lib/location-rooms";
-import { getOccupationSearchTerms, taxonomyLabel } from "@/lib/departments";
+import { getDepartmentRoleFormLabels, getOccupationSearchTerms, resolveDepartmentOccupation, taxonomyLabel } from "@/lib/departments";
 import { projectTypeLabel, roleOptionMatchesSearch } from "@/lib/project-type-labels";
 import ContentUsageNotice from "@/components/ContentUsageNotice";
 import { useTranslations , useLocale } from "next-intl";
@@ -18,7 +18,7 @@ import UnoptimizedImage from "@/components/UnoptimizedImage";
 
 import { useFormDraft } from "@/lib/use-form-draft";
 import FormDraftStatus from "@/components/FormDraftStatus";
-import React, { useState, useRef, useEffect } from "react";
+import React, { useMemo, useState, useRef, useEffect } from "react";
 import { compressImage, MAX_FUNCTION_UPLOAD_BYTES, safeObjectURL } from "@/lib/compressImage";
 
 import { useAuth } from "@clerk/nextjs";
@@ -229,6 +229,12 @@ function RoleDropdown({
 
   const selected = options.find((o) => o.label === value);
   const locale = useLocale();
+  const taxonomyText = useTranslations("Taxonomy");
+  const searchTerms = useMemo(() => new Map(options.map(option => {
+    const occupation = resolveDepartmentOccupation(option.label);
+    const forms = occupation ? getDepartmentRoleFormLabels(occupation.department.id, occupation.role, locale, undefined, taxonomyText) : [];
+    return [option.id, [...getOccupationSearchTerms(option.label), ...forms]];
+  })), [options, locale, taxonomyText]);
   const secondaryLabel = (option: RoleOption) => {
     if (!option.labelEn) return "";
     const localized = taxonomyLabel(option.labelEn, uiText);
@@ -237,7 +243,7 @@ function RoleDropdown({
     return localized !== option.labelEn && localized !== taxonomyLabel(option.label, uiText) ? localized : "";
   };
   const filteredOptions = options.filter(option =>
-    roleOptionMatchesSearch(option, query, value => taxonomyLabel(value, uiText), locale, getOccupationSearchTerms(option.label)),
+    roleOptionMatchesSearch(option, query, value => taxonomyLabel(value, uiText), locale, searchTerms.get(option.id)),
   );
 
   return (

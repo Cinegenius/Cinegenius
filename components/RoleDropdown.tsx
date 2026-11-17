@@ -2,11 +2,11 @@
 
 import { useTranslations , useLocale } from "next-intl";
 import { animalRoleLabel, animalOccupation } from "@/lib/animal-taxonomy";
-import { useState, useRef } from "react";
+import { useMemo, useState, useRef } from "react";
 import FloatingPanel from "@/components/FloatingPanel";
 import { ChevronDown, Search } from "lucide-react";
 import { gripSearchTerms, normalizeOccupation } from "@/lib/gripTaxonomy";
-import { getDepartmentRoleLabel, getDepartmentRoleSearchTerms, getOccupationSearchTerms, resolveDepartmentOccupation, taxonomyLabel } from "@/lib/departments";
+import { getDepartmentRoleLabel, getDepartmentRoleFormLabels, getDepartmentRoleSearchTerms, getOccupationSearchTerms, resolveDepartmentOccupation, taxonomyLabel } from "@/lib/departments";
 
 
 export default function RoleDropdown({
@@ -24,34 +24,40 @@ export default function RoleDropdown({
 }) {
   const locale = useLocale();
   const taxonomyText = useTranslations("Taxonomy");
+  const uiText = useTranslations();
+  const animals = useTranslations("FilmAnimals");
+  if (placeholder === undefined) placeholder = uiText("Ui.text_e6d42eab5f5bc9");
+  const searchOptions = useMemo(() => options.map(value => {
+    const occupation = resolveDepartmentOccupation(value);
+    const label = occupation
+      ? getDepartmentRoleLabel(occupation.department.id, occupation.role, locale, animals, taxonomyText)
+      : animalRoleLabel(taxonomyLabel(value, uiText), animals);
+    const terms = occupation
+      ? getDepartmentRoleSearchTerms(occupation.department, occupation.role, label,
+          getDepartmentRoleFormLabels(occupation.department.id, occupation.role, locale, animals, taxonomyText))
+      : getOccupationSearchTerms(value);
+    const animal = animalOccupation(value);
+    return { value, label, terms: [...terms, ...gripSearchTerms(value), label, ...(animal ? [animal.labelEn, ...animal.aliases] : [])].map(normalizeOccupation) };
+  }), [options, locale, animals, taxonomyText, uiText]);
   const roleLabel = (role: string) => {
+    const cached = searchOptions.find(option => option.value === role);
+    if (cached) return cached.label;
+    // A saved canonical title can differ from the legacy options used by this form.
     const occupation = resolveDepartmentOccupation(role);
-    return occupation ? getDepartmentRoleLabel(occupation.department.id, occupation.role, locale, animals, taxonomyText) : animalRoleLabel(taxonomyLabel(role, uiText), animals);
+    return occupation
+      ? getDepartmentRoleLabel(occupation.department.id, occupation.role, locale, animals, taxonomyText)
+      : animalRoleLabel(taxonomyLabel(role, uiText), animals);
   };
 
-  const uiText = useTranslations();
-  if (placeholder === undefined) placeholder = uiText("Ui.text_e6d42eab5f5bc9");
-
-
-  const animals = useTranslations("FilmAnimals");
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
   const triggerRef = useRef<HTMLButtonElement>(null);
 
   const normalizedQuery = normalizeOccupation(query);
   const compactQuery = normalizedQuery.replaceAll(" ", "");
-  const filtered = options.filter((option) => {
-    const occupation = resolveDepartmentOccupation(option);
-    const terms = occupation
-      ? getDepartmentRoleSearchTerms(occupation.department, occupation.role, roleLabel(option))
-      : getOccupationSearchTerms(option);
-    const animal = animalOccupation(option);
-    return !normalizedQuery || [...terms, ...gripSearchTerms(option), roleLabel(option), ...(animal ? [animal.labelEn, ...animal.aliases] : [])]
-      .some(term => {
-        const normalized = normalizeOccupation(term);
-        return normalized.includes(normalizedQuery) || normalized.replaceAll(" ", "").includes(compactQuery);
-      });
-  });
+  const filtered = searchOptions.filter(option => !normalizedQuery || option.terms.some(term =>
+    term.includes(normalizedQuery) || term.replaceAll(" ", "").includes(compactQuery),
+  )).map(option => option.value);
 
   return (
     <div className={`relative ${className}`}>

@@ -1,3 +1,4 @@
+import { isOccupationForm, occupationFormFromCrew } from "./occupation-form";
 import { normalizeProfileTypes } from "./profile-display";
 import { getQuickStartProfileTypesForRoles, type QuickStartDraft, type QuickStartRoleSelection } from "./quick-start-flow";
 import { occupationReference, orderPositionsByPrimary, primaryOccupationForPositions } from "./primary-occupation";
@@ -39,7 +40,7 @@ export function setupProfilePayload(draft: QuickStartDraft, existing: SetupProfi
     location: [draft.personCity.trim(), draft.personCountry.trim()].filter(Boolean).join(", "),
     selected_place_city_id: draft.personPlaceCityId || undefined,
     profile_types: types, profile_type: types[0] ?? null,
-    ...(personal ? { positions, crew: { ...existing?.crew, primaryOccupation: occupationReference(primary), additionalOccupation: draft.additionalOccupation ?? null, occupations: selectedCrewOccupations(positions, roles.map(item => ({ departmentId: item.departmentId, roleId: `${item.departmentId}/${encodeURIComponent(item.role)}` }))) } } : {}),
+    ...(personal ? { positions, crew: { ...existing?.crew, ...(isOccupationForm(draft.occupationForm) ? { occupationForm: draft.occupationForm } : {}), primaryOccupation: occupationReference(primary), additionalOccupation: draft.additionalOccupation ?? null, occupations: selectedCrewOccupations(positions, roles.map(item => ({ departmentId: item.departmentId, roleId: `${item.departmentId}/${encodeURIComponent(item.role)}` }))) } } : {}),
     ...(!existing ? { bio: draft.talentIntro.trim(), avatar_url: photo || null, available: true } : {
       ...(draft.talentIntro.trim() ? { bio: draft.talentIntro.trim() } : {}),
       ...(photo || typeof draft.profileAvatarUrl === "string" ? { avatar_url: photo || null } : {}),
@@ -53,4 +54,11 @@ export function setupProfilePayload(draft: QuickStartDraft, existing: SetupProfi
 export function providerProfileEntry(hasProfile: boolean, saved: { intent?: unknown; setupComplete?: unknown } | null) {
   return !hasProfile && saved?.setupComplete === true && (saved.intent === "location" || saved.intent === "equipment")
     ? `/profile-setup?provider=${saved.intent}` : null;
+}
+
+/** Resume explicit draft choices before using an existing profile presentation. */
+export function initializeSetupOccupationForm(draft: QuickStartDraft, existing: SetupProfileIdentity | null): QuickStartDraft {
+  if (isOccupationForm(draft.occupationForm) || !existing) return draft;
+  const form = occupationFormFromCrew(existing.crew);
+  return form === "standard" ? draft : { ...draft, occupationForm: form };
 }

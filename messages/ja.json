@@ -1701,7 +1701,54 @@
     "previewNotice": "この動物ポートフォリオは承認待ちで、保護されたプレビューとしてのみ表示されています。",
     "count": "動物の数（任意）",
     "handler": "トレーナーまたはハンドラーの監督予定あり",
-    "delivery": "セットへの輸送対応可能"
+    "delivery": "セットへの輸送対応可能",
+    "roleForms": {
+      "tiertrainer": {
+        "masculine": "映像用動物トレーナー",
+        "feminine": "映像用動物トレーナー",
+        "neutral": "映像用動物トレーナー"
+      },
+      "filmhundetrainer": {
+        "masculine": "映画用犬トレーナー",
+        "feminine": "映画用犬トレーナー",
+        "neutral": "映画用犬トレーナー"
+      },
+      "tierbetreuer": {
+        "masculine": "動物ハンドラー",
+        "feminine": "動物ハンドラー",
+        "neutral": "動物ハンドラー"
+      },
+      "tierkoordination": {
+        "masculine": "動物コーディネーター",
+        "feminine": "動物コーディネーター",
+        "neutral": "動物コーディネーター"
+      },
+      "set-tierbetreuung": {
+        "masculine": "撮影現場の動物ケア担当",
+        "feminine": "撮影現場の動物ケア担当",
+        "neutral": "撮影現場の動物ケア担当"
+      },
+      "horse-master": {
+        "masculine": "ホースマスター",
+        "feminine": "ホースマスター",
+        "neutral": "ホースマスター"
+      },
+      "assistant-horse-master": {
+        "masculine": "アシスタントホースマスター",
+        "feminine": "アシスタントホースマスター",
+        "neutral": "アシスタントホースマスター"
+      },
+      "horse-trainer": {
+        "masculine": "映画用馬トレーナー",
+        "feminine": "映画用馬トレーナー",
+        "neutral": "映画用馬トレーナー"
+      },
+      "horse-wrangler": {
+        "masculine": "ホースラングラー",
+        "feminine": "ホースラングラー",
+        "neutral": "ホースラングラー"
+      }
+    }
   },
   "MarketplaceCatalog": {
     "categories": {
@@ -6145,9 +6192,9 @@
       },
       "licht": {
         "r_222be04dbf00": "ガファー",
-        "r_1e210e69039a": "照明チーフ補佐 (Best Boy / Best Girl Electric)",
+        "r_1e210e69039a": "照明チーフ補佐",
         "r_14dd174cd76c": "リギングガファー",
-        "r_92137802b24a": "事前仕込み照明チーフ補佐 (Rigging Best Boy / Rigging Best Girl Electric)",
+        "r_92137802b24a": "事前仕込み照明チーフ補佐",
         "r_7fce7d6fcf12": "リギング電気技師",
         "r_1bcf9d8d9b03": "電気技師／照明技術者",
         "r_d95b919dded9": "チーフ照明技術者",
@@ -6167,13 +6214,13 @@
       },
       "grip": {
         "r_470156bd03e4": "キーグリップ",
-        "r_cfbf2a22ed6e": "グリップチーフ補佐 (Best Boy / Best Girl Grip)",
+        "r_cfbf2a22ed6e": "グリップチーフ補佐",
         "r_32a6ab31b1a1": "ドリーグリップ／ドリーオペレーター",
         "r_376dc1f790b8": "グリップ",
         "r_dbfaadb8821c": "グリップアシスタント",
         "r_46dab52c1995": "リギンググリップ",
         "r_ea7e925bd850": "リギングキーグリップ",
-        "r_fa9d72fc7978": "事前仕込みグリップチーフ補佐 (Rigging Best Boy / Rigging Best Girl Grip)",
+        "r_fa9d72fc7978": "事前仕込みグリップチーフ補佐",
         "r_2fa0b44342d7": "特殊グリップ構造",
         "r_08c07afebb7f": "カメラクレーン／ジブオペレーター",
         "r_5ece318b289f": "カメラクレーン技術者",
@@ -6979,6 +7026,4868 @@
       "x_907c602b417d": "オンライン＆デジタル",
       "x_f4581b3b4f89": "ウェブサイト、プラットフォーム、ストリーミング",
       "x_d06f18dfc1af": "その他の映画サービス"
+    },
+    "roleForms": {
+      "produktion": {
+        "r_d479a6d8637e": {
+          "masculine": "プロデューサー",
+          "feminine": "プロデューサー",
+          "neutral": "プロデューサー"
+        },
+        "r_86ca6f7fac85": {
+          "masculine": "エグゼクティブプロデューサー",
+          "feminine": "エグゼクティブプロデューサー",
+          "neutral": "エグゼクティブプロデューサー"
+        },
+        "r_9b38cf86cffe": {
+          "masculine": "共同プロデューサー",
+          "feminine": "共同プロデューサー",
+          "neutral": "共同プロデューサー"
+        },
+        "r_bd2e1cd12f54": {
+          "masculine": "アソシエイトプロデューサー",
+          "feminine": "アソシエイトプロデューサー",
+          "neutral": "アソシエイトプロデューサー"
+        },
+        "r_bc840a4895a2": {
+          "masculine": "ジュニアプロデューサー",
+          "feminine": "ジュニアプロデューサー",
+          "neutral": "ジュニアプロデューサー"
+        },
+        "r_ebaa595e4927": {
+          "masculine": "ラインプロデューサー",
+          "feminine": "ラインプロデューサー",
+          "neutral": "ラインプロデューサー"
+        },
+        "r_9f722922fe7b": {
+          "masculine": "プロダクションヘッド（HL）",
+          "feminine": "プロダクションヘッド（HL）",
+          "neutral": "プロダクションヘッド（HL）"
+        },
+        "r_7fdd4fd31143": {
+          "masculine": "プロダクションマネジメントアシスタント",
+          "feminine": "プロダクションマネジメントアシスタント",
+          "neutral": "プロダクションマネジメントアシスタント"
+        },
+        "r_c8c7f4cd576e": {
+          "masculine": "プロダクションマネージャー（PL）",
+          "feminine": "プロダクションマネージャー（PL）",
+          "neutral": "プロダクションマネージャー（PL）"
+        },
+        "r_edde7bed564a": {
+          "masculine": "プロダクションマネージャー（放送局）",
+          "feminine": "プロダクションマネージャー（放送局）",
+          "neutral": "プロダクションマネージャー（放送局）"
+        },
+        "r_08532652fb27": {
+          "masculine": "プロダクションマネージャーアシスタント",
+          "feminine": "プロダクションマネージャーアシスタント",
+          "neutral": "プロダクションマネージャーアシスタント"
+        },
+        "r_a8ccedf1c4fc": {
+          "masculine": "プロダクションスケジューラー／プランナー",
+          "feminine": "プロダクションスケジューラー／プランナー",
+          "neutral": "プロダクションスケジューラー／プランナー"
+        },
+        "r_73ab62cc6ea9": {
+          "masculine": "プロダクション予算作成担当",
+          "feminine": "プロダクション予算作成担当",
+          "neutral": "プロダクション予算作成担当"
+        },
+        "r_5e8f13168720": {
+          "masculine": "プロダクションスーパーバイザー",
+          "feminine": "プロダクションスーパーバイザー",
+          "neutral": "プロダクションスーパーバイザー"
+        },
+        "r_a8aaf07776e6": {
+          "masculine": "プロダクションスーパーバイザーアシスタント",
+          "feminine": "プロダクションスーパーバイザーアシスタント",
+          "neutral": "プロダクションスーパーバイザーアシスタント"
+        },
+        "r_86a64b938274": {
+          "masculine": "スタジオマネージャー",
+          "feminine": "スタジオマネージャー",
+          "neutral": "スタジオマネージャー"
+        },
+        "r_1dc3e15735f4": {
+          "masculine": "プロダクションコーディネーター",
+          "feminine": "プロダクションコーディネーター",
+          "neutral": "プロダクションコーディネーター"
+        },
+        "r_3d2828618f01": {
+          "masculine": "アシスタントプロダクションコーディネーター",
+          "feminine": "アシスタントプロダクションコーディネーター",
+          "neutral": "アシスタントプロダクションコーディネーター"
+        },
+        "r_b7b1c24b3218": {
+          "masculine": "プロダクションアシスタント（セット）",
+          "feminine": "プロダクションアシスタント（セット）",
+          "neutral": "プロダクションアシスタント（セット）"
+        },
+        "r_504614327108": {
+          "masculine": "プロダクションアシスタント（オフィス）",
+          "feminine": "プロダクションアシスタント（オフィス）",
+          "neutral": "プロダクションアシスタント（オフィス）"
+        },
+        "r_b1c1be59d3fb": {
+          "masculine": "セカンドプロダクションアシスタント",
+          "feminine": "セカンドプロダクションアシスタント",
+          "neutral": "セカンドプロダクションアシスタント"
+        },
+        "r_e9fe06329d79": {
+          "masculine": "チームアシスタント",
+          "feminine": "チームアシスタント",
+          "neutral": "チームアシスタント"
+        },
+        "r_caad7ad378e8": {
+          "masculine": "パーソナルアシスタント",
+          "feminine": "パーソナルアシスタント",
+          "neutral": "パーソナルアシスタント"
+        },
+        "r_9b9ea0970d1e": {
+          "masculine": "プロダクションパーソナルアシスタント",
+          "feminine": "プロダクションパーソナルアシスタント",
+          "neutral": "プロダクションパーソナルアシスタント"
+        },
+        "r_22ca8fe2e611": {
+          "masculine": "タレント／キャストパーソナルアシスタント",
+          "feminine": "タレント／キャストパーソナルアシスタント",
+          "neutral": "タレント／キャストパーソナルアシスタント"
+        },
+        "r_bdfbe6854805": {
+          "masculine": "プロデューサーアシスタント",
+          "feminine": "プロデューサーアシスタント",
+          "neutral": "プロデューサーアシスタント"
+        },
+        "r_d894e33cd89e": {
+          "masculine": "エグゼクティブアシスタント",
+          "feminine": "エグゼクティブアシスタント",
+          "neutral": "エグゼクティブアシスタント"
+        },
+        "r_bdc2cdf19051": {
+          "masculine": "オフィスアシスタント",
+          "feminine": "オフィスアシスタント",
+          "neutral": "オフィスアシスタント"
+        },
+        "r_328519d70fd2": {
+          "masculine": "宿泊コーディネーター",
+          "feminine": "宿泊コーディネーター",
+          "neutral": "宿泊コーディネーター"
+        },
+        "r_6747956824f3": {
+          "masculine": "トラベルコーディネーター",
+          "feminine": "トラベルコーディネーター",
+          "neutral": "トラベルコーディネーター"
+        },
+        "r_b809fe7525be": {
+          "masculine": "アシスタントトラベルコーディネーター",
+          "feminine": "アシスタントトラベルコーディネーター",
+          "neutral": "アシスタントトラベルコーディネーター"
+        },
+        "r_86c92e0bfce0": {
+          "masculine": "安全衛生コーディネーター",
+          "feminine": "安全衛生コーディネーター",
+          "neutral": "安全衛生コーディネーター"
+        },
+        "r_14cee2575cf1": {
+          "masculine": "ADRコーディネーター",
+          "feminine": "ADRコーディネーター",
+          "neutral": "ADRコーディネーター"
+        },
+        "r_92286a252903": {
+          "masculine": "ロケーションマネージャー",
+          "feminine": "ロケーションマネージャー",
+          "neutral": "ロケーションマネージャー"
+        },
+        "r_fc08fa159e6a": {
+          "masculine": "ロケーションスカウト",
+          "feminine": "ロケーションスカウト",
+          "neutral": "ロケーションスカウト"
+        },
+        "r_e5215fd85f99": {
+          "masculine": "追加ロケーションスカウト",
+          "feminine": "追加ロケーションスカウト",
+          "neutral": "追加ロケーションスカウト"
+        },
+        "r_9454a017e69a": {
+          "masculine": "アシスタントロケーションスカウト",
+          "feminine": "アシスタントロケーションスカウト",
+          "neutral": "アシスタントロケーションスカウト"
+        },
+        "r_0d7a23f6a056": {
+          "masculine": "ロケーションコーディネーター",
+          "feminine": "ロケーションコーディネーター",
+          "neutral": "ロケーションコーディネーター"
+        },
+        "r_11bbfbf26e46": {
+          "masculine": "キャストコーディネーター",
+          "feminine": "キャストコーディネーター",
+          "neutral": "キャストコーディネーター"
+        },
+        "r_155f85cc8157": {
+          "masculine": "ユニットマネージャー",
+          "feminine": "ユニットマネージャー",
+          "neutral": "ユニットマネージャー"
+        },
+        "r_475eba080a17": {
+          "masculine": "コロナ対策コーディネーター",
+          "feminine": "コロナ対策コーディネーター",
+          "neutral": "コロナ対策コーディネーター"
+        },
+        "r_a60ca701fcab": {
+          "masculine": "アシスタントコロナ対策コーディネーター",
+          "feminine": "アシスタントコロナ対策コーディネーター",
+          "neutral": "アシスタントコロナ対策コーディネーター"
+        },
+        "r_87a049b62039": {
+          "masculine": "ロケーションユニットマネージャー",
+          "feminine": "ロケーションユニットマネージャー",
+          "neutral": "ロケーションユニットマネージャー"
+        },
+        "r_5b93948ca9fc": {
+          "masculine": "アシスタントロケーションユニットマネージャー",
+          "feminine": "アシスタントロケーションユニットマネージャー",
+          "neutral": "アシスタントロケーションユニットマネージャー"
+        },
+        "r_8a0cbf242686": {
+          "masculine": "クルースケジューラー",
+          "feminine": "クルースケジューラー",
+          "neutral": "クルースケジューラー"
+        },
+        "r_286fb0baa150": {
+          "masculine": "輸送コーディネーター",
+          "feminine": "輸送コーディネーター",
+          "neutral": "輸送コーディネーター"
+        },
+        "r_8e7b74f8a60b": {
+          "masculine": "アシスタント輸送コーディネーター",
+          "feminine": "アシスタント輸送コーディネーター",
+          "neutral": "アシスタント輸送コーディネーター"
+        },
+        "r_940718151db8": {
+          "masculine": "輸送キャプテン",
+          "feminine": "輸送キャプテン",
+          "neutral": "輸送キャプテン"
+        },
+        "r_34e7de86b42e": {
+          "masculine": "ユニットマネージャー（1st AD）",
+          "feminine": "ユニットマネージャー（1st AD）",
+          "neutral": "ユニットマネージャー（1st AD）"
+        },
+        "r_2492443d2786": {
+          "masculine": "セットユニットマネージャー",
+          "feminine": "セットユニットマネージャー",
+          "neutral": "セットユニットマネージャー"
+        },
+        "r_e9593d0ce404": {
+          "masculine": "3rd AD／群衆AD",
+          "feminine": "3rd AD／群衆AD",
+          "neutral": "3rd AD／群衆AD"
+        },
+        "r_4492528d7f86": {
+          "masculine": "ベースユニットマネージャー",
+          "feminine": "ベースユニットマネージャー",
+          "neutral": "ベースユニットマネージャー"
+        },
+        "r_eaee2c8a1b89": {
+          "masculine": "ドライバーキャプテン",
+          "feminine": "ドライバーキャプテン",
+          "neutral": "ドライバーキャプテン"
+        },
+        "r_1e792192a593": {
+          "masculine": "スタジオユニットマネージャー",
+          "feminine": "スタジオユニットマネージャー",
+          "neutral": "スタジオユニットマネージャー"
+        },
+        "r_453722f35b4e": {
+          "masculine": "ロックオフマネージャー",
+          "feminine": "ロックオフマネージャー",
+          "neutral": "ロックオフマネージャー"
+        },
+        "r_01cf9ccbf27d": {
+          "masculine": "セカンドユニットマネージャー（ショー／放送）",
+          "feminine": "セカンドユニットマネージャー（ショー／放送）",
+          "neutral": "セカンドユニットマネージャー（ショー／放送）"
+        },
+        "r_282e1b7d8f09": {
+          "masculine": "ユニットムーブコーディネーター",
+          "feminine": "ユニットムーブコーディネーター",
+          "neutral": "ユニットムーブコーディネーター"
+        },
+        "r_8016e2e4e662": {
+          "masculine": "アシスタントユニットマネージャー",
+          "feminine": "アシスタントユニットマネージャー",
+          "neutral": "アシスタントユニットマネージャー"
+        },
+        "r_1fb7a2292310": {
+          "masculine": "1stユニットマネージャーアシスタント",
+          "feminine": "1stユニットマネージャーアシスタント",
+          "neutral": "1stユニットマネージャーアシスタント"
+        },
+        "r_366708fdb0b3": {
+          "masculine": "アシスタントセットユニットマネージャー",
+          "feminine": "アシスタントセットユニットマネージャー",
+          "neutral": "アシスタントセットユニットマネージャー"
+        },
+        "r_d73d495c6d75": {
+          "masculine": "駐車場プロダクションアシスタント",
+          "feminine": "駐車場プロダクションアシスタント",
+          "neutral": "駐車場プロダクションアシスタント"
+        },
+        "r_4ed4cafa632a": {
+          "masculine": "ロケーションブロッカー／群衆管理",
+          "feminine": "ロケーションブロッカー／群衆管理",
+          "neutral": "ロケーションブロッカー／群衆管理"
+        },
+        "r_6fbe7d952889": {
+          "masculine": "セットランナー",
+          "feminine": "セットランナー",
+          "neutral": "セットランナー"
+        },
+        "r_c8d2a6e8ca0f": {
+          "masculine": "プロダクションドライバー",
+          "feminine": "プロダクションドライバー",
+          "neutral": "プロダクションドライバー"
+        },
+        "r_0d9b0abd3608": {
+          "masculine": "パーソナルドライバー",
+          "feminine": "パーソナルドライバー",
+          "neutral": "パーソナルドライバー"
+        },
+        "r_ef2266f5ad5d": {
+          "masculine": "機材ドライバー",
+          "feminine": "機材ドライバー",
+          "neutral": "機材ドライバー"
+        },
+        "r_100be7827daf": {
+          "masculine": "オフィス制作アシスタント",
+          "feminine": "オフィス制作アシスタント",
+          "neutral": "オフィス制作アシスタント"
+        },
+        "r_c24ef6245054": {
+          "masculine": "制作予算担当",
+          "feminine": "制作予算担当",
+          "neutral": "制作予算担当"
+        },
+        "r_e90f5848bfc3": {
+          "masculine": "制作会計",
+          "feminine": "制作会計",
+          "neutral": "制作会計"
+        },
+        "r_c6dc08a47d0d": {
+          "masculine": "映画財務管理者",
+          "feminine": "映画財務管理者",
+          "neutral": "映画財務管理者"
+        },
+        "r_2557c22fb3d7": {
+          "masculine": "グリーンコンサルタント／サステナビリティマネージャー",
+          "feminine": "グリーンコンサルタント／サステナビリティマネージャー",
+          "neutral": "グリーンコンサルタント／サステナビリティマネージャー"
+        },
+        "r_2a6c1d42831e": {
+          "masculine": "制作インターン",
+          "feminine": "制作インターン",
+          "neutral": "制作インターン"
+        },
+        "r_ede69642be01": {
+          "masculine": "セットユニットマネージャーインターン",
+          "feminine": "セットユニットマネージャーインターン",
+          "neutral": "セットユニットマネージャーインターン"
+        },
+        "r_de9ab1a6b55a": {
+          "masculine": "制作マネージャー",
+          "feminine": "制作マネージャー",
+          "neutral": "制作マネージャー"
+        },
+        "r_fd701e2c1e86": {
+          "masculine": "ユニット制作マネージャー",
+          "feminine": "ユニット制作マネージャー",
+          "neutral": "ユニット制作マネージャー"
+        },
+        "r_eb2de9d80eb5": {
+          "masculine": "制作コーディネーター",
+          "feminine": "制作コーディネーター",
+          "neutral": "制作コーディネーター"
+        },
+        "r_14ba71897157": {
+          "masculine": "アシスタント制作コーディネーター",
+          "feminine": "アシスタント制作コーディネーター",
+          "neutral": "アシスタント制作コーディネーター"
+        },
+        "r_9a9272ffef87": {
+          "masculine": "制作アシスタント（PA）",
+          "feminine": "制作アシスタント（PA）",
+          "neutral": "制作アシスタント（PA）"
+        },
+        "r_b37de62fa7b6": {
+          "masculine": "セカンド制作アシスタント",
+          "feminine": "セカンド制作アシスタント",
+          "neutral": "セカンド制作アシスタント"
+        },
+        "r_35a318ed734f": {
+          "masculine": "アシスタントトラベルコーディネーター",
+          "feminine": "アシスタントトラベルコーディネーター",
+          "neutral": "アシスタントトラベルコーディネーター"
+        },
+        "r_282f5f19af6e": {
+          "masculine": "セットユニットマネージャー",
+          "feminine": "セットユニットマネージャー",
+          "neutral": "セットユニットマネージャー"
+        },
+        "r_a1888e7923b1": {
+          "masculine": "制作秘書／チームアシスタント",
+          "feminine": "制作秘書／チームアシスタント",
+          "neutral": "制作秘書／チームアシスタント"
+        },
+        "r_079a221fcd0e": {
+          "masculine": "セカンドユニットマネージャー（ショー／放送）",
+          "feminine": "セカンドユニットマネージャー（ショー／放送）",
+          "neutral": "セカンドユニットマネージャー（ショー／放送）"
+        },
+        "r_c74c78be5dc2": {
+          "masculine": "キャスティングディレクター",
+          "feminine": "キャスティングディレクター",
+          "neutral": "キャスティングディレクター"
+        },
+        "r_b6e7722029a2": {
+          "masculine": "制作コントローラー",
+          "feminine": "制作コントローラー",
+          "neutral": "制作コントローラー"
+        },
+        "r_4e9c5d6d7198": {
+          "masculine": "映画ビジネスマネージャー",
+          "feminine": "映画ビジネスマネージャー",
+          "neutral": "映画ビジネスマネージャー"
+        },
+        "r_907eb6829faf": {
+          "masculine": "会計士",
+          "feminine": "会計士",
+          "neutral": "会計士"
+        },
+        "r_9ef806a95399": {
+          "masculine": "アシスタントビジネス担当",
+          "feminine": "アシスタントビジネス担当",
+          "neutral": "アシスタントビジネス担当"
+        },
+        "r_3365c6d66b72": {
+          "masculine": "出納係／小口現金担当",
+          "feminine": "出納係／小口現金担当",
+          "neutral": "出納係／小口現金担当"
+        },
+        "r_354a33db42c7": {
+          "masculine": "給与会計士",
+          "feminine": "給与会計士",
+          "neutral": "給与会計士"
+        },
+        "r_f3b7a4579d13": {
+          "masculine": "ビジネス担当インターン",
+          "feminine": "ビジネス担当インターン",
+          "neutral": "ビジネス担当インターン"
+        },
+        "r_614a09237466": {
+          "masculine": "制作戦略責任者",
+          "feminine": "制作戦略責任者",
+          "neutral": "制作戦略責任者"
+        },
+        "r_ab2bca044ad5": {
+          "masculine": "開発責任者",
+          "feminine": "開発責任者",
+          "neutral": "開発責任者"
+        },
+        "r_4c6443207ff2": {
+          "masculine": "サービスプロデューサー",
+          "feminine": "サービスプロデューサー",
+          "neutral": "サービスプロデューサー"
+        },
+        "r_f43970f8871f": {
+          "masculine": "制作エグゼクティブ",
+          "feminine": "制作エグゼクティブ",
+          "neutral": "制作エグゼクティブ"
+        },
+        "r_b490dba5695d": {
+          "masculine": "アシスタントプロデューサー",
+          "feminine": "アシスタントプロデューサー",
+          "neutral": "アシスタントプロデューサー"
+        },
+        "r_7b68ca0f0fb6": {
+          "masculine": "テレビプロデューサー",
+          "feminine": "テレビプロデューサー",
+          "neutral": "テレビプロデューサー"
+        },
+        "r_564bd1be967c": {
+          "masculine": "プロモーションプロデューサー",
+          "feminine": "プロモーションプロデューサー",
+          "neutral": "プロモーションプロデューサー"
+        },
+        "r_17e75f09bb7a": {
+          "masculine": "監督プロデューサー",
+          "feminine": "監督プロデューサー",
+          "neutral": "監督プロデューサー"
+        },
+        "r_09bdde75b5c6": {
+          "masculine": "ストーリープロデューサー",
+          "feminine": "ストーリープロデューサー",
+          "neutral": "ストーリープロデューサー"
+        },
+        "r_63333ae7406f": {
+          "masculine": "ポストストーリープロデューサー",
+          "feminine": "ポストストーリープロデューサー",
+          "neutral": "ポストストーリープロデューサー"
+        },
+        "r_1c7b4db06402": {
+          "masculine": "代理店／テレビコマーシャルプロデューサー",
+          "feminine": "代理店／テレビコマーシャルプロデューサー",
+          "neutral": "代理店／テレビコマーシャルプロデューサー"
+        },
+        "r_05c4bc7ca840": {
+          "masculine": "3Dステレオプロデューサー",
+          "feminine": "3Dステレオプロデューサー",
+          "neutral": "3Dステレオプロデューサー"
+        },
+        "r_6221ed87ef22": {
+          "masculine": "3Dステレオ監督プロデューサー",
+          "feminine": "3Dステレオ監督プロデューサー",
+          "neutral": "3Dステレオ監督プロデューサー"
+        },
+        "r_7edb24c15dcf": {
+          "masculine": "ウェブテレビプロデューサー",
+          "feminine": "ウェブテレビプロデューサー",
+          "neutral": "ウェブテレビプロデューサー"
+        },
+        "r_3d984a13d7b5": {
+          "masculine": "クリエイティブプロデューサー",
+          "feminine": "クリエイティブプロデューサー",
+          "neutral": "クリエイティブプロデューサー"
+        },
+        "r_ae0c8b90c8d1": {
+          "masculine": "開発プロデューサー",
+          "feminine": "開発プロデューサー",
+          "neutral": "開発プロデューサー"
+        },
+        "r_d297bfadcae2": {
+          "masculine": "開発コーディネーター",
+          "feminine": "開発コーディネーター",
+          "neutral": "開発コーディネーター"
+        },
+        "r_54f1c9f4d11e": {
+          "masculine": "開発エグゼクティブ",
+          "feminine": "開発エグゼクティブ",
+          "neutral": "開発エグゼクティブ"
+        },
+        "r_f42fa61db712": {
+          "masculine": "アソシエイトコントロールルームプロデューサー",
+          "feminine": "アソシエイトコントロールルームプロデューサー",
+          "neutral": "アソシエイトコントロールルームプロデューサー"
+        },
+        "r_9d8ea4e7c7aa": {
+          "masculine": "コントロールルームプロデューサー／オンエアプロデューサー",
+          "feminine": "コントロールルームプロデューサー／オンエアプロデューサー",
+          "neutral": "コントロールルームプロデューサー／オンエアプロデューサー"
+        },
+        "r_b837afb89817": {
+          "masculine": "オンエアプロモーションプロデューサー",
+          "feminine": "オンエアプロモーションプロデューサー",
+          "neutral": "オンエアプロモーションプロデューサー"
+        },
+        "r_bacc7a4ec265": {
+          "masculine": "著作権担当",
+          "feminine": "著作権担当",
+          "neutral": "著作権担当"
+        },
+        "r_7e0ace38e8fc": {
+          "masculine": "ビジネス担当",
+          "feminine": "ビジネス担当",
+          "neutral": "ビジネス担当"
+        },
+        "r_0daf662f57c6": {
+          "masculine": "ビジネス＆リーガル担当",
+          "feminine": "ビジネス＆リーガル担当",
+          "neutral": "ビジネス＆リーガル担当"
+        },
+        "r_a95b977fa84f": {
+          "masculine": "リーガル担当",
+          "feminine": "リーガル担当",
+          "neutral": "リーガル担当"
+        },
+        "r_0433186beb99": {
+          "masculine": "マーケティング＆配給プロデューサー",
+          "feminine": "マーケティング＆配給プロデューサー",
+          "neutral": "マーケティング＆配給プロデューサー"
+        },
+        "r_07f0060c8996": {
+          "masculine": "プロデューサーインターン",
+          "feminine": "プロデューサーインターン",
+          "neutral": "プロデューサーインターン"
+        }
+      },
+      "regie": {
+        "r_f59d6991c44a": {
+          "masculine": "監督",
+          "feminine": "監督",
+          "neutral": "監督"
+        },
+        "r_5562e3abbb45": {
+          "masculine": "共同監督",
+          "feminine": "共同監督",
+          "neutral": "共同監督"
+        },
+        "r_df7e552a6792": {
+          "masculine": "セカンドユニット監督",
+          "feminine": "セカンドユニット監督",
+          "neutral": "セカンドユニット監督"
+        },
+        "r_0aca88b2853d": {
+          "masculine": "スタジオ監督",
+          "feminine": "スタジオ監督",
+          "neutral": "スタジオ監督"
+        },
+        "r_394140e22c16": {
+          "masculine": "吹替監督",
+          "feminine": "吹替監督",
+          "neutral": "吹替監督"
+        },
+        "r_7d2cd6bd3a73": {
+          "masculine": "ビジョンディレクター（放送）",
+          "feminine": "ビジョンディレクター（放送）",
+          "neutral": "ビジョンディレクター（放送）"
+        },
+        "r_988a573b39e7": {
+          "masculine": "放送監督",
+          "feminine": "放送監督",
+          "neutral": "放送監督"
+        },
+        "r_0719ad7a68ec": {
+          "masculine": "ダイアログディレクター",
+          "feminine": "ダイアログディレクター",
+          "neutral": "ダイアログディレクター"
+        },
+        "r_463462fca2ec": {
+          "masculine": "1st AD（アシスタントディレクター）",
+          "feminine": "1st AD（アシスタントディレクター）",
+          "neutral": "1st AD（アシスタントディレクター）"
+        },
+        "r_de1c193ae4d6": {
+          "masculine": "2nd AD",
+          "feminine": "2nd AD",
+          "neutral": "2nd AD"
+        },
+        "r_c37babd28464": {
+          "masculine": "キー2nd AD",
+          "feminine": "キー2nd AD",
+          "neutral": "キー2nd AD"
+        },
+        "r_2b8bbebafa40": {
+          "masculine": "フロア2nd AD",
+          "feminine": "フロア2nd AD",
+          "neutral": "フロア2nd AD"
+        },
+        "r_b0a3c67c20bf": {
+          "masculine": "群衆2nd AD",
+          "feminine": "群衆2nd AD",
+          "neutral": "群衆2nd AD"
+        },
+        "r_b6640a0bf9b6": {
+          "masculine": "3rd AD（3rdアシスタントディレクター）",
+          "feminine": "3rd AD（3rdアシスタントディレクター）",
+          "neutral": "3rd AD（3rdアシスタントディレクター）"
+        },
+        "r_962cb1546148": {
+          "masculine": "3rd AD群衆担当",
+          "feminine": "3rd AD群衆担当",
+          "neutral": "3rd AD群衆担当"
+        },
+        "r_619aa382d108": {
+          "masculine": "ベース3rd AD",
+          "feminine": "ベース3rd AD",
+          "neutral": "ベース3rd AD"
+        },
+        "r_14816f8e2f93": {
+          "masculine": "フロア3rd AD",
+          "feminine": "フロア3rd AD",
+          "neutral": "フロア3rd AD"
+        },
+        "r_00bb63b14962": {
+          "masculine": "AD PA",
+          "feminine": "AD PA",
+          "neutral": "AD PA"
+        },
+        "r_da45564f42a3": {
+          "masculine": "キーAD PA",
+          "feminine": "キーAD PA",
+          "neutral": "キーAD PA"
+        },
+        "r_d4de545cc559": {
+          "masculine": "AD研修生",
+          "feminine": "AD研修生",
+          "neutral": "AD研修生"
+        },
+        "r_b8f3b216cf72": {
+          "masculine": "群衆マーシャル",
+          "feminine": "群衆マーシャル",
+          "neutral": "群衆マーシャル"
+        },
+        "r_7d061a318612": {
+          "masculine": "アシスタント群衆マーシャル",
+          "feminine": "アシスタント群衆マーシャル",
+          "neutral": "アシスタント群衆マーシャル"
+        },
+        "r_dbf51638d5ed": {
+          "masculine": "スクリプトスーパーバイザー／継続管理",
+          "feminine": "スクリプトスーパーバイザー／継続管理",
+          "neutral": "スクリプトスーパーバイザー／継続管理"
+        },
+        "r_db6f57df190b": {
+          "masculine": "アシスタントスクリプトスーパーバイザー",
+          "feminine": "アシスタントスクリプトスーパーバイザー",
+          "neutral": "アシスタントスクリプトスーパーバイザー"
+        },
+        "r_043751863fa5": {
+          "masculine": "現場スクリプト管理",
+          "feminine": "現場スクリプト管理",
+          "neutral": "現場スクリプト管理"
+        },
+        "r_d7e7e0e56ce6": {
+          "masculine": "絵コンテアーティスト",
+          "feminine": "絵コンテアーティスト",
+          "neutral": "絵コンテアーティスト"
+        },
+        "r_d5f343108ed5": {
+          "masculine": "演技コーチ",
+          "feminine": "演技コーチ",
+          "neutral": "演技コーチ"
+        },
+        "r_8ac3532c0c32": {
+          "masculine": "子役演技コーチ",
+          "feminine": "子役演技コーチ",
+          "neutral": "子役演技コーチ"
+        },
+        "r_bf13c927e8eb": {
+          "masculine": "ダイアログコーチ",
+          "feminine": "ダイアログコーチ",
+          "neutral": "ダイアログコーチ"
+        },
+        "r_82fff9096145": {
+          "masculine": "エキストラコーディネーター",
+          "feminine": "エキストラコーディネーター",
+          "neutral": "エキストラコーディネーター"
+        },
+        "r_e57426b6a805": {
+          "masculine": "アシスタントエキストラコーディネーター",
+          "feminine": "アシスタントエキストラコーディネーター",
+          "neutral": "アシスタントエキストラコーディネーター"
+        },
+        "r_c2b6031ad212": {
+          "masculine": "監督個人アシスタント",
+          "feminine": "監督個人アシスタント",
+          "neutral": "監督個人アシスタント"
+        },
+        "r_1ed956774605": {
+          "masculine": "監督個人アシスタント",
+          "feminine": "監督個人アシスタント",
+          "neutral": "監督個人アシスタント"
+        },
+        "r_7d0bc36aabcb": {
+          "masculine": "監督インターン",
+          "feminine": "監督インターン",
+          "neutral": "監督インターン"
+        },
+        "r_bf4aaefa2f9f": {
+          "masculine": "スクリプト研修生",
+          "feminine": "スクリプト研修生",
+          "neutral": "スクリプト研修生"
+        },
+        "r_45bf2bbe37f0": {
+          "masculine": "現場PA／ランナー",
+          "feminine": "現場PA／ランナー",
+          "neutral": "現場PA／ランナー"
+        },
+        "r_9ced64ab6db5": {
+          "masculine": "第一助監督（1st AD）",
+          "feminine": "第一助監督（1st AD）",
+          "neutral": "第一助監督（1st AD）"
+        },
+        "r_b6ac41792b48": {
+          "masculine": "第二助監督（2nd AD）",
+          "feminine": "第二助監督（2nd AD）",
+          "neutral": "第二助監督（2nd AD）"
+        },
+        "r_6b9cabf3cbca": {
+          "masculine": "スクリプト（現場）",
+          "feminine": "スクリプト（現場）",
+          "neutral": "スクリプト（現場）"
+        },
+        "r_93f52c1c7000": {
+          "masculine": "第二ユニット監督",
+          "feminine": "第二ユニット監督",
+          "neutral": "第二ユニット監督"
+        },
+        "r_591d7faf8f5d": {
+          "masculine": "個人アシスタント（監督）",
+          "feminine": "個人アシスタント（監督）",
+          "neutral": "個人アシスタント（監督）"
+        },
+        "r_c01dd7739f5a": {
+          "masculine": "アシスタントエキストラコーディネーター",
+          "feminine": "アシスタントエキストラコーディネーター",
+          "neutral": "アシスタントエキストラコーディネーター"
+        }
+      },
+      "kamera": {
+        "r_9659ff478da5": {
+          "masculine": "撮影監督／DoP",
+          "feminine": "撮影監督／DoP",
+          "neutral": "撮影監督／DoP"
+        },
+        "r_f1286611f452": {
+          "masculine": "映像監督",
+          "feminine": "映像監督",
+          "neutral": "映像監督"
+        },
+        "r_c519de89c832": {
+          "masculine": "Aカメラオペレーター",
+          "feminine": "Aカメラオペレーター",
+          "neutral": "Aカメラオペレーター"
+        },
+        "r_69b451280549": {
+          "masculine": "Bカメラオペレーター",
+          "feminine": "Bカメラオペレーター",
+          "neutral": "Bカメラオペレーター"
+        },
+        "r_147c6db611ab": {
+          "masculine": "Cカメラオペレーター",
+          "feminine": "Cカメラオペレーター",
+          "neutral": "Cカメラオペレーター"
+        },
+        "r_00ec6018a92f": {
+          "masculine": "ENGカメラオペレーター（スタジオ）",
+          "feminine": "ENGカメラオペレーター（スタジオ）",
+          "neutral": "ENGカメラオペレーター（スタジオ）"
+        },
+        "r_15338319dd09": {
+          "masculine": "ENG/EBカメラオペレーター",
+          "feminine": "ENG/EBカメラオペレーター",
+          "neutral": "ENG/EBカメラオペレーター"
+        },
+        "r_3b00f8763d24": {
+          "masculine": "第二ユニットカメラオペレーター",
+          "feminine": "第二ユニットカメラオペレーター",
+          "neutral": "第二ユニットカメラオペレーター"
+        },
+        "r_2815a6f7d251": {
+          "masculine": "第三ユニットカメラオペレーター",
+          "feminine": "第三ユニットカメラオペレーター",
+          "neutral": "第三ユニットカメラオペレーター"
+        },
+        "r_46bfee3f1077": {
+          "masculine": "第一カメラ助手／フォーカスプラー",
+          "feminine": "第一カメラ助手／フォーカスプラー",
+          "neutral": "第一カメラ助手／フォーカスプラー"
+        },
+        "r_4f6a54aa8672": {
+          "masculine": "第二カメラ助手／クラッパーローダー",
+          "feminine": "第二カメラ助手／クラッパーローダー",
+          "neutral": "第二カメラ助手／クラッパーローダー"
+        },
+        "r_a6d3a38613fa": {
+          "masculine": "クラッパーローダー",
+          "feminine": "クラッパーローダー",
+          "neutral": "クラッパーローダー"
+        },
+        "r_4406ae44f8be": {
+          "masculine": "第三カメラ助手",
+          "feminine": "第三カメラ助手",
+          "neutral": "第三カメラ助手"
+        },
+        "r_a29ed25142f3": {
+          "masculine": "デジタル第二カメラ助手",
+          "feminine": "デジタル第二カメラ助手",
+          "neutral": "デジタル第二カメラ助手"
+        },
+        "r_048d538ee34d": {
+          "masculine": "DIT",
+          "feminine": "DIT",
+          "neutral": "DIT"
+        },
+        "r_c48ad1ee75a7": {
+          "masculine": "DITアシスタント",
+          "feminine": "DITアシスタント",
+          "neutral": "DITアシスタント"
+        },
+        "r_0e473a1887e9": {
+          "masculine": "ステディカムオペレーター",
+          "feminine": "ステディカムオペレーター",
+          "neutral": "ステディカムオペレーター"
+        },
+        "r_1d7535202c92": {
+          "masculine": "ステディカムアシスタント",
+          "feminine": "ステディカムアシスタント",
+          "neutral": "ステディカムアシスタント"
+        },
+        "r_baee8ff4a63f": {
+          "masculine": "ジンバルシステムオペレーター",
+          "feminine": "ジンバルシステムオペレーター",
+          "neutral": "ジンバルシステムオペレーター"
+        },
+        "r_569d248c1dfd": {
+          "masculine": "ドローンパイロット／ドローンオペレーター",
+          "feminine": "ドローンパイロット／ドローンオペレーター",
+          "neutral": "ドローンパイロット／ドローンオペレーター"
+        },
+        "r_3ca1ad3e14b2": {
+          "masculine": "カメラドローンオペレーター",
+          "feminine": "カメラドローンオペレーター",
+          "neutral": "カメラドローンオペレーター"
+        },
+        "r_c2ff9d51c86a": {
+          "masculine": "カメラドローンパイロット",
+          "feminine": "カメラドローンパイロット",
+          "neutral": "カメラドローンパイロット"
+        },
+        "r_0502b3c5dec3": {
+          "masculine": "カメラカー運転手",
+          "feminine": "カメラカー運転手",
+          "neutral": "カメラカー運転手"
+        },
+        "r_a3fa606ea916": {
+          "masculine": "飛行機パイロット（空撮）",
+          "feminine": "飛行機パイロット（空撮）",
+          "neutral": "飛行機パイロット（空撮）"
+        },
+        "r_05d7d18da0c4": {
+          "masculine": "ヘリコプターパイロット（空撮）",
+          "feminine": "ヘリコプターパイロット（空撮）",
+          "neutral": "ヘリコプターパイロット（空撮）"
+        },
+        "r_32e8a90fee3b": {
+          "masculine": "スパイダーカムパイロット",
+          "feminine": "スパイダーカムパイロット",
+          "neutral": "スパイダーカムパイロット"
+        },
+        "r_c4b0d3dfb7d8": {
+          "masculine": "カメラドローンアシスタント",
+          "feminine": "カメラドローンアシスタント",
+          "neutral": "カメラドローンアシスタント"
+        },
+        "r_86c7b305ba77": {
+          "masculine": "リモートカメラオペレーター",
+          "feminine": "リモートカメラオペレーター",
+          "neutral": "リモートカメラオペレーター"
+        },
+        "r_386b1f9db2c1": {
+          "masculine": "リモートヘッドオペレーター",
+          "feminine": "リモートヘッドオペレーター",
+          "neutral": "リモートヘッドオペレーター"
+        },
+        "r_1490637c95ed": {
+          "masculine": "空撮カメラオペレーター",
+          "feminine": "空撮カメラオペレーター",
+          "neutral": "空撮カメラオペレーター"
+        },
+        "r_76c05f6fba78": {
+          "masculine": "エア・トゥ・エアオペレーター",
+          "feminine": "エア・トゥ・エアオペレーター",
+          "neutral": "エア・トゥ・エアオペレーター"
+        },
+        "r_b59f3c08153b": {
+          "masculine": "ハイスピードカメラオペレーター",
+          "feminine": "ハイスピードカメラオペレーター",
+          "neutral": "ハイスピードカメラオペレーター"
+        },
+        "r_f6e99ab3d5dd": {
+          "masculine": "ARRIトリニティオペレーター",
+          "feminine": "ARRIトリニティオペレーター",
+          "neutral": "ARRIトリニティオペレーター"
+        },
+        "r_953bc24b7077": {
+          "masculine": "ケーブルカムオペレーター",
+          "feminine": "ケーブルカムオペレーター",
+          "neutral": "ケーブルカムオペレーター"
+        },
+        "r_e834e506e54b": {
+          "masculine": "ポールカムオペレーター",
+          "feminine": "ポールカムオペレーター",
+          "neutral": "ポールカムオペレーター"
+        },
+        "r_b7ea35e3f38d": {
+          "masculine": "ロッドカムオペレーター",
+          "feminine": "ロッドカムオペレーター",
+          "neutral": "ロッドカムオペレーター"
+        },
+        "r_3531de1d9278": {
+          "masculine": "モーションコントロールオペレーター",
+          "feminine": "モーションコントロールオペレーター",
+          "neutral": "モーションコントロールオペレーター"
+        },
+        "r_edf22fe94ff4": {
+          "masculine": "モーションコントロールアシスタント",
+          "feminine": "モーションコントロールアシスタント",
+          "neutral": "モーションコントロールアシスタント"
+        },
+        "r_7be83f893235": {
+          "masculine": "ライブカメラオペレーター",
+          "feminine": "ライブカメラオペレーター",
+          "neutral": "ライブカメラオペレーター"
+        },
+        "r_8d0fa92d5c06": {
+          "masculine": "VR撮影監督",
+          "feminine": "VR撮影監督",
+          "neutral": "VR撮影監督"
+        },
+        "r_e4f1f8410ee1": {
+          "masculine": "VRカメラオペレーター",
+          "feminine": "VRカメラオペレーター",
+          "neutral": "VRカメラオペレーター"
+        },
+        "r_fe4955d24d9d": {
+          "masculine": "3Dステレオカメラオペレーター",
+          "feminine": "3Dステレオカメラオペレーター",
+          "neutral": "3Dステレオカメラオペレーター"
+        },
+        "r_63d8f7ae5c77": {
+          "masculine": "3Dステレオコンバージェンスオペレーター",
+          "feminine": "3Dステレオコンバージェンスオペレーター",
+          "neutral": "3Dステレオコンバージェンスオペレーター"
+        },
+        "r_5d780d27f437": {
+          "masculine": "ステレオスコピック技術者",
+          "feminine": "ステレオスコピック技術者",
+          "neutral": "ステレオスコピック技術者"
+        },
+        "r_0350366ccf64": {
+          "masculine": "ステレオグラファー",
+          "feminine": "ステレオグラファー",
+          "neutral": "ステレオグラファー"
+        },
+        "r_892df5d9ed45": {
+          "masculine": "第二ユニットステレオグラファー",
+          "feminine": "第二ユニットステレオグラファー",
+          "neutral": "第二ユニットステレオグラファー"
+        },
+        "r_87b9b49ccc72": {
+          "masculine": "ステレオグラファーアシスタント",
+          "feminine": "ステレオグラファーアシスタント",
+          "neutral": "ステレオグラファーアシスタント"
+        },
+        "r_503758a49393": {
+          "masculine": "水中カメラオペレーター",
+          "feminine": "水中カメラオペレーター",
+          "neutral": "水中カメラオペレーター"
+        },
+        "r_ad809b37ab32": {
+          "masculine": "水中カメラアシスタント",
+          "feminine": "水中カメラアシスタント",
+          "neutral": "水中カメラアシスタント"
+        },
+        "r_fdaafaca34cb": {
+          "masculine": "フリーフォール／スカイダイブカメラオペレーター",
+          "feminine": "フリーフォール／スカイダイブカメラオペレーター",
+          "neutral": "フリーフォール／スカイダイブカメラオペレーター"
+        },
+        "r_6fd521b70caf": {
+          "masculine": "ドライテック",
+          "feminine": "ドライテック",
+          "neutral": "ドライテック"
+        },
+        "r_7a8573f394c1": {
+          "masculine": "データラングラー",
+          "feminine": "データラングラー",
+          "neutral": "データラングラー"
+        },
+        "r_59c04d8b3609": {
+          "masculine": "データラングラー／デジタルローダー",
+          "feminine": "データラングラー／デジタルローダー",
+          "neutral": "データラングラー／デジタルローダー"
+        },
+        "r_1b6d2deeae11": {
+          "masculine": "メディアマネージャー",
+          "feminine": "メディアマネージャー",
+          "neutral": "メディアマネージャー"
+        },
+        "r_bfd5ad0745cb": {
+          "masculine": "ビデオアシストオペレーター",
+          "feminine": "ビデオアシストオペレーター",
+          "neutral": "ビデオアシストオペレーター"
+        },
+        "r_ab65480d38bf": {
+          "masculine": "ビデオアシストユーティリティ",
+          "feminine": "ビデオアシストユーティリティ",
+          "neutral": "ビデオアシストユーティリティ"
+        },
+        "r_44cbe06f7edd": {
+          "masculine": "クラッシュボックスオペレーター",
+          "feminine": "クラッシュボックスオペレーター",
+          "neutral": "クラッシュボックスオペレーター"
+        },
+        "r_ff391e554ef1": {
+          "masculine": "ビデオオペレーター",
+          "feminine": "ビデオオペレーター",
+          "neutral": "ビデオオペレーター"
+        },
+        "r_04b8806e4aea": {
+          "masculine": "Qtakeオペレーター",
+          "feminine": "Qtakeオペレーター",
+          "neutral": "Qtakeオペレーター"
+        },
+        "r_881fbad171dd": {
+          "masculine": "ビデオオペレーターアシスタント",
+          "feminine": "ビデオオペレーターアシスタント",
+          "neutral": "ビデオオペレーターアシスタント"
+        },
+        "r_e8b3776feee3": {
+          "masculine": "プレイバックオペレーター",
+          "feminine": "プレイバックオペレーター",
+          "neutral": "プレイバックオペレーター"
+        },
+        "r_2cd28c233eb0": {
+          "masculine": "ENGアシスタント（映像・音声）",
+          "feminine": "ENGアシスタント（映像・音声）",
+          "neutral": "ENGアシスタント（映像・音声）"
+        },
+        "r_aaf320fee04d": {
+          "masculine": "ENG技術者（映像・音声）",
+          "feminine": "ENG技術者（映像・音声）",
+          "neutral": "ENG技術者（映像・音声）"
+        },
+        "r_6c484917c545": {
+          "masculine": "カメラアシスタント（ノンフィクション）",
+          "feminine": "カメラアシスタント（ノンフィクション）",
+          "neutral": "カメラアシスタント（ノンフィクション）"
+        },
+        "r_c071a417cdf8": {
+          "masculine": "データキャプチャエンジニア",
+          "feminine": "データキャプチャエンジニア",
+          "neutral": "データキャプチャエンジニア"
+        },
+        "r_ff3821a892d3": {
+          "masculine": "リアプロジェクションプレートオペレーター",
+          "feminine": "リアプロジェクションプレートオペレーター",
+          "neutral": "リアプロジェクションプレートオペレーター"
+        },
+        "r_e160ca78eefe": {
+          "masculine": "カメラ技術者",
+          "feminine": "カメラ技術者",
+          "neutral": "カメラ技術者"
+        },
+        "r_b2a908032997": {
+          "masculine": "カメラインターン",
+          "feminine": "カメラインターン",
+          "neutral": "カメラインターン"
+        },
+        "r_20c91979a5fc": {
+          "masculine": "カメラオペレーター",
+          "feminine": "カメラオペレーター",
+          "neutral": "カメラオペレーター"
+        },
+        "r_3008a154e7ef": {
+          "masculine": "ドローンオペレーター／空撮DP",
+          "feminine": "ドローンオペレーター／空撮DP",
+          "neutral": "ドローンオペレーター／空撮DP"
+        },
+        "r_ee4208621795": {
+          "masculine": "追加カメラオペレーター",
+          "feminine": "追加カメラオペレーター",
+          "neutral": "追加カメラオペレーター"
+        },
+        "r_59f7261be55a": {
+          "masculine": "水中カメラオペレーター",
+          "feminine": "水中カメラオペレーター",
+          "neutral": "水中カメラオペレーター"
+        },
+        "r_6767d1f92822": {
+          "masculine": "モーションコントロールカメラオペレーター",
+          "feminine": "モーションコントロールカメラオペレーター",
+          "neutral": "モーションコントロールカメラオペレーター"
+        },
+        "r_15047c5a622a": {
+          "masculine": "カメラドローンアシスタント／技術者",
+          "feminine": "カメラドローンアシスタント／技術者",
+          "neutral": "カメラドローンアシスタント／技術者"
+        },
+        "r_7b6aa965b572": {
+          "masculine": "第1カメラアシスタント",
+          "feminine": "第1カメラアシスタント",
+          "neutral": "第1カメラアシスタント"
+        },
+        "r_403c761ac7c7": {
+          "masculine": "ENGアシスタント（カメラ・音声）",
+          "feminine": "ENGアシスタント（カメラ・音声）",
+          "neutral": "ENGアシスタント（カメラ・音声）"
+        },
+        "r_6170f09c0f17": {
+          "masculine": "ENG技術者（カメラ・音声）",
+          "feminine": "ENG技術者（カメラ・音声）",
+          "neutral": "ENG技術者（カメラ・音声）"
+        },
+        "r_6a6303b77029": {
+          "masculine": "スチールフォトグラファー",
+          "feminine": "スチールフォトグラファー",
+          "neutral": "スチールフォトグラファー"
+        }
+      },
+      "licht": {
+        "r_222be04dbf00": {
+          "masculine": "ガファー",
+          "feminine": "ガファー",
+          "neutral": "ガファー"
+        },
+        "r_1e210e69039a": {
+          "masculine": "照明チーフ補佐 (Best Boy Electric)",
+          "feminine": "照明チーフ補佐 (Best Girl Electric)",
+          "neutral": "照明チーフ補佐"
+        },
+        "r_14dd174cd76c": {
+          "masculine": "リギングガファー",
+          "feminine": "リギングガファー",
+          "neutral": "リギングガファー"
+        },
+        "r_92137802b24a": {
+          "masculine": "事前仕込み照明チーフ補佐 (Rigging Best Boy Electric)",
+          "feminine": "事前仕込み照明チーフ補佐 (Rigging Best Girl Electric)",
+          "neutral": "事前仕込み照明チーフ補佐"
+        },
+        "r_7fce7d6fcf12": {
+          "masculine": "リギング電気技師",
+          "feminine": "リギング電気技師",
+          "neutral": "リギング電気技師"
+        },
+        "r_1bcf9d8d9b03": {
+          "masculine": "電気技師／照明技術者",
+          "feminine": "電気技師／照明技術者",
+          "neutral": "電気技師／照明技術者"
+        },
+        "r_d95b919dded9": {
+          "masculine": "チーフ照明技術者",
+          "feminine": "チーフ照明技術者",
+          "neutral": "チーフ照明技術者"
+        },
+        "r_de223259b793": {
+          "masculine": "照明ボードオペレーター",
+          "feminine": "照明ボードオペレーター",
+          "neutral": "照明ボードオペレーター"
+        },
+        "r_d927855afff9": {
+          "masculine": "照明ボードアシスタント",
+          "feminine": "照明ボードアシスタント",
+          "neutral": "照明ボードアシスタント"
+        },
+        "r_56ad1c6a1ad4": {
+          "masculine": "照明プログラマー（DMX）",
+          "feminine": "照明プログラマー（DMX）",
+          "neutral": "照明プログラマー（DMX）"
+        },
+        "r_090ac2a092b8": {
+          "masculine": "照明技術者",
+          "feminine": "照明技術者",
+          "neutral": "照明技術者"
+        },
+        "r_d1edcbd50142": {
+          "masculine": "照明ドライバー",
+          "feminine": "照明ドライバー",
+          "neutral": "照明ドライバー"
+        },
+        "r_7d79588c14f3": {
+          "masculine": "追加照明技術者",
+          "feminine": "追加照明技術者",
+          "neutral": "追加照明技術者"
+        },
+        "r_b3d1d585beaa": {
+          "masculine": "発電機オペレーター",
+          "feminine": "発電機オペレーター",
+          "neutral": "発電機オペレーター"
+        },
+        "r_bcd4b312b67e": {
+          "masculine": "ケーブルラングラー",
+          "feminine": "ケーブルラングラー",
+          "neutral": "ケーブルラングラー"
+        },
+        "r_35cca1fe3c5c": {
+          "masculine": "水中照明技術者",
+          "feminine": "水中照明技術者",
+          "neutral": "水中照明技術者"
+        },
+        "r_89058c839b15": {
+          "masculine": "バルーンライトオペレーター",
+          "feminine": "バルーンライトオペレーター",
+          "neutral": "バルーンライトオペレーター"
+        },
+        "r_9bd915bb46a4": {
+          "masculine": "スポット／トラススポットオペレーター",
+          "feminine": "スポット／トラススポットオペレーター",
+          "neutral": "スポット／トラススポットオペレーター"
+        },
+        "r_2c0dd7b64cf3": {
+          "masculine": "照明アシスタント",
+          "feminine": "照明アシスタント",
+          "neutral": "照明アシスタント"
+        },
+        "r_0cc27c01ca07": {
+          "masculine": "照明インターン",
+          "feminine": "照明インターン",
+          "neutral": "照明インターン"
+        }
+      },
+      "grip": {
+        "r_470156bd03e4": {
+          "masculine": "キーグリップ",
+          "feminine": "キーグリップ",
+          "neutral": "キーグリップ"
+        },
+        "r_cfbf2a22ed6e": {
+          "masculine": "グリップチーフ補佐 (Best Boy Grip)",
+          "feminine": "グリップチーフ補佐 (Best Girl Grip)",
+          "neutral": "グリップチーフ補佐"
+        },
+        "r_32a6ab31b1a1": {
+          "masculine": "ドリーグリップ／ドリーオペレーター",
+          "feminine": "ドリーグリップ／ドリーオペレーター",
+          "neutral": "ドリーグリップ／ドリーオペレーター"
+        },
+        "r_376dc1f790b8": {
+          "masculine": "グリップ",
+          "feminine": "グリップ",
+          "neutral": "グリップ"
+        },
+        "r_dbfaadb8821c": {
+          "masculine": "グリップアシスタント",
+          "feminine": "グリップアシスタント",
+          "neutral": "グリップアシスタント"
+        },
+        "r_46dab52c1995": {
+          "masculine": "リギンググリップ",
+          "feminine": "リギンググリップ",
+          "neutral": "リギンググリップ"
+        },
+        "r_ea7e925bd850": {
+          "masculine": "リギングキーグリップ",
+          "feminine": "リギングキーグリップ",
+          "neutral": "リギングキーグリップ"
+        },
+        "r_fa9d72fc7978": {
+          "masculine": "事前仕込みグリップチーフ補佐 (Rigging Best Boy Grip)",
+          "feminine": "事前仕込みグリップチーフ補佐 (Rigging Best Girl Grip)",
+          "neutral": "事前仕込みグリップチーフ補佐"
+        },
+        "r_2fa0b44342d7": {
+          "masculine": "特殊グリップ構造",
+          "feminine": "特殊グリップ構造",
+          "neutral": "特殊グリップ構造"
+        },
+        "r_08c07afebb7f": {
+          "masculine": "カメラクレーン／ジブオペレーター",
+          "feminine": "カメラクレーン／ジブオペレーター",
+          "neutral": "カメラクレーン／ジブオペレーター"
+        },
+        "r_5ece318b289f": {
+          "masculine": "カメラクレーン技術者",
+          "feminine": "カメラクレーン技術者",
+          "neutral": "カメラクレーン技術者"
+        },
+        "r_a5c74e86fb2b": {
+          "masculine": "Uクレーン／テクノクレーンオペレーター",
+          "feminine": "Uクレーン／テクノクレーンオペレーター",
+          "neutral": "Uクレーン／テクノクレーンオペレーター"
+        },
+        "r_819dd64bff9d": {
+          "masculine": "リモートヘッド技術者／オペレーター",
+          "feminine": "リモートヘッド技術者／オペレーター",
+          "neutral": "リモートヘッド技術者／オペレーター"
+        },
+        "r_9c6f674da63a": {
+          "masculine": "グリップインターン",
+          "feminine": "グリップインターン",
+          "neutral": "グリップインターン"
+        }
+      },
+      "ton": {
+        "r_fccf287d8f40": {
+          "masculine": "プロダクションサウンドミキサー",
+          "feminine": "プロダクションサウンドミキサー",
+          "neutral": "プロダクションサウンドミキサー"
+        },
+        "r_54f3d59eb241": {
+          "masculine": "プロダクションサウンドミキサー",
+          "feminine": "プロダクションサウンドミキサー",
+          "neutral": "プロダクションサウンドミキサー"
+        },
+        "r_b0c1942e7358": {
+          "masculine": "フィルムサウンドレコーディスト",
+          "feminine": "フィルムサウンドレコーディスト",
+          "neutral": "フィルムサウンドレコーディスト"
+        },
+        "r_8b1cc700407b": {
+          "masculine": "ブームオペレーター",
+          "feminine": "ブームオペレーター",
+          "neutral": "ブームオペレーター"
+        },
+        "r_fd909904c9c7": {
+          "masculine": "サウンドアシスタント",
+          "feminine": "サウンドアシスタント",
+          "neutral": "サウンドアシスタント"
+        },
+        "r_4c5fe4b3a1f3": {
+          "masculine": "第1サウンドアシスタント",
+          "feminine": "第1サウンドアシスタント",
+          "neutral": "第1サウンドアシスタント"
+        },
+        "r_ab87e9473072": {
+          "masculine": "第1サウンドアシスタント",
+          "feminine": "第1サウンドアシスタント",
+          "neutral": "第1サウンドアシスタント"
+        },
+        "r_d83df9d29ab1": {
+          "masculine": "第2サウンドアシスタント",
+          "feminine": "第2サウンドアシスタント",
+          "neutral": "第2サウンドアシスタント"
+        },
+        "r_8377b0674c5d": {
+          "masculine": "第2サウンドアシスタント",
+          "feminine": "第2サウンドアシスタント",
+          "neutral": "第2サウンドアシスタント"
+        },
+        "r_93302391f02a": {
+          "masculine": "ADR／ループグループラングラー",
+          "feminine": "ADR／ループグループラングラー",
+          "neutral": "ADR／ループグループラングラー"
+        },
+        "r_3e7456f82724": {
+          "masculine": "サラウンドサウンドレコーディスト",
+          "feminine": "サラウンドサウンドレコーディスト",
+          "neutral": "サラウンドサウンドレコーディスト"
+        },
+        "r_352c199bfbc1": {
+          "masculine": "ユーティリティサウンド技術者",
+          "feminine": "ユーティリティサウンド技術者",
+          "neutral": "ユーティリティサウンド技術者"
+        },
+        "r_fdfa14e36d06": {
+          "masculine": "サウンド機材アシスタント",
+          "feminine": "サウンド機材アシスタント",
+          "neutral": "サウンド機材アシスタント"
+        },
+        "r_9615bbb28141": {
+          "masculine": "サウンドプレイバックオペレーター",
+          "feminine": "サウンドプレイバックオペレーター",
+          "neutral": "サウンドプレイバックオペレーター"
+        },
+        "r_13544e0c2d08": {
+          "masculine": "サウンドレコーディスト（ノンフィクション）",
+          "feminine": "サウンドレコーディスト（ノンフィクション）",
+          "neutral": "サウンドレコーディスト（ノンフィクション）"
+        },
+        "r_f804f9794c40": {
+          "masculine": "サウンドインターン",
+          "feminine": "サウンドインターン",
+          "neutral": "サウンドインターン"
+        },
+        "r_26ad417384db": {
+          "masculine": "サウンドデザイナー",
+          "feminine": "サウンドデザイナー",
+          "neutral": "サウンドデザイナー"
+        },
+        "r_e4afa3da823e": {
+          "masculine": "スーパーバイジングサウンドエディター",
+          "feminine": "スーパーバイジングサウンドエディター",
+          "neutral": "スーパーバイジングサウンドエディター"
+        },
+        "r_754377fae1cb": {
+          "masculine": "ダイアログ編集者",
+          "feminine": "ダイアログ編集者",
+          "neutral": "ダイアログ編集者"
+        },
+        "r_a80f60e08e2f": {
+          "masculine": "ADR編集者",
+          "feminine": "ADR編集者",
+          "neutral": "ADR編集者"
+        },
+        "r_65ab3bc0b779": {
+          "masculine": "ADRスーパーバイザー",
+          "feminine": "ADRスーパーバイザー",
+          "neutral": "ADRスーパーバイザー"
+        },
+        "r_927d0ca8e1d9": {
+          "masculine": "フォーリーアーティスト",
+          "feminine": "フォーリーアーティスト",
+          "neutral": "フォーリーアーティスト"
+        },
+        "r_c196984117d7": {
+          "masculine": "フォーリー編集者",
+          "feminine": "フォーリー編集者",
+          "neutral": "フォーリー編集者"
+        },
+        "r_df6ebbcf6038": {
+          "masculine": "リレコーディングミキサー",
+          "feminine": "リレコーディングミキサー",
+          "neutral": "リレコーディングミキサー"
+        },
+        "r_f4776d32d356": {
+          "masculine": "プレイバックオペレーター",
+          "feminine": "プレイバックオペレーター",
+          "neutral": "プレイバックオペレーター"
+        },
+        "r_6abc8617e983": {
+          "masculine": "サウンドスーパーバイザー",
+          "feminine": "サウンドスーパーバイザー",
+          "neutral": "サウンドスーパーバイザー"
+        },
+        "r_0faba800cb95": {
+          "masculine": "音楽リレコーディングミキサー",
+          "feminine": "音楽リレコーディングミキサー",
+          "neutral": "音楽リレコーディングミキサー"
+        },
+        "r_a5fba4295f52": {
+          "masculine": "音楽録音",
+          "feminine": "音楽録音",
+          "neutral": "音楽録音"
+        },
+        "r_f2e629941a7a": {
+          "masculine": "ダビングミキサー",
+          "feminine": "ダビングミキサー",
+          "neutral": "ダビングミキサー"
+        },
+        "r_f73a9a076c95": {
+          "masculine": "音声解説ミキサー",
+          "feminine": "音声解説ミキサー",
+          "neutral": "音声解説ミキサー"
+        },
+        "r_9d583d9712f5": {
+          "masculine": "リレコーディングアシスタント",
+          "feminine": "リレコーディングアシスタント",
+          "neutral": "リレコーディングアシスタント"
+        },
+        "r_c4334fc01411": {
+          "masculine": "サウンドマスタリングエンジニア",
+          "feminine": "サウンドマスタリングエンジニア",
+          "neutral": "サウンドマスタリングエンジニア"
+        },
+        "r_6a7ea11d04ed": {
+          "masculine": "サウンドデザインアシスタント",
+          "feminine": "サウンドデザインアシスタント",
+          "neutral": "サウンドデザインアシスタント"
+        },
+        "r_539e45fc2e6d": {
+          "masculine": "監督ADR編集者",
+          "feminine": "監督ADR編集者",
+          "neutral": "監督ADR編集者"
+        },
+        "r_021e586f6845": {
+          "masculine": "監督ダイアログ＆ADR編集者",
+          "feminine": "監督ダイアログ＆ADR編集者",
+          "neutral": "監督ダイアログ＆ADR編集者"
+        },
+        "r_58f4b9fff63e": {
+          "masculine": "監督ダイアログ編集者",
+          "feminine": "監督ダイアログ編集者",
+          "neutral": "監督ダイアログ編集者"
+        },
+        "r_934c9dff31b6": {
+          "masculine": "監督SFX編集者",
+          "feminine": "監督SFX編集者",
+          "neutral": "監督SFX編集者"
+        },
+        "r_8ffed7b496e8": {
+          "masculine": "ダイアログ編集者（ポスト）",
+          "feminine": "ダイアログ編集者（ポスト）",
+          "neutral": "ダイアログ編集者（ポスト）"
+        },
+        "r_37f0cea40905": {
+          "masculine": "効果音編集者",
+          "feminine": "効果音編集者",
+          "neutral": "効果音編集者"
+        },
+        "r_e22d9239a33f": {
+          "masculine": "ボイスオーバー／ダビング編集者",
+          "feminine": "ボイスオーバー／ダビング編集者",
+          "neutral": "ボイスオーバー／ダビング編集者"
+        },
+        "r_cf36114f7a15": {
+          "masculine": "同期SFX編集者",
+          "feminine": "同期SFX編集者",
+          "neutral": "同期SFX編集者"
+        },
+        "r_7ca65f7a0064": {
+          "masculine": "ADR／同期編集者",
+          "feminine": "ADR／同期編集者",
+          "neutral": "ADR／同期編集者"
+        },
+        "r_944e077953d3": {
+          "masculine": "サウンド編集アシスタント",
+          "feminine": "サウンド編集アシスタント",
+          "neutral": "サウンド編集アシスタント"
+        },
+        "r_9d4ed0bf92ee": {
+          "masculine": "ADR／ダビングサウンドミキサー",
+          "feminine": "ADR／ダビングサウンドミキサー",
+          "neutral": "ADR／ダビングサウンドミキサー"
+        },
+        "r_b3e198ffbf29": {
+          "masculine": "同期SFXミキサー",
+          "feminine": "同期SFXミキサー",
+          "neutral": "同期SFXミキサー"
+        },
+        "r_c41c6bc414c3": {
+          "masculine": "ダビングプロダクションマネージャー",
+          "feminine": "ダビングプロダクションマネージャー",
+          "neutral": "ダビングプロダクションマネージャー"
+        },
+        "r_2b6bc11139d6": {
+          "masculine": "ADR／ダビングスーパーバイザー",
+          "feminine": "ADR／ダビングスーパーバイザー",
+          "neutral": "ADR／ダビングスーパーバイザー"
+        },
+        "r_6645c4583551": {
+          "masculine": "アシスタントADR／ダビングスーパーバイザー",
+          "feminine": "アシスタントADR／ダビングスーパーバイザー",
+          "neutral": "アシスタントADR／ダビングスーパーバイザー"
+        },
+        "r_2f0b82350b59": {
+          "masculine": "フォーリーアシスタント",
+          "feminine": "フォーリーアシスタント",
+          "neutral": "フォーリーアシスタント"
+        },
+        "r_a4171d6359fb": {
+          "masculine": "サウンドポストプロダクションインターン",
+          "feminine": "サウンドポストプロダクションインターン",
+          "neutral": "サウンドポストプロダクションインターン"
+        },
+        "r_9e4b74ecd5ff": {
+          "masculine": "技術スーパーバイザーADR",
+          "feminine": "技術スーパーバイザーADR",
+          "neutral": "技術スーパーバイザーADR"
+        }
+      },
+      "art": {
+        "r_ff29ce0e215c": {
+          "masculine": "プロダクションデザイナー",
+          "feminine": "プロダクションデザイナー",
+          "neutral": "プロダクションデザイナー"
+        },
+        "r_f3db07db6bf4": {
+          "masculine": "プロダクションデザイナー（ドイツ）",
+          "feminine": "プロダクションデザイナー（ドイツ）",
+          "neutral": "プロダクションデザイナー（ドイツ）"
+        },
+        "r_97a0a726b446": {
+          "masculine": "監督アートディレクター",
+          "feminine": "監督アートディレクター",
+          "neutral": "監督アートディレクター"
+        },
+        "r_3f274caf46f5": {
+          "masculine": "アートディレクター",
+          "feminine": "アートディレクター",
+          "neutral": "アートディレクター"
+        },
+        "r_7e93c2713534": {
+          "masculine": "スタンバイアートディレクター",
+          "feminine": "スタンバイアートディレクター",
+          "neutral": "スタンバイアートディレクター"
+        },
+        "r_891f7ee6a391": {
+          "masculine": "アシスタントアートディレクター",
+          "feminine": "アシスタントアートディレクター",
+          "neutral": "アシスタントアートディレクター"
+        },
+        "r_29765953355c": {
+          "masculine": "プロダクションデザインアシスタント",
+          "feminine": "プロダクションデザインアシスタント",
+          "neutral": "プロダクションデザインアシスタント"
+        },
+        "r_8543a5c61931": {
+          "masculine": "アート部門アシスタント",
+          "feminine": "アート部門アシスタント",
+          "neutral": "アート部門アシスタント"
+        },
+        "r_3ffad936200e": {
+          "masculine": "セットデザイナー",
+          "feminine": "セットデザイナー",
+          "neutral": "セットデザイナー"
+        },
+        "r_bce8305a5535": {
+          "masculine": "CADデザイナー",
+          "feminine": "CADデザイナー",
+          "neutral": "CADデザイナー"
+        },
+        "r_b5a1fa9969c7": {
+          "masculine": "コンセプトアーティスト",
+          "feminine": "コンセプトアーティスト",
+          "neutral": "コンセプトアーティスト"
+        },
+        "r_f1dbbb97b010": {
+          "masculine": "コンセプトアーティスト（アート部門）",
+          "feminine": "コンセプトアーティスト（アート部門）",
+          "neutral": "コンセプトアーティスト（アート部門）"
+        },
+        "r_57a4a106cbd6": {
+          "masculine": "イラストレーター",
+          "feminine": "イラストレーター",
+          "neutral": "イラストレーター"
+        },
+        "r_6aa3fecc3ba9": {
+          "masculine": "グラフィックデザイナー（セットグラフィックス）",
+          "feminine": "グラフィックデザイナー（セットグラフィックス）",
+          "neutral": "グラフィックデザイナー（セットグラフィックス）"
+        },
+        "r_6978775ad99b": {
+          "masculine": "リードグラフィックデザイナー",
+          "feminine": "リードグラフィックデザイナー",
+          "neutral": "リードグラフィックデザイナー"
+        },
+        "r_7534f951d040": {
+          "masculine": "グラフィックアーティスト",
+          "feminine": "グラフィックアーティスト",
+          "neutral": "グラフィックアーティスト"
+        },
+        "r_a8e10d0ecc47": {
+          "masculine": "ムードスカウト／レイアウター",
+          "feminine": "ムードスカウト／レイアウター",
+          "neutral": "ムードスカウト／レイアウター"
+        },
+        "r_a1ce9e299c8f": {
+          "masculine": "セットデコレーター",
+          "feminine": "セットデコレーター",
+          "neutral": "セットデコレーター"
+        },
+        "r_420521110dcc": {
+          "masculine": "セットデコレーションコーディネーター",
+          "feminine": "セットデコレーションコーディネーター",
+          "neutral": "セットデコレーションコーディネーター"
+        },
+        "r_d5b7a7d716a2": {
+          "masculine": "アシスタントセットデコレーター",
+          "feminine": "アシスタントセットデコレーター",
+          "neutral": "アシスタントセットデコレーター"
+        },
+        "r_d0964de45366": {
+          "masculine": "セットデコレーションバイヤー",
+          "feminine": "セットデコレーションバイヤー",
+          "neutral": "セットデコレーションバイヤー"
+        },
+        "r_10a8275fbc87": {
+          "masculine": "セットデコレーションストアマネージャー",
+          "feminine": "セットデコレーションストアマネージャー",
+          "neutral": "セットデコレーションストアマネージャー"
+        },
+        "r_1df861fbde16": {
+          "masculine": "アシスタントセットデココーディネーター",
+          "feminine": "アシスタントセットデココーディネーター",
+          "neutral": "アシスタントセットデココーディネーター"
+        },
+        "r_393242957f26": {
+          "masculine": "セットドレッサー",
+          "feminine": "セットドレッサー",
+          "neutral": "セットドレッサー"
+        },
+        "r_e3ce1061c0ff": {
+          "masculine": "リードマン",
+          "feminine": "リードマン",
+          "neutral": "リードマン"
+        },
+        "r_d588cad49b89": {
+          "masculine": "リードマン／ウーマンセットドレッサー",
+          "feminine": "リードマン／ウーマンセットドレッサー",
+          "neutral": "リードマン／ウーマンセットドレッサー"
+        },
+        "r_6cafa4dd814b": {
+          "masculine": "プロップスマスター",
+          "feminine": "プロップスマスター",
+          "neutral": "プロップスマスター"
+        },
+        "r_413221e86652": {
+          "masculine": "プロップスマスター",
+          "feminine": "プロップスマスター",
+          "neutral": "プロップスマスター"
+        },
+        "r_a1e9f4cffb70": {
+          "masculine": "屋外プロップスマスター",
+          "feminine": "屋外プロップスマスター",
+          "neutral": "屋外プロップスマスター"
+        },
+        "r_8f20bee45473": {
+          "masculine": "オンセットプロップス",
+          "feminine": "オンセットプロップス",
+          "neutral": "オンセットプロップス"
+        },
+        "r_7d553f96df87": {
+          "masculine": "オンセットプロップスマスター",
+          "feminine": "オンセットプロップスマスター",
+          "neutral": "オンセットプロップスマスター"
+        },
+        "r_bf9d71b6fdc2": {
+          "masculine": "スタンバイプロップス",
+          "feminine": "スタンバイプロップス",
+          "neutral": "スタンバイプロップス"
+        },
+        "r_a38576fafdab": {
+          "masculine": "プロップアシスタント",
+          "feminine": "プロップアシスタント",
+          "neutral": "プロップアシスタント"
+        },
+        "r_ea2b2fab38f4": {
+          "masculine": "プロップアシスタント",
+          "feminine": "プロップアシスタント",
+          "neutral": "プロップアシスタント"
+        },
+        "r_b685fb4dc943": {
+          "masculine": "屋外プロップアシスタント",
+          "feminine": "屋外プロップアシスタント",
+          "neutral": "屋外プロップアシスタント"
+        },
+        "r_7b9477ba5686": {
+          "masculine": "オンセットプロップアシスタント",
+          "feminine": "オンセットプロップアシスタント",
+          "neutral": "オンセットプロップアシスタント"
+        },
+        "r_541c87622274": {
+          "masculine": "プロップバイヤー",
+          "feminine": "プロップバイヤー",
+          "neutral": "プロップバイヤー"
+        },
+        "r_3c2dae1ec180": {
+          "masculine": "バイヤー（セットデコ）",
+          "feminine": "バイヤー（セットデコ）",
+          "neutral": "バイヤー（セットデコ）"
+        },
+        "r_c17d76240812": {
+          "masculine": "プロップストアマネージャー",
+          "feminine": "プロップストアマネージャー",
+          "neutral": "プロップストアマネージャー"
+        },
+        "r_6a373738f331": {
+          "masculine": "デジタルプロップデザイナー",
+          "feminine": "デジタルプロップデザイナー",
+          "neutral": "デジタルプロップデザイナー"
+        },
+        "r_404bfcb27b87": {
+          "masculine": "デジタルプロップスマスター",
+          "feminine": "デジタルプロップスマスター",
+          "neutral": "デジタルプロップスマスター"
+        },
+        "r_efdc51e3e8eb": {
+          "masculine": "プロップメーカー",
+          "feminine": "プロップメーカー",
+          "neutral": "プロップメーカー"
+        },
+        "r_30872cd93e0c": {
+          "masculine": "小道具デザイナー",
+          "feminine": "小道具デザイナー",
+          "neutral": "小道具デザイナー"
+        },
+        "r_264fc56ea7a5": {
+          "masculine": "武器アドバイザー／武器管理者",
+          "feminine": "武器アドバイザー／武器管理者",
+          "neutral": "武器アドバイザー／武器管理者"
+        },
+        "r_00f9e2afb019": {
+          "masculine": "小道具ランナー",
+          "feminine": "小道具ランナー",
+          "neutral": "小道具ランナー"
+        },
+        "r_ef64ec97e93f": {
+          "masculine": "小道具ペインター",
+          "feminine": "小道具ペインター",
+          "neutral": "小道具ペインター"
+        },
+        "r_8a17379f4cf2": {
+          "masculine": "小道具ドライバー",
+          "feminine": "小道具ドライバー",
+          "neutral": "小道具ドライバー"
+        },
+        "r_fb928031fe07": {
+          "masculine": "ピクチャーカー／車両コーディネーター",
+          "feminine": "ピクチャーカー／車両コーディネーター",
+          "neutral": "ピクチャーカー／車両コーディネーター"
+        },
+        "r_77928b37c49d": {
+          "masculine": "ピクチャーカー担当",
+          "feminine": "ピクチャーカー担当",
+          "neutral": "ピクチャーカー担当"
+        },
+        "r_115e6da0f002": {
+          "masculine": "実務電気技師",
+          "feminine": "実務電気技師",
+          "neutral": "実務電気技師"
+        },
+        "r_857a05036004": {
+          "masculine": "グリーンスマスター／グリーンマン",
+          "feminine": "グリーンスマスター／グリーンマン",
+          "neutral": "グリーンスマスター／グリーンマン"
+        },
+        "r_d8e3dea65e7b": {
+          "masculine": "グリーン／セットガーデナー",
+          "feminine": "グリーン／セットガーデナー",
+          "neutral": "グリーン／セットガーデナー"
+        },
+        "r_aa5ce508ee21": {
+          "masculine": "フローラルアーティスト",
+          "feminine": "フローラルアーティスト",
+          "neutral": "フローラルアーティスト"
+        },
+        "r_36b1709b4159": {
+          "masculine": "フードスタイリスト",
+          "feminine": "フードスタイリスト",
+          "neutral": "フードスタイリスト"
+        },
+        "r_40b095fdeb85": {
+          "masculine": "エアブラシアーティスト",
+          "feminine": "エアブラシアーティスト",
+          "neutral": "エアブラシアーティスト"
+        },
+        "r_afee4f58989a": {
+          "masculine": "シーニックアーティスト／美術画家",
+          "feminine": "シーニックアーティスト／美術画家",
+          "neutral": "シーニックアーティスト／美術画家"
+        },
+        "r_c056e02e39c4": {
+          "masculine": "シーニックペインター",
+          "feminine": "シーニックペインター",
+          "neutral": "シーニックペインター"
+        },
+        "r_e689709eac01": {
+          "masculine": "主任シーニックペインター",
+          "feminine": "主任シーニックペインター",
+          "neutral": "主任シーニックペインター"
+        },
+        "r_70a7586bb774": {
+          "masculine": "看板描き／レタリングアーティスト",
+          "feminine": "看板描き／レタリングアーティスト",
+          "neutral": "看板描き／レタリングアーティスト"
+        },
+        "r_12f20cf536a1": {
+          "masculine": "ペインター／シーニックアーティスト",
+          "feminine": "ペインター／シーニックアーティスト",
+          "neutral": "ペインター／シーニックアーティスト"
+        },
+        "r_dcf49adce47b": {
+          "masculine": "彫刻家／模型製作者",
+          "feminine": "彫刻家／模型製作者",
+          "neutral": "彫刻家／模型製作者"
+        },
+        "r_f4670c7a29a7": {
+          "masculine": "シーニックプラスター／彫刻家",
+          "feminine": "シーニックプラスター／彫刻家",
+          "neutral": "シーニックプラスター／彫刻家"
+        },
+        "r_5fc07d2f3030": {
+          "masculine": "模型製作者",
+          "feminine": "模型製作者",
+          "neutral": "模型製作者"
+        },
+        "r_f545a993cec8": {
+          "masculine": "ミニチュアスーパーバイザー",
+          "feminine": "ミニチュアスーパーバイザー",
+          "neutral": "ミニチュアスーパーバイザー"
+        },
+        "r_d3f5fd4b86c3": {
+          "masculine": "ミニチュアエフェクトスーパーバイザー",
+          "feminine": "ミニチュアエフェクトスーパーバイザー",
+          "neutral": "ミニチュアエフェクトスーパーバイザー"
+        },
+        "r_a6d3fd7eaada": {
+          "masculine": "建設マネージャー",
+          "feminine": "建設マネージャー",
+          "neutral": "建設マネージャー"
+        },
+        "r_ca83b607f08e": {
+          "masculine": "建設コーディネーター",
+          "feminine": "建設コーディネーター",
+          "neutral": "建設コーディネーター"
+        },
+        "r_fbcfd1e1839b": {
+          "masculine": "スタジオ／セット建設マネージャー",
+          "feminine": "スタジオ／セット建設マネージャー",
+          "neutral": "スタジオ／セット建設マネージャー"
+        },
+        "r_0231e128483a": {
+          "masculine": "セットビルダー／大工",
+          "feminine": "セットビルダー／大工",
+          "neutral": "セットビルダー／大工"
+        },
+        "r_62f07946c8f1": {
+          "masculine": "セット建設スタッフ",
+          "feminine": "セット建設スタッフ",
+          "neutral": "セット建設スタッフ"
+        },
+        "r_a3c94f3f3cd1": {
+          "masculine": "舞台／建設マスター",
+          "feminine": "舞台／建設マスター",
+          "neutral": "舞台／建設マスター"
+        },
+        "r_c606af121ce8": {
+          "masculine": "舞台技術者",
+          "feminine": "舞台技術者",
+          "neutral": "舞台技術者"
+        },
+        "r_2017ec503138": {
+          "masculine": "技術製図士",
+          "feminine": "技術製図士",
+          "neutral": "技術製図士"
+        },
+        "r_169af74d49f6": {
+          "masculine": "レンガ職人（セット）",
+          "feminine": "レンガ職人（セット）",
+          "neutral": "レンガ職人（セット）"
+        },
+        "r_578a92348ec6": {
+          "masculine": "金属加工職人",
+          "feminine": "金属加工職人",
+          "neutral": "金属加工職人"
+        },
+        "r_6c7b48200cb3": {
+          "masculine": "金属加工職人（セット）",
+          "feminine": "金属加工職人（セット）",
+          "neutral": "金属加工職人（セット）"
+        },
+        "r_e7f7da33c876": {
+          "masculine": "主任金属加工職人（セット）",
+          "feminine": "主任金属加工職人（セット）",
+          "neutral": "主任金属加工職人（セット）"
+        },
+        "r_027c0b61577d": {
+          "masculine": "スタッコアーティスト（セット）",
+          "feminine": "スタッコアーティスト（セット）",
+          "neutral": "スタッコアーティスト（セット）"
+        },
+        "r_8d5fe63edbd3": {
+          "masculine": "装飾職人",
+          "feminine": "装飾職人",
+          "neutral": "装飾職人"
+        },
+        "r_61ab14bcf2c6": {
+          "masculine": "大工／木工職人（セット）",
+          "feminine": "大工／木工職人（セット）",
+          "neutral": "大工／木工職人（セット）"
+        },
+        "r_3addd9ac0457": {
+          "masculine": "旋盤工／木工職人（セット）",
+          "feminine": "旋盤工／木工職人（セット）",
+          "neutral": "旋盤工／木工職人（セット）"
+        },
+        "r_be99bdf8e0ab": {
+          "masculine": "美術部コーディネーター",
+          "feminine": "美術部コーディネーター",
+          "neutral": "美術部コーディネーター"
+        },
+        "r_9187325e0d84": {
+          "masculine": "アシスタント美術部コーディネーター",
+          "feminine": "アシスタント美術部コーディネーター",
+          "neutral": "アシスタント美術部コーディネーター"
+        },
+        "r_a8af82f5e937": {
+          "masculine": "美術部ランナー",
+          "feminine": "美術部ランナー",
+          "neutral": "美術部ランナー"
+        },
+        "r_8310307922eb": {
+          "masculine": "美術部研修生",
+          "feminine": "美術部研修生",
+          "neutral": "美術部研修生"
+        },
+        "r_f7d87853929b": {
+          "masculine": "セット装飾ドライバー",
+          "feminine": "セット装飾ドライバー",
+          "neutral": "セット装飾ドライバー"
+        },
+        "r_71506d96f350": {
+          "masculine": "グラフィックデザイナー（美術部）",
+          "feminine": "グラフィックデザイナー（美術部）",
+          "neutral": "グラフィックデザイナー（美術部）"
+        },
+        "r_dd224ea66364": {
+          "masculine": "プロダクトケア",
+          "feminine": "プロダクトケア",
+          "neutral": "プロダクトケア"
+        },
+        "r_b2e24af2a895": {
+          "masculine": "アートワークアーティスト",
+          "feminine": "アートワークアーティスト",
+          "neutral": "アートワークアーティスト"
+        },
+        "r_c399668f6f57": {
+          "masculine": "コンピューター／ビデオプレイバックスーパーバイザー",
+          "feminine": "コンピューター／ビデオプレイバックスーパーバイザー",
+          "neutral": "コンピューター／ビデオプレイバックスーパーバイザー"
+        },
+        "r_d278f8dea5ee": {
+          "masculine": "セットビルダー／建設",
+          "feminine": "セットビルダー／建設",
+          "neutral": "セットビルダー／建設"
+        },
+        "r_ed52a3596ba0": {
+          "masculine": "オンセット建設スタッフ",
+          "feminine": "オンセット建設スタッフ",
+          "neutral": "オンセット建設スタッフ"
+        },
+        "r_e3f39e455941": {
+          "masculine": "建設ランナー",
+          "feminine": "建設ランナー",
+          "neutral": "建設ランナー"
+        },
+        "r_74a60171830a": {
+          "masculine": "水中セット建設",
+          "feminine": "水中セット建設",
+          "neutral": "水中セット建設"
+        },
+        "r_18c785ac7bd8": {
+          "masculine": "リギング／特殊建設",
+          "feminine": "リギング／特殊建設",
+          "neutral": "リギング／特殊建設"
+        },
+        "r_8f15fc164b86": {
+          "masculine": "技術製図士アシスタント",
+          "feminine": "技術製図士アシスタント",
+          "neutral": "技術製図士アシスタント"
+        },
+        "r_7e3c819b39ed": {
+          "masculine": "主任スタッコアーティスト（セット）",
+          "feminine": "主任スタッコアーティスト（セット）",
+          "neutral": "主任スタッコアーティスト（セット）"
+        },
+        "r_24a7497a9f06": {
+          "masculine": "セットアップホルスター",
+          "feminine": "セットアップホルスター",
+          "neutral": "セットアップホルスター"
+        },
+        "r_a279ae7e16ec": {
+          "masculine": "主任セットアップホルスター",
+          "feminine": "主任セットアップホルスター",
+          "neutral": "主任セットアップホルスター"
+        },
+        "r_0f2d76b6cc82": {
+          "masculine": "主任大工（セット）",
+          "feminine": "主任大工（セット）",
+          "neutral": "主任大工（セット）"
+        },
+        "r_08876b0452b5": {
+          "masculine": "美術部インターン",
+          "feminine": "美術部インターン",
+          "neutral": "美術部インターン"
+        }
+      },
+      "kostuem": {
+        "r_cfc0491e1daf": {
+          "masculine": "衣装デザイナー",
+          "feminine": "衣装デザイナー",
+          "neutral": "衣装デザイナー"
+        },
+        "r_acbff2b1675d": {
+          "masculine": "衣装スーパーバイザー",
+          "feminine": "衣装スーパーバイザー",
+          "neutral": "衣装スーパーバイザー"
+        },
+        "r_4e5a29f37fde": {
+          "masculine": "アシスタント衣装スーパーバイザー",
+          "feminine": "アシスタント衣装スーパーバイザー",
+          "neutral": "アシスタント衣装スーパーバイザー"
+        },
+        "r_9dacdd987a87": {
+          "masculine": "衣装コーディネーター",
+          "feminine": "衣装コーディネーター",
+          "neutral": "衣装コーディネーター"
+        },
+        "r_3ea2819cc8c4": {
+          "masculine": "アシスタント衣装コーディネーター",
+          "feminine": "アシスタント衣装コーディネーター",
+          "neutral": "アシスタント衣装コーディネーター"
+        },
+        "r_3684af682bde": {
+          "masculine": "アシスタント衣装デザイナー",
+          "feminine": "アシスタント衣装デザイナー",
+          "neutral": "アシスタント衣装デザイナー"
+        },
+        "r_bca9201a3794": {
+          "masculine": "第2アシスタント衣装デザイナー",
+          "feminine": "第2アシスタント衣装デザイナー",
+          "neutral": "第2アシスタント衣装デザイナー"
+        },
+        "r_570a76c15c34": {
+          "masculine": "第3アシスタント衣装デザイナー",
+          "feminine": "第3アシスタント衣装デザイナー",
+          "neutral": "第3アシスタント衣装デザイナー"
+        },
+        "r_75358a18f698": {
+          "masculine": "キーコスチューマー",
+          "feminine": "キーコスチューマー",
+          "neutral": "キーコスチューマー"
+        },
+        "r_df59c1f51566": {
+          "masculine": "セットコスチューマー／ワードローブアテンダント",
+          "feminine": "セットコスチューマー／ワードローブアテンダント",
+          "neutral": "セットコスチューマー／ワードローブアテンダント"
+        },
+        "r_7d1eb3e51b50": {
+          "masculine": "追加セットコスチューマー",
+          "feminine": "追加セットコスチューマー",
+          "neutral": "追加セットコスチューマー"
+        },
+        "r_aa38c8f5acdd": {
+          "masculine": "セット衣装アシスタント",
+          "feminine": "セット衣装アシスタント",
+          "neutral": "セット衣装アシスタント"
+        },
+        "r_85a93499fa51": {
+          "masculine": "群衆衣装スーパーバイザー",
+          "feminine": "群衆衣装スーパーバイザー",
+          "neutral": "群衆衣装スーパーバイザー"
+        },
+        "r_73f373881e68": {
+          "masculine": "群衆フィッター",
+          "feminine": "群衆フィッター",
+          "neutral": "群衆フィッター"
+        },
+        "r_82daef37fafd": {
+          "masculine": "トラックコスチューマー",
+          "feminine": "トラックコスチューマー",
+          "neutral": "トラックコスチューマー"
+        },
+        "r_40f30fffbd6a": {
+          "masculine": "衣装バイヤー",
+          "feminine": "衣装バイヤー",
+          "neutral": "衣装バイヤー"
+        },
+        "r_60a2042cfa65": {
+          "masculine": "衣装会計担当",
+          "feminine": "衣装会計担当",
+          "neutral": "衣装会計担当"
+        },
+        "r_6ece4b3c2f60": {
+          "masculine": "ワードローブマスター",
+          "feminine": "ワードローブマスター",
+          "neutral": "ワードローブマスター"
+        },
+        "r_bb614a4f62e2": {
+          "masculine": "衣装アシスタント",
+          "feminine": "衣装アシスタント",
+          "neutral": "衣装アシスタント"
+        },
+        "r_86f8b66926fc": {
+          "masculine": "衣装研修生",
+          "feminine": "衣装研修生",
+          "neutral": "衣装研修生"
+        },
+        "r_272717911d79": {
+          "masculine": "仕立て職人",
+          "feminine": "仕立て職人",
+          "neutral": "仕立て職人"
+        },
+        "r_3a35662b53a3": {
+          "masculine": "ミシン工",
+          "feminine": "ミシン工",
+          "neutral": "ミシン工"
+        },
+        "r_298c04a0eec5": {
+          "masculine": "テキスタイルアーティスト",
+          "feminine": "テキスタイルアーティスト",
+          "neutral": "テキスタイルアーティスト"
+        },
+        "r_2a6b1e3320f5": {
+          "masculine": "衣装製作者",
+          "feminine": "衣装製作者",
+          "neutral": "衣装製作者"
+        },
+        "r_066dc1f269bb": {
+          "masculine": "衣装小道具製作者",
+          "feminine": "衣装小道具製作者",
+          "neutral": "衣装小道具製作者"
+        },
+        "r_83db0e1a7bff": {
+          "masculine": "ディレクトリス",
+          "feminine": "ディレクトリス",
+          "neutral": "ディレクトリス"
+        },
+        "r_fc8d26a01b37": {
+          "masculine": "婦人仕立て職人（オーダーメイド）",
+          "feminine": "婦人仕立て職人（オーダーメイド）",
+          "neutral": "婦人仕立て職人（オーダーメイド）"
+        },
+        "r_9aaa9c423455": {
+          "masculine": "紳士仕立て職人（オーダーメイド）",
+          "feminine": "紳士仕立て職人（オーダーメイド）",
+          "neutral": "紳士仕立て職人（オーダーメイド）"
+        },
+        "r_975bb2c38b93": {
+          "masculine": "帽子職人",
+          "feminine": "帽子職人",
+          "neutral": "帽子職人"
+        },
+        "r_e5cb00d76add": {
+          "masculine": "コルセット製作者",
+          "feminine": "コルセット製作者",
+          "neutral": "コルセット製作者"
+        },
+        "r_f573123c66c5": {
+          "masculine": "衣装イラストレーター",
+          "feminine": "衣装イラストレーター",
+          "neutral": "衣装イラストレーター"
+        },
+        "r_3218fd13d59c": {
+          "masculine": "衣装ペインター／染色師",
+          "feminine": "衣装ペインター／染色師",
+          "neutral": "衣装ペインター／染色師"
+        },
+        "r_f8c4b94e93de": {
+          "masculine": "衣装エイジングアーティスト",
+          "feminine": "衣装エイジングアーティスト",
+          "neutral": "衣装エイジングアーティスト"
+        },
+        "r_25bf82085577": {
+          "masculine": "衣装刺繍師",
+          "feminine": "衣装刺繍師",
+          "neutral": "衣装刺繍師"
+        },
+        "r_4bd9dd09da1d": {
+          "masculine": "衣装リサーチャー",
+          "feminine": "衣装リサーチャー",
+          "neutral": "衣装リサーチャー"
+        },
+        "r_2efd6bda8664": {
+          "masculine": "衣装ドライバー",
+          "feminine": "衣装ドライバー",
+          "neutral": "衣装ドライバー"
+        },
+        "r_a723a074986b": {
+          "masculine": "ブレイクダウンアーティスト（エイジング／ダメージ加工）",
+          "feminine": "ブレイクダウンアーティスト（エイジング／ダメージ加工）",
+          "neutral": "ブレイクダウンアーティスト（エイジング／ダメージ加工）"
+        },
+        "r_ac01a53c578c": {
+          "masculine": "特殊効果衣装",
+          "feminine": "特殊効果衣装",
+          "neutral": "特殊効果衣装"
+        },
+        "r_bbc01e9dad81": {
+          "masculine": "スタイリスト／スタイリングアシスタント",
+          "feminine": "スタイリスト／スタイリングアシスタント",
+          "neutral": "スタイリスト／スタイリングアシスタント"
+        },
+        "r_0cf394ee7640": {
+          "masculine": "衣装デザイナー（デザイン）",
+          "feminine": "衣装デザイナー（デザイン）",
+          "neutral": "衣装デザイナー（デザイン）"
+        },
+        "r_6e84493aa620": {
+          "masculine": "衣装コンサルタント",
+          "feminine": "衣装コンサルタント",
+          "neutral": "衣装コンサルタント"
+        },
+        "r_7673a5020856": {
+          "masculine": "衣装デザインアシスタント",
+          "feminine": "衣装デザインアシスタント",
+          "neutral": "衣装デザインアシスタント"
+        },
+        "r_1ca2128245c1": {
+          "masculine": "衣装部コーディネーター",
+          "feminine": "衣装部コーディネーター",
+          "neutral": "衣装部コーディネーター"
+        },
+        "r_f707bb1f5992": {
+          "masculine": "セット衣装担当",
+          "feminine": "セット衣装担当",
+          "neutral": "セット衣装担当"
+        },
+        "r_cc15942423ce": {
+          "masculine": "セット衣装アシスタント",
+          "feminine": "セット衣装アシスタント",
+          "neutral": "セット衣装アシスタント"
+        },
+        "r_fa17db9ddd73": {
+          "masculine": "スタイリスト",
+          "feminine": "スタイリスト",
+          "neutral": "スタイリスト"
+        },
+        "r_510b1830a8a9": {
+          "masculine": "スタイリングアシスタント",
+          "feminine": "スタイリングアシスタント",
+          "neutral": "スタイリングアシスタント"
+        },
+        "r_cc5427b5207e": {
+          "masculine": "ワードローブマスター",
+          "feminine": "ワードローブマスター",
+          "neutral": "ワードローブマスター"
+        },
+        "r_51e4b1b69e51": {
+          "masculine": "婦人仕立て職人",
+          "feminine": "婦人仕立て職人",
+          "neutral": "婦人仕立て職人"
+        },
+        "r_c90f0f14aa1d": {
+          "masculine": "紳士仕立て職人",
+          "feminine": "紳士仕立て職人",
+          "neutral": "紳士仕立て職人"
+        },
+        "r_b02e861df06e": {
+          "masculine": "帽子職人／ハットメーカー",
+          "feminine": "帽子職人／ハットメーカー",
+          "neutral": "帽子職人／ハットメーカー"
+        },
+        "r_f4d2f92c7063": {
+          "masculine": "コルセット製作者",
+          "feminine": "コルセット製作者",
+          "neutral": "コルセット製作者"
+        },
+        "r_60b06eb1a3e5": {
+          "masculine": "ワードローブスーパーバイザー",
+          "feminine": "ワードローブスーパーバイザー",
+          "neutral": "ワードローブスーパーバイザー"
+        },
+        "r_b57d7945c2e1": {
+          "masculine": "衣装アシスタント",
+          "feminine": "衣装アシスタント",
+          "neutral": "衣装アシスタント"
+        },
+        "r_2ac825cfa903": {
+          "masculine": "仕立て職人",
+          "feminine": "仕立て職人",
+          "neutral": "仕立て職人"
+        },
+        "r_f5c79a825c6d": {
+          "masculine": "衣装ドライバー",
+          "feminine": "衣装ドライバー",
+          "neutral": "衣装ドライバー"
+        },
+        "r_d964234f1385": {
+          "masculine": "縫製工／裁縫師",
+          "feminine": "縫製工／裁縫師",
+          "neutral": "縫製工／裁縫師"
+        },
+        "r_6371bcd4467e": {
+          "masculine": "衣装エイジング／ブレイクダウンアーティスト",
+          "feminine": "衣装エイジング／ブレイクダウンアーティスト",
+          "neutral": "衣装エイジング／ブレイクダウンアーティスト"
+        },
+        "r_93cc3465aeac": {
+          "masculine": "衣装ペインター／染色師",
+          "feminine": "衣装ペインター／染色師",
+          "neutral": "衣装ペインター／染色師"
+        },
+        "r_9f631f727b98": {
+          "masculine": "衣装刺繍師",
+          "feminine": "衣装刺繍師",
+          "neutral": "衣装刺繍師"
+        },
+        "r_fd593b68c6bd": {
+          "masculine": "衣装イラストレーター",
+          "feminine": "衣装イラストレーター",
+          "neutral": "衣装イラストレーター"
+        },
+        "r_52cc391775b8": {
+          "masculine": "衣装デザインインターン",
+          "feminine": "衣装デザインインターン",
+          "neutral": "衣装デザインインターン"
+        }
+      },
+      "maske": {
+        "r_2cecb5bef109": {
+          "masculine": "メイク＆ヘア統括",
+          "feminine": "メイク＆ヘア統括",
+          "neutral": "メイク＆ヘア統括"
+        },
+        "r_8c46abf33a4b": {
+          "masculine": "ヘアデザイナー",
+          "feminine": "ヘアデザイナー",
+          "neutral": "ヘアデザイナー"
+        },
+        "r_afd55563be09": {
+          "masculine": "ヘア＆メイクデザイナー",
+          "feminine": "ヘア＆メイクデザイナー",
+          "neutral": "ヘア＆メイクデザイナー"
+        },
+        "r_0d2723e6a8cc": {
+          "masculine": "メイクデザイナー",
+          "feminine": "メイクデザイナー",
+          "neutral": "メイクデザイナー"
+        },
+        "r_b73ceeda53dd": {
+          "masculine": "ヘア＆メイクスーパーバイザー",
+          "feminine": "ヘア＆メイクスーパーバイザー",
+          "neutral": "ヘア＆メイクスーパーバイザー"
+        },
+        "r_913e5cf46a02": {
+          "masculine": "キー・メイクアップアーティスト",
+          "feminine": "キー・メイクアップアーティスト",
+          "neutral": "キー・メイクアップアーティスト"
+        },
+        "r_495a42f74fbb": {
+          "masculine": "キー・ヘアスタイリスト",
+          "feminine": "キー・ヘアスタイリスト",
+          "neutral": "キー・ヘアスタイリスト"
+        },
+        "r_ff414fc1a4e8": {
+          "masculine": "メイクアップアーティスト",
+          "feminine": "メイクアップアーティスト",
+          "neutral": "メイクアップアーティスト"
+        },
+        "r_ace166547405": {
+          "masculine": "追加メイクアップアーティスト",
+          "feminine": "追加メイクアップアーティスト",
+          "neutral": "追加メイクアップアーティスト"
+        },
+        "r_96cb48e2539d": {
+          "masculine": "ヘアスタイリスト",
+          "feminine": "ヘアスタイリスト",
+          "neutral": "ヘアスタイリスト"
+        },
+        "r_3a06bbd5516b": {
+          "masculine": "追加ヘアスタイリスト",
+          "feminine": "追加ヘアスタイリスト",
+          "neutral": "追加ヘアスタイリスト"
+        },
+        "r_a8a061642ea1": {
+          "masculine": "メイク部門長",
+          "feminine": "メイク部門長",
+          "neutral": "メイク部門長"
+        },
+        "r_988255c043c0": {
+          "masculine": "ボディメイク",
+          "feminine": "ボディメイク",
+          "neutral": "ボディメイク"
+        },
+        "r_62302b472d3b": {
+          "masculine": "追加メイクアップアーティスト",
+          "feminine": "追加メイクアップアーティスト",
+          "neutral": "追加メイクアップアーティスト"
+        },
+        "r_de6fbe18e529": {
+          "masculine": "メイクアシスタント",
+          "feminine": "メイクアシスタント",
+          "neutral": "メイクアシスタント"
+        },
+        "r_89708da23c7a": {
+          "masculine": "ウィッグメーカー",
+          "feminine": "ウィッグメーカー",
+          "neutral": "ウィッグメーカー"
+        },
+        "r_eb0f745569de": {
+          "masculine": "プロステティクスアーティスト",
+          "feminine": "プロステティクスアーティスト",
+          "neutral": "プロステティクスアーティスト"
+        },
+        "r_bc667775a067": {
+          "masculine": "特殊効果メイク",
+          "feminine": "特殊効果メイク",
+          "neutral": "特殊効果メイク"
+        },
+        "r_a27c177f51ef": {
+          "masculine": "群衆ヘア＆メイクスーパーバイザー",
+          "feminine": "群衆ヘア＆メイクスーパーバイザー",
+          "neutral": "群衆ヘア＆メイクスーパーバイザー"
+        },
+        "r_e46c728a4398": {
+          "masculine": "メイク研修生",
+          "feminine": "メイク研修生",
+          "neutral": "メイク研修生"
+        },
+        "r_3bd74d7ca372": {
+          "masculine": "キー・メイクアップアーティスト",
+          "feminine": "キー・メイクアップアーティスト",
+          "neutral": "キー・メイクアップアーティスト"
+        },
+        "r_1dbe2290254a": {
+          "masculine": "メイク部門長",
+          "feminine": "メイク部門長",
+          "neutral": "メイク部門長"
+        },
+        "r_3e08c4bedcc0": {
+          "masculine": "ボディメイクアップアーティスト",
+          "feminine": "ボディメイクアップアーティスト",
+          "neutral": "ボディメイクアップアーティスト"
+        },
+        "r_24c9ee41124f": {
+          "masculine": "追加メイクアップアーティスト",
+          "feminine": "追加メイクアップアーティスト",
+          "neutral": "追加メイクアップアーティスト"
+        },
+        "r_6373cbbea77f": {
+          "masculine": "ウィッグメーカー",
+          "feminine": "ウィッグメーカー",
+          "neutral": "ウィッグメーカー"
+        },
+        "r_e9a07f599b31": {
+          "masculine": "メイクインターン",
+          "feminine": "メイクインターン",
+          "neutral": "メイクインターン"
+        }
+      },
+      "post": {
+        "r_f88d95239ea1": {
+          "masculine": "ポストプロダクションプロデューサー",
+          "feminine": "ポストプロダクションプロデューサー",
+          "neutral": "ポストプロダクションプロデューサー"
+        },
+        "r_4284177c72b3": {
+          "masculine": "ポストプロダクションスーパーバイザー",
+          "feminine": "ポストプロダクションスーパーバイザー",
+          "neutral": "ポストプロダクションスーパーバイザー"
+        },
+        "r_c2fb80f3e981": {
+          "masculine": "ポストプロダクションマネージャー",
+          "feminine": "ポストプロダクションマネージャー",
+          "neutral": "ポストプロダクションマネージャー"
+        },
+        "r_78b6f4ddb08c": {
+          "masculine": "ポストプロダクションコーディネーター",
+          "feminine": "ポストプロダクションコーディネーター",
+          "neutral": "ポストプロダクションコーディネーター"
+        },
+        "r_0bb7e59012ae": {
+          "masculine": "ポストプロダクションスケジューラー",
+          "feminine": "ポストプロダクションスケジューラー",
+          "neutral": "ポストプロダクションスケジューラー"
+        },
+        "r_b54fb6f974fa": {
+          "masculine": "アシスタントポストプロダクションスーパーバイザー",
+          "feminine": "アシスタントポストプロダクションスーパーバイザー",
+          "neutral": "アシスタントポストプロダクションスーパーバイザー"
+        },
+        "r_fae43b642354": {
+          "masculine": "デリバリーマネージャー／スーパーバイザー",
+          "feminine": "デリバリーマネージャー／スーパーバイザー",
+          "neutral": "デリバリーマネージャー／スーパーバイザー"
+        },
+        "r_54b281a42495": {
+          "masculine": "編集者",
+          "feminine": "編集者",
+          "neutral": "編集者"
+        },
+        "r_eb67aee95450": {
+          "masculine": "フィルムエディター",
+          "feminine": "フィルムエディター",
+          "neutral": "フィルムエディター"
+        },
+        "r_332deef8530f": {
+          "masculine": "追加編集者",
+          "feminine": "追加編集者",
+          "neutral": "追加編集者"
+        },
+        "r_4b8538db6e6e": {
+          "masculine": "ジュニアエディター",
+          "feminine": "ジュニアエディター",
+          "neutral": "ジュニアエディター"
+        },
+        "r_a000c69c93cd": {
+          "masculine": "ファーストアシスタントエディター",
+          "feminine": "ファーストアシスタントエディター",
+          "neutral": "ファーストアシスタントエディター"
+        },
+        "r_fb53d3bb0ca0": {
+          "masculine": "編集アシスタント",
+          "feminine": "編集アシスタント",
+          "neutral": "編集アシスタント"
+        },
+        "r_58fb452bb25d": {
+          "masculine": "セカンドアシスタントエディター",
+          "feminine": "セカンドアシスタントエディター",
+          "neutral": "セカンドアシスタントエディター"
+        },
+        "r_e73f1067c3d0": {
+          "masculine": "2nd編集アシスタント",
+          "feminine": "2nd編集アシスタント",
+          "neutral": "2nd編集アシスタント"
+        },
+        "r_f40a64b53f4e": {
+          "masculine": "3rd編集アシスタント",
+          "feminine": "3rd編集アシスタント",
+          "neutral": "3rd編集アシスタント"
+        },
+        "r_f034db9da000": {
+          "masculine": "編集ドラマトゥルク",
+          "feminine": "編集ドラマトゥルク",
+          "neutral": "編集ドラマトゥルク"
+        },
+        "r_9d8fc1953afd": {
+          "masculine": "VFXエディター",
+          "feminine": "VFXエディター",
+          "neutral": "VFXエディター"
+        },
+        "r_6742bca7f725": {
+          "masculine": "トレーラーエディター",
+          "feminine": "トレーラーエディター",
+          "neutral": "トレーラーエディター"
+        },
+        "r_0088f1d1581d": {
+          "masculine": "デイリーズエディター",
+          "feminine": "デイリーズエディター",
+          "neutral": "デイリーズエディター"
+        },
+        "r_855df6fe84d9": {
+          "masculine": "シンクアシスタント",
+          "feminine": "シンクアシスタント",
+          "neutral": "シンクアシスタント"
+        },
+        "r_76fe5605aea7": {
+          "masculine": "Avidオペレーター",
+          "feminine": "Avidオペレーター",
+          "neutral": "Avidオペレーター"
+        },
+        "r_9a37f1a2f07c": {
+          "masculine": "Final Cutオペレーター",
+          "feminine": "Final Cutオペレーター",
+          "neutral": "Final Cutオペレーター"
+        },
+        "r_5c291075de55": {
+          "masculine": "カラーリスト／DI",
+          "feminine": "カラーリスト／DI",
+          "neutral": "カラーリスト／DI"
+        },
+        "r_ee3d75537a1f": {
+          "masculine": "オンラインエディター",
+          "feminine": "オンラインエディター",
+          "neutral": "オンラインエディター"
+        },
+        "r_24e3087423e1": {
+          "masculine": "フィニッシングアーティスト",
+          "feminine": "フィニッシングアーティスト",
+          "neutral": "フィニッシングアーティスト"
+        },
+        "r_1b9c5df34287": {
+          "masculine": "スクリーンデザイナー",
+          "feminine": "スクリーンデザイナー",
+          "neutral": "スクリーンデザイナー"
+        },
+        "r_0c866fbdd1b9": {
+          "masculine": "タイトルデザイナー",
+          "feminine": "タイトルデザイナー",
+          "neutral": "タイトルデザイナー"
+        },
+        "r_cac32c0c1a16": {
+          "masculine": "DCPテクニシャン",
+          "feminine": "DCPテクニシャン",
+          "neutral": "DCPテクニシャン"
+        },
+        "r_3bf9436831af": {
+          "masculine": "フィルムスキャンオペレーター",
+          "feminine": "フィルムスキャンオペレーター",
+          "neutral": "フィルムスキャンオペレーター"
+        },
+        "r_0c4887e0a1b6": {
+          "masculine": "フィルムスキャンスーパーバイザー",
+          "feminine": "フィルムスキャンスーパーバイザー",
+          "neutral": "フィルムスキャンスーパーバイザー"
+        },
+        "r_85f36a10ca63": {
+          "masculine": "VFXスーパーバイザー",
+          "feminine": "VFXスーパーバイザー",
+          "neutral": "VFXスーパーバイザー"
+        },
+        "r_3690883b97f2": {
+          "masculine": "VFXプロデューサー",
+          "feminine": "VFXプロデューサー",
+          "neutral": "VFXプロデューサー"
+        },
+        "r_01122a78805d": {
+          "masculine": "VFXコーディネーター",
+          "feminine": "VFXコーディネーター",
+          "neutral": "VFXコーディネーター"
+        },
+        "r_4c1b3c0e7030": {
+          "masculine": "VFXプロダクションマネージャー",
+          "feminine": "VFXプロダクションマネージャー",
+          "neutral": "VFXプロダクションマネージャー"
+        },
+        "r_b11b0566c205": {
+          "masculine": "VFXアウトソースプロデューサー",
+          "feminine": "VFXアウトソースプロデューサー",
+          "neutral": "VFXアウトソースプロデューサー"
+        },
+        "r_061d09311a06": {
+          "masculine": "アシスタントVFXプロデューサー",
+          "feminine": "アシスタントVFXプロデューサー",
+          "neutral": "アシスタントVFXプロデューサー"
+        },
+        "r_c20adc0c544f": {
+          "masculine": "VFXアニメーションスーパーバイザー",
+          "feminine": "VFXアニメーションスーパーバイザー",
+          "neutral": "VFXアニメーションスーパーバイザー"
+        },
+        "r_ef84bdb88ead": {
+          "masculine": "VRプロデューサー",
+          "feminine": "VRプロデューサー",
+          "neutral": "VRプロデューサー"
+        },
+        "r_33a9c6da17ea": {
+          "masculine": "コンポジター",
+          "feminine": "コンポジター",
+          "neutral": "コンポジター"
+        },
+        "r_aca1c9874a93": {
+          "masculine": "コンポジティングスーパーバイザー",
+          "feminine": "コンポジティングスーパーバイザー",
+          "neutral": "コンポジティングスーパーバイザー"
+        },
+        "r_74803d65a47d": {
+          "masculine": "デジタルコンポジター",
+          "feminine": "デジタルコンポジター",
+          "neutral": "デジタルコンポジター"
+        },
+        "r_a61ab2d8897e": {
+          "masculine": "デジタルエフェクトスーパーバイザー",
+          "feminine": "デジタルエフェクトスーパーバイザー",
+          "neutral": "デジタルエフェクトスーパーバイザー"
+        },
+        "r_41f1fab43430": {
+          "masculine": "デジタルエフェクトデザイナー",
+          "feminine": "デジタルエフェクトデザイナー",
+          "neutral": "デジタルエフェクトデザイナー"
+        },
+        "r_09a4c7b8c909": {
+          "masculine": "デジタルマットペインター",
+          "feminine": "デジタルマットペインター",
+          "neutral": "デジタルマットペインター"
+        },
+        "r_1df80b2df510": {
+          "masculine": "2Dアーティスト",
+          "feminine": "2Dアーティスト",
+          "neutral": "2Dアーティスト"
+        },
+        "r_c5222c873ae5": {
+          "masculine": "3Dアーティスト",
+          "feminine": "3Dアーティスト",
+          "neutral": "3Dアーティスト"
+        },
+        "r_f1d016eba483": {
+          "masculine": "ライティングアーティスト（CG）",
+          "feminine": "ライティングアーティスト（CG）",
+          "neutral": "ライティングアーティスト（CG）"
+        },
+        "r_1374d004f892": {
+          "masculine": "テクスチャアーティスト",
+          "feminine": "テクスチャアーティスト",
+          "neutral": "テクスチャアーティスト"
+        },
+        "r_ca0826d47a19": {
+          "masculine": "マッチムーブアーティスト",
+          "feminine": "マッチムーブアーティスト",
+          "neutral": "マッチムーブアーティスト"
+        },
+        "r_272f028d80c7": {
+          "masculine": "ロトアーティスト",
+          "feminine": "ロトアーティスト",
+          "neutral": "ロトアーティスト"
+        },
+        "r_fb2a18a56ba5": {
+          "masculine": "FXアーティスト",
+          "feminine": "FXアーティスト",
+          "neutral": "FXアーティスト"
+        },
+        "r_89c1660cb356": {
+          "masculine": "アニメーター",
+          "feminine": "アニメーター",
+          "neutral": "アニメーター"
+        },
+        "r_2efa5e8c0d5f": {
+          "masculine": "モーションデザイナー",
+          "feminine": "モーションデザイナー",
+          "neutral": "モーションデザイナー"
+        },
+        "r_c2053cb7660f": {
+          "masculine": "キャラクターアニメーター",
+          "feminine": "キャラクターアニメーター",
+          "neutral": "キャラクターアニメーター"
+        },
+        "r_247d43bdfb47": {
+          "masculine": "ポストプロダクションアシスタント",
+          "feminine": "ポストプロダクションアシスタント",
+          "neutral": "ポストプロダクションアシスタント"
+        },
+        "r_e2802de21986": {
+          "masculine": "ポストプロダクションテクニシャン",
+          "feminine": "ポストプロダクションテクニシャン",
+          "neutral": "ポストプロダクションテクニシャン"
+        },
+        "r_1f9c7a9f75a8": {
+          "masculine": "編集インターン",
+          "feminine": "編集インターン",
+          "neutral": "編集インターン"
+        },
+        "r_bf7027763437": {
+          "masculine": "ポストプロダクションコーディネーター",
+          "feminine": "ポストプロダクションコーディネーター",
+          "neutral": "ポストプロダクションコーディネーター"
+        },
+        "r_fc841e10fe4f": {
+          "masculine": "ポストスーパーバイザーアシスタント",
+          "feminine": "ポストスーパーバイザーアシスタント",
+          "neutral": "ポストスーパーバイザーアシスタント"
+        },
+        "r_a79df89d104c": {
+          "masculine": "VFXアーティスト／コンポジター",
+          "feminine": "VFXアーティスト／コンポジター",
+          "neutral": "VFXアーティスト／コンポジター"
+        },
+        "r_2a16dc4c4550": {
+          "masculine": "サウンドデザイナー",
+          "feminine": "サウンドデザイナー",
+          "neutral": "サウンドデザイナー"
+        },
+        "r_b96fddf3696f": {
+          "masculine": "サウンドエディター",
+          "feminine": "サウンドエディター",
+          "neutral": "サウンドエディター"
+        },
+        "r_a903b5656a8c": {
+          "masculine": "DCPアーティスト",
+          "feminine": "DCPアーティスト",
+          "neutral": "DCPアーティスト"
+        },
+        "r_774ffd708e0e": {
+          "masculine": "フィルムレコーダーオペレーター",
+          "feminine": "フィルムレコーダーオペレーター",
+          "neutral": "フィルムレコーダーオペレーター"
+        },
+        "r_8685aa8f2a95": {
+          "masculine": "Mistikaオペレーター",
+          "feminine": "Mistikaオペレーター",
+          "neutral": "Mistikaオペレーター"
+        },
+        "r_9b86e6dde935": {
+          "masculine": "VFXテクニカルディレクター",
+          "feminine": "VFXテクニカルディレクター",
+          "neutral": "VFXテクニカルディレクター"
+        },
+        "r_ab44975f8351": {
+          "masculine": "VFXコンサルタント",
+          "feminine": "VFXコンサルタント",
+          "neutral": "VFXコンサルタント"
+        },
+        "r_6a2814e6546b": {
+          "masculine": "VFXライティングスーパーバイザー",
+          "feminine": "VFXライティングスーパーバイザー",
+          "neutral": "VFXライティングスーパーバイザー"
+        },
+        "r_c043402107e7": {
+          "masculine": "VFXセットスーパーバイザー",
+          "feminine": "VFXセットスーパーバイザー",
+          "neutral": "VFXセットスーパーバイザー"
+        },
+        "r_2d4e2d1e1c2c": {
+          "masculine": "VFXプロダクションコーディネーター",
+          "feminine": "VFXプロダクションコーディネーター",
+          "neutral": "VFXプロダクションコーディネーター"
+        },
+        "r_3a24d45a3a71": {
+          "masculine": "アシスタントVFXコーディネーター",
+          "feminine": "アシスタントVFXコーディネーター",
+          "neutral": "アシスタントVFXコーディネーター"
+        },
+        "r_a2d3fd026c27": {
+          "masculine": "VFXエグゼクティブ",
+          "feminine": "VFXエグゼクティブ",
+          "neutral": "VFXエグゼクティブ"
+        },
+        "r_1d0ffcaee2f8": {
+          "masculine": "VFX人事マネージャー",
+          "feminine": "VFX人事マネージャー",
+          "neutral": "VFX人事マネージャー"
+        },
+        "r_6eb353601a03": {
+          "masculine": "VFX IT管理者",
+          "feminine": "VFX IT管理者",
+          "neutral": "VFX IT管理者"
+        },
+        "r_e70450322709": {
+          "masculine": "VFX ITサポート",
+          "feminine": "VFX ITサポート",
+          "neutral": "VFX ITサポート"
+        },
+        "r_71a68d7195b5": {
+          "masculine": "VFX ITシステムエンジニア",
+          "feminine": "VFX ITシステムエンジニア",
+          "neutral": "VFX ITシステムエンジニア"
+        },
+        "r_30de176c3d86": {
+          "masculine": "パイプラインテクニカルディレクター",
+          "feminine": "パイプラインテクニカルディレクター",
+          "neutral": "パイプラインテクニカルディレクター"
+        },
+        "r_3021537edab0": {
+          "masculine": "コンピュータグラフィックススーパーバイザー",
+          "feminine": "コンピュータグラフィックススーパーバイザー",
+          "neutral": "コンピュータグラフィックススーパーバイザー"
+        },
+        "r_0d4cd83ac5f0": {
+          "masculine": "CGソフトウェア開発者",
+          "feminine": "CGソフトウェア開発者",
+          "neutral": "CGソフトウェア開発者"
+        },
+        "r_4d7b70afc38f": {
+          "masculine": "コンセプトアーティスト（VFX）",
+          "feminine": "コンセプトアーティスト（VFX）",
+          "neutral": "コンセプトアーティスト（VFX）"
+        },
+        "r_1d77801b6bcb": {
+          "masculine": "キャラクターデザイナー",
+          "feminine": "キャラクターデザイナー",
+          "neutral": "キャラクターデザイナー"
+        },
+        "r_2eeabfb3e033": {
+          "masculine": "キャラクタースーパーバイザー",
+          "feminine": "キャラクタースーパーバイザー",
+          "neutral": "キャラクタースーパーバイザー"
+        },
+        "r_d4054cc011f7": {
+          "masculine": "アニマトロニクススーパーバイザー",
+          "feminine": "アニマトロニクススーパーバイザー",
+          "neutral": "アニマトロニクススーパーバイザー"
+        },
+        "r_27773325d503": {
+          "masculine": "プリビズスーパーバイザー",
+          "feminine": "プリビズスーパーバイザー",
+          "neutral": "プリビズスーパーバイザー"
+        },
+        "r_4e65539d8bde": {
+          "masculine": "プリビズアーティスト",
+          "feminine": "プリビズアーティスト",
+          "neutral": "プリビズアーティスト"
+        },
+        "r_09f34347e5ee": {
+          "masculine": "モーションキャプチャースーパーバイザー",
+          "feminine": "モーションキャプチャースーパーバイザー",
+          "neutral": "モーションキャプチャースーパーバイザー"
+        },
+        "r_96c37e1de0fa": {
+          "masculine": "モーションコントロールスーパーバイザー",
+          "feminine": "モーションコントロールスーパーバイザー",
+          "neutral": "モーションコントロールスーパーバイザー"
+        },
+        "r_733686f9ae97": {
+          "masculine": "デイリーズオペレーター",
+          "feminine": "デイリーズオペレーター",
+          "neutral": "デイリーズオペレーター"
+        },
+        "r_ab703255dec3": {
+          "masculine": "I/Oコーディネーター",
+          "feminine": "I/Oコーディネーター",
+          "neutral": "I/Oコーディネーター"
+        },
+        "r_75540ed9967e": {
+          "masculine": "テレシネオペレーター",
+          "feminine": "テレシネオペレーター",
+          "neutral": "テレシネオペレーター"
+        },
+        "r_6c17929b4f69": {
+          "masculine": "デジタルマッチムーバー",
+          "feminine": "デジタルマッチムーバー",
+          "neutral": "デジタルマッチムーバー"
+        },
+        "r_2646f9b4aadf": {
+          "masculine": "ロトスコーピングアーティスト",
+          "feminine": "ロトスコーピングアーティスト",
+          "neutral": "ロトスコーピングアーティスト"
+        },
+        "r_1abce9757421": {
+          "masculine": "デジタルアセットマネージャー（DAM）",
+          "feminine": "デジタルアセットマネージャー（DAM）",
+          "neutral": "デジタルアセットマネージャー（DAM）"
+        },
+        "r_e28081bd8659": {
+          "masculine": "DIスーパーバイザー",
+          "feminine": "DIスーパーバイザー",
+          "neutral": "DIスーパーバイザー"
+        },
+        "r_3be4ac15eccc": {
+          "masculine": "デジタルインターミディエイトエンジニア",
+          "feminine": "デジタルインターミディエイトエンジニア",
+          "neutral": "デジタルインターミディエイトエンジニア"
+        },
+        "r_ac6763f1d04b": {
+          "masculine": "デジタルインターミディエイトアシスタント",
+          "feminine": "デジタルインターミディエイトアシスタント",
+          "neutral": "デジタルインターミディエイトアシスタント"
+        },
+        "r_68b5ed487d7c": {
+          "masculine": "VFXデータラングラー",
+          "feminine": "VFXデータラングラー",
+          "neutral": "VFXデータラングラー"
+        },
+        "r_98875c546157": {
+          "masculine": "レンダリングラングラー",
+          "feminine": "レンダリングラングラー",
+          "neutral": "レンダリングラングラー"
+        },
+        "r_37de85ee2914": {
+          "masculine": "3Dステレオスーパーバイザー",
+          "feminine": "3Dステレオスーパーバイザー",
+          "neutral": "3Dステレオスーパーバイザー"
+        },
+        "r_138f0f7f11c5": {
+          "masculine": "オンセットプレイバックオペレーター",
+          "feminine": "オンセットプレイバックオペレーター",
+          "neutral": "オンセットプレイバックオペレーター"
+        },
+        "r_6c52a0b17c05": {
+          "masculine": "VFXインターン",
+          "feminine": "VFXインターン",
+          "neutral": "VFXインターン"
+        },
+        "r_1a1b5684e757": {
+          "masculine": "VFXプロダクションアシスタント",
+          "feminine": "VFXプロダクションアシスタント",
+          "neutral": "VFXプロダクションアシスタント"
+        },
+        "r_03863e1fa165": {
+          "masculine": "VFXチームマネージャー",
+          "feminine": "VFXチームマネージャー",
+          "neutral": "VFXチームマネージャー"
+        },
+        "r_0006a71a7050": {
+          "masculine": "3Dヘッド",
+          "feminine": "3Dヘッド",
+          "neutral": "3Dヘッド"
+        },
+        "r_9ad285824801": {
+          "masculine": "3Dアニメーションディレクター",
+          "feminine": "3Dアニメーションディレクター",
+          "neutral": "3Dアニメーションディレクター"
+        },
+        "r_365169e4e39c": {
+          "masculine": "3Dリードキャラクターアニメーター",
+          "feminine": "3Dリードキャラクターアニメーター",
+          "neutral": "3Dリードキャラクターアニメーター"
+        },
+        "r_6dac25e38271": {
+          "masculine": "3Dキャラクターアニメーター",
+          "feminine": "3Dキャラクターアニメーター",
+          "neutral": "3Dキャラクターアニメーター"
+        },
+        "r_18b24b362b8f": {
+          "masculine": "3Dリガー",
+          "feminine": "3Dリガー",
+          "neutral": "3Dリガー"
+        },
+        "r_b6265894c01c": {
+          "masculine": "3Dモデラー",
+          "feminine": "3Dモデラー",
+          "neutral": "3Dモデラー"
+        },
+        "r_401ce457432d": {
+          "masculine": "3Dライター",
+          "feminine": "3Dライター",
+          "neutral": "3Dライター"
+        },
+        "r_d6c0df6758d4": {
+          "masculine": "3Dテクスチャーアーティスト",
+          "feminine": "3Dテクスチャーアーティスト",
+          "neutral": "3Dテクスチャーアーティスト"
+        },
+        "r_aff4837ba039": {
+          "masculine": "3Dカメラアーティスト",
+          "feminine": "3Dカメラアーティスト",
+          "neutral": "3Dカメラアーティスト"
+        },
+        "r_01ea52ed92df": {
+          "masculine": "3Dカメラスーパーバイザー",
+          "feminine": "3Dカメラスーパーバイザー",
+          "neutral": "3Dカメラスーパーバイザー"
+        },
+        "r_1b2a5f055d73": {
+          "masculine": "FXアニメーター",
+          "feminine": "FXアニメーター",
+          "neutral": "FXアニメーター"
+        },
+        "r_25d305ae2181": {
+          "masculine": "パーティクルアニメーター",
+          "feminine": "パーティクルアニメーター",
+          "neutral": "パーティクルアニメーター"
+        },
+        "r_493348eeb5c9": {
+          "masculine": "2Dリガー",
+          "feminine": "2Dリガー",
+          "neutral": "2Dリガー"
+        },
+        "r_50d612c5929c": {
+          "masculine": "2Dアニメーションディレクター",
+          "feminine": "2Dアニメーションディレクター",
+          "neutral": "2Dアニメーションディレクター"
+        },
+        "r_5b75d1dcc3ba": {
+          "masculine": "2Dリードキャラクターアニメーター",
+          "feminine": "2Dリードキャラクターアニメーター",
+          "neutral": "2Dリードキャラクターアニメーター"
+        },
+        "r_d3bed7009009": {
+          "masculine": "2Dキャラクターアニメーター",
+          "feminine": "2Dキャラクターアニメーター",
+          "neutral": "2Dキャラクターアニメーター"
+        },
+        "r_b9b34ba4ee44": {
+          "masculine": "MotionBuilderアーティスト",
+          "feminine": "MotionBuilderアーティスト",
+          "neutral": "MotionBuilderアーティスト"
+        },
+        "r_40ba6442d974": {
+          "masculine": "MotionBuilderオペレーター",
+          "feminine": "MotionBuilderオペレーター",
+          "neutral": "MotionBuilderオペレーター"
+        }
+      },
+      "musik": {
+        "r_4b516c3014b1": {
+          "masculine": "作曲家",
+          "feminine": "作曲家",
+          "neutral": "作曲家"
+        },
+        "r_78a8b7bafdcf": {
+          "masculine": "追加音楽",
+          "feminine": "追加音楽",
+          "neutral": "追加音楽"
+        },
+        "r_be9c85f652ee": {
+          "masculine": "トレーラー作曲家",
+          "feminine": "トレーラー作曲家",
+          "neutral": "トレーラー作曲家"
+        },
+        "r_d052f25322c5": {
+          "masculine": "音楽監督",
+          "feminine": "音楽監督",
+          "neutral": "音楽監督"
+        },
+        "r_520348654852": {
+          "masculine": "音楽監督",
+          "feminine": "音楽監督",
+          "neutral": "音楽監督"
+        },
+        "r_d614bde7c500": {
+          "masculine": "音楽スーパーバイザー",
+          "feminine": "音楽スーパーバイザー",
+          "neutral": "音楽スーパーバイザー"
+        },
+        "r_1f0d7374bb4c": {
+          "masculine": "オーケストレーター",
+          "feminine": "オーケストレーター",
+          "neutral": "オーケストレーター"
+        },
+        "r_aa4b42f84387": {
+          "masculine": "編曲者",
+          "feminine": "編曲者",
+          "neutral": "編曲者"
+        },
+        "r_8c334f2ac9d3": {
+          "masculine": "編曲者",
+          "feminine": "編曲者",
+          "neutral": "編曲者"
+        },
+        "r_fe19755b0b9e": {
+          "masculine": "指揮者",
+          "feminine": "指揮者",
+          "neutral": "指揮者"
+        },
+        "r_73021f352efb": {
+          "masculine": "指揮者",
+          "feminine": "指揮者",
+          "neutral": "指揮者"
+        },
+        "r_1a95751341fb": {
+          "masculine": "音楽編集者",
+          "feminine": "音楽編集者",
+          "neutral": "音楽編集者"
+        },
+        "r_8fd3dbb18e49": {
+          "masculine": "音楽コピーイスト",
+          "feminine": "音楽コピーイスト",
+          "neutral": "音楽コピーイスト"
+        },
+        "r_d5e57768aab8": {
+          "masculine": "音楽プロデューサー",
+          "feminine": "音楽プロデューサー",
+          "neutral": "音楽プロデューサー"
+        },
+        "r_0e9738be9045": {
+          "masculine": "音楽コンサルタント",
+          "feminine": "音楽コンサルタント",
+          "neutral": "音楽コンサルタント"
+        },
+        "r_82e1a4d8181e": {
+          "masculine": "音楽コーディネーター",
+          "feminine": "音楽コーディネーター",
+          "neutral": "音楽コーディネーター"
+        },
+        "r_00bc34dec4f3": {
+          "masculine": "Logicオペレーター",
+          "feminine": "Logicオペレーター",
+          "neutral": "Logicオペレーター"
+        },
+        "r_0eae67a415cd": {
+          "masculine": "Pro Toolsオペレーター",
+          "feminine": "Pro Toolsオペレーター",
+          "neutral": "Pro Toolsオペレーター"
+        },
+        "r_52aa8c6866dc": {
+          "masculine": "作曲家アシスタント",
+          "feminine": "作曲家アシスタント",
+          "neutral": "作曲家アシスタント"
+        },
+        "r_3e66ad9f45e2": {
+          "masculine": "ミュージシャン",
+          "feminine": "ミュージシャン",
+          "neutral": "ミュージシャン"
+        },
+        "r_ade18645efa3": {
+          "masculine": "サウンドエディター",
+          "feminine": "サウンドエディター",
+          "neutral": "サウンドエディター"
+        },
+        "r_0972afcc1e55": {
+          "masculine": "作曲家インターン",
+          "feminine": "作曲家インターン",
+          "neutral": "作曲家インターン"
+        },
+        "r_801e363423c3": {
+          "masculine": "エグゼクティブサウンドトラックプロデューサー",
+          "feminine": "エグゼクティブサウンドトラックプロデューサー",
+          "neutral": "エグゼクティブサウンドトラックプロデューサー"
+        }
+      },
+      "set-logistik": {
+        "r_06d9aa28368f": {
+          "masculine": "ベースランナー",
+          "feminine": "ベースランナー",
+          "neutral": "ベースランナー"
+        },
+        "r_51e581b5ea39": {
+          "masculine": "ドライバー（乗用車・トラック）",
+          "feminine": "ドライバー（乗用車・トラック）",
+          "neutral": "ドライバー（乗用車・トラック）"
+        },
+        "r_36a599628c2e": {
+          "masculine": "ロケーションドライバー",
+          "feminine": "ロケーションドライバー",
+          "neutral": "ロケーションドライバー"
+        },
+        "r_9bc1a35535fa": {
+          "masculine": "ロケーションユニットマネージャー",
+          "feminine": "ロケーションユニットマネージャー",
+          "neutral": "ロケーションユニットマネージャー"
+        },
+        "r_273f12c52b95": {
+          "masculine": "アシスタントロケーションマネージャー",
+          "feminine": "アシスタントロケーションマネージャー",
+          "neutral": "アシスタントロケーションマネージャー"
+        },
+        "r_ad61df711cdf": {
+          "masculine": "セットセキュリティ",
+          "feminine": "セットセキュリティ",
+          "neutral": "セットセキュリティ"
+        },
+        "r_16476d55e646": {
+          "masculine": "群衆管理",
+          "feminine": "群衆管理",
+          "neutral": "群衆管理"
+        },
+        "r_d4d0eb9a01ad": {
+          "masculine": "ムーブメントディレクター",
+          "feminine": "ムーブメントディレクター",
+          "neutral": "ムーブメントディレクター"
+        },
+        "r_3c6a65ecb046": {
+          "masculine": "ムーブメントコーチ",
+          "feminine": "ムーブメントコーチ",
+          "neutral": "ムーブメントコーチ"
+        },
+        "r_c66e045ffbbf": {
+          "masculine": "インティマシーコーディネーター",
+          "feminine": "インティマシーコーディネーター",
+          "neutral": "インティマシーコーディネーター"
+        },
+        "r_2e9dcd12712e": {
+          "masculine": "振付師",
+          "feminine": "振付師",
+          "neutral": "振付師"
+        },
+        "r_6f899f66fa58": {
+          "masculine": "ダンスコーチ",
+          "feminine": "ダンスコーチ",
+          "neutral": "ダンスコーチ"
+        },
+        "r_f4a45af86f47": {
+          "masculine": "ボーカルコーチ／歌唱コーチ",
+          "feminine": "ボーカルコーチ／歌唱コーチ",
+          "neutral": "ボーカルコーチ／歌唱コーチ"
+        },
+        "r_6e8ad217ef2f": {
+          "masculine": "ダイアログコーチ",
+          "feminine": "ダイアログコーチ",
+          "neutral": "ダイアログコーチ"
+        },
+        "r_63787dc385b1": {
+          "masculine": "方言／言語コーチ",
+          "feminine": "方言／言語コーチ",
+          "neutral": "方言／言語コーチ"
+        },
+        "r_8546ce0263e3": {
+          "masculine": "演技コーチ（障害者／神経多様性）",
+          "feminine": "演技コーチ（障害者／神経多様性）",
+          "neutral": "演技コーチ（障害者／神経多様性）"
+        },
+        "r_969986f76695": {
+          "masculine": "音楽コーチ",
+          "feminine": "音楽コーチ",
+          "neutral": "音楽コーチ"
+        },
+        "r_717c17e3e434": {
+          "masculine": "聴覚障害者サポート担当",
+          "feminine": "聴覚障害者サポート担当",
+          "neutral": "聴覚障害者サポート担当"
+        },
+        "r_e30edc1bd3f8": {
+          "masculine": "ダイバーシティコンサルタント",
+          "feminine": "ダイバーシティコンサルタント",
+          "neutral": "ダイバーシティコンサルタント"
+        },
+        "r_5595cb9aacd1": {
+          "masculine": "センシティビティリーダー",
+          "feminine": "センシティビティリーダー",
+          "neutral": "センシティビティリーダー"
+        },
+        "r_2d5e77118f48": {
+          "masculine": "通訳／翻訳者",
+          "feminine": "通訳／翻訳者",
+          "neutral": "通訳／翻訳者"
+        },
+        "r_48bf6fb54a76": {
+          "masculine": "スタンドイン",
+          "feminine": "スタンドイン",
+          "neutral": "スタンドイン"
+        },
+        "r_5845830d5e82": {
+          "masculine": "セットメディック／現場救急隊員",
+          "feminine": "セットメディック／現場救急隊員",
+          "neutral": "セットメディック／現場救急隊員"
+        },
+        "r_ad72daba923d": {
+          "masculine": "セット教師／現場チューター",
+          "feminine": "セット教師／現場チューター",
+          "neutral": "セット教師／現場チューター"
+        },
+        "r_79e9614b81a6": {
+          "masculine": "チャイルドマインダー／現場付き添い",
+          "feminine": "チャイルドマインダー／現場付き添い",
+          "neutral": "チャイルドマインダー／現場付き添い"
+        },
+        "r_29d48a809858": {
+          "masculine": "児童福祉担当者",
+          "feminine": "児童福祉担当者",
+          "neutral": "児童福祉担当者"
+        },
+        "r_aba4d92c8e69": {
+          "masculine": "アーティスト／ゲスト／VIPリエゾン",
+          "feminine": "アーティスト／ゲスト／VIPリエゾン",
+          "neutral": "アーティスト／ゲスト／VIPリエゾン"
+        },
+        "r_53207f6ae5f4": {
+          "masculine": "メンタルヘルスコーディネーター",
+          "feminine": "メンタルヘルスコーディネーター",
+          "neutral": "メンタルヘルスコーディネーター"
+        },
+        "r_45520abcff27": {
+          "masculine": "ウェルビーイング担当／信頼担当者",
+          "feminine": "ウェルビーイング担当／信頼担当者",
+          "neutral": "ウェルビーイング担当／信頼担当者"
+        },
+        "r_355cbf436694": {
+          "masculine": "安全衛生担当者",
+          "feminine": "安全衛生担当者",
+          "neutral": "安全衛生担当者"
+        },
+        "r_308811767175": {
+          "masculine": "衛生担当者（Covid）",
+          "feminine": "衛生担当者（Covid）",
+          "neutral": "衛生担当者（Covid）"
+        },
+        "r_32790b195d9e": {
+          "masculine": "マリンコーディネーター",
+          "feminine": "マリンコーディネーター",
+          "neutral": "マリンコーディネーター"
+        },
+        "r_c93f3dbba0c2": {
+          "masculine": "水中／ダイビングコーディネーター",
+          "feminine": "水中／ダイビングコーディネーター",
+          "neutral": "水中／ダイビングコーディネーター"
+        },
+        "r_2aed0957c337": {
+          "masculine": "鞍／ハーネスマスター",
+          "feminine": "鞍／ハーネスマスター",
+          "neutral": "鞍／ハーネスマスター"
+        },
+        "r_36f2141e2445": {
+          "masculine": "観客コーディネーター",
+          "feminine": "観客コーディネーター",
+          "neutral": "観客コーディネーター"
+        },
+        "r_dd293d0b7b4b": {
+          "masculine": "コンサルタントディレクター",
+          "feminine": "コンサルタントディレクター",
+          "neutral": "コンサルタントディレクター"
+        },
+        "r_d675b4f70ea4": {
+          "masculine": "クリエイティブディレクター（広告代理店）",
+          "feminine": "クリエイティブディレクター（広告代理店）",
+          "neutral": "クリエイティブディレクター（広告代理店）"
+        },
+        "r_2c01621b03b3": {
+          "masculine": "技術アドバイザー／コンサルタント",
+          "feminine": "技術アドバイザー／コンサルタント",
+          "neutral": "技術アドバイザー／コンサルタント"
+        },
+        "r_777d604a46c7": {
+          "masculine": "専門コンサルタント（制作）",
+          "feminine": "専門コンサルタント（制作）",
+          "neutral": "専門コンサルタント（制作）"
+        },
+        "r_69b1f75394b4": {
+          "masculine": "講師／コーチ",
+          "feminine": "講師／コーチ",
+          "neutral": "講師／コーチ"
+        },
+        "r_9b689ca40dcd": {
+          "masculine": "インパクトプロデューサー",
+          "feminine": "インパクトプロデューサー",
+          "neutral": "インパクトプロデューサー"
+        },
+        "r_b22d32243e5e": {
+          "masculine": "グリーンコンサルタント／サステナビリティアドバイザー",
+          "feminine": "グリーンコンサルタント／サステナビリティアドバイザー",
+          "neutral": "グリーンコンサルタント／サステナビリティアドバイザー"
+        },
+        "r_b7e6bdc7cc1f": {
+          "masculine": "グリーンコンサルタントアシスタント",
+          "feminine": "グリーンコンサルタントアシスタント",
+          "neutral": "グリーンコンサルタントアシスタント"
+        },
+        "r_e84880be1d61": {
+          "masculine": "EPK／BTSラインプロデューサー",
+          "feminine": "EPK／BTSラインプロデューサー",
+          "neutral": "EPK／BTSラインプロデューサー"
+        },
+        "r_715e70975075": {
+          "masculine": "EPK／BTSプロデューサー",
+          "feminine": "EPK／BTSプロデューサー",
+          "neutral": "EPK／BTSプロデューサー"
+        },
+        "r_7028ae82d2e2": {
+          "masculine": "フィルムレストレーションアーティスト",
+          "feminine": "フィルムレストレーションアーティスト",
+          "neutral": "フィルムレストレーションアーティスト"
+        },
+        "r_92791462fbdd": {
+          "masculine": "フィルムカラリスト（写真化学）",
+          "feminine": "フィルムカラリスト（写真化学）",
+          "neutral": "フィルムカラリスト（写真化学）"
+        },
+        "r_e732abed8e31": {
+          "masculine": "ディスクメディアオーサー（DVD／Blu-ray）",
+          "feminine": "ディスクメディアオーサー（DVD／Blu-ray）",
+          "neutral": "ディスクメディアオーサー（DVD／Blu-ray）"
+        },
+        "r_a63ade2d8c7d": {
+          "masculine": "ストップモーションアニメーター",
+          "feminine": "ストップモーションアニメーター",
+          "neutral": "ストップモーションアニメーター"
+        },
+        "r_e56da499fa85": {
+          "masculine": "セルアニメーター／伝統的アニメーター",
+          "feminine": "セルアニメーター／伝統的アニメーター",
+          "neutral": "セルアニメーター／伝統的アニメーター"
+        },
+        "r_868363b4696a": {
+          "masculine": "ゲーム開発者（ショー）",
+          "feminine": "ゲーム開発者（ショー）",
+          "neutral": "ゲーム開発者（ショー）"
+        },
+        "r_776e611a5b6e": {
+          "masculine": "パペッティア",
+          "feminine": "パペッティア",
+          "neutral": "パペッティア"
+        },
+        "r_d3d5008ffded": {
+          "masculine": "VJ／ビジュアルジョッキー",
+          "feminine": "VJ／ビジュアルジョッキー",
+          "neutral": "VJ／ビジュアルジョッキー"
+        },
+        "r_f62082fcf3e6": {
+          "masculine": "オンエアデザイナー",
+          "feminine": "オンエアデザイナー",
+          "neutral": "オンエアデザイナー"
+        },
+        "r_915e8fdeaa84": {
+          "masculine": "字幕スポッター",
+          "feminine": "字幕スポッター",
+          "neutral": "字幕スポッター"
+        },
+        "r_e7b09583174a": {
+          "masculine": "字幕制作者",
+          "feminine": "字幕制作者",
+          "neutral": "字幕制作者"
+        },
+        "r_823099351f18": {
+          "masculine": "監督スカウト",
+          "feminine": "監督スカウト",
+          "neutral": "監督スカウト"
+        },
+        "r_f25ed374ada5": {
+          "masculine": "権利クリアランス",
+          "feminine": "権利クリアランス",
+          "neutral": "権利クリアランス"
+        },
+        "r_bf29b54303ec": {
+          "masculine": "PRフォトグラファー",
+          "feminine": "PRフォトグラファー",
+          "neutral": "PRフォトグラファー"
+        },
+        "r_e2fe82d9e60c": {
+          "masculine": "プロジェクトマネージャー（外部）",
+          "feminine": "プロジェクトマネージャー（外部）",
+          "neutral": "プロジェクトマネージャー（外部）"
+        },
+        "r_3687ead5b451": {
+          "masculine": "パーソナルアシスタント（現場）",
+          "feminine": "パーソナルアシスタント（現場）",
+          "neutral": "パーソナルアシスタント（現場）"
+        },
+        "r_b85e79c1153f": {
+          "masculine": "リサーチャー（一般）",
+          "feminine": "リサーチャー（一般）",
+          "neutral": "リサーチャー（一般）"
+        }
+      },
+      "cast": {
+        "r_3d0e76b883b1": {
+          "masculine": "主演俳優",
+          "feminine": "主演俳優",
+          "neutral": "主演俳優"
+        },
+        "r_543b99d52c01": {
+          "masculine": "俳優",
+          "feminine": "俳優",
+          "neutral": "俳優"
+        },
+        "r_aa64ee1fd5d6": {
+          "masculine": "助演俳優",
+          "feminine": "助演俳優",
+          "neutral": "助演俳優"
+        },
+        "r_5fea55df03ed": {
+          "masculine": "エキストラ",
+          "feminine": "エキストラ",
+          "neutral": "エキストラ"
+        },
+        "r_912a4dbdd23c": {
+          "masculine": "フィーチャードエキストラ",
+          "feminine": "フィーチャードエキストラ",
+          "neutral": "フィーチャードエキストラ"
+        },
+        "r_130f7a137659": {
+          "masculine": "モデル",
+          "feminine": "モデル",
+          "neutral": "モデル"
+        },
+        "r_e1e954da6cbb": {
+          "masculine": "声優／ナレーター",
+          "feminine": "声優／ナレーター",
+          "neutral": "声優／ナレーター"
+        },
+        "r_67da9411185f": {
+          "masculine": "スタンドイン",
+          "feminine": "スタンドイン",
+          "neutral": "スタンドイン"
+        },
+        "r_00100aeac4bb": {
+          "masculine": "スタントパフォーマー",
+          "feminine": "スタントパフォーマー",
+          "neutral": "スタントパフォーマー"
+        },
+        "r_0367b47c9554": {
+          "masculine": "スタントダブル",
+          "feminine": "スタントダブル",
+          "neutral": "スタントダブル"
+        },
+        "r_ca9ccb4b0409": {
+          "masculine": "スタントリガー",
+          "feminine": "スタントリガー",
+          "neutral": "スタントリガー"
+        },
+        "r_418902de8e38": {
+          "masculine": "スタントコーディネーター",
+          "feminine": "スタントコーディネーター",
+          "neutral": "スタントコーディネーター"
+        },
+        "r_7f2d1a7f256f": {
+          "masculine": "アシスタントスタントコーディネーター",
+          "feminine": "アシスタントスタントコーディネーター",
+          "neutral": "アシスタントスタントコーディネーター"
+        },
+        "r_e84ab42c1ded": {
+          "masculine": "スタント部門コーディネーター",
+          "feminine": "スタント部門コーディネーター",
+          "neutral": "スタント部門コーディネーター"
+        },
+        "r_e09f42bb8f68": {
+          "masculine": "ファイト振付師",
+          "feminine": "ファイト振付師",
+          "neutral": "ファイト振付師"
+        },
+        "r_f1b27e4baea8": {
+          "masculine": "アクションディレクター／第2ユニット監督",
+          "feminine": "アクションディレクター／第2ユニット監督",
+          "neutral": "アクションディレクター／第2ユニット監督"
+        },
+        "r_ccdc591d96b4": {
+          "masculine": "エアリアルコーディネーター",
+          "feminine": "エアリアルコーディネーター",
+          "neutral": "エアリアルコーディネーター"
+        },
+        "r_df312d5bf658": {
+          "masculine": "スタントライダー",
+          "feminine": "スタントライダー",
+          "neutral": "スタントライダー"
+        },
+        "r_64fe45905183": {
+          "masculine": "スタントテクニシャン",
+          "feminine": "スタントテクニシャン",
+          "neutral": "スタントテクニシャン"
+        },
+        "r_28088de1cde2": {
+          "masculine": "スタントレスキューダイバー",
+          "feminine": "スタントレスキューダイバー",
+          "neutral": "スタントレスキューダイバー"
+        },
+        "r_f1b818bfac99": {
+          "masculine": "パルクールアーティスト",
+          "feminine": "パルクールアーティスト",
+          "neutral": "パルクールアーティスト"
+        },
+        "r_c9bf4b44628b": {
+          "masculine": "精密ドライバー",
+          "feminine": "精密ドライバー",
+          "neutral": "精密ドライバー"
+        },
+        "r_901a1b08f6ba": {
+          "masculine": "インティマシーコーディネーター",
+          "feminine": "インティマシーコーディネーター",
+          "neutral": "インティマシーコーディネーター"
+        },
+        "r_7a721e572105": {
+          "masculine": "キャスティングアソシエイト",
+          "feminine": "キャスティングアソシエイト",
+          "neutral": "キャスティングアソシエイト"
+        },
+        "r_a1f9ba79ab08": {
+          "masculine": "キャスティングアシスタント",
+          "feminine": "キャスティングアシスタント",
+          "neutral": "キャスティングアシスタント"
+        },
+        "r_84927cc7b2bc": {
+          "masculine": "助演俳優",
+          "feminine": "助演俳優",
+          "neutral": "助演俳優"
+        },
+        "r_97144193d2e9": {
+          "masculine": "エキストラ",
+          "feminine": "エキストラ",
+          "neutral": "エキストラ"
+        },
+        "r_de130677203b": {
+          "masculine": "ユースキャスティングディレクター",
+          "feminine": "ユースキャスティングディレクター",
+          "neutral": "ユースキャスティングディレクター"
+        },
+        "r_27725de30521": {
+          "masculine": "子役キャスティングディレクター",
+          "feminine": "子役キャスティングディレクター",
+          "neutral": "子役キャスティングディレクター"
+        },
+        "r_9e31ceb09d88": {
+          "masculine": "ストリートキャスティング",
+          "feminine": "ストリートキャスティング",
+          "neutral": "ストリートキャスティング"
+        },
+        "r_081340fc2740": {
+          "masculine": "エキストラ・助演キャスティング",
+          "feminine": "エキストラ・助演キャスティング",
+          "neutral": "エキストラ・助演キャスティング"
+        },
+        "r_bff79e6f4b26": {
+          "masculine": "キャスティングインターン",
+          "feminine": "キャスティングインターン",
+          "neutral": "キャスティングインターン"
+        },
+        "r_2f8822fb833a": {
+          "masculine": "ヘッドスタントリガー",
+          "feminine": "ヘッドスタントリガー",
+          "neutral": "ヘッドスタントリガー"
+        },
+        "r_9fadc25f432e": {
+          "masculine": "馬車の御者",
+          "feminine": "馬車の御者",
+          "neutral": "馬車の御者"
+        }
+      },
+      "sfx": {
+        "r_a35d5905e687": {
+          "masculine": "特殊効果スーパーバイザー",
+          "feminine": "特殊効果スーパーバイザー",
+          "neutral": "特殊効果スーパーバイザー"
+        },
+        "r_09c0a67cf5e1": {
+          "masculine": "SFXテクニシャン",
+          "feminine": "SFXテクニシャン",
+          "neutral": "SFXテクニシャン"
+        },
+        "r_881a5efb4c8a": {
+          "masculine": "特殊効果コーディネーター",
+          "feminine": "特殊効果コーディネーター",
+          "neutral": "特殊効果コーディネーター"
+        },
+        "r_a9f1b82c4859": {
+          "masculine": "特殊効果プロジェクトマネージャー",
+          "feminine": "特殊効果プロジェクトマネージャー",
+          "neutral": "特殊効果プロジェクトマネージャー"
+        },
+        "r_cea7226b63f6": {
+          "masculine": "火薬技師",
+          "feminine": "火薬技師",
+          "neutral": "火薬技師"
+        },
+        "r_eb065a9f90c9": {
+          "masculine": "火薬助手",
+          "feminine": "火薬助手",
+          "neutral": "火薬助手"
+        },
+        "r_4d3662b84a22": {
+          "masculine": "ミニチュアエフェクトプロデューサー",
+          "feminine": "ミニチュアエフェクトプロデューサー",
+          "neutral": "ミニチュアエフェクトプロデューサー"
+        },
+        "r_e62650b9e5ae": {
+          "masculine": "クリーチャーデザイナー",
+          "feminine": "クリーチャーデザイナー",
+          "neutral": "クリーチャーデザイナー"
+        },
+        "r_00baca6dc147": {
+          "masculine": "アニマトロニクスエンジニア",
+          "feminine": "アニマトロニクスエンジニア",
+          "neutral": "アニマトロニクスエンジニア"
+        },
+        "r_174ffb787533": {
+          "masculine": "パペット・小道具製作者",
+          "feminine": "パペット・小道具製作者",
+          "neutral": "パペット・小道具製作者"
+        },
+        "r_506a008769b9": {
+          "masculine": "武器係",
+          "feminine": "武器係",
+          "neutral": "武器係"
+        },
+        "r_2409c6266fd3": {
+          "masculine": "武器技術者・武器係",
+          "feminine": "武器技術者・武器係",
+          "neutral": "武器技術者・武器係"
+        },
+        "r_ddb886337a99": {
+          "masculine": "リガー（ワイヤー）",
+          "feminine": "リガー（ワイヤー）",
+          "neutral": "リガー（ワイヤー）"
+        },
+        "r_72a4b7fb935e": {
+          "masculine": "SFXリギング・特殊建築",
+          "feminine": "SFXリギング・特殊建築",
+          "neutral": "SFXリギング・特殊建築"
+        },
+        "r_3628c7df2899": {
+          "masculine": "機械効果技術者",
+          "feminine": "機械効果技術者",
+          "neutral": "機械効果技術者"
+        },
+        "r_41cde5889636": {
+          "masculine": "雪・雨効果技術者",
+          "feminine": "雪・雨効果技術者",
+          "neutral": "雪・雨効果技術者"
+        },
+        "r_ba881d560569": {
+          "masculine": "特殊効果会計担当",
+          "feminine": "特殊効果会計担当",
+          "neutral": "特殊効果会計担当"
+        },
+        "r_c723decf9e2c": {
+          "masculine": "特殊効果技術者",
+          "feminine": "特殊効果技術者",
+          "neutral": "特殊効果技術者"
+        }
+      },
+      "broadcast": {
+        "r_56003554d627": {
+          "masculine": "プロダクションエンジニア",
+          "feminine": "プロダクションエンジニア",
+          "neutral": "プロダクションエンジニア"
+        },
+        "r_a5145362deb9": {
+          "masculine": "放送エンジニア",
+          "feminine": "放送エンジニア",
+          "neutral": "放送エンジニア"
+        },
+        "r_21789a4bd26e": {
+          "masculine": "テクニカルディレクター",
+          "feminine": "テクニカルディレクター",
+          "neutral": "テクニカルディレクター"
+        },
+        "r_ed2861824940": {
+          "masculine": "ビジョンエンジニア",
+          "feminine": "ビジョンエンジニア",
+          "neutral": "ビジョンエンジニア"
+        },
+        "r_f35ad506ce91": {
+          "masculine": "ビジョンミキサー",
+          "feminine": "ビジョンミキサー",
+          "neutral": "ビジョンミキサー"
+        },
+        "r_96549186fbdd": {
+          "masculine": "ビジョンミキサー",
+          "feminine": "ビジョンミキサー",
+          "neutral": "ビジョンミキサー"
+        },
+        "r_b0f32c270502": {
+          "masculine": "シェーダー",
+          "feminine": "シェーダー",
+          "neutral": "シェーダー"
+        },
+        "r_4444caa14211": {
+          "masculine": "カメラCCUオペレーター",
+          "feminine": "カメラCCUオペレーター",
+          "neutral": "カメラCCUオペレーター"
+        },
+        "r_3a845b2c45a4": {
+          "masculine": "DVEオペレーター",
+          "feminine": "DVEオペレーター",
+          "neutral": "DVEオペレーター"
+        },
+        "r_5eb58151f915": {
+          "masculine": "プロファイルオペレーター",
+          "feminine": "プロファイルオペレーター",
+          "neutral": "プロファイルオペレーター"
+        },
+        "r_bc517c79d131": {
+          "masculine": "放送技術者",
+          "feminine": "放送技術者",
+          "neutral": "放送技術者"
+        },
+        "r_d0bc62ba1257": {
+          "masculine": "放送音響スーパーバイザー",
+          "feminine": "放送音響スーパーバイザー",
+          "neutral": "放送音響スーパーバイザー"
+        },
+        "r_6189d7ba75a5": {
+          "masculine": "放送音響技師",
+          "feminine": "放送音響技師",
+          "neutral": "放送音響技師"
+        },
+        "r_9eadf0334fa2": {
+          "masculine": "スタジオ・イベントマスター",
+          "feminine": "スタジオ・イベントマスター",
+          "neutral": "スタジオ・イベントマスター"
+        },
+        "r_da7a6180d72a": {
+          "masculine": "イベントマネージャー",
+          "feminine": "イベントマネージャー",
+          "neutral": "イベントマネージャー"
+        },
+        "r_84e084ee4081": {
+          "masculine": "イベント技術者",
+          "feminine": "イベント技術者",
+          "neutral": "イベント技術者"
+        },
+        "r_2b01c5ebf763": {
+          "masculine": "MAZオペレーター",
+          "feminine": "MAZオペレーター",
+          "neutral": "MAZオペレーター"
+        },
+        "r_d2b49ec6c87b": {
+          "masculine": "VTR・MAZ技術者",
+          "feminine": "VTR・MAZ技術者",
+          "neutral": "VTR・MAZ技術者"
+        },
+        "r_b1e7ad7a4e8d": {
+          "masculine": "EVSオペレーター",
+          "feminine": "EVSオペレーター",
+          "neutral": "EVSオペレーター"
+        },
+        "r_6ce5d1fae4b4": {
+          "masculine": "LSMオペレーター（スローモーション）",
+          "feminine": "LSMオペレーター（スローモーション）",
+          "neutral": "LSMオペレーター（スローモーション）"
+        },
+        "r_23864113991d": {
+          "masculine": "ストリーミング技術者",
+          "feminine": "ストリーミング技術者",
+          "neutral": "ストリーミング技術者"
+        },
+        "r_4e59228ff2bb": {
+          "masculine": "リガー（放送・イベント）",
+          "feminine": "リガー（放送・イベント）",
+          "neutral": "リガー（放送・イベント）"
+        },
+        "r_54aa44e2bc03": {
+          "masculine": "リギングアシスタント",
+          "feminine": "リギングアシスタント",
+          "neutral": "リギングアシスタント"
+        },
+        "r_accbebaa16ce": {
+          "masculine": "ビジョン技術者",
+          "feminine": "ビジョン技術者",
+          "neutral": "ビジョン技術者"
+        },
+        "r_152179bb65ff": {
+          "masculine": "照明技術者（放送）",
+          "feminine": "照明技術者（放送）",
+          "neutral": "照明技術者（放送）"
+        },
+        "r_916b292e3ecc": {
+          "masculine": "音響技術者（放送）",
+          "feminine": "音響技術者（放送）",
+          "neutral": "音響技術者（放送）"
+        },
+        "r_a409aeab8c20": {
+          "masculine": "音響技師（PA・イベント）",
+          "feminine": "音響技師（PA・イベント）",
+          "neutral": "音響技師（PA・イベント）"
+        },
+        "r_894d032abc78": {
+          "masculine": "PA・音響技術者（イベント）",
+          "feminine": "PA・音響技術者（イベント）",
+          "neutral": "PA・音響技術者（イベント）"
+        },
+        "r_87a1930129df": {
+          "masculine": "SNGオペレーター",
+          "feminine": "SNGオペレーター",
+          "neutral": "SNGオペレーター"
+        },
+        "r_0d146769f561": {
+          "masculine": "音響アシスタント（放送）",
+          "feminine": "音響アシスタント（放送）",
+          "neutral": "音響アシスタント（放送）"
+        },
+        "r_4ee86e5361a7": {
+          "masculine": "ビデオウォールオペレーター",
+          "feminine": "ビデオウォールオペレーター",
+          "neutral": "ビデオウォールオペレーター"
+        },
+        "r_7c7bcadca79c": {
+          "masculine": "テレプロンプターオペレーター",
+          "feminine": "テレプロンプターオペレーター",
+          "neutral": "テレプロンプターオペレーター"
+        },
+        "r_e627ebc7d6a6": {
+          "masculine": "テクニカルアシスタント（放送）",
+          "feminine": "テクニカルアシスタント（放送）",
+          "neutral": "テクニカルアシスタント（放送）"
+        },
+        "r_b81926eec6f3": {
+          "masculine": "ビジョンアシスタント",
+          "feminine": "ビジョンアシスタント",
+          "neutral": "ビジョンアシスタント"
+        },
+        "r_45710f001c06": {
+          "masculine": "ケーブルランナー",
+          "feminine": "ケーブルランナー",
+          "neutral": "ケーブルランナー"
+        },
+        "r_34cfe59314f7": {
+          "masculine": "ビジョンミキサー・ビデオスイッチャー",
+          "feminine": "ビジョンミキサー・ビデオスイッチャー",
+          "neutral": "ビジョンミキサー・ビデオスイッチャー"
+        },
+        "r_ba025e1926d2": {
+          "masculine": "LSMオペレーター（スローモーション）",
+          "feminine": "LSMオペレーター（スローモーション）",
+          "neutral": "LSMオペレーター（スローモーション）"
+        },
+        "r_c7e1fa1f7572": {
+          "masculine": "SGオペレーター",
+          "feminine": "SGオペレーター",
+          "neutral": "SGオペレーター"
+        },
+        "r_c0aa2d3b3f9c": {
+          "masculine": "音響アシスタント（放送）",
+          "feminine": "音響アシスタント（放送）",
+          "neutral": "音響アシスタント（放送）"
+        },
+        "r_32ca4217464e": {
+          "masculine": "テクニカルアシスタント（放送）",
+          "feminine": "テクニカルアシスタント（放送）",
+          "neutral": "テクニカルアシスタント（放送）"
+        }
+      },
+      "virtual": {
+        "r_9d90887128a0": {
+          "masculine": "バーチャルプロダクションスーパーバイザー",
+          "feminine": "バーチャルプロダクションスーパーバイザー",
+          "neutral": "バーチャルプロダクションスーパーバイザー"
+        },
+        "r_9c3babb3c638": {
+          "masculine": "バーチャルプロダクションプロデューサー",
+          "feminine": "バーチャルプロダクションプロデューサー",
+          "neutral": "バーチャルプロダクションプロデューサー"
+        },
+        "r_1fee1676270e": {
+          "masculine": "バーチャルプロダクションコーディネーター",
+          "feminine": "バーチャルプロダクションコーディネーター",
+          "neutral": "バーチャルプロダクションコーディネーター"
+        },
+        "r_82e993b4422d": {
+          "masculine": "バーチャルプロダクションスタジオマネージャー",
+          "feminine": "バーチャルプロダクションスタジオマネージャー",
+          "neutral": "バーチャルプロダクションスタジオマネージャー"
+        },
+        "r_14e7e79a9ca8": {
+          "masculine": "VADアーティスト（バーチャルアート部門）",
+          "feminine": "VADアーティスト（バーチャルアート部門）",
+          "neutral": "VADアーティスト（バーチャルアート部門）"
+        },
+        "r_2034a25adda6": {
+          "masculine": "バーチャルプロダクションエンジニア",
+          "feminine": "バーチャルプロダクションエンジニア",
+          "neutral": "バーチャルプロダクションエンジニア"
+        },
+        "r_188b9da491f3": {
+          "masculine": "VPシステム＆ツールテクニカルディレクター",
+          "feminine": "VPシステム＆ツールテクニカルディレクター",
+          "neutral": "VPシステム＆ツールテクニカルディレクター"
+        },
+        "r_93a5c89da775": {
+          "masculine": "LEDウォールオペレーター",
+          "feminine": "LEDウォールオペレーター",
+          "neutral": "LEDウォールオペレーター"
+        },
+        "r_d1415a80bf57": {
+          "masculine": "Unreal Engineオペレーター",
+          "feminine": "Unreal Engineオペレーター",
+          "neutral": "Unreal Engineオペレーター"
+        },
+        "r_1c2e82f4274b": {
+          "masculine": "リアルタイムエンジンオペレーター",
+          "feminine": "リアルタイムエンジンオペレーター",
+          "neutral": "リアルタイムエンジンオペレーター"
+        },
+        "r_247afd3ab3fd": {
+          "masculine": "メディアサーバーオペレーター",
+          "feminine": "メディアサーバーオペレーター",
+          "neutral": "メディアサーバーオペレーター"
+        },
+        "r_8728a8d46ae1": {
+          "masculine": "VPシステム管理者",
+          "feminine": "VPシステム管理者",
+          "neutral": "VPシステム管理者"
+        },
+        "r_e7c27999f9ae": {
+          "masculine": "VPトラッキング技術者",
+          "feminine": "VPトラッキング技術者",
+          "neutral": "VPトラッキング技術者"
+        },
+        "r_bbe66ea7740f": {
+          "masculine": "VP LED技術者",
+          "feminine": "VP LED技術者",
+          "neutral": "VP LED技術者"
+        },
+        "r_ad04846bb2b3": {
+          "masculine": "トラッキング技術者",
+          "feminine": "トラッキング技術者",
+          "neutral": "トラッキング技術者"
+        },
+        "r_c100cb7d8cdf": {
+          "masculine": "リアルタイムアーティスト",
+          "feminine": "リアルタイムアーティスト",
+          "neutral": "リアルタイムアーティスト"
+        },
+        "r_84ae9f742a8c": {
+          "masculine": "バーチャルアート部門アーティスト",
+          "feminine": "バーチャルアート部門アーティスト",
+          "neutral": "バーチャルアート部門アーティスト"
+        }
+      },
+      "redaktion": {
+        "r_67a1c14f27d6": {
+          "masculine": "編集ディレクター",
+          "feminine": "編集ディレクター",
+          "neutral": "編集ディレクター"
+        },
+        "r_fb6f303e781e": {
+          "masculine": "編集長",
+          "feminine": "編集長",
+          "neutral": "編集長"
+        },
+        "r_1d083876d102": {
+          "masculine": "当直編集者",
+          "feminine": "当直編集者",
+          "neutral": "当直編集者"
+        },
+        "r_dba49499f044": {
+          "masculine": "制作責任者（放送局）",
+          "feminine": "制作責任者（放送局）",
+          "neutral": "制作責任者（放送局）"
+        },
+        "r_399d5722db1b": {
+          "masculine": "制作ディレクター（放送局）",
+          "feminine": "制作ディレクター（放送局）",
+          "neutral": "制作ディレクター（放送局）"
+        },
+        "r_97c6fe9db2a1": {
+          "masculine": "ラウンドダウンコーディネーター",
+          "feminine": "ラウンドダウンコーディネーター",
+          "neutral": "ラウンドダウンコーディネーター"
+        },
+        "r_c1f3dd5d125c": {
+          "masculine": "編集者",
+          "feminine": "編集者",
+          "neutral": "編集者"
+        },
+        "r_74db110eed35": {
+          "masculine": "テレビライター／著者",
+          "feminine": "テレビライター／著者",
+          "neutral": "テレビライター／著者"
+        },
+        "r_c68ab8bdf35f": {
+          "masculine": "キャスティングエディター",
+          "feminine": "キャスティングエディター",
+          "neutral": "キャスティングエディター"
+        },
+        "r_db514834619e": {
+          "masculine": "映像編集者",
+          "feminine": "映像編集者",
+          "neutral": "映像編集者"
+        },
+        "r_2d3838a04d2d": {
+          "masculine": "編集エディター",
+          "feminine": "編集エディター",
+          "neutral": "編集エディター"
+        },
+        "r_72b16f73761b": {
+          "masculine": "オンラインエディター／ウェブエディター",
+          "feminine": "オンラインエディター／ウェブエディター",
+          "neutral": "オンラインエディター／ウェブエディター"
+        },
+        "r_1eb2a3ac7a7f": {
+          "masculine": "ビデオ編集者（編集部）",
+          "feminine": "ビデオ編集者（編集部）",
+          "neutral": "ビデオ編集者（編集部）"
+        },
+        "r_fea2147a3023": {
+          "masculine": "テレビジャーナリスト",
+          "feminine": "テレビジャーナリスト",
+          "neutral": "テレビジャーナリスト"
+        },
+        "r_89901fa29127": {
+          "masculine": "レポーター",
+          "feminine": "レポーター",
+          "neutral": "レポーター"
+        },
+        "r_49092803ca90": {
+          "masculine": "演出家／ショーディレクター",
+          "feminine": "演出家／ショーディレクター",
+          "neutral": "演出家／ショーディレクター"
+        },
+        "r_558623ea54e2": {
+          "masculine": "ビデオプロデューサー",
+          "feminine": "ビデオプロデューサー",
+          "neutral": "ビデオプロデューサー"
+        },
+        "r_cd94582e5de3": {
+          "masculine": "ビデオジャーナリスト（VJ）",
+          "feminine": "ビデオジャーナリスト（VJ）",
+          "neutral": "ビデオジャーナリスト（VJ）"
+        },
+        "r_c1632a39db5a": {
+          "masculine": "ビデオコンテンツクリエイター（ソーシャルメディア）",
+          "feminine": "ビデオコンテンツクリエイター（ソーシャルメディア）",
+          "neutral": "ビデオコンテンツクリエイター（ソーシャルメディア）"
+        },
+        "r_48a469f4753e": {
+          "masculine": "ホスト／プレゼンター",
+          "feminine": "ホスト／プレゼンター",
+          "neutral": "ホスト／プレゼンター"
+        },
+        "r_dff0d36f7649": {
+          "masculine": "ニュースアンカー／ニュースリーダー",
+          "feminine": "ニュースアンカー／ニュースリーダー",
+          "neutral": "ニュースアンカー／ニュースリーダー"
+        },
+        "r_d8ae611e8a84": {
+          "masculine": "クリエイティブプロデューサー",
+          "feminine": "クリエイティブプロデューサー",
+          "neutral": "クリエイティブプロデューサー"
+        },
+        "r_52eb2ef13219": {
+          "masculine": "クリエイティブディレクター",
+          "feminine": "クリエイティブディレクター",
+          "neutral": "クリエイティブディレクター"
+        },
+        "r_4741fd392c78": {
+          "masculine": "コピーライター",
+          "feminine": "コピーライター",
+          "neutral": "コピーライター"
+        },
+        "r_7693f0b6836d": {
+          "masculine": "コンセプトデベロッパー",
+          "feminine": "コンセプトデベロッパー",
+          "neutral": "コンセプトデベロッパー"
+        },
+        "r_8ed4467cbce1": {
+          "masculine": "ソーシャルメディアプロデューサー",
+          "feminine": "ソーシャルメディアプロデューサー",
+          "neutral": "ソーシャルメディアプロデューサー"
+        },
+        "r_f3046605ff7d": {
+          "masculine": "編集アシスタント",
+          "feminine": "編集アシスタント",
+          "neutral": "編集アシスタント"
+        },
+        "r_39b32b25eed9": {
+          "masculine": "編集インターン",
+          "feminine": "編集インターン",
+          "neutral": "編集インターン"
+        },
+        "r_7947e117851f": {
+          "masculine": "当直編集者／マネージングエディター",
+          "feminine": "当直編集者／マネージングエディター",
+          "neutral": "当直編集者／マネージングエディター"
+        },
+        "r_9c948261499b": {
+          "masculine": "制作責任者（スタジオ／ネットワーク）",
+          "feminine": "制作責任者（スタジオ／ネットワーク）",
+          "neutral": "制作責任者（スタジオ／ネットワーク）"
+        },
+        "r_844ebb650ef7": {
+          "masculine": "編集者／ジャーナリスト",
+          "feminine": "編集者／ジャーナリスト",
+          "neutral": "編集者／ジャーナリスト"
+        },
+        "r_bac4afc8f929": {
+          "masculine": "編集プロデューサー／演出家",
+          "feminine": "編集プロデューサー／演出家",
+          "neutral": "編集プロデューサー／演出家"
+        },
+        "r_324910e3b0ab": {
+          "masculine": "クイズエディター",
+          "feminine": "クイズエディター",
+          "neutral": "クイズエディター"
+        },
+        "r_363c83ce0934": {
+          "masculine": "ウォームアップアーティスト",
+          "feminine": "ウォームアップアーティスト",
+          "neutral": "ウォームアップアーティスト"
+        },
+        "r_6227b3014b7a": {
+          "masculine": "ストリンガー／フィクサー",
+          "feminine": "ストリンガー／フィクサー",
+          "neutral": "ストリンガー／フィクサー"
+        },
+        "r_dfa579f14095": {
+          "masculine": "ロガー／映像ロガー",
+          "feminine": "ロガー／映像ロガー",
+          "neutral": "ロガー／映像ロガー"
+        },
+        "r_57c0fec76f7d": {
+          "masculine": "文字起こし担当",
+          "feminine": "文字起こし担当",
+          "neutral": "文字起こし担当"
+        },
+        "r_cabe547e084e": {
+          "masculine": "画像リサーチャー",
+          "feminine": "画像リサーチャー",
+          "neutral": "画像リサーチャー"
+        }
+      },
+      "social": {
+        "r_e8a967aad9b7": {
+          "masculine": "コンテンツクリエイター",
+          "feminine": "コンテンツクリエイター",
+          "neutral": "コンテンツクリエイター"
+        },
+        "r_631c65ad8827": {
+          "masculine": "インフルエンサー",
+          "feminine": "インフルエンサー",
+          "neutral": "インフルエンサー"
+        },
+        "r_a9eeb34333bc": {
+          "masculine": "ソーシャルメディアマネージャー",
+          "feminine": "ソーシャルメディアマネージャー",
+          "neutral": "ソーシャルメディアマネージャー"
+        },
+        "r_b510fa57cea0": {
+          "masculine": "UGCクリエイター",
+          "feminine": "UGCクリエイター",
+          "neutral": "UGCクリエイター"
+        },
+        "r_4d66d4dbbf12": {
+          "masculine": "リールズビデオグラファー",
+          "feminine": "リールズビデオグラファー",
+          "neutral": "リールズビデオグラファー"
+        },
+        "r_423ece24b5c2": {
+          "masculine": "TikTokクリエイター",
+          "feminine": "TikTokクリエイター",
+          "neutral": "TikTokクリエイター"
+        },
+        "r_e7483d4ddd6d": {
+          "masculine": "コミュニティマネージャー",
+          "feminine": "コミュニティマネージャー",
+          "neutral": "コミュニティマネージャー"
+        },
+        "r_6f877112cd0a": {
+          "masculine": "ソーシャルメディアストラテジスト",
+          "feminine": "ソーシャルメディアストラテジスト",
+          "neutral": "ソーシャルメディアストラテジスト"
+        },
+        "r_bd90a8429d6f": {
+          "masculine": "インフルエンサー／クリエイター",
+          "feminine": "インフルエンサー／クリエイター",
+          "neutral": "インフルエンサー／クリエイター"
+        },
+        "r_c43ce08ef6e8": {
+          "masculine": "ブランドストーリーテラー",
+          "feminine": "ブランドストーリーテラー",
+          "neutral": "ブランドストーリーテラー"
+        },
+        "r_e75a59be5b02": {
+          "masculine": "ソーシャルビデオグラファー",
+          "feminine": "ソーシャルビデオグラファー",
+          "neutral": "ソーシャルビデオグラファー"
+        },
+        "r_5f522b44dd48": {
+          "masculine": "ショートフォームエディター",
+          "feminine": "ショートフォームエディター",
+          "neutral": "ショートフォームエディター"
+        },
+        "r_ce039c1f951f": {
+          "masculine": "モーションデザイナー（ソーシャル）",
+          "feminine": "モーションデザイナー（ソーシャル）",
+          "neutral": "モーションデザイナー（ソーシャル）"
+        }
+      },
+      "foto": {
+        "r_d2c0588cf0d1": {
+          "masculine": "フォトグラファー",
+          "feminine": "フォトグラファー",
+          "neutral": "フォトグラファー"
+        },
+        "r_d7f7fbf5939c": {
+          "masculine": "ファッションフォトグラファー",
+          "feminine": "ファッションフォトグラファー",
+          "neutral": "ファッションフォトグラファー"
+        },
+        "r_e0551919b067": {
+          "masculine": "商品写真家",
+          "feminine": "商品写真家",
+          "neutral": "商品写真家"
+        },
+        "r_b06301444ef7": {
+          "masculine": "イベントフォトグラファー",
+          "feminine": "イベントフォトグラファー",
+          "neutral": "イベントフォトグラファー"
+        },
+        "r_124df4c664ce": {
+          "masculine": "ポートレートフォトグラファー",
+          "feminine": "ポートレートフォトグラファー",
+          "neutral": "ポートレートフォトグラファー"
+        },
+        "r_2e1fcf07d241": {
+          "masculine": "コマーシャルフォトグラファー",
+          "feminine": "コマーシャルフォトグラファー",
+          "neutral": "コマーシャルフォトグラファー"
+        },
+        "r_02bd21bcff9c": {
+          "masculine": "フードフォトグラファー",
+          "feminine": "フードフォトグラファー",
+          "neutral": "フードフォトグラファー"
+        },
+        "r_8a273a427bd6": {
+          "masculine": "ドローンフォトグラファー",
+          "feminine": "ドローンフォトグラファー",
+          "neutral": "ドローンフォトグラファー"
+        },
+        "r_843b4748146d": {
+          "masculine": "スチールフォトグラファー",
+          "feminine": "スチールフォトグラファー",
+          "neutral": "スチールフォトグラファー"
+        },
+        "r_b622037392fb": {
+          "masculine": "フォトアシスタント",
+          "feminine": "フォトアシスタント",
+          "neutral": "フォトアシスタント"
+        },
+        "r_6a2008f9f2ef": {
+          "masculine": "スタジオマネージャー",
+          "feminine": "スタジオマネージャー",
+          "neutral": "スタジオマネージャー"
+        },
+        "r_341b032b61fc": {
+          "masculine": "レタッチャー",
+          "feminine": "レタッチャー",
+          "neutral": "レタッチャー"
+        },
+        "r_468329a20ba4": {
+          "masculine": "フォトエディター",
+          "feminine": "フォトエディター",
+          "neutral": "フォトエディター"
+        }
+      },
+      "ki": {
+        "r_0af68f26119c": {
+          "masculine": "AIフィルムメーカー",
+          "feminine": "AIフィルムメーカー",
+          "neutral": "AIフィルムメーカー"
+        },
+        "r_7ebc4eeffa63": {
+          "masculine": "AIリード / AIスーパーバイザー",
+          "feminine": "AIリード / AIスーパーバイザー",
+          "neutral": "AIリード / AIスーパーバイザー"
+        },
+        "r_5143bd061069": {
+          "masculine": "AIディレクター",
+          "feminine": "AIディレクター",
+          "neutral": "AIディレクター"
+        },
+        "r_8b38d96f6763": {
+          "masculine": "AIアニメーター",
+          "feminine": "AIアニメーター",
+          "neutral": "AIアニメーター"
+        },
+        "r_addc4afc90e0": {
+          "masculine": "プロンプトエンジニア（映画・メディア）",
+          "feminine": "プロンプトエンジニア（映画・メディア）",
+          "neutral": "プロンプトエンジニア（映画・メディア）"
+        },
+        "r_227b357243e1": {
+          "masculine": "AI脚本家",
+          "feminine": "AI脚本家",
+          "neutral": "AI脚本家"
+        },
+        "r_53ef2619b5af": {
+          "masculine": "AI絵コンテアーティスト",
+          "feminine": "AI絵コンテアーティスト",
+          "neutral": "AI絵コンテアーティスト"
+        },
+        "r_1185b1151f24": {
+          "masculine": "AI画像クリエイター",
+          "feminine": "AI画像クリエイター",
+          "neutral": "AI画像クリエイター"
+        },
+        "r_f551cf191b74": {
+          "masculine": "AIビデオクリエイター",
+          "feminine": "AIビデオクリエイター",
+          "neutral": "AIビデオクリエイター"
+        },
+        "r_b69e1ec80a94": {
+          "masculine": "AIサウンドデザイナー",
+          "feminine": "AIサウンドデザイナー",
+          "neutral": "AIサウンドデザイナー"
+        },
+        "r_237f8a4202e1": {
+          "masculine": "AIカラーリスト",
+          "feminine": "AIカラーリスト",
+          "neutral": "AIカラーリスト"
+        },
+        "r_38b5ef6c319c": {
+          "masculine": "AIワークフローコンサルタント（映画）",
+          "feminine": "AIワークフローコンサルタント（映画）",
+          "neutral": "AIワークフローコンサルタント（映画）"
+        }
+      },
+      "drehbuch": {
+        "r_f63a97948825": {
+          "masculine": "ショーランナー",
+          "feminine": "ショーランナー",
+          "neutral": "ショーランナー"
+        },
+        "r_da4094d01df6": {
+          "masculine": "ヘッドライター",
+          "feminine": "ヘッドライター",
+          "neutral": "ヘッドライター"
+        },
+        "r_48862b016872": {
+          "masculine": "ヘッドライターアシスタント",
+          "feminine": "ヘッドライターアシスタント",
+          "neutral": "ヘッドライターアシスタント"
+        },
+        "r_f0e5da473f57": {
+          "masculine": "アシスタントショーランナー",
+          "feminine": "アシスタントショーランナー",
+          "neutral": "アシスタントショーランナー"
+        },
+        "r_be444be7e73a": {
+          "masculine": "脚本家",
+          "feminine": "脚本家",
+          "neutral": "脚本家"
+        },
+        "r_d1a561dc7125": {
+          "masculine": "共同脚本家",
+          "feminine": "共同脚本家",
+          "neutral": "共同脚本家"
+        },
+        "r_da01eb9b61e7": {
+          "masculine": "リライター",
+          "feminine": "リライター",
+          "neutral": "リライター"
+        },
+        "r_199c194315c9": {
+          "masculine": "スクリプトドクター",
+          "feminine": "スクリプトドクター",
+          "neutral": "スクリプトドクター"
+        },
+        "r_a180812047b1": {
+          "masculine": "ストーリーエディター",
+          "feminine": "ストーリーエディター",
+          "neutral": "ストーリーエディター"
+        },
+        "r_5f9704129182": {
+          "masculine": "ストーリーライナー",
+          "feminine": "ストーリーライナー",
+          "neutral": "ストーリーライナー"
+        },
+        "r_41126a4d581f": {
+          "masculine": "スクリプトエディター",
+          "feminine": "スクリプトエディター",
+          "neutral": "スクリプトエディター"
+        },
+        "r_11bee057c159": {
+          "masculine": "ダイアログエディター",
+          "feminine": "ダイアログエディター",
+          "neutral": "ダイアログエディター"
+        },
+        "r_d578a24e6a6c": {
+          "masculine": "ダイアログライター",
+          "feminine": "ダイアログライター",
+          "neutral": "ダイアログライター"
+        },
+        "r_cbc48ad9850e": {
+          "masculine": "スクリプトリーダー",
+          "feminine": "スクリプトリーダー",
+          "neutral": "スクリプトリーダー"
+        },
+        "r_850bbf550984": {
+          "masculine": "ドラマトゥルク / スクリプトコンサルタント",
+          "feminine": "ドラマトゥルク / スクリプトコンサルタント",
+          "neutral": "ドラマトゥルク / スクリプトコンサルタント"
+        },
+        "r_c33a26535234": {
+          "masculine": "ストーリー開発",
+          "feminine": "ストーリー開発",
+          "neutral": "ストーリー開発"
+        },
+        "r_e439aac0b481": {
+          "masculine": "スクリプト責任者",
+          "feminine": "スクリプト責任者",
+          "neutral": "スクリプト責任者"
+        },
+        "r_a30d0af43af8": {
+          "masculine": "ストーリー責任者",
+          "feminine": "ストーリー責任者",
+          "neutral": "ストーリー責任者"
+        },
+        "r_3aa5851edfa7": {
+          "masculine": "フォーマット開発者",
+          "feminine": "フォーマット開発者",
+          "neutral": "フォーマット開発者"
+        },
+        "r_fc05d4531220": {
+          "masculine": "トリートメントライター",
+          "feminine": "トリートメントライター",
+          "neutral": "トリートメントライター"
+        },
+        "r_601f64f82db2": {
+          "masculine": "吹替脚本家",
+          "feminine": "吹替脚本家",
+          "neutral": "吹替脚本家"
+        },
+        "r_1ddc57dbbeb2": {
+          "masculine": "音声解説ライター",
+          "feminine": "音声解説ライター",
+          "neutral": "音声解説ライター"
+        },
+        "r_9f89ae134497": {
+          "masculine": "映画翻訳者",
+          "feminine": "映画翻訳者",
+          "neutral": "映画翻訳者"
+        },
+        "r_6cc875ec3963": {
+          "masculine": "スクリプト翻訳者",
+          "feminine": "スクリプト翻訳者",
+          "neutral": "スクリプト翻訳者"
+        },
+        "r_5947f173deeb": {
+          "masculine": "字幕翻訳者",
+          "feminine": "字幕翻訳者",
+          "neutral": "字幕翻訳者"
+        },
+        "r_7b6a9a537e9a": {
+          "masculine": "ダイアログ翻訳者",
+          "feminine": "ダイアログ翻訳者",
+          "neutral": "ダイアログ翻訳者"
+        },
+        "r_07f1b8537dbc": {
+          "masculine": "トランスクリプト翻訳者",
+          "feminine": "トランスクリプト翻訳者",
+          "neutral": "トランスクリプト翻訳者"
+        },
+        "r_baf097c29e20": {
+          "masculine": "ダイアログリスト書き起こし者",
+          "feminine": "ダイアログリスト書き起こし者",
+          "neutral": "ダイアログリスト書き起こし者"
+        },
+        "r_84f5505f76e2": {
+          "masculine": "コピーライター",
+          "feminine": "コピーライター",
+          "neutral": "コピーライター"
+        },
+        "r_f38e225361bf": {
+          "masculine": "言語アシスタント",
+          "feminine": "言語アシスタント",
+          "neutral": "言語アシスタント"
+        },
+        "r_eda2531fdadf": {
+          "masculine": "リサーチャー",
+          "feminine": "リサーチャー",
+          "neutral": "リサーチャー"
+        },
+        "r_c6e3b618f79f": {
+          "masculine": "リサーチアシスタント",
+          "feminine": "リサーチアシスタント",
+          "neutral": "リサーチアシスタント"
+        },
+        "r_0434302793dc": {
+          "masculine": "スクリプトコーディネーター",
+          "feminine": "スクリプトコーディネーター",
+          "neutral": "スクリプトコーディネーター"
+        },
+        "r_dae3743c6b89": {
+          "masculine": "スクリプトインターン",
+          "feminine": "スクリプトインターン",
+          "neutral": "スクリプトインターン"
+        }
+      },
+      "public-relations": {
+        "r_1860a572354e": {
+          "masculine": "マーケティング＆PR",
+          "feminine": "マーケティング＆PR",
+          "neutral": "マーケティング＆PR"
+        },
+        "r_201f2da74897": {
+          "masculine": "ソーシャルメディアマネージャー（映画）",
+          "feminine": "ソーシャルメディアマネージャー（映画）",
+          "neutral": "ソーシャルメディアマネージャー（映画）"
+        },
+        "r_041271a6a3ee": {
+          "masculine": "プロモーションコーディネーター",
+          "feminine": "プロモーションコーディネーター",
+          "neutral": "プロモーションコーディネーター"
+        }
+      },
+      "sicherheit-sanitaetsdienst": {
+        "r_972d7ff7233a": {
+          "masculine": "セットメディック",
+          "feminine": "セットメディック",
+          "neutral": "セットメディック"
+        },
+        "r_deefff77f871": {
+          "masculine": "救急医療技術者",
+          "feminine": "救急医療技術者",
+          "neutral": "救急医療技術者"
+        },
+        "r_63a9f32e6a72": {
+          "masculine": "職場応急処置メディック",
+          "feminine": "職場応急処置メディック",
+          "neutral": "職場応急処置メディック"
+        },
+        "r_550de11c2d96": {
+          "masculine": "火災監視 / 火災安全監視",
+          "feminine": "火災監視 / 火災安全監視",
+          "neutral": "火災監視 / 火災安全監視"
+        },
+        "r_427dc70aedd7": {
+          "masculine": "火災安全アシスタント",
+          "feminine": "火災安全アシスタント",
+          "neutral": "火災安全アシスタント"
+        },
+        "r_a3247768d472": {
+          "masculine": "火災安全責任者",
+          "feminine": "火災安全責任者",
+          "neutral": "火災安全責任者"
+        }
+      },
+      "catering-setverpflegung": {
+        "r_330e10f94b8f": {
+          "masculine": "ケータリングマネージャー",
+          "feminine": "ケータリングマネージャー",
+          "neutral": "ケータリングマネージャー"
+        },
+        "r_2fe8f1ac7f90": {
+          "masculine": "セットクック / シェフ",
+          "feminine": "セットクック / シェフ",
+          "neutral": "セットクック / シェフ"
+        },
+        "r_463cca2307e9": {
+          "masculine": "ケータリングアシスタント / キッチンアシスタント",
+          "feminine": "ケータリングアシスタント / キッチンアシスタント",
+          "neutral": "ケータリングアシスタント / キッチンアシスタント"
+        },
+        "r_e114754d9175": {
+          "masculine": "クラフトサービス",
+          "feminine": "クラフトサービス",
+          "neutral": "クラフトサービス"
+        },
+        "r_cb6d56c18bf6": {
+          "masculine": "セットケータリング / フードサービス担当",
+          "feminine": "セットケータリング / フードサービス担当",
+          "neutral": "セットケータリング / フードサービス担当"
+        },
+        "r_532adc563b66": {
+          "masculine": "ケータリング / 移動式キッチンドライバー",
+          "feminine": "ケータリング / 移動式キッチンドライバー",
+          "neutral": "ケータリング / 移動式キッチンドライバー"
+        }
+      },
+      "filmtiere-tiertraining": {
+        "r_3d8ab6fb2c6a": {
+          "masculine": "映像用動物トレーナー",
+          "feminine": "映像用動物トレーナー",
+          "neutral": "映像用動物トレーナー"
+        },
+        "r_654c33dc9c6b": {
+          "masculine": "映画用犬トレーナー",
+          "feminine": "映画用犬トレーナー",
+          "neutral": "映画用犬トレーナー"
+        },
+        "r_40758f075d18": {
+          "masculine": "動物ハンドラー",
+          "feminine": "動物ハンドラー",
+          "neutral": "動物ハンドラー"
+        },
+        "r_7a1591b96b3a": {
+          "masculine": "動物コーディネーター",
+          "feminine": "動物コーディネーター",
+          "neutral": "動物コーディネーター"
+        },
+        "r_a63695a566c3": {
+          "masculine": "撮影現場の動物ケア担当",
+          "feminine": "撮影現場の動物ケア担当",
+          "neutral": "撮影現場の動物ケア担当"
+        },
+        "r_9faf951b627e": {
+          "masculine": "ホースマスター",
+          "feminine": "ホースマスター",
+          "neutral": "ホースマスター"
+        },
+        "r_7c4f137defec": {
+          "masculine": "アシスタントホースマスター",
+          "feminine": "アシスタントホースマスター",
+          "neutral": "アシスタントホースマスター"
+        },
+        "r_8e8f21cf0303": {
+          "masculine": "映画用馬トレーナー",
+          "feminine": "映画用馬トレーナー",
+          "neutral": "映画用馬トレーナー"
+        },
+        "r_35f9ffa503c4": {
+          "masculine": "ホースラングラー",
+          "feminine": "ホースラングラー",
+          "neutral": "ホースラングラー"
+        }
+      }
     }
   },
   "TransactionalEmail": {
@@ -8454,5 +13363,13 @@
     "noMatches": "このカテゴリにはまだ保存した項目がありません。",
     "signInHint": "保存した項目を見るにはログインしてください。",
     "removeItem": "保存した項目から{name}を削除"
+  },
+  "OccupationForm": {
+    "title": "職業名の表記",
+    "help": "職業名の表示形式を選べます。いつでも変更できます。",
+    "standard": "標準",
+    "masculine": "男性形",
+    "feminine": "女性形",
+    "neutral": "中立形"
   }
 }

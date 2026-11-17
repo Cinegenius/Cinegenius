@@ -1,3 +1,5 @@
+import type { OccupationForm } from "./occupation-form";
+
 // ═══════════════════════════════════════════════════════════════════════════
 // CineGenius — Vollständiges Profilsystem
 // ═══════════════════════════════════════════════════════════════════════════
@@ -214,6 +216,8 @@ export type TargetFormat =
 // ─── Crew / Technik ──────────────────────────────────────────────────────────
 
 export interface CrewData {
+  /** Self-selected professional wording; absent keeps the compact standard. */
+  occupationForm?: OccupationForm;
   primaryOccupation?: {departmentId: string; roleId: string} | null;
   occupations?: {departmentId: string; roleId: string}[];
   additionalOccupation?: {departmentId: string; roleId: string} | null;

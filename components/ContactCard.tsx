@@ -1,5 +1,7 @@
 "use client";
 
+import type { OccupationForm } from "@/lib/occupation-form";
+
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
@@ -14,6 +16,7 @@ type Contact = {
   display_name: string;
   avatar_url: string | null;
   role: string;
+  occupationForm?: OccupationForm;
 };
 
 export default function ContactCard({ contact, pending, error, onRemove, messageHref, onMessage }: {
@@ -74,7 +77,7 @@ export default function ContactCard({ contact, pending, error, onRemove, message
         </div>
         <div className="min-w-0 [overflow-wrap:anywhere]">
           <p className="text-sm font-semibold text-text-primary">{contact.display_name}</p>
-          <p className="text-xs text-text-muted">{taxonomyLabel(contact.role, uiText)}</p>
+          <p className="text-xs text-text-muted">{taxonomyLabel(contact.role, uiText, contact.occupationForm)}</p>
         </div>
       </div>
       <div className="flex max-w-full flex-wrap items-center gap-x-3 gap-y-1 sm:justify-end">

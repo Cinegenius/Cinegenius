@@ -1687,7 +1687,54 @@
     "previewNotice": "Ez a portfólió jóváhagyásra vár, és csak védett előnézetként látható.",
     "count": "Állatok száma (nem kötelező)",
     "handler": "Tervezett felügyelet trénerrel vagy állatkezelővel",
-    "delivery": "Szállítás a forgatásra lehetséges"
+    "delivery": "Szállítás a forgatásra lehetséges",
+    "roleForms": {
+      "tiertrainer": {
+        "masculine": "Filmes állatidomár",
+        "feminine": "Filmes állatidomár",
+        "neutral": "Filmes állatidomár"
+      },
+      "filmhundetrainer": {
+        "masculine": "Filmes kutyakiképző",
+        "feminine": "Filmes kutyakiképző",
+        "neutral": "Filmes kutyakiképző"
+      },
+      "tierbetreuer": {
+        "masculine": "Állatkezelő (Animal Handler)",
+        "feminine": "Állatkezelő (Animal Handler)",
+        "neutral": "Állatkezelő (Animal Handler)"
+      },
+      "tierkoordination": {
+        "masculine": "Állatkoordinátor",
+        "feminine": "Állatkoordinátor",
+        "neutral": "Állatkoordinátor"
+      },
+      "set-tierbetreuung": {
+        "masculine": "Forgatási állatgondozó",
+        "feminine": "Forgatási állatgondozó",
+        "neutral": "Forgatási állatgondozó"
+      },
+      "horse-master": {
+        "masculine": "Lókoordinátor (Horse Master)",
+        "feminine": "Lókoordinátor (Horse Master)",
+        "neutral": "Lókoordinátor (Horse Master)"
+      },
+      "assistant-horse-master": {
+        "masculine": "Lókoordinátor asszisztense",
+        "feminine": "Lókoordinátor asszisztense",
+        "neutral": "Lókoordinátor asszisztense"
+      },
+      "horse-trainer": {
+        "masculine": "Filmes lókiképző",
+        "feminine": "Filmes lókiképző",
+        "neutral": "Filmes lókiképző"
+      },
+      "horse-wrangler": {
+        "masculine": "Lógondozó (Horse Wrangler)",
+        "feminine": "Lógondozó (Horse Wrangler)",
+        "neutral": "Lógondozó (Horse Wrangler)"
+      }
+    }
   },
   "MarketplaceCatalog": {
     "categories": {
@@ -6145,9 +6192,9 @@
       },
       "licht": {
         "r_222be04dbf00": "Fővilágosító (gaffer)",
-        "r_1e210e69039a": "Világosítóvezető-helyettes (Best Boy / Best Girl Electric)",
+        "r_1e210e69039a": "Vezető világosító-asszisztens (Best Boy/Girl Electric)",
         "r_14dd174cd76c": "Rigging-fővilágosító",
-        "r_92137802b24a": "Rigging világosítóvezető-helyettes (Rigging Best Boy / Rigging Best Girl Electric)",
+        "r_92137802b24a": "Rigging Best Boy/Girl",
         "r_7fce7d6fcf12": "Rigging-világosító",
         "r_1bcf9d8d9b03": "Világosító",
         "r_d95b919dded9": "Világítómester",
@@ -6167,13 +6214,13 @@
       },
       "grip": {
         "r_470156bd03e4": "Vezető grip (Key Grip)",
-        "r_cfbf2a22ed6e": "Gripvezető-helyettes (Best Boy / Best Girl Grip)",
+        "r_cfbf2a22ed6e": "Gripvezető-helyettes / második kameramozgató",
         "r_32a6ab31b1a1": "Dollykezelő",
         "r_376dc1f790b8": "Grip / kameramozgatás",
         "r_dbfaadb8821c": "Kameramozgató asszisztens",
         "r_46dab52c1995": "Rigging grip",
         "r_ea7e925bd850": "Vezető rigging grip",
-        "r_fa9d72fc7978": "Rigging gripvezető-helyettes (Rigging Best Boy / Rigging Best Girl Grip)",
+        "r_fa9d72fc7978": "Rigging gripvezető-helyettes",
         "r_2fa0b44342d7": "Különleges szerkezetek (kameramozgatás)",
         "r_08c07afebb7f": "Kameradaru- / jibkezelő",
         "r_5ece318b289f": "Kameradaru-technikus",
@@ -6815,7 +6862,7 @@
         "r_ce039c1f951f": "Mozgógrafikus (közösségi média)"
       },
       "foto": {
-        "r_d2c0588cf0d1": "Fotós",
+        "r_d2c0588cf0d1": "Fotográfus",
         "r_d7f7fbf5939c": "Divatfotós",
         "r_e0551919b067": "Termékfotós",
         "r_b06301444ef7": "Rendezvényfotós",
@@ -6979,6 +7026,4868 @@
       "x_907c602b417d": "Online és digitális",
       "x_f4581b3b4f89": "Weboldal, platform, streaming",
       "x_d06f18dfc1af": "Egyéb filmes szolgáltatások"
+    },
+    "roleForms": {
+      "produktion": {
+        "r_d479a6d8637e": {
+          "masculine": "Producer",
+          "feminine": "Producer",
+          "neutral": "Producer"
+        },
+        "r_86ca6f7fac85": {
+          "masculine": "Vezető producer",
+          "feminine": "Vezető producer",
+          "neutral": "Vezető producer"
+        },
+        "r_9b38cf86cffe": {
+          "masculine": "Koproducer",
+          "feminine": "Koproducer",
+          "neutral": "Koproducer"
+        },
+        "r_bd2e1cd12f54": {
+          "masculine": "Társproducer",
+          "feminine": "Társproducer",
+          "neutral": "Társproducer"
+        },
+        "r_bc840a4895a2": {
+          "masculine": "Junior producer",
+          "feminine": "Junior producer",
+          "neutral": "Junior producer"
+        },
+        "r_ebaa595e4927": {
+          "masculine": "Line producer",
+          "feminine": "Line producer",
+          "neutral": "Line producer"
+        },
+        "r_9f722922fe7b": {
+          "masculine": "Gyártásvezető (HL)",
+          "feminine": "Gyártásvezető (HL)",
+          "neutral": "Gyártásvezető (HL)"
+        },
+        "r_7fdd4fd31143": {
+          "masculine": "Gyártásvezető asszisztense",
+          "feminine": "Gyártásvezető asszisztense",
+          "neutral": "Gyártásvezető asszisztense"
+        },
+        "r_c8c7f4cd576e": {
+          "masculine": "Produkcióvezető (PL)",
+          "feminine": "Produkcióvezető (PL)",
+          "neutral": "Produkcióvezető (PL)"
+        },
+        "r_edde7bed564a": {
+          "masculine": "Produkcióvezető (csatorna)",
+          "feminine": "Produkcióvezető (csatorna)",
+          "neutral": "Produkcióvezető (csatorna)"
+        },
+        "r_08532652fb27": {
+          "masculine": "Produkcióvezető asszisztense",
+          "feminine": "Produkcióvezető asszisztense",
+          "neutral": "Produkcióvezető asszisztense"
+        },
+        "r_a8ccedf1c4fc": {
+          "masculine": "Beosztásszervező / produkciótervező",
+          "feminine": "Beosztásszervező / produkciótervező",
+          "neutral": "Beosztásszervező / produkciótervező"
+        },
+        "r_73ab62cc6ea9": {
+          "masculine": "Költségvetés-készítő",
+          "feminine": "Költségvetés-készítő",
+          "neutral": "Költségvetés-készítő"
+        },
+        "r_5e8f13168720": {
+          "masculine": "Produkciós felügyelő",
+          "feminine": "Produkciós felügyelő",
+          "neutral": "Produkciós felügyelő"
+        },
+        "r_a8aaf07776e6": {
+          "masculine": "Produkciós felügyelő asszisztense",
+          "feminine": "Produkciós felügyelő asszisztense",
+          "neutral": "Produkciós felügyelő asszisztense"
+        },
+        "r_86a64b938274": {
+          "masculine": "Stúdióvezető",
+          "feminine": "Stúdióvezető",
+          "neutral": "Stúdióvezető"
+        },
+        "r_1dc3e15735f4": {
+          "masculine": "Produkciós koordinátor",
+          "feminine": "Produkciós koordinátor",
+          "neutral": "Produkciós koordinátor"
+        },
+        "r_3d2828618f01": {
+          "masculine": "Produkciós koordinátor asszisztense",
+          "feminine": "Produkciós koordinátor asszisztense",
+          "neutral": "Produkciós koordinátor asszisztense"
+        },
+        "r_b7b1c24b3218": {
+          "masculine": "Produkciós asszisztens (forgatás)",
+          "feminine": "Produkciós asszisztens (forgatás)",
+          "neutral": "Produkciós asszisztens (forgatás)"
+        },
+        "r_504614327108": {
+          "masculine": "Produkciós asszisztens (iroda)",
+          "feminine": "Produkciós asszisztens (iroda)",
+          "neutral": "Produkciós asszisztens (iroda)"
+        },
+        "r_b1c1be59d3fb": {
+          "masculine": "Második produkciós asszisztens",
+          "feminine": "Második produkciós asszisztens",
+          "neutral": "Második produkciós asszisztens"
+        },
+        "r_e9fe06329d79": {
+          "masculine": "Csapatasszisztens",
+          "feminine": "Csapatasszisztens",
+          "neutral": "Csapatasszisztens"
+        },
+        "r_caad7ad378e8": {
+          "masculine": "Személyi asszisztens",
+          "feminine": "Személyi asszisztens",
+          "neutral": "Személyi asszisztens"
+        },
+        "r_9b9ea0970d1e": {
+          "masculine": "A produkció személyi asszisztense",
+          "feminine": "A produkció személyi asszisztense",
+          "neutral": "A produkció személyi asszisztense"
+        },
+        "r_22ca8fe2e611": {
+          "masculine": "Színészek személyi asszisztense",
+          "feminine": "Színészek személyi asszisztense",
+          "neutral": "Színészek személyi asszisztense"
+        },
+        "r_bdfbe6854805": {
+          "masculine": "Producer asszisztense",
+          "feminine": "Producer asszisztense",
+          "neutral": "Producer asszisztense"
+        },
+        "r_d894e33cd89e": {
+          "masculine": "Vezetői asszisztens",
+          "feminine": "Vezetői asszisztens",
+          "neutral": "Vezetői asszisztens"
+        },
+        "r_bdc2cdf19051": {
+          "masculine": "Irodai asszisztens",
+          "feminine": "Irodai asszisztens",
+          "neutral": "Irodai asszisztens"
+        },
+        "r_328519d70fd2": {
+          "masculine": "Szálláskoordinátor",
+          "feminine": "Szálláskoordinátor",
+          "neutral": "Szálláskoordinátor"
+        },
+        "r_6747956824f3": {
+          "masculine": "Utazási koordinátor",
+          "feminine": "Utazási koordinátor",
+          "neutral": "Utazási koordinátor"
+        },
+        "r_b809fe7525be": {
+          "masculine": "Utazási koordinátor asszisztense",
+          "feminine": "Utazási koordinátor asszisztense",
+          "neutral": "Utazási koordinátor asszisztense"
+        },
+        "r_86c92e0bfce0": {
+          "masculine": "Munkavédelmi koordinátor",
+          "feminine": "Munkavédelmi koordinátor",
+          "neutral": "Munkavédelmi koordinátor"
+        },
+        "r_14cee2575cf1": {
+          "masculine": "Utószinkron-koordinátor",
+          "feminine": "Utószinkron-koordinátor",
+          "neutral": "Utószinkron-koordinátor"
+        },
+        "r_92286a252903": {
+          "masculine": "Helyszínmenedzser",
+          "feminine": "Helyszínmenedzser",
+          "neutral": "Helyszínmenedzser"
+        },
+        "r_fc08fa159e6a": {
+          "masculine": "Helyszínkereső",
+          "feminine": "Helyszínkereső",
+          "neutral": "Helyszínkereső"
+        },
+        "r_e5215fd85f99": {
+          "masculine": "Kiegészítő helyszínkereső",
+          "feminine": "Kiegészítő helyszínkereső",
+          "neutral": "Kiegészítő helyszínkereső"
+        },
+        "r_9454a017e69a": {
+          "masculine": "Helyszínkereső asszisztense",
+          "feminine": "Helyszínkereső asszisztense",
+          "neutral": "Helyszínkereső asszisztense"
+        },
+        "r_0d7a23f6a056": {
+          "masculine": "Helyszínkoordinátor",
+          "feminine": "Helyszínkoordinátor",
+          "neutral": "Helyszínkoordinátor"
+        },
+        "r_11bbfbf26e46": {
+          "masculine": "Színészkoordinátor",
+          "feminine": "Színészkoordinátor",
+          "neutral": "Színészkoordinátor"
+        },
+        "r_155f85cc8157": {
+          "masculine": "Egységvezető",
+          "feminine": "Egységvezető",
+          "neutral": "Egységvezető"
+        },
+        "r_475eba080a17": {
+          "masculine": "Covid-koordinátor",
+          "feminine": "Covid-koordinátor",
+          "neutral": "Covid-koordinátor"
+        },
+        "r_a60ca701fcab": {
+          "masculine": "Covid-koordinátor asszisztense",
+          "feminine": "Covid-koordinátor asszisztense",
+          "neutral": "Covid-koordinátor asszisztense"
+        },
+        "r_87a049b62039": {
+          "masculine": "Helyszíni felvételvezető",
+          "feminine": "Helyszíni felvételvezető",
+          "neutral": "Helyszíni felvételvezető"
+        },
+        "r_5b93948ca9fc": {
+          "masculine": "Helyszíni felvételvezető asszisztense",
+          "feminine": "Helyszíni felvételvezető asszisztense",
+          "neutral": "Helyszíni felvételvezető asszisztense"
+        },
+        "r_8a0cbf242686": {
+          "masculine": "Személyzeti beosztásszervező",
+          "feminine": "Személyzeti beosztásszervező",
+          "neutral": "Személyzeti beosztásszervező"
+        },
+        "r_286fb0baa150": {
+          "masculine": "Szállítási koordinátor",
+          "feminine": "Szállítási koordinátor",
+          "neutral": "Szállítási koordinátor"
+        },
+        "r_8e7b74f8a60b": {
+          "masculine": "Szállítási koordinátor asszisztense",
+          "feminine": "Szállítási koordinátor asszisztense",
+          "neutral": "Szállítási koordinátor asszisztense"
+        },
+        "r_940718151db8": {
+          "masculine": "Szállítási csoportvezető",
+          "feminine": "Szállítási csoportvezető",
+          "neutral": "Szállítási csoportvezető"
+        },
+        "r_34e7de86b42e": {
+          "masculine": "Felvételvezető (1st AD)",
+          "feminine": "Felvételvezető (1st AD)",
+          "neutral": "Felvételvezető (1st AD)"
+        },
+        "r_2492443d2786": {
+          "masculine": "Forgatási felvételvezető",
+          "feminine": "Forgatási felvételvezető",
+          "neutral": "Forgatási felvételvezető"
+        },
+        "r_e9593d0ce404": {
+          "masculine": "Harmadik rendezőasszisztens / statiszták rendezőasszisztense",
+          "feminine": "Harmadik rendezőasszisztens / statiszták rendezőasszisztense",
+          "neutral": "Harmadik rendezőasszisztens / statiszták rendezőasszisztense"
+        },
+        "r_4492528d7f86": {
+          "masculine": "Bázis-felvételvezető",
+          "feminine": "Bázis-felvételvezető",
+          "neutral": "Bázis-felvételvezető"
+        },
+        "r_eaee2c8a1b89": {
+          "masculine": "Sofőrök csoportvezetője",
+          "feminine": "Sofőrök csoportvezetője",
+          "neutral": "Sofőrök csoportvezetője"
+        },
+        "r_1e792192a593": {
+          "masculine": "Stúdió-felvételvezető",
+          "feminine": "Stúdió-felvételvezető",
+          "neutral": "Stúdió-felvételvezető"
+        },
+        "r_453722f35b4e": {
+          "masculine": "Területlezárási vezető",
+          "feminine": "Területlezárási vezető",
+          "neutral": "Területlezárási vezető"
+        },
+        "r_01cf9ccbf27d": {
+          "masculine": "Második felvételvezető (műsor / közvetítés)",
+          "feminine": "Második felvételvezető (műsor / közvetítés)",
+          "neutral": "Második felvételvezető (műsor / közvetítés)"
+        },
+        "r_282e1b7d8f09": {
+          "masculine": "Átállási koordinátor",
+          "feminine": "Átállási koordinátor",
+          "neutral": "Átállási koordinátor"
+        },
+        "r_8016e2e4e662": {
+          "masculine": "Felvételvezető asszisztense",
+          "feminine": "Felvételvezető asszisztense",
+          "neutral": "Felvételvezető asszisztense"
+        },
+        "r_1fb7a2292310": {
+          "masculine": "Első felvételvezető asszisztense",
+          "feminine": "Első felvételvezető asszisztense",
+          "neutral": "Első felvételvezető asszisztense"
+        },
+        "r_366708fdb0b3": {
+          "masculine": "Forgatási felvételvezető asszisztense",
+          "feminine": "Forgatási felvételvezető asszisztense",
+          "neutral": "Forgatási felvételvezető asszisztense"
+        },
+        "r_d73d495c6d75": {
+          "masculine": "Parkolási produkciós asszisztens",
+          "feminine": "Parkolási produkciós asszisztens",
+          "neutral": "Parkolási produkciós asszisztens"
+        },
+        "r_4ed4cafa632a": {
+          "masculine": "Lezárási segítő",
+          "feminine": "Lezárási segítő",
+          "neutral": "Lezárási segítő"
+        },
+        "r_6fbe7d952889": {
+          "masculine": "Forgatási kisegítő",
+          "feminine": "Forgatási kisegítő",
+          "neutral": "Forgatási kisegítő"
+        },
+        "r_c8d2a6e8ca0f": {
+          "masculine": "Produkciós sofőr",
+          "feminine": "Produkciós sofőr",
+          "neutral": "Produkciós sofőr"
+        },
+        "r_0d9b0abd3608": {
+          "masculine": "Személyi sofőr",
+          "feminine": "Személyi sofőr",
+          "neutral": "Személyi sofőr"
+        },
+        "r_ef2266f5ad5d": {
+          "masculine": "Eszközszállító sofőr",
+          "feminine": "Eszközszállító sofőr",
+          "neutral": "Eszközszállító sofőr"
+        },
+        "r_100be7827daf": {
+          "masculine": "Irodai produkciós asszisztens",
+          "feminine": "Irodai produkciós asszisztens",
+          "neutral": "Irodai produkciós asszisztens"
+        },
+        "r_c24ef6245054": {
+          "masculine": "Költségvetés-készítő",
+          "feminine": "Költségvetés-készítő",
+          "neutral": "Költségvetés-készítő"
+        },
+        "r_e90f5848bfc3": {
+          "masculine": "Filmes pénzügyi vezetés",
+          "feminine": "Filmes pénzügyi vezetés",
+          "neutral": "Filmes pénzügyi vezetés"
+        },
+        "r_c6dc08a47d0d": {
+          "masculine": "Filmes kontroller",
+          "feminine": "Filmes kontroller",
+          "neutral": "Filmes kontroller"
+        },
+        "r_2557c22fb3d7": {
+          "masculine": "Környezeti tanácsadó / fenntarthatósági vezető",
+          "feminine": "Környezeti tanácsadó / fenntarthatósági vezető",
+          "neutral": "Környezeti tanácsadó / fenntarthatósági vezető"
+        },
+        "r_2a6c1d42831e": {
+          "masculine": "Produkciós gyakornok",
+          "feminine": "Produkciós gyakornok",
+          "neutral": "Produkciós gyakornok"
+        },
+        "r_ede69642be01": {
+          "masculine": "Forgatási felvételvezetői gyakornok",
+          "feminine": "Forgatási felvételvezetői gyakornok",
+          "neutral": "Forgatási felvételvezetői gyakornok"
+        },
+        "r_de9ab1a6b55a": {
+          "masculine": "Produkcióvezető",
+          "feminine": "Produkcióvezető",
+          "neutral": "Produkcióvezető"
+        },
+        "r_fd701e2c1e86": {
+          "masculine": "Felvételvezető",
+          "feminine": "Felvételvezető",
+          "neutral": "Felvételvezető"
+        },
+        "r_eb2de9d80eb5": {
+          "masculine": "Produkciós koordinátor",
+          "feminine": "Produkciós koordinátor",
+          "neutral": "Produkciós koordinátor"
+        },
+        "r_14ba71897157": {
+          "masculine": "Produkciós koordinátor asszisztense",
+          "feminine": "Produkciós koordinátor asszisztense",
+          "neutral": "Produkciós koordinátor asszisztense"
+        },
+        "r_9a9272ffef87": {
+          "masculine": "Produkciós asszisztencia",
+          "feminine": "Produkciós asszisztencia",
+          "neutral": "Produkciós asszisztencia"
+        },
+        "r_b37de62fa7b6": {
+          "masculine": "Második produkciós asszisztens",
+          "feminine": "Második produkciós asszisztens",
+          "neutral": "Második produkciós asszisztens"
+        },
+        "r_35a318ed734f": {
+          "masculine": "Utazási koordinátor asszisztense",
+          "feminine": "Utazási koordinátor asszisztense",
+          "neutral": "Utazási koordinátor asszisztense"
+        },
+        "r_282f5f19af6e": {
+          "masculine": "Forgatási felvételvezető",
+          "feminine": "Forgatási felvételvezető",
+          "neutral": "Forgatási felvételvezető"
+        },
+        "r_a1888e7923b1": {
+          "masculine": "Csapatasszisztens (korábban produkciós titkár)",
+          "feminine": "Csapatasszisztens (korábban produkciós titkár)",
+          "neutral": "Csapatasszisztens (korábban produkciós titkár)"
+        },
+        "r_079a221fcd0e": {
+          "masculine": "Második felvételvezetők (műsor / közvetítés)",
+          "feminine": "Második felvételvezetők (műsor / közvetítés)",
+          "neutral": "Második felvételvezetők (műsor / közvetítés)"
+        },
+        "r_c74c78be5dc2": {
+          "masculine": "Szereplőválogató rendező",
+          "feminine": "Szereplőválogató rendező",
+          "neutral": "Szereplőválogató rendező"
+        },
+        "r_b6e7722029a2": {
+          "masculine": "Produkciós kontroller",
+          "feminine": "Produkciós kontroller",
+          "neutral": "Produkciós kontroller"
+        },
+        "r_4e9c5d6d7198": {
+          "masculine": "Filmes pénzügyi vezető",
+          "feminine": "Filmes pénzügyi vezető",
+          "neutral": "Filmes pénzügyi vezető"
+        },
+        "r_907eb6829faf": {
+          "masculine": "Könyvelő",
+          "feminine": "Könyvelő",
+          "neutral": "Könyvelő"
+        },
+        "r_9ef806a95399": {
+          "masculine": "Filmes pénzügyi vezető asszisztense",
+          "feminine": "Filmes pénzügyi vezető asszisztense",
+          "neutral": "Filmes pénzügyi vezető asszisztense"
+        },
+        "r_3365c6d66b72": {
+          "masculine": "Pénztáros",
+          "feminine": "Pénztáros",
+          "neutral": "Pénztáros"
+        },
+        "r_354a33db42c7": {
+          "masculine": "Bérszámfejtő",
+          "feminine": "Bérszámfejtő",
+          "neutral": "Bérszámfejtő"
+        },
+        "r_f3b7a4579d13": {
+          "masculine": "Filmes pénzügyi gyakornok",
+          "feminine": "Filmes pénzügyi gyakornok",
+          "neutral": "Filmes pénzügyi gyakornok"
+        },
+        "r_614a09237466": {
+          "masculine": "Produkciós stratégiai vezető",
+          "feminine": "Produkciós stratégiai vezető",
+          "neutral": "Produkciós stratégiai vezető"
+        },
+        "r_ab2bca044ad5": {
+          "masculine": "Fejlesztési vezető",
+          "feminine": "Fejlesztési vezető",
+          "neutral": "Fejlesztési vezető"
+        },
+        "r_4c6443207ff2": {
+          "masculine": "Szolgáltató producer",
+          "feminine": "Szolgáltató producer",
+          "neutral": "Szolgáltató producer"
+        },
+        "r_f43970f8871f": {
+          "masculine": "Produkciós vezető (stúdió / csatorna)",
+          "feminine": "Produkciós vezető (stúdió / csatorna)",
+          "neutral": "Produkciós vezető (stúdió / csatorna)"
+        },
+        "r_b490dba5695d": {
+          "masculine": "Asszisztens producer",
+          "feminine": "Asszisztens producer",
+          "neutral": "Asszisztens producer"
+        },
+        "r_7b68ca0f0fb6": {
+          "masculine": "Televíziós producer",
+          "feminine": "Televíziós producer",
+          "neutral": "Televíziós producer"
+        },
+        "r_564bd1be967c": {
+          "masculine": "Promóciós producer",
+          "feminine": "Promóciós producer",
+          "neutral": "Promóciós producer"
+        },
+        "r_17e75f09bb7a": {
+          "masculine": "Felügyelő producer",
+          "feminine": "Felügyelő producer",
+          "neutral": "Felügyelő producer"
+        },
+        "r_09bdde75b5c6": {
+          "masculine": "Történetproducer",
+          "feminine": "Történetproducer",
+          "neutral": "Történetproducer"
+        },
+        "r_63333ae7406f": {
+          "masculine": "Utómunka-történetproducer",
+          "feminine": "Utómunka-történetproducer",
+          "neutral": "Utómunka-történetproducer"
+        },
+        "r_1c7b4db06402": {
+          "masculine": "Ügynökségi / televíziós reklámproducer",
+          "feminine": "Ügynökségi / televíziós reklámproducer",
+          "neutral": "Ügynökségi / televíziós reklámproducer"
+        },
+        "r_05c4bc7ca840": {
+          "masculine": "3D sztereó producer",
+          "feminine": "3D sztereó producer",
+          "neutral": "3D sztereó producer"
+        },
+        "r_6221ed87ef22": {
+          "masculine": "3D sztereó felügyelő producer",
+          "feminine": "3D sztereó felügyelő producer",
+          "neutral": "3D sztereó felügyelő producer"
+        },
+        "r_7edb24c15dcf": {
+          "masculine": "Webtévés producer",
+          "feminine": "Webtévés producer",
+          "neutral": "Webtévés producer"
+        },
+        "r_3d984a13d7b5": {
+          "masculine": "Kreatív producer",
+          "feminine": "Kreatív producer",
+          "neutral": "Kreatív producer"
+        },
+        "r_ae0c8b90c8d1": {
+          "masculine": "Fejlesztési producer",
+          "feminine": "Fejlesztési producer",
+          "neutral": "Fejlesztési producer"
+        },
+        "r_d297bfadcae2": {
+          "masculine": "Fejlesztési koordinátor",
+          "feminine": "Fejlesztési koordinátor",
+          "neutral": "Fejlesztési koordinátor"
+        },
+        "r_54f1c9f4d11e": {
+          "masculine": "Fejlesztési vezető (stúdió / csatorna)",
+          "feminine": "Fejlesztési vezető (stúdió / csatorna)",
+          "neutral": "Fejlesztési vezető (stúdió / csatorna)"
+        },
+        "r_f42fa61db712": {
+          "masculine": "Vezérlőtermi társproducer",
+          "feminine": "Vezérlőtermi társproducer",
+          "neutral": "Vezérlőtermi társproducer"
+        },
+        "r_9d8ea4e7c7aa": {
+          "masculine": "Vezérlőtermi producer / adásproducer",
+          "feminine": "Vezérlőtermi producer / adásproducer",
+          "neutral": "Vezérlőtermi producer / adásproducer"
+        },
+        "r_b837afb89817": {
+          "masculine": "Adáspromóciós producer",
+          "feminine": "Adáspromóciós producer",
+          "neutral": "Adáspromóciós producer"
+        },
+        "r_bacc7a4ec265": {
+          "masculine": "Szerzői jogi ügyek",
+          "feminine": "Szerzői jogi ügyek",
+          "neutral": "Szerzői jogi ügyek"
+        },
+        "r_7e0ace38e8fc": {
+          "masculine": "Üzleti ügyek",
+          "feminine": "Üzleti ügyek",
+          "neutral": "Üzleti ügyek"
+        },
+        "r_0daf662f57c6": {
+          "masculine": "Üzleti és jogi ügyek",
+          "feminine": "Üzleti és jogi ügyek",
+          "neutral": "Üzleti és jogi ügyek"
+        },
+        "r_a95b977fa84f": {
+          "masculine": "Jogi ügyek",
+          "feminine": "Jogi ügyek",
+          "neutral": "Jogi ügyek"
+        },
+        "r_0433186beb99": {
+          "masculine": "Marketing- és forgalmazási producer",
+          "feminine": "Marketing- és forgalmazási producer",
+          "neutral": "Marketing- és forgalmazási producer"
+        },
+        "r_07f0060c8996": {
+          "masculine": "Produceri gyakornok",
+          "feminine": "Produceri gyakornok",
+          "neutral": "Produceri gyakornok"
+        }
+      },
+      "regie": {
+        "r_f59d6991c44a": {
+          "masculine": "Rendező",
+          "feminine": "Rendező",
+          "neutral": "Rendező"
+        },
+        "r_5562e3abbb45": {
+          "masculine": "Társrendező",
+          "feminine": "Társrendező",
+          "neutral": "Társrendező"
+        },
+        "r_df7e552a6792": {
+          "masculine": "Második stáb rendezője",
+          "feminine": "Második stáb rendezője",
+          "neutral": "Második stáb rendezője"
+        },
+        "r_0aca88b2853d": {
+          "masculine": "Stúdiórendező",
+          "feminine": "Stúdiórendező",
+          "neutral": "Stúdiórendező"
+        },
+        "r_394140e22c16": {
+          "masculine": "Szinkronrendező",
+          "feminine": "Szinkronrendező",
+          "neutral": "Szinkronrendező"
+        },
+        "r_7d2cd6bd3a73": {
+          "masculine": "Képrendező",
+          "feminine": "Képrendező",
+          "neutral": "Képrendező"
+        },
+        "r_988a573b39e7": {
+          "masculine": "Adásrendező",
+          "feminine": "Adásrendező",
+          "neutral": "Adásrendező"
+        },
+        "r_0719ad7a68ec": {
+          "masculine": "Dialógusrendező",
+          "feminine": "Dialógusrendező",
+          "neutral": "Dialógusrendező"
+        },
+        "r_463462fca2ec": {
+          "masculine": "Első rendezőasszisztens (1st AD)",
+          "feminine": "Első rendezőasszisztens (1st AD)",
+          "neutral": "Első rendezőasszisztens (1st AD)"
+        },
+        "r_de1c193ae4d6": {
+          "masculine": "Második rendezőasszisztens (2nd AD)",
+          "feminine": "Második rendezőasszisztens (2nd AD)",
+          "neutral": "Második rendezőasszisztens (2nd AD)"
+        },
+        "r_c37babd28464": {
+          "masculine": "Vezető második rendezőasszisztens",
+          "feminine": "Vezető második rendezőasszisztens",
+          "neutral": "Vezető második rendezőasszisztens"
+        },
+        "r_2b8bbebafa40": {
+          "masculine": "Helyszíni második rendezőasszisztens",
+          "feminine": "Helyszíni második rendezőasszisztens",
+          "neutral": "Helyszíni második rendezőasszisztens"
+        },
+        "r_b0a3c67c20bf": {
+          "masculine": "Statiszták második rendezőasszisztense",
+          "feminine": "Statiszták második rendezőasszisztense",
+          "neutral": "Statiszták második rendezőasszisztense"
+        },
+        "r_b6640a0bf9b6": {
+          "masculine": "Harmadik rendezőasszisztens (3rd AD)",
+          "feminine": "Harmadik rendezőasszisztens (3rd AD)",
+          "neutral": "Harmadik rendezőasszisztens (3rd AD)"
+        },
+        "r_962cb1546148": {
+          "masculine": "Statiszták harmadik rendezőasszisztense",
+          "feminine": "Statiszták harmadik rendezőasszisztense",
+          "neutral": "Statiszták harmadik rendezőasszisztense"
+        },
+        "r_619aa382d108": {
+          "masculine": "Bázis harmadik rendezőasszisztense",
+          "feminine": "Bázis harmadik rendezőasszisztense",
+          "neutral": "Bázis harmadik rendezőasszisztense"
+        },
+        "r_14816f8e2f93": {
+          "masculine": "Helyszíni harmadik rendezőasszisztens",
+          "feminine": "Helyszíni harmadik rendezőasszisztens",
+          "neutral": "Helyszíni harmadik rendezőasszisztens"
+        },
+        "r_00bb63b14962": {
+          "masculine": "Rendezőasszisztensi kisegítő",
+          "feminine": "Rendezőasszisztensi kisegítő",
+          "neutral": "Rendezőasszisztensi kisegítő"
+        },
+        "r_da45564f42a3": {
+          "masculine": "Vezető rendezőasszisztensi kisegítő",
+          "feminine": "Vezető rendezőasszisztensi kisegítő",
+          "neutral": "Vezető rendezőasszisztensi kisegítő"
+        },
+        "r_d4de545cc559": {
+          "masculine": "Rendezőasszisztens-gyakornok",
+          "feminine": "Rendezőasszisztens-gyakornok",
+          "neutral": "Rendezőasszisztens-gyakornok"
+        },
+        "r_b8f3b216cf72": {
+          "masculine": "Statisztaszervező",
+          "feminine": "Statisztaszervező",
+          "neutral": "Statisztaszervező"
+        },
+        "r_7d061a318612": {
+          "masculine": "Statisztaszervező asszisztense",
+          "feminine": "Statisztaszervező asszisztense",
+          "neutral": "Statisztaszervező asszisztense"
+        },
+        "r_dbf51638d5ed": {
+          "masculine": "Skript / folytonossági felügyelő",
+          "feminine": "Skript / folytonossági felügyelő",
+          "neutral": "Skript / folytonossági felügyelő"
+        },
+        "r_db6f57df190b": {
+          "masculine": "Skriptasszisztens",
+          "feminine": "Skriptasszisztens",
+          "neutral": "Skriptasszisztens"
+        },
+        "r_043751863fa5": {
+          "masculine": "Forgatási skript",
+          "feminine": "Forgatási skript",
+          "neutral": "Forgatási skript"
+        },
+        "r_d7e7e0e56ce6": {
+          "masculine": "Storyboardrajzoló",
+          "feminine": "Storyboardrajzoló",
+          "neutral": "Storyboardrajzoló"
+        },
+        "r_d5f343108ed5": {
+          "masculine": "Színésztréner",
+          "feminine": "Színésztréner",
+          "neutral": "Színésztréner"
+        },
+        "r_8ac3532c0c32": {
+          "masculine": "Gyermekszínész-tréner",
+          "feminine": "Gyermekszínész-tréner",
+          "neutral": "Gyermekszínész-tréner"
+        },
+        "r_bf13c927e8eb": {
+          "masculine": "Dialóguscoach",
+          "feminine": "Dialóguscoach",
+          "neutral": "Dialóguscoach"
+        },
+        "r_82fff9096145": {
+          "masculine": "Statisztafelügyelő",
+          "feminine": "Statisztafelügyelő",
+          "neutral": "Statisztafelügyelő"
+        },
+        "r_e57426b6a805": {
+          "masculine": "Statisztafelügyelő asszisztense",
+          "feminine": "Statisztafelügyelő asszisztense",
+          "neutral": "Statisztafelügyelő asszisztense"
+        },
+        "r_c2b6031ad212": {
+          "masculine": "Rendező személyi asszisztense",
+          "feminine": "Rendező személyi asszisztense",
+          "neutral": "Rendező személyi asszisztense"
+        },
+        "r_1ed956774605": {
+          "masculine": "Rendező személyi asszisztenciája",
+          "feminine": "Rendező személyi asszisztenciája",
+          "neutral": "Rendező személyi asszisztenciája"
+        },
+        "r_7d0bc36aabcb": {
+          "masculine": "Rendezői gyakornok",
+          "feminine": "Rendezői gyakornok",
+          "neutral": "Rendezői gyakornok"
+        },
+        "r_bf4aaefa2f9f": {
+          "masculine": "Skriptgyakornok",
+          "feminine": "Skriptgyakornok",
+          "neutral": "Skriptgyakornok"
+        },
+        "r_45bf2bbe37f0": {
+          "masculine": "Rendezőasszisztencia (forgatási kisegítő)",
+          "feminine": "Rendezőasszisztencia (forgatási kisegítő)",
+          "neutral": "Rendezőasszisztencia (forgatási kisegítő)"
+        },
+        "r_9ced64ab6db5": {
+          "masculine": "Első rendezőasszisztens",
+          "feminine": "Első rendezőasszisztens",
+          "neutral": "Első rendezőasszisztens"
+        },
+        "r_b6ac41792b48": {
+          "masculine": "Második rendezőasszisztens",
+          "feminine": "Második rendezőasszisztens",
+          "neutral": "Második rendezőasszisztens"
+        },
+        "r_6b9cabf3cbca": {
+          "masculine": "Skript",
+          "feminine": "Skript",
+          "neutral": "Skript"
+        },
+        "r_93f52c1c7000": {
+          "masculine": "Második stáb rendezője",
+          "feminine": "Második stáb rendezője",
+          "neutral": "Második stáb rendezője"
+        },
+        "r_591d7faf8f5d": {
+          "masculine": "Személyi asszisztens",
+          "feminine": "Személyi asszisztens",
+          "neutral": "Személyi asszisztens"
+        },
+        "r_c01dd7739f5a": {
+          "masculine": "Statisztafelügyelő asszisztense",
+          "feminine": "Statisztafelügyelő asszisztense",
+          "neutral": "Statisztafelügyelő asszisztense"
+        }
+      },
+      "kamera": {
+        "r_9659ff478da5": {
+          "masculine": "Vezető operatőr (DoP)",
+          "feminine": "Vezető operatőr (DoP)",
+          "neutral": "Vezető operatőr (DoP)"
+        },
+        "r_f1286611f452": {
+          "masculine": "Képi megjelenés vezetője (DoI)",
+          "feminine": "Képi megjelenés vezetője (DoI)",
+          "neutral": "Képi megjelenés vezetője (DoI)"
+        },
+        "r_c519de89c832": {
+          "masculine": "A-kamera operatőre",
+          "feminine": "A-kamera operatőre",
+          "neutral": "A-kamera operatőre"
+        },
+        "r_69b451280549": {
+          "masculine": "B-kamera operatőre",
+          "feminine": "B-kamera operatőre",
+          "neutral": "B-kamera operatőre"
+        },
+        "r_147c6db611ab": {
+          "masculine": "C-kamera operatőre",
+          "feminine": "C-kamera operatőre",
+          "neutral": "C-kamera operatőre"
+        },
+        "r_00ec6018a92f": {
+          "masculine": "Elektronikus kamera operatőre (stúdió / külső)",
+          "feminine": "Elektronikus kamera operatőre (stúdió / külső)",
+          "neutral": "Elektronikus kamera operatőre (stúdió / külső)"
+        },
+        "r_15338319dd09": {
+          "masculine": "Hírforgató operatőr",
+          "feminine": "Hírforgató operatőr",
+          "neutral": "Hírforgató operatőr"
+        },
+        "r_3b00f8763d24": {
+          "masculine": "Második stáb operatőre",
+          "feminine": "Második stáb operatőre",
+          "neutral": "Második stáb operatőre"
+        },
+        "r_2815a6f7d251": {
+          "masculine": "Harmadik stáb operatőre",
+          "feminine": "Harmadik stáb operatőre",
+          "neutral": "Harmadik stáb operatőre"
+        },
+        "r_46bfee3f1077": {
+          "masculine": "Első kameraasszisztens / fókuszhúzó",
+          "feminine": "Első kameraasszisztens / fókuszhúzó",
+          "neutral": "Első kameraasszisztens / fókuszhúzó"
+        },
+        "r_4f6a54aa8672": {
+          "masculine": "Második kameraasszisztens / csapó és töltő",
+          "feminine": "Második kameraasszisztens / csapó és töltő",
+          "neutral": "Második kameraasszisztens / csapó és töltő"
+        },
+        "r_a6d3a38613fa": {
+          "masculine": "Csapó- és kameratöltő",
+          "feminine": "Csapó- és kameratöltő",
+          "neutral": "Csapó- és kameratöltő"
+        },
+        "r_4406ae44f8be": {
+          "masculine": "Harmadik kameraasszisztens",
+          "feminine": "Harmadik kameraasszisztens",
+          "neutral": "Harmadik kameraasszisztens"
+        },
+        "r_a29ed25142f3": {
+          "masculine": "Digitális második kameraasszisztens",
+          "feminine": "Digitális második kameraasszisztens",
+          "neutral": "Digitális második kameraasszisztens"
+        },
+        "r_048d538ee34d": {
+          "masculine": "DIT",
+          "feminine": "DIT",
+          "neutral": "DIT"
+        },
+        "r_c48ad1ee75a7": {
+          "masculine": "DIT-asszisztens",
+          "feminine": "DIT-asszisztens",
+          "neutral": "DIT-asszisztens"
+        },
+        "r_0e473a1887e9": {
+          "masculine": "Steadicam-operatőr",
+          "feminine": "Steadicam-operatőr",
+          "neutral": "Steadicam-operatőr"
+        },
+        "r_1d7535202c92": {
+          "masculine": "Steadicam-asszisztens",
+          "feminine": "Steadicam-asszisztens",
+          "neutral": "Steadicam-asszisztens"
+        },
+        "r_baee8ff4a63f": {
+          "masculine": "Gimbalkezelő",
+          "feminine": "Gimbalkezelő",
+          "neutral": "Gimbalkezelő"
+        },
+        "r_569d248c1dfd": {
+          "masculine": "Drónpilóta / drónkezelő",
+          "feminine": "Drónpilóta / drónkezelő",
+          "neutral": "Drónpilóta / drónkezelő"
+        },
+        "r_3ca1ad3e14b2": {
+          "masculine": "Kameradrón-kezelő",
+          "feminine": "Kameradrón-kezelő",
+          "neutral": "Kameradrón-kezelő"
+        },
+        "r_c2ff9d51c86a": {
+          "masculine": "Kameradrón-pilóta",
+          "feminine": "Kameradrón-pilóta",
+          "neutral": "Kameradrón-pilóta"
+        },
+        "r_0502b3c5dec3": {
+          "masculine": "Kamerakocsi-vezető",
+          "feminine": "Kamerakocsi-vezető",
+          "neutral": "Kamerakocsi-vezető"
+        },
+        "r_a3fa606ea916": {
+          "masculine": "Repülőgép-pilóta (légi felvételek)",
+          "feminine": "Repülőgép-pilóta (légi felvételek)",
+          "neutral": "Repülőgép-pilóta (légi felvételek)"
+        },
+        "r_05d7d18da0c4": {
+          "masculine": "Helikopterpilóta (légi felvételek)",
+          "feminine": "Helikopterpilóta (légi felvételek)",
+          "neutral": "Helikopterpilóta (légi felvételek)"
+        },
+        "r_32e8a90fee3b": {
+          "masculine": "Spidercam-pilóta",
+          "feminine": "Spidercam-pilóta",
+          "neutral": "Spidercam-pilóta"
+        },
+        "r_c4b0d3dfb7d8": {
+          "masculine": "Kameradrón-asszisztens",
+          "feminine": "Kameradrón-asszisztens",
+          "neutral": "Kameradrón-asszisztens"
+        },
+        "r_86c7b305ba77": {
+          "masculine": "Távirányított kamera kezelője",
+          "feminine": "Távirányított kamera kezelője",
+          "neutral": "Távirányított kamera kezelője"
+        },
+        "r_386b1f9db2c1": {
+          "masculine": "Távirányított kamerafej kezelője",
+          "feminine": "Távirányított kamerafej kezelője",
+          "neutral": "Távirányított kamerafej kezelője"
+        },
+        "r_1490637c95ed": {
+          "masculine": "Légi kamera operatőre",
+          "feminine": "Légi kamera operatőre",
+          "neutral": "Légi kamera operatőre"
+        },
+        "r_76c05f6fba78": {
+          "masculine": "Légi–légi felvételek operatőre",
+          "feminine": "Légi–légi felvételek operatőre",
+          "neutral": "Légi–légi felvételek operatőre"
+        },
+        "r_b59f3c08153b": {
+          "masculine": "Nagysebességű kamera operatőre",
+          "feminine": "Nagysebességű kamera operatőre",
+          "neutral": "Nagysebességű kamera operatőre"
+        },
+        "r_f6e99ab3d5dd": {
+          "masculine": "ARRI Trinity-operatőr",
+          "feminine": "ARRI Trinity-operatőr",
+          "neutral": "ARRI Trinity-operatőr"
+        },
+        "r_953bc24b7077": {
+          "masculine": "Cablecam-kezelő",
+          "feminine": "Cablecam-kezelő",
+          "neutral": "Cablecam-kezelő"
+        },
+        "r_e834e506e54b": {
+          "masculine": "Polecam-kezelő",
+          "feminine": "Polecam-kezelő",
+          "neutral": "Polecam-kezelő"
+        },
+        "r_b7ea35e3f38d": {
+          "masculine": "Rod-Cam-kezelő",
+          "feminine": "Rod-Cam-kezelő",
+          "neutral": "Rod-Cam-kezelő"
+        },
+        "r_3531de1d9278": {
+          "masculine": "Motion control kezelő",
+          "feminine": "Motion control kezelő",
+          "neutral": "Motion control kezelő"
+        },
+        "r_edf22fe94ff4": {
+          "masculine": "Motion control asszisztens",
+          "feminine": "Motion control asszisztens",
+          "neutral": "Motion control asszisztens"
+        },
+        "r_7be83f893235": {
+          "masculine": "Élő közvetítés operatőre",
+          "feminine": "Élő közvetítés operatőre",
+          "neutral": "Élő közvetítés operatőre"
+        },
+        "r_8d0fa92d5c06": {
+          "masculine": "VR vezető operatőr",
+          "feminine": "VR vezető operatőr",
+          "neutral": "VR vezető operatőr"
+        },
+        "r_e4f1f8410ee1": {
+          "masculine": "VR-kamera operatőre",
+          "feminine": "VR-kamera operatőre",
+          "neutral": "VR-kamera operatőre"
+        },
+        "r_fe4955d24d9d": {
+          "masculine": "3D sztereó operatőr",
+          "feminine": "3D sztereó operatőr",
+          "neutral": "3D sztereó operatőr"
+        },
+        "r_63d8f7ae5c77": {
+          "masculine": "3D sztereó konvergenciakezelő",
+          "feminine": "3D sztereó konvergenciakezelő",
+          "neutral": "3D sztereó konvergenciakezelő"
+        },
+        "r_5d780d27f437": {
+          "masculine": "Sztereoszkópiai technikus",
+          "feminine": "Sztereoszkópiai technikus",
+          "neutral": "Sztereoszkópiai technikus"
+        },
+        "r_0350366ccf64": {
+          "masculine": "Sztereográfus",
+          "feminine": "Sztereográfus",
+          "neutral": "Sztereográfus"
+        },
+        "r_892df5d9ed45": {
+          "masculine": "Második stáb sztereográfusa",
+          "feminine": "Második stáb sztereográfusa",
+          "neutral": "Második stáb sztereográfusa"
+        },
+        "r_87b9b49ccc72": {
+          "masculine": "Sztereográfus-asszisztens",
+          "feminine": "Sztereográfus-asszisztens",
+          "neutral": "Sztereográfus-asszisztens"
+        },
+        "r_503758a49393": {
+          "masculine": "Víz alatti kamera kezelője",
+          "feminine": "Víz alatti kamera kezelője",
+          "neutral": "Víz alatti kamera kezelője"
+        },
+        "r_ad809b37ab32": {
+          "masculine": "Víz alatti kameraasszisztens",
+          "feminine": "Víz alatti kameraasszisztens",
+          "neutral": "Víz alatti kameraasszisztens"
+        },
+        "r_fdaafaca34cb": {
+          "masculine": "Szabadeséses operatőr",
+          "feminine": "Szabadeséses operatőr",
+          "neutral": "Szabadeséses operatőr"
+        },
+        "r_6fd521b70caf": {
+          "masculine": "Drytech-technikus",
+          "feminine": "Drytech-technikus",
+          "neutral": "Drytech-technikus"
+        },
+        "r_7a8573f394c1": {
+          "masculine": "Adatkezelő (Data Wrangler)",
+          "feminine": "Adatkezelő (Data Wrangler)",
+          "neutral": "Adatkezelő (Data Wrangler)"
+        },
+        "r_59c04d8b3609": {
+          "masculine": "Adatkezelő / digitális töltő",
+          "feminine": "Adatkezelő / digitális töltő",
+          "neutral": "Adatkezelő / digitális töltő"
+        },
+        "r_1b6d2deeae11": {
+          "masculine": "Médiakezelő",
+          "feminine": "Médiakezelő",
+          "neutral": "Médiakezelő"
+        },
+        "r_bfd5ad0745cb": {
+          "masculine": "Videoassziszt-kezelő",
+          "feminine": "Videoassziszt-kezelő",
+          "neutral": "Videoassziszt-kezelő"
+        },
+        "r_ab65480d38bf": {
+          "masculine": "Videoassziszt-kisegítő",
+          "feminine": "Videoassziszt-kisegítő",
+          "neutral": "Videoassziszt-kisegítő"
+        },
+        "r_44cbe06f7edd": {
+          "masculine": "Védődobozos kamera kezelője",
+          "feminine": "Védődobozos kamera kezelője",
+          "neutral": "Védődobozos kamera kezelője"
+        },
+        "r_ff391e554ef1": {
+          "masculine": "Videókezelő",
+          "feminine": "Videókezelő",
+          "neutral": "Videókezelő"
+        },
+        "r_04b8806e4aea": {
+          "masculine": "Qtake-kezelő",
+          "feminine": "Qtake-kezelő",
+          "neutral": "Qtake-kezelő"
+        },
+        "r_881fbad171dd": {
+          "masculine": "Videókezelő asszisztense",
+          "feminine": "Videókezelő asszisztense",
+          "neutral": "Videókezelő asszisztense"
+        },
+        "r_e8b3776feee3": {
+          "masculine": "Visszajátszás-kezelő",
+          "feminine": "Visszajátszás-kezelő",
+          "neutral": "Visszajátszás-kezelő"
+        },
+        "r_2cd28c233eb0": {
+          "masculine": "Hírforgató kép- és hangasszisztens",
+          "feminine": "Hírforgató kép- és hangasszisztens",
+          "neutral": "Hírforgató kép- és hangasszisztens"
+        },
+        "r_aaf320fee04d": {
+          "masculine": "Hírforgató kép- és hangtechnikus",
+          "feminine": "Hírforgató kép- és hangtechnikus",
+          "neutral": "Hírforgató kép- és hangtechnikus"
+        },
+        "r_6c484917c545": {
+          "masculine": "Kameraasszisztens (nem fikciós)",
+          "feminine": "Kameraasszisztens (nem fikciós)",
+          "neutral": "Kameraasszisztens (nem fikciós)"
+        },
+        "r_c071a417cdf8": {
+          "masculine": "Adatrögzítési mérnök (DCE)",
+          "feminine": "Adatrögzítési mérnök (DCE)",
+          "neutral": "Adatrögzítési mérnök (DCE)"
+        },
+        "r_ff3821a892d3": {
+          "masculine": "Háttérvetítési felvétel kezelője",
+          "feminine": "Háttérvetítési felvétel kezelője",
+          "neutral": "Háttérvetítési felvétel kezelője"
+        },
+        "r_e160ca78eefe": {
+          "masculine": "Kameratechnikus",
+          "feminine": "Kameratechnikus",
+          "neutral": "Kameratechnikus"
+        },
+        "r_b2a908032997": {
+          "masculine": "Kamerás gyakornok",
+          "feminine": "Kamerás gyakornok",
+          "neutral": "Kamerás gyakornok"
+        },
+        "r_20c91979a5fc": {
+          "masculine": "Kameraoperatőr",
+          "feminine": "Kameraoperatőr",
+          "neutral": "Kameraoperatőr"
+        },
+        "r_3008a154e7ef": {
+          "masculine": "Drónpilóta / légi felvételek",
+          "feminine": "Drónpilóta / légi felvételek",
+          "neutral": "Drónpilóta / légi felvételek"
+        },
+        "r_ee4208621795": {
+          "masculine": "Kiegészítő kamera",
+          "feminine": "Kiegészítő kamera",
+          "neutral": "Kiegészítő kamera"
+        },
+        "r_59f7261be55a": {
+          "masculine": "Víz alatti operatőr",
+          "feminine": "Víz alatti operatőr",
+          "neutral": "Víz alatti operatőr"
+        },
+        "r_6767d1f92822": {
+          "masculine": "Motion control operatőr",
+          "feminine": "Motion control operatőr",
+          "neutral": "Motion control operatőr"
+        },
+        "r_15047c5a622a": {
+          "masculine": "Kameradrón-asszisztens / technikus",
+          "feminine": "Kameradrón-asszisztens / technikus",
+          "neutral": "Kameradrón-asszisztens / technikus"
+        },
+        "r_7b6aa965b572": {
+          "masculine": "Első kameraasszisztens",
+          "feminine": "Első kameraasszisztens",
+          "neutral": "Első kameraasszisztens"
+        },
+        "r_403c761ac7c7": {
+          "masculine": "Hírforgató kép- és hangasszisztens",
+          "feminine": "Hírforgató kép- és hangasszisztens",
+          "neutral": "Hírforgató kép- és hangasszisztens"
+        },
+        "r_6170f09c0f17": {
+          "masculine": "Hírforgató kép- és hangtechnikus",
+          "feminine": "Hírforgató kép- és hangtechnikus",
+          "neutral": "Hírforgató kép- és hangtechnikus"
+        },
+        "r_6a6303b77029": {
+          "masculine": "Forgatási fotós",
+          "feminine": "Forgatási fotós",
+          "neutral": "Forgatási fotós"
+        }
+      },
+      "licht": {
+        "r_222be04dbf00": {
+          "masculine": "Fővilágosító (gaffer)",
+          "feminine": "Fővilágosító (gaffer)",
+          "neutral": "Fővilágosító (gaffer)"
+        },
+        "r_1e210e69039a": {
+          "masculine": "Világosítóvezető-helyettes (Best Boy Electric)",
+          "feminine": "Világosítóvezető-helyettes (Best Girl Electric)",
+          "neutral": "Világosítóvezető-helyettes"
+        },
+        "r_14dd174cd76c": {
+          "masculine": "Rigging-fővilágosító",
+          "feminine": "Rigging-fővilágosító",
+          "neutral": "Rigging-fővilágosító"
+        },
+        "r_92137802b24a": {
+          "masculine": "Rigging világosítóvezető-helyettes (Rigging Best Boy Electric)",
+          "feminine": "Rigging világosítóvezető-helyettes (Rigging Best Girl Electric)",
+          "neutral": "Rigging világosítóvezető-helyettes"
+        },
+        "r_7fce7d6fcf12": {
+          "masculine": "Rigging-világosító",
+          "feminine": "Rigging-világosító",
+          "neutral": "Rigging-világosító"
+        },
+        "r_1bcf9d8d9b03": {
+          "masculine": "Világosító",
+          "feminine": "Világosító",
+          "neutral": "Világosító"
+        },
+        "r_d95b919dded9": {
+          "masculine": "Világítómester",
+          "feminine": "Világítómester",
+          "neutral": "Világítómester"
+        },
+        "r_de223259b793": {
+          "masculine": "Fénypultkezelő",
+          "feminine": "Fénypultkezelő",
+          "neutral": "Fénypultkezelő"
+        },
+        "r_d927855afff9": {
+          "masculine": "Fénypult-asszisztens",
+          "feminine": "Fénypult-asszisztens",
+          "neutral": "Fénypult-asszisztens"
+        },
+        "r_56ad1c6a1ad4": {
+          "masculine": "Világításprogramozó (DMX)",
+          "feminine": "Világításprogramozó (DMX)",
+          "neutral": "Világításprogramozó (DMX)"
+        },
+        "r_090ac2a092b8": {
+          "masculine": "Világítástechnikus",
+          "feminine": "Világítástechnikus",
+          "neutral": "Világítástechnikus"
+        },
+        "r_d1edcbd50142": {
+          "masculine": "Világítási sofőr",
+          "feminine": "Világítási sofőr",
+          "neutral": "Világítási sofőr"
+        },
+        "r_7d79588c14f3": {
+          "masculine": "Kiegészítő világosító",
+          "feminine": "Kiegészítő világosító",
+          "neutral": "Kiegészítő világosító"
+        },
+        "r_b3d1d585beaa": {
+          "masculine": "Aggregátorkezelő",
+          "feminine": "Aggregátorkezelő",
+          "neutral": "Aggregátorkezelő"
+        },
+        "r_bcd4b312b67e": {
+          "masculine": "Kábelkezelő",
+          "feminine": "Kábelkezelő",
+          "neutral": "Kábelkezelő"
+        },
+        "r_35cca1fe3c5c": {
+          "masculine": "Víz alatti világítás",
+          "feminine": "Víz alatti világítás",
+          "neutral": "Víz alatti világítás"
+        },
+        "r_89058c839b15": {
+          "masculine": "Ballonlámpa-kezelő",
+          "feminine": "Ballonlámpa-kezelő",
+          "neutral": "Ballonlámpa-kezelő"
+        },
+        "r_9bd915bb46a4": {
+          "masculine": "Spot- / truss-spot-kezelő",
+          "feminine": "Spot- / truss-spot-kezelő",
+          "neutral": "Spot- / truss-spot-kezelő"
+        },
+        "r_2c0dd7b64cf3": {
+          "masculine": "Világítási asszisztens",
+          "feminine": "Világítási asszisztens",
+          "neutral": "Világítási asszisztens"
+        },
+        "r_0cc27c01ca07": {
+          "masculine": "Világítási gyakornok",
+          "feminine": "Világítási gyakornok",
+          "neutral": "Világítási gyakornok"
+        }
+      },
+      "grip": {
+        "r_470156bd03e4": {
+          "masculine": "Vezető grip (Key Grip)",
+          "feminine": "Vezető grip (Key Grip)",
+          "neutral": "Vezető grip (Key Grip)"
+        },
+        "r_cfbf2a22ed6e": {
+          "masculine": "Gripvezető-helyettes (Best Boy Grip)",
+          "feminine": "Gripvezető-helyettes (Best Girl Grip)",
+          "neutral": "Gripvezető-helyettes"
+        },
+        "r_32a6ab31b1a1": {
+          "masculine": "Dollykezelő",
+          "feminine": "Dollykezelő",
+          "neutral": "Dollykezelő"
+        },
+        "r_376dc1f790b8": {
+          "masculine": "Grip / kameramozgatás",
+          "feminine": "Grip / kameramozgatás",
+          "neutral": "Grip / kameramozgatás"
+        },
+        "r_dbfaadb8821c": {
+          "masculine": "Kameramozgató asszisztens",
+          "feminine": "Kameramozgató asszisztens",
+          "neutral": "Kameramozgató asszisztens"
+        },
+        "r_46dab52c1995": {
+          "masculine": "Rigging grip",
+          "feminine": "Rigging grip",
+          "neutral": "Rigging grip"
+        },
+        "r_ea7e925bd850": {
+          "masculine": "Vezető rigging grip",
+          "feminine": "Vezető rigging grip",
+          "neutral": "Vezető rigging grip"
+        },
+        "r_fa9d72fc7978": {
+          "masculine": "Rigging gripvezető-helyettes (Rigging Best Boy Grip)",
+          "feminine": "Rigging gripvezető-helyettes (Rigging Best Girl Grip)",
+          "neutral": "Rigging gripvezető-helyettes"
+        },
+        "r_2fa0b44342d7": {
+          "masculine": "Különleges szerkezetek (kameramozgatás)",
+          "feminine": "Különleges szerkezetek (kameramozgatás)",
+          "neutral": "Különleges szerkezetek (kameramozgatás)"
+        },
+        "r_08c07afebb7f": {
+          "masculine": "Kameradaru- / jibkezelő",
+          "feminine": "Kameradaru- / jibkezelő",
+          "neutral": "Kameradaru- / jibkezelő"
+        },
+        "r_5ece318b289f": {
+          "masculine": "Kameradaru-technikus",
+          "feminine": "Kameradaru-technikus",
+          "neutral": "Kameradaru-technikus"
+        },
+        "r_a5c74e86fb2b": {
+          "masculine": "U-Crane- / Technocrane-kezelő",
+          "feminine": "U-Crane- / Technocrane-kezelő",
+          "neutral": "U-Crane- / Technocrane-kezelő"
+        },
+        "r_819dd64bff9d": {
+          "masculine": "Távirányított kamerafej technikusa / kezelője",
+          "feminine": "Távirányított kamerafej technikusa / kezelője",
+          "neutral": "Távirányított kamerafej technikusa / kezelője"
+        },
+        "r_9c6f674da63a": {
+          "masculine": "Kameramozgató / gripgyakornok",
+          "feminine": "Kameramozgató / gripgyakornok",
+          "neutral": "Kameramozgató / gripgyakornok"
+        }
+      },
+      "ton": {
+        "r_fccf287d8f40": {
+          "masculine": "Hangmérnök / hangkeverő",
+          "feminine": "Hangmérnök / hangkeverő",
+          "neutral": "Hangmérnök / hangkeverő"
+        },
+        "r_54f3d59eb241": {
+          "masculine": "Forgatási hangmérnök",
+          "feminine": "Forgatási hangmérnök",
+          "neutral": "Forgatási hangmérnök"
+        },
+        "r_b0c1942e7358": {
+          "masculine": "Filmes hangmérnök",
+          "feminine": "Filmes hangmérnök",
+          "neutral": "Filmes hangmérnök"
+        },
+        "r_8b1cc700407b": {
+          "masculine": "Mikrofonos",
+          "feminine": "Mikrofonos",
+          "neutral": "Mikrofonos"
+        },
+        "r_fd909904c9c7": {
+          "masculine": "Hangasszisztencia",
+          "feminine": "Hangasszisztencia",
+          "neutral": "Hangasszisztencia"
+        },
+        "r_4c5fe4b3a1f3": {
+          "masculine": "Első hangasszisztens",
+          "feminine": "Első hangasszisztens",
+          "neutral": "Első hangasszisztens"
+        },
+        "r_ab87e9473072": {
+          "masculine": "Első filmes hangasszisztens",
+          "feminine": "Első filmes hangasszisztens",
+          "neutral": "Első filmes hangasszisztens"
+        },
+        "r_d83df9d29ab1": {
+          "masculine": "Második hangasszisztens",
+          "feminine": "Második hangasszisztens",
+          "neutral": "Második hangasszisztens"
+        },
+        "r_8377b0674c5d": {
+          "masculine": "Második filmes hangasszisztens",
+          "feminine": "Második filmes hangasszisztens",
+          "neutral": "Második filmes hangasszisztens"
+        },
+        "r_93302391f02a": {
+          "masculine": "Utószinkron-mikrofonos",
+          "feminine": "Utószinkron-mikrofonos",
+          "neutral": "Utószinkron-mikrofonos"
+        },
+        "r_3e7456f82724": {
+          "masculine": "Térhangzás-felvevő",
+          "feminine": "Térhangzás-felvevő",
+          "neutral": "Térhangzás-felvevő"
+        },
+        "r_352c199bfbc1": {
+          "masculine": "Kisegítő hangtechnikus",
+          "feminine": "Kisegítő hangtechnikus",
+          "neutral": "Kisegítő hangtechnikus"
+        },
+        "r_fdfa14e36d06": {
+          "masculine": "Hangeszköz-asszisztens",
+          "feminine": "Hangeszköz-asszisztens",
+          "neutral": "Hangeszköz-asszisztens"
+        },
+        "r_9615bbb28141": {
+          "masculine": "Hang-visszajátszó kezelő",
+          "feminine": "Hang-visszajátszó kezelő",
+          "neutral": "Hang-visszajátszó kezelő"
+        },
+        "r_13544e0c2d08": {
+          "masculine": "Hangfelvevő (nem fikciós)",
+          "feminine": "Hangfelvevő (nem fikciós)",
+          "neutral": "Hangfelvevő (nem fikciós)"
+        },
+        "r_f804f9794c40": {
+          "masculine": "Hanggyakornok",
+          "feminine": "Hanggyakornok",
+          "neutral": "Hanggyakornok"
+        },
+        "r_26ad417384db": {
+          "masculine": "Hangtervező",
+          "feminine": "Hangtervező",
+          "neutral": "Hangtervező"
+        },
+        "r_e4afa3da823e": {
+          "masculine": "Vezető hangvágó",
+          "feminine": "Vezető hangvágó",
+          "neutral": "Vezető hangvágó"
+        },
+        "r_754377fae1cb": {
+          "masculine": "Dialógusvágó",
+          "feminine": "Dialógusvágó",
+          "neutral": "Dialógusvágó"
+        },
+        "r_a80f60e08e2f": {
+          "masculine": "Utószinkronvágó",
+          "feminine": "Utószinkronvágó",
+          "neutral": "Utószinkronvágó"
+        },
+        "r_65ab3bc0b779": {
+          "masculine": "Utószinkron-felügyelő",
+          "feminine": "Utószinkron-felügyelő",
+          "neutral": "Utószinkron-felügyelő"
+        },
+        "r_927d0ca8e1d9": {
+          "masculine": "Zörejművész",
+          "feminine": "Zörejművész",
+          "neutral": "Zörejművész"
+        },
+        "r_c196984117d7": {
+          "masculine": "Zörejvágó",
+          "feminine": "Zörejvágó",
+          "neutral": "Zörejvágó"
+        },
+        "r_df6ebbcf6038": {
+          "masculine": "Utómunka-hangkeverő",
+          "feminine": "Utómunka-hangkeverő",
+          "neutral": "Utómunka-hangkeverő"
+        },
+        "r_f4776d32d356": {
+          "masculine": "Visszajátszás-kezelő",
+          "feminine": "Visszajátszás-kezelő",
+          "neutral": "Visszajátszás-kezelő"
+        },
+        "r_6abc8617e983": {
+          "masculine": "Hangfelügyelő",
+          "feminine": "Hangfelügyelő",
+          "neutral": "Hangfelügyelő"
+        },
+        "r_0faba800cb95": {
+          "masculine": "Zenei hangkeverő",
+          "feminine": "Zenei hangkeverő",
+          "neutral": "Zenei hangkeverő"
+        },
+        "r_a5fba4295f52": {
+          "masculine": "Zenei felvétel",
+          "feminine": "Zenei felvétel",
+          "neutral": "Zenei felvétel"
+        },
+        "r_f2e629941a7a": {
+          "masculine": "Szinkron-hangkeverő",
+          "feminine": "Szinkron-hangkeverő",
+          "neutral": "Szinkron-hangkeverő"
+        },
+        "r_f73a9a076c95": {
+          "masculine": "Audionarrációs hangkeverő",
+          "feminine": "Audionarrációs hangkeverő",
+          "neutral": "Audionarrációs hangkeverő"
+        },
+        "r_9d583d9712f5": {
+          "masculine": "Hangkeverő asszisztense",
+          "feminine": "Hangkeverő asszisztense",
+          "neutral": "Hangkeverő asszisztense"
+        },
+        "r_c4334fc01411": {
+          "masculine": "Hangmastering-mérnök",
+          "feminine": "Hangmastering-mérnök",
+          "neutral": "Hangmastering-mérnök"
+        },
+        "r_6a7ea11d04ed": {
+          "masculine": "Hangtervező asszisztense",
+          "feminine": "Hangtervező asszisztense",
+          "neutral": "Hangtervező asszisztense"
+        },
+        "r_539e45fc2e6d": {
+          "masculine": "Vezető utószinkronvágó",
+          "feminine": "Vezető utószinkronvágó",
+          "neutral": "Vezető utószinkronvágó"
+        },
+        "r_021e586f6845": {
+          "masculine": "Vezető dialógus- és utószinkronvágó",
+          "feminine": "Vezető dialógus- és utószinkronvágó",
+          "neutral": "Vezető dialógus- és utószinkronvágó"
+        },
+        "r_58f4b9fff63e": {
+          "masculine": "Vezető dialógusvágó",
+          "feminine": "Vezető dialógusvágó",
+          "neutral": "Vezető dialógusvágó"
+        },
+        "r_934c9dff31b6": {
+          "masculine": "Vezető szinkronzörejvágó",
+          "feminine": "Vezető szinkronzörejvágó",
+          "neutral": "Vezető szinkronzörejvágó"
+        },
+        "r_8ffed7b496e8": {
+          "masculine": "Dialógusvágó",
+          "feminine": "Dialógusvágó",
+          "neutral": "Dialógusvágó"
+        },
+        "r_37f0cea40905": {
+          "masculine": "Hangeffektvágó",
+          "feminine": "Hangeffektvágó",
+          "neutral": "Hangeffektvágó"
+        },
+        "r_e22d9239a33f": {
+          "masculine": "Beszédszinkron-vágó",
+          "feminine": "Beszédszinkron-vágó",
+          "neutral": "Beszédszinkron-vágó"
+        },
+        "r_cf36114f7a15": {
+          "masculine": "Szinkronzörejvágó",
+          "feminine": "Szinkronzörejvágó",
+          "neutral": "Szinkronzörejvágó"
+        },
+        "r_7ca65f7a0064": {
+          "masculine": "Utószinkron- / szinkronvágó",
+          "feminine": "Utószinkron- / szinkronvágó",
+          "neutral": "Utószinkron- / szinkronvágó"
+        },
+        "r_944e077953d3": {
+          "masculine": "Hangvágó asszisztense",
+          "feminine": "Hangvágó asszisztense",
+          "neutral": "Hangvágó asszisztense"
+        },
+        "r_9d4ed0bf92ee": {
+          "masculine": "Utószinkron- / szinkronhangmérnök",
+          "feminine": "Utószinkron- / szinkronhangmérnök",
+          "neutral": "Utószinkron- / szinkronhangmérnök"
+        },
+        "r_b3e198ffbf29": {
+          "masculine": "Szinkronzörej-hangmérnök",
+          "feminine": "Szinkronzörej-hangmérnök",
+          "neutral": "Szinkronzörej-hangmérnök"
+        },
+        "r_c41c6bc414c3": {
+          "masculine": "Szinkronprodukció-vezető",
+          "feminine": "Szinkronprodukció-vezető",
+          "neutral": "Szinkronprodukció-vezető"
+        },
+        "r_2b6bc11139d6": {
+          "masculine": "Szinkronfelvétel-vezető / ADR-felügyelő",
+          "feminine": "Szinkronfelvétel-vezető / ADR-felügyelő",
+          "neutral": "Szinkronfelvétel-vezető / ADR-felügyelő"
+        },
+        "r_6645c4583551": {
+          "masculine": "Szinkronfelvétel-vezető / ADR-felügyelő asszisztense",
+          "feminine": "Szinkronfelvétel-vezető / ADR-felügyelő asszisztense",
+          "neutral": "Szinkronfelvétel-vezető / ADR-felügyelő asszisztense"
+        },
+        "r_2f0b82350b59": {
+          "masculine": "Zörejművész asszisztense",
+          "feminine": "Zörejművész asszisztense",
+          "neutral": "Zörejművész asszisztense"
+        },
+        "r_a4171d6359fb": {
+          "masculine": "Hangutómunka-gyakornok",
+          "feminine": "Hangutómunka-gyakornok",
+          "neutral": "Hangutómunka-gyakornok"
+        },
+        "r_9e4b74ecd5ff": {
+          "masculine": "Utószinkron műszaki felügyelője",
+          "feminine": "Utószinkron műszaki felügyelője",
+          "neutral": "Utószinkron műszaki felügyelője"
+        }
+      },
+      "art": {
+        "r_ff29ce0e215c": {
+          "masculine": "Látványtervező",
+          "feminine": "Látványtervező",
+          "neutral": "Látványtervező"
+        },
+        "r_f3db07db6bf4": {
+          "masculine": "Díszlettervező",
+          "feminine": "Díszlettervező",
+          "neutral": "Díszlettervező"
+        },
+        "r_97a0a726b446": {
+          "masculine": "Vezető művészeti vezető",
+          "feminine": "Vezető művészeti vezető",
+          "neutral": "Vezető művészeti vezető"
+        },
+        "r_3f274caf46f5": {
+          "masculine": "Művészeti vezető",
+          "feminine": "Művészeti vezető",
+          "neutral": "Művészeti vezető"
+        },
+        "r_7e93c2713534": {
+          "masculine": "Forgatáson jelen lévő művészeti vezető",
+          "feminine": "Forgatáson jelen lévő művészeti vezető",
+          "neutral": "Forgatáson jelen lévő művészeti vezető"
+        },
+        "r_891f7ee6a391": {
+          "masculine": "Művészeti vezető asszisztense",
+          "feminine": "Művészeti vezető asszisztense",
+          "neutral": "Művészeti vezető asszisztense"
+        },
+        "r_29765953355c": {
+          "masculine": "Díszlettervező asszisztense",
+          "feminine": "Díszlettervező asszisztense",
+          "neutral": "Díszlettervező asszisztense"
+        },
+        "r_8543a5c61931": {
+          "masculine": "Berendező asszisztense",
+          "feminine": "Berendező asszisztense",
+          "neutral": "Berendező asszisztense"
+        },
+        "r_3ffad936200e": {
+          "masculine": "Díszlettervező",
+          "feminine": "Díszlettervező",
+          "neutral": "Díszlettervező"
+        },
+        "r_bce8305a5535": {
+          "masculine": "CAD-tervező",
+          "feminine": "CAD-tervező",
+          "neutral": "CAD-tervező"
+        },
+        "r_b5a1fa9969c7": {
+          "masculine": "Koncepciórajzoló",
+          "feminine": "Koncepciórajzoló",
+          "neutral": "Koncepciórajzoló"
+        },
+        "r_f1dbbb97b010": {
+          "masculine": "Koncepciórajzoló (művészeti részleg)",
+          "feminine": "Koncepciórajzoló (művészeti részleg)",
+          "neutral": "Koncepciórajzoló (művészeti részleg)"
+        },
+        "r_57a4a106cbd6": {
+          "masculine": "Illusztrátor",
+          "feminine": "Illusztrátor",
+          "neutral": "Illusztrátor"
+        },
+        "r_6aa3fecc3ba9": {
+          "masculine": "Grafikus (díszletgrafika)",
+          "feminine": "Grafikus (díszletgrafika)",
+          "neutral": "Grafikus (díszletgrafika)"
+        },
+        "r_6978775ad99b": {
+          "masculine": "Vezető grafikus",
+          "feminine": "Vezető grafikus",
+          "neutral": "Vezető grafikus"
+        },
+        "r_7534f951d040": {
+          "masculine": "Grafikus (művészeti részleg)",
+          "feminine": "Grafikus (művészeti részleg)",
+          "neutral": "Grafikus (művészeti részleg)"
+        },
+        "r_a8e10d0ecc47": {
+          "masculine": "Hangulati referenciakereső / tördelő",
+          "feminine": "Hangulati referenciakereső / tördelő",
+          "neutral": "Hangulati referenciakereső / tördelő"
+        },
+        "r_a1ce9e299c8f": {
+          "masculine": "Díszletberendező",
+          "feminine": "Díszletberendező",
+          "neutral": "Díszletberendező"
+        },
+        "r_420521110dcc": {
+          "masculine": "Díszletberendezési koordinátor",
+          "feminine": "Díszletberendezési koordinátor",
+          "neutral": "Díszletberendezési koordinátor"
+        },
+        "r_d5b7a7d716a2": {
+          "masculine": "Díszletberendező asszisztense",
+          "feminine": "Díszletberendező asszisztense",
+          "neutral": "Díszletberendező asszisztense"
+        },
+        "r_d0964de45366": {
+          "masculine": "Díszletbeszerző",
+          "feminine": "Díszletbeszerző",
+          "neutral": "Díszletbeszerző"
+        },
+        "r_10a8275fbc87": {
+          "masculine": "Díszletberendezési raktárvezető",
+          "feminine": "Díszletberendezési raktárvezető",
+          "neutral": "Díszletberendezési raktárvezető"
+        },
+        "r_1df861fbde16": {
+          "masculine": "Díszletberendezési koordinátor asszisztense",
+          "feminine": "Díszletberendezési koordinátor asszisztense",
+          "neutral": "Díszletberendezési koordinátor asszisztense"
+        },
+        "r_393242957f26": {
+          "masculine": "Díszletberendező munkatárs",
+          "feminine": "Díszletberendező munkatárs",
+          "neutral": "Díszletberendező munkatárs"
+        },
+        "r_e3ce1061c0ff": {
+          "masculine": "Vezető berendező",
+          "feminine": "Vezető berendező",
+          "neutral": "Vezető berendező"
+        },
+        "r_d588cad49b89": {
+          "masculine": "Vezető díszletberendező",
+          "feminine": "Vezető díszletberendező",
+          "neutral": "Vezető díszletberendező"
+        },
+        "r_6cafa4dd814b": {
+          "masculine": "Főkellékes",
+          "feminine": "Főkellékes",
+          "neutral": "Főkellékes"
+        },
+        "r_413221e86652": {
+          "masculine": "Kellékes",
+          "feminine": "Kellékes",
+          "neutral": "Kellékes"
+        },
+        "r_a1e9f4cffb70": {
+          "masculine": "Külső kellékes",
+          "feminine": "Külső kellékes",
+          "neutral": "Külső kellékes"
+        },
+        "r_8f20bee45473": {
+          "masculine": "Forgatási kellékes",
+          "feminine": "Forgatási kellékes",
+          "neutral": "Forgatási kellékes"
+        },
+        "r_7d553f96df87": {
+          "masculine": "Díszletkellékes",
+          "feminine": "Díszletkellékes",
+          "neutral": "Díszletkellékes"
+        },
+        "r_bf9d71b6fdc2": {
+          "masculine": "Ügyeletes kellékes",
+          "feminine": "Ügyeletes kellékes",
+          "neutral": "Ügyeletes kellékes"
+        },
+        "r_a38576fafdab": {
+          "masculine": "Kellékes asszisztens",
+          "feminine": "Kellékes asszisztens",
+          "neutral": "Kellékes asszisztens"
+        },
+        "r_ea2b2fab38f4": {
+          "masculine": "Kellékasszisztens",
+          "feminine": "Kellékasszisztens",
+          "neutral": "Kellékasszisztens"
+        },
+        "r_b685fb4dc943": {
+          "masculine": "Külső kellékasszisztens",
+          "feminine": "Külső kellékasszisztens",
+          "neutral": "Külső kellékasszisztens"
+        },
+        "r_7b9477ba5686": {
+          "masculine": "Forgatási kellékasszisztens",
+          "feminine": "Forgatási kellékasszisztens",
+          "neutral": "Forgatási kellékasszisztens"
+        },
+        "r_541c87622274": {
+          "masculine": "Kellékbeszerző",
+          "feminine": "Kellékbeszerző",
+          "neutral": "Kellékbeszerző"
+        },
+        "r_3c2dae1ec180": {
+          "masculine": "Díszletberendezési beszerző",
+          "feminine": "Díszletberendezési beszerző",
+          "neutral": "Díszletberendezési beszerző"
+        },
+        "r_c17d76240812": {
+          "masculine": "Kellékraktár-vezető",
+          "feminine": "Kellékraktár-vezető",
+          "neutral": "Kellékraktár-vezető"
+        },
+        "r_6a373738f331": {
+          "masculine": "Digitális kelléktervező",
+          "feminine": "Digitális kelléktervező",
+          "neutral": "Digitális kelléktervező"
+        },
+        "r_404bfcb27b87": {
+          "masculine": "Digitális főkellékes",
+          "feminine": "Digitális főkellékes",
+          "neutral": "Digitális főkellékes"
+        },
+        "r_efdc51e3e8eb": {
+          "masculine": "Kellékkészítő",
+          "feminine": "Kellékkészítő",
+          "neutral": "Kellékkészítő"
+        },
+        "r_30872cd93e0c": {
+          "masculine": "Kelléktervező",
+          "feminine": "Kelléktervező",
+          "neutral": "Kelléktervező"
+        },
+        "r_264fc56ea7a5": {
+          "masculine": "Fegyverszakértő",
+          "feminine": "Fegyverszakértő",
+          "neutral": "Fegyverszakértő"
+        },
+        "r_00f9e2afb019": {
+          "masculine": "Kellékes kisegítő",
+          "feminine": "Kellékes kisegítő",
+          "neutral": "Kellékes kisegítő"
+        },
+        "r_ef64ec97e93f": {
+          "masculine": "Kellékfestő",
+          "feminine": "Kellékfestő",
+          "neutral": "Kellékfestő"
+        },
+        "r_8a17379f4cf2": {
+          "masculine": "Kellékszállító sofőr",
+          "feminine": "Kellékszállító sofőr",
+          "neutral": "Kellékszállító sofőr"
+        },
+        "r_fb928031fe07": {
+          "masculine": "Jelenetjármű-koordinátor",
+          "feminine": "Jelenetjármű-koordinátor",
+          "neutral": "Jelenetjármű-koordinátor"
+        },
+        "r_77928b37c49d": {
+          "masculine": "Jelenetjármű-felelős",
+          "feminine": "Jelenetjármű-felelős",
+          "neutral": "Jelenetjármű-felelős"
+        },
+        "r_115e6da0f002": {
+          "masculine": "Díszletvillanyszerelő",
+          "feminine": "Díszletvillanyszerelő",
+          "neutral": "Díszletvillanyszerelő"
+        },
+        "r_857a05036004": {
+          "masculine": "Vezető díszletkertész / díszletkertész",
+          "feminine": "Vezető díszletkertész / díszletkertész",
+          "neutral": "Vezető díszletkertész / díszletkertész"
+        },
+        "r_d8e3dea65e7b": {
+          "masculine": "Díszletkertész",
+          "feminine": "Díszletkertész",
+          "neutral": "Díszletkertész"
+        },
+        "r_aa5ce508ee21": {
+          "masculine": "Virágdekoratőr",
+          "feminine": "Virágdekoratőr",
+          "neutral": "Virágdekoratőr"
+        },
+        "r_36b1709b4159": {
+          "masculine": "Ételfotózási stylist",
+          "feminine": "Ételfotózási stylist",
+          "neutral": "Ételfotózási stylist"
+        },
+        "r_40b095fdeb85": {
+          "masculine": "Airbrush-művész",
+          "feminine": "Airbrush-művész",
+          "neutral": "Airbrush-művész"
+        },
+        "r_afee4f58989a": {
+          "masculine": "Festőművész",
+          "feminine": "Festőművész",
+          "neutral": "Festőművész"
+        },
+        "r_c056e02e39c4": {
+          "masculine": "Díszletfestő",
+          "feminine": "Díszletfestő",
+          "neutral": "Díszletfestő"
+        },
+        "r_e689709eac01": {
+          "masculine": "Vezető díszletfestő",
+          "feminine": "Vezető díszletfestő",
+          "neutral": "Vezető díszletfestő"
+        },
+        "r_70a7586bb774": {
+          "masculine": "Címfestő",
+          "feminine": "Címfestő",
+          "neutral": "Címfestő"
+        },
+        "r_12f20cf536a1": {
+          "masculine": "Festő / díszletfestő",
+          "feminine": "Festő / díszletfestő",
+          "neutral": "Festő / díszletfestő"
+        },
+        "r_dcf49adce47b": {
+          "masculine": "Szobrász / plasztikus",
+          "feminine": "Szobrász / plasztikus",
+          "neutral": "Szobrász / plasztikus"
+        },
+        "r_f4670c7a29a7": {
+          "masculine": "Díszletszobrász",
+          "feminine": "Díszletszobrász",
+          "neutral": "Díszletszobrász"
+        },
+        "r_5fc07d2f3030": {
+          "masculine": "Modellkészítő",
+          "feminine": "Modellkészítő",
+          "neutral": "Modellkészítő"
+        },
+        "r_f545a993cec8": {
+          "masculine": "Miniatűrfelügyelő",
+          "feminine": "Miniatűrfelügyelő",
+          "neutral": "Miniatűrfelügyelő"
+        },
+        "r_d3f5fd4b86c3": {
+          "masculine": "Miniatűreffekt-felügyelő",
+          "feminine": "Miniatűreffekt-felügyelő",
+          "neutral": "Miniatűreffekt-felügyelő"
+        },
+        "r_a6d3fd7eaada": {
+          "masculine": "Díszletépítési vezető",
+          "feminine": "Díszletépítési vezető",
+          "neutral": "Díszletépítési vezető"
+        },
+        "r_ca83b607f08e": {
+          "masculine": "Díszletépítési koordinátor",
+          "feminine": "Díszletépítési koordinátor",
+          "neutral": "Díszletépítési koordinátor"
+        },
+        "r_fbcfd1e1839b": {
+          "masculine": "Stúdiódíszlet-építés vezetője",
+          "feminine": "Stúdiódíszlet-építés vezetője",
+          "neutral": "Stúdiódíszlet-építés vezetője"
+        },
+        "r_0231e128483a": {
+          "masculine": "Díszletépítő / ács",
+          "feminine": "Díszletépítő / ács",
+          "neutral": "Díszletépítő / ács"
+        },
+        "r_62f07946c8f1": {
+          "masculine": "Díszletépítő részleg",
+          "feminine": "Díszletépítő részleg",
+          "neutral": "Díszletépítő részleg"
+        },
+        "r_a3c94f3f3cd1": {
+          "masculine": "Színpadmester",
+          "feminine": "Színpadmester",
+          "neutral": "Színpadmester"
+        },
+        "r_c606af121ce8": {
+          "masculine": "Színpadtechnikus",
+          "feminine": "Színpadtechnikus",
+          "neutral": "Színpadtechnikus"
+        },
+        "r_2017ec503138": {
+          "masculine": "Műszaki rajzoló",
+          "feminine": "Műszaki rajzoló",
+          "neutral": "Műszaki rajzoló"
+        },
+        "r_169af74d49f6": {
+          "masculine": "Kőműves",
+          "feminine": "Kőműves",
+          "neutral": "Kőműves"
+        },
+        "r_578a92348ec6": {
+          "masculine": "Fémműves",
+          "feminine": "Fémműves",
+          "neutral": "Fémműves"
+        },
+        "r_6c7b48200cb3": {
+          "masculine": "Lakatos",
+          "feminine": "Lakatos",
+          "neutral": "Lakatos"
+        },
+        "r_e7f7da33c876": {
+          "masculine": "Vezető lakatos",
+          "feminine": "Vezető lakatos",
+          "neutral": "Vezető lakatos"
+        },
+        "r_027c0b61577d": {
+          "masculine": "Stukkókészítő",
+          "feminine": "Stukkókészítő",
+          "neutral": "Stukkókészítő"
+        },
+        "r_8d5fe63edbd3": {
+          "masculine": "Tapétázó",
+          "feminine": "Tapétázó",
+          "neutral": "Tapétázó"
+        },
+        "r_61ab14bcf2c6": {
+          "masculine": "Asztalos",
+          "feminine": "Asztalos",
+          "neutral": "Asztalos"
+        },
+        "r_3addd9ac0457": {
+          "masculine": "Esztergályos",
+          "feminine": "Esztergályos",
+          "neutral": "Esztergályos"
+        },
+        "r_be99bdf8e0ab": {
+          "masculine": "Művészeti részleg koordinátora",
+          "feminine": "Művészeti részleg koordinátora",
+          "neutral": "Művészeti részleg koordinátora"
+        },
+        "r_9187325e0d84": {
+          "masculine": "Művészeti részleg koordinátorának asszisztense",
+          "feminine": "Művészeti részleg koordinátorának asszisztense",
+          "neutral": "Művészeti részleg koordinátorának asszisztense"
+        },
+        "r_a8af82f5e937": {
+          "masculine": "Művészeti részleg kisegítője",
+          "feminine": "Művészeti részleg kisegítője",
+          "neutral": "Művészeti részleg kisegítője"
+        },
+        "r_8310307922eb": {
+          "masculine": "Művészeti részleg gyakornoka",
+          "feminine": "Művészeti részleg gyakornoka",
+          "neutral": "Művészeti részleg gyakornoka"
+        },
+        "r_f7d87853929b": {
+          "masculine": "Díszletberendezési sofőr",
+          "feminine": "Díszletberendezési sofőr",
+          "neutral": "Díszletberendezési sofőr"
+        },
+        "r_71506d96f350": {
+          "masculine": "Grafikus",
+          "feminine": "Grafikus",
+          "neutral": "Grafikus"
+        },
+        "r_dd224ea66364": {
+          "masculine": "Termékgondozás",
+          "feminine": "Termékgondozás",
+          "neutral": "Termékgondozás"
+        },
+        "r_b2e24af2a895": {
+          "masculine": "Grafikai anyag",
+          "feminine": "Grafikai anyag",
+          "neutral": "Grafikai anyag"
+        },
+        "r_c399668f6f57": {
+          "masculine": "Számítógépes / videós visszajátszás felügyelője",
+          "feminine": "Számítógépes / videós visszajátszás felügyelője",
+          "neutral": "Számítógépes / videós visszajátszás felügyelője"
+        },
+        "r_d278f8dea5ee": {
+          "masculine": "Díszletépítő",
+          "feminine": "Díszletépítő",
+          "neutral": "Díszletépítő"
+        },
+        "r_ed52a3596ba0": {
+          "masculine": "Forgatási díszletépítő részleg",
+          "feminine": "Forgatási díszletépítő részleg",
+          "neutral": "Forgatási díszletépítő részleg"
+        },
+        "r_e3f39e455941": {
+          "masculine": "Díszletépítő kisegítő",
+          "feminine": "Díszletépítő kisegítő",
+          "neutral": "Díszletépítő kisegítő"
+        },
+        "r_74a60171830a": {
+          "masculine": "Víz alatti díszletépítés",
+          "feminine": "Víz alatti díszletépítés",
+          "neutral": "Víz alatti díszletépítés"
+        },
+        "r_18c785ac7bd8": {
+          "masculine": "Rigging, különleges szerkezetek",
+          "feminine": "Rigging, különleges szerkezetek",
+          "neutral": "Rigging, különleges szerkezetek"
+        },
+        "r_8f15fc164b86": {
+          "masculine": "Műszaki rajzoló asszisztense",
+          "feminine": "Műszaki rajzoló asszisztense",
+          "neutral": "Műszaki rajzoló asszisztense"
+        },
+        "r_7e3c819b39ed": {
+          "masculine": "Vezető stukkókészítő",
+          "feminine": "Vezető stukkókészítő",
+          "neutral": "Vezető stukkókészítő"
+        },
+        "r_24a7497a9f06": {
+          "masculine": "Kárpitos (textil)",
+          "feminine": "Kárpitos (textil)",
+          "neutral": "Kárpitos (textil)"
+        },
+        "r_a279ae7e16ec": {
+          "masculine": "Vezető kárpitos (textil)",
+          "feminine": "Vezető kárpitos (textil)",
+          "neutral": "Vezető kárpitos (textil)"
+        },
+        "r_0f2d76b6cc82": {
+          "masculine": "Vezető asztalos",
+          "feminine": "Vezető asztalos",
+          "neutral": "Vezető asztalos"
+        },
+        "r_08876b0452b5": {
+          "masculine": "Berendezőgyakornok",
+          "feminine": "Berendezőgyakornok",
+          "neutral": "Berendezőgyakornok"
+        }
+      },
+      "kostuem": {
+        "r_cfc0491e1daf": {
+          "masculine": "Jelmeztervező",
+          "feminine": "Jelmeztervező",
+          "neutral": "Jelmeztervező"
+        },
+        "r_acbff2b1675d": {
+          "masculine": "Jelmezfelügyelő",
+          "feminine": "Jelmezfelügyelő",
+          "neutral": "Jelmezfelügyelő"
+        },
+        "r_4e5a29f37fde": {
+          "masculine": "Jelmezfelügyelő asszisztense",
+          "feminine": "Jelmezfelügyelő asszisztense",
+          "neutral": "Jelmezfelügyelő asszisztense"
+        },
+        "r_9dacdd987a87": {
+          "masculine": "Jelmezkoordinátor",
+          "feminine": "Jelmezkoordinátor",
+          "neutral": "Jelmezkoordinátor"
+        },
+        "r_3ea2819cc8c4": {
+          "masculine": "Jelmezkoordinátor asszisztense",
+          "feminine": "Jelmezkoordinátor asszisztense",
+          "neutral": "Jelmezkoordinátor asszisztense"
+        },
+        "r_3684af682bde": {
+          "masculine": "Jelmeztervező asszisztense",
+          "feminine": "Jelmeztervező asszisztense",
+          "neutral": "Jelmeztervező asszisztense"
+        },
+        "r_bca9201a3794": {
+          "masculine": "Jelmeztervező második asszisztense",
+          "feminine": "Jelmeztervező második asszisztense",
+          "neutral": "Jelmeztervező második asszisztense"
+        },
+        "r_570a76c15c34": {
+          "masculine": "Jelmeztervező harmadik asszisztense",
+          "feminine": "Jelmeztervező harmadik asszisztense",
+          "neutral": "Jelmeztervező harmadik asszisztense"
+        },
+        "r_75358a18f698": {
+          "masculine": "Vezető jelmezes",
+          "feminine": "Vezető jelmezes",
+          "neutral": "Vezető jelmezes"
+        },
+        "r_df59c1f51566": {
+          "masculine": "Forgatási öltöztető",
+          "feminine": "Forgatási öltöztető",
+          "neutral": "Forgatási öltöztető"
+        },
+        "r_7d1eb3e51b50": {
+          "masculine": "Kiegészítő forgatási öltöztető",
+          "feminine": "Kiegészítő forgatási öltöztető",
+          "neutral": "Kiegészítő forgatási öltöztető"
+        },
+        "r_aa38c8f5acdd": {
+          "masculine": "Forgatási jelmezasszisztens",
+          "feminine": "Forgatási jelmezasszisztens",
+          "neutral": "Forgatási jelmezasszisztens"
+        },
+        "r_85a93499fa51": {
+          "masculine": "Statisztajelmez-felügyelő",
+          "feminine": "Statisztajelmez-felügyelő",
+          "neutral": "Statisztajelmez-felügyelő"
+        },
+        "r_73f373881e68": {
+          "masculine": "Statiszták ruhapróbafelelőse",
+          "feminine": "Statiszták ruhapróbafelelőse",
+          "neutral": "Statiszták ruhapróbafelelőse"
+        },
+        "r_82daef37fafd": {
+          "masculine": "Jelmezkocsi-felelős",
+          "feminine": "Jelmezkocsi-felelős",
+          "neutral": "Jelmezkocsi-felelős"
+        },
+        "r_40f30fffbd6a": {
+          "masculine": "Jelmezbeszerző",
+          "feminine": "Jelmezbeszerző",
+          "neutral": "Jelmezbeszerző"
+        },
+        "r_60a2042cfa65": {
+          "masculine": "Jelmezrészleg könyvelője",
+          "feminine": "Jelmezrészleg könyvelője",
+          "neutral": "Jelmezrészleg könyvelője"
+        },
+        "r_6ece4b3c2f60": {
+          "masculine": "Szabómester / ruhatárvezető",
+          "feminine": "Szabómester / ruhatárvezető",
+          "neutral": "Szabómester / ruhatárvezető"
+        },
+        "r_bb614a4f62e2": {
+          "masculine": "Jelmezasszisztens",
+          "feminine": "Jelmezasszisztens",
+          "neutral": "Jelmezasszisztens"
+        },
+        "r_86f8b66926fc": {
+          "masculine": "Jelmezgyakornok",
+          "feminine": "Jelmezgyakornok",
+          "neutral": "Jelmezgyakornok"
+        },
+        "r_272717911d79": {
+          "masculine": "Szabó",
+          "feminine": "Szabó",
+          "neutral": "Szabó"
+        },
+        "r_3a35662b53a3": {
+          "masculine": "Varró",
+          "feminine": "Varró",
+          "neutral": "Varró"
+        },
+        "r_298c04a0eec5": {
+          "masculine": "Textilművész",
+          "feminine": "Textilművész",
+          "neutral": "Textilművész"
+        },
+        "r_2a6b1e3320f5": {
+          "masculine": "Jelmezkészítő",
+          "feminine": "Jelmezkészítő",
+          "neutral": "Jelmezkészítő"
+        },
+        "r_066dc1f269bb": {
+          "masculine": "Jelmezkellék-készítő",
+          "feminine": "Jelmezkellék-készítő",
+          "neutral": "Jelmezkellék-készítő"
+        },
+        "r_83db0e1a7bff": {
+          "masculine": "Szabászati vezető",
+          "feminine": "Szabászati vezető",
+          "neutral": "Szabászati vezető"
+        },
+        "r_fc8d26a01b37": {
+          "masculine": "Női méretszabó",
+          "feminine": "Női méretszabó",
+          "neutral": "Női méretszabó"
+        },
+        "r_9aaa9c423455": {
+          "masculine": "Férfi méretszabó",
+          "feminine": "Férfi méretszabó",
+          "neutral": "Férfi méretszabó"
+        },
+        "r_975bb2c38b93": {
+          "masculine": "Kalapkészítő",
+          "feminine": "Kalapkészítő",
+          "neutral": "Kalapkészítő"
+        },
+        "r_e5cb00d76add": {
+          "masculine": "Fűzőkészítő",
+          "feminine": "Fűzőkészítő",
+          "neutral": "Fűzőkészítő"
+        },
+        "r_f573123c66c5": {
+          "masculine": "Jelmezillusztrátor",
+          "feminine": "Jelmezillusztrátor",
+          "neutral": "Jelmezillusztrátor"
+        },
+        "r_3218fd13d59c": {
+          "masculine": "Jelmezfestő / kelmefestő",
+          "feminine": "Jelmezfestő / kelmefestő",
+          "neutral": "Jelmezfestő / kelmefestő"
+        },
+        "r_f8c4b94e93de": {
+          "masculine": "Jelmezöregítő",
+          "feminine": "Jelmezöregítő",
+          "neutral": "Jelmezöregítő"
+        },
+        "r_25bf82085577": {
+          "masculine": "Jelmezhímző",
+          "feminine": "Jelmezhímző",
+          "neutral": "Jelmezhímző"
+        },
+        "r_4bd9dd09da1d": {
+          "masculine": "Jelmezkutatás",
+          "feminine": "Jelmezkutatás",
+          "neutral": "Jelmezkutatás"
+        },
+        "r_2efd6bda8664": {
+          "masculine": "Jelmezszállító sofőr",
+          "feminine": "Jelmezszállító sofőr",
+          "neutral": "Jelmezszállító sofőr"
+        },
+        "r_a723a074986b": {
+          "masculine": "Jelmezöregítő / koptató",
+          "feminine": "Jelmezöregítő / koptató",
+          "neutral": "Jelmezöregítő / koptató"
+        },
+        "r_ac01a53c578c": {
+          "masculine": "SFX-jelmez",
+          "feminine": "SFX-jelmez",
+          "neutral": "SFX-jelmez"
+        },
+        "r_bbc01e9dad81": {
+          "masculine": "Stylist / stylistasszisztens",
+          "feminine": "Stylist / stylistasszisztens",
+          "neutral": "Stylist / stylistasszisztens"
+        },
+        "r_0cf394ee7640": {
+          "masculine": "Jelmeztervező (tervezés)",
+          "feminine": "Jelmeztervező (tervezés)",
+          "neutral": "Jelmeztervező (tervezés)"
+        },
+        "r_6e84493aa620": {
+          "masculine": "Jelmeztanácsadó",
+          "feminine": "Jelmeztanácsadó",
+          "neutral": "Jelmeztanácsadó"
+        },
+        "r_7673a5020856": {
+          "masculine": "Jelmeztervező asszisztense",
+          "feminine": "Jelmeztervező asszisztense",
+          "neutral": "Jelmeztervező asszisztense"
+        },
+        "r_1ca2128245c1": {
+          "masculine": "Jelmezrészleg koordinátora",
+          "feminine": "Jelmezrészleg koordinátora",
+          "neutral": "Jelmezrészleg koordinátora"
+        },
+        "r_f707bb1f5992": {
+          "masculine": "Forgatási jelmez / öltöztető",
+          "feminine": "Forgatási jelmez / öltöztető",
+          "neutral": "Forgatási jelmez / öltöztető"
+        },
+        "r_cc15942423ce": {
+          "masculine": "Forgatási jelmezasszisztens",
+          "feminine": "Forgatási jelmezasszisztens",
+          "neutral": "Forgatási jelmezasszisztens"
+        },
+        "r_fa17db9ddd73": {
+          "masculine": "Stylist",
+          "feminine": "Stylist",
+          "neutral": "Stylist"
+        },
+        "r_510b1830a8a9": {
+          "masculine": "Stylistasszisztens",
+          "feminine": "Stylistasszisztens",
+          "neutral": "Stylistasszisztens"
+        },
+        "r_cc5427b5207e": {
+          "masculine": "Szabómester",
+          "feminine": "Szabómester",
+          "neutral": "Szabómester"
+        },
+        "r_51e4b1b69e51": {
+          "masculine": "Női méretszabó",
+          "feminine": "Női méretszabó",
+          "neutral": "Női méretszabó"
+        },
+        "r_c90f0f14aa1d": {
+          "masculine": "Férfi méretszabó",
+          "feminine": "Férfi méretszabó",
+          "neutral": "Férfi méretszabó"
+        },
+        "r_b02e861df06e": {
+          "masculine": "Kalapkészítő",
+          "feminine": "Kalapkészítő",
+          "neutral": "Kalapkészítő"
+        },
+        "r_f4d2f92c7063": {
+          "masculine": "Fűzőkészítő",
+          "feminine": "Fűzőkészítő",
+          "neutral": "Fűzőkészítő"
+        },
+        "r_60b06eb1a3e5": {
+          "masculine": "Öltöztető",
+          "feminine": "Öltöztető",
+          "neutral": "Öltöztető"
+        },
+        "r_b57d7945c2e1": {
+          "masculine": "Jelmezasszisztencia",
+          "feminine": "Jelmezasszisztencia",
+          "neutral": "Jelmezasszisztencia"
+        },
+        "r_2ac825cfa903": {
+          "masculine": "Szabó",
+          "feminine": "Szabó",
+          "neutral": "Szabó"
+        },
+        "r_f5c79a825c6d": {
+          "masculine": "Jelmezszállító sofőr",
+          "feminine": "Jelmezszállító sofőr",
+          "neutral": "Jelmezszállító sofőr"
+        },
+        "r_d964234f1385": {
+          "masculine": "Varró",
+          "feminine": "Varró",
+          "neutral": "Varró"
+        },
+        "r_6371bcd4467e": {
+          "masculine": "Jelmezöregítő",
+          "feminine": "Jelmezöregítő",
+          "neutral": "Jelmezöregítő"
+        },
+        "r_93cc3465aeac": {
+          "masculine": "Jelmez- / kelmefestő",
+          "feminine": "Jelmez- / kelmefestő",
+          "neutral": "Jelmez- / kelmefestő"
+        },
+        "r_9f631f727b98": {
+          "masculine": "Jelmezhímző",
+          "feminine": "Jelmezhímző",
+          "neutral": "Jelmezhímző"
+        },
+        "r_fd593b68c6bd": {
+          "masculine": "Jelmezillusztrátor",
+          "feminine": "Jelmezillusztrátor",
+          "neutral": "Jelmezillusztrátor"
+        },
+        "r_52cc391775b8": {
+          "masculine": "Jelmeztervező-gyakornok",
+          "feminine": "Jelmeztervező-gyakornok",
+          "neutral": "Jelmeztervező-gyakornok"
+        }
+      },
+      "maske": {
+        "r_2cecb5bef109": {
+          "masculine": "Smink- és fodrászrészleg vezetője",
+          "feminine": "Smink- és fodrászrészleg vezetője",
+          "neutral": "Smink- és fodrászrészleg vezetője"
+        },
+        "r_8c46abf33a4b": {
+          "masculine": "Frizuratervező",
+          "feminine": "Frizuratervező",
+          "neutral": "Frizuratervező"
+        },
+        "r_afd55563be09": {
+          "masculine": "Frizura- és sminktervező",
+          "feminine": "Frizura- és sminktervező",
+          "neutral": "Frizura- és sminktervező"
+        },
+        "r_0d2723e6a8cc": {
+          "masculine": "Sminktervező",
+          "feminine": "Sminktervező",
+          "neutral": "Sminktervező"
+        },
+        "r_b73ceeda53dd": {
+          "masculine": "Fodrász- és sminkfelügyelő",
+          "feminine": "Fodrász- és sminkfelügyelő",
+          "neutral": "Fodrász- és sminkfelügyelő"
+        },
+        "r_913e5cf46a02": {
+          "masculine": "Vezető sminkes",
+          "feminine": "Vezető sminkes",
+          "neutral": "Vezető sminkes"
+        },
+        "r_495a42f74fbb": {
+          "masculine": "Vezető fodrász",
+          "feminine": "Vezető fodrász",
+          "neutral": "Vezető fodrász"
+        },
+        "r_ff414fc1a4e8": {
+          "masculine": "Sminkes",
+          "feminine": "Sminkes",
+          "neutral": "Sminkes"
+        },
+        "r_ace166547405": {
+          "masculine": "Kiegészítő sminkes",
+          "feminine": "Kiegészítő sminkes",
+          "neutral": "Kiegészítő sminkes"
+        },
+        "r_96cb48e2539d": {
+          "masculine": "Fodrász",
+          "feminine": "Fodrász",
+          "neutral": "Fodrász"
+        },
+        "r_3a06bbd5516b": {
+          "masculine": "Kiegészítő fodrász",
+          "feminine": "Kiegészítő fodrász",
+          "neutral": "Kiegészítő fodrász"
+        },
+        "r_a8a061642ea1": {
+          "masculine": "Vezető maszkmester / sminkrészlegvezető",
+          "feminine": "Vezető maszkmester / sminkrészlegvezető",
+          "neutral": "Vezető maszkmester / sminkrészlegvezető"
+        },
+        "r_988255c043c0": {
+          "masculine": "Testsmink",
+          "feminine": "Testsmink",
+          "neutral": "Testsmink"
+        },
+        "r_62302b472d3b": {
+          "masculine": "Kiegészítő maszkmester / sminkes",
+          "feminine": "Kiegészítő maszkmester / sminkes",
+          "neutral": "Kiegészítő maszkmester / sminkes"
+        },
+        "r_de6fbe18e529": {
+          "masculine": "Sminkasszisztens",
+          "feminine": "Sminkasszisztens",
+          "neutral": "Sminkasszisztens"
+        },
+        "r_89708da23c7a": {
+          "masculine": "Parókakészítő",
+          "feminine": "Parókakészítő",
+          "neutral": "Parókakészítő"
+        },
+        "r_eb0f745569de": {
+          "masculine": "Protézisművész",
+          "feminine": "Protézisművész",
+          "neutral": "Protézisművész"
+        },
+        "r_bc667775a067": {
+          "masculine": "SFX-sminkes",
+          "feminine": "SFX-sminkes",
+          "neutral": "SFX-sminkes"
+        },
+        "r_a27c177f51ef": {
+          "masculine": "Statiszták fodrász- és sminkfelügyelője",
+          "feminine": "Statiszták fodrász- és sminkfelügyelője",
+          "neutral": "Statiszták fodrász- és sminkfelügyelője"
+        },
+        "r_e46c728a4398": {
+          "masculine": "Maszkgyakornok",
+          "feminine": "Maszkgyakornok",
+          "neutral": "Maszkgyakornok"
+        },
+        "r_3bd74d7ca372": {
+          "masculine": "Vezető sminkes",
+          "feminine": "Vezető sminkes",
+          "neutral": "Vezető sminkes"
+        },
+        "r_1dbe2290254a": {
+          "masculine": "Vezető maszkmester",
+          "feminine": "Vezető maszkmester",
+          "neutral": "Vezető maszkmester"
+        },
+        "r_3e08c4bedcc0": {
+          "masculine": "Testsmink",
+          "feminine": "Testsmink",
+          "neutral": "Testsmink"
+        },
+        "r_24c9ee41124f": {
+          "masculine": "Kiegészítő maszkmester",
+          "feminine": "Kiegészítő maszkmester",
+          "neutral": "Kiegészítő maszkmester"
+        },
+        "r_6373cbbea77f": {
+          "masculine": "Parókakészítő",
+          "feminine": "Parókakészítő",
+          "neutral": "Parókakészítő"
+        },
+        "r_e9a07f599b31": {
+          "masculine": "Maszkgyakornok",
+          "feminine": "Maszkgyakornok",
+          "neutral": "Maszkgyakornok"
+        }
+      },
+      "post": {
+        "r_f88d95239ea1": {
+          "masculine": "Utómunka-producer",
+          "feminine": "Utómunka-producer",
+          "neutral": "Utómunka-producer"
+        },
+        "r_4284177c72b3": {
+          "masculine": "Utómunka-felügyelő",
+          "feminine": "Utómunka-felügyelő",
+          "neutral": "Utómunka-felügyelő"
+        },
+        "r_c2fb80f3e981": {
+          "masculine": "Utómunka-vezető",
+          "feminine": "Utómunka-vezető",
+          "neutral": "Utómunka-vezető"
+        },
+        "r_78b6f4ddb08c": {
+          "masculine": "Utómunka-koordinátor",
+          "feminine": "Utómunka-koordinátor",
+          "neutral": "Utómunka-koordinátor"
+        },
+        "r_0bb7e59012ae": {
+          "masculine": "Utómunka-beosztásszervező",
+          "feminine": "Utómunka-beosztásszervező",
+          "neutral": "Utómunka-beosztásszervező"
+        },
+        "r_b54fb6f974fa": {
+          "masculine": "Utómunka-felügyelő asszisztense",
+          "feminine": "Utómunka-felügyelő asszisztense",
+          "neutral": "Utómunka-felügyelő asszisztense"
+        },
+        "r_fae43b642354": {
+          "masculine": "Anyagleadási vezető / felügyelő",
+          "feminine": "Anyagleadási vezető / felügyelő",
+          "neutral": "Anyagleadási vezető / felügyelő"
+        },
+        "r_54b281a42495": {
+          "masculine": "Vágó",
+          "feminine": "Vágó",
+          "neutral": "Vágó"
+        },
+        "r_eb67aee95450": {
+          "masculine": "Filmvágó",
+          "feminine": "Filmvágó",
+          "neutral": "Filmvágó"
+        },
+        "r_332deef8530f": {
+          "masculine": "Kiegészítő vágó",
+          "feminine": "Kiegészítő vágó",
+          "neutral": "Kiegészítő vágó"
+        },
+        "r_4b8538db6e6e": {
+          "masculine": "Junior vágó",
+          "feminine": "Junior vágó",
+          "neutral": "Junior vágó"
+        },
+        "r_a000c69c93cd": {
+          "masculine": "Első vágóasszisztens",
+          "feminine": "Első vágóasszisztens",
+          "neutral": "Első vágóasszisztens"
+        },
+        "r_fb53d3bb0ca0": {
+          "masculine": "Vágóasszisztens",
+          "feminine": "Vágóasszisztens",
+          "neutral": "Vágóasszisztens"
+        },
+        "r_58fb452bb25d": {
+          "masculine": "Második vágóasszisztens",
+          "feminine": "Második vágóasszisztens",
+          "neutral": "Második vágóasszisztens"
+        },
+        "r_e73f1067c3d0": {
+          "masculine": "Második vágóasszisztens",
+          "feminine": "Második vágóasszisztens",
+          "neutral": "Második vágóasszisztens"
+        },
+        "r_f40a64b53f4e": {
+          "masculine": "Harmadik vágóasszisztens",
+          "feminine": "Harmadik vágóasszisztens",
+          "neutral": "Harmadik vágóasszisztens"
+        },
+        "r_f034db9da000": {
+          "masculine": "Vágási dramaturg",
+          "feminine": "Vágási dramaturg",
+          "neutral": "Vágási dramaturg"
+        },
+        "r_9d8fc1953afd": {
+          "masculine": "VFX-vágó",
+          "feminine": "VFX-vágó",
+          "neutral": "VFX-vágó"
+        },
+        "r_6742bca7f725": {
+          "masculine": "Előzetesvágó",
+          "feminine": "Előzetesvágó",
+          "neutral": "Előzetesvágó"
+        },
+        "r_0088f1d1581d": {
+          "masculine": "Napi anyag vágója",
+          "feminine": "Napi anyag vágója",
+          "neutral": "Napi anyag vágója"
+        },
+        "r_855df6fe84d9": {
+          "masculine": "Szinkronizálási asszisztens",
+          "feminine": "Szinkronizálási asszisztens",
+          "neutral": "Szinkronizálási asszisztens"
+        },
+        "r_76fe5605aea7": {
+          "masculine": "Avid-kezelő",
+          "feminine": "Avid-kezelő",
+          "neutral": "Avid-kezelő"
+        },
+        "r_9a37f1a2f07c": {
+          "masculine": "Final Cut-kezelő",
+          "feminine": "Final Cut-kezelő",
+          "neutral": "Final Cut-kezelő"
+        },
+        "r_5c291075de55": {
+          "masculine": "Fényelő",
+          "feminine": "Fényelő",
+          "neutral": "Fényelő"
+        },
+        "r_ee3d75537a1f": {
+          "masculine": "Online vágó",
+          "feminine": "Online vágó",
+          "neutral": "Online vágó"
+        },
+        "r_24e3087423e1": {
+          "masculine": "Véglegesítési művész",
+          "feminine": "Véglegesítési művész",
+          "neutral": "Véglegesítési művész"
+        },
+        "r_1b9c5df34287": {
+          "masculine": "Képernyőgrafika-tervező",
+          "feminine": "Képernyőgrafika-tervező",
+          "neutral": "Képernyőgrafika-tervező"
+        },
+        "r_0c866fbdd1b9": {
+          "masculine": "Főcímtervező",
+          "feminine": "Főcímtervező",
+          "neutral": "Főcímtervező"
+        },
+        "r_cac32c0c1a16": {
+          "masculine": "DCP-technikus",
+          "feminine": "DCP-technikus",
+          "neutral": "DCP-technikus"
+        },
+        "r_3bf9436831af": {
+          "masculine": "Filmszkenner-kezelő",
+          "feminine": "Filmszkenner-kezelő",
+          "neutral": "Filmszkenner-kezelő"
+        },
+        "r_0c4887e0a1b6": {
+          "masculine": "Filmszkennelés felügyelője",
+          "feminine": "Filmszkennelés felügyelője",
+          "neutral": "Filmszkennelés felügyelője"
+        },
+        "r_85f36a10ca63": {
+          "masculine": "VFX-felügyelő",
+          "feminine": "VFX-felügyelő",
+          "neutral": "VFX-felügyelő"
+        },
+        "r_3690883b97f2": {
+          "masculine": "VFX-producer",
+          "feminine": "VFX-producer",
+          "neutral": "VFX-producer"
+        },
+        "r_01122a78805d": {
+          "masculine": "VFX-koordinátor",
+          "feminine": "VFX-koordinátor",
+          "neutral": "VFX-koordinátor"
+        },
+        "r_4c1b3c0e7030": {
+          "masculine": "VFX-gyártásvezető",
+          "feminine": "VFX-gyártásvezető",
+          "neutral": "VFX-gyártásvezető"
+        },
+        "r_b11b0566c205": {
+          "masculine": "Kiszervezett VFX producer",
+          "feminine": "Kiszervezett VFX producer",
+          "neutral": "Kiszervezett VFX producer"
+        },
+        "r_061d09311a06": {
+          "masculine": "VFX-producer asszisztense",
+          "feminine": "VFX-producer asszisztense",
+          "neutral": "VFX-producer asszisztense"
+        },
+        "r_c20adc0c544f": {
+          "masculine": "VFX-animációs felügyelő",
+          "feminine": "VFX-animációs felügyelő",
+          "neutral": "VFX-animációs felügyelő"
+        },
+        "r_ef84bdb88ead": {
+          "masculine": "VR-producer",
+          "feminine": "VR-producer",
+          "neutral": "VR-producer"
+        },
+        "r_33a9c6da17ea": {
+          "masculine": "Kompozitőr",
+          "feminine": "Kompozitőr",
+          "neutral": "Kompozitőr"
+        },
+        "r_aca1c9874a93": {
+          "masculine": "Kompozitálási felügyelő",
+          "feminine": "Kompozitálási felügyelő",
+          "neutral": "Kompozitálási felügyelő"
+        },
+        "r_74803d65a47d": {
+          "masculine": "Digitális kompozitőr",
+          "feminine": "Digitális kompozitőr",
+          "neutral": "Digitális kompozitőr"
+        },
+        "r_a61ab2d8897e": {
+          "masculine": "Digitális effektek felügyelője",
+          "feminine": "Digitális effektek felügyelője",
+          "neutral": "Digitális effektek felügyelője"
+        },
+        "r_41f1fab43430": {
+          "masculine": "Digitális effekttervező",
+          "feminine": "Digitális effekttervező",
+          "neutral": "Digitális effekttervező"
+        },
+        "r_09a4c7b8c909": {
+          "masculine": "Digitális háttérfestő",
+          "feminine": "Digitális háttérfestő",
+          "neutral": "Digitális háttérfestő"
+        },
+        "r_1df80b2df510": {
+          "masculine": "2D-grafikus",
+          "feminine": "2D-grafikus",
+          "neutral": "2D-grafikus"
+        },
+        "r_c5222c873ae5": {
+          "masculine": "3D-grafikus",
+          "feminine": "3D-grafikus",
+          "neutral": "3D-grafikus"
+        },
+        "r_f1d016eba483": {
+          "masculine": "CG-világítási művész",
+          "feminine": "CG-világítási művész",
+          "neutral": "CG-világítási művész"
+        },
+        "r_1374d004f892": {
+          "masculine": "Textúraművész",
+          "feminine": "Textúraművész",
+          "neutral": "Textúraművész"
+        },
+        "r_ca0826d47a19": {
+          "masculine": "Kamerakövetési művész",
+          "feminine": "Kamerakövetési művész",
+          "neutral": "Kamerakövetési művész"
+        },
+        "r_272f028d80c7": {
+          "masculine": "Rotoszkópművész",
+          "feminine": "Rotoszkópművész",
+          "neutral": "Rotoszkópművész"
+        },
+        "r_fb2a18a56ba5": {
+          "masculine": "Effektművész",
+          "feminine": "Effektművész",
+          "neutral": "Effektművész"
+        },
+        "r_89c1660cb356": {
+          "masculine": "Animátor",
+          "feminine": "Animátor",
+          "neutral": "Animátor"
+        },
+        "r_2efa5e8c0d5f": {
+          "masculine": "Mozgógrafikus",
+          "feminine": "Mozgógrafikus",
+          "neutral": "Mozgógrafikus"
+        },
+        "r_c2053cb7660f": {
+          "masculine": "Karakteranimátor",
+          "feminine": "Karakteranimátor",
+          "neutral": "Karakteranimátor"
+        },
+        "r_247d43bdfb47": {
+          "masculine": "Utómunka-asszisztens",
+          "feminine": "Utómunka-asszisztens",
+          "neutral": "Utómunka-asszisztens"
+        },
+        "r_e2802de21986": {
+          "masculine": "Utómunka-technikus",
+          "feminine": "Utómunka-technikus",
+          "neutral": "Utómunka-technikus"
+        },
+        "r_1f9c7a9f75a8": {
+          "masculine": "Vágógyakornok",
+          "feminine": "Vágógyakornok",
+          "neutral": "Vágógyakornok"
+        },
+        "r_bf7027763437": {
+          "masculine": "Utómunka-koordinátor",
+          "feminine": "Utómunka-koordinátor",
+          "neutral": "Utómunka-koordinátor"
+        },
+        "r_fc841e10fe4f": {
+          "masculine": "Utómunka-felügyelő asszisztense",
+          "feminine": "Utómunka-felügyelő asszisztense",
+          "neutral": "Utómunka-felügyelő asszisztense"
+        },
+        "r_a79df89d104c": {
+          "masculine": "VFX-művész / kompozitőr",
+          "feminine": "VFX-művész / kompozitőr",
+          "neutral": "VFX-művész / kompozitőr"
+        },
+        "r_2a16dc4c4550": {
+          "masculine": "Hangtervező",
+          "feminine": "Hangtervező",
+          "neutral": "Hangtervező"
+        },
+        "r_b96fddf3696f": {
+          "masculine": "Hangvágó",
+          "feminine": "Hangvágó",
+          "neutral": "Hangvágó"
+        },
+        "r_a903b5656a8c": {
+          "masculine": "DCP-művész",
+          "feminine": "DCP-művész",
+          "neutral": "DCP-művész"
+        },
+        "r_774ffd708e0e": {
+          "masculine": "Filmkiíró kezelő",
+          "feminine": "Filmkiíró kezelő",
+          "neutral": "Filmkiíró kezelő"
+        },
+        "r_8685aa8f2a95": {
+          "masculine": "Mistika-kezelő",
+          "feminine": "Mistika-kezelő",
+          "neutral": "Mistika-kezelő"
+        },
+        "r_9b86e6dde935": {
+          "masculine": "VFX műszaki vezető",
+          "feminine": "VFX műszaki vezető",
+          "neutral": "VFX műszaki vezető"
+        },
+        "r_ab44975f8351": {
+          "masculine": "VFX-tanácsadó",
+          "feminine": "VFX-tanácsadó",
+          "neutral": "VFX-tanácsadó"
+        },
+        "r_6a2814e6546b": {
+          "masculine": "VFX-világítási felügyelő",
+          "feminine": "VFX-világítási felügyelő",
+          "neutral": "VFX-világítási felügyelő"
+        },
+        "r_c043402107e7": {
+          "masculine": "Forgatási VFX-felügyelő",
+          "feminine": "Forgatási VFX-felügyelő",
+          "neutral": "Forgatási VFX-felügyelő"
+        },
+        "r_2d4e2d1e1c2c": {
+          "masculine": "VFX-produkciós koordinátor",
+          "feminine": "VFX-produkciós koordinátor",
+          "neutral": "VFX-produkciós koordinátor"
+        },
+        "r_3a24d45a3a71": {
+          "masculine": "VFX-koordinátor asszisztense",
+          "feminine": "VFX-koordinátor asszisztense",
+          "neutral": "VFX-koordinátor asszisztense"
+        },
+        "r_a2d3fd026c27": {
+          "masculine": "VFX-vezető",
+          "feminine": "VFX-vezető",
+          "neutral": "VFX-vezető"
+        },
+        "r_1d0ffcaee2f8": {
+          "masculine": "VFX személyzeti vezető",
+          "feminine": "VFX személyzeti vezető",
+          "neutral": "VFX személyzeti vezető"
+        },
+        "r_6eb353601a03": {
+          "masculine": "VFX informatikai rendszergazda",
+          "feminine": "VFX informatikai rendszergazda",
+          "neutral": "VFX informatikai rendszergazda"
+        },
+        "r_e70450322709": {
+          "masculine": "VFX informatikai támogatás",
+          "feminine": "VFX informatikai támogatás",
+          "neutral": "VFX informatikai támogatás"
+        },
+        "r_71a68d7195b5": {
+          "masculine": "VFX informatikai rendszermérnök / technikus",
+          "feminine": "VFX informatikai rendszermérnök / technikus",
+          "neutral": "VFX informatikai rendszermérnök / technikus"
+        },
+        "r_30de176c3d86": {
+          "masculine": "Munkafolyamat-technikai vezető",
+          "feminine": "Munkafolyamat-technikai vezető",
+          "neutral": "Munkafolyamat-technikai vezető"
+        },
+        "r_3021537edab0": {
+          "masculine": "Számítógépes grafika felügyelője",
+          "feminine": "Számítógépes grafika felügyelője",
+          "neutral": "Számítógépes grafika felügyelője"
+        },
+        "r_0d4cd83ac5f0": {
+          "masculine": "CG-szoftverfejlesztő",
+          "feminine": "CG-szoftverfejlesztő",
+          "neutral": "CG-szoftverfejlesztő"
+        },
+        "r_4d7b70afc38f": {
+          "masculine": "Koncepciórajzoló (VFX)",
+          "feminine": "Koncepciórajzoló (VFX)",
+          "neutral": "Koncepciórajzoló (VFX)"
+        },
+        "r_1d77801b6bcb": {
+          "masculine": "Karaktertervező",
+          "feminine": "Karaktertervező",
+          "neutral": "Karaktertervező"
+        },
+        "r_2eeabfb3e033": {
+          "masculine": "Karakterfelügyelő",
+          "feminine": "Karakterfelügyelő",
+          "neutral": "Karakterfelügyelő"
+        },
+        "r_d4054cc011f7": {
+          "masculine": "Animatronikai felügyelő",
+          "feminine": "Animatronikai felügyelő",
+          "neutral": "Animatronikai felügyelő"
+        },
+        "r_27773325d503": {
+          "masculine": "Elővizualizációs felügyelő",
+          "feminine": "Elővizualizációs felügyelő",
+          "neutral": "Elővizualizációs felügyelő"
+        },
+        "r_4e65539d8bde": {
+          "masculine": "Elővizualizációs művész",
+          "feminine": "Elővizualizációs művész",
+          "neutral": "Elővizualizációs művész"
+        },
+        "r_09f34347e5ee": {
+          "masculine": "Mozgásrögzítési felügyelő",
+          "feminine": "Mozgásrögzítési felügyelő",
+          "neutral": "Mozgásrögzítési felügyelő"
+        },
+        "r_96c37e1de0fa": {
+          "masculine": "Motion control felügyelő",
+          "feminine": "Motion control felügyelő",
+          "neutral": "Motion control felügyelő"
+        },
+        "r_733686f9ae97": {
+          "masculine": "Napi anyag kezelője",
+          "feminine": "Napi anyag kezelője",
+          "neutral": "Napi anyag kezelője"
+        },
+        "r_ab703255dec3": {
+          "masculine": "Be- és kimeneti koordinátor",
+          "feminine": "Be- és kimeneti koordinátor",
+          "neutral": "Be- és kimeneti koordinátor"
+        },
+        "r_75540ed9967e": {
+          "masculine": "Telecine-kezelő",
+          "feminine": "Telecine-kezelő",
+          "neutral": "Telecine-kezelő"
+        },
+        "r_6c17929b4f69": {
+          "masculine": "Digitális kamerakövető",
+          "feminine": "Digitális kamerakövető",
+          "neutral": "Digitális kamerakövető"
+        },
+        "r_2646f9b4aadf": {
+          "masculine": "Rotoszkópművész",
+          "feminine": "Rotoszkópművész",
+          "neutral": "Rotoszkópművész"
+        },
+        "r_1abce9757421": {
+          "masculine": "Digitális eszközkezelő (DAM)",
+          "feminine": "Digitális eszközkezelő (DAM)",
+          "neutral": "Digitális eszközkezelő (DAM)"
+        },
+        "r_e28081bd8659": {
+          "masculine": "Digitális köztesfeldolgozás felügyelője (DI)",
+          "feminine": "Digitális köztesfeldolgozás felügyelője (DI)",
+          "neutral": "Digitális köztesfeldolgozás felügyelője (DI)"
+        },
+        "r_3be4ac15eccc": {
+          "masculine": "Digitális köztesfeldolgozás mérnöke",
+          "feminine": "Digitális köztesfeldolgozás mérnöke",
+          "neutral": "Digitális köztesfeldolgozás mérnöke"
+        },
+        "r_ac6763f1d04b": {
+          "masculine": "Digitális köztesfeldolgozás asszisztense",
+          "feminine": "Digitális köztesfeldolgozás asszisztense",
+          "neutral": "Digitális köztesfeldolgozás asszisztense"
+        },
+        "r_68b5ed487d7c": {
+          "masculine": "VFX-adatkezelő",
+          "feminine": "VFX-adatkezelő",
+          "neutral": "VFX-adatkezelő"
+        },
+        "r_98875c546157": {
+          "masculine": "Renderelési folyamatkezelő",
+          "feminine": "Renderelési folyamatkezelő",
+          "neutral": "Renderelési folyamatkezelő"
+        },
+        "r_37de85ee2914": {
+          "masculine": "3D sztereó felügyelő",
+          "feminine": "3D sztereó felügyelő",
+          "neutral": "3D sztereó felügyelő"
+        },
+        "r_138f0f7f11c5": {
+          "masculine": "Forgatási képernyő-visszajátszás",
+          "feminine": "Forgatási képernyő-visszajátszás",
+          "neutral": "Forgatási képernyő-visszajátszás"
+        },
+        "r_6c52a0b17c05": {
+          "masculine": "VFX-gyakornok",
+          "feminine": "VFX-gyakornok",
+          "neutral": "VFX-gyakornok"
+        },
+        "r_1a1b5684e757": {
+          "masculine": "VFX-produkciós asszisztens",
+          "feminine": "VFX-produkciós asszisztens",
+          "neutral": "VFX-produkciós asszisztens"
+        },
+        "r_03863e1fa165": {
+          "masculine": "VFX-csapatvezető",
+          "feminine": "VFX-csapatvezető",
+          "neutral": "VFX-csapatvezető"
+        },
+        "r_0006a71a7050": {
+          "masculine": "3D-részleg vezetője",
+          "feminine": "3D-részleg vezetője",
+          "neutral": "3D-részleg vezetője"
+        },
+        "r_9ad285824801": {
+          "masculine": "3D-animációs rendező",
+          "feminine": "3D-animációs rendező",
+          "neutral": "3D-animációs rendező"
+        },
+        "r_365169e4e39c": {
+          "masculine": "Vezető 3D-karakteranimátor",
+          "feminine": "Vezető 3D-karakteranimátor",
+          "neutral": "Vezető 3D-karakteranimátor"
+        },
+        "r_6dac25e38271": {
+          "masculine": "3D-karakteranimátor",
+          "feminine": "3D-karakteranimátor",
+          "neutral": "3D-karakteranimátor"
+        },
+        "r_18b24b362b8f": {
+          "masculine": "3D-rigger",
+          "feminine": "3D-rigger",
+          "neutral": "3D-rigger"
+        },
+        "r_b6265894c01c": {
+          "masculine": "3D-modellező",
+          "feminine": "3D-modellező",
+          "neutral": "3D-modellező"
+        },
+        "r_401ce457432d": {
+          "masculine": "3D-világító",
+          "feminine": "3D-világító",
+          "neutral": "3D-világító"
+        },
+        "r_d6c0df6758d4": {
+          "masculine": "3D-textúrázó",
+          "feminine": "3D-textúrázó",
+          "neutral": "3D-textúrázó"
+        },
+        "r_aff4837ba039": {
+          "masculine": "3D-kameraművész",
+          "feminine": "3D-kameraművész",
+          "neutral": "3D-kameraművész"
+        },
+        "r_01ea52ed92df": {
+          "masculine": "3D-kamerafelügyelő",
+          "feminine": "3D-kamerafelügyelő",
+          "neutral": "3D-kamerafelügyelő"
+        },
+        "r_1b2a5f055d73": {
+          "masculine": "Effektanimátor",
+          "feminine": "Effektanimátor",
+          "neutral": "Effektanimátor"
+        },
+        "r_25d305ae2181": {
+          "masculine": "Részecskeanimátor",
+          "feminine": "Részecskeanimátor",
+          "neutral": "Részecskeanimátor"
+        },
+        "r_493348eeb5c9": {
+          "masculine": "2D-rigger",
+          "feminine": "2D-rigger",
+          "neutral": "2D-rigger"
+        },
+        "r_50d612c5929c": {
+          "masculine": "2D-animációs rendező",
+          "feminine": "2D-animációs rendező",
+          "neutral": "2D-animációs rendező"
+        },
+        "r_5b75d1dcc3ba": {
+          "masculine": "Vezető 2D-karakteranimátor",
+          "feminine": "Vezető 2D-karakteranimátor",
+          "neutral": "Vezető 2D-karakteranimátor"
+        },
+        "r_d3bed7009009": {
+          "masculine": "2D-karakteranimátor",
+          "feminine": "2D-karakteranimátor",
+          "neutral": "2D-karakteranimátor"
+        },
+        "r_b9b34ba4ee44": {
+          "masculine": "MotionBuilder-művész",
+          "feminine": "MotionBuilder-művész",
+          "neutral": "MotionBuilder-művész"
+        },
+        "r_40ba6442d974": {
+          "masculine": "MotionBuilder-kezelő",
+          "feminine": "MotionBuilder-kezelő",
+          "neutral": "MotionBuilder-kezelő"
+        }
+      },
+      "musik": {
+        "r_4b516c3014b1": {
+          "masculine": "Zeneszerző",
+          "feminine": "Zeneszerző",
+          "neutral": "Zeneszerző"
+        },
+        "r_78a8b7bafdcf": {
+          "masculine": "Kiegészítő zene",
+          "feminine": "Kiegészítő zene",
+          "neutral": "Kiegészítő zene"
+        },
+        "r_be9c85f652ee": {
+          "masculine": "Előzetes-zeneszerző",
+          "feminine": "Előzetes-zeneszerző",
+          "neutral": "Előzetes-zeneszerző"
+        },
+        "r_d052f25322c5": {
+          "masculine": "Zenei vezető",
+          "feminine": "Zenei vezető",
+          "neutral": "Zenei vezető"
+        },
+        "r_520348654852": {
+          "masculine": "Zenei rendező",
+          "feminine": "Zenei rendező",
+          "neutral": "Zenei rendező"
+        },
+        "r_d614bde7c500": {
+          "masculine": "Zenei felügyelő",
+          "feminine": "Zenei felügyelő",
+          "neutral": "Zenei felügyelő"
+        },
+        "r_1f0d7374bb4c": {
+          "masculine": "Zenekari hangszerelő",
+          "feminine": "Zenekari hangszerelő",
+          "neutral": "Zenekari hangszerelő"
+        },
+        "r_aa4b42f84387": {
+          "masculine": "Hangszerelő",
+          "feminine": "Hangszerelő",
+          "neutral": "Hangszerelő"
+        },
+        "r_8c334f2ac9d3": {
+          "masculine": "Hangszerelő",
+          "feminine": "Hangszerelő",
+          "neutral": "Hangszerelő"
+        },
+        "r_fe19755b0b9e": {
+          "masculine": "Karmester",
+          "feminine": "Karmester",
+          "neutral": "Karmester"
+        },
+        "r_73021f352efb": {
+          "masculine": "Karmester",
+          "feminine": "Karmester",
+          "neutral": "Karmester"
+        },
+        "r_1a95751341fb": {
+          "masculine": "Zenei vágó",
+          "feminine": "Zenei vágó",
+          "neutral": "Zenei vágó"
+        },
+        "r_8fd3dbb18e49": {
+          "masculine": "Kottamásoló",
+          "feminine": "Kottamásoló",
+          "neutral": "Kottamásoló"
+        },
+        "r_d5e57768aab8": {
+          "masculine": "Zenei producer",
+          "feminine": "Zenei producer",
+          "neutral": "Zenei producer"
+        },
+        "r_0e9738be9045": {
+          "masculine": "Zenei tanácsadó",
+          "feminine": "Zenei tanácsadó",
+          "neutral": "Zenei tanácsadó"
+        },
+        "r_82e1a4d8181e": {
+          "masculine": "Zenei koordinátor",
+          "feminine": "Zenei koordinátor",
+          "neutral": "Zenei koordinátor"
+        },
+        "r_00bc34dec4f3": {
+          "masculine": "Logic-kezelő",
+          "feminine": "Logic-kezelő",
+          "neutral": "Logic-kezelő"
+        },
+        "r_0eae67a415cd": {
+          "masculine": "Pro Tools-kezelő",
+          "feminine": "Pro Tools-kezelő",
+          "neutral": "Pro Tools-kezelő"
+        },
+        "r_52aa8c6866dc": {
+          "masculine": "Zeneszerző asszisztense",
+          "feminine": "Zeneszerző asszisztense",
+          "neutral": "Zeneszerző asszisztense"
+        },
+        "r_3e66ad9f45e2": {
+          "masculine": "Zenész",
+          "feminine": "Zenész",
+          "neutral": "Zenész"
+        },
+        "r_ade18645efa3": {
+          "masculine": "Hangvágó",
+          "feminine": "Hangvágó",
+          "neutral": "Hangvágó"
+        },
+        "r_0972afcc1e55": {
+          "masculine": "Zeneszerző-gyakornok",
+          "feminine": "Zeneszerző-gyakornok",
+          "neutral": "Zeneszerző-gyakornok"
+        },
+        "r_801e363423c3": {
+          "masculine": "Vezető filmzenei producer",
+          "feminine": "Vezető filmzenei producer",
+          "neutral": "Vezető filmzenei producer"
+        }
+      },
+      "set-logistik": {
+        "r_06d9aa28368f": {
+          "masculine": "Báziskisegítő",
+          "feminine": "Báziskisegítő",
+          "neutral": "Báziskisegítő"
+        },
+        "r_51e581b5ea39": {
+          "masculine": "Sofőr (személyautó / teherautó)",
+          "feminine": "Sofőr (személyautó / teherautó)",
+          "neutral": "Sofőr (személyautó / teherautó)"
+        },
+        "r_36a599628c2e": {
+          "masculine": "Helyszíni sofőr",
+          "feminine": "Helyszíni sofőr",
+          "neutral": "Helyszíni sofőr"
+        },
+        "r_9bc1a35535fa": {
+          "masculine": "Helyszíni felvételvezető",
+          "feminine": "Helyszíni felvételvezető",
+          "neutral": "Helyszíni felvételvezető"
+        },
+        "r_273f12c52b95": {
+          "masculine": "Helyszínmenedzser asszisztense",
+          "feminine": "Helyszínmenedzser asszisztense",
+          "neutral": "Helyszínmenedzser asszisztense"
+        },
+        "r_ad61df711cdf": {
+          "masculine": "Forgatási biztonsági őr",
+          "feminine": "Forgatási biztonsági őr",
+          "neutral": "Forgatási biztonsági őr"
+        },
+        "r_16476d55e646": {
+          "masculine": "Tömegirányítás",
+          "feminine": "Tömegirányítás",
+          "neutral": "Tömegirányítás"
+        },
+        "r_d4d0eb9a01ad": {
+          "masculine": "Mozgásrendező",
+          "feminine": "Mozgásrendező",
+          "neutral": "Mozgásrendező"
+        },
+        "r_3c6a65ecb046": {
+          "masculine": "Mozgástréner",
+          "feminine": "Mozgástréner",
+          "neutral": "Mozgástréner"
+        },
+        "r_c66e045ffbbf": {
+          "masculine": "Intimitáskoordinátor",
+          "feminine": "Intimitáskoordinátor",
+          "neutral": "Intimitáskoordinátor"
+        },
+        "r_2e9dcd12712e": {
+          "masculine": "Koreográfus",
+          "feminine": "Koreográfus",
+          "neutral": "Koreográfus"
+        },
+        "r_6f899f66fa58": {
+          "masculine": "Tánctréner",
+          "feminine": "Tánctréner",
+          "neutral": "Tánctréner"
+        },
+        "r_f4a45af86f47": {
+          "masculine": "Énektréner",
+          "feminine": "Énektréner",
+          "neutral": "Énektréner"
+        },
+        "r_6e8ad217ef2f": {
+          "masculine": "Dialóguscoach",
+          "feminine": "Dialóguscoach",
+          "neutral": "Dialóguscoach"
+        },
+        "r_63787dc385b1": {
+          "masculine": "Nyelvjárás- és beszédtréner",
+          "feminine": "Nyelvjárás- és beszédtréner",
+          "neutral": "Nyelvjárás- és beszédtréner"
+        },
+        "r_8546ce0263e3": {
+          "masculine": "Fogyatékossággal élő / neurodivergens színészek trénere",
+          "feminine": "Fogyatékossággal élő / neurodivergens színészek trénere",
+          "neutral": "Fogyatékossággal élő / neurodivergens színészek trénere"
+        },
+        "r_969986f76695": {
+          "masculine": "Zenei tréner",
+          "feminine": "Zenei tréner",
+          "neutral": "Zenei tréner"
+        },
+        "r_717c17e3e434": {
+          "masculine": "Siketügyi felügyelő",
+          "feminine": "Siketügyi felügyelő",
+          "neutral": "Siketügyi felügyelő"
+        },
+        "r_e30edc1bd3f8": {
+          "masculine": "Sokszínűségi tanácsadó",
+          "feminine": "Sokszínűségi tanácsadó",
+          "neutral": "Sokszínűségi tanácsadó"
+        },
+        "r_5595cb9aacd1": {
+          "masculine": "Érzékenységi lektor",
+          "feminine": "Érzékenységi lektor",
+          "neutral": "Érzékenységi lektor"
+        },
+        "r_2d5e77118f48": {
+          "masculine": "Tolmács",
+          "feminine": "Tolmács",
+          "neutral": "Tolmács"
+        },
+        "r_48bf6fb54a76": {
+          "masculine": "Fénydublőr",
+          "feminine": "Fénydublőr",
+          "neutral": "Fénydublőr"
+        },
+        "r_5845830d5e82": {
+          "masculine": "Forgatási egészségügyi szakember",
+          "feminine": "Forgatási egészségügyi szakember",
+          "neutral": "Forgatási egészségügyi szakember"
+        },
+        "r_ad72daba923d": {
+          "masculine": "Forgatási tanár",
+          "feminine": "Forgatási tanár",
+          "neutral": "Forgatási tanár"
+        },
+        "r_79e9614b81a6": {
+          "masculine": "Gyermekfelügyelő",
+          "feminine": "Gyermekfelügyelő",
+          "neutral": "Gyermekfelügyelő"
+        },
+        "r_29d48a809858": {
+          "masculine": "Gyermekjóléti felelős",
+          "feminine": "Gyermekjóléti felelős",
+          "neutral": "Gyermekjóléti felelős"
+        },
+        "r_aba4d92c8e69": {
+          "masculine": "Művész-, vendég- és VIP-kísérő",
+          "feminine": "Művész-, vendég- és VIP-kísérő",
+          "neutral": "Művész-, vendég- és VIP-kísérő"
+        },
+        "r_53207f6ae5f4": {
+          "masculine": "Mentális egészség koordinátora",
+          "feminine": "Mentális egészség koordinátora",
+          "neutral": "Mentális egészség koordinátora"
+        },
+        "r_45520abcff27": {
+          "masculine": "Bizalmi személy",
+          "feminine": "Bizalmi személy",
+          "neutral": "Bizalmi személy"
+        },
+        "r_355cbf436694": {
+          "masculine": "Munkavédelmi szakember",
+          "feminine": "Munkavédelmi szakember",
+          "neutral": "Munkavédelmi szakember"
+        },
+        "r_308811767175": {
+          "masculine": "Higiéniai felelős (koronavírus-védelem)",
+          "feminine": "Higiéniai felelős (koronavírus-védelem)",
+          "neutral": "Higiéniai felelős (koronavírus-védelem)"
+        },
+        "r_32790b195d9e": {
+          "masculine": "Vízi koordinátor",
+          "feminine": "Vízi koordinátor",
+          "neutral": "Vízi koordinátor"
+        },
+        "r_c93f3dbba0c2": {
+          "masculine": "Víz alatti / búvárkoordinátor",
+          "feminine": "Víz alatti / búvárkoordinátor",
+          "neutral": "Víz alatti / búvárkoordinátor"
+        },
+        "r_2aed0957c337": {
+          "masculine": "Nyereg- és szerszámmester",
+          "feminine": "Nyereg- és szerszámmester",
+          "neutral": "Nyereg- és szerszámmester"
+        },
+        "r_36f2141e2445": {
+          "masculine": "Közönségkísérő",
+          "feminine": "Közönségkísérő",
+          "neutral": "Közönségkísérő"
+        },
+        "r_dd293d0b7b4b": {
+          "masculine": "Tanácsadó rendező",
+          "feminine": "Tanácsadó rendező",
+          "neutral": "Tanácsadó rendező"
+        },
+        "r_d675b4f70ea4": {
+          "masculine": "Kreatív igazgató (reklámügynökség)",
+          "feminine": "Kreatív igazgató (reklámügynökség)",
+          "neutral": "Kreatív igazgató (reklámügynökség)"
+        },
+        "r_2c01621b03b3": {
+          "masculine": "Szakmai tanácsadó",
+          "feminine": "Szakmai tanácsadó",
+          "neutral": "Szakmai tanácsadó"
+        },
+        "r_777d604a46c7": {
+          "masculine": "Szakértő (produkció)",
+          "feminine": "Szakértő (produkció)",
+          "neutral": "Szakértő (produkció)"
+        },
+        "r_69b1f75394b4": {
+          "masculine": "Oktató / coach",
+          "feminine": "Oktató / coach",
+          "neutral": "Oktató / coach"
+        },
+        "r_9b689ca40dcd": {
+          "masculine": "Társadalmi hatásért felelős producer",
+          "feminine": "Társadalmi hatásért felelős producer",
+          "neutral": "Társadalmi hatásért felelős producer"
+        },
+        "r_b22d32243e5e": {
+          "masculine": "Környezeti tanácsadó",
+          "feminine": "Környezeti tanácsadó",
+          "neutral": "Környezeti tanácsadó"
+        },
+        "r_b7e6bdc7cc1f": {
+          "masculine": "Környezeti tanácsadó asszisztense",
+          "feminine": "Környezeti tanácsadó asszisztense",
+          "neutral": "Környezeti tanácsadó asszisztense"
+        },
+        "r_e84880be1d61": {
+          "masculine": "EPK / werkfilm line producer",
+          "feminine": "EPK / werkfilm line producer",
+          "neutral": "EPK / werkfilm line producer"
+        },
+        "r_715e70975075": {
+          "masculine": "EPK / werkfilm producer",
+          "feminine": "EPK / werkfilm producer",
+          "neutral": "EPK / werkfilm producer"
+        },
+        "r_7028ae82d2e2": {
+          "masculine": "Filmrestaurátor",
+          "feminine": "Filmrestaurátor",
+          "neutral": "Filmrestaurátor"
+        },
+        "r_92791462fbdd": {
+          "masculine": "Filmszínező",
+          "feminine": "Filmszínező",
+          "neutral": "Filmszínező"
+        },
+        "r_e732abed8e31": {
+          "masculine": "Lemezes média szerkesztője",
+          "feminine": "Lemezes média szerkesztője",
+          "neutral": "Lemezes média szerkesztője"
+        },
+        "r_a63ade2d8c7d": {
+          "masculine": "Stop-motion animátor",
+          "feminine": "Stop-motion animátor",
+          "neutral": "Stop-motion animátor"
+        },
+        "r_e56da499fa85": {
+          "masculine": "Rajzfilmes",
+          "feminine": "Rajzfilmes",
+          "neutral": "Rajzfilmes"
+        },
+        "r_868363b4696a": {
+          "masculine": "Játékfejlesztő (műsorok)",
+          "feminine": "Játékfejlesztő (műsorok)",
+          "neutral": "Játékfejlesztő (műsorok)"
+        },
+        "r_776e611a5b6e": {
+          "masculine": "Bábművész",
+          "feminine": "Bábművész",
+          "neutral": "Bábművész"
+        },
+        "r_d3d5008ffded": {
+          "masculine": "Vizuális lemezlovas",
+          "feminine": "Vizuális lemezlovas",
+          "neutral": "Vizuális lemezlovas"
+        },
+        "r_f62082fcf3e6": {
+          "masculine": "Adásgrafikus",
+          "feminine": "Adásgrafikus",
+          "neutral": "Adásgrafikus"
+        },
+        "r_915e8fdeaa84": {
+          "masculine": "Feliratidőzítő",
+          "feminine": "Feliratidőzítő",
+          "neutral": "Feliratidőzítő"
+        },
+        "r_e7b09583174a": {
+          "masculine": "Feliratozó",
+          "feminine": "Feliratozó",
+          "neutral": "Feliratozó"
+        },
+        "r_823099351f18": {
+          "masculine": "Rendezői felderítő",
+          "feminine": "Rendezői felderítő",
+          "neutral": "Rendezői felderítő"
+        },
+        "r_f25ed374ada5": {
+          "masculine": "Jogtisztázás",
+          "feminine": "Jogtisztázás",
+          "neutral": "Jogtisztázás"
+        },
+        "r_bf29b54303ec": {
+          "masculine": "PR-fotós",
+          "feminine": "PR-fotós",
+          "neutral": "PR-fotós"
+        },
+        "r_e2fe82d9e60c": {
+          "masculine": "Projektvezető (külső)",
+          "feminine": "Projektvezető (külső)",
+          "neutral": "Projektvezető (külső)"
+        },
+        "r_3687ead5b451": {
+          "masculine": "Személyi asszisztens",
+          "feminine": "Személyi asszisztens",
+          "neutral": "Személyi asszisztens"
+        },
+        "r_b85e79c1153f": {
+          "masculine": "Kutatás",
+          "feminine": "Kutatás",
+          "neutral": "Kutatás"
+        }
+      },
+      "cast": {
+        "r_3d0e76b883b1": {
+          "masculine": "Főszereplő",
+          "feminine": "Főszereplő",
+          "neutral": "Főszereplő"
+        },
+        "r_543b99d52c01": {
+          "masculine": "Színész",
+          "feminine": "Színésznő",
+          "neutral": "Színész"
+        },
+        "r_aa64ee1fd5d6": {
+          "masculine": "Mellékszereplő",
+          "feminine": "Mellékszereplő",
+          "neutral": "Mellékszereplő"
+        },
+        "r_5fea55df03ed": {
+          "masculine": "Statiszta",
+          "feminine": "Statiszta",
+          "neutral": "Statiszta"
+        },
+        "r_912a4dbdd23c": {
+          "masculine": "Epizódszereplő",
+          "feminine": "Epizódszereplő",
+          "neutral": "Epizódszereplő"
+        },
+        "r_130f7a137659": {
+          "masculine": "Modell",
+          "feminine": "Modell",
+          "neutral": "Modell"
+        },
+        "r_e1e954da6cbb": {
+          "masculine": "Narrátor / felmondó",
+          "feminine": "Narrátor / felmondó",
+          "neutral": "Narrátor / felmondó"
+        },
+        "r_67da9411185f": {
+          "masculine": "Fénydublőr",
+          "feminine": "Fénydublőr",
+          "neutral": "Fénydublőr"
+        },
+        "r_00100aeac4bb": {
+          "masculine": "Kaszkadőr",
+          "feminine": "Kaszkadőr",
+          "neutral": "Kaszkadőr"
+        },
+        "r_0367b47c9554": {
+          "masculine": "Kaszkadőrdublőr",
+          "feminine": "Kaszkadőrdublőr",
+          "neutral": "Kaszkadőrdublőr"
+        },
+        "r_ca9ccb4b0409": {
+          "masculine": "Kaszkadőrrigger",
+          "feminine": "Kaszkadőrrigger",
+          "neutral": "Kaszkadőrrigger"
+        },
+        "r_418902de8e38": {
+          "masculine": "Kaszkadőr-koordinátor",
+          "feminine": "Kaszkadőr-koordinátor",
+          "neutral": "Kaszkadőr-koordinátor"
+        },
+        "r_7f2d1a7f256f": {
+          "masculine": "Kaszkadőr-koordinátor asszisztense",
+          "feminine": "Kaszkadőr-koordinátor asszisztense",
+          "neutral": "Kaszkadőr-koordinátor asszisztense"
+        },
+        "r_e84ab42c1ded": {
+          "masculine": "Kaszkadőrrészleg koordinátora",
+          "feminine": "Kaszkadőrrészleg koordinátora",
+          "neutral": "Kaszkadőrrészleg koordinátora"
+        },
+        "r_e09f42bb8f68": {
+          "masculine": "Harci koreográfus",
+          "feminine": "Harci koreográfus",
+          "neutral": "Harci koreográfus"
+        },
+        "r_f1b27e4baea8": {
+          "masculine": "Akciórendező",
+          "feminine": "Akciórendező",
+          "neutral": "Akciórendező"
+        },
+        "r_ccdc591d96b4": {
+          "masculine": "Légi koordinátor",
+          "feminine": "Légi koordinátor",
+          "neutral": "Légi koordinátor"
+        },
+        "r_df312d5bf658": {
+          "masculine": "Lovas kaszkadőr",
+          "feminine": "Lovas kaszkadőr",
+          "neutral": "Lovas kaszkadőr"
+        },
+        "r_64fe45905183": {
+          "masculine": "Kaszkadőrtechnikus",
+          "feminine": "Kaszkadőrtechnikus",
+          "neutral": "Kaszkadőrtechnikus"
+        },
+        "r_28088de1cde2": {
+          "masculine": "Kaszkadőr mentőbúvár",
+          "feminine": "Kaszkadőr mentőbúvár",
+          "neutral": "Kaszkadőr mentőbúvár"
+        },
+        "r_f1b818bfac99": {
+          "masculine": "Parkourművész",
+          "feminine": "Parkourművész",
+          "neutral": "Parkourművész"
+        },
+        "r_c9bf4b44628b": {
+          "masculine": "Precíziós sofőr",
+          "feminine": "Precíziós sofőr",
+          "neutral": "Precíziós sofőr"
+        },
+        "r_901a1b08f6ba": {
+          "masculine": "Intimitáskoordinátor",
+          "feminine": "Intimitáskoordinátor",
+          "neutral": "Intimitáskoordinátor"
+        },
+        "r_7a721e572105": {
+          "masculine": "Szereplőválogató munkatárs",
+          "feminine": "Szereplőválogató munkatárs",
+          "neutral": "Szereplőválogató munkatárs"
+        },
+        "r_a1f9ba79ab08": {
+          "masculine": "Szereplőválogató asszisztens",
+          "feminine": "Szereplőválogató asszisztens",
+          "neutral": "Szereplőválogató asszisztens"
+        },
+        "r_84927cc7b2bc": {
+          "masculine": "Mellékszereplő",
+          "feminine": "Mellékszereplő",
+          "neutral": "Mellékszereplő"
+        },
+        "r_97144193d2e9": {
+          "masculine": "Statiszta",
+          "feminine": "Statiszta",
+          "neutral": "Statiszta"
+        },
+        "r_de130677203b": {
+          "masculine": "Szereplőválogató rendező (fiatalok)",
+          "feminine": "Szereplőválogató rendező (fiatalok)",
+          "neutral": "Szereplőválogató rendező (fiatalok)"
+        },
+        "r_27725de30521": {
+          "masculine": "Szereplőválogató rendező (gyermekek)",
+          "feminine": "Szereplőválogató rendező (gyermekek)",
+          "neutral": "Szereplőválogató rendező (gyermekek)"
+        },
+        "r_9e31ceb09d88": {
+          "masculine": "Utcai szereplőválogatás",
+          "feminine": "Utcai szereplőválogatás",
+          "neutral": "Utcai szereplőválogatás"
+        },
+        "r_081340fc2740": {
+          "masculine": "Statiszta- és epizódszereplő-válogatás",
+          "feminine": "Statiszta- és epizódszereplő-válogatás",
+          "neutral": "Statiszta- és epizódszereplő-válogatás"
+        },
+        "r_bff79e6f4b26": {
+          "masculine": "Szereplőválogató gyakornok",
+          "feminine": "Szereplőválogató gyakornok",
+          "neutral": "Szereplőválogató gyakornok"
+        },
+        "r_2f8822fb833a": {
+          "masculine": "Vezető kaszkadőrrigger",
+          "feminine": "Vezető kaszkadőrrigger",
+          "neutral": "Vezető kaszkadőrrigger"
+        },
+        "r_9fadc25f432e": {
+          "masculine": "Kocsis",
+          "feminine": "Kocsis",
+          "neutral": "Kocsis"
+        }
+      },
+      "sfx": {
+        "r_a35d5905e687": {
+          "masculine": "Speciális effektek felügyelője",
+          "feminine": "Speciális effektek felügyelője",
+          "neutral": "Speciális effektek felügyelője"
+        },
+        "r_09c0a67cf5e1": {
+          "masculine": "SFX-technikus",
+          "feminine": "SFX-technikus",
+          "neutral": "SFX-technikus"
+        },
+        "r_881a5efb4c8a": {
+          "masculine": "Speciális effektek koordinátora",
+          "feminine": "Speciális effektek koordinátora",
+          "neutral": "Speciális effektek koordinátora"
+        },
+        "r_a9f1b82c4859": {
+          "masculine": "Speciális effektek projektvezetője",
+          "feminine": "Speciális effektek projektvezetője",
+          "neutral": "Speciális effektek projektvezetője"
+        },
+        "r_cea7226b63f6": {
+          "masculine": "Pirotechnikus",
+          "feminine": "Pirotechnikus",
+          "neutral": "Pirotechnikus"
+        },
+        "r_eb065a9f90c9": {
+          "masculine": "Pirotechnikai asszisztens",
+          "feminine": "Pirotechnikai asszisztens",
+          "neutral": "Pirotechnikai asszisztens"
+        },
+        "r_4d3662b84a22": {
+          "masculine": "Miniatűreffekt-producer",
+          "feminine": "Miniatűreffekt-producer",
+          "neutral": "Miniatűreffekt-producer"
+        },
+        "r_e62650b9e5ae": {
+          "masculine": "Lénytervező",
+          "feminine": "Lénytervező",
+          "neutral": "Lénytervező"
+        },
+        "r_00baca6dc147": {
+          "masculine": "Animatronikai mérnök",
+          "feminine": "Animatronikai mérnök",
+          "neutral": "Animatronikai mérnök"
+        },
+        "r_174ffb787533": {
+          "masculine": "Bábkészítő",
+          "feminine": "Bábkészítő",
+          "neutral": "Bábkészítő"
+        },
+        "r_506a008769b9": {
+          "masculine": "Fegyvermester",
+          "feminine": "Fegyvermester",
+          "neutral": "Fegyvermester"
+        },
+        "r_2409c6266fd3": {
+          "masculine": "Fegyvertechnikus",
+          "feminine": "Fegyvertechnikus",
+          "neutral": "Fegyvertechnikus"
+        },
+        "r_ddb886337a99": {
+          "masculine": "Kötélrigger",
+          "feminine": "Kötélrigger",
+          "neutral": "Kötélrigger"
+        },
+        "r_72a4b7fb935e": {
+          "masculine": "SFX-rigging / különleges szerkezetek",
+          "feminine": "SFX-rigging / különleges szerkezetek",
+          "neutral": "SFX-rigging / különleges szerkezetek"
+        },
+        "r_3628c7df2899": {
+          "masculine": "Mechanikus effektek technikusa",
+          "feminine": "Mechanikus effektek technikusa",
+          "neutral": "Mechanikus effektek technikusa"
+        },
+        "r_41cde5889636": {
+          "masculine": "Hó- és esőeffekt-technikus",
+          "feminine": "Hó- és esőeffekt-technikus",
+          "neutral": "Hó- és esőeffekt-technikus"
+        },
+        "r_ba881d560569": {
+          "masculine": "Speciáliseffekt-részleg könyvelője",
+          "feminine": "Speciáliseffekt-részleg könyvelője",
+          "neutral": "Speciáliseffekt-részleg könyvelője"
+        },
+        "r_c723decf9e2c": {
+          "masculine": "SFX-speciáliseffekt-technikus",
+          "feminine": "SFX-speciáliseffekt-technikus",
+          "neutral": "SFX-speciáliseffekt-technikus"
+        }
+      },
+      "broadcast": {
+        "r_56003554d627": {
+          "masculine": "Produkciós mérnök",
+          "feminine": "Produkciós mérnök",
+          "neutral": "Produkciós mérnök"
+        },
+        "r_a5145362deb9": {
+          "masculine": "Műsorszórási mérnök",
+          "feminine": "Műsorszórási mérnök",
+          "neutral": "Műsorszórási mérnök"
+        },
+        "r_21789a4bd26e": {
+          "masculine": "Műszaki vezető",
+          "feminine": "Műszaki vezető",
+          "neutral": "Műszaki vezető"
+        },
+        "r_ed2861824940": {
+          "masculine": "Képmérnök",
+          "feminine": "Képmérnök",
+          "neutral": "Képmérnök"
+        },
+        "r_f35ad506ce91": {
+          "masculine": "Képkeverő",
+          "feminine": "Képkeverő",
+          "neutral": "Képkeverő"
+        },
+        "r_96549186fbdd": {
+          "masculine": "Vizuális keverő",
+          "feminine": "Vizuális keverő",
+          "neutral": "Vizuális keverő"
+        },
+        "r_b0f32c270502": {
+          "masculine": "Képszabályozó",
+          "feminine": "Képszabályozó",
+          "neutral": "Képszabályozó"
+        },
+        "r_4444caa14211": {
+          "masculine": "Kamera-CCU-kezelő",
+          "feminine": "Kamera-CCU-kezelő",
+          "neutral": "Kamera-CCU-kezelő"
+        },
+        "r_3a845b2c45a4": {
+          "masculine": "DVE-kezelő",
+          "feminine": "DVE-kezelő",
+          "neutral": "DVE-kezelő"
+        },
+        "r_5eb58151f915": {
+          "masculine": "Profile-kezelő",
+          "feminine": "Profile-kezelő",
+          "neutral": "Profile-kezelő"
+        },
+        "r_bc517c79d131": {
+          "masculine": "Adástechnikus",
+          "feminine": "Adástechnikus",
+          "neutral": "Adástechnikus"
+        },
+        "r_d0bc62ba1257": {
+          "masculine": "Hangfelügyelő (közvetítés)",
+          "feminine": "Hangfelügyelő (közvetítés)",
+          "neutral": "Hangfelügyelő (közvetítés)"
+        },
+        "r_6189d7ba75a5": {
+          "masculine": "Hangmérnök",
+          "feminine": "Hangmérnök",
+          "neutral": "Hangmérnök"
+        },
+        "r_9eadf0334fa2": {
+          "masculine": "Stúdió- / rendezvénymester",
+          "feminine": "Stúdió- / rendezvénymester",
+          "neutral": "Stúdió- / rendezvénymester"
+        },
+        "r_da7a6180d72a": {
+          "masculine": "Rendezvényvezető",
+          "feminine": "Rendezvényvezető",
+          "neutral": "Rendezvényvezető"
+        },
+        "r_84e084ee4081": {
+          "masculine": "Rendezvénytechnikus",
+          "feminine": "Rendezvénytechnikus",
+          "neutral": "Rendezvénytechnikus"
+        },
+        "r_2b01c5ebf763": {
+          "masculine": "MAZ-kezelő",
+          "feminine": "MAZ-kezelő",
+          "neutral": "MAZ-kezelő"
+        },
+        "r_d2b49ec6c87b": {
+          "masculine": "MAZ-technikus",
+          "feminine": "MAZ-technikus",
+          "neutral": "MAZ-technikus"
+        },
+        "r_b1e7ad7a4e8d": {
+          "masculine": "EVS-kezelő",
+          "feminine": "EVS-kezelő",
+          "neutral": "EVS-kezelő"
+        },
+        "r_6ce5d1fae4b4": {
+          "masculine": "LSM-kezelő (lassítás)",
+          "feminine": "LSM-kezelő (lassítás)",
+          "neutral": "LSM-kezelő (lassítás)"
+        },
+        "r_23864113991d": {
+          "masculine": "Streamingtechnikus",
+          "feminine": "Streamingtechnikus",
+          "neutral": "Streamingtechnikus"
+        },
+        "r_4e59228ff2bb": {
+          "masculine": "Rigger (közvetítés / rendezvény)",
+          "feminine": "Rigger (közvetítés / rendezvény)",
+          "neutral": "Rigger (közvetítés / rendezvény)"
+        },
+        "r_54aa44e2bc03": {
+          "masculine": "Riggingasszisztens",
+          "feminine": "Riggingasszisztens",
+          "neutral": "Riggingasszisztens"
+        },
+        "r_accbebaa16ce": {
+          "masculine": "Képtechnikus",
+          "feminine": "Képtechnikus",
+          "neutral": "Képtechnikus"
+        },
+        "r_152179bb65ff": {
+          "masculine": "Világítástechnikus",
+          "feminine": "Világítástechnikus",
+          "neutral": "Világítástechnikus"
+        },
+        "r_916b292e3ecc": {
+          "masculine": "Hangtechnikus",
+          "feminine": "Hangtechnikus",
+          "neutral": "Hangtechnikus"
+        },
+        "r_a409aeab8c20": {
+          "masculine": "Hangosítási mérnök",
+          "feminine": "Hangosítási mérnök",
+          "neutral": "Hangosítási mérnök"
+        },
+        "r_894d032abc78": {
+          "masculine": "Hangosító technikus",
+          "feminine": "Hangosító technikus",
+          "neutral": "Hangosító technikus"
+        },
+        "r_87a1930129df": {
+          "masculine": "SNG-kezelő",
+          "feminine": "SNG-kezelő",
+          "neutral": "SNG-kezelő"
+        },
+        "r_0d146769f561": {
+          "masculine": "Hangasszisztens (közvetítés)",
+          "feminine": "Hangasszisztens (közvetítés)",
+          "neutral": "Hangasszisztens (közvetítés)"
+        },
+        "r_4ee86e5361a7": {
+          "masculine": "Videófal-kezelő",
+          "feminine": "Videófal-kezelő",
+          "neutral": "Videófal-kezelő"
+        },
+        "r_7c7bcadca79c": {
+          "masculine": "Súgógépkezelő",
+          "feminine": "Súgógépkezelő",
+          "neutral": "Súgógépkezelő"
+        },
+        "r_e627ebc7d6a6": {
+          "masculine": "Műszaki asszisztens (közvetítés)",
+          "feminine": "Műszaki asszisztens (közvetítés)",
+          "neutral": "Műszaki asszisztens (közvetítés)"
+        },
+        "r_b81926eec6f3": {
+          "masculine": "Képasszisztens",
+          "feminine": "Képasszisztens",
+          "neutral": "Képasszisztens"
+        },
+        "r_45710f001c06": {
+          "masculine": "Kábeles kisegítő",
+          "feminine": "Kábeles kisegítő",
+          "neutral": "Kábeles kisegítő"
+        },
+        "r_34cfe59314f7": {
+          "masculine": "Képkeverő",
+          "feminine": "Képkeverő",
+          "neutral": "Képkeverő"
+        },
+        "r_ba025e1926d2": {
+          "masculine": "LSM-kezelő (lassított összefoglaló)",
+          "feminine": "LSM-kezelő (lassított összefoglaló)",
+          "neutral": "LSM-kezelő (lassított összefoglaló)"
+        },
+        "r_c7e1fa1f7572": {
+          "masculine": "SG-kezelő",
+          "feminine": "SG-kezelő",
+          "neutral": "SG-kezelő"
+        },
+        "r_c0aa2d3b3f9c": {
+          "masculine": "Hangasszisztens",
+          "feminine": "Hangasszisztens",
+          "neutral": "Hangasszisztens"
+        },
+        "r_32ca4217464e": {
+          "masculine": "Műszaki asszisztens",
+          "feminine": "Műszaki asszisztens",
+          "neutral": "Műszaki asszisztens"
+        }
+      },
+      "virtual": {
+        "r_9d90887128a0": {
+          "masculine": "Virtuális produkció felügyelője",
+          "feminine": "Virtuális produkció felügyelője",
+          "neutral": "Virtuális produkció felügyelője"
+        },
+        "r_9c3babb3c638": {
+          "masculine": "Virtuális produkció producere",
+          "feminine": "Virtuális produkció producere",
+          "neutral": "Virtuális produkció producere"
+        },
+        "r_1fee1676270e": {
+          "masculine": "Virtuális produkció koordinátora",
+          "feminine": "Virtuális produkció koordinátora",
+          "neutral": "Virtuális produkció koordinátora"
+        },
+        "r_82e993b4422d": {
+          "masculine": "Virtuális produkciós stúdió vezetője",
+          "feminine": "Virtuális produkciós stúdió vezetője",
+          "neutral": "Virtuális produkciós stúdió vezetője"
+        },
+        "r_14e7e79a9ca8": {
+          "masculine": "VAD-művész (virtuális művészeti részleg)",
+          "feminine": "VAD-művész (virtuális művészeti részleg)",
+          "neutral": "VAD-művész (virtuális művészeti részleg)"
+        },
+        "r_2034a25adda6": {
+          "masculine": "Virtuális produkciós mérnök",
+          "feminine": "Virtuális produkciós mérnök",
+          "neutral": "Virtuális produkciós mérnök"
+        },
+        "r_188b9da491f3": {
+          "masculine": "VP-rendszerek és eszközök műszaki vezetője",
+          "feminine": "VP-rendszerek és eszközök műszaki vezetője",
+          "neutral": "VP-rendszerek és eszközök műszaki vezetője"
+        },
+        "r_93a5c89da775": {
+          "masculine": "LED-fal-kezelő",
+          "feminine": "LED-fal-kezelő",
+          "neutral": "LED-fal-kezelő"
+        },
+        "r_d1415a80bf57": {
+          "masculine": "Unreal Engine-kezelő",
+          "feminine": "Unreal Engine-kezelő",
+          "neutral": "Unreal Engine-kezelő"
+        },
+        "r_1c2e82f4274b": {
+          "masculine": "Valós idejű motor kezelője",
+          "feminine": "Valós idejű motor kezelője",
+          "neutral": "Valós idejű motor kezelője"
+        },
+        "r_247afd3ab3fd": {
+          "masculine": "Médiaszerver-kezelő",
+          "feminine": "Médiaszerver-kezelő",
+          "neutral": "Médiaszerver-kezelő"
+        },
+        "r_8728a8d46ae1": {
+          "masculine": "VP-rendszergazda",
+          "feminine": "VP-rendszergazda",
+          "neutral": "VP-rendszergazda"
+        },
+        "r_e7c27999f9ae": {
+          "masculine": "VP-követési technikus",
+          "feminine": "VP-követési technikus",
+          "neutral": "VP-követési technikus"
+        },
+        "r_bbe66ea7740f": {
+          "masculine": "VP LED-technikus",
+          "feminine": "VP LED-technikus",
+          "neutral": "VP LED-technikus"
+        },
+        "r_ad04846bb2b3": {
+          "masculine": "Követési technikus",
+          "feminine": "Követési technikus",
+          "neutral": "Követési technikus"
+        },
+        "r_c100cb7d8cdf": {
+          "masculine": "Valós idejű grafikus",
+          "feminine": "Valós idejű grafikus",
+          "neutral": "Valós idejű grafikus"
+        },
+        "r_84ae9f742a8c": {
+          "masculine": "Virtuális művészeti részleg (VAD) művésze",
+          "feminine": "Virtuális művészeti részleg (VAD) művésze",
+          "neutral": "Virtuális művészeti részleg (VAD) művésze"
+        }
+      },
+      "redaktion": {
+        "r_67a1c14f27d6": {
+          "masculine": "Szerkesztőségi vezető",
+          "feminine": "Szerkesztőségi vezető",
+          "neutral": "Szerkesztőségi vezető"
+        },
+        "r_fb6f303e781e": {
+          "masculine": "Főszerkesztő",
+          "feminine": "Főszerkesztő",
+          "neutral": "Főszerkesztő"
+        },
+        "r_1d083876d102": {
+          "masculine": "Ügyeletes szerkesztő",
+          "feminine": "Ügyeletes szerkesztő",
+          "neutral": "Ügyeletes szerkesztő"
+        },
+        "r_dba49499f044": {
+          "masculine": "Produkciós vezető (csatorna)",
+          "feminine": "Produkciós vezető (csatorna)",
+          "neutral": "Produkciós vezető (csatorna)"
+        },
+        "r_399d5722db1b": {
+          "masculine": "Gyártásvezető (csatorna)",
+          "feminine": "Gyártásvezető (csatorna)",
+          "neutral": "Gyártásvezető (csatorna)"
+        },
+        "r_97c6fe9db2a1": {
+          "masculine": "Lebonyolítási koordinátor",
+          "feminine": "Lebonyolítási koordinátor",
+          "neutral": "Lebonyolítási koordinátor"
+        },
+        "r_c1f3dd5d125c": {
+          "masculine": "Szerkesztő",
+          "feminine": "Szerkesztő",
+          "neutral": "Szerkesztő"
+        },
+        "r_74db110eed35": {
+          "masculine": "Televíziós szerző",
+          "feminine": "Televíziós szerző",
+          "neutral": "Televíziós szerző"
+        },
+        "r_c68ab8bdf35f": {
+          "masculine": "Szereplőválogatási szerkesztő",
+          "feminine": "Szereplőválogatási szerkesztő",
+          "neutral": "Szereplőválogatási szerkesztő"
+        },
+        "r_db514834619e": {
+          "masculine": "Képszerkesztő",
+          "feminine": "Képszerkesztő",
+          "neutral": "Képszerkesztő"
+        },
+        "r_2d3838a04d2d": {
+          "masculine": "Vágószerkesztő",
+          "feminine": "Vágószerkesztő",
+          "neutral": "Vágószerkesztő"
+        },
+        "r_72b16f73761b": {
+          "masculine": "Online szerkesztő",
+          "feminine": "Online szerkesztő",
+          "neutral": "Online szerkesztő"
+        },
+        "r_1eb2a3ac7a7f": {
+          "masculine": "Videós szerkesztő",
+          "feminine": "Videós szerkesztő",
+          "neutral": "Videós szerkesztő"
+        },
+        "r_fea2147a3023": {
+          "masculine": "Televíziós újságíró",
+          "feminine": "Televíziós újságíró",
+          "neutral": "Televíziós újságíró"
+        },
+        "r_89901fa29127": {
+          "masculine": "Riporter",
+          "feminine": "Riporter",
+          "neutral": "Riporter"
+        },
+        "r_49092803ca90": {
+          "masculine": "Műsorkészítő",
+          "feminine": "Műsorkészítő",
+          "neutral": "Műsorkészítő"
+        },
+        "r_558623ea54e2": {
+          "masculine": "Videóproducer",
+          "feminine": "Videóproducer",
+          "neutral": "Videóproducer"
+        },
+        "r_cd94582e5de3": {
+          "masculine": "Videóújságíró",
+          "feminine": "Videóújságíró",
+          "neutral": "Videóújságíró"
+        },
+        "r_c1632a39db5a": {
+          "masculine": "Videós tartalomalkotó (közösségi média)",
+          "feminine": "Videós tartalomalkotó (közösségi média)",
+          "neutral": "Videós tartalomalkotó (közösségi média)"
+        },
+        "r_48a469f4753e": {
+          "masculine": "Műsorvezető",
+          "feminine": "Műsorvezető",
+          "neutral": "Műsorvezető"
+        },
+        "r_dff0d36f7649": {
+          "masculine": "Hírolvasó",
+          "feminine": "Hírolvasó",
+          "neutral": "Hírolvasó"
+        },
+        "r_d8ae611e8a84": {
+          "masculine": "Kreatív producer",
+          "feminine": "Kreatív producer",
+          "neutral": "Kreatív producer"
+        },
+        "r_52eb2ef13219": {
+          "masculine": "Kreatív igazgató",
+          "feminine": "Kreatív igazgató",
+          "neutral": "Kreatív igazgató"
+        },
+        "r_4741fd392c78": {
+          "masculine": "Reklámszövegíró",
+          "feminine": "Reklámszövegíró",
+          "neutral": "Reklámszövegíró"
+        },
+        "r_7693f0b6836d": {
+          "masculine": "Koncepcióalkotó",
+          "feminine": "Koncepcióalkotó",
+          "neutral": "Koncepcióalkotó"
+        },
+        "r_8ed4467cbce1": {
+          "masculine": "Közösségimédia-producer",
+          "feminine": "Közösségimédia-producer",
+          "neutral": "Közösségimédia-producer"
+        },
+        "r_f3046605ff7d": {
+          "masculine": "Szerkesztőségi asszisztens",
+          "feminine": "Szerkesztőségi asszisztens",
+          "neutral": "Szerkesztőségi asszisztens"
+        },
+        "r_39b32b25eed9": {
+          "masculine": "Szerkesztőségi gyakornok",
+          "feminine": "Szerkesztőségi gyakornok",
+          "neutral": "Szerkesztőségi gyakornok"
+        },
+        "r_7947e117851f": {
+          "masculine": "Ügyeletes szerkesztő",
+          "feminine": "Ügyeletes szerkesztő",
+          "neutral": "Ügyeletes szerkesztő"
+        },
+        "r_9c948261499b": {
+          "masculine": "Produkciós vezető (stúdió / csatorna)",
+          "feminine": "Produkciós vezető (stúdió / csatorna)",
+          "neutral": "Produkciós vezető (stúdió / csatorna)"
+        },
+        "r_844ebb650ef7": {
+          "masculine": "Szerkesztő",
+          "feminine": "Szerkesztő",
+          "neutral": "Szerkesztő"
+        },
+        "r_bac4afc8f929": {
+          "masculine": "Vágási műsorkészítő",
+          "feminine": "Vágási műsorkészítő",
+          "neutral": "Vágási műsorkészítő"
+        },
+        "r_324910e3b0ab": {
+          "masculine": "Kvízszerkesztő",
+          "feminine": "Kvízszerkesztő",
+          "neutral": "Kvízszerkesztő"
+        },
+        "r_363c83ce0934": {
+          "masculine": "Közönségbemelegítő",
+          "feminine": "Közönségbemelegítő",
+          "neutral": "Közönségbemelegítő"
+        },
+        "r_6227b3014b7a": {
+          "masculine": "Helyi tudósító / fixer",
+          "feminine": "Helyi tudósító / fixer",
+          "neutral": "Helyi tudósító / fixer"
+        },
+        "r_dfa579f14095": {
+          "masculine": "Anyagnaplózó",
+          "feminine": "Anyagnaplózó",
+          "neutral": "Anyagnaplózó"
+        },
+        "r_57c0fec76f7d": {
+          "masculine": "Átíró",
+          "feminine": "Átíró",
+          "neutral": "Átíró"
+        },
+        "r_cabe547e084e": {
+          "masculine": "Képkutatás",
+          "feminine": "Képkutatás",
+          "neutral": "Képkutatás"
+        }
+      },
+      "social": {
+        "r_e8a967aad9b7": {
+          "masculine": "Tartalomalkotó",
+          "feminine": "Tartalomalkotó",
+          "neutral": "Tartalomalkotó"
+        },
+        "r_631c65ad8827": {
+          "masculine": "Influenszer",
+          "feminine": "Influenszer",
+          "neutral": "Influenszer"
+        },
+        "r_a9eeb34333bc": {
+          "masculine": "Közösségimédia-menedzser",
+          "feminine": "Közösségimédia-menedzser",
+          "neutral": "Közösségimédia-menedzser"
+        },
+        "r_b510fa57cea0": {
+          "masculine": "UGC-tartalomalkotó",
+          "feminine": "UGC-tartalomalkotó",
+          "neutral": "UGC-tartalomalkotó"
+        },
+        "r_4d66d4dbbf12": {
+          "masculine": "Reels-videós",
+          "feminine": "Reels-videós",
+          "neutral": "Reels-videós"
+        },
+        "r_423ece24b5c2": {
+          "masculine": "TikTok-tartalomalkotó",
+          "feminine": "TikTok-tartalomalkotó",
+          "neutral": "TikTok-tartalomalkotó"
+        },
+        "r_e7483d4ddd6d": {
+          "masculine": "Közösségmenedzser",
+          "feminine": "Közösségmenedzser",
+          "neutral": "Közösségmenedzser"
+        },
+        "r_6f877112cd0a": {
+          "masculine": "Közösségimédia-stratéga",
+          "feminine": "Közösségimédia-stratéga",
+          "neutral": "Közösségimédia-stratéga"
+        },
+        "r_bd90a8429d6f": {
+          "masculine": "Influenszer / tartalomalkotó",
+          "feminine": "Influenszer / tartalomalkotó",
+          "neutral": "Influenszer / tartalomalkotó"
+        },
+        "r_c43ce08ef6e8": {
+          "masculine": "Márkatörténet-mesélő",
+          "feminine": "Márkatörténet-mesélő",
+          "neutral": "Márkatörténet-mesélő"
+        },
+        "r_e75a59be5b02": {
+          "masculine": "Videós (közösségi tartalom)",
+          "feminine": "Videós (közösségi tartalom)",
+          "neutral": "Videós (közösségi tartalom)"
+        },
+        "r_5f522b44dd48": {
+          "masculine": "Vágó (Reels / TikTok)",
+          "feminine": "Vágó (Reels / TikTok)",
+          "neutral": "Vágó (Reels / TikTok)"
+        },
+        "r_ce039c1f951f": {
+          "masculine": "Mozgógrafikus (közösségi média)",
+          "feminine": "Mozgógrafikus (közösségi média)",
+          "neutral": "Mozgógrafikus (közösségi média)"
+        }
+      },
+      "foto": {
+        "r_d2c0588cf0d1": {
+          "masculine": "Fotós",
+          "feminine": "Fotós",
+          "neutral": "Fotós"
+        },
+        "r_d7f7fbf5939c": {
+          "masculine": "Divatfotós",
+          "feminine": "Divatfotós",
+          "neutral": "Divatfotós"
+        },
+        "r_e0551919b067": {
+          "masculine": "Termékfotós",
+          "feminine": "Termékfotós",
+          "neutral": "Termékfotós"
+        },
+        "r_b06301444ef7": {
+          "masculine": "Rendezvényfotós",
+          "feminine": "Rendezvényfotós",
+          "neutral": "Rendezvényfotós"
+        },
+        "r_124df4c664ce": {
+          "masculine": "Portréfotós",
+          "feminine": "Portréfotós",
+          "neutral": "Portréfotós"
+        },
+        "r_2e1fcf07d241": {
+          "masculine": "Reklámfotós",
+          "feminine": "Reklámfotós",
+          "neutral": "Reklámfotós"
+        },
+        "r_02bd21bcff9c": {
+          "masculine": "Ételfotós",
+          "feminine": "Ételfotós",
+          "neutral": "Ételfotós"
+        },
+        "r_8a273a427bd6": {
+          "masculine": "Drónfotós",
+          "feminine": "Drónfotós",
+          "neutral": "Drónfotós"
+        },
+        "r_843b4748146d": {
+          "masculine": "Forgatási fotós",
+          "feminine": "Forgatási fotós",
+          "neutral": "Forgatási fotós"
+        },
+        "r_b622037392fb": {
+          "masculine": "Fotóasszisztens",
+          "feminine": "Fotóasszisztens",
+          "neutral": "Fotóasszisztens"
+        },
+        "r_6a2008f9f2ef": {
+          "masculine": "Stúdióvezető",
+          "feminine": "Stúdióvezető",
+          "neutral": "Stúdióvezető"
+        },
+        "r_341b032b61fc": {
+          "masculine": "Retusőr",
+          "feminine": "Retusőr",
+          "neutral": "Retusőr"
+        },
+        "r_468329a20ba4": {
+          "masculine": "Képfeldolgozó",
+          "feminine": "Képfeldolgozó",
+          "neutral": "Képfeldolgozó"
+        }
+      },
+      "ki": {
+        "r_0af68f26119c": {
+          "masculine": "MI-filmes",
+          "feminine": "MI-filmes",
+          "neutral": "MI-filmes"
+        },
+        "r_7ebc4eeffa63": {
+          "masculine": "MI-felelős / AI-felügyelő",
+          "feminine": "MI-felelős / AI-felügyelő",
+          "neutral": "MI-felelős / AI-felügyelő"
+        },
+        "r_5143bd061069": {
+          "masculine": "MI-rendező",
+          "feminine": "MI-rendező",
+          "neutral": "MI-rendező"
+        },
+        "r_8b38d96f6763": {
+          "masculine": "MI-animátor",
+          "feminine": "MI-animátor",
+          "neutral": "MI-animátor"
+        },
+        "r_addc4afc90e0": {
+          "masculine": "Promptmérnök (film és média)",
+          "feminine": "Promptmérnök (film és média)",
+          "neutral": "Promptmérnök (film és média)"
+        },
+        "r_227b357243e1": {
+          "masculine": "MI-forgatókönyvíró",
+          "feminine": "MI-forgatókönyvíró",
+          "neutral": "MI-forgatókönyvíró"
+        },
+        "r_53ef2619b5af": {
+          "masculine": "MI-storyboardrajzoló",
+          "feminine": "MI-storyboardrajzoló",
+          "neutral": "MI-storyboardrajzoló"
+        },
+        "r_1185b1151f24": {
+          "masculine": "MI-képgeneráló",
+          "feminine": "MI-képgeneráló",
+          "neutral": "MI-képgeneráló"
+        },
+        "r_f551cf191b74": {
+          "masculine": "MI-videóalkotó",
+          "feminine": "MI-videóalkotó",
+          "neutral": "MI-videóalkotó"
+        },
+        "r_b69e1ec80a94": {
+          "masculine": "MI-hangtervező",
+          "feminine": "MI-hangtervező",
+          "neutral": "MI-hangtervező"
+        },
+        "r_237f8a4202e1": {
+          "masculine": "MI-fényelő",
+          "feminine": "MI-fényelő",
+          "neutral": "MI-fényelő"
+        },
+        "r_38b5ef6c319c": {
+          "masculine": "MI-munkafolyamat-tanácsadó (film)",
+          "feminine": "MI-munkafolyamat-tanácsadó (film)",
+          "neutral": "MI-munkafolyamat-tanácsadó (film)"
+        }
+      },
+      "drehbuch": {
+        "r_f63a97948825": {
+          "masculine": "Showrunner",
+          "feminine": "Showrunner",
+          "neutral": "Showrunner"
+        },
+        "r_da4094d01df6": {
+          "masculine": "Vezető szerző",
+          "feminine": "Vezető szerző",
+          "neutral": "Vezető szerző"
+        },
+        "r_48862b016872": {
+          "masculine": "Vezető szerző asszisztense",
+          "feminine": "Vezető szerző asszisztense",
+          "neutral": "Vezető szerző asszisztense"
+        },
+        "r_f0e5da473f57": {
+          "masculine": "Showrunner asszisztense",
+          "feminine": "Showrunner asszisztense",
+          "neutral": "Showrunner asszisztense"
+        },
+        "r_be444be7e73a": {
+          "masculine": "Forgatókönyvíró",
+          "feminine": "Forgatókönyvíró",
+          "neutral": "Forgatókönyvíró"
+        },
+        "r_d1a561dc7125": {
+          "masculine": "Társszerző",
+          "feminine": "Társszerző",
+          "neutral": "Társszerző"
+        },
+        "r_da01eb9b61e7": {
+          "masculine": "Átdolgozó szerző",
+          "feminine": "Átdolgozó szerző",
+          "neutral": "Átdolgozó szerző"
+        },
+        "r_199c194315c9": {
+          "masculine": "Forgatókönyv-javító",
+          "feminine": "Forgatókönyv-javító",
+          "neutral": "Forgatókönyv-javító"
+        },
+        "r_a180812047b1": {
+          "masculine": "Történetszerkesztő",
+          "feminine": "Történetszerkesztő",
+          "neutral": "Történetszerkesztő"
+        },
+        "r_5f9704129182": {
+          "masculine": "Történetvázlat-író",
+          "feminine": "Történetvázlat-író",
+          "neutral": "Történetvázlat-író"
+        },
+        "r_41126a4d581f": {
+          "masculine": "Forgatókönyv-szerkesztő",
+          "feminine": "Forgatókönyv-szerkesztő",
+          "neutral": "Forgatókönyv-szerkesztő"
+        },
+        "r_11bee057c159": {
+          "masculine": "Dialógusszerkesztő",
+          "feminine": "Dialógusszerkesztő",
+          "neutral": "Dialógusszerkesztő"
+        },
+        "r_d578a24e6a6c": {
+          "masculine": "Dialógusíró",
+          "feminine": "Dialógusíró",
+          "neutral": "Dialógusíró"
+        },
+        "r_cbc48ad9850e": {
+          "masculine": "Forgatókönyv-lektor",
+          "feminine": "Forgatókönyv-lektor",
+          "neutral": "Forgatókönyv-lektor"
+        },
+        "r_850bbf550984": {
+          "masculine": "Dramaturg / forgatókönyv-tanácsadó",
+          "feminine": "Dramaturg / forgatókönyv-tanácsadó",
+          "neutral": "Dramaturg / forgatókönyv-tanácsadó"
+        },
+        "r_c33a26535234": {
+          "masculine": "Forgatókönyv- és történetfejlesztés",
+          "feminine": "Forgatókönyv- és történetfejlesztés",
+          "neutral": "Forgatókönyv- és történetfejlesztés"
+        },
+        "r_e439aac0b481": {
+          "masculine": "Forgatókönyv-részleg vezetője",
+          "feminine": "Forgatókönyv-részleg vezetője",
+          "neutral": "Forgatókönyv-részleg vezetője"
+        },
+        "r_a30d0af43af8": {
+          "masculine": "Történetfejlesztési vezető",
+          "feminine": "Történetfejlesztési vezető",
+          "neutral": "Történetfejlesztési vezető"
+        },
+        "r_3aa5851edfa7": {
+          "masculine": "Formátumfejlesztő",
+          "feminine": "Formátumfejlesztő",
+          "neutral": "Formátumfejlesztő"
+        },
+        "r_fc05d4531220": {
+          "masculine": "Treatmentvázlat-író",
+          "feminine": "Treatmentvázlat-író",
+          "neutral": "Treatmentvázlat-író"
+        },
+        "r_601f64f82db2": {
+          "masculine": "Szinkrondialógus-író",
+          "feminine": "Szinkrondialógus-író",
+          "neutral": "Szinkrondialógus-író"
+        },
+        "r_1ddc57dbbeb2": {
+          "masculine": "Audionarrációs szerző",
+          "feminine": "Audionarrációs szerző",
+          "neutral": "Audionarrációs szerző"
+        },
+        "r_9f89ae134497": {
+          "masculine": "Filmfordító",
+          "feminine": "Filmfordító",
+          "neutral": "Filmfordító"
+        },
+        "r_6cc875ec3963": {
+          "masculine": "Forgatókönyv-fordító",
+          "feminine": "Forgatókönyv-fordító",
+          "neutral": "Forgatókönyv-fordító"
+        },
+        "r_5947f173deeb": {
+          "masculine": "Feliratfordítás",
+          "feminine": "Feliratfordítás",
+          "neutral": "Feliratfordítás"
+        },
+        "r_7b6a9a537e9a": {
+          "masculine": "Dialógusfordítás",
+          "feminine": "Dialógusfordítás",
+          "neutral": "Dialógusfordítás"
+        },
+        "r_07f1b8537dbc": {
+          "masculine": "Átiratfordítás",
+          "feminine": "Átiratfordítás",
+          "neutral": "Átiratfordítás"
+        },
+        "r_baf097c29e20": {
+          "masculine": "Dialóguslista-átíró",
+          "feminine": "Dialóguslista-átíró",
+          "neutral": "Dialóguslista-átíró"
+        },
+        "r_84f5505f76e2": {
+          "masculine": "Szövegíró / reklámszövegíró",
+          "feminine": "Szövegíró / reklámszövegíró",
+          "neutral": "Szövegíró / reklámszövegíró"
+        },
+        "r_f38e225361bf": {
+          "masculine": "Nyelvi asszisztens",
+          "feminine": "Nyelvi asszisztens",
+          "neutral": "Nyelvi asszisztens"
+        },
+        "r_eda2531fdadf": {
+          "masculine": "Kutató",
+          "feminine": "Kutató",
+          "neutral": "Kutató"
+        },
+        "r_c6e3b618f79f": {
+          "masculine": "Kutatási asszisztens",
+          "feminine": "Kutatási asszisztens",
+          "neutral": "Kutatási asszisztens"
+        },
+        "r_0434302793dc": {
+          "masculine": "Forgatókönyv-koordinátor",
+          "feminine": "Forgatókönyv-koordinátor",
+          "neutral": "Forgatókönyv-koordinátor"
+        },
+        "r_dae3743c6b89": {
+          "masculine": "Forgatókönyvíró-gyakornok",
+          "feminine": "Forgatókönyvíró-gyakornok",
+          "neutral": "Forgatókönyvíró-gyakornok"
+        }
+      },
+      "public-relations": {
+        "r_1860a572354e": {
+          "masculine": "Marketing, PR",
+          "feminine": "Marketing, PR",
+          "neutral": "Marketing, PR"
+        },
+        "r_201f2da74897": {
+          "masculine": "Közösségimédia-menedzser (film / produkció)",
+          "feminine": "Közösségimédia-menedzser (film / produkció)",
+          "neutral": "Közösségimédia-menedzser (film / produkció)"
+        },
+        "r_041271a6a3ee": {
+          "masculine": "Promóciós koordinátor",
+          "feminine": "Promóciós koordinátor",
+          "neutral": "Promóciós koordinátor"
+        }
+      },
+      "sicherheit-sanitaetsdienst": {
+        "r_972d7ff7233a": {
+          "masculine": "Forgatási egészségügyi szakember / Set Medic",
+          "feminine": "Forgatási egészségügyi szakember / Set Medic",
+          "neutral": "Forgatási egészségügyi szakember / Set Medic"
+        },
+        "r_deefff77f871": {
+          "masculine": "Mentőszakápoló",
+          "feminine": "Mentőszakápoló",
+          "neutral": "Mentőszakápoló"
+        },
+        "r_63a9f32e6a72": {
+          "masculine": "Üzemi elsősegélynyújtó",
+          "feminine": "Üzemi elsősegélynyújtó",
+          "neutral": "Üzemi elsősegélynyújtó"
+        },
+        "r_550de11c2d96": {
+          "masculine": "Tűzőrség",
+          "feminine": "Tűzőrség",
+          "neutral": "Tűzőrség"
+        },
+        "r_427dc70aedd7": {
+          "masculine": "Tűzvédelmi segítő",
+          "feminine": "Tűzvédelmi segítő",
+          "neutral": "Tűzvédelmi segítő"
+        },
+        "r_a3247768d472": {
+          "masculine": "Tűzvédelmi megbízott",
+          "feminine": "Tűzvédelmi megbízott",
+          "neutral": "Tűzvédelmi megbízott"
+        }
+      },
+      "catering-setverpflegung": {
+        "r_330e10f94b8f": {
+          "masculine": "Cateringvezető",
+          "feminine": "Cateringvezető",
+          "neutral": "Cateringvezető"
+        },
+        "r_2fe8f1ac7f90": {
+          "masculine": "Forgatási szakács",
+          "feminine": "Forgatási szakács",
+          "neutral": "Forgatási szakács"
+        },
+        "r_463cca2307e9": {
+          "masculine": "Cateringasszisztens / konyhai kisegítő",
+          "feminine": "Cateringasszisztens / konyhai kisegítő",
+          "neutral": "Cateringasszisztens / konyhai kisegítő"
+        },
+        "r_e114754d9175": {
+          "masculine": "Forgatási frissítőellátás",
+          "feminine": "Forgatási frissítőellátás",
+          "neutral": "Forgatási frissítőellátás"
+        },
+        "r_cb6d56c18bf6": {
+          "masculine": "Forgatási ellátás / ételosztás",
+          "feminine": "Forgatási ellátás / ételosztás",
+          "neutral": "Forgatási ellátás / ételosztás"
+        },
+        "r_532adc563b66": {
+          "masculine": "Catering- és konyhakocsi-sofőr",
+          "feminine": "Catering- és konyhakocsi-sofőr",
+          "neutral": "Catering- és konyhakocsi-sofőr"
+        }
+      },
+      "filmtiere-tiertraining": {
+        "r_3d8ab6fb2c6a": {
+          "masculine": "Filmes állatidomár",
+          "feminine": "Filmes állatidomár",
+          "neutral": "Filmes állatidomár"
+        },
+        "r_654c33dc9c6b": {
+          "masculine": "Filmes kutyakiképző",
+          "feminine": "Filmes kutyakiképző",
+          "neutral": "Filmes kutyakiképző"
+        },
+        "r_40758f075d18": {
+          "masculine": "Állatkezelő (Animal Handler)",
+          "feminine": "Állatkezelő (Animal Handler)",
+          "neutral": "Állatkezelő (Animal Handler)"
+        },
+        "r_7a1591b96b3a": {
+          "masculine": "Állatkoordinátor",
+          "feminine": "Állatkoordinátor",
+          "neutral": "Állatkoordinátor"
+        },
+        "r_a63695a566c3": {
+          "masculine": "Forgatási állatgondozó",
+          "feminine": "Forgatási állatgondozó",
+          "neutral": "Forgatási állatgondozó"
+        },
+        "r_9faf951b627e": {
+          "masculine": "Lókoordinátor (Horse Master)",
+          "feminine": "Lókoordinátor (Horse Master)",
+          "neutral": "Lókoordinátor (Horse Master)"
+        },
+        "r_7c4f137defec": {
+          "masculine": "Lókoordinátor asszisztense",
+          "feminine": "Lókoordinátor asszisztense",
+          "neutral": "Lókoordinátor asszisztense"
+        },
+        "r_8e8f21cf0303": {
+          "masculine": "Filmes lókiképző",
+          "feminine": "Filmes lókiképző",
+          "neutral": "Filmes lókiképző"
+        },
+        "r_35f9ffa503c4": {
+          "masculine": "Lógondozó (Horse Wrangler)",
+          "feminine": "Lógondozó (Horse Wrangler)",
+          "neutral": "Lógondozó (Horse Wrangler)"
+        }
+      }
     }
   },
   "TransactionalEmail": {
@@ -8454,5 +13363,13 @@
     "noMatches": "Ezen a területen még nem mentettél semmit.",
     "signInHint": "Jelentkezz be a mentett elemek megtekintéséhez.",
     "removeItem": "{name} eltávolítása a mentett elemek közül"
+  },
+  "OccupationForm": {
+    "title": "Foglalkozásaid megnevezése",
+    "help": "Válaszd ki, hogyan jelenjenek meg foglalkozásaid megnevezései. Ezt bármikor módosíthatod.",
+    "standard": "Alapértelmezett",
+    "masculine": "Férfi alak",
+    "feminine": "Női alak",
+    "neutral": "Semleges alak"
   }
 }

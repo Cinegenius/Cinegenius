@@ -36,7 +36,9 @@
     "Assistent*in des*der Produktionsleiter*in": [
       "Assistenz der Produktionsleitung",
       "Assistent des Produktionsleiters",
-      "Assistentin der Produktionsleiterin"
+      "Assistentin der Produktionsleiterin",
+      "Assistent der Produktionsleitung",
+      "Assistentin der Produktionsleitung"
     ],
     "Disponent*in / Produktionsplaner*in": [
       "Disposition / Produktionsplanung",
@@ -46,7 +48,9 @@
       "Disponent",
       "Disponentin",
       "Produktionsplaner",
-      "Produktionsplanerin"
+      "Produktionsplanerin",
+      "Disponent · Produktionsplaner",
+      "Disponentin · Produktionsplanerin"
     ],
     "Kalkulationserstellung": [
       "Produktionskalkulator / Produktionskalkulatorin",
@@ -72,7 +76,9 @@
     "Assistent*in der Produktionskoordinator*in": [
       "Assistenz der Produktionskoordination",
       "Assistent des Produktionskoordinators",
-      "Assistentin der Produktionskoordinatorin"
+      "Assistentin der Produktionskoordinatorin",
+      "Assistent der Produktionskoordination",
+      "Assistentin der Produktionskoordination"
     ],
     "Produktionsassistenz (Set)": [],
     "Produktionsassistenz (Office)": [],
@@ -92,7 +98,9 @@
     "Assistent*in der/des Produzent*in": [
       "Producer-Assistenz",
       "Assistent des Produzenten",
-      "Assistentin der Produzentin"
+      "Assistentin der Produzentin",
+      "Producer-Assistent",
+      "Producer-Assistentin"
     ],
     "Executive Assistant / Geschäftsführungsassistenz": [],
     "Office Assistant / Büroassistenz": [],
@@ -101,7 +109,9 @@
     "Assistent*in der Reisekoordinator*in": [
       "Assistenz der Reisekoordination",
       "Assistent des Reisekoordinators",
-      "Assistentin der Reisekoordinatorin"
+      "Assistentin der Reisekoordinatorin",
+      "Assistent der Reisekoordination",
+      "Assistentin der Reisekoordination"
     ],
     "Health and Safety Coordinator": [],
     "ADR Coordinator": [],
@@ -118,7 +128,9 @@
       "Schauspielkoordination",
       "Schauspielerkoordinator",
       "Schauspielerkoordinatorin",
-      "Cast Coordinator"
+      "Cast Coordinator",
+      "Cast-Koordinator",
+      "Cast-Koordinatorin"
     ],
     "Unit Manager": [],
     "Covid-Koordinator*in": [
@@ -259,7 +271,9 @@
     "Assistent*in des*der Produktionskoordinator*in": [
       "Assistenz der Produktionskoordination",
       "Assistent des Produktionskoordinators",
-      "Assistentin der Produktionskoordinatorin"
+      "Assistentin der Produktionskoordinatorin",
+      "Assistent der Produktionskoordination",
+      "Assistentin der Produktionskoordination"
     ],
     "Produktionsassistenz": [],
     "2. Produktionsassistent*in": [
@@ -269,7 +283,9 @@
     "Assistent*in des*der Reisekoordinator*in": [
       "Assistenz der Reisekoordination",
       "Assistent des Reisekoordinators",
-      "Assistentin der Reisekoordinatorin"
+      "Assistentin der Reisekoordinatorin",
+      "Assistent der Reisekoordination",
+      "Assistentin der Reisekoordination"
     ],
     "Setaufnahmeleiter*in": [
       "Setaufnahmeleitung",
@@ -279,7 +295,9 @@
     "Teamassistent*in (vormals Produktionssekretär*in)": [
       "Teamassistenz / Produktionssekretariat",
       "Teamassistent (vormals Produktionssekretär)",
-      "Teamassistentin (vormals Produktionssekretärin)"
+      "Teamassistentin (vormals Produktionssekretärin)",
+      "Teamassistent (Produktionssekretariat)",
+      "Teamassistentin (Produktionssekretariat)"
     ],
     "2. Aufnahmeleiter*innen (Show/Broadcast)": [
       "2. Aufnahmeleitung (Show/Broadcast)",
@@ -323,7 +341,9 @@
       "Lohnbuchhalter (Payroll Accountant)",
       "Lohnbuchhalterin (Payroll Accountant)",
       "Lohnbuchhalter",
-      "Lohnbuchhalterin"
+      "Lohnbuchhalterin",
+      "Payroll Accountant (Lohnbuchhalter)",
+      "Payroll Accountant (Lohnbuchhalterin)"
     ],
     "Praktikant*in der Filmgeschäftsführung": [
       "Praktikum der Filmgeschäftsführung",
@@ -506,7 +526,9 @@
     "Assistent*in des*r Komparsenbetreuuer*in": [
       "Assistenz der Komparseriebetreuung",
       "Assistent des Komparsenbetreuers",
-      "Assistentin der Komparsenbetreuerin"
+      "Assistentin der Komparsenbetreuerin",
+      "Assistent der Komparseriebetreuung",
+      "Assistentin der Komparseriebetreuung"
     ]
   },
   "kamera": {
@@ -893,7 +915,9 @@
       "BestBoy Grip / BestGirl Grip (2. Kamerabühne)",
       "BestBoy Grip",
       "BestGirl Grip",
-      "BestGirl Grip / 2. Kamerabühne"
+      "BestGirl Grip / 2. Kamerabühne",
+      "Best Boy Grip (2. Kamerabühne)",
+      "Best Girl Grip (2. Kamerabühne)"
     ],
     "Dolly Grip / Dollyfahrer*in": [
       "Dolly Grip / Dolly-Fahrtechnik",
@@ -901,7 +925,9 @@
       "Dolly Grip / Dollyfahrer",
       "Dolly Grip / Dollyfahrerin",
       "Dollyfahrer",
-      "Dollyfahrerin"
+      "Dollyfahrerin",
+      "Dolly Grip (Dollyfahrer)",
+      "Dolly Grip (Dollyfahrerin)"
     ],
     "Grip / Kamerabühne": [],
     "Kamerabühnenassistenz": [],
@@ -936,7 +962,9 @@
       "Remote-Head-Technikerin / -Operatorin",
       "Remote-Head-Techniker",
       "Remote-Head-Technikerin",
-      "Remote-Head-Operatorin"
+      "Remote-Head-Operatorin",
+      "Remote-Head-Techniker (Operator)",
+      "Remote-Head-Technikerin (Operator)"
     ],
     "Praktikant*in Kamerabühne / Grip": [
       "Praktikum Kamerabühne / Grip",
@@ -1124,7 +1152,9 @@
     "Assistent*in des/der Geräuschemacher*in": [
       "Foley-Assistenz",
       "Assistent des Geräuschemachers",
-      "Assistentin der Geräuschemacherin"
+      "Assistentin der Geräuschemacherin",
+      "Foley-Assistent",
+      "Foley-Assistentin"
     ],
     "Postproduktion Ton Praktikant*in": [
       "Postproduktion Ton Praktikum",
@@ -1246,7 +1276,9 @@
       "Leadman / Leadwoman (Set Dressing)",
       "Leadman Set Dresser",
       "Leadwoman Set Dresser",
-      "Leadperson Set Dresser"
+      "Leadperson Set Dresser",
+      "Leadman (Set Dressing)",
+      "Leadwoman (Set Dressing)"
     ],
     "Props Master (Chef-Requisiteur)": [
       "Props Master (Chefrequisiteur / Chefrequisiteurin)",
@@ -1254,7 +1286,9 @@
       "Chef-Requisiteur",
       "Chef-Requisiteurin",
       "Chefrequisiteur",
-      "Chefrequisiteurin"
+      "Chefrequisiteurin",
+      "Props Master (Chefrequisiteur)",
+      "Props Master (Chefrequisiteurin)"
     ],
     "Requisiteur/in": [
       "Requisite",
@@ -1274,7 +1308,9 @@
       "On-Set-Requisiteur / On-Set-Requisiteurin",
       "On-Set Requisiteurin",
       "On Set Requisiteur",
-      "On Set Requisiteurin"
+      "On Set Requisiteurin",
+      "On-Set-Requisiteur",
+      "On-Set-Requisiteurin"
     ],
     "Setrequisiteur*in": [
       "Setrequisite",
@@ -1367,7 +1403,8 @@
       "Greenswoman",
       "Greensperson",
       "Greens Master",
-      "Greens Person"
+      "Greens Person",
+      "Greensmaster / Greenswoman"
     ],
     "Greens Person (Gartengestaltung)": [
       "Greensman",
@@ -1421,7 +1458,9 @@
       "Plastiker",
       "Plastikerin",
       "Bildhauer",
-      "Bildhauerin"
+      "Bildhauerin",
+      "Sculptor (Plastiker)",
+      "Sculptor (Plastikerin)"
     ],
     "Bühnenplastiker*in": [
       "Bühnenplastik",
@@ -1456,7 +1495,9 @@
       "Bühnenbauer / Bühnenbauerin (Carpenter)",
       "Bühnenbauer",
       "Bühnenbauerin",
-      "Carpenter"
+      "Carpenter",
+      "Bühnenbauer (Carpenter)",
+      "Bühnenbauerin (Carpenter)"
     ],
     "Baubühne": [],
     "Bühnenmeister*in": [
@@ -1488,7 +1529,9 @@
       "Schlosser",
       "Schlosserin",
       "Metallschlosser",
-      "Metallschlosserin"
+      "Metallschlosserin",
+      "Schlosser (Metall)",
+      "Schlosserin (Metall)"
     ],
     "Schlosser*in": [
       "Schlosserei",
@@ -1524,7 +1567,9 @@
       "Tischler",
       "Tischlerin",
       "Schreiner",
-      "Schreinerin"
+      "Schreinerin",
+      "Tischler / Schreiner",
+      "Tischlerin / Schreinerin"
     ],
     "Drechsler*in": [
       "Drechselarbeiten",
@@ -1595,7 +1640,9 @@
       "Stofftapezierer",
       "Stofftapeziererin",
       "Tapezierer Stoff",
-      "Tapeziererin Stoff"
+      "Tapeziererin Stoff",
+      "Tapezierer (Stoff)",
+      "Tapeziererin (Stoff)"
     ],
     "Cheftapezierer*in (Stoff)": [
       "Leitung Stofftapezierarbeiten",
@@ -1603,7 +1650,9 @@
       "Chefstofftapezierer",
       "Chefstofftapeziererin",
       "Cheftapezierer Stoff",
-      "Cheftapeziererin Stoff"
+      "Cheftapeziererin Stoff",
+      "Cheftapezierer (Stoff)",
+      "Cheftapeziererin (Stoff)"
     ],
     "Cheftischler*in": [
       "Leitung Tischlerei",
@@ -1659,7 +1708,9 @@
       "Garderobiere",
       "Garderobierin",
       "Setgarderobier",
-      "Setgarderobiere"
+      "Setgarderobiere",
+      "Set Costumer (Garderobier)",
+      "Set Costumer (Garderobiere)"
     ],
     "Additional Set Costumer": [],
     "Setkostüm Assistent": [
@@ -1681,7 +1732,9 @@
       "Gewandmeister / Gewandmeisterin (Wardrobe Master)",
       "Gewandmeister",
       "Gewandmeisterin",
-      "Wardrobe Master"
+      "Wardrobe Master",
+      "Gewandmeister (Wardrobe Master)",
+      "Gewandmeisterin (Wardrobe Master)"
     ],
     "Kostümassistent": [
       "Kostümassistent / Kostümassistentin",
@@ -1695,7 +1748,9 @@
       "Schneider / Schneiderin (Tailor)",
       "Schneider",
       "Schneiderin",
-      "Tailor"
+      "Tailor",
+      "Schneider (Tailor)",
+      "Schneiderin (Tailor)"
     ],
     "Näher / Seamstress": [
       "Näher / Näherin",
@@ -1741,13 +1796,17 @@
       "Hutmacherin",
       "Milliner",
       "Modist",
-      "Modistin"
+      "Modistin",
+      "Hutmacher (Milliner)",
+      "Hutmacherin (Milliner)"
     ],
     "Korsettmacher / Corset Maker": [
       "Korsettmacher / Korsettmacherin (Corset Maker)",
       "Korsettmacher",
       "Korsettmacherin",
-      "Corset Maker"
+      "Corset Maker",
+      "Korsettmacher (Corset Maker)",
+      "Korsettmacherin (Corset Maker)"
     ],
     "Kostümillustrator": [
       "Kostümillustrator / Kostümillustratorin",
@@ -1762,7 +1821,9 @@
       "Kostümfärberin",
       "Dyer",
       "Färber",
-      "Färberin"
+      "Färberin",
+      "Kostümmaler / Kostümfärber",
+      "Kostümmalerin / Kostümfärberin"
     ],
     "Kostüm Patinierer (Aging)": [
       "Kostümpatinierer / Kostümpatiniererin (Aging)",
@@ -1770,13 +1831,17 @@
       "Kostümpatiniererin",
       "Kostüm Patinierer",
       "Kostüm Patiniererin",
-      "Aging"
+      "Aging",
+      "Kostümpatinierer (Aging)",
+      "Kostümpatiniererin (Aging)"
     ],
     "Kostümsticker / Embroiderer": [
       "Kostümsticker / Kostümstickerin (Embroiderer)",
       "Kostümsticker",
       "Kostümstickerin",
-      "Embroiderer"
+      "Embroiderer",
+      "Kostümsticker (Embroiderer)",
+      "Kostümstickerin (Embroiderer)"
     ],
     "Kostümrecherche": [],
     "Kostümfahrer": [
@@ -1791,13 +1856,16 @@
       "Stylist",
       "Stylistin",
       "Stylingassistent",
-      "Stylingassistentin"
+      "Stylingassistentin",
+      "Stylistin / Stylingassistentin"
     ],
     "Kostümbildner*in (Gestaltung)": [
       "Kostümbild (Gestaltung)",
       "Kostümbildner / Kostümbildnerin (Gestaltung)",
       "Kostümbildner",
-      "Kostümbildnerin"
+      "Kostümbildnerin",
+      "Kostümbildner (Gestaltung)",
+      "Kostümbildnerin (Gestaltung)"
     ],
     "Kostümberater*in": [
       "Kostümberatung",
@@ -1826,7 +1894,9 @@
       "Setgarderobierin",
       "Garderobier",
       "Garderobiere",
-      "Garderobierin"
+      "Garderobierin",
+      "Setkostüm (Garderobier)",
+      "Setkostüm (Garderobiere)"
     ],
     "Setkostüm Assistent*in": [
       "Setkostüm Assistenz",
@@ -1920,7 +1990,9 @@
       "Kostümmaler",
       "Kostümmalerin",
       "Kostümfärber",
-      "Kostümfärberin"
+      "Kostümfärberin",
+      "Kostümmaler / Kostümfärber",
+      "Kostümmalerin / Kostümfärberin"
     ],
     "Kostümsticker*in": [
       "Kostümstickerei",
@@ -1985,7 +2057,9 @@
       "Chefmaskenbildner / Chefmaskenbildnerin (Head of Make-up)",
       "Chefmaskenbildner",
       "Chefmaskenbildnerin",
-      "Head of Make-up"
+      "Head of Make-up",
+      "Chefmaskenbildner (Head of Make-up)",
+      "Chefmaskenbildnerin (Head of Make-up)"
     ],
     "Körper Makeup / Body Make-up": [],
     "Zusatzmaskenbildner / Additional Make-up": [
@@ -1993,7 +2067,9 @@
       "Zusatzmaskenbildner / Zusatzmaskenbildnerin (Additional Make-up)",
       "Zusatzmaskenbildner",
       "Zusatzmaskenbildnerin",
-      "Additional Make-up"
+      "Additional Make-up",
+      "Zusatzmaskenbildner (Additional Make-up)",
+      "Zusatzmaskenbildnerin (Additional Make-up)"
     ],
     "Make-up Assistant": [
       "Make-up-Assistent",
@@ -2003,7 +2079,9 @@
       "Perückenmacher / Perückenmacherin (Wig Maker)",
       "Perückenmacher",
       "Perückenmacherin",
-      "Wig Maker"
+      "Wig Maker",
+      "Perückenmacher (Wig Maker)",
+      "Perückenmacherin (Wig Maker)"
     ],
     "Prosthetics Artist": [],
     "SFX Make-up Artist": [],
@@ -2089,7 +2167,9 @@
       "Cutterin",
       "Editorin",
       "Filmeditor",
-      "Filmeditorin"
+      "Filmeditorin",
+      "Cutter (Editor)",
+      "Cutterin (Editor)"
     ],
     "Additional Editor*in": [
       "Additional Editor",
@@ -2704,7 +2784,9 @@
       "Dozent",
       "Dozentin",
       "Dozent / Coach",
-      "Dozentin / Coach"
+      "Dozentin / Coach",
+      "Dozent · Coach",
+      "Dozentin · Coach"
     ],
     "Impact Producer": [],
     "Green Consultant": [],
@@ -2802,7 +2884,9 @@
       "Sprecher / Sprecherin · Voice-over",
       "Sprecher",
       "Sprecherin",
-      "Sprecherin / Voice-Over"
+      "Sprecherin / Voice-Over",
+      "Sprecher · Voice-over",
+      "Sprecherin · Voice-over"
     ],
     "Stand-In": [],
     "Stunt Performer": [
@@ -2865,7 +2949,9 @@
       "Statist",
       "Statistin",
       "Komparsin",
-      "Statistin / Komparsin"
+      "Statistin / Komparsin",
+      "Statist · Komparse",
+      "Statistin · Komparsin"
     ],
     "Casting Director (Jugendliche)": [],
     "Casting Director (Kinder)": [],
@@ -2982,7 +3068,9 @@
       "Veranstaltungsmeister",
       "Veranstaltungsmeisterin",
       "Studio-/Veranstaltungsmeister",
-      "Studio-/Veranstaltungsmeisterin"
+      "Studio-/Veranstaltungsmeisterin",
+      "Studiomeister · Veranstaltungsmeister",
+      "Studiomeisterin · Veranstaltungsmeisterin"
     ],
     "Veranstaltungsmanager*in": [
       "Veranstaltungsmanagement",
@@ -3364,7 +3452,9 @@
       "Retuscheur / Retuscheurin (Retoucher)",
       "Retoucherin",
       "Retuscheur",
-      "Retuscheurin"
+      "Retuscheurin",
+      "Retuscheur (Retoucher)",
+      "Retuscheurin (Retoucher)"
     ],
     "Bildbearbeiter/in": [
       "Bildbearbeitung",
@@ -3384,7 +3474,9 @@
       "KI-Beauftragter / KI-Beauftragte · AI Supervisor",
       "KI-Beauftragter",
       "KI-Beauftragte",
-      "KI-Beauftragte / AI Supervisor"
+      "KI-Beauftragte / AI Supervisor",
+      "KI-Beauftragter · AI Supervisor",
+      "KI-Beauftragte · AI Supervisor"
     ],
     "AI Director": [],
     "KI-Animator/in": [
@@ -3479,7 +3571,9 @@
       "Dramaturg / Dramaturgin · Script Consultant",
       "Dramaturg",
       "Dramaturgin",
-      "Dramaturgin, Script Consultant"
+      "Dramaturgin, Script Consultant",
+      "Dramaturg · Script Consultant",
+      "Dramaturgin · Script Consultant"
     ],
     "Drehbuch-Stoffentwicklung": [],
     "Head of Script": [],
@@ -3501,7 +3595,9 @@
       "Audiodeskription / Hörfilmtext",
       "Hörfilmautor / Hörfilmautorin (Audiodeskription)",
       "Hörfilmautor",
-      "Hörfilmautorin"
+      "Hörfilmautorin",
+      "Hörfilmautor (Audiodeskription)",
+      "Hörfilmautorin (Audiodeskription)"
     ],
     "Filmübersetzer*in": [
       "Filmübersetzung",
@@ -3537,7 +3633,9 @@
       "Texter",
       "Texterin",
       "Texter, Copywriter",
-      "Texterin, Copywriter"
+      "Texterin, Copywriter",
+      "Texter · Copywriter",
+      "Texterin · Copywriter"
     ],
     "Language Assistant": [],
     "Rechercheur*in": [
@@ -3578,7 +3676,9 @@
       "Set-Sanitäter",
       "Set-Sanitäterin",
       "Set-Sanitäter / Set Medic",
-      "Set-Sanitäterin / Set Medic"
+      "Set-Sanitäterin / Set Medic",
+      "Set-Sanitäter · Set Medic",
+      "Set-Sanitäterin · Set Medic"
     ],
     "Rettungssanitäter/in": [
       "Rettungssanitätsfachkraft",
@@ -3660,7 +3760,9 @@
       "Tierhandler / Animal Handler",
       "Tierhandlerin / Animal Handler",
       "Tierbetreuer",
-      "Tierbetreuerin"
+      "Tierbetreuerin",
+      "Tierhandler · Animal Handler",
+      "Tierhandlerin · Animal Handler"
     ],
     "Tierkoordination / Animal Coordinator": [
       "Tierkoordinator",
@@ -3675,7 +3777,9 @@
     "Horse Master": [
       "Horse Master / Pferdekoordination",
       "Pferdekoordinator",
-      "Pferdekoordinatorin"
+      "Pferdekoordinatorin",
+      "Pferdekoordinator (Horse Master)",
+      "Pferdekoordinatorin (Horse Master)"
     ],
     "Assistant Horse Master": [
       "Assistant Horse Master / Assistenz der Pferdekoordination",
@@ -3690,7 +3794,9 @@
       "Filmpferdetrainer",
       "Filmpferdetrainerin",
       "Pferdetrainer für Film",
-      "Pferdetrainerin für Film"
+      "Pferdetrainerin für Film",
+      "Filmpferdetrainer · Horse Trainer",
+      "Filmpferdetrainerin · Horse Trainer"
     ],
     "Horse Wrangler": [
       "Horse Wrangler (Pferdebetreuung)",

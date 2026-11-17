@@ -1,4 +1,6 @@
 "use client";
+
+import type { OccupationForm } from "@/lib/occupation-form";
 import MessageAttachments from "@/components/messaging/MessageAttachments";
 import type {MessageAttachment} from "@/lib/message-attachments";
 
@@ -72,6 +74,7 @@ type FriendRequest = {
   display_name: string;
   avatar_url: string | null;
   role?: string;
+  occupationForm?: OccupationForm;
 };
 
 function formatTime(locale: string, iso: string) {
@@ -465,7 +468,7 @@ function MessagesContent() {
   const isNewConv = !!newConvRecipient && !activeId;
   const peerProfileHref = conversationPeerProfileHref(activeConv, user?.id ?? "", isNewConv ? newConvRecipient : null);
 
-  const people = [...contacts].sort((a,b) => a.display_name.localeCompare(b.display_name,uiLocale)).map(contact => ({id:contact.user_id, name:contact.display_name, avatar:contact.avatar_url, role:contact.role}));
+  const people = [...contacts].sort((a,b) => a.display_name.localeCompare(b.display_name,uiLocale)).map(contact => ({id:contact.user_id, name:contact.display_name, avatar:contact.avatar_url, role:contact.role, occupationForm:contact.occupationForm}));
   const filteredConversations = conversations.filter(conversation => `${conversation.otherName ?? ""} ${conversation.group_name ?? ""}`.toLocaleLowerCase(uiLocale).includes(search.trim().toLocaleLowerCase(uiLocale)));
 
   return <div className={`inbox-shell ${utilityView ? "flex-col" : "flex-col sm:flex-row"} ${showChat ? "bottom-0" : "bottom-[var(--mobile-nav-clearance)]"} lg:bottom-0`}

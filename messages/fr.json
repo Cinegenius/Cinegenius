@@ -1655,14 +1655,14 @@
       "tiertraining-film-medien": "Dressage animal pour cinéma et médias"
     },
     "roles": {
-      "tiertrainer": "Dresseur animalier de cinéma / Dresseuse animalière de cinéma",
-      "filmhundetrainer": "Dresseur de chiens de cinéma / Dresseuse de chiens de cinéma",
-      "tierbetreuer": "Soigneur animalier / Soigneuse animalière (Animal Handler)",
+      "tiertrainer": "Dresseur·se animalier de cinéma / Dresseur·se animalière de cinéma",
+      "filmhundetrainer": "Dresseur·se de chiens de cinéma",
+      "tierbetreuer": "Soigneur·se animalier / Soigneur·se animalière (Animal Handler)",
       "tierkoordination": "Responsable de la coordination animalière",
       "set-tierbetreuung": "Responsable des animaux sur le plateau",
       "horse-master": "Responsable des chevaux (Horse Master)",
-      "assistant-horse-master": "Assistant / Assistante du Horse Master",
-      "horse-trainer": "Dresseur de chevaux de cinéma / Dresseuse de chevaux de cinéma",
+      "assistant-horse-master": "Assistant·e / Assistant·e du Horse Master",
+      "horse-trainer": "Dresseur·se de chevaux de cinéma",
       "horse-wrangler": "Responsable de la conduite des chevaux (Horse Wrangler)"
     },
     "species": {
@@ -1688,7 +1688,54 @@
     "speciesLabel": "Espèces (sélections multiples, optionnel)",
     "otherSpeciesLabel": "Autres espèces ou spécialisation (optionnel)",
     "selfReported": "Ces détails décrivent vos services. Ils ne garantissent pas de licence ou certification.",
-    "portfolio": "Portfolio animalier"
+    "portfolio": "Portfolio animalier",
+    "roleForms": {
+      "tiertrainer": {
+        "masculine": "Dresseur animalier de cinéma / Dresseur animalière de cinéma",
+        "feminine": "Dresseuse animalier de cinéma / Dresseuse animalière de cinéma",
+        "neutral": "Dresseur·se animalier de cinéma / Dresseur·se animalière de cinéma"
+      },
+      "filmhundetrainer": {
+        "masculine": "Dresseur de chiens de cinéma",
+        "feminine": "Dresseuse de chiens de cinéma",
+        "neutral": "Dresseur·se de chiens de cinéma"
+      },
+      "tierbetreuer": {
+        "masculine": "Soigneur animalier / Soigneur animalière (Animal Handler)",
+        "feminine": "Soigneuse animalier / Soigneuse animalière (Animal Handler)",
+        "neutral": "Soigneur·se animalier / Soigneur·se animalière (Animal Handler)"
+      },
+      "tierkoordination": {
+        "masculine": "Responsable de la coordination animalière",
+        "feminine": "Responsable de la coordination animalière",
+        "neutral": "Responsable de la coordination animalière"
+      },
+      "set-tierbetreuung": {
+        "masculine": "Responsable des animaux sur le plateau",
+        "feminine": "Responsable des animaux sur le plateau",
+        "neutral": "Responsable des animaux sur le plateau"
+      },
+      "horse-master": {
+        "masculine": "Responsable des chevaux (Horse Master)",
+        "feminine": "Responsable des chevaux (Horse Master)",
+        "neutral": "Responsable des chevaux (Horse Master)"
+      },
+      "assistant-horse-master": {
+        "masculine": "Assistant / Assistant du Horse Master",
+        "feminine": "Assistante / Assistante du Horse Master",
+        "neutral": "Assistant·e / Assistant·e du Horse Master"
+      },
+      "horse-trainer": {
+        "masculine": "Dresseur de chevaux de cinéma",
+        "feminine": "Dresseuse de chevaux de cinéma",
+        "neutral": "Dresseur·se de chevaux de cinéma"
+      },
+      "horse-wrangler": {
+        "masculine": "Responsable de la conduite des chevaux (Horse Wrangler)",
+        "feminine": "Responsable de la conduite des chevaux (Horse Wrangler)",
+        "neutral": "Responsable de la conduite des chevaux (Horse Wrangler)"
+      }
+    }
   },
   "MarketplaceCatalog": {
     "categories": {
@@ -6040,7 +6087,7 @@
         "r_93f52c1c7000": "Réalisateur 2e unité",
         "r_591d7faf8f5d": "Assistant personnel (du réalisateur)",
         "r_c01dd7739f5a": "Assistant coordinateur figurants",
-        "r_f59d6991c44a": "Réalisateur / Réalisatrice",
+        "r_f59d6991c44a": "Réalisateur·rice",
         "r_5562e3abbb45": "Co-réalisateur",
         "r_df7e552a6792": "Réalisateur seconde équipe",
         "r_0aca88b2853d": "Réalisateur studio",
@@ -6145,9 +6192,9 @@
       },
       "licht": {
         "r_222be04dbf00": "Chef électricien",
-        "r_1e210e69039a": "Second électricien / Seconde électricienne (Best Boy / Best Girl Electric)",
+        "r_1e210e69039a": "Assistant·e chef électricien·ne",
         "r_14dd174cd76c": "Chef électricien de montage",
-        "r_92137802b24a": "Second électricien / Seconde électricienne de pré-éclairage (Rigging Best Boy / Rigging Best Girl Electric)",
+        "r_92137802b24a": "Assistant·e chef électricien·ne (rigging)",
         "r_7fce7d6fcf12": "Électricien de montage",
         "r_1bcf9d8d9b03": "Électricien / technicien éclairage",
         "r_d95b919dded9": "Chef technicien éclairage",
@@ -6167,13 +6214,13 @@
       },
       "grip": {
         "r_470156bd03e4": "Chef machiniste",
-        "r_cfbf2a22ed6e": "Second machiniste / Seconde machiniste (Best Boy / Best Girl Grip)",
+        "r_cfbf2a22ed6e": "Assistant·e chef machiniste",
         "r_32a6ab31b1a1": "Machiniste dolly / opérateur dolly",
         "r_376dc1f790b8": "Machiniste",
         "r_dbfaadb8821c": "Assistant machiniste",
         "r_46dab52c1995": "Machiniste de montage",
         "r_ea7e925bd850": "Chef machiniste de montage",
-        "r_fa9d72fc7978": "Second machiniste / Seconde machiniste de préinstallation (Rigging Best Boy / Rigging Best Girl Grip)",
+        "r_fa9d72fc7978": "Assistant·e chef machiniste (rigging)",
         "r_2fa0b44342d7": "Constructions spéciales machiniste",
         "r_08c07afebb7f": "Opérateur grue caméra / jib",
         "r_5ece318b289f": "Technicien grue caméra",
@@ -6580,7 +6627,7 @@
       },
       "set-logistik": {
         "r_06d9aa28368f": "Coursier",
-        "r_51e581b5ea39": "Chauffeur / Chauffeuse (voiture / poids lourd)",
+        "r_51e581b5ea39": "Chauffeur·se / Chauffeur·se (voiture / poids lourd)",
         "r_36a599628c2e": "Conducteur de plateau",
         "r_9bc1a35535fa": "Responsable unité de plateau",
         "r_273f12c52b95": "Assistant responsable de plateau",
@@ -6901,14 +6948,14 @@
         "r_532adc563b66": "Conducteur restauration / cuisine mobile"
       },
       "filmtiere-tiertraining": {
-        "r_3d8ab6fb2c6a": "Dresseur animalier de cinéma / Dresseuse animalière de cinéma",
-        "r_654c33dc9c6b": "Dresseur de chiens de cinéma / Dresseuse de chiens de cinéma",
-        "r_40758f075d18": "Soigneur animalier / Soigneuse animalière (Animal Handler)",
+        "r_3d8ab6fb2c6a": "Dresseur·se animalier de cinéma / Dresseur·se animalière de cinéma",
+        "r_654c33dc9c6b": "Dresseur·se de chiens de cinéma",
+        "r_40758f075d18": "Soigneur·se animalier / Soigneur·se animalière (Animal Handler)",
         "r_7a1591b96b3a": "Responsable de la coordination animalière",
         "r_a63695a566c3": "Responsable des animaux sur le plateau",
         "r_9faf951b627e": "Responsable des chevaux (Horse Master)",
-        "r_7c4f137defec": "Assistant / Assistante du Horse Master",
-        "r_8e8f21cf0303": "Dresseur de chevaux de cinéma / Dresseuse de chevaux de cinéma",
+        "r_7c4f137defec": "Assistant·e / Assistant·e du Horse Master",
+        "r_8e8f21cf0303": "Dresseur·se de chevaux de cinéma",
         "r_35f9ffa503c4": "Responsable de la conduite des chevaux (Horse Wrangler)"
       }
     },
@@ -6979,6 +7026,4868 @@
       "x_0ed32809d320": "Opérateur steadicam",
       "x_9a3970c57b61": "Décor / Direction artistique",
       "x_61f2e2faadbe": "Planificateur / Ordonnanceur de production"
+    },
+    "roleForms": {
+      "produktion": {
+        "r_d479a6d8637e": {
+          "masculine": "Producteur",
+          "feminine": "Productrice",
+          "neutral": "Producteur·rice"
+        },
+        "r_86ca6f7fac85": {
+          "masculine": "Producteur exécutif",
+          "feminine": "Productrice exécutive",
+          "neutral": "Producteur·rice exécutif·ve"
+        },
+        "r_9b38cf86cffe": {
+          "masculine": "Co-producteur",
+          "feminine": "Co-productrice",
+          "neutral": "Co-producteur·rice"
+        },
+        "r_bd2e1cd12f54": {
+          "masculine": "Producteur associé",
+          "feminine": "Productrice associée",
+          "neutral": "Producteur·rice associé·e"
+        },
+        "r_bc840a4895a2": {
+          "masculine": "Producteur junior",
+          "feminine": "Productrice junior",
+          "neutral": "Producteur·rice junior"
+        },
+        "r_ebaa595e4927": {
+          "masculine": "Producteur délégué",
+          "feminine": "Productrice déléguée",
+          "neutral": "Producteur·rice délégué·e"
+        },
+        "r_9f722922fe7b": {
+          "masculine": "Responsable de production (HL)",
+          "feminine": "Responsable de production (HL)",
+          "neutral": "Responsable de production (HL)"
+        },
+        "r_7fdd4fd31143": {
+          "masculine": "Assistant de la direction de production",
+          "feminine": "Assistante de la direction de production",
+          "neutral": "Assistant·e de la direction de production"
+        },
+        "r_c8c7f4cd576e": {
+          "masculine": "Directeur de production (PL)",
+          "feminine": "Directrice de production (PL)",
+          "neutral": "Directeur·rice de production (PL)"
+        },
+        "r_edde7bed564a": {
+          "masculine": "Directeur de production (Diffuseur)",
+          "feminine": "Directrice de production (Diffuseur)",
+          "neutral": "Directeur·rice de production (Diffuseur)"
+        },
+        "r_08532652fb27": {
+          "masculine": "Assistant du directeur de production",
+          "feminine": "Assistante du directeur de production",
+          "neutral": "Assistant·e du directeur de production"
+        },
+        "r_a8ccedf1c4fc": {
+          "masculine": "Planificateur / Ordonnanceur de production",
+          "feminine": "Planificatrice / Ordonnanceuse de production",
+          "neutral": "Planificateur·rice / Ordonnanceur·se de production"
+        },
+        "r_73ab62cc6ea9": {
+          "masculine": "Préparation du budget de production",
+          "feminine": "Préparation du budget de production",
+          "neutral": "Préparation du budget de production"
+        },
+        "r_5e8f13168720": {
+          "masculine": "Superviseur de production",
+          "feminine": "Superviseuse de production",
+          "neutral": "Superviseur·se de production"
+        },
+        "r_a8aaf07776e6": {
+          "masculine": "Assistant du superviseur de production",
+          "feminine": "Assistante du superviseur de production",
+          "neutral": "Assistant·e du superviseur de production"
+        },
+        "r_86a64b938274": {
+          "masculine": "Responsable de studio",
+          "feminine": "Responsable de studio",
+          "neutral": "Responsable de studio"
+        },
+        "r_1dc3e15735f4": {
+          "masculine": "Coordinateur de production",
+          "feminine": "Coordinatrice de production",
+          "neutral": "Coordinateur·rice de production"
+        },
+        "r_3d2828618f01": {
+          "masculine": "Assistant coordinateur de production",
+          "feminine": "Assistante coordinatrice de production",
+          "neutral": "Assistant·e coordinateur·rice de production"
+        },
+        "r_b7b1c24b3218": {
+          "masculine": "Assistant de production (plateau)",
+          "feminine": "Assistante de production (plateau)",
+          "neutral": "Assistant·e de production (plateau)"
+        },
+        "r_504614327108": {
+          "masculine": "Assistant de production (bureau)",
+          "feminine": "Assistante de production (bureau)",
+          "neutral": "Assistant·e de production (bureau)"
+        },
+        "r_b1c1be59d3fb": {
+          "masculine": "Second assistant de production",
+          "feminine": "Seconde assistante de production",
+          "neutral": "Second·e assistant·e de production"
+        },
+        "r_e9fe06329d79": {
+          "masculine": "Assistant d’équipe",
+          "feminine": "Assistante d’équipe",
+          "neutral": "Assistant·e d’équipe"
+        },
+        "r_caad7ad378e8": {
+          "masculine": "Assistant personnel",
+          "feminine": "Assistante personnelle",
+          "neutral": "Assistant·e personnel·le"
+        },
+        "r_9b9ea0970d1e": {
+          "masculine": "Assistant personnel de production",
+          "feminine": "Assistante personnelle de production",
+          "neutral": "Assistant·e personnel·le de production"
+        },
+        "r_22ca8fe2e611": {
+          "masculine": "Assistant personnel talent / casting",
+          "feminine": "Assistante personnelle talent / casting",
+          "neutral": "Assistant·e personnel·le talent / casting"
+        },
+        "r_bdfbe6854805": {
+          "masculine": "Assistant du producteur",
+          "feminine": "Assistante du producteur",
+          "neutral": "Assistant·e du producteur"
+        },
+        "r_d894e33cd89e": {
+          "masculine": "Assistant exécutif",
+          "feminine": "Assistante exécutive",
+          "neutral": "Assistant·e exécutif·ve"
+        },
+        "r_bdc2cdf19051": {
+          "masculine": "Assistant de bureau",
+          "feminine": "Assistante de bureau",
+          "neutral": "Assistant·e de bureau"
+        },
+        "r_328519d70fd2": {
+          "masculine": "Coordinateur hébergement",
+          "feminine": "Coordinatrice hébergement",
+          "neutral": "Coordinateur·rice hébergement"
+        },
+        "r_6747956824f3": {
+          "masculine": "Coordinateur voyage",
+          "feminine": "Coordinatrice voyage",
+          "neutral": "Coordinateur·rice voyage"
+        },
+        "r_b809fe7525be": {
+          "masculine": "Assistant coordinateur voyage",
+          "feminine": "Assistante coordinatrice voyage",
+          "neutral": "Assistant·e coordinateur·rice voyage"
+        },
+        "r_86c92e0bfce0": {
+          "masculine": "Coordinateur santé & sécurité",
+          "feminine": "Coordinatrice santé & sécurité",
+          "neutral": "Coordinateur·rice santé & sécurité"
+        },
+        "r_14cee2575cf1": {
+          "masculine": "Coordinateur ADR",
+          "feminine": "Coordinatrice ADR",
+          "neutral": "Coordinateur·rice ADR"
+        },
+        "r_92286a252903": {
+          "masculine": "Responsable des lieux de tournage",
+          "feminine": "Responsable des lieux de tournage",
+          "neutral": "Responsable des lieux de tournage"
+        },
+        "r_fc08fa159e6a": {
+          "masculine": "Repéreur de lieux",
+          "feminine": "Repéreuse de lieux",
+          "neutral": "Repéreur·se de lieux"
+        },
+        "r_e5215fd85f99": {
+          "masculine": "Repéreur de lieux supplémentaire",
+          "feminine": "Repéreuse de lieux supplémentaire",
+          "neutral": "Repéreur·se de lieux supplémentaire"
+        },
+        "r_9454a017e69a": {
+          "masculine": "Assistant repéreur de lieux",
+          "feminine": "Assistante repéreuse de lieux",
+          "neutral": "Assistant·e repéreur·se de lieux"
+        },
+        "r_0d7a23f6a056": {
+          "masculine": "Coordinateur des lieux",
+          "feminine": "Coordinatrice des lieux",
+          "neutral": "Coordinateur·rice des lieux"
+        },
+        "r_11bbfbf26e46": {
+          "masculine": "Coordinateur casting",
+          "feminine": "Coordinatrice casting",
+          "neutral": "Coordinateur·rice casting"
+        },
+        "r_155f85cc8157": {
+          "masculine": "Chef d’unité",
+          "feminine": "Cheffe d’unité",
+          "neutral": "Chef·fe d’unité"
+        },
+        "r_475eba080a17": {
+          "masculine": "Coordinateur Covid",
+          "feminine": "Coordinatrice Covid",
+          "neutral": "Coordinateur·rice Covid"
+        },
+        "r_a60ca701fcab": {
+          "masculine": "Assistant coordinateur Covid",
+          "feminine": "Assistante coordinatrice Covid",
+          "neutral": "Assistant·e coordinateur·rice Covid"
+        },
+        "r_87a049b62039": {
+          "masculine": "Chef d’unité des lieux",
+          "feminine": "Cheffe d’unité des lieux",
+          "neutral": "Chef·fe d’unité des lieux"
+        },
+        "r_5b93948ca9fc": {
+          "masculine": "Assistant chef d’unité des lieux",
+          "feminine": "Assistante cheffe d’unité des lieux",
+          "neutral": "Assistant·e chef·fe d’unité des lieux"
+        },
+        "r_8a0cbf242686": {
+          "masculine": "Ordonnanceur d’équipe",
+          "feminine": "Ordonnanceuse d’équipe",
+          "neutral": "Ordonnanceur·se d’équipe"
+        },
+        "r_286fb0baa150": {
+          "masculine": "Coordinateur transport",
+          "feminine": "Coordinatrice transport",
+          "neutral": "Coordinateur·rice transport"
+        },
+        "r_8e7b74f8a60b": {
+          "masculine": "Assistant coordinateur transport",
+          "feminine": "Assistante coordinatrice transport",
+          "neutral": "Assistant·e coordinateur·rice transport"
+        },
+        "r_940718151db8": {
+          "masculine": "Chef chauffeur",
+          "feminine": "Cheffe chauffeuse",
+          "neutral": "Chef·fe chauffeur·se"
+        },
+        "r_34e7de86b42e": {
+          "masculine": "Chef d’unité (1er assistant réalisateur)",
+          "feminine": "Cheffe d’unité (1re assistant réalisateur)",
+          "neutral": "Chef·fe d’unité (1er/1re assistant réalisateur)"
+        },
+        "r_2492443d2786": {
+          "masculine": "Chef d’unité plateau",
+          "feminine": "Cheffe d’unité plateau",
+          "neutral": "Chef·fe d’unité plateau"
+        },
+        "r_e9593d0ce404": {
+          "masculine": "3e assistant réalisateur / assistant foule",
+          "feminine": "3e assistante réalisatrice / assistante foule",
+          "neutral": "3e assistant·e réalisateur·rice / assistant·e foule"
+        },
+        "r_4492528d7f86": {
+          "masculine": "Chef d’unité base",
+          "feminine": "Cheffe d’unité base",
+          "neutral": "Chef·fe d’unité base"
+        },
+        "r_eaee2c8a1b89": {
+          "masculine": "Chef des chauffeurs",
+          "feminine": "Cheffe des chauffeurs",
+          "neutral": "Chef·fe des chauffeurs"
+        },
+        "r_1e792192a593": {
+          "masculine": "Chef d’unité studio",
+          "feminine": "Cheffe d’unité studio",
+          "neutral": "Chef·fe d’unité studio"
+        },
+        "r_453722f35b4e": {
+          "masculine": "Responsable verrouillage",
+          "feminine": "Responsable verrouillage",
+          "neutral": "Responsable verrouillage"
+        },
+        "r_01cf9ccbf27d": {
+          "masculine": "Second chef d’unité (spectacle/diffusion)",
+          "feminine": "Seconde cheffe d’unité (spectacle/diffusion)",
+          "neutral": "Second·e chef·fe d’unité (spectacle/diffusion)"
+        },
+        "r_282e1b7d8f09": {
+          "masculine": "Coordinateur des déplacements d’unité",
+          "feminine": "Coordinatrice des déplacements d’unité",
+          "neutral": "Coordinateur·rice des déplacements d’unité"
+        },
+        "r_8016e2e4e662": {
+          "masculine": "Assistant chef d’unité",
+          "feminine": "Assistante cheffe d’unité",
+          "neutral": "Assistant·e chef·fe d’unité"
+        },
+        "r_1fb7a2292310": {
+          "masculine": "Assistant du 1er chef d’unité",
+          "feminine": "Assistante du 1re chef d’unité",
+          "neutral": "Assistant·e du 1er/1re chef d’unité"
+        },
+        "r_366708fdb0b3": {
+          "masculine": "Assistant chef d’unité plateau",
+          "feminine": "Assistante cheffe d’unité plateau",
+          "neutral": "Assistant·e chef·fe d’unité plateau"
+        },
+        "r_d73d495c6d75": {
+          "masculine": "Assistant production parking",
+          "feminine": "Assistante production parking",
+          "neutral": "Assistant·e production parking"
+        },
+        "r_4ed4cafa632a": {
+          "masculine": "Agent de blocage / contrôle de foule",
+          "feminine": "Agent de blocage / contrôle de foule",
+          "neutral": "Agent de blocage / contrôle de foule"
+        },
+        "r_6fbe7d952889": {
+          "masculine": "Messager plateau",
+          "feminine": "Messagère plateau",
+          "neutral": "Messager·ère plateau"
+        },
+        "r_c8d2a6e8ca0f": {
+          "masculine": "Chauffeur de production",
+          "feminine": "Chauffeuse de production",
+          "neutral": "Chauffeur·se de production"
+        },
+        "r_0d9b0abd3608": {
+          "masculine": "Chauffeur personnel",
+          "feminine": "Chauffeuse personnelle",
+          "neutral": "Chauffeur·se personnel·le"
+        },
+        "r_ef2266f5ad5d": {
+          "masculine": "Conducteur d’équipement",
+          "feminine": "Conductrice d’équipement",
+          "neutral": "Conducteur·rice d’équipement"
+        },
+        "r_100be7827daf": {
+          "masculine": "Assistant de production bureau",
+          "feminine": "Assistante de production bureau",
+          "neutral": "Assistant·e de production bureau"
+        },
+        "r_c24ef6245054": {
+          "masculine": "Responsable budget production",
+          "feminine": "Responsable budget production",
+          "neutral": "Responsable budget production"
+        },
+        "r_e90f5848bfc3": {
+          "masculine": "Comptabilité production",
+          "feminine": "Comptabilité production",
+          "neutral": "Comptabilité production"
+        },
+        "r_c6dc08a47d0d": {
+          "masculine": "Contrôleur financier film",
+          "feminine": "Contrôleuse financière film",
+          "neutral": "Contrôleur·se financier·ère film"
+        },
+        "r_2557c22fb3d7": {
+          "masculine": "Consultant environnement / Responsable durabilité",
+          "feminine": "Consultante environnement / Responsable durabilité",
+          "neutral": "Consultant·e environnement / Responsable durabilité"
+        },
+        "r_2a6c1d42831e": {
+          "masculine": "Stagiaire de production",
+          "feminine": "Stagiaire de production",
+          "neutral": "Stagiaire de production"
+        },
+        "r_ede69642be01": {
+          "masculine": "Stagiaire chef d’unité plateau",
+          "feminine": "Stagiaire cheffe d’unité plateau",
+          "neutral": "Stagiaire chef·fe d’unité plateau"
+        },
+        "r_de9ab1a6b55a": {
+          "masculine": "Directeur de production",
+          "feminine": "Directrice de production",
+          "neutral": "Directeur·rice de production"
+        },
+        "r_fd701e2c1e86": {
+          "masculine": "Chef d’unité production",
+          "feminine": "Cheffe d’unité production",
+          "neutral": "Chef·fe d’unité production"
+        },
+        "r_eb2de9d80eb5": {
+          "masculine": "Coordinateur production",
+          "feminine": "Coordinatrice production",
+          "neutral": "Coordinateur·rice production"
+        },
+        "r_14ba71897157": {
+          "masculine": "Assistant coordinateur production",
+          "feminine": "Assistante coordinatrice production",
+          "neutral": "Assistant·e coordinateur·rice production"
+        },
+        "r_9a9272ffef87": {
+          "masculine": "Assistant production (PA)",
+          "feminine": "Assistante production (PA)",
+          "neutral": "Assistant·e production (PA)"
+        },
+        "r_b37de62fa7b6": {
+          "masculine": "Second assistant production",
+          "feminine": "Seconde assistante production",
+          "neutral": "Second·e assistant·e production"
+        },
+        "r_35a318ed734f": {
+          "masculine": "Assistant coordinateur voyages",
+          "feminine": "Assistante coordinatrice voyages",
+          "neutral": "Assistant·e coordinateur·rice voyages"
+        },
+        "r_282f5f19af6e": {
+          "masculine": "Chef d’unité plateau",
+          "feminine": "Cheffe d’unité plateau",
+          "neutral": "Chef·fe d’unité plateau"
+        },
+        "r_a1888e7923b1": {
+          "masculine": "Secrétaire production / Assistant d’équipe",
+          "feminine": "Secrétaire production / Assistante d’équipe",
+          "neutral": "Secrétaire production / Assistant·e d’équipe"
+        },
+        "r_079a221fcd0e": {
+          "masculine": "Second chef d’unité (spectacle / diffusion)",
+          "feminine": "Seconde cheffe d’unité (spectacle / diffusion)",
+          "neutral": "Second·e chef·fe d’unité (spectacle / diffusion)"
+        },
+        "r_c74c78be5dc2": {
+          "masculine": "Directeur de casting",
+          "feminine": "Directrice de casting",
+          "neutral": "Directeur·rice de casting"
+        },
+        "r_b6e7722029a2": {
+          "masculine": "Contrôleur production",
+          "feminine": "Contrôleuse production",
+          "neutral": "Contrôleur·se production"
+        },
+        "r_4e9c5d6d7198": {
+          "masculine": "Responsable affaires film",
+          "feminine": "Responsable affaires film",
+          "neutral": "Responsable affaires film"
+        },
+        "r_907eb6829faf": {
+          "masculine": "Comptable",
+          "feminine": "Comptable",
+          "neutral": "Comptable"
+        },
+        "r_9ef806a95399": {
+          "masculine": "Assistant affaires commerciales",
+          "feminine": "Assistante affaires commerciales",
+          "neutral": "Assistant·e affaires commerciales"
+        },
+        "r_3365c6d66b72": {
+          "masculine": "Caissier / Petite caisse",
+          "feminine": "Caissière / Petite caisse",
+          "neutral": "Caissier·ère / Petite caisse"
+        },
+        "r_354a33db42c7": {
+          "masculine": "Comptable paie",
+          "feminine": "Comptable paie",
+          "neutral": "Comptable paie"
+        },
+        "r_f3b7a4579d13": {
+          "masculine": "Stagiaire affaires commerciales",
+          "feminine": "Stagiaire affaires commerciales",
+          "neutral": "Stagiaire affaires commerciales"
+        },
+        "r_614a09237466": {
+          "masculine": "Responsable stratégie production",
+          "feminine": "Responsable stratégie production",
+          "neutral": "Responsable stratégie production"
+        },
+        "r_ab2bca044ad5": {
+          "masculine": "Responsable développement",
+          "feminine": "Responsable développement",
+          "neutral": "Responsable développement"
+        },
+        "r_4c6443207ff2": {
+          "masculine": "Producteur de service",
+          "feminine": "Productrice de service",
+          "neutral": "Producteur·rice de service"
+        },
+        "r_f43970f8871f": {
+          "masculine": "Directeur de production",
+          "feminine": "Directrice de production",
+          "neutral": "Directeur·rice de production"
+        },
+        "r_b490dba5695d": {
+          "masculine": "Producteur adjoint",
+          "feminine": "Productrice adjointe",
+          "neutral": "Producteur·rice adjoint·e"
+        },
+        "r_7b68ca0f0fb6": {
+          "masculine": "Producteur TV",
+          "feminine": "Productrice TV",
+          "neutral": "Producteur·rice TV"
+        },
+        "r_564bd1be967c": {
+          "masculine": "Producteur promotion",
+          "feminine": "Productrice promotion",
+          "neutral": "Producteur·rice promotion"
+        },
+        "r_17e75f09bb7a": {
+          "masculine": "Producteur superviseur",
+          "feminine": "Productrice superviseuse",
+          "neutral": "Producteur·rice superviseur·se"
+        },
+        "r_09bdde75b5c6": {
+          "masculine": "Producteur d’histoire",
+          "feminine": "Productrice d’histoire",
+          "neutral": "Producteur·rice d’histoire"
+        },
+        "r_63333ae7406f": {
+          "masculine": "Producteur post-histoire",
+          "feminine": "Productrice post-histoire",
+          "neutral": "Producteur·rice post-histoire"
+        },
+        "r_1c7b4db06402": {
+          "masculine": "Producteur agence / publicité TV",
+          "feminine": "Productrice agence / publicité TV",
+          "neutral": "Producteur·rice agence / publicité TV"
+        },
+        "r_05c4bc7ca840": {
+          "masculine": "Producteur 3D stéréo",
+          "feminine": "Productrice 3D stéréo",
+          "neutral": "Producteur·rice 3D stéréo"
+        },
+        "r_6221ed87ef22": {
+          "masculine": "Producteur superviseur 3D stéréo",
+          "feminine": "Productrice superviseuse 3D stéréo",
+          "neutral": "Producteur·rice superviseur·se 3D stéréo"
+        },
+        "r_7edb24c15dcf": {
+          "masculine": "Producteur Web TV",
+          "feminine": "Productrice Web TV",
+          "neutral": "Producteur·rice Web TV"
+        },
+        "r_3d984a13d7b5": {
+          "masculine": "Producteur créatif",
+          "feminine": "Productrice créatif",
+          "neutral": "Producteur·rice créatif"
+        },
+        "r_ae0c8b90c8d1": {
+          "masculine": "Producteur développement",
+          "feminine": "Productrice développement",
+          "neutral": "Producteur·rice développement"
+        },
+        "r_d297bfadcae2": {
+          "masculine": "Coordinateur développement",
+          "feminine": "Coordinatrice développement",
+          "neutral": "Coordinateur·rice développement"
+        },
+        "r_54f1c9f4d11e": {
+          "masculine": "Directeur développement",
+          "feminine": "Directrice développement",
+          "neutral": "Directeur·rice développement"
+        },
+        "r_f42fa61db712": {
+          "masculine": "Producteur associé salle de contrôle",
+          "feminine": "Productrice associée salle de contrôle",
+          "neutral": "Producteur·rice associé·e salle de contrôle"
+        },
+        "r_9d8ea4e7c7aa": {
+          "masculine": "Producteur salle de contrôle / à l’antenne",
+          "feminine": "Productrice salle de contrôle / à l’antenne",
+          "neutral": "Producteur·rice salle de contrôle / à l’antenne"
+        },
+        "r_b837afb89817": {
+          "masculine": "Producteur promotion à l’antenne",
+          "feminine": "Productrice promotion à l’antenne",
+          "neutral": "Producteur·rice promotion à l’antenne"
+        },
+        "r_bacc7a4ec265": {
+          "masculine": "Affaires droits d’auteur",
+          "feminine": "Affaires droits d’auteur",
+          "neutral": "Affaires droits d’auteur"
+        },
+        "r_7e0ace38e8fc": {
+          "masculine": "Affaires commerciales",
+          "feminine": "Affaires commerciales",
+          "neutral": "Affaires commerciales"
+        },
+        "r_0daf662f57c6": {
+          "masculine": "Affaires commerciales et juridiques",
+          "feminine": "Affaires commerciales et juridiques",
+          "neutral": "Affaires commerciales et juridiques"
+        },
+        "r_a95b977fa84f": {
+          "masculine": "Affaires juridiques",
+          "feminine": "Affaires juridiques",
+          "neutral": "Affaires juridiques"
+        },
+        "r_0433186beb99": {
+          "masculine": "Producteur marketing & distribution",
+          "feminine": "Productrice marketing & distribution",
+          "neutral": "Producteur·rice marketing & distribution"
+        },
+        "r_07f0060c8996": {
+          "masculine": "Stagiaire producteur",
+          "feminine": "Stagiaire productrice",
+          "neutral": "Stagiaire producteur·rice"
+        }
+      },
+      "regie": {
+        "r_dbf51638d5ed": {
+          "masculine": "Script Supervisor / Continuité",
+          "feminine": "Script Supervisor / Continuité",
+          "neutral": "Script Supervisor / Continuité"
+        },
+        "r_db6f57df190b": {
+          "masculine": "Assistant Script Supervisor",
+          "feminine": "Assistante Script Supervisor",
+          "neutral": "Assistant·e Script Supervisor"
+        },
+        "r_043751863fa5": {
+          "masculine": "Supervision de script sur le plateau",
+          "feminine": "Supervision de script sur le plateau",
+          "neutral": "Supervision de script sur le plateau"
+        },
+        "r_d7e7e0e56ce6": {
+          "masculine": "Storyboardeur",
+          "feminine": "Storyboardeuse",
+          "neutral": "Storyboardeur·se"
+        },
+        "r_d5f343108ed5": {
+          "masculine": "Coach d’acteur",
+          "feminine": "Coach d’acteur",
+          "neutral": "Coach d’acteur"
+        },
+        "r_8ac3532c0c32": {
+          "masculine": "Coach d’acteur (enfants)",
+          "feminine": "Coach d’acteur (enfants)",
+          "neutral": "Coach d’acteur (enfants)"
+        },
+        "r_bf13c927e8eb": {
+          "masculine": "Coach de dialogue",
+          "feminine": "Coach de dialogue",
+          "neutral": "Coach de dialogue"
+        },
+        "r_82fff9096145": {
+          "masculine": "Coordinateur figurants / régisseur d’extras",
+          "feminine": "Coordinatrice figurantes / régisseuse d’extras",
+          "neutral": "Coordinateur·rice figurant·es / régisseur·se d’extras"
+        },
+        "r_e57426b6a805": {
+          "masculine": "Assistant coordinateur figurants",
+          "feminine": "Assistante coordinatrice figurantes",
+          "neutral": "Assistant·e coordinateur·rice figurant·es"
+        },
+        "r_c2b6031ad212": {
+          "masculine": "Assistant personnel du réalisateur",
+          "feminine": "Assistante personnelle du réalisateur",
+          "neutral": "Assistant·e personnel·le du réalisateur"
+        },
+        "r_1ed956774605": {
+          "masculine": "Assistant personnel du réalisateur",
+          "feminine": "Assistante personnelle du réalisateur",
+          "neutral": "Assistant·e personnel·le du réalisateur"
+        },
+        "r_7d0bc36aabcb": {
+          "masculine": "Stagiaire réalisateur",
+          "feminine": "Stagiaire réalisatrice",
+          "neutral": "Stagiaire réalisateur·rice"
+        },
+        "r_bf4aaefa2f9f": {
+          "masculine": "Stagiaire script",
+          "feminine": "Stagiaire script",
+          "neutral": "Stagiaire script"
+        },
+        "r_45bf2bbe37f0": {
+          "masculine": "Assistant plateau / Messager",
+          "feminine": "Assistante plateau / Messagère",
+          "neutral": "Assistant·e plateau / Messager·ère"
+        },
+        "r_9ced64ab6db5": {
+          "masculine": "1er assistant réalisateur (1er AR)",
+          "feminine": "1re assistante réalisatrice (1re AR)",
+          "neutral": "1er/1re assistant·e réalisateur·rice (1er/1re AR)"
+        },
+        "r_b6ac41792b48": {
+          "masculine": "2e assistant réalisateur (2e AR)",
+          "feminine": "2e assistante réalisatrice (2e AR)",
+          "neutral": "2e assistant·e réalisateur·rice (2e AR)"
+        },
+        "r_6b9cabf3cbca": {
+          "masculine": "Script (sur le plateau)",
+          "feminine": "Script (sur le plateau)",
+          "neutral": "Script (sur le plateau)"
+        },
+        "r_93f52c1c7000": {
+          "masculine": "Réalisateur 2e unité",
+          "feminine": "Réalisatrice 2e unité",
+          "neutral": "Réalisateur·rice 2e unité"
+        },
+        "r_591d7faf8f5d": {
+          "masculine": "Assistant personnel (du réalisateur)",
+          "feminine": "Assistante personnelle (du réalisatrice)",
+          "neutral": "Assistant·e personnel·le (du réalisateur·rice)"
+        },
+        "r_c01dd7739f5a": {
+          "masculine": "Assistant coordinateur figurants",
+          "feminine": "Assistante coordinatrice figurantes",
+          "neutral": "Assistant·e coordinateur·rice figurant·es"
+        },
+        "r_f59d6991c44a": {
+          "masculine": "Réalisateur",
+          "feminine": "Réalisatrice",
+          "neutral": "Réalisateur·rice"
+        },
+        "r_5562e3abbb45": {
+          "masculine": "Co-réalisateur",
+          "feminine": "Co-réalisatrice",
+          "neutral": "Co-réalisateur·rice"
+        },
+        "r_df7e552a6792": {
+          "masculine": "Réalisateur second équipe",
+          "feminine": "Réalisatrice seconde équipe",
+          "neutral": "Réalisateur·rice second·e équipe"
+        },
+        "r_0aca88b2853d": {
+          "masculine": "Réalisateur studio",
+          "feminine": "Réalisatrice studio",
+          "neutral": "Réalisateur·rice studio"
+        },
+        "r_394140e22c16": {
+          "masculine": "Réalisateur doublage",
+          "feminine": "Réalisatrice doublage",
+          "neutral": "Réalisateur·rice doublage"
+        },
+        "r_7d2cd6bd3a73": {
+          "masculine": "Réalisateur vision (diffusion)",
+          "feminine": "Réalisatrice vision (diffusion)",
+          "neutral": "Réalisateur·rice vision (diffusion)"
+        },
+        "r_988a573b39e7": {
+          "masculine": "Réalisateur diffusion",
+          "feminine": "Réalisatrice diffusion",
+          "neutral": "Réalisateur·rice diffusion"
+        },
+        "r_0719ad7a68ec": {
+          "masculine": "Réalisateur dialogues",
+          "feminine": "Réalisatrice dialogues",
+          "neutral": "Réalisateur·rice dialogues"
+        },
+        "r_463462fca2ec": {
+          "masculine": "Premier assistant réalisateur",
+          "feminine": "Première assistante réalisatrice",
+          "neutral": "Premier·ère assistant·e réalisateur·rice"
+        },
+        "r_de1c193ae4d6": {
+          "masculine": "Second assistant réalisateur",
+          "feminine": "Seconde assistante réalisatrice",
+          "neutral": "Second·e assistant·e réalisateur·rice"
+        },
+        "r_c37babd28464": {
+          "masculine": "Assistant réalisateur principal 2",
+          "feminine": "Assistante réalisatrice principale 2",
+          "neutral": "Assistant·e réalisateur·rice principal·e 2"
+        },
+        "r_2b8bbebafa40": {
+          "masculine": "Assistant réalisateur sol 2",
+          "feminine": "Assistante réalisatrice sol 2",
+          "neutral": "Assistant·e réalisateur·rice sol 2"
+        },
+        "r_b0a3c67c20bf": {
+          "masculine": "Assistant réalisateur foule 2",
+          "feminine": "Assistante réalisatrice foule 2",
+          "neutral": "Assistant·e réalisateur·rice foule 2"
+        },
+        "r_b6640a0bf9b6": {
+          "masculine": "Troisième assistant réalisateur (3e AR)",
+          "feminine": "Troisième assistante réalisatrice (3e AR)",
+          "neutral": "Troisième assistant·e réalisateur·rice (3e AR)"
+        },
+        "r_962cb1546148": {
+          "masculine": "Troisième assistant réalisateur foule",
+          "feminine": "Troisième assistante réalisatrice foule",
+          "neutral": "Troisième assistant·e réalisateur·rice foule"
+        },
+        "r_619aa382d108": {
+          "masculine": "Base troisième assistant réalisateur",
+          "feminine": "Base troisième assistante réalisatrice",
+          "neutral": "Base troisième assistant·e réalisateur·rice"
+        },
+        "r_14816f8e2f93": {
+          "masculine": "Troisième assistant réalisateur sol",
+          "feminine": "Troisième assistante réalisatrice sol",
+          "neutral": "Troisième assistant·e réalisateur·rice sol"
+        },
+        "r_00bb63b14962": {
+          "masculine": "Assistant réalisateur PA",
+          "feminine": "Assistante réalisatrice PA",
+          "neutral": "Assistant·e réalisateur·rice PA"
+        },
+        "r_da45564f42a3": {
+          "masculine": "Assistant réalisateur PA principal",
+          "feminine": "Assistante réalisatrice PA principale",
+          "neutral": "Assistant·e réalisateur·rice PA principal·e"
+        },
+        "r_d4de545cc559": {
+          "masculine": "Stagiaire assistant réalisateur",
+          "feminine": "Stagiaire assistante réalisatrice",
+          "neutral": "Stagiaire assistant·e réalisateur·rice"
+        },
+        "r_b8f3b216cf72": {
+          "masculine": "Chef de foule",
+          "feminine": "Cheffe de foule",
+          "neutral": "Chef·fe de foule"
+        },
+        "r_7d061a318612": {
+          "masculine": "Assistant chef de foule",
+          "feminine": "Assistante cheffe de foule",
+          "neutral": "Assistant·e chef·fe de foule"
+        }
+      },
+      "kamera": {
+        "r_9659ff478da5": {
+          "masculine": "Directeur de la photographie / Chef opérateur",
+          "feminine": "Directrice de la photographie / Cheffe opératrice",
+          "neutral": "Directeur·rice de la photographie / Chef·fe opérateur·rice"
+        },
+        "r_f1286611f452": {
+          "masculine": "Directeur de l’image",
+          "feminine": "Directrice de l’image",
+          "neutral": "Directeur·rice de l’image"
+        },
+        "r_c519de89c832": {
+          "masculine": "Opérateur caméra A",
+          "feminine": "Opératrice caméra A",
+          "neutral": "Opérateur·rice caméra A"
+        },
+        "r_69b451280549": {
+          "masculine": "Opérateur caméra B",
+          "feminine": "Opératrice caméra B",
+          "neutral": "Opérateur·rice caméra B"
+        },
+        "r_147c6db611ab": {
+          "masculine": "Opérateur caméra C",
+          "feminine": "Opératrice caméra C",
+          "neutral": "Opérateur·rice caméra C"
+        },
+        "r_00ec6018a92f": {
+          "masculine": "Opérateur caméra ENG (studio)",
+          "feminine": "Opératrice caméra ENG (studio)",
+          "neutral": "Opérateur·rice caméra ENG (studio)"
+        },
+        "r_15338319dd09": {
+          "masculine": "Opérateur caméra ENG/EB",
+          "feminine": "Opératrice caméra ENG/EB",
+          "neutral": "Opérateur·rice caméra ENG/EB"
+        },
+        "r_3b00f8763d24": {
+          "masculine": "Opérateur caméra 2e unité",
+          "feminine": "Opératrice caméra 2e unité",
+          "neutral": "Opérateur·rice caméra 2e unité"
+        },
+        "r_2815a6f7d251": {
+          "masculine": "Opérateur caméra 3e unité",
+          "feminine": "Opératrice caméra 3e unité",
+          "neutral": "Opérateur·rice caméra 3e unité"
+        },
+        "r_46bfee3f1077": {
+          "masculine": "1er assistant caméra / Opérateur de mise au point",
+          "feminine": "1re assistante caméra / Opératrice de mise au point",
+          "neutral": "1er/1re assistant·e caméra / Opérateur·rice de mise au point"
+        },
+        "r_4f6a54aa8672": {
+          "masculine": "2e assistant caméra / Clapman",
+          "feminine": "2e assistante caméra / Clapman",
+          "neutral": "2e assistant·e caméra / Clapman"
+        },
+        "r_a6d3a38613fa": {
+          "masculine": "Chargé du clap",
+          "feminine": "Chargée du clap",
+          "neutral": "Personne chargée du clap"
+        },
+        "r_4406ae44f8be": {
+          "masculine": "3e assistant caméra",
+          "feminine": "3e assistante caméra",
+          "neutral": "3e assistant·e caméra"
+        },
+        "r_a29ed25142f3": {
+          "masculine": "2e assistant caméra numérique",
+          "feminine": "2e assistante caméra numérique",
+          "neutral": "2e assistant·e caméra numérique"
+        },
+        "r_048d538ee34d": {
+          "masculine": "DIT",
+          "feminine": "DIT",
+          "neutral": "DIT"
+        },
+        "r_c48ad1ee75a7": {
+          "masculine": "Assistant DIT",
+          "feminine": "Assistante DIT",
+          "neutral": "Assistant·e DIT"
+        },
+        "r_0e473a1887e9": {
+          "masculine": "Opérateur steadicam",
+          "feminine": "Opératrice steadicam",
+          "neutral": "Opérateur·rice steadicam"
+        },
+        "r_1d7535202c92": {
+          "masculine": "Assistant steadicam",
+          "feminine": "Assistante steadicam",
+          "neutral": "Assistant·e steadicam"
+        },
+        "r_baee8ff4a63f": {
+          "masculine": "Opérateur système Gimbal",
+          "feminine": "Opératrice système Gimbal",
+          "neutral": "Opérateur·rice système Gimbal"
+        },
+        "r_569d248c1dfd": {
+          "masculine": "Pilote de drone / Opérateur drone",
+          "feminine": "Pilote de drone / Opératrice drone",
+          "neutral": "Pilote de drone / Opérateur·rice drone"
+        },
+        "r_3ca1ad3e14b2": {
+          "masculine": "Opérateur drone caméra",
+          "feminine": "Opératrice drone caméra",
+          "neutral": "Opérateur·rice drone caméra"
+        },
+        "r_c2ff9d51c86a": {
+          "masculine": "Pilote drone caméra",
+          "feminine": "Pilote drone caméra",
+          "neutral": "Pilote drone caméra"
+        },
+        "r_0502b3c5dec3": {
+          "masculine": "Conducteur voiture caméra",
+          "feminine": "Conductrice voiture caméra",
+          "neutral": "Conducteur·rice voiture caméra"
+        },
+        "r_a3fa606ea916": {
+          "masculine": "Pilote avion (prises de vue aériennes)",
+          "feminine": "Pilote avion (prises de vue aériennes)",
+          "neutral": "Pilote avion (prises de vue aériennes)"
+        },
+        "r_05d7d18da0c4": {
+          "masculine": "Pilote hélicoptère (prises de vue aériennes)",
+          "feminine": "Pilote hélicoptère (prises de vue aériennes)",
+          "neutral": "Pilote hélicoptère (prises de vue aériennes)"
+        },
+        "r_32e8a90fee3b": {
+          "masculine": "Pilote Spidercam",
+          "feminine": "Pilote Spidercam",
+          "neutral": "Pilote Spidercam"
+        },
+        "r_c4b0d3dfb7d8": {
+          "masculine": "Assistant drone caméra",
+          "feminine": "Assistante drone caméra",
+          "neutral": "Assistant·e drone caméra"
+        },
+        "r_86c7b305ba77": {
+          "masculine": "Opérateur caméra à distance",
+          "feminine": "Opératrice caméra à distance",
+          "neutral": "Opérateur·rice caméra à distance"
+        },
+        "r_386b1f9db2c1": {
+          "masculine": "Opérateur tête à distance",
+          "feminine": "Opératrice tête à distance",
+          "neutral": "Opérateur·rice tête à distance"
+        },
+        "r_1490637c95ed": {
+          "masculine": "Opérateur caméra aérienne",
+          "feminine": "Opératrice caméra aérienne",
+          "neutral": "Opérateur·rice caméra aérienne"
+        },
+        "r_76c05f6fba78": {
+          "masculine": "Opérateur air-to-air",
+          "feminine": "Opératrice air-to-air",
+          "neutral": "Opérateur·rice air-to-air"
+        },
+        "r_b59f3c08153b": {
+          "masculine": "Opérateur caméra haute vitesse",
+          "feminine": "Opératrice caméra haute vitesse",
+          "neutral": "Opérateur·rice caméra haute vitesse"
+        },
+        "r_f6e99ab3d5dd": {
+          "masculine": "Opérateur ARRI Trinity",
+          "feminine": "Opératrice ARRI Trinity",
+          "neutral": "Opérateur·rice ARRI Trinity"
+        },
+        "r_953bc24b7077": {
+          "masculine": "Opérateur Cablecam",
+          "feminine": "Opératrice Cablecam",
+          "neutral": "Opérateur·rice Cablecam"
+        },
+        "r_e834e506e54b": {
+          "masculine": "Opérateur Polecam",
+          "feminine": "Opératrice Polecam",
+          "neutral": "Opérateur·rice Polecam"
+        },
+        "r_b7ea35e3f38d": {
+          "masculine": "Opérateur Rod-Cam",
+          "feminine": "Opératrice Rod-Cam",
+          "neutral": "Opérateur·rice Rod-Cam"
+        },
+        "r_3531de1d9278": {
+          "masculine": "Opérateur Motion Control",
+          "feminine": "Opératrice Motion Control",
+          "neutral": "Opérateur·rice Motion Control"
+        },
+        "r_edf22fe94ff4": {
+          "masculine": "Assistant Motion Control",
+          "feminine": "Assistante Motion Control",
+          "neutral": "Assistant·e Motion Control"
+        },
+        "r_7be83f893235": {
+          "masculine": "Opérateur caméra live",
+          "feminine": "Opératrice caméra live",
+          "neutral": "Opérateur·rice caméra live"
+        },
+        "r_8d0fa92d5c06": {
+          "masculine": "Directeur de la photographie VR",
+          "feminine": "Directrice de la photographie VR",
+          "neutral": "Directeur·rice de la photographie VR"
+        },
+        "r_e4f1f8410ee1": {
+          "masculine": "Opérateur caméra VR",
+          "feminine": "Opératrice caméra VR",
+          "neutral": "Opérateur·rice caméra VR"
+        },
+        "r_fe4955d24d9d": {
+          "masculine": "Opérateur caméra 3D stéréo",
+          "feminine": "Opératrice caméra 3D stéréo",
+          "neutral": "Opérateur·rice caméra 3D stéréo"
+        },
+        "r_63d8f7ae5c77": {
+          "masculine": "Opérateur convergence 3D stéréo",
+          "feminine": "Opératrice convergence 3D stéréo",
+          "neutral": "Opérateur·rice convergence 3D stéréo"
+        },
+        "r_5d780d27f437": {
+          "masculine": "Technicien stéréoscopie",
+          "feminine": "Technicienne stéréoscopie",
+          "neutral": "Technicien·ne stéréoscopie"
+        },
+        "r_0350366ccf64": {
+          "masculine": "Stéréographe",
+          "feminine": "Stéréographe",
+          "neutral": "Stéréographe"
+        },
+        "r_892df5d9ed45": {
+          "masculine": "Stéréographe 2e unité",
+          "feminine": "Stéréographe 2e unité",
+          "neutral": "Stéréographe 2e unité"
+        },
+        "r_87b9b49ccc72": {
+          "masculine": "Assistant stéréographe",
+          "feminine": "Assistante stéréographe",
+          "neutral": "Assistant·e stéréographe"
+        },
+        "r_503758a49393": {
+          "masculine": "Opérateur caméra sous-marine",
+          "feminine": "Opératrice caméra sous-marine",
+          "neutral": "Opérateur·rice caméra sous-marine"
+        },
+        "r_ad809b37ab32": {
+          "masculine": "Assistant caméra sous-marine",
+          "feminine": "Assistante caméra sous-marine",
+          "neutral": "Assistant·e caméra sous-marine"
+        },
+        "r_fdaafaca34cb": {
+          "masculine": "Opérateur caméra chute libre / parachutisme",
+          "feminine": "Opératrice caméra chute libre / parachutisme",
+          "neutral": "Opérateur·rice caméra chute libre / parachutisme"
+        },
+        "r_6fd521b70caf": {
+          "masculine": "Drytech",
+          "feminine": "Drytech",
+          "neutral": "Drytech"
+        },
+        "r_7a8573f394c1": {
+          "masculine": "Data Wrangler",
+          "feminine": "Data Wrangler",
+          "neutral": "Data Wrangler"
+        },
+        "r_59c04d8b3609": {
+          "masculine": "Data Wrangler / Chargeur numérique",
+          "feminine": "Data Wrangler / Chargeur numérique",
+          "neutral": "Data Wrangler / Chargeur numérique"
+        },
+        "r_1b6d2deeae11": {
+          "masculine": "Gestionnaire médias",
+          "feminine": "Gestionnaire médias",
+          "neutral": "Gestionnaire médias"
+        },
+        "r_bfd5ad0745cb": {
+          "masculine": "Opérateur vidéo assist",
+          "feminine": "Opératrice vidéo assist",
+          "neutral": "Opérateur·rice vidéo assist"
+        },
+        "r_ab65480d38bf": {
+          "masculine": "Assistant vidéo utilitaire",
+          "feminine": "Assistante vidéo utilitaire",
+          "neutral": "Assistant·e vidéo utilitaire"
+        },
+        "r_44cbe06f7edd": {
+          "masculine": "Opérateurs de crash box",
+          "feminine": "Opératrices de crash box",
+          "neutral": "Opérateur·rices de crash box"
+        },
+        "r_ff391e554ef1": {
+          "masculine": "Opérateur vidéo",
+          "feminine": "Opératrice vidéo",
+          "neutral": "Opérateur·rice vidéo"
+        },
+        "r_04b8806e4aea": {
+          "masculine": "Opérateur Qtake",
+          "feminine": "Opératrice Qtake",
+          "neutral": "Opérateur·rice Qtake"
+        },
+        "r_881fbad171dd": {
+          "masculine": "Assistant opérateur vidéo",
+          "feminine": "Assistante opératrice vidéo",
+          "neutral": "Assistant·e opérateur·rice vidéo"
+        },
+        "r_e8b3776feee3": {
+          "masculine": "Opérateur de lecture",
+          "feminine": "Opératrice de lecture",
+          "neutral": "Opérateur·rice de lecture"
+        },
+        "r_2cd28c233eb0": {
+          "masculine": "Assistant ENG (image et son)",
+          "feminine": "Assistante ENG (image et son)",
+          "neutral": "Assistant·e ENG (image et son)"
+        },
+        "r_aaf320fee04d": {
+          "masculine": "Technicien ENG (image et son)",
+          "feminine": "Technicienne ENG (image et son)",
+          "neutral": "Technicien·ne ENG (image et son)"
+        },
+        "r_6c484917c545": {
+          "masculine": "Assistant caméra (non-fiction)",
+          "feminine": "Assistante caméra (non-fiction)",
+          "neutral": "Assistant·e caméra (non-fiction)"
+        },
+        "r_c071a417cdf8": {
+          "masculine": "Ingénieur capture de données",
+          "feminine": "Ingénieure capture de données",
+          "neutral": "Ingénieur·e capture de données"
+        },
+        "r_ff3821a892d3": {
+          "masculine": "Opérateur plaques de rétroprojection",
+          "feminine": "Opératrice plaques de rétroprojection",
+          "neutral": "Opérateur·rice plaques de rétroprojection"
+        },
+        "r_e160ca78eefe": {
+          "masculine": "Technicien caméra",
+          "feminine": "Technicienne caméra",
+          "neutral": "Technicien·ne caméra"
+        },
+        "r_b2a908032997": {
+          "masculine": "Stagiaire caméra",
+          "feminine": "Stagiaire caméra",
+          "neutral": "Stagiaire caméra"
+        },
+        "r_20c91979a5fc": {
+          "masculine": "Opérateur caméra",
+          "feminine": "Opératrice caméra",
+          "neutral": "Opérateur·rice caméra"
+        },
+        "r_3008a154e7ef": {
+          "masculine": "Pilote de drone / Directeur de la photographie aérienne",
+          "feminine": "Pilote de drone / Directrice de la photographie aérienne",
+          "neutral": "Pilote de drone / Directeur·rice de la photographie aérienne"
+        },
+        "r_ee4208621795": {
+          "masculine": "Opérateur caméra supplémentaire",
+          "feminine": "Opératrice caméra supplémentaire",
+          "neutral": "Opérateur·rice caméra supplémentaire"
+        },
+        "r_59f7261be55a": {
+          "masculine": "Opérateur caméra sous-marine",
+          "feminine": "Opératrice caméra sous-marine",
+          "neutral": "Opérateur·rice caméra sous-marine"
+        },
+        "r_6767d1f92822": {
+          "masculine": "Opérateur caméra motion control",
+          "feminine": "Opératrice caméra motion control",
+          "neutral": "Opérateur·rice caméra motion control"
+        },
+        "r_15047c5a622a": {
+          "masculine": "Assistant/technicien drone caméra",
+          "feminine": "Assistante/technicienne drone caméra",
+          "neutral": "Assistant·e/technicien·ne drone caméra"
+        },
+        "r_7b6aa965b572": {
+          "masculine": "1er assistant caméra",
+          "feminine": "1re assistante caméra",
+          "neutral": "1er/1re assistant·e caméra"
+        },
+        "r_403c761ac7c7": {
+          "masculine": "Assistant ENG (caméra/son)",
+          "feminine": "Assistante ENG (caméra/son)",
+          "neutral": "Assistant·e ENG (caméra/son)"
+        },
+        "r_6170f09c0f17": {
+          "masculine": "Technicien ENG (caméra/son)",
+          "feminine": "Technicienne ENG (caméra/son)",
+          "neutral": "Technicien·ne ENG (caméra/son)"
+        },
+        "r_6a6303b77029": {
+          "masculine": "Photographe fixe",
+          "feminine": "Photographe fixe",
+          "neutral": "Photographe fixe"
+        }
+      },
+      "licht": {
+        "r_222be04dbf00": {
+          "masculine": "Chef électricien",
+          "feminine": "Cheffe électricienne",
+          "neutral": "Chef·fe électricien·ne"
+        },
+        "r_1e210e69039a": {
+          "masculine": "Best Boy Electric",
+          "feminine": "Best Girl Electric",
+          "neutral": "Assistant·e chef électricien·ne"
+        },
+        "r_14dd174cd76c": {
+          "masculine": "Chef électricien de montage",
+          "feminine": "Cheffe électricienne de montage",
+          "neutral": "Chef·fe électricien·ne de montage"
+        },
+        "r_92137802b24a": {
+          "masculine": "Rigging Best Boy Electric",
+          "feminine": "Rigging Best Girl Electric",
+          "neutral": "Assistant·e chef électricien·ne (rigging)"
+        },
+        "r_7fce7d6fcf12": {
+          "masculine": "Électricien de montage",
+          "feminine": "Électricienne de montage",
+          "neutral": "Électricien·ne de montage"
+        },
+        "r_1bcf9d8d9b03": {
+          "masculine": "Électricien / technicien éclairage",
+          "feminine": "Électricienne / technicienne éclairage",
+          "neutral": "Électricien·ne / technicien·ne éclairage"
+        },
+        "r_d95b919dded9": {
+          "masculine": "Chef technicien éclairage",
+          "feminine": "Cheffe technicienne éclairage",
+          "neutral": "Chef·fe technicien·ne éclairage"
+        },
+        "r_de223259b793": {
+          "masculine": "Opérateur pupitre éclairage",
+          "feminine": "Opératrice pupitre éclairage",
+          "neutral": "Opérateur·rice pupitre éclairage"
+        },
+        "r_d927855afff9": {
+          "masculine": "Assistant pupitre éclairage",
+          "feminine": "Assistante pupitre éclairage",
+          "neutral": "Assistant·e pupitre éclairage"
+        },
+        "r_56ad1c6a1ad4": {
+          "masculine": "Programmeur éclairage (DMX)",
+          "feminine": "Programmeuse éclairage (DMX)",
+          "neutral": "Programmeur·se éclairage (DMX)"
+        },
+        "r_090ac2a092b8": {
+          "masculine": "Technicien éclairage",
+          "feminine": "Technicienne éclairage",
+          "neutral": "Technicien·ne éclairage"
+        },
+        "r_d1edcbd50142": {
+          "masculine": "Conducteur éclairage",
+          "feminine": "Conductrice éclairage",
+          "neutral": "Conducteur·rice éclairage"
+        },
+        "r_7d79588c14f3": {
+          "masculine": "Technicien éclairage supplémentaire",
+          "feminine": "Technicienne éclairage supplémentaire",
+          "neutral": "Technicien·ne éclairage supplémentaire"
+        },
+        "r_b3d1d585beaa": {
+          "masculine": "Opérateur groupe électrogène",
+          "feminine": "Opératrice groupe électrogène",
+          "neutral": "Opérateur·rice groupe électrogène"
+        },
+        "r_bcd4b312b67e": {
+          "masculine": "Gestionnaire de câbles",
+          "feminine": "Gestionnaire de câbles",
+          "neutral": "Gestionnaire de câbles"
+        },
+        "r_35cca1fe3c5c": {
+          "masculine": "Technicien éclairage sous-marin",
+          "feminine": "Technicienne éclairage sous-marin",
+          "neutral": "Technicien·ne éclairage sous-marin"
+        },
+        "r_89058c839b15": {
+          "masculine": "Opérateur lumière ballon",
+          "feminine": "Opératrice lumière ballon",
+          "neutral": "Opérateur·rice lumière ballon"
+        },
+        "r_9bd915bb46a4": {
+          "masculine": "Opérateur projecteur / projecteur sur structure",
+          "feminine": "Opératrice projecteur / projecteur sur structure",
+          "neutral": "Opérateur·rice projecteur / projecteur sur structure"
+        },
+        "r_2c0dd7b64cf3": {
+          "masculine": "Assistant éclairage",
+          "feminine": "Assistante éclairage",
+          "neutral": "Assistant·e éclairage"
+        },
+        "r_0cc27c01ca07": {
+          "masculine": "Stagiaire éclairage",
+          "feminine": "Stagiaire éclairage",
+          "neutral": "Stagiaire éclairage"
+        }
+      },
+      "grip": {
+        "r_470156bd03e4": {
+          "masculine": "Chef machiniste",
+          "feminine": "Cheffe machiniste",
+          "neutral": "Chef·fe machiniste"
+        },
+        "r_cfbf2a22ed6e": {
+          "masculine": "Best Boy Grip",
+          "feminine": "Best Girl Grip",
+          "neutral": "Assistant·e chef machiniste"
+        },
+        "r_32a6ab31b1a1": {
+          "masculine": "Machiniste dolly / opérateur dolly",
+          "feminine": "Machiniste dolly / opératrice dolly",
+          "neutral": "Machiniste dolly / opérateur·rice dolly"
+        },
+        "r_376dc1f790b8": {
+          "masculine": "Machiniste",
+          "feminine": "Machiniste",
+          "neutral": "Machiniste"
+        },
+        "r_dbfaadb8821c": {
+          "masculine": "Assistant machiniste",
+          "feminine": "Assistante machiniste",
+          "neutral": "Assistant·e machiniste"
+        },
+        "r_46dab52c1995": {
+          "masculine": "Machiniste de montage",
+          "feminine": "Machiniste de montage",
+          "neutral": "Machiniste de montage"
+        },
+        "r_ea7e925bd850": {
+          "masculine": "Chef machiniste de montage",
+          "feminine": "Cheffe machiniste de montage",
+          "neutral": "Chef·fe machiniste de montage"
+        },
+        "r_fa9d72fc7978": {
+          "masculine": "Rigging Best Boy Grip",
+          "feminine": "Rigging Best Girl Grip",
+          "neutral": "Assistant·e chef machiniste (rigging)"
+        },
+        "r_2fa0b44342d7": {
+          "masculine": "Constructions spéciales machiniste",
+          "feminine": "Constructions spéciales machiniste",
+          "neutral": "Constructions spéciales machiniste"
+        },
+        "r_08c07afebb7f": {
+          "masculine": "Opérateur grue caméra / jib",
+          "feminine": "Opératrice grue caméra / jib",
+          "neutral": "Opérateur·rice grue caméra / jib"
+        },
+        "r_5ece318b289f": {
+          "masculine": "Technicien grue caméra",
+          "feminine": "Technicienne grue caméra",
+          "neutral": "Technicien·ne grue caméra"
+        },
+        "r_a5c74e86fb2b": {
+          "masculine": "Opérateur U-Crane / Technocrane",
+          "feminine": "Opératrice U-Crane / Technocrane",
+          "neutral": "Opérateur·rice U-Crane / Technocrane"
+        },
+        "r_819dd64bff9d": {
+          "masculine": "Technicien / opérateur tête à distance",
+          "feminine": "Technicienne / opératrice tête à distance",
+          "neutral": "Technicien·ne / opérateur·rice tête à distance"
+        },
+        "r_9c6f674da63a": {
+          "masculine": "Stagiaire machiniste",
+          "feminine": "Stagiaire machiniste",
+          "neutral": "Stagiaire machiniste"
+        }
+      },
+      "ton": {
+        "r_fccf287d8f40": {
+          "masculine": "Mixeur son production",
+          "feminine": "Mixeuse son production",
+          "neutral": "Mixeur·se son production"
+        },
+        "r_54f3d59eb241": {
+          "masculine": "Mixeur son production",
+          "feminine": "Mixeuse son production",
+          "neutral": "Mixeur·se son production"
+        },
+        "r_b0c1942e7358": {
+          "masculine": "Enregistreur son film",
+          "feminine": "Enregistreuse son film",
+          "neutral": "Enregistreur·se son film"
+        },
+        "r_8b1cc700407b": {
+          "masculine": "Perchman",
+          "feminine": "Perchiste",
+          "neutral": "Perchiste"
+        },
+        "r_fd909904c9c7": {
+          "masculine": "Assistant son",
+          "feminine": "Assistante son",
+          "neutral": "Assistant·e son"
+        },
+        "r_4c5fe4b3a1f3": {
+          "masculine": "1er assistant son",
+          "feminine": "1re assistante son",
+          "neutral": "1er/1re assistant·e son"
+        },
+        "r_ab87e9473072": {
+          "masculine": "1er assistant son",
+          "feminine": "1re assistante son",
+          "neutral": "1er/1re assistant·e son"
+        },
+        "r_d83df9d29ab1": {
+          "masculine": "2e assistant son",
+          "feminine": "2e assistante son",
+          "neutral": "2e assistant·e son"
+        },
+        "r_8377b0674c5d": {
+          "masculine": "2e assistant son",
+          "feminine": "2e assistante son",
+          "neutral": "2e assistant·e son"
+        },
+        "r_93302391f02a": {
+          "masculine": "Coordinateur ADR / groupe de doublage",
+          "feminine": "Coordinatrice ADR / groupe de doublage",
+          "neutral": "Coordinateur·rice ADR / groupe de doublage"
+        },
+        "r_3e7456f82724": {
+          "masculine": "Enregistreur son surround",
+          "feminine": "Enregistreuse son surround",
+          "neutral": "Enregistreur·se son surround"
+        },
+        "r_352c199bfbc1": {
+          "masculine": "Technicien son utilitaire",
+          "feminine": "Technicienne son utilitaire",
+          "neutral": "Technicien·ne son utilitaire"
+        },
+        "r_fdfa14e36d06": {
+          "masculine": "Assistant équipement son",
+          "feminine": "Assistante équipement son",
+          "neutral": "Assistant·e équipement son"
+        },
+        "r_9615bbb28141": {
+          "masculine": "Opérateur lecture son",
+          "feminine": "Opératrice lecture son",
+          "neutral": "Opérateur·rice lecture son"
+        },
+        "r_13544e0c2d08": {
+          "masculine": "Enregistreur son (non-fiction)",
+          "feminine": "Enregistreuse son (non-fiction)",
+          "neutral": "Enregistreur·se son (non-fiction)"
+        },
+        "r_f804f9794c40": {
+          "masculine": "Stagiaire son",
+          "feminine": "Stagiaire son",
+          "neutral": "Stagiaire son"
+        },
+        "r_26ad417384db": {
+          "masculine": "Concepteur sonore",
+          "feminine": "Conceptrice sonore",
+          "neutral": "Concepteur·rice sonore"
+        },
+        "r_e4afa3da823e": {
+          "masculine": "Monteur son superviseur",
+          "feminine": "Monteuse son superviseuse",
+          "neutral": "Monteur·se son superviseur·se"
+        },
+        "r_754377fae1cb": {
+          "masculine": "Monteur dialogue",
+          "feminine": "Monteuse dialogue",
+          "neutral": "Monteur·se dialogue"
+        },
+        "r_a80f60e08e2f": {
+          "masculine": "Monteur ADR",
+          "feminine": "Monteuse ADR",
+          "neutral": "Monteur·se ADR"
+        },
+        "r_65ab3bc0b779": {
+          "masculine": "Superviseur ADR",
+          "feminine": "Superviseuse ADR",
+          "neutral": "Superviseur·se ADR"
+        },
+        "r_927d0ca8e1d9": {
+          "masculine": "Artisan Foley",
+          "feminine": "Artisane Foley",
+          "neutral": "Artisan·e Foley"
+        },
+        "r_c196984117d7": {
+          "masculine": "Monteur Foley",
+          "feminine": "Monteuse Foley",
+          "neutral": "Monteur·se Foley"
+        },
+        "r_df6ebbcf6038": {
+          "masculine": "Mixeur de réenregistrement",
+          "feminine": "Mixeuse de réenregistrement",
+          "neutral": "Mixeur·se de réenregistrement"
+        },
+        "r_f4776d32d356": {
+          "masculine": "Opérateur de lecture",
+          "feminine": "Opératrice de lecture",
+          "neutral": "Opérateur·rice de lecture"
+        },
+        "r_6abc8617e983": {
+          "masculine": "Superviseur son",
+          "feminine": "Superviseuse son",
+          "neutral": "Superviseur·se son"
+        },
+        "r_0faba800cb95": {
+          "masculine": "Mixeur de réenregistrement musique",
+          "feminine": "Mixeuse de réenregistrement musique",
+          "neutral": "Mixeur·se de réenregistrement musique"
+        },
+        "r_a5fba4295f52": {
+          "masculine": "Enregistrement musique",
+          "feminine": "Enregistrement musique",
+          "neutral": "Enregistrement musique"
+        },
+        "r_f2e629941a7a": {
+          "masculine": "Mixeur doublage",
+          "feminine": "Mixeuse doublage",
+          "neutral": "Mixeur·se doublage"
+        },
+        "r_f73a9a076c95": {
+          "masculine": "Mixeur audiodescription",
+          "feminine": "Mixeuse audiodescription",
+          "neutral": "Mixeur·se audiodescription"
+        },
+        "r_9d583d9712f5": {
+          "masculine": "Assistant mixeur de réenregistrement",
+          "feminine": "Assistante mixeuse de réenregistrement",
+          "neutral": "Assistant·e mixeur·se de réenregistrement"
+        },
+        "r_c4334fc01411": {
+          "masculine": "Ingénieur mastering son",
+          "feminine": "Ingénieure mastering son",
+          "neutral": "Ingénieur·e mastering son"
+        },
+        "r_6a7ea11d04ed": {
+          "masculine": "Assistant conception sonore",
+          "feminine": "Assistante conception sonore",
+          "neutral": "Assistant·e conception sonore"
+        },
+        "r_539e45fc2e6d": {
+          "masculine": "Monteur ADR superviseur",
+          "feminine": "Monteuse ADR superviseuse",
+          "neutral": "Monteur·se ADR superviseur·se"
+        },
+        "r_021e586f6845": {
+          "masculine": "Monteur dialogue & ADR superviseur",
+          "feminine": "Monteuse dialogue & ADR superviseuse",
+          "neutral": "Monteur·se dialogue & ADR superviseur·se"
+        },
+        "r_58f4b9fff63e": {
+          "masculine": "Monteur dialogue superviseur",
+          "feminine": "Monteuse dialogue superviseuse",
+          "neutral": "Monteur·se dialogue superviseur·se"
+        },
+        "r_934c9dff31b6": {
+          "masculine": "Monteur effets sonores superviseur",
+          "feminine": "Monteuse effets sonores superviseuse",
+          "neutral": "Monteur·se effets sonores superviseur·se"
+        },
+        "r_8ffed7b496e8": {
+          "masculine": "Monteur dialogue (postproduction)",
+          "feminine": "Monteuse dialogue (postproduction)",
+          "neutral": "Monteur·se dialogue (postproduction)"
+        },
+        "r_37f0cea40905": {
+          "masculine": "Monteur effets sonores",
+          "feminine": "Monteuse effets sonores",
+          "neutral": "Monteur·se effets sonores"
+        },
+        "r_e22d9239a33f": {
+          "masculine": "Monteur voix-off / doublage",
+          "feminine": "Monteuse voix-off / doublage",
+          "neutral": "Monteur·se voix-off / doublage"
+        },
+        "r_cf36114f7a15": {
+          "masculine": "Monteur effets sonores synchro",
+          "feminine": "Monteuse effets sonores synchro",
+          "neutral": "Monteur·se effets sonores synchro"
+        },
+        "r_7ca65f7a0064": {
+          "masculine": "Monteur ADR / synchro",
+          "feminine": "Monteuse ADR / synchro",
+          "neutral": "Monteur·se ADR / synchro"
+        },
+        "r_944e077953d3": {
+          "masculine": "Assistant monteur son",
+          "feminine": "Assistante monteuse son",
+          "neutral": "Assistant·e monteur·se son"
+        },
+        "r_9d4ed0bf92ee": {
+          "masculine": "Mixeur son ADR / doublage",
+          "feminine": "Mixeuse son ADR / doublage",
+          "neutral": "Mixeur·se son ADR / doublage"
+        },
+        "r_b3e198ffbf29": {
+          "masculine": "Mixeur effets sonores synchro",
+          "feminine": "Mixeuse effets sonores synchro",
+          "neutral": "Mixeur·se effets sonores synchro"
+        },
+        "r_c41c6bc414c3": {
+          "masculine": "Chef de production doublage",
+          "feminine": "Cheffe de production doublage",
+          "neutral": "Chef·fe de production doublage"
+        },
+        "r_2b6bc11139d6": {
+          "masculine": "Superviseur ADR / doublage",
+          "feminine": "Superviseuse ADR / doublage",
+          "neutral": "Superviseur·se ADR / doublage"
+        },
+        "r_6645c4583551": {
+          "masculine": "Assistant superviseur ADR / doublage",
+          "feminine": "Assistante superviseuse ADR / doublage",
+          "neutral": "Assistant·e superviseur·se ADR / doublage"
+        },
+        "r_2f0b82350b59": {
+          "masculine": "Assistant Foley",
+          "feminine": "Assistante Foley",
+          "neutral": "Assistant·e Foley"
+        },
+        "r_a4171d6359fb": {
+          "masculine": "Stagiaire postproduction son",
+          "feminine": "Stagiaire postproduction son",
+          "neutral": "Stagiaire postproduction son"
+        },
+        "r_9e4b74ecd5ff": {
+          "masculine": "Superviseur technique ADR",
+          "feminine": "Superviseuse technique ADR",
+          "neutral": "Superviseur·se technique ADR"
+        }
+      },
+      "art": {
+        "r_ff29ce0e215c": {
+          "masculine": "Chef décorateur",
+          "feminine": "Cheffe décoratrice",
+          "neutral": "Chef·fe décorateur·rice"
+        },
+        "r_f3db07db6bf4": {
+          "masculine": "Chef décorateur (DE)",
+          "feminine": "Cheffe décoratrice (DE)",
+          "neutral": "Chef·fe décorateur·rice (DE)"
+        },
+        "r_97a0a726b446": {
+          "masculine": "Directeur artistique superviseur",
+          "feminine": "Directrice artistique superviseuse",
+          "neutral": "Directeur·rice artistique superviseur·se"
+        },
+        "r_3f274caf46f5": {
+          "masculine": "Directeur artistique",
+          "feminine": "Directrice artistique",
+          "neutral": "Directeur·rice artistique"
+        },
+        "r_7e93c2713534": {
+          "masculine": "Directeur artistique de permanence",
+          "feminine": "Directrice artistique de permanence",
+          "neutral": "Directeur·rice artistique de permanence"
+        },
+        "r_891f7ee6a391": {
+          "masculine": "Assistant directeur artistique",
+          "feminine": "Assistante directrice artistique",
+          "neutral": "Assistant·e directeur·rice artistique"
+        },
+        "r_29765953355c": {
+          "masculine": "Assistant chef décorateur",
+          "feminine": "Assistante cheffe décoratrice",
+          "neutral": "Assistant·e chef·fe décorateur·rice"
+        },
+        "r_8543a5c61931": {
+          "masculine": "Assistant département artistique",
+          "feminine": "Assistante département artistique",
+          "neutral": "Assistant·e département artistique"
+        },
+        "r_3ffad936200e": {
+          "masculine": "Concepteur de décors",
+          "feminine": "Conceptrice de décors",
+          "neutral": "Concepteur·rice de décors"
+        },
+        "r_bce8305a5535": {
+          "masculine": "Concepteur CAO",
+          "feminine": "Conceptrice CAO",
+          "neutral": "Concepteur·rice CAO"
+        },
+        "r_b5a1fa9969c7": {
+          "masculine": "Artiste conceptuel",
+          "feminine": "Artiste conceptuel",
+          "neutral": "Artiste conceptuel"
+        },
+        "r_f1dbbb97b010": {
+          "masculine": "Artiste conceptuel (département artistique)",
+          "feminine": "Artiste conceptuel (département artistique)",
+          "neutral": "Artiste conceptuel (département artistique)"
+        },
+        "r_57a4a106cbd6": {
+          "masculine": "Illustrateur",
+          "feminine": "Illustratrice",
+          "neutral": "Illustrateur·rice"
+        },
+        "r_6aa3fecc3ba9": {
+          "masculine": "Graphiste (graphismes décors)",
+          "feminine": "Graphiste (graphismes décors)",
+          "neutral": "Graphiste (graphismes décors)"
+        },
+        "r_6978775ad99b": {
+          "masculine": "Graphiste principal",
+          "feminine": "Graphiste principale",
+          "neutral": "Graphiste principal·e"
+        },
+        "r_7534f951d040": {
+          "masculine": "Artiste graphique",
+          "feminine": "Artiste graphique",
+          "neutral": "Artiste graphique"
+        },
+        "r_a8e10d0ecc47": {
+          "masculine": "Chargé d’ambiance / mise en page",
+          "feminine": "Chargée d’ambiance / mise en page",
+          "neutral": "Chargé·e d’ambiance / mise en page"
+        },
+        "r_a1ce9e299c8f": {
+          "masculine": "Décorateur de plateau",
+          "feminine": "Décoratrice de plateau",
+          "neutral": "Décorateur·rice de plateau"
+        },
+        "r_420521110dcc": {
+          "masculine": "Coordinateur décoration de plateau",
+          "feminine": "Coordinatrice décoration de plateau",
+          "neutral": "Coordinateur·rice décoration de plateau"
+        },
+        "r_d5b7a7d716a2": {
+          "masculine": "Assistant décorateur de plateau",
+          "feminine": "Assistante décoratrice de plateau",
+          "neutral": "Assistant·e décorateur·rice de plateau"
+        },
+        "r_d0964de45366": {
+          "masculine": "Acheteur décoration de plateau",
+          "feminine": "Acheteuse décoration de plateau",
+          "neutral": "Acheteur·se décoration de plateau"
+        },
+        "r_10a8275fbc87": {
+          "masculine": "Responsable magasin décoration",
+          "feminine": "Responsable magasin décoration",
+          "neutral": "Responsable magasin décoration"
+        },
+        "r_1df861fbde16": {
+          "masculine": "Assistant coordinateur décoration",
+          "feminine": "Assistante coordinatrice décoration",
+          "neutral": "Assistant·e coordinateur·rice décoration"
+        },
+        "r_393242957f26": {
+          "masculine": "Habilleur de plateau",
+          "feminine": "Habilleuse de plateau",
+          "neutral": "Habilleur·se de plateau"
+        },
+        "r_e3ce1061c0ff": {
+          "masculine": "Chef habilleur",
+          "feminine": "Cheffe habilleuse",
+          "neutral": "Chef·fe habilleur·se"
+        },
+        "r_d588cad49b89": {
+          "masculine": "Chef habilleur de plateau",
+          "feminine": "Cheffe habilleuse de plateau",
+          "neutral": "Chef·fe habilleur·se de plateau"
+        },
+        "r_6cafa4dd814b": {
+          "masculine": "Chef accessoiriste",
+          "feminine": "Cheffe accessoiriste",
+          "neutral": "Chef·fe accessoiriste"
+        },
+        "r_413221e86652": {
+          "masculine": "Chef accessoiriste",
+          "feminine": "Cheffe accessoiriste",
+          "neutral": "Chef·fe accessoiriste"
+        },
+        "r_a1e9f4cffb70": {
+          "masculine": "Chef accessoiriste extérieur",
+          "feminine": "Cheffe accessoiriste extérieur",
+          "neutral": "Chef·fe accessoiriste extérieur"
+        },
+        "r_8f20bee45473": {
+          "masculine": "Accessoiriste plateau",
+          "feminine": "Accessoiriste plateau",
+          "neutral": "Accessoiriste plateau"
+        },
+        "r_7d553f96df87": {
+          "masculine": "Chef accessoiriste plateau",
+          "feminine": "Cheffe accessoiriste plateau",
+          "neutral": "Chef·fe accessoiriste plateau"
+        },
+        "r_bf9d71b6fdc2": {
+          "masculine": "Accessoiriste de permanence",
+          "feminine": "Accessoiriste de permanence",
+          "neutral": "Accessoiriste de permanence"
+        },
+        "r_a38576fafdab": {
+          "masculine": "Assistant accessoiriste",
+          "feminine": "Assistante accessoiriste",
+          "neutral": "Assistant·e accessoiriste"
+        },
+        "r_ea2b2fab38f4": {
+          "masculine": "Assistant accessoiriste",
+          "feminine": "Assistante accessoiriste",
+          "neutral": "Assistant·e accessoiriste"
+        },
+        "r_b685fb4dc943": {
+          "masculine": "Assistant accessoiriste extérieur",
+          "feminine": "Assistante accessoiriste extérieur",
+          "neutral": "Assistant·e accessoiriste extérieur"
+        },
+        "r_7b9477ba5686": {
+          "masculine": "Assistant accessoiriste plateau",
+          "feminine": "Assistante accessoiriste plateau",
+          "neutral": "Assistant·e accessoiriste plateau"
+        },
+        "r_541c87622274": {
+          "masculine": "Acheteur accessoires",
+          "feminine": "Acheteuse accessoires",
+          "neutral": "Acheteur·se accessoires"
+        },
+        "r_3c2dae1ec180": {
+          "masculine": "Acheteur (décoration)",
+          "feminine": "Acheteuse (décoration)",
+          "neutral": "Acheteur·se (décoration)"
+        },
+        "r_c17d76240812": {
+          "masculine": "Responsable magasin accessoires",
+          "feminine": "Responsable magasin accessoires",
+          "neutral": "Responsable magasin accessoires"
+        },
+        "r_6a373738f331": {
+          "masculine": "Concepteur accessoires numériques",
+          "feminine": "Conceptrice accessoires numériques",
+          "neutral": "Concepteur·rice accessoires numériques"
+        },
+        "r_404bfcb27b87": {
+          "masculine": "Chef accessoires numériques",
+          "feminine": "Cheffe accessoires numériques",
+          "neutral": "Chef·fe accessoires numériques"
+        },
+        "r_efdc51e3e8eb": {
+          "masculine": "Fabricant d’accessoires",
+          "feminine": "Fabricante d’accessoires",
+          "neutral": "Fabricant·e d’accessoires"
+        },
+        "r_30872cd93e0c": {
+          "masculine": "Concepteur d’accessoires",
+          "feminine": "Conceptrice d’accessoires",
+          "neutral": "Concepteur·rice d’accessoires"
+        },
+        "r_264fc56ea7a5": {
+          "masculine": "Conseiller en armes / Armurier",
+          "feminine": "Conseillère en armes / Armurière",
+          "neutral": "Conseiller·ère en armes / Armurier·ère"
+        },
+        "r_00f9e2afb019": {
+          "masculine": "Assistant accessoires",
+          "feminine": "Assistante accessoires",
+          "neutral": "Assistant·e accessoires"
+        },
+        "r_ef64ec97e93f": {
+          "masculine": "Peintre d’accessoires",
+          "feminine": "Peintre d’accessoires",
+          "neutral": "Peintre d’accessoires"
+        },
+        "r_8a17379f4cf2": {
+          "masculine": "Conducteur d’accessoires",
+          "feminine": "Conductrice d’accessoires",
+          "neutral": "Conducteur·rice d’accessoires"
+        },
+        "r_fb928031fe07": {
+          "masculine": "Coordinateur véhicules vedettes",
+          "feminine": "Coordinatrice véhicules vedettes",
+          "neutral": "Coordinateur·rice véhicules vedettes"
+        },
+        "r_77928b37c49d": {
+          "masculine": "Responsable véhicules vedettes",
+          "feminine": "Responsable véhicules vedettes",
+          "neutral": "Responsable véhicules vedettes"
+        },
+        "r_115e6da0f002": {
+          "masculine": "Électricien pratique",
+          "feminine": "Électricienne pratique",
+          "neutral": "Électricien·ne pratique"
+        },
+        "r_857a05036004": {
+          "masculine": "Responsable espaces verts",
+          "feminine": "Responsable espaces verts",
+          "neutral": "Responsable espaces verts"
+        },
+        "r_d8e3dea65e7b": {
+          "masculine": "Jardinier plateau",
+          "feminine": "Jardinière plateau",
+          "neutral": "Jardinier·ère plateau"
+        },
+        "r_aa5ce508ee21": {
+          "masculine": "Artiste floral",
+          "feminine": "Artiste floral",
+          "neutral": "Artiste floral"
+        },
+        "r_36b1709b4159": {
+          "masculine": "Styliste culinaire",
+          "feminine": "Styliste culinaire",
+          "neutral": "Styliste culinaire"
+        },
+        "r_40b095fdeb85": {
+          "masculine": "Artiste à l’aérographe",
+          "feminine": "Artiste à l’aérographe",
+          "neutral": "Artiste à l’aérographe"
+        },
+        "r_afee4f58989a": {
+          "masculine": "Peintre décorateur / Artiste peintre",
+          "feminine": "Peintre décoratrice / Artiste peintre",
+          "neutral": "Peintre décorateur·rice / Artiste peintre"
+        },
+        "r_c056e02e39c4": {
+          "masculine": "Peintre décorateur",
+          "feminine": "Peintre décoratrice",
+          "neutral": "Peintre décorateur·rice"
+        },
+        "r_e689709eac01": {
+          "masculine": "Chef peintre décorateur",
+          "feminine": "Cheffe peintre décoratrice",
+          "neutral": "Chef·fe peintre décorateur·rice"
+        },
+        "r_70a7586bb774": {
+          "masculine": "Calligraphe / Peintre en lettres",
+          "feminine": "Calligraphe / Peintre en lettres",
+          "neutral": "Calligraphe / Peintre en lettres"
+        },
+        "r_12f20cf536a1": {
+          "masculine": "Peintre / Artiste décorateur",
+          "feminine": "Peintre / Artiste décoratrice",
+          "neutral": "Peintre / Artiste décorateur·rice"
+        },
+        "r_dcf49adce47b": {
+          "masculine": "Sculpteur / Modeleur",
+          "feminine": "Sculptrice / Modeleuse",
+          "neutral": "Sculpteur·rice / Modeleur·se"
+        },
+        "r_f4670c7a29a7": {
+          "masculine": "Plâtrier décorateur / Sculpteur",
+          "feminine": "Plâtrière décoratrice / Sculptrice",
+          "neutral": "Plâtrier·ère décorateur·rice / Sculpteur·rice"
+        },
+        "r_5fc07d2f3030": {
+          "masculine": "Modeleur",
+          "feminine": "Modeleuse",
+          "neutral": "Modeleur·se"
+        },
+        "r_f545a993cec8": {
+          "masculine": "Superviseur miniatures",
+          "feminine": "Superviseuse miniatures",
+          "neutral": "Superviseur·se miniatures"
+        },
+        "r_d3f5fd4b86c3": {
+          "masculine": "Superviseur effets miniatures",
+          "feminine": "Superviseuse effets miniatures",
+          "neutral": "Superviseur·se effets miniatures"
+        },
+        "r_a6d3fd7eaada": {
+          "masculine": "Chef construction",
+          "feminine": "Cheffe construction",
+          "neutral": "Chef·fe construction"
+        },
+        "r_ca83b607f08e": {
+          "masculine": "Coordinateur construction",
+          "feminine": "Coordinatrice construction",
+          "neutral": "Coordinateur·rice construction"
+        },
+        "r_fbcfd1e1839b": {
+          "masculine": "Chef construction studio / plateau",
+          "feminine": "Cheffe construction studio / plateau",
+          "neutral": "Chef·fe construction studio / plateau"
+        },
+        "r_0231e128483a": {
+          "masculine": "Menuisier plateau",
+          "feminine": "Menuisière plateau",
+          "neutral": "Menuisier·ère plateau"
+        },
+        "r_62f07946c8f1": {
+          "masculine": "Équipe construction plateau",
+          "feminine": "Équipe construction plateau",
+          "neutral": "Équipe construction plateau"
+        },
+        "r_a3c94f3f3cd1": {
+          "masculine": "Chef plateau / construction",
+          "feminine": "Cheffe plateau / construction",
+          "neutral": "Chef·fe plateau / construction"
+        },
+        "r_c606af121ce8": {
+          "masculine": "Technicien plateau",
+          "feminine": "Technicienne plateau",
+          "neutral": "Technicien·ne plateau"
+        },
+        "r_2017ec503138": {
+          "masculine": "Dessinateur technique",
+          "feminine": "Dessinatrice technique",
+          "neutral": "Dessinateur·rice technique"
+        },
+        "r_169af74d49f6": {
+          "masculine": "Maçon (plateau)",
+          "feminine": "Maçonne (plateau)",
+          "neutral": "Maçon·ne (plateau)"
+        },
+        "r_578a92348ec6": {
+          "masculine": "Métallier",
+          "feminine": "Métallière",
+          "neutral": "Métallier·ère"
+        },
+        "r_6c7b48200cb3": {
+          "masculine": "Métallier (plateau)",
+          "feminine": "Métallière (plateau)",
+          "neutral": "Métallier·ère (plateau)"
+        },
+        "r_e7f7da33c876": {
+          "masculine": "Chef métallier (plateau)",
+          "feminine": "Cheffe métallière (plateau)",
+          "neutral": "Chef·fe métallier·ère (plateau)"
+        },
+        "r_027c0b61577d": {
+          "masculine": "Stucateur (plateau)",
+          "feminine": "Stucatrice (plateau)",
+          "neutral": "Stucateur·rice (plateau)"
+        },
+        "r_8d5fe63edbd3": {
+          "masculine": "Décorateur",
+          "feminine": "Décoratrice",
+          "neutral": "Décorateur·rice"
+        },
+        "r_61ab14bcf2c6": {
+          "masculine": "Menuisier / Ébéniste (plateau)",
+          "feminine": "Menuisière / Ébéniste (plateau)",
+          "neutral": "Menuisier·ère / Ébéniste (plateau)"
+        },
+        "r_3addd9ac0457": {
+          "masculine": "Tourneur / Ebeniste (plateau)",
+          "feminine": "Tourneuse / Ebeniste (plateau)",
+          "neutral": "Tourneur·se / Ebeniste (plateau)"
+        },
+        "r_be99bdf8e0ab": {
+          "masculine": "Coordinateur département artistique",
+          "feminine": "Coordinatrice département artistique",
+          "neutral": "Coordinateur·rice département artistique"
+        },
+        "r_9187325e0d84": {
+          "masculine": "Assistant coordinateur département artistique",
+          "feminine": "Assistante coordinatrice département artistique",
+          "neutral": "Assistant·e coordinateur·rice département artistique"
+        },
+        "r_a8af82f5e937": {
+          "masculine": "Assistant département artistique",
+          "feminine": "Assistante département artistique",
+          "neutral": "Assistant·e département artistique"
+        },
+        "r_8310307922eb": {
+          "masculine": "Stagiaire département artistique",
+          "feminine": "Stagiaire département artistique",
+          "neutral": "Stagiaire département artistique"
+        },
+        "r_f7d87853929b": {
+          "masculine": "Conducteur décoration plateau",
+          "feminine": "Conductrice décoration plateau",
+          "neutral": "Conducteur·rice décoration plateau"
+        },
+        "r_71506d96f350": {
+          "masculine": "Graphiste (département artistique)",
+          "feminine": "Graphiste (département artistique)",
+          "neutral": "Graphiste (département artistique)"
+        },
+        "r_dd224ea66364": {
+          "masculine": "Entretien des œuvres",
+          "feminine": "Entretien des œuvres",
+          "neutral": "Entretien des œuvres"
+        },
+        "r_b2e24af2a895": {
+          "masculine": "Artiste œuvre d’art",
+          "feminine": "Artiste œuvre d’art",
+          "neutral": "Artiste œuvre d’art"
+        },
+        "r_c399668f6f57": {
+          "masculine": "Superviseur informatique / vidéo",
+          "feminine": "Superviseuse informatique / vidéo",
+          "neutral": "Superviseur·se informatique / vidéo"
+        },
+        "r_d278f8dea5ee": {
+          "masculine": "Menuisier / construction plateau",
+          "feminine": "Menuisière / construction plateau",
+          "neutral": "Menuisier·ère / construction plateau"
+        },
+        "r_ed52a3596ba0": {
+          "masculine": "Équipe construction plateau",
+          "feminine": "Équipe construction plateau",
+          "neutral": "Équipe construction plateau"
+        },
+        "r_e3f39e455941": {
+          "masculine": "Assistant construction",
+          "feminine": "Assistante construction",
+          "neutral": "Assistant·e construction"
+        },
+        "r_74a60171830a": {
+          "masculine": "Construction plateau sous-marine",
+          "feminine": "Construction plateau sous-marine",
+          "neutral": "Construction plateau sous-marine"
+        },
+        "r_18c785ac7bd8": {
+          "masculine": "Gréage / Constructions spéciales",
+          "feminine": "Gréage / Constructions spéciales",
+          "neutral": "Gréage / Constructions spéciales"
+        },
+        "r_8f15fc164b86": {
+          "masculine": "Assistant dessinateur technique",
+          "feminine": "Assistante dessinatrice technique",
+          "neutral": "Assistant·e dessinateur·rice technique"
+        },
+        "r_7e3c819b39ed": {
+          "masculine": "Chef stucateur (plateau)",
+          "feminine": "Cheffe stucatrice (plateau)",
+          "neutral": "Chef·fe stucateur·rice (plateau)"
+        },
+        "r_24a7497a9f06": {
+          "masculine": "Tapissier plateau",
+          "feminine": "Tapissière plateau",
+          "neutral": "Tapissier·ère plateau"
+        },
+        "r_a279ae7e16ec": {
+          "masculine": "Chef tapissier plateau",
+          "feminine": "Cheffe tapissière plateau",
+          "neutral": "Chef·fe tapissier·ère plateau"
+        },
+        "r_0f2d76b6cc82": {
+          "masculine": "Chef menuisier (plateau)",
+          "feminine": "Cheffe menuisière (plateau)",
+          "neutral": "Chef·fe menuisier·ère (plateau)"
+        },
+        "r_08876b0452b5": {
+          "masculine": "Stagiaire département artistique",
+          "feminine": "Stagiaire département artistique",
+          "neutral": "Stagiaire département artistique"
+        }
+      },
+      "kostuem": {
+        "r_cfc0491e1daf": {
+          "masculine": "Créateur de costumes",
+          "feminine": "Créatrice de costumes",
+          "neutral": "Créateur·rice de costumes"
+        },
+        "r_acbff2b1675d": {
+          "masculine": "Superviseur costumes",
+          "feminine": "Superviseuse costumes",
+          "neutral": "Superviseur·se costumes"
+        },
+        "r_4e5a29f37fde": {
+          "masculine": "Assistant superviseur costumes",
+          "feminine": "Assistante superviseuse costumes",
+          "neutral": "Assistant·e superviseur·se costumes"
+        },
+        "r_9dacdd987a87": {
+          "masculine": "Coordinateur costumes",
+          "feminine": "Coordinatrice costumes",
+          "neutral": "Coordinateur·rice costumes"
+        },
+        "r_3ea2819cc8c4": {
+          "masculine": "Assistant coordinateur costumes",
+          "feminine": "Assistante coordinatrice costumes",
+          "neutral": "Assistant·e coordinateur·rice costumes"
+        },
+        "r_3684af682bde": {
+          "masculine": "Assistant créateur costumes",
+          "feminine": "Assistante créatrice costumes",
+          "neutral": "Assistant·e créateur·rice costumes"
+        },
+        "r_bca9201a3794": {
+          "masculine": "2e assistant créateur costumes",
+          "feminine": "2e assistante créatrice costumes",
+          "neutral": "2e assistant·e créateur·rice costumes"
+        },
+        "r_570a76c15c34": {
+          "masculine": "3e assistant créateur costumes",
+          "feminine": "3e assistante créatrice costumes",
+          "neutral": "3e assistant·e créateur·rice costumes"
+        },
+        "r_75358a18f698": {
+          "masculine": "Costumier principal",
+          "feminine": "Costumière principale",
+          "neutral": "Costumier·ère principal·e"
+        },
+        "r_df59c1f51566": {
+          "masculine": "Costumier plateau / Habilleur",
+          "feminine": "Costumière plateau / Habilleuse",
+          "neutral": "Costumier·ère plateau / Habilleur·se"
+        },
+        "r_7d1eb3e51b50": {
+          "masculine": "Costumier plateau supplémentaire",
+          "feminine": "Costumière plateau supplémentaire",
+          "neutral": "Costumier·ère plateau supplémentaire"
+        },
+        "r_aa38c8f5acdd": {
+          "masculine": "Assistant costumier plateau",
+          "feminine": "Assistante costumière plateau",
+          "neutral": "Assistant·e costumier·ère plateau"
+        },
+        "r_85a93499fa51": {
+          "masculine": "Superviseur costumes figurants",
+          "feminine": "Superviseuse costumes figurantes",
+          "neutral": "Superviseur·se costumes figurant·es"
+        },
+        "r_73f373881e68": {
+          "masculine": "Habilleur figurants",
+          "feminine": "Habilleuse figurantes",
+          "neutral": "Habilleur·se figurant·es"
+        },
+        "r_82daef37fafd": {
+          "masculine": "Costumier camion",
+          "feminine": "Costumière camion",
+          "neutral": "Costumier·ère camion"
+        },
+        "r_40f30fffbd6a": {
+          "masculine": "Acheteur costumes",
+          "feminine": "Acheteuse costumes",
+          "neutral": "Acheteur·se costumes"
+        },
+        "r_60a2042cfa65": {
+          "masculine": "Comptable costumes",
+          "feminine": "Comptable costumes",
+          "neutral": "Comptable costumes"
+        },
+        "r_6ece4b3c2f60": {
+          "masculine": "Chef de garde-robe",
+          "feminine": "Cheffe de garde-robe",
+          "neutral": "Chef·fe de garde-robe"
+        },
+        "r_bb614a4f62e2": {
+          "masculine": "Assistant costumes",
+          "feminine": "Assistante costumes",
+          "neutral": "Assistant·e costumes"
+        },
+        "r_86f8b66926fc": {
+          "masculine": "Stagiaire costumes",
+          "feminine": "Stagiaire costumes",
+          "neutral": "Stagiaire costumes"
+        },
+        "r_272717911d79": {
+          "masculine": "Tailleur",
+          "feminine": "Tailleuse",
+          "neutral": "Tailleur·se"
+        },
+        "r_3a35662b53a3": {
+          "masculine": "Opérateur machine à coudre",
+          "feminine": "Opératrice machine à coudre",
+          "neutral": "Opérateur·rice machine à coudre"
+        },
+        "r_298c04a0eec5": {
+          "masculine": "Artiste textile",
+          "feminine": "Artiste textile",
+          "neutral": "Artiste textile"
+        },
+        "r_2a6b1e3320f5": {
+          "masculine": "Créateur de costumes",
+          "feminine": "Créatrice de costumes",
+          "neutral": "Créateur·rice de costumes"
+        },
+        "r_066dc1f269bb": {
+          "masculine": "Fabricant d’accessoires de costume",
+          "feminine": "Fabricante d’accessoires de costume",
+          "neutral": "Fabricant·e d’accessoires de costume"
+        },
+        "r_83db0e1a7bff": {
+          "masculine": "Directeur",
+          "feminine": "Directrice",
+          "neutral": "Directeur·rice"
+        },
+        "r_fc8d26a01b37": {
+          "masculine": "Tailleur sur mesure femme",
+          "feminine": "Tailleuse sur mesure femme",
+          "neutral": "Tailleur·se sur mesure femme"
+        },
+        "r_9aaa9c423455": {
+          "masculine": "Tailleur sur mesure homme",
+          "feminine": "Tailleuse sur mesure homme",
+          "neutral": "Tailleur·se sur mesure homme"
+        },
+        "r_975bb2c38b93": {
+          "masculine": "Modiste",
+          "feminine": "Modiste",
+          "neutral": "Modiste"
+        },
+        "r_e5cb00d76add": {
+          "masculine": "Fabricant de corsets",
+          "feminine": "Fabricante de corsets",
+          "neutral": "Fabricant·e de corsets"
+        },
+        "r_f573123c66c5": {
+          "masculine": "Illustrateur costumes",
+          "feminine": "Illustratrice costumes",
+          "neutral": "Illustrateur·rice costumes"
+        },
+        "r_3218fd13d59c": {
+          "masculine": "Peintre / Teinturier costumes",
+          "feminine": "Peintre / Teinturier costumes",
+          "neutral": "Peintre / Teinturier costumes"
+        },
+        "r_f8c4b94e93de": {
+          "masculine": "Artiste vieillissement costumes",
+          "feminine": "Artiste vieillissement costumes",
+          "neutral": "Artiste vieillissement costumes"
+        },
+        "r_25bf82085577": {
+          "masculine": "Brodeur costumes",
+          "feminine": "Brodeuse costumes",
+          "neutral": "Brodeur·se costumes"
+        },
+        "r_4bd9dd09da1d": {
+          "masculine": "Chercheur costumes",
+          "feminine": "Chercheuse costumes",
+          "neutral": "Chercheur·se costumes"
+        },
+        "r_2efd6bda8664": {
+          "masculine": "Conducteur costumes",
+          "feminine": "Conductrice costumes",
+          "neutral": "Conducteur·rice costumes"
+        },
+        "r_a723a074986b": {
+          "masculine": "Artiste dégradation (vieillissement / usure)",
+          "feminine": "Artiste dégradation (vieillissement / usure)",
+          "neutral": "Artiste dégradation (vieillissement / usure)"
+        },
+        "r_ac01a53c578c": {
+          "masculine": "Costume SFX",
+          "feminine": "Costume SFX",
+          "neutral": "Costume SFX"
+        },
+        "r_bbc01e9dad81": {
+          "masculine": "Styliste / Assistant styliste",
+          "feminine": "Styliste / Assistante styliste",
+          "neutral": "Styliste / Assistant·e styliste"
+        },
+        "r_0cf394ee7640": {
+          "masculine": "Créateur costumes (design)",
+          "feminine": "Créatrice costumes (design)",
+          "neutral": "Créateur·rice costumes (design)"
+        },
+        "r_6e84493aa620": {
+          "masculine": "Consultant costumes",
+          "feminine": "Consultante costumes",
+          "neutral": "Consultant·e costumes"
+        },
+        "r_7673a5020856": {
+          "masculine": "Assistant création costumes",
+          "feminine": "Assistante création costumes",
+          "neutral": "Assistant·e création costumes"
+        },
+        "r_1ca2128245c1": {
+          "masculine": "Coordinateur département costumes",
+          "feminine": "Coordinatrice département costumes",
+          "neutral": "Coordinateur·rice département costumes"
+        },
+        "r_f707bb1f5992": {
+          "masculine": "Habilleur plateau",
+          "feminine": "Habilleuse plateau",
+          "neutral": "Habilleur·se plateau"
+        },
+        "r_cc15942423ce": {
+          "masculine": "Assistant habilleur plateau",
+          "feminine": "Assistante habilleuse plateau",
+          "neutral": "Assistant·e habilleur·se plateau"
+        },
+        "r_fa17db9ddd73": {
+          "masculine": "Styliste",
+          "feminine": "Styliste",
+          "neutral": "Styliste"
+        },
+        "r_510b1830a8a9": {
+          "masculine": "Assistant styliste",
+          "feminine": "Assistante styliste",
+          "neutral": "Assistant·e styliste"
+        },
+        "r_cc5427b5207e": {
+          "masculine": "Chef de garde-robe",
+          "feminine": "Cheffe de garde-robe",
+          "neutral": "Chef·fe de garde-robe"
+        },
+        "r_51e4b1b69e51": {
+          "masculine": "Tailleur femme",
+          "feminine": "Tailleuse femme",
+          "neutral": "Tailleur·se femme"
+        },
+        "r_c90f0f14aa1d": {
+          "masculine": "Tailleur homme",
+          "feminine": "Tailleuse homme",
+          "neutral": "Tailleur·se homme"
+        },
+        "r_b02e861df06e": {
+          "masculine": "Modiste / Chapelier",
+          "feminine": "Modiste / Chapelier",
+          "neutral": "Modiste / Chapelier"
+        },
+        "r_f4d2f92c7063": {
+          "masculine": "Fabricant de corsets",
+          "feminine": "Fabricante de corsets",
+          "neutral": "Fabricant·e de corsets"
+        },
+        "r_60b06eb1a3e5": {
+          "masculine": "Superviseur garde-robe",
+          "feminine": "Superviseuse garde-robe",
+          "neutral": "Superviseur·se garde-robe"
+        },
+        "r_b57d7945c2e1": {
+          "masculine": "Assistant costumes",
+          "feminine": "Assistante costumes",
+          "neutral": "Assistant·e costumes"
+        },
+        "r_2ac825cfa903": {
+          "masculine": "Tailleur",
+          "feminine": "Tailleuse",
+          "neutral": "Tailleur·se"
+        },
+        "r_f5c79a825c6d": {
+          "masculine": "Conducteur costumes",
+          "feminine": "Conductrice costumes",
+          "neutral": "Conducteur·rice costumes"
+        },
+        "r_d964234f1385": {
+          "masculine": "Couturier",
+          "feminine": "Couturière",
+          "neutral": "Couturier·ère"
+        },
+        "r_6371bcd4467e": {
+          "masculine": "Artiste vieillissement / dégradation costumes",
+          "feminine": "Artiste vieillissement / dégradation costumes",
+          "neutral": "Artiste vieillissement / dégradation costumes"
+        },
+        "r_93cc3465aeac": {
+          "masculine": "Peintre / Teinturier costumes",
+          "feminine": "Peintre / Teinturier costumes",
+          "neutral": "Peintre / Teinturier costumes"
+        },
+        "r_9f631f727b98": {
+          "masculine": "Brodeur costumes",
+          "feminine": "Brodeuse costumes",
+          "neutral": "Brodeur·se costumes"
+        },
+        "r_fd593b68c6bd": {
+          "masculine": "Illustrateur costumes",
+          "feminine": "Illustratrice costumes",
+          "neutral": "Illustrateur·rice costumes"
+        },
+        "r_52cc391775b8": {
+          "masculine": "Stagiaire création costumes",
+          "feminine": "Stagiaire création costumes",
+          "neutral": "Stagiaire création costumes"
+        }
+      },
+      "maske": {
+        "r_2cecb5bef109": {
+          "masculine": "Chef maquillage & coiffure",
+          "feminine": "Cheffe maquillage & coiffure",
+          "neutral": "Chef·fe maquillage & coiffure"
+        },
+        "r_8c46abf33a4b": {
+          "masculine": "Créateur coiffure",
+          "feminine": "Créatrice coiffure",
+          "neutral": "Créateur·rice coiffure"
+        },
+        "r_afd55563be09": {
+          "masculine": "Créateur maquillage & coiffure",
+          "feminine": "Créatrice maquillage & coiffure",
+          "neutral": "Créateur·rice maquillage & coiffure"
+        },
+        "r_0d2723e6a8cc": {
+          "masculine": "Créateur maquillage",
+          "feminine": "Créatrice maquillage",
+          "neutral": "Créateur·rice maquillage"
+        },
+        "r_b73ceeda53dd": {
+          "masculine": "Superviseur maquillage & coiffure",
+          "feminine": "Superviseuse maquillage & coiffure",
+          "neutral": "Superviseur·se maquillage & coiffure"
+        },
+        "r_913e5cf46a02": {
+          "masculine": "Maquilleur principal",
+          "feminine": "Maquilleuse principale",
+          "neutral": "Maquilleur·se principal·e"
+        },
+        "r_495a42f74fbb": {
+          "masculine": "Coiffeur principal",
+          "feminine": "Coiffeuse principale",
+          "neutral": "Coiffeur·se principal·e"
+        },
+        "r_ff414fc1a4e8": {
+          "masculine": "Maquilleur",
+          "feminine": "Maquilleuse",
+          "neutral": "Maquilleur·se"
+        },
+        "r_ace166547405": {
+          "masculine": "Maquilleur supplémentaire",
+          "feminine": "Maquilleuse supplémentaire",
+          "neutral": "Maquilleur·se supplémentaire"
+        },
+        "r_96cb48e2539d": {
+          "masculine": "Coiffeur",
+          "feminine": "Coiffeuse",
+          "neutral": "Coiffeur·se"
+        },
+        "r_3a06bbd5516b": {
+          "masculine": "Coiffeur supplémentaire",
+          "feminine": "Coiffeuse supplémentaire",
+          "neutral": "Coiffeur·se supplémentaire"
+        },
+        "r_a8a061642ea1": {
+          "masculine": "Chef département maquillage",
+          "feminine": "Cheffe département maquillage",
+          "neutral": "Chef·fe département maquillage"
+        },
+        "r_988255c043c0": {
+          "masculine": "Maquillage corporel",
+          "feminine": "Maquillage corporel",
+          "neutral": "Maquillage corporel"
+        },
+        "r_62302b472d3b": {
+          "masculine": "Maquilleur supplémentaire",
+          "feminine": "Maquilleuse supplémentaire",
+          "neutral": "Maquilleur·se supplémentaire"
+        },
+        "r_de6fbe18e529": {
+          "masculine": "Assistant maquillage",
+          "feminine": "Assistante maquillage",
+          "neutral": "Assistant·e maquillage"
+        },
+        "r_89708da23c7a": {
+          "masculine": "Fabricant perruques",
+          "feminine": "Fabricante perruques",
+          "neutral": "Fabricant·e perruques"
+        },
+        "r_eb0f745569de": {
+          "masculine": "Artiste prothèses",
+          "feminine": "Artiste prothèses",
+          "neutral": "Artiste prothèses"
+        },
+        "r_bc667775a067": {
+          "masculine": "Maquillage effets spéciaux",
+          "feminine": "Maquillage effets spéciaux",
+          "neutral": "Maquillage effets spéciaux"
+        },
+        "r_a27c177f51ef": {
+          "masculine": "Superviseur coiffure & maquillage figurants",
+          "feminine": "Superviseuse coiffure & maquillage figurantes",
+          "neutral": "Superviseur·se coiffure & maquillage figurant·es"
+        },
+        "r_e46c728a4398": {
+          "masculine": "Stagiaire maquillage",
+          "feminine": "Stagiaire maquillage",
+          "neutral": "Stagiaire maquillage"
+        },
+        "r_3bd74d7ca372": {
+          "masculine": "Maquilleur principal",
+          "feminine": "Maquilleuse principale",
+          "neutral": "Maquilleur·se principal·e"
+        },
+        "r_1dbe2290254a": {
+          "masculine": "Chef département maquillage",
+          "feminine": "Cheffe département maquillage",
+          "neutral": "Chef·fe département maquillage"
+        },
+        "r_3e08c4bedcc0": {
+          "masculine": "Artiste maquillage corporel",
+          "feminine": "Artiste maquillage corporel",
+          "neutral": "Artiste maquillage corporel"
+        },
+        "r_24c9ee41124f": {
+          "masculine": "Maquilleur supplémentaire",
+          "feminine": "Maquilleuse supplémentaire",
+          "neutral": "Maquilleur·se supplémentaire"
+        },
+        "r_6373cbbea77f": {
+          "masculine": "Fabricant perruques",
+          "feminine": "Fabricante perruques",
+          "neutral": "Fabricant·e perruques"
+        },
+        "r_e9a07f599b31": {
+          "masculine": "Stagiaire maquillage",
+          "feminine": "Stagiaire maquillage",
+          "neutral": "Stagiaire maquillage"
+        }
+      },
+      "post": {
+        "r_f88d95239ea1": {
+          "masculine": "Producteur postproduction",
+          "feminine": "Productrice postproduction",
+          "neutral": "Producteur·rice postproduction"
+        },
+        "r_4284177c72b3": {
+          "masculine": "Superviseur postproduction",
+          "feminine": "Superviseuse postproduction",
+          "neutral": "Superviseur·se postproduction"
+        },
+        "r_c2fb80f3e981": {
+          "masculine": "Responsable postproduction",
+          "feminine": "Responsable postproduction",
+          "neutral": "Responsable postproduction"
+        },
+        "r_78b6f4ddb08c": {
+          "masculine": "Coordinateur de postproduction",
+          "feminine": "Coordinatrice de postproduction",
+          "neutral": "Coordinateur·rice de postproduction"
+        },
+        "r_0bb7e59012ae": {
+          "masculine": "Planificateur de postproduction",
+          "feminine": "Planificatrice de postproduction",
+          "neutral": "Planificateur·rice de postproduction"
+        },
+        "r_b54fb6f974fa": {
+          "masculine": "Assistant du superviseur de postproduction",
+          "feminine": "Assistante du superviseur de postproduction",
+          "neutral": "Assistant·e du superviseur de postproduction"
+        },
+        "r_fae43b642354": {
+          "masculine": "Responsable / Superviseur de livraison",
+          "feminine": "Responsable / Superviseuse de livraison",
+          "neutral": "Responsable / Superviseur·se de livraison"
+        },
+        "r_54b281a42495": {
+          "masculine": "Monteur",
+          "feminine": "Monteuse",
+          "neutral": "Monteur·se"
+        },
+        "r_eb67aee95450": {
+          "masculine": "Monteur de film",
+          "feminine": "Monteuse de film",
+          "neutral": "Monteur·se de film"
+        },
+        "r_332deef8530f": {
+          "masculine": "Monteur supplémentaire",
+          "feminine": "Monteuse supplémentaire",
+          "neutral": "Monteur·se supplémentaire"
+        },
+        "r_4b8538db6e6e": {
+          "masculine": "Monteur junior",
+          "feminine": "Monteuse junior",
+          "neutral": "Monteur·se junior"
+        },
+        "r_a000c69c93cd": {
+          "masculine": "Premier assistant monteur",
+          "feminine": "Première assistante monteuse",
+          "neutral": "Premier·ère assistant·e monteur·se"
+        },
+        "r_fb53d3bb0ca0": {
+          "masculine": "Assistant monteur",
+          "feminine": "Assistante monteuse",
+          "neutral": "Assistant·e monteur·se"
+        },
+        "r_58fb452bb25d": {
+          "masculine": "Second assistant monteur",
+          "feminine": "Seconde assistante monteuse",
+          "neutral": "Second·e assistant·e monteur·se"
+        },
+        "r_e73f1067c3d0": {
+          "masculine": "Second assistant monteur",
+          "feminine": "Seconde assistante monteuse",
+          "neutral": "Second·e assistant·e monteur·se"
+        },
+        "r_f40a64b53f4e": {
+          "masculine": "Troisième assistant monteur",
+          "feminine": "Troisième assistante monteuse",
+          "neutral": "Troisième assistant·e monteur·se"
+        },
+        "r_f034db9da000": {
+          "masculine": "Dramaturge de montage",
+          "feminine": "Dramaturge de montage",
+          "neutral": "Dramaturge de montage"
+        },
+        "r_9d8fc1953afd": {
+          "masculine": "Monteur VFX",
+          "feminine": "Monteuse VFX",
+          "neutral": "Monteur·se VFX"
+        },
+        "r_6742bca7f725": {
+          "masculine": "Monteur de bande-annonce",
+          "feminine": "Monteuse de bande-annonce",
+          "neutral": "Monteur·se de bande-annonce"
+        },
+        "r_0088f1d1581d": {
+          "masculine": "Monteur de rushes",
+          "feminine": "Monteuse de rushes",
+          "neutral": "Monteur·se de rushes"
+        },
+        "r_855df6fe84d9": {
+          "masculine": "Assistant de synchronisation",
+          "feminine": "Assistante de synchronisation",
+          "neutral": "Assistant·e de synchronisation"
+        },
+        "r_76fe5605aea7": {
+          "masculine": "Opérateur Avid",
+          "feminine": "Opératrice Avid",
+          "neutral": "Opérateur·rice Avid"
+        },
+        "r_9a37f1a2f07c": {
+          "masculine": "Opérateur Final Cut",
+          "feminine": "Opératrice Final Cut",
+          "neutral": "Opérateur·rice Final Cut"
+        },
+        "r_5c291075de55": {
+          "masculine": "Étalonneur / DI",
+          "feminine": "Étalonneuse / DI",
+          "neutral": "Étalonneur·se / DI"
+        },
+        "r_ee3d75537a1f": {
+          "masculine": "Monteur en ligne",
+          "feminine": "Monteuse en ligne",
+          "neutral": "Monteur·se en ligne"
+        },
+        "r_24e3087423e1": {
+          "masculine": "Artiste de finition",
+          "feminine": "Artiste de finition",
+          "neutral": "Artiste de finition"
+        },
+        "r_1b9c5df34287": {
+          "masculine": "Concepteur d’écran",
+          "feminine": "Conceptrice d’écran",
+          "neutral": "Concepteur·rice d’écran"
+        },
+        "r_0c866fbdd1b9": {
+          "masculine": "Concepteur de titres",
+          "feminine": "Conceptrice de titres",
+          "neutral": "Concepteur·rice de titres"
+        },
+        "r_cac32c0c1a16": {
+          "masculine": "Technicien DCP",
+          "feminine": "Technicienne DCP",
+          "neutral": "Technicien·ne DCP"
+        },
+        "r_3bf9436831af": {
+          "masculine": "Opérateur Filmscan",
+          "feminine": "Opératrice Filmscan",
+          "neutral": "Opérateur·rice Filmscan"
+        },
+        "r_0c4887e0a1b6": {
+          "masculine": "Superviseur Filmscanning",
+          "feminine": "Superviseuse Filmscanning",
+          "neutral": "Superviseur·se Filmscanning"
+        },
+        "r_85f36a10ca63": {
+          "masculine": "Superviseur VFX",
+          "feminine": "Superviseuse VFX",
+          "neutral": "Superviseur·se VFX"
+        },
+        "r_3690883b97f2": {
+          "masculine": "Producteur VFX",
+          "feminine": "Productrice VFX",
+          "neutral": "Producteur·rice VFX"
+        },
+        "r_01122a78805d": {
+          "masculine": "Coordinateur VFX",
+          "feminine": "Coordinatrice VFX",
+          "neutral": "Coordinateur·rice VFX"
+        },
+        "r_4c1b3c0e7030": {
+          "masculine": "Responsable production VFX",
+          "feminine": "Responsable production VFX",
+          "neutral": "Responsable production VFX"
+        },
+        "r_b11b0566c205": {
+          "masculine": "Producteur externalisation VFX",
+          "feminine": "Productrice externalisation VFX",
+          "neutral": "Producteur·rice externalisation VFX"
+        },
+        "r_061d09311a06": {
+          "masculine": "Assistant producteur VFX",
+          "feminine": "Assistante productrice VFX",
+          "neutral": "Assistant·e producteur·rice VFX"
+        },
+        "r_c20adc0c544f": {
+          "masculine": "Superviseur animation VFX",
+          "feminine": "Superviseuse animation VFX",
+          "neutral": "Superviseur·se animation VFX"
+        },
+        "r_ef84bdb88ead": {
+          "masculine": "Producteur VR",
+          "feminine": "Productrice VR",
+          "neutral": "Producteur·rice VR"
+        },
+        "r_33a9c6da17ea": {
+          "masculine": "Compositeur",
+          "feminine": "Compositrice",
+          "neutral": "Compositeur·rice"
+        },
+        "r_aca1c9874a93": {
+          "masculine": "Superviseur compositing",
+          "feminine": "Superviseuse compositing",
+          "neutral": "Superviseur·se compositing"
+        },
+        "r_74803d65a47d": {
+          "masculine": "Compositeur numérique",
+          "feminine": "Compositrice numérique",
+          "neutral": "Compositeur·rice numérique"
+        },
+        "r_a61ab2d8897e": {
+          "masculine": "Superviseur effets numériques",
+          "feminine": "Superviseuse effets numériques",
+          "neutral": "Superviseur·se effets numériques"
+        },
+        "r_41f1fab43430": {
+          "masculine": "Concepteur effets numériques",
+          "feminine": "Conceptrice effets numériques",
+          "neutral": "Concepteur·rice effets numériques"
+        },
+        "r_09a4c7b8c909": {
+          "masculine": "Peintre matte numérique",
+          "feminine": "Peintre matte numérique",
+          "neutral": "Peintre matte numérique"
+        },
+        "r_1df80b2df510": {
+          "masculine": "Artiste 2D",
+          "feminine": "Artiste 2D",
+          "neutral": "Artiste 2D"
+        },
+        "r_c5222c873ae5": {
+          "masculine": "Artiste 3D",
+          "feminine": "Artiste 3D",
+          "neutral": "Artiste 3D"
+        },
+        "r_f1d016eba483": {
+          "masculine": "Artiste éclairage (CG)",
+          "feminine": "Artiste éclairage (CG)",
+          "neutral": "Artiste éclairage (CG)"
+        },
+        "r_1374d004f892": {
+          "masculine": "Artiste textures",
+          "feminine": "Artiste textures",
+          "neutral": "Artiste textures"
+        },
+        "r_ca0826d47a19": {
+          "masculine": "Artiste matchmove",
+          "feminine": "Artiste matchmove",
+          "neutral": "Artiste matchmove"
+        },
+        "r_272f028d80c7": {
+          "masculine": "Artiste roto",
+          "feminine": "Artiste roto",
+          "neutral": "Artiste roto"
+        },
+        "r_fb2a18a56ba5": {
+          "masculine": "Artiste FX",
+          "feminine": "Artiste FX",
+          "neutral": "Artiste FX"
+        },
+        "r_89c1660cb356": {
+          "masculine": "Animateur",
+          "feminine": "Animatrice",
+          "neutral": "Animateur·rice"
+        },
+        "r_2efa5e8c0d5f": {
+          "masculine": "Designer motion",
+          "feminine": "Designer motion",
+          "neutral": "Designer motion"
+        },
+        "r_c2053cb7660f": {
+          "masculine": "Animateur de personnages",
+          "feminine": "Animatrice de personnages",
+          "neutral": "Animateur·rice de personnages"
+        },
+        "r_247d43bdfb47": {
+          "masculine": "Assistant postproduction",
+          "feminine": "Assistante postproduction",
+          "neutral": "Assistant·e postproduction"
+        },
+        "r_e2802de21986": {
+          "masculine": "Technicien postproduction",
+          "feminine": "Technicienne postproduction",
+          "neutral": "Technicien·ne postproduction"
+        },
+        "r_1f9c7a9f75a8": {
+          "masculine": "Stagiaire montage",
+          "feminine": "Stagiaire montage",
+          "neutral": "Stagiaire montage"
+        },
+        "r_bf7027763437": {
+          "masculine": "Coordinateur postproduction",
+          "feminine": "Coordinatrice postproduction",
+          "neutral": "Coordinateur·rice postproduction"
+        },
+        "r_fc841e10fe4f": {
+          "masculine": "Assistant du superviseur de postproduction",
+          "feminine": "Assistante du superviseur de postproduction",
+          "neutral": "Assistant·e du superviseur de postproduction"
+        },
+        "r_a79df89d104c": {
+          "masculine": "Artiste / Compositeur VFX",
+          "feminine": "Artiste / Compositrice VFX",
+          "neutral": "Artiste / Compositeur·rice VFX"
+        },
+        "r_2a16dc4c4550": {
+          "masculine": "Concepteur sonore",
+          "feminine": "Conceptrice sonore",
+          "neutral": "Concepteur·rice sonore"
+        },
+        "r_b96fddf3696f": {
+          "masculine": "Monteur son",
+          "feminine": "Monteuse son",
+          "neutral": "Monteur·se son"
+        },
+        "r_a903b5656a8c": {
+          "masculine": "Artiste DCP",
+          "feminine": "Artiste DCP",
+          "neutral": "Artiste DCP"
+        },
+        "r_774ffd708e0e": {
+          "masculine": "Opérateur film recorder",
+          "feminine": "Opératrice film recorder",
+          "neutral": "Opérateur·rice film recorder"
+        },
+        "r_8685aa8f2a95": {
+          "masculine": "Opérateur Mistika",
+          "feminine": "Opératrice Mistika",
+          "neutral": "Opérateur·rice Mistika"
+        },
+        "r_9b86e6dde935": {
+          "masculine": "Directeur technique VFX",
+          "feminine": "Directrice technique VFX",
+          "neutral": "Directeur·rice technique VFX"
+        },
+        "r_ab44975f8351": {
+          "masculine": "Consultant VFX",
+          "feminine": "Consultante VFX",
+          "neutral": "Consultant·e VFX"
+        },
+        "r_6a2814e6546b": {
+          "masculine": "Superviseur éclairage VFX",
+          "feminine": "Superviseuse éclairage VFX",
+          "neutral": "Superviseur·se éclairage VFX"
+        },
+        "r_c043402107e7": {
+          "masculine": "Superviseur plateau VFX",
+          "feminine": "Superviseuse plateau VFX",
+          "neutral": "Superviseur·se plateau VFX"
+        },
+        "r_2d4e2d1e1c2c": {
+          "masculine": "Coordinateur production VFX",
+          "feminine": "Coordinatrice production VFX",
+          "neutral": "Coordinateur·rice production VFX"
+        },
+        "r_3a24d45a3a71": {
+          "masculine": "Assistant coordinateur VFX",
+          "feminine": "Assistante coordinatrice VFX",
+          "neutral": "Assistant·e coordinateur·rice VFX"
+        },
+        "r_a2d3fd026c27": {
+          "masculine": "Cadre VFX",
+          "feminine": "Cadre VFX",
+          "neutral": "Cadre VFX"
+        },
+        "r_1d0ffcaee2f8": {
+          "masculine": "Responsable RH VFX",
+          "feminine": "Responsable RH VFX",
+          "neutral": "Responsable RH VFX"
+        },
+        "r_6eb353601a03": {
+          "masculine": "Administrateur IT VFX",
+          "feminine": "Administratrice IT VFX",
+          "neutral": "Administrateur·rice IT VFX"
+        },
+        "r_e70450322709": {
+          "masculine": "Support IT VFX",
+          "feminine": "Support IT VFX",
+          "neutral": "Support IT VFX"
+        },
+        "r_71a68d7195b5": {
+          "masculine": "Ingénieur système IT VFX",
+          "feminine": "Ingénieure système IT VFX",
+          "neutral": "Ingénieur·e système IT VFX"
+        },
+        "r_30de176c3d86": {
+          "masculine": "Directeur technique pipeline",
+          "feminine": "Directrice technique pipeline",
+          "neutral": "Directeur·rice technique pipeline"
+        },
+        "r_3021537edab0": {
+          "masculine": "Superviseur des images de synthèse",
+          "feminine": "Superviseuse des images de synthèse",
+          "neutral": "Superviseur·se des images de synthèse"
+        },
+        "r_0d4cd83ac5f0": {
+          "masculine": "Développeur logiciel CG",
+          "feminine": "Développeuse logiciel CG",
+          "neutral": "Développeur·se logiciel CG"
+        },
+        "r_4d7b70afc38f": {
+          "masculine": "Concept artist (VFX)",
+          "feminine": "Concept artist (VFX)",
+          "neutral": "Concept artist (VFX)"
+        },
+        "r_1d77801b6bcb": {
+          "masculine": "Designer de personnages",
+          "feminine": "Designer de personnages",
+          "neutral": "Designer de personnages"
+        },
+        "r_2eeabfb3e033": {
+          "masculine": "Superviseur de personnages",
+          "feminine": "Superviseuse de personnages",
+          "neutral": "Superviseur·se de personnages"
+        },
+        "r_d4054cc011f7": {
+          "masculine": "Superviseur animatronique",
+          "feminine": "Superviseuse animatronique",
+          "neutral": "Superviseur·se animatronique"
+        },
+        "r_27773325d503": {
+          "masculine": "Superviseur prévisualisation",
+          "feminine": "Superviseuse prévisualisation",
+          "neutral": "Superviseur·se prévisualisation"
+        },
+        "r_4e65539d8bde": {
+          "masculine": "Artiste prévisualisation",
+          "feminine": "Artiste prévisualisation",
+          "neutral": "Artiste prévisualisation"
+        },
+        "r_09f34347e5ee": {
+          "masculine": "Superviseur capture de mouvement",
+          "feminine": "Superviseuse capture de mouvement",
+          "neutral": "Superviseur·se capture de mouvement"
+        },
+        "r_96c37e1de0fa": {
+          "masculine": "Superviseur motion control",
+          "feminine": "Superviseuse motion control",
+          "neutral": "Superviseur·se motion control"
+        },
+        "r_733686f9ae97": {
+          "masculine": "Opérateur rushes",
+          "feminine": "Opératrice rushes",
+          "neutral": "Opérateur·rice rushes"
+        },
+        "r_ab703255dec3": {
+          "masculine": "Coordinateur I/O",
+          "feminine": "Coordinatrice I/O",
+          "neutral": "Coordinateur·rice I/O"
+        },
+        "r_75540ed9967e": {
+          "masculine": "Opérateur télécinéma",
+          "feminine": "Opératrice télécinéma",
+          "neutral": "Opérateur·rice télécinéma"
+        },
+        "r_6c17929b4f69": {
+          "masculine": "Matchmover numérique",
+          "feminine": "Matchmover numérique",
+          "neutral": "Matchmover numérique"
+        },
+        "r_2646f9b4aadf": {
+          "masculine": "Artiste rotoscopie",
+          "feminine": "Artiste rotoscopie",
+          "neutral": "Artiste rotoscopie"
+        },
+        "r_1abce9757421": {
+          "masculine": "Gestionnaire d’actifs numériques (DAM)",
+          "feminine": "Gestionnaire d’actifs numériques (DAM)",
+          "neutral": "Gestionnaire d’actifs numériques (DAM)"
+        },
+        "r_e28081bd8659": {
+          "masculine": "Superviseur DI",
+          "feminine": "Superviseuse DI",
+          "neutral": "Superviseur·se DI"
+        },
+        "r_3be4ac15eccc": {
+          "masculine": "Ingénieur intermédiaire numérique",
+          "feminine": "Ingénieure intermédiaire numérique",
+          "neutral": "Ingénieur·e intermédiaire numérique"
+        },
+        "r_ac6763f1d04b": {
+          "masculine": "Assistant intermédiaire numérique",
+          "feminine": "Assistante intermédiaire numérique",
+          "neutral": "Assistant·e intermédiaire numérique"
+        },
+        "r_68b5ed487d7c": {
+          "masculine": "Gestionnaire des données VFX",
+          "feminine": "Gestionnaire des données VFX",
+          "neutral": "Gestionnaire des données VFX"
+        },
+        "r_98875c546157": {
+          "masculine": "Gestionnaire rendu",
+          "feminine": "Gestionnaire rendu",
+          "neutral": "Gestionnaire rendu"
+        },
+        "r_37de85ee2914": {
+          "masculine": "Superviseur 3D stéréo",
+          "feminine": "Superviseuse 3D stéréo",
+          "neutral": "Superviseur·se 3D stéréo"
+        },
+        "r_138f0f7f11c5": {
+          "masculine": "Opérateur playback plateau",
+          "feminine": "Opératrice playback plateau",
+          "neutral": "Opérateur·rice playback plateau"
+        },
+        "r_6c52a0b17c05": {
+          "masculine": "Stagiaire VFX",
+          "feminine": "Stagiaire VFX",
+          "neutral": "Stagiaire VFX"
+        },
+        "r_1a1b5684e757": {
+          "masculine": "Assistant production VFX",
+          "feminine": "Assistante production VFX",
+          "neutral": "Assistant·e production VFX"
+        },
+        "r_03863e1fa165": {
+          "masculine": "Chef d’équipe VFX",
+          "feminine": "Cheffe d’équipe VFX",
+          "neutral": "Chef·fe d’équipe VFX"
+        },
+        "r_0006a71a7050": {
+          "masculine": "Responsable 3D",
+          "feminine": "Responsable 3D",
+          "neutral": "Responsable 3D"
+        },
+        "r_9ad285824801": {
+          "masculine": "Directeur animation 3D",
+          "feminine": "Directrice animation 3D",
+          "neutral": "Directeur·rice animation 3D"
+        },
+        "r_365169e4e39c": {
+          "masculine": "Animateur personnage principal 3D",
+          "feminine": "Animatrice personnage principale 3D",
+          "neutral": "Animateur·rice personnage principal·e 3D"
+        },
+        "r_6dac25e38271": {
+          "masculine": "Animateur personnage 3D",
+          "feminine": "Animatrice personnage 3D",
+          "neutral": "Animateur·rice personnage 3D"
+        },
+        "r_18b24b362b8f": {
+          "masculine": "Rigger 3D",
+          "feminine": "Rigger 3D",
+          "neutral": "Rigger 3D"
+        },
+        "r_b6265894c01c": {
+          "masculine": "Modeleur 3D",
+          "feminine": "Modeleuse 3D",
+          "neutral": "Modeleur·se 3D"
+        },
+        "r_401ce457432d": {
+          "masculine": "Lumiériste 3D",
+          "feminine": "Lumiériste 3D",
+          "neutral": "Lumiériste 3D"
+        },
+        "r_d6c0df6758d4": {
+          "masculine": "Textureur 3D",
+          "feminine": "Textureuse 3D",
+          "neutral": "Textureur·se 3D"
+        },
+        "r_aff4837ba039": {
+          "masculine": "Artiste caméra 3D",
+          "feminine": "Artiste caméra 3D",
+          "neutral": "Artiste caméra 3D"
+        },
+        "r_01ea52ed92df": {
+          "masculine": "Superviseur caméra 3D",
+          "feminine": "Superviseuse caméra 3D",
+          "neutral": "Superviseur·se caméra 3D"
+        },
+        "r_1b2a5f055d73": {
+          "masculine": "Animateur FX",
+          "feminine": "Animatrice FX",
+          "neutral": "Animateur·rice FX"
+        },
+        "r_25d305ae2181": {
+          "masculine": "Animateur particules",
+          "feminine": "Animatrice particules",
+          "neutral": "Animateur·rice particules"
+        },
+        "r_493348eeb5c9": {
+          "masculine": "Rigger 2D",
+          "feminine": "Rigger 2D",
+          "neutral": "Rigger 2D"
+        },
+        "r_50d612c5929c": {
+          "masculine": "Directeur animation 2D",
+          "feminine": "Directrice animation 2D",
+          "neutral": "Directeur·rice animation 2D"
+        },
+        "r_5b75d1dcc3ba": {
+          "masculine": "Animateur personnage principal 2D",
+          "feminine": "Animatrice personnage principale 2D",
+          "neutral": "Animateur·rice personnage principal·e 2D"
+        },
+        "r_d3bed7009009": {
+          "masculine": "Animateur personnage 2D",
+          "feminine": "Animatrice personnage 2D",
+          "neutral": "Animateur·rice personnage 2D"
+        },
+        "r_b9b34ba4ee44": {
+          "masculine": "Artiste MotionBuilder",
+          "feminine": "Artiste MotionBuilder",
+          "neutral": "Artiste MotionBuilder"
+        },
+        "r_40ba6442d974": {
+          "masculine": "Opérateur MotionBuilder",
+          "feminine": "Opératrice MotionBuilder",
+          "neutral": "Opérateur·rice MotionBuilder"
+        }
+      },
+      "musik": {
+        "r_4b516c3014b1": {
+          "masculine": "Compositeur",
+          "feminine": "Compositrice",
+          "neutral": "Compositeur·rice"
+        },
+        "r_78a8b7bafdcf": {
+          "masculine": "Musique additionnelle",
+          "feminine": "Musique additionnelle",
+          "neutral": "Musique additionnelle"
+        },
+        "r_be9c85f652ee": {
+          "masculine": "Compositeur bande-annonce",
+          "feminine": "Compositrice bande-annonce",
+          "neutral": "Compositeur·rice bande-annonce"
+        },
+        "r_d052f25322c5": {
+          "masculine": "Directeur musical",
+          "feminine": "Directrice musical",
+          "neutral": "Directeur·rice musical"
+        },
+        "r_520348654852": {
+          "masculine": "Directeur musical",
+          "feminine": "Directrice musical",
+          "neutral": "Directeur·rice musical"
+        },
+        "r_d614bde7c500": {
+          "masculine": "Superviseur musical",
+          "feminine": "Superviseuse musical",
+          "neutral": "Superviseur·se musical"
+        },
+        "r_1f0d7374bb4c": {
+          "masculine": "Orchestrateur",
+          "feminine": "Orchestratrice",
+          "neutral": "Orchestrateur·rice"
+        },
+        "r_aa4b42f84387": {
+          "masculine": "Arrangeur",
+          "feminine": "Arrangeuse",
+          "neutral": "Arrangeur·se"
+        },
+        "r_8c334f2ac9d3": {
+          "masculine": "Arrangeur",
+          "feminine": "Arrangeuse",
+          "neutral": "Arrangeur·se"
+        },
+        "r_fe19755b0b9e": {
+          "masculine": "Chef d’orchestre",
+          "feminine": "Cheffe d’orchestre",
+          "neutral": "Chef·fe d’orchestre"
+        },
+        "r_73021f352efb": {
+          "masculine": "Chef d’orchestre",
+          "feminine": "Cheffe d’orchestre",
+          "neutral": "Chef·fe d’orchestre"
+        },
+        "r_1a95751341fb": {
+          "masculine": "Monteur musical",
+          "feminine": "Monteuse musical",
+          "neutral": "Monteur·se musical"
+        },
+        "r_8fd3dbb18e49": {
+          "masculine": "Copiste musical",
+          "feminine": "Copiste musical",
+          "neutral": "Copiste musical"
+        },
+        "r_d5e57768aab8": {
+          "masculine": "Producteur musical",
+          "feminine": "Productrice musical",
+          "neutral": "Producteur·rice musical"
+        },
+        "r_0e9738be9045": {
+          "masculine": "Consultant musical",
+          "feminine": "Consultante musical",
+          "neutral": "Consultant·e musical"
+        },
+        "r_82e1a4d8181e": {
+          "masculine": "Coordinateur musical",
+          "feminine": "Coordinatrice musical",
+          "neutral": "Coordinateur·rice musical"
+        },
+        "r_00bc34dec4f3": {
+          "masculine": "Opérateur Logic",
+          "feminine": "Opératrice Logic",
+          "neutral": "Opérateur·rice Logic"
+        },
+        "r_0eae67a415cd": {
+          "masculine": "Opérateur Pro Tools",
+          "feminine": "Opératrice Pro Tools",
+          "neutral": "Opérateur·rice Pro Tools"
+        },
+        "r_52aa8c6866dc": {
+          "masculine": "Assistant compositeur",
+          "feminine": "Assistante compositrice",
+          "neutral": "Assistant·e compositeur·rice"
+        },
+        "r_3e66ad9f45e2": {
+          "masculine": "Musicien",
+          "feminine": "Musicienne",
+          "neutral": "Musicien·ne"
+        },
+        "r_ade18645efa3": {
+          "masculine": "Monteur son",
+          "feminine": "Monteuse son",
+          "neutral": "Monteur·se son"
+        },
+        "r_0972afcc1e55": {
+          "masculine": "Stagiaire compositeur",
+          "feminine": "Stagiaire compositrice",
+          "neutral": "Stagiaire compositeur·rice"
+        },
+        "r_801e363423c3": {
+          "masculine": "Producteur exécutif de la bande originale",
+          "feminine": "Productrice exécutive de la bande originale",
+          "neutral": "Producteur·rice exécutif·ve de la bande originale"
+        }
+      },
+      "set-logistik": {
+        "r_06d9aa28368f": {
+          "masculine": "Coursier",
+          "feminine": "Coursière",
+          "neutral": "Coursier·ère"
+        },
+        "r_51e581b5ea39": {
+          "masculine": "Chauffeur / Chauffeur (voiture / poids lourd)",
+          "feminine": "Chauffeuse / Chauffeuse (voiture / poids lourd)",
+          "neutral": "Chauffeur·se / Chauffeur·se (voiture / poids lourd)"
+        },
+        "r_36a599628c2e": {
+          "masculine": "Conducteur de plateau",
+          "feminine": "Conductrice de plateau",
+          "neutral": "Conducteur·rice de plateau"
+        },
+        "r_9bc1a35535fa": {
+          "masculine": "Responsable unité de plateau",
+          "feminine": "Responsable unité de plateau",
+          "neutral": "Responsable unité de plateau"
+        },
+        "r_273f12c52b95": {
+          "masculine": "Assistant responsable de plateau",
+          "feminine": "Assistante responsable de plateau",
+          "neutral": "Assistant·e responsable de plateau"
+        },
+        "r_ad61df711cdf": {
+          "masculine": "Sécurité plateau",
+          "feminine": "Sécurité plateau",
+          "neutral": "Sécurité plateau"
+        },
+        "r_16476d55e646": {
+          "masculine": "Contrôle de foule",
+          "feminine": "Contrôle de foule",
+          "neutral": "Contrôle de foule"
+        },
+        "r_d4d0eb9a01ad": {
+          "masculine": "Directeur de mouvement",
+          "feminine": "Directrice de mouvement",
+          "neutral": "Directeur·rice de mouvement"
+        },
+        "r_3c6a65ecb046": {
+          "masculine": "Coach en mouvement",
+          "feminine": "Coach en mouvement",
+          "neutral": "Coach en mouvement"
+        },
+        "r_c66e045ffbbf": {
+          "masculine": "Coordinateur d’intimité",
+          "feminine": "Coordinatrice d’intimité",
+          "neutral": "Coordinateur·rice d’intimité"
+        },
+        "r_2e9dcd12712e": {
+          "masculine": "Chorégraphe",
+          "feminine": "Chorégraphe",
+          "neutral": "Chorégraphe"
+        },
+        "r_6f899f66fa58": {
+          "masculine": "Coach de danse",
+          "feminine": "Coach de danse",
+          "neutral": "Coach de danse"
+        },
+        "r_f4a45af86f47": {
+          "masculine": "Coach de chant / Coach vocal",
+          "feminine": "Coach de chant / Coach vocal",
+          "neutral": "Coach de chant / Coach vocal"
+        },
+        "r_6e8ad217ef2f": {
+          "masculine": "Coach de dialogue",
+          "feminine": "Coach de dialogue",
+          "neutral": "Coach de dialogue"
+        },
+        "r_63787dc385b1": {
+          "masculine": "Coach en dialecte / langue",
+          "feminine": "Coach en dialecte / langue",
+          "neutral": "Coach en dialecte / langue"
+        },
+        "r_8546ce0263e3": {
+          "masculine": "Coach d’interprétation (handicap / neurodivergence)",
+          "feminine": "Coach d’interprétation (handicap / neurodivergence)",
+          "neutral": "Coach d’interprétation (handicap / neurodivergence)"
+        },
+        "r_969986f76695": {
+          "masculine": "Coach musical",
+          "feminine": "Coach musical",
+          "neutral": "Coach musical"
+        },
+        "r_717c17e3e434": {
+          "masculine": "Superviseur sourd",
+          "feminine": "Superviseuse sourd",
+          "neutral": "Superviseur·se sourd"
+        },
+        "r_e30edc1bd3f8": {
+          "masculine": "Consultant diversité",
+          "feminine": "Consultante diversité",
+          "neutral": "Consultant·e diversité"
+        },
+        "r_5595cb9aacd1": {
+          "masculine": "Lecteur sensible",
+          "feminine": "Lectrice sensible",
+          "neutral": "Lecteur·rice sensible"
+        },
+        "r_2d5e77118f48": {
+          "masculine": "Interprète / Traducteur",
+          "feminine": "Interprète / Traductrice",
+          "neutral": "Interprète / Traducteur·rice"
+        },
+        "r_48bf6fb54a76": {
+          "masculine": "Double",
+          "feminine": "Double",
+          "neutral": "Double"
+        },
+        "r_5845830d5e82": {
+          "masculine": "Médecin de plateau / Ambulancier sur le plateau",
+          "feminine": "Médecin de plateau / Ambulancier sur le plateau",
+          "neutral": "Médecin de plateau / Ambulancier sur le plateau"
+        },
+        "r_ad72daba923d": {
+          "masculine": "Enseignant sur le plateau / Tuteur sur le plateau",
+          "feminine": "Enseignante sur le plateau / Tuteur sur le plateau",
+          "neutral": "Enseignant·e sur le plateau / Tuteur sur le plateau"
+        },
+        "r_79e9614b81a6": {
+          "masculine": "Garde d’enfants / Accompagnant sur le plateau",
+          "feminine": "Garde d’enfants / Accompagnant sur le plateau",
+          "neutral": "Garde d’enfants / Accompagnant sur le plateau"
+        },
+        "r_29d48a809858": {
+          "masculine": "Responsable de la protection de l’enfance",
+          "feminine": "Responsable de la protection de l’enfance",
+          "neutral": "Responsable de la protection de l’enfance"
+        },
+        "r_aba4d92c8e69": {
+          "masculine": "Chargé des relations artistes / invités / VIP",
+          "feminine": "Chargée des relations artistes / invités / VIP",
+          "neutral": "Chargé·e des relations artistes / invités / VIP"
+        },
+        "r_53207f6ae5f4": {
+          "masculine": "Coordinateur santé mentale",
+          "feminine": "Coordinatrice santé mentale",
+          "neutral": "Coordinateur·rice santé mentale"
+        },
+        "r_45520abcff27": {
+          "masculine": "Responsable bien-être / Personne de confiance",
+          "feminine": "Responsable bien-être / Personne de confiance",
+          "neutral": "Responsable bien-être / Personne de confiance"
+        },
+        "r_355cbf436694": {
+          "masculine": "Responsable santé et sécurité",
+          "feminine": "Responsable santé et sécurité",
+          "neutral": "Responsable santé et sécurité"
+        },
+        "r_308811767175": {
+          "masculine": "Responsable hygiène (Covid)",
+          "feminine": "Responsable hygiène (Covid)",
+          "neutral": "Responsable hygiène (Covid)"
+        },
+        "r_32790b195d9e": {
+          "masculine": "Coordinateur maritime",
+          "feminine": "Coordinatrice maritime",
+          "neutral": "Coordinateur·rice maritime"
+        },
+        "r_c93f3dbba0c2": {
+          "masculine": "Coordinateur sous-marin / plongée",
+          "feminine": "Coordinatrice sous-marin / plongée",
+          "neutral": "Coordinateur·rice sous-marin / plongée"
+        },
+        "r_2aed0957c337": {
+          "masculine": "Maître d’équitation / Harnais",
+          "feminine": "Maîtresse d’équitation / Harnais",
+          "neutral": "Maître·sse d’équitation / Harnais"
+        },
+        "r_36f2141e2445": {
+          "masculine": "Coordinateur du public",
+          "feminine": "Coordinatrice du public",
+          "neutral": "Coordinateur·rice du public"
+        },
+        "r_dd293d0b7b4b": {
+          "masculine": "Consultant réalisateur",
+          "feminine": "Consultante réalisatrice",
+          "neutral": "Consultant·e réalisateur·rice"
+        },
+        "r_d675b4f70ea4": {
+          "masculine": "Directeur créatif (agence de pub)",
+          "feminine": "Directrice créatif (agence de pub)",
+          "neutral": "Directeur·rice créatif (agence de pub)"
+        },
+        "r_2c01621b03b3": {
+          "masculine": "Conseiller technique / Consultant",
+          "feminine": "Conseillère technique / Consultante",
+          "neutral": "Conseiller·ère technique / Consultant·e"
+        },
+        "r_777d604a46c7": {
+          "masculine": "Consultant expert (production)",
+          "feminine": "Consultante expert (production)",
+          "neutral": "Consultant·e expert (production)"
+        },
+        "r_69b1f75394b4": {
+          "masculine": "Formateur / Coach",
+          "feminine": "Formatrice / Coach",
+          "neutral": "Formateur·rice / Coach"
+        },
+        "r_9b689ca40dcd": {
+          "masculine": "Producteur d’impact",
+          "feminine": "Productrice d’impact",
+          "neutral": "Producteur·rice d’impact"
+        },
+        "r_b22d32243e5e": {
+          "masculine": "Consultant vert / Conseiller en durabilité",
+          "feminine": "Consultante vert / Conseillère en durabilité",
+          "neutral": "Consultant·e vert / Conseiller·ère en durabilité"
+        },
+        "r_b7e6bdc7cc1f": {
+          "masculine": "Assistant consultant vert",
+          "feminine": "Assistante consultante vert",
+          "neutral": "Assistant·e consultant·e vert"
+        },
+        "r_e84880be1d61": {
+          "masculine": "Producteur de ligne EPK / BTS",
+          "feminine": "Productrice de ligne EPK / BTS",
+          "neutral": "Producteur·rice de ligne EPK / BTS"
+        },
+        "r_715e70975075": {
+          "masculine": "Producteur EPK / BTS",
+          "feminine": "Productrice EPK / BTS",
+          "neutral": "Producteur·rice EPK / BTS"
+        },
+        "r_7028ae82d2e2": {
+          "masculine": "Restaurateur de films",
+          "feminine": "Restauratrice de films",
+          "neutral": "Restaurateur·rice de films"
+        },
+        "r_92791462fbdd": {
+          "masculine": "Étalonneur film (photochimique)",
+          "feminine": "Étalonneuse film (photochimique)",
+          "neutral": "Étalonneur·se film (photochimique)"
+        },
+        "r_e732abed8e31": {
+          "masculine": "Auteur média disque (DVD / Blu-ray)",
+          "feminine": "Autrice média disque (DVD / Blu-ray)",
+          "neutral": "Auteur·rice média disque (DVD / Blu-ray)"
+        },
+        "r_a63ade2d8c7d": {
+          "masculine": "Animateur stop motion",
+          "feminine": "Animatrice stop motion",
+          "neutral": "Animateur·rice stop motion"
+        },
+        "r_e56da499fa85": {
+          "masculine": "Animateur cel / Animateur traditionnel",
+          "feminine": "Animatrice cel / Animatrice traditionnel",
+          "neutral": "Animateur·rice cel / Animateur·rice traditionnel"
+        },
+        "r_868363b4696a": {
+          "masculine": "Développeur de jeux (spectacles)",
+          "feminine": "Développeuse de jeux (spectacles)",
+          "neutral": "Développeur·se de jeux (spectacles)"
+        },
+        "r_776e611a5b6e": {
+          "masculine": "Marionnettiste",
+          "feminine": "Marionnettiste",
+          "neutral": "Marionnettiste"
+        },
+        "r_d3d5008ffded": {
+          "masculine": "VJ / Jockey visuel",
+          "feminine": "VJ / Jockey visuel",
+          "neutral": "VJ / Jockey visuel"
+        },
+        "r_f62082fcf3e6": {
+          "masculine": "Designer à l’antenne",
+          "feminine": "Designer à l’antenne",
+          "neutral": "Designer à l’antenne"
+        },
+        "r_915e8fdeaa84": {
+          "masculine": "Repéreur de sous-titres",
+          "feminine": "Repéreuse de sous-titres",
+          "neutral": "Repéreur·se de sous-titres"
+        },
+        "r_e7b09583174a": {
+          "masculine": "Sous-titreur",
+          "feminine": "Sous-titreur",
+          "neutral": "Sous-titreur"
+        },
+        "r_823099351f18": {
+          "masculine": "Repéreur de réalisation",
+          "feminine": "Repéreuse de réalisation",
+          "neutral": "Repéreur·se de réalisation"
+        },
+        "r_f25ed374ada5": {
+          "masculine": "Gestion des droits",
+          "feminine": "Gestion des droits",
+          "neutral": "Gestion des droits"
+        },
+        "r_bf29b54303ec": {
+          "masculine": "Photographe RP",
+          "feminine": "Photographe RP",
+          "neutral": "Photographe RP"
+        },
+        "r_e2fe82d9e60c": {
+          "masculine": "Chef de projet (externe)",
+          "feminine": "Cheffe de projet (externe)",
+          "neutral": "Chef·fe de projet (externe)"
+        },
+        "r_3687ead5b451": {
+          "masculine": "Assistant personnel (sur le plateau)",
+          "feminine": "Assistante personnelle (sur le plateau)",
+          "neutral": "Assistant·e personnel·le (sur le plateau)"
+        },
+        "r_b85e79c1153f": {
+          "masculine": "Chercheur (général)",
+          "feminine": "Chercheuse (générale)",
+          "neutral": "Chercheur·se (général·e)"
+        }
+      },
+      "cast": {
+        "r_3d0e76b883b1": {
+          "masculine": "Interprète du rôle principal",
+          "feminine": "Interprète du rôle principal",
+          "neutral": "Interprète du rôle principal"
+        },
+        "r_543b99d52c01": {
+          "masculine": "Acteur",
+          "feminine": "Actrice",
+          "neutral": "Acteur·rice"
+        },
+        "r_aa64ee1fd5d6": {
+          "masculine": "Interprète d’un second rôle",
+          "feminine": "Interprète d’un second rôle",
+          "neutral": "Interprète d’un second rôle"
+        },
+        "r_5fea55df03ed": {
+          "masculine": "Figurant",
+          "feminine": "Figurante",
+          "neutral": "Figurant·e"
+        },
+        "r_912a4dbdd23c": {
+          "masculine": "Figurant principal",
+          "feminine": "Figurante principale",
+          "neutral": "Figurant·e principal·e"
+        },
+        "r_130f7a137659": {
+          "masculine": "Mannequin",
+          "feminine": "Mannequin",
+          "neutral": "Mannequin"
+        },
+        "r_e1e954da6cbb": {
+          "masculine": "Doubleur / Voix off",
+          "feminine": "Doubleuse / Voix off",
+          "neutral": "Doubleur·se / Voix off"
+        },
+        "r_67da9411185f": {
+          "masculine": "Double",
+          "feminine": "Double",
+          "neutral": "Double"
+        },
+        "r_00100aeac4bb": {
+          "masculine": "Cascadeur",
+          "feminine": "Cascadeuse",
+          "neutral": "Cascadeur·se"
+        },
+        "r_0367b47c9554": {
+          "masculine": "Double cascadeur",
+          "feminine": "Double cascadeuse",
+          "neutral": "Double cascadeur·se"
+        },
+        "r_ca9ccb4b0409": {
+          "masculine": "Machiniste cascade",
+          "feminine": "Machiniste cascade",
+          "neutral": "Machiniste cascade"
+        },
+        "r_418902de8e38": {
+          "masculine": "Coordinateur cascade",
+          "feminine": "Coordinatrice cascade",
+          "neutral": "Coordinateur·rice cascade"
+        },
+        "r_7f2d1a7f256f": {
+          "masculine": "Assistant coordinateur cascade",
+          "feminine": "Assistante coordinatrice cascade",
+          "neutral": "Assistant·e coordinateur·rice cascade"
+        },
+        "r_e84ab42c1ded": {
+          "masculine": "Coordinateur département cascade",
+          "feminine": "Coordinatrice département cascade",
+          "neutral": "Coordinateur·rice département cascade"
+        },
+        "r_e09f42bb8f68": {
+          "masculine": "Chorégraphe de combat",
+          "feminine": "Chorégraphe de combat",
+          "neutral": "Chorégraphe de combat"
+        },
+        "r_f1b27e4baea8": {
+          "masculine": "Réalisateur d’action / Réalisateur 2e équipe",
+          "feminine": "Réalisatrice d’action / Réalisatrice 2e équipe",
+          "neutral": "Réalisateur·rice d’action / Réalisateur·rice 2e équipe"
+        },
+        "r_ccdc591d96b4": {
+          "masculine": "Coordinateur aérien",
+          "feminine": "Coordinatrice aérien",
+          "neutral": "Coordinateur·rice aérien"
+        },
+        "r_df312d5bf658": {
+          "masculine": "Cavalier cascadeur",
+          "feminine": "Cavalière cascadeuse",
+          "neutral": "Cavalier·ère cascadeur·se"
+        },
+        "r_64fe45905183": {
+          "masculine": "Technicien cascade",
+          "feminine": "Technicienne cascade",
+          "neutral": "Technicien·ne cascade"
+        },
+        "r_28088de1cde2": {
+          "masculine": "Plongeur de secours cascade",
+          "feminine": "Plongeuse de secours cascade",
+          "neutral": "Plongeur·se de secours cascade"
+        },
+        "r_f1b818bfac99": {
+          "masculine": "Artiste parkour",
+          "feminine": "Artiste parkour",
+          "neutral": "Artiste parkour"
+        },
+        "r_c9bf4b44628b": {
+          "masculine": "Conducteur de précision",
+          "feminine": "Conductrice de précision",
+          "neutral": "Conducteur·rice de précision"
+        },
+        "r_901a1b08f6ba": {
+          "masculine": "Coordinateur d’intimité",
+          "feminine": "Coordinatrice d’intimité",
+          "neutral": "Coordinateur·rice d’intimité"
+        },
+        "r_7a721e572105": {
+          "masculine": "Associé au casting",
+          "feminine": "Associée au casting",
+          "neutral": "Associé·e au casting"
+        },
+        "r_a1f9ba79ab08": {
+          "masculine": "Assistant casting",
+          "feminine": "Assistante casting",
+          "neutral": "Assistant·e casting"
+        },
+        "r_84927cc7b2bc": {
+          "masculine": "Interprète d’un second rôle",
+          "feminine": "Interprète d’un second rôle",
+          "neutral": "Interprète d’un second rôle"
+        },
+        "r_97144193d2e9": {
+          "masculine": "Figurant",
+          "feminine": "Figurante",
+          "neutral": "Figurant·e"
+        },
+        "r_de130677203b": {
+          "masculine": "Directeur de casting jeunesse",
+          "feminine": "Directrice de casting jeunesse",
+          "neutral": "Directeur·rice de casting jeunesse"
+        },
+        "r_27725de30521": {
+          "masculine": "Directeur de casting enfants",
+          "feminine": "Directrice de casting enfants",
+          "neutral": "Directeur·rice de casting enfants"
+        },
+        "r_9e31ceb09d88": {
+          "masculine": "Casting de rue",
+          "feminine": "Casting de rue",
+          "neutral": "Casting de rue"
+        },
+        "r_081340fc2740": {
+          "masculine": "Casting figurants / secondaires",
+          "feminine": "Casting figurantes / secondaires",
+          "neutral": "Casting figurant·es / secondaires"
+        },
+        "r_bff79e6f4b26": {
+          "masculine": "Stagiaire casting",
+          "feminine": "Stagiaire casting",
+          "neutral": "Stagiaire casting"
+        },
+        "r_2f8822fb833a": {
+          "masculine": "Chef coordinateur cascades",
+          "feminine": "Cheffe coordinatrice cascades",
+          "neutral": "Chef·fe coordinateur·rice cascades"
+        },
+        "r_9fadc25f432e": {
+          "masculine": "Cocher",
+          "feminine": "Cochère",
+          "neutral": "Cocher·ère"
+        }
+      },
+      "virtual": {
+        "r_14e7e79a9ca8": {
+          "masculine": "Artiste VAD (Département d’Art Virtuel)",
+          "feminine": "Artiste VAD (Département d’Art Virtuel)",
+          "neutral": "Artiste VAD (Département d’Art Virtuel)"
+        },
+        "r_2034a25adda6": {
+          "masculine": "Ingénieur en Production Virtuelle",
+          "feminine": "Ingénieure en Production Virtuelle",
+          "neutral": "Ingénieur·e en Production Virtuelle"
+        },
+        "r_188b9da491f3": {
+          "masculine": "Directeur Technique Systèmes & Outils VP",
+          "feminine": "Directrice Technique Systèmes & Outils VP",
+          "neutral": "Directeur·rice Technique Systèmes & Outils VP"
+        },
+        "r_93a5c89da775": {
+          "masculine": "Opérateur Mur LED",
+          "feminine": "Opératrice Mur LED",
+          "neutral": "Opérateur·rice Mur LED"
+        },
+        "r_d1415a80bf57": {
+          "masculine": "Opérateur Unreal Engine",
+          "feminine": "Opératrice Unreal Engine",
+          "neutral": "Opérateur·rice Unreal Engine"
+        },
+        "r_1c2e82f4274b": {
+          "masculine": "Opérateur Moteur Temps Réel",
+          "feminine": "Opératrice Moteur Temps Réel",
+          "neutral": "Opérateur·rice Moteur Temps Réel"
+        },
+        "r_247afd3ab3fd": {
+          "masculine": "Opérateur Serveur Média",
+          "feminine": "Opératrice Serveur Média",
+          "neutral": "Opérateur·rice Serveur Média"
+        },
+        "r_8728a8d46ae1": {
+          "masculine": "Administrateur Système VP",
+          "feminine": "Administratrice Système VP",
+          "neutral": "Administrateur·rice Système VP"
+        },
+        "r_e7c27999f9ae": {
+          "masculine": "Technicien Tracking VP",
+          "feminine": "Technicienne Tracking VP",
+          "neutral": "Technicien·ne Tracking VP"
+        },
+        "r_bbe66ea7740f": {
+          "masculine": "Technicien LED VP",
+          "feminine": "Technicienne LED VP",
+          "neutral": "Technicien·ne LED VP"
+        },
+        "r_ad04846bb2b3": {
+          "masculine": "Technicien Tracking",
+          "feminine": "Technicienne Tracking",
+          "neutral": "Technicien·ne Tracking"
+        },
+        "r_c100cb7d8cdf": {
+          "masculine": "Artiste Temps Réel",
+          "feminine": "Artiste Temps Réel",
+          "neutral": "Artiste Temps Réel"
+        },
+        "r_84ae9f742a8c": {
+          "masculine": "Artiste Département d’Art Virtuel",
+          "feminine": "Artiste Département d’Art Virtuel",
+          "neutral": "Artiste Département d’Art Virtuel"
+        },
+        "r_9d90887128a0": {
+          "masculine": "Superviseur production virtuelle",
+          "feminine": "Superviseuse production virtuelle",
+          "neutral": "Superviseur·se production virtuelle"
+        },
+        "r_9c3babb3c638": {
+          "masculine": "Producteur production virtuelle",
+          "feminine": "Productrice production virtuelle",
+          "neutral": "Producteur·rice production virtuelle"
+        },
+        "r_1fee1676270e": {
+          "masculine": "Coordinateur production virtuelle",
+          "feminine": "Coordinatrice production virtuelle",
+          "neutral": "Coordinateur·rice production virtuelle"
+        },
+        "r_82e993b4422d": {
+          "masculine": "Responsable studio production virtuelle",
+          "feminine": "Responsable studio production virtuelle",
+          "neutral": "Responsable studio production virtuelle"
+        }
+      },
+      "redaktion": {
+        "r_67a1c14f27d6": {
+          "masculine": "Directeur Editorial",
+          "feminine": "Directrice Editorial",
+          "neutral": "Directeur·rice Editorial"
+        },
+        "r_fb6f303e781e": {
+          "masculine": "Rédacteur en Chef",
+          "feminine": "Rédactrice en Chef",
+          "neutral": "Rédacteur·rice en Chef"
+        },
+        "r_1d083876d102": {
+          "masculine": "Rédacteur de Service",
+          "feminine": "Rédactrice de Service",
+          "neutral": "Rédacteur·rice de Service"
+        },
+        "r_dba49499f044": {
+          "masculine": "Responsable Production (Diffuseur)",
+          "feminine": "Responsable Production (Diffuseur)",
+          "neutral": "Responsable Production (Diffuseur)"
+        },
+        "r_399d5722db1b": {
+          "masculine": "Directeur de Production (Diffuseur)",
+          "feminine": "Directrice de Production (Diffuseur)",
+          "neutral": "Directeur·rice de Production (Diffuseur)"
+        },
+        "r_97c6fe9db2a1": {
+          "masculine": "Coordinateur de Grille",
+          "feminine": "Coordinatrice de Grille",
+          "neutral": "Coordinateur·rice de Grille"
+        },
+        "r_c1f3dd5d125c": {
+          "masculine": "Monteur",
+          "feminine": "Monteuse",
+          "neutral": "Monteur·se"
+        },
+        "r_74db110eed35": {
+          "masculine": "Scénariste TV / Auteur",
+          "feminine": "Scénariste TV / Autrice",
+          "neutral": "Scénariste TV / Auteur·rice"
+        },
+        "r_c68ab8bdf35f": {
+          "masculine": "Rédacteur Casting",
+          "feminine": "Rédactrice Casting",
+          "neutral": "Rédacteur·rice Casting"
+        },
+        "r_db514834619e": {
+          "masculine": "Monteur Image",
+          "feminine": "Monteuse Image",
+          "neutral": "Monteur·se Image"
+        },
+        "r_2d3838a04d2d": {
+          "masculine": "Monteur Montage",
+          "feminine": "Monteuse Montage",
+          "neutral": "Monteur·se Montage"
+        },
+        "r_72b16f73761b": {
+          "masculine": "Monteur en Ligne / Rédacteur Web",
+          "feminine": "Monteuse en Ligne / Rédactrice Web",
+          "neutral": "Monteur·se en Ligne / Rédacteur·rice Web"
+        },
+        "r_1eb2a3ac7a7f": {
+          "masculine": "Monteur Vidéo (Editorial)",
+          "feminine": "Monteuse Vidéo (Editorial)",
+          "neutral": "Monteur·se Vidéo (Editorial)"
+        },
+        "r_fea2147a3023": {
+          "masculine": "Journaliste TV",
+          "feminine": "Journaliste TV",
+          "neutral": "Journaliste TV"
+        },
+        "r_89901fa29127": {
+          "masculine": "Reporter",
+          "feminine": "Reporter",
+          "neutral": "Reporter"
+        },
+        "r_49092803ca90": {
+          "masculine": "Réalisateur / Directeur de Spectacle",
+          "feminine": "Réalisatrice / Directrice de Spectacle",
+          "neutral": "Réalisateur·rice / Directeur·rice de Spectacle"
+        },
+        "r_558623ea54e2": {
+          "masculine": "Producteur Vidéo",
+          "feminine": "Productrice Vidéo",
+          "neutral": "Producteur·rice Vidéo"
+        },
+        "r_cd94582e5de3": {
+          "masculine": "Journaliste Vidéo (VJ)",
+          "feminine": "Journaliste Vidéo (VJ)",
+          "neutral": "Journaliste Vidéo (VJ)"
+        },
+        "r_c1632a39db5a": {
+          "masculine": "Créateur de Contenu Vidéo (Réseaux Sociaux)",
+          "feminine": "Créatrice de Contenu Vidéo (Réseaux Sociaux)",
+          "neutral": "Créateur·rice de Contenu Vidéo (Réseaux Sociaux)"
+        },
+        "r_48a469f4753e": {
+          "masculine": "Animateur / Présentateur",
+          "feminine": "Animatrice / Présentatrice",
+          "neutral": "Animateur·rice / Présentateur·rice"
+        },
+        "r_dff0d36f7649": {
+          "masculine": "Présentateur de Journal",
+          "feminine": "Présentatrice de Journal",
+          "neutral": "Présentateur·rice de Journal"
+        },
+        "r_d8ae611e8a84": {
+          "masculine": "Producteur Créatif",
+          "feminine": "Productrice Créatif",
+          "neutral": "Producteur·rice Créatif"
+        },
+        "r_52eb2ef13219": {
+          "masculine": "Directeur Créatif",
+          "feminine": "Directrice Créatif",
+          "neutral": "Directeur·rice Créatif"
+        },
+        "r_4741fd392c78": {
+          "masculine": "Rédacteur Publicitaire",
+          "feminine": "Rédactrice Publicitaire",
+          "neutral": "Rédacteur·rice Publicitaire"
+        },
+        "r_7693f0b6836d": {
+          "masculine": "Développeur de Concepts",
+          "feminine": "Développeuse de Concepts",
+          "neutral": "Développeur·se de Concepts"
+        },
+        "r_8ed4467cbce1": {
+          "masculine": "Producteur Réseaux Sociaux",
+          "feminine": "Productrice Réseaux Sociaux",
+          "neutral": "Producteur·rice Réseaux Sociaux"
+        },
+        "r_f3046605ff7d": {
+          "masculine": "Assistant Editorial",
+          "feminine": "Assistante Editorial",
+          "neutral": "Assistant·e Editorial"
+        },
+        "r_39b32b25eed9": {
+          "masculine": "Stagiaire Editorial",
+          "feminine": "Stagiaire Editorial",
+          "neutral": "Stagiaire Editorial"
+        },
+        "r_7947e117851f": {
+          "masculine": "Rédacteur de Service / Rédacteur en Chef Adjoint",
+          "feminine": "Rédactrice de Service / Rédactrice en Chef Adjoint",
+          "neutral": "Rédacteur·rice de Service / Rédacteur·rice en Chef Adjoint"
+        },
+        "r_9c948261499b": {
+          "masculine": "Responsable Production (Studio / Réseau)",
+          "feminine": "Responsable Production (Studio / Réseau)",
+          "neutral": "Responsable Production (Studio / Réseau)"
+        },
+        "r_844ebb650ef7": {
+          "masculine": "Rédacteur / Journaliste",
+          "feminine": "Rédactrice / Journaliste",
+          "neutral": "Rédacteur·rice / Journaliste"
+        },
+        "r_bac4afc8f929": {
+          "masculine": "Producteur de Montage / Réalisateur",
+          "feminine": "Productrice de Montage / Réalisatrice",
+          "neutral": "Producteur·rice de Montage / Réalisateur·rice"
+        },
+        "r_324910e3b0ab": {
+          "masculine": "Rédacteur Quiz",
+          "feminine": "Rédactrice Quiz",
+          "neutral": "Rédacteur·rice Quiz"
+        },
+        "r_363c83ce0934": {
+          "masculine": "Animateur d’Ambiance",
+          "feminine": "Animatrice d’Ambiance",
+          "neutral": "Animateur·rice d’Ambiance"
+        },
+        "r_6227b3014b7a": {
+          "masculine": "Pigiste / Fixeur",
+          "feminine": "Pigiste / Fixeur",
+          "neutral": "Pigiste / Fixeur"
+        },
+        "r_dfa579f14095": {
+          "masculine": "Logger / Catalogueur de Séquences",
+          "feminine": "Logger / Catalogueur de Séquences",
+          "neutral": "Logger / Catalogueur de Séquences"
+        },
+        "r_57c0fec76f7d": {
+          "masculine": "Transcripteur",
+          "feminine": "Transcriptrice",
+          "neutral": "Transcripteur·rice"
+        },
+        "r_cabe547e084e": {
+          "masculine": "Chercheur d’Images",
+          "feminine": "Chercheuse d’Images",
+          "neutral": "Chercheur·se d’Images"
+        }
+      },
+      "social": {
+        "r_e8a967aad9b7": {
+          "masculine": "Créateur de Contenu",
+          "feminine": "Créatrice de Contenu",
+          "neutral": "Créateur·rice de Contenu"
+        },
+        "r_631c65ad8827": {
+          "masculine": "Influenceur",
+          "feminine": "Influenceuse",
+          "neutral": "Influenceur·se"
+        },
+        "r_a9eeb34333bc": {
+          "masculine": "Gestionnaire de Réseaux Sociaux",
+          "feminine": "Gestionnaire de Réseaux Sociaux",
+          "neutral": "Gestionnaire de Réseaux Sociaux"
+        },
+        "r_b510fa57cea0": {
+          "masculine": "Créateur UGC",
+          "feminine": "Créatrice UGC",
+          "neutral": "Créateur·rice UGC"
+        },
+        "r_4d66d4dbbf12": {
+          "masculine": "Vidéaste Reels",
+          "feminine": "Vidéaste Reels",
+          "neutral": "Vidéaste Reels"
+        },
+        "r_423ece24b5c2": {
+          "masculine": "Créateur TikTok",
+          "feminine": "Créatrice TikTok",
+          "neutral": "Créateur·rice TikTok"
+        },
+        "r_e7483d4ddd6d": {
+          "masculine": "Community Manager",
+          "feminine": "Community Manager",
+          "neutral": "Community Manager"
+        },
+        "r_6f877112cd0a": {
+          "masculine": "Stratège Réseaux Sociaux",
+          "feminine": "Stratège Réseaux Sociaux",
+          "neutral": "Stratège Réseaux Sociaux"
+        },
+        "r_bd90a8429d6f": {
+          "masculine": "Influenceur / Créateur",
+          "feminine": "Influenceuse / Créatrice",
+          "neutral": "Influenceur·se / Créateur·rice"
+        },
+        "r_c43ce08ef6e8": {
+          "masculine": "Narrateur de Marque",
+          "feminine": "Narratrice de Marque",
+          "neutral": "Narrateur·rice de Marque"
+        },
+        "r_e75a59be5b02": {
+          "masculine": "Vidéaste Social",
+          "feminine": "Vidéaste Social",
+          "neutral": "Vidéaste Social"
+        },
+        "r_5f522b44dd48": {
+          "masculine": "Monteur Court Format",
+          "feminine": "Monteuse Court Format",
+          "neutral": "Monteur·se Court Format"
+        },
+        "r_ce039c1f951f": {
+          "masculine": "Motion Designer (Social)",
+          "feminine": "Motion Designer (Social)",
+          "neutral": "Motion Designer (Social)"
+        }
+      },
+      "foto": {
+        "r_d2c0588cf0d1": {
+          "masculine": "Photographe",
+          "feminine": "Photographe",
+          "neutral": "Photographe"
+        },
+        "r_d7f7fbf5939c": {
+          "masculine": "Photographe de Mode",
+          "feminine": "Photographe de Mode",
+          "neutral": "Photographe de Mode"
+        },
+        "r_e0551919b067": {
+          "masculine": "Photographe Produit",
+          "feminine": "Photographe Produit",
+          "neutral": "Photographe Produit"
+        },
+        "r_b06301444ef7": {
+          "masculine": "Photographe Événementiel",
+          "feminine": "Photographe Événementiel",
+          "neutral": "Photographe Événementiel"
+        },
+        "r_124df4c664ce": {
+          "masculine": "Photographe Portrait",
+          "feminine": "Photographe Portrait",
+          "neutral": "Photographe Portrait"
+        },
+        "r_2e1fcf07d241": {
+          "masculine": "Photographe Commercial",
+          "feminine": "Photographe Commercial",
+          "neutral": "Photographe Commercial"
+        },
+        "r_02bd21bcff9c": {
+          "masculine": "Photographe Culinaire",
+          "feminine": "Photographe Culinaire",
+          "neutral": "Photographe Culinaire"
+        },
+        "r_8a273a427bd6": {
+          "masculine": "Photographe Drone",
+          "feminine": "Photographe Drone",
+          "neutral": "Photographe Drone"
+        },
+        "r_843b4748146d": {
+          "masculine": "Photographe Fixe",
+          "feminine": "Photographe Fixe",
+          "neutral": "Photographe Fixe"
+        },
+        "r_b622037392fb": {
+          "masculine": "Assistant Photographe",
+          "feminine": "Assistante Photographe",
+          "neutral": "Assistant·e Photographe"
+        },
+        "r_6a2008f9f2ef": {
+          "masculine": "Responsable Studio",
+          "feminine": "Responsable Studio",
+          "neutral": "Responsable Studio"
+        },
+        "r_341b032b61fc": {
+          "masculine": "Retoucheur",
+          "feminine": "Retoucheuse",
+          "neutral": "Retoucheur·se"
+        },
+        "r_468329a20ba4": {
+          "masculine": "Éditeur photo",
+          "feminine": "Éditrice photo",
+          "neutral": "Éditeur·rice photo"
+        }
+      },
+      "sfx": {
+        "r_a35d5905e687": {
+          "masculine": "Superviseur effets spéciaux",
+          "feminine": "Superviseuse effets spéciaux",
+          "neutral": "Superviseur·se effets spéciaux"
+        },
+        "r_09c0a67cf5e1": {
+          "masculine": "Technicien effets spéciaux",
+          "feminine": "Technicienne effets spéciaux",
+          "neutral": "Technicien·ne effets spéciaux"
+        },
+        "r_881a5efb4c8a": {
+          "masculine": "Coordinateur effets spéciaux",
+          "feminine": "Coordinatrice effets spéciaux",
+          "neutral": "Coordinateur·rice effets spéciaux"
+        },
+        "r_a9f1b82c4859": {
+          "masculine": "Chef de projet effets spéciaux",
+          "feminine": "Cheffe de projet effets spéciaux",
+          "neutral": "Chef·fe de projet effets spéciaux"
+        },
+        "r_cea7226b63f6": {
+          "masculine": "Pyrotechnicien",
+          "feminine": "Pyrotechnicienne",
+          "neutral": "Pyrotechnicien·ne"
+        },
+        "r_eb065a9f90c9": {
+          "masculine": "Assistant pyro",
+          "feminine": "Assistante pyro",
+          "neutral": "Assistant·e pyro"
+        },
+        "r_4d3662b84a22": {
+          "masculine": "Producteur effets miniatures",
+          "feminine": "Productrice effets miniatures",
+          "neutral": "Producteur·rice effets miniatures"
+        },
+        "r_e62650b9e5ae": {
+          "masculine": "Concepteur de créatures",
+          "feminine": "Conceptrice de créatures",
+          "neutral": "Concepteur·rice de créatures"
+        },
+        "r_00baca6dc147": {
+          "masculine": "Ingénieur animatronique",
+          "feminine": "Ingénieure animatronique",
+          "neutral": "Ingénieur·e animatronique"
+        },
+        "r_174ffb787533": {
+          "masculine": "Constructeur de marionnettes / accessoires",
+          "feminine": "Constructrice de marionnettes / accessoires",
+          "neutral": "Constructeur·rice de marionnettes / accessoires"
+        },
+        "r_506a008769b9": {
+          "masculine": "Armurier",
+          "feminine": "Armurière",
+          "neutral": "Armurier·ère"
+        },
+        "r_2409c6266fd3": {
+          "masculine": "Technicien armes / armurier",
+          "feminine": "Technicienne armes / armurière",
+          "neutral": "Technicien·ne armes / armurier·ère"
+        },
+        "r_ddb886337a99": {
+          "masculine": "Gréeur (câbles)",
+          "feminine": "Gréeuse (câbles)",
+          "neutral": "Gréeur·se (câbles)"
+        },
+        "r_72a4b7fb935e": {
+          "masculine": "Gréage effets spéciaux / constructions spéciales",
+          "feminine": "Gréage effets spéciaux / constructions spéciales",
+          "neutral": "Gréage effets spéciaux / constructions spéciales"
+        },
+        "r_3628c7df2899": {
+          "masculine": "Technicien effets mécaniques",
+          "feminine": "Technicienne effets mécaniques",
+          "neutral": "Technicien·ne effets mécaniques"
+        },
+        "r_41cde5889636": {
+          "masculine": "Technicien effets neige / pluie",
+          "feminine": "Technicienne effets neige / pluie",
+          "neutral": "Technicien·ne effets neige / pluie"
+        },
+        "r_ba881d560569": {
+          "masculine": "Comptable effets spéciaux",
+          "feminine": "Comptable effets spéciaux",
+          "neutral": "Comptable effets spéciaux"
+        },
+        "r_c723decf9e2c": {
+          "masculine": "Technicien effets spéciaux",
+          "feminine": "Technicienne effets spéciaux",
+          "neutral": "Technicien·ne effets spéciaux"
+        }
+      },
+      "broadcast": {
+        "r_56003554d627": {
+          "masculine": "Ingénieur production",
+          "feminine": "Ingénieure production",
+          "neutral": "Ingénieur·e production"
+        },
+        "r_a5145362deb9": {
+          "masculine": "Ingénieur diffusion",
+          "feminine": "Ingénieure diffusion",
+          "neutral": "Ingénieur·e diffusion"
+        },
+        "r_21789a4bd26e": {
+          "masculine": "Directeur technique",
+          "feminine": "Directrice technique",
+          "neutral": "Directeur·rice technique"
+        },
+        "r_ed2861824940": {
+          "masculine": "Ingénieur vision",
+          "feminine": "Ingénieure vision",
+          "neutral": "Ingénieur·e vision"
+        },
+        "r_f35ad506ce91": {
+          "masculine": "Mixeur vision",
+          "feminine": "Mixeuse vision",
+          "neutral": "Mixeur·se vision"
+        },
+        "r_96549186fbdd": {
+          "masculine": "Mixeur vision",
+          "feminine": "Mixeuse vision",
+          "neutral": "Mixeur·se vision"
+        },
+        "r_b0f32c270502": {
+          "masculine": "Shader",
+          "feminine": "Shader",
+          "neutral": "Shader"
+        },
+        "r_4444caa14211": {
+          "masculine": "Opérateur CCU caméra",
+          "feminine": "Opératrice CCU caméra",
+          "neutral": "Opérateur·rice CCU caméra"
+        },
+        "r_3a845b2c45a4": {
+          "masculine": "Opérateur DVE",
+          "feminine": "Opératrice DVE",
+          "neutral": "Opérateur·rice DVE"
+        },
+        "r_5eb58151f915": {
+          "masculine": "Opérateur profil",
+          "feminine": "Opératrice profil",
+          "neutral": "Opérateur·rice profil"
+        },
+        "r_bc517c79d131": {
+          "masculine": "Technicien diffusion",
+          "feminine": "Technicienne diffusion",
+          "neutral": "Technicien·ne diffusion"
+        },
+        "r_d0bc62ba1257": {
+          "masculine": "Superviseur son diffusion",
+          "feminine": "Superviseuse son diffusion",
+          "neutral": "Superviseur·se son diffusion"
+        },
+        "r_6189d7ba75a5": {
+          "masculine": "Ingénieur son (diffusion)",
+          "feminine": "Ingénieure son (diffusion)",
+          "neutral": "Ingénieur·e son (diffusion)"
+        },
+        "r_9eadf0334fa2": {
+          "masculine": "Régisseur studio / événement",
+          "feminine": "Régisseuse studio / événement",
+          "neutral": "Régisseur·se studio / événement"
+        },
+        "r_da7a6180d72a": {
+          "masculine": "Responsable événementiel",
+          "feminine": "Responsable événementiel",
+          "neutral": "Responsable événementiel"
+        },
+        "r_84e084ee4081": {
+          "masculine": "Technicien événementiel",
+          "feminine": "Technicienne événementiel",
+          "neutral": "Technicien·ne événementiel"
+        },
+        "r_2b01c5ebf763": {
+          "masculine": "Opérateur MAZ",
+          "feminine": "Opératrice MAZ",
+          "neutral": "Opérateur·rice MAZ"
+        },
+        "r_d2b49ec6c87b": {
+          "masculine": "Technicien VTR / MAZ",
+          "feminine": "Technicienne VTR / MAZ",
+          "neutral": "Technicien·ne VTR / MAZ"
+        },
+        "r_b1e7ad7a4e8d": {
+          "masculine": "Opérateur EVS",
+          "feminine": "Opératrice EVS",
+          "neutral": "Opérateur·rice EVS"
+        },
+        "r_6ce5d1fae4b4": {
+          "masculine": "Opérateur LSM (ralenti)",
+          "feminine": "Opératrice LSM (ralenti)",
+          "neutral": "Opérateur·rice LSM (ralenti)"
+        },
+        "r_23864113991d": {
+          "masculine": "Technicien streaming",
+          "feminine": "Technicienne streaming",
+          "neutral": "Technicien·ne streaming"
+        },
+        "r_4e59228ff2bb": {
+          "masculine": "Gréeur (diffusion / événement)",
+          "feminine": "Gréeuse (diffusion / événement)",
+          "neutral": "Gréeur·se (diffusion / événement)"
+        },
+        "r_54aa44e2bc03": {
+          "masculine": "Assistant gréage",
+          "feminine": "Assistante gréage",
+          "neutral": "Assistant·e gréage"
+        },
+        "r_accbebaa16ce": {
+          "masculine": "Technicien vision",
+          "feminine": "Technicienne vision",
+          "neutral": "Technicien·ne vision"
+        },
+        "r_152179bb65ff": {
+          "masculine": "Technicien éclairage (diffusion)",
+          "feminine": "Technicienne éclairage (diffusion)",
+          "neutral": "Technicien·ne éclairage (diffusion)"
+        },
+        "r_916b292e3ecc": {
+          "masculine": "Technicien son (diffusion)",
+          "feminine": "Technicienne son (diffusion)",
+          "neutral": "Technicien·ne son (diffusion)"
+        },
+        "r_a409aeab8c20": {
+          "masculine": "Ingénieur audio (PA / événement)",
+          "feminine": "Ingénieure audio (PA / événement)",
+          "neutral": "Ingénieur·e audio (PA / événement)"
+        },
+        "r_894d032abc78": {
+          "masculine": "Technicien PA / son (événement)",
+          "feminine": "Technicienne PA / son (événement)",
+          "neutral": "Technicien·ne PA / son (événement)"
+        },
+        "r_87a1930129df": {
+          "masculine": "Opérateur SNG",
+          "feminine": "Opératrice SNG",
+          "neutral": "Opérateur·rice SNG"
+        },
+        "r_0d146769f561": {
+          "masculine": "Assistant son (diffusion)",
+          "feminine": "Assistante son (diffusion)",
+          "neutral": "Assistant·e son (diffusion)"
+        },
+        "r_4ee86e5361a7": {
+          "masculine": "Opérateur vidéomur",
+          "feminine": "Opératrice vidéomur",
+          "neutral": "Opérateur·rice vidéomur"
+        },
+        "r_7c7bcadca79c": {
+          "masculine": "Opérateur prompteur",
+          "feminine": "Opératrice prompteur",
+          "neutral": "Opérateur·rice prompteur"
+        },
+        "r_e627ebc7d6a6": {
+          "masculine": "Assistant technique (diffusion)",
+          "feminine": "Assistante technique (diffusion)",
+          "neutral": "Assistant·e technique (diffusion)"
+        },
+        "r_b81926eec6f3": {
+          "masculine": "Assistant vision",
+          "feminine": "Assistante vision",
+          "neutral": "Assistant·e vision"
+        },
+        "r_45710f001c06": {
+          "masculine": "Câbleur",
+          "feminine": "Câbleuse",
+          "neutral": "Câbleur·se"
+        },
+        "r_34cfe59314f7": {
+          "masculine": "Mixeur vision / commutateur vidéo",
+          "feminine": "Mixeuse vision / commutateur vidéo",
+          "neutral": "Mixeur·se vision / commutateur vidéo"
+        },
+        "r_ba025e1926d2": {
+          "masculine": "Opérateur LSM (ralenti)",
+          "feminine": "Opératrice LSM (ralenti)",
+          "neutral": "Opérateur·rice LSM (ralenti)"
+        },
+        "r_c7e1fa1f7572": {
+          "masculine": "Opérateur SG",
+          "feminine": "Opératrice SG",
+          "neutral": "Opérateur·rice SG"
+        },
+        "r_c0aa2d3b3f9c": {
+          "masculine": "Assistant son (diffusion)",
+          "feminine": "Assistante son (diffusion)",
+          "neutral": "Assistant·e son (diffusion)"
+        },
+        "r_32ca4217464e": {
+          "masculine": "Assistant technique (diffusion)",
+          "feminine": "Assistante technique (diffusion)",
+          "neutral": "Assistant·e technique (diffusion)"
+        }
+      },
+      "ki": {
+        "r_0af68f26119c": {
+          "masculine": "Réalisateur IA",
+          "feminine": "Réalisatrice IA",
+          "neutral": "Réalisateur·rice IA"
+        },
+        "r_7ebc4eeffa63": {
+          "masculine": "Responsable IA / Superviseur IA",
+          "feminine": "Responsable IA / Superviseuse IA",
+          "neutral": "Responsable IA / Superviseur·se IA"
+        },
+        "r_5143bd061069": {
+          "masculine": "Directeur IA",
+          "feminine": "Directrice IA",
+          "neutral": "Directeur·rice IA"
+        },
+        "r_8b38d96f6763": {
+          "masculine": "Animateur IA",
+          "feminine": "Animatrice IA",
+          "neutral": "Animateur·rice IA"
+        },
+        "r_addc4afc90e0": {
+          "masculine": "Ingénieur de prompt (Film & Médias)",
+          "feminine": "Ingénieure de prompt (Film & Médias)",
+          "neutral": "Ingénieur·e de prompt (Film & Médias)"
+        },
+        "r_227b357243e1": {
+          "masculine": "Scénariste IA",
+          "feminine": "Scénariste IA",
+          "neutral": "Scénariste IA"
+        },
+        "r_53ef2619b5af": {
+          "masculine": "Storyboarder IA",
+          "feminine": "Storyboarder IA",
+          "neutral": "Storyboarder IA"
+        },
+        "r_1185b1151f24": {
+          "masculine": "Créateur d’images IA",
+          "feminine": "Créatrice d’images IA",
+          "neutral": "Créateur·rice d’images IA"
+        },
+        "r_f551cf191b74": {
+          "masculine": "Créateur vidéo IA",
+          "feminine": "Créatrice vidéo IA",
+          "neutral": "Créateur·rice vidéo IA"
+        },
+        "r_b69e1ec80a94": {
+          "masculine": "Concepteur sonore IA",
+          "feminine": "Conceptrice sonore IA",
+          "neutral": "Concepteur·rice sonore IA"
+        },
+        "r_237f8a4202e1": {
+          "masculine": "Étalonneur IA",
+          "feminine": "Étalonneuse IA",
+          "neutral": "Étalonneur·se IA"
+        },
+        "r_38b5ef6c319c": {
+          "masculine": "Consultant workflow IA (Film)",
+          "feminine": "Consultante workflow IA (Film)",
+          "neutral": "Consultant·e workflow IA (Film)"
+        }
+      },
+      "drehbuch": {
+        "r_f63a97948825": {
+          "masculine": "Showrunner",
+          "feminine": "Showrunner",
+          "neutral": "Showrunner"
+        },
+        "r_da4094d01df6": {
+          "masculine": "Chef scénariste",
+          "feminine": "Cheffe scénariste",
+          "neutral": "Chef·fe scénariste"
+        },
+        "r_48862b016872": {
+          "masculine": "Assistant du chef scénariste",
+          "feminine": "Assistante du chef scénariste",
+          "neutral": "Assistant·e du chef scénariste"
+        },
+        "r_f0e5da473f57": {
+          "masculine": "Assistant showrunner",
+          "feminine": "Assistante showrunner",
+          "neutral": "Assistant·e showrunner"
+        },
+        "r_be444be7e73a": {
+          "masculine": "Scénariste",
+          "feminine": "Scénariste",
+          "neutral": "Scénariste"
+        },
+        "r_d1a561dc7125": {
+          "masculine": "Co-scénariste",
+          "feminine": "Co-scénariste",
+          "neutral": "Co-scénariste"
+        },
+        "r_da01eb9b61e7": {
+          "masculine": "Réécrivain",
+          "feminine": "Réécrivaine",
+          "neutral": "Réécrivain·e"
+        },
+        "r_199c194315c9": {
+          "masculine": "Script doctor",
+          "feminine": "Script doctor",
+          "neutral": "Script doctor"
+        },
+        "r_a180812047b1": {
+          "masculine": "Éditeur d’histoire",
+          "feminine": "Éditrice d’histoire",
+          "neutral": "Éditeur·rice d’histoire"
+        },
+        "r_5f9704129182": {
+          "masculine": "Créateur de synopsis",
+          "feminine": "Créatrice de synopsis",
+          "neutral": "Créateur·rice de synopsis"
+        },
+        "r_41126a4d581f": {
+          "masculine": "Éditeur de script",
+          "feminine": "Éditrice de script",
+          "neutral": "Éditeur·rice de script"
+        },
+        "r_11bee057c159": {
+          "masculine": "Éditeur de dialogues",
+          "feminine": "Éditrice de dialogues",
+          "neutral": "Éditeur·rice de dialogues"
+        },
+        "r_d578a24e6a6c": {
+          "masculine": "Dialoguiste",
+          "feminine": "Dialoguiste",
+          "neutral": "Dialoguiste"
+        },
+        "r_cbc48ad9850e": {
+          "masculine": "Lecteur de script",
+          "feminine": "Lectrice de script",
+          "neutral": "Lecteur·rice de script"
+        },
+        "r_850bbf550984": {
+          "masculine": "Dramaturge / Consultant script",
+          "feminine": "Dramaturge / Consultante script",
+          "neutral": "Dramaturge / Consultant·e script"
+        },
+        "r_c33a26535234": {
+          "masculine": "Développement d’histoire",
+          "feminine": "Développement d’histoire",
+          "neutral": "Développement d’histoire"
+        },
+        "r_e439aac0b481": {
+          "masculine": "Responsable script",
+          "feminine": "Responsable script",
+          "neutral": "Responsable script"
+        },
+        "r_a30d0af43af8": {
+          "masculine": "Responsable histoire",
+          "feminine": "Responsable histoire",
+          "neutral": "Responsable histoire"
+        },
+        "r_3aa5851edfa7": {
+          "masculine": "Développeur de format",
+          "feminine": "Développeuse de format",
+          "neutral": "Développeur·se de format"
+        },
+        "r_fc05d4531220": {
+          "masculine": "Auteur de traitement",
+          "feminine": "Autrice de traitement",
+          "neutral": "Auteur·rice de traitement"
+        },
+        "r_601f64f82db2": {
+          "masculine": "Auteur de script de doublage",
+          "feminine": "Autrice de script de doublage",
+          "neutral": "Auteur·rice de script de doublage"
+        },
+        "r_1ddc57dbbeb2": {
+          "masculine": "Auteur de description audio",
+          "feminine": "Autrice de description audio",
+          "neutral": "Auteur·rice de description audio"
+        },
+        "r_9f89ae134497": {
+          "masculine": "Traducteur de film",
+          "feminine": "Traductrice de film",
+          "neutral": "Traducteur·rice de film"
+        },
+        "r_6cc875ec3963": {
+          "masculine": "Traducteur de script",
+          "feminine": "Traductrice de script",
+          "neutral": "Traducteur·rice de script"
+        },
+        "r_5947f173deeb": {
+          "masculine": "Traducteur de sous-titres",
+          "feminine": "Traductrice de sous-titres",
+          "neutral": "Traducteur·rice de sous-titres"
+        },
+        "r_7b6a9a537e9a": {
+          "masculine": "Traducteur de dialogues",
+          "feminine": "Traductrice de dialogues",
+          "neutral": "Traducteur·rice de dialogues"
+        },
+        "r_07f1b8537dbc": {
+          "masculine": "Traducteur de transcription",
+          "feminine": "Traductrice de transcription",
+          "neutral": "Traducteur·rice de transcription"
+        },
+        "r_baf097c29e20": {
+          "masculine": "Transcripteur de liste de dialogues",
+          "feminine": "Transcriptrice de liste de dialogues",
+          "neutral": "Transcripteur·rice de liste de dialogues"
+        },
+        "r_84f5505f76e2": {
+          "masculine": "Rédacteur publicitaire",
+          "feminine": "Rédactrice publicitaire",
+          "neutral": "Rédacteur·rice publicitaire"
+        },
+        "r_f38e225361bf": {
+          "masculine": "Assistant linguistique",
+          "feminine": "Assistante linguistique",
+          "neutral": "Assistant·e linguistique"
+        },
+        "r_eda2531fdadf": {
+          "masculine": "Chercheur",
+          "feminine": "Chercheuse",
+          "neutral": "Chercheur·se"
+        },
+        "r_c6e3b618f79f": {
+          "masculine": "Assistant de recherche",
+          "feminine": "Assistante de recherche",
+          "neutral": "Assistant·e de recherche"
+        },
+        "r_0434302793dc": {
+          "masculine": "Coordinateur de script",
+          "feminine": "Coordinatrice de script",
+          "neutral": "Coordinateur·rice de script"
+        },
+        "r_dae3743c6b89": {
+          "masculine": "Stagiaire script",
+          "feminine": "Stagiaire script",
+          "neutral": "Stagiaire script"
+        }
+      },
+      "public-relations": {
+        "r_1860a572354e": {
+          "masculine": "Marketing & RP",
+          "feminine": "Marketing & RP",
+          "neutral": "Marketing & RP"
+        },
+        "r_201f2da74897": {
+          "masculine": "Responsable réseaux sociaux (Film)",
+          "feminine": "Responsable réseaux sociaux (Film)",
+          "neutral": "Responsable réseaux sociaux (Film)"
+        },
+        "r_041271a6a3ee": {
+          "masculine": "Coordinateur promotions",
+          "feminine": "Coordinatrice promotions",
+          "neutral": "Coordinateur·rice promotions"
+        }
+      },
+      "sicherheit-sanitaetsdienst": {
+        "r_972d7ff7233a": {
+          "masculine": "Médecin de plateau",
+          "feminine": "Médecin de plateau",
+          "neutral": "Médecin de plateau"
+        },
+        "r_deefff77f871": {
+          "masculine": "Technicien médical d’urgence",
+          "feminine": "Technicienne médical d’urgence",
+          "neutral": "Technicien·ne médical d’urgence"
+        },
+        "r_63a9f32e6a72": {
+          "masculine": "Secouriste en milieu professionnel",
+          "feminine": "Secouriste en milieu professionnel",
+          "neutral": "Secouriste en milieu professionnel"
+        },
+        "r_550de11c2d96": {
+          "masculine": "Veilleur incendie / Surveillance incendie",
+          "feminine": "Veilleuse incendie / Surveillance incendie",
+          "neutral": "Veilleur·se incendie / Surveillance incendie"
+        },
+        "r_427dc70aedd7": {
+          "masculine": "Assistant sécurité incendie",
+          "feminine": "Assistante sécurité incendie",
+          "neutral": "Assistant·e sécurité incendie"
+        },
+        "r_a3247768d472": {
+          "masculine": "Responsable sécurité incendie",
+          "feminine": "Responsable sécurité incendie",
+          "neutral": "Responsable sécurité incendie"
+        }
+      },
+      "catering-setverpflegung": {
+        "r_330e10f94b8f": {
+          "masculine": "Responsable restauration",
+          "feminine": "Responsable restauration",
+          "neutral": "Responsable restauration"
+        },
+        "r_2fe8f1ac7f90": {
+          "masculine": "Cuisinier / Chef de plateau",
+          "feminine": "Cuisinière / Cheffe de plateau",
+          "neutral": "Cuisinier·ère / Chef·fe de plateau"
+        },
+        "r_463cca2307e9": {
+          "masculine": "Assistant restauration / Aide cuisine",
+          "feminine": "Assistante restauration / Aide cuisine",
+          "neutral": "Assistant·e restauration / Aide cuisine"
+        },
+        "r_e114754d9175": {
+          "masculine": "Service traiteur",
+          "feminine": "Service traiteur",
+          "neutral": "Service traiteur"
+        },
+        "r_cb6d56c18bf6": {
+          "masculine": "Agent de restauration sur plateau",
+          "feminine": "Agent de restauration sur plateau",
+          "neutral": "Agent de restauration sur plateau"
+        },
+        "r_532adc563b66": {
+          "masculine": "Conducteur restauration / cuisine mobile",
+          "feminine": "Conductrice restauration / cuisine mobile",
+          "neutral": "Conducteur·rice restauration / cuisine mobile"
+        }
+      },
+      "filmtiere-tiertraining": {
+        "r_3d8ab6fb2c6a": {
+          "masculine": "Dresseur animalier de cinéma / Dresseur animalière de cinéma",
+          "feminine": "Dresseuse animalier de cinéma / Dresseuse animalière de cinéma",
+          "neutral": "Dresseur·se animalier de cinéma / Dresseur·se animalière de cinéma"
+        },
+        "r_654c33dc9c6b": {
+          "masculine": "Dresseur de chiens de cinéma",
+          "feminine": "Dresseuse de chiens de cinéma",
+          "neutral": "Dresseur·se de chiens de cinéma"
+        },
+        "r_40758f075d18": {
+          "masculine": "Soigneur animalier / Soigneur animalière (Animal Handler)",
+          "feminine": "Soigneuse animalier / Soigneuse animalière (Animal Handler)",
+          "neutral": "Soigneur·se animalier / Soigneur·se animalière (Animal Handler)"
+        },
+        "r_7a1591b96b3a": {
+          "masculine": "Responsable de la coordination animalière",
+          "feminine": "Responsable de la coordination animalière",
+          "neutral": "Responsable de la coordination animalière"
+        },
+        "r_a63695a566c3": {
+          "masculine": "Responsable des animaux sur le plateau",
+          "feminine": "Responsable des animaux sur le plateau",
+          "neutral": "Responsable des animaux sur le plateau"
+        },
+        "r_9faf951b627e": {
+          "masculine": "Responsable des chevaux (Horse Master)",
+          "feminine": "Responsable des chevaux (Horse Master)",
+          "neutral": "Responsable des chevaux (Horse Master)"
+        },
+        "r_7c4f137defec": {
+          "masculine": "Assistant / Assistant du Horse Master",
+          "feminine": "Assistante / Assistante du Horse Master",
+          "neutral": "Assistant·e / Assistant·e du Horse Master"
+        },
+        "r_8e8f21cf0303": {
+          "masculine": "Dresseur de chevaux de cinéma",
+          "feminine": "Dresseuse de chevaux de cinéma",
+          "neutral": "Dresseur·se de chevaux de cinéma"
+        },
+        "r_35f9ffa503c4": {
+          "masculine": "Responsable de la conduite des chevaux (Horse Wrangler)",
+          "feminine": "Responsable de la conduite des chevaux (Horse Wrangler)",
+          "neutral": "Responsable de la conduite des chevaux (Horse Wrangler)"
+        }
+      }
     }
   },
   "TransactionalEmail": {
@@ -8454,5 +13363,13 @@
     "noMatches": "Tu n’as encore rien enregistré dans cette rubrique.",
     "signInHint": "Connecte-toi pour voir tes favoris.",
     "removeItem": "Retirer {name} des favoris"
+  },
+  "OccupationForm": {
+    "title": "Forme de tes intitulés professionnels",
+    "help": "Choisis comment afficher tes intitulés professionnels. Tu peux modifier ce choix à tout moment.",
+    "standard": "Standard",
+    "masculine": "Forme masculine",
+    "feminine": "Forme féminine",
+    "neutral": "Forme neutre"
   }
 }

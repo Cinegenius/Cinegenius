@@ -1,3 +1,4 @@
+import { isOccupationForm, type OccupationForm } from "./occupation-form";
 import { occupationReference, primaryOccupationForPositions, type PrimaryOccupation } from "./primary-occupation";
 import { additionalCrewOccupation } from "./crew-occupations";
 import { selectedPlaceId } from "./selected-place-id";
@@ -16,6 +17,7 @@ export type GuidedProfileDraft = {
   primaryOccupation?: PrimaryOccupation | null;
   additionalOccupation?: PrimaryOccupation | null;
   bio: string;
+  occupationForm?: OccupationForm;
 };
 
 export const START_GUIDED_PROFILE_DRAFT: GuidedProfileDraft = {
@@ -32,7 +34,7 @@ const oldWizardTalentPosition: Record<string, string> = {
 };
 
 export function normalizeGuidedProfileDraft(value: Partial<GuidedProfileDraft> & { gripPositions?: string[]; types?: string[] }): GuidedProfileDraft {
-  const { gripPositions: _legacyGripPositions, ...currentValues } = value;
+  const { gripPositions: _legacyGripPositions, occupationForm, ...currentValues } = value;
   void _legacyGripPositions;
   const rawTypes = Array.isArray(value.types) ? value.types : [];
   const departmentIds = new Set(Array.isArray(value.departmentIds) ? value.departmentIds : []);
@@ -54,14 +56,19 @@ export function normalizeGuidedProfileDraft(value: Partial<GuidedProfileDraft> &
     else if (profileTypeIds.has(type)) types.push(type);
   }
 
-  for (const department of departments) {
-    if (department.roles.some((role) => positions.includes(role))) departmentIds.add(department.id);
+  for (const position of positions) {
+    const matching = departments.filter((department) => department.roles.includes(position));
+    // A shared title keeps its explicit selected group when another group is removed.
+    if (!matching.some((department) => departmentIds.has(department.id))) {
+      for (const department of matching) departmentIds.add(department.id);
+    }
   }
   if ((value.gripPositions?.length ?? 0) > 0) departmentIds.add("grip");
 
   return {
     ...START_GUIDED_PROFILE_DRAFT,
     ...currentValues,
+    ...(isOccupationForm(occupationForm) ? { occupationForm } : {}),
     selected_place_city_id: selectedPlaceId(value.selected_place_city_id),
     step: Math.max(1, Math.min(4, Number(value.step) || 1)),
     types: [...new Set(types)],

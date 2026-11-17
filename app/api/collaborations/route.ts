@@ -1,3 +1,4 @@
+import { occupationFormFromCrew } from "@/lib/occupation-form";
 import { profileOccupationPreview } from "@/lib/crew-occupations";
 import { auth } from "@clerk/nextjs/server";
 import { canViewProfile } from "@/lib/trust";
@@ -59,6 +60,7 @@ export async function GET(req: NextRequest) {
         avatar_url: p.avatar_url ?? null,
         slug: p.slug ?? c.friendId,
         role: profileOccupationPreview(p)[0] ?? null,
+        occupationForm: occupationFormFromCrew(p.crew),
       };
     }),
   });

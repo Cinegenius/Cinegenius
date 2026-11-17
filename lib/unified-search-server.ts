@@ -1,10 +1,11 @@
+import { occupationFormFromCrew } from "@/lib/occupation-form";
 import "server-only";
 import { profileOccupationPreview, type OccupationProfile } from "@/lib/crew-occupations";
 import { db } from "@/lib/db";
 import { getTranslations } from "next-intl/server";
 import { profileAccessFor } from "@/lib/profile-privacy-server";
 import { projectProfilePrivacy } from "@/lib/profile-privacy";
-import { getDeptLabel, getDepartmentRoleLabel, departments, taxonomyLabel } from "@/lib/departments";
+import { getDeptLabel, departments, taxonomyLabel } from "@/lib/departments";
 import { placeReadFields } from "@/lib/places/catalog";
 import { publicMapPoint } from "@/lib/places/public-map-point";
 import { readPublicLocationArea } from "@/lib/location-privacy";
@@ -125,7 +126,7 @@ async function readGroup(plan: SearchPlan, wishIndex: number, area: SearchArea, 
     if (area === "projects") row = publicProjectMedia(row);
     const place = placeDisplay(placeReadFields(String(row.location ?? row.city ?? ""), row, locale), String(row.location ?? row.city ?? ""), locale);
     const organization = Array.isArray(row.organization) ? row.organization[0] : row.organization;
-    const role = area === "crew" ? profileOccupationPreview(row as OccupationProfile).map(title => taxonomyLabel(title, ui)).join(" · ") : row.role;
+    const role = area === "crew" ? profileOccupationPreview(row as OccupationProfile).map(title => taxonomyLabel(title, ui, occupationFormFromCrew(row.crew))).join(" · ") : row.role;
     const result: SearchResult = {
       id: String(area === "crew" ? row.user_id : area === "news" ? `${(organization as Row)?.slug}/${row.slug}` : row.slug || row.id),
       title: String(row.display_name ?? row.name ?? row.title ?? ""),

@@ -3,7 +3,7 @@
 import GenieWritingAssistant from "@/components/GenieWritingAssistant";
 
 import PlaceField from "@/components/PlaceField";
-import { needsPublicSetupProfile, setupProfilePayload, initializeSetupProfileArt, setupProfileAvatar, type SetupProfileIdentity } from "@/lib/provider-profile-setup";
+import { needsPublicSetupProfile, setupProfilePayload, initializeSetupProfileArt, initializeSetupOccupationForm, setupProfileAvatar, type SetupProfileIdentity } from "@/lib/provider-profile-setup";
 import ProfileArtPicker from "@/components/ProfileArtPicker";
 import SetupCompletionOffers from "@/components/SetupCompletionOffers";
 import ContentUsageNotice from "@/components/ContentUsageNotice";
@@ -28,18 +28,20 @@ import { marketplaceCategory } from "@/lib/marketplaceCategories";
 import { listingPriceLabel } from "@/lib/listing-price";
 import { MAX_PROFILE_OCCUPATIONS } from "@/lib/crew-occupations";
 import PrimaryOccupationPicker from "@/components/PrimaryOccupationPicker";
+import OccupationFormSelect from "@/components/OccupationFormSelect";
+import { normalizeOccupationForm } from "@/lib/occupation-form";
 import {
   ArrowLeft, ArrowRight, Building2, Camera, CheckCircle2, Film, ImagePlus,
   Loader2, MapPin, Package, Search, Trash2, Lock, UserRound,
 } from "lucide-react";
 import { compressImage, MAX_FUNCTION_UPLOAD_BYTES } from "@/lib/compressImage";
-import { departments, getDeptLabel, getDepartmentRoleLabel, getDepartmentRoleSearchTerms , taxonomyLabel } from "@/lib/departments";
+import { departments, getDeptLabel, getDepartmentRoleLabel, getDepartmentRoleSearchTerms, getDepartmentRoleFormLabels, taxonomyLabel } from "@/lib/departments";
 import { safeAuthRedirect } from "@/lib/auth-redirect";
 import { hasCompletedNonPersonalSetup, hasProfileBasics, shouldSkipProfileSetup } from "@/lib/profile-setup-flow";
 import { createOnboardingSaveQueue, isQuickStartContentSaved } from "@/lib/onboarding-save";
 import {
   buildQuickStartScreens, createQuickStartIntentData, findQuickStartRoles, getQuickStartDepartments, getQuickStartIntroIntents,
-  normalizeQuickStartDraft, selectQuickStartIntent, QUICK_START_CATEGORIES,
+  normalizeQuickStartDraft, selectQuickStartIntent, selectQuickStartOccupationForm, QUICK_START_CATEGORIES,
   START_QUICK_START_DRAFT,
   validateQuickStartDraft, validateQuickStartScreen, validateQuickStartIntentDetails,
   type QuickStartDraft, type QuickStartIntent, type QuickStartIntentData,
@@ -144,6 +146,11 @@ function ProfileSetupContent() {
   const redirectTo = safeAuthRedirect(params.get("redirect") ?? undefined, "", ["/sign-in", "/sign-up", "/profile-setup", "/guided-profile", "/guided-listing", "/company-setup"]);
   const [responsibleErrors, setResponsibleErrors] = useState<Record<string, string>>({});
   const [draft, setDraft] = useState<QuickStartDraft>(START_QUICK_START_DRAFT);
+  const occupationForm = normalizeOccupationForm(draft.occupationForm);
+  const hasProfileIntent = draft.intents.includes("crew") || draft.intents.includes("talent");
+  const localizedRoleForms = useMemo(() => new Map<string, string[]>(hasProfileIntent ? departments.flatMap(department => department.roles.map(role => [
+    `${department.id}:${role}`, getDepartmentRoleFormLabels(department.id, role, locale, animals, taxonomyText),
+  ] as [string, string[]])) : []), [hasProfileIntent, locale, animals, taxonomyText]);
   const [finished, setFinished] = useState<QuickStartDraft | null>(null);
   const [profileIsPrivate, setProfileIsPrivate] = useState(false);
   const [profilePublic, setProfilePublic] = useState(false);
@@ -238,6 +245,7 @@ function ProfileSetupContent() {
         if (missing) nextDraft = { ...nextDraft, step: missing.field === "primaryOccupation" ? "review" : screenForField(missing.field), activeIntent: intentForField(missing.field) ?? nextDraft.activeIntent };
       }
       nextDraft = initializeSetupProfileArt(nextDraft, user.id, profile?.exists ? profile.profile : null);
+      nextDraft = initializeSetupOccupationForm(nextDraft, profile?.exists ? profile.profile : null);
       setDraft(nextDraft);
 
       setReady(true);
@@ -279,10 +287,9 @@ function ProfileSetupContent() {
   ].filter((role, index, list) => list.findIndex((other) => other.departmentId === role.departmentId && other.role === role.role) === index), [draft.sections.crew?.roles, draft.sections.talent?.roles]);
   const filteredDepartments = useMemo(() => {
     const query = departmentSearch.trim().toLocaleLowerCase("de");
-    return crewDepartments.filter((department) => !query || getDeptLabel(department, locale, animals, taxonomyText).toLocaleLowerCase(locale).includes(query) || [department.label, ...Object.values(department.labels)].some((label) => label.toLocaleLowerCase("de").includes(query)) || department.roles.some((role) => getDepartmentRoleSearchTerms(department, role, getDepartmentRoleLabel(department.id, role, locale, animals, taxonomyText)).some((term) => term.toLocaleLowerCase("de").includes(query))));
-  }, [departmentSearch, locale, animals, taxonomyText]);
+    return crewDepartments.filter((department) => !query || getDeptLabel(department, locale, animals, taxonomyText).toLocaleLowerCase(locale).includes(query) || [department.label, ...Object.values(department.labels)].some((label) => label.toLocaleLowerCase("de").includes(query)) || department.roles.some((role) => getDepartmentRoleSearchTerms(department, role, getDepartmentRoleLabel(department.id, role, locale, animals, taxonomyText, occupationForm), localizedRoleForms.get(`${department.id}:${role}`)).some((term) => term.toLocaleLowerCase("de").includes(query))));
+  }, [departmentSearch, locale, animals, taxonomyText, occupationForm, localizedRoleForms]);
   const selectedIntentTitles = draft.intents.map((intent) => t(`${intent}Intent`));
-  const hasProfileIntent = draft.intents.includes("crew") || draft.intents.includes("talent");
   const needsProfile = needsPublicSetupProfile(draft.intents);
   const hasCompanyIntent = draft.intents.includes("company");
   const hasOfferIntent = draft.intents.includes("location") || draft.intents.includes("equipment");
@@ -296,6 +303,7 @@ function ProfileSetupContent() {
       : hasOfferIntent ? uiText("setup.draftsFinish") : uiText("setup.searchFinish");
 
   function update<K extends keyof QuickStartDraft>(key: K, value: QuickStartDraft[K]) {
+    if (key === "occupationForm") { setDraft(current => selectQuickStartOccupationForm(current, value)); setError(""); return; }
     setDraft((current) => ({ ...current, [key]: value, ...(["name", "personCity", "personCountry", "talentIntro", "providerImageUrl", "primaryOccupation", "additionalOccupation"].includes(key) ? { completed: { ...current.completed, profile: false } } : {}) }));
     setError("");
   }
@@ -643,8 +651,9 @@ function ProfileSetupContent() {
     const data = draft.sections[intent] ?? createQuickStartIntentData();
     const activeDepartments = intent === "crew" ? data.departmentIds : (castDepartment ? [castDepartment.id] : []);
     const roleFilter = intent === "crew" && activeDepartments.length ? activeDepartments : intent === "talent" ? activeDepartments : undefined;
-    const matches = findQuickStartRoles(roleSearch, 50, roleFilter, (departmentId, role) => getDepartmentRoleLabel(departmentId, role, locale, animals, taxonomyText));
+    const matches = findQuickStartRoles(roleSearch, 50, roleFilter, (departmentId, role) => [getDepartmentRoleLabel(departmentId, role, locale, animals, taxonomyText, occupationForm), ...(localizedRoleForms.get(`${departmentId}:${role}`) ?? [])]);
     return <div className="space-y-4">
+      <OccupationFormSelect value={occupationForm} onChange={value => update("occupationForm", value)} />
       {intent === "crew" && <details className="rounded-xl border border-border bg-bg-primary p-3" open={activeDepartments.length === 0}>
         <summary className="flex min-h-11 cursor-pointer items-center justify-between gap-3 text-sm font-semibold text-text-primary"><span>{t("copy3")}</span><span className="text-gold" aria-hidden="true">⌄</span></summary>
         {activeDepartments.length > 0 && <p className="mb-3 text-xs leading-5 text-gold">{activeDepartments.map(id => { const department = crewDepartments.find(item => item.id === id); return department ? getDeptLabel(department, locale, animals, taxonomyText) : ""; }).filter(Boolean).join(" · ")}</p>}
@@ -664,22 +673,22 @@ function ProfileSetupContent() {
         {roleSearch.trim() ? <div className="mt-3 max-h-56 space-y-1 overflow-y-auto rounded-xl border border-border bg-bg-primary p-2">
           {matches.map((item) => {
             const selected = data.roles.some((role) => role.departmentId === item.departmentId && role.role === item.role);
-            return <button key={`${item.departmentId}:${item.role}`} type="button" aria-pressed={selected} onClick={() => toggleRole(item, intent)} className={`flex min-h-11 w-full items-center justify-between gap-3 rounded-lg px-3 py-2 text-left ${selected ? "bg-gold/10 text-gold" : "text-text-primary hover:bg-bg-elevated"}`}><span className="min-w-0"><span className="block break-words text-sm font-medium">{getDepartmentRoleLabel(item.departmentId, item.role, locale, animals, taxonomyText)}</span><span className="block text-xs text-text-muted">{getDeptLabel(departments.find(department=>department.id===item.departmentId)!, locale, animals, taxonomyText)}</span></span><span className="shrink-0">{selected ? "✓" : "+"}</span></button>;
+            return <button key={`${item.departmentId}:${item.role}`} type="button" aria-pressed={selected} onClick={() => toggleRole(item, intent)} className={`flex min-h-11 w-full items-center justify-between gap-3 rounded-lg px-3 py-2 text-left ${selected ? "bg-gold/10 text-gold" : "text-text-primary hover:bg-bg-elevated"}`}><span className="min-w-0"><span className="block break-words text-sm font-medium">{getDepartmentRoleLabel(item.departmentId, item.role, locale, animals, taxonomyText, occupationForm)}</span><span className="block text-xs text-text-muted">{getDeptLabel(departments.find(department=>department.id===item.departmentId)!, locale, animals, taxonomyText)}</span></span><span className="shrink-0">{selected ? "✓" : "+"}</span></button>;
           })}
           {!matches.length && <p className="px-3 py-4 text-sm text-text-muted">{t("copy6")}</p>}
         </div> : intent === "talent" ? <div className="mt-3 grid gap-2 sm:grid-cols-2">
-          {(castDepartment?.roles ?? []).map((role) => { const selected = data.roles.some((item) => item.role === role); return <button key={role} type="button" aria-pressed={selected} onClick={() => toggleRole({ departmentId: "cast", role }, intent)} className={`flex min-h-11 items-center justify-between gap-3 rounded-xl border px-3 py-2 text-left text-sm ${selected ? "border-gold bg-gold/10 text-gold" : "border-border bg-bg-primary text-text-primary"}`}><span className="break-words">{getDepartmentRoleLabel("cast", role, locale, animals, taxonomyText)}</span><span className="shrink-0">{selected ? "✓" : "+"}</span></button>; })}
+          {(castDepartment?.roles ?? []).map((role) => { const selected = data.roles.some((item) => item.role === role); return <button key={role} type="button" aria-pressed={selected} onClick={() => toggleRole({ departmentId: "cast", role }, intent)} className={`flex min-h-11 items-center justify-between gap-3 rounded-xl border px-3 py-2 text-left text-sm ${selected ? "border-gold bg-gold/10 text-gold" : "border-border bg-bg-primary text-text-primary"}`}><span className="break-words">{getDepartmentRoleLabel("cast", role, locale, animals, taxonomyText, occupationForm)}</span><span className="shrink-0">{selected ? "✓" : "+"}</span></button>; })}
         </div> : <div className="mt-3 space-y-2">
           {data.departmentIds.map((id, index) => {
             const department = departments.find((item) => item.id === id);
             if (!department) return null;
             const selectedCount = data.roles.filter((role) => role.departmentId === id).length;
-            return <details key={id} className="rounded-xl border border-border bg-bg-primary" open={index === 0}><summary className="flex min-h-12 cursor-pointer list-none items-center justify-between gap-3 px-4 py-3 text-sm font-semibold text-text-primary"><span className="break-words">{department.emoji} {getDeptLabel(department, locale, animals, taxonomyText)}</span><span className="shrink-0 text-xs font-normal text-text-muted">{selectedCount ? uiText("Ui.text_fd3252760fa813", { value1: String(selectedCount) }) : uiText("Ui.text_15ffa5773e8f7a", { value1: String(department.roles.length) })}</span></summary><div className="max-h-64 space-y-1 overflow-y-auto overscroll-contain border-t border-border p-2">{[...new Set(department.roles)].map((role) => { const selected = data.roles.some((item) => item.departmentId === id && item.role === role); return <button key={role} type="button" aria-pressed={selected} onClick={() => toggleRole({ departmentId: id, role }, intent)} className={`flex min-h-11 w-full items-center justify-between gap-3 rounded-lg px-3 py-2 text-left text-sm ${selected ? "bg-gold/10 text-gold" : "text-text-secondary hover:bg-bg-elevated"}`}><span className="break-words">{getDepartmentRoleLabel(id, role, locale, animals, taxonomyText)}</span><span className="shrink-0">{selected ? "✓" : "+"}</span></button>; })}</div></details>;
+            return <details key={id} className="rounded-xl border border-border bg-bg-primary" open={index === 0}><summary className="flex min-h-12 cursor-pointer list-none items-center justify-between gap-3 px-4 py-3 text-sm font-semibold text-text-primary"><span className="break-words">{department.emoji} {getDeptLabel(department, locale, animals, taxonomyText)}</span><span className="shrink-0 text-xs font-normal text-text-muted">{selectedCount ? uiText("Ui.text_fd3252760fa813", { value1: String(selectedCount) }) : uiText("Ui.text_15ffa5773e8f7a", { value1: String(department.roles.length) })}</span></summary><div className="max-h-64 space-y-1 overflow-y-auto overscroll-contain border-t border-border p-2">{[...new Set(department.roles)].map((role) => { const selected = data.roles.some((item) => item.departmentId === id && item.role === role); return <button key={role} type="button" aria-pressed={selected} onClick={() => toggleRole({ departmentId: id, role }, intent)} className={`flex min-h-11 w-full items-center justify-between gap-3 rounded-lg px-3 py-2 text-left text-sm ${selected ? "bg-gold/10 text-gold" : "text-text-secondary hover:bg-bg-elevated"}`}><span className="break-words">{getDepartmentRoleLabel(id, role, locale, animals, taxonomyText, occupationForm)}</span><span className="shrink-0">{selected ? "✓" : "+"}</span></button>; })}</div></details>;
           })}
           {!data.departmentIds.length && <p className="rounded-xl border border-border bg-bg-primary p-3 text-sm text-text-muted">{t("copy7")}</p>}
         </div>}
         <p className="mt-3 text-sm leading-6 text-text-secondary">{uiText("occupation.focusExplanation")}</p>
-        <div className="mt-3 flex flex-wrap gap-2">{data.roles.map((item) => <span key={`${item.departmentId}:${item.role}`} className="inline-flex max-w-full items-center gap-2 rounded-full border border-gold/35 bg-gold/10 px-3 py-2 text-xs text-gold"><span className="break-words">{getDepartmentRoleLabel(item.departmentId, item.role, locale, animals, taxonomyText)}</span><button type="button" aria-label={uiText("Ui.text_f10fe7a27ce274", { value1: String(getDepartmentRoleLabel(item.departmentId, item.role, locale, animals, taxonomyText)) })} onClick={() => toggleRole(item, intent)} className="min-h-11 min-w-11 rounded-full hover:bg-bg-elevated">×</button></span>)}</div>
+        <div className="mt-3 flex flex-wrap gap-2">{data.roles.map((item) => <span key={`${item.departmentId}:${item.role}`} className="inline-flex max-w-full items-center gap-2 rounded-full border border-gold/35 bg-gold/10 px-3 py-2 text-xs text-gold"><span className="break-words">{getDepartmentRoleLabel(item.departmentId, item.role, locale, animals, taxonomyText, occupationForm)}</span><button type="button" aria-label={uiText("Ui.text_f10fe7a27ce274", { value1: String(getDepartmentRoleLabel(item.departmentId, item.role, locale, animals, taxonomyText, occupationForm)) })} onClick={() => toggleRole(item, intent)} className="min-h-11 min-w-11 rounded-full hover:bg-bg-elevated">×</button></span>)}</div>
       </div>
     </div>;
   }
@@ -814,7 +823,7 @@ function ProfileSetupContent() {
           <ReviewSection title={t("copy84")} onEdit={() => editReview("goals")}><p className="break-words text-sm text-text-primary">{selectedIntentTitles.join(" · ") || "—"}</p></ReviewSection>
           {hasOfferIntent && <ReviewSection title={providerText("title")} onEdit={() => editReview("intro", draft.intents.find(intent => intent === "location" || intent === "equipment"))}><ReviewRow label={t("name")} value={draft.name} /><ReviewRow label={t("place")} value={[draft.personCity, draft.personCountry].filter(Boolean).join(", ")} />{!hasProfileIntent && draft.talentIntro && <ReviewRow label={t("introduction")} value={draft.talentIntro} />}{!hasProfileIntent && renderArtworkReview()}<p className="rounded-xl border border-border bg-bg-primary p-3 text-xs leading-5 text-text-muted">{providerText(profileIsPrivate ? "privateNotice" : "publicNotice")}</p></ReviewSection>}
           {(draft.intents.includes("crew") || draft.intents.includes("talent")) && <>
-            <ReviewSection title={t("copy85")} onEdit={() => editReview("details", draft.intents.includes("crew") ? "crew" : "talent")}><ReviewRow label={t("occupations")} value={selectedRoles.map((role) => getDepartmentRoleLabel(role.departmentId, role.role, locale, animals, taxonomyText)).join(", ")} /><PrimaryOccupationPicker id="quick-start-primary-occupation" positions={selectedRoles.map(role=>role.role)} selections={selectedRoles.map(item => ({departmentId: item.departmentId, roleId: `${item.departmentId}/${encodeURIComponent(item.role)}`}))} additionalValue={draft.additionalOccupation ?? null} onAdditionalChange={value=>update("additionalOccupation", value)} value={draft.primaryOccupation ?? null} onChange={value=>update("primaryOccupation", value)} /><ReviewRow label={t("place")} value={[draft.personCity, draft.personCountry].filter(Boolean).join(", ")} /><p className="rounded-xl border border-amber-400/25 bg-amber-500/5 p-3 text-xs leading-5 text-text-muted">{t("copy86")}</p></ReviewSection>
+            <ReviewSection title={t("copy85")} onEdit={() => editReview("details", draft.intents.includes("crew") ? "crew" : "talent")}><ReviewRow label={t("occupations")} value={selectedRoles.map((role) => getDepartmentRoleLabel(role.departmentId, role.role, locale, animals, taxonomyText, occupationForm)).join(", ")} /><PrimaryOccupationPicker occupationForm={occupationForm} id="quick-start-primary-occupation" positions={selectedRoles.map(role=>role.role)} selections={selectedRoles.map(item => ({departmentId: item.departmentId, roleId: `${item.departmentId}/${encodeURIComponent(item.role)}`}))} additionalValue={draft.additionalOccupation ?? null} onAdditionalChange={value=>update("additionalOccupation", value)} value={draft.primaryOccupation ?? null} onChange={value=>update("primaryOccupation", value)} /><ReviewRow label={t("place")} value={[draft.personCity, draft.personCountry].filter(Boolean).join(", ")} /><p className="rounded-xl border border-amber-400/25 bg-amber-500/5 p-3 text-xs leading-5 text-text-muted">{t("copy86")}</p></ReviewSection>
             <ReviewSection title={t("copy87")} onEdit={() => editReview("intro", draft.intents.includes("crew") ? "crew" : "talent")}>{renderArtworkReview()}<ReviewRow label={t("introduction")} value={draft.talentIntro} /></ReviewSection>
           </>}
           {draft.intents.filter((intent): intent is "location" | "equipment" => (intent === "location" || intent === "equipment") && !draft.sections[intent]?.offerLater).map((intent) => { const data = draft.sections[intent] ?? createQuickStartIntentData(); const categoryName = intent === "equipment" ? marketplaceCategoryLabel(data.category,marketCatalog) : QUICK_START_CATEGORIES[intent].find((item) => item.value === data.category)?.label ?? data.category; return <div key={intent} className="space-y-3"><ReviewSection title={t(`${intent}Intent`)} onEdit={() => editReview("details", intent)}><ReviewRow label={t("kind")} value={taxonomyLabel(categoryName, uiText)} /><ReviewRow label={t("listing")} value={data.title} /><ReviewRow label={t("place")} value={data.city} /></ReviewSection><ReviewSection title={uiText("Ui.text_de70e79498ecb6", { value1: String(t(`${intent}Intent`)) })} onEdit={() => editReview("intro", intent)}>{data.description && <ReviewRow label={t("description")} value={data.description} />}<ReviewRow label={t("copy41")} value={listingPriceLabel(Number(data.price), {price_on_request:data.priceOnRequest,price_negotiable:data.priceNegotiable}, undefined, locale, uiPriceText)} />{data.imageUrl && <Image src={data.imageUrl} alt={t("copy90")} width={720} height={480} sizes="(max-width: 640px) 100vw, 640px" className="max-h-40 w-full rounded-lg object-contain" />}<p className="rounded-xl border border-border bg-bg-primary p-3 text-xs leading-5 text-text-muted">{t("copy91")}</p></ReviewSection></div>; })}

@@ -1,4 +1,4 @@
-import { departments, getDepartmentRoleLabel, getDeptLabel } from "./departments";
+import { departments, getDepartmentRoleFormLabels, getDeptLabel } from "./departments";
 import { occupationCatalogue } from "./primary-occupation";
 import { placeCandidatesForLabel, placeReadFields } from "./places/catalog";
 import { countryCode, placeKey, placeCitySearchAliases } from "./places/core";
@@ -67,8 +67,8 @@ export function wishSearchTerms(wish: SearchWish, locale = "de", taxonomy?: (key
     const dept = departments.find(d => d.id === wish.department) ?? searchDepartment(wish.query, locale, taxonomy);
     const roles = occupationCatalogue.filter(role => !dept || role.departmentId === dept.id).map(role => {
       const department = departments.find(d => d.id === role.departmentId)!;
-      const label = getDepartmentRoleLabel(department.id, role.label, locale, undefined, taxonomy);
-      return { ...role, aliases: [...new Set([...role.aliases, label])] };
+      const forms = getDepartmentRoleFormLabels(department.id, role.label, locale, undefined, taxonomy);
+      return { ...role, aliases: [...new Set([...role.aliases, ...forms])] };
     });
     if (dept && (!requested.length || searchDepartment(wish.query, locale, taxonomy)?.id === dept.id)) terms.push(...roles.flatMap(role => role.aliases));
     for (const term of requested) {

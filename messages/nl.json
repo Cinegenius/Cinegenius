@@ -1631,15 +1631,15 @@
       "tiertraining-film-medien": "Dierentraining voor film en media"
     },
     "roles": {
-      "tiertrainer": "Trainer van filmdieren / Trainster van filmdieren",
-      "filmhundetrainer": "Trainer van filmhonden / Trainster van filmhonden",
-      "tierbetreuer": "Dierenbegeleider / Dierenbegeleidster (Animal Handler)",
-      "tierkoordination": "Dierencoördinator / Dierencoördinatrice",
-      "set-tierbetreuung": "Dierenverzorger / Dierenverzorgster op de set",
-      "horse-master": "Paardencoördinator / Paardencoördinatrice (Horse Master)",
-      "assistant-horse-master": "Assistent / Assistente van de Horse Master",
-      "horse-trainer": "Trainer van filmpaarden / Trainster van filmpaarden",
-      "horse-wrangler": "Paardenbegeleider / Paardenbegeleidster (Horse Wrangler)"
+      "tiertrainer": "Dierentrainer voor film",
+      "filmhundetrainer": "Hondentrainer voor film",
+      "tierbetreuer": "Dierenbegeleider (Animal Handler)",
+      "tierkoordination": "Dierencoördinator",
+      "set-tierbetreuung": "Dierenbegeleider op de set",
+      "horse-master": "Paardencoördinator (Horse Master)",
+      "assistant-horse-master": "Assistent van de Horse Master",
+      "horse-trainer": "Paardentrainer voor film",
+      "horse-wrangler": "Paardenbegeleider (Horse Wrangler)"
     },
     "species": {
       "dogs": "Honden",
@@ -1687,7 +1687,54 @@
     "previewNotice": "Dit dierenportfolio wacht nog op goedkeuring en is alleen zichtbaar als beveiligd voorbeeld.",
     "count": "Aantal (optioneel)",
     "handler": "Begeleiding door een trainer of dierenbegeleider voorzien",
-    "delivery": "Vervoer naar de set mogelijk"
+    "delivery": "Vervoer naar de set mogelijk",
+    "roleForms": {
+      "tiertrainer": {
+        "masculine": "Trainer van filmdieren",
+        "feminine": "Trainster van filmdieren",
+        "neutral": "Dierentrainer voor film"
+      },
+      "filmhundetrainer": {
+        "masculine": "Trainer van filmhonden",
+        "feminine": "Trainster van filmhonden",
+        "neutral": "Hondentrainer voor film"
+      },
+      "tierbetreuer": {
+        "masculine": "Dierenbegeleider (Animal Handler)",
+        "feminine": "Dierenbegeleidster (Animal Handler)",
+        "neutral": "Dierenbegeleider (Animal Handler)"
+      },
+      "tierkoordination": {
+        "masculine": "Dierencoördinator",
+        "feminine": "Dierencoördinatrice",
+        "neutral": "Dierencoördinator"
+      },
+      "set-tierbetreuung": {
+        "masculine": "Dierenbegeleider op de set",
+        "feminine": "Dierenbegeleidster op de set",
+        "neutral": "Dierenbegeleider op de set"
+      },
+      "horse-master": {
+        "masculine": "Paardencoördinator (Horse Master)",
+        "feminine": "Paardencoördinatrice (Horse Master)",
+        "neutral": "Paardencoördinator (Horse Master)"
+      },
+      "assistant-horse-master": {
+        "masculine": "Assistent van de Horse Master",
+        "feminine": "Assistente van de Horse Master",
+        "neutral": "Assistent van de Horse Master"
+      },
+      "horse-trainer": {
+        "masculine": "Trainer van filmpaarden",
+        "feminine": "Trainster van filmpaarden",
+        "neutral": "Paardentrainer voor film"
+      },
+      "horse-wrangler": {
+        "masculine": "Paardenbegeleider (Horse Wrangler)",
+        "feminine": "Paardenbegeleidster (Horse Wrangler)",
+        "neutral": "Paardenbegeleider (Horse Wrangler)"
+      }
+    }
   },
   "MarketplaceCatalog": {
     "categories": {
@@ -5971,7 +6018,7 @@
         "r_e90f5848bfc3": "Financieel productiebeheer",
         "r_c6dc08a47d0d": "Filmcontroller",
         "r_2557c22fb3d7": "Duurzaamheidsadviseur / sustainabilitymanager",
-        "r_2a6c1d42831e": "Productiestagiair / Productiestagiaire",
+        "r_2a6c1d42831e": "Productiestagiair",
         "r_ede69642be01": "Stagiair setopnameleiding",
         "r_de9ab1a6b55a": "Productieleider",
         "r_fd701e2c1e86": "Opnameleider",
@@ -6020,7 +6067,7 @@
         "r_07f0060c8996": "Productiestagiair (producer)"
       },
       "regie": {
-        "r_f59d6991c44a": "Regisseur / Regisseuse",
+        "r_f59d6991c44a": "Regisseur",
         "r_5562e3abbb45": "Coregisseur",
         "r_df7e552a6792": "Second-unitregisseur",
         "r_0aca88b2853d": "Studioregisseur",
@@ -6145,9 +6192,9 @@
       },
       "licht": {
         "r_222be04dbf00": "Gaffer (hoofd belichting)",
-        "r_1e210e69039a": "Assistent-hoofd belichting (Best Boy / Best Girl Electric)",
+        "r_1e210e69039a": "Best boy electric",
         "r_14dd174cd76c": "Rigginggaffer",
-        "r_92137802b24a": "Assistent-hoofd voorbelichting (Rigging Best Boy / Rigging Best Girl Electric)",
+        "r_92137802b24a": "Riggingbestboy",
         "r_7fce7d6fcf12": "Riggingelektricien",
         "r_1bcf9d8d9b03": "Belichter (electrician)",
         "r_d95b919dded9": "Hoofd belichtingstechniek",
@@ -6167,13 +6214,13 @@
       },
       "grip": {
         "r_470156bd03e4": "Key grip",
-        "r_cfbf2a22ed6e": "Assistent-hoofd grip (Best Boy / Best Girl Grip)",
+        "r_cfbf2a22ed6e": "Best boy grip / tweede grip",
         "r_32a6ab31b1a1": "Dollygrip / dollyoperator",
         "r_376dc1f790b8": "Grip",
         "r_dbfaadb8821c": "Gripassistent",
         "r_46dab52c1995": "Rigginggrip",
         "r_ea7e925bd850": "Riggingkeygrip",
-        "r_fa9d72fc7978": "Assistent-hoofd rigginggrip (Rigging Best Boy / Rigging Best Girl Grip)",
+        "r_fa9d72fc7978": "Riggingbestboygrip",
         "r_2fa0b44342d7": "Speciale constructies (grip)",
         "r_08c07afebb7f": "Camerakraan- / jiboperator",
         "r_5ece318b289f": "Camerakraantechnicus",
@@ -6363,7 +6410,7 @@
         "r_298c04a0eec5": "Textielkunstenaar",
         "r_2a6b1e3320f5": "Kostuummaker",
         "r_066dc1f269bb": "Maker kostuumrekwisieten",
-        "r_83db0e1a7bff": "Hoofd patroonontwikkeling",
+        "r_83db0e1a7bff": "Patroonmaker",
         "r_fc8d26a01b37": "Maatkleermaker dames",
         "r_9aaa9c423455": "Maatkleermaker heren",
         "r_975bb2c38b93": "Hoedenmaker",
@@ -6580,7 +6627,7 @@
       },
       "set-logistik": {
         "r_06d9aa28368f": "Runner uitvalsbasis",
-        "r_51e581b5ea39": "Chauffeur / Chauffeuse (personenauto / vrachtwagen)",
+        "r_51e581b5ea39": "Chauffeur (personenauto / vrachtwagen)",
         "r_36a599628c2e": "Locatiechauffeur",
         "r_9bc1a35535fa": "Locatie-opnameleider",
         "r_273f12c52b95": "Assistent locatiemanager",
@@ -6643,9 +6690,9 @@
         "r_b85e79c1153f": "Onderzoek"
       },
       "cast": {
-        "r_3d0e76b883b1": "Hoofdrolspeler / Hoofdrolspeelster",
+        "r_3d0e76b883b1": "Hoofdrolspeler",
         "r_543b99d52c01": "Acteur",
-        "r_aa64ee1fd5d6": "Bijrolspeler / Bijrolspeelster",
+        "r_aa64ee1fd5d6": "Bijrolspeler",
         "r_5fea55df03ed": "Figurant",
         "r_912a4dbdd23c": "Kleine-rolspeler",
         "r_130f7a137659": "Model",
@@ -6668,7 +6715,7 @@
         "r_901a1b08f6ba": "Intimiteitscoördinator",
         "r_7a721e572105": "Castingmedewerker",
         "r_a1f9ba79ab08": "Castingassistent",
-        "r_84927cc7b2bc": "Bijrolspeler / Bijrolspeelster",
+        "r_84927cc7b2bc": "Bijrolspeler",
         "r_97144193d2e9": "Figurant",
         "r_de130677203b": "Castingdirector (jongeren)",
         "r_27725de30521": "Castingdirector (kinderen)",
@@ -6815,7 +6862,7 @@
         "r_ce039c1f951f": "Motiondesigner (sociale media)"
       },
       "foto": {
-        "r_d2c0588cf0d1": "Fotograaf / Fotografe",
+        "r_d2c0588cf0d1": "Fotograaf",
         "r_d7f7fbf5939c": "Modefotograaf",
         "r_e0551919b067": "Productfotograaf",
         "r_b06301444ef7": "Evenementfotograaf",
@@ -6901,15 +6948,15 @@
         "r_532adc563b66": "Chauffeur catering en mobiele keuken"
       },
       "filmtiere-tiertraining": {
-        "r_3d8ab6fb2c6a": "Trainer van filmdieren / Trainster van filmdieren",
-        "r_654c33dc9c6b": "Trainer van filmhonden / Trainster van filmhonden",
-        "r_40758f075d18": "Dierenbegeleider / Dierenbegeleidster (Animal Handler)",
-        "r_7a1591b96b3a": "Dierencoördinator / Dierencoördinatrice",
-        "r_a63695a566c3": "Dierenverzorger / Dierenverzorgster op de set",
-        "r_9faf951b627e": "Paardencoördinator / Paardencoördinatrice (Horse Master)",
-        "r_7c4f137defec": "Assistent / Assistente van de Horse Master",
-        "r_8e8f21cf0303": "Trainer van filmpaarden / Trainster van filmpaarden",
-        "r_35f9ffa503c4": "Paardenbegeleider / Paardenbegeleidster (Horse Wrangler)"
+        "r_3d8ab6fb2c6a": "Dierentrainer voor film",
+        "r_654c33dc9c6b": "Hondentrainer voor film",
+        "r_40758f075d18": "Dierenbegeleider (Animal Handler)",
+        "r_7a1591b96b3a": "Dierencoördinator",
+        "r_a63695a566c3": "Dierenbegeleider op de set",
+        "r_9faf951b627e": "Paardencoördinator (Horse Master)",
+        "r_7c4f137defec": "Assistent van de Horse Master",
+        "r_8e8f21cf0303": "Paardentrainer voor film",
+        "r_35f9ffa503c4": "Paardenbegeleider (Horse Wrangler)"
       }
     },
     "extra": {
@@ -6979,6 +7026,4868 @@
       "x_907c602b417d": "Online en digitaal",
       "x_f4581b3b4f89": "Website, platform, streaming",
       "x_d06f18dfc1af": "Andere filmdiensten"
+    },
+    "roleForms": {
+      "produktion": {
+        "r_d479a6d8637e": {
+          "masculine": "Producent",
+          "feminine": "Producente",
+          "neutral": "Producent"
+        },
+        "r_86ca6f7fac85": {
+          "masculine": "Executive producer",
+          "feminine": "Executive producer",
+          "neutral": "Executive producer"
+        },
+        "r_9b38cf86cffe": {
+          "masculine": "Coproducent",
+          "feminine": "Coproducente",
+          "neutral": "Coproducent"
+        },
+        "r_bd2e1cd12f54": {
+          "masculine": "Associate producer",
+          "feminine": "Associate producer",
+          "neutral": "Associate producer"
+        },
+        "r_bc840a4895a2": {
+          "masculine": "Juniorproducent",
+          "feminine": "Juniorproducente",
+          "neutral": "Juniorproducent"
+        },
+        "r_ebaa595e4927": {
+          "masculine": "Lineproducer",
+          "feminine": "Lineproducer",
+          "neutral": "Lineproducer"
+        },
+        "r_9f722922fe7b": {
+          "masculine": "Hoofd productie (HL)",
+          "feminine": "Hoofd productie (HL)",
+          "neutral": "Hoofd productie (HL)"
+        },
+        "r_7fdd4fd31143": {
+          "masculine": "Assistent hoofd productie",
+          "feminine": "Assistente hoofd productie",
+          "neutral": "Assistent hoofd productie"
+        },
+        "r_c8c7f4cd576e": {
+          "masculine": "Productieleider (PL)",
+          "feminine": "Productieleidster (PL)",
+          "neutral": "Productieleider (PL)"
+        },
+        "r_edde7bed564a": {
+          "masculine": "Productieleider (omroep)",
+          "feminine": "Productieleidster (omroep)",
+          "neutral": "Productieleider (omroep)"
+        },
+        "r_08532652fb27": {
+          "masculine": "Assistent productieleider",
+          "feminine": "Assistente productieleider",
+          "neutral": "Assistent productieleider"
+        },
+        "r_a8ccedf1c4fc": {
+          "masculine": "Planner / productieplanner",
+          "feminine": "Planner / productieplanner",
+          "neutral": "Planner / productieplanner"
+        },
+        "r_73ab62cc6ea9": {
+          "masculine": "Begrotingsopstelling",
+          "feminine": "Begrotingsopstelling",
+          "neutral": "Begrotingsopstelling"
+        },
+        "r_5e8f13168720": {
+          "masculine": "Productiesupervisor",
+          "feminine": "Productiesupervisor",
+          "neutral": "Productiesupervisor"
+        },
+        "r_a8aaf07776e6": {
+          "masculine": "Assistent productiesupervisor",
+          "feminine": "Assistente productiesupervisor",
+          "neutral": "Assistent productiesupervisor"
+        },
+        "r_86a64b938274": {
+          "masculine": "Studioleider",
+          "feminine": "Studioleidster",
+          "neutral": "Studioleider"
+        },
+        "r_1dc3e15735f4": {
+          "masculine": "Productiecoördinator",
+          "feminine": "Productiecoördinatrice",
+          "neutral": "Productiecoördinator"
+        },
+        "r_3d2828618f01": {
+          "masculine": "Assistent productiecoördinator",
+          "feminine": "Assistente productiecoördinator",
+          "neutral": "Assistent productiecoördinator"
+        },
+        "r_b7b1c24b3218": {
+          "masculine": "Productieassistent (set)",
+          "feminine": "Productieassistente (set)",
+          "neutral": "Productieassistent (set)"
+        },
+        "r_504614327108": {
+          "masculine": "Productieassistent (kantoor)",
+          "feminine": "Productieassistente (kantoor)",
+          "neutral": "Productieassistent (kantoor)"
+        },
+        "r_b1c1be59d3fb": {
+          "masculine": "Tweede productieassistent",
+          "feminine": "Tweede productieassistente",
+          "neutral": "Tweede productieassistent"
+        },
+        "r_e9fe06329d79": {
+          "masculine": "Teamassistent",
+          "feminine": "Teamassistente",
+          "neutral": "Teamassistent"
+        },
+        "r_caad7ad378e8": {
+          "masculine": "Persoonlijk assistent",
+          "feminine": "Persoonlijke assistente",
+          "neutral": "Persoonlijk assistent"
+        },
+        "r_9b9ea0970d1e": {
+          "masculine": "Persoonlijk productieassistent",
+          "feminine": "Persoonlijke productieassistente",
+          "neutral": "Persoonlijk productieassistent"
+        },
+        "r_22ca8fe2e611": {
+          "masculine": "Persoonlijk assistent voor acteurs (talent assistant)",
+          "feminine": "Persoonlijke assistente voor acteurs (talent assistant)",
+          "neutral": "Persoonlijk assistent voor acteurs (talent assistant)"
+        },
+        "r_bdfbe6854805": {
+          "masculine": "Assistent producent",
+          "feminine": "Assistente producent",
+          "neutral": "Assistent producent"
+        },
+        "r_d894e33cd89e": {
+          "masculine": "Directieassistent / executive assistant",
+          "feminine": "Directieassistente / executive assistant",
+          "neutral": "Directieassistent / executive assistant"
+        },
+        "r_bdc2cdf19051": {
+          "masculine": "Kantoorassistent",
+          "feminine": "Kantoorassistente",
+          "neutral": "Kantoorassistent"
+        },
+        "r_328519d70fd2": {
+          "masculine": "Accommodatiecoördinator",
+          "feminine": "Accommodatiecoördinatrice",
+          "neutral": "Accommodatiecoördinator"
+        },
+        "r_6747956824f3": {
+          "masculine": "Reiscoördinator",
+          "feminine": "Reiscoördinatrice",
+          "neutral": "Reiscoördinator"
+        },
+        "r_b809fe7525be": {
+          "masculine": "Assistent reiscoördinator",
+          "feminine": "Assistente reiscoördinator",
+          "neutral": "Assistent reiscoördinator"
+        },
+        "r_86c92e0bfce0": {
+          "masculine": "Gezondheids- en veiligheidscoördinator",
+          "feminine": "Gezondheids- en veiligheidscoördinatrice",
+          "neutral": "Gezondheids- en veiligheidscoördinator"
+        },
+        "r_14cee2575cf1": {
+          "masculine": "ADR-coördinator",
+          "feminine": "ADR-coördinatrice",
+          "neutral": "ADR-coördinator"
+        },
+        "r_92286a252903": {
+          "masculine": "Locatiemanager",
+          "feminine": "Locatiemanager",
+          "neutral": "Locatiemanager"
+        },
+        "r_fc08fa159e6a": {
+          "masculine": "Locatiescout",
+          "feminine": "Locatiescout",
+          "neutral": "Locatiescout"
+        },
+        "r_e5215fd85f99": {
+          "masculine": "Locatiescout (aanvullend)",
+          "feminine": "Locatiescout (aanvullend)",
+          "neutral": "Locatiescout (aanvullend)"
+        },
+        "r_9454a017e69a": {
+          "masculine": "Assistent locatiescout",
+          "feminine": "Assistente locatiescout",
+          "neutral": "Assistent locatiescout"
+        },
+        "r_0d7a23f6a056": {
+          "masculine": "Locatiecoördinator",
+          "feminine": "Locatiecoördinatrice",
+          "neutral": "Locatiecoördinator"
+        },
+        "r_11bbfbf26e46": {
+          "masculine": "Acteurscoördinator",
+          "feminine": "Acteurscoördinatrice",
+          "neutral": "Acteurscoördinator"
+        },
+        "r_155f85cc8157": {
+          "masculine": "Unitmanager",
+          "feminine": "Unitmanager",
+          "neutral": "Unitmanager"
+        },
+        "r_475eba080a17": {
+          "masculine": "Covidcoördinator",
+          "feminine": "Covidcoördinatrice",
+          "neutral": "Covidcoördinator"
+        },
+        "r_a60ca701fcab": {
+          "masculine": "Assistent covidcoördinator",
+          "feminine": "Assistente covidcoördinator",
+          "neutral": "Assistent covidcoördinator"
+        },
+        "r_87a049b62039": {
+          "masculine": "Locatie-opnameleider",
+          "feminine": "Locatie-opnameleidster",
+          "neutral": "Locatie-opnameleider"
+        },
+        "r_5b93948ca9fc": {
+          "masculine": "Assistent locatie-opnameleider",
+          "feminine": "Assistente locatie-opnameleider",
+          "neutral": "Assistent locatie-opnameleider"
+        },
+        "r_8a0cbf242686": {
+          "masculine": "Personeelsplanner",
+          "feminine": "Personeelsplanner",
+          "neutral": "Personeelsplanner"
+        },
+        "r_286fb0baa150": {
+          "masculine": "Transportcoördinator",
+          "feminine": "Transportcoördinatrice",
+          "neutral": "Transportcoördinator"
+        },
+        "r_8e7b74f8a60b": {
+          "masculine": "Assistent transportcoördinator",
+          "feminine": "Assistente transportcoördinator",
+          "neutral": "Assistent transportcoördinator"
+        },
+        "r_940718151db8": {
+          "masculine": "Transportleider",
+          "feminine": "Transportleidster",
+          "neutral": "Transportleider"
+        },
+        "r_34e7de86b42e": {
+          "masculine": "Opnameleider (1st AD)",
+          "feminine": "Opnameleidster (1st AD)",
+          "neutral": "Opnameleider (1st AD)"
+        },
+        "r_2492443d2786": {
+          "masculine": "Setopnameleider",
+          "feminine": "Setopnameleidster",
+          "neutral": "Setopnameleider"
+        },
+        "r_e9593d0ce404": {
+          "masculine": "Derde regieassistent / figurantenregie",
+          "feminine": "Derde regieassistente / figurantenregie",
+          "neutral": "Derde regieassistent / figurantenregie"
+        },
+        "r_4492528d7f86": {
+          "masculine": "Opnameleider uitvalsbasis",
+          "feminine": "Opnameleidster uitvalsbasis",
+          "neutral": "Opnameleider uitvalsbasis"
+        },
+        "r_eaee2c8a1b89": {
+          "masculine": "Chauffeurscoördinator",
+          "feminine": "Chauffeurscoördinatrice",
+          "neutral": "Chauffeurscoördinator"
+        },
+        "r_1e792192a593": {
+          "masculine": "Studio-opnameleider",
+          "feminine": "Studio-opnameleidster",
+          "neutral": "Studio-opnameleider"
+        },
+        "r_453722f35b4e": {
+          "masculine": "Afzettingsmanager",
+          "feminine": "Afzettingsmanager",
+          "neutral": "Afzettingsmanager"
+        },
+        "r_01cf9ccbf27d": {
+          "masculine": "Tweede opnameleider (show / omroep)",
+          "feminine": "Tweede opnameleidster (show / omroep)",
+          "neutral": "Tweede opnameleider (show / omroep)"
+        },
+        "r_282e1b7d8f09": {
+          "masculine": "Verplaatsingscoördinator",
+          "feminine": "Verplaatsingscoördinatrice",
+          "neutral": "Verplaatsingscoördinator"
+        },
+        "r_8016e2e4e662": {
+          "masculine": "Assistent opnameleiding",
+          "feminine": "Assistente opnameleiding",
+          "neutral": "Assistent opnameleiding"
+        },
+        "r_1fb7a2292310": {
+          "masculine": "Assistent eerste opnameleiding",
+          "feminine": "Assistente eerste opnameleiding",
+          "neutral": "Assistent eerste opnameleiding"
+        },
+        "r_366708fdb0b3": {
+          "masculine": "Assistent setopnameleiding",
+          "feminine": "Assistente setopnameleiding",
+          "neutral": "Assistent setopnameleiding"
+        },
+        "r_d73d495c6d75": {
+          "masculine": "Productieassistent parkeren",
+          "feminine": "Productieassistente parkeren",
+          "neutral": "Productieassistent parkeren"
+        },
+        "r_4ed4cafa632a": {
+          "masculine": "Afzettingshulp / verkeersregelaar",
+          "feminine": "Afzettingshulp / verkeersregelaar",
+          "neutral": "Afzettingshulp / verkeersregelaar"
+        },
+        "r_6fbe7d952889": {
+          "masculine": "Setrunner",
+          "feminine": "Setrunner",
+          "neutral": "Setrunner"
+        },
+        "r_c8d2a6e8ca0f": {
+          "masculine": "Productiechauffeur",
+          "feminine": "Productiechauffeuse",
+          "neutral": "Productiechauffeur"
+        },
+        "r_0d9b0abd3608": {
+          "masculine": "Persoonlijk chauffeur",
+          "feminine": "Persoonlijke chauffeuse",
+          "neutral": "Persoonlijk chauffeur"
+        },
+        "r_ef2266f5ad5d": {
+          "masculine": "Apparatuurchauffeur",
+          "feminine": "Apparatuurchauffeuse",
+          "neutral": "Apparatuurchauffeur"
+        },
+        "r_100be7827daf": {
+          "masculine": "Kantoorproductieassistent",
+          "feminine": "Kantoorproductieassistente",
+          "neutral": "Kantoorproductieassistent"
+        },
+        "r_c24ef6245054": {
+          "masculine": "Begrotingsspecialist",
+          "feminine": "Begrotingsspecialiste",
+          "neutral": "Begrotingsspecialist"
+        },
+        "r_e90f5848bfc3": {
+          "masculine": "Financieel productiebeheer",
+          "feminine": "Financieel productiebeheer",
+          "neutral": "Financieel productiebeheer"
+        },
+        "r_c6dc08a47d0d": {
+          "masculine": "Filmcontroller",
+          "feminine": "Filmcontroller",
+          "neutral": "Filmcontroller"
+        },
+        "r_2557c22fb3d7": {
+          "masculine": "Duurzaamheidsadviseur / sustainabilitymanager",
+          "feminine": "Duurzaamheidsadviseuse / sustainabilitymanager",
+          "neutral": "Duurzaamheidsadviseur / sustainabilitymanager"
+        },
+        "r_2a6c1d42831e": {
+          "masculine": "Productiestagiair",
+          "feminine": "Productiestagiaire",
+          "neutral": "Productiestagiair"
+        },
+        "r_ede69642be01": {
+          "masculine": "Stagiair setopnameleiding",
+          "feminine": "Stagiaire setopnameleiding",
+          "neutral": "Stagiair setopnameleiding"
+        },
+        "r_de9ab1a6b55a": {
+          "masculine": "Productieleider",
+          "feminine": "Productieleidster",
+          "neutral": "Productieleider"
+        },
+        "r_fd701e2c1e86": {
+          "masculine": "Opnameleider",
+          "feminine": "Opnameleidster",
+          "neutral": "Opnameleider"
+        },
+        "r_eb2de9d80eb5": {
+          "masculine": "Productiecoördinator",
+          "feminine": "Productiecoördinatrice",
+          "neutral": "Productiecoördinator"
+        },
+        "r_14ba71897157": {
+          "masculine": "Assistent productiecoördinator",
+          "feminine": "Assistente productiecoördinator",
+          "neutral": "Assistent productiecoördinator"
+        },
+        "r_9a9272ffef87": {
+          "masculine": "Productieassistent",
+          "feminine": "Productieassistente",
+          "neutral": "Productieassistent"
+        },
+        "r_b37de62fa7b6": {
+          "masculine": "Tweede productieassistent",
+          "feminine": "Tweede productieassistente",
+          "neutral": "Tweede productieassistent"
+        },
+        "r_35a318ed734f": {
+          "masculine": "Assistent reiscoördinator",
+          "feminine": "Assistente reiscoördinator",
+          "neutral": "Assistent reiscoördinator"
+        },
+        "r_282f5f19af6e": {
+          "masculine": "Setopnameleider",
+          "feminine": "Setopnameleidster",
+          "neutral": "Setopnameleider"
+        },
+        "r_a1888e7923b1": {
+          "masculine": "Teamassistent (voorheen productiesecretaris)",
+          "feminine": "Teamassistente (voorheen productiesecretaresse)",
+          "neutral": "Teamassistent (voorheen productiesecretaris)"
+        },
+        "r_079a221fcd0e": {
+          "masculine": "Tweede opnameleider (show / omroep)",
+          "feminine": "Tweede opnameleidster (show / omroep)",
+          "neutral": "Tweede opnameleider (show / omroep)"
+        },
+        "r_c74c78be5dc2": {
+          "masculine": "Castingdirector",
+          "feminine": "Castingdirector",
+          "neutral": "Castingdirector"
+        },
+        "r_b6e7722029a2": {
+          "masculine": "Productiecontroller",
+          "feminine": "Productiecontroller",
+          "neutral": "Productiecontroller"
+        },
+        "r_4e9c5d6d7198": {
+          "masculine": "Financieel productiemanager",
+          "feminine": "Financieel productiemanager",
+          "neutral": "Financieel productiemanager"
+        },
+        "r_907eb6829faf": {
+          "masculine": "Boekhouder",
+          "feminine": "Boekhouder",
+          "neutral": "Boekhouder"
+        },
+        "r_9ef806a95399": {
+          "masculine": "Assistent financieel productiebeheer",
+          "feminine": "Assistente financieel productiebeheer",
+          "neutral": "Assistent financieel productiebeheer"
+        },
+        "r_3365c6d66b72": {
+          "masculine": "Kasbeheerder",
+          "feminine": "Kasbeheerder",
+          "neutral": "Kasbeheerder"
+        },
+        "r_354a33db42c7": {
+          "masculine": "Salarisadministrateur / payrollaccountant",
+          "feminine": "Salarisadministrateur / payrollaccountant",
+          "neutral": "Salarisadministrateur / payrollaccountant"
+        },
+        "r_f3b7a4579d13": {
+          "masculine": "Stagiair financieel productiebeheer",
+          "feminine": "Stagiaire financieel productiebeheer",
+          "neutral": "Stagiair financieel productiebeheer"
+        },
+        "r_614a09237466": {
+          "masculine": "Hoofd productiestrategie",
+          "feminine": "Hoofd productiestrategie",
+          "neutral": "Hoofd productiestrategie"
+        },
+        "r_ab2bca044ad5": {
+          "masculine": "Hoofd ontwikkeling",
+          "feminine": "Hoofd ontwikkeling",
+          "neutral": "Hoofd ontwikkeling"
+        },
+        "r_4c6443207ff2": {
+          "masculine": "Serviceproducent",
+          "feminine": "Serviceproducente",
+          "neutral": "Serviceproducent"
+        },
+        "r_f43970f8871f": {
+          "masculine": "Productieverantwoordelijke (studio / omroep)",
+          "feminine": "Productieverantwoordelijke (studio / omroep)",
+          "neutral": "Productieverantwoordelijke (studio / omroep)"
+        },
+        "r_b490dba5695d": {
+          "masculine": "Assistent-producent",
+          "feminine": "Assistente-producent",
+          "neutral": "Assistent-producent"
+        },
+        "r_7b68ca0f0fb6": {
+          "masculine": "Tv-producent",
+          "feminine": "Tv-producente",
+          "neutral": "Tv-producent"
+        },
+        "r_564bd1be967c": {
+          "masculine": "Promotieproducent",
+          "feminine": "Promotieproducente",
+          "neutral": "Promotieproducent"
+        },
+        "r_17e75f09bb7a": {
+          "masculine": "Superviserend producent",
+          "feminine": "Superviserend producente",
+          "neutral": "Superviserend producent"
+        },
+        "r_09bdde75b5c6": {
+          "masculine": "Storyproducer",
+          "feminine": "Storyproducer",
+          "neutral": "Storyproducer"
+        },
+        "r_63333ae7406f": {
+          "masculine": "Post-storyproducer",
+          "feminine": "Post-storyproducer",
+          "neutral": "Post-storyproducer"
+        },
+        "r_1c7b4db06402": {
+          "masculine": "Bureauproducent / producent tv-reclame",
+          "feminine": "Bureauproducente / producent tv-reclame",
+          "neutral": "Bureauproducent / producent tv-reclame"
+        },
+        "r_05c4bc7ca840": {
+          "masculine": "3D-stereoproducent",
+          "feminine": "3D-stereoproducente",
+          "neutral": "3D-stereoproducent"
+        },
+        "r_6221ed87ef22": {
+          "masculine": "Superviserend 3D-stereoproducent",
+          "feminine": "Superviserend 3D-stereoproducente",
+          "neutral": "Superviserend 3D-stereoproducent"
+        },
+        "r_7edb24c15dcf": {
+          "masculine": "Web-tv-producent",
+          "feminine": "Web-tv-producente",
+          "neutral": "Web-tv-producent"
+        },
+        "r_3d984a13d7b5": {
+          "masculine": "Creatief producent",
+          "feminine": "Creatieve producente",
+          "neutral": "Creatief producent"
+        },
+        "r_ae0c8b90c8d1": {
+          "masculine": "Ontwikkelingsproducent",
+          "feminine": "Ontwikkelingsproducente",
+          "neutral": "Ontwikkelingsproducent"
+        },
+        "r_d297bfadcae2": {
+          "masculine": "Ontwikkelingscoördinator",
+          "feminine": "Ontwikkelingscoördinatrice",
+          "neutral": "Ontwikkelingscoördinator"
+        },
+        "r_54f1c9f4d11e": {
+          "masculine": "Ontwikkelingsverantwoordelijke (studio / omroep)",
+          "feminine": "Ontwikkelingsverantwoordelijke (studio / omroep)",
+          "neutral": "Ontwikkelingsverantwoordelijke (studio / omroep)"
+        },
+        "r_f42fa61db712": {
+          "masculine": "Assistent regiekamerproducent",
+          "feminine": "Assistente regiekamerproducent",
+          "neutral": "Assistent regiekamerproducent"
+        },
+        "r_9d8ea4e7c7aa": {
+          "masculine": "Regiekamerproducent / uitzendproducent",
+          "feminine": "Regiekamerproducente / uitzendproducent",
+          "neutral": "Regiekamerproducent / uitzendproducent"
+        },
+        "r_b837afb89817": {
+          "masculine": "Producent uitzendpromotie",
+          "feminine": "Producente uitzendpromotie",
+          "neutral": "Producent uitzendpromotie"
+        },
+        "r_bacc7a4ec265": {
+          "masculine": "Auteursrechtenzaken",
+          "feminine": "Auteursrechtenzaken",
+          "neutral": "Auteursrechtenzaken"
+        },
+        "r_7e0ace38e8fc": {
+          "masculine": "Zakelijke aangelegenheden",
+          "feminine": "Zakelijke aangelegenheden",
+          "neutral": "Zakelijke aangelegenheden"
+        },
+        "r_0daf662f57c6": {
+          "masculine": "Zakelijke en juridische aangelegenheden",
+          "feminine": "Zakelijke en juridische aangelegenheden",
+          "neutral": "Zakelijke en juridische aangelegenheden"
+        },
+        "r_a95b977fa84f": {
+          "masculine": "Juridische aangelegenheden",
+          "feminine": "Juridische aangelegenheden",
+          "neutral": "Juridische aangelegenheden"
+        },
+        "r_0433186beb99": {
+          "masculine": "Producent marketing en distributie",
+          "feminine": "Producente marketing en distributie",
+          "neutral": "Producent marketing en distributie"
+        },
+        "r_07f0060c8996": {
+          "masculine": "Productiestagiair (producer)",
+          "feminine": "Productiestagiaire (producer)",
+          "neutral": "Productiestagiair (producer)"
+        }
+      },
+      "regie": {
+        "r_f59d6991c44a": {
+          "masculine": "Regisseur",
+          "feminine": "Regisseuse",
+          "neutral": "Regisseur"
+        },
+        "r_5562e3abbb45": {
+          "masculine": "Coregisseur",
+          "feminine": "Coregisseuse",
+          "neutral": "Coregisseur"
+        },
+        "r_df7e552a6792": {
+          "masculine": "Second-unitregisseur",
+          "feminine": "Second-unitregisseuse",
+          "neutral": "Second-unitregisseur"
+        },
+        "r_0aca88b2853d": {
+          "masculine": "Studioregisseur",
+          "feminine": "Studioregisseuse",
+          "neutral": "Studioregisseur"
+        },
+        "r_394140e22c16": {
+          "masculine": "Nasynchronisatieregisseur",
+          "feminine": "Nasynchronisatieregisseuse",
+          "neutral": "Nasynchronisatieregisseur"
+        },
+        "r_7d2cd6bd3a73": {
+          "masculine": "Beeldregisseur",
+          "feminine": "Beeldregisseuse",
+          "neutral": "Beeldregisseur"
+        },
+        "r_988a573b39e7": {
+          "masculine": "Uitzendregisseur",
+          "feminine": "Uitzendregisseuse",
+          "neutral": "Uitzendregisseur"
+        },
+        "r_0719ad7a68ec": {
+          "masculine": "Dialoogregisseur",
+          "feminine": "Dialoogregisseuse",
+          "neutral": "Dialoogregisseur"
+        },
+        "r_463462fca2ec": {
+          "masculine": "Eerste regieassistent (1st AD)",
+          "feminine": "Eerste regieassistente (1st AD)",
+          "neutral": "Eerste regieassistent (1st AD)"
+        },
+        "r_de1c193ae4d6": {
+          "masculine": "Tweede regieassistent (2nd AD)",
+          "feminine": "Tweede regieassistente (2nd AD)",
+          "neutral": "Tweede regieassistent (2nd AD)"
+        },
+        "r_c37babd28464": {
+          "masculine": "Hoofd tweede regieassistentie",
+          "feminine": "Hoofd tweede regieassistentie",
+          "neutral": "Hoofd tweede regieassistentie"
+        },
+        "r_2b8bbebafa40": {
+          "masculine": "Tweede regieassistent op de set",
+          "feminine": "Tweede regieassistente op de set",
+          "neutral": "Tweede regieassistent op de set"
+        },
+        "r_b0a3c67c20bf": {
+          "masculine": "Tweede regieassistent figuratie",
+          "feminine": "Tweede regieassistente figuratie",
+          "neutral": "Tweede regieassistent figuratie"
+        },
+        "r_b6640a0bf9b6": {
+          "masculine": "Derde regieassistent (3rd AD)",
+          "feminine": "Derde regieassistente (3rd AD)",
+          "neutral": "Derde regieassistent (3rd AD)"
+        },
+        "r_962cb1546148": {
+          "masculine": "Derde regieassistent figuratie",
+          "feminine": "Derde regieassistente figuratie",
+          "neutral": "Derde regieassistent figuratie"
+        },
+        "r_619aa382d108": {
+          "masculine": "Derde regieassistent uitvalsbasis",
+          "feminine": "Derde regieassistente uitvalsbasis",
+          "neutral": "Derde regieassistent uitvalsbasis"
+        },
+        "r_14816f8e2f93": {
+          "masculine": "Derde regieassistent op de set",
+          "feminine": "Derde regieassistente op de set",
+          "neutral": "Derde regieassistent op de set"
+        },
+        "r_00bb63b14962": {
+          "masculine": "Productieassistent regie",
+          "feminine": "Productieassistente regie",
+          "neutral": "Productieassistent regie"
+        },
+        "r_da45564f42a3": {
+          "masculine": "Hoofd productieassistentie regie",
+          "feminine": "Hoofd productieassistentie regie",
+          "neutral": "Hoofd productieassistentie regie"
+        },
+        "r_d4de545cc559": {
+          "masculine": "Stagiair regieassistentie",
+          "feminine": "Stagiaire regieassistentie",
+          "neutral": "Stagiair regieassistentie"
+        },
+        "r_b8f3b216cf72": {
+          "masculine": "Figurantenbegeleider",
+          "feminine": "Figurantenbegeleidster",
+          "neutral": "Figurantenbegeleider"
+        },
+        "r_7d061a318612": {
+          "masculine": "Assistent figurantenbegeleider",
+          "feminine": "Assistente figurantenbegeleider",
+          "neutral": "Assistent figurantenbegeleider"
+        },
+        "r_dbf51638d5ed": {
+          "masculine": "Script supervisor (continuïteit)",
+          "feminine": "Script supervisor (continuïteit)",
+          "neutral": "Script supervisor (continuïteit)"
+        },
+        "r_db6f57df190b": {
+          "masculine": "Assistent script supervisor",
+          "feminine": "Assistente script supervisor",
+          "neutral": "Assistent script supervisor"
+        },
+        "r_043751863fa5": {
+          "masculine": "Scriptbegeleiding op de set",
+          "feminine": "Scriptbegeleiding op de set",
+          "neutral": "Scriptbegeleiding op de set"
+        },
+        "r_d7e7e0e56ce6": {
+          "masculine": "Storyboardtekenaar",
+          "feminine": "Storyboardtekenares",
+          "neutral": "Storyboardtekenaar"
+        },
+        "r_d5f343108ed5": {
+          "masculine": "Acteercoach",
+          "feminine": "Acteercoach",
+          "neutral": "Acteercoach"
+        },
+        "r_8ac3532c0c32": {
+          "masculine": "Acteercoach voor kinderen",
+          "feminine": "Acteercoach voor kinderen",
+          "neutral": "Acteercoach voor kinderen"
+        },
+        "r_bf13c927e8eb": {
+          "masculine": "Dialoogcoach",
+          "feminine": "Dialoogcoach",
+          "neutral": "Dialoogcoach"
+        },
+        "r_82fff9096145": {
+          "masculine": "Figurantenbegeleider",
+          "feminine": "Figurantenbegeleidster",
+          "neutral": "Figurantenbegeleider"
+        },
+        "r_e57426b6a805": {
+          "masculine": "Assistent figurantenbegeleider",
+          "feminine": "Assistente figurantenbegeleider",
+          "neutral": "Assistent figurantenbegeleider"
+        },
+        "r_c2b6031ad212": {
+          "masculine": "Persoonlijk assistent (regie)",
+          "feminine": "Persoonlijke assistente (regie)",
+          "neutral": "Persoonlijk assistent (regie)"
+        },
+        "r_1ed956774605": {
+          "masculine": "Persoonlijke regieassistentie",
+          "feminine": "Persoonlijke regieassistentie",
+          "neutral": "Persoonlijke regieassistentie"
+        },
+        "r_7d0bc36aabcb": {
+          "masculine": "Regiestagiair",
+          "feminine": "Regiestagiaire",
+          "neutral": "Regiestagiair"
+        },
+        "r_bf4aaefa2f9f": {
+          "masculine": "Scriptstagiair",
+          "feminine": "Scriptstagiaire",
+          "neutral": "Scriptstagiair"
+        },
+        "r_45bf2bbe37f0": {
+          "masculine": "Regieassistent (setrunner)",
+          "feminine": "Regieassistente (setrunner)",
+          "neutral": "Regieassistent (setrunner)"
+        },
+        "r_9ced64ab6db5": {
+          "masculine": "Eerste regieassistent",
+          "feminine": "Eerste regieassistente",
+          "neutral": "Eerste regieassistent"
+        },
+        "r_b6ac41792b48": {
+          "masculine": "Tweede regieassistent",
+          "feminine": "Tweede regieassistente",
+          "neutral": "Tweede regieassistent"
+        },
+        "r_6b9cabf3cbca": {
+          "masculine": "Scriptbegeleiding",
+          "feminine": "Scriptbegeleiding",
+          "neutral": "Scriptbegeleiding"
+        },
+        "r_93f52c1c7000": {
+          "masculine": "Second-unitregisseur",
+          "feminine": "Second-unitregisseuse",
+          "neutral": "Second-unitregisseur"
+        },
+        "r_591d7faf8f5d": {
+          "masculine": "Persoonlijk assistent",
+          "feminine": "Persoonlijke assistente",
+          "neutral": "Persoonlijk assistent"
+        },
+        "r_c01dd7739f5a": {
+          "masculine": "Assistent figurantenbegeleider",
+          "feminine": "Assistente figurantenbegeleider",
+          "neutral": "Assistent figurantenbegeleider"
+        }
+      },
+      "kamera": {
+        "r_9659ff478da5": {
+          "masculine": "Director of photography (DoP)",
+          "feminine": "Director of photography (DoP)",
+          "neutral": "Director of photography (DoP)"
+        },
+        "r_f1286611f452": {
+          "masculine": "Director of imagery (DoI)",
+          "feminine": "Director of imagery (DoI)",
+          "neutral": "Director of imagery (DoI)"
+        },
+        "r_c519de89c832": {
+          "masculine": "A-cameraoperator",
+          "feminine": "A-cameraoperator",
+          "neutral": "A-cameraoperator"
+        },
+        "r_69b451280549": {
+          "masculine": "B-cameraoperator",
+          "feminine": "B-cameraoperator",
+          "neutral": "B-cameraoperator"
+        },
+        "r_147c6db611ab": {
+          "masculine": "C-cameraoperator",
+          "feminine": "C-cameraoperator",
+          "neutral": "C-cameraoperator"
+        },
+        "r_00ec6018a92f": {
+          "masculine": "Elektronische cameraprofessional (studio / buitenopnames)",
+          "feminine": "Elektronische cameraprofessional (studio / buitenopnames)",
+          "neutral": "Elektronische cameraprofessional (studio / buitenopnames)"
+        },
+        "r_15338319dd09": {
+          "masculine": "Reportagecameraprofessional",
+          "feminine": "Reportagecameraprofessional",
+          "neutral": "Reportagecameraprofessional"
+        },
+        "r_3b00f8763d24": {
+          "masculine": "Second-unitcameraprofessional",
+          "feminine": "Second-unitcameraprofessional",
+          "neutral": "Second-unitcameraprofessional"
+        },
+        "r_2815a6f7d251": {
+          "masculine": "Third-unitcameraprofessional",
+          "feminine": "Third-unitcameraprofessional",
+          "neutral": "Third-unitcameraprofessional"
+        },
+        "r_46bfee3f1077": {
+          "masculine": "Eerste camera-assistent (focuspuller)",
+          "feminine": "Eerste camera-assistente (focuspuller)",
+          "neutral": "Eerste camera-assistent (focuspuller)"
+        },
+        "r_4f6a54aa8672": {
+          "masculine": "Tweede camera-assistent (clapper / loader)",
+          "feminine": "Tweede camera-assistente (clapper / loader)",
+          "neutral": "Tweede camera-assistent (clapper / loader)"
+        },
+        "r_a6d3a38613fa": {
+          "masculine": "Clapper-loader",
+          "feminine": "Clapper-loader",
+          "neutral": "Clapper-loader"
+        },
+        "r_4406ae44f8be": {
+          "masculine": "Derde camera-assistent",
+          "feminine": "Derde camera-assistente",
+          "neutral": "Derde camera-assistent"
+        },
+        "r_a29ed25142f3": {
+          "masculine": "Tweede digitale camera-assistent",
+          "feminine": "Tweede digitale camera-assistente",
+          "neutral": "Tweede digitale camera-assistent"
+        },
+        "r_048d538ee34d": {
+          "masculine": "DIT",
+          "feminine": "DIT",
+          "neutral": "DIT"
+        },
+        "r_c48ad1ee75a7": {
+          "masculine": "DIT-assistent",
+          "feminine": "DIT-assistente",
+          "neutral": "DIT-assistent"
+        },
+        "r_0e473a1887e9": {
+          "masculine": "Steadicamoperator",
+          "feminine": "Steadicamoperator",
+          "neutral": "Steadicamoperator"
+        },
+        "r_1d7535202c92": {
+          "masculine": "Steadicamassistent",
+          "feminine": "Steadicamassistente",
+          "neutral": "Steadicamassistent"
+        },
+        "r_baee8ff4a63f": {
+          "masculine": "Gimbalsysteemoperator",
+          "feminine": "Gimbalsysteemoperator",
+          "neutral": "Gimbalsysteemoperator"
+        },
+        "r_569d248c1dfd": {
+          "masculine": "Dronepiloot / droneoperator",
+          "feminine": "Dronepiloot / droneoperator",
+          "neutral": "Dronepiloot / droneoperator"
+        },
+        "r_3ca1ad3e14b2": {
+          "masculine": "Cameradroneoperator",
+          "feminine": "Cameradroneoperator",
+          "neutral": "Cameradroneoperator"
+        },
+        "r_c2ff9d51c86a": {
+          "masculine": "Cameradronepiloot",
+          "feminine": "Cameradronepiloot",
+          "neutral": "Cameradronepiloot"
+        },
+        "r_0502b3c5dec3": {
+          "masculine": "Camerawagenchauffeur",
+          "feminine": "Camerawagenchauffeuse",
+          "neutral": "Camerawagenchauffeur"
+        },
+        "r_a3fa606ea916": {
+          "masculine": "Vliegtuigpiloot (luchtopnames)",
+          "feminine": "Vliegtuigpiloot (luchtopnames)",
+          "neutral": "Vliegtuigpiloot (luchtopnames)"
+        },
+        "r_05d7d18da0c4": {
+          "masculine": "Helikopterpiloot (luchtopnames)",
+          "feminine": "Helikopterpiloot (luchtopnames)",
+          "neutral": "Helikopterpiloot (luchtopnames)"
+        },
+        "r_32e8a90fee3b": {
+          "masculine": "Spidercampiloot",
+          "feminine": "Spidercampiloot",
+          "neutral": "Spidercampiloot"
+        },
+        "r_c4b0d3dfb7d8": {
+          "masculine": "Cameradroneassistent",
+          "feminine": "Cameradroneassistente",
+          "neutral": "Cameradroneassistent"
+        },
+        "r_86c7b305ba77": {
+          "masculine": "Remote-cameraoperator",
+          "feminine": "Remote-cameraoperator",
+          "neutral": "Remote-cameraoperator"
+        },
+        "r_386b1f9db2c1": {
+          "masculine": "Remote-headoperator",
+          "feminine": "Remote-headoperator",
+          "neutral": "Remote-headoperator"
+        },
+        "r_1490637c95ed": {
+          "masculine": "Luchtcameraoperator",
+          "feminine": "Luchtcameraoperator",
+          "neutral": "Luchtcameraoperator"
+        },
+        "r_76c05f6fba78": {
+          "masculine": "Air-to-airoperator",
+          "feminine": "Air-to-airoperator",
+          "neutral": "Air-to-airoperator"
+        },
+        "r_b59f3c08153b": {
+          "masculine": "Hogesnelheidscameraoperator",
+          "feminine": "Hogesnelheidscameraoperator",
+          "neutral": "Hogesnelheidscameraoperator"
+        },
+        "r_f6e99ab3d5dd": {
+          "masculine": "ARRI Trinity-operator",
+          "feminine": "ARRI Trinity-operator",
+          "neutral": "ARRI Trinity-operator"
+        },
+        "r_953bc24b7077": {
+          "masculine": "Cablecamoperator",
+          "feminine": "Cablecamoperator",
+          "neutral": "Cablecamoperator"
+        },
+        "r_e834e506e54b": {
+          "masculine": "Polecamoperator",
+          "feminine": "Polecamoperator",
+          "neutral": "Polecamoperator"
+        },
+        "r_b7ea35e3f38d": {
+          "masculine": "Rod-camoperator",
+          "feminine": "Rod-camoperator",
+          "neutral": "Rod-camoperator"
+        },
+        "r_3531de1d9278": {
+          "masculine": "Motioncontroloperator",
+          "feminine": "Motioncontroloperator",
+          "neutral": "Motioncontroloperator"
+        },
+        "r_edf22fe94ff4": {
+          "masculine": "Motioncontrolassistent",
+          "feminine": "Motioncontrolassistente",
+          "neutral": "Motioncontrolassistent"
+        },
+        "r_7be83f893235": {
+          "masculine": "Livecameraoperator",
+          "feminine": "Livecameraoperator",
+          "neutral": "Livecameraoperator"
+        },
+        "r_8d0fa92d5c06": {
+          "masculine": "VR-director of photography",
+          "feminine": "VR-director of photography",
+          "neutral": "VR-director of photography"
+        },
+        "r_e4f1f8410ee1": {
+          "masculine": "VR-cameraoperator",
+          "feminine": "VR-cameraoperator",
+          "neutral": "VR-cameraoperator"
+        },
+        "r_fe4955d24d9d": {
+          "masculine": "3D-stereocameraprofessional",
+          "feminine": "3D-stereocameraprofessional",
+          "neutral": "3D-stereocameraprofessional"
+        },
+        "r_63d8f7ae5c77": {
+          "masculine": "3D-stereoconvergentieoperator",
+          "feminine": "3D-stereoconvergentieoperator",
+          "neutral": "3D-stereoconvergentieoperator"
+        },
+        "r_5d780d27f437": {
+          "masculine": "Stereoscopietechnicus",
+          "feminine": "Stereoscopietechnica",
+          "neutral": "Stereoscopietechnicus"
+        },
+        "r_0350366ccf64": {
+          "masculine": "Stereograaf",
+          "feminine": "Stereograaf",
+          "neutral": "Stereograaf"
+        },
+        "r_892df5d9ed45": {
+          "masculine": "Second-unitstereograaf",
+          "feminine": "Second-unitstereograaf",
+          "neutral": "Second-unitstereograaf"
+        },
+        "r_87b9b49ccc72": {
+          "masculine": "Stereograafassistent",
+          "feminine": "Stereograafassistente",
+          "neutral": "Stereograafassistent"
+        },
+        "r_503758a49393": {
+          "masculine": "Onderwatercameraoperator",
+          "feminine": "Onderwatercameraoperator",
+          "neutral": "Onderwatercameraoperator"
+        },
+        "r_ad809b37ab32": {
+          "masculine": "Onderwatercamera-assistent",
+          "feminine": "Onderwatercamera-assistente",
+          "neutral": "Onderwatercamera-assistent"
+        },
+        "r_fdaafaca34cb": {
+          "masculine": "Vrijevalcameraprofessional",
+          "feminine": "Vrijevalcameraprofessional",
+          "neutral": "Vrijevalcameraprofessional"
+        },
+        "r_6fd521b70caf": {
+          "masculine": "Drytech",
+          "feminine": "Drytech",
+          "neutral": "Drytech"
+        },
+        "r_7a8573f394c1": {
+          "masculine": "Datawrangler",
+          "feminine": "Datawrangler",
+          "neutral": "Datawrangler"
+        },
+        "r_59c04d8b3609": {
+          "masculine": "Datawrangler / digitale loader",
+          "feminine": "Datawrangler / digitale loader",
+          "neutral": "Datawrangler / digitale loader"
+        },
+        "r_1b6d2deeae11": {
+          "masculine": "Mediabeheerder",
+          "feminine": "Mediabeheerder",
+          "neutral": "Mediabeheerder"
+        },
+        "r_bfd5ad0745cb": {
+          "masculine": "Video-assistoperator",
+          "feminine": "Video-assistoperator",
+          "neutral": "Video-assistoperator"
+        },
+        "r_ab65480d38bf": {
+          "masculine": "Video-assistmedewerker",
+          "feminine": "Video-assistmedewerkster",
+          "neutral": "Video-assistmedewerker"
+        },
+        "r_44cbe06f7edd": {
+          "masculine": "Crashboxoperator",
+          "feminine": "Crashboxoperator",
+          "neutral": "Crashboxoperator"
+        },
+        "r_ff391e554ef1": {
+          "masculine": "Video-operator",
+          "feminine": "Video-operator",
+          "neutral": "Video-operator"
+        },
+        "r_04b8806e4aea": {
+          "masculine": "Qtake-operator",
+          "feminine": "Qtake-operator",
+          "neutral": "Qtake-operator"
+        },
+        "r_881fbad171dd": {
+          "masculine": "Assistent video-operator",
+          "feminine": "Assistente video-operator",
+          "neutral": "Assistent video-operator"
+        },
+        "r_e8b3776feee3": {
+          "masculine": "Playbackoperator",
+          "feminine": "Playbackoperator",
+          "neutral": "Playbackoperator"
+        },
+        "r_2cd28c233eb0": {
+          "masculine": "Reportageassistent (beeld en geluid)",
+          "feminine": "Reportageassistente (beeld en geluid)",
+          "neutral": "Reportageassistent (beeld en geluid)"
+        },
+        "r_aaf320fee04d": {
+          "masculine": "Reportagetechnicus (beeld en geluid)",
+          "feminine": "Reportagetechnica (beeld en geluid)",
+          "neutral": "Reportagetechnicus (beeld en geluid)"
+        },
+        "r_6c484917c545": {
+          "masculine": "Camera-assistent (non-fictie)",
+          "feminine": "Camera-assistente (non-fictie)",
+          "neutral": "Camera-assistent (non-fictie)"
+        },
+        "r_c071a417cdf8": {
+          "masculine": "DCE-datacapture-engineer",
+          "feminine": "DCE-datacapture-engineer",
+          "neutral": "DCE-datacapture-engineer"
+        },
+        "r_ff3821a892d3": {
+          "masculine": "Operator achterprojectiebeelden",
+          "feminine": "Operator achterprojectiebeelden",
+          "neutral": "Operator achterprojectiebeelden"
+        },
+        "r_e160ca78eefe": {
+          "masculine": "Cameratechnicus",
+          "feminine": "Cameratechnica",
+          "neutral": "Cameratechnicus"
+        },
+        "r_b2a908032997": {
+          "masculine": "Camerastagiair",
+          "feminine": "Camerastagiaire",
+          "neutral": "Camerastagiair"
+        },
+        "r_20c91979a5fc": {
+          "masculine": "Cameraoperator",
+          "feminine": "Cameraoperator",
+          "neutral": "Cameraoperator"
+        },
+        "r_3008a154e7ef": {
+          "masculine": "Dronepiloot / luchtopnames",
+          "feminine": "Dronepiloot / luchtopnames",
+          "neutral": "Dronepiloot / luchtopnames"
+        },
+        "r_ee4208621795": {
+          "masculine": "Extra camera",
+          "feminine": "Extra camera",
+          "neutral": "Extra camera"
+        },
+        "r_59f7261be55a": {
+          "masculine": "Onderwatercameraprofessional",
+          "feminine": "Onderwatercameraprofessional",
+          "neutral": "Onderwatercameraprofessional"
+        },
+        "r_6767d1f92822": {
+          "masculine": "Motioncontrolcameraprofessional",
+          "feminine": "Motioncontrolcameraprofessional",
+          "neutral": "Motioncontrolcameraprofessional"
+        },
+        "r_15047c5a622a": {
+          "masculine": "Cameradroneassistent / -technicus",
+          "feminine": "Cameradroneassistente / -technica",
+          "neutral": "Cameradroneassistent / -technicus"
+        },
+        "r_7b6aa965b572": {
+          "masculine": "Eerste camera-assistent",
+          "feminine": "Eerste camera-assistente",
+          "neutral": "Eerste camera-assistent"
+        },
+        "r_403c761ac7c7": {
+          "masculine": "Reportageassistent beeld en geluid",
+          "feminine": "Reportageassistente beeld en geluid",
+          "neutral": "Reportageassistent beeld en geluid"
+        },
+        "r_6170f09c0f17": {
+          "masculine": "Reportagetechnicus beeld en geluid",
+          "feminine": "Reportagetechnica beeld en geluid",
+          "neutral": "Reportagetechnicus beeld en geluid"
+        },
+        "r_6a6303b77029": {
+          "masculine": "Setfotograaf",
+          "feminine": "Setfotografe",
+          "neutral": "Setfotograaf"
+        }
+      },
+      "licht": {
+        "r_222be04dbf00": {
+          "masculine": "Gaffer (hoofd belichting)",
+          "feminine": "Gaffer (hoofd belichting)",
+          "neutral": "Gaffer (hoofd belichting)"
+        },
+        "r_1e210e69039a": {
+          "masculine": "Assistent-hoofd belichting (Best Boy Electric)",
+          "feminine": "Assistente-hoofd belichting (Best Girl Electric)",
+          "neutral": "Assistent-hoofd belichting"
+        },
+        "r_14dd174cd76c": {
+          "masculine": "Rigginggaffer",
+          "feminine": "Rigginggaffer",
+          "neutral": "Rigginggaffer"
+        },
+        "r_92137802b24a": {
+          "masculine": "Assistent-hoofd voorbelichting (Rigging Best Boy Electric)",
+          "feminine": "Assistente-hoofd voorbelichting (Rigging Best Girl Electric)",
+          "neutral": "Assistent-hoofd voorbelichting"
+        },
+        "r_7fce7d6fcf12": {
+          "masculine": "Riggingelektricien",
+          "feminine": "Riggingelektricien",
+          "neutral": "Riggingelektricien"
+        },
+        "r_1bcf9d8d9b03": {
+          "masculine": "Belichter (electrician)",
+          "feminine": "Belichter (electrician)",
+          "neutral": "Belichter (electrician)"
+        },
+        "r_d95b919dded9": {
+          "masculine": "Hoofd belichtingstechniek",
+          "feminine": "Hoofd belichtingstechniek",
+          "neutral": "Hoofd belichtingstechniek"
+        },
+        "r_de223259b793": {
+          "masculine": "Lichttafeloperator",
+          "feminine": "Lichttafeloperator",
+          "neutral": "Lichttafeloperator"
+        },
+        "r_d927855afff9": {
+          "masculine": "Lichttafelassistent",
+          "feminine": "Lichttafelassistente",
+          "neutral": "Lichttafelassistent"
+        },
+        "r_56ad1c6a1ad4": {
+          "masculine": "Lichtprogrammeur (DMX)",
+          "feminine": "Lichtprogrammeuse (DMX)",
+          "neutral": "Lichtprogrammeur (DMX)"
+        },
+        "r_090ac2a092b8": {
+          "masculine": "Lichttechnicus",
+          "feminine": "Lichttechnica",
+          "neutral": "Lichttechnicus"
+        },
+        "r_d1edcbd50142": {
+          "masculine": "Lichtchauffeur",
+          "feminine": "Lichtchauffeuse",
+          "neutral": "Lichtchauffeur"
+        },
+        "r_7d79588c14f3": {
+          "masculine": "Extra belichter",
+          "feminine": "Extra belichter",
+          "neutral": "Extra belichter"
+        },
+        "r_b3d1d585beaa": {
+          "masculine": "Generatoroperator",
+          "feminine": "Generatoroperator",
+          "neutral": "Generatoroperator"
+        },
+        "r_bcd4b312b67e": {
+          "masculine": "Kabelbeheerder",
+          "feminine": "Kabelbeheerder",
+          "neutral": "Kabelbeheerder"
+        },
+        "r_35cca1fe3c5c": {
+          "masculine": "Onderwaterbelichting",
+          "feminine": "Onderwaterbelichting",
+          "neutral": "Onderwaterbelichting"
+        },
+        "r_89058c839b15": {
+          "masculine": "Ballonlichtoperator",
+          "feminine": "Ballonlichtoperator",
+          "neutral": "Ballonlichtoperator"
+        },
+        "r_9bd915bb46a4": {
+          "masculine": "Volgspot- / trussspotoperator",
+          "feminine": "Volgspot- / trussspotoperator",
+          "neutral": "Volgspot- / trussspotoperator"
+        },
+        "r_2c0dd7b64cf3": {
+          "masculine": "Lichtassistent",
+          "feminine": "Lichtassistente",
+          "neutral": "Lichtassistent"
+        },
+        "r_0cc27c01ca07": {
+          "masculine": "Lichtstagiair",
+          "feminine": "Lichtstagiaire",
+          "neutral": "Lichtstagiair"
+        }
+      },
+      "grip": {
+        "r_470156bd03e4": {
+          "masculine": "Key grip",
+          "feminine": "Key grip",
+          "neutral": "Key grip"
+        },
+        "r_cfbf2a22ed6e": {
+          "masculine": "Assistent-hoofd grip (Best Boy Grip)",
+          "feminine": "Assistente-hoofd grip (Best Girl Grip)",
+          "neutral": "Assistent-hoofd grip"
+        },
+        "r_32a6ab31b1a1": {
+          "masculine": "Dollygrip / dollyoperator",
+          "feminine": "Dollygrip / dollyoperator",
+          "neutral": "Dollygrip / dollyoperator"
+        },
+        "r_376dc1f790b8": {
+          "masculine": "Grip",
+          "feminine": "Grip",
+          "neutral": "Grip"
+        },
+        "r_dbfaadb8821c": {
+          "masculine": "Gripassistent",
+          "feminine": "Gripassistente",
+          "neutral": "Gripassistent"
+        },
+        "r_46dab52c1995": {
+          "masculine": "Rigginggrip",
+          "feminine": "Rigginggrip",
+          "neutral": "Rigginggrip"
+        },
+        "r_ea7e925bd850": {
+          "masculine": "Riggingkeygrip",
+          "feminine": "Riggingkeygrip",
+          "neutral": "Riggingkeygrip"
+        },
+        "r_fa9d72fc7978": {
+          "masculine": "Assistent-hoofd rigginggrip (Rigging Best Boy Grip)",
+          "feminine": "Assistente-hoofd rigginggrip (Rigging Best Girl Grip)",
+          "neutral": "Assistent-hoofd rigginggrip"
+        },
+        "r_2fa0b44342d7": {
+          "masculine": "Speciale constructies (grip)",
+          "feminine": "Speciale constructies (grip)",
+          "neutral": "Speciale constructies (grip)"
+        },
+        "r_08c07afebb7f": {
+          "masculine": "Camerakraan- / jiboperator",
+          "feminine": "Camerakraan- / jiboperator",
+          "neutral": "Camerakraan- / jiboperator"
+        },
+        "r_5ece318b289f": {
+          "masculine": "Camerakraantechnicus",
+          "feminine": "Camerakraantechnica",
+          "neutral": "Camerakraantechnicus"
+        },
+        "r_a5c74e86fb2b": {
+          "masculine": "U-Crane- / Technocrane-operator",
+          "feminine": "U-Crane- / Technocrane-operator",
+          "neutral": "U-Crane- / Technocrane-operator"
+        },
+        "r_819dd64bff9d": {
+          "masculine": "Remote-headtechnicus / -operator",
+          "feminine": "Remote-headtechnica / -operator",
+          "neutral": "Remote-headtechnicus / -operator"
+        },
+        "r_9c6f674da63a": {
+          "masculine": "Stagiair grip",
+          "feminine": "Stagiaire grip",
+          "neutral": "Stagiair grip"
+        }
+      },
+      "ton": {
+        "r_fccf287d8f40": {
+          "masculine": "Geluidsmeester / soundmixer",
+          "feminine": "Geluidsmeester / soundmixer",
+          "neutral": "Geluidsmeester / soundmixer"
+        },
+        "r_54f3d59eb241": {
+          "masculine": "Productiegeluidsmixer",
+          "feminine": "Productiegeluidsmixer",
+          "neutral": "Productiegeluidsmixer"
+        },
+        "r_b0c1942e7358": {
+          "masculine": "Filmgeluidsmeester",
+          "feminine": "Filmgeluidsmeester",
+          "neutral": "Filmgeluidsmeester"
+        },
+        "r_8b1cc700407b": {
+          "masculine": "Boomoperator",
+          "feminine": "Boomoperator",
+          "neutral": "Boomoperator"
+        },
+        "r_fd909904c9c7": {
+          "masculine": "Geluidsassistent",
+          "feminine": "Geluidsassistente",
+          "neutral": "Geluidsassistent"
+        },
+        "r_4c5fe4b3a1f3": {
+          "masculine": "Eerste geluidsassistent",
+          "feminine": "Eerste geluidsassistente",
+          "neutral": "Eerste geluidsassistent"
+        },
+        "r_ab87e9473072": {
+          "masculine": "Eerste filmgeluidsassistent",
+          "feminine": "Eerste filmgeluidsassistente",
+          "neutral": "Eerste filmgeluidsassistent"
+        },
+        "r_d83df9d29ab1": {
+          "masculine": "Tweede geluidsassistent",
+          "feminine": "Tweede geluidsassistente",
+          "neutral": "Tweede geluidsassistent"
+        },
+        "r_8377b0674c5d": {
+          "masculine": "Tweede filmgeluidsassistent",
+          "feminine": "Tweede filmgeluidsassistente",
+          "neutral": "Tweede filmgeluidsassistent"
+        },
+        "r_93302391f02a": {
+          "masculine": "ADR- / nasynchronisatieboommicrofonist",
+          "feminine": "ADR- / nasynchronisatieboommicrofonist",
+          "neutral": "ADR- / nasynchronisatieboommicrofonist"
+        },
+        "r_3e7456f82724": {
+          "masculine": "Surroundgeluidsopnametechnicus",
+          "feminine": "Surroundgeluidsopnametechnica",
+          "neutral": "Surroundgeluidsopnametechnicus"
+        },
+        "r_352c199bfbc1": {
+          "masculine": "Allround geluidstechnicus",
+          "feminine": "Allround geluidstechnica",
+          "neutral": "Allround geluidstechnicus"
+        },
+        "r_fdfa14e36d06": {
+          "masculine": "Geluidsapparatuurassistent",
+          "feminine": "Geluidsapparatuurassistente",
+          "neutral": "Geluidsapparatuurassistent"
+        },
+        "r_9615bbb28141": {
+          "masculine": "Geluidsplaybackoperator",
+          "feminine": "Geluidsplaybackoperator",
+          "neutral": "Geluidsplaybackoperator"
+        },
+        "r_13544e0c2d08": {
+          "masculine": "Geluidsprofessional (non-fictie)",
+          "feminine": "Geluidsprofessional (non-fictie)",
+          "neutral": "Geluidsprofessional (non-fictie)"
+        },
+        "r_f804f9794c40": {
+          "masculine": "Geluidsstagiair",
+          "feminine": "Geluidsstagiaire",
+          "neutral": "Geluidsstagiair"
+        },
+        "r_26ad417384db": {
+          "masculine": "Geluidsontwerper",
+          "feminine": "Geluidsontwerpster",
+          "neutral": "Geluidsontwerper"
+        },
+        "r_e4afa3da823e": {
+          "masculine": "Superviserend geluidseditor",
+          "feminine": "Superviserend geluidseditor",
+          "neutral": "Superviserend geluidseditor"
+        },
+        "r_754377fae1cb": {
+          "masculine": "Dialoogeditor",
+          "feminine": "Dialoogeditor",
+          "neutral": "Dialoogeditor"
+        },
+        "r_a80f60e08e2f": {
+          "masculine": "ADR-editor",
+          "feminine": "ADR-editor",
+          "neutral": "ADR-editor"
+        },
+        "r_65ab3bc0b779": {
+          "masculine": "ADR-supervisor",
+          "feminine": "ADR-supervisor",
+          "neutral": "ADR-supervisor"
+        },
+        "r_927d0ca8e1d9": {
+          "masculine": "Foleyartiest",
+          "feminine": "Foleyartieste",
+          "neutral": "Foleyartiest"
+        },
+        "r_c196984117d7": {
+          "masculine": "Foley-editor",
+          "feminine": "Foley-editor",
+          "neutral": "Foley-editor"
+        },
+        "r_df6ebbcf6038": {
+          "masculine": "Re-recordingmixer",
+          "feminine": "Re-recordingmixer",
+          "neutral": "Re-recordingmixer"
+        },
+        "r_f4776d32d356": {
+          "masculine": "Playbackoperator",
+          "feminine": "Playbackoperator",
+          "neutral": "Playbackoperator"
+        },
+        "r_6abc8617e983": {
+          "masculine": "Geluidssupervisor",
+          "feminine": "Geluidssupervisor",
+          "neutral": "Geluidssupervisor"
+        },
+        "r_0faba800cb95": {
+          "masculine": "Muziekmixer",
+          "feminine": "Muziekmixer",
+          "neutral": "Muziekmixer"
+        },
+        "r_a5fba4295f52": {
+          "masculine": "Muziekopname",
+          "feminine": "Muziekopname",
+          "neutral": "Muziekopname"
+        },
+        "r_f2e629941a7a": {
+          "masculine": "Nasynchronisatiemixer",
+          "feminine": "Nasynchronisatiemixer",
+          "neutral": "Nasynchronisatiemixer"
+        },
+        "r_f73a9a076c95": {
+          "masculine": "Audiodescriptiemixer",
+          "feminine": "Audiodescriptiemixer",
+          "neutral": "Audiodescriptiemixer"
+        },
+        "r_9d583d9712f5": {
+          "masculine": "Assistent geluidsmixer",
+          "feminine": "Assistente geluidsmixer",
+          "neutral": "Assistent geluidsmixer"
+        },
+        "r_c4334fc01411": {
+          "masculine": "Geluidsmasteringtechnicus",
+          "feminine": "Geluidsmasteringtechnica",
+          "neutral": "Geluidsmasteringtechnicus"
+        },
+        "r_6a7ea11d04ed": {
+          "masculine": "Assistent geluidsontwerp",
+          "feminine": "Assistente geluidsontwerp",
+          "neutral": "Assistent geluidsontwerp"
+        },
+        "r_539e45fc2e6d": {
+          "masculine": "Superviserend ADR-editor",
+          "feminine": "Superviserend ADR-editor",
+          "neutral": "Superviserend ADR-editor"
+        },
+        "r_021e586f6845": {
+          "masculine": "Superviserend dialoog- en ADR-editor",
+          "feminine": "Superviserend dialoog- en ADR-editor",
+          "neutral": "Superviserend dialoog- en ADR-editor"
+        },
+        "r_58f4b9fff63e": {
+          "masculine": "Superviserend dialoogeditor",
+          "feminine": "Superviserend dialoogeditor",
+          "neutral": "Superviserend dialoogeditor"
+        },
+        "r_934c9dff31b6": {
+          "masculine": "Superviserend foley-editor",
+          "feminine": "Superviserend foley-editor",
+          "neutral": "Superviserend foley-editor"
+        },
+        "r_8ffed7b496e8": {
+          "masculine": "Dialoogeditor",
+          "feminine": "Dialoogeditor",
+          "neutral": "Dialoogeditor"
+        },
+        "r_37f0cea40905": {
+          "masculine": "Geluidseffecteneditor",
+          "feminine": "Geluidseffecteneditor",
+          "neutral": "Geluidseffecteneditor"
+        },
+        "r_e22d9239a33f": {
+          "masculine": "Nasynchronisatie-editor",
+          "feminine": "Nasynchronisatie-editor",
+          "neutral": "Nasynchronisatie-editor"
+        },
+        "r_cf36114f7a15": {
+          "masculine": "Foley-editor",
+          "feminine": "Foley-editor",
+          "neutral": "Foley-editor"
+        },
+        "r_7ca65f7a0064": {
+          "masculine": "ADR- / nasynchronisatie-editor",
+          "feminine": "ADR- / nasynchronisatie-editor",
+          "neutral": "ADR- / nasynchronisatie-editor"
+        },
+        "r_944e077953d3": {
+          "masculine": "Assistent geluidseditor",
+          "feminine": "Assistente geluidseditor",
+          "neutral": "Assistent geluidseditor"
+        },
+        "r_9d4ed0bf92ee": {
+          "masculine": "ADR- / nasynchronisatiegeluidsmeester",
+          "feminine": "ADR- / nasynchronisatiegeluidsmeester",
+          "neutral": "ADR- / nasynchronisatiegeluidsmeester"
+        },
+        "r_b3e198ffbf29": {
+          "masculine": "Foley-opnametechnicus",
+          "feminine": "Foley-opnametechnica",
+          "neutral": "Foley-opnametechnicus"
+        },
+        "r_c41c6bc414c3": {
+          "masculine": "Productieleider nasynchronisatie",
+          "feminine": "Productieleidster nasynchronisatie",
+          "neutral": "Productieleider nasynchronisatie"
+        },
+        "r_2b6bc11139d6": {
+          "masculine": "Opnameleider nasynchronisatie / ADR-supervisor",
+          "feminine": "Opnameleidster nasynchronisatie / ADR-supervisor",
+          "neutral": "Opnameleider nasynchronisatie / ADR-supervisor"
+        },
+        "r_6645c4583551": {
+          "masculine": "Assistent opnameleider nasynchronisatie / ADR-supervisor",
+          "feminine": "Assistente opnameleider nasynchronisatie / ADR-supervisor",
+          "neutral": "Assistent opnameleider nasynchronisatie / ADR-supervisor"
+        },
+        "r_2f0b82350b59": {
+          "masculine": "Assistent foleyartiest",
+          "feminine": "Assistente foleyartiest",
+          "neutral": "Assistent foleyartiest"
+        },
+        "r_a4171d6359fb": {
+          "masculine": "Stagiair geluidspostproductie",
+          "feminine": "Stagiaire geluidspostproductie",
+          "neutral": "Stagiair geluidspostproductie"
+        },
+        "r_9e4b74ecd5ff": {
+          "masculine": "Technisch ADR-supervisor",
+          "feminine": "Technisch ADR-supervisor",
+          "neutral": "Technisch ADR-supervisor"
+        }
+      },
+      "art": {
+        "r_ff29ce0e215c": {
+          "masculine": "Productiondesigner",
+          "feminine": "Productiondesigner",
+          "neutral": "Productiondesigner"
+        },
+        "r_f3db07db6bf4": {
+          "masculine": "Decorontwerper",
+          "feminine": "Decorontwerpster",
+          "neutral": "Decorontwerper"
+        },
+        "r_97a0a726b446": {
+          "masculine": "Superviserend artdirector",
+          "feminine": "Superviserend artdirector",
+          "neutral": "Superviserend artdirector"
+        },
+        "r_3f274caf46f5": {
+          "masculine": "Artdirector",
+          "feminine": "Artdirector",
+          "neutral": "Artdirector"
+        },
+        "r_7e93c2713534": {
+          "masculine": "Stand-by-artdirector",
+          "feminine": "Stand-by-artdirector",
+          "neutral": "Stand-by-artdirector"
+        },
+        "r_891f7ee6a391": {
+          "masculine": "Assistent-artdirector",
+          "feminine": "Assistente-artdirector",
+          "neutral": "Assistent-artdirector"
+        },
+        "r_29765953355c": {
+          "masculine": "Assistent decorontwerper",
+          "feminine": "Assistente decorontwerper",
+          "neutral": "Assistent decorontwerper"
+        },
+        "r_8543a5c61931": {
+          "masculine": "Assistent aankleding",
+          "feminine": "Assistente aankleding",
+          "neutral": "Assistent aankleding"
+        },
+        "r_3ffad936200e": {
+          "masculine": "Setontwerper",
+          "feminine": "Setontwerpster",
+          "neutral": "Setontwerper"
+        },
+        "r_bce8305a5535": {
+          "masculine": "CAD-ontwerper",
+          "feminine": "CAD-ontwerpster",
+          "neutral": "CAD-ontwerper"
+        },
+        "r_b5a1fa9969c7": {
+          "masculine": "Concepttekenaar",
+          "feminine": "Concepttekenares",
+          "neutral": "Concepttekenaar"
+        },
+        "r_f1dbbb97b010": {
+          "masculine": "Concepttekenaar (artdepartment)",
+          "feminine": "Concepttekenares (artdepartment)",
+          "neutral": "Concepttekenaar (artdepartment)"
+        },
+        "r_57a4a106cbd6": {
+          "masculine": "Illustrator",
+          "feminine": "Illustratrice",
+          "neutral": "Illustrator"
+        },
+        "r_6aa3fecc3ba9": {
+          "masculine": "Grafisch ontwerper (setgrafiek)",
+          "feminine": "Grafisch ontwerpster (setgrafiek)",
+          "neutral": "Grafisch ontwerper (setgrafiek)"
+        },
+        "r_6978775ad99b": {
+          "masculine": "Hoofd grafisch ontwerp",
+          "feminine": "Hoofd grafisch ontwerp",
+          "neutral": "Hoofd grafisch ontwerp"
+        },
+        "r_7534f951d040": {
+          "masculine": "Grafisch vormgever (artdepartment)",
+          "feminine": "Grafisch vormgever (artdepartment)",
+          "neutral": "Grafisch vormgever (artdepartment)"
+        },
+        "r_a8e10d0ecc47": {
+          "masculine": "Sfeerscout / lay-outontwerper",
+          "feminine": "Sfeerscout / lay-outontwerpster",
+          "neutral": "Sfeerscout / lay-outontwerper"
+        },
+        "r_a1ce9e299c8f": {
+          "masculine": "Setdecorateur",
+          "feminine": "Setdecorateur",
+          "neutral": "Setdecorateur"
+        },
+        "r_420521110dcc": {
+          "masculine": "Coördinator setdecoratie",
+          "feminine": "Coördinatrice setdecoratie",
+          "neutral": "Coördinator setdecoratie"
+        },
+        "r_d5b7a7d716a2": {
+          "masculine": "Assistent setdecorateur",
+          "feminine": "Assistente setdecorateur",
+          "neutral": "Assistent setdecorateur"
+        },
+        "r_d0964de45366": {
+          "masculine": "Inkoper setdecoratie",
+          "feminine": "Inkoper setdecoratie",
+          "neutral": "Inkoper setdecoratie"
+        },
+        "r_10a8275fbc87": {
+          "masculine": "Magazijnbeheerder setdecoratie",
+          "feminine": "Magazijnbeheerder setdecoratie",
+          "neutral": "Magazijnbeheerder setdecoratie"
+        },
+        "r_1df861fbde16": {
+          "masculine": "Assistent coördinator setdecoratie",
+          "feminine": "Assistente coördinator setdecoratie",
+          "neutral": "Assistent coördinator setdecoratie"
+        },
+        "r_393242957f26": {
+          "masculine": "Setaankleder",
+          "feminine": "Setaankleder",
+          "neutral": "Setaankleder"
+        },
+        "r_e3ce1061c0ff": {
+          "masculine": "Hoofd setaankleding",
+          "feminine": "Hoofd setaankleding",
+          "neutral": "Hoofd setaankleding"
+        },
+        "r_d588cad49b89": {
+          "masculine": "Hoofd setaankleding",
+          "feminine": "Hoofd setaankleding",
+          "neutral": "Hoofd setaankleding"
+        },
+        "r_6cafa4dd814b": {
+          "masculine": "Hoofd rekwisieten (props master)",
+          "feminine": "Hoofd rekwisieten (props master)",
+          "neutral": "Hoofd rekwisieten (props master)"
+        },
+        "r_413221e86652": {
+          "masculine": "Rekwisiteur",
+          "feminine": "Rekwisiteur",
+          "neutral": "Rekwisiteur"
+        },
+        "r_a1e9f4cffb70": {
+          "masculine": "Rekwisiteur buitenopnames",
+          "feminine": "Rekwisiteur buitenopnames",
+          "neutral": "Rekwisiteur buitenopnames"
+        },
+        "r_8f20bee45473": {
+          "masculine": "Rekwisiteur op de set",
+          "feminine": "Rekwisiteur op de set",
+          "neutral": "Rekwisiteur op de set"
+        },
+        "r_7d553f96df87": {
+          "masculine": "Setrekwisiteur",
+          "feminine": "Setrekwisiteur",
+          "neutral": "Setrekwisiteur"
+        },
+        "r_bf9d71b6fdc2": {
+          "masculine": "Stand-byrekwisiteur",
+          "feminine": "Stand-byrekwisiteur",
+          "neutral": "Stand-byrekwisiteur"
+        },
+        "r_a38576fafdab": {
+          "masculine": "Rekwisietenassistent",
+          "feminine": "Rekwisietenassistente",
+          "neutral": "Rekwisietenassistent"
+        },
+        "r_ea2b2fab38f4": {
+          "masculine": "Rekwisietenassistent",
+          "feminine": "Rekwisietenassistente",
+          "neutral": "Rekwisietenassistent"
+        },
+        "r_b685fb4dc943": {
+          "masculine": "Rekwisietenassistent buitenopnames",
+          "feminine": "Rekwisietenassistente buitenopnames",
+          "neutral": "Rekwisietenassistent buitenopnames"
+        },
+        "r_7b9477ba5686": {
+          "masculine": "Setrekwisietenassistent",
+          "feminine": "Setrekwisietenassistente",
+          "neutral": "Setrekwisietenassistent"
+        },
+        "r_541c87622274": {
+          "masculine": "Rekwisieteninkoper",
+          "feminine": "Rekwisieteninkoper",
+          "neutral": "Rekwisieteninkoper"
+        },
+        "r_3c2dae1ec180": {
+          "masculine": "Inkoper setdecoratie",
+          "feminine": "Inkoper setdecoratie",
+          "neutral": "Inkoper setdecoratie"
+        },
+        "r_c17d76240812": {
+          "masculine": "Rekwisietenmagazijnbeheerder",
+          "feminine": "Rekwisietenmagazijnbeheerder",
+          "neutral": "Rekwisietenmagazijnbeheerder"
+        },
+        "r_6a373738f331": {
+          "masculine": "Digitaal rekwisietenontwerper",
+          "feminine": "Digitaal rekwisietenontwerpster",
+          "neutral": "Digitaal rekwisietenontwerper"
+        },
+        "r_404bfcb27b87": {
+          "masculine": "Hoofd digitale rekwisieten",
+          "feminine": "Hoofd digitale rekwisieten",
+          "neutral": "Hoofd digitale rekwisieten"
+        },
+        "r_efdc51e3e8eb": {
+          "masculine": "Rekwisietenmaker",
+          "feminine": "Rekwisietenmaakster",
+          "neutral": "Rekwisietenmaker"
+        },
+        "r_30872cd93e0c": {
+          "masculine": "Rekwisietenontwerper",
+          "feminine": "Rekwisietenontwerpster",
+          "neutral": "Rekwisietenontwerper"
+        },
+        "r_264fc56ea7a5": {
+          "masculine": "Wapenadviseur",
+          "feminine": "Wapenadviseuse",
+          "neutral": "Wapenadviseur"
+        },
+        "r_00f9e2afb019": {
+          "masculine": "Rekwisietenhulp",
+          "feminine": "Rekwisietenhulp",
+          "neutral": "Rekwisietenhulp"
+        },
+        "r_ef64ec97e93f": {
+          "masculine": "Rekwisietenschilder",
+          "feminine": "Rekwisietenschilder",
+          "neutral": "Rekwisietenschilder"
+        },
+        "r_8a17379f4cf2": {
+          "masculine": "Rekwisietenchauffeur",
+          "feminine": "Rekwisietenchauffeuse",
+          "neutral": "Rekwisietenchauffeur"
+        },
+        "r_fb928031fe07": {
+          "masculine": "Beeldvoertuigcoördinator",
+          "feminine": "Beeldvoertuigcoördinatrice",
+          "neutral": "Beeldvoertuigcoördinator"
+        },
+        "r_77928b37c49d": {
+          "masculine": "Beeldvoertuigbegeleider",
+          "feminine": "Beeldvoertuigbegeleidster",
+          "neutral": "Beeldvoertuigbegeleider"
+        },
+        "r_115e6da0f002": {
+          "masculine": "Setelektricien",
+          "feminine": "Setelektricien",
+          "neutral": "Setelektricien"
+        },
+        "r_857a05036004": {
+          "masculine": "Hoofd groenvoorziening / greensman",
+          "feminine": "Hoofd groenvoorziening / greenswoman",
+          "neutral": "Hoofd groenvoorziening / groenmedewerker"
+        },
+        "r_d8e3dea65e7b": {
+          "masculine": "Groenmedewerker (tuinontwerp)",
+          "feminine": "Groenmedewerkster (tuinontwerp)",
+          "neutral": "Groenmedewerker (tuinontwerp)"
+        },
+        "r_aa5ce508ee21": {
+          "masculine": "Bloemkunstenaar",
+          "feminine": "Bloemkunstenares",
+          "neutral": "Bloemkunstenaar"
+        },
+        "r_36b1709b4159": {
+          "masculine": "Foodstylist",
+          "feminine": "Foodstyliste",
+          "neutral": "Foodstylist"
+        },
+        "r_40b095fdeb85": {
+          "masculine": "Airbrushartiest",
+          "feminine": "Airbrushartieste",
+          "neutral": "Airbrushartiest"
+        },
+        "r_afee4f58989a": {
+          "masculine": "Kunstschilder",
+          "feminine": "Kunstschilder",
+          "neutral": "Kunstschilder"
+        },
+        "r_c056e02e39c4": {
+          "masculine": "Decorschilder",
+          "feminine": "Decorschilder",
+          "neutral": "Decorschilder"
+        },
+        "r_e689709eac01": {
+          "masculine": "Hoofd decorschilder",
+          "feminine": "Hoofd decorschilder",
+          "neutral": "Hoofd decorschilder"
+        },
+        "r_70a7586bb774": {
+          "masculine": "Letterschilder",
+          "feminine": "Letterschilder",
+          "neutral": "Letterschilder"
+        },
+        "r_12f20cf536a1": {
+          "masculine": "Schilder / decorartiest",
+          "feminine": "Schilder / decorartieste",
+          "neutral": "Schilder / decorartiest"
+        },
+        "r_dcf49adce47b": {
+          "masculine": "Beeldhouwer / vormgever",
+          "feminine": "Beeldhouwster / vormgever",
+          "neutral": "Beeldhouwer / vormgever"
+        },
+        "r_f4670c7a29a7": {
+          "masculine": "Decorbeeldhouwer",
+          "feminine": "Decorbeeldhouwster",
+          "neutral": "Decorbeeldhouwer"
+        },
+        "r_5fc07d2f3030": {
+          "masculine": "Modelbouwer",
+          "feminine": "Modelbouwer",
+          "neutral": "Modelbouwer"
+        },
+        "r_f545a993cec8": {
+          "masculine": "Miniatuursupervisor",
+          "feminine": "Miniatuursupervisor",
+          "neutral": "Miniatuursupervisor"
+        },
+        "r_d3f5fd4b86c3": {
+          "masculine": "Supervisor miniatuureffecten",
+          "feminine": "Supervisor miniatuureffecten",
+          "neutral": "Supervisor miniatuureffecten"
+        },
+        "r_a6d3fd7eaada": {
+          "masculine": "Bouwmanager",
+          "feminine": "Bouwmanager",
+          "neutral": "Bouwmanager"
+        },
+        "r_ca83b607f08e": {
+          "masculine": "Bouwcoördinator",
+          "feminine": "Bouwcoördinatrice",
+          "neutral": "Bouwcoördinator"
+        },
+        "r_fbcfd1e1839b": {
+          "masculine": "Hoofd studiodecorbouw",
+          "feminine": "Hoofd studiodecorbouw",
+          "neutral": "Hoofd studiodecorbouw"
+        },
+        "r_0231e128483a": {
+          "masculine": "Decorbouwer / timmerman",
+          "feminine": "Decorbouwer / timmervrouw",
+          "neutral": "Decorbouwer / timmerkracht"
+        },
+        "r_62f07946c8f1": {
+          "masculine": "Decorbouw",
+          "feminine": "Decorbouw",
+          "neutral": "Decorbouw"
+        },
+        "r_a3c94f3f3cd1": {
+          "masculine": "Hoofd podiumtechniek",
+          "feminine": "Hoofd podiumtechniek",
+          "neutral": "Hoofd podiumtechniek"
+        },
+        "r_c606af121ce8": {
+          "masculine": "Podiumtechnicus",
+          "feminine": "Podiumtechnica",
+          "neutral": "Podiumtechnicus"
+        },
+        "r_2017ec503138": {
+          "masculine": "Constructietekenaar",
+          "feminine": "Constructietekenares",
+          "neutral": "Constructietekenaar"
+        },
+        "r_169af74d49f6": {
+          "masculine": "Metselaar",
+          "feminine": "Metselaar",
+          "neutral": "Metselaar"
+        },
+        "r_578a92348ec6": {
+          "masculine": "Metaalbewerker",
+          "feminine": "Metaalbewerker",
+          "neutral": "Metaalbewerker"
+        },
+        "r_6c7b48200cb3": {
+          "masculine": "Metaalbewerker",
+          "feminine": "Metaalbewerker",
+          "neutral": "Metaalbewerker"
+        },
+        "r_e7f7da33c876": {
+          "masculine": "Hoofd metaalbewerking",
+          "feminine": "Hoofd metaalbewerking",
+          "neutral": "Hoofd metaalbewerking"
+        },
+        "r_027c0b61577d": {
+          "masculine": "Stukadoor",
+          "feminine": "Stukadoor",
+          "neutral": "Stukadoor"
+        },
+        "r_8d5fe63edbd3": {
+          "masculine": "Behanger",
+          "feminine": "Behanger",
+          "neutral": "Behanger"
+        },
+        "r_61ab14bcf2c6": {
+          "masculine": "Meubelmaker / timmerman",
+          "feminine": "Meubelmaker / timmervrouw",
+          "neutral": "Meubelmaker / timmerkracht"
+        },
+        "r_3addd9ac0457": {
+          "masculine": "Houtdraaier",
+          "feminine": "Houtdraaier",
+          "neutral": "Houtdraaier"
+        },
+        "r_be99bdf8e0ab": {
+          "masculine": "Artdepartmentcoördinator",
+          "feminine": "Artdepartmentcoördinatrice",
+          "neutral": "Artdepartmentcoördinator"
+        },
+        "r_9187325e0d84": {
+          "masculine": "Assistent artdepartmentcoördinator",
+          "feminine": "Assistente artdepartmentcoördinator",
+          "neutral": "Assistent artdepartmentcoördinator"
+        },
+        "r_a8af82f5e937": {
+          "masculine": "Artdepartmentrunner",
+          "feminine": "Artdepartmentrunner",
+          "neutral": "Artdepartmentrunner"
+        },
+        "r_8310307922eb": {
+          "masculine": "Artdepartmentstagiair",
+          "feminine": "Artdepartmentstagiaire",
+          "neutral": "Artdepartmentstagiair"
+        },
+        "r_f7d87853929b": {
+          "masculine": "Chauffeur setdecoratie",
+          "feminine": "Chauffeuse setdecoratie",
+          "neutral": "Chauffeur setdecoratie"
+        },
+        "r_71506d96f350": {
+          "masculine": "Grafisch ontwerper",
+          "feminine": "Grafisch ontwerpster",
+          "neutral": "Grafisch ontwerper"
+        },
+        "r_dd224ea66364": {
+          "masculine": "Productverzorging",
+          "feminine": "Productverzorging",
+          "neutral": "Productverzorging"
+        },
+        "r_b2e24af2a895": {
+          "masculine": "Grafische uitwerking",
+          "feminine": "Grafische uitwerking",
+          "neutral": "Grafische uitwerking"
+        },
+        "r_c399668f6f57": {
+          "masculine": "Supervisor computer- en videoplayback",
+          "feminine": "Supervisor computer- en videoplayback",
+          "neutral": "Supervisor computer- en videoplayback"
+        },
+        "r_d278f8dea5ee": {
+          "masculine": "Decorbouwer",
+          "feminine": "Decorbouwer",
+          "neutral": "Decorbouwer"
+        },
+        "r_ed52a3596ba0": {
+          "masculine": "Setdecorbouw",
+          "feminine": "Setdecorbouw",
+          "neutral": "Setdecorbouw"
+        },
+        "r_e3f39e455941": {
+          "masculine": "Decorbouwhulp",
+          "feminine": "Decorbouwhulp",
+          "neutral": "Decorbouwhulp"
+        },
+        "r_74a60171830a": {
+          "masculine": "Onderwatersetbouw",
+          "feminine": "Onderwatersetbouw",
+          "neutral": "Onderwatersetbouw"
+        },
+        "r_18c785ac7bd8": {
+          "masculine": "Rigging en speciale constructies",
+          "feminine": "Rigging en speciale constructies",
+          "neutral": "Rigging en speciale constructies"
+        },
+        "r_8f15fc164b86": {
+          "masculine": "Assistent constructietekenaar",
+          "feminine": "Assistente constructietekenaar",
+          "neutral": "Assistent constructietekenaar"
+        },
+        "r_7e3c819b39ed": {
+          "masculine": "Hoofd stukadoor",
+          "feminine": "Hoofd stukadoor",
+          "neutral": "Hoofd stukadoor"
+        },
+        "r_24a7497a9f06": {
+          "masculine": "Stoffeerder",
+          "feminine": "Stoffeerder",
+          "neutral": "Stoffeerder"
+        },
+        "r_a279ae7e16ec": {
+          "masculine": "Hoofd stoffering",
+          "feminine": "Hoofd stoffering",
+          "neutral": "Hoofd stoffering"
+        },
+        "r_0f2d76b6cc82": {
+          "masculine": "Hoofd timmerwerk",
+          "feminine": "Hoofd timmerwerk",
+          "neutral": "Hoofd timmerwerk"
+        },
+        "r_08876b0452b5": {
+          "masculine": "Stagiair aankleding",
+          "feminine": "Stagiaire aankleding",
+          "neutral": "Stagiair aankleding"
+        }
+      },
+      "kostuem": {
+        "r_cfc0491e1daf": {
+          "masculine": "Kostuumontwerper",
+          "feminine": "Kostuumontwerpster",
+          "neutral": "Kostuumontwerper"
+        },
+        "r_acbff2b1675d": {
+          "masculine": "Kostuumsupervisor",
+          "feminine": "Kostuumsupervisor",
+          "neutral": "Kostuumsupervisor"
+        },
+        "r_4e5a29f37fde": {
+          "masculine": "Assistent kostuumsupervisor",
+          "feminine": "Assistente kostuumsupervisor",
+          "neutral": "Assistent kostuumsupervisor"
+        },
+        "r_9dacdd987a87": {
+          "masculine": "Kostuumcoördinator",
+          "feminine": "Kostuumcoördinatrice",
+          "neutral": "Kostuumcoördinator"
+        },
+        "r_3ea2819cc8c4": {
+          "masculine": "Assistent kostuumcoördinator",
+          "feminine": "Assistente kostuumcoördinator",
+          "neutral": "Assistent kostuumcoördinator"
+        },
+        "r_3684af682bde": {
+          "masculine": "Assistent kostuumontwerper",
+          "feminine": "Assistente kostuumontwerper",
+          "neutral": "Assistent kostuumontwerper"
+        },
+        "r_bca9201a3794": {
+          "masculine": "Tweede assistent kostuumontwerper",
+          "feminine": "Tweede assistente kostuumontwerper",
+          "neutral": "Tweede assistent kostuumontwerper"
+        },
+        "r_570a76c15c34": {
+          "masculine": "Derde assistent kostuumontwerper",
+          "feminine": "Derde assistente kostuumontwerper",
+          "neutral": "Derde assistent kostuumontwerper"
+        },
+        "r_75358a18f698": {
+          "masculine": "Hoofd kostuumverzorging",
+          "feminine": "Hoofd kostuumverzorging",
+          "neutral": "Hoofd kostuumverzorging"
+        },
+        "r_df59c1f51566": {
+          "masculine": "Setkostuumverzorger / garderobier",
+          "feminine": "Setkostuumverzorgster / garderobier",
+          "neutral": "Setkostuumverzorger / garderobier"
+        },
+        "r_7d1eb3e51b50": {
+          "masculine": "Extra setkostuumverzorger",
+          "feminine": "Extra setkostuumverzorgster",
+          "neutral": "Extra setkostuumverzorger"
+        },
+        "r_aa38c8f5acdd": {
+          "masculine": "Setkostuumassistent",
+          "feminine": "Setkostuumassistente",
+          "neutral": "Setkostuumassistent"
+        },
+        "r_85a93499fa51": {
+          "masculine": "Kostuumsupervisor figuratie",
+          "feminine": "Kostuumsupervisor figuratie",
+          "neutral": "Kostuumsupervisor figuratie"
+        },
+        "r_73f373881e68": {
+          "masculine": "Kostuumpasmedewerker figuratie",
+          "feminine": "Kostuumpasmedewerkster figuratie",
+          "neutral": "Kostuumpasmedewerker figuratie"
+        },
+        "r_82daef37fafd": {
+          "masculine": "Kostuumwagenmedewerker",
+          "feminine": "Kostuumwagenmedewerkster",
+          "neutral": "Kostuumwagenmedewerker"
+        },
+        "r_40f30fffbd6a": {
+          "masculine": "Kostuuminkoper",
+          "feminine": "Kostuuminkoper",
+          "neutral": "Kostuuminkoper"
+        },
+        "r_60a2042cfa65": {
+          "masculine": "Kostuumboekhouder",
+          "feminine": "Kostuumboekhouder",
+          "neutral": "Kostuumboekhouder"
+        },
+        "r_6ece4b3c2f60": {
+          "masculine": "Hoofd kostuumatelier / wardrobe master",
+          "feminine": "Hoofd kostuumatelier / wardrobe master",
+          "neutral": "Hoofd kostuumatelier / wardrobe master"
+        },
+        "r_bb614a4f62e2": {
+          "masculine": "Kostuumassistent",
+          "feminine": "Kostuumassistente",
+          "neutral": "Kostuumassistent"
+        },
+        "r_86f8b66926fc": {
+          "masculine": "Kostuumstagiair",
+          "feminine": "Kostuumstagiaire",
+          "neutral": "Kostuumstagiair"
+        },
+        "r_272717911d79": {
+          "masculine": "Kleermaker",
+          "feminine": "Kleermaakster",
+          "neutral": "Kleermaker"
+        },
+        "r_3a35662b53a3": {
+          "masculine": "Naaiateliermedewerker",
+          "feminine": "Naaiateliermedewerkster",
+          "neutral": "Naaiateliermedewerker"
+        },
+        "r_298c04a0eec5": {
+          "masculine": "Textielkunstenaar",
+          "feminine": "Textielkunstenares",
+          "neutral": "Textielkunstenaar"
+        },
+        "r_2a6b1e3320f5": {
+          "masculine": "Kostuummaker",
+          "feminine": "Kostuummaakster",
+          "neutral": "Kostuummaker"
+        },
+        "r_066dc1f269bb": {
+          "masculine": "Maker kostuumrekwisieten",
+          "feminine": "Maakster kostuumrekwisieten",
+          "neutral": "Maker kostuumrekwisieten"
+        },
+        "r_83db0e1a7bff": {
+          "masculine": "Patroonmaker",
+          "feminine": "Patroonmaker",
+          "neutral": "Patroonmaker"
+        },
+        "r_fc8d26a01b37": {
+          "masculine": "Maatkleermaker dames",
+          "feminine": "Maatkleermaakster dames",
+          "neutral": "Maatkleermaker dames"
+        },
+        "r_9aaa9c423455": {
+          "masculine": "Maatkleermaker heren",
+          "feminine": "Maatkleermaakster heren",
+          "neutral": "Maatkleermaker heren"
+        },
+        "r_975bb2c38b93": {
+          "masculine": "Hoedenmaker",
+          "feminine": "Hoedenmaakster",
+          "neutral": "Hoedenmaker"
+        },
+        "r_e5cb00d76add": {
+          "masculine": "Korsettenmaker",
+          "feminine": "Korsettenmaakster",
+          "neutral": "Korsettenmaker"
+        },
+        "r_f573123c66c5": {
+          "masculine": "Kostuumillustrator",
+          "feminine": "Kostuumillustratrice",
+          "neutral": "Kostuumillustrator"
+        },
+        "r_3218fd13d59c": {
+          "masculine": "Kostuumschilder / -verver",
+          "feminine": "Kostuumschilder / -verver",
+          "neutral": "Kostuumschilder / -verver"
+        },
+        "r_f8c4b94e93de": {
+          "masculine": "Kostuumpatineerder",
+          "feminine": "Kostuumpatineerder",
+          "neutral": "Kostuumpatineerder"
+        },
+        "r_25bf82085577": {
+          "masculine": "Kostuumborduurder",
+          "feminine": "Kostuumborduurder",
+          "neutral": "Kostuumborduurder"
+        },
+        "r_4bd9dd09da1d": {
+          "masculine": "Kostuumonderzoeker",
+          "feminine": "Kostuumonderzoekster",
+          "neutral": "Kostuumonderzoeker"
+        },
+        "r_2efd6bda8664": {
+          "masculine": "Kostuumchauffeur",
+          "feminine": "Kostuumchauffeuse",
+          "neutral": "Kostuumchauffeur"
+        },
+        "r_a723a074986b": {
+          "masculine": "Specialist veroudering en slijtage",
+          "feminine": "Specialiste veroudering en slijtage",
+          "neutral": "Specialist veroudering en slijtage"
+        },
+        "r_ac01a53c578c": {
+          "masculine": "SFX-kostuummaker",
+          "feminine": "SFX-kostuummaakster",
+          "neutral": "SFX-kostuummaker"
+        },
+        "r_bbc01e9dad81": {
+          "masculine": "Stylist / stylingassistent",
+          "feminine": "Styliste / stylingassistent",
+          "neutral": "Stylist / stylingassistent"
+        },
+        "r_0cf394ee7640": {
+          "masculine": "Kostuumontwerper (vormgeving)",
+          "feminine": "Kostuumontwerpster (vormgeving)",
+          "neutral": "Kostuumontwerper (vormgeving)"
+        },
+        "r_6e84493aa620": {
+          "masculine": "Kostuumadviseur",
+          "feminine": "Kostuumadviseuse",
+          "neutral": "Kostuumadviseur"
+        },
+        "r_7673a5020856": {
+          "masculine": "Assistent kostuumontwerp",
+          "feminine": "Assistente kostuumontwerp",
+          "neutral": "Assistent kostuumontwerp"
+        },
+        "r_1ca2128245c1": {
+          "masculine": "Kostuumafdelingscoördinator",
+          "feminine": "Kostuumafdelingscoördinatrice",
+          "neutral": "Kostuumafdelingscoördinator"
+        },
+        "r_f707bb1f5992": {
+          "masculine": "Setkostuumverzorger (garderobier)",
+          "feminine": "Setkostuumverzorgster (garderobier)",
+          "neutral": "Setkostuumverzorger (garderobier)"
+        },
+        "r_cc15942423ce": {
+          "masculine": "Setkostuumassistent",
+          "feminine": "Setkostuumassistente",
+          "neutral": "Setkostuumassistent"
+        },
+        "r_fa17db9ddd73": {
+          "masculine": "Stylist",
+          "feminine": "Styliste",
+          "neutral": "Stylist"
+        },
+        "r_510b1830a8a9": {
+          "masculine": "Stylingassistent",
+          "feminine": "Stylingassistente",
+          "neutral": "Stylingassistent"
+        },
+        "r_cc5427b5207e": {
+          "masculine": "Hoofd kostuumatelier",
+          "feminine": "Hoofd kostuumatelier",
+          "neutral": "Hoofd kostuumatelier"
+        },
+        "r_51e4b1b69e51": {
+          "masculine": "Maatkleermaker dames",
+          "feminine": "Maatkleermaakster dames",
+          "neutral": "Maatkleermaker dames"
+        },
+        "r_c90f0f14aa1d": {
+          "masculine": "Maatkleermaker heren",
+          "feminine": "Maatkleermaakster heren",
+          "neutral": "Maatkleermaker heren"
+        },
+        "r_b02e861df06e": {
+          "masculine": "Hoedenmaker",
+          "feminine": "Hoedenmaakster",
+          "neutral": "Hoedenmaker"
+        },
+        "r_f4d2f92c7063": {
+          "masculine": "Korsettenmaker",
+          "feminine": "Korsettenmaakster",
+          "neutral": "Korsettenmaker"
+        },
+        "r_60b06eb1a3e5": {
+          "masculine": "Garderobier",
+          "feminine": "Garderobier",
+          "neutral": "Garderobier"
+        },
+        "r_b57d7945c2e1": {
+          "masculine": "Kostuumassistentie",
+          "feminine": "Kostuumassistentie",
+          "neutral": "Kostuumassistentie"
+        },
+        "r_2ac825cfa903": {
+          "masculine": "Kleermaker",
+          "feminine": "Kleermaakster",
+          "neutral": "Kleermaker"
+        },
+        "r_f5c79a825c6d": {
+          "masculine": "Kostuumchauffeur",
+          "feminine": "Kostuumchauffeuse",
+          "neutral": "Kostuumchauffeur"
+        },
+        "r_d964234f1385": {
+          "masculine": "Naaiateliermedewerker",
+          "feminine": "Naaiateliermedewerkster",
+          "neutral": "Naaiateliermedewerker"
+        },
+        "r_6371bcd4467e": {
+          "masculine": "Kostuumpatineerder",
+          "feminine": "Kostuumpatineerder",
+          "neutral": "Kostuumpatineerder"
+        },
+        "r_93cc3465aeac": {
+          "masculine": "Kostuumschilder / -verver",
+          "feminine": "Kostuumschilder / -verver",
+          "neutral": "Kostuumschilder / -verver"
+        },
+        "r_9f631f727b98": {
+          "masculine": "Kostuumborduurder",
+          "feminine": "Kostuumborduurder",
+          "neutral": "Kostuumborduurder"
+        },
+        "r_fd593b68c6bd": {
+          "masculine": "Kostuumillustrator",
+          "feminine": "Kostuumillustratrice",
+          "neutral": "Kostuumillustrator"
+        },
+        "r_52cc391775b8": {
+          "masculine": "Stagiair kostuumontwerp",
+          "feminine": "Stagiaire kostuumontwerp",
+          "neutral": "Stagiair kostuumontwerp"
+        }
+      },
+      "maske": {
+        "r_2cecb5bef109": {
+          "masculine": "Hoofd make-up en haar",
+          "feminine": "Hoofd make-up en haar",
+          "neutral": "Hoofd make-up en haar"
+        },
+        "r_8c46abf33a4b": {
+          "masculine": "Haarontwerper",
+          "feminine": "Haarontwerpster",
+          "neutral": "Haarontwerper"
+        },
+        "r_afd55563be09": {
+          "masculine": "Haar- en make-upontwerper",
+          "feminine": "Haar- en make-upontwerpster",
+          "neutral": "Haar- en make-upontwerper"
+        },
+        "r_0d2723e6a8cc": {
+          "masculine": "Make-upontwerper",
+          "feminine": "Make-upontwerpster",
+          "neutral": "Make-upontwerper"
+        },
+        "r_b73ceeda53dd": {
+          "masculine": "Haar- en make-upsupervisor",
+          "feminine": "Haar- en make-upsupervisor",
+          "neutral": "Haar- en make-upsupervisor"
+        },
+        "r_913e5cf46a02": {
+          "masculine": "Hoofd make-up",
+          "feminine": "Hoofd make-up",
+          "neutral": "Hoofd make-up"
+        },
+        "r_495a42f74fbb": {
+          "masculine": "Hoofd haarstyling",
+          "feminine": "Hoofd haarstyling",
+          "neutral": "Hoofd haarstyling"
+        },
+        "r_ff414fc1a4e8": {
+          "masculine": "Make-upartiest",
+          "feminine": "Make-upartieste",
+          "neutral": "Make-upartiest"
+        },
+        "r_ace166547405": {
+          "masculine": "Extra make-upartiest",
+          "feminine": "Extra make-upartieste",
+          "neutral": "Extra make-upartiest"
+        },
+        "r_96cb48e2539d": {
+          "masculine": "Haarstylist",
+          "feminine": "Haarstyliste",
+          "neutral": "Haarstylist"
+        },
+        "r_3a06bbd5516b": {
+          "masculine": "Extra haarstylist",
+          "feminine": "Extra haarstyliste",
+          "neutral": "Extra haarstylist"
+        },
+        "r_a8a061642ea1": {
+          "masculine": "Hoofd grime / make-upafdeling",
+          "feminine": "Hoofd grime / make-upafdeling",
+          "neutral": "Hoofd grime / make-upafdeling"
+        },
+        "r_988255c043c0": {
+          "masculine": "Lichaamsmake-up",
+          "feminine": "Lichaamsmake-up",
+          "neutral": "Lichaamsmake-up"
+        },
+        "r_62302b472d3b": {
+          "masculine": "Extra grimeur / make-upartiest",
+          "feminine": "Extra grimeur / make-upartieste",
+          "neutral": "Extra grimeur / make-upartiest"
+        },
+        "r_de6fbe18e529": {
+          "masculine": "Make-upassistent",
+          "feminine": "Make-upassistente",
+          "neutral": "Make-upassistent"
+        },
+        "r_89708da23c7a": {
+          "masculine": "Pruikenmaker",
+          "feminine": "Pruikenmaakster",
+          "neutral": "Pruikenmaker"
+        },
+        "r_eb0f745569de": {
+          "masculine": "Prothesemaker",
+          "feminine": "Prothesemaakster",
+          "neutral": "Prothesemaker"
+        },
+        "r_bc667775a067": {
+          "masculine": "SFX-make-upartiest",
+          "feminine": "SFX-make-upartieste",
+          "neutral": "SFX-make-upartiest"
+        },
+        "r_a27c177f51ef": {
+          "masculine": "Supervisor haar en make-up figuratie",
+          "feminine": "Supervisor haar en make-up figuratie",
+          "neutral": "Supervisor haar en make-up figuratie"
+        },
+        "r_e46c728a4398": {
+          "masculine": "Grimestagiair",
+          "feminine": "Grimestagiaire",
+          "neutral": "Grimestagiair"
+        },
+        "r_3bd74d7ca372": {
+          "masculine": "Hoofd make-up",
+          "feminine": "Hoofd make-up",
+          "neutral": "Hoofd make-up"
+        },
+        "r_1dbe2290254a": {
+          "masculine": "Hoofd grime",
+          "feminine": "Hoofd grime",
+          "neutral": "Hoofd grime"
+        },
+        "r_3e08c4bedcc0": {
+          "masculine": "Lichaamsmake-up",
+          "feminine": "Lichaamsmake-up",
+          "neutral": "Lichaamsmake-up"
+        },
+        "r_24c9ee41124f": {
+          "masculine": "Extra grimeur",
+          "feminine": "Extra grimeur",
+          "neutral": "Extra grimeur"
+        },
+        "r_6373cbbea77f": {
+          "masculine": "Pruikenmaker",
+          "feminine": "Pruikenmaakster",
+          "neutral": "Pruikenmaker"
+        },
+        "r_e9a07f599b31": {
+          "masculine": "Grimestagiair",
+          "feminine": "Grimestagiaire",
+          "neutral": "Grimestagiair"
+        }
+      },
+      "post": {
+        "r_f88d95239ea1": {
+          "masculine": "Postproductieproducent",
+          "feminine": "Postproductieproducente",
+          "neutral": "Postproductieproducent"
+        },
+        "r_4284177c72b3": {
+          "masculine": "Postproductiesupervisor",
+          "feminine": "Postproductiesupervisor",
+          "neutral": "Postproductiesupervisor"
+        },
+        "r_c2fb80f3e981": {
+          "masculine": "Postproductiemanager",
+          "feminine": "Postproductiemanager",
+          "neutral": "Postproductiemanager"
+        },
+        "r_78b6f4ddb08c": {
+          "masculine": "Postproductiecoördinator",
+          "feminine": "Postproductiecoördinatrice",
+          "neutral": "Postproductiecoördinator"
+        },
+        "r_0bb7e59012ae": {
+          "masculine": "Postproductieplanner",
+          "feminine": "Postproductieplanner",
+          "neutral": "Postproductieplanner"
+        },
+        "r_b54fb6f974fa": {
+          "masculine": "Assistent postproductiesupervisor",
+          "feminine": "Assistente postproductiesupervisor",
+          "neutral": "Assistent postproductiesupervisor"
+        },
+        "r_fae43b642354": {
+          "masculine": "Opleveringsmanager / opleveringssupervisor",
+          "feminine": "Opleveringsmanager / opleveringssupervisor",
+          "neutral": "Opleveringsmanager / opleveringssupervisor"
+        },
+        "r_54b281a42495": {
+          "masculine": "Editor",
+          "feminine": "Editor",
+          "neutral": "Editor"
+        },
+        "r_eb67aee95450": {
+          "masculine": "Editor / monteur",
+          "feminine": "Editor / monteuse",
+          "neutral": "Editor / monteur"
+        },
+        "r_332deef8530f": {
+          "masculine": "Extra editor",
+          "feminine": "Extra editor",
+          "neutral": "Extra editor"
+        },
+        "r_4b8538db6e6e": {
+          "masculine": "Junioreditor",
+          "feminine": "Junioreditor",
+          "neutral": "Junioreditor"
+        },
+        "r_a000c69c93cd": {
+          "masculine": "Eerste assistent-editor",
+          "feminine": "Eerste assistente-editor",
+          "neutral": "Eerste assistent-editor"
+        },
+        "r_fb53d3bb0ca0": {
+          "masculine": "Montageassistent",
+          "feminine": "Montageassistente",
+          "neutral": "Montageassistent"
+        },
+        "r_58fb452bb25d": {
+          "masculine": "Tweede assistent-editor",
+          "feminine": "Tweede assistente-editor",
+          "neutral": "Tweede assistent-editor"
+        },
+        "r_e73f1067c3d0": {
+          "masculine": "Tweede montageassistent",
+          "feminine": "Tweede montageassistente",
+          "neutral": "Tweede montageassistent"
+        },
+        "r_f40a64b53f4e": {
+          "masculine": "Derde montageassistent",
+          "feminine": "Derde montageassistente",
+          "neutral": "Derde montageassistent"
+        },
+        "r_f034db9da000": {
+          "masculine": "Montagedramaturg",
+          "feminine": "Montagedramaturge",
+          "neutral": "Montagedramaturg"
+        },
+        "r_9d8fc1953afd": {
+          "masculine": "VFX-editor",
+          "feminine": "VFX-editor",
+          "neutral": "VFX-editor"
+        },
+        "r_6742bca7f725": {
+          "masculine": "Trailereditor",
+          "feminine": "Trailereditor",
+          "neutral": "Trailereditor"
+        },
+        "r_0088f1d1581d": {
+          "masculine": "Dailies-editor",
+          "feminine": "Dailies-editor",
+          "neutral": "Dailies-editor"
+        },
+        "r_855df6fe84d9": {
+          "masculine": "Synchronisatieassistent",
+          "feminine": "Synchronisatieassistente",
+          "neutral": "Synchronisatieassistent"
+        },
+        "r_76fe5605aea7": {
+          "masculine": "Avid-operator",
+          "feminine": "Avid-operator",
+          "neutral": "Avid-operator"
+        },
+        "r_9a37f1a2f07c": {
+          "masculine": "Final Cut-operator",
+          "feminine": "Final Cut-operator",
+          "neutral": "Final Cut-operator"
+        },
+        "r_5c291075de55": {
+          "masculine": "Colorist",
+          "feminine": "Colorist",
+          "neutral": "Colorist"
+        },
+        "r_ee3d75537a1f": {
+          "masculine": "Online-editor",
+          "feminine": "Online-editor",
+          "neutral": "Online-editor"
+        },
+        "r_24e3087423e1": {
+          "masculine": "Afwerkingsspecialist",
+          "feminine": "Afwerkingsspecialiste",
+          "neutral": "Afwerkingsspecialist"
+        },
+        "r_1b9c5df34287": {
+          "masculine": "Schermontwerper",
+          "feminine": "Schermontwerpster",
+          "neutral": "Schermontwerper"
+        },
+        "r_0c866fbdd1b9": {
+          "masculine": "Titelontwerper",
+          "feminine": "Titelontwerpster",
+          "neutral": "Titelontwerper"
+        },
+        "r_cac32c0c1a16": {
+          "masculine": "DCP-technicus",
+          "feminine": "DCP-technica",
+          "neutral": "DCP-technicus"
+        },
+        "r_3bf9436831af": {
+          "masculine": "Filmscanneroperator",
+          "feminine": "Filmscanneroperator",
+          "neutral": "Filmscanneroperator"
+        },
+        "r_0c4887e0a1b6": {
+          "masculine": "Filmscanningsupervisor",
+          "feminine": "Filmscanningsupervisor",
+          "neutral": "Filmscanningsupervisor"
+        },
+        "r_85f36a10ca63": {
+          "masculine": "VFX-supervisor",
+          "feminine": "VFX-supervisor",
+          "neutral": "VFX-supervisor"
+        },
+        "r_3690883b97f2": {
+          "masculine": "VFX-producent",
+          "feminine": "VFX-producente",
+          "neutral": "VFX-producent"
+        },
+        "r_01122a78805d": {
+          "masculine": "VFX-coördinator",
+          "feminine": "VFX-coördinatrice",
+          "neutral": "VFX-coördinator"
+        },
+        "r_4c1b3c0e7030": {
+          "masculine": "VFX-productieleider",
+          "feminine": "VFX-productieleidster",
+          "neutral": "VFX-productieleider"
+        },
+        "r_b11b0566c205": {
+          "masculine": "Producent uitbestede VFX",
+          "feminine": "Producente uitbestede VFX",
+          "neutral": "Producent uitbestede VFX"
+        },
+        "r_061d09311a06": {
+          "masculine": "Assistent VFX-producent",
+          "feminine": "Assistente VFX-producent",
+          "neutral": "Assistent VFX-producent"
+        },
+        "r_c20adc0c544f": {
+          "masculine": "VFX-animatiesupervisor",
+          "feminine": "VFX-animatiesupervisor",
+          "neutral": "VFX-animatiesupervisor"
+        },
+        "r_ef84bdb88ead": {
+          "masculine": "VR-producent",
+          "feminine": "VR-producente",
+          "neutral": "VR-producent"
+        },
+        "r_33a9c6da17ea": {
+          "masculine": "Compositor",
+          "feminine": "Compositor",
+          "neutral": "Compositor"
+        },
+        "r_aca1c9874a93": {
+          "masculine": "Compositingsupervisor",
+          "feminine": "Compositingsupervisor",
+          "neutral": "Compositingsupervisor"
+        },
+        "r_74803d65a47d": {
+          "masculine": "Digitaal compositor",
+          "feminine": "Digitaal compositor",
+          "neutral": "Digitaal compositor"
+        },
+        "r_a61ab2d8897e": {
+          "masculine": "Supervisor digitale effecten",
+          "feminine": "Supervisor digitale effecten",
+          "neutral": "Supervisor digitale effecten"
+        },
+        "r_41f1fab43430": {
+          "masculine": "Ontwerper digitale effecten",
+          "feminine": "Ontwerpster digitale effecten",
+          "neutral": "Ontwerper digitale effecten"
+        },
+        "r_09a4c7b8c909": {
+          "masculine": "Digitaal matteschilder",
+          "feminine": "Digitaal matteschilder",
+          "neutral": "Digitaal matteschilder"
+        },
+        "r_1df80b2df510": {
+          "masculine": "2D-artiest",
+          "feminine": "2D-artieste",
+          "neutral": "2D-artiest"
+        },
+        "r_c5222c873ae5": {
+          "masculine": "3D-artiest",
+          "feminine": "3D-artieste",
+          "neutral": "3D-artiest"
+        },
+        "r_f1d016eba483": {
+          "masculine": "CG-belichtingsartiest",
+          "feminine": "CG-belichtingsartieste",
+          "neutral": "CG-belichtingsartiest"
+        },
+        "r_1374d004f892": {
+          "masculine": "Textuurartiest",
+          "feminine": "Textuurartieste",
+          "neutral": "Textuurartiest"
+        },
+        "r_ca0826d47a19": {
+          "masculine": "Matchmove-artiest",
+          "feminine": "Matchmove-artieste",
+          "neutral": "Matchmove-artiest"
+        },
+        "r_272f028d80c7": {
+          "masculine": "Roto-artiest",
+          "feminine": "Roto-artieste",
+          "neutral": "Roto-artiest"
+        },
+        "r_fb2a18a56ba5": {
+          "masculine": "FX-artiest",
+          "feminine": "FX-artieste",
+          "neutral": "FX-artiest"
+        },
+        "r_89c1660cb356": {
+          "masculine": "Animator",
+          "feminine": "Animatrice",
+          "neutral": "Animator"
+        },
+        "r_2efa5e8c0d5f": {
+          "masculine": "Motiondesigner",
+          "feminine": "Motiondesigner",
+          "neutral": "Motiondesigner"
+        },
+        "r_c2053cb7660f": {
+          "masculine": "Personage-animator",
+          "feminine": "Personage-animatrice",
+          "neutral": "Personage-animator"
+        },
+        "r_247d43bdfb47": {
+          "masculine": "Postproductieassistent",
+          "feminine": "Postproductieassistente",
+          "neutral": "Postproductieassistent"
+        },
+        "r_e2802de21986": {
+          "masculine": "Postproductietechnicus",
+          "feminine": "Postproductietechnica",
+          "neutral": "Postproductietechnicus"
+        },
+        "r_1f9c7a9f75a8": {
+          "masculine": "Montagestagiair",
+          "feminine": "Montagestagiaire",
+          "neutral": "Montagestagiair"
+        },
+        "r_bf7027763437": {
+          "masculine": "Postproductiecoördinator",
+          "feminine": "Postproductiecoördinatrice",
+          "neutral": "Postproductiecoördinator"
+        },
+        "r_fc841e10fe4f": {
+          "masculine": "Assistent postproductiesupervisor",
+          "feminine": "Assistente postproductiesupervisor",
+          "neutral": "Assistent postproductiesupervisor"
+        },
+        "r_a79df89d104c": {
+          "masculine": "VFX-artiest / compositor",
+          "feminine": "VFX-artieste / compositor",
+          "neutral": "VFX-artiest / compositor"
+        },
+        "r_2a16dc4c4550": {
+          "masculine": "Geluidsontwerper",
+          "feminine": "Geluidsontwerpster",
+          "neutral": "Geluidsontwerper"
+        },
+        "r_b96fddf3696f": {
+          "masculine": "Geluidseditor / -monteur",
+          "feminine": "Geluidseditor / -monteuse",
+          "neutral": "Geluidseditor / -monteur"
+        },
+        "r_a903b5656a8c": {
+          "masculine": "DCP-artiest",
+          "feminine": "DCP-artieste",
+          "neutral": "DCP-artiest"
+        },
+        "r_774ffd708e0e": {
+          "masculine": "Filmrecorderoperator",
+          "feminine": "Filmrecorderoperator",
+          "neutral": "Filmrecorderoperator"
+        },
+        "r_8685aa8f2a95": {
+          "masculine": "Mistika-operator",
+          "feminine": "Mistika-operator",
+          "neutral": "Mistika-operator"
+        },
+        "r_9b86e6dde935": {
+          "masculine": "Technisch VFX-directeur",
+          "feminine": "Technische VFX-directrice",
+          "neutral": "Technisch VFX-directeur"
+        },
+        "r_ab44975f8351": {
+          "masculine": "VFX-adviseur",
+          "feminine": "VFX-adviseuse",
+          "neutral": "VFX-adviseur"
+        },
+        "r_6a2814e6546b": {
+          "masculine": "VFX-belichtingssupervisor",
+          "feminine": "VFX-belichtingssupervisor",
+          "neutral": "VFX-belichtingssupervisor"
+        },
+        "r_c043402107e7": {
+          "masculine": "VFX-setsupervisor",
+          "feminine": "VFX-setsupervisor",
+          "neutral": "VFX-setsupervisor"
+        },
+        "r_2d4e2d1e1c2c": {
+          "masculine": "VFX-productiecoördinator",
+          "feminine": "VFX-productiecoördinatrice",
+          "neutral": "VFX-productiecoördinator"
+        },
+        "r_3a24d45a3a71": {
+          "masculine": "Assistent VFX-coördinator",
+          "feminine": "Assistente VFX-coördinator",
+          "neutral": "Assistent VFX-coördinator"
+        },
+        "r_a2d3fd026c27": {
+          "masculine": "VFX-verantwoordelijke",
+          "feminine": "VFX-verantwoordelijke",
+          "neutral": "VFX-verantwoordelijke"
+        },
+        "r_1d0ffcaee2f8": {
+          "masculine": "VFX-hr-manager",
+          "feminine": "VFX-hr-manager",
+          "neutral": "VFX-hr-manager"
+        },
+        "r_6eb353601a03": {
+          "masculine": "VFX-IT-beheerder",
+          "feminine": "VFX-IT-beheerder",
+          "neutral": "VFX-IT-beheerder"
+        },
+        "r_e70450322709": {
+          "masculine": "VFX-IT-supportmedewerker",
+          "feminine": "VFX-IT-supportmedewerkster",
+          "neutral": "VFX-IT-supportmedewerker"
+        },
+        "r_71a68d7195b5": {
+          "masculine": "VFX-IT-systeemingenieur / -technicus",
+          "feminine": "VFX-IT-systeemingenieur / -technica",
+          "neutral": "VFX-IT-systeemingenieur / -technicus"
+        },
+        "r_30de176c3d86": {
+          "masculine": "Technisch pipelinedirecteur",
+          "feminine": "Technische pipelinedirectrice",
+          "neutral": "Technisch pipelinedirecteur"
+        },
+        "r_3021537edab0": {
+          "masculine": "CG-supervisor",
+          "feminine": "CG-supervisor",
+          "neutral": "CG-supervisor"
+        },
+        "r_0d4cd83ac5f0": {
+          "masculine": "CG-softwareontwikkelaar",
+          "feminine": "CG-softwareontwikkelaar",
+          "neutral": "CG-softwareontwikkelaar"
+        },
+        "r_4d7b70afc38f": {
+          "masculine": "Concepttekenaar (VFX)",
+          "feminine": "Concepttekenares (VFX)",
+          "neutral": "Concepttekenaar (VFX)"
+        },
+        "r_1d77801b6bcb": {
+          "masculine": "Personageontwerper",
+          "feminine": "Personageontwerpster",
+          "neutral": "Personageontwerper"
+        },
+        "r_2eeabfb3e033": {
+          "masculine": "Personagesupervisor",
+          "feminine": "Personagesupervisor",
+          "neutral": "Personagesupervisor"
+        },
+        "r_d4054cc011f7": {
+          "masculine": "Animatronicssupervisor",
+          "feminine": "Animatronicssupervisor",
+          "neutral": "Animatronicssupervisor"
+        },
+        "r_27773325d503": {
+          "masculine": "Previsualisatiesupervisor",
+          "feminine": "Previsualisatiesupervisor",
+          "neutral": "Previsualisatiesupervisor"
+        },
+        "r_4e65539d8bde": {
+          "masculine": "Previsualisatieartiest",
+          "feminine": "Previsualisatieartieste",
+          "neutral": "Previsualisatieartiest"
+        },
+        "r_09f34347e5ee": {
+          "masculine": "Motioncapturesupervisor",
+          "feminine": "Motioncapturesupervisor",
+          "neutral": "Motioncapturesupervisor"
+        },
+        "r_96c37e1de0fa": {
+          "masculine": "Motioncontrolsupervisor",
+          "feminine": "Motioncontrolsupervisor",
+          "neutral": "Motioncontrolsupervisor"
+        },
+        "r_733686f9ae97": {
+          "masculine": "Dailies-operator",
+          "feminine": "Dailies-operator",
+          "neutral": "Dailies-operator"
+        },
+        "r_ab703255dec3": {
+          "masculine": "I/O-coördinator",
+          "feminine": "I/O-coördinatrice",
+          "neutral": "I/O-coördinator"
+        },
+        "r_75540ed9967e": {
+          "masculine": "Telecineoperator",
+          "feminine": "Telecineoperator",
+          "neutral": "Telecineoperator"
+        },
+        "r_6c17929b4f69": {
+          "masculine": "Digitaal matchmover",
+          "feminine": "Digitaal matchmover",
+          "neutral": "Digitaal matchmover"
+        },
+        "r_2646f9b4aadf": {
+          "masculine": "Rotoscopieartiest",
+          "feminine": "Rotoscopieartieste",
+          "neutral": "Rotoscopieartiest"
+        },
+        "r_1abce9757421": {
+          "masculine": "Beheerder digitale assets (DAM)",
+          "feminine": "Beheerder digitale assets (DAM)",
+          "neutral": "Beheerder digitale assets (DAM)"
+        },
+        "r_e28081bd8659": {
+          "masculine": "Digital-intermediatesupervisor (DI)",
+          "feminine": "Digital-intermediatesupervisor (DI)",
+          "neutral": "Digital-intermediatesupervisor (DI)"
+        },
+        "r_3be4ac15eccc": {
+          "masculine": "Digital-intermediate-engineer",
+          "feminine": "Digital-intermediate-engineer",
+          "neutral": "Digital-intermediate-engineer"
+        },
+        "r_ac6763f1d04b": {
+          "masculine": "Digital-intermediateassistent",
+          "feminine": "Digital-intermediateassistente",
+          "neutral": "Digital-intermediateassistent"
+        },
+        "r_68b5ed487d7c": {
+          "masculine": "VFX-datawrangler",
+          "feminine": "VFX-datawrangler",
+          "neutral": "VFX-datawrangler"
+        },
+        "r_98875c546157": {
+          "masculine": "Renderwrangler",
+          "feminine": "Renderwrangler",
+          "neutral": "Renderwrangler"
+        },
+        "r_37de85ee2914": {
+          "masculine": "3D-stereosupervisor",
+          "feminine": "3D-stereosupervisor",
+          "neutral": "3D-stereosupervisor"
+        },
+        "r_138f0f7f11c5": {
+          "masculine": "Schermplayback op de set",
+          "feminine": "Schermplayback op de set",
+          "neutral": "Schermplayback op de set"
+        },
+        "r_6c52a0b17c05": {
+          "masculine": "VFX-stagiair",
+          "feminine": "VFX-stagiaire",
+          "neutral": "VFX-stagiair"
+        },
+        "r_1a1b5684e757": {
+          "masculine": "VFX-productieassistent",
+          "feminine": "VFX-productieassistente",
+          "neutral": "VFX-productieassistent"
+        },
+        "r_03863e1fa165": {
+          "masculine": "VFX-teammanager",
+          "feminine": "VFX-teammanager",
+          "neutral": "VFX-teammanager"
+        },
+        "r_0006a71a7050": {
+          "masculine": "Hoofd 3D",
+          "feminine": "Hoofd 3D",
+          "neutral": "Hoofd 3D"
+        },
+        "r_9ad285824801": {
+          "masculine": "3D-animatieregisseur",
+          "feminine": "3D-animatieregisseuse",
+          "neutral": "3D-animatieregisseur"
+        },
+        "r_365169e4e39c": {
+          "masculine": "Hoofd 3D-personage-animatie",
+          "feminine": "Hoofd 3D-personage-animatie",
+          "neutral": "Hoofd 3D-personage-animatie"
+        },
+        "r_6dac25e38271": {
+          "masculine": "3D-personage-animator",
+          "feminine": "3D-personage-animatrice",
+          "neutral": "3D-personage-animator"
+        },
+        "r_18b24b362b8f": {
+          "masculine": "3D-rigger",
+          "feminine": "3D-rigger",
+          "neutral": "3D-rigger"
+        },
+        "r_b6265894c01c": {
+          "masculine": "3D-modelleur",
+          "feminine": "3D-modelleur",
+          "neutral": "3D-modelleur"
+        },
+        "r_401ce457432d": {
+          "masculine": "3D-belichtingsartiest",
+          "feminine": "3D-belichtingsartieste",
+          "neutral": "3D-belichtingsartiest"
+        },
+        "r_d6c0df6758d4": {
+          "masculine": "3D-textuurartiest",
+          "feminine": "3D-textuurartieste",
+          "neutral": "3D-textuurartiest"
+        },
+        "r_aff4837ba039": {
+          "masculine": "3D-camera-artiest",
+          "feminine": "3D-camera-artieste",
+          "neutral": "3D-camera-artiest"
+        },
+        "r_01ea52ed92df": {
+          "masculine": "3D-camerasupervisor",
+          "feminine": "3D-camerasupervisor",
+          "neutral": "3D-camerasupervisor"
+        },
+        "r_1b2a5f055d73": {
+          "masculine": "FX-animator",
+          "feminine": "FX-animatrice",
+          "neutral": "FX-animator"
+        },
+        "r_25d305ae2181": {
+          "masculine": "Deeltjesanimator",
+          "feminine": "Deeltjesanimatrice",
+          "neutral": "Deeltjesanimator"
+        },
+        "r_493348eeb5c9": {
+          "masculine": "2D-rigger",
+          "feminine": "2D-rigger",
+          "neutral": "2D-rigger"
+        },
+        "r_50d612c5929c": {
+          "masculine": "2D-animatieregisseur",
+          "feminine": "2D-animatieregisseuse",
+          "neutral": "2D-animatieregisseur"
+        },
+        "r_5b75d1dcc3ba": {
+          "masculine": "Hoofd 2D-personage-animatie",
+          "feminine": "Hoofd 2D-personage-animatie",
+          "neutral": "Hoofd 2D-personage-animatie"
+        },
+        "r_d3bed7009009": {
+          "masculine": "2D-personage-animator",
+          "feminine": "2D-personage-animatrice",
+          "neutral": "2D-personage-animator"
+        },
+        "r_b9b34ba4ee44": {
+          "masculine": "MotionBuilder-artiest",
+          "feminine": "MotionBuilder-artieste",
+          "neutral": "MotionBuilder-artiest"
+        },
+        "r_40ba6442d974": {
+          "masculine": "MotionBuilder-operator",
+          "feminine": "MotionBuilder-operator",
+          "neutral": "MotionBuilder-operator"
+        }
+      },
+      "musik": {
+        "r_4b516c3014b1": {
+          "masculine": "Componist",
+          "feminine": "Componiste",
+          "neutral": "Componist"
+        },
+        "r_78a8b7bafdcf": {
+          "masculine": "Aanvullende muziek",
+          "feminine": "Aanvullende muziek",
+          "neutral": "Aanvullende muziek"
+        },
+        "r_be9c85f652ee": {
+          "masculine": "Trailercomponist",
+          "feminine": "Trailercomponiste",
+          "neutral": "Trailercomponist"
+        },
+        "r_d052f25322c5": {
+          "masculine": "Muzikaal leider",
+          "feminine": "Muzikale leidster",
+          "neutral": "Muzikaal leider"
+        },
+        "r_520348654852": {
+          "masculine": "Muziekdirecteur",
+          "feminine": "Muziekdirectrice",
+          "neutral": "Muziekdirecteur"
+        },
+        "r_d614bde7c500": {
+          "masculine": "Muzieksupervisor",
+          "feminine": "Muzieksupervisor",
+          "neutral": "Muzieksupervisor"
+        },
+        "r_1f0d7374bb4c": {
+          "masculine": "Orkestrator",
+          "feminine": "Orkestrator",
+          "neutral": "Orkestrator"
+        },
+        "r_aa4b42f84387": {
+          "masculine": "Arrangeur",
+          "feminine": "Arrangeur",
+          "neutral": "Arrangeur"
+        },
+        "r_8c334f2ac9d3": {
+          "masculine": "Arrangeur",
+          "feminine": "Arrangeur",
+          "neutral": "Arrangeur"
+        },
+        "r_fe19755b0b9e": {
+          "masculine": "Dirigent",
+          "feminine": "Dirigent",
+          "neutral": "Dirigent"
+        },
+        "r_73021f352efb": {
+          "masculine": "Dirigent",
+          "feminine": "Dirigent",
+          "neutral": "Dirigent"
+        },
+        "r_1a95751341fb": {
+          "masculine": "Muziekeditor",
+          "feminine": "Muziekeditor",
+          "neutral": "Muziekeditor"
+        },
+        "r_8fd3dbb18e49": {
+          "masculine": "Muziekkopiist",
+          "feminine": "Muziekkopiist",
+          "neutral": "Muziekkopiist"
+        },
+        "r_d5e57768aab8": {
+          "masculine": "Muziekproducent",
+          "feminine": "Muziekproducente",
+          "neutral": "Muziekproducent"
+        },
+        "r_0e9738be9045": {
+          "masculine": "Muziekadviseur",
+          "feminine": "Muziekadviseuse",
+          "neutral": "Muziekadviseur"
+        },
+        "r_82e1a4d8181e": {
+          "masculine": "Muziekcoördinator",
+          "feminine": "Muziekcoördinatrice",
+          "neutral": "Muziekcoördinator"
+        },
+        "r_00bc34dec4f3": {
+          "masculine": "Logic-operator",
+          "feminine": "Logic-operator",
+          "neutral": "Logic-operator"
+        },
+        "r_0eae67a415cd": {
+          "masculine": "Pro Tools-operator",
+          "feminine": "Pro Tools-operator",
+          "neutral": "Pro Tools-operator"
+        },
+        "r_52aa8c6866dc": {
+          "masculine": "Assistent componist",
+          "feminine": "Assistente componist",
+          "neutral": "Assistent componist"
+        },
+        "r_3e66ad9f45e2": {
+          "masculine": "Musicus",
+          "feminine": "Musicus",
+          "neutral": "Musicus"
+        },
+        "r_ade18645efa3": {
+          "masculine": "Geluidseditor",
+          "feminine": "Geluidseditor",
+          "neutral": "Geluidseditor"
+        },
+        "r_0972afcc1e55": {
+          "masculine": "Compositiestagiair",
+          "feminine": "Compositiestagiaire",
+          "neutral": "Compositiestagiair"
+        },
+        "r_801e363423c3": {
+          "masculine": "Uitvoerend soundtrackproducent",
+          "feminine": "Uitvoerend soundtrackproducente",
+          "neutral": "Uitvoerend soundtrackproducent"
+        }
+      },
+      "set-logistik": {
+        "r_06d9aa28368f": {
+          "masculine": "Runner uitvalsbasis",
+          "feminine": "Runner uitvalsbasis",
+          "neutral": "Runner uitvalsbasis"
+        },
+        "r_51e581b5ea39": {
+          "masculine": "Chauffeur (personenauto / vrachtwagen)",
+          "feminine": "Chauffeuse (personenauto / vrachtwagen)",
+          "neutral": "Chauffeur (personenauto / vrachtwagen)"
+        },
+        "r_36a599628c2e": {
+          "masculine": "Locatiechauffeur",
+          "feminine": "Locatiechauffeuse",
+          "neutral": "Locatiechauffeur"
+        },
+        "r_9bc1a35535fa": {
+          "masculine": "Locatie-opnameleider",
+          "feminine": "Locatie-opnameleidster",
+          "neutral": "Locatie-opnameleider"
+        },
+        "r_273f12c52b95": {
+          "masculine": "Assistent locatiemanager",
+          "feminine": "Assistente locatiemanager",
+          "neutral": "Assistent locatiemanager"
+        },
+        "r_ad61df711cdf": {
+          "masculine": "Setbeveiliging",
+          "feminine": "Setbeveiliging",
+          "neutral": "Setbeveiliging"
+        },
+        "r_16476d55e646": {
+          "masculine": "Publieksbegeleiding",
+          "feminine": "Publieksbegeleiding",
+          "neutral": "Publieksbegeleiding"
+        },
+        "r_d4d0eb9a01ad": {
+          "masculine": "Bewegingsregisseur",
+          "feminine": "Bewegingsregisseuse",
+          "neutral": "Bewegingsregisseur"
+        },
+        "r_3c6a65ecb046": {
+          "masculine": "Bewegingscoach",
+          "feminine": "Bewegingscoach",
+          "neutral": "Bewegingscoach"
+        },
+        "r_c66e045ffbbf": {
+          "masculine": "Intimiteitscoördinator",
+          "feminine": "Intimiteitscoördinatrice",
+          "neutral": "Intimiteitscoördinator"
+        },
+        "r_2e9dcd12712e": {
+          "masculine": "Choreograaf",
+          "feminine": "Choreograaf",
+          "neutral": "Choreograaf"
+        },
+        "r_6f899f66fa58": {
+          "masculine": "Danscoach",
+          "feminine": "Danscoach",
+          "neutral": "Danscoach"
+        },
+        "r_f4a45af86f47": {
+          "masculine": "Zangcoach",
+          "feminine": "Zangcoach",
+          "neutral": "Zangcoach"
+        },
+        "r_6e8ad217ef2f": {
+          "masculine": "Dialoogcoach",
+          "feminine": "Dialoogcoach",
+          "neutral": "Dialoogcoach"
+        },
+        "r_63787dc385b1": {
+          "masculine": "Dialect- en taalcoach",
+          "feminine": "Dialect- en taalcoach",
+          "neutral": "Dialect- en taalcoach"
+        },
+        "r_8546ce0263e3": {
+          "masculine": "Acteercoach (beperking / neurodivergentie)",
+          "feminine": "Acteercoach (beperking / neurodivergentie)",
+          "neutral": "Acteercoach (beperking / neurodivergentie)"
+        },
+        "r_969986f76695": {
+          "masculine": "Muziekcoach",
+          "feminine": "Muziekcoach",
+          "neutral": "Muziekcoach"
+        },
+        "r_717c17e3e434": {
+          "masculine": "Supervisor doventoegankelijkheid",
+          "feminine": "Supervisor doventoegankelijkheid",
+          "neutral": "Supervisor doventoegankelijkheid"
+        },
+        "r_e30edc1bd3f8": {
+          "masculine": "Diversiteitsadviseur",
+          "feminine": "Diversiteitsadviseuse",
+          "neutral": "Diversiteitsadviseur"
+        },
+        "r_5595cb9aacd1": {
+          "masculine": "Sensitiviteitslezer",
+          "feminine": "Sensitiviteitslezer",
+          "neutral": "Sensitiviteitslezer"
+        },
+        "r_2d5e77118f48": {
+          "masculine": "Tolk",
+          "feminine": "Tolk",
+          "neutral": "Tolk"
+        },
+        "r_48bf6fb54a76": {
+          "masculine": "Stand-in",
+          "feminine": "Stand-in",
+          "neutral": "Stand-in"
+        },
+        "r_5845830d5e82": {
+          "masculine": "Setmedicus",
+          "feminine": "Setmedicus",
+          "neutral": "Setmedicus"
+        },
+        "r_ad72daba923d": {
+          "masculine": "Setdocent",
+          "feminine": "Setdocent",
+          "neutral": "Setdocent"
+        },
+        "r_79e9614b81a6": {
+          "masculine": "Kinderbegeleider",
+          "feminine": "Kinderbegeleidster",
+          "neutral": "Kinderbegeleider"
+        },
+        "r_29d48a809858": {
+          "masculine": "Verantwoordelijke kinderwelzijn",
+          "feminine": "Verantwoordelijke kinderwelzijn",
+          "neutral": "Verantwoordelijke kinderwelzijn"
+        },
+        "r_aba4d92c8e69": {
+          "masculine": "Begeleider artiesten, gasten en vip's",
+          "feminine": "Begeleidster artiesten, gasten en vip's",
+          "neutral": "Begeleider artiesten, gasten en vip's"
+        },
+        "r_53207f6ae5f4": {
+          "masculine": "Coördinator mentale gezondheid",
+          "feminine": "Coördinatrice mentale gezondheid",
+          "neutral": "Coördinator mentale gezondheid"
+        },
+        "r_45520abcff27": {
+          "masculine": "Vertrouwenspersoon",
+          "feminine": "Vertrouwenspersoon",
+          "neutral": "Vertrouwenspersoon"
+        },
+        "r_355cbf436694": {
+          "masculine": "Arbeidsveiligheidsspecialist",
+          "feminine": "Arbeidsveiligheidsspecialiste",
+          "neutral": "Arbeidsveiligheidsspecialist"
+        },
+        "r_308811767175": {
+          "masculine": "Hygiëneverantwoordelijke (coronabescherming)",
+          "feminine": "Hygiëneverantwoordelijke (coronabescherming)",
+          "neutral": "Hygiëneverantwoordelijke (coronabescherming)"
+        },
+        "r_32790b195d9e": {
+          "masculine": "Maritiem coördinator",
+          "feminine": "Maritieme coördinatrice",
+          "neutral": "Maritiem coördinator"
+        },
+        "r_c93f3dbba0c2": {
+          "masculine": "Onderwater- / duikcoördinator",
+          "feminine": "Onderwater- / duikcoördinatrice",
+          "neutral": "Onderwater- / duikcoördinator"
+        },
+        "r_2aed0957c337": {
+          "masculine": "Zadel- en tuigmeester",
+          "feminine": "Zadel- en tuigmeester",
+          "neutral": "Zadel- en tuigmeester"
+        },
+        "r_36f2141e2445": {
+          "masculine": "Publieksbegeleider",
+          "feminine": "Publieksbegeleidster",
+          "neutral": "Publieksbegeleider"
+        },
+        "r_dd293d0b7b4b": {
+          "masculine": "Adviserend regisseur",
+          "feminine": "Adviserende regisseuse",
+          "neutral": "Adviserend regisseur"
+        },
+        "r_d675b4f70ea4": {
+          "masculine": "Creatief directeur (reclamebureau)",
+          "feminine": "Creatieve directrice (reclamebureau)",
+          "neutral": "Creatief directeur (reclamebureau)"
+        },
+        "r_2c01621b03b3": {
+          "masculine": "Vakadviseur",
+          "feminine": "Vakadviseuse",
+          "neutral": "Vakadviseur"
+        },
+        "r_777d604a46c7": {
+          "masculine": "Deskundige (productie)",
+          "feminine": "Deskundige (productie)",
+          "neutral": "Deskundige (productie)"
+        },
+        "r_69b1f75394b4": {
+          "masculine": "Docent / coach",
+          "feminine": "Docent / coach",
+          "neutral": "Docent / coach"
+        },
+        "r_9b689ca40dcd": {
+          "masculine": "Impactproducent",
+          "feminine": "Impactproducente",
+          "neutral": "Impactproducent"
+        },
+        "r_b22d32243e5e": {
+          "masculine": "Duurzaamheidsadviseur",
+          "feminine": "Duurzaamheidsadviseuse",
+          "neutral": "Duurzaamheidsadviseur"
+        },
+        "r_b7e6bdc7cc1f": {
+          "masculine": "Assistent duurzaamheidsadviseur",
+          "feminine": "Assistente duurzaamheidsadviseur",
+          "neutral": "Assistent duurzaamheidsadviseur"
+        },
+        "r_e84880be1d61": {
+          "masculine": "Lineproducer EPK / achter de schermen",
+          "feminine": "Lineproducer EPK / achter de schermen",
+          "neutral": "Lineproducer EPK / achter de schermen"
+        },
+        "r_715e70975075": {
+          "masculine": "Producent EPK / achter de schermen",
+          "feminine": "Producente EPK / achter de schermen",
+          "neutral": "Producent EPK / achter de schermen"
+        },
+        "r_7028ae82d2e2": {
+          "masculine": "Filmrestaurateur",
+          "feminine": "Filmrestaurateur",
+          "neutral": "Filmrestaurateur"
+        },
+        "r_92791462fbdd": {
+          "masculine": "Filmcolorist",
+          "feminine": "Filmcolorist",
+          "neutral": "Filmcolorist"
+        },
+        "r_e732abed8e31": {
+          "masculine": "Discmedia-auteur",
+          "feminine": "Discmedia-auteur",
+          "neutral": "Discmedia-auteur"
+        },
+        "r_a63ade2d8c7d": {
+          "masculine": "Stop-motionanimator",
+          "feminine": "Stop-motionanimatrice",
+          "neutral": "Stop-motionanimator"
+        },
+        "r_e56da499fa85": {
+          "masculine": "Animatietekenaar",
+          "feminine": "Animatietekenares",
+          "neutral": "Animatietekenaar"
+        },
+        "r_868363b4696a": {
+          "masculine": "Spelontwikkelaar (shows)",
+          "feminine": "Spelontwikkelaar (shows)",
+          "neutral": "Spelontwikkelaar (shows)"
+        },
+        "r_776e611a5b6e": {
+          "masculine": "Poppenspeler",
+          "feminine": "Poppenspeelster",
+          "neutral": "Poppenspeler"
+        },
+        "r_d3d5008ffded": {
+          "masculine": "Visual jockey",
+          "feminine": "Visual jockey",
+          "neutral": "Visual jockey"
+        },
+        "r_f62082fcf3e6": {
+          "masculine": "Uitzendvormgever",
+          "feminine": "Uitzendvormgever",
+          "neutral": "Uitzendvormgever"
+        },
+        "r_915e8fdeaa84": {
+          "masculine": "Ondertitelspotter",
+          "feminine": "Ondertitelspotter",
+          "neutral": "Ondertitelspotter"
+        },
+        "r_e7b09583174a": {
+          "masculine": "Ondertitelaar",
+          "feminine": "Ondertitelaar",
+          "neutral": "Ondertitelaar"
+        },
+        "r_823099351f18": {
+          "masculine": "Regiescout",
+          "feminine": "Regiescout",
+          "neutral": "Regiescout"
+        },
+        "r_f25ed374ada5": {
+          "masculine": "Rechtenafhandeling",
+          "feminine": "Rechtenafhandeling",
+          "neutral": "Rechtenafhandeling"
+        },
+        "r_bf29b54303ec": {
+          "masculine": "PR-fotograaf",
+          "feminine": "PR-fotografe",
+          "neutral": "PR-fotograaf"
+        },
+        "r_e2fe82d9e60c": {
+          "masculine": "Extern projectleider",
+          "feminine": "Externe projectleidster",
+          "neutral": "Extern projectleider"
+        },
+        "r_3687ead5b451": {
+          "masculine": "Persoonlijk assistent",
+          "feminine": "Persoonlijke assistente",
+          "neutral": "Persoonlijk assistent"
+        },
+        "r_b85e79c1153f": {
+          "masculine": "Onderzoek",
+          "feminine": "Onderzoek",
+          "neutral": "Onderzoek"
+        }
+      },
+      "cast": {
+        "r_3d0e76b883b1": {
+          "masculine": "Hoofdrolspeler / Hoofdrolspeelster",
+          "feminine": "Hoofdrolspeelster",
+          "neutral": "Hoofdrolspeler / Hoofdrolspeelster"
+        },
+        "r_543b99d52c01": {
+          "masculine": "Acteur",
+          "feminine": "Actrice",
+          "neutral": "Acteur"
+        },
+        "r_aa64ee1fd5d6": {
+          "masculine": "Bijrolspeler / Bijrolspeelster",
+          "feminine": "Bijrolspeelster",
+          "neutral": "Bijrolspeler / Bijrolspeelster"
+        },
+        "r_5fea55df03ed": {
+          "masculine": "Figurant",
+          "feminine": "Figurante",
+          "neutral": "Figurant"
+        },
+        "r_912a4dbdd23c": {
+          "masculine": "Kleine-rolspeler",
+          "feminine": "Kleine-rolspeelster",
+          "neutral": "Kleine-rolspeler"
+        },
+        "r_130f7a137659": {
+          "masculine": "Model",
+          "feminine": "Model",
+          "neutral": "Model"
+        },
+        "r_e1e954da6cbb": {
+          "masculine": "Stemacteur / voice-over",
+          "feminine": "Stemactrice / voice-over",
+          "neutral": "Stemacteur / voice-over"
+        },
+        "r_67da9411185f": {
+          "masculine": "Stand-in",
+          "feminine": "Stand-in",
+          "neutral": "Stand-in"
+        },
+        "r_00100aeac4bb": {
+          "masculine": "Stuntartiest",
+          "feminine": "Stuntartieste",
+          "neutral": "Stuntartiest"
+        },
+        "r_0367b47c9554": {
+          "masculine": "Stuntdubbel",
+          "feminine": "Stuntdubbel",
+          "neutral": "Stuntdubbel"
+        },
+        "r_ca9ccb4b0409": {
+          "masculine": "Stuntrigger",
+          "feminine": "Stuntrigger",
+          "neutral": "Stuntrigger"
+        },
+        "r_418902de8e38": {
+          "masculine": "Stuntcoördinator",
+          "feminine": "Stuntcoördinatrice",
+          "neutral": "Stuntcoördinator"
+        },
+        "r_7f2d1a7f256f": {
+          "masculine": "Assistent stuntcoördinator",
+          "feminine": "Assistente stuntcoördinator",
+          "neutral": "Assistent stuntcoördinator"
+        },
+        "r_e84ab42c1ded": {
+          "masculine": "Stuntafdelingscoördinator",
+          "feminine": "Stuntafdelingscoördinatrice",
+          "neutral": "Stuntafdelingscoördinator"
+        },
+        "r_e09f42bb8f68": {
+          "masculine": "Gevechtschoreograaf",
+          "feminine": "Gevechtschoreograaf",
+          "neutral": "Gevechtschoreograaf"
+        },
+        "r_f1b27e4baea8": {
+          "masculine": "Actieregisseur",
+          "feminine": "Actieregisseuse",
+          "neutral": "Actieregisseur"
+        },
+        "r_ccdc591d96b4": {
+          "masculine": "Luchtstuntcoördinator",
+          "feminine": "Luchtstuntcoördinatrice",
+          "neutral": "Luchtstuntcoördinator"
+        },
+        "r_df312d5bf658": {
+          "masculine": "Stuntruiter",
+          "feminine": "Stuntruiter",
+          "neutral": "Stuntruiter"
+        },
+        "r_64fe45905183": {
+          "masculine": "Stunttechnicus",
+          "feminine": "Stunttechnica",
+          "neutral": "Stunttechnicus"
+        },
+        "r_28088de1cde2": {
+          "masculine": "Stuntreddingsduiker",
+          "feminine": "Stuntreddingsduiker",
+          "neutral": "Stuntreddingsduiker"
+        },
+        "r_f1b818bfac99": {
+          "masculine": "Parkourartiest",
+          "feminine": "Parkourartieste",
+          "neutral": "Parkourartiest"
+        },
+        "r_c9bf4b44628b": {
+          "masculine": "Precisiechauffeur",
+          "feminine": "Precisiechauffeuse",
+          "neutral": "Precisiechauffeur"
+        },
+        "r_901a1b08f6ba": {
+          "masculine": "Intimiteitscoördinator",
+          "feminine": "Intimiteitscoördinatrice",
+          "neutral": "Intimiteitscoördinator"
+        },
+        "r_7a721e572105": {
+          "masculine": "Castingmedewerker",
+          "feminine": "Castingmedewerkster",
+          "neutral": "Castingmedewerker"
+        },
+        "r_a1f9ba79ab08": {
+          "masculine": "Castingassistent",
+          "feminine": "Castingassistente",
+          "neutral": "Castingassistent"
+        },
+        "r_84927cc7b2bc": {
+          "masculine": "Bijrolspeler / Bijrolspeelster",
+          "feminine": "Bijrolspeelster",
+          "neutral": "Bijrolspeler / Bijrolspeelster"
+        },
+        "r_97144193d2e9": {
+          "masculine": "Figurant",
+          "feminine": "Figurante",
+          "neutral": "Figurant"
+        },
+        "r_de130677203b": {
+          "masculine": "Castingdirector (jongeren)",
+          "feminine": "Castingdirector (jongeren)",
+          "neutral": "Castingdirector (jongeren)"
+        },
+        "r_27725de30521": {
+          "masculine": "Castingdirector (kinderen)",
+          "feminine": "Castingdirector (kinderen)",
+          "neutral": "Castingdirector (kinderen)"
+        },
+        "r_9e31ceb09d88": {
+          "masculine": "Streetcasting",
+          "feminine": "Streetcasting",
+          "neutral": "Streetcasting"
+        },
+        "r_081340fc2740": {
+          "masculine": "Casting figuranten en kleine rollen",
+          "feminine": "Casting figuranten en kleine rollen",
+          "neutral": "Casting figuranten en kleine rollen"
+        },
+        "r_bff79e6f4b26": {
+          "masculine": "Castingstagiair",
+          "feminine": "Castingstagiaire",
+          "neutral": "Castingstagiair"
+        },
+        "r_2f8822fb833a": {
+          "masculine": "Hoofd stuntrigging",
+          "feminine": "Hoofd stuntrigging",
+          "neutral": "Hoofd stuntrigging"
+        },
+        "r_9fadc25f432e": {
+          "masculine": "Koetsier",
+          "feminine": "Koetsier",
+          "neutral": "Koetsier"
+        }
+      },
+      "sfx": {
+        "r_a35d5905e687": {
+          "masculine": "Supervisor speciale effecten",
+          "feminine": "Supervisor speciale effecten",
+          "neutral": "Supervisor speciale effecten"
+        },
+        "r_09c0a67cf5e1": {
+          "masculine": "SFX-technicus",
+          "feminine": "SFX-technica",
+          "neutral": "SFX-technicus"
+        },
+        "r_881a5efb4c8a": {
+          "masculine": "Coördinator speciale effecten",
+          "feminine": "Coördinatrice speciale effecten",
+          "neutral": "Coördinator speciale effecten"
+        },
+        "r_a9f1b82c4859": {
+          "masculine": "Projectmanager speciale effecten",
+          "feminine": "Projectmanager speciale effecten",
+          "neutral": "Projectmanager speciale effecten"
+        },
+        "r_cea7226b63f6": {
+          "masculine": "Pyrotechnicus",
+          "feminine": "Pyrotechnica",
+          "neutral": "Pyrotechnicus"
+        },
+        "r_eb065a9f90c9": {
+          "masculine": "Pyrotechnisch assistent",
+          "feminine": "Pyrotechnisch assistente",
+          "neutral": "Pyrotechnisch assistent"
+        },
+        "r_4d3662b84a22": {
+          "masculine": "Producent miniatuureffecten",
+          "feminine": "Producente miniatuureffecten",
+          "neutral": "Producent miniatuureffecten"
+        },
+        "r_e62650b9e5ae": {
+          "masculine": "Creatureontwerper",
+          "feminine": "Creatureontwerpster",
+          "neutral": "Creatureontwerper"
+        },
+        "r_00baca6dc147": {
+          "masculine": "Animatronicsingenieur",
+          "feminine": "Animatronicsingenieur",
+          "neutral": "Animatronicsingenieur"
+        },
+        "r_174ffb787533": {
+          "masculine": "Poppenbouwer",
+          "feminine": "Poppenbouwer",
+          "neutral": "Poppenbouwer"
+        },
+        "r_506a008769b9": {
+          "masculine": "Wapenmeester",
+          "feminine": "Wapenmeester",
+          "neutral": "Wapenmeester"
+        },
+        "r_2409c6266fd3": {
+          "masculine": "Wapentechnicus",
+          "feminine": "Wapentechnica",
+          "neutral": "Wapentechnicus"
+        },
+        "r_ddb886337a99": {
+          "masculine": "Draadrigger",
+          "feminine": "Draadrigger",
+          "neutral": "Draadrigger"
+        },
+        "r_72a4b7fb935e": {
+          "masculine": "SFX-rigging / speciale constructies",
+          "feminine": "SFX-rigging / speciale constructies",
+          "neutral": "SFX-rigging / speciale constructies"
+        },
+        "r_3628c7df2899": {
+          "masculine": "Technicus mechanische effecten",
+          "feminine": "Technica mechanische effecten",
+          "neutral": "Technicus mechanische effecten"
+        },
+        "r_41cde5889636": {
+          "masculine": "Technicus sneeuw- en regeneffecten",
+          "feminine": "Technica sneeuw- en regeneffecten",
+          "neutral": "Technicus sneeuw- en regeneffecten"
+        },
+        "r_ba881d560569": {
+          "masculine": "Boekhouder speciale effecten",
+          "feminine": "Boekhouder speciale effecten",
+          "neutral": "Boekhouder speciale effecten"
+        },
+        "r_c723decf9e2c": {
+          "masculine": "SFX-speciale-effectentechnicus",
+          "feminine": "SFX-speciale-effectentechnica",
+          "neutral": "SFX-speciale-effectentechnicus"
+        }
+      },
+      "broadcast": {
+        "r_56003554d627": {
+          "masculine": "Productie-ingenieur",
+          "feminine": "Productie-ingenieur",
+          "neutral": "Productie-ingenieur"
+        },
+        "r_a5145362deb9": {
+          "masculine": "Omroepingenieur",
+          "feminine": "Omroepingenieur",
+          "neutral": "Omroepingenieur"
+        },
+        "r_21789a4bd26e": {
+          "masculine": "Technisch leider",
+          "feminine": "Technische leidster",
+          "neutral": "Technisch leider"
+        },
+        "r_ed2861824940": {
+          "masculine": "Beeldingenieur",
+          "feminine": "Beeldingenieur",
+          "neutral": "Beeldingenieur"
+        },
+        "r_f35ad506ce91": {
+          "masculine": "Beeldmixer",
+          "feminine": "Beeldmixer",
+          "neutral": "Beeldmixer"
+        },
+        "r_96549186fbdd": {
+          "masculine": "Visionmixer",
+          "feminine": "Visionmixer",
+          "neutral": "Visionmixer"
+        },
+        "r_b0f32c270502": {
+          "masculine": "Shader",
+          "feminine": "Shader",
+          "neutral": "Shader"
+        },
+        "r_4444caa14211": {
+          "masculine": "Camera-CCU-operator",
+          "feminine": "Camera-CCU-operator",
+          "neutral": "Camera-CCU-operator"
+        },
+        "r_3a845b2c45a4": {
+          "masculine": "DVE-operator",
+          "feminine": "DVE-operator",
+          "neutral": "DVE-operator"
+        },
+        "r_5eb58151f915": {
+          "masculine": "Profile-operator",
+          "feminine": "Profile-operator",
+          "neutral": "Profile-operator"
+        },
+        "r_bc517c79d131": {
+          "masculine": "Uitzendtechnicus",
+          "feminine": "Uitzendtechnica",
+          "neutral": "Uitzendtechnicus"
+        },
+        "r_d0bc62ba1257": {
+          "masculine": "Geluidssupervisor (omroep)",
+          "feminine": "Geluidssupervisor (omroep)",
+          "neutral": "Geluidssupervisor (omroep)"
+        },
+        "r_6189d7ba75a5": {
+          "masculine": "Geluidsingenieur",
+          "feminine": "Geluidsingenieur",
+          "neutral": "Geluidsingenieur"
+        },
+        "r_9eadf0334fa2": {
+          "masculine": "Hoofd studio- / evenementtechniek",
+          "feminine": "Hoofd studio- / evenementtechniek",
+          "neutral": "Hoofd studio- / evenementtechniek"
+        },
+        "r_da7a6180d72a": {
+          "masculine": "Evenementmanager",
+          "feminine": "Evenementmanager",
+          "neutral": "Evenementmanager"
+        },
+        "r_84e084ee4081": {
+          "masculine": "Evenementtechnicus",
+          "feminine": "Evenementtechnica",
+          "neutral": "Evenementtechnicus"
+        },
+        "r_2b01c5ebf763": {
+          "masculine": "MAZ-operator",
+          "feminine": "MAZ-operator",
+          "neutral": "MAZ-operator"
+        },
+        "r_d2b49ec6c87b": {
+          "masculine": "MAZ-technicus",
+          "feminine": "MAZ-technica",
+          "neutral": "MAZ-technicus"
+        },
+        "r_b1e7ad7a4e8d": {
+          "masculine": "EVS-operator",
+          "feminine": "EVS-operator",
+          "neutral": "EVS-operator"
+        },
+        "r_6ce5d1fae4b4": {
+          "masculine": "LSM-operator (slow motion)",
+          "feminine": "LSM-operator (slow motion)",
+          "neutral": "LSM-operator (slow motion)"
+        },
+        "r_23864113991d": {
+          "masculine": "Streamingtechnicus",
+          "feminine": "Streamingtechnica",
+          "neutral": "Streamingtechnicus"
+        },
+        "r_4e59228ff2bb": {
+          "masculine": "Rigger (omroep / evenement)",
+          "feminine": "Rigger (omroep / evenement)",
+          "neutral": "Rigger (omroep / evenement)"
+        },
+        "r_54aa44e2bc03": {
+          "masculine": "Riggingassistent",
+          "feminine": "Riggingassistente",
+          "neutral": "Riggingassistent"
+        },
+        "r_accbebaa16ce": {
+          "masculine": "Beeldtechnicus",
+          "feminine": "Beeldtechnica",
+          "neutral": "Beeldtechnicus"
+        },
+        "r_152179bb65ff": {
+          "masculine": "Lichttechnicus",
+          "feminine": "Lichttechnica",
+          "neutral": "Lichttechnicus"
+        },
+        "r_916b292e3ecc": {
+          "masculine": "Geluidstechnicus",
+          "feminine": "Geluidstechnica",
+          "neutral": "Geluidstechnicus"
+        },
+        "r_a409aeab8c20": {
+          "masculine": "Geluidsversterkingsingenieur",
+          "feminine": "Geluidsversterkingsingenieur",
+          "neutral": "Geluidsversterkingsingenieur"
+        },
+        "r_894d032abc78": {
+          "masculine": "Geluidsversterkingstechnicus",
+          "feminine": "Geluidsversterkingstechnica",
+          "neutral": "Geluidsversterkingstechnicus"
+        },
+        "r_87a1930129df": {
+          "masculine": "SNG-operator",
+          "feminine": "SNG-operator",
+          "neutral": "SNG-operator"
+        },
+        "r_0d146769f561": {
+          "masculine": "Geluidsassistent (omroep)",
+          "feminine": "Geluidsassistente (omroep)",
+          "neutral": "Geluidsassistent (omroep)"
+        },
+        "r_4ee86e5361a7": {
+          "masculine": "Videowalloperator",
+          "feminine": "Videowalloperator",
+          "neutral": "Videowalloperator"
+        },
+        "r_7c7bcadca79c": {
+          "masculine": "Teleprompteroperator",
+          "feminine": "Teleprompteroperator",
+          "neutral": "Teleprompteroperator"
+        },
+        "r_e627ebc7d6a6": {
+          "masculine": "Technisch assistent (omroep)",
+          "feminine": "Technische assistente (omroep)",
+          "neutral": "Technisch assistent (omroep)"
+        },
+        "r_b81926eec6f3": {
+          "masculine": "Beeldassistent",
+          "feminine": "Beeldassistente",
+          "neutral": "Beeldassistent"
+        },
+        "r_45710f001c06": {
+          "masculine": "Kabelhulp",
+          "feminine": "Kabelhulp",
+          "neutral": "Kabelhulp"
+        },
+        "r_34cfe59314f7": {
+          "masculine": "Beeldmixer",
+          "feminine": "Beeldmixer",
+          "neutral": "Beeldmixer"
+        },
+        "r_ba025e1926d2": {
+          "masculine": "LSM-operator (slowmotionhoogtepunten)",
+          "feminine": "LSM-operator (slowmotionhoogtepunten)",
+          "neutral": "LSM-operator (slowmotionhoogtepunten)"
+        },
+        "r_c7e1fa1f7572": {
+          "masculine": "SG-operator",
+          "feminine": "SG-operator",
+          "neutral": "SG-operator"
+        },
+        "r_c0aa2d3b3f9c": {
+          "masculine": "Geluidsassistent",
+          "feminine": "Geluidsassistente",
+          "neutral": "Geluidsassistent"
+        },
+        "r_32ca4217464e": {
+          "masculine": "Technisch assistent",
+          "feminine": "Technische assistente",
+          "neutral": "Technisch assistent"
+        }
+      },
+      "virtual": {
+        "r_9d90887128a0": {
+          "masculine": "Supervisor virtuele productie",
+          "feminine": "Supervisor virtuele productie",
+          "neutral": "Supervisor virtuele productie"
+        },
+        "r_9c3babb3c638": {
+          "masculine": "Producent virtuele productie",
+          "feminine": "Producente virtuele productie",
+          "neutral": "Producent virtuele productie"
+        },
+        "r_1fee1676270e": {
+          "masculine": "Coördinator virtuele productie",
+          "feminine": "Coördinatrice virtuele productie",
+          "neutral": "Coördinator virtuele productie"
+        },
+        "r_82e993b4422d": {
+          "masculine": "Studiomanager virtuele productie",
+          "feminine": "Studiomanager virtuele productie",
+          "neutral": "Studiomanager virtuele productie"
+        },
+        "r_14e7e79a9ca8": {
+          "masculine": "VAD-artiest (virtueel artdepartment)",
+          "feminine": "VAD-artieste (virtueel artdepartment)",
+          "neutral": "VAD-artiest (virtueel artdepartment)"
+        },
+        "r_2034a25adda6": {
+          "masculine": "Ingenieur virtuele productie",
+          "feminine": "Ingenieur virtuele productie",
+          "neutral": "Ingenieur virtuele productie"
+        },
+        "r_188b9da491f3": {
+          "masculine": "Technisch directeur VP-systemen en -tools",
+          "feminine": "Technische directrice VP-systemen en -tools",
+          "neutral": "Technisch directeur VP-systemen en -tools"
+        },
+        "r_93a5c89da775": {
+          "masculine": "Ledwandoperator",
+          "feminine": "Ledwandoperator",
+          "neutral": "Ledwandoperator"
+        },
+        "r_d1415a80bf57": {
+          "masculine": "Unreal Engine-operator",
+          "feminine": "Unreal Engine-operator",
+          "neutral": "Unreal Engine-operator"
+        },
+        "r_1c2e82f4274b": {
+          "masculine": "Realtime-engineoperator",
+          "feminine": "Realtime-engineoperator",
+          "neutral": "Realtime-engineoperator"
+        },
+        "r_247afd3ab3fd": {
+          "masculine": "Mediaserveroperator",
+          "feminine": "Mediaserveroperator",
+          "neutral": "Mediaserveroperator"
+        },
+        "r_8728a8d46ae1": {
+          "masculine": "VP-systeembeheerder",
+          "feminine": "VP-systeembeheerder",
+          "neutral": "VP-systeembeheerder"
+        },
+        "r_e7c27999f9ae": {
+          "masculine": "VP-trackingtechnicus",
+          "feminine": "VP-trackingtechnica",
+          "neutral": "VP-trackingtechnicus"
+        },
+        "r_bbe66ea7740f": {
+          "masculine": "VP-ledtechnicus",
+          "feminine": "VP-ledtechnica",
+          "neutral": "VP-ledtechnicus"
+        },
+        "r_ad04846bb2b3": {
+          "masculine": "Trackingtechnicus",
+          "feminine": "Trackingtechnica",
+          "neutral": "Trackingtechnicus"
+        },
+        "r_c100cb7d8cdf": {
+          "masculine": "Realtime-artiest",
+          "feminine": "Realtime-artieste",
+          "neutral": "Realtime-artiest"
+        },
+        "r_84ae9f742a8c": {
+          "masculine": "Virtueel-artdepartmentartiest (VAD)",
+          "feminine": "Virtueel-artdepartmentartieste (VAD)",
+          "neutral": "Virtueel-artdepartmentartiest (VAD)"
+        }
+      },
+      "redaktion": {
+        "r_67a1c14f27d6": {
+          "masculine": "Redactieleider",
+          "feminine": "Redactieleidster",
+          "neutral": "Redactieleider"
+        },
+        "r_fb6f303e781e": {
+          "masculine": "Hoofdredacteur",
+          "feminine": "Hoofdredactrice",
+          "neutral": "Hoofdredacteur"
+        },
+        "r_1d083876d102": {
+          "masculine": "Chef van dienst",
+          "feminine": "Chef van dienst",
+          "neutral": "Chef van dienst"
+        },
+        "r_dba49499f044": {
+          "masculine": "Hoofd productie (omroep)",
+          "feminine": "Hoofd productie (omroep)",
+          "neutral": "Hoofd productie (omroep)"
+        },
+        "r_399d5722db1b": {
+          "masculine": "Productieleider (omroep)",
+          "feminine": "Productieleidster (omroep)",
+          "neutral": "Productieleider (omroep)"
+        },
+        "r_97c6fe9db2a1": {
+          "masculine": "Draaiboekcoördinator",
+          "feminine": "Draaiboekcoördinatrice",
+          "neutral": "Draaiboekcoördinator"
+        },
+        "r_c1f3dd5d125c": {
+          "masculine": "Redacteur",
+          "feminine": "Redactrice",
+          "neutral": "Redacteur"
+        },
+        "r_74db110eed35": {
+          "masculine": "Tv-auteur",
+          "feminine": "Tv-auteur",
+          "neutral": "Tv-auteur"
+        },
+        "r_c68ab8bdf35f": {
+          "masculine": "Castingredacteur",
+          "feminine": "Castingredactrice",
+          "neutral": "Castingredacteur"
+        },
+        "r_db514834619e": {
+          "masculine": "Beeldredacteur",
+          "feminine": "Beeldredactrice",
+          "neutral": "Beeldredacteur"
+        },
+        "r_2d3838a04d2d": {
+          "masculine": "Montageredacteur",
+          "feminine": "Montageredactrice",
+          "neutral": "Montageredacteur"
+        },
+        "r_72b16f73761b": {
+          "masculine": "Onlineredacteur",
+          "feminine": "Onlineredactrice",
+          "neutral": "Onlineredacteur"
+        },
+        "r_1eb2a3ac7a7f": {
+          "masculine": "Videoredacteur",
+          "feminine": "Videoredactrice",
+          "neutral": "Videoredacteur"
+        },
+        "r_fea2147a3023": {
+          "masculine": "Tv-journalist",
+          "feminine": "Tv-journaliste",
+          "neutral": "Tv-journalist"
+        },
+        "r_89901fa29127": {
+          "masculine": "Verslaggever",
+          "feminine": "Verslaggever",
+          "neutral": "Verslaggever"
+        },
+        "r_49092803ca90": {
+          "masculine": "Realisator",
+          "feminine": "Realisator",
+          "neutral": "Realisator"
+        },
+        "r_558623ea54e2": {
+          "masculine": "Videoproducent",
+          "feminine": "Videoproducente",
+          "neutral": "Videoproducent"
+        },
+        "r_cd94582e5de3": {
+          "masculine": "Videojournalist",
+          "feminine": "Videojournaliste",
+          "neutral": "Videojournalist"
+        },
+        "r_c1632a39db5a": {
+          "masculine": "Videocontentcreator (sociale media)",
+          "feminine": "Videocontentcreator (sociale media)",
+          "neutral": "Videocontentcreator (sociale media)"
+        },
+        "r_48a469f4753e": {
+          "masculine": "Presentator",
+          "feminine": "Presentatrice",
+          "neutral": "Presentator"
+        },
+        "r_dff0d36f7649": {
+          "masculine": "Nieuwslezer",
+          "feminine": "Nieuwslezer",
+          "neutral": "Nieuwslezer"
+        },
+        "r_d8ae611e8a84": {
+          "masculine": "Creatief producent",
+          "feminine": "Creatieve producente",
+          "neutral": "Creatief producent"
+        },
+        "r_52eb2ef13219": {
+          "masculine": "Creatief directeur",
+          "feminine": "Creatieve directrice",
+          "neutral": "Creatief directeur"
+        },
+        "r_4741fd392c78": {
+          "masculine": "Copywriter",
+          "feminine": "Copywriter",
+          "neutral": "Copywriter"
+        },
+        "r_7693f0b6836d": {
+          "masculine": "Conceptontwikkelaar",
+          "feminine": "Conceptontwikkelaar",
+          "neutral": "Conceptontwikkelaar"
+        },
+        "r_8ed4467cbce1": {
+          "masculine": "Socialmediaproducent",
+          "feminine": "Socialmediaproducente",
+          "neutral": "Socialmediaproducent"
+        },
+        "r_f3046605ff7d": {
+          "masculine": "Redactieassistent",
+          "feminine": "Redactieassistente",
+          "neutral": "Redactieassistent"
+        },
+        "r_39b32b25eed9": {
+          "masculine": "Redactiestagiair",
+          "feminine": "Redactiestagiaire",
+          "neutral": "Redactiestagiair"
+        },
+        "r_7947e117851f": {
+          "masculine": "Chef van dienst",
+          "feminine": "Chef van dienst",
+          "neutral": "Chef van dienst"
+        },
+        "r_9c948261499b": {
+          "masculine": "Hoofd productie (studio / omroep)",
+          "feminine": "Hoofd productie (studio / omroep)",
+          "neutral": "Hoofd productie (studio / omroep)"
+        },
+        "r_844ebb650ef7": {
+          "masculine": "Redacteur",
+          "feminine": "Redactrice",
+          "neutral": "Redacteur"
+        },
+        "r_bac4afc8f929": {
+          "masculine": "Montagerealisator",
+          "feminine": "Montagerealisator",
+          "neutral": "Montagerealisator"
+        },
+        "r_324910e3b0ab": {
+          "masculine": "Quizredacteur",
+          "feminine": "Quizredactrice",
+          "neutral": "Quizredacteur"
+        },
+        "r_363c83ce0934": {
+          "masculine": "Publieksopwarmer",
+          "feminine": "Publieksopwarmer",
+          "neutral": "Publieksopwarmer"
+        },
+        "r_6227b3014b7a": {
+          "masculine": "Lokale verslaggever / fixer",
+          "feminine": "Lokale verslaggever / fixer",
+          "neutral": "Lokale verslaggever / fixer"
+        },
+        "r_dfa579f14095": {
+          "masculine": "Logger",
+          "feminine": "Logger",
+          "neutral": "Logger"
+        },
+        "r_57c0fec76f7d": {
+          "masculine": "Transcribent",
+          "feminine": "Transcribent",
+          "neutral": "Transcribent"
+        },
+        "r_cabe547e084e": {
+          "masculine": "Beeldonderzoek",
+          "feminine": "Beeldonderzoek",
+          "neutral": "Beeldonderzoek"
+        }
+      },
+      "social": {
+        "r_e8a967aad9b7": {
+          "masculine": "Contentcreator",
+          "feminine": "Contentcreator",
+          "neutral": "Contentcreator"
+        },
+        "r_631c65ad8827": {
+          "masculine": "Influencer",
+          "feminine": "Influencer",
+          "neutral": "Influencer"
+        },
+        "r_a9eeb34333bc": {
+          "masculine": "Socialmediamanager",
+          "feminine": "Socialmediamanager",
+          "neutral": "Socialmediamanager"
+        },
+        "r_b510fa57cea0": {
+          "masculine": "UGC-creator",
+          "feminine": "UGC-creator",
+          "neutral": "UGC-creator"
+        },
+        "r_4d66d4dbbf12": {
+          "masculine": "Reels-videograaf",
+          "feminine": "Reels-videograaf",
+          "neutral": "Reels-videograaf"
+        },
+        "r_423ece24b5c2": {
+          "masculine": "TikTok-creator",
+          "feminine": "TikTok-creator",
+          "neutral": "TikTok-creator"
+        },
+        "r_e7483d4ddd6d": {
+          "masculine": "Communitymanager",
+          "feminine": "Communitymanager",
+          "neutral": "Communitymanager"
+        },
+        "r_6f877112cd0a": {
+          "masculine": "Socialmediastrateeg",
+          "feminine": "Socialmediastrateeg",
+          "neutral": "Socialmediastrateeg"
+        },
+        "r_bd90a8429d6f": {
+          "masculine": "Influencer / creator",
+          "feminine": "Influencer / creator",
+          "neutral": "Influencer / creator"
+        },
+        "r_c43ce08ef6e8": {
+          "masculine": "Merkverhalenverteller",
+          "feminine": "Merkverhalenverteller",
+          "neutral": "Merkverhalenverteller"
+        },
+        "r_e75a59be5b02": {
+          "masculine": "Videograaf (sociale content)",
+          "feminine": "Videograaf (sociale content)",
+          "neutral": "Videograaf (sociale content)"
+        },
+        "r_5f522b44dd48": {
+          "masculine": "Editor (Reels / TikTok)",
+          "feminine": "Editor (Reels / TikTok)",
+          "neutral": "Editor (Reels / TikTok)"
+        },
+        "r_ce039c1f951f": {
+          "masculine": "Motiondesigner (sociale media)",
+          "feminine": "Motiondesigner (sociale media)",
+          "neutral": "Motiondesigner (sociale media)"
+        }
+      },
+      "foto": {
+        "r_d2c0588cf0d1": {
+          "masculine": "Fotograaf",
+          "feminine": "Fotografe",
+          "neutral": "Fotograaf"
+        },
+        "r_d7f7fbf5939c": {
+          "masculine": "Modefotograaf",
+          "feminine": "Modefotografe",
+          "neutral": "Modefotograaf"
+        },
+        "r_e0551919b067": {
+          "masculine": "Productfotograaf",
+          "feminine": "Productfotografe",
+          "neutral": "Productfotograaf"
+        },
+        "r_b06301444ef7": {
+          "masculine": "Evenementfotograaf",
+          "feminine": "Evenementfotografe",
+          "neutral": "Evenementfotograaf"
+        },
+        "r_124df4c664ce": {
+          "masculine": "Portretfotograaf",
+          "feminine": "Portretfotografe",
+          "neutral": "Portretfotograaf"
+        },
+        "r_2e1fcf07d241": {
+          "masculine": "Reclamefotograaf",
+          "feminine": "Reclamefotografe",
+          "neutral": "Reclamefotograaf"
+        },
+        "r_02bd21bcff9c": {
+          "masculine": "Foodfotograaf",
+          "feminine": "Foodfotografe",
+          "neutral": "Foodfotograaf"
+        },
+        "r_8a273a427bd6": {
+          "masculine": "Dronefotograaf",
+          "feminine": "Dronefotografe",
+          "neutral": "Dronefotograaf"
+        },
+        "r_843b4748146d": {
+          "masculine": "Setfotograaf",
+          "feminine": "Setfotografe",
+          "neutral": "Setfotograaf"
+        },
+        "r_b622037392fb": {
+          "masculine": "Fotoassistent",
+          "feminine": "Fotoassistente",
+          "neutral": "Fotoassistent"
+        },
+        "r_6a2008f9f2ef": {
+          "masculine": "Studiomanager",
+          "feminine": "Studiomanager",
+          "neutral": "Studiomanager"
+        },
+        "r_341b032b61fc": {
+          "masculine": "Retoucheur",
+          "feminine": "Retoucheur",
+          "neutral": "Retoucheur"
+        },
+        "r_468329a20ba4": {
+          "masculine": "Beeldbewerker",
+          "feminine": "Beeldbewerker",
+          "neutral": "Beeldbewerker"
+        }
+      },
+      "ki": {
+        "r_0af68f26119c": {
+          "masculine": "AI-filmmaker",
+          "feminine": "AI-filmmaakster",
+          "neutral": "AI-filmmaker"
+        },
+        "r_7ebc4eeffa63": {
+          "masculine": "AI-verantwoordelijke / AI-supervisor",
+          "feminine": "AI-verantwoordelijke / AI-supervisor",
+          "neutral": "AI-verantwoordelijke / AI-supervisor"
+        },
+        "r_5143bd061069": {
+          "masculine": "AI-regisseur",
+          "feminine": "AI-regisseuse",
+          "neutral": "AI-regisseur"
+        },
+        "r_8b38d96f6763": {
+          "masculine": "AI-animator",
+          "feminine": "AI-animatrice",
+          "neutral": "AI-animator"
+        },
+        "r_addc4afc90e0": {
+          "masculine": "Promptengineer (film en media)",
+          "feminine": "Promptengineer (film en media)",
+          "neutral": "Promptengineer (film en media)"
+        },
+        "r_227b357243e1": {
+          "masculine": "AI-scenarioschrijver",
+          "feminine": "AI-scenarioschrijfster",
+          "neutral": "AI-scenarioschrijver"
+        },
+        "r_53ef2619b5af": {
+          "masculine": "AI-storyboardtekenaar",
+          "feminine": "AI-storyboardtekenares",
+          "neutral": "AI-storyboardtekenaar"
+        },
+        "r_1185b1151f24": {
+          "masculine": "AI-beeldmaker",
+          "feminine": "AI-beeldmaakster",
+          "neutral": "AI-beeldmaker"
+        },
+        "r_f551cf191b74": {
+          "masculine": "AI-videocreator",
+          "feminine": "AI-videocreator",
+          "neutral": "AI-videocreator"
+        },
+        "r_b69e1ec80a94": {
+          "masculine": "AI-geluidsontwerper",
+          "feminine": "AI-geluidsontwerpster",
+          "neutral": "AI-geluidsontwerper"
+        },
+        "r_237f8a4202e1": {
+          "masculine": "AI-colorist",
+          "feminine": "AI-colorist",
+          "neutral": "AI-colorist"
+        },
+        "r_38b5ef6c319c": {
+          "masculine": "AI-workflowadviseur (film)",
+          "feminine": "AI-workflowadviseuse (film)",
+          "neutral": "AI-workflowadviseur (film)"
+        }
+      },
+      "drehbuch": {
+        "r_f63a97948825": {
+          "masculine": "Showrunner",
+          "feminine": "Showrunner",
+          "neutral": "Showrunner"
+        },
+        "r_da4094d01df6": {
+          "masculine": "Hoofdschrijver",
+          "feminine": "Hoofdschrijfster",
+          "neutral": "Hoofdschrijver"
+        },
+        "r_48862b016872": {
+          "masculine": "Assistent hoofdschrijver",
+          "feminine": "Assistente hoofdschrijver",
+          "neutral": "Assistent hoofdschrijver"
+        },
+        "r_f0e5da473f57": {
+          "masculine": "Assistent-showrunner",
+          "feminine": "Assistente-showrunner",
+          "neutral": "Assistent-showrunner"
+        },
+        "r_be444be7e73a": {
+          "masculine": "Scenarioschrijver",
+          "feminine": "Scenarioschrijfster",
+          "neutral": "Scenarioschrijver"
+        },
+        "r_d1a561dc7125": {
+          "masculine": "Medeauteur",
+          "feminine": "Medeauteur",
+          "neutral": "Medeauteur"
+        },
+        "r_da01eb9b61e7": {
+          "masculine": "Herschrijver",
+          "feminine": "Herschrijfster",
+          "neutral": "Herschrijver"
+        },
+        "r_199c194315c9": {
+          "masculine": "Scriptdoctor",
+          "feminine": "Scriptdoctor",
+          "neutral": "Scriptdoctor"
+        },
+        "r_a180812047b1": {
+          "masculine": "Verhaalredacteur",
+          "feminine": "Verhaalredactrice",
+          "neutral": "Verhaalredacteur"
+        },
+        "r_5f9704129182": {
+          "masculine": "Storyliner",
+          "feminine": "Storyliner",
+          "neutral": "Storyliner"
+        },
+        "r_41126a4d581f": {
+          "masculine": "Scenarioredacteur",
+          "feminine": "Scenarioredactrice",
+          "neutral": "Scenarioredacteur"
+        },
+        "r_11bee057c159": {
+          "masculine": "Dialoogredacteur",
+          "feminine": "Dialoogredactrice",
+          "neutral": "Dialoogredacteur"
+        },
+        "r_d578a24e6a6c": {
+          "masculine": "Dialoogschrijver",
+          "feminine": "Dialoogschrijfster",
+          "neutral": "Dialoogschrijver"
+        },
+        "r_cbc48ad9850e": {
+          "masculine": "Scriptlezer",
+          "feminine": "Scriptlezer",
+          "neutral": "Scriptlezer"
+        },
+        "r_850bbf550984": {
+          "masculine": "Dramaturg / scenarioadviseur",
+          "feminine": "Dramaturge / scenarioadviseur",
+          "neutral": "Dramaturg / scenarioadviseur"
+        },
+        "r_c33a26535234": {
+          "masculine": "Scenario- en verhaalontwikkeling",
+          "feminine": "Scenario- en verhaalontwikkeling",
+          "neutral": "Scenario- en verhaalontwikkeling"
+        },
+        "r_e439aac0b481": {
+          "masculine": "Hoofd scenario",
+          "feminine": "Hoofd scenario",
+          "neutral": "Hoofd scenario"
+        },
+        "r_a30d0af43af8": {
+          "masculine": "Hoofd verhaal",
+          "feminine": "Hoofd verhaal",
+          "neutral": "Hoofd verhaal"
+        },
+        "r_3aa5851edfa7": {
+          "masculine": "Formatontwikkelaar",
+          "feminine": "Formatontwikkelaar",
+          "neutral": "Formatontwikkelaar"
+        },
+        "r_fc05d4531220": {
+          "masculine": "Treatmentschrijver",
+          "feminine": "Treatmentschrijfster",
+          "neutral": "Treatmentschrijver"
+        },
+        "r_601f64f82db2": {
+          "masculine": "Dialoogschrijver nasynchronisatie",
+          "feminine": "Dialoogschrijfster nasynchronisatie",
+          "neutral": "Dialoogschrijver nasynchronisatie"
+        },
+        "r_1ddc57dbbeb2": {
+          "masculine": "Audiodescriptieschrijver",
+          "feminine": "Audiodescriptieschrijfster",
+          "neutral": "Audiodescriptieschrijver"
+        },
+        "r_9f89ae134497": {
+          "masculine": "Filmvertaler",
+          "feminine": "Filmvertaalster",
+          "neutral": "Filmvertaler"
+        },
+        "r_6cc875ec3963": {
+          "masculine": "Scenariovertaler",
+          "feminine": "Scenariovertaalster",
+          "neutral": "Scenariovertaler"
+        },
+        "r_5947f173deeb": {
+          "masculine": "Ondertitelvertaler",
+          "feminine": "Ondertitelvertaalster",
+          "neutral": "Ondertitelvertaler"
+        },
+        "r_7b6a9a537e9a": {
+          "masculine": "Dialoogvertaler",
+          "feminine": "Dialoogvertaalster",
+          "neutral": "Dialoogvertaler"
+        },
+        "r_07f1b8537dbc": {
+          "masculine": "Transcriptvertaler",
+          "feminine": "Transcriptvertaalster",
+          "neutral": "Transcriptvertaler"
+        },
+        "r_baf097c29e20": {
+          "masculine": "Dialooglijsttranscribent",
+          "feminine": "Dialooglijsttranscribent",
+          "neutral": "Dialooglijsttranscribent"
+        },
+        "r_84f5505f76e2": {
+          "masculine": "Tekstschrijver / copywriter",
+          "feminine": "Tekstschrijfster / copywriter",
+          "neutral": "Tekstschrijver / copywriter"
+        },
+        "r_f38e225361bf": {
+          "masculine": "Taalassistent",
+          "feminine": "Taalassistente",
+          "neutral": "Taalassistent"
+        },
+        "r_eda2531fdadf": {
+          "masculine": "Onderzoeker",
+          "feminine": "Onderzoekster",
+          "neutral": "Onderzoeker"
+        },
+        "r_c6e3b618f79f": {
+          "masculine": "Onderzoeksassistent",
+          "feminine": "Onderzoeksassistente",
+          "neutral": "Onderzoeksassistent"
+        },
+        "r_0434302793dc": {
+          "masculine": "Scenariocoördinator",
+          "feminine": "Scenariocoördinatrice",
+          "neutral": "Scenariocoördinator"
+        },
+        "r_dae3743c6b89": {
+          "masculine": "Scenariostagiair",
+          "feminine": "Scenariostagiaire",
+          "neutral": "Scenariostagiair"
+        }
+      },
+      "public-relations": {
+        "r_1860a572354e": {
+          "masculine": "Marketing, PR",
+          "feminine": "Marketing, PR",
+          "neutral": "Marketing, PR"
+        },
+        "r_201f2da74897": {
+          "masculine": "Socialmediamanager (film / productie)",
+          "feminine": "Socialmediamanager (film / productie)",
+          "neutral": "Socialmediamanager (film / productie)"
+        },
+        "r_041271a6a3ee": {
+          "masculine": "Promotiecoördinator",
+          "feminine": "Promotiecoördinatrice",
+          "neutral": "Promotiecoördinator"
+        }
+      },
+      "sicherheit-sanitaetsdienst": {
+        "r_972d7ff7233a": {
+          "masculine": "Setmedicus / set medic",
+          "feminine": "Setmedicus / set medic",
+          "neutral": "Setmedicus / set medic"
+        },
+        "r_deefff77f871": {
+          "masculine": "Ambulancehulpverlener",
+          "feminine": "Ambulancehulpverlener",
+          "neutral": "Ambulancehulpverlener"
+        },
+        "r_63a9f32e6a72": {
+          "masculine": "Bedrijfshulpverlener medische zorg",
+          "feminine": "Bedrijfshulpverlener medische zorg",
+          "neutral": "Bedrijfshulpverlener medische zorg"
+        },
+        "r_550de11c2d96": {
+          "masculine": "Brandwacht / brandveiligheidswacht",
+          "feminine": "Brandwacht / brandveiligheidswacht",
+          "neutral": "Brandwacht / brandveiligheidswacht"
+        },
+        "r_427dc70aedd7": {
+          "masculine": "Brandveiligheidshulpverlener",
+          "feminine": "Brandveiligheidshulpverlener",
+          "neutral": "Brandveiligheidshulpverlener"
+        },
+        "r_a3247768d472": {
+          "masculine": "Brandveiligheidsfunctionaris",
+          "feminine": "Brandveiligheidsfunctionaris",
+          "neutral": "Brandveiligheidsfunctionaris"
+        }
+      },
+      "catering-setverpflegung": {
+        "r_330e10f94b8f": {
+          "masculine": "Cateringleider",
+          "feminine": "Cateringleidster",
+          "neutral": "Cateringleider"
+        },
+        "r_2fe8f1ac7f90": {
+          "masculine": "Setkok",
+          "feminine": "Setkokkin",
+          "neutral": "Setkok"
+        },
+        "r_463cca2307e9": {
+          "masculine": "Cateringassistent / keukenhulp",
+          "feminine": "Cateringassistente / keukenhulp",
+          "neutral": "Cateringassistent / keukenhulp"
+        },
+        "r_e114754d9175": {
+          "masculine": "Craftservice",
+          "feminine": "Craftservice",
+          "neutral": "Craftservice"
+        },
+        "r_cb6d56c18bf6": {
+          "masculine": "Setverzorging / maaltijdverstrekking",
+          "feminine": "Setverzorging / maaltijdverstrekking",
+          "neutral": "Setverzorging / maaltijdverstrekking"
+        },
+        "r_532adc563b66": {
+          "masculine": "Chauffeur catering en mobiele keuken",
+          "feminine": "Chauffeuse catering en mobiele keuken",
+          "neutral": "Chauffeur catering en mobiele keuken"
+        }
+      },
+      "filmtiere-tiertraining": {
+        "r_3d8ab6fb2c6a": {
+          "masculine": "Trainer van filmdieren",
+          "feminine": "Trainster van filmdieren",
+          "neutral": "Dierentrainer voor film"
+        },
+        "r_654c33dc9c6b": {
+          "masculine": "Trainer van filmhonden",
+          "feminine": "Trainster van filmhonden",
+          "neutral": "Hondentrainer voor film"
+        },
+        "r_40758f075d18": {
+          "masculine": "Dierenbegeleider (Animal Handler)",
+          "feminine": "Dierenbegeleidster (Animal Handler)",
+          "neutral": "Dierenbegeleider (Animal Handler)"
+        },
+        "r_7a1591b96b3a": {
+          "masculine": "Dierencoördinator",
+          "feminine": "Dierencoördinatrice",
+          "neutral": "Dierencoördinator"
+        },
+        "r_a63695a566c3": {
+          "masculine": "Dierenbegeleider op de set",
+          "feminine": "Dierenbegeleidster op de set",
+          "neutral": "Dierenbegeleider op de set"
+        },
+        "r_9faf951b627e": {
+          "masculine": "Paardencoördinator (Horse Master)",
+          "feminine": "Paardencoördinatrice (Horse Master)",
+          "neutral": "Paardencoördinator (Horse Master)"
+        },
+        "r_7c4f137defec": {
+          "masculine": "Assistent van de Horse Master",
+          "feminine": "Assistente van de Horse Master",
+          "neutral": "Assistent van de Horse Master"
+        },
+        "r_8e8f21cf0303": {
+          "masculine": "Trainer van filmpaarden",
+          "feminine": "Trainster van filmpaarden",
+          "neutral": "Paardentrainer voor film"
+        },
+        "r_35f9ffa503c4": {
+          "masculine": "Paardenbegeleider (Horse Wrangler)",
+          "feminine": "Paardenbegeleidster (Horse Wrangler)",
+          "neutral": "Paardenbegeleider (Horse Wrangler)"
+        }
+      }
     }
   },
   "TransactionalEmail": {
@@ -8454,5 +13363,13 @@
     "noMatches": "Je hebt in dit onderdeel nog niets opgeslagen.",
     "signInHint": "Log in om je opgeslagen items te bekijken.",
     "removeItem": "{name} uit opgeslagen items verwijderen"
+  },
+  "OccupationForm": {
+    "title": "Vorm van je beroepstitels",
+    "help": "Kies hoe je beroepstitels worden weergegeven. Je kunt dit op elk moment wijzigen.",
+    "standard": "Standaard",
+    "masculine": "Mannelijke vorm",
+    "feminine": "Vrouwelijke vorm",
+    "neutral": "Neutrale vorm"
   }
 }

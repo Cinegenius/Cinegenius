@@ -1631,15 +1631,15 @@
       "tiertraining-film-medien": "Výcvik zvířat pro film a média"
     },
     "roles": {
-      "tiertrainer": "Trenér filmových zvířat / Trenérka filmových zvířat",
-      "filmhundetrainer": "Trenér filmových psů / Trenérka filmových psů",
-      "tierbetreuer": "Ošetřovatel zvířat / Ošetřovatelka zvířat (Animal Handler)",
-      "tierkoordination": "Koordinátor zvířat / Koordinátorka zvířat",
-      "set-tierbetreuung": "Ošetřovatel zvířat na natáčení / Ošetřovatelka zvířat na natáčení",
+      "tiertrainer": "Trenér/ka filmových zvířat",
+      "filmhundetrainer": "Trenér/ka filmových psů",
+      "tierbetreuer": "Ošetřovatel/ka zvířat / Ošetřovatel/ka zvířat (Animal Handler)",
+      "tierkoordination": "Koordinátor/ka zvířat",
+      "set-tierbetreuung": "Ošetřovatel/ka zvířat na natáčení",
       "horse-master": "Vedoucí koordinace koní (Horse Master)",
-      "assistant-horse-master": "Asistent koordinace koní / Asistentka koordinace koní",
-      "horse-trainer": "Trenér filmových koní / Trenérka filmových koní",
-      "horse-wrangler": "Ošetřovatel koní / Ošetřovatelka koní (Horse Wrangler)"
+      "assistant-horse-master": "Asistent/ka koordinace koní",
+      "horse-trainer": "Trenér/ka filmových koní",
+      "horse-wrangler": "Ošetřovatel/ka koní / Ošetřovatel/ka koní (Horse Wrangler)"
     },
     "species": {
       "dogs": "Psi",
@@ -1687,7 +1687,54 @@
     "previewNotice": "Toto portfolio čeká na schválení a je viditelné pouze v chráněném náhledu.",
     "count": "Počet zvířat (nepovinné)",
     "handler": "Plánovaný doprovod trenéra nebo handlera",
-    "delivery": "Možnost dopravy na natáčení"
+    "delivery": "Možnost dopravy na natáčení",
+    "roleForms": {
+      "tiertrainer": {
+        "masculine": "Trenér filmových zvířat",
+        "feminine": "Trenérka filmových zvířat",
+        "neutral": "Trenér/ka filmových zvířat"
+      },
+      "filmhundetrainer": {
+        "masculine": "Trenér filmových psů",
+        "feminine": "Trenérka filmových psů",
+        "neutral": "Trenér/ka filmových psů"
+      },
+      "tierbetreuer": {
+        "masculine": "Ošetřovatel zvířat / Ošetřovatel zvířat (Animal Handler)",
+        "feminine": "Ošetřovatelka zvířat / Ošetřovatelka zvířat (Animal Handler)",
+        "neutral": "Ošetřovatel/ka zvířat / Ošetřovatel/ka zvířat (Animal Handler)"
+      },
+      "tierkoordination": {
+        "masculine": "Koordinátor zvířat",
+        "feminine": "Koordinátorka zvířat",
+        "neutral": "Koordinátor/ka zvířat"
+      },
+      "set-tierbetreuung": {
+        "masculine": "Ošetřovatel zvířat na natáčení",
+        "feminine": "Ošetřovatelka zvířat na natáčení",
+        "neutral": "Ošetřovatel/ka zvířat na natáčení"
+      },
+      "horse-master": {
+        "masculine": "Vedoucí koordinace koní (Horse Master)",
+        "feminine": "Vedoucí koordinace koní (Horse Master)",
+        "neutral": "Vedoucí koordinace koní (Horse Master)"
+      },
+      "assistant-horse-master": {
+        "masculine": "Asistent koordinace koní",
+        "feminine": "Asistentka koordinace koní",
+        "neutral": "Asistent/ka koordinace koní"
+      },
+      "horse-trainer": {
+        "masculine": "Trenér filmových koní",
+        "feminine": "Trenérka filmových koní",
+        "neutral": "Trenér/ka filmových koní"
+      },
+      "horse-wrangler": {
+        "masculine": "Ošetřovatel koní / Ošetřovatel koní (Horse Wrangler)",
+        "feminine": "Ošetřovatelka koní / Ošetřovatelka koní (Horse Wrangler)",
+        "neutral": "Ošetřovatel/ka koní / Ošetřovatel/ka koní (Horse Wrangler)"
+      }
+    }
   },
   "MarketplaceCatalog": {
     "categories": {
@@ -5971,7 +6018,7 @@
         "r_e90f5848bfc3": "Filmová ekonomika",
         "r_c6dc08a47d0d": "Controller (film)",
         "r_2557c22fb3d7": "Ekologický poradce / manažer udržitelnosti",
-        "r_2a6c1d42831e": "Produkční stážista / Produkční stážistka",
+        "r_2a6c1d42831e": "Produkční stážista",
         "r_ede69642be01": "Stážista vedení natáčení",
         "r_de9ab1a6b55a": "Vedoucí produkce",
         "r_fd701e2c1e86": "Vedoucí natáčení",
@@ -6020,7 +6067,7 @@
         "r_07f0060c8996": "Produkční stážista u producenta"
       },
       "regie": {
-        "r_f59d6991c44a": "Režisér / Režisérka",
+        "r_f59d6991c44a": "Režisér",
         "r_5562e3abbb45": "Spolurežisér",
         "r_df7e552a6792": "Režisér druhého štábu",
         "r_0aca88b2853d": "Studiový režisér",
@@ -6145,9 +6192,9 @@
       },
       "licht": {
         "r_222be04dbf00": "Gaffer (hlavní osvětlovač)",
-        "r_1e210e69039a": "Zástupce / Zástupkyně mistra osvětlení (Best Boy / Best Girl Electric)",
+        "r_1e210e69039a": "Best boy elektro",
         "r_14dd174cd76c": "Gaffer přípravných instalací",
-        "r_92137802b24a": "Zástupce / Zástupkyně mistra přípravného osvětlení (Rigging Best Boy / Rigging Best Girl Electric)",
+        "r_92137802b24a": "Best boy přípravných instalací",
         "r_7fce7d6fcf12": "Elektrikář přípravných instalací",
         "r_1bcf9d8d9b03": "Osvětlovač (elektrikář)",
         "r_d95b919dded9": "Mistr osvětlení",
@@ -6167,13 +6214,13 @@
       },
       "grip": {
         "r_470156bd03e4": "Key grip",
-        "r_cfbf2a22ed6e": "Zástupce / Zástupkyně vedoucího gripu (Best Boy / Best Girl Grip)",
+        "r_cfbf2a22ed6e": "Best boy grip / druhý grip",
         "r_32a6ab31b1a1": "Dolly grip / operátor vozíku",
         "r_376dc1f790b8": "Grip / kamerová technika",
         "r_dbfaadb8821c": "Asistent gripu",
         "r_46dab52c1995": "Grip přípravných instalací",
         "r_ea7e925bd850": "Key grip přípravných instalací",
-        "r_fa9d72fc7978": "Zástupce / Zástupkyně vedoucího přípravného gripu (Rigging Best Boy / Rigging Best Girl Grip)",
+        "r_fa9d72fc7978": "Best boy grip přípravných instalací",
         "r_2fa0b44342d7": "Speciální konstrukce pro kameru",
         "r_08c07afebb7f": "Operátor kamerového jeřábu / jibu",
         "r_5ece318b289f": "Technik kamerového jeřábu",
@@ -6580,7 +6627,7 @@
       },
       "set-logistik": {
         "r_06d9aa28368f": "Pomocník na produkční základně",
-        "r_51e581b5ea39": "Řidič / Řidička (osobní / nákladní vůz)",
+        "r_51e581b5ea39": "Řidič (osobní / nákladní vozidlo)",
         "r_36a599628c2e": "Řidič na lokaci",
         "r_9bc1a35535fa": "Vedoucí natáčení na lokaci",
         "r_273f12c52b95": "Asistent manažera lokací",
@@ -6643,9 +6690,9 @@
         "r_b85e79c1153f": "Rešerše"
       },
       "cast": {
-        "r_3d0e76b883b1": "Herec v hlavní roli / Herečka v hlavní roli",
+        "r_3d0e76b883b1": "Představitel hlavní role",
         "r_543b99d52c01": "Herci",
-        "r_aa64ee1fd5d6": "Herec ve vedlejší roli / Herečka ve vedlejší roli",
+        "r_aa64ee1fd5d6": "Herec vedlejší role",
         "r_5fea55df03ed": "Komparzista",
         "r_912a4dbdd23c": "Herec malé role",
         "r_130f7a137659": "Model",
@@ -6668,7 +6715,7 @@
         "r_901a1b08f6ba": "Koordinátor intimity",
         "r_7a721e572105": "Castingový spolupracovník",
         "r_a1f9ba79ab08": "Castingový asistent",
-        "r_84927cc7b2bc": "Herec ve vedlejší roli / Herečka ve vedlejší roli",
+        "r_84927cc7b2bc": "Herec vedlejší role",
         "r_97144193d2e9": "Statista / komparzista",
         "r_de130677203b": "Castingový režisér pro mládež",
         "r_27725de30521": "Castingový režisér pro děti",
@@ -6815,7 +6862,7 @@
         "r_ce039c1f951f": "Motion designér (sociální sítě)"
       },
       "foto": {
-        "r_d2c0588cf0d1": "Fotograf / Fotografka",
+        "r_d2c0588cf0d1": "Fotograf/ka",
         "r_d7f7fbf5939c": "Módní fotograf",
         "r_e0551919b067": "Produktový fotograf",
         "r_b06301444ef7": "Fotograf akcí",
@@ -6901,15 +6948,15 @@
         "r_532adc563b66": "Řidič cateringu a mobilní kuchyně"
       },
       "filmtiere-tiertraining": {
-        "r_3d8ab6fb2c6a": "Trenér filmových zvířat / Trenérka filmových zvířat",
-        "r_654c33dc9c6b": "Trenér filmových psů / Trenérka filmových psů",
-        "r_40758f075d18": "Ošetřovatel zvířat / Ošetřovatelka zvířat (Animal Handler)",
-        "r_7a1591b96b3a": "Koordinátor zvířat / Koordinátorka zvířat",
-        "r_a63695a566c3": "Ošetřovatel zvířat na natáčení / Ošetřovatelka zvířat na natáčení",
+        "r_3d8ab6fb2c6a": "Trenér/ka filmových zvířat",
+        "r_654c33dc9c6b": "Trenér/ka filmových psů",
+        "r_40758f075d18": "Ošetřovatel/ka zvířat / Ošetřovatel/ka zvířat (Animal Handler)",
+        "r_7a1591b96b3a": "Koordinátor/ka zvířat",
+        "r_a63695a566c3": "Ošetřovatel/ka zvířat na natáčení",
         "r_9faf951b627e": "Vedoucí koordinace koní (Horse Master)",
-        "r_7c4f137defec": "Asistent koordinace koní / Asistentka koordinace koní",
-        "r_8e8f21cf0303": "Trenér filmových koní / Trenérka filmových koní",
-        "r_35f9ffa503c4": "Ošetřovatel koní / Ošetřovatelka koní (Horse Wrangler)"
+        "r_7c4f137defec": "Asistent/ka koordinace koní",
+        "r_8e8f21cf0303": "Trenér/ka filmových koní",
+        "r_35f9ffa503c4": "Ošetřovatel/ka koní / Ošetřovatel/ka koní (Horse Wrangler)"
       }
     },
     "extra": {
@@ -6979,6 +7026,4868 @@
       "x_907c602b417d": "Online a digitální tvorba",
       "x_f4581b3b4f89": "Web, platforma, streamování",
       "x_d06f18dfc1af": "Další filmové služby"
+    },
+    "roleForms": {
+      "produktion": {
+        "r_d479a6d8637e": {
+          "masculine": "Producent",
+          "feminine": "Producentka",
+          "neutral": "Producent/ka"
+        },
+        "r_86ca6f7fac85": {
+          "masculine": "Výkonný producent",
+          "feminine": "Výkonná producentka",
+          "neutral": "Výkonný/á producent/ka"
+        },
+        "r_9b38cf86cffe": {
+          "masculine": "Koproducent",
+          "feminine": "Koproducentka",
+          "neutral": "Koproducent/ka"
+        },
+        "r_bd2e1cd12f54": {
+          "masculine": "Přidružený producent",
+          "feminine": "Přidružená producentka",
+          "neutral": "Přidružený/á producent/ka"
+        },
+        "r_bc840a4895a2": {
+          "masculine": "Junior producent",
+          "feminine": "Junior producentka",
+          "neutral": "Junior producent/ka"
+        },
+        "r_ebaa595e4927": {
+          "masculine": "Line producent",
+          "feminine": "Line producentka",
+          "neutral": "Line producent/ka"
+        },
+        "r_9f722922fe7b": {
+          "masculine": "Vedoucí výroby (HL)",
+          "feminine": "Vedoucí výroby (HL)",
+          "neutral": "Vedoucí výroby (HL)"
+        },
+        "r_7fdd4fd31143": {
+          "masculine": "Asistent vedoucího výroby",
+          "feminine": "Asistentka vedoucího výroby",
+          "neutral": "Asistent/ka vedoucího výroby"
+        },
+        "r_c8c7f4cd576e": {
+          "masculine": "Vedoucí produkce (PL)",
+          "feminine": "Vedoucí produkce (PL)",
+          "neutral": "Vedoucí produkce (PL)"
+        },
+        "r_edde7bed564a": {
+          "masculine": "Vedoucí produkce (televizní stanice)",
+          "feminine": "Vedoucí produkce (televizní stanice)",
+          "neutral": "Vedoucí produkce (televizní stanice)"
+        },
+        "r_08532652fb27": {
+          "masculine": "Asistent vedoucího produkce",
+          "feminine": "Asistentka vedoucího produkce",
+          "neutral": "Asistent/ka vedoucího produkce"
+        },
+        "r_a8ccedf1c4fc": {
+          "masculine": "Disponent / plánovač produkce",
+          "feminine": "Disponentka / plánovačka produkce",
+          "neutral": "Disponent/ka / plánovač/ka produkce"
+        },
+        "r_73ab62cc6ea9": {
+          "masculine": "Sestavování rozpočtu",
+          "feminine": "Sestavování rozpočtu",
+          "neutral": "Sestavování rozpočtu"
+        },
+        "r_5e8f13168720": {
+          "masculine": "Produkční supervizor",
+          "feminine": "Produkční supervizorka",
+          "neutral": "Produkční supervizor/ka"
+        },
+        "r_a8aaf07776e6": {
+          "masculine": "Asistent produkčního supervizora",
+          "feminine": "Asistentka produkčního supervizora",
+          "neutral": "Asistent/ka produkčního supervizora"
+        },
+        "r_86a64b938274": {
+          "masculine": "Vedoucí studia",
+          "feminine": "Vedoucí studia",
+          "neutral": "Vedoucí studia"
+        },
+        "r_1dc3e15735f4": {
+          "masculine": "Produkční koordinátor",
+          "feminine": "Produkční koordinátorka",
+          "neutral": "Produkční koordinátor/ka"
+        },
+        "r_3d2828618f01": {
+          "masculine": "Asistent produkčního koordinátora",
+          "feminine": "Asistentka produkčního koordinátora",
+          "neutral": "Asistent/ka produkčního koordinátora"
+        },
+        "r_b7b1c24b3218": {
+          "masculine": "Asistent produkce (natáčení)",
+          "feminine": "Asistentka produkce (natáčení)",
+          "neutral": "Asistent/ka produkce (natáčení)"
+        },
+        "r_504614327108": {
+          "masculine": "Asistent produkce (kancelář)",
+          "feminine": "Asistentka produkce (kancelář)",
+          "neutral": "Asistent/ka produkce (kancelář)"
+        },
+        "r_b1c1be59d3fb": {
+          "masculine": "Druhý asistent produkce",
+          "feminine": "Druhá asistentka produkce",
+          "neutral": "Druhý/á asistent/ka produkce"
+        },
+        "r_e9fe06329d79": {
+          "masculine": "Týmový asistent",
+          "feminine": "Týmová asistentka",
+          "neutral": "Týmový/á asistent/ka"
+        },
+        "r_caad7ad378e8": {
+          "masculine": "Osobní asistent",
+          "feminine": "Osobní asistentka",
+          "neutral": "Osobní asistent/ka"
+        },
+        "r_9b9ea0970d1e": {
+          "masculine": "Osobní asistent produkce",
+          "feminine": "Osobní asistentka produkce",
+          "neutral": "Osobní asistent/ka produkce"
+        },
+        "r_22ca8fe2e611": {
+          "masculine": "Osobní asistent herců (talent assistant)",
+          "feminine": "Osobní asistentka herců (talent assistant)",
+          "neutral": "Osobní asistent/ka herců (talent assistant)"
+        },
+        "r_bdfbe6854805": {
+          "masculine": "Asistent producenta",
+          "feminine": "Asistentka producenta",
+          "neutral": "Asistent/ka producenta"
+        },
+        "r_d894e33cd89e": {
+          "masculine": "Asistent vedení",
+          "feminine": "Asistentka vedení",
+          "neutral": "Asistent/ka vedení"
+        },
+        "r_bdc2cdf19051": {
+          "masculine": "Kancelářský asistent",
+          "feminine": "Kancelářská asistentka",
+          "neutral": "Kancelářský/á asistent/ka"
+        },
+        "r_328519d70fd2": {
+          "masculine": "Koordinátor ubytování",
+          "feminine": "Koordinátorka ubytování",
+          "neutral": "Koordinátor/ka ubytování"
+        },
+        "r_6747956824f3": {
+          "masculine": "Koordinátor cest",
+          "feminine": "Koordinátorka cest",
+          "neutral": "Koordinátor/ka cest"
+        },
+        "r_b809fe7525be": {
+          "masculine": "Asistent koordinátora cest",
+          "feminine": "Asistentka koordinátora cest",
+          "neutral": "Asistent/ka koordinátora cest"
+        },
+        "r_86c92e0bfce0": {
+          "masculine": "Koordinátor bezpečnosti a ochrany zdraví",
+          "feminine": "Koordinátorka bezpečnosti a ochrany zdraví",
+          "neutral": "Koordinátor/ka bezpečnosti a ochrany zdraví"
+        },
+        "r_14cee2575cf1": {
+          "masculine": "ADR koordinátor",
+          "feminine": "ADR koordinátorka",
+          "neutral": "ADR koordinátor/ka"
+        },
+        "r_92286a252903": {
+          "masculine": "Manažer lokací",
+          "feminine": "Manažerka lokací",
+          "neutral": "Manažer/ka lokací"
+        },
+        "r_fc08fa159e6a": {
+          "masculine": "Lokáční skaut",
+          "feminine": "Lokáční skautka",
+          "neutral": "Lokáční skaut/ka"
+        },
+        "r_e5215fd85f99": {
+          "masculine": "Lokáční skaut (dodatečný)",
+          "feminine": "Lokáční skautka (dodatečný)",
+          "neutral": "Lokáční skaut/ka (dodatečný)"
+        },
+        "r_9454a017e69a": {
+          "masculine": "Asistent lokáčního skauta",
+          "feminine": "Asistentka lokáčního skauta",
+          "neutral": "Asistent/ka lokáčního skauta"
+        },
+        "r_0d7a23f6a056": {
+          "masculine": "Koordinátor lokací",
+          "feminine": "Koordinátorka lokací",
+          "neutral": "Koordinátor/ka lokací"
+        },
+        "r_11bbfbf26e46": {
+          "masculine": "Koordinátor herců",
+          "feminine": "Koordinátorka herců",
+          "neutral": "Koordinátor/ka herců"
+        },
+        "r_155f85cc8157": {
+          "masculine": "Vedoucí jednotky",
+          "feminine": "Vedoucí jednotky",
+          "neutral": "Vedoucí jednotky"
+        },
+        "r_475eba080a17": {
+          "masculine": "Covid koordinátor",
+          "feminine": "Covid koordinátorka",
+          "neutral": "Covid koordinátor/ka"
+        },
+        "r_a60ca701fcab": {
+          "masculine": "Asistent covid koordinátora",
+          "feminine": "Asistentka covid koordinátora",
+          "neutral": "Asistent/ka covid koordinátora"
+        },
+        "r_87a049b62039": {
+          "masculine": "Vedoucí natáčení na lokaci",
+          "feminine": "Vedoucí natáčení na lokaci",
+          "neutral": "Vedoucí natáčení na lokaci"
+        },
+        "r_5b93948ca9fc": {
+          "masculine": "Asistent vedoucího natáčení na lokaci",
+          "feminine": "Asistentka vedoucího natáčení na lokaci",
+          "neutral": "Asistent/ka vedoucího natáčení na lokaci"
+        },
+        "r_8a0cbf242686": {
+          "masculine": "Personální disponent",
+          "feminine": "Personální disponentka",
+          "neutral": "Personální disponent/ka"
+        },
+        "r_286fb0baa150": {
+          "masculine": "Koordinátor dopravy",
+          "feminine": "Koordinátorka dopravy",
+          "neutral": "Koordinátor/ka dopravy"
+        },
+        "r_8e7b74f8a60b": {
+          "masculine": "Asistent koordinátora dopravy",
+          "feminine": "Asistentka koordinátora dopravy",
+          "neutral": "Asistent/ka koordinátora dopravy"
+        },
+        "r_940718151db8": {
+          "masculine": "Vedoucí dopravy",
+          "feminine": "Vedoucí dopravy",
+          "neutral": "Vedoucí dopravy"
+        },
+        "r_34e7de86b42e": {
+          "masculine": "Vedoucí natáčení (1st AD)",
+          "feminine": "Vedoucí natáčení (1st AD)",
+          "neutral": "Vedoucí natáčení (1st AD)"
+        },
+        "r_2492443d2786": {
+          "masculine": "Vedoucí natáčení na place",
+          "feminine": "Vedoucí natáčení na place",
+          "neutral": "Vedoucí natáčení na place"
+        },
+        "r_e9593d0ce404": {
+          "masculine": "Třetí asistent režie / asistent pro komparz",
+          "feminine": "Třetí asistentka režie / asistentka pro komparz",
+          "neutral": "Třetí asistent/ka režie / asistent/ka pro komparz"
+        },
+        "r_4492528d7f86": {
+          "masculine": "Vedoucí produkční základny",
+          "feminine": "Vedoucí produkční základny",
+          "neutral": "Vedoucí produkční základny"
+        },
+        "r_eaee2c8a1b89": {
+          "masculine": "Vedoucí řidičů",
+          "feminine": "Vedoucí řidičů",
+          "neutral": "Vedoucí řidičů"
+        },
+        "r_1e792192a593": {
+          "masculine": "Vedoucí natáčení ve studiu",
+          "feminine": "Vedoucí natáčení ve studiu",
+          "neutral": "Vedoucí natáčení ve studiu"
+        },
+        "r_453722f35b4e": {
+          "masculine": "Vedoucí uzavírek",
+          "feminine": "Vedoucí uzavírek",
+          "neutral": "Vedoucí uzavírek"
+        },
+        "r_01cf9ccbf27d": {
+          "masculine": "Druhý vedoucí natáčení (show / vysílání)",
+          "feminine": "Druhá vedoucí natáčení (show / vysílání)",
+          "neutral": "Druhý/á vedoucí natáčení (show / vysílání)"
+        },
+        "r_282e1b7d8f09": {
+          "masculine": "Koordinátor přesunů štábu",
+          "feminine": "Koordinátorka přesunů štábu",
+          "neutral": "Koordinátor/ka přesunů štábu"
+        },
+        "r_8016e2e4e662": {
+          "masculine": "Asistent vedoucího natáčení",
+          "feminine": "Asistentka vedoucího natáčení",
+          "neutral": "Asistent/ka vedoucího natáčení"
+        },
+        "r_1fb7a2292310": {
+          "masculine": "Asistent prvního vedoucího natáčení",
+          "feminine": "Asistentka prvního vedoucího natáčení",
+          "neutral": "Asistent/ka prvního vedoucího natáčení"
+        },
+        "r_366708fdb0b3": {
+          "masculine": "Asistent vedoucího natáčení na place",
+          "feminine": "Asistentka vedoucího natáčení na place",
+          "neutral": "Asistent/ka vedoucího natáčení na place"
+        },
+        "r_d73d495c6d75": {
+          "masculine": "Asistent produkce pro parkování",
+          "feminine": "Asistentka produkce pro parkování",
+          "neutral": "Asistent/ka produkce pro parkování"
+        },
+        "r_4ed4cafa632a": {
+          "masculine": "Pomocník uzavírek",
+          "feminine": "Pomocnice uzavírek",
+          "neutral": "Pomocník/pomocnice uzavírek"
+        },
+        "r_6fbe7d952889": {
+          "masculine": "Pomocník na place",
+          "feminine": "Pomocnice na place",
+          "neutral": "Pomocník/pomocnice na place"
+        },
+        "r_c8d2a6e8ca0f": {
+          "masculine": "Produkční řidič",
+          "feminine": "Produkční řidička",
+          "neutral": "Produkční řidič/ka"
+        },
+        "r_0d9b0abd3608": {
+          "masculine": "Osobní řidič",
+          "feminine": "Osobní řidička",
+          "neutral": "Osobní řidič/ka"
+        },
+        "r_ef2266f5ad5d": {
+          "masculine": "Řidič pro přepravu vybavení",
+          "feminine": "Řidička pro přepravu vybavení",
+          "neutral": "Řidič/ka pro přepravu vybavení"
+        },
+        "r_100be7827daf": {
+          "masculine": "Kancelářský asistent produkce",
+          "feminine": "Kancelářská asistentka produkce",
+          "neutral": "Kancelářský/á asistent/ka produkce"
+        },
+        "r_c24ef6245054": {
+          "masculine": "Rozpočtář",
+          "feminine": "Rozpočtářka",
+          "neutral": "Rozpočtář/ka"
+        },
+        "r_e90f5848bfc3": {
+          "masculine": "Filmová ekonomika",
+          "feminine": "Filmová ekonomika",
+          "neutral": "Filmová ekonomika"
+        },
+        "r_c6dc08a47d0d": {
+          "masculine": "Controller (film)",
+          "feminine": "Controller (film)",
+          "neutral": "Controller (film)"
+        },
+        "r_2557c22fb3d7": {
+          "masculine": "Ekologický poradce / manažer udržitelnosti",
+          "feminine": "Ekologická poradkyně / manažerka udržitelnosti",
+          "neutral": "Ekologický/á poradce/poradkyně / manažer/ka udržitelnosti"
+        },
+        "r_2a6c1d42831e": {
+          "masculine": "Produkční stážista",
+          "feminine": "Produkční stážistka",
+          "neutral": "Produkční stážista/stážistka"
+        },
+        "r_ede69642be01": {
+          "masculine": "Stážista vedení natáčení",
+          "feminine": "Stážistka vedení natáčení",
+          "neutral": "Stážista/stážistka vedení natáčení"
+        },
+        "r_de9ab1a6b55a": {
+          "masculine": "Vedoucí produkce",
+          "feminine": "Vedoucí produkce",
+          "neutral": "Vedoucí produkce"
+        },
+        "r_fd701e2c1e86": {
+          "masculine": "Vedoucí natáčení",
+          "feminine": "Vedoucí natáčení",
+          "neutral": "Vedoucí natáčení"
+        },
+        "r_eb2de9d80eb5": {
+          "masculine": "Produkční koordinátor",
+          "feminine": "Produkční koordinátorka",
+          "neutral": "Produkční koordinátor/ka"
+        },
+        "r_14ba71897157": {
+          "masculine": "Asistent produkčního koordinátora",
+          "feminine": "Asistentka produkčního koordinátora",
+          "neutral": "Asistent/ka produkčního koordinátora"
+        },
+        "r_9a9272ffef87": {
+          "masculine": "Asistent produkce",
+          "feminine": "Asistentka produkce",
+          "neutral": "Asistent/ka produkce"
+        },
+        "r_b37de62fa7b6": {
+          "masculine": "Druhý asistent produkce",
+          "feminine": "Druhá asistentka produkce",
+          "neutral": "Druhý/á asistent/ka produkce"
+        },
+        "r_35a318ed734f": {
+          "masculine": "Asistent koordinátora cest",
+          "feminine": "Asistentka koordinátora cest",
+          "neutral": "Asistent/ka koordinátora cest"
+        },
+        "r_282f5f19af6e": {
+          "masculine": "Vedoucí natáčení na place",
+          "feminine": "Vedoucí natáčení na place",
+          "neutral": "Vedoucí natáčení na place"
+        },
+        "r_a1888e7923b1": {
+          "masculine": "Týmový asistent (dříve produkční sekretář)",
+          "feminine": "Týmová asistentka (dříve produkční sekretář)",
+          "neutral": "Týmový/á asistent/ka (dříve produkční sekretář)"
+        },
+        "r_079a221fcd0e": {
+          "masculine": "Druhý vedoucí natáčení (show / vysílání)",
+          "feminine": "Druhá vedoucí natáčení (show / vysílání)",
+          "neutral": "Druhý/á vedoucí natáčení (show / vysílání)"
+        },
+        "r_c74c78be5dc2": {
+          "masculine": "Castingový režisér",
+          "feminine": "Castingová režisérka",
+          "neutral": "Castingový/á režisér/ka"
+        },
+        "r_b6e7722029a2": {
+          "masculine": "Produkční controller",
+          "feminine": "Produkční controller",
+          "neutral": "Produkční controller"
+        },
+        "r_4e9c5d6d7198": {
+          "masculine": "Filmový ekonom",
+          "feminine": "Filmová ekonomka",
+          "neutral": "Filmový/á ekonom/ka"
+        },
+        "r_907eb6829faf": {
+          "masculine": "Účetní",
+          "feminine": "Účetní",
+          "neutral": "Účetní"
+        },
+        "r_9ef806a95399": {
+          "masculine": "Asistent filmové ekonomiky",
+          "feminine": "Asistentka filmové ekonomiky",
+          "neutral": "Asistent/ka filmové ekonomiky"
+        },
+        "r_3365c6d66b72": {
+          "masculine": "Pokladník",
+          "feminine": "Pokladnice",
+          "neutral": "Pokladník/pokladnice"
+        },
+        "r_354a33db42c7": {
+          "masculine": "Mzdový účetní",
+          "feminine": "Mzdová účetní",
+          "neutral": "Mzdový/á účetní"
+        },
+        "r_f3b7a4579d13": {
+          "masculine": "Stážista filmové ekonomiky",
+          "feminine": "Stážistka filmové ekonomiky",
+          "neutral": "Stážista/stážistka filmové ekonomiky"
+        },
+        "r_614a09237466": {
+          "masculine": "Vedoucí produkční strategie",
+          "feminine": "Vedoucí produkční strategie",
+          "neutral": "Vedoucí produkční strategie"
+        },
+        "r_ab2bca044ad5": {
+          "masculine": "Vedoucí vývoje",
+          "feminine": "Vedoucí vývoje",
+          "neutral": "Vedoucí vývoje"
+        },
+        "r_4c6443207ff2": {
+          "masculine": "Servisní producent",
+          "feminine": "Servisní producentka",
+          "neutral": "Servisní producent/ka"
+        },
+        "r_f43970f8871f": {
+          "masculine": "Produkční vedení (studio / televizní síť)",
+          "feminine": "Produkční vedení (studio / televizní síť)",
+          "neutral": "Produkční vedení (studio / televizní síť)"
+        },
+        "r_b490dba5695d": {
+          "masculine": "Asistent producenta",
+          "feminine": "Asistentka producenta",
+          "neutral": "Asistent/ka producenta"
+        },
+        "r_7b68ca0f0fb6": {
+          "masculine": "Televizní producent",
+          "feminine": "Televizní producentka",
+          "neutral": "Televizní producent/ka"
+        },
+        "r_564bd1be967c": {
+          "masculine": "Producent propagace",
+          "feminine": "Producentka propagace",
+          "neutral": "Producent/ka propagace"
+        },
+        "r_17e75f09bb7a": {
+          "masculine": "Dohlížející producent",
+          "feminine": "Dohlížející producentka",
+          "neutral": "Dohlížející producent/ka"
+        },
+        "r_09bdde75b5c6": {
+          "masculine": "Producent příběhu",
+          "feminine": "Producentka příběhu",
+          "neutral": "Producent/ka příběhu"
+        },
+        "r_63333ae7406f": {
+          "masculine": "Producent příběhu v postprodukci",
+          "feminine": "Producentka příběhu v postprodukci",
+          "neutral": "Producent/ka příběhu v postprodukci"
+        },
+        "r_1c7b4db06402": {
+          "masculine": "Producent agentury a TV reklamy",
+          "feminine": "Producentka agentury a TV reklamy",
+          "neutral": "Producent/ka agentury a TV reklamy"
+        },
+        "r_05c4bc7ca840": {
+          "masculine": "Producent stereoskopického 3D",
+          "feminine": "Producentka stereoskopického 3D",
+          "neutral": "Producent/ka stereoskopického 3D"
+        },
+        "r_6221ed87ef22": {
+          "masculine": "Dohlížející producent stereoskopického 3D",
+          "feminine": "Dohlížející producentka stereoskopického 3D",
+          "neutral": "Dohlížející producent/ka stereoskopického 3D"
+        },
+        "r_7edb24c15dcf": {
+          "masculine": "Producent webové televize",
+          "feminine": "Producentka webové televize",
+          "neutral": "Producent/ka webové televize"
+        },
+        "r_3d984a13d7b5": {
+          "masculine": "Kreativní producent",
+          "feminine": "Kreativní producentka",
+          "neutral": "Kreativní producent/ka"
+        },
+        "r_ae0c8b90c8d1": {
+          "masculine": "Vývojový producent",
+          "feminine": "Vývojová producentka",
+          "neutral": "Vývojový/á producent/ka"
+        },
+        "r_d297bfadcae2": {
+          "masculine": "Koordinátor vývoje",
+          "feminine": "Koordinátorka vývoje",
+          "neutral": "Koordinátor/ka vývoje"
+        },
+        "r_54f1c9f4d11e": {
+          "masculine": "Vedoucí vývoje (studio / televizní síť)",
+          "feminine": "Vedoucí vývoje (studio / televizní síť)",
+          "neutral": "Vedoucí vývoje (studio / televizní síť)"
+        },
+        "r_f42fa61db712": {
+          "masculine": "Přidružený producent režijního pracoviště",
+          "feminine": "Přidružená producentka režijního pracoviště",
+          "neutral": "Přidružený/á producent/ka režijního pracoviště"
+        },
+        "r_9d8ea4e7c7aa": {
+          "masculine": "Producent režijního pracoviště / vysílání",
+          "feminine": "Producentka režijního pracoviště / vysílání",
+          "neutral": "Producent/ka režijního pracoviště / vysílání"
+        },
+        "r_b837afb89817": {
+          "masculine": "Producent vysílací propagace",
+          "feminine": "Producentka vysílací propagace",
+          "neutral": "Producent/ka vysílací propagace"
+        },
+        "r_bacc7a4ec265": {
+          "masculine": "Autorskoprávní záležitosti",
+          "feminine": "Autorskoprávní záležitosti",
+          "neutral": "Autorskoprávní záležitosti"
+        },
+        "r_7e0ace38e8fc": {
+          "masculine": "Obchodní záležitosti",
+          "feminine": "Obchodní záležitosti",
+          "neutral": "Obchodní záležitosti"
+        },
+        "r_0daf662f57c6": {
+          "masculine": "Obchodní a právní záležitosti",
+          "feminine": "Obchodní a právní záležitosti",
+          "neutral": "Obchodní a právní záležitosti"
+        },
+        "r_a95b977fa84f": {
+          "masculine": "Právní záležitosti",
+          "feminine": "Právní záležitosti",
+          "neutral": "Právní záležitosti"
+        },
+        "r_0433186beb99": {
+          "masculine": "Producent marketingu a distribuce",
+          "feminine": "Producentka marketingu a distribuce",
+          "neutral": "Producent/ka marketingu a distribuce"
+        },
+        "r_07f0060c8996": {
+          "masculine": "Produkční stážista u producenta",
+          "feminine": "Produkční stážistka u producenta",
+          "neutral": "Produkční stážista/stážistka u producenta"
+        }
+      },
+      "regie": {
+        "r_f59d6991c44a": {
+          "masculine": "Režisér",
+          "feminine": "Režisérka",
+          "neutral": "Režisér/ka"
+        },
+        "r_5562e3abbb45": {
+          "masculine": "Spolurežisér",
+          "feminine": "Spolurežisérka",
+          "neutral": "Spolurežisér/ka"
+        },
+        "r_df7e552a6792": {
+          "masculine": "Režisér druhého štábu",
+          "feminine": "Režisérka druhého štábu",
+          "neutral": "Režisér/ka druhého štábu"
+        },
+        "r_0aca88b2853d": {
+          "masculine": "Studiový režisér",
+          "feminine": "Studiová režisérka",
+          "neutral": "Studiový/á režisér/ka"
+        },
+        "r_394140e22c16": {
+          "masculine": "Dabingový režisér",
+          "feminine": "Dabingová režisérka",
+          "neutral": "Dabingový/á režisér/ka"
+        },
+        "r_7d2cd6bd3a73": {
+          "masculine": "Obrazový režisér",
+          "feminine": "Obrazová režisérka",
+          "neutral": "Obrazový/á režisér/ka"
+        },
+        "r_988a573b39e7": {
+          "masculine": "Režisér vysílání",
+          "feminine": "Režisérka vysílání",
+          "neutral": "Režisér/ka vysílání"
+        },
+        "r_0719ad7a68ec": {
+          "masculine": "Dialogový režisér",
+          "feminine": "Dialogová režisérka",
+          "neutral": "Dialogový/á režisér/ka"
+        },
+        "r_463462fca2ec": {
+          "masculine": "První asistent režie (1st AD)",
+          "feminine": "První asistentka režie (1st AD)",
+          "neutral": "První asistent/ka režie (1st AD)"
+        },
+        "r_de1c193ae4d6": {
+          "masculine": "Druhý asistent režie (2nd AD)",
+          "feminine": "Druhá asistentka režie (2nd AD)",
+          "neutral": "Druhý/á asistent/ka režie (2nd AD)"
+        },
+        "r_c37babd28464": {
+          "masculine": "Vedoucí druhý asistent režie",
+          "feminine": "Vedoucí druhá asistentka režie",
+          "neutral": "Vedoucí druhý/á asistent/ka režie"
+        },
+        "r_2b8bbebafa40": {
+          "masculine": "Druhý asistent režie na place",
+          "feminine": "Druhá asistentka režie na place",
+          "neutral": "Druhý/á asistent/ka režie na place"
+        },
+        "r_b0a3c67c20bf": {
+          "masculine": "Druhý asistent režie pro komparz",
+          "feminine": "Druhá asistentka režie pro komparz",
+          "neutral": "Druhý/á asistent/ka režie pro komparz"
+        },
+        "r_b6640a0bf9b6": {
+          "masculine": "Třetí asistent režie (3rd AD)",
+          "feminine": "Třetí asistentka režie (3rd AD)",
+          "neutral": "Třetí asistent/ka režie (3rd AD)"
+        },
+        "r_962cb1546148": {
+          "masculine": "Třetí asistent režie pro komparz",
+          "feminine": "Třetí asistentka režie pro komparz",
+          "neutral": "Třetí asistent/ka režie pro komparz"
+        },
+        "r_619aa382d108": {
+          "masculine": "Třetí asistent režie na základně",
+          "feminine": "Třetí asistentka režie na základně",
+          "neutral": "Třetí asistent/ka režie na základně"
+        },
+        "r_14816f8e2f93": {
+          "masculine": "Třetí asistent režie na place",
+          "feminine": "Třetí asistentka režie na place",
+          "neutral": "Třetí asistent/ka režie na place"
+        },
+        "r_00bb63b14962": {
+          "masculine": "Produkční asistent režie",
+          "feminine": "Produkční asistentka režie",
+          "neutral": "Produkční asistent/ka režie"
+        },
+        "r_da45564f42a3": {
+          "masculine": "Vedoucí produkční asistent režie",
+          "feminine": "Vedoucí produkční asistentka režie",
+          "neutral": "Vedoucí produkční asistent/ka režie"
+        },
+        "r_d4de545cc559": {
+          "masculine": "Stážista asistence režie",
+          "feminine": "Stážistka asistence režie",
+          "neutral": "Stážista/stážistka asistence režie"
+        },
+        "r_b8f3b216cf72": {
+          "masculine": "Koordinátor komparzu",
+          "feminine": "Koordinátorka komparzu",
+          "neutral": "Koordinátor/ka komparzu"
+        },
+        "r_7d061a318612": {
+          "masculine": "Asistent koordinátora komparzu",
+          "feminine": "Asistentka koordinátora komparzu",
+          "neutral": "Asistent/ka koordinátora komparzu"
+        },
+        "r_dbf51638d5ed": {
+          "masculine": "Skript / kontinuita",
+          "feminine": "Skriptka / kontinuita",
+          "neutral": "Skript/ka / kontinuita"
+        },
+        "r_db6f57df190b": {
+          "masculine": "Asistent skriptu",
+          "feminine": "Asistentka skriptu",
+          "neutral": "Asistent/ka skriptu"
+        },
+        "r_043751863fa5": {
+          "masculine": "Skript na place",
+          "feminine": "Skriptka na place",
+          "neutral": "Skript/ka na place"
+        },
+        "r_d7e7e0e56ce6": {
+          "masculine": "Storyboardista",
+          "feminine": "Storyboardistka",
+          "neutral": "Storyboardista/storyboardistka"
+        },
+        "r_d5f343108ed5": {
+          "masculine": "Herecký kouč",
+          "feminine": "Herecká koučka",
+          "neutral": "Herecký/á kouč/ka"
+        },
+        "r_8ac3532c0c32": {
+          "masculine": "Herecký kouč pro děti",
+          "feminine": "Herecká koučka pro děti",
+          "neutral": "Herecký/á kouč/ka pro děti"
+        },
+        "r_bf13c927e8eb": {
+          "masculine": "Dialogový kouč",
+          "feminine": "Dialogová koučka",
+          "neutral": "Dialogový/á kouč/ka"
+        },
+        "r_82fff9096145": {
+          "masculine": "Koordinátor komparzu",
+          "feminine": "Koordinátorka komparzu",
+          "neutral": "Koordinátor/ka komparzu"
+        },
+        "r_e57426b6a805": {
+          "masculine": "Asistent koordinátora komparzu",
+          "feminine": "Asistentka koordinátora komparzu",
+          "neutral": "Asistent/ka koordinátora komparzu"
+        },
+        "r_c2b6031ad212": {
+          "masculine": "Osobní asistent režiséra",
+          "feminine": "Osobní asistentka režiséra",
+          "neutral": "Osobní asistent/ka režiséra"
+        },
+        "r_1ed956774605": {
+          "masculine": "Osobní asistent režie",
+          "feminine": "Osobní asistentka režie",
+          "neutral": "Osobní asistent/ka režie"
+        },
+        "r_7d0bc36aabcb": {
+          "masculine": "Stážista režie",
+          "feminine": "Stážistka režie",
+          "neutral": "Stážista/stážistka režie"
+        },
+        "r_bf4aaefa2f9f": {
+          "masculine": "Stážista skriptu",
+          "feminine": "Stážistka skriptu",
+          "neutral": "Stážista/stážistka skriptu"
+        },
+        "r_45bf2bbe37f0": {
+          "masculine": "Asistent režie (pomocník na place)",
+          "feminine": "Asistentka režie (pomocník na place)",
+          "neutral": "Asistent/ka režie (pomocník na place)"
+        },
+        "r_9ced64ab6db5": {
+          "masculine": "První asistent režie",
+          "feminine": "První asistentka režie",
+          "neutral": "První asistent/ka režie"
+        },
+        "r_b6ac41792b48": {
+          "masculine": "Druhý asistent režie",
+          "feminine": "Druhá asistentka režie",
+          "neutral": "Druhý/á asistent/ka režie"
+        },
+        "r_6b9cabf3cbca": {
+          "masculine": "Skript",
+          "feminine": "Skriptka",
+          "neutral": "Skript/ka"
+        },
+        "r_93f52c1c7000": {
+          "masculine": "Režisér druhého štábu",
+          "feminine": "Režisérka druhého štábu",
+          "neutral": "Režisér/ka druhého štábu"
+        },
+        "r_591d7faf8f5d": {
+          "masculine": "Osobní asistent",
+          "feminine": "Osobní asistentka",
+          "neutral": "Osobní asistent/ka"
+        },
+        "r_c01dd7739f5a": {
+          "masculine": "Asistent koordinátora komparzu",
+          "feminine": "Asistentka koordinátora komparzu",
+          "neutral": "Asistent/ka koordinátora komparzu"
+        }
+      },
+      "kamera": {
+        "r_9659ff478da5": {
+          "masculine": "Hlavní kameraman (DoP)",
+          "feminine": "Hlavní kameramanka (DoP)",
+          "neutral": "Hlavní kameraman/ka (DoP)"
+        },
+        "r_f1286611f452": {
+          "masculine": "Vedoucí obrazové tvorby (DoI)",
+          "feminine": "Vedoucí obrazové tvorby (DoI)",
+          "neutral": "Vedoucí obrazové tvorby (DoI)"
+        },
+        "r_c519de89c832": {
+          "masculine": "Kameraman A kamery",
+          "feminine": "Kameramanka A kamery",
+          "neutral": "Kameraman/ka A kamery"
+        },
+        "r_69b451280549": {
+          "masculine": "Kameraman B kamery",
+          "feminine": "Kameramanka B kamery",
+          "neutral": "Kameraman/ka B kamery"
+        },
+        "r_147c6db611ab": {
+          "masculine": "Kameraman C kamery",
+          "feminine": "Kameramanka C kamery",
+          "neutral": "Kameraman/ka C kamery"
+        },
+        "r_00ec6018a92f": {
+          "masculine": "Elektronický kameraman (studio / exteriér)",
+          "feminine": "Elektronická kameramanka (studio / exteriér)",
+          "neutral": "Elektronický/á kameraman/ka (studio / exteriér)"
+        },
+        "r_15338319dd09": {
+          "masculine": "Reportážní kameraman",
+          "feminine": "Reportážní kameramanka",
+          "neutral": "Reportážní kameraman/ka"
+        },
+        "r_3b00f8763d24": {
+          "masculine": "Kameraman druhého štábu",
+          "feminine": "Kameramanka druhého štábu",
+          "neutral": "Kameraman/ka druhého štábu"
+        },
+        "r_2815a6f7d251": {
+          "masculine": "Kameraman třetího štábu",
+          "feminine": "Kameramanka třetího štábu",
+          "neutral": "Kameraman/ka třetího štábu"
+        },
+        "r_46bfee3f1077": {
+          "masculine": "První asistent kamery (ostřič)",
+          "feminine": "První asistentka kamery (ostřič)",
+          "neutral": "První asistent/ka kamery (ostřič)"
+        },
+        "r_4f6a54aa8672": {
+          "masculine": "Druhý asistent kamery (klapka / zakládání)",
+          "feminine": "Druhá asistentka kamery (klapka / zakládání)",
+          "neutral": "Druhý/á asistent/ka kamery (klapka / zakládání)"
+        },
+        "r_a6d3a38613fa": {
+          "masculine": "Asistent kamery – klapka a zakládání filmu",
+          "feminine": "Asistentka kamery – klapka a zakládání filmu",
+          "neutral": "Asistent/ka kamery – klapka a zakládání filmu"
+        },
+        "r_4406ae44f8be": {
+          "masculine": "Třetí asistent kamery",
+          "feminine": "Třetí asistentka kamery",
+          "neutral": "Třetí asistent/ka kamery"
+        },
+        "r_a29ed25142f3": {
+          "masculine": "Druhý asistent digitální kamery",
+          "feminine": "Druhá asistentka digitální kamery",
+          "neutral": "Druhý/á asistent/ka digitální kamery"
+        },
+        "r_048d538ee34d": {
+          "masculine": "DIT",
+          "feminine": "DIT",
+          "neutral": "DIT"
+        },
+        "r_c48ad1ee75a7": {
+          "masculine": "Asistent DIT",
+          "feminine": "Asistentka DIT",
+          "neutral": "Asistent/ka DIT"
+        },
+        "r_0e473a1887e9": {
+          "masculine": "Operátor Steadicamu",
+          "feminine": "Operátorka Steadicamu",
+          "neutral": "Operátor/ka Steadicamu"
+        },
+        "r_1d7535202c92": {
+          "masculine": "Asistent Steadicamu",
+          "feminine": "Asistentka Steadicamu",
+          "neutral": "Asistent/ka Steadicamu"
+        },
+        "r_baee8ff4a63f": {
+          "masculine": "Operátor gimbalu",
+          "feminine": "Operátorka gimbalu",
+          "neutral": "Operátor/ka gimbalu"
+        },
+        "r_569d248c1dfd": {
+          "masculine": "Pilot dronu / operátor dronu",
+          "feminine": "Pilotka dronu / operátorka dronu",
+          "neutral": "Pilot/ka dronu / operátor/ka dronu"
+        },
+        "r_3ca1ad3e14b2": {
+          "masculine": "Operátor kamerového dronu",
+          "feminine": "Operátorka kamerového dronu",
+          "neutral": "Operátor/ka kamerového dronu"
+        },
+        "r_c2ff9d51c86a": {
+          "masculine": "Pilot kamerového dronu",
+          "feminine": "Pilotka kamerového dronu",
+          "neutral": "Pilot/ka kamerového dronu"
+        },
+        "r_0502b3c5dec3": {
+          "masculine": "Řidič kamerového vozu",
+          "feminine": "Řidička kamerového vozu",
+          "neutral": "Řidič/ka kamerového vozu"
+        },
+        "r_a3fa606ea916": {
+          "masculine": "Pilot letadla (letecké záběry)",
+          "feminine": "Pilotka letadla (letecké záběry)",
+          "neutral": "Pilot/ka letadla (letecké záběry)"
+        },
+        "r_05d7d18da0c4": {
+          "masculine": "Pilot vrtulníku (letecké záběry)",
+          "feminine": "Pilotka vrtulníku (letecké záběry)",
+          "neutral": "Pilot/ka vrtulníku (letecké záběry)"
+        },
+        "r_32e8a90fee3b": {
+          "masculine": "Pilot Spidercamu",
+          "feminine": "Pilotka Spidercamu",
+          "neutral": "Pilot/ka Spidercamu"
+        },
+        "r_c4b0d3dfb7d8": {
+          "masculine": "Asistent kamerového dronu",
+          "feminine": "Asistentka kamerového dronu",
+          "neutral": "Asistent/ka kamerového dronu"
+        },
+        "r_86c7b305ba77": {
+          "masculine": "Operátor dálkově ovládané kamery",
+          "feminine": "Operátorka dálkově ovládané kamery",
+          "neutral": "Operátor/ka dálkově ovládané kamery"
+        },
+        "r_386b1f9db2c1": {
+          "masculine": "Operátor dálkově ovládané hlavy",
+          "feminine": "Operátorka dálkově ovládané hlavy",
+          "neutral": "Operátor/ka dálkově ovládané hlavy"
+        },
+        "r_1490637c95ed": {
+          "masculine": "Letecký kameraman",
+          "feminine": "Letecká kameramanka",
+          "neutral": "Letecký/á kameraman/ka"
+        },
+        "r_76c05f6fba78": {
+          "masculine": "Operátor leteckých záběrů z letadla",
+          "feminine": "Operátorka leteckých záběrů z letadla",
+          "neutral": "Operátor/ka leteckých záběrů z letadla"
+        },
+        "r_b59f3c08153b": {
+          "masculine": "Operátor vysokorychlostní kamery",
+          "feminine": "Operátorka vysokorychlostní kamery",
+          "neutral": "Operátor/ka vysokorychlostní kamery"
+        },
+        "r_f6e99ab3d5dd": {
+          "masculine": "Operátor ARRI Trinity",
+          "feminine": "Operátorka ARRI Trinity",
+          "neutral": "Operátor/ka ARRI Trinity"
+        },
+        "r_953bc24b7077": {
+          "masculine": "Operátor Cablecamu",
+          "feminine": "Operátorka Cablecamu",
+          "neutral": "Operátor/ka Cablecamu"
+        },
+        "r_e834e506e54b": {
+          "masculine": "Operátor Polecamu",
+          "feminine": "Operátorka Polecamu",
+          "neutral": "Operátor/ka Polecamu"
+        },
+        "r_b7ea35e3f38d": {
+          "masculine": "Operátor Rod-Camu",
+          "feminine": "Operátorka Rod-Camu",
+          "neutral": "Operátor/ka Rod-Camu"
+        },
+        "r_3531de1d9278": {
+          "masculine": "Operátor motion control",
+          "feminine": "Operátorka motion control",
+          "neutral": "Operátor/ka motion control"
+        },
+        "r_edf22fe94ff4": {
+          "masculine": "Asistent motion control",
+          "feminine": "Asistentka motion control",
+          "neutral": "Asistent/ka motion control"
+        },
+        "r_7be83f893235": {
+          "masculine": "Kameraman živého přenosu",
+          "feminine": "Kameramanka živého přenosu",
+          "neutral": "Kameraman/ka živého přenosu"
+        },
+        "r_8d0fa92d5c06": {
+          "masculine": "Hlavní kameraman VR",
+          "feminine": "Hlavní kameramanka VR",
+          "neutral": "Hlavní kameraman/ka VR"
+        },
+        "r_e4f1f8410ee1": {
+          "masculine": "Kameraman VR",
+          "feminine": "Kameramanka VR",
+          "neutral": "Kameraman/ka VR"
+        },
+        "r_fe4955d24d9d": {
+          "masculine": "Kameraman stereoskopického 3D",
+          "feminine": "Kameramanka stereoskopického 3D",
+          "neutral": "Kameraman/ka stereoskopického 3D"
+        },
+        "r_63d8f7ae5c77": {
+          "masculine": "Operátor konvergence stereoskopického 3D",
+          "feminine": "Operátorka konvergence stereoskopického 3D",
+          "neutral": "Operátor/ka konvergence stereoskopického 3D"
+        },
+        "r_5d780d27f437": {
+          "masculine": "Stereoskopický technik",
+          "feminine": "Stereoskopická technička",
+          "neutral": "Stereoskopický/á technik/technička"
+        },
+        "r_0350366ccf64": {
+          "masculine": "Stereograf",
+          "feminine": "Stereografka",
+          "neutral": "Stereograf/ka"
+        },
+        "r_892df5d9ed45": {
+          "masculine": "Stereograf druhého štábu",
+          "feminine": "Stereografka druhého štábu",
+          "neutral": "Stereograf/ka druhého štábu"
+        },
+        "r_87b9b49ccc72": {
+          "masculine": "Asistent stereografa",
+          "feminine": "Asistentka stereografa",
+          "neutral": "Asistent/ka stereografa"
+        },
+        "r_503758a49393": {
+          "masculine": "Podvodní kameraman",
+          "feminine": "Podvodní kameramanka",
+          "neutral": "Podvodní kameraman/ka"
+        },
+        "r_ad809b37ab32": {
+          "masculine": "Asistent podvodní kamery",
+          "feminine": "Asistentka podvodní kamery",
+          "neutral": "Asistent/ka podvodní kamery"
+        },
+        "r_fdaafaca34cb": {
+          "masculine": "Kameraman volného pádu",
+          "feminine": "Kameramanka volného pádu",
+          "neutral": "Kameraman/ka volného pádu"
+        },
+        "r_6fd521b70caf": {
+          "masculine": "Technik Drytech",
+          "feminine": "Technička Drytech",
+          "neutral": "Technik/technička Drytech"
+        },
+        "r_7a8573f394c1": {
+          "masculine": "Správce dat",
+          "feminine": "Správkyně dat",
+          "neutral": "Správce/správkyně dat"
+        },
+        "r_59c04d8b3609": {
+          "masculine": "Správce dat / digitální zakladač",
+          "feminine": "Správkyně dat / digitální zakladačka",
+          "neutral": "Správce/správkyně dat / digitální zakladač/ka"
+        },
+        "r_1b6d2deeae11": {
+          "masculine": "Správce médií",
+          "feminine": "Správkyně médií",
+          "neutral": "Správce/správkyně médií"
+        },
+        "r_bfd5ad0745cb": {
+          "masculine": "Operátor video asistence",
+          "feminine": "Operátorka video asistence",
+          "neutral": "Operátor/ka video asistence"
+        },
+        "r_ab65480d38bf": {
+          "masculine": "Pomocník video asistence",
+          "feminine": "Pomocnice video asistence",
+          "neutral": "Pomocník/pomocnice video asistence"
+        },
+        "r_44cbe06f7edd": {
+          "masculine": "Operátor crash boxu",
+          "feminine": "Operátorka crash boxu",
+          "neutral": "Operátor/ka crash boxu"
+        },
+        "r_ff391e554ef1": {
+          "masculine": "Videooperátor",
+          "feminine": "Videooperátorka",
+          "neutral": "Videooperátor/ka"
+        },
+        "r_04b8806e4aea": {
+          "masculine": "Operátor Qtake",
+          "feminine": "Operátorka Qtake",
+          "neutral": "Operátor/ka Qtake"
+        },
+        "r_881fbad171dd": {
+          "masculine": "Asistent videooperátora",
+          "feminine": "Asistentka videooperátora",
+          "neutral": "Asistent/ka videooperátora"
+        },
+        "r_e8b3776feee3": {
+          "masculine": "Operátor přehrávání",
+          "feminine": "Operátorka přehrávání",
+          "neutral": "Operátor/ka přehrávání"
+        },
+        "r_2cd28c233eb0": {
+          "masculine": "Reportážní asistent (obraz a zvuk)",
+          "feminine": "Reportážní asistentka (obraz a zvuk)",
+          "neutral": "Reportážní asistent/ka (obraz a zvuk)"
+        },
+        "r_aaf320fee04d": {
+          "masculine": "Reportážní technik (obraz a zvuk)",
+          "feminine": "Reportážní technička (obraz a zvuk)",
+          "neutral": "Reportážní technik/technička (obraz a zvuk)"
+        },
+        "r_6c484917c545": {
+          "masculine": "Asistent kamery (dokumentární tvorba)",
+          "feminine": "Asistentka kamery (dokumentární tvorba)",
+          "neutral": "Asistent/ka kamery (dokumentární tvorba)"
+        },
+        "r_c071a417cdf8": {
+          "masculine": "Technik sběru dat (DCE)",
+          "feminine": "Technička sběru dat (DCE)",
+          "neutral": "Technik/technička sběru dat (DCE)"
+        },
+        "r_ff3821a892d3": {
+          "masculine": "Operátor podkladů zadní projekce",
+          "feminine": "Operátorka podkladů zadní projekce",
+          "neutral": "Operátor/ka podkladů zadní projekce"
+        },
+        "r_e160ca78eefe": {
+          "masculine": "Kamerový technik",
+          "feminine": "Kamerová technička",
+          "neutral": "Kamerový/á technik/technička"
+        },
+        "r_b2a908032997": {
+          "masculine": "Kamerový stážista",
+          "feminine": "Kamerová stážistka",
+          "neutral": "Kamerový/á stážista/stážistka"
+        },
+        "r_20c91979a5fc": {
+          "masculine": "Kameraman / operátor",
+          "feminine": "Kameramanka / operátorka",
+          "neutral": "Kameraman/ka / operátor/ka"
+        },
+        "r_3008a154e7ef": {
+          "masculine": "Pilot dronu / letecké záběry",
+          "feminine": "Pilotka dronu / letecké záběry",
+          "neutral": "Pilot/ka dronu / letecké záběry"
+        },
+        "r_ee4208621795": {
+          "masculine": "Dodatečný kameraman",
+          "feminine": "Dodatečná kameramanka",
+          "neutral": "Dodatečný/á kameraman/ka"
+        },
+        "r_59f7261be55a": {
+          "masculine": "Podvodní kameraman",
+          "feminine": "Podvodní kameramanka",
+          "neutral": "Podvodní kameraman/ka"
+        },
+        "r_6767d1f92822": {
+          "masculine": "Kameraman motion control",
+          "feminine": "Kameramanka motion control",
+          "neutral": "Kameraman/ka motion control"
+        },
+        "r_15047c5a622a": {
+          "masculine": "Asistent / technik kamerového dronu",
+          "feminine": "Asistentka / technička kamerového dronu",
+          "neutral": "Asistent/ka / technik/technička kamerového dronu"
+        },
+        "r_7b6aa965b572": {
+          "masculine": "První asistent kamery",
+          "feminine": "První asistentka kamery",
+          "neutral": "První asistent/ka kamery"
+        },
+        "r_403c761ac7c7": {
+          "masculine": "Reportážní asistent obrazu a zvuku",
+          "feminine": "Reportážní asistentka obrazu a zvuku",
+          "neutral": "Reportážní asistent/ka obrazu a zvuku"
+        },
+        "r_6170f09c0f17": {
+          "masculine": "Reportážní technik obrazu a zvuku",
+          "feminine": "Reportážní technička obrazu a zvuku",
+          "neutral": "Reportážní technik/technička obrazu a zvuku"
+        },
+        "r_6a6303b77029": {
+          "masculine": "Filmový fotograf",
+          "feminine": "Filmová fotografka",
+          "neutral": "Filmový/á fotograf/ka"
+        }
+      },
+      "licht": {
+        "r_222be04dbf00": {
+          "masculine": "Gaffer (hlavní osvětlovač)",
+          "feminine": "Gaffer (hlavní osvětlovač)",
+          "neutral": "Gaffer (hlavní osvětlovač)"
+        },
+        "r_1e210e69039a": {
+          "masculine": "Zástupce mistra osvětlení (Best Boy Electric)",
+          "feminine": "Zástupkyně mistra osvětlení (Best Girl Electric)",
+          "neutral": "Zástupce/zástupkyně mistra osvětlení"
+        },
+        "r_14dd174cd76c": {
+          "masculine": "Gaffer přípravných instalací",
+          "feminine": "Gaffer přípravných instalací",
+          "neutral": "Gaffer přípravných instalací"
+        },
+        "r_92137802b24a": {
+          "masculine": "Zástupce mistra přípravného osvětlení (Rigging Best Boy Electric)",
+          "feminine": "Zástupkyně mistra přípravného osvětlení (Rigging Best Girl Electric)",
+          "neutral": "Zástupce/zástupkyně mistra přípravného osvětlení"
+        },
+        "r_7fce7d6fcf12": {
+          "masculine": "Elektrikář přípravných instalací",
+          "feminine": "Elektrikářka přípravných instalací",
+          "neutral": "Elektrikář/ka přípravných instalací"
+        },
+        "r_1bcf9d8d9b03": {
+          "masculine": "Osvětlovač (elektrikář)",
+          "feminine": "Osvětlovačka (elektrikář)",
+          "neutral": "Osvětlovač/ka (elektrikář)"
+        },
+        "r_d95b919dded9": {
+          "masculine": "Mistr osvětlení",
+          "feminine": "Mistryně osvětlení",
+          "neutral": "Mistr/yně osvětlení"
+        },
+        "r_de223259b793": {
+          "masculine": "Operátor světelného pultu",
+          "feminine": "Operátorka světelného pultu",
+          "neutral": "Operátor/ka světelného pultu"
+        },
+        "r_d927855afff9": {
+          "masculine": "Asistent světelného pultu",
+          "feminine": "Asistentka světelného pultu",
+          "neutral": "Asistent/ka světelného pultu"
+        },
+        "r_56ad1c6a1ad4": {
+          "masculine": "Programátor osvětlení (DMX)",
+          "feminine": "Programátorka osvětlení (DMX)",
+          "neutral": "Programátor/ka osvětlení (DMX)"
+        },
+        "r_090ac2a092b8": {
+          "masculine": "Světelný technik",
+          "feminine": "Světelná technička",
+          "neutral": "Světelný/á technik/technička"
+        },
+        "r_d1edcbd50142": {
+          "masculine": "Řidič osvětlovací techniky",
+          "feminine": "Řidička osvětlovací techniky",
+          "neutral": "Řidič/ka osvětlovací techniky"
+        },
+        "r_7d79588c14f3": {
+          "masculine": "Dodatečný osvětlovač",
+          "feminine": "Dodatečná osvětlovačka",
+          "neutral": "Dodatečný/á osvětlovač/ka"
+        },
+        "r_b3d1d585beaa": {
+          "masculine": "Operátor generátoru",
+          "feminine": "Operátorka generátoru",
+          "neutral": "Operátor/ka generátoru"
+        },
+        "r_bcd4b312b67e": {
+          "masculine": "Správce kabeláže",
+          "feminine": "Správkyně kabeláže",
+          "neutral": "Správce/správkyně kabeláže"
+        },
+        "r_35cca1fe3c5c": {
+          "masculine": "Technik podvodního osvětlení",
+          "feminine": "Technička podvodního osvětlení",
+          "neutral": "Technik/technička podvodního osvětlení"
+        },
+        "r_89058c839b15": {
+          "masculine": "Operátor balónového světla",
+          "feminine": "Operátorka balónového světla",
+          "neutral": "Operátor/ka balónového světla"
+        },
+        "r_9bd915bb46a4": {
+          "masculine": "Operátor sledovacího reflektoru",
+          "feminine": "Operátorka sledovacího reflektoru",
+          "neutral": "Operátor/ka sledovacího reflektoru"
+        },
+        "r_2c0dd7b64cf3": {
+          "masculine": "Asistent osvětlení",
+          "feminine": "Asistentka osvětlení",
+          "neutral": "Asistent/ka osvětlení"
+        },
+        "r_0cc27c01ca07": {
+          "masculine": "Stážista osvětlení",
+          "feminine": "Stážistka osvětlení",
+          "neutral": "Stážista/stážistka osvětlení"
+        }
+      },
+      "grip": {
+        "r_470156bd03e4": {
+          "masculine": "Key grip",
+          "feminine": "Key grip",
+          "neutral": "Key grip"
+        },
+        "r_cfbf2a22ed6e": {
+          "masculine": "Zástupce vedoucího gripu (Best Boy Grip)",
+          "feminine": "Zástupkyně vedoucího gripu (Best Girl Grip)",
+          "neutral": "Zástupce/zástupkyně vedoucího gripu"
+        },
+        "r_32a6ab31b1a1": {
+          "masculine": "Dolly grip / operátor vozíku",
+          "feminine": "Dolly grip / operátorka vozíku",
+          "neutral": "Dolly grip / operátor/ka vozíku"
+        },
+        "r_376dc1f790b8": {
+          "masculine": "Grip / kamerová technika",
+          "feminine": "Grip / kamerová technika",
+          "neutral": "Grip / kamerová technika"
+        },
+        "r_dbfaadb8821c": {
+          "masculine": "Asistent gripu",
+          "feminine": "Asistentka gripu",
+          "neutral": "Asistent/ka gripu"
+        },
+        "r_46dab52c1995": {
+          "masculine": "Grip přípravných instalací",
+          "feminine": "Grip přípravných instalací",
+          "neutral": "Grip přípravných instalací"
+        },
+        "r_ea7e925bd850": {
+          "masculine": "Key grip přípravných instalací",
+          "feminine": "Key grip přípravných instalací",
+          "neutral": "Key grip přípravných instalací"
+        },
+        "r_fa9d72fc7978": {
+          "masculine": "Zástupce vedoucího přípravného gripu (Rigging Best Boy Grip)",
+          "feminine": "Zástupkyně vedoucího přípravného gripu (Rigging Best Girl Grip)",
+          "neutral": "Zástupce/zástupkyně vedoucího přípravného gripu"
+        },
+        "r_2fa0b44342d7": {
+          "masculine": "Speciální konstrukce pro kameru",
+          "feminine": "Speciální konstrukce pro kameru",
+          "neutral": "Speciální konstrukce pro kameru"
+        },
+        "r_08c07afebb7f": {
+          "masculine": "Operátor kamerového jeřábu / jibu",
+          "feminine": "Operátorka kamerového jeřábu / jibu",
+          "neutral": "Operátor/ka kamerového jeřábu / jibu"
+        },
+        "r_5ece318b289f": {
+          "masculine": "Technik kamerového jeřábu",
+          "feminine": "Technička kamerového jeřábu",
+          "neutral": "Technik/technička kamerového jeřábu"
+        },
+        "r_a5c74e86fb2b": {
+          "masculine": "Operátor U-Crane / Technocrane",
+          "feminine": "Operátorka U-Crane / Technocrane",
+          "neutral": "Operátor/ka U-Crane / Technocrane"
+        },
+        "r_819dd64bff9d": {
+          "masculine": "Technik / operátor dálkově ovládané hlavy",
+          "feminine": "Technička / operátorka dálkově ovládané hlavy",
+          "neutral": "Technik/technička / operátor/ka dálkově ovládané hlavy"
+        },
+        "r_9c6f674da63a": {
+          "masculine": "Stážista gripu",
+          "feminine": "Stážistka gripu",
+          "neutral": "Stážista/stážistka gripu"
+        }
+      },
+      "ton": {
+        "r_fccf287d8f40": {
+          "masculine": "Mistr zvuku / mixážní technik",
+          "feminine": "Mistryně zvuku / mixážní technička",
+          "neutral": "Mistr/yně zvuku / mixážní technik/technička"
+        },
+        "r_54f3d59eb241": {
+          "masculine": "Mistr kontaktního zvuku",
+          "feminine": "Mistryně kontaktního zvuku",
+          "neutral": "Mistr/yně kontaktního zvuku"
+        },
+        "r_b0c1942e7358": {
+          "masculine": "Filmový mistr zvuku",
+          "feminine": "Filmová mistryně zvuku",
+          "neutral": "Filmový/á mistr/yně zvuku"
+        },
+        "r_8b1cc700407b": {
+          "masculine": "Mikrofonista",
+          "feminine": "Mikrofonistka",
+          "neutral": "Mikrofonista/mikrofonistka"
+        },
+        "r_fd909904c9c7": {
+          "masculine": "Asistent zvuku",
+          "feminine": "Asistentka zvuku",
+          "neutral": "Asistent/ka zvuku"
+        },
+        "r_4c5fe4b3a1f3": {
+          "masculine": "První asistent zvuku",
+          "feminine": "První asistentka zvuku",
+          "neutral": "První asistent/ka zvuku"
+        },
+        "r_ab87e9473072": {
+          "masculine": "První asistent filmového zvuku",
+          "feminine": "První asistentka filmového zvuku",
+          "neutral": "První asistent/ka filmového zvuku"
+        },
+        "r_d83df9d29ab1": {
+          "masculine": "Druhý asistent zvuku",
+          "feminine": "Druhá asistentka zvuku",
+          "neutral": "Druhý/á asistent/ka zvuku"
+        },
+        "r_8377b0674c5d": {
+          "masculine": "Druhý asistent filmového zvuku",
+          "feminine": "Druhá asistentka filmového zvuku",
+          "neutral": "Druhý/á asistent/ka filmového zvuku"
+        },
+        "r_93302391f02a": {
+          "masculine": "Mikrofonista ADR / dabingu",
+          "feminine": "Mikrofonistka ADR / dabingu",
+          "neutral": "Mikrofonista/mikrofonistka ADR / dabingu"
+        },
+        "r_3e7456f82724": {
+          "masculine": "Zvukař prostorového záznamu",
+          "feminine": "Zvukařka prostorového záznamu",
+          "neutral": "Zvukař/ka prostorového záznamu"
+        },
+        "r_352c199bfbc1": {
+          "masculine": "Pomocný zvukový technik",
+          "feminine": "Pomocná zvuková technička",
+          "neutral": "Pomocný/á zvukový/á technik/technička"
+        },
+        "r_fdfa14e36d06": {
+          "masculine": "Asistent zvukového vybavení",
+          "feminine": "Asistentka zvukového vybavení",
+          "neutral": "Asistent/ka zvukového vybavení"
+        },
+        "r_9615bbb28141": {
+          "masculine": "Operátor zvukového přehrávání",
+          "feminine": "Operátorka zvukového přehrávání",
+          "neutral": "Operátor/ka zvukového přehrávání"
+        },
+        "r_13544e0c2d08": {
+          "masculine": "Zvukař (dokumentární tvorba)",
+          "feminine": "Zvukařka (dokumentární tvorba)",
+          "neutral": "Zvukař/ka (dokumentární tvorba)"
+        },
+        "r_f804f9794c40": {
+          "masculine": "Zvukový stážista",
+          "feminine": "Zvuková stážistka",
+          "neutral": "Zvukový/á stážista/stážistka"
+        },
+        "r_26ad417384db": {
+          "masculine": "Zvukový designér",
+          "feminine": "Zvuková designérka",
+          "neutral": "Zvukový/á designér/ka"
+        },
+        "r_e4afa3da823e": {
+          "masculine": "Vedoucí zvukového střihu",
+          "feminine": "Vedoucí zvukového střihu",
+          "neutral": "Vedoucí zvukového střihu"
+        },
+        "r_754377fae1cb": {
+          "masculine": "Střihač dialogů",
+          "feminine": "Střihačka dialogů",
+          "neutral": "Střihač/ka dialogů"
+        },
+        "r_a80f60e08e2f": {
+          "masculine": "Střihač ADR",
+          "feminine": "Střihačka ADR",
+          "neutral": "Střihač/ka ADR"
+        },
+        "r_65ab3bc0b779": {
+          "masculine": "Supervizor ADR",
+          "feminine": "Supervizorka ADR",
+          "neutral": "Supervizor/ka ADR"
+        },
+        "r_927d0ca8e1d9": {
+          "masculine": "Ruchař",
+          "feminine": "Ruchařka",
+          "neutral": "Ruchař/ka"
+        },
+        "r_c196984117d7": {
+          "masculine": "Střihač ruchů",
+          "feminine": "Střihačka ruchů",
+          "neutral": "Střihač/ka ruchů"
+        },
+        "r_df6ebbcf6038": {
+          "masculine": "Mistr výsledné mixáže",
+          "feminine": "Mistryně výsledné mixáže",
+          "neutral": "Mistr/yně výsledné mixáže"
+        },
+        "r_f4776d32d356": {
+          "masculine": "Operátor přehrávání",
+          "feminine": "Operátorka přehrávání",
+          "neutral": "Operátor/ka přehrávání"
+        },
+        "r_6abc8617e983": {
+          "masculine": "Zvukový supervizor",
+          "feminine": "Zvuková supervizorka",
+          "neutral": "Zvukový/á supervizor/ka"
+        },
+        "r_0faba800cb95": {
+          "masculine": "Mistr hudební mixáže",
+          "feminine": "Mistryně hudební mixáže",
+          "neutral": "Mistr/yně hudební mixáže"
+        },
+        "r_a5fba4295f52": {
+          "masculine": "Nahrávání hudby",
+          "feminine": "Nahrávání hudby",
+          "neutral": "Nahrávání hudby"
+        },
+        "r_f2e629941a7a": {
+          "masculine": "Mistr dabingové mixáže",
+          "feminine": "Mistryně dabingové mixáže",
+          "neutral": "Mistr/yně dabingové mixáže"
+        },
+        "r_f73a9a076c95": {
+          "masculine": "Mistr mixáže audiopopisu",
+          "feminine": "Mistryně mixáže audiopopisu",
+          "neutral": "Mistr/yně mixáže audiopopisu"
+        },
+        "r_9d583d9712f5": {
+          "masculine": "Asistent mistra mixáže",
+          "feminine": "Asistentka mistra mixáže",
+          "neutral": "Asistent/ka mistra mixáže"
+        },
+        "r_c4334fc01411": {
+          "masculine": "Technik zvukového masteringu",
+          "feminine": "Technička zvukového masteringu",
+          "neutral": "Technik/technička zvukového masteringu"
+        },
+        "r_6a7ea11d04ed": {
+          "masculine": "Asistent zvukového designu",
+          "feminine": "Asistentka zvukového designu",
+          "neutral": "Asistent/ka zvukového designu"
+        },
+        "r_539e45fc2e6d": {
+          "masculine": "Vedoucí střihu ADR",
+          "feminine": "Vedoucí střihu ADR",
+          "neutral": "Vedoucí střihu ADR"
+        },
+        "r_021e586f6845": {
+          "masculine": "Vedoucí střihu dialogů a ADR",
+          "feminine": "Vedoucí střihu dialogů a ADR",
+          "neutral": "Vedoucí střihu dialogů a ADR"
+        },
+        "r_58f4b9fff63e": {
+          "masculine": "Vedoucí střihu dialogů",
+          "feminine": "Vedoucí střihu dialogů",
+          "neutral": "Vedoucí střihu dialogů"
+        },
+        "r_934c9dff31b6": {
+          "masculine": "Vedoucí střihu ruchů",
+          "feminine": "Vedoucí střihu ruchů",
+          "neutral": "Vedoucí střihu ruchů"
+        },
+        "r_8ffed7b496e8": {
+          "masculine": "Střihač dialogů",
+          "feminine": "Střihačka dialogů",
+          "neutral": "Střihač/ka dialogů"
+        },
+        "r_37f0cea40905": {
+          "masculine": "Střihač zvukových efektů",
+          "feminine": "Střihačka zvukových efektů",
+          "neutral": "Střihač/ka zvukových efektů"
+        },
+        "r_e22d9239a33f": {
+          "masculine": "Střihač dabingových dialogů",
+          "feminine": "Střihačka dabingových dialogů",
+          "neutral": "Střihač/ka dabingových dialogů"
+        },
+        "r_cf36114f7a15": {
+          "masculine": "Střihač ruchů",
+          "feminine": "Střihačka ruchů",
+          "neutral": "Střihač/ka ruchů"
+        },
+        "r_7ca65f7a0064": {
+          "masculine": "Střihač ADR / dabingu",
+          "feminine": "Střihačka ADR / dabingu",
+          "neutral": "Střihač/ka ADR / dabingu"
+        },
+        "r_944e077953d3": {
+          "masculine": "Asistent zvukového střihu",
+          "feminine": "Asistentka zvukového střihu",
+          "neutral": "Asistent/ka zvukového střihu"
+        },
+        "r_9d4ed0bf92ee": {
+          "masculine": "Mistr zvuku ADR / dabingu",
+          "feminine": "Mistryně zvuku ADR / dabingu",
+          "neutral": "Mistr/yně zvuku ADR / dabingu"
+        },
+        "r_b3e198ffbf29": {
+          "masculine": "Mistr záznamu ruchů",
+          "feminine": "Mistryně záznamu ruchů",
+          "neutral": "Mistr/yně záznamu ruchů"
+        },
+        "r_c41c6bc414c3": {
+          "masculine": "Vedoucí produkce dabingu",
+          "feminine": "Vedoucí produkce dabingu",
+          "neutral": "Vedoucí produkce dabingu"
+        },
+        "r_2b6bc11139d6": {
+          "masculine": "Vedoucí nahrávání dabingu / supervizor ADR",
+          "feminine": "Vedoucí nahrávání dabingu / supervizorka ADR",
+          "neutral": "Vedoucí nahrávání dabingu / supervizor/ka ADR"
+        },
+        "r_6645c4583551": {
+          "masculine": "Asistent vedoucího nahrávání dabingu / supervizora ADR",
+          "feminine": "Asistentka vedoucího nahrávání dabingu / supervizora ADR",
+          "neutral": "Asistent/ka vedoucího nahrávání dabingu / supervizora ADR"
+        },
+        "r_2f0b82350b59": {
+          "masculine": "Asistent ruchaře",
+          "feminine": "Asistentka ruchaře",
+          "neutral": "Asistent/ka ruchaře"
+        },
+        "r_a4171d6359fb": {
+          "masculine": "Stážista zvukové postprodukce",
+          "feminine": "Stážistka zvukové postprodukce",
+          "neutral": "Stážista/stážistka zvukové postprodukce"
+        },
+        "r_9e4b74ecd5ff": {
+          "masculine": "Technický supervizor ADR",
+          "feminine": "Technická supervizorka ADR",
+          "neutral": "Technický/á supervizor/ka ADR"
+        }
+      },
+      "art": {
+        "r_ff29ce0e215c": {
+          "masculine": "Hlavní výtvarník",
+          "feminine": "Hlavní výtvarnice",
+          "neutral": "Hlavní výtvarník/výtvarnice"
+        },
+        "r_f3db07db6bf4": {
+          "masculine": "Scénograf",
+          "feminine": "Scénografka",
+          "neutral": "Scénograf/ka"
+        },
+        "r_97a0a726b446": {
+          "masculine": "Vedoucí výtvarník",
+          "feminine": "Vedoucí výtvarnice",
+          "neutral": "Vedoucí výtvarník/výtvarnice"
+        },
+        "r_3f274caf46f5": {
+          "masculine": "Výtvarník",
+          "feminine": "Výtvarnice",
+          "neutral": "Výtvarník/výtvarnice"
+        },
+        "r_7e93c2713534": {
+          "masculine": "Výtvarník na place",
+          "feminine": "Výtvarnice na place",
+          "neutral": "Výtvarník/výtvarnice na place"
+        },
+        "r_891f7ee6a391": {
+          "masculine": "Asistent výtvarníka",
+          "feminine": "Asistentka výtvarníka",
+          "neutral": "Asistent/ka výtvarníka"
+        },
+        "r_29765953355c": {
+          "masculine": "Asistent scénografa",
+          "feminine": "Asistentka scénografa",
+          "neutral": "Asistent/ka scénografa"
+        },
+        "r_8543a5c61931": {
+          "masculine": "Asistent výpravy",
+          "feminine": "Asistentka výpravy",
+          "neutral": "Asistent/ka výpravy"
+        },
+        "r_3ffad936200e": {
+          "masculine": "Návrhář dekorací",
+          "feminine": "Návrhářka dekorací",
+          "neutral": "Návrhář/ka dekorací"
+        },
+        "r_bce8305a5535": {
+          "masculine": "CAD návrhář",
+          "feminine": "CAD návrhářka",
+          "neutral": "CAD návrhář/ka"
+        },
+        "r_b5a1fa9969c7": {
+          "masculine": "Konceptuální výtvarník",
+          "feminine": "Konceptuální výtvarnice",
+          "neutral": "Konceptuální výtvarník/výtvarnice"
+        },
+        "r_f1dbbb97b010": {
+          "masculine": "Konceptuální výtvarník (výprava)",
+          "feminine": "Konceptuální výtvarnice (výprava)",
+          "neutral": "Konceptuální výtvarník/výtvarnice (výprava)"
+        },
+        "r_57a4a106cbd6": {
+          "masculine": "Ilustrátor",
+          "feminine": "Ilustrátorka",
+          "neutral": "Ilustrátor/ka"
+        },
+        "r_6aa3fecc3ba9": {
+          "masculine": "Grafik (scénická grafika)",
+          "feminine": "Grafička (scénická grafika)",
+          "neutral": "Grafik/grafička (scénická grafika)"
+        },
+        "r_6978775ad99b": {
+          "masculine": "Vedoucí grafik",
+          "feminine": "Vedoucí grafička",
+          "neutral": "Vedoucí grafik/grafička"
+        },
+        "r_7534f951d040": {
+          "masculine": "Grafik výpravy",
+          "feminine": "Grafička výpravy",
+          "neutral": "Grafik/grafička výpravy"
+        },
+        "r_a8e10d0ecc47": {
+          "masculine": "Skaut vizuálních referencí / grafik sazby",
+          "feminine": "Skautka vizuálních referencí / grafička sazby",
+          "neutral": "Skaut/ka vizuálních referencí / grafik/grafička sazby"
+        },
+        "r_a1ce9e299c8f": {
+          "masculine": "Dekoratér",
+          "feminine": "Dekoratérka",
+          "neutral": "Dekoratér/ka"
+        },
+        "r_420521110dcc": {
+          "masculine": "Koordinátor dekorací",
+          "feminine": "Koordinátorka dekorací",
+          "neutral": "Koordinátor/ka dekorací"
+        },
+        "r_d5b7a7d716a2": {
+          "masculine": "Asistent dekoratéra",
+          "feminine": "Asistentka dekoratéra",
+          "neutral": "Asistent/ka dekoratéra"
+        },
+        "r_d0964de45366": {
+          "masculine": "Nákupčí dekorací",
+          "feminine": "Nákupčí dekorací",
+          "neutral": "Nákupčí dekorací"
+        },
+        "r_10a8275fbc87": {
+          "masculine": "Vedoucí skladu dekorací",
+          "feminine": "Vedoucí skladu dekorací",
+          "neutral": "Vedoucí skladu dekorací"
+        },
+        "r_1df861fbde16": {
+          "masculine": "Asistent koordinátora dekorací",
+          "feminine": "Asistentka koordinátora dekorací",
+          "neutral": "Asistent/ka koordinátora dekorací"
+        },
+        "r_393242957f26": {
+          "masculine": "Aranžér scény",
+          "feminine": "Aranžérka scény",
+          "neutral": "Aranžér/ka scény"
+        },
+        "r_e3ce1061c0ff": {
+          "masculine": "Vedoucí aranžér",
+          "feminine": "Vedoucí aranžérka",
+          "neutral": "Vedoucí aranžér/ka"
+        },
+        "r_d588cad49b89": {
+          "masculine": "Vedoucí aranžér scény",
+          "feminine": "Vedoucí aranžérka scény",
+          "neutral": "Vedoucí aranžér/ka scény"
+        },
+        "r_6cafa4dd814b": {
+          "masculine": "Vedoucí rekvizitář",
+          "feminine": "Vedoucí rekvizitářka",
+          "neutral": "Vedoucí rekvizitář/ka"
+        },
+        "r_413221e86652": {
+          "masculine": "Rekvizitář",
+          "feminine": "Rekvizitářka",
+          "neutral": "Rekvizitář/ka"
+        },
+        "r_a1e9f4cffb70": {
+          "masculine": "Externí rekvizitář",
+          "feminine": "Externí rekvizitářka",
+          "neutral": "Externí rekvizitář/ka"
+        },
+        "r_8f20bee45473": {
+          "masculine": "Rekvizitář na place",
+          "feminine": "Rekvizitářka na place",
+          "neutral": "Rekvizitář/ka na place"
+        },
+        "r_7d553f96df87": {
+          "masculine": "Scénický rekvizitář",
+          "feminine": "Scénická rekvizitářka",
+          "neutral": "Scénický/á rekvizitář/ka"
+        },
+        "r_bf9d71b6fdc2": {
+          "masculine": "Pohotovostní rekvizitář",
+          "feminine": "Pohotovostní rekvizitářka",
+          "neutral": "Pohotovostní rekvizitář/ka"
+        },
+        "r_a38576fafdab": {
+          "masculine": "Asistent rekvizit",
+          "feminine": "Asistentka rekvizit",
+          "neutral": "Asistent/ka rekvizit"
+        },
+        "r_ea2b2fab38f4": {
+          "masculine": "Asistent rekvizitáře",
+          "feminine": "Asistentka rekvizitáře",
+          "neutral": "Asistent/ka rekvizitáře"
+        },
+        "r_b685fb4dc943": {
+          "masculine": "Asistent externího rekvizitáře",
+          "feminine": "Asistentka externího rekvizitáře",
+          "neutral": "Asistent/ka externího rekvizitáře"
+        },
+        "r_7b9477ba5686": {
+          "masculine": "Asistent scénických rekvizit",
+          "feminine": "Asistentka scénických rekvizit",
+          "neutral": "Asistent/ka scénických rekvizit"
+        },
+        "r_541c87622274": {
+          "masculine": "Nákupčí rekvizit",
+          "feminine": "Nákupčí rekvizit",
+          "neutral": "Nákupčí rekvizit"
+        },
+        "r_3c2dae1ec180": {
+          "masculine": "Nákupčí dekorací",
+          "feminine": "Nákupčí dekorací",
+          "neutral": "Nákupčí dekorací"
+        },
+        "r_c17d76240812": {
+          "masculine": "Vedoucí skladu rekvizit",
+          "feminine": "Vedoucí skladu rekvizit",
+          "neutral": "Vedoucí skladu rekvizit"
+        },
+        "r_6a373738f331": {
+          "masculine": "Návrhář digitálních rekvizit",
+          "feminine": "Návrhářka digitálních rekvizit",
+          "neutral": "Návrhář/ka digitálních rekvizit"
+        },
+        "r_404bfcb27b87": {
+          "masculine": "Vedoucí digitálních rekvizit",
+          "feminine": "Vedoucí digitálních rekvizit",
+          "neutral": "Vedoucí digitálních rekvizit"
+        },
+        "r_efdc51e3e8eb": {
+          "masculine": "Výrobce rekvizit",
+          "feminine": "Výrobkyně rekvizit",
+          "neutral": "Výrobce/výrobkyně rekvizit"
+        },
+        "r_30872cd93e0c": {
+          "masculine": "Návrhář rekvizit",
+          "feminine": "Návrhářka rekvizit",
+          "neutral": "Návrhář/ka rekvizit"
+        },
+        "r_264fc56ea7a5": {
+          "masculine": "Poradce pro zbraně",
+          "feminine": "Poradkyně pro zbraně",
+          "neutral": "Poradce/poradkyně pro zbraně"
+        },
+        "r_00f9e2afb019": {
+          "masculine": "Pomocník rekvizit",
+          "feminine": "Pomocnice rekvizit",
+          "neutral": "Pomocník/pomocnice rekvizit"
+        },
+        "r_ef64ec97e93f": {
+          "masculine": "Malíř rekvizit",
+          "feminine": "Malířka rekvizit",
+          "neutral": "Malíř/ka rekvizit"
+        },
+        "r_8a17379f4cf2": {
+          "masculine": "Řidič rekvizit",
+          "feminine": "Řidička rekvizit",
+          "neutral": "Řidič/ka rekvizit"
+        },
+        "r_fb928031fe07": {
+          "masculine": "Koordinátor vozidel do záběru",
+          "feminine": "Koordinátorka vozidel do záběru",
+          "neutral": "Koordinátor/ka vozidel do záběru"
+        },
+        "r_77928b37c49d": {
+          "masculine": "Správce vozidel do záběru",
+          "feminine": "Správkyně vozidel do záběru",
+          "neutral": "Správce/správkyně vozidel do záběru"
+        },
+        "r_115e6da0f002": {
+          "masculine": "Elektrikář scénických svítidel",
+          "feminine": "Elektrikářka scénických svítidel",
+          "neutral": "Elektrikář/ka scénických svítidel"
+        },
+        "r_857a05036004": {
+          "masculine": "Vedoucí zeleně",
+          "feminine": "Vedoucí zeleně",
+          "neutral": "Vedoucí zeleně"
+        },
+        "r_d8e3dea65e7b": {
+          "masculine": "Zahradní výtvarník",
+          "feminine": "Zahradní výtvarnice",
+          "neutral": "Zahradní výtvarník/výtvarnice"
+        },
+        "r_aa5ce508ee21": {
+          "masculine": "Květinový výtvarník",
+          "feminine": "Květinová výtvarnice",
+          "neutral": "Květinový/á výtvarník/výtvarnice"
+        },
+        "r_36b1709b4159": {
+          "masculine": "Food stylista",
+          "feminine": "Food stylistka",
+          "neutral": "Food stylista/stylistka"
+        },
+        "r_40b095fdeb85": {
+          "masculine": "Airbrush výtvarník",
+          "feminine": "Airbrush výtvarnice",
+          "neutral": "Airbrush výtvarník/výtvarnice"
+        },
+        "r_afee4f58989a": {
+          "masculine": "Umělecký malíř",
+          "feminine": "Umělecká malířka",
+          "neutral": "Umělecký/á malíř/ka"
+        },
+        "r_c056e02e39c4": {
+          "masculine": "Malíř dekorací",
+          "feminine": "Malířka dekorací",
+          "neutral": "Malíř/ka dekorací"
+        },
+        "r_e689709eac01": {
+          "masculine": "Vedoucí malíř dekorací",
+          "feminine": "Vedoucí malířka dekorací",
+          "neutral": "Vedoucí malíř/ka dekorací"
+        },
+        "r_70a7586bb774": {
+          "masculine": "Písmomalíř",
+          "feminine": "Písmomalířka",
+          "neutral": "Písmomalíř/ka"
+        },
+        "r_12f20cf536a1": {
+          "masculine": "Malíř / scénický výtvarník",
+          "feminine": "Malířka / scénická výtvarnice",
+          "neutral": "Malíř/ka / scénický/á výtvarník/výtvarnice"
+        },
+        "r_dcf49adce47b": {
+          "masculine": "Sochař / plastik",
+          "feminine": "Sochařka / plastik",
+          "neutral": "Sochař/ka / plastik"
+        },
+        "r_f4670c7a29a7": {
+          "masculine": "Scénický sochař",
+          "feminine": "Scénická sochařka",
+          "neutral": "Scénický/á sochař/ka"
+        },
+        "r_5fc07d2f3030": {
+          "masculine": "Modelář",
+          "feminine": "Modelářka",
+          "neutral": "Modelář/ka"
+        },
+        "r_f545a993cec8": {
+          "masculine": "Vedoucí miniatur",
+          "feminine": "Vedoucí miniatur",
+          "neutral": "Vedoucí miniatur"
+        },
+        "r_d3f5fd4b86c3": {
+          "masculine": "Supervizor miniaturních efektů",
+          "feminine": "Supervizorka miniaturních efektů",
+          "neutral": "Supervizor/ka miniaturních efektů"
+        },
+        "r_a6d3fd7eaada": {
+          "masculine": "Vedoucí stavby",
+          "feminine": "Vedoucí stavby",
+          "neutral": "Vedoucí stavby"
+        },
+        "r_ca83b607f08e": {
+          "masculine": "Koordinátor stavby",
+          "feminine": "Koordinátorka stavby",
+          "neutral": "Koordinátor/ka stavby"
+        },
+        "r_fbcfd1e1839b": {
+          "masculine": "Vedoucí stavby studiových kulis",
+          "feminine": "Vedoucí stavby studiových kulis",
+          "neutral": "Vedoucí stavby studiových kulis"
+        },
+        "r_0231e128483a": {
+          "masculine": "Stavěč dekorací / tesař",
+          "feminine": "Stavěčka dekorací / tesařka",
+          "neutral": "Stavěč/ka dekorací / tesař/ka"
+        },
+        "r_62f07946c8f1": {
+          "masculine": "Stavba dekorací",
+          "feminine": "Stavba dekorací",
+          "neutral": "Stavba dekorací"
+        },
+        "r_a3c94f3f3cd1": {
+          "masculine": "Jevištní mistr",
+          "feminine": "Jevištní mistryně",
+          "neutral": "Jevištní mistr/yně"
+        },
+        "r_c606af121ce8": {
+          "masculine": "Jevištní technik",
+          "feminine": "Jevištní technička",
+          "neutral": "Jevištní technik/technička"
+        },
+        "r_2017ec503138": {
+          "masculine": "Konstrukční kreslič",
+          "feminine": "Konstrukční kreslička",
+          "neutral": "Konstrukční kreslič/ka"
+        },
+        "r_169af74d49f6": {
+          "masculine": "Zedník",
+          "feminine": "Zednice",
+          "neutral": "Zedník/zednice"
+        },
+        "r_578a92348ec6": {
+          "masculine": "Zámečník (kov)",
+          "feminine": "Zámečnice (kov)",
+          "neutral": "Zámečník/zámečnice (kov)"
+        },
+        "r_6c7b48200cb3": {
+          "masculine": "Zámečník",
+          "feminine": "Zámečnice",
+          "neutral": "Zámečník/zámečnice"
+        },
+        "r_e7f7da33c876": {
+          "masculine": "Vedoucí zámečník",
+          "feminine": "Vedoucí zámečnice",
+          "neutral": "Vedoucí zámečník/zámečnice"
+        },
+        "r_027c0b61577d": {
+          "masculine": "Štukatér",
+          "feminine": "Štukatérka",
+          "neutral": "Štukatér/ka"
+        },
+        "r_8d5fe63edbd3": {
+          "masculine": "Čalouník",
+          "feminine": "Čalounice",
+          "neutral": "Čalouník/čalounice"
+        },
+        "r_61ab14bcf2c6": {
+          "masculine": "Truhlář",
+          "feminine": "Truhlářka",
+          "neutral": "Truhlář/ka"
+        },
+        "r_3addd9ac0457": {
+          "masculine": "Soustružník",
+          "feminine": "Soustružnice",
+          "neutral": "Soustružník/soustružnice"
+        },
+        "r_be99bdf8e0ab": {
+          "masculine": "Koordinátor výpravy",
+          "feminine": "Koordinátorka výpravy",
+          "neutral": "Koordinátor/ka výpravy"
+        },
+        "r_9187325e0d84": {
+          "masculine": "Asistent koordinátora výpravy",
+          "feminine": "Asistentka koordinátora výpravy",
+          "neutral": "Asistent/ka koordinátora výpravy"
+        },
+        "r_a8af82f5e937": {
+          "masculine": "Pomocník výpravy",
+          "feminine": "Pomocnice výpravy",
+          "neutral": "Pomocník/pomocnice výpravy"
+        },
+        "r_8310307922eb": {
+          "masculine": "Stážista výpravy",
+          "feminine": "Stážistka výpravy",
+          "neutral": "Stážista/stážistka výpravy"
+        },
+        "r_f7d87853929b": {
+          "masculine": "Řidič dekorací",
+          "feminine": "Řidička dekorací",
+          "neutral": "Řidič/ka dekorací"
+        },
+        "r_71506d96f350": {
+          "masculine": "Grafický designér",
+          "feminine": "Grafická designérka",
+          "neutral": "Grafický/á designér/ka"
+        },
+        "r_dd224ea66364": {
+          "masculine": "Péče o produkt",
+          "feminine": "Péče o produkt",
+          "neutral": "Péče o produkt"
+        },
+        "r_b2e24af2a895": {
+          "masculine": "Grafický výtvarník",
+          "feminine": "Grafická výtvarnice",
+          "neutral": "Grafický/á výtvarník/výtvarnice"
+        },
+        "r_c399668f6f57": {
+          "masculine": "Vedoucí počítačového a video přehrávání",
+          "feminine": "Vedoucí počítačového a video přehrávání",
+          "neutral": "Vedoucí počítačového a video přehrávání"
+        },
+        "r_d278f8dea5ee": {
+          "masculine": "Stavěč dekorací",
+          "feminine": "Stavěčka dekorací",
+          "neutral": "Stavěč/ka dekorací"
+        },
+        "r_ed52a3596ba0": {
+          "masculine": "Stavba filmových dekorací",
+          "feminine": "Stavba filmových dekorací",
+          "neutral": "Stavba filmových dekorací"
+        },
+        "r_e3f39e455941": {
+          "masculine": "Pomocník stavby dekorací",
+          "feminine": "Pomocnice stavby dekorací",
+          "neutral": "Pomocník/pomocnice stavby dekorací"
+        },
+        "r_74a60171830a": {
+          "masculine": "Stavba podvodních scén",
+          "feminine": "Stavba podvodních scén",
+          "neutral": "Stavba podvodních scén"
+        },
+        "r_18c785ac7bd8": {
+          "masculine": "Rigging a speciální konstrukce",
+          "feminine": "Rigging a speciální konstrukce",
+          "neutral": "Rigging a speciální konstrukce"
+        },
+        "r_8f15fc164b86": {
+          "masculine": "Asistent konstrukčního kresliče",
+          "feminine": "Asistentka konstrukčního kresliče",
+          "neutral": "Asistent/ka konstrukčního kresliče"
+        },
+        "r_7e3c819b39ed": {
+          "masculine": "Vedoucí štukatér",
+          "feminine": "Vedoucí štukatérka",
+          "neutral": "Vedoucí štukatér/ka"
+        },
+        "r_24a7497a9f06": {
+          "masculine": "Textilní čalouník",
+          "feminine": "Textilní čalounice",
+          "neutral": "Textilní čalouník/čalounice"
+        },
+        "r_a279ae7e16ec": {
+          "masculine": "Vedoucí textilní čalouník",
+          "feminine": "Vedoucí textilní čalounice",
+          "neutral": "Vedoucí textilní čalouník/čalounice"
+        },
+        "r_0f2d76b6cc82": {
+          "masculine": "Vedoucí truhlář",
+          "feminine": "Vedoucí truhlářka",
+          "neutral": "Vedoucí truhlář/ka"
+        },
+        "r_08876b0452b5": {
+          "masculine": "Stážista výpravy",
+          "feminine": "Stážistka výpravy",
+          "neutral": "Stážista/stážistka výpravy"
+        }
+      },
+      "kostuem": {
+        "r_cfc0491e1daf": {
+          "masculine": "Kostýmní výtvarník",
+          "feminine": "Kostýmní výtvarnice",
+          "neutral": "Kostýmní výtvarník/výtvarnice"
+        },
+        "r_acbff2b1675d": {
+          "masculine": "Vedoucí kostýmů",
+          "feminine": "Vedoucí kostýmů",
+          "neutral": "Vedoucí kostýmů"
+        },
+        "r_4e5a29f37fde": {
+          "masculine": "Asistent vedoucího kostýmů",
+          "feminine": "Asistentka vedoucího kostýmů",
+          "neutral": "Asistent/ka vedoucího kostýmů"
+        },
+        "r_9dacdd987a87": {
+          "masculine": "Koordinátor kostýmů",
+          "feminine": "Koordinátorka kostýmů",
+          "neutral": "Koordinátor/ka kostýmů"
+        },
+        "r_3ea2819cc8c4": {
+          "masculine": "Asistent koordinátora kostýmů",
+          "feminine": "Asistentka koordinátora kostýmů",
+          "neutral": "Asistent/ka koordinátora kostýmů"
+        },
+        "r_3684af682bde": {
+          "masculine": "Asistent kostýmního výtvarníka",
+          "feminine": "Asistentka kostýmního výtvarníka",
+          "neutral": "Asistent/ka kostýmního výtvarníka"
+        },
+        "r_bca9201a3794": {
+          "masculine": "Druhý asistent kostýmního výtvarníka",
+          "feminine": "Druhá asistentka kostýmního výtvarníka",
+          "neutral": "Druhý/á asistent/ka kostýmního výtvarníka"
+        },
+        "r_570a76c15c34": {
+          "masculine": "Třetí asistent kostýmního výtvarníka",
+          "feminine": "Třetí asistentka kostýmního výtvarníka",
+          "neutral": "Třetí asistent/ka kostýmního výtvarníka"
+        },
+        "r_75358a18f698": {
+          "masculine": "Hlavní kostymér",
+          "feminine": "Hlavní kostymérka",
+          "neutral": "Hlavní kostymér/ka"
+        },
+        "r_df59c1f51566": {
+          "masculine": "Kostymér na place / garderobiér",
+          "feminine": "Kostymérka na place / garderobiérka",
+          "neutral": "Kostymér/ka na place / garderobiér/ka"
+        },
+        "r_7d1eb3e51b50": {
+          "masculine": "Dodatečný kostymér na place",
+          "feminine": "Dodatečná kostymérka na place",
+          "neutral": "Dodatečný/á kostymér/ka na place"
+        },
+        "r_aa38c8f5acdd": {
+          "masculine": "Asistent kostýmů na place",
+          "feminine": "Asistentka kostýmů na place",
+          "neutral": "Asistent/ka kostýmů na place"
+        },
+        "r_85a93499fa51": {
+          "masculine": "Vedoucí kostýmů komparzu",
+          "feminine": "Vedoucí kostýmů komparzu",
+          "neutral": "Vedoucí kostýmů komparzu"
+        },
+        "r_73f373881e68": {
+          "masculine": "Zkoušeč kostýmů komparzu",
+          "feminine": "Zkoušečka kostýmů komparzu",
+          "neutral": "Zkoušeč/ka kostýmů komparzu"
+        },
+        "r_82daef37fafd": {
+          "masculine": "Kostymér kostýmního vozu",
+          "feminine": "Kostymérka kostýmního vozu",
+          "neutral": "Kostymér/ka kostýmního vozu"
+        },
+        "r_40f30fffbd6a": {
+          "masculine": "Nákupčí kostýmů",
+          "feminine": "Nákupčí kostýmů",
+          "neutral": "Nákupčí kostýmů"
+        },
+        "r_60a2042cfa65": {
+          "masculine": "Účetní kostýmů",
+          "feminine": "Účetní kostýmů",
+          "neutral": "Účetní kostýmů"
+        },
+        "r_6ece4b3c2f60": {
+          "masculine": "Kostýmní mistr",
+          "feminine": "Kostýmní mistryně",
+          "neutral": "Kostýmní mistr/yně"
+        },
+        "r_bb614a4f62e2": {
+          "masculine": "Asistent kostýmů",
+          "feminine": "Asistentka kostýmů",
+          "neutral": "Asistent/ka kostýmů"
+        },
+        "r_86f8b66926fc": {
+          "masculine": "Kostýmní stážista",
+          "feminine": "Kostýmní stážistka",
+          "neutral": "Kostýmní stážista/stážistka"
+        },
+        "r_272717911d79": {
+          "masculine": "Krejčí",
+          "feminine": "Krejčová",
+          "neutral": "Krejčí/krejčová"
+        },
+        "r_3a35662b53a3": {
+          "masculine": "Šič / šič",
+          "feminine": "Šička / šička",
+          "neutral": "Šič/ka / šič/ka"
+        },
+        "r_298c04a0eec5": {
+          "masculine": "Textilní výtvarník",
+          "feminine": "Textilní výtvarnice",
+          "neutral": "Textilní výtvarník/výtvarnice"
+        },
+        "r_2a6b1e3320f5": {
+          "masculine": "Výrobce kostýmů",
+          "feminine": "Výrobkyně kostýmů",
+          "neutral": "Výrobce/výrobkyně kostýmů"
+        },
+        "r_066dc1f269bb": {
+          "masculine": "Výrobce kostýmních rekvizit",
+          "feminine": "Výrobkyně kostýmních rekvizit",
+          "neutral": "Výrobce/výrobkyně kostýmních rekvizit"
+        },
+        "r_83db0e1a7bff": {
+          "masculine": "Oděvní konstruktér",
+          "feminine": "Oděvní konstruktérka",
+          "neutral": "Oděvní konstruktér/ka"
+        },
+        "r_fc8d26a01b37": {
+          "masculine": "Dámský krejčí na míru",
+          "feminine": "Dámská krejčová na míru",
+          "neutral": "Dámský/á krejčí/krejčová na míru"
+        },
+        "r_9aaa9c423455": {
+          "masculine": "Pánský krejčí na míru",
+          "feminine": "Pánská krejčová na míru",
+          "neutral": "Pánský/á krejčí/krejčová na míru"
+        },
+        "r_975bb2c38b93": {
+          "masculine": "Kloboučník / modista",
+          "feminine": "Kloboučnice / modistka",
+          "neutral": "Kloboučník/kloboučnice / modista/modistka"
+        },
+        "r_e5cb00d76add": {
+          "masculine": "Výrobce korzetů",
+          "feminine": "Výrobkyně korzetů",
+          "neutral": "Výrobce/výrobkyně korzetů"
+        },
+        "r_f573123c66c5": {
+          "masculine": "Kostýmní ilustrátor",
+          "feminine": "Kostýmní ilustrátorka",
+          "neutral": "Kostýmní ilustrátor/ka"
+        },
+        "r_3218fd13d59c": {
+          "masculine": "Malíř / barvíř kostýmů",
+          "feminine": "Malířka / barvířka kostýmů",
+          "neutral": "Malíř/ka / barvíř/ka kostýmů"
+        },
+        "r_f8c4b94e93de": {
+          "masculine": "Patinér kostýmů",
+          "feminine": "Patinérka kostýmů",
+          "neutral": "Patinér/ka kostýmů"
+        },
+        "r_25bf82085577": {
+          "masculine": "Vyšívač kostýmů",
+          "feminine": "Vyšívačka kostýmů",
+          "neutral": "Vyšívač/ka kostýmů"
+        },
+        "r_4bd9dd09da1d": {
+          "masculine": "Rešeršista kostýmů",
+          "feminine": "Rešeršistka kostýmů",
+          "neutral": "Rešeršista/rešeršistka kostýmů"
+        },
+        "r_2efd6bda8664": {
+          "masculine": "Řidič kostýmů",
+          "feminine": "Řidička kostýmů",
+          "neutral": "Řidič/ka kostýmů"
+        },
+        "r_a723a074986b": {
+          "masculine": "Patinér kostýmů (stárnutí / opotřebení)",
+          "feminine": "Patinérka kostýmů (stárnutí / opotřebení)",
+          "neutral": "Patinér/ka kostýmů (stárnutí / opotřebení)"
+        },
+        "r_ac01a53c578c": {
+          "masculine": "Kostýmy pro speciální efekty",
+          "feminine": "Kostýmy pro speciální efekty",
+          "neutral": "Kostýmy pro speciální efekty"
+        },
+        "r_bbc01e9dad81": {
+          "masculine": "Stylista / asistent stylingu",
+          "feminine": "Stylistka / asistentka stylingu",
+          "neutral": "Stylista/stylistka / asistent/ka stylingu"
+        },
+        "r_0cf394ee7640": {
+          "masculine": "Kostýmní výtvarník (návrhy)",
+          "feminine": "Kostýmní výtvarnice (návrhy)",
+          "neutral": "Kostýmní výtvarník/výtvarnice (návrhy)"
+        },
+        "r_6e84493aa620": {
+          "masculine": "Kostýmní poradce",
+          "feminine": "Kostýmní poradkyně",
+          "neutral": "Kostýmní poradce/poradkyně"
+        },
+        "r_7673a5020856": {
+          "masculine": "Asistent kostýmního výtvarníka",
+          "feminine": "Asistentka kostýmního výtvarníka",
+          "neutral": "Asistent/ka kostýmního výtvarníka"
+        },
+        "r_1ca2128245c1": {
+          "masculine": "Koordinátor kostýmního oddělení",
+          "feminine": "Koordinátorka kostýmního oddělení",
+          "neutral": "Koordinátor/ka kostýmního oddělení"
+        },
+        "r_f707bb1f5992": {
+          "masculine": "Kostymér na place (garderobiér)",
+          "feminine": "Kostymérka na place (garderobiér)",
+          "neutral": "Kostymér/ka na place (garderobiér)"
+        },
+        "r_cc15942423ce": {
+          "masculine": "Asistent kostýmů na place",
+          "feminine": "Asistentka kostýmů na place",
+          "neutral": "Asistent/ka kostýmů na place"
+        },
+        "r_fa17db9ddd73": {
+          "masculine": "Stylista",
+          "feminine": "Stylistka",
+          "neutral": "Stylista/stylistka"
+        },
+        "r_510b1830a8a9": {
+          "masculine": "Asistent stylingu",
+          "feminine": "Asistentka stylingu",
+          "neutral": "Asistent/ka stylingu"
+        },
+        "r_cc5427b5207e": {
+          "masculine": "Kostýmní mistr",
+          "feminine": "Kostýmní mistryně",
+          "neutral": "Kostýmní mistr/yně"
+        },
+        "r_51e4b1b69e51": {
+          "masculine": "Dámský krejčí na míru",
+          "feminine": "Dámská krejčová na míru",
+          "neutral": "Dámský/á krejčí/krejčová na míru"
+        },
+        "r_c90f0f14aa1d": {
+          "masculine": "Pánský krejčí na míru",
+          "feminine": "Pánská krejčová na míru",
+          "neutral": "Pánský/á krejčí/krejčová na míru"
+        },
+        "r_b02e861df06e": {
+          "masculine": "Kloboučník",
+          "feminine": "Kloboučnice",
+          "neutral": "Kloboučník/kloboučnice"
+        },
+        "r_f4d2f92c7063": {
+          "masculine": "Výrobce korzetů",
+          "feminine": "Výrobkyně korzetů",
+          "neutral": "Výrobce/výrobkyně korzetů"
+        },
+        "r_60b06eb1a3e5": {
+          "masculine": "Garderobiér",
+          "feminine": "Garderobiérka",
+          "neutral": "Garderobiér/ka"
+        },
+        "r_b57d7945c2e1": {
+          "masculine": "Asistent kostýmů",
+          "feminine": "Asistentka kostýmů",
+          "neutral": "Asistent/ka kostýmů"
+        },
+        "r_2ac825cfa903": {
+          "masculine": "Krejčí",
+          "feminine": "Krejčová",
+          "neutral": "Krejčí/krejčová"
+        },
+        "r_f5c79a825c6d": {
+          "masculine": "Řidič kostýmů",
+          "feminine": "Řidička kostýmů",
+          "neutral": "Řidič/ka kostýmů"
+        },
+        "r_d964234f1385": {
+          "masculine": "Šič / šič",
+          "feminine": "Šička / šička",
+          "neutral": "Šič/ka / šič/ka"
+        },
+        "r_6371bcd4467e": {
+          "masculine": "Patinér kostýmů",
+          "feminine": "Patinérka kostýmů",
+          "neutral": "Patinér/ka kostýmů"
+        },
+        "r_93cc3465aeac": {
+          "masculine": "Malíř / barvíř kostýmů",
+          "feminine": "Malířka / barvířka kostýmů",
+          "neutral": "Malíř/ka / barvíř/ka kostýmů"
+        },
+        "r_9f631f727b98": {
+          "masculine": "Vyšívač kostýmů",
+          "feminine": "Vyšívačka kostýmů",
+          "neutral": "Vyšívač/ka kostýmů"
+        },
+        "r_fd593b68c6bd": {
+          "masculine": "Kostýmní ilustrátor",
+          "feminine": "Kostýmní ilustrátorka",
+          "neutral": "Kostýmní ilustrátor/ka"
+        },
+        "r_52cc391775b8": {
+          "masculine": "Stážista kostýmní výpravy",
+          "feminine": "Stážistka kostýmní výpravy",
+          "neutral": "Stážista/stážistka kostýmní výpravy"
+        }
+      },
+      "maske": {
+        "r_2cecb5bef109": {
+          "masculine": "Vedoucí masek a vlasů",
+          "feminine": "Vedoucí masek a vlasů",
+          "neutral": "Vedoucí masek a vlasů"
+        },
+        "r_8c46abf33a4b": {
+          "masculine": "Vlasový návrhář",
+          "feminine": "Vlasová návrhářka",
+          "neutral": "Vlasový/á návrhář/ka"
+        },
+        "r_afd55563be09": {
+          "masculine": "Návrhář vlasů a líčení",
+          "feminine": "Návrhářka vlasů a líčení",
+          "neutral": "Návrhář/ka vlasů a líčení"
+        },
+        "r_0d2723e6a8cc": {
+          "masculine": "Návrhář líčení",
+          "feminine": "Návrhářka líčení",
+          "neutral": "Návrhář/ka líčení"
+        },
+        "r_b73ceeda53dd": {
+          "masculine": "Vedoucí vlasů a líčení",
+          "feminine": "Vedoucí vlasů a líčení",
+          "neutral": "Vedoucí vlasů a líčení"
+        },
+        "r_913e5cf46a02": {
+          "masculine": "Hlavní maskér",
+          "feminine": "Hlavní maskérka",
+          "neutral": "Hlavní maskér/ka"
+        },
+        "r_495a42f74fbb": {
+          "masculine": "Hlavní vlasový stylista",
+          "feminine": "Hlavní vlasová stylistka",
+          "neutral": "Hlavní vlasový/á stylista/stylistka"
+        },
+        "r_ff414fc1a4e8": {
+          "masculine": "Maskér",
+          "feminine": "Maskérka",
+          "neutral": "Maskér/ka"
+        },
+        "r_ace166547405": {
+          "masculine": "Dodatečný maskér",
+          "feminine": "Dodatečná maskérka",
+          "neutral": "Dodatečný/á maskér/ka"
+        },
+        "r_96cb48e2539d": {
+          "masculine": "Vlasový stylista",
+          "feminine": "Vlasová stylistka",
+          "neutral": "Vlasový/á stylista/stylistka"
+        },
+        "r_3a06bbd5516b": {
+          "masculine": "Dodatečný vlasový stylista",
+          "feminine": "Dodatečná vlasová stylistka",
+          "neutral": "Dodatečný/á vlasový/á stylista/stylistka"
+        },
+        "r_a8a061642ea1": {
+          "masculine": "Vedoucí maskérského oddělení",
+          "feminine": "Vedoucí maskérského oddělení",
+          "neutral": "Vedoucí maskérského oddělení"
+        },
+        "r_988255c043c0": {
+          "masculine": "Tělové líčení",
+          "feminine": "Tělové líčení",
+          "neutral": "Tělové líčení"
+        },
+        "r_62302b472d3b": {
+          "masculine": "Dodatečný maskér",
+          "feminine": "Dodatečná maskérka",
+          "neutral": "Dodatečný/á maskér/ka"
+        },
+        "r_de6fbe18e529": {
+          "masculine": "Asistent líčení",
+          "feminine": "Asistentka líčení",
+          "neutral": "Asistent/ka líčení"
+        },
+        "r_89708da23c7a": {
+          "masculine": "Výrobce paruk",
+          "feminine": "Výrobkyně paruk",
+          "neutral": "Výrobce/výrobkyně paruk"
+        },
+        "r_eb0f745569de": {
+          "masculine": "Maskér protetiky",
+          "feminine": "Maskérka protetiky",
+          "neutral": "Maskér/ka protetiky"
+        },
+        "r_bc667775a067": {
+          "masculine": "Maskér speciálních efektů",
+          "feminine": "Maskérka speciálních efektů",
+          "neutral": "Maskér/ka speciálních efektů"
+        },
+        "r_a27c177f51ef": {
+          "masculine": "Vedoucí vlasů a líčení komparzu",
+          "feminine": "Vedoucí vlasů a líčení komparzu",
+          "neutral": "Vedoucí vlasů a líčení komparzu"
+        },
+        "r_e46c728a4398": {
+          "masculine": "Maskérský stážista",
+          "feminine": "Maskérská stážistka",
+          "neutral": "Maskérský/á stážista/stážistka"
+        },
+        "r_3bd74d7ca372": {
+          "masculine": "Hlavní maskér",
+          "feminine": "Hlavní maskérka",
+          "neutral": "Hlavní maskér/ka"
+        },
+        "r_1dbe2290254a": {
+          "masculine": "Vedoucí maskér",
+          "feminine": "Vedoucí maskérka",
+          "neutral": "Vedoucí maskér/ka"
+        },
+        "r_3e08c4bedcc0": {
+          "masculine": "Maskér tělového líčení",
+          "feminine": "Maskérka tělového líčení",
+          "neutral": "Maskér/ka tělového líčení"
+        },
+        "r_24c9ee41124f": {
+          "masculine": "Dodatečný maskér",
+          "feminine": "Dodatečná maskérka",
+          "neutral": "Dodatečný/á maskér/ka"
+        },
+        "r_6373cbbea77f": {
+          "masculine": "Výrobce paruk",
+          "feminine": "Výrobkyně paruk",
+          "neutral": "Výrobce/výrobkyně paruk"
+        },
+        "r_e9a07f599b31": {
+          "masculine": "Maskérský stážista",
+          "feminine": "Maskérská stážistka",
+          "neutral": "Maskérský/á stážista/stážistka"
+        }
+      },
+      "post": {
+        "r_f88d95239ea1": {
+          "masculine": "Postprodukční producent",
+          "feminine": "Postprodukční producentka",
+          "neutral": "Postprodukční producent/ka"
+        },
+        "r_4284177c72b3": {
+          "masculine": "Postprodukční supervizor",
+          "feminine": "Postprodukční supervizorka",
+          "neutral": "Postprodukční supervizor/ka"
+        },
+        "r_c2fb80f3e981": {
+          "masculine": "Vedoucí postprodukce",
+          "feminine": "Vedoucí postprodukce",
+          "neutral": "Vedoucí postprodukce"
+        },
+        "r_78b6f4ddb08c": {
+          "masculine": "Koordinátor postprodukce",
+          "feminine": "Koordinátorka postprodukce",
+          "neutral": "Koordinátor/ka postprodukce"
+        },
+        "r_0bb7e59012ae": {
+          "masculine": "Postprodukční disponent",
+          "feminine": "Postprodukční disponentka",
+          "neutral": "Postprodukční disponent/ka"
+        },
+        "r_b54fb6f974fa": {
+          "masculine": "Asistent postprodukčního supervizora",
+          "feminine": "Asistentka postprodukčního supervizora",
+          "neutral": "Asistent/ka postprodukčního supervizora"
+        },
+        "r_fae43b642354": {
+          "masculine": "Vedoucí dodání",
+          "feminine": "Vedoucí dodání",
+          "neutral": "Vedoucí dodání"
+        },
+        "r_54b281a42495": {
+          "masculine": "Střihač",
+          "feminine": "Střihačka",
+          "neutral": "Střihač/ka"
+        },
+        "r_eb67aee95450": {
+          "masculine": "Střihač (editor)",
+          "feminine": "Střihačka (editor)",
+          "neutral": "Střihač/ka (editor)"
+        },
+        "r_332deef8530f": {
+          "masculine": "Dodatečný střihač",
+          "feminine": "Dodatečná střihačka",
+          "neutral": "Dodatečný/á střihač/ka"
+        },
+        "r_4b8538db6e6e": {
+          "masculine": "Junior střihač",
+          "feminine": "Junior střihačka",
+          "neutral": "Junior střihač/ka"
+        },
+        "r_a000c69c93cd": {
+          "masculine": "První asistent střihu",
+          "feminine": "První asistentka střihu",
+          "neutral": "První asistent/ka střihu"
+        },
+        "r_fb53d3bb0ca0": {
+          "masculine": "Asistent střihu",
+          "feminine": "Asistentka střihu",
+          "neutral": "Asistent/ka střihu"
+        },
+        "r_58fb452bb25d": {
+          "masculine": "Druhý asistent střihu",
+          "feminine": "Druhá asistentka střihu",
+          "neutral": "Druhý/á asistent/ka střihu"
+        },
+        "r_e73f1067c3d0": {
+          "masculine": "Druhý asistent střihu",
+          "feminine": "Druhá asistentka střihu",
+          "neutral": "Druhý/á asistent/ka střihu"
+        },
+        "r_f40a64b53f4e": {
+          "masculine": "Třetí asistent střihu",
+          "feminine": "Třetí asistentka střihu",
+          "neutral": "Třetí asistent/ka střihu"
+        },
+        "r_f034db9da000": {
+          "masculine": "Střihový dramaturg",
+          "feminine": "Střihová dramaturgyně",
+          "neutral": "Střihový/á dramaturg/yně"
+        },
+        "r_9d8fc1953afd": {
+          "masculine": "VFX střihač",
+          "feminine": "VFX střihačka",
+          "neutral": "VFX střihač/ka"
+        },
+        "r_6742bca7f725": {
+          "masculine": "Střihač trailerů",
+          "feminine": "Střihačka trailerů",
+          "neutral": "Střihač/ka trailerů"
+        },
+        "r_0088f1d1581d": {
+          "masculine": "Střihač denních materiálů",
+          "feminine": "Střihačka denních materiálů",
+          "neutral": "Střihač/ka denních materiálů"
+        },
+        "r_855df6fe84d9": {
+          "masculine": "Asistent synchronizace",
+          "feminine": "Asistentka synchronizace",
+          "neutral": "Asistent/ka synchronizace"
+        },
+        "r_76fe5605aea7": {
+          "masculine": "Operátor Avid",
+          "feminine": "Operátorka Avid",
+          "neutral": "Operátor/ka Avid"
+        },
+        "r_9a37f1a2f07c": {
+          "masculine": "Operátor Final Cut",
+          "feminine": "Operátorka Final Cut",
+          "neutral": "Operátor/ka Final Cut"
+        },
+        "r_5c291075de55": {
+          "masculine": "Kolorista",
+          "feminine": "Koloristka",
+          "neutral": "Kolorista/koloristka"
+        },
+        "r_ee3d75537a1f": {
+          "masculine": "Online střihač",
+          "feminine": "Online střihačka",
+          "neutral": "Online střihač/ka"
+        },
+        "r_24e3087423e1": {
+          "masculine": "Specialista finálního zpracování",
+          "feminine": "Specialistka finálního zpracování",
+          "neutral": "Specialista/specialistka finálního zpracování"
+        },
+        "r_1b9c5df34287": {
+          "masculine": "Návrhář obrazovkové grafiky",
+          "feminine": "Návrhářka obrazovkové grafiky",
+          "neutral": "Návrhář/ka obrazovkové grafiky"
+        },
+        "r_0c866fbdd1b9": {
+          "masculine": "Návrhář titulků",
+          "feminine": "Návrhářka titulků",
+          "neutral": "Návrhář/ka titulků"
+        },
+        "r_cac32c0c1a16": {
+          "masculine": "DCP technik",
+          "feminine": "DCP technička",
+          "neutral": "DCP technik/technička"
+        },
+        "r_3bf9436831af": {
+          "masculine": "Operátor skenování filmu",
+          "feminine": "Operátorka skenování filmu",
+          "neutral": "Operátor/ka skenování filmu"
+        },
+        "r_0c4887e0a1b6": {
+          "masculine": "Vedoucí skenování filmu",
+          "feminine": "Vedoucí skenování filmu",
+          "neutral": "Vedoucí skenování filmu"
+        },
+        "r_85f36a10ca63": {
+          "masculine": "VFX supervizor",
+          "feminine": "VFX supervizorka",
+          "neutral": "VFX supervizor/ka"
+        },
+        "r_3690883b97f2": {
+          "masculine": "VFX producent",
+          "feminine": "VFX producentka",
+          "neutral": "VFX producent/ka"
+        },
+        "r_01122a78805d": {
+          "masculine": "VFX koordinátor",
+          "feminine": "VFX koordinátorka",
+          "neutral": "VFX koordinátor/ka"
+        },
+        "r_4c1b3c0e7030": {
+          "masculine": "Vedoucí výroby VFX",
+          "feminine": "Vedoucí výroby VFX",
+          "neutral": "Vedoucí výroby VFX"
+        },
+        "r_b11b0566c205": {
+          "masculine": "Producent externí výroby VFX",
+          "feminine": "Producentka externí výroby VFX",
+          "neutral": "Producent/ka externí výroby VFX"
+        },
+        "r_061d09311a06": {
+          "masculine": "Asistent VFX producenta",
+          "feminine": "Asistentka VFX producenta",
+          "neutral": "Asistent/ka VFX producenta"
+        },
+        "r_c20adc0c544f": {
+          "masculine": "Supervizor VFX animace",
+          "feminine": "Supervizorka VFX animace",
+          "neutral": "Supervizor/ka VFX animace"
+        },
+        "r_ef84bdb88ead": {
+          "masculine": "VR producent",
+          "feminine": "VR producentka",
+          "neutral": "VR producent/ka"
+        },
+        "r_33a9c6da17ea": {
+          "masculine": "Kompozitor obrazu",
+          "feminine": "Kompozitorka obrazu",
+          "neutral": "Kompozitor/ka obrazu"
+        },
+        "r_aca1c9874a93": {
+          "masculine": "Vedoucí kompozitingu",
+          "feminine": "Vedoucí kompozitingu",
+          "neutral": "Vedoucí kompozitingu"
+        },
+        "r_74803d65a47d": {
+          "masculine": "Digitální kompozitor",
+          "feminine": "Digitální kompozitorka",
+          "neutral": "Digitální kompozitor/ka"
+        },
+        "r_a61ab2d8897e": {
+          "masculine": "Supervizor digitálních efektů",
+          "feminine": "Supervizorka digitálních efektů",
+          "neutral": "Supervizor/ka digitálních efektů"
+        },
+        "r_41f1fab43430": {
+          "masculine": "Návrhář digitálních efektů",
+          "feminine": "Návrhářka digitálních efektů",
+          "neutral": "Návrhář/ka digitálních efektů"
+        },
+        "r_09a4c7b8c909": {
+          "masculine": "Digitální malíř pozadí",
+          "feminine": "Digitální malířka pozadí",
+          "neutral": "Digitální malíř/ka pozadí"
+        },
+        "r_1df80b2df510": {
+          "masculine": "2D výtvarník",
+          "feminine": "2D výtvarnice",
+          "neutral": "2D výtvarník/výtvarnice"
+        },
+        "r_c5222c873ae5": {
+          "masculine": "3D výtvarník",
+          "feminine": "3D výtvarnice",
+          "neutral": "3D výtvarník/výtvarnice"
+        },
+        "r_f1d016eba483": {
+          "masculine": "CG osvětlovač",
+          "feminine": "CG osvětlovačka",
+          "neutral": "CG osvětlovač/ka"
+        },
+        "r_1374d004f892": {
+          "masculine": "Tvůrce textur",
+          "feminine": "Tvůrkyně textur",
+          "neutral": "Tvůrce/tvůrkyně textur"
+        },
+        "r_ca0826d47a19": {
+          "masculine": "Matchmove specialista",
+          "feminine": "Matchmove specialistka",
+          "neutral": "Matchmove specialista/specialistka"
+        },
+        "r_272f028d80c7": {
+          "masculine": "Rotoskopický výtvarník",
+          "feminine": "Rotoskopická výtvarnice",
+          "neutral": "Rotoskopický/á výtvarník/výtvarnice"
+        },
+        "r_fb2a18a56ba5": {
+          "masculine": "Tvůrce efektů",
+          "feminine": "Tvůrkyně efektů",
+          "neutral": "Tvůrce/tvůrkyně efektů"
+        },
+        "r_89c1660cb356": {
+          "masculine": "Animátor",
+          "feminine": "Animátorka",
+          "neutral": "Animátor/ka"
+        },
+        "r_2efa5e8c0d5f": {
+          "masculine": "Motion designér",
+          "feminine": "Motion designérka",
+          "neutral": "Motion designér/ka"
+        },
+        "r_c2053cb7660f": {
+          "masculine": "Animátor postav",
+          "feminine": "Animátorka postav",
+          "neutral": "Animátor/ka postav"
+        },
+        "r_247d43bdfb47": {
+          "masculine": "Asistent postprodukce",
+          "feminine": "Asistentka postprodukce",
+          "neutral": "Asistent/ka postprodukce"
+        },
+        "r_e2802de21986": {
+          "masculine": "Postprodukční technik",
+          "feminine": "Postprodukční technička",
+          "neutral": "Postprodukční technik/technička"
+        },
+        "r_1f9c7a9f75a8": {
+          "masculine": "Stážista střihu",
+          "feminine": "Stážistka střihu",
+          "neutral": "Stážista/stážistka střihu"
+        },
+        "r_bf7027763437": {
+          "masculine": "Koordinátor postprodukce",
+          "feminine": "Koordinátorka postprodukce",
+          "neutral": "Koordinátor/ka postprodukce"
+        },
+        "r_fc841e10fe4f": {
+          "masculine": "Asistent postprodukčního supervizora",
+          "feminine": "Asistentka postprodukčního supervizora",
+          "neutral": "Asistent/ka postprodukčního supervizora"
+        },
+        "r_a79df89d104c": {
+          "masculine": "VFX výtvarník / kompozitor",
+          "feminine": "VFX výtvarnice / kompozitorka",
+          "neutral": "VFX výtvarník/výtvarnice / kompozitor/ka"
+        },
+        "r_2a16dc4c4550": {
+          "masculine": "Zvukový designér",
+          "feminine": "Zvuková designérka",
+          "neutral": "Zvukový/á designér/ka"
+        },
+        "r_b96fddf3696f": {
+          "masculine": "Zvukový střihač",
+          "feminine": "Zvuková střihačka",
+          "neutral": "Zvukový/á střihač/ka"
+        },
+        "r_a903b5656a8c": {
+          "masculine": "DCP specialista",
+          "feminine": "DCP specialistka",
+          "neutral": "DCP specialista/specialistka"
+        },
+        "r_774ffd708e0e": {
+          "masculine": "Operátor filmového záznamu",
+          "feminine": "Operátorka filmového záznamu",
+          "neutral": "Operátor/ka filmového záznamu"
+        },
+        "r_8685aa8f2a95": {
+          "masculine": "Operátor Mistika",
+          "feminine": "Operátorka Mistika",
+          "neutral": "Operátor/ka Mistika"
+        },
+        "r_9b86e6dde935": {
+          "masculine": "Technický ředitel VFX",
+          "feminine": "Technická ředitelka VFX",
+          "neutral": "Technický/á ředitel/ka VFX"
+        },
+        "r_ab44975f8351": {
+          "masculine": "VFX konzultant",
+          "feminine": "VFX konzultantka",
+          "neutral": "VFX konzultant/ka"
+        },
+        "r_6a2814e6546b": {
+          "masculine": "Supervizor VFX osvětlení",
+          "feminine": "Supervizorka VFX osvětlení",
+          "neutral": "Supervizor/ka VFX osvětlení"
+        },
+        "r_c043402107e7": {
+          "masculine": "VFX supervizor na place",
+          "feminine": "VFX supervizorka na place",
+          "neutral": "VFX supervizor/ka na place"
+        },
+        "r_2d4e2d1e1c2c": {
+          "masculine": "Produkční koordinátor VFX",
+          "feminine": "Produkční koordinátorka VFX",
+          "neutral": "Produkční koordinátor/ka VFX"
+        },
+        "r_3a24d45a3a71": {
+          "masculine": "Asistent VFX koordinátora",
+          "feminine": "Asistentka VFX koordinátora",
+          "neutral": "Asistent/ka VFX koordinátora"
+        },
+        "r_a2d3fd026c27": {
+          "masculine": "Vedoucí VFX",
+          "feminine": "Vedoucí VFX",
+          "neutral": "Vedoucí VFX"
+        },
+        "r_1d0ffcaee2f8": {
+          "masculine": "Personální manažer VFX",
+          "feminine": "Personální manažerka VFX",
+          "neutral": "Personální manažer/ka VFX"
+        },
+        "r_6eb353601a03": {
+          "masculine": "IT administrátor VFX",
+          "feminine": "IT administrátorka VFX",
+          "neutral": "IT administrátor/ka VFX"
+        },
+        "r_e70450322709": {
+          "masculine": "IT podpora VFX",
+          "feminine": "IT podpora VFX",
+          "neutral": "IT podpora VFX"
+        },
+        "r_71a68d7195b5": {
+          "masculine": "Systémový inženýr / technik VFX",
+          "feminine": "Systémová inženýrka / technička VFX",
+          "neutral": "Systémový/á inženýr/ka / technik/technička VFX"
+        },
+        "r_30de176c3d86": {
+          "masculine": "Technický ředitel produkčních procesů",
+          "feminine": "Technická ředitelka produkčních procesů",
+          "neutral": "Technický/á ředitel/ka produkčních procesů"
+        },
+        "r_3021537edab0": {
+          "masculine": "Supervizor počítačové grafiky",
+          "feminine": "Supervizorka počítačové grafiky",
+          "neutral": "Supervizor/ka počítačové grafiky"
+        },
+        "r_0d4cd83ac5f0": {
+          "masculine": "Vývojář CG softwaru",
+          "feminine": "Vývojářka CG softwaru",
+          "neutral": "Vývojář/ka CG softwaru"
+        },
+        "r_4d7b70afc38f": {
+          "masculine": "Konceptuální výtvarník (VFX)",
+          "feminine": "Konceptuální výtvarnice (VFX)",
+          "neutral": "Konceptuální výtvarník/výtvarnice (VFX)"
+        },
+        "r_1d77801b6bcb": {
+          "masculine": "Návrhář postav",
+          "feminine": "Návrhářka postav",
+          "neutral": "Návrhář/ka postav"
+        },
+        "r_2eeabfb3e033": {
+          "masculine": "Supervizor postav",
+          "feminine": "Supervizorka postav",
+          "neutral": "Supervizor/ka postav"
+        },
+        "r_d4054cc011f7": {
+          "masculine": "Supervizor animatroniky",
+          "feminine": "Supervizorka animatroniky",
+          "neutral": "Supervizor/ka animatroniky"
+        },
+        "r_27773325d503": {
+          "masculine": "Supervizor předvizualizace",
+          "feminine": "Supervizorka předvizualizace",
+          "neutral": "Supervizor/ka předvizualizace"
+        },
+        "r_4e65539d8bde": {
+          "masculine": "Tvůrce předvizualizace",
+          "feminine": "Tvůrkyně předvizualizace",
+          "neutral": "Tvůrce/tvůrkyně předvizualizace"
+        },
+        "r_09f34347e5ee": {
+          "masculine": "Supervizor motion capture",
+          "feminine": "Supervizorka motion capture",
+          "neutral": "Supervizor/ka motion capture"
+        },
+        "r_96c37e1de0fa": {
+          "masculine": "Supervizor motion control",
+          "feminine": "Supervizorka motion control",
+          "neutral": "Supervizor/ka motion control"
+        },
+        "r_733686f9ae97": {
+          "masculine": "Operátor denních materiálů",
+          "feminine": "Operátorka denních materiálů",
+          "neutral": "Operátor/ka denních materiálů"
+        },
+        "r_ab703255dec3": {
+          "masculine": "Koordinátor vstupů a výstupů",
+          "feminine": "Koordinátorka vstupů a výstupů",
+          "neutral": "Koordinátor/ka vstupů a výstupů"
+        },
+        "r_75540ed9967e": {
+          "masculine": "Operátor telecine",
+          "feminine": "Operátorka telecine",
+          "neutral": "Operátor/ka telecine"
+        },
+        "r_6c17929b4f69": {
+          "masculine": "Digitální matchmove specialista",
+          "feminine": "Digitální matchmove specialistka",
+          "neutral": "Digitální matchmove specialista/specialistka"
+        },
+        "r_2646f9b4aadf": {
+          "masculine": "Rotoskopický výtvarník",
+          "feminine": "Rotoskopická výtvarnice",
+          "neutral": "Rotoskopický/á výtvarník/výtvarnice"
+        },
+        "r_1abce9757421": {
+          "masculine": "Správce digitálních podkladů (DAM)",
+          "feminine": "Správkyně digitálních podkladů (DAM)",
+          "neutral": "Správce/správkyně digitálních podkladů (DAM)"
+        },
+        "r_e28081bd8659": {
+          "masculine": "Supervizor digitálního intermediátu (DI)",
+          "feminine": "Supervizorka digitálního intermediátu (DI)",
+          "neutral": "Supervizor/ka digitálního intermediátu (DI)"
+        },
+        "r_3be4ac15eccc": {
+          "masculine": "Technik digitálního intermediátu",
+          "feminine": "Technička digitálního intermediátu",
+          "neutral": "Technik/technička digitálního intermediátu"
+        },
+        "r_ac6763f1d04b": {
+          "masculine": "Asistent digitálního intermediátu",
+          "feminine": "Asistentka digitálního intermediátu",
+          "neutral": "Asistent/ka digitálního intermediátu"
+        },
+        "r_68b5ed487d7c": {
+          "masculine": "Správce VFX dat",
+          "feminine": "Správkyně VFX dat",
+          "neutral": "Správce/správkyně VFX dat"
+        },
+        "r_98875c546157": {
+          "masculine": "Správce renderingu",
+          "feminine": "Správkyně renderingu",
+          "neutral": "Správce/správkyně renderingu"
+        },
+        "r_37de85ee2914": {
+          "masculine": "Supervizor stereoskopického 3D",
+          "feminine": "Supervizorka stereoskopického 3D",
+          "neutral": "Supervizor/ka stereoskopického 3D"
+        },
+        "r_138f0f7f11c5": {
+          "masculine": "Operátor přehrávání na place",
+          "feminine": "Operátorka přehrávání na place",
+          "neutral": "Operátor/ka přehrávání na place"
+        },
+        "r_6c52a0b17c05": {
+          "masculine": "VFX stážista",
+          "feminine": "VFX stážistka",
+          "neutral": "VFX stážista/stážistka"
+        },
+        "r_1a1b5684e757": {
+          "masculine": "Produkční asistent VFX",
+          "feminine": "Produkční asistentka VFX",
+          "neutral": "Produkční asistent/ka VFX"
+        },
+        "r_03863e1fa165": {
+          "masculine": "Vedoucí VFX týmu",
+          "feminine": "Vedoucí VFX týmu",
+          "neutral": "Vedoucí VFX týmu"
+        },
+        "r_0006a71a7050": {
+          "masculine": "Vedoucí 3D",
+          "feminine": "Vedoucí 3D",
+          "neutral": "Vedoucí 3D"
+        },
+        "r_9ad285824801": {
+          "masculine": "Režisér 3D animace",
+          "feminine": "Režisérka 3D animace",
+          "neutral": "Režisér/ka 3D animace"
+        },
+        "r_365169e4e39c": {
+          "masculine": "Vedoucí 3D animátor postav",
+          "feminine": "Vedoucí 3D animátorka postav",
+          "neutral": "Vedoucí 3D animátor/ka postav"
+        },
+        "r_6dac25e38271": {
+          "masculine": "3D animátor postav",
+          "feminine": "3D animátorka postav",
+          "neutral": "3D animátor/ka postav"
+        },
+        "r_18b24b362b8f": {
+          "masculine": "3D rigger",
+          "feminine": "3D rigger",
+          "neutral": "3D rigger"
+        },
+        "r_b6265894c01c": {
+          "masculine": "3D modelář",
+          "feminine": "3D modelářka",
+          "neutral": "3D modelář/ka"
+        },
+        "r_401ce457432d": {
+          "masculine": "3D osvětlovač",
+          "feminine": "3D osvětlovačka",
+          "neutral": "3D osvětlovač/ka"
+        },
+        "r_d6c0df6758d4": {
+          "masculine": "3D texturář",
+          "feminine": "3D texturářka",
+          "neutral": "3D texturář/ka"
+        },
+        "r_aff4837ba039": {
+          "masculine": "Tvůrce 3D kamer",
+          "feminine": "Tvůrkyně 3D kamer",
+          "neutral": "Tvůrce/tvůrkyně 3D kamer"
+        },
+        "r_01ea52ed92df": {
+          "masculine": "Supervizor 3D kamer",
+          "feminine": "Supervizorka 3D kamer",
+          "neutral": "Supervizor/ka 3D kamer"
+        },
+        "r_1b2a5f055d73": {
+          "masculine": "Animátor efektů",
+          "feminine": "Animátorka efektů",
+          "neutral": "Animátor/ka efektů"
+        },
+        "r_25d305ae2181": {
+          "masculine": "Animátor částic",
+          "feminine": "Animátorka částic",
+          "neutral": "Animátor/ka částic"
+        },
+        "r_493348eeb5c9": {
+          "masculine": "2D rigger",
+          "feminine": "2D rigger",
+          "neutral": "2D rigger"
+        },
+        "r_50d612c5929c": {
+          "masculine": "Režisér 2D animace",
+          "feminine": "Režisérka 2D animace",
+          "neutral": "Režisér/ka 2D animace"
+        },
+        "r_5b75d1dcc3ba": {
+          "masculine": "Vedoucí 2D animátor postav",
+          "feminine": "Vedoucí 2D animátorka postav",
+          "neutral": "Vedoucí 2D animátor/ka postav"
+        },
+        "r_d3bed7009009": {
+          "masculine": "2D animátor postav",
+          "feminine": "2D animátorka postav",
+          "neutral": "2D animátor/ka postav"
+        },
+        "r_b9b34ba4ee44": {
+          "masculine": "Tvůrce v MotionBuilderu",
+          "feminine": "Tvůrkyně v MotionBuilderu",
+          "neutral": "Tvůrce/tvůrkyně v MotionBuilderu"
+        },
+        "r_40ba6442d974": {
+          "masculine": "Operátor MotionBuilderu",
+          "feminine": "Operátorka MotionBuilderu",
+          "neutral": "Operátor/ka MotionBuilderu"
+        }
+      },
+      "musik": {
+        "r_4b516c3014b1": {
+          "masculine": "Skladatel",
+          "feminine": "Skladatelka",
+          "neutral": "Skladatel/ka"
+        },
+        "r_78a8b7bafdcf": {
+          "masculine": "Dodatečná hudba",
+          "feminine": "Dodatečná hudba",
+          "neutral": "Dodatečná hudba"
+        },
+        "r_be9c85f652ee": {
+          "masculine": "Skladatel hudby k trailerům",
+          "feminine": "Skladatelka hudby k trailerům",
+          "neutral": "Skladatel/ka hudby k trailerům"
+        },
+        "r_d052f25322c5": {
+          "masculine": "Hudební vedoucí",
+          "feminine": "Hudební vedoucí",
+          "neutral": "Hudební vedoucí"
+        },
+        "r_520348654852": {
+          "masculine": "Hudební režisér",
+          "feminine": "Hudební režisérka",
+          "neutral": "Hudební režisér/ka"
+        },
+        "r_d614bde7c500": {
+          "masculine": "Hudební supervizor",
+          "feminine": "Hudební supervizorka",
+          "neutral": "Hudební supervizor/ka"
+        },
+        "r_1f0d7374bb4c": {
+          "masculine": "Orchestrátor",
+          "feminine": "Orchestrátorka",
+          "neutral": "Orchestrátor/ka"
+        },
+        "r_aa4b42f84387": {
+          "masculine": "Aranžér",
+          "feminine": "Aranžérka",
+          "neutral": "Aranžér/ka"
+        },
+        "r_8c334f2ac9d3": {
+          "masculine": "Aranžér",
+          "feminine": "Aranžérka",
+          "neutral": "Aranžér/ka"
+        },
+        "r_fe19755b0b9e": {
+          "masculine": "Dirigent",
+          "feminine": "Dirigentka",
+          "neutral": "Dirigent/ka"
+        },
+        "r_73021f352efb": {
+          "masculine": "Dirigent",
+          "feminine": "Dirigentka",
+          "neutral": "Dirigent/ka"
+        },
+        "r_1a95751341fb": {
+          "masculine": "Hudební střihač",
+          "feminine": "Hudební střihačka",
+          "neutral": "Hudební střihač/ka"
+        },
+        "r_8fd3dbb18e49": {
+          "masculine": "Opisovač not",
+          "feminine": "Opisovačka not",
+          "neutral": "Opisovač/ka not"
+        },
+        "r_d5e57768aab8": {
+          "masculine": "Hudební producent",
+          "feminine": "Hudební producentka",
+          "neutral": "Hudební producent/ka"
+        },
+        "r_0e9738be9045": {
+          "masculine": "Hudební konzultant",
+          "feminine": "Hudební konzultantka",
+          "neutral": "Hudební konzultant/ka"
+        },
+        "r_82e1a4d8181e": {
+          "masculine": "Hudební koordinátor",
+          "feminine": "Hudební koordinátorka",
+          "neutral": "Hudební koordinátor/ka"
+        },
+        "r_00bc34dec4f3": {
+          "masculine": "Operátor Logic",
+          "feminine": "Operátorka Logic",
+          "neutral": "Operátor/ka Logic"
+        },
+        "r_0eae67a415cd": {
+          "masculine": "Operátor Pro Tools",
+          "feminine": "Operátorka Pro Tools",
+          "neutral": "Operátor/ka Pro Tools"
+        },
+        "r_52aa8c6866dc": {
+          "masculine": "Asistent skladatele",
+          "feminine": "Asistentka skladatele",
+          "neutral": "Asistent/ka skladatele"
+        },
+        "r_3e66ad9f45e2": {
+          "masculine": "Hudebník",
+          "feminine": "Hudebnice",
+          "neutral": "Hudebník/hudebnice"
+        },
+        "r_ade18645efa3": {
+          "masculine": "Zvukový střihač",
+          "feminine": "Zvuková střihačka",
+          "neutral": "Zvukový/á střihač/ka"
+        },
+        "r_0972afcc1e55": {
+          "masculine": "Skladatelský stážista",
+          "feminine": "Skladatelská stážistka",
+          "neutral": "Skladatelský/á stážista/stážistka"
+        },
+        "r_801e363423c3": {
+          "masculine": "Výkonný producent soundtracku",
+          "feminine": "Výkonná producentka soundtracku",
+          "neutral": "Výkonný/á producent/ka soundtracku"
+        }
+      },
+      "set-logistik": {
+        "r_06d9aa28368f": {
+          "masculine": "Pomocník na produkční základně",
+          "feminine": "Pomocnice na produkční základně",
+          "neutral": "Pomocník/pomocnice na produkční základně"
+        },
+        "r_51e581b5ea39": {
+          "masculine": "Řidič / Řidič (osobní / nákladní vůz)",
+          "feminine": "Řidička / Řidička (osobní / nákladní vůz)",
+          "neutral": "Řidič/ka / Řidič/ka (osobní / nákladní vůz)"
+        },
+        "r_36a599628c2e": {
+          "masculine": "Řidič na lokaci",
+          "feminine": "Řidička na lokaci",
+          "neutral": "Řidič/ka na lokaci"
+        },
+        "r_9bc1a35535fa": {
+          "masculine": "Vedoucí natáčení na lokaci",
+          "feminine": "Vedoucí natáčení na lokaci",
+          "neutral": "Vedoucí natáčení na lokaci"
+        },
+        "r_273f12c52b95": {
+          "masculine": "Asistent manažera lokací",
+          "feminine": "Asistentka manažera lokací",
+          "neutral": "Asistent/ka manažera lokací"
+        },
+        "r_ad61df711cdf": {
+          "masculine": "Ostraha natáčení",
+          "feminine": "Ostraha natáčení",
+          "neutral": "Ostraha natáčení"
+        },
+        "r_16476d55e646": {
+          "masculine": "Řízení davu",
+          "feminine": "Řízení davu",
+          "neutral": "Řízení davu"
+        },
+        "r_d4d0eb9a01ad": {
+          "masculine": "Pohybový režisér",
+          "feminine": "Pohybová režisérka",
+          "neutral": "Pohybový/á režisér/ka"
+        },
+        "r_3c6a65ecb046": {
+          "masculine": "Pohybový kouč",
+          "feminine": "Pohybová koučka",
+          "neutral": "Pohybový/á kouč/ka"
+        },
+        "r_c66e045ffbbf": {
+          "masculine": "Koordinátor intimity",
+          "feminine": "Koordinátorka intimity",
+          "neutral": "Koordinátor/ka intimity"
+        },
+        "r_2e9dcd12712e": {
+          "masculine": "Choreograf",
+          "feminine": "Choreografka",
+          "neutral": "Choreograf/ka"
+        },
+        "r_6f899f66fa58": {
+          "masculine": "Taneční kouč",
+          "feminine": "Taneční koučka",
+          "neutral": "Taneční kouč/ka"
+        },
+        "r_f4a45af86f47": {
+          "masculine": "Pěvecký kouč",
+          "feminine": "Pěvecká koučka",
+          "neutral": "Pěvecký/pěvecká kouč/ka"
+        },
+        "r_6e8ad217ef2f": {
+          "masculine": "Dialogový kouč",
+          "feminine": "Dialogová koučka",
+          "neutral": "Dialogový/á kouč/ka"
+        },
+        "r_63787dc385b1": {
+          "masculine": "Nářeční a jazykový kouč",
+          "feminine": "Nářeční a jazyková koučka",
+          "neutral": "Nářeční a jazykový/á kouč/ka"
+        },
+        "r_8546ce0263e3": {
+          "masculine": "Herecký kouč pro postižení a neurodiverzitu",
+          "feminine": "Herecká koučka pro postižení a neurodiverzitu",
+          "neutral": "Herecký/á kouč/ka pro postižení a neurodiverzitu"
+        },
+        "r_969986f76695": {
+          "masculine": "Hudební kouč",
+          "feminine": "Hudební koučka",
+          "neutral": "Hudební kouč/ka"
+        },
+        "r_717c17e3e434": {
+          "masculine": "Poradce pro neslyšící a znakový jazyk",
+          "feminine": "Poradkyně pro neslyšící a znakový jazyk",
+          "neutral": "Poradce/poradkyně pro neslyšící a znakový jazyk"
+        },
+        "r_e30edc1bd3f8": {
+          "masculine": "Konzultant diverzity",
+          "feminine": "Konzultantka diverzity",
+          "neutral": "Konzultant/ka diverzity"
+        },
+        "r_5595cb9aacd1": {
+          "masculine": "Citlivostní čtenář",
+          "feminine": "Citlivostní čtenářka",
+          "neutral": "Citlivostní čtenář/ka"
+        },
+        "r_2d5e77118f48": {
+          "masculine": "Tlumočník",
+          "feminine": "Tlumočnice",
+          "neutral": "Tlumočník/tlumočnice"
+        },
+        "r_48bf6fb54a76": {
+          "masculine": "Stand-in",
+          "feminine": "Stand-in",
+          "neutral": "Stand-in"
+        },
+        "r_5845830d5e82": {
+          "masculine": "Zdravotník na natáčení",
+          "feminine": "Zdravotnice na natáčení",
+          "neutral": "Zdravotník/zdravotnice na natáčení"
+        },
+        "r_ad72daba923d": {
+          "masculine": "Učitel na natáčení",
+          "feminine": "Učitelka na natáčení",
+          "neutral": "Učitel/ka na natáčení"
+        },
+        "r_79e9614b81a6": {
+          "masculine": "Pečovatel o děti",
+          "feminine": "Pečovatelka o děti",
+          "neutral": "Pečovatel/ka o děti"
+        },
+        "r_29d48a809858": {
+          "masculine": "Pověřenec pro blaho dětí",
+          "feminine": "Pověřenkyně pro blaho dětí",
+          "neutral": "Pověřenec/pověřenkyně pro blaho dětí"
+        },
+        "r_aba4d92c8e69": {
+          "masculine": "Péče o umělce, hosty a VIP",
+          "feminine": "Péče o umělce, hosty a VIP",
+          "neutral": "Péče o umělce, hosty a VIP"
+        },
+        "r_53207f6ae5f4": {
+          "masculine": "Koordinátor duševního zdraví",
+          "feminine": "Koordinátorka duševního zdraví",
+          "neutral": "Koordinátor/ka duševního zdraví"
+        },
+        "r_45520abcff27": {
+          "masculine": "Důvěrná kontaktní osoba",
+          "feminine": "Důvěrná kontaktní osoba",
+          "neutral": "Důvěrná kontaktní osoba"
+        },
+        "r_355cbf436694": {
+          "masculine": "Specialista bezpečnosti práce",
+          "feminine": "Specialistka bezpečnosti práce",
+          "neutral": "Specialista/specialistka bezpečnosti práce"
+        },
+        "r_308811767175": {
+          "masculine": "Hygienický pověřenec (ochrana před covidem)",
+          "feminine": "Hygienická pověřenkyně (ochrana před covidem)",
+          "neutral": "Hygienický/á pověřenec/pověřenkyně (ochrana před covidem)"
+        },
+        "r_32790b195d9e": {
+          "masculine": "Koordinátor plavidel",
+          "feminine": "Koordinátorka plavidel",
+          "neutral": "Koordinátor/ka plavidel"
+        },
+        "r_c93f3dbba0c2": {
+          "masculine": "Koordinátor podvodního natáčení / potápění",
+          "feminine": "Koordinátorka podvodního natáčení / potápění",
+          "neutral": "Koordinátor/ka podvodního natáčení / potápění"
+        },
+        "r_2aed0957c337": {
+          "masculine": "Mistr sedel a postrojů",
+          "feminine": "Mistryně sedel a postrojů",
+          "neutral": "Mistr/yně sedel a postrojů"
+        },
+        "r_36f2141e2445": {
+          "masculine": "Koordinátor publika",
+          "feminine": "Koordinátorka publika",
+          "neutral": "Koordinátor/ka publika"
+        },
+        "r_dd293d0b7b4b": {
+          "masculine": "Poradní režisér",
+          "feminine": "Poradní režisérka",
+          "neutral": "Poradní režisér/ka"
+        },
+        "r_d675b4f70ea4": {
+          "masculine": "Kreativní ředitel (reklamní agentura)",
+          "feminine": "Kreativní ředitelka (reklamní agentura)",
+          "neutral": "Kreativní ředitel/ka (reklamní agentura)"
+        },
+        "r_2c01621b03b3": {
+          "masculine": "Odborný poradce",
+          "feminine": "Odborná poradkyně",
+          "neutral": "Odborný/á poradce/poradkyně"
+        },
+        "r_777d604a46c7": {
+          "masculine": "Znalec pro produkci",
+          "feminine": "Znalkyně pro produkci",
+          "neutral": "Znalec/znalkyně pro produkci"
+        },
+        "r_69b1f75394b4": {
+          "masculine": "Lektor / kouč",
+          "feminine": "Lektorka / koučka",
+          "neutral": "Lektor/ka / kouč/ka"
+        },
+        "r_9b689ca40dcd": {
+          "masculine": "Producent společenského dopadu",
+          "feminine": "Producentka společenského dopadu",
+          "neutral": "Producent/ka společenského dopadu"
+        },
+        "r_b22d32243e5e": {
+          "masculine": "Ekologický poradce",
+          "feminine": "Ekologická poradkyně",
+          "neutral": "Ekologický/á poradce/poradkyně"
+        },
+        "r_b7e6bdc7cc1f": {
+          "masculine": "Asistent ekologického poradce",
+          "feminine": "Asistentka ekologického poradce",
+          "neutral": "Asistent/ka ekologického poradce"
+        },
+        "r_e84880be1d61": {
+          "masculine": "Line producent EPK / zákulisí",
+          "feminine": "Line producentka EPK / zákulisí",
+          "neutral": "Line producent/ka EPK / zákulisí"
+        },
+        "r_715e70975075": {
+          "masculine": "Producent EPK / zákulisí",
+          "feminine": "Producentka EPK / zákulisí",
+          "neutral": "Producent/ka EPK / zákulisí"
+        },
+        "r_7028ae82d2e2": {
+          "masculine": "Filmový restaurátor",
+          "feminine": "Filmová restaurátorka",
+          "neutral": "Filmový/á restaurátor/ka"
+        },
+        "r_92791462fbdd": {
+          "masculine": "Filmový kolorista",
+          "feminine": "Filmová koloristka",
+          "neutral": "Filmový/á kolorista/koloristka"
+        },
+        "r_e732abed8e31": {
+          "masculine": "Autor diskových médií",
+          "feminine": "Autorka diskových médií",
+          "neutral": "Autor/ka diskových médií"
+        },
+        "r_a63ade2d8c7d": {
+          "masculine": "Stop-motion animátor",
+          "feminine": "Stop-motion animátorka",
+          "neutral": "Stop-motion animátor/ka"
+        },
+        "r_e56da499fa85": {
+          "masculine": "Animátor kresleného filmu",
+          "feminine": "Animátorka kresleného filmu",
+          "neutral": "Animátor/ka kresleného filmu"
+        },
+        "r_868363b4696a": {
+          "masculine": "Vývojář her pro pořady",
+          "feminine": "Vývojářka her pro pořady",
+          "neutral": "Vývojář/ka her pro pořady"
+        },
+        "r_776e611a5b6e": {
+          "masculine": "Loutkoherec",
+          "feminine": "Loutkoherečka",
+          "neutral": "Loutkoherec/loutkoherečka"
+        },
+        "r_d3d5008ffded": {
+          "masculine": "Vizuální žokej",
+          "feminine": "Vizuální žokejka",
+          "neutral": "Vizuální žokej/ka"
+        },
+        "r_f62082fcf3e6": {
+          "masculine": "Návrhář vysílací grafiky",
+          "feminine": "Návrhářka vysílací grafiky",
+          "neutral": "Návrhář/ka vysílací grafiky"
+        },
+        "r_915e8fdeaa84": {
+          "masculine": "Specialista časování titulků",
+          "feminine": "Specialistka časování titulků",
+          "neutral": "Specialista/specialistka časování titulků"
+        },
+        "r_e7b09583174a": {
+          "masculine": "Titulkář",
+          "feminine": "Titulkářka",
+          "neutral": "Titulkář/ka"
+        },
+        "r_823099351f18": {
+          "masculine": "Rešeršista režie",
+          "feminine": "Rešeršistka režie",
+          "neutral": "Rešeršista/rešeršistka režie"
+        },
+        "r_f25ed374ada5": {
+          "masculine": "Vypořádání práv",
+          "feminine": "Vypořádání práv",
+          "neutral": "Vypořádání práv"
+        },
+        "r_bf29b54303ec": {
+          "masculine": "PR fotograf",
+          "feminine": "PR fotografka",
+          "neutral": "PR fotograf/ka"
+        },
+        "r_e2fe82d9e60c": {
+          "masculine": "Externí vedoucí projektu",
+          "feminine": "Externí vedoucí projektu",
+          "neutral": "Externí vedoucí projektu"
+        },
+        "r_3687ead5b451": {
+          "masculine": "Osobní asistent",
+          "feminine": "Osobní asistentka",
+          "neutral": "Osobní asistent/ka"
+        },
+        "r_b85e79c1153f": {
+          "masculine": "Rešeršista",
+          "feminine": "Rešeršistka",
+          "neutral": "Rešeršista/rešeršistka"
+        }
+      },
+      "cast": {
+        "r_3d0e76b883b1": {
+          "masculine": "Herec v hlavní roli",
+          "feminine": "Herečka v hlavní roli",
+          "neutral": "Herec/herečka v hlavní roli"
+        },
+        "r_543b99d52c01": {
+          "masculine": "Herec",
+          "feminine": "Herečka",
+          "neutral": "Herec/herečka"
+        },
+        "r_aa64ee1fd5d6": {
+          "masculine": "Herec ve vedlejší roli",
+          "feminine": "Herečka ve vedlejší roli",
+          "neutral": "Herec/herečka ve vedlejší roli"
+        },
+        "r_5fea55df03ed": {
+          "masculine": "Komparzista",
+          "feminine": "Komparzistka",
+          "neutral": "Komparzista/komparzistka"
+        },
+        "r_912a4dbdd23c": {
+          "masculine": "Herec malé role",
+          "feminine": "Herečka malé role",
+          "neutral": "Herec/herečka malé role"
+        },
+        "r_130f7a137659": {
+          "masculine": "Model",
+          "feminine": "Modelka",
+          "neutral": "Model/ka"
+        },
+        "r_e1e954da6cbb": {
+          "masculine": "Mluvčí / voice-over",
+          "feminine": "Mluvčí / voice-over",
+          "neutral": "Mluvčí / voice-over"
+        },
+        "r_67da9411185f": {
+          "masculine": "Stand-in",
+          "feminine": "Stand-in",
+          "neutral": "Stand-in"
+        },
+        "r_00100aeac4bb": {
+          "masculine": "Kaskadér",
+          "feminine": "Kaskadérka",
+          "neutral": "Kaskadér/ka"
+        },
+        "r_0367b47c9554": {
+          "masculine": "Kaskadérský dublér",
+          "feminine": "Kaskadérská dublérka",
+          "neutral": "Kaskadérský/á dublér/ka"
+        },
+        "r_ca9ccb4b0409": {
+          "masculine": "Kaskadérský rigger",
+          "feminine": "Kaskadérská rigger",
+          "neutral": "Kaskadérský/á rigger"
+        },
+        "r_418902de8e38": {
+          "masculine": "Koordinátor kaskadérů",
+          "feminine": "Koordinátorka kaskadérů",
+          "neutral": "Koordinátor/ka kaskadérů"
+        },
+        "r_7f2d1a7f256f": {
+          "masculine": "Asistent koordinátora kaskadérů",
+          "feminine": "Asistentka koordinátora kaskadérů",
+          "neutral": "Asistent/ka koordinátora kaskadérů"
+        },
+        "r_e84ab42c1ded": {
+          "masculine": "Koordinátor kaskadérského oddělení",
+          "feminine": "Koordinátorka kaskadérského oddělení",
+          "neutral": "Koordinátor/ka kaskadérského oddělení"
+        },
+        "r_e09f42bb8f68": {
+          "masculine": "Choreograf bojových scén",
+          "feminine": "Choreografka bojových scén",
+          "neutral": "Choreograf/ka bojových scén"
+        },
+        "r_f1b27e4baea8": {
+          "masculine": "Akční režisér",
+          "feminine": "Akční režisérka",
+          "neutral": "Akční režisér/ka"
+        },
+        "r_ccdc591d96b4": {
+          "masculine": "Koordinátor leteckých akcí",
+          "feminine": "Koordinátorka leteckých akcí",
+          "neutral": "Koordinátor/ka leteckých akcí"
+        },
+        "r_df312d5bf658": {
+          "masculine": "Kaskadérský jezdec",
+          "feminine": "Kaskadérská jezdkyně",
+          "neutral": "Kaskadérský/á jezdec/jezdkyně"
+        },
+        "r_64fe45905183": {
+          "masculine": "Kaskadérský technik",
+          "feminine": "Kaskadérská technička",
+          "neutral": "Kaskadérský/á technik/technička"
+        },
+        "r_28088de1cde2": {
+          "masculine": "Záchranný potápěč pro kaskadérské scény",
+          "feminine": "Záchranná potápěčka pro kaskadérské scény",
+          "neutral": "Záchranný/á potápěč/ka pro kaskadérské scény"
+        },
+        "r_f1b818bfac99": {
+          "masculine": "Parkourový umělec",
+          "feminine": "Parkourová umělkyně",
+          "neutral": "Parkourový/á umělec/umělkyně"
+        },
+        "r_c9bf4b44628b": {
+          "masculine": "Precizní řidič",
+          "feminine": "Precizní řidička",
+          "neutral": "Precizní řidič/ka"
+        },
+        "r_901a1b08f6ba": {
+          "masculine": "Koordinátor intimity",
+          "feminine": "Koordinátorka intimity",
+          "neutral": "Koordinátor/ka intimity"
+        },
+        "r_7a721e572105": {
+          "masculine": "Castingový spolupracovník",
+          "feminine": "Castingová spolupracovnice",
+          "neutral": "Castingový/á spolupracovník/spolupracovnice"
+        },
+        "r_a1f9ba79ab08": {
+          "masculine": "Castingový asistent",
+          "feminine": "Castingová asistentka",
+          "neutral": "Castingový/á asistent/ka"
+        },
+        "r_84927cc7b2bc": {
+          "masculine": "Herec ve vedlejší roli",
+          "feminine": "Herečka ve vedlejší roli",
+          "neutral": "Herec/herečka ve vedlejší roli"
+        },
+        "r_97144193d2e9": {
+          "masculine": "Statista / komparzista",
+          "feminine": "Statistka / komparzistka",
+          "neutral": "Statista/statistka / komparzista/komparzistka"
+        },
+        "r_de130677203b": {
+          "masculine": "Castingový režisér pro mládež",
+          "feminine": "Castingová režisérka pro mládež",
+          "neutral": "Castingový/á režisér/ka pro mládež"
+        },
+        "r_27725de30521": {
+          "masculine": "Castingový režisér pro děti",
+          "feminine": "Castingová režisérka pro děti",
+          "neutral": "Castingový/á režisér/ka pro děti"
+        },
+        "r_9e31ceb09d88": {
+          "masculine": "Pouliční casting",
+          "feminine": "Pouliční casting",
+          "neutral": "Pouliční casting"
+        },
+        "r_081340fc2740": {
+          "masculine": "Casting komparzu a malých rolí",
+          "feminine": "Casting komparzu a malých rolí",
+          "neutral": "Casting komparzu a malých rolí"
+        },
+        "r_bff79e6f4b26": {
+          "masculine": "Castingový stážista",
+          "feminine": "Castingová stážistka",
+          "neutral": "Castingový/á stážista/stážistka"
+        },
+        "r_2f8822fb833a": {
+          "masculine": "Vedoucí kaskadérského riggingu",
+          "feminine": "Vedoucí kaskadérského riggingu",
+          "neutral": "Vedoucí kaskadérského riggingu"
+        },
+        "r_9fadc25f432e": {
+          "masculine": "Kočí",
+          "feminine": "Kočí",
+          "neutral": "Kočí"
+        }
+      },
+      "sfx": {
+        "r_a35d5905e687": {
+          "masculine": "Supervizor speciálních efektů",
+          "feminine": "Supervizorka speciálních efektů",
+          "neutral": "Supervizor/ka speciálních efektů"
+        },
+        "r_09c0a67cf5e1": {
+          "masculine": "SFX technik",
+          "feminine": "SFX technička",
+          "neutral": "SFX technik/technička"
+        },
+        "r_881a5efb4c8a": {
+          "masculine": "Koordinátor speciálních efektů",
+          "feminine": "Koordinátorka speciálních efektů",
+          "neutral": "Koordinátor/ka speciálních efektů"
+        },
+        "r_a9f1b82c4859": {
+          "masculine": "Projektový manažer speciálních efektů",
+          "feminine": "Projektová manažerka speciálních efektů",
+          "neutral": "Projektový/á manažer/ka speciálních efektů"
+        },
+        "r_cea7226b63f6": {
+          "masculine": "Pyrotechnik",
+          "feminine": "Pyrotechnička",
+          "neutral": "Pyrotechnik/pyrotechnička"
+        },
+        "r_eb065a9f90c9": {
+          "masculine": "Pyrotechnický asistent",
+          "feminine": "Pyrotechnická asistentka",
+          "neutral": "Pyrotechnický/á asistent/ka"
+        },
+        "r_4d3662b84a22": {
+          "masculine": "Producent miniaturních efektů",
+          "feminine": "Producentka miniaturních efektů",
+          "neutral": "Producent/ka miniaturních efektů"
+        },
+        "r_e62650b9e5ae": {
+          "masculine": "Návrhář tvorů",
+          "feminine": "Návrhářka tvorů",
+          "neutral": "Návrhář/ka tvorů"
+        },
+        "r_00baca6dc147": {
+          "masculine": "Inženýr animatroniky",
+          "feminine": "Inženýrka animatroniky",
+          "neutral": "Inženýr/ka animatroniky"
+        },
+        "r_174ffb787533": {
+          "masculine": "Výrobce loutek",
+          "feminine": "Výrobkyně loutek",
+          "neutral": "Výrobce/výrobkyně loutek"
+        },
+        "r_506a008769b9": {
+          "masculine": "Zbrojíř",
+          "feminine": "Zbrojířka",
+          "neutral": "Zbrojíř/ka"
+        },
+        "r_2409c6266fd3": {
+          "masculine": "Zbraňový technik",
+          "feminine": "Zbraňová technička",
+          "neutral": "Zbraňový/á technik/technička"
+        },
+        "r_ddb886337a99": {
+          "masculine": "Lanový rigger",
+          "feminine": "Lanová rigger",
+          "neutral": "Lanový/á rigger"
+        },
+        "r_72a4b7fb935e": {
+          "masculine": "SFX rigging / speciální konstrukce",
+          "feminine": "SFX rigging / speciální konstrukce",
+          "neutral": "SFX rigging / speciální konstrukce"
+        },
+        "r_3628c7df2899": {
+          "masculine": "Technik mechanických efektů",
+          "feminine": "Technička mechanických efektů",
+          "neutral": "Technik/technička mechanických efektů"
+        },
+        "r_41cde5889636": {
+          "masculine": "Technik sněhových a dešťových efektů",
+          "feminine": "Technička sněhových a dešťových efektů",
+          "neutral": "Technik/technička sněhových a dešťových efektů"
+        },
+        "r_ba881d560569": {
+          "masculine": "Účetní speciálních efektů",
+          "feminine": "Účetní speciálních efektů",
+          "neutral": "Účetní speciálních efektů"
+        },
+        "r_c723decf9e2c": {
+          "masculine": "Technik speciálních efektů SFX",
+          "feminine": "Technička speciálních efektů SFX",
+          "neutral": "Technik/technička speciálních efektů SFX"
+        }
+      },
+      "broadcast": {
+        "r_56003554d627": {
+          "masculine": "Produkční inženýr",
+          "feminine": "Produkční inženýrka",
+          "neutral": "Produkční inženýr/ka"
+        },
+        "r_a5145362deb9": {
+          "masculine": "Vysílací inženýr",
+          "feminine": "Vysílací inženýrka",
+          "neutral": "Vysílací inženýr/ka"
+        },
+        "r_21789a4bd26e": {
+          "masculine": "Technický vedoucí",
+          "feminine": "Technická vedoucí",
+          "neutral": "Technický/á vedoucí"
+        },
+        "r_ed2861824940": {
+          "masculine": "Obrazový inženýr",
+          "feminine": "Obrazová inženýrka",
+          "neutral": "Obrazový/á inženýr/ka"
+        },
+        "r_f35ad506ce91": {
+          "masculine": "Obrazový střihač",
+          "feminine": "Obrazová střihačka",
+          "neutral": "Obrazový/á střihač/ka"
+        },
+        "r_96549186fbdd": {
+          "masculine": "Obrazový střihač",
+          "feminine": "Obrazová střihačka",
+          "neutral": "Obrazový/á střihač/ka"
+        },
+        "r_b0f32c270502": {
+          "masculine": "Obrazový korektor (shader)",
+          "feminine": "Obrazová korektorka (shader)",
+          "neutral": "Obrazový/á korektor/ka (shader)"
+        },
+        "r_4444caa14211": {
+          "masculine": "Operátor kamerové CCU",
+          "feminine": "Operátorka kamerové CCU",
+          "neutral": "Operátor/ka kamerové CCU"
+        },
+        "r_3a845b2c45a4": {
+          "masculine": "Operátor DVE",
+          "feminine": "Operátorka DVE",
+          "neutral": "Operátor/ka DVE"
+        },
+        "r_5eb58151f915": {
+          "masculine": "Operátor Profile",
+          "feminine": "Operátorka Profile",
+          "neutral": "Operátor/ka Profile"
+        },
+        "r_bc517c79d131": {
+          "masculine": "Vysílací technik",
+          "feminine": "Vysílací technička",
+          "neutral": "Vysílací technik/technička"
+        },
+        "r_d0bc62ba1257": {
+          "masculine": "Zvukový supervizor (vysílání)",
+          "feminine": "Zvuková supervizorka (vysílání)",
+          "neutral": "Zvukový/á supervizor/ka (vysílání)"
+        },
+        "r_6189d7ba75a5": {
+          "masculine": "Zvukový inženýr",
+          "feminine": "Zvuková inženýrka",
+          "neutral": "Zvukový/á inženýr/ka"
+        },
+        "r_9eadf0334fa2": {
+          "masculine": "Studiový / jevištní mistr",
+          "feminine": "Studiová / jevištní mistryně",
+          "neutral": "Studiový/á / jevištní mistr/yně"
+        },
+        "r_da7a6180d72a": {
+          "masculine": "Manažer akcí",
+          "feminine": "Manažerka akcí",
+          "neutral": "Manažer/ka akcí"
+        },
+        "r_84e084ee4081": {
+          "masculine": "Technik akcí",
+          "feminine": "Technička akcí",
+          "neutral": "Technik/technička akcí"
+        },
+        "r_2b01c5ebf763": {
+          "masculine": "Operátor MAZ",
+          "feminine": "Operátorka MAZ",
+          "neutral": "Operátor/ka MAZ"
+        },
+        "r_d2b49ec6c87b": {
+          "masculine": "Technik MAZ",
+          "feminine": "Technička MAZ",
+          "neutral": "Technik/technička MAZ"
+        },
+        "r_b1e7ad7a4e8d": {
+          "masculine": "Operátor EVS",
+          "feminine": "Operátorka EVS",
+          "neutral": "Operátor/ka EVS"
+        },
+        "r_6ce5d1fae4b4": {
+          "masculine": "Operátor LSM (zpomalené záběry)",
+          "feminine": "Operátorka LSM (zpomalené záběry)",
+          "neutral": "Operátor/ka LSM (zpomalené záběry)"
+        },
+        "r_23864113991d": {
+          "masculine": "Technik streamování",
+          "feminine": "Technička streamování",
+          "neutral": "Technik/technička streamování"
+        },
+        "r_4e59228ff2bb": {
+          "masculine": "Rigger (vysílání / akce)",
+          "feminine": "Rigger (vysílání / akce)",
+          "neutral": "Rigger (vysílání / akce)"
+        },
+        "r_54aa44e2bc03": {
+          "masculine": "Asistent riggingu",
+          "feminine": "Asistentka riggingu",
+          "neutral": "Asistent/ka riggingu"
+        },
+        "r_accbebaa16ce": {
+          "masculine": "Obrazový technik",
+          "feminine": "Obrazová technička",
+          "neutral": "Obrazový/á technik/technička"
+        },
+        "r_152179bb65ff": {
+          "masculine": "Světelný technik",
+          "feminine": "Světelná technička",
+          "neutral": "Světelný/á technik/technička"
+        },
+        "r_916b292e3ecc": {
+          "masculine": "Zvukový technik",
+          "feminine": "Zvuková technička",
+          "neutral": "Zvukový/á technik/technička"
+        },
+        "r_a409aeab8c20": {
+          "masculine": "Inženýr ozvučení",
+          "feminine": "Inženýrka ozvučení",
+          "neutral": "Inženýr/ka ozvučení"
+        },
+        "r_894d032abc78": {
+          "masculine": "Technik ozvučení",
+          "feminine": "Technička ozvučení",
+          "neutral": "Technik/technička ozvučení"
+        },
+        "r_87a1930129df": {
+          "masculine": "Operátor SNG",
+          "feminine": "Operátorka SNG",
+          "neutral": "Operátor/ka SNG"
+        },
+        "r_0d146769f561": {
+          "masculine": "Asistent zvuku (vysílání)",
+          "feminine": "Asistentka zvuku (vysílání)",
+          "neutral": "Asistent/ka zvuku (vysílání)"
+        },
+        "r_4ee86e5361a7": {
+          "masculine": "Operátor videostěny",
+          "feminine": "Operátorka videostěny",
+          "neutral": "Operátor/ka videostěny"
+        },
+        "r_7c7bcadca79c": {
+          "masculine": "Operátor čtecího zařízení",
+          "feminine": "Operátorka čtecího zařízení",
+          "neutral": "Operátor/ka čtecího zařízení"
+        },
+        "r_e627ebc7d6a6": {
+          "masculine": "Technický asistent (vysílání)",
+          "feminine": "Technická asistentka (vysílání)",
+          "neutral": "Technický/á asistent/ka (vysílání)"
+        },
+        "r_b81926eec6f3": {
+          "masculine": "Obrazový asistent",
+          "feminine": "Obrazová asistentka",
+          "neutral": "Obrazový/á asistent/ka"
+        },
+        "r_45710f001c06": {
+          "masculine": "Pomocník kabeláže",
+          "feminine": "Pomocnice kabeláže",
+          "neutral": "Pomocník/pomocnice kabeláže"
+        },
+        "r_34cfe59314f7": {
+          "masculine": "Obrazový střihač",
+          "feminine": "Obrazová střihačka",
+          "neutral": "Obrazový/á střihač/ka"
+        },
+        "r_ba025e1926d2": {
+          "masculine": "Operátor LSM (zpomalené sestřihy)",
+          "feminine": "Operátorka LSM (zpomalené sestřihy)",
+          "neutral": "Operátor/ka LSM (zpomalené sestřihy)"
+        },
+        "r_c7e1fa1f7572": {
+          "masculine": "Operátor znakové grafiky (SG)",
+          "feminine": "Operátorka znakové grafiky (SG)",
+          "neutral": "Operátor/ka znakové grafiky (SG)"
+        },
+        "r_c0aa2d3b3f9c": {
+          "masculine": "Asistent zvuku",
+          "feminine": "Asistentka zvuku",
+          "neutral": "Asistent/ka zvuku"
+        },
+        "r_32ca4217464e": {
+          "masculine": "Technický asistent",
+          "feminine": "Technická asistentka",
+          "neutral": "Technický/á asistent/ka"
+        }
+      },
+      "virtual": {
+        "r_9d90887128a0": {
+          "masculine": "Supervizor virtuální produkce",
+          "feminine": "Supervizorka virtuální produkce",
+          "neutral": "Supervizor/ka virtuální produkce"
+        },
+        "r_9c3babb3c638": {
+          "masculine": "Producent virtuální produkce",
+          "feminine": "Producentka virtuální produkce",
+          "neutral": "Producent/ka virtuální produkce"
+        },
+        "r_1fee1676270e": {
+          "masculine": "Koordinátor virtuální produkce",
+          "feminine": "Koordinátorka virtuální produkce",
+          "neutral": "Koordinátor/ka virtuální produkce"
+        },
+        "r_82e993b4422d": {
+          "masculine": "Vedoucí studia virtuální produkce",
+          "feminine": "Vedoucí studia virtuální produkce",
+          "neutral": "Vedoucí studia virtuální produkce"
+        },
+        "r_14e7e79a9ca8": {
+          "masculine": "Výtvarník virtuální výpravy (VAD)",
+          "feminine": "Výtvarnice virtuální výpravy (VAD)",
+          "neutral": "Výtvarník/výtvarnice virtuální výpravy (VAD)"
+        },
+        "r_2034a25adda6": {
+          "masculine": "Inženýr virtuální produkce",
+          "feminine": "Inženýrka virtuální produkce",
+          "neutral": "Inženýr/ka virtuální produkce"
+        },
+        "r_188b9da491f3": {
+          "masculine": "Technický ředitel VP systémů a nástrojů",
+          "feminine": "Technická ředitelka VP systémů a nástrojů",
+          "neutral": "Technický/á ředitel/ka VP systémů a nástrojů"
+        },
+        "r_93a5c89da775": {
+          "masculine": "Operátor LED stěny",
+          "feminine": "Operátorka LED stěny",
+          "neutral": "Operátor/ka LED stěny"
+        },
+        "r_d1415a80bf57": {
+          "masculine": "Operátor Unreal Engine",
+          "feminine": "Operátorka Unreal Engine",
+          "neutral": "Operátor/ka Unreal Engine"
+        },
+        "r_1c2e82f4274b": {
+          "masculine": "Operátor realtimového enginu",
+          "feminine": "Operátorka realtimového enginu",
+          "neutral": "Operátor/ka realtimového enginu"
+        },
+        "r_247afd3ab3fd": {
+          "masculine": "Operátor mediálního serveru",
+          "feminine": "Operátorka mediálního serveru",
+          "neutral": "Operátor/ka mediálního serveru"
+        },
+        "r_8728a8d46ae1": {
+          "masculine": "Administrátor VP systémů",
+          "feminine": "Administrátorka VP systémů",
+          "neutral": "Administrátor/ka VP systémů"
+        },
+        "r_e7c27999f9ae": {
+          "masculine": "VP trackingový technik",
+          "feminine": "VP trackingová technička",
+          "neutral": "VP trackingový/á technik/technička"
+        },
+        "r_bbe66ea7740f": {
+          "masculine": "VP LED technik",
+          "feminine": "VP LED technička",
+          "neutral": "VP LED technik/technička"
+        },
+        "r_ad04846bb2b3": {
+          "masculine": "Trackingový technik",
+          "feminine": "Trackingová technička",
+          "neutral": "Trackingový/á technik/technička"
+        },
+        "r_c100cb7d8cdf": {
+          "masculine": "Realtimový výtvarník",
+          "feminine": "Realtimová výtvarnice",
+          "neutral": "Realtimový/á výtvarník/výtvarnice"
+        },
+        "r_84ae9f742a8c": {
+          "masculine": "Výtvarník virtuální výpravy (VAD)",
+          "feminine": "Výtvarnice virtuální výpravy (VAD)",
+          "neutral": "Výtvarník/výtvarnice virtuální výpravy (VAD)"
+        }
+      },
+      "redaktion": {
+        "r_67a1c14f27d6": {
+          "masculine": "Vedoucí redakce",
+          "feminine": "Vedoucí redakce",
+          "neutral": "Vedoucí redakce"
+        },
+        "r_fb6f303e781e": {
+          "masculine": "Šéfredaktor",
+          "feminine": "Šéfredaktorka",
+          "neutral": "Šéfredaktor/ka"
+        },
+        "r_1d083876d102": {
+          "masculine": "Vedoucí vydání",
+          "feminine": "Vedoucí vydání",
+          "neutral": "Vedoucí vydání"
+        },
+        "r_dba49499f044": {
+          "masculine": "Vedoucí produkce (stanice)",
+          "feminine": "Vedoucí produkce (stanice)",
+          "neutral": "Vedoucí produkce (stanice)"
+        },
+        "r_399d5722db1b": {
+          "masculine": "Vedoucí výroby (stanice)",
+          "feminine": "Vedoucí výroby (stanice)",
+          "neutral": "Vedoucí výroby (stanice)"
+        },
+        "r_97c6fe9db2a1": {
+          "masculine": "Koordinátor průběhu",
+          "feminine": "Koordinátorka průběhu",
+          "neutral": "Koordinátor/ka průběhu"
+        },
+        "r_c1f3dd5d125c": {
+          "masculine": "Redaktor",
+          "feminine": "Redaktorka",
+          "neutral": "Redaktor/ka"
+        },
+        "r_74db110eed35": {
+          "masculine": "Televizní autor",
+          "feminine": "Televizní autorka",
+          "neutral": "Televizní autor/ka"
+        },
+        "r_c68ab8bdf35f": {
+          "masculine": "Castingový redaktor",
+          "feminine": "Castingová redaktorka",
+          "neutral": "Castingový/á redaktor/ka"
+        },
+        "r_db514834619e": {
+          "masculine": "Obrazový redaktor",
+          "feminine": "Obrazová redaktorka",
+          "neutral": "Obrazový/á redaktor/ka"
+        },
+        "r_2d3838a04d2d": {
+          "masculine": "Střihový redaktor",
+          "feminine": "Střihová redaktorka",
+          "neutral": "Střihový/á redaktor/ka"
+        },
+        "r_72b16f73761b": {
+          "masculine": "Online redaktor",
+          "feminine": "Online redaktorka",
+          "neutral": "Online redaktor/ka"
+        },
+        "r_1eb2a3ac7a7f": {
+          "masculine": "Videoredaktor",
+          "feminine": "Videoredaktorka",
+          "neutral": "Videoredaktor/ka"
+        },
+        "r_fea2147a3023": {
+          "masculine": "Televizní novinář",
+          "feminine": "Televizní novinářka",
+          "neutral": "Televizní novinář/ka"
+        },
+        "r_89901fa29127": {
+          "masculine": "Reportér",
+          "feminine": "Reportérka",
+          "neutral": "Reportér/ka"
+        },
+        "r_49092803ca90": {
+          "masculine": "Realizátor",
+          "feminine": "Realizátorka",
+          "neutral": "Realizátor/ka"
+        },
+        "r_558623ea54e2": {
+          "masculine": "Videoproducent",
+          "feminine": "Videoproducentka",
+          "neutral": "Videoproducent/ka"
+        },
+        "r_cd94582e5de3": {
+          "masculine": "Videožurnalista",
+          "feminine": "Videožurnalistka",
+          "neutral": "Videožurnalista/videožurnalistka"
+        },
+        "r_c1632a39db5a": {
+          "masculine": "Tvůrce videí pro sociální sítě",
+          "feminine": "Tvůrkyně videí pro sociální sítě",
+          "neutral": "Tvůrce/tvůrkyně videí pro sociální sítě"
+        },
+        "r_48a469f4753e": {
+          "masculine": "Moderátor",
+          "feminine": "Moderátorka",
+          "neutral": "Moderátor/ka"
+        },
+        "r_dff0d36f7649": {
+          "masculine": "Moderátor zpráv",
+          "feminine": "Moderátorka zpráv",
+          "neutral": "Moderátor/ka zpráv"
+        },
+        "r_d8ae611e8a84": {
+          "masculine": "Kreativní producent",
+          "feminine": "Kreativní producentka",
+          "neutral": "Kreativní producent/ka"
+        },
+        "r_52eb2ef13219": {
+          "masculine": "Kreativní ředitel",
+          "feminine": "Kreativní ředitelka",
+          "neutral": "Kreativní ředitel/ka"
+        },
+        "r_4741fd392c78": {
+          "masculine": "Reklamní textař",
+          "feminine": "Reklamní textařka",
+          "neutral": "Reklamní textař/ka"
+        },
+        "r_7693f0b6836d": {
+          "masculine": "Tvůrce konceptů",
+          "feminine": "Tvůrkyně konceptů",
+          "neutral": "Tvůrce/tvůrkyně konceptů"
+        },
+        "r_8ed4467cbce1": {
+          "masculine": "Producent sociálních sítí",
+          "feminine": "Producentka sociálních sítí",
+          "neutral": "Producent/ka sociálních sítí"
+        },
+        "r_f3046605ff7d": {
+          "masculine": "Asistent redakce",
+          "feminine": "Asistentka redakce",
+          "neutral": "Asistent/ka redakce"
+        },
+        "r_39b32b25eed9": {
+          "masculine": "Redakční stážista",
+          "feminine": "Redakční stážistka",
+          "neutral": "Redakční stážista/stážistka"
+        },
+        "r_7947e117851f": {
+          "masculine": "Vedoucí vydání",
+          "feminine": "Vedoucí vydání",
+          "neutral": "Vedoucí vydání"
+        },
+        "r_9c948261499b": {
+          "masculine": "Vedoucí produkce (studio / televizní síť)",
+          "feminine": "Vedoucí produkce (studio / televizní síť)",
+          "neutral": "Vedoucí produkce (studio / televizní síť)"
+        },
+        "r_844ebb650ef7": {
+          "masculine": "Redaktor",
+          "feminine": "Redaktorka",
+          "neutral": "Redaktor/ka"
+        },
+        "r_bac4afc8f929": {
+          "masculine": "Střihový realizátor",
+          "feminine": "Střihová realizátorka",
+          "neutral": "Střihový/á realizátor/ka"
+        },
+        "r_324910e3b0ab": {
+          "masculine": "Redaktor kvízů",
+          "feminine": "Redaktorka kvízů",
+          "neutral": "Redaktor/ka kvízů"
+        },
+        "r_363c83ce0934": {
+          "masculine": "Animátor publika",
+          "feminine": "Animátorka publika",
+          "neutral": "Animátor/ka publika"
+        },
+        "r_6227b3014b7a": {
+          "masculine": "Externí zpravodaj / fixer",
+          "feminine": "Externí zpravodajka / fixer",
+          "neutral": "Externí zpravodaj/ka / fixer"
+        },
+        "r_dfa579f14095": {
+          "masculine": "Zapisovatel materiálu",
+          "feminine": "Zapisovatelka materiálu",
+          "neutral": "Zapisovatel/ka materiálu"
+        },
+        "r_57c0fec76f7d": {
+          "masculine": "Přepisovatel",
+          "feminine": "Přepisovatelka",
+          "neutral": "Přepisovatel/ka"
+        },
+        "r_cabe547e084e": {
+          "masculine": "Obrazový rešeršista",
+          "feminine": "Obrazová rešeršistka",
+          "neutral": "Obrazový/á rešeršista/rešeršistka"
+        }
+      },
+      "social": {
+        "r_e8a967aad9b7": {
+          "masculine": "Tvůrce obsahu",
+          "feminine": "Tvůrkyně obsahu",
+          "neutral": "Tvůrce/tvůrkyně obsahu"
+        },
+        "r_631c65ad8827": {
+          "masculine": "Influencer",
+          "feminine": "Influencerka",
+          "neutral": "Influencer/ka"
+        },
+        "r_a9eeb34333bc": {
+          "masculine": "Správce sociálních sítí",
+          "feminine": "Správkyně sociálních sítí",
+          "neutral": "Správce/správkyně sociálních sítí"
+        },
+        "r_b510fa57cea0": {
+          "masculine": "Tvůrce UGC",
+          "feminine": "Tvůrkyně UGC",
+          "neutral": "Tvůrce/tvůrkyně UGC"
+        },
+        "r_4d66d4dbbf12": {
+          "masculine": "Videograf pro Reels",
+          "feminine": "Videografka pro Reels",
+          "neutral": "Videograf/ka pro Reels"
+        },
+        "r_423ece24b5c2": {
+          "masculine": "Tvůrce TikToku",
+          "feminine": "Tvůrkyně TikToku",
+          "neutral": "Tvůrce/tvůrkyně TikToku"
+        },
+        "r_e7483d4ddd6d": {
+          "masculine": "Správce komunity",
+          "feminine": "Správkyně komunity",
+          "neutral": "Správce/správkyně komunity"
+        },
+        "r_6f877112cd0a": {
+          "masculine": "Strateg sociálních sítí",
+          "feminine": "Stratéžka sociálních sítí",
+          "neutral": "Strateg/stratéžka sociálních sítí"
+        },
+        "r_bd90a8429d6f": {
+          "masculine": "Influencer / tvůrce",
+          "feminine": "Influencerka / tvůrkyně",
+          "neutral": "Influencer/ka / tvůrce/tvůrkyně"
+        },
+        "r_c43ce08ef6e8": {
+          "masculine": "Vypravěč příběhů značky",
+          "feminine": "Vypravěčka příběhů značky",
+          "neutral": "Vypravěč/ka příběhů značky"
+        },
+        "r_e75a59be5b02": {
+          "masculine": "Videograf (sociální obsah)",
+          "feminine": "Videografka (sociální obsah)",
+          "neutral": "Videograf/ka (sociální obsah)"
+        },
+        "r_5f522b44dd48": {
+          "masculine": "Střihač (Reels / TikTok)",
+          "feminine": "Střihačka (Reels / TikTok)",
+          "neutral": "Střihač/ka (Reels / TikTok)"
+        },
+        "r_ce039c1f951f": {
+          "masculine": "Motion designér (sociální sítě)",
+          "feminine": "Motion designérka (sociální sítě)",
+          "neutral": "Motion designér/ka (sociální sítě)"
+        }
+      },
+      "foto": {
+        "r_d2c0588cf0d1": {
+          "masculine": "Fotograf",
+          "feminine": "Fotografka",
+          "neutral": "Fotograf/ka"
+        },
+        "r_d7f7fbf5939c": {
+          "masculine": "Módní fotograf",
+          "feminine": "Módní fotografka",
+          "neutral": "Módní fotograf/ka"
+        },
+        "r_e0551919b067": {
+          "masculine": "Produktový fotograf",
+          "feminine": "Produktová fotografka",
+          "neutral": "Produktový/á fotograf/ka"
+        },
+        "r_b06301444ef7": {
+          "masculine": "Fotograf akcí",
+          "feminine": "Fotografka akcí",
+          "neutral": "Fotograf/ka akcí"
+        },
+        "r_124df4c664ce": {
+          "masculine": "Portrétní fotograf",
+          "feminine": "Portrétní fotografka",
+          "neutral": "Portrétní fotograf/ka"
+        },
+        "r_2e1fcf07d241": {
+          "masculine": "Reklamní fotograf",
+          "feminine": "Reklamní fotografka",
+          "neutral": "Reklamní fotograf/ka"
+        },
+        "r_02bd21bcff9c": {
+          "masculine": "Fotograf jídla",
+          "feminine": "Fotografka jídla",
+          "neutral": "Fotograf/ka jídla"
+        },
+        "r_8a273a427bd6": {
+          "masculine": "Dronový fotograf",
+          "feminine": "Dronová fotografka",
+          "neutral": "Dronový/á fotograf/ka"
+        },
+        "r_843b4748146d": {
+          "masculine": "Filmový fotograf",
+          "feminine": "Filmová fotografka",
+          "neutral": "Filmový/á fotograf/ka"
+        },
+        "r_b622037392fb": {
+          "masculine": "Fotografický asistent",
+          "feminine": "Fotografická asistentka",
+          "neutral": "Fotografický/á asistent/ka"
+        },
+        "r_6a2008f9f2ef": {
+          "masculine": "Vedoucí studia",
+          "feminine": "Vedoucí studia",
+          "neutral": "Vedoucí studia"
+        },
+        "r_341b032b61fc": {
+          "masculine": "Retušér",
+          "feminine": "Retušérka",
+          "neutral": "Retušér/ka"
+        },
+        "r_468329a20ba4": {
+          "masculine": "Editor fotografií",
+          "feminine": "Editorka fotografií",
+          "neutral": "Editor/ka fotografií"
+        }
+      },
+      "ki": {
+        "r_0af68f26119c": {
+          "masculine": "AI filmař",
+          "feminine": "AI filmařka",
+          "neutral": "AI filmař/ka"
+        },
+        "r_7ebc4eeffa63": {
+          "masculine": "AI koordinátor / supervizor",
+          "feminine": "AI koordinátorka / supervizorka",
+          "neutral": "AI koordinátor/ka / supervizor/ka"
+        },
+        "r_5143bd061069": {
+          "masculine": "AI režisér",
+          "feminine": "AI režisérka",
+          "neutral": "AI režisér/ka"
+        },
+        "r_8b38d96f6763": {
+          "masculine": "AI animátor",
+          "feminine": "AI animátorka",
+          "neutral": "AI animátor/ka"
+        },
+        "r_addc4afc90e0": {
+          "masculine": "Prompt inženýr (film a média)",
+          "feminine": "Prompt inženýrka (film a média)",
+          "neutral": "Prompt inženýr/ka (film a média)"
+        },
+        "r_227b357243e1": {
+          "masculine": "AI scenárista",
+          "feminine": "AI scenáristka",
+          "neutral": "AI scenárista/scenáristka"
+        },
+        "r_53ef2619b5af": {
+          "masculine": "AI storyboardista",
+          "feminine": "AI storyboardistka",
+          "neutral": "AI storyboardista/storyboardistka"
+        },
+        "r_1185b1151f24": {
+          "masculine": "Tvůrce AI obrázků",
+          "feminine": "Tvůrkyně AI obrázků",
+          "neutral": "Tvůrce/tvůrkyně AI obrázků"
+        },
+        "r_f551cf191b74": {
+          "masculine": "Tvůrce AI videí",
+          "feminine": "Tvůrkyně AI videí",
+          "neutral": "Tvůrce/tvůrkyně AI videí"
+        },
+        "r_b69e1ec80a94": {
+          "masculine": "AI zvukový designér",
+          "feminine": "AI zvuková designérka",
+          "neutral": "AI zvukový/á designér/ka"
+        },
+        "r_237f8a4202e1": {
+          "masculine": "AI kolorista",
+          "feminine": "AI koloristka",
+          "neutral": "AI kolorista/koloristka"
+        },
+        "r_38b5ef6c319c": {
+          "masculine": "Konzultant AI pracovních postupů (film)",
+          "feminine": "Konzultantka AI pracovních postupů (film)",
+          "neutral": "Konzultant/ka AI pracovních postupů (film)"
+        }
+      },
+      "drehbuch": {
+        "r_f63a97948825": {
+          "masculine": "Showrunner",
+          "feminine": "Showrunner",
+          "neutral": "Showrunner"
+        },
+        "r_da4094d01df6": {
+          "masculine": "Hlavní autor",
+          "feminine": "Hlavní autorka",
+          "neutral": "Hlavní autor/ka"
+        },
+        "r_48862b016872": {
+          "masculine": "Asistent hlavního autora",
+          "feminine": "Asistentka hlavního autora",
+          "neutral": "Asistent/ka hlavního autora"
+        },
+        "r_f0e5da473f57": {
+          "masculine": "Asistent showrunnera",
+          "feminine": "Asistentka showrunnera",
+          "neutral": "Asistent/ka showrunnera"
+        },
+        "r_be444be7e73a": {
+          "masculine": "Scenárista",
+          "feminine": "Scenáristka",
+          "neutral": "Scenárista/scenáristka"
+        },
+        "r_d1a561dc7125": {
+          "masculine": "Spoluautor",
+          "feminine": "Spoluautorka",
+          "neutral": "Spoluautor/ka"
+        },
+        "r_da01eb9b61e7": {
+          "masculine": "Autor přepracování scénáře",
+          "feminine": "Autorka přepracování scénáře",
+          "neutral": "Autor/ka přepracování scénáře"
+        },
+        "r_199c194315c9": {
+          "masculine": "Scenáristický doktor",
+          "feminine": "Scenáristická doktorka",
+          "neutral": "Scenáristický/á doktor/ka"
+        },
+        "r_a180812047b1": {
+          "masculine": "Editor příběhu",
+          "feminine": "Editorka příběhu",
+          "neutral": "Editor/ka příběhu"
+        },
+        "r_5f9704129182": {
+          "masculine": "Autor příběhových linií",
+          "feminine": "Autorka příběhových linií",
+          "neutral": "Autor/ka příběhových linií"
+        },
+        "r_41126a4d581f": {
+          "masculine": "Editor scénáře",
+          "feminine": "Editorka scénáře",
+          "neutral": "Editor/ka scénáře"
+        },
+        "r_11bee057c159": {
+          "masculine": "Dialogový editor",
+          "feminine": "Dialogová editorka",
+          "neutral": "Dialogový/á editor/ka"
+        },
+        "r_d578a24e6a6c": {
+          "masculine": "Autor dialogů",
+          "feminine": "Autorka dialogů",
+          "neutral": "Autor/ka dialogů"
+        },
+        "r_cbc48ad9850e": {
+          "masculine": "Lektor scénáře",
+          "feminine": "Lektorka scénáře",
+          "neutral": "Lektor/ka scénáře"
+        },
+        "r_850bbf550984": {
+          "masculine": "Dramaturg / scenáristický konzultant",
+          "feminine": "Dramaturgyně / scenáristická konzultantka",
+          "neutral": "Dramaturg/yně / scenáristický/á konzultant/ka"
+        },
+        "r_c33a26535234": {
+          "masculine": "Vývoj scénářů a námětů",
+          "feminine": "Vývoj scénářů a námětů",
+          "neutral": "Vývoj scénářů a námětů"
+        },
+        "r_e439aac0b481": {
+          "masculine": "Vedoucí scénářů",
+          "feminine": "Vedoucí scénářů",
+          "neutral": "Vedoucí scénářů"
+        },
+        "r_a30d0af43af8": {
+          "masculine": "Vedoucí příběhu",
+          "feminine": "Vedoucí příběhu",
+          "neutral": "Vedoucí příběhu"
+        },
+        "r_3aa5851edfa7": {
+          "masculine": "Tvůrce formátů",
+          "feminine": "Tvůrkyně formátů",
+          "neutral": "Tvůrce/tvůrkyně formátů"
+        },
+        "r_fc05d4531220": {
+          "masculine": "Autor treatmentu",
+          "feminine": "Autorka treatmentu",
+          "neutral": "Autor/ka treatmentu"
+        },
+        "r_601f64f82db2": {
+          "masculine": "Autor dabingových dialogů",
+          "feminine": "Autorka dabingových dialogů",
+          "neutral": "Autor/ka dabingových dialogů"
+        },
+        "r_1ddc57dbbeb2": {
+          "masculine": "Autor audiopopisu",
+          "feminine": "Autorka audiopopisu",
+          "neutral": "Autor/ka audiopopisu"
+        },
+        "r_9f89ae134497": {
+          "masculine": "Filmový překladatel",
+          "feminine": "Filmová překladatelka",
+          "neutral": "Filmový/á překladatel/ka"
+        },
+        "r_6cc875ec3963": {
+          "masculine": "Překladatel scénářů",
+          "feminine": "Překladatelka scénářů",
+          "neutral": "Překladatel/ka scénářů"
+        },
+        "r_5947f173deeb": {
+          "masculine": "Překlad titulků",
+          "feminine": "Překlad titulků",
+          "neutral": "Překlad titulků"
+        },
+        "r_7b6a9a537e9a": {
+          "masculine": "Překlad dialogů",
+          "feminine": "Překlad dialogů",
+          "neutral": "Překlad dialogů"
+        },
+        "r_07f1b8537dbc": {
+          "masculine": "Překlad přepisů",
+          "feminine": "Překlad přepisů",
+          "neutral": "Překlad přepisů"
+        },
+        "r_baf097c29e20": {
+          "masculine": "Přepisovatel dialogové listiny",
+          "feminine": "Přepisovatelka dialogové listiny",
+          "neutral": "Přepisovatel/ka dialogové listiny"
+        },
+        "r_84f5505f76e2": {
+          "masculine": "Textař / copywriter",
+          "feminine": "Textařka / copywriterka",
+          "neutral": "Textař/ka / copywriter/ka"
+        },
+        "r_f38e225361bf": {
+          "masculine": "Jazykový asistent",
+          "feminine": "Jazyková asistentka",
+          "neutral": "Jazykový/á asistent/ka"
+        },
+        "r_eda2531fdadf": {
+          "masculine": "Rešeršista",
+          "feminine": "Rešeršistka",
+          "neutral": "Rešeršista/rešeršistka"
+        },
+        "r_c6e3b618f79f": {
+          "masculine": "Asistent rešerše",
+          "feminine": "Asistentka rešerše",
+          "neutral": "Asistent/ka rešerše"
+        },
+        "r_0434302793dc": {
+          "masculine": "Koordinátor scénáře",
+          "feminine": "Koordinátorka scénáře",
+          "neutral": "Koordinátor/ka scénáře"
+        },
+        "r_dae3743c6b89": {
+          "masculine": "Scenáristický stážista",
+          "feminine": "Scenáristická stážistka",
+          "neutral": "Scenáristický/á stážista/stážistka"
+        }
+      },
+      "public-relations": {
+        "r_1860a572354e": {
+          "masculine": "Marketing a PR",
+          "feminine": "Marketing a PR",
+          "neutral": "Marketing a PR"
+        },
+        "r_201f2da74897": {
+          "masculine": "Správce sociálních sítí (film / produkce)",
+          "feminine": "Správkyně sociálních sítí (film / produkce)",
+          "neutral": "Správce/správkyně sociálních sítí (film / produkce)"
+        },
+        "r_041271a6a3ee": {
+          "masculine": "Koordinátor propagace",
+          "feminine": "Koordinátorka propagace",
+          "neutral": "Koordinátor/ka propagace"
+        }
+      },
+      "sicherheit-sanitaetsdienst": {
+        "r_972d7ff7233a": {
+          "masculine": "Zdravotník na place / Set Medic",
+          "feminine": "Zdravotnice na place / Set Medic",
+          "neutral": "Zdravotník/zdravotnice na place / Set Medic"
+        },
+        "r_deefff77f871": {
+          "masculine": "Zdravotnický záchranář / záchranář",
+          "feminine": "Zdravotnická záchranářka / záchranářka",
+          "neutral": "Zdravotnický/á záchranář/ka / záchranář/ka"
+        },
+        "r_63a9f32e6a72": {
+          "masculine": "Podnikový zdravotník / zdravotník",
+          "feminine": "Podniková zdravotnice / zdravotnice",
+          "neutral": "Podnikový/á zdravotník/zdravotnice / zdravotník/zdravotnice"
+        },
+        "r_550de11c2d96": {
+          "masculine": "Požární hlídka",
+          "feminine": "Požární hlídka",
+          "neutral": "Požární hlídka"
+        },
+        "r_427dc70aedd7": {
+          "masculine": "Pomocník požární ochrany",
+          "feminine": "Pomocnice požární ochrany",
+          "neutral": "Pomocník/pomocnice požární ochrany"
+        },
+        "r_a3247768d472": {
+          "masculine": "Technik požární ochrany",
+          "feminine": "Technička požární ochrany",
+          "neutral": "Technik/technička požární ochrany"
+        }
+      },
+      "catering-setverpflegung": {
+        "r_330e10f94b8f": {
+          "masculine": "Vedoucí cateringu",
+          "feminine": "Vedoucí cateringu",
+          "neutral": "Vedoucí cateringu"
+        },
+        "r_2fe8f1ac7f90": {
+          "masculine": "Kuchař na natáčení",
+          "feminine": "Kuchařka na natáčení",
+          "neutral": "Kuchař/ka na natáčení"
+        },
+        "r_463cca2307e9": {
+          "masculine": "Asistent cateringu / pomocník v kuchyni",
+          "feminine": "Asistentka cateringu / pomocnice v kuchyni",
+          "neutral": "Asistent/ka cateringu / pomocník/pomocnice v kuchyni"
+        },
+        "r_e114754d9175": {
+          "masculine": "Průběžné občerstvení na natáčení",
+          "feminine": "Průběžné občerstvení na natáčení",
+          "neutral": "Průběžné občerstvení na natáčení"
+        },
+        "r_cb6d56c18bf6": {
+          "masculine": "Péče o štáb / výdej jídla",
+          "feminine": "Péče o štáb / výdej jídla",
+          "neutral": "Péče o štáb / výdej jídla"
+        },
+        "r_532adc563b66": {
+          "masculine": "Řidič cateringu a mobilní kuchyně",
+          "feminine": "Řidička cateringu a mobilní kuchyně",
+          "neutral": "Řidič/ka cateringu a mobilní kuchyně"
+        }
+      },
+      "filmtiere-tiertraining": {
+        "r_3d8ab6fb2c6a": {
+          "masculine": "Trenér filmových zvířat",
+          "feminine": "Trenérka filmových zvířat",
+          "neutral": "Trenér/ka filmových zvířat"
+        },
+        "r_654c33dc9c6b": {
+          "masculine": "Trenér filmových psů",
+          "feminine": "Trenérka filmových psů",
+          "neutral": "Trenér/ka filmových psů"
+        },
+        "r_40758f075d18": {
+          "masculine": "Ošetřovatel zvířat / Ošetřovatel zvířat (Animal Handler)",
+          "feminine": "Ošetřovatelka zvířat / Ošetřovatelka zvířat (Animal Handler)",
+          "neutral": "Ošetřovatel/ka zvířat / Ošetřovatel/ka zvířat (Animal Handler)"
+        },
+        "r_7a1591b96b3a": {
+          "masculine": "Koordinátor zvířat",
+          "feminine": "Koordinátorka zvířat",
+          "neutral": "Koordinátor/ka zvířat"
+        },
+        "r_a63695a566c3": {
+          "masculine": "Ošetřovatel zvířat na natáčení",
+          "feminine": "Ošetřovatelka zvířat na natáčení",
+          "neutral": "Ošetřovatel/ka zvířat na natáčení"
+        },
+        "r_9faf951b627e": {
+          "masculine": "Vedoucí koordinace koní (Horse Master)",
+          "feminine": "Vedoucí koordinace koní (Horse Master)",
+          "neutral": "Vedoucí koordinace koní (Horse Master)"
+        },
+        "r_7c4f137defec": {
+          "masculine": "Asistent koordinace koní",
+          "feminine": "Asistentka koordinace koní",
+          "neutral": "Asistent/ka koordinace koní"
+        },
+        "r_8e8f21cf0303": {
+          "masculine": "Trenér filmových koní",
+          "feminine": "Trenérka filmových koní",
+          "neutral": "Trenér/ka filmových koní"
+        },
+        "r_35f9ffa503c4": {
+          "masculine": "Ošetřovatel koní / Ošetřovatel koní (Horse Wrangler)",
+          "feminine": "Ošetřovatelka koní / Ošetřovatelka koní (Horse Wrangler)",
+          "neutral": "Ošetřovatel/ka koní / Ošetřovatel/ka koní (Horse Wrangler)"
+        }
+      }
     }
   },
   "TransactionalEmail": {
@@ -8454,5 +13363,13 @@
     "noMatches": "V této sekci zatím nemáš nic uloženého.",
     "signInHint": "Pro zobrazení uložených položek se přihlas.",
     "removeItem": "Odebrat {name} z uložených položek"
+  },
+  "OccupationForm": {
+    "title": "Podoba názvů tvých profesí",
+    "help": "Vyber, jak se mají zobrazovat názvy tvých profesí. Tuto volbu můžeš kdykoli změnit.",
+    "standard": "Výchozí",
+    "masculine": "Mužský tvar",
+    "feminine": "Ženský tvar",
+    "neutral": "Neutrální tvar"
   }
 }

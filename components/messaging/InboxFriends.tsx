@@ -1,5 +1,7 @@
 "use client";
 
+import type { OccupationForm } from "@/lib/occupation-form";
+
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { useAuth } from "@clerk/nextjs";
 import { useLocale, useTranslations } from "next-intl";
@@ -9,7 +11,7 @@ import { useFormNavigation } from "@/contexts/FormDraftContext";
 import { navigateMessageView } from "@/lib/message-navigation";
 import { uiErrorMessage } from "@/lib/ui-error-message";
 
-type Contact = { friendship_id: string; user_id: string; display_name: string; avatar_url: string | null; role: string };
+type Contact = { friendship_id: string; user_id: string; display_name: string; avatar_url: string | null; role: string; occupationForm?: OccupationForm };
 
 /** Only accepted connections belong here; incoming requests live in Mitteilungen. */
 export default function InboxFriends() {

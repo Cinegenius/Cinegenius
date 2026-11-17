@@ -1,3 +1,4 @@
+import { occupationFormFromCrew } from "@/lib/occupation-form";
 import { profileOccupationPreview, type OccupationProfile } from "@/lib/crew-occupations";
 import { profileAccessFor } from "@/lib/profile-privacy-server";
 import { projectProfilePrivacy } from "@/lib/profile-privacy";
@@ -141,6 +142,7 @@ async function getHomeData() {
       city: profile.location?.split(",")[0]?.trim() ?? "",
       verified: profile.verified ?? false,
       positions,
+      occupationForm: occupationFormFromCrew(profile.crew),
       createdAt: profile.created_at ?? "",
     };
   });
@@ -258,7 +260,7 @@ async function HomeCrew({ dataPromise }: { dataPromise: HomeDataPromise }) {
                   </div>
                   <div className="p-3 flex flex-col flex-1">
                     <h3 className="font-semibold text-text-primary text-sm leading-snug mb-0.5">{c.name}</h3>
-                    {c.positions.length > 0 && <p className="mb-1 line-clamp-2 text-[11px] leading-snug text-gold">{c.positions.map(label => taxonomyLabel(label, uiText)).join(" · ")}</p>}
+                    {c.positions.length > 0 && <p className="mb-1 line-clamp-2 text-[11px] leading-snug text-gold">{c.positions.map(label => taxonomyLabel(label, uiText, c.occupationForm)).join(" · ")}</p>}
                     {c.city && (
                       <p className="text-[11px] text-text-muted flex items-center gap-1 mb-1.5">
                         <MapPin size={9} /> {c.city}

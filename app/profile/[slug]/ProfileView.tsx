@@ -1,5 +1,7 @@
 "use client";
 
+import { occupationFormFromCrew, type OccupationForm } from "@/lib/occupation-form";
+
 import ProfilePronouns from "@/components/ProfilePronouns";
 import { profileTraitLabel, profileTravelValue } from "@/lib/profile-trait-labels";
 import { listingPriceLabel } from "@/lib/listing-price";
@@ -129,7 +131,7 @@ function AdditionalProfileOccupations({profile}: {profile: UserProfile}) {
   const summary = displayPositions(profile, getLocalizedProfileTypeLabels(t));
   const additional = (profile.positions ?? []).filter(title => !summary.includes(title));
   if (!additional.length) return null;
-  return <details className="mt-3 text-sm text-text-secondary"><summary className="flex min-h-11 cursor-pointer items-center font-semibold">{t("occupation.additionalTitle")}</summary><p className="break-words leading-6">{additional.map(title => taxonomyLabel(title, t)).join(" · ")}</p></details>;
+  return <details className="mt-3 text-sm text-text-secondary"><summary className="flex min-h-11 cursor-pointer items-center font-semibold">{t("occupation.additionalTitle")}</summary><p className="break-words leading-6">{additional.map(title => taxonomyLabel(title, t, occupationFormFromCrew(profile.crew))).join(" · ")}</p></details>;
 }
 
 function SectionLabel({ children }: { children: React.ReactNode }) {
@@ -304,7 +306,7 @@ function BlockReportBar({ targetId, initialYouBlocked }: { targetId: string; ini
 
 // ─── Collaborations Section ───────────────────────────────────────────────────
 
-type PublicCollab = { label: string; display_name: string; avatar_url: string | null; slug: string; role: string | null };
+type PublicCollab = { label: string; display_name: string; avatar_url: string | null; slug: string; role: string | null; occupationForm?: OccupationForm };
 
 function CollaborationsSection({ collaborations }: { collaborations: PublicCollab[] }) {
   const uiText = useTranslations();
@@ -338,7 +340,7 @@ function CollaborationsSection({ collaborations }: { collaborations: PublicColla
                 {c.display_name}
               </p>
               <p className="text-[10px] text-gold font-medium truncate mt-0.5">{c.label}</p>
-              {c.role && <p className="text-[10px] text-text-muted truncate">{taxonomyLabel(c.role, uiText)}</p>}
+              {c.role && <p className="text-[10px] text-text-muted truncate">{taxonomyLabel(c.role, uiText, c.occupationForm)}</p>}
             </div>
           </Link>
         ))}
@@ -503,7 +505,7 @@ function ActorProfile({ organizationSection, profile, isOwner, projectCredits, c
   const [expandedFilm, setExpandedFilm] = useState<number | null>(null);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const p = (profile.physical ?? {}) as any;
-  const roleLabels = displayPositions(profile, getLocalizedProfileTypeLabels(uiText)).map(label => taxonomyLabel(label, uiText));
+  const roleLabels = displayPositions(profile, getLocalizedProfileTypeLabels(uiText)).map(label => taxonomyLabel(label, uiText, occupationFormFromCrew(profile.crew)));
   const performance = profile.performance ?? {};
   const dialects: string[] = performance.dialects ?? [];
   const drivingLicenses: string[] = performance.driving_licenses ?? [];
@@ -982,7 +984,7 @@ function ModelProfile({ organizationSection, profile, isOwner, projectCredits = 
   const memberships: string[] = profile.memberships ?? [];
   const languages = profile.languages ?? [];
   const performance = profile.performance ?? {};
-  const roleLabels = displayPositions(profile, getLocalizedProfileTypeLabels(uiText)).map(label => taxonomyLabel(label, uiText));
+  const roleLabels = displayPositions(profile, getLocalizedProfileTypeLabels(uiText)).map(label => taxonomyLabel(label, uiText, occupationFormFromCrew(profile.crew)));
   const manualFilms: FilmographyEntry[] = profile.filmography ?? [];
   const creditedTitles = new Set(projectCredits.filter((credit) => credit.projects).map((credit) => credit.projects!.title.trim().toLocaleLowerCase("de")));
   const films = manualFilms.filter((film) => film.title?.trim() && !creditedTitles.has(film.title.trim().toLocaleLowerCase("de")));
@@ -1258,7 +1260,7 @@ function GenericProfile({ organizationSection, profile, isOwner, projectCredits,
   const certificates: string[] = profile.crew?.certificates ?? [];
   const software: string[] = profile.crew?.software ?? [];
   const bgImage = profile.cover_image_url ?? (images.find((i) => i.featured)?.url);
-  const roleLabels = displayPositions(profile, getLocalizedProfileTypeLabels(uiText)).map(label => taxonomyLabel(label, uiText));
+  const roleLabels = displayPositions(profile, getLocalizedProfileTypeLabels(uiText)).map(label => taxonomyLabel(label, uiText, occupationFormFromCrew(profile.crew)));
 
   // Filmografie shows only manual entries — linked project credits appear as visual cards in "Projekte"
   const creditTitles = new Set(
@@ -1818,6 +1820,7 @@ function PhotoGrid({
 
 
 type SimilarProfile = {
+  occupationForm?: OccupationForm;
   user_id: string;
   display_name: string;
   avatar_url: string | null;
@@ -1866,7 +1869,7 @@ function SimilarProfilesSection({ profiles }: { profiles: SimilarProfile[] }) {
                 </div>
                 <p className="text-xs font-semibold text-text-primary leading-tight line-clamp-1 group-hover:text-gold transition-colors">{p.display_name}</p>
                 {(p.role ?? p.tagline) && (
-                  <p className="text-[10px] text-text-muted mt-0.5 line-clamp-1">{p.role ?? p.tagline}</p>
+                  <p className="text-[10px] text-text-muted mt-0.5 line-clamp-1">{p.role ? taxonomyLabel(p.role, uiText, p.occupationForm) : p.tagline}</p>
                 )}
                 {city && (
                   <p className="text-[10px] text-text-muted/60 mt-0.5 flex items-center gap-0.5">

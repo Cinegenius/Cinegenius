@@ -40,3 +40,13 @@ jemand einen zugewiesenen Beruf, wird dessen veralteter Platzhalter geleert; die
 Der Vergleich veröffentlichter Creditlisten von 140 Filmen und seine Grenzen stehen
 in [der Untersuchung](research/crew-catalogue-2026-11-16.md). Kandidaten sind noch keine
 neuen Auswahlpunkte. Bestehende IDs und Übersetzungen wurden nicht umbenannt.
+
+## Freiwillige Schreibweise — 17. November 2026
+
+Die Anzahl und Zuordnung der Tätigkeiten bleibt unabhängig von ihrer Schreibweise.
+Ohne ausdrückliche Auswahl gilt wieder die bisherige kompakte Standardanzeige,
+einschließlich etablierter Sternchen-/Schrägstrichformen. Optional speichert
+`crew.occupationForm` die vom Profilinhaber gewählte männliche, weibliche oder neutrale
+Form. Das ersetzt die zwischenzeitliche Pflicht zur ausgeschriebenen Beidnennung.
+Siehe [Web-/App-Vertrag](occupation-form-preference.md); Berufs-IDs, Suchbarkeit und
+ältere gespeicherte Angaben bleiben erhalten.

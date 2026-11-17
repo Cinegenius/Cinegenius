@@ -1,6 +1,6 @@
 # Optional profile identity and expanded languages
 
-Markus approved implementation and publication on 16–17 November 2026. Latest scope: neutral occupation labels, optional pronouns and eight additional interface languages. **Avatar and cover presets are explicitly deferred**, pending selection from 20 paired visual studies. Existing photo/cover uploads and site design remain unchanged.
+Markus approved identity and language work on 16–17 November 2026. The latest occupation decision restores the compact shared standard and adds an optional owner-selected wording preference; see [the current contract](occupation-form-preference.md). Earlier neutralization and full-pair instructions below are historical. Artwork approval and its current scope are recorded in [profile-art.md](profile-art.md), which supersedes the earlier preset deferral. Existing member uploads remain preserved.
 
 ## Profile contract
 
@@ -12,7 +12,7 @@ Migration `20261116223941_profile_pronouns.sql` was applied and verified: all 20
 
 ## Languages
 
-Existing: de, en, es, it, cs, hu, nl, nl-BE, sv. Additions: fr, pl, pt-PT, zh-Hans, ja, ko, ru, uk. All seventeen catalogs contain 8,068 keys. The eight new catalogs were generated in an explicitly guarded staged build using the existing authorized OpenAI account, checked against the source hash, then reviewed for interpolation, auth/recovery wording, taxonomy lookup and layout. Invalid structured fragments and translated example addresses were repaired. Only UI strings and usage totals were exported; no key, account data or member text was exported. Temporary public draft placeholders are removed from this feature release. Machine-generated wording can still need native-speaker editorial improvements; key parity alone is not a linguistic certification.
+Existing: de, en, es, it, cs, hu, nl, nl-BE, sv. Additions: fr, pl, pt-PT, zh-Hans, ja, ko, ru, uk. At the original language-expansion verification, all seventeen catalogs contained 8,068 keys; subsequent feature namespaces are documented with their changes. The eight new catalogs were generated in an explicitly guarded staged build using the existing authorized OpenAI account, checked against the source hash, then reviewed for interpolation, auth/recovery wording, taxonomy lookup and layout. Invalid structured fragments and translated example addresses were repaired. Only UI strings and usage totals were exported; no key, account data or member text was exported. Temporary public draft placeholders are removed from this feature release. Machine-generated wording can still need native-speaker editorial improvements; key parity alone is not a linguistic certification.
 
 Manual language choice takes priority over browser language and persists across sign-in/out. Regional Portuguese falls back to the explicitly labeled Portugal catalog. Simplified Chinese aliases resolve to zh-Hans; traditional Chinese is not falsely advertised as supported. Shared locale resolution applies to authentication, interface, country display, Genie and application-generated mail. Provider-owned security/billing email originals retain their existing separate configuration; the website language expansion does not claim to translate those templates. Only the selected catalog and the German fallback load; no per-visit translation requests. Stable taxonomy IDs and member-created content remain unchanged.
 
@@ -24,7 +24,7 @@ Listing freshness also needs `20261117000500_profile_language_expansion.sql`: ex
 
 ## App coordination and validation
 
-APP Entwicklung must use the same optional fields, visibility contract, stable taxonomy IDs and locale tags. Avatar and cover presets must remain disabled there too. Existing native sources and device behavior are separate from this website change.
+APP Entwicklung must use the same optional fields, visibility contract, stable taxonomy IDs and locale tags. The original native preset deferral is superseded by the current scope in docs/profile-art.md. Existing native sources and device behavior are separate from this website change.
 
 Browser simulations cover phone/tablet/laptop widths. They do not certify an actual iPhone, Xcode build or native language switching. APP Entwicklung messaging transport was unavailable; record the final source/test/publication handoff locally and do not claim delivery until acknowledged.
 
@@ -40,9 +40,9 @@ The 20 paired visual studies are at `/srv/cinegenius/research/20261117-twenty-st
 - Production build, final source commit and actual deployment outcome are recorded separately in `/srv/cinegenius/handoffs/20261117-profile-identity/`; schema application alone is never called a website release.
 
 
-## Complete occupation forms — operator correction, 17 November 2026
+## Historical full-pair correction — superseded later on 17 November 2026
 
-The user reported that occupational choices had become masculine-only or been replaced with activities. This correction supersedes the earlier blanket neutralization. All 962 existing German choices in 25 departments were reviewed: gendered German professional names display full masculine/feminine pairs; accurate established neutral professional titles remain. No gender is inferred or selected for a member, pronouns remain optional and private by default, and no stored occupation, canonical role ID, department ID or member-written text is migrated.
+The user reported that occupational choices had become masculine-only or been replaced with activities. At this earlier stage, full masculine/feminine pairs replaced the blanket neutralization across the 962 existing German choices in 25 departments. The user subsequently rejected that expanded default. This full-pair display requirement is superseded by the compact-standard and optional-preference contract in [occupation-form-preference.md](occupation-form-preference.md); the alias and qualification safeguards remain applicable. No gender is inferred or selected for a member, pronouns remain optional and private by default, and no stored occupation, canonical role ID, department ID or member-written text is migrated.
 
 Examples include Oberbeleuchter / Oberbeleuchterin, Kameramann / Kamerafrau, Setkoch / Setköchin and Schnittmodelleur / Schnittdirektrice. Best Boy Electric / Best Girl Electric and the separate Grip and Rigging specializations retain their existing single choice IDs. Stuntman/Stuntwoman and Stuntfrau are exact search aliases of Stunt Performer. No additional physician aliases are created for paramedic occupations. The inherited Set-Arzt / Medic / Set-Arzt legacy aliases remain compatible; this correction does not add an Arzt/Ärztin choice or redesign medical qualifications.
 

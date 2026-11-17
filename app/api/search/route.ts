@@ -1,3 +1,6 @@
+import { taxonomyLabel } from "@/lib/departments";
+import { occupationSearchValues } from "@/lib/occupation-search";
+import { occupationFormFromCrew } from "@/lib/occupation-form";
 import { profileOccupationPreview } from "@/lib/crew-occupations";
 import { profileAccessFor } from "@/lib/profile-privacy-server";
 import { projectProfilePrivacy } from "@/lib/profile-privacy";
@@ -21,7 +24,7 @@ import { getPrivateProfileIds } from "@/lib/trust";
 import { getLocale,getTranslations } from "next-intl/server";
 import { NextRequest,NextResponse } from "next/server";
 
-async function publicProfileMatches(read: (from: number, to: number) => PromiseLike<{ data: Record<string, unknown>[] | null; error: unknown }>, queryText?: string) {
+async function publicProfileMatches(read: (from: number, to: number) => PromiseLike<{ data: Record<string, unknown>[] | null; error: unknown }>, queryText?: string, occupationValues: readonly string[] = []) {
   const visible: Record<string, unknown>[] = [];
   for (let from = 0; visible.length < 24; from += 100) {
     const result = await read(from, from + 99);
@@ -30,7 +33,9 @@ async function publicProfileMatches(read: (from: number, to: number) => PromiseL
     const privacy = await profileAccessFor(rows.map(row => String(row.user_id)));
     const key = (value: unknown) => String(value ?? "").normalize("NFKD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
     visible.push(...rows.filter(row => row.display_name && privacy.get(String(row.user_id))?.profile)
-      .filter(row => !queryText || privacy.get(String(row.user_id))?.location || key([row.display_name,row.role,row.bio,...(Array.isArray(row.positions)?row.positions:[])]).includes(key(queryText)))
+      .filter(row => !queryText || privacy.get(String(row.user_id))?.location
+        || key([row.display_name,row.role,row.bio,...(Array.isArray(row.positions)?row.positions:[])]).includes(key(queryText))
+        || [row.role,...(Array.isArray(row.positions)?row.positions:[])].some(value => typeof value === "string" && occupationValues.includes(value)))
       .map(row => projectProfilePrivacy(row,privacy.get(String(row.user_id)))));
     if (rows.length < 100) break;
   }
@@ -47,6 +52,12 @@ export async function GET(req: NextRequest) {
   const q    = raw.replace(/[(),]/g, " ").trim();
   const like = `%${q}%`;
   const catalog=await getTranslations("MarketplaceCatalog"),market=await getTranslations("MarketplaceOffer"),locale=await getLocale();
+  const uiText = await getTranslations();
+  const taxonomy = await getTranslations("Taxonomy");
+  const occupationValues = occupationSearchValues(raw, locale, taxonomy);
+  // JSON quoting protects trusted catalogue titles containing commas or brackets.
+  const occupationLiterals = occupationValues.map(value => JSON.stringify(value)).join(",");
+  const occupationFilter = occupationLiterals ? `,role.in.(${occupationLiterals}),positions.ov.{${occupationLiterals}}` : "";
   const geoFilter=placeSearchFilter(raw);
   const categoryCandidates=marketplaceSearchCategories(q,catalog).map(value=>`"${value.replace(/["\\]/g,'')}"`).join(",");
 
@@ -73,9 +84,9 @@ export async function GET(req: NextRequest) {
       ? publicProfileMatches((from, to) => db
           .from("profiles")
           .select("place_country_code,place_region_id,place_city_id,place_city_name,place_region_name,place_status,user_id, display_name, location, bio, role, positions, crew, avatar_url, available")
-          .or(`display_name.ilike.${like},role.ilike.${like},location.ilike.${like},bio.ilike.${like}${geoFilter?`,${geoFilter}`:""}`)
+          .or(`display_name.ilike.${like},role.ilike.${like},location.ilike.${like},bio.ilike.${like}${occupationFilter}${geoFilter?`,${geoFilter}`:""}`)
           .not("display_name", "is", null)
-          .neq("display_name", "").order("user_id").range(from, to), q)
+          .neq("display_name", "").order("user_id").range(from, to), q, occupationValues)
       : Promise.resolve({ data: [] }),
 
     wantCompanies
@@ -144,7 +155,7 @@ export async function GET(req: NextRequest) {
     .map((p: Record<string, unknown>) => ({
       id: p.user_id as string,
       title: p.display_name as string,
-      subtitle: [profileOccupationPreview(p)[0], placeDisplay(placeReadFields(String(p.location??""),p,locale),String(p.location??""),locale)].filter(Boolean).join(" · "),
+      subtitle: [profileOccupationPreview(p)[0] ? taxonomyLabel(profileOccupationPreview(p)[0], uiText, occupationFormFromCrew(p.crew)) : null, placeDisplay(placeReadFields(String(p.location??""),p,locale),String(p.location??""),locale)].filter(Boolean).join(" · "),
       type: "profile",
       price: 0,
       image: p.avatar_url as string | null,

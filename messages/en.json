@@ -1687,7 +1687,54 @@
     "previewNotice": "This animal portfolio is awaiting approval and is only visible as a protected preview.",
     "count": "Number of animals (optional)",
     "handler": "Trainer or handler supervision planned",
-    "delivery": "Transport to the set available"
+    "delivery": "Transport to the set available",
+    "roleForms": {
+      "tiertrainer": {
+        "masculine": "Film animal trainer",
+        "feminine": "Film animal trainer",
+        "neutral": "Film animal trainer"
+      },
+      "filmhundetrainer": {
+        "masculine": "Film dog trainer",
+        "feminine": "Film dog trainer",
+        "neutral": "Film dog trainer"
+      },
+      "tierbetreuer": {
+        "masculine": "Animal handler",
+        "feminine": "Animal handler",
+        "neutral": "Animal handler"
+      },
+      "tierkoordination": {
+        "masculine": "Animal coordinator",
+        "feminine": "Animal coordinator",
+        "neutral": "Animal coordinator"
+      },
+      "set-tierbetreuung": {
+        "masculine": "On-set animal carer",
+        "feminine": "On-set animal carer",
+        "neutral": "On-set animal carer"
+      },
+      "horse-master": {
+        "masculine": "Horse Master",
+        "feminine": "Horse Master",
+        "neutral": "Horse Master"
+      },
+      "assistant-horse-master": {
+        "masculine": "Assistant Horse Master",
+        "feminine": "Assistant Horse Master",
+        "neutral": "Assistant Horse Master"
+      },
+      "horse-trainer": {
+        "masculine": "Film horse trainer",
+        "feminine": "Film horse trainer",
+        "neutral": "Film horse trainer"
+      },
+      "horse-wrangler": {
+        "masculine": "Horse Wrangler",
+        "feminine": "Horse Wrangler",
+        "neutral": "Horse Wrangler"
+      }
+    }
   },
   "MarketplaceCatalog": {
     "categories": {
@@ -5971,7 +6018,7 @@
         "r_e90f5848bfc3": "Production Accounting",
         "r_c6dc08a47d0d": "Film Financial Controller",
         "r_2557c22fb3d7": "Green Consultant / Sustainability Manager",
-        "r_2a6c1d42831e": "Production intern",
+        "r_2a6c1d42831e": "Production Intern",
         "r_ede69642be01": "Set Unit Manager Intern",
         "r_de9ab1a6b55a": "Production Manager",
         "r_fd701e2c1e86": "Unit Production Manager",
@@ -6145,9 +6192,9 @@
       },
       "licht": {
         "r_222be04dbf00": "Gaffer",
-        "r_1e210e69039a": "Best Boy / Best Girl Electric",
+        "r_1e210e69039a": "Best Boy/Girl Electric",
         "r_14dd174cd76c": "Rigging Gaffer",
-        "r_92137802b24a": "Rigging Best Boy / Rigging Best Girl Electric",
+        "r_92137802b24a": "Rigging Best Boy/Girl",
         "r_7fce7d6fcf12": "Rigging Electrician",
         "r_1bcf9d8d9b03": "Electrician / Lighting Tech",
         "r_d95b919dded9": "Chief Lighting Technician",
@@ -6167,13 +6214,13 @@
       },
       "grip": {
         "r_470156bd03e4": "Key Grip",
-        "r_cfbf2a22ed6e": "Best Boy / Best Girl Grip",
+        "r_cfbf2a22ed6e": "Best Boy/Girl Grip / 2nd Camera Grip",
         "r_32a6ab31b1a1": "Dolly Grip / Dolly Operator",
         "r_376dc1f790b8": "Grip",
         "r_dbfaadb8821c": "Grip Assistant",
         "r_46dab52c1995": "Rigging Grip",
         "r_ea7e925bd850": "Rigging Key Grip",
-        "r_fa9d72fc7978": "Rigging Best Boy / Rigging Best Girl Grip",
+        "r_fa9d72fc7978": "Rigging Best Boy/Girl Grip",
         "r_2fa0b44342d7": "Special Grip Constructions",
         "r_08c07afebb7f": "Camera Crane / Jib Operator",
         "r_5ece318b289f": "Camera Crane Technician",
@@ -6363,7 +6410,7 @@
         "r_298c04a0eec5": "Textile Artist",
         "r_2a6b1e3320f5": "Costume Maker",
         "r_066dc1f269bb": "Costume Prop Maker",
-        "r_83db0e1a7bff": "Directrice",
+        "r_83db0e1a7bff": "Pattern Cutter",
         "r_fc8d26a01b37": "Women's Bespoke Tailor",
         "r_9aaa9c423455": "Men's Bespoke Tailor",
         "r_975bb2c38b93": "Milliner",
@@ -6580,7 +6627,7 @@
       },
       "set-logistik": {
         "r_06d9aa28368f": "Base Runner",
-        "r_51e581b5ea39": "Driver (car / truck)",
+        "r_51e581b5ea39": "Driver (Car / Truck)",
         "r_36a599628c2e": "Location Driver",
         "r_9bc1a35535fa": "Location Unit Manager",
         "r_273f12c52b95": "Assistant Location Manager",
@@ -6643,9 +6690,9 @@
         "r_b85e79c1153f": "Researcher (General)"
       },
       "cast": {
-        "r_3d0e76b883b1": "Lead actor / Lead actress",
+        "r_3d0e76b883b1": "Lead Actor/Actress",
         "r_543b99d52c01": "Actor",
-        "r_aa64ee1fd5d6": "Supporting actor / Supporting actress",
+        "r_aa64ee1fd5d6": "Supporting Actor",
         "r_5fea55df03ed": "Extra",
         "r_912a4dbdd23c": "Featured Extra",
         "r_130f7a137659": "Model",
@@ -6668,7 +6715,7 @@
         "r_901a1b08f6ba": "Intimacy Coordinator",
         "r_7a721e572105": "Casting Associate",
         "r_a1f9ba79ab08": "Casting Assistant",
-        "r_84927cc7b2bc": "Supporting actor / Supporting actress",
+        "r_84927cc7b2bc": "Supporting Actor/Actress",
         "r_97144193d2e9": "Background / Extra",
         "r_de130677203b": "Youth Casting Director",
         "r_27725de30521": "Children's Casting Director",
@@ -6979,6 +7026,4868 @@
       "x_907c602b417d": "Online & Digital",
       "x_f4581b3b4f89": "Website, Platform, Streaming",
       "x_d06f18dfc1af": "Other Film Services"
+    },
+    "roleForms": {
+      "produktion": {
+        "r_d479a6d8637e": {
+          "masculine": "Producer",
+          "feminine": "Producer",
+          "neutral": "Producer"
+        },
+        "r_86ca6f7fac85": {
+          "masculine": "Executive Producer",
+          "feminine": "Executive Producer",
+          "neutral": "Executive Producer"
+        },
+        "r_9b38cf86cffe": {
+          "masculine": "Co-Producer",
+          "feminine": "Co-Producer",
+          "neutral": "Co-Producer"
+        },
+        "r_bd2e1cd12f54": {
+          "masculine": "Associate Producer",
+          "feminine": "Associate Producer",
+          "neutral": "Associate Producer"
+        },
+        "r_bc840a4895a2": {
+          "masculine": "Junior Producer",
+          "feminine": "Junior Producer",
+          "neutral": "Junior Producer"
+        },
+        "r_ebaa595e4927": {
+          "masculine": "Line Producer",
+          "feminine": "Line Producer",
+          "neutral": "Line Producer"
+        },
+        "r_9f722922fe7b": {
+          "masculine": "Head of Production (HL)",
+          "feminine": "Head of Production (HL)",
+          "neutral": "Head of Production (HL)"
+        },
+        "r_7fdd4fd31143": {
+          "masculine": "Assistant to Production Management",
+          "feminine": "Assistant to Production Management",
+          "neutral": "Assistant to Production Management"
+        },
+        "r_c8c7f4cd576e": {
+          "masculine": "Production Manager (PL)",
+          "feminine": "Production Manager (PL)",
+          "neutral": "Production Manager (PL)"
+        },
+        "r_edde7bed564a": {
+          "masculine": "Production Manager (Broadcaster)",
+          "feminine": "Production Manager (Broadcaster)",
+          "neutral": "Production Manager (Broadcaster)"
+        },
+        "r_08532652fb27": {
+          "masculine": "Assistant to Production Manager",
+          "feminine": "Assistant to Production Manager",
+          "neutral": "Assistant to Production Manager"
+        },
+        "r_a8ccedf1c4fc": {
+          "masculine": "Production Scheduler / Planner",
+          "feminine": "Production Scheduler / Planner",
+          "neutral": "Production Scheduler / Planner"
+        },
+        "r_73ab62cc6ea9": {
+          "masculine": "Production Budget Preparation",
+          "feminine": "Production Budget Preparation",
+          "neutral": "Production Budget Preparation"
+        },
+        "r_5e8f13168720": {
+          "masculine": "Production Supervisor",
+          "feminine": "Production Supervisor",
+          "neutral": "Production Supervisor"
+        },
+        "r_a8aaf07776e6": {
+          "masculine": "Assistant to Production Supervisor",
+          "feminine": "Assistant to Production Supervisor",
+          "neutral": "Assistant to Production Supervisor"
+        },
+        "r_86a64b938274": {
+          "masculine": "Studio Manager",
+          "feminine": "Studio Manager",
+          "neutral": "Studio Manager"
+        },
+        "r_1dc3e15735f4": {
+          "masculine": "Production Coordinator",
+          "feminine": "Production Coordinator",
+          "neutral": "Production Coordinator"
+        },
+        "r_3d2828618f01": {
+          "masculine": "Assistant Production Coordinator",
+          "feminine": "Assistant Production Coordinator",
+          "neutral": "Assistant Production Coordinator"
+        },
+        "r_b7b1c24b3218": {
+          "masculine": "Production Assistant (Set)",
+          "feminine": "Production Assistant (Set)",
+          "neutral": "Production Assistant (Set)"
+        },
+        "r_504614327108": {
+          "masculine": "Production Assistant (Office)",
+          "feminine": "Production Assistant (Office)",
+          "neutral": "Production Assistant (Office)"
+        },
+        "r_b1c1be59d3fb": {
+          "masculine": "Second Production Assistant",
+          "feminine": "Second Production Assistant",
+          "neutral": "Second Production Assistant"
+        },
+        "r_e9fe06329d79": {
+          "masculine": "Team Assistant",
+          "feminine": "Team Assistant",
+          "neutral": "Team Assistant"
+        },
+        "r_caad7ad378e8": {
+          "masculine": "Personal Assistant",
+          "feminine": "Personal Assistant",
+          "neutral": "Personal Assistant"
+        },
+        "r_9b9ea0970d1e": {
+          "masculine": "Personal Assistant to Production",
+          "feminine": "Personal Assistant to Production",
+          "neutral": "Personal Assistant to Production"
+        },
+        "r_22ca8fe2e611": {
+          "masculine": "Talent / Cast Personal Assistant",
+          "feminine": "Talent / Cast Personal Assistant",
+          "neutral": "Talent / Cast Personal Assistant"
+        },
+        "r_bdfbe6854805": {
+          "masculine": "Assistant to the Producer",
+          "feminine": "Assistant to the Producer",
+          "neutral": "Assistant to the Producer"
+        },
+        "r_d894e33cd89e": {
+          "masculine": "Executive Assistant",
+          "feminine": "Executive Assistant",
+          "neutral": "Executive Assistant"
+        },
+        "r_bdc2cdf19051": {
+          "masculine": "Office Assistant",
+          "feminine": "Office Assistant",
+          "neutral": "Office Assistant"
+        },
+        "r_328519d70fd2": {
+          "masculine": "Accommodation Coordinator",
+          "feminine": "Accommodation Coordinator",
+          "neutral": "Accommodation Coordinator"
+        },
+        "r_6747956824f3": {
+          "masculine": "Travel Coordinator",
+          "feminine": "Travel Coordinator",
+          "neutral": "Travel Coordinator"
+        },
+        "r_b809fe7525be": {
+          "masculine": "Assistant Travel Coordinator",
+          "feminine": "Assistant Travel Coordinator",
+          "neutral": "Assistant Travel Coordinator"
+        },
+        "r_86c92e0bfce0": {
+          "masculine": "Health & Safety Coordinator",
+          "feminine": "Health & Safety Coordinator",
+          "neutral": "Health & Safety Coordinator"
+        },
+        "r_14cee2575cf1": {
+          "masculine": "ADR Coordinator",
+          "feminine": "ADR Coordinator",
+          "neutral": "ADR Coordinator"
+        },
+        "r_92286a252903": {
+          "masculine": "Location Manager",
+          "feminine": "Location Manager",
+          "neutral": "Location Manager"
+        },
+        "r_fc08fa159e6a": {
+          "masculine": "Location Scout",
+          "feminine": "Location Scout",
+          "neutral": "Location Scout"
+        },
+        "r_e5215fd85f99": {
+          "masculine": "Additional Location Scout",
+          "feminine": "Additional Location Scout",
+          "neutral": "Additional Location Scout"
+        },
+        "r_9454a017e69a": {
+          "masculine": "Assistant Location Scout",
+          "feminine": "Assistant Location Scout",
+          "neutral": "Assistant Location Scout"
+        },
+        "r_0d7a23f6a056": {
+          "masculine": "Location Coordinator",
+          "feminine": "Location Coordinator",
+          "neutral": "Location Coordinator"
+        },
+        "r_11bbfbf26e46": {
+          "masculine": "Cast Coordinator",
+          "feminine": "Cast Coordinator",
+          "neutral": "Cast Coordinator"
+        },
+        "r_155f85cc8157": {
+          "masculine": "Unit Manager",
+          "feminine": "Unit Manager",
+          "neutral": "Unit Manager"
+        },
+        "r_475eba080a17": {
+          "masculine": "Covid Coordinator",
+          "feminine": "Covid Coordinator",
+          "neutral": "Covid Coordinator"
+        },
+        "r_a60ca701fcab": {
+          "masculine": "Assistant Covid Coordinator",
+          "feminine": "Assistant Covid Coordinator",
+          "neutral": "Assistant Covid Coordinator"
+        },
+        "r_87a049b62039": {
+          "masculine": "Location Unit Manager",
+          "feminine": "Location Unit Manager",
+          "neutral": "Location Unit Manager"
+        },
+        "r_5b93948ca9fc": {
+          "masculine": "Assistant Location Unit Manager",
+          "feminine": "Assistant Location Unit Manager",
+          "neutral": "Assistant Location Unit Manager"
+        },
+        "r_8a0cbf242686": {
+          "masculine": "Crew Scheduler",
+          "feminine": "Crew Scheduler",
+          "neutral": "Crew Scheduler"
+        },
+        "r_286fb0baa150": {
+          "masculine": "Transportation Coordinator",
+          "feminine": "Transportation Coordinator",
+          "neutral": "Transportation Coordinator"
+        },
+        "r_8e7b74f8a60b": {
+          "masculine": "Assistant Transportation Coordinator",
+          "feminine": "Assistant Transportation Coordinator",
+          "neutral": "Assistant Transportation Coordinator"
+        },
+        "r_940718151db8": {
+          "masculine": "Transportation Captain",
+          "feminine": "Transportation Captain",
+          "neutral": "Transportation Captain"
+        },
+        "r_34e7de86b42e": {
+          "masculine": "Unit Manager (1st AD)",
+          "feminine": "Unit Manager (1st AD)",
+          "neutral": "Unit Manager (1st AD)"
+        },
+        "r_2492443d2786": {
+          "masculine": "Set Unit Manager",
+          "feminine": "Set Unit Manager",
+          "neutral": "Set Unit Manager"
+        },
+        "r_e9593d0ce404": {
+          "masculine": "3rd AD / Crowd AD",
+          "feminine": "3rd AD / Crowd AD",
+          "neutral": "3rd AD / Crowd AD"
+        },
+        "r_4492528d7f86": {
+          "masculine": "Base Unit Manager",
+          "feminine": "Base Unit Manager",
+          "neutral": "Base Unit Manager"
+        },
+        "r_eaee2c8a1b89": {
+          "masculine": "Drivers Captain",
+          "feminine": "Drivers Captain",
+          "neutral": "Drivers Captain"
+        },
+        "r_1e792192a593": {
+          "masculine": "Studio Unit Manager",
+          "feminine": "Studio Unit Manager",
+          "neutral": "Studio Unit Manager"
+        },
+        "r_453722f35b4e": {
+          "masculine": "Lock Off Manager",
+          "feminine": "Lock Off Manager",
+          "neutral": "Lock Off Manager"
+        },
+        "r_01cf9ccbf27d": {
+          "masculine": "Second Unit Manager (Show/Broadcast)",
+          "feminine": "Second Unit Manager (Show/Broadcast)",
+          "neutral": "Second Unit Manager (Show/Broadcast)"
+        },
+        "r_282e1b7d8f09": {
+          "masculine": "Unit Move Coordinator",
+          "feminine": "Unit Move Coordinator",
+          "neutral": "Unit Move Coordinator"
+        },
+        "r_8016e2e4e662": {
+          "masculine": "Assistant Unit Manager",
+          "feminine": "Assistant Unit Manager",
+          "neutral": "Assistant Unit Manager"
+        },
+        "r_1fb7a2292310": {
+          "masculine": "Assistant to the 1st Unit Manager",
+          "feminine": "Assistant to the 1st Unit Manager",
+          "neutral": "Assistant to the 1st Unit Manager"
+        },
+        "r_366708fdb0b3": {
+          "masculine": "Assistant Set Unit Manager",
+          "feminine": "Assistant Set Unit Manager",
+          "neutral": "Assistant Set Unit Manager"
+        },
+        "r_d73d495c6d75": {
+          "masculine": "Parking Production Assistant",
+          "feminine": "Parking Production Assistant",
+          "neutral": "Parking Production Assistant"
+        },
+        "r_4ed4cafa632a": {
+          "masculine": "Location Blocker / Crowd Control",
+          "feminine": "Location Blocker / Crowd Control",
+          "neutral": "Location Blocker / Crowd Control"
+        },
+        "r_6fbe7d952889": {
+          "masculine": "Set Runner",
+          "feminine": "Set Runner",
+          "neutral": "Set Runner"
+        },
+        "r_c8d2a6e8ca0f": {
+          "masculine": "Production Driver",
+          "feminine": "Production Driver",
+          "neutral": "Production Driver"
+        },
+        "r_0d9b0abd3608": {
+          "masculine": "Personal Driver",
+          "feminine": "Personal Driver",
+          "neutral": "Personal Driver"
+        },
+        "r_ef2266f5ad5d": {
+          "masculine": "Equipment Driver",
+          "feminine": "Equipment Driver",
+          "neutral": "Equipment Driver"
+        },
+        "r_100be7827daf": {
+          "masculine": "Office Production Assistant",
+          "feminine": "Office Production Assistant",
+          "neutral": "Office Production Assistant"
+        },
+        "r_c24ef6245054": {
+          "masculine": "Production Budgeter",
+          "feminine": "Production Budgeter",
+          "neutral": "Production Budgeter"
+        },
+        "r_e90f5848bfc3": {
+          "masculine": "Production Accounting",
+          "feminine": "Production Accounting",
+          "neutral": "Production Accounting"
+        },
+        "r_c6dc08a47d0d": {
+          "masculine": "Film Financial Controller",
+          "feminine": "Film Financial Controller",
+          "neutral": "Film Financial Controller"
+        },
+        "r_2557c22fb3d7": {
+          "masculine": "Green Consultant / Sustainability Manager",
+          "feminine": "Green Consultant / Sustainability Manager",
+          "neutral": "Green Consultant / Sustainability Manager"
+        },
+        "r_2a6c1d42831e": {
+          "masculine": "Production intern",
+          "feminine": "Production intern",
+          "neutral": "Production intern"
+        },
+        "r_ede69642be01": {
+          "masculine": "Set Unit Manager Intern",
+          "feminine": "Set Unit Manager Intern",
+          "neutral": "Set Unit Manager Intern"
+        },
+        "r_de9ab1a6b55a": {
+          "masculine": "Production Manager",
+          "feminine": "Production Manager",
+          "neutral": "Production Manager"
+        },
+        "r_fd701e2c1e86": {
+          "masculine": "Unit Production Manager",
+          "feminine": "Unit Production Manager",
+          "neutral": "Unit Production Manager"
+        },
+        "r_eb2de9d80eb5": {
+          "masculine": "Production Coordinator",
+          "feminine": "Production Coordinator",
+          "neutral": "Production Coordinator"
+        },
+        "r_14ba71897157": {
+          "masculine": "Assistant Production Coordinator",
+          "feminine": "Assistant Production Coordinator",
+          "neutral": "Assistant Production Coordinator"
+        },
+        "r_9a9272ffef87": {
+          "masculine": "Production Assistant (PA)",
+          "feminine": "Production Assistant (PA)",
+          "neutral": "Production Assistant (PA)"
+        },
+        "r_b37de62fa7b6": {
+          "masculine": "2nd Production Assistant",
+          "feminine": "2nd Production Assistant",
+          "neutral": "2nd Production Assistant"
+        },
+        "r_35a318ed734f": {
+          "masculine": "Assistant Travel Coordinator",
+          "feminine": "Assistant Travel Coordinator",
+          "neutral": "Assistant Travel Coordinator"
+        },
+        "r_282f5f19af6e": {
+          "masculine": "Set Unit Manager",
+          "feminine": "Set Unit Manager",
+          "neutral": "Set Unit Manager"
+        },
+        "r_a1888e7923b1": {
+          "masculine": "Production Secretary / Team Assistant",
+          "feminine": "Production Secretary / Team Assistant",
+          "neutral": "Production Secretary / Team Assistant"
+        },
+        "r_079a221fcd0e": {
+          "masculine": "2nd Unit Manager (Show / Broadcast)",
+          "feminine": "2nd Unit Manager (Show / Broadcast)",
+          "neutral": "2nd Unit Manager (Show / Broadcast)"
+        },
+        "r_c74c78be5dc2": {
+          "masculine": "Casting Director",
+          "feminine": "Casting Director",
+          "neutral": "Casting Director"
+        },
+        "r_b6e7722029a2": {
+          "masculine": "Production Controller",
+          "feminine": "Production Controller",
+          "neutral": "Production Controller"
+        },
+        "r_4e9c5d6d7198": {
+          "masculine": "Film Business Manager",
+          "feminine": "Film Business Manager",
+          "neutral": "Film Business Manager"
+        },
+        "r_907eb6829faf": {
+          "masculine": "Accountant",
+          "feminine": "Accountant",
+          "neutral": "Accountant"
+        },
+        "r_9ef806a95399": {
+          "masculine": "Assistant Business Affairs",
+          "feminine": "Assistant Business Affairs",
+          "neutral": "Assistant Business Affairs"
+        },
+        "r_3365c6d66b72": {
+          "masculine": "Cashier / Petty Cash",
+          "feminine": "Cashier / Petty Cash",
+          "neutral": "Cashier / Petty Cash"
+        },
+        "r_354a33db42c7": {
+          "masculine": "Payroll Accountant",
+          "feminine": "Payroll Accountant",
+          "neutral": "Payroll Accountant"
+        },
+        "r_f3b7a4579d13": {
+          "masculine": "Business Affairs Intern",
+          "feminine": "Business Affairs Intern",
+          "neutral": "Business Affairs Intern"
+        },
+        "r_614a09237466": {
+          "masculine": "Head of Production Strategy",
+          "feminine": "Head of Production Strategy",
+          "neutral": "Head of Production Strategy"
+        },
+        "r_ab2bca044ad5": {
+          "masculine": "Head of Development",
+          "feminine": "Head of Development",
+          "neutral": "Head of Development"
+        },
+        "r_4c6443207ff2": {
+          "masculine": "Service Producer",
+          "feminine": "Service Producer",
+          "neutral": "Service Producer"
+        },
+        "r_f43970f8871f": {
+          "masculine": "Production Executive",
+          "feminine": "Production Executive",
+          "neutral": "Production Executive"
+        },
+        "r_b490dba5695d": {
+          "masculine": "Assistant Producer",
+          "feminine": "Assistant Producer",
+          "neutral": "Assistant Producer"
+        },
+        "r_7b68ca0f0fb6": {
+          "masculine": "TV Producer",
+          "feminine": "TV Producer",
+          "neutral": "TV Producer"
+        },
+        "r_564bd1be967c": {
+          "masculine": "Promotion Producer",
+          "feminine": "Promotion Producer",
+          "neutral": "Promotion Producer"
+        },
+        "r_17e75f09bb7a": {
+          "masculine": "Supervising Producer",
+          "feminine": "Supervising Producer",
+          "neutral": "Supervising Producer"
+        },
+        "r_09bdde75b5c6": {
+          "masculine": "Story Producer",
+          "feminine": "Story Producer",
+          "neutral": "Story Producer"
+        },
+        "r_63333ae7406f": {
+          "masculine": "Post Story Producer",
+          "feminine": "Post Story Producer",
+          "neutral": "Post Story Producer"
+        },
+        "r_1c7b4db06402": {
+          "masculine": "Agency / TV Commercial Producer",
+          "feminine": "Agency / TV Commercial Producer",
+          "neutral": "Agency / TV Commercial Producer"
+        },
+        "r_05c4bc7ca840": {
+          "masculine": "3D Stereo Producer",
+          "feminine": "3D Stereo Producer",
+          "neutral": "3D Stereo Producer"
+        },
+        "r_6221ed87ef22": {
+          "masculine": "3D Stereo Supervising Producer",
+          "feminine": "3D Stereo Supervising Producer",
+          "neutral": "3D Stereo Supervising Producer"
+        },
+        "r_7edb24c15dcf": {
+          "masculine": "Web TV Producer",
+          "feminine": "Web TV Producer",
+          "neutral": "Web TV Producer"
+        },
+        "r_3d984a13d7b5": {
+          "masculine": "Creative Producer",
+          "feminine": "Creative Producer",
+          "neutral": "Creative Producer"
+        },
+        "r_ae0c8b90c8d1": {
+          "masculine": "Development Producer",
+          "feminine": "Development Producer",
+          "neutral": "Development Producer"
+        },
+        "r_d297bfadcae2": {
+          "masculine": "Development Coordinator",
+          "feminine": "Development Coordinator",
+          "neutral": "Development Coordinator"
+        },
+        "r_54f1c9f4d11e": {
+          "masculine": "Development Executive",
+          "feminine": "Development Executive",
+          "neutral": "Development Executive"
+        },
+        "r_f42fa61db712": {
+          "masculine": "Associate Control Room Producer",
+          "feminine": "Associate Control Room Producer",
+          "neutral": "Associate Control Room Producer"
+        },
+        "r_9d8ea4e7c7aa": {
+          "masculine": "Control Room Producer / On-Air Producer",
+          "feminine": "Control Room Producer / On-Air Producer",
+          "neutral": "Control Room Producer / On-Air Producer"
+        },
+        "r_b837afb89817": {
+          "masculine": "On-Air Promotion Producer",
+          "feminine": "On-Air Promotion Producer",
+          "neutral": "On-Air Promotion Producer"
+        },
+        "r_bacc7a4ec265": {
+          "masculine": "Copyright Affairs",
+          "feminine": "Copyright Affairs",
+          "neutral": "Copyright Affairs"
+        },
+        "r_7e0ace38e8fc": {
+          "masculine": "Business Affairs",
+          "feminine": "Business Affairs",
+          "neutral": "Business Affairs"
+        },
+        "r_0daf662f57c6": {
+          "masculine": "Business & Legal Affairs",
+          "feminine": "Business & Legal Affairs",
+          "neutral": "Business & Legal Affairs"
+        },
+        "r_a95b977fa84f": {
+          "masculine": "Legal Affairs",
+          "feminine": "Legal Affairs",
+          "neutral": "Legal Affairs"
+        },
+        "r_0433186beb99": {
+          "masculine": "Producer of Marketing & Distribution",
+          "feminine": "Producer of Marketing & Distribution",
+          "neutral": "Producer of Marketing & Distribution"
+        },
+        "r_07f0060c8996": {
+          "masculine": "Producer Intern",
+          "feminine": "Producer Intern",
+          "neutral": "Producer Intern"
+        }
+      },
+      "regie": {
+        "r_f59d6991c44a": {
+          "masculine": "Director",
+          "feminine": "Director",
+          "neutral": "Director"
+        },
+        "r_5562e3abbb45": {
+          "masculine": "Co-Director",
+          "feminine": "Co-Director",
+          "neutral": "Co-Director"
+        },
+        "r_df7e552a6792": {
+          "masculine": "Second Unit Director",
+          "feminine": "Second Unit Director",
+          "neutral": "Second Unit Director"
+        },
+        "r_0aca88b2853d": {
+          "masculine": "Studio Director",
+          "feminine": "Studio Director",
+          "neutral": "Studio Director"
+        },
+        "r_394140e22c16": {
+          "masculine": "Dubbing Director",
+          "feminine": "Dubbing Director",
+          "neutral": "Dubbing Director"
+        },
+        "r_7d2cd6bd3a73": {
+          "masculine": "Vision Director (Broadcast)",
+          "feminine": "Vision Director (Broadcast)",
+          "neutral": "Vision Director (Broadcast)"
+        },
+        "r_988a573b39e7": {
+          "masculine": "Broadcast Director",
+          "feminine": "Broadcast Director",
+          "neutral": "Broadcast Director"
+        },
+        "r_0719ad7a68ec": {
+          "masculine": "Dialogue Director",
+          "feminine": "Dialogue Director",
+          "neutral": "Dialogue Director"
+        },
+        "r_463462fca2ec": {
+          "masculine": "1st AD",
+          "feminine": "1st AD",
+          "neutral": "1st AD"
+        },
+        "r_de1c193ae4d6": {
+          "masculine": "2nd AD",
+          "feminine": "2nd AD",
+          "neutral": "2nd AD"
+        },
+        "r_c37babd28464": {
+          "masculine": "Key 2nd AD",
+          "feminine": "Key 2nd AD",
+          "neutral": "Key 2nd AD"
+        },
+        "r_2b8bbebafa40": {
+          "masculine": "Floor 2nd AD",
+          "feminine": "Floor 2nd AD",
+          "neutral": "Floor 2nd AD"
+        },
+        "r_b0a3c67c20bf": {
+          "masculine": "Crowd 2nd AD",
+          "feminine": "Crowd 2nd AD",
+          "neutral": "Crowd 2nd AD"
+        },
+        "r_b6640a0bf9b6": {
+          "masculine": "3rd Assistant Director (3rd AD)",
+          "feminine": "3rd Assistant Director (3rd AD)",
+          "neutral": "3rd Assistant Director (3rd AD)"
+        },
+        "r_962cb1546148": {
+          "masculine": "3rd AD Crowd",
+          "feminine": "3rd AD Crowd",
+          "neutral": "3rd AD Crowd"
+        },
+        "r_619aa382d108": {
+          "masculine": "Base 3rd AD",
+          "feminine": "Base 3rd AD",
+          "neutral": "Base 3rd AD"
+        },
+        "r_14816f8e2f93": {
+          "masculine": "Floor 3rd AD",
+          "feminine": "Floor 3rd AD",
+          "neutral": "Floor 3rd AD"
+        },
+        "r_00bb63b14962": {
+          "masculine": "AD PA",
+          "feminine": "AD PA",
+          "neutral": "AD PA"
+        },
+        "r_da45564f42a3": {
+          "masculine": "Key AD PA",
+          "feminine": "Key AD PA",
+          "neutral": "Key AD PA"
+        },
+        "r_d4de545cc559": {
+          "masculine": "AD Trainee",
+          "feminine": "AD Trainee",
+          "neutral": "AD Trainee"
+        },
+        "r_b8f3b216cf72": {
+          "masculine": "Crowd Marshall",
+          "feminine": "Crowd Marshall",
+          "neutral": "Crowd Marshall"
+        },
+        "r_7d061a318612": {
+          "masculine": "Assistant Crowd Marshall",
+          "feminine": "Assistant Crowd Marshall",
+          "neutral": "Assistant Crowd Marshall"
+        },
+        "r_dbf51638d5ed": {
+          "masculine": "Script Supervisor / Continuity",
+          "feminine": "Script Supervisor / Continuity",
+          "neutral": "Script Supervisor / Continuity"
+        },
+        "r_db6f57df190b": {
+          "masculine": "Assistant Script Supervisor",
+          "feminine": "Assistant Script Supervisor",
+          "neutral": "Assistant Script Supervisor"
+        },
+        "r_043751863fa5": {
+          "masculine": "On-Set Script Supervision",
+          "feminine": "On-Set Script Supervision",
+          "neutral": "On-Set Script Supervision"
+        },
+        "r_d7e7e0e56ce6": {
+          "masculine": "Storyboard Artist",
+          "feminine": "Storyboard Artist",
+          "neutral": "Storyboard Artist"
+        },
+        "r_d5f343108ed5": {
+          "masculine": "Acting Coach",
+          "feminine": "Acting Coach",
+          "neutral": "Acting Coach"
+        },
+        "r_8ac3532c0c32": {
+          "masculine": "Acting Coach (Children)",
+          "feminine": "Acting Coach (Children)",
+          "neutral": "Acting Coach (Children)"
+        },
+        "r_bf13c927e8eb": {
+          "masculine": "Dialogue Coach",
+          "feminine": "Dialogue Coach",
+          "neutral": "Dialogue Coach"
+        },
+        "r_82fff9096145": {
+          "masculine": "Background / Extra Wrangler",
+          "feminine": "Background / Extra Wrangler",
+          "neutral": "Background / Extra Wrangler"
+        },
+        "r_e57426b6a805": {
+          "masculine": "Assistant Extras Coordinator",
+          "feminine": "Assistant Extras Coordinator",
+          "neutral": "Assistant Extras Coordinator"
+        },
+        "r_c2b6031ad212": {
+          "masculine": "Director's Personal Assistant",
+          "feminine": "Director's Personal Assistant",
+          "neutral": "Director's Personal Assistant"
+        },
+        "r_1ed956774605": {
+          "masculine": "Director's Personal Assistant",
+          "feminine": "Director's Personal Assistant",
+          "neutral": "Director's Personal Assistant"
+        },
+        "r_7d0bc36aabcb": {
+          "masculine": "Directing Intern",
+          "feminine": "Directing Intern",
+          "neutral": "Directing Intern"
+        },
+        "r_bf4aaefa2f9f": {
+          "masculine": "Script Trainee",
+          "feminine": "Script Trainee",
+          "neutral": "Script Trainee"
+        },
+        "r_45bf2bbe37f0": {
+          "masculine": "Set PA / Runner",
+          "feminine": "Set PA / Runner",
+          "neutral": "Set PA / Runner"
+        },
+        "r_9ced64ab6db5": {
+          "masculine": "1st Assistant Director (1st AD)",
+          "feminine": "1st Assistant Director (1st AD)",
+          "neutral": "1st Assistant Director (1st AD)"
+        },
+        "r_b6ac41792b48": {
+          "masculine": "2nd Assistant Director (2nd AD)",
+          "feminine": "2nd Assistant Director (2nd AD)",
+          "neutral": "2nd Assistant Director (2nd AD)"
+        },
+        "r_6b9cabf3cbca": {
+          "masculine": "Scripts (On-Set)",
+          "feminine": "Scripts (On-Set)",
+          "neutral": "Scripts (On-Set)"
+        },
+        "r_93f52c1c7000": {
+          "masculine": "2nd Unit Director",
+          "feminine": "2nd Unit Director",
+          "neutral": "2nd Unit Director"
+        },
+        "r_591d7faf8f5d": {
+          "masculine": "Personal Assistant (to Director)",
+          "feminine": "Personal Assistant (to Director)",
+          "neutral": "Personal Assistant (to Director)"
+        },
+        "r_c01dd7739f5a": {
+          "masculine": "Assistant Background Wrangler",
+          "feminine": "Assistant Background Wrangler",
+          "neutral": "Assistant Background Wrangler"
+        }
+      },
+      "kamera": {
+        "r_9659ff478da5": {
+          "masculine": "Cinematographer / DoP",
+          "feminine": "Cinematographer / DoP",
+          "neutral": "Cinematographer / DoP"
+        },
+        "r_f1286611f452": {
+          "masculine": "Director of Imagery",
+          "feminine": "Director of Imagery",
+          "neutral": "Director of Imagery"
+        },
+        "r_c519de89c832": {
+          "masculine": "A-Camera Operator",
+          "feminine": "A-Camera Operator",
+          "neutral": "A-Camera Operator"
+        },
+        "r_69b451280549": {
+          "masculine": "B-Camera Operator",
+          "feminine": "B-Camera Operator",
+          "neutral": "B-Camera Operator"
+        },
+        "r_147c6db611ab": {
+          "masculine": "C-Camera Operator",
+          "feminine": "C-Camera Operator",
+          "neutral": "C-Camera Operator"
+        },
+        "r_00ec6018a92f": {
+          "masculine": "ENG Camera Operator (Studio)",
+          "feminine": "ENG Camera Operator (Studio)",
+          "neutral": "ENG Camera Operator (Studio)"
+        },
+        "r_15338319dd09": {
+          "masculine": "ENG/EB Camera Operator",
+          "feminine": "ENG/EB Camera Operator",
+          "neutral": "ENG/EB Camera Operator"
+        },
+        "r_3b00f8763d24": {
+          "masculine": "2nd Unit Camera Operator",
+          "feminine": "2nd Unit Camera Operator",
+          "neutral": "2nd Unit Camera Operator"
+        },
+        "r_2815a6f7d251": {
+          "masculine": "3rd Unit Camera Operator",
+          "feminine": "3rd Unit Camera Operator",
+          "neutral": "3rd Unit Camera Operator"
+        },
+        "r_46bfee3f1077": {
+          "masculine": "1st AC / Focus Puller",
+          "feminine": "1st AC / Focus Puller",
+          "neutral": "1st AC / Focus Puller"
+        },
+        "r_4f6a54aa8672": {
+          "masculine": "2nd AC / Clapper Loader",
+          "feminine": "2nd AC / Clapper Loader",
+          "neutral": "2nd AC / Clapper Loader"
+        },
+        "r_a6d3a38613fa": {
+          "masculine": "Clapper Loader",
+          "feminine": "Clapper Loader",
+          "neutral": "Clapper Loader"
+        },
+        "r_4406ae44f8be": {
+          "masculine": "3rd Camera Assistant",
+          "feminine": "3rd Camera Assistant",
+          "neutral": "3rd Camera Assistant"
+        },
+        "r_a29ed25142f3": {
+          "masculine": "Digital 2nd AC",
+          "feminine": "Digital 2nd AC",
+          "neutral": "Digital 2nd AC"
+        },
+        "r_048d538ee34d": {
+          "masculine": "DIT",
+          "feminine": "DIT",
+          "neutral": "DIT"
+        },
+        "r_c48ad1ee75a7": {
+          "masculine": "DIT Assistant",
+          "feminine": "DIT Assistant",
+          "neutral": "DIT Assistant"
+        },
+        "r_0e473a1887e9": {
+          "masculine": "Steadicam Operator",
+          "feminine": "Steadicam Operator",
+          "neutral": "Steadicam Operator"
+        },
+        "r_1d7535202c92": {
+          "masculine": "Steadicam Assistant",
+          "feminine": "Steadicam Assistant",
+          "neutral": "Steadicam Assistant"
+        },
+        "r_baee8ff4a63f": {
+          "masculine": "Gimbal System Operator",
+          "feminine": "Gimbal System Operator",
+          "neutral": "Gimbal System Operator"
+        },
+        "r_569d248c1dfd": {
+          "masculine": "Drone Pilot / Drone Operator",
+          "feminine": "Drone Pilot / Drone Operator",
+          "neutral": "Drone Pilot / Drone Operator"
+        },
+        "r_3ca1ad3e14b2": {
+          "masculine": "Camera Drone Operator",
+          "feminine": "Camera Drone Operator",
+          "neutral": "Camera Drone Operator"
+        },
+        "r_c2ff9d51c86a": {
+          "masculine": "Camera Drone Pilot",
+          "feminine": "Camera Drone Pilot",
+          "neutral": "Camera Drone Pilot"
+        },
+        "r_0502b3c5dec3": {
+          "masculine": "Camera Car Driver",
+          "feminine": "Camera Car Driver",
+          "neutral": "Camera Car Driver"
+        },
+        "r_a3fa606ea916": {
+          "masculine": "Airplane Pilot (Aerial Filming)",
+          "feminine": "Airplane Pilot (Aerial Filming)",
+          "neutral": "Airplane Pilot (Aerial Filming)"
+        },
+        "r_05d7d18da0c4": {
+          "masculine": "Helicopter Pilot (Aerial Filming)",
+          "feminine": "Helicopter Pilot (Aerial Filming)",
+          "neutral": "Helicopter Pilot (Aerial Filming)"
+        },
+        "r_32e8a90fee3b": {
+          "masculine": "Spidercam Pilot",
+          "feminine": "Spidercam Pilot",
+          "neutral": "Spidercam Pilot"
+        },
+        "r_c4b0d3dfb7d8": {
+          "masculine": "Camera Drone Assistant",
+          "feminine": "Camera Drone Assistant",
+          "neutral": "Camera Drone Assistant"
+        },
+        "r_86c7b305ba77": {
+          "masculine": "Remote Camera Operator",
+          "feminine": "Remote Camera Operator",
+          "neutral": "Remote Camera Operator"
+        },
+        "r_386b1f9db2c1": {
+          "masculine": "Remote Head Operator",
+          "feminine": "Remote Head Operator",
+          "neutral": "Remote Head Operator"
+        },
+        "r_1490637c95ed": {
+          "masculine": "Aerial Camera Operator",
+          "feminine": "Aerial Camera Operator",
+          "neutral": "Aerial Camera Operator"
+        },
+        "r_76c05f6fba78": {
+          "masculine": "Air-to-Air Operator",
+          "feminine": "Air-to-Air Operator",
+          "neutral": "Air-to-Air Operator"
+        },
+        "r_b59f3c08153b": {
+          "masculine": "High-Speed Camera Operator",
+          "feminine": "High-Speed Camera Operator",
+          "neutral": "High-Speed Camera Operator"
+        },
+        "r_f6e99ab3d5dd": {
+          "masculine": "ARRI Trinity Operator",
+          "feminine": "ARRI Trinity Operator",
+          "neutral": "ARRI Trinity Operator"
+        },
+        "r_953bc24b7077": {
+          "masculine": "Cablecam Operator",
+          "feminine": "Cablecam Operator",
+          "neutral": "Cablecam Operator"
+        },
+        "r_e834e506e54b": {
+          "masculine": "Polecam Operator",
+          "feminine": "Polecam Operator",
+          "neutral": "Polecam Operator"
+        },
+        "r_b7ea35e3f38d": {
+          "masculine": "Rod-Cam Operator",
+          "feminine": "Rod-Cam Operator",
+          "neutral": "Rod-Cam Operator"
+        },
+        "r_3531de1d9278": {
+          "masculine": "Motion Control Operator",
+          "feminine": "Motion Control Operator",
+          "neutral": "Motion Control Operator"
+        },
+        "r_edf22fe94ff4": {
+          "masculine": "Motion Control Assistant",
+          "feminine": "Motion Control Assistant",
+          "neutral": "Motion Control Assistant"
+        },
+        "r_7be83f893235": {
+          "masculine": "Live Camera Operator",
+          "feminine": "Live Camera Operator",
+          "neutral": "Live Camera Operator"
+        },
+        "r_8d0fa92d5c06": {
+          "masculine": "VR Director of Photography",
+          "feminine": "VR Director of Photography",
+          "neutral": "VR Director of Photography"
+        },
+        "r_e4f1f8410ee1": {
+          "masculine": "VR Camera Operator",
+          "feminine": "VR Camera Operator",
+          "neutral": "VR Camera Operator"
+        },
+        "r_fe4955d24d9d": {
+          "masculine": "3D Stereo Camera Operator",
+          "feminine": "3D Stereo Camera Operator",
+          "neutral": "3D Stereo Camera Operator"
+        },
+        "r_63d8f7ae5c77": {
+          "masculine": "3D Stereo Convergence Operator",
+          "feminine": "3D Stereo Convergence Operator",
+          "neutral": "3D Stereo Convergence Operator"
+        },
+        "r_5d780d27f437": {
+          "masculine": "Stereoscopic Technician",
+          "feminine": "Stereoscopic Technician",
+          "neutral": "Stereoscopic Technician"
+        },
+        "r_0350366ccf64": {
+          "masculine": "Stereographer",
+          "feminine": "Stereographer",
+          "neutral": "Stereographer"
+        },
+        "r_892df5d9ed45": {
+          "masculine": "2nd Unit Stereographer",
+          "feminine": "2nd Unit Stereographer",
+          "neutral": "2nd Unit Stereographer"
+        },
+        "r_87b9b49ccc72": {
+          "masculine": "Stereographer Assistant",
+          "feminine": "Stereographer Assistant",
+          "neutral": "Stereographer Assistant"
+        },
+        "r_503758a49393": {
+          "masculine": "Underwater Camera Operator",
+          "feminine": "Underwater Camera Operator",
+          "neutral": "Underwater Camera Operator"
+        },
+        "r_ad809b37ab32": {
+          "masculine": "Underwater Camera Assistant",
+          "feminine": "Underwater Camera Assistant",
+          "neutral": "Underwater Camera Assistant"
+        },
+        "r_fdaafaca34cb": {
+          "masculine": "Freefall / Skydive Camera Operator",
+          "feminine": "Freefall / Skydive Camera Operator",
+          "neutral": "Freefall / Skydive Camera Operator"
+        },
+        "r_6fd521b70caf": {
+          "masculine": "Drytech",
+          "feminine": "Drytech",
+          "neutral": "Drytech"
+        },
+        "r_7a8573f394c1": {
+          "masculine": "Data Wrangler",
+          "feminine": "Data Wrangler",
+          "neutral": "Data Wrangler"
+        },
+        "r_59c04d8b3609": {
+          "masculine": "Data Wrangler / Digital Loader",
+          "feminine": "Data Wrangler / Digital Loader",
+          "neutral": "Data Wrangler / Digital Loader"
+        },
+        "r_1b6d2deeae11": {
+          "masculine": "Media Manager",
+          "feminine": "Media Manager",
+          "neutral": "Media Manager"
+        },
+        "r_bfd5ad0745cb": {
+          "masculine": "Video Assist Operator",
+          "feminine": "Video Assist Operator",
+          "neutral": "Video Assist Operator"
+        },
+        "r_ab65480d38bf": {
+          "masculine": "Video Assist Utility",
+          "feminine": "Video Assist Utility",
+          "neutral": "Video Assist Utility"
+        },
+        "r_44cbe06f7edd": {
+          "masculine": "Crash Box Operators",
+          "feminine": "Crash Box Operators",
+          "neutral": "Crash Box Operators"
+        },
+        "r_ff391e554ef1": {
+          "masculine": "Video Operator",
+          "feminine": "Video Operator",
+          "neutral": "Video Operator"
+        },
+        "r_04b8806e4aea": {
+          "masculine": "Qtake Operator",
+          "feminine": "Qtake Operator",
+          "neutral": "Qtake Operator"
+        },
+        "r_881fbad171dd": {
+          "masculine": "Video Operator Assistant",
+          "feminine": "Video Operator Assistant",
+          "neutral": "Video Operator Assistant"
+        },
+        "r_e8b3776feee3": {
+          "masculine": "Playback Operator",
+          "feminine": "Playback Operator",
+          "neutral": "Playback Operator"
+        },
+        "r_2cd28c233eb0": {
+          "masculine": "ENG Assistant (Picture and Sound)",
+          "feminine": "ENG Assistant (Picture and Sound)",
+          "neutral": "ENG Assistant (Picture and Sound)"
+        },
+        "r_aaf320fee04d": {
+          "masculine": "ENG Technician (Picture and Sound)",
+          "feminine": "ENG Technician (Picture and Sound)",
+          "neutral": "ENG Technician (Picture and Sound)"
+        },
+        "r_6c484917c545": {
+          "masculine": "Camera Assistant (Non-Fiction)",
+          "feminine": "Camera Assistant (Non-Fiction)",
+          "neutral": "Camera Assistant (Non-Fiction)"
+        },
+        "r_c071a417cdf8": {
+          "masculine": "Data Capture Engineer",
+          "feminine": "Data Capture Engineer",
+          "neutral": "Data Capture Engineer"
+        },
+        "r_ff3821a892d3": {
+          "masculine": "Rear Projection Plates Operator",
+          "feminine": "Rear Projection Plates Operator",
+          "neutral": "Rear Projection Plates Operator"
+        },
+        "r_e160ca78eefe": {
+          "masculine": "Camera Technician",
+          "feminine": "Camera Technician",
+          "neutral": "Camera Technician"
+        },
+        "r_b2a908032997": {
+          "masculine": "Camera Intern",
+          "feminine": "Camera Intern",
+          "neutral": "Camera Intern"
+        },
+        "r_20c91979a5fc": {
+          "masculine": "Camera Operator",
+          "feminine": "Camera Operator",
+          "neutral": "Camera Operator"
+        },
+        "r_3008a154e7ef": {
+          "masculine": "Drone Operator / Aerial DP",
+          "feminine": "Drone Operator / Aerial DP",
+          "neutral": "Drone Operator / Aerial DP"
+        },
+        "r_ee4208621795": {
+          "masculine": "Additional Camera Operator",
+          "feminine": "Additional Camera Operator",
+          "neutral": "Additional Camera Operator"
+        },
+        "r_59f7261be55a": {
+          "masculine": "Underwater Camera Operator",
+          "feminine": "Underwater Camera Operator",
+          "neutral": "Underwater Camera Operator"
+        },
+        "r_6767d1f92822": {
+          "masculine": "Motion Control Camera Operator",
+          "feminine": "Motion Control Camera Operator",
+          "neutral": "Motion Control Camera Operator"
+        },
+        "r_15047c5a622a": {
+          "masculine": "Camera Drone Assistant/Technician",
+          "feminine": "Camera Drone Assistant/Technician",
+          "neutral": "Camera Drone Assistant/Technician"
+        },
+        "r_7b6aa965b572": {
+          "masculine": "1st Camera Assistant",
+          "feminine": "1st Camera Assistant",
+          "neutral": "1st Camera Assistant"
+        },
+        "r_403c761ac7c7": {
+          "masculine": "ENG Assistant (Camera/Sound)",
+          "feminine": "ENG Assistant (Camera/Sound)",
+          "neutral": "ENG Assistant (Camera/Sound)"
+        },
+        "r_6170f09c0f17": {
+          "masculine": "ENG Technician (Camera/Sound)",
+          "feminine": "ENG Technician (Camera/Sound)",
+          "neutral": "ENG Technician (Camera/Sound)"
+        },
+        "r_6a6303b77029": {
+          "masculine": "Still Photographer",
+          "feminine": "Still Photographer",
+          "neutral": "Still Photographer"
+        }
+      },
+      "licht": {
+        "r_222be04dbf00": {
+          "masculine": "Gaffer",
+          "feminine": "Gaffer",
+          "neutral": "Gaffer"
+        },
+        "r_1e210e69039a": {
+          "masculine": "Best Boy Electric",
+          "feminine": "Best Girl Electric",
+          "neutral": "Assistant Chief Lighting Technician"
+        },
+        "r_14dd174cd76c": {
+          "masculine": "Rigging Gaffer",
+          "feminine": "Rigging Gaffer",
+          "neutral": "Rigging Gaffer"
+        },
+        "r_92137802b24a": {
+          "masculine": "Rigging Best Boy Electric",
+          "feminine": "Rigging Best Girl Electric",
+          "neutral": "Rigging Assistant Chief Lighting Technician"
+        },
+        "r_7fce7d6fcf12": {
+          "masculine": "Rigging Electrician",
+          "feminine": "Rigging Electrician",
+          "neutral": "Rigging Electrician"
+        },
+        "r_1bcf9d8d9b03": {
+          "masculine": "Electrician / Lighting Tech",
+          "feminine": "Electrician / Lighting Tech",
+          "neutral": "Electrician / Lighting Tech"
+        },
+        "r_d95b919dded9": {
+          "masculine": "Chief Lighting Technician",
+          "feminine": "Chief Lighting Technician",
+          "neutral": "Chief Lighting Technician"
+        },
+        "r_de223259b793": {
+          "masculine": "Lighting Board Operator",
+          "feminine": "Lighting Board Operator",
+          "neutral": "Lighting Board Operator"
+        },
+        "r_d927855afff9": {
+          "masculine": "Lighting Board Assistant",
+          "feminine": "Lighting Board Assistant",
+          "neutral": "Lighting Board Assistant"
+        },
+        "r_56ad1c6a1ad4": {
+          "masculine": "Lighting Programmer (DMX)",
+          "feminine": "Lighting Programmer (DMX)",
+          "neutral": "Lighting Programmer (DMX)"
+        },
+        "r_090ac2a092b8": {
+          "masculine": "Lighting Technician",
+          "feminine": "Lighting Technician",
+          "neutral": "Lighting Technician"
+        },
+        "r_d1edcbd50142": {
+          "masculine": "Lighting Driver",
+          "feminine": "Lighting Driver",
+          "neutral": "Lighting Driver"
+        },
+        "r_7d79588c14f3": {
+          "masculine": "Additional Lighting Technician",
+          "feminine": "Additional Lighting Technician",
+          "neutral": "Additional Lighting Technician"
+        },
+        "r_b3d1d585beaa": {
+          "masculine": "Generator Operator",
+          "feminine": "Generator Operator",
+          "neutral": "Generator Operator"
+        },
+        "r_bcd4b312b67e": {
+          "masculine": "Cable Wrangler",
+          "feminine": "Cable Wrangler",
+          "neutral": "Cable Wrangler"
+        },
+        "r_35cca1fe3c5c": {
+          "masculine": "Underwater Lighting Technician",
+          "feminine": "Underwater Lighting Technician",
+          "neutral": "Underwater Lighting Technician"
+        },
+        "r_89058c839b15": {
+          "masculine": "Balloon Light Operator",
+          "feminine": "Balloon Light Operator",
+          "neutral": "Balloon Light Operator"
+        },
+        "r_9bd915bb46a4": {
+          "masculine": "Spot / Truss-Spot Operator",
+          "feminine": "Spot / Truss-Spot Operator",
+          "neutral": "Spot / Truss-Spot Operator"
+        },
+        "r_2c0dd7b64cf3": {
+          "masculine": "Lighting Assistant",
+          "feminine": "Lighting Assistant",
+          "neutral": "Lighting Assistant"
+        },
+        "r_0cc27c01ca07": {
+          "masculine": "Lighting Intern",
+          "feminine": "Lighting Intern",
+          "neutral": "Lighting Intern"
+        }
+      },
+      "grip": {
+        "r_470156bd03e4": {
+          "masculine": "Key Grip",
+          "feminine": "Key Grip",
+          "neutral": "Key Grip"
+        },
+        "r_cfbf2a22ed6e": {
+          "masculine": "Best Boy Grip",
+          "feminine": "Best Girl Grip",
+          "neutral": "Assistant Key Grip"
+        },
+        "r_32a6ab31b1a1": {
+          "masculine": "Dolly Grip / Dolly Operator",
+          "feminine": "Dolly Grip / Dolly Operator",
+          "neutral": "Dolly Grip / Dolly Operator"
+        },
+        "r_376dc1f790b8": {
+          "masculine": "Grip",
+          "feminine": "Grip",
+          "neutral": "Grip"
+        },
+        "r_dbfaadb8821c": {
+          "masculine": "Grip Assistant",
+          "feminine": "Grip Assistant",
+          "neutral": "Grip Assistant"
+        },
+        "r_46dab52c1995": {
+          "masculine": "Rigging Grip",
+          "feminine": "Rigging Grip",
+          "neutral": "Rigging Grip"
+        },
+        "r_ea7e925bd850": {
+          "masculine": "Rigging Key Grip",
+          "feminine": "Rigging Key Grip",
+          "neutral": "Rigging Key Grip"
+        },
+        "r_fa9d72fc7978": {
+          "masculine": "Rigging Best Boy Grip",
+          "feminine": "Rigging Best Girl Grip",
+          "neutral": "Rigging Assistant Key Grip"
+        },
+        "r_2fa0b44342d7": {
+          "masculine": "Special Grip Constructions",
+          "feminine": "Special Grip Constructions",
+          "neutral": "Special Grip Constructions"
+        },
+        "r_08c07afebb7f": {
+          "masculine": "Camera Crane / Jib Operator",
+          "feminine": "Camera Crane / Jib Operator",
+          "neutral": "Camera Crane / Jib Operator"
+        },
+        "r_5ece318b289f": {
+          "masculine": "Camera Crane Technician",
+          "feminine": "Camera Crane Technician",
+          "neutral": "Camera Crane Technician"
+        },
+        "r_a5c74e86fb2b": {
+          "masculine": "U-Crane / Technocrane Operator",
+          "feminine": "U-Crane / Technocrane Operator",
+          "neutral": "U-Crane / Technocrane Operator"
+        },
+        "r_819dd64bff9d": {
+          "masculine": "Remote Head Technician / Operator",
+          "feminine": "Remote Head Technician / Operator",
+          "neutral": "Remote Head Technician / Operator"
+        },
+        "r_9c6f674da63a": {
+          "masculine": "Grip Intern",
+          "feminine": "Grip Intern",
+          "neutral": "Grip Intern"
+        }
+      },
+      "ton": {
+        "r_fccf287d8f40": {
+          "masculine": "Production Sound Mixer",
+          "feminine": "Production Sound Mixer",
+          "neutral": "Production Sound Mixer"
+        },
+        "r_54f3d59eb241": {
+          "masculine": "Production Sound Mixer",
+          "feminine": "Production Sound Mixer",
+          "neutral": "Production Sound Mixer"
+        },
+        "r_b0c1942e7358": {
+          "masculine": "Film Sound Recordist",
+          "feminine": "Film Sound Recordist",
+          "neutral": "Film Sound Recordist"
+        },
+        "r_8b1cc700407b": {
+          "masculine": "Boom Operator",
+          "feminine": "Boom Operator",
+          "neutral": "Boom Operator"
+        },
+        "r_fd909904c9c7": {
+          "masculine": "Sound Assistant",
+          "feminine": "Sound Assistant",
+          "neutral": "Sound Assistant"
+        },
+        "r_4c5fe4b3a1f3": {
+          "masculine": "1st Sound Assistant",
+          "feminine": "1st Sound Assistant",
+          "neutral": "1st Sound Assistant"
+        },
+        "r_ab87e9473072": {
+          "masculine": "1st Sound Assistant",
+          "feminine": "1st Sound Assistant",
+          "neutral": "1st Sound Assistant"
+        },
+        "r_d83df9d29ab1": {
+          "masculine": "2nd Sound Assistant",
+          "feminine": "2nd Sound Assistant",
+          "neutral": "2nd Sound Assistant"
+        },
+        "r_8377b0674c5d": {
+          "masculine": "2nd Sound Assistant",
+          "feminine": "2nd Sound Assistant",
+          "neutral": "2nd Sound Assistant"
+        },
+        "r_93302391f02a": {
+          "masculine": "ADR / Loop Group Wrangler",
+          "feminine": "ADR / Loop Group Wrangler",
+          "neutral": "ADR / Loop Group Wrangler"
+        },
+        "r_3e7456f82724": {
+          "masculine": "Surround Sound Recordist",
+          "feminine": "Surround Sound Recordist",
+          "neutral": "Surround Sound Recordist"
+        },
+        "r_352c199bfbc1": {
+          "masculine": "Utility Sound Technician",
+          "feminine": "Utility Sound Technician",
+          "neutral": "Utility Sound Technician"
+        },
+        "r_fdfa14e36d06": {
+          "masculine": "Sound Equipment Assistant",
+          "feminine": "Sound Equipment Assistant",
+          "neutral": "Sound Equipment Assistant"
+        },
+        "r_9615bbb28141": {
+          "masculine": "Sound Playback Operator",
+          "feminine": "Sound Playback Operator",
+          "neutral": "Sound Playback Operator"
+        },
+        "r_13544e0c2d08": {
+          "masculine": "Sound Recordist (Non-Fiction)",
+          "feminine": "Sound Recordist (Non-Fiction)",
+          "neutral": "Sound Recordist (Non-Fiction)"
+        },
+        "r_f804f9794c40": {
+          "masculine": "Sound Intern",
+          "feminine": "Sound Intern",
+          "neutral": "Sound Intern"
+        },
+        "r_26ad417384db": {
+          "masculine": "Sound Designer",
+          "feminine": "Sound Designer",
+          "neutral": "Sound Designer"
+        },
+        "r_e4afa3da823e": {
+          "masculine": "Supervising Sound Editor",
+          "feminine": "Supervising Sound Editor",
+          "neutral": "Supervising Sound Editor"
+        },
+        "r_754377fae1cb": {
+          "masculine": "Dialogue Editor",
+          "feminine": "Dialogue Editor",
+          "neutral": "Dialogue Editor"
+        },
+        "r_a80f60e08e2f": {
+          "masculine": "ADR Editor",
+          "feminine": "ADR Editor",
+          "neutral": "ADR Editor"
+        },
+        "r_65ab3bc0b779": {
+          "masculine": "ADR Supervisor",
+          "feminine": "ADR Supervisor",
+          "neutral": "ADR Supervisor"
+        },
+        "r_927d0ca8e1d9": {
+          "masculine": "Foley Artist",
+          "feminine": "Foley Artist",
+          "neutral": "Foley Artist"
+        },
+        "r_c196984117d7": {
+          "masculine": "Foley Editor",
+          "feminine": "Foley Editor",
+          "neutral": "Foley Editor"
+        },
+        "r_df6ebbcf6038": {
+          "masculine": "Re-Recording Mixer",
+          "feminine": "Re-Recording Mixer",
+          "neutral": "Re-Recording Mixer"
+        },
+        "r_f4776d32d356": {
+          "masculine": "Playback Operator",
+          "feminine": "Playback Operator",
+          "neutral": "Playback Operator"
+        },
+        "r_6abc8617e983": {
+          "masculine": "Sound Supervisor",
+          "feminine": "Sound Supervisor",
+          "neutral": "Sound Supervisor"
+        },
+        "r_0faba800cb95": {
+          "masculine": "Music Re-Recording Mixer",
+          "feminine": "Music Re-Recording Mixer",
+          "neutral": "Music Re-Recording Mixer"
+        },
+        "r_a5fba4295f52": {
+          "masculine": "Music Recording",
+          "feminine": "Music Recording",
+          "neutral": "Music Recording"
+        },
+        "r_f2e629941a7a": {
+          "masculine": "Dubbing Mixer",
+          "feminine": "Dubbing Mixer",
+          "neutral": "Dubbing Mixer"
+        },
+        "r_f73a9a076c95": {
+          "masculine": "Audio Description Mixer",
+          "feminine": "Audio Description Mixer",
+          "neutral": "Audio Description Mixer"
+        },
+        "r_9d583d9712f5": {
+          "masculine": "Re-Recording Assistant",
+          "feminine": "Re-Recording Assistant",
+          "neutral": "Re-Recording Assistant"
+        },
+        "r_c4334fc01411": {
+          "masculine": "Sound Mastering Engineer",
+          "feminine": "Sound Mastering Engineer",
+          "neutral": "Sound Mastering Engineer"
+        },
+        "r_6a7ea11d04ed": {
+          "masculine": "Sound Design Assistant",
+          "feminine": "Sound Design Assistant",
+          "neutral": "Sound Design Assistant"
+        },
+        "r_539e45fc2e6d": {
+          "masculine": "Supervising ADR Editor",
+          "feminine": "Supervising ADR Editor",
+          "neutral": "Supervising ADR Editor"
+        },
+        "r_021e586f6845": {
+          "masculine": "Supervising Dialogue & ADR Editor",
+          "feminine": "Supervising Dialogue & ADR Editor",
+          "neutral": "Supervising Dialogue & ADR Editor"
+        },
+        "r_58f4b9fff63e": {
+          "masculine": "Supervising Dialogue Editor",
+          "feminine": "Supervising Dialogue Editor",
+          "neutral": "Supervising Dialogue Editor"
+        },
+        "r_934c9dff31b6": {
+          "masculine": "Supervising SFX Editor",
+          "feminine": "Supervising SFX Editor",
+          "neutral": "Supervising SFX Editor"
+        },
+        "r_8ffed7b496e8": {
+          "masculine": "Dialogue Editor (Post)",
+          "feminine": "Dialogue Editor (Post)",
+          "neutral": "Dialogue Editor (Post)"
+        },
+        "r_37f0cea40905": {
+          "masculine": "Sound Effects Editor",
+          "feminine": "Sound Effects Editor",
+          "neutral": "Sound Effects Editor"
+        },
+        "r_e22d9239a33f": {
+          "masculine": "Voice-Over / Dubbing Editor",
+          "feminine": "Voice-Over / Dubbing Editor",
+          "neutral": "Voice-Over / Dubbing Editor"
+        },
+        "r_cf36114f7a15": {
+          "masculine": "Sync SFX Editor",
+          "feminine": "Sync SFX Editor",
+          "neutral": "Sync SFX Editor"
+        },
+        "r_7ca65f7a0064": {
+          "masculine": "ADR / Sync Editor",
+          "feminine": "ADR / Sync Editor",
+          "neutral": "ADR / Sync Editor"
+        },
+        "r_944e077953d3": {
+          "masculine": "Sound Editor Assistant",
+          "feminine": "Sound Editor Assistant",
+          "neutral": "Sound Editor Assistant"
+        },
+        "r_9d4ed0bf92ee": {
+          "masculine": "ADR / Dubbing Sound Mixer",
+          "feminine": "ADR / Dubbing Sound Mixer",
+          "neutral": "ADR / Dubbing Sound Mixer"
+        },
+        "r_b3e198ffbf29": {
+          "masculine": "Sync SFX Mixer",
+          "feminine": "Sync SFX Mixer",
+          "neutral": "Sync SFX Mixer"
+        },
+        "r_c41c6bc414c3": {
+          "masculine": "Dubbing Production Manager",
+          "feminine": "Dubbing Production Manager",
+          "neutral": "Dubbing Production Manager"
+        },
+        "r_2b6bc11139d6": {
+          "masculine": "ADR / Dubbing Supervisor",
+          "feminine": "ADR / Dubbing Supervisor",
+          "neutral": "ADR / Dubbing Supervisor"
+        },
+        "r_6645c4583551": {
+          "masculine": "Assistant ADR / Dubbing Supervisor",
+          "feminine": "Assistant ADR / Dubbing Supervisor",
+          "neutral": "Assistant ADR / Dubbing Supervisor"
+        },
+        "r_2f0b82350b59": {
+          "masculine": "Foley Assistant",
+          "feminine": "Foley Assistant",
+          "neutral": "Foley Assistant"
+        },
+        "r_a4171d6359fb": {
+          "masculine": "Sound Post-Production Intern",
+          "feminine": "Sound Post-Production Intern",
+          "neutral": "Sound Post-Production Intern"
+        },
+        "r_9e4b74ecd5ff": {
+          "masculine": "Technical Supervisor ADR",
+          "feminine": "Technical Supervisor ADR",
+          "neutral": "Technical Supervisor ADR"
+        }
+      },
+      "art": {
+        "r_ff29ce0e215c": {
+          "masculine": "Production Designer",
+          "feminine": "Production Designer",
+          "neutral": "Production Designer"
+        },
+        "r_f3db07db6bf4": {
+          "masculine": "Production Designer (DE)",
+          "feminine": "Production Designer (DE)",
+          "neutral": "Production Designer (DE)"
+        },
+        "r_97a0a726b446": {
+          "masculine": "Supervising Art Director",
+          "feminine": "Supervising Art Director",
+          "neutral": "Supervising Art Director"
+        },
+        "r_3f274caf46f5": {
+          "masculine": "Art Director",
+          "feminine": "Art Director",
+          "neutral": "Art Director"
+        },
+        "r_7e93c2713534": {
+          "masculine": "Standby Art Director",
+          "feminine": "Standby Art Director",
+          "neutral": "Standby Art Director"
+        },
+        "r_891f7ee6a391": {
+          "masculine": "Assistant Art Director",
+          "feminine": "Assistant Art Director",
+          "neutral": "Assistant Art Director"
+        },
+        "r_29765953355c": {
+          "masculine": "Production Design Assistant",
+          "feminine": "Production Design Assistant",
+          "neutral": "Production Design Assistant"
+        },
+        "r_8543a5c61931": {
+          "masculine": "Art Department Assistant",
+          "feminine": "Art Department Assistant",
+          "neutral": "Art Department Assistant"
+        },
+        "r_3ffad936200e": {
+          "masculine": "Set Designer",
+          "feminine": "Set Designer",
+          "neutral": "Set Designer"
+        },
+        "r_bce8305a5535": {
+          "masculine": "CAD Designer",
+          "feminine": "CAD Designer",
+          "neutral": "CAD Designer"
+        },
+        "r_b5a1fa9969c7": {
+          "masculine": "Concept Artist",
+          "feminine": "Concept Artist",
+          "neutral": "Concept Artist"
+        },
+        "r_f1dbbb97b010": {
+          "masculine": "Concept Artist (Art Dept.)",
+          "feminine": "Concept Artist (Art Dept.)",
+          "neutral": "Concept Artist (Art Dept.)"
+        },
+        "r_57a4a106cbd6": {
+          "masculine": "Illustrator",
+          "feminine": "Illustrator",
+          "neutral": "Illustrator"
+        },
+        "r_6aa3fecc3ba9": {
+          "masculine": "Graphic Designer (Set Graphics)",
+          "feminine": "Graphic Designer (Set Graphics)",
+          "neutral": "Graphic Designer (Set Graphics)"
+        },
+        "r_6978775ad99b": {
+          "masculine": "Lead Graphic Designer",
+          "feminine": "Lead Graphic Designer",
+          "neutral": "Lead Graphic Designer"
+        },
+        "r_7534f951d040": {
+          "masculine": "Graphic Artist",
+          "feminine": "Graphic Artist",
+          "neutral": "Graphic Artist"
+        },
+        "r_a8e10d0ecc47": {
+          "masculine": "Mood Scout / Layouter",
+          "feminine": "Mood Scout / Layouter",
+          "neutral": "Mood Scout / Layouter"
+        },
+        "r_a1ce9e299c8f": {
+          "masculine": "Set Decorator",
+          "feminine": "Set Decorator",
+          "neutral": "Set Decorator"
+        },
+        "r_420521110dcc": {
+          "masculine": "Set Decoration Coordinator",
+          "feminine": "Set Decoration Coordinator",
+          "neutral": "Set Decoration Coordinator"
+        },
+        "r_d5b7a7d716a2": {
+          "masculine": "Assistant Set Decorator",
+          "feminine": "Assistant Set Decorator",
+          "neutral": "Assistant Set Decorator"
+        },
+        "r_d0964de45366": {
+          "masculine": "Set Decoration Buyer",
+          "feminine": "Set Decoration Buyer",
+          "neutral": "Set Decoration Buyer"
+        },
+        "r_10a8275fbc87": {
+          "masculine": "Set Decoration Store Manager",
+          "feminine": "Set Decoration Store Manager",
+          "neutral": "Set Decoration Store Manager"
+        },
+        "r_1df861fbde16": {
+          "masculine": "Assistant Set Dec Coordinator",
+          "feminine": "Assistant Set Dec Coordinator",
+          "neutral": "Assistant Set Dec Coordinator"
+        },
+        "r_393242957f26": {
+          "masculine": "Set Dresser",
+          "feminine": "Set Dresser",
+          "neutral": "Set Dresser"
+        },
+        "r_e3ce1061c0ff": {
+          "masculine": "Leadman",
+          "feminine": "Leadwoman",
+          "neutral": "Lead Set Dresser"
+        },
+        "r_d588cad49b89": {
+          "masculine": "Leadman Set Dresser",
+          "feminine": "Leadwoman Set Dresser",
+          "neutral": "Lead Set Dresser"
+        },
+        "r_6cafa4dd814b": {
+          "masculine": "Props Master",
+          "feminine": "Props Master",
+          "neutral": "Props Master"
+        },
+        "r_413221e86652": {
+          "masculine": "Props Master",
+          "feminine": "Props Master",
+          "neutral": "Props Master"
+        },
+        "r_a1e9f4cffb70": {
+          "masculine": "Exterior Props Master",
+          "feminine": "Exterior Props Master",
+          "neutral": "Exterior Props Master"
+        },
+        "r_8f20bee45473": {
+          "masculine": "On-Set Props",
+          "feminine": "On-Set Props",
+          "neutral": "On-Set Props"
+        },
+        "r_7d553f96df87": {
+          "masculine": "On-Set Props Master",
+          "feminine": "On-Set Props Master",
+          "neutral": "On-Set Props Master"
+        },
+        "r_bf9d71b6fdc2": {
+          "masculine": "Standby Props",
+          "feminine": "Standby Props",
+          "neutral": "Standby Props"
+        },
+        "r_a38576fafdab": {
+          "masculine": "Prop Assistant",
+          "feminine": "Prop Assistant",
+          "neutral": "Prop Assistant"
+        },
+        "r_ea2b2fab38f4": {
+          "masculine": "Props Assistant",
+          "feminine": "Props Assistant",
+          "neutral": "Props Assistant"
+        },
+        "r_b685fb4dc943": {
+          "masculine": "Exterior Props Assistant",
+          "feminine": "Exterior Props Assistant",
+          "neutral": "Exterior Props Assistant"
+        },
+        "r_7b9477ba5686": {
+          "masculine": "On-Set Props Assistant",
+          "feminine": "On-Set Props Assistant",
+          "neutral": "On-Set Props Assistant"
+        },
+        "r_541c87622274": {
+          "masculine": "Prop Buyer",
+          "feminine": "Prop Buyer",
+          "neutral": "Prop Buyer"
+        },
+        "r_3c2dae1ec180": {
+          "masculine": "Buyer (Set Dec)",
+          "feminine": "Buyer (Set Dec)",
+          "neutral": "Buyer (Set Dec)"
+        },
+        "r_c17d76240812": {
+          "masculine": "Prop Store Manager",
+          "feminine": "Prop Store Manager",
+          "neutral": "Prop Store Manager"
+        },
+        "r_6a373738f331": {
+          "masculine": "Digital Props Designer",
+          "feminine": "Digital Props Designer",
+          "neutral": "Digital Props Designer"
+        },
+        "r_404bfcb27b87": {
+          "masculine": "Digital Props Master",
+          "feminine": "Digital Props Master",
+          "neutral": "Digital Props Master"
+        },
+        "r_efdc51e3e8eb": {
+          "masculine": "Prop Maker",
+          "feminine": "Prop Maker",
+          "neutral": "Prop Maker"
+        },
+        "r_30872cd93e0c": {
+          "masculine": "Prop Designer",
+          "feminine": "Prop Designer",
+          "neutral": "Prop Designer"
+        },
+        "r_264fc56ea7a5": {
+          "masculine": "Weapon Advisor / Armorer",
+          "feminine": "Weapon Advisor / Armorer",
+          "neutral": "Weapon Advisor / Armorer"
+        },
+        "r_00f9e2afb019": {
+          "masculine": "Props Runner",
+          "feminine": "Props Runner",
+          "neutral": "Props Runner"
+        },
+        "r_ef64ec97e93f": {
+          "masculine": "Props Painter",
+          "feminine": "Props Painter",
+          "neutral": "Props Painter"
+        },
+        "r_8a17379f4cf2": {
+          "masculine": "Props Driver",
+          "feminine": "Props Driver",
+          "neutral": "Props Driver"
+        },
+        "r_fb928031fe07": {
+          "masculine": "Picture Car / Vehicle Coordinator",
+          "feminine": "Picture Car / Vehicle Coordinator",
+          "neutral": "Picture Car / Vehicle Coordinator"
+        },
+        "r_77928b37c49d": {
+          "masculine": "Picture Car Wrangler",
+          "feminine": "Picture Car Wrangler",
+          "neutral": "Picture Car Wrangler"
+        },
+        "r_115e6da0f002": {
+          "masculine": "Practical Electrician",
+          "feminine": "Practical Electrician",
+          "neutral": "Practical Electrician"
+        },
+        "r_857a05036004": {
+          "masculine": "Greensmaster / Greensman",
+          "feminine": "Greensmaster / Greenswoman",
+          "neutral": "Greensmaster / Greensperson"
+        },
+        "r_d8e3dea65e7b": {
+          "masculine": "Greens / Set Gardener",
+          "feminine": "Greens / Set Gardener",
+          "neutral": "Greens / Set Gardener"
+        },
+        "r_aa5ce508ee21": {
+          "masculine": "Floral Artist",
+          "feminine": "Floral Artist",
+          "neutral": "Floral Artist"
+        },
+        "r_36b1709b4159": {
+          "masculine": "Food Stylist",
+          "feminine": "Food Stylist",
+          "neutral": "Food Stylist"
+        },
+        "r_40b095fdeb85": {
+          "masculine": "Airbrush Artist",
+          "feminine": "Airbrush Artist",
+          "neutral": "Airbrush Artist"
+        },
+        "r_afee4f58989a": {
+          "masculine": "Scenic Artist / Fine Art Painter",
+          "feminine": "Scenic Artist / Fine Art Painter",
+          "neutral": "Scenic Artist / Fine Art Painter"
+        },
+        "r_c056e02e39c4": {
+          "masculine": "Scenic Painter",
+          "feminine": "Scenic Painter",
+          "neutral": "Scenic Painter"
+        },
+        "r_e689709eac01": {
+          "masculine": "Head Scenic Painter",
+          "feminine": "Head Scenic Painter",
+          "neutral": "Head Scenic Painter"
+        },
+        "r_70a7586bb774": {
+          "masculine": "Sign Writer / Lettering Artist",
+          "feminine": "Sign Writer / Lettering Artist",
+          "neutral": "Sign Writer / Lettering Artist"
+        },
+        "r_12f20cf536a1": {
+          "masculine": "Painter / Scenic Artist",
+          "feminine": "Painter / Scenic Artist",
+          "neutral": "Painter / Scenic Artist"
+        },
+        "r_dcf49adce47b": {
+          "masculine": "Sculptor / Model Maker",
+          "feminine": "Sculptor / Model Maker",
+          "neutral": "Sculptor / Model Maker"
+        },
+        "r_f4670c7a29a7": {
+          "masculine": "Scenic Plasterer / Sculptor",
+          "feminine": "Scenic Plasterer / Sculptor",
+          "neutral": "Scenic Plasterer / Sculptor"
+        },
+        "r_5fc07d2f3030": {
+          "masculine": "Model Maker",
+          "feminine": "Model Maker",
+          "neutral": "Model Maker"
+        },
+        "r_f545a993cec8": {
+          "masculine": "Miniature Supervisor",
+          "feminine": "Miniature Supervisor",
+          "neutral": "Miniature Supervisor"
+        },
+        "r_d3f5fd4b86c3": {
+          "masculine": "Miniature Effects Supervisor",
+          "feminine": "Miniature Effects Supervisor",
+          "neutral": "Miniature Effects Supervisor"
+        },
+        "r_a6d3fd7eaada": {
+          "masculine": "Construction Manager",
+          "feminine": "Construction Manager",
+          "neutral": "Construction Manager"
+        },
+        "r_ca83b607f08e": {
+          "masculine": "Construction Coordinator",
+          "feminine": "Construction Coordinator",
+          "neutral": "Construction Coordinator"
+        },
+        "r_fbcfd1e1839b": {
+          "masculine": "Studio / Set Construction Manager",
+          "feminine": "Studio / Set Construction Manager",
+          "neutral": "Studio / Set Construction Manager"
+        },
+        "r_0231e128483a": {
+          "masculine": "Set Builder / Carpenter",
+          "feminine": "Set Builder / Carpenter",
+          "neutral": "Set Builder / Carpenter"
+        },
+        "r_62f07946c8f1": {
+          "masculine": "Set Construction Crew",
+          "feminine": "Set Construction Crew",
+          "neutral": "Set Construction Crew"
+        },
+        "r_a3c94f3f3cd1": {
+          "masculine": "Stage / Construction Master",
+          "feminine": "Stage / Construction Master",
+          "neutral": "Stage / Construction Master"
+        },
+        "r_c606af121ce8": {
+          "masculine": "Stage Technician",
+          "feminine": "Stage Technician",
+          "neutral": "Stage Technician"
+        },
+        "r_2017ec503138": {
+          "masculine": "Technical Draughtsman",
+          "feminine": "Technical Draughtswoman",
+          "neutral": "Technical Drafter"
+        },
+        "r_169af74d49f6": {
+          "masculine": "Bricklayer (Set)",
+          "feminine": "Bricklayer (Set)",
+          "neutral": "Bricklayer (Set)"
+        },
+        "r_578a92348ec6": {
+          "masculine": "Metalworker",
+          "feminine": "Metalworker",
+          "neutral": "Metalworker"
+        },
+        "r_6c7b48200cb3": {
+          "masculine": "Metalworker (Set)",
+          "feminine": "Metalworker (Set)",
+          "neutral": "Metalworker (Set)"
+        },
+        "r_e7f7da33c876": {
+          "masculine": "Head Metalworker (Set)",
+          "feminine": "Head Metalworker (Set)",
+          "neutral": "Head Metalworker (Set)"
+        },
+        "r_027c0b61577d": {
+          "masculine": "Stucco Artist (Set)",
+          "feminine": "Stucco Artist (Set)",
+          "neutral": "Stucco Artist (Set)"
+        },
+        "r_8d5fe63edbd3": {
+          "masculine": "Decorator",
+          "feminine": "Decorator",
+          "neutral": "Decorator"
+        },
+        "r_61ab14bcf2c6": {
+          "masculine": "Carpenter / Joiner (Set)",
+          "feminine": "Carpenter / Joiner (Set)",
+          "neutral": "Carpenter / Joiner (Set)"
+        },
+        "r_3addd9ac0457": {
+          "masculine": "Turner / Woodworker (Set)",
+          "feminine": "Turner / Woodworker (Set)",
+          "neutral": "Turner / Woodworker (Set)"
+        },
+        "r_be99bdf8e0ab": {
+          "masculine": "Art Department Coordinator",
+          "feminine": "Art Department Coordinator",
+          "neutral": "Art Department Coordinator"
+        },
+        "r_9187325e0d84": {
+          "masculine": "Assistant Art Department Coordinator",
+          "feminine": "Assistant Art Department Coordinator",
+          "neutral": "Assistant Art Department Coordinator"
+        },
+        "r_a8af82f5e937": {
+          "masculine": "Art Department Runner",
+          "feminine": "Art Department Runner",
+          "neutral": "Art Department Runner"
+        },
+        "r_8310307922eb": {
+          "masculine": "Art Department Trainee",
+          "feminine": "Art Department Trainee",
+          "neutral": "Art Department Trainee"
+        },
+        "r_f7d87853929b": {
+          "masculine": "Set Decoration Driver",
+          "feminine": "Set Decoration Driver",
+          "neutral": "Set Decoration Driver"
+        },
+        "r_71506d96f350": {
+          "masculine": "Graphic Designer (Art Dept.)",
+          "feminine": "Graphic Designer (Art Dept.)",
+          "neutral": "Graphic Designer (Art Dept.)"
+        },
+        "r_dd224ea66364": {
+          "masculine": "Product Care",
+          "feminine": "Product Care",
+          "neutral": "Product Care"
+        },
+        "r_b2e24af2a895": {
+          "masculine": "Artwork Artist",
+          "feminine": "Artwork Artist",
+          "neutral": "Artwork Artist"
+        },
+        "r_c399668f6f57": {
+          "masculine": "Computer / Video Playback Supervisor",
+          "feminine": "Computer / Video Playback Supervisor",
+          "neutral": "Computer / Video Playback Supervisor"
+        },
+        "r_d278f8dea5ee": {
+          "masculine": "Set Builder / Construction",
+          "feminine": "Set Builder / Construction",
+          "neutral": "Set Builder / Construction"
+        },
+        "r_ed52a3596ba0": {
+          "masculine": "On-Set Construction Crew",
+          "feminine": "On-Set Construction Crew",
+          "neutral": "On-Set Construction Crew"
+        },
+        "r_e3f39e455941": {
+          "masculine": "Construction Runner",
+          "feminine": "Construction Runner",
+          "neutral": "Construction Runner"
+        },
+        "r_74a60171830a": {
+          "masculine": "Underwater Set Construction",
+          "feminine": "Underwater Set Construction",
+          "neutral": "Underwater Set Construction"
+        },
+        "r_18c785ac7bd8": {
+          "masculine": "Rigging / Special Constructions",
+          "feminine": "Rigging / Special Constructions",
+          "neutral": "Rigging / Special Constructions"
+        },
+        "r_8f15fc164b86": {
+          "masculine": "Technical Drafting Assistant",
+          "feminine": "Technical Drafting Assistant",
+          "neutral": "Technical Drafting Assistant"
+        },
+        "r_7e3c819b39ed": {
+          "masculine": "Head Stucco Artist (Set)",
+          "feminine": "Head Stucco Artist (Set)",
+          "neutral": "Head Stucco Artist (Set)"
+        },
+        "r_24a7497a9f06": {
+          "masculine": "Set Upholsterer",
+          "feminine": "Set Upholsterer",
+          "neutral": "Set Upholsterer"
+        },
+        "r_a279ae7e16ec": {
+          "masculine": "Head Set Upholsterer",
+          "feminine": "Head Set Upholsterer",
+          "neutral": "Head Set Upholsterer"
+        },
+        "r_0f2d76b6cc82": {
+          "masculine": "Head Carpenter (Set)",
+          "feminine": "Head Carpenter (Set)",
+          "neutral": "Head Carpenter (Set)"
+        },
+        "r_08876b0452b5": {
+          "masculine": "Art Department Intern",
+          "feminine": "Art Department Intern",
+          "neutral": "Art Department Intern"
+        }
+      },
+      "kostuem": {
+        "r_cfc0491e1daf": {
+          "masculine": "Costume Designer",
+          "feminine": "Costume Designer",
+          "neutral": "Costume Designer"
+        },
+        "r_acbff2b1675d": {
+          "masculine": "Costume Supervisor",
+          "feminine": "Costume Supervisor",
+          "neutral": "Costume Supervisor"
+        },
+        "r_4e5a29f37fde": {
+          "masculine": "Assistant Costume Supervisor",
+          "feminine": "Assistant Costume Supervisor",
+          "neutral": "Assistant Costume Supervisor"
+        },
+        "r_9dacdd987a87": {
+          "masculine": "Costume Coordinator",
+          "feminine": "Costume Coordinator",
+          "neutral": "Costume Coordinator"
+        },
+        "r_3ea2819cc8c4": {
+          "masculine": "Assistant Costume Coordinator",
+          "feminine": "Assistant Costume Coordinator",
+          "neutral": "Assistant Costume Coordinator"
+        },
+        "r_3684af682bde": {
+          "masculine": "Assistant Costume Designer",
+          "feminine": "Assistant Costume Designer",
+          "neutral": "Assistant Costume Designer"
+        },
+        "r_bca9201a3794": {
+          "masculine": "2nd Assistant Costume Designer",
+          "feminine": "2nd Assistant Costume Designer",
+          "neutral": "2nd Assistant Costume Designer"
+        },
+        "r_570a76c15c34": {
+          "masculine": "3rd Assistant Costume Designer",
+          "feminine": "3rd Assistant Costume Designer",
+          "neutral": "3rd Assistant Costume Designer"
+        },
+        "r_75358a18f698": {
+          "masculine": "Key Costumer",
+          "feminine": "Key Costumer",
+          "neutral": "Key Costumer"
+        },
+        "r_df59c1f51566": {
+          "masculine": "Set Costumer / Wardrobe Attendant",
+          "feminine": "Set Costumer / Wardrobe Attendant",
+          "neutral": "Set Costumer / Wardrobe Attendant"
+        },
+        "r_7d1eb3e51b50": {
+          "masculine": "Additional Set Costumer",
+          "feminine": "Additional Set Costumer",
+          "neutral": "Additional Set Costumer"
+        },
+        "r_aa38c8f5acdd": {
+          "masculine": "Set Costume Assistant",
+          "feminine": "Set Costume Assistant",
+          "neutral": "Set Costume Assistant"
+        },
+        "r_85a93499fa51": {
+          "masculine": "Crowd Costume Supervisor",
+          "feminine": "Crowd Costume Supervisor",
+          "neutral": "Crowd Costume Supervisor"
+        },
+        "r_73f373881e68": {
+          "masculine": "Crowd Fitter",
+          "feminine": "Crowd Fitter",
+          "neutral": "Crowd Fitter"
+        },
+        "r_82daef37fafd": {
+          "masculine": "Truck Costumer",
+          "feminine": "Truck Costumer",
+          "neutral": "Truck Costumer"
+        },
+        "r_40f30fffbd6a": {
+          "masculine": "Costume Buyer",
+          "feminine": "Costume Buyer",
+          "neutral": "Costume Buyer"
+        },
+        "r_60a2042cfa65": {
+          "masculine": "Costume Accountant",
+          "feminine": "Costume Accountant",
+          "neutral": "Costume Accountant"
+        },
+        "r_6ece4b3c2f60": {
+          "masculine": "Wardrobe Master",
+          "feminine": "Wardrobe Master",
+          "neutral": "Wardrobe Master"
+        },
+        "r_bb614a4f62e2": {
+          "masculine": "Costume Assistant",
+          "feminine": "Costume Assistant",
+          "neutral": "Costume Assistant"
+        },
+        "r_86f8b66926fc": {
+          "masculine": "Costume Trainee",
+          "feminine": "Costume Trainee",
+          "neutral": "Costume Trainee"
+        },
+        "r_272717911d79": {
+          "masculine": "Tailor",
+          "feminine": "Tailor",
+          "neutral": "Tailor"
+        },
+        "r_3a35662b53a3": {
+          "masculine": "Sewing Machinist",
+          "feminine": "Sewing Machinist",
+          "neutral": "Sewing Machinist"
+        },
+        "r_298c04a0eec5": {
+          "masculine": "Textile Artist",
+          "feminine": "Textile Artist",
+          "neutral": "Textile Artist"
+        },
+        "r_2a6b1e3320f5": {
+          "masculine": "Costume Maker",
+          "feminine": "Costume Maker",
+          "neutral": "Costume Maker"
+        },
+        "r_066dc1f269bb": {
+          "masculine": "Costume Prop Maker",
+          "feminine": "Costume Prop Maker",
+          "neutral": "Costume Prop Maker"
+        },
+        "r_83db0e1a7bff": {
+          "masculine": "Pattern Cutter",
+          "feminine": "Pattern Cutter",
+          "neutral": "Pattern Cutter"
+        },
+        "r_fc8d26a01b37": {
+          "masculine": "Women's Bespoke Tailor",
+          "feminine": "Women's Bespoke Tailor",
+          "neutral": "Women's Bespoke Tailor"
+        },
+        "r_9aaa9c423455": {
+          "masculine": "Men's Bespoke Tailor",
+          "feminine": "Men's Bespoke Tailor",
+          "neutral": "Men's Bespoke Tailor"
+        },
+        "r_975bb2c38b93": {
+          "masculine": "Milliner",
+          "feminine": "Milliner",
+          "neutral": "Milliner"
+        },
+        "r_e5cb00d76add": {
+          "masculine": "Corset Maker",
+          "feminine": "Corset Maker",
+          "neutral": "Corset Maker"
+        },
+        "r_f573123c66c5": {
+          "masculine": "Costume Illustrator",
+          "feminine": "Costume Illustrator",
+          "neutral": "Costume Illustrator"
+        },
+        "r_3218fd13d59c": {
+          "masculine": "Costume Painter / Dyer",
+          "feminine": "Costume Painter / Dyer",
+          "neutral": "Costume Painter / Dyer"
+        },
+        "r_f8c4b94e93de": {
+          "masculine": "Costume Aging Artist",
+          "feminine": "Costume Aging Artist",
+          "neutral": "Costume Aging Artist"
+        },
+        "r_25bf82085577": {
+          "masculine": "Costume Embroiderer",
+          "feminine": "Costume Embroiderer",
+          "neutral": "Costume Embroiderer"
+        },
+        "r_4bd9dd09da1d": {
+          "masculine": "Costume Researcher",
+          "feminine": "Costume Researcher",
+          "neutral": "Costume Researcher"
+        },
+        "r_2efd6bda8664": {
+          "masculine": "Costume Driver",
+          "feminine": "Costume Driver",
+          "neutral": "Costume Driver"
+        },
+        "r_a723a074986b": {
+          "masculine": "Breakdown Artist (Aging / Distressing)",
+          "feminine": "Breakdown Artist (Aging / Distressing)",
+          "neutral": "Breakdown Artist (Aging / Distressing)"
+        },
+        "r_ac01a53c578c": {
+          "masculine": "SFX Costume",
+          "feminine": "SFX Costume",
+          "neutral": "SFX Costume"
+        },
+        "r_bbc01e9dad81": {
+          "masculine": "Stylist / Styling Assistant",
+          "feminine": "Stylist / Styling Assistant",
+          "neutral": "Stylist / Styling Assistant"
+        },
+        "r_0cf394ee7640": {
+          "masculine": "Costume Designer (Design)",
+          "feminine": "Costume Designer (Design)",
+          "neutral": "Costume Designer (Design)"
+        },
+        "r_6e84493aa620": {
+          "masculine": "Costume Consultant",
+          "feminine": "Costume Consultant",
+          "neutral": "Costume Consultant"
+        },
+        "r_7673a5020856": {
+          "masculine": "Costume Design Assistant",
+          "feminine": "Costume Design Assistant",
+          "neutral": "Costume Design Assistant"
+        },
+        "r_1ca2128245c1": {
+          "masculine": "Costume Department Coordinator",
+          "feminine": "Costume Department Coordinator",
+          "neutral": "Costume Department Coordinator"
+        },
+        "r_f707bb1f5992": {
+          "masculine": "Set Costumer",
+          "feminine": "Set Costumer",
+          "neutral": "Set Costumer"
+        },
+        "r_cc15942423ce": {
+          "masculine": "Set Costume Assistant",
+          "feminine": "Set Costume Assistant",
+          "neutral": "Set Costume Assistant"
+        },
+        "r_fa17db9ddd73": {
+          "masculine": "Stylist",
+          "feminine": "Stylist",
+          "neutral": "Stylist"
+        },
+        "r_510b1830a8a9": {
+          "masculine": "Styling Assistant",
+          "feminine": "Styling Assistant",
+          "neutral": "Styling Assistant"
+        },
+        "r_cc5427b5207e": {
+          "masculine": "Wardrobe Master",
+          "feminine": "Wardrobe Master",
+          "neutral": "Wardrobe Master"
+        },
+        "r_51e4b1b69e51": {
+          "masculine": "Women's Tailor",
+          "feminine": "Women's Tailor",
+          "neutral": "Women's Tailor"
+        },
+        "r_c90f0f14aa1d": {
+          "masculine": "Men's Tailor",
+          "feminine": "Men's Tailor",
+          "neutral": "Men's Tailor"
+        },
+        "r_b02e861df06e": {
+          "masculine": "Milliner / Hat Maker",
+          "feminine": "Milliner / Hat Maker",
+          "neutral": "Milliner / Hat Maker"
+        },
+        "r_f4d2f92c7063": {
+          "masculine": "Corset Maker",
+          "feminine": "Corset Maker",
+          "neutral": "Corset Maker"
+        },
+        "r_60b06eb1a3e5": {
+          "masculine": "Wardrobe Supervisor",
+          "feminine": "Wardrobe Supervisor",
+          "neutral": "Wardrobe Supervisor"
+        },
+        "r_b57d7945c2e1": {
+          "masculine": "Costume Assistant",
+          "feminine": "Costume Assistant",
+          "neutral": "Costume Assistant"
+        },
+        "r_2ac825cfa903": {
+          "masculine": "Tailor",
+          "feminine": "Tailor",
+          "neutral": "Tailor"
+        },
+        "r_f5c79a825c6d": {
+          "masculine": "Costume Driver",
+          "feminine": "Costume Driver",
+          "neutral": "Costume Driver"
+        },
+        "r_d964234f1385": {
+          "masculine": "Sewer / Seamstress",
+          "feminine": "Sewer / Seamstress",
+          "neutral": "Sewer / Seamstress"
+        },
+        "r_6371bcd4467e": {
+          "masculine": "Costume Aging / Breakdown Artist",
+          "feminine": "Costume Aging / Breakdown Artist",
+          "neutral": "Costume Aging / Breakdown Artist"
+        },
+        "r_93cc3465aeac": {
+          "masculine": "Costume Painter / Dyer",
+          "feminine": "Costume Painter / Dyer",
+          "neutral": "Costume Painter / Dyer"
+        },
+        "r_9f631f727b98": {
+          "masculine": "Costume Embroiderer",
+          "feminine": "Costume Embroiderer",
+          "neutral": "Costume Embroiderer"
+        },
+        "r_fd593b68c6bd": {
+          "masculine": "Costume Illustrator",
+          "feminine": "Costume Illustrator",
+          "neutral": "Costume Illustrator"
+        },
+        "r_52cc391775b8": {
+          "masculine": "Costume Design Intern",
+          "feminine": "Costume Design Intern",
+          "neutral": "Costume Design Intern"
+        }
+      },
+      "maske": {
+        "r_2cecb5bef109": {
+          "masculine": "Head of Make-up & Hair",
+          "feminine": "Head of Make-up & Hair",
+          "neutral": "Head of Make-up & Hair"
+        },
+        "r_8c46abf33a4b": {
+          "masculine": "Hair Designer",
+          "feminine": "Hair Designer",
+          "neutral": "Hair Designer"
+        },
+        "r_afd55563be09": {
+          "masculine": "Hair & Makeup Designer",
+          "feminine": "Hair & Makeup Designer",
+          "neutral": "Hair & Makeup Designer"
+        },
+        "r_0d2723e6a8cc": {
+          "masculine": "Makeup Designer",
+          "feminine": "Makeup Designer",
+          "neutral": "Makeup Designer"
+        },
+        "r_b73ceeda53dd": {
+          "masculine": "Hair & Makeup Supervisor",
+          "feminine": "Hair & Makeup Supervisor",
+          "neutral": "Hair & Makeup Supervisor"
+        },
+        "r_913e5cf46a02": {
+          "masculine": "Key Make-up Artist",
+          "feminine": "Key Make-up Artist",
+          "neutral": "Key Make-up Artist"
+        },
+        "r_495a42f74fbb": {
+          "masculine": "Key Hair Stylist",
+          "feminine": "Key Hair Stylist",
+          "neutral": "Key Hair Stylist"
+        },
+        "r_ff414fc1a4e8": {
+          "masculine": "Make-up Artist",
+          "feminine": "Make-up Artist",
+          "neutral": "Make-up Artist"
+        },
+        "r_ace166547405": {
+          "masculine": "Additional Makeup Artist",
+          "feminine": "Additional Makeup Artist",
+          "neutral": "Additional Makeup Artist"
+        },
+        "r_96cb48e2539d": {
+          "masculine": "Hair Stylist",
+          "feminine": "Hair Stylist",
+          "neutral": "Hair Stylist"
+        },
+        "r_3a06bbd5516b": {
+          "masculine": "Additional Hair Stylist",
+          "feminine": "Additional Hair Stylist",
+          "neutral": "Additional Hair Stylist"
+        },
+        "r_a8a061642ea1": {
+          "masculine": "Head of Make-up Department",
+          "feminine": "Head of Make-up Department",
+          "neutral": "Head of Make-up Department"
+        },
+        "r_988255c043c0": {
+          "masculine": "Body Make-up",
+          "feminine": "Body Make-up",
+          "neutral": "Body Make-up"
+        },
+        "r_62302b472d3b": {
+          "masculine": "Additional Make-up Artist",
+          "feminine": "Additional Make-up Artist",
+          "neutral": "Additional Make-up Artist"
+        },
+        "r_de6fbe18e529": {
+          "masculine": "Make-up Assistant",
+          "feminine": "Make-up Assistant",
+          "neutral": "Make-up Assistant"
+        },
+        "r_89708da23c7a": {
+          "masculine": "Wig Maker",
+          "feminine": "Wig Maker",
+          "neutral": "Wig Maker"
+        },
+        "r_eb0f745569de": {
+          "masculine": "Prosthetics Artist",
+          "feminine": "Prosthetics Artist",
+          "neutral": "Prosthetics Artist"
+        },
+        "r_bc667775a067": {
+          "masculine": "Special FX Make-up",
+          "feminine": "Special FX Make-up",
+          "neutral": "Special FX Make-up"
+        },
+        "r_a27c177f51ef": {
+          "masculine": "Crowd Hair & Makeup Supervisor",
+          "feminine": "Crowd Hair & Makeup Supervisor",
+          "neutral": "Crowd Hair & Makeup Supervisor"
+        },
+        "r_e46c728a4398": {
+          "masculine": "Make-up Trainee",
+          "feminine": "Make-up Trainee",
+          "neutral": "Make-up Trainee"
+        },
+        "r_3bd74d7ca372": {
+          "masculine": "Key Makeup Artist",
+          "feminine": "Key Makeup Artist",
+          "neutral": "Key Makeup Artist"
+        },
+        "r_1dbe2290254a": {
+          "masculine": "Department Head Make-up",
+          "feminine": "Department Head Make-up",
+          "neutral": "Department Head Make-up"
+        },
+        "r_3e08c4bedcc0": {
+          "masculine": "Body Make-up Artist",
+          "feminine": "Body Make-up Artist",
+          "neutral": "Body Make-up Artist"
+        },
+        "r_24c9ee41124f": {
+          "masculine": "Additional Make-up Artist",
+          "feminine": "Additional Make-up Artist",
+          "neutral": "Additional Make-up Artist"
+        },
+        "r_6373cbbea77f": {
+          "masculine": "Wig Maker",
+          "feminine": "Wig Maker",
+          "neutral": "Wig Maker"
+        },
+        "r_e9a07f599b31": {
+          "masculine": "Make-up Intern",
+          "feminine": "Make-up Intern",
+          "neutral": "Make-up Intern"
+        }
+      },
+      "post": {
+        "r_f88d95239ea1": {
+          "masculine": "Postproduction Producer",
+          "feminine": "Postproduction Producer",
+          "neutral": "Postproduction Producer"
+        },
+        "r_4284177c72b3": {
+          "masculine": "Postproduction Supervisor",
+          "feminine": "Postproduction Supervisor",
+          "neutral": "Postproduction Supervisor"
+        },
+        "r_c2fb80f3e981": {
+          "masculine": "Postproduction Manager",
+          "feminine": "Postproduction Manager",
+          "neutral": "Postproduction Manager"
+        },
+        "r_78b6f4ddb08c": {
+          "masculine": "Post-Production Coordinator",
+          "feminine": "Post-Production Coordinator",
+          "neutral": "Post-Production Coordinator"
+        },
+        "r_0bb7e59012ae": {
+          "masculine": "Post-Production Scheduler",
+          "feminine": "Post-Production Scheduler",
+          "neutral": "Post-Production Scheduler"
+        },
+        "r_b54fb6f974fa": {
+          "masculine": "Assistant Post-Production Supervisor",
+          "feminine": "Assistant Post-Production Supervisor",
+          "neutral": "Assistant Post-Production Supervisor"
+        },
+        "r_fae43b642354": {
+          "masculine": "Delivery Manager / Supervisor",
+          "feminine": "Delivery Manager / Supervisor",
+          "neutral": "Delivery Manager / Supervisor"
+        },
+        "r_54b281a42495": {
+          "masculine": "Editor",
+          "feminine": "Editor",
+          "neutral": "Editor"
+        },
+        "r_eb67aee95450": {
+          "masculine": "Film Editor",
+          "feminine": "Film Editor",
+          "neutral": "Film Editor"
+        },
+        "r_332deef8530f": {
+          "masculine": "Additional Editor",
+          "feminine": "Additional Editor",
+          "neutral": "Additional Editor"
+        },
+        "r_4b8538db6e6e": {
+          "masculine": "Junior Editor",
+          "feminine": "Junior Editor",
+          "neutral": "Junior Editor"
+        },
+        "r_a000c69c93cd": {
+          "masculine": "First Assistant Editor",
+          "feminine": "First Assistant Editor",
+          "neutral": "First Assistant Editor"
+        },
+        "r_fb53d3bb0ca0": {
+          "masculine": "Editing Assistant",
+          "feminine": "Editing Assistant",
+          "neutral": "Editing Assistant"
+        },
+        "r_58fb452bb25d": {
+          "masculine": "Second Assistant Editor",
+          "feminine": "Second Assistant Editor",
+          "neutral": "Second Assistant Editor"
+        },
+        "r_e73f1067c3d0": {
+          "masculine": "2nd Editing Assistant",
+          "feminine": "2nd Editing Assistant",
+          "neutral": "2nd Editing Assistant"
+        },
+        "r_f40a64b53f4e": {
+          "masculine": "3rd Editing Assistant",
+          "feminine": "3rd Editing Assistant",
+          "neutral": "3rd Editing Assistant"
+        },
+        "r_f034db9da000": {
+          "masculine": "Editing Dramaturg",
+          "feminine": "Editing Dramaturg",
+          "neutral": "Editing Dramaturg"
+        },
+        "r_9d8fc1953afd": {
+          "masculine": "VFX Editor",
+          "feminine": "VFX Editor",
+          "neutral": "VFX Editor"
+        },
+        "r_6742bca7f725": {
+          "masculine": "Trailer Editor",
+          "feminine": "Trailer Editor",
+          "neutral": "Trailer Editor"
+        },
+        "r_0088f1d1581d": {
+          "masculine": "Dailies Editor",
+          "feminine": "Dailies Editor",
+          "neutral": "Dailies Editor"
+        },
+        "r_855df6fe84d9": {
+          "masculine": "Sync Assistant",
+          "feminine": "Sync Assistant",
+          "neutral": "Sync Assistant"
+        },
+        "r_76fe5605aea7": {
+          "masculine": "Avid Operator",
+          "feminine": "Avid Operator",
+          "neutral": "Avid Operator"
+        },
+        "r_9a37f1a2f07c": {
+          "masculine": "Final Cut Operator",
+          "feminine": "Final Cut Operator",
+          "neutral": "Final Cut Operator"
+        },
+        "r_5c291075de55": {
+          "masculine": "Colorist / DI",
+          "feminine": "Colorist / DI",
+          "neutral": "Colorist / DI"
+        },
+        "r_ee3d75537a1f": {
+          "masculine": "Online Editor",
+          "feminine": "Online Editor",
+          "neutral": "Online Editor"
+        },
+        "r_24e3087423e1": {
+          "masculine": "Finishing Artist",
+          "feminine": "Finishing Artist",
+          "neutral": "Finishing Artist"
+        },
+        "r_1b9c5df34287": {
+          "masculine": "Screen Designer",
+          "feminine": "Screen Designer",
+          "neutral": "Screen Designer"
+        },
+        "r_0c866fbdd1b9": {
+          "masculine": "Title Designer",
+          "feminine": "Title Designer",
+          "neutral": "Title Designer"
+        },
+        "r_cac32c0c1a16": {
+          "masculine": "DCP Technician",
+          "feminine": "DCP Technician",
+          "neutral": "DCP Technician"
+        },
+        "r_3bf9436831af": {
+          "masculine": "Filmscan Operator",
+          "feminine": "Filmscan Operator",
+          "neutral": "Filmscan Operator"
+        },
+        "r_0c4887e0a1b6": {
+          "masculine": "Filmscanning Supervisor",
+          "feminine": "Filmscanning Supervisor",
+          "neutral": "Filmscanning Supervisor"
+        },
+        "r_85f36a10ca63": {
+          "masculine": "VFX Supervisor",
+          "feminine": "VFX Supervisor",
+          "neutral": "VFX Supervisor"
+        },
+        "r_3690883b97f2": {
+          "masculine": "VFX Producer",
+          "feminine": "VFX Producer",
+          "neutral": "VFX Producer"
+        },
+        "r_01122a78805d": {
+          "masculine": "VFX Coordinator",
+          "feminine": "VFX Coordinator",
+          "neutral": "VFX Coordinator"
+        },
+        "r_4c1b3c0e7030": {
+          "masculine": "VFX Production Manager",
+          "feminine": "VFX Production Manager",
+          "neutral": "VFX Production Manager"
+        },
+        "r_b11b0566c205": {
+          "masculine": "VFX Outsource Producer",
+          "feminine": "VFX Outsource Producer",
+          "neutral": "VFX Outsource Producer"
+        },
+        "r_061d09311a06": {
+          "masculine": "Assistant VFX Producer",
+          "feminine": "Assistant VFX Producer",
+          "neutral": "Assistant VFX Producer"
+        },
+        "r_c20adc0c544f": {
+          "masculine": "VFX Animation Supervisor",
+          "feminine": "VFX Animation Supervisor",
+          "neutral": "VFX Animation Supervisor"
+        },
+        "r_ef84bdb88ead": {
+          "masculine": "VR Producer",
+          "feminine": "VR Producer",
+          "neutral": "VR Producer"
+        },
+        "r_33a9c6da17ea": {
+          "masculine": "Compositor",
+          "feminine": "Compositor",
+          "neutral": "Compositor"
+        },
+        "r_aca1c9874a93": {
+          "masculine": "Compositing Supervisor",
+          "feminine": "Compositing Supervisor",
+          "neutral": "Compositing Supervisor"
+        },
+        "r_74803d65a47d": {
+          "masculine": "Digital Compositor",
+          "feminine": "Digital Compositor",
+          "neutral": "Digital Compositor"
+        },
+        "r_a61ab2d8897e": {
+          "masculine": "Digital Effects Supervisor",
+          "feminine": "Digital Effects Supervisor",
+          "neutral": "Digital Effects Supervisor"
+        },
+        "r_41f1fab43430": {
+          "masculine": "Digital Effects Designer",
+          "feminine": "Digital Effects Designer",
+          "neutral": "Digital Effects Designer"
+        },
+        "r_09a4c7b8c909": {
+          "masculine": "Digital Matte Painter",
+          "feminine": "Digital Matte Painter",
+          "neutral": "Digital Matte Painter"
+        },
+        "r_1df80b2df510": {
+          "masculine": "2D Artist",
+          "feminine": "2D Artist",
+          "neutral": "2D Artist"
+        },
+        "r_c5222c873ae5": {
+          "masculine": "3D Artist",
+          "feminine": "3D Artist",
+          "neutral": "3D Artist"
+        },
+        "r_f1d016eba483": {
+          "masculine": "Lighting Artist (CG)",
+          "feminine": "Lighting Artist (CG)",
+          "neutral": "Lighting Artist (CG)"
+        },
+        "r_1374d004f892": {
+          "masculine": "Texture Artist",
+          "feminine": "Texture Artist",
+          "neutral": "Texture Artist"
+        },
+        "r_ca0826d47a19": {
+          "masculine": "Matchmove Artist",
+          "feminine": "Matchmove Artist",
+          "neutral": "Matchmove Artist"
+        },
+        "r_272f028d80c7": {
+          "masculine": "Roto Artist",
+          "feminine": "Roto Artist",
+          "neutral": "Roto Artist"
+        },
+        "r_fb2a18a56ba5": {
+          "masculine": "FX Artist",
+          "feminine": "FX Artist",
+          "neutral": "FX Artist"
+        },
+        "r_89c1660cb356": {
+          "masculine": "Animator",
+          "feminine": "Animator",
+          "neutral": "Animator"
+        },
+        "r_2efa5e8c0d5f": {
+          "masculine": "Motion Designer",
+          "feminine": "Motion Designer",
+          "neutral": "Motion Designer"
+        },
+        "r_c2053cb7660f": {
+          "masculine": "Character Animator",
+          "feminine": "Character Animator",
+          "neutral": "Character Animator"
+        },
+        "r_247d43bdfb47": {
+          "masculine": "Post-Production Assistant",
+          "feminine": "Post-Production Assistant",
+          "neutral": "Post-Production Assistant"
+        },
+        "r_e2802de21986": {
+          "masculine": "Post-Production Technician",
+          "feminine": "Post-Production Technician",
+          "neutral": "Post-Production Technician"
+        },
+        "r_1f9c7a9f75a8": {
+          "masculine": "Editing Intern",
+          "feminine": "Editing Intern",
+          "neutral": "Editing Intern"
+        },
+        "r_bf7027763437": {
+          "masculine": "Post-Production Coordinator",
+          "feminine": "Post-Production Coordinator",
+          "neutral": "Post-Production Coordinator"
+        },
+        "r_fc841e10fe4f": {
+          "masculine": "Assistant to Post Supervisor",
+          "feminine": "Assistant to Post Supervisor",
+          "neutral": "Assistant to Post Supervisor"
+        },
+        "r_a79df89d104c": {
+          "masculine": "VFX Artist / Compositor",
+          "feminine": "VFX Artist / Compositor",
+          "neutral": "VFX Artist / Compositor"
+        },
+        "r_2a16dc4c4550": {
+          "masculine": "Sound Designer",
+          "feminine": "Sound Designer",
+          "neutral": "Sound Designer"
+        },
+        "r_b96fddf3696f": {
+          "masculine": "Sound Editor",
+          "feminine": "Sound Editor",
+          "neutral": "Sound Editor"
+        },
+        "r_a903b5656a8c": {
+          "masculine": "DCP Artist",
+          "feminine": "DCP Artist",
+          "neutral": "DCP Artist"
+        },
+        "r_774ffd708e0e": {
+          "masculine": "Film Recorder Operator",
+          "feminine": "Film Recorder Operator",
+          "neutral": "Film Recorder Operator"
+        },
+        "r_8685aa8f2a95": {
+          "masculine": "Mistika Operator",
+          "feminine": "Mistika Operator",
+          "neutral": "Mistika Operator"
+        },
+        "r_9b86e6dde935": {
+          "masculine": "VFX Technical Director",
+          "feminine": "VFX Technical Director",
+          "neutral": "VFX Technical Director"
+        },
+        "r_ab44975f8351": {
+          "masculine": "VFX Consultant",
+          "feminine": "VFX Consultant",
+          "neutral": "VFX Consultant"
+        },
+        "r_6a2814e6546b": {
+          "masculine": "VFX Lighting Supervisor",
+          "feminine": "VFX Lighting Supervisor",
+          "neutral": "VFX Lighting Supervisor"
+        },
+        "r_c043402107e7": {
+          "masculine": "VFX Set Supervisor",
+          "feminine": "VFX Set Supervisor",
+          "neutral": "VFX Set Supervisor"
+        },
+        "r_2d4e2d1e1c2c": {
+          "masculine": "VFX Production Coordinator",
+          "feminine": "VFX Production Coordinator",
+          "neutral": "VFX Production Coordinator"
+        },
+        "r_3a24d45a3a71": {
+          "masculine": "Assistant VFX Coordinator",
+          "feminine": "Assistant VFX Coordinator",
+          "neutral": "Assistant VFX Coordinator"
+        },
+        "r_a2d3fd026c27": {
+          "masculine": "VFX Executive",
+          "feminine": "VFX Executive",
+          "neutral": "VFX Executive"
+        },
+        "r_1d0ffcaee2f8": {
+          "masculine": "VFX HR Manager",
+          "feminine": "VFX HR Manager",
+          "neutral": "VFX HR Manager"
+        },
+        "r_6eb353601a03": {
+          "masculine": "VFX IT Admin",
+          "feminine": "VFX IT Admin",
+          "neutral": "VFX IT Admin"
+        },
+        "r_e70450322709": {
+          "masculine": "VFX IT Support",
+          "feminine": "VFX IT Support",
+          "neutral": "VFX IT Support"
+        },
+        "r_71a68d7195b5": {
+          "masculine": "VFX IT System Engineer",
+          "feminine": "VFX IT System Engineer",
+          "neutral": "VFX IT System Engineer"
+        },
+        "r_30de176c3d86": {
+          "masculine": "Pipeline Technical Director",
+          "feminine": "Pipeline Technical Director",
+          "neutral": "Pipeline Technical Director"
+        },
+        "r_3021537edab0": {
+          "masculine": "Computer Graphics Supervisor",
+          "feminine": "Computer Graphics Supervisor",
+          "neutral": "Computer Graphics Supervisor"
+        },
+        "r_0d4cd83ac5f0": {
+          "masculine": "CG Software Developer",
+          "feminine": "CG Software Developer",
+          "neutral": "CG Software Developer"
+        },
+        "r_4d7b70afc38f": {
+          "masculine": "Concept Artist (VFX)",
+          "feminine": "Concept Artist (VFX)",
+          "neutral": "Concept Artist (VFX)"
+        },
+        "r_1d77801b6bcb": {
+          "masculine": "Character Designer",
+          "feminine": "Character Designer",
+          "neutral": "Character Designer"
+        },
+        "r_2eeabfb3e033": {
+          "masculine": "Character Supervisor",
+          "feminine": "Character Supervisor",
+          "neutral": "Character Supervisor"
+        },
+        "r_d4054cc011f7": {
+          "masculine": "Animatronics Supervisor",
+          "feminine": "Animatronics Supervisor",
+          "neutral": "Animatronics Supervisor"
+        },
+        "r_27773325d503": {
+          "masculine": "Previs Supervisor",
+          "feminine": "Previs Supervisor",
+          "neutral": "Previs Supervisor"
+        },
+        "r_4e65539d8bde": {
+          "masculine": "Previs Artist",
+          "feminine": "Previs Artist",
+          "neutral": "Previs Artist"
+        },
+        "r_09f34347e5ee": {
+          "masculine": "Motion Capture Supervisor",
+          "feminine": "Motion Capture Supervisor",
+          "neutral": "Motion Capture Supervisor"
+        },
+        "r_96c37e1de0fa": {
+          "masculine": "Motion Control Supervisor",
+          "feminine": "Motion Control Supervisor",
+          "neutral": "Motion Control Supervisor"
+        },
+        "r_733686f9ae97": {
+          "masculine": "Dailies Operator",
+          "feminine": "Dailies Operator",
+          "neutral": "Dailies Operator"
+        },
+        "r_ab703255dec3": {
+          "masculine": "I/O Coordinator",
+          "feminine": "I/O Coordinator",
+          "neutral": "I/O Coordinator"
+        },
+        "r_75540ed9967e": {
+          "masculine": "Telecine Operator",
+          "feminine": "Telecine Operator",
+          "neutral": "Telecine Operator"
+        },
+        "r_6c17929b4f69": {
+          "masculine": "Digital Matchmover",
+          "feminine": "Digital Matchmover",
+          "neutral": "Digital Matchmover"
+        },
+        "r_2646f9b4aadf": {
+          "masculine": "Rotoscoping Artist",
+          "feminine": "Rotoscoping Artist",
+          "neutral": "Rotoscoping Artist"
+        },
+        "r_1abce9757421": {
+          "masculine": "Digital Asset Manager (DAM)",
+          "feminine": "Digital Asset Manager (DAM)",
+          "neutral": "Digital Asset Manager (DAM)"
+        },
+        "r_e28081bd8659": {
+          "masculine": "DI Supervisor",
+          "feminine": "DI Supervisor",
+          "neutral": "DI Supervisor"
+        },
+        "r_3be4ac15eccc": {
+          "masculine": "Digital Intermediate Engineer",
+          "feminine": "Digital Intermediate Engineer",
+          "neutral": "Digital Intermediate Engineer"
+        },
+        "r_ac6763f1d04b": {
+          "masculine": "Digital Intermediate Assistant",
+          "feminine": "Digital Intermediate Assistant",
+          "neutral": "Digital Intermediate Assistant"
+        },
+        "r_68b5ed487d7c": {
+          "masculine": "VFX Data Wrangler",
+          "feminine": "VFX Data Wrangler",
+          "neutral": "VFX Data Wrangler"
+        },
+        "r_98875c546157": {
+          "masculine": "Render Wrangler",
+          "feminine": "Render Wrangler",
+          "neutral": "Render Wrangler"
+        },
+        "r_37de85ee2914": {
+          "masculine": "3D Stereo Supervisor",
+          "feminine": "3D Stereo Supervisor",
+          "neutral": "3D Stereo Supervisor"
+        },
+        "r_138f0f7f11c5": {
+          "masculine": "On-Set Playback Operator",
+          "feminine": "On-Set Playback Operator",
+          "neutral": "On-Set Playback Operator"
+        },
+        "r_6c52a0b17c05": {
+          "masculine": "VFX Intern",
+          "feminine": "VFX Intern",
+          "neutral": "VFX Intern"
+        },
+        "r_1a1b5684e757": {
+          "masculine": "VFX Production Assistant",
+          "feminine": "VFX Production Assistant",
+          "neutral": "VFX Production Assistant"
+        },
+        "r_03863e1fa165": {
+          "masculine": "VFX Team Manager",
+          "feminine": "VFX Team Manager",
+          "neutral": "VFX Team Manager"
+        },
+        "r_0006a71a7050": {
+          "masculine": "Head of 3D",
+          "feminine": "Head of 3D",
+          "neutral": "Head of 3D"
+        },
+        "r_9ad285824801": {
+          "masculine": "3D Animation Director",
+          "feminine": "3D Animation Director",
+          "neutral": "3D Animation Director"
+        },
+        "r_365169e4e39c": {
+          "masculine": "3D Lead Character Animator",
+          "feminine": "3D Lead Character Animator",
+          "neutral": "3D Lead Character Animator"
+        },
+        "r_6dac25e38271": {
+          "masculine": "3D Character Animator",
+          "feminine": "3D Character Animator",
+          "neutral": "3D Character Animator"
+        },
+        "r_18b24b362b8f": {
+          "masculine": "3D Rigger",
+          "feminine": "3D Rigger",
+          "neutral": "3D Rigger"
+        },
+        "r_b6265894c01c": {
+          "masculine": "3D Modeler",
+          "feminine": "3D Modeler",
+          "neutral": "3D Modeler"
+        },
+        "r_401ce457432d": {
+          "masculine": "3D Lighter",
+          "feminine": "3D Lighter",
+          "neutral": "3D Lighter"
+        },
+        "r_d6c0df6758d4": {
+          "masculine": "3D Texturer",
+          "feminine": "3D Texturer",
+          "neutral": "3D Texturer"
+        },
+        "r_aff4837ba039": {
+          "masculine": "3D Camera Artist",
+          "feminine": "3D Camera Artist",
+          "neutral": "3D Camera Artist"
+        },
+        "r_01ea52ed92df": {
+          "masculine": "3D Camera Supervisor",
+          "feminine": "3D Camera Supervisor",
+          "neutral": "3D Camera Supervisor"
+        },
+        "r_1b2a5f055d73": {
+          "masculine": "FX Animator",
+          "feminine": "FX Animator",
+          "neutral": "FX Animator"
+        },
+        "r_25d305ae2181": {
+          "masculine": "Particle Animator",
+          "feminine": "Particle Animator",
+          "neutral": "Particle Animator"
+        },
+        "r_493348eeb5c9": {
+          "masculine": "2D Rigger",
+          "feminine": "2D Rigger",
+          "neutral": "2D Rigger"
+        },
+        "r_50d612c5929c": {
+          "masculine": "2D Animation Director",
+          "feminine": "2D Animation Director",
+          "neutral": "2D Animation Director"
+        },
+        "r_5b75d1dcc3ba": {
+          "masculine": "2D Lead Character Animator",
+          "feminine": "2D Lead Character Animator",
+          "neutral": "2D Lead Character Animator"
+        },
+        "r_d3bed7009009": {
+          "masculine": "2D Character Animator",
+          "feminine": "2D Character Animator",
+          "neutral": "2D Character Animator"
+        },
+        "r_b9b34ba4ee44": {
+          "masculine": "MotionBuilder Artist",
+          "feminine": "MotionBuilder Artist",
+          "neutral": "MotionBuilder Artist"
+        },
+        "r_40ba6442d974": {
+          "masculine": "MotionBuilder Operator",
+          "feminine": "MotionBuilder Operator",
+          "neutral": "MotionBuilder Operator"
+        }
+      },
+      "musik": {
+        "r_4b516c3014b1": {
+          "masculine": "Composer",
+          "feminine": "Composer",
+          "neutral": "Composer"
+        },
+        "r_78a8b7bafdcf": {
+          "masculine": "Additional Music",
+          "feminine": "Additional Music",
+          "neutral": "Additional Music"
+        },
+        "r_be9c85f652ee": {
+          "masculine": "Trailer Composer",
+          "feminine": "Trailer Composer",
+          "neutral": "Trailer Composer"
+        },
+        "r_d052f25322c5": {
+          "masculine": "Music Director",
+          "feminine": "Music Director",
+          "neutral": "Music Director"
+        },
+        "r_520348654852": {
+          "masculine": "Music Director",
+          "feminine": "Music Director",
+          "neutral": "Music Director"
+        },
+        "r_d614bde7c500": {
+          "masculine": "Music Supervisor",
+          "feminine": "Music Supervisor",
+          "neutral": "Music Supervisor"
+        },
+        "r_1f0d7374bb4c": {
+          "masculine": "Orchestrator",
+          "feminine": "Orchestrator",
+          "neutral": "Orchestrator"
+        },
+        "r_aa4b42f84387": {
+          "masculine": "Arranger",
+          "feminine": "Arranger",
+          "neutral": "Arranger"
+        },
+        "r_8c334f2ac9d3": {
+          "masculine": "Arranger",
+          "feminine": "Arranger",
+          "neutral": "Arranger"
+        },
+        "r_fe19755b0b9e": {
+          "masculine": "Conductor",
+          "feminine": "Conductor",
+          "neutral": "Conductor"
+        },
+        "r_73021f352efb": {
+          "masculine": "Conductor",
+          "feminine": "Conductor",
+          "neutral": "Conductor"
+        },
+        "r_1a95751341fb": {
+          "masculine": "Music Editor",
+          "feminine": "Music Editor",
+          "neutral": "Music Editor"
+        },
+        "r_8fd3dbb18e49": {
+          "masculine": "Music Copyist",
+          "feminine": "Music Copyist",
+          "neutral": "Music Copyist"
+        },
+        "r_d5e57768aab8": {
+          "masculine": "Music Producer",
+          "feminine": "Music Producer",
+          "neutral": "Music Producer"
+        },
+        "r_0e9738be9045": {
+          "masculine": "Music Consultant",
+          "feminine": "Music Consultant",
+          "neutral": "Music Consultant"
+        },
+        "r_82e1a4d8181e": {
+          "masculine": "Music Coordinator",
+          "feminine": "Music Coordinator",
+          "neutral": "Music Coordinator"
+        },
+        "r_00bc34dec4f3": {
+          "masculine": "Logic Operator",
+          "feminine": "Logic Operator",
+          "neutral": "Logic Operator"
+        },
+        "r_0eae67a415cd": {
+          "masculine": "Pro Tools Operator",
+          "feminine": "Pro Tools Operator",
+          "neutral": "Pro Tools Operator"
+        },
+        "r_52aa8c6866dc": {
+          "masculine": "Composer's Assistant",
+          "feminine": "Composer's Assistant",
+          "neutral": "Composer's Assistant"
+        },
+        "r_3e66ad9f45e2": {
+          "masculine": "Musician",
+          "feminine": "Musician",
+          "neutral": "Musician"
+        },
+        "r_ade18645efa3": {
+          "masculine": "Sound Editor",
+          "feminine": "Sound Editor",
+          "neutral": "Sound Editor"
+        },
+        "r_0972afcc1e55": {
+          "masculine": "Composer Intern",
+          "feminine": "Composer Intern",
+          "neutral": "Composer Intern"
+        },
+        "r_801e363423c3": {
+          "masculine": "Executive Soundtrack Producer",
+          "feminine": "Executive Soundtrack Producer",
+          "neutral": "Executive Soundtrack Producer"
+        }
+      },
+      "set-logistik": {
+        "r_06d9aa28368f": {
+          "masculine": "Base Runner",
+          "feminine": "Base Runner",
+          "neutral": "Base Runner"
+        },
+        "r_51e581b5ea39": {
+          "masculine": "Driver (car / truck)",
+          "feminine": "Driver (car / truck)",
+          "neutral": "Driver (car / truck)"
+        },
+        "r_36a599628c2e": {
+          "masculine": "Location Driver",
+          "feminine": "Location Driver",
+          "neutral": "Location Driver"
+        },
+        "r_9bc1a35535fa": {
+          "masculine": "Location Unit Manager",
+          "feminine": "Location Unit Manager",
+          "neutral": "Location Unit Manager"
+        },
+        "r_273f12c52b95": {
+          "masculine": "Assistant Location Manager",
+          "feminine": "Assistant Location Manager",
+          "neutral": "Assistant Location Manager"
+        },
+        "r_ad61df711cdf": {
+          "masculine": "Set Security",
+          "feminine": "Set Security",
+          "neutral": "Set Security"
+        },
+        "r_16476d55e646": {
+          "masculine": "Crowd Control",
+          "feminine": "Crowd Control",
+          "neutral": "Crowd Control"
+        },
+        "r_d4d0eb9a01ad": {
+          "masculine": "Movement Director",
+          "feminine": "Movement Director",
+          "neutral": "Movement Director"
+        },
+        "r_3c6a65ecb046": {
+          "masculine": "Movement Coach",
+          "feminine": "Movement Coach",
+          "neutral": "Movement Coach"
+        },
+        "r_c66e045ffbbf": {
+          "masculine": "Intimacy Coordinator",
+          "feminine": "Intimacy Coordinator",
+          "neutral": "Intimacy Coordinator"
+        },
+        "r_2e9dcd12712e": {
+          "masculine": "Choreographer",
+          "feminine": "Choreographer",
+          "neutral": "Choreographer"
+        },
+        "r_6f899f66fa58": {
+          "masculine": "Dance Coach",
+          "feminine": "Dance Coach",
+          "neutral": "Dance Coach"
+        },
+        "r_f4a45af86f47": {
+          "masculine": "Singing Coach / Vocal Coach",
+          "feminine": "Singing Coach / Vocal Coach",
+          "neutral": "Singing Coach / Vocal Coach"
+        },
+        "r_6e8ad217ef2f": {
+          "masculine": "Dialogue Coach",
+          "feminine": "Dialogue Coach",
+          "neutral": "Dialogue Coach"
+        },
+        "r_63787dc385b1": {
+          "masculine": "Dialect / Language Coach",
+          "feminine": "Dialect / Language Coach",
+          "neutral": "Dialect / Language Coach"
+        },
+        "r_8546ce0263e3": {
+          "masculine": "Acting Coach (Disability / Neurodivergence)",
+          "feminine": "Acting Coach (Disability / Neurodivergence)",
+          "neutral": "Acting Coach (Disability / Neurodivergence)"
+        },
+        "r_969986f76695": {
+          "masculine": "Music Coach",
+          "feminine": "Music Coach",
+          "neutral": "Music Coach"
+        },
+        "r_717c17e3e434": {
+          "masculine": "Deaf Supervisor",
+          "feminine": "Deaf Supervisor",
+          "neutral": "Deaf Supervisor"
+        },
+        "r_e30edc1bd3f8": {
+          "masculine": "Diversity Consultant",
+          "feminine": "Diversity Consultant",
+          "neutral": "Diversity Consultant"
+        },
+        "r_5595cb9aacd1": {
+          "masculine": "Sensitivity Reader",
+          "feminine": "Sensitivity Reader",
+          "neutral": "Sensitivity Reader"
+        },
+        "r_2d5e77118f48": {
+          "masculine": "Interpreter / Translator",
+          "feminine": "Interpreter / Translator",
+          "neutral": "Interpreter / Translator"
+        },
+        "r_48bf6fb54a76": {
+          "masculine": "Stand-In",
+          "feminine": "Stand-In",
+          "neutral": "Stand-In"
+        },
+        "r_5845830d5e82": {
+          "masculine": "Set Medic / On-Set Paramedic",
+          "feminine": "Set Medic / On-Set Paramedic",
+          "neutral": "Set Medic / On-Set Paramedic"
+        },
+        "r_ad72daba923d": {
+          "masculine": "Set Teacher / On-Set Tutor",
+          "feminine": "Set Teacher / On-Set Tutor",
+          "neutral": "Set Teacher / On-Set Tutor"
+        },
+        "r_79e9614b81a6": {
+          "masculine": "Child Minder / On-Set Chaperone",
+          "feminine": "Child Minder / On-Set Chaperone",
+          "neutral": "Child Minder / On-Set Chaperone"
+        },
+        "r_29d48a809858": {
+          "masculine": "Child Welfare Officer",
+          "feminine": "Child Welfare Officer",
+          "neutral": "Child Welfare Officer"
+        },
+        "r_aba4d92c8e69": {
+          "masculine": "Artist / Guest / VIP Liaison",
+          "feminine": "Artist / Guest / VIP Liaison",
+          "neutral": "Artist / Guest / VIP Liaison"
+        },
+        "r_53207f6ae5f4": {
+          "masculine": "Mental Health Coordinator",
+          "feminine": "Mental Health Coordinator",
+          "neutral": "Mental Health Coordinator"
+        },
+        "r_45520abcff27": {
+          "masculine": "Wellbeing Officer / Person of Trust",
+          "feminine": "Wellbeing Officer / Person of Trust",
+          "neutral": "Wellbeing Officer / Person of Trust"
+        },
+        "r_355cbf436694": {
+          "masculine": "Health & Safety Officer",
+          "feminine": "Health & Safety Officer",
+          "neutral": "Health & Safety Officer"
+        },
+        "r_308811767175": {
+          "masculine": "Hygiene Officer (Covid)",
+          "feminine": "Hygiene Officer (Covid)",
+          "neutral": "Hygiene Officer (Covid)"
+        },
+        "r_32790b195d9e": {
+          "masculine": "Marine Coordinator",
+          "feminine": "Marine Coordinator",
+          "neutral": "Marine Coordinator"
+        },
+        "r_c93f3dbba0c2": {
+          "masculine": "Underwater / Dive Coordinator",
+          "feminine": "Underwater / Dive Coordinator",
+          "neutral": "Underwater / Dive Coordinator"
+        },
+        "r_2aed0957c337": {
+          "masculine": "Saddle / Harness Master",
+          "feminine": "Saddle / Harness Master",
+          "neutral": "Saddle / Harness Master"
+        },
+        "r_36f2141e2445": {
+          "masculine": "Audience Coordinator",
+          "feminine": "Audience Coordinator",
+          "neutral": "Audience Coordinator"
+        },
+        "r_dd293d0b7b4b": {
+          "masculine": "Consultant Director",
+          "feminine": "Consultant Director",
+          "neutral": "Consultant Director"
+        },
+        "r_d675b4f70ea4": {
+          "masculine": "Creative Director (Ad Agency)",
+          "feminine": "Creative Director (Ad Agency)",
+          "neutral": "Creative Director (Ad Agency)"
+        },
+        "r_2c01621b03b3": {
+          "masculine": "Technical Advisor / Consultant",
+          "feminine": "Technical Advisor / Consultant",
+          "neutral": "Technical Advisor / Consultant"
+        },
+        "r_777d604a46c7": {
+          "masculine": "Expert Consultant (Production)",
+          "feminine": "Expert Consultant (Production)",
+          "neutral": "Expert Consultant (Production)"
+        },
+        "r_69b1f75394b4": {
+          "masculine": "Lecturer / Coach",
+          "feminine": "Lecturer / Coach",
+          "neutral": "Lecturer / Coach"
+        },
+        "r_9b689ca40dcd": {
+          "masculine": "Impact Producer",
+          "feminine": "Impact Producer",
+          "neutral": "Impact Producer"
+        },
+        "r_b22d32243e5e": {
+          "masculine": "Green Consultant / Sustainability Advisor",
+          "feminine": "Green Consultant / Sustainability Advisor",
+          "neutral": "Green Consultant / Sustainability Advisor"
+        },
+        "r_b7e6bdc7cc1f": {
+          "masculine": "Green Consultant Assistant",
+          "feminine": "Green Consultant Assistant",
+          "neutral": "Green Consultant Assistant"
+        },
+        "r_e84880be1d61": {
+          "masculine": "EPK / BTS Line Producer",
+          "feminine": "EPK / BTS Line Producer",
+          "neutral": "EPK / BTS Line Producer"
+        },
+        "r_715e70975075": {
+          "masculine": "EPK / BTS Producer",
+          "feminine": "EPK / BTS Producer",
+          "neutral": "EPK / BTS Producer"
+        },
+        "r_7028ae82d2e2": {
+          "masculine": "Film Restoration Artist",
+          "feminine": "Film Restoration Artist",
+          "neutral": "Film Restoration Artist"
+        },
+        "r_92791462fbdd": {
+          "masculine": "Film Colorist (Photochemical)",
+          "feminine": "Film Colorist (Photochemical)",
+          "neutral": "Film Colorist (Photochemical)"
+        },
+        "r_e732abed8e31": {
+          "masculine": "Disc Media Author (DVD / Blu-ray)",
+          "feminine": "Disc Media Author (DVD / Blu-ray)",
+          "neutral": "Disc Media Author (DVD / Blu-ray)"
+        },
+        "r_a63ade2d8c7d": {
+          "masculine": "Stop Motion Animator",
+          "feminine": "Stop Motion Animator",
+          "neutral": "Stop Motion Animator"
+        },
+        "r_e56da499fa85": {
+          "masculine": "Cel Animator / Traditional Animator",
+          "feminine": "Cel Animator / Traditional Animator",
+          "neutral": "Cel Animator / Traditional Animator"
+        },
+        "r_868363b4696a": {
+          "masculine": "Game Developer (Shows)",
+          "feminine": "Game Developer (Shows)",
+          "neutral": "Game Developer (Shows)"
+        },
+        "r_776e611a5b6e": {
+          "masculine": "Puppeteer",
+          "feminine": "Puppeteer",
+          "neutral": "Puppeteer"
+        },
+        "r_d3d5008ffded": {
+          "masculine": "VJ / Visual Jockey",
+          "feminine": "VJ / Visual Jockey",
+          "neutral": "VJ / Visual Jockey"
+        },
+        "r_f62082fcf3e6": {
+          "masculine": "On-Air Designer",
+          "feminine": "On-Air Designer",
+          "neutral": "On-Air Designer"
+        },
+        "r_915e8fdeaa84": {
+          "masculine": "Subtitles Spotter",
+          "feminine": "Subtitles Spotter",
+          "neutral": "Subtitles Spotter"
+        },
+        "r_e7b09583174a": {
+          "masculine": "Subtitler",
+          "feminine": "Subtitler",
+          "neutral": "Subtitler"
+        },
+        "r_823099351f18": {
+          "masculine": "Directing Scout",
+          "feminine": "Directing Scout",
+          "neutral": "Directing Scout"
+        },
+        "r_f25ed374ada5": {
+          "masculine": "Rights Clearance",
+          "feminine": "Rights Clearance",
+          "neutral": "Rights Clearance"
+        },
+        "r_bf29b54303ec": {
+          "masculine": "PR Photographer",
+          "feminine": "PR Photographer",
+          "neutral": "PR Photographer"
+        },
+        "r_e2fe82d9e60c": {
+          "masculine": "Project Manager (External)",
+          "feminine": "Project Manager (External)",
+          "neutral": "Project Manager (External)"
+        },
+        "r_3687ead5b451": {
+          "masculine": "Personal Assistant (On-Set)",
+          "feminine": "Personal Assistant (On-Set)",
+          "neutral": "Personal Assistant (On-Set)"
+        },
+        "r_b85e79c1153f": {
+          "masculine": "Researcher (General)",
+          "feminine": "Researcher (General)",
+          "neutral": "Researcher (General)"
+        }
+      },
+      "cast": {
+        "r_3d0e76b883b1": {
+          "masculine": "Lead Actor",
+          "feminine": "Lead Actress",
+          "neutral": "Lead Performer"
+        },
+        "r_543b99d52c01": {
+          "masculine": "Actor",
+          "feminine": "Actress",
+          "neutral": "Performer"
+        },
+        "r_aa64ee1fd5d6": {
+          "masculine": "Supporting Actor",
+          "feminine": "Supporting Actress",
+          "neutral": "Supporting Performer"
+        },
+        "r_5fea55df03ed": {
+          "masculine": "Extra",
+          "feminine": "Extra",
+          "neutral": "Extra"
+        },
+        "r_912a4dbdd23c": {
+          "masculine": "Featured Extra",
+          "feminine": "Featured Extra",
+          "neutral": "Featured Extra"
+        },
+        "r_130f7a137659": {
+          "masculine": "Model",
+          "feminine": "Model",
+          "neutral": "Model"
+        },
+        "r_e1e954da6cbb": {
+          "masculine": "Voice Actor / Voice-Over",
+          "feminine": "Voice Actress / Voice-Over",
+          "neutral": "Voice Performer / Voice-Over"
+        },
+        "r_67da9411185f": {
+          "masculine": "Stand-In",
+          "feminine": "Stand-In",
+          "neutral": "Stand-In"
+        },
+        "r_00100aeac4bb": {
+          "masculine": "Stunt Performer",
+          "feminine": "Stunt Performer",
+          "neutral": "Stunt Performer"
+        },
+        "r_0367b47c9554": {
+          "masculine": "Stunt Double",
+          "feminine": "Stunt Double",
+          "neutral": "Stunt Double"
+        },
+        "r_ca9ccb4b0409": {
+          "masculine": "Stunt Rigger",
+          "feminine": "Stunt Rigger",
+          "neutral": "Stunt Rigger"
+        },
+        "r_418902de8e38": {
+          "masculine": "Stunt Coordinator",
+          "feminine": "Stunt Coordinator",
+          "neutral": "Stunt Coordinator"
+        },
+        "r_7f2d1a7f256f": {
+          "masculine": "Assistant Stunt Coordinator",
+          "feminine": "Assistant Stunt Coordinator",
+          "neutral": "Assistant Stunt Coordinator"
+        },
+        "r_e84ab42c1ded": {
+          "masculine": "Stunt Department Coordinator",
+          "feminine": "Stunt Department Coordinator",
+          "neutral": "Stunt Department Coordinator"
+        },
+        "r_e09f42bb8f68": {
+          "masculine": "Fight Choreographer",
+          "feminine": "Fight Choreographer",
+          "neutral": "Fight Choreographer"
+        },
+        "r_f1b27e4baea8": {
+          "masculine": "Action Director / 2nd Unit Director",
+          "feminine": "Action Director / 2nd Unit Director",
+          "neutral": "Action Director / 2nd Unit Director"
+        },
+        "r_ccdc591d96b4": {
+          "masculine": "Aerial Coordinator",
+          "feminine": "Aerial Coordinator",
+          "neutral": "Aerial Coordinator"
+        },
+        "r_df312d5bf658": {
+          "masculine": "Stunt Rider",
+          "feminine": "Stunt Rider",
+          "neutral": "Stunt Rider"
+        },
+        "r_64fe45905183": {
+          "masculine": "Stunt Technician",
+          "feminine": "Stunt Technician",
+          "neutral": "Stunt Technician"
+        },
+        "r_28088de1cde2": {
+          "masculine": "Stunt Rescue Diver",
+          "feminine": "Stunt Rescue Diver",
+          "neutral": "Stunt Rescue Diver"
+        },
+        "r_f1b818bfac99": {
+          "masculine": "Parkour Artist",
+          "feminine": "Parkour Artist",
+          "neutral": "Parkour Artist"
+        },
+        "r_c9bf4b44628b": {
+          "masculine": "Precision Driver",
+          "feminine": "Precision Driver",
+          "neutral": "Precision Driver"
+        },
+        "r_901a1b08f6ba": {
+          "masculine": "Intimacy Coordinator",
+          "feminine": "Intimacy Coordinator",
+          "neutral": "Intimacy Coordinator"
+        },
+        "r_7a721e572105": {
+          "masculine": "Casting Associate",
+          "feminine": "Casting Associate",
+          "neutral": "Casting Associate"
+        },
+        "r_a1f9ba79ab08": {
+          "masculine": "Casting Assistant",
+          "feminine": "Casting Assistant",
+          "neutral": "Casting Assistant"
+        },
+        "r_84927cc7b2bc": {
+          "masculine": "Supporting Actor",
+          "feminine": "Supporting Actress",
+          "neutral": "Supporting Performer"
+        },
+        "r_97144193d2e9": {
+          "masculine": "Background / Extra",
+          "feminine": "Background / Extra",
+          "neutral": "Background / Extra"
+        },
+        "r_de130677203b": {
+          "masculine": "Youth Casting Director",
+          "feminine": "Youth Casting Director",
+          "neutral": "Youth Casting Director"
+        },
+        "r_27725de30521": {
+          "masculine": "Children's Casting Director",
+          "feminine": "Children's Casting Director",
+          "neutral": "Children's Casting Director"
+        },
+        "r_9e31ceb09d88": {
+          "masculine": "Street Casting",
+          "feminine": "Street Casting",
+          "neutral": "Street Casting"
+        },
+        "r_081340fc2740": {
+          "masculine": "Background / Supporting Casting",
+          "feminine": "Background / Supporting Casting",
+          "neutral": "Background / Supporting Casting"
+        },
+        "r_bff79e6f4b26": {
+          "masculine": "Casting Intern",
+          "feminine": "Casting Intern",
+          "neutral": "Casting Intern"
+        },
+        "r_2f8822fb833a": {
+          "masculine": "Head Stunt Rigger",
+          "feminine": "Head Stunt Rigger",
+          "neutral": "Head Stunt Rigger"
+        },
+        "r_9fadc25f432e": {
+          "masculine": "Coachman",
+          "feminine": "Coachwoman",
+          "neutral": "Carriage Driver"
+        }
+      },
+      "sfx": {
+        "r_a35d5905e687": {
+          "masculine": "Special Effects Supervisor",
+          "feminine": "Special Effects Supervisor",
+          "neutral": "Special Effects Supervisor"
+        },
+        "r_09c0a67cf5e1": {
+          "masculine": "SFX Technician",
+          "feminine": "SFX Technician",
+          "neutral": "SFX Technician"
+        },
+        "r_881a5efb4c8a": {
+          "masculine": "Special Effects Coordinator",
+          "feminine": "Special Effects Coordinator",
+          "neutral": "Special Effects Coordinator"
+        },
+        "r_a9f1b82c4859": {
+          "masculine": "Special Effects Project Manager",
+          "feminine": "Special Effects Project Manager",
+          "neutral": "Special Effects Project Manager"
+        },
+        "r_cea7226b63f6": {
+          "masculine": "Pyrotechnician",
+          "feminine": "Pyrotechnician",
+          "neutral": "Pyrotechnician"
+        },
+        "r_eb065a9f90c9": {
+          "masculine": "Pyro Assistant",
+          "feminine": "Pyro Assistant",
+          "neutral": "Pyro Assistant"
+        },
+        "r_4d3662b84a22": {
+          "masculine": "Miniature Effects Producer",
+          "feminine": "Miniature Effects Producer",
+          "neutral": "Miniature Effects Producer"
+        },
+        "r_e62650b9e5ae": {
+          "masculine": "Creature Designer",
+          "feminine": "Creature Designer",
+          "neutral": "Creature Designer"
+        },
+        "r_00baca6dc147": {
+          "masculine": "Animatronics Engineer",
+          "feminine": "Animatronics Engineer",
+          "neutral": "Animatronics Engineer"
+        },
+        "r_174ffb787533": {
+          "masculine": "Puppet / Prop Builder",
+          "feminine": "Puppet / Prop Builder",
+          "neutral": "Puppet / Prop Builder"
+        },
+        "r_506a008769b9": {
+          "masculine": "Armourer",
+          "feminine": "Armourer",
+          "neutral": "Armourer"
+        },
+        "r_2409c6266fd3": {
+          "masculine": "Weapons Technician / Armorer",
+          "feminine": "Weapons Technician / Armorer",
+          "neutral": "Weapons Technician / Armorer"
+        },
+        "r_ddb886337a99": {
+          "masculine": "Rigger (Wire)",
+          "feminine": "Rigger (Wire)",
+          "neutral": "Rigger (Wire)"
+        },
+        "r_72a4b7fb935e": {
+          "masculine": "SFX Rigging / Special Constructions",
+          "feminine": "SFX Rigging / Special Constructions",
+          "neutral": "SFX Rigging / Special Constructions"
+        },
+        "r_3628c7df2899": {
+          "masculine": "Mechanical Effects Technician",
+          "feminine": "Mechanical Effects Technician",
+          "neutral": "Mechanical Effects Technician"
+        },
+        "r_41cde5889636": {
+          "masculine": "Snow / Rain Effects Tech",
+          "feminine": "Snow / Rain Effects Tech",
+          "neutral": "Snow / Rain Effects Tech"
+        },
+        "r_ba881d560569": {
+          "masculine": "Special Effects Accountant",
+          "feminine": "Special Effects Accountant",
+          "neutral": "Special Effects Accountant"
+        },
+        "r_c723decf9e2c": {
+          "masculine": "Special Effects Technician",
+          "feminine": "Special Effects Technician",
+          "neutral": "Special Effects Technician"
+        }
+      },
+      "broadcast": {
+        "r_56003554d627": {
+          "masculine": "Production Engineer",
+          "feminine": "Production Engineer",
+          "neutral": "Production Engineer"
+        },
+        "r_a5145362deb9": {
+          "masculine": "Broadcast Engineer",
+          "feminine": "Broadcast Engineer",
+          "neutral": "Broadcast Engineer"
+        },
+        "r_21789a4bd26e": {
+          "masculine": "Technical Director",
+          "feminine": "Technical Director",
+          "neutral": "Technical Director"
+        },
+        "r_ed2861824940": {
+          "masculine": "Vision Engineer",
+          "feminine": "Vision Engineer",
+          "neutral": "Vision Engineer"
+        },
+        "r_f35ad506ce91": {
+          "masculine": "Vision Mixer",
+          "feminine": "Vision Mixer",
+          "neutral": "Vision Mixer"
+        },
+        "r_96549186fbdd": {
+          "masculine": "Vision Mixer",
+          "feminine": "Vision Mixer",
+          "neutral": "Vision Mixer"
+        },
+        "r_b0f32c270502": {
+          "masculine": "Shader",
+          "feminine": "Shader",
+          "neutral": "Shader"
+        },
+        "r_4444caa14211": {
+          "masculine": "Camera CCU Operator",
+          "feminine": "Camera CCU Operator",
+          "neutral": "Camera CCU Operator"
+        },
+        "r_3a845b2c45a4": {
+          "masculine": "DVE Operator",
+          "feminine": "DVE Operator",
+          "neutral": "DVE Operator"
+        },
+        "r_5eb58151f915": {
+          "masculine": "Profile Operator",
+          "feminine": "Profile Operator",
+          "neutral": "Profile Operator"
+        },
+        "r_bc517c79d131": {
+          "masculine": "Broadcast Technician",
+          "feminine": "Broadcast Technician",
+          "neutral": "Broadcast Technician"
+        },
+        "r_d0bc62ba1257": {
+          "masculine": "Broadcast Sound Supervisor",
+          "feminine": "Broadcast Sound Supervisor",
+          "neutral": "Broadcast Sound Supervisor"
+        },
+        "r_6189d7ba75a5": {
+          "masculine": "Sound Engineer (Broadcast)",
+          "feminine": "Sound Engineer (Broadcast)",
+          "neutral": "Sound Engineer (Broadcast)"
+        },
+        "r_9eadf0334fa2": {
+          "masculine": "Studio / Event Master",
+          "feminine": "Studio / Event Master",
+          "neutral": "Studio / Event Master"
+        },
+        "r_da7a6180d72a": {
+          "masculine": "Event Manager",
+          "feminine": "Event Manager",
+          "neutral": "Event Manager"
+        },
+        "r_84e084ee4081": {
+          "masculine": "Event Technician",
+          "feminine": "Event Technician",
+          "neutral": "Event Technician"
+        },
+        "r_2b01c5ebf763": {
+          "masculine": "MAZ Operator",
+          "feminine": "MAZ Operator",
+          "neutral": "MAZ Operator"
+        },
+        "r_d2b49ec6c87b": {
+          "masculine": "VTR / MAZ Technician",
+          "feminine": "VTR / MAZ Technician",
+          "neutral": "VTR / MAZ Technician"
+        },
+        "r_b1e7ad7a4e8d": {
+          "masculine": "EVS Operator",
+          "feminine": "EVS Operator",
+          "neutral": "EVS Operator"
+        },
+        "r_6ce5d1fae4b4": {
+          "masculine": "LSM Operator (Slomo)",
+          "feminine": "LSM Operator (Slomo)",
+          "neutral": "LSM Operator (Slomo)"
+        },
+        "r_23864113991d": {
+          "masculine": "Streaming Technician",
+          "feminine": "Streaming Technician",
+          "neutral": "Streaming Technician"
+        },
+        "r_4e59228ff2bb": {
+          "masculine": "Rigger (Broadcast / Event)",
+          "feminine": "Rigger (Broadcast / Event)",
+          "neutral": "Rigger (Broadcast / Event)"
+        },
+        "r_54aa44e2bc03": {
+          "masculine": "Rigging Assistant",
+          "feminine": "Rigging Assistant",
+          "neutral": "Rigging Assistant"
+        },
+        "r_accbebaa16ce": {
+          "masculine": "Vision Technician",
+          "feminine": "Vision Technician",
+          "neutral": "Vision Technician"
+        },
+        "r_152179bb65ff": {
+          "masculine": "Lighting Technician (Broadcast)",
+          "feminine": "Lighting Technician (Broadcast)",
+          "neutral": "Lighting Technician (Broadcast)"
+        },
+        "r_916b292e3ecc": {
+          "masculine": "Sound Technician (Broadcast)",
+          "feminine": "Sound Technician (Broadcast)",
+          "neutral": "Sound Technician (Broadcast)"
+        },
+        "r_a409aeab8c20": {
+          "masculine": "Audio Engineer (PA / Event)",
+          "feminine": "Audio Engineer (PA / Event)",
+          "neutral": "Audio Engineer (PA / Event)"
+        },
+        "r_894d032abc78": {
+          "masculine": "PA / Sound Technician (Event)",
+          "feminine": "PA / Sound Technician (Event)",
+          "neutral": "PA / Sound Technician (Event)"
+        },
+        "r_87a1930129df": {
+          "masculine": "SNG Operator",
+          "feminine": "SNG Operator",
+          "neutral": "SNG Operator"
+        },
+        "r_0d146769f561": {
+          "masculine": "Sound Assistant (Broadcast)",
+          "feminine": "Sound Assistant (Broadcast)",
+          "neutral": "Sound Assistant (Broadcast)"
+        },
+        "r_4ee86e5361a7": {
+          "masculine": "Videowall Operator",
+          "feminine": "Videowall Operator",
+          "neutral": "Videowall Operator"
+        },
+        "r_7c7bcadca79c": {
+          "masculine": "Teleprompter Operator",
+          "feminine": "Teleprompter Operator",
+          "neutral": "Teleprompter Operator"
+        },
+        "r_e627ebc7d6a6": {
+          "masculine": "Technical Assistant (Broadcast)",
+          "feminine": "Technical Assistant (Broadcast)",
+          "neutral": "Technical Assistant (Broadcast)"
+        },
+        "r_b81926eec6f3": {
+          "masculine": "Vision Assistant",
+          "feminine": "Vision Assistant",
+          "neutral": "Vision Assistant"
+        },
+        "r_45710f001c06": {
+          "masculine": "Cable Runner",
+          "feminine": "Cable Runner",
+          "neutral": "Cable Runner"
+        },
+        "r_34cfe59314f7": {
+          "masculine": "Vision Mixer / Video Switcher",
+          "feminine": "Vision Mixer / Video Switcher",
+          "neutral": "Vision Mixer / Video Switcher"
+        },
+        "r_ba025e1926d2": {
+          "masculine": "LSM Operator (Slow Motion)",
+          "feminine": "LSM Operator (Slow Motion)",
+          "neutral": "LSM Operator (Slow Motion)"
+        },
+        "r_c7e1fa1f7572": {
+          "masculine": "SG Operator",
+          "feminine": "SG Operator",
+          "neutral": "SG Operator"
+        },
+        "r_c0aa2d3b3f9c": {
+          "masculine": "Sound Assistant (Broadcast)",
+          "feminine": "Sound Assistant (Broadcast)",
+          "neutral": "Sound Assistant (Broadcast)"
+        },
+        "r_32ca4217464e": {
+          "masculine": "Technical Assistant (Broadcast)",
+          "feminine": "Technical Assistant (Broadcast)",
+          "neutral": "Technical Assistant (Broadcast)"
+        }
+      },
+      "virtual": {
+        "r_9d90887128a0": {
+          "masculine": "Virtual Production Supervisor",
+          "feminine": "Virtual Production Supervisor",
+          "neutral": "Virtual Production Supervisor"
+        },
+        "r_9c3babb3c638": {
+          "masculine": "Virtual Production Producer",
+          "feminine": "Virtual Production Producer",
+          "neutral": "Virtual Production Producer"
+        },
+        "r_1fee1676270e": {
+          "masculine": "Virtual Production Coordinator",
+          "feminine": "Virtual Production Coordinator",
+          "neutral": "Virtual Production Coordinator"
+        },
+        "r_82e993b4422d": {
+          "masculine": "Virtual Production Studio Manager",
+          "feminine": "Virtual Production Studio Manager",
+          "neutral": "Virtual Production Studio Manager"
+        },
+        "r_14e7e79a9ca8": {
+          "masculine": "VAD Artist (Virtual Art Department)",
+          "feminine": "VAD Artist (Virtual Art Department)",
+          "neutral": "VAD Artist (Virtual Art Department)"
+        },
+        "r_2034a25adda6": {
+          "masculine": "Virtual Production Engineer",
+          "feminine": "Virtual Production Engineer",
+          "neutral": "Virtual Production Engineer"
+        },
+        "r_188b9da491f3": {
+          "masculine": "VP Systems & Tools Technical Director",
+          "feminine": "VP Systems & Tools Technical Director",
+          "neutral": "VP Systems & Tools Technical Director"
+        },
+        "r_93a5c89da775": {
+          "masculine": "LED Wall Operator",
+          "feminine": "LED Wall Operator",
+          "neutral": "LED Wall Operator"
+        },
+        "r_d1415a80bf57": {
+          "masculine": "Unreal Engine Operator",
+          "feminine": "Unreal Engine Operator",
+          "neutral": "Unreal Engine Operator"
+        },
+        "r_1c2e82f4274b": {
+          "masculine": "Realtime Engine Operator",
+          "feminine": "Realtime Engine Operator",
+          "neutral": "Realtime Engine Operator"
+        },
+        "r_247afd3ab3fd": {
+          "masculine": "Media Server Operator",
+          "feminine": "Media Server Operator",
+          "neutral": "Media Server Operator"
+        },
+        "r_8728a8d46ae1": {
+          "masculine": "VP System Administrator",
+          "feminine": "VP System Administrator",
+          "neutral": "VP System Administrator"
+        },
+        "r_e7c27999f9ae": {
+          "masculine": "VP Tracking Technician",
+          "feminine": "VP Tracking Technician",
+          "neutral": "VP Tracking Technician"
+        },
+        "r_bbe66ea7740f": {
+          "masculine": "VP LED Technician",
+          "feminine": "VP LED Technician",
+          "neutral": "VP LED Technician"
+        },
+        "r_ad04846bb2b3": {
+          "masculine": "Tracking Technician",
+          "feminine": "Tracking Technician",
+          "neutral": "Tracking Technician"
+        },
+        "r_c100cb7d8cdf": {
+          "masculine": "Real-Time Artist",
+          "feminine": "Real-Time Artist",
+          "neutral": "Real-Time Artist"
+        },
+        "r_84ae9f742a8c": {
+          "masculine": "Virtual Art Department Artist",
+          "feminine": "Virtual Art Department Artist",
+          "neutral": "Virtual Art Department Artist"
+        }
+      },
+      "redaktion": {
+        "r_67a1c14f27d6": {
+          "masculine": "Editorial Director",
+          "feminine": "Editorial Director",
+          "neutral": "Editorial Director"
+        },
+        "r_fb6f303e781e": {
+          "masculine": "Editor-in-Chief",
+          "feminine": "Editor-in-Chief",
+          "neutral": "Editor-in-Chief"
+        },
+        "r_1d083876d102": {
+          "masculine": "Duty Editor",
+          "feminine": "Duty Editor",
+          "neutral": "Duty Editor"
+        },
+        "r_dba49499f044": {
+          "masculine": "Head of Production (Broadcaster)",
+          "feminine": "Head of Production (Broadcaster)",
+          "neutral": "Head of Production (Broadcaster)"
+        },
+        "r_399d5722db1b": {
+          "masculine": "Production Director (Broadcaster)",
+          "feminine": "Production Director (Broadcaster)",
+          "neutral": "Production Director (Broadcaster)"
+        },
+        "r_97c6fe9db2a1": {
+          "masculine": "Rundown Coordinator",
+          "feminine": "Rundown Coordinator",
+          "neutral": "Rundown Coordinator"
+        },
+        "r_c1f3dd5d125c": {
+          "masculine": "Editor",
+          "feminine": "Editor",
+          "neutral": "Editor"
+        },
+        "r_74db110eed35": {
+          "masculine": "TV Writer / Author",
+          "feminine": "TV Writer / Author",
+          "neutral": "TV Writer / Author"
+        },
+        "r_c68ab8bdf35f": {
+          "masculine": "Casting Editor",
+          "feminine": "Casting Editor",
+          "neutral": "Casting Editor"
+        },
+        "r_db514834619e": {
+          "masculine": "Picture Editor",
+          "feminine": "Picture Editor",
+          "neutral": "Picture Editor"
+        },
+        "r_2d3838a04d2d": {
+          "masculine": "Editing Editor",
+          "feminine": "Editing Editor",
+          "neutral": "Editing Editor"
+        },
+        "r_72b16f73761b": {
+          "masculine": "Online Editor / Web Editor",
+          "feminine": "Online Editor / Web Editor",
+          "neutral": "Online Editor / Web Editor"
+        },
+        "r_1eb2a3ac7a7f": {
+          "masculine": "Video Editor (Editorial)",
+          "feminine": "Video Editor (Editorial)",
+          "neutral": "Video Editor (Editorial)"
+        },
+        "r_fea2147a3023": {
+          "masculine": "TV Journalist",
+          "feminine": "TV Journalist",
+          "neutral": "TV Journalist"
+        },
+        "r_89901fa29127": {
+          "masculine": "Reporter",
+          "feminine": "Reporter",
+          "neutral": "Reporter"
+        },
+        "r_49092803ca90": {
+          "masculine": "Realisator / Show Director",
+          "feminine": "Realisator / Show Director",
+          "neutral": "Realisator / Show Director"
+        },
+        "r_558623ea54e2": {
+          "masculine": "Video Producer",
+          "feminine": "Video Producer",
+          "neutral": "Video Producer"
+        },
+        "r_cd94582e5de3": {
+          "masculine": "Video Journalist (VJ)",
+          "feminine": "Video Journalist (VJ)",
+          "neutral": "Video Journalist (VJ)"
+        },
+        "r_c1632a39db5a": {
+          "masculine": "Video Content Creator (Social Media)",
+          "feminine": "Video Content Creator (Social Media)",
+          "neutral": "Video Content Creator (Social Media)"
+        },
+        "r_48a469f4753e": {
+          "masculine": "Host / Presenter",
+          "feminine": "Host / Presenter",
+          "neutral": "Host / Presenter"
+        },
+        "r_dff0d36f7649": {
+          "masculine": "News Anchor / Newsreader",
+          "feminine": "News Anchor / Newsreader",
+          "neutral": "News Anchor / Newsreader"
+        },
+        "r_d8ae611e8a84": {
+          "masculine": "Creative Producer",
+          "feminine": "Creative Producer",
+          "neutral": "Creative Producer"
+        },
+        "r_52eb2ef13219": {
+          "masculine": "Creative Director",
+          "feminine": "Creative Director",
+          "neutral": "Creative Director"
+        },
+        "r_4741fd392c78": {
+          "masculine": "Copywriter",
+          "feminine": "Copywriter",
+          "neutral": "Copywriter"
+        },
+        "r_7693f0b6836d": {
+          "masculine": "Concept Developer",
+          "feminine": "Concept Developer",
+          "neutral": "Concept Developer"
+        },
+        "r_8ed4467cbce1": {
+          "masculine": "Social Media Producer",
+          "feminine": "Social Media Producer",
+          "neutral": "Social Media Producer"
+        },
+        "r_f3046605ff7d": {
+          "masculine": "Editorial Assistant",
+          "feminine": "Editorial Assistant",
+          "neutral": "Editorial Assistant"
+        },
+        "r_39b32b25eed9": {
+          "masculine": "Editorial Intern",
+          "feminine": "Editorial Intern",
+          "neutral": "Editorial Intern"
+        },
+        "r_7947e117851f": {
+          "masculine": "Duty Editor / Managing Editor",
+          "feminine": "Duty Editor / Managing Editor",
+          "neutral": "Duty Editor / Managing Editor"
+        },
+        "r_9c948261499b": {
+          "masculine": "Head of Production (Studio / Network)",
+          "feminine": "Head of Production (Studio / Network)",
+          "neutral": "Head of Production (Studio / Network)"
+        },
+        "r_844ebb650ef7": {
+          "masculine": "Editor / Journalist",
+          "feminine": "Editor / Journalist",
+          "neutral": "Editor / Journalist"
+        },
+        "r_bac4afc8f929": {
+          "masculine": "Edit Producer / Realisator",
+          "feminine": "Edit Producer / Realisator",
+          "neutral": "Edit Producer / Realisator"
+        },
+        "r_324910e3b0ab": {
+          "masculine": "Quiz Editor",
+          "feminine": "Quiz Editor",
+          "neutral": "Quiz Editor"
+        },
+        "r_363c83ce0934": {
+          "masculine": "Warm-Up Artist",
+          "feminine": "Warm-Up Artist",
+          "neutral": "Warm-Up Artist"
+        },
+        "r_6227b3014b7a": {
+          "masculine": "Stringer / Fixer",
+          "feminine": "Stringer / Fixer",
+          "neutral": "Stringer / Fixer"
+        },
+        "r_dfa579f14095": {
+          "masculine": "Logger / Footage Logger",
+          "feminine": "Logger / Footage Logger",
+          "neutral": "Logger / Footage Logger"
+        },
+        "r_57c0fec76f7d": {
+          "masculine": "Transcriptionist",
+          "feminine": "Transcriptionist",
+          "neutral": "Transcriptionist"
+        },
+        "r_cabe547e084e": {
+          "masculine": "Picture Researcher",
+          "feminine": "Picture Researcher",
+          "neutral": "Picture Researcher"
+        }
+      },
+      "social": {
+        "r_e8a967aad9b7": {
+          "masculine": "Content Creator",
+          "feminine": "Content Creator",
+          "neutral": "Content Creator"
+        },
+        "r_631c65ad8827": {
+          "masculine": "Influencer",
+          "feminine": "Influencer",
+          "neutral": "Influencer"
+        },
+        "r_a9eeb34333bc": {
+          "masculine": "Social Media Manager",
+          "feminine": "Social Media Manager",
+          "neutral": "Social Media Manager"
+        },
+        "r_b510fa57cea0": {
+          "masculine": "UGC Creator",
+          "feminine": "UGC Creator",
+          "neutral": "UGC Creator"
+        },
+        "r_4d66d4dbbf12": {
+          "masculine": "Reels Videographer",
+          "feminine": "Reels Videographer",
+          "neutral": "Reels Videographer"
+        },
+        "r_423ece24b5c2": {
+          "masculine": "TikTok Creator",
+          "feminine": "TikTok Creator",
+          "neutral": "TikTok Creator"
+        },
+        "r_e7483d4ddd6d": {
+          "masculine": "Community Manager",
+          "feminine": "Community Manager",
+          "neutral": "Community Manager"
+        },
+        "r_6f877112cd0a": {
+          "masculine": "Social Media Strategist",
+          "feminine": "Social Media Strategist",
+          "neutral": "Social Media Strategist"
+        },
+        "r_bd90a8429d6f": {
+          "masculine": "Influencer / Creator",
+          "feminine": "Influencer / Creator",
+          "neutral": "Influencer / Creator"
+        },
+        "r_c43ce08ef6e8": {
+          "masculine": "Brand Storyteller",
+          "feminine": "Brand Storyteller",
+          "neutral": "Brand Storyteller"
+        },
+        "r_e75a59be5b02": {
+          "masculine": "Social Videographer",
+          "feminine": "Social Videographer",
+          "neutral": "Social Videographer"
+        },
+        "r_5f522b44dd48": {
+          "masculine": "Shortform Editor",
+          "feminine": "Shortform Editor",
+          "neutral": "Shortform Editor"
+        },
+        "r_ce039c1f951f": {
+          "masculine": "Motion Designer (Social)",
+          "feminine": "Motion Designer (Social)",
+          "neutral": "Motion Designer (Social)"
+        }
+      },
+      "foto": {
+        "r_d2c0588cf0d1": {
+          "masculine": "Photographer",
+          "feminine": "Photographer",
+          "neutral": "Photographer"
+        },
+        "r_d7f7fbf5939c": {
+          "masculine": "Fashion Photographer",
+          "feminine": "Fashion Photographer",
+          "neutral": "Fashion Photographer"
+        },
+        "r_e0551919b067": {
+          "masculine": "Product Photographer",
+          "feminine": "Product Photographer",
+          "neutral": "Product Photographer"
+        },
+        "r_b06301444ef7": {
+          "masculine": "Event Photographer",
+          "feminine": "Event Photographer",
+          "neutral": "Event Photographer"
+        },
+        "r_124df4c664ce": {
+          "masculine": "Portrait Photographer",
+          "feminine": "Portrait Photographer",
+          "neutral": "Portrait Photographer"
+        },
+        "r_2e1fcf07d241": {
+          "masculine": "Commercial Photographer",
+          "feminine": "Commercial Photographer",
+          "neutral": "Commercial Photographer"
+        },
+        "r_02bd21bcff9c": {
+          "masculine": "Food Photographer",
+          "feminine": "Food Photographer",
+          "neutral": "Food Photographer"
+        },
+        "r_8a273a427bd6": {
+          "masculine": "Drone Photographer",
+          "feminine": "Drone Photographer",
+          "neutral": "Drone Photographer"
+        },
+        "r_843b4748146d": {
+          "masculine": "Still Photographer",
+          "feminine": "Still Photographer",
+          "neutral": "Still Photographer"
+        },
+        "r_b622037392fb": {
+          "masculine": "Photo Assistant",
+          "feminine": "Photo Assistant",
+          "neutral": "Photo Assistant"
+        },
+        "r_6a2008f9f2ef": {
+          "masculine": "Studio Manager",
+          "feminine": "Studio Manager",
+          "neutral": "Studio Manager"
+        },
+        "r_341b032b61fc": {
+          "masculine": "Retoucher",
+          "feminine": "Retoucher",
+          "neutral": "Retoucher"
+        },
+        "r_468329a20ba4": {
+          "masculine": "Photo Editor",
+          "feminine": "Photo Editor",
+          "neutral": "Photo Editor"
+        }
+      },
+      "ki": {
+        "r_0af68f26119c": {
+          "masculine": "AI Filmmaker",
+          "feminine": "AI Filmmaker",
+          "neutral": "AI Filmmaker"
+        },
+        "r_7ebc4eeffa63": {
+          "masculine": "AI Lead / AI Supervisor",
+          "feminine": "AI Lead / AI Supervisor",
+          "neutral": "AI Lead / AI Supervisor"
+        },
+        "r_5143bd061069": {
+          "masculine": "AI Director",
+          "feminine": "AI Director",
+          "neutral": "AI Director"
+        },
+        "r_8b38d96f6763": {
+          "masculine": "AI Animator",
+          "feminine": "AI Animator",
+          "neutral": "AI Animator"
+        },
+        "r_addc4afc90e0": {
+          "masculine": "Prompt Engineer (Film & Media)",
+          "feminine": "Prompt Engineer (Film & Media)",
+          "neutral": "Prompt Engineer (Film & Media)"
+        },
+        "r_227b357243e1": {
+          "masculine": "AI Screenwriter",
+          "feminine": "AI Screenwriter",
+          "neutral": "AI Screenwriter"
+        },
+        "r_53ef2619b5af": {
+          "masculine": "AI Storyboard Artist",
+          "feminine": "AI Storyboard Artist",
+          "neutral": "AI Storyboard Artist"
+        },
+        "r_1185b1151f24": {
+          "masculine": "AI Image Creator",
+          "feminine": "AI Image Creator",
+          "neutral": "AI Image Creator"
+        },
+        "r_f551cf191b74": {
+          "masculine": "AI Video Creator",
+          "feminine": "AI Video Creator",
+          "neutral": "AI Video Creator"
+        },
+        "r_b69e1ec80a94": {
+          "masculine": "AI Sound Designer",
+          "feminine": "AI Sound Designer",
+          "neutral": "AI Sound Designer"
+        },
+        "r_237f8a4202e1": {
+          "masculine": "AI Colourist",
+          "feminine": "AI Colourist",
+          "neutral": "AI Colourist"
+        },
+        "r_38b5ef6c319c": {
+          "masculine": "AI Workflow Consultant (Film)",
+          "feminine": "AI Workflow Consultant (Film)",
+          "neutral": "AI Workflow Consultant (Film)"
+        }
+      },
+      "drehbuch": {
+        "r_f63a97948825": {
+          "masculine": "Showrunner",
+          "feminine": "Showrunner",
+          "neutral": "Showrunner"
+        },
+        "r_da4094d01df6": {
+          "masculine": "Head Writer",
+          "feminine": "Head Writer",
+          "neutral": "Head Writer"
+        },
+        "r_48862b016872": {
+          "masculine": "Assistant to Head Writer",
+          "feminine": "Assistant to Head Writer",
+          "neutral": "Assistant to Head Writer"
+        },
+        "r_f0e5da473f57": {
+          "masculine": "Assistant Showrunner",
+          "feminine": "Assistant Showrunner",
+          "neutral": "Assistant Showrunner"
+        },
+        "r_be444be7e73a": {
+          "masculine": "Screenwriter",
+          "feminine": "Screenwriter",
+          "neutral": "Screenwriter"
+        },
+        "r_d1a561dc7125": {
+          "masculine": "Co-Writer",
+          "feminine": "Co-Writer",
+          "neutral": "Co-Writer"
+        },
+        "r_da01eb9b61e7": {
+          "masculine": "Re-Writer",
+          "feminine": "Re-Writer",
+          "neutral": "Re-Writer"
+        },
+        "r_199c194315c9": {
+          "masculine": "Script Doctor",
+          "feminine": "Script Doctor",
+          "neutral": "Script Doctor"
+        },
+        "r_a180812047b1": {
+          "masculine": "Story Editor",
+          "feminine": "Story Editor",
+          "neutral": "Story Editor"
+        },
+        "r_5f9704129182": {
+          "masculine": "Storyliner",
+          "feminine": "Storyliner",
+          "neutral": "Storyliner"
+        },
+        "r_41126a4d581f": {
+          "masculine": "Script Editor",
+          "feminine": "Script Editor",
+          "neutral": "Script Editor"
+        },
+        "r_11bee057c159": {
+          "masculine": "Dialogue Editor",
+          "feminine": "Dialogue Editor",
+          "neutral": "Dialogue Editor"
+        },
+        "r_d578a24e6a6c": {
+          "masculine": "Dialogue Writer",
+          "feminine": "Dialogue Writer",
+          "neutral": "Dialogue Writer"
+        },
+        "r_cbc48ad9850e": {
+          "masculine": "Script Reader",
+          "feminine": "Script Reader",
+          "neutral": "Script Reader"
+        },
+        "r_850bbf550984": {
+          "masculine": "Dramaturg / Script Consultant",
+          "feminine": "Dramaturg / Script Consultant",
+          "neutral": "Dramaturg / Script Consultant"
+        },
+        "r_c33a26535234": {
+          "masculine": "Story Development",
+          "feminine": "Story Development",
+          "neutral": "Story Development"
+        },
+        "r_e439aac0b481": {
+          "masculine": "Head of Script",
+          "feminine": "Head of Script",
+          "neutral": "Head of Script"
+        },
+        "r_a30d0af43af8": {
+          "masculine": "Head of Story",
+          "feminine": "Head of Story",
+          "neutral": "Head of Story"
+        },
+        "r_3aa5851edfa7": {
+          "masculine": "Format Developer",
+          "feminine": "Format Developer",
+          "neutral": "Format Developer"
+        },
+        "r_fc05d4531220": {
+          "masculine": "Treatment Writer",
+          "feminine": "Treatment Writer",
+          "neutral": "Treatment Writer"
+        },
+        "r_601f64f82db2": {
+          "masculine": "Dubbing Script Writer",
+          "feminine": "Dubbing Script Writer",
+          "neutral": "Dubbing Script Writer"
+        },
+        "r_1ddc57dbbeb2": {
+          "masculine": "Audio Description Writer",
+          "feminine": "Audio Description Writer",
+          "neutral": "Audio Description Writer"
+        },
+        "r_9f89ae134497": {
+          "masculine": "Film Translator",
+          "feminine": "Film Translator",
+          "neutral": "Film Translator"
+        },
+        "r_6cc875ec3963": {
+          "masculine": "Script Translator",
+          "feminine": "Script Translator",
+          "neutral": "Script Translator"
+        },
+        "r_5947f173deeb": {
+          "masculine": "Subtitle Translation",
+          "feminine": "Subtitle Translation",
+          "neutral": "Subtitle Translation"
+        },
+        "r_7b6a9a537e9a": {
+          "masculine": "Dialogue Translation",
+          "feminine": "Dialogue Translation",
+          "neutral": "Dialogue Translation"
+        },
+        "r_07f1b8537dbc": {
+          "masculine": "Transcript Translation",
+          "feminine": "Transcript Translation",
+          "neutral": "Transcript Translation"
+        },
+        "r_baf097c29e20": {
+          "masculine": "Dialogue List Transcriber",
+          "feminine": "Dialogue List Transcriber",
+          "neutral": "Dialogue List Transcriber"
+        },
+        "r_84f5505f76e2": {
+          "masculine": "Copywriter",
+          "feminine": "Copywriter",
+          "neutral": "Copywriter"
+        },
+        "r_f38e225361bf": {
+          "masculine": "Language Assistant",
+          "feminine": "Language Assistant",
+          "neutral": "Language Assistant"
+        },
+        "r_eda2531fdadf": {
+          "masculine": "Researcher",
+          "feminine": "Researcher",
+          "neutral": "Researcher"
+        },
+        "r_c6e3b618f79f": {
+          "masculine": "Research Assistant",
+          "feminine": "Research Assistant",
+          "neutral": "Research Assistant"
+        },
+        "r_0434302793dc": {
+          "masculine": "Script Coordinator",
+          "feminine": "Script Coordinator",
+          "neutral": "Script Coordinator"
+        },
+        "r_dae3743c6b89": {
+          "masculine": "Script Intern",
+          "feminine": "Script Intern",
+          "neutral": "Script Intern"
+        }
+      },
+      "public-relations": {
+        "r_1860a572354e": {
+          "masculine": "Marketing & PR",
+          "feminine": "Marketing & PR",
+          "neutral": "Marketing & PR"
+        },
+        "r_201f2da74897": {
+          "masculine": "Social Media Manager (Film)",
+          "feminine": "Social Media Manager (Film)",
+          "neutral": "Social Media Manager (Film)"
+        },
+        "r_041271a6a3ee": {
+          "masculine": "Promotions Coordinator",
+          "feminine": "Promotions Coordinator",
+          "neutral": "Promotions Coordinator"
+        }
+      },
+      "sicherheit-sanitaetsdienst": {
+        "r_972d7ff7233a": {
+          "masculine": "Set Medic",
+          "feminine": "Set Medic",
+          "neutral": "Set Medic"
+        },
+        "r_deefff77f871": {
+          "masculine": "Emergency Medical Technician",
+          "feminine": "Emergency Medical Technician",
+          "neutral": "Emergency Medical Technician"
+        },
+        "r_63a9f32e6a72": {
+          "masculine": "Occupational First Aid Medic",
+          "feminine": "Occupational First Aid Medic",
+          "neutral": "Occupational First Aid Medic"
+        },
+        "r_550de11c2d96": {
+          "masculine": "Fire Watch / Fire Safety Watch",
+          "feminine": "Fire Watch / Fire Safety Watch",
+          "neutral": "Fire Watch / Fire Safety Watch"
+        },
+        "r_427dc70aedd7": {
+          "masculine": "Fire Safety Assistant",
+          "feminine": "Fire Safety Assistant",
+          "neutral": "Fire Safety Assistant"
+        },
+        "r_a3247768d472": {
+          "masculine": "Fire Safety Officer",
+          "feminine": "Fire Safety Officer",
+          "neutral": "Fire Safety Officer"
+        }
+      },
+      "catering-setverpflegung": {
+        "r_330e10f94b8f": {
+          "masculine": "Catering Manager",
+          "feminine": "Catering Manager",
+          "neutral": "Catering Manager"
+        },
+        "r_2fe8f1ac7f90": {
+          "masculine": "Set Cook / Chef",
+          "feminine": "Set Cook / Chef",
+          "neutral": "Set Cook / Chef"
+        },
+        "r_463cca2307e9": {
+          "masculine": "Catering Assistant / Kitchen Assistant",
+          "feminine": "Catering Assistant / Kitchen Assistant",
+          "neutral": "Catering Assistant / Kitchen Assistant"
+        },
+        "r_e114754d9175": {
+          "masculine": "Craft Service",
+          "feminine": "Craft Service",
+          "neutral": "Craft Service"
+        },
+        "r_cb6d56c18bf6": {
+          "masculine": "Set Catering / Food Service Attendant",
+          "feminine": "Set Catering / Food Service Attendant",
+          "neutral": "Set Catering / Food Service Attendant"
+        },
+        "r_532adc563b66": {
+          "masculine": "Catering / Mobile Kitchen Driver",
+          "feminine": "Catering / Mobile Kitchen Driver",
+          "neutral": "Catering / Mobile Kitchen Driver"
+        }
+      },
+      "filmtiere-tiertraining": {
+        "r_3d8ab6fb2c6a": {
+          "masculine": "Film animal trainer",
+          "feminine": "Film animal trainer",
+          "neutral": "Film animal trainer"
+        },
+        "r_654c33dc9c6b": {
+          "masculine": "Film dog trainer",
+          "feminine": "Film dog trainer",
+          "neutral": "Film dog trainer"
+        },
+        "r_40758f075d18": {
+          "masculine": "Animal handler",
+          "feminine": "Animal handler",
+          "neutral": "Animal handler"
+        },
+        "r_7a1591b96b3a": {
+          "masculine": "Animal coordinator",
+          "feminine": "Animal coordinator",
+          "neutral": "Animal coordinator"
+        },
+        "r_a63695a566c3": {
+          "masculine": "On-set animal carer",
+          "feminine": "On-set animal carer",
+          "neutral": "On-set animal carer"
+        },
+        "r_9faf951b627e": {
+          "masculine": "Horse Master",
+          "feminine": "Horse Master",
+          "neutral": "Horse Master"
+        },
+        "r_7c4f137defec": {
+          "masculine": "Assistant Horse Master",
+          "feminine": "Assistant Horse Master",
+          "neutral": "Assistant Horse Master"
+        },
+        "r_8e8f21cf0303": {
+          "masculine": "Film horse trainer",
+          "feminine": "Film horse trainer",
+          "neutral": "Film horse trainer"
+        },
+        "r_35f9ffa503c4": {
+          "masculine": "Horse Wrangler",
+          "feminine": "Horse Wrangler",
+          "neutral": "Horse Wrangler"
+        }
+      }
     }
   },
   "TransactionalEmail": {
@@ -8454,5 +13363,13 @@
     "noMatches": "You have not saved anything in this section yet.",
     "signInHint": "Sign in to see your saved items.",
     "removeItem": "Remove {name} from saved items"
+  },
+  "OccupationForm": {
+    "title": "Wording of your occupations",
+    "help": "Choose how your occupation titles are displayed. You can change this at any time.",
+    "standard": "Standard",
+    "masculine": "Masculine form",
+    "feminine": "Feminine form",
+    "neutral": "Neutral form"
   }
 }

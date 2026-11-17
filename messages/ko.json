@@ -1701,7 +1701,54 @@
     "previewNotice": "이 동물 포트폴리오는 승인 대기 중이며 보호된 미리보기로만 볼 수 있습니다.",
     "count": "동물 수 (선택 사항)",
     "handler": "트레이너 또는 핸들러 감독 예정",
-    "delivery": "촬영장까지 운송 가능"
+    "delivery": "촬영장까지 운송 가능",
+    "roleForms": {
+      "tiertrainer": {
+        "masculine": "영상 촬영용 동물 훈련사",
+        "feminine": "영상 촬영용 동물 훈련사",
+        "neutral": "영상 촬영용 동물 훈련사"
+      },
+      "filmhundetrainer": {
+        "masculine": "영화 촬영용 개 훈련사",
+        "feminine": "영화 촬영용 개 훈련사",
+        "neutral": "영화 촬영용 개 훈련사"
+      },
+      "tierbetreuer": {
+        "masculine": "동물 핸들러",
+        "feminine": "동물 핸들러",
+        "neutral": "동물 핸들러"
+      },
+      "tierkoordination": {
+        "masculine": "동물 코디네이터",
+        "feminine": "동물 코디네이터",
+        "neutral": "동물 코디네이터"
+      },
+      "set-tierbetreuung": {
+        "masculine": "촬영장 동물 관리 담당자",
+        "feminine": "촬영장 동물 관리 담당자",
+        "neutral": "촬영장 동물 관리 담당자"
+      },
+      "horse-master": {
+        "masculine": "말 총괄 (Horse Master)",
+        "feminine": "말 총괄 (Horse Master)",
+        "neutral": "말 총괄 (Horse Master)"
+      },
+      "assistant-horse-master": {
+        "masculine": "말 총괄 보조",
+        "feminine": "말 총괄 보조",
+        "neutral": "말 총괄 보조"
+      },
+      "horse-trainer": {
+        "masculine": "영화 촬영용 말 훈련사",
+        "feminine": "영화 촬영용 말 훈련사",
+        "neutral": "영화 촬영용 말 훈련사"
+      },
+      "horse-wrangler": {
+        "masculine": "말 핸들러 (Horse Wrangler)",
+        "feminine": "말 핸들러 (Horse Wrangler)",
+        "neutral": "말 핸들러 (Horse Wrangler)"
+      }
+    }
   },
   "MarketplaceCatalog": {
     "categories": {
@@ -6145,9 +6192,9 @@
       },
       "licht": {
         "r_222be04dbf00": "개퍼",
-        "r_1e210e69039a": "조명 팀장 보조 (Best Boy / Best Girl Electric)",
+        "r_1e210e69039a": "조명 팀장 보조",
         "r_14dd174cd76c": "리깅 개퍼",
-        "r_92137802b24a": "사전 설치 조명 팀장 보조 (Rigging Best Boy / Rigging Best Girl Electric)",
+        "r_92137802b24a": "사전 설치 조명 팀장 보조",
         "r_7fce7d6fcf12": "리깅 전기 기술자",
         "r_1bcf9d8d9b03": "전기 기술자 / 조명 기술자",
         "r_d95b919dded9": "수석 조명 기술자",
@@ -6167,13 +6214,13 @@
       },
       "grip": {
         "r_470156bd03e4": "키 그립",
-        "r_cfbf2a22ed6e": "그립 팀장 보조 (Best Boy / Best Girl Grip)",
+        "r_cfbf2a22ed6e": "그립 팀장 보조",
         "r_32a6ab31b1a1": "돌리 그립 / 돌리 운영자",
         "r_376dc1f790b8": "그립",
         "r_dbfaadb8821c": "그립 보조",
         "r_46dab52c1995": "리깅 그립",
         "r_ea7e925bd850": "리깅 키 그립",
-        "r_fa9d72fc7978": "사전 설치 그립 팀장 보조 (Rigging Best Boy / Rigging Best Girl Grip)",
+        "r_fa9d72fc7978": "사전 설치 그립 팀장 보조",
         "r_2fa0b44342d7": "특수 그립 구조물",
         "r_08c07afebb7f": "카메라 크레인 / 지브 운영자",
         "r_5ece318b289f": "카메라 크레인 기술자",
@@ -6979,6 +7026,4868 @@
       "x_907c602b417d": "온라인 & 디지털",
       "x_f4581b3b4f89": "웹사이트, 플랫폼, 스트리밍",
       "x_d06f18dfc1af": "기타 영화 서비스"
+    },
+    "roleForms": {
+      "produktion": {
+        "r_d479a6d8637e": {
+          "masculine": "프로듀서",
+          "feminine": "프로듀서",
+          "neutral": "프로듀서"
+        },
+        "r_86ca6f7fac85": {
+          "masculine": "총괄 프로듀서",
+          "feminine": "총괄 프로듀서",
+          "neutral": "총괄 프로듀서"
+        },
+        "r_9b38cf86cffe": {
+          "masculine": "공동 프로듀서",
+          "feminine": "공동 프로듀서",
+          "neutral": "공동 프로듀서"
+        },
+        "r_bd2e1cd12f54": {
+          "masculine": "어소시에이트 프로듀서",
+          "feminine": "어소시에이트 프로듀서",
+          "neutral": "어소시에이트 프로듀서"
+        },
+        "r_bc840a4895a2": {
+          "masculine": "주니어 프로듀서",
+          "feminine": "주니어 프로듀서",
+          "neutral": "주니어 프로듀서"
+        },
+        "r_ebaa595e4927": {
+          "masculine": "라인 프로듀서",
+          "feminine": "라인 프로듀서",
+          "neutral": "라인 프로듀서"
+        },
+        "r_9f722922fe7b": {
+          "masculine": "프로덕션 책임자 (HL)",
+          "feminine": "프로덕션 책임자 (HL)",
+          "neutral": "프로덕션 책임자 (HL)"
+        },
+        "r_7fdd4fd31143": {
+          "masculine": "프로덕션 매니지먼트 어시스턴트",
+          "feminine": "프로덕션 매니지먼트 어시스턴트",
+          "neutral": "프로덕션 매니지먼트 어시스턴트"
+        },
+        "r_c8c7f4cd576e": {
+          "masculine": "프로덕션 매니저 (PL)",
+          "feminine": "프로덕션 매니저 (PL)",
+          "neutral": "프로덕션 매니저 (PL)"
+        },
+        "r_edde7bed564a": {
+          "masculine": "프로덕션 매니저 (방송사)",
+          "feminine": "프로덕션 매니저 (방송사)",
+          "neutral": "프로덕션 매니저 (방송사)"
+        },
+        "r_08532652fb27": {
+          "masculine": "프로덕션 매니저 어시스턴트",
+          "feminine": "프로덕션 매니저 어시스턴트",
+          "neutral": "프로덕션 매니저 어시스턴트"
+        },
+        "r_a8ccedf1c4fc": {
+          "masculine": "프로덕션 스케줄러 / 플래너",
+          "feminine": "프로덕션 스케줄러 / 플래너",
+          "neutral": "프로덕션 스케줄러 / 플래너"
+        },
+        "r_73ab62cc6ea9": {
+          "masculine": "프로덕션 예산 준비",
+          "feminine": "프로덕션 예산 준비",
+          "neutral": "프로덕션 예산 준비"
+        },
+        "r_5e8f13168720": {
+          "masculine": "프로덕션 감독",
+          "feminine": "프로덕션 감독",
+          "neutral": "프로덕션 감독"
+        },
+        "r_a8aaf07776e6": {
+          "masculine": "프로덕션 감독 어시스턴트",
+          "feminine": "프로덕션 감독 어시스턴트",
+          "neutral": "프로덕션 감독 어시스턴트"
+        },
+        "r_86a64b938274": {
+          "masculine": "스튜디오 매니저",
+          "feminine": "스튜디오 매니저",
+          "neutral": "스튜디오 매니저"
+        },
+        "r_1dc3e15735f4": {
+          "masculine": "프로덕션 코디네이터",
+          "feminine": "프로덕션 코디네이터",
+          "neutral": "프로덕션 코디네이터"
+        },
+        "r_3d2828618f01": {
+          "masculine": "프로덕션 코디네이터 어시스턴트",
+          "feminine": "프로덕션 코디네이터 어시스턴트",
+          "neutral": "프로덕션 코디네이터 어시스턴트"
+        },
+        "r_b7b1c24b3218": {
+          "masculine": "프로덕션 어시스턴트 (세트)",
+          "feminine": "프로덕션 어시스턴트 (세트)",
+          "neutral": "프로덕션 어시스턴트 (세트)"
+        },
+        "r_504614327108": {
+          "masculine": "프로덕션 어시스턴트 (사무실)",
+          "feminine": "프로덕션 어시스턴트 (사무실)",
+          "neutral": "프로덕션 어시스턴트 (사무실)"
+        },
+        "r_b1c1be59d3fb": {
+          "masculine": "세컨드 프로덕션 어시스턴트",
+          "feminine": "세컨드 프로덕션 어시스턴트",
+          "neutral": "세컨드 프로덕션 어시스턴트"
+        },
+        "r_e9fe06329d79": {
+          "masculine": "팀 어시스턴트",
+          "feminine": "팀 어시스턴트",
+          "neutral": "팀 어시스턴트"
+        },
+        "r_caad7ad378e8": {
+          "masculine": "개인 비서",
+          "feminine": "개인 비서",
+          "neutral": "개인 비서"
+        },
+        "r_9b9ea0970d1e": {
+          "masculine": "프로덕션 개인 비서",
+          "feminine": "프로덕션 개인 비서",
+          "neutral": "프로덕션 개인 비서"
+        },
+        "r_22ca8fe2e611": {
+          "masculine": "출연진 개인 비서",
+          "feminine": "출연진 개인 비서",
+          "neutral": "출연진 개인 비서"
+        },
+        "r_bdfbe6854805": {
+          "masculine": "프로듀서 어시스턴트",
+          "feminine": "프로듀서 어시스턴트",
+          "neutral": "프로듀서 어시스턴트"
+        },
+        "r_d894e33cd89e": {
+          "masculine": "총괄 비서",
+          "feminine": "총괄 비서",
+          "neutral": "총괄 비서"
+        },
+        "r_bdc2cdf19051": {
+          "masculine": "사무 보조",
+          "feminine": "사무 보조",
+          "neutral": "사무 보조"
+        },
+        "r_328519d70fd2": {
+          "masculine": "숙박 코디네이터",
+          "feminine": "숙박 코디네이터",
+          "neutral": "숙박 코디네이터"
+        },
+        "r_6747956824f3": {
+          "masculine": "여행 코디네이터",
+          "feminine": "여행 코디네이터",
+          "neutral": "여행 코디네이터"
+        },
+        "r_b809fe7525be": {
+          "masculine": "여행 코디네이터 어시스턴트",
+          "feminine": "여행 코디네이터 어시스턴트",
+          "neutral": "여행 코디네이터 어시스턴트"
+        },
+        "r_86c92e0bfce0": {
+          "masculine": "안전 및 보건 코디네이터",
+          "feminine": "안전 및 보건 코디네이터",
+          "neutral": "안전 및 보건 코디네이터"
+        },
+        "r_14cee2575cf1": {
+          "masculine": "ADR 코디네이터",
+          "feminine": "ADR 코디네이터",
+          "neutral": "ADR 코디네이터"
+        },
+        "r_92286a252903": {
+          "masculine": "로케이션 매니저",
+          "feminine": "로케이션 매니저",
+          "neutral": "로케이션 매니저"
+        },
+        "r_fc08fa159e6a": {
+          "masculine": "로케이션 스카우트",
+          "feminine": "로케이션 스카우트",
+          "neutral": "로케이션 스카우트"
+        },
+        "r_e5215fd85f99": {
+          "masculine": "추가 로케이션 스카우트",
+          "feminine": "추가 로케이션 스카우트",
+          "neutral": "추가 로케이션 스카우트"
+        },
+        "r_9454a017e69a": {
+          "masculine": "로케이션 스카우트 어시스턴트",
+          "feminine": "로케이션 스카우트 어시스턴트",
+          "neutral": "로케이션 스카우트 어시스턴트"
+        },
+        "r_0d7a23f6a056": {
+          "masculine": "로케이션 코디네이터",
+          "feminine": "로케이션 코디네이터",
+          "neutral": "로케이션 코디네이터"
+        },
+        "r_11bbfbf26e46": {
+          "masculine": "출연진 코디네이터",
+          "feminine": "출연진 코디네이터",
+          "neutral": "출연진 코디네이터"
+        },
+        "r_155f85cc8157": {
+          "masculine": "유닛 매니저",
+          "feminine": "유닛 매니저",
+          "neutral": "유닛 매니저"
+        },
+        "r_475eba080a17": {
+          "masculine": "코로나19 코디네이터",
+          "feminine": "코로나19 코디네이터",
+          "neutral": "코로나19 코디네이터"
+        },
+        "r_a60ca701fcab": {
+          "masculine": "코로나19 코디네이터 어시스턴트",
+          "feminine": "코로나19 코디네이터 어시스턴트",
+          "neutral": "코로나19 코디네이터 어시스턴트"
+        },
+        "r_87a049b62039": {
+          "masculine": "로케이션 유닛 매니저",
+          "feminine": "로케이션 유닛 매니저",
+          "neutral": "로케이션 유닛 매니저"
+        },
+        "r_5b93948ca9fc": {
+          "masculine": "로케이션 유닛 매니저 어시스턴트",
+          "feminine": "로케이션 유닛 매니저 어시스턴트",
+          "neutral": "로케이션 유닛 매니저 어시스턴트"
+        },
+        "r_8a0cbf242686": {
+          "masculine": "크루 스케줄러",
+          "feminine": "크루 스케줄러",
+          "neutral": "크루 스케줄러"
+        },
+        "r_286fb0baa150": {
+          "masculine": "운송 코디네이터",
+          "feminine": "운송 코디네이터",
+          "neutral": "운송 코디네이터"
+        },
+        "r_8e7b74f8a60b": {
+          "masculine": "운송 코디네이터 어시스턴트",
+          "feminine": "운송 코디네이터 어시스턴트",
+          "neutral": "운송 코디네이터 어시스턴트"
+        },
+        "r_940718151db8": {
+          "masculine": "운송 책임자",
+          "feminine": "운송 책임자",
+          "neutral": "운송 책임자"
+        },
+        "r_34e7de86b42e": {
+          "masculine": "유닛 매니저 (1st AD)",
+          "feminine": "유닛 매니저 (1st AD)",
+          "neutral": "유닛 매니저 (1st AD)"
+        },
+        "r_2492443d2786": {
+          "masculine": "세트 유닛 매니저",
+          "feminine": "세트 유닛 매니저",
+          "neutral": "세트 유닛 매니저"
+        },
+        "r_e9593d0ce404": {
+          "masculine": "3rd AD / 군중 AD",
+          "feminine": "3rd AD / 군중 AD",
+          "neutral": "3rd AD / 군중 AD"
+        },
+        "r_4492528d7f86": {
+          "masculine": "기본 유닛 매니저",
+          "feminine": "기본 유닛 매니저",
+          "neutral": "기본 유닛 매니저"
+        },
+        "r_eaee2c8a1b89": {
+          "masculine": "운전사 책임자",
+          "feminine": "운전사 책임자",
+          "neutral": "운전사 책임자"
+        },
+        "r_1e792192a593": {
+          "masculine": "스튜디오 유닛 매니저",
+          "feminine": "스튜디오 유닛 매니저",
+          "neutral": "스튜디오 유닛 매니저"
+        },
+        "r_453722f35b4e": {
+          "masculine": "락 오프 매니저",
+          "feminine": "락 오프 매니저",
+          "neutral": "락 오프 매니저"
+        },
+        "r_01cf9ccbf27d": {
+          "masculine": "세컨드 유닛 매니저 (쇼/방송)",
+          "feminine": "세컨드 유닛 매니저 (쇼/방송)",
+          "neutral": "세컨드 유닛 매니저 (쇼/방송)"
+        },
+        "r_282e1b7d8f09": {
+          "masculine": "유닛 이동 코디네이터",
+          "feminine": "유닛 이동 코디네이터",
+          "neutral": "유닛 이동 코디네이터"
+        },
+        "r_8016e2e4e662": {
+          "masculine": "유닛 매니저 어시스턴트",
+          "feminine": "유닛 매니저 어시스턴트",
+          "neutral": "유닛 매니저 어시스턴트"
+        },
+        "r_1fb7a2292310": {
+          "masculine": "1st 유닛 매니저 어시스턴트",
+          "feminine": "1st 유닛 매니저 어시스턴트",
+          "neutral": "1st 유닛 매니저 어시스턴트"
+        },
+        "r_366708fdb0b3": {
+          "masculine": "세트 유닛 매니저 어시스턴트",
+          "feminine": "세트 유닛 매니저 어시스턴트",
+          "neutral": "세트 유닛 매니저 어시스턴트"
+        },
+        "r_d73d495c6d75": {
+          "masculine": "주차 프로덕션 어시스턴트",
+          "feminine": "주차 프로덕션 어시스턴트",
+          "neutral": "주차 프로덕션 어시스턴트"
+        },
+        "r_4ed4cafa632a": {
+          "masculine": "로케이션 차단 / 군중 통제",
+          "feminine": "로케이션 차단 / 군중 통제",
+          "neutral": "로케이션 차단 / 군중 통제"
+        },
+        "r_6fbe7d952889": {
+          "masculine": "세트 러너",
+          "feminine": "세트 러너",
+          "neutral": "세트 러너"
+        },
+        "r_c8d2a6e8ca0f": {
+          "masculine": "프로덕션 운전사",
+          "feminine": "프로덕션 운전사",
+          "neutral": "프로덕션 운전사"
+        },
+        "r_0d9b0abd3608": {
+          "masculine": "개인 운전사",
+          "feminine": "개인 운전사",
+          "neutral": "개인 운전사"
+        },
+        "r_ef2266f5ad5d": {
+          "masculine": "장비 운전사",
+          "feminine": "장비 운전사",
+          "neutral": "장비 운전사"
+        },
+        "r_100be7827daf": {
+          "masculine": "사무실 프로덕션 어시스턴트",
+          "feminine": "사무실 프로덕션 어시스턴트",
+          "neutral": "사무실 프로덕션 어시스턴트"
+        },
+        "r_c24ef6245054": {
+          "masculine": "프로덕션 예산 담당자",
+          "feminine": "프로덕션 예산 담당자",
+          "neutral": "프로덕션 예산 담당자"
+        },
+        "r_e90f5848bfc3": {
+          "masculine": "프로덕션 회계 담당자",
+          "feminine": "프로덕션 회계 담당자",
+          "neutral": "프로덕션 회계 담당자"
+        },
+        "r_c6dc08a47d0d": {
+          "masculine": "영화 재무 관리자",
+          "feminine": "영화 재무 관리자",
+          "neutral": "영화 재무 관리자"
+        },
+        "r_2557c22fb3d7": {
+          "masculine": "그린 컨설턴트 / 지속 가능성 관리자",
+          "feminine": "그린 컨설턴트 / 지속 가능성 관리자",
+          "neutral": "그린 컨설턴트 / 지속 가능성 관리자"
+        },
+        "r_2a6c1d42831e": {
+          "masculine": "제작 인턴",
+          "feminine": "제작 인턴",
+          "neutral": "제작 인턴"
+        },
+        "r_ede69642be01": {
+          "masculine": "세트 유닛 매니저 인턴",
+          "feminine": "세트 유닛 매니저 인턴",
+          "neutral": "세트 유닛 매니저 인턴"
+        },
+        "r_de9ab1a6b55a": {
+          "masculine": "프로덕션 매니저",
+          "feminine": "프로덕션 매니저",
+          "neutral": "프로덕션 매니저"
+        },
+        "r_fd701e2c1e86": {
+          "masculine": "유닛 프로덕션 매니저",
+          "feminine": "유닛 프로덕션 매니저",
+          "neutral": "유닛 프로덕션 매니저"
+        },
+        "r_eb2de9d80eb5": {
+          "masculine": "프로덕션 코디네이터",
+          "feminine": "프로덕션 코디네이터",
+          "neutral": "프로덕션 코디네이터"
+        },
+        "r_14ba71897157": {
+          "masculine": "어시스턴트 프로덕션 코디네이터",
+          "feminine": "어시스턴트 프로덕션 코디네이터",
+          "neutral": "어시스턴트 프로덕션 코디네이터"
+        },
+        "r_9a9272ffef87": {
+          "masculine": "프로덕션 어시스턴트 (PA)",
+          "feminine": "프로덕션 어시스턴트 (PA)",
+          "neutral": "프로덕션 어시스턴트 (PA)"
+        },
+        "r_b37de62fa7b6": {
+          "masculine": "2차 프로덕션 어시스턴트",
+          "feminine": "2차 프로덕션 어시스턴트",
+          "neutral": "2차 프로덕션 어시스턴트"
+        },
+        "r_35a318ed734f": {
+          "masculine": "어시스턴트 여행 코디네이터",
+          "feminine": "어시스턴트 여행 코디네이터",
+          "neutral": "어시스턴트 여행 코디네이터"
+        },
+        "r_282f5f19af6e": {
+          "masculine": "세트 유닛 매니저",
+          "feminine": "세트 유닛 매니저",
+          "neutral": "세트 유닛 매니저"
+        },
+        "r_a1888e7923b1": {
+          "masculine": "프로덕션 비서 / 팀 어시스턴트",
+          "feminine": "프로덕션 비서 / 팀 어시스턴트",
+          "neutral": "프로덕션 비서 / 팀 어시스턴트"
+        },
+        "r_079a221fcd0e": {
+          "masculine": "2차 유닛 매니저 (쇼 / 방송)",
+          "feminine": "2차 유닛 매니저 (쇼 / 방송)",
+          "neutral": "2차 유닛 매니저 (쇼 / 방송)"
+        },
+        "r_c74c78be5dc2": {
+          "masculine": "캐스팅 디렉터",
+          "feminine": "캐스팅 디렉터",
+          "neutral": "캐스팅 디렉터"
+        },
+        "r_b6e7722029a2": {
+          "masculine": "프로덕션 컨트롤러",
+          "feminine": "프로덕션 컨트롤러",
+          "neutral": "프로덕션 컨트롤러"
+        },
+        "r_4e9c5d6d7198": {
+          "masculine": "영화 비즈니스 매니저",
+          "feminine": "영화 비즈니스 매니저",
+          "neutral": "영화 비즈니스 매니저"
+        },
+        "r_907eb6829faf": {
+          "masculine": "회계사",
+          "feminine": "회계사",
+          "neutral": "회계사"
+        },
+        "r_9ef806a95399": {
+          "masculine": "비즈니스 어페어즈 어시스턴트",
+          "feminine": "비즈니스 어페어즈 어시스턴트",
+          "neutral": "비즈니스 어페어즈 어시스턴트"
+        },
+        "r_3365c6d66b72": {
+          "masculine": "출납 / 소액 현금 담당",
+          "feminine": "출납 / 소액 현금 담당",
+          "neutral": "출납 / 소액 현금 담당"
+        },
+        "r_354a33db42c7": {
+          "masculine": "급여 회계사",
+          "feminine": "급여 회계사",
+          "neutral": "급여 회계사"
+        },
+        "r_f3b7a4579d13": {
+          "masculine": "비즈니스 어페어즈 인턴",
+          "feminine": "비즈니스 어페어즈 인턴",
+          "neutral": "비즈니스 어페어즈 인턴"
+        },
+        "r_614a09237466": {
+          "masculine": "프로덕션 전략 책임자",
+          "feminine": "프로덕션 전략 책임자",
+          "neutral": "프로덕션 전략 책임자"
+        },
+        "r_ab2bca044ad5": {
+          "masculine": "개발 책임자",
+          "feminine": "개발 책임자",
+          "neutral": "개발 책임자"
+        },
+        "r_4c6443207ff2": {
+          "masculine": "서비스 프로듀서",
+          "feminine": "서비스 프로듀서",
+          "neutral": "서비스 프로듀서"
+        },
+        "r_f43970f8871f": {
+          "masculine": "프로덕션 임원",
+          "feminine": "프로덕션 임원",
+          "neutral": "프로덕션 임원"
+        },
+        "r_b490dba5695d": {
+          "masculine": "어시스턴트 프로듀서",
+          "feminine": "어시스턴트 프로듀서",
+          "neutral": "어시스턴트 프로듀서"
+        },
+        "r_7b68ca0f0fb6": {
+          "masculine": "TV 프로듀서",
+          "feminine": "TV 프로듀서",
+          "neutral": "TV 프로듀서"
+        },
+        "r_564bd1be967c": {
+          "masculine": "홍보 프로듀서",
+          "feminine": "홍보 프로듀서",
+          "neutral": "홍보 프로듀서"
+        },
+        "r_17e75f09bb7a": {
+          "masculine": "감독 프로듀서",
+          "feminine": "감독 프로듀서",
+          "neutral": "감독 프로듀서"
+        },
+        "r_09bdde75b5c6": {
+          "masculine": "스토리 프로듀서",
+          "feminine": "스토리 프로듀서",
+          "neutral": "스토리 프로듀서"
+        },
+        "r_63333ae7406f": {
+          "masculine": "포스트 스토리 프로듀서",
+          "feminine": "포스트 스토리 프로듀서",
+          "neutral": "포스트 스토리 프로듀서"
+        },
+        "r_1c7b4db06402": {
+          "masculine": "에이전시 / TV 광고 프로듀서",
+          "feminine": "에이전시 / TV 광고 프로듀서",
+          "neutral": "에이전시 / TV 광고 프로듀서"
+        },
+        "r_05c4bc7ca840": {
+          "masculine": "3D 스테레오 프로듀서",
+          "feminine": "3D 스테레오 프로듀서",
+          "neutral": "3D 스테레오 프로듀서"
+        },
+        "r_6221ed87ef22": {
+          "masculine": "3D 스테레오 감독 프로듀서",
+          "feminine": "3D 스테레오 감독 프로듀서",
+          "neutral": "3D 스테레오 감독 프로듀서"
+        },
+        "r_7edb24c15dcf": {
+          "masculine": "웹 TV 프로듀서",
+          "feminine": "웹 TV 프로듀서",
+          "neutral": "웹 TV 프로듀서"
+        },
+        "r_3d984a13d7b5": {
+          "masculine": "크리에이티브 프로듀서",
+          "feminine": "크리에이티브 프로듀서",
+          "neutral": "크리에이티브 프로듀서"
+        },
+        "r_ae0c8b90c8d1": {
+          "masculine": "개발 프로듀서",
+          "feminine": "개발 프로듀서",
+          "neutral": "개발 프로듀서"
+        },
+        "r_d297bfadcae2": {
+          "masculine": "개발 코디네이터",
+          "feminine": "개발 코디네이터",
+          "neutral": "개발 코디네이터"
+        },
+        "r_54f1c9f4d11e": {
+          "masculine": "개발 임원",
+          "feminine": "개발 임원",
+          "neutral": "개발 임원"
+        },
+        "r_f42fa61db712": {
+          "masculine": "부조정실 프로듀서",
+          "feminine": "부조정실 프로듀서",
+          "neutral": "부조정실 프로듀서"
+        },
+        "r_9d8ea4e7c7aa": {
+          "masculine": "조정실 프로듀서 / 온에어 프로듀서",
+          "feminine": "조정실 프로듀서 / 온에어 프로듀서",
+          "neutral": "조정실 프로듀서 / 온에어 프로듀서"
+        },
+        "r_b837afb89817": {
+          "masculine": "온에어 홍보 프로듀서",
+          "feminine": "온에어 홍보 프로듀서",
+          "neutral": "온에어 홍보 프로듀서"
+        },
+        "r_bacc7a4ec265": {
+          "masculine": "저작권 담당",
+          "feminine": "저작권 담당",
+          "neutral": "저작권 담당"
+        },
+        "r_7e0ace38e8fc": {
+          "masculine": "비즈니스 어페어즈",
+          "feminine": "비즈니스 어페어즈",
+          "neutral": "비즈니스 어페어즈"
+        },
+        "r_0daf662f57c6": {
+          "masculine": "비즈니스 및 법무",
+          "feminine": "비즈니스 및 법무",
+          "neutral": "비즈니스 및 법무"
+        },
+        "r_a95b977fa84f": {
+          "masculine": "법무 담당",
+          "feminine": "법무 담당",
+          "neutral": "법무 담당"
+        },
+        "r_0433186beb99": {
+          "masculine": "마케팅 및 배급 프로듀서",
+          "feminine": "마케팅 및 배급 프로듀서",
+          "neutral": "마케팅 및 배급 프로듀서"
+        },
+        "r_07f0060c8996": {
+          "masculine": "프로듀서 인턴",
+          "feminine": "프로듀서 인턴",
+          "neutral": "프로듀서 인턴"
+        }
+      },
+      "regie": {
+        "r_f59d6991c44a": {
+          "masculine": "감독",
+          "feminine": "감독",
+          "neutral": "감독"
+        },
+        "r_5562e3abbb45": {
+          "masculine": "공동 감독",
+          "feminine": "공동 감독",
+          "neutral": "공동 감독"
+        },
+        "r_df7e552a6792": {
+          "masculine": "세컨드 유닛 감독",
+          "feminine": "세컨드 유닛 감독",
+          "neutral": "세컨드 유닛 감독"
+        },
+        "r_0aca88b2853d": {
+          "masculine": "스튜디오 감독",
+          "feminine": "스튜디오 감독",
+          "neutral": "스튜디오 감독"
+        },
+        "r_394140e22c16": {
+          "masculine": "더빙 감독",
+          "feminine": "더빙 감독",
+          "neutral": "더빙 감독"
+        },
+        "r_7d2cd6bd3a73": {
+          "masculine": "비전 감독 (방송)",
+          "feminine": "비전 감독 (방송)",
+          "neutral": "비전 감독 (방송)"
+        },
+        "r_988a573b39e7": {
+          "masculine": "방송 감독",
+          "feminine": "방송 감독",
+          "neutral": "방송 감독"
+        },
+        "r_0719ad7a68ec": {
+          "masculine": "대사 감독",
+          "feminine": "대사 감독",
+          "neutral": "대사 감독"
+        },
+        "r_463462fca2ec": {
+          "masculine": "1차 조감독",
+          "feminine": "1차 조감독",
+          "neutral": "1차 조감독"
+        },
+        "r_de1c193ae4d6": {
+          "masculine": "2차 조감독",
+          "feminine": "2차 조감독",
+          "neutral": "2차 조감독"
+        },
+        "r_c37babd28464": {
+          "masculine": "주요 2차 조감독",
+          "feminine": "주요 2차 조감독",
+          "neutral": "주요 2차 조감독"
+        },
+        "r_2b8bbebafa40": {
+          "masculine": "현장 2차 조감독",
+          "feminine": "현장 2차 조감독",
+          "neutral": "현장 2차 조감독"
+        },
+        "r_b0a3c67c20bf": {
+          "masculine": "군중 2차 조감독",
+          "feminine": "군중 2차 조감독",
+          "neutral": "군중 2차 조감독"
+        },
+        "r_b6640a0bf9b6": {
+          "masculine": "3차 조감독",
+          "feminine": "3차 조감독",
+          "neutral": "3차 조감독"
+        },
+        "r_962cb1546148": {
+          "masculine": "3차 조감독 군중 담당",
+          "feminine": "3차 조감독 군중 담당",
+          "neutral": "3차 조감독 군중 담당"
+        },
+        "r_619aa382d108": {
+          "masculine": "기본 3차 조감독",
+          "feminine": "기본 3차 조감독",
+          "neutral": "기본 3차 조감독"
+        },
+        "r_14816f8e2f93": {
+          "masculine": "현장 3차 조감독",
+          "feminine": "현장 3차 조감독",
+          "neutral": "현장 3차 조감독"
+        },
+        "r_00bb63b14962": {
+          "masculine": "조감독 PA",
+          "feminine": "조감독 PA",
+          "neutral": "조감독 PA"
+        },
+        "r_da45564f42a3": {
+          "masculine": "주요 조감독 PA",
+          "feminine": "주요 조감독 PA",
+          "neutral": "주요 조감독 PA"
+        },
+        "r_d4de545cc559": {
+          "masculine": "조감독 연수생",
+          "feminine": "조감독 연수생",
+          "neutral": "조감독 연수생"
+        },
+        "r_b8f3b216cf72": {
+          "masculine": "군중 마샬",
+          "feminine": "군중 마샬",
+          "neutral": "군중 마샬"
+        },
+        "r_7d061a318612": {
+          "masculine": "어시스턴트 군중 마샬",
+          "feminine": "어시스턴트 군중 마샬",
+          "neutral": "어시스턴트 군중 마샬"
+        },
+        "r_dbf51638d5ed": {
+          "masculine": "스크립트 슈퍼바이저 / 연속성 담당",
+          "feminine": "스크립트 슈퍼바이저 / 연속성 담당",
+          "neutral": "스크립트 슈퍼바이저 / 연속성 담당"
+        },
+        "r_db6f57df190b": {
+          "masculine": "조수 스크립트 슈퍼바이저",
+          "feminine": "조수 스크립트 슈퍼바이저",
+          "neutral": "조수 스크립트 슈퍼바이저"
+        },
+        "r_043751863fa5": {
+          "masculine": "현장 스크립트 감독",
+          "feminine": "현장 스크립트 감독",
+          "neutral": "현장 스크립트 감독"
+        },
+        "r_d7e7e0e56ce6": {
+          "masculine": "스토리보드 아티스트",
+          "feminine": "스토리보드 아티스트",
+          "neutral": "스토리보드 아티스트"
+        },
+        "r_d5f343108ed5": {
+          "masculine": "연기 코치",
+          "feminine": "연기 코치",
+          "neutral": "연기 코치"
+        },
+        "r_8ac3532c0c32": {
+          "masculine": "아동 연기 코치",
+          "feminine": "아동 연기 코치",
+          "neutral": "아동 연기 코치"
+        },
+        "r_bf13c927e8eb": {
+          "masculine": "대사 코치",
+          "feminine": "대사 코치",
+          "neutral": "대사 코치"
+        },
+        "r_82fff9096145": {
+          "masculine": "배경 / 엑스트라 코디네이터",
+          "feminine": "배경 / 엑스트라 코디네이터",
+          "neutral": "배경 / 엑스트라 코디네이터"
+        },
+        "r_e57426b6a805": {
+          "masculine": "조수 엑스트라 코디네이터",
+          "feminine": "조수 엑스트라 코디네이터",
+          "neutral": "조수 엑스트라 코디네이터"
+        },
+        "r_c2b6031ad212": {
+          "masculine": "감독 개인 비서",
+          "feminine": "감독 개인 비서",
+          "neutral": "감독 개인 비서"
+        },
+        "r_1ed956774605": {
+          "masculine": "감독 개인 비서",
+          "feminine": "감독 개인 비서",
+          "neutral": "감독 개인 비서"
+        },
+        "r_7d0bc36aabcb": {
+          "masculine": "연출 인턴",
+          "feminine": "연출 인턴",
+          "neutral": "연출 인턴"
+        },
+        "r_bf4aaefa2f9f": {
+          "masculine": "스크립트 연수생",
+          "feminine": "스크립트 연수생",
+          "neutral": "스크립트 연수생"
+        },
+        "r_45bf2bbe37f0": {
+          "masculine": "현장 PA / 러너",
+          "feminine": "현장 PA / 러너",
+          "neutral": "현장 PA / 러너"
+        },
+        "r_9ced64ab6db5": {
+          "masculine": "1차 조감독 (1st AD)",
+          "feminine": "1차 조감독 (1st AD)",
+          "neutral": "1차 조감독 (1st AD)"
+        },
+        "r_b6ac41792b48": {
+          "masculine": "2차 조감독 (2nd AD)",
+          "feminine": "2차 조감독 (2nd AD)",
+          "neutral": "2차 조감독 (2nd AD)"
+        },
+        "r_6b9cabf3cbca": {
+          "masculine": "스크립트 (현장)",
+          "feminine": "스크립트 (현장)",
+          "neutral": "스크립트 (현장)"
+        },
+        "r_93f52c1c7000": {
+          "masculine": "2차 유닛 감독",
+          "feminine": "2차 유닛 감독",
+          "neutral": "2차 유닛 감독"
+        },
+        "r_591d7faf8f5d": {
+          "masculine": "감독 개인 비서",
+          "feminine": "감독 개인 비서",
+          "neutral": "감독 개인 비서"
+        },
+        "r_c01dd7739f5a": {
+          "masculine": "조수 배경 코디네이터",
+          "feminine": "조수 배경 코디네이터",
+          "neutral": "조수 배경 코디네이터"
+        }
+      },
+      "kamera": {
+        "r_9659ff478da5": {
+          "masculine": "촬영감독 / DoP",
+          "feminine": "촬영감독 / DoP",
+          "neutral": "촬영감독 / DoP"
+        },
+        "r_f1286611f452": {
+          "masculine": "영상 감독",
+          "feminine": "영상 감독",
+          "neutral": "영상 감독"
+        },
+        "r_c519de89c832": {
+          "masculine": "A-카메라 오퍼레이터",
+          "feminine": "A-카메라 오퍼레이터",
+          "neutral": "A-카메라 오퍼레이터"
+        },
+        "r_69b451280549": {
+          "masculine": "B-카메라 오퍼레이터",
+          "feminine": "B-카메라 오퍼레이터",
+          "neutral": "B-카메라 오퍼레이터"
+        },
+        "r_147c6db611ab": {
+          "masculine": "C-카메라 오퍼레이터",
+          "feminine": "C-카메라 오퍼레이터",
+          "neutral": "C-카메라 오퍼레이터"
+        },
+        "r_00ec6018a92f": {
+          "masculine": "ENG 카메라 오퍼레이터 (스튜디오)",
+          "feminine": "ENG 카메라 오퍼레이터 (스튜디오)",
+          "neutral": "ENG 카메라 오퍼레이터 (스튜디오)"
+        },
+        "r_15338319dd09": {
+          "masculine": "ENG/EB 카메라 오퍼레이터",
+          "feminine": "ENG/EB 카메라 오퍼레이터",
+          "neutral": "ENG/EB 카메라 오퍼레이터"
+        },
+        "r_3b00f8763d24": {
+          "masculine": "2차 유닛 카메라 오퍼레이터",
+          "feminine": "2차 유닛 카메라 오퍼레이터",
+          "neutral": "2차 유닛 카메라 오퍼레이터"
+        },
+        "r_2815a6f7d251": {
+          "masculine": "3차 유닛 카메라 오퍼레이터",
+          "feminine": "3차 유닛 카메라 오퍼레이터",
+          "neutral": "3차 유닛 카메라 오퍼레이터"
+        },
+        "r_46bfee3f1077": {
+          "masculine": "1차 AC / 포커스 풀러",
+          "feminine": "1차 AC / 포커스 풀러",
+          "neutral": "1차 AC / 포커스 풀러"
+        },
+        "r_4f6a54aa8672": {
+          "masculine": "2차 AC / 클래퍼 로더",
+          "feminine": "2차 AC / 클래퍼 로더",
+          "neutral": "2차 AC / 클래퍼 로더"
+        },
+        "r_a6d3a38613fa": {
+          "masculine": "클래퍼 로더",
+          "feminine": "클래퍼 로더",
+          "neutral": "클래퍼 로더"
+        },
+        "r_4406ae44f8be": {
+          "masculine": "3차 카메라 어시스턴트",
+          "feminine": "3차 카메라 어시스턴트",
+          "neutral": "3차 카메라 어시스턴트"
+        },
+        "r_a29ed25142f3": {
+          "masculine": "디지털 2차 AC",
+          "feminine": "디지털 2차 AC",
+          "neutral": "디지털 2차 AC"
+        },
+        "r_048d538ee34d": {
+          "masculine": "DIT",
+          "feminine": "DIT",
+          "neutral": "DIT"
+        },
+        "r_c48ad1ee75a7": {
+          "masculine": "DIT 어시스턴트",
+          "feminine": "DIT 어시스턴트",
+          "neutral": "DIT 어시스턴트"
+        },
+        "r_0e473a1887e9": {
+          "masculine": "스테디캠 오퍼레이터",
+          "feminine": "스테디캠 오퍼레이터",
+          "neutral": "스테디캠 오퍼레이터"
+        },
+        "r_1d7535202c92": {
+          "masculine": "스테디캠 어시스턴트",
+          "feminine": "스테디캠 어시스턴트",
+          "neutral": "스테디캠 어시스턴트"
+        },
+        "r_baee8ff4a63f": {
+          "masculine": "짐벌 시스템 오퍼레이터",
+          "feminine": "짐벌 시스템 오퍼레이터",
+          "neutral": "짐벌 시스템 오퍼레이터"
+        },
+        "r_569d248c1dfd": {
+          "masculine": "드론 조종사 / 드론 오퍼레이터",
+          "feminine": "드론 조종사 / 드론 오퍼레이터",
+          "neutral": "드론 조종사 / 드론 오퍼레이터"
+        },
+        "r_3ca1ad3e14b2": {
+          "masculine": "카메라 드론 오퍼레이터",
+          "feminine": "카메라 드론 오퍼레이터",
+          "neutral": "카메라 드론 오퍼레이터"
+        },
+        "r_c2ff9d51c86a": {
+          "masculine": "카메라 드론 조종사",
+          "feminine": "카메라 드론 조종사",
+          "neutral": "카메라 드론 조종사"
+        },
+        "r_0502b3c5dec3": {
+          "masculine": "카메라 카 드라이버",
+          "feminine": "카메라 카 드라이버",
+          "neutral": "카메라 카 드라이버"
+        },
+        "r_a3fa606ea916": {
+          "masculine": "비행기 조종사 (항공 촬영)",
+          "feminine": "비행기 조종사 (항공 촬영)",
+          "neutral": "비행기 조종사 (항공 촬영)"
+        },
+        "r_05d7d18da0c4": {
+          "masculine": "헬리콥터 조종사 (항공 촬영)",
+          "feminine": "헬리콥터 조종사 (항공 촬영)",
+          "neutral": "헬리콥터 조종사 (항공 촬영)"
+        },
+        "r_32e8a90fee3b": {
+          "masculine": "스파이더캠 조종사",
+          "feminine": "스파이더캠 조종사",
+          "neutral": "스파이더캠 조종사"
+        },
+        "r_c4b0d3dfb7d8": {
+          "masculine": "카메라 드론 어시스턴트",
+          "feminine": "카메라 드론 어시스턴트",
+          "neutral": "카메라 드론 어시스턴트"
+        },
+        "r_86c7b305ba77": {
+          "masculine": "원격 카메라 오퍼레이터",
+          "feminine": "원격 카메라 오퍼레이터",
+          "neutral": "원격 카메라 오퍼레이터"
+        },
+        "r_386b1f9db2c1": {
+          "masculine": "원격 헤드 오퍼레이터",
+          "feminine": "원격 헤드 오퍼레이터",
+          "neutral": "원격 헤드 오퍼레이터"
+        },
+        "r_1490637c95ed": {
+          "masculine": "항공 카메라 오퍼레이터",
+          "feminine": "항공 카메라 오퍼레이터",
+          "neutral": "항공 카메라 오퍼레이터"
+        },
+        "r_76c05f6fba78": {
+          "masculine": "항공기 간 촬영 오퍼레이터",
+          "feminine": "항공기 간 촬영 오퍼레이터",
+          "neutral": "항공기 간 촬영 오퍼레이터"
+        },
+        "r_b59f3c08153b": {
+          "masculine": "고속 카메라 오퍼레이터",
+          "feminine": "고속 카메라 오퍼레이터",
+          "neutral": "고속 카메라 오퍼레이터"
+        },
+        "r_f6e99ab3d5dd": {
+          "masculine": "ARRI 트리니티 오퍼레이터",
+          "feminine": "ARRI 트리니티 오퍼레이터",
+          "neutral": "ARRI 트리니티 오퍼레이터"
+        },
+        "r_953bc24b7077": {
+          "masculine": "케이블캠 오퍼레이터",
+          "feminine": "케이블캠 오퍼레이터",
+          "neutral": "케이블캠 오퍼레이터"
+        },
+        "r_e834e506e54b": {
+          "masculine": "폴캠 오퍼레이터",
+          "feminine": "폴캠 오퍼레이터",
+          "neutral": "폴캠 오퍼레이터"
+        },
+        "r_b7ea35e3f38d": {
+          "masculine": "로드캠 오퍼레이터",
+          "feminine": "로드캠 오퍼레이터",
+          "neutral": "로드캠 오퍼레이터"
+        },
+        "r_3531de1d9278": {
+          "masculine": "모션 컨트롤 오퍼레이터",
+          "feminine": "모션 컨트롤 오퍼레이터",
+          "neutral": "모션 컨트롤 오퍼레이터"
+        },
+        "r_edf22fe94ff4": {
+          "masculine": "모션 컨트롤 어시스턴트",
+          "feminine": "모션 컨트롤 어시스턴트",
+          "neutral": "모션 컨트롤 어시스턴트"
+        },
+        "r_7be83f893235": {
+          "masculine": "라이브 카메라 오퍼레이터",
+          "feminine": "라이브 카메라 오퍼레이터",
+          "neutral": "라이브 카메라 오퍼레이터"
+        },
+        "r_8d0fa92d5c06": {
+          "masculine": "VR 촬영감독",
+          "feminine": "VR 촬영감독",
+          "neutral": "VR 촬영감독"
+        },
+        "r_e4f1f8410ee1": {
+          "masculine": "VR 카메라 오퍼레이터",
+          "feminine": "VR 카메라 오퍼레이터",
+          "neutral": "VR 카메라 오퍼레이터"
+        },
+        "r_fe4955d24d9d": {
+          "masculine": "3D 스테레오 카메라 오퍼레이터",
+          "feminine": "3D 스테레오 카메라 오퍼레이터",
+          "neutral": "3D 스테레오 카메라 오퍼레이터"
+        },
+        "r_63d8f7ae5c77": {
+          "masculine": "3D 스테레오 컨버전스 오퍼레이터",
+          "feminine": "3D 스테레오 컨버전스 오퍼레이터",
+          "neutral": "3D 스테레오 컨버전스 오퍼레이터"
+        },
+        "r_5d780d27f437": {
+          "masculine": "입체 촬영 기술자",
+          "feminine": "입체 촬영 기술자",
+          "neutral": "입체 촬영 기술자"
+        },
+        "r_0350366ccf64": {
+          "masculine": "입체 촬영 감독",
+          "feminine": "입체 촬영 감독",
+          "neutral": "입체 촬영 감독"
+        },
+        "r_892df5d9ed45": {
+          "masculine": "2차 유닛 입체 촬영 감독",
+          "feminine": "2차 유닛 입체 촬영 감독",
+          "neutral": "2차 유닛 입체 촬영 감독"
+        },
+        "r_87b9b49ccc72": {
+          "masculine": "입체 촬영 감독 보조",
+          "feminine": "입체 촬영 감독 보조",
+          "neutral": "입체 촬영 감독 보조"
+        },
+        "r_503758a49393": {
+          "masculine": "수중 카메라 오퍼레이터",
+          "feminine": "수중 카메라 오퍼레이터",
+          "neutral": "수중 카메라 오퍼레이터"
+        },
+        "r_ad809b37ab32": {
+          "masculine": "수중 카메라 어시스턴트",
+          "feminine": "수중 카메라 어시스턴트",
+          "neutral": "수중 카메라 어시스턴트"
+        },
+        "r_fdaafaca34cb": {
+          "masculine": "프리폴 / 스카이다이브 카메라 오퍼레이터",
+          "feminine": "프리폴 / 스카이다이브 카메라 오퍼레이터",
+          "neutral": "프리폴 / 스카이다이브 카메라 오퍼레이터"
+        },
+        "r_6fd521b70caf": {
+          "masculine": "드라이테크",
+          "feminine": "드라이테크",
+          "neutral": "드라이테크"
+        },
+        "r_7a8573f394c1": {
+          "masculine": "데이터 코디네이터",
+          "feminine": "데이터 코디네이터",
+          "neutral": "데이터 코디네이터"
+        },
+        "r_59c04d8b3609": {
+          "masculine": "데이터 코디네이터 / 디지털 로더",
+          "feminine": "데이터 코디네이터 / 디지털 로더",
+          "neutral": "데이터 코디네이터 / 디지털 로더"
+        },
+        "r_1b6d2deeae11": {
+          "masculine": "미디어 매니저",
+          "feminine": "미디어 매니저",
+          "neutral": "미디어 매니저"
+        },
+        "r_bfd5ad0745cb": {
+          "masculine": "비디오 어시스트 오퍼레이터",
+          "feminine": "비디오 어시스트 오퍼레이터",
+          "neutral": "비디오 어시스트 오퍼레이터"
+        },
+        "r_ab65480d38bf": {
+          "masculine": "비디오 어시스트 유틸리티",
+          "feminine": "비디오 어시스트 유틸리티",
+          "neutral": "비디오 어시스트 유틸리티"
+        },
+        "r_44cbe06f7edd": {
+          "masculine": "크래시 박스 운영자",
+          "feminine": "크래시 박스 운영자",
+          "neutral": "크래시 박스 운영자"
+        },
+        "r_ff391e554ef1": {
+          "masculine": "비디오 운영자",
+          "feminine": "비디오 운영자",
+          "neutral": "비디오 운영자"
+        },
+        "r_04b8806e4aea": {
+          "masculine": "Qtake 운영자",
+          "feminine": "Qtake 운영자",
+          "neutral": "Qtake 운영자"
+        },
+        "r_881fbad171dd": {
+          "masculine": "비디오 운영 보조",
+          "feminine": "비디오 운영 보조",
+          "neutral": "비디오 운영 보조"
+        },
+        "r_e8b3776feee3": {
+          "masculine": "재생 운영자",
+          "feminine": "재생 운영자",
+          "neutral": "재생 운영자"
+        },
+        "r_2cd28c233eb0": {
+          "masculine": "ENG 보조 (영상 및 음향)",
+          "feminine": "ENG 보조 (영상 및 음향)",
+          "neutral": "ENG 보조 (영상 및 음향)"
+        },
+        "r_aaf320fee04d": {
+          "masculine": "ENG 기술자 (영상 및 음향)",
+          "feminine": "ENG 기술자 (영상 및 음향)",
+          "neutral": "ENG 기술자 (영상 및 음향)"
+        },
+        "r_6c484917c545": {
+          "masculine": "카메라 보조 (논픽션)",
+          "feminine": "카메라 보조 (논픽션)",
+          "neutral": "카메라 보조 (논픽션)"
+        },
+        "r_c071a417cdf8": {
+          "masculine": "데이터 캡처 엔지니어",
+          "feminine": "데이터 캡처 엔지니어",
+          "neutral": "데이터 캡처 엔지니어"
+        },
+        "r_ff3821a892d3": {
+          "masculine": "리어 프로젝션 플레이트 운영자",
+          "feminine": "리어 프로젝션 플레이트 운영자",
+          "neutral": "리어 프로젝션 플레이트 운영자"
+        },
+        "r_e160ca78eefe": {
+          "masculine": "카메라 기술자",
+          "feminine": "카메라 기술자",
+          "neutral": "카메라 기술자"
+        },
+        "r_b2a908032997": {
+          "masculine": "카메라 인턴",
+          "feminine": "카메라 인턴",
+          "neutral": "카메라 인턴"
+        },
+        "r_20c91979a5fc": {
+          "masculine": "카메라 운영자",
+          "feminine": "카메라 운영자",
+          "neutral": "카메라 운영자"
+        },
+        "r_3008a154e7ef": {
+          "masculine": "드론 운영자 / 항공 촬영 감독",
+          "feminine": "드론 운영자 / 항공 촬영 감독",
+          "neutral": "드론 운영자 / 항공 촬영 감독"
+        },
+        "r_ee4208621795": {
+          "masculine": "추가 카메라 운영자",
+          "feminine": "추가 카메라 운영자",
+          "neutral": "추가 카메라 운영자"
+        },
+        "r_59f7261be55a": {
+          "masculine": "수중 카메라 운영자",
+          "feminine": "수중 카메라 운영자",
+          "neutral": "수중 카메라 운영자"
+        },
+        "r_6767d1f92822": {
+          "masculine": "모션 컨트롤 카메라 운영자",
+          "feminine": "모션 컨트롤 카메라 운영자",
+          "neutral": "모션 컨트롤 카메라 운영자"
+        },
+        "r_15047c5a622a": {
+          "masculine": "카메라 드론 보조/기술자",
+          "feminine": "카메라 드론 보조/기술자",
+          "neutral": "카메라 드론 보조/기술자"
+        },
+        "r_7b6aa965b572": {
+          "masculine": "1st 카메라 보조",
+          "feminine": "1st 카메라 보조",
+          "neutral": "1st 카메라 보조"
+        },
+        "r_403c761ac7c7": {
+          "masculine": "ENG 보조 (카메라/음향)",
+          "feminine": "ENG 보조 (카메라/음향)",
+          "neutral": "ENG 보조 (카메라/음향)"
+        },
+        "r_6170f09c0f17": {
+          "masculine": "ENG 기술자 (카메라/음향)",
+          "feminine": "ENG 기술자 (카메라/음향)",
+          "neutral": "ENG 기술자 (카메라/음향)"
+        },
+        "r_6a6303b77029": {
+          "masculine": "스틸 사진작가",
+          "feminine": "스틸 사진작가",
+          "neutral": "스틸 사진작가"
+        }
+      },
+      "licht": {
+        "r_222be04dbf00": {
+          "masculine": "개퍼",
+          "feminine": "개퍼",
+          "neutral": "개퍼"
+        },
+        "r_1e210e69039a": {
+          "masculine": "조명 팀장 보조 (Best Boy Electric)",
+          "feminine": "조명 팀장 보조 (Best Girl Electric)",
+          "neutral": "조명 팀장 보조"
+        },
+        "r_14dd174cd76c": {
+          "masculine": "리깅 개퍼",
+          "feminine": "리깅 개퍼",
+          "neutral": "리깅 개퍼"
+        },
+        "r_92137802b24a": {
+          "masculine": "사전 설치 조명 팀장 보조 (Rigging Best Boy Electric)",
+          "feminine": "사전 설치 조명 팀장 보조 (Rigging Best Girl Electric)",
+          "neutral": "사전 설치 조명 팀장 보조"
+        },
+        "r_7fce7d6fcf12": {
+          "masculine": "리깅 전기 기술자",
+          "feminine": "리깅 전기 기술자",
+          "neutral": "리깅 전기 기술자"
+        },
+        "r_1bcf9d8d9b03": {
+          "masculine": "전기 기술자 / 조명 기술자",
+          "feminine": "전기 기술자 / 조명 기술자",
+          "neutral": "전기 기술자 / 조명 기술자"
+        },
+        "r_d95b919dded9": {
+          "masculine": "수석 조명 기술자",
+          "feminine": "수석 조명 기술자",
+          "neutral": "수석 조명 기술자"
+        },
+        "r_de223259b793": {
+          "masculine": "조명 보드 운영자",
+          "feminine": "조명 보드 운영자",
+          "neutral": "조명 보드 운영자"
+        },
+        "r_d927855afff9": {
+          "masculine": "조명 보드 보조",
+          "feminine": "조명 보드 보조",
+          "neutral": "조명 보드 보조"
+        },
+        "r_56ad1c6a1ad4": {
+          "masculine": "조명 프로그래머 (DMX)",
+          "feminine": "조명 프로그래머 (DMX)",
+          "neutral": "조명 프로그래머 (DMX)"
+        },
+        "r_090ac2a092b8": {
+          "masculine": "조명 기술자",
+          "feminine": "조명 기술자",
+          "neutral": "조명 기술자"
+        },
+        "r_d1edcbd50142": {
+          "masculine": "조명 드라이버",
+          "feminine": "조명 드라이버",
+          "neutral": "조명 드라이버"
+        },
+        "r_7d79588c14f3": {
+          "masculine": "추가 조명 기술자",
+          "feminine": "추가 조명 기술자",
+          "neutral": "추가 조명 기술자"
+        },
+        "r_b3d1d585beaa": {
+          "masculine": "발전기 운영자",
+          "feminine": "발전기 운영자",
+          "neutral": "발전기 운영자"
+        },
+        "r_bcd4b312b67e": {
+          "masculine": "케이블 정리 담당",
+          "feminine": "케이블 정리 담당",
+          "neutral": "케이블 정리 담당"
+        },
+        "r_35cca1fe3c5c": {
+          "masculine": "수중 조명 기술자",
+          "feminine": "수중 조명 기술자",
+          "neutral": "수중 조명 기술자"
+        },
+        "r_89058c839b15": {
+          "masculine": "벌룬 라이트 운영자",
+          "feminine": "벌룬 라이트 운영자",
+          "neutral": "벌룬 라이트 운영자"
+        },
+        "r_9bd915bb46a4": {
+          "masculine": "스팟 / 트러스 스팟 운영자",
+          "feminine": "스팟 / 트러스 스팟 운영자",
+          "neutral": "스팟 / 트러스 스팟 운영자"
+        },
+        "r_2c0dd7b64cf3": {
+          "masculine": "조명 보조",
+          "feminine": "조명 보조",
+          "neutral": "조명 보조"
+        },
+        "r_0cc27c01ca07": {
+          "masculine": "조명 인턴",
+          "feminine": "조명 인턴",
+          "neutral": "조명 인턴"
+        }
+      },
+      "grip": {
+        "r_470156bd03e4": {
+          "masculine": "키 그립",
+          "feminine": "키 그립",
+          "neutral": "키 그립"
+        },
+        "r_cfbf2a22ed6e": {
+          "masculine": "그립 팀장 보조 (Best Boy Grip)",
+          "feminine": "그립 팀장 보조 (Best Girl Grip)",
+          "neutral": "그립 팀장 보조"
+        },
+        "r_32a6ab31b1a1": {
+          "masculine": "돌리 그립 / 돌리 운영자",
+          "feminine": "돌리 그립 / 돌리 운영자",
+          "neutral": "돌리 그립 / 돌리 운영자"
+        },
+        "r_376dc1f790b8": {
+          "masculine": "그립",
+          "feminine": "그립",
+          "neutral": "그립"
+        },
+        "r_dbfaadb8821c": {
+          "masculine": "그립 보조",
+          "feminine": "그립 보조",
+          "neutral": "그립 보조"
+        },
+        "r_46dab52c1995": {
+          "masculine": "리깅 그립",
+          "feminine": "리깅 그립",
+          "neutral": "리깅 그립"
+        },
+        "r_ea7e925bd850": {
+          "masculine": "리깅 키 그립",
+          "feminine": "리깅 키 그립",
+          "neutral": "리깅 키 그립"
+        },
+        "r_fa9d72fc7978": {
+          "masculine": "사전 설치 그립 팀장 보조 (Rigging Best Boy Grip)",
+          "feminine": "사전 설치 그립 팀장 보조 (Rigging Best Girl Grip)",
+          "neutral": "사전 설치 그립 팀장 보조"
+        },
+        "r_2fa0b44342d7": {
+          "masculine": "특수 그립 구조물",
+          "feminine": "특수 그립 구조물",
+          "neutral": "특수 그립 구조물"
+        },
+        "r_08c07afebb7f": {
+          "masculine": "카메라 크레인 / 지브 운영자",
+          "feminine": "카메라 크레인 / 지브 운영자",
+          "neutral": "카메라 크레인 / 지브 운영자"
+        },
+        "r_5ece318b289f": {
+          "masculine": "카메라 크레인 기술자",
+          "feminine": "카메라 크레인 기술자",
+          "neutral": "카메라 크레인 기술자"
+        },
+        "r_a5c74e86fb2b": {
+          "masculine": "U-크레인 / 테크노크레인 운영자",
+          "feminine": "U-크레인 / 테크노크레인 운영자",
+          "neutral": "U-크레인 / 테크노크레인 운영자"
+        },
+        "r_819dd64bff9d": {
+          "masculine": "리모트 헤드 기술자 / 운영자",
+          "feminine": "리모트 헤드 기술자 / 운영자",
+          "neutral": "리모트 헤드 기술자 / 운영자"
+        },
+        "r_9c6f674da63a": {
+          "masculine": "그립 인턴",
+          "feminine": "그립 인턴",
+          "neutral": "그립 인턴"
+        }
+      },
+      "ton": {
+        "r_fccf287d8f40": {
+          "masculine": "프로덕션 사운드 믹서",
+          "feminine": "프로덕션 사운드 믹서",
+          "neutral": "프로덕션 사운드 믹서"
+        },
+        "r_54f3d59eb241": {
+          "masculine": "프로덕션 사운드 믹서",
+          "feminine": "프로덕션 사운드 믹서",
+          "neutral": "프로덕션 사운드 믹서"
+        },
+        "r_b0c1942e7358": {
+          "masculine": "영화 사운드 레코더",
+          "feminine": "영화 사운드 레코더",
+          "neutral": "영화 사운드 레코더"
+        },
+        "r_8b1cc700407b": {
+          "masculine": "붐 운영자",
+          "feminine": "붐 운영자",
+          "neutral": "붐 운영자"
+        },
+        "r_fd909904c9c7": {
+          "masculine": "사운드 보조",
+          "feminine": "사운드 보조",
+          "neutral": "사운드 보조"
+        },
+        "r_4c5fe4b3a1f3": {
+          "masculine": "1st 사운드 보조",
+          "feminine": "1st 사운드 보조",
+          "neutral": "1st 사운드 보조"
+        },
+        "r_ab87e9473072": {
+          "masculine": "1st 사운드 보조",
+          "feminine": "1st 사운드 보조",
+          "neutral": "1st 사운드 보조"
+        },
+        "r_d83df9d29ab1": {
+          "masculine": "2nd 사운드 보조",
+          "feminine": "2nd 사운드 보조",
+          "neutral": "2nd 사운드 보조"
+        },
+        "r_8377b0674c5d": {
+          "masculine": "2nd 사운드 보조",
+          "feminine": "2nd 사운드 보조",
+          "neutral": "2nd 사운드 보조"
+        },
+        "r_93302391f02a": {
+          "masculine": "ADR / 루프 그룹 정리 담당",
+          "feminine": "ADR / 루프 그룹 정리 담당",
+          "neutral": "ADR / 루프 그룹 정리 담당"
+        },
+        "r_3e7456f82724": {
+          "masculine": "서라운드 사운드 레코더",
+          "feminine": "서라운드 사운드 레코더",
+          "neutral": "서라운드 사운드 레코더"
+        },
+        "r_352c199bfbc1": {
+          "masculine": "유틸리티 사운드 기술자",
+          "feminine": "유틸리티 사운드 기술자",
+          "neutral": "유틸리티 사운드 기술자"
+        },
+        "r_fdfa14e36d06": {
+          "masculine": "사운드 장비 보조",
+          "feminine": "사운드 장비 보조",
+          "neutral": "사운드 장비 보조"
+        },
+        "r_9615bbb28141": {
+          "masculine": "사운드 재생 운영자",
+          "feminine": "사운드 재생 운영자",
+          "neutral": "사운드 재생 운영자"
+        },
+        "r_13544e0c2d08": {
+          "masculine": "사운드 레코더 (논픽션)",
+          "feminine": "사운드 레코더 (논픽션)",
+          "neutral": "사운드 레코더 (논픽션)"
+        },
+        "r_f804f9794c40": {
+          "masculine": "사운드 인턴",
+          "feminine": "사운드 인턴",
+          "neutral": "사운드 인턴"
+        },
+        "r_26ad417384db": {
+          "masculine": "사운드 디자이너",
+          "feminine": "사운드 디자이너",
+          "neutral": "사운드 디자이너"
+        },
+        "r_e4afa3da823e": {
+          "masculine": "수석 사운드 편집자",
+          "feminine": "수석 사운드 편집자",
+          "neutral": "수석 사운드 편집자"
+        },
+        "r_754377fae1cb": {
+          "masculine": "대사 편집자",
+          "feminine": "대사 편집자",
+          "neutral": "대사 편집자"
+        },
+        "r_a80f60e08e2f": {
+          "masculine": "ADR 편집자",
+          "feminine": "ADR 편집자",
+          "neutral": "ADR 편집자"
+        },
+        "r_65ab3bc0b779": {
+          "masculine": "ADR 감독",
+          "feminine": "ADR 감독",
+          "neutral": "ADR 감독"
+        },
+        "r_927d0ca8e1d9": {
+          "masculine": "폴리 아티스트",
+          "feminine": "폴리 아티스트",
+          "neutral": "폴리 아티스트"
+        },
+        "r_c196984117d7": {
+          "masculine": "폴리 편집자",
+          "feminine": "폴리 편집자",
+          "neutral": "폴리 편집자"
+        },
+        "r_df6ebbcf6038": {
+          "masculine": "재녹음 믹서",
+          "feminine": "재녹음 믹서",
+          "neutral": "재녹음 믹서"
+        },
+        "r_f4776d32d356": {
+          "masculine": "재생 조작자",
+          "feminine": "재생 조작자",
+          "neutral": "재생 조작자"
+        },
+        "r_6abc8617e983": {
+          "masculine": "사운드 감독",
+          "feminine": "사운드 감독",
+          "neutral": "사운드 감독"
+        },
+        "r_0faba800cb95": {
+          "masculine": "음악 재녹음 믹서",
+          "feminine": "음악 재녹음 믹서",
+          "neutral": "음악 재녹음 믹서"
+        },
+        "r_a5fba4295f52": {
+          "masculine": "음악 녹음",
+          "feminine": "음악 녹음",
+          "neutral": "음악 녹음"
+        },
+        "r_f2e629941a7a": {
+          "masculine": "더빙 믹서",
+          "feminine": "더빙 믹서",
+          "neutral": "더빙 믹서"
+        },
+        "r_f73a9a076c95": {
+          "masculine": "오디오 설명 믹서",
+          "feminine": "오디오 설명 믹서",
+          "neutral": "오디오 설명 믹서"
+        },
+        "r_9d583d9712f5": {
+          "masculine": "재녹음 보조",
+          "feminine": "재녹음 보조",
+          "neutral": "재녹음 보조"
+        },
+        "r_c4334fc01411": {
+          "masculine": "사운드 마스터링 엔지니어",
+          "feminine": "사운드 마스터링 엔지니어",
+          "neutral": "사운드 마스터링 엔지니어"
+        },
+        "r_6a7ea11d04ed": {
+          "masculine": "사운드 디자인 보조",
+          "feminine": "사운드 디자인 보조",
+          "neutral": "사운드 디자인 보조"
+        },
+        "r_539e45fc2e6d": {
+          "masculine": "ADR 편집 감독",
+          "feminine": "ADR 편집 감독",
+          "neutral": "ADR 편집 감독"
+        },
+        "r_021e586f6845": {
+          "masculine": "대사 및 ADR 편집 감독",
+          "feminine": "대사 및 ADR 편집 감독",
+          "neutral": "대사 및 ADR 편집 감독"
+        },
+        "r_58f4b9fff63e": {
+          "masculine": "대사 편집 감독",
+          "feminine": "대사 편집 감독",
+          "neutral": "대사 편집 감독"
+        },
+        "r_934c9dff31b6": {
+          "masculine": "특수효과 편집 감독",
+          "feminine": "특수효과 편집 감독",
+          "neutral": "특수효과 편집 감독"
+        },
+        "r_8ffed7b496e8": {
+          "masculine": "대사 편집자 (포스트)",
+          "feminine": "대사 편집자 (포스트)",
+          "neutral": "대사 편집자 (포스트)"
+        },
+        "r_37f0cea40905": {
+          "masculine": "사운드 효과 편집자",
+          "feminine": "사운드 효과 편집자",
+          "neutral": "사운드 효과 편집자"
+        },
+        "r_e22d9239a33f": {
+          "masculine": "보이스오버 / 더빙 편집자",
+          "feminine": "보이스오버 / 더빙 편집자",
+          "neutral": "보이스오버 / 더빙 편집자"
+        },
+        "r_cf36114f7a15": {
+          "masculine": "동기화 특수효과 편집자",
+          "feminine": "동기화 특수효과 편집자",
+          "neutral": "동기화 특수효과 편집자"
+        },
+        "r_7ca65f7a0064": {
+          "masculine": "ADR / 동기화 편집자",
+          "feminine": "ADR / 동기화 편집자",
+          "neutral": "ADR / 동기화 편집자"
+        },
+        "r_944e077953d3": {
+          "masculine": "사운드 편집 보조",
+          "feminine": "사운드 편집 보조",
+          "neutral": "사운드 편집 보조"
+        },
+        "r_9d4ed0bf92ee": {
+          "masculine": "ADR / 더빙 사운드 믹서",
+          "feminine": "ADR / 더빙 사운드 믹서",
+          "neutral": "ADR / 더빙 사운드 믹서"
+        },
+        "r_b3e198ffbf29": {
+          "masculine": "동기화 특수효과 믹서",
+          "feminine": "동기화 특수효과 믹서",
+          "neutral": "동기화 특수효과 믹서"
+        },
+        "r_c41c6bc414c3": {
+          "masculine": "더빙 프로덕션 매니저",
+          "feminine": "더빙 프로덕션 매니저",
+          "neutral": "더빙 프로덕션 매니저"
+        },
+        "r_2b6bc11139d6": {
+          "masculine": "ADR / 더빙 감독",
+          "feminine": "ADR / 더빙 감독",
+          "neutral": "ADR / 더빙 감독"
+        },
+        "r_6645c4583551": {
+          "masculine": "ADR / 더빙 감독 보조",
+          "feminine": "ADR / 더빙 감독 보조",
+          "neutral": "ADR / 더빙 감독 보조"
+        },
+        "r_2f0b82350b59": {
+          "masculine": "폴리 보조",
+          "feminine": "폴리 보조",
+          "neutral": "폴리 보조"
+        },
+        "r_a4171d6359fb": {
+          "masculine": "사운드 포스트 프로덕션 인턴",
+          "feminine": "사운드 포스트 프로덕션 인턴",
+          "neutral": "사운드 포스트 프로덕션 인턴"
+        },
+        "r_9e4b74ecd5ff": {
+          "masculine": "기술 감독 ADR",
+          "feminine": "기술 감독 ADR",
+          "neutral": "기술 감독 ADR"
+        }
+      },
+      "art": {
+        "r_ff29ce0e215c": {
+          "masculine": "프로덕션 디자이너",
+          "feminine": "프로덕션 디자이너",
+          "neutral": "프로덕션 디자이너"
+        },
+        "r_f3db07db6bf4": {
+          "masculine": "프로덕션 디자이너 (독일)",
+          "feminine": "프로덕션 디자이너 (독일)",
+          "neutral": "프로덕션 디자이너 (독일)"
+        },
+        "r_97a0a726b446": {
+          "masculine": "아트 디렉터 감독",
+          "feminine": "아트 디렉터 감독",
+          "neutral": "아트 디렉터 감독"
+        },
+        "r_3f274caf46f5": {
+          "masculine": "아트 디렉터",
+          "feminine": "아트 디렉터",
+          "neutral": "아트 디렉터"
+        },
+        "r_7e93c2713534": {
+          "masculine": "대기 아트 디렉터",
+          "feminine": "대기 아트 디렉터",
+          "neutral": "대기 아트 디렉터"
+        },
+        "r_891f7ee6a391": {
+          "masculine": "아트 디렉터 보조",
+          "feminine": "아트 디렉터 보조",
+          "neutral": "아트 디렉터 보조"
+        },
+        "r_29765953355c": {
+          "masculine": "프로덕션 디자인 보조",
+          "feminine": "프로덕션 디자인 보조",
+          "neutral": "프로덕션 디자인 보조"
+        },
+        "r_8543a5c61931": {
+          "masculine": "아트 부서 보조",
+          "feminine": "아트 부서 보조",
+          "neutral": "아트 부서 보조"
+        },
+        "r_3ffad936200e": {
+          "masculine": "세트 디자이너",
+          "feminine": "세트 디자이너",
+          "neutral": "세트 디자이너"
+        },
+        "r_bce8305a5535": {
+          "masculine": "CAD 디자이너",
+          "feminine": "CAD 디자이너",
+          "neutral": "CAD 디자이너"
+        },
+        "r_b5a1fa9969c7": {
+          "masculine": "컨셉 아티스트",
+          "feminine": "컨셉 아티스트",
+          "neutral": "컨셉 아티스트"
+        },
+        "r_f1dbbb97b010": {
+          "masculine": "컨셉 아티스트 (아트 부서)",
+          "feminine": "컨셉 아티스트 (아트 부서)",
+          "neutral": "컨셉 아티스트 (아트 부서)"
+        },
+        "r_57a4a106cbd6": {
+          "masculine": "일러스트레이터",
+          "feminine": "일러스트레이터",
+          "neutral": "일러스트레이터"
+        },
+        "r_6aa3fecc3ba9": {
+          "masculine": "그래픽 디자이너 (세트 그래픽)",
+          "feminine": "그래픽 디자이너 (세트 그래픽)",
+          "neutral": "그래픽 디자이너 (세트 그래픽)"
+        },
+        "r_6978775ad99b": {
+          "masculine": "수석 그래픽 디자이너",
+          "feminine": "수석 그래픽 디자이너",
+          "neutral": "수석 그래픽 디자이너"
+        },
+        "r_7534f951d040": {
+          "masculine": "그래픽 아티스트",
+          "feminine": "그래픽 아티스트",
+          "neutral": "그래픽 아티스트"
+        },
+        "r_a8e10d0ecc47": {
+          "masculine": "무드 스카우트 / 레이아웃 담당",
+          "feminine": "무드 스카우트 / 레이아웃 담당",
+          "neutral": "무드 스카우트 / 레이아웃 담당"
+        },
+        "r_a1ce9e299c8f": {
+          "masculine": "세트 데코레이터",
+          "feminine": "세트 데코레이터",
+          "neutral": "세트 데코레이터"
+        },
+        "r_420521110dcc": {
+          "masculine": "세트 장식 코디네이터",
+          "feminine": "세트 장식 코디네이터",
+          "neutral": "세트 장식 코디네이터"
+        },
+        "r_d5b7a7d716a2": {
+          "masculine": "세트 데코레이터 보조",
+          "feminine": "세트 데코레이터 보조",
+          "neutral": "세트 데코레이터 보조"
+        },
+        "r_d0964de45366": {
+          "masculine": "세트 장식 구매 담당",
+          "feminine": "세트 장식 구매 담당",
+          "neutral": "세트 장식 구매 담당"
+        },
+        "r_10a8275fbc87": {
+          "masculine": "세트 장식 창고 관리자",
+          "feminine": "세트 장식 창고 관리자",
+          "neutral": "세트 장식 창고 관리자"
+        },
+        "r_1df861fbde16": {
+          "masculine": "세트 장식 코디네이터 보조",
+          "feminine": "세트 장식 코디네이터 보조",
+          "neutral": "세트 장식 코디네이터 보조"
+        },
+        "r_393242957f26": {
+          "masculine": "세트 드레서",
+          "feminine": "세트 드레서",
+          "neutral": "세트 드레서"
+        },
+        "r_e3ce1061c0ff": {
+          "masculine": "리드맨",
+          "feminine": "리드맨",
+          "neutral": "리드맨"
+        },
+        "r_d588cad49b89": {
+          "masculine": "리드 세트 드레서",
+          "feminine": "리드 세트 드레서",
+          "neutral": "리드 세트 드레서"
+        },
+        "r_6cafa4dd814b": {
+          "masculine": "소품 마스터",
+          "feminine": "소품 마스터",
+          "neutral": "소품 마스터"
+        },
+        "r_413221e86652": {
+          "masculine": "소품 마스터",
+          "feminine": "소품 마스터",
+          "neutral": "소품 마스터"
+        },
+        "r_a1e9f4cffb70": {
+          "masculine": "외부 소품 마스터",
+          "feminine": "외부 소품 마스터",
+          "neutral": "외부 소품 마스터"
+        },
+        "r_8f20bee45473": {
+          "masculine": "현장 소품",
+          "feminine": "현장 소품",
+          "neutral": "현장 소품"
+        },
+        "r_7d553f96df87": {
+          "masculine": "현장 소품 마스터",
+          "feminine": "현장 소품 마스터",
+          "neutral": "현장 소품 마스터"
+        },
+        "r_bf9d71b6fdc2": {
+          "masculine": "대기 소품",
+          "feminine": "대기 소품",
+          "neutral": "대기 소품"
+        },
+        "r_a38576fafdab": {
+          "masculine": "소품 보조",
+          "feminine": "소품 보조",
+          "neutral": "소품 보조"
+        },
+        "r_ea2b2fab38f4": {
+          "masculine": "소품 보조",
+          "feminine": "소품 보조",
+          "neutral": "소품 보조"
+        },
+        "r_b685fb4dc943": {
+          "masculine": "외부 소품 보조",
+          "feminine": "외부 소품 보조",
+          "neutral": "외부 소품 보조"
+        },
+        "r_7b9477ba5686": {
+          "masculine": "현장 소품 보조",
+          "feminine": "현장 소품 보조",
+          "neutral": "현장 소품 보조"
+        },
+        "r_541c87622274": {
+          "masculine": "소품 구매 담당",
+          "feminine": "소품 구매 담당",
+          "neutral": "소품 구매 담당"
+        },
+        "r_3c2dae1ec180": {
+          "masculine": "구매 담당 (세트 장식)",
+          "feminine": "구매 담당 (세트 장식)",
+          "neutral": "구매 담당 (세트 장식)"
+        },
+        "r_c17d76240812": {
+          "masculine": "소품 창고 관리자",
+          "feminine": "소품 창고 관리자",
+          "neutral": "소품 창고 관리자"
+        },
+        "r_6a373738f331": {
+          "masculine": "디지털 소품 디자이너",
+          "feminine": "디지털 소품 디자이너",
+          "neutral": "디지털 소품 디자이너"
+        },
+        "r_404bfcb27b87": {
+          "masculine": "디지털 소품 마스터",
+          "feminine": "디지털 소품 마스터",
+          "neutral": "디지털 소품 마스터"
+        },
+        "r_efdc51e3e8eb": {
+          "masculine": "소품 제작자",
+          "feminine": "소품 제작자",
+          "neutral": "소품 제작자"
+        },
+        "r_30872cd93e0c": {
+          "masculine": "소품 디자이너",
+          "feminine": "소품 디자이너",
+          "neutral": "소품 디자이너"
+        },
+        "r_264fc56ea7a5": {
+          "masculine": "무기 자문 / 무기 담당자",
+          "feminine": "무기 자문 / 무기 담당자",
+          "neutral": "무기 자문 / 무기 담당자"
+        },
+        "r_00f9e2afb019": {
+          "masculine": "소품 담당자",
+          "feminine": "소품 담당자",
+          "neutral": "소품 담당자"
+        },
+        "r_ef64ec97e93f": {
+          "masculine": "소품 페인터",
+          "feminine": "소품 페인터",
+          "neutral": "소품 페인터"
+        },
+        "r_8a17379f4cf2": {
+          "masculine": "소품 운전사",
+          "feminine": "소품 운전사",
+          "neutral": "소품 운전사"
+        },
+        "r_fb928031fe07": {
+          "masculine": "픽처카 / 차량 코디네이터",
+          "feminine": "픽처카 / 차량 코디네이터",
+          "neutral": "픽처카 / 차량 코디네이터"
+        },
+        "r_77928b37c49d": {
+          "masculine": "픽처카 담당자",
+          "feminine": "픽처카 담당자",
+          "neutral": "픽처카 담당자"
+        },
+        "r_115e6da0f002": {
+          "masculine": "실무 전기기사",
+          "feminine": "실무 전기기사",
+          "neutral": "실무 전기기사"
+        },
+        "r_857a05036004": {
+          "masculine": "그린스마스터 / 조경 담당자",
+          "feminine": "그린스마스터 / 조경 담당자",
+          "neutral": "그린스마스터 / 조경 담당자"
+        },
+        "r_d8e3dea65e7b": {
+          "masculine": "그린스 / 세트 정원사",
+          "feminine": "그린스 / 세트 정원사",
+          "neutral": "그린스 / 세트 정원사"
+        },
+        "r_aa5ce508ee21": {
+          "masculine": "플로랄 아티스트",
+          "feminine": "플로랄 아티스트",
+          "neutral": "플로랄 아티스트"
+        },
+        "r_36b1709b4159": {
+          "masculine": "푸드 스타일리스트",
+          "feminine": "푸드 스타일리스트",
+          "neutral": "푸드 스타일리스트"
+        },
+        "r_40b095fdeb85": {
+          "masculine": "에어브러시 아티스트",
+          "feminine": "에어브러시 아티스트",
+          "neutral": "에어브러시 아티스트"
+        },
+        "r_afee4f58989a": {
+          "masculine": "풍경화가 / 순수미술 화가",
+          "feminine": "풍경화가 / 순수미술 화가",
+          "neutral": "풍경화가 / 순수미술 화가"
+        },
+        "r_c056e02e39c4": {
+          "masculine": "풍경화가",
+          "feminine": "풍경화가",
+          "neutral": "풍경화가"
+        },
+        "r_e689709eac01": {
+          "masculine": "수석 풍경화가",
+          "feminine": "수석 풍경화가",
+          "neutral": "수석 풍경화가"
+        },
+        "r_70a7586bb774": {
+          "masculine": "사인 라이터 / 레터링 아티스트",
+          "feminine": "사인 라이터 / 레터링 아티스트",
+          "neutral": "사인 라이터 / 레터링 아티스트"
+        },
+        "r_12f20cf536a1": {
+          "masculine": "페인터 / 풍경화가",
+          "feminine": "페인터 / 풍경화가",
+          "neutral": "페인터 / 풍경화가"
+        },
+        "r_dcf49adce47b": {
+          "masculine": "조각가 / 모델 제작자",
+          "feminine": "조각가 / 모델 제작자",
+          "neutral": "조각가 / 모델 제작자"
+        },
+        "r_f4670c7a29a7": {
+          "masculine": "풍경 석고공 / 조각가",
+          "feminine": "풍경 석고공 / 조각가",
+          "neutral": "풍경 석고공 / 조각가"
+        },
+        "r_5fc07d2f3030": {
+          "masculine": "모델 제작자",
+          "feminine": "모델 제작자",
+          "neutral": "모델 제작자"
+        },
+        "r_f545a993cec8": {
+          "masculine": "미니어처 감독",
+          "feminine": "미니어처 감독",
+          "neutral": "미니어처 감독"
+        },
+        "r_d3f5fd4b86c3": {
+          "masculine": "미니어처 효과 감독",
+          "feminine": "미니어처 효과 감독",
+          "neutral": "미니어처 효과 감독"
+        },
+        "r_a6d3fd7eaada": {
+          "masculine": "건설 매니저",
+          "feminine": "건설 매니저",
+          "neutral": "건설 매니저"
+        },
+        "r_ca83b607f08e": {
+          "masculine": "건설 코디네이터",
+          "feminine": "건설 코디네이터",
+          "neutral": "건설 코디네이터"
+        },
+        "r_fbcfd1e1839b": {
+          "masculine": "스튜디오 / 세트 건설 매니저",
+          "feminine": "스튜디오 / 세트 건설 매니저",
+          "neutral": "스튜디오 / 세트 건설 매니저"
+        },
+        "r_0231e128483a": {
+          "masculine": "세트 제작자 / 목수",
+          "feminine": "세트 제작자 / 목수",
+          "neutral": "세트 제작자 / 목수"
+        },
+        "r_62f07946c8f1": {
+          "masculine": "세트 건설 팀",
+          "feminine": "세트 건설 팀",
+          "neutral": "세트 건설 팀"
+        },
+        "r_a3c94f3f3cd1": {
+          "masculine": "무대 / 건설 책임자",
+          "feminine": "무대 / 건설 책임자",
+          "neutral": "무대 / 건설 책임자"
+        },
+        "r_c606af121ce8": {
+          "masculine": "무대 기술자",
+          "feminine": "무대 기술자",
+          "neutral": "무대 기술자"
+        },
+        "r_2017ec503138": {
+          "masculine": "기술 제도사",
+          "feminine": "기술 제도사",
+          "neutral": "기술 제도사"
+        },
+        "r_169af74d49f6": {
+          "masculine": "벽돌공 (세트)",
+          "feminine": "벽돌공 (세트)",
+          "neutral": "벽돌공 (세트)"
+        },
+        "r_578a92348ec6": {
+          "masculine": "금속공",
+          "feminine": "금속공",
+          "neutral": "금속공"
+        },
+        "r_6c7b48200cb3": {
+          "masculine": "금속공 (세트)",
+          "feminine": "금속공 (세트)",
+          "neutral": "금속공 (세트)"
+        },
+        "r_e7f7da33c876": {
+          "masculine": "수석 금속공 (세트)",
+          "feminine": "수석 금속공 (세트)",
+          "neutral": "수석 금속공 (세트)"
+        },
+        "r_027c0b61577d": {
+          "masculine": "스투코 아티스트 (세트)",
+          "feminine": "스투코 아티스트 (세트)",
+          "neutral": "스투코 아티스트 (세트)"
+        },
+        "r_8d5fe63edbd3": {
+          "masculine": "장식가",
+          "feminine": "장식가",
+          "neutral": "장식가"
+        },
+        "r_61ab14bcf2c6": {
+          "masculine": "목수 / 조립공 (세트)",
+          "feminine": "목수 / 조립공 (세트)",
+          "neutral": "목수 / 조립공 (세트)"
+        },
+        "r_3addd9ac0457": {
+          "masculine": "선반공 / 목공 (세트)",
+          "feminine": "선반공 / 목공 (세트)",
+          "neutral": "선반공 / 목공 (세트)"
+        },
+        "r_be99bdf8e0ab": {
+          "masculine": "미술부 코디네이터",
+          "feminine": "미술부 코디네이터",
+          "neutral": "미술부 코디네이터"
+        },
+        "r_9187325e0d84": {
+          "masculine": "미술부 보조 코디네이터",
+          "feminine": "미술부 보조 코디네이터",
+          "neutral": "미술부 보조 코디네이터"
+        },
+        "r_a8af82f5e937": {
+          "masculine": "미술부 담당자",
+          "feminine": "미술부 담당자",
+          "neutral": "미술부 담당자"
+        },
+        "r_8310307922eb": {
+          "masculine": "미술부 연수생",
+          "feminine": "미술부 연수생",
+          "neutral": "미술부 연수생"
+        },
+        "r_f7d87853929b": {
+          "masculine": "세트 장식 운전사",
+          "feminine": "세트 장식 운전사",
+          "neutral": "세트 장식 운전사"
+        },
+        "r_71506d96f350": {
+          "masculine": "그래픽 디자이너 (미술부)",
+          "feminine": "그래픽 디자이너 (미술부)",
+          "neutral": "그래픽 디자이너 (미술부)"
+        },
+        "r_dd224ea66364": {
+          "masculine": "제품 관리",
+          "feminine": "제품 관리",
+          "neutral": "제품 관리"
+        },
+        "r_b2e24af2a895": {
+          "masculine": "아트워크 아티스트",
+          "feminine": "아트워크 아티스트",
+          "neutral": "아트워크 아티스트"
+        },
+        "r_c399668f6f57": {
+          "masculine": "컴퓨터 / 비디오 재생 감독",
+          "feminine": "컴퓨터 / 비디오 재생 감독",
+          "neutral": "컴퓨터 / 비디오 재생 감독"
+        },
+        "r_d278f8dea5ee": {
+          "masculine": "세트 제작자 / 건설",
+          "feminine": "세트 제작자 / 건설",
+          "neutral": "세트 제작자 / 건설"
+        },
+        "r_ed52a3596ba0": {
+          "masculine": "현장 건설 팀",
+          "feminine": "현장 건설 팀",
+          "neutral": "현장 건설 팀"
+        },
+        "r_e3f39e455941": {
+          "masculine": "건설 담당자",
+          "feminine": "건설 담당자",
+          "neutral": "건설 담당자"
+        },
+        "r_74a60171830a": {
+          "masculine": "수중 세트 건설",
+          "feminine": "수중 세트 건설",
+          "neutral": "수중 세트 건설"
+        },
+        "r_18c785ac7bd8": {
+          "masculine": "리깅 / 특수 건설",
+          "feminine": "리깅 / 특수 건설",
+          "neutral": "리깅 / 특수 건설"
+        },
+        "r_8f15fc164b86": {
+          "masculine": "기술 제도사 보조",
+          "feminine": "기술 제도사 보조",
+          "neutral": "기술 제도사 보조"
+        },
+        "r_7e3c819b39ed": {
+          "masculine": "수석 스투코 아티스트 (세트)",
+          "feminine": "수석 스투코 아티스트 (세트)",
+          "neutral": "수석 스투코 아티스트 (세트)"
+        },
+        "r_24a7497a9f06": {
+          "masculine": "세트 장식가",
+          "feminine": "세트 장식가",
+          "neutral": "세트 장식가"
+        },
+        "r_a279ae7e16ec": {
+          "masculine": "수석 세트 장식가",
+          "feminine": "수석 세트 장식가",
+          "neutral": "수석 세트 장식가"
+        },
+        "r_0f2d76b6cc82": {
+          "masculine": "수석 목수 (세트)",
+          "feminine": "수석 목수 (세트)",
+          "neutral": "수석 목수 (세트)"
+        },
+        "r_08876b0452b5": {
+          "masculine": "미술부 인턴",
+          "feminine": "미술부 인턴",
+          "neutral": "미술부 인턴"
+        }
+      },
+      "kostuem": {
+        "r_cfc0491e1daf": {
+          "masculine": "의상 디자이너",
+          "feminine": "의상 디자이너",
+          "neutral": "의상 디자이너"
+        },
+        "r_acbff2b1675d": {
+          "masculine": "의상 감독",
+          "feminine": "의상 감독",
+          "neutral": "의상 감독"
+        },
+        "r_4e5a29f37fde": {
+          "masculine": "보조 의상 감독",
+          "feminine": "보조 의상 감독",
+          "neutral": "보조 의상 감독"
+        },
+        "r_9dacdd987a87": {
+          "masculine": "의상 코디네이터",
+          "feminine": "의상 코디네이터",
+          "neutral": "의상 코디네이터"
+        },
+        "r_3ea2819cc8c4": {
+          "masculine": "보조 의상 코디네이터",
+          "feminine": "보조 의상 코디네이터",
+          "neutral": "보조 의상 코디네이터"
+        },
+        "r_3684af682bde": {
+          "masculine": "보조 의상 디자이너",
+          "feminine": "보조 의상 디자이너",
+          "neutral": "보조 의상 디자이너"
+        },
+        "r_bca9201a3794": {
+          "masculine": "2차 보조 의상 디자이너",
+          "feminine": "2차 보조 의상 디자이너",
+          "neutral": "2차 보조 의상 디자이너"
+        },
+        "r_570a76c15c34": {
+          "masculine": "3차 보조 의상 디자이너",
+          "feminine": "3차 보조 의상 디자이너",
+          "neutral": "3차 보조 의상 디자이너"
+        },
+        "r_75358a18f698": {
+          "masculine": "주요 의상 담당자",
+          "feminine": "주요 의상 담당자",
+          "neutral": "주요 의상 담당자"
+        },
+        "r_df59c1f51566": {
+          "masculine": "세트 의상 담당자 / 의상 보조",
+          "feminine": "세트 의상 담당자 / 의상 보조",
+          "neutral": "세트 의상 담당자 / 의상 보조"
+        },
+        "r_7d1eb3e51b50": {
+          "masculine": "추가 세트 의상 담당자",
+          "feminine": "추가 세트 의상 담당자",
+          "neutral": "추가 세트 의상 담당자"
+        },
+        "r_aa38c8f5acdd": {
+          "masculine": "세트 의상 보조",
+          "feminine": "세트 의상 보조",
+          "neutral": "세트 의상 보조"
+        },
+        "r_85a93499fa51": {
+          "masculine": "군중 의상 감독",
+          "feminine": "군중 의상 감독",
+          "neutral": "군중 의상 감독"
+        },
+        "r_73f373881e68": {
+          "masculine": "군중 의상 담당자",
+          "feminine": "군중 의상 담당자",
+          "neutral": "군중 의상 담당자"
+        },
+        "r_82daef37fafd": {
+          "masculine": "트럭 의상 담당자",
+          "feminine": "트럭 의상 담당자",
+          "neutral": "트럭 의상 담당자"
+        },
+        "r_40f30fffbd6a": {
+          "masculine": "의상 구매 담당자",
+          "feminine": "의상 구매 담당자",
+          "neutral": "의상 구매 담당자"
+        },
+        "r_60a2042cfa65": {
+          "masculine": "의상 회계 담당자",
+          "feminine": "의상 회계 담당자",
+          "neutral": "의상 회계 담당자"
+        },
+        "r_6ece4b3c2f60": {
+          "masculine": "의상 담당자",
+          "feminine": "의상 담당자",
+          "neutral": "의상 담당자"
+        },
+        "r_bb614a4f62e2": {
+          "masculine": "의상 보조",
+          "feminine": "의상 보조",
+          "neutral": "의상 보조"
+        },
+        "r_86f8b66926fc": {
+          "masculine": "의상 연수생",
+          "feminine": "의상 연수생",
+          "neutral": "의상 연수생"
+        },
+        "r_272717911d79": {
+          "masculine": "재단사",
+          "feminine": "재단사",
+          "neutral": "재단사"
+        },
+        "r_3a35662b53a3": {
+          "masculine": "재봉사",
+          "feminine": "재봉사",
+          "neutral": "재봉사"
+        },
+        "r_298c04a0eec5": {
+          "masculine": "섬유 아티스트",
+          "feminine": "섬유 아티스트",
+          "neutral": "섬유 아티스트"
+        },
+        "r_2a6b1e3320f5": {
+          "masculine": "의상 제작자",
+          "feminine": "의상 제작자",
+          "neutral": "의상 제작자"
+        },
+        "r_066dc1f269bb": {
+          "masculine": "의상 소품 제작자",
+          "feminine": "의상 소품 제작자",
+          "neutral": "의상 소품 제작자"
+        },
+        "r_83db0e1a7bff": {
+          "masculine": "디렉트리스",
+          "feminine": "디렉트리스",
+          "neutral": "디렉트리스"
+        },
+        "r_fc8d26a01b37": {
+          "masculine": "여성 맞춤 재단사",
+          "feminine": "여성 맞춤 재단사",
+          "neutral": "여성 맞춤 재단사"
+        },
+        "r_9aaa9c423455": {
+          "masculine": "남성 맞춤 재단사",
+          "feminine": "남성 맞춤 재단사",
+          "neutral": "남성 맞춤 재단사"
+        },
+        "r_975bb2c38b93": {
+          "masculine": "모자 장인",
+          "feminine": "모자 장인",
+          "neutral": "모자 장인"
+        },
+        "r_e5cb00d76add": {
+          "masculine": "코르셋 제작자",
+          "feminine": "코르셋 제작자",
+          "neutral": "코르셋 제작자"
+        },
+        "r_f573123c66c5": {
+          "masculine": "의상 일러스트레이터",
+          "feminine": "의상 일러스트레이터",
+          "neutral": "의상 일러스트레이터"
+        },
+        "r_3218fd13d59c": {
+          "masculine": "의상 페인터 / 염색사",
+          "feminine": "의상 페인터 / 염색사",
+          "neutral": "의상 페인터 / 염색사"
+        },
+        "r_f8c4b94e93de": {
+          "masculine": "의상 노화 아티스트",
+          "feminine": "의상 노화 아티스트",
+          "neutral": "의상 노화 아티스트"
+        },
+        "r_25bf82085577": {
+          "masculine": "의상 자수사",
+          "feminine": "의상 자수사",
+          "neutral": "의상 자수사"
+        },
+        "r_4bd9dd09da1d": {
+          "masculine": "의상 연구원",
+          "feminine": "의상 연구원",
+          "neutral": "의상 연구원"
+        },
+        "r_2efd6bda8664": {
+          "masculine": "의상 운전사",
+          "feminine": "의상 운전사",
+          "neutral": "의상 운전사"
+        },
+        "r_a723a074986b": {
+          "masculine": "분해 아티스트 (노화 / 손상)",
+          "feminine": "분해 아티스트 (노화 / 손상)",
+          "neutral": "분해 아티스트 (노화 / 손상)"
+        },
+        "r_ac01a53c578c": {
+          "masculine": "특수효과 의상",
+          "feminine": "특수효과 의상",
+          "neutral": "특수효과 의상"
+        },
+        "r_bbc01e9dad81": {
+          "masculine": "스타일리스트 / 스타일링 보조",
+          "feminine": "스타일리스트 / 스타일링 보조",
+          "neutral": "스타일리스트 / 스타일링 보조"
+        },
+        "r_0cf394ee7640": {
+          "masculine": "의상 디자이너 (디자인)",
+          "feminine": "의상 디자이너 (디자인)",
+          "neutral": "의상 디자이너 (디자인)"
+        },
+        "r_6e84493aa620": {
+          "masculine": "의상 컨설턴트",
+          "feminine": "의상 컨설턴트",
+          "neutral": "의상 컨설턴트"
+        },
+        "r_7673a5020856": {
+          "masculine": "의상 디자인 보조",
+          "feminine": "의상 디자인 보조",
+          "neutral": "의상 디자인 보조"
+        },
+        "r_1ca2128245c1": {
+          "masculine": "의상 부서 코디네이터",
+          "feminine": "의상 부서 코디네이터",
+          "neutral": "의상 부서 코디네이터"
+        },
+        "r_f707bb1f5992": {
+          "masculine": "세트 의상 담당자",
+          "feminine": "세트 의상 담당자",
+          "neutral": "세트 의상 담당자"
+        },
+        "r_cc15942423ce": {
+          "masculine": "세트 의상 보조",
+          "feminine": "세트 의상 보조",
+          "neutral": "세트 의상 보조"
+        },
+        "r_fa17db9ddd73": {
+          "masculine": "스타일리스트",
+          "feminine": "스타일리스트",
+          "neutral": "스타일리스트"
+        },
+        "r_510b1830a8a9": {
+          "masculine": "스타일링 보조",
+          "feminine": "스타일링 보조",
+          "neutral": "스타일링 보조"
+        },
+        "r_cc5427b5207e": {
+          "masculine": "의상 담당자",
+          "feminine": "의상 담당자",
+          "neutral": "의상 담당자"
+        },
+        "r_51e4b1b69e51": {
+          "masculine": "여성 재단사",
+          "feminine": "여성 재단사",
+          "neutral": "여성 재단사"
+        },
+        "r_c90f0f14aa1d": {
+          "masculine": "남성 재단사",
+          "feminine": "남성 재단사",
+          "neutral": "남성 재단사"
+        },
+        "r_b02e861df06e": {
+          "masculine": "모자 장인 / 모자 제작자",
+          "feminine": "모자 장인 / 모자 제작자",
+          "neutral": "모자 장인 / 모자 제작자"
+        },
+        "r_f4d2f92c7063": {
+          "masculine": "코르셋 제작자",
+          "feminine": "코르셋 제작자",
+          "neutral": "코르셋 제작자"
+        },
+        "r_60b06eb1a3e5": {
+          "masculine": "의상 감독",
+          "feminine": "의상 감독",
+          "neutral": "의상 감독"
+        },
+        "r_b57d7945c2e1": {
+          "masculine": "의상 보조",
+          "feminine": "의상 보조",
+          "neutral": "의상 보조"
+        },
+        "r_2ac825cfa903": {
+          "masculine": "재단사",
+          "feminine": "재단사",
+          "neutral": "재단사"
+        },
+        "r_f5c79a825c6d": {
+          "masculine": "의상 운전사",
+          "feminine": "의상 운전사",
+          "neutral": "의상 운전사"
+        },
+        "r_d964234f1385": {
+          "masculine": "재봉사 / 바느질 전문가",
+          "feminine": "재봉사 / 바느질 전문가",
+          "neutral": "재봉사 / 바느질 전문가"
+        },
+        "r_6371bcd4467e": {
+          "masculine": "의상 노화 / 분해 아티스트",
+          "feminine": "의상 노화 / 분해 아티스트",
+          "neutral": "의상 노화 / 분해 아티스트"
+        },
+        "r_93cc3465aeac": {
+          "masculine": "의상 페인터 / 염색사",
+          "feminine": "의상 페인터 / 염색사",
+          "neutral": "의상 페인터 / 염색사"
+        },
+        "r_9f631f727b98": {
+          "masculine": "의상 자수사",
+          "feminine": "의상 자수사",
+          "neutral": "의상 자수사"
+        },
+        "r_fd593b68c6bd": {
+          "masculine": "의상 일러스트레이터",
+          "feminine": "의상 일러스트레이터",
+          "neutral": "의상 일러스트레이터"
+        },
+        "r_52cc391775b8": {
+          "masculine": "의상 디자인 인턴",
+          "feminine": "의상 디자인 인턴",
+          "neutral": "의상 디자인 인턴"
+        }
+      },
+      "maske": {
+        "r_2cecb5bef109": {
+          "masculine": "메이크업 & 헤어 책임자",
+          "feminine": "메이크업 & 헤어 책임자",
+          "neutral": "메이크업 & 헤어 책임자"
+        },
+        "r_8c46abf33a4b": {
+          "masculine": "헤어 디자이너",
+          "feminine": "헤어 디자이너",
+          "neutral": "헤어 디자이너"
+        },
+        "r_afd55563be09": {
+          "masculine": "헤어 & 메이크업 디자이너",
+          "feminine": "헤어 & 메이크업 디자이너",
+          "neutral": "헤어 & 메이크업 디자이너"
+        },
+        "r_0d2723e6a8cc": {
+          "masculine": "메이크업 디자이너",
+          "feminine": "메이크업 디자이너",
+          "neutral": "메이크업 디자이너"
+        },
+        "r_b73ceeda53dd": {
+          "masculine": "헤어 & 메이크업 감독",
+          "feminine": "헤어 & 메이크업 감독",
+          "neutral": "헤어 & 메이크업 감독"
+        },
+        "r_913e5cf46a02": {
+          "masculine": "수석 메이크업 아티스트",
+          "feminine": "수석 메이크업 아티스트",
+          "neutral": "수석 메이크업 아티스트"
+        },
+        "r_495a42f74fbb": {
+          "masculine": "수석 헤어 스타일리스트",
+          "feminine": "수석 헤어 스타일리스트",
+          "neutral": "수석 헤어 스타일리스트"
+        },
+        "r_ff414fc1a4e8": {
+          "masculine": "메이크업 아티스트",
+          "feminine": "메이크업 아티스트",
+          "neutral": "메이크업 아티스트"
+        },
+        "r_ace166547405": {
+          "masculine": "추가 메이크업 아티스트",
+          "feminine": "추가 메이크업 아티스트",
+          "neutral": "추가 메이크업 아티스트"
+        },
+        "r_96cb48e2539d": {
+          "masculine": "헤어 스타일리스트",
+          "feminine": "헤어 스타일리스트",
+          "neutral": "헤어 스타일리스트"
+        },
+        "r_3a06bbd5516b": {
+          "masculine": "추가 헤어 스타일리스트",
+          "feminine": "추가 헤어 스타일리스트",
+          "neutral": "추가 헤어 스타일리스트"
+        },
+        "r_a8a061642ea1": {
+          "masculine": "메이크업 부서장",
+          "feminine": "메이크업 부서장",
+          "neutral": "메이크업 부서장"
+        },
+        "r_988255c043c0": {
+          "masculine": "바디 메이크업",
+          "feminine": "바디 메이크업",
+          "neutral": "바디 메이크업"
+        },
+        "r_62302b472d3b": {
+          "masculine": "추가 메이크업 아티스트",
+          "feminine": "추가 메이크업 아티스트",
+          "neutral": "추가 메이크업 아티스트"
+        },
+        "r_de6fbe18e529": {
+          "masculine": "메이크업 보조",
+          "feminine": "메이크업 보조",
+          "neutral": "메이크업 보조"
+        },
+        "r_89708da23c7a": {
+          "masculine": "가발 제작자",
+          "feminine": "가발 제작자",
+          "neutral": "가발 제작자"
+        },
+        "r_eb0f745569de": {
+          "masculine": "특수 분장 아티스트",
+          "feminine": "특수 분장 아티스트",
+          "neutral": "특수 분장 아티스트"
+        },
+        "r_bc667775a067": {
+          "masculine": "특수 효과 메이크업",
+          "feminine": "특수 효과 메이크업",
+          "neutral": "특수 효과 메이크업"
+        },
+        "r_a27c177f51ef": {
+          "masculine": "군중 헤어 & 메이크업 감독",
+          "feminine": "군중 헤어 & 메이크업 감독",
+          "neutral": "군중 헤어 & 메이크업 감독"
+        },
+        "r_e46c728a4398": {
+          "masculine": "메이크업 연수생",
+          "feminine": "메이크업 연수생",
+          "neutral": "메이크업 연수생"
+        },
+        "r_3bd74d7ca372": {
+          "masculine": "수석 메이크업 아티스트",
+          "feminine": "수석 메이크업 아티스트",
+          "neutral": "수석 메이크업 아티스트"
+        },
+        "r_1dbe2290254a": {
+          "masculine": "메이크업 부서장",
+          "feminine": "메이크업 부서장",
+          "neutral": "메이크업 부서장"
+        },
+        "r_3e08c4bedcc0": {
+          "masculine": "바디 메이크업 아티스트",
+          "feminine": "바디 메이크업 아티스트",
+          "neutral": "바디 메이크업 아티스트"
+        },
+        "r_24c9ee41124f": {
+          "masculine": "추가 메이크업 아티스트",
+          "feminine": "추가 메이크업 아티스트",
+          "neutral": "추가 메이크업 아티스트"
+        },
+        "r_6373cbbea77f": {
+          "masculine": "가발 제작자",
+          "feminine": "가발 제작자",
+          "neutral": "가발 제작자"
+        },
+        "r_e9a07f599b31": {
+          "masculine": "메이크업 인턴",
+          "feminine": "메이크업 인턴",
+          "neutral": "메이크업 인턴"
+        }
+      },
+      "post": {
+        "r_f88d95239ea1": {
+          "masculine": "후반 제작 프로듀서",
+          "feminine": "후반 제작 프로듀서",
+          "neutral": "후반 제작 프로듀서"
+        },
+        "r_4284177c72b3": {
+          "masculine": "후반 제작 감독",
+          "feminine": "후반 제작 감독",
+          "neutral": "후반 제작 감독"
+        },
+        "r_c2fb80f3e981": {
+          "masculine": "후반 제작 매니저",
+          "feminine": "후반 제작 매니저",
+          "neutral": "후반 제작 매니저"
+        },
+        "r_78b6f4ddb08c": {
+          "masculine": "포스트 프로덕션 코디네이터",
+          "feminine": "포스트 프로덕션 코디네이터",
+          "neutral": "포스트 프로덕션 코디네이터"
+        },
+        "r_0bb7e59012ae": {
+          "masculine": "포스트 프로덕션 스케줄러",
+          "feminine": "포스트 프로덕션 스케줄러",
+          "neutral": "포스트 프로덕션 스케줄러"
+        },
+        "r_b54fb6f974fa": {
+          "masculine": "어시스턴트 포스트 프로덕션 슈퍼바이저",
+          "feminine": "어시스턴트 포스트 프로덕션 슈퍼바이저",
+          "neutral": "어시스턴트 포스트 프로덕션 슈퍼바이저"
+        },
+        "r_fae43b642354": {
+          "masculine": "딜리버리 매니저 / 슈퍼바이저",
+          "feminine": "딜리버리 매니저 / 슈퍼바이저",
+          "neutral": "딜리버리 매니저 / 슈퍼바이저"
+        },
+        "r_54b281a42495": {
+          "masculine": "편집자",
+          "feminine": "편집자",
+          "neutral": "편집자"
+        },
+        "r_eb67aee95450": {
+          "masculine": "필름 편집자",
+          "feminine": "필름 편집자",
+          "neutral": "필름 편집자"
+        },
+        "r_332deef8530f": {
+          "masculine": "추가 편집자",
+          "feminine": "추가 편집자",
+          "neutral": "추가 편집자"
+        },
+        "r_4b8538db6e6e": {
+          "masculine": "주니어 편집자",
+          "feminine": "주니어 편집자",
+          "neutral": "주니어 편집자"
+        },
+        "r_a000c69c93cd": {
+          "masculine": "퍼스트 어시스턴트 편집자",
+          "feminine": "퍼스트 어시스턴트 편집자",
+          "neutral": "퍼스트 어시스턴트 편집자"
+        },
+        "r_fb53d3bb0ca0": {
+          "masculine": "편집 보조",
+          "feminine": "편집 보조",
+          "neutral": "편집 보조"
+        },
+        "r_58fb452bb25d": {
+          "masculine": "세컨드 어시스턴트 편집자",
+          "feminine": "세컨드 어시스턴트 편집자",
+          "neutral": "세컨드 어시스턴트 편집자"
+        },
+        "r_e73f1067c3d0": {
+          "masculine": "2차 편집 보조",
+          "feminine": "2차 편집 보조",
+          "neutral": "2차 편집 보조"
+        },
+        "r_f40a64b53f4e": {
+          "masculine": "3차 편집 보조",
+          "feminine": "3차 편집 보조",
+          "neutral": "3차 편집 보조"
+        },
+        "r_f034db9da000": {
+          "masculine": "편집 드라마터그",
+          "feminine": "편집 드라마터그",
+          "neutral": "편집 드라마터그"
+        },
+        "r_9d8fc1953afd": {
+          "masculine": "VFX 편집자",
+          "feminine": "VFX 편집자",
+          "neutral": "VFX 편집자"
+        },
+        "r_6742bca7f725": {
+          "masculine": "트레일러 편집자",
+          "feminine": "트레일러 편집자",
+          "neutral": "트레일러 편집자"
+        },
+        "r_0088f1d1581d": {
+          "masculine": "데일리 편집자",
+          "feminine": "데일리 편집자",
+          "neutral": "데일리 편집자"
+        },
+        "r_855df6fe84d9": {
+          "masculine": "싱크 보조",
+          "feminine": "싱크 보조",
+          "neutral": "싱크 보조"
+        },
+        "r_76fe5605aea7": {
+          "masculine": "아비드 오퍼레이터",
+          "feminine": "아비드 오퍼레이터",
+          "neutral": "아비드 오퍼레이터"
+        },
+        "r_9a37f1a2f07c": {
+          "masculine": "파이널 컷 오퍼레이터",
+          "feminine": "파이널 컷 오퍼레이터",
+          "neutral": "파이널 컷 오퍼레이터"
+        },
+        "r_5c291075de55": {
+          "masculine": "컬러리스트 / DI",
+          "feminine": "컬러리스트 / DI",
+          "neutral": "컬러리스트 / DI"
+        },
+        "r_ee3d75537a1f": {
+          "masculine": "온라인 편집자",
+          "feminine": "온라인 편집자",
+          "neutral": "온라인 편집자"
+        },
+        "r_24e3087423e1": {
+          "masculine": "피니싱 아티스트",
+          "feminine": "피니싱 아티스트",
+          "neutral": "피니싱 아티스트"
+        },
+        "r_1b9c5df34287": {
+          "masculine": "스크린 디자이너",
+          "feminine": "스크린 디자이너",
+          "neutral": "스크린 디자이너"
+        },
+        "r_0c866fbdd1b9": {
+          "masculine": "타이틀 디자이너",
+          "feminine": "타이틀 디자이너",
+          "neutral": "타이틀 디자이너"
+        },
+        "r_cac32c0c1a16": {
+          "masculine": "DCP 기술자",
+          "feminine": "DCP 기술자",
+          "neutral": "DCP 기술자"
+        },
+        "r_3bf9436831af": {
+          "masculine": "필름스캔 오퍼레이터",
+          "feminine": "필름스캔 오퍼레이터",
+          "neutral": "필름스캔 오퍼레이터"
+        },
+        "r_0c4887e0a1b6": {
+          "masculine": "필름스캐닝 슈퍼바이저",
+          "feminine": "필름스캐닝 슈퍼바이저",
+          "neutral": "필름스캐닝 슈퍼바이저"
+        },
+        "r_85f36a10ca63": {
+          "masculine": "VFX 슈퍼바이저",
+          "feminine": "VFX 슈퍼바이저",
+          "neutral": "VFX 슈퍼바이저"
+        },
+        "r_3690883b97f2": {
+          "masculine": "VFX 프로듀서",
+          "feminine": "VFX 프로듀서",
+          "neutral": "VFX 프로듀서"
+        },
+        "r_01122a78805d": {
+          "masculine": "VFX 코디네이터",
+          "feminine": "VFX 코디네이터",
+          "neutral": "VFX 코디네이터"
+        },
+        "r_4c1b3c0e7030": {
+          "masculine": "VFX 프로덕션 매니저",
+          "feminine": "VFX 프로덕션 매니저",
+          "neutral": "VFX 프로덕션 매니저"
+        },
+        "r_b11b0566c205": {
+          "masculine": "VFX 외주 프로듀서",
+          "feminine": "VFX 외주 프로듀서",
+          "neutral": "VFX 외주 프로듀서"
+        },
+        "r_061d09311a06": {
+          "masculine": "어시스턴트 VFX 프로듀서",
+          "feminine": "어시스턴트 VFX 프로듀서",
+          "neutral": "어시스턴트 VFX 프로듀서"
+        },
+        "r_c20adc0c544f": {
+          "masculine": "VFX 애니메이션 슈퍼바이저",
+          "feminine": "VFX 애니메이션 슈퍼바이저",
+          "neutral": "VFX 애니메이션 슈퍼바이저"
+        },
+        "r_ef84bdb88ead": {
+          "masculine": "VR 프로듀서",
+          "feminine": "VR 프로듀서",
+          "neutral": "VR 프로듀서"
+        },
+        "r_33a9c6da17ea": {
+          "masculine": "합성 아티스트",
+          "feminine": "합성 아티스트",
+          "neutral": "합성 아티스트"
+        },
+        "r_aca1c9874a93": {
+          "masculine": "합성 슈퍼바이저",
+          "feminine": "합성 슈퍼바이저",
+          "neutral": "합성 슈퍼바이저"
+        },
+        "r_74803d65a47d": {
+          "masculine": "디지털 합성 아티스트",
+          "feminine": "디지털 합성 아티스트",
+          "neutral": "디지털 합성 아티스트"
+        },
+        "r_a61ab2d8897e": {
+          "masculine": "디지털 이펙트 슈퍼바이저",
+          "feminine": "디지털 이펙트 슈퍼바이저",
+          "neutral": "디지털 이펙트 슈퍼바이저"
+        },
+        "r_41f1fab43430": {
+          "masculine": "디지털 이펙트 디자이너",
+          "feminine": "디지털 이펙트 디자이너",
+          "neutral": "디지털 이펙트 디자이너"
+        },
+        "r_09a4c7b8c909": {
+          "masculine": "디지털 매트 페인터",
+          "feminine": "디지털 매트 페인터",
+          "neutral": "디지털 매트 페인터"
+        },
+        "r_1df80b2df510": {
+          "masculine": "2D 아티스트",
+          "feminine": "2D 아티스트",
+          "neutral": "2D 아티스트"
+        },
+        "r_c5222c873ae5": {
+          "masculine": "3D 아티스트",
+          "feminine": "3D 아티스트",
+          "neutral": "3D 아티스트"
+        },
+        "r_f1d016eba483": {
+          "masculine": "라이팅 아티스트 (CG)",
+          "feminine": "라이팅 아티스트 (CG)",
+          "neutral": "라이팅 아티스트 (CG)"
+        },
+        "r_1374d004f892": {
+          "masculine": "텍스처 아티스트",
+          "feminine": "텍스처 아티스트",
+          "neutral": "텍스처 아티스트"
+        },
+        "r_ca0826d47a19": {
+          "masculine": "매치무브 아티스트",
+          "feminine": "매치무브 아티스트",
+          "neutral": "매치무브 아티스트"
+        },
+        "r_272f028d80c7": {
+          "masculine": "로토 아티스트",
+          "feminine": "로토 아티스트",
+          "neutral": "로토 아티스트"
+        },
+        "r_fb2a18a56ba5": {
+          "masculine": "FX 아티스트",
+          "feminine": "FX 아티스트",
+          "neutral": "FX 아티스트"
+        },
+        "r_89c1660cb356": {
+          "masculine": "애니메이터",
+          "feminine": "애니메이터",
+          "neutral": "애니메이터"
+        },
+        "r_2efa5e8c0d5f": {
+          "masculine": "모션 디자이너",
+          "feminine": "모션 디자이너",
+          "neutral": "모션 디자이너"
+        },
+        "r_c2053cb7660f": {
+          "masculine": "캐릭터 애니메이터",
+          "feminine": "캐릭터 애니메이터",
+          "neutral": "캐릭터 애니메이터"
+        },
+        "r_247d43bdfb47": {
+          "masculine": "포스트 프로덕션 어시스턴트",
+          "feminine": "포스트 프로덕션 어시스턴트",
+          "neutral": "포스트 프로덕션 어시스턴트"
+        },
+        "r_e2802de21986": {
+          "masculine": "포스트 프로덕션 기술자",
+          "feminine": "포스트 프로덕션 기술자",
+          "neutral": "포스트 프로덕션 기술자"
+        },
+        "r_1f9c7a9f75a8": {
+          "masculine": "편집 인턴",
+          "feminine": "편집 인턴",
+          "neutral": "편집 인턴"
+        },
+        "r_bf7027763437": {
+          "masculine": "포스트 프로덕션 코디네이터",
+          "feminine": "포스트 프로덕션 코디네이터",
+          "neutral": "포스트 프로덕션 코디네이터"
+        },
+        "r_fc841e10fe4f": {
+          "masculine": "포스트 슈퍼바이저 어시스턴트",
+          "feminine": "포스트 슈퍼바이저 어시스턴트",
+          "neutral": "포스트 슈퍼바이저 어시스턴트"
+        },
+        "r_a79df89d104c": {
+          "masculine": "VFX 아티스트 / 합성 아티스트",
+          "feminine": "VFX 아티스트 / 합성 아티스트",
+          "neutral": "VFX 아티스트 / 합성 아티스트"
+        },
+        "r_2a16dc4c4550": {
+          "masculine": "사운드 디자이너",
+          "feminine": "사운드 디자이너",
+          "neutral": "사운드 디자이너"
+        },
+        "r_b96fddf3696f": {
+          "masculine": "사운드 편집자",
+          "feminine": "사운드 편집자",
+          "neutral": "사운드 편집자"
+        },
+        "r_a903b5656a8c": {
+          "masculine": "DCP 아티스트",
+          "feminine": "DCP 아티스트",
+          "neutral": "DCP 아티스트"
+        },
+        "r_774ffd708e0e": {
+          "masculine": "필름 레코더 오퍼레이터",
+          "feminine": "필름 레코더 오퍼레이터",
+          "neutral": "필름 레코더 오퍼레이터"
+        },
+        "r_8685aa8f2a95": {
+          "masculine": "미스티카 오퍼레이터",
+          "feminine": "미스티카 오퍼레이터",
+          "neutral": "미스티카 오퍼레이터"
+        },
+        "r_9b86e6dde935": {
+          "masculine": "VFX 테크니컬 디렉터",
+          "feminine": "VFX 테크니컬 디렉터",
+          "neutral": "VFX 테크니컬 디렉터"
+        },
+        "r_ab44975f8351": {
+          "masculine": "VFX 컨설턴트",
+          "feminine": "VFX 컨설턴트",
+          "neutral": "VFX 컨설턴트"
+        },
+        "r_6a2814e6546b": {
+          "masculine": "VFX 라이팅 슈퍼바이저",
+          "feminine": "VFX 라이팅 슈퍼바이저",
+          "neutral": "VFX 라이팅 슈퍼바이저"
+        },
+        "r_c043402107e7": {
+          "masculine": "VFX 세트 슈퍼바이저",
+          "feminine": "VFX 세트 슈퍼바이저",
+          "neutral": "VFX 세트 슈퍼바이저"
+        },
+        "r_2d4e2d1e1c2c": {
+          "masculine": "VFX 프로덕션 코디네이터",
+          "feminine": "VFX 프로덕션 코디네이터",
+          "neutral": "VFX 프로덕션 코디네이터"
+        },
+        "r_3a24d45a3a71": {
+          "masculine": "어시스턴트 VFX 코디네이터",
+          "feminine": "어시스턴트 VFX 코디네이터",
+          "neutral": "어시스턴트 VFX 코디네이터"
+        },
+        "r_a2d3fd026c27": {
+          "masculine": "VFX 임원",
+          "feminine": "VFX 임원",
+          "neutral": "VFX 임원"
+        },
+        "r_1d0ffcaee2f8": {
+          "masculine": "VFX 인사 관리자",
+          "feminine": "VFX 인사 관리자",
+          "neutral": "VFX 인사 관리자"
+        },
+        "r_6eb353601a03": {
+          "masculine": "VFX IT 관리자",
+          "feminine": "VFX IT 관리자",
+          "neutral": "VFX IT 관리자"
+        },
+        "r_e70450322709": {
+          "masculine": "VFX IT 지원",
+          "feminine": "VFX IT 지원",
+          "neutral": "VFX IT 지원"
+        },
+        "r_71a68d7195b5": {
+          "masculine": "VFX IT 시스템 엔지니어",
+          "feminine": "VFX IT 시스템 엔지니어",
+          "neutral": "VFX IT 시스템 엔지니어"
+        },
+        "r_30de176c3d86": {
+          "masculine": "파이프라인 테크니컬 디렉터",
+          "feminine": "파이프라인 테크니컬 디렉터",
+          "neutral": "파이프라인 테크니컬 디렉터"
+        },
+        "r_3021537edab0": {
+          "masculine": "컴퓨터 그래픽스 슈퍼바이저",
+          "feminine": "컴퓨터 그래픽스 슈퍼바이저",
+          "neutral": "컴퓨터 그래픽스 슈퍼바이저"
+        },
+        "r_0d4cd83ac5f0": {
+          "masculine": "CG 소프트웨어 개발자",
+          "feminine": "CG 소프트웨어 개발자",
+          "neutral": "CG 소프트웨어 개발자"
+        },
+        "r_4d7b70afc38f": {
+          "masculine": "컨셉 아티스트 (VFX)",
+          "feminine": "컨셉 아티스트 (VFX)",
+          "neutral": "컨셉 아티스트 (VFX)"
+        },
+        "r_1d77801b6bcb": {
+          "masculine": "캐릭터 디자이너",
+          "feminine": "캐릭터 디자이너",
+          "neutral": "캐릭터 디자이너"
+        },
+        "r_2eeabfb3e033": {
+          "masculine": "캐릭터 슈퍼바이저",
+          "feminine": "캐릭터 슈퍼바이저",
+          "neutral": "캐릭터 슈퍼바이저"
+        },
+        "r_d4054cc011f7": {
+          "masculine": "애니매트로닉스 슈퍼바이저",
+          "feminine": "애니매트로닉스 슈퍼바이저",
+          "neutral": "애니매트로닉스 슈퍼바이저"
+        },
+        "r_27773325d503": {
+          "masculine": "프리비즈 슈퍼바이저",
+          "feminine": "프리비즈 슈퍼바이저",
+          "neutral": "프리비즈 슈퍼바이저"
+        },
+        "r_4e65539d8bde": {
+          "masculine": "프리비즈 아티스트",
+          "feminine": "프리비즈 아티스트",
+          "neutral": "프리비즈 아티스트"
+        },
+        "r_09f34347e5ee": {
+          "masculine": "모션 캡처 슈퍼바이저",
+          "feminine": "모션 캡처 슈퍼바이저",
+          "neutral": "모션 캡처 슈퍼바이저"
+        },
+        "r_96c37e1de0fa": {
+          "masculine": "모션 컨트롤 슈퍼바이저",
+          "feminine": "모션 컨트롤 슈퍼바이저",
+          "neutral": "모션 컨트롤 슈퍼바이저"
+        },
+        "r_733686f9ae97": {
+          "masculine": "데일리 오퍼레이터",
+          "feminine": "데일리 오퍼레이터",
+          "neutral": "데일리 오퍼레이터"
+        },
+        "r_ab703255dec3": {
+          "masculine": "I/O 코디네이터",
+          "feminine": "I/O 코디네이터",
+          "neutral": "I/O 코디네이터"
+        },
+        "r_75540ed9967e": {
+          "masculine": "텔레신 오퍼레이터",
+          "feminine": "텔레신 오퍼레이터",
+          "neutral": "텔레신 오퍼레이터"
+        },
+        "r_6c17929b4f69": {
+          "masculine": "디지털 매치무버",
+          "feminine": "디지털 매치무버",
+          "neutral": "디지털 매치무버"
+        },
+        "r_2646f9b4aadf": {
+          "masculine": "로토스코핑 아티스트",
+          "feminine": "로토스코핑 아티스트",
+          "neutral": "로토스코핑 아티스트"
+        },
+        "r_1abce9757421": {
+          "masculine": "디지털 자산 관리자 (DAM)",
+          "feminine": "디지털 자산 관리자 (DAM)",
+          "neutral": "디지털 자산 관리자 (DAM)"
+        },
+        "r_e28081bd8659": {
+          "masculine": "DI 슈퍼바이저",
+          "feminine": "DI 슈퍼바이저",
+          "neutral": "DI 슈퍼바이저"
+        },
+        "r_3be4ac15eccc": {
+          "masculine": "디지털 인터미디어트 엔지니어",
+          "feminine": "디지털 인터미디어트 엔지니어",
+          "neutral": "디지털 인터미디어트 엔지니어"
+        },
+        "r_ac6763f1d04b": {
+          "masculine": "디지털 인터미디어트 어시스턴트",
+          "feminine": "디지털 인터미디어트 어시스턴트",
+          "neutral": "디지털 인터미디어트 어시스턴트"
+        },
+        "r_68b5ed487d7c": {
+          "masculine": "VFX 데이터 매니저",
+          "feminine": "VFX 데이터 매니저",
+          "neutral": "VFX 데이터 매니저"
+        },
+        "r_98875c546157": {
+          "masculine": "렌더 매니저",
+          "feminine": "렌더 매니저",
+          "neutral": "렌더 매니저"
+        },
+        "r_37de85ee2914": {
+          "masculine": "3D 스테레오 슈퍼바이저",
+          "feminine": "3D 스테레오 슈퍼바이저",
+          "neutral": "3D 스테레오 슈퍼바이저"
+        },
+        "r_138f0f7f11c5": {
+          "masculine": "온셋 플레이백 오퍼레이터",
+          "feminine": "온셋 플레이백 오퍼레이터",
+          "neutral": "온셋 플레이백 오퍼레이터"
+        },
+        "r_6c52a0b17c05": {
+          "masculine": "VFX 인턴",
+          "feminine": "VFX 인턴",
+          "neutral": "VFX 인턴"
+        },
+        "r_1a1b5684e757": {
+          "masculine": "VFX 프로덕션 어시스턴트",
+          "feminine": "VFX 프로덕션 어시스턴트",
+          "neutral": "VFX 프로덕션 어시스턴트"
+        },
+        "r_03863e1fa165": {
+          "masculine": "VFX 팀 매니저",
+          "feminine": "VFX 팀 매니저",
+          "neutral": "VFX 팀 매니저"
+        },
+        "r_0006a71a7050": {
+          "masculine": "3D 헤드",
+          "feminine": "3D 헤드",
+          "neutral": "3D 헤드"
+        },
+        "r_9ad285824801": {
+          "masculine": "3D 애니메이션 디렉터",
+          "feminine": "3D 애니메이션 디렉터",
+          "neutral": "3D 애니메이션 디렉터"
+        },
+        "r_365169e4e39c": {
+          "masculine": "3D 리드 캐릭터 애니메이터",
+          "feminine": "3D 리드 캐릭터 애니메이터",
+          "neutral": "3D 리드 캐릭터 애니메이터"
+        },
+        "r_6dac25e38271": {
+          "masculine": "3D 캐릭터 애니메이터",
+          "feminine": "3D 캐릭터 애니메이터",
+          "neutral": "3D 캐릭터 애니메이터"
+        },
+        "r_18b24b362b8f": {
+          "masculine": "3D 리거",
+          "feminine": "3D 리거",
+          "neutral": "3D 리거"
+        },
+        "r_b6265894c01c": {
+          "masculine": "3D 모델러",
+          "feminine": "3D 모델러",
+          "neutral": "3D 모델러"
+        },
+        "r_401ce457432d": {
+          "masculine": "3D 라이팅 아티스트",
+          "feminine": "3D 라이팅 아티스트",
+          "neutral": "3D 라이팅 아티스트"
+        },
+        "r_d6c0df6758d4": {
+          "masculine": "3D 텍스처 아티스트",
+          "feminine": "3D 텍스처 아티스트",
+          "neutral": "3D 텍스처 아티스트"
+        },
+        "r_aff4837ba039": {
+          "masculine": "3D 카메라 아티스트",
+          "feminine": "3D 카메라 아티스트",
+          "neutral": "3D 카메라 아티스트"
+        },
+        "r_01ea52ed92df": {
+          "masculine": "3D 카메라 슈퍼바이저",
+          "feminine": "3D 카메라 슈퍼바이저",
+          "neutral": "3D 카메라 슈퍼바이저"
+        },
+        "r_1b2a5f055d73": {
+          "masculine": "FX 애니메이터",
+          "feminine": "FX 애니메이터",
+          "neutral": "FX 애니메이터"
+        },
+        "r_25d305ae2181": {
+          "masculine": "파티클 애니메이터",
+          "feminine": "파티클 애니메이터",
+          "neutral": "파티클 애니메이터"
+        },
+        "r_493348eeb5c9": {
+          "masculine": "2D 리거",
+          "feminine": "2D 리거",
+          "neutral": "2D 리거"
+        },
+        "r_50d612c5929c": {
+          "masculine": "2D 애니메이션 디렉터",
+          "feminine": "2D 애니메이션 디렉터",
+          "neutral": "2D 애니메이션 디렉터"
+        },
+        "r_5b75d1dcc3ba": {
+          "masculine": "2D 리드 캐릭터 애니메이터",
+          "feminine": "2D 리드 캐릭터 애니메이터",
+          "neutral": "2D 리드 캐릭터 애니메이터"
+        },
+        "r_d3bed7009009": {
+          "masculine": "2D 캐릭터 애니메이터",
+          "feminine": "2D 캐릭터 애니메이터",
+          "neutral": "2D 캐릭터 애니메이터"
+        },
+        "r_b9b34ba4ee44": {
+          "masculine": "모션빌더 아티스트",
+          "feminine": "모션빌더 아티스트",
+          "neutral": "모션빌더 아티스트"
+        },
+        "r_40ba6442d974": {
+          "masculine": "모션빌더 오퍼레이터",
+          "feminine": "모션빌더 오퍼레이터",
+          "neutral": "모션빌더 오퍼레이터"
+        }
+      },
+      "musik": {
+        "r_4b516c3014b1": {
+          "masculine": "작곡가",
+          "feminine": "작곡가",
+          "neutral": "작곡가"
+        },
+        "r_78a8b7bafdcf": {
+          "masculine": "추가 음악",
+          "feminine": "추가 음악",
+          "neutral": "추가 음악"
+        },
+        "r_be9c85f652ee": {
+          "masculine": "트레일러 작곡가",
+          "feminine": "트레일러 작곡가",
+          "neutral": "트레일러 작곡가"
+        },
+        "r_d052f25322c5": {
+          "masculine": "뮤직 디렉터",
+          "feminine": "뮤직 디렉터",
+          "neutral": "뮤직 디렉터"
+        },
+        "r_520348654852": {
+          "masculine": "뮤직 디렉터",
+          "feminine": "뮤직 디렉터",
+          "neutral": "뮤직 디렉터"
+        },
+        "r_d614bde7c500": {
+          "masculine": "뮤직 슈퍼바이저",
+          "feminine": "뮤직 슈퍼바이저",
+          "neutral": "뮤직 슈퍼바이저"
+        },
+        "r_1f0d7374bb4c": {
+          "masculine": "오케스트레이터",
+          "feminine": "오케스트레이터",
+          "neutral": "오케스트레이터"
+        },
+        "r_aa4b42f84387": {
+          "masculine": "편곡가",
+          "feminine": "편곡가",
+          "neutral": "편곡가"
+        },
+        "r_8c334f2ac9d3": {
+          "masculine": "편곡가",
+          "feminine": "편곡가",
+          "neutral": "편곡가"
+        },
+        "r_fe19755b0b9e": {
+          "masculine": "지휘자",
+          "feminine": "지휘자",
+          "neutral": "지휘자"
+        },
+        "r_73021f352efb": {
+          "masculine": "지휘자",
+          "feminine": "지휘자",
+          "neutral": "지휘자"
+        },
+        "r_1a95751341fb": {
+          "masculine": "뮤직 에디터",
+          "feminine": "뮤직 에디터",
+          "neutral": "뮤직 에디터"
+        },
+        "r_8fd3dbb18e49": {
+          "masculine": "뮤직 카피스트",
+          "feminine": "뮤직 카피스트",
+          "neutral": "뮤직 카피스트"
+        },
+        "r_d5e57768aab8": {
+          "masculine": "뮤직 프로듀서",
+          "feminine": "뮤직 프로듀서",
+          "neutral": "뮤직 프로듀서"
+        },
+        "r_0e9738be9045": {
+          "masculine": "뮤직 컨설턴트",
+          "feminine": "뮤직 컨설턴트",
+          "neutral": "뮤직 컨설턴트"
+        },
+        "r_82e1a4d8181e": {
+          "masculine": "뮤직 코디네이터",
+          "feminine": "뮤직 코디네이터",
+          "neutral": "뮤직 코디네이터"
+        },
+        "r_00bc34dec4f3": {
+          "masculine": "로직 오퍼레이터",
+          "feminine": "로직 오퍼레이터",
+          "neutral": "로직 오퍼레이터"
+        },
+        "r_0eae67a415cd": {
+          "masculine": "프로툴스 오퍼레이터",
+          "feminine": "프로툴스 오퍼레이터",
+          "neutral": "프로툴스 오퍼레이터"
+        },
+        "r_52aa8c6866dc": {
+          "masculine": "작곡가 어시스턴트",
+          "feminine": "작곡가 어시스턴트",
+          "neutral": "작곡가 어시스턴트"
+        },
+        "r_3e66ad9f45e2": {
+          "masculine": "뮤지션",
+          "feminine": "뮤지션",
+          "neutral": "뮤지션"
+        },
+        "r_ade18645efa3": {
+          "masculine": "사운드 에디터",
+          "feminine": "사운드 에디터",
+          "neutral": "사운드 에디터"
+        },
+        "r_0972afcc1e55": {
+          "masculine": "작곡가 인턴",
+          "feminine": "작곡가 인턴",
+          "neutral": "작곡가 인턴"
+        },
+        "r_801e363423c3": {
+          "masculine": "수석 사운드트랙 프로듀서",
+          "feminine": "수석 사운드트랙 프로듀서",
+          "neutral": "수석 사운드트랙 프로듀서"
+        }
+      },
+      "set-logistik": {
+        "r_06d9aa28368f": {
+          "masculine": "베이스 러너",
+          "feminine": "베이스 러너",
+          "neutral": "베이스 러너"
+        },
+        "r_51e581b5ea39": {
+          "masculine": "운전기사 (승용차 / 트럭)",
+          "feminine": "운전기사 (승용차 / 트럭)",
+          "neutral": "운전기사 (승용차 / 트럭)"
+        },
+        "r_36a599628c2e": {
+          "masculine": "로케이션 운전사",
+          "feminine": "로케이션 운전사",
+          "neutral": "로케이션 운전사"
+        },
+        "r_9bc1a35535fa": {
+          "masculine": "로케이션 유닛 매니저",
+          "feminine": "로케이션 유닛 매니저",
+          "neutral": "로케이션 유닛 매니저"
+        },
+        "r_273f12c52b95": {
+          "masculine": "어시스턴트 로케이션 매니저",
+          "feminine": "어시스턴트 로케이션 매니저",
+          "neutral": "어시스턴트 로케이션 매니저"
+        },
+        "r_ad61df711cdf": {
+          "masculine": "세트 보안 담당",
+          "feminine": "세트 보안 담당",
+          "neutral": "세트 보안 담당"
+        },
+        "r_16476d55e646": {
+          "masculine": "군중 통제 담당",
+          "feminine": "군중 통제 담당",
+          "neutral": "군중 통제 담당"
+        },
+        "r_d4d0eb9a01ad": {
+          "masculine": "무브먼트 디렉터",
+          "feminine": "무브먼트 디렉터",
+          "neutral": "무브먼트 디렉터"
+        },
+        "r_3c6a65ecb046": {
+          "masculine": "무브먼트 코치",
+          "feminine": "무브먼트 코치",
+          "neutral": "무브먼트 코치"
+        },
+        "r_c66e045ffbbf": {
+          "masculine": "친밀감 코디네이터",
+          "feminine": "친밀감 코디네이터",
+          "neutral": "친밀감 코디네이터"
+        },
+        "r_2e9dcd12712e": {
+          "masculine": "안무가",
+          "feminine": "안무가",
+          "neutral": "안무가"
+        },
+        "r_6f899f66fa58": {
+          "masculine": "댄스 코치",
+          "feminine": "댄스 코치",
+          "neutral": "댄스 코치"
+        },
+        "r_f4a45af86f47": {
+          "masculine": "노래 코치 / 보컬 코치",
+          "feminine": "노래 코치 / 보컬 코치",
+          "neutral": "노래 코치 / 보컬 코치"
+        },
+        "r_6e8ad217ef2f": {
+          "masculine": "대사 코치",
+          "feminine": "대사 코치",
+          "neutral": "대사 코치"
+        },
+        "r_63787dc385b1": {
+          "masculine": "방언 / 언어 코치",
+          "feminine": "방언 / 언어 코치",
+          "neutral": "방언 / 언어 코치"
+        },
+        "r_8546ce0263e3": {
+          "masculine": "연기 코치 (장애 / 신경다양성)",
+          "feminine": "연기 코치 (장애 / 신경다양성)",
+          "neutral": "연기 코치 (장애 / 신경다양성)"
+        },
+        "r_969986f76695": {
+          "masculine": "음악 코치",
+          "feminine": "음악 코치",
+          "neutral": "음악 코치"
+        },
+        "r_717c17e3e434": {
+          "masculine": "청각 장애 감독",
+          "feminine": "청각 장애 감독",
+          "neutral": "청각 장애 감독"
+        },
+        "r_e30edc1bd3f8": {
+          "masculine": "다양성 컨설턴트",
+          "feminine": "다양성 컨설턴트",
+          "neutral": "다양성 컨설턴트"
+        },
+        "r_5595cb9aacd1": {
+          "masculine": "감수성 리더",
+          "feminine": "감수성 리더",
+          "neutral": "감수성 리더"
+        },
+        "r_2d5e77118f48": {
+          "masculine": "통역사 / 번역가",
+          "feminine": "통역사 / 번역가",
+          "neutral": "통역사 / 번역가"
+        },
+        "r_48bf6fb54a76": {
+          "masculine": "대역 배우",
+          "feminine": "대역 배우",
+          "neutral": "대역 배우"
+        },
+        "r_5845830d5e82": {
+          "masculine": "현장 의료진 / 현장 구급대원",
+          "feminine": "현장 의료진 / 현장 구급대원",
+          "neutral": "현장 의료진 / 현장 구급대원"
+        },
+        "r_ad72daba923d": {
+          "masculine": "현장 교사 / 현장 튜터",
+          "feminine": "현장 교사 / 현장 튜터",
+          "neutral": "현장 교사 / 현장 튜터"
+        },
+        "r_79e9614b81a6": {
+          "masculine": "아동 보호자 / 현장 보호자",
+          "feminine": "아동 보호자 / 현장 보호자",
+          "neutral": "아동 보호자 / 현장 보호자"
+        },
+        "r_29d48a809858": {
+          "masculine": "아동 복지 담당자",
+          "feminine": "아동 복지 담당자",
+          "neutral": "아동 복지 담당자"
+        },
+        "r_aba4d92c8e69": {
+          "masculine": "아티스트 / 게스트 / VIP 연락 담당자",
+          "feminine": "아티스트 / 게스트 / VIP 연락 담당자",
+          "neutral": "아티스트 / 게스트 / VIP 연락 담당자"
+        },
+        "r_53207f6ae5f4": {
+          "masculine": "정신 건강 코디네이터",
+          "feminine": "정신 건강 코디네이터",
+          "neutral": "정신 건강 코디네이터"
+        },
+        "r_45520abcff27": {
+          "masculine": "복지 담당자 / 신뢰인",
+          "feminine": "복지 담당자 / 신뢰인",
+          "neutral": "복지 담당자 / 신뢰인"
+        },
+        "r_355cbf436694": {
+          "masculine": "보건 및 안전 담당자",
+          "feminine": "보건 및 안전 담당자",
+          "neutral": "보건 및 안전 담당자"
+        },
+        "r_308811767175": {
+          "masculine": "위생 담당자 (코로나)",
+          "feminine": "위생 담당자 (코로나)",
+          "neutral": "위생 담당자 (코로나)"
+        },
+        "r_32790b195d9e": {
+          "masculine": "해양 코디네이터",
+          "feminine": "해양 코디네이터",
+          "neutral": "해양 코디네이터"
+        },
+        "r_c93f3dbba0c2": {
+          "masculine": "수중 / 다이빙 코디네이터",
+          "feminine": "수중 / 다이빙 코디네이터",
+          "neutral": "수중 / 다이빙 코디네이터"
+        },
+        "r_2aed0957c337": {
+          "masculine": "안장 / 하네스 마스터",
+          "feminine": "안장 / 하네스 마스터",
+          "neutral": "안장 / 하네스 마스터"
+        },
+        "r_36f2141e2445": {
+          "masculine": "관객 코디네이터",
+          "feminine": "관객 코디네이터",
+          "neutral": "관객 코디네이터"
+        },
+        "r_dd293d0b7b4b": {
+          "masculine": "컨설턴트 감독",
+          "feminine": "컨설턴트 감독",
+          "neutral": "컨설턴트 감독"
+        },
+        "r_d675b4f70ea4": {
+          "masculine": "크리에이티브 디렉터 (광고 대행사)",
+          "feminine": "크리에이티브 디렉터 (광고 대행사)",
+          "neutral": "크리에이티브 디렉터 (광고 대행사)"
+        },
+        "r_2c01621b03b3": {
+          "masculine": "기술 자문 / 컨설턴트",
+          "feminine": "기술 자문 / 컨설턴트",
+          "neutral": "기술 자문 / 컨설턴트"
+        },
+        "r_777d604a46c7": {
+          "masculine": "전문 컨설턴트 (제작)",
+          "feminine": "전문 컨설턴트 (제작)",
+          "neutral": "전문 컨설턴트 (제작)"
+        },
+        "r_69b1f75394b4": {
+          "masculine": "강사 / 코치",
+          "feminine": "강사 / 코치",
+          "neutral": "강사 / 코치"
+        },
+        "r_9b689ca40dcd": {
+          "masculine": "임팩트 프로듀서",
+          "feminine": "임팩트 프로듀서",
+          "neutral": "임팩트 프로듀서"
+        },
+        "r_b22d32243e5e": {
+          "masculine": "그린 컨설턴트 / 지속 가능성 자문",
+          "feminine": "그린 컨설턴트 / 지속 가능성 자문",
+          "neutral": "그린 컨설턴트 / 지속 가능성 자문"
+        },
+        "r_b7e6bdc7cc1f": {
+          "masculine": "그린 컨설턴트 보조",
+          "feminine": "그린 컨설턴트 보조",
+          "neutral": "그린 컨설턴트 보조"
+        },
+        "r_e84880be1d61": {
+          "masculine": "EPK / BTS 라인 프로듀서",
+          "feminine": "EPK / BTS 라인 프로듀서",
+          "neutral": "EPK / BTS 라인 프로듀서"
+        },
+        "r_715e70975075": {
+          "masculine": "EPK / BTS 프로듀서",
+          "feminine": "EPK / BTS 프로듀서",
+          "neutral": "EPK / BTS 프로듀서"
+        },
+        "r_7028ae82d2e2": {
+          "masculine": "필름 복원 아티스트",
+          "feminine": "필름 복원 아티스트",
+          "neutral": "필름 복원 아티스트"
+        },
+        "r_92791462fbdd": {
+          "masculine": "필름 컬러리스트 (광학)",
+          "feminine": "필름 컬러리스트 (광학)",
+          "neutral": "필름 컬러리스트 (광학)"
+        },
+        "r_e732abed8e31": {
+          "masculine": "디스크 미디어 저작자 (DVD / 블루레이)",
+          "feminine": "디스크 미디어 저작자 (DVD / 블루레이)",
+          "neutral": "디스크 미디어 저작자 (DVD / 블루레이)"
+        },
+        "r_a63ade2d8c7d": {
+          "masculine": "스톱 모션 애니메이터",
+          "feminine": "스톱 모션 애니메이터",
+          "neutral": "스톱 모션 애니메이터"
+        },
+        "r_e56da499fa85": {
+          "masculine": "셀 애니메이터 / 전통 애니메이터",
+          "feminine": "셀 애니메이터 / 전통 애니메이터",
+          "neutral": "셀 애니메이터 / 전통 애니메이터"
+        },
+        "r_868363b4696a": {
+          "masculine": "게임 개발자 (쇼)",
+          "feminine": "게임 개발자 (쇼)",
+          "neutral": "게임 개발자 (쇼)"
+        },
+        "r_776e611a5b6e": {
+          "masculine": "퍼펫티어",
+          "feminine": "퍼펫티어",
+          "neutral": "퍼펫티어"
+        },
+        "r_d3d5008ffded": {
+          "masculine": "VJ / 비주얼 조키",
+          "feminine": "VJ / 비주얼 조키",
+          "neutral": "VJ / 비주얼 조키"
+        },
+        "r_f62082fcf3e6": {
+          "masculine": "온에어 디자이너",
+          "feminine": "온에어 디자이너",
+          "neutral": "온에어 디자이너"
+        },
+        "r_915e8fdeaa84": {
+          "masculine": "자막 감수자",
+          "feminine": "자막 감수자",
+          "neutral": "자막 감수자"
+        },
+        "r_e7b09583174a": {
+          "masculine": "자막 제작자",
+          "feminine": "자막 제작자",
+          "neutral": "자막 제작자"
+        },
+        "r_823099351f18": {
+          "masculine": "연출 스카우트",
+          "feminine": "연출 스카우트",
+          "neutral": "연출 스카우트"
+        },
+        "r_f25ed374ada5": {
+          "masculine": "권리 클리어런스",
+          "feminine": "권리 클리어런스",
+          "neutral": "권리 클리어런스"
+        },
+        "r_bf29b54303ec": {
+          "masculine": "홍보 사진작가",
+          "feminine": "홍보 사진작가",
+          "neutral": "홍보 사진작가"
+        },
+        "r_e2fe82d9e60c": {
+          "masculine": "프로젝트 매니저 (외부)",
+          "feminine": "프로젝트 매니저 (외부)",
+          "neutral": "프로젝트 매니저 (외부)"
+        },
+        "r_3687ead5b451": {
+          "masculine": "개인 비서 (현장)",
+          "feminine": "개인 비서 (현장)",
+          "neutral": "개인 비서 (현장)"
+        },
+        "r_b85e79c1153f": {
+          "masculine": "연구원 (일반)",
+          "feminine": "연구원 (일반)",
+          "neutral": "연구원 (일반)"
+        }
+      },
+      "cast": {
+        "r_3d0e76b883b1": {
+          "masculine": "주연 배우",
+          "feminine": "주연 배우",
+          "neutral": "주연 배우"
+        },
+        "r_543b99d52c01": {
+          "masculine": "배우",
+          "feminine": "배우",
+          "neutral": "배우"
+        },
+        "r_aa64ee1fd5d6": {
+          "masculine": "조연 배우",
+          "feminine": "조연 배우",
+          "neutral": "조연 배우"
+        },
+        "r_5fea55df03ed": {
+          "masculine": "엑스트라",
+          "feminine": "엑스트라",
+          "neutral": "엑스트라"
+        },
+        "r_912a4dbdd23c": {
+          "masculine": "특별 출연 엑스트라",
+          "feminine": "특별 출연 엑스트라",
+          "neutral": "특별 출연 엑스트라"
+        },
+        "r_130f7a137659": {
+          "masculine": "모델",
+          "feminine": "모델",
+          "neutral": "모델"
+        },
+        "r_e1e954da6cbb": {
+          "masculine": "성우 / 보이스오버",
+          "feminine": "성우 / 보이스오버",
+          "neutral": "성우 / 보이스오버"
+        },
+        "r_67da9411185f": {
+          "masculine": "대역 배우",
+          "feminine": "대역 배우",
+          "neutral": "대역 배우"
+        },
+        "r_00100aeac4bb": {
+          "masculine": "스턴트 배우",
+          "feminine": "스턴트 배우",
+          "neutral": "스턴트 배우"
+        },
+        "r_0367b47c9554": {
+          "masculine": "스턴트 더블",
+          "feminine": "스턴트 더블",
+          "neutral": "스턴트 더블"
+        },
+        "r_ca9ccb4b0409": {
+          "masculine": "스턴트 리거",
+          "feminine": "스턴트 리거",
+          "neutral": "스턴트 리거"
+        },
+        "r_418902de8e38": {
+          "masculine": "스턴트 코디네이터",
+          "feminine": "스턴트 코디네이터",
+          "neutral": "스턴트 코디네이터"
+        },
+        "r_7f2d1a7f256f": {
+          "masculine": "조수 스턴트 코디네이터",
+          "feminine": "조수 스턴트 코디네이터",
+          "neutral": "조수 스턴트 코디네이터"
+        },
+        "r_e84ab42c1ded": {
+          "masculine": "스턴트 부서 코디네이터",
+          "feminine": "스턴트 부서 코디네이터",
+          "neutral": "스턴트 부서 코디네이터"
+        },
+        "r_e09f42bb8f68": {
+          "masculine": "격투 안무가",
+          "feminine": "격투 안무가",
+          "neutral": "격투 안무가"
+        },
+        "r_f1b27e4baea8": {
+          "masculine": "액션 감독 / 2차 유닛 감독",
+          "feminine": "액션 감독 / 2차 유닛 감독",
+          "neutral": "액션 감독 / 2차 유닛 감독"
+        },
+        "r_ccdc591d96b4": {
+          "masculine": "항공 코디네이터",
+          "feminine": "항공 코디네이터",
+          "neutral": "항공 코디네이터"
+        },
+        "r_df312d5bf658": {
+          "masculine": "스턴트 라이더",
+          "feminine": "스턴트 라이더",
+          "neutral": "스턴트 라이더"
+        },
+        "r_64fe45905183": {
+          "masculine": "스턴트 기술자",
+          "feminine": "스턴트 기술자",
+          "neutral": "스턴트 기술자"
+        },
+        "r_28088de1cde2": {
+          "masculine": "스턴트 구조 잠수사",
+          "feminine": "스턴트 구조 잠수사",
+          "neutral": "스턴트 구조 잠수사"
+        },
+        "r_f1b818bfac99": {
+          "masculine": "파쿠르 아티스트",
+          "feminine": "파쿠르 아티스트",
+          "neutral": "파쿠르 아티스트"
+        },
+        "r_c9bf4b44628b": {
+          "masculine": "정밀 운전사",
+          "feminine": "정밀 운전사",
+          "neutral": "정밀 운전사"
+        },
+        "r_901a1b08f6ba": {
+          "masculine": "친밀감 코디네이터",
+          "feminine": "친밀감 코디네이터",
+          "neutral": "친밀감 코디네이터"
+        },
+        "r_7a721e572105": {
+          "masculine": "캐스팅 어소시에이트",
+          "feminine": "캐스팅 어소시에이트",
+          "neutral": "캐스팅 어소시에이트"
+        },
+        "r_a1f9ba79ab08": {
+          "masculine": "캐스팅 어시스턴트",
+          "feminine": "캐스팅 어시스턴트",
+          "neutral": "캐스팅 어시스턴트"
+        },
+        "r_84927cc7b2bc": {
+          "masculine": "조연 배우",
+          "feminine": "조연 배우",
+          "neutral": "조연 배우"
+        },
+        "r_97144193d2e9": {
+          "masculine": "엑스트라 / 배경 배우",
+          "feminine": "엑스트라 / 배경 배우",
+          "neutral": "엑스트라 / 배경 배우"
+        },
+        "r_de130677203b": {
+          "masculine": "청소년 캐스팅 디렉터",
+          "feminine": "청소년 캐스팅 디렉터",
+          "neutral": "청소년 캐스팅 디렉터"
+        },
+        "r_27725de30521": {
+          "masculine": "아동 캐스팅 디렉터",
+          "feminine": "아동 캐스팅 디렉터",
+          "neutral": "아동 캐스팅 디렉터"
+        },
+        "r_9e31ceb09d88": {
+          "masculine": "스트리트 캐스팅",
+          "feminine": "스트리트 캐스팅",
+          "neutral": "스트리트 캐스팅"
+        },
+        "r_081340fc2740": {
+          "masculine": "배경 / 조연 캐스팅",
+          "feminine": "배경 / 조연 캐스팅",
+          "neutral": "배경 / 조연 캐스팅"
+        },
+        "r_bff79e6f4b26": {
+          "masculine": "캐스팅 인턴",
+          "feminine": "캐스팅 인턴",
+          "neutral": "캐스팅 인턴"
+        },
+        "r_2f8822fb833a": {
+          "masculine": "수석 스턴트 리거",
+          "feminine": "수석 스턴트 리거",
+          "neutral": "수석 스턴트 리거"
+        },
+        "r_9fadc25f432e": {
+          "masculine": "마부",
+          "feminine": "마부",
+          "neutral": "마부"
+        }
+      },
+      "sfx": {
+        "r_a35d5905e687": {
+          "masculine": "특수효과 감독",
+          "feminine": "특수효과 감독",
+          "neutral": "특수효과 감독"
+        },
+        "r_09c0a67cf5e1": {
+          "masculine": "SFX 기술자",
+          "feminine": "SFX 기술자",
+          "neutral": "SFX 기술자"
+        },
+        "r_881a5efb4c8a": {
+          "masculine": "특수효과 코디네이터",
+          "feminine": "특수효과 코디네이터",
+          "neutral": "특수효과 코디네이터"
+        },
+        "r_a9f1b82c4859": {
+          "masculine": "특수효과 프로젝트 매니저",
+          "feminine": "특수효과 프로젝트 매니저",
+          "neutral": "특수효과 프로젝트 매니저"
+        },
+        "r_cea7226b63f6": {
+          "masculine": "불꽃 기술자",
+          "feminine": "불꽃 기술자",
+          "neutral": "불꽃 기술자"
+        },
+        "r_eb065a9f90c9": {
+          "masculine": "불꽃 보조",
+          "feminine": "불꽃 보조",
+          "neutral": "불꽃 보조"
+        },
+        "r_4d3662b84a22": {
+          "masculine": "미니어처 효과 프로듀서",
+          "feminine": "미니어처 효과 프로듀서",
+          "neutral": "미니어처 효과 프로듀서"
+        },
+        "r_e62650b9e5ae": {
+          "masculine": "크리처 디자이너",
+          "feminine": "크리처 디자이너",
+          "neutral": "크리처 디자이너"
+        },
+        "r_00baca6dc147": {
+          "masculine": "애니매트로닉스 엔지니어",
+          "feminine": "애니매트로닉스 엔지니어",
+          "neutral": "애니매트로닉스 엔지니어"
+        },
+        "r_174ffb787533": {
+          "masculine": "퍼펫 / 소품 제작자",
+          "feminine": "퍼펫 / 소품 제작자",
+          "neutral": "퍼펫 / 소품 제작자"
+        },
+        "r_506a008769b9": {
+          "masculine": "무기 담당자",
+          "feminine": "무기 담당자",
+          "neutral": "무기 담당자"
+        },
+        "r_2409c6266fd3": {
+          "masculine": "무기 기술자 / 무기 담당자",
+          "feminine": "무기 기술자 / 무기 담당자",
+          "neutral": "무기 기술자 / 무기 담당자"
+        },
+        "r_ddb886337a99": {
+          "masculine": "리거 (와이어)",
+          "feminine": "리거 (와이어)",
+          "neutral": "리거 (와이어)"
+        },
+        "r_72a4b7fb935e": {
+          "masculine": "SFX 리깅 / 특수 구조물",
+          "feminine": "SFX 리깅 / 특수 구조물",
+          "neutral": "SFX 리깅 / 특수 구조물"
+        },
+        "r_3628c7df2899": {
+          "masculine": "기계 효과 기술자",
+          "feminine": "기계 효과 기술자",
+          "neutral": "기계 효과 기술자"
+        },
+        "r_41cde5889636": {
+          "masculine": "눈 / 비 효과 기술자",
+          "feminine": "눈 / 비 효과 기술자",
+          "neutral": "눈 / 비 효과 기술자"
+        },
+        "r_ba881d560569": {
+          "masculine": "특수효과 회계 담당자",
+          "feminine": "특수효과 회계 담당자",
+          "neutral": "특수효과 회계 담당자"
+        },
+        "r_c723decf9e2c": {
+          "masculine": "특수효과 기술자",
+          "feminine": "특수효과 기술자",
+          "neutral": "특수효과 기술자"
+        }
+      },
+      "broadcast": {
+        "r_56003554d627": {
+          "masculine": "프로덕션 엔지니어",
+          "feminine": "프로덕션 엔지니어",
+          "neutral": "프로덕션 엔지니어"
+        },
+        "r_a5145362deb9": {
+          "masculine": "방송 엔지니어",
+          "feminine": "방송 엔지니어",
+          "neutral": "방송 엔지니어"
+        },
+        "r_21789a4bd26e": {
+          "masculine": "기술 감독",
+          "feminine": "기술 감독",
+          "neutral": "기술 감독"
+        },
+        "r_ed2861824940": {
+          "masculine": "비전 엔지니어",
+          "feminine": "비전 엔지니어",
+          "neutral": "비전 엔지니어"
+        },
+        "r_f35ad506ce91": {
+          "masculine": "비전 믹서",
+          "feminine": "비전 믹서",
+          "neutral": "비전 믹서"
+        },
+        "r_96549186fbdd": {
+          "masculine": "비전 믹서",
+          "feminine": "비전 믹서",
+          "neutral": "비전 믹서"
+        },
+        "r_b0f32c270502": {
+          "masculine": "쉐이더",
+          "feminine": "쉐이더",
+          "neutral": "쉐이더"
+        },
+        "r_4444caa14211": {
+          "masculine": "카메라 CCU 오퍼레이터",
+          "feminine": "카메라 CCU 오퍼레이터",
+          "neutral": "카메라 CCU 오퍼레이터"
+        },
+        "r_3a845b2c45a4": {
+          "masculine": "DVE 오퍼레이터",
+          "feminine": "DVE 오퍼레이터",
+          "neutral": "DVE 오퍼레이터"
+        },
+        "r_5eb58151f915": {
+          "masculine": "프로파일 오퍼레이터",
+          "feminine": "프로파일 오퍼레이터",
+          "neutral": "프로파일 오퍼레이터"
+        },
+        "r_bc517c79d131": {
+          "masculine": "방송 기술자",
+          "feminine": "방송 기술자",
+          "neutral": "방송 기술자"
+        },
+        "r_d0bc62ba1257": {
+          "masculine": "방송 음향 감독",
+          "feminine": "방송 음향 감독",
+          "neutral": "방송 음향 감독"
+        },
+        "r_6189d7ba75a5": {
+          "masculine": "음향 엔지니어 (방송)",
+          "feminine": "음향 엔지니어 (방송)",
+          "neutral": "음향 엔지니어 (방송)"
+        },
+        "r_9eadf0334fa2": {
+          "masculine": "스튜디오 / 이벤트 마스터",
+          "feminine": "스튜디오 / 이벤트 마스터",
+          "neutral": "스튜디오 / 이벤트 마스터"
+        },
+        "r_da7a6180d72a": {
+          "masculine": "이벤트 매니저",
+          "feminine": "이벤트 매니저",
+          "neutral": "이벤트 매니저"
+        },
+        "r_84e084ee4081": {
+          "masculine": "이벤트 기술자",
+          "feminine": "이벤트 기술자",
+          "neutral": "이벤트 기술자"
+        },
+        "r_2b01c5ebf763": {
+          "masculine": "MAZ 오퍼레이터",
+          "feminine": "MAZ 오퍼레이터",
+          "neutral": "MAZ 오퍼레이터"
+        },
+        "r_d2b49ec6c87b": {
+          "masculine": "VTR / MAZ 기술자",
+          "feminine": "VTR / MAZ 기술자",
+          "neutral": "VTR / MAZ 기술자"
+        },
+        "r_b1e7ad7a4e8d": {
+          "masculine": "EVS 오퍼레이터",
+          "feminine": "EVS 오퍼레이터",
+          "neutral": "EVS 오퍼레이터"
+        },
+        "r_6ce5d1fae4b4": {
+          "masculine": "LSM 오퍼레이터 (슬로모)",
+          "feminine": "LSM 오퍼레이터 (슬로모)",
+          "neutral": "LSM 오퍼레이터 (슬로모)"
+        },
+        "r_23864113991d": {
+          "masculine": "스트리밍 기술자",
+          "feminine": "스트리밍 기술자",
+          "neutral": "스트리밍 기술자"
+        },
+        "r_4e59228ff2bb": {
+          "masculine": "리거 (방송 / 이벤트)",
+          "feminine": "리거 (방송 / 이벤트)",
+          "neutral": "리거 (방송 / 이벤트)"
+        },
+        "r_54aa44e2bc03": {
+          "masculine": "리깅 어시스턴트",
+          "feminine": "리깅 어시스턴트",
+          "neutral": "리깅 어시스턴트"
+        },
+        "r_accbebaa16ce": {
+          "masculine": "비전 기술자",
+          "feminine": "비전 기술자",
+          "neutral": "비전 기술자"
+        },
+        "r_152179bb65ff": {
+          "masculine": "조명 기술자 (방송)",
+          "feminine": "조명 기술자 (방송)",
+          "neutral": "조명 기술자 (방송)"
+        },
+        "r_916b292e3ecc": {
+          "masculine": "음향 기술자 (방송)",
+          "feminine": "음향 기술자 (방송)",
+          "neutral": "음향 기술자 (방송)"
+        },
+        "r_a409aeab8c20": {
+          "masculine": "오디오 엔지니어 (PA / 이벤트)",
+          "feminine": "오디오 엔지니어 (PA / 이벤트)",
+          "neutral": "오디오 엔지니어 (PA / 이벤트)"
+        },
+        "r_894d032abc78": {
+          "masculine": "PA / 음향 기술자 (이벤트)",
+          "feminine": "PA / 음향 기술자 (이벤트)",
+          "neutral": "PA / 음향 기술자 (이벤트)"
+        },
+        "r_87a1930129df": {
+          "masculine": "SNG 오퍼레이터",
+          "feminine": "SNG 오퍼레이터",
+          "neutral": "SNG 오퍼레이터"
+        },
+        "r_0d146769f561": {
+          "masculine": "음향 보조 (방송)",
+          "feminine": "음향 보조 (방송)",
+          "neutral": "음향 보조 (방송)"
+        },
+        "r_4ee86e5361a7": {
+          "masculine": "비디오월 오퍼레이터",
+          "feminine": "비디오월 오퍼레이터",
+          "neutral": "비디오월 오퍼레이터"
+        },
+        "r_7c7bcadca79c": {
+          "masculine": "텔레프롬프터 오퍼레이터",
+          "feminine": "텔레프롬프터 오퍼레이터",
+          "neutral": "텔레프롬프터 오퍼레이터"
+        },
+        "r_e627ebc7d6a6": {
+          "masculine": "기술 보조 (방송)",
+          "feminine": "기술 보조 (방송)",
+          "neutral": "기술 보조 (방송)"
+        },
+        "r_b81926eec6f3": {
+          "masculine": "비전 보조",
+          "feminine": "비전 보조",
+          "neutral": "비전 보조"
+        },
+        "r_45710f001c06": {
+          "masculine": "케이블 러너",
+          "feminine": "케이블 러너",
+          "neutral": "케이블 러너"
+        },
+        "r_34cfe59314f7": {
+          "masculine": "비전 믹서 / 비디오 스위처",
+          "feminine": "비전 믹서 / 비디오 스위처",
+          "neutral": "비전 믹서 / 비디오 스위처"
+        },
+        "r_ba025e1926d2": {
+          "masculine": "LSM 오퍼레이터 (슬로우 모션)",
+          "feminine": "LSM 오퍼레이터 (슬로우 모션)",
+          "neutral": "LSM 오퍼레이터 (슬로우 모션)"
+        },
+        "r_c7e1fa1f7572": {
+          "masculine": "SG 오퍼레이터",
+          "feminine": "SG 오퍼레이터",
+          "neutral": "SG 오퍼레이터"
+        },
+        "r_c0aa2d3b3f9c": {
+          "masculine": "음향 보조 (방송)",
+          "feminine": "음향 보조 (방송)",
+          "neutral": "음향 보조 (방송)"
+        },
+        "r_32ca4217464e": {
+          "masculine": "기술 보조 (방송)",
+          "feminine": "기술 보조 (방송)",
+          "neutral": "기술 보조 (방송)"
+        }
+      },
+      "virtual": {
+        "r_9d90887128a0": {
+          "masculine": "버추얼 프로덕션 슈퍼바이저",
+          "feminine": "버추얼 프로덕션 슈퍼바이저",
+          "neutral": "버추얼 프로덕션 슈퍼바이저"
+        },
+        "r_9c3babb3c638": {
+          "masculine": "버추얼 프로덕션 프로듀서",
+          "feminine": "버추얼 프로덕션 프로듀서",
+          "neutral": "버추얼 프로덕션 프로듀서"
+        },
+        "r_1fee1676270e": {
+          "masculine": "버추얼 프로덕션 코디네이터",
+          "feminine": "버추얼 프로덕션 코디네이터",
+          "neutral": "버추얼 프로덕션 코디네이터"
+        },
+        "r_82e993b4422d": {
+          "masculine": "버추얼 프로덕션 스튜디오 매니저",
+          "feminine": "버추얼 프로덕션 스튜디오 매니저",
+          "neutral": "버추얼 프로덕션 스튜디오 매니저"
+        },
+        "r_14e7e79a9ca8": {
+          "masculine": "VAD 아티스트 (가상 아트 디파트먼트)",
+          "feminine": "VAD 아티스트 (가상 아트 디파트먼트)",
+          "neutral": "VAD 아티스트 (가상 아트 디파트먼트)"
+        },
+        "r_2034a25adda6": {
+          "masculine": "가상 제작 엔지니어",
+          "feminine": "가상 제작 엔지니어",
+          "neutral": "가상 제작 엔지니어"
+        },
+        "r_188b9da491f3": {
+          "masculine": "VP 시스템 및 도구 기술 감독",
+          "feminine": "VP 시스템 및 도구 기술 감독",
+          "neutral": "VP 시스템 및 도구 기술 감독"
+        },
+        "r_93a5c89da775": {
+          "masculine": "LED 월 운영자",
+          "feminine": "LED 월 운영자",
+          "neutral": "LED 월 운영자"
+        },
+        "r_d1415a80bf57": {
+          "masculine": "언리얼 엔진 운영자",
+          "feminine": "언리얼 엔진 운영자",
+          "neutral": "언리얼 엔진 운영자"
+        },
+        "r_1c2e82f4274b": {
+          "masculine": "실시간 엔진 운영자",
+          "feminine": "실시간 엔진 운영자",
+          "neutral": "실시간 엔진 운영자"
+        },
+        "r_247afd3ab3fd": {
+          "masculine": "미디어 서버 운영자",
+          "feminine": "미디어 서버 운영자",
+          "neutral": "미디어 서버 운영자"
+        },
+        "r_8728a8d46ae1": {
+          "masculine": "VP 시스템 관리자",
+          "feminine": "VP 시스템 관리자",
+          "neutral": "VP 시스템 관리자"
+        },
+        "r_e7c27999f9ae": {
+          "masculine": "VP 트래킹 기술자",
+          "feminine": "VP 트래킹 기술자",
+          "neutral": "VP 트래킹 기술자"
+        },
+        "r_bbe66ea7740f": {
+          "masculine": "VP LED 기술자",
+          "feminine": "VP LED 기술자",
+          "neutral": "VP LED 기술자"
+        },
+        "r_ad04846bb2b3": {
+          "masculine": "트래킹 기술자",
+          "feminine": "트래킹 기술자",
+          "neutral": "트래킹 기술자"
+        },
+        "r_c100cb7d8cdf": {
+          "masculine": "실시간 아티스트",
+          "feminine": "실시간 아티스트",
+          "neutral": "실시간 아티스트"
+        },
+        "r_84ae9f742a8c": {
+          "masculine": "가상 아트 디파트먼트 아티스트",
+          "feminine": "가상 아트 디파트먼트 아티스트",
+          "neutral": "가상 아트 디파트먼트 아티스트"
+        }
+      },
+      "redaktion": {
+        "r_67a1c14f27d6": {
+          "masculine": "편집 감독",
+          "feminine": "편집 감독",
+          "neutral": "편집 감독"
+        },
+        "r_fb6f303e781e": {
+          "masculine": "편집장",
+          "feminine": "편집장",
+          "neutral": "편집장"
+        },
+        "r_1d083876d102": {
+          "masculine": "당직 편집자",
+          "feminine": "당직 편집자",
+          "neutral": "당직 편집자"
+        },
+        "r_dba49499f044": {
+          "masculine": "프로덕션 책임자 (방송사)",
+          "feminine": "프로덕션 책임자 (방송사)",
+          "neutral": "프로덕션 책임자 (방송사)"
+        },
+        "r_399d5722db1b": {
+          "masculine": "프로덕션 디렉터 (방송사)",
+          "feminine": "프로덕션 디렉터 (방송사)",
+          "neutral": "프로덕션 디렉터 (방송사)"
+        },
+        "r_97c6fe9db2a1": {
+          "masculine": "런다운 코디네이터",
+          "feminine": "런다운 코디네이터",
+          "neutral": "런다운 코디네이터"
+        },
+        "r_c1f3dd5d125c": {
+          "masculine": "편집자",
+          "feminine": "편집자",
+          "neutral": "편집자"
+        },
+        "r_74db110eed35": {
+          "masculine": "TV 작가 / 저자",
+          "feminine": "TV 작가 / 저자",
+          "neutral": "TV 작가 / 저자"
+        },
+        "r_c68ab8bdf35f": {
+          "masculine": "캐스팅 편집자",
+          "feminine": "캐스팅 편집자",
+          "neutral": "캐스팅 편집자"
+        },
+        "r_db514834619e": {
+          "masculine": "영상 편집자",
+          "feminine": "영상 편집자",
+          "neutral": "영상 편집자"
+        },
+        "r_2d3838a04d2d": {
+          "masculine": "편집 편집자",
+          "feminine": "편집 편집자",
+          "neutral": "편집 편집자"
+        },
+        "r_72b16f73761b": {
+          "masculine": "온라인 편집자 / 웹 편집자",
+          "feminine": "온라인 편집자 / 웹 편집자",
+          "neutral": "온라인 편집자 / 웹 편집자"
+        },
+        "r_1eb2a3ac7a7f": {
+          "masculine": "비디오 편집자 (편집부)",
+          "feminine": "비디오 편집자 (편집부)",
+          "neutral": "비디오 편집자 (편집부)"
+        },
+        "r_fea2147a3023": {
+          "masculine": "TV 기자",
+          "feminine": "TV 기자",
+          "neutral": "TV 기자"
+        },
+        "r_89901fa29127": {
+          "masculine": "리포터",
+          "feminine": "리포터",
+          "neutral": "리포터"
+        },
+        "r_49092803ca90": {
+          "masculine": "연출자 / 쇼 디렉터",
+          "feminine": "연출자 / 쇼 디렉터",
+          "neutral": "연출자 / 쇼 디렉터"
+        },
+        "r_558623ea54e2": {
+          "masculine": "비디오 프로듀서",
+          "feminine": "비디오 프로듀서",
+          "neutral": "비디오 프로듀서"
+        },
+        "r_cd94582e5de3": {
+          "masculine": "비디오 기자 (VJ)",
+          "feminine": "비디오 기자 (VJ)",
+          "neutral": "비디오 기자 (VJ)"
+        },
+        "r_c1632a39db5a": {
+          "masculine": "비디오 콘텐츠 크리에이터 (소셜 미디어)",
+          "feminine": "비디오 콘텐츠 크리에이터 (소셜 미디어)",
+          "neutral": "비디오 콘텐츠 크리에이터 (소셜 미디어)"
+        },
+        "r_48a469f4753e": {
+          "masculine": "호스트 / 진행자",
+          "feminine": "호스트 / 진행자",
+          "neutral": "호스트 / 진행자"
+        },
+        "r_dff0d36f7649": {
+          "masculine": "뉴스 앵커 / 뉴스 리더",
+          "feminine": "뉴스 앵커 / 뉴스 리더",
+          "neutral": "뉴스 앵커 / 뉴스 리더"
+        },
+        "r_d8ae611e8a84": {
+          "masculine": "크리에이티브 프로듀서",
+          "feminine": "크리에이티브 프로듀서",
+          "neutral": "크리에이티브 프로듀서"
+        },
+        "r_52eb2ef13219": {
+          "masculine": "크리에이티브 디렉터",
+          "feminine": "크리에이티브 디렉터",
+          "neutral": "크리에이티브 디렉터"
+        },
+        "r_4741fd392c78": {
+          "masculine": "카피라이터",
+          "feminine": "카피라이터",
+          "neutral": "카피라이터"
+        },
+        "r_7693f0b6836d": {
+          "masculine": "콘셉트 개발자",
+          "feminine": "콘셉트 개발자",
+          "neutral": "콘셉트 개발자"
+        },
+        "r_8ed4467cbce1": {
+          "masculine": "소셜 미디어 프로듀서",
+          "feminine": "소셜 미디어 프로듀서",
+          "neutral": "소셜 미디어 프로듀서"
+        },
+        "r_f3046605ff7d": {
+          "masculine": "편집 보조",
+          "feminine": "편집 보조",
+          "neutral": "편집 보조"
+        },
+        "r_39b32b25eed9": {
+          "masculine": "편집 인턴",
+          "feminine": "편집 인턴",
+          "neutral": "편집 인턴"
+        },
+        "r_7947e117851f": {
+          "masculine": "당직 편집자 / 편집장",
+          "feminine": "당직 편집자 / 편집장",
+          "neutral": "당직 편집자 / 편집장"
+        },
+        "r_9c948261499b": {
+          "masculine": "프로덕션 책임자 (스튜디오 / 네트워크)",
+          "feminine": "프로덕션 책임자 (스튜디오 / 네트워크)",
+          "neutral": "프로덕션 책임자 (스튜디오 / 네트워크)"
+        },
+        "r_844ebb650ef7": {
+          "masculine": "편집자 / 기자",
+          "feminine": "편집자 / 기자",
+          "neutral": "편집자 / 기자"
+        },
+        "r_bac4afc8f929": {
+          "masculine": "편집 프로듀서 / 연출자",
+          "feminine": "편집 프로듀서 / 연출자",
+          "neutral": "편집 프로듀서 / 연출자"
+        },
+        "r_324910e3b0ab": {
+          "masculine": "퀴즈 편집자",
+          "feminine": "퀴즈 편집자",
+          "neutral": "퀴즈 편집자"
+        },
+        "r_363c83ce0934": {
+          "masculine": "웜업 아티스트",
+          "feminine": "웜업 아티스트",
+          "neutral": "웜업 아티스트"
+        },
+        "r_6227b3014b7a": {
+          "masculine": "스트링거 / 픽서",
+          "feminine": "스트링거 / 픽서",
+          "neutral": "스트링거 / 픽서"
+        },
+        "r_dfa579f14095": {
+          "masculine": "로거 / 영상 로거",
+          "feminine": "로거 / 영상 로거",
+          "neutral": "로거 / 영상 로거"
+        },
+        "r_57c0fec76f7d": {
+          "masculine": "전사자",
+          "feminine": "전사자",
+          "neutral": "전사자"
+        },
+        "r_cabe547e084e": {
+          "masculine": "영상 조사자",
+          "feminine": "영상 조사자",
+          "neutral": "영상 조사자"
+        }
+      },
+      "social": {
+        "r_e8a967aad9b7": {
+          "masculine": "콘텐츠 크리에이터",
+          "feminine": "콘텐츠 크리에이터",
+          "neutral": "콘텐츠 크리에이터"
+        },
+        "r_631c65ad8827": {
+          "masculine": "인플루언서",
+          "feminine": "인플루언서",
+          "neutral": "인플루언서"
+        },
+        "r_a9eeb34333bc": {
+          "masculine": "소셜 미디어 매니저",
+          "feminine": "소셜 미디어 매니저",
+          "neutral": "소셜 미디어 매니저"
+        },
+        "r_b510fa57cea0": {
+          "masculine": "UGC 크리에이터",
+          "feminine": "UGC 크리에이터",
+          "neutral": "UGC 크리에이터"
+        },
+        "r_4d66d4dbbf12": {
+          "masculine": "릴스 비디오그래퍼",
+          "feminine": "릴스 비디오그래퍼",
+          "neutral": "릴스 비디오그래퍼"
+        },
+        "r_423ece24b5c2": {
+          "masculine": "틱톡 크리에이터",
+          "feminine": "틱톡 크리에이터",
+          "neutral": "틱톡 크리에이터"
+        },
+        "r_e7483d4ddd6d": {
+          "masculine": "커뮤니티 매니저",
+          "feminine": "커뮤니티 매니저",
+          "neutral": "커뮤니티 매니저"
+        },
+        "r_6f877112cd0a": {
+          "masculine": "소셜 미디어 전략가",
+          "feminine": "소셜 미디어 전략가",
+          "neutral": "소셜 미디어 전략가"
+        },
+        "r_bd90a8429d6f": {
+          "masculine": "인플루언서 / 크리에이터",
+          "feminine": "인플루언서 / 크리에이터",
+          "neutral": "인플루언서 / 크리에이터"
+        },
+        "r_c43ce08ef6e8": {
+          "masculine": "브랜드 스토리텔러",
+          "feminine": "브랜드 스토리텔러",
+          "neutral": "브랜드 스토리텔러"
+        },
+        "r_e75a59be5b02": {
+          "masculine": "소셜 비디오그래퍼",
+          "feminine": "소셜 비디오그래퍼",
+          "neutral": "소셜 비디오그래퍼"
+        },
+        "r_5f522b44dd48": {
+          "masculine": "쇼트폼 편집자",
+          "feminine": "쇼트폼 편집자",
+          "neutral": "쇼트폼 편집자"
+        },
+        "r_ce039c1f951f": {
+          "masculine": "모션 디자이너 (소셜)",
+          "feminine": "모션 디자이너 (소셜)",
+          "neutral": "모션 디자이너 (소셜)"
+        }
+      },
+      "foto": {
+        "r_d2c0588cf0d1": {
+          "masculine": "사진작가",
+          "feminine": "사진작가",
+          "neutral": "사진작가"
+        },
+        "r_d7f7fbf5939c": {
+          "masculine": "패션 사진작가",
+          "feminine": "패션 사진작가",
+          "neutral": "패션 사진작가"
+        },
+        "r_e0551919b067": {
+          "masculine": "제품 사진작가",
+          "feminine": "제품 사진작가",
+          "neutral": "제품 사진작가"
+        },
+        "r_b06301444ef7": {
+          "masculine": "이벤트 사진작가",
+          "feminine": "이벤트 사진작가",
+          "neutral": "이벤트 사진작가"
+        },
+        "r_124df4c664ce": {
+          "masculine": "인물 사진작가",
+          "feminine": "인물 사진작가",
+          "neutral": "인물 사진작가"
+        },
+        "r_2e1fcf07d241": {
+          "masculine": "상업 사진작가",
+          "feminine": "상업 사진작가",
+          "neutral": "상업 사진작가"
+        },
+        "r_02bd21bcff9c": {
+          "masculine": "음식 사진작가",
+          "feminine": "음식 사진작가",
+          "neutral": "음식 사진작가"
+        },
+        "r_8a273a427bd6": {
+          "masculine": "드론 사진작가",
+          "feminine": "드론 사진작가",
+          "neutral": "드론 사진작가"
+        },
+        "r_843b4748146d": {
+          "masculine": "스틸 사진작가",
+          "feminine": "스틸 사진작가",
+          "neutral": "스틸 사진작가"
+        },
+        "r_b622037392fb": {
+          "masculine": "사진 보조",
+          "feminine": "사진 보조",
+          "neutral": "사진 보조"
+        },
+        "r_6a2008f9f2ef": {
+          "masculine": "스튜디오 매니저",
+          "feminine": "스튜디오 매니저",
+          "neutral": "스튜디오 매니저"
+        },
+        "r_341b032b61fc": {
+          "masculine": "리터처",
+          "feminine": "리터처",
+          "neutral": "리터처"
+        },
+        "r_468329a20ba4": {
+          "masculine": "포토 에디터",
+          "feminine": "포토 에디터",
+          "neutral": "포토 에디터"
+        }
+      },
+      "ki": {
+        "r_0af68f26119c": {
+          "masculine": "AI 영화 제작자",
+          "feminine": "AI 영화 제작자",
+          "neutral": "AI 영화 제작자"
+        },
+        "r_7ebc4eeffa63": {
+          "masculine": "AI 리드 / AI 슈퍼바이저",
+          "feminine": "AI 리드 / AI 슈퍼바이저",
+          "neutral": "AI 리드 / AI 슈퍼바이저"
+        },
+        "r_5143bd061069": {
+          "masculine": "AI 감독",
+          "feminine": "AI 감독",
+          "neutral": "AI 감독"
+        },
+        "r_8b38d96f6763": {
+          "masculine": "AI 애니메이터",
+          "feminine": "AI 애니메이터",
+          "neutral": "AI 애니메이터"
+        },
+        "r_addc4afc90e0": {
+          "masculine": "프롬프트 엔지니어 (영화 및 미디어)",
+          "feminine": "프롬프트 엔지니어 (영화 및 미디어)",
+          "neutral": "프롬프트 엔지니어 (영화 및 미디어)"
+        },
+        "r_227b357243e1": {
+          "masculine": "AI 시나리오 작가",
+          "feminine": "AI 시나리오 작가",
+          "neutral": "AI 시나리오 작가"
+        },
+        "r_53ef2619b5af": {
+          "masculine": "AI 스토리보드 아티스트",
+          "feminine": "AI 스토리보드 아티스트",
+          "neutral": "AI 스토리보드 아티스트"
+        },
+        "r_1185b1151f24": {
+          "masculine": "AI 이미지 크리에이터",
+          "feminine": "AI 이미지 크리에이터",
+          "neutral": "AI 이미지 크리에이터"
+        },
+        "r_f551cf191b74": {
+          "masculine": "AI 비디오 크리에이터",
+          "feminine": "AI 비디오 크리에이터",
+          "neutral": "AI 비디오 크리에이터"
+        },
+        "r_b69e1ec80a94": {
+          "masculine": "AI 사운드 디자이너",
+          "feminine": "AI 사운드 디자이너",
+          "neutral": "AI 사운드 디자이너"
+        },
+        "r_237f8a4202e1": {
+          "masculine": "AI 컬러리스트",
+          "feminine": "AI 컬러리스트",
+          "neutral": "AI 컬러리스트"
+        },
+        "r_38b5ef6c319c": {
+          "masculine": "AI 워크플로우 컨설턴트 (영화)",
+          "feminine": "AI 워크플로우 컨설턴트 (영화)",
+          "neutral": "AI 워크플로우 컨설턴트 (영화)"
+        }
+      },
+      "drehbuch": {
+        "r_f63a97948825": {
+          "masculine": "쇼러너",
+          "feminine": "쇼러너",
+          "neutral": "쇼러너"
+        },
+        "r_da4094d01df6": {
+          "masculine": "수석 작가",
+          "feminine": "수석 작가",
+          "neutral": "수석 작가"
+        },
+        "r_48862b016872": {
+          "masculine": "수석 작가 보조",
+          "feminine": "수석 작가 보조",
+          "neutral": "수석 작가 보조"
+        },
+        "r_f0e5da473f57": {
+          "masculine": "어시스턴트 쇼러너",
+          "feminine": "어시스턴트 쇼러너",
+          "neutral": "어시스턴트 쇼러너"
+        },
+        "r_be444be7e73a": {
+          "masculine": "시나리오 작가",
+          "feminine": "시나리오 작가",
+          "neutral": "시나리오 작가"
+        },
+        "r_d1a561dc7125": {
+          "masculine": "공동 작가",
+          "feminine": "공동 작가",
+          "neutral": "공동 작가"
+        },
+        "r_da01eb9b61e7": {
+          "masculine": "리라이터",
+          "feminine": "리라이터",
+          "neutral": "리라이터"
+        },
+        "r_199c194315c9": {
+          "masculine": "스크립트 닥터",
+          "feminine": "스크립트 닥터",
+          "neutral": "스크립트 닥터"
+        },
+        "r_a180812047b1": {
+          "masculine": "스토리 에디터",
+          "feminine": "스토리 에디터",
+          "neutral": "스토리 에디터"
+        },
+        "r_5f9704129182": {
+          "masculine": "스토리라이너",
+          "feminine": "스토리라이너",
+          "neutral": "스토리라이너"
+        },
+        "r_41126a4d581f": {
+          "masculine": "스크립트 에디터",
+          "feminine": "스크립트 에디터",
+          "neutral": "스크립트 에디터"
+        },
+        "r_11bee057c159": {
+          "masculine": "대사 에디터",
+          "feminine": "대사 에디터",
+          "neutral": "대사 에디터"
+        },
+        "r_d578a24e6a6c": {
+          "masculine": "대사 작가",
+          "feminine": "대사 작가",
+          "neutral": "대사 작가"
+        },
+        "r_cbc48ad9850e": {
+          "masculine": "스크립트 리더",
+          "feminine": "스크립트 리더",
+          "neutral": "스크립트 리더"
+        },
+        "r_850bbf550984": {
+          "masculine": "드라마투르그 / 스크립트 컨설턴트",
+          "feminine": "드라마투르그 / 스크립트 컨설턴트",
+          "neutral": "드라마투르그 / 스크립트 컨설턴트"
+        },
+        "r_c33a26535234": {
+          "masculine": "스토리 개발",
+          "feminine": "스토리 개발",
+          "neutral": "스토리 개발"
+        },
+        "r_e439aac0b481": {
+          "masculine": "스크립트 책임자",
+          "feminine": "스크립트 책임자",
+          "neutral": "스크립트 책임자"
+        },
+        "r_a30d0af43af8": {
+          "masculine": "스토리 책임자",
+          "feminine": "스토리 책임자",
+          "neutral": "스토리 책임자"
+        },
+        "r_3aa5851edfa7": {
+          "masculine": "포맷 개발자",
+          "feminine": "포맷 개발자",
+          "neutral": "포맷 개발자"
+        },
+        "r_fc05d4531220": {
+          "masculine": "트리트먼트 작가",
+          "feminine": "트리트먼트 작가",
+          "neutral": "트리트먼트 작가"
+        },
+        "r_601f64f82db2": {
+          "masculine": "더빙 스크립트 작가",
+          "feminine": "더빙 스크립트 작가",
+          "neutral": "더빙 스크립트 작가"
+        },
+        "r_1ddc57dbbeb2": {
+          "masculine": "오디오 설명 작가",
+          "feminine": "오디오 설명 작가",
+          "neutral": "오디오 설명 작가"
+        },
+        "r_9f89ae134497": {
+          "masculine": "영화 번역가",
+          "feminine": "영화 번역가",
+          "neutral": "영화 번역가"
+        },
+        "r_6cc875ec3963": {
+          "masculine": "스크립트 번역가",
+          "feminine": "스크립트 번역가",
+          "neutral": "스크립트 번역가"
+        },
+        "r_5947f173deeb": {
+          "masculine": "자막 번역",
+          "feminine": "자막 번역",
+          "neutral": "자막 번역"
+        },
+        "r_7b6a9a537e9a": {
+          "masculine": "대사 번역",
+          "feminine": "대사 번역",
+          "neutral": "대사 번역"
+        },
+        "r_07f1b8537dbc": {
+          "masculine": "대본 번역",
+          "feminine": "대본 번역",
+          "neutral": "대본 번역"
+        },
+        "r_baf097c29e20": {
+          "masculine": "대사 목록 필사자",
+          "feminine": "대사 목록 필사자",
+          "neutral": "대사 목록 필사자"
+        },
+        "r_84f5505f76e2": {
+          "masculine": "카피라이터",
+          "feminine": "카피라이터",
+          "neutral": "카피라이터"
+        },
+        "r_f38e225361bf": {
+          "masculine": "언어 보조",
+          "feminine": "언어 보조",
+          "neutral": "언어 보조"
+        },
+        "r_eda2531fdadf": {
+          "masculine": "연구원",
+          "feminine": "연구원",
+          "neutral": "연구원"
+        },
+        "r_c6e3b618f79f": {
+          "masculine": "연구 보조",
+          "feminine": "연구 보조",
+          "neutral": "연구 보조"
+        },
+        "r_0434302793dc": {
+          "masculine": "스크립트 코디네이터",
+          "feminine": "스크립트 코디네이터",
+          "neutral": "스크립트 코디네이터"
+        },
+        "r_dae3743c6b89": {
+          "masculine": "스크립트 인턴",
+          "feminine": "스크립트 인턴",
+          "neutral": "스크립트 인턴"
+        }
+      },
+      "public-relations": {
+        "r_1860a572354e": {
+          "masculine": "마케팅 및 PR",
+          "feminine": "마케팅 및 PR",
+          "neutral": "마케팅 및 PR"
+        },
+        "r_201f2da74897": {
+          "masculine": "소셜 미디어 매니저 (영화)",
+          "feminine": "소셜 미디어 매니저 (영화)",
+          "neutral": "소셜 미디어 매니저 (영화)"
+        },
+        "r_041271a6a3ee": {
+          "masculine": "프로모션 코디네이터",
+          "feminine": "프로모션 코디네이터",
+          "neutral": "프로모션 코디네이터"
+        }
+      },
+      "sicherheit-sanitaetsdienst": {
+        "r_972d7ff7233a": {
+          "masculine": "세트 메딕",
+          "feminine": "세트 메딕",
+          "neutral": "세트 메딕"
+        },
+        "r_deefff77f871": {
+          "masculine": "응급 의료 기술자",
+          "feminine": "응급 의료 기술자",
+          "neutral": "응급 의료 기술자"
+        },
+        "r_63a9f32e6a72": {
+          "masculine": "산업 응급 처치 메딕",
+          "feminine": "산업 응급 처치 메딕",
+          "neutral": "산업 응급 처치 메딕"
+        },
+        "r_550de11c2d96": {
+          "masculine": "화재 감시 / 화재 안전 감시",
+          "feminine": "화재 감시 / 화재 안전 감시",
+          "neutral": "화재 감시 / 화재 안전 감시"
+        },
+        "r_427dc70aedd7": {
+          "masculine": "화재 안전 보조",
+          "feminine": "화재 안전 보조",
+          "neutral": "화재 안전 보조"
+        },
+        "r_a3247768d472": {
+          "masculine": "화재 안전 책임자",
+          "feminine": "화재 안전 책임자",
+          "neutral": "화재 안전 책임자"
+        }
+      },
+      "catering-setverpflegung": {
+        "r_330e10f94b8f": {
+          "masculine": "케이터링 매니저",
+          "feminine": "케이터링 매니저",
+          "neutral": "케이터링 매니저"
+        },
+        "r_2fe8f1ac7f90": {
+          "masculine": "세트 요리사 / 셰프",
+          "feminine": "세트 요리사 / 셰프",
+          "neutral": "세트 요리사 / 셰프"
+        },
+        "r_463cca2307e9": {
+          "masculine": "케이터링 보조 / 주방 보조",
+          "feminine": "케이터링 보조 / 주방 보조",
+          "neutral": "케이터링 보조 / 주방 보조"
+        },
+        "r_e114754d9175": {
+          "masculine": "크래프트 서비스",
+          "feminine": "크래프트 서비스",
+          "neutral": "크래프트 서비스"
+        },
+        "r_cb6d56c18bf6": {
+          "masculine": "세트 케이터링 / 음식 서비스 담당",
+          "feminine": "세트 케이터링 / 음식 서비스 담당",
+          "neutral": "세트 케이터링 / 음식 서비스 담당"
+        },
+        "r_532adc563b66": {
+          "masculine": "케이터링 / 이동 주방 운전사",
+          "feminine": "케이터링 / 이동 주방 운전사",
+          "neutral": "케이터링 / 이동 주방 운전사"
+        }
+      },
+      "filmtiere-tiertraining": {
+        "r_3d8ab6fb2c6a": {
+          "masculine": "영상 촬영용 동물 훈련사",
+          "feminine": "영상 촬영용 동물 훈련사",
+          "neutral": "영상 촬영용 동물 훈련사"
+        },
+        "r_654c33dc9c6b": {
+          "masculine": "영화 촬영용 개 훈련사",
+          "feminine": "영화 촬영용 개 훈련사",
+          "neutral": "영화 촬영용 개 훈련사"
+        },
+        "r_40758f075d18": {
+          "masculine": "동물 핸들러",
+          "feminine": "동물 핸들러",
+          "neutral": "동물 핸들러"
+        },
+        "r_7a1591b96b3a": {
+          "masculine": "동물 코디네이터",
+          "feminine": "동물 코디네이터",
+          "neutral": "동물 코디네이터"
+        },
+        "r_a63695a566c3": {
+          "masculine": "촬영장 동물 관리 담당자",
+          "feminine": "촬영장 동물 관리 담당자",
+          "neutral": "촬영장 동물 관리 담당자"
+        },
+        "r_9faf951b627e": {
+          "masculine": "말 총괄 (Horse Master)",
+          "feminine": "말 총괄 (Horse Master)",
+          "neutral": "말 총괄 (Horse Master)"
+        },
+        "r_7c4f137defec": {
+          "masculine": "말 총괄 보조",
+          "feminine": "말 총괄 보조",
+          "neutral": "말 총괄 보조"
+        },
+        "r_8e8f21cf0303": {
+          "masculine": "영화 촬영용 말 훈련사",
+          "feminine": "영화 촬영용 말 훈련사",
+          "neutral": "영화 촬영용 말 훈련사"
+        },
+        "r_35f9ffa503c4": {
+          "masculine": "말 핸들러 (Horse Wrangler)",
+          "feminine": "말 핸들러 (Horse Wrangler)",
+          "neutral": "말 핸들러 (Horse Wrangler)"
+        }
+      }
     }
   },
   "TransactionalEmail": {
@@ -8454,5 +13363,13 @@
     "noMatches": "이 분야에는 아직 저장한 항목이 없습니다.",
     "signInHint": "저장한 항목을 보려면 로그인하세요.",
     "removeItem": "저장한 항목에서 {name} 삭제"
+  },
+  "OccupationForm": {
+    "title": "직업명 표기 방식",
+    "help": "직업명을 어떤 형태로 표시할지 선택하세요. 언제든지 변경할 수 있습니다.",
+    "standard": "기본",
+    "masculine": "남성형",
+    "feminine": "여성형",
+    "neutral": "중립형"
   }
 }

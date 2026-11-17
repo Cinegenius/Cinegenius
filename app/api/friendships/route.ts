@@ -1,3 +1,4 @@
+import { occupationFormFromCrew } from "@/lib/occupation-form";
 import { profileOccupationPreview } from "@/lib/crew-occupations";
 import { requireAuth } from "@/lib/auth";
 import { db } from "@/lib/db";
@@ -61,6 +62,7 @@ export async function GET(req: NextRequest) {
     return {
       friendship_id: row.id, user_id: id, display_name: profile?.display_name || t("member"), avatar_url: profile?.avatar_url ?? null,
       role: (profile ? profileOccupationPreview(profile)[0] : null) || t("member"), created_at: row.created_at,
+      ...(profile ? { occupationForm: occupationFormFromCrew(profile.crew) } : {}),
       collab_label: (sender ? row.sender_collab_label : row.receiver_collab_label) ?? null,
       collab_public: (sender ? row.sender_collab_public : row.receiver_collab_public) ?? false,
       ...(native ? {profile_visible: !!profile, ...friendOccupations(profile), ...(row.status === 'accepted' && favorites?.read ? {is_favorite: favorites.values.get(row.id)} : {})} : {}),
