@@ -198,6 +198,11 @@ export default async function DatenschutzPage() {
           </section>
 
           <section lang="de">
+            <h2 className="text-base font-semibold text-text-primary mb-3">{t("organizationLifecycleTitle")}</h2>
+            <p>{t("organizationLifecycleDisclosure")}</p>
+          </section>
+
+          <section lang="de">
             <h2 className="text-base font-semibold text-text-primary mb-3">{t("genieVoiceTitle")}</h2>
             <p>{t("genieVoiceDisclosure")}</p>
           </section>

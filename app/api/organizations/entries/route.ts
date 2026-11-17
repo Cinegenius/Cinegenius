@@ -61,6 +61,7 @@ export async function PATCH(request: NextRequest) {
   if (readError) return NextResponse.json({ error: "load" }, { status: 503 });
   if (!existing || !await canManageOrganization(existing.organization_id, session.userId)) return NextResponse.json({ error: "forbidden" }, { status: 403 });
   if (typeof body?.expectedUpdatedAt !== "string" || body.expectedUpdatedAt !== existing.updated_at) return NextResponse.json({ error: "conflict" }, { status: 409 });
+  if (existing.moderation_status === "deleted") return NextResponse.json({ error: "conflict" }, { status: 409 });
   const title = clean(body?.title, 180);
   if (title.length < 2 || !isOrganizationEntryType(body?.entryType) || !isOrganizationFormat(body?.format) || !isOrganizationTopic(body?.topic)) return NextResponse.json({ error: "required" }, { status: 400 });
   const registrationUrl = body.entryType === "news" ? null : safeExternalUrl(body.registrationUrl); const externalUrl = safeExternalUrl(body.externalUrl);
@@ -81,6 +82,7 @@ export async function PATCH(request: NextRequest) {
   if (nextStatus === "submitted") {
     patch.submitted_at = now;
     patch.moderation_reason = "";
+    patch.owner_withdrawn_from = null;
   }
   const { data, error } = await db.from("organization_entries").update(patch).eq("id", id).eq("updated_at", existing.updated_at).select("id,slug,moderation_status,updated_at").maybeSingle();
   if (error) return NextResponse.json({ error: "save" }, { status: 503 });
