@@ -16,7 +16,7 @@ export default async function HomeOrganizations() {
  ]);
  const topic = await homeNewsTopic(region.cookieName);
  const selectedTopic = topic.selection === 'all' ? '' : topic.selection;
- const newsHref = `/news?${new URLSearchParams({country: region.selection, ...(selectedTopic ? {topic: selectedTopic} : {})})}`;
+ const newsHref = `/news?${new URLSearchParams({country: region.selection, topic: topic.selection})}`;
  let organizations: Awaited<ReturnType<typeof organizationDiscovery>>['organizations'] = [];
  let entries: Awaited<ReturnType<typeof latestOrganizationEntries>> = [], codes: string[] = [], failed = false;
  let topics: OrganizationTopic[] = [];
