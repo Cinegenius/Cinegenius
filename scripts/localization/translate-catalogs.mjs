@@ -10,6 +10,7 @@ const targets = {'fr':'French','pl':'Polish','pt-PT':'European Portuguese','zh-H
 const key=process.env.OPENAI_API_KEY?.trim();
 if(!key?.startsWith('sk-') || key.length<35) throw new Error('A usable existing OPENAI_API_KEY is required; no request sent.');
 const output=process.env.CG_TRANSLATION_OUTPUT;
+const cache=process.env.CG_TRANSLATION_CACHE;
 if(!output) throw new Error('Set CG_TRANSLATION_OUTPUT to a private draft directory.');
 const requested=process.argv.slice(2);
 const locales=requested.length?requested:Object.keys(targets);
@@ -56,6 +57,7 @@ for(const locale of locales){
   const failed=await translate(locale,batch,async(values,usage)=>{
    Object.assign(state.values,values);state.usage.push(usage);
    await writeFile(path,JSON.stringify(state,null,2)+'\n',{mode:0o600});
+   if(cache)await writeFile(`${cache}/${locale}.progress.json`,JSON.stringify(state)+'\n',{mode:0o600});
   });
   if(failed.length)console.log(`${locale}: ${failed.length} fragments require manual repair; continuing other strings.`);
   console.log(`${locale}: ${Object.keys(state.values).length}/${entries.length}`);
