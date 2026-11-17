@@ -56,8 +56,8 @@ export function interpretSearchPlan(text: string, locale = 'de', taxonomy?: (key
   let period: string | undefined;
   rest = rest.replace(/\b(?:für|am|on|for)\s+((?:Montag|Dienstag|Mittwoch|Donnerstag|Freitag|Samstag|Sonntag|Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday)(?:\s+\d{1,2}\.\d{1,2}\.(?:\d{4})?)?)\b/iu, (_, value) => { period = value; return ''; });
   const requirements: string[][] = [];
-  rest = rest.replace(/\b(?:mit\s+eigener\s+Kamera|with\s+(?:their\s+)?own\s+camera)\b/iu, () => { requirements.push(['eigene Kamera', 'eigener Kamera', 'own camera']); return ''; });
-  rest = rest.replace(/\b(?:mit\s+Balkon|with\s+(?:a\s+)?balcony)\b/iu, () => { requirements.push(['Balkon', 'balcony']); return ''; });
+  rest = rest.replace(/\b(?:mit\s+eigener\s+Kamera|with\s+(?:their\s+)?own\s+camera)\b/iu, phrase => { requirements.push(/^with/iu.test(phrase) ? ['own camera', 'eigene Kamera', 'eigener Kamera'] : ['eigene Kamera', 'eigener Kamera', 'own camera']); return ''; });
+  rest = rest.replace(/\b(?:mit\s+Balkon|with\s+(?:a\s+)?balcony)\b/iu, phrase => { requirements.push(/^with/iu.test(phrase) ? ['balcony', 'Balkon'] : ['Balkon', 'balcony']); return ''; });
   rest = rest.replace(/\bLED[-\s]+(?=Leuchten?\b|Lampen?\b|lights?\b|lamps?\b)/iu, () => { requirements.push(['LED']); return ''; });
   let historical = false;
   rest = rest.replace(/\bfür\s+einen\s+historischen\s+Film\b/iu, () => { historical = true; requirements.push(['historisch', 'historical', 'Mittelalter', 'medieval']); return ''; });
