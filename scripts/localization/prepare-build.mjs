@@ -33,9 +33,9 @@ async function worker(){
   const locale=locales.shift();
   const code=await new Promise(resolveExit=>{
    const child=spawn(process.execPath,['scripts/localization/translate-catalogs.mjs',locale],{
-    env:{...process.env,CG_TRANSLATION_OUTPUT:output,CG_TRANSLATION_CACHE:cache,CG_TRANSLATION_MAX_REQUESTS:'180'},stdio:'inherit',
+    env:{...process.env,CG_TRANSLATION_OUTPUT:output,CG_TRANSLATION_CACHE:cache,CG_TRANSLATION_CONCURRENCY:'2',CG_TRANSLATION_MAX_REQUESTS:'180'},stdio:'inherit',
    });
-   const timer=setTimeout(()=>child.kill('SIGTERM'),26*60*1000);
+   const timer=setTimeout(()=>child.kill('SIGTERM'),37*60*1000);
    child.on('error',()=>{clearTimeout(timer);resolveExit(1);});child.on('exit',code=>{clearTimeout(timer);resolveExit(code??1);});
   });
   statuses.push({locale,complete:code===0});
