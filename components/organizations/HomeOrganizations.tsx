@@ -37,9 +37,10 @@ export default async function HomeOrganizations() {
    <div className="min-w-0"><p className="mb-1 text-xs uppercase tracking-widest text-gold">{t('eyebrow')}</p><h2 id="home-industry-title" className="break-words font-serif text-xl leading-snug text-text-primary sm:text-2xl">{entryT('newsTitleLead')} <span className="text-gold">{entryT('newsTitleHighlight')}</span></h2></div>
    <Link href={newsHref} className="inline-flex min-h-11 min-w-0 items-center gap-1 text-sm text-gold hover:text-gold-light"><span className="break-words">{t('allEntries')}</span><span aria-hidden="true">→</span></Link>
   </div>
-  <HomeNewsRegion key={region.cookieName} region={region} codes={codes} topic={topic} topics={topics} empty={!entries.length} failed={failed}/>
-  <div className={`grid min-w-0 items-start gap-6 lg:gap-9 ${paired ? 'lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]' : ''}`}>
-   {entries.length > 0 && <HomeCardRail id="home-news-rail" labelledBy="home-industry-title" hint={newsT('railHint')} itemCount={Math.ceil(entries.length / 3)} variant="news">
+  <div className={`grid min-w-0 items-start gap-3 lg:gap-x-9 ${paired ? 'lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]' : ''}`}>
+   <HomeNewsRegion key={region.cookieName} region={region} codes={codes} topic={topic} topics={topics} empty={!entries.length} failed={failed}/>
+   {entries.length > 0 && <div className="min-w-0 lg:col-start-1">
+   <HomeCardRail id="home-news-rail" labelledBy="home-industry-title" hint={newsT('railHint')} itemCount={Math.ceil(entries.length / 3)} variant="news">
     {Array.from({length: Math.ceil(entries.length / 3)}, (_, page) => <div key={page} className="grid min-w-0 content-start gap-2">
     {entries.slice(page * 3, page * 3 + 3).map(entry => {
      const org = (Array.isArray(entry.organization) ? entry.organization[0] : entry.organization) as unknown as {slug:string;name:string;logo_url:string|null};
@@ -59,10 +60,11 @@ export default async function HomeOrganizations() {
      </article>;
     })}
     </div>)}
-   </HomeCardRail>}
-   {organizations.length > 0 && <div className={`min-w-0 ${paired ? 'home-section-divider home-section-divider--organizations' : ''}`}>
-    <div className="mb-1 flex min-w-0 flex-wrap items-center justify-between gap-x-3 gap-y-1"><h3 className="font-serif text-lg text-text-primary">{t('organizations')}</h3><Link href="/organizations" className="inline-flex min-h-11 min-w-0 items-center text-xs text-gold hover:text-gold-light"><span className="break-words">{t('allOrganizations')}</span><span className="ml-1" aria-hidden="true">→</span></Link></div>
-    <ul className={`grid min-w-0 auto-rows-fr grid-cols-2 gap-2 ${paired ? '' : 'sm:grid-cols-3'}`}>
+   </HomeCardRail>
+   </div>}
+   {organizations.length > 0 && <div className={`min-w-0 ${paired ? 'home-section-divider home-section-divider--organizations mt-3 lg:col-start-2 lg:row-span-2 lg:row-start-1 lg:mt-0 lg:grid lg:grid-rows-subgrid lg:self-stretch' : ''}`}>
+    <div className={`mb-1 flex min-w-0 flex-wrap items-center justify-between gap-x-3 gap-y-1 ${paired ? 'lg:mb-0 lg:self-end' : ''}`}><h3 className="font-serif text-lg text-text-primary">{t('organizations')}</h3><Link href="/organizations" className="inline-flex min-h-11 min-w-0 items-center text-xs text-gold hover:text-gold-light"><span className="break-words">{t('allOrganizations')}</span><span className="ml-1" aria-hidden="true">→</span></Link></div>
+    <ul className={`grid min-w-0 auto-rows-fr grid-cols-2 gap-2 self-start ${paired ? '' : 'sm:grid-cols-3'}`}>
      {organizations.map(org => <li key={org.id} className="min-w-0">
       <Link href={`/organizations/${org.slug}`} className="group flex h-full min-h-11 min-w-0 items-center gap-2 rounded-xl border border-border bg-bg-secondary px-2 py-3 transition-colors hover:border-gold/40 hover:bg-bg-elevated">
        <span className="flex h-11 w-11 shrink-0 items-center justify-center">
