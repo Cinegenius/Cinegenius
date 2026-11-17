@@ -8414,5 +8414,29 @@
       "feminine": "ona/jej",
       "neutral": "ono/jego"
     }
+  },
+  "ProfileArt": {
+    "chooseAvatar": "Wybierz awatar",
+    "chooseCover": "Wybierz zdjęcie w tle",
+    "hint": "Wszystkie wzory są dostępne dla każdego.",
+    "avatarOption": "Awatar {number}",
+    "masculine": "Męskie",
+    "feminine": "Kobiece",
+    "neutral": "Neutralne",
+    "editable": "Propozycja dla Ciebie. Wybierz inny awatar lub prześlij własne zdjęcie – możesz go zmienić w dowolnej chwili.",
+    "themes": {
+      "water": "Woda",
+      "moon": "Księżyc",
+      "sun": "Słońce",
+      "earth": "Ziemia",
+      "sky": "Niebo",
+      "cold": "Chłód",
+      "heat": "Ciepło",
+      "mountains": "Góry",
+      "valley": "Dolina",
+      "forest": "Las",
+      "desert": "Pustynia",
+      "polar": "Polarny"
+    }
   }
 }

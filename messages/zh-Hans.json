@@ -8414,5 +8414,29 @@
       "feminine": "她",
       "neutral": "TA"
     }
+  },
+  "ProfileArt": {
+    "chooseAvatar": "选择头像",
+    "chooseCover": "选择封面",
+    "hint": "所有人都可以自由选择任意图案。",
+    "avatarOption": "头像 {number}",
+    "masculine": "男性风格",
+    "feminine": "女性风格",
+    "neutral": "中性风格",
+    "editable": "为你推荐的头像。你可以选择其他头像或上传自己的照片，随时都能更换。",
+    "themes": {
+      "water": "水",
+      "moon": "月亮",
+      "sun": "太阳",
+      "earth": "大地",
+      "sky": "天空",
+      "cold": "寒冷",
+      "heat": "温暖",
+      "mountains": "山脉",
+      "valley": "山谷",
+      "forest": "森林",
+      "desert": "沙漠",
+      "polar": "极地"
+    }
   }
 }

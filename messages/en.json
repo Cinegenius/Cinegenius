@@ -8414,5 +8414,29 @@
       "feminine": "she/her",
       "neutral": "they/them"
     }
+  },
+  "ProfileArt": {
+    "chooseAvatar": "Choose an avatar",
+    "chooseCover": "Choose a cover",
+    "hint": "All designs are available to everyone.",
+    "avatarOption": "Avatar {number}",
+    "masculine": "Masculine",
+    "feminine": "Feminine",
+    "neutral": "Neutral",
+    "editable": "A suggestion for you. Choose another avatar or upload your own photo – you can change it anytime.",
+    "themes": {
+      "water": "Water",
+      "moon": "Moon",
+      "sun": "Sun",
+      "earth": "Earth",
+      "sky": "Sky",
+      "cold": "Cold",
+      "heat": "Heat",
+      "mountains": "Mountains",
+      "valley": "Valley",
+      "forest": "Forest",
+      "desert": "Desert",
+      "polar": "Polar"
+    }
   }
 }

@@ -3,7 +3,8 @@
 import GenieWritingAssistant from "@/components/GenieWritingAssistant";
 
 import PlaceField from "@/components/PlaceField";
-import { needsPublicSetupProfile, setupProfilePayload } from "@/lib/provider-profile-setup";
+import { needsPublicSetupProfile, setupProfilePayload, initializeSetupProfileArt, setupProfileAvatar, type SetupProfileIdentity } from "@/lib/provider-profile-setup";
+import ProfileArtPicker from "@/components/ProfileArtPicker";
 import SetupCompletionOffers from "@/components/SetupCompletionOffers";
 import ContentUsageNotice from "@/components/ContentUsageNotice";
 import { useFormRouter as useRouter } from "@/lib/use-form-router";
@@ -111,6 +112,11 @@ function screenForField(field: string): QuickStartScreen {
 }
 
 export default function ProfileSetupWizard() {
+  const { user } = useUser();
+  return <ProfileSetupContent key={user?.id ?? "signed-out"} />;
+}
+
+function ProfileSetupContent() {
   const uiPriceText = useTranslations("MarketplaceOffer");
 
   const taxonomyText = useTranslations("Taxonomy");
@@ -156,8 +162,13 @@ export default function ProfileSetupWizard() {
   const [companyCategorySearch, setCompanyCategorySearch] = useState("");
 
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const savedProfile = useRef<{ profile_type?: string | null; profile_types?: string[] | null; crew?: Record<string, unknown> } | null>(null);
-  const saveQueue = useMemo(() => createOnboardingSaveQueue(async (value) => {
+  const [savedProfile, setSavedProfile] = useState<SetupProfileIdentity | null>(null);
+  const mounted = useRef(true);
+  const latestDraft = useRef(draft);
+  useEffect(() => { latestDraft.current = draft; }, [draft]);
+  useEffect(() => { mounted.current = true; return () => { mounted.current = false; }; }, []);
+  const saveSnapshot = useCallback(async (value: QuickStartDraft) => {
+    if (!mounted.current) return false;
     setSaveState("saving");
     try {
       const response = await fetch("/api/onboarding", {
@@ -174,7 +185,10 @@ export default function ProfileSetupWizard() {
       setError(uiErrorMessage(cause, uiText("Ui.text_1a732f2b583c89")));
       return false;
     }
-  }), []);
+  }, []);
+  // The queue stores this callback; only save(), after render, invokes it.
+  // eslint-disable-next-line react-hooks/refs
+  const saveQueue = useMemo(() => createOnboardingSaveQueue(saveSnapshot), [saveSnapshot]);
 
   useEffect(() => {
     if (retrySeconds <= 0) return;
@@ -183,6 +197,7 @@ export default function ProfileSetupWizard() {
   }, [retrySeconds]);
 
   useEffect(() => {
+    if (!user?.id) return;
     let active = true;
     Promise.all([
       fetch("/api/onboarding", { cache: "no-store" }).then(async (response) => {
@@ -200,7 +215,7 @@ export default function ProfileSetupWizard() {
       if (!active) return;
       setProfileIsPrivate(settings?.settings?.profile_visibility === "private" || settings?.settings?.ghost_mode === true);
       setProfileExists(profile?.exists === true);
-      savedProfile.current = profile?.profile ?? null;
+      setSavedProfile(profile?.profile ?? null);
       const profileComplete = hasProfileBasics(profile?.profile);
       const hasInProgressDraft = !!saved?.quickStart && saved.setupComplete !== true;
       if (!providerEntry && saved?.setupComplete && (profileComplete || hasCompletedNonPersonalSetup(saved))) {
@@ -222,6 +237,7 @@ export default function ProfileSetupWizard() {
         const missing = validateQuickStartDraft(nextDraft);
         if (missing) nextDraft = { ...nextDraft, step: missing.field === "primaryOccupation" ? "review" : screenForField(missing.field), activeIntent: intentForField(missing.field) ?? nextDraft.activeIntent };
       }
+      nextDraft = initializeSetupProfileArt(nextDraft, user.id, profile?.exists ? profile.profile : null);
       setDraft(nextDraft);
 
       setReady(true);
@@ -231,7 +247,7 @@ export default function ProfileSetupWizard() {
       setReady(true);
     });
     return () => { active = false; };
-  }, [isNewRegistration, resumeIncomplete, loadAttempt, redirectTo, router, user?.fullName, user?.firstName, user?.lastName, saveQueue, providerEntry]);
+  }, [isNewRegistration, resumeIncomplete, loadAttempt, redirectTo, router, user?.id, user?.fullName, user?.firstName, user?.lastName, saveQueue, providerEntry]);
 
 
 
@@ -424,7 +440,7 @@ export default function ProfileSetupWizard() {
     else await transition("review", detailIntents[0] ?? "search");
   }
 
-  async function upload(file: File | undefined, intent: QuickStartIntent, forProvider = false) {
+  async function upload(file: File | undefined, intent: QuickStartIntent, forProvider = false, forCover = false) {
     if (!file) return;
     if (!file.type.startsWith("image/")) { setError(uiText("Ui.text_573d9a56a2eedf")); return; }
     setUploading(true);
@@ -433,15 +449,21 @@ export default function ProfileSetupWizard() {
       const compressed = await compressImage(file, { maxWidth: 1920, quality: 0.82, maxBytes: MAX_FUNCTION_UPLOAD_BYTES , translate: uiText });
       const form = new FormData();
       form.append("file", compressed);
+      if (!mounted.current) return;
       const response = await fetch("/api/upload", { method: "POST", body: form });
       const result = await response.json().catch(() => ({}));
       if (!response.ok || !result.url) throw new Error(result.error ?? uiText("Ui.text_c3b9328b1f25e4"));
-      const nextDraft = forProvider ? { ...draft, providerImageUrl: result.url, completed: { ...draft.completed, profile: false } } : { ...draft, sections: { ...draft.sections, [intent]: { ...createQuickStartIntentData(), ...draft.sections[intent], imageUrl: result.url } } };
+      if (!mounted.current) return;
+      const current = latestDraft.current;
+      const personal = forProvider || intent === "crew" || intent === "talent";
+      const nextDraft = forCover ? { ...current, profileCoverUrl: result.url, completed: { ...current.completed, profile: false } }
+        : personal ? { ...current, profileAvatarUrl: result.url, completed: { ...current.completed, profile: false } }
+        : { ...current, sections: { ...current.sections, [intent]: { ...createQuickStartIntentData(), ...current.sections[intent], imageUrl: result.url } } };
       setDraft(nextDraft);
       if (!(await persist(nextDraft))) setError(uiText("Ui.text_cf35517ee63d3e"));
     } catch (cause) {
       setError(uiErrorMessage(cause, uiText("Ui.text_c3b9328b1f25e4")));
-    } finally { setUploading(false); }
+    } finally { if (mounted.current) setUploading(false); }
   }
 
   async function clearAndContinue(completedDraft: QuickStartDraft) {
@@ -491,7 +513,7 @@ export default function ProfileSetupWizard() {
       if (!isQuickStartContentSaved(progress) && !(await persist(progress))) return;
 
       if (needsPublicSetupProfile(progress.intents) && !progress.completed.profile) {
-        const profilePayload = setupProfilePayload(progress, profileExists ? savedProfile.current : null, selectedRoles);
+        const profilePayload = setupProfilePayload(progress, profileExists ? savedProfile : null, selectedRoles);
         const response = await fetch("/api/profile", {
           method: profileExists ? "PATCH" : "POST", headers: { "Content-Type": "application/json" },
           body: JSON.stringify(profilePayload),
@@ -504,7 +526,7 @@ export default function ProfileSetupWizard() {
           if (field) { setDraft({ ...progress, step: screenForField(field), activeIntent: intentForField(field) ?? activeIntent }); focusValidation(field); }
           throw new Error(result.fieldErrors?.[firstField] ?? result.error ?? uiText("Ui.text_92added47b1ce3"));
         }
-        savedProfile.current = { profile_type: profilePayload.profile_type, profile_types: profilePayload.profile_types, crew: profilePayload.crew ?? savedProfile.current?.crew };
+        setSavedProfile(current => ({ ...current, ...profilePayload }));
         progress = { ...progress, completed: { ...progress.completed, profile: true } };
         setProfileExists(true);
         setDraft(progress);
@@ -577,11 +599,43 @@ export default function ProfileSetupWizard() {
   }
 
   function renderPhotoInput(intent: QuickStartIntent, label: string, forProvider = false) {
-    const data = forProvider ? { imageUrl: draft.providerImageUrl ?? "" } : draft.sections[intent] ?? createQuickStartIntentData();
+    if (forProvider || intent === "crew" || intent === "talent") return renderPersonalArtwork(intent, label, forProvider);
+    const data = draft.sections[intent] ?? createQuickStartIntentData();
     return <div className="space-y-3">
-      <ContentUsageNotice context={intent === "company" ? "company" : intent === "crew" || intent === "talent" ? "profile" : "offer"} visibility="configured" />
+      <ContentUsageNotice context={intent === "company" ? "company" : "offer"} visibility="configured" />
       {data.imageUrl ? <div className="space-y-3"><Image src={data.imageUrl} alt={label} width={960} height={640} sizes="(max-width: 640px) 100vw, 720px" className="max-h-64 w-full rounded-xl border border-border object-contain" /><button type="button" onClick={() => forProvider ? update("providerImageUrl", "") : updateSection(intent, { imageUrl: "" })} className="inline-flex min-h-11 items-center gap-2 rounded-lg border border-border px-4 text-sm text-text-secondary"><Trash2 size={15} /> {t("copy0")}</button></div> : <label className={`flex min-h-40 cursor-pointer flex-col items-center justify-center gap-3 rounded-xl border border-dashed border-border bg-bg-primary p-5 text-center hover:border-gold/50 ${uploading ? "pointer-events-none opacity-60" : ""}`}><ImagePlus className="text-gold" /><span className="text-sm font-medium text-text-primary">{uploading ? uiText("Ui.text_5fd6ef633a74ed") : label}</span><span className="text-xs text-text-muted">{t("copy1")}</span><input type="file" accept="image/jpeg,image/png,image/webp,image/heic" className="sr-only" onChange={(event) => { void upload(event.target.files?.[0], intent, forProvider); event.currentTarget.value = ""; }} /></label>}
       {uploading && <p role="status" className="flex items-center gap-2 text-xs text-text-muted"><Loader2 size={14} className="animate-spin" /> {t("copy2")}</p>}
+    </div>;
+  }
+
+  function renderArtworkReview() {
+    const avatar = setupProfileAvatar(draft, savedProfile);
+    const cover = draft.profileCoverUrl ?? savedProfile?.cover_image_url ?? "";
+    return <>{avatar && <Image src={avatar} alt={t("copy22")} width={160} height={160} className="h-20 w-20 rounded-full object-cover" />}{cover && !draft.intents.includes("talent") && <Image src={cover} alt={uiText("profile.sectionCover")} width={720} height={288} className="aspect-[5/2] w-full rounded-lg object-cover" />}</>;
+  }
+
+  function renderPersonalArtwork(intent: QuickStartIntent, label: string, forProvider: boolean) {
+    const avatar = setupProfileAvatar(draft, savedProfile);
+    const cover = draft.profileCoverUrl ?? savedProfile?.cover_image_url ?? "";
+    const disabled = uploading || saving || retrySeconds > 0;
+    const select = (field: "profileAvatarUrl" | "profileCoverUrl", src: string) => setDraft(current => ({ ...current, [field]: src, completed: { ...current.completed, profile: false } }));
+    const uploadInput = (isCover: boolean) => <label className={`inline-flex min-h-11 cursor-pointer items-center gap-2 rounded-lg border border-border px-3 text-sm text-text-secondary ${disabled ? "pointer-events-none opacity-50" : "hover:border-gold/50"}`}>
+      <ImagePlus size={16} /><span>{uiText(isCover ? "profile.uploadCover" : "profile.photoUpload")}</span>
+      <input type="file" disabled={disabled} accept="image/jpeg,image/png,image/webp,image/heic" className="sr-only" onChange={event => { void upload(event.target.files?.[0], intent, forProvider, isCover); event.currentTarget.value = ""; }} />
+    </label>;
+    return <div className="space-y-3">
+      <ContentUsageNotice context="profile" visibility="configured" />
+      {avatar && <Image src={avatar} alt={label} width={160} height={160} className="h-24 w-24 rounded-full border border-border object-cover" />}
+      <p className="text-xs leading-5 text-text-muted">{uiText("ProfileArt.editable")}</p>
+      <div className="flex flex-wrap gap-2">{uploadInput(false)}{avatar && <button type="button" disabled={disabled} onClick={() => select("profileAvatarUrl", "")} className="min-h-11 rounded-lg border border-border px-3 text-sm text-text-secondary disabled:opacity-50">{t("copy0")}</button>}</div>
+      <ProfileArtPicker kind="avatar" value={avatar} onChange={src => select("profileAvatarUrl", src)} disabled={disabled} />
+      {intent !== "talent" && <div className="space-y-3 pt-3">
+        <p className="text-sm font-medium">{uiText("profile.sectionCover")} <span className="text-text-muted">{t("copy23")}</span></p>
+        {cover && <Image src={cover} alt={uiText("profile.sectionCover")} width={720} height={288} className="aspect-[5/2] w-full rounded-lg object-cover" />}
+        <div className="flex flex-wrap gap-2">{uploadInput(true)}{cover && <button type="button" disabled={disabled} onClick={() => select("profileCoverUrl", "")} className="min-h-11 rounded-lg border border-border px-3 text-sm text-text-secondary disabled:opacity-50">{t("copy0")}</button>}</div>
+        <ProfileArtPicker kind="cover" value={cover} onChange={src => select("profileCoverUrl", src)} disabled={disabled} />
+      </div>}
+      {uploading && <p role="status" className="text-xs text-text-muted">{t("copy2")}</p>}
     </div>;
   }
 
@@ -758,10 +812,10 @@ export default function ProfileSetupWizard() {
           <ReviewSection title={t("copy66")} onEdit={() => editReview("name")}><ReviewRow label={t("name")} value={draft.name} /></ReviewSection>
           <ReviewSection title={t("copy83")} onEdit={() => editReview("location")}><ReviewRow label={t("place")} value={[draft.personCity, draft.personCountry].filter(Boolean).join(", ")} /></ReviewSection>
           <ReviewSection title={t("copy84")} onEdit={() => editReview("goals")}><p className="break-words text-sm text-text-primary">{selectedIntentTitles.join(" · ") || "—"}</p></ReviewSection>
-          {hasOfferIntent && <ReviewSection title={providerText("title")} onEdit={() => editReview("intro", draft.intents.find(intent => intent === "location" || intent === "equipment"))}><ReviewRow label={t("name")} value={draft.name} /><ReviewRow label={t("place")} value={[draft.personCity, draft.personCountry].filter(Boolean).join(", ")} />{!hasProfileIntent && draft.talentIntro && <ReviewRow label={t("introduction")} value={draft.talentIntro} />}{!hasProfileIntent && draft.providerImageUrl && <Image src={draft.providerImageUrl} alt={t("copy22")} width={160} height={160} className="h-20 w-20 rounded-xl object-cover" />}<p className="rounded-xl border border-border bg-bg-primary p-3 text-xs leading-5 text-text-muted">{providerText(profileIsPrivate ? "privateNotice" : "publicNotice")}</p></ReviewSection>}
+          {hasOfferIntent && <ReviewSection title={providerText("title")} onEdit={() => editReview("intro", draft.intents.find(intent => intent === "location" || intent === "equipment"))}><ReviewRow label={t("name")} value={draft.name} /><ReviewRow label={t("place")} value={[draft.personCity, draft.personCountry].filter(Boolean).join(", ")} />{!hasProfileIntent && draft.talentIntro && <ReviewRow label={t("introduction")} value={draft.talentIntro} />}{!hasProfileIntent && renderArtworkReview()}<p className="rounded-xl border border-border bg-bg-primary p-3 text-xs leading-5 text-text-muted">{providerText(profileIsPrivate ? "privateNotice" : "publicNotice")}</p></ReviewSection>}
           {(draft.intents.includes("crew") || draft.intents.includes("talent")) && <>
             <ReviewSection title={t("copy85")} onEdit={() => editReview("details", draft.intents.includes("crew") ? "crew" : "talent")}><ReviewRow label={t("occupations")} value={selectedRoles.map((role) => getDepartmentRoleLabel(role.departmentId, role.role, locale, animals, taxonomyText)).join(", ")} /><PrimaryOccupationPicker id="quick-start-primary-occupation" positions={selectedRoles.map(role=>role.role)} selections={selectedRoles.map(item => ({departmentId: item.departmentId, roleId: `${item.departmentId}/${encodeURIComponent(item.role)}`}))} additionalValue={draft.additionalOccupation ?? null} onAdditionalChange={value=>update("additionalOccupation", value)} value={draft.primaryOccupation ?? null} onChange={value=>update("primaryOccupation", value)} /><ReviewRow label={t("place")} value={[draft.personCity, draft.personCountry].filter(Boolean).join(", ")} /><p className="rounded-xl border border-amber-400/25 bg-amber-500/5 p-3 text-xs leading-5 text-text-muted">{t("copy86")}</p></ReviewSection>
-            <ReviewSection title={t("copy87")} onEdit={() => editReview("intro", draft.intents.includes("crew") ? "crew" : "talent")}>{draft.sections.crew?.imageUrl && <Image src={draft.sections.crew.imageUrl} alt={t("copy22")} width={240} height={240} className="h-20 w-20 rounded-xl object-cover" />}{draft.sections.talent?.imageUrl && <Image src={draft.sections.talent.imageUrl} alt={t("copy22")} width={240} height={240} className="h-20 w-20 rounded-xl object-cover" />}<ReviewRow label={t("introduction")} value={draft.talentIntro} /></ReviewSection>
+            <ReviewSection title={t("copy87")} onEdit={() => editReview("intro", draft.intents.includes("crew") ? "crew" : "talent")}>{renderArtworkReview()}<ReviewRow label={t("introduction")} value={draft.talentIntro} /></ReviewSection>
           </>}
           {draft.intents.filter((intent): intent is "location" | "equipment" => (intent === "location" || intent === "equipment") && !draft.sections[intent]?.offerLater).map((intent) => { const data = draft.sections[intent] ?? createQuickStartIntentData(); const categoryName = intent === "equipment" ? marketplaceCategoryLabel(data.category,marketCatalog) : QUICK_START_CATEGORIES[intent].find((item) => item.value === data.category)?.label ?? data.category; return <div key={intent} className="space-y-3"><ReviewSection title={t(`${intent}Intent`)} onEdit={() => editReview("details", intent)}><ReviewRow label={t("kind")} value={taxonomyLabel(categoryName, uiText)} /><ReviewRow label={t("listing")} value={data.title} /><ReviewRow label={t("place")} value={data.city} /></ReviewSection><ReviewSection title={uiText("Ui.text_de70e79498ecb6", { value1: String(t(`${intent}Intent`)) })} onEdit={() => editReview("intro", intent)}>{data.description && <ReviewRow label={t("description")} value={data.description} />}<ReviewRow label={t("copy41")} value={listingPriceLabel(Number(data.price), {price_on_request:data.priceOnRequest,price_negotiable:data.priceNegotiable}, undefined, locale, uiPriceText)} />{data.imageUrl && <Image src={data.imageUrl} alt={t("copy90")} width={720} height={480} sizes="(max-width: 640px) 100vw, 640px" className="max-h-40 w-full rounded-lg object-contain" />}<p className="rounded-xl border border-border bg-bg-primary p-3 text-xs leading-5 text-text-muted">{t("copy91")}</p></ReviewSection></div>; })}
           {draft.intents.includes("company") && (() => { const data = draft.sections.company ?? createQuickStartIntentData(); const categoryLabels = QUICK_START_CATEGORIES.company.filter((category) => data.categoryIds.includes(category.value)).map((category) => companyCategoryLabel(category.value, category.label)); const catering = data.cateringDetails; return <>

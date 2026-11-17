@@ -57,6 +57,8 @@ export type QuickStartDraft = {
   activeIntent: QuickStartIntent | null;
   talentIntro: string;
   providerImageUrl?: string;
+  profileAvatarUrl?: string;
+  profileCoverUrl?: string;
   primaryOccupation?: PrimaryOccupation | null;
   additionalOccupation?: PrimaryOccupation | null;
   sections: Partial<Record<QuickStartIntent, QuickStartIntentData>>;
@@ -261,6 +263,8 @@ export function normalizeQuickStartDraft(value: unknown): QuickStartDraft {
     personCountry: typeof input.personCountry === "string" ? input.personCountry.slice(0, 100) : "Deutschland",
     activeIntent,
     providerImageUrl: typeof input.providerImageUrl === "string" ? input.providerImageUrl.slice(0, 1200) : "",
+    ...(typeof input.profileAvatarUrl === "string" ? { profileAvatarUrl: input.profileAvatarUrl.slice(0, 1200) } : {}),
+    ...(typeof input.profileCoverUrl === "string" ? { profileCoverUrl: input.profileCoverUrl.slice(0, 1200) } : {}),
     talentIntro: typeof input.talentIntro === "string" ? input.talentIntro.slice(0, 1200) : "",
     sections,
     primaryOccupation: occupationReference(primaryOccupationForPositions(input.primaryOccupation, [...(sections.crew?.roles ?? []), ...(sections.talent?.roles ?? [])].map(item=>item.role))),

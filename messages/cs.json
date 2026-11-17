@@ -8414,5 +8414,29 @@
       "feminine": "ona/její",
       "neutral": "oni/jejich"
     }
+  },
+  "ProfileArt": {
+    "chooseAvatar": "Vybrat avatar",
+    "chooseCover": "Vybrat úvodní obrázek",
+    "hint": "Všechny motivy jsou dostupné každému.",
+    "avatarOption": "Avatar {number}",
+    "masculine": "Mužské",
+    "feminine": "Ženské",
+    "neutral": "Neutrální",
+    "editable": "Návrh pro tebe. Vyber jiný avatar nebo nahraj vlastní fotku – kdykoli ho můžeš změnit.",
+    "themes": {
+      "water": "Voda",
+      "moon": "Měsíc",
+      "sun": "Slunce",
+      "earth": "Země",
+      "sky": "Obloha",
+      "cold": "Chlad",
+      "heat": "Teplo",
+      "mountains": "Hory",
+      "valley": "Údolí",
+      "forest": "Les",
+      "desert": "Poušť",
+      "polar": "Polární"
+    }
   }
 }

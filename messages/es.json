@@ -8414,5 +8414,29 @@
       "feminine": "ella",
       "neutral": "elle"
     }
+  },
+  "ProfileArt": {
+    "chooseAvatar": "Elegir avatar",
+    "chooseCover": "Elegir portada",
+    "hint": "Todos los diseños están disponibles para cualquier persona.",
+    "avatarOption": "Avatar {number}",
+    "masculine": "Masculino",
+    "feminine": "Femenino",
+    "neutral": "Neutro",
+    "editable": "Una sugerencia para ti. Elige otro avatar o sube tu propia foto; puedes cambiarlo cuando quieras.",
+    "themes": {
+      "water": "Agua",
+      "moon": "Luna",
+      "sun": "Sol",
+      "earth": "Tierra",
+      "sky": "Cielo",
+      "cold": "Frío",
+      "heat": "Calor",
+      "mountains": "Montañas",
+      "valley": "Valle",
+      "forest": "Bosque",
+      "desert": "Desierto",
+      "polar": "Polar"
+    }
   }
 }

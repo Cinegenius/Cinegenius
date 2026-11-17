@@ -8414,5 +8414,29 @@
       "feminine": "ela/dela",
       "neutral": "elu/delu"
     }
+  },
+  "ProfileArt": {
+    "chooseAvatar": "Escolher avatar",
+    "chooseCover": "Escolher capa",
+    "hint": "Todos os motivos estão disponíveis para qualquer pessoa.",
+    "avatarOption": "Avatar {number}",
+    "masculine": "Masculino",
+    "feminine": "Feminino",
+    "neutral": "Neutro",
+    "editable": "Uma sugestão para ti. Escolhe outro avatar ou carrega uma fotografia tua – podes alterar a qualquer momento.",
+    "themes": {
+      "water": "Água",
+      "moon": "Lua",
+      "sun": "Sol",
+      "earth": "Terra",
+      "sky": "Céu",
+      "cold": "Frio",
+      "heat": "Calor",
+      "mountains": "Montanhas",
+      "valley": "Vale",
+      "forest": "Floresta",
+      "desert": "Deserto",
+      "polar": "Polar"
+    }
   }
 }

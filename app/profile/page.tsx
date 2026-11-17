@@ -40,6 +40,7 @@ import { calculateProfileCompletion } from "@/lib/profile-completion";
 import { prepareProfileMediaFile, sendProfileMediaFile, PROFILE_MEDIA_ACCEPT, PROFILE_MEDIA_MAX_BYTES, PROFILE_MEDIA_SOURCE_MAX_BYTES } from "@/lib/profile-media-client";
 import { publishProfileUpdated } from "@/lib/profile-update-events";
 import ProfileIdentityFields from "@/components/ProfileIdentityFields";
+import ProfileArtPicker from "@/components/ProfileArtPicker";
 import { isAvatarUploadAssociated } from "@/lib/profile-avatar-persistence";
 import { validateProfileSave, type ProfileSaveFieldErrors } from "@/lib/profile-save-validation";
 import { PROFILE_EDITOR_STEPS, profileEditorAvailabilityConfig, profileEditorRequiredMissing, profileEditorStepForErrors, profileEditorStepForHint, shouldResumeProfileEditorDraft, type ProfileEditorStep } from "@/lib/profile-editor-flow";
@@ -1823,6 +1824,11 @@ export default function ProfilePage() {
                   </div>
                   <input ref={fileRef} type="file" accept={PROFILE_MEDIA_ACCEPT} className="hidden" onChange={handleAvatarChange} />
                   <p className="mt-2 text-xs text-text-muted">{profileMediaLimitsText}</p>
+                  <ProfileArtPicker kind="avatar" value={avatarUrl} disabled={avatarUploading || saving} onChange={src => {
+                    setAvatarUrl(src); setAvatarPreview(src);
+                    setFocalPoint(current => ({ ...current, x: 50, y: 50, card: { x: 50, y: 50, zoom: 1 } }));
+                    markEditorChanged();
+                  }} />
                 </div>
 
                 {/* Profilfotos — direkt unter Avatar */}
@@ -1955,6 +1961,11 @@ export default function ProfilePage() {
                       <p className="text-xs text-text-muted">{uiText("Ui.text_50631b89c1473b")}</p>
                     </button>
                   )}
+                  <ProfileArtPicker kind="cover" value={coverImageUrl} disabled={coverUploading || saving} onChange={src => {
+                    setCoverImageUrl(src); setCoverImagePreview(src);
+                    setFocalPoint(current => ({ ...current, cover: { x: 50, y: 50 } }));
+                    markEditorChanged();
+                  }} />
                 </div>}
 
                 </div>}

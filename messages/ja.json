@@ -8414,5 +8414,29 @@
       "feminine": "she/her",
       "neutral": "they/them"
     }
+  },
+  "ProfileArt": {
+    "chooseAvatar": "アバターを選ぶ",
+    "chooseCover": "カバーを選ぶ",
+    "hint": "すべてのデザインを誰でも自由に選べます。",
+    "avatarOption": "アバター {number}",
+    "masculine": "男性的",
+    "feminine": "女性的",
+    "neutral": "中性的",
+    "editable": "おすすめのアバターです。別のアバターを選んだり、自分の写真をアップロードしたり、いつでも変更できます。",
+    "themes": {
+      "water": "水",
+      "moon": "月",
+      "sun": "太陽",
+      "earth": "大地",
+      "sky": "空",
+      "cold": "寒さ",
+      "heat": "暖かさ",
+      "mountains": "山々",
+      "valley": "谷",
+      "forest": "森",
+      "desert": "砂漠",
+      "polar": "極地"
+    }
   }
 }

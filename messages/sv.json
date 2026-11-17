@@ -8414,5 +8414,29 @@
       "feminine": "hon/henne",
       "neutral": "hen"
     }
+  },
+  "ProfileArt": {
+    "chooseAvatar": "Välj avatar",
+    "chooseCover": "Välj omslagsbild",
+    "hint": "Alla motiv är tillgängliga för alla.",
+    "avatarOption": "Avatar {number}",
+    "masculine": "Maskulin",
+    "feminine": "Feminin",
+    "neutral": "Neutral",
+    "editable": "Ett förslag till dig. Välj en annan avatar eller ladda upp ett eget foto – du kan ändra när som helst.",
+    "themes": {
+      "water": "Vatten",
+      "moon": "Måne",
+      "sun": "Sol",
+      "earth": "Jord",
+      "sky": "Himmel",
+      "cold": "Kyla",
+      "heat": "Värme",
+      "mountains": "Berg",
+      "valley": "Dal",
+      "forest": "Skog",
+      "desert": "Öken",
+      "polar": "Polar"
+    }
   }
 }

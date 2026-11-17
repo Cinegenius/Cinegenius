@@ -8414,5 +8414,29 @@
       "feminine": "ő",
       "neutral": "ők"
     }
+  },
+  "ProfileArt": {
+    "chooseAvatar": "Avatar választása",
+    "chooseCover": "Borítókép választása",
+    "hint": "Minden minta szabadon választható.",
+    "avatarOption": "{number}. avatar",
+    "masculine": "Férfias",
+    "feminine": "Nőies",
+    "neutral": "Semleges",
+    "editable": "Egy javaslat neked. Válassz másik avatart, vagy tölts fel saját fotót – bármikor megváltoztathatod.",
+    "themes": {
+      "water": "Víz",
+      "moon": "Hold",
+      "sun": "Nap",
+      "earth": "Föld",
+      "sky": "Égbolt",
+      "cold": "Hideg",
+      "heat": "Meleg",
+      "mountains": "Hegyek",
+      "valley": "Völgy",
+      "forest": "Erdő",
+      "desert": "Sivatag",
+      "polar": "Sarkvidék"
+    }
   }
 }

@@ -8414,5 +8414,29 @@
       "feminine": "zij/haar",
       "neutral": "die/diens"
     }
+  },
+  "ProfileArt": {
+    "chooseAvatar": "Avatar kiezen",
+    "chooseCover": "Omslag kiezen",
+    "hint": "Alle ontwerpen zijn voor iedereen beschikbaar.",
+    "avatarOption": "Avatar {number}",
+    "masculine": "Mannelijk",
+    "feminine": "Vrouwelijk",
+    "neutral": "Neutraal",
+    "editable": "Een voorstel voor jou. Kies een andere avatar of upload je eigen foto – je kunt dit altijd wijzigen.",
+    "themes": {
+      "water": "Water",
+      "moon": "Maan",
+      "sun": "Zon",
+      "earth": "Aarde",
+      "sky": "Lucht",
+      "cold": "Kou",
+      "heat": "Warmte",
+      "mountains": "Bergen",
+      "valley": "Vallei",
+      "forest": "Bos",
+      "desert": "Woestijn",
+      "polar": "Poolgebied"
+    }
   }
 }

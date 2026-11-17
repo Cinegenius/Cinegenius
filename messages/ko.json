@@ -8414,5 +8414,29 @@
       "feminine": "she/her",
       "neutral": "they/them"
     }
+  },
+  "ProfileArt": {
+    "chooseAvatar": "아바타 선택",
+    "chooseCover": "커버 선택",
+    "hint": "모든 디자인을 누구나 자유롭게 선택할 수 있어요.",
+    "avatarOption": "아바타 {number}",
+    "masculine": "남성적",
+    "feminine": "여성적",
+    "neutral": "중성적",
+    "editable": "추천 아바타예요. 다른 아바타를 선택하거나 내 사진을 올릴 수 있으며, 언제든 변경할 수 있어요.",
+    "themes": {
+      "water": "물",
+      "moon": "달",
+      "sun": "태양",
+      "earth": "대지",
+      "sky": "하늘",
+      "cold": "추위",
+      "heat": "온기",
+      "mountains": "산",
+      "valley": "계곡",
+      "forest": "숲",
+      "desert": "사막",
+      "polar": "극지"
+    }
   }
 }
