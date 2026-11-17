@@ -12808,7 +12808,8 @@
     "loading": "地図を読み込み中…",
     "providerPurpose": "インタラクティブマップ",
     "providerRegion": "ハンガリー / CDN",
-    "providerNotice": "地図を開くと、ブラウザはOpenFreeMapから地図素材を読み込みます。あなたのIPアドレスと技術的なリクエストデータは地図提供者に送信されます。名前、プロフィール、メッセージは地図データとして送信されません。<provider>提供者情報</provider>。"
+    "providerNotice": "地図を開くと、ブラウザはOpenFreeMapから地図素材を読み込みます。あなたのIPアドレスと技術的なリクエストデータは地図提供者に送信されます。名前、プロフィール、メッセージは地図データとして送信されません。<provider>提供者情報</provider>。",
+    "information": "地図について"
   },
   "BrowseGeography": {
     "preferred": "近隣と{country}を優先",

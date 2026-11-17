@@ -12808,7 +12808,8 @@
     "loading": "Laddar karta …",
     "providerPurpose": "Interaktiva kartor",
     "providerRegion": "Ungern / CDN",
-    "providerNotice": "När du öppnar en karta hämtar webbläsaren kartmaterial från OpenFreeMap. Din IP-adress och tekniska uppgifter om förfrågan skickas till kartleverantören. Namn, profiler och meddelanden skickas inte som kartdata. <provider>Information om leverantören</provider>."
+    "providerNotice": "När du öppnar en karta hämtar webbläsaren kartmaterial från OpenFreeMap. Din IP-adress och tekniska uppgifter om förfrågan skickas till kartleverantören. Namn, profiler och meddelanden skickas inte som kartdata. <provider>Information om leverantören</provider>.",
+    "information": "Kartinformation"
   },
   "BrowseGeography": {
     "preferred": "Nära dig och {country} först",

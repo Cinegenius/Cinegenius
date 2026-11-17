@@ -12808,7 +12808,8 @@
     "loading": "Kaart laden …",
     "providerPurpose": "Interactieve kaarten",
     "providerRegion": "Hongarije / CDN",
-    "providerNotice": "Wanneer je een kaart opent, laadt je browser kaartmateriaal van OpenFreeMap. Je IP-adres en technische aanvraaggegevens worden naar de kaartaanbieder verstuurd. Namen, profielen en berichten worden niet als kaartgegevens verzonden. <provider>Informatie over de aanbieder</provider>."
+    "providerNotice": "Wanneer je een kaart opent, laadt je browser kaartmateriaal van OpenFreeMap. Je IP-adres en technische aanvraaggegevens worden naar de kaartaanbieder verstuurd. Namen, profielen en berichten worden niet als kaartgegevens verzonden. <provider>Informatie over de aanbieder</provider>.",
+    "information": "Kaartinformatie"
   },
   "BrowseGeography": {
     "preferred": "Dichtbij en {country} eerst",

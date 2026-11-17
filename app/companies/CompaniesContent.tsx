@@ -5,6 +5,7 @@ import { useBrowseGeography } from "@/lib/use-browse-geography";
 
 
 import DirectoryMap from "@/components/DirectoryMap";
+import DirectoryResults from "@/components/DirectoryResults";
 import DirectoryViewControls,{ type DirectoryView } from "@/components/DirectoryViewControls";
 import FloatingMapToggle from "@/components/FloatingMapToggle";
 import PlaceFilters from "@/components/PlaceFilters";
@@ -25,7 +26,6 @@ import { safetyMedicalCompanyCategoryLabel } from "@/lib/safety-medical-taxonomy
 import {
 Building2,
 CheckCircle,
-ChevronRight,
 MapPin
 } from "lucide-react";
 import { useLocale,useTranslations } from "next-intl";
@@ -178,15 +178,10 @@ export default function CompaniesContent({ initialCompanies }: { initialCompanie
       <div className="site-container py-3 sm:py-6">
         <div className="flex gap-8 items-start">
 
-          {/* Sidebar */}
-
-
           {/* Main content */}
           <div ref={resultsRef} className="flex-1 min-w-0 scroll-mt-24">
 
-            {/* Mobile category pills */}
-
-            {viewMode === "map" && <DirectoryMap kind="companies" items={mapItems} bounds={map.bounds} onBoundsChange={map.setBounds} />}
+            <DirectoryResults view={viewMode} map={<DirectoryMap compact kind="companies" items={mapItems} bounds={map.bounds} onBoundsChange={map.setBounds} />}>
             {paginated.length === 0 ? (
               <div className="py-16 text-center">
                 <div className="w-16 h-16 rounded-2xl bg-bg-secondary border border-border flex items-center justify-center mx-auto mb-5">
@@ -196,7 +191,7 @@ export default function CompaniesContent({ initialCompanies }: { initialCompanie
                   <>
                     <p className="text-text-primary font-semibold mb-1">{t("emptyFilteredTitle")}</p>
                     <p className="text-text-muted text-sm mb-5">{t("emptyFilteredDesc")}</p>
-                    <button onClick={clearAll} className="px-5 py-2.5 border border-border rounded-xl text-sm text-text-secondary hover:border-gold hover:text-gold transition-colors">
+                    <button onClick={clearAll} className="min-h-11 px-5 py-2.5 border border-border rounded-xl text-sm text-text-secondary hover:border-gold hover:text-gold transition-colors">
                       {t("resetFilters")}
                     </button>
                   </>
@@ -208,26 +203,24 @@ export default function CompaniesContent({ initialCompanies }: { initialCompanie
                 )}
               </div>
             ) : viewMode === "grid" ? (
-              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+              <div className="directory-cards">
                 {paginated.map((company) => <CompanyCard key={company.id} company={company} />)}
               </div>
             ) : (
-              <div className="browse-card overflow-hidden">
-                <div className="divide-y divide-border">
+              <div className="directory-list">
                   {paginated.map((company) => <CompanyListRow key={company.id} company={company} />)}
-                </div>
               </div>
             )}
 
             {hasMore && (
               <div className="mt-8 text-center">
                 <button onClick={() => changePage((p) => p + 1)}
-                  className="px-6 py-2.5 border border-border rounded-xl text-sm text-text-secondary hover:border-gold hover:text-gold transition-colors">
+                  className="min-h-11 px-6 py-2.5 border border-border rounded-xl text-sm text-text-secondary hover:border-gold hover:text-gold transition-colors">
                   {t("loadMore", { count: map.rows.length - paginated.length })}
                 </button>
               </div>
             )}
-
+            </DirectoryResults>
           </div>
         </div>
       </div>
@@ -235,67 +228,33 @@ export default function CompaniesContent({ initialCompanies }: { initialCompanie
   );
 }
 
-// ─── Grid card ────────────────────────────────────────────────────
-function CompanyCard({ company }: { company: Company }) {
+/** A logo stays whole; names and places share the same compact hierarchy in every view. */
+function CompanyIdentity({ company }: { company: Company }) {
   const locale = useLocale();
-  const animals = useTranslations("FilmAnimals");
-  const safetyMedical = useTranslations("SafetyMedical");
-  const categoryLabel = (id: string, fallback: string) => safetyMedicalCompanyCategoryLabel(id, animalCategoryLabel(id, fallback, animals), safetyMedical);
-  const cats = company.categories.slice(0, 2).map((id) => COMPANY_CATEGORY_BY_ID[id]).filter(Boolean);
-  return (
-    <Link href={`/companies/${company.slug}`}
-      className="browse-card card-hover group flex min-w-0 flex-col p-3 sm:h-full">
-      <div className="mb-2 flex min-w-0 items-start gap-3">
-        <CompanyLogo src={company.logo_url} name={company.name} className="h-16 w-28 shrink-0 sm:h-14 sm:w-24" />
-        <div className="flex-1 min-w-0">
-          <div className="flex items-start justify-between gap-1">
-            <h3 className="line-clamp-2 font-semibold text-sm text-text-primary group-hover:text-gold transition-colors break-words leading-snug [overflow-wrap:anywhere]">{company.name}</h3>
-            {company.verified && <CheckCircle size={13} className="text-gold shrink-0 mt-0.5" />}
-          </div>
-          <div className="mt-0.5 flex items-center gap-1 text-[11px] text-text-muted">
-            {company.city && <><MapPin size={9} className="shrink-0" /><span className="truncate">{placeDisplay(company, company.city, locale)}</span></>}
-          </div>
-        </div>
-      </div>
-      {/* Categories */}
-      <div className="mb-2.5 flex flex-wrap content-start gap-1 overflow-hidden">
-        {cats.map((cat) => (
-          <span key={cat.id} title={categoryLabel(cat.id, cat.label)} className={`block max-w-full truncate whitespace-nowrap rounded-full border px-2 py-0.5 text-[10px] font-semibold border-border bg-bg-elevated text-text-secondary`}>{categoryLabel(cat.id, cat.label)}</span>
-        ))}
-        {company.categories.length > 2 && (
-          <span className="shrink-0 rounded-full border border-border px-2 py-0.5 text-[10px] font-medium text-text-muted">+{company.categories.length - 2}</span>
-        )}
-      </div>
-      {/* Description */}
-      <p className="mt-2 empty:mt-0 text-[11px] text-text-muted line-clamp-2 leading-relaxed sm:mt-auto">{company.description || ""}</p>
-    </Link>
-  );
+  const t = useTranslations("common");
+  return <div className="directory-entry-body">
+    <div className="directory-company-title">
+      <h3 className="directory-entry-title" title={company.name}>{company.name}</h3>
+      {company.verified && <CheckCircle size={13} aria-label={t("verified")} />}
+    </div>
+    {company.city && <p className="directory-entry-place"><MapPin size={11} aria-hidden="true" /><span title={placeDisplay(company, company.city, locale)}>{placeDisplay(company, company.city, locale)}</span></p>}
+  </div>;
 }
 
-// ─── List row ─────────────────────────────────────────────────────
-function CompanyListRow({ company }: { company: Company }) {
-  const locale = useLocale();
-  const animals = useTranslations("FilmAnimals");
-  const safetyMedical = useTranslations("SafetyMedical");
-  const categoryLabel = (id: string, fallback: string) => safetyMedicalCompanyCategoryLabel(id, animalCategoryLabel(id, fallback, animals), safetyMedical);
-  const cats = company.categories.slice(0, 3).map((id) => COMPANY_CATEGORY_BY_ID[id]).filter(Boolean);
-  return (
-    <Link href={`/companies/${company.slug}`}
-      className="flex items-center gap-4 px-5 py-4 hover:bg-bg-elevated transition-colors group">
-      <CompanyLogo src={company.logo_url} name={company.name} className="h-10 w-10 shrink-0" />
-      <div className="flex-1 min-w-0">
-        <div className="flex items-center gap-2 mb-0.5">
-          <span className="font-semibold text-sm text-text-primary group-hover:text-gold transition-colors break-words [overflow-wrap:anywhere]">{company.name}</span>
-          {company.verified && <CheckCircle size={12} className="text-gold shrink-0" />}
-        </div>
-        <div className="flex items-center gap-1 text-xs text-text-muted"><MapPin size={10} /><span>{placeDisplay(company, company.city, locale)}</span></div>
-      </div>
-      <div className="hidden sm:flex items-center gap-1.5 flex-wrap justify-end">
-        {cats.map((cat) => (
-          <span key={cat.id} className={`px-2 py-0.5 text-[10px] font-semibold rounded-full border border-border bg-bg-elevated text-text-secondary`}>{categoryLabel(cat.id, cat.label)}</span>
-        ))}
-      </div>
-      <ChevronRight size={14} className="text-text-muted shrink-0 group-hover:text-gold transition-colors" />
+function CompanyCard({ company }: { company: Company }) {
+  return <article className="browse-card directory-entry directory-company">
+    <Link href={`/companies/${company.slug}`} className="directory-entry-link">
+      <CompanyLogo src={company.logo_url} name={company.name} className="directory-company-logo" />
+      <CompanyIdentity company={company} />
     </Link>
-  );
+  </article>;
+}
+
+function CompanyListRow({ company }: { company: Company }) {
+  return <article className="directory-entry directory-company">
+    <Link href={`/companies/${company.slug}`} className="directory-entry-link">
+      <CompanyLogo src={company.logo_url} name={company.name} className="directory-company-logo" />
+      <CompanyIdentity company={company} />
+    </Link>
+  </article>;
 }

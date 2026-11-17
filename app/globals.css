@@ -1009,6 +1009,78 @@ input:-webkit-autofill:active {
 .directory-map-frame { height: clamp(16rem, 38svh, 22rem); min-width: 0; }
 @media (min-width: 1024px) { .directory-map-frame { height: clamp(20rem, 44svh, 30rem); } }
 
+/* Approved compact views for offers and companies. Crew keeps its own layout. */
+.directory-results { display: grid; gap: 16px; align-items: start; min-width: 0; }
+.directory-results-content, .directory-results-map { min-width: 0; }
+.directory-results-map .directory-map-frame { height: clamp(190px, 28svh, 240px); }
+.directory-results-map .location-map-preview { bottom: 48px; max-height: calc(100% - 56px); }
+.directory-results-map .directory-map-compact { margin-bottom: 0; }
+.directory-map-compact { display: flex; flex-direction: column; gap: 6px; }
+.directory-map-compact .directory-map-frame { order: -1; }
+.directory-map-compact .directory-map-notice { font-size: 11px; line-height: 1.4; }
+.directory-map-compact .directory-map-source { font-size: 10px; }
+.directory-map-meta { display: flex; justify-content: space-between; min-height: 44px; }
+.directory-map-info { position: relative; margin-inline-start: auto; }
+.directory-map-info > summary { list-style: none; }
+.directory-map-info > summary::-webkit-details-marker { display: none; }
+.directory-map-info > div { position: absolute; z-index: 30; top: 100%; inset-inline-end: 0; width: min(300px, calc(100vw - 32px)); box-shadow: 0 8px 24px #0003; }
+.directory-map-meta button:focus-visible, .directory-map-info > summary:focus-visible { outline: 2px solid var(--color-gold); outline-offset: -2px; border-radius: 8px; }
+
+.directory-cards { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+.directory-list { min-width: 0; overflow: hidden; border: 1px solid var(--color-border); border-radius: 12px; background: var(--color-bg-secondary); }
+.directory-entry { min-width: 0; position: relative; }
+.directory-entry-link { display: flex; min-width: 0; height: 100%; color: inherit; }
+.directory-entry-link:focus-visible { outline: 2px solid var(--color-gold); outline-offset: -2px; border-radius: inherit; }
+.directory-entry-photo { position: relative; flex-shrink: 0; overflow: hidden; background: var(--color-bg-elevated); }
+.directory-entry-photo img { object-fit: cover; }
+.directory-entry-body { min-width: 0; flex: 1; }
+.directory-entry-title { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden; overflow-wrap: anywhere; color: var(--color-text-primary); font-size: 13px; line-height: 1.4; font-weight: 600; }
+.directory-entry-place { display: flex; align-items: center; gap: 4px; min-width: 0; color: var(--color-text-muted); font-size: 11px; line-height: 1.5; }
+.directory-entry-place svg { flex-shrink: 0; }
+.directory-entry-place span { overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.directory-entry-price { color: var(--color-gold); font-size: 11px; line-height: 1.5; font-weight: 600; overflow-wrap: anywhere; }
+.directory-entry-link:hover .directory-entry-title { color: var(--color-gold); }
+.directory-cards .directory-entry { display: flex; flex-direction: column; height: 100%; overflow: hidden; border: 1px solid var(--color-border); border-radius: 12px; background: var(--color-bg-secondary); }
+.directory-cards .directory-entry-link { flex: 1; height: auto; flex-direction: column; }
+.directory-cards .directory-entry-photo { width: 100%; aspect-ratio: 3 / 2; }
+.directory-cards .directory-entry-body { display: flex; flex-direction: column; gap: 4px; padding: 10px; background: var(--color-bg-secondary); }
+.directory-cards .directory-entry-title { min-height: 2.8em; margin-bottom: 2px; }
+.directory-cards .directory-entry-place { margin-top: auto; }
+.directory-list .directory-entry { display: flex; align-items: center; gap: 4px; padding: 10px 12px; border-bottom: 1px solid color-mix(in srgb, var(--color-border) 65%, transparent); }
+.directory-list .directory-entry:last-child { border-bottom: 0; }
+.directory-list .directory-entry:hover { background: color-mix(in srgb, var(--color-bg-elevated) 40%, transparent); }
+.directory-list .directory-entry-link { flex: 1; align-items: center; gap: 12px; min-height: 64px; }
+.directory-list .directory-entry-photo { width: 64px; height: 64px; border-radius: 8px; }
+.directory-list .directory-entry-body { display: flex; flex-direction: column; gap: 3px; }
+.directory-list .directory-entry-favorite { flex-shrink: 0; border-color: transparent; background: transparent; backdrop-filter: none; }
+.directory-cards .directory-entry-favorite { position: absolute; top: 3px; right: 3px; z-index: 1; }
+.directory-company-logo { background: transparent; }
+.directory-cards .directory-company { min-height: 154px; padding: 12px; }
+.directory-cards .directory-company .directory-entry-link { gap: 10px; }
+.directory-cards .directory-company-logo { height: 44px; width: 120px; max-width: 100%; }
+.directory-company-logo img { object-position: left center; }
+.directory-cards .directory-company .directory-entry-body { padding: 0; gap: 5px; }
+.directory-cards .directory-company .directory-entry-place { margin-top: 0; }
+.directory-list .directory-company { min-height: 76px; }
+.directory-list .directory-company-logo { width: 64px; height: 46px; flex-shrink: 0; }
+.directory-list .directory-company .directory-entry-link { min-height: 54px; gap: 14px; }
+.directory-company-title { display: flex; align-items: start; gap: 5px; }
+.directory-company-title > svg { flex-shrink: 0; margin-top: 2px; color: var(--color-gold); }
+@media (min-width: 768px) {
+  .directory-cards { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+}
+@media (min-width: 1024px) {
+  .directory-cards { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .directory-entry-title { font-size: 14px; }
+  .directory-entry-place, .directory-entry-price { font-size: 12px; }
+  .directory-cards .directory-entry-body { padding: 12px; }
+  .directory-list .directory-entry { padding: 12px 16px; }
+  .directory-results[data-view="map"] { grid-template-columns: minmax(0, .9fr) minmax(0, 1.25fr); gap: 24px; }
+  .directory-results[data-view="map"] .directory-results-content { grid-column: 1; grid-row: 1; }
+  .directory-results-map { grid-column: 2; grid-row: 1; position: sticky; top: 88px; }
+  .directory-results-map .directory-map-frame { height: clamp(320px, 64svh, 680px); }
+}
+
 /* One brand treatment for all mobile directory map actions, alongside Genie. */
 .browse-map-toggle {
   position: fixed;

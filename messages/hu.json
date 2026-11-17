@@ -12808,7 +12808,8 @@
     "loading": "Térkép betöltése …",
     "providerPurpose": "Interaktív térképek",
     "providerRegion": "Magyarország / CDN",
-    "providerNotice": "Térkép megnyitásakor a böngésző az OpenFreeMap szolgáltatástól tölti be a térképadatokat. A térképszolgáltató megkapja az IP-címedet és a kérés technikai adatait. Neveket, profilokat és üzeneteket nem küldünk térképadatként. <provider>A szolgáltató adatai</provider>."
+    "providerNotice": "Térkép megnyitásakor a böngésző az OpenFreeMap szolgáltatástól tölti be a térképadatokat. A térképszolgáltató megkapja az IP-címedet és a kérés technikai adatait. Neveket, profilokat és üzeneteket nem küldünk térképadatként. <provider>A szolgáltató adatai</provider>.",
+    "information": "Térképinformációk"
   },
   "BrowseGeography": {
     "preferred": "Először a közelben és itt: {country}",

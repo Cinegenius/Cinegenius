@@ -3,6 +3,7 @@ import DirectoryPage from "@/components/DirectoryPage";
 
 /** Keep the directory image and compact layout visible while results load. */
 export default function DirectoryLoading({ area }: Pick<ComponentProps<typeof DirectoryPage>, "area">) {
+  const compact = area === "locations" || area === "marketplace" || area === "companies";
   return <DirectoryPage area={area}>
     <div className="site-container pt-24 pb-8 motion-safe:animate-pulse" aria-hidden="true">
       <div className="mb-3 h-8 w-3/4 max-w-lg rounded bg-bg-secondary" />
@@ -15,8 +16,15 @@ export default function DirectoryLoading({ area }: Pick<ComponentProps<typeof Di
         </div>
         <div className="mobile-browse-summary py-3"><div className="h-4 w-28 rounded bg-bg-secondary" /></div>
       </div>
-      <div className="grid grid-cols-1 gap-5 py-5 sm:grid-cols-2 xl:grid-cols-3">
-        {Array.from({ length: 6 }, (_, index) => <div key={index} className="browse-card space-y-4 p-5">
+      <div className={compact ? "directory-cards py-5" : "grid grid-cols-1 gap-5 py-5 sm:grid-cols-2 xl:grid-cols-3"}>
+        {Array.from({ length: 6 }, (_, index) => compact ? <div key={index} className={`browse-card directory-entry ${area === "companies" ? "directory-company gap-3" : ""}`}>
+          <div className={area === "companies" ? "h-11 w-20 rounded bg-bg-elevated" : "directory-entry-photo"} />
+          <div className="directory-entry-body">
+            <div className="h-9 w-3/4 rounded bg-bg-elevated" />
+            <div className="h-4 w-1/2 rounded bg-bg-elevated" />
+            {area !== "companies" && <div className="h-4 w-2/3 rounded bg-bg-elevated" />}
+          </div>
+        </div> : <div key={index} className="browse-card space-y-4 p-5">
           <div className="h-12 w-12 rounded-xl bg-bg-elevated" />
           <div className="h-4 w-3/4 rounded bg-bg-elevated" />
           <div className="h-3 w-1/2 rounded bg-bg-elevated" />
