@@ -14,11 +14,13 @@ import { cateringSearch, CATERING_SEARCH_TERMS } from "./unified-search-catering
 // Country group facts: Unicode CLDR supplemental/territoryContainment.json (UN M49).
 // https://github.com/unicode-org/cldr-json/blob/main/cldr-json/cldr-core/supplemental/territoryContainment.json
 export const continentCountries = (code: string): string[] => continents[code as keyof typeof continents] ?? [];
-export const searchKey = (value: unknown) => String(value ?? "").normalize("NFKD").replace(/\p{M}/gu, "").toLowerCase().replace(/ß/g, "ss").replace(/[^\p{L}\p{N}]+/gu, " ").trim();
+export const searchKey = (value: unknown) => String(value ?? "").normalize("NFKD").replace(/\p{M}/gu, "").normalize("NFC").toLowerCase().replace(/ß/g, "ss").replace(/[^\p{L}\p{N}]+/gu, " ").trim();
 
 /** Search interpretation only, never a stored identity update. Prefer a current
  * city name to historical aliases (e.g. Berlin vs North Canton's former name). */
 export function searchCityCandidates(label: string, country = "") {
+  const forms: Record<string, string> = { mnichove: 'München', monachium: 'München', 'мюнхене': 'München', 'мюнхені': 'München' };
+  label = forms[searchKey(label)] ?? label;
   const candidates = placeCandidatesForLabel(label, country), key = searchKey(label);
   const current = candidates.filter(city => [city.name, ...Object.values(city.names)].some(name => searchKey(name) === key));
   return current.length ? current : candidates;
@@ -39,8 +41,20 @@ const synonyms: Record<string, string[]> = {
 const cameraPeople = ["Director of Photography (DoP)", "Kameramann", "Camera Operator"];
 const crewSynonyms: Record<string, string[]> = {
   kameramann: cameraPeople, kameramanner: cameraPeople, kamerafrau: cameraPeople, kamerafrauen: cameraPeople,
+  kammeramann: cameraPeople, kameraman: cameraPeople,
   cameraman: cameraPeople, cameramen: cameraPeople, camerawoman: cameraPeople, cinematographer: cameraPeople,
 };
+
+/** A model code is a precision constraint, never a reason to include siblings. */
+export function namedModelToken(query: string): string | null {
+  return query.match(/(?:^|\s)([a-z]{1,8}[-]?\d+[a-z0-9-]*)(?=$|\s)/i)?.[1] ?? null;
+}
+export function matchesNamedModel(row: Record<string, unknown>, query: string): boolean {
+  if (!namedModelToken(query)) return true;
+  const market = row.marketplace && typeof row.marketplace === 'object' ? row.marketplace as Record<string, unknown> : {};
+  const text = searchKey([row.title, row.make, row.model, market.manufacturer, market.brand, market.model].filter(value => typeof value === 'string').join(' '));
+  return searchKey(query).split(' ').every(word => (` ${text} `).includes(` ${word} `));
+}
 // Gender punctuation is not part of an occupation. Keep the original labels in
 // returned terms so stored IDs/positions and member-written text are untouched.
 export const occupationKey = (value: string) => searchKey(value.replace(/(?:\*|:|\/)innen\b/giu, "").replace(/(?:\*|:|\/)in\b/giu, "").replace(/\*frau\b/giu, ""));
@@ -134,7 +148,7 @@ export function matchesSearchPlace(row: Record<string, unknown>, place: SearchPl
     });
   }
   if (fields.place_city_id && candidates.some(city => city.id === fields.place_city_id)) return true;
-  const names = [place.city, ...placeCitySearchAliases(place.city)].map(placeKey);
+  const names = [place.city, ...placeCitySearchAliases(place.city), ...candidates.flatMap(city => [city.name, ...Object.values(city.names)])].map(placeKey);
   return [fields.place_city_name, legacy.split(",")[0]].some(value => names.includes(placeKey(String(value ?? ""))));
 }
 

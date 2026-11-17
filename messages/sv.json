@@ -13265,9 +13265,36 @@
       "evidence": {
         "role": "Yrke angivet i profilen",
         "title": "Sökord i rubriken",
-        "requirements": "Krav enligt leverantörens uppgifter"
+        "requirements": "Krav enligt leverantörens uppgifter",
+        "category": "Matchande kategori"
       },
       "applyMapArea": "Begränsa till detta kartområde"
+    },
+    "conditions": {
+      "budgetLimit": "Högsta belopp",
+      "currency": "Valuta",
+      "priceUnit": "Prisenhet",
+      "unspecified": "Inte angivet",
+      "priceScope": "Budgeten gäller",
+      "each": "Per styck",
+      "total": "Alla efterfrågade artiklar",
+      "scopeUnknown": "Ännu inte bestämt",
+      "period": "Tidsperiod",
+      "periodNote": "Tillgänglighet för dessa datum måste bekräftas.",
+      "unsupported": "Kan inte verifieras: {values}",
+      "unconfirmed": "Behöver bekräftas",
+      "exact": "Matchande uppgifter",
+      "nearby": "Alternativ utanför den önskade orten",
+      "priceUnknown": "Pris eller prisenhet ej bekräftad",
+      "periodUnknown": "Datum ej bekräftade",
+      "quantityUnknown": "Efterfrågat antal ej bekräftat",
+      "unsupportedUnknown": "Ett annat villkor kan inte verifieras",
+      "nearbyAction": "Sök alternativ på andra orter",
+      "noResults": "Inga matchande resultat. Ändra enskilda villkor eller sök uttryckligen på andra orter.",
+      "radius": "Radie i km",
+      "requirements": "Nödvändiga egenskaper (en per rad)",
+      "exclusions": "Uteslutna egenskaper (en per rad)",
+      "removeCondition": "Ta bort villkor"
     }
   },
   "PublicReport": {

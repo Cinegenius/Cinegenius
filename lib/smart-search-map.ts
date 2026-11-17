@@ -1,4 +1,5 @@
 import type { SearchArea, SearchGroup, SearchResult } from "./unified-search";
+import { discoveryResults } from "./smart-discovery";
 
 export const SMART_MAP_COLORS: Record<SearchArea, string> = {
   crew: "#c2f135", locations: "#f3a45e", marketplace: "#b69ae8", companies: "#85b9ec",
@@ -11,7 +12,7 @@ export function smartMapEntries(groups: SearchGroup[]) {
     const key = `${result.type}:${result.id}`;
     if (!entries.has(key)) entries.set(key, { key, area: group.area, result });
   }
-  return [...entries.values()];
+  return discoveryResults(groups).map(result => ({ ...entries.get(`${result.type}:${result.id}`)!, result }));
 }
 
 /** Only fixed hex colours enter Leaflet's generated marker HTML. No member text. */

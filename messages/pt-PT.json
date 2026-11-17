@@ -13265,9 +13265,36 @@
       "evidence": {
         "role": "Profissão indicada no perfil",
         "title": "Termo de pesquisa no título",
-        "requirements": "Requisitos declarados pelo fornecedor"
+        "requirements": "Requisitos declarados pelo fornecedor",
+        "category": "Categoria correspondente"
       },
       "applyMapArea": "Limitar a esta área do mapa"
+    },
+    "conditions": {
+      "budgetLimit": "Montante máximo",
+      "currency": "Moeda",
+      "priceUnit": "Unidade de preço",
+      "unspecified": "Não especificado",
+      "priceScope": "O orçamento aplica-se a",
+      "each": "Cada artigo",
+      "total": "Todos os artigos pedidos",
+      "scopeUnknown": "Por definir",
+      "period": "Período",
+      "periodNote": "A disponibilidade para estas datas tem de ser confirmada.",
+      "unsupported": "Não é possível verificar: {values}",
+      "unconfirmed": "Por confirmar",
+      "exact": "Dados correspondentes",
+      "nearby": "Alternativas fora do local pedido",
+      "priceUnknown": "Preço ou unidade de preço por confirmar",
+      "periodUnknown": "Datas por confirmar",
+      "quantityUnknown": "Quantidade pedida por confirmar",
+      "unsupportedUnknown": "Outra condição não pode ser verificada",
+      "nearbyAction": "Procurar alternativas noutros locais",
+      "noResults": "Sem resultados correspondentes. Altere condições individuais ou procure explicitamente noutros locais.",
+      "radius": "Raio em km",
+      "requirements": "Características obrigatórias (uma por linha)",
+      "exclusions": "Características excluídas (uma por linha)",
+      "removeCondition": "Remover condição"
     }
   },
   "PublicReport": {

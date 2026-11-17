@@ -13265,9 +13265,36 @@
       "evidence": {
         "role": "Métier indiqué sur le profil",
         "title": "Terme recherché dans le titre",
-        "requirements": "Critères déclarés par le prestataire"
+        "requirements": "Critères déclarés par le prestataire",
+        "category": "Catégorie correspondante"
       },
       "applyMapArea": "Limiter à cette zone de la carte"
+    },
+    "conditions": {
+      "budgetLimit": "Montant maximal",
+      "currency": "Devise",
+      "priceUnit": "Unité de prix",
+      "unspecified": "Non précisé",
+      "priceScope": "Le budget concerne",
+      "each": "Chaque article",
+      "total": "Tous les articles demandés",
+      "scopeUnknown": "À préciser",
+      "period": "Période",
+      "periodNote": "La disponibilité pour ces dates doit être confirmée.",
+      "unsupported": "Impossible à vérifier : {values}",
+      "unconfirmed": "À confirmer",
+      "exact": "Informations correspondantes",
+      "nearby": "Alternatives hors du lieu demandé",
+      "priceUnknown": "Prix ou unité de prix non confirmés",
+      "periodUnknown": "Dates non confirmées",
+      "quantityUnknown": "Quantité demandée non confirmée",
+      "unsupportedUnknown": "Une autre condition ne peut pas être vérifiée",
+      "nearbyAction": "Chercher des alternatives ailleurs",
+      "noResults": "Aucun résultat correspondant. Modifiez certaines conditions ou cherchez explicitement dans d’autres lieux.",
+      "radius": "Rayon en km",
+      "requirements": "Caractéristiques requises (une par ligne)",
+      "exclusions": "Caractéristiques exclues (une par ligne)",
+      "removeCondition": "Supprimer la condition"
     }
   },
   "PublicReport": {

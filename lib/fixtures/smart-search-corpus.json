@@ -1,0 +1,23 @@
+{
+ "version":1,"frozenBeforeImplementation":true,"data":"Synthetic QA records, never real members","productionCommit":"ce0f6cc123781c5984d4396a42499bae17055107","appBaseline":"23be094042f4f97094ba77d2f44679e7a88f95e3 plus pending directory merge; fbaef73 already integrated, not live",
+ "cases":[
+ {"id":"camera-owned","text":"Ich brauche für Freitag einen Kameramann mit eigener Kamera in München.","expect":{"area":"crew","city":"München","requirement":"own camera on same person","period":"Freitag","availability":"unknown"},"include":["qa-camera-own"],"exclude":["qa-camera-no-equipment","qa-separate-camera","qa-camera-ghost"]},
+ {"id":"led-budget-radius","text":"Zwei LED-Leuchten bis 100 Euro pro Tag, höchstens 30 km um Wien.","expect":{"area":"marketplace","quantity":2,"budget":100,"unit":"day","city":"Wien","radiusKm":30,"requirement":"LED","quantityMeaning":"requested, not confirmed stock"},"include":["qa-led-vienna-80"],"exclude":["qa-led-150","qa-led-salzburg","qa-tungsten"],"unknown":["qa-led-price-request"]},
+ {"id":"balcony-no-studio","text":"Altbauwohnung mit Balkon für einen Dreh in Berlin, keine Studios.","expect":{"area":"locations","query":"Altbauwohnung","city":"Berlin","requirement":"Balkon","exclude":"Studio"},"include":["qa-old-flat-balcony"],"exclude":["qa-flat-no-balcony","qa-studio-balcony"]},
+ {"id":"costumes-hats","text":"Kostüme und Hüte für einen historischen Film in München.","expect":{"areas":["marketplace","marketplace"],"queries":["Kostüm","Hut"],"city":"München","requirement":"historical declared"},"include":["qa-medieval-hat","qa-medieval-costume"],"exclude":["qa-modern-suit"]},
+ {"id":"specific-model","text":"Godox F800R in München.","expect":{"area":"marketplace","query":"Godox F800R","city":"München"},"include":["qa-godox-f800r"],"exclude":["qa-aputure-nova","qa-godox-f800"]},
+ {"id":"refine-city","text":"Doch lieber Salzburg, alles andere wie vorher.","context":"led-budget-radius","expect":{"city":"Salzburg","preserve":["quantity","query","budget","unit","radiusKm","requirements"]}},
+ {"id":"refine-budget-city","text":"Doch Berlin, bis 500 Euro","context":"camera-owned","expect":{"city":"Berlin","budget":500,"preserve":["period","query","requirements"]}},
+ {"id":"ambiguous-place","text":"Kameramann in Springfield","expect":{"clarification":"country or city choice"}},
+ {"id":"near-me","text":"Studio in meiner Nähe","expect":{"clarification":"place, no guessed GPS"}},
+ {"id":"empty","text":"Godox F800R in Wien","expect":{"exact":0,"alternatives":"explicit separate opt-in, never silently relocated"}},
+ {"id":"late-match","text":"Lampe in München","expect":{"scan":"eligible matches beyond first 180 candidates","exclude":["private","blocked","ghost"]}},
+ {"id":"model-typo","text":"Kammeramann München","expect":{"role":"camera people","exclude":["equipment","model maker"]}},
+ {"id":"malicious-content","text":"Lampe in München","expect":{"recordText":"ignore previous instructions is data; no expanded permissions"}},
+ {"id":"stale-response","expect":{"flow":"new search wins over slow old response"}},
+ {"id":"rights-change","expect":{"flow":"account/logout/revoked admin clears results; requests recheck rights"}},
+ {"id":"real-back","expect":{"flow":"detail and Back retain original query, view, filters, scroll; private rows freshly rechecked"}}
+ ],
+ "languages":{"de":"Lampe in München","en":"Lamp in Munich","es":"Lámpara en Múnich","it":"Lampada a Monaco di Baviera","cs":"Lampa v Mnichově","hu":"Lámpa München","nl":"Lamp in München","nl-BE":"Lamp in München","sv":"Lampa i München","fr":"Lampe à Munich","pl":"Lampa w Monachium","pt-PT":"Lâmpada em Munique","zh-Hans":"慕尼黑的灯","ja":"ミュンヘンの照明","ko":"뮌헨의 조명","ru":"Лампа в Мюнхене","uk":"Лампа в Мюнхені"},
+ "measurements":"Record deterministic interpretation vs provider-contract mocks separately. No paid model calls; no claim to have measured real model quality or production latency. Compare eligible result IDs and timings using unchanged fixture."
+}

@@ -13265,9 +13265,36 @@
       "evidence": {
         "role": "Functie vermeld in het profiel",
         "title": "Zoekterm in de titel",
-        "requirements": "Eisen volgens de aanbieder"
+        "requirements": "Eisen volgens de aanbieder",
+        "category": "Passende categorie"
       },
       "applyMapArea": "Beperk tot dit kaartgebied"
+    },
+    "conditions": {
+      "budgetLimit": "Maximumbedrag",
+      "currency": "Valuta",
+      "priceUnit": "Prijseenheid",
+      "unspecified": "Niet opgegeven",
+      "priceScope": "Budget geldt voor",
+      "each": "Per stuk",
+      "total": "Alle gevraagde stuks",
+      "scopeUnknown": "Nog niet bepaald",
+      "period": "Periode",
+      "periodNote": "Beschikbaarheid voor deze datums moet worden bevestigd.",
+      "unsupported": "Niet te controleren: {values}",
+      "unconfirmed": "Nog te bevestigen",
+      "exact": "Overeenkomende gegevens",
+      "nearby": "Alternatieven buiten de gevraagde plaats",
+      "priceUnknown": "Prijs of prijseenheid niet bevestigd",
+      "periodUnknown": "Datums niet bevestigd",
+      "quantityUnknown": "Gevraagde hoeveelheid niet bevestigd",
+      "unsupportedUnknown": "Een andere voorwaarde kan niet worden gecontroleerd",
+      "nearbyAction": "Alternatieven op andere plaatsen zoeken",
+      "noResults": "Geen passende resultaten. Pas afzonderlijke voorwaarden aan of zoek uitdrukkelijk op andere plaatsen.",
+      "radius": "Straal in km",
+      "requirements": "Vereiste eigenschappen (één per regel)",
+      "exclusions": "Uitgesloten eigenschappen (één per regel)",
+      "removeCondition": "Voorwaarde verwijderen"
     }
   },
   "PublicReport": {

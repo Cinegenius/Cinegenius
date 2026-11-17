@@ -13265,9 +13265,36 @@
       "evidence": {
         "role": "Profese uvedená v profilu",
         "title": "Hledaný výraz v názvu",
-        "requirements": "Požadavky uvedené poskytovatelem"
+        "requirements": "Požadavky uvedené poskytovatelem",
+        "category": "Odpovídající kategorie"
       },
       "applyMapArea": "Omezit na tuto oblast mapy"
+    },
+    "conditions": {
+      "budgetLimit": "Maximální částka",
+      "currency": "Měna",
+      "priceUnit": "Cenová jednotka",
+      "unspecified": "Neuvedeno",
+      "priceScope": "Rozpočet platí pro",
+      "each": "Každý kus",
+      "total": "Všechny požadované kusy",
+      "scopeUnknown": "Zatím neurčeno",
+      "period": "Termín",
+      "periodNote": "Dostupnost v tomto termínu je nutné potvrdit.",
+      "unsupported": "Nelze ověřit: {values}",
+      "unconfirmed": "Nutno potvrdit",
+      "exact": "Odpovídající údaje",
+      "nearby": "Alternativy mimo požadované místo",
+      "priceUnknown": "Cena nebo cenová jednotka nepotvrzena",
+      "periodUnknown": "Termín nepotvrzen",
+      "quantityUnknown": "Požadované množství nepotvrzeno",
+      "unsupportedUnknown": "Další podmínku nelze ověřit",
+      "nearbyAction": "Hledat alternativy v jiných místech",
+      "noResults": "Žádné odpovídající výsledky. Uprav jednotlivé podmínky nebo výslovně hledej v jiných místech.",
+      "radius": "Okruh v km",
+      "requirements": "Požadované vlastnosti (jedna na řádek)",
+      "exclusions": "Vyloučené vlastnosti (jedna na řádek)",
+      "removeCondition": "Odebrat podmínku"
     }
   },
   "PublicReport": {

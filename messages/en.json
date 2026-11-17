@@ -13265,9 +13265,36 @@
       "evidence": {
         "role": "Role stated in the profile",
         "title": "Search term in the title",
-        "requirements": "Requirements declared by the provider"
+        "requirements": "Requirements declared by the provider",
+        "category": "Matching category"
       },
       "applyMapArea": "Limit to this map area"
+    },
+    "conditions": {
+      "budgetLimit": "Maximum amount",
+      "currency": "Currency",
+      "priceUnit": "Price unit",
+      "unspecified": "Not specified",
+      "priceScope": "Budget applies to",
+      "each": "Each item",
+      "total": "All requested items",
+      "scopeUnknown": "Not yet specified",
+      "period": "Dates",
+      "periodNote": "Availability for these dates must be confirmed.",
+      "unsupported": "Cannot verify: {values}",
+      "unconfirmed": "Needs confirmation",
+      "exact": "Matching details",
+      "nearby": "Alternatives outside the requested place",
+      "priceUnknown": "Price or price unit unconfirmed",
+      "periodUnknown": "Dates unconfirmed",
+      "quantityUnknown": "Requested quantity unconfirmed",
+      "unsupportedUnknown": "Another condition cannot be verified",
+      "nearbyAction": "Search alternatives in other places",
+      "noResults": "No matching results. Edit individual conditions or explicitly search other places.",
+      "radius": "Radius in km",
+      "requirements": "Required properties (one per line)",
+      "exclusions": "Excluded properties (one per line)",
+      "removeCondition": "Remove condition"
     }
   },
   "PublicReport": {

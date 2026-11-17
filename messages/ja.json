@@ -13265,9 +13265,36 @@
       "evidence": {
         "role": "プロフィールに記載された職種",
         "title": "タイトルに検索語を含む",
-        "requirements": "提供者が申告した条件"
+        "requirements": "提供者が申告した条件",
+        "category": "一致するカテゴリー"
       },
       "applyMapArea": "この地図範囲に絞る"
+    },
+    "conditions": {
+      "budgetLimit": "上限金額",
+      "currency": "通貨",
+      "priceUnit": "料金単位",
+      "unspecified": "未指定",
+      "priceScope": "予算の対象",
+      "each": "1点ごと",
+      "total": "希望する全点",
+      "scopeUnknown": "未確定",
+      "period": "期間",
+      "periodNote": "この期間の空き状況は確認が必要です。",
+      "unsupported": "確認できない条件：{values}",
+      "unconfirmed": "要確認",
+      "exact": "条件に合う情報",
+      "nearby": "指定地域外の候補",
+      "priceUnknown": "料金または料金単位が未確認",
+      "periodUnknown": "日程が未確認",
+      "quantityUnknown": "希望数量が未確認",
+      "unsupportedUnknown": "ほかに確認できない条件があります",
+      "nearbyAction": "ほかの地域の候補を検索",
+      "noResults": "条件に合う結果がありません。個別の条件を変更するか、ほかの地域での検索を選択してください。",
+      "radius": "半径（km）",
+      "requirements": "必要な特徴（1行に1件）",
+      "exclusions": "除外する特徴（1行に1件）",
+      "removeCondition": "条件を削除"
     }
   },
   "PublicReport": {

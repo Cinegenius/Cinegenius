@@ -13265,9 +13265,36 @@
       "evidence": {
         "role": "Tätigkeit im Profil angegeben",
         "title": "Suchbegriff im Titel",
-        "requirements": "Anforderungen laut Anbieter"
+        "requirements": "Anforderungen laut Anbieter",
+        "category": "Passende Kategorie"
       },
       "applyMapArea": "Auf diesen Ausschnitt begrenzen"
+    },
+    "conditions": {
+      "budgetLimit": "Höchstbetrag",
+      "currency": "Währung",
+      "priceUnit": "Preiseinheit",
+      "unspecified": "Nicht angegeben",
+      "priceScope": "Budget gilt für",
+      "each": "Je Stück",
+      "total": "Alle angefragten Stücke",
+      "scopeUnknown": "Noch offen",
+      "period": "Zeitraum",
+      "periodNote": "Terminverfügbarkeit muss bestätigt werden.",
+      "unsupported": "Nicht prüfbar: {values}",
+      "unconfirmed": "Noch zu klären",
+      "exact": "Passende Angaben",
+      "nearby": "Alternativen außerhalb des Ortes",
+      "priceUnknown": "Preis oder Preiseinheit nicht bestätigt",
+      "periodUnknown": "Termin nicht bestätigt",
+      "quantityUnknown": "Angefragte Anzahl nicht bestätigt",
+      "unsupportedUnknown": "Weitere Bedingung nicht prüfbar",
+      "nearbyAction": "Alternativen in anderen Orten suchen",
+      "noResults": "Keine passenden Treffer. Ändere einzelne Bedingungen oder suche ausdrücklich in anderen Orten.",
+      "radius": "Umkreis in km",
+      "requirements": "Erforderliche Eigenschaften (eine pro Zeile)",
+      "exclusions": "Ausgeschlossene Eigenschaften (eine pro Zeile)",
+      "removeCondition": "Bedingung entfernen"
     }
   },
   "PublicReport": {

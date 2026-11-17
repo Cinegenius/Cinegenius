@@ -70,6 +70,11 @@ export function discoveryResults(groups: SearchGroup[]): SearchResult[] {
   for (const group of groups) for (const result of group.results) {
     const key = `${result.type}:${result.id}`;
     if (!results.has(key)) results.set(key, result);
+    else {
+      const first = results.get(key)!;
+      const unconfirmed = [...new Set([...(first.unconfirmed ?? []), ...(result.unconfirmed ?? [])])];
+      if (unconfirmed.length) results.set(key, { ...first, unconfirmed, ...(unconfirmed.includes('period') ? { available: null } : {}) });
+    }
   }
   return [...results.values()];
 }

@@ -3,7 +3,7 @@
 import SmartSearchPreview from "@/components/SmartSearchPreview";
 import { ServerAdminContext } from "@/lib/server-admin-context";
 import { useAuth } from "@clerk/nextjs";
-import { useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useContext, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
@@ -11,7 +11,9 @@ import { ArrowUp, Loader2 } from "lucide-react";
 import { useFormRouter } from "@/lib/use-form-router";
 import { decodeSearchPlan, searchPlanFromHref, type SearchPlan, type SearchGroup } from "@/lib/unified-search";
 import DirectoryPage from "@/components/DirectoryPage";
-import SmartSearchExplorer from "@/components/SmartSearchExplorer";
+import SmartSearchExplorer, { type SmartSearchControls } from "@/components/SmartSearchExplorer";
+import { useViewState } from "@/lib/use-view-state";
+import { emptyDiscoveryFilters } from "@/lib/smart-discovery";
 import SmartSearchExamples from "@/components/SmartSearchExamples";
 import SmartSearchClarification from "@/components/SmartSearchClarification";
 import SmartSearchWishes from "@/components/SmartSearchWishes";
@@ -48,7 +50,11 @@ function AccessibleUnifiedSearchResults({ onUnavailable }: { onUnavailable: () =
   const encodedPlan = params.get("plan");
   const editablePlan = useMemo(() => decodeSearchPlan(encodedPlan), [encodedPlan]);
   const requestText = params.get("q") ?? "";
+  const encodedContext = params.get("context");
   const [input, setInput] = useState(requestText);
+  // Keep controls above the result loader: replacing a plan temporarily unmounts
+  // the result pool, but must not reset a chosen list/map view.
+  const [controls, setControls] = useViewState<SmartSearchControls>('smart.controls', { scope: '', filters: emptyDiscoveryFilters(), mapOpen: true, limits: {} });
   const [plan, setPlan] = useState<SearchPlan | null>(null);
   const [groups, setGroups] = useState<SearchGroup[]>([]);
   const [mapGroups, setMapGroups] = useState<SearchGroup[] | undefined>();
@@ -61,12 +67,38 @@ function AccessibleUnifiedSearchResults({ onUnavailable }: { onUnavailable: () =
   const [resultScope, setResultScope] = useState("");
   const active = useRef<AbortController | null>(null);
   const inputSource = useRef("");
-  const interpretationAttempt = useRef<{ text: string; retry: number } | null>(null);
+  const editedInputSource = useRef<string | null>(null);
+  const interpretationAttempt = useRef<{ text: string; context: string | null; retry: number } | null>(null);
   const inputElement = useRef<HTMLInputElement>(null);
+  useLayoutEffect(() => {
+    // Server-rendered fields are already usable before hydration. Adopt any
+    // text entered in that interval before the first result effect can reset it.
+    const field = inputElement.current;
+    if (!inputSource.current && field && field.value !== requestText) {
+      editedInputSource.current = JSON.stringify([encodedPlan, requestText]);
+      setInput(field.value);
+    }
+  }, [encodedPlan, requestText]);
   const navigation = useRef(router);
   useEffect(() => { navigation.current = router; }, [router]);
-  const scope = JSON.stringify([encodedPlan, requestText, locale, userId, isLoaded]);
-  const dialogueScope = JSON.stringify([encodedPlan, requestText, userId]);
+  const scope = JSON.stringify([encodedPlan, requestText, encodedContext, locale, userId, isLoaded]);
+  const dialogueScope = JSON.stringify([encodedPlan, requestText, encodedContext, userId]);
+
+  useEffect(() => {
+    if (!encodedPlan || !userId) return;
+    let refreshed = 0;
+    const refresh = () => {
+      if (document.visibilityState === 'hidden' || Date.now() - refreshed < 500) return;
+      refreshed = Date.now();
+      active.current?.abort();
+      setResultScope('');
+      setRetry(value => value + 1);
+    };
+    const events = ['focus', 'pageshow', 'cinegenius:app-resume'];
+    events.forEach(event => window.addEventListener(event, refresh));
+    document.addEventListener('visibilitychange', refresh);
+    return () => { events.forEach(event => window.removeEventListener(event, refresh)); document.removeEventListener('visibilitychange', refresh); };
+  }, [encodedPlan, userId]);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -90,12 +122,16 @@ function AccessibleUnifiedSearchResults({ onUnavailable }: { onUnavailable: () =
           });
           return [title, ...places].filter(Boolean).join(" · ");
         }).join("; ");
-        setInput(requestText || summary || "");
+        // Initial hydration/result setup may finish after the first keystroke.
+        // Never replace an unsent draft belonging to this same address.
+        if (editedInputSource.current !== source) setInput(requestText || summary || "");
       }
       if (!isLoaded) { setLoading(false); return; }
       if (!userId) { updateClarification(null); setError(SEARCH_ERROR.unauthorized); setLoading(false); return; }
       if (!encodedPlan && !requestText.trim()) { setLoading(false); return; }
       if (encodedPlan && !decoded) { setError(SEARCH_ERROR.invalid); setLoading(false); return; }
+      const context = decodeSearchPlan(encodedContext);
+      if (encodedContext && !context) { setError(SEARCH_ERROR.invalid); setLoading(false); return; }
       // Locale changes translate the controls without losing the answer draft or
       // reinterpreting the initial request. Account/query changes get a new dialogue.
       if (!encodedPlan && clarificationRef.current?.scope === dialogueScope && clarificationRef.current.retry === retry) { setLoading(false); return; }
@@ -111,13 +147,13 @@ function AccessibleUnifiedSearchResults({ onUnavailable }: { onUnavailable: () =
         } else {
           // Locale/account changes may cancel a request, but never repeat paid
           // interpretation of the previous input without another explicit send.
-          if (interpretationAttempt.current?.text === requestText && interpretationAttempt.current.retry === retry) {
+          if (interpretationAttempt.current?.text === requestText && interpretationAttempt.current.context === encodedContext && interpretationAttempt.current.retry === retry) {
             setError(SEARCH_ERROR.unavailable);
             return;
           }
-          interpretationAttempt.current = { text: requestText, retry };
+          interpretationAttempt.current = { text: requestText, context: encodedContext, retry };
           const response = await fetch("/api/genie", { method: "POST", headers: { "Content-Type": "application/json" }, cache: "no-store", signal: AbortSignal.any([controller.signal, AbortSignal.timeout(35_000)]),
-            body: JSON.stringify({ area: "general", locale, messages: [{ role: "user", content: requestText }] }) });
+            body: JSON.stringify({ area: "general", locale, messages: [{ role: "user", content: requestText }], ...(context ? { searchContext: { plan: context } } : {}) }) });
           const data = await response.json();
           if (response.status === 401 || (response.status === 403 && data.error === "in_development")) { if (!controller.signal.aborted) onUnavailable(); return; }
           if (!response.ok) throw new Error(data.error || SEARCH_ERROR.unavailable);
@@ -131,7 +167,7 @@ function AccessibleUnifiedSearchResults({ onUnavailable }: { onUnavailable: () =
       } finally { if (!controller.signal.aborted) setLoading(false); }
     }, 0);
     return () => { clearTimeout(timer); controller.abort(); };
-  }, [encodedPlan, requestText, locale, userId, isLoaded, retry, scope, dialogueScope, updateClarification, t, taxonomy, onUnavailable]);
+  }, [encodedPlan, requestText, encodedContext, locale, userId, isLoaded, retry, scope, dialogueScope, updateClarification, t, taxonomy, onUnavailable]);
 
   const errorText = error === "unauthorized" ? t("signInRequired") : error === "rate_limited" ? genie("errorRateLimited") : error === "invalid" || error === "search_unresolved" ? genie("errorSearch") : t("error");
   const returnTo = `/search?${new URLSearchParams(plan && encodedPlan ? { plan: encodedPlan } : { smart: "1", q: input })}`;
@@ -146,20 +182,20 @@ function AccessibleUnifiedSearchResults({ onUnavailable }: { onUnavailable: () =
         <form className="smart-search-input mt-4 flex min-h-[52px] items-center gap-2 rounded-xl border p-1" onSubmit={event => {
           event.preventDefault(); if (!input.trim()) return;
           active.current?.abort();
-          const href = `/search?${new URLSearchParams({ smart: "1", q: input.trim() })}`;
+          const href = `/search?${new URLSearchParams({ smart: "1", q: input.trim(), ...(plan ? { context: JSON.stringify(plan) } : {}) })}`;
           if (!encodedPlan && input.trim() === requestText) setRetry(value => value + 1);
           else router.push(href, { scroll: false });
         }}>
-          <input ref={inputElement} aria-label={t("title")} value={input} maxLength={2000} onChange={event => { active.current?.abort(); setLoading(false); setInput(event.target.value); }}
+          <input ref={inputElement} aria-label={t("title")} value={input} maxLength={2000} onChange={event => { editedInputSource.current = JSON.stringify([encodedPlan, requestText]); active.current?.abort(); setLoading(false); setInput(event.target.value); }}
             placeholder={t("placeholder")} className="min-h-11 min-w-0 flex-1 bg-transparent px-3 py-2 text-base text-text-primary focus:outline-none" />
           <button type="submit" aria-label={t("submit")} disabled={!input.trim()} className="flex min-h-11 min-w-11 items-center justify-center rounded-xl bg-gold px-3 text-bg-primary disabled:opacity-50"><ArrowUp size={20} aria-hidden="true" /></button>
         </form>
-        {!encodedPlan && !plan && <SmartSearchExamples onSelect={value => { active.current?.abort(); setLoading(false); setInput(value); inputElement.current?.focus({ preventScroll: true }); }} />}
+        {!encodedPlan && !plan && <SmartSearchExamples onSelect={value => { editedInputSource.current = JSON.stringify([encodedPlan, requestText]); active.current?.abort(); setLoading(false); setInput(value); inputElement.current?.focus({ preventScroll: true }); }} />}
         <div aria-live="polite" className={`${loading ? "mt-3" : ""} text-sm text-text-secondary`}>
           {loading && <p className="flex items-center gap-2"><Loader2 size={18} className="animate-spin text-gold" />{plan ? t("loading") : t("understanding")}</p>}
         </div>
         {clarification?.scope === dialogueScope && clarification.retry === retry && !error && userId && <SmartSearchClarification key={`${dialogueScope}:${retry}`}
-          question={clarification.question} requestText={requestText} onUnauthorized={onUnavailable} />}
+          question={clarification.question} requestText={requestText} onUnauthorized={onUnavailable} searchContext={decodeSearchPlan(encodedContext) ? { plan: decodeSearchPlan(encodedContext)! } : undefined} />}
         {resultScope === scope && error && <div role="alert" className="mt-3 text-sm text-text-secondary"><p>{errorText}</p>
           {error === "unauthorized" ? <Link className="inline-flex min-h-11 items-center text-gold" href={`/sign-in?redirect_url=${encodeURIComponent(returnTo)}`}>{genie("signIn")}</Link>
             : <button type="button" className="min-h-11 text-gold" onClick={() => setRetry(value => value + 1)}>{t("retry")}</button>}
@@ -167,7 +203,7 @@ function AccessibleUnifiedSearchResults({ onUnavailable }: { onUnavailable: () =
       </div>
     </div>
     {resultScope === scope && !loading && !error && <div className="site-container pb-5">
-      {plan && userId && <SmartSearchExplorer key={scope} plan={plan} initialGroups={groups} initialMapGroups={mapGroups} onUnavailable={onUnavailable} />}
+      {plan && userId && <SmartSearchExplorer key={scope} plan={plan} initialGroups={groups} initialMapGroups={mapGroups} onUnavailable={onUnavailable} stored={controls} setStored={setControls} />}
     </div>}
   </main></DirectoryPage>;
 }

@@ -81,6 +81,7 @@ export default function ResultCard({ result, compact = false, showEvidence = fal
         </h3>
         <p title={result.subtitle} className="text-xs text-text-muted line-clamp-1 flex-1">{result.subtitle}</p>
         {showEvidence && result.evidence && <p className="mt-1 text-xs text-text-secondary">{uiText(`UnifiedSearch.discovery.evidence.${result.evidence}`)}</p>}
+        {showEvidence && result.unconfirmed?.map(fact => <p key={fact} className="text-xs text-text-muted">{uiText(`UnifiedSearch.conditions.${fact}Unknown`)}</p>)}
         {result.nearby && <p className="text-xs text-text-muted">{uiText("UnifiedSearch.nearbyDistance", { distance: result.nearby.distanceKm.toLocaleString(uiLocale), place: result.nearby.origin })}</p>}
         {!isProfile && result.type !== "animal" && (result.priceLabel || result.price > 0) && (
           <p className={`${compact ? "text-xs" : "mt-2 text-sm"} font-semibold font-mono text-gold`}>

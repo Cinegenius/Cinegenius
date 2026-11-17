@@ -1,14 +1,16 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import { useCallback, useEffect, useId, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useId, useMemo, useRef, useState, type Dispatch, type SetStateAction } from "react";
 import { useTranslations } from "next-intl";
+import { useSearchParams } from "next/navigation";
+import { useFormRouter } from "@/lib/use-form-router";
 import { ChevronDown, RotateCcw, SlidersHorizontal, X } from "lucide-react";
 import BrowseResultCount from "./BrowseResultCount";
 import BrowseSelect from "./BrowseSelect";
 import DirectoryViewControls from "./DirectoryViewControls";
 import ResultCard from "./SearchResultCard";
-import { searchGroupKey, type SearchGroup, type SearchPlan } from "@/lib/unified-search";
+import { searchGroupKey, unifiedSearchHref, type SearchGroup, type SearchPlan } from "@/lib/unified-search";
 import { SMART_MAP_COLORS } from "@/lib/smart-search-map";
 import { searchQueryTitle } from "@/lib/unified-search-areas";
 import { discoveryAreas, discoveryResults, discoveryCount, discoveryFacets, emptyDiscoveryFilters, filterDiscoveryGroups, mergeDiscoveryPage, sortDiscoveryGroups, type DiscoveryFilters } from "@/lib/smart-discovery";
@@ -26,13 +28,13 @@ const toggle = <T,>(values: T[], value: T) => values.includes(value) ? values.fi
 const chip = "inline-flex min-h-11 min-w-11 items-center justify-center gap-2 rounded-xl border px-3 py-2 text-sm transition-colors focus-visible:outline-2 focus-visible:outline-gold";
 const activeChip = "border-gold/40 bg-gold/10 text-text-primary";
 const inactiveChip = "border-border bg-bg-secondary text-text-muted";
+export type SmartSearchControls = { scope: string; filters: DiscoveryFilters; mapOpen: boolean; limits: Record<string, number> };
 
-function ResultArea({ area, groups, pending, errors, more }: {
-  area: SearchGroup["area"]; groups: SearchGroup[]; pending: string[]; errors: string[]; more: (group: SearchGroup) => void;
+function ResultArea({ area, groups, pending, errors, more, limit, setLimit }: {
+  area: SearchGroup["area"]; groups: SearchGroup[]; pending: string[]; errors: string[]; more: (group: SearchGroup) => void; limit: number; setLimit: (limit: number) => void;
 }) {
   const t = useTranslations("UnifiedSearch");
-  const [limit, setLimit] = useState(3);
-  const results = discoveryResults(groups);
+  const results = discoveryResults(groups).sort((a, b) => Number(!!a.nearby) - Number(!!b.nearby) || Number(!!a.unconfirmed?.length) - Number(!!b.unconfirmed?.length));
   const next = groups.find(group => errors.includes(searchGroupKey(group))) ?? groups.find(group => group.nextOffset !== null);
   const busy = groups.some(group => pending.includes(searchGroupKey(group)));
   const failed = groups.some(group => errors.includes(searchGroupKey(group)));
@@ -41,24 +43,43 @@ function ResultArea({ area, groups, pending, errors, more }: {
     <h2 className="smart-area-heading"><span className="size-1.5 shrink-0 rounded-full" style={{ backgroundColor: SMART_MAP_COLORS[area] }} aria-hidden="true" />
       <span className="min-w-0 flex-1">{t(`areas.${area}`)}</span><BrowseResultCount count={results.length} label={t("discovery.loaded", { count: results.length })} />
     </h2>
-    {results.slice(0, limit).map(result => <ResultCard key={`${result.type}:${result.id}`} result={result} compact row />)}
+    {results.slice(0, limit).map((result, index) => {
+      const kind = result.nearby ? 'nearby' : result.unconfirmed?.length ? 'unconfirmed' : 'exact';
+      const previous = results[index - 1];
+      const prior = previous ? previous.nearby ? 'nearby' : previous.unconfirmed?.length ? 'unconfirmed' : 'exact' : '';
+      return <div key={`${result.type}:${result.id}`} className="min-w-0">{kind !== prior && <p className="px-2 py-1 text-xs text-text-muted">{t(`conditions.${kind}`)}</p>}<ResultCard result={result} compact row showEvidence /></div>;
+    })}
     {failed && <p role="alert" className="py-2 text-sm text-text-secondary">{t("error")}</p>}
     {(results.length > limit || next) && <button type="button" disabled={busy} className="min-h-11 min-w-11 text-sm text-gold disabled:opacity-50" onClick={() => {
-      if (results.length > limit && !failed) setLimit(value => value + 6);
-      else if (next) { setLimit(value => value + 6); more(next); }
+      if (results.length > limit && !failed) setLimit(limit + 6);
+      else if (next) { setLimit(limit + 6); more(next); }
     }}>{busy ? t("loading") : failed ? t("retry") : t("more")}</button>}
   </section>;
 }
 
-/** Account/plan-scoped by the parent key; ephemeral filters never enter history
- * or storage. Combined responses serve both surfaces without duplicate reads. */
-export default function SmartSearchExplorer({ plan, initialGroups, initialMapGroups, onUnavailable }: {
+/** Only controls are restored on the actual account-owned history entry.
+ * Returned rows are always fetched again with current permissions. */
+export default function SmartSearchExplorer({ plan, initialGroups, initialMapGroups, onUnavailable, stored, setStored }: {
   plan: SearchPlan; initialGroups: SearchGroup[]; initialMapGroups?: SearchGroup[]; onUnavailable: () => void;
+  stored: SmartSearchControls; setStored: Dispatch<SetStateAction<SmartSearchControls>>;
 }) {
   const t = useTranslations("UnifiedSearch"), taxonomy = useTranslations("Taxonomy"), marketplace = useTranslations("MarketplaceCatalog");
+  const router = useFormRouter();
+  const requestText = useSearchParams().get('q') ?? '';
   const [groups, setGroups] = useState(initialMapGroups ?? initialGroups);
-  const [filters, setFilters] = useState<DiscoveryFilters>(emptyDiscoveryFilters);
-  const [mapOpen, setMapOpen] = useState(true);
+  const scope = JSON.stringify(plan);
+  const defaults = { scope, filters: emptyDiscoveryFilters(), mapOpen: true, limits: {} as Record<string, number> };
+  const controls = stored.scope === scope ? stored : { ...defaults, mapOpen: stored.mapOpen };
+  const { filters, mapOpen } = controls;
+  const setFilters = (action: DiscoveryFilters | ((previous: DiscoveryFilters) => DiscoveryFilters)) => setStored(old => {
+    const current = old.scope === scope ? old : { ...defaults, mapOpen: old.mapOpen };
+    return { ...current, filters: typeof action === 'function' ? action(current.filters) : action };
+  });
+  const setMapOpen = (value: boolean) => setStored(old => ({ ...(old.scope === scope ? old : defaults), mapOpen: value }));
+  const setLimit = (area: string, value: number) => setStored(old => {
+    const current = old.scope === scope ? old : { ...defaults, mapOpen: old.mapOpen };
+    return { ...current, limits: { ...current.limits, [area]: value } };
+  });
   const [filtersOpen, setFiltersOpen] = useState(false);
   const filterId = useId();
   const filterTrigger = useRef<HTMLButtonElement>(null);
@@ -113,6 +134,15 @@ export default function SmartSearchExplorer({ plan, initialGroups, initialMapGro
     const timer = window.setTimeout(() => void read(), 0);
     return () => window.clearTimeout(timer);
   }, [initialMapGroups, read]);
+
+  useEffect(() => {
+    // Refill previously expanded pages on Back without storing private results.
+    if (pending.length || errors.length) return;
+    const group = groups.find(group => group.nextOffset !== null && discoveryResults(groups.filter(item => item.area === group.area)).length < (controls.limits[group.area] ?? 3));
+    if (!group) return;
+    const timer = window.setTimeout(() => void read(group), 0);
+    return () => window.clearTimeout(timer);
+  }, [groups, controls.limits, pending.length, errors.length, read]);
 
   const areas = discoveryAreas(groups);
   const selectedAreas = areas.filter(area => !filters.hiddenAreas.includes(area));
@@ -179,15 +209,21 @@ export default function SmartSearchExplorer({ plan, initialGroups, initialMapGro
     <div className="smart-result-list">
     {errors.includes("initial") && <div role="alert" className="text-sm text-text-secondary"><p>{t("error")}</p><button type="button" className="min-h-11 min-w-11 text-gold" onClick={() => void read()} disabled={pending.includes("initial")}>{t("retry")}</button></div>}
     {pending.includes("initial") && <p role="status" className="text-sm text-text-muted">{t("loading")}</p>}
-    {!count && <div role="status" className="rounded-xl border border-border bg-bg-secondary p-4 text-sm text-text-secondary"><p>{t(filtered ? "discovery.emptyFilters" : "emptyGroup")}</p>{filtered && <button type="button" className="min-h-11 min-w-11 text-gold" onClick={reset}>{t("discovery.reset")}</button>}</div>}
-    {discoveryAreas(visible).map(area => <ResultArea key={area} area={area} groups={visible.filter(group => group.area === area)} pending={pending} errors={errors} more={group => void read(groups.find(item => searchGroupKey(item) === searchGroupKey(group))!)} />)}
+    {!count && !pending.length && !errors.length && <div role="status" className="rounded-xl border border-border bg-bg-secondary p-4 text-sm text-text-secondary"><p>{t(filtered ? "discovery.emptyFilters" : "conditions.noResults")}</p>{filtered && <button type="button" className="min-h-11 min-w-11 text-gold" onClick={reset}>{t("discovery.reset")}</button>}
+      {!filtered && plan.searches.some(wish => wish.places.some(place => place.city) && !wish.places.some(place => place.radiusKm) && !wish.allowNearby) && <button type="button" className="min-h-11 text-left text-gold" onClick={() => router.replace(unifiedSearchHref({ ...plan, searches: plan.searches.map(wish => ({ ...wish, allowNearby: wish.places.some(place => !!place.city) && !wish.places.some(place => place.radiusKm > 0) })) }, requestText), { scroll: false })}>{t('conditions.nearbyAction')}</button>}
+    </div>}
+    {plan.searches.flatMap((wish, i) => wish.unsupported?.length ? [<p key={i} className="text-xs text-text-muted">{t('conditions.unsupported', { values: wish.unsupported.join(' · ') })}</p>] : [])}
+    {discoveryAreas(visible).map(area => <ResultArea key={area} area={area} groups={visible.filter(group => group.area === area)} pending={pending} errors={errors} limit={controls.limits[area] ?? 3} setLimit={value => setLimit(area, value)} more={group => void read(groups.find(item => searchGroupKey(item) === searchGroupKey(group))!)} />)}
     {groups.some(group => group.nextOffset !== null) && <p className="text-xs text-text-muted">{t("discovery.partial")}</p>}
     {/* A cursor with no currently matching rows remains reachable without an empty area card. */}
     {visible.some(group => group.nextOffset !== null && !visible.some(item => item.area === group.area && item.results.length)) && <button type="button" disabled={pending.length > 0} className="min-h-11 text-sm text-gold" onClick={() => {
       const next = visible.find(group => group.nextOffset !== null && !visible.some(item => item.area === group.area && item.results.length));
       if (next) void read(groups.find(item => searchGroupKey(item) === searchGroupKey(next))!);
     }}>{pending.length ? t("loading") : t("more")}</button>}
-    {errors.some(key => key !== "initial" && !visible.some(group => searchGroupKey(group) === key && group.results.length)) && <p role="alert" className="text-sm text-text-secondary">{t("error")}</p>}
+    {errors.some(key => key !== "initial" && !visible.some(group => searchGroupKey(group) === key && group.results.length)) && <div role="alert" className="text-sm text-text-secondary"><p>{t("error")}</p><button type="button" className="min-h-11 text-gold" disabled={pending.length > 0} onClick={() => {
+      const failed = groups.find(group => errors.includes(searchGroupKey(group)));
+      if (failed) void read(failed);
+    }}>{t('retry')}</button></div>}
     </div>
   </div>;
 }

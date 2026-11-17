@@ -551,7 +551,7 @@ export const SEARCH_SYNONYMS: Record<string, string[]> = {
 // name. Match the complete phrase: a named model or a specific accessory must
 // not inherit every item from its parent category. These are search aliases,
 // not new display labels or changes to stored category IDs.
-const SEARCH_CONCEPTS = [
+export const SEARCH_CONCEPTS = [
   {
     groups: ["licht-quellen"],
     aliases: [
@@ -560,7 +560,7 @@ const SEARCH_CONCEPTS = [
       "lámpara", "lámparas", "lampada", "lampade", "svítidlo", "svítidla", "lampa", "lampy",
       "lámpa", "lámpák", "lampen", "lampor", "luminaire", "luminaires", "lampes",
       "oprawa oświetleniowa", "oprawy oświetleniowe", "lâmpada", "lâmpadas", "luminária", "luminárias",
-      "灯", "灯具", "ランプ", "照明器具", "램프", "조명기구", "조명 기구",
+      "灯", "灯具", "ランプ", "照明", "照明器具", "램프", "조명", "조명기구", "조명 기구",
       "лампа", "лампы", "светильник", "светильники", "лампи", "світильник", "світильники",
     ],
   },

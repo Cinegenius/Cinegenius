@@ -13265,9 +13265,36 @@
       "evidence": {
         "role": "Zawód podany w profilu",
         "title": "Wyszukiwane słowo w tytule",
-        "requirements": "Wymagania według deklaracji usługodawcy"
+        "requirements": "Wymagania według deklaracji usługodawcy",
+        "category": "Pasująca kategoria"
       },
       "applyMapArea": "Ogranicz do tego obszaru mapy"
+    },
+    "conditions": {
+      "budgetLimit": "Maksymalna kwota",
+      "currency": "Waluta",
+      "priceUnit": "Jednostka ceny",
+      "unspecified": "Nie podano",
+      "priceScope": "Budżet dotyczy",
+      "each": "Każdej sztuki",
+      "total": "Wszystkich zamówionych sztuk",
+      "scopeUnknown": "Jeszcze nie określono",
+      "period": "Termin",
+      "periodNote": "Dostępność w tym terminie wymaga potwierdzenia.",
+      "unsupported": "Nie można zweryfikować: {values}",
+      "unconfirmed": "Wymaga potwierdzenia",
+      "exact": "Zgodne informacje",
+      "nearby": "Alternatywy poza wybraną miejscowością",
+      "priceUnknown": "Cena lub jednostka ceny niepotwierdzona",
+      "periodUnknown": "Termin niepotwierdzony",
+      "quantityUnknown": "Żądana ilość niepotwierdzona",
+      "unsupportedUnknown": "Nie można zweryfikować innego warunku",
+      "nearbyAction": "Szukaj alternatyw w innych miejscowościach",
+      "noResults": "Brak pasujących wyników. Zmień poszczególne warunki lub wybierz wyszukiwanie w innych miejscowościach.",
+      "radius": "Promień w km",
+      "requirements": "Wymagane cechy (jedna w wierszu)",
+      "exclusions": "Wykluczone cechy (jedna w wierszu)",
+      "removeCondition": "Usuń warunek"
     }
   },
   "PublicReport": {

@@ -14,7 +14,8 @@ import { countryCode, PLACE_COLUMNS, placeDisplay } from "@/lib/places/core";
 import { publicProjectMedia } from "@/lib/project-media-rights";
 import { listingPriceLabel } from "@/lib/listing-price";
 import { COMPANY_CATEGORIES } from "@/lib/companyCategories";
-import { containsLiteral, exactLiteral, filterLiteral, isOccupationWish, matchesWishPlaces, searchKey, wishMarketplaceCategories, wishSearchTerms } from "@/lib/unified-search-matching";
+import { containsLiteral, exactLiteral, filterLiteral, isOccupationWish, matchesWishPlaces, searchKey, wishMarketplaceCategories, wishSearchTerms, namedModelToken, matchesNamedModel } from "@/lib/unified-search-matching";
+import { searchBudgetState, unconfirmedSearchFacts } from "@/lib/unified-search-constraints";
 import { compareNearby, nearbyDistance, nearbyOrigins } from "@/lib/unified-search-nearby";
 import { isDepartmentHeadsQuery, matchingDepartmentHead, departmentHeadTerms, isProductionCrewQuery, matchingProductionRole, productionCrewTerms, crewSearchSegments } from "@/lib/unified-search-production";
 import { matchesSearchRequirements, searchMatchScore } from "@/lib/unified-search-requirements";
@@ -48,10 +49,13 @@ function queryFor(area: SearchArea, wish: SearchWish, terms: string[], categorie
   const filtered = <T extends { or: (filters: string) => T }>(query: T, filters: string[]) => filters.length ? query.or(filters.join(",")) : query;
   if (kinds) {
     const facts = area === "animals" ? ",training_level:metadata->>training_level,special_skills:metadata->>special_skills" : area === "marketplace" ? ",vehicle_subtype:metadata->>vehicle_subtype,make:metadata->>make,model:metadata->>model" : "";
-    const filters = patterns(["title", "description", "category", ...(area === "marketplace"
-      ? ["metadata->>vehicle_subtype", "metadata->>make", "metadata->>model", "metadata->marketplace->>brand", "metadata->marketplace->>model"] : area === "animals" ? ["metadata->>special_skills"] : [])]);
+    const columns = ["title", "description", "category", ...(area === "marketplace"
+      ? ["metadata->>vehicle_subtype", "metadata->>make", "metadata->>model", "metadata->marketplace->>manufacturer", "metadata->marketplace->>brand", "metadata->marketplace->>model", "metadata->marketplace->>included", "metadata->marketplace->specs->>era", "metadata->marketplace->specs->>power"] : area === "animals" ? ["metadata->>special_skills"] : [])];
+    const filters = patterns(columns);
+    const model = area === "marketplace" ? namedModelToken(wish.query) : null;
+    if (model) filters.push(...columns.map(column => `${column}.ilike.${containsLiteral(model)}`));
     if (area === "marketplace" && categories.length) filters.push(`category.in.(${categories.map(filterLiteral).join(",")})`);
-    return filtered(db.from("privacy_visible_listings").select(`${PLACE_COLUMNS},id,user_id,title,city,type,category,price,image_url,price_negotiable:metadata->price_negotiable,price_on_request:metadata->price_on_request,rental_type:metadata->>rental_type,marketplace:metadata->marketplace${evidence ? `,description${facts}` : ""}${map && area === "locations" ? ",location_area:metadata->location_area" : ""}`)
+    return filtered(db.from("privacy_visible_listings").select(`${PLACE_COLUMNS},id,user_id,title,city,type,category,price,image_url,price_negotiable:metadata->price_negotiable,price_on_request:metadata->price_on_request,rental_type:metadata->>rental_type,marketplace:metadata->marketplace${evidence ? `,description${facts}${area === "locations" ? ",amenities:metadata->amenities" : ""}` : ""}${map && area === "locations" ? ",location_area:metadata->location_area" : ""}`)
       .eq("published", true).in("type", kinds), filters).order("id");
   }
   if (area === "crew") {
@@ -114,14 +118,15 @@ async function readGroup(plan: SearchPlan, wishIndex: number, area: SearchArea, 
   const limit = view !== "list" ? PAGE * 3 : VISIBLE;
   const origins = nearbyOrigins(wish);
   const ranked = plan.version === 2;
-  const allowNearby = origins.length > 0 && !wish.places.some(place => place.radiusKm > 0) && (offset === 0 || !!nearbyAfter || ranked);
+  const allowNearby = wish.allowNearby === true && origins.length > 0 && !wish.places.some(place => place.radiusKm > 0) && (offset === 0 || !!nearbyAfter || ranked);
   const requestedOffset = offset;
   if (nearbyAfter || ranked) offset = 0;
   type Candidate = NearbyCursor & { row: Row; origin: string };
   const nearest: Candidate[] = [];
   const local: (Candidate & SearchRankCursor)[] = [];
   let localExists = false;
-  const compareRank = (a: SearchRankCursor, b: SearchRankCursor) => b.score - a.score || compareNearby(a, b);
+  let total = 0;
+  const compareRank = (a: SearchRankCursor, b: SearchRankCursor) => Number(!!a.uncertain) - Number(!!b.uncertain) || b.score - a.score || compareNearby(a, b);
   const toResult = (input: Row): SearchResult => {
     let row = input;
     if (area === "projects") row = publicProjectMedia(row);
@@ -137,6 +142,9 @@ async function readGroup(plan: SearchPlan, wishIndex: number, area: SearchArea, 
       image: String(row.avatar_url ?? row.logo_url ?? row.poster_url ?? row.image_url ?? "") || null,
       available: typeof row.available === "boolean" ? row.available : null,
     };
+    const unconfirmed = unconfirmedSearchFacts(row, wish);
+    if (unconfirmed.length) result.unconfirmed = unconfirmed;
+    if (wish.period) result.available = null;
     // Only public, canonical search facts leave the permission-projected row.
     if (area === "crew") {
       const profile = row as OccupationProfile;
@@ -148,7 +156,9 @@ async function readGroup(plan: SearchPlan, wishIndex: number, area: SearchArea, 
       if (category) result.facets = { marketplace: category.department };
     }
     if (!result.evidence && terms.some(term => [row.title, row.name].some(title => typeof title === "string" && searchKey(title).includes(searchKey(term))))) result.evidence = "title";
+    if (!result.evidence && area === 'marketplace' && categories.includes(String(row.category))) result.evidence = 'category';
     if (wish.requirements?.length || catering) result.evidence = "requirements";
+    if (area === 'marketplace' && namedModelToken(wish.query)) result.evidence = 'requirements';
     if (["prop", "vehicle", "location"].includes(result.type)) result.priceLabel = listingPriceLabel(result.price, row, "/Tag", locale, market);
     if (view !== "list") {
       // Never geocode private fields or use an offer's exact coordinates. Crew
@@ -191,14 +201,17 @@ async function readGroup(plan: SearchPlan, wishIndex: number, area: SearchArea, 
       if (productionCrew && !matchingProductionRole(row, segment)) continue;
       if (catering && !matchesCateringSearch(row, catering)) continue;
       if (!matchesSearchRequirements(row, wish)) continue;
+      if (area === "marketplace" && !matchesNamedModel(row, wish.query)) continue;
+      if (searchBudgetState(row, wish) === "outside") continue;
       row = geographyRow(row, area);
       if (matchesWishPlaces(row, wish)) {
+        total++;
         localExists = true;
         // Local matches always win, even if records changed between nearby pages.
         nearest.length = 0;
         if (ranked) {
           const distance = nearbyDistance(row, origins);
-          const candidate = { row, score: searchMatchScore(row, terms), distanceKm: distance?.distanceKm ?? 20050, origin: distance?.origin ?? "", id: String(area === "crew" ? row.user_id : row.id) };
+          const candidate = { row, score: searchMatchScore(row, terms), uncertain: unconfirmedSearchFacts(row, wish).length > 0, distanceKm: distance?.distanceKm ?? 20050, origin: distance?.origin ?? "", id: String(area === "crew" ? row.user_id : row.id) };
           if (!rankAfter || compareRank(candidate, rankAfter) > 0) {
             local.push(candidate); local.sort(compareRank);
             if (local.length > limit + 1) local.pop();
@@ -223,16 +236,17 @@ async function readGroup(plan: SearchPlan, wishIndex: number, area: SearchArea, 
     if (!ranked && !wish.places.length && pass >= 2) { group.nextOffset = offset; return group; }
   }
   if (ranked && localExists) {
+    group.total = total;
     group.results = local.slice(0, limit).map(candidate => toResult(candidate.row));
     if (local.length > limit) {
-      const { score, distanceKm, id } = local[limit - 1];
-      group.rankCursor = { score, distanceKm, id };
+      const { score, distanceKm, id, uncertain } = local[limit - 1];
+      group.rankCursor = { score, distanceKm, id, uncertain };
       group.nextOffset = requestedOffset + limit;
     }
     if (view === "combined") {
       const more = local.length > VISIBLE, last = local[VISIBLE - 1];
       group.listPage = { ...group, results: group.results.slice(0, VISIBLE), nextOffset: more ? VISIBLE : null,
-        rankCursor: more ? { score: last.score, distanceKm: last.distanceKm, id: last.id } : undefined };
+        rankCursor: more ? { score: last.score, distanceKm: last.distanceKm, id: last.id, uncertain: last.uncertain } : undefined };
     }
     return group;
   }
@@ -258,12 +272,14 @@ async function readGroup(plan: SearchPlan, wishIndex: number, area: SearchArea, 
 export type SearchCursor = { wishIndex: number; area: SearchArea; offset: number; segment?: string; rank?: SearchRankCursor; nearby?: NearbyCursor };
 export function validSearchCursor(plan: SearchPlan, cursor: SearchCursor) {
   const wish = plan.searches[cursor.wishIndex];
+  if (cursor.nearby && wish.allowNearby !== true) return false;
   const segments = crewSearchSegments(wish);
   if (cursor.segment !== undefined && (plan.version !== 2 || cursor.area !== "crew" || !segments.includes(cursor.segment))) return false;
   if (plan.version === 2 && cursor.area === "crew" && segments.length && !cursor.segment) return false;
   if (cursor.rank !== undefined) {
     const rank = cursor.rank;
-    if (plan.version !== 2 || cursor.nearby || !rank || typeof rank !== "object" || Array.isArray(rank) || Object.keys(rank).some(key => !["score", "distanceKm", "id"].includes(key))
+    if (plan.version !== 2 || cursor.nearby || !rank || typeof rank !== "object" || Array.isArray(rank) || Object.keys(rank).some(key => !["score", "distanceKm", "id", "uncertain"].includes(key))
+      || (rank.uncertain !== undefined && typeof rank.uncertain !== "boolean")
       || !Number.isInteger(rank.score) || rank.score < 0 || rank.score > 3 || !Number.isFinite(rank.distanceKm) || rank.distanceKm < 0 || rank.distanceKm > 20050 || typeof rank.id !== "string" || !rank.id || rank.id.length > 200) return false;
   }
   return plan.version !== 2 || cursor.offset === 0 || !!cursor.nearby || !!cursor.rank;

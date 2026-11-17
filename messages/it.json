@@ -13265,9 +13265,36 @@
       "evidence": {
         "role": "Professione indicata nel profilo",
         "title": "Termine cercato nel titolo",
-        "requirements": "Requisiti dichiarati dal fornitore"
+        "requirements": "Requisiti dichiarati dal fornitore",
+        "category": "Categoria corrispondente"
       },
       "applyMapArea": "Limita a questa zona della mappa"
+    },
+    "conditions": {
+      "budgetLimit": "Importo massimo",
+      "currency": "Valuta",
+      "priceUnit": "Unità di prezzo",
+      "unspecified": "Non specificato",
+      "priceScope": "Il budget si applica a",
+      "each": "Ogni articolo",
+      "total": "Tutti gli articoli richiesti",
+      "scopeUnknown": "Da specificare",
+      "period": "Periodo",
+      "periodNote": "La disponibilità per queste date deve essere confermata.",
+      "unsupported": "Non verificabile: {values}",
+      "unconfirmed": "Da confermare",
+      "exact": "Dati corrispondenti",
+      "nearby": "Alternative fuori dal luogo richiesto",
+      "priceUnknown": "Prezzo o unità di prezzo non confermati",
+      "periodUnknown": "Date non confermate",
+      "quantityUnknown": "Quantità richiesta non confermata",
+      "unsupportedUnknown": "Un’altra condizione non è verificabile",
+      "nearbyAction": "Cerca alternative in altri luoghi",
+      "noResults": "Nessun risultato corrispondente. Modifica le singole condizioni o cerca espressamente in altri luoghi.",
+      "radius": "Raggio in km",
+      "requirements": "Caratteristiche richieste (una per riga)",
+      "exclusions": "Caratteristiche escluse (una per riga)",
+      "removeCondition": "Rimuovi condizione"
     }
   },
   "PublicReport": {

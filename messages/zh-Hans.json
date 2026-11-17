@@ -13265,9 +13265,36 @@
       "evidence": {
         "role": "资料中注明了该工种",
         "title": "标题包含搜索词",
-        "requirements": "服务方声明符合要求"
+        "requirements": "服务方声明符合要求",
+        "category": "符合的类别"
       },
       "applyMapArea": "仅显示此地图区域内的结果"
+    },
+    "conditions": {
+      "budgetLimit": "最高金额",
+      "currency": "货币",
+      "priceUnit": "计价单位",
+      "unspecified": "未指定",
+      "priceScope": "预算适用于",
+      "each": "每件",
+      "total": "全部所需物品",
+      "scopeUnknown": "尚未确定",
+      "period": "日期范围",
+      "periodNote": "这些日期的可用情况需要确认。",
+      "unsupported": "无法核实：{values}",
+      "unconfirmed": "待确认",
+      "exact": "符合条件的信息",
+      "nearby": "所选地点以外的备选结果",
+      "priceUnknown": "价格或计价单位未确认",
+      "periodUnknown": "日期未确认",
+      "quantityUnknown": "所需数量未确认",
+      "unsupportedUnknown": "另一项条件无法核实",
+      "nearbyAction": "搜索其他地点的备选结果",
+      "noResults": "没有符合条件的结果。请修改个别条件，或明确选择搜索其他地点。",
+      "radius": "半径（公里）",
+      "requirements": "必需属性（每行一项）",
+      "exclusions": "排除属性（每行一项）",
+      "removeCondition": "移除条件"
     }
   },
   "PublicReport": {

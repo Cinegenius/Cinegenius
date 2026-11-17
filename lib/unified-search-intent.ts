@@ -1,6 +1,8 @@
 import { departments, getDepartmentRoleLabel, getDeptLabel } from "./departments";
 import { occupationCatalogue } from "./primary-occupation";
-import { occupationKey, searchDepartment, searchCityCandidates } from "./unified-search-matching";
+import { occupationKey, searchDepartment, searchCityCandidates, namedModelToken } from "./unified-search-matching";
+import { SEARCH_CONCEPTS } from "./marketplaceCategories";
+import { SUPPORTED_LOCALES } from "./i18n/locales";
 import { countryCode } from "./places/core";
 import { MAX_SEARCHES, readSearchPlan, type SearchPlan, type SearchWish } from "./unified-search";
 import { SEARCH_AREA_WORDS } from "./unified-search-areas";
@@ -8,8 +10,17 @@ import { cateringSearch } from "./unified-search-catering";
 import { DEPARTMENT_HEADS_QUERY, isDepartmentHeadsQuery, PRODUCTION_CREW_QUERY, isProductionCrewQuery } from "./unified-search-production";
 
 type Keyword = Omit<SearchWish, "places">;
+// Public catalogue indexes only; never cache requests, records or permissions.
+// Translator instances can be collected after the request. The plain index has
+// at most one entry per supported locale.
+const plainIndexes = new Map<string, Map<string, Keyword>>();
+const translatedIndexes = new WeakMap<(key: string) => string, Map<string, Map<string, Keyword>>>();
 
 function keywordIndex(locale: string, taxonomy?: (key: string) => string) {
+  const cache = taxonomy ? translatedIndexes.get(taxonomy) ?? new Map<string, Map<string, Keyword>>() : plainIndexes;
+  if (taxonomy && !translatedIndexes.has(taxonomy)) translatedIndexes.set(taxonomy, cache);
+  const existing = cache.get(locale);
+  if (existing) return existing;
   const index = new Map<string, Keyword>();
   const add = (label: string, wish: Keyword) => {
     const key = occupationKey(label);
@@ -25,9 +36,15 @@ function keywordIndex(locale: string, taxonomy?: (key: string) => string) {
       add(label, { area: "crew", query: role.label, department: "" });
     }
   }
-  for (const query of ["OB", "Fahrer", "Driver", "Beleuchter", "Kameramann", "Kamerafrau", "Kameramänner"]) {
+  for (const query of ["OB", "Fahrer", "Driver", "Beleuchter", "Kameramann", "Kamerafrau", "Kameramänner", "Kammeramann", "Kameraman"]) {
     index.set(occupationKey(query), { area: "crew", query, department: "" });
   }
+  for (const concept of SEARCH_CONCEPTS) for (const query of concept.aliases) {
+    const wish: Keyword = { area: "marketplace", query, department: "" };
+    if ((concept.groups as readonly string[]).includes('licht-quellen')) index.set(occupationKey(query), wish);
+    else add(query, wish);
+  }
+  for (const [query, canonical] of [["Hut", "Hut"], ["Hüte", "Hut"], ["hat", "Hut"], ["hats", "Hut"], ["Altbauwohnung", "Altbauwohnung"]]) add(query, { area: query === "Altbauwohnung" ? "locations" : "marketplace", query: canonical, department: "" });
   for (const query of ["Boot", "Boat", "Auto", "Car", "Motorrad", "Fahrrad", "Yacht"]) {
     add(query, { area: "marketplace", query, department: "" });
   }
@@ -39,6 +56,7 @@ function keywordIndex(locale: string, taxonomy?: (key: string) => string) {
     add(query, { area: "all", query: "Polizei", department: "" });
   }
   index.set("catering", { area: "companies", query: "Catering", department: "" });
+  if ((SUPPORTED_LOCALES as readonly string[]).includes(locale)) cache.set(locale, index);
   return index;
 }
 
@@ -46,6 +64,10 @@ function keywordIndex(locale: string, taxonomy?: (key: string) => string) {
  * Longest catalogue phrases win, so "Assistant Costume Designer" stays one job.
  * Conjunctions and commas are optional; nothing is silently discarded. */
 function keywords(text: string, locale: string, taxonomy?: (key: string) => string, index = keywordIndex(locale, taxonomy)): Keyword[] | null {
+  // Brand + exact model code, with no unconsumed place/modifier after the code.
+  const model = namedModelToken(text);
+  if (model && text.trim().endsWith(model) && /^[\p{L}\p{N}\s-]{1,100}$/u.test(text) && text.trim().split(/\s+/).length <= 5
+    && !/\b(?:in|and|und|with|mit|ohne|without)\b/i.test(text)) return [{ area: 'marketplace', query: text.trim(), department: '' }];
   const person = /^(?:jemand(?:en)?|eine?|einen)\s+(?:vom|aus\s+dem|aus\s+der)\s+(.+)$/i.exec(text.trim());
   if (person) {
     const dept = searchDepartment(person[1], locale, taxonomy);
@@ -94,7 +116,7 @@ export function normalizeKeywordPlan(plan: SearchPlan, locale = "de", taxonomy?:
     if (!["crew", "all"].includes(wish.area) || wish.department) return [wish];
     const parts = keywords(wish.query, locale, taxonomy);
     if (!parts || parts.length < 2) return [wish];
-    if (wish.quantity || wish.requirements?.length || wish.exclude?.length) return [wish];
+    if (wish.quantity || wish.requirements?.length || wish.exclude?.length || wish.budget || wish.period || wish.unsupported?.length) return [wish];
     return parts.map(part => ({ ...wish, ...part, places: wish.places }));
   });
   return readSearchPlan({ version: plan.version, searches });
@@ -150,13 +172,18 @@ function simpleSearchPlan(text: string, locale = "de", taxonomy?: (key: string) 
   let parts = keywords(request, locale, taxonomy, index);
   let places: SearchWish["places"] = [];
   if (!parts) {
-    const match = /^(.*?)\s+(?:in|en|v|ve|i)\s+(?:(?:der|den|the|la|les)\s+)?(.+)$/i.exec(request);
+    const asian = /^(.+?)(?:的|の|의)\s*(.+)$/u.exec(request);
+    if (asian && searchCityCandidates(asian[1]).length === 1) {
+      parts = keywords(asian[2], locale, taxonomy, index);
+      if (parts) return readSearchPlan({ version: 2, searches: parts.map(part => ({ ...part, places: [{ city: asian[1], country: '', continent: '', radiusKm: 0 }] })) });
+    }
+    const match = /^(.*?)\s+(?:in|en|v|ve|i|a|à|w|em|в|у)\s+(?:(?:der|den|the|la|les)\s+)?(.+)$/i.exec(request);
     if (match) {
       parts = keywords(match[1], locale, taxonomy, index);
       if (!parts) return null;
       const country = countryCode(match[2]);
       const cities = country ? [] : searchCityCandidates(match[2]);
-      if (!country && !cities.length) return null;
+      if (!country && cities.length !== 1) return null;
       places = [{ city: country ? "" : match[2], country, continent: "", radiusKm: 0 }];
     } else {
       // Bare city-first/city-last requests are common on phones. Accept only a

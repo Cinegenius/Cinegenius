@@ -147,7 +147,7 @@ async function safeAdvice(value: unknown, input: GenieRequest, canSearch: boolea
   }
   const t = await getTranslations({ locale: language, namespace: "Genie.destinations" });
   const searches = !canSearch ? [] : advice.searches !== undefined
-    ? await unifiedSearchLinks(advice.searches, language, input.messages.length === 1 && !input.searchContext ? input.messages[0].content : "", input.searchContext)
+    ? await unifiedSearchLinks(advice.searches, language, input.searchContext ? input.messages.filter(message => message.role === "user").at(-1)?.content ?? "" : input.messages.length === 1 ? input.messages[0].content : "", input.searchContext)
     : [...await crewSearchLinks(advice.crewSearches ?? [], language), ...await directorySearchLinks(advice.directorySearches ?? [], language)];
   if (searches.length > 3) throw new GenieError("failed", 502);
   const ids = [...new Set(advice.linkIds as string[])].slice(0, 4);
@@ -170,11 +170,11 @@ export async function generateGenieAdvice(request: Request, input: GenieRequest,
   const signal = AbortSignal.any([request.signal, timeout]);
   try {
     signal.throwIfAborted();
-    if (!input.writing && !input.searchContext && input.messages.length === 1) {
+    if (!input.writing && (input.messages.length === 1 || input.searchContext)) {
       const lastRequest = input.messages.filter(message => message.role === "user").at(-1)?.content ?? "";
       // Complete catalogue keyword requests need no paid interpretation. Auth,
       // membership and quota checks still happen at the normal route boundary.
-      const links = await unifiedSearchLinks([], input.locale, lastRequest);
+      const links = await unifiedSearchLinks([], input.locale, lastRequest, input.searchContext);
       if (links.length) {
         if (!config.smartSearch) return developmentNotice(input.locale);
         const t = await getTranslations({ locale: input.locale, namespace: "UnifiedSearch" });

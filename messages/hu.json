@@ -13265,9 +13265,36 @@
       "evidence": {
         "role": "A profilban megadott foglalkozás",
         "title": "Keresőkifejezés a címben",
-        "requirements": "A szolgáltató által megadott követelmények"
+        "requirements": "A szolgáltató által megadott követelmények",
+        "category": "Megfelelő kategória"
       },
       "applyMapArea": "Szűkítés erre a térképterületre"
+    },
+    "conditions": {
+      "budgetLimit": "Legnagyobb összeg",
+      "currency": "Pénznem",
+      "priceUnit": "Áregység",
+      "unspecified": "Nincs megadva",
+      "priceScope": "A keret erre vonatkozik",
+      "each": "Darabonként",
+      "total": "Az összes kért darabra",
+      "scopeUnknown": "Még nincs megadva",
+      "period": "Időszak",
+      "periodNote": "Az időszakra vonatkozó elérhetőséget meg kell erősíteni.",
+      "unsupported": "Nem ellenőrizhető: {values}",
+      "unconfirmed": "Megerősítendő",
+      "exact": "Egyező adatok",
+      "nearby": "Alternatívák a kért helyen kívül",
+      "priceUnknown": "Az ár vagy az áregység nincs megerősítve",
+      "periodUnknown": "Az időpont nincs megerősítve",
+      "quantityUnknown": "A kért mennyiség nincs megerősítve",
+      "unsupportedUnknown": "Egy további feltétel nem ellenőrizhető",
+      "nearbyAction": "Alternatívák keresése más helyeken",
+      "noResults": "Nincs megfelelő találat. Módosíts egyes feltételeket, vagy kifejezetten keress más helyeken.",
+      "radius": "Sugár km-ben",
+      "requirements": "Szükséges tulajdonságok (soronként egy)",
+      "exclusions": "Kizárt tulajdonságok (soronként egy)",
+      "removeCondition": "Feltétel eltávolítása"
     }
   },
   "PublicReport": {
