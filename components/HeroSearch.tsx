@@ -113,7 +113,7 @@ export default function HeroSearch() {
         onSubmit={handleSearch}
         action={tab.href}
         method="get"
-        className="flex min-h-[52px] items-center overflow-hidden rounded-xl border border-border bg-bg-secondary shadow-sm transition-colors focus-within:border-gold"
+        className={`flex min-h-[52px] items-center overflow-hidden rounded-xl border border-border bg-bg-secondary shadow-sm transition-colors focus-within:border-gold ${activeTab === "all" && canUseSmart ? "smart-search-input" : ""}`}
       >
         {activeTab === "all" && <input type="hidden" name="smart" value="1" />}
         {/* Query */}

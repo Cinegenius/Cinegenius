@@ -1,5 +1,5 @@
 import { inMapBounds, type MapBounds } from "./location-map";
-import { SEARCH_AREAS, searchGroupKey, type SearchArea, type SearchGroup, type SearchPlan } from "./unified-search";
+import { SEARCH_AREAS, searchGroupKey, type SearchArea, type SearchGroup, type SearchPlan, type SearchResult } from "./unified-search";
 
 export type DiscoveryFilters = {
   hiddenAreas: SearchArea[];
@@ -56,4 +56,20 @@ export function discoveryFacets(groups: SearchGroup[]) {
     if (group.area === "marketplace" && result.facets?.marketplace) marketplace.add(result.facets.marketplace);
   }
   return { departments: [...departments], marketplace: [...marketplace] };
+}
+
+/** Display only areas backed by currently visible rows, never by the plan alone. */
+export function discoveryAreas(groups: SearchGroup[]) {
+  const primary: SearchArea[] = ["crew", "locations", "marketplace", "companies"];
+  return [...primary, ...SEARCH_AREAS.filter(area => !primary.includes(area))].filter(area => groups.some(group => group.area === area && group.results.length > 0));
+}
+
+/** One compact row per actual identity; the map uses the same first-match order. */
+export function discoveryResults(groups: SearchGroup[]): SearchResult[] {
+  const results = new Map<string, SearchResult>();
+  for (const group of groups) for (const result of group.results) {
+    const key = `${result.type}:${result.id}`;
+    if (!results.has(key)) results.set(key, result);
+  }
+  return [...results.values()];
 }
