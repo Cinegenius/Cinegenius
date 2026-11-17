@@ -34,13 +34,13 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 
 ## Mandatory localization for all changes
 
-- Use the existing next-intl catalogs in `messages/{de,en,es,it,cs,hu,nl,nl-BE,sv}.json` for all new or changed interface and system copy: pages, buttons, usage guidance, accessible labels, validation, errors, safety/moderation prompts, statuses, categories, notifications, and application-generated email. Update every supported language in the same change. Markus explicitly reaffirmed on 14 November 2026 that this applies from the start to both the website and native app/Xcode work; do not defer translations to a later phase. Never add a parallel translation system or hard-coded German UI copy.
+- Use the existing next-intl catalogs in `messages/{de,en,es,it,cs,hu,nl,nl-BE,sv,fr,pl,pt-PT,zh-Hans,ja,ko,ru,uk}.json` for all new or changed interface and system copy: pages, buttons, usage guidance, accessible labels, validation, errors, safety/moderation prompts, statuses, categories, notifications, and application-generated email. Update every supported language in the same change. Markus explicitly reaffirmed on 14 November 2026 that this applies from the start to both the website and native app/Xcode work; do not defer translations to a later phase. Never add a parallel translation system or hard-coded German UI copy.
 - A feature is not complete until its strings, interpolation placeholders, and layout have been checked in all supported locales. Run `npm run check:i18n` before release; it also runs during production builds and deployment. Do not expand `scripts/i18n-legacy-texts.json` to admit new hard-coded text. That file is a frozen inventory of existing localization debt; remove entries as those surfaces are translated.
 - Preserve stable department, occupation, category, and offer IDs. Translate display labels only and reuse the same taxonomy in setup, editing, filters, and public views. Never translate or overwrite personal messages, member-written descriptions, names, or company names automatically.
 - Legal documents need reviewed language versions. Until available, explicitly show that the original German legal text is authoritative; do not publish machine translations as approved legal documents.
 - The manual locale cookie takes priority over browser preferences, persists across authentication, and must not be removed on logout. Use the shared locale resolver for both next-intl and Clerk. Switch with a server-component refresh, never a hard page reload or a locale-keyed form remount. Preserve unsaved fields and ongoing uploads.
 - Load only the requested language bundle, merged with the defined default fallback, on the server. Do not fetch all language catalogs on navigation or add external translation requests per page. Format dates and numbers with the active locale without currency conversion.
-- All nine supported locales have complete catalogs and verified critical language flows. Maintain that coverage across public/browse pages, authentication entry forms, profile editing, canonical place filters, taxonomies and generated system copy. If later work introduces partial coverage, disclose it until its legacy UI, system copy, taxonomies and critical flows are verified. Never claim full coverage from catalog key parity alone.
+- Maintain complete catalogs and verified critical language flows for all seventeen supported locales across public/browse pages, authentication entry forms, profile editing, canonical place filters, taxonomies and generated system copy. If later work introduces partial coverage, disclose it until its legacy UI, system copy, taxonomies and critical flows are verified. Never claim full coverage from catalog key parity alone; distinguish native-only bundles and third-party-owned templates from the website catalogs.
 
 ## Preventative security checks
 
@@ -132,9 +132,98 @@ Markus hat in der laufenden Mac-/Xcode-Aufgabe die Pflicht, vor jedem Grundriss 
 - Apply and verify `20261114180242_profile_privacy_controls.sql` before dependent Web/native releases. Settings are own-account only through `/api/user-settings`; errors or missing capability fields must not look like saved privacy choices. Native settings use the same contract in `docs/profile-privacy.md`.
 - Ghost is visibility control, not deletion or a promise to recall previously public Storage URLs/copies. Keep this limit explicit; retiring legacy originals requires the existing reviewed, journaled media cutover and cache retirement. Existing shared messages and participant transaction records remain accessible under their existing rules.
 
-## Smart-Suche nur für Mitglieder – 14. November 2026
+## Frühere Smart-Mitgliedsregel – durch die Admin-Regel vom 16. November ersetzt
 
 - Die gemeinsame Suche heißt **Smart**. Ihre Interpretation und Ergebnisse setzen eine gültige Mitgliedersitzung voraus, einschließlich geteilter `/search?plan=…`-Links. Gewöhnliche öffentliche Suche und Verzeichnisse bleiben separat erreichbar; keine Bezahlschranke aus dieser Regel ableiten.
 - Native und Web-Einstiege verwenden denselben Plan-v1-Vertrag und dieselbe serverseitige Sitzungsprüfung. Gäste erhalten bei `POST /api/search/unified` JSON 401 mit privaten No-store-Headern vor Kontingent, Body und Datenzugriff. Der Client ruft vor geklärter Anmeldung weder Interpretation noch Ergebnisse ab. Sitzungsende und Kontowechsel entfernen vorherige Ergebnisse und verwerfen späte Antworten.
 - Die Anmeldung erhält den vollständigen validierten Suchplan oder den ursprünglichen Suchtext als gleichursprüngliches Rückkehrziel. Keine Umwandlung eines fertigen Plans in eine erneut zu interpretierende Kurzbeschreibung; keine native Kopie von Sitzungstokens, Suchparsern oder Berechtigungen. Neue Abläufe in allen neun Sprachen prüfen und bestehende App-Entwürfe erhalten.
 - Die Startseite beginnt mit **Locations**. Smart bleibt äußerlich ein gewöhnlicher Reiter ohne vorzeitigen Mitgliederhinweis, Schloss oder Hover-/Fokushinweis. Erst Gast-Klick oder Tastaturaktivierung zeigt die kleine lokalisierte Sprechblase „Nur für Mitglieder“, bei noch ungeklärter Sitzung den vorhandenen Ladehinweis. Keine Navigation oder Layoutverschiebung; öffentliche Auswahl und Eingaben erhalten. Erneuter Klick, Klick außerhalb, Fokuswechsel und Escape schließen die Blase. Mitglieder wechseln normal zu Smart; der neutrale Platzhalter lautet lokalisiert „Was suchst du?“. Sitzungsablauf auch beim Absenden abfangen.
+
+## Smart development preview (operator decision, 16 November 2026)
+
+- Smart is temporarily admin-only, including Genie search planning, direct links,
+  results, maps and pagination. Enforce the existing server admin allowlist;
+  ordinary membership, personal AI quota and client claims grant no access.
+- Other members see only a clearly labeled static example: a small schematic
+  map and a graphic explanation underneath. Guests see the development notice.
+  Reuse existing Smart area colors; load no real results or map services for the
+  preview. Keep ordinary search and Genie's general help/writing available.
+- Preserve Locations as the homepage default and the existing shared design.
+  See `docs/smart-development-preview.md` for the API/native contract and limits.
+
+## Occupation focus and email presentation (operator decisions, 16 November 2026)
+
+- A personal profile selects one main occupation, up to two secondary occupations
+  and at most one additional occupation. Only the first three belong on cards;
+  the additional occupation remains in profile details and search. Reuse
+  `lib/crew-occupations.ts`; never truncate persisted positions or silently reduce
+  older selections during unrelated edits. See `docs/profile-occupation-focus.md`.
+- Directory sort menus and homepage news country/topic selectors use
+  `components/BrowseSelect.tsx`, with the shared subtle translucent lime popup,
+  keyboard support and 44px options. Keep existing page layouts and filter choices.
+  Header search, directory filter dialogs and their category/place/detail choices
+  use the same `browse-popup-surface` treatment. Nested selection popups must stay
+  in the modal's top layer, with Escape closing the selection before the filter
+  dialog. See `docs/browse-selection-menus.md`.
+- New application emails use `lib/email-layout.ts` and the existing localized
+  content. Preserve token links, unsubscribe choices, recipient language and
+  delivery/idempotency checks. Provider-managed authentication/billing templates
+  require their separate reviewed configuration; a website deployment alone does
+  not update them. See `docs/email-branding.md` for the audit and limits.
+
+## Zentrale News-Redaktion (Betreiberauftrag, 16. November 2026)
+
+- Alle redaktionellen News-Aufträge einschließlich früherer „Erstelle News“-Aufträge
+  gehören zu Agent AG DOK. Der Technik-News-Agent betreut Hersteller, Geräte und
+  Firmware; bestehende Rechercheaufträge und Einreichungen übernehmen, nicht
+  duplizieren. Siehe `docs/agents/technology-news.md`.
+- WEB CODEX verantwortet Website-Programmierung und Datenanbindung, APP/APP
+  Entwicklung die native Umsetzung. Laufende App-Arbeit erhalten und Schnittstellen
+  abstimmen. Redaktionelle Quellen und Prüfergebnisse zentral weitergeben.
+- Die Startseiten-Themenwahl verwendet den vorhandenen News-Katalog, tatsächliche
+  freigegebene aktuelle Inhalte und kontogebundene Einstellungen. Keine Beispiel-
+  artikel als echte News, keine Herkunft eines Herstellers als erfundene Zielregion.
+  Siehe `docs/home-news-topics.md`.
+- Lernen bedeutet ein privates, belegbares Korrekturprotokoll. Es erlaubt weder
+  automatische Rechteausweitung noch Selbstfreigabe neuer Artikel. Agenten und
+  Zeitpläne nur nach bestätigter Einrichtung als aktiv melden; eine Anleitung oder
+  Übergabedatei allein aktiviert nichts. Der Website-Prüfagent bleibt deaktiviert.
+
+## Profile identity and expanded languages (operator decision, 16 November 2026)
+
+- User-approved target languages: existing de/en/es/it/cs/hu/nl/nl-BE/sv plus fr/pl/pt-PT/zh-Hans/ja/ko/ru/uk. All new and changed interface, validation, accessibility, system and generated email copy must cover every enabled language, with the same target for the native app. Do not declare a new locale complete or enable it with copied fallback text. Preserve locale choice, drafts, authentication and stable taxonomy IDs. Keep member-written content unchanged. Legal language versions require review; retain the clearly labeled authoritative German original until reviewed versions exist.
+- Occupation wording follows the latest 17 November preference decision below; the earlier blanket neutralization rule is superseded. Optional pronouns default to empty, have an explicit display choice, remain editable/removable and are never inferred or used for search/ranking.
+- Provide twelve optional profile avatars: four masculine, four feminine and four neutral. Every choice is available to every member; never derive gender or pronouns from a choice. Preserve existing photographs and protected-media permissions.
+- Markus confirms an existing OpenAI key and explicitly authorizes reusing it for the one-time catalog translations after being informed that API usage can incur additional costs. Prefer that existing credential for authorized API work; never expose it or treat its presence as unlimited spending authorization. Translation outputs are bundled locally; no per-page translation requests. Lack of a locally usable credential is not permission to expose production secrets or bypass access controls.
+
+## Profile identity and language expansion (operator update, 17 November 2026)
+
+- Occupation wording follows the latest 17 November preference decision below, preserving canonical role/department IDs and legacy search aliases. Optional self-described pronouns are private by default, displayed only after explicit consent and current profile visibility checks. Never infer gender/pronouns or use them for ranking, filtering or mandatory completion. Keep consent fresh outside shared profile caches.
+- Approved additional locales: fr, pl, pt-PT, zh-Hans, ja, ko, ru, uk. Update all supported catalogs, locale resolution, Clerk, Genie and generated mail together, with legal originals identified. Incomplete draft catalogs are not enabled in production. Check the full critical language flow, not only key parity.
+- Avatar and cover presets are deferred by Markus. Show twenty paired style previews for selection; do not publish any preset picker or replace existing user uploads. This supersedes earlier avatar/cover draft approvals. See docs/profile-identity-languages.md.
+
+## Profile art assortment (operator update, 17 November 2026)
+
+- Markus approved all twenty paired studies and delegated selection of twelve avatars (four masculine, four feminine, four neutral presentations) and twelve nature covers. This supersedes the earlier design deferral; production publication remains a separate release request.
+- Offer the shared selection during personal profile setup and later profile editing. Suggest one varied, account-stable avatar only for new profiles; preserve resumed choices, explicit removals, uploads and existing profiles. Every design is available to everyone and implies no gender, pronouns, permissions or verification.
+- Keep versioned public artwork URLs available permanently when changing the assortment. Retain all original studies in `design/profile-art/2026-11-17`; never rotate artwork on existing profiles. Art is repository-owned decoration, not a member-uploaded photograph for community discovery. Uploaded media keeps the private permission-checked workflow. See `docs/profile-art.md` for the native contract and test limits.
+
+
+## Simplified personal area (operator decision, 17 November 2026)
+
+- The portrait menu contains only Mein Bereich, Profil ansehen, Einstellungen and Abmelden. Keep server-confirmed administration/support access within Mein Bereich; preserve current-account support badges on the portrait. PersonalAreaHome is the management entry; do not restore a second personal navigation bar or duplicate editors in the dropdown.
+- Existing profile editing uses direct sections with Save changes; the sequential assistant remains for first creation only. Navigating sections is not a content edit. Preserve private recovery, explicit publication, optional media, current occupation/artwork rules and account isolation.
+- Settings group sign-in/account management, privacy, notification preferences, payments and verification. Use the existing identity provider for credentials and retain the separately available verification-document flow. Keep destructive actions collapsed and explicitly confirmed.
+- Messages has one mixed list for direct and group conversations, with recipient search and multi-person group creation in New message. Contacts and notices are utility destinations with a clear return to Messages; keep legacy links and real Back working. Platform notices use a separate header bell; chat and notice badges must remain independently account-scoped. This supersedes the earlier four inbox tabs and combined-badge/header-no-bell decisions.
+- Browse popups and selectors use neutral readable surfaces, retaining only restrained accent selection/focus. This supersedes the translucent lime surface decision. News country/type selectors have stable dimensions across selection changes; countryless news is labeled Neutral in every supported locale.
+- Homepage news advances horizontally through pages of three actual eligible stories with visible position dots. Keep ordinary vertical page scrolling; never create a nested vertical news scroll area. Preserve country/topic/approval filtering and the bounded query.
+
+
+## Compact occupation labels and optional wording (latest operator correction, 17 November 2026)
+
+- This decision supersedes both the earlier blanket occupation-neutralization rule and the intervening full masculine/feminine pair requirement. Restore the previous compact shared standard, including established asterisks/slashes (for example Oberbeleuchter*in). Existing profiles and older drafts without an explicit choice use that standard; never bulk-rewrite their saved occupations or artwork.
+- An owner may optionally choose standard, masculine, feminine or neutral professional wording while creating or editing their own occupations. Use the shared `components/OccupationFormSelect.tsx`, neutral readable surfaces and at least 44px controls. The optional choice is `crew.occupationForm`; use `lib/occupation-form.ts` for validation, defaulting and preservation. Explicit standard resets the override; omitted keys and older clients preserve a saved override.
+- Render a person's occupations using that person's explicit preference, never the viewer's preference or inferred sex. Names, portraits, artwork, pronouns and casting attributes must not select it. Pronoun consent and visibility remain independent. Unknown member-written titles remain untouched.
+- Keep one canonical choice and stable occupation/department IDs for all forms. Best Boy / Best Girl, including Electric, Grip and Rigging, remain aliases of the same existing role. Search all localized forms and legacy exact aliases regardless of the selected presentation; do not create duplicate role choices or guess ambiguous departments.
+- Keep precise professional meaning and qualifications. Use curated explicit catalog forms, including irregular forms; do not derive grammar at runtime, invent female suffixes, replace occupations with unrelated activities or imply new leadership/medical qualifications. A neutral option may use an accurate established epicene/international title or locale-appropriate compact inclusive spelling.
+- Preserve all seventeen locales, both animal-role namespaces, account-scoped private recovery, existing images and provider-only flows. Load only the current language bundle and defined fallback, never all seventeen catalogs into an editor. See `docs/occupation-form-preference.md` for the shared Web/app contract and verification limits.

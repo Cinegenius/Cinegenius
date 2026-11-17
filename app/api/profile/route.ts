@@ -1,7 +1,9 @@
+import { hasInvalidOccupationForm, preserveOccupationForm } from "@/lib/occupation-form";
+import { validPronouns } from "@/lib/profile-identity";
 import { placeWriteFields } from "@/lib/places/catalog";
 import { PLACE_COLUMNS } from "@/lib/places/core";
 import { getTranslations } from "next-intl/server";
-import { crewOccupationsError } from "@/lib/crew-occupations";
+import { crewOccupationsError, profileOccupationFocusError, profileOccupationsUnchanged, type OccupationProfile } from "@/lib/crew-occupations";
 import { primaryOccupationError } from "@/lib/primary-occupation";
 import { db } from "@/lib/db";
 import { requireAuth } from "@/lib/auth";
@@ -35,9 +37,9 @@ const PROFILE_COLS = [
 // not-yet-applied database migration cannot disable the entire profile editor.
 const PROFILE_OPTIONAL_COLS = [
   "profile_types", "physical", "performance", "model_measurements", "casting",
-  "contact_email", "imdb_url",
+  "contact_email", "imdb_url", "pronouns", "show_pronouns",
 ] as const;
-const PROFILE_OPTIONAL_COLUMN_SET = new Set<string>(PROFILE_OPTIONAL_COLS);
+const PROFILE_OPTIONAL_COLUMN_SET = new Set<string>(PROFILE_OPTIONAL_COLS.filter(key => key !== "pronouns" && key !== "show_pronouns"));
 
 const PROFILE_TYPE_VALUES = new Set(Object.keys(PROFILE_TYPE_LABELS));
 function privateNoStoreJson(body: unknown, status = 200) {
@@ -71,11 +73,13 @@ function isValidProfileTypes(value: unknown): value is string[] {
   return Array.isArray(value) && value.every((entry) => typeof entry === "string" && PROFILE_TYPE_VALUES.has(entry));
 }
 
-export async function GET() {
+export async function GET(req: NextRequest) {
   const tResponse = await getResponseTranslations();
   const authResult = await requireAuth();
   if (authResult instanceof NextResponse) return authResult;
   const { userId } = authResult;
+  const expectedAccount = req?.headers.get("X-Profile-Account");
+  if (expectedAccount && expectedAccount !== userId) return privateNoStoreJson({ error: tResponse("System.requestFailed") }, 409);
 
   const { data: base, error: dbError } = await db
     .from("profiles")
@@ -125,16 +129,26 @@ export async function POST(req: NextRequest) {
   const authResult = await requireAuth();
   if (authResult instanceof NextResponse) return authResult;
   const { userId } = authResult;
+  const expectedAccount = req?.headers.get("X-Profile-Account");
+  if (expectedAccount && expectedAccount !== userId) return privateNoStoreJson({ error: tResponse("System.requestFailed") }, 409);
 
   const body = await req.json().catch(() => null);
   if (!body) return NextResponse.json({ error: tResponse('System.m_9c5ea1715bd5') }, { status: 400 });
   const {
-    display_name, bio, location, avatar_url, skills, memberships, portfolio_url, positions,
+    display_name, pronouns, show_pronouns, bio, location, avatar_url, skills, memberships, portfolio_url, positions,
     portfolio_images, profile_images, experience, profile_types, profile_type, slug, phone, contact_email,
     available, available_from, travel_ready, availability_config, languages, reel_url, imdb_url, crew,
     cover_image_url, instagram_url, tiktok_url, youtube_url, vimeo_url, linkedin_url, website_url,
     day_rate, filmography, video_links, focal_point, physical, performance, model_measurements, casting,
   } = body;
+
+  if ((pronouns !== undefined && !validPronouns(pronouns)) || (show_pronouns !== undefined && typeof show_pronouns !== "boolean")) {
+    return privateNoStoreJson({ error: tResponse("ProfileIdentity.invalidPronouns") }, 400);
+  }
+
+  if (hasInvalidOccupationForm(crew)) {
+    return privateNoStoreJson({ error: tResponse("System.requestFailed") }, 400);
+  }
 
   if (focal_point !== undefined && !validProfileFocalPoint(focal_point)) {
     return NextResponse.json({ error: tResponse('System.m_a9e61c5f5c7e') }, { status: 400 });
@@ -152,8 +166,15 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: tResponse('System.m_61d340f2b8c0') }, { status: 400 });
   }
   const normalizedProfileTypes = normalizeProfileTypes(profile_types ?? [], profile_type ?? null);
-  const primaryError = primaryOccupationError(crew, positions) ?? crewOccupationsError(crew, positions);
-  if (primaryError) fieldErrors.activity = primaryError;
+  const previous = await db.from("profiles").select("positions, crew, role").eq("user_id", userId).maybeSingle();
+  if (previous.error) return privateNoStoreJson({ error: tResponse("System.requestFailed") }, 503);
+  const activity = { positions, crew, role: previous.data?.role };
+  if (!profileOccupationsUnchanged(activity, previous.data)) {
+    const primaryError = primaryOccupationError(crew, positions) ?? crewOccupationsError(crew, positions);
+    if (primaryError) fieldErrors.activity = primaryError;
+  }
+  const focusError = profileOccupationFocusError(activity, previous.data);
+  if (focusError) fieldErrors.activity = tResponse(`occupation.${focusError}`);
   const hasPositions = Array.isArray(positions) && positions.some((position: unknown) => typeof position === "string" && position.trim());
   if (!hasPositions && normalizedProfileTypes.length === 0) fieldErrors.activity = "Bitte wähle mindestens eine Tätigkeit aus.";
   if (Object.keys(fieldErrors).length > 0) {
@@ -179,6 +200,8 @@ export async function POST(req: NextRequest) {
   const payload: Record<string, unknown> = {
     user_id: userId,
     display_name: display_name.trim(),
+    ...(pronouns !== undefined ? { pronouns: pronouns?.trim() || null } : {}),
+    ...(show_pronouns !== undefined ? { show_pronouns } : {}),
     bio: bio?.trim() ?? "",
     location: location?.trim() ?? "",
     ...place?.fields,
@@ -207,7 +230,7 @@ export async function POST(req: NextRequest) {
     performance: performance ?? null,
     model_measurements: model_measurements ?? null,
     casting: casting ?? null,
-    crew: crew ?? null,
+    crew: preserveOccupationForm(previous.data?.crew, crew ?? null),
     cover_image_url: cover_image_url ?? null,
     instagram_url: instagram_url ?? null,
     tiktok_url: tiktok_url ?? null,
@@ -269,7 +292,7 @@ export async function POST(req: NextRequest) {
 // All known profile columns — any unknown key from the client is silently dropped
 const ALLOWED_PATCH_KEYS = new Set([
   // SECURITY: "role", "verified", "account_type" excluded — set via admin routes only
-  "display_name", "display_name_alias", "slug", "phone", "contact_email", "location", "bio",
+  "display_name", "display_name_alias", "slug", "phone", "contact_email", "location", "bio", "pronouns", "show_pronouns",
   "available", "available_from", "travel_ready",
   "avatar_url", "cover_image_url", "portfolio_url", "website_url",
   "skills", "memberships", "positions", "languages", "portfolio_images", "profile_images", "experience",
@@ -288,6 +311,8 @@ export async function PATCH(req: NextRequest) {
     const authResult = await requireAuth();
     if (authResult instanceof NextResponse) return authResult;
     const { userId } = authResult;
+    const expectedAccount = req.headers.get("X-Profile-Account");
+    if (expectedAccount && expectedAccount !== userId) return privateNoStoreJson({ error: tResponse("System.requestFailed") }, 409);
 
     const body = await req.json().catch(() => null);
     if (!body) return NextResponse.json({ error: tResponse('System.m_9c5ea1715bd5') }, { status: 400 });
@@ -299,6 +324,13 @@ export async function PATCH(req: NextRequest) {
     if (Object.keys(safe).length === 0) {
       return NextResponse.json({ error: tResponse('System.m_f1389f5a0bd3') }, { status: 400 });
     }
+    if (("pronouns" in safe && !validPronouns(safe.pronouns)) || ("show_pronouns" in safe && typeof safe.show_pronouns !== "boolean")) {
+      return privateNoStoreJson({ error: tResponse("ProfileIdentity.invalidPronouns") }, 400);
+    }
+    if (hasInvalidOccupationForm(safe.crew)) {
+      return privateNoStoreJson({ error: tResponse("System.requestFailed") }, 400);
+    }
+    if (typeof safe.pronouns === "string") safe.pronouns = safe.pronouns.trim() || null;
     if ("focal_point" in safe && !validProfileFocalPoint(safe.focal_point)) {
       return NextResponse.json({ error: tResponse('System.m_a9e61c5f5c7e') }, { status: 400 });
     }
@@ -325,11 +357,16 @@ export async function PATCH(req: NextRequest) {
     if ("location" in safe && (typeof safe.location !== "string" || !String(place?.fields?.place_city_name ?? '').trim())) {
       fieldErrors.location = "Bitte gib deinen Standort ein.";
     }
-    if ("positions" in safe || "profile_types" in safe || "profile_type" in safe) {
+    let previousActivity: OccupationProfile | null = null;
+    if ("positions" in safe || "crew" in safe || "profile_types" in safe || "profile_type" in safe) {
       // PATCH leaves omitted fields unchanged. Validate the resulting activity
       // selection rather than treating those saved fields as empty.
-      const current = await db.from("profiles").select("positions, profile_type").eq("user_id", userId).maybeSingle();
+      const current = await db.from("profiles").select("positions, profile_type, crew, role").eq("user_id", userId).maybeSingle();
       if (current.error) return privateNoStoreJson({ error: tResponse("System.requestFailed"), code: current.error.code }, 500);
+      previousActivity = current.data;
+      // Omitted occupation fields survive older clients and partial crew edits.
+      if (safe.crew && typeof safe.crew === "object" && !Array.isArray(safe.crew)) safe.crew = { ...current.data?.crew, ...safe.crew };
+      if (Object.hasOwn(safe, "crew")) safe.crew = preserveOccupationForm(current.data?.crew, safe.crew);
       const optional = await selectOptionalProfileColumns<Record<string, unknown>>(
         ["profile_types"],
         async (projection) => {
@@ -346,8 +383,15 @@ export async function PATCH(req: NextRequest) {
       );
       if (!hasPositions && types.length === 0) fieldErrors.activity = "Bitte wähle mindestens eine Tätigkeit aus.";
     }
-    const primaryError = primaryOccupationError(safe.crew, safe.positions) ?? crewOccupationsError(safe.crew, safe.positions);
-    if (primaryError) fieldErrors.activity = primaryError;
+    if ("positions" in safe || "crew" in safe) {
+      const activity = { ...previousActivity, ...safe } as OccupationProfile;
+      if (!profileOccupationsUnchanged(activity, previousActivity)) {
+        const primaryError = primaryOccupationError(activity.crew, activity.positions) ?? crewOccupationsError(activity.crew, activity.positions);
+        if (primaryError) fieldErrors.activity = primaryError;
+      }
+      const focusError = profileOccupationFocusError(activity, previousActivity);
+      if (focusError) fieldErrors.activity = tResponse(`occupation.${focusError}`);
+    }
     if (Object.keys(fieldErrors).length > 0) {
       return NextResponse.json({ error: tResponse('System.m_09c9f4d72a9a'), fieldErrors }, { status: 400 });
     }

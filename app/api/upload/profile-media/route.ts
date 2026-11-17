@@ -12,6 +12,8 @@ export async function POST(req: NextRequest) {
   const authResult = await requireAuth();
   if (authResult instanceof NextResponse) return authResult;
   const { userId } = authResult;
+  const expectedAccount = req.headers.get("X-Profile-Account");
+  if (expectedAccount && expectedAccount !== userId) return NextResponse.json({ error: tResponse("System.requestFailed") }, { status: 409, headers: { "Cache-Control": "private, no-store, max-age=0" } });
   const t = await getTranslations("mediaSecurity");
 
   const { allowed } = await rateLimit(`profile-media:${userId}`, 10, 60);

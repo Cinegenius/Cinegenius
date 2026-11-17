@@ -4,20 +4,28 @@ import {Building2} from 'lucide-react';
 import {getLocale, getTranslations} from 'next-intl/server';
 import {organizationDiscovery, latestOrganizationEntries} from '@/lib/organization-discovery';
 import {newsRegion} from '@/lib/news-region-server';
-import {newsCountries} from '@/lib/news-discovery';
+import {homeNewsFacets} from '@/lib/news-discovery';
+import {homeNewsTopic} from '@/lib/news-topic-server';
+import {isOrganizationTopic, type OrganizationTopic} from '@/lib/organization-taxonomy';
 import HomeNewsRegion from './HomeNewsRegion';
+import HomeCardRail from '@/components/HomeCardRail';
 
 export default async function HomeOrganizations() {
- const [t, entryT, locale, region] = await Promise.all([
-  getTranslations('OrganizationDiscovery'), getTranslations('Organizations'), getLocale(), newsRegion(),
+ const [t, entryT, newsT, locale, region] = await Promise.all([
+  getTranslations('OrganizationDiscovery'), getTranslations('Organizations'), getTranslations('NewsRegion'), getLocale(), newsRegion(),
  ]);
+ const topic = await homeNewsTopic(region.cookieName);
+ const selectedTopic = topic.selection === 'all' ? '' : topic.selection;
+ const newsHref = `/news?${new URLSearchParams({country: region.selection, ...(selectedTopic ? {topic: selectedTopic} : {})})}`;
  let organizations: Awaited<ReturnType<typeof organizationDiscovery>>['organizations'] = [];
  let entries: Awaited<ReturnType<typeof latestOrganizationEntries>> = [], codes: string[] = [], failed = false;
+ let topics: OrganizationTopic[] = [];
  try {
-  const results = await Promise.all([organizationDiscovery(1, 6), latestOrganizationEntries(region.country), newsCountries(true)]);
+  const results = await Promise.all([organizationDiscovery(1, 6), latestOrganizationEntries(region.country, selectedTopic, 12), homeNewsFacets(region.country, selectedTopic)]);
   organizations = results[0].organizations;
   entries = results[1];
-  codes = results[2];
+  codes = results[2].codes;
+  topics = results[2].topics;
  } catch {
   console.error('homepage_organization_discovery_unavailable');
   failed = true;
@@ -26,20 +34,21 @@ export default async function HomeOrganizations() {
  const paired = entries.length > 0 && organizations.length > 0;
  return <section className="home-section-divider home-section-divider--wide py-5 sm:py-7" aria-labelledby="home-industry-title"><div className="site-container">
   <div className="mb-3 flex min-w-0 flex-wrap items-end justify-between gap-x-5 gap-y-1">
-   <div className="min-w-0"><p className="mb-1 text-xs uppercase tracking-widest text-gold">{t('eyebrow')}</p><h2 id="home-industry-title" className="break-words font-serif text-xl leading-snug text-text-primary sm:text-2xl">{t('title')}</h2></div>
-   <Link href={`/news?country=${region.selection}`} className="inline-flex min-h-11 min-w-0 items-center gap-1 text-sm text-gold hover:text-gold-light"><span className="break-words">{t('allEntries')}</span><span aria-hidden="true">→</span></Link>
+   <div className="min-w-0"><p className="mb-1 text-xs uppercase tracking-widest text-gold">{t('eyebrow')}</p><h2 id="home-industry-title" className="break-words font-serif text-xl leading-snug text-text-primary sm:text-2xl">{entryT('newsTitleLead')} <span className="text-gold">{entryT('newsTitleHighlight')}</span></h2></div>
+   <Link href={newsHref} className="inline-flex min-h-11 min-w-0 items-center gap-1 text-sm text-gold hover:text-gold-light"><span className="break-words">{t('allEntries')}</span><span aria-hidden="true">→</span></Link>
   </div>
-  <HomeNewsRegion region={region} codes={codes} empty={!entries.length} failed={failed}/>
+  <HomeNewsRegion key={region.cookieName} region={region} codes={codes} topic={topic} topics={topics} empty={!entries.length} failed={failed}/>
   <div className={`grid min-w-0 items-start gap-6 lg:gap-9 ${paired ? 'lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]' : ''}`}>
-   {entries.length > 0 && <div className="min-w-0 space-y-2">
-    {entries.map(entry => {
+   {entries.length > 0 && <HomeCardRail id="home-news-rail" labelledBy="home-industry-title" hint={newsT('railHint')} itemCount={Math.ceil(entries.length / 3)} variant="news">
+    {Array.from({length: Math.ceil(entries.length / 3)}, (_, page) => <div key={page} className="grid min-w-0 content-start gap-2">
+    {entries.slice(page * 3, page * 3 + 3).map(entry => {
      const org = (Array.isArray(entry.organization) ? entry.organization[0] : entry.organization) as unknown as {slug:string;name:string;logo_url:string|null};
      const date = entry.entry_type === 'news' ? entry.created_at : entry.starts_at;
      return <article key={entry.id} className="grid min-w-0 grid-cols-[minmax(0,1fr)_6rem] items-start gap-x-3 rounded-xl border border-border bg-bg-secondary px-3 py-1 sm:grid-cols-[minmax(0,1fr)_8rem] lg:grid-cols-[minmax(0,1fr)_9rem]">
       <Link href={`/news/${org.slug}/${entry.slug}`} className="group flex min-h-11 min-w-0 items-start gap-3 py-1">
        {entry.image_url && <Image src={entry.image_url} alt="" width={80} height={56} sizes="80px" className="mt-0.5 hidden h-14 w-20 shrink-0 rounded-md object-cover sm:block"/>}
        <div className="min-w-0 flex-1">
-        <div className="flex min-w-0 flex-wrap items-center gap-x-3 gap-y-0.5 text-[11px] leading-snug"><span className="break-words text-gold">{entryT(`entryType.${entry.entry_type}`)}</span>{date && <time dateTime={date} className="text-text-muted">{dates.format(new Date(date))}</time>}</div>
+        <div className="flex min-w-0 flex-wrap items-center gap-x-3 gap-y-0.5 text-[11px] leading-snug"><span className="break-words text-gold">{entryT(`entryType.${entry.entry_type}`)}{isOrganizationTopic(entry.topic) && <> · {entryT(`topic.${entry.topic}`)}</>}</span>{date && <time dateTime={date} className="text-text-muted">{dates.format(new Date(date))}</time>}</div>
         <h3 className="mt-1 line-clamp-2 break-words text-sm font-semibold leading-snug text-text-primary transition-colors group-hover:text-gold sm:text-base [overflow-wrap:anywhere]">{entry.title}</h3>
         {entry.summary && <p className="mt-1 line-clamp-1 break-words text-xs leading-relaxed text-text-secondary">{entry.summary}</p>}
        </div>
@@ -49,7 +58,8 @@ export default async function HomeOrganizations() {
       </Link>
      </article>;
     })}
-   </div>}
+    </div>)}
+   </HomeCardRail>}
    {organizations.length > 0 && <div className={`min-w-0 ${paired ? 'home-section-divider home-section-divider--organizations' : ''}`}>
     <div className="mb-1 flex min-w-0 flex-wrap items-center justify-between gap-x-3 gap-y-1"><h3 className="font-serif text-lg text-text-primary">{t('organizations')}</h3><Link href="/organizations" className="inline-flex min-h-11 min-w-0 items-center text-xs text-gold hover:text-gold-light"><span className="break-words">{t('allOrganizations')}</span><span className="ml-1" aria-hidden="true">→</span></Link></div>
     <ul className={`grid min-w-0 auto-rows-fr grid-cols-2 gap-2 ${paired ? '' : 'sm:grid-cols-3'}`}>

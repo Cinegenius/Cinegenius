@@ -1,3 +1,4 @@
+import {emailLayout, emailButton} from "@/lib/email-layout";
 import {getTranslations} from "next-intl/server";
 import {recipientEmailLocale} from "@/lib/i18n/email-locale";
 import {appLocale, type AppLocale} from "@/lib/i18n/locales";
@@ -152,260 +153,24 @@ function buildOtpEmail(otp: string, type: "verification" | "password", locale: A
     : escapeHtml(t("otpVerificationBody"));
   const label = escapeHtml(t(isPassword ? "otpPasswordLabel" : "otpVerificationLabel"));
 
-  return `<!DOCTYPE html>
-<html lang="${escapeHtml(locale)}">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>${headline}</title>
-</head>
-<body style="margin:0;padding:0;background-color:#0D0D0D;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;">
-  <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#0D0D0D;padding:48px 16px;">
-    <tr>
-      <td align="center">
-        <table width="560" cellpadding="0" cellspacing="0" border="0" style="max-width:560px;width:100%;">
-
-          <!-- Logo -->
-          <tr>
-            <td style="padding-bottom:40px;text-align:center;">
-              <table cellpadding="0" cellspacing="0" border="0" style="display:inline-table;">
-                <tr>
-                  <td style="background:#C2F135;border-radius:8px;width:36px;height:36px;text-align:center;vertical-align:middle;font-size:18px;line-height:36px;">
-                    &#9654;
-                  </td>
-                  <td style="padding-left:10px;font-size:22px;font-weight:800;color:#FFFFFF;letter-spacing:-0.5px;vertical-align:middle;">
-                    Cine<span style="color:#C2F135;">Genius</span>
-                  </td>
-                </tr>
-              </table>
-            </td>
-          </tr>
-
-          <!-- Main card -->
-          <tr>
-            <td style="background-color:#141414;border-radius:20px;border:1px solid #222222;overflow:hidden;">
-
-              <!-- Top accent bar -->
-              <table width="100%" cellpadding="0" cellspacing="0" border="0">
-                <tr>
-                  <td style="height:3px;background:linear-gradient(90deg,#C2F135 0%,#8fbf00 100%);font-size:0;line-height:0;">&nbsp;</td>
-                </tr>
-              </table>
-
-              <!-- Body -->
-              <table width="100%" cellpadding="0" cellspacing="0" border="0">
-                <tr>
-                  <td style="padding:44px 44px 40px;">
-
-                    <!-- Label -->
-                    <p style="margin:0 0 16px;font-size:11px;font-weight:700;color:#C2F135;text-transform:uppercase;letter-spacing:3px;">${label}</p>
-
-                    <!-- Welcome -->
-                    <p style="margin:0 0 8px;font-size:15px;color:#888888;line-height:1.5;">${welcome}</p>
-
-                    <!-- Headline -->
-                    <h1 style="margin:0 0 20px;font-size:34px;font-weight:800;color:#FFFFFF;line-height:1.15;letter-spacing:-0.8px;">
-                      ${headline}
-                    </h1>
-
-                    <!-- Subline -->
-                    <p style="margin:0 0 36px;font-size:15px;color:#777777;line-height:1.7;">
-                      ${subline}
-                    </p>
-
-                    <!-- OTP Box -->
-                    <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:32px;">
-                      <tr>
-                        <td style="background:#0D0D0D;border:1.5px solid #C2F135;border-radius:14px;padding:30px 20px;text-align:center;">
-                          <span style="font-size:48px;font-weight:800;color:#C2F135;letter-spacing:14px;font-family:'Courier New',Courier,monospace;display:inline-block;padding-left:14px;">${escapeHtml(otp)}</span>
-                        </td>
-                      </tr>
-                    </table>
-
-                    <!-- Divider -->
-                    <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:24px;">
-                      <tr><td style="height:1px;background:#1E1E1E;font-size:0;line-height:0;">&nbsp;</td></tr>
-                    </table>
-
-                    <!-- Security note -->
-                    <p style="margin:0;font-size:13px;color:#444444;line-height:1.65;">
-                      ${escapeHtml(t("otpIgnore"))}
-                    </p>
-
-                  </td>
-                </tr>
-              </table>
-            </td>
-          </tr>
-
-          <!-- Footer -->
-          <tr>
-            <td style="padding-top:32px;text-align:center;">
-              <p style="margin:0;font-size:12px;color:#333333;line-height:1.7;">
-                ${escapeHtml(t("brandFooter"))}<br/>
-                <a href="https://cinegenius.co" style="color:#444444;text-decoration:none;">cinegenius.co</a>
-              </p>
-            </td>
-          </tr>
-
-        </table>
-      </td>
-    </tr>
-  </table>
-</body>
-</html>`;
+  return emailLayout(`
+    <p style="margin:0 0 16px;color:#c2f135;font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase">${label}</p>
+    <p style="margin:0 0 8px;color:#b2bbc8;font-size:15px;line-height:1.6">${welcome}</p>
+    <h1 style="margin:0 0 16px;color:#f0f2f5;font-size:25px;line-height:1.3">${headline}</h1>
+    <p style="margin:0 0 22px;color:#b2bbc8;font-size:15px;line-height:1.7">${subline}</p>
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="table-layout:fixed;background:#1e2330;border:1px solid #c2f135;border-radius:12px"><tr><td style="padding:22px 8px;text-align:center"><span style="color:#c2f135;font-size:32px;line-height:40px;font-weight:700;letter-spacing:4px;font-family:'Courier New',monospace">${escapeHtml(otp)}</span></td></tr></table>
+    <p style="margin:22px 0 0;color:#8995a8;font-size:13px;line-height:1.65">${escapeHtml(t("otpIgnore"))}</p>
+  `, {locale, title: t(isPassword ? "otpPasswordHeading" : "otpVerificationHeading"), footerHtml: escapeHtml(t("brandFooter"))});
 }
 
 function buildWelcomeEmail(firstName: string, locale: AppLocale, t: EmailTranslator): string {
   const name = firstName || t("anonymousGreeting");
-  return `<!DOCTYPE html>
-<html lang="${escapeHtml(locale)}">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>${escapeHtml(t("welcomeTitle"))}</title>
-</head>
-<body style="margin:0;padding:0;background-color:#0D0D0D;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;">
-  <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#0D0D0D;padding:48px 16px;">
-    <tr>
-      <td align="center">
-        <table width="560" cellpadding="0" cellspacing="0" border="0" style="max-width:560px;width:100%;">
-
-          <!-- Logo -->
-          <tr>
-            <td style="padding-bottom:40px;text-align:center;">
-              <table cellpadding="0" cellspacing="0" border="0" style="display:inline-table;">
-                <tr>
-                  <td style="background:#C2F135;border-radius:8px;width:32px;height:32px;text-align:center;vertical-align:middle;font-size:16px;line-height:32px;">
-                    &#9654;
-                  </td>
-                  <td style="padding-left:10px;font-size:20px;font-weight:700;color:#FFFFFF;letter-spacing:-0.3px;vertical-align:middle;">
-                    Cine<span style="color:#C2F135;">Genius</span>
-                  </td>
-                </tr>
-              </table>
-            </td>
-          </tr>
-
-          <!-- Main card -->
-          <tr>
-            <td style="background-color:#141414;border-radius:20px;border:1px solid #222222;overflow:hidden;">
-
-              <!-- Top accent bar -->
-              <table width="100%" cellpadding="0" cellspacing="0" border="0">
-                <tr>
-                  <td style="height:3px;background:linear-gradient(90deg,#C2F135 0%,#8fbf00 100%);font-size:0;line-height:0;">&nbsp;</td>
-                </tr>
-              </table>
-
-              <!-- Body -->
-              <table width="100%" cellpadding="0" cellspacing="0" border="0">
-                <tr>
-                  <td style="padding:44px 44px 0;">
-
-                    <!-- Label -->
-                    <p style="margin:0 0 20px;font-size:11px;font-weight:700;color:#C2F135;text-transform:uppercase;letter-spacing:3px;">${escapeHtml(t("welcomeLabel"))}</p>
-
-                    <!-- Headline -->
-                    <h1 style="margin:0 0 16px;font-size:36px;font-weight:800;color:#FFFFFF;line-height:1.15;letter-spacing:-0.8px;">
-                      ${escapeHtml(t("welcomeGreetingShort", {name}))}
-                    </h1>
-
-                    <!-- Subline -->
-                    <p style="margin:0 0 40px;font-size:16px;color:#888888;line-height:1.65;">
-                      ${escapeHtml(t("welcomeDachIntro"))}
-                    </p>
-
-                    <!-- Divider -->
-                    <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:32px;">
-                      <tr><td style="height:1px;background:#222222;font-size:0;line-height:0;">&nbsp;</td></tr>
-                    </table>
-
-                    <!-- Steps -->
-                    <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:8px;">
-                      <tr>
-                        <td style="padding-bottom:16px;">
-                          <table width="100%" cellpadding="0" cellspacing="0" border="0">
-                            <tr>
-                              <td style="width:28px;vertical-align:top;padding-top:1px;">
-                                <span style="display:inline-block;width:20px;height:20px;background:#C2F135;border-radius:50%;text-align:center;line-height:20px;font-size:11px;font-weight:800;color:#0D0D0D;">1</span>
-                              </td>
-                              <td style="padding-left:12px;">
-                                <p style="margin:0;font-size:15px;font-weight:600;color:#FFFFFF;">${escapeHtml(t("profileStep"))}</p>
-                                <p style="margin:3px 0 0;font-size:13px;color:#555555;line-height:1.5;">${escapeHtml(t("portfolioStepDescription"))}</p>
-                              </td>
-                            </tr>
-                          </table>
-                        </td>
-                      </tr>
-                      <tr>
-                        <td style="padding-bottom:16px;">
-                          <table width="100%" cellpadding="0" cellspacing="0" border="0">
-                            <tr>
-                              <td style="width:28px;vertical-align:top;padding-top:1px;">
-                                <span style="display:inline-block;width:20px;height:20px;background:#C2F135;border-radius:50%;text-align:center;line-height:20px;font-size:11px;font-weight:800;color:#0D0D0D;">2</span>
-                              </td>
-                              <td style="padding-left:12px;">
-                                <p style="margin:0;font-size:15px;font-weight:600;color:#FFFFFF;">${escapeHtml(t("firstListing"))}</p>
-                                <p style="margin:3px 0 0;font-size:13px;color:#555555;line-height:1.5;">${escapeHtml(t("firstListingDescription"))}</p>
-                              </td>
-                            </tr>
-                          </table>
-                        </td>
-                      </tr>
-                      <tr>
-                        <td>
-                          <table width="100%" cellpadding="0" cellspacing="0" border="0">
-                            <tr>
-                              <td style="width:28px;vertical-align:top;padding-top:1px;">
-                                <span style="display:inline-block;width:20px;height:20px;background:#C2F135;border-radius:50%;text-align:center;line-height:20px;font-size:11px;font-weight:800;color:#0D0D0D;">3</span>
-                              </td>
-                              <td style="padding-left:12px;">
-                                <p style="margin:0;font-size:15px;font-weight:600;color:#FFFFFF;">${escapeHtml(t("discoverStep"))}</p>
-                                <p style="margin:3px 0 0;font-size:13px;color:#555555;line-height:1.5;">${escapeHtml(t("discoverStepDescription"))}</p>
-                              </td>
-                            </tr>
-                          </table>
-                        </td>
-                      </tr>
-                    </table>
-
-                  </td>
-                </tr>
-
-                <!-- CTA -->
-                <tr>
-                  <td style="padding:40px 44px 44px;">
-                    <table cellpadding="0" cellspacing="0" border="0">
-                      <tr>
-                        <td style="background:#C2F135;border-radius:10px;">
-                          <a href="https://cinegenius.co/dashboard" style="display:inline-block;padding:14px 28px;font-size:15px;font-weight:700;color:#0D0D0D;text-decoration:none;letter-spacing:-0.2px;">
-                            ${escapeHtml(t("dashboard"))} &rarr;
-                          </a>
-                        </td>
-                      </tr>
-                    </table>
-                  </td>
-                </tr>
-
-              </table>
-            </td>
-          </tr>
-
-          <!-- Footer -->
-          <tr>
-            <td style="padding-top:32px;text-align:center;">
-              <p style="margin:0;font-size:12px;color:#333333;line-height:1.7;">
-                ${escapeHtml(t("brandFooter"))}<br/>
-                <a href="https://cinegenius.co" style="color:#444444;text-decoration:none;">cinegenius.co</a>
-              </p>
-            </td>
-          </tr>
-
-        </table>
-      </td>
-    </tr>
-  </table>
-</body>
-</html>`;
+  const steps = [["profileStep", "portfolioStepDescription"], ["firstListing", "firstListingDescription"], ["discoverStep", "discoverStepDescription"]];
+  return emailLayout(`
+    <p style="margin:0 0 16px;color:#c2f135;font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase">${escapeHtml(t("welcomeLabel"))}</p>
+    <h1 style="margin:0 0 16px;color:#f0f2f5;font-size:25px;line-height:1.3">${escapeHtml(t("welcomeGreetingShort", {name}))}</h1>
+    <p style="margin:0 0 22px;color:#b2bbc8;font-size:15px;line-height:1.65">${escapeHtml(t("welcomeDachIntro"))}</p>
+    ${steps.map(([heading, description], index) => `<p style="margin:18px 0 4px;color:#f0f2f5;font-size:15px;font-weight:600"><span style="color:#c2f135">${index+1}.</span> ${escapeHtml(t(heading))}</p><p style="margin:0;color:#b2bbc8;font-size:14px;line-height:1.6">${escapeHtml(t(description))}</p>`).join("")}
+    ${emailButton(escapeHtml(t("dashboard")), "https://cinegenius.co/dashboard")}
+  `, {locale, title: t("welcomeTitle"), footerHtml: escapeHtml(t("brandFooter"))});
 }

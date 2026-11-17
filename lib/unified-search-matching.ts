@@ -1,10 +1,10 @@
-import { departments, getDepartmentRoleLabel, getDeptLabel } from "./departments";
+import { departments, getDepartmentRoleFormLabels, getDeptLabel } from "./departments";
 import { occupationCatalogue } from "./primary-occupation";
 import { placeCandidatesForLabel, placeReadFields } from "./places/catalog";
 import { countryCode, placeKey, placeCitySearchAliases } from "./places/core";
 import { publicMapPoint } from "./places/public-map-point";
 import { withinCrewRadius } from "./genie-search";
-import { DEPARTMENTS as marketplaceDepartments, deptValues, groupValues, SEARCH_SYNONYMS } from "./marketplaceCategories";
+import { DEPARTMENTS as marketplaceDepartments, deptValues, groupValues, marketplaceCategory, SEARCH_SYNONYMS } from "./marketplaceCategories";
 import continents from "./places/continents.json" with { type: "json" };
 import type { SearchPlace, SearchWish } from "./unified-search";
 import { isWholeAreaQuery } from "./unified-search-areas";
@@ -67,8 +67,8 @@ export function wishSearchTerms(wish: SearchWish, locale = "de", taxonomy?: (key
     const dept = departments.find(d => d.id === wish.department) ?? searchDepartment(wish.query, locale, taxonomy);
     const roles = occupationCatalogue.filter(role => !dept || role.departmentId === dept.id).map(role => {
       const department = departments.find(d => d.id === role.departmentId)!;
-      const label = getDepartmentRoleLabel(department.id, role.label, locale, undefined, taxonomy);
-      return { ...role, aliases: [...new Set([...role.aliases, label])] };
+      const forms = getDepartmentRoleFormLabels(department.id, role.label, locale, undefined, taxonomy);
+      return { ...role, aliases: [...new Set([...role.aliases, ...forms])] };
     });
     if (dept && (!requested.length || searchDepartment(wish.query, locale, taxonomy)?.id === dept.id)) terms.push(...roles.flatMap(role => role.aliases));
     for (const term of requested) {
@@ -92,6 +92,11 @@ export function wishSearchTerms(wish: SearchWish, locale = "de", taxonomy?: (key
 export function wishMarketplaceCategories(query: string, t: (key: string) => string): string[] {
   const key = searchKey(query);
   const values: string[] = Object.entries(SEARCH_SYNONYMS).filter(([alias]) => searchKey(alias) === key).flatMap(([, values]) => values);
+  const service = marketplaceCategory(query);
+  if (service?.department === "dienstleistungen" && service.subcategory) {
+    const group = marketplaceDepartments.find(dept => dept.id === service.department)?.groups.find(group => group.id === service.subcategory);
+    if (group) values.push(...groupValues(group));
+  }
   // A broad costume request includes the current clothing group. A particular
   // hat, camera brand or vehicle must not expand to every sibling in its group.
   if (["kostum", "kostuem", "costume"].includes(key)) {

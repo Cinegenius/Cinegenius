@@ -12,8 +12,9 @@ import {restoredPeople, validConversationId, suggestedGroupName, validMessageReq
 import {uiErrorMessage} from "@/lib/ui-error-message";
 
 type NewValue = {name: string; selected: MessagePerson[]; requestKey: string};
-export default function NewMessageDialog({open, accountId, contacts, onClose, onOpen, forceGroup = false}: {forceGroup?:boolean;open:boolean; accountId:string; contacts:MessagePerson[]; onClose:()=>void; onOpen:(destination:MessageDestination, commit:()=>void)=>void}) {
+export default function NewMessageDialog({open, accountId, contacts, onClose, onOpen, onContacts, contactsError = false, onRetryContacts, forceGroup = false}: {onContacts?:()=>void;contactsError?:boolean;onRetryContacts?:()=>void;forceGroup?:boolean;open:boolean; accountId:string; contacts:MessagePerson[]; onClose:()=>void; onOpen:(destination:MessageDestination, commit:()=>void)=>void}) {
   const t = useTranslations("Messaging");
+  const contactsText = useTranslations("Contacts");
   const {user, isLoaded} = useUser();
   const [value,setValue] = useState<NewValue>({name:"",selected:[],requestKey:""});
   const [phase,setPhase] = useState<"idle"|"saving"|"posting">("idle");
@@ -58,6 +59,8 @@ export default function NewMessageDialog({open, accountId, contacts, onClose, on
   }
   return <MessagingDialog open={open&&sameAccount} title={t(forceGroup ? "createGroup" : "newMessage")} onClose={onClose} busy={phase!=="idle"} footer={<button type="button" onClick={()=>void start()} disabled={phase!=="idle"||!draft.loaded||!value.selected.length} className="inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-xl bg-gold px-4 text-sm font-semibold text-bg-primary disabled:opacity-40">{phase!=="idle"&&<Loader2 size={17} className="animate-spin"/>}{t(forceGroup || value.selected.length>1?"createGroup":"openChat")}</button>}>
     <p className="text-sm text-text-secondary">{t(forceGroup ? "chooseGroupPeople" : "choosePeople")}</p>
+    {onContacts && <button type="button" onClick={onContacts} disabled={phase!=="idle"||!draft.loaded} className="inline-flex min-h-11 items-center rounded-lg border border-border px-3 text-sm font-medium text-text-secondary hover:bg-bg-elevated disabled:opacity-40">{contactsText("title")}</button>}
+    {contactsError && <div role="alert" className="text-sm text-red-400 [[data-theme=light]_&]:text-red-700"><p>{contactsText("loadError")}</p>{onRetryContacts && <button type="button" onClick={onRetryContacts} disabled={phase!=="idle"} className="min-h-11 text-gold">{contactsText("retry")}</button>}</div>}
     <PeoplePicker contacts={contacts} selected={value.selected} onChange={selected=>edit({selected})} disabled={phase!=="idle"||!draft.loaded}/>
     {(forceGroup || value.selected.length>1)&&<label className="block text-sm text-text-secondary">{t("groupNameOptional")}<input value={value.name} disabled={phase!=="idle"||!draft.loaded} maxLength={80} onChange={event=>edit({name:event.target.value})} placeholder={suggestion} className="mt-2 min-h-11 w-full rounded-xl border border-border bg-bg-secondary px-3 text-base text-text-primary"/><span className="mt-2 block break-words text-xs text-text-muted">{t("groupNameSuggestion",{name:suggestion})}</span></label>}
     <FormDraftStatus draft={draft}/>

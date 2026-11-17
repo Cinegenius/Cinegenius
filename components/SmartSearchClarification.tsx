@@ -75,7 +75,7 @@ export default function SmartSearchClarification({ question, requestText, onUnau
         body: JSON.stringify(validated.value),
       });
       if (controller.signal.aborted) return;
-      if (response.status === 401) {
+      if (response.status === 401 || response.status === 403) {
         history.current = []; setReply(""); setError(ERROR.unauthorized); onUnauthorized(); return;
       }
       const data = await response.json();

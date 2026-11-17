@@ -59,10 +59,15 @@ export function roleOptionMatchesSearch(
   query: string,
   displayLabel: (value: string) => string,
   locale: string,
+  additionalTerms: readonly string[] = [],
 ): boolean {
   const normalized = normalizedCatalogueSearch(query, locale);
   if (!normalized) return true;
-  const terms = [option.label, option.labelEn ?? "", ...(option.aliases ?? []), displayLabel(option.label)];
+  const terms = [option.label, option.labelEn ?? "", ...(option.aliases ?? []), ...additionalTerms, displayLabel(option.label)];
   if (option.description) terms.push(option.description, displayLabel(option.description));
-  return terms.some(term => normalizedCatalogueSearch(term, locale).includes(normalized));
+  const compactQuery = normalized.replace(/[^\p{L}\p{M}\p{N}]+/gu, "");
+  return terms.some(term => {
+    const candidate = normalizedCatalogueSearch(term, locale);
+    return candidate.includes(normalized) || candidate.replace(/[^\p{L}\p{M}\p{N}]+/gu, "").includes(compactQuery);
+  });
 }

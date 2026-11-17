@@ -2,7 +2,7 @@
 
 import { useId, useMemo } from "react";
 import { useLocale, useTranslations } from "next-intl";
-import { ChevronDown } from "lucide-react";
+import BrowseSelect from "@/components/BrowseSelect";
 import { browsePlaceOptions as placeOptions, UNASSIGNED_COUNTRY, matchesPlace } from "@/lib/places/core";
 
 export type PlaceFilterValue = { country: string; region: string; city: string };
@@ -24,15 +24,14 @@ export default function PlaceFilters({ rows, value, onChange }: { rows: object[]
     const missing = selected && !options.some(option => option.value === selected);
     return <div key={kind} className="min-w-0">
       <label htmlFor={`${id}-${kind}`} className="mb-1 block text-xs text-text-muted">{t(kind)}</label>
-      <div className="relative">
-        <select id={`${id}-${kind}`} value={selected} onChange={event => onChange(kind === "country" ? { country: event.target.value, region: "", city: "" } : kind === "region" ? { ...value, region: event.target.value, city: "" } : { ...value, city: event.target.value })}
-          className="min-h-11 w-full min-w-0 appearance-none rounded-lg border border-border bg-bg-primary pl-3 pr-9 text-sm text-text-primary focus:border-gold focus:outline-none">
-          <option value="">{t(kind === "country" ? "allCountries" : kind === "region" ? "allRegions" : "allCities")}</option>
-          {missing && <option value={selected} disabled>{kind === "country" && countries.has(selected) ? countries(selected) : placeOptions(rows, kind, locale).find(option => option.value === selected)?.label ?? selected}</option>}
-          {options.map(option => <option key={option.value} value={option.value}>{option.label}</option>)}
-        </select>
-        <ChevronDown aria-hidden="true" size={16} className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-text-muted" />
-      </div>
+      <BrowseSelect id={`${id}-${kind}`} label={t(kind)} value={selected}
+        onChange={next => onChange(kind === "country" ? { country: next, region: "", city: "" } : kind === "region" ? { ...value, region: next, city: "" } : { ...value, city: next })}
+        triggerClassName="browse-filter-select"
+        options={[
+          { value: "", label: t(kind === "country" ? "allCountries" : kind === "region" ? "allRegions" : "allCities") },
+          ...(missing ? [{ value: selected, label: kind === "country" && countries.has(selected) ? countries(selected) : placeOptions(rows, kind, locale).find(option => option.value === selected)?.label ?? selected, disabled: true }] : []),
+          ...options,
+        ]} />
     </div>;
   })}</div>;
 }

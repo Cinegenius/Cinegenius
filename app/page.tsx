@@ -1,3 +1,5 @@
+import { occupationFormFromCrew } from "@/lib/occupation-form";
+import { profileOccupationPreview, type OccupationProfile } from "@/lib/crew-occupations";
 import { profileAccessFor } from "@/lib/profile-privacy-server";
 import { projectProfilePrivacy } from "@/lib/profile-privacy";
 import { homeMarketplaceOffers } from "@/lib/home-marketplace";
@@ -59,6 +61,7 @@ type HomeProfileRow = {
   verified: boolean | null;
   role: string | null;
   positions: string[] | null;
+  crew?: OccupationProfile["crew"];
   profile_type: string | null;
   profile_types: string[] | null;
   created_at?: string | null;
@@ -98,7 +101,7 @@ async function getHomeData() {
     db.from("privacy_visible_listings").select("id,title,city,price,created_at").eq("type", "job").eq("published", true).order("created_at", { ascending: false }).limit(4),
     homeMarketplaceOffers(currentTime),
     db.from("companies").select("id,slug,name,logo_url,city,categories").eq("published", true).order("created_at", { ascending: false }).limit(6),
-    db.from("profiles").select("user_id,slug,display_name,tagline,avatar_url,location,verified,role,positions,profile_type,profile_types,created_at").not("display_name", "is", null).neq("display_name", "").order("created_at", { ascending: false }).limit(300),
+    db.from("profiles").select("user_id,slug,display_name,tagline,avatar_url,location,verified,role,positions,crew,profile_type,profile_types,created_at").not("display_name", "is", null).neq("display_name", "").order("created_at", { ascending: false }).limit(300),
   ]);
   if (results.some(result => result.error)) throw new Error("Homepage recommendations unavailable");
   const [
@@ -123,7 +126,7 @@ async function getHomeData() {
   // an invented crew occupation.
   const peopleProfiles = publicProfiles.filter(isPeopleDirectoryProfile);
   const peopleSummaries = peopleProfiles.map((profile) => {
-    const positions = [...new Set([...(profile.positions ?? []), ...(profile.role ? [profile.role] : [])].map((position) => position.trim()).filter(Boolean))];
+    const positions = profileOccupationPreview(profile);
     if (positions.length === 0) {
       const profileTypes = [...new Set([profile.profile_type, ...(profile.profile_types ?? [])].filter((type): type is string => Boolean(type)))];
       positions.push(...profileTypes
@@ -139,6 +142,7 @@ async function getHomeData() {
       city: profile.location?.split(",")[0]?.trim() ?? "",
       verified: profile.verified ?? false,
       positions,
+      occupationForm: occupationFormFromCrew(profile.crew),
       createdAt: profile.created_at ?? "",
     };
   });
@@ -219,7 +223,7 @@ async function HomeLocations({ dataPromise }: { dataPromise: HomeDataPromise }) 
 }
 
 async function HomeCrew({ dataPromise }: { dataPromise: HomeDataPromise }) {
-  const [data, t, tc] = await Promise.all([dataPromise, getTranslations("home"), getTranslations("common")]);
+  const [data, t, tc, uiText] = await Promise.all([dataPromise, getTranslations("home"), getTranslations("common"), getTranslations()]);
   if (!data?.newCrew.length) return null;
   const { newCrew } = data;
   return <section className="home-section-divider home-section-divider--intro min-w-0" aria-labelledby="home-crew-title">
@@ -256,7 +260,7 @@ async function HomeCrew({ dataPromise }: { dataPromise: HomeDataPromise }) {
                   </div>
                   <div className="p-3 flex flex-col flex-1">
                     <h3 className="font-semibold text-text-primary text-sm leading-snug mb-0.5">{c.name}</h3>
-                    {c.positions.length > 0 && <p className="mb-1 line-clamp-2 text-[11px] leading-snug text-gold">{c.positions.join(" · ")}</p>}
+                    {c.positions.length > 0 && <p className="mb-1 line-clamp-2 text-[11px] leading-snug text-gold">{c.positions.map(label => taxonomyLabel(label, uiText, c.occupationForm)).join(" · ")}</p>}
                     {c.city && (
                       <p className="text-[11px] text-text-muted flex items-center gap-1 mb-1.5">
                         <MapPin size={9} /> {c.city}

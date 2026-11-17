@@ -23,7 +23,7 @@ export default async function AgbPage() {
         <div className="mb-10">
           <p className="text-xs uppercase tracking-widest text-text-muted font-semibold mb-3">{uiText("Ui.text_0da5374b4c42ae")}</p>
           <h1 className="font-display text-3xl font-bold text-text-primary mb-2">{uiText("Ui.text_986664fa33f063")}</h1>
-          <p className="text-text-muted text-sm">{t("termsDate")}</p>
+          <p lang="de" className="text-text-muted text-sm">{t("termsDate")}</p>
         </div>
 
         <div className="space-y-8 text-text-secondary">
@@ -93,14 +93,12 @@ export default async function AgbPage() {
 
           <section>
             <h2 className="text-base font-semibold text-text-primary mb-2">{uiText("Ui.text_487f273bffb92c")}</h2>
-            <p className="text-sm leading-relaxed mt-3">{uiText("Ui.text_d1c77181f5535a")}</p>
-            <p className="text-sm leading-relaxed mt-3">{uiText("Ui.text_abe5b8678ae610")}</p>
-            <SupportServiceNotice compact />
+            <SupportServiceNotice compact legalOriginal />
           </section>
 
           <section>
             <h2 className="text-base font-semibold text-text-primary mb-2">{uiText("Ui.text_112fd2920ee6c6")}</h2>
-            <p className="text-sm leading-relaxed mt-3">{uiText("Ui.text_0cca91f33c7540")}</p>
+            <p lang="de" className="text-sm leading-relaxed mt-3">{t("futureFunctions")}</p>
           </section>
 
           <section>
@@ -143,7 +141,7 @@ export default async function AgbPage() {
 
           <section>
             <h2 className="text-base font-semibold text-text-primary mb-2">{uiText("Ui.text_49442663ee1e7b")}</h2>
-            <p className="text-sm leading-relaxed">{uiText.rich("Ui.text_b96e50a60df1cc", { part1: chunks => (<a href="mailto:cinegenius.co@gmail.com" className="text-gold hover:underline">{chunks}</a>) })}</p>
+            <p className="text-sm leading-relaxed">{uiText.rich("Ui.text_b96e50a60df1cc", { part1: chunks => (<a href="mailto:hello@cinegenius.co" className="text-gold hover:underline">{chunks}</a>) })}</p>
             <p className="text-sm leading-relaxed mt-3">{uiText("Ui.text_ca14a695232c3b")}</p>
             <p className="text-sm leading-relaxed mt-3">{uiText("Ui.text_f97f494f842b6b")}</p>
           </section>
@@ -183,7 +181,7 @@ export default async function AgbPage() {
             <div className="mt-3 text-sm leading-relaxed bg-bg-elevated rounded-lg p-4 space-y-1">
               <p className="font-medium text-text-primary">{uiText("Ui.text_9caa74787b1567")}</p>
               <p>{uiText("Ui.text_05310b88e6fcc0")}</p>
-              <p>{uiText.rich("Ui.text_c4c264ee568fd4", { part1: chunks => (<a href="mailto:cinegenius.co@gmail.com" className="text-gold hover:underline">{chunks}</a>) })}</p>
+              <p>{uiText.rich("Ui.text_c4c264ee568fd4", { part1: chunks => (<a href="mailto:hello@cinegenius.co" className="text-gold hover:underline">{chunks}</a>) })}</p>
             </div>
           </section>
 

@@ -8,7 +8,7 @@ import { localizedNotification } from "@/lib/i18n/notification-copy";
 import { sendFriendAcceptedEmail, sendFriendRequestEmail } from "@/lib/email";
 import { publicContactConnection, validContactConnection } from "@/lib/contact-connections";
 
-export const contactHeaders = { "Cache-Control": "private, no-store, max-age=0" };
+export const contactHeaders = { "Cache-Control": "private, no-store, max-age=0", "CDN-Cache-Control": "no-store", "Vercel-CDN-Cache-Control": "no-store" };
 export const contactJson = (body: unknown, status = 200) => NextResponse.json(body, { status, headers: contactHeaders });
 export async function mutateContact(actor: string, action: string, input: { target?: string; id?: string; label?: string | null; isPublic?: boolean }) {
   const t = await getTranslations("Contacts");

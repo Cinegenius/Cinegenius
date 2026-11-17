@@ -1,3 +1,5 @@
+import { occupationFormFromCrew } from "@/lib/occupation-form";
+import { profileOccupationPreview } from "@/lib/crew-occupations";
 import { db } from "@/lib/db";
 import { requireAuth } from "@/lib/auth";
 import { MESSAGING_HEADERS } from "@/lib/messaging-backend";
@@ -16,7 +18,7 @@ export async function GET(request: NextRequest) {
   if (query.length < 2 || query.length > 80) return NextResponse.json({ users: [] }, { headers: MESSAGING_HEADERS });
   const signal = AbortSignal.any([request.signal, AbortSignal.timeout(8000)]);
   try {
-    const result = await db.from("profiles").select("user_id,display_name,avatar_url,role,location")
+    const result = await db.from("profiles").select("user_id,display_name,avatar_url,role,positions,crew,location")
       .neq("user_id", authResult.userId).not("display_name", "is", null)
       .ilike("display_name", `%${query.replace(/[\\%_]/g, "\\$&")}%`).order("display_name", { ascending: true }).limit(25).abortSignal(signal);
     if (result.error) return fail();
@@ -30,7 +32,7 @@ export async function GET(request: NextRequest) {
     const allowed = new Set(eligible.data.map((item: { user_id: string }) => item.user_id));
     return NextResponse.json({ users: publicProfiles.filter(profile => allowed.has(profile.user_id)).map(profile => ({
       id: profile.user_id, name: profile.display_name ?? t("senderFallback"), avatar: profile.avatar_url ?? null,
-      role: profile.role ?? null, location: profile.location ?? null,
+      role: profileOccupationPreview(profile)[0] ?? profile.role ?? null, occupationForm: occupationFormFromCrew(profile.crew), location: profile.location ?? null,
     })) }, { headers: MESSAGING_HEADERS });
   } catch { return fail(); }
 }

@@ -82,14 +82,14 @@ test('microphone requires visible page, explicit activation, supported locale an
   const f = fixture(); f.navigator.userActivation.isActive = false;
   await rejects(f.api.start({locale:'de'}), 'gesture-required');
   f.navigator.userActivation.isActive = true;
-  await rejects(f.api.start({locale:'fr'}), 'language-unavailable');
+  await rejects(f.api.start({locale:'zz'}), 'language-unavailable');
   f.document.visibilityState = 'hidden'; await rejects(f.api.start({locale:'de'}), 'interrupted');
   assert.equal(f.sent.length, 0); f.document.visibilityState = 'visible';
   const first = f.api.start({locale:'de'}); await rejects(f.api.start({locale:'de'}), 'busy');
   const cancelled = rejects(first, 'cancelled'); f.api.cancel(); await cancelled;
 });
 
-test('capability queries work for all nine locales without sending account material', async () => {
+test('capability queries work for all supported locales without sending account material', async () => {
   const f = fixture();
   for (const locale of SUPPORTED_LOCALES) {
     const pending = f.api.capabilities({locale, account:'private'}), request = f.sent.at(-1);
@@ -136,7 +136,7 @@ test('invalid native payloads do not become a successful transcript', async () =
 test('speaking cancels capture, respects length and language, and stops on backgrounding', async () => {
   const f = fixture();
   for (const text of ['', ' ', 'a'.repeat(6001), null]) await rejects(f.api.speak({locale:'de',text}), 'invalid-request');
-  await rejects(f.api.speak({locale:'fr',text:'Bonjour'}), 'language-unavailable');
+  await rejects(f.api.speak({locale:'zz',text:'Bonjour'}), 'language-unavailable');
   const recording = f.api.start({locale:'de'}), cancelled = rejects(recording, 'cancelled');
   const speech = f.api.speak({locale:'de',text:'Antwort'}); await cancelled;
   assert.equal(f.sent.at(-2).action, 'cancel'); assert.equal(f.sent.at(-1).action, 'speak');

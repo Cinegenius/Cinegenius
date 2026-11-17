@@ -1,3 +1,5 @@
+import { occupationFormFromCrew } from "@/lib/occupation-form";
+import { profileOccupationPreview } from "@/lib/crew-occupations";
 import { auth } from "@clerk/nextjs/server";
 import { canViewProfile } from "@/lib/trust";
 import { visibleLinkedProfileIds } from "@/lib/linked-profile-access";
@@ -43,7 +45,7 @@ export async function GET(req: NextRequest) {
   if (!ids.length) return NextResponse.json({ collaborations: [] });
   const { data: profiles } = await db
     .from("profiles")
-    .select("user_id, display_name, avatar_url, slug, role, positions")
+    .select("user_id, display_name, avatar_url, slug, role, positions, crew")
     .in("user_id", ids);
 
   const profileMap = Object.fromEntries((profiles ?? []).map((p) => [p.user_id, p]));
@@ -57,7 +59,8 @@ export async function GET(req: NextRequest) {
         display_name: p.display_name ?? tResponse("Contacts.member"),
         avatar_url: p.avatar_url ?? null,
         slug: p.slug ?? c.friendId,
-        role: p.role ?? (Array.isArray(p.positions) ? p.positions[0] : null) ?? null,
+        role: profileOccupationPreview(p)[0] ?? null,
+        occupationForm: occupationFormFromCrew(p.crew),
       };
     }),
   });

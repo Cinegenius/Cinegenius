@@ -20,7 +20,8 @@ export async function POST(request: NextRequest) {
   try {
     const user = await getCurrentUser();
     const userId = user?.userId ?? null;
-    if (!userId || !unifiedSearchAccess(userId).canReadResults) return json({ error: "unauthorized" }, 401);
+    if (!userId) return json({ error: "unauthorized" }, 401);
+    if (!unifiedSearchAccess(userId, process.env.ADMIN_USER_IDS).canReadResults) return json({ error: "in_development" }, 403);
     if (!(await rateLimit(`unified-search:${userId}`, 40, 60)).allowed) return json({ error: "rate_limited" }, 429);
     const body = await readGenieBody(request);
     if (!body || typeof body !== "object" || Array.isArray(body) || Object.keys(body).some(key => !["plan", "cursor", "view"].includes(key))) return json({ error: "invalid_request" }, 400);

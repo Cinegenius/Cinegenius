@@ -15,9 +15,10 @@ import { useFormRouter } from "@/lib/use-form-router";
 import GenieVoiceControls from "./GenieVoiceControls";
 
 type Message = { role: "user" | "assistant"; content: string };
-type Status = "errorSearch" | "errorInvalid" | "errorRateLimited" | "errorUnavailable" | "errorTimeout" | "errorFailed" | "errorUnsafe" | "errorNetwork" | "cancelled";
+type Status = "errorInDevelopment" | "errorSearch" | "errorInvalid" | "errorRateLimited" | "errorUnavailable" | "errorTimeout" | "errorFailed" | "errorUnsafe" | "errorNetwork" | "cancelled";
 
 const SERVER_ERRORS: Record<string, Status> = {
+  in_development: "errorInDevelopment",
   invalid_request: "errorInvalid",
   search_unresolved: "errorSearch",
   rate_limited: "errorRateLimited",

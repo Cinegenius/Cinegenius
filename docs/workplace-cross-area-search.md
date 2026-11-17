@@ -1,5 +1,37 @@
 # Smart-Suche: Startseite und Arbeitsplatz
 
+## App-Abgleich vom 17. November 2026
+
+Der App-Quellstand übernimmt den geprüften WEB-Stand `cedb788` samt veröffentlichter
+Grundlage `057c4c9`: serverseitiger Admin-Zugang, statische Mitgliedervorschau,
+17 Sprachkataloge, persönliche Berufsschreibweise und aktuelle Marktplatzkategorien.
+Smart-Beispiele füllen nur das bearbeitbare Suchfeld; Karte und kompakte Gruppen
+teilen dieselben geladenen Ergebnisse und Filter. Kartenbewegungen starten keine
+Suche, der Ausschnitt wird ausdrücklich übernommen. Der additive Vertrag steht in
+`smart-discovery.md`. Ältere Mitgliedschaftshinweise weiter unten sind historisch
+und werden durch die aktuelle Admin-Beschränkung ersetzt.
+
+Die bestehende App nutzt die gemeinsamen Web-Oberflächen im erlaubten Ursprung;
+es entsteht kein eigener nativer Suchparser, Berechtigungsersatz oder zusätzlicher
+Smart-Einstieg im Raumscanner. Raumpläne, Konto-/Dateigrenzen, sichere Ursprünge,
+Sprach- und Vordergrund-Brücken bleiben erhalten. Alle bisherigen 161 Scannertexte
+je Sprache bleiben unverändert; die acht zusätzlichen Sprachen erhalten vollständige
+App-Texte und passende Betriebssystem-Sprachzuordnungen.
+
+Der aktuelle App-Abgleich veröffentlicht weder Website noch App. WEB hat `cedb788` inzwischen mit Markus’ gesonderter Freigabe veröffentlicht
+(Deployment `dpl_93fq8xJh6qgwWtEQGHBrSjVt8dU9`, Beleg
+`/srv/cinegenius/handoffs/20261117-smart-discovery/LIVE-STATUS.md`). Die entfernte
+Produktionsvorschau lädt damit bereits den neuen gemeinsamen Smart-Ablauf. Xcode-/Geräteprüfung und der Abgleich mit neueren Mac-Arbeitsplatzdateien
+bleiben ausdrücklich getrennt; keine älteren Serverdateien über Mac-Entwürfe kopieren.
+Die vorhandene Kontonutzungsanzeige bleibt in den gruppierten Datenschutzeinstellungen;
+ihre noch unveröffentlichte Backend-API wird durch diesen Abgleich nicht aktiviert.
+Prüfbelege: `/srv/cinegenius/handoffs/20261117-app-smart-discovery/`.
+
+WEB bereitet inzwischen drei Layoutvorschläge je Handy und Laptop vor. Dieser
+Abgleich übernimmt ausschließlich den bereits geprüften veröffentlichten Stand;
+eine weitere Smart-Oberfläche wartet auf Markus’ Auswahl und den geprüften Rücklauf.
+
+
 Aktueller Status vom 14. November 2026: **geprüfte Smart-Korrektur einschließlich Mitgliedersperre zur App-Integration übergeben**. WEB CODEX liefert `3604ba46de1a3486696121ff6786cca9fd5861e9` auf `origin/codex/genie-search-repair`; dieser Quellstand wurde in den App-Zweig übernommen. WEB hat genau diesen Stand nach Markus’ Freigabe „Ja, gemeinsam live stellen“ inzwischen veröffentlicht: `origin/main` ist `3604ba4`, Vercel `dpl_DspHipL1e9mfkhdLfnS5TV19NkPX` READY. Der geprüfte Veröffentlichungsbeleg steht unter `/srv/cinegenius/audits/20261114-genie-search-repair/production-receipt.json`. Der App-Quellabgleich ist in `e5db2b9e81361c3222e590c4493770e29fd96bd1` gesichert. Die zuvor übermittelten Noch-nicht-live-Hinweise beschreiben den Stand vor dieser WEB-Veröffentlichung. Diese Übernahme beauftragt keine App- oder Website-Veröffentlichung. Andere App-Arbeiten bleiben erhalten; reale native Sprach- und persönliche Modellprüfungen sind davon getrennt.
 
 Der vorherige App-Abgleich des veröffentlichten `ce37ab6` ist in `8eac132ce6c4d6ffba6d58bdff1377cb27d9ca3f` gesichert. 215 gezielte Fälle, Build, Übersetzungs- und Designprüfung sowie Browserprüfungen in neun Sprachen und 16 simulierte native Sprachantworten bestanden; die 123 nativen Dateien blieben unverändert. Der Beleg unter `/srv/cinegenius/handoffs/20261114-app-unified-search/receipt.json` unterscheidet diese Prüfungen von noch offenen echten Geräteprüfungen und bestehenden Lint-Befunden.

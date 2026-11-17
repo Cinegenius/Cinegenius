@@ -36,7 +36,7 @@ type Prop = {
   [key: string]: unknown;
   id: string; title: string; category: string; vendor: string; location: string;
   dailyRate: number; image: string; condition: string; era: string | null;
-  delivery: boolean; rentalType?: "miete" | "kauf" | "beides"; focalPoint?: { x: number; y: number } | null;
+  delivery: boolean; rentalType?: "miete" | "kauf" | "beides" | "dienstleistung"; focalPoint?: { x: number; y: number } | null;
   description?: string; isReal?: boolean; type?: string; meta?: Record<string, unknown> | null;
   ownerId?: string;
   lat?: number | null; lng?: number | null;
@@ -73,7 +73,7 @@ function PropCard({ p, list, ratingData, myRating, onRate, canRate, isFavorited,
             <p className="mt-0.5 flex min-w-0 items-center gap-1 text-xs text-text-muted"><MapPin size={11} className="shrink-0" aria-hidden="true" /><span className="truncate">{p.location || p.vendor}</span></p>
             <div className="mt-1 flex min-w-0 flex-wrap items-baseline gap-x-2 gap-y-0.5">
               <p className="text-xs font-semibold text-gold [overflow-wrap:anywhere]">{listingPriceLabel(p.dailyRate, { ...p.meta, rental_type: p.rentalType }, "/Tag", locale, market)}</p>
-              <span className="text-[11px] text-text-muted">{navigation(p.rentalType === "beides" ? "both" : p.rentalType === "kauf" ? "buy" : "rent")}</span>
+              <span className="text-[11px] text-text-muted">{navigation(p.rentalType === "dienstleistung" ? "service" : p.rentalType === "beides" ? "both" : p.rentalType === "kauf" ? "buy" : "rent")}</span>
             </div>
           </div>
         </Link>
@@ -105,7 +105,7 @@ function PropCard({ p, list, ratingData, myRating, onRate, canRate, isFavorited,
       <div className="bg-bg-secondary px-3 py-2 border-t border-border/50">
         <div className="flex flex-wrap items-center justify-between gap-x-2 gap-y-1">
           <span className="text-[10px] text-text-muted">{p.condition}</span>
-          <span className="text-[10px] font-medium text-gold">{navigation(p.rentalType === "beides" ? "both" : p.rentalType === "kauf" ? "buy" : "rent")}</span>
+          <span className="text-[10px] font-medium text-gold">{navigation(p.rentalType === "dienstleistung" ? "service" : p.rentalType === "beides" ? "both" : p.rentalType === "kauf" ? "buy" : "rent")}</span>
           {p.era && <span className="text-[10px] text-gold/70">{p.era}</span>}
           <span className="text-[10px] text-text-muted group-hover:text-gold transition-colors">{tp("detailsArrow")}</span>
         </div>
@@ -177,7 +177,7 @@ function PropsInner({ serverListings, serverError = false, facetRows, initialDep
   const selected = marketplaceCategorySelection(department, subcategory);
   const selectedDept = selected.department ? String(selected.department) : null;
   const selectedSub = String(selected.subcategory);
-  const rentalTypeFilter = offer === "miete" || offer === "kauf" ? offer : "alle";
+  const rentalTypeFilter = offer === "miete" || offer === "kauf" || offer === "dienstleistung" ? offer : "alle";
   const sortKey = sort === "price-asc" || sort === "price-desc" ? sort : "featured";
   const geography = useBrowseGeography(sortKey === "featured" && !placeFilters.country && !placeFilters.region && !placeFilters.city && !cityText);
   const viewMode = view === "map" ? "map" : view === "list" ? "list" : "grid";
@@ -212,7 +212,7 @@ function PropsInner({ serverListings, serverError = false, facetRows, initialDep
       if ((selectedDept || selectedSub) && !marketplaceMatches(row.category, selectedDept, selectedSub || null, row.type)) return false;
       if (!["country", "region", "city"].every(kind => matchesPlace(row, kind as "country" | "region" | "city", placeFilters[kind as keyof typeof placeFilters]))) return false;
       if (cityText && !placeSearchMatches(row, cityText) && !row.location.toLocaleLowerCase(locale).includes(cityText.toLocaleLowerCase(locale))) return false;
-      if (rentalTypeFilter !== "alle" && row.rentalType !== "beides" && (row.rentalType ?? "miete") !== rentalTypeFilter) return false;
+      if (rentalTypeFilter !== "alle" && (row.rentalType ?? "miete") !== rentalTypeFilter && !(row.rentalType === "beides" && rentalTypeFilter !== "dienstleistung")) return false;
       if (!search) return true;
       return [row.title, row.location, row.description ?? "", marketplaceSearchTerms(row.category)].some(value => value.toLocaleLowerCase(locale).includes(search))
         || placeSearchMatches(row, search)
@@ -364,7 +364,7 @@ function PropsInner({ serverListings, serverError = false, facetRows, initialDep
       return { owner, ids };
     });
     try {
-      const response = await fetch("/api/favorites", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ listing_id: id }) });
+      const response = await fetch("/api/favorites", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ listing_id: id, action: previous ? "remove" : "add" }) });
       if (!response.ok) throw new Error("favorite_save_failed");
       const result = await response.json();
       if (typeof result.isFavorited !== "boolean") throw new Error("invalid_favorite_response");
@@ -405,7 +405,7 @@ function PropsInner({ serverListings, serverError = false, facetRows, initialDep
     ...(activeSubcategory ? [{ id: "subcategory", label: activeSubcategory.label, onRemove: () => changeCategory(null) }] : []),
     ...(cityText ? [{ id: "city-text", label: `${uiText("Places.city")}: ${cityText}`, onRemove: () => setCityText("") }] : []),
     ...(["country", "region", "city"] as const).flatMap(kind => placeFilters[kind] ? [{ id: `place-${kind}`, label: placeFilters[kind] === UNASSIGNED_COUNTRY ? uiText("Places.countryUnassigned") : placeOptions(facetRows, kind, locale).find(option => option.value === placeFilters[kind])?.label ?? placeFilters[kind], onRemove: () => updatePlaceFilters(kind === "country" ? EMPTY_PLACE_FILTERS : kind === "region" ? { ...placeFilters, region: "", city: "" } : { ...placeFilters, city: "" }) }] : []),
-    ...(rentalTypeFilter !== "alle" ? [{ id: "offer", label: navigation(rentalTypeFilter === "miete" ? "rent" : "buy"), onRemove: () => setOffer("alle") }] : []),
+    ...(rentalTypeFilter !== "alle" ? [{ id: "offer", label: navigation(rentalTypeFilter === "dienstleistung" ? "service" : rentalTypeFilter === "miete" ? "rent" : "buy"), onRemove: () => setOffer("alle") }] : []),
   ];
   const viewControls = <DirectoryViewControls value={viewMode} onChange={setView} />;
   return <div className="min-h-screen mobile-bottom-nav-clear">
@@ -413,7 +413,7 @@ function PropsInner({ serverListings, serverError = false, facetRows, initialDep
       <MobileBrowseControls preference={<BrowseGeography geography={geography} />} query={query} onQueryChange={setQuery} searchPlaceholder={t("searchPlaceholder")} sortValue={sortKey} sortOptions={sortOptions} onSortChange={value => { geography.setEnabled(false); setSort(value as MarketplaceSort); }} categoryLabel={navigation("category")} allCategoryLabel={navigation("allCategories")} categories={departments.map(row => ({ value: row.id, label: row.label }))} categoryValue={selectedDept ?? ""} onCategoryChange={value => changeCategory(value || null)} categoryPlacement="filters" resultCount={browseLoading ? null : resultCount} resultSummary={t("results", { count: resultCount })} viewControls={viewControls} filterCount={chips.length} chips={chips} onReset={clearAll} resetLabel={t("clearAllFilters")} showResultsLabel={t("results", { count: resultCount })}>
       <PlaceFilters rows={facetRows} value={placeFilters} onChange={updatePlaceFilters} />
       {activeDepartment && <MobileFilterField label={navigation("subcategory")}><MobileFilterSelect value={selectedSub} onChange={value => changeCategory(selectedDept, value)} placeholder={navigation("allInCategory", { category: activeDepartment.label })} options={activeDepartment.groups.map(row => ({ value: row.id, label: row.label }))} /></MobileFilterField>}
-      <MobileFilterField label={navigation("offerType")}><MobileFilterSelect value={rentalTypeFilter === "alle" ? "" : rentalTypeFilter} onChange={value => setOffer(value === "miete" || value === "kauf" ? value : "alle")} placeholder={uiText("common.all")} options={[{ value: "miete", label: navigation("rent") }, { value: "kauf", label: navigation("buy") }].filter(option => facetRows.some(row => row.rentalType === option.value || row.rentalType === "beides"))} /></MobileFilterField>
+      <MobileFilterField label={navigation("offerType")}><MobileFilterSelect value={rentalTypeFilter === "alle" ? "" : rentalTypeFilter} onChange={value => setOffer(value === "miete" || value === "kauf" || value === "dienstleistung" ? value : "alle")} placeholder={uiText("common.all")} options={[{ value: "miete", label: navigation("rent") }, { value: "kauf", label: navigation("buy") }, { value: "dienstleistung", label: navigation("service") }].filter(option => facetRows.some(row => row.rentalType === option.value || (row.rentalType === "beides" && option.value !== "dienstleistung")))} /></MobileFilterField>
     </MobileBrowseControls>
 
     <div ref={resultsRef} className="site-container scroll-mt-24 py-4 sm:py-6">

@@ -1,0 +1,92 @@
+# Guided Smart discovery — 17 November 2026
+
+## Scope and access
+
+This is an expansion of the existing Smart result experience, not a new search
+provider. Smart remains admin-only on the server and in the UI. Ordinary members
+retain the static development preview; guests retain its notice. Locations remains
+the homepage default. No database migration, model change, new paid integration,
+persistent search history or booking action is introduced.
+
+## Website flow
+
+- On the Smart homepage tab and empty Smart search, three translated examples fill
+  the existing input. They do not submit, navigate or invoke the AI. Users can edit
+  them before explicitly searching.
+- Existing plan interpretation, quantities, independent/shared places, requirements,
+  exclusions, complete production crew selection and nearby alternatives remain.
+  Full production starters also have deterministic patterns for the eight recently
+  added languages. Unknown/qualified sentences continue through the existing model;
+  these patterns do not guess away unfamiliar words.
+- The plan editor is collapsed under “Deine Suche ansehen & anpassen”. Its existing
+  per-wish editing and contextual follow-ups remain available, including unsent edits.
+- A single account/plan/locale-scoped explorer owns results for both the map and list.
+  Areas, individual wishes and available crew/marketplace categories can be toggled.
+  Active choices are removable and there is one reset. Category choices come only
+  from the permission-projected loaded results. Selecting multiple categories within
+  an area is OR; filters across different dimensions are AND.
+- Areas retain their shared colors: crew lime, locations orange, marketplace violet,
+  companies blue. Other existing area colors remain. No homepage/brand redesign.
+- Results are grouped by area and wish/production department. Explicit wishes precede
+  recommendations within the area, nonempty groups precede empty groups, local
+  matches precede nearby alternatives. Server relevance/distance order within each
+  group is preserved. The first three nonempty groups per area start expanded, with
+  three small uncropped previews each. All remaining groups can be opened; “more”
+  first reveals loaded rows and then requests the group's next page.
+- Pan/zoom does not call the AI, request results or silently change filters. Applying
+  a map area explicitly filters the current selection by its public map positions.
+  It does not change the search's original cities. Changing area/category choices
+  preserves the map viewport; hiding the map keeps it mounted. Clearing the applied
+  bounds fits the remaining selection again.
+- Results without a public map position stay in the list, including when bounds are
+  applied, with an explicit notice. Never infer precise coordinates, create pins for
+  private locations or imply that unpositioned entries are inside the selected area.
+- Counts deduplicate type/id across wishes. The map includes all loaded matching rows,
+  not only the three cards currently expanded. A partial-results notice explains that
+  filters apply to the loaded selection until more pages are requested.
+
+## Additive API contract for native clients
+
+The existing plan versions, request fields, combined result mode and per-group
+cursors remain unchanged. `SearchResult` gains optional public facts:
+
+```ts
+facets?: { departments?: string[]; marketplace?: string };
+evidence?: "role" | "title" | "requirements";
+```
+
+`departments` and `marketplace` use existing stable catalogue IDs; translate display
+labels with the existing dictionaries. `role` means a matching declared public role,
+not verified employment, expertise or the primary occupation. `title` means the
+public result title contains the term. `requirements` describes a match to public
+provider information, not an independent certification. Missing fields mean no
+such evidence/category can be asserted. Never derive permissions from these fields.
+
+All fields are populated only after the existing current privacy/visibility
+projection. Ghost, protected media, map opt-out, linked identity restrictions and
+approximate location areas retain their existing checks. List/map pagination still
+rechecks admin and content permissions. No authorization decision is cached here.
+
+For v2, reuse the combined response's map groups as the complete loaded pool for
+both views. The existing server bounds each map page to 180 rows per group. Reveal
+small slices locally, then use the group's existing rank/nearby/segment cursor with
+`view: "map"`; merge by type/id only within that group. A changed local/nearby phase
+replaces that group's previous phase. Old v1 links can fetch map groups separately.
+
+Keep filter and view state ephemeral and tied to the authenticated account and
+search. Account/plan changes abort in-flight reads and discard private results.
+401/403 discards both views and restores the access notice. A timeout/ordinary error
+keeps the confirmed rows, provides retry and does not trigger a paid interpretation.
+The browser imposes a 35-second request timeout. An unsent new question is retained.
+
+## Localization and verification
+
+All new copy is in the existing 17 locale catalogs. No per-page translation calls,
+additional locale loading system or automatic member-content translation was added.
+
+See `docs/test-reports/smart-discovery-2026-11-17.md` for final checks and limits.
+Native implementation and actual iPhone/iPad/Xcode checks are coordinated through
+APP Entwicklung. Browser simulations are not native-device validation.
+
+This document describes the prepared source change, not a production release.
+Publication requires the operator's specific request and the guarded release path.

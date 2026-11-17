@@ -1,7 +1,6 @@
 import {getTranslations} from "next-intl/server";
 import Link from "next/link";
 import AnalyticsSettingsButton from "@/components/AnalyticsSettingsButton";
-import type { Metadata } from "next";
 import { getTranslations as getMetadataTranslations } from "next-intl/server";
 
 export async function generateMetadata(): Promise<import("next").Metadata> {
@@ -22,16 +21,12 @@ export default async function DatenschutzPage() {
     "Stripe": uiText("Ui.text_961a6062ba1ba2"),
     "Sentry": uiText("Ui.text_5ece526b2e72c2"),
     "Resend": uiText("Ui.text_1f94843777aed8"),
-    "Vercel Analytics": uiText("Ui.text_3f1ff89269fcea"),
-    "Vercel Speed Insights": uiText("Ui.text_52862c368ba698"),
     "OpenStreetMap Nominatim": uiText("Ui.text_8cef47f31aa306"),
     "Authentifizierung / Login": uiText("Ui.text_a5373ffc8409d2"),
     "Datenbank & Dateispeicher": uiText("Ui.text_1cbf6f1bafcd28"),
     "Hosting & CDN": uiText("Ui.text_da77aba39cd821"),
     "Zahlungsabwicklung": uiText("Ui.text_6f48fbdba30ab1"),
     "E-Mail-Versand": uiText("Ui.text_aede0443695428"),
-    "Nutzungsstatistiken (cookielos)": uiText("Ui.text_7872cd1b8aa7c3"),
-    "Performance-Messung (cookielos)": uiText("Ui.text_888d385c2be74b"),
     "Geocoding von Städtenamen": uiText("Ui.text_9e98ad5683d751"),
     "USA": uiText("Ui.text_aa5ab35a9174c2"),
     "EU (Frankfurt)": uiText("Ui.text_fc3782bd2fd753"),
@@ -66,7 +61,7 @@ export default async function DatenschutzPage() {
 
           <section>
             <h2 className="text-base font-semibold text-text-primary mb-3">{uiText("Ui.text_ebb2bcce0d2b33")}</h2>
-            <p>{uiText.rich("Ui.text_6c75d83671505b", { part1: () => (<br />), part2: () => (<br />), part3: chunks => (<a href="mailto:cinegenius.co@gmail.com" className="text-gold hover:underline">{chunks}</a>), part4: () => (<br />), part5: chunks => (<a href="tel:+491713866624" className="text-gold hover:underline">{chunks}</a>) })}</p>
+            <p>{uiText.rich("Ui.text_6c75d83671505b", { part1: () => (<br />), part2: () => (<br />), part3: chunks => (<a href="mailto:hello@cinegenius.co" className="text-gold hover:underline">{chunks}</a>), part4: () => (<br />), part5: chunks => (<a href="tel:+491713866624" className="text-gold hover:underline">{chunks}</a>) })}</p>
           </section>
 
           <section>
@@ -89,8 +84,6 @@ export default async function DatenschutzPage() {
                     ["Stripe", "Zahlungsabwicklung", "USA"],
                     ["Sentry", t("sentryPurpose"), "USA"],
                     ["Resend", "E-Mail-Versand", "USA"],
-                    ["Vercel Analytics", "Nutzungsstatistiken (cookielos)", "USA"],
-                    ["Vercel Speed Insights", "Performance-Messung (cookielos)", "USA"],
                     ["OpenStreetMap Nominatim", "Geocoding von Städtenamen", "UK / EU"],
                     ["OpenFreeMap", uiText("directoryMap.providerPurpose"), uiText("directoryMap.providerRegion")],
                   ].map(([d, z, s]) => (
@@ -124,6 +117,7 @@ export default async function DatenschutzPage() {
             <p>{uiText("PrivacySettings.ghostHelp")}</p>
             <p className="mt-2">{uiText("PrivacySettings.locationHelp")}</p>
             <p className="mt-2">{uiText("PrivacySettings.limits")}</p>
+            <p className="mt-2" lang="de">{t("pronounsDisclosure")}</p>
           </section>
 
           <section>
@@ -174,11 +168,6 @@ export default async function DatenschutzPage() {
           <section>
             <h2 className="text-base font-semibold text-text-primary mb-3">{uiText("Ui.text_e966e1c8944555")}</h2>
             <p>{uiText.rich("Ui.text_2f87ba40e8a08c", { value1: () => (t("resendDisclosure")), part2: () => (<br />), part3: chunks => (<a href="https://resend.com/privacy" target="_blank" rel="noopener noreferrer" className="text-gold hover:underline">{chunks}</a>) })}</p>
-          </section>
-
-          <section>
-            <h2 className="text-base font-semibold text-text-primary mb-3">{uiText("Ui.text_3cd4554dd7ab2f")}</h2>
-            <p>{uiText.rich("Ui.text_fb3764d3dac6f5", { part1: chunks => (<strong className="text-text-primary">{chunks}</strong>), part2: chunks => (<strong className="text-text-primary">{chunks}</strong>), part3: chunks => (<strong className="text-text-primary">{chunks}</strong>), part4: () => (<br />), part5: chunks => (<a href="https://vercel.com/docs/analytics/privacy-policy" target="_blank" rel="noopener noreferrer" className="text-gold hover:underline">{chunks}</a>) })}</p>
           </section>
 
           <section>
@@ -253,13 +242,13 @@ export default async function DatenschutzPage() {
               <li>{uiText.rich("Ui.text_fc5b657f756222", { part1: chunks => (<strong className="text-text-primary">{chunks}</strong>) })}</li>
               <li>{uiText.rich("Ui.text_351e16f55e9108", { part1: chunks => (<strong className="text-text-primary">{chunks}</strong>) })}</li>
             </ul>
-            <p className="mt-3">{uiText.rich("Ui.text_11ecf3b1603bc3", { part1: chunks => (<strong className="text-text-primary">{chunks}</strong>), part2: () => (<br />), part3: chunks => (<a href="mailto:cinegenius.co@gmail.com" className="text-gold hover:underline">{chunks}</a>) })}</p>
+            <p className="mt-3">{uiText.rich("Ui.text_11ecf3b1603bc3", { part1: chunks => (<strong className="text-text-primary">{chunks}</strong>), part2: () => (<br />), part3: chunks => (<a href="mailto:hello@cinegenius.co" className="text-gold hover:underline">{chunks}</a>) })}</p>
             <p className="mt-3">{uiText.rich("Ui.text_dec738ce27179f", { part1: () => (<br />), part2: chunks => (<strong className="text-text-primary">{chunks}</strong>), part3: () => (<br />), part4: chunks => (<a href="https://www.lda.bayern.de" target="_blank" rel="noopener noreferrer" className="text-gold hover:underline">{chunks}</a>) })}</p>
           </section>
 
           <section>
             <h2 className="text-base font-semibold text-text-primary mb-3">{uiText("Ui.text_3e62bfdd32525c")}</h2>
-            <p>{uiText.rich("Ui.text_7fb3434c1d331e", { part1: chunks => (<a href="mailto:cinegenius.co@gmail.com" className="text-gold hover:underline">{chunks}</a>) })}</p>
+            <p>{uiText.rich("Ui.text_7fb3434c1d331e", { part1: chunks => (<a href="mailto:hello@cinegenius.co" className="text-gold hover:underline">{chunks}</a>) })}</p>
           </section>
 
           <section>
@@ -269,7 +258,7 @@ export default async function DatenschutzPage() {
 
           <section>
             <h2 className="text-base font-semibold text-text-primary mb-3">{uiText("Ui.text_da1aa5f0d7763e")}</h2>
-            <p>{uiText.rich("Ui.text_d47b701f28bc95", { part1: () => (<br />), part2: () => (<br />), part3: chunks => (<a href="mailto:cinegenius.co@gmail.com" className="text-gold hover:underline">{chunks}</a>) })}</p>
+            <p>{uiText.rich("Ui.text_d47b701f28bc95", { part1: () => (<br />), part2: () => (<br />), part3: chunks => (<a href="mailto:hello@cinegenius.co" className="text-gold hover:underline">{chunks}</a>) })}</p>
           </section>
 
         </div>

@@ -104,6 +104,7 @@ export default function Footer() {
           <div className="flex max-w-full flex-wrap justify-center gap-x-6 gap-y-2">
             <AnalyticsSettingsButton />
             <Link href="/bildrechte" prefetch={false} className="inline-flex min-h-11 items-center text-sm text-text-muted hover:text-text-secondary">{rights("pageTitle")}</Link>
+            <Link href="/melden" prefetch={false} className="inline-flex min-h-11 items-center text-sm text-text-muted hover:text-text-secondary">{uiText("PublicReport.footerLink")}</Link>
             {[
               { labelKey: "links_privacy", href: "/datenschutz" },
               { labelKey: "links_terms", href: "/agb" },

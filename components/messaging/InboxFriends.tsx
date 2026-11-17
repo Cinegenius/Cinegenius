@@ -1,5 +1,7 @@
 "use client";
 
+import type { OccupationForm } from "@/lib/occupation-form";
+
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { useAuth } from "@clerk/nextjs";
 import { useLocale, useTranslations } from "next-intl";
@@ -9,7 +11,7 @@ import { useFormNavigation } from "@/contexts/FormDraftContext";
 import { navigateMessageView } from "@/lib/message-navigation";
 import { uiErrorMessage } from "@/lib/ui-error-message";
 
-type Contact = { friendship_id: string; user_id: string; display_name: string; avatar_url: string | null; role: string };
+type Contact = { friendship_id: string; user_id: string; display_name: string; avatar_url: string | null; role: string; occupationForm?: OccupationForm };
 
 /** Only accepted connections belong here; incoming requests live in Mitteilungen. */
 export default function InboxFriends() {
@@ -111,7 +113,7 @@ export default function InboxFriends() {
       {error && <div role="alert" className="text-sm text-red-400"><p>{error}</p>{failure?.kind === "load" && <button type="button" onClick={() => void load()} className="min-h-11 text-gold">{t("retry")}</button>}</div>}
       {loading && !ready ? <p role="status" className="py-8 text-sm text-text-muted">{t("loading")}</p> : ready && !visible.length ? <div className="space-y-3 py-8 text-center text-sm text-text-muted"><Users size={26} className="mx-auto" /><p>{query ? messaging("noPeople") : t("empty")}</p></div> : visible.map(contact => <ContactCard
         key={`${scope}:${contact.friendship_id}`} contact={contact} pending={pending.has(`${scope}:${contact.friendship_id}`)} error={error} onRemove={remove}
-        messageHref={`/messages?view=friends&to=${encodeURIComponent(contact.user_id)}`}
+        messageHref={`/messages?to=${encodeURIComponent(contact.user_id)}`}
         onMessage={() => { if (userId) leave(() => navigateMessageView(window, userId, { recipientId: contact.user_id })); }}
       />)}
     </div>

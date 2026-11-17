@@ -116,6 +116,14 @@ function productionSearchPlan(text: string): SearchPlan | null {
     /^(.+?)(?:ban|ben)\s+forgatok$/i,
     /^ik\s+(?:film|draai|ga\s+filmen)\s+in\s+(.+)$/i,
     /^jag\s+(?:filmar|ska\s+filma)\s+i\s+(.+)$/i,
+    /^je\s+(?:tourne|prévois\s+un\s+tournage)\s+à\s+(.+)$/i,
+    /^(?:kręcę|planuję\s+zdjęcia)\s+w\s+(.+)$/i,
+    /^estou\s+a\s+filmar\s+em\s+(.+)$/i,
+    /^我(?:计划)?在(.+?)(?:拍摄|拍片)[。]?$/u,
+    /^(.+?)で撮影を(?:計画しています|しています)[。]?$/u,
+    /^(.+?)에서\s*촬영을\s*(?:계획하고\s*있어요|하고\s*있어요)$/u,
+    /^я\s+(?:планирую\s+съёмки|снимаю)\s+в\s+(.+)$/i,
+    /^я\s+(?:планую\s+зйомки|знімаю)\s+[ув]\s+(.+)$/i,
   ].map(pattern => pattern.exec(request)).find(Boolean);
   if (!german && !english && !generic) return null;
   const city = german ? german[1] || german[3] : english ? english[2] : generic![1];

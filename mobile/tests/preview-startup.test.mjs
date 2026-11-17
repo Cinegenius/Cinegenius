@@ -1,4 +1,5 @@
 import test from 'node:test';
+import { SUPPORTED_LOCALES } from '../../lib/i18n/locales.ts';
 import assert from 'node:assert/strict';
 import { cp, mkdir, mkdtemp, readFile, rm, stat } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
@@ -36,7 +37,7 @@ test('prepared remote sign-in entry satisfies the native local-start-file requir
     const voice = await readFile(join(fixture, 'mobile/www/voice.js'), 'utf8');
     assert.ok(voice.includes(JSON.stringify(new URL(config.server.url).origin)));
     assert.ok(!voice.includes('CINEGENIUS_VOICE_CONFIG'));
-    for (const locale of ['de','en','es','it','cs','hu','nl','nl-BE','sv']) {
+    for (const locale of SUPPORTED_LOCALES) {
       const catalog = JSON.parse(await readFile(join(fixture, 'messages', `${locale}.json`), 'utf8'));
       const permissions = await readFile(join(fixture, 'mobile/ios/App/App/NativeStrings', `${locale}.lproj/InfoPlist.strings`), 'utf8');
       assert.ok(permissions.includes(`"NSMicrophoneUsageDescription" = ${JSON.stringify(catalog.NativeRoomScanner.microphoneUsage)};`));
@@ -46,9 +47,12 @@ test('prepared remote sign-in entry satisfies the native local-start-file requir
     const { resolveLocale } = await import(`data:text/javascript;base64,${Buffer.from(localeSource).toString('base64')}`);
     assert.equal(resolveLocale('nl-BE', 'it-IT', 'DE'), 'nl-BE', 'the packaged resolver preserves a manual language');
     assert.equal(resolveLocale(undefined, 'it-IT', 'DE'), 'it', 'browser language wins over country');
-    assert.equal(resolveLocale(undefined, 'fr', 'IT'), 'it', 'country is only the last available fallback');
-    assert.equal(resolveLocale(undefined, 'fr', 'CH'), 'de', 'multilingual countries do not imply a language');
-    assert.equal(resolveLocale(undefined, 'fr'), 'de', 'offline rendering does not invent a request country');
+    assert.equal(resolveLocale(undefined, 'zz', 'IT'), 'it', 'country is only the last available fallback');
+    assert.equal(resolveLocale(undefined, 'zz', 'CH'), 'de', 'multilingual countries do not imply a language');
+    assert.equal(resolveLocale(undefined, 'zz'), 'de', 'offline rendering does not invent a request country');
+    assert.equal(resolveLocale('pt-BR', 'de'), 'pt-PT');
+    assert.equal(resolveLocale(undefined, 'zh-Hans-CN'), 'zh-Hans');
+    for (const locale of SUPPORTED_LOCALES) assert.equal(resolveLocale(locale, 'de'), locale);
   } finally {
     await rm(fixture, { recursive: true, force: true });
   }

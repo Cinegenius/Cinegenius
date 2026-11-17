@@ -4,7 +4,7 @@ import GenieWritingAssistant from "@/components/GenieWritingAssistant";
 
 import PlaceField from "@/components/PlaceField";
 import { LOCATION_ROOMS } from "@/lib/location-rooms";
-import { taxonomyLabel } from "@/lib/departments";
+import { getDepartmentRoleFormLabels, getOccupationSearchTerms, resolveDepartmentOccupation, taxonomyLabel } from "@/lib/departments";
 import { projectTypeLabel, roleOptionMatchesSearch } from "@/lib/project-type-labels";
 import ContentUsageNotice from "@/components/ContentUsageNotice";
 import { useTranslations , useLocale } from "next-intl";
@@ -18,7 +18,7 @@ import UnoptimizedImage from "@/components/UnoptimizedImage";
 
 import { useFormDraft } from "@/lib/use-form-draft";
 import FormDraftStatus from "@/components/FormDraftStatus";
-import React, { useState, useRef, useEffect } from "react";
+import React, { useMemo, useState, useRef, useEffect } from "react";
 import { compressImage, MAX_FUNCTION_UPLOAD_BYTES, safeObjectURL } from "@/lib/compressImage";
 
 import { useAuth } from "@clerk/nextjs";
@@ -77,6 +77,7 @@ function getLocalizedGroups(translate: (key: string) => string): Group[] {
     color: "text-violet-400",
     border: "border-violet-500/30",
     items: [
+      { id: "mk_dienstleistungen", label: translate("MarketplaceOffer.service"), sub: translate("MarketplaceOffer.serviceHint"), icon: Wrench, type: "prop", category: "dienstleistungen", color: "text-gold", bg: "bg-gold/10 border-gold/20" },
       // Film Equipment
       { id: "mk_fahrzeuge",           label: translate("Ui.text_3013f219634d4b"),        sub: translate("Ui.text_bd3383ef531ec9"),       icon: Car,         type: "vehicle", category: "Bild-Fahrzeug",          color: "text-orange-400",  bg: "bg-orange-500/10 border-orange-500/20" },
       { id: "mk_produktionsfahrzeug", label: translate("Ui.text_b1ea23191f1202"), sub: translate("Ui.text_08478634222825"),     icon: Truck,       type: "vehicle", category: "Produktionsfahrzeug",     color: "text-cyan-400",    bg: "bg-cyan-500/10 border-cyan-500/20" },
@@ -228,8 +229,21 @@ function RoleDropdown({
 
   const selected = options.find((o) => o.label === value);
   const locale = useLocale();
+  const taxonomyText = useTranslations("Taxonomy");
+  const searchTerms = useMemo(() => new Map(options.map(option => {
+    const occupation = resolveDepartmentOccupation(option.label);
+    const forms = occupation ? getDepartmentRoleFormLabels(occupation.department.id, occupation.role, locale, undefined, taxonomyText) : [];
+    return [option.id, [...getOccupationSearchTerms(option.label), ...forms]];
+  })), [options, locale, taxonomyText]);
+  const secondaryLabel = (option: RoleOption) => {
+    if (!option.labelEn) return "";
+    const localized = taxonomyLabel(option.labelEn, uiText);
+    // Old English metadata remains searchable; display only a distinct,
+    // translated catalogue label beside the localized main title.
+    return localized !== option.labelEn && localized !== taxonomyLabel(option.label, uiText) ? localized : "";
+  };
   const filteredOptions = options.filter(option =>
-    roleOptionMatchesSearch(option, query, value => taxonomyLabel(value, uiText), locale),
+    roleOptionMatchesSearch(option, query, value => taxonomyLabel(value, uiText), locale, searchTerms.get(option.id)),
   );
 
   return (
@@ -279,8 +293,8 @@ function RoleDropdown({
               >
                 <span className="min-w-0">{taxonomyLabel(opt.label, uiText)}{opt.description && <span className="mt-0.5 block whitespace-normal text-[10px] leading-4 text-text-muted">{taxonomyLabel(opt.description, uiText)}</span>}</span>
                 <span className="flex items-center gap-2 shrink-0 ml-2">
-                  {opt.labelEn && (
-                    <span className="text-[11px] text-text-muted hidden sm:block">{opt.labelEn}</span>
+                  {secondaryLabel(opt) && (
+                    <span className="text-[11px] text-text-muted hidden sm:block">{secondaryLabel(opt)}</span>
                   )}
                   {opt.label === value && <CheckCircle size={13} className="text-gold" />}
                 </span>

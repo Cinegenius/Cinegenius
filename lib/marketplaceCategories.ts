@@ -3,6 +3,7 @@ export type MarketplaceItem = { label: string; value: string };
 export type MarketplaceGroup = { id: string; label: string; items: MarketplaceItem[] };
 export type MarketplaceDept = { id: string; label: string; iconName: string; color: string; legacyValues: string[]; groups: MarketplaceGroup[] };
 export const DEPARTMENTS: MarketplaceDept[] = [
+  {"id": "dienstleistungen", "label": "Dienstleistungen", "iconName": "Wrench", "color": "slate", "legacyValues": [], "groups": [{"id": "dienstleistungen-kamera", "label": "Kamera, Steadicam & Fotografie", "items": [{"label": "Kamera, Steadicam & Fotografie", "value": "dienstleistungen-kamera"}]}, {"id": "dienstleistungen-licht", "label": "Licht, Pultbedienung & Grip", "items": [{"label": "Licht, Pultbedienung & Grip", "value": "dienstleistungen-licht"}]}, {"id": "dienstleistungen-ton", "label": "Ton & Audio", "items": [{"label": "Ton & Audio", "value": "dienstleistungen-ton"}]}, {"id": "dienstleistungen-kostuem-maske", "label": "Kostüm, Maske & Styling", "items": [{"label": "Kostüm, Maske & Styling", "value": "dienstleistungen-kostuem-maske"}]}, {"id": "dienstleistungen-handwerk", "label": "Handwerk & Setbau", "items": [{"label": "Handwerk & Setbau", "value": "dienstleistungen-handwerk"}]}, {"id": "dienstleistungen-produktion", "label": "Produktion & Crew-Service", "items": [{"label": "Produktion & Crew-Service", "value": "dienstleistungen-produktion"}]}, {"id": "dienstleistungen-postproduktion", "label": "Postproduktion & Content", "items": [{"label": "Postproduktion & Content", "value": "dienstleistungen-postproduktion"}]}, {"id": "dienstleistungen-catering", "label": "Crew-Catering & Verpflegung", "items": [{"label": "Crew-Catering & Verpflegung", "value": "dienstleistungen-catering"}]}, {"id": "dienstleistungen-sonstige", "label": "Weitere Dienstleistungen", "items": [{"label": "Weitere Dienstleistungen", "value": "dienstleistungen-sonstige"}]}]},
   { id: "licht", label: "Licht & Lichtsteuerung", iconName: "Lightbulb", color: "amber", legacyValues: [], groups: [
     {"id": "licht-quellen", "label": "Scheinwerfer und Leuchten", "items": [{"label": "Scheinwerfer und Leuchten", "value": "licht-quellen"}]},
     {"id": "licht-steuerung", "label": "Lichtpulte und DMX-Steuerung", "items": [{"label": "Lichtpulte und DMX-Steuerung", "value": "licht-steuerung"}]},
@@ -149,6 +150,12 @@ export const DEPARTMENTS: MarketplaceDept[] = [
   ] },
 ];
 const LEGACY_ALIASES: Record<string, {department:string;subcategory:string|null}> = {
+  dienstleistungen: { department: "dienstleistungen", subcategory: null },
+  "Crew Catering": { department: "dienstleistungen", subcategory: "dienstleistungen-catering" },
+  "Steadicam Operator": { department: "dienstleistungen", subcategory: "dienstleistungen-kamera" },
+  "Stady Cam Kameramann": { department: "dienstleistungen", subcategory: "dienstleistungen-kamera" },
+  "Pult Operator": { department: "dienstleistungen", subcategory: "dienstleistungen-licht" },
+  "Pult Operater": { department: "dienstleistungen", subcategory: "dienstleistungen-licht" },
   "kamera": {"department": "kamera", "subcategory": null},
   "Kameraequipment": {"department": "kamera", "subcategory": null},
   "filmtechnik": {"department": "kamera", "subcategory": null},
@@ -425,6 +432,38 @@ export function marketplaceMatches(category:unknown,department:string|null,subca
 }
 export function marketplaceSearchTerms(category:string):string {const resolved=marketplaceCategory(category);const d=DEPARTMENTS.find(d=>d.id===resolved?.department);return [category,d?.label,d?.groups.find(g=>g.id===resolved?.subcategory)?.label,...Object.entries(SEARCH_SYNONYMS).filter(([,values])=>values.some(v=>{const r=marketplaceCategory(v);return r?.subcategory && r.subcategory===resolved?.subcategory;})).map(([key])=>key)].filter(Boolean).join(' ');}
 export const SEARCH_SYNONYMS: Record<string, string[]> = {
+  "kameramann": ["dienstleistungen-kamera"],
+  "kamerafrau": ["dienstleistungen-kamera"],
+  "kameraoperator": ["dienstleistungen-kamera"],
+  "steadicam-operator": ["dienstleistungen-kamera"],
+  "stady": ["dienstleistungen-kamera"],
+  "steadycam": ["dienstleistungen-kamera"],
+  "steadicam": ["dienstleistungen-kamera"],
+  "operator": ["dienstleistungen-kamera", "dienstleistungen-licht", "dienstleistungen-ton"],
+  "operater": ["dienstleistungen-kamera", "dienstleistungen-licht", "dienstleistungen-ton"],
+  "pult": ["dienstleistungen-licht"],
+  "pultoperator": ["dienstleistungen-licht"],
+  "pultoperater": ["dienstleistungen-licht"],
+  "beleuchter": ["dienstleistungen-licht"],
+  "oberbeleuchter": ["dienstleistungen-licht"],
+  "gaffer": ["dienstleistungen-licht"],
+  "tonmeister": ["dienstleistungen-ton"],
+  "tonassistenz": ["dienstleistungen-ton"],
+  "maskenbildner": ["dienstleistungen-kostuem-maske"],
+  "schneider": ["dienstleistungen-kostuem-maske"],
+  "kostumbildner": ["dienstleistungen-kostuem-maske"],
+  "handwerker": ["dienstleistungen-handwerk"],
+  "schreiner": ["dienstleistungen-handwerk"],
+  "tischler": ["dienstleistungen-handwerk"],
+  "setbau": ["dienstleistungen-handwerk"],
+  "fahrer": ["dienstleistungen-produktion"],
+  "produktionsleitung": ["dienstleistungen-produktion"],
+  "crew": ["dienstleistungen-produktion", "dienstleistungen-catering"],
+  "cutter": ["dienstleistungen-postproduktion"],
+  "editor": ["dienstleistungen-postproduktion"],
+  "colorist": ["dienstleistungen-postproduktion"],
+  "koch": ["dienstleistungen-catering"],
+  "craft": ["dienstleistungen-catering"],
   // Küche / Essen
   löffel:        ["kueche"],
   gabel:         ["kueche"],
@@ -505,7 +544,7 @@ export const SEARCH_SYNONYMS: Record<string, string[]> = {
   garderobenständer: ["kostuem-staender"],
   clothingrail: ["kostuem-staender"],
   maskenstuhl: ["maske-stuehle"],
-  catering: ["catering-kuechen"],
+  catering: ["catering-kuechen", "dienstleistungen-catering"],
 };
 
 /** Candidate stored values for search, using explicit aliases plus translated display terms. */

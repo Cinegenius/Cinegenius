@@ -1,0 +1,3809 @@
+{
+  "produktion": {
+    "Produzent/in": [
+      "Producer",
+      "Produzent / Produzentin",
+      "Produzent",
+      "Produzentin"
+    ],
+    "Executive Producer": [],
+    "Co-Producer": [],
+    "Associate Producer": [],
+    "Junior Producer": [],
+    "Line Producer": [],
+    "Herstellungsleiter (HL)": [
+      "Herstellungsleitung (HL)",
+      "Herstellungsleiterin (HL)",
+      "Herstellungsleiter",
+      "Herstellungsleiterin"
+    ],
+    "Assistent*in der Herstellungsleitung": [
+      "Assistenz der Herstellungsleitung",
+      "Assistent der Herstellungsleitung",
+      "Assistentin der Herstellungsleitung"
+    ],
+    "Produktionsleiter (PL)": [
+      "Produktionsleitung (PL)",
+      "Produktionsleiterin (PL)",
+      "Produktionsleiter",
+      "Produktionsleiterin"
+    ],
+    "Produktionsleiter*in (Sender)": [
+      "Produktionsleitung (Sender)",
+      "Produktionsleiter (Sender)",
+      "Produktionsleiterin (Sender)"
+    ],
+    "Assistent*in des*der Produktionsleiter*in": [
+      "Assistenz der Produktionsleitung",
+      "Assistent des Produktionsleiters",
+      "Assistentin der Produktionsleiterin",
+      "Assistent der Produktionsleitung",
+      "Assistentin der Produktionsleitung"
+    ],
+    "Disponent*in / Produktionsplaner*in": [
+      "Disposition / Produktionsplanung",
+      "Disponent / Disponentin · Produktionsplaner / Produktionsplanerin",
+      "Disponent / Produktionsplaner",
+      "Disponentin / Produktionsplanerin",
+      "Disponent",
+      "Disponentin",
+      "Produktionsplaner",
+      "Produktionsplanerin",
+      "Disponent · Produktionsplaner",
+      "Disponentin · Produktionsplanerin"
+    ],
+    "Kalkulationserstellung": [
+      "Produktionskalkulator / Produktionskalkulatorin",
+      "Produktionskalkulator",
+      "Produktionskalkulatorin"
+    ],
+    "Production Supervisor": [],
+    "Assistent*in des Production Supervisors": [
+      "Assistenz des Production Supervisors",
+      "Assistent des Production Supervisors",
+      "Assistentin des Production Supervisors"
+    ],
+    "Studioleiter*in": [
+      "Studioleitung",
+      "Studioleiter",
+      "Studioleiterin"
+    ],
+    "Produktionskoordinator": [
+      "Produktionskoordination",
+      "Produktionskoordinator / Produktionskoordinatorin",
+      "Produktionskoordinatorin"
+    ],
+    "Assistent*in der Produktionskoordinator*in": [
+      "Assistenz der Produktionskoordination",
+      "Assistent des Produktionskoordinators",
+      "Assistentin der Produktionskoordinatorin",
+      "Assistent der Produktionskoordination",
+      "Assistentin der Produktionskoordination"
+    ],
+    "Produktionsassistenz (Set)": [],
+    "Produktionsassistenz (Office)": [],
+    "2. Produktionsassistenz": [],
+    "Teamassistent*in": [
+      "Teamassistenz",
+      "Teamassistent",
+      "Teamassistentin"
+    ],
+    "Personal Assistant (persönliche Assistenz)": [],
+    "Persönliche Assistenz der Produktion": [],
+    "Persönliche Assistenz für Schauspieler*innen (Talent Assistant)": [
+      "Persönliche Assistenz für Schauspielende (Talent Assistant)",
+      "Persönliche Assistenz für Schauspieler (Talent Assistant)",
+      "Persönliche Assistenz für Schauspielerinnen (Talent Assistant)"
+    ],
+    "Assistent*in der/des Produzent*in": [
+      "Producer-Assistenz",
+      "Assistent des Produzenten",
+      "Assistentin der Produzentin",
+      "Producer-Assistent",
+      "Producer-Assistentin"
+    ],
+    "Executive Assistant / Geschäftsführungsassistenz": [],
+    "Office Assistant / Büroassistenz": [],
+    "Accommodation Coordinator": [],
+    "Travel Coordinator": [],
+    "Assistent*in der Reisekoordinator*in": [
+      "Assistenz der Reisekoordination",
+      "Assistent des Reisekoordinators",
+      "Assistentin der Reisekoordinatorin",
+      "Assistent der Reisekoordination",
+      "Assistentin der Reisekoordination"
+    ],
+    "Health and Safety Coordinator": [],
+    "ADR Coordinator": [],
+    "Location Manager": [],
+    "Location Scout": [],
+    "Location Scout (Zusatz)": [],
+    "Assistant Location Scout": [],
+    "Location Coordinator": [],
+    "Schauspieler Koordinator*in": [
+      "Cast-Koordination",
+      "Cast-Koordinator / Cast-Koordinatorin",
+      "Schauspieler Koordinator",
+      "Schauspieler Koordinatorin",
+      "Schauspielkoordination",
+      "Schauspielerkoordinator",
+      "Schauspielerkoordinatorin",
+      "Cast Coordinator",
+      "Cast-Koordinator",
+      "Cast-Koordinatorin"
+    ],
+    "Unit Manager": [],
+    "Covid-Koordinator*in": [
+      "Covid-Koordination",
+      "Covid-Koordinator / Covid-Koordinatorin",
+      "Covid-Koordinator",
+      "Covid-Koordinatorin"
+    ],
+    "Assistant Covid Coordinator": [],
+    "Motivaufnahmeleiter*in": [
+      "Motivaufnahmeleitung",
+      "Motivaufnahmeleiterin"
+    ],
+    "Assistent*in der Motiv-AL": [
+      "Assistenz der Motiv-AL",
+      "Assistent der Motiv-AL",
+      "Assistentin der Motiv-AL"
+    ],
+    "Personaldisponent*in": [
+      "Personaldisposition",
+      "Personaldisponent / Personaldisponentin",
+      "Personaldisponent",
+      "Personaldisponentin"
+    ],
+    "Transportation Coordinator": [],
+    "Assistant Transportation Coordinator": [],
+    "Transportation Captain": [],
+    "Aufnahmeleiter (1st AD)": [
+      "Aufnahmeleitung (1st AD)",
+      "Aufnahmeleiterin (1st AD)",
+      "Aufnahmeleiter",
+      "Aufnahmeleiterin"
+    ],
+    "Set-Aufnahmeleiter": [
+      "Set-Aufnahmeleitung",
+      "Set-Aufnahmeleiterin"
+    ],
+    "3rd AD / Crowd AD": [],
+    "Base-AL": [],
+    "Drivers Captain": [],
+    "Studio-Aufnahmeleiter*in": [
+      "Studio-Aufnahmeleitung",
+      "Studio-Aufnahmeleiter",
+      "Studio-Aufnahmeleiterin"
+    ],
+    "Lock Off Manager*in": [
+      "Lock Off Manager",
+      "Lock Off Managerin"
+    ],
+    "2. Aufnahmeleiter*in (Show/Broadcast)": [
+      "2. Aufnahmeleitung (Show/Broadcast)",
+      "2. Aufnahmeleiter (Show/Broadcast)",
+      "2. Aufnahmeleiterin (Show/Broadcast)"
+    ],
+    "Unit Move Coordinator": [],
+    "Assistent*in der Aufnahmeleitung": [
+      "Assistenz der Aufnahmeleitung",
+      "Assistent der Aufnahmeleitung",
+      "Assistentin der Aufnahmeleitung"
+    ],
+    "Assistent*in in der 1. AL": [
+      "Assistenz in der 1. AL",
+      "Assistent in der 1. AL",
+      "Assistentin in der 1. AL"
+    ],
+    "Assistent*in der Set-AL": [
+      "Assistenz der Set-AL",
+      "Assistent der Set-AL",
+      "Assistentin der Set-AL"
+    ],
+    "Parking Production Assistant": [],
+    "Absperrhilfe / Blocker*in": [
+      "Absperrhilfe / Lock-off",
+      "Absperrhilfe / Blocker",
+      "Absperrhilfe / Blockerin"
+    ],
+    "Set Runner": [],
+    "Produktionsfahrer*in": [
+      "Produktionsfahrdienst",
+      "Produktionsfahrer / Produktionsfahrerin",
+      "Produktionsfahrer",
+      "Produktionsfahrerin"
+    ],
+    "Personal Driver": [
+      "Persönlicher Fahrer",
+      "Persönliche Fahrerin"
+    ],
+    "Equipmentfahrer*in": [
+      "Equipmentfahrdienst",
+      "Equipmentfahrer / Equipmentfahrerin",
+      "Equipmentfahrer",
+      "Equipmentfahrerin"
+    ],
+    "Office Production Assistent*in": [
+      "Office Production Assistenz",
+      "Office Production Assistent",
+      "Office Production Assistentin"
+    ],
+    "Kalkulator": [
+      "Produktionskalkulation",
+      "Kalkulator / Kalkulatorin",
+      "Kalkulatorin"
+    ],
+    "Filmgeschäftsführung": [],
+    "Controller (Film)": [
+      "Controllerin (Film)"
+    ],
+    "Green Consultant / Sustainability Manager": [],
+    "Produktionspraktikant*in": [
+      "Produktionspraktikum",
+      "Produktionspraktikant / Produktionspraktikantin",
+      "Produktionspraktikant",
+      "Produktionspraktikantin"
+    ],
+    "Set-AL Praktikant*in": [
+      "Set-AL Praktikum",
+      "Set-AL-Praktikant / Set-AL-Praktikantin",
+      "Set-AL Praktikant",
+      "Set-AL Praktikantin",
+      "Set-AL-Praktikant",
+      "Set-AL-Praktikantin"
+    ],
+    "Produktionsleiter/in": [
+      "Produktionsleitung",
+      "Produktionsleiter",
+      "Produktionsleiterin"
+    ],
+    "Aufnahmeleiter/in": [
+      "Aufnahmeleitung",
+      "Aufnahmeleiter",
+      "Aufnahmeleiterin"
+    ],
+    "Produktionskoordinator*in": [
+      "Produktionskoordination",
+      "Produktionskoordinator / Produktionskoordinatorin",
+      "Produktionskoordinatorin"
+    ],
+    "Assistent*in des*der Produktionskoordinator*in": [
+      "Assistenz der Produktionskoordination",
+      "Assistent des Produktionskoordinators",
+      "Assistentin der Produktionskoordinatorin",
+      "Assistent der Produktionskoordination",
+      "Assistentin der Produktionskoordination"
+    ],
+    "Produktionsassistenz": [],
+    "2. Produktionsassistent*in": [
+      "2. Produktionsassistent",
+      "2. Produktionsassistentin"
+    ],
+    "Assistent*in des*der Reisekoordinator*in": [
+      "Assistenz der Reisekoordination",
+      "Assistent des Reisekoordinators",
+      "Assistentin der Reisekoordinatorin",
+      "Assistent der Reisekoordination",
+      "Assistentin der Reisekoordination"
+    ],
+    "Setaufnahmeleiter*in": [
+      "Setaufnahmeleitung",
+      "Setaufnahmeleiter",
+      "Setaufnahmeleiterin"
+    ],
+    "Teamassistent*in (vormals Produktionssekretär*in)": [
+      "Teamassistenz / Produktionssekretariat",
+      "Teamassistent (vormals Produktionssekretär)",
+      "Teamassistentin (vormals Produktionssekretärin)",
+      "Teamassistent (Produktionssekretariat)",
+      "Teamassistentin (Produktionssekretariat)"
+    ],
+    "2. Aufnahmeleiter*innen (Show/Broadcast)": [
+      "2. Aufnahmeleitung (Show/Broadcast)",
+      "2. Aufnahmeleiter (Show/Broadcast)",
+      "2. Aufnahmeleiterin (Show/Broadcast)",
+      "2. Aufnahmeleiterinnen (Show/Broadcast)"
+    ],
+    "Casting Director": [],
+    "Produktionscontroller*in": [
+      "Produktionscontrolling",
+      "Produktionscontroller / Produktionscontrollerin",
+      "Produktionscontroller",
+      "Produktionscontrollerin"
+    ],
+    "Filmgeschäftsführer*in": [
+      "Filmgeschäftsführer",
+      "Filmgeschäftsführerin"
+    ],
+    "Buchhalter*in": [
+      "Buchhaltung",
+      "Buchhalter / Buchhalterin",
+      "Buchhalter",
+      "Buchhalterin"
+    ],
+    "Assistent*in der Filmgeschäftsführung": [
+      "Assistenz der Filmgeschäftsführung",
+      "Assistent der Filmgeschäftsführung",
+      "Assistentin der Filmgeschäftsführung"
+    ],
+    "Kassenführer*in": [
+      "Kassenführung",
+      "Kassenführer / Kassenführerin",
+      "Kassenführer",
+      "Kassenführerin"
+    ],
+    "Payroll Accountant / Lohnbuchhalter*in": [
+      "Payroll Accounting / Lohnbuchhaltung",
+      "Payroll Accountant (Lohnbuchhalter / Lohnbuchhalterin)",
+      "Payroll Accountant / Lohnbuchhalter",
+      "Payroll Accountant / Lohnbuchhalterin",
+      "Lohnbuchhalter (Payroll Accountant)",
+      "Lohnbuchhalterin (Payroll Accountant)",
+      "Lohnbuchhalter",
+      "Lohnbuchhalterin",
+      "Payroll Accountant (Lohnbuchhalter)",
+      "Payroll Accountant (Lohnbuchhalterin)"
+    ],
+    "Praktikant*in der Filmgeschäftsführung": [
+      "Praktikum der Filmgeschäftsführung",
+      "Praktikant der Filmgeschäftsführung / Praktikantin der Filmgeschäftsführung",
+      "Praktikant der Filmgeschäftsführung",
+      "Praktikantin der Filmgeschäftsführung"
+    ],
+    "Head of Production Strategy": [],
+    "Head of Development": [],
+    "Service Producer*in": [
+      "Service Producer",
+      "Service Producerin"
+    ],
+    "Production Executive (Studio/Network)": [],
+    "Assistant Producer*in": [
+      "Assistant Producer",
+      "Assistant Producerin"
+    ],
+    "TV-Producer*in": [
+      "TV-Producer",
+      "TV-Producerin"
+    ],
+    "Promotion Producer*in": [
+      "Promotion Producer",
+      "Promotion Producerin"
+    ],
+    "Supervising Producer": [],
+    "Story Producer*in": [
+      "Story Producer",
+      "Story Producerin"
+    ],
+    "Post Story Producer*in": [
+      "Post Story Producer",
+      "Post Story Producerin"
+    ],
+    "Agency, TV Commercial Producer*in": [
+      "Agency, TV Commercial Producer",
+      "Agency, TV Commercial Producerin"
+    ],
+    "3D Stereo Producer*in": [
+      "3D Stereo Producer",
+      "3D Stereo Producerin"
+    ],
+    "3D Stereo Supervising Producer": [],
+    "Web TV Producer*in": [
+      "Web TV Producer",
+      "Web TV Producerin"
+    ],
+    "Creative Producer": [],
+    "Development Producer*in": [
+      "Development Producer",
+      "Development Producerin"
+    ],
+    "Development Coordinator": [],
+    "Development Executive (Studio/Network)": [],
+    "Associate Control Room Producer": [],
+    "Control Room Producer / On-Air Producer": [],
+    "On Air Promotion Producer*in": [
+      "On Air Promotion Producer",
+      "On Air Promotion Producerin"
+    ],
+    "Copyright Affairs": [],
+    "Business Affairs": [],
+    "Business und Legal Affairs": [],
+    "Legal Affairs": [],
+    "Producer of Marketing and Distribution": [],
+    "Producer Praktikant*in": [
+      "Producer Praktikum",
+      "Producer-Praktikant / Producer-Praktikantin",
+      "Producer Praktikant",
+      "Producer Praktikantin",
+      "Producer-Praktikant",
+      "Producer-Praktikantin"
+    ]
+  },
+  "regie": {
+    "Regisseur/in": [
+      "Regisseur / Regisseurin",
+      "Regisseur",
+      "Regisseurin"
+    ],
+    "Co-Regisseur*in": [
+      "Co-Regie",
+      "Co-Regisseur / Co-Regisseurin",
+      "Co-Regisseur",
+      "Co-Regisseurin"
+    ],
+    "Second Unit Director": [],
+    "Studioregisseur*in": [
+      "Studioregie",
+      "Studioregisseur / Studioregisseurin",
+      "Studioregisseur",
+      "Studioregisseurin"
+    ],
+    "Synchronregisseur*in": [
+      "Synchronregie",
+      "Synchronregisseur / Synchronregisseurin",
+      "Synchronregisseur",
+      "Synchronregisseurin"
+    ],
+    "Bildregisseur*in": [
+      "Bildregie",
+      "Bildregisseur / Bildregisseurin",
+      "Bildregisseur",
+      "Bildregisseurin"
+    ],
+    "Senderegisseur*in": [
+      "Senderegie",
+      "Senderegisseur / Senderegisseurin",
+      "Senderegisseur",
+      "Senderegisseurin"
+    ],
+    "Dialog Regisseur*in": [
+      "Dialog Regie",
+      "Dialogregisseur / Dialogregisseurin",
+      "Dialog Regisseur",
+      "Dialog Regisseurin",
+      "Dialogregisseur",
+      "Dialogregisseurin"
+    ],
+    "1st AD": [],
+    "2nd AD": [],
+    "Key 2nd AD": [],
+    "Floor 2nd AD": [],
+    "Crowd 2nd AD": [],
+    "3rd AD": [],
+    "3rd AD Crowd": [],
+    "Base 3rd AD": [],
+    "Floor 3rd AD": [],
+    "AD PA": [],
+    "Key AD PA": [],
+    "AD Trainee": [],
+    "Crowd Marshall": [],
+    "Assistant Crowd Marshall": [],
+    "Script Supervisor (Continuity)": [],
+    "Assistant Script Supervisor": [],
+    "Skripts (On-Set)": [],
+    "Storyboard Artist": [],
+    "Schauspiel Coach": [],
+    "Schauspiel Coach (Kinder)": [],
+    "Dialog Coach": [],
+    "Komparsenbetreuuer*in": [
+      "Komparseriebetreuung",
+      "Komparsenbetreuer",
+      "Komparsenbetreuerin"
+    ],
+    "Assistent*in Komparsenbetreuuer*in": [
+      "Assistenz Komparseriebetreuung",
+      "Assistent der Komparsenbetreuung",
+      "Assistentin der Komparsenbetreuung"
+    ],
+    "Persönlicher Assistent*in (Regie)": [
+      "Persönliche Regieassistenz",
+      "Persönlicher Assistent (Regie)",
+      "Persönliche Assistentin (Regie)"
+    ],
+    "Persönliche Assistenz der Regie": [],
+    "Regiepraktikant*in": [
+      "Regiepraktikum",
+      "Regiepraktikant / Regiepraktikantin",
+      "Regiepraktikant",
+      "Regiepraktikantin"
+    ],
+    "Script Trainee": [],
+    "Regieassistenz (Set-Runner)": [],
+    "1. Regieassistenz": [],
+    "2. Regieassistenz": [],
+    "Skripts": [],
+    "2nd Unit Regisseur*in": [
+      "2nd Unit Regie",
+      "2nd Unit Regisseur / 2nd Unit Regisseurin",
+      "2nd Unit Regisseur",
+      "2nd Unit Regisseurin"
+    ],
+    "Persönlicher Assistent*in": [
+      "Persönliche Assistenz",
+      "Persönlicher Assistent",
+      "Persönliche Assistentin"
+    ],
+    "Assistent*in des*r Komparsenbetreuuer*in": [
+      "Assistenz der Komparseriebetreuung",
+      "Assistent des Komparsenbetreuers",
+      "Assistentin der Komparsenbetreuerin",
+      "Assistent der Komparseriebetreuung",
+      "Assistentin der Komparseriebetreuung"
+    ]
+  },
+  "kamera": {
+    "Director of Photography (DoP)": [],
+    "Director of Imagery (DoI)": [],
+    "A-Kamera Operator": [
+      "A-Kamera-Operator",
+      "A-Kamera-Operatorin"
+    ],
+    "B-Kamera Operator": [
+      "B-Kamera-Operator",
+      "B-Kamera-Operatorin"
+    ],
+    "C-Kamera Operator": [
+      "C-Kamera-Operator",
+      "C-Kamera-Operatorin"
+    ],
+    "E-Kameramann*frau (Studio/AU)": [
+      "E-Kameraperson (Studio/AU)",
+      "E-Kameramann / E-Kamerafrau (Studio/AU)",
+      "E-Kameramann (Studio/AU)",
+      "E-Kamerafrau (Studio/AU)"
+    ],
+    "EB Kameramann*frau": [
+      "EB Kameraperson",
+      "EB-Kameramann / EB-Kamerafrau",
+      "EB Kameramann",
+      "EB Kamerafrau",
+      "EB-Kameramann",
+      "EB-Kamerafrau"
+    ],
+    "2nd Unit Kameramann*frau": [
+      "2nd Unit Kameraperson",
+      "2nd Unit Kameramann / 2nd Unit Kamerafrau",
+      "2nd Unit Kameramann",
+      "2nd Unit Kamerafrau"
+    ],
+    "3rd Unit Kameramann*frau": [
+      "3rd Unit Kameraperson",
+      "3rd Unit Kameramann / 3rd Unit Kamerafrau",
+      "3rd Unit Kameramann",
+      "3rd Unit Kamerafrau"
+    ],
+    "1st AC (Focus Puller)": [],
+    "2nd AC (Clapper / Loader)": [],
+    "Clapper-Loader": [],
+    "3. Kameraassistent*in": [
+      "3. Kameraassistenz",
+      "3. Kameraassistent",
+      "3. Kameraassistentin"
+    ],
+    "2nd AC Digital": [],
+    "DIT": [],
+    "DIT Assistent*in": [
+      "DIT Assistenz",
+      "DIT Assistent",
+      "DIT Assistentin"
+    ],
+    "Steadicam Operator": [],
+    "Steadicam Assistent*in": [
+      "Steadicam Assistenz",
+      "Steadicam Assistent",
+      "Steadicam Assistentin"
+    ],
+    "Gimbal System Operator": [],
+    "Drohnenpilot / Drone Operator": [
+      "Drohnensteuerung / Drone Operator",
+      "Drohnenpilot / Drohnenpilotin (Drone Operator)",
+      "Drohnenpilot (Drone Operator)",
+      "Drohnenpilotin (Drone Operator)",
+      "Drohnenpilot",
+      "Drohnenpilotin"
+    ],
+    "Kamera-Drohnen Operator": [
+      "Kamera-Drohnen-Operator",
+      "Kamera-Drohnen-Operatorin"
+    ],
+    "Kamera-Drohnen Pilot*in": [
+      "Kamera-Drohnensteuerung",
+      "Kamera-Drohnenpilot / Kamera-Drohnenpilotin",
+      "Kamera-Drohnen Pilot",
+      "Kamera-Drohnen Pilotin",
+      "Kamera-Drohnenpilot",
+      "Kamera-Drohnenpilotin"
+    ],
+    "Camera Car Driver": [
+      "Kamerafahrzeugfahrer",
+      "Kamerafahrzeugfahrerin"
+    ],
+    "Flugzeugpilot*in (Luftaufnahmen)": [
+      "Flugzeugführung (Luftaufnahmen)",
+      "Flugzeugpilot / Flugzeugpilotin (Luftaufnahmen)",
+      "Flugzeugpilot (Luftaufnahmen)",
+      "Flugzeugpilotin (Luftaufnahmen)"
+    ],
+    "Helikopterpilot*in (Luftaufnahmen)": [
+      "Helikopterführung (Luftaufnahmen)",
+      "Helikopterpilot / Helikopterpilotin (Luftaufnahmen)",
+      "Helikopterpilot (Luftaufnahmen)",
+      "Helikopterpilotin (Luftaufnahmen)"
+    ],
+    "Spidercam-Pilot*in": [
+      "Spidercam-Steuerung",
+      "Spidercam-Pilot / Spidercam-Pilotin",
+      "Spidercam-Pilot",
+      "Spidercam-Pilotin"
+    ],
+    "Kamera-Drohnen Assistent*in": [
+      "Kamera-Drohnen Assistenz",
+      "Kamera-Drohnen Assistent",
+      "Kamera-Drohnen Assistentin"
+    ],
+    "Remote Kamera Operator": [],
+    "Remote Head Operator": [],
+    "Aerial Camera Operator": [],
+    "Air to Air Operator": [],
+    "Highspeed Operator": [],
+    "ARRI Trinity Operator": [],
+    "Cablecam Operator": [],
+    "Polecam Operator": [],
+    "Rod-Cam Operator": [],
+    "Motion Control Operator": [],
+    "Motion Control Assistent*in": [
+      "Motion Control Assistenz",
+      "Motion Control Assistent",
+      "Motion Control Assistentin"
+    ],
+    "Live-Kamera Operator": [],
+    "VR Director of Photography": [],
+    "VR Camera Operator": [],
+    "3D Stereo Kameramann*frau": [
+      "3D Stereo Kameraperson",
+      "3D-Stereo-Kameramann / 3D-Stereo-Kamerafrau",
+      "3D Stereo Kameramann",
+      "3D Stereo Kamerafrau",
+      "3D-Stereo-Kameramann",
+      "3D-Stereo-Kamerafrau"
+    ],
+    "3D Stereo Convergence Operator": [],
+    "Stereoscopic Technician": [],
+    "Stereographer": [],
+    "2nd Unit Stereographer*in": [
+      "2nd Unit Stereographer",
+      "2nd Unit Stereographerin"
+    ],
+    "Stereographerassistent*in": [
+      "Stereographerassistenz",
+      "Stereographerassistent",
+      "Stereographerassistentin"
+    ],
+    "Unterwasser-Kameraoperator": [
+      "Unterwasser-Kameraoperator / Unterwasser-Kameraoperatorin",
+      "Unterwasser-Kameraoperatorin"
+    ],
+    "Unterwasser Kameraassistent*in": [
+      "Unterwasser Kameraassistenz",
+      "Unterwasser Kameraassistent",
+      "Unterwasser Kameraassistentin"
+    ],
+    "Freifall Kameramann*frau": [
+      "Freifall Kameraperson",
+      "Freifallkameramann / Freifallkamerafrau",
+      "Freifall Kameramann",
+      "Freifall Kamerafrau",
+      "Freifallkameramann",
+      "Freifallkamerafrau"
+    ],
+    "Drytech": [],
+    "Data Wrangler": [],
+    "Data Wrangler / Digital Loader": [],
+    "Media Manager": [],
+    "Video Assist Operator": [],
+    "Video Assist Utility": [],
+    "Crash-Box Operators": [],
+    "Videooperator": [
+      "Videooperator / Videooperatorin",
+      "Videooperatorin"
+    ],
+    "Qtake Operator*in": [
+      "Qtake Operator",
+      "Qtake Operatorin"
+    ],
+    "Videooperatorassistent*in": [
+      "Videooperatorassistenz",
+      "Videooperatorassistent",
+      "Videooperatorassistentin"
+    ],
+    "Playback Operator": [],
+    "EB Assistent*in (Bild-Ton)": [
+      "EB Assistenz (Bild-Ton)",
+      "EB Assistent (Bild-Ton)",
+      "EB Assistentin (Bild-Ton)"
+    ],
+    "EB Techniker*in (Bild-Ton)": [
+      "EB Technikfachkraft (Bild-Ton)",
+      "EB-Techniker / EB-Technikerin (Bild-Ton)",
+      "EB Techniker (Bild-Ton)",
+      "EB Technikerin (Bild-Ton)",
+      "EB-Techniker (Bild-Ton)",
+      "EB-Technikerin (Bild-Ton)"
+    ],
+    "Kameraassistent*in (Non-Fiction)": [
+      "Kameraassistenz (Non-Fiction)",
+      "Kameraassistent (Non-Fiction)",
+      "Kameraassistentin (Non-Fiction)"
+    ],
+    "DCE Data Capture Engineer": [],
+    "Rear Projection Plates Operator": [],
+    "Kamera-Techniker": [
+      "Kameratechnik",
+      "Kameratechniker / Kameratechnikerin",
+      "Kameratechniker",
+      "Kameratechnikerin",
+      "Kamera-Technikerin"
+    ],
+    "Kamerapraktikant*in": [
+      "Kamerapraktikum",
+      "Kamerapraktikant / Kamerapraktikantin",
+      "Kamerapraktikant",
+      "Kamerapraktikantin"
+    ],
+    "Kamera-Operator": [
+      "Kamera-Operatorin"
+    ],
+    "Drohnen-Pilot / Aerial": [
+      "Drohnenpilot / Drohnenpilotin (Aerial)",
+      "Drohnenpilot (Aerial)",
+      "Drohnenpilotin (Aerial)",
+      "Drohnen-Pilot",
+      "Drohnen-Pilotin"
+    ],
+    "Zusätzliche Kamera": [],
+    "Unterwasser Kameramann*frau": [
+      "Unterwasser Kameraperson",
+      "Unterwasserkameramann / Unterwasserkamerafrau",
+      "Unterwasser Kameramann",
+      "Unterwasser Kamerafrau",
+      "Unterwasserkameramann",
+      "Unterwasserkamerafrau"
+    ],
+    "Motion Control Kameramann*frau": [
+      "Motion Control Kameraperson",
+      "Motion-Control-Kameramann / Motion-Control-Kamerafrau",
+      "Motion Control Kameramann",
+      "Motion Control Kamerafrau",
+      "Motion-Control-Kameramann",
+      "Motion-Control-Kamerafrau"
+    ],
+    "Kamera-Drohnen Assistent*in/Techniker*in": [
+      "Kamera-Drohnen Assistenz/Technikfachkraft",
+      "Kamera-Drohnenassistent / Kamera-Drohnentechniker",
+      "Kamera-Drohnenassistentin / Kamera-Drohnentechnikerin",
+      "Kamera-Drohnenassistenz",
+      "Kamera-Drohnentechniker",
+      "Kamera-Drohnentechnikerin"
+    ],
+    "1. Kameraassistent*in": [
+      "1. Kameraassistenz",
+      "1. Kameraassistent",
+      "1. Kameraassistentin"
+    ],
+    "EB Assistent*in in Bild-Ton": [
+      "EB Assistenz in Bild-Ton",
+      "EB Assistentin in Bild-Ton"
+    ],
+    "EB Techniker*in in Bild-Ton": [
+      "EB Technikfachkraft in Bild-Ton",
+      "EB Technikerin in Bild-Ton"
+    ],
+    "Standfotograf*in": [
+      "Standfotografie",
+      "Standfotograf / Standfotografin",
+      "Standfotograf",
+      "Standfotografin"
+    ]
+  },
+  "licht": {
+    "Gaffer (Oberbeleuchter)": [
+      "Gaffer (Oberbeleuchter / Oberbeleuchterin)",
+      "Oberbeleuchter",
+      "Oberbeleuchterin",
+      "Gaffer (Oberbeleuchterin)",
+      "Gaffer / Oberbeleuchterin",
+      "Oberbeleuchterin / Gaffer",
+      "Licht / Gaffer",
+      "Gafferin"
+    ],
+    "Best Boy Electric": [
+      "Best Boy Electric / Best Girl Electric",
+      "Best Girl Electric",
+      "Best Boy Licht",
+      "Best Girl Licht",
+      "Best Boy",
+      "Best Girl",
+      "BestBoy Electric",
+      "BestBoy Electric / BestGirl Electric",
+      "BestGirl Electric",
+      "BestBoy Licht",
+      "BestGirl Licht",
+      "BestBoy",
+      "BestGirl"
+    ],
+    "Rigging Gaffer": [
+      "Rigging-Oberbeleuchter",
+      "Rigging-Oberbeleuchterin"
+    ],
+    "Rigging Best Boy": [
+      "Rigging Best Boy / Rigging Best Girl",
+      "Rigging Best Girl",
+      "Rigging Best Boy Electric",
+      "Rigging Best Girl Electric",
+      "Rigging BestBoy",
+      "Rigging BestBoy / Rigging BestGirl",
+      "Rigging BestGirl",
+      "Rigging BestBoy Electric",
+      "Rigging BestGirl Electric"
+    ],
+    "Rigging Electrician": [],
+    "Beleuchter (Electrician)": [
+      "Beleuchter / Beleuchterin (Electrician)",
+      "Beleuchterin (Electrician)",
+      "Beleuchter",
+      "Beleuchterin"
+    ],
+    "Beleuchtungsmeister*in": [
+      "Beleuchtung (Meisterqualifikation)",
+      "Beleuchtungsmeister / Beleuchtungsmeisterin",
+      "Beleuchtungsmeister",
+      "Beleuchtungsmeisterin"
+    ],
+    "Lichtpult Operator": [
+      "Lichtpult-Operator",
+      "Lichtpult-Operatorin"
+    ],
+    "Lichtpult Assistent*in": [
+      "Lichtpult Assistenz",
+      "Lichtpult Assistent",
+      "Lichtpult Assistentin"
+    ],
+    "Lighting Programmer (DMX)": [],
+    "Lichttechniker": [
+      "Lichttechnikfachkraft",
+      "Lichttechniker / Lichttechnikerin",
+      "Lichttechnikerin"
+    ],
+    "Lichtfahrer": [
+      "Lichtfahrdienst",
+      "Lichtfahrer / Lichtfahrerin",
+      "Lichtfahrerin"
+    ],
+    "Zusatzbeleuchter*in": [
+      "Zusatzlichttechnik",
+      "Zusatzbeleuchter / Zusatzbeleuchterin",
+      "Zusatzbeleuchter",
+      "Zusatzbeleuchterin"
+    ],
+    "Generator Operator": [],
+    "Cable Wrangler": [],
+    "Unterwasser Licht": [],
+    "Ballonlicht Operator": [],
+    "Spot-/Truss-Spot Operator": [],
+    "Lichtassistent*in": [
+      "Lichtassistenz",
+      "Lichtassistent",
+      "Lichtassistentin"
+    ],
+    "Licht Praktikant*in": [
+      "Licht Praktikum",
+      "Lichtpraktikant / Lichtpraktikantin",
+      "Licht Praktikant",
+      "Licht Praktikantin",
+      "Lichtpraktikant",
+      "Lichtpraktikantin"
+    ]
+  },
+  "grip": {
+    "Key Grip": [],
+    "Best Boy Grip / 2. Kamerabühne": [
+      "Best Boy Grip / Best Girl Grip (2. Kamerabühne)",
+      "Best Boy Grip",
+      "Best Girl Grip",
+      "Best Girl Grip / 2. Kamerabühne",
+      "BestBoy Grip / 2. Kamerabühne",
+      "BestBoy Grip / BestGirl Grip (2. Kamerabühne)",
+      "BestBoy Grip",
+      "BestGirl Grip",
+      "BestGirl Grip / 2. Kamerabühne",
+      "Best Boy Grip (2. Kamerabühne)",
+      "Best Girl Grip (2. Kamerabühne)"
+    ],
+    "Dolly Grip / Dollyfahrer*in": [
+      "Dolly Grip / Dolly-Fahrtechnik",
+      "Dolly Grip (Dollyfahrer / Dollyfahrerin)",
+      "Dolly Grip / Dollyfahrer",
+      "Dolly Grip / Dollyfahrerin",
+      "Dollyfahrer",
+      "Dollyfahrerin",
+      "Dolly Grip (Dollyfahrer)",
+      "Dolly Grip (Dollyfahrerin)"
+    ],
+    "Grip / Kamerabühne": [],
+    "Kamerabühnenassistenz": [],
+    "Rigging Grip": [],
+    "Rigging Key Grip": [],
+    "Rigging Best Boy Grip": [
+      "Rigging Best Boy Grip / Rigging Best Girl Grip",
+      "Rigging Best Girl Grip",
+      "Rigging BestBoy Grip",
+      "Rigging BestBoy Grip / Rigging BestGirl Grip",
+      "Rigging BestGirl Grip"
+    ],
+    "Spezialkonstruktionen (Kamerabühne)": [],
+    "Kamera-Kran- / Jib-Operator*in": [
+      "Kamera-Kran- / Jib-Operator",
+      "Kamera-Kran- / Jib-Operatorin"
+    ],
+    "Kamerakran-Techniker*in": [
+      "Kamerakran-Technikfachkraft",
+      "Kamerakran-Techniker / Kamerakran-Technikerin",
+      "Kamerakran-Techniker",
+      "Kamerakran-Technikerin"
+    ],
+    "U-Crane / Technocrane Operator*in": [
+      "U-Crane / Technocrane Operator",
+      "U-Crane / Technocrane Operatorin"
+    ],
+    "Remote-Head-Techniker*in / -Operator*in": [
+      "Remote-Head-Technikfachkraft / -Operator",
+      "Remote-Head-Techniker / Remote-Head-Technikerin (Operator)",
+      "Remote-Head-Techniker / -Operator",
+      "Remote-Head-Technikerin / -Operatorin",
+      "Remote-Head-Techniker",
+      "Remote-Head-Technikerin",
+      "Remote-Head-Operatorin",
+      "Remote-Head-Techniker (Operator)",
+      "Remote-Head-Technikerin (Operator)"
+    ],
+    "Praktikant*in Kamerabühne / Grip": [
+      "Praktikum Kamerabühne / Grip",
+      "Praktikant Kamerabühne / Grip / Praktikantin Kamerabühne / Grip",
+      "Praktikant Kamerabühne / Grip",
+      "Praktikantin Kamerabühne / Grip"
+    ]
+  },
+  "ton": {
+    "Tonmeister / Sound Mixer": [
+      "Tonmischung / Sound Mixer",
+      "Tonmeister / Tonmeisterin (Sound Mixer)",
+      "Tonmeister (Sound Mixer)",
+      "Tonmeisterin (Sound Mixer)",
+      "Tonmeister",
+      "Tonmeisterin",
+      "Tonmeisterin / Sound Mixer"
+    ],
+    "Production Sound Mixer": [],
+    "Filmtonmeister*in": [
+      "Filmton / Production Sound Mixing",
+      "Filmtonmeister / Filmtonmeisterin",
+      "Filmtonmeister",
+      "Filmtonmeisterin"
+    ],
+    "Boom Operator": [],
+    "Tonassistenz": [],
+    "1st Sound Assistant": [],
+    "1. Filmtonassistent*in": [
+      "1. Filmtonassistenz",
+      "1. Filmtonassistent",
+      "1. Filmtonassistentin"
+    ],
+    "2nd Sound Assistant": [],
+    "2. Filmtonassistent*in": [
+      "2. Filmtonassistenz",
+      "2. Filmtonassistent",
+      "2. Filmtonassistentin"
+    ],
+    "ADR / Synchron-Angler*in": [
+      "ADR / Synchron-Boom-Operating",
+      "ADR-/Synchronangler / ADR-/Synchronanglerin",
+      "ADR / Synchron-Angler",
+      "ADR / Synchron-Anglerin",
+      "ADR-/Synchronangler",
+      "ADR-/Synchronanglerin",
+      "Synchronangler",
+      "Synchronanglerin"
+    ],
+    "Surround Sound Recordist": [],
+    "Utility Sound Technician": [],
+    "Tongeräteassistent*in": [
+      "Tongeräteassistenz",
+      "Tongeräteassistent",
+      "Tongeräteassistentin"
+    ],
+    "Playback Operator Ton": [],
+    "Tonmann*frau (Non-Fiction)": [
+      "Tonfachkraft (Non-Fiction)",
+      "Tonmann (Non-Fiction)",
+      "Tonfrau (Non-Fiction)"
+    ],
+    "Tonpraktikant*in": [
+      "Tonpraktikum",
+      "Tonpraktikant / Tonpraktikantin",
+      "Tonpraktikant",
+      "Tonpraktikantin"
+    ],
+    "Sound Designer": [],
+    "Supervising Sound Editor": [],
+    "Dialogue Editor": [],
+    "ADR Editor": [],
+    "ADR Supervisor": [],
+    "Foley Artist": [],
+    "Foley Editor": [],
+    "Re-Recording Mixer": [],
+    "Playback Operator": [],
+    "Sound Supervisor": [],
+    "Musik Mischtonmeister*in": [
+      "Musikmischung",
+      "Musik-Mischtonmeister / Musik-Mischtonmeisterin",
+      "Musik Mischtonmeister",
+      "Musik Mischtonmeisterin",
+      "Musik-Mischtonmeister",
+      "Musik-Mischtonmeisterin"
+    ],
+    "Musikaufnahme": [],
+    "Synchron Mischtonmeister*in": [
+      "Synchronmischung",
+      "Synchron-Mischtonmeister / Synchron-Mischtonmeisterin",
+      "Synchron Mischtonmeister",
+      "Synchron Mischtonmeisterin",
+      "Synchron-Mischtonmeister",
+      "Synchron-Mischtonmeisterin"
+    ],
+    "Audiodeskription Mischtonmeister*in": [
+      "Audiodeskriptionsmischung",
+      "Audiodeskriptions-Mischtonmeister / Audiodeskriptions-Mischtonmeisterin",
+      "Audiodeskription Mischtonmeister",
+      "Audiodeskription Mischtonmeisterin",
+      "Audiodeskriptions-Mischtonmeister",
+      "Audiodeskriptions-Mischtonmeisterin"
+    ],
+    "Mischtonmeisterassistent*in": [
+      "Assistenz der Tonmischung",
+      "Mischtonmeisterassistent",
+      "Mischtonmeisterassistentin"
+    ],
+    "Sound Mastering Engineer": [],
+    "Sound Design Assistent*in": [
+      "Sound Design Assistenz",
+      "Sound Design Assistent",
+      "Sound Design Assistentin"
+    ],
+    "Supervising ADR Editor*in": [
+      "Supervising ADR Editor",
+      "Supervising ADR Editorin"
+    ],
+    "Supervising Dialog & ADR Editor*in": [
+      "Supervising Dialog & ADR Editor",
+      "Supervising Dialog & ADR Editorin"
+    ],
+    "Supervising Dialog Editor*in": [
+      "Supervising Dialog Editor",
+      "Supervising Dialog Editorin"
+    ],
+    "Supervising Synchrongeräusche Editor*in": [
+      "Supervising Synchrongeräusche Editor",
+      "Supervising Synchrongeräusche Editorin"
+    ],
+    "Dialog Editor*in": [
+      "Dialog Editor",
+      "Dialog Editorin"
+    ],
+    "Sound Effects Editor*in": [
+      "Sound Effects Editor",
+      "Sound Effects Editorin"
+    ],
+    "Sprachsynchron Editor*in": [
+      "Sprachsynchron Editor",
+      "Sprachsynchron Editorin"
+    ],
+    "Synchrongeräusche Editor*in": [
+      "Synchrongeräusche Editor",
+      "Synchrongeräusche Editorin"
+    ],
+    "ADR / Synchron Editor*in": [
+      "ADR / Synchron Editor",
+      "ADR / Synchron Editorin"
+    ],
+    "Sound Editor Assistent*in": [
+      "Sound Editor Assistenz",
+      "Sound Editor Assistent",
+      "Sound Editor Assistentin"
+    ],
+    "ADR / Synchrontonmeister*in": [
+      "ADR / Synchronton",
+      "ADR-/Synchrontonmeister / ADR-/Synchrontonmeisterin",
+      "ADR / Synchrontonmeister",
+      "ADR / Synchrontonmeisterin",
+      "ADR-/Synchrontonmeister",
+      "ADR-/Synchrontonmeisterin"
+    ],
+    "Synchrongeräuschetonmeister*in": [
+      "Foley-Aufnahme / Synchrongeräuscheton",
+      "Synchrongeräuschetonmeister / Synchrongeräuschetonmeisterin",
+      "Synchrongeräuschetonmeister",
+      "Synchrongeräuschetonmeisterin"
+    ],
+    "Produktionsleiter*in Synchron": [
+      "Produktionsleitung Synchron",
+      "Produktionsleiter Synchron",
+      "Produktionsleiterin Synchron"
+    ],
+    "Synchronaufnahmeleiter*in / ADR Supervisor": [
+      "Synchronaufnahmeleitung / ADR Supervisor",
+      "Synchronaufnahmeleiter / ADR Supervisor",
+      "Synchronaufnahmeleiterin / ADR Supervisor"
+    ],
+    "Assistent*in Synchronaufnahmeleiter*in / ADR Supervisors": [
+      "Assistenz Synchronaufnahmeleitung / ADR Supervisors",
+      "Assistent der Synchronaufnahmeleitung / des ADR Supervisors",
+      "Assistentin der Synchronaufnahmeleitung / des ADR Supervisors"
+    ],
+    "Assistent*in des/der Geräuschemacher*in": [
+      "Foley-Assistenz",
+      "Assistent des Geräuschemachers",
+      "Assistentin der Geräuschemacherin",
+      "Foley-Assistent",
+      "Foley-Assistentin"
+    ],
+    "Postproduktion Ton Praktikant*in": [
+      "Postproduktion Ton Praktikum",
+      "Ton-Postproduktionspraktikant / Ton-Postproduktionspraktikantin",
+      "Postproduktion Ton Praktikant",
+      "Postproduktion Ton Praktikantin",
+      "Ton-Postproduktionspraktikant",
+      "Ton-Postproduktionspraktikantin"
+    ],
+    "Technical Supervisor ADR": []
+  },
+  "art": {
+    "Production Designer": [
+      "Produktionsdesigner",
+      "Produktionsdesignerin",
+      "Szenenbildner",
+      "Szenenbildnerin"
+    ],
+    "Szenenbildner*in": [
+      "Szenenbild",
+      "Szenenbildner / Szenenbildnerin",
+      "Szenenbildner",
+      "Szenenbildnerin"
+    ],
+    "Supervising Art Director": [
+      "Supervising Art Direktor",
+      "Supervising Art Direktorin"
+    ],
+    "Art Director": [
+      "Art Direktor",
+      "Art Direktorin",
+      "Artdirektor",
+      "Artdirektorin"
+    ],
+    "Standby Art Director": [
+      "Standby Art Direktor",
+      "Standby Art Direktorin"
+    ],
+    "Assistant Art Director": [
+      "Art-Director-Assistent",
+      "Art-Director-Assistentin"
+    ],
+    "Szenenbildassistent*in": [
+      "Szenenbildassistenz",
+      "Szenenbildassistent",
+      "Szenenbildassistentin"
+    ],
+    "Ausstattungsassistent*in": [
+      "Ausstattungsassistenz",
+      "Ausstattungsassistent",
+      "Ausstattungsassistentin"
+    ],
+    "Set Designer": [
+      "Setdesigner",
+      "Setdesignerin"
+    ],
+    "CAD Designer": [
+      "CAD-Designer",
+      "CAD-Designerin"
+    ],
+    "Concept Artist": [],
+    "Concept Artist (Art Dept.)": [],
+    "Illustrator": [
+      "Illustrator / Illustratorin",
+      "Illustratorin"
+    ],
+    "Graphic Designer (Set-Grafik)": [
+      "Set-Grafiker",
+      "Set-Grafikerin"
+    ],
+    "Lead Graphic Designer": [
+      "Leitender Grafikdesigner",
+      "Leitende Grafikdesignerin"
+    ],
+    "Graphic Artist (Art Dept.)": [],
+    "Mood Scout / Layouter": [
+      "Layouterin",
+      "Mood Scout",
+      "Layouter"
+    ],
+    "Set Decorator": [
+      "Set-Dekorateur",
+      "Set-Dekorateurin"
+    ],
+    "Set Decoration Coordinator": [
+      "Set-Decoration-Koordinator",
+      "Set-Decoration-Koordinatorin"
+    ],
+    "Assistant Set Decorator": [
+      "Set-Decoration-Assistent",
+      "Set-Decoration-Assistentin"
+    ],
+    "Set Decoration Buyer": [
+      "Set-Decoration-Einkäufer",
+      "Set-Decoration-Einkäuferin"
+    ],
+    "Set Decoration Store Manager*in": [
+      "Set Decoration Store Manager",
+      "Set Decoration Store Managerin",
+      "Set-Decoration-Lagerverwalter",
+      "Set-Decoration-Lagerverwalterin"
+    ],
+    "Assistant Set Dec Coordinator": [
+      "Set-Decoration-Koordinationsassistent",
+      "Set-Decoration-Koordinationsassistentin"
+    ],
+    "Set Dresser": [
+      "Set-Dekorateur",
+      "Set-Dekorateurin"
+    ],
+    "Leadman": [
+      "Leadman / Leadwoman",
+      "Leadwoman",
+      "Leadperson",
+      "Set Dressing Lead"
+    ],
+    "Leadman*woman Set Dresser": [
+      "Set Dressing Lead",
+      "Leadman / Leadwoman (Set Dressing)",
+      "Leadman Set Dresser",
+      "Leadwoman Set Dresser",
+      "Leadperson Set Dresser",
+      "Leadman (Set Dressing)",
+      "Leadwoman (Set Dressing)"
+    ],
+    "Props Master (Chef-Requisiteur)": [
+      "Props Master (Chefrequisiteur / Chefrequisiteurin)",
+      "Props Master",
+      "Chef-Requisiteur",
+      "Chef-Requisiteurin",
+      "Chefrequisiteur",
+      "Chefrequisiteurin",
+      "Props Master (Chefrequisiteur)",
+      "Props Master (Chefrequisiteurin)"
+    ],
+    "Requisiteur/in": [
+      "Requisite",
+      "Requisiteur / Requisiteurin",
+      "Requisiteur",
+      "Requisiteurin"
+    ],
+    "Außenrequisiteur*in": [
+      "Außenrequisite",
+      "Außenrequisiteur / Außenrequisiteurin",
+      "Außenrequisiteur",
+      "Außenrequisiteurin",
+      "Aussenrequisiteur",
+      "Aussenrequisiteurin"
+    ],
+    "On-Set Requisiteur": [
+      "On-Set-Requisiteur / On-Set-Requisiteurin",
+      "On-Set Requisiteurin",
+      "On Set Requisiteur",
+      "On Set Requisiteurin",
+      "On-Set-Requisiteur",
+      "On-Set-Requisiteurin"
+    ],
+    "Setrequisiteur*in": [
+      "Setrequisite",
+      "Setrequisiteur / Setrequisiteurin",
+      "Setrequisiteur",
+      "Setrequisiteurin"
+    ],
+    "Standby Props": [],
+    "Prop Assistant": [
+      "Requisitenassistent",
+      "Requisitenassistentin"
+    ],
+    "Requisitenassistent*in": [
+      "Requisitenassistenz",
+      "Requisitenassistent",
+      "Requisitenassistentin"
+    ],
+    "Außenrequisitenassistent*in": [
+      "Außenrequisitenassistenz",
+      "Außenrequisitenassistent",
+      "Außenrequisitenassistentin",
+      "Aussenrequisitenassistent",
+      "Aussenrequisitenassistentin"
+    ],
+    "Setrequisitenassistent*in": [
+      "Setrequisitenassistenz",
+      "Setrequisitenassistent",
+      "Setrequisitenassistentin"
+    ],
+    "Prop Buyer": [
+      "Requisiteneinkäufer",
+      "Requisiteneinkäuferin"
+    ],
+    "Buyer (Set Dec)": [
+      "Set-Decoration-Einkäufer",
+      "Set-Decoration-Einkäuferin"
+    ],
+    "Prop Store Manager*in": [
+      "Prop Store Manager",
+      "Prop Store Managerin",
+      "Requisitenlagerverwalter",
+      "Requisitenlagerverwalterin"
+    ],
+    "Digital Props Designer": [
+      "Digital Props Designerin"
+    ],
+    "Digital Props Master": [],
+    "Prop Maker": [
+      "Requisitenbauer",
+      "Requisitenbauerin"
+    ],
+    "Propdesigner*in": [
+      "Prop Design",
+      "Requisitendesigner / Requisitendesignerin",
+      "Propdesigner",
+      "Propdesignerin",
+      "Requisitendesigner",
+      "Requisitendesignerin"
+    ],
+    "Weapon Advisor": [
+      "Waffenberater",
+      "Waffenberaterin"
+    ],
+    "Requisitenhilfe": [],
+    "Requisitenmaler*in": [
+      "Requisitenmalerei",
+      "Requisitenmaler / Requisitenmalerin",
+      "Requisitenmaler",
+      "Requisitenmalerin"
+    ],
+    "Requisitenfahrer*in": [
+      "Requisitenfahrdienst",
+      "Requisitenfahrer / Requisitenfahrerin",
+      "Requisitenfahrer",
+      "Requisitenfahrerin"
+    ],
+    "Picture Car/Vehicle Coordinator": [
+      "Spielfahrzeugkoordinator",
+      "Spielfahrzeugkoordinatorin"
+    ],
+    "Picture Car Wrangler": [],
+    "Practical Electrician": [
+      "Requisitenelektriker",
+      "Requisitenelektrikerin"
+    ],
+    "Greensmaster / Greensman": [
+      "Greensmaster / Greensperson",
+      "Greensmaster",
+      "Greensman",
+      "Greenswoman",
+      "Greensperson",
+      "Greens Master",
+      "Greens Person",
+      "Greensmaster / Greenswoman"
+    ],
+    "Greens Person (Gartengestaltung)": [
+      "Greensman",
+      "Greenswoman",
+      "Greensperson",
+      "Greens Person"
+    ],
+    "Floral Artist": [],
+    "Food Stylist*in": [
+      "Food Styling",
+      "Food Stylist / Food Stylistin",
+      "Food Stylist",
+      "Food Stylistin",
+      "Foodstylist",
+      "Foodstylistin"
+    ],
+    "Airbrush Artist": [],
+    "Kunstmaler*in": [
+      "Kunstmalerei",
+      "Kunstmaler / Kunstmalerin",
+      "Kunstmaler",
+      "Kunstmalerin"
+    ],
+    "Bühnenmaler*in": [
+      "Bühnenmalerei",
+      "Bühnenmaler / Bühnenmalerin",
+      "Bühnenmaler",
+      "Bühnenmalerin"
+    ],
+    "Chefbühnenmaler*in": [
+      "Leitung Bühnenmalerei",
+      "Chefbühnenmaler / Chefbühnenmalerin",
+      "Chefbühnenmaler",
+      "Chefbühnenmalerin"
+    ],
+    "Schriftenmaler*in": [
+      "Schriftenmalerei",
+      "Schriftenmaler / Schriftenmalerin",
+      "Schriftenmaler",
+      "Schriftenmalerin"
+    ],
+    "Painter / Scenic Artist": [
+      "Szenenmaler",
+      "Szenenmalerin",
+      "Bühnenmaler",
+      "Bühnenmalerin"
+    ],
+    "Sculptor / Plastiker": [
+      "Sculptor (Plastiker / Plastikerin)",
+      "Sculptor",
+      "Plastiker",
+      "Plastikerin",
+      "Bildhauer",
+      "Bildhauerin",
+      "Sculptor (Plastiker)",
+      "Sculptor (Plastikerin)"
+    ],
+    "Bühnenplastiker*in": [
+      "Bühnenplastik",
+      "Bühnenplastiker / Bühnenplastikerin",
+      "Bühnenplastiker",
+      "Bühnenplastikerin"
+    ],
+    "Modellbauer*in": [
+      "Modellbau",
+      "Modellbauer / Modellbauerin",
+      "Modellbauer",
+      "Modellbauerin"
+    ],
+    "Miniature Supervisor": [],
+    "Miniature Effects Supervisor": [],
+    "Construction Manager": [
+      "Construction Managerin",
+      "Bauleiter",
+      "Bauleiterin"
+    ],
+    "Construction Coordinator": [
+      "Baukoordinator",
+      "Baukoordinatorin"
+    ],
+    "Studio-Kulissenbauleiter*in": [
+      "Studio-Kulissenbauleitung",
+      "Studio-Kulissenbauleiter / Studio-Kulissenbauleiterin",
+      "Studio-Kulissenbauleiter",
+      "Studio-Kulissenbauleiterin"
+    ],
+    "Bühnenbauer / Carpenter": [
+      "Bühnenbauer / Bühnenbauerin (Carpenter)",
+      "Bühnenbauer",
+      "Bühnenbauerin",
+      "Carpenter",
+      "Bühnenbauer (Carpenter)",
+      "Bühnenbauerin (Carpenter)"
+    ],
+    "Baubühne": [],
+    "Bühnenmeister*in": [
+      "Bühnentechnik (Meisterqualifikation)",
+      "Bühnenmeister / Bühnenmeisterin",
+      "Bühnenmeister",
+      "Bühnenmeisterin"
+    ],
+    "Bühnentechniker*in": [
+      "Bühnentechnikfachkraft",
+      "Bühnentechniker / Bühnentechnikerin",
+      "Bühnentechniker",
+      "Bühnentechnikerin"
+    ],
+    "Konstruktionszeichner*in": [
+      "Konstruktionszeichnung",
+      "Konstruktionszeichner / Konstruktionszeichnerin",
+      "Konstruktionszeichner",
+      "Konstruktionszeichnerin"
+    ],
+    "Maurer*in": [
+      "Maurerarbeiten",
+      "Maurer / Maurerin",
+      "Maurer",
+      "Maurerin"
+    ],
+    "Schlosser (Metal)": [
+      "Schlosser / Schlosserin (Metall)",
+      "Schlosser",
+      "Schlosserin",
+      "Metallschlosser",
+      "Metallschlosserin",
+      "Schlosser (Metall)",
+      "Schlosserin (Metall)"
+    ],
+    "Schlosser*in": [
+      "Schlosserei",
+      "Schlosser / Schlosserin",
+      "Schlosser",
+      "Schlosserin"
+    ],
+    "Chefschlosser*in": [
+      "Leitung Schlosserei",
+      "Chefschlosser / Chefschlosserin",
+      "Chefschlosser",
+      "Chefschlosserin"
+    ],
+    "Stukkatuer*in": [
+      "Stuckgestaltung",
+      "Stuckateur / Stuckateurin",
+      "Stuckateur",
+      "Stuckateurin",
+      "Stukkateur",
+      "Stukkateurin",
+      "Stukkatuer",
+      "Stukkatuerin"
+    ],
+    "Tapezierer*in": [
+      "Tapezierarbeiten",
+      "Tapezierer / Tapeziererin",
+      "Tapezierer",
+      "Tapeziererin"
+    ],
+    "Tischler*in / Schreiner*in": [
+      "Tischlerei / Schreinerei",
+      "Tischler / Tischlerin / Schreiner / Schreinerin",
+      "Tischler",
+      "Tischlerin",
+      "Schreiner",
+      "Schreinerin",
+      "Tischler / Schreiner",
+      "Tischlerin / Schreinerin"
+    ],
+    "Drechsler*in": [
+      "Drechselarbeiten",
+      "Drechsler / Drechslerin",
+      "Drechsler",
+      "Drechslerin"
+    ],
+    "Art Department Coordinator": [
+      "Art-Department-Koordinator",
+      "Art-Department-Koordinatorin"
+    ],
+    "Assistant Art Dept. Coordinator": [
+      "Art-Department-Koordinationsassistent",
+      "Art-Department-Koordinationsassistentin"
+    ],
+    "Art Department Runner": [],
+    "Art Department Praktikant": [
+      "Art-Department-Praktikant / Art-Department-Praktikantin",
+      "Art Department Praktikantin",
+      "Art-Department-Praktikant",
+      "Art-Department-Praktikantin"
+    ],
+    "Set Decoration Fahrer*in": [
+      "Set Decoration Fahrdienst",
+      "Set-Decoration-Fahrer / Set-Decoration-Fahrerin",
+      "Set Decoration Fahrer",
+      "Set Decoration Fahrerin",
+      "Set-Decoration-Fahrer",
+      "Set-Decoration-Fahrerin"
+    ],
+    "Graphic Designer": [
+      "Grafikdesigner",
+      "Grafikdesignerin",
+      "Grafiker",
+      "Grafikerin"
+    ],
+    "Product Care": [],
+    "Artwork": [],
+    "Computer/Video Playback Supervisor": [],
+    "Bühnenbauer/in": [
+      "Bühnenbau",
+      "Bühnenbauer / Bühnenbauerin",
+      "Bühnenbauer",
+      "Bühnenbauerin"
+    ],
+    "Setbaubühne": [],
+    "Baubühnenhilfe": [],
+    "Unterwassersetbau": [],
+    "Rigging, Spezial Konstruktionen": [],
+    "Konstruktionszeichnerassistent*in": [
+      "Konstruktionszeichnungsassistenz",
+      "Konstruktionszeichnerassistent",
+      "Konstruktionszeichnerassistentin"
+    ],
+    "Chefstukkatuer*in": [
+      "Leitung Stuckgestaltung",
+      "Chefstuckateur / Chefstuckateurin",
+      "Chefstuckateur",
+      "Chefstuckateurin",
+      "Chefstukkateur",
+      "Chefstukkateurin",
+      "Chefstukkatuer",
+      "Chefstukkatuerin"
+    ],
+    "Tapezierer*in (Stoff)": [
+      "Tapezierarbeiten (Stoff)",
+      "Tapezierer / Tapeziererin (Stoff)",
+      "Stofftapezierer",
+      "Stofftapeziererin",
+      "Tapezierer Stoff",
+      "Tapeziererin Stoff",
+      "Tapezierer (Stoff)",
+      "Tapeziererin (Stoff)"
+    ],
+    "Cheftapezierer*in (Stoff)": [
+      "Leitung Stofftapezierarbeiten",
+      "Cheftapezierer / Cheftapeziererin (Stoff)",
+      "Chefstofftapezierer",
+      "Chefstofftapeziererin",
+      "Cheftapezierer Stoff",
+      "Cheftapeziererin Stoff",
+      "Cheftapezierer (Stoff)",
+      "Cheftapeziererin (Stoff)"
+    ],
+    "Cheftischler*in": [
+      "Leitung Tischlerei",
+      "Cheftischler / Cheftischlerin",
+      "Cheftischler",
+      "Cheftischlerin"
+    ],
+    "Ausstattungspraktikant*in": [
+      "Ausstattungspraktikum",
+      "Ausstattungspraktikant / Ausstattungspraktikantin",
+      "Ausstattungspraktikant",
+      "Ausstattungspraktikantin"
+    ]
+  },
+  "kostuem": {
+    "Costume Designer": [
+      "Kostümbildner",
+      "Kostümbildnerin",
+      "Kostümdesigner",
+      "Kostümdesignerin"
+    ],
+    "Costume Supervisor": [],
+    "Assistant Costume Supervisor": [],
+    "Costume Coordinator": [
+      "Kostümkoordinator",
+      "Kostümkoordinatorin"
+    ],
+    "Assistant Costume Coordinator": [
+      "Kostümkoordinationsassistent",
+      "Kostümkoordinationsassistentin"
+    ],
+    "Assistant Costume Designer": [
+      "Kostümbildassistent",
+      "Kostümbildassistentin"
+    ],
+    "2nd Assistant Costume Designer": [
+      "Zweiter Kostümbildassistent",
+      "Zweite Kostümbildassistentin",
+      "2. Kostümbildassistent",
+      "2. Kostümbildassistentin"
+    ],
+    "3rd Assistant Costume Designer": [
+      "Dritter Kostümbildassistent",
+      "Dritte Kostümbildassistentin",
+      "3. Kostümbildassistent",
+      "3. Kostümbildassistentin"
+    ],
+    "Key Costumer": [],
+    "Set Costumer / Garderobier": [
+      "Set Costumer (Garderobier / Garderobiere)",
+      "Set Costumer",
+      "Garderobier",
+      "Garderobiere",
+      "Garderobierin",
+      "Setgarderobier",
+      "Setgarderobiere",
+      "Set Costumer (Garderobier)",
+      "Set Costumer (Garderobiere)"
+    ],
+    "Additional Set Costumer": [],
+    "Setkostüm Assistent": [
+      "Setkostüm Assistenz",
+      "Setkostümassistent",
+      "Setkostümassistentin",
+      "Setkostüm Assistentin"
+    ],
+    "Crowd Costume Supervisor": [],
+    "Crowd Fitter": [],
+    "Truck Costumer": [],
+    "Costume Buyer": [
+      "Kostümeinkäufer",
+      "Kostümeinkäuferin"
+    ],
+    "Costume Accountant": [],
+    "Gewandmeister / Wardrobe Master": [
+      "Gewandmeisterei / Wardrobe Master",
+      "Gewandmeister / Gewandmeisterin (Wardrobe Master)",
+      "Gewandmeister",
+      "Gewandmeisterin",
+      "Wardrobe Master",
+      "Gewandmeister (Wardrobe Master)",
+      "Gewandmeisterin (Wardrobe Master)"
+    ],
+    "Kostümassistent": [
+      "Kostümassistent / Kostümassistentin",
+      "Kostümassistentin"
+    ],
+    "Kostümpraktikant": [
+      "Kostümpraktikant / Kostümpraktikantin",
+      "Kostümpraktikantin"
+    ],
+    "Schneider / Tailor": [
+      "Schneider / Schneiderin (Tailor)",
+      "Schneider",
+      "Schneiderin",
+      "Tailor",
+      "Schneider (Tailor)",
+      "Schneiderin (Tailor)"
+    ],
+    "Näher / Seamstress": [
+      "Näher / Näherin",
+      "Näher",
+      "Näherin",
+      "Seamster",
+      "Seamstress"
+    ],
+    "Textile Artist": [],
+    "Costume Maker": [
+      "Kostümfertiger",
+      "Kostümfertigerin"
+    ],
+    "Costume Prop Maker": [
+      "Kostümrequisitenbauer",
+      "Kostümrequisitenbauerin"
+    ],
+    "Direktrice": [
+      "Schnittmodelleur / Schnittdirektrice",
+      "Schnittdirektrice",
+      "Modelleur",
+      "Schnittmodelleur",
+      "Entwurfsmodelleur",
+      "Entwurfsdirektrice",
+      "Fertigungsmodelleur",
+      "Fertigungsdirektrice"
+    ],
+    "Damen Maßschneider": [
+      "Damenmaßschneider / Damenmaßschneiderin",
+      "Damenmaßschneider",
+      "Damenmaßschneiderin",
+      "Damen Maßschneiderin"
+    ],
+    "Herren Maßschneider": [
+      "Herrenmaßschneider / Herrenmaßschneiderin",
+      "Herrenmaßschneider",
+      "Herrenmaßschneiderin",
+      "Herren Maßschneiderin"
+    ],
+    "Hutmacher / Milliner": [
+      "Hutmacher / Hutmacherin (Milliner)",
+      "Hutmacher",
+      "Hutmacherin",
+      "Milliner",
+      "Modist",
+      "Modistin",
+      "Hutmacher (Milliner)",
+      "Hutmacherin (Milliner)"
+    ],
+    "Korsettmacher / Corset Maker": [
+      "Korsettmacher / Korsettmacherin (Corset Maker)",
+      "Korsettmacher",
+      "Korsettmacherin",
+      "Corset Maker",
+      "Korsettmacher (Corset Maker)",
+      "Korsettmacherin (Corset Maker)"
+    ],
+    "Kostümillustrator": [
+      "Kostümillustrator / Kostümillustratorin",
+      "Kostümillustratorin"
+    ],
+    "Kostümmaler / Dyer (Färber)": [
+      "Kostümmalerei / Kostümfärbung",
+      "Kostümmaler / Kostümmalerin / Kostümfärber / Kostümfärberin",
+      "Kostümmaler",
+      "Kostümmalerin",
+      "Kostümfärber",
+      "Kostümfärberin",
+      "Dyer",
+      "Färber",
+      "Färberin",
+      "Kostümmaler / Kostümfärber",
+      "Kostümmalerin / Kostümfärberin"
+    ],
+    "Kostüm Patinierer (Aging)": [
+      "Kostümpatinierer / Kostümpatiniererin (Aging)",
+      "Kostümpatinierer",
+      "Kostümpatiniererin",
+      "Kostüm Patinierer",
+      "Kostüm Patiniererin",
+      "Aging",
+      "Kostümpatinierer (Aging)",
+      "Kostümpatiniererin (Aging)"
+    ],
+    "Kostümsticker / Embroiderer": [
+      "Kostümsticker / Kostümstickerin (Embroiderer)",
+      "Kostümsticker",
+      "Kostümstickerin",
+      "Embroiderer",
+      "Kostümsticker (Embroiderer)",
+      "Kostümstickerin (Embroiderer)"
+    ],
+    "Kostümrecherche": [],
+    "Kostümfahrer": [
+      "Kostümfahrdienst",
+      "Kostümfahrer / Kostümfahrerin",
+      "Kostümfahrerin"
+    ],
+    "Breakdown Artist (Aging / Distressing)": [],
+    "SFX Kostüm": [],
+    "Stylist / Stylingassistent": [
+      "Stylist / Stylistin / Stylingassistent / Stylingassistentin",
+      "Stylist",
+      "Stylistin",
+      "Stylingassistent",
+      "Stylingassistentin",
+      "Stylistin / Stylingassistentin"
+    ],
+    "Kostümbildner*in (Gestaltung)": [
+      "Kostümbild (Gestaltung)",
+      "Kostümbildner / Kostümbildnerin (Gestaltung)",
+      "Kostümbildner",
+      "Kostümbildnerin",
+      "Kostümbildner (Gestaltung)",
+      "Kostümbildnerin (Gestaltung)"
+    ],
+    "Kostümberater*in": [
+      "Kostümberatung",
+      "Kostümberater / Kostümberaterin",
+      "Kostümberater",
+      "Kostümberaterin"
+    ],
+    "Kostümbildassistent*in": [
+      "Kostümbildassistenz",
+      "Kostümbildassistent",
+      "Kostümbildassistentin"
+    ],
+    "Kostümdepartment Koordinator*in": [
+      "Kostümdepartment Koordination",
+      "Kostümdepartment-Koordinator / Kostümdepartment-Koordinatorin",
+      "Kostümdepartment Koordinator",
+      "Kostümdepartment Koordinatorin",
+      "Kostümdepartment-Koordinator",
+      "Kostümdepartment-Koordinatorin"
+    ],
+    "Setkostüm (Garderobier*e)": [
+      "Setkostüm / Garderobe",
+      "Setkostüm (Garderobier / Garderobiere)",
+      "Setgarderobier",
+      "Setgarderobiere",
+      "Setgarderobierin",
+      "Garderobier",
+      "Garderobiere",
+      "Garderobierin",
+      "Setkostüm (Garderobier)",
+      "Setkostüm (Garderobiere)"
+    ],
+    "Setkostüm Assistent*in": [
+      "Setkostüm Assistenz",
+      "Setkostümassistent",
+      "Setkostümassistentin",
+      "Setkostüm Assistentin"
+    ],
+    "Stylist*in": [
+      "Styling",
+      "Stylist / Stylistin",
+      "Stylist",
+      "Stylistin"
+    ],
+    "Stylingassistent*in": [
+      "Stylingassistenz",
+      "Stylingassistent",
+      "Stylingassistentin"
+    ],
+    "Gewandmeister*in": [
+      "Gewandmeisterei / Leitung Kostümfertigung",
+      "Gewandmeister / Gewandmeisterin",
+      "Gewandmeister",
+      "Gewandmeisterin"
+    ],
+    "Damen Maßschneider*in": [
+      "Damen Maßschneiderei",
+      "Damenmaßschneider / Damenmaßschneiderin",
+      "Damenmaßschneider",
+      "Damenmaßschneiderin",
+      "Damen Maßschneiderin"
+    ],
+    "Herren Maßschneider*in": [
+      "Herren Maßschneiderei",
+      "Herrenmaßschneider / Herrenmaßschneiderin",
+      "Herrenmaßschneider",
+      "Herrenmaßschneiderin",
+      "Herren Maßschneiderin"
+    ],
+    "Hutmacher*in": [
+      "Hutmacherei",
+      "Hutmacher / Hutmacherin",
+      "Hutmacher",
+      "Hutmacherin",
+      "Modist",
+      "Modistin"
+    ],
+    "Korsettmacher*in": [
+      "Korsettmacherei",
+      "Korsettmacher / Korsettmacherin",
+      "Korsettmacher",
+      "Korsettmacherin"
+    ],
+    "Garderobier/in": [
+      "Garderobe",
+      "Garderobier / Garderobiere",
+      "Garderobier",
+      "Garderobiere",
+      "Garderobierin"
+    ],
+    "Kostümassistenz": [
+      "Kostümassistentin"
+    ],
+    "Schneider*in": [
+      "Schneiderei",
+      "Schneider / Schneiderin",
+      "Schneider",
+      "Schneiderin"
+    ],
+    "Kostümfahrer*in": [
+      "Kostümfahrdienst",
+      "Kostümfahrer / Kostümfahrerin",
+      "Kostümfahrerin"
+    ],
+    "Näher*in": [
+      "Näharbeiten",
+      "Näher / Näherin",
+      "Näher",
+      "Näherin"
+    ],
+    "Kostüm Patinierer*in": [
+      "Kostüm Patinierung",
+      "Kostümpatinierer / Kostümpatiniererin",
+      "Kostümpatinierer",
+      "Kostümpatiniererin",
+      "Kostüm Patinierer",
+      "Kostüm Patiniererin"
+    ],
+    "Kostümmaler/-färber*in": [
+      "Kostümmalerei / Kostümfärbung",
+      "Kostümmaler / Kostümmalerin / Kostümfärber / Kostümfärberin",
+      "Kostümmaler",
+      "Kostümmalerin",
+      "Kostümfärber",
+      "Kostümfärberin",
+      "Kostümmaler / Kostümfärber",
+      "Kostümmalerin / Kostümfärberin"
+    ],
+    "Kostümsticker*in": [
+      "Kostümstickerei",
+      "Kostümsticker / Kostümstickerin",
+      "Kostümsticker",
+      "Kostümstickerin"
+    ],
+    "Kostümillustrator*in": [
+      "Kostümillustration",
+      "Kostümillustrator / Kostümillustratorin",
+      "Kostümillustratorin"
+    ],
+    "Kostümbildpraktikant*in": [
+      "Kostümbildpraktikum",
+      "Kostümbildpraktikant / Kostümbildpraktikantin",
+      "Kostümbildpraktikant",
+      "Kostümbildpraktikantin"
+    ]
+  },
+  "maske": {
+    "Head of Make-up & Hair": [],
+    "Hair Designer": [
+      "Haardesigner",
+      "Haardesignerin"
+    ],
+    "Hair/Makeup Designer": [
+      "Haar- und Make-up-Designer",
+      "Haar- und Make-up-Designerin"
+    ],
+    "Makeup Designer": [
+      "Make-up-Designer",
+      "Make-up-Designerin"
+    ],
+    "Hair/Makeup Supervisor": [],
+    "Key Make-up Artist": [],
+    "Key Hair Stylist": [
+      "Key Hair Stylistin",
+      "Leitender Hairstylist",
+      "Leitende Hairstylistin"
+    ],
+    "Make-up Artist": [
+      "Visagist",
+      "Visagistin",
+      "Maskenbildner",
+      "Maskenbildnerin"
+    ],
+    "Additional Makeup Artist": [],
+    "Hair Stylist": [
+      "Hairstylist",
+      "Hairstylistin",
+      "Friseur",
+      "Friseurin",
+      "Coiffeur",
+      "Coiffeuse"
+    ],
+    "Additional Hair Stylist": [
+      "Zusätzlicher Hairstylist",
+      "Zusätzliche Hairstylistin"
+    ],
+    "Chefmaskenbildner / Dept. Head Make-up": [
+      "Leitung Maskenbild / Head of Make-up",
+      "Chefmaskenbildner / Chefmaskenbildnerin (Head of Make-up)",
+      "Chefmaskenbildner",
+      "Chefmaskenbildnerin",
+      "Head of Make-up",
+      "Chefmaskenbildner (Head of Make-up)",
+      "Chefmaskenbildnerin (Head of Make-up)"
+    ],
+    "Körper Makeup / Body Make-up": [],
+    "Zusatzmaskenbildner / Additional Make-up": [
+      "Zusatzmaskenbild / Additional Make-up",
+      "Zusatzmaskenbildner / Zusatzmaskenbildnerin (Additional Make-up)",
+      "Zusatzmaskenbildner",
+      "Zusatzmaskenbildnerin",
+      "Additional Make-up",
+      "Zusatzmaskenbildner (Additional Make-up)",
+      "Zusatzmaskenbildnerin (Additional Make-up)"
+    ],
+    "Make-up Assistant": [
+      "Make-up-Assistent",
+      "Make-up-Assistentin"
+    ],
+    "Wig Maker / Perückenmacher": [
+      "Perückenmacher / Perückenmacherin (Wig Maker)",
+      "Perückenmacher",
+      "Perückenmacherin",
+      "Wig Maker",
+      "Perückenmacher (Wig Maker)",
+      "Perückenmacherin (Wig Maker)"
+    ],
+    "Prosthetics Artist": [],
+    "SFX Make-up Artist": [],
+    "Crowd Hair & Makeup Supervisor": [],
+    "Maskenbildpraktikant": [
+      "Maskenbildpraktikant / Maskenbildpraktikantin",
+      "Maskenbildpraktikantin"
+    ],
+    "Key Makeup Artist": [],
+    "Chefmaskenbildner*in": [
+      "Leitung Maskenbild",
+      "Chefmaskenbildner / Chefmaskenbildnerin",
+      "Chefmaskenbildner",
+      "Chefmaskenbildnerin"
+    ],
+    "Körper Makeup": [],
+    "Zusatzmaskenbildner*in": [
+      "Zusatzmaskenbild",
+      "Zusatzmaskenbildner / Zusatzmaskenbildnerin",
+      "Zusatzmaskenbildner",
+      "Zusatzmaskenbildnerin"
+    ],
+    "Perückenmacher*in": [
+      "Perückenmacherei",
+      "Perückenmacher / Perückenmacherin",
+      "Perückenmacher",
+      "Perückenmacherin"
+    ],
+    "Maskenbildpraktikant*in": [
+      "Maskenbildpraktikum",
+      "Maskenbildpraktikant / Maskenbildpraktikantin",
+      "Maskenbildpraktikantin"
+    ]
+  },
+  "post": {
+    "Postproduction Producer*in": [
+      "Postproduction Producer",
+      "Postproduction Producerin",
+      "Postproduktionsproduzent",
+      "Postproduktionsproduzentin"
+    ],
+    "Postproduction Supervisor": [],
+    "Postproduction Manager": [
+      "Postproduction Managerin",
+      "Postproduktionsmanager",
+      "Postproduktionsmanagerin"
+    ],
+    "Post-Koordinator*in": [
+      "Post-Koordination",
+      "Postproduktionskoordinator / Postproduktionskoordinatorin",
+      "Post-Koordinator",
+      "Post-Koordinatorin",
+      "Postproduktionskoordinator",
+      "Postproduktionskoordinatorin"
+    ],
+    "Postproduktionsdisponent*in": [
+      "Postproduktionsdisposition",
+      "Postproduktionsdisponent / Postproduktionsdisponentin",
+      "Postproduktionsdisponent",
+      "Postproduktionsdisponentin"
+    ],
+    "Assistent*in Postprod. Supervisor": [
+      "Assistenz Postprod. Supervisor",
+      "Assistent Postprod. Supervisor",
+      "Assistentin Postprod. Supervisor",
+      "Postproduktionssupervisor-Assistent",
+      "Postproduktionssupervisor-Assistentin"
+    ],
+    "Delivery Manager / Delivery Supervisor": [
+      "Delivery Managerin"
+    ],
+    "Editor": [
+      "Editorin",
+      "Cutter",
+      "Cutterin",
+      "Filmeditor",
+      "Filmeditorin"
+    ],
+    "Cutter/in (Editor)": [
+      "Schnitt / Editing",
+      "Cutter / Cutterin (Editor)",
+      "Cutter",
+      "Cutterin",
+      "Editorin",
+      "Filmeditor",
+      "Filmeditorin",
+      "Cutter (Editor)",
+      "Cutterin (Editor)"
+    ],
+    "Additional Editor*in": [
+      "Additional Editor",
+      "Additional Editorin",
+      "Zusätzlicher Editor",
+      "Zusätzliche Editorin",
+      "Zusätzlicher Cutter",
+      "Zusätzliche Cutterin"
+    ],
+    "Junior Editor*in": [
+      "Junior Editor",
+      "Junior Editorin",
+      "Junior Cutter",
+      "Junior Cutterin"
+    ],
+    "First Assistant Editor": [
+      "Erster Schnittassistent",
+      "Erste Schnittassistentin",
+      "1. Schnittassistent",
+      "1. Schnittassistentin"
+    ],
+    "Schnittassistent*in": [
+      "Schnittassistenz",
+      "Schnittassistent",
+      "Schnittassistentin"
+    ],
+    "Second Assistant Editor": [
+      "Zweiter Schnittassistent",
+      "Zweite Schnittassistentin",
+      "2. Schnittassistent",
+      "2. Schnittassistentin"
+    ],
+    "2. Schnittassistent*in": [
+      "2. Schnittassistenz",
+      "2. Schnittassistent",
+      "2. Schnittassistentin",
+      "Zweiter Schnittassistent",
+      "Zweite Schnittassistentin"
+    ],
+    "3. Schnittassistent*in": [
+      "3. Schnittassistenz",
+      "3. Schnittassistent",
+      "3. Schnittassistentin",
+      "Dritter Schnittassistent",
+      "Dritte Schnittassistentin"
+    ],
+    "Schnittdramaturg*in": [
+      "Schnittdramaturgie",
+      "Schnittdramaturg / Schnittdramaturgin",
+      "Schnittdramaturg",
+      "Schnittdramaturgin"
+    ],
+    "VFX Editor*in": [
+      "VFX Editor",
+      "VFX Editorin",
+      "VFX Cutter",
+      "VFX Cutterin"
+    ],
+    "Trailer Editor*in": [
+      "Trailer Editor",
+      "Trailer Editorin",
+      "Trailer Cutter",
+      "Trailer Cutterin"
+    ],
+    "Dailies Cutter": [
+      "Dailies Cutterin",
+      "Dailies Editor",
+      "Dailies Editorin"
+    ],
+    "Sync Assistant": [
+      "Synchronassistent",
+      "Synchronassistentin"
+    ],
+    "Avid Operator": [
+      "Avid Operatorin"
+    ],
+    "Final Cut Operator*in": [
+      "Final Cut Operator",
+      "Final Cut Operatorin"
+    ],
+    "Colorist": [
+      "Coloristin",
+      "Colourist",
+      "Colouristin"
+    ],
+    "Online Editor": [
+      "Online Editorin",
+      "Online Cutter",
+      "Online Cutterin"
+    ],
+    "Finishing Artist": [],
+    "Screen Designer*in": [
+      "Screen Designer",
+      "Screen Designerin",
+      "Screendesigner",
+      "Screendesignerin"
+    ],
+    "Title Designer*in": [
+      "Title Designer",
+      "Title Designerin",
+      "Titeldesigner",
+      "Titeldesignerin"
+    ],
+    "DCP Technician": [
+      "DCP-Techniker",
+      "DCP-Technikerin"
+    ],
+    "Filmscan Operator": [
+      "Filmscan Operatorin",
+      "Filmscan-Operator",
+      "Filmscan-Operatorin"
+    ],
+    "Filmscanning Supervisor": [],
+    "VFX Supervisor": [],
+    "VFX Producer*in": [
+      "VFX Producer",
+      "VFX Producerin",
+      "VFX-Produzent",
+      "VFX-Produzentin"
+    ],
+    "VFX Coordinator": [
+      "VFX-Koordinator",
+      "VFX-Koordinatorin"
+    ],
+    "VFX Herstellungsleiter*in": [
+      "VFX Herstellungsleitung",
+      "VFX-Herstellungsleiter / VFX-Herstellungsleiterin",
+      "VFX Herstellungsleiter",
+      "VFX Herstellungsleiterin",
+      "VFX-Herstellungsleiter",
+      "VFX-Herstellungsleiterin"
+    ],
+    "VFX Outsource Producer": [
+      "VFX Outsource Producerin"
+    ],
+    "Assistant VFX Producer*in": [
+      "Assistant VFX Producer",
+      "Assistant VFX Producerin",
+      "VFX-Produktionsassistent",
+      "VFX-Produktionsassistentin"
+    ],
+    "VFX Animation Supervisor": [],
+    "VR Producer*in": [
+      "VR Producer",
+      "VR Producerin",
+      "VR-Produzent",
+      "VR-Produzentin"
+    ],
+    "Compositor": [
+      "Compositorin",
+      "Compositing Artist"
+    ],
+    "Compositing Supervisor": [],
+    "Digital Compositor": [
+      "Digital Compositorin"
+    ],
+    "Digital Effects Supervisor": [],
+    "Digital Effects Designer*in": [
+      "Digital Effects Designer",
+      "Digital Effects Designerin"
+    ],
+    "Digital Matte Painter": [],
+    "2D Artist": [],
+    "3D Artist": [],
+    "Lighting Artist (CG)": [],
+    "Texture Artist": [],
+    "Matchmove Artist": [],
+    "Roto Artist": [],
+    "FX Artist": [],
+    "Animator": [
+      "Animatorin",
+      "Animationsgestalter",
+      "Animationsgestalterin"
+    ],
+    "Motion Designer": [
+      "Motion Designerin",
+      "Motiondesigner",
+      "Motiondesignerin"
+    ],
+    "Character Animator": [
+      "Character Animatorin",
+      "Charakteranimator",
+      "Charakteranimatorin"
+    ],
+    "Post-Produktionsassistent*in": [
+      "Post-Produktionsassistenz",
+      "Post-Produktionsassistent",
+      "Post-Produktionsassistentin",
+      "Postproduktionsassistent",
+      "Postproduktionsassistentin"
+    ],
+    "Post-Produktionstechniker*in": [
+      "Post-Produktionstechnikfachkraft",
+      "Postproduktionstechniker / Postproduktionstechnikerin",
+      "Post-Produktionstechniker",
+      "Post-Produktionstechnikerin",
+      "Postproduktionstechniker",
+      "Postproduktionstechnikerin"
+    ],
+    "Schnittpraktikant*in": [
+      "Schnittpraktikum",
+      "Schnittpraktikant / Schnittpraktikantin",
+      "Schnittpraktikant",
+      "Schnittpraktikantin"
+    ],
+    "Post-Produktionskoordinator*in": [
+      "Post-Produktionskoordination",
+      "Postproduktionskoordinator / Postproduktionskoordinatorin",
+      "Post-Produktionskoordinator",
+      "Post-Produktionskoordinatorin",
+      "Postproduktionskoordinator",
+      "Postproduktionskoordinatorin"
+    ],
+    "Assistant to Postprod. Supervisor": [
+      "Postproduktionssupervisor-Assistent",
+      "Postproduktionssupervisor-Assistentin"
+    ],
+    "VFX Artist / Compositor": [
+      "VFX Compositor",
+      "VFX Compositorin"
+    ],
+    "Sound Designer": [
+      "Sound Designerin",
+      "Sounddesigner",
+      "Sounddesignerin",
+      "Tongestalter",
+      "Tongestalterin"
+    ],
+    "Sound Editor / Cutter": [
+      "Sound Editorin",
+      "Sound Cutterin",
+      "Toncutter",
+      "Toncutterin"
+    ],
+    "DCP Artist": [],
+    "Film Recorder Operator": [
+      "Film Recorder Operatorin"
+    ],
+    "Mistika Operator": [
+      "Mistika Operatorin"
+    ],
+    "VFX Technical Director": [],
+    "VFX Consultant*in": [
+      "VFX Consultant",
+      "VFX-Berater",
+      "VFX-Beraterin"
+    ],
+    "VFX Lighting Supervisor": [],
+    "VFX Set Supervisor": [],
+    "VFX Production Coordinator": [
+      "VFX-Produktionskoordinator",
+      "VFX-Produktionskoordinatorin"
+    ],
+    "Assistant VFX Coordinator": [
+      "VFX-Koordinationsassistent",
+      "VFX-Koordinationsassistentin"
+    ],
+    "VFX Executive": [],
+    "VFX HR Manager": [
+      "VFX HR Managerin"
+    ],
+    "VFX IT Admin": [
+      "VFX-IT-Administrator",
+      "VFX-IT-Administratorin"
+    ],
+    "VFX IT Support": [],
+    "VFX IT System Engineer / Technician": [
+      "VFX-IT-Systemingenieur",
+      "VFX-IT-Systemingenieurin",
+      "VFX-IT-Systemtechniker",
+      "VFX-IT-Systemtechnikerin"
+    ],
+    "Pipeline Technical Director": [],
+    "Computer Graphics Supervisor": [],
+    "CG Software Entwickler*in": [
+      "CG Software Entwicklung",
+      "CG-Softwareentwickler / CG-Softwareentwicklerin",
+      "CG Software Entwickler",
+      "CG Software Entwicklerin",
+      "CG-Softwareentwickler",
+      "CG-Softwareentwicklerin"
+    ],
+    "Concept Artist (VFX)": [],
+    "Character Designer": [
+      "Character Designerin",
+      "Charakterdesigner",
+      "Charakterdesignerin"
+    ],
+    "Character Supervisor": [],
+    "Animatronics Supervisor": [],
+    "Previs Supervisor": [],
+    "Previs Artist*in": [
+      "Previs Artist"
+    ],
+    "Motion Capture Supervisor": [],
+    "Motioncontrol Supervisor": [],
+    "Dailies Operator": [
+      "Dailies Operatorin"
+    ],
+    "I/O Coordinator": [
+      "I/O-Koordinator",
+      "I/O-Koordinatorin"
+    ],
+    "Telecine Operator": [
+      "Telecine Operatorin"
+    ],
+    "Digital Matchmover": [
+      "Digital Matchmoverin"
+    ],
+    "Rotoscoping Artist": [],
+    "DAM Digital Asset Manager": [
+      "DAM Digital Asset Managerin",
+      "Digital Asset Managerin"
+    ],
+    "DI Digital Intermediate Supervisor": [],
+    "Digital Intermediate Engineer": [
+      "Digital-Intermediate-Ingenieur",
+      "Digital-Intermediate-Ingenieurin"
+    ],
+    "Digital Intermediate Assistent*in": [
+      "Digital Intermediate Assistenz",
+      "Digital Intermediate Assistent",
+      "Digital Intermediate Assistentin",
+      "Digital-Intermediate-Assistent",
+      "Digital-Intermediate-Assistentin"
+    ],
+    "VFX Data Wrangler": [],
+    "Render Wrangler": [],
+    "3D Stereo Supervisor": [],
+    "On-Set Screen-Zuspielung": [],
+    "VFX Praktikant*in": [
+      "VFX Praktikum",
+      "VFX-Praktikant / VFX-Praktikantin",
+      "VFX Praktikant",
+      "VFX Praktikantin",
+      "VFX-Praktikant",
+      "VFX-Praktikantin"
+    ],
+    "VFX Production Assistent*in": [
+      "VFX Production Assistenz",
+      "VFX Production Assistent",
+      "VFX Production Assistentin",
+      "VFX-Produktionsassistent",
+      "VFX-Produktionsassistentin"
+    ],
+    "VFX Team Manager": [
+      "VFX Team Managerin"
+    ],
+    "Head of 3D": [],
+    "3D Animation Director": [],
+    "3D Lead Character Animator": [
+      "3D Lead Character Animatorin",
+      "Leitender 3D-Charakteranimator",
+      "Leitende 3D-Charakteranimatorin"
+    ],
+    "3D Character Animator": [
+      "3D Character Animatorin",
+      "3D-Charakteranimator",
+      "3D-Charakteranimatorin"
+    ],
+    "3D Rigger": [
+      "3D Riggerin"
+    ],
+    "3D Modeler": [
+      "3D Modelerin",
+      "3D-Modellierer",
+      "3D-Modelliererin"
+    ],
+    "3D Lighter": [],
+    "3D Texturer": [],
+    "3D Camera Artist": [],
+    "3D Camera Supervisor": [],
+    "FX Animator": [
+      "FX Animatorin"
+    ],
+    "Particle Animator": [
+      "Particle Animatorin",
+      "Partikelanimator",
+      "Partikelanimatorin"
+    ],
+    "2D Rigger": [
+      "2D Riggerin"
+    ],
+    "2D Animation Director": [],
+    "2D Lead Character Animator": [
+      "2D Lead Character Animatorin",
+      "Leitender 2D-Charakteranimator",
+      "Leitende 2D-Charakteranimatorin"
+    ],
+    "2D Character Animator": [
+      "2D Character Animatorin",
+      "2D-Charakteranimator",
+      "2D-Charakteranimatorin"
+    ],
+    "MotionBuilder Artist": [],
+    "MotionBuilder Operator": [
+      "MotionBuilder Operatorin"
+    ]
+  },
+  "musik": {
+    "Komponist*in": [
+      "Komposition",
+      "Komponist / Komponistin",
+      "Komponist",
+      "Komponistin"
+    ],
+    "Additional Music": [],
+    "Trailer-Komponist*in": [
+      "Trailer-Komposition",
+      "Trailer-Komponist / Trailer-Komponistin",
+      "Trailer-Komponist",
+      "Trailer-Komponistin"
+    ],
+    "Musikalische*r Leiter*in": [
+      "Musikalische Leitung",
+      "Musikalischer Leiter",
+      "Musikalische Leiterin"
+    ],
+    "Music Director": [],
+    "Music Supervisor": [],
+    "Orchestrator": [],
+    "Arranger": [],
+    "Arrangeur*in": [
+      "Arrangement",
+      "Arrangeur / Arrangeurin",
+      "Arrangeur",
+      "Arrangeurin"
+    ],
+    "Conductor": [],
+    "Dirigent*in": [
+      "Dirigat",
+      "Dirigent / Dirigentin",
+      "Dirigent",
+      "Dirigentin"
+    ],
+    "Music Editor": [],
+    "Music Copyist": [],
+    "Musikproduzent*in": [
+      "Musikproduktion",
+      "Musikproduzent / Musikproduzentin",
+      "Musikproduzent",
+      "Musikproduzentin"
+    ],
+    "Music Consultant": [],
+    "Musik Koordinator*in": [
+      "Musik Koordination",
+      "Musikkoordinator / Musikkoordinatorin",
+      "Musikkoordinator",
+      "Musikkoordinatorin",
+      "Musik Koordinator",
+      "Musik Koordinatorin"
+    ],
+    "Logic Operator": [],
+    "Pro Tools Operator": [],
+    "Assistent*in des/der Komponist*in": [
+      "Kompositionsassistenz",
+      "Kompositionsassistent",
+      "Kompositionsassistentin",
+      "Assistent des Komponisten",
+      "Assistentin des Komponisten",
+      "Assistent der Komponistin",
+      "Assistentin der Komponistin"
+    ],
+    "Musiker*in": [
+      "Musiker / Musikerin",
+      "Musiker",
+      "Musikerin"
+    ],
+    "Sound Editor": [],
+    "Komponistenpraktikant*in": [
+      "Kompositionspraktikum",
+      "Kompositionspraktikant / Kompositionspraktikantin",
+      "Kompositionspraktikant",
+      "Kompositionspraktikantin",
+      "Komponistenpraktikant",
+      "Komponistenpraktikantin"
+    ],
+    "Executive Soundtrack Producer*in": [
+      "Executive Soundtrack Producer",
+      "Executive Soundtrack Producerin"
+    ]
+  },
+  "set-logistik": {
+    "Base Runner": [],
+    "Fahrer (PKW / LKW)": [
+      "Fahrdienst (PKW / LKW)",
+      "Fahrer / Fahrerin (PKW / LKW)",
+      "Fahrerin (PKW / LKW)"
+    ],
+    "Motivfahrer": [
+      "Motivfahrdienst",
+      "Motivfahrer / Motivfahrerin",
+      "Motivfahrerin"
+    ],
+    "Motivaufnahmeleiter": [
+      "Motivaufnahmeleitung",
+      "Motivaufnahmeleiterin"
+    ],
+    "Assistant Location Manager": [],
+    "Set Security": [],
+    "Crowd Control": [],
+    "Movement Director": [],
+    "Movement Coach": [],
+    "Intimacy Coordinator": [],
+    "Choreograph*in": [
+      "Choreografie",
+      "Choreograf / Choreografin",
+      "Choreograf",
+      "Choreografin",
+      "Choreograph",
+      "Choreographin"
+    ],
+    "Tanz Coach": [],
+    "Gesangs Coach": [],
+    "Dialog Coach": [],
+    "Dialekt-, Sprach-Coach": [],
+    "Coach für Schauspieler*innen (Behinderung/Neurodivergenz)": [
+      "Coach für Schauspielende (Behinderung/Neurodivergenz)"
+    ],
+    "Musikcoach": [],
+    "Deaf Supervisor": [],
+    "Diversity Consultant": [],
+    "Sensivity Reader": [],
+    "Dolmetscher*in": [
+      "Dolmetschen",
+      "Dolmetscher / Dolmetscherin",
+      "Dolmetscher",
+      "Dolmetscherin"
+    ],
+    "Stand In": [],
+    "Set Medic": [],
+    "Set Lehrer*in": [
+      "Set Lehrkraft",
+      "Set-Lehrkraft",
+      "Set-Lehrer",
+      "Set-Lehrerin",
+      "Set Lehrer",
+      "Set Lehrerin"
+    ],
+    "Kinderbetreuer*in": [
+      "Kinderbetreuung",
+      "Kinderbetreuer / Kinderbetreuerin",
+      "Kinderbetreuer",
+      "Kinderbetreuerin"
+    ],
+    "Kindeswohlbeauftragte*r": [
+      "Kindeswohlbetreuung",
+      "Kindeswohlbeauftragter / Kindeswohlbeauftragte",
+      "Kindeswohlbeauftragter",
+      "Kindeswohlbeauftragte"
+    ],
+    "Künstler-, Gäste-, VIP-Betreuer*in": [
+      "Künstler-, Gäste-, VIP-Betreuung",
+      "Künstler-, Gäste- und VIP-Betreuer / Künstler-, Gäste- und VIP-Betreuerin",
+      "Künstler-, Gäste- und VIP-Betreuer",
+      "Künstler-, Gäste- und VIP-Betreuerin",
+      "Künstlerbetreuer",
+      "Künstlerbetreuerin",
+      "Gästebetreuer",
+      "Gästebetreuerin",
+      "VIP-Betreuer",
+      "VIP-Betreuerin"
+    ],
+    "Mental Health Coordinator": [],
+    "Vertrauensperson": [],
+    "Fachkraft für Arbeitssicherheit": [],
+    "Hygienebeauftragte*r (Coronaschutz)": [
+      "Hygienebeauftragte Person (Coronaschutz)",
+      "Hygienebeauftragter / Hygienebeauftragte (Coronaschutz)",
+      "Hygienebeauftragter (Coronaschutz)",
+      "Hygienebeauftragte (Coronaschutz)"
+    ],
+    "Marine Coordinator": [],
+    "Underwater / Dive Coordinator": [],
+    "Sattel-, Schirrmeister*in": [
+      "Sattel-, Schirrmeisterei",
+      "Sattel- und Schirrmeister / Sattel- und Schirrmeisterin",
+      "Sattel- und Schirrmeister",
+      "Sattel- und Schirrmeisterin",
+      "Sattelmeister",
+      "Sattelmeisterin",
+      "Schirrmeister",
+      "Schirrmeisterin"
+    ],
+    "Zuschauerbetreuuer*in": [
+      "Publikumsbetreuung",
+      "Publikumsbetreuer / Publikumsbetreuerin",
+      "Publikumsbetreuer",
+      "Publikumsbetreuerin",
+      "Zuschauerbetreuer",
+      "Zuschauerbetreuerin",
+      "Zuschauerbetreuuer",
+      "Zuschauerbetreuuerin"
+    ],
+    "Consultant Director": [],
+    "Creative Director (Werbeagentur)": [],
+    "Fachberater*in": [
+      "Fachberatung",
+      "Fachberater / Fachberaterin",
+      "Fachberater",
+      "Fachberaterin"
+    ],
+    "Sachverständige*r (Produktion)": [
+      "Sachverständige Person (Produktion)",
+      "Sachverständiger / Sachverständige (Produktion)",
+      "Sachverständiger (Produktion)",
+      "Sachverständige (Produktion)"
+    ],
+    "Dozent*in / Coach": [
+      "Lehrkraft / Coach",
+      "Dozent / Dozentin · Coach",
+      "Dozent",
+      "Dozentin",
+      "Dozent / Coach",
+      "Dozentin / Coach",
+      "Dozent · Coach",
+      "Dozentin · Coach"
+    ],
+    "Impact Producer": [],
+    "Green Consultant": [],
+    "Green Consultant Assistant": [],
+    "EPK / Behind the Scenes Line Producer": [],
+    "EPK / Behind the Scenes Producer": [],
+    "Filmrestaurator*in": [
+      "Filmrestaurierung",
+      "Filmrestaurator / Filmrestauratorin",
+      "Filmrestaurator",
+      "Filmrestauratorin"
+    ],
+    "Filmkolorist*in": [
+      "Filmkolorierung",
+      "Filmkolorist / Filmkoloristin",
+      "Filmkolorist",
+      "Filmkoloristin"
+    ],
+    "Disc Media Author": [],
+    "Stop Motion Animator": [],
+    "Trickfilmzeichner*in": [
+      "Trickfilmzeichnung",
+      "Trickfilmzeichner / Trickfilmzeichnerin",
+      "Trickfilmzeichner",
+      "Trickfilmzeichnerin"
+    ],
+    "Spieleentwickler*in (Shows)": [
+      "Spieleentwicklung (Shows)",
+      "Spieleentwickler / Spieleentwicklerin (Shows)",
+      "Spieleentwickler (Shows)",
+      "Spieleentwicklerin (Shows)"
+    ],
+    "Puppenspieler*in": [
+      "Puppenspiel",
+      "Puppenspieler / Puppenspielerin",
+      "Puppenspieler",
+      "Puppenspielerin"
+    ],
+    "Visual Jockey": [],
+    "On Air Designer*in": [
+      "On Air Designer",
+      "On Air Designerin"
+    ],
+    "Subtitles Spotter": [],
+    "Untertitler*in": [
+      "Untertitelung",
+      "Untertitler / Untertitlerin",
+      "Untertitler",
+      "Untertitlerin"
+    ],
+    "Regiescout": [],
+    "Rechteklärung": [],
+    "PR Fotograf*in": [
+      "PR Fotografie",
+      "PR-Fotograf / PR-Fotografin",
+      "PR-Fotograf",
+      "PR-Fotografin",
+      "PR Fotograf",
+      "PR Fotografin"
+    ],
+    "Projektleiter*in (extern)": [
+      "Projektleitung (extern)",
+      "Projektleiter (extern)",
+      "Projektleiterin (extern)"
+    ],
+    "Personal Assistant": [],
+    "Recherche": []
+  },
+  "cast": {
+    "Hauptdarsteller/in": [
+      "Hauptrolle",
+      "Hauptdarsteller / Hauptdarstellerin",
+      "Hauptdarsteller",
+      "Hauptdarstellerin"
+    ],
+    "Schauspieler": [
+      "Schauspieler / Schauspielerin",
+      "Schauspielerin"
+    ],
+    "Nebendarsteller": [
+      "Nebendarsteller / Nebendarstellerin",
+      "Nebendarstellerin"
+    ],
+    "Komparse": [
+      "Komparse / Komparsin",
+      "Komparsin"
+    ],
+    "Kleindarsteller": [
+      "Kleindarsteller / Kleindarstellerin",
+      "Kleindarstellerin"
+    ],
+    "Model": [],
+    "Sprecher / Voice-Over": [
+      "Sprechstimme / Voice-over",
+      "Sprecher / Sprecherin · Voice-over",
+      "Sprecher",
+      "Sprecherin",
+      "Sprecherin / Voice-Over",
+      "Sprecher · Voice-over",
+      "Sprecherin · Voice-over"
+    ],
+    "Stand-In": [],
+    "Stunt Performer": [
+      "Stuntman",
+      "Stuntwoman",
+      "Stuntmann",
+      "Stuntfrau",
+      "Stuntdarsteller",
+      "Stuntdarstellerin"
+    ],
+    "Stunt Double": [
+      "Stuntdouble",
+      "Stunt-Double"
+    ],
+    "Stunt Rigger": [],
+    "Stunt Coordinator": [],
+    "Assistant Stunt Coordinator": [],
+    "Stunt Department Koordinator*in": [
+      "Stunt Department Koordination",
+      "Stunt-Department-Koordinator / Stunt-Department-Koordinatorin",
+      "Stunt-Department-Koordinator",
+      "Stunt-Department-Koordinatorin",
+      "Stunt Department Koordinator",
+      "Stunt Department Koordinatorin"
+    ],
+    "Fight Choreographer": [],
+    "Action Regisseur*in": [
+      "Action Regie",
+      "Action-Regisseur / Action-Regisseurin",
+      "Action-Regisseur",
+      "Action-Regisseurin",
+      "Action Regisseur",
+      "Action Regisseurin"
+    ],
+    "Aerial Coordinator": [],
+    "Stunt Rider": [],
+    "Stunt Technician": [],
+    "Stunt Rescue Diver": [],
+    "Parkour Artist": [],
+    "Präzisionsfahrer*in": [
+      "Präzisionsfahrtechnik",
+      "Präzisionsfahrer / Präzisionsfahrerin",
+      "Präzisionsfahrer",
+      "Präzisionsfahrerin"
+    ],
+    "Intimacy Coordinator": [],
+    "Casting Associate": [],
+    "Castingassistent*in": [
+      "Castingassistenz",
+      "Castingassistent",
+      "Castingassistentin"
+    ],
+    "Nebendarsteller/in": [
+      "Nebenrolle",
+      "Nebendarsteller / Nebendarstellerin",
+      "Nebendarstellerin"
+    ],
+    "Statist / Komparse": [
+      "Statist / Statistin · Komparse / Komparsin",
+      "Statist",
+      "Statistin",
+      "Komparsin",
+      "Statistin / Komparsin",
+      "Statist · Komparse",
+      "Statistin · Komparsin"
+    ],
+    "Casting Director (Jugendliche)": [],
+    "Casting Director (Kinder)": [],
+    "Streetcasting": [],
+    "Komparsen-, Kleindarstellercasting": [],
+    "Castingpraktikant*in": [
+      "Castingpraktikum",
+      "Castingpraktikant / Castingpraktikantin",
+      "Castingpraktikant",
+      "Castingpraktikantin"
+    ],
+    "Head Stunt Rigger": [],
+    "Coachmen*women": [
+      "Kutschführung",
+      "Kutscher / Kutscherin",
+      "Kutscher",
+      "Kutscherin",
+      "Coachman",
+      "Coachwoman",
+      "Coachmen",
+      "Coachwomen"
+    ]
+  },
+  "sfx": {
+    "Special Effects Supervisor": [],
+    "SFX Technician": [],
+    "Special Effects Coordinator": [],
+    "Special Effects Project Manager": [],
+    "Pyrotechnician": [],
+    "Pyro Assistant": [],
+    "Miniature Effects Producer": [],
+    "Creature Designer*in": [
+      "Creature Designer",
+      "Creature Designerin"
+    ],
+    "Animatronics Engineer": [],
+    "Puppenbauer*in": [
+      "Puppenbau",
+      "Puppenbauer / Puppenbauerin",
+      "Puppenbauer",
+      "Puppenbauerin"
+    ],
+    "Waffenmeister": [
+      "Waffenbetreuung",
+      "Waffenmeister / Waffenmeisterin",
+      "Waffenmeisterin"
+    ],
+    "Waffentechniker*in": [
+      "Waffentechnikfachkraft",
+      "Waffentechniker / Waffentechnikerin",
+      "Waffentechniker",
+      "Waffentechnikerin"
+    ],
+    "Rigger (Wire)": [],
+    "SFX Rigging / Spezialkonstruktionen": [],
+    "Mechanical Effects Technician": [],
+    "Snow / Rain Effects Tech": [],
+    "Special Effects Accountant": [],
+    "SFX Spezialeffekte Techniker*in": [
+      "SFX Spezialeffekte Technikfachkraft",
+      "SFX-Spezialeffekttechniker / SFX-Spezialeffekttechnikerin",
+      "SFX-Spezialeffekttechniker",
+      "SFX-Spezialeffekttechnikerin",
+      "SFX Spezialeffekte Techniker",
+      "SFX Spezialeffekte Technikerin"
+    ]
+  },
+  "broadcast": {
+    "Produktionsingenieur*in": [
+      "Produktionsengineering",
+      "Produktionsingenieur / Produktionsingenieurin",
+      "Produktionsingenieur",
+      "Produktionsingenieurin"
+    ],
+    "Broadcast Engineer": [],
+    "Technische*r Leiter*in": [
+      "Technische Leitung",
+      "Technischer Leiter",
+      "Technische Leiterin"
+    ],
+    "Bildingenieur*in": [
+      "Bildengineering",
+      "Bildingenieur / Bildingenieurin",
+      "Bildingenieur",
+      "Bildingenieurin"
+    ],
+    "Bildmischer": [
+      "Bildmischer / Bildmischerin",
+      "Bildmischerin"
+    ],
+    "Vision Mixer": [],
+    "Shader": [],
+    "Kamera CCU Operator": [],
+    "DVE Operator": [],
+    "Profile Operator": [],
+    "Sendetechniker*in": [
+      "Sendetechnikfachkraft",
+      "Sendetechniker / Sendetechnikerin",
+      "Sendetechniker",
+      "Sendetechnikerin"
+    ],
+    "Sound Supervisor (Broadcast)": [],
+    "Toningenieur*in": [
+      "Tonengineering",
+      "Toningenieur / Toningenieurin",
+      "Toningenieur",
+      "Toningenieurin"
+    ],
+    "Studio-/Veranstaltungsmeister*in": [
+      "Studio-/Veranstaltungsmeisterei",
+      "Studiomeister / Studiomeisterin · Veranstaltungsmeister / Veranstaltungsmeisterin",
+      "Studiomeister",
+      "Studiomeisterin",
+      "Veranstaltungsmeister",
+      "Veranstaltungsmeisterin",
+      "Studio-/Veranstaltungsmeister",
+      "Studio-/Veranstaltungsmeisterin",
+      "Studiomeister · Veranstaltungsmeister",
+      "Studiomeisterin · Veranstaltungsmeisterin"
+    ],
+    "Veranstaltungsmanager*in": [
+      "Veranstaltungsmanagement",
+      "Veranstaltungsmanager / Veranstaltungsmanagerin",
+      "Veranstaltungsmanager",
+      "Veranstaltungsmanagerin"
+    ],
+    "Veranstaltungstechniker*in": [
+      "Veranstaltungstechnikfachkraft",
+      "Veranstaltungstechniker / Veranstaltungstechnikerin",
+      "Veranstaltungstechniker",
+      "Veranstaltungstechnikerin"
+    ],
+    "MAZ Operator": [],
+    "MAZ Techniker*in": [
+      "MAZ Technikfachkraft",
+      "MAZ-Techniker / MAZ-Technikerin",
+      "MAZ-Techniker",
+      "MAZ-Technikerin",
+      "MAZ Techniker",
+      "MAZ Technikerin"
+    ],
+    "EVS Operator": [],
+    "LSM Operator (Slomo)": [],
+    "Streaming Technician": [],
+    "Rigger (Broadcast/Event)": [],
+    "Rigging Assistent*in": [
+      "Rigging Assistenz",
+      "Rigging-Assistenz",
+      "Rigging-Assistent",
+      "Rigging-Assistentin",
+      "Rigging Assistent",
+      "Rigging Assistentin"
+    ],
+    "Bildtechniker*in": [
+      "Bildtechnikfachkraft",
+      "Bildtechniker / Bildtechnikerin",
+      "Bildtechniker",
+      "Bildtechnikerin"
+    ],
+    "Lichttechniker*in": [
+      "Lichttechnikfachkraft",
+      "Lichttechniker / Lichttechnikerin",
+      "Lichttechnikerin"
+    ],
+    "Tontechniker*in": [
+      "Tontechnikfachkraft",
+      "Tontechniker / Tontechnikerin",
+      "Tontechniker",
+      "Tontechnikerin"
+    ],
+    "Beschallungsingenieur*in": [
+      "Beschallungsengineering",
+      "Beschallungsingenieur / Beschallungsingenieurin",
+      "Beschallungsingenieur",
+      "Beschallungsingenieurin"
+    ],
+    "Beschallungstechniker*in": [
+      "Beschallungstechnikfachkraft",
+      "Beschallungstechniker / Beschallungstechnikerin",
+      "Beschallungstechniker",
+      "Beschallungstechnikerin"
+    ],
+    "SNG Operator": [],
+    "Tonassistent*in (Broadcast)": [
+      "Tonassistenz (Broadcast)",
+      "Tonassistent (Broadcast)",
+      "Tonassistentin (Broadcast)"
+    ],
+    "Vidiwall Operator": [],
+    "Teleprompter Operator": [],
+    "Technischer Assistent*in (Broadcast)": [
+      "Technische Assistenz (Broadcast)",
+      "Technischer Assistent (Broadcast)",
+      "Technische Assistentin (Broadcast)"
+    ],
+    "Bildassistent*in": [
+      "Bildassistenz",
+      "Bildassistent",
+      "Bildassistentin"
+    ],
+    "Kabelhilfe": [],
+    "Bildmischer*in": [
+      "Bildmischung",
+      "Bildmischer / Bildmischerin",
+      "Bildmischerin"
+    ],
+    "LSM Operator (Slomo Highlight)": [],
+    "SG Operator": [],
+    "Tonassistent*in": [
+      "Tonassistent",
+      "Tonassistentin"
+    ],
+    "Technischer Assistent*in": [
+      "Technische Assistenz",
+      "Technischer Assistent",
+      "Technische Assistentin"
+    ]
+  },
+  "virtual": {
+    "Virtual Production Supervisor": [],
+    "Virtual Production Producer": [],
+    "Virtual Production Coordinator": [],
+    "Virtual Production Studio Manager": [],
+    "VAD Artist (Virtual Art Department)": [],
+    "Virtual Production Engineer": [],
+    "VP Systems & Tools Technical Director": [],
+    "LED Wall Operator": [],
+    "Unreal Engine Operator": [],
+    "Realtime Engine Operator": [],
+    "Media Server Operator": [],
+    "VP System Admin": [],
+    "VP Tracking Technician": [],
+    "VP LED Technician": [],
+    "Tracking Technician": [],
+    "Real-Time Artist": [],
+    "Virtual Art Department (VAD) Artist": []
+  },
+  "redaktion": {
+    "Redaktionsleiter*in": [
+      "Redaktionsleitung",
+      "Redaktionsleiter",
+      "Redaktionsleiterin"
+    ],
+    "Chefredakteur*in": [
+      "Chefredaktion",
+      "Chefredakteur / Chefredakteurin",
+      "Chefredakteur",
+      "Chefredakteurin"
+    ],
+    "Chef vom Dienst": [
+      "Chef vom Dienst / Chefin vom Dienst",
+      "Chefin vom Dienst"
+    ],
+    "Head of Production (Sender)": [],
+    "Herstellungsleiter*in (Sender)": [
+      "Herstellungsleitung (Sender)",
+      "Herstellungsleiter (Sender)",
+      "Herstellungsleiterin (Sender)"
+    ],
+    "Ablaufkoordinator*in": [
+      "Ablaufkoordination",
+      "Ablaufkoordinator / Ablaufkoordinatorin",
+      "Ablaufkoordinator",
+      "Ablaufkoordinatorin"
+    ],
+    "Redakteur": [
+      "Redakteur / Redakteurin",
+      "Redakteurin"
+    ],
+    "TV Autor*in": [
+      "TV Writing",
+      "TV-Autor / TV-Autorin",
+      "TV-Autor",
+      "TV-Autorin",
+      "TV Autor",
+      "TV Autorin"
+    ],
+    "Castingredakteur*in": [
+      "Castingredaktion",
+      "Castingredakteur / Castingredakteurin",
+      "Castingredakteur",
+      "Castingredakteurin"
+    ],
+    "Bildredakteur*in": [
+      "Bildredaktion",
+      "Bildredakteur / Bildredakteurin",
+      "Bildredakteur",
+      "Bildredakteurin"
+    ],
+    "Schnittredakteur*in": [
+      "Schnittredaktion",
+      "Schnittredakteur / Schnittredakteurin",
+      "Schnittredakteur",
+      "Schnittredakteurin"
+    ],
+    "Onlineredakteur*in": [
+      "Onlineredaktion",
+      "Onlineredakteur / Onlineredakteurin",
+      "Onlineredakteur",
+      "Onlineredakteurin"
+    ],
+    "Videoredakteur*in": [
+      "Videoredaktion",
+      "Videoredakteur / Videoredakteurin",
+      "Videoredakteur",
+      "Videoredakteurin"
+    ],
+    "TV Journalist*in": [
+      "TV Journalismus",
+      "TV-Journalist / TV-Journalistin",
+      "TV-Journalist",
+      "TV-Journalistin",
+      "TV Journalist",
+      "TV Journalistin"
+    ],
+    "Reporter*in": [
+      "Reporting",
+      "Reporter / Reporterin",
+      "Reporter",
+      "Reporterin"
+    ],
+    "Realisator*in": [
+      "Realisation",
+      "Realisator / Realisatorin",
+      "Realisator",
+      "Realisatorin"
+    ],
+    "Videoproducer*in": [
+      "Videoproduktion",
+      "Video Producer",
+      "Videoproducer",
+      "Videoproducerin",
+      "Video Producerin"
+    ],
+    "Videojournalist*in": [
+      "Videojournalismus",
+      "Videojournalist / Videojournalistin",
+      "Videojournalist",
+      "Videojournalistin"
+    ],
+    "Video Content Creator (Social Media)": [],
+    "Moderator*in": [
+      "Moderation",
+      "Moderator / Moderatorin",
+      "Moderator",
+      "Moderatorin"
+    ],
+    "Nachrichtensprecher*in": [
+      "Nachrichtenmoderation",
+      "Nachrichtensprecher / Nachrichtensprecherin",
+      "Nachrichtensprecher",
+      "Nachrichtensprecherin"
+    ],
+    "Creative Producer": [],
+    "Creative Director": [],
+    "Copywriter": [],
+    "Konzepter": [
+      "Konzepter / Konzepterin",
+      "Konzepterin"
+    ],
+    "Social Media Producer": [],
+    "Redaktionsassistent*in": [
+      "Redaktionsassistenz",
+      "Redaktionsassistent",
+      "Redaktionsassistentin"
+    ],
+    "Redaktionspraktikant*in": [
+      "Redaktionspraktikum",
+      "Redaktionspraktikant / Redaktionspraktikantin",
+      "Redaktionspraktikant",
+      "Redaktionspraktikantin"
+    ],
+    "Chef*in vom Dienst": [
+      "Diensthabende Redaktionsleitung (CvD)",
+      "Chef vom Dienst / Chefin vom Dienst",
+      "Chefin vom Dienst"
+    ],
+    "Head of Production (Studio/Network)": [],
+    "Redakteur*in": [
+      "Redakteur / Redakteurin",
+      "Redakteurin"
+    ],
+    "Schnittrealisator*in": [
+      "Schnittrealisation",
+      "Schnittrealisator / Schnittrealisatorin",
+      "Schnittrealisator",
+      "Schnittrealisatorin"
+    ],
+    "Quiz-Redakteur*in": [
+      "Quiz-Redaktion",
+      "Quiz-Redakteur / Quiz-Redakteurin",
+      "Quiz-Redakteur",
+      "Quiz-Redakteurin"
+    ],
+    "Warm-Upper": [],
+    "Stringer, Fixer": [],
+    "Logger": [],
+    "Transkriptor*in": [
+      "Transkription",
+      "Transkriptor / Transkriptorin",
+      "Transkriptor",
+      "Transkriptorin"
+    ],
+    "Bildrecherche": []
+  },
+  "social": {
+    "Content Creator": [],
+    "Influencer": [
+      "Influencer / Influencerin",
+      "Influencerin"
+    ],
+    "Social Media Manager": [],
+    "UGC Creator": [],
+    "Reels Videograf": [
+      "Reels-Videograf / Reels-Videografin",
+      "Reels-Videograf",
+      "Reels-Videografin",
+      "Reels Videografin"
+    ],
+    "TikTok Creator": [],
+    "Community Manager": [],
+    "Social Media Strategist": [],
+    "Influencer / Creator": [],
+    "Brand Storyteller": [],
+    "Videograf (Social Content)": [
+      "Videograf / Videografin (Social Content)",
+      "Videografin (Social Content)"
+    ],
+    "Editor (Reels / TikTok)": [],
+    "Motion Designer (Social)": []
+  },
+  "foto": {
+    "Fotograf/in": [
+      "Fotograf / Fotografin",
+      "Fotograf",
+      "Fotografin"
+    ],
+    "Modefotograf/in": [
+      "Modefotografie",
+      "Modefotograf / Modefotografin",
+      "Modefotograf",
+      "Modefotografin"
+    ],
+    "Produktfotograf/in": [
+      "Produktfotografie",
+      "Produktfotograf / Produktfotografin",
+      "Produktfotograf",
+      "Produktfotografin"
+    ],
+    "Eventfotograf/in": [
+      "Eventfotografie",
+      "Eventfotograf / Eventfotografin",
+      "Eventfotograf",
+      "Eventfotografin"
+    ],
+    "Portraitfotograf/in": [
+      "Portraitfotografie",
+      "Porträtfotograf / Porträtfotografin",
+      "Porträtfotograf",
+      "Porträtfotografin",
+      "Portraitfotograf",
+      "Portraitfotografin"
+    ],
+    "Werbefotograf/in": [
+      "Werbefotografie",
+      "Werbefotograf / Werbefotografin",
+      "Werbefotograf",
+      "Werbefotografin"
+    ],
+    "Food Fotograf/in": [
+      "Food Fotografie",
+      "Food-Fotograf / Food-Fotografin",
+      "Food-Fotograf",
+      "Food-Fotografin",
+      "Food Fotograf",
+      "Food Fotografin"
+    ],
+    "Drone Fotograf": [
+      "Drohnenfotografie",
+      "Drohnenfotograf / Drohnenfotografin",
+      "Drohnenfotograf",
+      "Drohnenfotografin",
+      "Drone Fotografin"
+    ],
+    "Standfotograf*in": [
+      "Standfotografie",
+      "Standfotograf / Standfotografin",
+      "Standfotograf",
+      "Standfotografin"
+    ],
+    "Fotoassistenz": [],
+    "Studio Manager*in": [
+      "Studio Manager",
+      "Studio Managerin"
+    ],
+    "Retoucher/in": [
+      "Retoucher",
+      "Retuscheur / Retuscheurin (Retoucher)",
+      "Retoucherin",
+      "Retuscheur",
+      "Retuscheurin",
+      "Retuscheur (Retoucher)",
+      "Retuscheurin (Retoucher)"
+    ],
+    "Bildbearbeiter/in": [
+      "Bildbearbeitung",
+      "Bildbearbeiter / Bildbearbeiterin",
+      "Bildbearbeiter",
+      "Bildbearbeiterin"
+    ]
+  },
+  "ki": {
+    "KI-Filmemacher/in": [
+      "KI-Filmgestaltung",
+      "KI-Filmemacher / KI-Filmemacherin",
+      "KI-Filmemacher",
+      "KI-Filmemacherin"
+    ],
+    "KI-Beauftragter / AI Supervisor": [
+      "KI-Beauftragter / KI-Beauftragte · AI Supervisor",
+      "KI-Beauftragter",
+      "KI-Beauftragte",
+      "KI-Beauftragte / AI Supervisor",
+      "KI-Beauftragter · AI Supervisor",
+      "KI-Beauftragte · AI Supervisor"
+    ],
+    "AI Director": [],
+    "KI-Animator/in": [
+      "KI-Animation",
+      "KI-Animator / KI-Animatorin",
+      "KI-Animator",
+      "KI-Animatorin"
+    ],
+    "Prompt Engineer (Film & Media)": [],
+    "KI-Drehbuchautor/in": [
+      "KI-Drehbuch",
+      "KI-Drehbuchautor / KI-Drehbuchautorin",
+      "KI-Drehbuchautor",
+      "KI-Drehbuchautorin"
+    ],
+    "KI-Storyboard Artist": [],
+    "KI-Bildgenerator/in": [
+      "KI-Bildgestaltung",
+      "AI Image Artist (KI-Bildgestaltung)",
+      "KI-Bildgenerator",
+      "KI-Bildgeneratorin",
+      "KI-Bildgestalter",
+      "KI-Bildgestalterin"
+    ],
+    "AI Video Creator": [],
+    "KI-Sound Designer": [],
+    "KI-Colorist": [],
+    "AI Workflow Consultant (Film)": []
+  },
+  "drehbuch": {
+    "Showrunner": [],
+    "Headautor*in": [
+      "Head Writing",
+      "Headautor / Headautorin",
+      "Headautor",
+      "Headautorin"
+    ],
+    "Assistent der*des Headautor*in": [
+      "Assistenz Head Writing",
+      "Assistent des Headautors",
+      "Assistentin des Headautors",
+      "Assistent der Headautorin",
+      "Assistentin der Headautorin"
+    ],
+    "Assistant Showrunner": [],
+    "Drehbuchautor*in": [
+      "Drehbuchautor / Drehbuchautorin",
+      "Drehbuchautor",
+      "Drehbuchautorin"
+    ],
+    "Co-Autor*in": [
+      "Co-Writing",
+      "Co-Autor / Co-Autorin",
+      "Co-Autor",
+      "Co-Autorin"
+    ],
+    "Re-Writer*in": [
+      "Re-Writer",
+      "Re-Writerin"
+    ],
+    "Script Doctor": [],
+    "Story Editor*in": [
+      "Story Editor",
+      "Story Editorin"
+    ],
+    "Storyliner": [],
+    "Drehbucheditor*in": [
+      "Drehbuch-Editing",
+      "Drehbucheditor / Drehbucheditorin",
+      "Drehbucheditor",
+      "Drehbucheditorin"
+    ],
+    "Dialogeditor*in": [
+      "Dialog-Editing",
+      "Dialogeditor / Dialogeditorin",
+      "Dialogeditor",
+      "Dialogeditorin"
+    ],
+    "Dialogautor*in": [
+      "Dialogbuch",
+      "Dialogautor / Dialogautorin",
+      "Dialogautor",
+      "Dialogautorin"
+    ],
+    "Drehbuchlektor*in": [
+      "Drehbuchlektorat",
+      "Drehbuchlektor / Drehbuchlektorin",
+      "Drehbuchlektor",
+      "Drehbuchlektorin"
+    ],
+    "Dramaturg, Script Consultant": [
+      "Dramaturg / Dramaturgin · Script Consultant",
+      "Dramaturg",
+      "Dramaturgin",
+      "Dramaturgin, Script Consultant",
+      "Dramaturg · Script Consultant",
+      "Dramaturgin · Script Consultant"
+    ],
+    "Drehbuch-Stoffentwicklung": [],
+    "Head of Script": [],
+    "Head of Story": [],
+    "Formatentwickler*in": [
+      "Formatentwicklung",
+      "Formatentwickler / Formatentwicklerin",
+      "Formatentwickler",
+      "Formatentwicklerin"
+    ],
+    "Treatmentliner": [],
+    "Synchron-Dialogbuchautor*in": [
+      "Synchron-Dialogbuch",
+      "Synchron-Dialogbuchautor / Synchron-Dialogbuchautorin",
+      "Synchron-Dialogbuchautor",
+      "Synchron-Dialogbuchautorin"
+    ],
+    "Hörfilmautor*in": [
+      "Audiodeskription / Hörfilmtext",
+      "Hörfilmautor / Hörfilmautorin (Audiodeskription)",
+      "Hörfilmautor",
+      "Hörfilmautorin",
+      "Hörfilmautor (Audiodeskription)",
+      "Hörfilmautorin (Audiodeskription)"
+    ],
+    "Filmübersetzer*in": [
+      "Filmübersetzung",
+      "Filmübersetzer / Filmübersetzerin",
+      "Filmübersetzer",
+      "Filmübersetzerin"
+    ],
+    "Drehbuchübersetzer*in": [
+      "Drehbuchübersetzung",
+      "Drehbuchübersetzer / Drehbuchübersetzerin",
+      "Drehbuchübersetzer",
+      "Drehbuchübersetzerin"
+    ],
+    "Untertitel Übersetzung": [
+      "Untertitelübersetzer / Untertitelübersetzerin",
+      "Untertitelübersetzer",
+      "Untertitelübersetzerin"
+    ],
+    "Übersetzung Dialoge": [
+      "Dialogübersetzer / Dialogübersetzerin",
+      "Dialogübersetzer",
+      "Dialogübersetzerin"
+    ],
+    "Transkript Übersetzung": [
+      "Transkriptübersetzer / Transkriptübersetzerin",
+      "Transkriptübersetzer",
+      "Transkriptübersetzerin"
+    ],
+    "Dialogue List Transcriber": [],
+    "Texter*in, Copywriter": [
+      "Text, Copywriter",
+      "Texter / Texterin · Copywriter",
+      "Texter",
+      "Texterin",
+      "Texter, Copywriter",
+      "Texterin, Copywriter",
+      "Texter · Copywriter",
+      "Texterin · Copywriter"
+    ],
+    "Language Assistant": [],
+    "Rechercheur*in": [
+      "Rechercheur / Rechercheurin",
+      "Rechercheur",
+      "Rechercheurin"
+    ],
+    "Recherche Assistent*in": [
+      "Recherche Assistenz",
+      "Rechercheassistenz",
+      "Rechercheassistent",
+      "Rechercheassistentin",
+      "Recherche Assistent",
+      "Recherche Assistentin"
+    ],
+    "Script Coordinator": [],
+    "Drehbuchpraktikant*in": [
+      "Drehbuchpraktikum",
+      "Drehbuchpraktikant / Drehbuchpraktikantin",
+      "Drehbuchpraktikant",
+      "Drehbuchpraktikantin"
+    ]
+  },
+  "public-relations": {
+    "Marketing, PR": [],
+    "Social Media Manager (Film/Production)": [],
+    "Promotionkoordinator*in": [
+      "Promotionkoordination",
+      "Promotionkoordinator / Promotionkoordinatorin",
+      "Promotionkoordinator",
+      "Promotionkoordinatorin"
+    ]
+  },
+  "sicherheit-sanitaetsdienst": {
+    "Set-Sanitäter/in / Set Medic": [
+      "Set-Sanitätsdienst / Set Medic",
+      "Set-Sanitäter / Set-Sanitäterin · Set Medic",
+      "Set-Sanitäter",
+      "Set-Sanitäterin",
+      "Set-Sanitäter / Set Medic",
+      "Set-Sanitäterin / Set Medic",
+      "Set-Sanitäter · Set Medic",
+      "Set-Sanitäterin · Set Medic"
+    ],
+    "Rettungssanitäter/in": [
+      "Rettungssanitätsfachkraft",
+      "Rettungssanitäter / Rettungssanitäterin",
+      "Rettungssanitäter",
+      "Rettungssanitäterin"
+    ],
+    "Betriebssanitäter/in": [
+      "Betriebssanitätsfachkraft",
+      "Betriebssanitäter / Betriebssanitäterin",
+      "Betriebssanitäter",
+      "Betriebssanitäterin"
+    ],
+    "Brandwache / Brandsicherheitswache": [],
+    "Brandschutzhelfer/in": [
+      "Brandschutzassistenz",
+      "Brandschutzhelfer / Brandschutzhelferin",
+      "Brandschutzhelfer",
+      "Brandschutzhelferin"
+    ],
+    "Brandschutzbeauftragte/r": [
+      "Brandschutzbeauftragter / Brandschutzbeauftragte",
+      "Brandschutzbeauftragter",
+      "Brandschutzbeauftragte"
+    ]
+  },
+  "catering-setverpflegung": {
+    "Catering-Leitung": [
+      "Cateringleiter",
+      "Cateringleiterin",
+      "Catering-Leiter",
+      "Catering-Leiterin"
+    ],
+    "Setkoch / Setköchin": [
+      "Setkoch",
+      "Setköchin"
+    ],
+    "Catering-Assistenz / Küchenhilfe": [
+      "Catering-Assistent",
+      "Catering-Assistentin",
+      "Cateringassistent",
+      "Cateringassistentin",
+      "Küchenhelfer",
+      "Küchenhelferin"
+    ],
+    "Craft Service": [],
+    "Setbetreuung / Essensausgabe": [],
+    "Fahrer/in für Catering und Küchenmobil": [
+      "Fahrdienst für Catering und Küchenmobil",
+      "Fahrer / Fahrerin für Catering und Küchenmobil",
+      "Fahrer für Catering und Küchenmobil",
+      "Fahrerin für Catering und Küchenmobil"
+    ]
+  },
+  "filmtiere-tiertraining": {
+    "Filmtiertrainer/in": [
+      "Filmtiertraining",
+      "Filmtiertrainer / Filmtiertrainerin",
+      "Filmtiertrainer",
+      "Filmtiertrainerin",
+      "Tiertrainer",
+      "Tiertrainerin",
+      "Tiertrainer für Film",
+      "Tiertrainerin für Film",
+      "Tiertrainer für Film, Fernsehen und Werbung",
+      "Tiertrainerin für Film, Fernsehen und Werbung"
+    ],
+    "Filmhundetrainer/in": [
+      "Filmhundetraining",
+      "Filmhundetrainer / Filmhundetrainerin",
+      "Filmhundetrainer",
+      "Filmhundetrainerin"
+    ],
+    "Tierhandler/in / Animal Handler": [
+      "Tierbetreuung / Animal Handling",
+      "Tierhandler / Tierhandlerin · Animal Handler",
+      "Tierhandler",
+      "Tierhandlerin",
+      "Tierhandler / Animal Handler",
+      "Tierhandlerin / Animal Handler",
+      "Tierbetreuer",
+      "Tierbetreuerin",
+      "Tierhandler · Animal Handler",
+      "Tierhandlerin · Animal Handler"
+    ],
+    "Tierkoordination / Animal Coordinator": [
+      "Tierkoordinator",
+      "Tierkoordinatorin",
+      "Tier-Koordinator",
+      "Tier-Koordinatorin"
+    ],
+    "Set-Tierbetreuung": [
+      "Set-Tierbetreuer",
+      "Set-Tierbetreuerin"
+    ],
+    "Horse Master": [
+      "Horse Master / Pferdekoordination",
+      "Pferdekoordinator",
+      "Pferdekoordinatorin",
+      "Pferdekoordinator (Horse Master)",
+      "Pferdekoordinatorin (Horse Master)"
+    ],
+    "Assistant Horse Master": [
+      "Assistant Horse Master / Assistenz der Pferdekoordination",
+      "Assistent des Horse Masters",
+      "Assistentin des Horse Masters",
+      "Horse-Master-Assistenz"
+    ],
+    "Horse Trainer": [
+      "Filmpferdetrainer / Filmpferdetrainerin · Horse Trainer",
+      "Pferdetrainer",
+      "Pferdetrainerin",
+      "Filmpferdetrainer",
+      "Filmpferdetrainerin",
+      "Pferdetrainer für Film",
+      "Pferdetrainerin für Film",
+      "Filmpferdetrainer · Horse Trainer",
+      "Filmpferdetrainerin · Horse Trainer"
+    ],
+    "Horse Wrangler": [
+      "Horse Wrangler (Pferdebetreuung)",
+      "Pferdebetreuer",
+      "Pferdebetreuerin",
+      "Pferdehandler",
+      "Pferdehandlerin"
+    ]
+  }
+}

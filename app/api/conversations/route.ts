@@ -10,6 +10,7 @@ import { applyParticipantReadReceipts } from "@/lib/message-read-state";
 import { getUnreadMessageCounts } from "@/lib/unread-message-counts";
 import { getTranslations as getResponseTranslations } from "next-intl/server";
 import { MESSAGING_HEADERS, messagingAccountId, messagingRequestKey, messagingUuid, messagingRpcFailure } from "@/lib/messaging-backend";
+import { MESSAGE_OPEN_V1, nativeJson, nativeReadGuard, privateNativeResponse } from '@/lib/native-contact-contract';
 
 
 // The membership table is the access-control source for both direct and group
@@ -18,19 +19,28 @@ import { MESSAGING_HEADERS, messagingAccountId, messagingRequestKey, messagingUu
 export async function GET(request: NextRequest) {
   const tResponse = await getResponseTranslations();
   const authResult = await requireAuth();
-  if (authResult instanceof NextResponse) return authResult;
+  if (authResult instanceof NextResponse) return privateNativeResponse(authResult);
   const { userId } = authResult;
+  const nativeError = nativeReadGuard(request, userId, MESSAGE_OPEN_V1, key => tResponse(`Contacts.${key}`));
+  if (nativeError) return nativeError;
+  const native = request.headers.get('X-CineGenius-Native-Contract') === MESSAGE_OPEN_V1;
 
   const contactId = request.nextUrl.searchParams.get("with_user");
+  if (native && !contactId) return nativeJson({error: tResponse('MessagingBackend.invalid'), code: 'invalid'}, 400);
   if (contactId) {
-    if (!/^[a-zA-Z0-9_-]{1,128}$/.test(contactId) || contactId === userId) return NextResponse.json({ error: tResponse('System.m_ccdfe6406c75') }, { status: 400 });
+    if (!/^[a-zA-Z0-9_-]{1,128}$/.test(contactId) || contactId === userId) return NextResponse.json({ error: tResponse('System.m_ccdfe6406c75') }, { status: 400, ...(native ? {headers: MESSAGING_HEADERS} : {}) });
     const { data, error } = await db.from("conversations")
       .select("id,conversation_members!inner(user_id,left_at)")
       .eq("kind", "direct")
       .or(`and(sender_id.eq.${userId},receiver_id.eq.${contactId}),and(sender_id.eq.${contactId},receiver_id.eq.${userId})`)
       .eq("conversation_members.user_id", userId).is("conversation_members.left_at", null)
       .order("listing_id", { nullsFirst: true }).order("updated_at", { ascending: false }).limit(1).maybeSingle();
-    if (error) return NextResponse.json({ error: tResponse('System.m_2fd1f0952739') }, { status: 500 });
+    if (error) return NextResponse.json({ error: tResponse('System.m_2fd1f0952739') }, { status: 500, ...(native ? {headers: MESSAGING_HEADERS} : {}) });
+    if (native) {
+      const allowed = await db.rpc('messaging_available_recipients', {p_sender: userId, p_recipients: [contactId]});
+      const canSend = !allowed.error && Array.isArray(allowed.data) && allowed.data.some(row => row.user_id === contactId);
+      return nativeJson({contract: MESSAGE_OPEN_V1, accountId: userId, receiverId: contactId, conversationId: data?.id ?? null, canSend});
+    }
     return NextResponse.json({ conversationId: data?.id ?? null }, { headers: { "Cache-Control": "private, no-store" } });
   }
 

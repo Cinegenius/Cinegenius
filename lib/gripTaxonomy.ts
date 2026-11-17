@@ -139,7 +139,9 @@ export const GRIP_OCCUPATIONS: readonly GripOccupation[] = [
 ];
 
 export function normalizeOccupation(value: string): string {
-  return value.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLocaleLowerCase("de").replace(/[^a-z0-9]+/g, " ").trim();
+  // Keep non-Latin occupations searchable too. Retain script-specific marks
+  // such as Japanese dakuten while preserving the existing Latin accent fold.
+  return value.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLocaleLowerCase("de").replace(/[^\p{L}\p{M}\p{N}]+/gu, " ").trim();
 }
 
 export function findGripOccupation(value: string): GripOccupation | undefined {

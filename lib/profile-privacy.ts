@@ -50,6 +50,7 @@ export function profileAccess(settings: Partial<PrivacySettings> | null, ownerId
 /** Strip before serialization, filtering or distance calculation; never just hide CSS. */
 export function projectProfilePrivacy<T extends object>(row: T, access: ProfileAccess = HIDDEN_PROFILE_ACCESS): T {
   const result = { ...row } as Record<string, unknown>;
+  if ("pronouns" in result && (!access.profile || result.show_pronouns !== true)) result.pronouns = null;
   if (!access.location) {
     for (const key of ["location", "city", "place_city_name", "place_region_name", "place_country_code", "place_region_id", "place_city_id", "address", "postal_code"]) if (key in result) result[key] = null;
     result.place_status = "empty";

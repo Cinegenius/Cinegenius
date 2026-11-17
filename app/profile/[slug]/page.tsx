@@ -1,5 +1,8 @@
+import { occupationFormFromCrew, type OccupationForm } from "@/lib/occupation-form";
 import { profileAccessFor, filterPublicListings } from "@/lib/profile-privacy-server";
 import { projectProfilePrivacy } from "@/lib/profile-privacy";
+import { profileOccupationPreview } from "@/lib/crew-occupations";
+import { taxonomyLabel } from "@/lib/departments";
 import { getTranslations as getPageTranslations } from "next-intl/server";
 import {getLocale} from "next-intl/server";
 import {placeReadFields} from "@/lib/places/catalog";
@@ -109,8 +112,9 @@ export async function generateMetadata(
   if (!profile || !(await canViewProfile(profile.user_id, userId))) {
     return { title: tMetadata('m_4b7786bc0e50') };
   }
-  const name = profile.display_name ?? (await getMetadataTranslations())("profile.tabProfile");
-  const role = profile.role ?? "";
+  const profileText = await getMetadataTranslations();
+  const name = profile.display_name ?? profileText("profile.tabProfile");
+  const role = profile.role ? taxonomyLabel(profile.role, profileText, occupationFormFromCrew(profile.crew)) : "";
   return {
     title: `${name}${role ? ` — ${role}` : ""} · CineGenius`,
     description: profile.tagline ?? profile.bio ?? pageCopy("p_630f545a7082", { value0: String(name) }),
@@ -177,7 +181,7 @@ function getPublicListings(userId: string): Promise<Array<{ pricing?: import("@/
   )();
 }
 
-type PublicCollab = { label: string; display_name: string; avatar_url: string | null; slug: string; role: string | null };
+type PublicCollab = { label: string; display_name: string; avatar_url: string | null; slug: string; role: string | null; occupationForm?: OccupationForm };
 
 function getPublicCollaborations(userId: string, viewerId: string | null = null): Promise<PublicCollab[]> {
   return (async () => {
@@ -209,7 +213,7 @@ function getPublicCollaborations(userId: string, viewerId: string | null = null)
       if (!ids.length) return [];
       const { data: profiles } = await db
         .from("profiles")
-        .select("user_id, display_name, avatar_url, slug, role, positions")
+        .select("user_id, display_name, avatar_url, slug, role, positions, crew")
         .in("user_id", ids);
 
       const profileMap = Object.fromEntries((profiles ?? []).map((p) => [p.user_id, p]));
@@ -222,7 +226,8 @@ function getPublicCollaborations(userId: string, viewerId: string | null = null)
           display_name: p.display_name ?? "Unbekannt",
           avatar_url: p.avatar_url ?? null,
           slug: p.slug,
-          role: p.role ?? (Array.isArray(p.positions) ? p.positions[0] : null) ?? null,
+          role: profileOccupationPreview(p)[0] ?? null,
+          occupationForm: occupationFormFromCrew(p.crew),
         }];
       });
     })();
@@ -278,7 +283,13 @@ export default async function ProfilePage(
   if (!rawProfile) notFound();
   const privacy = (await profileAccessFor([rawProfile.user_id],userId)).get(rawProfile.user_id);
   if (!privacy?.profile) notFound();
-  const profile = projectProfilePrivacy(rawProfile,privacy);
+  // Display consent is request-scoped: hiding pronouns must take effect even
+  // while ordinary profile content still has a cached version.
+  const identity = await db.from("profiles").select("pronouns, show_pronouns").eq("user_id", rawProfile.user_id).maybeSingle();
+  const profile = projectProfilePrivacy({ ...rawProfile,
+    pronouns: identity.error ? null : identity.data?.pronouns ?? null,
+    show_pronouns: !identity.error && identity.data?.show_pronouns === true,
+  },privacy);
 
   const isOwner = userId === profile.user_id;
   if (!isOwner && !(await canViewProfile(profile.user_id, userId))) notFound();
@@ -337,21 +348,21 @@ export default async function ProfilePage(
       const city = placeReadFields(profile.location??"",profile,locale).place_city_id;
       const { data } = await db
         .from("profiles")
-        .select("place_country_code,place_region_id,place_city_id,place_city_name,place_region_name,place_status,user_id, display_name, avatar_url, slug, role, profile_type, location, tagline, verified, day_rate")
+        .select("place_country_code,place_region_id,place_city_id,place_city_name,place_region_name,place_status,user_id, display_name, avatar_url, slug, role, crew, profile_type, location, tagline, verified, day_rate")
         .eq("profile_type", profile.profile_type)
         .neq("user_id", profile.user_id)
         .not("display_name", "is", null)
         .not("slug", "is", null)
         .order("updated_at", { ascending: false })
         .limit(20);
-      const rows = (data ?? []) as Array<{ user_id: string; display_name: string; avatar_url: string | null; slug: string; role: string | null; profile_type: string; location: string | null; tagline: string | null; verified: boolean; day_rate: number | null }>;
+      const rows = (data ?? []) as Array<{ user_id: string; display_name: string; avatar_url: string | null; slug: string; role: string | null; crew?: unknown; profile_type: string; location: string | null; tagline: string | null; verified: boolean; day_rate: number | null }>;
       const visibleIds = await visibleLinkedProfileIds(rows.map((row) => row.user_id), userId);
       const fieldPrivacy = await profileAccessFor(rows.map(row => row.user_id),userId);
       const visibleRows = rows.filter(row => visibleIds.has(row.user_id)).map(row => projectProfilePrivacy(row,fieldPrivacy.get(row.user_id)));
       // Prioritize same city, then fill with others, cap at 6
       const sameCity = city ? visibleRows.filter(r => placeReadFields(r.location??"",r,locale).place_city_id===city) : [];
       const others = visibleRows.filter(r => !city || placeReadFields(r.location??"",r,locale).place_city_id!==city);
-      return [...sameCity, ...others].slice(0, 6);
+      return [...sameCity, ...others].slice(0, 6).map(({ crew, ...row }) => ({ ...row, occupationForm: occupationFormFromCrew(crew) }));
     })(),
     // Resolve the optional slot before the client decides whether details exist.
     // An element wrapping an async component is truthy even when it renders null.
@@ -361,13 +372,15 @@ export default async function ProfilePage(
   // Track profile view — awaited so serverless doesn't drop it before .then() runs
   await recordProfileView(profile.user_id, userId);
 
+  const roleText = await getPageTranslations();
+  const mainOccupation = profileOccupationPreview(profile)[0];
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "Person",
     "name": profile.display_name ?? "",
     "description": profile.bio ?? "",
     "image": profile.avatar_url ?? "",
-    "jobTitle": profile.role ?? (profile.positions?.[0] ?? ""),
+    "jobTitle": mainOccupation ? taxonomyLabel(mainOccupation, roleText, occupationFormFromCrew(profile.crew)) : "",
     "address": profile.location ? { "@type": "PostalAddress", "addressLocality": profile.location } : undefined,
     "url": `https://cinegenius.co/profile/${slug}`,
   };

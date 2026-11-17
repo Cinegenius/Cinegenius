@@ -10,7 +10,7 @@ export function navigateMessageView(browser: Window, owner: string, destination:
   const target = new URL(browser.location.href);
   for (const key of ["conv", "to", "company_slug"]) target.searchParams.delete(key);
   if (destination.conversationId || destination.recipientId) {
-    if (inboxView(target.searchParams) === "notices") target.searchParams.delete("view");
+    target.searchParams.delete("view");
     target.searchParams.delete("requests");
   }
   if (destination.conversationId) target.searchParams.set("conv", destination.conversationId);
@@ -45,15 +45,18 @@ export function inboxView(params: Pick<URLSearchParams, "get">): InboxView {
   // Saved notification links from earlier releases still lead to requests.
   if (params.get("requests") === "1") return "notices";
   const view = params.get("view");
-  return view === "notices" || view === "friends" || view === "groups" ? view : "chats";
+  if (view === "notices") return "notices";
+  // Saved friend-to-chat and group links use the same mixed conversation list.
+  if (params.get("conv") || params.get("to")) return "chats";
+  return view === "friends" ? "friends" : "chats";
 }
 
-/** Switch just the inbox content, retaining the mounted navigation and real Back entries. */
+/** Open a real inbox or utility destination without synthetic Back entries. */
 export function navigateInboxView(browser: Window, view: InboxView): boolean {
   if (browser.location.pathname !== "/messages") return false;
   const target = new URL(browser.location.href);
   for (const key of ["conv", "to", "company_slug", "requests", "view"]) target.searchParams.delete(key);
-  if (view !== "chats") target.searchParams.set("view", view);
+  if (view === "friends" || view === "notices") target.searchParams.set("view", view);
   const next = localHref(target);
   if (next === localHref(new URL(browser.location.href))) return false;
   browser.history.pushState({}, "", next);

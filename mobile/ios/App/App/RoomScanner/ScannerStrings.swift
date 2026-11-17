@@ -14,10 +14,16 @@ final class ScannerStrings: ObservableObject {
         select(preference: preference)
     }
     func valid(_ value: String) -> String? {
-        catalog.supportedLocales.first { $0.caseInsensitiveCompare(value.replacingOccurrences(of: "_", with: "-")) == .orderedSame }
+        let tag = value.trimmingCharacters(in: .whitespacesAndNewlines).replacingOccurrences(of: "_", with: "-").lowercased()
+        if let exact = catalog.supportedLocales.first(where: { $0.lowercased() == tag }) { return exact }
+        let alias: String
+        if tag == "pt" || tag.hasPrefix("pt-") { alias = "pt-PT" }
+        else if ["zh", "zh-cn", "zh-sg", "zh-hans"].contains(tag) || tag.hasPrefix("zh-hans-") { alias = "zh-Hans" }
+        else { alias = String(tag.split(separator: "-").first ?? "") }
+        return catalog.supportedLocales.first { $0.caseInsensitiveCompare(alias) == .orderedSame }
     }
     func select(preference: String?) {
-        let device = Locale.preferredLanguages.compactMap { value in valid(value) ?? valid(String(value.split(separator: "-").first ?? "")) }.first
+        let device = Locale.preferredLanguages.compactMap(valid).first
         let selected = preference.flatMap(valid) ?? device ?? catalog.defaultLocale
         let base = (try? JSONDecoder().decode([String: String].self, from: Data(contentsOf: root.appendingPathComponent(catalog.defaultLocale + ".json")))) ?? [:]
         let current = (try? JSONDecoder().decode([String: String].self, from: Data(contentsOf: root.appendingPathComponent(selected + ".json")))) ?? [:]

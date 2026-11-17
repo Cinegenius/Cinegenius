@@ -1,5 +1,6 @@
 // Run with the existing browser toolchain; no browser dependency is shipped in the app.
 import { createRequire } from 'node:module';
+import { SUPPORTED_LOCALES } from '../../lib/i18n/locales.ts';
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import assert from 'node:assert/strict';
@@ -9,7 +10,7 @@ const { chromium } = loadTool(process.env.PLAYWRIGHT_MODULE || 'playwright');
 const root = fileURLToPath(new URL('../../', import.meta.url));
 const output = process.env.CINEGENIUS_TEST_OUTPUT || path.join(root, 'mobile/test-results');
 const origin = 'https://www.cinegenius.co';
-const locales = ['de', 'en', 'es', 'it', 'cs', 'hu', 'nl', 'nl-BE', 'sv'];
+const locales = SUPPORTED_LOCALES;
 const escapeHTML = value => value.replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
 
 async function run() {
@@ -76,7 +77,8 @@ async function run() {
     // The app source can move ahead of publication. A new bundle must still
     // recognize the currently live KI/AI row as well as the reviewed Work row.
     const previousLabels = { de: 'KI', en: 'AI', es: 'IA', it: 'IA', cs: 'AI', hu: 'MI', nl: 'AI', 'nl-BE': 'AI', sv: 'AI' };
-    for (const locale of locales) {
+    // Only the original nine locales had a historical KI/AI label.
+    for (const locale of Object.keys(previousLabels)) {
       const { context, page } = await fixture(locale);
       await page.locator('dialog nav button').first().evaluate((button, label) => {
         button.querySelector('span > span').textContent = label;

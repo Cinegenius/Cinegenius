@@ -12,7 +12,13 @@ async function localizedProxyError(request: NextRequest, key: string, init: Resp
   const messages = await loadMessages(locale);
   const system = messages.System as Record<string, string>;
   const copy = createTranslator({locale, messages: {System: system}, namespace: "System"});
-  return NextResponse.json({error: copy(key)}, init);
+  const headers = new Headers(init.headers);
+  if (request.nextUrl.pathname.startsWith('/api/native/v1/') || request.headers.has('X-CineGenius-Native-Contract')) {
+    headers.set('Cache-Control', 'private, no-store, max-age=0');
+    headers.set('CDN-Cache-Control', 'no-store');
+    headers.set('Vercel-CDN-Cache-Control', 'no-store');
+  }
+  return NextResponse.json({error: copy(key)}, {...init, headers});
 }
 
 function genieAuthFailure(status: 401 | 503): NextResponse {
@@ -73,7 +79,10 @@ const RATE_LIMITS: Record<string, { limit: number; windowMs: number }> = {
 };
 
 async function ipRateLimit(req: NextRequest): Promise<NextResponse | null> {
-  const path = req.nextUrl.pathname;
+  const requestedPath = req.nextUrl.pathname;
+  // Native and Web writes share the existing conversation IP budget.
+  const path = requestedPath === '/api/native/v1/conversations' || requestedPath.startsWith('/api/native/v1/conversations/')
+    ? requestedPath.replace('/api/native/v1/conversations', '/api/conversations') : requestedPath;
   const rule = Object.entries(RATE_LIMITS).find(([prefix]) => path.startsWith(prefix))?.[1];
   if (!rule) return null;
 
@@ -195,6 +204,7 @@ const isPublicRoute = createRouteMatcher([
   "/pricing(.*)",
   "/help(.*)",
   "/trust",
+  "/melden",
   "/ki-transparenz",
   "/bildrechte",
   "/marketplace(.*)",
@@ -271,6 +281,7 @@ export default clerkMiddleware(async (auth, request) => {
     "/api/newsletter/subscribe", "/api/newsletter/confirm", "/api/newsletter/unsubscribe",
   ].includes(request.nextUrl.pathname);
   const isSmartSearchRead = request.method === "POST" && request.nextUrl.pathname === "/api/search/unified";
+  const isPublicReportPost = request.method === "POST" && request.nextUrl.pathname === "/api/public-reports";
 
   // 2. Admin route guard — enforces both session + admin role
   //    This runs BEFORE the generic auth.protect() so non-admin authenticated
@@ -306,6 +317,9 @@ export default clerkMiddleware(async (auth, request) => {
     // Newsletter opt-in and signed confirmation/unsubscribe links also serve
     // visitors without a member account. Origin checks above still apply;
     // handlers validate consent/tokens and retain their durable rate limits.
+  } else if (isPublicReportPost) {
+    // Public reports do not require a member account. Origin protection above
+    // and the handler's validation/durable limits still apply to this exact POST.
   } else if (isSmartSearchRead) {
     // Smart search is members-only, including saved/shared result plans.
     try {

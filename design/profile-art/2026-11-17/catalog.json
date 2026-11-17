@@ -1,0 +1,306 @@
+{
+  "collection": "v1",
+  "approvedBy": "Markus, 17 November 2026",
+  "avatars": [
+    [
+      1,
+      "masculine"
+    ],
+    [
+      4,
+      "masculine"
+    ],
+    [
+      5,
+      "masculine"
+    ],
+    [
+      19,
+      "masculine"
+    ],
+    [
+      3,
+      "feminine"
+    ],
+    [
+      6,
+      "feminine"
+    ],
+    [
+      12,
+      "feminine"
+    ],
+    [
+      15,
+      "feminine"
+    ],
+    [
+      13,
+      "neutral"
+    ],
+    [
+      14,
+      "neutral"
+    ],
+    [
+      16,
+      "neutral"
+    ],
+    [
+      20,
+      "neutral"
+    ]
+  ],
+  "covers": [
+    [
+      1,
+      "water"
+    ],
+    [
+      2,
+      "moon"
+    ],
+    [
+      5,
+      "sun"
+    ],
+    [
+      9,
+      "earth"
+    ],
+    [
+      3,
+      "sky"
+    ],
+    [
+      12,
+      "cold"
+    ],
+    [
+      16,
+      "heat"
+    ],
+    [
+      11,
+      "mountains"
+    ],
+    [
+      4,
+      "valley"
+    ],
+    [
+      6,
+      "forest"
+    ],
+    [
+      7,
+      "desert"
+    ],
+    [
+      14,
+      "polar"
+    ]
+  ],
+  "studies": [
+    {
+      "study": 1,
+      "name": "Feine Kontur",
+      "avatarSelected": true,
+      "coverSelected": true,
+      "sha256": {
+        "avatar": "26be29e1503ed8f5ee6b83ce5bb83da6c075f25a24abeec69e21557ad89c578c",
+        "cover": "a2674ed3e92f904e63a7c57cece2b8ef1089e3aeb94d8b9dcc1bb39ae0165dd5"
+      }
+    },
+    {
+      "study": 2,
+      "name": "Reiner Schatten",
+      "avatarSelected": false,
+      "coverSelected": true,
+      "sha256": {
+        "avatar": "a9afeb885c4179cfa15b8e730f715038ebeebd3dc20566582b2ba30672e0ffc2",
+        "cover": "c7bf2f4593e09a35029eeb5ad944df2ee1886a2f3da5a17227f5ceb8542e6329"
+      }
+    },
+    {
+      "study": 3,
+      "name": "Abendlicht",
+      "avatarSelected": true,
+      "coverSelected": true,
+      "sha256": {
+        "avatar": "6eb90ecf3c47c0eb9ba2c8953fdcc5c6683fec4c676717ba44e34b0dd13a0d51",
+        "cover": "204515d1c594c61e199fa80f382b33148d75f5a91a2c7c30bd89c019eab52254"
+      }
+    },
+    {
+      "study": 4,
+      "name": "Farbflächen",
+      "avatarSelected": true,
+      "coverSelected": true,
+      "sha256": {
+        "avatar": "3d6471cd0f023d3e14626498b80440fc5218f9f79df3392be39c4d418583eef0",
+        "cover": "dc4e3d0f759d5b976322f2863df310d90c573a51d735d938e3cc78e5c5e300ec"
+      }
+    },
+    {
+      "study": 5,
+      "name": "Freundlich",
+      "avatarSelected": true,
+      "coverSelected": true,
+      "sha256": {
+        "avatar": "9f75186a72d0ab7e16de85b323829356500bec5c6a589f78bca28fd05bcd36fa",
+        "cover": "82d690dd3420bec17b71b2a102afa794d2b0e743158fff1d52d1a037b6cadbf2"
+      }
+    },
+    {
+      "study": 6,
+      "name": "Tusche",
+      "avatarSelected": true,
+      "coverSelected": true,
+      "sha256": {
+        "avatar": "7c81c6a3626ba84389a6e28be77f61127ec2dce2249c87c26fd9944334d8182e",
+        "cover": "8b2f8860551c758c9191f193315eec5963cd51e033800b7b526f2a54298f4f27"
+      }
+    },
+    {
+      "study": 7,
+      "name": "Papiercollage",
+      "avatarSelected": false,
+      "coverSelected": true,
+      "sha256": {
+        "avatar": "c213febd5d790ffbb62c97611b088a9b835cdc9940ade265a81c9cfcb81564a8",
+        "cover": "02ee60fcccc68000e2b46451aa5791529edb1a4e6da14f62f85a6ad7efe156b4"
+      }
+    },
+    {
+      "study": 8,
+      "name": "Duoton",
+      "avatarSelected": false,
+      "coverSelected": false,
+      "sha256": {
+        "avatar": "b300a1ee462bd2331c87ffefbe726495962efb01fb53d2b6c6dc1266c0b045ce",
+        "cover": "387045ec75841f093e2e4607e71077350650800588cf4b0083f099c1dc9466cd"
+      }
+    },
+    {
+      "study": 9,
+      "name": "Punktdruck",
+      "avatarSelected": false,
+      "coverSelected": true,
+      "sha256": {
+        "avatar": "034b0cb722c9ff08023f15702345b4e05368c54d279cbf829c7a342c2ed6175b",
+        "cover": "89578528df2b89cf2fbc47c66cbe2d7ea93f6f9f8cd6f741ef56b1cd51dcaca0"
+      }
+    },
+    {
+      "study": 10,
+      "name": "Lichtkontur",
+      "avatarSelected": false,
+      "coverSelected": false,
+      "sha256": {
+        "avatar": "75c04f112d81dda7d03f32a9584f04f8ec670a48971ebf9a55fdc77a076c7d55",
+        "cover": "b1a1835dc700dce125022a0ccb61de4c1b39e8df33c53654152ec258f13b7b68"
+      }
+    },
+    {
+      "study": 11,
+      "name": "Skizze",
+      "avatarSelected": false,
+      "coverSelected": true,
+      "sha256": {
+        "avatar": "dfac65475a1fe54774bc08ccb0718db041ff2607e6478fbe0eb1b9cdb62a00b2",
+        "cover": "9ca8201ff085f3db11cb6bca5a344df7dbdea62cde10e4860c6f07a31f427f23"
+      }
+    },
+    {
+      "study": 12,
+      "name": "Weiche Formen",
+      "avatarSelected": true,
+      "coverSelected": true,
+      "sha256": {
+        "avatar": "efddb2822640b832617da88cf7082bbfd5e317198aab3465ef8388483460a2de",
+        "cover": "a3c8275835376ef470ee28871dc4d1286010dd3975ea6e2b94b4db398fbf961f"
+      }
+    },
+    {
+      "study": 13,
+      "name": "Facetten",
+      "avatarSelected": true,
+      "coverSelected": false,
+      "sha256": {
+        "avatar": "4e9dd186643c0a3022892c4d9e21330837ef454849658906b30d9aee568c3a09",
+        "cover": "50021ac62a2862f85399b5416a95c357df5d390e1c027bdcef1e1b513d4e82f1"
+      }
+    },
+    {
+      "study": 14,
+      "name": "Pixel",
+      "avatarSelected": true,
+      "coverSelected": true,
+      "sha256": {
+        "avatar": "2f09f0ef7536d757a23a413c4b544041a813fa222e92a6e25e1bfb604ae1fc4f",
+        "cover": "768298dd92b72cd027748c1956328642ee0303bd801e8265c46479347506d252"
+      }
+    },
+    {
+      "study": 15,
+      "name": "Negativraum",
+      "avatarSelected": true,
+      "coverSelected": false,
+      "sha256": {
+        "avatar": "4f5798faf66a130e98368084658b9d4ad09b3aa80bb8e5f6616198852253a718",
+        "cover": "68b4e94126785a303915fac6103ee133d92db240170734db6359b44013a17fb0"
+      }
+    },
+    {
+      "study": 16,
+      "name": "Farbfluss",
+      "avatarSelected": true,
+      "coverSelected": true,
+      "sha256": {
+        "avatar": "805867bf216832e43ad414d208d884699f5fa51c341cb19c749dcf1727970f56",
+        "cover": "2f98b316145a7f558a81ebc63b11f4b21424d703f2acc07395d50f3e02a17b40"
+      }
+    },
+    {
+      "study": 17,
+      "name": "Gravur",
+      "avatarSelected": false,
+      "coverSelected": false,
+      "sha256": {
+        "avatar": "6a05a4836d3f01fb312ce1f3758b45fc067b335f6f03f283a035998a16febea4",
+        "cover": "3ad42d7c165ee37a373cee910aa6adfcc559d8e2c3f071f8678f43349ebf4800"
+      }
+    },
+    {
+      "study": 18,
+      "name": "Pinsel",
+      "avatarSelected": false,
+      "coverSelected": false,
+      "sha256": {
+        "avatar": "85fb88fb3c674166eddf69c564e6b54928a847804323d405f805c14c97831a01",
+        "cover": "3685e57235f8be46c6ee4636fdf05245dd0bee3285b84d5edb1fcb06c7ead580"
+      }
+    },
+    {
+      "study": 19,
+      "name": "Retro",
+      "avatarSelected": true,
+      "coverSelected": false,
+      "sha256": {
+        "avatar": "d0a1454c905d56e06ae4db0bacfd9ae7d8178694fd78f481093aac29e470674e",
+        "cover": "d33b32954950e678003133c243cef6c2278cf9e55d6b4c23780730c48d40f435"
+      }
+    },
+    {
+      "study": 20,
+      "name": "Lichtspur",
+      "avatarSelected": true,
+      "coverSelected": false,
+      "sha256": {
+        "avatar": "d3374ae7a1ae36a66727af714cec408cfc2cc79163cb38d7f2b2fd926ac70a4d",
+        "cover": "38ceb9082ae42386996df15676a665bbd87d99a5db9c4c3c4cc1e100c7ed0f61"
+      }
+    }
+  ]
+}

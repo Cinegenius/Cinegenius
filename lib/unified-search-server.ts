@@ -1,9 +1,12 @@
+import { occupationFormFromCrew } from "@/lib/occupation-form";
 import "server-only";
+import { profileOccupationPreview, selectedCrewOccupations, type OccupationProfile } from "@/lib/crew-occupations";
+import { marketplaceCategory } from "@/lib/marketplaceCategories";
 import { db } from "@/lib/db";
 import { getTranslations } from "next-intl/server";
 import { profileAccessFor } from "@/lib/profile-privacy-server";
 import { projectProfilePrivacy } from "@/lib/profile-privacy";
-import { getDeptLabel, getDepartmentRoleLabel, departments, taxonomyLabel } from "@/lib/departments";
+import { getDeptLabel, departments, taxonomyLabel } from "@/lib/departments";
 import { placeReadFields } from "@/lib/places/catalog";
 import { publicMapPoint } from "@/lib/places/public-map-point";
 import { readPublicLocationArea } from "@/lib/location-privacy";
@@ -56,7 +59,7 @@ function queryFor(area: SearchArea, wish: SearchWish, terms: string[], categorie
       ? terms.map(term => `role.ilike.${exactLiteral(term)}`)
       : patterns(["display_name", "role", "bio"]);
     if (terms.length) filters.push(`positions.ov.{${terms.map(filterLiteral).join(",")}}`);
-    return filtered(db.from("profiles").select(`${PLACE_COLUMNS},user_id,display_name,role,positions,bio,location,avatar_url,available`)
+    return filtered(db.from("profiles").select(`${PLACE_COLUMNS},user_id,display_name,role,positions,crew,bio,location,avatar_url,available`)
       .not("display_name", "is", null).neq("display_name", ""), filters).order("user_id");
   }
   if (area === "companies") {
@@ -124,8 +127,7 @@ async function readGroup(plan: SearchPlan, wishIndex: number, area: SearchArea, 
     if (area === "projects") row = publicProjectMedia(row);
     const place = placeDisplay(placeReadFields(String(row.location ?? row.city ?? ""), row, locale), String(row.location ?? row.city ?? ""), locale);
     const organization = Array.isArray(row.organization) ? row.organization[0] : row.organization;
-    const headRole = heads ? matchingDepartmentHead(row, segment) : productionCrew ? matchingProductionRole(row, segment) : undefined;
-    const role = headRole ? getDepartmentRoleLabel(headRole.departmentId, headRole.label, locale, undefined, taxonomy) : row.role;
+    const role = area === "crew" ? profileOccupationPreview(row as OccupationProfile).map(title => taxonomyLabel(title, ui, occupationFormFromCrew(row.crew))).join(" · ") : row.role;
     const result: SearchResult = {
       id: String(area === "crew" ? row.user_id : area === "news" ? `${(organization as Row)?.slug}/${row.slug}` : row.slug || row.id),
       title: String(row.display_name ?? row.name ?? row.title ?? ""),
@@ -135,6 +137,18 @@ async function readGroup(plan: SearchPlan, wishIndex: number, area: SearchArea, 
       image: String(row.avatar_url ?? row.logo_url ?? row.poster_url ?? row.image_url ?? "") || null,
       available: typeof row.available === "boolean" ? row.available : null,
     };
+    // Only public, canonical search facts leave the permission-projected row.
+    if (area === "crew") {
+      const profile = row as OccupationProfile;
+      result.facets = { departments: [...new Set(selectedCrewOccupations(profile.positions ?? [], profile.crew?.occupations, profile.role, profile.crew?.primaryOccupation).map(role => role.departmentId))] };
+      if (terms.length && [row.role, ...(Array.isArray(row.positions) ? row.positions : [])]
+        .some(role => typeof role === "string" && terms.some(term => searchKey(term) === searchKey(role)))) result.evidence = "role";
+    } else if (area === "marketplace") {
+      const category = marketplaceCategory(row.category, result.type);
+      if (category) result.facets = { marketplace: category.department };
+    }
+    if (!result.evidence && terms.some(term => [row.title, row.name].some(title => typeof title === "string" && searchKey(title).includes(searchKey(term))))) result.evidence = "title";
+    if (wish.requirements?.length || catering) result.evidence = "requirements";
     if (["prop", "vehicle", "location"].includes(result.type)) result.priceLabel = listingPriceLabel(result.price, row, "/Tag", locale, market);
     if (view !== "list") {
       // Never geocode private fields or use an offer's exact coordinates. Crew

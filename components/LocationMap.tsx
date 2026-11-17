@@ -27,7 +27,8 @@ type Location = {
   markerColor?: string;
 };
 type Props = {
-  labels?: { label: string; results: string; empty: string; unknownCoordinates: string; cluster?: (count: number) => string; error?: string };
+  preserveViewport?: boolean;
+  labels?: { label: string; results: string; empty: string; unknownCoordinates: string; cluster?: (count: number) => string; error?: string; applyArea?: string };
   renderPreview?: (location: Location) => ReactNode;
   readOnly?: boolean;
   onBoundsChange?: (bounds: MapBounds) => void;
@@ -41,7 +42,7 @@ type Props = {
   onApplyBounds: (bounds: MapBounds | null) => void;
 };
 
-export default function LocationMap({ readOnly = false, locations, activeId, onHover, userLocation, radiusKm, appliedBounds, onApplyBounds, onBoundsChange, visibleCount, labels, renderPreview }: Props) {
+export default function LocationMap({ preserveViewport = false, readOnly = false, locations, activeId, onHover, userLocation, radiusKm, appliedBounds, onApplyBounds, onBoundsChange, visibleCount, labels, renderPreview }: Props) {
   const clusterLabel = labels?.cluster;
   const t = useTranslations("locationMap");
   const mapUi = useTranslations("directoryMap"), commonUi = useTranslations("notifications");
@@ -54,6 +55,8 @@ export default function LocationMap({ readOnly = false, locations, activeId, onH
   const locationsText = useTranslations("locations");
   const containerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<Leaflet.Map | null>(null);
+  const fittedMap = useRef<Leaflet.Map | null>(null);
+  const previousAppliedBounds = useRef<MapBounds | null>(appliedBounds);
   const [map, setMap] = useState<Leaflet.Map | null>(null);
   const [moved, setMoved] = useState(false);
   const [basemapReady, setBasemapReady] = useState(false);
@@ -239,14 +242,16 @@ export default function LocationMap({ readOnly = false, locations, activeId, onH
   }, [map, activeId, selected, locations]);
 
   useEffect(() => {
-    if (!map || appliedBounds) return;
+    const reset = previousAppliedBounds.current !== null && appliedBounds === null;
+    previousAppliedBounds.current = appliedBounds;
+    if (!map || appliedBounds || (preserveViewport && fittedMap.current === map && !reset)) return;
     const coords = locations.filter(hasCoordinates).map(location => [location.lat, location.lng] as [number, number]);
     if (coords.length) {
       void import("leaflet").then(({ default: L }) => {
-        if (mapRef.current === map && !userLocation) { map.fitBounds(L.latLngBounds(coords), { padding: [48, 48], maxZoom: 13, animate: false }); setMoved(false); }
+        if (mapRef.current === map && !userLocation) { fittedMap.current = map; map.fitBounds(L.latLngBounds(coords), { padding: [48, 48], maxZoom: 13, animate: false }); setMoved(false); }
       });
     }
-  }, [map, locations, userLocation, appliedBounds]);
+  }, [map, locations, userLocation, appliedBounds, preserveViewport]);
 
   useEffect(() => {
     if (!map || !userLocation) return;
@@ -271,7 +276,7 @@ export default function LocationMap({ readOnly = false, locations, activeId, onH
           label={!basemapReady && !failed ? mapUi("loading") : labels?.results ?? locationsText("results", { count: visibleCount ?? locations.length })} />
       </div>
       {!readOnly && !automaticBounds && <div className="absolute left-3 top-16 z-[500] flex max-w-[calc(100%-5rem)] flex-wrap gap-2">
-        {moved && <button type="button" onClick={() => { if (!map) return; const b = map.getBounds(); onApplyBounds({ south: b.getSouth(), north: b.getNorth(), west: b.getWest(), east: b.getEast() }); setMoved(false); }} className="min-h-11 rounded-lg border border-border bg-bg-primary px-3 text-sm text-text-primary">{t("searchArea")}</button>}
+        {moved && <button type="button" onClick={() => { if (!map) return; const b = map.getBounds(); onApplyBounds({ south: b.getSouth(), north: b.getNorth(), west: b.getWest(), east: b.getEast() }); setMoved(false); }} className="min-h-11 rounded-lg border border-border bg-bg-primary px-3 text-sm text-text-primary">{labels?.applyArea ?? t("searchArea")}</button>}
         {appliedBounds && <button type="button" onClick={() => { onApplyBounds(null); setMoved(false); }} className="min-h-11 rounded-lg border border-border bg-bg-primary px-3 text-sm text-text-primary">{t("resetArea")}</button>}
       </div>}
       {(labels?.unknownCoordinates ?? true) && locations.some(location => !hasCoordinates(location)) && <p className="absolute bottom-8 left-3 z-[400] rounded bg-bg-primary px-2 py-1 text-xs text-text-muted">{labels?.unknownCoordinates ?? t("unknownCoordinates")}</p>}

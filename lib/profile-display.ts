@@ -1,3 +1,4 @@
+import { profileOccupationPreview, type OccupationProfile } from "./crew-occupations";
 import type { ProfileType } from "./profile-types";
 
 export function normalizeProfileTypes(
@@ -16,13 +17,21 @@ export function getProfileDisplayPositions({
   profileTypes,
   primaryType,
   labels,
+  crew,
+  mode = "details",
 }: {
   positions?: readonly string[] | null;
   role?: string | null;
   profileTypes?: readonly string[] | null;
   primaryType?: string | null;
   labels: Record<string, string>;
+  crew?: OccupationProfile["crew"];
+  mode?: "summary" | "details";
 }): string[] {
+  if (mode === "summary") {
+    const summary = profileOccupationPreview({positions, role, crew});
+    return summary.length ? summary : normalizeProfileTypes(profileTypes, primaryType).map(type => labels[type]).filter(Boolean).slice(0, 3);
+  }
   const explicitPositions = (positions ?? []).filter((position) => typeof position === "string" && position.trim());
   if (explicitPositions.length === 0 && role?.trim()) explicitPositions.push(role.trim());
   const categoryLabels = normalizeProfileTypes(profileTypes, primaryType)

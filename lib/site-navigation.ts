@@ -47,19 +47,23 @@ export function isPrimaryBrowseItem(id: string) {
   return PRIMARY_NAV_ITEMS.some(item => item.kind === "link" && item.id === id);
 }
 
+/** Compact portrait menu; management destinations live in Mein Bereich. */
 export const ACCOUNT_NAV_ITEMS: readonly NavigationLink[] = [
-  { id: "overview", href: "/dashboard", key: "accountOverview", icon: "account" },
+  { id: "overview", href: "/dashboard", key: "personalArea", icon: "account" },
+  { id: "public-profile", href: "/profile", key: "publicProfile", icon: "profile" },
+  { id: "settings", href: "/dashboard?tab=settings", key: "accountSettings", icon: "settings" },
+];
+
+export const PERSONAL_CONTENT_ITEMS: readonly NavigationLink[] = [
   { id: "profile", href: "/profile", key: "myProfile", icon: "profile" },
   { id: "offers", href: "/dashboard?tab=listings", key: "myOffers", icon: "offers" },
-  { id: "saved", href: "/dashboard?tab=favorites", key: "savedItems", icon: "saved" },
-  { id: "contacts", href: "/messages?view=friends", key: "contacts", icon: "contacts" },
   { id: "bookings", href: "/dashboard?tab=bookings", key: "bookings", icon: "bookings" },
   { id: "company", href: "/company-dashboard", key: "manageCompany", icon: "companies" },
-  { id: "notifications", href: "/notifications", key: "notifications", icon: "notifications" },
-  { id: "payments", href: "/invoices", key: "payments", icon: "payments" },
-  { id: "settings", href: "/dashboard?tab=settings", key: "accountSettings", icon: "settings" },
-  { id: "analytics", href: "/dashboard?tab=analytics", key: "analytics", icon: "analytics" },
-  { id: "security", href: "/profile?tab=security", key: "securityAndSignIn", icon: "security" },
+];
+export const PERSONAL_ACTIVITY_ITEMS: readonly NavigationLink[] = [
+  { id: "messages", href: "/messages", key: "messages", icon: "messages" },
+  { id: "contacts", href: "/messages?view=friends", key: "contacts", icon: "contacts" },
+  { id: "saved", href: "/favorites", key: "savedItems", icon: "saved" },
 ];
 
 export function routeMatches(pathname: string, route: string) {

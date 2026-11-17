@@ -2,11 +2,14 @@
 
 import { ArrowUpDown,Search,SlidersHorizontal,X } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { isValidElement,useEffect,useRef,useState,type ReactNode } from "react";
+import { cloneElement,isValidElement,useEffect,useRef,useState,type ReactNode } from "react";
+import BrowseSelect from "@/components/BrowseSelect";
 import BrowseResultCount from "@/components/BrowseResultCount";
+import { useSwipeDismiss } from "@/lib/use-swipe-dismiss";
+import { normalizeOccupation } from "@/lib/gripTaxonomy";
 
 
-export type BrowseOption = { value: string; label: string };
+export type BrowseOption = { value: string; label: string; searchTerms?: readonly string[] };
 export type BrowseChip = { id: string; label: string; onRemove: () => void };
 
 type MobileBrowseControlsProps = {
@@ -46,6 +49,8 @@ export default function MobileBrowseControls({
 
   const [open, setOpen] = useState(false);
   const dialog = useRef<HTMLDialogElement>(null);
+  const panel = useRef<HTMLElement>(null);
+  useSwipeDismiss(panel, open, () => setOpen(false));
 
   useEffect(() => {
     const element = dialog.current;
@@ -54,7 +59,7 @@ export default function MobileBrowseControls({
     const previousFocus = document.activeElement;
     document.body.style.overflow = "hidden";
     element.showModal();
-    element.querySelector<HTMLButtonElement>("[data-filter-close]")?.focus();
+    element.querySelector<HTMLButtonElement>("[data-filter-close]")?.focus({preventScroll: true});
     const viewport = window.visualViewport;
     const resize = () => {
       const height = viewport?.height ?? window.innerHeight;
@@ -75,7 +80,7 @@ export default function MobileBrowseControls({
       viewport?.removeEventListener("scroll", resize);
       window.removeEventListener("resize", resize);
       window.removeEventListener("popstate", back);
-      if (previousFocus instanceof HTMLElement && previousFocus.isConnected) previousFocus.focus();
+      if (previousFocus instanceof HTMLElement && previousFocus.isConnected) previousFocus.focus({preventScroll: true});
     };
   }, [open]);
 
@@ -92,23 +97,14 @@ export default function MobileBrowseControls({
 
         <div className="mobile-browse-controls__row">
           <button type="button" className="mobile-browse-action" onClick={() => setOpen(true)} aria-haspopup="dialog" aria-expanded={open}>{uiText.rich("Ui.text_91811d44ec1fe7", { part1: () => (<SlidersHorizontal size={16} />), part2: chunks => (<span>{chunks}</span>), value3: () => (filterCount > 0 && <span className="mobile-browse-count">{filterCount}</span>) })}</button>
-          <label className="mobile-browse-sort">
-            <ArrowUpDown size={15} aria-hidden="true" />
-            <span className="sr-only">{uiText("creators.sort")}</span>
-            <select value={sortValue} onChange={(event) => onSortChange(event.target.value)}>
-              {sortOptions.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}
-            </select>
-          </label>
+          <BrowseSelect label={uiText("creators.sort")} value={sortValue} options={sortOptions} onChange={onSortChange}
+            icon={<ArrowUpDown size={15} />} className="flex-1" triggerClassName="mobile-browse-sort w-full text-left" />
           {preference}
         </div>
 
         {categoryPlacement === "toolbar" && <label className="mobile-browse-category">
           <span>{categoryLabel}</span>
-          <select value={categoryValue} onChange={(event) => onCategoryChange(event.target.value)}>
-            <option value="">{allCategoryLabel}</option>
-            {categoryValue && !categories.some(option => option.value === categoryValue) && <option value={categoryValue} disabled>{categoryValue}</option>}
-            {categories.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}
-          </select>
+          <MobileFilterSelect label={categoryLabel} value={categoryValue} onChange={onCategoryChange} options={categories} placeholder={allCategoryLabel} />
         </label>}
 
         <div className="mobile-browse-summary">
@@ -143,20 +139,16 @@ export default function MobileBrowseControls({
       {open && (
         <dialog ref={dialog} className="mobile-filter-dialog" aria-modal="true" aria-label={uiText("locations.filterBtn")} onCancel={event => { event.preventDefault(); setOpen(false); }}>
           <button tabIndex={-1} className="mobile-filter-dialog__backdrop" aria-label={uiText("Ui.text_5f423bd7da0e95")} onClick={() => setOpen(false)} />
-          <section className="mobile-filter-panel">
-            <div className="mobile-filter-panel__handle" />
-            <header className="mobile-filter-panel__header">
+          <section ref={panel} className="mobile-filter-panel browse-popup-surface">
+            <div data-swipe-dismiss-handle className="mobile-filter-panel__handle" />
+            <header data-swipe-dismiss-handle className="mobile-filter-panel__header">
               <h2>{uiText("locations.filterBtn")}</h2>
               <button data-filter-close type="button" aria-label={uiText("ProfilePhotoCrop.close")} onClick={() => setOpen(false)}><X size={20} /></button>
             </header>
             <div className="mobile-filter-panel__content">
               {(categories.length > 0 || categoryValue) && <label className="mobile-filter-field">
                 <span>{categoryLabel}</span>
-                <select value={categoryValue} onChange={(event) => onCategoryChange(event.target.value)}>
-                  <option value="">{allCategoryLabel}</option>
-                  {categoryValue && !categories.some(option => option.value === categoryValue) && <option value={categoryValue} disabled>{categoryValue}</option>}
-            {categories.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}
-                </select>
+                <MobileFilterSelect label={categoryLabel} value={categoryValue} onChange={onCategoryChange} options={categories} placeholder={allCategoryLabel} />
               </label>}
               {children}
             </div>
@@ -172,7 +164,10 @@ export default function MobileBrowseControls({
 }
 
 export function MobileFilterField({ label, children }: { label: string; children: ReactNode }) {
-  if (isValidElement<{ options?: BrowseOption[]; value?: string }>(children) && children.type === MobileFilterSelect && !children.props.value && !children.props.options?.length) return null;
+  if (isValidElement<{ options?: BrowseOption[]; value?: string; label?: string }>(children) && children.type === MobileFilterSelect) {
+    if (!children.props.value && !children.props.options?.length) return null;
+    children = cloneElement(children, { label: children.props.label ?? label });
+  }
   return <label className="mobile-filter-field"><span>{label}</span>{children}</label>;
 }
 
@@ -183,20 +178,25 @@ export function MobileFilterSelect({ value, onChange, options, placeholder, labe
   placeholder: string;
   label?: string;
 }) {
-  return (
-    <select aria-label={label} value={value} onChange={(event) => onChange(event.target.value)}>
-      <option value="">{placeholder}</option>
-      {value && !options.some(option => option.value === value) && <option value={value} disabled>{value}</option>}
-      {options.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}
-    </select>
-  );
+  return <BrowseSelect label={label ?? placeholder} value={value} onChange={onChange}
+    triggerClassName="browse-filter-select"
+    options={[
+      { value: "", label: placeholder },
+      ...(value && !options.some(option => option.value === value) ? [{ value, label: value, disabled: true }] : []),
+      ...options,
+    ]} />;
 }
 
 export function BrowseRoleFilter({ label, placeholder, options, selected, onChange }: { label: string; placeholder: string; options: BrowseOption[]; selected: Set<string>; onChange: (values: Set<string>) => void }) {
   const [query, setQuery] = useState("");
   const t = useTranslations("creators");
   if (!options.length && !selected.size) return null;
-  const visible = options.filter(option => option.label.toLocaleLowerCase().includes(query.toLocaleLowerCase()));
+  const normalizedQuery = normalizeOccupation(query);
+  const compactQuery = normalizedQuery.replaceAll(" ", "");
+  const visible = options.filter(option => !normalizedQuery || [option.label, ...(option.searchTerms ?? [])].some(term => {
+    const normalized = normalizeOccupation(term);
+    return normalized.includes(normalizedQuery) || normalized.replaceAll(" ", "").includes(compactQuery);
+  }));
   return <fieldset className="mobile-filter-field">
     <legend className="mb-2 text-xs text-text-muted">{label}</legend>
     <details className="rounded-xl border border-border bg-bg-primary">

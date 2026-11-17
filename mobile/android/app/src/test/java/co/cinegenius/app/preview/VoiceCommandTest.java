@@ -12,9 +12,11 @@ public class VoiceCommandTest {
         value.put("requestId","7ce6da09-70eb-4d50-b04d-b8a0ba6b9b2b");value.put("action",action);
         return value;
     }
-    @Test public void mapsAllNineLocalesExplicitly() {
+    @Test public void mapsAllSupportedLocalesExplicitly() {
         String[][] expected={{"de","de-DE"},{"en","en-GB"},{"es","es-ES"},{"it","it-IT"},{"cs","cs-CZ"},
-            {"hu","hu-HU"},{"nl","nl-NL"},{"nl-BE","nl-BE"},{"sv","sv-SE"}};
+            {"hu","hu-HU"},{"nl","nl-NL"},{"nl-BE","nl-BE"},{"sv","sv-SE"},
+            {"fr","fr-FR"},{"pl","pl-PL"},{"pt-PT","pt-PT"},{"zh-Hans","zh-CN"},
+            {"ja","ja-JP"},{"ko","ko-KR"},{"ru","ru-RU"},{"uk","uk-UA"}};
         for(String[] row:expected){Map<String,Object> value=command("start");value.put("locale",row[0]);assertEquals(row[1],VoiceCommand.parse(value).languageTag);}
     }
     @Test public void rejectsUnsupportedActionsAndPrivatePayloads() {
@@ -36,7 +38,7 @@ public class VoiceCommandTest {
         for(Object text:new Object[]{null,"","  ",42,"a".repeat(6001)}){value.put("text",text);assertNull(VoiceCommand.parse(value));}
         value.put("text","München: \"Kamera\" <script>data only</script>");
         assertEquals(value.get("text"),VoiceCommand.parse(value).text);
-        value.put("locale","fr");assertNull(VoiceCommand.parse(value));
+        value.put("locale","zz");assertNull(VoiceCommand.parse(value));
     }
     @Test public void controlMessagesTargetOnlyDocumentAndRequest() {
         for(String action:new String[]{"stop","cancel","stopSpeaking"}) {

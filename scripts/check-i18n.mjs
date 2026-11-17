@@ -97,7 +97,7 @@ export function responseTextInventory(root) {
 }
 
 export function main(root=process.cwd()) {
-  const locales=['de','en','es','it','cs','hu','nl','nl-BE','sv'];
+  const locales=['de','en','es','it','cs','hu','nl','nl-BE','sv','fr', 'pl', 'pt-PT', 'zh-Hans', 'ja', 'ko', 'ru', 'uk'];
   const catalogs=Object.fromEntries(locales.map(locale=>[locale,flatten(JSON.parse(readFileSync(path.join(root,'messages',locale+'.json'),'utf8')))]));
   const problems=[];for(const locale of locales) problems.push(...compareCatalogs(catalogs.de,catalogs[locale]).map(message=>locale+': '+message));
   const clientSelectionProblem = checkClientMessageOmissions(root);

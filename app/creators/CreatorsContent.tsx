@@ -1,4 +1,6 @@
 "use client";
+
+import type { OccupationForm } from "@/lib/occupation-form";
 import { withinCrewRadius, type CrewNear } from "@/lib/genie-search";
 import BrowseGeography from "@/components/BrowseGeography";
 import { prioritizeGeographically } from "@/lib/browse-geography";
@@ -27,7 +29,7 @@ import MobileBrowseControls,{ BrowseRoleFilter,MobileFilterField,MobileFilterSel
 import ProfileCardPhoto from "@/components/ProfileCardPhoto";
 import ProviderQuickFilters from "@/components/ProviderQuickFilters";
 import { compareCreatorNames } from "@/lib/creator-directory-order";
-import { departments,getDepartmentRoleLabel,getDeptLabel,getOccupationSearchTerms,taxonomyLabel } from "@/lib/departments";
+import { departments,getDepartmentRoleLabel,getDepartmentRoleFormLabels,getDeptLabel,getOccupationSearchTerms,taxonomyLabel } from "@/lib/departments";
 import { gripSearchTerms,isGripDepartmentSearch,isGripOccupation,normalizeOccupation } from "@/lib/gripTaxonomy";
 import { occupationById,occupationCatalogue,type PrimaryOccupation } from "@/lib/primary-occupation";
 import type { ProfileFocalPoint } from "@/lib/profile-cover";
@@ -53,6 +55,8 @@ export type ServerCreator = {
   name: string;
   role: string;
   positions: string[];
+  occupationForm?: OccupationForm;
+  displayPositions?: string[];
   primaryOccupation?: PrimaryOccupation | null;
   occupationIds?: string[];
   location: string;
@@ -90,6 +94,10 @@ export type ServerCreator = {
 function getPositions(c: ServerCreator): string[] {
   if (Array.isArray(c.positions) && c.positions.length > 0) return c.positions;
   return [c.role];
+}
+
+function getDisplayPositions(c: ServerCreator): string[] {
+  return (c.displayPositions ?? getPositions(c)).slice(0, 3);
 }
 
 function hasProfileType(c: ServerCreator, ...types: string[]): boolean {
@@ -260,6 +268,13 @@ function CreatorsInner({
 
   // Keep canonical catalogue IDs and order; show only roles represented by public profiles.
   const availableOccupations = useMemo(() => occupationCatalogue.filter(option => filterCrewOccupations(allCreators, null, [option.roleId]).length > 0), [allCreators]);
+  const roleFilterOptions = useMemo(() => availableOccupations
+    .filter(option => !sidebarDept || sidebarDept === CREW_PROVIDER_FILTER || option.departmentId === sidebarDept)
+    .map(option => ({
+      value: option.roleId,
+      label: getDepartmentRoleLabel(option.departmentId, option.label, locale, animals, taxonomyText),
+      searchTerms: [...getOccupationSearchTerms(option.label), ...getDepartmentRoleFormLabels(option.departmentId, option.label, locale, animals, taxonomyText)],
+    })), [availableOccupations, sidebarDept, locale, animals, taxonomyText]);
   const activeDepts = useMemo(() => departments.filter(dept => filterCrewOccupations(allCreators, dept.id).length > 0), [allCreators]);
 
   const chooseSidebarDept = (deptId: string | null) => {
@@ -392,7 +407,7 @@ function CreatorsInner({
   const filtered = map.rows;
   const mapItems = useMemo(() => matching.map(creator => ({
     id: creator.id, title: creator.name, city: creator.location,
-    subtitle: getPositions(creator).map(label => taxonomyLabel(label, uiText)).join(" · "),
+    subtitle: getDisplayPositions(creator).map(label => taxonomyLabel(label, uiText, creator.occupationForm)).join(" · "),
     href: creator.id.startsWith("listing_") ? `/creators/${encodeURIComponent(creator.id.slice(8))}` : `/profile/${encodeURIComponent(creator.id)}`,
     image: creator.image, focalPoint: creator.focal_point, lat: creator.lat, lng: creator.lng,
   })), [matching, uiText]);
@@ -495,7 +510,7 @@ function CreatorsInner({
           <MobileFilterSelect value={profileTypeFilter} onChange={setProfileTypeFilter} placeholder={t("filterAll")} options={availableProfileTypes.map((value) => ({ value, label: PROFILE_TYPE_MAP[value] ?? value }))} />
         </MobileFilterField>
         {(!isProviderFilter(sidebarDept)||sidebarDept===CREW_PROVIDER_FILTER) && <BrowseRoleFilter label={uiText("Ui.text_0038a9cf86613c")} placeholder={t("searchRoles")}
-          selected={selectedRoles} onChange={setSelectedRoles} options={availableOccupations.filter(option => !sidebarDept || sidebarDept===CREW_PROVIDER_FILTER || option.departmentId === sidebarDept).map(option => ({ value: option.roleId, label: getDepartmentRoleLabel(option.departmentId, option.label, locale, animals, taxonomyText) }))} />}
+          selected={selectedRoles} onChange={setSelectedRoles} options={roleFilterOptions} />}
         <MobileFilterField label={t("filterLanguage")}>
           <MobileFilterSelect value={languageFilter} onChange={setLanguageFilter} placeholder={t("filterAll")} options={availableLanguages.map((value) => ({ value, label: crewLanguageLabel(value, locale) }))} />
         </MobileFilterField>
@@ -587,7 +602,7 @@ function CreatorsInner({
               {(viewMode === "list" || viewMode === "map") && (
                 <div className="border border-border rounded-xl overflow-hidden bg-bg-secondary divide-y divide-border/50">
                   {crewVisible.map((c) => {
-                    const displayPositions = getPositions(c).map(label => taxonomyLabel(label, uiText));
+                    const displayPositions = getDisplayPositions(c).map(label => taxonomyLabel(label, uiText, c.occupationForm));
                     const href = c.id.startsWith("listing_") ? `/creators/${c.id.replace("listing_", "")}` : `/profile/${c.id}`;
                     return (
                       <Link key={c.id} href={href} suppressHydrationWarning
@@ -626,7 +641,7 @@ function CreatorsInner({
               {viewMode === "grid" && (
               <div className="grid grid-cols-2 lg:grid-cols-3 gap-2.5 sm:gap-3">
                 {crewVisible.map((c) => {
-                  const displayPositions = getPositions(c).map(label => taxonomyLabel(label, uiText));
+                  const displayPositions = getDisplayPositions(c).map(label => taxonomyLabel(label, uiText, c.occupationForm));
                   const href = c.id.startsWith("listing_") ? `/creators/${c.id.replace("listing_", "")}` : `/profile/${c.id}`;
                   const photo = crewPhotoInput(c);
                   return (

@@ -12,7 +12,9 @@ final class VoiceCommand {
     private static final Map<String, String> TAGS = new HashMap<>();
     static {
         String[][] rows = {{"de","de-DE"},{"en","en-GB"},{"es","es-ES"},{"it","it-IT"},{"cs","cs-CZ"},
-            {"hu","hu-HU"},{"nl","nl-NL"},{"nl-BE","nl-BE"},{"sv","sv-SE"}};
+            {"hu","hu-HU"},{"nl","nl-NL"},{"nl-BE","nl-BE"},{"sv","sv-SE"},
+            {"fr","fr-FR"},{"pl","pl-PL"},{"pt-PT","pt-PT"},{"zh-Hans","zh-CN"},
+            {"ja","ja-JP"},{"ko","ko-KR"},{"ru","ru-RU"},{"uk","uk-UA"}};
         for (String[] row : rows) TAGS.put(row[0], row[1]);
     }
     final String documentId, requestId, action, locale, languageTag, text;

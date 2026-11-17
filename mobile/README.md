@@ -2,7 +2,7 @@
 
 Development preview started 13 November 2026. This is an isolated Capacitor 8.6.2
 package with real iOS and Android projects. It loads the existing CineGenius site,
-including its server-rendered routes, shared design, nine languages and Clerk
+including its server-rendered routes, shared design, seventeen languages and Clerk
 account flows. There is no second backend or duplicated product UI.
 
 Markus reaffirmed on 14 November 2026 that web and native features are developed
@@ -11,6 +11,16 @@ and sv. This includes guidance, validation, errors and safety/moderation prompts
 Use the existing catalogs and native resource generator in the same change;
 preserve the manual language choice and leave member-written content and names
 unchanged. Catalog completeness alone does not verify the translated device UI.
+
+The 17 November source reconciliation adds fr, pl, pt-PT, zh-Hans, ja, ko, ru
+and uk to the same catalogs and generated native resources. Existing scanner
+translations stay unchanged. Both speech bridges map all seventeen app locales
+to explicit OS language tags; actual recognition/voices still depend on the device.
+The shared web source includes Smart discovery and its server-admin gate from
+`cedb788`. WEB confirmed that website release on 17 November; a new native
+build and installation remain separate steps. Preserve
+newer Mac workplace edits when transferring the narrowly changed native files.
+See `docs/workplace-cross-area-search.md` for the current reconciliation boundaries.
 
 ## Run
 
@@ -66,7 +76,7 @@ canonical app source is the server branch; build copies are not replacement sour
   origin. Retrying replaces that page. It does not promise recovery of unsaved
   input or unfinished uploads. Existing server-confirmed private recovery remains
   the web application's responsibility.
-- Offline copy comes from `MobilePreview` in the existing nine message catalogs;
+- Offline copy comes from `MobilePreview` in the existing seventeen message catalogs;
   the existing shared locale resolver is compiled for the local page. Only the
   selected local translation file loads. Native hosts forward the site's public
   `cg_locale` preference to the error page; session cookies are never forwarded.
@@ -93,11 +103,11 @@ for compatibility with older documents. Historical label
 tokens are used only for recognition; all displayed native text continues to
 come from `NativeRoomScanner`. Other disabled menu items stay unchanged.
 
-Plans stay in protected local storage, independent of the CineGenius account and
-excluded from backups. Opening the private library requires device-owner
+Plans stay in protected account-scoped local storage, excluded from backups.
+Account and ownership checks remain required; legacy unassigned originals are kept. Opening the private library requires device-owner
 authentication. Sharing PDF/available USDZ files and deleting plans are explicit
 actions. Example plans are labelled throughout and do not establish real scan
-accuracy. All UI and permission text is generated from the existing nine message
+accuracy. All UI and permission text is generated from the existing seventeen message
 catalogs by `prepare:preview`; run `sync` after changes.
 
 See [the scanner's design and test boundaries](../docs/native-workplace-room-scanner.md).

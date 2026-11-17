@@ -1,12 +1,14 @@
 import taxonomyLabelIndex from "./i18n/taxonomy-label-index.json" with { type: "json" };
+import germanOccupationAliases from "./i18n/occupation-aliases.de.json" with { type: "json" };
 import taxonomyIndex from "./i18n/taxonomy-index.json" with { type: "json" };
 const TAXONOMY_INDEX = taxonomyIndex as Record<string, {label: string; roles: Record<string, string>}>;
-import { ANIMAL_DEPARTMENT_ID, ANIMAL_DEPARTMENT_LABEL, animalRoleLabel, type AnimalTranslator } from "@/lib/animal-taxonomy";
+import { ANIMAL_DEPARTMENT_ID, ANIMAL_DEPARTMENT_LABEL, animalOccupation, animalRoleLabel, type AnimalTranslator } from "@/lib/animal-taxonomy";
 import { GRIP_DEPARTMENT_LABEL, GRIP_OCCUPATIONS } from "@/lib/gripTaxonomy";
 import { FILM_DEPARTMENTS } from "@/lib/filmRoles";
 import { CATERING_DEPARTMENT_ID, CATERING_DEPARTMENT_LABEL } from "@/lib/catering-taxonomy";
 import { SAFETY_MEDICAL_DEPARTMENT_ID, SAFETY_MEDICAL_DEPARTMENT_LABEL, SAFETY_MEDICAL_DEPARTMENT_LABELS, SAFETY_MEDICAL_OCCUPATIONS, SAFETY_MEDICAL_ROLE_LABELS } from "@/lib/safety-medical-taxonomy";
 import type { ProfileType } from "@/lib/profile-types";
+import { isOccupationForm, type OccupationForm } from "@/lib/occupation-form";
 
 export type Department = {
   id: string;
@@ -521,7 +523,7 @@ export const departments: Department[] = [
  * folding every job/project title into the profile catalogue at module load.
  * Exact labels and declared aliases resolve to one visible choice.
  */
-const FILM_TO_PROFILE_DEPARTMENT: Record<string, string> = {
+export const FILM_TO_PROFILE_DEPARTMENT: Record<string, string> = {
   "vor-der-kamera": "cast",
   regie: "regie",
   kamera: "kamera",
@@ -624,6 +626,48 @@ for (const filmDepartment of FILM_DEPARTMENTS) {
   }
 }
 
+/** Search aliases never change canonical choices, saved IDs or member-authored text. */
+const curatedRoleAliases = germanOccupationAliases as Record<string, Record<string, string[]>>;
+for (const department of departments) {
+  department.roleAliases ??= {};
+  for (const role of department.roles) {
+    const aliases = curatedRoleAliases[department.id]?.[role] ?? [];
+    department.roleAliases[role] = [...new Set([...(department.roleAliases[role] ?? []), ...aliases])];
+  }
+}
+
+type ResolvedDepartmentOccupation = { department: Department; role: string };
+const canonicalOccupations = new Map<string, ResolvedDepartmentOccupation[]>();
+const aliasedOccupations = new Map<string, ResolvedDepartmentOccupation[]>();
+for (const department of departments) for (const role of department.roles) {
+  const resolved = { department, role };
+  const canonicalKey = roleKey(role);
+  canonicalOccupations.set(canonicalKey, [...(canonicalOccupations.get(canonicalKey) ?? []), resolved]);
+  for (const alias of department.roleAliases?.[role] ?? []) {
+    const aliasKey = roleKey(alias);
+    const current = aliasedOccupations.get(aliasKey) ?? [];
+    if (!current.some(item => item.department.id === department.id && item.role === role)) {
+      aliasedOccupations.set(aliasKey, [...current, resolved]);
+    }
+  }
+}
+
+/** Exact catalogue lookup. A canonical title wins over an alias; ambiguity is never guessed. */
+export function resolveDepartmentOccupation(value: string, departmentId?: string): ResolvedDepartmentOccupation | null {
+  const key = roleKey(value);
+  if (!key) return null;
+  const withinDepartment = (options: ResolvedDepartmentOccupation[]) => departmentId
+    ? options.filter(option => option.department.id === departmentId) : options;
+  const canonical = withinDepartment(canonicalOccupations.get(key) ?? []);
+  if (canonical.length) return canonical.length === 1 ? canonical[0] : null;
+  const aliases = withinDepartment(aliasedOccupations.get(key) ?? []);
+  return aliases.length === 1 ? aliases[0] : null;
+}
+
+export function resolveDepartmentRole(departmentId: string, value: string): string | undefined {
+  return resolveDepartmentOccupation(value, departmentId)?.role;
+}
+
 /** Department -> valid profile type keys, shared by setup and profile editing. */
 export const DEPARTMENT_TO_PROFILE_TYPES: Record<string, ProfileType[]> = {
   kamera: ["camera"], grip: ["camera"], licht: ["lighting"], ton: ["sound"],
@@ -662,8 +706,9 @@ export function getProfileTypesForDepartment(departmentId: string, selectedRoles
 }
 
 /** Add reader-specific display text only for this search; never alter catalogue aliases or stored IDs. */
-export function getDepartmentRoleSearchTerms(department: Department, role: string, displayLabel?: string): string[] {
-  return [...new Set([role, ...(department.roleAliases?.[role] ?? []), ...(displayLabel ? [displayLabel] : [])])];
+export function getDepartmentRoleSearchTerms(department: Department, role: string, displayLabel?: string, localizedForms: readonly string[] = []): string[] {
+  const canonical = department.roles.includes(role) ? role : resolveDepartmentRole(department.id, role) ?? role;
+  return [...new Set([canonical, role, ...(department.roleAliases?.[canonical] ?? []), ...(displayLabel ? [displayLabel] : []), ...localizedForms])];
 }
 
 const occupationSearchIndex = new Map<string, string[]>();
@@ -720,17 +765,40 @@ export function deptColors(color: string) {
   return map[color] ?? map.slate;
 }
 
+/** The preferred form belongs to the profile owner; it never changes identity or IDs. */
+function occupationFormKey(key: string, requested: OccupationForm): string {
+  const form = isOccupationForm(requested) ? requested : "standard";
+  return form === "standard" ? key : `${key.replace(/^roles\./, "roleForms.")}.${form}`;
+}
+
 /** Display only; stored occupation titles and stable role IDs never change. */
-export function getDepartmentRoleLabel(departmentId: string, role: string, locale: string, animals?: AnimalTranslator, taxonomy?: (key: string) => string): string {
-  if (departmentId === ANIMAL_DEPARTMENT_ID && animals) return animalRoleLabel(role, animals);
+export function getDepartmentRoleLabel(departmentId: string, role: string, locale: string, animals?: AnimalTranslator, taxonomy?: (key: string) => string, form: OccupationForm = "standard"): string {
+  const canonical = resolveDepartmentRole(departmentId, role) ?? role;
+  if (departmentId === ANIMAL_DEPARTMENT_ID && animals) {
+    const animal = animalOccupation(canonical);
+    if (animal && isOccupationForm(form) && form !== "standard") return animals(`roleForms.${animal.id}.${form}`);
+    return animalRoleLabel(canonical, animals);
+  }
   const index = Object.hasOwn(TAXONOMY_INDEX, departmentId) ? TAXONOMY_INDEX[departmentId] : null;
-  const key = index && Object.hasOwn(index.roles, role) ? index.roles[role] : undefined;
-  if (taxonomy && key) return taxonomy(key);
-  return departments.find(department=>department.id===departmentId)?.roleLabels?.[role]?.[locale] ?? role;
+  const key = index && Object.hasOwn(index.roles, canonical) ? index.roles[canonical] : undefined;
+  if (taxonomy && key) return taxonomy(occupationFormKey(key, form));
+  return departments.find(department=>department.id===departmentId)?.roleLabels?.[canonical]?.[locale] ?? role;
+}
+
+/** All current-reader spellings are searchable without importing another locale bundle. */
+export function getDepartmentRoleFormLabels(departmentId: string, role: string, locale: string, animals?: AnimalTranslator, taxonomy?: (key: string) => string): string[] {
+  return [...new Set((["standard", "masculine", "feminine", "neutral"] as const).map(form => getDepartmentRoleLabel(departmentId, role, locale, animals, taxonomy, form)))];
 }
 
 /** Display only curated catalogue labels; unknown member-written values stay unchanged. */
-export function taxonomyLabel(value: string, translate: (key: string) => string): string {
+export function taxonomyLabel(value: string, translate: (key: string) => string, form: OccupationForm = "standard"): string {
   const index = taxonomyLabelIndex as Record<string, string>;
-  return Object.hasOwn(index, value) ? translate(index[value]) : value;
+  const directKey = Object.hasOwn(index, value) ? index[value] : undefined;
+  // Directory/department names keep their own meaning even when also a role alias.
+  if (directKey?.startsWith("Taxonomy.departments.")) return translate(directKey);
+  const resolved = resolveDepartmentOccupation(value);
+  const roleKey = resolved && TAXONOMY_INDEX[resolved.department.id]?.roles[resolved.role];
+  if (roleKey) return translate(`Taxonomy.${occupationFormKey(roleKey, form)}`);
+  if (directKey?.startsWith("Taxonomy.roles.")) return translate(`Taxonomy.${occupationFormKey(directKey.slice("Taxonomy.".length), form)}`);
+  return directKey ? translate(directKey) : value;
 }

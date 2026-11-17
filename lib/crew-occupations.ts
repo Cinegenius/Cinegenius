@@ -1,4 +1,4 @@
-import { occupationChoices, occupationById, occupationReference, readPrimaryOccupation, type PrimaryOccupation } from './primary-occupation';
+import { occupationChoices, occupationById, occupationReference, readPrimaryOccupation, primaryOccupationForPositions, orderPositionsByPrimary, type PrimaryOccupation } from './primary-occupation';
 import { PROFILE_CATEGORY_MAP, type ProfileType } from './profile-types';
 
 /** Stored selections only: never pass display positions containing inferred type labels. */
@@ -58,4 +58,68 @@ export function crewOccupationsError(crew: unknown, positions: unknown): string 
     const option = readPrimaryOccupation(item);
     return !!option && allowed.has(option.roleId);
   }) ? null : 'Die gewählten Tätigkeiten passen nicht zu den gespeicherten Berufen. Bitte prüfe deine Auswahl.';
+}
+
+export const MAX_PROFILE_OCCUPATIONS = 4;
+export const MAX_VISIBLE_PROFILE_OCCUPATIONS = 3;
+export type OccupationProfile = {
+  positions?: readonly string[] | null;
+  role?: string | null;
+  crew?: { primaryOccupation?: unknown; occupations?: unknown; additionalOccupation?: unknown } | null;
+};
+
+/** Additional is an explicit slot, never inferred from the fourth array item. */
+export function additionalCrewOccupation(profile: OccupationProfile): PrimaryOccupation | null {
+  const option = readPrimaryOccupation(profile.crew?.additionalOccupation);
+  const selected = selectedCrewOccupations(profile.positions ?? [], profile.crew?.occupations, profile.role, profile.crew?.primaryOccupation);
+  const main = primaryOccupationForPositions(profile.crew?.primaryOccupation, profile.positions ?? [], profile.role);
+  return option && option.roleId !== main?.roleId && selected.some(item => item.roleId === option.roleId)
+    ? occupationReference(option) : null;
+}
+
+/** Presentation only. Search continues to use all saved positions/occupation IDs. */
+export function profileOccupationPreview(profile: OccupationProfile): string[] {
+  const positions = (profile.positions ?? []).filter(title => typeof title === 'string' && title.trim());
+  const primary = primaryOccupationForPositions(profile.crew?.primaryOccupation, positions, profile.role);
+  const additional = additionalCrewOccupation(profile);
+  const ordered = orderPositionsByPrimary(positions.length ? positions : profile.role?.trim() ? [profile.role] : [], primary);
+  return ordered.filter(title => {
+    const matches = selectedCrewOccupations([title], profile.crew?.occupations);
+    return !additional || !matches.length || matches.some(item => item.roleId !== additional.roleId);
+  })
+    .slice(0, MAX_VISIBLE_PROFILE_OCCUPATIONS);
+}
+
+export function profileOccupationCount(profile: OccupationProfile): number {
+  const titles = new Set((profile.positions ?? []).map(title => title.trim().normalize('NFC').toLocaleLowerCase('de')).filter(Boolean));
+  return Math.max(titles.size, selectedCrewOccupations(profile.positions ?? [], profile.crew?.occupations).length);
+}
+
+function occupationSignature(profile: OccupationProfile): string {
+  return JSON.stringify({
+    positions: [...new Set(profile.positions ?? [])].sort(),
+    occupations: selectedCrewOccupations(profile.positions ?? [], profile.crew?.occupations, profile.role, profile.crew?.primaryOccupation).map(item => item.roleId).sort(),
+    primary: occupationReference(primaryOccupationForPositions(profile.crew?.primaryOccupation, profile.positions ?? [], profile.role)) ?? profile.crew?.primaryOccupation ?? null,
+    additional: occupationReference(readPrimaryOccupation(profile.crew?.additionalOccupation)) ?? profile.crew?.additionalOccupation ?? null,
+  });
+}
+
+export function profileOccupationsUnchanged(profile: OccupationProfile, previous?: OccupationProfile | null): boolean {
+  if (!previous || (profile.positions != null && (!Array.isArray(profile.positions) || profile.positions.some(value => typeof value !== "string")))) return false;
+  return occupationSignature(profile) === occupationSignature(previous);
+}
+
+/** Existing oversized selections survive unrelated edits. Changing the selection
+ * requires a deliberate reduction; reads and draft recovery never truncate it. */
+export function profileOccupationFocusError(profile: OccupationProfile, previous?: OccupationProfile | null): 'limit' | 'mainRequired' | 'additionalRequired' | 'invalidAdditional' | 'invalidSelection' | null {
+  if (profile.positions != null && (!Array.isArray(profile.positions) || profile.positions.some(value => typeof value !== 'string' || !value.trim()))) return 'invalidSelection';
+  const unchanged = profileOccupationsUnchanged(profile, previous);
+  const count = profileOccupationCount(profile);
+  if (count > MAX_PROFILE_OCCUPATIONS) return unchanged ? null : 'limit';
+  const main = primaryOccupationForPositions(profile.crew?.primaryOccupation, profile.positions ?? [], profile.role);
+  if (profile.crew?.additionalOccupation != null && !additionalCrewOccupation(profile)) return 'invalidAdditional';
+  if (unchanged) return null;
+  if (count && !main) return 'mainRequired';
+  if (count > MAX_VISIBLE_PROFILE_OCCUPATIONS && !additionalCrewOccupation(profile)) return 'additionalRequired';
+  return null;
 }
