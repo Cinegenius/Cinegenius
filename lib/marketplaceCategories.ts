@@ -547,9 +547,43 @@ export const SEARCH_SYNONYMS: Record<string, string[]> = {
   catering: ["catering-kuechen", "dienstleistungen-catering"],
 };
 
+// Broad objects span current categories even when an offer uses only a model
+// name. Match the complete phrase: a named model or a specific accessory must
+// not inherit every item from its parent category. These are search aliases,
+// not new display labels or changes to stored category IDs.
+const SEARCH_CONCEPTS = [
+  {
+    groups: ["licht-quellen"],
+    aliases: [
+      "Lampe", "Lampen", "Leuchte", "Leuchten", "Scheinwerfer",
+      "lamp", "lamps", "light", "lights", "light fixture", "light fixtures",
+      "lámpara", "lámparas", "lampada", "lampade", "svítidlo", "svítidla", "lampa", "lampy",
+      "lámpa", "lámpák", "lampen", "lampor", "luminaire", "luminaires", "lampes",
+      "oprawa oświetleniowa", "oprawy oświetleniowe", "lâmpada", "lâmpadas", "luminária", "luminárias",
+      "灯", "灯具", "ランプ", "照明器具", "램프", "조명기구", "조명 기구",
+      "лампа", "лампы", "светильник", "светильники", "лампи", "світильник", "світильники",
+    ],
+  },
+  {
+    groups: ["kostuem-kleidung", "kostuem-accessoires"],
+    aliases: [
+      "Kostüm", "Kostüme", "kostum", "kostume", "kostuem", "kostueme", "costume", "costumes",
+      "vestuario", "disfraz", "disfraces", "costumi", "kostým", "kostýmy", "jelmez", "jelmezek",
+      "kostuum", "kostuums", "kostym", "kostymer", "kostium", "kostiumy", "figurino", "figurinos",
+      "服装", "戏服", "衣装", "衣裳", "의상", "костюм", "костюмы", "костюми",
+    ],
+  },
+] as const;
+
+export function marketplaceConceptGroups(query: string): string[] {
+  const key = normalize(query);
+  return SEARCH_CONCEPTS.filter(concept => concept.aliases.some(alias => normalize(alias) === key))
+    .flatMap(concept => [...concept.groups]);
+}
+
 /** Candidate stored values for search, using explicit aliases plus translated display terms. */
 export function marketplaceSearchCategories(query:string,t?:(key:string)=>string):string[] {
- const text=normalize(query);if(text.length<2)return [];
+ const text=normalize(query),concepts=marketplaceConceptGroups(query);if(text.length<2&&!concepts.length)return [];
  const words=text.match(/[\p{L}\p{N}_-]+/gu)??[];if(!words.length)return [];
  const addResolved=(values:Set<string>,resolved:ReturnType<typeof marketplaceCategory>)=>{
   if(!resolved)return;
@@ -557,11 +591,14 @@ export function marketplaceSearchCategories(query:string,t?:(key:string)=>string
   if(resolved.subcategory){const group=department?.groups.find(g=>g.id===resolved.subcategory);if(group)groupValues(group).forEach(v=>values.add(v));}
   else if(department)deptValues(department).forEach(v=>values.add(v));
  };
+ // A complete object phrase also works in languages with spaces or a single character.
+ if(concepts.length&&(words.length>1||text.length<2)){const values=new Set<string>();for(const groupId of concepts)addResolved(values,marketplaceCategory(groupId));return [...values];}
  // A complete declared legacy alias covers its whole phrase without guessing from individual words.
  const exact=marketplaceCategory(query);
  if(words.length>1&&exact){const values=new Set<string>();addResolved(values,exact);return [...values];}
  const candidates=(word:string)=>{
   const values=new Set<string>();addResolved(values,marketplaceCategory(word));
+  for(const groupId of marketplaceConceptGroups(word))addResolved(values,marketplaceCategory(groupId));
   for(const [alias,resolved]of Object.entries(LEGACY_ALIASES))if(normalize(alias).includes(word))addResolved(values,resolved);
   for(const department of DEPARTMENTS){
    const label=t?.(`categories.${department.id}`)??department.label;
