@@ -8,7 +8,8 @@ import FavoriteButton from "@/components/FavoriteButton";
 import FloatingMapToggle from "@/components/FloatingMapToggle";
 import ListingImage from "@/components/ListingImage";
 import MobileBrowseControls,{ MobileFilterField,MobileFilterSelect,type BrowseChip } from "@/components/MobileBrowseControls";
-import BrowseResultCount from "@/components/BrowseResultCount";
+import DirectoryResults from "@/components/DirectoryResults";
+import DirectoryViewControls, { type DirectoryView } from "@/components/DirectoryViewControls";
 import BrowseSelect from "@/components/BrowseSelect";
 import PageHeader from "@/components/PageHeader";
 import DirectoryPage from "@/components/DirectoryPage";
@@ -23,12 +24,12 @@ import { browsePlaceOptions as placeOptions, UNASSIGNED_COUNTRY } from "@/lib/pl
 import { useNearbyLocation } from "@/lib/use-nearby-location";
 import { useViewState } from "@/lib/use-view-state";
 import { useViewUrl } from "@/lib/use-view-url";
-import { ArrowRight,ChevronDown,LayoutList,Map,MapPin,Navigation,Plus,Share2,Star } from "lucide-react";
+import { ArrowRight,ChevronDown,MapPin,Navigation,Plus,Share2 } from "lucide-react";
 import { useLocale,useTranslations } from "next-intl";
 import dynamic from "next/dynamic";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { useEffect,useMemo,useRef,useState,useSyncExternalStore } from "react";
+import { useEffect,useMemo,useRef,useState } from "react";
 
 export type LocationCard = {
   id: string; title: string; type: string; city: string; price: number;
@@ -43,18 +44,9 @@ export type LocationCard = {
 
 function MapLoading() {
   const t = useTranslations();
-  return <div role="status" className="flex h-full min-h-80 items-center justify-center rounded-xl border border-border bg-bg-secondary text-sm text-text-muted">{t("Ui.text_8cd626fb7674ab")}</div>;
+  return <div role="status" className="flex h-full items-center justify-center rounded-xl border border-border bg-bg-secondary text-sm text-text-muted">{t("Ui.text_8cd626fb7674ab")}</div>;
 }
 const LocationMap = dynamic(() => import("@/components/LocationMap"), { ssr: false, loading: MapLoading });
-const wideQuery = "(min-width: 1280px)";
-function subscribeWideLayout(listener: () => void) {
-  const media = window.matchMedia(wideQuery);
-  media.addEventListener("change", listener);
-  return () => media.removeEventListener("change", listener);
-}
-const readWideLayout = () => window.matchMedia(wideQuery).matches;
-const serverWideLayout = () => false;
-
 export default function LocationsLanding({ allLocations, totalCount, initialFilters = DEFAULT_LOCATION_LANDING_FILTERS }: { allLocations: LocationCard[]; totalCount: number; initialFilters?: LocationLandingFilters }) {
   const uiText = useTranslations();
 
@@ -63,9 +55,9 @@ export default function LocationsLanding({ allLocations, totalCount, initialFilt
   const categoryText = useTranslations("menu");
   const [filters, setFilters] = useViewState("locations.landing.filters", () => ({ ...initialFilters }));
   const [pagination, setPagination] = useViewState("locations.landing.pagination", { filterKey: "", visibleCount: 24 });
-  const [viewMode, setViewMode] = useViewState<"split" | "list" | "map">("locations.landing.view", "split");
-  const wide = useSyncExternalStore(subscribeWideLayout, readWideLayout, serverWideLayout);
-  const effectiveView = viewMode === "split" && !wide ? "list" : viewMode;
+  const [viewMode, setViewMode] = useViewState<DirectoryView | "split">("locations.landing.view", "grid");
+  // Preserve saved legacy split views as the shared map/list mode.
+  const effectiveView: DirectoryView = viewMode === "map" || viewMode === "split" ? "map" : viewMode === "list" ? "list" : "grid";
   const [browseBounds, setBrowseBounds] = useViewState<MapBounds | null>("locations.landing.bounds", null);
   const [activeId, setActiveId] = useState<string | null>(null);
   const nearby = useNearbyLocation();
@@ -107,7 +99,7 @@ export default function LocationsLanding({ allLocations, totalCount, initialFilt
   const geography = useBrowseGeography(filters.sort === "featured" && !filters.country && !filters.region && !filters.city && !filters.cityText && !nearby.coordinates);
   const matching = useMemo(() => prioritizeGeographically(filterLandingLocations(allLocations, filters, value => locationCategoryLabel(value, categoryText)), geography.preferred), [allLocations, filters, categoryText, geography.preferred]);
   const mapLocations = useMemo(() => matching.filter(row => !nearby.coordinates || (hasCoordinates(row) && locationDistanceKm(nearby.coordinates, [row.lat, row.lng]) <= radiusKm)), [matching, nearby.coordinates, radiusKm]);
-  const filtered = useMemo(() => mapBounds ? mapLocations.filter(row => inMapBounds(row, mapBounds)) : mapLocations, [mapLocations, mapBounds]);
+  const filtered = useMemo(() => effectiveView === "map" && mapBounds ? mapLocations.filter(row => inMapBounds(row, mapBounds)) : mapLocations, [effectiveView, mapLocations, mapBounds]);
   const updateMapBounds = (next: MapBounds) => {
     if (mapBounds && mapBounds.south === next.south && mapBounds.north === next.north && mapBounds.west === next.west && mapBounds.east === next.east) return;
     setMapBounds(next);
@@ -115,7 +107,7 @@ export default function LocationsLanding({ allLocations, totalCount, initialFilt
   };
   const params = locationLandingParams(filters);
   const urlParams = params.toString();
-  const filterKey = JSON.stringify([urlParams, nearby.coordinates ? nearbyViewportRevision : mapBounds, nearby.coordinates ? nearby.session : null, radiusKm, geography.key]);
+  const filterKey = JSON.stringify([urlParams, effectiveView === "map" ? nearby.coordinates ? nearbyViewportRevision : mapBounds : null, nearby.coordinates ? nearby.session : null, radiusKm, geography.key]);
   const visibleCount = pagination.filterKey === filterKey ? pagination.visibleCount : 24;
   const locations = filtered.slice(0, visibleCount);
   useViewUrl(urlParams ? `/locations?${urlParams}` : "/locations", 300, genieLaunch);
@@ -127,7 +119,7 @@ export default function LocationsLanding({ allLocations, totalCount, initialFilt
     ...(nearby.coordinates ? [{id: "nearby", label: `${t("locateActive")} · ${t("inRadius", {radius: radiusKm})}`, onRemove: () => clearLocation()}] : []),
     ...(filters.lage ? [{id: "lage", label: t(filters.lage === "Innen" ? "filterInnen" : filters.lage === "Außen" ? "filterAussen" : "filterInnenAussen"), onRemove: () => updateFilters({lage: ""})}] : []),
     ...([['power', 'filterPower'], ['instant', 'filterInstant'], ['verified', 'filterVerified']] as const).flatMap(([key,label]) => filters[key] ? [{id: key, label: t(label), onRemove: () => updateFilters({[key]: ""})}] : []),
-    ...(mapBounds ? [{ id: "map-area", label: uiText("locationMap.areaActive"), onRemove: () => setMapBounds(null) }] : []),
+    ...(effectiveView === "map" && mapBounds ? [{ id: "map-area", label: uiText("locationMap.areaActive"), onRemove: () => setMapBounds(null) }] : []),
     ...(filters.type ? [{ id: "type", label: categoryLabel(filters.type), onRemove: () => updateFilters({ type: "" }) }] : []),
     ...(["country", "region", "city"] as const).flatMap(kind => filters[kind] ? [{
       id: kind, label: filters[kind] === UNASSIGNED_COUNTRY ? uiText("Places.countryUnassigned") : placeOptions(allLocations, kind, locale).find(option => option.value === filters[kind])?.label ?? filters[kind],
@@ -138,13 +130,8 @@ export default function LocationsLanding({ allLocations, totalCount, initialFilt
     ...(filters.max ? [{ id: "max", label: uiText("Ui.text_f47e415aff7a38", { value1: filters.max }), onRemove: () => updateFilters({ max: "" }) }] : []),
   ];
 
-  const chooseView = (mode: "list" | "map" | "split") => {
-    setViewMode(mode);
-    resultsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
-  };
-  const viewControls = <div role="group" aria-label={t("viewLabel")} className="directory-view-controls">
-    {([{ mode: "list", label: t("viewList"), icon: LayoutList }, ...(wide ? [{ mode: "split" as const, label: t("viewSplit"), icon: Map }] : []), { mode: "map", label: t("viewMap"), icon: Map }] as const).map(({mode,label,icon: Icon}) => <button type="button" key={mode} aria-label={label} aria-pressed={effectiveView === mode} onClick={() => chooseView(mode)} className="directory-view-button"><Icon size={17} aria-hidden="true" />{label}</button>)}
-  </div>;
+  const chooseView = (mode: DirectoryView) => setViewMode(mode);
+  const viewControls = <DirectoryViewControls value={effectiveView} onChange={chooseView} />;
 
   const additionalFilters = () => <>
     <MobileFilterField label={uiText("Ui.text_295029201d603e")}>
@@ -161,7 +148,7 @@ export default function LocationsLanding({ allLocations, totalCount, initialFilt
     {nearby.error && <p role="alert" className="text-sm text-text-secondary">{t(nearby.error)}</p>}
   </>;
 
-  const mapPanel = <aside aria-label={t("viewMap")} className={`locations-discovery-map directory-map-frame ${effectiveView === "split" ? "xl:sticky xl:top-24" : ""}`}>
+  const mapPanel = <aside aria-label={t("viewMap")} className="locations-discovery-map directory-map-frame">
           <LocationMap locations={mapLocations} visibleCount={filtered.length} onBoundsChange={updateMapBounds} activeId={activeId} onHover={setActiveId} userLocation={nearby.coordinates} radiusKm={radiusKm} appliedBounds={mapBounds} onApplyBounds={setMapBounds} />
         </aside>;
 
@@ -198,8 +185,7 @@ export default function LocationsLanding({ allLocations, totalCount, initialFilt
 
       <div id="locations-discover" ref={resultsRef} className="site-container mobile-bottom-nav-clear scroll-mt-24 space-y-10 py-6 sm:space-y-10">
 
-        <div className={`locations-discovery-layout ${effectiveView === "split" ? "xl:grid xl:grid-cols-[minmax(0,1.05fr)_minmax(0,1fr)] xl:items-start xl:gap-6" : "space-y-6"}`}>
-        {effectiveView === "map" && mapPanel}
+        <DirectoryResults view={effectiveView} map={mapPanel}>
         {(allLocations.length === 0 ? (
           <div className="px-4 py-16 text-center">
             <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl border border-border bg-bg-elevated"><MapPin size={24} aria-hidden="true" className="text-text-muted" /></div>
@@ -209,41 +195,23 @@ export default function LocationsLanding({ allLocations, totalCount, initialFilt
           </div>
         ) : (
           <section aria-label={t("landingDiscover")} className="min-w-0">
-            {effectiveView === "map" && <div className="mb-4 flex flex-wrap items-center justify-between gap-3"><h2 className="text-xl font-bold text-text-primary">{t("landingDiscover")}</h2><BrowseResultCount count={filtered.length} label={t("results", {count: filtered.length})} /></div>}
-            {filtered.length === 0 ? <EmptyState icon={MapPin} title={t("emptyTitleFiltered")} description={t("emptyDescFiltered")} action={{ label: t("emptyActionReset"), onClick: resetFilters }} /> : <div className={`grid grid-cols-1 gap-5 sm:grid-cols-2 ${effectiveView === "split" ? "xl:grid-cols-2" : "lg:grid-cols-3"}`}>
+            {filtered.length === 0 ? <EmptyState icon={MapPin} title={t("emptyTitleFiltered")} description={t("emptyDescFiltered")} action={{ label: t("emptyActionReset"), onClick: resetFilters }} /> : <div className={effectiveView === "grid" ? "directory-cards" : "directory-list"}>
               {locations.map(location => (
-                <article key={location.id} data-id={location.id} className="relative min-w-0">
-                <Link href={`/locations/${location.id}`} onMouseEnter={() => setActiveId(location.id)} onMouseLeave={() => setActiveId(null)} onFocus={() => setActiveId(location.id)} onBlur={() => setActiveId(null)} className={`browse-card group flex h-full min-w-0 flex-col transition-colors hover:border-gold/50 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-gold ${activeId === location.id ? "border-gold ring-1 ring-gold" : ""}`}>
-                  <div className="relative aspect-video w-full overflow-hidden bg-bg-elevated">
-                    {location.image ? (
-                      <ListingImage
-                        src={location.image}
-                        alt={location.title}
-                        fill
-                        sizes={effectiveView === "split" ? "(min-width: 1280px) 25vw, (min-width: 640px) 50vw, 100vw" : "(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"}
-                        mediaSize="thumbnail"
-                        className="object-cover transition-transform duration-500 group-hover:scale-105"
-                        style={location.focalPoint ? { objectPosition: `${location.focalPoint.x}% ${location.focalPoint.y}%` } : undefined}
-                      />
-                    ) : (
-                      <div className="flex h-full w-full items-center justify-center"><MapPin size={28} aria-hidden="true" className="text-text-muted" /></div>
-                    )}
-                  </div>
-                  <div className="flex flex-1 flex-col p-4">
-                    <h3 className="line-clamp-2 min-h-12 text-base font-semibold leading-6 text-text-primary transition-colors group-hover:text-gold">{location.title}</h3>
-                    <p className="mt-2 break-words text-sm text-text-muted">{location.type ? locationCategoryLabel(location.type, categoryText) : t("landingBadge")}</p>
-                    {location.city && <p className="mt-1 flex items-start gap-1.5 text-sm text-text-secondary"><MapPin size={14} aria-hidden="true" className="mt-0.5 shrink-0 text-text-muted" /><span className="min-w-0 break-words">{location.city}</span></p>}
-                    <div className="mt-auto flex flex-wrap items-center justify-between gap-2 pt-4">
-                      {location.rating > 0 ? (
-                        <span className="flex items-center gap-1 text-xs text-text-muted"><Star size={12} aria-hidden="true" className="fill-gold text-gold" />{location.rating.toLocaleString(locale, { minimumFractionDigits: 1, maximumFractionDigits: 1 })}<span>({location.reviews.toLocaleString(locale)})</span></span>
-                      ) : (
-                        <span title={t("landingNoReviews")} className="text-xs text-text-muted">{t("newBadge")}</span>
-                      )}
-                      <span className="break-words text-sm font-bold text-gold">{location.priceLabel}</span>
+                <article key={location.id} data-id={location.id} className={`directory-entry ${effectiveView === "grid" ? "browse-card" : ""}`}>
+                  <Link href={`/locations/${location.id}`} onMouseEnter={() => setActiveId(location.id)} onMouseLeave={() => setActiveId(null)} onFocus={() => setActiveId(location.id)} onBlur={() => setActiveId(null)} className={`directory-entry-link ${activeId === location.id ? "ring-1 ring-gold" : ""}`}>
+                    <div className="directory-entry-photo">
+                      {location.image ? <ListingImage src={location.image} alt="" fill mediaSize="thumbnail"
+                        sizes={effectiveView === "grid" ? "(min-width: 1024px) 25vw, (min-width: 768px) 33vw, 50vw" : "64px"}
+                        className="object-cover" style={location.focalPoint ? { objectPosition: `${location.focalPoint.x}% ${location.focalPoint.y}%` } : undefined} />
+                        : <div className="flex h-full items-center justify-center text-text-muted"><MapPin size={24} aria-hidden="true" /></div>}
                     </div>
-                  </div>
-                </Link>
-                <FavoriteButton listingId={location.id} listingType="location" listingTitle={location.title} listingCity={location.city} listingPrice={location.price} listingImage={location.image} className="absolute right-2 top-2 min-h-11 min-w-11" />
+                    <div className="directory-entry-body">
+                      <h3 className="directory-entry-title" title={location.title}>{location.title}</h3>
+                      {location.city && <p className="directory-entry-place"><MapPin size={11} aria-hidden="true" /><span title={location.city}>{location.city}</span></p>}
+                      <p className="directory-entry-price">{location.priceLabel}</p>
+                    </div>
+                  </Link>
+                  <FavoriteButton listingId={location.id} listingType="location" listingTitle={location.title} listingCity={location.city} listingPrice={location.price} listingImage={location.image} className="directory-entry-favorite" />
                 </article>
               ))}
             </div>}
@@ -252,8 +220,7 @@ export default function LocationsLanding({ allLocations, totalCount, initialFilt
             )}
           </section>
         ))}
-        {effectiveView === "split" && mapPanel}
-        </div>
+        </DirectoryResults>
 
         {allLocations.length > 0 && (
           <div className="flex flex-col items-start justify-between gap-4 rounded-2xl border border-border bg-bg-elevated p-6 sm:flex-row sm:items-center sm:p-8">
@@ -262,7 +229,7 @@ export default function LocationsLanding({ allLocations, totalCount, initialFilt
           </div>
         )}
       </div>
-      <FloatingMapToggle mapActive={effectiveView === "map"} onToggle={() => chooseView(effectiveView === "map" ? "list" : "map")} />
+      <FloatingMapToggle mapActive={effectiveView === "map"} onToggle={() => { chooseView(effectiveView === "map" ? "list" : "map"); requestAnimationFrame(() => resultsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" })); }} />
     </DirectoryPage>
   );
 }

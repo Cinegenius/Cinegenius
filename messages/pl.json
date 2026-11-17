@@ -12810,7 +12810,8 @@
     "loading": "Ładowanie mapy …",
     "providerPurpose": "Mapy interaktywne",
     "providerRegion": "Węgry / CDN",
-    "providerNotice": "Po otwarciu mapy Twoja przeglądarka ładuje materiały mapowe z OpenFreeMap. Twój adres IP i dane techniczne zapytania są przesyłane do dostawcy mapy. Nazwy, profile i wiadomości nie są przesyłane jako dane mapy. <provider>Informacje o dostawcy</provider>."
+    "providerNotice": "Po otwarciu mapy Twoja przeglądarka ładuje materiały mapowe z OpenFreeMap. Twój adres IP i dane techniczne zapytania są przesyłane do dostawcy mapy. Nazwy, profile i wiadomości nie są przesyłane jako dane mapy. <provider>Informacje o dostawcy</provider>.",
+    "information": "Informacje o mapie"
   },
   "BrowseGeography": {
     "preferred": "Najpierw pobliskie i {country}",

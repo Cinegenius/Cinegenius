@@ -12810,7 +12810,8 @@
     "loading": "지도 로딩 중…",
     "providerPurpose": "인터랙티브 지도",
     "providerRegion": "헝가리 / CDN",
-    "providerNotice": "지도를 열면 브라우저가 OpenFreeMap에서 지도 자료를 불러옵니다. 귀하의 IP 주소와 기술적 요청 데이터가 지도 제공자에게 전송됩니다. 이름, 프로필, 메시지는 지도 데이터로 전송되지 않습니다. <provider>제공자 정보</provider>."
+    "providerNotice": "지도를 열면 브라우저가 OpenFreeMap에서 지도 자료를 불러옵니다. 귀하의 IP 주소와 기술적 요청 데이터가 지도 제공자에게 전송됩니다. 이름, 프로필, 메시지는 지도 데이터로 전송되지 않습니다. <provider>제공자 정보</provider>.",
+    "information": "지도 정보"
   },
   "BrowseGeography": {
     "preferred": "근처 및 {country} 우선",

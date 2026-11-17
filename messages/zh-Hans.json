@@ -12810,7 +12810,8 @@
     "loading": "地图加载中…",
     "providerPurpose": "互动地图",
     "providerRegion": "匈牙利 / CDN",
-    "providerNotice": "打开地图时，您的浏览器会从 OpenFreeMap 加载地图数据。您的 IP 地址和技术请求数据会传输给地图提供商。名称、资料和消息不会作为地图数据发送。<provider>提供商信息</provider>。"
+    "providerNotice": "打开地图时，您的浏览器会从 OpenFreeMap 加载地图数据。您的 IP 地址和技术请求数据会传输给地图提供商。名称、资料和消息不会作为地图数据发送。<provider>提供商信息</provider>。",
+    "information": "地图信息"
   },
   "BrowseGeography": {
     "preferred": "优先显示附近和{country}",

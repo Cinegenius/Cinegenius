@@ -6,6 +6,7 @@ import { useBrowseGeography } from "@/lib/use-browse-geography";
 
 
 import DirectoryMap from "@/components/DirectoryMap";
+import DirectoryResults from "@/components/DirectoryResults";
 import DirectoryViewControls,{ type DirectoryView } from "@/components/DirectoryViewControls";
 import FloatingMapToggle from "@/components/FloatingMapToggle";
 import { useDirectoryMap } from "@/lib/use-directory-map";
@@ -26,7 +27,7 @@ import MobileBrowseControls,{ MobileFilterField,MobileFilterSelect,type BrowseCh
 import { MARKETPLACE_PAGE_SIZE,marketplaceCardData,marketplaceCategorySelection,readMarketplaceBrowseState,type MarketplaceOfferFilter,type MarketplaceSort } from "@/lib/marketplace-browse";
 import { localizedMarketplaceDepartments,marketplaceMatches,marketplaceSearchCategories,marketplaceSearchTerms } from "@/lib/marketplaceCategories";
 import { useAuth,useUser } from "@clerk/nextjs";
-import { Heart,MapPin,Package,Truck } from "lucide-react";
+import { Heart,MapPin,Package,Star } from "lucide-react";
 import { useLocale,useTranslations } from "next-intl";
 import Link from "next/link";
 import { usePathname,useSearchParams } from "next/navigation";
@@ -53,98 +54,39 @@ function PropCard({ p, list, ratingData, myRating, onRate, canRate, isFavorited,
   isFavorited?: boolean; onFavorite?: (e: React.MouseEvent) => void;
 }) {
   const uiText = useTranslations();
-
-  const tp = useTranslations("props");
   const navigation = useTranslations("MarketplaceNavigation");
-  const market=useTranslations("MarketplaceOffer"),catalog=useTranslations("MarketplaceCatalog"),locale=useLocale();
+  const market = useTranslations("MarketplaceOffer"), locale = useLocale();
   const href = p.type === "vehicle" ? `/vehicles/${p.id}` : `/props/${p.id}`;
-  const favorite = onFavorite && <button type="button" onClick={onFavorite} aria-label={navigation(isFavorited ? "removeFavorite" : "saveFavorite")} aria-pressed={!!isFavorited} className={`flex min-h-11 min-w-11 items-center justify-center rounded-full transition-colors ${list ? `shrink-0 ${isFavorited ? "text-crimson-light" : "text-text-muted hover:text-crimson-light"}` : `absolute right-2.5 top-2.5 z-10 border backdrop-blur-sm ${isFavorited ? "border-crimson/50 bg-crimson/20 text-crimson-light" : "border-border bg-bg-primary/80 text-text-secondary hover:text-crimson-light"}`}`}><Heart size={16} className={isFavorited ? "fill-current" : ""} /></button>;
+  const favorite = onFavorite && <button type="button" onClick={onFavorite} aria-label={navigation(isFavorited ? "removeFavorite" : "saveFavorite")} aria-pressed={!!isFavorited}
+    className={`directory-entry-favorite flex min-h-11 min-w-11 items-center justify-center rounded-full border transition-colors ${isFavorited ? "border-crimson/50 bg-crimson/20 text-crimson-light" : "border-border bg-bg-primary/70 text-text-muted hover:text-crimson-light"}`}>
+    <Heart size={17} aria-hidden="true" className={isFavorited ? "fill-current" : ""} />
+  </button>;
 
-
-  if (list) {
-    return (
-      <article className="browse-card group flex min-w-0 items-center gap-1 p-2 sm:gap-2 sm:p-3" data-visible>
-        <Link href={href} className="flex min-w-0 flex-1 items-center gap-3 rounded-lg focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold">
-          <div className="relative h-14 w-14 shrink-0 overflow-hidden rounded-lg border border-border bg-bg-elevated sm:h-16 sm:w-16">
-            {p.image ? <ListingImage mediaSize="thumbnail" src={p.image} alt="" fill sizes="64px" loading="lazy" className="object-cover" style={{ objectPosition: p.focalPoint ? `${p.focalPoint.x}% ${p.focalPoint.y}%` : "50% 66%" }} /> : <div className="flex h-full items-center justify-center text-text-muted"><Package size={22} aria-hidden="true" /></div>}
-          </div>
-          <div className="min-w-0 flex-1 py-0.5">
-            <h3 className="line-clamp-2 text-sm font-semibold leading-5 text-text-primary [overflow-wrap:anywhere]">{p.title}</h3>
-            <p className="mt-0.5 flex min-w-0 items-center gap-1 text-xs text-text-muted"><MapPin size={11} className="shrink-0" aria-hidden="true" /><span className="truncate">{p.location || p.vendor}</span></p>
-            <div className="mt-1 flex min-w-0 flex-wrap items-baseline gap-x-2 gap-y-0.5">
-              <p className="text-xs font-semibold text-gold [overflow-wrap:anywhere]">{listingPriceLabel(p.dailyRate, { ...p.meta, rental_type: p.rentalType }, "/Tag", locale, market)}</p>
-              <span className="text-[11px] text-text-muted">{navigation(p.rentalType === "dienstleistung" ? "service" : p.rentalType === "beides" ? "both" : p.rentalType === "kauf" ? "buy" : "rent")}</span>
-            </div>
-          </div>
-        </Link>
-        {favorite}
-      </article>
-    );
-  }
-
-  return (
-    <article className="browse-card card-hover group relative block overflow-hidden" data-visible>
-    <Link href={href} className="block">
-      <div className="relative aspect-[4/3] overflow-hidden bg-bg-elevated">
-        {p.image
-          ? <ListingImage mediaSize="thumbnail" src={p.image} alt={p.title} fill sizes="(max-width: 768px) 50vw, 400px" loading="lazy" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" style={{ objectPosition: p.focalPoint ? `${p.focalPoint.x}% ${p.focalPoint.y}%` : "50% 66%" }} />
-          : <div className="w-full h-full flex items-center justify-center text-text-muted/20"><svg viewBox="0 0 24 24" fill="currentColor" className="w-12 h-12"><path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/></svg></div>
-        }
-        <div className={`absolute top-2.5 left-2.5 right-2.5 flex items-start justify-between gap-1 ${onFavorite ? "pr-12" : ""}`}>
-          <span className="px-2 py-0.5 bg-black/50 backdrop-blur-sm border border-white/10 text-white/70 text-[10px] rounded-full truncate max-w-[65%]">{marketplaceCategoryLabel(p.category,catalog)}</span>
-          <div className="flex gap-1 shrink-0 items-center">
-            {p.delivery && <span className="flex items-center gap-0.5 px-2 py-0.5 bg-teal-500/25 backdrop-blur-sm border border-teal-400/30 text-teal-300 text-[10px] rounded-full"><Truck size={8} /></span>}
-          </div>
-        </div>
+  return <article className={`directory-entry ${list ? "" : "browse-card"}`} data-visible>
+    <Link href={href} className="directory-entry-link">
+      <div className="directory-entry-photo">
+        {p.image ? <ListingImage src={p.image} alt="" fill mediaSize="thumbnail" loading="lazy"
+          sizes={list ? "64px" : "(min-width: 1024px) 25vw, (min-width: 768px) 33vw, 50vw"}
+          className="object-cover" style={{ objectPosition: p.focalPoint ? `${p.focalPoint.x}% ${p.focalPoint.y}%` : "50% 66%" }} />
+          : <div className="flex h-full items-center justify-center text-text-muted"><Package size={24} aria-hidden="true" /></div>}
       </div>
-      <div className="bg-bg-secondary p-3">
-        <h3 className="mb-1.5 line-clamp-2 text-sm font-semibold text-text-primary">{p.title}</h3>
-        <p className="flex min-w-0 items-center gap-1 text-xs text-text-muted"><MapPin size={11} className="shrink-0" /><span className="truncate">{p.location || p.vendor}</span></p>
-        <p className="mt-2 max-w-full break-words text-sm font-bold leading-snug text-gold">{listingPriceLabel(p.dailyRate,{...p.meta,rental_type:p.rentalType},"/Tag",locale,market)}</p>
-      </div>
-      <div className="bg-bg-secondary px-3 py-2 border-t border-border/50">
-        <div className="flex flex-wrap items-center justify-between gap-x-2 gap-y-1">
-          <span className="text-[10px] text-text-muted">{p.condition}</span>
-          <span className="text-[10px] font-medium text-gold">{navigation(p.rentalType === "dienstleistung" ? "service" : p.rentalType === "beides" ? "both" : p.rentalType === "kauf" ? "buy" : "rent")}</span>
-          {p.era && <span className="text-[10px] text-gold/70">{p.era}</span>}
-          <span className="text-[10px] text-text-muted group-hover:text-gold transition-colors">{tp("detailsArrow")}</span>
-        </div>
+      <div className="directory-entry-body bg-bg-secondary">
+        <h3 className="directory-entry-title" title={p.title}>{p.title}</h3>
+        <p className="directory-entry-place"><MapPin size={11} aria-hidden="true" /><span title={p.location || p.vendor}>{p.location || p.vendor}</span></p>
+        <p className="directory-entry-price font-bold">{listingPriceLabel(p.dailyRate, { ...p.meta, rental_type: p.rentalType }, "/Tag", locale, market)}</p>
       </div>
     </Link>
     {favorite}
-      <div className="bg-bg-secondary px-3 pb-2">
-        {/* Rating strip */}
-        <div className="flex flex-col items-start gap-1.5 border-t border-border/30 pt-1.5"
-          onClick={(e) => e.stopPropagation()}>
-          <div className="flex items-center gap-1 pointer-events-none">
-            {ratingData && ratingData.count > 0 ? (
-              <>
-                <span className="text-gold text-[10px] font-bold">{ratingData.avg.toFixed(1)}</span>
-                {[1,2,3,4,5].map((s) => (
-                  <span key={s} className={`text-[9px] ${s <= Math.round(ratingData.avg) ? "text-gold" : "text-text-muted/30"}`}>★</span>
-                ))}
-                <span className="text-[9px] text-text-muted">({ratingData.count})</span>
-              </>
-            ) : (
-              <span className="text-[9px] text-text-muted/60">{uiText("locations.landingNoReviews")}</span>
-            )}
-          </div>
-          {canRate && (
-            <div className="hidden max-w-full flex-wrap sm:flex">
-              {[1,2,3,4,5].map((star) => (
-                <button key={star} type="button" aria-label={uiText("Ui.text_ce0d0c38532e69", { value1: star })} aria-pressed={myRating === star}
-                  onClick={(e) => { e.preventDefault(); e.stopPropagation(); onRate?.(star); }}
-                  className="min-w-11 min-h-11 flex items-center justify-center text-xs touch-manipulation transition-transform active:scale-125 hover:scale-110"
-                  style={{ color: star <= (myRating ?? 0) ? "#d4af37" : "rgba(255,255,255,0.2)" }}>
-                  ★
-                </button>
-              ))}
-            </div>
-          )}
-        </div>
-      </div>
-    </article>
-  );
+    {!list && ((ratingData?.count ?? 0) > 0 || canRate) && <div className="border-t border-border/50 px-3 py-2">
+      {ratingData && ratingData.count > 0 && <span className="flex items-center gap-1 text-xs text-text-muted"><Star size={12} aria-hidden="true" className="text-gold" />{ratingData.avg.toLocaleString(locale, { maximumFractionDigits: 1 })} ({ratingData.count.toLocaleString(locale)})</span>}
+      {canRate && <div className="flex max-w-full flex-wrap">
+        {[1,2,3,4,5].map(star => <button key={star} type="button" aria-label={uiText("Ui.text_ce0d0c38532e69", { value1: star })} aria-pressed={myRating === star}
+          onClick={() => onRate?.(star)} className={`flex min-h-11 min-w-11 items-center justify-center ${star <= (myRating ?? 0) ? "text-gold" : "text-text-muted"}`}>
+          <Star size={14} aria-hidden="true" className={star <= (myRating ?? 0) ? "fill-current" : ""} />
+        </button>)}
+      </div>}
+    </div>}
+  </article>;
 }
 
 type PropsContentProps = { serverListings: Prop[]; serverError?: boolean; facetRows: Array<{ category: string; type: string; rentalType: string }>; initialDepartment?: string };
@@ -421,13 +363,14 @@ function PropsInner({ serverListings, serverError = false, facetRows, initialDep
       {actionError && <p role="alert" className="mb-4 text-sm text-red-400">{uiText("System.requestFailed")}</p>}
       {failed && <div role="alert" className="mb-4 flex flex-wrap items-center gap-3 rounded-xl border border-border bg-bg-secondary p-4 text-sm text-text-secondary"><span>{navigation("filterError")}</span><button type="button" onClick={() => { setBrowseError(null); setRetry(value => value + 1); }} className="min-h-11 rounded-lg border border-border px-4 font-medium text-gold hover:border-gold">{navigation("retry")}</button></div>}
       {browseLoading && <p role="status" className="mb-4 text-sm text-text-muted">{navigation("loading")}</p>}
-      {viewMode === "map" && <DirectoryMap kind="marketplace" items={mapItems} bounds={map.bounds} onBoundsChange={map.setBounds} />}
+      <DirectoryResults view={viewMode} map={<DirectoryMap compact kind="marketplace" items={mapItems} bounds={map.bounds} onBoundsChange={map.setBounds} />}>
       <div aria-busy={browseLoading}>
         {visibleRows.length > 0 ? <>
-          <div className={viewMode === "grid" ? "grid grid-cols-2 gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4" : "space-y-2"}>{visibleRows.map(row => <PropCard key={row.id} p={row} list={viewMode !== "grid"} ratingData={liveRatings[row.id]} myRating={myRatings[row.id]} canRate={!!isSignedIn && !!user && user.id !== row.ownerId && eligible.has(row.id)} onRate={star => handleRate(row.id, row.ownerId, star)} isFavorited={favorites.has(row.id)} onFavorite={isSignedIn ? event => { void handleFavorite(event, row.id); } : undefined} />)}</div>
+          <div className={viewMode === "grid" ? "directory-cards" : "directory-list"}>{visibleRows.map(row => <PropCard key={row.id} p={row} list={viewMode !== "grid"} ratingData={liveRatings[row.id]} myRating={myRatings[row.id]} canRate={!!isSignedIn && !!user && user.id !== row.ownerId && eligible.has(row.id)} onRate={star => handleRate(row.id, row.ownerId, star)} isFavorited={favorites.has(row.id)} onFavorite={isSignedIn ? event => { void handleFavorite(event, row.id); } : undefined} />)}</div>
           {resultCount > visibleCount && <div className="mt-8 text-center"><button type="button" disabled={browseLoading} onClick={() => setPagination({ filterKey, visibleCount: visibleCount + MARKETPLACE_PAGE_SIZE })} className="min-h-11 rounded-xl border border-border px-8 py-3 text-sm font-semibold text-text-secondary transition-colors hover:border-gold hover:text-gold disabled:opacity-50">{t("loadMore", { count: resultCount - visibleCount })}</button></div>}
         </> : !failed && !browseLoading ? <EmptyState icon={Package} title={serverListings.length === 0 ? t("emptyTitle") : t("emptyTitleFiltered")} description={serverListings.length === 0 ? t("emptyDesc") : t("emptyDescFiltered")} action={chips.length || query ? { label: t("emptyReset"), onClick: clearAll } : undefined} /> : null}
       </div>
+      </DirectoryResults>
     </div>
   </div>;
 }

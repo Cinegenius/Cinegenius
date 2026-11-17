@@ -12810,7 +12810,8 @@
     "loading": "Chargement de la carte…",
     "providerPurpose": "Cartes interactives",
     "providerRegion": "Hongrie / CDN",
-    "providerNotice": "Lorsque vous ouvrez une carte, votre navigateur charge des données cartographiques depuis OpenFreeMap. Votre adresse IP et les données techniques de la requête sont transmises au fournisseur de la carte. Les noms, profils et messages ne sont pas envoyés comme données cartographiques. <provider>Informations sur le fournisseur</provider>."
+    "providerNotice": "Lorsque vous ouvrez une carte, votre navigateur charge des données cartographiques depuis OpenFreeMap. Votre adresse IP et les données techniques de la requête sont transmises au fournisseur de la carte. Les noms, profils et messages ne sont pas envoyés comme données cartographiques. <provider>Informations sur le fournisseur</provider>.",
+    "information": "Informations sur la carte"
   },
   "BrowseGeography": {
     "preferred": "À proximité et {country} en priorité",

@@ -12810,7 +12810,8 @@
     "loading": "Cargando mapa …",
     "providerPurpose": "Mapas interactivos",
     "providerRegion": "Hungría / CDN",
-    "providerNotice": "Al abrir un mapa, tu navegador carga material cartográfico de OpenFreeMap. Tu dirección IP y los datos técnicos de la solicitud se transmiten al proveedor del mapa. Los nombres, perfiles y mensajes no se envían como datos del mapa. <provider>Información del proveedor</provider>."
+    "providerNotice": "Al abrir un mapa, tu navegador carga material cartográfico de OpenFreeMap. Tu dirección IP y los datos técnicos de la solicitud se transmiten al proveedor del mapa. Los nombres, perfiles y mensajes no se envían como datos del mapa. <provider>Información del proveedor</provider>.",
+    "information": "Información del mapa"
   },
   "BrowseGeography": {
     "preferred": "Primero cerca y en {country}",
