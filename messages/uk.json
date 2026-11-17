@@ -287,7 +287,7 @@
     "findCompaniesTitle": "Компанії",
     "findProjectsLink": "Переглянути проєкти",
     "offerLocationAction": "Запропонувати локацію",
-    "newCrewTitle": "Нові члени команди",
+    "newCrewTitle": "Відкривайте фахівців",
     "crewScrollHint": "Проведіть вбік, щоб побачити більше учасників",
     "locationScrollHint": "Проведіть вбік, щоб побачити більше локацій",
     "railPrevious": "Прокрутити назад",
@@ -466,7 +466,8 @@
     "filterCountry": "Країна",
     "loadMoreApi": "Завантажити більше профілів",
     "emptyActionCreate": "Створити профіль",
-    "emptyActionReset": "Скинути фільтри"
+    "emptyActionReset": "Скинути фільтри",
+    "sortRandom": "Випадковий порядок"
   },
   "props": {
     "heroBadge": "Маркетплейс",
@@ -4613,7 +4614,7 @@
     "text_cc1aa58bac3624": "Відкрийте щось нове",
     "text_8164423ceb0d22": "Фото, що надихають",
     "text_00d91ff46043ce": "Свіжі інсайти від спільноти",
-    "text_9ea95e425aef59": "Нові публічні зображення від усієї спільноти CineGenius.",
+    "text_9ea95e425aef59": "Випадково вибрані загальнодоступні зображення з усієї спільноти CineGenius.",
     "text_e050882385dd5b": "Відновити фотострічки",
     "text_ed9d7fe735c3ea": "Пауза фотострічок",
     "text_a32e5e57280170": "<value1></value1><part2>Переглянути всі інсайти <part3></part3></part2>",

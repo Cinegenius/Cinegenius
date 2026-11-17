@@ -273,7 +273,7 @@
     "findCompaniesTitle": "Cégek",
     "findProjectsLink": "Projektek böngészése",
     "offerLocationAction": "Helyszín felajánlása",
-    "newCrewTitle": "Új stábtagok",
+    "newCrewTitle": "Fedezd fel a filmes szakembereket",
     "crewScrollHint": "Húzd oldalra a további tagokért",
     "locationScrollHint": "Húzd oldalra a további helyszínekért",
     "railPrevious": "Lapozás vissza",
@@ -452,7 +452,8 @@
     "filterCountry": "Ország",
     "loadMoreApi": "További profilok betöltése",
     "emptyActionCreate": "Profil létrehozása",
-    "emptyActionReset": "Szűrők visszaállítása"
+    "emptyActionReset": "Szűrők visszaállítása",
+    "sortRandom": "Véletlenszerű"
   },
   "props": {
     "heroBadge": "Piac",
@@ -4688,7 +4689,7 @@
     "text_cc1aa58bac3624": "Új felfedezések",
     "text_8164423ceb0d22": "Lenyűgöző fotók",
     "text_00d91ff46043ce": "Friss pillanatok a közösségből",
-    "text_9ea95e425aef59": "Új nyilvános képek a CineGenius teljes közösségéből.",
+    "text_9ea95e425aef59": "Véletlenszerűen kiválasztott nyilvános képek a CineGenius teljes közösségéből.",
     "text_e050882385dd5b": "Fotósávok folytatása",
     "text_ed9d7fe735c3ea": "Fotósávok szüneteltetése",
     "text_a32e5e57280170": "<value1></value1><part2>Minden pillanat megtekintése <part3></part3></part2>",

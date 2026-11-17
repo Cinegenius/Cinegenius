@@ -1,4 +1,5 @@
 import { occupationFormFromCrew } from "@/lib/occupation-form";
+import { validDiscoverySeed, discoveryOrder } from "@/lib/discovery-order-server";
 import { auth } from "@clerk/nextjs/server";
 import { profileAccessFor } from "@/lib/profile-privacy-server";
 import { projectProfilePrivacy } from "@/lib/profile-privacy";
@@ -25,16 +26,17 @@ export async function GET(req: NextRequest) {
   const from = 96 + (page - 1) * PAGE_SIZE;
   const to = from + PAGE_SIZE - 1;
 
-  const { data: profiles, error } = await db
-    .from("profiles")
+  const seed = validDiscoverySeed(req.nextUrl.searchParams.get("seed"));
+  // Older installed clients retain their original pagination contract.
+  let query = (seed ? db.rpc("random_crew_profiles", { p_seed: seed, p_offset: from, p_limit: PAGE_SIZE }) : db.from("profiles"))
     .select("place_country_code,place_region_id,place_city_id,place_city_name,place_region_name,place_status,user_id, display_name, location, bio, skills, role, positions, crew, available, avatar_url, portfolio_images, languages, profile_types, profile_type, physical, availability_config, day_rate, travel_ready, verified, tagline, focal_point")
     .not("display_name", "is", null)
-    .neq("display_name", "")
-    .order("display_name", { ascending: true })
-    .order("user_id", { ascending: true })
-    .range(from, to);
+    .neq("display_name", "");
+  if (!seed) query = query.order("display_name", { ascending: true }).order("user_id", { ascending: true });
+  const { data, error } = await query.range(seed ? 0 : from, seed ? PAGE_SIZE - 1 : to);
 
-  if (error) return NextResponse.json({ error: tResponse('System.requestFailed') }, { status: 500 });
+  if (error || (data !== null && !Array.isArray(data))) return NextResponse.json({ error: tResponse('System.requestFailed') }, { status: 500 });
+  const profiles = Array.isArray(data) ? data : [];
 
   const { userId } = await auth();
   const privacy = await profileAccessFor((profiles ?? []).map(profile => profile.user_id), userId);
@@ -56,6 +58,7 @@ export async function GET(req: NextRequest) {
     });
     return {
       id: p.user_id,
+      ...(seed ? { discoveryOrder: discoveryOrder(seed, p.user_id) } : {}),
       name: p.display_name ?? "Unbekannt",
       role: primaryOccupationForPositions(p.crew?.primaryOccupation, p.positions ?? [], p.role)?.label ?? p.role ?? displayPositions[0] ?? typeLabel ?? "Filmschaffende/r",
       occupationForm: occupationFormFromCrew(p.crew),

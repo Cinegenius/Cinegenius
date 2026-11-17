@@ -273,7 +273,7 @@
     "findCompaniesTitle": "Bedrijven",
     "findProjectsLink": "Projecten bekijken",
     "offerLocationAction": "Locatie aanbieden",
-    "newCrewTitle": "Nieuwe crewleden",
+    "newCrewTitle": "Ontdek crewleden",
     "crewScrollHint": "Veeg opzij om meer leden te ontdekken",
     "locationScrollHint": "Veeg opzij om meer locaties te ontdekken",
     "railPrevious": "Terugbladeren",
@@ -452,7 +452,8 @@
     "filterCountry": "Land",
     "loadMoreApi": "Meer profielen laden",
     "emptyActionCreate": "Profiel aanmaken",
-    "emptyActionReset": "Filters resetten"
+    "emptyActionReset": "Filters resetten",
+    "sortRandom": "Willekeurig"
   },
   "props": {
     "heroBadge": "Marktplaats",
@@ -4688,7 +4689,7 @@
     "text_cc1aa58bac3624": "Nieuw ontdekken",
     "text_8164423ceb0d22": "Foto's die inspireren",
     "text_00d91ff46043ce": "Frisse indrukken uit de community",
-    "text_9ea95e425aef59": "Nieuwe openbare afbeeldingen uit de hele CineGenius-community.",
+    "text_9ea95e425aef59": "Willekeurig gekozen openbare beelden uit de hele CineGenius-community.",
     "text_e050882385dd5b": "Fotostroken hervatten",
     "text_ed9d7fe735c3ea": "Fotostroken pauzeren",
     "text_a32e5e57280170": "<value1></value1><part2>Alle indrukken bekijken <part3></part3></part2>",

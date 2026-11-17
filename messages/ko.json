@@ -287,7 +287,7 @@
     "findCompaniesTitle": "업체",
     "findProjectsLink": "프로젝트 둘러보기",
     "offerLocationAction": "로케이션 제공",
-    "newCrewTitle": "새로운 크루 멤버",
+    "newCrewTitle": "제작진 둘러보기",
     "crewScrollHint": "옆으로 스와이프하여 더 많은 멤버 보기",
     "locationScrollHint": "옆으로 스와이프하여 더 많은 로케이션 보기",
     "railPrevious": "뒤로 스크롤",
@@ -466,7 +466,8 @@
     "filterCountry": "국가",
     "loadMoreApi": "프로필 더 불러오기",
     "emptyActionCreate": "프로필 만들기",
-    "emptyActionReset": "필터 초기화"
+    "emptyActionReset": "필터 초기화",
+    "sortRandom": "무작위"
   },
   "props": {
     "heroBadge": "마켓플레이스",
@@ -4613,7 +4614,7 @@
     "text_cc1aa58bac3624": "새로운 발견",
     "text_8164423ceb0d22": "영감을 주는 사진들",
     "text_00d91ff46043ce": "커뮤니티의 새로운 인사이트",
-    "text_9ea95e425aef59": "전체 CineGenius 커뮤니티의 새로운 공개 이미지입니다.",
+    "text_9ea95e425aef59": "CineGenius 커뮤니티 전체에서 무작위로 선정한 공개 이미지입니다.",
     "text_e050882385dd5b": "사진 스트립 재개",
     "text_ed9d7fe735c3ea": "사진 스트립 일시정지",
     "text_a32e5e57280170": "<value1></value1><part2>모든 인사이트 보기 <part3></part3></part2>",

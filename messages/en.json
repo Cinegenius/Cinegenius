@@ -273,7 +273,7 @@
     "findCompaniesTitle": "Companies",
     "findProjectsLink": "Browse projects",
     "offerLocationAction": "Offer a location",
-    "newCrewTitle": "New crew members",
+    "newCrewTitle": "Discover crew",
     "crewScrollHint": "Swipe sideways to discover more members",
     "locationScrollHint": "Swipe sideways to discover more locations",
     "railPrevious": "Scroll back",
@@ -452,7 +452,8 @@
     "filterCountry": "Country",
     "loadMoreApi": "Load more profiles",
     "emptyActionCreate": "Create profile",
-    "emptyActionReset": "Reset filters"
+    "emptyActionReset": "Reset filters",
+    "sortRandom": "Random"
   },
   "props": {
     "heroBadge": "Marketplace",
@@ -4688,7 +4689,7 @@
     "text_cc1aa58bac3624": "Discover something new",
     "text_8164423ceb0d22": "Photos that inspire",
     "text_00d91ff46043ce": "Fresh insights from the community",
-    "text_9ea95e425aef59": "New public images from the entire CineGenius community.",
+    "text_9ea95e425aef59": "Randomly selected public images from across the CineGenius community.",
     "text_e050882385dd5b": "Resume photo strips",
     "text_ed9d7fe735c3ea": "Pause photo strips",
     "text_a32e5e57280170": "<value1></value1><part2>View all insights <part3></part3></part2>",

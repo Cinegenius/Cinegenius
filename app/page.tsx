@@ -49,6 +49,7 @@ import { isPeopleDirectoryProfile } from "@/lib/profile-provider-filters";
 import { getPrivateProfileIds } from "@/lib/trust";
 import { taxonomyLabel } from "@/lib/departments";
 import { getCommunityMedia } from "@/lib/community-media-server";
+import { discoverySeed } from "@/lib/discovery-order-server";
 import { getTranslations as getMetadataTranslations } from "next-intl/server";
 
 type HomeProfileRow = {
@@ -101,7 +102,7 @@ async function getHomeData() {
     db.from("privacy_visible_listings").select("id,title,city,price,created_at").eq("type", "job").eq("published", true).order("created_at", { ascending: false }).limit(4),
     homeMarketplaceOffers(currentTime),
     db.from("companies").select("id,slug,name,logo_url,city,categories").eq("published", true).order("created_at", { ascending: false }).limit(6),
-    db.from("profiles").select("user_id,slug,display_name,tagline,avatar_url,location,verified,role,positions,crew,profile_type,profile_types,created_at").not("display_name", "is", null).neq("display_name", "").order("created_at", { ascending: false }).limit(300),
+    db.rpc("random_crew_profiles", { p_seed: discoverySeed(), p_limit: 300 }).select("user_id,slug,display_name,tagline,avatar_url,location,verified,role,positions,crew,profile_type,profile_types,created_at").limit(300),
   ]);
   if (results.some(result => result.error)) throw new Error("Homepage recommendations unavailable");
   const [
@@ -146,11 +147,9 @@ async function getHomeData() {
       createdAt: profile.created_at ?? "",
     };
   });
-  // Keep this homepage selection strictly chronological: the latest eligible
-  // public people profiles always occupy the first positions.
-  const newCrew = peopleSummaries
-    .sort((a, b) => b.createdAt.localeCompare(a.createdAt) || a.name.localeCompare(b.name, marketLocale))
-    .slice(0, 10);
+  // The database shuffles the whole candidate set before the bounded fetch.
+  // Privacy and person eligibility still apply before selecting visible cards.
+  const newCrew = peopleSummaries.slice(0, 10);
 
   const liveLocations = (recentLocations ?? []).map((l) => ({
     id: l.id as string,
@@ -369,7 +368,7 @@ async function HomePhotoRecommendations({ viewerId }: { viewerId: string | null 
   if (process.env.NODE_ENV === "development" && process.env.CINEGENIUS_LOCAL_PREVIEW === "1" && !(process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.SUPABASE_SERVICE_ROLE_KEY)) return null;
   let newPhotos: DiscoverPhoto[];
   try {
-    const { photos } = await getCommunityMedia({ limit: 24, viewerId, diverse: true, includeTotal: false, signal: AbortSignal.timeout(4000) });
+    const { photos } = await getCommunityMedia({ limit: 24, viewerId, randomSeed: discoverySeed(), includeTotal: false, signal: AbortSignal.timeout(4000) });
     newPhotos = photos.slice(0, 24);
   } catch {
     console.error("[homepage] Photo discovery unavailable");

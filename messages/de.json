@@ -273,7 +273,7 @@
     "findCompaniesTitle": "Firmen",
     "findProjectsLink": "Projekte ansehen",
     "offerLocationAction": "Location anbieten",
-    "newCrewTitle": "Neue Crew Mitglieder",
+    "newCrewTitle": "Crew entdecken",
     "crewScrollHint": "Weitere Mitglieder entdecken – seitlich wischen",
     "locationScrollHint": "Weitere Locations entdecken – seitlich wischen",
     "railPrevious": "Zurückblättern",
@@ -452,7 +452,8 @@
     "filterCountry": "Land",
     "loadMoreApi": "Weitere Profile laden",
     "emptyActionCreate": "Profil anlegen",
-    "emptyActionReset": "Filter zurücksetzen"
+    "emptyActionReset": "Filter zurücksetzen",
+    "sortRandom": "Zufällig"
   },
   "props": {
     "heroBadge": "Marktplatz",
@@ -4688,7 +4689,7 @@
     "text_cc1aa58bac3624": "Neu entdecken",
     "text_8164423ceb0d22": "Fotos, die begeistern",
     "text_00d91ff46043ce": "Frische Einblicke aus der Community",
-    "text_9ea95e425aef59": "Neue öffentliche Bilder aus der gesamten CineGenius-Community.",
+    "text_9ea95e425aef59": "Zufällig ausgewählte öffentliche Bilder aus der gesamten CineGenius-Community.",
     "text_e050882385dd5b": "Fotobänder fortsetzen",
     "text_ed9d7fe735c3ea": "Fotobänder pausieren",
     "text_a32e5e57280170": "<value1></value1><part2>Alle Einblicke ansehen <part3></part3></part2>",

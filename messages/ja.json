@@ -287,7 +287,7 @@
     "findCompaniesTitle": "企業",
     "findProjectsLink": "プロジェクトを閲覧",
     "offerLocationAction": "ロケ地を提供する",
-    "newCrewTitle": "新しいクルーメンバー",
+    "newCrewTitle": "制作スタッフを探す",
     "crewScrollHint": "横にスワイプして他のメンバーを探す",
     "locationScrollHint": "横にスワイプして他のロケ地を探す",
     "railPrevious": "前へスクロール",
@@ -466,7 +466,8 @@
     "filterCountry": "国",
     "loadMoreApi": "プロフィールをさらに読み込む",
     "emptyActionCreate": "プロフィールを作成",
-    "emptyActionReset": "フィルターをリセット"
+    "emptyActionReset": "フィルターをリセット",
+    "sortRandom": "ランダム"
   },
   "props": {
     "heroBadge": "マーケットプレイス",
@@ -4612,7 +4613,7 @@
     "text_cc1aa58bac3624": "新しい発見を",
     "text_8164423ceb0d22": "インスピレーションを与える写真",
     "text_00d91ff46043ce": "コミュニティからの新鮮な洞察",
-    "text_9ea95e425aef59": "CineGeniusコミュニティ全体からの新しい公開画像。",
+    "text_9ea95e425aef59": "CineGenius コミュニティ全体からランダムに選ばれた公開画像。",
     "text_e050882385dd5b": "写真ストリップを再開",
     "text_ed9d7fe735c3ea": "写真ストリップを一時停止",
     "text_a32e5e57280170": "<value1></value1><part2>すべての洞察を見る <part3></part3></part2>",

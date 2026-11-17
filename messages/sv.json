@@ -273,7 +273,7 @@
     "findCompaniesTitle": "Företag",
     "findProjectsLink": "Visa projekt",
     "offerLocationAction": "Erbjud en inspelningsplats",
-    "newCrewTitle": "Nya medlemmar i filmteamet",
+    "newCrewTitle": "Upptäck filmteam",
     "crewScrollHint": "Svep åt sidan för att upptäcka fler medlemmar",
     "locationScrollHint": "Svep åt sidan för att upptäcka fler inspelningsplatser",
     "railPrevious": "Bläddra bakåt",
@@ -452,7 +452,8 @@
     "filterCountry": "Land",
     "loadMoreApi": "Läs in fler profiler",
     "emptyActionCreate": "Skapa profil",
-    "emptyActionReset": "Återställ filter"
+    "emptyActionReset": "Återställ filter",
+    "sortRandom": "Slumpmässigt"
   },
   "props": {
     "heroBadge": "Marknadsplats",
@@ -4688,7 +4689,7 @@
     "text_cc1aa58bac3624": "Upptäck nytt",
     "text_8164423ceb0d22": "Foton som inspirerar",
     "text_00d91ff46043ce": "Nya inblickar från gemenskapen",
-    "text_9ea95e425aef59": "Nya offentliga bilder från hela CineGenius-gemenskapen.",
+    "text_9ea95e425aef59": "Slumpmässigt utvalda offentliga bilder från hela CineGenius-communityn.",
     "text_e050882385dd5b": "Fortsätt bildremsorna",
     "text_ed9d7fe735c3ea": "Pausa bildremsorna",
     "text_a32e5e57280170": "<value1></value1><part2>Visa alla inblickar <part3></part3></part2>",

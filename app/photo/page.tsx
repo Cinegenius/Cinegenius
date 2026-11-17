@@ -18,6 +18,7 @@ export async function generateMetadata(): Promise<import("next").Metadata> {
 export const revalidate = 300;
 
 import { getCommunityMedia } from "@/lib/community-media-server";
+import { discoverySeed } from "@/lib/discovery-order-server";
 import { getTranslations as getMetadataTranslations } from "next-intl/server";
 export const dynamic = "force-dynamic";
 
@@ -30,7 +31,8 @@ export default async function PhotoPage({ searchParams }: { searchParams: Promis
   const resumeLike = params.action === "like";
   const page = Math.max(1, Number.parseInt(typeof params.page === "string" ? params.page : "1", 10) || 1);
   const { userId } = await auth();
-  const { photos: gridItems, total } = await getCommunityMedia({ page, viewerId: userId });
+  const seed = discoverySeed(params.seed);
+  const { photos: gridItems, total } = await getCommunityMedia({ page, viewerId: userId, randomSeed: seed });
   const selectedWithLikes = profileParam && imageParam
     ? (await getCommunityMedia({ ownerId: profileParam.startsWith("media:") ? undefined : profileParam, imageUrl: imageParam, limit: 1, viewerId: userId })).photos[0] ?? null : null;
   return (
@@ -47,8 +49,8 @@ export default async function PhotoPage({ searchParams }: { searchParams: Promis
           </div>
         </section>
         {imageParam && !selectedWithLikes && <p role="status" className="site-container mb-6 text-sm text-text-muted">{uiText("Ui.text_c115f0a7e58370")}</p>}
-        <PhotoGallery items={gridItems} selectedPhoto={selectedWithLikes} resumeLike={resumeLike} />
-        <nav aria-label={uiText("Ui.text_6642485ca65572")} className="site-container flex items-center justify-between gap-3 pb-24 text-sm text-gold">{uiText.rich("Ui.text_366656bc16effa", { value1: () => (page > 1 ? <Link href={`/photo?page=${page - 1}`} className="min-h-11 p-3">{uiText("setup.copy99")}</Link> : <span />), value3: () => (page), value4: () => (total), part2: chunks => (<span className="text-text-muted">{chunks}</span>), value5: () => (page * 48 < total ? <Link href={`/photo?page=${page + 1}`} className="min-h-11 p-3">{uiText("Ui.text_e8ed3a778cde39")}</Link> : <span />) })}</nav>
+        <PhotoGallery items={gridItems} selectedPhoto={selectedWithLikes} resumeLike={resumeLike} discoverySeed={seed} page={page} />
+        <nav aria-label={uiText("Ui.text_6642485ca65572")} className="site-container flex items-center justify-between gap-3 pb-24 text-sm text-gold">{uiText.rich("Ui.text_366656bc16effa", { value1: () => (page > 1 ? <Link href={`/photo?page=${page - 1}&seed=${seed}`} className="min-h-11 p-3">{uiText("setup.copy99")}</Link> : <span />), value3: () => (page), value4: () => (total), part2: chunks => (<span className="text-text-muted">{chunks}</span>), value5: () => (page * 48 < total ? <Link href={`/photo?page=${page + 1}&seed=${seed}`} className="min-h-11 p-3">{uiText("Ui.text_e8ed3a778cde39")}</Link> : <span />) })}</nav>
       </div>
     </div>
   );

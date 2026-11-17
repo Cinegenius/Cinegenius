@@ -273,7 +273,7 @@
     "findCompaniesTitle": "Firmy",
     "findProjectsLink": "Prohlédnout projekty",
     "offerLocationAction": "Nabídnout lokaci",
-    "newCrewTitle": "Noví členové štábu",
+    "newCrewTitle": "Objevte filmové profesionály",
     "crewScrollHint": "Další členy objevíš přejetím do strany",
     "locationScrollHint": "Další lokace objevíš přejetím do strany",
     "railPrevious": "Posunout zpět",
@@ -452,7 +452,8 @@
     "filterCountry": "Země",
     "loadMoreApi": "Načíst další profily",
     "emptyActionCreate": "Vytvořit profil",
-    "emptyActionReset": "Resetovat filtry"
+    "emptyActionReset": "Resetovat filtry",
+    "sortRandom": "Náhodně"
   },
   "props": {
     "heroBadge": "Tržiště",
@@ -4688,7 +4689,7 @@
     "text_cc1aa58bac3624": "Objevit něco nového",
     "text_8164423ceb0d22": "Fotografie, které nadchnou",
     "text_00d91ff46043ce": "Čerstvé pohledy z komunity",
-    "text_9ea95e425aef59": "Nové veřejné obrázky z celé komunity CineGenius.",
+    "text_9ea95e425aef59": "Náhodně vybrané veřejné obrázky z celé komunity CineGenius.",
     "text_e050882385dd5b": "Spustit pásy fotografií",
     "text_ed9d7fe735c3ea": "Pozastavit pásy fotografií",
     "text_a32e5e57280170": "<value1></value1><part2>Zobrazit všechny snímky <part3></part3></part2>",

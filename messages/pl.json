@@ -287,7 +287,7 @@
     "findCompaniesTitle": "Firmy",
     "findProjectsLink": "Przeglądaj projekty",
     "offerLocationAction": "Zaproponuj lokalizację",
-    "newCrewTitle": "Nowi członkowie ekipy",
+    "newCrewTitle": "Odkryj twórców",
     "crewScrollHint": "Przesuń w bok, aby odkryć więcej członków",
     "locationScrollHint": "Przesuń w bok, aby odkryć więcej lokalizacji",
     "railPrevious": "Przewiń wstecz",
@@ -466,7 +466,8 @@
     "filterCountry": "Kraj",
     "loadMoreApi": "Załaduj więcej profili",
     "emptyActionCreate": "Utwórz profil",
-    "emptyActionReset": "Resetuj filtry"
+    "emptyActionReset": "Resetuj filtry",
+    "sortRandom": "Losowo"
   },
   "props": {
     "heroBadge": "Marketplace",
@@ -4688,7 +4689,7 @@
     "text_cc1aa58bac3624": "Odkryj coś nowego",
     "text_8164423ceb0d22": "Zdjęcia, które inspirują",
     "text_00d91ff46043ce": "Świeże wglądy od społeczności",
-    "text_9ea95e425aef59": "Nowe publiczne zdjęcia od całej społeczności CineGenius.",
+    "text_9ea95e425aef59": "Losowo wybrane publiczne zdjęcia z całej społeczności CineGenius.",
     "text_e050882385dd5b": "Wznów przewijanie zdjęć",
     "text_ed9d7fe735c3ea": "Wstrzymaj przewijanie zdjęć",
     "text_a32e5e57280170": "<value1></value1><part2>Zobacz wszystkie wglądy <part3></part3></part2>",
