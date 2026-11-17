@@ -53,12 +53,14 @@ function WishEditor({ plan, index, onUnauthorized }: { plan: SearchPlan; index: 
   </div>;
 }
 
-export default function SmartSearchWishes({ plan, onUnauthorized }: { plan: SearchPlan; onUnauthorized: () => void }) {
+export default function SmartSearchWishes({ plan, onUnauthorized, compact = false }: { plan: SearchPlan; onUnauthorized: () => void; compact?: boolean }) {
   const t = useTranslations("UnifiedSearch"), taxonomy = useTranslations("Taxonomy"), locale = useLocale();
   const [opened, setOpened] = useState<number[]>([]);
   const [refineOpened, setRefineOpened] = useState(false);
   const names = new Intl.DisplayNames([locale], { type: "region" });
-  return <details className="mt-3 rounded-xl border border-border bg-bg-secondary/70 px-3"><summary className="flex min-h-11 cursor-pointer items-center gap-2 text-sm text-text-primary"><Pencil size={16} aria-hidden="true" />{t("discovery.understood")}</summary><div className="space-y-2 pb-3">
+  return <details className={compact ? "smart-plan-editor" : "mt-3 rounded-xl border border-border bg-bg-secondary/70 px-3"} onKeyDown={event => {
+    if (event.key === "Escape") { event.currentTarget.open = false; event.currentTarget.querySelector("summary")?.focus(); }
+  }}><summary aria-label={t("discovery.understood")} className="flex min-h-11 min-w-11 cursor-pointer items-center justify-center gap-2 text-sm text-text-primary"><Pencil size={16} aria-hidden="true" /><span className={compact ? "sr-only" : ""}>{t("discovery.understood")}</span></summary><div className={compact ? "smart-plan-editor-panel space-y-2" : "space-y-2 pb-3"}>
     {plan.searches.map((wish, index) => <details key={index} className="rounded-xl border border-border bg-bg-secondary/70 px-3" onToggle={event => {
       if (event.currentTarget.open) setOpened(values => values.includes(index) ? values : [...values, index]);
     }}>

@@ -90,3 +90,39 @@ APP Entwicklung. Browser simulations are not native-device validation.
 
 This document describes the prepared source change, not a production release.
 Publication requires the operator's specific request and the guarded release path.
+
+## Selected compact layout — 17 November 2026
+
+This supersedes the earlier expanded filter panel and nested wish result cards.
+Markus selected mobile option 1: a 220px map above compact results, with the shared
+Crew list/map switch. Tablets use 280px; from 1024px the map occupies the larger
+right column and results stay on the left. List mode hides, but retains, the map.
+
+The count, available-area selector, filter action and shared view switch occupy one
+row. Detailed area/wish/category filters are initially collapsed. Existing edits
+remain available from the pencil by the Smart heading; that editor is independent
+of the locale/result-scoped explorer so unfinished changes survive result refreshes.
+
+Only areas backed by current visible result rows are shown. Within each area,
+identical type/id pairs appear once, with the first server-ranked result retained.
+Three compact rows are initially shown; More reveals six additional loaded rows,
+then uses the original group's cursor. Empty result groups do not create cards or
+filter options; their existing pagination remains reachable through More. Errors
+retain confirmed rows. Counts and map points cover the full loaded selection, not
+just expanded rows. No new availability, location or qualification is inferred.
+
+The default area display order is Crew, Locations, Marketplace, Companies, followed
+by other existing nonempty areas. Canonical IDs and server relevance are unchanged.
+Map area colors, privacy projection, approximate-coordinate notices, unmapped rows,
+provider attribution and explicit geographic filtering remain effective.
+
+An authorized active Smart input has the existing Lime border and a restrained
+Lime-tinted surface, both on the homepage and Smart results. Homepage styling uses
+the same current-account server-admin predicate as Smart access. Other visitors
+retain the existing notices/static preview and ordinary search styling. The change
+does not enable Smart for additional accounts.
+
+No API, migration, model, quota or locale-key change is required. All labels reuse
+the existing 17 catalogs. Native implementation must retain actual safe areas,
+input/keyboard state, current-account access and real Back navigation. Browser
+layout checks do not establish native/Xcode device behavior.

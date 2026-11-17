@@ -7,9 +7,10 @@ import { useCallback, useContext, useEffect, useMemo, useRef, useState } from "r
 import { useLocale, useTranslations } from "next-intl";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { Loader2, Search } from "lucide-react";
+import { ArrowUp, Loader2 } from "lucide-react";
 import { useFormRouter } from "@/lib/use-form-router";
 import { decodeSearchPlan, searchPlanFromHref, type SearchPlan, type SearchGroup } from "@/lib/unified-search";
+import DirectoryPage from "@/components/DirectoryPage";
 import SmartSearchExplorer from "@/components/SmartSearchExplorer";
 import SmartSearchExamples from "@/components/SmartSearchExamples";
 import SmartSearchClarification from "@/components/SmartSearchClarification";
@@ -134,12 +135,15 @@ function AccessibleUnifiedSearchResults({ onUnavailable }: { onUnavailable: () =
 
   const errorText = error === "unauthorized" ? t("signInRequired") : error === "rate_limited" ? genie("errorRateLimited") : error === "invalid" || error === "search_unresolved" ? genie("errorSearch") : t("error");
   const returnTo = `/search?${new URLSearchParams(plan && encodedPlan ? { plan: encodedPlan } : { smart: "1", q: input })}`;
-  return <main className="min-h-screen pt-16 pb-28 xl:pb-12">
-    <div className="border-b border-border bg-bg-secondary/50">
-      <div className="site-container py-7 sm:py-10">
-        <h1 className="font-serif text-3xl text-text-primary sm:text-4xl">{t("title")}</h1>
-        <p className="mt-2 text-sm text-text-secondary">{t("intro")}</p>
-        <form className="mt-5 flex items-center gap-2" onSubmit={event => {
+  return <DirectoryPage area="crew"><main className="smart-search-page min-h-screen pt-16 pb-28 xl:pb-12">
+    <div>
+      <div className="site-container py-4 sm:py-5">
+        <div className="flex items-center justify-between gap-3"><h1 className="font-serif text-3xl text-text-primary sm:text-4xl">{t("tab")}</h1>
+          {/* The editor stays outside the locale/result-scoped explorer so unfinished edits survive refreshes. */}
+          {editablePlan && isLoaded && userId && error !== SEARCH_ERROR.unauthorized && <SmartSearchWishes key={dialogueScope} plan={editablePlan} onUnauthorized={onUnavailable} compact />}
+        </div>
+        {!plan && <p className="mt-2 text-sm text-text-secondary">{t("intro")}</p>}
+        <form className="smart-search-input mt-4 flex min-h-[52px] items-center gap-2 rounded-xl border p-1" onSubmit={event => {
           event.preventDefault(); if (!input.trim()) return;
           active.current?.abort();
           const href = `/search?${new URLSearchParams({ smart: "1", q: input.trim() })}`;
@@ -147,13 +151,11 @@ function AccessibleUnifiedSearchResults({ onUnavailable }: { onUnavailable: () =
           else router.push(href, { scroll: false });
         }}>
           <input ref={inputElement} aria-label={t("title")} value={input} maxLength={2000} onChange={event => { active.current?.abort(); setLoading(false); setInput(event.target.value); }}
-            placeholder={t("placeholder")} className="min-h-11 min-w-0 flex-1 rounded-xl border border-border bg-bg-elevated px-4 py-3 text-base text-text-primary focus:border-gold focus:outline-none" />
-          <button type="submit" aria-label={t("submit")} disabled={!input.trim()} className="flex min-h-11 min-w-11 items-center justify-center rounded-xl bg-gold px-3 text-bg-primary disabled:opacity-50"><Search size={20} /></button>
+            placeholder={t("placeholder")} className="min-h-11 min-w-0 flex-1 bg-transparent px-3 py-2 text-base text-text-primary focus:outline-none" />
+          <button type="submit" aria-label={t("submit")} disabled={!input.trim()} className="flex min-h-11 min-w-11 items-center justify-center rounded-xl bg-gold px-3 text-bg-primary disabled:opacity-50"><ArrowUp size={20} aria-hidden="true" /></button>
         </form>
-        {!encodedPlan && <SmartSearchExamples onSelect={value => { active.current?.abort(); setLoading(false); setInput(value); inputElement.current?.focus({ preventScroll: true }); }} />}
-        {/* Keep unsent edits while locale/results refresh; account and plan changes reset the editor. */}
-        {editablePlan && isLoaded && userId && error !== SEARCH_ERROR.unauthorized && <SmartSearchWishes key={dialogueScope} plan={editablePlan} onUnauthorized={onUnavailable} />}
-        <div aria-live="polite" className="mt-3 text-sm text-text-secondary">
+        {!encodedPlan && !plan && <SmartSearchExamples onSelect={value => { active.current?.abort(); setLoading(false); setInput(value); inputElement.current?.focus({ preventScroll: true }); }} />}
+        <div aria-live="polite" className={`${loading ? "mt-3" : ""} text-sm text-text-secondary`}>
           {loading && <p className="flex items-center gap-2"><Loader2 size={18} className="animate-spin text-gold" />{plan ? t("loading") : t("understanding")}</p>}
         </div>
         {clarification?.scope === dialogueScope && clarification.retry === retry && !error && userId && <SmartSearchClarification key={`${dialogueScope}:${retry}`}
@@ -164,8 +166,8 @@ function AccessibleUnifiedSearchResults({ onUnavailable }: { onUnavailable: () =
         </div>}
       </div>
     </div>
-    {resultScope === scope && !loading && !error && <div className="site-container space-y-7 py-5">
+    {resultScope === scope && !loading && !error && <div className="site-container pb-5">
       {plan && userId && <SmartSearchExplorer key={scope} plan={plan} initialGroups={groups} initialMapGroups={mapGroups} onUnavailable={onUnavailable} />}
     </div>}
-  </main>;
+  </main></DirectoryPage>;
 }

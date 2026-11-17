@@ -43,9 +43,7 @@ html .inbox-shell {
   padding-right: env(safe-area-inset-right, 0px);
 }
 @media (min-width: 1024px) {
-  html .inbox-shell {
-    top: calc(7.25rem + 1px + env(safe-area-inset-top, 0px) + var(--messages-viewport-offset, 0px));
-  }
+  /* The inbox uses the shared header-height offset at every width. */
   html #header-account-menu {
     max-height: calc(100dvh - 5rem - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px));
   }

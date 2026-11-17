@@ -67,9 +67,10 @@ canonical app source is the server branch; build copies are not replacement sour
 ## Behavior and boundaries
 
 - Separate identity `co.cinegenius.app.preview`, display name CineGenius Preview.
-- iOS places the WebView inside the native safe area with layout constraints,
-  avoiding a status-bar overlap on cold launch without hard-coded offsets or
-  doubled scroll insets. Rotation follows the same constraints.
+- iOS fills the whole window when its bundled viewport adapter is present.
+  The adapter protects controls with safe-area spacing while backgrounds reach
+  every edge, without doubled scroll insets. An incomplete bundle retains the
+  previous safe-area bounds. Physical rotation and edge checks remain required.
 - iOS native Back/Forward gestures and Android real-history Back; no sentinel
   entries, fake history or additional product navigation bars.
 - Local connection-failure page with an explicit retry to the configured home

@@ -3,7 +3,7 @@
 import dynamic from "next/dynamic";
 import { useCallback, useMemo, useState } from "react";
 import { useTranslations } from "next-intl";
-import { Map as MapIcon } from "lucide-react";
+import { Info } from "lucide-react";
 import { hasCoordinates, type MapBounds } from "@/lib/location-map";
 import { SMART_MAP_COLORS, smartMapEntries } from "@/lib/smart-search-map";
 import type { SearchGroup } from "@/lib/unified-search";
@@ -29,19 +29,20 @@ export default function SmartSearchMap({ groups, bounds, onApplyBounds }: {
   }), [entries, t]);
   const clusterLabel = useCallback((count: number) => mapText("cluster", { count }), [mapText]);
 
-  return <section className="min-w-0 space-y-3" aria-label={t("mapTitle")}>
-    <h2 className="flex items-center gap-2 text-base font-semibold text-text-primary"><MapIcon size={20} className="text-gold" aria-hidden="true" />{t("mapTitle")}</h2>
-    <p className="text-xs text-text-muted">{mapText("cityNotice")}</p>
-    <div className="directory-map-frame">
+  return <section className="smart-map min-w-0 space-y-2" aria-label={t("mapTitle")}>
+    <p className="sr-only">{mapText("cityNotice")}</p>
+    <div className="smart-map-frame">
       <LocationMap locations={locations} activeId={activeId} onHover={setActiveId} userLocation={null} radiusKm={50}
         preserveViewport appliedBounds={bounds} onApplyBounds={onApplyBounds} visibleCount={locations.length}
         labels={{ label: t("mapTitle"), results: mapText("mapped", { count: locations.length }), empty: mapText("empty"), unknownCoordinates: "", cluster: clusterLabel, error: mapText("error"), applyArea: t("discovery.applyMapArea") }}
         renderPreview={selected => {
           const entry = entries.find(item => item.key === selected.id);
-          return entry ? <div className="p-3 pt-12"><p className="mb-2 text-xs font-medium" style={{ color: SMART_MAP_COLORS[entry.area] }}>{t(`areas.${entry.area}`)}</p><ResultCard result={entry.result} compact showEvidence /></div> : null;
+          return entry ? <div className="p-3 pt-11"><p className="mb-2 text-xs font-medium" style={{ color: SMART_MAP_COLORS[entry.area] }}>{t(`areas.${entry.area}`)}</p><ResultCard result={entry.result} compact row /></div> : null;
         }} />
     </div>
+    <div className="smart-map-meta">
     {entries.length > locations.length && <p className="text-xs text-text-muted">{t("discovery.unmapped", { count: entries.length - locations.length })}</p>}
-    <p className="text-xs text-text-muted">{mapText.rich("source", { provider: chunks => <a href="https://www.geonames.org/" target="_blank" rel="noreferrer" className="inline-flex min-h-11 items-center underline">{chunks}</a>, license: chunks => <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noreferrer" className="inline-flex min-h-11 items-center underline">{chunks}</a> })}</p>
+    <details className="smart-map-info"><summary aria-label={t("mapTitle")} className="inline-flex min-h-11 min-w-11 cursor-pointer items-center justify-center text-text-muted"><Info size={16} aria-hidden="true" /></summary><div className="space-y-2 rounded-xl border border-border bg-bg-secondary p-3 text-xs text-text-muted"><p>{mapText("cityNotice")}</p><p>{mapText.rich("source", { provider: chunks => <a href="https://www.geonames.org/" target="_blank" rel="noreferrer" className="inline-flex min-h-11 items-center underline">{chunks}</a>, license: chunks => <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noreferrer" className="inline-flex min-h-11 items-center underline">{chunks}</a> })}</p></div></details>
+    </div>
   </section>;
 }

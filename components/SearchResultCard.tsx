@@ -1,7 +1,7 @@
 "use client";
 import MediaImage from "@/components/MediaImage";
 import ListingImage from "@/components/ListingImage";
-import { Briefcase, Building2, Car, MapPin, Package, PawPrint, User, Users, Film, Newspaper } from "lucide-react";
+import { ChevronRight, Briefcase, Building2, Car, MapPin, Package, PawPrint, User, Users, Film, Newspaper } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import Link from "next/link";
 import type { SearchResult as Result } from "@/lib/unified-search";
@@ -29,7 +29,7 @@ export function getLocalizedTypeConfig(translate: (key: string) => string): Reco
 });
 }
 
-export default function ResultCard({ result, compact = false, showEvidence = false }: { result: Result; compact?: boolean; showEvidence?: boolean }) {
+export default function ResultCard({ result, compact = false, showEvidence = false, row = false }: { result: Result; compact?: boolean; showEvidence?: boolean; row?: boolean }) {
   const uiText = useTranslations();
   const typeConfig = getLocalizedTypeConfig(uiText);
 
@@ -45,10 +45,10 @@ export default function ResultCard({ result, compact = false, showEvidence = fal
   return (
     <Link
       href={cfg.href(result.id)}
-      className={`group flex min-w-0 bg-bg-secondary border border-border rounded-xl overflow-hidden hover:border-gold/40 transition-colors ${compact ? "items-center gap-2.5 p-2" : "flex-col hover:shadow-lg hover:shadow-black/20"}`}
+      className={`${row ? "smart-result-row" : ""} group flex min-w-0 bg-bg-secondary border border-border rounded-xl overflow-hidden hover:border-gold/40 transition-colors ${compact ? "items-center gap-2.5 p-2" : "flex-col hover:shadow-lg hover:shadow-black/20"}`}
     >
       {/* Image */}
-      <div className={`relative bg-bg-elevated overflow-hidden ${compact ? "flex h-12 w-12 shrink-0 items-center justify-center rounded-md" : "aspect-video"}`}>
+      <div className={`${row && isProfile ? "smart-result-portrait" : ""} relative bg-bg-elevated overflow-hidden ${compact ? "flex h-12 w-12 shrink-0 items-center justify-center rounded-md" : "aspect-video"}`}>
         {result.image ? (
           <PreviewImage
             {...(compact ? { width: 48, height: 48 } : { fill: true })}
@@ -94,10 +94,11 @@ export default function ResultCard({ result, compact = false, showEvidence = fal
           </div>
         )}
       </div>
-      {compact && isProfile && result.available !== null && <span role="img"
+      {compact && !row && isProfile && result.available !== null && <span role="img"
         aria-label={result.available ? uiText("common.available") : uiText("common.booked")}
         title={result.available ? uiText("common.available") : uiText("common.booked")}
         className={`h-1.5 w-1.5 shrink-0 rounded-full ${result.available ? "bg-success" : "bg-text-muted"}`} />}
+      {row && <ChevronRight size={15} className="shrink-0 text-text-muted" aria-hidden="true" />}
     </Link>
   );
 }
