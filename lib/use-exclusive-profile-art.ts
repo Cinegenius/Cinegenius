@@ -49,11 +49,11 @@ export function useExclusiveProfileArt({accountId, kind, value, savedValue, onCh
     const response = await fetch("/api/profile-art", {method: "POST", cache: "no-store", signal,
       headers: {"Content-Type": "application/json", "X-Profile-Account": accountId}, body: JSON.stringify({...body, kind})});
     const result = await response.json();
+    if (!alive.current || generation !== epoch.current) throw new Error(t("error"));
     if (!response.ok || !result.data) {
       if (response.status >= 400 && response.status < 500) retry.current = null;
       throw new Error(t(result.code === "ART_EXPIRED" ? "expired" : "error"));
     }
-    if (!alive.current || generation !== epoch.current) throw new Error(t("error"));
     return result.data;
   }
   async function read() {
@@ -109,6 +109,7 @@ export function useExclusiveProfileArt({accountId, kind, value, savedValue, onCh
     // Explicit profile save can reserve its unchanged suggestion or renew an
     // expired choice. It never substitutes another artwork without consent.
     if (!selected.current || selected.current.previewSrc !== value || Date.parse(selected.current.expiresAt) <= Date.now()) {
+      const generation = epoch.current;
       busy.current = true;
       try {
         if (retry.current) await perform(retry.current);
@@ -121,7 +122,7 @@ export function useExclusiveProfileArt({accountId, kind, value, savedValue, onCh
             await perform(retry.current);
           }
         }
-      } finally {busy.current = false;}
+      } finally {if (generation === epoch.current) busy.current = false;}
     }
     const chosen = selected.current;
     if (!chosen || chosen.previewSrc !== value || Date.parse(chosen.expiresAt) <= Date.now()) throw new Error(t("expired"));
@@ -130,6 +131,7 @@ export function useExclusiveProfileArt({accountId, kind, value, savedValue, onCh
   async function suggest() {
     if (busy.current || disabled || !accountId || savedValue) return;
     const original = latest.current.value;
+    const generation = epoch.current;
     busy.current = true;
     try {
       const available = await read();
@@ -140,7 +142,7 @@ export function useExclusiveProfileArt({accountId, kind, value, savedValue, onCh
         setStatus("ready");
       }
     } catch { /* Optional suggestion never blocks registration or existing images. */ }
-    finally {busy.current = false;}
+    finally {if (generation === epoch.current) busy.current = false;}
   }
   const props: ExclusiveProfileArtPickerProps = {
     kind, options, status, disabled: disabled || !!pending, pendingArtworkId: pending,

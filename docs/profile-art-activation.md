@@ -63,8 +63,9 @@ v1 references. All source studies and original user media are retained.
 
 ## Database / operations
 
-Apply only the three targeted migrations in order: reservations foundation,
-refill pipeline, then `20261118131126_profile_art_atomic_profile_save.sql`.
+Apply only the targeted migrations in order: reservations foundation,
+refill pipeline, `20261118131126_profile_art_atomic_profile_save.sql`, then
+`20261118133702_profile_art_canonical_image_refs.sql`.
 Settings default off. Enable the pipeline after the actual 24-reference fingerprint
 baseline; enable reader/reservations after ready inventory and save checks exist.
 Disabling the worker stops new generation. Preserve the reader and owned-art ledger
