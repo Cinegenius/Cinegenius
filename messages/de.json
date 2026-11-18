@@ -13404,5 +13404,23 @@
     "masculine": "Männliche Form",
     "feminine": "Weibliche Form",
     "neutral": "Neutrale Form"
+  },
+  "ExclusiveProfileArt": {
+    "chooseAvatar": "Avatar auswählen",
+    "chooseCover": "Cover auswählen",
+    "help": "Neue Bilder sind optional. Änderungen werden erst mit deinem Profil gespeichert.",
+    "saved": "Aktuelles Bild",
+    "selected": "Ausgewählt",
+    "selectedHint": "Ausgewählt. Wird erst mit deinem Profil gespeichert.",
+    "option": "Bild {number}",
+    "pending": "Auswahl wird bestätigt …",
+    "loading": "Bilder werden geladen …",
+    "error": "Die Auswahl konnte nicht bestätigt werden.",
+    "empty": "Momentan sind keine neuen Bilder verfügbar.",
+    "expired": "Diese Auswahl ist abgelaufen. Bitte wähle erneut.",
+    "retry": "Erneut laden",
+    "restore": "Aktuelles Bild verwenden",
+    "optional": "Du kannst ohne neues Bild fortfahren.",
+    "unavailable": "Bild nicht verfügbar"
   }
 }

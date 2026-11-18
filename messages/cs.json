@@ -13404,5 +13404,23 @@
     "masculine": "Mužský tvar",
     "feminine": "Ženský tvar",
     "neutral": "Neutrální tvar"
+  },
+  "ExclusiveProfileArt": {
+    "chooseAvatar": "Vybrat avatar",
+    "chooseCover": "Vybrat úvodní obrázek",
+    "help": "Nové obrázky jsou nepovinné. Změny se uloží až s profilem.",
+    "saved": "Aktuální obrázek",
+    "selected": "Vybráno",
+    "selectedHint": "Vybráno. Uloží se až při uložení profilu.",
+    "option": "Obrázek {number}",
+    "pending": "Potvrzuje se výběr …",
+    "loading": "Načítají se obrázky …",
+    "error": "Výběr se nepodařilo potvrdit.",
+    "empty": "Momentálně nejsou dostupné žádné nové obrázky.",
+    "expired": "Platnost tohoto výběru vypršela. Vyber znovu.",
+    "retry": "Načíst znovu",
+    "restore": "Použít aktuální obrázek",
+    "optional": "Můžeš pokračovat bez nového obrázku.",
+    "unavailable": "Obrázek není dostupný"
   }
 }

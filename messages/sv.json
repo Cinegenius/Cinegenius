@@ -13404,5 +13404,23 @@
     "masculine": "Maskulin form",
     "feminine": "Feminin form",
     "neutral": "Neutral form"
+  },
+  "ExclusiveProfileArt": {
+    "chooseAvatar": "Välj avatar",
+    "chooseCover": "Välj omslagsbild",
+    "help": "Nya bilder är valfria. Ändringar sparas först när du sparar din profil.",
+    "saved": "Nuvarande bild",
+    "selected": "Vald",
+    "selectedHint": "Vald. Sparas först när du sparar profilen.",
+    "option": "Bild {number}",
+    "pending": "Bekräftar ditt val …",
+    "loading": "Laddar bilder …",
+    "error": "Ditt val kunde inte bekräftas.",
+    "empty": "Det finns inga nya bilder just nu.",
+    "expired": "Det här valet har gått ut. Välj igen.",
+    "retry": "Ladda om",
+    "restore": "Använd nuvarande bild",
+    "optional": "Du kan fortsätta utan en ny bild.",
+    "unavailable": "Bilden är inte tillgänglig"
   }
 }

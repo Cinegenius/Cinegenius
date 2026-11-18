@@ -13404,5 +13404,23 @@
     "masculine": "Forma maschile",
     "feminine": "Forma femminile",
     "neutral": "Forma neutra"
+  },
+  "ExclusiveProfileArt": {
+    "chooseAvatar": "Scegli un avatar",
+    "chooseCover": "Scegli una copertina",
+    "help": "Le nuove immagini sono facoltative. Le modifiche si salvano solo insieme al profilo.",
+    "saved": "Immagine attuale",
+    "selected": "Selezionata",
+    "selectedHint": "Selezionata. Verrà salvata quando salvi il profilo.",
+    "option": "Immagine {number}",
+    "pending": "Conferma della selezione …",
+    "loading": "Caricamento delle immagini …",
+    "error": "Non è stato possibile confermare la selezione.",
+    "empty": "Al momento non sono disponibili nuove immagini.",
+    "expired": "Questa selezione è scaduta. Scegli di nuovo.",
+    "retry": "Ricarica",
+    "restore": "Usa immagine attuale",
+    "optional": "Puoi continuare senza una nuova immagine.",
+    "unavailable": "Immagine non disponibile"
   }
 }

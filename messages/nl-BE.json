@@ -13404,5 +13404,23 @@
     "masculine": "Mannelijke vorm",
     "feminine": "Vrouwelijke vorm",
     "neutral": "Neutrale vorm"
+  },
+  "ExclusiveProfileArt": {
+    "chooseAvatar": "Avatar kiezen",
+    "chooseCover": "Omslag kiezen",
+    "help": "Nieuwe afbeeldingen zijn optioneel. Wijzigingen worden pas samen met je profiel opgeslagen.",
+    "saved": "Huidige afbeelding",
+    "selected": "Gekozen",
+    "selectedHint": "Gekozen. Wordt pas opgeslagen wanneer je je profiel opslaat.",
+    "option": "Afbeelding {number}",
+    "pending": "Je keuze wordt bevestigd …",
+    "loading": "Afbeeldingen worden geladen …",
+    "error": "Je keuze kon niet worden bevestigd.",
+    "empty": "Er zijn momenteel geen nieuwe afbeeldingen beschikbaar.",
+    "expired": "Deze keuze is verlopen. Kies opnieuw.",
+    "retry": "Opnieuw laden",
+    "restore": "Huidige afbeelding gebruiken",
+    "optional": "Je kunt doorgaan zonder nieuwe afbeelding.",
+    "unavailable": "Afbeelding niet beschikbaar"
   }
 }

@@ -13404,5 +13404,23 @@
     "masculine": "男性形式",
     "feminine": "女性形式",
     "neutral": "中性形式"
+  },
+  "ExclusiveProfileArt": {
+    "chooseAvatar": "选择头像",
+    "chooseCover": "选择封面",
+    "help": "新图片为可选项。更改仅在保存个人资料时保存。",
+    "saved": "当前图片",
+    "selected": "已选择",
+    "selectedHint": "已选择。保存个人资料时才会保存此更改。",
+    "option": "图片 {number}",
+    "pending": "正在确认选择…",
+    "loading": "正在加载图片…",
+    "error": "无法确认你的选择。",
+    "empty": "目前没有可用的新图片。",
+    "expired": "此选择已过期，请重新选择。",
+    "retry": "重新加载",
+    "restore": "使用当前图片",
+    "optional": "你可以不选择新图片，直接继续。",
+    "unavailable": "图片不可用"
   }
 }

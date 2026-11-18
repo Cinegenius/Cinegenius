@@ -13404,5 +13404,23 @@
     "masculine": "Forma masculina",
     "feminine": "Forma feminina",
     "neutral": "Forma neutra"
+  },
+  "ExclusiveProfileArt": {
+    "chooseAvatar": "Escolher avatar",
+    "chooseCover": "Escolher capa",
+    "help": "As novas imagens são opcionais. As alterações só são guardadas com o teu perfil.",
+    "saved": "Imagem atual",
+    "selected": "Selecionada",
+    "selectedHint": "Selecionada. Só será guardada quando guardares o perfil.",
+    "option": "Imagem {number}",
+    "pending": "A confirmar a tua escolha …",
+    "loading": "A carregar imagens …",
+    "error": "Não foi possível confirmar a tua escolha.",
+    "empty": "De momento não há novas imagens disponíveis.",
+    "expired": "Esta escolha expirou. Escolhe novamente.",
+    "retry": "Voltar a carregar",
+    "restore": "Usar a imagem atual",
+    "optional": "Podes continuar sem uma nova imagem.",
+    "unavailable": "Imagem indisponível"
   }
 }

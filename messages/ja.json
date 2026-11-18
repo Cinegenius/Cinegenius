@@ -13404,5 +13404,23 @@
     "masculine": "男性形",
     "feminine": "女性形",
     "neutral": "中立形"
+  },
+  "ExclusiveProfileArt": {
+    "chooseAvatar": "アバターを選択",
+    "chooseCover": "カバーを選択",
+    "help": "新しい画像の選択は任意です。変更はプロフィールと一緒に保存されます。",
+    "saved": "現在の画像",
+    "selected": "選択済み",
+    "selectedHint": "選択済み。プロフィールを保存するまで変更は保存されません。",
+    "option": "画像 {number}",
+    "pending": "選択を確認しています…",
+    "loading": "画像を読み込んでいます…",
+    "error": "選択を確認できませんでした。",
+    "empty": "現在、新しい画像はありません。",
+    "expired": "この選択の有効期限が切れました。もう一度選択してください。",
+    "retry": "再読み込み",
+    "restore": "現在の画像を使う",
+    "optional": "新しい画像を選ばずに続行できます。",
+    "unavailable": "画像を表示できません"
   }
 }

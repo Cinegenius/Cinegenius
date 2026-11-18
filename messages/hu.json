@@ -13404,5 +13404,23 @@
     "masculine": "Férfi alak",
     "feminine": "Női alak",
     "neutral": "Semleges alak"
+  },
+  "ExclusiveProfileArt": {
+    "chooseAvatar": "Avatar kiválasztása",
+    "chooseCover": "Borítókép kiválasztása",
+    "help": "Az új képek nem kötelezők. A módosítások csak a profil mentésekor kerülnek mentésre.",
+    "saved": "Jelenlegi kép",
+    "selected": "Kiválasztva",
+    "selectedHint": "Kiválasztva. Csak a profil mentésekor lesz elmentve.",
+    "option": "{number}. kép",
+    "pending": "A választás megerősítése …",
+    "loading": "Képek betöltése …",
+    "error": "Nem sikerült megerősíteni a választást.",
+    "empty": "Jelenleg nincs elérhető új kép.",
+    "expired": "Ez a választás lejárt. Kérjük, válassz újra.",
+    "retry": "Újratöltés",
+    "restore": "Jelenlegi kép használata",
+    "optional": "Új kép nélkül is folytathatod.",
+    "unavailable": "A kép nem érhető el"
   }
 }
