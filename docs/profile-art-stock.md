@@ -17,7 +17,7 @@ one replacement in the same transaction; failure of the refill quota cannot undo
 the profile save. Post-response work can start it immediately. The five-minute worker
 catches up after an interruption, with only one generation running globally.
 
-Source limits: 48 newly enqueued attempts per UTC day, 36 outstanding jobs, one image
+Source limits: 64 newly enqueued attempts per UTC day, 36 outstanding jobs, one image
 per job, fixed prompts/models, bounded bytes/time. A provider or quality failure can
 still temporarily reduce stock: never relabel a shared image as exclusive or falsely
 claim a failed refill succeeded. Accepted artwork metadata/fingerprints remain for
@@ -56,7 +56,7 @@ contract; a web release alone does not establish native support.
 Apply balanced-stock and permanent-deletion migrations after the four existing
 profile-art migrations. Keep the reader enabled while replacing rejected inventory;
 retire rejected style entries from new choices without rewriting an owner's profile.
-Only actually approved new assets count as available. Verify category counts, real
+Apply the follow-up stock-budget migration as well: the bounded allowance includes the existing seed journal and rejected quality attempts. Only actually approved new assets count as available. Verify category counts, real
 provider/style checks, current private Storage hashes, reservations/save/deletion
 transactions, account switching, interrupted input, 320px/WebKit/desktop and all
 locales before production publication. The ongoing website-check agent stays off.

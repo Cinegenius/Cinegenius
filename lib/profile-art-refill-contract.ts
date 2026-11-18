@@ -12,7 +12,7 @@ export const PROFILE_ART_REFILL_POLICY = Object.freeze({
   workerTimeoutMs: 110_000,
   storageTimeoutMs: 8_000,
   maxQueued: 36,
-  maxJobsPerDay: 48,
+  maxJobsPerDay: 64,
   targetBufferPerKind: 18,
   visiblePerKind: 12,
   targetPerPresentation: 6,
