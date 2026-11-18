@@ -41,7 +41,7 @@ accidentally included under public. This does not classify v2 as owned user medi
 
 - `profile-art-producer.ts` sends one bounded request to the fixed OpenAI image
   generation endpoint with the existing server `OPENAI_API_KEY`. Model
-  `gpt-image-1.5`, low quality, one opaque WebP, fixed avatar/cover sizes and curated
+  `gpt-image-2.6-flare`, low quality, one opaque WebP, fixed avatar/cover sizes and curated
   prompts. It accepts no user prompt, private photo or arbitrary URL. Only a
   single canonical base64 image is accepted; no URL fallback or automatic retry.
 - `profile-art-refill.ts` claims one durable job, obtains the complete comparison
@@ -131,3 +131,15 @@ API references checked during source preparation:
 [OpenAI Images](https://developers.openai.com/api/reference/resources/images),
 [Supabase upload](https://supabase.com/docs/reference/javascript/storage-from-upload),
 [bucket configuration](https://supabase.com/docs/guides/storage/buckets/creating-buckets).
+
+## Provider model review, 18 November 2026
+
+The disabled adapter is pinned to `gpt-image-2.6-flare`. OpenAI's current
+[deprecation notice](https://developers.openai.com/api/docs/deprecations) lists
+1 December 2026 as the shutdown date for `gpt-image-1.5` and recommends Flare or
+Sunburst as replacements. The current
+[image generation guide](https://developers.openai.com/api/docs/guides/image-generation)
+supports the existing low-quality, opaque WebP request and both fixed input sizes.
+Only this inactive producer changes; no other Genie model or access changes.
+Synthetic request tests cover both kinds and the fixed model/settings. No actual
+image request, quality assessment or provider billing verification was performed.

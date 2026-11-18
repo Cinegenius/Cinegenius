@@ -4,7 +4,7 @@ export const PROFILE_ART_READER_ENABLED = false;
 export const PROFILE_ART_BUCKET = "platform-profile-art";
 export const PROFILE_ART_REFILL_POLICY = Object.freeze({
   version: "cg-profile-art-v2" as const,
-  model: "gpt-image-1.5" as const,
+  model: "gpt-image-2.6-flare" as const,
   maxResponseBytes: 12 * 1024 * 1024,
   maxInputBytes: 8 * 1024 * 1024,
   maxOutputBytes: { avatar: 64_000, cover: 180_000 },
