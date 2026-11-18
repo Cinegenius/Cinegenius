@@ -6,8 +6,15 @@ import { MAX_SEARCHES, readSearchPlan, type SearchPlan, type SearchWish } from "
 import { SEARCH_AREA_WORDS } from "./unified-search-areas";
 import { cateringSearch } from "./unified-search-catering";
 import { DEPARTMENT_HEADS_QUERY, isDepartmentHeadsQuery, PRODUCTION_CREW_QUERY, isProductionCrewQuery } from "./unified-search-production";
+import { ambiguousCrewShorthand, searchJargon, vocabularyKeyword } from "./unified-search-vocabulary";
 
 type Keyword = Omit<SearchWish, "places">;
+
+const placePreposition = "(?:in|en|v|ve|i|à|a|w|we|em|в|у|на)";
+const placeArticle = "(?:(?:der|den|the|la|les|el|los|le|il|de|do|da)\\s+)?";
+const stripPlacePrefix = (text: string) => text.replace(new RegExp(`^${placePreposition}\\s+${placeArticle}`, "i"), "");
+const stripRequestPrefix = (text: string) => text.trim().replace(/[.!?。]+$/, "")
+  .replace(/^(?:(?:ich\s+)?suche|zeig(?:e)?\s+mir|ich\s+brauche|find|show\s+me|i(?:'m|\s+am)\s+looking\s+for|je\s+(?:cherche|recherche)|busco|cerco|hledám|hledam|szukam|procuro|ik\s+zoek|jag\s+söker|я\s+ищу|я\s+шукаю|szeretnék)\s+/iu, "");
 
 function keywordIndex(locale: string, taxonomy?: (key: string) => string) {
   const index = new Map<string, Keyword>();
@@ -58,21 +65,23 @@ function keywords(text: string, locale: string, taxonomy?: (key: string) => stri
   const result: Keyword[] = [];
   let offset = 0;
   while (offset < words.length) {
-    if (result.length && /^(und|and|et|en|y|e|a|es|och|sowie)$/.test(words[offset])) {
+    if (result.length && /^(und|and|et|en|y|e|a|es|och|sowie|i|oraz|и|та|і)$/.test(words[offset])) {
       if (++offset === words.length) return null;
     }
     const numbers: Record<string, number> = { ein: 1, eine: 1, einen: 1, eins: 1, zwei: 2, drei: 3, vier: 4, funf: 5,
       one: 1, two: 2, three: 3, four: 4, five: 5, dos: 2, tres: 3, due: 2, tre: 3, twee: 2, drie: 3, tva: 2, dva: 2, harom: 3, ket: 2 };
     const quantity = /^\d{1,3}$/.test(words[offset]) ? Number(words[offset]) : numbers[words[offset]];
     if (quantity) offset++;
-    else if (/^(a|an)$/.test(words[offset])) offset++;
+    else if (/^(a|an|un|une|una|unos|unas|des|du|um|uma)$/.test(words[offset])) offset++;
     if (offset >= words.length) return null;
     let found = false;
     for (let end = words.length; end > offset; end--) {
       const phrase = words.slice(offset, end).join(" ");
+      if (ambiguousCrewShorthand(phrase)) return null;
       const match = isProductionCrewQuery(phrase) ? { area: "crew" as const, query: PRODUCTION_CREW_QUERY, department: "" }
         : isDepartmentHeadsQuery(phrase) ? { area: "crew" as const, query: DEPARTMENT_HEADS_QUERY, department: "" }
-        : cateringSearch(phrase) ? { area: "companies" as const, query: phrase, department: "" } : index.get(phrase);
+        : cateringSearch(phrase) ? { area: "companies" as const, query: phrase, department: "" }
+        : searchJargon(phrase) ? vocabularyKeyword(phrase) : index.get(phrase) ?? vocabularyKeyword(phrase);
       if (!match) continue;
       result.push({ ...match, ...(quantity ? { quantity } : {}) }); offset = end; found = true; break;
     }
@@ -146,11 +155,11 @@ function simpleSearchPlan(text: string, locale = "de", taxonomy?: (key: string) 
   const production = productionSearchPlan(text);
   if (production) return production;
   const index = keywordIndex(locale, taxonomy);
-  const request = text.trim().replace(/[.!?]+$/, "").replace(/^(?:(?:ich\s+)?suche|zeig(?:e)?\s+mir|ich\s+brauche|find|show\s+me|i(?:'m|\s+am)\s+looking\s+for)\s+/i, "");
+  const request = stripRequestPrefix(text);
   let parts = keywords(request, locale, taxonomy, index);
   let places: SearchWish["places"] = [];
   if (!parts) {
-    const match = /^(.*?)\s+(?:in|en|v|ve|i)\s+(?:(?:der|den|the|la|les)\s+)?(.+)$/i.exec(request);
+    const match = new RegExp(`^(.*?)\\s+${placePreposition}\\s+${placeArticle}(.+)$`, "i").exec(request);
     if (match) {
       parts = keywords(match[1], locale, taxonomy, index);
       if (!parts) return null;
@@ -186,21 +195,21 @@ function simpleSearchPlan(text: string, locale = "de", taxonomy?: (key: string) 
 export function keywordSearchPlan(text: string, locale = "de", taxonomy?: (key: string) => string): SearchPlan | null {
   const direct = simpleSearchPlan(text, locale, taxonomy);
   if (direct) return direct;
-  const request = text.trim().replace(/[.!?]+$/, "").replace(/^(?:(?:ich\s+)?suche|zeig(?:e)?\s+mir|ich\s+brauche|find|show\s+me|i(?:'m|\s+am)\s+looking\s+for)\s+/i, "");
-  const chunks = request.split(/\s+(?:und|and|en|och|y|e|sowie)\s+|\s*[,;]\s*/i);
+  const request = stripRequestPrefix(text);
+  const chunks = request.split(/\s+(?:und|and|en|och|y|e|et|oraz|и|та|і|sowie)\s+|\s*[,;]\s*/i);
   if (chunks.length < 2 || chunks.length > 10) return null;
   const wishes: SearchWish[] = [];
   for (let i = 0; i < chunks.length;) {
     let parsed = false;
     for (let end = chunks.length; end > i; end--) {
       const phrase = chunks.slice(i, end).join(" und ");
-      const part = simpleSearchPlan(phrase.replace(/^(?:in|en|v|ve|i)\s+/i, ""), locale, taxonomy);
+      const part = simpleSearchPlan(stripPlacePrefix(phrase), locale, taxonomy);
       if (part && !part.searches.some(wish => wish.recommended)) {
         wishes.push(...part.searches); i = end; parsed = true; break;
       }
     }
     if (parsed) continue;
-    const placeText = chunks[i].replace(/^(?:in|en|v|ve|i)\s+(?:(?:der|the|la)\s+)?/i, "");
+    const placeText = stripPlacePrefix(chunks[i]);
     const country = countryCode(placeText);
     if (!wishes.length || (!country && searchCityCandidates(placeText).length !== 1)) return null;
     // A place-only continuation belongs to the immediately preceding wish.

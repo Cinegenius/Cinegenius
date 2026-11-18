@@ -4,14 +4,15 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "node scripts/localization/prepare-build.mjs && npm run check:i18n && next build --webpack",
+    "build": "node scripts/localization/prepare-build.mjs && node --experimental-strip-types --import ./scripts/register-test-aliases.mjs scripts/evaluate-smart-search.mts && npm run check:i18n && next build --webpack",
     "start": "next start",
     "test": "node --experimental-strip-types --import ./scripts/register-test-aliases.mjs --test lib/*.test.mjs",
     "lint": "eslint",
     "check:design": "node scripts/check-design.mjs",
     "deploy": "node scripts/deploy-production.mjs",
     "deploy:production": "node scripts/deploy-production.mjs",
-    "check:i18n": "node scripts/check-i18n.mjs"
+    "check:i18n": "node scripts/check-i18n.mjs && npm run check:smart-vocabulary",
+    "check:smart-vocabulary": "node --experimental-strip-types --import ./scripts/register-test-aliases.mjs scripts/generate-smart-language-index.mts --check"
   },
   "dependencies": {
     "@clerk/localizations": "^4.5.3",
