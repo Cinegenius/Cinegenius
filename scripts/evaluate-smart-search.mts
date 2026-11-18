@@ -7,6 +7,7 @@ import { SEARCH_WISH_SCHEMA, readSearchPlan, type SearchWish } from "../lib/unif
 import { keywordSearchPlan, normalizeKeywordPlan } from "../lib/unified-search-intent";
 import { matchesWishPlaces, wishMarketplaceCategories, wishSearchTerms } from "../lib/unified-search-matching";
 import { departments } from "../lib/departments";
+import { matchesSearchRequirements } from "../lib/unified-search-requirements";
 
 const checkOnly = process.argv.includes("--check");
 if (process.env.CG_EVALUATE_SMART !== "1" && !checkOnly) process.exit(0);
@@ -40,11 +41,13 @@ const requests: Record<string, string> = {
   ru: "Для съёмок в Мюнхене хочу арендовать лампу и костюмы.",
   uk: "Для зйомок у Мюнхені хочу орендувати лампу та костюми.",
 };
-const munich = { city: "München", place_city_id: "geonames:2867714", place_country_code: "DE" };
+const munich = { city: "München", place_city_id: "geonames:2867714", place_country_code: "DE", place_status: "verified" };
 type Case = { id: string; locale: string; query: string; check: (wishes: SearchWish[]) => boolean };
 const cases: Case[] = Object.entries(requests).map(([locale, query]) => ({ id: locale, locale, query, check: wishes =>
   ["licht-quellen", "kostuem-accessoires"].every(category => wishes.some(wish => ["all", "marketplace"].includes(wish.area)
-    && wishMarketplaceCategories(wish.query, key => key).includes(category) && wish.places.length && matchesWishPlaces(munich, wish))) }));
+    && wishMarketplaceCategories(wish.query, key => key).includes(category) && wish.places.length && matchesWishPlaces(munich, wish)
+    && wish.places.every(place => !place.country && !place.continent) && !wish.recommended
+    && matchesSearchRequirements({ title: category === "licht-quellen" ? "Nova P600C" : "Bayerischer Hut", category, rental_type: "miete" }, wish))) }));
 cases.push({ id: "independent-places", locale: "de", query: "Für Berlin brauche ich zwei sparkies, aber den foquista brauche ich in München.", check: wishes =>
   wishes.some(wish => wish.area === "crew" && wish.quantity === 2 && wishSearchTerms(wish).includes("Beleuchter (Electrician)") && wish.places.some(p => p.city === "Berlin"))
   && wishes.some(wish => wish.area === "crew" && wishSearchTerms(wish).includes("1st AC (Focus Puller)") && wish.places.length > 0 && matchesWishPlaces(munich, wish)) });

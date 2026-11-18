@@ -6,7 +6,7 @@ import { MAX_SEARCHES, readSearchPlan, type SearchPlan, type SearchWish } from "
 import { SEARCH_AREA_WORDS } from "./unified-search-areas";
 import { cateringSearch } from "./unified-search-catering";
 import { DEPARTMENT_HEADS_QUERY, isDepartmentHeadsQuery, PRODUCTION_CREW_QUERY, isProductionCrewQuery } from "./unified-search-production";
-import { ambiguousCrewShorthand, searchJargon, vocabularyKeyword } from "./unified-search-vocabulary";
+import { ambiguousCrewShorthand, searchConcept, searchJargon, vocabularyKeyword } from "./unified-search-vocabulary";
 
 type Keyword = Omit<SearchWish, "places">;
 
@@ -96,7 +96,12 @@ function keywords(text: string, locale: string, taxonomy?: (key: string) => stri
 }
 
 export function normalizeKeywordPlan(plan: SearchPlan, locale = "de", taxonomy?: (key: string) => string): SearchPlan | null {
-  const searches = plan.searches.flatMap(wish => {
+  const searches = plan.searches.flatMap(original => {
+    // The query already identifies the object. A duplicated literal requirement
+    // would wrongly remove category-labelled offers whose title is a model name.
+    const concept = searchConcept(original.query);
+    const wish = original.requirements?.length ? { ...original, requirements: original.requirements.filter(group => !group.every(term =>
+      occupationKey(term) === occupationKey(original.query) || (concept && searchConcept(term)?.query === concept.query))) } : original;
     if (!wish.department && ["crew", "all"].includes(wish.area) && isProductionCrewQuery(wish.query)) return [{ ...wish, area: "crew" as const, query: PRODUCTION_CREW_QUERY }];
     if (!wish.department && ["crew", "all"].includes(wish.area) && isDepartmentHeadsQuery(wish.query)) return [{ ...wish, area: "crew" as const, query: DEPARTMENT_HEADS_QUERY }];
     if (!wish.department && ["companies", "all"].includes(wish.area) && cateringSearch(wish.query)) return [{ ...wish, area: "companies" as const }];

@@ -38,7 +38,7 @@ const synonyms: Record<string, string[]> = {
   polizei: ["Polizei", "Police", "Polizia", "Policía", "Policie", "Rendőrség", "Politie", "Polis", "Streifenwagen", "Streifenpolizist"],
 };
 
-const cameraPeople = ["Director of Photography (DoP)", "Kameramann", "Camera Operator"];
+const cameraPeople = ["Director of Photography (DoP)", "Kameramann", "Camera Operator", "A-Kamera Operator", "B-Kamera Operator", "C-Kamera Operator"];
 const crewSynonyms: Record<string, string[]> = {
   kameramann: cameraPeople, kameramanner: cameraPeople, kamerafrau: cameraPeople, kamerafrauen: cameraPeople,
   cameraman: cameraPeople, cameramen: cameraPeople, camerawoman: cameraPeople, cinematographer: cameraPeople,
@@ -67,8 +67,8 @@ export function wishSearchTerms(wish: SearchWish, locale = "de", taxonomy?: (key
   const concept = searchConcept(wish.query);
   const jargon = crew ? searchJargon(wish.query) : undefined;
   const role = crew ? vocabularyRole(wish.query) : undefined;
-  const terms = wish.query ? [...(jargon?.terms || (role ? [role.label] : undefined)
-    || (crew && crewSynonyms[searchKey(wish.query)]) || concept?.terms || synonyms[searchKey(wish.query)] || [wish.query])] : [];
+  const terms = wish.query ? [...(jargon?.terms || (crew && crewSynonyms[searchKey(wish.query)])
+    || concept?.terms || synonyms[searchKey(wish.query)] || (role ? [role.label] : undefined) || [wish.query])] : [];
   const requested = [...terms];
   if (crew) {
     const dept = departments.find(d => d.id === wish.department) ?? searchDepartment(wish.query, locale, taxonomy);

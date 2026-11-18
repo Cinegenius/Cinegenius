@@ -31,6 +31,14 @@ Hut does not match Schutz and English hat does not match the German auxiliary ve
 in a description. A mixed equipment offer can still match if it actually includes
 lamps. Publication, Ghost, geographic and other explicit constraints still apply.
 
+The provider schema keeps continent scopes separate from city/country scopes and
+explicitly distinguishes requested items from inferred suggestions. City-only
+requests must not acquire an unrequested country constraint. A model-added
+requirement that only repeats the query is removed; genuine additional properties
+and exclusions remain mandatory. Rental/sale requirements use declared public
+offer modes, including legacy metadata, instead of requiring a particular phrase
+in the description. Missing mode information is not guessed from the price.
+
 Read-only checks against current eligible Munich offers found Aputure Nova P600C,
 ARRI M18 and Godox KNOWLED F800R for generic lamps, and the Lodenfrey Bavarian hat
 for costume/hat requests. No listings were edited or reclassified.
