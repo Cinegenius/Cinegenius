@@ -13630,5 +13630,14 @@
       "deletionNoticeAt": "Označení ke smazání nejdříve",
       "reviewAfter": "Posouzení nejdříve"
     }
+  },
+  "ProfileLayout": {
+    "title": "Vzhled profilu",
+    "compact": "Kompaktní",
+    "large-photo": "Velká fotografie",
+    "hint": "Tvé údaje zůstanou stejné. Volba se uloží s profilem a lze ji později změnit.",
+    "legacyHint": "Stávající vzhled zůstane, dokud si nevybereš jiný.",
+    "unavailable": "Volba vzhledu profilu nyní není dostupná. Zkus to později.",
+    "invalid": "Vyber Kompaktní nebo Velká fotografie."
   }
 }

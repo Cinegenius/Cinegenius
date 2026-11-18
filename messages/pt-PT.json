@@ -13630,5 +13630,14 @@
       "deletionNoticeAt": "Marcação para revisão não antes de",
       "reviewAfter": "Revisão não antes de"
     }
+  },
+  "ProfileLayout": {
+    "title": "Apresentação do perfil",
+    "compact": "Compacta",
+    "large-photo": "Fotografia grande",
+    "hint": "Os teus dados mantêm-se. A escolha é guardada com o perfil e pode ser alterada mais tarde.",
+    "legacyHint": "A apresentação atual mantém-se até escolheres outra.",
+    "unavailable": "A escolha de apresentação está indisponível neste momento. Tenta novamente mais tarde.",
+    "invalid": "Escolhe Compacta ou Fotografia grande."
   }
 }

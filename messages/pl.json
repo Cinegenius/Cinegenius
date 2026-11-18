@@ -13630,5 +13630,14 @@
       "deletionNoticeAt": "Oznaczenie do przeglądu nie wcześniej niż",
       "reviewAfter": "Przegląd nie wcześniej niż"
     }
+  },
+  "ProfileLayout": {
+    "title": "Wygląd profilu",
+    "compact": "Kompaktowy",
+    "large-photo": "Duże zdjęcie",
+    "hint": "Twoje dane pozostają bez zmian. Wybór zapisuje się z profilem i można go później zmienić.",
+    "legacyHint": "Obecny wygląd pozostaje, dopóki nie wybierzesz innego.",
+    "unavailable": "Wybór wyglądu profilu jest teraz niedostępny. Spróbuj ponownie później.",
+    "invalid": "Wybierz Kompaktowy lub Duże zdjęcie."
   }
 }

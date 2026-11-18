@@ -13630,5 +13630,14 @@
       "deletionNoticeAt": "Markering op zijn vroegst",
       "reviewAfter": "Beoordeling op zijn vroegst"
     }
+  },
+  "ProfileLayout": {
+    "title": "Profielweergave",
+    "compact": "Compact",
+    "large-photo": "Grote foto",
+    "hint": "Je gegevens blijven hetzelfde. Je keuze wordt met je profiel opgeslagen en kan later worden gewijzigd.",
+    "legacyHint": "Je huidige weergave blijft staan totdat je er een kiest.",
+    "unavailable": "De profielweergave is momenteel niet beschikbaar. Probeer het later opnieuw.",
+    "invalid": "Kies Compact of Grote foto."
   }
 }

@@ -13630,5 +13630,14 @@
       "deletionNoticeAt": "Löschvormerkung frühestens",
       "reviewAfter": "Prüfung frühestens"
     }
+  },
+  "ProfileLayout": {
+    "title": "Profilansicht",
+    "compact": "Kompakt",
+    "large-photo": "Großes Bild",
+    "hint": "Deine Angaben bleiben gleich. Die Auswahl wird mit dem Profil gespeichert und bleibt änderbar.",
+    "legacyHint": "Deine bisherige Ansicht bleibt erhalten, bis du eine auswählst.",
+    "unavailable": "Die Profilansicht ist momentan nicht verfügbar. Bitte später erneut versuchen.",
+    "invalid": "Bitte wähle Kompakt oder Großes Bild."
   }
 }

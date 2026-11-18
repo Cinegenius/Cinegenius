@@ -13630,5 +13630,14 @@
       "deletionNoticeAt": "Törlésre jelölés legkorábban",
       "reviewAfter": "Felülvizsgálat legkorábban"
     }
+  },
+  "ProfileLayout": {
+    "title": "Profil megjelenése",
+    "compact": "Kompakt",
+    "large-photo": "Nagy kép",
+    "hint": "Adataid nem változnak. A választás a profillal együtt mentődik, és később módosítható.",
+    "legacyHint": "A jelenlegi megjelenés marad, amíg nem választasz másikat.",
+    "unavailable": "A profil megjelenése jelenleg nem választható ki. Próbáld újra később.",
+    "invalid": "Válaszd a Kompakt vagy a Nagy kép lehetőséget."
   }
 }

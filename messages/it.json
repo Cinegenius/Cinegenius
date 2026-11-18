@@ -13630,5 +13630,14 @@
       "deletionNoticeAt": "Segnalazione non prima del",
       "reviewAfter": "Verifica non prima del"
     }
+  },
+  "ProfileLayout": {
+    "title": "Aspetto del profilo",
+    "compact": "Compatto",
+    "large-photo": "Foto grande",
+    "hint": "I tuoi dati restano invariati. La scelta si salva con il profilo e puoi modificarla in seguito.",
+    "legacyHint": "La vista attuale resta finché non ne scegli una.",
+    "unavailable": "La scelta della vista non è disponibile al momento. Riprova più tardi.",
+    "invalid": "Scegli Compatto o Foto grande."
   }
 }

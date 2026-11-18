@@ -13630,5 +13630,14 @@
       "deletionNoticeAt": "Marked for review no earlier than",
       "reviewAfter": "Review no earlier than"
     }
+  },
+  "ProfileLayout": {
+    "title": "Profile layout",
+    "compact": "Compact",
+    "large-photo": "Large photo",
+    "hint": "Your details stay the same. Your choice is saved with your profile and can be changed later.",
+    "legacyHint": "Your current layout stays until you choose one.",
+    "unavailable": "Profile layout is currently unavailable. Please try again later.",
+    "invalid": "Please choose Compact or Large photo."
   }
 }

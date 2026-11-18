@@ -42,6 +42,8 @@ import { calculateProfileCompletion } from "@/lib/profile-completion";
 import { prepareProfileMediaFile, sendProfileMediaFile, PROFILE_MEDIA_ACCEPT, PROFILE_MEDIA_MAX_BYTES, PROFILE_MEDIA_SOURCE_MAX_BYTES } from "@/lib/profile-media-client";
 import { publishProfileUpdated } from "@/lib/profile-update-events";
 import ProfileIdentityFields from "@/components/ProfileIdentityFields";
+import ProfileLayoutPicker from "@/components/ProfileLayoutPicker";
+import { isProfileLayout, profileLayout as readProfileLayout, type ProfileLayout } from "@/lib/profile-layout";
 import ProfileArtPicker from "@/components/ProfileArtPicker";
 import { isAvatarUploadAssociated } from "@/lib/profile-avatar-persistence";
 import { validateProfileSave, type ProfileSaveFieldErrors } from "@/lib/profile-save-validation";
@@ -679,6 +681,8 @@ function ProfileEditorContent({ accountId }: { accountId: string }) {
   const profileImagesRef = useRef<HTMLInputElement>(null);
   const [avatarUrl, setAvatarUrl] = useState("");
   const [avatarPreview, setAvatarPreview] = useState("");
+  const [profileLayout, setProfileLayout] = useState<ProfileLayout | null>(null);
+  const [layoutUnavailable, setLayoutUnavailable] = useState(false);
   const [coverImageUrl, setCoverImageUrl] = useState("");
   const [coverImagePreview, setCoverImagePreview] = useState("");
   const [coverUploading, setCoverUploading] = useState(false);
@@ -798,8 +802,11 @@ function ProfileEditorContent({ accountId }: { accountId: string }) {
         if (!current() || !result) return;
         const { profile, exists, unavailableFields = [] } = result;
         if (unavailableFields.length > 0) {
-          addToast(uiText("Ui.text_e7f05d1a09c33f", { value1: String(unavailableFields.join(", ")) }), "error");
+          const labels = unavailableFields.map((field: string) => field === "profile_layout" ? uiText("ProfileLayout.title") : field);
+          addToast(uiText("Ui.text_e7f05d1a09c33f", { value1: labels.join(", ") }), "error");
         }
+        setLayoutUnavailable(unavailableFields.includes("profile_layout"));
+        setProfileLayout(profile ? readProfileLayout(profile.profile_layout) : unavailableFields.includes("profile_layout") ? null : "compact");
         setProfileExists(!!exists);
         setEditorStep(exists ? 0 : 1);
         if (profile) {
@@ -1217,6 +1224,7 @@ function ProfileEditorContent({ accountId }: { accountId: string }) {
         available_from: form.availableFrom || null,
         travel_ready:   form.travelReady,
         availability_config: profileEditorAvailabilityConfig(availabilityConfigRef.current, { ...form, originalTravelReady: originalTravelReadyRef.current }),
+        ...(profileLayout ? { profile_layout: profileLayout } : {}),
         cover_image_url: coverImageUrl || null,
         focal_point: { ...focalPoint, opacity: coverOpacity },
         instagram_url:  instagramUrl || null,
@@ -1426,6 +1434,7 @@ function ProfileEditorContent({ accountId }: { accountId: string }) {
     profileImages,
     avatarUrl,
     coverImageUrl,
+    profileLayout,
     focalPoint,
     coverOpacity,
     instagramUrl,
@@ -1468,6 +1477,7 @@ function ProfileEditorContent({ accountId }: { accountId: string }) {
           if (Array.isArray(saved.languages)) setLanguages(saved.languages.filter((item: unknown): item is string => typeof item === "string"));
           if (Array.isArray(saved.profileImages)) setProfileImages(saved.profileImages.filter((item: unknown) => !!item && typeof item === "object" && typeof (item as ProfileImage).url === "string"));
           if (typeof saved.avatarUrl === "string") { setAvatarUrl(saved.avatarUrl); setAvatarPreview(saved.avatarUrl); }
+          if (isProfileLayout(saved.profileLayout)) setProfileLayout(saved.profileLayout);
           if (typeof saved.coverImageUrl === "string") { setCoverImageUrl(saved.coverImageUrl); setCoverImagePreview(saved.coverImageUrl); }
           if (saved.focalPoint && typeof saved.focalPoint === "object") setFocalPoint(saved.focalPoint as FocalPoint);
           if (typeof saved.coverOpacity === "number") setCoverOpacity(saved.coverOpacity);
@@ -1796,6 +1806,7 @@ function ProfileEditorContent({ accountId }: { accountId: string }) {
                   <p className="mt-1 text-right text-xs text-text-muted">{(form.bio ?? "").length} / 500</p>
                 </div>
                 <ProfileIdentityFields value={form.pronouns ?? ""} visible={form.showPronouns ?? false} onChange={(pronouns, showPronouns) => setForm(current => ({ ...current, pronouns, showPronouns }))} />
+                <div className="rounded-xl border border-border bg-bg-secondary p-4 sm:p-6"><ProfileLayoutPicker value={profileLayout} onChange={value => { setProfileLayout(value); markEditorChanged(); }} disabled={saving} unavailable={layoutUnavailable} /></div>
                 {/* Avatar */}
                 <div className="p-4 sm:p-6 bg-bg-secondary border border-border rounded-xl">
                   <h2 className="font-semibold text-text-primary mb-5">{t("sectionAvatar")} <span className="text-xs font-normal text-text-muted">({optionalMedia("optional")})</span></h2>

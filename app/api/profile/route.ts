@@ -1,3 +1,4 @@
+import { isProfileLayout } from "@/lib/profile-layout";
 import { hasInvalidOccupationForm, preserveOccupationForm } from "@/lib/occupation-form";
 import { validPronouns } from "@/lib/profile-identity";
 import { placeWriteFields } from "@/lib/places/catalog";
@@ -14,6 +15,7 @@ import { PROFILE_TYPE_LABELS } from "@/lib/profile-types";
 import { normalizeProfileTypes } from "@/lib/profile-display";
 import { validProfileFocalPoint } from "@/lib/profile-cover";
 import {
+  missingProfileColumnName,
   retryWithoutMissingOptionalProfileColumns,
   selectOptionalProfileColumns,
 } from "@/lib/profile-db-compat";
@@ -37,9 +39,9 @@ const PROFILE_COLS = [
 // not-yet-applied database migration cannot disable the entire profile editor.
 const PROFILE_OPTIONAL_COLS = [
   "profile_types", "physical", "performance", "model_measurements", "casting",
-  "contact_email", "imdb_url", "pronouns", "show_pronouns",
+  "contact_email", "imdb_url", "pronouns", "show_pronouns", "profile_layout",
 ] as const;
-const PROFILE_OPTIONAL_COLUMN_SET = new Set<string>(PROFILE_OPTIONAL_COLS.filter(key => key !== "pronouns" && key !== "show_pronouns"));
+const PROFILE_OPTIONAL_COLUMN_SET = new Set<string>(PROFILE_OPTIONAL_COLS.filter(key => key !== "pronouns" && key !== "show_pronouns" && key !== "profile_layout"));
 
 const PROFILE_TYPE_VALUES = new Set(Object.keys(PROFILE_TYPE_LABELS));
 function privateNoStoreJson(body: unknown, status = 200) {
@@ -89,23 +91,20 @@ export async function GET(req: NextRequest) {
 
   if (dbError) return privateNoStoreJson({ error: tResponse('System.requestFailed') }, 500);
 
-  let data = base;
-  let unavailableFields: string[] = [];
-  if (base) {
-    const optionalResult = await selectOptionalProfileColumns<Record<string, unknown>>(
-      PROFILE_OPTIONAL_COLS,
-      async (projection) => {
-        const result = await db.from("profiles").select(projection).eq("user_id", userId).maybeSingle();
-        return { data: result.data as Record<string, unknown> | null, error: result.error };
-      },
-    );
-    if (optionalResult.error) {
-      console.error("[profile GET] optional profile fields could not be read");
-      return privateNoStoreJson({ error: tResponse("System.requestFailed"), code: optionalResult.error.code }, 500);
-    }
-    data = Object.assign({}, base, optionalResult.data ?? {}) as typeof base;
-    unavailableFields = optionalResult.unavailableFields;
+  // Probe additive capabilities even before this account creates its first profile.
+  const optionalResult = await selectOptionalProfileColumns<Record<string, unknown>>(
+    PROFILE_OPTIONAL_COLS,
+    async (projection) => {
+      const result = await db.from("profiles").select(projection).eq("user_id", userId).maybeSingle();
+      return { data: result.data as Record<string, unknown> | null, error: result.error };
+    },
+  );
+  if (optionalResult.error) {
+    console.error("[profile GET] optional profile fields could not be read");
+    return privateNoStoreJson({ error: tResponse("System.requestFailed"), code: optionalResult.error.code }, 500);
   }
+  const data = base ? Object.assign({}, base, optionalResult.data ?? {}) as typeof base : null;
+  const unavailableFields = optionalResult.unavailableFields;
 
   // Reading a profile must not write Clerk metadata: session claims can lag,
   // and repeated GETs otherwise exhaust the per-user metadata write limit.
@@ -121,7 +120,7 @@ export async function GET(req: NextRequest) {
     return res;
   }
 
-  return privateNoStoreJson({ profile: null, exists: false, unavailableFields: [] });
+  return privateNoStoreJson({ profile: null, exists: false, unavailableFields });
 }
 
 export async function POST(req: NextRequest) {
@@ -135,12 +134,16 @@ export async function POST(req: NextRequest) {
   const body = await req.json().catch(() => null);
   if (!body) return NextResponse.json({ error: tResponse('System.m_9c5ea1715bd5') }, { status: 400 });
   const {
-    display_name, pronouns, show_pronouns, bio, location, avatar_url, skills, memberships, portfolio_url, positions,
+    display_name, pronouns, show_pronouns, profile_layout, bio, location, avatar_url, skills, memberships, portfolio_url, positions,
     portfolio_images, profile_images, experience, profile_types, profile_type, slug, phone, contact_email,
     available, available_from, travel_ready, availability_config, languages, reel_url, imdb_url, crew,
     cover_image_url, instagram_url, tiktok_url, youtube_url, vimeo_url, linkedin_url, website_url,
     day_rate, filmography, video_links, focal_point, physical, performance, model_measurements, casting,
   } = body;
+
+  if (profile_layout !== undefined && !isProfileLayout(profile_layout)) {
+    return privateNoStoreJson({ error: tResponse("ProfileLayout.invalid") }, 400);
+  }
 
   if ((pronouns !== undefined && !validPronouns(pronouns)) || (show_pronouns !== undefined && typeof show_pronouns !== "boolean")) {
     return privateNoStoreJson({ error: tResponse("ProfileIdentity.invalidPronouns") }, 400);
@@ -200,6 +203,7 @@ export async function POST(req: NextRequest) {
   const payload: Record<string, unknown> = {
     user_id: userId,
     display_name: display_name.trim(),
+    ...(profile_layout !== undefined ? { profile_layout } : {}),
     ...(pronouns !== undefined ? { pronouns: pronouns?.trim() || null } : {}),
     ...(show_pronouns !== undefined ? { show_pronouns } : {}),
     bio: bio?.trim() ?? "",
@@ -253,6 +257,7 @@ export async function POST(req: NextRequest) {
     },
   );
   if (saveResult.error) {
+    if (missingProfileColumnName(saveResult.error) === "profile_layout") return privateNoStoreJson({ error: tResponse("ProfileLayout.unavailable"), code: "PROFILE_LAYOUT_UNAVAILABLE" }, 503);
     console.error("[profile POST] database save failed");
     return NextResponse.json({ error: tResponse("System.requestFailed"), code: saveResult.error.code }, { status: 500 });
   }
@@ -302,7 +307,7 @@ const ALLOWED_PATCH_KEYS = new Set([
   "availability_config",
   "profile_types",
   "profile_type", "modules", "physical", "performance", "model_measurements", "casting", "crew", "creative", "vendor",
-  "focal_point", "tagline",
+  "focal_point", "tagline", "profile_layout",
 ]);
 
 export async function PATCH(req: NextRequest) {
@@ -326,6 +331,9 @@ export async function PATCH(req: NextRequest) {
     }
     if (("pronouns" in safe && !validPronouns(safe.pronouns)) || ("show_pronouns" in safe && typeof safe.show_pronouns !== "boolean")) {
       return privateNoStoreJson({ error: tResponse("ProfileIdentity.invalidPronouns") }, 400);
+    }
+    if ("profile_layout" in safe && !isProfileLayout(safe.profile_layout)) {
+      return privateNoStoreJson({ error: tResponse("ProfileLayout.invalid") }, 400);
     }
     if (hasInvalidOccupationForm(safe.crew)) {
       return privateNoStoreJson({ error: tResponse("System.requestFailed") }, 400);
@@ -435,6 +443,7 @@ export async function PATCH(req: NextRequest) {
     );
 
     if (saveResult.error) {
+      if (missingProfileColumnName(saveResult.error) === "profile_layout") return privateNoStoreJson({ error: tResponse("ProfileLayout.unavailable"), code: "PROFILE_LAYOUT_UNAVAILABLE" }, 503);
       console.error("[profile PATCH] database save failed");
       return NextResponse.json({ error: tResponse("System.requestFailed"), code: saveResult.error.code }, { status: 500 });
     }

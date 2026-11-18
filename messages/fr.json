@@ -13630,5 +13630,14 @@
       "deletionNoticeAt": "Marquage pour examen au plus tôt le",
       "reviewAfter": "Examen au plus tôt le"
     }
+  },
+  "ProfileLayout": {
+    "title": "Présentation du profil",
+    "compact": "Compacte",
+    "large-photo": "Grande photo",
+    "hint": "Tes informations restent identiques. Le choix est enregistré avec ton profil et peut être modifié plus tard.",
+    "legacyHint": "Ta présentation actuelle reste inchangée tant que tu ne choisis pas une autre vue.",
+    "unavailable": "Le choix de présentation est indisponible pour le moment. Réessaie plus tard.",
+    "invalid": "Choisis Compacte ou Grande photo."
   }
 }

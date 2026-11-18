@@ -13630,5 +13630,14 @@
       "deletionNoticeAt": "Markeras tidigast",
       "reviewAfter": "Granskning tidigast"
     }
+  },
+  "ProfileLayout": {
+    "title": "Profilutseende",
+    "compact": "Kompakt",
+    "large-photo": "Stor bild",
+    "hint": "Dina uppgifter ändras inte. Valet sparas med profilen och kan ändras senare.",
+    "legacyHint": "Din nuvarande vy behålls tills du väljer en annan.",
+    "unavailable": "Profilutseendet är inte tillgängligt just nu. Försök igen senare.",
+    "invalid": "Välj Kompakt eller Stor bild."
   }
 }

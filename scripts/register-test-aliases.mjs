@@ -8,7 +8,7 @@ register("./test-alias-loader.mjs", import.meta.url);
 const { registerHooks } = await import('node:module');
 registerHooks({
   resolve(specifier, context, nextResolve) {
-    if (specifier.startsWith('@/lib/places/')) {
+    if (specifier.startsWith('@/lib/places/') || specifier === '@/lib/profile-layout') {
       return nextResolve(fileURLToPath(new URL(`../${specifier.slice(2)}.ts`, import.meta.url)), context);
     }
     return nextResolve(specifier, context);
