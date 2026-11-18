@@ -28,3 +28,9 @@ Prüfbelege: `/srv/cinegenius/research/20261117-map-pin-previews/`.
 ## Weiterhin getrennt offen
 
 Die berufsfreie Profilwahl „Kompakt / Großes Bild – Schwebende Karte“, kontenübergreifend exklusive persönliche Avatare/Cover mit atomarer Vergabe und Nachfüllung sowie auswählbare wiederverwendbare Firmenmotive sind noch nicht Teil dieses Pakets. Bereits verwendete Bilder dürfen dabei nicht stillschweigend ausgetauscht werden. Die Firmenkategorien `kostumfundus` und `requisite` existieren bereits; keine doppelten Kategorien anlegen. Ebenfalls separat: Angebotsformulare/strukturierte Suchangaben, optionaler Tierprofil-Einstieg für Tierberufe und der echte angemeldete Smart-Test mit dem bestehenden Hundprofil.
+
+## Rückübernahme aus dem App-Abgleich
+
+Der App-Stand `3165592b48c6b767dcfba1c45c15c30ac71ef7e4` meldete einen Überlauf der langen russischen Galerieaktion bei 320 CSS px. Nur die Aktionsgruppe und ihr Link dürfen jetzt umbrechen; der Pfeil bleibt unverzerrt. Drei veraltete Testadapter wurden an die vorhandenen Tier-Sichtbarkeitsprüfungen, Homepage-Abhängigkeiten und Organisations-Taxonomie angepasst. Keine App-eigenen Produktänderungen oder nativen Kataloge wurden übernommen.
+
+Eigene Website-Nachprüfung: 49 gezielte Regressionen bestanden; Komponenten-Lint bestanden. 20 Browserfälle prüfen die tatsächliche Galeriekomponente mit synthetischen Daten: alle 17 Sprachen bei 320 px sowie Russisch bei 390/834/1440 px. Die Kopfzeile bleibt innerhalb des Viewports und Pause/Fortsetzen funktioniert. Die Prüfung betrifft Textumbruch und Bedienelemente, keine echte Anmeldung, privaten Uploads oder native Geräte. Belege: `app-follow-up-tests.log`, `gallery-locales-browser.json` und `gallery-follow-up-lint.log` im oben genannten Prüfverzeichnis. Veröffentlichung und Migrationsstatus bleiben unverändert: nicht live, Migration nicht in Produktion angewendet.
