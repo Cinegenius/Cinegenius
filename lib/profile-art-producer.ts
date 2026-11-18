@@ -4,12 +4,18 @@ import { PROFILE_ART_REFILL_POLICY as POLICY, isArtUUID, isPlatformArtKind, isAr
 import { ArtPipelineError, readArtStream, withArtDeadline } from "@/lib/profile-art-io";
 
 const themes = ["water", "moon", "sun", "earth", "sky", "ice", "heat", "mountains", "valley", "forest", "desert", "polar landscape"];
+const outlines = {
+  feminine: ["soft shoulder-length waves", "a clean chin-length bob", "hair loosely gathered at the back", "a short layered crop"],
+  masculine: ["a short textured crop", "soft short curls", "neatly side-swept hair", "a close-cropped rounded hair outline"],
+  neutral: ["a softly rounded short haircut", "an asymmetric ear-length bob", "short loose waves", "a simple medium-length hair outline"],
+};
+const palettes = ["muted petrol and sage", "slate blue and soft lavender", "warm terracotta and deep burgundy", "forest green and soft amber", "dusty turquoise and warm gray", "deep plum and muted coral"];
 export function profileArtPrompt(job: ArtJob): string {
   const index = parseInt(job.id.slice(0, 8), 16);
   const common = "Create one original, refined CineGenius profile illustration. Calm contemporary cinematic design, subtle light and depth, a restrained lime accent, rich but harmonious colors. Simple readable composition with generous negative space. No text, logos, signatures, collage, wireframes, line drawings, technical patterns, low-poly geometry or harsh neon background. No real people or copied existing artwork. A genuinely different composition, not a recoloring of an existing motif.";
   return job.kind === "cover"
     ? `${common} Theme: ${themes[index % themes.length]}. Peaceful natural landscape, soft atmospheric layers, believable organic shapes, no animals or people, no fantasy adventure painting. Wide panoramic composition, all important forms inside the central 5:2 crop. Avoid a generic central triangular mountain and oversized sun.`
-    : `${common} One ${job.presentation === "feminine" ? "feminine-presenting" : job.presentation === "masculine" ? "masculine-presenting" : "gender-neutral"} human head-and-shoulders silhouette. Sculpted dark navy shape with a subtle soft rim light, no eyes, mouth, nose detail or skin tones. Clearly readable silhouette and natural hair outline, friendly and understated. No hats, cameras, props or studio scenery. Quiet colored background, not solid bright yellow. Centered square portrait, no cropped head. The presentation is freely selectable by everyone and does not describe a real user's identity.`;
+    : `${common} One ${job.presentation === "feminine" ? "feminine-presenting" : job.presentation === "masculine" ? "masculine-presenting" : "gender-neutral"} human head-and-shoulders silhouette with ${outlines[job.presentation ?? "neutral"][index % 4]}. ${index % 2 ? "A slight three-quarter shoulder turn" : "Relaxed front-facing shoulders"}, head kept centered. Sculpted dark navy shape with a subtle soft rim light, no eyes, mouth, nose detail or skin tones. Clearly readable silhouette and natural hair outline, friendly and understated. No hats, cameras, props or studio scenery. Quiet colored background in ${palettes[Math.floor(index / 4) % palettes.length]}, not solid bright yellow. Centered square portrait, no cropped head. The presentation is freely selectable by everyone and does not describe a real user's identity.`;
 }
 
 export function createProfileArtProducer({ enabled = false, apiKey, fetcher = fetch }: { enabled?: boolean; apiKey?: string; fetcher?: typeof fetch } = {}) {
