@@ -6,6 +6,10 @@
     {
       "path": "/api/cron/listing-freshness",
       "schedule": "0 8 * * *"
+    },
+    {
+      "path": "/api/cron/profile-art",
+      "schedule": "15 * * * *"
     }
   ],
   "git": {

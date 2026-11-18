@@ -1,5 +1,5 @@
 /** Inactive contract for a future exclusive artwork picker. No HTTP route imports it. */
-export const PROFILE_ART_RESERVATIONS_ENABLED = false;
+export const PROFILE_ART_RESERVATIONS_ENABLED = true;
 export const PROFILE_ART_LEASE_SECONDS = 300;
 export type ProfileArtKind = "avatar" | "cover";
 export type ProfileArtFailure = { ok: false; status: number; code: string };
@@ -35,7 +35,8 @@ export function prepareProfileArtCommand(userId: string | null, input: unknown):
 
 /** No confirmation RPC is exposed here: confirmation belongs inside the future atomic profile save. */
 export function profileArtDatabaseFailure(error: { code?: string; message?: string } | null): ProfileArtFailure {
-  const conflicts = new Set(["ART_BUSY", "ART_REVISION", "ART_UNAVAILABLE", "ART_EXPIRED", "ART_KEY_REUSED", "ART_STALE_RETRY"]);
+  const conflicts = new Set(["ART_BUSY", "ART_REVISION", "ART_UNAVAILABLE", "ART_EXPIRED", "ART_KEY_REUSED", "ART_STALE_RETRY", "ART_PROFILE_CHANGED", "ART_NOT_OWNED"]);
+  if (error?.code === "PT429") return failure(429, "ART_RATE_LIMIT");
   if (error?.code === "PT409") return failure(409, conflicts.has(error.message ?? "") ? error!.message! : "ART_CONFLICT");
   if (error?.code === "23505" || error?.code === "55P03") return failure(409, "ART_BUSY");
   if (error?.code === "PT400") return failure(400, "ART_INVALID");

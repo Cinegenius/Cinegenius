@@ -42,7 +42,8 @@ import { calculateProfileCompletion } from "@/lib/profile-completion";
 import { prepareProfileMediaFile, sendProfileMediaFile, PROFILE_MEDIA_ACCEPT, PROFILE_MEDIA_MAX_BYTES, PROFILE_MEDIA_SOURCE_MAX_BYTES } from "@/lib/profile-media-client";
 import { publishProfileUpdated } from "@/lib/profile-update-events";
 import ProfileIdentityFields from "@/components/ProfileIdentityFields";
-import ProfileArtPicker from "@/components/ProfileArtPicker";
+import ExclusiveProfileArtPicker from "@/components/ExclusiveProfileArtPicker";
+import { useExclusiveProfileArt, useProfileArtSaveRequest } from "@/lib/use-exclusive-profile-art";
 import { isAvatarUploadAssociated } from "@/lib/profile-avatar-persistence";
 import { validateProfileSave, type ProfileSaveFieldErrors } from "@/lib/profile-save-validation";
 import { PROFILE_EDITOR_STEPS, profileEditorAvailabilityConfig, profileEditorRequiredMissing, profileEditorStepForErrors, profileEditorStepForHint, profileEditorDraftStep, profileEditorResumeStep, profileSettingsHref, shouldResumeProfileEditorDraft, type ProfileEditorStep } from "@/lib/profile-editor-flow";
@@ -685,6 +686,13 @@ function ProfileEditorContent({ accountId }: { accountId: string }) {
   const coverRef = useRef<HTMLInputElement>(null);
   const [focalPoint, setFocalPoint] = useState<FocalPoint>({ x: 50, y: 33 });
   const [coverOpacity, setCoverOpacity] = useState(0.4);
+  const [savedArt, setSavedArt] = useState({avatar: "", cover: ""});
+  const prepareArtSave = useProfileArtSaveRequest();
+  const avatarArt = useExclusiveProfileArt({accountId, kind: "avatar", value: avatarUrl, savedValue: savedArt.avatar, disabled: saving || avatarUploading,
+    onChange: src => {setAvatarUrl(src); setAvatarPreview(src); setFocalPoint(current => ({...current, x: 50, y: 50, card: {x: 50, y: 50, zoom: 1}})); markEditorChanged();}});
+  const coverArt = useExclusiveProfileArt({accountId, kind: "cover", value: coverImageUrl, savedValue: savedArt.cover, disabled: saving || coverUploading,
+    onChange: src => {setCoverImageUrl(src); setCoverImagePreview(src); setFocalPoint(current => ({...current, cover: {x: 50, y: 50}})); markEditorChanged();}});
+
   const [focalPickerImage, setFocalPickerImage] = useState<string | null>(null);
   const [instagramUrl, setInstagramUrl] = useState("");
   const [tiktokUrl, setTiktokUrl] = useState("");
@@ -804,6 +812,7 @@ function ProfileEditorContent({ accountId }: { accountId: string }) {
         setEditorStep(exists ? 0 : 1);
         if (profile) {
           setProfileUpdatedAt(typeof profile.updated_at === "string" ? profile.updated_at : "");
+          setSavedArt({avatar: profile.avatar_url || "", cover: profile.cover_image_url || ""});
           const availabilityConfig = profile.availability_config as {
             weekends?: boolean;
             night_shoots?: boolean;
@@ -940,6 +949,8 @@ function ProfileEditorContent({ accountId }: { accountId: string }) {
           throw new Error(result.error ?? uiText("Ui.text_2669fecc698980", { value1: String(response.status) }));
         }
         url = result.url as string;
+        setSavedArt(current => ({...current, avatar: url}));
+        if (result.updated_at) setProfileUpdatedAt(result.updated_at);
       } else {
         // A not-yet-created profile has no row to associate yet. Keep the
         // upload as a draft and persist its URL with the first profile save.
@@ -965,6 +976,7 @@ function ProfileEditorContent({ accountId }: { accountId: string }) {
           const result = await response.json().catch(() => ({}));
           if (!isCurrentEditor()) return;
           const savedUrl = result?.profile?.avatar_url;
+          if (response.ok && result?.profile?.updated_at) setProfileUpdatedAt(result.profile.updated_at);
           if (response.ok && isAvatarUploadAssociated(savedUrl, uploadId)) {
             setAvatarUrl(savedUrl);
             setAvatarPreview(savedUrl);
@@ -1240,7 +1252,7 @@ function ProfileEditorContent({ accountId }: { accountId: string }) {
       const res = await fetch("/api/profile", {
         method: isNew ? "POST" : "PATCH",
         headers: { "Content-Type": "application/json", "X-Profile-Account": accountId },
-        body: JSON.stringify(isNew ? {
+        body: JSON.stringify(prepareArtSave(isNew ? {
           ...commonPayload,
           avatar_url:     avatarUrl || null,
           portfolio_images: [],
@@ -1249,7 +1261,7 @@ function ProfileEditorContent({ accountId }: { accountId: string }) {
         } : {
           ...commonPayload,
           slug:           form.slug.trim().toLowerCase().replace(/[^a-z0-9-]/g, "-").replace(/-+/g, "-").replace(/^-|-$/g, "") || null,
-        }),
+        }, profileUpdatedAt || null, [await avatarArt.claim(), await coverArt.claim()])),
       });
       const baseResult = await res.json().catch(() => ({}));
       if (!isCurrentEditor()) return;
@@ -1271,7 +1283,9 @@ function ProfileEditorContent({ accountId }: { accountId: string }) {
         return;
       }
       if (isNew) setProfileExists(true);
-      setProfileUpdatedAt(new Date().toISOString());
+      setProfileUpdatedAt(baseResult.profile?.updated_at ?? baseResult.updated_at ?? "");
+      setSavedArt({avatar: avatarUrl, cover: coverImageUrl});
+      avatarArt.saved(); coverArt.saved();
       setEditorStep(0);
       setEditorRevision(0);
       const url = avatarUrl || null;
@@ -1848,11 +1862,7 @@ function ProfileEditorContent({ accountId }: { accountId: string }) {
                   </div>
                   <input ref={fileRef} type="file" accept={PROFILE_MEDIA_ACCEPT} className="hidden" onChange={handleAvatarChange} />
                   <p className="mt-2 text-xs text-text-muted">{profileMediaLimitsText}</p>
-                  <ProfileArtPicker kind="avatar" value={avatarUrl} disabled={avatarUploading || saving} onChange={src => {
-                    setAvatarUrl(src); setAvatarPreview(src);
-                    setFocalPoint(current => ({ ...current, x: 50, y: 50, card: { x: 50, y: 50, zoom: 1 } }));
-                    markEditorChanged();
-                  }} />
+                  <ExclusiveProfileArtPicker {...avatarArt.props} />
                 </div>
 
                 {/* Profilfotos — direkt unter Avatar */}
@@ -1985,11 +1995,7 @@ function ProfileEditorContent({ accountId }: { accountId: string }) {
                       <p className="text-xs text-text-muted">{uiText("Ui.text_50631b89c1473b")}</p>
                     </button>
                   )}
-                  <ProfileArtPicker kind="cover" value={coverImageUrl} disabled={coverUploading || saving} onChange={src => {
-                    setCoverImageUrl(src); setCoverImagePreview(src);
-                    setFocalPoint(current => ({ ...current, cover: { x: 50, y: 50 } }));
-                    markEditorChanged();
-                  }} />
+                  <ExclusiveProfileArtPicker {...coverArt.props} />
                 </div>}
 
                 </div>}

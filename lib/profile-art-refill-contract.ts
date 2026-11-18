@@ -1,6 +1,6 @@
 /** Platform-owned decorative artwork only. Never a member upload or identity record. */
-export const PROFILE_ART_REFILL_ENABLED = false;
-export const PROFILE_ART_READER_ENABLED = false;
+export const PROFILE_ART_REFILL_ENABLED = true;
+export const PROFILE_ART_READER_ENABLED = true;
 export const PROFILE_ART_BUCKET = "platform-profile-art";
 export const PROFILE_ART_REFILL_POLICY = Object.freeze({
   version: "cg-profile-art-v2" as const,

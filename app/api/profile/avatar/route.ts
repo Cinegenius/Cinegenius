@@ -72,18 +72,21 @@ export async function POST(req: NextRequest) {
     return json({ error: tResponse('System.m_4b512cdc5e47') }, 500);
   }
 
+  let savedUpdatedAt: string | null = null;
   const outcome = await persistAvatarAssociation({
     url: savedUrl,
     path,
     update: async () => {
       let update = db.from("profiles").update({ avatar_url: savedUrl, updated_at: new Date().toISOString() }).eq("user_id", userId);
       update = current.avatar_url == null ? update.is("avatar_url", null) : update.eq("avatar_url", current.avatar_url);
-      const { data, error } = await update.select("user_id, avatar_url").maybeSingle();
+      const { data, error } = await update.select("user_id, avatar_url, updated_at").maybeSingle();
       if (error) console.error("[profile avatar] association failed:", error.message);
+      if (data?.updated_at) savedUpdatedAt = data.updated_at;
       return { updated: !!data, error };
     },
     readCurrentUrl: async () => {
-      const { data, error } = await db.from("profiles").select("avatar_url").eq("user_id", userId).maybeSingle();
+      const { data, error } = await db.from("profiles").select("avatar_url, updated_at").eq("user_id", userId).maybeSingle();
+      if (!error && data?.avatar_url === savedUrl) savedUpdatedAt = data.updated_at ?? null;
       return { ok: !error, url: data?.avatar_url ?? null };
     },
     removeUnusedAsset: (unusedPath) => removeUnusedProtectedMedia(userId, unusedPath),
@@ -98,5 +101,5 @@ export async function POST(req: NextRequest) {
 
   revalidateTag("profiles", { expire: 0 });
   revalidateTag("creator-directory", { expire: 0 });
-  return json({ url: savedUrl, saved: true });
+  return json({ url: savedUrl, saved: true, updated_at: savedUpdatedAt });
 }

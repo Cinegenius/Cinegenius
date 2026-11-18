@@ -1,3 +1,6 @@
+> Current activation and save contract: [profile-art-activation.md](profile-art-activation.md).
+> The inactive descriptions below document the earlier foundation.
+
 # Dormant platform-art producer, queue, storage and reader
 
 This is a source implementation, **not an active service or available inventory**.

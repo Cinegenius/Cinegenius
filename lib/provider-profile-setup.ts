@@ -5,7 +5,7 @@ import { occupationReference, orderPositionsByPrimary, primaryOccupationForPosit
 import { selectedCrewOccupations } from "./crew-occupations";
 import { defaultProfileAvatar } from "./profile-art";
 
-export type SetupProfileIdentity = { profile_type?: string | null; profile_types?: string[] | null; crew?: Record<string, unknown>; avatar_url?: string | null; cover_image_url?: string | null };
+export type SetupProfileIdentity = { updated_at?: string | null; profile_type?: string | null; profile_types?: string[] | null; crew?: Record<string, unknown>; avatar_url?: string | null; cover_image_url?: string | null };
 
 /** Only new personal profiles receive a suggestion. An explicit empty choice is final. */
 export function initializeSetupProfileArt(draft: QuickStartDraft, accountId: string, existing: SetupProfileIdentity | null): QuickStartDraft {

@@ -1,3 +1,5 @@
+import { saveProfileWithArt } from "@/lib/profile-art-save-server";
+import { profileArtDatabaseFailure } from "@/lib/profile-art-reservations";
 import { hasInvalidOccupationForm, preserveOccupationForm } from "@/lib/occupation-form";
 import { validPronouns } from "@/lib/profile-identity";
 import { placeWriteFields } from "@/lib/places/catalog";
@@ -247,11 +249,17 @@ export async function POST(req: NextRequest) {
     payload,
     PROFILE_OPTIONAL_COLUMN_SET,
     async (nextPayload) => {
-      const result = await db.from("profiles").upsert(nextPayload, { onConflict: "user_id" }).select().single();
+      const result = body.profileArt !== undefined
+        ? await saveProfileWithArt(userId, nextPayload, body.profileArt, true)
+        : await db.from("profiles").upsert(nextPayload, { onConflict: "user_id" }).select().single();
       return { data: result.data as Record<string, unknown> | null, error: result.error };
     },
   );
   if (saveResult.error) {
+      if (body.profileArt !== undefined || saveResult.error.message?.startsWith("ART_")) {
+        const failure = profileArtDatabaseFailure(saveResult.error);
+        return privateNoStoreJson({error: tResponse(failure.code === "ART_EXPIRED" ? "ExclusiveProfileArt.expired" : "ExclusiveProfileArt.error"), code: failure.code}, failure.status);
+      }
     console.error("[profile POST] database save failed");
     return NextResponse.json({ error: tResponse("System.requestFailed"), code: saveResult.error.code }, { status: 500 });
   }
@@ -427,12 +435,18 @@ export async function PATCH(req: NextRequest) {
       payload,
       PROFILE_OPTIONAL_COLUMN_SET,
       async (nextPayload) => {
-        const result = await db.from("profiles").update(nextPayload).eq("user_id", userId).select("user_id").maybeSingle();
-        return { data: result.data as { user_id: string } | null, error: result.error };
+        const result = body.profileArt !== undefined
+          ? await saveProfileWithArt(userId, nextPayload, body.profileArt, false)
+          : await db.from("profiles").update(nextPayload).eq("user_id", userId).select("user_id, updated_at").maybeSingle();
+        return { data: result.data as { user_id: string; updated_at?: string } | null, error: result.error };
       },
     );
 
     if (saveResult.error) {
+      if (body.profileArt !== undefined || saveResult.error.message?.startsWith("ART_")) {
+        const failure = profileArtDatabaseFailure(saveResult.error);
+        return privateNoStoreJson({error: tResponse(failure.code === "ART_EXPIRED" ? "ExclusiveProfileArt.expired" : "ExclusiveProfileArt.error"), code: failure.code}, failure.status);
+      }
       console.error("[profile PATCH] database save failed");
       return NextResponse.json({ error: tResponse("System.requestFailed"), code: saveResult.error.code }, { status: 500 });
     }
@@ -440,9 +454,9 @@ export async function PATCH(req: NextRequest) {
 
     revalidateTag("profiles", { expire: 0 });
     if (saveResult.unavailableFields.length > 0) {
-      return NextResponse.json({ success: true, unavailableFields: saveResult.unavailableFields });
+      return NextResponse.json({ success: true, updated_at: saveResult.data.updated_at, unavailableFields: saveResult.unavailableFields });
     }
-    return NextResponse.json({ success: true, unavailableFields: [] });
+    return NextResponse.json({ success: true, updated_at: saveResult.data.updated_at, unavailableFields: [] });
   } catch {
     console.error("[profile PATCH] unexpected failure");
     return NextResponse.json({ error: tResponse('System.requestFailed') }, { status: 500 });

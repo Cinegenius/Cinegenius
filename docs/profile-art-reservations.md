@@ -1,3 +1,6 @@
+> Current activation and save contract: [profile-art-activation.md](profile-art-activation.md).
+> The inactive descriptions below document the earlier foundation.
+
 # Exclusive personal artwork: inactive reservation foundation
 
 This package prepares account-bound reservations for **both avatars and covers**.

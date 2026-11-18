@@ -24,7 +24,7 @@ const queue: ArtQueue = {
   fail: async (job, code) => { await rpc("profile_art_fail_refill", {p_job: job.id, p_token: job.token, p_code: code}); },
 };
 
-/** Internal worker only. No public route, Server Action, scheduler or user input. */
+/** Secret-authenticated scheduled worker; no user prompts or private photographs. */
 export async function runServerProfileArtRefill(signal?: AbortSignal) {
   if (!PROFILE_ART_REFILL_ENABLED) return {status: "disabled" as const, inventoryReady: false as const};
   const storage = createProfileArtStorage(db.storage);

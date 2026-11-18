@@ -292,6 +292,8 @@ export default clerkMiddleware(async (auth, request) => {
   } else if (request.method === "GET" && request.nextUrl.pathname === "/api/cron/listing-freshness") {
     // This exact scheduler route checks CRON_SECRET itself before any work.
     // Other cron paths and methods retain the normal session protection.
+  } else if (["GET", "POST", "HEAD"].includes(request.method) && request.nextUrl.pathname === "/api/cron/profile-art") {
+    // Exact fixed-input artwork worker; the handler verifies a scoped machine secret.
   } else if (isGeniePost) {
     // This exact endpoint already required authentication before its IP limit.
     // Origin protection above and the handler's own session/quota checks still

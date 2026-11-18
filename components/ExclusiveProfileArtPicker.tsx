@@ -24,15 +24,16 @@ export type ExclusiveProfileArtPickerProps = {
   onSelect: (artworkId: string) => void;
   onRestoreSaved: () => void;
   onRetry: () => void;
+  onOpen?: () => void;
 };
 
 /** A controlled view only: no identity, leases, timers, requests or persistence.
- * Opening/rerendering never calls the owner. The owner binds all props/results to
+ * Opening requests a read only; rendering never reserves. The owner binds results to
  * its current account/form, enforces deadlines and validates inventory/media.
  * Existing upload/removal actions remain in the surrounding profile form. */
 export default function ExclusiveProfileArtPicker({
   kind, options, savedChoice, confirmedChoice, pendingArtworkId, status,
-  disabled = false, onSelect, onRestoreSaved, onRetry,
+  disabled = false, onSelect, onRestoreSaved, onRetry, onOpen,
 }: ExclusiveProfileArtPickerProps) {
   const t = useTranslations("ExclusiveProfileArt");
   const id = useId();
@@ -41,7 +42,7 @@ export default function ExclusiveProfileArtPicker({
   const confirmed = status === "expired" ? null : confirmedChoice;
   const savedIsSelected = Boolean(savedChoice && (!confirmed || (savedChoice.artworkId && savedChoice.artworkId === confirmed.artworkId)));
   const pending = Boolean(pendingArtworkId);
-  const choicesDisabled = disabled || pending || status === "loading" || status === "expired";
+  const choicesDisabled = disabled || pending || status === "loading";
   const visibleOptions = options.slice(0, 12).filter(option => option.artworkId !== savedChoice?.artworkId);
   // A confirmed selection may have left the ready inventory; it must stay visible.
   const separateConfirmed = confirmed && !savedIsSelected && !visibleOptions.some(option => option.artworkId === confirmed.artworkId);
@@ -63,7 +64,7 @@ export default function ExclusiveProfileArtPicker({
     </label>;
   };
 
-  return <details data-no-draft className="mt-3 min-w-0 rounded-xl border border-border bg-bg-primary px-3" onToggle={event => setOpen(event.currentTarget.open)}>
+  return <details data-no-draft className="mt-3 min-w-0 rounded-xl border border-border bg-bg-primary px-3" onToggle={event => { setOpen(event.currentTarget.open); if (event.currentTarget.open) onOpen?.(); }}>
     <summary className="flex min-h-11 cursor-pointer list-none items-center justify-between gap-2 text-sm text-text-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold [&::-webkit-details-marker]:hidden">
       <span className="min-w-0 break-words">{title}</span><ChevronDown size={16} aria-hidden="true" className={`shrink-0 ${open ? "rotate-180" : ""}`} />
     </summary>
