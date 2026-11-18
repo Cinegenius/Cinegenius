@@ -1,19 +1,6 @@
 import { searchKey } from "./unified-search-matching";
 import type { SearchWish } from "./unified-search";
 
-const offerModeTerms = new Map<string, "rent" | "sale">([
-  ...["Miete", "mieten", "Vermietung", "zur Miete", "zum Ausleihen", "rent", "rental", "for rent", "alquiler", "noleggio", "pronájem", "bérlés", "huur", "uthyrning", "location", "louer", "wynajem", "aluguer", "alugar", "租赁", "出租", "レンタル", "대여", "аренда", "оренда"].map(term => [searchKey(term), "rent"] as const),
-  ...["Kauf", "kaufen", "Verkauf", "sale", "for sale", "buy", "venta", "vendita", "prodej", "eladó", "koop", "försäljning", "vente", "sprzedaż", "venda", "出售", "販売", "판매", "продажа", "продаж"].map(term => [searchKey(term), "sale"] as const),
-]);
-
-/** Structured public offer modes are evidence even when the description never
- * repeats a rental phrase. Missing mode data is not guessed from a price. */
-function declaredOfferMode(row: Record<string, unknown>): string | undefined {
-  const market = row.marketplace && typeof row.marketplace === "object" ? row.marketplace as Record<string, unknown> : {};
-  if (["rent", "sale", "both", "service"].includes(String(market.mode))) return String(market.mode);
-  return ({ miete: "rent", kauf: "sale", beides: "both", dienstleistung: "service" } as Record<string, string>)[String(row.rental_type)];
-}
-
 /** Only explicitly public, search-relevant fields. Never stringify whole records,
  * private metadata, contact details, coordinates or moderation evidence. */
 export function publicSearchText(row: Record<string, unknown>): string[] {
@@ -47,18 +34,10 @@ function declaration(text: string, term: string): -1 | 0 | 1 {
 export function matchesSearchRequirements(row: Record<string, unknown>, wish: SearchWish): boolean {
   const texts = publicSearchText(row);
   const states = (term: string) => texts.map(text => declaration(text, term));
-  const mode = declaredOfferMode(row);
   return (wish.requirements ?? []).every(alternatives => {
-    const evidence = alternatives.flatMap(term => {
-      const requested = offerModeTerms.get(searchKey(term));
-      if (mode && requested) return [mode === "both" || mode === requested ? 1 : 0];
-      return states(term);
-    });
+    const evidence = alternatives.flatMap(states);
     return evidence.includes(1) && !evidence.includes(-1);
-  }) && !(wish.exclude ?? []).some(term => {
-    const excluded = offerModeTerms.get(searchKey(term));
-    return mode && excluded ? mode === "both" || mode === excluded : states(term).includes(1);
-  });
+  }) && !(wish.exclude ?? []).some(term => states(term).includes(1));
 }
 
 /** Evidence ordering, never a quality rating. Distance only breaks equally good

@@ -10,13 +10,11 @@ import type { SearchPlace, SearchWish } from "./unified-search";
 import { isWholeAreaQuery } from "./unified-search-areas";
 import { departmentHeadTerms, isDepartmentHeadsQuery } from "./unified-search-production";
 import { cateringSearch, CATERING_SEARCH_TERMS } from "./unified-search-catering";
-import { searchTextKey, occupationTextKey } from "./search-text-key";
-import { searchConcept, searchJargon, vocabularyDepartment, vocabularyRole } from "./unified-search-vocabulary";
 
 // Country group facts: Unicode CLDR supplemental/territoryContainment.json (UN M49).
 // https://github.com/unicode-org/cldr-json/blob/main/cldr-json/cldr-core/supplemental/territoryContainment.json
 export const continentCountries = (code: string): string[] => continents[code as keyof typeof continents] ?? [];
-export const searchKey = searchTextKey;
+export const searchKey = (value: unknown) => String(value ?? "").normalize("NFKD").replace(/\p{M}/gu, "").toLowerCase().replace(/ß/g, "ss").replace(/[^\p{L}\p{N}]+/gu, " ").trim();
 
 /** Search interpretation only, never a stored identity update. Prefer a current
  * city name to historical aliases (e.g. Berlin vs North Canton's former name). */
@@ -38,14 +36,14 @@ const synonyms: Record<string, string[]> = {
   polizei: ["Polizei", "Police", "Polizia", "Policía", "Policie", "Rendőrség", "Politie", "Polis", "Streifenwagen", "Streifenpolizist"],
 };
 
-const cameraPeople = ["Director of Photography (DoP)", "Kameramann", "Camera Operator", "A-Kamera Operator", "B-Kamera Operator", "C-Kamera Operator"];
+const cameraPeople = ["Director of Photography (DoP)", "Kameramann", "Camera Operator"];
 const crewSynonyms: Record<string, string[]> = {
   kameramann: cameraPeople, kameramanner: cameraPeople, kamerafrau: cameraPeople, kamerafrauen: cameraPeople,
   cameraman: cameraPeople, cameramen: cameraPeople, camerawoman: cameraPeople, cinematographer: cameraPeople,
 };
 // Gender punctuation is not part of an occupation. Keep the original labels in
 // returned terms so stored IDs/positions and member-written text are untouched.
-export const occupationKey = occupationTextKey;
+export const occupationKey = (value: string) => searchKey(value.replace(/(?:\*|:|\/)innen\b/giu, "").replace(/(?:\*|:|\/)in\b/giu, "").replace(/\*frau\b/giu, ""));
 const occupationKeys = (value: string) => {
   const key = occupationKey(value);
   return [key, ...(key.endsWith("innen") ? [key.slice(0, -5)] : key.endsWith("in") ? [key.slice(0, -2)] : [])];
@@ -55,8 +53,7 @@ const occupationKeys = (value: string) => {
 export function searchDepartment(query: string, locale = "de", taxonomy?: (key: string) => string) {
   const key = searchKey(query);
   return key ? departments.find(dept => [dept.id, dept.label, ...Object.values(dept.labels), getDeptLabel(dept, locale, undefined, taxonomy)]
-    .some(label => searchKey(label) === key)) ?? vocabularyDepartment(query)
-    ?? (searchConcept(query)?.query === "Kostüm" ? departments.find(dept => dept.id === "kostuem") : undefined) : undefined;
+    .some(label => searchKey(label) === key)) : undefined;
 }
 
 export function wishSearchTerms(wish: SearchWish, locale = "de", taxonomy?: (key: string) => string): string[] {
@@ -64,11 +61,7 @@ export function wishSearchTerms(wish: SearchWish, locale = "de", taxonomy?: (key
   if (wish.area === "companies" && !wish.department && cateringSearch(wish.query)) return CATERING_SEARCH_TERMS;
   if (!wish.department && isWholeAreaQuery(wish.area, wish.query)) return [];
   const crew = wish.area === "crew" || wish.area === "all";
-  const concept = searchConcept(wish.query);
-  const jargon = crew ? searchJargon(wish.query) : undefined;
-  const role = crew ? vocabularyRole(wish.query) : undefined;
-  const terms = wish.query ? [...(jargon?.terms || (crew && crewSynonyms[searchKey(wish.query)])
-    || concept?.terms || synonyms[searchKey(wish.query)] || (role ? [role.label] : undefined) || [wish.query])] : [];
+  const terms = wish.query ? [...((crew && crewSynonyms[searchKey(wish.query)]) || synonyms[searchKey(wish.query)] || [wish.query])] : [];
   const requested = [...terms];
   if (crew) {
     const dept = departments.find(d => d.id === wish.department) ?? searchDepartment(wish.query, locale, taxonomy);
@@ -104,11 +97,11 @@ export function wishMarketplaceCategories(query: string, t: (key: string) => str
     const group = marketplaceDepartments.find(dept => dept.id === service.department)?.groups.find(group => group.id === service.subcategory);
     if (group) values.push(...groupValues(group));
   }
-  // Generic lamps include every actual light source, not just entries whose
-  // descriptions contain "Lampe". Control desks/DMX nodes remain separate.
-  for (const groupId of searchConcept(query)?.groups ?? []) {
-    const group = marketplaceDepartments.flatMap(dept => dept.groups).find(group => group.id === groupId);
-    if (group) values.push(...groupValues(group));
+  // A broad costume request includes the current clothing group. A particular
+  // hat, camera brand or vehicle must not expand to every sibling in its group.
+  if (["kostum", "kostuem", "costume"].includes(key)) {
+    const clothing = marketplaceDepartments.find(dept => dept.id === "kostuem")?.groups.find(group => group.id === "kostuem-kleidung");
+    if (clothing) values.push(...groupValues(clothing));
   }
   for (const department of marketplaceDepartments) {
     if ([department.id, department.label, t(`categories.${department.id}`)].some(label => searchKey(label) === key)) values.push(...deptValues(department));
@@ -117,30 +110,6 @@ export function wishMarketplaceCategories(query: string, t: (key: string) => str
     }
   }
   return [...new Set(values)];
-}
-
-export const needsMarketplaceEvidence = (query: string) => !!searchConcept(query);
-
-/** SQL first selects possible matches; verify actual words before ranking,
- * pagination and map projection. "Hut" must not match "Schutz", and the English
- * noun "hat" must not match the German auxiliary verb in a description. */
-export function matchesMarketplaceConcept(row: Record<string, unknown>, query: string): boolean {
-  const concept = searchConcept(query);
-  if (!concept) return true;
-  const category = marketplaceCategory(String(row.category ?? ""));
-  if (category?.subcategory && concept.groups?.includes(category.subcategory)) return true;
-  const title = [row.title, row.category].filter(value => typeof value === "string").join(" ");
-  const matches = (text: string, term: string) => {
-    const needle = searchKey(term).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-    if (!needle) return false;
-    // Unsegmented CJK text uses substrings; alphabetic words need boundaries.
-    const alphabetic = /[\p{Script=Latin}\p{Script=Cyrillic}]/u.test(needle);
-    const prefix = ["hut", "hute", "lampe", "leuchte"].includes(needle) ? "[\\p{L}]*" : "";
-    const suffix = ["lampe", "leuchte"].includes(needle) ? "n?" : "";
-    return alphabetic ? new RegExp(`(?:^|[^\\p{L}\\p{N}\\p{M}])${prefix}${needle}${suffix}(?=$|[^\\p{L}\\p{N}\\p{M}])`, "u").test(searchKey(text)) : searchKey(text).includes(needle);
-  };
-  return (concept.terms ?? [concept.query]).some(term => matches(title, term)
-    || (searchKey(term) !== "hat" && matches(String(row.description ?? ""), term)));
 }
 
 export function isOccupationWish(wish: SearchWish, terms: string[]) {

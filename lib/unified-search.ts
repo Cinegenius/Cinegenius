@@ -83,19 +83,13 @@ export const searchGroupKey = (group: Pick<SearchGroup, "area" | "wishIndex" | "
 
 export const SEARCH_WISH_SCHEMA = { type: "array", maxItems: MAX_SEARCHES, items: { type: "object", additionalProperties: false,
   properties: {
-    area: { type: "string", enum: ["all", ...SEARCH_AREAS] }, query: { type: "string" }, department: { type: "string", description: "Empty except for an explicitly requested whole crew department. Never set for objects or locations." },
-    quantity: { type: ["integer", "null"], minimum: 1, maximum: 999 }, recommended: { type: "boolean", description: "False for every item the user requested. True only for an extra inferred production suggestion." },
-    requirements: { type: "array", description: "Only additional explicitly requested properties. Never repeat the object, role or query here; default []. A rental/sale wish can use its offer-mode term, not an availability claim.", maxItems: 5, items: { type: "array", minItems: 1, maxItems: 4, items: { type: "string", maxLength: 60 } } },
+    area: { type: "string", enum: ["all", ...SEARCH_AREAS] }, query: { type: "string" }, department: { type: "string" },
+    quantity: { type: ["integer", "null"], minimum: 1, maximum: 999 }, recommended: { type: "boolean" },
+    requirements: { type: "array", maxItems: 5, items: { type: "array", minItems: 1, maxItems: 4, items: { type: "string", maxLength: 60 } } },
     exclude: { type: "array", maxItems: 6, items: { type: "string", maxLength: 60 } },
-    places: { type: "array", maxItems: 4, items: { anyOf: [
-      { type: "object", additionalProperties: false, properties: {
-        city: { type: "string" }, country: { type: "string", enum: ["", ...COUNTRY_CODES], description: "Set ONLY if the user explicitly named a country. A city alone, including Munich/Berlin, requires an empty string." },
-        continent: { type: "string", enum: [""] }, radiusKm: { type: "integer", minimum: 0, maximum: 200 },
-      }, required: ["city", "country", "continent", "radiusKm"] },
-      { type: "object", additionalProperties: false, properties: {
-        city: { type: "string", enum: [""] }, country: { type: "string", enum: [""] },
-        continent: { type: "string", enum: CONTINENTS }, radiusKm: { type: "integer", enum: [0] },
-      }, required: ["city", "country", "continent", "radiusKm"] },
-    ] } },
+    places: { type: "array", maxItems: 4, items: { type: "object", additionalProperties: false, properties: {
+      city: { type: "string" }, country: { type: "string", enum: ["", ...COUNTRY_CODES] },
+      continent: { type: "string", enum: ["", ...CONTINENTS] }, radiusKm: { type: "integer", minimum: 0, maximum: 200 },
+    }, required: ["city", "country", "continent", "radiusKm"] } },
   }, required: ["area", "query", "department", "places", "quantity", "recommended", "requirements", "exclude"],
 } };

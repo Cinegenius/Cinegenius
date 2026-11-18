@@ -215,3 +215,15 @@ Crew result row correction, 14 November 2026: Keep the compact count, Crew, Loca
 - Offer four avatars per presentation and twelve covers, with an additional reserve. Refill after confirmed assignment, not page opening. One-time assignment must be backed by durable ownership and current availability; never recycle shared legacy artwork as exclusive. Provider/quality failures must not be reported as available stock.
 - A picture change retains prior ownership. Explicit permanent deletion requires confirmation and profile Save, blocks future use/reassignment, and retains a duplicate-prevention tombstone. Preserve interrupted input and old clients; do not make ordinary photo uploads destructive.
 - Verschenken/Tauschen is a future proposal, not an active feature. Any later transfer must change a single owner atomically and require the actual owner's confirmation. See `docs/profile-art-stock.md` for the Web/native contract and validation boundary.
+
+## Classic artwork replacement (latest operator correction, 18 November 2026)
+
+- Markus requests immediate replacement of both avatars and covers, one at a time,
+  using the original 17 November flat graphic style. Preserve the editable sources,
+  existing member photos, claimed artwork and exclusive assignment rules. Retire
+  rejected free stock from selection without deleting originals or owner records.
+- Prefer simple matte two-dimensional silhouettes and broad graphic nature scenes.
+  Do not generate realistic/sculptural heads, plastic busts or photographic/painted
+  landscapes. The independent review must enforce this style before replenishment.
+- Unrelated work remains paused; the Smart-language branch is not part of this
+  artwork publication. See `design/profile-art/2026-11-18-classic/README.md`.

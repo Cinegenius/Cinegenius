@@ -14,7 +14,7 @@ import { countryCode, PLACE_COLUMNS, placeDisplay } from "@/lib/places/core";
 import { publicProjectMedia } from "@/lib/project-media-rights";
 import { listingPriceLabel } from "@/lib/listing-price";
 import { COMPANY_CATEGORIES } from "@/lib/companyCategories";
-import { containsLiteral, exactLiteral, filterLiteral, isOccupationWish, matchesMarketplaceConcept, matchesWishPlaces, needsMarketplaceEvidence, searchKey, wishMarketplaceCategories, wishSearchTerms } from "@/lib/unified-search-matching";
+import { containsLiteral, exactLiteral, filterLiteral, isOccupationWish, matchesWishPlaces, searchKey, wishMarketplaceCategories, wishSearchTerms } from "@/lib/unified-search-matching";
 import { compareNearby, nearbyDistance, nearbyOrigins } from "@/lib/unified-search-nearby";
 import { isDepartmentHeadsQuery, matchingDepartmentHead, departmentHeadTerms, isProductionCrewQuery, matchingProductionRole, productionCrewTerms, crewSearchSegments } from "@/lib/unified-search-production";
 import { matchesSearchRequirements, searchMatchScore } from "@/lib/unified-search-requirements";
@@ -42,7 +42,7 @@ export async function searchWishLabel(wish: SearchWish, locale: string) {
 }
 
 function queryFor(area: SearchArea, wish: SearchWish, terms: string[], categories: string[], map = false) {
-  const evidence = !!(wish.requirements?.length || wish.exclude?.length || (area === "marketplace" && needsMarketplaceEvidence(wish.query)));
+  const evidence = !!(wish.requirements?.length || wish.exclude?.length);
   const patterns = (columns: string[]) => terms.flatMap(term => columns.map(column => `${column}.ilike.${containsLiteral(term)}`));
   const kinds = LISTING_AREAS[area];
   const filtered = <T extends { or: (filters: string) => T }>(query: T, filters: string[]) => filters.length ? query.or(filters.join(",")) : query;
@@ -191,7 +191,6 @@ async function readGroup(plan: SearchPlan, wishIndex: number, area: SearchArea, 
       if (productionCrew && !matchingProductionRole(row, segment)) continue;
       if (catering && !matchesCateringSearch(row, catering)) continue;
       if (!matchesSearchRequirements(row, wish)) continue;
-      if (area === "marketplace" && !matchesMarketplaceConcept(row, wish.query)) continue;
       row = geographyRow(row, area);
       if (matchesWishPlaces(row, wish)) {
         localExists = true;
