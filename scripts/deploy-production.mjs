@@ -71,6 +71,6 @@ execFileSync("npm", ["run", "check:i18n"], { stdio: "inherit" });
 // redacts sensitive values in local files; a prebuilt upload would then compile with
 // placeholders instead of the real production configuration.
 const deployArgs = ["vercel", "deploy", "--prod", "--yes", "--logs"];
-if (stage) deployArgs.push("--skip-domain", "--env", "LISTING_FRESHNESS_ENABLED=false");
+if (stage) deployArgs.push("--skip-domain", "--env", "LISTING_FRESHNESS_ENABLED=false", "--env", "PROFILE_ART_WORKER_ENABLED=false");
 if (prepareLocales) deployArgs.push("--build-env", "CG_PREPARE_LOCALES=1");
 execFileSync("npx", deployArgs, { stdio: "inherit" });

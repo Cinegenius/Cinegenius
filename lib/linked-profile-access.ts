@@ -1,5 +1,6 @@
 import "server-only";
 import { db } from "@/lib/db";
+import { profileAccess } from "@/lib/profile-privacy";
 
 /** Blocked sources are excluded before community pagination and file access. */
 export async function blockedMediaOwnerIds(viewerId: string | null, signal?: AbortSignal): Promise<string[]> {
@@ -28,9 +29,8 @@ export async function visibleLinkedProfileIds(ids: Array<string | null>, viewerI
     viewerId ? db.from("friendships").select("sender_id").eq("receiver_id", viewerId).eq("status", "accepted").in("sender_id", unique) : empty,
   ]);
   if ([settings, blockedBy, blocks, friendsFrom, friendsTo].some((result) => result.error)) return own;
-  const ghostIds = new Set((settings.data ?? []).filter(row => row.ghost_mode).map(row => row.user_id));
-  const privateIds = new Set((settings.data ?? []).filter((row) => row.profile_visibility === "private").map((row) => row.user_id));
+  const byId = new Map((settings.data ?? []).map(row => [row.user_id, row]));
   const blocked = new Set([...(blockedBy.data ?? []).map((row) => row.blocker_id), ...(blocks.data ?? []).map((row) => row.blocked_id)]);
   const friends = new Set([...(friendsFrom.data ?? []).map((row) => row.receiver_id), ...(friendsTo.data ?? []).map((row) => row.sender_id)]);
-  return new Set(unique.filter((id) => id === viewerId || (!ghostIds.has(id) && !blocked.has(id) && (!privateIds.has(id) || friends.has(id)))));
+  return new Set(unique.filter(id => profileAccess(byId.get(id) ?? null, id, viewerId, friends.has(id), blocked.has(id)).profile));
 }

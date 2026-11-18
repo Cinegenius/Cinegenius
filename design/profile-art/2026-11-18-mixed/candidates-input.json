@@ -1,0 +1,530 @@
+[
+  {
+    "id": "mixed-01-avatar",
+    "kind": "avatar",
+    "pair": 1,
+    "presentation": "masculine",
+    "style": "studio",
+    "name": "Abendprofil",
+    "source": "2026-11-18-mixed/01-avatar.svg",
+    "origin": "new study"
+  },
+  {
+    "id": "mixed-01-cover",
+    "kind": "cover",
+    "pair": 1,
+    "presentation": null,
+    "style": "studio",
+    "name": "Wasser",
+    "source": "2026-11-18-mixed/01-cover.svg",
+    "origin": "new study"
+  },
+  {
+    "id": "mixed-02-avatar",
+    "kind": "avatar",
+    "pair": 2,
+    "presentation": "feminine",
+    "style": "paper",
+    "name": "Faltenlicht",
+    "source": "2026-11-18-mixed/02-avatar.svg",
+    "origin": "new study"
+  },
+  {
+    "id": "mixed-02-cover",
+    "kind": "cover",
+    "pair": 2,
+    "presentation": null,
+    "style": "paper",
+    "name": "Mond",
+    "source": "2026-11-18-mixed/02-cover.svg",
+    "origin": "new study"
+  },
+  {
+    "id": "mixed-03-avatar",
+    "kind": "avatar",
+    "pair": 3,
+    "presentation": "neutral",
+    "style": "flow",
+    "name": "Lagune",
+    "source": "2026-11-18-mixed/03-avatar.svg",
+    "origin": "new study"
+  },
+  {
+    "id": "mixed-03-cover",
+    "kind": "cover",
+    "pair": 3,
+    "presentation": null,
+    "style": "flow",
+    "name": "Sonne",
+    "source": "2026-11-18-mixed/03-cover.svg",
+    "origin": "new study"
+  },
+  {
+    "id": "mixed-04-avatar",
+    "kind": "avatar",
+    "pair": 4,
+    "presentation": "masculine",
+    "style": "blocks",
+    "name": "Terrakotta",
+    "source": "2026-11-18-mixed/04-avatar.svg",
+    "origin": "new study"
+  },
+  {
+    "id": "mixed-04-cover",
+    "kind": "cover",
+    "pair": 4,
+    "presentation": null,
+    "style": "blocks",
+    "name": "Erde",
+    "source": "2026-11-18-mixed/04-cover.svg",
+    "origin": "new study"
+  },
+  {
+    "id": "mixed-05-avatar",
+    "kind": "avatar",
+    "pair": 5,
+    "presentation": "feminine",
+    "style": "soft",
+    "name": "Blaue Stunde",
+    "source": "2026-11-18-mixed/05-avatar.svg",
+    "origin": "new study"
+  },
+  {
+    "id": "mixed-05-cover",
+    "kind": "cover",
+    "pair": 5,
+    "presentation": null,
+    "style": "soft",
+    "name": "Himmel",
+    "source": "2026-11-18-mixed/05-cover.svg",
+    "origin": "new study"
+  },
+  {
+    "id": "mixed-06-avatar",
+    "kind": "avatar",
+    "pair": 6,
+    "presentation": "neutral",
+    "style": "facets",
+    "name": "Jade",
+    "source": "2026-11-18-mixed/06-avatar.svg",
+    "origin": "new study"
+  },
+  {
+    "id": "mixed-06-cover",
+    "kind": "cover",
+    "pair": 6,
+    "presentation": null,
+    "style": "facets",
+    "name": "Kalt",
+    "source": "2026-11-18-mixed/06-cover.svg",
+    "origin": "new study"
+  },
+  {
+    "id": "mixed-07-avatar",
+    "kind": "avatar",
+    "pair": 7,
+    "presentation": "masculine",
+    "style": "paper",
+    "name": "Ocker",
+    "source": "2026-11-18-mixed/07-avatar.svg",
+    "origin": "new study"
+  },
+  {
+    "id": "mixed-07-cover",
+    "kind": "cover",
+    "pair": 7,
+    "presentation": null,
+    "style": "paper",
+    "name": "Heiß",
+    "source": "2026-11-18-mixed/07-cover.svg",
+    "origin": "new study"
+  },
+  {
+    "id": "mixed-08-avatar",
+    "kind": "avatar",
+    "pair": 8,
+    "presentation": "feminine",
+    "style": "studio",
+    "name": "Kupferlicht",
+    "source": "2026-11-18-mixed/08-avatar.svg",
+    "origin": "new study"
+  },
+  {
+    "id": "mixed-08-cover",
+    "kind": "cover",
+    "pair": 8,
+    "presentation": null,
+    "style": "studio",
+    "name": "Berge",
+    "source": "2026-11-18-mixed/08-cover.svg",
+    "origin": "new study"
+  },
+  {
+    "id": "mixed-09-avatar",
+    "kind": "avatar",
+    "pair": 9,
+    "presentation": "neutral",
+    "style": "blocks",
+    "name": "Kobalt",
+    "source": "2026-11-18-mixed/09-avatar.svg",
+    "origin": "new study"
+  },
+  {
+    "id": "mixed-09-cover",
+    "kind": "cover",
+    "pair": 9,
+    "presentation": null,
+    "style": "blocks",
+    "name": "Tal",
+    "source": "2026-11-18-mixed/09-cover.svg",
+    "origin": "new study"
+  },
+  {
+    "id": "mixed-10-avatar",
+    "kind": "avatar",
+    "pair": 10,
+    "presentation": "masculine",
+    "style": "facets",
+    "name": "Kante",
+    "source": "2026-11-18-mixed/10-avatar.svg",
+    "origin": "new study"
+  },
+  {
+    "id": "mixed-10-cover",
+    "kind": "cover",
+    "pair": 10,
+    "presentation": null,
+    "style": "facets",
+    "name": "Wald",
+    "source": "2026-11-18-mixed/10-cover.svg",
+    "origin": "new study"
+  },
+  {
+    "id": "mixed-11-avatar",
+    "kind": "avatar",
+    "pair": 11,
+    "presentation": "feminine",
+    "style": "flow",
+    "name": "Koralle",
+    "source": "2026-11-18-mixed/11-avatar.svg",
+    "origin": "new study"
+  },
+  {
+    "id": "mixed-11-cover",
+    "kind": "cover",
+    "pair": 11,
+    "presentation": null,
+    "style": "flow",
+    "name": "Wüste",
+    "source": "2026-11-18-mixed/11-cover.svg",
+    "origin": "new study"
+  },
+  {
+    "id": "mixed-12-avatar",
+    "kind": "avatar",
+    "pair": 12,
+    "presentation": "neutral",
+    "style": "soft",
+    "name": "Salbei",
+    "source": "2026-11-18-mixed/12-avatar.svg",
+    "origin": "new study"
+  },
+  {
+    "id": "mixed-12-cover",
+    "kind": "cover",
+    "pair": 12,
+    "presentation": null,
+    "style": "soft",
+    "name": "Polar",
+    "source": "2026-11-18-mixed/12-cover.svg",
+    "origin": "new study"
+  },
+  {
+    "id": "mixed-13-avatar",
+    "kind": "avatar",
+    "pair": 13,
+    "presentation": "masculine",
+    "style": "soft",
+    "name": "Morgenruhe",
+    "source": "2026-11-18-mixed/13-avatar.svg",
+    "origin": "new study"
+  },
+  {
+    "id": "mixed-13-cover",
+    "kind": "cover",
+    "pair": 13,
+    "presentation": null,
+    "style": "soft",
+    "name": "Küste",
+    "source": "2026-11-18-mixed/13-cover.svg",
+    "origin": "new study"
+  },
+  {
+    "id": "mixed-14-avatar",
+    "kind": "avatar",
+    "pair": 14,
+    "presentation": "feminine",
+    "style": "blocks",
+    "name": "Aprikose",
+    "source": "2026-11-18-mixed/14-avatar.svg",
+    "origin": "new study"
+  },
+  {
+    "id": "mixed-14-cover",
+    "kind": "cover",
+    "pair": 14,
+    "presentation": null,
+    "style": "blocks",
+    "name": "See",
+    "source": "2026-11-18-mixed/14-cover.svg",
+    "origin": "new study"
+  },
+  {
+    "id": "mixed-15-avatar",
+    "kind": "avatar",
+    "pair": 15,
+    "presentation": "neutral",
+    "style": "paper",
+    "name": "Naturpapier",
+    "source": "2026-11-18-mixed/15-avatar.svg",
+    "origin": "new study"
+  },
+  {
+    "id": "mixed-15-cover",
+    "kind": "cover",
+    "pair": 15,
+    "presentation": null,
+    "style": "paper",
+    "name": "Fluss",
+    "source": "2026-11-18-mixed/15-cover.svg",
+    "origin": "new study"
+  },
+  {
+    "id": "mixed-16-avatar",
+    "kind": "avatar",
+    "pair": 16,
+    "presentation": "masculine",
+    "style": "flow",
+    "name": "Polar",
+    "source": "2026-11-18-mixed/16-avatar.svg",
+    "origin": "new study"
+  },
+  {
+    "id": "mixed-16-cover",
+    "kind": "cover",
+    "pair": 16,
+    "presentation": null,
+    "style": "flow",
+    "name": "Regen",
+    "source": "2026-11-18-mixed/16-cover.svg",
+    "origin": "new study"
+  },
+  {
+    "id": "mixed-17-avatar",
+    "kind": "avatar",
+    "pair": 17,
+    "presentation": "feminine",
+    "style": "facets",
+    "name": "Pflaume",
+    "source": "2026-11-18-mixed/17-avatar.svg",
+    "origin": "new study"
+  },
+  {
+    "id": "mixed-17-cover",
+    "kind": "cover",
+    "pair": 17,
+    "presentation": null,
+    "style": "facets",
+    "name": "Felsen",
+    "source": "2026-11-18-mixed/17-cover.svg",
+    "origin": "new study"
+  },
+  {
+    "id": "mixed-18-avatar",
+    "kind": "avatar",
+    "pair": 18,
+    "presentation": "neutral",
+    "style": "studio",
+    "name": "Nebelblau",
+    "source": "2026-11-18-mixed/18-avatar.svg",
+    "origin": "new study"
+  },
+  {
+    "id": "mixed-18-cover",
+    "kind": "cover",
+    "pair": 18,
+    "presentation": null,
+    "style": "studio",
+    "name": "Wiese",
+    "source": "2026-11-18-mixed/18-cover.svg",
+    "origin": "new study"
+  },
+  {
+    "id": "mixed-19-avatar",
+    "kind": "avatar",
+    "pair": 19,
+    "presentation": "masculine",
+    "style": "blocks",
+    "name": "Azur",
+    "source": "2026-11-18-mixed/19-avatar.svg",
+    "origin": "new study"
+  },
+  {
+    "id": "mixed-19-cover",
+    "kind": "cover",
+    "pair": 19,
+    "presentation": null,
+    "style": "blocks",
+    "name": "Wasserfall",
+    "source": "2026-11-18-mixed/19-cover.svg",
+    "origin": "new study"
+  },
+  {
+    "id": "mixed-20-avatar",
+    "kind": "avatar",
+    "pair": 20,
+    "presentation": "feminine",
+    "style": "paper",
+    "name": "Rosengold",
+    "source": "2026-11-18-mixed/20-avatar.svg",
+    "origin": "new study"
+  },
+  {
+    "id": "mixed-20-cover",
+    "kind": "cover",
+    "pair": 20,
+    "presentation": null,
+    "style": "paper",
+    "name": "Wolken",
+    "source": "2026-11-18-mixed/20-cover.svg",
+    "origin": "new study"
+  },
+  {
+    "id": "archive-02-avatar",
+    "kind": "avatar",
+    "presentation": "neutral",
+    "name": "Reiner Schatten",
+    "source": "2026-11-17/02-avatar.svg",
+    "origin": "previously unselected 17 November study"
+  },
+  {
+    "id": "archive-07-avatar",
+    "kind": "avatar",
+    "presentation": "masculine",
+    "name": "Papiercollage",
+    "source": "2026-11-17/07-avatar.svg",
+    "origin": "previously unselected 17 November study"
+  },
+  {
+    "id": "archive-08-avatar",
+    "kind": "avatar",
+    "presentation": "feminine",
+    "name": "Duoton",
+    "source": "2026-11-17/08-avatar.svg",
+    "origin": "previously unselected 17 November study"
+  },
+  {
+    "id": "archive-08-cover",
+    "kind": "cover",
+    "presentation": null,
+    "name": "Duoton",
+    "source": "2026-11-17/08-cover.svg",
+    "origin": "previously unselected 17 November study"
+  },
+  {
+    "id": "archive-09-avatar",
+    "kind": "avatar",
+    "presentation": "neutral",
+    "name": "Punktdruck",
+    "source": "2026-11-17/09-avatar.svg",
+    "origin": "previously unselected 17 November study"
+  },
+  {
+    "id": "archive-10-avatar",
+    "kind": "avatar",
+    "presentation": "feminine",
+    "name": "Lichtkontur",
+    "source": "2026-11-17/10-avatar.svg",
+    "origin": "previously unselected 17 November study"
+  },
+  {
+    "id": "archive-10-cover",
+    "kind": "cover",
+    "presentation": null,
+    "name": "Lichtkontur",
+    "source": "2026-11-17/10-cover.svg",
+    "origin": "previously unselected 17 November study"
+  },
+  {
+    "id": "archive-11-avatar",
+    "kind": "avatar",
+    "presentation": "neutral",
+    "name": "Skizze",
+    "source": "2026-11-17/11-avatar.svg",
+    "origin": "previously unselected 17 November study"
+  },
+  {
+    "id": "archive-13-cover",
+    "kind": "cover",
+    "presentation": null,
+    "name": "Facetten",
+    "source": "2026-11-17/13-cover.svg",
+    "origin": "previously unselected 17 November study"
+  },
+  {
+    "id": "archive-15-cover",
+    "kind": "cover",
+    "presentation": null,
+    "name": "Negativraum",
+    "source": "2026-11-17/15-cover.svg",
+    "origin": "previously unselected 17 November study"
+  },
+  {
+    "id": "archive-17-avatar",
+    "kind": "avatar",
+    "presentation": "masculine",
+    "name": "Gravur",
+    "source": "2026-11-17/17-avatar.svg",
+    "origin": "previously unselected 17 November study"
+  },
+  {
+    "id": "archive-17-cover",
+    "kind": "cover",
+    "presentation": null,
+    "name": "Gravur",
+    "source": "2026-11-17/17-cover.svg",
+    "origin": "previously unselected 17 November study"
+  },
+  {
+    "id": "archive-18-avatar",
+    "kind": "avatar",
+    "presentation": "feminine",
+    "name": "Pinsel",
+    "source": "2026-11-17/18-avatar.svg",
+    "origin": "previously unselected 17 November study"
+  },
+  {
+    "id": "archive-18-cover",
+    "kind": "cover",
+    "presentation": null,
+    "name": "Pinsel",
+    "source": "2026-11-17/18-cover.svg",
+    "origin": "previously unselected 17 November study"
+  },
+  {
+    "id": "archive-19-cover",
+    "kind": "cover",
+    "presentation": null,
+    "name": "Retro",
+    "source": "2026-11-17/19-cover.svg",
+    "origin": "previously unselected 17 November study"
+  },
+  {
+    "id": "archive-20-cover",
+    "kind": "cover",
+    "presentation": null,
+    "name": "Lichtspur",
+    "source": "2026-11-17/20-cover.svg",
+    "origin": "previously unselected 17 November study"
+  }
+]

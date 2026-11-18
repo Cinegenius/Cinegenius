@@ -13639,5 +13639,32 @@
     "legacyHint": "Obecny wygląd pozostaje, dopóki nie wybierzesz innego.",
     "unavailable": "Wybór wyglądu profilu jest teraz niedostępny. Spróbuj ponownie później.",
     "invalid": "Wybierz Kompaktowy lub Duże zdjęcie."
+  },
+  "ExclusiveProfileArt": {
+    "chooseAvatar": "Wybierz awatar",
+    "chooseCover": "Wybierz zdjęcie w tle",
+    "help": "Nowe obrazy są opcjonalne. Zmiany zostaną zapisane dopiero razem z profilem.",
+    "saved": "Obecny obraz",
+    "selected": "Wybrano",
+    "selectedHint": "Wybrano. Zapis nastąpi dopiero przy zapisywaniu profilu.",
+    "option": "Obraz {number}",
+    "pending": "Potwierdzanie wyboru …",
+    "loading": "Wczytywanie obrazów …",
+    "error": "Nie udało się potwierdzić wyboru.",
+    "empty": "Obecnie nie ma dostępnych nowych obrazów.",
+    "expired": "Ten wybór wygasł. Wybierz ponownie.",
+    "retry": "Wczytaj ponownie",
+    "restore": "Użyj obecnego obrazu",
+    "optional": "Możesz kontynuować bez nowego obrazu.",
+    "unavailable": "Obraz niedostępny",
+    "exclusiveHint": "Każdy nowy motyw jest przypisywany tylko raz. Trwale usunięte motywy nie wracają.",
+    "all": "Wszystkie",
+    "feminine": "Kobiecy",
+    "masculine": "Męski",
+    "neutral": "Neutralny",
+    "presentationLabel": "Styl awatara",
+    "deleteConfirm": "Trwale usunąć ten motyw przy zapisie? Nigdy nie zostanie ponownie przypisany. Sama zmiana zdjęcia go nie usuwa.",
+    "deleteCancelled": "Usunięcie nie zostało potwierdzone. Wpisane dane zostały zachowane.",
+    "deletePending": "Ten motyw zostanie trwale usunięty przy zapisie."
   }
 }

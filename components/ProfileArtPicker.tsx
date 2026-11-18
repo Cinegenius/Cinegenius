@@ -6,6 +6,9 @@ import { Check, ChevronDown } from "lucide-react";
 import MediaImage from "@/components/MediaImage";
 import { PROFILE_AVATARS, PROFILE_COVERS } from "@/lib/profile-art";
 
+const avatarGroups = (["masculine", "feminine", "neutral"] as const).map(presentation => PROFILE_AVATARS.filter(item => item.presentation === presentation));
+const mixedAvatars = Array.from({ length: Math.max(...avatarGroups.map(group => group.length)) }, (_, index) => avatarGroups.flatMap(group => group[index] ? [group[index]] : [])).flat();
+
 export default function ProfileArtPicker({ kind, value, onChange, disabled = false }: {
   kind: "avatar" | "cover";
   value: string;
@@ -30,10 +33,7 @@ export default function ProfileArtPicker({ kind, value, onChange, disabled = fal
     </summary>
     {open && <div className="pb-3">
       <p className="mb-3 text-xs leading-5 text-text-muted">{t("hint")}</p>
-      {kind === "avatar" ? (["masculine", "feminine", "neutral"] as const).map(presentation => <div key={presentation} role="group" aria-label={t(presentation)} className="mt-3">
-        <p className="mb-1 text-xs text-text-muted">{t(presentation)}</p>
-        <div className="grid grid-cols-4 gap-1">{PROFILE_AVATARS.filter(item => item.presentation === presentation).map(item => choice(item.src, t("avatarOption", { number: PROFILE_AVATARS.indexOf(item) + 1 }), true))}</div>
-      </div>) : <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">{PROFILE_COVERS.map(item => choice(item.src, t(`themes.${item.theme}`), false))}</div>}
+      {kind === "avatar" ? <div className="grid grid-cols-4 gap-1">{mixedAvatars.map(item => choice(item.src, t("avatarOption", { number: PROFILE_AVATARS.indexOf(item) + 1 }), true))}</div> : <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">{PROFILE_COVERS.map(item => choice(item.src, t(`themes.${item.theme}`), false))}</div>}
     </div>}
   </details>;
 }

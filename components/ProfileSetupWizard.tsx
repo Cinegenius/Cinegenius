@@ -6,7 +6,8 @@ import PlaceField from "@/components/PlaceField";
 import { needsPublicSetupProfile, setupProfilePayload, initializeSetupProfileArt, initializeSetupOccupationForm, setupProfileAvatar, type SetupProfileIdentity } from "@/lib/provider-profile-setup";
 import ProfileLayoutPicker from "@/components/ProfileLayoutPicker";
 import { isProfileLayout, profileLayout } from "@/lib/profile-layout";
-import ProfileArtPicker from "@/components/ProfileArtPicker";
+import ExclusiveProfileArtPicker from "@/components/ExclusiveProfileArtPicker";
+import { useExclusiveProfileArt, useProfileArtSaveRequest } from "@/lib/use-exclusive-profile-art";
 import SetupCompletionOffers from "@/components/SetupCompletionOffers";
 import ContentUsageNotice from "@/components/ContentUsageNotice";
 import { useFormRouter as useRouter } from "@/lib/use-form-router";
@@ -173,6 +174,19 @@ function ProfileSetupContent() {
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [layoutUnavailable, setLayoutUnavailable] = useState(false);
   const [savedProfile, setSavedProfile] = useState<SetupProfileIdentity | null>(null);
+  const prepareArtSave = useProfileArtSaveRequest();
+  const [suggestNewAvatar, setSuggestNewAvatar] = useState(false);
+  const suggestedAvatar = useRef(false);
+  const avatarArt = useExclusiveProfileArt({accountId: user?.id ?? "", kind: "avatar", value: setupProfileAvatar(draft, savedProfile), savedValue: savedProfile?.avatar_url ?? "", disabled: uploading || saving || retrySeconds > 0,
+    onChange: src => setDraft(current => ({...current, profileAvatarUrl: src, completed: {...current.completed, profile: false}}))});
+  const coverArt = useExclusiveProfileArt({accountId: user?.id ?? "", kind: "cover", value: draft.profileCoverUrl ?? savedProfile?.cover_image_url ?? "", savedValue: savedProfile?.cover_image_url ?? "", disabled: uploading || saving || retrySeconds > 0,
+    onChange: src => setDraft(current => ({...current, profileCoverUrl: src, completed: {...current.completed, profile: false}}))});
+
+  useEffect(() => {
+    if (!ready || !suggestNewAvatar || suggestedAvatar.current || profileExists || !user?.id) return;
+    suggestedAvatar.current = true;
+    void avatarArt.suggest();
+  }, [ready, suggestNewAvatar, profileExists, user?.id, avatarArt]);
   const mounted = useRef(true);
   const latestDraft = useRef(draft);
   useEffect(() => { latestDraft.current = draft; }, [draft]);
@@ -223,12 +237,13 @@ function ProfileSetupContent() {
       fetch("/api/user-settings", { cache: "no-store" }).then(response => response.ok ? response.json() : null).catch(() => null),
     ]).then(([saved, profile, settings]) => {
       if (!active) return;
-      setProfileIsPrivate(settings?.settings?.profile_visibility === "private" || settings?.settings?.ghost_mode === true);
+      setProfileIsPrivate(["private", "members"].includes(settings?.settings?.profile_visibility) || settings?.settings?.ghost_mode === true);
       setProfileExists(profile?.exists === true);
       setSavedProfile(profile?.profile ?? null);
       setLayoutUnavailable(profile?.unavailableFields?.includes("profile_layout") === true);
       const profileComplete = hasProfileBasics(profile?.profile);
       const hasInProgressDraft = !!saved?.quickStart && saved.setupComplete !== true;
+      setSuggestNewAvatar(!hasInProgressDraft && profile?.exists !== true);
       if (!providerEntry && saved?.setupComplete && (profileComplete || hasCompletedNonPersonalSetup(saved))) {
         router.replace(saved.intent === "search" ? (redirectTo || "/search") : (redirectTo || "/dashboard"));
         return;
@@ -532,7 +547,7 @@ function ProfileSetupContent() {
         const profilePayload = setupProfilePayload(progress, profileExists ? savedProfile : null, selectedRoles);
         const response = await fetch("/api/profile", {
           method: profileExists ? "PATCH" : "POST", headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(profilePayload),
+          body: JSON.stringify(prepareArtSave(profilePayload, savedProfile?.updated_at ?? null, [await avatarArt.claim(), await coverArt.claim()], [avatarArt.deletion(), coverArt.deletion()])),
         });
         const result = await response.json().catch(() => ({}));
         const profileSaved = response.ok && (profileExists ? result.success === true : Boolean(result.profile?.user_id));
@@ -542,7 +557,8 @@ function ProfileSetupContent() {
           if (field) { setDraft({ ...progress, step: screenForField(field), activeIntent: intentForField(field) ?? activeIntent }); focusValidation(field); }
           throw new Error(result.fieldErrors?.[firstField] ?? result.error ?? uiText("Ui.text_92added47b1ce3"));
         }
-        setSavedProfile(current => ({ ...current, ...profilePayload }));
+        setSavedProfile(current => ({ ...current, ...profilePayload, updated_at: result.profile?.updated_at ?? result.updated_at ?? null }));
+        avatarArt.saved(); coverArt.saved();
         progress = { ...progress, completed: { ...progress.completed, profile: true } };
         setProfileExists(true);
         setDraft(progress);
@@ -644,13 +660,13 @@ function ProfileSetupContent() {
       <ContentUsageNotice context="profile" visibility="configured" />
       {avatar && <Image src={avatar} alt={label} width={160} height={160} className="h-24 w-24 rounded-full border border-border object-cover" />}
       <p className="text-xs leading-5 text-text-muted">{uiText("ProfileArt.editable")}</p>
-      <div className="flex flex-wrap gap-2">{uploadInput(false)}{avatar && <button type="button" disabled={disabled} onClick={() => select("profileAvatarUrl", "")} className="min-h-11 rounded-lg border border-border px-3 text-sm text-text-secondary disabled:opacity-50">{t("copy0")}</button>}</div>
-      <ProfileArtPicker kind="avatar" value={avatar} onChange={src => select("profileAvatarUrl", src)} disabled={disabled} />
+      <div className="flex flex-wrap gap-2">{uploadInput(false)}{avatar && <button type="button" disabled={disabled} onClick={() => {if (avatarArt.confirmRemoval()) select("profileAvatarUrl", "");}} className="min-h-11 rounded-lg border border-border px-3 text-sm text-text-secondary disabled:opacity-50">{t("copy0")}</button>}</div>
+      <ExclusiveProfileArtPicker {...avatarArt.props} />
       {intent !== "talent" && <div className="space-y-3 pt-3">
         <p className="text-sm font-medium">{uiText("profile.sectionCover")} <span className="text-text-muted">{t("copy23")}</span></p>
         {cover && <Image src={cover} alt={uiText("profile.sectionCover")} width={720} height={288} className="aspect-[5/2] w-full rounded-lg object-cover" />}
-        <div className="flex flex-wrap gap-2">{uploadInput(true)}{cover && <button type="button" disabled={disabled} onClick={() => select("profileCoverUrl", "")} className="min-h-11 rounded-lg border border-border px-3 text-sm text-text-secondary disabled:opacity-50">{t("copy0")}</button>}</div>
-        <ProfileArtPicker kind="cover" value={cover} onChange={src => select("profileCoverUrl", src)} disabled={disabled} />
+        <div className="flex flex-wrap gap-2">{uploadInput(true)}{cover && <button type="button" disabled={disabled} onClick={() => {if (coverArt.confirmRemoval()) select("profileCoverUrl", "");}} className="min-h-11 rounded-lg border border-border px-3 text-sm text-text-secondary disabled:opacity-50">{t("copy0")}</button>}</div>
+        <ExclusiveProfileArtPicker {...coverArt.props} />
       </div>}
       {uploading && <p role="status" className="text-xs text-text-muted">{t("copy2")}</p>}
     </div>;

@@ -13639,5 +13639,32 @@
     "legacyHint": "Tu vista actual se mantiene hasta que elijas otra.",
     "unavailable": "La vista del perfil no está disponible ahora. Inténtalo más tarde.",
     "invalid": "Elige Compacta o Foto grande."
+  },
+  "ExclusiveProfileArt": {
+    "chooseAvatar": "Elegir avatar",
+    "chooseCover": "Elegir portada",
+    "help": "Las imágenes nuevas son opcionales. Los cambios solo se guardan al guardar tu perfil.",
+    "saved": "Imagen actual",
+    "selected": "Seleccionada",
+    "selectedHint": "Seleccionada. Se guardará cuando guardes tu perfil.",
+    "option": "Imagen {number}",
+    "pending": "Confirmando tu selección …",
+    "loading": "Cargando imágenes …",
+    "error": "No se pudo confirmar tu selección.",
+    "empty": "Ahora mismo no hay imágenes nuevas disponibles.",
+    "expired": "Esta selección ha caducado. Vuelve a elegir.",
+    "retry": "Volver a cargar",
+    "restore": "Usar imagen actual",
+    "optional": "Puedes continuar sin una imagen nueva.",
+    "unavailable": "Imagen no disponible",
+    "exclusiveHint": "Cada nuevo diseño se asigna una sola vez. Los diseños eliminados definitivamente no vuelven.",
+    "all": "Todos",
+    "feminine": "Femenino",
+    "masculine": "Masculino",
+    "neutral": "Neutro",
+    "presentationLabel": "Estilo del avatar",
+    "deleteConfirm": "¿Eliminar este diseño definitivamente al guardar? No volverá a asignarse. Cambiar de imagen no lo elimina.",
+    "deleteCancelled": "Eliminación no confirmada. Se conservan tus datos.",
+    "deletePending": "Este diseño se eliminará definitivamente al guardar."
   }
 }

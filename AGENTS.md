@@ -264,3 +264,38 @@ Automatisierte Quell- und Browserprüfungen mit dem zusammengeführten App-Stand
 - Every personal profession and provider type can choose `compact` or `large-photo` during setup and later editing. The approved large presentation is the floating identity card. Store the shared Web/native preference in `profiles.profile_layout`; null preserves the existing presentation until an explicit choice. Never infer the new preference from a profession or rewrite existing profile types, casting information, media, focal points, galleries or showreels.
 - Reuse `ProfileLayoutPicker` and `ProfileLayoutHeader`; keep profession-specific content below the chosen header. Selection changes the private recoverable form only; explicit save persists it. Preserve omitted fields from old clients. Missing schema support must disable the choice or fail with `PROFILE_LAYOUT_UNAVAILABLE`, never silently acknowledge a dropped save.
 - Apply and verify `20261118002930_profile_layout_choice.sql` before a separately authorized dependent release. The source handoff does not apply SQL or publish. Exclusive avatar/cover assignment and company motifs remain separate work. See `docs/profile-layout-choice.md`.
+
+## Exclusive artwork replenishment (operator correction, 18 November 2026)
+
+- New optional artwork uses faceless silhouettes and quiet nature covers; omit line drawings, technical patterns, harsh neon geometry and busy illustrated scenes. Avatar presentation is freely selectable as feminine, masculine or neutral, never inferred from the member.
+- Offer four avatars per presentation and twelve covers, with an additional reserve. Refill after confirmed assignment, not page opening. One-time assignment must be backed by durable ownership and current availability; never recycle shared legacy artwork as exclusive. Provider/quality failures must not be reported as available stock.
+- A picture change retains prior ownership. Explicit permanent deletion requires confirmation and profile Save, blocks future use/reassignment, and retains a duplicate-prevention tombstone. Preserve interrupted input and old clients; do not make ordinary photo uploads destructive.
+- Verschenken/Tauschen is a future proposal, not an active feature. Any later transfer must change a single owner atomically and require the actual owner's confirmation. See `docs/profile-art-stock.md` for the Web/native contract and validation boundary.
+
+## Classic artwork replacement (latest operator correction, 18 November 2026)
+
+- Markus requests immediate replacement of both avatars and covers, one at a time,
+  using the original 17 November flat graphic style. Preserve the editable sources,
+  existing member photos, claimed artwork and exclusive assignment rules. Retire
+  rejected free stock from selection without deleting originals or owner records.
+- Prefer simple matte two-dimensional silhouettes and broad graphic nature scenes.
+  Do not generate realistic/sculptural heads, plastic busts or photographic/painted
+  landscapes. The independent review must enforce this style before replenishment.
+- Unrelated work remains paused; the Smart-language branch is not part of this
+  artwork publication. See `design/profile-art/2026-11-18-classic/README.md`.
+
+
+## Mixed optional artwork and member profiles (operator update, 18 November 2026)
+
+- New stock uses the approved evening-light, color-field, paper-collage, soft-form,
+  faceted and flowing-color directions, including abstract invented facial features
+  and stronger color variations. This supersedes the faceless-only requirement.
+  Always show a collage before a new style; preserve exclusive ownership and
+  duplicate prevention. All presentations are freely selectable, mixed by default.
+  Personal photo likenesses remain private preview requests, outside stock generation.
+- Add `members` as an explicit profile visibility option, retaining `public`, legacy
+  friend-only `private`, Ghost, blocks and field audiences. Enforce visibility on
+  direct profiles, linked identities, search and protected media. Apply the member
+  privacy migration before releasing dependent controls. See docs/profile-privacy.md.
+- These additions do not resume the paused Smart-language work or authorize a new
+  production publication on their own.

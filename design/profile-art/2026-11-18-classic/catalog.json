@@ -1,0 +1,194 @@
+[
+  {
+    "id": "avatar-01",
+    "kind": "avatar",
+    "name": "Seitenlicht",
+    "presentation": "masculine",
+    "source": "avatar-01.svg",
+    "input": "avatar-01.png"
+  },
+  {
+    "id": "avatar-02",
+    "kind": "avatar",
+    "name": "Locken",
+    "presentation": "masculine",
+    "source": "avatar-02.svg",
+    "input": "avatar-02.png"
+  },
+  {
+    "id": "avatar-03",
+    "kind": "avatar",
+    "name": "Mantel",
+    "presentation": "masculine",
+    "source": "avatar-03.svg",
+    "input": "avatar-03.png"
+  },
+  {
+    "id": "avatar-04",
+    "kind": "avatar",
+    "name": "Abendprofil",
+    "presentation": "masculine",
+    "source": "avatar-04.svg",
+    "input": "avatar-04.png"
+  },
+  {
+    "id": "avatar-05",
+    "kind": "avatar",
+    "name": "Bob",
+    "presentation": "feminine",
+    "source": "avatar-05.svg",
+    "input": "avatar-05.png"
+  },
+  {
+    "id": "avatar-06",
+    "kind": "avatar",
+    "name": "Zopf",
+    "presentation": "feminine",
+    "source": "avatar-06.svg",
+    "input": "avatar-06.png"
+  },
+  {
+    "id": "avatar-07",
+    "kind": "avatar",
+    "name": "Wellen",
+    "presentation": "feminine",
+    "source": "avatar-07.svg",
+    "input": "avatar-07.png"
+  },
+  {
+    "id": "avatar-08",
+    "kind": "avatar",
+    "name": "Dutt",
+    "presentation": "feminine",
+    "source": "avatar-08.svg",
+    "input": "avatar-08.png"
+  },
+  {
+    "id": "avatar-09",
+    "kind": "avatar",
+    "name": "Ruhige Form",
+    "presentation": "neutral",
+    "source": "avatar-09.svg",
+    "input": "avatar-09.png"
+  },
+  {
+    "id": "avatar-10",
+    "kind": "avatar",
+    "name": "Asymmetrie",
+    "presentation": "neutral",
+    "source": "avatar-10.svg",
+    "input": "avatar-10.png"
+  },
+  {
+    "id": "avatar-11",
+    "kind": "avatar",
+    "name": "Weicher Schatten",
+    "presentation": "neutral",
+    "source": "avatar-11.svg",
+    "input": "avatar-11.png"
+  },
+  {
+    "id": "avatar-12",
+    "kind": "avatar",
+    "name": "Sonnenkante",
+    "presentation": "neutral",
+    "source": "avatar-12.svg",
+    "input": "avatar-12.png"
+  },
+  {
+    "id": "cover-01",
+    "kind": "cover",
+    "name": "Wasser",
+    "theme": "water",
+    "source": "cover-01.svg",
+    "input": "cover-01.png"
+  },
+  {
+    "id": "cover-02",
+    "kind": "cover",
+    "name": "Mond",
+    "theme": "moon",
+    "source": "cover-02.svg",
+    "input": "cover-02.png"
+  },
+  {
+    "id": "cover-03",
+    "kind": "cover",
+    "name": "Sonne",
+    "theme": "sun",
+    "source": "cover-03.svg",
+    "input": "cover-03.png"
+  },
+  {
+    "id": "cover-04",
+    "kind": "cover",
+    "name": "Erde",
+    "theme": "earth",
+    "source": "cover-04.svg",
+    "input": "cover-04.png"
+  },
+  {
+    "id": "cover-05",
+    "kind": "cover",
+    "name": "Himmel",
+    "theme": "sky",
+    "source": "cover-05.svg",
+    "input": "cover-05.png"
+  },
+  {
+    "id": "cover-06",
+    "kind": "cover",
+    "name": "Kalt",
+    "theme": "cold",
+    "source": "cover-06.svg",
+    "input": "cover-06.png"
+  },
+  {
+    "id": "cover-07",
+    "kind": "cover",
+    "name": "Heiß",
+    "theme": "heat",
+    "source": "cover-07.svg",
+    "input": "cover-07.png"
+  },
+  {
+    "id": "cover-08",
+    "kind": "cover",
+    "name": "Berge",
+    "theme": "mountains",
+    "source": "cover-08.svg",
+    "input": "cover-08.png"
+  },
+  {
+    "id": "cover-09",
+    "kind": "cover",
+    "name": "Tal",
+    "theme": "valley",
+    "source": "cover-09.svg",
+    "input": "cover-09.png"
+  },
+  {
+    "id": "cover-10",
+    "kind": "cover",
+    "name": "Wald",
+    "theme": "forest",
+    "source": "cover-10.svg",
+    "input": "cover-10.png"
+  },
+  {
+    "id": "cover-11",
+    "kind": "cover",
+    "name": "Wüste",
+    "theme": "desert",
+    "source": "cover-11.svg",
+    "input": "cover-11.png"
+  },
+  {
+    "id": "cover-12",
+    "kind": "cover",
+    "name": "Polar",
+    "theme": "polar",
+    "source": "cover-12.svg",
+    "input": "cover-12.png"
+  }
+]

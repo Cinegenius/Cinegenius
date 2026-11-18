@@ -13639,5 +13639,32 @@
     "legacyHint": "Ta présentation actuelle reste inchangée tant que tu ne choisis pas une autre vue.",
     "unavailable": "Le choix de présentation est indisponible pour le moment. Réessaie plus tard.",
     "invalid": "Choisis Compacte ou Grande photo."
+  },
+  "ExclusiveProfileArt": {
+    "chooseAvatar": "Choisir un avatar",
+    "chooseCover": "Choisir une couverture",
+    "help": "Les nouvelles images sont facultatives. Les modifications ne sont enregistrées qu’avec ton profil.",
+    "saved": "Image actuelle",
+    "selected": "Sélectionnée",
+    "selectedHint": "Sélectionnée. Elle sera enregistrée quand tu enregistreras ton profil.",
+    "option": "Image {number}",
+    "pending": "Confirmation de ton choix …",
+    "loading": "Chargement des images …",
+    "error": "Ton choix n’a pas pu être confirmé.",
+    "empty": "Aucune nouvelle image n’est disponible pour le moment.",
+    "expired": "Ce choix a expiré. Choisis à nouveau.",
+    "retry": "Recharger",
+    "restore": "Utiliser l’image actuelle",
+    "optional": "Tu peux continuer sans nouvelle image.",
+    "unavailable": "Image indisponible",
+    "exclusiveHint": "Chaque nouveau motif est attribué une seule fois. Un motif supprimé définitivement ne revient pas.",
+    "all": "Tous",
+    "feminine": "Féminin",
+    "masculine": "Masculin",
+    "neutral": "Neutre",
+    "presentationLabel": "Style de l’avatar",
+    "deleteConfirm": "Supprimer définitivement ce motif à l’enregistrement ? Il ne sera jamais réattribué. Changer d’image ne le supprime pas.",
+    "deleteCancelled": "Suppression non confirmée. Vos saisies sont conservées.",
+    "deletePending": "Ce motif sera définitivement supprimé à l’enregistrement."
   }
 }

@@ -9,7 +9,7 @@ Authenticated `GET /api/user-settings` returns `settings`. `PATCH` accepts only 
 | Field | Values | Default |
 | --- | --- | --- |
 | `ghost_mode` | boolean | false |
-| `profile_visibility` | `public`, `private` (accepted friends) | public |
+| `profile_visibility` | `public`, `members` (signed-in accounts), `private` (accepted friends) | public |
 | `location_visibility` | public, members, friends, hidden | public |
 | `map_visibility` | public, members, friends, hidden | public |
 | `activity_visibility` | public, members, friends, hidden | public |
@@ -53,3 +53,28 @@ Application rollback should retain the additive migration and privacy choices. D
 - Actual `PrivacySettings.tsx` plus project CSS rendered in Chromium with mocked auth/navigation/API boundaries: de/en/es/it/cs/hu/nl/nl-BE/sv at 320, 393, 834, 1440 CSS px. No horizontal overflow or page errors; Ghost restore, saved choices, failure/retry and stale account response tested. This is browser simulation, not an iPhone/iPad/Xcode device test.
 - Production build, TypeScript, catalog validation (nine languages, no newly admitted hard-coded copy) and shared design checks passed. Browser testing used mocked boundaries; production migration/live verification remains a release prerequisite.
 - Evidence: `/srv/cinegenius/audits/20261114-profile-privacy/`.
+
+## Member-only profiles — 18 November 2026 (prepared, not deployed)
+
+The owner can additionally choose the existing translated “signed-in members”
+audience for the whole profile. Guest reads, metadata, public photo discovery and
+linked company/project identities exclude it. Authenticated Crew/global search and
+direct profile access include it subject to current Ghost, block and field rules.
+It does not require friendship and does not change the independently published
+state of personal or company offers. The existing disclosure about legacy public
+image URLs and participant records still applies.
+
+The contract adds `members` to `settings.profile_visibility`; all seventeen
+`PrivacySettings.audience.members` translations are reused. There is no new
+gender, account-type or paid-status check. Native UI must wait for backend release
+before offering the value, retain server error/retry behavior, and refresh permissions
+on sign-in/out. Unknown audience values fail closed.
+
+Apply and verify `20261118205822_member_profile_visibility.sql` before the dependent
+source release. It constrains allowed values, extends protected original-media
+reads, and excludes legacy member-image mirrors from both public discovery paths.
+Do not roll back to an application that treats every non-private profile as public.
+
+Checks: local Postgres policy/original-image/mirror tests, API/account-boundary tests,
+linked identity tests and global-search tests. Browser results are recorded separately
+and do not establish native-app or live-account validation.

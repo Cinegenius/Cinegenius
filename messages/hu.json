@@ -13639,5 +13639,32 @@
     "legacyHint": "A jelenlegi megjelenés marad, amíg nem választasz másikat.",
     "unavailable": "A profil megjelenése jelenleg nem választható ki. Próbáld újra később.",
     "invalid": "Válaszd a Kompakt vagy a Nagy kép lehetőséget."
+  },
+  "ExclusiveProfileArt": {
+    "chooseAvatar": "Avatar kiválasztása",
+    "chooseCover": "Borítókép kiválasztása",
+    "help": "Az új képek nem kötelezők. A módosítások csak a profil mentésekor kerülnek mentésre.",
+    "saved": "Jelenlegi kép",
+    "selected": "Kiválasztva",
+    "selectedHint": "Kiválasztva. Csak a profil mentésekor lesz elmentve.",
+    "option": "{number}. kép",
+    "pending": "A választás megerősítése …",
+    "loading": "Képek betöltése …",
+    "error": "Nem sikerült megerősíteni a választást.",
+    "empty": "Jelenleg nincs elérhető új kép.",
+    "expired": "Ez a választás lejárt. Kérjük, válassz újra.",
+    "retry": "Újratöltés",
+    "restore": "Jelenlegi kép használata",
+    "optional": "Új kép nélkül is folytathatod.",
+    "unavailable": "A kép nem érhető el",
+    "exclusiveHint": "Minden új motívumot csak egyszer rendelünk hozzá valakihez. A végleg törölt motívumok nem térnek vissza.",
+    "all": "Összes",
+    "feminine": "Nőies",
+    "masculine": "Férfias",
+    "neutral": "Semleges",
+    "presentationLabel": "Avatar stílusa",
+    "deleteConfirm": "Végleg törlöd ezt a motívumot mentéskor? Többé nem rendeljük senkihez. A kép cseréje önmagában nem törli.",
+    "deleteCancelled": "A törlést nem erősítetted meg. A beírt adatok megmaradnak.",
+    "deletePending": "Ez a motívum mentéskor végleg törlődik."
   }
 }

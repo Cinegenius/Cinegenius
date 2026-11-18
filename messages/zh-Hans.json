@@ -13639,5 +13639,32 @@
     "legacyHint": "在你选择新布局前，将保留现有布局。",
     "unavailable": "暂时无法选择个人资料布局，请稍后重试。",
     "invalid": "请选择“紧凑”或“大图”。"
+  },
+  "ExclusiveProfileArt": {
+    "chooseAvatar": "选择头像",
+    "chooseCover": "选择封面",
+    "help": "新图片为可选项。更改仅在保存个人资料时保存。",
+    "saved": "当前图片",
+    "selected": "已选择",
+    "selectedHint": "已选择。保存个人资料时才会保存此更改。",
+    "option": "图片 {number}",
+    "pending": "正在确认选择…",
+    "loading": "正在加载图片…",
+    "error": "无法确认你的选择。",
+    "empty": "目前没有可用的新图片。",
+    "expired": "此选择已过期，请重新选择。",
+    "retry": "重新加载",
+    "restore": "使用当前图片",
+    "optional": "你可以不选择新图片，直接继续。",
+    "unavailable": "图片不可用",
+    "exclusiveHint": "每个新图案仅分配一次。永久删除的图案不会再次提供。",
+    "all": "全部",
+    "feminine": "女性风格",
+    "masculine": "男性风格",
+    "neutral": "中性风格",
+    "presentationLabel": "头像风格",
+    "deleteConfirm": "保存时永久删除此图案？它将不再分配给任何人。仅更换图片不会删除图案。",
+    "deleteCancelled": "未确认删除。已保留你输入的内容。",
+    "deletePending": "此图案将在保存时被永久删除。"
   }
 }

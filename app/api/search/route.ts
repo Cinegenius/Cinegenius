@@ -1,3 +1,4 @@
+import { auth } from "@clerk/nextjs/server";
 import { taxonomyLabel } from "@/lib/departments";
 import { occupationSearchValues } from "@/lib/occupation-search";
 import { occupationFormFromCrew } from "@/lib/occupation-form";
@@ -24,13 +25,13 @@ import { getPrivateProfileIds } from "@/lib/trust";
 import { getLocale,getTranslations } from "next-intl/server";
 import { NextRequest,NextResponse } from "next/server";
 
-async function publicProfileMatches(read: (from: number, to: number) => PromiseLike<{ data: Record<string, unknown>[] | null; error: unknown }>, queryText?: string, occupationValues: readonly string[] = []) {
+async function publicProfileMatches(viewerId: string | null, read: (from: number, to: number) => PromiseLike<{ data: Record<string, unknown>[] | null; error: unknown }>, queryText?: string, occupationValues: readonly string[] = []) {
   const visible: Record<string, unknown>[] = [];
   for (let from = 0; visible.length < 24; from += 100) {
     const result = await read(from, from + 99);
     if (result.error) throw new Error("search_unavailable");
     const rows = result.data ?? [];
-    const privacy = await profileAccessFor(rows.map(row => String(row.user_id)));
+    const privacy = await profileAccessFor(rows.map(row => String(row.user_id)), viewerId);
     const key = (value: unknown) => String(value ?? "").normalize("NFKD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
     visible.push(...rows.filter(row => row.display_name && privacy.get(String(row.user_id))?.profile)
       .filter(row => !queryText || privacy.get(String(row.user_id))?.location
@@ -47,6 +48,8 @@ export async function GET(req: NextRequest) {
   const type = req.nextUrl.searchParams.get("type")?.trim() ?? "all";
   if (raw.length < 2) return NextResponse.json({ results: [] });
   if (raw.length > 100) return NextResponse.json({ results: [] });
+
+  const { userId } = await auth();
 
   // Strip PostgREST filter-syntax chars that could break the .or() string structure
   const q    = raw.replace(/[(),]/g, " ").trim();
@@ -81,7 +84,7 @@ export async function GET(req: NextRequest) {
       : Promise.resolve({ data: [] }),
 
     wantProfiles
-      ? publicProfileMatches((from, to) => db
+      ? publicProfileMatches(userId, (from, to) => db
           .from("profiles")
           .select("place_country_code,place_region_id,place_city_id,place_city_name,place_region_name,place_status,user_id, display_name, location, bio, role, positions, crew, avatar_url, available")
           .or(`display_name.ilike.${like},role.ilike.${like},location.ilike.${like},bio.ilike.${like}${occupationFilter}${geoFilter?`,${geoFilter}`:""}`)
@@ -99,7 +102,7 @@ export async function GET(req: NextRequest) {
       : Promise.resolve({ data: [] }),
 
     cateringProfileValues.length
-      ? Promise.all(cateringProfileValues.map((position) => publicProfileMatches((from, to) => db
+      ? Promise.all(cateringProfileValues.map((position) => publicProfileMatches(userId, (from, to) => db
           .from("profiles")
           .select("place_country_code,place_region_id,place_city_id,place_city_name,place_region_name,place_status,user_id, display_name, location, bio, role, positions, crew, avatar_url, available")
           .contains("positions", [position])
@@ -114,11 +117,11 @@ export async function GET(req: NextRequest) {
           .contains("categories", [CATERING_COMPANY_CATEGORY.id])
           .limit(type === "all" ? 8 : 24)
       : Promise.resolve({ data: [] }),
-    animalValues.length ? publicProfileMatches((from, to) => db.from("profiles").select("place_country_code,place_region_id,place_city_id,place_city_name,place_region_name,place_status,user_id, display_name, location, bio, role, positions, crew, avatar_url, available").overlaps("positions", animalValues).order("user_id").range(from, to)) : Promise.resolve({data: []}),
-    animalValues.length ? publicProfileMatches((from, to) => db.from("profiles").select("place_country_code,place_region_id,place_city_id,place_city_name,place_region_name,place_status,user_id, display_name, location, bio, role, positions, crew, avatar_url, available").in("role", animalValues).order("user_id").range(from, to)) : Promise.resolve({data: []}),
+    animalValues.length ? publicProfileMatches(userId, (from, to) => db.from("profiles").select("place_country_code,place_region_id,place_city_id,place_city_name,place_region_name,place_status,user_id, display_name, location, bio, role, positions, crew, avatar_url, available").overlaps("positions", animalValues).order("user_id").range(from, to)) : Promise.resolve({data: []}),
+    animalValues.length ? publicProfileMatches(userId, (from, to) => db.from("profiles").select("place_country_code,place_region_id,place_city_id,place_city_name,place_region_name,place_status,user_id, display_name, location, bio, role, positions, crew, avatar_url, available").in("role", animalValues).order("user_id").range(from, to)) : Promise.resolve({data: []}),
     wantCompanies && animalCompanySearchFilter(raw) ? db.from("companies").select("place_country_code,place_region_id,place_city_id,place_city_name,place_region_name,place_status,id, slug, name, city, logo_url, categories").eq("published",true).or(animalCompanySearchFilter(raw)).limit(24) : Promise.resolve({data: []}),
-    safetyMedicalValues.length ? publicProfileMatches((from, to) => db.from("profiles").select("place_country_code,place_region_id,place_city_id,place_city_name,place_region_name,place_status,user_id, display_name, location, bio, role, positions, crew, avatar_url, available").overlaps("positions", safetyMedicalValues).order("user_id").range(from, to)) : Promise.resolve({data: []}),
-    safetyMedicalValues.length ? publicProfileMatches((from, to) => db.from("profiles").select("place_country_code,place_region_id,place_city_id,place_city_name,place_region_name,place_status,user_id, display_name, location, bio, role, positions, crew, avatar_url, available").in("role", safetyMedicalValues).order("user_id").range(from, to)) : Promise.resolve({data: []}),
+    safetyMedicalValues.length ? publicProfileMatches(userId, (from, to) => db.from("profiles").select("place_country_code,place_region_id,place_city_id,place_city_name,place_region_name,place_status,user_id, display_name, location, bio, role, positions, crew, avatar_url, available").overlaps("positions", safetyMedicalValues).order("user_id").range(from, to)) : Promise.resolve({data: []}),
+    safetyMedicalValues.length ? publicProfileMatches(userId, (from, to) => db.from("profiles").select("place_country_code,place_region_id,place_city_id,place_city_name,place_region_name,place_status,user_id, display_name, location, bio, role, positions, crew, avatar_url, available").in("role", safetyMedicalValues).order("user_id").range(from, to)) : Promise.resolve({data: []}),
     searchSafetyMedicalCompanies ? db.from("companies").select("place_country_code,place_region_id,place_city_id,place_city_name,place_region_name,place_status,id, slug, name, city, logo_url, categories").eq("published", true).contains("categories", [SAFETY_MEDICAL_COMPANY_CATEGORY_ID]).limit(24) : Promise.resolve({data: []}),
   ]);
 
@@ -127,7 +130,7 @@ export async function GET(req: NextRequest) {
   }
 
   const listingRows = listingsRes.data ?? [];
-  const creatorPrivacy = await profileAccessFor(listingRows.filter(row => row.type === "creator").map(row => String(row.user_id)));
+  const creatorPrivacy = await profileAccessFor(listingRows.filter(row => row.type === "creator").map(row => String(row.user_id)), userId);
   const listings = listingRows.filter(row => row.type !== "creator" || (creatorPrivacy.get(String(row.user_id))?.profile
     && (creatorPrivacy.get(String(row.user_id))?.location || `${row.title ?? ""} ${row.category ?? ""}`.toLowerCase().includes(q.toLowerCase()))))
     .map(row => row.type === "creator" ? projectProfilePrivacy(row, creatorPrivacy.get(String(row.user_id))) : row)
@@ -148,7 +151,7 @@ export async function GET(req: NextRequest) {
     if (profile?.user_id) profileById.set(profile.user_id, profile);
   }
   const profileRows = [...profileById.values()];
-  const privateProfileIds = await getPrivateProfileIds(profileRows.map((profile) => profile.user_id));
+  const privateProfileIds = await getPrivateProfileIds(profileRows.map((profile) => profile.user_id), userId);
   const profiles = profileRows
     .filter((profile) => !privateProfileIds.has(profile.user_id))
     .filter((p: Record<string, unknown>) => p.display_name)

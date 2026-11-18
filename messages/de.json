@@ -13639,5 +13639,32 @@
     "legacyHint": "Deine bisherige Ansicht bleibt erhalten, bis du eine auswählst.",
     "unavailable": "Die Profilansicht ist momentan nicht verfügbar. Bitte später erneut versuchen.",
     "invalid": "Bitte wähle Kompakt oder Großes Bild."
+  },
+  "ExclusiveProfileArt": {
+    "chooseAvatar": "Avatar auswählen",
+    "chooseCover": "Cover auswählen",
+    "help": "Neue Bilder sind optional. Änderungen werden erst mit deinem Profil gespeichert.",
+    "saved": "Aktuelles Bild",
+    "selected": "Ausgewählt",
+    "selectedHint": "Ausgewählt. Wird erst mit deinem Profil gespeichert.",
+    "option": "Bild {number}",
+    "pending": "Auswahl wird bestätigt …",
+    "loading": "Bilder werden geladen …",
+    "error": "Die Auswahl konnte nicht bestätigt werden.",
+    "empty": "Momentan sind keine neuen Bilder verfügbar.",
+    "expired": "Diese Auswahl ist abgelaufen. Bitte wähle erneut.",
+    "retry": "Erneut laden",
+    "restore": "Aktuelles Bild verwenden",
+    "optional": "Du kannst ohne neues Bild fortfahren.",
+    "unavailable": "Bild nicht verfügbar",
+    "exclusiveHint": "Jedes neue Motiv wird nur einmal vergeben. Endgültig gelöschte Motive kommen nicht zurück.",
+    "all": "Alle",
+    "feminine": "Weiblich",
+    "masculine": "Männlich",
+    "neutral": "Neutral",
+    "presentationLabel": "Avatar-Stil",
+    "deleteConfirm": "Dieses Motiv beim Speichern endgültig löschen? Es wird nie erneut vergeben. Ein Bildwechsel allein löscht es nicht.",
+    "deleteCancelled": "Löschen nicht bestätigt. Deine Eingaben bleiben erhalten.",
+    "deletePending": "Dieses Motiv wird beim Speichern endgültig gelöscht."
   }
 }

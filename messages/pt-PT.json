@@ -13639,5 +13639,32 @@
     "legacyHint": "A apresentação atual mantém-se até escolheres outra.",
     "unavailable": "A escolha de apresentação está indisponível neste momento. Tenta novamente mais tarde.",
     "invalid": "Escolhe Compacta ou Fotografia grande."
+  },
+  "ExclusiveProfileArt": {
+    "chooseAvatar": "Escolher avatar",
+    "chooseCover": "Escolher capa",
+    "help": "As novas imagens são opcionais. As alterações só são guardadas com o teu perfil.",
+    "saved": "Imagem atual",
+    "selected": "Selecionada",
+    "selectedHint": "Selecionada. Só será guardada quando guardares o perfil.",
+    "option": "Imagem {number}",
+    "pending": "A confirmar a tua escolha …",
+    "loading": "A carregar imagens …",
+    "error": "Não foi possível confirmar a tua escolha.",
+    "empty": "De momento não há novas imagens disponíveis.",
+    "expired": "Esta escolha expirou. Escolhe novamente.",
+    "retry": "Voltar a carregar",
+    "restore": "Usar a imagem atual",
+    "optional": "Podes continuar sem uma nova imagem.",
+    "unavailable": "Imagem indisponível",
+    "exclusiveHint": "Cada novo motivo é atribuído apenas uma vez. Os motivos eliminados definitivamente não voltam.",
+    "all": "Todos",
+    "feminine": "Feminino",
+    "masculine": "Masculino",
+    "neutral": "Neutro",
+    "presentationLabel": "Estilo do avatar",
+    "deleteConfirm": "Eliminar este motivo definitivamente ao guardar? Nunca será atribuído novamente. Mudar apenas a imagem não o elimina.",
+    "deleteCancelled": "Eliminação não confirmada. Os dados introduzidos foram mantidos.",
+    "deletePending": "Este motivo será eliminado definitivamente ao guardar."
   }
 }
