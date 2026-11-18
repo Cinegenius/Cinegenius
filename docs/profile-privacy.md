@@ -54,7 +54,7 @@ Application rollback should retain the additive migration and privacy choices. D
 - Production build, TypeScript, catalog validation (nine languages, no newly admitted hard-coded copy) and shared design checks passed. Browser testing used mocked boundaries; production migration/live verification remains a release prerequisite.
 - Evidence: `/srv/cinegenius/audits/20261114-profile-privacy/`.
 
-## Member-only profiles — 18 November 2026 (prepared, not deployed)
+## Member-only profiles — 18 November 2026 (released)
 
 The owner can additionally choose the existing translated “signed-in members”
 audience for the whole profile. Guest reads, metadata, public photo discovery and
@@ -66,15 +66,31 @@ image URLs and participant records still applies.
 
 The contract adds `members` to `settings.profile_visibility`; all seventeen
 `PrivacySettings.audience.members` translations are reused. There is no new
-gender, account-type or paid-status check. Native UI must wait for backend release
-before offering the value, retain server error/retry behavior, and refresh permissions
-on sign-in/out. Unknown audience values fail closed.
+gender, account-type or paid-status check. WEB confirmed the matching backend
+release in `6f5ec38a8f4df537a77885285f2bf053875fa785`; its prerequisite for clients
+offering this value is fulfilled. Retain server error/retry behavior and refresh
+permissions on sign-in/out. Unknown audience values fail closed.
 
-Apply and verify `20261118205822_member_profile_visibility.sql` before the dependent
-source release. It constrains allowed values, extends protected original-media
+WEB applied and verified `20261118205822_member_profile_visibility.sql` before
+the dependent release; do not apply it again during App reconciliation.
+It constrains allowed values, extends protected original-media
 reads, and excludes legacy member-image mirrors from both public discovery paths.
 Do not roll back to an application that treats every non-private profile as public.
 
 Checks: local Postgres policy/original-image/mirror tests, API/account-boundary tests,
 linked identity tests and global-search tests. Browser results are recorded separately
 and do not establish native-app or live-account validation.
+
+App follow-up `0189398` also fixes a shared loading state: account changes clear
+`busy` before an absent account returns, so logout during a pending settings read
+or write cannot leave the old loading indicator active. The Web component's
+synthetic browser check reproduced the failure before the fix and verifies logout,
+late-response rejection, the next account's settings and a subsequent save.
+
+WEB's release receipt records eleven rolled-back live permission cases, including
+canonical image access. Evidence:
+`/srv/cinegenius/research/20261118-profile-art-mixed-release/receipt.json`.
+App's source migration hash matches that receipt; its signed-out API checks return
+401/private-no-store and `/dashboard` redirects to same-host `/sign-in`.
+These checks do not replace authenticated iPhone validation or constitute a native
+release. Smart remains paused.

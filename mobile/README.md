@@ -179,17 +179,19 @@ References:
 
 ### Profile artwork and members privacy — 18 November 2026
 
-The shared App source now includes the exclusive artwork dependency chain through
-live Web commit `2a4dac4` and the prepared follow-up `e96edbb`. Atomic artwork
+The shared App source includes the exclusive artwork dependency chain through
+`2a4dac4` and follow-up `e96edbb`, released by WEB in `6f5ec38` on 18 November.
+The final account-loading correction was already present in App `0189398`. Atomic artwork
 selection/deletion remains compatible with App's compact/large-photo preference.
 The account-scoped privacy validator understands `members`; signing out during
 a pending privacy save clears its loading state.
 
-The members migration and new mixed artwork package are **not published**.
-Do not enable members controls in an independently bundled client before WEB
-confirms the matching backend release. The current remote preview keeps using
-the published site's controls. This source reconciliation neither applies the
-SQL nor replaces the app installed on a device. Native scanner sources and their
+The members migration and 21 avatar/21 cover package are now **published** by WEB
+after explicit approval. The backend prerequisite for `members` is fulfilled;
+there is no separate native visibility switch in this checkout. The remote
+preview loads the published site's controls from the configured origin. This
+status reconciliation neither reapplies SQL nor replaces the app installed on a
+device. Native scanner sources and their
 translations remain unchanged. See
 [`docs/test-reports/app-members-and-artwork-2026-11-18.md`](../docs/test-reports/app-members-and-artwork-2026-11-18.md)
 for checks and outstanding device limits. The full shared-source production build
