@@ -22,7 +22,10 @@ export function isProtectedMediaOptimizerSource(value: string | null, origin: st
     let decodedValue = value;
     for (let n = 0; n < 3; n++) { const next = decodeURIComponent(decodedValue); if (next === decodedValue) break; decodedValue = next; }
     const path = new URL(decodedValue.replace(/\\/g,"/"), origin).pathname.replace(/\/{2,}/g, "/");
-    return /^\/api\/(?:media(?:\/|$)|message-attachments(?:\/|$)|admin\/(?:reviews|organizations|support)(?:\/|$)|verification-requests(?:\/|$)|community-image(?:\/|$))/i.test(path);
+    // v2 decoration has a revocable approval reader; it must not acquire a
+    // permanent optimizer copy. This does not make it an owned member upload.
+    return /^\/profile-art\/v2(?:\/|$)/i.test(path)
+      || /^\/api\/(?:media(?:\/|$)|message-attachments(?:\/|$)|admin\/(?:reviews|organizations|support)(?:\/|$)|verification-requests(?:\/|$)|community-image(?:\/|$))/i.test(path);
 
   } catch { return true; }
 }

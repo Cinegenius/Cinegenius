@@ -84,7 +84,7 @@ const shaPattern = /^[0-9a-f]{64}$/;
 const failure = (code: ProfileArtImageErrorCode, match?: ProfileArtMatchEvidence): ProfileArtImagePreparationResult =>
   ({ ok: false, code, inventoryReady: false, ...(match ? { match } : {}) });
 
-function validateComparisons(value: ProfileArtComparisonSet): ProfileArtImageErrorCode | null {
+export function validateProfileArtComparisons(value: ProfileArtComparisonSet): ProfileArtImageErrorCode | null {
   if (!value || value.scope !== "all-catalog-art" || value.complete !== true) return "comparison_set_incomplete";
   if (typeof value.snapshotID !== "string" || !idPattern.test(value.snapshotID) || !Array.isArray(value.entries)) return "invalid_comparison_set";
   if (value.entries.length > PROFILE_ART_IMAGE_POLICY.maxReferences) return "comparison_set_too_large";
@@ -200,7 +200,7 @@ export async function prepareProfileArtImage(
   if (!input || !["avatar", "cover"].includes(input.kind) || !(input.bytes instanceof Uint8Array)) return failure("invalid_input");
   if (!input.bytes.byteLength) return failure("empty_input");
   if (input.bytes.byteLength > PROFILE_ART_IMAGE_POLICY.maxInputBytes) return failure("input_too_large");
-  const comparisonError = validateComparisons(comparisons);
+  const comparisonError = validateProfileArtComparisons(comparisons);
   if (comparisonError) return failure(comparisonError);
   if (options.signal?.aborted) return failure("aborted");
   if (activeJobs >= PROFILE_ART_IMAGE_POLICY.maxActiveJobs) return failure("busy");

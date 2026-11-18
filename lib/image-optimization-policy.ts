@@ -4,7 +4,7 @@
  */
 export function staticImagePatterns(publicFiles: string[]) {
   const assets = publicFiles.filter(file => /\.(avif|webp|png|jpe?g|gif|svg|ico)$/i.test(file)
-    && !file.startsWith("api/") && !file.split("/").includes(".."));
+    && !file.startsWith("api/") && !file.startsWith("profile-art/v2/") && !file.split("/").includes(".."));
   // Next accepts at most 25 local patterns. Group each repository-owned art
   // collection; never broaden the allowlist to API routes or private uploads.
   const artDirectories = new Set(assets.filter(file => /^profile-art\/v\d+\/[a-z0-9-]+\.webp$/.test(file)).map(file => file.slice(0, file.lastIndexOf("/"))));
