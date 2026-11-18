@@ -29,12 +29,21 @@ API records and image stand-ins; they cover all locales, narrow layouts, retry,
 lease expiry, account changes and explicit deletion. No real account or iPhone
 was tested. Native resources were not regenerated or installed.
 
-The full build compiled successfully but its TypeScript stage was interrupted
-(exit 143); this is not a passing full build. Two diagnostics in the unchanged
-upstream `use-exclusive-profile-art.ts` hook and existing unrelated component
-diagnostics remain; lint is not clean. See external logs for the exact comparison.
+The final full production build passed (exit 0), including TypeScript and 160
+generated pages. The preceding run had been interrupted during TypeScript (143);
+the final log supersedes that incomplete result. The build reports unavailable
+homepage recommendations; this does not establish an authenticated homepage test.
+Two diagnostics in the unchanged upstream `use-exclusive-profile-art.ts` hook
+and existing unrelated component diagnostics remain; lint is not clean. See
+external logs for the exact comparison.
 No new dependency beyond upstream's pinned Next/eslint-config-next 16.4.6 was added.
 
+WEB independently reproduced the pending-save logout issue and accepted the same
+loading-state correction in prepared `6f5ec38a8f4df537a77885285f2bf053875fa785`.
+WEB reports five browser cases plus locale/design checks; these are separate
+from the App checks above. The fix is already in App `0189398`; no duplicate
+source import is needed. It remains unpublished with the members package.
+
 No deployment, production migration, production content write, paid model request
-or device installation was performed. Smart work is kept separate from this
-artwork integration; newer explicit Smart instructions govern subsequent work.
+or device installation was performed. The existing Smart work remains preserved
+and paused. Its historical Web/App requirements do not lift the later pause.

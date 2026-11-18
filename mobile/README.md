@@ -177,6 +177,24 @@ References:
 
 ## Checks
 
+### Profile artwork and members privacy — 18 November 2026
+
+The shared App source now includes the exclusive artwork dependency chain through
+live Web commit `2a4dac4` and the prepared follow-up `e96edbb`. Atomic artwork
+selection/deletion remains compatible with App's compact/large-photo preference.
+The account-scoped privacy validator understands `members`; signing out during
+a pending privacy save clears its loading state.
+
+The members migration and new mixed artwork package are **not published**.
+Do not enable members controls in an independently bundled client before WEB
+confirms the matching backend release. The current remote preview keeps using
+the published site's controls. This source reconciliation neither applies the
+SQL nor replaces the app installed on a device. Native scanner sources and their
+translations remain unchanged. See
+[`docs/test-reports/app-members-and-artwork-2026-11-18.md`](../docs/test-reports/app-members-and-artwork-2026-11-18.md)
+for checks and outstanding device limits. The full shared-source production build
+passed; this does not constitute an Xcode build or an iPhone installation.
+
 ### Regional news and language preferences
 
 The remote homepage and News directory use the shared `lib/news-region*` logic.
