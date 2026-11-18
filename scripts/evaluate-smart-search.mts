@@ -77,7 +77,8 @@ async function worker() {
       const plan = keywordSearchPlan(item.query, item.locale) ?? (provided && normalizeKeywordPlan(provided, item.locale));
       const passed = !!plan && item.check(plan.searches);
       if (!passed) failed++;
-      console.log("SMART_EVAL " + JSON.stringify({ id: item.id, model: item.model, passed, searches: plan?.searches ?? [], usage: body.usage }));
+      console.log("SMART_EVAL " + JSON.stringify({ id: item.id, model: item.model, passed, searches: plan?.searches ?? [],
+        ...(!passed ? { syntheticProposal: advice.searches, syntheticReply: advice.reply } : {}), usage: body.usage }));
     } catch (error) {
       failed++;
       console.log("SMART_EVAL " + JSON.stringify({ id: item.id, model: item.model, passed: false, error: error instanceof Error && /^Provider status \d+$/.test(error.message) ? error.message : "Evaluation failed" }));
