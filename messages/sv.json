@@ -13421,6 +13421,15 @@
     "retry": "Ladda om",
     "restore": "Använd nuvarande bild",
     "optional": "Du kan fortsätta utan en ny bild.",
-    "unavailable": "Bilden är inte tillgänglig"
+    "unavailable": "Bilden är inte tillgänglig",
+    "exclusiveHint": "Varje nytt motiv tilldelas bara en gång. Permanent raderade motiv kommer inte tillbaka.",
+    "all": "Alla",
+    "feminine": "Kvinnlig",
+    "masculine": "Manlig",
+    "neutral": "Neutral",
+    "presentationLabel": "Avatarstil",
+    "deleteConfirm": "Radera motivet permanent när du sparar? Det tilldelas aldrig igen. Att bara byta bild raderar det inte.",
+    "deleteCancelled": "Raderingen bekräftades inte. Dina uppgifter finns kvar.",
+    "deletePending": "Motivet raderas permanent när du sparar."
   }
 }

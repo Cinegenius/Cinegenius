@@ -539,7 +539,7 @@ function ProfileSetupContent() {
         const profilePayload = setupProfilePayload(progress, profileExists ? savedProfile : null, selectedRoles);
         const response = await fetch("/api/profile", {
           method: profileExists ? "PATCH" : "POST", headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(prepareArtSave(profilePayload, savedProfile?.updated_at ?? null, [await avatarArt.claim(), await coverArt.claim()])),
+          body: JSON.stringify(prepareArtSave(profilePayload, savedProfile?.updated_at ?? null, [await avatarArt.claim(), await coverArt.claim()], [avatarArt.deletion(), coverArt.deletion()])),
         });
         const result = await response.json().catch(() => ({}));
         const profileSaved = response.ok && (profileExists ? result.success === true : Boolean(result.profile?.user_id));
@@ -651,12 +651,12 @@ function ProfileSetupContent() {
       <ContentUsageNotice context="profile" visibility="configured" />
       {avatar && <Image src={avatar} alt={label} width={160} height={160} className="h-24 w-24 rounded-full border border-border object-cover" />}
       <p className="text-xs leading-5 text-text-muted">{uiText("ProfileArt.editable")}</p>
-      <div className="flex flex-wrap gap-2">{uploadInput(false)}{avatar && <button type="button" disabled={disabled} onClick={() => select("profileAvatarUrl", "")} className="min-h-11 rounded-lg border border-border px-3 text-sm text-text-secondary disabled:opacity-50">{t("copy0")}</button>}</div>
+      <div className="flex flex-wrap gap-2">{uploadInput(false)}{avatar && <button type="button" disabled={disabled} onClick={() => {if (avatarArt.confirmRemoval()) select("profileAvatarUrl", "");}} className="min-h-11 rounded-lg border border-border px-3 text-sm text-text-secondary disabled:opacity-50">{t("copy0")}</button>}</div>
       <ExclusiveProfileArtPicker {...avatarArt.props} />
       {intent !== "talent" && <div className="space-y-3 pt-3">
         <p className="text-sm font-medium">{uiText("profile.sectionCover")} <span className="text-text-muted">{t("copy23")}</span></p>
         {cover && <Image src={cover} alt={uiText("profile.sectionCover")} width={720} height={288} className="aspect-[5/2] w-full rounded-lg object-cover" />}
-        <div className="flex flex-wrap gap-2">{uploadInput(true)}{cover && <button type="button" disabled={disabled} onClick={() => select("profileCoverUrl", "")} className="min-h-11 rounded-lg border border-border px-3 text-sm text-text-secondary disabled:opacity-50">{t("copy0")}</button>}</div>
+        <div className="flex flex-wrap gap-2">{uploadInput(true)}{cover && <button type="button" disabled={disabled} onClick={() => {if (coverArt.confirmRemoval()) select("profileCoverUrl", "");}} className="min-h-11 rounded-lg border border-border px-3 text-sm text-text-secondary disabled:opacity-50">{t("copy0")}</button>}</div>
         <ExclusiveProfileArtPicker {...coverArt.props} />
       </div>}
       {uploading && <p role="status" className="text-xs text-text-muted">{t("copy2")}</p>}

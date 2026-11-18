@@ -13421,6 +13421,15 @@
     "retry": "Voltar a carregar",
     "restore": "Usar a imagem atual",
     "optional": "Podes continuar sem uma nova imagem.",
-    "unavailable": "Imagem indisponível"
+    "unavailable": "Imagem indisponível",
+    "exclusiveHint": "Cada novo motivo é atribuído apenas uma vez. Os motivos eliminados definitivamente não voltam.",
+    "all": "Todos",
+    "feminine": "Feminino",
+    "masculine": "Masculino",
+    "neutral": "Neutro",
+    "presentationLabel": "Estilo do avatar",
+    "deleteConfirm": "Eliminar este motivo definitivamente ao guardar? Nunca será atribuído novamente. Mudar apenas a imagem não o elimina.",
+    "deleteCancelled": "Eliminação não confirmada. Os dados introduzidos foram mantidos.",
+    "deletePending": "Este motivo será eliminado definitivamente ao guardar."
   }
 }

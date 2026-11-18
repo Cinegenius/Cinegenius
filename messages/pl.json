@@ -13421,6 +13421,15 @@
     "retry": "Wczytaj ponownie",
     "restore": "Użyj obecnego obrazu",
     "optional": "Możesz kontynuować bez nowego obrazu.",
-    "unavailable": "Obraz niedostępny"
+    "unavailable": "Obraz niedostępny",
+    "exclusiveHint": "Każdy nowy motyw jest przypisywany tylko raz. Trwale usunięte motywy nie wracają.",
+    "all": "Wszystkie",
+    "feminine": "Kobiecy",
+    "masculine": "Męski",
+    "neutral": "Neutralny",
+    "presentationLabel": "Styl awatara",
+    "deleteConfirm": "Trwale usunąć ten motyw przy zapisie? Nigdy nie zostanie ponownie przypisany. Sama zmiana zdjęcia go nie usuwa.",
+    "deleteCancelled": "Usunięcie nie zostało potwierdzone. Wpisane dane zostały zachowane.",
+    "deletePending": "Ten motyw zostanie trwale usunięty przy zapisie."
   }
 }

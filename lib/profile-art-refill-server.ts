@@ -6,6 +6,7 @@ import { createProfileArtProducer } from "@/lib/profile-art-producer";
 import { createProfileArtStorage } from "@/lib/profile-art-storage";
 import { runProfileArtRefill, type ArtQueue, type ArtCatalogSnapshot } from "@/lib/profile-art-refill";
 import { readProfileArtResponse } from "@/lib/profile-art-reader";
+import { createProfileArtReviewer } from "@/lib/profile-art-reviewer";
 
 async function rpc(name: string, args: Record<string, unknown>, parent?: AbortSignal): Promise<unknown> {
   return withArtDeadline(async signal => {
@@ -18,7 +19,7 @@ async function rpc(name: string, args: Record<string, unknown>, parent?: AbortSi
   }, parent, 5000);
 }
 const queue: ArtQueue = {
-  claim: signal => rpc("profile_art_claim_refill", {}, signal),
+  claim: signal => rpc("profile_art_claim_refill_v2", {}, signal),
   snapshot: async signal => await rpc("profile_art_catalog_snapshot", {}, signal) as ArtCatalogSnapshot,
   stage: (job, revision, candidate, signal) => rpc("profile_art_stage_candidate", {p_job: job.id, p_token: job.token, p_revision: revision, p_candidate: candidate}, signal),
   fail: async (job, code) => { await rpc("profile_art_fail_refill", {p_job: job.id, p_token: job.token, p_code: code}); },
@@ -28,7 +29,15 @@ const queue: ArtQueue = {
 export async function runServerProfileArtRefill(signal?: AbortSignal) {
   if (!PROFILE_ART_REFILL_ENABLED) return {status: "disabled" as const, inventoryReady: false as const};
   const storage = createProfileArtStorage(db.storage);
-  return runProfileArtRefill({queue, produce: createProfileArtProducer({enabled: true, apiKey: process.env.OPENAI_API_KEY}), putVerified: storage.putVerified}, {enabled: true, signal});
+  return runProfileArtRefill({queue, produce: createProfileArtProducer({enabled: true, apiKey: process.env.OPENAI_API_KEY}), putVerified: storage.putVerified,
+    review: createProfileArtReviewer({apiKey: process.env.OPENAI_API_KEY}),
+    release: async (job, review, hash, bounded) => {
+      // Re-read the actual private object just before public release.
+      const {artBytesSHA256} = await import("@/lib/profile-art-storage");
+      if (artBytesSHA256(await storage.read(job.kind, job.mediaKey, bounded)) !== hash) throw new ArtPipelineError("storage_mismatch");
+      return rpc("profile_art_complete_review", {p_job: job.id, p_review: review, p_verified_sha: hash}, bounded);
+    },
+  }, {enabled: true, signal});
 }
 export async function enqueueServerProfileArtRefill(kind: PlatformArtKind, requestKey: string) {
   if (!PROFILE_ART_REFILL_ENABLED) return {status: "disabled" as const};

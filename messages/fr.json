@@ -13421,6 +13421,15 @@
     "retry": "Recharger",
     "restore": "Utiliser l’image actuelle",
     "optional": "Tu peux continuer sans nouvelle image.",
-    "unavailable": "Image indisponible"
+    "unavailable": "Image indisponible",
+    "exclusiveHint": "Chaque nouveau motif est attribué une seule fois. Un motif supprimé définitivement ne revient pas.",
+    "all": "Tous",
+    "feminine": "Féminin",
+    "masculine": "Masculin",
+    "neutral": "Neutre",
+    "presentationLabel": "Style de l’avatar",
+    "deleteConfirm": "Supprimer définitivement ce motif à l’enregistrement ? Il ne sera jamais réattribué. Changer d’image ne le supprime pas.",
+    "deleteCancelled": "Suppression non confirmée. Vos saisies sont conservées.",
+    "deletePending": "Ce motif sera définitivement supprimé à l’enregistrement."
   }
 }

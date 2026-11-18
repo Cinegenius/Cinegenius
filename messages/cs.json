@@ -13421,6 +13421,15 @@
     "retry": "Načíst znovu",
     "restore": "Použít aktuální obrázek",
     "optional": "Můžeš pokračovat bez nového obrázku.",
-    "unavailable": "Obrázek není dostupný"
+    "unavailable": "Obrázek není dostupný",
+    "exclusiveHint": "Každý nový motiv je přidělen pouze jednou. Trvale smazané motivy se nevracejí.",
+    "all": "Vše",
+    "feminine": "Ženský",
+    "masculine": "Mužský",
+    "neutral": "Neutrální",
+    "presentationLabel": "Styl avataru",
+    "deleteConfirm": "Při uložení tento motiv trvale smazat? Už nikdy nebude znovu přidělen. Pouhá změna obrázku jej nesmaže.",
+    "deleteCancelled": "Smazání nebylo potvrzeno. Zadané údaje zůstávají zachovány.",
+    "deletePending": "Tento motiv bude při uložení trvale smazán."
   }
 }

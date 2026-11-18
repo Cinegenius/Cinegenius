@@ -4,8 +4,9 @@ import { useId, useState } from "react";
 import { useTranslations } from "next-intl";
 import { Check, ChevronDown, ImageOff } from "lucide-react";
 import MediaImage from "@/components/MediaImage";
+import { ART_PRESENTATIONS, type ArtPresentation } from "@/lib/profile-art-refill-contract";
 
-export type ExclusiveProfileArtOption = Readonly<{ artworkId: string; previewSrc: string }>;
+export type ExclusiveProfileArtOption = Readonly<{ artworkId: string; previewSrc: string; presentation?: ArtPresentation }>;
 export type SavedProfileArtChoice = Readonly<{ previewSrc: string; artworkId?: string }>;
 export type ExclusiveProfileArtStatus = "ready" | "loading" | "error" | "empty" | "expired";
 
@@ -15,12 +16,14 @@ export type ExclusiveProfileArtPickerProps = {
   options: readonly ExclusiveProfileArtOption[];
   /** Actual saved photograph, legacy artwork or owned artwork; never inferred. */
   savedChoice?: SavedProfileArtChoice | null;
+  savedIsCurrent?: boolean;
   /** Server-confirmed draft selection, NOT a saved/published profile change. */
   confirmedChoice?: ExclusiveProfileArtOption | null;
   /** The owner supplies and clears this while its bounded request is pending. */
   pendingArtworkId?: string | null;
   status: ExclusiveProfileArtStatus;
   disabled?: boolean;
+  pendingDeletion?: boolean;
   onSelect: (artworkId: string) => void;
   onRestoreSaved: () => void;
   onRetry: () => void;
@@ -33,17 +36,18 @@ export type ExclusiveProfileArtPickerProps = {
  * Existing upload/removal actions remain in the surrounding profile form. */
 export default function ExclusiveProfileArtPicker({
   kind, options, savedChoice, confirmedChoice, pendingArtworkId, status,
-  disabled = false, onSelect, onRestoreSaved, onRetry, onOpen,
+  disabled = false, pendingDeletion = false, savedIsCurrent = true, onSelect, onRestoreSaved, onRetry, onOpen,
 }: ExclusiveProfileArtPickerProps) {
   const t = useTranslations("ExclusiveProfileArt");
   const id = useId();
   const [open, setOpen] = useState(false);
+  const [presentation, setPresentation] = useState<ArtPresentation | "all">("all");
   const title = t(kind === "avatar" ? "chooseAvatar" : "chooseCover");
   const confirmed = status === "expired" ? null : confirmedChoice;
-  const savedIsSelected = Boolean(savedChoice && (!confirmed || (savedChoice.artworkId && savedChoice.artworkId === confirmed.artworkId)));
+  const savedIsSelected = Boolean(savedIsCurrent && savedChoice && (!confirmed || (savedChoice.artworkId && savedChoice.artworkId === confirmed.artworkId)));
   const pending = Boolean(pendingArtworkId);
   const choicesDisabled = disabled || pending || status === "loading";
-  const visibleOptions = options.slice(0, 12).filter(option => option.artworkId !== savedChoice?.artworkId);
+  const visibleOptions = options.slice(0, 12).filter(option => option.artworkId !== savedChoice?.artworkId && (kind === "cover" || presentation === "all" || option.presentation === presentation));
   // A confirmed selection may have left the ready inventory; it must stay visible.
   const separateConfirmed = confirmed && !savedIsSelected && !visibleOptions.some(option => option.artworkId === confirmed.artworkId);
   const messageKey = pending ? "pending" : status === "loading" ? "loading" : status === "error" ? "error"
@@ -71,6 +75,11 @@ export default function ExclusiveProfileArtPicker({
     {open && <fieldset disabled={disabled} aria-describedby={`${id}-help`} className="min-w-0 space-y-3 pb-3">
       <legend className="sr-only">{title}</legend>
       <p id={`${id}-help`} className="text-xs leading-5 text-text-muted">{t("help")}</p>
+      <p className="text-xs leading-5 text-text-secondary">{t("exclusiveHint")}</p>
+      {pendingDeletion && <p role="status" className="text-xs leading-5 text-text-secondary">{t("deletePending")}</p>}
+      {kind === "avatar" && <div role="group" aria-label={t("presentationLabel")} className="grid grid-cols-2 gap-1 min-[420px]:grid-cols-4">
+        {(["all", ...ART_PRESENTATIONS] as const).map(group => <button key={group} type="button" aria-pressed={presentation === group} onClick={() => setPresentation(group)} className={`min-h-11 min-w-0 rounded-lg px-2 py-1 text-xs focus-visible:outline-2 focus-visible:outline-gold ${presentation === group ? "bg-gold/10 text-gold" : "text-text-secondary hover:bg-bg-secondary"}`}>{t(group)}</button>)}
+      </div>}
       {savedChoice && <label className={`flex min-h-11 min-w-0 cursor-pointer items-center gap-3 rounded-xl border p-2 has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-gold ${savedIsSelected ? "border-gold bg-gold/10" : "border-border bg-bg-secondary"} ${disabled ? "cursor-default opacity-70" : ""}`}>
         <input type="radio" name={id} value="current" checked={savedIsSelected} disabled={disabled} onClick={() => { if (!disabled && savedIsSelected && (pending || status === "expired")) onRestoreSaved(); }} onChange={() => { if (!disabled && !savedIsSelected) onRestoreSaved(); }} className="h-4 w-4 shrink-0 accent-gold" />
         <span className="block w-14 shrink-0"><ProfileArtPreview key={savedChoice.previewSrc} src={savedChoice.previewSrc} kind={kind} unavailable={t("unavailable")} /></span>

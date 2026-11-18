@@ -13421,6 +13421,15 @@
     "retry": "Reload",
     "restore": "Use current image",
     "optional": "You can continue without a new image.",
-    "unavailable": "Image unavailable"
+    "unavailable": "Image unavailable",
+    "exclusiveHint": "Each new design is assigned only once. Permanently deleted designs never return.",
+    "all": "All",
+    "feminine": "Feminine",
+    "masculine": "Masculine",
+    "neutral": "Neutral",
+    "presentationLabel": "Avatar style",
+    "deleteConfirm": "Permanently delete this design when you save? It will never be assigned again. Changing your picture alone does not delete it.",
+    "deleteCancelled": "Deletion not confirmed. Your input is preserved.",
+    "deletePending": "This design will be permanently deleted when you save."
   }
 }

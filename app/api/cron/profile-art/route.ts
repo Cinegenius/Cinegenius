@@ -5,7 +5,7 @@ import { enqueueServerProfileArtRefill, runServerProfileArtRefill } from "@/lib/
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
-export const maxDuration = 120;
+export const maxDuration = 150;
 const headers = {"Cache-Control": "private, no-store"};
 
 /** Fixed curated artwork only. Neither prompts, accounts nor URLs are accepted. */

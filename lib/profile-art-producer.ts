@@ -1,15 +1,15 @@
 /** Node-only adapter. The production entrypoint is additionally server-only. */
 import { Buffer } from "node:buffer";
-import { PROFILE_ART_REFILL_POLICY as POLICY, isArtUUID, isPlatformArtKind, type ArtJob } from "@/lib/profile-art-refill-contract";
+import { PROFILE_ART_REFILL_POLICY as POLICY, isArtUUID, isPlatformArtKind, isArtPresentation, type ArtJob } from "@/lib/profile-art-refill-contract";
 import { ArtPipelineError, readArtStream, withArtDeadline } from "@/lib/profile-art-io";
 
 const themes = ["water", "moon", "sun", "earth", "sky", "ice", "heat", "mountains", "valley", "forest", "desert", "polar landscape"];
-function promptFor(job: ArtJob): string {
+export function profileArtPrompt(job: ArtJob): string {
   const index = parseInt(job.id.slice(0, 8), 16);
-  const common = "Create one original editorial illustration for CineGenius, a film-production community. Restrained cinematic shapes, charcoal and rich color with a small lime accent. No text, logos, signatures, real people or copied existing artwork. A distinct new composition, not a recoloring of another illustration.";
+  const common = "Create one original, refined CineGenius profile illustration. Calm contemporary cinematic design, subtle light and depth, a restrained lime accent, rich but harmonious colors. Simple readable composition with generous negative space. No text, logos, signatures, collage, wireframes, line drawings, technical patterns, low-poly geometry or harsh neon background. No real people or copied existing artwork. A genuinely different composition, not a recoloring of an existing motif.";
   return job.kind === "cover"
-    ? `${common} Theme: ${themes[index % themes.length]}. Nature cover, generous horizontal composition; important forms inside the central 5:2 crop.`
-    : `${common} Abstract ${["masculine-presenting", "feminine-presenting", "androgynous"][index % 3]} silhouette. Friendly, faceless, no identifiable ethnicity; centered square portrait, readable at small sizes. This is a freely chosen illustration, not a statement of its owner's identity.`;
+    ? `${common} Theme: ${themes[index % themes.length]}. Peaceful natural landscape, soft atmospheric layers, believable organic shapes, no animals or people, no fantasy adventure painting. Wide panoramic composition, all important forms inside the central 5:2 crop. Avoid a generic central triangular mountain and oversized sun.`
+    : `${common} One ${job.presentation === "feminine" ? "feminine-presenting" : job.presentation === "masculine" ? "masculine-presenting" : "gender-neutral"} human head-and-shoulders silhouette. Sculpted dark navy shape with a subtle soft rim light, no eyes, mouth, nose detail or skin tones. Clearly readable silhouette and natural hair outline, friendly and understated. No hats, cameras, props or studio scenery. Quiet colored background, not solid bright yellow. Centered square portrait, no cropped head. The presentation is freely selectable by everyone and does not describe a real user's identity.`;
 }
 
 export function createProfileArtProducer({ enabled = false, apiKey, fetcher = fetch }: { enabled?: boolean; apiKey?: string; fetcher?: typeof fetch } = {}) {
@@ -17,12 +17,13 @@ export function createProfileArtProducer({ enabled = false, apiKey, fetcher = fe
     if (!enabled) throw new ArtPipelineError("producer_disabled");
     if (!apiKey || !apiKey.trim()) throw new ArtPipelineError("provider_unavailable");
     if (!isArtUUID(job.id) || !isPlatformArtKind(job.kind)) throw new ArtPipelineError("invalid_job");
+    if (job.kind === "avatar" && !isArtPresentation(job.presentation)) throw new ArtPipelineError("invalid_presentation");
     return withArtDeadline(async signal => {
       // One attempt only; unknown outcomes must never trigger an automatic paid retry.
       const response = await fetcher("https://api.openai.com/v1/images/generations", {
         method: "POST", redirect: "error", cache: "no-store", signal,
         headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
-        body: JSON.stringify({ model: POLICY.model, prompt: promptFor(job), n: 1, quality: "low", size: job.kind === "avatar" ? "1024x1024" : "1536x1024", output_format: "webp", background: "opaque", moderation: "auto" }),
+        body: JSON.stringify({ model: POLICY.model, prompt: profileArtPrompt(job), n: 1, quality: "low", size: job.kind === "avatar" ? "1024x1024" : "1536x1024", output_format: "webp", background: "opaque", moderation: "auto" }),
       });
       if (!response.ok) { void response.body?.cancel().catch(() => undefined); throw new ArtPipelineError("provider_failed"); }
       if (!response.headers.get("content-type")?.toLowerCase().includes("application/json")) { void response.body?.cancel().catch(() => undefined); throw new ArtPipelineError("provider_invalid"); }

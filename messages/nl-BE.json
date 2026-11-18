@@ -13421,6 +13421,15 @@
     "retry": "Opnieuw laden",
     "restore": "Huidige afbeelding gebruiken",
     "optional": "Je kunt doorgaan zonder nieuwe afbeelding.",
-    "unavailable": "Afbeelding niet beschikbaar"
+    "unavailable": "Afbeelding niet beschikbaar",
+    "exclusiveHint": "Elk nieuw ontwerp wordt maar één keer toegewezen. Definitief verwijderde ontwerpen komen niet terug.",
+    "all": "Alle",
+    "feminine": "Vrouwelijk",
+    "masculine": "Mannelijk",
+    "neutral": "Neutraal",
+    "presentationLabel": "Avatarstijl",
+    "deleteConfirm": "Dit ontwerp bij het opslaan definitief verwijderen? Het wordt nooit opnieuw toegewezen. Alleen je afbeelding wijzigen verwijdert het niet.",
+    "deleteCancelled": "Verwijdering niet bevestigd. Je invoer blijft behouden.",
+    "deletePending": "Dit ontwerp wordt bij het opslaan definitief verwijderd."
   }
 }

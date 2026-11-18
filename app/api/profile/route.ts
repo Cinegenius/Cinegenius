@@ -75,6 +75,8 @@ function isValidProfileTypes(value: unknown): value is string[] {
   return Array.isArray(value) && value.every((entry) => typeof entry === "string" && PROFILE_TYPE_VALUES.has(entry));
 }
 
+export const maxDuration = 150;
+
 export async function GET(req: NextRequest) {
   const tResponse = await getResponseTranslations();
   const authResult = await requireAuth();

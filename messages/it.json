@@ -13421,6 +13421,15 @@
     "retry": "Ricarica",
     "restore": "Usa immagine attuale",
     "optional": "Puoi continuare senza una nuova immagine.",
-    "unavailable": "Immagine non disponibile"
+    "unavailable": "Immagine non disponibile",
+    "exclusiveHint": "Ogni nuovo motivo viene assegnato una sola volta. I motivi eliminati definitivamente non tornano disponibili.",
+    "all": "Tutti",
+    "feminine": "Femminile",
+    "masculine": "Maschile",
+    "neutral": "Neutro",
+    "presentationLabel": "Stile avatar",
+    "deleteConfirm": "Eliminare definitivamente questo motivo al salvataggio? Non verrà più assegnato. Cambiare immagine non lo elimina.",
+    "deleteCancelled": "Eliminazione non confermata. I dati inseriti sono conservati.",
+    "deletePending": "Questo motivo verrà eliminato definitivamente al salvataggio."
   }
 }

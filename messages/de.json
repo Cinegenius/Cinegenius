@@ -13421,6 +13421,15 @@
     "retry": "Erneut laden",
     "restore": "Aktuelles Bild verwenden",
     "optional": "Du kannst ohne neues Bild fortfahren.",
-    "unavailable": "Bild nicht verfügbar"
+    "unavailable": "Bild nicht verfügbar",
+    "exclusiveHint": "Jedes neue Motiv wird nur einmal vergeben. Endgültig gelöschte Motive kommen nicht zurück.",
+    "all": "Alle",
+    "feminine": "Weiblich",
+    "masculine": "Männlich",
+    "neutral": "Neutral",
+    "presentationLabel": "Avatar-Stil",
+    "deleteConfirm": "Dieses Motiv beim Speichern endgültig löschen? Es wird nie erneut vergeben. Ein Bildwechsel allein löscht es nicht.",
+    "deleteCancelled": "Löschen nicht bestätigt. Deine Eingaben bleiben erhalten.",
+    "deletePending": "Dieses Motiv wird beim Speichern endgültig gelöscht."
   }
 }

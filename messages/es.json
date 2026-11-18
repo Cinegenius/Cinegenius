@@ -13421,6 +13421,15 @@
     "retry": "Volver a cargar",
     "restore": "Usar imagen actual",
     "optional": "Puedes continuar sin una imagen nueva.",
-    "unavailable": "Imagen no disponible"
+    "unavailable": "Imagen no disponible",
+    "exclusiveHint": "Cada nuevo diseño se asigna una sola vez. Los diseños eliminados definitivamente no vuelven.",
+    "all": "Todos",
+    "feminine": "Femenino",
+    "masculine": "Masculino",
+    "neutral": "Neutro",
+    "presentationLabel": "Estilo del avatar",
+    "deleteConfirm": "¿Eliminar este diseño definitivamente al guardar? No volverá a asignarse. Cambiar de imagen no lo elimina.",
+    "deleteCancelled": "Eliminación no confirmada. Se conservan tus datos.",
+    "deletePending": "Este diseño se eliminará definitivamente al guardar."
   }
 }

@@ -207,3 +207,11 @@ Crew result row correction, 14 November 2026: Keep the compact count, Crew, Loca
 - The latest approved mobile concept is option 1: a small map above compact, area-grouped results with the shared Crew list/map switch. Desktop keeps a large map on the right and compact results on the left. Keep further filters collapsed and show only areas with actual currently visible entries; no empty requested categories or invented results.
 - Deduplicate repeated type/id results across wishes without changing their public facts or server ranking. Keep all existing result cursors, unmapped list entries, explicit map filtering and current privacy/admin checks.
 - Mark the active, authorized Smart search input with the existing Lime accent on the homepage and Smart results. The same server-confirmed account predicate controls access and homepage styling; this is not an access expansion. Preserve ordinary search and member/guest development previews. See docs/smart-discovery.md.
+
+
+## Exclusive artwork replenishment (operator correction, 18 November 2026)
+
+- New optional artwork uses faceless silhouettes and quiet nature covers; omit line drawings, technical patterns, harsh neon geometry and busy illustrated scenes. Avatar presentation is freely selectable as feminine, masculine or neutral, never inferred from the member.
+- Offer four avatars per presentation and twelve covers, with an additional reserve. Refill after confirmed assignment, not page opening. One-time assignment must be backed by durable ownership and current availability; never recycle shared legacy artwork as exclusive. Provider/quality failures must not be reported as available stock.
+- A picture change retains prior ownership. Explicit permanent deletion requires confirmation and profile Save, blocks future use/reassignment, and retains a duplicate-prevention tombstone. Preserve interrupted input and old clients; do not make ordinary photo uploads destructive.
+- Verschenken/Tauschen is a future proposal, not an active feature. Any later transfer must change a single owner atomically and require the actual owner's confirmation. See `docs/profile-art-stock.md` for the Web/native contract and validation boundary.

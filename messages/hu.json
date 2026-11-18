@@ -13421,6 +13421,15 @@
     "retry": "Újratöltés",
     "restore": "Jelenlegi kép használata",
     "optional": "Új kép nélkül is folytathatod.",
-    "unavailable": "A kép nem érhető el"
+    "unavailable": "A kép nem érhető el",
+    "exclusiveHint": "Minden új motívumot csak egyszer rendelünk hozzá valakihez. A végleg törölt motívumok nem térnek vissza.",
+    "all": "Összes",
+    "feminine": "Nőies",
+    "masculine": "Férfias",
+    "neutral": "Semleges",
+    "presentationLabel": "Avatar stílusa",
+    "deleteConfirm": "Végleg törlöd ezt a motívumot mentéskor? Többé nem rendeljük senkihez. A kép cseréje önmagában nem törli.",
+    "deleteCancelled": "A törlést nem erősítetted meg. A beírt adatok megmaradnak.",
+    "deletePending": "Ez a motívum mentéskor végleg törlődik."
   }
 }

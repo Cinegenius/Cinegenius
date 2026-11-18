@@ -1002,6 +1002,7 @@ function ProfileEditorContent({ accountId }: { accountId: string }) {
   };
 
   const removeAvatar = () => {
+    if (!avatarArt.confirmRemoval()) return;
     setAvatarPreview("");
     setAvatarUrl("");
   };
@@ -1261,7 +1262,7 @@ function ProfileEditorContent({ accountId }: { accountId: string }) {
         } : {
           ...commonPayload,
           slug:           form.slug.trim().toLowerCase().replace(/[^a-z0-9-]/g, "-").replace(/-+/g, "-").replace(/^-|-$/g, "") || null,
-        }, profileUpdatedAt || null, [await avatarArt.claim(), await coverArt.claim()])),
+        }, profileUpdatedAt || null, [await avatarArt.claim(), await coverArt.claim()], [avatarArt.deletion(), coverArt.deletion()])),
       });
       const baseResult = await res.json().catch(() => ({}));
       if (!isCurrentEditor()) return;
@@ -1979,6 +1980,7 @@ function ProfileEditorContent({ accountId }: { accountId: string }) {
                         markEditorChanged();
                       }}
                       onRemove={() => {
+                        if (!coverArt.confirmRemoval()) return;
                         setCoverImagePreview("");
                         setCoverImageUrl("");
                         markEditorChanged();

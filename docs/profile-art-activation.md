@@ -1,3 +1,5 @@
+> Replenishment, independent automatic style review and permanent deletion are updated in [profile-art-stock.md](profile-art-stock.md). The manual-only review workflow below describes the first activation.
+
 # Personal artwork activation — 18 November 2026
 
 This document supersedes the inactive-status descriptions in the earlier foundation,

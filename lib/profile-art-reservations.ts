@@ -16,7 +16,7 @@ export function prepareProfileArtCommand(userId: string | null, input: unknown):
   if (!isRecord(input) || !kindIsValid(input.kind)) return failure(400, "ART_INVALID");
   if (input.action === "read") {
     if (Object.keys(input).some(key => !["action", "kind"].includes(key))) return failure(400, "ART_INVALID");
-    return { ok: true, rpc: "profile_art_choices", args: { p_user: userId, p_kind: input.kind } };
+    return { ok: true, rpc: "profile_art_choices_v2", args: { p_user: userId, p_kind: input.kind } };
   }
   if (input.action !== "lease" && input.action !== "cancel") return failure(400, "ART_INVALID");
   const allowed = ["action", "kind", "expectedRevision", "requestKey", ...(input.action === "lease" ? ["artworkId"] : [])];

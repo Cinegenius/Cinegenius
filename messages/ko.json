@@ -13421,6 +13421,15 @@
     "retry": "다시 불러오기",
     "restore": "현재 이미지 사용",
     "optional": "새 이미지 없이 계속할 수 있습니다.",
-    "unavailable": "이미지를 사용할 수 없음"
+    "unavailable": "이미지를 사용할 수 없음",
+    "exclusiveHint": "새 디자인은 각각 한 번만 배정됩니다. 영구 삭제된 디자인은 다시 제공되지 않습니다.",
+    "all": "전체",
+    "feminine": "여성적",
+    "masculine": "남성적",
+    "neutral": "중성적",
+    "presentationLabel": "아바타 스타일",
+    "deleteConfirm": "저장할 때 이 디자인을 영구 삭제할까요? 다시는 배정되지 않습니다. 사진만 바꾸면 디자인은 삭제되지 않습니다.",
+    "deleteCancelled": "삭제가 확인되지 않았습니다. 입력 내용은 유지됩니다.",
+    "deletePending": "이 디자인은 저장할 때 영구 삭제됩니다."
   }
 }
