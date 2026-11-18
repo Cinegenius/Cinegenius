@@ -42,7 +42,7 @@ export async function PATCH(req: NextRequest) {
   const update: Record<string, unknown> = { user_id: userId, updated_at: new Date().toISOString() };
 
   if (body.profile_visibility !== undefined) {
-    if (!["public", "private"].includes(body.profile_visibility)) {
+    if (!["public", "members", "private"].includes(body.profile_visibility)) {
       return NextResponse.json({ error: tResponse('System.m_f4c28597d2f6') }, { status: 400 });
     }
     update.profile_visibility = body.profile_visibility;

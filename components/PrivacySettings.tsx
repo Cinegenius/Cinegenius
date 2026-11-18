@@ -61,7 +61,7 @@ export default function PrivacySettings({ accountId, showEmailPreference = true,
         <legend className="sr-only">{t("visibility")}</legend>
         <label className="block min-w-0 text-xs text-text-muted"><span className="mb-1.5 block">{t("profile")}</span>
           <select className={control} value={settings.profile_visibility} onChange={event => void change("profile_visibility",event.target.value)}>
-            <option value="public">{t("audience.public")}</option><option value="private">{t("audience.friends")}</option>
+            <option value="public">{t("audience.public")}</option><option value="members">{t("audience.members")}</option><option value="private">{t("audience.friends")}</option>
           </select>
         </label>
         {(["location_visibility","map_visibility","activity_visibility","phone_visibility","contact_email_visibility"] as const).map(key => <label key={key} className="block min-w-0 text-xs text-text-muted"><span className="mb-1.5 block">{t(key)}</span>

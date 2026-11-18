@@ -234,7 +234,7 @@ function ProfileSetupContent() {
       fetch("/api/user-settings", { cache: "no-store" }).then(response => response.ok ? response.json() : null).catch(() => null),
     ]).then(([saved, profile, settings]) => {
       if (!active) return;
-      setProfileIsPrivate(settings?.settings?.profile_visibility === "private" || settings?.settings?.ghost_mode === true);
+      setProfileIsPrivate(["private", "members"].includes(settings?.settings?.profile_visibility) || settings?.settings?.ghost_mode === true);
       setProfileExists(profile?.exists === true);
       setSavedProfile(profile?.profile ?? null);
       const profileComplete = hasProfileBasics(profile?.profile);

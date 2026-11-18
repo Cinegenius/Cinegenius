@@ -63,3 +63,15 @@ locales before production publication. The ongoing website-check agent stays off
 
 Operational results and exact live status belong in the separate release receipt;
 this document describes the implementation, not a claim of publication.
+
+## Mixed abstract assortment — 18 November 2026 (prepared, not deployed)
+
+The latest operator decision supersedes the faceless-only style brief: use the six
+approved mixed abstract directions, with restrained invented facial features allowed
+and some stronger color. Keep every presentation freely selectable. The default
+exclusive catalogue already interleaves presentations under All; the legacy grid
+now does the same. Preserve the 12-choice window and balanced reserve rather than
+loading the entire historical catalogue. The next reviewed package contains 21
+avatars and 21 covers, including one previously unselected original pair.
+See `design/profile-art/2026-11-18-mixed/README.md` for duplicate checks and release
+requirements. Personal likeness requests never go into the automatic stock pipeline.

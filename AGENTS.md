@@ -227,3 +227,19 @@ Crew result row correction, 14 November 2026: Keep the compact count, Crew, Loca
   landscapes. The independent review must enforce this style before replenishment.
 - Unrelated work remains paused; the Smart-language branch is not part of this
   artwork publication. See `design/profile-art/2026-11-18-classic/README.md`.
+
+
+## Mixed optional artwork and member profiles (operator update, 18 November 2026)
+
+- New stock uses the approved evening-light, color-field, paper-collage, soft-form,
+  faceted and flowing-color directions, including abstract invented facial features
+  and stronger color variations. This supersedes the faceless-only requirement.
+  Always show a collage before a new style; preserve exclusive ownership and
+  duplicate prevention. All presentations are freely selectable, mixed by default.
+  Personal photo likenesses remain private preview requests, outside stock generation.
+- Add `members` as an explicit profile visibility option, retaining `public`, legacy
+  friend-only `private`, Ghost, blocks and field audiences. Enforce visibility on
+  direct profiles, linked identities, search and protected media. Apply the member
+  privacy migration before releasing dependent controls. See docs/profile-privacy.md.
+- These additions do not resume the paused Smart-language work or authorize a new
+  production publication on their own.

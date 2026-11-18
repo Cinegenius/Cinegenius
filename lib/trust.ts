@@ -68,7 +68,7 @@ export async function canViewProfile(ownerId: string, viewerId: string | null): 
 }
 
 /** Private profiles stay out of public crew discovery, even if their link is known. */
-export async function getPrivateProfileIds(userIds: string[]): Promise<Set<string>> {
+export async function getPrivateProfileIds(userIds: string[], viewerId: string | null = null): Promise<Set<string>> {
   const uniqueIds = [...new Set(userIds)];
   if (uniqueIds.length === 0) return new Set();
 
@@ -83,7 +83,7 @@ export async function getPrivateProfileIds(userIds: string[]): Promise<Set<strin
     return new Set(uniqueIds);
   }
 
-  return new Set((data ?? []).filter((setting) => setting.profile_visibility === "private" || setting.ghost_mode).map((setting) => setting.user_id));
+  return new Set((data ?? []).filter((setting) => setting.ghost_mode || (setting.profile_visibility !== "public" && !(setting.profile_visibility === "members" && viewerId))).map((setting) => setting.user_id));
 }
 
 /**

@@ -30,7 +30,7 @@ export async function POST(req: NextRequest) {
     const recipient = body.recipient_user_id.slice(0, 128);
     const titles = normalizeCompanyPublicTitles(body.public_titles);
     if (!titles.length) return privateJson({ error: tResponse('System.m_d47564d2d8bc') }, 400);
-    if ((await getPrivateProfileIds([recipient])).has(recipient)) return privateJson({ error: tResponse('System.m_cd02279f1b7d') }, 404);
+    if ((await getPrivateProfileIds([recipient], userId)).has(recipient)) return privateJson({ error: tResponse('System.m_cd02279f1b7d') }, 404);
     const { data, error } = await db.rpc("invite_company_member", { p_actor: userId, p_company: companyId, p_recipient: recipient, p_titles: titles });
     if (error) return privateJson({ error: error.code === "23505" ? "Es besteht bereits eine Zugehörigkeit oder Anfrage. Bitte prüfe Team → Anfragen." : "Die Einladung konnte nicht gespeichert werden." }, error.code === "23505" ? 409 : 500);
     return privateJson({ success: true, id: data });

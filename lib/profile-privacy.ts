@@ -2,7 +2,7 @@ export const PRIVACY_AUDIENCES = ["public", "members", "friends", "hidden"] as c
 export type PrivacyAudience = typeof PRIVACY_AUDIENCES[number];
 export type PrivacySettings = {
   ghost_mode: boolean;
-  profile_visibility: "public" | "private";
+  profile_visibility: "public" | "members" | "private";
   location_visibility: PrivacyAudience;
   map_visibility: PrivacyAudience;
   activity_visibility: PrivacyAudience;
@@ -28,7 +28,7 @@ export function audienceAllows(audience: unknown, viewerId: string | null, frien
 export function profileAccess(settings: Partial<PrivacySettings> | null, ownerId: string, viewerId: string | null, friend = false, blocked = false): ProfileAccess {
   if (ownerId && ownerId === viewerId) return { profile: true, location: true, map: true, activity: true, phone: true, email: true };
   const s = { ...DEFAULT_PRIVACY, ...settings };
-  const profile = !blocked && !s.ghost_mode && (s.profile_visibility === "public" || (s.profile_visibility === "private" && !!viewerId && friend));
+  const profile = !blocked && !s.ghost_mode && (s.profile_visibility === "public" || (s.profile_visibility === "members" && !!viewerId) || (s.profile_visibility === "private" && !!viewerId && friend));
   const location = profile && audienceAllows(s.location_visibility, viewerId, friend);
   return { profile, location, map: location && audienceAllows(s.map_visibility, viewerId, friend),
     activity: profile && audienceAllows(s.activity_visibility, viewerId, friend),
