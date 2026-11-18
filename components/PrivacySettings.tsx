@@ -18,7 +18,7 @@ export default function PrivacySettings({ accountId, showEmailPreference = true,
   const settings = loaded?.account === accountId ? loaded.settings : null;
 
   useEffect(() => {
-    setLoaded(null); setError(false); setSaved(false);
+    setLoaded(null); setError(false); setSaved(false); setBusy(false);
     if (!accountId) return;
     const controller = new AbortController(); request.current = controller; setBusy(true);
     fetch("/api/user-settings", { cache: "no-store", signal: controller.signal })

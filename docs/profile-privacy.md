@@ -78,3 +78,9 @@ Do not roll back to an application that treats every non-private profile as publ
 Checks: local Postgres policy/original-image/mirror tests, API/account-boundary tests,
 linked identity tests and global-search tests. Browser results are recorded separately
 and do not establish native-app or live-account validation.
+
+App follow-up `0189398` also fixes a shared loading state: account changes clear
+`busy` before an absent account returns, so logout during a pending settings read
+or write cannot leave the old loading indicator active. The Web component's
+synthetic browser check reproduced the failure before the fix and verifies logout,
+late-response rejection, the next account's settings and a subsequent save.
