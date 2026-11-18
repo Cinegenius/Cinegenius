@@ -6,16 +6,19 @@ import { buildGenieInstructions, GENIE_LINKS, GENIE_LOCALES } from "../lib/genie
 import { SEARCH_WISH_SCHEMA, readSearchPlan, type SearchWish } from "../lib/unified-search";
 import { keywordSearchPlan, normalizeKeywordPlan } from "../lib/unified-search-intent";
 import { matchesWishPlaces, wishMarketplaceCategories, wishSearchTerms } from "../lib/unified-search-matching";
+import { departments } from "../lib/departments";
 
-if (process.env.CG_EVALUATE_SMART !== "1") process.exit(0);
-if (process.env.VERCEL !== "1") throw new Error("Smart evaluation requires the explicit staged build.");
-const key = process.env.OPENAI_API_KEY?.trim();
-if (!key || key.length < 20 || /placeholder|sensitive/i.test(key)) throw new Error("No usable staged AI credential.");
+const checkOnly = process.argv.includes("--check");
+if (process.env.CG_EVALUATE_SMART !== "1" && !checkOnly) process.exit(0);
 const source = ts.createSourceFile("plan.ts", readFileSync("lib/unified-search-plan-server.ts", "utf8"), ts.ScriptTarget.Latest);
 let instructions = "";
 for (const statement of source.statements) if (ts.isVariableStatement(statement)) {
   for (const declaration of statement.declarationList.declarations) if (declaration.name.getText(source) === "UNIFIED_SEARCH_INSTRUCTIONS"
-    && declaration.initializer && ts.isNoSubstitutionTemplateLiteral(declaration.initializer)) instructions = declaration.initializer.text;
+    && declaration.initializer && (ts.isNoSubstitutionTemplateLiteral(declaration.initializer) || ts.isTemplateExpression(declaration.initializer))) {
+      // Evaluate only our checked-in instruction template and its catalogue
+      // interpolation, never provider output or user content.
+      instructions = new Function("departments", `return ${declaration.initializer.getText(source)}`)(departments);
+    }
 }
 if (!instructions) throw new Error("Cannot read current Smart instructions.");
 const requests: Record<string, string> = {
@@ -51,6 +54,10 @@ const schema = { type: "object", additionalProperties: false, properties: { repl
   topic: { type: "string", enum: ["general", "platform_costs"] }, searches: SEARCH_WISH_SCHEMA, language: { type: "string", enum: GENIE_LOCALES } }, required: ["reply", "linkIds", "topic", "searches", "language"] };
 const checks = [...cases.map(item => ({ ...item, model: "gpt-4.1-mini" })), ...cases.filter(item => ["de", "independent-places", "exact-model"].includes(item.id)).map(item => ({ ...item, model: "gpt-6-astra" }))];
 if (checks.length > 22) throw new Error("Evaluation request budget exceeded.");
+if (checkOnly) { console.log(`Smart evaluation prepared: ${checks.length} synthetic requests, no API calls.`); process.exit(0); }
+if (process.env.VERCEL !== "1") throw new Error("Smart evaluation requires the explicit staged build.");
+const key = process.env.OPENAI_API_KEY?.trim();
+if (!key || key.length < 20 || /placeholder|sensitive/i.test(key)) throw new Error("No usable staged AI credential.");
 let next = 0, failed = 0;
 async function worker() {
   while (next < checks.length) {
