@@ -4,6 +4,19 @@ App-Auftrag vom 17. November 2026: Community-Fotos und Crew sollen ohne dauerhaf
 
 Aktualisierung vom 18. November 2026: Auf der Startseite beginnen die neuen Bilder ausdrücklich mit bis zu drei neuesten zulässigen Bildern unterschiedlicher Anbieter. Anschließend folgt die zufällige Mischung; dieselbe Bildadresse erscheint in der Auswahl nur einmal. Die vollständige Fotogalerie bleibt zufällig sortiert. Beide Startseitenabfragen verwenden dieselben aktuellen Sichtbarkeitsprüfungen und eine gemeinsame Zeitgrenze von vier Sekunden.
 
+Aktualisierung vom 19. November 2026: Der Startseitenbereich „Die Crew“ zeigt nach
+der neueren Betreiberentscheidung die neuesten sichtbaren Personen zuerst. Dort
+gilt jetzt wieder die gemeinsame chronologische Web-Abfrage; die vorherige
+zufällige Startseiten-Crew-Auswahl entfällt. Die vollständige Crew-Seite behält
+ihre stabile Zufallsreihenfolge. Die Startseite prüft weiterhin aktuelle Rechte
+und Personeneignung, bevor sie bis zu zehn Karten ausgibt. Die bestehende
+Web-Abfrage berücksichtigt höchstens 300 aktuelle benannte Kandidaten; bei mehr
+ausgeblendeten Kandidaten kann der Einstieg weniger als zehn Karten zeigen.
+Es wird keine vollständige Mitgliederliste oder Gesamtzahl behauptet.
+Dieser Abgleich betrifft den gemeinsamen Website-Quellcode im App-Arbeitszweig.
+Er ergänzt keinen nativen Crew-Bereich und belegt nicht die derzeit installierte
+iPhone-Oberfläche.
+
 Die Serverfunktionen `random_community_media`, `random_crew_profiles` und `random_crew_listings` sortieren den gesamten Kandidatenbestand anhand einer zufälligen öffentlichen Kennung vor der begrenzten Ausgabe. Community-Fotos verwenden pro beitragendem Konto eine zufällige Bildfolge; jede Runde zeigt höchstens ein Bild je Konto, bevor die nächste Runde beginnt. So beeinflusst die Zahl der Uploads nicht die erste Auswahl. Die bestehende Community-Ansicht entscheidet weiterhin über tatsächliche öffentliche Ursprünge. Blockierungen und der gültige Medienursprung werden vor der Fotozählung und Paginierung angewendet.
 
 Die Kennung ist kein Konto- oder Sitzungstoken. Foto-Blätterlinks, Fotodetails und Crew-Nachladeanfragen führen sie weiter. Die Crew-Sortierung bleibt bei lokaler Filterung und bei derselben Zurück-Navigation stabil; ein neuer Einstieg ohne Kennung erhält eine neue Mischung. Bei tatsächlich geänderten oder zurückgezogenen Datensätzen hat die aktuelle Sichtbarkeit Vorrang vor einer unveränderten Seitenzusammensetzung. Die Ordnung ist kein gespeicherter Berechtigungs-Schnappschuss.

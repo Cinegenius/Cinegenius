@@ -103,7 +103,7 @@ async function getHomeData() {
     db.from("privacy_visible_listings").select("id,title,city,price,created_at").eq("type", "job").eq("published", true).order("created_at", { ascending: false }).limit(4),
     homeMarketplaceOffers(currentTime),
     db.from("companies").select("id,slug,name,logo_url,city,categories").eq("published", true).order("created_at", { ascending: false }).limit(6),
-    db.rpc("random_crew_profiles", { p_seed: discoverySeed(), p_limit: 300 }).select("user_id,slug,display_name,tagline,avatar_url,location,verified,role,positions,crew,profile_type,profile_types,created_at").limit(300),
+    db.from("profiles").select("user_id,slug,display_name,tagline,avatar_url,location,verified,role,positions,crew,profile_type,profile_types,created_at").not("display_name", "is", null).neq("display_name", "").order("created_at", { ascending: false }).limit(300),
   ]);
   if (results.some(result => result.error)) throw new Error("Homepage recommendations unavailable");
   const [
@@ -148,9 +148,11 @@ async function getHomeData() {
       createdAt: profile.created_at ?? "",
     };
   });
-  // The database shuffles the whole candidate set before the bounded fetch.
-  // Privacy and person eligibility still apply before selecting visible cards.
-  const newCrew = peopleSummaries.slice(0, 10);
+  // The homepage shows newest eligible profiles first. Keep the directory's
+  // separate discovery order and current privacy checks unchanged.
+  const newCrew = peopleSummaries
+    .sort((a, b) => b.createdAt.localeCompare(a.createdAt) || a.name.localeCompare(b.name, marketLocale))
+    .slice(0, 10);
 
   const liveLocations = (recentLocations ?? []).map((l) => ({
     id: l.id as string,

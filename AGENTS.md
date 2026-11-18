@@ -239,6 +239,19 @@ Markus hat in der laufenden Mac-/Xcode-Aufgabe die Pflicht, vor jedem Grundriss 
 
 Markus bekräftigt ausdrücklich: Alles fertiggestellte Website-Verhalten gehört auch in die App, einschließlich Funktionen, Design, aller Sprachen, Schnittstellen und Fehlerkorrekturen. WEB → APP ist der beauftragte laufende Abgleich; mobile Bedienung und native Ergänzungen dabei prüfen und erhalten. Keine isolierte Auswahl nur einzelner Web-Funktionen. Unausgewählte Entwürfe sind noch kein fertiggestellter Stand. Tatsächliche Prüfung, Quellübernahme, Website-Veröffentlichung und Geräteinstallation getrennt dokumentieren. Umgekehrt bleibt APP → Website an einen ausdrücklichen Auftrag gebunden; dieser Abgleich ist keine pauschale Veröffentlichungserlaubnis. Die Verantwortung bleibt WEB CODEX für Website und APP Entwicklung für Abgleich/Xcode/native Funktionen; kein weiterer täglicher Prüfagent.
 
+### Startseiten-Crew – Präzisierung, 19. November 2026
+
+Der Startseitenbereich heißt „Die Crew“ und zeigt die neuesten sichtbaren,
+berechtigten Personenprofile zuerst. Diese über WEB CODEX in `2bbf54b`
+übergebene Entscheidung ersetzt die ältere Zufallsregel nur für den
+Startseiten-Einstieg. Die vollständige Crew-Seite und Fotogalerie behalten ihre
+jeweilige Entdeckungsreihenfolge. Alle 17 Sprachen, aktuelle Privatsphäre und
+Anbietertypen erhalten. Markus präzisiert: Der Auftrag gilt dem vorhandenen
+Website-Bereich, nicht einer neuen nativen App-Sektion. `app/page.tsx` im
+App-Arbeitszweig ist gemeinsamer Web-Quellcode; daraus keine Aussage über die
+sichtbare installierte iPhone-Oberfläche ableiten. Den Abgleich auf
+Website-Kompatibilität beschränken. Kein Wiederaufnehmen der Smart-Arbeit.
+
 ## Compact Smart layout (operator selection, 17 November 2026)
 
 - The latest approved mobile concept is option 1: a small map above compact, area-grouped results with the shared Crew list/map switch. Desktop keeps a large map on the right and compact results on the left. Keep further filters collapsed and show only areas with actual currently visible entries; no empty requested categories or invented results.
