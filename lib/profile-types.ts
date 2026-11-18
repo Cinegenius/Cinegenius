@@ -409,6 +409,7 @@ export interface VisibilitySettings {
 // ─── Vollständiges Profil ────────────────────────────────────────────────────
 
 export interface UserProfile {
+  profile_layout?: import("./profile-layout").ProfileLayout | null;
   // Identität
   user_id: string;
   display_name: string | null;

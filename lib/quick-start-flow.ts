@@ -1,3 +1,4 @@
+import { isProfileLayout, type ProfileLayout } from "./profile-layout";
 import { isOccupationForm, normalizeOccupationForm, type OccupationForm } from "./occupation-form";
 
 import { additionalCrewOccupation, profileOccupationFocusError, selectedCrewOccupations } from "./crew-occupations";
@@ -60,6 +61,7 @@ export type QuickStartDraft = {
   providerImageUrl?: string;
   profileAvatarUrl?: string;
   profileCoverUrl?: string;
+  profileLayout?: ProfileLayout;
   occupationForm?: OccupationForm;
   primaryOccupation?: PrimaryOccupation | null;
   additionalOccupation?: PrimaryOccupation | null;
@@ -266,6 +268,7 @@ export function normalizeQuickStartDraft(value: unknown): QuickStartDraft {
     activeIntent,
     providerImageUrl: typeof input.providerImageUrl === "string" ? input.providerImageUrl.slice(0, 1200) : "",
     ...(typeof input.profileAvatarUrl === "string" ? { profileAvatarUrl: input.profileAvatarUrl.slice(0, 1200) } : {}),
+    ...(isProfileLayout(input.profileLayout) ? { profileLayout: input.profileLayout } : {}),
     ...(typeof input.profileCoverUrl === "string" ? { profileCoverUrl: input.profileCoverUrl.slice(0, 1200) } : {}),
     ...(isOccupationForm(input.occupationForm) ? { occupationForm: input.occupationForm } : {}),
     talentIntro: typeof input.talentIntro === "string" ? input.talentIntro.slice(0, 1200) : "",

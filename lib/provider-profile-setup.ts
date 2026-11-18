@@ -1,3 +1,4 @@
+import { isProfileLayout, type ProfileLayout } from "./profile-layout";
 import { isOccupationForm, occupationFormFromCrew } from "./occupation-form";
 import { normalizeProfileTypes } from "./profile-display";
 import { getQuickStartProfileTypesForRoles, type QuickStartDraft, type QuickStartRoleSelection } from "./quick-start-flow";
@@ -5,7 +6,7 @@ import { occupationReference, orderPositionsByPrimary, primaryOccupationForPosit
 import { selectedCrewOccupations } from "./crew-occupations";
 import { defaultProfileAvatar } from "./profile-art";
 
-export type SetupProfileIdentity = { profile_type?: string | null; profile_types?: string[] | null; crew?: Record<string, unknown>; avatar_url?: string | null; cover_image_url?: string | null };
+export type SetupProfileIdentity = { profile_layout?: ProfileLayout | null; profile_type?: string | null; profile_types?: string[] | null; crew?: Record<string, unknown>; avatar_url?: string | null; cover_image_url?: string | null };
 
 /** Only new personal profiles receive a suggestion. An explicit empty choice is final. */
 export function initializeSetupProfileArt(draft: QuickStartDraft, accountId: string, existing: SetupProfileIdentity | null): QuickStartDraft {
@@ -36,6 +37,7 @@ export function setupProfilePayload(draft: QuickStartDraft, existing: SetupProfi
   const positions = personal ? orderPositionsByPrimary(roles.map(role => role.role), primary) : [];
   const photo = draft.profileAvatarUrl ?? (personal ? draft.sections.crew?.imageUrl || draft.sections.talent?.imageUrl : draft.providerImageUrl);
   return {
+    ...(isProfileLayout(draft.profileLayout) ? { profile_layout: draft.profileLayout } : {}),
     display_name: draft.name.trim(),
     location: [draft.personCity.trim(), draft.personCountry.trim()].filter(Boolean).join(", "),
     selected_place_city_id: draft.personPlaceCityId || undefined,

@@ -1,3 +1,5 @@
+import { profileLayout } from "@/lib/profile-layout";
+import { selectOptionalProfileColumns } from "@/lib/profile-db-compat";
 import { occupationFormFromCrew, type OccupationForm } from "@/lib/occupation-form";
 import { profileAccessFor, filterPublicListings } from "@/lib/profile-privacy-server";
 import { projectProfilePrivacy } from "@/lib/profile-privacy";
@@ -285,9 +287,13 @@ export default async function ProfilePage(
   if (!privacy?.profile) notFound();
   // Display consent is request-scoped: hiding pronouns must take effect even
   // while ordinary profile content still has a cached version.
-  const identity = await db.from("profiles").select("pronouns, show_pronouns").eq("user_id", rawProfile.user_id).maybeSingle();
+  const identity = await selectOptionalProfileColumns<Record<string, unknown>>(["pronouns", "show_pronouns", "profile_layout"], async projection => {
+    const result = await db.from("profiles").select(projection).eq("user_id", rawProfile.user_id).maybeSingle();
+    return { data: result.data as Record<string, unknown> | null, error: result.error };
+  });
   const profile = projectProfilePrivacy({ ...rawProfile,
-    pronouns: identity.error ? null : identity.data?.pronouns ?? null,
+    profile_layout: identity.error ? null : profileLayout(identity.data?.profile_layout),
+    pronouns: identity.error ? null : typeof identity.data?.pronouns === "string" ? identity.data.pronouns : null,
     show_pronouns: !identity.error && identity.data?.show_pronouns === true,
   },privacy);
 

@@ -27,6 +27,9 @@ import PhotoLikeButton from "@/components/PhotoLikeButton";
 import { markPhotoNavigation, photoHref } from "@/lib/photo-link";
 import CompanyBadge, { type CompanyMemberships } from "@/components/ProfileCompanyLinks";
 import ProfileRoles from "./ProfileRoles";
+import ProfileLayoutHeader from "@/components/ProfileLayoutHeader";
+import { profileLayout } from "@/lib/profile-layout";
+import type { ProfileLayout } from "@/lib/profile-layout";
 import ProfileCardPhoto from "@/components/ProfileCardPhoto";
 import ResilientPublicImage from "@/components/ResilientPublicImage";
 import { profileCoverStyle } from "@/lib/profile-cover";
@@ -492,8 +495,45 @@ function ExternalProfilesDisplay({ profiles }: { profiles: ExternalProfileRow[] 
 // ACTOR PROFILE
 // ═══════════════════════════════════════════════════════════════════════════════
 
+function ChosenProfileHeader({ profile, layout, isOwner, blockStatus, onOpenPhoto }: {
+  profile: UserProfile; layout: ProfileLayout; isOwner: boolean;
+  blockStatus?: { youBlocked: boolean; theyBlocked: boolean } | null;
+  onOpenPhoto: (src: string) => void;
+}) {
+  const t = useTranslations();
+  const roles = displayPositions(profile, getLocalizedProfileTypeLabels(t)).map(label => taxonomyLabel(label, t, occupationFormFromCrew(profile.crew)));
+  const canContact = !blockStatus?.youBlocked && !blockStatus?.theyBlocked;
+  const availability = profile.availability_config;
+  return <ProfileLayoutHeader profile={profile} layout={layout} onOpenPhoto={onOpenPhoto}>
+    <div className="flex flex-wrap items-center gap-2 text-xs text-text-muted">
+      <span>{t(profile.available ? "common.available" : "common.unavailable")}</span>
+      {profile.verified && <span className="inline-flex items-center gap-1 text-gold"><Check size={12} />{t("common.verified")}</span>}
+      {availability?.weekends && <span>{t("Ui.text_fe3dd00105d06a")}</span>}
+      {availability?.night_shoots && <span>{t("Ui.text_94c1be269db94c")}</span>}
+      {availability?.short_notice && <span>{t("Ui.text_da452aeb15b5c6")}</span>}
+      {availability?.work_radius_km && <span>{t("Ui.text_9b0f0d8a886f44", { value1: String(availability.work_radius_km) })}</span>}
+    </div>
+    <h1 className="break-words font-display text-2xl font-bold leading-tight text-text-primary sm:text-3xl">{profile.display_name ?? t("Ui.text_276ffa1fb4f970")}</h1>
+    <ProfilePronouns profile={profile} />
+    <ProfileRoles positions={roles} /><AdditionalProfileOccupations profile={profile} />
+    {profile.tagline && <p className="text-sm italic text-text-secondary">{cleanProfileBio(profile.tagline)}</p>}
+    {profile.location && <p className="flex items-start gap-1.5 text-sm text-text-muted"><MapPin size={14} className="mt-0.5 shrink-0" />{profile.location}</p>}
+    <div className="flex flex-wrap gap-2">
+      {isOwner ? <Link href="/profile" className="profile-action-button inline-flex min-h-11 items-center gap-1.5 rounded-lg px-3 text-xs">{t.rich("Ui.text_603ead2ae843f0", { part1: () => <Pencil size={12} /> })}</Link> : <>
+        {canContact && <>
+          <Link href={`/messages?to=${profile.user_id}`} className="profile-action-button inline-flex min-h-11 items-center gap-1.5 rounded-lg px-3 text-xs">{t.rich("Ui.text_e670272347a032", { part1: () => <MessageSquare size={12} /> })}</Link>
+          <ConnectButton targetUserId={profile.user_id} disabled={!canContact} />
+          <Link href={`/booking?profile=${profile.user_id}`} className="profile-action-button inline-flex min-h-11 items-center gap-1.5 rounded-lg px-3 text-xs">{t.rich("Ui.text_9855da52a3b061", { part1: () => <ExternalLink size={12} /> })}</Link>
+        </>}
+        <BlockReportBar targetId={profile.user_id} initialYouBlocked={blockStatus?.youBlocked ?? false} />
+      </>}
+    </div>
+  </ProfileLayoutHeader>;
+}
+
 function ActorProfile({ organizationSection, profile, isOwner, projectCredits, companyMembership, externalProfiles, listings = [], blockStatus = null, collaborations = [], imageLikes = {}, myImageLikes = [] }: { organizationSection?: React.ReactNode; profile: UserProfile; isOwner: boolean; projectCredits: ProjectCredit[]; companyMembership: CompanyMemberships; externalProfiles: ExternalProfileRow[]; listings?: PublicListing[]; blockStatus?: { youBlocked: boolean; theyBlocked: boolean } | null; collaborations?: PublicCollab[]; imageLikes?: Record<string, number>; myImageLikes?: string[] }) {
   const uiText = useTranslations();
+  const layout = profileLayout(profile.profile_layout);
 
   const tc = useTranslations("common");
   const profileText = useTranslations("profile");
@@ -559,14 +599,15 @@ function ActorProfile({ organizationSection, profile, isOwner, projectCredits, c
   return (
     <div className="min-h-screen min-w-0 max-w-full bg-bg-primary text-text-primary [overflow-wrap:anywhere]">
       {lightbox && <Lightbox src={lightbox} onClose={() => setLightbox(null)} />}
+      {layout && <div className="pt-16"><ChosenProfileHeader profile={profile} layout={layout} isOwner={isOwner} blockStatus={blockStatus} onOpenPhoto={setLightbox} /></div>}
 
       {/* ── HERO ─────────────────────────────────────────────────────────── */}
-      <section className="pt-16 bg-bg-primary">
+      <section className={layout ? "bg-bg-primary" : "pt-16 bg-bg-primary"}>
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10 lg:py-14">
-          <div className="grid grid-cols-1 lg:grid-cols-5 gap-6 lg:gap-10 items-start">
+          <div className={layout ? "min-w-0" : "grid grid-cols-1 lg:grid-cols-5 gap-6 lg:gap-10 items-start"}>
 
             {/* ── Main headshot (= avatar) ── */}
-            <div className="lg:col-span-2">
+            {!layout && <div className="lg:col-span-2">
               {mainShot ? (
                 <div
                   className="relative w-full aspect-[3/4] rounded-xl overflow-hidden cursor-pointer group bg-bg-elevated"
@@ -586,13 +627,13 @@ function ActorProfile({ organizationSection, profile, isOwner, projectCredits, c
                   </span>
                 </div>
               )}
-            </div>
+            </div>}
 
             {/* ── Info panel ── */}
             <div className="lg:col-span-3 flex flex-col gap-5 lg:pt-1">
 
               {/* Top bar: availability + name + CTAs */}
-              <div className="flex flex-col sm:flex-row items-start gap-3">
+              {!layout && <div className="flex flex-col sm:flex-row items-start gap-3">
                 <div className="flex-1 min-w-0 w-full">
                   <div className="flex items-center gap-2 flex-wrap mb-2">
                     <span className={`w-2 h-2 rounded-full shrink-0 ${profile.available ? "bg-emerald-400" : "bg-red-400"}`} />
@@ -649,7 +690,7 @@ function ActorProfile({ organizationSection, profile, isOwner, projectCredits, c
                     <Link href="/profile" className="flex items-center gap-1 text-xs text-text-muted hover:text-gold transition-colors">{uiText.rich("Ui.text_603ead2ae843f0", { part1: () => (<Pencil size={11} />) })}</Link>
                   )}
                 </div>
-              </div>
+              </div>}
 
               {/* Stats grid — only non-null values */}
               {(playingAge || p.height_cm || p.clothing_size || p.shoe_size || p.hair_color || p.eye_color || languages.length > 0 || dialects.length > 0 || drivingLicenses.length > 0 || p.body_type || profile.day_rate || travel) && (
@@ -960,6 +1001,7 @@ function ActorProfile({ organizationSection, profile, isOwner, projectCredits, c
 
 function ModelProfile({ organizationSection, profile, isOwner, projectCredits = [], companyMembership, listings = [], blockStatus = null, collaborations = [] }: { organizationSection?: React.ReactNode; profile: UserProfile; isOwner: boolean; projectCredits?: ProjectCredit[]; companyMembership: CompanyMemberships; listings?: PublicListing[]; blockStatus?: { youBlocked: boolean; theyBlocked: boolean } | null; collaborations?: PublicCollab[] }) {
   const uiText = useTranslations();
+  const layout = profileLayout(profile.profile_layout);
 
   const profileText = useTranslations("profile");
   const canContact = !blockStatus?.youBlocked && !blockStatus?.theyBlocked;
@@ -970,13 +1012,13 @@ function ModelProfile({ organizationSection, profile, isOwner, projectCredits = 
   const images: ProfileImage[] = profile.profile_images ?? [];
   const heroImg = images.find((i) => i.featured) ?? images[0];
   const mainPhotoUrl = profile.avatar_url ?? heroImg?.url ?? null;
-  const galleryImgs = images.filter((image) => image.url !== mainPhotoUrl);
+  const galleryImgs = images.filter((image) => image.url !== (layout ? profile.avatar_url : mainPhotoUrl));
   // Prefer the square profile portrait and use a gallery photo only when no avatar exists.
   const portfolioImages: string[] = (profile as unknown as { portfolio_images?: string[] }).portfolio_images ?? [];
   const resolvedMainPhotoUrl: string | null = mainPhotoUrl ?? portfolioImages[0] ?? null;
   const galleryPhotos: { url: string; caption?: string | null }[] = galleryImgs.length > 0
     ? galleryImgs
-    : portfolioImages.filter((url) => url !== resolvedMainPhotoUrl).map((url) => ({ url }));
+    : portfolioImages.filter((url) => url !== (layout ? profile.avatar_url : resolvedMainPhotoUrl)).map((url) => ({ url }));
 
   const reelUrl = profile.showreel_url ?? profile.reel_url;
   const reelEmbed = reelUrl ? getVideoEmbed(reelUrl) : null;
@@ -993,26 +1035,27 @@ function ModelProfile({ organizationSection, profile, isOwner, projectCredits = 
   const playingAge = p.playing_age_min || p.playing_age_max
     ? `${p.playing_age_min ?? "?"}–${p.playing_age_max ?? "?"} J.`
     : null;
-  const castingFacts: [string, string | number | null | undefined][] = [
-    [uiText("creators.filterAge"), playingAge],
-    [uiText("MarketplaceOffer.fields.size"), p.height_cm ? `${p.height_cm} cm` : null],
-    [uiText("Ui.text_4d0a63d41fbd12"), p.clothing_size],
-    [uiText("Ui.text_edccd3bba39b7b"), p.shoe_size],
-    [profileText("castingHair"), p.hair_color ? profileTraitLabel("hair", p.hair_color, profileText) : null],
-    [profileText("castingEyes"), p.eye_color ? profileTraitLabel("eyes", p.eye_color, profileText) : null],
-    [uiText("profile.sectionLanguages"), languages.length ? languages.join(", ") : null],
-    [uiText("Ui.text_c36026be4f20c4"), performance.dialects?.length ? performance.dialects.join(", ") : null],
-    [uiText("Ui.text_b64c9c6e5a0fcd"), performance.driving_licenses?.length ? performance.driving_licenses.join(", ") : null],
-  ].filter((entry): entry is [string, string | number] => entry[1] !== null && entry[1] !== undefined && entry[1] !== "");
+  const castingFacts: [string, string, string | number | null | undefined][] = [
+    ["age", uiText("creators.filterAge"), playingAge],
+    ["height", uiText("MarketplaceOffer.fields.size"), p.height_cm ? `${p.height_cm} cm` : null],
+    ["clothing", uiText("Ui.text_4d0a63d41fbd12"), p.clothing_size],
+    ["shoes", uiText("Ui.text_edccd3bba39b7b"), p.shoe_size],
+    ["hair", profileText("castingHair"), p.hair_color ? profileTraitLabel("hair", p.hair_color, profileText) : null],
+    ["eyes", profileText("castingEyes"), p.eye_color ? profileTraitLabel("eyes", p.eye_color, profileText) : null],
+    ["languages", uiText("profile.sectionLanguages"), languages.length ? languages.join(", ") : null],
+    ["dialects", uiText("Ui.text_c36026be4f20c4"), performance.dialects?.length ? performance.dialects.join(", ") : null],
+    ["licenses", uiText("Ui.text_b64c9c6e5a0fcd"), performance.driving_licenses?.length ? performance.driving_licenses.join(", ") : null],
+  ].filter((entry): entry is [string, string, string | number] => entry[2] !== null && entry[2] !== undefined && entry[2] !== "");
 
   return (
     <div className="min-h-screen min-w-0 max-w-full bg-bg-primary text-text-primary [overflow-wrap:anywhere]">
       {lightbox && <Lightbox src={lightbox} onClose={() => setLightbox(null)} />}
+      {layout && <div className="pt-16"><ChosenProfileHeader profile={profile} layout={layout} isOwner={isOwner} blockStatus={blockStatus} onOpenPhoto={setLightbox} /></div>}
 
-      <section className="border-b border-border bg-bg-primary pt-16 sm:pt-20">
+      <section className={`border-b border-border bg-bg-primary ${layout ? "" : "pt-16 sm:pt-20"}`}>
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-10">
-          <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] gap-5 sm:gap-8 lg:gap-12 items-start">
-            <div className="relative mx-auto w-full max-w-[520px] lg:max-w-none">
+          <div className={layout ? "min-w-0" : "grid grid-cols-1 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] gap-5 sm:gap-8 lg:gap-12 items-start"}>
+            {!layout && <div className="relative mx-auto w-full max-w-[520px] lg:max-w-none">
               <button type="button" onClick={() => resolvedMainPhotoUrl && setLightbox(resolvedMainPhotoUrl)} disabled={!resolvedMainPhotoUrl}
                 aria-label={resolvedMainPhotoUrl ? uiText("Ui.text_7418b51c63879f") : undefined}
                 className="relative block w-full aspect-[4/3] sm:aspect-[16/10] lg:aspect-[4/3] max-h-[420px] overflow-hidden rounded-2xl border border-border bg-bg-secondary disabled:cursor-default">
@@ -1028,9 +1071,10 @@ function ModelProfile({ organizationSection, profile, isOwner, projectCredits = 
                 ) : <span className="flex h-full items-center justify-center font-display text-5xl font-bold text-text-muted/30">{(profile.display_name ?? "?")[0]}</span>}
                 {profile.verified && <span className="absolute left-3 top-3 inline-flex items-center gap-1.5 rounded-full border border-white/20 bg-black/60 px-2.5 py-1 text-[10px] font-semibold text-white">{uiText.rich("Ui.text_712de43869af36", { part1: () => (<Check size={10} />) })}</span>}
               </button>
-            </div>
+            </div>}
 
             <div className="min-w-0 space-y-4">
+              {!layout && <>
               <div className="flex flex-wrap items-center gap-2">
                 <span className={`inline-flex items-center gap-2 text-xs font-medium ${profile.available ? "text-emerald-400" : "text-text-muted"}`}>
                   <span className={`h-2 w-2 rounded-full ${profile.available ? "bg-emerald-400" : "bg-text-muted"}`} />
@@ -1049,8 +1093,9 @@ function ModelProfile({ organizationSection, profile, isOwner, projectCredits = 
 
               {!isOwner && canContact && <div className="flex flex-wrap gap-2">{uiText.rich("Ui.text_7b21662e97de90", { part2: () => (<ExternalLink size={12} />), part1: chunks => (<Link href={`/booking?profile=${profile.user_id}`} className="inline-flex min-h-11 items-center gap-2 rounded-lg bg-gold px-4 text-xs font-semibold text-bg-primary hover:bg-gold-light">{chunks}</Link>), part4: () => (<MessageSquare size={13} />), part3: chunks => (<Link href={`/messages?to=${profile.user_id}`} className="inline-flex min-h-11 items-center gap-2 rounded-lg border border-border bg-bg-secondary px-4 text-xs font-medium text-text-primary hover:border-gold/40">{chunks}</Link>), part5: () => (<BlockReportBar targetId={profile.user_id} initialYouBlocked={blockStatus?.youBlocked ?? false} />) })}</div>}
 
+              </>}
               {castingFacts.length > 0 && <div className="grid grid-cols-2 sm:grid-cols-3 gap-x-4 gap-y-4 rounded-xl border border-border bg-bg-secondary p-4 sm:p-5">
-                {castingFacts.map(([label, value]) => <StatPill key={label} label={label} value={value} />)}
+                {castingFacts.map(([id, label, value]) => <StatPill key={id} label={label} value={value} />)}
               </div>}
 
               {(skills.length > 0 || profile.crew?.experience_years || profile.crew?.equipment_known?.length || profile.crew?.software?.length) && (
@@ -1241,6 +1286,7 @@ function ModelProfile({ organizationSection, profile, isOwner, projectCredits = 
 
 function GenericProfile({ organizationSection, profile, isOwner, projectCredits, companyMembership, externalProfiles, listings = [], blockStatus = null, collaborations = [], imageLikes = {}, myImageLikes = [] }: { organizationSection?: React.ReactNode; profile: UserProfile; isOwner: boolean; projectCredits: ProjectCredit[]; companyMembership: CompanyMemberships; externalProfiles: ExternalProfileRow[]; listings?: PublicListing[]; blockStatus?: { youBlocked: boolean; theyBlocked: boolean } | null; collaborations?: PublicCollab[]; imageLikes?: Record<string, number>; myImageLikes?: string[] }) {
   const uiText = useTranslations();
+  const layout = profileLayout(profile.profile_layout);
 
   const profileText = useTranslations("profile");
   const creatorText = useTranslations("creators");
@@ -1282,7 +1328,9 @@ function GenericProfile({ organizationSection, profile, isOwner, projectCredits,
   return (
     <div className="pt-16 min-h-screen min-w-0 max-w-full bg-bg-primary text-text-primary [overflow-wrap:anywhere]">
       {lightbox && <Lightbox src={lightbox} onClose={() => setLightbox(null)} />}
+      {layout && <div><ChosenProfileHeader profile={profile} layout={layout} isOwner={isOwner} blockStatus={blockStatus} onOpenPhoto={setLightbox} /></div>}
 
+      {!layout && <>
       {/* Hero */}
       <section data-profile-header={bgImage ? "banner" : "compact"} className={`relative isolate flex items-end ${bgImage ? "min-h-[300px] sm:min-h-[340px]" : "profile-hero--compact"}`}>
         {bgImage ? (
@@ -1346,6 +1394,7 @@ function GenericProfile({ organizationSection, profile, isOwner, projectCredits,
             </div>
       </div>
 
+      </>}
       <div className={`mx-auto w-full min-w-0 max-w-5xl px-4 sm:px-6 lg:px-8 pb-10 ${hasProfileDetails || hasPortfolioSections ? "pt-6 sm:pt-8" : "pt-2 sm:pt-3"}`}>
 
         {/* Only affiliations occupy the sidebar; the portrait appears once in the header. */}

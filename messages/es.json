@@ -13411,5 +13411,14 @@
     "masculine": "Forma masculina",
     "feminine": "Forma femenina",
     "neutral": "Forma neutra"
+  },
+  "ProfileLayout": {
+    "title": "Vista del perfil",
+    "compact": "Compacta",
+    "large-photo": "Foto grande",
+    "hint": "Tus datos no cambian. La elección se guarda con tu perfil y puedes cambiarla después.",
+    "legacyHint": "Tu vista actual se mantiene hasta que elijas otra.",
+    "unavailable": "La vista del perfil no está disponible ahora. Inténtalo más tarde.",
+    "invalid": "Elige Compacta o Foto grande."
   }
 }

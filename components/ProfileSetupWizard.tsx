@@ -4,6 +4,8 @@ import GenieWritingAssistant from "@/components/GenieWritingAssistant";
 
 import PlaceField from "@/components/PlaceField";
 import { needsPublicSetupProfile, setupProfilePayload, initializeSetupProfileArt, initializeSetupOccupationForm, setupProfileAvatar, type SetupProfileIdentity } from "@/lib/provider-profile-setup";
+import ProfileLayoutPicker from "@/components/ProfileLayoutPicker";
+import { isProfileLayout, profileLayout } from "@/lib/profile-layout";
 import ProfileArtPicker from "@/components/ProfileArtPicker";
 import SetupCompletionOffers from "@/components/SetupCompletionOffers";
 import ContentUsageNotice from "@/components/ContentUsageNotice";
@@ -169,6 +171,7 @@ function ProfileSetupContent() {
   const [companyCategorySearch, setCompanyCategorySearch] = useState("");
 
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const [layoutUnavailable, setLayoutUnavailable] = useState(false);
   const [savedProfile, setSavedProfile] = useState<SetupProfileIdentity | null>(null);
   const mounted = useRef(true);
   const latestDraft = useRef(draft);
@@ -223,6 +226,7 @@ function ProfileSetupContent() {
       setProfileIsPrivate(settings?.settings?.profile_visibility === "private" || settings?.settings?.ghost_mode === true);
       setProfileExists(profile?.exists === true);
       setSavedProfile(profile?.profile ?? null);
+      setLayoutUnavailable(profile?.unavailableFields?.includes("profile_layout") === true);
       const profileComplete = hasProfileBasics(profile?.profile);
       const hasInProgressDraft = !!saved?.quickStart && saved.setupComplete !== true;
       if (!providerEntry && saved?.setupComplete && (profileComplete || hasCompletedNonPersonalSetup(saved))) {
@@ -243,6 +247,10 @@ function ProfileSetupContent() {
       if (resumeIncomplete && hasInProgressDraft) {
         const missing = validateQuickStartDraft(nextDraft);
         if (missing) nextDraft = { ...nextDraft, step: missing.field === "primaryOccupation" ? "review" : screenForField(missing.field), activeIntent: intentForField(missing.field) ?? nextDraft.activeIntent };
+      }
+      if (!isProfileLayout(nextDraft.profileLayout) && !profile?.unavailableFields?.includes("profile_layout")) {
+        const layout = profile?.exists ? profileLayout(profile.profile?.profile_layout) : "compact";
+        if (layout) nextDraft = { ...nextDraft, profileLayout: layout };
       }
       nextDraft = initializeSetupProfileArt(nextDraft, user.id, profile?.exists ? profile.profile : null);
       nextDraft = initializeSetupOccupationForm(nextDraft, profile?.exists ? profile.profile : null);
@@ -619,7 +627,7 @@ function ProfileSetupContent() {
   function renderArtworkReview() {
     const avatar = setupProfileAvatar(draft, savedProfile);
     const cover = draft.profileCoverUrl ?? savedProfile?.cover_image_url ?? "";
-    return <>{avatar && <Image src={avatar} alt={t("copy22")} width={160} height={160} className="h-20 w-20 rounded-full object-cover" />}{cover && !draft.intents.includes("talent") && <Image src={cover} alt={uiText("profile.sectionCover")} width={720} height={288} className="aspect-[5/2] w-full rounded-lg object-cover" />}</>;
+    return <>{draft.profileLayout && <p className="text-sm text-text-secondary">{uiText("ProfileLayout.title")}: {uiText(`ProfileLayout.${draft.profileLayout}`)}</p>}{avatar && <Image src={avatar} alt={t("copy22")} width={160} height={160} className="h-20 w-20 rounded-full object-cover" />}{cover && !draft.intents.includes("talent") && <Image src={cover} alt={uiText("profile.sectionCover")} width={720} height={288} className="aspect-[5/2] w-full rounded-lg object-cover" />}</>;
   }
 
   function renderPersonalArtwork(intent: QuickStartIntent, label: string, forProvider: boolean) {
@@ -632,6 +640,7 @@ function ProfileSetupContent() {
       <input type="file" disabled={disabled} accept="image/jpeg,image/png,image/webp,image/heic" className="sr-only" onChange={event => { void upload(event.target.files?.[0], intent, forProvider, isCover); event.currentTarget.value = ""; }} />
     </label>;
     return <div className="space-y-3">
+      <ProfileLayoutPicker value={profileLayout(draft.profileLayout)} unavailable={layoutUnavailable} disabled={disabled} onChange={value => setDraft(current => ({ ...current, profileLayout: value, completed: { ...current.completed, profile: false } }))} />
       <ContentUsageNotice context="profile" visibility="configured" />
       {avatar && <Image src={avatar} alt={label} width={160} height={160} className="h-24 w-24 rounded-full border border-border object-cover" />}
       <p className="text-xs leading-5 text-text-muted">{uiText("ProfileArt.editable")}</p>
@@ -801,6 +810,7 @@ function ProfileSetupContent() {
       <p className="mb-6 max-w-2xl text-sm leading-6 text-text-muted">{localizeSetupMessage(currentContent.description, t)}</p>
 
       <section className="min-w-0 rounded-2xl border border-border bg-bg-secondary p-4 sm:p-7">
+        {draft.step === "name" && <div className="mb-5"><ProfileLayoutPicker value={profileLayout(draft.profileLayout)} unavailable={layoutUnavailable} disabled={saving || uploading} onChange={value => setDraft(current => ({ ...current, profileLayout: value, completed: { ...current.completed, profile: false } }))} /></div>}
         {draft.step === "name" && (draft.name && !draft.accountPerson ? <div><label htmlFor="quick-start-name" className="mb-2 block text-sm font-medium text-text-primary">{t("copy65")}<span className="text-gold">*</span></label><input id="quick-start-name" autoComplete="name" maxLength={120} value={draft.name} onChange={(event) => update("name", event.target.value)} placeholder={t("copy66")} className={inputClass} aria-describedby="quick-start-name-help" /><p id="quick-start-name-help" className="mt-2 text-xs leading-5 text-text-muted">{t("copy67")}</p></div> : <ResponsiblePersonFields identityOnly accountPrefill value={draft.accountPerson ?? NEW_RESPONSIBLE_PERSON} errors={responsibleErrors} onChange={person => { setResponsibleErrors({}); setDraft(current => ({ ...current, accountPerson: person, name: `${person.firstName} ${person.lastName}`.trim() })); }} />)}
 
         {draft.step === "location" && <PlaceField id="quick-start-person-city" selectedCityId={draft.personPlaceCityId} value={[draft.personCity, draft.personCountry].filter(Boolean).join(", ")} onChange={(value, cityId) => { const parts = value.split(","); setDraft(current => ({ ...current, personCity: parts.slice(0,-1).join(",").trim(), personCountry: parts.at(-1)?.trim() ?? "", personPlaceCityId: cityId || "", completed: { ...current.completed, profile: false } })); }} required={needsProfile} />}

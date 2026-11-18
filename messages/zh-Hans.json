@@ -13411,5 +13411,14 @@
     "masculine": "男性形式",
     "feminine": "女性形式",
     "neutral": "中性形式"
+  },
+  "ProfileLayout": {
+    "title": "个人资料布局",
+    "compact": "紧凑",
+    "large-photo": "大图",
+    "hint": "你的资料内容保持不变。所选布局会随个人资料一起保存，之后仍可更改。",
+    "legacyHint": "在你选择新布局前，将保留现有布局。",
+    "unavailable": "暂时无法选择个人资料布局，请稍后重试。",
+    "invalid": "请选择“紧凑”或“大图”。"
   }
 }
