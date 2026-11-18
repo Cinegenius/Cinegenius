@@ -49,9 +49,11 @@ export function matchesSearchRequirements(row: Record<string, unknown>, wish: Se
   const states = (term: string) => texts.map(text => declaration(text, term));
   const mode = declaredOfferMode(row);
   return (wish.requirements ?? []).every(alternatives => {
-    const requested = alternatives.map(term => offerModeTerms.get(searchKey(term)));
-    if (mode && requested[0] && requested.every(value => value === requested[0])) return mode === "both" || mode === requested[0];
-    const evidence = alternatives.flatMap(states);
+    const evidence = alternatives.flatMap(term => {
+      const requested = offerModeTerms.get(searchKey(term));
+      if (mode && requested) return [mode === "both" || mode === requested ? 1 : 0];
+      return states(term);
+    });
     return evidence.includes(1) && !evidence.includes(-1);
   }) && !(wish.exclude ?? []).some(term => {
     const excluded = offerModeTerms.get(searchKey(term));
