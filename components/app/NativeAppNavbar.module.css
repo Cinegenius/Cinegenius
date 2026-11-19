@@ -16,7 +16,7 @@
   color: var(--native-ink);
   pointer-events: none;
 }
-.header::before { content:""; position:fixed; z-index:-1; top:0; right:0; left:0; height:var(--cg-app-chrome-clearance,88px); background:color-mix(in srgb,var(--cg-app-bg,var(--color-bg-primary)) 94%,transparent); -webkit-backdrop-filter:blur(24px) saturate(115%); backdrop-filter:blur(24px) saturate(115%); pointer-events:auto; touch-action:pan-y; }
+.header::before { content:""; position:fixed; z-index:-1; top:0; right:0; left:0; height:var(--cg-app-chrome-clearance,88px); background:color-mix(in srgb,var(--cg-app-bg,var(--color-bg-primary)) 58%,transparent); -webkit-backdrop-filter:blur(24px) saturate(115%); backdrop-filter:blur(24px) saturate(115%); pointer-events:auto; touch-action:pan-y; }
 
 .bubble {
   display: flex;
@@ -104,5 +104,5 @@
 .spinner { animation: native-navbar-spin 1s linear infinite; }
 @keyframes native-navbar-spin { to { transform: rotate(360deg); } }
 @media (prefers-reduced-motion: reduce) { .spinner { animation: none; } }
-@media (prefers-reduced-transparency: reduce) { .bubble { background: var(--native-surface); -webkit-backdrop-filter: none; backdrop-filter: none; } }
-@media (prefers-contrast: more) { .bubble, .profileMenu { border-color: var(--native-ink); } }
+@media (prefers-reduced-transparency: reduce) { .header::before { background:var(--cg-app-bg,var(--color-bg-primary)); -webkit-backdrop-filter:none; backdrop-filter:none; } .bubble { background: var(--native-surface); -webkit-backdrop-filter: none; backdrop-filter: none; } }
+@media (prefers-contrast: more) { .header::before { background:var(--cg-app-bg,var(--color-bg-primary)); } .bubble, .profileMenu { border-color: var(--native-ink); } }

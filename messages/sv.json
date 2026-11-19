@@ -13450,6 +13450,7 @@
   },
   "ProfileLayout": {},
   "NativeAppChrome": {
+    "work": "Work",
     "createEntry": "Skapa post",
     "navigation": "Appgenvägar",
     "profileMenu": "Öppna profilmenyn",

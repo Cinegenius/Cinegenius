@@ -1,8 +1,12 @@
 "use client";
 
 import { removeRecentSearches } from "@/lib/recent-searches";
-import { useState, useEffect, useRef } from "react";
-import { useRouter } from "next/navigation";
+import { useState, useEffect, useLayoutEffect, useCallback, useRef } from "react";
+import { usePathname } from "next/navigation";
+import { useAuth } from "@clerk/nextjs";
+import { useFormRouter } from "@/lib/use-form-router";
+import { BEFORE_FORM_NAVIGATION_EVENT } from "@/lib/form-navigation-events";
+import { announceNativeHeaderAction, nativeHeaderBlocked, useNativeHeaderAction } from "@/lib/native-header-utility";
 import { useTranslations , useLocale } from "next-intl";
 import {
   Search, X, MapPin, Car, Package, Briefcase, Users,
@@ -39,13 +43,33 @@ export default function GlobalSearch() {
   const t = useTranslations("search");
   const nativeAppearance = useNativeAppAppearance();
   const animals = useTranslations("FilmAnimals");
-  const [open, setOpen] = useState(false);
+  const { userId, sessionId, isLoaded } = useAuth();
+  const pathname = usePathname();
+  const scope = JSON.stringify([isLoaded, userId, sessionId, pathname]);
+  const [panelScope, setPanelScope] = useState<string | null>(null);
+  const open = panelScope === scope;
+  const currentScope = useRef(scope), sequence = useRef(0), request = useRef<AbortController | null>(null);
+  const invalidate = useCallback(() => { sequence.current++; request.current?.abort(); }, []);
+  const closeSearch = useCallback(() => { invalidate(); setPanelScope(null); }, [invalidate]);
+  useLayoutEffect(() => {
+    currentScope.current = scope;
+    return invalidate;
+  }, [scope, invalidate]);
+  useEffect(() => {
+    if (panelScope !== null && panelScope !== scope) queueMicrotask(() => setPanelScope(value => value === currentScope.current ? value : null));
+  }, [scope, panelScope]);
+  useNativeHeaderAction(action => { if (nativeAppearance && action !== "search") closeSearch(); });
+  useEffect(() => {
+    window.addEventListener(BEFORE_FORM_NAVIGATION_EVENT, closeSearch);
+    window.addEventListener("popstate", closeSearch);
+    return () => { window.removeEventListener(BEFORE_FORM_NAVIGATION_EVENT, closeSearch); window.removeEventListener("popstate", closeSearch); };
+  }, [closeSearch]);
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<Result[]>([]);
   const [loading, setLoading] = useState(false);
   const [selectedIdx, setSelectedIdx] = useState(-1);
   const inputRef = useRef<HTMLInputElement>(null);
-  const router = useRouter();
+  const router = useFormRouter();
   const [failed, setFailed] = useState(false);
   const [attempt, setAttempt] = useState(0);
 
@@ -68,9 +92,13 @@ export default function GlobalSearch() {
   // Cmd+K / Ctrl+K + custom event from mobile nav button
   useEffect(() => {
     clearRecentSearches();
-    const openFromEvent = () => {
+    const openFromEvent = (event?: Event) => {
+      if (nativeAppearance && nativeHeaderBlocked()) return;
+      if (nativeAppearance && (event as CustomEvent<{toggle?:boolean}> | undefined)?.detail?.toggle && open) { closeSearch(); return; }
+      if (nativeAppearance && !announceNativeHeaderAction("search")) return;
+      sequence.current++; request.current?.abort();
       setQuery(""); setResults([]); setSelectedIdx(-1);
-      setFailed(false); setLoading(false); clearRecentSearches(); setOpen(true);
+      setFailed(false); setLoading(false); clearRecentSearches(); setPanelScope(scope);
     };
     const handler = (e: KeyboardEvent) => {
       if ((e.metaKey || e.ctrlKey) && e.key === "k") { e.preventDefault(); openFromEvent(); }
@@ -81,7 +109,7 @@ export default function GlobalSearch() {
       document.removeEventListener("keydown", handler);
       document.removeEventListener("cg:opensearch", openFromEvent);
     };
-  }, []);
+  }, [nativeAppearance, open, scope, closeSearch]);
 
   useEffect(() => {
     if (!open) return;
@@ -97,25 +125,28 @@ export default function GlobalSearch() {
   useEffect(() => {
     if (!open || query.trim().length < 2) return;
     const controller = new AbortController();
+    request.current = controller;
+    const version = ++sequence.current;
+    const current = () => !controller.signal.aborted && sequence.current === version && currentScope.current === scope;
     const timer = setTimeout(async () => {
       try {
         const res = await fetch(`/api/search?q=${encodeURIComponent(query.trim())}`, { signal: controller.signal });
         if (!res.ok) throw new Error("Search unavailable");
         const { results: data } = await res.json();
-        if (!controller.signal.aborted) setResults(Array.isArray(data) ? data : []);
+        if (current()) setResults(Array.isArray(data) ? data : []);
       } catch {
-        if (!controller.signal.aborted) setFailed(true);
+        if (current()) setFailed(true);
       } finally {
-        if (!controller.signal.aborted) setLoading(false);
+        if (current()) setLoading(false);
       }
     }, 220);
     return () => { clearTimeout(timer); controller.abort(); };
-  }, [query, open, attempt]);
+  }, [query, open, attempt, scope]);
 
   const navigate = (result: Result) => {
     const config = typeConfig[result.type];
     if (!config) return;
-    setOpen(false);
+    closeSearch();
     router.push(config.href(result.id));
   };
 
@@ -131,7 +162,7 @@ export default function GlobalSearch() {
       if (selectedIdx >= 0 && results[selectedIdx]) {
         navigate(results[selectedIdx]);
       } else if (query.trim()) {
-        setOpen(false);
+        closeSearch();
         router.push(`/search?q=${encodeURIComponent(query.trim())}`);
       }
     }
@@ -154,7 +185,7 @@ export default function GlobalSearch() {
   if (!open) return null;
 
   return (
-    <MessagingDialog className={styles.dialog} open={open} title={t("accessibleLabel")} onClose={() => setOpen(false)} compact surface="browse">
+    <MessagingDialog nativeHeaderUtility={nativeAppearance} className={styles.dialog} open={open} title={t("accessibleLabel")} onClose={() => closeSearch()} compact surface="browse">
         {/* Input */}
         <div data-global-search-input className="flex items-center gap-3 px-4 py-3.5 border-b border-border">
           {loading
@@ -268,7 +299,7 @@ export default function GlobalSearch() {
             <div className="px-4 py-3 border-t border-border flex items-center justify-between">
               <p className="text-xs text-text-muted">{t("resultCount", { count: results.length })}</p>
               <button
-                onClick={() => { setOpen(false); router.push(`/search?q=${encodeURIComponent(query.trim())}`); }}
+                onClick={() => { closeSearch(); router.push(`/search?q=${encodeURIComponent(query.trim())}`); }}
                 className="flex min-h-11 items-center gap-1.5 text-xs font-medium text-gold hover:text-gold-light transition-colors"
               >
                 {t("viewAll")} <ArrowRight size={11} />
@@ -278,7 +309,7 @@ export default function GlobalSearch() {
           {query.length >= 2 && results.length === 0 && !loading && (
             <div className="px-4 py-3 border-t border-border text-center">
               <button
-                onClick={() => { setOpen(false); router.push(`/search?q=${encodeURIComponent(query.trim())}`); }}
+                onClick={() => { closeSearch(); router.push(`/search?q=${encodeURIComponent(query.trim())}`); }}
                 className="text-xs text-text-muted hover:text-gold transition-colors"
               >
                 {t("openFull")} <ArrowRight size={10} className="inline" />

@@ -1,6 +1,6 @@
 ## App server release authorized by Markus – 19 November 2026
 
-Markus explicitly authorized publishing the reviewed app server code after the native iPhone installation. The requested app has Shots / Workspace / Smart / News / Projekte in its bottom bar; Smart combines Crew, marketplace, Locations and companies with multi-selection and grid/list/map-list views. These changes apply only to the exact installed native appearance marker; preserve the current ordinary website, live main authentication/privacy fixes and existing Smart server access gate. Port reviewed app deltas onto current main, never upload the divergent mobile branch wholesale. Existing native Workspace is reactivated; local archives are not an online collaboration service.
+Markus explicitly authorized publishing the reviewed app server code after the native iPhone installation. The latest requested app has Shots / News / Smart / Projekte / Work in its bottom bar; Smart combines Crew, marketplace, Locations and companies with multi-selection and grid/list/map-list views. These changes apply only to the exact installed native appearance marker; preserve the current ordinary website, live main authentication/privacy fixes and existing Smart server access gate. Port reviewed app deltas onto current main, never upload the divergent mobile branch wholesale. Existing native Workspace is reactivated; local archives are not an online collaboration service.
 
 Push and Shots publication activation remain separately disabled. This release does not apply migrations, enable provider credentials or feature flags, send real messages, or claim genuine Push delivery. Preserve safe unavailable states without a new schema. Stage/commit/merge/push through GitHub Desktop, then release only clean main equal to origin/main using the existing guarded production script. User publication authorization is already given; do not ask again for this same release.
 
@@ -249,3 +249,7 @@ Crew result row correction, 14 November 2026: Keep the compact count, Crew, Loca
   privacy migration before releasing dependent controls. See docs/profile-privacy.md.
 - These additions do not resume the paused Smart-language work or authorize a new
   production publication on their own.
+
+## Latest app interaction and Workspace contract – 19 November 2026
+
+Follow `docs/design/app-current-20261119.md` for the latest native-only navigation, shared measured header clearance, swipeable view controls, Workspace-style Genie and department About-glass contract. Workspace functions must reuse account-bound project/document IDs and respect revocable source context; Genie navigation context never grants access. Preserve actual implemented scope and distinguish local references from online team delivery.

@@ -1,5 +1,6 @@
 "use client";
 
+import { useNativeHeaderAction, useNativeHeaderUtility } from "@/lib/native-header-utility";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
 import NavigationIcon from "@/components/NavigationIcon";
 import { useSiteNavigation } from "@/contexts/SiteNavigationContext";
@@ -33,10 +34,13 @@ function MenuContent() {
       oldOverflow.current = null;
     }
   }, []);
-  const dismiss = useCallback(() => { closeNative(); closeMenu(); }, [closeNative, closeMenu]);
+  const dismiss = useCallback(() => { if (!nativeAppearance) closeNative(); closeMenu(); }, [nativeAppearance, closeNative, closeMenu]);
+
+  useNativeHeaderUtility(dialog, menuOpen && nativeAppearance, "menu", closeMenu);
+  useNativeHeaderAction(action => { if (nativeAppearance && action !== "menu") closeMenu(); });
 
   useEffect(() => {
-    if (!menuOpen) return;
+    if (!menuOpen || nativeAppearance) return;
     const element = dialog.current;
     if (!element) return;
     oldOverflow.current = document.body.style.overflow;
@@ -51,7 +55,7 @@ function MenuContent() {
       window.removeEventListener("popstate", closeForNavigation);
       closeNative();
     };
-  }, [menuOpen, closeNative, dismiss]);
+  }, [menuOpen, nativeAppearance, closeNative, dismiss]);
 
   const routeKey = `${pathname}?${searchParams.toString()}`;
   const previousScreen = useRef({ routeKey, userId, nativeAppearance });

@@ -6,6 +6,7 @@ import Link from "next/link";
 import { Bell, ChevronRight, Loader2, LogOut, Menu, MessageSquare, Search, User } from "lucide-react";
 import NavigationIcon from "@/components/NavigationIcon";
 import type { SiteNavigationIcon } from "@/lib/site-navigation";
+import { announceNativeHeaderAction, useNativeHeaderUtilityKind } from "@/lib/native-header-utility";
 import styles from "./NativeAppNavbar.module.css";
 
 type ProfileLink = { id: string; href: string; label: string; icon: SiteNavigationIcon };
@@ -41,6 +42,7 @@ export type NativeAppNavbarProps = {
 /** App presentation of the existing Navbar controller; no identity, request or preference store. */
 export default function NativeAppNavbar({ navigationLabel, accountButtonRef, accountMenuRef, account, messages, search, menu, signInLabel }: NativeAppNavbarProps) {
   const { open, ready } = account;
+  const utility = useNativeHeaderUtilityKind();
   const header = useRef<HTMLElement>(null);
   useLayoutEffect(() => {
     const root = document.documentElement, element = header.current, bubble = element?.querySelector("nav");
@@ -97,13 +99,13 @@ export default function NativeAppNavbar({ navigationLabel, accountButtonRef, acc
       ><span className={styles.avatar}>{account.avatar}</span>{account.supportBadge && <span className={styles.support}>{account.supportBadge}</span>}</button>
         : <Link href="/sign-in" prefetch={false} className={styles.action} data-native-app-action="profile" aria-label={signInLabel} title={signInLabel}><User size={22} aria-hidden="true" /></Link>}
       <Link href="/messages" prefetch={false} className={styles.action} data-native-app-action="messages"
-        aria-label={messages.label} title={messages.label} aria-current={messages.active ? "page" : undefined} onClick={account.onClose}>
+        aria-label={messages.label} title={messages.label} aria-current={messages.active ? "page" : undefined} onClick={event => { if (!announceNativeHeaderAction("messages")) { event.preventDefault(); return; } account.onClose(); }}>
         <MessageSquare size={22} aria-hidden="true" />
         {messages.failed && <span aria-hidden="true" className={styles.failed} />}
         {messages.count > 0 && <span aria-hidden="true" data-native-unread="messages" className={styles.messageBadge}>{messages.count > 9 ? "9+" : messages.count}</span>}
         {messages.noticeCount > 0 && <span aria-hidden="true" data-native-unread="notices" className={styles.noticeBadge}><Bell size={8} />{messages.noticeCount > 9 ? "9+" : messages.noticeCount}</span>}
       </Link>
-      <button type="button" className={styles.action} data-native-app-action="search" aria-label={search.label} title={search.label} onClick={search.onClick}><Search size={22} aria-hidden="true" /></button>
+      <button type="button" className={styles.action} data-native-app-action="search" aria-label={search.label} title={search.label} aria-expanded={utility === "search"} aria-haspopup="dialog" onClick={search.onClick}><Search size={22} aria-hidden="true" /></button>
       <button type="button" className={styles.action} data-native-app-action="menu" aria-label={menu.label} title={menu.label}
         aria-expanded={menu.open} aria-controls={menu.controls} aria-haspopup="dialog" onClick={menu.onClick}><Menu size={22} aria-hidden="true" /></button>
     </nav>

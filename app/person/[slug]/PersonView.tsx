@@ -139,7 +139,7 @@ export default function PersonView({
               <p className="text-sm text-text-muted mb-2">{profile.primary_role}</p>
             )}
             {profile.bio && (
-              <ProfileAboutCard><p className="text-sm text-text-secondary"><TranslatedText kind="person" id={profile.id} field="bio">{profile.bio}</TranslatedText></p></ProfileAboutCard>
+              <ProfileAboutCard role={profile.primary_role}><p className="text-sm text-text-secondary"><TranslatedText kind="person" id={profile.id} field="bio">{profile.bio}</TranslatedText></p></ProfileAboutCard>
             )}
           </div>
         </div>

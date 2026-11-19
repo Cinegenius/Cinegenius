@@ -13450,6 +13450,7 @@
   },
   "ProfileLayout": {},
   "NativeAppChrome": {
+    "work": "Work",
     "createEntry": "Bejegyzés létrehozása",
     "navigation": "Alkalmazás-gyorselérés",
     "profileMenu": "Profilmenü megnyitása",

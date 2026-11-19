@@ -30,7 +30,7 @@ export default function BottomNav() {
 
   if (hideMobileNavigation(pathname, chatOpen)) return null;
   if (nativeAppearance) return <NativeAppBottomNav pathname={pathname} label={t("allAreas")} labels={{
-    shots: uiText("NativeAppChrome.shots"), workspace: uiText("NativeAppChrome.workspace"), smart: uiText("NativeAppChrome.smart"), news: t("news"), projects: t("projects"),
+    shots: uiText("NativeAppChrome.shots"), workspace: uiText("NativeAppChrome.work"), smart: uiText("NativeAppChrome.smart"), news: t("news"), projects: t("projects"),
   }} />;
   const activeId = activeMobileNavigationId(pathname);
   return <nav aria-label={t("allAreas")} className="fixed bottom-0 left-0 right-0 z-60 border-t border-border bg-bg-secondary safe-area-pb lg:hidden">

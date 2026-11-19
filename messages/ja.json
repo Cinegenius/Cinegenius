@@ -13450,6 +13450,7 @@
   },
   "ProfileLayout": {},
   "NativeAppChrome": {
+    "work": "Work",
     "createEntry": "項目を作成",
     "navigation": "アプリのショートカット",
     "profileMenu": "プロフィールメニューを開く",

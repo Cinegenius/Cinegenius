@@ -13450,6 +13450,7 @@
   },
   "ProfileLayout": {},
   "NativeAppChrome": {
+    "work": "Work",
     "createEntry": "항목 만들기",
     "navigation": "앱 바로가기",
     "profileMenu": "프로필 메뉴 열기",
