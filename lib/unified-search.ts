@@ -69,7 +69,7 @@ export function searchPlanFromHref(href: string): SearchPlan | null {
   return params.size === 1 && params.has("plan") ? decodeSearchPlan(params.get("plan")) : null;
 }
 
-export type SearchResult = { id: string; title: string; subtitle: string; type: string; price: number; priceLabel?: string; image: string | null; available: boolean | null;
+export type SearchResult = { id: string; sourceId?: string; title: string; subtitle: string; type: string; price: number; priceLabel?: string; image: string | null; available: boolean | null;
   facets?: { departments?: string[]; marketplace?: string };
   evidence?: "role" | "title" | "requirements";
   nearby?: { distanceKm: number; origin: string };

@@ -1,5 +1,8 @@
 "use client";
 
+import { TranslatedText } from "@/components/ContentTranslation";
+
+
 import PlaceField from "@/components/PlaceField";
 import {placeDisplay} from "@/lib/places/core";
 
@@ -213,8 +216,8 @@ export default function CommunityBoard({ loggedIn = false, fullPage = false }: {
                 {activeLoggedIn && post.is_mine && <button type="button" onClick={() => void deletePost(post.id)} disabled={deleting === post.id} aria-label={t("boardDelete")} title={t("boardDelete")} className="inline-flex min-h-9 items-center gap-1.5 rounded-lg border border-red-300/20 bg-red-400/[0.06] px-2.5 text-xs font-semibold text-red-200/80 transition-colors hover:border-red-300/40 hover:bg-red-400/15 hover:text-red-100 disabled:opacity-50"><Trash2 size={14} />{deleting === post.id ? t("boardDeleting") : t("boardDelete")}</button>}
               </div>
             </div>
-            <h3 className="break-words font-display text-lg font-bold leading-snug text-white [overflow-wrap:anywhere] sm:text-xl">{post.title}</h3>
-            <p className={`mt-2 whitespace-pre-wrap break-words text-[13px] leading-relaxed text-text-secondary [overflow-wrap:anywhere] sm:mt-2.5 sm:text-sm ${fullPage ? "" : "line-clamp-3"}`}>{post.body}</p>
+            <h3 className="break-words font-display text-lg font-bold leading-snug text-white [overflow-wrap:anywhere] sm:text-xl"><TranslatedText kind="community" id={post.id} field="title">{post.title}</TranslatedText></h3>
+            <p className={`mt-2 whitespace-pre-wrap break-words text-[13px] leading-relaxed text-text-secondary [overflow-wrap:anywhere] sm:mt-2.5 sm:text-sm ${fullPage ? "" : "line-clamp-3"}`}><TranslatedText kind="community" id={post.id} field="body">{post.body}</TranslatedText></p>
             <div className="mt-3 flex flex-wrap items-center justify-between gap-2 border-t border-border/80 pt-2.5 text-xs text-text-muted sm:mt-3.5 sm:gap-3 sm:pt-3">
               <div className="flex min-w-0 flex-1 items-center gap-1.5 sm:gap-2">
                 {post.author_avatar ? <Image src={post.author_avatar} alt="" width={24} height={24} unoptimized className="h-6 w-6 rounded-full object-cover ring-1 ring-border" /> : <span className="flex h-6 w-6 items-center justify-center rounded-full bg-gold/10 text-[10px] font-semibold text-gold">{post.author_name.slice(0, 1).toUpperCase()}</span>}
@@ -225,7 +228,7 @@ export default function CommunityBoard({ loggedIn = false, fullPage = false }: {
             </div>
             {fullPage && expanded === post.id && <div className="mt-3 border-t border-border/70 pt-3">
               <div className="space-y-3">
-                {(replies[post.id] ?? []).map(reply => <div key={reply.id} className="flex gap-2.5 text-sm"><span className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-bg-elevated text-[10px] text-text-secondary">{reply.author_name.slice(0, 1).toUpperCase()}</span><div><p className="font-medium text-text-primary">{reply.author_name} <time className="ml-1 text-[11px] font-normal text-text-muted">{formatDate(reply.created_at)}</time></p><p className="mt-0.5 whitespace-pre-wrap text-text-secondary">{reply.body}</p></div></div>)}
+                {(replies[post.id] ?? []).map(reply => <div key={reply.id} className="flex gap-2.5 text-sm"><span className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-bg-elevated text-[10px] text-text-secondary">{reply.author_name.slice(0, 1).toUpperCase()}</span><div><p className="font-medium text-text-primary">{reply.author_name} <time className="ml-1 text-[11px] font-normal text-text-muted">{formatDate(reply.created_at)}</time></p><p className="mt-0.5 whitespace-pre-wrap text-text-secondary"><TranslatedText kind="reply" id={reply.id} field="body">{reply.body}</TranslatedText></p></div></div>)}
                 {!replies[post.id]?.length && <p className="text-xs text-text-muted">{t("boardNoReplies")}</p>}
               </div>
               {activeLoggedIn ? <form onSubmit={event => void submitReply(event, post.id)} className="mt-3 flex gap-2"><input value={replyDrafts[post.id] ?? ""} onChange={event => { boardDraft.resume(); setReplyDrafts(current => ({ ...current, [post.id]: event.target.value })); }} maxLength={1000} placeholder={t("boardReplyPlaceholder")} className="h-10 min-w-0 flex-1 rounded-lg border border-border bg-bg-secondary px-3 text-sm text-text-primary outline-none placeholder:text-text-muted focus:border-gold/60" /><button aria-label={t("boardSendReply")} disabled={busy || !boardDraft.loaded || !(replyDrafts[post.id] ?? "").trim()} className="flex h-10 w-10 items-center justify-center rounded-lg bg-gold text-bg-primary disabled:opacity-50"><Send size={15} /></button></form> : <Link href="/sign-in?redirect_url=%2Fcommunity" className="mt-3 inline-block text-sm font-medium text-gold">{t("boardLogin")}</Link>}

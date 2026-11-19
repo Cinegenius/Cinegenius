@@ -1,5 +1,6 @@
 "use client";
 
+import LanguageSwitcher from "@/components/LanguageSwitcher";
 import NavigationIcon from "@/components/NavigationIcon";
 import { useSiteNavigation } from "@/contexts/SiteNavigationContext";
 import { BEFORE_FORM_NAVIGATION_EVENT } from "@/lib/form-navigation-events";
@@ -82,7 +83,7 @@ function MenuContent() {
               className={`${linkClass} ${routeMatches(pathname, item.href) ? "bg-gold/10 text-gold" : ""}`}>
               <NavigationIcon name={item.icon} className="shrink-0 text-gold" /><span className="min-w-0 break-words">{uiText(item.labelKey)}</span>
             </Link>)}
-          </nav><div data-native-app-theme-host="v1" /></> : <>
+          </nav><div className="mt-3 border-t border-border pt-3" data-native-language-choice><LanguageSwitcher inline /></div><div data-native-app-theme-host="v1" /></> : <>
           <button type="button" onClick={() => { dismiss(); document.dispatchEvent(new Event("cg:opensearch")); }} className={`${linkClass} mb-4 w-full border border-border lg:hidden`}><Search size={20} aria-hidden="true" />{uiText("Ui.text_9f6d74e0a12b67")}</button>
           <nav aria-label={t("discover")}>
             <h3 className="mb-2 px-3 text-xs font-semibold uppercase tracking-wider text-text-muted">{t("discover")}</h3>

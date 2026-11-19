@@ -1,3 +1,4 @@
+import { ContentTranslationNotice } from "@/components/ContentTranslation";
 import type { ReactNode } from "react";
 import type { DirectoryView } from "./DirectoryViewControls";
 
@@ -9,6 +10,6 @@ export default function DirectoryResults({ view, map, children }: {
 }) {
   return <div className="directory-results" data-view={view}>
     {view === "map" && <div className="directory-results-map">{map}</div>}
-    <div className="directory-results-content">{children}</div>
+    <div className="directory-results-content"><ContentTranslationNotice />{children}</div>
   </div>;
 }

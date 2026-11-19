@@ -1,3 +1,4 @@
+import { TranslatedText, ContentTranslationNotice } from "@/components/ContentTranslation";
 import Image from "@/components/MediaImage";
 import PageHeader from "@/components/PageHeader";
 import DirectoryPage from "@/components/DirectoryPage";
@@ -54,6 +55,7 @@ export default async function NewsPage({ searchParams }: { searchParams: Promise
 
   return <DirectoryPage area="news"><main className="min-h-screen">
     <PageHeader withBackdrop={false} badge={t("eyebrow")} title={t("newsTitleLead")} titleHighlight={t("newsTitleHighlight")} description={t("newsDescription")} />
+    <div className="site-container"><ContentTranslationNotice /></div>
     <NativeNews key={`${region.cookieName}:${filters.q}:${filters.type}:${filters.topic}:${filters.country}:${region.country}`}
       controls={{ filters, facets, count, region, topicCookieName: topic.cookieName }} entries={nativeEntries} page={page}
       previousHref={page > 1 ? href({ page: page - 1 }) : null} nextHref={hasMore ? href({ page: page + 1 }) : null}>
@@ -67,10 +69,10 @@ export default async function NewsPage({ searchParams }: { searchParams: Promise
           {entry.image_url ? <div className="aspect-[16/9] overflow-hidden bg-bg-elevated"><Image src={entry.image_url} alt="" width={720} height={405} className="h-full w-full object-cover" /></div> : null}
           <div className="p-5">
             <div className="mb-3 flex flex-wrap gap-2 text-xs text-gold"><span>{t(`entryType.${entry.entry_type}`)}</span>{entry.topic && <><span>·</span><span>{t(`topic.${entry.topic}`)}</span></>}</div>
-            <h2 className="break-words font-serif text-2xl text-text-primary">{entry.title}</h2>
+            <h2 className="break-words font-serif text-2xl text-text-primary"><TranslatedText kind="news" id={entry.id} field="title">{entry.title}</TranslatedText></h2>
             {entry.entry_type !== "news" && entry.starts_at && <p className="mt-2 text-sm text-text-secondary"><time dateTime={entry.starts_at}>{dates.format(new Date(entry.starts_at))}</time></p>}
             {(entry.moderation_status === "ended" || (entry.ends_at && new Date(entry.ends_at).getTime() < now.getTime())) && <p className="mt-2 text-sm text-gold">{t("status.ended")}</p>}
-            {entry.summary && <p className="mt-2 line-clamp-3 text-sm leading-relaxed text-text-secondary">{entry.summary}</p>}
+            {entry.summary && <p className="mt-2 line-clamp-3 text-sm leading-relaxed text-text-secondary"><TranslatedText kind="news" id={entry.id} field="summary">{entry.summary}</TranslatedText></p>}
             <p className="mt-4 text-sm text-text-muted">{(Array.isArray(entry.organization) ? entry.organization[0] : entry.organization).name}{entry.city ? uiText("Ui.text_f6b53f9c8ab3ef", { value1: String(entry.city) }) : ""}</p>
             <Link className="mt-5 inline-flex min-h-11 items-center font-semibold text-gold" href={`/news/${(Array.isArray(entry.organization) ? entry.organization[0] : entry.organization).slug}/${entry.slug}`}>{t("openEntry")} →</Link>
           </div>

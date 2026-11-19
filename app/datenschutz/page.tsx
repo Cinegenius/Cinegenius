@@ -187,7 +187,7 @@ export default async function DatenschutzPage() {
             <div className="space-y-3">
               <p>{uiText.rich("Ui.text_0401d93941cd17", { part1: chunks => (<strong className="text-text-primary">{chunks}</strong>) })}</p>
               <p>{uiText.rich("Ui.text_e2888ae24dc5fb", { part1: chunks => (<strong className="text-text-primary">{chunks}</strong>), part2: chunks => (<code className="bg-bg-elevated px-1 rounded text-xs">{chunks}</code>) })}</p>
-              <p>{t("newsRegionDisclosure")}</p>
+              <p>{t(process.env.CONTENT_TRANSLATION_ENABLED === "true" ? "newsRegionTranslationDisclosure" : "newsRegionDisclosure")}</p>
               <p>{uiText.rich("Ui.text_041e3e28efd4a6", { part1: chunks => (<strong className="text-text-primary">{chunks}</strong>) })}</p>
               <ul className="list-disc list-inside space-y-1 pl-2">
                 <li>{uiText.rich("Ui.text_02353b549012bf", { part1: chunks => (<code className="bg-bg-elevated px-1 rounded text-xs">{chunks}</code>) })}</li>
@@ -196,6 +196,12 @@ export default async function DatenschutzPage() {
               <p>{uiText.rich("Ui.text_a5da57f09fb33f", { part1: chunks => (<strong className="text-text-primary">{chunks}</strong>) })}</p>
             </div>
           </section>
+
+          {process.env.CONTENT_TRANSLATION_ENABLED === "true" && <section lang="de">
+            <h2 className="text-base font-semibold text-text-primary mb-3">{t("contentTranslationTitle")}</h2>
+            <p>{t("contentTranslationDisclosure")}</p>
+            <p className="mt-2">{t("contentTranslationRetention")}</p>
+          </section>}
 
           <section lang="de">
             <h2 className="text-base font-semibold text-text-primary mb-3">{t("genieVoiceTitle")}</h2>

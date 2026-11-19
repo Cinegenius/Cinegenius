@@ -45,11 +45,11 @@ export function PageBackdrop({
 
 type PageHeaderProps = {
   badge: string;
-  title: string;
+  title: ReactNode;
   titleHighlight?: string;
   /** Complete native accessible title when public artwork uses translated fragments. */
   nativeTitle?: string;
-  description: string;
+  description: ReactNode;
   leading?: ReactNode;
   image?: string;
   imagePosition?: string;

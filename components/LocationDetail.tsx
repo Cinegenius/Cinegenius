@@ -1,4 +1,7 @@
 "use client";
+
+import { TranslatedText } from "@/components/ContentTranslation";
+
 import dynamic from "next/dynamic";
 import { readPublicLocationArea } from "@/lib/location-privacy";
 import { listingPriceLabel } from "@/lib/listing-price";
@@ -205,7 +208,7 @@ export default function LocationDetail({ location }: { location: Location }) {
                     <span className="flex items-center gap-1 px-2 py-0.5 bg-success/10 border border-success/20 text-success text-xs rounded">{uiText.rich("Ui.text_712de43869af36", { part1: () => (<CheckCircle size={11} />) })}</span>
                   )}
                 </div>
-                <h1 className="font-display text-3xl sm:text-4xl font-bold text-text-primary mb-1">{location.title}</h1>
+                <h1 className="font-display text-3xl sm:text-4xl font-bold text-text-primary mb-1"><TranslatedText kind="listing" id={location.id} field="title">{location.title}</TranslatedText></h1>
                 <p className="text-text-secondary flex items-center gap-1.5">{uiText.rich("Ui.text_97a14078c43165", { part1: () => (<MapPin size={14} className="text-gold" />), value2: () => (location.city), value3: () => (location.type) })}</p>
               </div>
               <div className="flex items-center gap-1">
@@ -278,7 +281,7 @@ export default function LocationDetail({ location }: { location: Location }) {
             {location.description && (
               <div className="mb-8">
                 <h2 className="font-display text-xl font-bold text-text-primary mb-3">{uiText("Ui.text_802131a6b63644")}</h2>
-                <p className="text-text-secondary leading-relaxed whitespace-pre-line">{location.description}</p>
+                <p className="text-text-secondary leading-relaxed whitespace-pre-line"><TranslatedText kind="listing" id={location.id} field="description">{location.description}</TranslatedText></p>
               </div>
             )}
 
@@ -331,8 +334,8 @@ export default function LocationDetail({ location }: { location: Location }) {
                 <h2 className="font-display text-xl font-bold text-text-primary mb-3">{uiText("Ui.text_c34fa41b7de219")}</h2>
                 <dl className="space-y-3 text-sm">
                   {meta.shooting_hours && <div><dt className="text-xs text-text-muted">{uiText("AdminReview.fields.shooting_hours")}</dt><dd className="mt-0.5 text-text-secondary">{meta.shooting_hours}</dd></div>}
-                  {meta.access_notes && <div><dt className="text-xs text-text-muted">{uiText("Ui.text_9c68248af7b8fc")}</dt><dd className="mt-0.5 text-text-secondary">{meta.access_notes}</dd></div>}
-                  {meta.availability_notes && <div><dt className="text-xs text-text-muted">{uiText("Ui.text_e6c48894da484b")}</dt><dd className="mt-0.5 whitespace-pre-line text-text-secondary">{meta.availability_notes}</dd></div>}
+                  {meta.access_notes && <div><dt className="text-xs text-text-muted">{uiText("Ui.text_9c68248af7b8fc")}</dt><dd className="mt-0.5 text-text-secondary"><TranslatedText kind="listing" id={location.id} field="access_notes">{meta.access_notes}</TranslatedText></dd></div>}
+                  {meta.availability_notes && <div><dt className="text-xs text-text-muted">{uiText("Ui.text_e6c48894da484b")}</dt><dd className="mt-0.5 whitespace-pre-line text-text-secondary"><TranslatedText kind="listing" id={location.id} field="availability_notes">{meta.availability_notes}</TranslatedText></dd></div>}
                 </dl>
               </div>
             )}

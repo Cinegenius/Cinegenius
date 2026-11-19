@@ -1,4 +1,7 @@
 "use client";
+
+import { TranslatedText } from "@/components/ContentTranslation";
+
 import MediaImage from "@/components/MediaImage";
 import { projectTypeLabel } from "@/lib/project-type-labels";
 import { useFormRouter as useRouter } from "@/lib/use-form-router";
@@ -626,7 +629,7 @@ export default function ProjectDetail({
             </div>
 
             {!editing && project.description && (
-              <p className="text-sm text-text-secondary leading-relaxed max-w-xl border-t border-border pt-4">{project.description}</p>
+              <p className="text-sm text-text-secondary leading-relaxed max-w-xl border-t border-border pt-4"><TranslatedText kind="project" id={project.id} field="description">{project.description}</TranslatedText></p>
             )}
 
             {(editing || editingTimeline) && <FormDraftStatus draft={projectFormDraft} />}
@@ -756,13 +759,13 @@ export default function ProjectDetail({
             {project.logline && (
               <div>
                 <h2 className="text-xs uppercase tracking-widest text-text-muted font-semibold mb-2">{uiText("Ui.text_de976131fa0390")}</h2>
-                <p className="text-text-secondary italic leading-relaxed border-l-2 border-gold/30 pl-4">{project.logline}</p>
+                <p className="text-text-secondary italic leading-relaxed border-l-2 border-gold/30 pl-4"><TranslatedText kind="project" id={project.id} field="logline">{project.logline}</TranslatedText></p>
               </div>
             )}
             {(project.synopsis || project.description) && (
               <div>
                 <h2 className="text-xs uppercase tracking-widest text-text-muted font-semibold mb-3">{uiText("Ui.text_8eb3755381519d")}</h2>
-                <p className="text-text-secondary leading-relaxed">{project.synopsis ?? project.description}</p>
+                <p className="text-text-secondary leading-relaxed"><TranslatedText kind="project" id={project.id} field={project.synopsis ? "synopsis" : "description"}>{project.synopsis ?? project.description}</TranslatedText></p>
               </div>
             )}
             {!project.synopsis && !project.description && !project.logline && (

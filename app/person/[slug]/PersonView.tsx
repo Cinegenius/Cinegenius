@@ -1,5 +1,8 @@
 "use client";
 
+import { TranslatedText } from "@/components/ContentTranslation";
+
+
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -136,7 +139,7 @@ export default function PersonView({
               <p className="text-sm text-text-muted mb-2">{profile.primary_role}</p>
             )}
             {profile.bio && (
-              <ProfileAboutCard><p className="text-sm text-text-secondary">{profile.bio}</p></ProfileAboutCard>
+              <ProfileAboutCard><p className="text-sm text-text-secondary"><TranslatedText kind="person" id={profile.id} field="bio">{profile.bio}</TranslatedText></p></ProfileAboutCard>
             )}
           </div>
         </div>

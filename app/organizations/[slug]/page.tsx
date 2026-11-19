@@ -1,3 +1,4 @@
+import { TranslatedText } from "@/components/ContentTranslation";
 import Link from "next/link";
 import { db } from "@/lib/db";
 import { notFound } from "next/navigation";
@@ -46,11 +47,11 @@ export default async function OrganizationPage({ params }: { params: Promise<{ s
       {organization.description && (
         <section className="mb-8 max-w-3xl" aria-labelledby="organization-description">
           <h2 id="organization-description" className="mb-3 font-serif text-xl text-text-primary sm:text-2xl">{t("description")}</h2>
-          <p className="whitespace-pre-line break-words text-sm leading-7 text-text-secondary sm:text-base">{organization.description}</p>
+          <p className="whitespace-pre-line break-words text-sm leading-7 text-text-secondary sm:text-base"><TranslatedText kind="organization" id={organization.id} field="description">{organization.description}</TranslatedText></p>
         </section>
       )}
       <h2 className="font-serif text-3xl text-text-primary">{t("organizationEntries")}</h2>
-      {entries.length ? <div className="mt-6 grid gap-4 md:grid-cols-2">{entries.map((entry) => <Link key={entry.id} href={`/news/${organization.slug}/${entry.slug}`} className="browse-card p-5"><span className="text-xs text-gold">{t(`entryType.${entry.entry_type}`)}</span><h3 className="mt-2 text-xl font-semibold text-text-primary">{entry.title}</h3>{entry.summary && <p className="mt-2 line-clamp-2 text-sm text-text-secondary">{entry.summary}</p>}</Link>)}</div> : <p className="mt-4 text-text-muted">{t("emptyOrganization")}</p>}
+      {entries.length ? <div className="mt-6 grid gap-4 md:grid-cols-2">{entries.map((entry) => <Link key={entry.id} href={`/news/${organization.slug}/${entry.slug}`} className="browse-card p-5"><span className="text-xs text-gold">{t(`entryType.${entry.entry_type}`)}</span><h3 className="mt-2 text-xl font-semibold text-text-primary"><TranslatedText kind="news" id={entry.id} field="title">{entry.title}</TranslatedText></h3>{entry.summary && <p className="mt-2 line-clamp-2 text-sm text-text-secondary"><TranslatedText kind="news" id={entry.id} field="summary">{entry.summary}</TranslatedText></p>}</Link>)}</div> : <p className="mt-4 text-text-muted">{t("emptyOrganization")}</p>}
     </section>
   </main>;
 }

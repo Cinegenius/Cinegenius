@@ -1,4 +1,7 @@
 "use client";
+
+import { TranslatedText } from "@/components/ContentTranslation";
+
 import MarketplaceOfferSummary from "@/components/MarketplaceOfferSummary";
 import { useTranslations, useLocale } from "next-intl";
 import { marketplaceCategoryLabel } from "@/lib/marketplace-offer";
@@ -113,7 +116,7 @@ export default function PropDetail({ prop }: { prop: Prop }) {
         <header data-offer-heading className="mb-6 min-w-0">
             <div className="min-w-0 space-y-3 mb-3">
               <h1 className="min-w-0 break-words font-display text-3xl font-bold leading-tight text-text-primary sm:text-4xl [overflow-wrap:anywhere]">
-                {prop.title}
+                <TranslatedText kind="listing" id={prop.id} field="title">{prop.title}</TranslatedText>
               </h1>
             <div className="flex flex-wrap gap-2 mb-3">
               <span className="max-w-full break-words rounded-full border border-border bg-bg-secondary px-2.5 py-1 text-xs text-text-muted [overflow-wrap:anywhere]">
@@ -171,7 +174,7 @@ export default function PropDetail({ prop }: { prop: Prop }) {
             <div className="mb-8">
               <h2 className="font-display text-xl font-bold text-text-primary mb-3">{uiText("Ui.text_23a2f2f64fae98")}</h2>
               {prop.description ? (
-                <p className="text-text-secondary text-sm leading-relaxed whitespace-pre-line break-words [overflow-wrap:anywhere]">{prop.description}</p>
+                <p className="text-text-secondary text-sm leading-relaxed whitespace-pre-line break-words [overflow-wrap:anywhere]"><TranslatedText kind="listing" id={prop.id} field="description">{prop.description}</TranslatedText></p>
               ) : (
                 <p className="text-text-muted italic text-sm">{uiText("Ui.text_ce2a8b66be4591")}</p>
               )}

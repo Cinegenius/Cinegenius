@@ -130,6 +130,7 @@ async function readGroup(plan: SearchPlan, wishIndex: number, area: SearchArea, 
     const role = area === "crew" ? profileOccupationPreview(row as OccupationProfile).map(title => taxonomyLabel(title, ui, occupationFormFromCrew(row.crew))).join(" · ") : row.role;
     const result: SearchResult = {
       id: String(area === "crew" ? row.user_id : area === "news" ? `${(organization as Row)?.slug}/${row.slug}` : row.slug || row.id),
+      sourceId: String(area === "crew" ? row.user_id : row.id),
       title: String(row.display_name ?? row.name ?? row.title ?? ""),
       subtitle: area === "crew" ? [role, place].filter(Boolean).join(" · ") : place,
       type: area === "crew" ? "profile" : area === "companies" ? "company" : area === "organizations" ? "organization" : area === "projects" ? "project" : area === "news" ? "news" : String(row.type),
