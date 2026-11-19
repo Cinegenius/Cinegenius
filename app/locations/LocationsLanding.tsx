@@ -1,4 +1,7 @@
 "use client";
+
+import { TranslatedText } from "@/components/ContentTranslation";
+
 import BrowseGeography from "@/components/BrowseGeography";
 import { prioritizeGeographically } from "@/lib/browse-geography";
 import { useBrowseGeography } from "@/lib/use-browse-geography";
@@ -206,7 +209,7 @@ export default function LocationsLanding({ allLocations, totalCount, initialFilt
                         : <div className="flex h-full items-center justify-center text-text-muted"><MapPin size={24} aria-hidden="true" /></div>}
                     </div>
                     <div className="directory-entry-body">
-                      <h3 className="directory-entry-title" title={location.title}>{location.title}</h3>
+                      <h3 className="directory-entry-title" title={location.title}><TranslatedText kind="listing" id={location.id} field="title">{location.title}</TranslatedText></h3>
                       {location.city && <p className="directory-entry-place"><MapPin size={11} aria-hidden="true" /><span title={location.city}>{location.city}</span></p>}
                       <p className="directory-entry-price">{location.priceLabel}</p>
                     </div>

@@ -1,4 +1,7 @@
 "use client";
+
+import { TranslatedText } from "@/components/ContentTranslation";
+
 import MediaImage from "@/components/MediaImage";
 import ListingImage from "@/components/ListingImage";
 import { ChevronRight, Briefcase, Building2, Car, MapPin, Package, PawPrint, User, Users, Film, Newspaper } from "lucide-react";
@@ -79,7 +82,7 @@ export default function ResultCard({ result, compact = false, showEvidence = fal
       {/* Content */}
       <div className={`min-w-0 flex-1 flex flex-col ${compact ? "" : "p-4"}`}>
         <h3 data-result-title title={result.title} className={`font-semibold text-sm text-text-primary leading-tight group-hover:text-gold transition-colors ${compact ? "truncate" : "mb-1 line-clamp-2"}`}>
-          {result.title}
+          <SearchResultTitle result={result} />
         </h3>
         <p data-result-subtitle title={result.subtitle} className="text-xs text-text-muted line-clamp-1 flex-1">{result.subtitle}</p>
         {showEvidence && result.evidence && <p className="mt-1 text-xs text-text-secondary">{uiText(`UnifiedSearch.discovery.evidence.${result.evidence}`)}</p>}
@@ -105,3 +108,10 @@ export default function ResultCard({ result, compact = false, showEvidence = fal
   );
 }
 
+
+export function SearchResultTitle({result}: {result: Result}) {
+  const id = result.sourceId ?? result.id;
+  if (["location", "vehicle", "prop", "job"].includes(result.type)) return <TranslatedText kind="listing" id={id} field="title">{result.title}</TranslatedText>;
+  if (result.type === "news") return <TranslatedText kind="news" id={id} field="title">{result.title}</TranslatedText>;
+  return <>{result.title}</>;
+}

@@ -1,5 +1,8 @@
 "use client";
 
+import { TranslatedText } from "@/components/ContentTranslation";
+
+
 import { useCallback, useMemo, useState, type ReactNode } from "react";
 import dynamic from "next/dynamic";
 import Link from "next/link";
@@ -41,18 +44,18 @@ export default function NativeNews({ controls, entries, page, previousHref, next
   const clusterLabel = useCallback((count: number) => mapText("cluster", { count }), [mapText]);
   const locations = useMemo(() => entries.map(entry => ({
     id: entry.id, title: entry.title, city: entry.city, image: entry.image || "", type: "", price: 0,
-    lat: entry.lat, lng: entry.lng,
+    lat: entry.lat, lng: entry.lng, titleContent: <TranslatedText kind="news" id={entry.id} field="title">{entry.title}</TranslatedText>,
   })), [entries]);
   const mapped = locations.filter(hasCoordinates).length;
   const row = (entry: NativeNewsEntry, preview = false) => <Link href={entry.href} className={`${styles.card} ${preview ? styles.preview : ""}`} data-news-id={entry.id}>
     <div className={styles.image}>{entry.image ? <MediaImage src={entry.image} alt="" width={640} height={360} className={styles.photo} /> : <Newspaper size={24} aria-hidden="true" />}</div>
     <div className={styles.copy}>
       <p className={styles.type}>{[entry.typeLabel, entry.topicLabel].filter(Boolean).join(" · ")}</p>
-      <h2>{entry.title}</h2>
+      <h2><TranslatedText kind="news" id={entry.id} field="title">{entry.title}</TranslatedText></h2>
       <p className={styles.organization}>{[entry.organization, entry.city].filter(Boolean).join(" · ")}</p>
       {entry.dateLabel && <p className={styles.date}><time dateTime={entry.startsAt ?? undefined}>{entry.dateLabel}</time></p>}
       {entry.ended && <p className={styles.ended}>{t("status.ended")}</p>}
-      {entry.summary && <p className={styles.summary}>{entry.summary}</p>}
+      {entry.summary && <p className={styles.summary}><TranslatedText kind="news" id={entry.id} field="summary">{entry.summary}</TranslatedText></p>}
     </div>
     <ChevronRight size={17} aria-hidden="true" className={styles.chevron} />
   </Link>;

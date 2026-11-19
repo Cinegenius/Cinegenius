@@ -251,7 +251,7 @@ export default function Navbar({ initialIsSignedIn = false, initialAdminUserId =
 
   if (nativeAppearance) {
     // Dedicated authentication/setup screens keep their existing forms and task controls.
-    if (authRoute || routeMatches(pathname, "/profile-setup")) return null;
+    if (authRoute || routeMatches(pathname, "/profile-setup")) return <div data-native-auth-language className="fixed right-[max(1rem,env(safe-area-inset-right,0px))] top-[max(.5rem,env(safe-area-inset-top,0px))] z-50"><LanguageSwitcher /></div>;
     const profileHref = ACCOUNT_NAV_ITEMS.find(item => item.id === "public-profile")!.href;
     const settingsHref = ACCOUNT_NAV_ITEMS.find(item => item.id === "settings")!.href;
     return <NativeAppNavbar

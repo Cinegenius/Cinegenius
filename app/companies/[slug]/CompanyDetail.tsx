@@ -1,4 +1,7 @@
 "use client";
+
+import { TranslatedText } from "@/components/ContentTranslation";
+
 import ResponsiblePersonCard from "@/components/ResponsiblePersonCard";
 import type { PublicResponsiblePerson } from "@/lib/responsible-person-server";
 
@@ -364,7 +367,7 @@ export default function CompanyDetail({
               </div>
 
               {company.tagline && (
-                <p className="min-w-0 max-w-full break-words text-text-muted text-sm mt-1 leading-snug [overflow-wrap:anywhere]">{company.tagline}</p>
+                <p className="min-w-0 max-w-full break-words text-text-muted text-sm mt-1 leading-snug [overflow-wrap:anywhere]"><TranslatedText kind="company" id={company.id} field="tagline">{company.tagline}</TranslatedText></p>
               )}
             </div>
           </div>
@@ -552,18 +555,18 @@ export default function CompanyDetail({
                 <div className="space-y-4">
                   {company.bio_short && (
                     <p className="text-sm text-text-primary leading-relaxed font-medium">
-                      {company.bio_short}
+                      <TranslatedText kind="company" id={company.id} field="bio_short">{company.bio_short}</TranslatedText>
                     </p>
                   )}
                   {company.usp && (
                     <div className="flex gap-3 p-4 bg-gold/5 border-l-2 border-gold rounded-r-xl">
                       <Quote size={16} className="text-gold shrink-0 mt-0.5" />
-                      <p className="text-sm text-text-secondary leading-relaxed italic">{company.usp}</p>
+                      <p className="text-sm text-text-secondary leading-relaxed italic"><TranslatedText kind="company" id={company.id} field="usp">{company.usp}</TranslatedText></p>
                     </div>
                   )}
                   {company.description && (
                     <p className="text-sm text-text-secondary leading-relaxed whitespace-pre-wrap">
-                      {company.description}
+                      <TranslatedText kind="company" id={company.id} field="description">{company.description}</TranslatedText>
                     </p>
                   )}
                 </div>
@@ -651,15 +654,15 @@ export default function CompanyDetail({
                           {SERVICE_TYPE_BY_ID[svc.type]?.label ?? svc.type}
                         </span>
                         {!svc.price_on_request && svc.price_note && (
-                          <span className="text-[10px] text-gold">{svc.price_note}</span>
+                          <span className="text-[10px] text-gold"><TranslatedText kind="service" id={svc.id} field="price_note">{svc.price_note}</TranslatedText></span>
                         )}
                         {svc.price_on_request && (
                           <span className="text-[10px] text-text-muted">{uiText("AdminReview.fields.price_on_request")}</span>
                         )}
                       </div>
-                      <p className="text-sm font-semibold text-text-primary mb-1">{svc.title}</p>
+                      <p className="text-sm font-semibold text-text-primary mb-1"><TranslatedText kind="service" id={svc.id} field="title">{svc.title}</TranslatedText></p>
                       {svc.description && (
-                        <p className="text-xs text-text-muted leading-relaxed line-clamp-2">{svc.description}</p>
+                        <p className="text-xs text-text-muted leading-relaxed line-clamp-2"><TranslatedText kind="service" id={svc.id} field="description">{svc.description}</TranslatedText></p>
                       )}
                       {svc.use_cases?.length > 0 && (
                         <div className="flex flex-wrap gap-1 mt-2">
@@ -735,7 +738,7 @@ export default function CompanyDetail({
                           : <div className="w-10 h-10 rounded-lg bg-bg-elevated flex items-center justify-center shrink-0"><Icon size={16} className="text-text-muted" /></div>
                         }
                         <div className="flex-1 min-w-0">
-                          <p className="text-sm font-medium text-text-primary group-hover:text-gold transition-colors truncate">{listing.title}</p>
+                          <p className="text-sm font-medium text-text-primary group-hover:text-gold transition-colors truncate"><TranslatedText kind="listing" id={listing.id} field="title">{listing.title}</TranslatedText></p>
                           <div className="flex items-center gap-2 text-[11px] text-text-muted mt-0.5">
                             <span>{listing.type === "animal" ? animals("portfolio") : listingTypeLabel[listing.type] ?? listing.type}</span>
                             <span>·</span>

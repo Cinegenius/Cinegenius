@@ -1,3 +1,4 @@
+import { TranslatedText } from "@/components/ContentTranslation";
 import Link from 'next/link';
 import Image from '@/components/MediaImage';
 import {Building2} from 'lucide-react';
@@ -50,8 +51,8 @@ export default async function HomeOrganizations() {
        {entry.image_url && <Image src={entry.image_url} alt="" width={80} height={56} sizes="80px" className="mt-0.5 hidden h-14 w-20 shrink-0 rounded-md object-cover sm:block"/>}
        <div className="min-w-0 flex-1">
         <div className="flex min-w-0 flex-wrap items-center gap-x-3 gap-y-0.5 text-[11px] leading-snug"><span className="break-words text-gold">{entryT(`entryType.${entry.entry_type}`)}{isOrganizationTopic(entry.topic) && <> · {entryT(`topic.${entry.topic}`)}</>}</span>{date && <time dateTime={date} className="text-text-muted">{dates.format(new Date(date))}</time>}</div>
-        <h3 className="mt-1 line-clamp-2 break-words text-sm font-semibold leading-snug text-text-primary transition-colors group-hover:text-gold sm:text-base [overflow-wrap:anywhere]">{entry.title}</h3>
-        {entry.summary && <p className="mt-1 line-clamp-1 break-words text-xs leading-relaxed text-text-secondary">{entry.summary}</p>}
+        <h3 className="mt-1 line-clamp-2 break-words text-sm font-semibold leading-snug text-text-primary transition-colors group-hover:text-gold sm:text-base [overflow-wrap:anywhere]"><TranslatedText kind="news" id={entry.id} field="title">{entry.title}</TranslatedText></h3>
+        {entry.summary && <p className="mt-1 line-clamp-1 break-words text-xs leading-relaxed text-text-secondary"><TranslatedText kind="news" id={entry.id} field="summary">{entry.summary}</TranslatedText></p>}
        </div>
       </Link>
       <Link href={`/organizations/${org.slug}`} aria-label={org.name} title={org.name} className="inline-flex min-h-11 min-w-0 items-center justify-center self-center py-1 text-xs leading-snug text-text-muted hover:text-gold">

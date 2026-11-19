@@ -57,6 +57,7 @@ const rateLimitMap = new Map<string, { count: number; resetAt: number }>();
 
 const RATE_LIMITS: Record<string, { limit: number; windowMs: number }> = {
   "/api/genie": { limit: 20, windowMs: 60_000 },
+  "/api/content-translations": { limit: 120, windowMs: 60_000 },
   "/api/media": { limit: 120, windowMs: 60_000 },
   "/api/community-image": { limit: 120, windowMs: 60_000 },
   "/api/upload/avatar":  { limit: 5,  windowMs: 60_000 },
@@ -265,6 +266,7 @@ export default clerkMiddleware(async (auth, request) => {
   ].includes(request.nextUrl.pathname);
   const isSmartSearchRead = request.method === "POST" && request.nextUrl.pathname === "/api/search/unified";
   const isPublicReportPost = request.method === "POST" && request.nextUrl.pathname === "/api/public-reports";
+  const isPublicTranslationRead = request.method === "POST" && request.nextUrl.pathname === "/api/content-translations";
 
   // 2. Admin route guard — enforces both session + admin role
   //    This runs BEFORE the generic auth.protect() so non-admin authenticated
@@ -305,6 +307,9 @@ export default clerkMiddleware(async (auth, request) => {
   } else if (isPublicReportPost) {
     // Public reports do not require a member account. Origin protection above
     // and the handler's validation/durable limits still apply to this exact POST.
+  } else if (isPublicTranslationRead) {
+    // Public display only: the handler re-reads canonical public sources, never
+    // client text. Exact POST, origin/flood checks and generation budgets remain.
   } else if (isSmartSearchRead) {
     // Smart search is members-only, including saved/shared result plans.
     try {

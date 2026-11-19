@@ -1,5 +1,8 @@
 "use client";
 
+import { TranslatedText } from "@/components/ContentTranslation";
+
+
 import BrowseGeography from "@/components/BrowseGeography";
 import MobileBrowseControls,{ MobileFilterField,MobileFilterSelect,type BrowseChip } from "@/components/MobileBrowseControls";
 import PageHeader from "@/components/PageHeader";
@@ -117,7 +120,7 @@ function JobsInner({ serverJobs }: { serverJobs: Job[] }) {
           const facts = job.facts, dates = jobDateLabel(job, locale);
           return <article key={job.id} className="browse-card group"><Link href={`/jobs/${job.id}`} className="block p-4 sm:p-5">
             <div className="flex items-start gap-3"><div className="hidden size-11 shrink-0 items-center justify-center rounded-xl border border-border bg-bg-elevated sm:flex"><Briefcase size={18} className="text-text-muted" aria-hidden="true" /></div><div className="min-w-0 flex-1">
-              <div className="flex items-start justify-between gap-3"><h2 className="break-words text-base font-semibold leading-snug text-text-primary group-hover:text-gold sm:text-lg">{job.title}</h2><ArrowUpRight size={18} aria-hidden="true" className="mt-0.5 shrink-0 text-text-muted" /></div>
+              <div className="flex items-start justify-between gap-3"><h2 className="break-words text-base font-semibold leading-snug text-text-primary group-hover:text-gold sm:text-lg"><TranslatedText kind="listing" id={job.id} field="title">{job.title}</TranslatedText></h2><ArrowUpRight size={18} aria-hidden="true" className="mt-0.5 shrink-0 text-text-muted" /></div>
               <p className="mt-1 flex flex-wrap gap-x-2 text-xs text-text-secondary sm:text-sm">{[facts.company, facts.roleLabel && facts.roleLabel !== job.title && taxonomyLabel(facts.roleLabel, ui), facts.projectType && projectTypeLabel(facts.projectType, ui), facts.jobType && employments.find(row => row.value === facts.jobType)?.label].filter(Boolean).join(" · ")}</p>
               <div className="mt-3 flex flex-wrap gap-x-5 gap-y-2 text-xs text-text-secondary sm:text-sm">{job.location && <span className="inline-flex min-w-0 items-center gap-1.5"><MapPin size={14} aria-hidden="true" className="shrink-0 text-text-muted" />{placeDisplay(job, job.location, locale)}</span>}{dates && <span className="inline-flex min-w-0 items-center gap-1.5"><Calendar size={14} aria-hidden="true" className="shrink-0 text-text-muted" />{dates}</span>}</div>
               <div className="mt-3 flex flex-wrap items-center justify-between gap-2 border-t border-border/60 pt-3 text-xs sm:text-sm"><span className="font-medium text-gold">{jobRateLabel(job, ui, locale)}</span><div className="flex flex-wrap items-center gap-3">{facts.urgent && <span className="text-text-secondary">{t("urgentBadge")}</span>}{job.createdAt && Number.isFinite(Date.parse(job.createdAt)) && <time dateTime={job.createdAt} className="text-xs text-text-muted">{new Intl.DateTimeFormat(locale, { dateStyle: "medium", timeZone: "UTC" }).format(new Date(job.createdAt))}</time>}</div></div>

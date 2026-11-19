@@ -1,3 +1,4 @@
+import { TranslatedText } from "@/components/ContentTranslation";
 import { occupationFormFromCrew } from "@/lib/occupation-form";
 import { profileOccupationPreview, type OccupationProfile } from "@/lib/crew-occupations";
 import { profileAccessFor } from "@/lib/profile-privacy-server";
@@ -216,7 +217,7 @@ async function HomeLocations({ dataPromise }: { dataPromise: HomeDataPromise }) 
       {data.liveLocations.map(loc => <Link key={loc.id} href={`/locations/${loc.id}`} className="group relative isolate block aspect-[4/3] min-h-11 min-w-0 overflow-hidden rounded-2xl border border-border bg-bg-elevated sm:aspect-[3/2]">
         {loc.image ? <ListingImage src={loc.image} alt={loc.title} fill mediaSize="thumbnail" className="object-cover transition-transform duration-300 motion-safe:group-hover:scale-105" style={{ objectPosition: loc.focalPoint ? `${loc.focalPoint.x}% ${loc.focalPoint.y}%` : "50% 50%" }} sizes="(min-width:1024px) 33vw,(min-width:640px) 60vw,72vw" /> : <div className="absolute inset-0 flex items-center justify-center text-text-muted/30"><MapPin size={32} aria-hidden="true" /></div>}
         <div className="absolute inset-0 bg-gradient-to-t from-bg-primary via-bg-primary/30 to-transparent" />
-        <div className="absolute inset-x-0 bottom-0 p-3 sm:p-3.5"><h3 className="line-clamp-2 text-sm font-semibold leading-snug text-white">{loc.title}</h3><div className="mt-1.5 flex min-w-0 flex-wrap items-center justify-between gap-x-3 gap-y-1 text-xs"><span className="min-w-0 truncate text-white/75">{loc.city}</span><span className="font-semibold text-gold [overflow-wrap:anywhere]">{loc.priceLabel}</span></div></div>
+        <div className="absolute inset-x-0 bottom-0 p-3 sm:p-3.5"><h3 className="line-clamp-2 text-sm font-semibold leading-snug text-white"><TranslatedText kind="listing" id={loc.id} field="title">{loc.title}</TranslatedText></h3><div className="mt-1.5 flex min-w-0 flex-wrap items-center justify-between gap-x-3 gap-y-1 text-xs"><span className="min-w-0 truncate text-white/75">{loc.city}</span><span className="font-semibold text-gold [overflow-wrap:anywhere]">{loc.priceLabel}</span></div></div>
       </Link>)}
     </HomeCardRail>
   </section>;
@@ -267,7 +268,7 @@ async function HomeCrew({ dataPromise }: { dataPromise: HomeDataPromise }) {
                       </p>
                     )}
                     {c.tagline && (
-                      <p className="text-xs text-text-secondary leading-relaxed line-clamp-2 flex-1 mb-2">{c.tagline}</p>
+                      <p className="text-xs text-text-secondary leading-relaxed line-clamp-2 flex-1 mb-2"><TranslatedText kind="profile" id={c.id} field="tagline">{c.tagline}</TranslatedText></p>
                     )}
                   </div>
                 </Link>
@@ -317,7 +318,7 @@ async function HomeRecommendations({ dataPromise }: { dataPromise: HomeDataPromi
                       </span>
                     </div>
                     <div className="absolute bottom-2 left-2 right-2 sm:left-3 sm:right-3">
-                      <h3 className="line-clamp-2 text-xs font-semibold leading-tight text-white drop-shadow-md sm:text-sm">{prop.title}</h3>
+                      <h3 className="line-clamp-2 text-xs font-semibold leading-tight text-white drop-shadow-md sm:text-sm"><TranslatedText kind="listing" id={prop.id} field="title">{prop.title}</TranslatedText></h3>
                       {prop.city && (
                         <p className="text-[10px] sm:text-xs text-white/70 flex items-center gap-1 mt-0.5">
                           <MapPin size={10} /> {prop.city}
@@ -341,7 +342,7 @@ async function HomeRecommendations({ dataPromise }: { dataPromise: HomeDataPromi
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         {liveJobs.map(job => <Link key={job.id} href={`/jobs/${job.id}`} className="group flex min-h-11 min-w-0 items-start gap-2 rounded-xl border border-border/70 px-3 py-3 transition-colors hover:bg-bg-secondary/60">
           <Briefcase size={15} className="mt-0.5 shrink-0 text-gold" />
-          <div className="min-w-0 flex-1"><h3 className="truncate text-sm font-semibold text-text-primary group-hover:text-gold">{job.title}</h3><p className="mt-0.5 truncate text-xs text-text-muted">{job.location}</p><p className="mt-1 flex items-center gap-1 text-[10px] text-text-muted"><Clock size={9} />{formatDate(job.created_at)}</p></div>
+          <div className="min-w-0 flex-1"><h3 className="truncate text-sm font-semibold text-text-primary group-hover:text-gold"><TranslatedText kind="listing" id={job.id} field="title">{job.title}</TranslatedText></h3><p className="mt-0.5 truncate text-xs text-text-muted">{job.location}</p><p className="mt-1 flex items-center gap-1 text-[10px] text-text-muted"><Clock size={9} />{formatDate(job.created_at)}</p></div>
           <span className="shrink-0 text-right text-xs font-semibold text-gold">{job.rawPrice ? uiText("Ui.text_8ae8849cdb3aaa", { value1: String(job.rawPrice.toLocaleString(uiLocale)), value2: String(tc("perDay")) }) : tc("onRequest")}</span>
         </Link>)}
       </div>

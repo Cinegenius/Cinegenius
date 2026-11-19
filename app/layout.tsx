@@ -1,5 +1,7 @@
 import { Playfair_Display, DM_Sans, JetBrains_Mono } from "next/font/google";
 import { ClerkProvider } from "@clerk/nextjs";
+import { cookies } from "next/headers";
+import { ContentTranslationProvider } from "@/components/ContentTranslation";
 import { auth } from "@clerk/nextjs/server";
 import { deDE, enUS, esES, csCZ, huHU, itIT, nlNL, nlBE, svSE, frFR, plPL, ptPT, zhCN, jaJP, koKR, ruRU, ukUA } from "@clerk/localizations";
 import AppIntlProvider from "@/components/AppIntlProvider";
@@ -117,6 +119,7 @@ export default async function RootLayout({
 }>) {
   const [locale, messages, now, timeZone, { userId, sessionId }] = await Promise.all([getLocale(), getMessages(), getNow(), getTimeZone(), auth()]);
   const clerkLocalization = CLERK_LOCALIZATIONS[locale] ?? deDE;
+  const originalContent = (await cookies()).get("cg_content_original")?.value === "1";
   const htmlLang = HTML_LANG[locale] ?? "de";
 
   return (
@@ -146,6 +149,7 @@ export default async function RootLayout({
           <ThemeProvider>
             <ToastProvider>
               <AuthSessionBoundary initialSessionId={sessionId}>
+              <ContentTranslationProvider enabled={process.env.CONTENT_TRANSLATION_ENABLED === "true"} initialOriginal={originalContent} initialUserId={userId}>
               <FormDraftProvider>
                 <GlobalEffects />
                 <PresencePing />
@@ -155,6 +159,7 @@ export default async function RootLayout({
                 <ProductAnalytics />
                 <Genie />
               </FormDraftProvider>
+              </ContentTranslationProvider>
               </AuthSessionBoundary>
             </ToastProvider>
           </ThemeProvider>

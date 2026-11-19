@@ -1,5 +1,8 @@
 "use client";
 
+import { TranslatedText } from "@/components/ContentTranslation";
+
+
 import "leaflet/dist/leaflet.css";
 import "maplibre-gl/dist/maplibre-gl.css";
 
@@ -26,6 +29,7 @@ type Location = {
   metadata?: Record<string, unknown>;
   focalPoint?: { x: number; y: number } | null;
   markerColor?: string;
+  titleContent?: ReactNode;
 };
 type Props = {
   preserveViewport?: boolean;
@@ -297,7 +301,7 @@ export default function LocationMap({ preserveViewport = false, readOnly = false
                   {selected.image ? <ListingImage src={selected.image} alt="" fill mediaSize="thumbnail" sizes="48px" className="object-cover" style={{ objectPosition: selected.focalPoint ? `${selected.focalPoint.x}% ${selected.focalPoint.y}%` : "50% 50%" }} /> : <div className="flex h-full items-center justify-center text-text-muted"><MapPin size={22} aria-hidden="true" /></div>}
                 </div>
                 <div className="min-w-0 flex-1 space-y-1 [overflow-wrap:anywhere]">
-                  <h3 className="line-clamp-2 pr-8 text-sm font-semibold text-text-primary" title={selected.title}>{selected.title}</h3>
+                  <h3 className="line-clamp-2 pr-8 text-sm font-semibold text-text-primary" title={selected.title}>{selected.titleContent ?? <TranslatedText kind="listing" id={selected.id} field="title">{selected.title}</TranslatedText>}</h3>
                   <p className="line-clamp-2 text-xs text-text-muted">{placeDisplay(selected, selected.city, locale)} · {locationCategoryLabel(selected.type, categoryText)}</p>
                 </div>
               </div>
@@ -305,7 +309,7 @@ export default function LocationMap({ preserveViewport = false, readOnly = false
               <p className="mt-2 text-sm font-bold text-gold">{listingPriceLabel(selected.price, selected.metadata, "/Tag", locale, key => priceText(key))}</p>
               <span className="flex min-h-11 items-center text-sm font-medium text-gold">{t("details")} →</span>
             </Link>
-          )) : <div className="max-h-60 overflow-y-auto p-3 pt-12">{clusterLocations.map(location => <button type="button" key={location.id} onClick={() => { select(location.id); }} className="block min-h-11 w-full border-b border-border p-2 text-left text-sm text-text-primary">{location.title}</button>)}</div>}
+          )) : <div className="max-h-60 overflow-y-auto p-3 pt-12">{clusterLocations.map(location => <button type="button" key={location.id} onClick={() => { select(location.id); }} className="block min-h-11 w-full border-b border-border p-2 text-left text-sm text-text-primary">{location.titleContent ?? <TranslatedText kind="listing" id={location.id} field="title">{location.title}</TranslatedText>}</button>)}</div>}
         </div>
       )}
     </div>

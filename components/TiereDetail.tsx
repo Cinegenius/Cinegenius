@@ -1,5 +1,8 @@
 "use client";
 
+import { TranslatedText } from "@/components/ContentTranslation";
+
+
 import { useTranslations } from "next-intl";
 import { animalSpecies } from "@/lib/animal-taxonomy";
 import MediaImage from "@/components/MediaImage";
@@ -188,7 +191,7 @@ export default function TiereDetail({ animal }: { animal: Animal }) {
             {animal.description && (
               <div className="mb-8">
                 <h2 className="font-display text-xl font-bold text-text-primary mb-3">{animals("about")}</h2>
-                <p className="text-text-secondary text-sm leading-relaxed whitespace-pre-line">{animal.description}</p>
+                <p className="text-text-secondary text-sm leading-relaxed whitespace-pre-line"><TranslatedText kind="listing" id={animal.id} field="description">{animal.description}</TranslatedText></p>
               </div>
             )}
 

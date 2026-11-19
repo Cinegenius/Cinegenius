@@ -1,4 +1,7 @@
 "use client";
+
+import { TranslatedText } from "@/components/ContentTranslation";
+
 import { marketplaceBrowseDepartments } from "@/lib/browse-facets";
 import BrowseGeography from "@/components/BrowseGeography";
 import { prioritizeGeographically } from "@/lib/browse-geography";
@@ -71,7 +74,7 @@ function PropCard({ p, list, ratingData, myRating, onRate, canRate, isFavorited,
           : <div className="flex h-full items-center justify-center text-text-muted"><Package size={24} aria-hidden="true" /></div>}
       </div>
       <div className="directory-entry-body bg-bg-secondary">
-        <h3 className="directory-entry-title" title={p.title}>{p.title}</h3>
+        <h3 className="directory-entry-title" title={p.title}><TranslatedText kind="listing" id={p.id} field="title">{p.title}</TranslatedText></h3>
         <p className="directory-entry-place"><MapPin size={11} aria-hidden="true" /><span title={p.location || p.vendor}>{p.location || p.vendor}</span></p>
         <p className="directory-entry-price font-bold">{listingPriceLabel(p.dailyRate, { ...p.meta, rental_type: p.rentalType }, "/Tag", locale, market)}</p>
       </div>

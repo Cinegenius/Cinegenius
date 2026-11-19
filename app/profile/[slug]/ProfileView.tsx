@@ -1,5 +1,8 @@
 "use client";
 
+import { TranslatedText, useTranslatedContent } from "@/components/ContentTranslation";
+
+
 import { occupationFormFromCrew, type OccupationForm } from "@/lib/occupation-form";
 
 import ProfilePronouns from "@/components/ProfilePronouns";
@@ -94,17 +97,18 @@ function StatPill({ label, value }: { label: string; value?: string | number | n
   );
 }
 
-function ProfileBio({ value, limit = 360 }: { value: string | null | undefined; limit?: number }) {
+function ProfileBio({ value, userId, limit = 360 }: { value: string | null | undefined; userId: string; limit?: number }) {
   const uiText = useTranslations();
 
   const [expanded, setExpanded] = useState(false);
-  const text = cleanProfileBio(value);
+  const translated = useTranslatedContent({kind: "profile", id: userId, field: "bio", source: value});
+  const text = cleanProfileBio(translated.text);
   if (!text) return null;
   const shortened = text.length > limit && !expanded;
   const visibleText = shortened ? uiText("Ui.text_06fd28c4e0e314", { value1: String(text.slice(0, limit).trimEnd()) }) : text;
   return (
     <div>
-      <p className="whitespace-pre-line break-words text-text-secondary text-sm leading-relaxed">{visibleText}</p>
+      <p lang={translated.translated ? translated.locale : undefined} title={translated.translated ? uiText("contentTranslation.machineLabel") : undefined} className="whitespace-pre-line break-words text-text-secondary text-sm leading-relaxed">{visibleText}</p>
       {text.length > limit && (
         <button type="button" onClick={() => setExpanded((current) => !current)}
           className="mt-2 min-h-11 text-xs font-semibold text-gold hover:text-gold-light">
@@ -626,7 +630,7 @@ function ActorProfile({ organizationSection, profile, isOwner, projectCredits, c
                   <ProfileRoles positions={roleLabels} /><AdditionalProfileOccupations profile={profile} />
                   {profile.tagline && (
                     <p className="min-w-0 max-w-full break-words text-text-secondary text-sm mt-1 italic [overflow-wrap:anywhere]">
-                      {profile.tagline}
+                      <TranslatedText kind="profile" id={profile.user_id} field="tagline">{profile.tagline}</TranslatedText>
                     </p>
                   )}
                   {profile.location && (
@@ -671,7 +675,7 @@ function ActorProfile({ organizationSection, profile, isOwner, projectCredits, c
               )}
 
               {/* Bio */}
-              {profile.bio && <ProfileAboutCard crew={profile.crew}><ProfileBio value={profile.bio} /></ProfileAboutCard>}
+              {profile.bio && <ProfileAboutCard crew={profile.crew}><ProfileBio userId={profile.user_id} value={profile.bio} /></ProfileAboutCard>}
 
               {(crewData.experience_years || crewData.department || crewEquipment.length > 0 || crewSoftware.length > 0 || crewCertificates.length > 0) && (
                 <div className="rounded-xl border border-border bg-bg-secondary/70 p-4 space-y-3">
@@ -1117,7 +1121,7 @@ function ModelProfile({ organizationSection, profile, isOwner, projectCredits = 
           <>
             <Divider />
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-10">
-              {profile.bio && <ProfileAboutCard crew={profile.crew}><SectionLabel>{uiText("Ui.text_3f8ab8360131de")}</SectionLabel><ProfileBio value={profile.bio} /></ProfileAboutCard>}
+              {profile.bio && <ProfileAboutCard crew={profile.crew}><SectionLabel>{uiText("Ui.text_3f8ab8360131de")}</SectionLabel><ProfileBio userId={profile.user_id} value={profile.bio} /></ProfileAboutCard>}
               {skills.length > 0 && (
                 <div>
                   <SectionLabel>{uiText("Ui.text_05b86932f51fb5")}</SectionLabel>
@@ -1368,7 +1372,7 @@ function GenericProfile({ organizationSection, profile, isOwner, projectCredits,
                   <span className="w-1 h-1 rounded-full bg-gold shrink-0" />
                   <p className="text-[11px] uppercase tracking-widest text-gold font-bold">{uiText("Ui.text_3f8ab8360131de")}</p>
                 </div>
-                <ProfileBio value={profile.bio} />
+                <ProfileBio userId={profile.user_id} value={profile.bio} />
               </ProfileAboutCard>
             )}
 
