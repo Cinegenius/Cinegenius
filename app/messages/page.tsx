@@ -92,6 +92,7 @@ function MessagesContent() {
   useEffect(() => () => dismissNativeDialog(), []);
   const uiText = useTranslations();
   const t = useTranslations("Messaging");
+  const contactsText = useTranslations("Contacts");
   const {leave} = useFormNavigation();
   const uiLocale = useLocale();
 
@@ -139,6 +140,8 @@ function MessagesContent() {
   const [newMessageOpen, setNewMessageOpen] = useState(false);
   const [groupInfoOpen, setGroupInfoOpen] = useState(false);
   const [search, setSearch] = useState("");
+  const [contactSearch, setContactSearch] = useState({ owner: user?.id, value: "" });
+  const contactQuery = contactSearch.owner === user?.id ? contactSearch.value : "";
   const [selectedMessage, setSelectedMessage] = useState<Message | null>(null);
   const [olderLoading, setOlderLoading] = useState(false);
   const [hasOlderMessages, setHasOlderMessages] = useState(false);
@@ -478,6 +481,7 @@ function MessagesContent() {
     <aside className={`${showChat?"hidden sm:flex":"flex"} min-h-0 min-w-0 w-full flex-col border-border bg-bg-primary ${utilityView ? "shrink-0" : "border-r sm:w-80 flex-1 sm:flex-none"}`}>
       <InboxPaneHeader active={view} action={<button type="button" onClick={()=>setNewMessageOpen(true)} aria-label={t("newMessage")} title={t("newMessage")} className="flex size-11 shrink-0 items-center justify-center rounded-xl text-gold hover:bg-bg-elevated"><SquarePen size={22}/></button>}>
         {!friendsOnly && !noticesOnly && <label className="mt-2 flex min-h-11 items-center gap-2 rounded-xl border border-border bg-bg-secondary px-3"><Search size={17} className="shrink-0 text-text-muted"/><input type="search" value={search} onChange={event=>setSearch(event.target.value)} placeholder={t("searchChats")} aria-label={t("searchChats")} className="min-h-11 min-w-0 flex-1 bg-transparent text-base text-text-primary outline-none"/></label>}
+        {nativeAppearance && friendsOnly && <label className="flex min-h-11 items-center gap-2 rounded-xl border border-border bg-bg-secondary px-3"><Search size={17} aria-hidden="true" className="shrink-0 text-text-muted"/><input type="search" value={contactQuery} onChange={event=>setContactSearch({ owner: user?.id, value: event.target.value })} placeholder={contactsText("search")} aria-label={contactsText("search")} className="min-h-11 min-w-0 flex-1 bg-transparent text-base text-text-primary outline-none"/></label>}
       </InboxPaneHeader>
       {!friendsOnly && !noticesOnly && <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain">
         {contactsError&&<div role="alert" className="px-4 py-2 text-sm text-red-400 [[data-theme=light]_&]:text-red-700"><p>{uiText("Ui.text_4139ecbefbacc6")}</p><button type="button" onClick={()=>void loadContacts()} className="min-h-11 text-gold">{t("retry")}</button></div>}
@@ -493,7 +497,7 @@ function MessagesContent() {
       </div>}
     </aside>
     <Activity mode={noticesOnly ? "visible" : "hidden"}><InboxNotices /></Activity>
-    <Activity mode={friendsOnly && !showChat ? "visible" : "hidden"}><InboxFriends key={user?.id ?? "signed-out"} /></Activity>
+    <Activity mode={friendsOnly && !showChat ? "visible" : "hidden"}><InboxFriends key={user?.id ?? "signed-out"} searchValue={nativeAppearance ? contactQuery : undefined} hideSearch={nativeAppearance} hideTabs={nativeAppearance} /></Activity>
     {!noticesOnly && (!friendsOnly || showChat) && <section aria-label={t("conversation")} className={`${showChat?"flex":"hidden sm:flex"} relative min-w-0 flex-1 flex-col bg-bg-primary`}>
       {showChat?<>
         <header className="flex min-w-0 shrink-0 items-center gap-2 border-b border-border px-3 py-2">

@@ -1,0 +1,6 @@
+:global(html[data-cg-native-community-appearance="app"]) .card { scroll-margin-block:calc(var(--cg-app-chrome-clearance,88px) + var(--cg-app-active-rail-height,0px) + 12px) calc(var(--mobile-nav-clearance,96px) + var(--cg-app-genie-clearance,0px) + 12px); }
+:global(html[data-cg-native-community-appearance="app"]) .card :global([data-result-title]),
+:global(html[data-cg-native-community-appearance="app"]) .card :global([data-result-subtitle]),
+:global(html[data-cg-native-community-appearance="app"]) .card :global([data-result-price]) { display:block; max-height:none; overflow:visible; -webkit-line-clamp:unset; line-clamp:unset; white-space:normal; text-overflow:clip; overflow-wrap:anywhere; word-break:normal; }
+:global(html[data-cg-native-community-appearance="app"]) .card :global([data-result-title]) { line-height:1.35; }
+:global(html[data-cg-native-community-appearance="app"]) .card :global([data-result-subtitle]) { line-height:1.5; }

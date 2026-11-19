@@ -17,7 +17,7 @@ type Contact = { friendship_id: string; user_id: string; display_name: string; a
 const FRIENDSHIPS_CONTRACT = "cinegenius.friendships.v1";
 
 /** Only accepted connections belong here; incoming requests live in Mitteilungen. */
-export default function InboxFriends() {
+export default function InboxFriends({ searchValue, hideSearch = false, hideTabs = false }: { searchValue?: string; hideSearch?: boolean; hideTabs?: boolean } = {}) {
   const t = useTranslations("Contacts");
   const messaging = useTranslations("Messaging");
   const locale = useLocale();
@@ -35,7 +35,7 @@ export default function InboxFriends() {
   const [failure, setFailure] = useState<{ scope: string; kind: "load" | "remove" | "favorite"; text?: string; locale?: string } | null>(null);
   const [pending, setPending] = useState(new Set<string>());
   const [searchState, setSearch] = useState({ scope, value: "" });
-  const search = searchState.scope === scope ? searchState.value : "";
+  const search = searchValue ?? (searchState.scope === scope ? searchState.value : "");
   const onlyHomies = inboxHomies(searchParams);
   const nativeContract = nativeAppearance || onlyHomies;
   const contacts = snapshot.scope === scope ? snapshot.contacts : [];
@@ -149,18 +149,18 @@ export default function InboxFriends() {
     .sort((a, b) => a.display_name.localeCompare(b.display_name, locale));
 
   return <div ref={region} tabIndex={-1} role="region" aria-label={t("title")} className="min-h-0 min-w-0 flex-1 overflow-y-auto overscroll-contain">
-    <div className="mx-auto max-w-3xl space-y-3 p-4 sm:p-6">
-      <label className="flex min-h-11 items-center gap-2 rounded-xl border border-border bg-bg-secondary px-3">
+    <div data-native-inbox-contacts className={`mx-auto max-w-3xl ${nativeAppearance ? "space-y-2 p-3" : "space-y-3 p-4 sm:p-6"}`}>
+      {!hideSearch && <label className="flex min-h-11 items-center gap-2 rounded-xl border border-border bg-bg-secondary px-3">
         <Search size={17} aria-hidden="true" className="shrink-0 text-text-muted" />
         <input type="search" value={search} onChange={event => setSearch({ scope, value: event.target.value })} placeholder={t("search")} aria-label={t("search")} className="min-h-11 min-w-0 flex-1 bg-transparent text-base text-text-primary outline-none" />
-      </label>
+      </label>}
       {error && <div role="alert" className="text-sm text-red-400"><p>{error}</p>{failure?.kind === "load" && <button type="button" onClick={() => void load()} className="min-h-11 text-gold">{t("retry")}</button>}</div>}
-      {ready && (favoritesRead || onlyHomies) && <div className="space-y-2"><div className="flex gap-2">
+      {!hideTabs && ready && (favoritesRead || onlyHomies) && <div className="space-y-2"><div className="flex gap-2">
         <button type="button" aria-pressed={!onlyHomies} onClick={() => leave(() => navigateInboxView(window, "friends"))} className={`min-h-11 flex-1 rounded-xl border px-3 text-sm ${!onlyHomies ? "border-gold/30 bg-gold/10 text-gold" : "border-border text-text-secondary"}`}>{t("title")}</button>
         <button type="button" aria-pressed={onlyHomies} disabled={!favoritesRead} onClick={() => leave(() => navigateInboxView(window, "friends", { homies: true }))} className={`flex min-h-11 flex-1 items-center justify-center gap-2 rounded-xl border px-3 text-sm disabled:opacity-60 ${onlyHomies ? "border-gold/30 bg-gold/10 text-gold" : "border-border text-text-secondary"}`}><Star size={16} aria-hidden="true" />{t("homies")}</button>
       </div>{onlyHomies && !favoritesUnavailable && <p className="text-xs text-text-muted">{t("homiesHint")}</p>}</div>}
       {loading && !ready ? <p role="status" className="py-8 text-sm text-text-muted">{t("loading")}</p> : favoritesUnavailable ? <div role="status" className="space-y-3 py-8 text-sm text-text-muted"><p>{t("homiesUnavailable")}</p><button type="button" onClick={() => void load()} className="min-h-11 text-gold">{t("retry")}</button></div> : ready && !visible.length ? <div className="space-y-3 py-8 text-center text-sm text-text-muted"><Users size={26} className="mx-auto" /><p>{query ? messaging("noPeople") : onlyHomies ? t("homiesHint") : t("empty")}</p></div> : visible.map(contact => <ContactCard
-        key={`${scope}:${contact.friendship_id}`} contact={contact} pending={pending.has(`${scope}:${contact.friendship_id}`)} error={error} onRemove={remove}
+        key={`${scope}:${contact.friendship_id}`} compact={nativeAppearance} contact={contact} pending={pending.has(`${scope}:${contact.friendship_id}`)} error={error} onRemove={remove}
         favorite={favoritesRead ? contact.is_favorite : undefined} favoriteDisabled={!favoritesWrite} onFavorite={() => void favorite(contact)}
         messageHref={`/messages?to=${encodeURIComponent(contact.user_id)}`}
         onMessage={() => { if (userId) leave(() => navigateMessageView(window, userId, { recipientId: contact.user_id })); }}

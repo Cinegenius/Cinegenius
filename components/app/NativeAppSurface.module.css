@@ -1,12 +1,11 @@
 /* Presentation only. The same server pages, forms and permissions remain active. */
 :global(html[data-cg-native-community-appearance="app"]) > :global(body) > main.surface:global(.site-main[data-native-app-surface="v1"]) {
-  --mobile-nav-clearance: calc(96px + env(safe-area-inset-bottom, 0px));
-  --site-header-height: calc(env(safe-area-inset-top, 0px) + var(--cg-app-header-height, 54px) + 32px);
   min-width: 0;
   min-height: 100dvh;
   padding-top: var(--site-header-height) !important;
-  padding-bottom: var(--mobile-nav-clearance) !important;
+  padding-bottom: calc(var(--mobile-nav-clearance) + var(--cg-app-genie-clearance)) !important;
 }
+:global(html[data-cg-native-community-appearance="app"]) .surface :global(.smart-result-list) { padding:0; border:0; border-radius:0; background:transparent; }
 
 /* The bottom navigation already names these areas. Keep semantic headings and CTAs. */
 .surface :global(.directory-page > .site-page-hero) {
@@ -52,3 +51,12 @@
 @media (prefers-reduced-motion: reduce) {
   .surface { scroll-behavior: auto; }
 }
+
+:global(html[data-cg-native-community-appearance="app"]) .surface :global([data-native-card-copy]),
+:global(html[data-cg-native-community-appearance="app"]) .surface :global(.directory-entry-title),
+:global(html[data-cg-native-community-appearance="app"]) .surface :global(.directory-entry-place span),
+:global(html[data-cg-native-community-appearance="app"]) .surface :global(.directory-entry-price) {
+  display:block; max-height:none; overflow:visible; -webkit-line-clamp:unset; line-clamp:unset; white-space:normal; text-overflow:clip; overflow-wrap:anywhere;
+}
+
+:global(html[data-cg-native-community-appearance="app"]) .surface :global([data-native-inbox-contacts]) { padding-bottom:calc(12px + var(--cg-app-genie-clearance,0px)); }
