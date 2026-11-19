@@ -1,6 +1,48 @@
 # Veröffentlichte App-Oberfläche: Quellenabgleich am 19. November 2026
 
-## Maßgeblicher Stand
+## Aktueller Stand: gemeinsame App-Bedienleiste
+
+Der neuere Mac-Handoff ist als `origin/main`
+`9d86b9c4c794e6c8b74225b8c93ad9b70ddf3a01` bestätigt, nach
+`b3c3dbe2b24c664a6b20c9bdc003b48c5e27044f` und aufbauend auf `6d503f6`.
+Vercel bestätigt Production Ready für `dpl_6qipazX8iJfHt8UdmXWVzfkW9cDZ`
+unter `https://cinegenius-oi9fariq6-cinegenius-7216s-projects.vercel.app` und
+`https://www.cinegenius.co`. Dies ist die aktuelle Basis für weitere Produktarbeit.
+Die nachfolgenden Angaben zu `6d503f6` bleiben als vorheriger Empfang erhalten.
+
+`NativeBrowseToolbar` vereinheitlicht Smart, Projekte und News ausschließlich in
+der App: Zahl, tatsächliche Schnellfilter, More und Kacheln/Liste/Karte mit
+44-px-Bedienflächen. Suchblasen, Pure-Kontrast und WebKit-Fokusführung sind
+angepasst. News verwendet ausschließlich freigegebene Beiträge und ihren eigenen
+bekannten öffentlichen Stadtpunkt; Online-/unklare Orte bleiben ungepinnt und
+sichtbar in der Liste. Projekte deaktiviert die Karte mit lokalisiertem Grund,
+solange konkrete Projektorte fehlen. Verbindliche Details stehen in
+`docs/native-browse-toolbar.md` im veröffentlichten Hauptcommit.
+
+Hier erneut geprüft: Remote-Commit, Vorgängerfolge, Vercel-Status und vier anonyme
+GETs auf `/`, `/news`, `/projects` sowie `/search?smart=1`. Alle vier antworten
+mit 200, der neuen Deployment-ID und ohne native HTML-Markierungen; der Ursprung
+bleibt `www.cinegenius.co`. Der Release ändert gegenüber `6d503f6` 34 Pfade.
+13 ausgewählte Dateien bzw. Verzeichnisbäume sind identisch, darunter
+Darstellungsmarker, App-Navigation, Smart-Zugriffsprüfung, Suchserver/-typen,
+Datenschutzhelfer, Datenbankzugriff, Release-Script, `mobile` und `supabase`.
+Die Beitragsauswahl und der öffentliche Ortsauflöser bleiben ebenfalls identisch.
+Dies ist kein angemeldeter oder interaktiver Browser-/Gerätetest.
+
+Von der Mac-Aufgabe gemeldet, hier nicht erneut gezählt: 56 relevante Tests,
+17 Kataloge, Designcheck, ESLint und vollständiger Build mit TypeScript bestanden;
+36 Browser-Verhaltensfälle mit 1.656 Assertions sowie abschließende CSS-Prüfungen
+in Chromium/WebKit, Pure/Cinema und 320/393 px. Gemeldet sind außerdem sieben
+Live-Routen und 38 erreichbare JS-Dateien. Kein angemeldeter Livekonto- oder
+physischer iPhone-Nachweis dieses UI-Updates. Keine neue Schema-, Push- oder
+Shots-Aktivierung laut Übergabe.
+
+Dieser Empfang ändert weiterhin nur Dokumentation im erhaltenen älteren
+Mobile-Arbeitszweig. Keine vollständige Quellübernahme, keine erneute Installation
+und keine Veröffentlichung. Belege:
+`/srv/cinegenius/handoffs/20261119-app-native-toolbar-received/`.
+
+## Vorheriger Stand: erste App-Veröffentlichung
 
 Die Mac-Aufgabe **APP** (`01a1d38d-d672-7941-8033-30d87821d882`, Host `local`)
 hat nach Markus' ausdrücklichem „Ja, App-Servercode veröffentlichen“ den gezielt

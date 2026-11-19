@@ -1,8 +1,9 @@
 ## Aktuelle App-Veröffentlichung und Quellenbasis – 19. November 2026
 
-Der nach ausdrücklicher Freigabe in der Mac-Aufgabe veröffentlichte Hauptstand
-ist `6d503f66cfebc7aeda9236dc05e78b049db7a0c2` auf Basis `6f5ec38`.
-Die Veröffentlichung `dpl_HscsdkmUFyLKkpBg17GM7SwcjE74` wurde hier als Production
+Der aktuelle, von der Mac-Aufgabe veröffentlichte Hauptstand ist
+`9d86b9c4c794e6c8b74225b8c93ad9b70ddf3a01` (`b3c3dbe` plus CSS-Abschluss),
+aufbauend auf der zuvor freigegebenen App-Veröffentlichung `6d503f6`.
+Die Veröffentlichung `dpl_6qipazX8iJfHt8UdmXWVzfkW9cDZ` wurde hier als Production
 Ready und über `www.cinegenius.co` bestätigt. Weitere Web-/App-Abgleiche müssen
 diesen Hauptstand und seine App-Komponenten, Marker und Katalogeinträge erhalten.
 Dieser erhaltene Mobile-Arbeitszweig auf Basis `6478d77` ist kein Abbild des neuen
@@ -18,6 +19,17 @@ Fünferleiste nur für diese App-Darstellung. Smart bündelt Crew, Markt, Locati
 und Firmen mit Mehrfachauswahl und Kacheln/Liste/Karte mit Liste. Der Marker ist
 keine Berechtigung; Anmeldung, Privatsphäre und Smart-Adminprüfung bleiben
 serverseitig maßgeblich. Die gewöhnliche Website behält ihre Navigation.
+
+Smart, Projekte und News verwenden ausschließlich in der App die gemeinsame
+`NativeBrowseToolbar`: Zahl, tatsächliche Schnellfilter, More, Ansicht in fester
+Reihenfolge mit 44px-Zielen. Gemeinsame Suchblasen, Pure-Kontrast sowie
+WebKit-Fokusführung erhalten. News-Karten verwenden nur den bekannten öffentlichen
+Ort des freigegebenen Beitrags; Online-/unklare Orte bleiben ungepinnt und in der
+Liste. Die Projektkarte bleibt mit lokalisiertem Grund inaktiv, solange konkrete
+Projektorte fehlen. Siehe `docs/native-browse-toolbar.md` im aktuellen Hauptstand.
+Für dieses spätere UI-Update sind kein angemeldeter Livekonto-Test und kein
+physischer iPhone-Bedientest nachgewiesen; die frühere Installation ersetzt diese
+Prüfung nicht.
 
 Shots-Veröffentlichung und Push-Aktivierung bleiben aus; die neuen Migrationen
 sind laut Übergabe nicht angewendet. Die native iPhone-Installation und der
