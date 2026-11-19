@@ -1,8 +1,11 @@
 # Public content display translations
 
-Prepared 19 November 2026; not activated by adding these files. This is separate
-from the approved/live messages repair at `9715c7d`. No production schema,
-environment flag or provider setting has been changed for this draft.
+Prepared and approved for publication on 19 November 2026. This is separate
+from the live messages repair at `9715c7d` and preserves the newer app layout
+at `2537d92`. The additive translation schema has been applied and its actual
+service-only RPC lifecycle verified; original content is unchanged. Activation
+and deployment status are recorded in the release receipt, not inferred from
+the presence of these files.
 
 ## Shared behavior
 
@@ -138,11 +141,18 @@ editor. They cover all 17 menu languages, 320/393/820/1440px native-menu layouts
 language/account races and preserving text/file state. They are not real iPhone,
 full protected-editor/upload or linguistic quality tests.
 
-Before activation: reconcile the final patch with APP Entwicklung's newer native
-UI, complete the final build/checks, obtain the operator's separate publication
-request, apply/verify only the reviewed migration, verify the existing provider
-configuration and a bounded real public-text translation, and enable the flag
-through the guarded clean-main release process. Do not upload this worktree or
-enable the flag under the earlier messages release approval. A real device check
-and language quality review remain explicit follow-ups. To disable, remove/set
+The operator separately requested this publication with “dann mach” after the
+status of the unpublished country filters and language feature. The published
+app layout was merged while preserving native card styles, semantic hooks and
+the inbox fix. The migration was applied through the existing Management API
+in its own transaction; this project had no prior migration-history table. Its
+source hash, RLS/grant checks, real service RPC rollback test and denied guest
+REST access are journaled in
+`/srv/cinegenius/handoffs/20261119-translation-country-release`.
+
+Before promotion, complete the integrated country-filter checks and a staged
+translation using the existing protected provider configuration. Use only the
+guarded clean-main release process. The stage must never replace production
+because it disables unrelated workers for verification. Physical-device and
+all-language quality limits remain explicit. To disable translations, remove/set
 the flag false and redeploy; preserve original source and the reviewed migration.
