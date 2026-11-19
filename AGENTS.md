@@ -1,9 +1,9 @@
 ## Aktuelle App-Veröffentlichung und Quellenbasis – 19. November 2026
 
 Der aktuelle, von der Mac-Aufgabe veröffentlichte Hauptstand ist
-`9d86b9c4c794e6c8b74225b8c93ad9b70ddf3a01` (`b3c3dbe` plus CSS-Abschluss),
+`84a54a40aec915a38c5b02113c48082714aed011`, direkt auf `9d86b9c` und
 aufbauend auf der zuvor freigegebenen App-Veröffentlichung `6d503f6`.
-Die Veröffentlichung `dpl_6qipazX8iJfHt8UdmXWVzfkW9cDZ` wurde hier als Production
+Die Veröffentlichung `dpl_AKD2ibfVVxW3ZoPgi741Bk54KQ4N` wurde hier als Production
 Ready und über `www.cinegenius.co` bestätigt. Weitere Web-/App-Abgleiche müssen
 diesen Hauptstand und seine App-Komponenten, Marker und Katalogeinträge erhalten.
 Dieser erhaltene Mobile-Arbeitszweig auf Basis `6478d77` ist kein Abbild des neuen
@@ -27,14 +27,28 @@ WebKit-Fokusführung erhalten. News-Karten verwenden nur den bekannten öffentli
 Ort des freigegebenen Beitrags; Online-/unklare Orte bleiben ungepinnt und in der
 Liste. Die Projektkarte bleibt mit lokalisiertem Grund inaktiv, solange konkrete
 Projektorte fehlen. Siehe `docs/native-browse-toolbar.md` im aktuellen Hauptstand.
-Für dieses spätere UI-Update sind kein angemeldeter Livekonto-Test und kein
-physischer iPhone-Bedientest nachgewiesen; die frühere Installation ersetzt diese
-Prüfung nicht.
+Der neue private GET `/api/native/v1/workspace-account` liefert nur das verifizierte
+Konto und dessen eigene berechtigte Locations für den nativen Workspace. Die
+Kontoprüfung und getrennten lokalen Speicherbereiche bleiben erforderlich.
+Die Mac-Aufgabe meldet Installation und normalen Start der signierten Fassung
+aus `/Users/markusmueller/Library/Developer/CineGeniusMobile/Sources/cinegenius-room-scanner-1dc2486`.
+Für diesen DEBUG-Build ist `SWIFT_ACTIVE_COMPILATION_CONDITIONS='DEBUG CINEGENIUS_DEVICE_PREVIEW'`
+erforderlich, sonst startet die ältere Floorplan-Wurzel. Dies ist eine
+Build-Konfiguration, keine Erlaubnis für eine umgangene Anmeldung.
+Der native Einstieg zeigt wieder Community/Workspace; Markus hat laut Mac-Handoff
+die vier Workspace-Kacheln Heute/Meins/Teams/Tools am iPhone bestätigt. Ein eigener
+angemeldeter Livekonto- oder physischer iPhone-Test wurde hier nicht durchgeführt.
+Device-Hub-Fernansicht ist laut Mac-Handoff für die dortige Geräteversion nicht
+unterstützt. Keine Fernbedienungsprüfung daraus ableiten.
 
 Shots-Veröffentlichung und Push-Aktivierung bleiben aus; die neuen Migrationen
-sind laut Übergabe nicht angewendet. Die native iPhone-Installation und der
-Erhalt von 95 Dateien sind von der Mac-Aufgabe gemeldet, nicht hier erneut am
-Gerät geprüft. Der neue Hauptcommit enthält keinen aktuellen Swift-Rücklauf.
+sind laut Übergabe nicht angewendet. Der bytegleiche Erhalt von 95 Archiven bei
+120 vorhandenen Dateien ist von der Mac-Aufgabe gemeldet, nicht hier erneut am
+Gerät geprüft. Der neue Hauptcommit enthält keinen aktuellen Swift-Rücklauf;
+die tatsächlichen neueren Mac-Quellen nicht durch ältere Serverdateien ersetzen.
+Der geprüfte Nachrichten-Scrollfix `9715c7d` bleibt eine separate, noch nicht
+veröffentlichte Änderung. Die Kartenkorrekturen in `codex/app-readable-cards-20261119`
+sind laut Mac-Aufgabe noch in Arbeit. Kein paralleler Livegang.
 Die pausierte grundlegende Smart-/Spracharbeit wird durch diese abgeschlossene
 App-Oberflächen-Veröffentlichung nicht wieder aufgenommen. Die damalige
 Freigabe ist verbraucht und keine Freigabe für einen weiteren Livegang.

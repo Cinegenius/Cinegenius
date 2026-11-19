@@ -1,13 +1,69 @@
 # Veröffentlichte App-Oberfläche: Quellenabgleich am 19. November 2026
 
-## Aktueller Stand: gemeinsame App-Bedienleiste
+## Aktueller Stand: vollständiger Workspace-Einstieg und App-Oberfläche
+
+Die Mac-Aufgabe meldet `84a54a40aec915a38c5b02113c48082714aed011`, direkt nach
+`9d86b9c`, als veröffentlicht. Hier unabhängig bestätigt: derselbe Remote-Hauptstand,
+Vercel Production Ready für `dpl_AKD2ibfVVxW3ZoPgi741Bk54KQ4N`, Domain
+`https://www.cinegenius.co` sowie vier anonyme Seitenabrufe mit dieser Deployment-ID.
+Die Deployment-Adresse ist
+`https://cinegenius-d6e902cja-cinegenius-7216s-projects.vercel.app`.
+Dieser Stand ersetzt die nachfolgend historisch erhaltene Toolbar-Veröffentlichung
+als aktuelle Quellenbasis. Der erhaltene ältere Mobile-Arbeitszweig wird nicht
+pauschal übernommen oder veröffentlicht.
+
+Der Release ändert 73 Pfade. Dazu gehören App-Darstellung, bestehende Smart- und
+Kartenabläufe, native Inbox-Schnellzugriffe und der neue private, ausschließlich
+lesende `/api/native/v1/workspace-account`. Der Endpunkt leitet die Konto-ID aus
+der verifizierten Sitzung ab und liefert eigene Locations, bei Firmen zusätzlich
+mit aktueller Bearbeitungsberechtigung. Hier anonym geprüft: 401 und
+`private, no-store`. Die Antwort bleibt auf höchstens 200 Locations begrenzt und
+meldet weitere Kandidaten mit `limited`; dies ist keine Vollständigkeitszusage
+für größere Konten. Ein erfolgreicher angemeldeter Abruf wurde hier nicht geprüft.
+`mobile`, `supabase`, die Smart-Zugriffsprüfung, Profil-Datenschutzhelfer und das
+Veröffentlichungsscript sind gegenüber `9d86b9c` unverändert.
+
+Die Mac-Aufgabe meldet die neu signierte, installierte und normal gestartete
+iPhone-15-Pro-Fassung aus
+`/Users/markusmueller/Library/Developer/CineGeniusMobile/Sources/cinegenius-room-scanner-1dc2486`.
+Für den DEBUG-Build muss
+`SWIFT_ACTIVE_COMPILATION_CONDITIONS='DEBUG CINEGENIUS_DEVICE_PREVIEW'` gesetzt
+sein, sonst öffnet sich die ältere Floorplan-Wurzel. Dieser Schalter ersetzt keine
+Anmeldung: laut Übergabe bleiben unveränderlicher Kontokontext, Speicherfreigaben
+und tatsächliche Zugriffsprüfung wirksam, ohne Preview-Anmeldeumgehung. Der
+Kaltstart führt wieder zur Auswahl Community/Workspace. Markus hat laut Handoff
+die vier echten Workspace-Kacheln Heute/Meins/Teams/Tools auf dem Telefon bestätigt.
+
+Gemeldet, hier nicht erneut am Gerät geprüft: 95 Archive bytegleich, 120 Dateien
+vorhanden und zehn Browser-/Sitzungsunterschiede als erwartete Änderungen geprüft.
+Mac-Beleg: `work/workspace-full-entry-20261119/install.safe.json` in der dortigen
+Einrichtungsaufgabe. Device Hub unterstützt laut Mac-Handoff die physische Ansicht
+dieser Geräteversion nicht (iOS 26.7.1, dortige Hub-Anforderung 27). Keine
+Fernbedienungs-, Wisch- oder Tastaturprüfung aus der Installation ableiten.
+Der neue Hauptcommit enthält weiterhin keinen aktuellen Swift-Rücklauf. Native
+Quellen dürfen nicht durch die ältere Serverfassung ersetzt werden.
+
+Der Web-Nachrichtenfix `9715c7d` wurde hier separat mit 49 gezielten Tests und 14
+Browserfällen der App-Darstellung geprüft, ist aber nicht Bestandteil dieser
+Veröffentlichung. Belege unter
+`/srv/cinegenius/handoffs/20261119-app-messages-scroll-review/`.
+Der Mac-Zweig `codex/app-readable-cards-20261119` ist laut Übergabe noch in Arbeit.
+Kein weiterer oder paralleler Livegang mit dieser Empfangsdokumentation.
+Smart-Grundausbau und Inhaltsübersetzungsdienst bleiben separate Arbeiten.
+
+Eigene Empfangsbelege:
+`/srv/cinegenius/handoffs/20261119-app-full-workspace-received/`.
+Dieser Empfang ändert ausschließlich Dokumentation, ohne erneute Installation,
+Schemaänderung, Produktionsschreibzugriff oder Produktquellübernahme.
+
+## Vorheriger Stand: gemeinsame App-Bedienleiste
 
 Der neuere Mac-Handoff ist als `origin/main`
 `9d86b9c4c794e6c8b74225b8c93ad9b70ddf3a01` bestätigt, nach
 `b3c3dbe2b24c664a6b20c9bdc003b48c5e27044f` und aufbauend auf `6d503f6`.
 Vercel bestätigt Production Ready für `dpl_6qipazX8iJfHt8UdmXWVzfkW9cDZ`
 unter `https://cinegenius-oi9fariq6-cinegenius-7216s-projects.vercel.app` und
-`https://www.cinegenius.co`. Dies ist die aktuelle Basis für weitere Produktarbeit.
+`https://www.cinegenius.co`. Dies war die Basis vor `84a54a4`.
 Die nachfolgenden Angaben zu `6d503f6` bleiben als vorheriger Empfang erhalten.
 
 `NativeBrowseToolbar` vereinheitlicht Smart, Projekte und News ausschließlich in
