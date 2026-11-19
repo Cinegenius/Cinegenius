@@ -1,0 +1,14 @@
+/* Existing card gradients stay dark in both app themes; keep their ink local. */
+:global(html[data-cg-native-community-appearance="app"]) .nativePost {
+  --cg-app-ink:#f5f6f7;
+  --cg-app-muted:#c4ced9;
+  --cg-app-accent:#c2f135;
+  --color-text-primary:#f5f6f7;
+  --color-text-secondary:#d1d7df;
+  --color-text-muted:#c4ced9;
+  --color-bg-primary:#10131b;
+  --color-bg-secondary:#1b1d23;
+  --color-bg-elevated:#24262d;
+  --color-gold:#c2f135;
+  --color-gold-light:#d5fc60;
+}

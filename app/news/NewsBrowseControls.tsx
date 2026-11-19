@@ -12,6 +12,7 @@ import { rememberNewsTopic } from '@/lib/news-topic';
 import { ORGANIZATION_ENTRY_TYPES, ORGANIZATION_TOPICS } from "@/lib/organization-taxonomy";
 import { NativeBrowseQuickFilter } from "@/components/app/NativeBrowseToolbar";
 import { Globe, Tag } from "lucide-react";
+import { COUNTRY_CODES } from "@/lib/places/countries";
 
 type Filters = { q: string; type?: string; topic?: string; country: string };
 export type NewsBrowseControlsProps = { filters: Filters; facets: { type: string; topic: string; country: string }[]; count: number; region: NewsRegion; topicCookieName: string; nativeViewControls?: ReactNode };
@@ -40,7 +41,9 @@ export default function NewsBrowseControls({ filters, facets, count, region, top
   const reset = () => { const values = { ...draft, q: "", type: "", topic: "", country: "all" }; setDraft(values); setTopicChanged(true); apply(values, true); };
   const chips = (["type", "topic", "country"] as const).flatMap(key => draft[key] && (key !== 'country' || !['auto', 'all'].includes(draft.country)) ? [{ id: key, label: draft[key] === UNASSIGNED_COUNTRY ? ui("NewsRegion.unassignedCountry") : key === "country" ? (ui.has(`CountryNames.${draft[key]}`) ? ui(`CountryNames.${draft[key]}`) : draft[key]!) : t(`${key === "type" ? "entryType" : "topic"}.${draft[key]}`), onRemove: () => { const next = { ...draft, [key]: key === 'country' ? 'all' : '' }; setDraft(next); if (key === 'topic') setTopicChanged(true); apply(next, key === 'topic' || topicChanged); } }] : []);
   const preference = <BrowsePreferenceControl active={draft.country === 'auto'} label={ui(draft.country === 'auto' ? 'Places.allCountries' : 'NewsRegion.automatic')} onClick={() => { const next = {...draft, country: draft.country === 'auto' ? 'all' : 'auto'}; setDraft(next); apply(next); }} />;
-  const codes = [...new Set(facets.map(row => row.country || UNASSIGNED_COUNTRY))];
+  // Native News also contains the organization rail. Its countries must remain
+  // selectable even when that country currently has no eligible news entries.
+  const codes = nativeViewControls ? [UNASSIGNED_COUNTRY, ...COUNTRY_CODES] : [...new Set(facets.map(row => row.country || UNASSIGNED_COUNTRY))];
   const countryLabel = (code: string) => code === UNASSIGNED_COUNTRY ? ui("NewsRegion.unassignedCountry") : countryName(code, locale);
   const availableCountries = codes.filter(code => code !== UNASSIGNED_COUNTRY).sort((a, b) => countryLabel(a).localeCompare(countryLabel(b), locale));
   const countryOptions = [
@@ -62,7 +65,7 @@ export default function NewsBrowseControls({ filters, facets, count, region, top
     nativeQuickFilters={quickFilters} nativeViewControls={nativeViewControls}
     resultCount={pending ? null : count} resultSummary={pending ? ui("MarketplaceNavigation.loading") : ui("BrowseFilters.results", { count })}
     filterCount={chips.length} chips={chips} onReset={reset} resetLabel={ui("projects.resetFilters")} showResultsLabel={t("search")} onSearch={() => apply()} preference={preference}>
-    <NewsCountrySelect value={draft.country} country={region.selection === 'auto' ? region.country : ''} onChange={country => change({ country })} codes={facets.map(row => row.country || UNASSIGNED_COUNTRY)} disabled={pending}/>
+    <NewsCountrySelect value={draft.country} country={region.selection === 'auto' ? region.country : ''} onChange={country => change({ country })} codes={codes} disabled={pending}/>
     <MobileFilterField label={t("topicLabel")}><MobileFilterSelect value={draft.topic ?? ""} onChange={topic => change({ topic })} placeholder={t("all")} options={ORGANIZATION_TOPICS.filter(topic => topic === draft.topic || facets.some(row => row.topic === topic)).map(topic => ({ value: topic, label: t(`topic.${topic}`), disabled: !facets.some(row => row.topic === topic) }))} /></MobileFilterField>
   </MobileBrowseControls>{saveError && <p role="alert" className="site-container py-2 text-sm text-text-secondary">{ui('NewsRegion.saveError')}</p>}</div>;
 }
