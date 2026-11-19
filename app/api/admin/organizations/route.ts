@@ -80,6 +80,10 @@ export async function PATCH(request: NextRequest) {
   const { data: current, error: currentError } = await db.from(table).select("*").eq("id", id).maybeSingle();
   if (currentError) return NextResponse.json({ error: "load" }, { status: 500 });
   if (!current) return NextResponse.json({ error: "not_found" }, { status: 404 });
+  // Trash must first be explicitly restored by an organization manager.
+  if (kind === "entry" && current.moderation_status === "deleted") {
+    return NextResponse.json({ error: "conflict" }, { status: 409 });
+  }
 
   if (typeof body?.expectedUpdatedAt !== "string" || body.expectedUpdatedAt !== current.updated_at) {
     return NextResponse.json({ error: "conflict" }, { status: 409 });
@@ -113,6 +117,7 @@ export async function PATCH(request: NextRequest) {
     updated_at: now,
   };
   if (status === "approved") update.published_at = now;
+  if (kind === "entry") update.owner_withdrawn_from = null;
   const { data: updated, error: updateError } = await db.from(table).update(update).eq("id", id).eq("updated_at", current.updated_at).select("id,moderation_status,updated_at").maybeSingle();
   if (updateError || !updated) {
     await finishAdminAudit(audit, "failed");

@@ -11,7 +11,9 @@
     "genieVoiceTitle": "Genie-Sprachbedienung — deutscher Originaltext, Stand: 14. November 2026",
     "genieVoiceDisclosure": "Die freiwillige Sprachbedienung startet erst durch deine Mikrofonaktion und eine erforderliche Gerätefreigabe. Im Browser wird die beendete Aufnahme (höchstens 30 Sekunden und 1 MiB) über den CineGenius-Server an OpenAI zur Texterkennung übermittelt. In unterstützten nativen Apps übernimmt der Sprachdienst des Geräts die Erkennung; dabei kann eine Verarbeitung durch dessen Anbieter erforderlich sein. Bei leerem Eingabefeld wird der erkannte Text anschließend an Genie gesendet, andernfalls nur deinem ungesendeten Text hinzugefügt. Der KI-Dienst erhält die gesendeten Nachrichten, die letzten Gesprächsrunden, die Sprache und den groben Seitenbereich. Antworten können über die künstliche Stimme des Browsers oder Geräts vorgelesen werden; je nach gewählter Systemstimme verarbeitet deren Anbieter den Antworttext. CineGenius speichert keine Audiodateien. Abgeschlossene Textgespräche bleiben kurzzeitig kontogebunden im aktuellen Browser-Tab. Nach 10 Minuten ohne Bedienung von Genie wird dieser lokale Verlauf automatisch gelöscht; bei einer vom Gerät pausierten Seite geschieht dies beim Fortsetzen, vor der nächsten Anfrage. Ungesendete Eingaben und aktuelle Suchfilter werden dabei nicht gelöscht. Über den Papierkorb kannst du den Verlauf auch sofort löschen. CineGenius führt keine dauerhaft gespeicherte Suchhistorie; eine früher lokal gespeicherte Liste letzter Suchen wird beim Laden der aktuellen Website entfernt. Suchbegriffe in der aktuellen Seitenadresse und der vom Browser verwaltete Navigationsverlauf bleiben davon unberührt. Für die Missbrauchsbegrenzung werden Nutzungszähler geführt. Das Löschen des lokalen Verlaufs löscht keine bereits übermittelten Daten beim jeweiligen Dienst. Die Aufbewahrung bei OpenAI richtet sich nach dem verwendeten Dienst und seiner Konfiguration; deaktivierte Gesprächsspeicherung ist keine Zusage, dass keinerlei Sicherheitsprotokolle entstehen. Schließen, Abbrechen, Kontowechsel und der Wechsel in den Hintergrund beenden die aktuelle Aufnahme. Die Suche verwendet nur den von dir genannten Ort und ungefähre öffentliche Ortskoordinaten, keinen GPS-Standort. Sie kann passende Filter öffnen, veröffentlicht aber keine Inhalte und ändert keine gemeinsamen Arbeitspläne. Bitte sprich keine Passwörter oder unnötigen vertraulichen Angaben ein.",
     "futureFunctions": "Zusätzliche Funktionen können künftig kostenpflichtig angeboten werden. Eine Zahlungspflicht entsteht nur durch eine gesonderte ausdrückliche kostenpflichtige Buchung nach vorheriger Information über Leistungsumfang, Preis und Bedingungen. Weder Schweigen noch die bloße Weiternutzung begründen eine Zahlungspflicht. Profile bleiben dauerhaft kostenlos.",
-    "pronounsDisclosure": "Pronomen sind freiwillig und dienen ausschließlich deiner selbst gewählten Anrede. Wir speichern sie nur, wenn du sie in deinem Profil angibst. Sie erscheinen erst mit deiner ausdrücklichen Freigabe und innerhalb deiner bestehenden Profilsichtbarkeit neben deinem Namen. Du kannst die Anzeige jederzeit ausschalten oder die Angabe löschen. Wir leiten daraus kein Geschlecht ab und verwenden Pronomen nicht als Suchfilter oder für die Rangfolge von Profilen. Bereits von anderen gespeicherte Kopien können wir nicht zurückholen."
+    "pronounsDisclosure": "Pronomen sind freiwillig und dienen ausschließlich deiner selbst gewählten Anrede. Wir speichern sie nur, wenn du sie in deinem Profil angibst. Sie erscheinen erst mit deiner ausdrücklichen Freigabe und innerhalb deiner bestehenden Profilsichtbarkeit neben deinem Namen. Du kannst die Anzeige jederzeit ausschalten oder die Angabe löschen. Wir leiten daraus kein Geschlecht ab und verwenden Pronomen nicht als Suchfilter oder für die Rangfolge von Profilen. Bereits von anderen gespeicherte Kopien können wir nicht zurückholen.",
+    "organizationLifecycleTitle": "Organisationsbeiträge: Ausblenden und Papierkorb — deutscher Originaltext, Stand: 17. November 2026",
+    "organizationLifecycleDisclosure": "Berechtigte Verwaltungsmitglieder einer Organisation können deren Beiträge ausblenden oder über „Löschen“ in einen wiederherstellbaren Papierkorb verschieben. Beides entfernt die Beiträge aus der öffentlichen Ansicht. Inhalte, zugeordnete Bilder und Änderungsnachweise mit Konto-Kennung, Zeitpunkt, Status und eingegebenem Grund bleiben dafür gespeichert und im berechtigten Verwaltungsbereich zugänglich. Die Gründe dienen der Nachvollziehbarkeit und sollen keine unnötigen personenbezogenen Angaben enthalten. Eine Wiederherstellung veröffentlicht nichts automatisch; bestehende administrative Einschränkungen bleiben wirksam. Diese Funktionen sind keine endgültige Datenlöschung und ersetzen keine Löschanfrage an den Support. Bereits heruntergeladene oder anderweitig veröffentlichte Kopien werden dadurch nicht zurückgerufen. Eine feste automatische Papierkorb-Leerung wird nicht zugesichert. Die Erforderlichkeit weiterer Aufbewahrung und gesetzliche Löschansprüche sind gesondert zu prüfen."
   },
   "SiteContacts": {
     "markusName": "마르쿠스 뮐러",
@@ -2415,7 +2417,8 @@
       "changes_requested": "수정 요청됨",
       "rejected": "거부됨",
       "hidden": "숨김",
-      "ended": "종료됨"
+      "ended": "종료됨",
+      "deleted": "휴지통에 있음"
     },
     "conflict": "이 항목이 변경되었습니다. 다시 불러와 현재 버전을 확인하세요.",
     "searchLabel": "제목으로 항목 검색",
@@ -2423,7 +2426,27 @@
     "previous": "이전",
     "next": "다음",
     "manageOrganization": "조직 관리",
-    "timeZoneNotice": "날짜는 Europe/Berlin 시간대를 사용합니다."
+    "timeZoneNotice": "날짜는 Europe/Berlin 시간대를 사용합니다.",
+    "lifecycle": {
+      "manage": "게시물 관리",
+      "notice": "숨기기와 휴지통 이동은 취소할 수 있습니다. 내용, 이미지, 변경 기록은 보관됩니다.",
+      "confirm": "“{title}” 게시물을 {action}하시겠습니까?",
+      "reason": "사유 (5~1000자)",
+      "hide": "숨기기",
+      "delete": "삭제",
+      "restore": "복원",
+      "hideHelp": "저장된 게시물이 공개 화면에서 사라집니다. 저장하지 않은 변경 사항은 비공개로 유지됩니다.",
+      "deleteHelp": "저장된 게시물을 공개 화면에서 제거하고 휴지통으로 이동합니다. 나중에 복원할 수 있습니다.",
+      "restoreHelp": "복원된 게시물은 비공개로 유지되며 공개 전에 관리자 검토를 다시 받아야 합니다. 기존 제한은 계속 적용됩니다.",
+      "working": "저장 중…",
+      "cancel": "취소",
+      "trash": "휴지통",
+      "entries": "게시물",
+      "hideSuccess": "게시물을 숨겼습니다.",
+      "deleteSuccess": "게시물을 휴지통으로 이동했습니다.",
+      "restoreSuccess": "게시물을 복원했습니다. 비공개로 유지됩니다.",
+      "error": "작업이 확인되지 않았습니다. 새로고침하여 현재 상태를 확인하세요. 비공개 입력은 유지됩니다."
+    }
   },
   "AdminOrganizations": {
     "title": "조직 및 게시물",

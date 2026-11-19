@@ -7,7 +7,7 @@ import { Building2, CalendarDays, ExternalLink, RefreshCw, Search } from "lucide
 import MediaImage from "@/components/MediaImage";
 import { confirmDialog, promptDialog, dismissNativeDialog } from "@/lib/native-dialog";
 
-type ModerationStatus = "draft" | "submitted" | "approved" | "changes_requested" | "rejected" | "hidden" | "ended";
+type ModerationStatus = "draft" | "submitted" | "approved" | "changes_requested" | "rejected" | "hidden" | "ended" | "deleted";
 
 type OrganizationItem = {
   id: string;
@@ -147,6 +147,7 @@ export function AdminOrganizations() {
   }
 
   const actionButtons = (kind: ItemKind, id: string, status: ModerationStatus) => {
+    if (status === "deleted") return null;
     const disabled = acting === `${kind}:${id}`;
     return (
       <div className="flex flex-wrap gap-2">

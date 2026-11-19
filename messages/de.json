@@ -2189,7 +2189,9 @@
     "genieVoiceTitle": "Genie-Sprachbedienung — deutscher Originaltext, Stand: 14. November 2026",
     "genieVoiceDisclosure": "Die freiwillige Sprachbedienung startet erst durch deine Mikrofonaktion und eine erforderliche Gerätefreigabe. Im Browser wird die beendete Aufnahme (höchstens 30 Sekunden und 1 MiB) über den CineGenius-Server an OpenAI zur Texterkennung übermittelt. In unterstützten nativen Apps übernimmt der Sprachdienst des Geräts die Erkennung; dabei kann eine Verarbeitung durch dessen Anbieter erforderlich sein. Bei leerem Eingabefeld wird der erkannte Text anschließend an Genie gesendet, andernfalls nur deinem ungesendeten Text hinzugefügt. Der KI-Dienst erhält die gesendeten Nachrichten, die letzten Gesprächsrunden, die Sprache und den groben Seitenbereich. Antworten können über die künstliche Stimme des Browsers oder Geräts vorgelesen werden; je nach gewählter Systemstimme verarbeitet deren Anbieter den Antworttext. CineGenius speichert keine Audiodateien. Abgeschlossene Textgespräche bleiben kurzzeitig kontogebunden im aktuellen Browser-Tab. Nach 10 Minuten ohne Bedienung von Genie wird dieser lokale Verlauf automatisch gelöscht; bei einer vom Gerät pausierten Seite geschieht dies beim Fortsetzen, vor der nächsten Anfrage. Ungesendete Eingaben und aktuelle Suchfilter werden dabei nicht gelöscht. Über den Papierkorb kannst du den Verlauf auch sofort löschen. CineGenius führt keine dauerhaft gespeicherte Suchhistorie; eine früher lokal gespeicherte Liste letzter Suchen wird beim Laden der aktuellen Website entfernt. Suchbegriffe in der aktuellen Seitenadresse und der vom Browser verwaltete Navigationsverlauf bleiben davon unberührt. Für die Missbrauchsbegrenzung werden Nutzungszähler geführt. Das Löschen des lokalen Verlaufs löscht keine bereits übermittelten Daten beim jeweiligen Dienst. Die Aufbewahrung bei OpenAI richtet sich nach dem verwendeten Dienst und seiner Konfiguration; deaktivierte Gesprächsspeicherung ist keine Zusage, dass keinerlei Sicherheitsprotokolle entstehen. Schließen, Abbrechen, Kontowechsel und der Wechsel in den Hintergrund beenden die aktuelle Aufnahme. Die Suche verwendet nur den von dir genannten Ort und ungefähre öffentliche Ortskoordinaten, keinen GPS-Standort. Sie kann passende Filter öffnen, veröffentlicht aber keine Inhalte und ändert keine gemeinsamen Arbeitspläne. Bitte sprich keine Passwörter oder unnötigen vertraulichen Angaben ein.",
     "futureFunctions": "Zusätzliche Funktionen können künftig kostenpflichtig angeboten werden. Eine Zahlungspflicht entsteht nur durch eine gesonderte ausdrückliche kostenpflichtige Buchung nach vorheriger Information über Leistungsumfang, Preis und Bedingungen. Weder Schweigen noch die bloße Weiternutzung begründen eine Zahlungspflicht. Profile bleiben dauerhaft kostenlos.",
-    "pronounsDisclosure": "Pronomen sind freiwillig und dienen ausschließlich deiner selbst gewählten Anrede. Wir speichern sie nur, wenn du sie in deinem Profil angibst. Sie erscheinen erst mit deiner ausdrücklichen Freigabe und innerhalb deiner bestehenden Profilsichtbarkeit neben deinem Namen. Du kannst die Anzeige jederzeit ausschalten oder die Angabe löschen. Wir leiten daraus kein Geschlecht ab und verwenden Pronomen nicht als Suchfilter oder für die Rangfolge von Profilen. Bereits von anderen gespeicherte Kopien können wir nicht zurückholen."
+    "pronounsDisclosure": "Pronomen sind freiwillig und dienen ausschließlich deiner selbst gewählten Anrede. Wir speichern sie nur, wenn du sie in deinem Profil angibst. Sie erscheinen erst mit deiner ausdrücklichen Freigabe und innerhalb deiner bestehenden Profilsichtbarkeit neben deinem Namen. Du kannst die Anzeige jederzeit ausschalten oder die Angabe löschen. Wir leiten daraus kein Geschlecht ab und verwenden Pronomen nicht als Suchfilter oder für die Rangfolge von Profilen. Bereits von anderen gespeicherte Kopien können wir nicht zurückholen.",
+    "organizationLifecycleTitle": "Organisationsbeiträge: Ausblenden und Papierkorb — deutscher Originaltext, Stand: 17. November 2026",
+    "organizationLifecycleDisclosure": "Berechtigte Verwaltungsmitglieder einer Organisation können deren Beiträge ausblenden oder über „Löschen“ in einen wiederherstellbaren Papierkorb verschieben. Beides entfernt die Beiträge aus der öffentlichen Ansicht. Inhalte, zugeordnete Bilder und Änderungsnachweise mit Konto-Kennung, Zeitpunkt, Status und eingegebenem Grund bleiben dafür gespeichert und im berechtigten Verwaltungsbereich zugänglich. Die Gründe dienen der Nachvollziehbarkeit und sollen keine unnötigen personenbezogenen Angaben enthalten. Eine Wiederherstellung veröffentlicht nichts automatisch; bestehende administrative Einschränkungen bleiben wirksam. Diese Funktionen sind keine endgültige Datenlöschung und ersetzen keine Löschanfrage an den Support. Bereits heruntergeladene oder anderweitig veröffentlichte Kopien werden dadurch nicht zurückgerufen. Eine feste automatische Papierkorb-Leerung wird nicht zugesichert. Die Erforderlichkeit weiterer Aufbewahrung und gesetzliche Löschansprüche sind gesondert zu prüfen."
   },
   "SetupOffers": {
     "accountReady": "Dein Anbieterkonto ist eingerichtet.",
@@ -2415,7 +2417,8 @@
       "changes_requested": "Nachbesserung erforderlich",
       "rejected": "Abgelehnt",
       "hidden": "Ausgeblendet",
-      "ended": "Beendet"
+      "ended": "Beendet",
+      "deleted": "Im Papierkorb"
     },
     "conflict": "Dieser Eintrag wurde inzwischen geändert. Lade ihn neu und prüfe den aktuellen Stand.",
     "searchLabel": "Beiträge nach Titel suchen",
@@ -2423,7 +2426,27 @@
     "previous": "Zurück",
     "next": "Weiter",
     "manageOrganization": "Organisation verwalten",
-    "timeZoneNotice": "Termine in der Zeitzone Europa/Berlin."
+    "timeZoneNotice": "Termine in der Zeitzone Europa/Berlin.",
+    "lifecycle": {
+      "manage": "Beitrag verwalten",
+      "notice": "Ausblenden und Papierkorb sind rückgängig machbar. Inhalte, Bilder und Änderungsverlauf bleiben gespeichert.",
+      "confirm": "{action}: „{title}“?",
+      "reason": "Grund (5–1000 Zeichen)",
+      "hide": "Ausblenden",
+      "delete": "Löschen",
+      "restore": "Wiederherstellen",
+      "hideHelp": "Der gespeicherte Beitrag verschwindet aus der öffentlichen Ansicht. Ungespeicherte Änderungen bleiben privat.",
+      "deleteHelp": "Der gespeicherte Beitrag wird aus der öffentlichen Ansicht entfernt und in den Papierkorb verschoben. Er kann wiederhergestellt werden.",
+      "restoreHelp": "Der Beitrag bleibt nach der Wiederherstellung privat und benötigt vor einer Veröffentlichung erneut eine Adminprüfung. Bestehende Einschränkungen bleiben bestehen.",
+      "working": "Wird gespeichert …",
+      "cancel": "Abbrechen",
+      "trash": "Papierkorb",
+      "entries": "Beiträge",
+      "hideSuccess": "Beitrag ausgeblendet.",
+      "deleteSuccess": "Beitrag in den Papierkorb verschoben.",
+      "restoreSuccess": "Beitrag wiederhergestellt. Er bleibt privat.",
+      "error": "Aktion nicht bestätigt. Prüfe den aktuellen Stand durch Neuladen; private Eingaben bleiben erhalten."
+    }
   },
   "AdminOrganizations": {
     "title": "Organisationen & Beiträge",
