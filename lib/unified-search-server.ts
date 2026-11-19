@@ -1,3 +1,6 @@
+import { createHash } from "node:crypto";
+import { isDiscoverySeed, validDiscoveryCursor, type DiscoveryCursor } from "./discovery-seed";
+import { nativeDiscoveryPlan } from "./native-smart-discovery";
 import { occupationFormFromCrew } from "@/lib/occupation-form";
 import "server-only";
 import { profileOccupationPreview, selectedCrewOccupations, type OccupationProfile } from "@/lib/crew-occupations";
@@ -93,7 +96,7 @@ function geographyRow(row: Row, area: SearchArea): Row {
 type ResultPage = SearchGroup & { listPage?: SearchGroup };
 type ProfilePage = { data: Row[]; error: null; privacy: Awaited<ReturnType<typeof profileAccessFor>> };
 type ReadProfilePage = (offset: number) => Promise<ProfilePage>;
-async function readGroup(plan: SearchPlan, wishIndex: number, area: SearchArea, offset: number, locale: string, viewerId: string | null, signal: AbortSignal, view: "list" | "map" | "combined", nearbyAfter?: NearbyCursor, segment?: string, rankAfter?: SearchRankCursor, readProfilePage?: ReadProfilePage): Promise<ResultPage> {
+async function readGroup(plan: SearchPlan, wishIndex: number, area: SearchArea, offset: number, locale: string, viewerId: string | null, signal: AbortSignal, view: "list" | "map" | "combined", nearbyAfter?: NearbyCursor, segment?: string, rankAfter?: SearchRankCursor, readProfilePage?: ReadProfilePage, discoverySeed?: string, discoveryAfter?: DiscoveryCursor): Promise<ResultPage> {
   const wish = plan.searches[wishIndex];
   const taxonomy = await getTranslations({ locale, namespace: "Taxonomy" });
   const productionCrew = area === "crew" && !wish.department && isProductionCrewQuery(wish.query);
@@ -113,15 +116,19 @@ async function readGroup(plan: SearchPlan, wishIndex: number, area: SearchArea, 
   const catering = area === "companies" && !wish.department ? cateringSearch(wish.query) : null;
   const limit = view !== "list" ? PAGE * 3 : VISIBLE;
   const origins = nearbyOrigins(wish);
-  const ranked = plan.version === 2;
+  const shuffled = Boolean(discoverySeed && area === "crew");
+  const ranked = plan.version === 2 || shuffled;
   const allowNearby = origins.length > 0 && !wish.places.some(place => place.radiusKm > 0) && (offset === 0 || !!nearbyAfter || ranked);
   const requestedOffset = offset;
   if (nearbyAfter || ranked) offset = 0;
   type Candidate = NearbyCursor & { row: Row; origin: string };
   const nearest: Candidate[] = [];
-  const local: (Candidate & SearchRankCursor)[] = [];
+  const local: (Candidate & SearchRankCursor & { discoveryKey?: string })[] = [];
   let localExists = false;
-  const compareRank = (a: SearchRankCursor, b: SearchRankCursor) => b.score - a.score || compareNearby(a, b);
+  const compareRank = (a: SearchRankCursor & { discoveryKey?: string }, b: SearchRankCursor & { discoveryKey?: string }) => shuffled
+    ? (a.discoveryKey! < b.discoveryKey! ? -1 : a.discoveryKey! > b.discoveryKey! ? 1 : a.id.localeCompare(b.id))
+    : b.score - a.score || compareNearby(a, b);
+  const afterRank = shuffled ? discoveryAfter ? { score: 0, distanceKm: 20050, id: discoveryAfter.id, discoveryKey: discoveryAfter.key } : undefined : rankAfter;
   const toResult = (input: Row): SearchResult => {
     let row = input;
     if (area === "projects") row = publicProjectMedia(row);
@@ -200,8 +207,9 @@ async function readGroup(plan: SearchPlan, wishIndex: number, area: SearchArea, 
         if (ranked) {
           const distance = nearbyDistance(row, origins);
           const candidate = { row, score: searchMatchScore(row, terms), distanceKm: distance?.distanceKm ?? 20050, origin: distance?.origin ?? "", id: String(area === "crew" ? row.user_id : row.id) };
-          if (!rankAfter || compareRank(candidate, rankAfter) > 0) {
-            local.push(candidate); local.sort(compareRank);
+          const rankedCandidate = { ...candidate, ...(shuffled ? { discoveryKey: createHash("sha256").update(discoverySeed!).update("\0").update(candidate.id).digest("hex") } : {}) };
+          if (!afterRank || compareRank(rankedCandidate, afterRank) > 0) {
+            local.push(rankedCandidate); local.sort(compareRank);
             if (local.length > limit + 1) local.pop();
           }
           continue;
@@ -227,7 +235,8 @@ async function readGroup(plan: SearchPlan, wishIndex: number, area: SearchArea, 
     group.results = local.slice(0, limit).map(candidate => toResult(candidate.row));
     if (local.length > limit) {
       const { score, distanceKm, id } = local[limit - 1];
-      group.rankCursor = { score, distanceKm, id };
+      if (shuffled) group.discoveryCursor = { key: local[limit - 1].discoveryKey!, id };
+      else group.rankCursor = { score, distanceKm, id };
       group.nextOffset = requestedOffset + limit;
     }
     if (view === "combined") {
@@ -256,9 +265,12 @@ async function readGroup(plan: SearchPlan, wishIndex: number, area: SearchArea, 
   return group;
 }
 
-export type SearchCursor = { wishIndex: number; area: SearchArea; offset: number; segment?: string; rank?: SearchRankCursor; nearby?: NearbyCursor };
-export function validSearchCursor(plan: SearchPlan, cursor: SearchCursor) {
+export type SearchCursor = { wishIndex: number; area: SearchArea; offset: number; segment?: string; rank?: SearchRankCursor; nearby?: NearbyCursor; discovery?: DiscoveryCursor };
+export function validSearchCursor(plan: SearchPlan, cursor: SearchCursor, discoverySeed?: string) {
   const wish = plan.searches[cursor.wishIndex];
+  const shuffled = Boolean(discoverySeed && cursor.area === "crew");
+  if (cursor.discovery !== undefined && (!shuffled || cursor.rank || cursor.nearby || !validDiscoveryCursor(cursor.discovery))) return false;
+  if (shuffled && cursor.offset > 0 && !cursor.discovery) return false;
   const segments = crewSearchSegments(wish);
   if (cursor.segment !== undefined && (plan.version !== 2 || cursor.area !== "crew" || !segments.includes(cursor.segment))) return false;
   if (plan.version === 2 && cursor.area === "crew" && segments.length && !cursor.segment) return false;
@@ -269,7 +281,8 @@ export function validSearchCursor(plan: SearchPlan, cursor: SearchCursor) {
   }
   return plan.version !== 2 || cursor.offset === 0 || !!cursor.nearby || !!cursor.rank;
 }
-export async function executeUnifiedSearch(plan: SearchPlan, locale: string, viewerId: string | null, signal: AbortSignal, cursor?: SearchCursor, view: "list" | "map" | "combined" = "list") {
+export async function executeUnifiedSearch(plan: SearchPlan, locale: string, viewerId: string | null, signal: AbortSignal, cursor?: SearchCursor, view: "list" | "map" | "combined" = "list", discoverySeed?: string) {
+  if (discoverySeed !== undefined && (!isDiscoverySeed(discoverySeed) || JSON.stringify(plan) !== JSON.stringify(nativeDiscoveryPlan()))) throw new Error("invalid_request");
   const tasks: SearchCursor[] = cursor ? [cursor] : plan.searches.flatMap((wish, wishIndex) =>
     (wish.area === "all" ? SEARCH_AREAS : [wish.area]).flatMap(area => plan.version === 2 && area === "crew" && crewSearchSegments(wish).length
       ? crewSearchSegments(wish).map(segment => ({ wishIndex, area, offset: 0, segment })) : [{ wishIndex, area, offset: 0 }]));
@@ -298,7 +311,7 @@ export async function executeUnifiedSearch(plan: SearchPlan, locale: string, vie
   await Promise.all(Array.from({ length: Math.min(tasks.length, 4) }, async () => {
     while (next < tasks.length) {
       const index = next++, task = tasks[index];
-      pages[index] = await readGroup(plan, task.wishIndex, task.area, task.offset, locale, viewerId, signal, view, task.nearby, task.segment, task.rank, readProfilePage);
+      pages[index] = await readGroup(plan, task.wishIndex, task.area, task.offset, locale, viewerId, signal, view, task.nearby, task.segment, task.rank, readProfilePage, discoverySeed, task.discovery);
     }
   }));
   const groups = pages.map(({ listPage, ...group }) => view === "combined" && listPage ? listPage : group);

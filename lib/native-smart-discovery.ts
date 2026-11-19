@@ -1,5 +1,6 @@
 import { readSearchPlan, type SearchGroup, type SearchPlan } from "./unified-search";
 import { locationDistanceKm } from "./location-map";
+import { isDiscoverySeed, validDiscoveryCursor } from "./discovery-seed";
 
 export const NATIVE_DISCOVERY_CONTRACT = "cinegenius.native-discovery.v1" as const;
 export const NATIVE_DISCOVERY_DIRECTORIES = [
@@ -13,6 +14,7 @@ export type NativeDiscoveryFocus = { mode: NativeDiscoveryMode; departments: str
 export type NativeDiscoveryResponse = {
   contract: typeof NATIVE_DISCOVERY_CONTRACT; accountId: string; serverNow: string;
   focus: NativeDiscoveryFocus; plan: SearchPlan; groups: SearchGroup[];
+  seed?: string;
 };
 
 /** Six wishes are the existing plan-v1 ceiling. No invented tenth result domain. */
@@ -36,9 +38,11 @@ export function rankNativeDiscoveryGroups(groups: SearchGroup[], focus: NativeDi
 }
 
 /** Validate the account/plan envelope; public rows keep the shared SearchGroup contract. */
-export function readNativeDiscovery(value: unknown, accountId: string): NativeDiscoveryResponse | null {
+export function readNativeDiscovery(value: unknown, accountId: string, expectedSeed?: string): NativeDiscoveryResponse | null {
   if (!value || typeof value !== "object" || Array.isArray(value)) return null;
   const data = value as Record<string, unknown>;
+  if (data.seed !== undefined && !isDiscoverySeed(data.seed)) return null;
+  if (expectedSeed !== undefined && (!isDiscoverySeed(expectedSeed) || data.seed !== expectedSeed)) return null;
   if (data.contract !== NATIVE_DISCOVERY_CONTRACT || data.accountId !== accountId || typeof data.serverNow !== "string" || !Number.isFinite(Date.parse(data.serverNow))) return null;
   const plan = readSearchPlan(data.plan);
   if (!plan || JSON.stringify(plan) !== JSON.stringify(nativeDiscoveryPlan()) || !Array.isArray(data.groups) || data.groups.length !== plan.searches.length) return null;
@@ -46,6 +50,8 @@ export function readNativeDiscovery(value: unknown, accountId: string): NativeDi
   if (!focus || !["profile", "neutral"].includes(focus.mode) || !Array.isArray(focus.departments) || focus.departments.length > 100
     || focus.departments.some(id => typeof id !== "string" || id.length > 60) || (focus.city !== null && (typeof focus.city !== "string" || focus.city.length > 200))) return null;
   if (data.groups.some((group, index) => !group || typeof group !== "object" || group.area !== plan.searches[index].area || group.wishIndex !== index
-    || !Array.isArray(group.results) || group.results.length > 180 || (group.nextOffset !== null && (!Number.isInteger(group.nextOffset) || group.nextOffset < 0)))) return null;
+    || !Array.isArray(group.results) || group.results.length > 180 || (group.nextOffset !== null && (!Number.isInteger(group.nextOffset) || group.nextOffset < 0))
+    || (group.discoveryCursor !== undefined && (!data.seed || group.area !== "crew" || !validDiscoveryCursor(group.discoveryCursor)))
+    || (data.seed && group.area === "crew" && group.nextOffset !== null && !validDiscoveryCursor(group.discoveryCursor)))) return null;
   return data as unknown as NativeDiscoveryResponse;
 }

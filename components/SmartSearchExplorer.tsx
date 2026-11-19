@@ -60,8 +60,9 @@ function ResultArea({ area, groups, pending, errors, more, grid = false, limit: 
 
 /** Account/plan-scoped by the parent key; ephemeral filters never enter history
  * or storage. Combined responses serve both surfaces without duplicate reads. */
-export default function SmartSearchExplorer({ plan, initialGroups, initialMapGroups, onUnavailable, stored, setStored }: {
+export default function SmartSearchExplorer({ plan, initialGroups, initialMapGroups, onUnavailable, stored, setStored, discoverySeed }: {
   plan: SearchPlan; initialGroups: SearchGroup[]; initialMapGroups?: SearchGroup[]; onUnavailable: () => void;
+  discoverySeed?: string;
   stored?: SmartSearchControls; setStored?: Dispatch<SetStateAction<SmartSearchControls>>;
 }) {
   const t = useTranslations("UnifiedSearch"), taxonomy = useTranslations("Taxonomy"), marketplace = useTranslations("MarketplaceCatalog");
@@ -142,8 +143,8 @@ export default function SmartSearchExplorer({ plan, initialGroups, initialMapGro
     try {
       const response = await fetch("/api/search/unified", { method: "POST", headers: { "Content-Type": "application/json" }, credentials: "same-origin",
         cache: "no-store", referrerPolicy: "no-referrer", signal: AbortSignal.any([controller.signal, AbortSignal.timeout(35_000)]),
-        body: JSON.stringify({ plan, view: requestView, ...(group ? { cursor: { area: group.area, wishIndex: group.wishIndex, offset: group.nextOffset,
-          ...(group.segment ? { segment: group.segment } : {}), ...(group.rankCursor ? { rank: group.rankCursor } : {}), ...(group.nearbyCursor ? { nearby: group.nearbyCursor } : {}) } } : {}) }) });
+        body: JSON.stringify({ plan, view: requestView, ...(discoverySeed ? { discoverySeed } : {}), ...(group ? { cursor: { area: group.area, wishIndex: group.wishIndex, offset: group.nextOffset,
+          ...(group.discoveryCursor ? { discovery: group.discoveryCursor } : {}), ...(group.segment ? { segment: group.segment } : {}), ...(group.rankCursor ? { rank: group.rankCursor } : {}), ...(group.nearbyCursor ? { nearby: group.nearbyCursor } : {}) } } : {}) }) });
       if (!current()) return;
       if (response.status === 401 || response.status === 403) { denied.current(); return; }
       if (!response.ok) throw new Error("unavailable");
@@ -163,7 +164,7 @@ export default function SmartSearchExplorer({ plan, initialGroups, initialMapGro
         setPending(values => values.filter(value => value !== key));
       }
     }
-  }, [plan, mapOpen, mapReady, nativeAppearance]);
+  }, [plan, mapOpen, mapReady, nativeAppearance, discoverySeed]);
 
   useEffect(() => {
     if (initialMapGroups || !mapOpen || mapReady) return;

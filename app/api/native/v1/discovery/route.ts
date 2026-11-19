@@ -4,6 +4,7 @@ import { unifiedSearchAccess } from "@/lib/unified-search-access";
 import { rateLimit } from "@/lib/rateLimit";
 import { nativeDiscoveryForAccount } from "@/lib/native-smart-discovery-server";
 import { NATIVE_DISCOVERY_CONTRACT } from "@/lib/native-smart-discovery";
+import { isDiscoverySeed } from "@/lib/discovery-seed";
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 export const maxDuration = 30;
@@ -18,9 +19,11 @@ export async function GET(request: Request) {
     if (request.headers.get("X-CineGenius-Native-Discovery") !== NATIVE_DISCOVERY_CONTRACT) return json({ error: "invalid_request" }, 400);
     if (request.headers.get("X-Native-Account") !== user.userId) return json({ error: "account_changed" }, 409);
     const params = new URL(request.url).searchParams;
-    if ([...params.keys()].some(key => key !== "focus") || params.getAll("focus").length > 1 || (params.has("focus") && !["profile", "neutral"].includes(params.get("focus")!))) return json({ error: "invalid_request" }, 400);
+    const seed = params.get("seed") ?? undefined;
+    if ([...params.keys()].some(key => !["focus", "seed"].includes(key)) || params.getAll("focus").length > 1 || params.getAll("seed").length > 1
+      || (seed !== undefined && !isDiscoverySeed(seed)) || (params.has("focus") && !["profile", "neutral"].includes(params.get("focus")!))) return json({ error: "invalid_request" }, 400);
     if (!(await rateLimit(`unified-search:${user.userId}`, 40, 60)).allowed) return json({ error: "rate_limited" }, 429);
     const signal = AbortSignal.any([request.signal, AbortSignal.timeout(20_000)]);
-    return json(await nativeDiscoveryForAccount(user.userId, await getLocale(), params.get("focus") === "neutral" ? "neutral" : "profile", signal));
+    return json(await nativeDiscoveryForAccount(user.userId, await getLocale(), params.get("focus") === "neutral" ? "neutral" : "profile", signal, seed));
   } catch { return json({ error: "unavailable" }, 503); }
 }

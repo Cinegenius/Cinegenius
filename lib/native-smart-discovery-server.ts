@@ -4,6 +4,7 @@ import { selectedCrewOccupations } from "@/lib/crew-occupations";
 import { publicMapPoint } from "@/lib/places/public-map-point";
 import { PLACE_COLUMNS, cityName } from "@/lib/places/core";
 import { executeUnifiedSearch } from "@/lib/unified-search-server";
+import { isDiscoverySeed } from "./discovery-seed";
 import { NATIVE_DISCOVERY_CONTRACT, nativeDiscoveryPlan, rankNativeDiscoveryGroups, type NativeDiscoveryMode, type NativeDiscoveryFocus, type NativeDiscoveryResponse } from "./native-smart-discovery";
 
 /** Only the authenticated account's explicit saved occupations and verified city. */
@@ -28,8 +29,9 @@ async function discoveryFocus(accountId: string, locale: string, mode: NativeDis
 /** The caller has freshly verified the account and existing Smart permission.
  * Focus is soft ordering only, so it need not delay the independent search.
  * Maps retain their existing explicit, permission-checked Unified Search load. */
-export async function nativeDiscoveryForAccount(accountId: string, locale: string, mode: NativeDiscoveryMode, signal: AbortSignal): Promise<NativeDiscoveryResponse> {
+export async function nativeDiscoveryForAccount(accountId: string, locale: string, mode: NativeDiscoveryMode, signal: AbortSignal, seed?: string): Promise<NativeDiscoveryResponse> {
   if (signal.aborted) throw new Error("unavailable");
+  if (seed !== undefined && !isDiscoverySeed(seed)) throw new Error("invalid_request");
   const controller = new AbortController();
   const activeSignal = AbortSignal.any([signal, controller.signal]);
   const plan = nativeDiscoveryPlan();
@@ -38,11 +40,11 @@ export async function nativeDiscoveryForAccount(accountId: string, locale: strin
     // all current visibility checks inside executeUnifiedSearch unchanged.
     const [{ focus, origin }, { groups }] = await Promise.all([
       discoveryFocus(accountId, locale, mode, activeSignal),
-      executeUnifiedSearch(plan, locale, accountId, activeSignal, undefined, "list"),
+      executeUnifiedSearch(plan, locale, accountId, activeSignal, undefined, "list", seed),
     ]);
     if (activeSignal.aborted) throw new Error("unavailable");
     return { contract: NATIVE_DISCOVERY_CONTRACT, accountId, serverNow: new Date().toISOString(), focus,
-      plan, groups: rankNativeDiscoveryGroups(groups, focus, origin) };
+      plan, groups: rankNativeDiscoveryGroups(groups, focus, origin), ...(seed ? { seed } : {}) };
   } catch (error) {
     controller.abort();
     throw error;
