@@ -9,6 +9,8 @@ import { getLocale,getNow,getTranslations } from "next-intl/server";
 import Link from "next/link";
 import NativeNews, { type NativeNewsEntry } from "@/components/app/NativeNews";
 import { publicMapPoint } from "@/lib/places/public-map-point";
+import { organizationDiscovery } from "@/lib/organization-discovery";
+import { organizationsCountryHref } from "@/lib/browse-country";
 
 export const dynamic = "force-dynamic";
 
@@ -25,7 +27,10 @@ export default async function NewsPage({ searchParams }: { searchParams: Promise
   const topic = await homeNewsTopic(region.cookieName, params.topic);
   const filters = { country: region.selection, type: isOrganizationEntryType(params.type) ? params.type : undefined,
     topic: isOrganizationTopic(topic.selection) ? topic.selection : undefined, q: params.q?.trim().slice(0, 120) || "" };
-  const [{ entries: filtered, hasMore, page, count }, facets] = await Promise.all([approvedEntries({ ...filters, country: region.country, page: Number(params.page) || 1 }), newsFacetRows()]);
+  const [{ entries: filtered, hasMore, page, count }, facets, organizationPage] = await Promise.all([
+    approvedEntries({ ...filters, country: region.country, page: Number(params.page) || 1 }), newsFacetRows(),
+    organizationDiscovery(1, 12, region.country).catch(() => null),
+  ]);
   const href = (change: { type?: string; topic?: string; page?: number; country?: string; geo?: string } = {}) => {
     const values = { ...filters, ...change };
     const query = new URLSearchParams();
@@ -56,6 +61,8 @@ export default async function NewsPage({ searchParams }: { searchParams: Promise
     <PageHeader withBackdrop={false} badge={t("eyebrow")} title={t("newsTitleLead")} titleHighlight={t("newsTitleHighlight")} description={t("newsDescription")} />
     <NativeNews key={`${region.cookieName}:${filters.q}:${filters.type}:${filters.topic}:${filters.country}:${region.country}`}
       controls={{ filters, facets, count, region, topicCookieName: topic.cookieName }} entries={nativeEntries} page={page}
+      organizations={organizationPage?.organizations ?? []} organizationsUnavailable={organizationPage === null}
+      organizationsHref={organizationsCountryHref(region.country)}
       previousHref={page > 1 ? href({ page: page - 1 }) : null} nextHref={hasMore ? href({ page: page + 1 }) : null}>
     <section className="site-container py-5 pb-28 sm:py-7 sm:pb-28 xl:pb-10">
       <div className="mb-5 flex flex-wrap items-center justify-between gap-x-5 gap-y-1 text-sm">

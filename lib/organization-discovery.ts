@@ -4,6 +4,7 @@ import { newsDiscoveryIndex, regionalNews } from '@/lib/news-discovery';
 import { newsEntryCountry } from '@/lib/news-region';
 import { UNASSIGNED_COUNTRY } from '@/lib/places/core';
 import { isOrganizationTopic, type OrganizationTopic } from '@/lib/organization-taxonomy';
+import { browseCountryChoice } from '@/lib/browse-country';
 
 export type PublicOrganization = {id:string;slug:string;name:string;logo_url:string|null;city:string|null};
 const projection = "id,slug,name,logo_url,city";
@@ -19,11 +20,15 @@ export async function publicOrganizationLinks(target: {userId:string}|{companyId
  if(result.error) throw new Error('organization_links_unavailable');
  return (result.data??[]).map(row=>(Array.isArray(row.organization)?row.organization[0]:row.organization) as unknown as PublicOrganization);
 }
-export async function organizationDiscovery(page=1,limit=24) {
+export async function organizationDiscovery(page=1,limit=24,country:unknown='') {
+ const selectedCountry=browseCountryChoice(country);
+ if(selectedCountry===undefined)throw new Error('organization_country_invalid');
  page=Number.isFinite(page)?Math.min(10000,Math.max(1,Math.floor(page))):1;
- limit=Math.min(24,Math.max(1,Math.floor(limit)));
- const result=await db.from('organizations').select(projection).eq('moderation_status','approved')
- .order('created_at',{ascending:false}).order('id').range((page-1)*limit,page*limit);
+ limit=Number.isFinite(limit)?Math.min(24,Math.max(1,Math.floor(limit))):24;
+ let query=db.from('organizations').select(projection).eq('moderation_status','approved');
+ if(selectedCountry===UNASSIGNED_COUNTRY)query=query.or('place_country_code.is.null,place_country_code.eq.""');
+ else if(selectedCountry)query=query.eq('place_country_code',selectedCountry);
+ const result=await query.order('created_at',{ascending:false}).order('id').range((page-1)*limit,page*limit);
  if(result.error) throw new Error('organization_discovery_unavailable');
  return {organizations:(result.data??[]).slice(0,limit) as PublicOrganization[],hasMore:(result.data?.length??0)>limit,page};
 }

@@ -8,13 +8,17 @@ import { useFormNavigation } from "@/contexts/FormDraftContext";
 import FormDraftStatus from "@/components/FormDraftStatus";
 import { useViewState } from "@/lib/use-view-state";
 
-import { FormEvent, useCallback, useEffect, useRef, useState } from "react";
+import { FormEvent, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import Image from "@/components/MediaImage";
 import { useLocale, useTranslations } from "next-intl";
 import { MapPin, MessageCircle, Pin, Plus, Search, Send, Trash2, X } from "lucide-react";
 import { useUser } from "@clerk/nextjs";
 import { uiErrorMessage } from "@/lib/ui-error-message";
+import { useNativeAppAppearance } from "@/lib/use-native-app-appearance";
+import { browseCountryChoice } from "@/lib/browse-country";
+import NativeCountrySelect from "@/components/app/NativeCountrySelect";
+import styles from "./CommunityBoard.module.css";
 
 type Kind = "question" | "recommendation" | "request" | "offer";
 type Reply = { id: string; body: string; created_at: string; author_name: string; author_avatar: string | null; is_mine?: boolean };
@@ -22,6 +26,7 @@ type Post = {
   id: string; kind: Kind; title: string; body: string; city: string | null; created_at: string;
   author_name: string; author_avatar: string | null; reply_count: number; is_mine?: boolean;
 };
+type BoardRead = { search: string; kind: Kind | "all"; country: string; viewer: string };
 
 const KINDS: Kind[] = ["question", "recommendation", "request", "offer"];
 const KIND_STYLE: Record<Kind, string> = {
@@ -53,10 +58,13 @@ export default function CommunityBoard({ loggedIn = false, fullPage = false }: {
   const t = useTranslations("home");
   const locale = useLocale();
   const { user, isLoaded } = useUser();
+  const nativeAppearance = useNativeAppAppearance();
   const activeLoggedIn = isLoaded ? Boolean(user) : loggedIn;
-  const [posts, setPosts] = useState<Post[]>([]);
+  const [postSnapshot, setPostSnapshot] = useState<{ scope: string; posts: Post[] }>({ scope: "", posts: [] });
   const [kind, setKind] = useViewState<Kind | "all">("board.kind", "all");
   const [query, setQuery] = useViewState("board.query", "");
+  const [savedCountry, setCountry] = useViewState("board.country", "");
+  const country = browseCountryChoice(savedCountry) ?? "";
   const [loading, setLoading] = useState(true);
   const [composerOpen, setComposerOpen] = useState(false);
   const [expanded, setExpanded] = useViewState<string | null>("board.expanded", null);
@@ -73,34 +81,52 @@ export default function CommunityBoard({ loggedIn = false, fullPage = false }: {
   });
   const limit = fullPage ? 50 : 3;
   const postRequest = useRef(0);
+  const viewer = `${isLoaded ? "ready" : "loading"}:${user?.id ?? "guest"}`;
+  const criteria = useMemo<BoardRead>(() => ({ search: fullPage ? query : "", kind: fullPage ? kind : "all",
+    country: nativeAppearance && fullPage ? country : "", viewer }), [fullPage, query, kind, nativeAppearance, country, viewer]);
+  const readScope = JSON.stringify(criteria);
+  const activeRead = useRef({ scope: readScope, criteria });
+  const posts = postSnapshot.scope === readScope ? postSnapshot.posts : [];
+  useLayoutEffect(() => {
+    activeRead.current = { scope: readScope, criteria };
+    return () => { postRequest.current += 1; };
+  }, [readScope, criteria]);
+  const updatePosts = (action: (previous: Post[]) => Post[]) => setPostSnapshot(previous => previous.scope === readScope ? { ...previous, posts: action(previous.posts) } : previous);
 
-  const loadPosts = useCallback(async (search: string, selectedKind: Kind | "all") => {
+  const loadPosts = useCallback(async (selection = activeRead.current.criteria) => {
     const sequence = ++postRequest.current;
+    const scope = JSON.stringify(selection);
+    const current = () => sequence === postRequest.current && activeRead.current.scope === scope;
     setLoading(true);
     const params = new URLSearchParams({ limit: String(limit) });
-    if (search.trim()) params.set("q", search.trim());
-    if (selectedKind !== "all") params.set("kind", selectedKind);
+    if (selection.search.trim()) params.set("q", selection.search.trim());
+    if (selection.kind !== "all") params.set("kind", selection.kind);
+    if (selection.country) params.set("country", selection.country);
     try {
-      const response = await fetch(`/api/community-posts?${params}`);
+      const response = await fetch(`/api/community-posts?${params}`, { cache: "no-store" });
       const payload = await response.json();
-      if (sequence === postRequest.current) {
-        if (response.ok) setPosts(payload.posts ?? []);
+      if (current()) {
+        if (response.ok && Array.isArray(payload.posts)) setPostSnapshot({ scope, posts: payload.posts });
         else setError(t("boardError"));
       }
     } catch {
-      if (sequence === postRequest.current) setError(t("boardError"));
+      if (current()) setError(t("boardError"));
     } finally {
-      if (sequence === postRequest.current) setLoading(false);
+      if (current()) setLoading(false);
     }
   }, [limit, t]);
 
-  useEffect(() => { if (!fullPage) void loadPosts("", "all"); }, [fullPage, loadPosts]);
+  useEffect(() => {
+    let active = true;
+    if (!fullPage) queueMicrotask(() => { if (active) void loadPosts(criteria); });
+    return () => { active = false; };
+  }, [fullPage, criteria, loadPosts]);
 
   useEffect(() => {
     if (!fullPage) return;
-    const timer = window.setTimeout(() => void loadPosts(query, kind), 250);
+    const timer = window.setTimeout(() => void loadPosts(criteria), 250);
     return () => window.clearTimeout(timer);
-  }, [fullPage, kind, query, loadPosts]);
+  }, [fullPage, criteria, loadPosts]);
 
   async function submitPost(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -113,7 +139,7 @@ export default function CommunityBoard({ loggedIn = false, fullPage = false }: {
       if (!Object.values(replyDrafts).some(text => text.trim())) await boardDraft.complete();
       setForm({ kind: "question", title: "", body: "", city: "", selected_place_city_id: "" });
       setComposerOpen(false);
-      await loadPosts("", "all");
+      await loadPosts();
     } catch (cause) {
       setError(uiErrorMessage(cause, t("boardError")));
     } finally { setBusy(false); }
@@ -142,7 +168,7 @@ export default function CommunityBoard({ loggedIn = false, fullPage = false }: {
       if (!response.ok) throw new Error(payload.error || t("boardError"));
       if (!form.title.trim() && !form.body.trim() && !Object.entries(replyDrafts).some(([id, text]) => id !== postId && text.trim())) await boardDraft.complete();
       setReplies(current => ({ ...current, [postId]: [...(current[postId] ?? []), payload.reply] }));
-      setPosts(current => current.map(post => post.id === postId ? { ...post, reply_count: post.reply_count + 1 } : post));
+      updatePosts(current => current.map(post => post.id === postId ? { ...post, reply_count: post.reply_count + 1 } : post));
       setReplyDrafts(current => ({ ...current, [postId]: "" }));
     } catch (cause) { setError(uiErrorMessage(cause, t("boardError"))); }
     finally { setBusy(false); }
@@ -155,7 +181,7 @@ export default function CommunityBoard({ loggedIn = false, fullPage = false }: {
       const response = await fetch(`/api/community-posts/${postId}`, { method: "DELETE" });
       const payload = await response.json().catch(() => ({}));
       if (!response.ok) throw new Error(payload.error || t("boardError"));
-      setPosts(current => current.filter(post => post.id !== postId));
+      updatePosts(current => current.filter(post => post.id !== postId));
       setExpanded(current => current === postId ? null : current);
     } catch (cause) {
       setError(uiErrorMessage(cause, t("boardError")));
@@ -197,6 +223,10 @@ export default function CommunityBoard({ loggedIn = false, fullPage = false }: {
             <Search size={17} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-text-muted" />
             <input value={query} onChange={event => setQuery(event.target.value)} placeholder={t("boardSearchPlaceholder")} className="h-11 w-full rounded-xl border border-border bg-bg-secondary pl-10 pr-3 text-sm text-text-primary outline-none placeholder:text-text-muted focus:border-gold/60" />
           </label>
+          {nativeAppearance && <NativeCountrySelect value={country} onChange={value => {
+            const next = browseCountryChoice(value);
+            if (next !== undefined) setCountry(next);
+          }} />}
           <div className="flex flex-wrap gap-2">
             {(["all", ...KINDS] as const).map(value => <button key={value} type="button" onClick={() => setKind(value)} className={`shrink-0 rounded-full border px-3.5 py-2 text-xs font-semibold transition-colors ${kind === value ? "border-gold/50 bg-gold/10 text-gold" : "border-border bg-bg-secondary text-text-secondary hover:border-gold/30"}`}>{value === "all" ? t("boardAll") : t(`boardKind_${value}`)}</button>)}
           </div>
@@ -204,7 +234,7 @@ export default function CommunityBoard({ loggedIn = false, fullPage = false }: {
 
         {error && <p role="alert" className="relative mb-4 rounded-lg border border-red-400/30 bg-red-400/10 px-3 py-2 text-sm text-red-200">{error}</p>}
         {loading && !posts.length ? <div className="relative rounded-xl border border-border bg-bg-primary/40 px-4 py-8 text-center text-sm text-text-muted">{t("boardLoading")}</div> : posts.length ? <div className={`relative grid gap-2.5 sm:gap-3 ${fullPage ? "md:grid-cols-2" : "sm:grid-cols-2 xl:grid-cols-3"}`}>
-          {posts.map((post, index) => <article id={post.id} key={post.id} className={`relative min-w-0 overflow-hidden rounded-2xl border p-3.5 text-text-primary shadow-[0_12px_30px_rgba(0,0,0,0.26)] transition-all hover:-translate-y-0.5 hover:shadow-[0_18px_40px_rgba(0,0,0,0.38)] sm:p-5 ${KIND_CARD_STYLE[post.kind].card} ${!fullPage && index >= 2 ? "hidden sm:block" : ""}`}>
+          {posts.map((post, index) => <article id={post.id} key={post.id} data-native-board-post={nativeAppearance || undefined} className={`relative min-w-0 overflow-hidden rounded-2xl border p-3.5 text-text-primary shadow-[0_12px_30px_rgba(0,0,0,0.26)] transition-all hover:-translate-y-0.5 hover:shadow-[0_18px_40px_rgba(0,0,0,0.38)] sm:p-5 ${KIND_CARD_STYLE[post.kind].card} ${nativeAppearance ? styles.nativePost : ""} ${!fullPage && index >= 2 ? "hidden sm:block" : ""}`}>
             <span aria-hidden="true" className={`absolute inset-y-0 left-0 w-1 bg-gradient-to-b ${KIND_CARD_STYLE[post.kind].accent}`} />
             <div className="mb-2.5 flex flex-wrap items-center justify-between gap-2 sm:mb-3.5">
               <span className={`rounded-full border px-2.5 py-1 text-[11px] font-bold tracking-wide sm:px-3 sm:py-1.5 sm:text-xs ${KIND_STYLE[post.kind]}`}>{t(`boardKind_${post.kind}`)}</span>
