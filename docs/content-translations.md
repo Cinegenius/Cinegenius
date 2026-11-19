@@ -150,9 +150,16 @@ source hash, RLS/grant checks, real service RPC rollback test and denied guest
 REST access are journaled in
 `/srv/cinegenius/handoffs/20261119-translation-country-release`.
 
-Before promotion, complete the integrated country-filter checks and a staged
-translation using the existing protected provider configuration. Use only the
-guarded clean-main release process. The stage must never replace production
-because it disables unrelated workers for verification. Physical-device and
+The country integration passed 172 focused checks and the complete build.
+APP independently repeated six component-browser cases and its overlapping
+86-case group. The protected stage translated two eligible public offers into
+English, French and Hungarian using the existing provider configuration. A repeat
+used the cache without another generation reservation. Hostile origins, malformed
+requests and a missing source were also checked. These samples do not establish
+linguistic quality for all content and languages.
+
+Use only the guarded clean-main release process. The stage must never replace
+production because it disables unrelated workers for verification. Final live
+status and HTTP/browser checks belong in the release receipt. Physical-device and
 all-language quality limits remain explicit. To disable translations, remove/set
 the flag false and redeploy; preserve original source and the reviewed migration.
