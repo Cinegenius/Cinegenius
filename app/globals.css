@@ -1,5 +1,18 @@
 @import "tailwindcss";
 
+html[data-cg-native-community-appearance="app"] {
+  --cg-smart-crew:#ffab98;
+  --cg-smart-marketplace:#ffd071;
+  --cg-smart-locations:#7acbff;
+  --cg-smart-companies:#d3a1ff;
+}
+html[data-cg-native-community-appearance="app"][data-cg-app-theme="pure"] {
+  --cg-smart-crew:#9f3024;
+  --cg-smart-marketplace:#795200;
+  --cg-smart-locations:#00628f;
+  --cg-smart-companies:#7339a8;
+}
+
 /* Native browse controls own their compact rail; the ordinary site is unchanged. */
 html[data-cg-native-community-appearance="app"] .native-browse-filter-dot { position:absolute; top:8px; right:8px; width:5px; height:5px; border-radius:50%; background:currentColor; }
 html[data-cg-native-community-appearance="app"] .mobile-filter-dialog[data-native-browse-dialog="v1"] .mobile-filter-panel {

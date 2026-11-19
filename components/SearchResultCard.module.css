@@ -4,3 +4,13 @@
 :global(html[data-cg-native-community-appearance="app"]) .card :global([data-result-price]) { display:block; max-height:none; overflow:visible; -webkit-line-clamp:unset; line-clamp:unset; white-space:normal; text-overflow:clip; overflow-wrap:anywhere; word-break:normal; }
 :global(html[data-cg-native-community-appearance="app"]) .card :global([data-result-title]) { line-height:1.35; }
 :global(html[data-cg-native-community-appearance="app"]) .card :global([data-result-subtitle]) { line-height:1.5; }
+
+/* Crew portraits retain the whole uploaded image, including in map/list previews. */
+:global(html[data-cg-native-community-appearance="app"]) .card:is([data-search-result-card="profile"],[data-search-result-card="creator"]) :global([data-result-image] img) { object-fit:contain; object-position:center; }
+:global(html[data-cg-native-community-appearance="app"]) .card[data-result-layout="grid"]:is([data-search-result-card="profile"],[data-search-result-card="creator"]) > :global([data-result-image]) { aspect-ratio:1; }
+:global(html[data-cg-native-community-appearance="app"]) .card:is([data-search-result-card="profile"],[data-search-result-card="creator"]) { --result-accent:var(--cg-smart-crew,#ffab98); }
+:global(html[data-cg-native-community-appearance="app"]) .card:is([data-search-result-card="prop"],[data-search-result-card="vehicle"]) { --result-accent:var(--cg-smart-marketplace,#ffd071); }
+:global(html[data-cg-native-community-appearance="app"]) .card[data-search-result-card="location"] { --result-accent:var(--cg-smart-locations,#7acbff); }
+:global(html[data-cg-native-community-appearance="app"]) .card[data-search-result-card="company"] { --result-accent:var(--cg-smart-companies,#d3a1ff); }
+:global(html[data-cg-native-community-appearance="app"]) .card:is([data-search-result-card="profile"],[data-search-result-card="creator"],[data-search-result-card="prop"],[data-search-result-card="vehicle"],[data-search-result-card="location"],[data-search-result-card="company"]) :global([data-result-badge]) { color:var(--result-accent); border-color:color-mix(in srgb,var(--result-accent) 70%,transparent); background:color-mix(in srgb,var(--result-accent) 15%,var(--cg-app-surface,#1b1d23)); }
+:global(html[data-cg-native-community-appearance="app"]) .card :global([data-result-badge]) > :global(*) { color:inherit; }

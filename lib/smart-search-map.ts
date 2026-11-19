@@ -5,6 +5,12 @@ export const SMART_MAP_COLORS: Record<SearchArea, string> = {
   jobs: "#e6c675", animals: "#70cdb0", projects: "#e99eb2", news: "#a9bdcd", organizations: "#a5a4df",
 };
 
+/** App categories share the colored section controls; ordinary web colors stay unchanged. */
+export const NATIVE_SMART_MAP_COLORS: Record<SearchArea, string> = {
+  ...SMART_MAP_COLORS,
+  crew: "#ffab98", marketplace: "#ffd071", locations: "#7acbff", companies: "#d3a1ff",
+};
+
 export function smartMapEntries(groups: SearchGroup[]) {
   const entries = new Map<string, { key: string; area: SearchArea; result: SearchResult }>();
   for (const group of groups) for (const result of group.results) {

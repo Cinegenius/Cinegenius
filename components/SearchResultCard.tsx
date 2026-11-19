@@ -50,6 +50,7 @@ export default function ResultCard({ result, compact = false, showEvidence = fal
     <Link
       href={cfg.href(result.id)}
       data-search-result-card={result.type}
+      data-result-layout={compact ? "row" : "grid"}
       className={`${styles.card} ${row ? "smart-result-row" : ""} group flex min-w-0 bg-bg-secondary border border-border rounded-xl overflow-hidden hover:border-gold/40 transition-colors ${compact ? "items-center gap-2.5 p-2" : "flex-col hover:shadow-lg hover:shadow-black/20"}`}
     >
       {/* Image */}
@@ -68,7 +69,7 @@ export default function ResultCard({ result, compact = false, showEvidence = fal
           </div>
         )}
         {/* Type badge */}
-        {!compact && <div className={`absolute top-2.5 left-2.5 flex items-center gap-1.5 px-2 py-1 rounded-full text-[10px] font-semibold border backdrop-blur-sm ${cfg.bgColor}`}>
+        {!compact && <div data-result-badge className={`absolute top-2.5 left-2.5 flex items-center gap-1.5 px-2 py-1 rounded-full text-[10px] font-semibold border backdrop-blur-sm ${cfg.bgColor}`}>
           <Icon size={10} className={cfg.color} />
           <span className={cfg.color}>{result.type === "animal" ? animals("portfolio") : cfg.label}</span>
         </div>}

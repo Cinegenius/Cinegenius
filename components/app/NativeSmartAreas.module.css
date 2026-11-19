@@ -1,9 +1,9 @@
 .areas { display: grid; grid-template-columns: repeat(5,minmax(0,1fr)); gap: 3px; margin-bottom: 6px; }
 .areas > button { --domain: var(--cg-app-accent, #c2f135); display: flex; align-items: center; justify-content: center; gap: 3px; min-width: 0; min-height: 44px; border: 1px solid transparent; border-radius: 18px; padding: 5px 3px; background: transparent; color: var(--domain); font: 600 11px/15px -apple-system,BlinkMacSystemFont,sans-serif; overflow-wrap: anywhere; cursor: pointer; touch-action: manipulation; }
-.areas > button[data-smart-domain="crew"] { --domain: #ffab98; }
-.areas > button[data-smart-domain="marketplace"] { --domain: #ffd071; }
-.areas > button[data-smart-domain="locations"] { --domain: #7acbff; }
-.areas > button[data-smart-domain="companies"] { --domain: #d3a1ff; }
+.areas > button[data-smart-domain="crew"] { --domain: var(--cg-smart-crew, #ffab98); }
+.areas > button[data-smart-domain="marketplace"] { --domain: var(--cg-smart-marketplace, #ffd071); }
+.areas > button[data-smart-domain="locations"] { --domain: var(--cg-smart-locations, #7acbff); }
+.areas > button[data-smart-domain="companies"] { --domain: var(--cg-smart-companies, #d3a1ff); }
 :global(html[data-cg-app-theme="pure"]) .areas > button[data-smart-domain="crew"] { --domain: #9f3024; }
 :global(html[data-cg-app-theme="pure"]) .areas > button[data-smart-domain="marketplace"] { --domain: #795200; }
 :global(html[data-cg-app-theme="pure"]) .areas > button[data-smart-domain="locations"] { --domain: #00628f; }

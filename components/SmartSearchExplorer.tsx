@@ -15,7 +15,7 @@ import NativeBrowseToolbar, { NativeBrowseQuickFilter } from "./app/NativeBrowse
 import nativeStyles from "./app/NativeSmartAreas.module.css";
 import ResultCard from "./SearchResultCard";
 import { searchGroupKey, type SearchGroup, type SearchPlan } from "@/lib/unified-search";
-import { SMART_MAP_COLORS } from "@/lib/smart-search-map";
+import { SMART_MAP_COLORS, NATIVE_SMART_MAP_COLORS } from "@/lib/smart-search-map";
 import { searchQueryTitle } from "@/lib/unified-search-areas";
 import { discoveryAreas, discoveryResults, discoveryCount, discoveryFacets, emptyDiscoveryFilters, filterDiscoveryGroups, mergeDiscoveryPage, sortDiscoveryGroups, type DiscoveryFilters } from "@/lib/smart-discovery";
 
@@ -35,6 +35,7 @@ function ResultArea({ area, groups, pending, errors, more, grid = false, limit: 
   grid?: boolean; limit?: number; setLimit?: (limit: number) => void;
 }) {
   const t = useTranslations("UnifiedSearch");
+  const native = useNativeAppAppearance();
   const [localLimit, setLocalLimit] = useState(3);
   const limit = controlledLimit ?? localLimit;
   const setLimit = changeLimit ?? setLocalLimit;
@@ -44,7 +45,7 @@ function ResultArea({ area, groups, pending, errors, more, grid = false, limit: 
   const failed = groups.some(group => errors.includes(searchGroupKey(group)));
   if (!results.length) return null;
   return <section className="smart-result-area" aria-label={t(`areas.${area}`)}>
-    <h2 className="smart-area-heading"><span className="size-1.5 shrink-0 rounded-full" style={{ backgroundColor: SMART_MAP_COLORS[area] }} aria-hidden="true" />
+    <h2 className="smart-area-heading"><span className="size-1.5 shrink-0 rounded-full" style={{ backgroundColor: (native ? NATIVE_SMART_MAP_COLORS : SMART_MAP_COLORS)[area] }} aria-hidden="true" />
       <span className="min-w-0 flex-1">{t(`areas.${area}`)}</span><BrowseResultCount count={results.length} label={t("discovery.loaded", { count: results.length })} />
     </h2>
     {grid ? <div className={nativeStyles.grid}>{results.slice(0, limit).map(result => <ResultCard key={`${result.type}:${result.id}`} result={result} />)}</div>

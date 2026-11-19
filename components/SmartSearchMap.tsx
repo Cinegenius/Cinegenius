@@ -5,7 +5,8 @@ import { useCallback, useMemo, useState } from "react";
 import { useTranslations } from "next-intl";
 import { Info } from "lucide-react";
 import { hasCoordinates, type MapBounds } from "@/lib/location-map";
-import { SMART_MAP_COLORS, smartMapEntries } from "@/lib/smart-search-map";
+import { SMART_MAP_COLORS, NATIVE_SMART_MAP_COLORS, smartMapEntries } from "@/lib/smart-search-map";
+import { useNativeAppAppearance } from "@/lib/use-native-app-appearance";
 import type { SearchGroup } from "@/lib/unified-search";
 import ResultCard, { SearchResultTitle } from "./SearchResultCard";
 
@@ -17,6 +18,8 @@ export default function SmartSearchMap({ groups, bounds, onApplyBounds }: {
   groups: SearchGroup[]; bounds: MapBounds | null; onApplyBounds: (value: MapBounds | null) => void;
 }) {
   const t = useTranslations("UnifiedSearch"), mapText = useTranslations("directoryMap");
+  const native = useNativeAppAppearance();
+  const colors = native ? NATIVE_SMART_MAP_COLORS : SMART_MAP_COLORS;
   const [activeId, setActiveId] = useState<string | null>(null);
   const entries = useMemo(() => smartMapEntries(groups), [groups]);
   const locations = useMemo(() => entries.flatMap(entry => {
@@ -25,9 +28,9 @@ export default function SmartSearchMap({ groups, bounds, onApplyBounds }: {
     return [{ id: entry.key, title: `${t(`areas.${entry.area}`)} · ${entry.result.title}`, city: entry.result.subtitle,
       titleContent: <>{t(`areas.${entry.area}`)} · <SearchResultTitle result={entry.result} /></>,
       type: entry.result.type, price: entry.result.price, image: entry.result.image ?? "", lat: point.lat, lng: point.lng,
-      markerColor: SMART_MAP_COLORS[entry.area], ...(point.radiusMeters ? { metadata: { location_area: { lat: point.lat, lng: point.lng, radius_meters: point.radiusMeters } } } : {}),
+      markerColor: colors[entry.area], ...(point.radiusMeters ? { metadata: { location_area: { lat: point.lat, lng: point.lng, radius_meters: point.radiusMeters } } } : {}),
     }];
-  }), [entries, t]);
+  }), [entries, t, colors]);
   const clusterLabel = useCallback((count: number) => mapText("cluster", { count }), [mapText]);
 
   return <section className="smart-map min-w-0 space-y-2" aria-label={t("mapTitle")}>
@@ -38,7 +41,7 @@ export default function SmartSearchMap({ groups, bounds, onApplyBounds }: {
         labels={{ label: t("mapTitle"), results: mapText("mapped", { count: locations.length }), empty: mapText("empty"), unknownCoordinates: "", cluster: clusterLabel, error: mapText("error"), applyArea: t("discovery.applyMapArea"), nativeApplyArea: t("discovery.searchHere") }}
         renderPreview={selected => {
           const entry = entries.find(item => item.key === selected.id);
-          return entry ? <div className="p-3 pt-11"><p className="mb-2 text-xs font-medium" style={{ color: SMART_MAP_COLORS[entry.area] }}>{t(`areas.${entry.area}`)}</p><ResultCard result={entry.result} compact row /></div> : null;
+          return entry ? <div className="p-3 pt-11"><p className="mb-2 text-xs font-medium" style={{ color: native ? `var(--cg-smart-${entry.area}, ${colors[entry.area]})` : colors[entry.area] }}>{t(`areas.${entry.area}`)}</p><ResultCard result={entry.result} compact row /></div> : null;
         }} />
     </div>
     <div className="smart-map-meta">
