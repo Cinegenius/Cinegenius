@@ -192,7 +192,7 @@ export default function SmartSearchExplorer({ plan, initialGroups, initialMapGro
   </button>;
   const nativeQuickFilters = nativeAppearance ? (["departments", "marketplace"] as const)
     .filter(kind => available[kind].length > 0 || filters[kind].length > 0)
-    .map(kind => <NativeBrowseQuickFilter key={kind} label={ui(kind === "departments" ? "creators.deptFilter" : "MarketplaceNavigation.category")}
+    .map(kind => <NativeBrowseQuickFilter key={kind} kind={kind === "departments" ? "departments" : "category"} label={ui(kind === "departments" ? "creators.deptFilter" : "MarketplaceNavigation.category")}
       value={filters[kind].length > 1 ? "__selection" : filters[kind][0] ?? ""}
       options={[{ value: "", label: t("discovery.all") },
         ...(filters[kind].length > 1 ? [{ value: "__selection", label: t("discovery.activeFilters"), disabled: true }] : []),

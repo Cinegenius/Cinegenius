@@ -29,6 +29,10 @@
 .launcherDock[hidden] { display: none; }
 .launcherDock .launcher { position: relative; right: auto; bottom: auto; touch-action: none; user-select: none; -webkit-user-select: none; cursor: grab; }
 .launcherDock[data-dragging] .launcher { cursor: grabbing; }
+:global(html[data-cg-native-community-appearance="app"]) .launcherDock { right:max(12px,env(safe-area-inset-right,0px)); bottom:calc(var(--mobile-nav-clearance,96px) + 8px); }
+:global(html[data-cg-native-community-appearance="app"]) .launcherDock .launcher { width:48px; height:48px; min-width:48px; min-height:48px; gap:0; padding:0; border-radius:24px; border-color:var(--cg-app-border,var(--color-border)); background:color-mix(in srgb,var(--cg-app-surface,var(--color-bg-secondary)) 90%,transparent); color:var(--cg-app-accent,var(--color-gold)); box-shadow:inset 0 1px 0 #ffffff1a,0 5px 20px #0002; -webkit-backdrop-filter:blur(20px); backdrop-filter:blur(20px); }
+:global(html[data-cg-native-community-appearance="app"]) .launcherDock .launcherCopy { display:none; }
+:global(html[data-cg-native-community-appearance="app"]) .launcherDock .mark { width:23px; height:23px; }
 .launcherBounds { position: fixed; pointer-events: none; visibility: hidden; top: calc(var(--site-header-height, 64px) + 40px); right: max(8px, env(safe-area-inset-right, 0px)); bottom: calc(var(--mobile-nav-clearance) + 8px); left: max(8px, env(safe-area-inset-left, 0px)); }
 .hideLauncher { position: absolute; z-index: 46; top: -40px; right: -8px; display: flex; align-items: center; justify-content: center; width: 44px; height: 44px; color: var(--color-text-secondary); background: transparent; border: 0; cursor: pointer; }
 .hideLauncher svg { padding: 3px; box-sizing: content-box; border: 1px solid var(--color-border-light); border-radius: 50%; background: var(--color-bg-secondary); }

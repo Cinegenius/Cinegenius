@@ -105,7 +105,7 @@ function JobsInner({ serverJobs }: { serverJobs: Job[] }) {
 
   return <main className="min-h-screen mobile-bottom-nav-clear">
     <PageHeader withBackdrop={false} badge={t("heroBadge")} title={t("heroTitle")} titleHighlight={t("heroTitleHighlight")} description={copy("intro")} cta={{ label: t("postJobBtn"), href: "/inserat?group=jobs" }} />
-    <MobileBrowseControls preference={<BrowseGeography geography={geography} />} query={query} onQueryChange={setQuery} searchPlaceholder={t("searchPlaceholder")} sortValue={sortKey} sortOptions={sorts} onSortChange={value => { geography.setEnabled(false); setSortKey(value); }}
+    <MobileBrowseControls nativeCategoryKind="departments" preference={<BrowseGeography geography={geography} />} query={query} onQueryChange={setQuery} searchPlaceholder={t("searchPlaceholder")} sortValue={sortKey} sortOptions={sorts} onSortChange={value => { geography.setEnabled(false); setSortKey(value); }}
       categoryLabel={t("filterDeptRole")} allCategoryLabel={ui("Ui.text_bc0b501bb3186b")} categories={departments} categoryValue={selectedDeptId ?? ""} onCategoryChange={changeDepartment}
       resultCount={filtered.length} resultSummary={t("results", { count: filtered.length })} filterCount={chips.length} chips={chips} onReset={clearAll} resetLabel={t("emptyReset")} showResultsLabel={t("results", { count: filtered.length })}>
       {placeFields}

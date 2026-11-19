@@ -8,6 +8,7 @@ import { ChevronRight, Briefcase, Building2, Car, MapPin, Package, PawPrint, Use
 import { useLocale, useTranslations } from "next-intl";
 import Link from "next/link";
 import type { SearchResult as Result } from "@/lib/unified-search";
+import styles from "./SearchResultCard.module.css";
 
 export function getLocalizedTypeConfig(translate: (key: string) => string): Record<string, {
   label: string;
@@ -48,7 +49,8 @@ export default function ResultCard({ result, compact = false, showEvidence = fal
   return (
     <Link
       href={cfg.href(result.id)}
-      className={`${row ? "smart-result-row" : ""} group flex min-w-0 bg-bg-secondary border border-border rounded-xl overflow-hidden hover:border-gold/40 transition-colors ${compact ? "items-center gap-2.5 p-2" : "flex-col hover:shadow-lg hover:shadow-black/20"}`}
+      data-search-result-card={result.type}
+      className={`${styles.card} ${row ? "smart-result-row" : ""} group flex min-w-0 bg-bg-secondary border border-border rounded-xl overflow-hidden hover:border-gold/40 transition-colors ${compact ? "items-center gap-2.5 p-2" : "flex-col hover:shadow-lg hover:shadow-black/20"}`}
     >
       {/* Image */}
       <div data-result-image={result.type === "company" || result.type === "organization" ? "logo" : "photo"} className={`${row && isProfile ? "smart-result-portrait" : ""} relative bg-bg-elevated overflow-hidden ${compact ? "flex h-12 w-12 shrink-0 items-center justify-center rounded-md" : "aspect-video"}`}>
@@ -79,14 +81,14 @@ export default function ResultCard({ result, compact = false, showEvidence = fal
 
       {/* Content */}
       <div className={`min-w-0 flex-1 flex flex-col ${compact ? "" : "p-4"}`}>
-        <h3 title={result.title} className={`font-semibold text-sm text-text-primary leading-tight group-hover:text-gold transition-colors ${compact ? "truncate" : "mb-1 line-clamp-2"}`}>
+        <h3 data-result-title title={result.title} className={`font-semibold text-sm text-text-primary leading-tight group-hover:text-gold transition-colors ${compact ? "truncate" : "mb-1 line-clamp-2"}`}>
           <SearchResultTitle result={result} />
         </h3>
-        <p title={result.subtitle} className="text-xs text-text-muted line-clamp-1 flex-1">{result.subtitle}</p>
+        <p data-result-subtitle title={result.subtitle} className="text-xs text-text-muted line-clamp-1 flex-1">{result.subtitle}</p>
         {showEvidence && result.evidence && <p className="mt-1 text-xs text-text-secondary">{uiText(`UnifiedSearch.discovery.evidence.${result.evidence}`)}</p>}
         {result.nearby && <p className="text-xs text-text-muted">{uiText("UnifiedSearch.nearbyDistance", { distance: result.nearby.distanceKm.toLocaleString(uiLocale), place: result.nearby.origin })}</p>}
         {!isProfile && result.type !== "animal" && (result.priceLabel || result.price > 0) && (
-          <p className={`${compact ? "text-xs" : "mt-2 text-sm"} font-semibold font-mono text-gold`}>
+          <p data-result-price className={`${compact ? "text-xs" : "mt-2 text-sm"} font-semibold font-mono text-gold`}>
             {result.priceLabel ?? uiText("Ui.text_4519fabedb2cbd", { value1: String(result.price.toLocaleString(uiLocale)) })}
           </p>
         )}

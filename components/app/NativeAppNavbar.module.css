@@ -8,7 +8,7 @@
   --native-border: var(--cg-app-border, rgb(255 255 255 / 13%));
   position: fixed;
   z-index: 50;
-  top: calc(env(safe-area-inset-top, 0px) + 12px);
+  top: calc(var(--cg-app-safe-top,env(safe-area-inset-top,0px)) + 12px);
   left: max(12px, env(safe-area-inset-left, 0px));
   right: max(12px, env(safe-area-inset-right, 0px));
   display: flex;
@@ -16,6 +16,7 @@
   color: var(--native-ink);
   pointer-events: none;
 }
+.header::before { content:""; position:fixed; z-index:-1; top:0; right:0; left:0; height:var(--cg-app-chrome-clearance,88px); background:color-mix(in srgb,var(--cg-app-bg,var(--color-bg-primary)) 94%,transparent); -webkit-backdrop-filter:blur(24px) saturate(115%); backdrop-filter:blur(24px) saturate(115%); pointer-events:auto; touch-action:pan-y; }
 
 .bubble {
   display: flex;

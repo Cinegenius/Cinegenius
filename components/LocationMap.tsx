@@ -281,10 +281,10 @@ export default function LocationMap({ preserveViewport = false, readOnly = false
           label={!basemapReady && !failed ? mapUi("loading") : labels?.results ?? locationsText("results", { count: visibleCount ?? locations.length })} />
       </div>
       {!readOnly && !automaticBounds && <div className={`absolute left-3 top-16 z-[500] flex max-w-[calc(100%-5rem)] flex-wrap gap-2 ${labels?.nativeApplyArea ? styles.nativeActions : ""}`}>
-        {moved && <button type="button" onClick={() => { if (!map) return; const b = map.getBounds(); onApplyBounds({ south: b.getSouth(), north: b.getNorth(), west: b.getWest(), east: b.getEast() }); setMoved(false); }} className={`min-h-11 rounded-lg border border-border bg-bg-primary px-3 text-sm text-text-primary ${labels?.nativeApplyArea ? styles.applyButton : ""}`}>
+        {moved && <button data-map-bounds-action="apply" type="button" onClick={() => { if (!map) return; const b = map.getBounds(); onApplyBounds({ south: b.getSouth(), north: b.getNorth(), west: b.getWest(), east: b.getEast() }); setMoved(false); }} className={`min-h-11 rounded-lg border border-border bg-bg-primary px-3 text-sm text-text-primary ${labels?.nativeApplyArea ? `${styles.applyButton} ${styles.nativeApplyButton}` : ""}`}>
           {labels?.nativeApplyArea ? <><span className={styles.nativeCopy}><MapPin size={15} aria-hidden="true" />{labels.nativeApplyArea}</span>{" "}<span className={styles.webCopy}>{labels.applyArea ?? t("searchArea")}</span></> : labels?.applyArea ?? t("searchArea")}
         </button>}
-        {appliedBounds && <button type="button" aria-label={t("resetArea")} onClick={() => { onApplyBounds(null); setMoved(false); }} className={`min-h-11 rounded-lg border border-border bg-bg-primary px-3 text-sm text-text-primary ${labels?.nativeApplyArea ? `${styles.applyButton} ${styles.resetButton}` : ""}`}>
+        {appliedBounds && <button data-map-bounds-action="reset" type="button" aria-label={t("resetArea")} onClick={() => { onApplyBounds(null); setMoved(false); }} className={`min-h-11 rounded-lg border border-border bg-bg-primary px-3 text-sm text-text-primary ${labels?.nativeApplyArea ? `${styles.applyButton} ${styles.resetButton}` : ""}`}>
           {labels?.nativeApplyArea ? <><span className={styles.nativeCopy} aria-hidden="true"><X size={16} /></span><span className={styles.webCopy}>{t("resetArea")}</span></> : t("resetArea")}
         </button>}
       </div>}

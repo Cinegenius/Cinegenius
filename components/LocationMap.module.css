@@ -7,3 +7,6 @@
 :global(html[data-cg-native-community-appearance="app"]) .nativeActions .resetButton { width:44px; padding:0; }
 :global(html[data-cg-native-community-appearance="app"]) .nativeActions .applyButton:focus-visible { outline:2px solid var(--cg-app-accent,var(--color-gold)); outline-offset:2px; }
 @media(prefers-reduced-transparency:reduce) { :global(html[data-cg-native-community-appearance="app"]) .nativeActions .applyButton { background:var(--cg-app-surface,var(--color-bg-secondary)); -webkit-backdrop-filter:none; backdrop-filter:none; } }
+
+/* Smart app maps keep pan/zoom/pins and an existing bounds reset, without a search overlay. */
+:global(html[data-cg-native-community-appearance="app"]) .nativeActions .nativeApplyButton { display:none; }

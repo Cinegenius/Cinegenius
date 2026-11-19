@@ -5,7 +5,7 @@ import { useTranslations } from "next-intl";
 import { cloneElement,isValidElement,useEffect,useRef,useState,type ReactNode } from "react";
 import BrowseSelect from "@/components/BrowseSelect";
 import BrowseResultCount from "@/components/BrowseResultCount";
-import NativeBrowseToolbar, { NativeBrowseQuickFilter } from "@/components/app/NativeBrowseToolbar";
+import NativeBrowseToolbar, { NativeBrowseQuickFilter, type NativeBrowseQuickFilterKind } from "@/components/app/NativeBrowseToolbar";
 import { useNativeAppAppearance } from "@/lib/use-native-app-appearance";
 import { useSwipeDismiss } from "@/lib/use-swipe-dismiss";
 import { normalizeOccupation } from "@/lib/gripTaxonomy";
@@ -33,6 +33,7 @@ type MobileBrowseControlsProps = {
   viewControls?: ReactNode;
   nativeViewControls?: ReactNode;
   nativeQuickFilters?: ReactNode[];
+  nativeCategoryKind?: NativeBrowseQuickFilterKind;
   filterCount: number;
   chips?: BrowseChip[];
   onReset: () => void;
@@ -47,7 +48,7 @@ type MobileBrowseControlsProps = {
 export default function MobileBrowseControls({
   query, onQueryChange, searchPlaceholder, sortValue, sortOptions, onSortChange,
   categoryLabel, allCategoryLabel, categories, categoryValue, onCategoryChange, categoryPlacement = "filters",
-  resultSummary, resultCount, resultActions, viewControls, nativeViewControls, nativeQuickFilters, filterCount, chips = [], onReset, resetLabel, showResultsLabel, preference, onSearch, children,
+  resultSummary, resultCount, resultActions, viewControls, nativeViewControls, nativeQuickFilters, nativeCategoryKind = "category", filterCount, chips = [], onReset, resetLabel, showResultsLabel, preference, onSearch, children,
 }: MobileBrowseControlsProps) {
   const uiText = useTranslations();
   const nativeAppearance = useNativeAppAppearance();
@@ -134,8 +135,8 @@ export default function MobileBrowseControls({
         <div className="mobile-browse-summary">
           {nativeAppearance ? <NativeBrowseToolbar count={resultCount} countLabel={resultSummary} viewControls={nativeViewControls ?? viewControls}
             filters={nativeQuickFilters ?? [
-              ...(categories.length || categoryValue ? [<NativeBrowseQuickFilter key="category" label={categoryLabel} value={categoryValue} onChange={onCategoryChange} options={[{value:"",label:allCategoryLabel},...categories]} />] : []),
-              <NativeBrowseQuickFilter key="sort" label={uiText("creators.sort")} value={sortValue} options={sortOptions} onChange={onSortChange} icon={<ArrowUpDown size={18} />} />,
+              ...(categories.length || categoryValue ? [<NativeBrowseQuickFilter key="category" kind={nativeCategoryKind} label={categoryLabel} value={categoryValue} onChange={onCategoryChange} options={[{value:"",label:allCategoryLabel},...categories]} />] : []),
+              <NativeBrowseQuickFilter key="sort" kind="sort" label={uiText("creators.sort")} value={sortValue} options={sortOptions} onChange={onSortChange} icon={<ArrowUpDown size={18} />} />,
             ]}
             moreAction={<button ref={filterTrigger} type="button" onClick={() => setOpen(true)} aria-label={uiText("locations.filterBtn")} aria-haspopup="dialog" aria-expanded={open}><SlidersHorizontal size={17} aria-hidden="true" />{filterCount > 0 && <span className="native-browse-filter-dot" aria-hidden="true" />}</button>} />
             : viewControls ? <div className="mobile-browse-summary-row">{resultActions ? <div className="mobile-browse-summary-with-actions"><BrowseResultCount count={resultCount} label={resultSummary} /><div className="mobile-browse-result-actions">{resultActions}</div></div> : <BrowseResultCount count={resultCount} label={resultSummary} />}{viewControls}</div> : <BrowseResultCount count={resultCount} label={resultSummary} />}

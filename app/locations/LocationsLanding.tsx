@@ -169,7 +169,7 @@ export default function LocationsLanding({ allLocations, totalCount, initialFilt
 
       </PageHeader>
 
-      <MobileBrowseControls preference={<BrowseGeography geography={geography} />}
+      <MobileBrowseControls nativeCategoryKind="place" preference={<BrowseGeography geography={geography} />}
         query={filters.q} onQueryChange={value => updateFilters({ q: value })} searchPlaceholder={t("searchPlaceholder")}
         sortValue={filters.sort} sortOptions={sortOptions} onSortChange={value => { geography.setEnabled(false); updateFilters({ sort: value }); }}
         categoryLabel={t("categoryLabel")} allCategoryLabel={t("allLocations")} categories={categories}

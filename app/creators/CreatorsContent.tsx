@@ -475,7 +475,7 @@ function CreatorsInner({
       {near && <p className="site-container text-xs text-text-muted py-2">{uiText("Genie.radiusHint")}</p>}
       <FloatingMapToggle mapActive={viewMode === "map"} onToggle={() => { setViewMode(viewMode === "map" ? "list" : "map"); requestAnimationFrame(() => resultsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" })); }} />
 
-      <MobileBrowseControls preference={<BrowseGeography geography={geography} />}
+      <MobileBrowseControls nativeCategoryKind="departments" preference={<BrowseGeography geography={geography} />}
         query={query}
         onQueryChange={setQuery}
         searchPlaceholder={t("searchPlaceholder")}
@@ -653,11 +653,11 @@ function CreatorsInner({
                           <h3 className="min-w-0 break-words [overflow-wrap:anywhere] font-semibold text-text-primary text-[13px] leading-snug sm:text-sm">{c.name}</h3>
                           {c.verified && <CheckCircle size={12} className="text-gold/60 shrink-0 mt-0.5" />}
                         </div>
-                        <p className="line-clamp-2 text-[11px] leading-snug text-gold font-medium sm:text-xs">{displayPositions.slice(0, 2).join(" · ")}</p>
+                        <p data-native-card-copy className="line-clamp-2 text-[11px] leading-snug text-gold font-medium sm:text-xs">{displayPositions.slice(0, 2).join(" · ")}</p>
                         {c.location && (
                           <p className="mt-1.5 flex min-w-0 items-center gap-1 text-[10px] text-text-muted sm:text-xs">
                             <MapPin size={11} className="shrink-0" />
-                            <span className="truncate">{c.location.split(",")[0]}</span>
+                            <span data-native-card-copy className="truncate">{c.location.split(",")[0]}</span>
                           </p>
                         )}
                         {c.reviews > 0 && (
