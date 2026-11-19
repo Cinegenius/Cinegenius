@@ -11,8 +11,9 @@ the presence of these files.
 
 The existing next-intl locale and `cg_locale` cookie remain the single language
 choice for the website and installed WebView. The existing flag switcher is also
-available inside the native More menu and on native sign-in/setup pages. Changing
-language refreshes server components; it does not key/remount content forms or
+available inside the native More menu and on native sign-in/setup pages. Signed-out
+phone visitors can access it in the public menu. Changing language refreshes server
+components; it does not key/remount content forms or
 reload the document. Native Swift/offline resources still use their existing
 resource generator and must be checked by APP Entwicklung on its current sources.
 

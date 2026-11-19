@@ -85,6 +85,7 @@ function MenuContent() {
             </Link>)}
           </nav><div className="mt-3 border-t border-border pt-3" data-native-language-choice><LanguageSwitcher inline /></div><div data-native-app-theme-host="v1" /></> : <>
           <button type="button" onClick={() => { dismiss(); document.dispatchEvent(new Event("cg:opensearch")); }} className={`${linkClass} mb-4 w-full border border-border lg:hidden`}><Search size={20} aria-hidden="true" />{uiText("Ui.text_9f6d74e0a12b67")}</button>
+          {!isSignedIn && <div className="mb-4 border-b border-border pb-3 lg:hidden" data-guest-language-choice><LanguageSwitcher inline /></div>}
           <nav aria-label={t("discover")}>
             <h3 className="mb-2 px-3 text-xs font-semibold uppercase tracking-wider text-text-muted">{t("discover")}</h3>
             <div className="grid grid-cols-2 gap-1">
