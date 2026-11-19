@@ -8,6 +8,8 @@
 .quickTrigger { display:flex; align-items:center; justify-content:center; gap:3px; width:100%; min-width:44px; min-height:44px; padding:0 3px; color:var(--color-gold); background:transparent; border:0; border-radius:14px; font-size:12px; line-height:1.2; text-align:left; }
 .quickTrigger > span { color:inherit; }
 .quickTrigger > svg { width:11px; height:11px; color:inherit; }
+:global(html[data-cg-native-community-appearance="app"]) .container .quickTrigger { color:var(--cg-app-accent,var(--color-gold)) !important; -webkit-text-fill-color:currentColor !important; }
+:global(html[data-cg-native-community-appearance="app"]) .container .quickTrigger > :is(span,svg) { color:inherit !important; -webkit-text-fill-color:currentColor !important; }
 .quickTrigger:focus-visible { outline:2px solid var(--color-gold); outline-offset:-2px; }
 .quickTrigger[aria-expanded=true] { background:color-mix(in srgb,var(--color-gold) 13%,transparent); }
 .more { flex:0 0 44px; width:44px; }
