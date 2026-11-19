@@ -1,3 +1,33 @@
+## Aktuelle App-Veröffentlichung und Quellenbasis – 19. November 2026
+
+Der nach ausdrücklicher Freigabe in der Mac-Aufgabe veröffentlichte Hauptstand
+ist `6d503f66cfebc7aeda9236dc05e78b049db7a0c2` auf Basis `6f5ec38`.
+Die Veröffentlichung `dpl_HscsdkmUFyLKkpBg17GM7SwcjE74` wurde hier als Production
+Ready und über `www.cinegenius.co` bestätigt. Weitere Web-/App-Abgleiche müssen
+diesen Hauptstand und seine App-Komponenten, Marker und Katalogeinträge erhalten.
+Dieser erhaltene Mobile-Arbeitszweig auf Basis `6478d77` ist kein Abbild des neuen
+Live-Standes und enthält ältere bzw. unveröffentlichte Abweichungen. Nicht als
+Ganzes darüber veröffentlichen oder seine älteren App-Menüs zurückübertragen.
+Für neue Produktarbeit vom aktuellen Hauptstand ausgehen und zusätzlich benötigte
+App-Quellen gezielt anhand ihres geprüften Rücklaufs abgleichen; bestehende
+Entwürfe und native Dateien erhalten.
+
+Für die App mit exakt `data-cg-native-community-appearance="app"` gilt jetzt
+Shots / Workspace / Smart / News / Projekte. Dies ersetzt die ältere öffentliche
+Fünferleiste nur für diese App-Darstellung. Smart bündelt Crew, Markt, Locations
+und Firmen mit Mehrfachauswahl und Kacheln/Liste/Karte mit Liste. Der Marker ist
+keine Berechtigung; Anmeldung, Privatsphäre und Smart-Adminprüfung bleiben
+serverseitig maßgeblich. Die gewöhnliche Website behält ihre Navigation.
+
+Shots-Veröffentlichung und Push-Aktivierung bleiben aus; die neuen Migrationen
+sind laut Übergabe nicht angewendet. Die native iPhone-Installation und der
+Erhalt von 95 Dateien sind von der Mac-Aufgabe gemeldet, nicht hier erneut am
+Gerät geprüft. Der neue Hauptcommit enthält keinen aktuellen Swift-Rücklauf.
+Die pausierte grundlegende Smart-/Spracharbeit wird durch diese abgeschlossene
+App-Oberflächen-Veröffentlichung nicht wieder aufgenommen. Die damalige
+Freigabe ist verbraucht und keine Freigabe für einen weiteren Livegang.
+Siehe `docs/app-live-baseline-20261119.md` für Quellen und Prüfgrenzen.
+
 <!-- BEGIN:nextjs-agent-rules -->
 
 ## This is NOT the Next.js you know
