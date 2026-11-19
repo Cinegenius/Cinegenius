@@ -6,7 +6,7 @@ import { TranslatedText } from "@/components/ContentTranslation";
 import { useCallback, useMemo, useState, type ReactNode } from "react";
 import dynamic from "next/dynamic";
 import Link from "next/link";
-import { ChevronRight, Newspaper } from "lucide-react";
+import { Building2, ChevronRight, Newspaper } from "lucide-react";
 import { useTranslations } from "next-intl";
 import MediaImage from "@/components/MediaImage";
 import DirectoryViewControls, { type DirectoryView } from "@/components/DirectoryViewControls";
@@ -15,6 +15,7 @@ import { useNativeAppAppearance } from "@/lib/use-native-app-appearance";
 import { useViewState } from "@/lib/use-view-state";
 import { hasCoordinates } from "@/lib/location-map";
 import styles from "./NativeNews.module.css";
+import type { PublicOrganization } from "@/lib/organization-discovery";
 
 export type NativeNewsEntry = {
   id: string; href: string; title: string; summary: string | null; image: string | null;
@@ -25,6 +26,7 @@ export type NativeNewsEntry = {
 type Props = {
   controls: NewsBrowseControlsProps; entries: NativeNewsEntry[]; page: number;
   previousHref: string | null; nextHref: string | null; children: ReactNode;
+  organizations?: PublicOrganization[]; organizationsUnavailable?: boolean; organizationsHref?: string;
 };
 function LoadingMap() {
   const t = useTranslations();
@@ -33,11 +35,13 @@ function LoadingMap() {
 const LocationMap = dynamic(() => import("@/components/LocationMap"), { ssr: false, loading: LoadingMap });
 
 /** Existing server-approved page only; presentation never creates or geocodes news. */
-export default function NativeNews({ controls, entries, page, previousHref, nextHref, children }: Props) {
+export default function NativeNews({ controls, entries, page, previousHref, nextHref, children,
+  organizations = [], organizationsUnavailable = false, organizationsHref = "/organizations" }: Props) {
   const native = useNativeAppAppearance();
   const [view, setView] = useViewState<DirectoryView>("news.view", "grid");
   const t = useTranslations("Organizations"), news = useTranslations("NativeNews");
   const discovery = useTranslations("OrganizationDiscovery"), mapText = useTranslations("directoryMap");
+  const common = useTranslations("common");
   const [activeId, setActiveId] = useState<string | null>(null);
   // Keep the whole loaded page beneath the map, including all unlocated entries.
   const retainPage = useCallback(() => {}, []);
@@ -60,6 +64,14 @@ export default function NativeNews({ controls, entries, page, previousHref, next
     <ChevronRight size={17} aria-hidden="true" className={styles.chevron} />
   </Link>;
   return <>
+    {native && <nav className={`site-container ${styles.organizationRail}`} aria-label={discovery("organizations")} data-native-news-organizations>
+      {organizations.map(organization => <Link key={organization.id} className={styles.organizationIcon}
+        href={`/organizations/${encodeURIComponent(organization.slug)}`} aria-label={organization.name} title={organization.name}>
+        {organization.logo_url ? <MediaImage src={organization.logo_url} alt="" width={42} height={42} className={styles.organizationLogo} /> : <Building2 size={23} aria-hidden="true" />}
+      </Link>)}
+      {organizationsUnavailable && <span role="status" className={styles.organizationStatus}>{common("unavailable")}</span>}
+      <Link className={styles.organizationIcon} href={organizationsHref} aria-label={discovery("allOrganizations")} title={discovery("allOrganizations")}><ChevronRight size={21} aria-hidden="true" /></Link>
+    </nav>}
     <NewsBrowseControls {...controls} nativeViewControls={native ? <DirectoryViewControls value={view} onChange={setView} /> : undefined} />
     {native ? <section className={`site-container ${styles.root}`} data-native-news="v1" data-view={view} aria-label={t("newsTitle")}>
       {view === "map" && <section className={styles.map} aria-label={t("newsTitle")}>
@@ -77,7 +89,7 @@ export default function NativeNews({ controls, entries, page, previousHref, next
         {previousHref ? <Link href={previousHref}>← {t("previous")}</Link> : <span />}
         {nextHref && <Link href={nextHref}>{t("next")} →</Link>}
       </nav>
-      <div className={styles.links}><Link href="/organizations">{discovery("allOrganizations")} →</Link><Link href="/organization-dashboard">{t("manageOrganization")} →</Link></div>
+      <div className={styles.links}><Link href={organizationsHref}>{discovery("allOrganizations")} →</Link><Link href="/organization-dashboard">{t("manageOrganization")} →</Link></div>
     </section> : children}
   </>;
 }

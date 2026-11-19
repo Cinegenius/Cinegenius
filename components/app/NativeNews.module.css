@@ -1,4 +1,10 @@
 .root{padding-top:8px;padding-bottom:calc(110px + env(safe-area-inset-bottom,0px));min-width:0}
+.organizationRail{display:flex;align-items:center;gap:9px;min-width:0;overflow-x:auto;overscroll-behavior-x:contain;padding-block:5px 9px;scrollbar-width:none}
+.organizationRail::-webkit-scrollbar{display:none}
+.organizationIcon{display:flex;flex:0 0 54px;align-items:center;justify-content:center;width:54px;height:54px;min-width:44px;min-height:44px;border:1px solid var(--cg-app-border,var(--color-border));border-radius:18px;background:color-mix(in srgb,var(--cg-app-surface,var(--color-bg-secondary)) 82%,transparent);color:var(--cg-app-accent,var(--color-gold));-webkit-backdrop-filter:blur(20px);backdrop-filter:blur(20px)}
+.organizationIcon:focus-visible{outline:2px solid currentColor;outline-offset:-3px}
+.organizationLogo{width:42px;height:42px;object-fit:contain}
+.organizationStatus{flex:0 0 auto;font-size:12px;color:var(--cg-app-muted,var(--color-text-muted))}
 .results{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;min-width:0}
 .results article{min-width:0}
 .card{display:flex;position:relative;flex-direction:column;min-width:0;height:100%;overflow:hidden;border:1px solid var(--cg-app-border,rgba(255,255,255,.13));border-radius:18px;background:var(--cg-app-surface,#1b1d23);color:var(--cg-app-ink,#f4f4f6);text-decoration:none}

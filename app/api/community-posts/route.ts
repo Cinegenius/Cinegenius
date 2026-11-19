@@ -7,6 +7,8 @@ import { rateLimit } from "@/lib/rateLimit";
 import { auth } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from "next/server";
 import { getTranslations as getResponseTranslations } from "next-intl/server";
+import { browseCountryChoice } from "@/lib/browse-country";
+import { UNASSIGNED_COUNTRY } from "@/lib/places/core";
 
 const POST_KINDS = ["question", "recommendation", "request", "offer"] as const;
 type PostKind = (typeof POST_KINDS)[number];
@@ -18,6 +20,10 @@ export async function GET(request: NextRequest) {
   const rawLimit = Number.parseInt(params.get("limit") ?? "3", 10);
   const limit = Number.isFinite(rawLimit) ? Math.min(Math.max(rawLimit, 1), 50) : 3;
   const rawKind = params.get("kind");
+  const country = browseCountryChoice(params.get("country"));
+  if (country === undefined || params.getAll("country").length > 1) {
+    return NextResponse.json({ error: tResponse("Places.invalid") }, { status: 400, headers: { "Cache-Control": "private, no-store, max-age=0" } });
+  }
   const queryText = (params.get("q") ?? "").trim().slice(0, 80);
   const now = new Date().toISOString();
 
@@ -27,16 +33,17 @@ export async function GET(request: NextRequest) {
     .from("community_posts")
     .select("place_country_code,place_region_id,place_city_id,place_city_name,place_region_name,place_status,id,author_id,kind,title,body,city,created_at,expires_at")
     .gt("expires_at", now)
-    .order("created_at", { ascending: false })
-    .limit(limit);
+    .order("created_at", { ascending: false });
 
+  if (country === UNASSIGNED_COUNTRY) query = query.or('place_country_code.is.null,place_country_code.eq.""');
+  else if (country) query = query.eq("place_country_code", country);
   if (rawKind && POST_KINDS.includes(rawKind as PostKind)) query = query.eq("kind", rawKind);
   if (queryText) {
     const safeQuery = queryText.replace(/[^\p{L}\p{N}\s-]/gu, " ").replace(/\s+/g, " ").trim();
     if (safeQuery) query = query.or(`title.ilike.%${safeQuery}%,body.ilike.%${safeQuery}%,city.ilike.%${safeQuery}%${placeSearchFilter(safeQuery)?`,${placeSearchFilter(safeQuery)}`:""}`);
   }
 
-  const { data, error } = await query;
+  const { data, error } = await query.limit(limit);
   if (error) return NextResponse.json({ error: tResponse('System.m_2863c53106dd') }, { status: 500 });
   if (!data?.length) return NextResponse.json({ posts: [] });
 
