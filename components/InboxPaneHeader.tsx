@@ -16,6 +16,15 @@ export default function InboxPaneHeader({ active, action, children }: {
   const inbox = useTranslations("InboxNavigation");
   const nativeAppearance = useNativeAppAppearance();
   const title = active === "friends" ? contacts("title") : active === "notices" ? inbox("notices") : nativeAppearance && active === "groups" ? inbox("groups") : t("messages");
+  if (nativeAppearance) return <header className="shrink-0 space-y-2 border-b border-border px-3 py-2" data-native-inbox-header="v1">
+    <h1 className="sr-only">{title}</h1>
+    <div className="flex min-h-11 min-w-0 items-center gap-1">
+      <InboxNavigation active={active} part="back" />
+      <div className="min-w-0 flex-1 [&>label]:mt-0">{children}</div>
+      {action}
+    </div>
+    <InboxNavigation active={active} part="shortcuts" />
+  </header>;
   return <header className="shrink-0 border-b border-border px-4 py-3">
     <InboxNavigation active={active} />
     <div className="flex min-h-11 min-w-0 items-center justify-between gap-3">

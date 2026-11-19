@@ -1199,3 +1199,17 @@ input:-webkit-autofill:active {
 .smart-plan-editor > summary { list-style: none; }
 .smart-plan-editor > summary::-webkit-details-marker { display: none; }
 .smart-plan-editor-panel { position: absolute; z-index: 40; top: 100%; inset-inline-end: 0; width: min(36rem, calc(100vw - 32px)); max-height: 65dvh; overflow-y: auto; overscroll-behavior: contain; padding: 12px; border: 1px solid var(--color-border); border-radius: 14px; background: var(--color-bg-secondary); }
+
+/* Shared viewport clearance also reaches the sibling Genie launcher. */
+html[data-cg-native-community-appearance="app"] {
+  --cg-app-safe-top:env(safe-area-inset-top,0px);
+  --cg-app-safe-bottom:env(safe-area-inset-bottom,0px);
+  --cg-app-chrome-clearance:calc(var(--cg-app-safe-top) + var(--cg-app-header-height,56px) + 32px);
+  --site-header-height:var(--cg-app-chrome-clearance);
+  --mobile-safe-area-height:var(--cg-app-safe-bottom);
+  --mobile-nav-clearance:calc(96px + var(--cg-app-safe-bottom));
+  --cg-app-genie-clearance:0px;
+  scroll-padding-top:calc(var(--cg-app-chrome-clearance) + var(--cg-app-active-rail-height,0px) + 12px);
+  scroll-padding-bottom:calc(var(--mobile-nav-clearance) + var(--cg-app-genie-clearance) + 12px);
+}
+html[data-cg-native-community-appearance="app"]:has([data-genie-open]) { --cg-app-genie-clearance:104px; }

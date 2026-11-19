@@ -10,6 +10,8 @@ import {
 } from "lucide-react";
 import MediaImage from "@/components/MediaImage";
 import ListingImage from "@/components/ListingImage";
+import { useNativeAppAppearance } from "@/lib/use-native-app-appearance";
+import styles from "./GlobalSearch.module.css";
 import MessagingDialog from "@/components/messaging/MessagingDialog";
 
 type Result = {
@@ -35,6 +37,7 @@ export default function GlobalSearch() {
   const uiLocale = useLocale();
 
   const t = useTranslations("search");
+  const nativeAppearance = useNativeAppAppearance();
   const animals = useTranslations("FilmAnimals");
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
@@ -151,9 +154,9 @@ export default function GlobalSearch() {
   if (!open) return null;
 
   return (
-    <MessagingDialog open={open} title={t("accessibleLabel")} onClose={() => setOpen(false)} compact surface="browse">
+    <MessagingDialog className={styles.dialog} open={open} title={t("accessibleLabel")} onClose={() => setOpen(false)} compact surface="browse">
         {/* Input */}
-        <div className="flex items-center gap-3 px-4 py-3.5 border-b border-border">
+        <div data-global-search-input className="flex items-center gap-3 px-4 py-3.5 border-b border-border">
           {loading
             ? <Loader2 size={18} className="text-gold shrink-0 animate-spin" />
             : <Search size={18} className="text-text-muted shrink-0" />
@@ -165,7 +168,7 @@ export default function GlobalSearch() {
             value={query}
             onChange={(e) => { updateQuery(e.target.value); }}
             onKeyDown={handleKeyDown}
-            placeholder={t("inputPlaceholder")}
+            placeholder={t(nativeAppearance ? "buttonLabel" : "inputPlaceholder")}
             className="min-w-0 flex-1 bg-transparent text-text-primary placeholder:text-text-muted text-base focus:outline-none"
           />
           <div className="flex items-center gap-2 shrink-0">{uiText.rich("Ui.text_0633df8995bbb3", { value1: () => (query && (
@@ -180,8 +183,8 @@ export default function GlobalSearch() {
 
           {/* Empty suggestion chips */}
           {!query && (
-            <div className="px-4 py-8 text-center space-y-4">
-              <p className="text-xs text-text-muted">{t("hint")}</p>
+            <div data-global-search-suggestions className="px-4 py-8 text-center space-y-4">
+              <p data-global-search-hint className="text-xs text-text-muted">{t("hint")}</p>
               <div className="flex flex-wrap justify-center gap-2">
                 {[t("suggestion1"), t("suggestion2"), t("suggestion3"), t("suggestion4")].map((term) => (
                   <button key={term} onClick={() => updateQuery(term)}
@@ -242,8 +245,8 @@ export default function GlobalSearch() {
                         </div>
                       )}
                       <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium text-text-primary truncate">{r.title}</p>
-                        <p className="text-xs text-text-muted truncate">{r.subtitle}</p>
+                        <p data-global-search-copy className="text-sm font-medium text-text-primary truncate">{r.title}</p>
+                        <p data-global-search-copy className="text-xs text-text-muted truncate">{r.subtitle}</p>
                       </div>
                       <div className="flex items-center gap-2 shrink-0">
                         {isProfile && r.available !== null && (

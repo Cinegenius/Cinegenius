@@ -1,0 +1,24 @@
+:global(html[data-cg-native-community-appearance="app"]) .results { display:grid; min-width:0; gap:8px; margin:0; padding:0; list-style:none; }
+:global(html[data-cg-native-community-appearance="app"]) .list { grid-template-columns:minmax(0,1fr); }
+:global(html[data-cg-native-community-appearance="app"]) .grid { grid-template-columns:repeat(2,minmax(0,1fr)); }
+:global(html[data-cg-native-community-appearance="app"]) .item { --project-ink:hsl(var(--project-hue) var(--project-saturation) 82%); min-width:0; }
+:global(html[data-cg-native-community-appearance="app"][data-cg-app-theme="pure"]) .item { --project-ink:hsl(var(--project-hue) var(--project-saturation) 20%); }
+:global(html[data-cg-native-community-appearance="app"]) .card { display:flex; min-width:0; min-height:44px; height:100%; gap:10px; padding:10px; border:1px solid color-mix(in srgb,var(--cg-app-border,var(--color-border)) 80%,hsl(var(--project-hue) var(--project-saturation) 65%) 20%); border-radius:18px; background:linear-gradient(135deg,hsl(var(--project-hue) var(--project-saturation) 62% / .055),transparent 70%),var(--cg-app-surface,var(--color-bg-secondary)); color:var(--cg-app-ink,var(--color-text-primary)); text-decoration:none; }
+:global(html[data-cg-native-community-appearance="app"]) .poster { position:relative; display:flex; flex:0 0 44px; align-items:center; justify-content:center; width:44px; height:60px; overflow:hidden; border-radius:8px; background:hsl(var(--project-hue) var(--project-saturation) 60% / .10); color:var(--project-ink); }
+:global(html[data-cg-native-community-appearance="app"]) .posterImage { object-fit:contain; }
+:global(html[data-cg-native-community-appearance="app"]) .fallback { display:flex; align-items:center; justify-content:center; flex-direction:column; gap:3px; padding:4px; font-size:12px; font-weight:600; line-height:15px; }
+:global(html[data-cg-native-community-appearance="app"]) .body { display:flex; flex:1; min-width:0; flex-direction:column; gap:4px; }
+:global(html[data-cg-native-community-appearance="app"]) .type { display:flex; align-items:flex-start; gap:4px; color:var(--project-ink); font-size:11px; font-weight:600; line-height:15px; }
+:global(html[data-cg-native-community-appearance="app"]) .type svg { flex-shrink:0; margin-top:1px; }
+:global(html[data-cg-native-community-appearance="app"]) :is(.type > span,.title,.facts > span,.director,.credits) { min-width:0; max-width:100%; white-space:normal; overflow:visible; overflow-wrap:anywhere; text-overflow:clip; -webkit-line-clamp:unset; }
+:global(html[data-cg-native-community-appearance="app"]) .title { margin:0; color:var(--cg-app-ink,var(--color-text-primary)); font-size:14px; font-weight:600; line-height:19px; }
+:global(html[data-cg-native-community-appearance="app"]) .facts { display:flex; flex-wrap:wrap; gap:2px 8px; color:var(--cg-app-muted,var(--color-text-muted)); font-size:12px; line-height:17px; font-variant-numeric:tabular-nums; }
+:global(html[data-cg-native-community-appearance="app"]) :is(.director,.credits) { color:var(--cg-app-muted,var(--color-text-muted)); font-size:12px; line-height:17px; }
+:global(html[data-cg-native-community-appearance="app"]) .label { font-weight:500; }
+:global(html[data-cg-native-community-appearance="app"]) .grid .card { flex-direction:column; gap:8px; padding:0; overflow:hidden; }
+:global(html[data-cg-native-community-appearance="app"]) .grid .poster { flex-basis:auto; width:100%; height:auto; min-height:76px; aspect-ratio:16/9; border-radius:17px 17px 0 0; }
+:global(html[data-cg-native-community-appearance="app"]) .grid .fallback { gap:5px; font-size:19px; line-height:23px; }
+:global(html[data-cg-native-community-appearance="app"]) .grid .body { padding:0 10px 10px; }
+:global(html[data-cg-native-community-appearance="app"]) .card:focus-visible { outline:2px solid var(--cg-app-accent,var(--color-gold)); outline-offset:2px; }
+.srOnly { position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip-path:inset(50%); white-space:nowrap; border:0; }
+@media(min-width:700px) { :global(html[data-cg-native-community-appearance="app"]) .grid { grid-template-columns:repeat(3,minmax(0,1fr)); } }
