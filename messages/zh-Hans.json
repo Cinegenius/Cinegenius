@@ -13540,5 +13540,12 @@
     "deviceDescription": "管理此设备上的通知。",
     "messages": "消息",
     "notices": "通知"
+  },
+  "NativeBrowse": {
+    "projectMapUnavailable": "尚未添加项目地点。请使用卡片或列表视图。"
+  },
+  "NativeNews": {
+    "pageScope": "第{page}页 · 已加载{loaded}条，共{total}条",
+    "mapScope": "本页{loaded}条内容中有{mapped}条具有已知地点。其他内容仍显示在列表中。"
   }
 }

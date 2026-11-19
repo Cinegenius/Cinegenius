@@ -13540,5 +13540,12 @@
     "deviceDescription": "Spravuj oznámení na tomto zařízení.",
     "messages": "Zprávy",
     "notices": "Oznámení"
+  },
+  "NativeBrowse": {
+    "projectMapUnavailable": "Místa projektů zatím nejsou uvedena. Použij zobrazení dlaždic nebo seznam."
+  },
+  "NativeNews": {
+    "pageScope": "Strana {page} · načteno {loaded} z {total} příspěvků",
+    "mapScope": "U {mapped} z {loaded} příspěvků na této straně je známé místo. Ostatní zůstávají v seznamu."
   }
 }

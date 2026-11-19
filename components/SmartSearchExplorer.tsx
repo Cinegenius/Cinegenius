@@ -10,6 +10,7 @@ import DirectoryViewControls, { type DirectoryView } from "./DirectoryViewContro
 import { useNativeAppAppearance } from "@/lib/use-native-app-appearance";
 import { nativeSmartResultAreas, nativeSmartView } from "@/lib/native-smart-controls";
 import NativeSmartAreas from "./app/NativeSmartAreas";
+import NativeBrowseToolbar, { NativeBrowseQuickFilter } from "./app/NativeBrowseToolbar";
 import nativeStyles from "./app/NativeSmartAreas.module.css";
 import ResultCard from "./SearchResultCard";
 import { searchGroupKey, type SearchGroup, type SearchPlan } from "@/lib/unified-search";
@@ -161,19 +162,29 @@ export default function SmartSearchExplorer({ plan, initialGroups, initialMapGro
   const facetName = (kind: "departments" | "marketplace", id: string) => kind === "departments"
     ? taxonomy.has(`departments.${id}`) ? taxonomy(`departments.${id}`) : id
     : marketplace.has(`categories.${id}`) ? marketplace(`categories.${id}`) : id;
+  const moreAction = <button ref={filterTrigger} type="button" className="smart-filter-trigger" aria-label={t("discovery.filterTitle")} aria-expanded={filtersOpen} aria-controls={filterId} onClick={() => setFiltersOpen(value => !value)}>
+    <SlidersHorizontal size={18} aria-hidden="true" />{filtered && <span className="smart-filter-dot" aria-hidden="true" />}
+  </button>;
+  const nativeQuickFilters = nativeAppearance ? (["departments", "marketplace"] as const)
+    .filter(kind => available[kind].length > 0 || filters[kind].length > 0)
+    .map(kind => <NativeBrowseQuickFilter key={kind} label={ui(kind === "departments" ? "creators.deptFilter" : "MarketplaceNavigation.category")}
+      value={filters[kind].length > 1 ? "__selection" : filters[kind][0] ?? ""}
+      options={[{ value: "", label: t("discovery.all") },
+        ...(filters[kind].length > 1 ? [{ value: "__selection", label: t("discovery.activeFilters"), disabled: true }] : []),
+        ...[...new Set([...available[kind], ...filters[kind]])].map(id => ({ value: id, label: facetName(kind, id), disabled: !available[kind].includes(id) }))]}
+      onChange={value => { if (value !== "__selection") setFilters(current => ({ ...current, [kind]: value ? [value] : [] })); }} />) : [];
 
   return <div className="smart-explorer" data-smart-explorer data-map-open={mapOpen}>
     {nativeAppearance && <NativeSmartAreas available={areas} hidden={filters.hiddenAreas} onChange={hiddenAreas => setFilters(value => ({ ...value, hiddenAreas }))} />}
-    <div className="smart-result-toolbar">
+    {nativeAppearance ? <NativeBrowseToolbar count={count} countLabel={t("discovery.loaded", { count })} filters={nativeQuickFilters}
+      moreAction={moreAction} viewControls={<DirectoryViewControls value={view} onChange={setView} views={["grid", "list", "map"]} />} /> : <div className="smart-result-toolbar">
       <BrowseResultCount count={count} label={t("discovery.loaded", { count })} />
-      {!nativeAppearance && <BrowseSelect label={t("allAreas")} value={areaValue} className="smart-area-select" triggerClassName="smart-area-trigger"
+      <BrowseSelect label={t("allAreas")} value={areaValue} className="smart-area-select" triggerClassName="smart-area-trigger"
         options={[{ value: "all", label: t("allAreas") }, ...areas.map(area => ({ value: area, label: t(`areas.${area}`) })), ...(areaValue === "selection" ? [{ value: "selection", label: t("discovery.activeFilters"), disabled: true }] : [])]}
-        onChange={area => setFilters(value => ({ ...value, hiddenAreas: area === "all" ? [] : areas.filter(item => item !== area) }))} />}
-      <button ref={filterTrigger} type="button" className="smart-filter-trigger" aria-label={t("discovery.filterTitle")} aria-expanded={filtersOpen} aria-controls={filterId} onClick={() => setFiltersOpen(value => !value)}>
-        <SlidersHorizontal size={18} aria-hidden="true" />{filtered && <span className="smart-filter-dot" aria-hidden="true" />}
-      </button>
-      <DirectoryViewControls value={nativeAppearance ? view : mapOpen ? "map" : "list"} onChange={setView} views={nativeAppearance ? ["grid", "list", "map"] : ["list", "map"]} />
-    </div>
+        onChange={area => setFilters(value => ({ ...value, hiddenAreas: area === "all" ? [] : areas.filter(item => item !== area) }))} />
+      {moreAction}
+      <DirectoryViewControls value={mapOpen ? "map" : "list"} onChange={setView} views={["list", "map"]} />
+    </div>}
     <section id={filterId} hidden={!filtersOpen} onKeyDown={event => { if (event.key === "Escape") { event.stopPropagation(); closeFilters(); } }} className="smart-filter-panel space-y-3 rounded-xl border border-border bg-bg-secondary p-3 sm:p-4" aria-label={t("discovery.filterTitle")}>
 
       <div className="flex flex-wrap items-center gap-2">

@@ -13540,5 +13540,12 @@
     "deviceDescription": "この端末の通知を管理します。",
     "messages": "メッセージ",
     "notices": "通知"
+  },
+  "NativeBrowse": {
+    "projectMapUnavailable": "プロジェクトの場所はまだ登録されていません。カード表示またはリスト表示をご利用ください。"
+  },
+  "NativeNews": {
+    "pageScope": "{page}ページ · 全{total}件中{loaded}件を読み込み済み",
+    "mapScope": "このページの{loaded}件中{mapped}件に場所が登録されています。その他の項目もリストに表示されます。"
   }
 }

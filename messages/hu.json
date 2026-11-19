@@ -13540,5 +13540,12 @@
     "deviceDescription": "Értesítések kezelése ezen az eszközön.",
     "messages": "Üzenetek",
     "notices": "Értesítések"
+  },
+  "NativeBrowse": {
+    "projectMapUnavailable": "A projektek helyszínei még nincsenek megadva. Használd a kártya- vagy listanézetet."
+  },
+  "NativeNews": {
+    "pageScope": "{page}. oldal · {loaded} bejegyzés betöltve, összesen {total}",
+    "mapScope": "Az oldalon lévő {loaded} bejegyzés közül {mapped} helyszíne ismert. A többi a listában marad."
   }
 }

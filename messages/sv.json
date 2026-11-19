@@ -13540,5 +13540,12 @@
     "deviceDescription": "Hantera notiser på den här enheten.",
     "messages": "Meddelanden",
     "notices": "Aviseringar"
+  },
+  "NativeBrowse": {
+    "projectMapUnavailable": "Projektens platser har inte angetts än. Använd kort- eller listvyn."
+  },
+  "NativeNews": {
+    "pageScope": "Sida {page} · {loaded} av {total} inlägg inlästa",
+    "mapScope": "{mapped} av {loaded} inlägg på den här sidan har en känd plats. Övriga finns kvar i listan."
   }
 }

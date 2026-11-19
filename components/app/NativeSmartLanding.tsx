@@ -84,7 +84,7 @@ function AccountNativeSmartLanding({ accountId, loaded, allowed, onUnavailable }
   return <DirectoryPage area="crew"><main className={`smart-search-page ${styles.landing}`} data-native-smart-landing>
     <div className="site-container">
       <h1 className="sr-only">{search("tab")}</h1>
-      <form className={`smart-search-input ${styles.search}`} onSubmit={event => {
+      <form className={`smart-search-input native-browse-search ${styles.search}`} onSubmit={event => {
         event.preventDefault(); if (!input.trim()) return;
         request.current?.abort();
         router.push(`/search?${new URLSearchParams({ smart: "1", q: input.trim() })}`, { scroll: false });

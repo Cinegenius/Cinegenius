@@ -13540,5 +13540,12 @@
     "deviceDescription": "Zarządzaj powiadomieniami na tym urządzeniu.",
     "messages": "Wiadomości",
     "notices": "Powiadomienia"
+  },
+  "NativeBrowse": {
+    "projectMapUnavailable": "Lokalizacje projektów nie zostały jeszcze dodane. Użyj widoku kafelków lub listy."
+  },
+  "NativeNews": {
+    "pageScope": "Strona {page} · wczytano {loaded} z {total} wpisów",
+    "mapScope": "{mapped} z {loaded} wpisów na tej stronie ma znaną lokalizację. Pozostałe są nadal na liście."
   }
 }

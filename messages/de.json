@@ -13540,5 +13540,12 @@
     "deviceDescription": "Mitteilungen auf diesem Gerät verwalten.",
     "messages": "Nachrichten",
     "notices": "Benachrichtigungen"
+  },
+  "NativeBrowse": {
+    "projectMapUnavailable": "Projektstandorte sind noch nicht hinterlegt. Nutze die Kachel- oder Listenansicht."
+  },
+  "NativeNews": {
+    "pageScope": "Seite {page} · {loaded} von {total} Beiträgen geladen",
+    "mapScope": "{mapped} von {loaded} Beiträgen dieser Seite sind verortet. Die übrigen bleiben in der Liste."
   }
 }

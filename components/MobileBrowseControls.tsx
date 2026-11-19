@@ -5,6 +5,8 @@ import { useTranslations } from "next-intl";
 import { cloneElement,isValidElement,useEffect,useRef,useState,type ReactNode } from "react";
 import BrowseSelect from "@/components/BrowseSelect";
 import BrowseResultCount from "@/components/BrowseResultCount";
+import NativeBrowseToolbar, { NativeBrowseQuickFilter } from "@/components/app/NativeBrowseToolbar";
+import { useNativeAppAppearance } from "@/lib/use-native-app-appearance";
 import { useSwipeDismiss } from "@/lib/use-swipe-dismiss";
 import { normalizeOccupation } from "@/lib/gripTaxonomy";
 
@@ -29,6 +31,8 @@ type MobileBrowseControlsProps = {
   resultCount: number | null;
   resultActions?: ReactNode;
   viewControls?: ReactNode;
+  nativeViewControls?: ReactNode;
+  nativeQuickFilters?: ReactNode[];
   filterCount: number;
   chips?: BrowseChip[];
   onReset: () => void;
@@ -43,18 +47,21 @@ type MobileBrowseControlsProps = {
 export default function MobileBrowseControls({
   query, onQueryChange, searchPlaceholder, sortValue, sortOptions, onSortChange,
   categoryLabel, allCategoryLabel, categories, categoryValue, onCategoryChange, categoryPlacement = "filters",
-  resultSummary, resultCount, resultActions, viewControls, filterCount, chips = [], onReset, resetLabel, showResultsLabel, preference, onSearch, children,
+  resultSummary, resultCount, resultActions, viewControls, nativeViewControls, nativeQuickFilters, filterCount, chips = [], onReset, resetLabel, showResultsLabel, preference, onSearch, children,
 }: MobileBrowseControlsProps) {
   const uiText = useTranslations();
+  const nativeAppearance = useNativeAppAppearance();
 
   const [open, setOpen] = useState(false);
   const dialog = useRef<HTMLDialogElement>(null);
   const panel = useRef<HTMLElement>(null);
+  const filterTrigger = useRef<HTMLButtonElement>(null);
   useSwipeDismiss(panel, open, () => setOpen(false));
 
   useEffect(() => {
     const element = dialog.current;
     if (!open || !element) return;
+    const nativeTrigger = filterTrigger.current;
     const previous = document.body.style.overflow;
     const previousFocus = document.activeElement;
     document.body.style.overflow = "hidden";
@@ -66,6 +73,22 @@ export default function MobileBrowseControls({
       element.style.top = `${viewport?.offsetTop ?? 0}px`;
       element.style.height = `${height}px`;
       element.style.setProperty("--browse-panel-height", `${height * 0.88}px`);
+      if (nativeAppearance && nativeTrigger) {
+        const anchor = nativeTrigger.getBoundingClientRect();
+        const top = viewport?.offsetTop ?? 0;
+        const left = viewport?.offsetLeft ?? 0;
+        const width = Math.min(328, (viewport?.width ?? window.innerWidth) - 24);
+        const below = top + height - anchor.bottom - 20;
+        const above = anchor.top - top - 20;
+        const down = below >= Math.min(320, above);
+        const room = Math.max(88, down ? below : above);
+        const compactViewport = Math.max(below, above) < 160;
+        element.style.setProperty("--native-filter-width", `${width}px`);
+        element.style.setProperty("--native-filter-left", `${Math.max(left + 12, Math.min(anchor.right - width, left + (viewport?.width ?? window.innerWidth) - width - 12))}px`);
+        element.style.setProperty("--native-filter-top", `${compactViewport ? top + 12 : down ? anchor.bottom + 8 : anchor.top - 8}px`);
+        element.style.setProperty("--native-filter-height", `${compactViewport ? Math.max(88, height - 24) : Math.min(420, room)}px`);
+        element.style.setProperty("--native-filter-shift", compactViewport || down ? "none" : "translateY(-100%)");
+      }
     };
     const back = () => setOpen(false);
     resize();
@@ -80,35 +103,42 @@ export default function MobileBrowseControls({
       viewport?.removeEventListener("scroll", resize);
       window.removeEventListener("resize", resize);
       window.removeEventListener("popstate", back);
-      if (previousFocus instanceof HTMLElement && previousFocus.isConnected) previousFocus.focus({preventScroll: true});
+      const restoreFocus = nativeAppearance && nativeTrigger?.isConnected ? nativeTrigger : previousFocus;
+      if (restoreFocus instanceof HTMLElement && restoreFocus.isConnected) restoreFocus.focus({preventScroll: true});
     };
-  }, [open]);
+  }, [open, nativeAppearance]);
 
   return (
     <section className="mobile-browse-controls" aria-label={uiText("Ui.text_18e437adcea246")}>
       <div className="site-container mobile-browse-controls__inner">
-        <label className="mobile-browse-search">
+        <label className={`mobile-browse-search${nativeAppearance ? " native-browse-search" : ""}`}>
           <Search size={18} aria-hidden="true" />
           <span className="sr-only">{searchPlaceholder}</span>
-          <input type="search" value={query} onChange={(event) => onQueryChange(event.target.value)} placeholder={searchPlaceholder} onKeyDown={event => { if (event.key === "Enter" && onSearch) { event.preventDefault(); onSearch(); } }} />
-          {onSearch && <button type="button" aria-label={uiText("Organizations.search")} onClick={onSearch}><Search size={18} /></button>}
+          <input type="search" value={query} onChange={(event) => onQueryChange(event.target.value)} placeholder={nativeAppearance ? uiText("UnifiedSearch.placeholder") : searchPlaceholder} onKeyDown={event => { if (event.key === "Enter" && onSearch) { event.preventDefault(); onSearch(); } }} />
+          {onSearch && <button data-search-submit type="button" aria-label={uiText("Organizations.search")} onClick={onSearch}><Search size={18} /></button>}
           {query && <button type="button" aria-label={uiText("locations.landingClear")} onClick={() => onQueryChange("")}><X size={17} /></button>}
         </label>
 
-        <div className="mobile-browse-controls__row">
+        {!nativeAppearance && <div className="mobile-browse-controls__row">
           <button type="button" className="mobile-browse-action" onClick={() => setOpen(true)} aria-haspopup="dialog" aria-expanded={open}>{uiText.rich("Ui.text_91811d44ec1fe7", { part1: () => (<SlidersHorizontal size={16} />), part2: chunks => (<span>{chunks}</span>), value3: () => (filterCount > 0 && <span className="mobile-browse-count">{filterCount}</span>) })}</button>
           <BrowseSelect label={uiText("creators.sort")} value={sortValue} options={sortOptions} onChange={onSortChange}
             icon={<ArrowUpDown size={15} />} className="flex-1" triggerClassName="mobile-browse-sort w-full text-left" />
           {preference}
-        </div>
+        </div>}
 
-        {categoryPlacement === "toolbar" && <label className="mobile-browse-category">
+        {!nativeAppearance && categoryPlacement === "toolbar" && <label className="mobile-browse-category">
           <span>{categoryLabel}</span>
           <MobileFilterSelect label={categoryLabel} value={categoryValue} onChange={onCategoryChange} options={categories} placeholder={allCategoryLabel} />
         </label>}
 
         <div className="mobile-browse-summary">
-          {viewControls ? <div className="mobile-browse-summary-row">{resultActions ? <div className="mobile-browse-summary-with-actions"><BrowseResultCount count={resultCount} label={resultSummary} /><div className="mobile-browse-result-actions">{resultActions}</div></div> : <BrowseResultCount count={resultCount} label={resultSummary} />}{viewControls}</div> : <BrowseResultCount count={resultCount} label={resultSummary} />}
+          {nativeAppearance ? <NativeBrowseToolbar count={resultCount} countLabel={resultSummary} viewControls={nativeViewControls ?? viewControls}
+            filters={nativeQuickFilters ?? [
+              ...(categories.length || categoryValue ? [<NativeBrowseQuickFilter key="category" label={categoryLabel} value={categoryValue} onChange={onCategoryChange} options={[{value:"",label:allCategoryLabel},...categories]} />] : []),
+              <NativeBrowseQuickFilter key="sort" label={uiText("creators.sort")} value={sortValue} options={sortOptions} onChange={onSortChange} />,
+            ]}
+            moreAction={<button ref={filterTrigger} type="button" onClick={() => setOpen(true)} aria-label={uiText("locations.filterBtn")} aria-haspopup="dialog" aria-expanded={open}><SlidersHorizontal size={17} aria-hidden="true" />{filterCount > 0 && <span className="native-browse-filter-dot" aria-hidden="true" />}</button>} />
+            : viewControls ? <div className="mobile-browse-summary-row">{resultActions ? <div className="mobile-browse-summary-with-actions"><BrowseResultCount count={resultCount} label={resultSummary} /><div className="mobile-browse-result-actions">{resultActions}</div></div> : <BrowseResultCount count={resultCount} label={resultSummary} />}{viewControls}</div> : <BrowseResultCount count={resultCount} label={resultSummary} />}
           {chips.length > 0 && (
             <div className="mobile-browse-chips" aria-label={uiText("Ui.text_75e581194056a5")}>
               <button type="button" className="min-h-11 px-2 text-xs underline" onClick={onReset}>{resetLabel}</button>
@@ -137,7 +167,19 @@ export default function MobileBrowseControls({
       </div>
 
       {open && (
-        <dialog ref={dialog} className="mobile-filter-dialog" aria-modal="true" aria-label={uiText("locations.filterBtn")} onCancel={event => { event.preventDefault(); setOpen(false); }}>
+        <dialog ref={dialog} className="mobile-filter-dialog" data-native-browse-dialog={nativeAppearance ? "v1" : undefined} aria-modal="true" aria-label={uiText("locations.filterBtn")} onCancel={event => { event.preventDefault(); setOpen(false); }}
+          onKeyDown={event => {
+            if (!nativeAppearance || event.key !== "Tab" || event.defaultPrevented) return;
+            // WebKit can otherwise send Tab to browser chrome when its system
+            // button-navigation preference is off. Keep this modal usable too.
+            const targets = Array.from(event.currentTarget.querySelectorAll<HTMLElement>("button,a[href],input,select,textarea,[tabindex]"))
+              .filter(element => element.tabIndex >= 0 && !element.matches(":disabled") && !element.closest("[hidden],[inert]") && element.getClientRects().length > 0);
+            if (!targets.length) return;
+            const current = targets.indexOf(document.activeElement as HTMLElement);
+            const index = current < 0 ? (event.shiftKey ? targets.length - 1 : 0) : (current + (event.shiftKey ? -1 : 1) + targets.length) % targets.length;
+            event.preventDefault();
+            targets[index].focus();
+          }}>
           <button tabIndex={-1} className="mobile-filter-dialog__backdrop" aria-label={uiText("Ui.text_5f423bd7da0e95")} onClick={() => setOpen(false)} />
           <section ref={panel} className="mobile-filter-panel browse-popup-surface">
             <div data-swipe-dismiss-handle className="mobile-filter-panel__handle" />
@@ -146,6 +188,11 @@ export default function MobileBrowseControls({
               <button data-filter-close type="button" aria-label={uiText("ProfilePhotoCrop.close")} onClick={() => setOpen(false)}><X size={20} /></button>
             </header>
             <div className="mobile-filter-panel__content">
+              {nativeAppearance && <>
+                {sortOptions.length > 1 && <MobileFilterField label={uiText("creators.sort")}><MobileFilterSelect label={uiText("creators.sort")} value={sortValue} options={sortOptions} onChange={onSortChange} placeholder={uiText("creators.sort")} /></MobileFilterField>}
+                {preference}
+                {resultActions && <div className="mobile-browse-result-actions">{resultActions}</div>}
+              </>}
               {(categories.length > 0 || categoryValue) && <label className="mobile-filter-field">
                 <span>{categoryLabel}</span>
                 <MobileFilterSelect label={categoryLabel} value={categoryValue} onChange={onCategoryChange} options={categories} placeholder={allCategoryLabel} />

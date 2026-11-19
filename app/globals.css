@@ -1,5 +1,29 @@
 @import "tailwindcss";
 
+/* Native browse controls own their compact rail; the ordinary site is unchanged. */
+html[data-cg-native-community-appearance="app"] .native-browse-filter-dot { position:absolute; top:8px; right:8px; width:5px; height:5px; border-radius:50%; background:currentColor; }
+html[data-cg-native-community-appearance="app"] .mobile-filter-dialog[data-native-browse-dialog="v1"] .mobile-filter-panel {
+  position:fixed; inset:auto; left:var(--native-filter-left,12px); top:var(--native-filter-top,100px);
+  width:var(--native-filter-width,calc(100vw - 24px)); max-width:none; height:auto; max-height:var(--native-filter-height,60dvh);
+  margin:0; border-radius:22px; overflow:hidden; transform:var(--native-filter-shift,none);
+}
+html[data-cg-native-community-appearance="app"] .mobile-filter-dialog[data-native-browse-dialog="v1"] .mobile-filter-panel__handle { display:none; }
+html[data-cg-native-community-appearance="app"] .mobile-filter-dialog[data-native-browse-dialog="v1"] .mobile-filter-panel__header { min-height:44px; padding:4px 8px 4px 12px; }
+html[data-cg-native-community-appearance="app"] .mobile-filter-dialog[data-native-browse-dialog="v1"] .mobile-filter-panel__header h2 { font-size:14px; }
+html[data-cg-native-community-appearance="app"] .mobile-filter-dialog[data-native-browse-dialog="v1"] .mobile-filter-panel__content { min-height:0; padding:10px; gap:10px; overflow-y:auto; overscroll-behavior:contain; }
+html[data-cg-native-community-appearance="app"] .mobile-filter-dialog[data-native-browse-dialog="v1"] .mobile-filter-panel__footer { padding:8px; gap:6px; }
+html[data-cg-native-community-appearance="app"] .mobile-filter-dialog[data-native-browse-dialog="v1"] .mobile-filter-dialog__backdrop { background:rgb(0 0 0 / 25%); }
+html[data-cg-native-community-appearance="app"] .smart-explorer { grid-template-columns:minmax(0,1fr); gap:8px; }
+html[data-cg-native-community-appearance="app"] .smart-explorer > * { grid-column:1; }
+html[data-cg-native-community-appearance="app"] .smart-explorer > .smart-map-panel { grid-column:1; grid-row:auto; position:relative; top:auto; }
+html[data-cg-native-community-appearance="app"] .native-browse-search {
+  display:flex; align-items:center; gap:4px; min-width:0; min-height:52px; padding:4px 4px 4px 12px;
+  border:1px solid var(--color-border); border-radius:27px; background:color-mix(in srgb,var(--color-bg-secondary) 78%,transparent);
+  box-shadow:0 8px 26px #0000001a,inset 0 1px 0 #ffffff14; -webkit-backdrop-filter:blur(20px) saturate(135%); backdrop-filter:blur(20px) saturate(135%);
+}
+html[data-cg-native-community-appearance="app"] .native-browse-search input { flex:1; width:100%; min-width:0; min-height:44px; padding:8px 6px; font-size:16px; }
+html[data-cg-native-community-appearance="app"] .native-browse-search :is(button[type="submit"],button[data-search-submit]) { display:grid; place-items:center; flex:0 0 44px; width:44px; height:44px; min-width:44px; min-height:44px; border-radius:50%; background:var(--color-gold); color:var(--color-bg-primary); }
+
 /* The approved directory background keeps the homepage's darkness. A small crop
    also makes left/right framing visible on wide screens without changing home. */
 .directory-page-backdrop img {

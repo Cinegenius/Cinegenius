@@ -13540,5 +13540,12 @@
     "deviceDescription": "Gestionar notificaciones en este dispositivo.",
     "messages": "Mensajes",
     "notices": "Notificaciones"
+  },
+  "NativeBrowse": {
+    "projectMapUnavailable": "Aún no se han añadido las ubicaciones de los proyectos. Usa la vista de tarjetas o lista."
+  },
+  "NativeNews": {
+    "pageScope": "Página {page} · {loaded} de {total} publicaciones cargadas",
+    "mapScope": "{mapped} de las {loaded} publicaciones de esta página tienen ubicación. Las demás siguen en la lista."
   }
 }

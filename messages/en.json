@@ -13540,5 +13540,12 @@
     "deviceDescription": "Manage notifications on this device.",
     "messages": "Messages",
     "notices": "Notifications"
+  },
+  "NativeBrowse": {
+    "projectMapUnavailable": "Project locations have not been added yet. Use grid or list view."
+  },
+  "NativeNews": {
+    "pageScope": "Page {page} · {loaded} of {total} entries loaded",
+    "mapScope": "{mapped} of {loaded} entries on this page have a known location. The others remain in the list."
   }
 }

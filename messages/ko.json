@@ -13540,5 +13540,12 @@
     "deviceDescription": "이 기기의 알림을 관리합니다.",
     "messages": "메시지",
     "notices": "알림"
+  },
+  "NativeBrowse": {
+    "projectMapUnavailable": "프로젝트 위치가 아직 등록되지 않았습니다. 카드 또는 목록 보기를 이용하세요."
+  },
+  "NativeNews": {
+    "pageScope": "{page}페이지 · 전체 {total}개 중 {loaded}개 불러옴",
+    "mapScope": "이 페이지의 {loaded}개 중 {mapped}개에 위치 정보가 있습니다. 나머지는 목록에 계속 표시됩니다."
   }
 }

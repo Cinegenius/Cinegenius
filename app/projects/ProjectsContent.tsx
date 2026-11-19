@@ -6,6 +6,8 @@ import { useBrowseGeography } from "@/lib/use-browse-geography";
 
 import MobileBrowseControls,{ MobileFilterField,MobileFilterSelect,type BrowseChip } from "@/components/MobileBrowseControls";
 import ProjectBrowseResults from "@/components/ProjectBrowseResults";
+import DirectoryViewControls from "@/components/DirectoryViewControls";
+import { NativeBrowseQuickFilter } from "@/components/app/NativeBrowseToolbar";
 import { matchesPlace,browsePlaceOptions as placeOptions, UNASSIGNED_COUNTRY } from "@/lib/places/core";
 import { PROJECT_CATEGORIES,projectCategoryForType,type ProjectCategoryId } from "@/lib/project-category-filter";
 import { normalizedCatalogueSearch,projectTypeLabel,projectTypeOptions } from "@/lib/project-type-labels";
@@ -71,6 +73,11 @@ export default function ProjectsContent({ projects, category = null }: { project
       <MobileBrowseControls preference={<BrowseGeography geography={geography} />} query={query} onQueryChange={setQuery} searchPlaceholder={t("searchPlaceholder")}
       sortValue={sort} sortOptions={sortOptions} onSortChange={value => { geography.setEnabled(false); setSort(value as ProjectSort); }}
       categoryLabel={ui("props.categoryBtn")} allCategoryLabel={ui("common.allProjects")} categories={categories} categoryValue={category ?? ""} onCategoryChange={changeCategory}
+      nativeViewControls={<DirectoryViewControls value={view} onChange={value => { if (value !== "map") setView(value); }} unavailable={{map:ui("NativeBrowse.projectMapUnavailable")}} />}
+      nativeQuickFilters={[
+        <NativeBrowseQuickFilter key="country" label={ui("Places.country")} value={country} onChange={setCountry} options={[{value:"",label:ui("Places.allCountries")},...placeOptions(categoryProjects,"country",locale).map(option => ({value:option.value,label:option.value === UNASSIGNED_COUNTRY ? ui("Places.countryUnassigned") : ui.has(`CountryNames.${option.value}`) ? ui(`CountryNames.${option.value}`) : option.label}))]} />,
+        <NativeBrowseQuickFilter key="type" label={t("filterType")} value={typeFilter} onChange={setTypeFilter} options={[{value:"",label:ui("common.all")},...types]} />,
+      ]}
       resultCount={filtered.length} resultSummary={t("resultsCount", { count: filtered.length })} viewControls={views} filterCount={chips.length} chips={chips} onReset={reset} resetLabel={t("resetFilters")} showResultsLabel={ui("Ui.text_52ca04e867ebdc", { value1: String(filtered.length) })}>
       <CountrySelect popup value={country} onChange={setCountry} codes={placeOptions(categoryProjects, "country", locale).map(option => option.value)} />
       {fields.map(field => <MobileFilterField key={field.label} label={field.label}><MobileFilterSelect value={field.value} onChange={field.onChange} options={field.options} placeholder={ui("common.all")} label={field.label} /></MobileFilterField>)}

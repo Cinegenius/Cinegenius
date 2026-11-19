@@ -13540,5 +13540,12 @@
     "deviceDescription": "Gérer les notifications sur cet appareil.",
     "messages": "Messages",
     "notices": "Notifications"
+  },
+  "NativeBrowse": {
+    "projectMapUnavailable": "Les lieux des projets ne sont pas encore renseignés. Utilisez les cartes ou la liste."
+  },
+  "NativeNews": {
+    "pageScope": "Page {page} · {loaded} publications chargées sur {total}",
+    "mapScope": "{mapped} des {loaded} publications de cette page ont un lieu connu. Les autres restent dans la liste."
   }
 }

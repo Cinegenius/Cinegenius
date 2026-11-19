@@ -13540,5 +13540,12 @@
     "deviceDescription": "Meldingen op dit apparaat beheren.",
     "messages": "Berichten",
     "notices": "Meldingen"
+  },
+  "NativeBrowse": {
+    "projectMapUnavailable": "Projectlocaties zijn nog niet ingevuld. Gebruik de tegel- of lijstweergave."
+  },
+  "NativeNews": {
+    "pageScope": "Pagina {page} · {loaded} van {total} berichten geladen",
+    "mapScope": "{mapped} van de {loaded} berichten op deze pagina hebben een bekende locatie. De overige blijven in de lijst."
   }
 }

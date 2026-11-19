@@ -7,7 +7,8 @@ import { approvedEntries,newsFacetRows } from "@/lib/organization-data";
 import { isOrganizationEntryType,isOrganizationTopic } from "@/lib/organization-taxonomy";
 import { getLocale,getNow,getTranslations } from "next-intl/server";
 import Link from "next/link";
-import NewsBrowseControls from "./NewsBrowseControls";
+import NativeNews, { type NativeNewsEntry } from "@/components/app/NativeNews";
+import { publicMapPoint } from "@/lib/places/public-map-point";
 
 export const dynamic = "force-dynamic";
 
@@ -33,9 +34,29 @@ export default async function NewsPage({ searchParams }: { searchParams: Promise
     return `/news?${query}`;
   };
 
+
+  const nativeEntries: NativeNewsEntry[] = filtered.map(entry => {
+    // Selected by approvedEntries already. Only this entry's own public place;
+    // an organization's source country/seat is never a news/event location.
+    const own = entry as typeof entry & { format?: string; place_city_name?: string | null };
+    const organization = Array.isArray(entry.organization) ? entry.organization[0] : entry.organization;
+    const point = own.format === "online" ? { lat: null, lng: null } : publicMapPoint(own);
+    return {
+      id: entry.id, href: `/news/${organization.slug}/${entry.slug}`, title: entry.title, summary: entry.summary,
+      image: entry.image_url, typeLabel: t(`entryType.${entry.entry_type}`), topicLabel: entry.topic ? t(`topic.${entry.topic}`) : "",
+      organization: organization.name, city: own.place_city_name || entry.city || "",
+      startsAt: entry.entry_type !== "news" ? entry.starts_at : null,
+      dateLabel: entry.entry_type !== "news" && entry.starts_at ? dates.format(new Date(entry.starts_at)) : "",
+      ended: entry.moderation_status === "ended" || !!(entry.ends_at && new Date(entry.ends_at).getTime() < now.getTime()),
+      lat: point.lat, lng: point.lng,
+    };
+  });
+
   return <DirectoryPage area="news"><main className="min-h-screen">
     <PageHeader withBackdrop={false} badge={t("eyebrow")} title={t("newsTitleLead")} titleHighlight={t("newsTitleHighlight")} description={t("newsDescription")} />
-    <NewsBrowseControls key={`${region.cookieName}:${filters.q}:${filters.type}:${filters.topic}:${filters.country}:${region.country}`} filters={filters} facets={facets} count={count} region={region} topicCookieName={topic.cookieName} />
+    <NativeNews key={`${region.cookieName}:${filters.q}:${filters.type}:${filters.topic}:${filters.country}:${region.country}`}
+      controls={{ filters, facets, count, region, topicCookieName: topic.cookieName }} entries={nativeEntries} page={page}
+      previousHref={page > 1 ? href({ page: page - 1 }) : null} nextHref={hasMore ? href({ page: page + 1 }) : null}>
     <section className="site-container py-5 pb-28 sm:py-7 sm:pb-28 xl:pb-10">
       <div className="mb-5 flex flex-wrap items-center justify-between gap-x-5 gap-y-1 text-sm">
         <Link href="/organizations" className="inline-flex min-h-11 items-center text-gold">{discoveryT("allOrganizations")} →</Link>
@@ -60,5 +81,6 @@ export default async function NewsPage({ searchParams }: { searchParams: Promise
         {hasMore && <Link className="min-h-11 rounded-xl border border-border px-4 py-3 text-text-secondary" href={href({ page: page + 1 })}>{t("next")} →</Link>}
       </nav>
     </section>
+    </NativeNews>
   </main></DirectoryPage>;
 }
