@@ -6,10 +6,14 @@ import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 import NavigationIcon from "@/components/NavigationIcon";
 import { MOBILE_NAV_ITEMS, activeMobileNavigationId, hideMobileNavigation } from "@/lib/site-navigation";
+import NativeAppBottomNav from "@/components/app/NativeAppBottomNav";
+import { useNativeAppAppearance } from "@/lib/use-native-app-appearance";
 
 export default function BottomNav() {
   const pathname = usePathname();
   const t = useTranslations("nav");
+  const uiText = useTranslations();
+  const nativeAppearance = useNativeAppAppearance();
   const [chatOpen, setChatOpen] = useState(false);
 
   useEffect(() => {
@@ -25,6 +29,9 @@ export default function BottomNav() {
   }, []);
 
   if (hideMobileNavigation(pathname, chatOpen)) return null;
+  if (nativeAppearance) return <NativeAppBottomNav pathname={pathname} label={t("allAreas")} labels={{
+    shots: uiText("NativeAppChrome.shots"), workspace: uiText("NativeAppChrome.workspace"), smart: uiText("NativeAppChrome.smart"), news: t("news"), projects: t("projects"),
+  }} />;
   const activeId = activeMobileNavigationId(pathname);
   return <nav aria-label={t("allAreas")} className="fixed bottom-0 left-0 right-0 z-60 border-t border-border bg-bg-secondary safe-area-pb lg:hidden">
     <div className="flex h-[var(--mobile-nav-height)] items-stretch overflow-x-auto pl-[env(safe-area-inset-left,0px)] pr-[env(safe-area-inset-right,0px)]">

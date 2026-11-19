@@ -18,9 +18,11 @@ import { useTranslations } from "next-intl";
 import { useToast } from "@/contexts/ToastContext";
 import { useAuthenticatedInbox } from "@/lib/use-authenticated-inbox";
 import { subscribeToProfileUpdated } from "@/lib/profile-update-events";
-import { ACCOUNT_NAV_ITEMS, PRIMARY_NAV_ITEMS, activeNavigationId, SITE_NAV_MENU_ID, SITE_NAV_SIGN_OUT_EVENT } from "@/lib/site-navigation";
+import { ACCOUNT_NAV_ITEMS, PRIMARY_NAV_ITEMS, activeNavigationId, routeMatches, SITE_NAV_MENU_ID, SITE_NAV_SIGN_OUT_EVENT } from "@/lib/site-navigation";
 import { useSiteNavigation } from "@/contexts/SiteNavigationContext";
 import { useAdminSupportUnread } from "@/lib/use-admin-support-unread";
+import NativeAppNavbar from "@/components/app/NativeAppNavbar";
+import { useNativeAppAppearance } from "@/lib/use-native-app-appearance";
 
 export default function Navbar({ initialIsSignedIn = false, initialAdminUserId = null }: { initialIsSignedIn?: boolean; initialAdminUserId?: string | null }) {
   const uiText = useTranslations();
@@ -39,6 +41,7 @@ export default function Navbar({ initialIsSignedIn = false, initialAdminUserId =
   const signingOutRef = useRef(false);
   const inbox = useAuthenticatedInbox();
   const pathname = usePathname();
+  const nativeAppearance = useNativeAppAppearance();
   const authRoute = pathname.startsWith("/sign-in") || pathname.startsWith("/sign-up");
   const { isSignedIn, isLoaded, userId: authenticatedUserId, sessionId: authenticatedSessionId } = useAuth();
   const { user } = useUser();
@@ -81,7 +84,7 @@ export default function Navbar({ initialIsSignedIn = false, initialAdminUserId =
     // A route or account/session transition must not retain another identity's open menu.
     // eslint-disable-next-line react-hooks/set-state-in-effect
     closeAll();
-  }, [pathname, authenticatedUserId, authenticatedSessionId, activeUserId, hasSignedInSession]);
+  }, [pathname, authenticatedUserId, authenticatedSessionId, activeUserId, hasSignedInSession, nativeAppearance]);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 20);
@@ -245,6 +248,36 @@ export default function Navbar({ initialIsSignedIn = false, initialAdminUserId =
       </div>
     </div>
   ) : null;
+
+  if (nativeAppearance) {
+    // Dedicated authentication/setup screens keep their existing forms and task controls.
+    if (authRoute || routeMatches(pathname, "/profile-setup")) return null;
+    const profileHref = ACCOUNT_NAV_ITEMS.find(item => item.id === "public-profile")!.href;
+    const settingsHref = ACCOUNT_NAV_ITEMS.find(item => item.id === "settings")!.href;
+    return <NativeAppNavbar
+      navigationLabel={uiText("NativeAppChrome.navigation")}
+      accountButtonRef={accountButton} accountMenuRef={accountMenuRef}
+      signInLabel={t("signIn")}
+      account={{
+        signedIn: hasSignedInSession, ready: hasSignedInSession && !!activeUserId, open: userMenuOpen,
+        label: uiText("NativeAppChrome.profileMenu"), title: uiText("NativeAppChrome.profileMenuTitle"), loadingLabel: uiText("Contacts.loading"),
+        displayName, email, avatar: accountAvatar("h-11 w-11 min-h-11 min-w-11 shrink-0", 18), supportBadge,
+        onToggle: event => { activeAccountButton.current = event.currentTarget; closeMenu(); setUserMenuOpen(value => !value); },
+        onClose: () => setUserMenuOpen(false), onSignOut: () => requestSignOut.current(), signingOut,
+        signOutLabel: signingOut ? t("signingOut") : t("signOut"),
+        links: [
+          { id: "profile", href: profileHref, label: t("myProfile"), icon: "profile" },
+          { id: "saved", href: "/favorites", label: t("savedItems"), icon: "saved" },
+          { id: "colleagues", href: "/messages?view=friends", label: uiText("NativeAppChrome.colleagues"), icon: "contacts" },
+          { id: "homies", href: "/messages?view=friends&homies=1", label: uiText("Contacts.homies"), icon: "contacts" },
+          { id: "settings", href: settingsHref, label: uiText("PersonalArea.settings"), icon: "settings" },
+        ],
+      }}
+      messages={{ label: hasSignedInSession ? `${messageLabel}; ${noticeLabel}` : t("messages"), count: unreadMessages, noticeCount: unreadNotices, failed: inboxFailed, active: activeId === "messages" }}
+      search={{ label: uiText("Ui.text_9f6d74e0a12b67"), onClick: event => { setUserMenuOpen(false); event.currentTarget.focus({ preventScroll: true }); document.dispatchEvent(new Event("cg:opensearch")); } }}
+      menu={{ label: t("openMenu"), open: menuOpen, controls: SITE_NAV_MENU_ID, onClick: event => { setUserMenuOpen(false); event.currentTarget.focus({ preventScroll: true }); openMenu(); } }}
+    />;
+  }
 
   return (
     <>

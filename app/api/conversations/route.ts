@@ -1,3 +1,4 @@
+import { scheduleNativePushAfterCommit } from "@/lib/native-push-worker";
 import {attachmentIds} from "@/lib/message-attachments";
 import { SUPPORT_ACTOR_ID, SUPPORT_AVATAR_URL, SUPPORT_NAME } from "@/lib/support-identity";
 import { db } from "@/lib/db";
@@ -206,6 +207,7 @@ export async function POST(req: NextRequest) {
   }));
   if (error) { const failure = messagingRpcFailure(error); return fail(failure.key, failure.status); }
   if (!data || !messagingUuid(data.conversationId) || !messagingUuid(data.message?.id) || typeof data.created !== "boolean") return fail("saveError", 503);
+  if (data.created) scheduleNativePushAfterCommit();
   // Only the request that inserted the message may notify. A replay confirms
   // persisted content without repeating mail, even after a lost HTTP response.
   if (data.created) try {

@@ -81,13 +81,13 @@ export default function PageHeader({
         <div className="flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
           <div className="min-w-0">
             {leading}
-            <div className="mb-1.5 inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-3 py-1 backdrop-blur-sm">
+            <div data-page-header="badge" className="mb-1.5 inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-3 py-1 backdrop-blur-sm">
               <span className="text-[11px] font-bold uppercase tracking-widest text-white/80">{badge}</span>
             </div>
-            <h1 className="mb-1.5 font-display text-xl font-bold leading-tight text-white sm:text-3xl lg:text-4xl">
+            <h1 data-page-header="title" className="mb-1.5 font-display text-xl font-bold leading-tight text-white sm:text-3xl lg:text-4xl">
               {title}{titleHighlight && <> <span className="text-gradient-gold">{titleHighlight}</span></>}
             </h1>
-            <p className="max-w-xl text-sm leading-relaxed text-white/65 sm:text-base">{description}</p>
+            <p data-page-header="description" className="max-w-xl text-sm leading-relaxed text-white/65 sm:text-base">{description}</p>
           </div>
 
           {(cta || ctaSecondary) && (

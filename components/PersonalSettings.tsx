@@ -8,6 +8,7 @@ import Link from "next/link";
 import { Bell, ChevronDown, ChevronRight, ShieldCheck, Trash2, Wallet, type LucideIcon } from "lucide-react";
 import PrivacySettings from "@/components/PrivacySettings";
 import NotificationPreferences from "@/components/NotificationPreferences";
+import NativePushSettings from "@/components/app/NativePushSettings";
 
 type Props = { accountId: string | null; verification?: ReactNode; dangerZone?: ReactNode };
 const SETTING_SECTIONS = ["security", "privacy", "notifications", "verification", "delete"] as const;
@@ -58,7 +59,7 @@ export default function PersonalSettings({ accountId, verification, dangerZone }
         <button type="button" onClick={() => openUserProfile()} className="inline-flex min-h-11 items-center gap-2 rounded-lg border border-border bg-bg-primary px-4 py-2 text-sm font-medium text-text-primary hover:bg-bg-hover">{t("nav.accountSettings")}<ChevronRight size={16} aria-hidden="true" /></button>
       </div>)}
       {group("privacy", t("PrivacySettings.title"), ShieldCheck, <PrivacySettings accountId={activeAccount} showEmailPreference={false} embedded />)}
-      {group("notifications", t("nav.notifications"), Bell, <NotificationPreferences accountId={activeAccount} />)}
+      {group("notifications", t("nav.notifications"), Bell, <div className="space-y-4"><NativePushSettings /><NotificationPreferences accountId={activeAccount} /></div>)}
       <Link href="/invoices" className="flex min-h-16 items-center gap-3 border-b border-border px-4 py-4 text-sm font-medium text-text-primary transition-colors hover:bg-bg-hover sm:px-5"><Wallet size={19} className="shrink-0" aria-hidden="true" /><span className="min-w-0 flex-1 break-words">{t("nav.payments")}</span><ChevronRight size={16} className="shrink-0 text-text-muted" aria-hidden="true" /></Link>
       {verification && group("verification", t("profile.tabVerification"), ShieldCheck, <div className="space-y-4">{verification}<Link href="/profile?tab=verification" className="inline-flex min-h-11 items-center gap-2 rounded-lg border border-border px-4 py-2 text-sm text-text-primary hover:bg-bg-hover">{t("profile.verifIdLabel")}<ChevronRight size={16} aria-hidden="true" /></Link></div>)}
     </div>

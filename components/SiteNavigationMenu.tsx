@@ -10,12 +10,16 @@ import { useTranslations } from "next-intl";
 import Link from "next/link";
 import { usePathname,useSearchParams } from "next/navigation";
 import { Suspense,useCallback,useEffect,useRef } from "react";
+import { useNativeAppAppearance } from "@/lib/use-native-app-appearance";
+import { NATIVE_APP_MENU_ITEMS } from "@/lib/native-app-navigation";
+import nativeStyles from "@/components/app/NativeAppBottomNav.module.css";
 
 function MenuContent() {
   const t = useTranslations("nav");
   const uiText = useTranslations();
   const pathname = usePathname();
   const searchParams = useSearchParams();
+  const nativeAppearance = useNativeAppAppearance();
   const { isSignedIn, userId } = useAuth();
   const { menuOpen, closeMenu } = useSiteNavigation();
   const dialog = useRef<HTMLDialogElement>(null);
@@ -49,29 +53,36 @@ function MenuContent() {
   }, [menuOpen, closeNative, dismiss]);
 
   const routeKey = `${pathname}?${searchParams.toString()}`;
-  const previousScreen = useRef({ routeKey, userId });
+  const previousScreen = useRef({ routeKey, userId, nativeAppearance });
   useEffect(() => {
     const previous = previousScreen.current;
-    previousScreen.current = { routeKey, userId };
-    if (previous.routeKey !== routeKey || previous.userId !== userId) dismiss();
-  }, [routeKey, userId, dismiss]);
+    previousScreen.current = { routeKey, userId, nativeAppearance };
+    if (previous.routeKey !== routeKey || previous.userId !== userId || previous.nativeAppearance !== nativeAppearance) dismiss();
+  }, [routeKey, userId, nativeAppearance, dismiss]);
 
   const linkClass = "flex min-h-12 min-w-0 items-center gap-2 rounded-xl px-2 py-2.5 text-sm text-text-secondary transition-colors hover:bg-bg-elevated hover:text-text-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold";
   return (
-    <dialog ref={dialog} id={SITE_NAV_MENU_ID} aria-labelledby="site-navigation-title"
+    <dialog ref={dialog} id={SITE_NAV_MENU_ID} aria-labelledby="site-navigation-title" data-native-app-menu={nativeAppearance ? "v1" : undefined}
       onCancel={event => { event.preventDefault(); dismiss(); }} onClose={closeMenu}
       onClick={event => {
         if (event.target !== event.currentTarget) return;
         const bounds = event.currentTarget.getBoundingClientRect();
         if (event.clientX < bounds.left || event.clientX > bounds.right || event.clientY < bounds.top || event.clientY > bounds.bottom) dismiss();
       }}
-      className="fixed inset-x-0 bottom-0 top-auto m-0 h-[min(88dvh,44rem)] max-h-[calc(100dvh-env(safe-area-inset-top,0px)-1rem)] w-full max-w-none overflow-hidden rounded-t-2xl border border-border bg-bg-secondary p-0 text-text-primary shadow-2xl backdrop:bg-black/60 lg:inset-0 lg:m-auto lg:h-fit lg:max-h-[min(88dvh,44rem)] lg:w-[min(36rem,calc(100vw-2rem))] lg:rounded-2xl">
+      className={`fixed inset-x-0 bottom-0 top-auto m-0 h-[min(88dvh,44rem)] max-h-[calc(100dvh-env(safe-area-inset-top,0px)-1rem)] w-full max-w-none overflow-hidden rounded-t-2xl border border-border bg-bg-secondary p-0 text-text-primary shadow-2xl backdrop:bg-black/60 lg:inset-0 lg:m-auto lg:h-fit lg:max-h-[min(88dvh,44rem)] lg:w-[min(36rem,calc(100vw-2rem))] lg:rounded-2xl${nativeAppearance ? ` ${nativeStyles.menu}` : ""}`}>
       <div className="flex h-full min-h-0 flex-col lg:h-auto">
         <div className="flex shrink-0 items-center justify-between gap-3 border-b border-border py-3 pl-[max(1rem,env(safe-area-inset-left,0px))] pr-[max(1rem,env(safe-area-inset-right,0px))]">
-          <h2 id="site-navigation-title" className="font-display text-xl"><span className="lg:hidden">{t("allAreas")}</span><span className="hidden lg:inline">{t("more")}</span></h2>
+          <h2 id="site-navigation-title" className="font-display text-xl">{nativeAppearance ? t("more") : <><span className="lg:hidden">{t("allAreas")}</span><span className="hidden lg:inline">{t("more")}</span></>}</h2>
           <button data-close-navigation type="button" onClick={dismiss} aria-label={t("closeMenu")} className="flex min-h-11 min-w-11 items-center justify-center rounded-full text-text-muted hover:bg-bg-elevated hover:text-text-primary focus-visible:outline-2 focus-visible:outline-gold"><X size={22} aria-hidden="true" /></button>
         </div>
-        <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain lg:max-h-[calc(min(88dvh,44rem)-4.5rem)] pl-[max(1rem,env(safe-area-inset-left,0px))] pr-[max(1rem,env(safe-area-inset-right,0px))] pb-[max(1.5rem,env(safe-area-inset-bottom,0px))] pt-4">
+        <div data-native-app-menu-content={nativeAppearance ? "v1" : undefined} className="min-h-0 flex-1 overflow-y-auto overscroll-contain lg:max-h-[calc(min(88dvh,44rem)-4.5rem)] pl-[max(1rem,env(safe-area-inset-left,0px))] pr-[max(1rem,env(safe-area-inset-right,0px))] pb-[max(1.5rem,env(safe-area-inset-bottom,0px))] pt-4">
+          {nativeAppearance ? <><nav aria-label={t("more")} className="flex flex-col gap-1">
+            {NATIVE_APP_MENU_ITEMS.map(item => <Link key={item.id} href={item.href} prefetch={false} onClick={dismiss}
+              aria-current={routeMatches(pathname, item.href) ? "page" : undefined}
+              className={`${linkClass} ${routeMatches(pathname, item.href) ? "bg-gold/10 text-gold" : ""}`}>
+              <NavigationIcon name={item.icon} className="shrink-0 text-gold" /><span className="min-w-0 break-words">{uiText(item.labelKey)}</span>
+            </Link>)}
+          </nav><div data-native-app-theme-host="v1" /></> : <>
           <button type="button" onClick={() => { dismiss(); document.dispatchEvent(new Event("cg:opensearch")); }} className={`${linkClass} mb-4 w-full border border-border lg:hidden`}><Search size={20} aria-hidden="true" />{uiText("Ui.text_9f6d74e0a12b67")}</button>
           <nav aria-label={t("discover")}>
             <h3 className="mb-2 px-3 text-xs font-semibold uppercase tracking-wider text-text-muted">{t("discover")}</h3>
@@ -94,6 +105,7 @@ function MenuContent() {
               <Link href="/support" prefetch={false} onClick={dismiss} className={linkClass}><NavigationIcon name="support" className="shrink-0" />{t("support")}</Link>
             </div>
           </nav>
+          </>}
         </div>
       </div>
     </dialog>

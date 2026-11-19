@@ -45,3 +45,6 @@ next-env.d.ts
 
 # Local live-user reports may contain account-specific test details
 /docs/test-reports/live-user-journey-*.md
+
+# Local Supabase CLI metadata; never part of an app release.
+/supabase/.temp/

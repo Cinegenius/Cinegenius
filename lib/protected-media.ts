@@ -25,7 +25,7 @@ export function isProtectedMediaOptimizerSource(value: string | null, origin: st
     // v2 decoration has a revocable approval reader; it must not acquire a
     // permanent optimizer copy. This does not make it an owned member upload.
     return /^\/profile-art\/v2(?:\/|$)/i.test(path)
-      || /^\/api\/(?:media(?:\/|$)|message-attachments(?:\/|$)|admin\/(?:reviews|organizations|support)(?:\/|$)|verification-requests(?:\/|$)|community-image(?:\/|$))/i.test(path);
+      || /^\/api\/(?:media(?:\/|$)|shots(?:\/|$)|message-attachments(?:\/|$)|admin\/(?:reviews|organizations|support)(?:\/|$)|verification-requests(?:\/|$)|community-image(?:\/|$))/i.test(path);
 
   } catch { return true; }
 }

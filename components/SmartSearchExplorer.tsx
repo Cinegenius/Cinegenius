@@ -1,12 +1,16 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import { useCallback, useEffect, useId, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useId, useMemo, useRef, useState, type Dispatch, type SetStateAction } from "react";
 import { useTranslations } from "next-intl";
 import { ChevronDown, RotateCcw, SlidersHorizontal, X } from "lucide-react";
 import BrowseResultCount from "./BrowseResultCount";
 import BrowseSelect from "./BrowseSelect";
-import DirectoryViewControls from "./DirectoryViewControls";
+import DirectoryViewControls, { type DirectoryView } from "./DirectoryViewControls";
+import { useNativeAppAppearance } from "@/lib/use-native-app-appearance";
+import { nativeSmartResultAreas, nativeSmartView } from "@/lib/native-smart-controls";
+import NativeSmartAreas from "./app/NativeSmartAreas";
+import nativeStyles from "./app/NativeSmartAreas.module.css";
 import ResultCard from "./SearchResultCard";
 import { searchGroupKey, type SearchGroup, type SearchPlan } from "@/lib/unified-search";
 import { SMART_MAP_COLORS } from "@/lib/smart-search-map";
@@ -22,12 +26,16 @@ const toggle = <T,>(values: T[], value: T) => values.includes(value) ? values.fi
 const chip = "inline-flex min-h-11 min-w-11 items-center justify-center gap-2 rounded-xl border px-3 py-2 text-sm transition-colors focus-visible:outline-2 focus-visible:outline-gold";
 const activeChip = "border-gold/40 bg-gold/10 text-text-primary";
 const inactiveChip = "border-border bg-bg-secondary text-text-muted";
+export type SmartSearchControls = { scope: string; filters: DiscoveryFilters; mapOpen: boolean; view?: DirectoryView; limits: Record<string, number> };
 
-function ResultArea({ area, groups, pending, errors, more }: {
+function ResultArea({ area, groups, pending, errors, more, grid = false, limit: controlledLimit, setLimit: changeLimit }: {
   area: SearchGroup["area"]; groups: SearchGroup[]; pending: string[]; errors: string[]; more: (group: SearchGroup) => void;
+  grid?: boolean; limit?: number; setLimit?: (limit: number) => void;
 }) {
   const t = useTranslations("UnifiedSearch");
-  const [limit, setLimit] = useState(3);
+  const [localLimit, setLocalLimit] = useState(3);
+  const limit = controlledLimit ?? localLimit;
+  const setLimit = changeLimit ?? setLocalLimit;
   const results = discoveryResults(groups);
   const next = groups.find(group => errors.includes(searchGroupKey(group))) ?? groups.find(group => group.nextOffset !== null);
   const busy = groups.some(group => pending.includes(searchGroupKey(group)));
@@ -37,24 +45,50 @@ function ResultArea({ area, groups, pending, errors, more }: {
     <h2 className="smart-area-heading"><span className="size-1.5 shrink-0 rounded-full" style={{ backgroundColor: SMART_MAP_COLORS[area] }} aria-hidden="true" />
       <span className="min-w-0 flex-1">{t(`areas.${area}`)}</span><BrowseResultCount count={results.length} label={t("discovery.loaded", { count: results.length })} />
     </h2>
-    {results.slice(0, limit).map(result => <ResultCard key={`${result.type}:${result.id}`} result={result} compact row />)}
+    {grid ? <div className={nativeStyles.grid}>{results.slice(0, limit).map(result => <ResultCard key={`${result.type}:${result.id}`} result={result} />)}</div>
+      : results.slice(0, limit).map(result => <ResultCard key={`${result.type}:${result.id}`} result={result} compact row />)}
     {failed && <p role="alert" className="py-2 text-sm text-text-secondary">{t("error")}</p>}
     {(results.length > limit || next) && <button type="button" disabled={busy} className="min-h-11 min-w-11 text-sm text-gold disabled:opacity-50" onClick={() => {
-      if (results.length > limit && !failed) setLimit(value => value + 6);
-      else if (next) { setLimit(value => value + 6); more(next); }
+      if (results.length > limit && !failed) setLimit(limit + 6);
+      else if (next) { setLimit(limit + 6); more(next); }
     }}>{busy ? t("loading") : failed ? t("retry") : t("more")}</button>}
   </section>;
 }
 
 /** Account/plan-scoped by the parent key; ephemeral filters never enter history
  * or storage. Combined responses serve both surfaces without duplicate reads. */
-export default function SmartSearchExplorer({ plan, initialGroups, initialMapGroups, onUnavailable }: {
+export default function SmartSearchExplorer({ plan, initialGroups, initialMapGroups, onUnavailable, stored, setStored }: {
   plan: SearchPlan; initialGroups: SearchGroup[]; initialMapGroups?: SearchGroup[]; onUnavailable: () => void;
+  stored?: SmartSearchControls; setStored?: Dispatch<SetStateAction<SmartSearchControls>>;
 }) {
   const t = useTranslations("UnifiedSearch"), taxonomy = useTranslations("Taxonomy"), marketplace = useTranslations("MarketplaceCatalog");
+  const nativeAppearance = useNativeAppAppearance();
   const [groups, setGroups] = useState(initialMapGroups ?? initialGroups);
-  const [filters, setFilters] = useState<DiscoveryFilters>(emptyDiscoveryFilters);
-  const [mapOpen, setMapOpen] = useState(true);
+  const [webFilters, setWebFilters] = useState<DiscoveryFilters>(emptyDiscoveryFilters);
+  const [webMapOpen, setWebMapOpen] = useState(true);
+  const scope = JSON.stringify(plan);
+  const [localControls, setLocalControls] = useState<SmartSearchControls>(() => ({ scope, filters: emptyDiscoveryFilters(), mapOpen: true, limits: {} }));
+  const saved = stored ?? localControls;
+  const controls = saved.scope === scope ? saved : { ...saved, scope, filters: emptyDiscoveryFilters(), limits: {} };
+  const writeControls = setStored ?? setLocalControls;
+  const filters = nativeAppearance ? controls.filters : webFilters;
+  const mapOpen = nativeAppearance ? controls.mapOpen : webMapOpen;
+  const view = nativeSmartView(mapOpen, controls.view);
+  const setFilters = (action: SetStateAction<DiscoveryFilters>) => {
+    if (!nativeAppearance) { setWebFilters(action); return; }
+    writeControls(old => {
+      const current = old.scope === scope ? old : { ...old, scope, filters: emptyDiscoveryFilters(), limits: {} };
+      return { ...current, filters: typeof action === "function" ? action(current.filters) : action };
+    });
+  };
+  const setView = (value: DirectoryView) => {
+    if (!nativeAppearance) { setWebMapOpen(value === "map"); return; }
+    writeControls(old => ({ ...(old.scope === scope ? old : controls), mapOpen: value === "map", view: value }));
+  };
+  const setLimit = (area: string, limit: number) => writeControls(old => {
+    const current = old.scope === scope ? old : controls;
+    return { ...current, limits: { ...current.limits, [area]: limit } };
+  });
   const [filtersOpen, setFiltersOpen] = useState(false);
   const filterId = useId();
   const filterTrigger = useRef<HTMLButtonElement>(null);
@@ -129,15 +163,16 @@ export default function SmartSearchExplorer({ plan, initialGroups, initialMapGro
     : marketplace.has(`categories.${id}`) ? marketplace(`categories.${id}`) : id;
 
   return <div className="smart-explorer" data-smart-explorer data-map-open={mapOpen}>
+    {nativeAppearance && <NativeSmartAreas available={areas} hidden={filters.hiddenAreas} onChange={hiddenAreas => setFilters(value => ({ ...value, hiddenAreas }))} />}
     <div className="smart-result-toolbar">
       <BrowseResultCount count={count} label={t("discovery.loaded", { count })} />
-      <BrowseSelect label={t("allAreas")} value={areaValue} className="smart-area-select" triggerClassName="smart-area-trigger"
+      {!nativeAppearance && <BrowseSelect label={t("allAreas")} value={areaValue} className="smart-area-select" triggerClassName="smart-area-trigger"
         options={[{ value: "all", label: t("allAreas") }, ...areas.map(area => ({ value: area, label: t(`areas.${area}`) })), ...(areaValue === "selection" ? [{ value: "selection", label: t("discovery.activeFilters"), disabled: true }] : [])]}
-        onChange={area => setFilters(value => ({ ...value, hiddenAreas: area === "all" ? [] : areas.filter(item => item !== area) }))} />
+        onChange={area => setFilters(value => ({ ...value, hiddenAreas: area === "all" ? [] : areas.filter(item => item !== area) }))} />}
       <button ref={filterTrigger} type="button" className="smart-filter-trigger" aria-label={t("discovery.filterTitle")} aria-expanded={filtersOpen} aria-controls={filterId} onClick={() => setFiltersOpen(value => !value)}>
         <SlidersHorizontal size={18} aria-hidden="true" />{filtered && <span className="smart-filter-dot" aria-hidden="true" />}
       </button>
-      <DirectoryViewControls value={mapOpen ? "map" : "list"} onChange={view => setMapOpen(view === "map")} views={["list", "map"]} />
+      <DirectoryViewControls value={nativeAppearance ? view : mapOpen ? "map" : "list"} onChange={setView} views={nativeAppearance ? ["grid", "list", "map"] : ["list", "map"]} />
     </div>
     <section id={filterId} hidden={!filtersOpen} onKeyDown={event => { if (event.key === "Escape") { event.stopPropagation(); closeFilters(); } }} className="smart-filter-panel space-y-3 rounded-xl border border-border bg-bg-secondary p-3 sm:p-4" aria-label={t("discovery.filterTitle")}>
 
@@ -176,7 +211,9 @@ export default function SmartSearchExplorer({ plan, initialGroups, initialMapGro
     {errors.includes("initial") && <div role="alert" className="text-sm text-text-secondary"><p>{t("error")}</p><button type="button" className="min-h-11 min-w-11 text-gold" onClick={() => void read()} disabled={pending.includes("initial")}>{t("retry")}</button></div>}
     {pending.includes("initial") && <p role="status" className="text-sm text-text-muted">{t("loading")}</p>}
     {!count && <div role="status" className="rounded-xl border border-border bg-bg-secondary p-4 text-sm text-text-secondary"><p>{t(filtered ? "discovery.emptyFilters" : "emptyGroup")}</p>{filtered && <button type="button" className="min-h-11 min-w-11 text-gold" onClick={reset}>{t("discovery.reset")}</button>}</div>}
-    {discoveryAreas(visible).map(area => <ResultArea key={area} area={area} groups={visible.filter(group => group.area === area)} pending={pending} errors={errors} more={group => void read(groups.find(item => searchGroupKey(item) === searchGroupKey(group))!)} />)}
+    {(nativeAppearance ? nativeSmartResultAreas(discoveryAreas(visible)) : discoveryAreas(visible)).map(area => <ResultArea key={area} area={area} groups={visible.filter(group => group.area === area)} pending={pending} errors={errors}
+      {...(nativeAppearance ? { grid: view === "grid", limit: controls.limits[area] ?? (view === "grid" ? 4 : 3), setLimit: (limit: number) => setLimit(area, limit) } : {})}
+      more={group => void read(groups.find(item => searchGroupKey(item) === searchGroupKey(group))!)} />)}
     {groups.some(group => group.nextOffset !== null) && <p className="text-xs text-text-muted">{t("discovery.partial")}</p>}
     {/* A cursor with no currently matching rows remains reachable without an empty area card. */}
     {visible.some(group => group.nextOffset !== null && !visible.some(item => item.area === group.area && item.results.length)) && <button type="button" disabled={pending.length > 0} className="min-h-11 text-sm text-gold" onClick={() => {

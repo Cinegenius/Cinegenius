@@ -1,0 +1,54 @@
+# App Shots: prepared ephemeral-media contract
+
+This is source preparation for the app branch. The migration has **not** been applied, no scheduler was installed, and no photo was published to a real account. Existing profile, gallery, listing and message media are unchanged. The old BTS gallery is not this feature.
+
+## Ownership and lifetime
+
+Clerk supplies the authenticated account. A Shot has its own canonical parent in `shots_private.shots`, immutable full/thumbnail asset manifest, private `shots-ephemeral-v1` bucket, and durable cleanup job. It never aliases an existing permanent image. The server receives only the client's already edited publication image, not a second device original. It strips metadata and normalizes a full master (maximum edge1600) plus thumbnail (maximum edge640) to WebP. It does not apply the look twice. `format` chooses a UI crop, not destructive master cropping.
+
+A successful publish sets a millisecond-precision server timestamp and exactly thirty hours of lifetime. Preparation, failed uploads, retries, status reads and feed reads never start or extend that lifetime. Preparing drafts expire after thirty minutes. The device Photo Library source remains outside this server lifecycle.
+
+Published Shots are either `community` or `homies`. Homies is the author's current private favorite selection among currently accepted friendships, not the viewer's stars and not a frozen recipient list. Bidirectional blocks and the author's current Ghost setting apply on every foreign read. Owner reads are allowed only until expiry. A server read decision at or after expiry denies everybody, including the owner; media authorization is checked again after Storage I/O. No permanent archive, signed URL, public URL, image-optimizer copy or shared binary cache is created. Bytes previously downloaded to a recipient cannot be remotely recalled.
+
+## Wire contract
+
+Public types/constants/guards are in `lib/shots.ts`; contract `cinegenius.shots.v1`. IDs are canonical lowercase UUIDv4. Timestamps are UTC ISO8601 with exactly milliseconds (`.sssZ`). Every JSON response carries `contract`, current `accountId`, `serverNow` and boolean `capabilities` (`read`, `publish`, `homiesRead`). Errors carry `error.code` only. Headers are private/no-store for browser/CDN/Vercel, including errors.
+
+JSON API requests require `X-CineGenius-Shots-Contract: cinegenius.shots.v1` and `X-Shots-Account` matching the current Clerk account. A stale account receives409. Media `<img>` requests use the real session cookie; any supplied account/contract header must still match. Mutation Origin is validated through the existing application guard. There are no client service-role credentials or direct Storage grants.
+
+- `GET /api/shots?audience=community|homies&cursor=…` returns up to24 authorized `items`, `nextCursor` and capabilities. Cursor order is stable descending publication timestamp and ID; local visual shuffling must not modify that server cursor. There is no random-seed endpoint or author/recipient roster.
+- `POST /api/shots` accepts exactly six multipart fields: `requestId`, `photo`, `audience`, `format`, `look`, `grain`. `photo` is JPEG/PNG/WebP, maximum3MiB. `format`: `portrait|landscape`; `look`: `original|film|photo|bw`; `grain`: integer0–100. Returns201 for new publication or200 for a confirmed identical replay, with `status:'published'`, `requestId`, `item`. A202 `status:'pending',item:null` is not publication confirmation.
+- `GET /api/shots/requests/[requestId]` returns `absent|pending|published|expired|deleted`, `item` (only when own and published) and `retryAllowed`. It is true only for absent or an own, still valid preparing draft whose write lease has expired. It is false for a live lease and published/expired/deleted states. A user may explicitly retry the identical frozen file and metadata under the same requestId after a fresh allowed status. Never automatically retry POST or extend the draft/Shot TTL. A reload without the identical file cannot assert payload identity.
+- `GET /api/shots/[id]` returns one currently authorized `item`.
+- `GET /api/shots/[id]/media/full|thumbnail` returns private WebP bytes through the checked parent, never a Storage URL. Expiry/revocation/delete denies the response even after a successful download from Storage.
+- `DELETE /api/shots/[id]` checks ownership of a live record, immediately denies further reads and queues deletion. ACK: `{id,deleted:true,purgePending:boolean}`. For an already absent ID the response confirms only absence, without exposing whether a tombstone existed. `purgePending:true` is not a claim that bytes have been removed.
+
+An item carries `id`, own `requestId` (foreign `null`), `createdAt`, `expiresAt`, `isMine`, audience/format/look/grain/width/height, and exactly `/api/shots/[id]/media/full` and `/thumbnail`. It deliberately contains no author account ID, name, avatar, private Homies roster or Storage locator. Per-account capacity is six active/preparing Shots and12MiB across both derivatives/reservations. Rate limits are12 mutations or300 reads per minute per account.
+
+## Atomic state and recovery
+
+A service-only, security-invoker `public.shots_v1` RPC owns transitions; anonymous/authenticated database roles cannot execute it or access private tables. Restrictive Storage policy blocks direct access to this bucket even if unrelated legacy policies permit other buckets. Clerk IDs remain text; this does not substitute Supabase Auth or `auth.uid()`.
+
+Prepare locks the account capacity, reserves the request and immutable manifest before any write, and issues a90-second write lease. Every retry must match the same normalized content/metadata hash. A late or stale worker cannot publish after cleanup/delete. Row locks use parent-before-cleanup order; cleanup uses SKIP LOCKED and compare-and-set lease tokens. These paths have local sequential/crash/retry coverage; true multi-session PostgreSQL contention remains an activation check.
+
+Uploads use immutable create-only keys. An error/conflict ACK can be reconciled only by confirming identical bytes, size and SHA-256. Unknown outcomes remain pending and recoverable. Cleanup waits for any prior write lease plus a two-minute safety interval before dropping an abandoned upload's manifest. The deployment must bound upload request/storage operation duration below this interval; a provider that can materialize writes beyond this bound needs additional orphan reconciliation before activation. The minimal Shot-ID tombstone retains enough information to reconstruct both canonical object keys for a repair sweep; it is not an image archive.
+
+## Cleanup and health gate
+
+`POST /api/internal/shots-cleanup` uses the existing constant-time `CRON_SECRET` guard. GET/HEAD405; no arbitrary path/bucket/account payload is accepted. The worker checks private bucket metadata, claims at most ten due jobs, deletes only validated full/thumbnail paths belonging to each claimed parent, and checks authoritative absence of **both**. An unknown deletion ACK may still settle successfully if both are confirmed absent. Errors and uncertain existence checks retain the job with exponential backoff. Claim crashes recover after their lease; stale completion tokens cannot delete another claim's ledger.
+
+Only successful verified blob removal permits metadata purge. Afterward the Shot, asset manifest and job are removed; only an unlinkable request-scope digest, random Shot ID, final status and closure time remain for idempotency. The digest is derived separately per account and random request nonce; no owner, raw request nonce, audience, filename, path, photo metadata or bytes remain. A foreign account cannot query another account's completion via a known nonce.
+
+Readiness is **not** a static ready flag alone. `enabled` and `cleanup_ready` default false. Publication additionally requires a successful complete worker run within ten minutes, no later failure, and no due/error backlog. A claim alone never refreshes health. The initial worker must actually run successfully. A failed/stale worker blocks new prepares and publication; previously valid reads retain their normal permissions/expiry, and owner deletion remains available. The job processes bounded batches; repeat scheduled requests are required for a large backlog. No scheduler is enabled here.
+
+Hard read expiry and physical deletion are different events: all new read decisions deny at the server deadline, but byte removal follows the next successful worker execution and may be delayed by Storage outages/retry. The API and UI must never describe a queued or failed cleanup as physically completed. Storage provider backups, versioning and log-retention policies must be checked before making a broader deletion guarantee.
+
+## Separate activation checklist
+
+1. Review/apply the generated migration through the normal coordinated release process; verify actual roles/RLS, non-public bucket, no direct download/sign access, and no profile/public mirrors.
+2. Verify real Storage upload maximum duration, failed/unknown ACK semantics, deletion and404 absence semantics, no lingering versions/CDN derivatives, and repair-sweep capability. Exercise canonical original+thumbnail deletion with an isolated test account.
+3. Configure and verify the protected worker/scheduler, overlapping-run safety, maximum execution duration and monitoring. The existing authenticated POST worker remains available. The prepared Vercel GET route `/api/cron/shots-cleanup` is scheduled every five minutes and additionally requires the exact Bearer `CRON_SECRET`, server-side `VERCEL_ENV=production` and `SHOTS_CLEANUP_CRON_ENABLED=true`; an unauthenticated generic GET cannot run cleanup. A configured GET schedule alone is not proof of a running deletion chain. Confirm successful verified cleanup before changing private readiness flags; verify that stopping/failing it blocks publishing. See [app background workers](./app-background-workers.md) for the separate activation conditions and timing limits.
+4. Test true concurrent capacity/duplicate upload, publish-versus-cleanup, stale lease and crash recovery with separate PostgreSQL sessions. PGlite does not prove this multi-session behavior.
+5. Integrate the client against these exact account-bound ACKs, then test real Clerk account changes, Homies revocation, Ghost/block,30h owner hard expiry, restart/background and a real iPhone. Local synthetic checks are not a hosted or device acceptance.
+
+Official references: [Supabase private downloads](https://supabase.com/docs/guides/storage/serving/downloads), [Storage removal API](https://supabase.com/docs/reference/javascript/storage-from-remove), [CLI reference](https://supabase.com/docs/reference/cli/supabase-migration-new). The CLI was used only for local migration creation, not database deployment.

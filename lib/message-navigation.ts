@@ -8,7 +8,7 @@ const localHref = (url: URL) => url.pathname + url.search + url.hash;
 export function navigateMessageView(browser: Window, owner: string, destination: MessageDestination, replace = false): boolean {
   if (!owner || browser.location.pathname !== "/messages") return false;
   const target = new URL(browser.location.href);
-  for (const key of ["conv", "to", "company_slug"]) target.searchParams.delete(key);
+  for (const key of ["conv", "to", "company_slug", "homies"]) target.searchParams.delete(key);
   if (destination.conversationId || destination.recipientId) {
     target.searchParams.delete("view");
     target.searchParams.delete("requests");
@@ -51,12 +51,18 @@ export function inboxView(params: Pick<URLSearchParams, "get">): InboxView {
   return view === "friends" ? "friends" : "chats";
 }
 
+/** A utility-list filter, never a chat mode or proof of favorite capability. */
+export function inboxHomies(params: Pick<URLSearchParams, "get">): boolean {
+  return inboxView(params) === "friends" && params.get("homies") === "1";
+}
+
 /** Open a real inbox or utility destination without synthetic Back entries. */
-export function navigateInboxView(browser: Window, view: InboxView): boolean {
+export function navigateInboxView(browser: Window, view: InboxView, options: { homies?: boolean } = {}): boolean {
   if (browser.location.pathname !== "/messages") return false;
   const target = new URL(browser.location.href);
-  for (const key of ["conv", "to", "company_slug", "requests", "view"]) target.searchParams.delete(key);
+  for (const key of ["conv", "to", "company_slug", "requests", "view", "homies"]) target.searchParams.delete(key);
   if (view === "friends" || view === "notices") target.searchParams.set("view", view);
+  if (view === "friends" && options.homies) target.searchParams.set("homies", "1");
   const next = localHref(target);
   if (next === localHref(new URL(browser.location.href))) return false;
   browser.history.pushState({}, "", next);

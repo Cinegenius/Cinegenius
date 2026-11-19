@@ -1,5 +1,7 @@
 "use client";
 
+import NativeSmartLanding from "@/components/app/NativeSmartLanding";
+import { useNativeAppAppearance } from "@/lib/use-native-app-appearance";
 import SmartSearchPreview from "@/components/SmartSearchPreview";
 import { ServerAdminContext } from "@/lib/server-admin-context";
 import { useAuth } from "@clerk/nextjs";
@@ -11,7 +13,9 @@ import { ArrowUp, Loader2 } from "lucide-react";
 import { useFormRouter } from "@/lib/use-form-router";
 import { decodeSearchPlan, searchPlanFromHref, type SearchPlan, type SearchGroup } from "@/lib/unified-search";
 import DirectoryPage from "@/components/DirectoryPage";
-import SmartSearchExplorer from "@/components/SmartSearchExplorer";
+import SmartSearchExplorer, { type SmartSearchControls } from "@/components/SmartSearchExplorer";
+import { useViewState } from "@/lib/use-view-state";
+import { emptyDiscoveryFilters } from "@/lib/smart-discovery";
 import SmartSearchExamples from "@/components/SmartSearchExamples";
 import SmartSearchClarification from "@/components/SmartSearchClarification";
 import SmartSearchWishes from "@/components/SmartSearchWishes";
@@ -20,13 +24,25 @@ import { searchQueryTitle } from "@/lib/unified-search-areas";
 const SEARCH_ERROR = { invalid: "invalid", unavailable: "unavailable", unauthorized: "unauthorized" } as const;
 type Clarification = { question: string; scope: string; retry: number } | null;
 
+/** Only native result views retain controls on the existing account-owned entry. */
+function NativeControlledSearchExplorer(props: { plan: SearchPlan; initialGroups: SearchGroup[]; initialMapGroups?: SearchGroup[]; onUnavailable: () => void }) {
+  const [controls, setControls] = useViewState<SmartSearchControls>("smart.controls", { scope: "", filters: emptyDiscoveryFilters(), mapOpen: true, limits: {} });
+  return <SmartSearchExplorer {...props} stored={controls} setStored={setControls} />;
+}
+
 export default function UnifiedSearchResults() {
   const t = useTranslations("UnifiedSearch");
   const common = useTranslations("common");
   const { userId, isLoaded } = useAuth();
   const serverAdminId = useContext(ServerAdminContext);
+  const nativeAppearance = useNativeAppAppearance();
+  const entryParams = useSearchParams();
   const [deniedUserId, setDeniedUserId] = useState<string | null>(null);
   const denyAccess = useCallback(() => setDeniedUserId(userId ?? null), [userId]);
+  if (nativeAppearance && !entryParams.has("plan") && !entryParams.get("q")?.trim() && !entryParams.has("context")) {
+    return <NativeSmartLanding key={userId ?? "guest"} accountId={userId ?? null} loaded={isLoaded}
+      allowed={!!isLoaded && !!userId && serverAdminId === userId && deniedUserId !== userId} onUnavailable={denyAccess} />;
+  }
   if (!isLoaded || !userId || serverAdminId !== userId || deniedUserId === userId) {
     return <main className="min-h-screen pt-16 pb-28 xl:pb-12"><div className="site-container py-7 sm:py-10">
       <h1 className="font-serif text-3xl text-text-primary sm:text-4xl">{t("title")}</h1>
@@ -38,6 +54,7 @@ export default function UnifiedSearchResults() {
 }
 
 function AccessibleUnifiedSearchResults({ onUnavailable }: { onUnavailable: () => void }) {
+  const nativeAppearance = useNativeAppAppearance();
   const t = useTranslations("UnifiedSearch");
   const genie = useTranslations("Genie");
   const taxonomy = useTranslations("Taxonomy");
@@ -167,7 +184,9 @@ function AccessibleUnifiedSearchResults({ onUnavailable }: { onUnavailable: () =
       </div>
     </div>
     {resultScope === scope && !loading && !error && <div className="site-container pb-5">
-      {plan && userId && <SmartSearchExplorer key={scope} plan={plan} initialGroups={groups} initialMapGroups={mapGroups} onUnavailable={onUnavailable} />}
+      {plan && userId && (nativeAppearance
+        ? <NativeControlledSearchExplorer key={scope} plan={plan} initialGroups={groups} initialMapGroups={mapGroups} onUnavailable={onUnavailable} />
+        : <SmartSearchExplorer key={scope} plan={plan} initialGroups={groups} initialMapGroups={mapGroups} onUnavailable={onUnavailable} />)}
     </div>}
   </main></DirectoryPage>;
 }

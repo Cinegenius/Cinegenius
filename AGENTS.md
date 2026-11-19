@@ -1,3 +1,9 @@
+## App server release authorized by Markus – 19 November 2026
+
+Markus explicitly authorized publishing the reviewed app server code after the native iPhone installation. The requested app has Shots / Workspace / Smart / News / Projekte in its bottom bar; Smart combines Crew, marketplace, Locations and companies with multi-selection and grid/list/map-list views. These changes apply only to the exact installed native appearance marker; preserve the current ordinary website, live main authentication/privacy fixes and existing Smart server access gate. Port reviewed app deltas onto current main, never upload the divergent mobile branch wholesale. Existing native Workspace is reactivated; local archives are not an online collaboration service.
+
+Push and Shots publication activation remain separately disabled. This release does not apply migrations, enable provider credentials or feature flags, send real messages, or claim genuine Push delivery. Preserve safe unavailable states without a new schema. Stage/commit/merge/push through GitHub Desktop, then release only clean main equal to origin/main using the existing guarded production script. User publication authorization is already given; do not ask again for this same release.
+
 <!-- BEGIN:nextjs-agent-rules -->
 
 ## This is NOT the Next.js you know

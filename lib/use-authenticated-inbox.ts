@@ -11,7 +11,7 @@ import { INBOX_FALLBACK_REFRESH_MS } from "@/lib/message-refresh-policy";
 export function useAuthenticatedInbox() {
   const locale = useLocale();
   const localeRef = useRef(locale);
-  localeRef.current = locale;
+  useEffect(() => { localeRef.current = locale; }, [locale]);
   const { isLoaded, isSignedIn, userId, sessionId, getToken } = useAuth();
   const { session, isLoaded: sessionLoaded } = useSession();
   const active = isLoaded && sessionLoaded && isSignedIn && !!userId && !!sessionId
@@ -37,6 +37,9 @@ export function useAuthenticatedInbox() {
     const refresh = () => {
       if (document.visibilityState === "visible" && navigator.onLine !== false) void poll.refresh();
     };
+    const refreshAfterPush = () => {
+      if (document.visibilityState === "visible" && navigator.onLine !== false) void poll.refreshAfterExternalChange();
+    };
     refresh();
     const interval = window.setInterval(refresh, INBOX_FALLBACK_REFRESH_MS);
     const unsubscribeReads = subscribeToMessageReads(userId, () => {
@@ -44,6 +47,7 @@ export function useAuthenticatedInbox() {
     });
     document.addEventListener("visibilitychange", refresh);
     window.addEventListener("online", refresh);
+    window.addEventListener("cinegenius:push-inbox-refresh", refreshAfterPush);
     return () => {
       current.current = null;
       unsubscribe();
@@ -51,6 +55,7 @@ export function useAuthenticatedInbox() {
       window.clearInterval(interval);
       document.removeEventListener("visibilitychange", refresh);
       window.removeEventListener("online", refresh);
+      window.removeEventListener("cinegenius:push-inbox-refresh", refreshAfterPush);
       poll.stop();
       publishUnreadCount(null, 0);
     };

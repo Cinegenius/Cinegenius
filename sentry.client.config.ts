@@ -7,7 +7,7 @@ Sentry.init({
     userInfo: false,
     cookies: false,
     httpHeaders: {
-      request: { deny: ["forwarded", "-ip", "remote-", "via", "-user"] },
+      request: { deny: ["forwarded", "-ip", "remote-", "via", "-user", "x-push-installation-proof"] },
       response: { deny: ["forwarded", "-ip", "remote-", "via", "-user"] },
     },
     httpBodies: [],

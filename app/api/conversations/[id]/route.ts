@@ -1,3 +1,4 @@
+import { scheduleNativePushAfterCommit } from "@/lib/native-push-worker";
 import {attachMessageFiles} from "@/lib/message-attachment-server";
 import {attachmentIds} from "@/lib/message-attachments";
 import { SUPPORT_ACTOR_ID, SUPPORT_AVATAR_URL, SUPPORT_NAME } from "@/lib/support-identity";
@@ -176,6 +177,7 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
   }));
   if (error) { const failure = messagingRpcFailure(error); return fail(failure.key, failure.status); }
   if (!data || data.conversationId !== id || !messagingUuid(data.message?.id) || typeof data.created !== "boolean") return fail("saveError", 503);
+  if (data.created) scheduleNativePushAfterCommit();
   let senderName = t("senderFallback"); let senderAvatar = null;
   if (data.created) try {
     const [{ data: conversation }, { data: sender }] = await Promise.all([

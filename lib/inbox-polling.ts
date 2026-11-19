@@ -146,8 +146,9 @@ export function createInboxPolling(identity: Identity | null, getToken: TokenGet
     }
   }
 
-  async function refreshAfterMessageRead() {
-    // A count requested before a successful read receipt may already be stale.
+  async function refreshAfterExternalChange() {
+    // A count requested before a read receipt or an incoming push can be stale.
+    // This invalidates only GET results; it never acknowledges a notification.
     readRevision += 1;
     if (inFlight) await inFlight;
     await refresh();
@@ -175,7 +176,7 @@ export function createInboxPolling(identity: Identity | null, getToken: TokenGet
     getLocale: () => locale,
     setLocale,
     subscribe(listener: () => void) { listeners.add(listener); return () => { listeners.delete(listener); }; },
-    refresh, markRead, refreshAfterMessageRead,
+    refresh, markRead, refreshAfterMessageRead: refreshAfterExternalChange, refreshAfterExternalChange,
     stop() {
       stopped = true;
       controllers.forEach(controller => controller.abort());

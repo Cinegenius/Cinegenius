@@ -1,0 +1,53 @@
+/* Presentation only. The same server pages, forms and permissions remain active. */
+:global(html[data-cg-native-community-appearance="app"]) > :global(body) > main.surface:global(.site-main[data-native-app-surface="v1"]) {
+  --mobile-nav-clearance: calc(96px + env(safe-area-inset-bottom, 0px));
+  --site-header-height: calc(env(safe-area-inset-top, 0px) + var(--cg-app-header-height, 54px) + 32px);
+  min-width: 0;
+  min-height: 100dvh;
+  padding-top: var(--site-header-height) !important;
+  padding-bottom: var(--mobile-nav-clearance) !important;
+}
+
+/* The bottom navigation already names these areas. Keep semantic headings and CTAs. */
+.surface :global(.directory-page > .site-page-hero) {
+  padding-top: 0 !important;
+  border-bottom: 0;
+}
+.surface :global(.directory-page > .site-page-hero [data-page-header="badge"]),
+.surface :global(.directory-page > .site-page-hero [data-page-header="description"]) { display: none; }
+.surface :global(.directory-page > .site-page-hero [data-page-header="title"]) {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip-path: inset(50%) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+}
+.surface :global(.directory-page > .site-page-hero > .site-container) { padding-block: 4px; }
+.surface :global([data-result-image="photo"] img) { object-fit: cover; }
+.surface :global([data-result-image="logo"] img) { object-fit: contain; }
+
+.paused {
+  display: flex;
+  min-height: 60dvh;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 24px;
+  text-align: center;
+  color: var(--cg-app-ink, var(--color-text-primary));
+}
+.paused > svg { color: var(--cg-app-accent, var(--color-gold)); }
+.paused > h1 { margin: 0; font-size: 22px; font-weight: 600; }
+.paused > p { margin: 0; color: var(--cg-app-muted, var(--color-text-muted)); font-size: 14px; }
+.workspaceOpen { min-width: 44px; min-height: 44px; padding: 10px 22px; border: 0; border-radius: 22px; color: var(--cg-app-accent-ink, #12160a); background: var(--cg-app-accent, #c2f135); font: inherit; font-weight: 600; cursor: pointer; touch-action: manipulation; }
+.workspaceOpen:disabled { opacity: .45; cursor: default; }
+.workspaceOpen:focus-visible { outline: 2px solid var(--cg-app-accent, #c2f135); outline-offset: 3px; }
+
+@media (prefers-reduced-motion: reduce) {
+  .surface { scroll-behavior: auto; }
+}

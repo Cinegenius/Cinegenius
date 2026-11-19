@@ -10,6 +10,14 @@
     {
       "path": "/api/cron/profile-art",
       "schedule": "*/5 * * * *"
+    },
+    {
+      "path": "/api/cron/shots-cleanup",
+      "schedule": "*/5 * * * *"
+    },
+    {
+      "path": "/api/cron/native-push",
+      "schedule": "*/5 * * * *"
     }
   ],
   "git": {
