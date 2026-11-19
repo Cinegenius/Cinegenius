@@ -1,4 +1,5 @@
 import type { CrewData } from "./profile-types";
+import { resolveDepartmentOccupation } from "./departments";
 
 /** Curated by stable taxonomy ID. Light is yellow; make-up is soft pink. */
 export const PROFILE_ABOUT_HUES: Readonly<Record<string, number>> = Object.freeze({
@@ -21,4 +22,10 @@ export function profileAboutTheme(crew?: Pick<CrewData, "primaryOccupation" | "o
   const department = crew?.primaryOccupation?.departmentId || crew?.occupations?.[0]?.departmentId || crew?.department || "";
   const known = Object.hasOwn(PROFILE_ABOUT_HUES, department);
   return { department: known ? department : "neutral", hue: known ? PROFILE_ABOUT_HUES[department] : 210, saturation: known ? "60%" : "0%" };
+}
+
+/** Legacy public cards expose a role title only. Resolve an exact unambiguous catalogue title. */
+export function profileAboutThemeFromVisibleRole(role?: string | null) {
+  const resolved = role ? resolveDepartmentOccupation(role) : null;
+  return profileAboutTheme(resolved ? { department: resolved.department.id } : null);
 }

@@ -4,16 +4,44 @@ export const GENIE_RECORDING_MAX_MS = 30_000;
 export const GENIE_AUDIO_TYPES = ["audio/webm", "audio/mp4", "audio/ogg", "audio/wav"] as const;
 export const GENIE_SPEECH_RATE = 0.94;
 export const GENIE_SPEECH_VOLUME = 0.85;
+export const GENIE_SPEECH_LOCALES: Readonly<Record<string, string>> = Object.freeze({
+  de: "de-DE", en: "en-GB", es: "es-ES", it: "it-IT", cs: "cs-CZ", hu: "hu-HU",
+  nl: "nl-NL", "nl-BE": "nl-BE", sv: "sv-SE", fr: "fr-FR", pl: "pl-PL", "pt-PT": "pt-PT",
+  "zh-Hans": "zh-CN", ja: "ja-JP", ko: "ko-KR", ru: "ru-RU", uk: "uk-UA",
+});
 
-/** Keep the spoken language; prefer a natural/system-default voice when installed. */
+/** Preserve the requested accent; prefer higher quality among matching installed voices. */
 export function selectGenieSpeechVoice(voices: SpeechSynthesisVoice[], locale: string): SpeechSynthesisVoice | null {
-  const language = locale.toLowerCase().split("-")[0];
-  const score = (voice: SpeechSynthesisVoice) =>
-    (/premium|enhanced|natural|neural/i.test(voice.name) ? 8 : 0)
-    + (voice.lang.toLowerCase() === locale.toLowerCase() ? 4 : 0)
-    + (voice.default ? 2 : 0) + (voice.localService ? 1 : 0);
-  return voices.filter(voice => voice.lang.toLowerCase().split("-")[0] === language)
-    .sort((a, b) => score(b) - score(a))[0] ?? null;
+  const tag = (GENIE_SPEECH_LOCALES[locale] ?? locale).replaceAll("_", "-").toLowerCase();
+  const language = tag.split("-")[0];
+  const rank = (voice: SpeechSynthesisVoice) => [
+    Number(voice.lang.replaceAll("_", "-").toLowerCase() === tag),
+    /premium/i.test(voice.name) ? 3 : /enhanced|natural|neural/i.test(voice.name) ? 2 : 0,
+    Number(Boolean(voice.default)), Number(Boolean(voice.localService)),
+  ];
+  return voices.filter(voice => voice.lang.replaceAll("_", "-").toLowerCase().split("-")[0] === language)
+    .sort((a, b) => {
+      const left = rank(a), right = rank(b);
+      for (let i = 0; i < left.length; i++) if (left[i] !== right[i]) return right[i] - left[i];
+      return (a.voiceURI || a.name).localeCompare(b.voiceURI || b.name, "en");
+    })[0] ?? null;
+}
+
+/** Speak the visible wording, with paragraph pauses, rather than Markdown punctuation or URLs. */
+export function genieSpokenText(text: string): string {
+  return text.slice(0, 6000)
+    .replace(/```[^\n]*\n[\s\S]*?```/g, " ")
+    .replace(/!\[([^\]]*)\]\([^)]*\)/g, "$1")
+    .replace(/\[([^\]]+)\]\([^)]*\)/g, "$1")
+    .replace(/https?:\/\/[^\s)]+/g, " ")
+    .replace(/^[ \t]{0,3}(?:#{1,6}\s+|>\s*|[-*+]\s+|\d+[.)]\s+)/gm, "")
+    .replace(/(\*\*|__)([\s\S]*?)\1/g, "$2")
+    .replace(/(^|\s)[*_]([^\n*_]+)[*_](?=\s|[.,!?;:]|$)/g, "$1$2")
+    .replace(/~~([^~]+)~~/g, "$1")
+    .replace(/`([^`]+)`/g, "$1")
+    .replace(/[ \t]+/g, " ")
+    .replace(/\s*\n\s*/g, "\n")
+    .trim();
 }
 export interface NativeGenieVoice {
   readonly version: 1;

@@ -1217,7 +1217,7 @@ input:-webkit-autofill:active {
 html[data-cg-native-community-appearance="app"] {
   --cg-app-safe-top:env(safe-area-inset-top,0px);
   --cg-app-safe-bottom:env(safe-area-inset-bottom,0px);
-  --cg-app-chrome-clearance:calc(var(--cg-app-safe-top) + var(--cg-app-header-height,56px) + 32px);
+  --cg-app-chrome-clearance:calc(var(--cg-app-safe-top) + var(--cg-app-header-height,56px) + 20px);
   --site-header-height:var(--cg-app-chrome-clearance);
   --mobile-safe-area-height:var(--cg-app-safe-bottom);
   --mobile-nav-clearance:calc(96px + var(--cg-app-safe-bottom));

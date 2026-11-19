@@ -1,6 +1,6 @@
 # App: faire Crew-Entdeckung, vollständige Fotos und News-Struktur
 
-Status: vorbereitet auf `codex/app-smart-colors-20261119`, keine Veröffentlichung dieser Folgearbeit. Die frühere Freigabe ist verbraucht. Aktuelle veröffentlichte Quellenbasis ist `e18e666a1041d7170919e092c774c2eafbaf5dfc` (WEB CODEX bestätigt, Deployment `dpl_4Q4J2pnXASpjox6nRjrLh7Wy6FzK`). Deren Gast-Sprachwahl wird erhalten. Keine Migration, kein Provideraufruf, keine Aktivierung von Shots/Push und kein Produktionsschreibzugriff durch diese Folgearbeit.
+Status: vorbereitet auf `codex/app-smart-colors-20261119`, keine Veröffentlichung dieser Folgearbeit. Die frühere Freigabe ist verbraucht. Die erste geprüfte Quellenbasis war `e18e666a1041d7170919e092c774c2eafbaf5dfc`. Am 20. November wurde die Folgearbeit mit dem inzwischen veröffentlichten `8302dcd57d919db740b8b942cd579cfe4ee118c5` abgeglichen (WEB CODEX bestätigt, Deployment `dpl_C4ZAEtv2AtBBGBSEUuDX3QX7ZqJK`). Die neue Navigation Shots / News / Smart / Projekte / Work, Header-/Genie-Korrekturen und Gast-Sprachwahl bleiben erhalten. Keine Migration, kein Provideraufruf, keine Aktivierung von Shots/Push und kein Produktionsschreibzugriff durch diese Folgearbeit.
 
 ## Verhalten und Ursachen
 
@@ -42,3 +42,13 @@ Build-Ergebnis und endgültiger Commit stehen im Übergabebeleg unter `/srv/cine
 ## Noch ausdrücklich offen
 
 Aktuelle Swift-/Xcode-Quellen wurden nicht ersetzt. Kein neuer Xcode-Build, keine iPhone-Installation, keine echte Anmeldung, Softwaretastatur oder Gerätegeste auf iPhone 15 Pro durch diesen Serverlauf. Die vollständige native Integration und deren Theme-Regeln benötigen den aktuellen Mac-Rücklauf und einen Gerätetest. Bildtests verwenden vollständige synthetische Fotos, keine Veränderung realer Mitgliedermedien. Echte Datenbank-/Netzlaufzeiten der vollständigen Crew-Auswahl sind vor einer Veröffentlichung zu messen. Die pausierte allgemeine Smart-Verständnisarbeit bleibt pausiert.
+
+## Abgleich mit Header/Genie vom 20. November 2026
+
+Der Live-Stand `8302dcd` und die vorbereitete Folgearbeit ließen sich ohne Konflikte zusammenführen. Die gemessene Header-Freihöhe, der neue Suchdialog-Lebenszyklus, Entwurfsschutz, Genie, die neue Reihenfolge der unteren Navigation und ziehbare Ansichtswechsel werden erhalten. Organisationen bleiben im vorbereiteten Paket unter News; die älteren Menü-Erwartungen im gemeinsamen Navigationstest wurden an diese bestätigte Entscheidung angepasst. Kein Produktverhalten des neuen Live-Stands wurde zur Anpassung der Tests zurückgebaut.
+
+Der abgeglichene Stand besteht insgesamt 264 unterschiedliche zielgerichtete Tests: Im ersten Lauf bestanden 245 von 263; alle 18 Abweichungen betrafen die alten Organisations-Menüerwartungen. Nach deren Anpassung und einem zusätzlichen Test für Organisationsdetails besteht die gesamte betroffene Navigationssuite mit 81 Fällen. Die übrigen unveränderten Tests wurden nicht erneut gezählt. Dazu bestehen 8 Smart-/Suchdarstellungsfälle, 10 News-/Organisations-/Verlaufsfälle und 2 zusätzliche Prüfungen für ziehbare Ansichtswechsel in Chromium und WebKit. Die Oberflächenprüfungen umfassen 320/393px, beide App-Themes und alle 17 Sprachen; die Gestenprüfung bleibt eine Browsersimulation.
+
+Der abschließende vollständige Build bestand mit Exit 0 in 123,83 Sekunden, einschließlich TypeScript, 162 statischen Seiten und `check:i18n` mit 17 Katalogen und 11190 Schlüsseln. Die gemeinsamen Designprüfungen sind bestanden. Ein Serverneustart unterbrach zuvor noch laufende Prüfungen; die betroffenen WebKit-Fälle und der vollständige Build wurden erfolgreich neu ausgeführt. Die unveränderten Hinweise zur fehlenden Produktions-Datenbankkonfiguration bleiben ausdrücklich kein Datenbanktest. Die neue globale Suche, Navbar, Menü, Genie und Entwurfskontext sind inhaltlich identisch zum veröffentlichten Stand; alle 17 `NativeRoomScanner`-Sprachbereiche bleiben unverändert. Der separate Statistik-/PostHog-Entwurf wurde nicht übernommen.
+
+Die Prüfungen dieses Abgleichs, der genaue Commit und die weiterhin offenen Geräte-/Leistungsgrenzen stehen unter `/srv/cinegenius/handoffs/20261120-app-smart-colors-reconciliation/receipt.json`. Die ursprünglichen Belege bleiben unverändert erhalten. Dieser Abgleich ist keine Veröffentlichung und aktiviert keine weiteren Funktionen.

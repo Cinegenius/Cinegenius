@@ -13450,6 +13450,7 @@
   },
   "ProfileLayout": {},
   "NativeAppChrome": {
+    "work": "Work",
     "createEntry": "Item maken",
     "navigation": "App-snelkoppelingen",
     "profileMenu": "Profielmenu openen",

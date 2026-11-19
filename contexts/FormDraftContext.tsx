@@ -25,6 +25,7 @@ export default function FormDraftProvider({ children }: { children: ReactNode })
   const [canSave, setCanSave] = useState(false);
   const [hasUnsaved, setHasUnsaved] = useState(false);
   const working = useRef(false);
+  const attempt = useRef(0);
   const notify = useCallback(() => setHasUnsaved([...entries.current.values()].some(entry => entry.unsafe())), []);
   const register = useCallback((id: symbol, protection: FormProtection) => {
     entries.current.set(id, protection);
@@ -42,11 +43,13 @@ export default function FormDraftProvider({ children }: { children: ReactNode })
     if (pending.current || working.current) return;
     announceFormNavigation();
     if (!unsafe().length) { action(); return; }
+    const version = ++attempt.current;
     pending.current = action;
     setCanSave(unsafe().every(entry => !!entry.flush));
     working.current = true;
     setSaving(true); setFailed(false); setDialog(true);
     void flush().then(saved => {
+      if (version !== attempt.current) return;
       working.current = false; setSaving(false);
       if (!pending.current) return;
       if (saved) { const go = pending.current; pending.current = null; setDialog(false); go(); }
@@ -120,7 +123,7 @@ export default function FormDraftProvider({ children }: { children: ReactNode })
     };
   }, [leave, unsafe]);
 
-  const stay = useCallback(() => { pending.current = null; setDialog(false); setFailed(false); }, []);
+  const stay = useCallback(() => { attempt.current++; pending.current = null; working.current = false; setSaving(false); setDialog(false); setFailed(false); }, []);
   const panel = useRef<HTMLElement>(null);
   useEffect(() => {
     if (!dialog) return;
@@ -151,14 +154,16 @@ export default function FormDraftProvider({ children }: { children: ReactNode })
           <button data-stay type="button" onClick={stay} className="min-h-11 rounded-xl border border-border px-4 py-2 text-text-primary">{t("stay")}</button>
           {canSave && <button type="button" disabled={saving} onClick={() => {
             if (working.current) return;
+            const version = ++attempt.current;
             working.current = true; setSaving(true);
-            void flush().then(ok => { working.current = false; setSaving(false); if (ok && pending.current) { const go = pending.current; pending.current = null; setDialog(false); go(); } else setFailed(true); });
+            void flush().then(ok => { if (version !== attempt.current) return; working.current = false; setSaving(false); if (ok && pending.current) { const go = pending.current; pending.current = null; setDialog(false); go(); } else setFailed(true); });
           }} className="flex min-h-11 items-center justify-center gap-2 rounded-xl bg-gold px-4 py-2 font-semibold text-bg-primary disabled:opacity-60">{saving && <Loader2 size={16} className="animate-spin" />}{t("saveLeave")}</button>}
           <button type="button" disabled={saving} onClick={() => {
             const go = pending.current;
             if (!go) return;
+            const version = ++attempt.current;
             pending.current = null;
-            void Promise.all(unsafe().map(entry => entry.discard?.())).finally(() => { setDialog(false); go(); });
+            void Promise.all(unsafe().map(entry => entry.discard?.())).finally(() => { if (version === attempt.current) { setDialog(false); go(); } });
           }} className="min-h-11 rounded-xl px-4 py-2 text-text-muted disabled:opacity-60">{t("discard")}</button>
         </div>
       </section>

@@ -13450,6 +13450,7 @@
   },
   "ProfileLayout": {},
   "NativeAppChrome": {
+    "work": "Work",
     "createEntry": "Створити запис",
     "navigation": "Швидкий доступ у застосунку",
     "profileMenu": "Відкрити меню профілю",

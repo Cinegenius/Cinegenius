@@ -355,7 +355,7 @@ export default function CreatorDetail({
             {/* Über mich */}
             {creator.bio && (
               <section>
-                <ProfileAboutCard><SectionTitle icon={Users}>{uiText("Ui.text_3f8ab8360131de")}</SectionTitle>
+                <ProfileAboutCard role={creator.role}><SectionTitle icon={Users}>{uiText("Ui.text_3f8ab8360131de")}</SectionTitle>
                 <p className="text-text-secondary leading-relaxed">{creator.bio}</p></ProfileAboutCard>
               </section>
             )}

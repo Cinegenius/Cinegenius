@@ -13450,6 +13450,7 @@
   },
   "ProfileLayout": {},
   "NativeAppChrome": {
+    "work": "Work",
     "createEntry": "创建条目",
     "navigation": "应用快捷入口",
     "profileMenu": "打开个人资料菜单",

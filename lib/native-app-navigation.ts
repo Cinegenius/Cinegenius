@@ -6,10 +6,10 @@ export type NativeAppArea = "shots" | "workspace" | "smart" | "news" | "projects
 /** App destinations are real server routes; the native appearance marker grants no access. */
 export const NATIVE_APP_NAV_ITEMS = [
   { id: "shots", href: "/app/shots", labelKey: "NativeAppChrome.shots" },
-  { id: "workspace", href: "/app/workspace", labelKey: "NativeAppChrome.workspace" },
-  { id: "smart", href: "/search?smart=1", labelKey: "NativeAppChrome.smart" },
   { id: "news", href: "/news", labelKey: "nav.news" },
+  { id: "smart", href: "/search?smart=1", labelKey: "NativeAppChrome.smart" },
   { id: "projects", href: "/projects", labelKey: "nav.projects" },
+  { id: "workspace", href: "/app/workspace", labelKey: "NativeAppChrome.work" },
 ] as const;
 
 export const NATIVE_APP_MENU_ITEMS: readonly { id: string; href: string; labelKey: string; icon: SiteNavigationIcon }[] = [

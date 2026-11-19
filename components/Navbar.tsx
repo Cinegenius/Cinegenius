@@ -21,6 +21,8 @@ import { subscribeToProfileUpdated } from "@/lib/profile-update-events";
 import { ACCOUNT_NAV_ITEMS, PRIMARY_NAV_ITEMS, activeNavigationId, routeMatches, SITE_NAV_MENU_ID, SITE_NAV_SIGN_OUT_EVENT } from "@/lib/site-navigation";
 import { useSiteNavigation } from "@/contexts/SiteNavigationContext";
 import { useAdminSupportUnread } from "@/lib/use-admin-support-unread";
+import { announceNativeHeaderAction, dismissNativeHeaderUtility, useNativeHeaderAction } from "@/lib/native-header-utility";
+import { BEFORE_FORM_NAVIGATION_EVENT } from "@/lib/form-navigation-events";
 import NativeAppNavbar from "@/components/app/NativeAppNavbar";
 import { useNativeAppAppearance } from "@/lib/use-native-app-appearance";
 
@@ -79,11 +81,19 @@ export default function Navbar({ initialIsSignedIn = false, initialAdminUserId =
   const accountImageUrl = failedAccountImageUrl !== candidateImageUrl ? candidateImageUrl : "";
 
   const closeAll = () => { setUserMenuOpen(false); };
+  useNativeHeaderAction(action => { if (nativeAppearance && action !== "profile") setUserMenuOpen(false); });
+  useEffect(() => {
+    if (!nativeAppearance) return;
+    const close = () => setUserMenuOpen(false);
+    window.addEventListener(BEFORE_FORM_NAVIGATION_EVENT, close);
+    return () => window.removeEventListener(BEFORE_FORM_NAVIGATION_EVENT, close);
+  }, [nativeAppearance]);
 
   useEffect(() => {
     // A route or account/session transition must not retain another identity's open menu.
     // eslint-disable-next-line react-hooks/set-state-in-effect
     closeAll();
+    if (nativeAppearance) dismissNativeHeaderUtility();
   }, [pathname, authenticatedUserId, authenticatedSessionId, activeUserId, hasSignedInSession, nativeAppearance]);
 
   useEffect(() => {
@@ -262,7 +272,7 @@ export default function Navbar({ initialIsSignedIn = false, initialAdminUserId =
         signedIn: hasSignedInSession, ready: hasSignedInSession && !!activeUserId, open: userMenuOpen,
         label: uiText("NativeAppChrome.profileMenu"), title: uiText("NativeAppChrome.profileMenuTitle"), loadingLabel: uiText("Contacts.loading"),
         displayName, email, avatar: accountAvatar("h-11 w-11 min-h-11 min-w-11 shrink-0", 18), supportBadge,
-        onToggle: event => { activeAccountButton.current = event.currentTarget; closeMenu(); setUserMenuOpen(value => !value); },
+        onToggle: event => { if (!announceNativeHeaderAction("profile")) return; activeAccountButton.current = event.currentTarget; closeMenu(); setUserMenuOpen(value => !value); },
         onClose: () => setUserMenuOpen(false), onSignOut: () => requestSignOut.current(), signingOut,
         signOutLabel: signingOut ? t("signingOut") : t("signOut"),
         links: [
@@ -274,8 +284,8 @@ export default function Navbar({ initialIsSignedIn = false, initialAdminUserId =
         ],
       }}
       messages={{ label: hasSignedInSession ? `${messageLabel}; ${noticeLabel}` : t("messages"), count: unreadMessages, noticeCount: unreadNotices, failed: inboxFailed, active: activeId === "messages" }}
-      search={{ label: uiText("Ui.text_9f6d74e0a12b67"), onClick: event => { setUserMenuOpen(false); event.currentTarget.focus({ preventScroll: true }); document.dispatchEvent(new Event("cg:opensearch")); } }}
-      menu={{ label: t("openMenu"), open: menuOpen, controls: SITE_NAV_MENU_ID, onClick: event => { setUserMenuOpen(false); event.currentTarget.focus({ preventScroll: true }); openMenu(); } }}
+      search={{ label: uiText("Ui.text_9f6d74e0a12b67"), onClick: event => { setUserMenuOpen(false); event.currentTarget.focus({ preventScroll: true }); document.dispatchEvent(new CustomEvent("cg:opensearch", { detail:{toggle:true} })); } }}
+      menu={{ label: t("openMenu"), open: menuOpen, controls: SITE_NAV_MENU_ID, onClick: event => { if (!announceNativeHeaderAction(menuOpen ? "close" : "menu")) return; setUserMenuOpen(false); event.currentTarget.focus({ preventScroll: true }); if (menuOpen) closeMenu(); else openMenu(); } }}
     />;
   }
 
