@@ -71,7 +71,7 @@ export function AdminSupportCenter() {
   const loadInbox = useCallback(async () => {
     setLoading(true); setError("");
     try {
-      const payload = await fetchJson<{ threads: Thread[]; total: number; unreadCount?: number }>(uiText, `/api/admin/support/threads?page=${page}`, { cache: "no-store" });
+      const payload = await fetchJson<{ threads: Thread[]; total: number; unreadCount?: number }>(uiText, `/api/admin/support/threads?page=${page}`, { cache: "no-store", signal: AbortSignal.timeout(15_000) });
       setThreads(payload.threads); setTotal(payload.total); setGlobalUnread(payload.unreadCount ?? null);
     } catch (cause) { setError(uiErrorMessage(cause, uiText("Ui.text_7d9dadb013a54e"))); }
     finally { setLoading(false); }
@@ -97,7 +97,7 @@ export function AdminSupportCenter() {
     setActiveId(id); setDetail((current) => current?.thread.id === id ? current : null); setError("");
     try {
       const suffix = cursor ? "?" + new URLSearchParams(cursor).toString() : "";
-      const payload = await fetchJson<Detail>(uiText, "/api/admin/support/threads/" + id + suffix, { cache: "no-store" });
+      const payload = await fetchJson<Detail>(uiText, "/api/admin/support/threads/" + id + suffix, { cache: "no-store", signal: AbortSignal.timeout(15_000) });
       if (activeThreadRef.current !== id || (sequence !== null && sequence !== threadRequestRef.current)) return;
       setDetail((current) => {
         if (current?.thread.id !== id) return payload;
@@ -109,12 +109,15 @@ export function AdminSupportCenter() {
       });
       const unreadIds = payload.messages.filter((message) => !message.fromSupport && !message.readAt).map((message) => message.id);
       if (unreadIds.length) {
-        await fetchJson(uiText, "/api/admin/support/threads/" + id + "/read", {
+        // Read acknowledgement must not block visible history or its pagination.
+        void fetchJson(uiText, "/api/admin/support/threads/" + id + "/read", {
           method: "POST", headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ message_ids: unreadIds }),
-        });
-        window.dispatchEvent(new Event("cg:support-unread-changed"));
-        void loadInbox();
+          body: JSON.stringify({ message_ids: unreadIds }), signal: AbortSignal.timeout(8_000),
+        }).then(() => {
+          if (activeThreadRef.current !== id || (sequence !== null && sequence !== threadRequestRef.current)) return;
+          window.dispatchEvent(new Event("cg:support-unread-changed"));
+          void loadInbox();
+        }).catch(() => { /* The displayed history remains usable; refresh retries the receipt. */ });
       }
     } catch (cause) { if (activeThreadRef.current === id) setError(uiErrorMessage(cause, uiText("Ui.text_1fa117ab833b30"))); }
     finally { if (older) setOlderLoading(false); }

@@ -8,7 +8,7 @@ import { dismissNativeDialog } from "@/lib/native-dialog";
 
 import UnoptimizedImage from "@/components/UnoptimizedImage";
 
-import { useEffect, useRef, useState, useCallback, type CSSProperties } from "react";
+import { useEffect, useLayoutEffect, useRef, useState, useCallback, type CSSProperties } from "react";
 import { useSearchParams } from "next/navigation";
 import { useUser } from "@clerk/nextjs";
 import Link from "next/link";
@@ -146,6 +146,7 @@ function MessagesContent() {
   const [visualViewportTop, setVisualViewportTop] = useState(0);
   const bottomRef = useRef<HTMLDivElement>(null);
   const messagesViewportRef = useRef<HTMLDivElement>(null);
+  const olderScrollRestoreRef = useRef<{ owner: string; conversationId: string; height: number; top: number } | null>(null);
   const atBottomRef = useRef(true);
   const messagesRef = useRef<Message[]>([]);
   const activeIdRef = useRef<string | null>(null);
@@ -164,6 +165,17 @@ function MessagesContent() {
   const contactRequestSequence = useRef(0);
   const currentUserRef = useRef(user?.id);
   useEffect(() => { currentUserRef.current = user?.id; }, [user?.id]);
+
+  // Restore only after React has committed the prepended history to the viewport.
+  useLayoutEffect(() => {
+    const restore = olderScrollRestoreRef.current;
+    if (!restore) return;
+    olderScrollRestoreRef.current = null;
+    const viewport = messagesViewportRef.current;
+    if (viewport && user?.id === restore.owner && activeId === restore.conversationId) {
+      viewport.scrollTop = restore.top + viewport.scrollHeight - restore.height;
+    }
+  }, [messages, user?.id, activeId]);
 
   // Mobile: true = zeige Chat, false = zeige Liste
   const showChat = !noticesOnly && !!(activeId || newConvRecipient);
@@ -205,7 +217,7 @@ function MessagesContent() {
     if (!owner) return;
     const sequence = ++conversationRequestSequence.current;
     try {
-      const res = await fetch("/api/conversations", { cache: "no-store" });
+      const res = await fetch("/api/conversations", { cache: "no-store", signal: AbortSignal.timeout(15_000) });
       if (!res.ok) throw new Error();
       const { data } = await res.json();
       if (currentUserRef.current !== owner || sequence !== conversationRequestSequence.current) return;
@@ -309,7 +321,7 @@ function MessagesContent() {
       const query = options.before
         ? `?before=${encodeURIComponent(options.before.before)}&before_id=${encodeURIComponent(options.before.before_id)}`
         : "";
-      const res = await fetch(`/api/conversations/${convId}${query}`, { cache: "no-store" });
+      const res = await fetch(`/api/conversations/${convId}${query}`, { cache: "no-store", signal: AbortSignal.timeout(15_000) });
       if (!res.ok) throw new Error();
       const { messages: msgs, hasOlder, conversation } = await res.json();
       if (!Array.isArray(msgs)) throw new Error();
@@ -323,37 +335,38 @@ function MessagesContent() {
       if (options.before || !alreadyLoadedOlder) setHasOlderMessages(Boolean(hasOlder));
       const currentIds = new Set(messagesRef.current.map((message) => message.id));
       const hasNewVisibleMessage = snapshot.some((message) => !currentIds.has(message.id));
+      if (olderViewport) olderScrollRestoreRef.current = { owner, conversationId: convId, height: previousScrollHeight, top: previousScrollTop };
       setMessages((current) => mergeVisibleMessagePage(current, snapshot, hiddenMessageIds.current, !options.before));
       if (conversation?.id === convId) setConversations(current => current.some(c => c.id === convId) ? current : [{ ...conversation, messages: snapshot, updated_at: snapshot.at(-1)?.created_at ?? "" }, ...current]);
       const messageIds = incomingUnreadMessageIds(snapshot, owner);
       if (messageIds.length > 0) {
-        try {
-          const readResponse = await fetch(`/api/conversations/${convId}/read`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            cache: "no-store",
-            body: JSON.stringify({ message_ids: messageIds }),
-          });
-          if (readResponse.ok) {
-            const readState = await readResponse.json();
-            if (!isCurrentRequest()) return;
-            const readMessages = Array.isArray(readState.readMessages) ? readState.readMessages : [];
-            setMessages((current) => applyReadReceiptTimestamps(current, readMessages));
-            setConversations((current) => current.map((conversation) => conversation.id !== convId ? conversation : {
-              ...conversation,
-              unread_count: readState.byConversation?.[convId] ?? conversation.unread_count ?? 0,
-              messages: applyReadReceiptTimestamps(conversation.messages ?? [], readMessages),
-            }));
-            notifyMessagesRead(owner);
-          }
-        } catch { /* Read receipts do not invalidate a successfully loaded history. */ }
+        // A slow receipt must not hold history loading, pagination or scrolling open.
+        // Keep its account/conversation/revision guard independent of the visible history.
+        void (async () => {
+          try {
+            const readResponse = await fetch(`/api/conversations/${convId}/read`, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              cache: "no-store",
+              body: JSON.stringify({ message_ids: messageIds }),
+              signal: AbortSignal.timeout(8_000),
+            });
+            if (readResponse.ok) {
+              const readState = await readResponse.json();
+              if (!isCurrentRequest()) return;
+              const readMessages = Array.isArray(readState.readMessages) ? readState.readMessages : [];
+              setMessages((current) => applyReadReceiptTimestamps(current, readMessages));
+              setConversations((current) => current.map((conversation) => conversation.id !== convId ? conversation : {
+                ...conversation,
+                unread_count: readState.byConversation?.[convId] ?? conversation.unread_count ?? 0,
+                messages: applyReadReceiptTimestamps(conversation.messages ?? [], readMessages),
+              }));
+              notifyMessagesRead(owner);
+            }
+          } catch { /* Read receipts do not invalidate a successfully loaded history. */ }
+        })();
       }
-      if (olderViewport) {
-        window.setTimeout(() => {
-          const nextViewport = messagesViewportRef.current;
-          if (nextViewport && currentUserRef.current === owner && activeIdRef.current === convId) nextViewport.scrollTop = previousScrollTop + (nextViewport.scrollHeight - previousScrollHeight);
-        }, 0);
-      } else if (options.scroll || (atBottomRef.current && hasNewVisibleMessage)) {
+      if (!olderViewport && (options.scroll || (atBottomRef.current && hasNewVisibleMessage))) {
         window.setTimeout(() => {
           if (currentUserRef.current !== owner || activeIdRef.current !== convId || (!options.scroll && !atBottomRef.current)) return;
           const viewport = messagesViewportRef.current;
@@ -494,7 +507,7 @@ function MessagesContent() {
     </aside>
     <Activity mode={noticesOnly ? "visible" : "hidden"}><InboxNotices /></Activity>
     <Activity mode={friendsOnly && !showChat ? "visible" : "hidden"}><InboxFriends key={user?.id ?? "signed-out"} /></Activity>
-    {!noticesOnly && (!friendsOnly || showChat) && <section aria-label={t("conversation")} className={`${showChat?"flex":"hidden sm:flex"} relative min-w-0 flex-1 flex-col bg-bg-primary`}>
+    {!noticesOnly && (!friendsOnly || showChat) && <section aria-label={t("conversation")} className={`${showChat?"flex":"hidden sm:flex"} relative min-h-0 min-w-0 flex-1 flex-col bg-bg-primary`}>
       {showChat?<>
         <header className="flex min-w-0 shrink-0 items-center gap-2 border-b border-border px-3 py-2">
           <button type="button" onClick={closeChat} aria-label={messageNavigationText("back")} className="flex min-h-11 min-w-11 shrink-0 items-center justify-center rounded-xl text-text-muted"><ArrowLeft size={21}/></button>
