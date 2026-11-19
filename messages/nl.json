@@ -13270,6 +13270,7 @@
         "title": "Zoekterm in de titel",
         "requirements": "Eisen volgens de aanbieder"
       },
+      "searchHere": "Hier zoeken",
       "applyMapArea": "Beperk tot dit kaartgebied"
     },
     "conditions": {}
@@ -13445,6 +13446,7 @@
   },
   "ProfileLayout": {},
   "NativeAppChrome": {
+    "createEntry": "Item maken",
     "navigation": "App-snelkoppelingen",
     "profileMenu": "Profielmenu openen",
     "profileMenuTitle": "Je profiel",
@@ -13506,10 +13508,15 @@
     "look_photo": "Foto"
   },
   "NativeSmartDiscovery": {
+    "compactAreas": {
+      "crew": "Crew",
+      "marketplace": "Markt",
+      "locations": "Locaties"
+    },
     "directories": "Onderdelen openen",
     "loading": "Suggesties laden …",
     "focus": "Focus van suggesties",
-    "profileFocus": "Op basis van profiel",
+    "profileFocus": "Voor jou",
     "neutral": "Neutraal",
     "editProfile": "Profiel bewerken",
     "focusNote": "Je profiel ordent de geladen suggesties. Het beperkt je zoekopdracht niet.",

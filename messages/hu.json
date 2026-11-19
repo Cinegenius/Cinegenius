@@ -13270,6 +13270,7 @@
         "title": "Keresőkifejezés a címben",
         "requirements": "A szolgáltató által megadott követelmények"
       },
+      "searchHere": "Keresés itt",
       "applyMapArea": "Szűkítés erre a térképterületre"
     },
     "conditions": {}
@@ -13445,6 +13446,7 @@
   },
   "ProfileLayout": {},
   "NativeAppChrome": {
+    "createEntry": "Bejegyzés létrehozása",
     "navigation": "Alkalmazás-gyorselérés",
     "profileMenu": "Profilmenü megnyitása",
     "profileMenuTitle": "A profilod",
@@ -13506,10 +13508,15 @@
     "look_photo": "Fotó"
   },
   "NativeSmartDiscovery": {
+    "compactAreas": {
+      "crew": "Stáb",
+      "marketplace": "Piac",
+      "locations": "Helyek"
+    },
     "directories": "Területek megnyitása",
     "loading": "Javaslatok betöltése …",
     "focus": "Javaslatok fókusza",
-    "profileFocus": "Profil alapján",
+    "profileFocus": "Neked",
     "neutral": "Semleges",
     "editProfile": "Profil szerkesztése",
     "focusNote": "A profilod rendezi a betöltött javaslatokat. A keresést nem korlátozza.",

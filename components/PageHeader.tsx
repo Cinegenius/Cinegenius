@@ -2,6 +2,7 @@ import Image from "@/components/MediaImage";
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { ArrowRight } from "lucide-react";
+import styles from "./PageHeader.module.css";
 
 export const PROJECTS_BACKDROP_IMAGE =
   "https://images.unsplash.com/photo-1574717024653-61fd2cf4d44d?q=80&w=1740&auto=format&fit=crop";
@@ -46,6 +47,8 @@ type PageHeaderProps = {
   badge: string;
   title: string;
   titleHighlight?: string;
+  /** Complete native accessible title when public artwork uses translated fragments. */
+  nativeTitle?: string;
   description: string;
   leading?: ReactNode;
   image?: string;
@@ -63,6 +66,7 @@ export default function PageHeader({
   badge,
   title,
   titleHighlight,
+  nativeTitle,
   description,
   leading,
   image = PROJECTS_BACKDROP_IMAGE,
@@ -74,7 +78,7 @@ export default function PageHeader({
   children,
 }: PageHeaderProps) {
   return (
-    <section className="site-page-hero relative isolate overflow-hidden border-b border-border/40 pt-16">
+    <section className={`site-page-hero ${styles.hero} relative isolate overflow-hidden border-b border-border/40 pt-16`}>
       {withBackdrop && <PageBackdrop image={image} imagePosition={imagePosition} optimizeImage={optimizeImage} />}
 
       <div className="site-container relative z-10 py-4 sm:py-8">
@@ -85,13 +89,13 @@ export default function PageHeader({
               <span className="text-[11px] font-bold uppercase tracking-widest text-white/80">{badge}</span>
             </div>
             <h1 data-page-header="title" className="mb-1.5 font-display text-xl font-bold leading-tight text-white sm:text-3xl lg:text-4xl">
-              {title}{titleHighlight && <> <span className="text-gradient-gold">{titleHighlight}</span></>}
+              {nativeTitle ? <><span className={styles.nativeTitle} data-page-header="native-title">{nativeTitle}</span><span data-page-header="visual-title">{title}{titleHighlight && <> <span className="text-gradient-gold">{titleHighlight}</span></>}</span></> : <>{title}{titleHighlight && <> <span className="text-gradient-gold">{titleHighlight}</span></>}</>}
             </h1>
             <p data-page-header="description" className="max-w-xl text-sm leading-relaxed text-white/65 sm:text-base">{description}</p>
           </div>
 
           {(cta || ctaSecondary) && (
-            <div className="flex shrink-0 flex-wrap items-center gap-2">
+            <div data-page-header="actions" className="flex shrink-0 flex-wrap items-center gap-2">
               {ctaSecondary && (
                 <Link
                   href={ctaSecondary.href}

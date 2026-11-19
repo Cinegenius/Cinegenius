@@ -33,6 +33,7 @@ import { profileCoverStyle } from "@/lib/profile-cover";
 import FloatingPanel from "@/components/FloatingPanel";
 import ConnectButton from "@/components/ConnectButton";
 import { taxonomyLabel } from "@/lib/departments";
+import ProfileAboutCard from "@/components/ProfileAboutCard";
 
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -670,7 +671,7 @@ function ActorProfile({ organizationSection, profile, isOwner, projectCredits, c
               )}
 
               {/* Bio */}
-              {profile.bio && <ProfileBio value={profile.bio} />}
+              {profile.bio && <ProfileAboutCard crew={profile.crew}><ProfileBio value={profile.bio} /></ProfileAboutCard>}
 
               {(crewData.experience_years || crewData.department || crewEquipment.length > 0 || crewSoftware.length > 0 || crewCertificates.length > 0) && (
                 <div className="rounded-xl border border-border bg-bg-secondary/70 p-4 space-y-3">
@@ -1116,7 +1117,7 @@ function ModelProfile({ organizationSection, profile, isOwner, projectCredits = 
           <>
             <Divider />
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-10">
-              {profile.bio && <div><SectionLabel>{uiText("Ui.text_3f8ab8360131de")}</SectionLabel><ProfileBio value={profile.bio} /></div>}
+              {profile.bio && <ProfileAboutCard crew={profile.crew}><SectionLabel>{uiText("Ui.text_3f8ab8360131de")}</SectionLabel><ProfileBio value={profile.bio} /></ProfileAboutCard>}
               {skills.length > 0 && (
                 <div>
                   <SectionLabel>{uiText("Ui.text_05b86932f51fb5")}</SectionLabel>
@@ -1362,13 +1363,13 @@ function GenericProfile({ organizationSection, profile, isOwner, projectCredits,
             <div className="min-w-0 max-w-full space-y-6 sm:space-y-8 [overflow-wrap:anywhere]">
 
             {profile.bio && (
-              <div>
+              <ProfileAboutCard crew={profile.crew}>
                 <div className="flex items-center gap-2 mb-2.5">
                   <span className="w-1 h-1 rounded-full bg-gold shrink-0" />
                   <p className="text-[11px] uppercase tracking-widest text-gold font-bold">{uiText("Ui.text_3f8ab8360131de")}</p>
                 </div>
                 <ProfileBio value={profile.bio} />
-              </div>
+              </ProfileAboutCard>
             )}
 
             {(languages.length > 0 || profile.day_rate || travel || profile.crew?.experience_years) && (

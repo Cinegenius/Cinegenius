@@ -41,13 +41,14 @@ export function backFromMessageView(browser: Window, owner: string) {
 
 export type InboxView = "chats" | "notices" | "friends" | "groups";
 
-export function inboxView(params: Pick<URLSearchParams, "get">): InboxView {
+export function inboxView(params: Pick<URLSearchParams, "get">, nativeGroups = false): InboxView {
   // Saved notification links from earlier releases still lead to requests.
   if (params.get("requests") === "1") return "notices";
   const view = params.get("view");
   if (view === "notices") return "notices";
   // Saved friend-to-chat and group links use the same mixed conversation list.
   if (params.get("conv") || params.get("to")) return "chats";
+  if (nativeGroups && view === "groups") return "groups";
   return view === "friends" ? "friends" : "chats";
 }
 
@@ -57,11 +58,12 @@ export function inboxHomies(params: Pick<URLSearchParams, "get">): boolean {
 }
 
 /** Open a real inbox or utility destination without synthetic Back entries. */
-export function navigateInboxView(browser: Window, view: InboxView, options: { homies?: boolean } = {}): boolean {
+export function navigateInboxView(browser: Window, view: InboxView, options: { homies?: boolean; nativeGroups?: boolean } = {}): boolean {
   if (browser.location.pathname !== "/messages") return false;
   const target = new URL(browser.location.href);
   for (const key of ["conv", "to", "company_slug", "requests", "view", "homies"]) target.searchParams.delete(key);
   if (view === "friends" || view === "notices") target.searchParams.set("view", view);
+  if (view === "groups" && options.nativeGroups) target.searchParams.set("view", "groups");
   if (view === "friends" && options.homies) target.searchParams.set("homies", "1");
   const next = localHref(target);
   if (next === localHref(new URL(browser.location.href))) return false;

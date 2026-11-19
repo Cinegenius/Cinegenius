@@ -18,8 +18,8 @@ function revealOption(list: HTMLDivElement | null, index: number) {
 }
 
 /** Local select-only listbox with a neutral surface and native-size targets. */
-export default function BrowseSelect({label, value, options, onChange, disabled = false, icon, className = "", triggerClassName, id: triggerId, compactEmptyLabel = false}: {
-  label: string; value: string; options: BrowseSelectOption[]; onChange: (value: string) => void; disabled?: boolean; icon?: ReactNode; className?: string; triggerClassName?: string; id?: string; compactEmptyLabel?: boolean;
+export default function BrowseSelect({label, value, options, onChange, disabled = false, icon, className = "", triggerClassName, id: triggerId, compactEmptyLabel = false, iconOnly = false}: {
+  label: string; value: string; options: BrowseSelectOption[]; onChange: (value: string) => void; disabled?: boolean; icon?: ReactNode; className?: string; triggerClassName?: string; id?: string; compactEmptyLabel?: boolean; iconOnly?: boolean;
 }) {
   const id = useId();
   const trigger = useRef<HTMLButtonElement>(null), list = useRef<HTMLDivElement>(null);
@@ -75,8 +75,9 @@ export default function BrowseSelect({label, value, options, onChange, disabled 
   return <div className={`relative min-w-0 ${className}`}>
     <button ref={trigger} id={triggerId} type="button" aria-label={label} aria-describedby={`${id}-value`} title={selected?.label ?? label} aria-haspopup="listbox" aria-expanded={open} aria-controls={open ? `${id}-list` : undefined} disabled={disabled}
       onClick={() => open ? close() : show()} onKeyDown={event => { if (event.key === 'ArrowDown' || event.key === 'ArrowUp') { event.preventDefault(); show(event.key === 'ArrowUp'); } }}
+      data-icon-only={iconOnly || undefined} data-filter-active={iconOnly && value !== options[0]?.value && value !== "all" || undefined}
       className={triggerClassName ?? "flex min-h-11 w-full min-w-0 items-center gap-2 rounded-xl border border-border bg-bg-secondary px-3 py-2 text-left text-sm text-text-secondary outline-none focus-visible:ring-2 focus-visible:ring-gold disabled:opacity-60"}>
-      {icon && <span aria-hidden="true" className="shrink-0 text-text-muted">{icon}</span>}<span id={`${id}-value`} className="min-w-0 flex-1 truncate">{compactEmptyLabel && !value ? label : selected?.label ?? label}</span><ChevronDown size={16} aria-hidden="true" className={`shrink-0 text-text-muted transition-transform motion-reduce:transition-none ${open ? 'rotate-180' : ''}`} />
+      {icon && <span aria-hidden="true" className="shrink-0 text-text-muted">{icon}</span>}<span id={`${id}-value`} className={iconOnly ? "sr-only" : "min-w-0 flex-1 truncate"}>{compactEmptyLabel && !value ? label : selected?.label ?? label}</span><ChevronDown size={16} aria-hidden="true" className={`shrink-0 text-text-muted transition-transform motion-reduce:transition-none ${open ? 'rotate-180' : ''}`} />
     </button>
     {open && <FloatingPanel anchorRef={trigger} onClose={() => close()} width={180} align="left" matchAnchorWidth portalRoot={portalRoot}
       className="browse-popup-surface rounded-2xl border p-1.5">

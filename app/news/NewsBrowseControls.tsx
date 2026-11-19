@@ -11,6 +11,7 @@ import { rememberNewsCountry, type NewsRegion } from '@/lib/news-region';
 import { rememberNewsTopic } from '@/lib/news-topic';
 import { ORGANIZATION_ENTRY_TYPES, ORGANIZATION_TOPICS } from "@/lib/organization-taxonomy";
 import { NativeBrowseQuickFilter } from "@/components/app/NativeBrowseToolbar";
+import { Globe, Tag } from "lucide-react";
 
 type Filters = { q: string; type?: string; topic?: string; country: string };
 export type NewsBrowseControlsProps = { filters: Filters; facets: { type: string; topic: string; country: string }[]; count: number; region: NewsRegion; topicCookieName: string; nativeViewControls?: ReactNode };
@@ -51,8 +52,8 @@ export default function NewsBrowseControls({ filters, facets, count, region, top
   ];
   const topicOptions = [{ value: "", label: t("all") }, ...ORGANIZATION_TOPICS.filter(topic => topic === draft.topic || facets.some(row => row.topic === topic)).map(topic => ({ value: topic, label: t(`topic.${topic}`), disabled: !facets.some(row => row.topic === topic) }))];
   const quickFilters = [
-    <NativeBrowseQuickFilter key="country" label={ui("NewsRegion.countryLabel")} value={draft.country} options={countryOptions} onChange={country => { const next = { ...draft, country }; setDraft(next); apply(next); }} />,
-    <NativeBrowseQuickFilter key="topic" label={t("topicLabel")} value={draft.topic ?? ""} options={topicOptions} onChange={topic => { const next = { ...draft, topic }; setDraft(next); setTopicChanged(true); apply(next, true); }} />,
+    <NativeBrowseQuickFilter key="country" label={ui("NewsRegion.countryLabel")} value={draft.country} options={countryOptions} icon={<Globe size={18} />} onChange={country => { const next = { ...draft, country }; setDraft(next); apply(next); }} />,
+    <NativeBrowseQuickFilter key="topic" label={t("topicLabel")} value={draft.topic ?? ""} options={topicOptions} icon={<Tag size={18} />} onChange={topic => { const next = { ...draft, topic }; setDraft(next); setTopicChanged(true); apply(next, true); }} />,
   ];
   return <div aria-busy={pending}><MobileBrowseControls query={draft.q} onQueryChange={q => change({ q })} searchPlaceholder={t("searchLabel")}
     sortValue="newest" sortOptions={[{ value: "newest", label: ui("jobs.sortNewest") }]} onSortChange={() => {}}

@@ -18,6 +18,7 @@ import { mapLabelExpression } from "@/lib/map-style";
 import { mapMarkerStyle } from "@/lib/smart-search-map";
 import type { Map as VectorMap } from "maplibre-gl";
 import type * as Leaflet from "leaflet";
+import styles from "./LocationMap.module.css";
 
 type Location = {
   id: string; title: string; type: string; city: string;
@@ -28,7 +29,7 @@ type Location = {
 };
 type Props = {
   preserveViewport?: boolean;
-  labels?: { label: string; results: string; empty: string; unknownCoordinates: string; cluster?: (count: number) => string; error?: string; applyArea?: string };
+  labels?: { label: string; results: string; empty: string; unknownCoordinates: string; cluster?: (count: number) => string; error?: string; applyArea?: string; nativeApplyArea?: string };
   renderPreview?: (location: Location) => ReactNode;
   readOnly?: boolean;
   onBoundsChange?: (bounds: MapBounds) => void;
@@ -275,9 +276,13 @@ export default function LocationMap({ preserveViewport = false, readOnly = false
         <BrowseResultCount count={!basemapReady && !failed ? null : visibleCount ?? locations.length}
           label={!basemapReady && !failed ? mapUi("loading") : labels?.results ?? locationsText("results", { count: visibleCount ?? locations.length })} />
       </div>
-      {!readOnly && !automaticBounds && <div className="absolute left-3 top-16 z-[500] flex max-w-[calc(100%-5rem)] flex-wrap gap-2">
-        {moved && <button type="button" onClick={() => { if (!map) return; const b = map.getBounds(); onApplyBounds({ south: b.getSouth(), north: b.getNorth(), west: b.getWest(), east: b.getEast() }); setMoved(false); }} className="min-h-11 rounded-lg border border-border bg-bg-primary px-3 text-sm text-text-primary">{labels?.applyArea ?? t("searchArea")}</button>}
-        {appliedBounds && <button type="button" onClick={() => { onApplyBounds(null); setMoved(false); }} className="min-h-11 rounded-lg border border-border bg-bg-primary px-3 text-sm text-text-primary">{t("resetArea")}</button>}
+      {!readOnly && !automaticBounds && <div className={`absolute left-3 top-16 z-[500] flex max-w-[calc(100%-5rem)] flex-wrap gap-2 ${labels?.nativeApplyArea ? styles.nativeActions : ""}`}>
+        {moved && <button type="button" onClick={() => { if (!map) return; const b = map.getBounds(); onApplyBounds({ south: b.getSouth(), north: b.getNorth(), west: b.getWest(), east: b.getEast() }); setMoved(false); }} className={`min-h-11 rounded-lg border border-border bg-bg-primary px-3 text-sm text-text-primary ${labels?.nativeApplyArea ? styles.applyButton : ""}`}>
+          {labels?.nativeApplyArea ? <><span className={styles.nativeCopy}><MapPin size={15} aria-hidden="true" />{labels.nativeApplyArea}</span>{" "}<span className={styles.webCopy}>{labels.applyArea ?? t("searchArea")}</span></> : labels?.applyArea ?? t("searchArea")}
+        </button>}
+        {appliedBounds && <button type="button" aria-label={t("resetArea")} onClick={() => { onApplyBounds(null); setMoved(false); }} className={`min-h-11 rounded-lg border border-border bg-bg-primary px-3 text-sm text-text-primary ${labels?.nativeApplyArea ? `${styles.applyButton} ${styles.resetButton}` : ""}`}>
+          {labels?.nativeApplyArea ? <><span className={styles.nativeCopy} aria-hidden="true"><X size={16} /></span><span className={styles.webCopy}>{t("resetArea")}</span></> : t("resetArea")}
+        </button>}
       </div>}
       {(labels?.unknownCoordinates ?? true) && locations.some(location => !hasCoordinates(location)) && <p className="absolute bottom-8 left-3 z-[400] rounded bg-bg-primary px-2 py-1 text-xs text-text-muted">{labels?.unknownCoordinates ?? t("unknownCoordinates")}</p>}
       {failed && <div role="alert" className="absolute inset-x-3 top-16 z-[600] flex flex-wrap items-center gap-2 rounded-xl border border-border bg-bg-secondary p-3 text-sm text-text-secondary"><p className="min-w-0 flex-1">{labels?.error ?? t("error")}</p><button type="button" onClick={() => { setFailed(false); setBasemapReady(false); setMap(null); setAttempt(value => value + 1); }} className="min-h-11 rounded-lg border border-border px-3 text-gold">{commonUi("retry")}</button></div>}

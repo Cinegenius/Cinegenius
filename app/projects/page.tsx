@@ -16,7 +16,7 @@ export default async function ProjectsPage() {
   const t = await getTranslations("projects");
   const projects = await projectsPromise;
   return <DirectoryPage area="projects">
-    <PageHeader withBackdrop={false} badge={t("badge")} title={t("titleLead")} titleHighlight={t("titleHighlight")} description={t("browseIntro")} cta={{ label: t("addProject"), href: "/projects/neu" }} />
+    <PageHeader withBackdrop={false} badge={t("badge")} title={t("titleLead")} titleHighlight={t("titleHighlight")} nativeTitle={t("title")} description={t("browseIntro")} cta={{ label: t("addProject"), href: "/projects/neu" }} />
     <ProjectsContent projects={projects} />
   </DirectoryPage>;
 }

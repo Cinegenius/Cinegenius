@@ -13270,6 +13270,7 @@
         "title": "Sökord i rubriken",
         "requirements": "Krav enligt leverantörens uppgifter"
       },
+      "searchHere": "Sök här",
       "applyMapArea": "Begränsa till detta kartområde"
     },
     "conditions": {}
@@ -13445,6 +13446,7 @@
   },
   "ProfileLayout": {},
   "NativeAppChrome": {
+    "createEntry": "Skapa post",
     "navigation": "Appgenvägar",
     "profileMenu": "Öppna profilmenyn",
     "profileMenuTitle": "Din profil",
@@ -13506,10 +13508,15 @@
     "look_photo": "Foto"
   },
   "NativeSmartDiscovery": {
+    "compactAreas": {
+      "crew": "Team",
+      "marketplace": "Marknad",
+      "locations": "Platser"
+    },
     "directories": "Öppna områden",
     "loading": "Laddar förslag …",
     "focus": "Förslagens fokus",
-    "profileFocus": "Utifrån profilen",
+    "profileFocus": "För dig",
     "neutral": "Neutralt",
     "editProfile": "Redigera profil",
     "focusNote": "Din profil sorterar de inlästa förslagen. Den begränsar inte din sökning.",

@@ -1,7 +1,7 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import { useCallback, useEffect, useId, useMemo, useRef, useState, type Dispatch, type SetStateAction } from "react";
+import { useCallback, useEffect, useId, useLayoutEffect, useMemo, useRef, useState, type Dispatch, type SetStateAction } from "react";
 import { useTranslations } from "next-intl";
 import { ChevronDown, RotateCcw, SlidersHorizontal, X } from "lucide-react";
 import BrowseResultCount from "./BrowseResultCount";
@@ -39,7 +39,7 @@ function ResultArea({ area, groups, pending, errors, more, grid = false, limit: 
   const setLimit = changeLimit ?? setLocalLimit;
   const results = discoveryResults(groups);
   const next = groups.find(group => errors.includes(searchGroupKey(group))) ?? groups.find(group => group.nextOffset !== null);
-  const busy = groups.some(group => pending.includes(searchGroupKey(group)));
+  const busy = pending.includes("initial") || groups.some(group => pending.includes(searchGroupKey(group)));
   const failed = groups.some(group => errors.includes(searchGroupKey(group)));
   if (!results.length) return null;
   return <section className="smart-result-area" aria-label={t(`areas.${area}`)}>
@@ -109,41 +109,65 @@ export default function SmartSearchExplorer({ plan, initialGroups, initialMapGro
   const [pending, setPending] = useState<string[]>([]);
   const [errors, setErrors] = useState<string[]>([]);
   const [mapReady, setMapReady] = useState(!!initialMapGroups);
+  const mapReceived = useRef<number | null>(null);
   const requests = useRef(new Map<string, AbortController>());
+  const poolGeneration = useRef(0);
   const denied = useRef(onUnavailable);
   useEffect(() => { denied.current = onUnavailable; }, [onUnavailable]);
   useEffect(() => { const active = requests.current; return () => { for (const request of active.values()) request.abort(); active.clear(); }; }, []);
+  useLayoutEffect(() => {
+    if (!nativeAppearance || !mapReady || mapReceived.current === null) return;
+    performance.clearMeasures("cinegenius:smart:map-render");
+    performance.measure("cinegenius:smart:map-render", { start: mapReceived.current, end: performance.now() });
+    mapReceived.current = null;
+  }, [mapReady, groups, nativeAppearance]);
 
   const read = useCallback(async (group?: SearchGroup) => {
     const key = group ? searchGroupKey(group) : "initial";
-    if (requests.current.has(key)) return;
+    if (requests.current.has(key) || group && requests.current.has("initial")) return;
+    if (!group) {
+      // The complete map pool replaces the list snapshot. Retire every page
+      // from that snapshot, including transports that resolve after abort.
+      poolGeneration.current += 1;
+      for (const active of requests.current.values()) active.abort();
+      requests.current.clear();
+    }
+    const generation = poolGeneration.current;
     const controller = new AbortController(); requests.current.set(key, controller);
-    setPending(values => [...values, key]); setErrors(values => values.filter(value => value !== key));
+    const current = () => !controller.signal.aborted && generation === poolGeneration.current;
+    const started = performance.now(), requestView = group && !mapOpen && !mapReady ? "list" : "map";
+    setPending(values => group ? [...values, key] : [key]); setErrors(values => values.filter(value => value !== key));
     try {
       const response = await fetch("/api/search/unified", { method: "POST", headers: { "Content-Type": "application/json" }, credentials: "same-origin",
         cache: "no-store", referrerPolicy: "no-referrer", signal: AbortSignal.any([controller.signal, AbortSignal.timeout(35_000)]),
-        body: JSON.stringify({ plan, view: "map", ...(group ? { cursor: { area: group.area, wishIndex: group.wishIndex, offset: group.nextOffset,
+        body: JSON.stringify({ plan, view: requestView, ...(group ? { cursor: { area: group.area, wishIndex: group.wishIndex, offset: group.nextOffset,
           ...(group.segment ? { segment: group.segment } : {}), ...(group.rankCursor ? { rank: group.rankCursor } : {}), ...(group.nearbyCursor ? { nearby: group.nearbyCursor } : {}) } } : {}) }) });
-      if (controller.signal.aborted) return;
+      if (!current()) return;
       if (response.status === 401 || response.status === 403) { denied.current(); return; }
       if (!response.ok) throw new Error("unavailable");
       const data = await response.json();
-      if (controller.signal.aborted) return;
+      if (!current()) return;
       if (!Array.isArray(data.groups) || (group && !data.groups.some((page: SearchGroup) => searchGroupKey(page) === key))) throw new Error("invalid");
-      setGroups(current => group ? mergeDiscoveryPage(current, data.groups.find((page: SearchGroup) => searchGroupKey(page) === key)) : data.groups);
-      setMapReady(true);
-    } catch { if (!controller.signal.aborted) setErrors(values => [...new Set([...values, key])]); }
+      if (nativeAppearance) {
+        const name = `cinegenius:smart:${group ? "page-api" : "map-api"}`;
+        performance.clearMeasures(name); performance.measure(name, { start: started, end: performance.now() });
+      }
+      setGroups(groups => !current() ? groups : group ? mergeDiscoveryPage(groups, data.groups.find((page: SearchGroup) => searchGroupKey(page) === key)) : data.groups);
+      if (!group) { mapReceived.current = performance.now(); setMapReady(true); }
+    } catch { if (current()) setErrors(values => [...new Set([...values, key])]); }
     finally {
-      requests.current.delete(key);
-      if (!controller.signal.aborted) setPending(values => values.filter(value => value !== key));
+      if (requests.current.get(key) === controller) {
+        requests.current.delete(key);
+        setPending(values => values.filter(value => value !== key));
+      }
     }
-  }, [plan]);
+  }, [plan, mapOpen, mapReady, nativeAppearance]);
 
   useEffect(() => {
-    if (initialMapGroups) return;
+    if (initialMapGroups || !mapOpen || mapReady) return;
     const timer = window.setTimeout(() => void read(), 0);
     return () => window.clearTimeout(timer);
-  }, [initialMapGroups, read]);
+  }, [initialMapGroups, mapOpen, mapReady, read]);
 
   const areas = discoveryAreas(groups);
   const selectedAreas = areas.filter(area => !filters.hiddenAreas.includes(area));

@@ -105,7 +105,10 @@ export default function NativeAppBottomNav({ pathname, label, labels }: {
         }
       }
       settle(index, velocity);
-      if (from !== item.href) router.push(item.href, { scroll: false });
+      if (from !== item.href) {
+        if (item.id === "smart") { performance.clearMarks("cinegenius:smart:route-start"); performance.mark("cinegenius:smart:route-start"); }
+        router.push(item.href, { scroll: false });
+      }
       // A cancelled/failed router transition must not leave a false selection.
       motion.current.rollback = setTimeout(() => { motion.current.rollback = undefined; if (location.pathname + location.search === from) { stop(); paint(baseRef.current); preview(null); } }, 2000);
     });

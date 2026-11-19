@@ -10,6 +10,15 @@
 .audiences { display:flex; align-items:center; gap:2px; padding:2px; max-width:calc(100% - 54px); border:1px solid var(--shot-border); border-radius:26px; background:var(--shot-surface); }
 .audiences button { min-width:44px; padding:0 13px; border:0; border-radius:23px; color:var(--shot-muted); font-size:12px; overflow-wrap:anywhere; }
 .audiences button[aria-pressed=true] { background:color-mix(in srgb,var(--shot-accent) 12%,transparent); color:var(--shot-accent); }
+.audienceGlass { display:none; }
+:global(html[data-cg-native-community-appearance="app"]) .audiences { position:relative; isolation:isolate; touch-action:pan-y; background:color-mix(in srgb,var(--shot-surface) 82%,transparent); box-shadow:inset 0 1px 0 #ffffff12; -webkit-backdrop-filter:blur(22px) saturate(130%); backdrop-filter:blur(22px) saturate(130%); }
+:global(html[data-cg-native-community-appearance="app"]) .audiences button { position:relative; z-index:1; touch-action:pan-y; user-select:none; -webkit-user-select:none; background:transparent; }
+:global(html[data-cg-native-community-appearance="app"]) .audiences button[aria-pressed=true] { background:transparent; }
+:global(html[data-cg-native-community-appearance="app"]) .audienceGlass { display:block; position:absolute; z-index:0; top:2px; bottom:2px; left:0; width:var(--native-segment-width,50%); transform:translateX(var(--native-segment-x,2px)); border:1px solid color-mix(in srgb,var(--shot-accent) 30%,transparent); border-radius:23px; background:color-mix(in srgb,var(--shot-accent) 13%,transparent); box-shadow:inset 0 1px 0 #ffffff1a,0 2px 7px #0000000c; pointer-events:none; transition:transform 220ms ease,width 220ms ease; }
+:global(html[data-cg-native-community-appearance="app"]) .audiences[data-native-segment-dragging] .audienceGlass { transition:none; }
+:global(html[data-cg-native-community-appearance="app"]) .audiences button[data-native-segment-preview] { color:var(--shot-accent); }
+@media(prefers-reduced-motion:reduce) { :global(html[data-cg-native-community-appearance="app"]) .audienceGlass { transition:none; } }
+@media(prefers-reduced-transparency:reduce) { :global(html[data-cg-native-community-appearance="app"]) .audiences { background:var(--shot-surface); -webkit-backdrop-filter:none; backdrop-filter:none; } }
 .camera { display:grid; place-items:center; flex:0 0 44px; width:44px; height:44px; border:0; border-radius:50%; background:var(--shot-accent); color:var(--shot-accent-ink)!important; }
 .note { margin:9px 0 14px; font-size:11px; line-height:17px; color:var(--shot-muted); overflow-wrap:anywhere; }
 .message { padding:12px; border:1px solid var(--shot-border); border-radius:14px; background:var(--shot-raised); font-size:13px; line-height:20px; overflow-wrap:anywhere; }

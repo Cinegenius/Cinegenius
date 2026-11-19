@@ -467,7 +467,7 @@ export default function InseratPage() {
   const [activeGroup, setActiveGroup] = useState<string | null>(null); // null = main view
   useEffect(() => {
     const group = new URLSearchParams(window.location.search).get("group");
-    if (group === "marktplatz" || group === "jobs") {
+    if (group === "marktplatz" || group === "jobs" || group === "drehorte") {
       setActiveGroup(current => current ?? group);
     }
   }, []);

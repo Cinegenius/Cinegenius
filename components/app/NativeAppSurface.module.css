@@ -47,6 +47,7 @@
 .workspaceOpen { min-width: 44px; min-height: 44px; padding: 10px 22px; border: 0; border-radius: 22px; color: var(--cg-app-accent-ink, #12160a); background: var(--cg-app-accent, #c2f135); font: inherit; font-weight: 600; cursor: pointer; touch-action: manipulation; }
 .workspaceOpen:disabled { opacity: .45; cursor: default; }
 .workspaceOpen:focus-visible { outline: 2px solid var(--cg-app-accent, #c2f135); outline-offset: 3px; }
+:global(html[data-cg-native-community-appearance="app"][data-cg-app-theme="pure"]) .surface :global([data-profile-header="compact"] h1) { color:var(--cg-app-ink,#202820) !important; -webkit-text-fill-color:currentColor !important; text-shadow:none !important; }
 
 @media (prefers-reduced-motion: reduce) {
   .surface { scroll-behavior: auto; }

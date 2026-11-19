@@ -1,6 +1,7 @@
 "use client";
 
 import type { ReactNode } from "react";
+import { Tag } from "lucide-react";
 import BrowseResultCount from "@/components/BrowseResultCount";
 import BrowseSelect, { type BrowseSelectOption } from "@/components/BrowseSelect";
 import styles from "./NativeBrowseToolbar.module.css";
@@ -33,6 +34,6 @@ export function NativeBrowseQuickFilter({ label, value, options, onChange, icon 
   onChange: (value: string) => void;
   icon?: ReactNode;
 }) {
-  return <BrowseSelect label={label} value={value} options={options} onChange={onChange} icon={icon}
-    className={styles.quickSelect} triggerClassName={styles.quickTrigger} compactEmptyLabel />;
+  return <BrowseSelect label={label} value={value} options={options} onChange={onChange} icon={icon ?? <Tag size={18} />}
+    className={styles.quickSelect} triggerClassName={styles.quickTrigger} compactEmptyLabel iconOnly />;
 }

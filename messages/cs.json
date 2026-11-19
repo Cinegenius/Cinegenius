@@ -13270,6 +13270,7 @@
         "title": "Hledaný výraz v názvu",
         "requirements": "Požadavky uvedené poskytovatelem"
       },
+      "searchHere": "Hledat zde",
       "applyMapArea": "Omezit na tuto oblast mapy"
     },
     "conditions": {}
@@ -13445,6 +13446,7 @@
   },
   "ProfileLayout": {},
   "NativeAppChrome": {
+    "createEntry": "Vytvořit záznam",
     "navigation": "Rychlé volby aplikace",
     "profileMenu": "Otevřít nabídku profilu",
     "profileMenuTitle": "Tvůj profil",
@@ -13506,10 +13508,15 @@
     "look_photo": "Fotografie"
   },
   "NativeSmartDiscovery": {
+    "compactAreas": {
+      "crew": "Štáb",
+      "marketplace": "Trh",
+      "locations": "Lokace"
+    },
     "directories": "Otevřít oblasti",
     "loading": "Načítání návrhů …",
     "focus": "Zaměření návrhů",
-    "profileFocus": "Podle profilu",
+    "profileFocus": "Pro tebe",
     "neutral": "Neutrální",
     "editProfile": "Upravit profil",
     "focusNote": "Profil řadí načtené návrhy. Neomezuje vyhledávání.",

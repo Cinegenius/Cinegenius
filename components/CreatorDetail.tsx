@@ -21,6 +21,7 @@ import Lightbox from "@/components/Lightbox";
 import { uiErrorMessage } from "@/lib/ui-error-message";
 import ConnectButton from "@/components/ConnectButton";
 import { contactId } from "@/lib/contact-connections";
+import ProfileAboutCard from "@/components/ProfileAboutCard";
 
 type FilmographyEntry = {
   year: number;
@@ -354,8 +355,8 @@ export default function CreatorDetail({
             {/* Über mich */}
             {creator.bio && (
               <section>
-                <SectionTitle icon={Users}>{uiText("Ui.text_3f8ab8360131de")}</SectionTitle>
-                <p className="text-text-secondary leading-relaxed">{creator.bio}</p>
+                <ProfileAboutCard><SectionTitle icon={Users}>{uiText("Ui.text_3f8ab8360131de")}</SectionTitle>
+                <p className="text-text-secondary leading-relaxed">{creator.bio}</p></ProfileAboutCard>
               </section>
             )}
 

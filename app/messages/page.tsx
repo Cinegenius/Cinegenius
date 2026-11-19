@@ -36,6 +36,7 @@ import {
 import { mergeVisibleMessagePage } from "@/lib/message-actions";
 import { backFromMessageView, navigateMessageView, navigateInboxView, inboxView } from "@/lib/message-navigation";
 import { uiErrorMessage } from "@/lib/ui-error-message";
+import { useNativeAppAppearance } from "@/lib/use-native-app-appearance";
 
 type Message = {
   attachments?: MessageAttachment[];
@@ -101,7 +102,8 @@ function MessagesContent() {
   const searchParams = useSearchParams();
   const toParam = searchParams.get("to");
   const convParam = searchParams.get("conv");
-  const view = inboxView(searchParams);
+  const nativeAppearance = useNativeAppAppearance();
+  const view = inboxView(searchParams, nativeAppearance);
   const friendsOnly = view === "friends";
   const noticesOnly = view === "notices";
   const utilityView = friendsOnly || noticesOnly;
@@ -469,7 +471,7 @@ function MessagesContent() {
   const peerProfileHref = conversationPeerProfileHref(activeConv, user?.id ?? "", isNewConv ? newConvRecipient : null);
 
   const people = [...contacts].sort((a,b) => a.display_name.localeCompare(b.display_name,uiLocale)).map(contact => ({id:contact.user_id, name:contact.display_name, avatar:contact.avatar_url, role:contact.role, occupationForm:contact.occupationForm}));
-  const filteredConversations = conversations.filter(conversation => `${conversation.otherName ?? ""} ${conversation.group_name ?? ""}`.toLocaleLowerCase(uiLocale).includes(search.trim().toLocaleLowerCase(uiLocale)));
+  const filteredConversations = conversations.filter(conversation => (view !== "groups" || conversation.kind === "group") && `${conversation.otherName ?? ""} ${conversation.group_name ?? ""}`.toLocaleLowerCase(uiLocale).includes(search.trim().toLocaleLowerCase(uiLocale)));
 
   return <div className={`inbox-shell ${utilityView ? "flex-col" : "flex-col sm:flex-row"} ${showChat ? "bottom-0" : "bottom-[var(--mobile-nav-clearance)]"} lg:bottom-0`}
     style={{"--messages-viewport-offset":`${visualViewportTop}px`,...(keyboardInset>0?{bottom:`${keyboardInset}px`}:{})} as CSSProperties}>
@@ -480,7 +482,7 @@ function MessagesContent() {
       {!friendsOnly && !noticesOnly && <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain">
         {contactsError&&<div role="alert" className="px-4 py-2 text-sm text-red-400 [[data-theme=light]_&]:text-red-700"><p>{uiText("Ui.text_4139ecbefbacc6")}</p><button type="button" onClick={()=>void loadContacts()} className="min-h-11 text-gold">{t("retry")}</button></div>}
         {conversationLoadFailed&&<div role="alert" className="px-4 py-3 text-sm text-red-400 [[data-theme=light]_&]:text-red-700"><p>{messageNavigationText("loadError")}</p><button type="button" onClick={()=>{setLoading(conversations.length===0);void loadConversations();}} className="min-h-11 text-gold">{messageNavigationText("retry")}</button></div>}
-        {loading&&conversations.length===0?<p role="status" className="px-4 py-8 text-sm text-text-muted">{t("loading")}</p>:filteredConversations.length===0&&!conversationLoadFailed?<div className="space-y-3 px-5 py-10 text-center"><MessageSquare size={26} className="mx-auto text-text-muted"/><p className="text-sm text-text-muted">{t(search.trim()?"noChats":"emptyInbox")}</p><button type="button" onClick={()=>setNewMessageOpen(true)} className="min-h-11 rounded-xl bg-gold px-4 text-sm font-semibold text-bg-primary">{t("newMessage")}</button></div>:filteredConversations.map(conversation=>{
+        {loading&&conversations.length===0?<p role="status" className="px-4 py-8 text-sm text-text-muted">{t("loading")}</p>:filteredConversations.length===0&&!conversationLoadFailed?<div className="space-y-3 px-5 py-10 text-center"><MessageSquare size={26} className="mx-auto text-text-muted"/><p className="text-sm text-text-muted">{t(search.trim() || view === "groups" ? "noChats" : "emptyInbox")}</p><button type="button" onClick={()=>setNewMessageOpen(true)} className="min-h-11 rounded-xl bg-gold px-4 text-sm font-semibold text-bg-primary">{t("newMessage")}</button></div>:filteredConversations.map(conversation=>{
           const latest=conversation.messages?.[0];
           return <button key={conversation.id} type="button" aria-pressed={conversation.id===activeId} onClick={()=>openConversation(conversation)} className={`flex min-h-20 w-full min-w-0 items-center gap-3 border-b border-border px-4 py-3 text-left hover:bg-bg-elevated ${activeId===conversation.id?"bg-bg-elevated":""}`}>
             <span className="flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-full border border-border bg-bg-elevated">{conversation.kind==="group"?<Users size={19} className="text-gold"/>:conversation.kind==="support"?<UnoptimizedImage src={SUPPORT_AVATAR_URL} alt="" className="h-full w-full object-contain p-1"/>:conversation.otherAvatar?<UnoptimizedImage src={conversation.otherAvatar} alt="" className="h-full w-full object-cover"/>:<User size={19} className="text-text-muted"/>}</span>

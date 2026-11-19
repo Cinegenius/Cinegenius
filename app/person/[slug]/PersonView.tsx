@@ -7,6 +7,7 @@ import {
   Clapperboard, UserRound, Loader2, Check, ArrowLeft, ShieldAlert, Film,
 } from "lucide-react";
 import { useTranslations } from "next-intl";
+import ProfileAboutCard from "@/components/ProfileAboutCard";
 
 
 const PROJECT_TYPE_NORMALIZE: Record<string, string> = {
@@ -135,7 +136,7 @@ export default function PersonView({
               <p className="text-sm text-text-muted mb-2">{profile.primary_role}</p>
             )}
             {profile.bio && (
-              <p className="text-sm text-text-secondary">{profile.bio}</p>
+              <ProfileAboutCard><p className="text-sm text-text-secondary">{profile.bio}</p></ProfileAboutCard>
             )}
           </div>
         </div>

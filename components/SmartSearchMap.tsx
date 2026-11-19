@@ -34,7 +34,7 @@ export default function SmartSearchMap({ groups, bounds, onApplyBounds }: {
     <div className="smart-map-frame">
       <LocationMap locations={locations} activeId={activeId} onHover={setActiveId} userLocation={null} radiusKm={50}
         preserveViewport appliedBounds={bounds} onApplyBounds={onApplyBounds} visibleCount={locations.length}
-        labels={{ label: t("mapTitle"), results: mapText("mapped", { count: locations.length }), empty: mapText("empty"), unknownCoordinates: "", cluster: clusterLabel, error: mapText("error"), applyArea: t("discovery.applyMapArea") }}
+        labels={{ label: t("mapTitle"), results: mapText("mapped", { count: locations.length }), empty: mapText("empty"), unknownCoordinates: "", cluster: clusterLabel, error: mapText("error"), applyArea: t("discovery.applyMapArea"), nativeApplyArea: t("discovery.searchHere") }}
         renderPreview={selected => {
           const entry = entries.find(item => item.key === selected.id);
           return entry ? <div className="p-3 pt-11"><p className="mb-2 text-xs font-medium" style={{ color: SMART_MAP_COLORS[entry.area] }}>{t(`areas.${entry.area}`)}</p><ResultCard result={entry.result} compact row /></div> : null;

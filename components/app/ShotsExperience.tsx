@@ -12,6 +12,7 @@ import { useFormNavigation } from "@/contexts/FormDraftContext";
 import { createShotsClient, mergeShotsPage, ShotsClientError, type ClientShot, type ShotAudience, type ShotPublication, type ShotsFeed } from "@/lib/shots-client";
 import { importShotPhoto, renderShotPhoto, SHOT_LOOKS, type ShotFormat, type ShotLook, type ShotPhoto } from "@/lib/shots-photo";
 import styles from "./ShotsExperience.module.css";
+import ShotsAudienceControl from "./ShotsAudienceControl";
 
 type Draft = { source: ShotPhoto; sourceUrl: string; preview: ShotPhoto; previewUrl: string; previewLook: ShotLook; previewGrain: number; requestId: string; look: ShotLook; grain: number; format: ShotFormat; audience: ShotAudience | null };
 type Snapshot = { audience: ShotAudience; data: ShotsFeed | null; loading: boolean; error: string | null };
@@ -263,7 +264,7 @@ function AccountShots({ accountId }: { accountId: string }) {
   const expires = (value: string) => new Intl.DateTimeFormat(locale, { dateStyle: "short", timeStyle: "short" }).format(new Date(value));
   return <section ref={root} data-shots-root="v1" className={styles.root} aria-labelledby="real-shots-title">
     <h1 id="real-shots-title" className={styles.srOnly}>{t("title")}</h1>
-    <div className={styles.toolbar}><div className={styles.audiences} role="group" aria-label={t("showShots")}>{(["community", "homies"] as const).map(value => <button type="button" key={value} aria-pressed={audience === value} onClick={() => setAudience(value)}>{value === "community" ? t("community") : t("homies")}</button>)}</div>
+    <div className={styles.toolbar}><ShotsAudienceControl value={audience} onChange={setAudience} />
       <button type="button" className={styles.camera} aria-label={t("newShot")} disabled={!data?.capabilities.publish || snapshot.loading} onClick={event => { returnFocus.current = event.currentTarget; setNotice(null); setMode("source"); }}><Camera aria-hidden="true" size={21} /></button></div>
     <p className={styles.note}>{t("lifetime")}</p>
     {notice && <p role="status" className={styles.message}>{t(notice)}</p>}

@@ -13270,6 +13270,7 @@
         "title": "Terme recherché dans le titre",
         "requirements": "Critères déclarés par le prestataire"
       },
+      "searchHere": "Chercher ici",
       "applyMapArea": "Limiter à cette zone de la carte"
     },
     "conditions": {}
@@ -13445,6 +13446,7 @@
   },
   "ProfileLayout": {},
   "NativeAppChrome": {
+    "createEntry": "Créer une fiche",
     "navigation": "Raccourcis de l’application",
     "profileMenu": "Ouvrir le menu du profil",
     "profileMenuTitle": "Votre profil",
@@ -13506,10 +13508,15 @@
     "look_photo": "Photo"
   },
   "NativeSmartDiscovery": {
+    "compactAreas": {
+      "crew": "Équipe",
+      "marketplace": "Marché",
+      "locations": "Lieux"
+    },
     "directories": "Ouvrir les rubriques",
     "loading": "Chargement des suggestions …",
     "focus": "Orientation des suggestions",
-    "profileFocus": "Selon le profil",
+    "profileFocus": "Pour vous",
     "neutral": "Neutre",
     "editProfile": "Modifier le profil",
     "focusNote": "Votre profil classe les suggestions chargées. Il ne limite pas votre recherche.",

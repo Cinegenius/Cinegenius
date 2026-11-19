@@ -13270,6 +13270,7 @@
         "title": "제목에 검색어 포함",
         "requirements": "제공자가 명시한 조건"
       },
+      "searchHere": "여기 검색",
       "applyMapArea": "이 지도 영역으로 제한"
     },
     "conditions": {}
@@ -13445,6 +13446,7 @@
   },
   "ProfileLayout": {},
   "NativeAppChrome": {
+    "createEntry": "항목 만들기",
     "navigation": "앱 바로가기",
     "profileMenu": "프로필 메뉴 열기",
     "profileMenuTitle": "내 프로필",
@@ -13506,10 +13508,15 @@
     "look_photo": "사진"
   },
   "NativeSmartDiscovery": {
+    "compactAreas": {
+      "crew": "크루",
+      "marketplace": "마켓",
+      "locations": "장소"
+    },
     "directories": "분야 열기",
     "loading": "추천을 불러오는 중 …",
     "focus": "추천 기준",
-    "profileFocus": "프로필 기준",
+    "profileFocus": "맞춤",
     "neutral": "기준 없음",
     "editProfile": "프로필 편집",
     "focusNote": "프로필은 불러온 추천의 순서만 조정하며 검색 범위를 제한하지 않습니다.",

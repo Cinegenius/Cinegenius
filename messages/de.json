@@ -13270,6 +13270,7 @@
         "title": "Suchbegriff im Titel",
         "requirements": "Anforderungen laut Anbieter"
       },
+      "searchHere": "Hier suchen",
       "applyMapArea": "Auf diesen Ausschnitt begrenzen"
     },
     "conditions": {}
@@ -13445,6 +13446,7 @@
   },
   "ProfileLayout": {},
   "NativeAppChrome": {
+    "createEntry": "Eintrag erstellen",
     "navigation": "App-Schnellzugriff",
     "profileMenu": "Profilmenü öffnen",
     "profileMenuTitle": "Dein Profil",
@@ -13506,10 +13508,15 @@
     "look_photo": "Foto"
   },
   "NativeSmartDiscovery": {
+    "compactAreas": {
+      "crew": "Crew",
+      "marketplace": "Marktplatz",
+      "locations": "Locations"
+    },
     "directories": "Bereiche öffnen",
     "loading": "Vorschläge werden geladen …",
     "focus": "Fokus der Vorschläge",
-    "profileFocus": "Profilfokus",
+    "profileFocus": "Für dich",
     "neutral": "Neutral",
     "editProfile": "Profil bearbeiten",
     "focusNote": "Dein Profil sortiert die geladenen Vorschläge. Es schränkt deine Suche nicht ein.",

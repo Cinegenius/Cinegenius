@@ -13270,6 +13270,7 @@
         "title": "タイトルに検索語を含む",
         "requirements": "提供者が申告した条件"
       },
+      "searchHere": "ここを検索",
       "applyMapArea": "この地図範囲に絞る"
     },
     "conditions": {}
@@ -13445,6 +13446,7 @@
   },
   "ProfileLayout": {},
   "NativeAppChrome": {
+    "createEntry": "項目を作成",
     "navigation": "アプリのショートカット",
     "profileMenu": "プロフィールメニューを開く",
     "profileMenuTitle": "あなたのプロフィール",
@@ -13506,10 +13508,15 @@
     "look_photo": "写真"
   },
   "NativeSmartDiscovery": {
+    "compactAreas": {
+      "crew": "クルー",
+      "marketplace": "マーケット",
+      "locations": "ロケ地"
+    },
     "directories": "分野を開く",
     "loading": "おすすめを読み込み中 …",
     "focus": "おすすめの基準",
-    "profileFocus": "プロフィール基準",
+    "profileFocus": "あなた向け",
     "neutral": "指定なし",
     "editProfile": "プロフィールを編集",
     "focusNote": "プロフィールは読み込んだ候補の順番にのみ反映され、検索範囲は制限しません。",

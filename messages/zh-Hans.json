@@ -13270,6 +13270,7 @@
         "title": "标题包含搜索词",
         "requirements": "服务方声明符合要求"
       },
+      "searchHere": "搜索这里",
       "applyMapArea": "仅显示此地图区域内的结果"
     },
     "conditions": {}
@@ -13445,6 +13446,7 @@
   },
   "ProfileLayout": {},
   "NativeAppChrome": {
+    "createEntry": "创建条目",
     "navigation": "应用快捷入口",
     "profileMenu": "打开个人资料菜单",
     "profileMenuTitle": "你的个人资料",
@@ -13506,10 +13508,15 @@
     "look_photo": "照片"
   },
   "NativeSmartDiscovery": {
+    "compactAreas": {
+      "crew": "剧组",
+      "marketplace": "市场",
+      "locations": "地点"
+    },
     "directories": "打开分类",
     "loading": "正在加载推荐 …",
     "focus": "推荐侧重",
-    "profileFocus": "按个人资料",
+    "profileFocus": "为你推荐",
     "neutral": "不设侧重",
     "editProfile": "编辑个人资料",
     "focusNote": "个人资料仅调整已加载推荐的顺序，不会限制搜索范围。",

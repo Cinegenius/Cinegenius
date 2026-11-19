@@ -135,7 +135,7 @@ export default function MobileBrowseControls({
           {nativeAppearance ? <NativeBrowseToolbar count={resultCount} countLabel={resultSummary} viewControls={nativeViewControls ?? viewControls}
             filters={nativeQuickFilters ?? [
               ...(categories.length || categoryValue ? [<NativeBrowseQuickFilter key="category" label={categoryLabel} value={categoryValue} onChange={onCategoryChange} options={[{value:"",label:allCategoryLabel},...categories]} />] : []),
-              <NativeBrowseQuickFilter key="sort" label={uiText("creators.sort")} value={sortValue} options={sortOptions} onChange={onSortChange} />,
+              <NativeBrowseQuickFilter key="sort" label={uiText("creators.sort")} value={sortValue} options={sortOptions} onChange={onSortChange} icon={<ArrowUpDown size={18} />} />,
             ]}
             moreAction={<button ref={filterTrigger} type="button" onClick={() => setOpen(true)} aria-label={uiText("locations.filterBtn")} aria-haspopup="dialog" aria-expanded={open}><SlidersHorizontal size={17} aria-hidden="true" />{filterCount > 0 && <span className="native-browse-filter-dot" aria-hidden="true" />}</button>} />
             : viewControls ? <div className="mobile-browse-summary-row">{resultActions ? <div className="mobile-browse-summary-with-actions"><BrowseResultCount count={resultCount} label={resultSummary} /><div className="mobile-browse-result-actions">{resultActions}</div></div> : <BrowseResultCount count={resultCount} label={resultSummary} />}{viewControls}</div> : <BrowseResultCount count={resultCount} label={resultSummary} />}

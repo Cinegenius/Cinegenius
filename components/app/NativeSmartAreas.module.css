@@ -12,6 +12,12 @@
 .areas > button:disabled { opacity: .4; cursor: default; }
 .areas > button:focus-visible { outline: 2px solid var(--domain); outline-offset: -2px; }
 .areas svg { flex-shrink: 0; }
+:global(html[data-cg-native-community-appearance="app"]) .areas { position:relative; grid-template-columns:repeat(5,auto); gap:2px; touch-action:pan-y; }
+:global(html[data-cg-native-community-appearance="app"]) .areas > button { min-width:44px; padding:5px 2px; white-space:nowrap; overflow-wrap:normal; border-color:color-mix(in srgb,var(--domain) 23%,transparent); background:color-mix(in srgb,var(--domain) 7%,transparent); box-shadow:inset 0 1px 0 #ffffff12,0 2px 7px #00000008; -webkit-backdrop-filter:blur(18px) saturate(125%); backdrop-filter:blur(18px) saturate(125%); touch-action:pan-y; user-select:none; -webkit-user-select:none; transition:background-color 160ms ease,border-color 160ms ease,box-shadow 160ms ease; }
+:global(html[data-cg-native-community-appearance="app"]) .areas > button:is([aria-pressed="true"],[data-native-segment-preview]) { border-color:color-mix(in srgb,var(--domain) 58%,transparent); background:color-mix(in srgb,var(--domain) 21%,transparent); box-shadow:inset 0 1px 0 #ffffff26,0 2px 9px #00000010; }
+@media(prefers-reduced-motion:reduce) { :global(html[data-cg-native-community-appearance="app"]) .areas > button { transition:none; } }
+@media(max-width:359px) { :global(html[data-cg-native-community-appearance="app"]) .areas { gap:1px; } :global(html[data-cg-native-community-appearance="app"]) .areas > button { padding-inline:0; } }
+@media(prefers-reduced-transparency:reduce) { :global(html[data-cg-native-community-appearance="app"]) .areas > button { -webkit-backdrop-filter:none; backdrop-filter:none; } }
 .grid { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 8px; }
 .grid > div { min-width: 0; }
 .grid :global(a.group) { height: 100%; }

@@ -6,9 +6,8 @@ import { PLACE_COLUMNS, cityName } from "@/lib/places/core";
 import { executeUnifiedSearch } from "@/lib/unified-search-server";
 import { NATIVE_DISCOVERY_CONTRACT, nativeDiscoveryPlan, rankNativeDiscoveryGroups, type NativeDiscoveryMode, type NativeDiscoveryFocus, type NativeDiscoveryResponse } from "./native-smart-discovery";
 
-/** Only the authenticated account's explicit saved occupations and verified city.
- * No profile visibility inference, device GPS, behavioral history or LLM call. */
-export async function nativeDiscoveryForAccount(accountId: string, locale: string, mode: NativeDiscoveryMode, signal: AbortSignal): Promise<NativeDiscoveryResponse> {
+/** Only the authenticated account's explicit saved occupations and verified city. */
+async function discoveryFocus(accountId: string, locale: string, mode: NativeDiscoveryMode, signal: AbortSignal) {
   let focus: NativeDiscoveryFocus = { mode: "neutral", departments: [], city: null };
   let origin: { lat: number; lng: number } | null = null;
   if (mode === "profile") {
@@ -23,11 +22,29 @@ export async function nativeDiscoveryForAccount(accountId: string, locale: strin
       if (departments.length || city) focus = { mode: "profile", departments, city };
     }
   }
-  const plan = nativeDiscoveryPlan();
-  // The shared implementation projects current permissions before public map
-  // points, filters or our soft focus ordering. Keep all its cursors unchanged.
-  const { groups } = await executeUnifiedSearch(plan, locale, accountId, signal, undefined, "map");
+  return { focus, origin };
+}
+
+/** The caller has freshly verified the account and existing Smart permission.
+ * Focus is soft ordering only, so it need not delay the independent search.
+ * Maps retain their existing explicit, permission-checked Unified Search load. */
+export async function nativeDiscoveryForAccount(accountId: string, locale: string, mode: NativeDiscoveryMode, signal: AbortSignal): Promise<NativeDiscoveryResponse> {
   if (signal.aborted) throw new Error("unavailable");
-  return { contract: NATIVE_DISCOVERY_CONTRACT, accountId, serverNow: new Date().toISOString(), focus,
-    plan, groups: rankNativeDiscoveryGroups(groups, focus, origin) };
+  const controller = new AbortController();
+  const activeSignal = AbortSignal.any([signal, controller.signal]);
+  const plan = nativeDiscoveryPlan();
+  try {
+    // Initial cards/list use the shared 12-result pages and real cursors. Keep
+    // all current visibility checks inside executeUnifiedSearch unchanged.
+    const [{ focus, origin }, { groups }] = await Promise.all([
+      discoveryFocus(accountId, locale, mode, activeSignal),
+      executeUnifiedSearch(plan, locale, accountId, activeSignal, undefined, "list"),
+    ]);
+    if (activeSignal.aborted) throw new Error("unavailable");
+    return { contract: NATIVE_DISCOVERY_CONTRACT, accountId, serverNow: new Date().toISOString(), focus,
+      plan, groups: rankNativeDiscoveryGroups(groups, focus, origin) };
+  } catch (error) {
+    controller.abort();
+    throw error;
+  }
 }
