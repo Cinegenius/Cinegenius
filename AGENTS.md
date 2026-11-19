@@ -1,3 +1,13 @@
+## App-Folgearbeit: Smart-Karten und News – 19. November 2026
+
+Der bestätigte Hauptstand `e18e666a1041d7170919e092c774c2eafbaf5dfc` ist bereits veröffentlicht. Seine Gast-Sprachwahl und Übersetzungs-/Länderänderungen erhalten. Die frühere Freigabe ist damit verbraucht; die hier vorbereitete App-Folgearbeit hat keine neue Veröffentlichungsfreigabe. Der erhaltene alte Mobile-Zweig und ältere Swift-Dateien dürfen diesen Hauptstand nicht ersetzen.
+
+Für die genaue native App-Darstellung gilt jetzt: News ist der gemeinsame Einstieg zu Beiträge und Organisationen; Organisationen erscheinen nicht nochmals im App-Menü. Bestehende URLs bleiben erreichbar. Land/Stadt, Suche, Liste/Karte und Seitenauswahl dürfen keine berechtigten Organisationen wegen fehlender Kartenpunkte verlieren. Beide Ortsfilter müssen auch bei 320px erreichbar bleiben.
+
+Native Crew-Entdeckung wird ohne Eigentümerbonus über den vollständigen berechtigten Bestand gemischt; die Reihenfolge bleibt bei Nachladen, Zurück, Sprachwechsel und Wiederholen stabil. Berechtigungen werden weiter bei jeder Anfrage geprüft. Crew-Portraits vollständig darstellen, Originaldateien und gespeicherte Bildausschnitte erhalten. Die gemeinsame App-Farbzuordnung ist Crew Koralle, Marktplatz Gold, Smart Lime, Locations Blau, Firmen Violett. Sie gilt auch für Kategoriekennzeichen und Kartenpunkte. Die gewöhnliche Website bleibt gestalterisch unverändert. Diese begrenzte Folgearbeit nimmt die pausierte grundlegende Smart-/Spracharbeit nicht wieder auf.
+
+Quellen, Schnittstellen, Prüfungen und offene Geräte-/Leistungsgrenzen: `docs/app-news-crew-followup-20261119.md`.
+
 ## App server release authorized by Markus – 19 November 2026
 
 Markus explicitly authorized publishing the reviewed app server code after the native iPhone installation. The requested app has Shots / Workspace / Smart / News / Projekte in its bottom bar; Smart combines Crew, marketplace, Locations and companies with multi-selection and grid/list/map-list views. These changes apply only to the exact installed native appearance marker; preserve the current ordinary website, live main authentication/privacy fixes and existing Smart server access gate. Port reviewed app deltas onto current main, never upload the divergent mobile branch wholesale. Existing native Workspace is reactivated; local archives are not an online collaboration service.

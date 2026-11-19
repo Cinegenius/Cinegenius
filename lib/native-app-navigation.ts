@@ -13,7 +13,6 @@ export const NATIVE_APP_NAV_ITEMS = [
 ] as const;
 
 export const NATIVE_APP_MENU_ITEMS: readonly { id: string; href: string; labelKey: string; icon: SiteNavigationIcon }[] = [
-  { id: "organizations", href: "/organizations", labelKey: "nav.organizations", icon: "organizations" },
   { id: "board", href: "/community", labelKey: "footer.links_board", icon: "news" },
   { id: "help", href: "/help", labelKey: "nav.help", icon: "help" },
   { id: "support", href: "/support", labelKey: "nav.support", icon: "support" },
@@ -23,7 +22,7 @@ export const NATIVE_APP_MENU_ITEMS: readonly { id: string; href: string; labelKe
 export function nativeAppActiveArea(pathname: string): NativeAppArea | null {
   if (routeMatches(pathname, "/app/shots")) return "shots";
   if (routeMatches(pathname, "/app/workspace")) return "workspace";
-  if (routeMatches(pathname, "/news")) return "news";
+  if (routeMatches(pathname, "/news") || routeMatches(pathname, "/organizations")) return "news";
   if (pathname === "/projects/neu") return null;
   if (routeMatches(pathname, "/projects")) return "projects";
   if (/^\/companies\/[^/]+\/message\/?$/.test(pathname)) return null;

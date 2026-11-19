@@ -8,13 +8,15 @@ import styles from "./NativeBrowseToolbar.module.css";
 import { useNativeAppAppearance } from "@/lib/use-native-app-appearance";
 
 /** One layout for native directory controls; callers retain their real filters and views. */
-export default function NativeBrowseToolbar({ count, countLabel, filters = [], moreAction, viewControls, resultActions }: {
+export default function NativeBrowseToolbar({ count, countLabel, filters = [], moreAction, viewControls, resultActions, keepTwoFilters = false }: {
   count: number | null;
   countLabel: ReactNode;
   filters?: ReactNode[];
   moreAction?: ReactNode;
   viewControls?: ReactNode;
   resultActions?: ReactNode;
+  /** Two compact filters with two view actions fit from 320px without a hidden filter. */
+  keepTwoFilters?: boolean;
 }) {
   const native = useNativeAppAppearance();
   const anchor = useRef<HTMLDivElement>(null), rail = useRef<HTMLDivElement>(null), clearance = useRef<HTMLSpanElement>(null);
@@ -49,7 +51,7 @@ export default function NativeBrowseToolbar({ count, countLabel, filters = [], m
       window.visualViewport?.removeEventListener("resize", schedule); window.visualViewport?.removeEventListener("scroll", schedule);
     };
   }, [native]);
-  return <div ref={anchor} className={styles.anchor} data-native-browse-anchor><span ref={clearance} className={styles.clearance} aria-hidden="true" /><div ref={rail} className={styles.container} data-native-browse-toolbar="v1">
+  return <div ref={anchor} className={styles.anchor} data-native-browse-anchor><span ref={clearance} className={styles.clearance} aria-hidden="true" /><div ref={rail} className={styles.container} data-native-browse-toolbar="v1" data-keep-two-filters={keepTwoFilters || undefined}>
     <div className={styles.rail}>
       <div className={styles.count}><BrowseResultCount count={count} label={countLabel} /></div>
       <div className={styles.filters}>{filters.map((filter, index) => <div className={styles.filter} key={index} data-quick-filter={index}>{filter}</div>)}</div>

@@ -1,0 +1,4 @@
+.sections { display:flex; gap:8px; padding-block:8px; }
+.sections a { display:flex; align-items:center; justify-content:center; flex:1; min-width:44px; min-height:44px; padding:8px; border:1px solid var(--cg-app-border,#3d4963); border-radius:16px; background:var(--cg-app-surface,#1b1d23); color:var(--cg-app-muted,#b8b9be); font-size:13px; text-align:center; overflow-wrap:anywhere; }
+.sections a[aria-current="page"] { color:var(--cg-app-accent,#c2f135); border-color:currentColor; }
+.sections a:focus-visible { outline:2px solid var(--cg-app-accent,#c2f135); outline-offset:2px; }
