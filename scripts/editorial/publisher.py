@@ -115,17 +115,18 @@ class API:
         rows=self.call('/api/editorial/entries?'+urllib.parse.urlencode({'organizationId':PUBLISHER_ID,'id':entry_id}))['entries']
         return rows[0] if rows else None
     def upload(self,path,entry_id,expected_sha256,mime):
-        """Private upload with stable retry key; never passes credentials to AI."""
-        if path.is_symlink() or path.stat().st_size>10_000_000:raise ValueError('Invalid local media')
+        """Verified upload input and stable retry key; no credentials passed to AI."""
+        if path.is_symlink() or path.stat().st_size>4*1024*1024:raise ValueError('Invalid local media')
         raw=path.read_bytes()
         if hashlib.sha256(raw).hexdigest()!=expected_sha256:raise ValueError('Reviewed image bytes changed')
-        if mime not in ('image/jpeg','image/png'):raise ValueError('Unsupported upload type')
+        if mime not in ('image/jpeg','image/png','image/webp'):raise ValueError('Unsupported upload type')
         key=hashlib.sha256((entry_id+':'+expected_sha256).encode()).hexdigest()[:32]
         boundary='CineGenius'+uuid.uuid4().hex
         parts=[]
         for name,value in [('organizationId',PUBLISHER_ID),('upload_id',key)]:
             parts.append(('--'+boundary+'\r\nContent-Disposition: form-data; name="'+name+'"\r\n\r\n'+value+'\r\n').encode())
-        parts.extend([('--'+boundary+'\r\nContent-Disposition: form-data; name="file"; filename="editorial.'+('jpg' if mime=='image/jpeg' else 'png')+'"\r\nContent-Type: '+mime+'\r\n\r\n').encode(),raw,('\r\n--'+boundary+'--\r\n').encode()])
+        ext={'image/jpeg':'jpg','image/png':'png','image/webp':'webp'}[mime]
+        parts.extend([('--'+boundary+'\r\nContent-Disposition: form-data; name="file"; filename="editorial.'+ext+'"\r\nContent-Type: '+mime+'\r\n\r\n').encode(),raw,('\r\n--'+boundary+'--\r\n').encode()])
         req=urllib.request.Request(BASE+'/api/editorial/upload',data=b''.join(parts),headers={'Authorization':'Bearer '+self.token,'Content-Type':'multipart/form-data; boundary='+boundary})
         try:
             with self.opener.open(req,timeout=40) as response:data=json.load(response)
@@ -141,7 +142,7 @@ class API:
                 raw=response.read(10_000_001);digest=response.headers.get('X-Content-SHA256')
         except urllib.error.HTTPError as exc:raise ApiError(exc.code,'media_readback_failed') from None
         if len(raw)>10_000_000 or digest!=expected_sha256 or hashlib.sha256(raw).hexdigest()!=expected_sha256:
-            raise ValueError('Saved original media digest differs')
+            raise ValueError('Saved reviewed derivative digest differs')
 
 def schema():
     props={k:{'type':'string'} for k in ['reason','title','summary','description','countryCode','city','registrationUrl','startsAt','endsAt']}
@@ -220,11 +221,11 @@ def publish(api,draft,review,domains,ledger,run_dir=None):
         # A lost response is recovered by reading this SAME stable ID next run.
         api.call('/api/editorial/entries',{**doc,'id':entry_id,'expectedUpdatedAt':None,'submit':False});row=api.read(entry_id)
     if not matches(row,doc):raise ValueError('Stored content differs; do not overwrite')
-    for item in media_records:api.verify_media(entry_id,item['protectedUrl'],item['sha256'])
+    for item in media_records:api.verify_media(entry_id,item['protectedUrl'],item['publishedSha256'])
     if row['moderation_status']=='draft':
         api.call('/api/editorial/entries',{**doc,'id':entry_id,'expectedUpdatedAt':row['updated_at'],'submit':True});row=api.read(entry_id)
     if not matches(row,doc):raise ValueError('Submitted readback differs')
-    for item in media_records:api.verify_media(entry_id,item['protectedUrl'],item['sha256'])
+    for item in media_records:api.verify_media(entry_id,item['protectedUrl'],item['publishedSha256'])
     document(draft,review,domains) # publication must still be inside freshness window
     api.call('/api/editorial/entries/moderation',{'id':entry_id,'expectedUpdatedAt':row['updated_at'],'action':'publish','sourceUrl':doc['externalUrl'],'checkedAt':review['checkedAt'],'verified':True,'reason':review['reason'][:500]})
     row=api.read(entry_id)

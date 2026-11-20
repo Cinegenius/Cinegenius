@@ -43,6 +43,8 @@ def prepare_for_entry(api, entry_id, draft, review, run, row):
             raise ValueError('Image upload recovery requires the original record')
         records = saved.get('images') or []
         for record in records:
+            if not record.get('publishedSha256') or not record.get('normalization'):
+                raise ValueError('Saved photo requires independent derivative review')
             age = (dt.datetime.now(dt.timezone.utc) - dt.datetime.fromisoformat(record['checkedAt'])).total_seconds()
             if not 0 <= age < 300:
                 pages = media.api_query({'titles': 'File:' + record['title'], 'prop': 'imageinfo|categories', 'cllimit': 100, 'iiprop': 'url|sha1|size|mime|extmetadata'})
@@ -72,7 +74,7 @@ def prepare_for_entry(api, entry_id, draft, review, run, row):
     if record:
         # No model-generated URL is accepted. api.upload verifies original bytes
         # again after visual review and restricts the returned canonical origin.
-        record['protectedUrl'] = api.upload(Path(record['localPath']), entry_id, record['sha256'], record['mime'])
+        record['protectedUrl'] = api.upload(Path(record['uploadPath']), entry_id, record['uploadSha256'], record['uploadMime'])
         gallery_image(record)  # validate all required visible credits before save
         receipt.update(state='uploaded_private', images=[record], reason='Per-file licence, original digest and actual visual review passed')
     pub.atomic(journal, receipt)

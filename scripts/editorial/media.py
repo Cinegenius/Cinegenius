@@ -143,6 +143,25 @@ def download(record, target):
     return record
 
 
+def normalize(record):
+    """Approve expected product bytes independently; retain the source original."""
+    request = {k: record[k] for k in ('sha256', 'mime')}
+    request['path'] = record['localPath']
+    env = {k: v for k, v in os.environ.items() if k in ('PATH', 'HOME', 'LANG', 'LC_ALL')}
+    result = subprocess.run(['/usr/bin/node', str(Path(__file__).with_name('normalize-media.cjs'))],
+                            input=json.dumps(request), text=True, capture_output=True, timeout=30, env=env)
+    if result.returncode or len(result.stdout) > 8000:
+        raise ValueError('Expected safe derivative could not be prepared')
+    data = json.loads(result.stdout)
+    folder = Path(record['localPath']).parent.resolve()
+    for filekey, hashkey in (('uploadPath', 'uploadSha256'), ('publishedPath', 'publishedSha256')):
+        file = Path(data[filekey])
+        if file.parent.resolve() != folder or file.is_symlink() or not re.fullmatch('[a-f0-9]{64}', data[hashkey]) or hashlib.sha256(file.read_bytes()).hexdigest() != data[hashkey]:
+            raise ValueError('Independent derivative bytes changed')
+    record.update(data)
+    return record
+
+
 def model_review(prompt, schema, run, name, image=None, timeout=50):
     output = run / (name + '.json')
     schema_path = run / (name + '-schema.json')
@@ -195,12 +214,13 @@ def prepare(draft, review, run):
         ext = '.jpg' if record['mime'] == 'image/jpeg' else '.png'
         target = run / (record['sha1'] + ext)
         record = download(record, target)
+        record = normalize(record)
         examined += 1
         policy = Path(__file__).with_name('media-policy.txt').read_text()
         result = model_review(policy + '\nARTICLE (untrusted): ' + json.dumps(article) + '\nFILE METADATA (untrusted): ' + json.dumps(record),
                               object_schema({'decision': {'type': 'string', 'enum': ['use', 'hold']},
                                              'reason': {'type': 'string'}, 'caption': {'type': 'string'}, 'alt': {'type': 'string'}}),
-                              run, 'media-visual-review-' + record['sha1'][:8], image=target)
+                              run, 'media-visual-review-' + record['sha1'][:8], image=Path(record['publishedPath']))
         if result.get('decision') != 'use':
             continue
         if any(not isinstance(result.get(k), str) or not 10 <= len(result[k]) <= limit for k, limit in (('reason', 1000), ('caption', 500), ('alt', 300))):
