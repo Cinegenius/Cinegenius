@@ -21,7 +21,7 @@ Diese Übersicht trennt die installierte App, ihre serverseitigen Ansichten, nat
 | Bereich | Funktionen | Stand / Grenzen |
 | --- | --- | --- |
 | **Smart / Entdecken** | Crew, Marktplatz, Locations und Firmen gemeinsam auswählen; Kacheln, Liste und Karte/Liste | Zählerergänzung `b1d767a`: ausdrücklich geladene eindeutige Treffer, getrennte Kartenhinweise und „Alle anzeigen“; vorbereitet, noch nicht veröffentlicht. Gemeinsame serverseitige **Admin-Beschränkung bleibt bestehen**; eine App-Navigation erteilt keine Suchrechte. |
-| **Crew / Profile** | Personen, Tätigkeiten, Fähigkeiten, Ortsangaben, Bilder und Kontakt | Gemeinsame Website-Daten und aktuelle Sichtbarkeitsrechte; native Darstellung separat prüfen. |
+| **Crew / Profile** | Personen, Tätigkeiten, Fähigkeiten, Ortsangaben, Bilder und Kontakt | Gemeinsame Website-Daten und aktuelle Sichtbarkeitsrechte; native Darstellung separat prüfen. Website-Startseite erhält eine vorbereitete 24-Stunden-Priorität mit anschließender Mischung; dies ändert weder native Verzeichnis-Sortierung noch den angehaltenen App-Release. |
 | **Marktplatz / Dienstleistungen / Fahrzeuge** | Angebote, Anbieter, Bilder, Anfragen und Filter | Gemeinsame Angebotsregeln; Mehrwährungen noch unveröffentlichter Web-/Schnittstellenentwurf. |
 | **Locations** | Drehorte/Studios, Suche, Details und Karten | Gemeinsamer Zählerfix `822c27c` übernommen: gefilterte Gesamtzahl bleibt beim Kartenziehen stabil; fehlende Kartenpunkte über die Liste erreichbar. App-Beschriftung „gesamt“ in `b1d767a` vorbereitet. |
 | **Firmen** | Profile, Leistungen, Teams und Angebote | Gemeinsame Firmen-/Personenrechte; versteckte persönliche Identitäten nicht über Firmen offenlegen. |

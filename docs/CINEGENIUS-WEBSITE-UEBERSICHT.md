@@ -11,7 +11,7 @@ Dieses Verzeichnis hält die Bereiche, ihre Funktionen, den belegten Stand und o
 
 | Bereich | Was dazugehört | Aktueller Stand / nächste Arbeit |
 | --- | --- | --- |
-| **Startseite** | Suche, Entdecken, Die Crew, Aus der Branche, Organisationen, Marktplatz, Jobs, frische Einblicke, Branchenpartner, Locations und Schwarzes Brett | Vorhanden. Die länderweite Priorisierung neuer regionaler Inhalte ist ein neuer laufender Auftrag. Bestehende Gestaltung erhalten. |
+| **Startseite** | Suche, Entdecken, Die Crew, Aus der Branche, Organisationen, Marktplatz, Jobs, frische Einblicke, Branchenpartner, Locations und Schwarzes Brett | Vorhanden. Neue Crew-Auswahl vorbereitet, noch nicht live: 24 Stunden Vorrang für neue Profile, danach alle 15 Minuten wechselnde Mischung auch älterer Mitglieder. Gestaltung unverändert. Länderpriorisierung bleibt ein separater offener Auftrag. |
 | **Crew** | Personenprofile, Berufe, Haupt-/Nebentätigkeiten, Fähigkeiten, Orte, Anbieter-Wechsel, Suche, Filter, Kacheln/Liste/Karte | Vorhanden. Karten-Gesamtzahl und tatsächlich darstellbare Treffer getrennt; keine privaten oder erfundenen Positionen. |
 | **Locations** | Drehorte, Studios, Kategorien, Ortsfilter, Detailseiten, Bilder, Kontakt/Anfragen und Ansichten | Vorhanden. Formular- und Suchqualität weiter prüfen; Karte ersetzt keine vollständige Liste. |
 | **Marktplatz** | Equipment, Requisiten, Fahrzeuge, Dienstleistungen, Kategorien, Anbieter, Preise, Angebote und Suche | Vorhanden. Mehrwährungen sind ein separater unveröffentlichter Entwurf. Gemeldete Smart-Fälle „Lampe“ und „bayerischer Hut“ bleiben als Suchqualitätsfälle erfasst. |
