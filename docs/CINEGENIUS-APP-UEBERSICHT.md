@@ -122,3 +122,8 @@ exakter Commit im zugehörigen Handoff. Native Übernahme bleibt separat offen.
 Der Server liefert Galerie-Felder; Gast-/Fremdzugriffe werden abgewiesen. Der
 Nutzungsfeed meldet ohne separaten PostHog-Lesezugang ehrlich `unavailable`.
 Bildautomatik und echte App-Abnahme sind damit noch nicht bestätigt.
+
+Vier öffentliche Browsergrößen samt drei Mexiko-Artikeln und bestehendem Bild
+live geprüft; Einwilligungsablehnung in drei zusätzlichen Fällen wirksam. Der
+neue private Bildcanary deckte den Unterschied zwischen Original und bereinigtem
+WebP auf; NEWS ergänzt den exakten Derivatnachweis vor Medienaktivierung.

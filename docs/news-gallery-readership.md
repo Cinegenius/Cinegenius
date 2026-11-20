@@ -155,3 +155,19 @@ dem Vorherstand keine neuen Warnungen. Die zwei bekannten AG-DOK-Altimporte
 wurden separat von NEWS über die reguläre Adminoberfläche verborgen; nicht erneut
 freigeben oder ausblenden. Native News-Abnahme und Smart/Work-Release-Halt bleiben
 separat offen. Internationalisierung/Feedback sind nicht Teil dieses Releases.
+
+Vier echte öffentliche Browserprüfungen (Chromium/WebKit, 320/390/768/1440 px,
+Deutsch/Spanisch) bestanden: drei Mexiko-Artikel, Redaktion, Quellenlink,
+Bestandsbild und kein Überlauf. Drei zusätzliche Live-Einwilligungsprüfungen
+bestätigen neue Ablehnung, erneute Nachfrage bei alter Zustimmung und Fortgeltung
+alter Ablehnung; jeweils keine PostHog-Anfragen. Die anfänglichen WebKit-Probleme
+betrafen lokale Bibliotheks-/TLS-Modulpfade und sind in den später bestandenen
+Läufen behoben; keine native Geräteprüfung.
+
+Der erste echte private Mediencanary erkannte korrekt einen Digestunterschied:
+`validateUpload` normalisiert jedes Bild nach WebP, richtet es aus, verkleinert es
+gegebenenfalls innerhalb von 2560 × 2560 und entfernt Metadaten. NEWS berechnet
+und prüft dieses erwartete Derivat unabhängig, bewahrt den Originalnachweis und
+vergleicht den tatsächlichen geschützten Readback strikt dagegen. Ein beliebiger
+Server-Rückgabehash reicht nicht. Bis diese echte Abnahme bestanden ist, keine
+vollständige Gallery-Aktivierung behaupten; keine Änderung am Upload-Guard.
