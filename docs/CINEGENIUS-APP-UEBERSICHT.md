@@ -9,11 +9,11 @@ Diese Übersicht trennt die installierte App, ihre serverseitigen Ansichten, nat
 
 | Thema | Belegter Stand |
 | --- | --- |
-| **iPhone-App** | APP meldet am 20.11.2026 Build **2026112007** nach Datensicherung installiert; Geräteversion bestätigt, App zu diesem Meldezeitpunkt noch ungeöffnet. Kein vollständiger Funktionstest dieses Builds behauptet. |
-| **App-Server** | Gemeinsame aktuelle Server-/Oberflächenänderungen werden durch APP integriert und veröffentlicht. Abschlussbeleg steht zum Zeitpunkt dieser Übersicht aus. |
+| **iPhone-App** | Lokale APP-Aufgabe meldet Build **2026112007** nach Datensicherung installiert. Später gemeldete Hänger in Smart/Work und beim Wechsel Work → Community werden dort diagnostiziert. Diese Server-Aufgabe hat das Gerät nicht geprüft. |
+| **App-Server** | **Veröffentlichung angehalten.** Nach WEB-/lokaler APP-Abstimmung ist `407915184321628834171facb374c0592fe68811` nur ein lokaler Integrationsstand. Kein paralleler Deploy; erst Fehlerbehebung, Prüfbeleg und neue Freigabe. |
 | **Native Navigation** | Ziel gemäß aktuellem App-Vertrag: **Shots · News · Smart · Projekte · Work**. Die gewöhnliche Website behält ihre eigene Navigation. |
 | **Obere Aktionen** | Profil, Nachrichten, Suche und Menü; App-eigene Abstände und sichere Bedienung über Kopf-/Fußbereich. |
-| **Erscheinungsbild** | Gemeldete Auswahl Dunkel/Mauve und Hell/Heller Stein. Native Darstellung nicht pauschal in die Website übertragen. |
+| **Erscheinungsbild** | Mauve wurde als unpassend zurückgemeldet; die lokale APP-Aufgabe bereitet vier Farbvorlagen vor. Noch keine neue Auswahl oder Themeänderung. Bestehende Farben werden in dieser Server-Folgearbeit nicht geändert. |
 | **Weitere Plattformen / Veröffentlichung** | Kein aktueller Beleg für eine veröffentlichte Android-App, einen App-Store-Release oder eine eigenständige Desktop-App in dieser Bestandsaufnahme. iPad-/Mac-Kompatibilität je konkretem Build prüfen. |
 
 ## Entdecken und Community
@@ -21,7 +21,7 @@ Diese Übersicht trennt die installierte App, ihre serverseitigen Ansichten, nat
 | Bereich | Funktionen | Stand / Grenzen |
 | --- | --- | --- |
 | **Smart / Entdecken** | Crew, Marktplatz, Locations und Firmen gemeinsam auswählen; Kacheln, Liste und Karte/Liste | Zählerergänzung `b1d767a`: ausdrücklich geladene eindeutige Treffer, getrennte Kartenhinweise und „Alle anzeigen“; vorbereitet, noch nicht veröffentlicht. Gemeinsame serverseitige **Admin-Beschränkung bleibt bestehen**; eine App-Navigation erteilt keine Suchrechte. |
-| **Crew / Profile** | Personen, Tätigkeiten, Fähigkeiten, Ortsangaben, Bilder und Kontakt | Gemeinsame Website-Daten und aktuelle Sichtbarkeitsrechte; native Darstellung separat prüfen. |
+| **Crew / Profile** | Personen, Tätigkeiten, Fähigkeiten, Ortsangaben, Bilder und Kontakt | Neue Crew-Zähldifferenz aus WEB `5ba93dd7` als `a40a2bc6` übernommen: sichtbare und zugängliche Zahl folgt auch bei Anbieterfiltern der aktuellen Auswahl; 29 gezielte Tests und zehn App-Browserfälle bestanden; Details unter [Kartenzähler](map-result-counts.md). Noch nicht veröffentlicht oder auf dem Gerät geprüft. Die Homepage-Rotation ist separat in `0c5e63fd` geprüft und gesichert: 24 Stunden Vorrang, danach serverseitige Mischung; 61 Tests und vollständiger Build bestanden. Native Crew-Reihenfolge unverändert. |
 | **Marktplatz / Dienstleistungen / Fahrzeuge** | Angebote, Anbieter, Bilder, Anfragen und Filter | Gemeinsame Angebotsregeln; Mehrwährungen noch unveröffentlichter Web-/Schnittstellenentwurf. |
 | **Locations** | Drehorte/Studios, Suche, Details und Karten | Gemeinsamer Zählerfix `822c27c` übernommen: gefilterte Gesamtzahl bleibt beim Kartenziehen stabil; fehlende Kartenpunkte über die Liste erreichbar. App-Beschriftung „gesamt“ in `b1d767a` vorbereitet. |
 | **Firmen** | Profile, Leistungen, Teams und Angebote | Gemeinsame Firmen-/Personenrechte; versteckte persönliche Identitäten nicht über Firmen offenlegen. |
@@ -75,9 +75,9 @@ Diese Übersicht trennt die installierte App, ihre serverseitigen Ansichten, nat
 
 ## Nächste Schritte und Pflege
 
-1. Laufenden App-Server-Release mit aktuellem Website-Hauptstand einschließlich Kartenfix abgleichen; konkreten Livebeleg nachtragen.
-2. Installierten Build 2026112007 öffnen und beauftragte Abläufe auf dem tatsächlichen Gerät prüfen; Ergebnisse von Browserprüfungen unterscheiden.
-3. Geprüfte native Zählerergänzungen `b1d767a` separat mit dem aktuellen App-Release abstimmen; Veröffentlichung und echte Geräteprüfung bleiben offen.
+1. Veröffentlichungsstopp erhalten: Lokale APP-Aufgabe diagnostiziert Smart-/Work-Hänger und Work → Community. Konkrete Korrektur, Geräteprüfung und neue Freigabe vor Livegang.
+2. Installierten Build 2026112007 mit dem tatsächlichen Serverstand auf dem Gerät prüfen; Server-/Browserbelege nicht als Geräteprüfung ausweisen.
+3. Native Zählerergänzungen einschließlich der nachgemeldeten Crew-Filterkorrektur separat mit dem lokalen App-Stand abstimmen; danach die separat gesicherte Homepage-Rotation übernehmen. [Gemeinsame Prioritäten](AKTUELLE-AUFTRAEGE.md) erhalten.
 4. Länderpriorisierung und später Feedback-/Währungsfunktionen aus dem gemeinsamen Vertrag übernehmen.
 5. Work-Funktionsstand mit APP konkretisieren; unbelegte Teilfunktionen als offen führen.
 

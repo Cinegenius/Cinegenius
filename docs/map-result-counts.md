@@ -5,8 +5,9 @@ full set matching the active search/filters from points in the map viewport.
 
 - The toolbar count is the full filtered result count; moving/zooming the map
   must not replace it with a smaller viewport count.
-- The existing Crew provider shortcut exception still displays the full person
-  count as requested by the operator.
+- Crew, Location-provider and Marketplace-provider shortcuts use the same
+  filtered result total as all other filters. The later 20 November correction
+  supersedes the former unfiltered-person-count exception.
 - The map badge counts only valid public points inside the current bounds.
 - The shared `MapResultSummary` visibly explains mapped-in-view, mapped-outside
   and unmapped results. These partitions add up to the supplied result total.
@@ -49,3 +50,32 @@ errors. The full touched-page lint run retains three pre-existing Crew errors
 hook warnings; the Crew errors were reproduced from the untouched base commit.
 No authentication, database, stored coordinates or publication changes are part
 of this patch. No production build or native-device validation is claimed here.
+
+
+## App follow-up for the reported Crew mismatch
+
+The later WEB correction `5ba93dd7` is ported as a single source-line delta
+as `a40a2bc6` onto the native map-count base `38d87bb4`. With the synthetic reproduction,
+221 eligible people include 202 Crew, ten Location-only providers and nine
+Marketplace-only providers. Selecting Crew must show 202 overall, not 221;
+177 have a public point and 25 have none. Both the visible number and its
+screen-reader description now use `matching.length`. Viewport changes still
+only change the map number. The existing native `gesamt` caption is retained.
+
+The prior mismatch was reproduced with the actual native toolbar at 320px.
+The correction is checked using actual Crew/filter/dialog/map-summary
+components with synthetic data and simulated bounds. Evidence, exact commit
+and final results: `/srv/cinegenius/handoffs/20261120-app-crew-filter-count/receipt.json`.
+All 29 targeted provider/map/native-count tests and 10 Chromium/WebKit cases
+pass. The browser cases use the real native filter dialog and cover German,
+Spanish and Hungarian at 320/390/834/1366px, checking the visible and accessible
+count, search, empty states, reset and bounds changes. Map tiles, real accounts
+and physical devices are not part of this check.
+TypeScript, all 17 catalogs (11211 keys) and shared design checks pass. One
+earlier type-check process was terminated with status 143; its separate log
+is retained and the final independently recorded run exited 0. The full
+production build was not repeated for this count-only line; the separate
+homepage integration has its own successful build receipt.
+No new endpoint, locale string, map coordinate, media, native theme or release
+is introduced. The complete homepage rotation remains separately saved on
+`codex/app-home-crew-rotation-20261120`; it is not bundled into this count delta.

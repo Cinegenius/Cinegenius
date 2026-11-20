@@ -1,5 +1,7 @@
 # App-Abgleich der Karten- und Trefferzahlen
 
+**Späterer Nachtrag am 20. November:** Die neu gemeldete Crew-Differenz ersetzt die unten historisch erhaltene Anbieter-Ausnahme. Die aktuelle sichtbare und zugängliche Gesamtzahl folgt jetzt auch bei Anbieterfiltern der gefilterten Auswahl; siehe [gemeinsamer Vertrag](map-result-counts.md#app-follow-up-for-the-reported-crew-mismatch). Der frühere Prüfstand und seine Belege bleiben als Verlauf erhalten.
+
 Aktualisierung nach Markus' Auftrag „dann mach“: Die gemeinsame Korrektur `822c27c8446e73dad1e37c7c4b4f82c8f359a735` ist als `d7abae6` in den separaten App-Zählerzweig übernommen; native Ergänzungen sind umgesetzt. Die folgenden Bestandsbefunde bleiben als Vorhervergleich erhalten. Der zuvor eingefrorene UI-Stand `4327fc68f17dada987f5c2366f192a5bd26b254d` wurde nicht verändert.
 
 Ausgangsstand vor der Umsetzung: lesende Prüfung am 20. November 2026 auf `eb1eefe9cbf8355cd69d423d7cc93dab156e87f5`, damals ohne Produktkorrektur oder Veröffentlichung. WEBs Zwischenbefund steht unter `/srv/cinegenius/handoffs/20261120-community-feedback/map-count-audit.md`: zum dortigen Prüfzeitpunkt 63 öffentliche Firmen, 34 mit Kartenpunkt, davon 33 im Europaausschnitt, sowie 29 ohne eindeutig zugeordneten öffentlichen Ortsmittelpunkt. Diese Livezahlen wurden von APP nicht erneut erhoben und können sich ändern.

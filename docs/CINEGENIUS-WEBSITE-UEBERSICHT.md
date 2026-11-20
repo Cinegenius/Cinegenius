@@ -12,7 +12,7 @@ Dieses Verzeichnis hält die Bereiche, ihre Funktionen, den belegten Stand und o
 | Bereich | Was dazugehört | Aktueller Stand / nächste Arbeit |
 | --- | --- | --- |
 | **Startseite** | Suche, Entdecken, Die Crew, Aus der Branche, Organisationen, Marktplatz, Jobs, frische Einblicke, Branchenpartner, Locations und Schwarzes Brett | Vorhanden. Die länderweite Priorisierung neuer regionaler Inhalte ist ein neuer laufender Auftrag. Bestehende Gestaltung erhalten. |
-| **Crew** | Personenprofile, Berufe, Haupt-/Nebentätigkeiten, Fähigkeiten, Orte, Anbieter-Wechsel, Suche, Filter, Kacheln/Liste/Karte | Vorhanden. Karten-Gesamtzahl und tatsächlich darstellbare Treffer getrennt; keine privaten oder erfundenen Positionen. |
+| **Crew** | Personenprofile, Berufe, Haupt-/Nebentätigkeiten, Fähigkeiten, Orte, Anbieter-Wechsel, Suche, Filter, Kacheln/Liste/Karte | Vorhanden. Gemeinsamer Kartenfix veröffentlicht; die später gemeldete Crew-Anbieter-Differenz ist separat in WEB `5ba93dd7` korrigiert und noch nicht live. Oben zählt die aktuelle gefilterte Auswahl; keine privaten oder erfundenen Positionen. |
 | **Locations** | Drehorte, Studios, Kategorien, Ortsfilter, Detailseiten, Bilder, Kontakt/Anfragen und Ansichten | Vorhanden. Formular- und Suchqualität weiter prüfen; Karte ersetzt keine vollständige Liste. |
 | **Marktplatz** | Equipment, Requisiten, Fahrzeuge, Dienstleistungen, Kategorien, Anbieter, Preise, Angebote und Suche | Vorhanden. Mehrwährungen sind ein separater unveröffentlichter Entwurf. Gemeldete Smart-Fälle „Lampe“ und „bayerischer Hut“ bleiben als Suchqualitätsfälle erfasst. |
 | **Fahrzeuge** | Fahrzeuge als Angebotsart und eigene Detail-/Einstiegsseiten | Vorhanden; gemeinsames Angebots-, Bild- und Berechtigungsmodell verwenden. |

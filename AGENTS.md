@@ -10,7 +10,7 @@ Quellen, Schnittstellen, Prüfungen und offene Geräte-/Leistungsgrenzen: `docs/
 
 Die über WEB CODEX abgestimmte Länderarbeit priorisiert Mexiko und berücksichtigt Italien, Spanien, Frankreich, Schweiz, Österreich, Ungarn sowie die bereits vorhandenen Länder. Sprache, Suchland und Angebotswährung sind getrennte Angaben; vorhandene Preise werden nicht automatisch umgerechnet. Gemeinsame Länder-/Währungskorrekturen mit WEB abstimmen und geprüfte Änderungen in die App übernehmen. Der reine App-Bestandscheck unter `docs/app-regionalization-20261120.md` ist keine vollständige Länderfreigabe und keine native Geräteprüfung.
 
-App-Kartenzähler, Betreiberauftrag vom 20. November: Verzeichnis-Gesamtzahlen bleiben unabhängig vom Kartenausschnitt; die Crew-Provider-Ausnahme erhalten. Kartenpunkte im Ausschnitt, außerhalb und ohne Position unterscheiden, Einträge ohne Punkt über die Liste erreichbar halten. Native Smart-Zahlen sind ausdrücklich geladene, deduplizierte Treffer und kein vollständiger Serverbestand. Organisationen unterscheiden Gesamttotal, geladene Seite und Kartenpunkte. Neue App-Ergänzungen im separaten Zweig `codex/app-map-counts-20261120` erhalten; die UI-Folgearbeit bei `4327fc68f17dada987f5c2366f192a5bd26b254d` bleibt für den lokalen App-Abgleich eingefroren. Siehe `docs/app-map-count-audit-20261120.md` und die App-Übersicht `docs/CINEGENIUS-APP-UEBERSICHT.md`, sobald dessen geprüfte WEB-Übergabe übernommen ist. Die getrennte Website-Übersicht bleibt `docs/CINEGENIUS-WEBSITE-UEBERSICHT.md`; keine weitere konkurrierende Übersicht anlegen.
+App-Kartenzähler, Betreiberauftrag vom 20. November: Verzeichnis-Gesamtzahlen bleiben unabhängig vom Kartenausschnitt. Die später am 20. November gemeldete Crew-Zähldifferenz ersetzt die alte Provider-Ausnahme: Auch Crew-, Locations- und Marktplatz-Anbieter zählen die aktuelle gefilterte Auswahl. Kartenpunkte im Ausschnitt, außerhalb und ohne Position unterscheiden, Einträge ohne Punkt über die Liste erreichbar halten. Native Smart-Zahlen sind ausdrücklich geladene, deduplizierte Treffer und kein vollständiger Serverbestand. Organisationen unterscheiden Gesamttotal, geladene Seite und Kartenpunkte. Neue App-Ergänzungen im separaten Zweig `codex/app-map-counts-20261120` erhalten; die UI-Folgearbeit bei `4327fc68f17dada987f5c2366f192a5bd26b254d` bleibt für den lokalen App-Abgleich eingefroren. Siehe `docs/app-map-count-audit-20261120.md` und die App-Übersicht `docs/CINEGENIUS-APP-UEBERSICHT.md`, sobald dessen geprüfte WEB-Übergabe übernommen ist. Die getrennte Website-Übersicht bleibt `docs/CINEGENIUS-WEBSITE-UEBERSICHT.md`; keine weitere konkurrierende Übersicht anlegen.
 
 ## App server release authorized by Markus – 19 November 2026
 
@@ -274,3 +274,19 @@ Follow `docs/design/app-current-20261119.md` for the latest native-only navigati
 - Maintain `docs/CINEGENIUS-APP-UEBERSICHT.md` separately for the entire native app, including Work and device-specific capabilities. Markus explicitly requests two inventories, not one combined list.
 - With each relevant change update the affected entries: scope, date, implementation status, publication/activation evidence, tests and remaining work. Cross-link shared contracts and coordinate with APP Entwicklung. Preserve unrelated updates; these documents create no new automation or release authorization.
 - Distinguish source present, tested, deployed, activated, installed and verified on a physical device. Never infer a live feature from a route, a draft, a successful build or another platform's test. Add new modules and mark superseded behavior; do not silently drop unfinished work.
+
+
+## Nachgemeldete Crew-Zähldifferenz und Prioritäten — 20. November 2026
+
+Die mit WEB CODEX abgeglichene Korrektur aus `5ba93dd7` setzt die sichtbare und
+zugängliche Crew-Gesamtzahl auf denselben gefilterten Bestand wie die Karte.
+Die frühere Anbieter-Ausnahme ist überholt; die Kartenausschnittsbegrenzung
+ändert weiterhin nicht die gefilterte Gesamtsumme. Native Beschriftung
+„gesamt“, Lade-/Fehlerzustände und aktuelle Rechte erhalten.
+
+Die gemeinsame Prioritätenliste ist `docs/AKTUELLE-AUFTRAEGE.md`: akute
+Datenschutz-/Datenverlustfälle, dann Funktionsfehler, danach abhängige begonnene
+Arbeit und Erweiterungen. Die lokale Mac-Aufgabe bearbeitet die gemeldeten
+Smart-/Work-Hänger; keine konkurrierende Installation oder Veröffentlichung.
+Homepage-Rotation ist separat geprüft und gesichert. App-Livegang bleibt
+ausdrücklich angehalten; geprüfte Entwürfe sind keine neue Freigabe.
