@@ -294,3 +294,15 @@ denselben berechtigten Ergebnissatz; Zoomen ändert nur den Kartenausschnitt.
   Photo discovery has no reliable place projection and remains global.
 - See `docs/country-first-discovery.md` for Web/native contract, tests and limits.
   A checked branch is not a release; preserve the current APP release hold.
+
+
+## Website release request, 20 November 2026
+
+Markus explicitly requested “stell live” for the checked website package
+`f490b47c`: filtered Crew counts, compact map previews, one-day new-Crew priority
+and rotation, and country-first discovery. This supersedes the earlier WEB hold
+for this exact package. The separate native Smart/Work release hold remains;
+do not port or publish unrelated app branches, enable Push/Shots, or change flags.
+Use clean main at origin/main and the guarded production script. Actual release
+and live verification are recorded in
+`/srv/cinegenius/handoffs/20261120-country-first-release/receipt.json`.
