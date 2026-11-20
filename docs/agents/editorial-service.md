@@ -137,7 +137,7 @@ No public legal text has been silently marked reviewed by a machine.
 
 Native app: ordinary published-news reads keep the current status/organization
 contract. No machine credential or admin controls belong in the native client.
-Real device checks and end-to-end production checks are still pending.
+Real device checks remain pending. The live production save/readback/submit/publish/readback flow passed with a genuine newly verified article; see the release receipt below.
 
 ## Reviewed worker
 
@@ -168,3 +168,25 @@ capability alone does not activate it. No deletion or media generation runs here
 Human feedback/corrections are preserved; an analytics learning feed is not yet
 connected. A source-checking AI is not a guarantee that every future article is
 error-free; source attribution and human revocation remain available.
+
+## Production activation, 20 November 2026
+
+The central newsroom and both migrations are applied. All17 previous public
+articles retain their content, country fields, IDs, media origins and approvals;
+all25 old links resolve to the approved canonical content. A genuine FFA article
+passed the fresh independent review and published readback. The existing hourly
+timer is active and the separate publisher enable marker is installed. No second
+timer, member authentication or website checking agent was enabled.
+
+Source verification now has a bounded public-source fetch (one approved HTTPS
+URL, no redirects/cookies/authentication, at most1MB and24k text characters,
+public addresses only, configured blocked domains enforced). The separate model
+gets current original-source evidence with its URL, fetch time and SHA-256;
+source content remains untrusted data. If unavailable, actual browsing must
+verify the source or the result is held. Eleven worker regression checks include
+private/blocked source rejection and successful/lost-response publication.
+
+Production receipt: `/srv/cinegenius/handoffs/20261120-newsroom-release/receipt.json`.
+Browser checks cover320/390/768/1440px in Chromium/WebKit and German/Spanish.
+No physical/native or real Mexico-network verification is claimed. The first
+future hourly publication run remains distinct from the observed manual canary.

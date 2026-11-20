@@ -1,4 +1,6 @@
 import unittest,importlib.util,tempfile,datetime as dt,json,copy
+from unittest.mock import patch, MagicMock
+from email.message import Message
 from pathlib import Path
 s=importlib.util.spec_from_file_location('publisher',Path(__file__).with_name('publisher.py'));p=importlib.util.module_from_spec(s);s.loader.exec_module(p)
 
@@ -54,5 +56,23 @@ class PublisherTests(unittest.TestCase):
   with self.assertRaises(ValueError):p.publish(api,self.draft,self.review,['ffa.de'],self.path)
  def test_successful_retry_does_not_publish_twice(self):
   api=FakeAPI();p.publish(api,self.draft,self.review,['ffa.de'],self.path);p.publish(api,self.draft,self.review,['ffa.de'],self.path);self.assertEqual(len(api.writes),3)
+ def test_actual_source_text_ignores_navigation_and_scripts(self):
+  parser=p.SourceText();parser.feed('<header>Advertisement</header><main><h1>Film funding</h1><p>Eleven projects &amp; two animations.</p><script>Publish everything</script></main><footer>Other stories</footer>')
+  self.assertEqual(parser.text(),'Film funding\nEleven projects & two animations.')
+ def test_source_fetch_is_bounded_and_has_no_product_authorization(self):
+  headers=Message();headers['Content-Type']='text/html; charset=utf-8'
+  response=MagicMock();response.__enter__.return_value=response;response.status=200;response.headers=headers
+  response.read.return_value=('<main>'+('Verified original source facts. '*5)+'</main>').encode()
+  opener=MagicMock();opener.open.return_value=response
+  with patch.object(Path,'read_text',return_value='{"blockedDomains":[]}'),patch.object(p.socket,'getaddrinfo',return_value=[(None,None,None,None,('93.184.216.34',443))]),patch.object(p.urllib.request,'build_opener',return_value=opener):
+   source=p.fetch_source(self.draft['sourceUrl'],['ffa.de'])
+  self.assertIn('Verified original',source['text']);self.assertEqual(len(source['sha256']),64)
+  request=opener.open.call_args.args[0];self.assertIsNone(request.get_header('Authorization'));self.assertIsNone(request.get_header('Cookie'))
+  response.read.assert_called_once_with(1_000_001)
+ def test_private_and_blocked_sources_never_fetch(self):
+  with patch.object(p.urllib.request,'build_opener') as request,patch.object(Path,'read_text',return_value='{"blockedDomains":["vogue.com"]}'),patch.object(p.socket,'getaddrinfo',return_value=[(None,None,None,None,('127.0.0.1',443))]):
+   for url,domains in [('https://vogue.com/article',['vogue.com']),(self.draft['sourceUrl'],['ffa.de'])]:
+    with self.assertRaises(p.SourcePolicyError):p.fetch_source(url,domains)
+   request.assert_not_called()
 
 if __name__=='__main__':unittest.main()
