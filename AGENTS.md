@@ -260,3 +260,18 @@ Follow `docs/design/app-current-20261119.md` for the latest native-only navigati
 - Maintain `docs/CINEGENIUS-APP-UEBERSICHT.md` separately for the entire native app, including Work and device-specific capabilities. Markus explicitly requests two inventories, not one combined list.
 - With each relevant change update the affected entries: scope, date, implementation status, publication/activation evidence, tests and remaining work. Cross-link shared contracts and coordinate with APP Entwicklung. Preserve unrelated updates; these documents create no new automation or release authorization.
 - Distinguish source present, tested, deployed, activated, installed and verified on a physical device. Never infer a live feature from a route, a draft, a successful build or another platform's test. Add new modules and mark superseded behavior; do not silently drop unfinished work.
+
+
+## Auftragseinteilung und Crew-Zähler (20. November 2026)
+
+Markus verlangt eine nachvollziehbare Reihenfolge neuer und bestehender Aufträge.
+Pflege `docs/AKTUELLE-AUFTRAEGE.md`: akute Datenschutz-/Datenverlustprobleme zuerst,
+danach gemeldete Funktionsfehler, dann abhängige angefangene Arbeiten und neue
+Erweiterungen. Nicht jeden neuen Wunsch ungeprüft vorziehen; ältere Aufträge und
+ihren tatsächlichen Status erhalten, Prioritätswechsel kurz erklären. Getrennte
+APP-/Redaktionsarbeit abstimmen und bestehende Veröffentlichungsstopps beachten.
+
+Die bisherige Ausnahme einer konstanten Personenzahl bei Crew-Anbieterfiltern ist
+aufgehoben: Crew, Locations-Anbieter und Marktplatz-Anbieter zeigen oben die
+aktuell gefilterte Gesamtzahl. Karte, Kartenhinweise und „Alle anzeigen“ verwenden
+denselben berechtigten Ergebnissatz; Zoomen ändert nur den Kartenausschnitt.

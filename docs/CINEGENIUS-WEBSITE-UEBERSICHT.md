@@ -12,7 +12,7 @@ Dieses Verzeichnis hält die Bereiche, ihre Funktionen, den belegten Stand und o
 | Bereich | Was dazugehört | Aktueller Stand / nächste Arbeit |
 | --- | --- | --- |
 | **Startseite** | Suche, Entdecken, Die Crew, Aus der Branche, Organisationen, Marktplatz, Jobs, frische Einblicke, Branchenpartner, Locations und Schwarzes Brett | Vorhanden. Die länderweite Priorisierung neuer regionaler Inhalte ist ein neuer laufender Auftrag. Bestehende Gestaltung erhalten. |
-| **Crew** | Personenprofile, Berufe, Haupt-/Nebentätigkeiten, Fähigkeiten, Orte, Anbieter-Wechsel, Suche, Filter, Kacheln/Liste/Karte | Vorhanden. Karten-Gesamtzahl und tatsächlich darstellbare Treffer getrennt; keine privaten oder erfundenen Positionen. |
+| **Crew** | Personenprofile, Berufe, Haupt-/Nebentätigkeiten, Fähigkeiten, Orte, Anbieter-Wechsel, Suche, Filter, Kacheln/Liste/Karte | Vorhanden. Gemeinsamer Kartenfix veröffentlicht. Nachgemeldete Ausnahme im Crew-Anbieterfilter korrigiert: Die obere Zahl zählt jetzt im Entwurf dieselbe Auswahl wie Karte und Liste; noch nicht veröffentlicht. Keine privaten oder erfundenen Positionen. |
 | **Locations** | Drehorte, Studios, Kategorien, Ortsfilter, Detailseiten, Bilder, Kontakt/Anfragen und Ansichten | Vorhanden. Formular- und Suchqualität weiter prüfen; Karte ersetzt keine vollständige Liste. |
 | **Marktplatz** | Equipment, Requisiten, Fahrzeuge, Dienstleistungen, Kategorien, Anbieter, Preise, Angebote und Suche | Vorhanden. Mehrwährungen sind ein separater unveröffentlichter Entwurf. Gemeldete Smart-Fälle „Lampe“ und „bayerischer Hut“ bleiben als Suchqualitätsfälle erfasst. |
 | **Fahrzeuge** | Fahrzeuge als Angebotsart und eigene Detail-/Einstiegsseiten | Vorhanden; gemeinsames Angebots-, Bild- und Berechtigungsmodell verwenden. |
@@ -85,6 +85,8 @@ Dieses Verzeichnis hält die Bereiche, ihre Funktionen, den belegten Stand und o
 | **Redaktionsbetrieb** | AG DOK / NEWS, Technikrecherche, Quellen, Rechte, Dubletten und Länderzuordnung | Teilweise automatisierte Recherche gemeldet. Recherche, Entwurf, Freigabe und echte Veröffentlichung getrennt belegen; IMCINE-Erweiterung ist kein neuer doppelter Agent. |
 | **Aktualität von Profilen/Angeboten** | Bestandsprüfung, Hinweise und geregeltes Ausblenden veralteter Inhalte | Dokumentiert; tatsächliche Zeitpläne/Aktivierung brauchen Betriebsbeleg, keine unbestätigte automatische Löschung zusagen. |
 | **Werbung** | Bestehender historischer Pfad `/werben` | Kein freigegebenes aktives Werbeinventar; keine Banner oder Buchungsplätze reaktivieren. |
+
+Aktuelle Prioritäten und gesicherte Zwischenstände: [Auftragsreihenfolge](AKTUELLE-AUFTRAEGE.md). Der nachgemeldete Crew-Zählerfehler hat Vorrang; Homepage-Crew-Rotation ist separat in `f6b45be5` geprüft, noch nicht veröffentlicht.
 
 ## Aktuell offene Arbeit
 

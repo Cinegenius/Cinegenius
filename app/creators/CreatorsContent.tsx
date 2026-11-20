@@ -492,7 +492,7 @@ function CreatorsInner({
         ]}
         categoryValue={sidebarDept ?? ""}
         onCategoryChange={(value) => { setSelectedRoles(new Set()); chooseSidebarDept(value || null); }}
-        resultCount={hasMoreFromApi ? null : isProviderFilter(sidebarDept) ? allCreators.length : matching.length} resultSummary={hasMoreFromApi ? (loadError ? t("resultsLoadFailed") : t("resultsLoading")) : t("results", { count: isProviderFilter(sidebarDept) ? allCreators.length : matching.length })}
+        resultCount={hasMoreFromApi ? null : matching.length} resultSummary={hasMoreFromApi ? (loadError ? t("resultsLoadFailed") : t("resultsLoading")) : t("results", { count: matching.length })}
         resultActions={<ProviderQuickFilters value={sidebarDept}
           crew={filterProviderProfiles(allCreators, CREW_PROVIDER_FILTER).length > 0}
           locations={filterProviderProfiles(allCreators, LOCATION_PROVIDER_FILTER).length > 0}
