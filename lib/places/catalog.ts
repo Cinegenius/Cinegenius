@@ -1,6 +1,6 @@
 import { SUPPORTED_LOCALES } from "../i18n/locales";
 import rawData from './catalog.json' with { type: 'json' };
-import { aliasOverrides, countryCode, countryName, placeKey, type Place } from './core';
+import { aliasOverrides, cityName, countryCode, countryName, placeKey, type Place } from './core';
 type LocalNames=Record<string,string>;
 type CityEntry={id:string;name:string;country:string;region:string;district:string;aliases:string[];names:LocalNames};
 type RegionEntry={id:string;code:string;name:string;country:string;aliases:string[];names:LocalNames};
@@ -31,7 +31,7 @@ export function localizedPlaceFields(fields:Record<string,unknown>,locale:string
  const city=cityById.get(String(fields.place_city_id??'')),region=regionById.get(String(fields.place_region_id??''));
  return {...fields,place_search_terms:[...new Set([city?.name??"",...Object.values(city?.names??{}),...(aliasOverrides[city?.id??""]??[]),...(region?regionAliases(region):[]),...(SUPPORTED_LOCALES.map(language=>fields.place_country_code?countryName(String(fields.place_country_code),language):""))])],place_region_aliases:region?regionAliases(region):[],place_city_name:city?.names[locale]??fields.place_city_name,place_region_name:region?regionDisplayName(region.id,locale):fields.place_region_name};
 }
-export function aliases(city:typeof data.cities[number]) {return [city.name,...city.aliases,...(aliasOverrides[city.id]??[])];}
+export function aliases(city:typeof data.cities[number]) {return [...new Set([city.name,...city.aliases,...Object.values(city.names),...SUPPORTED_LOCALES.map(locale=>cityName(city.id,city.name,locale)),...(aliasOverrides[city.id]??[])])];}
 type CityRecord=typeof data.cities[number];
 const exactIndex=new Map<string,CityRecord[]>();
 for(const city of data.cities)for(const alias of new Set(aliases(city).map(placeKey))){const key=city.country+":"+alias;const existing=exactIndex.get(key);if(existing)existing.push(city);else exactIndex.set(key,[city]);}

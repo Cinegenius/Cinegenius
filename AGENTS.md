@@ -306,3 +306,20 @@ do not port or publish unrelated app branches, enable Push/Shots, or change flag
 Use clean main at origin/main and the guarded production script. Actual release
 and live verification are recorded in
 `/srv/cinegenius/handoffs/20261120-country-first-release/receipt.json`.
+
+## International price and private feedback contract (20 November 2026)
+
+- Reuse `lib/currency.ts` and `CurrencySelect` for prices. Preserve explicit currency
+  alongside amounts: listing `metadata.price_currency`, Crew `crew.price_currency`,
+  company equipment `currency`, booking `currency` snapshot. Missing legacy codes
+  remain EUR; never reinterpret or convert a price from language or geography.
+  Price bounds/sorting must apply inside one explicit currency before counts and
+  pagination. Native implementations must preserve these fields as well.
+- Apply and verify `20261120194027_booking_currency_snapshot.sql` before releasing
+  dependent booking code. Existing amounts and privacy rules remain unchanged.
+- `/mitgestalten` uses authenticated private drafts and explicit confirmed support
+  submissions. Local representatives never share private history. AI suggestions
+  are unreviewed proposals with actual user evidence, not permission to change or
+  publish. Coordination is admin-only; shared invitation links convey no rights.
+- See `docs/international-currency-feedback.md` for endpoints, limits and release
+  status. A prepared file is not a delivered APP message or a native device test.

@@ -139,3 +139,9 @@ einer Admin-Einzelfreigabe ohne allgemeinen Publikationsgrant. Vertrag und offen
 Aktivierungsschritte: [News-Galerie und Nutzung](news-gallery-readership.md).
 Noch nicht veröffentlicht; Migration und echter PostHog-Lesezugang fehlen. Native
 Abnahme durch APP offen, Smart-/Work-Release-Halt bleibt bestehen.
+
+**Gemeinsamer Abschlussstand (21.11., nicht live):** Währungen/Feedback und News
+sind unter `codex/international-news-ready-20261120` zusammengeführt. 166 gezielte
+Tests, 17 Sprachen und Designprüfung bestanden. Umfang und offene Aktivierung in
+[Gemeinsamer Prüfstand](international-news-release.md); vollständiger Build und
+exakter Commit im zugehörigen Handoff. Native Übernahme bleibt separat offen.

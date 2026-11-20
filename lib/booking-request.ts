@@ -3,6 +3,7 @@ export async function submitBookingRequest(payload: Record<string, unknown>, sen
   const response = await send("/api/bookings", {
     method: "POST", headers: {"Content-Type": "application/json"}, body: JSON.stringify(payload),
   });
+  if (response.status === 409) throw new Error("BOOKING_QUOTE_CHANGED");
   const data: unknown = await response.json();
   if (!response.ok || !data || typeof data !== "object" || !("ref" in data) || typeof data.ref !== "string" || !/^CG-[A-Z0-9]+$/.test(data.ref)) {
     throw new Error("BOOKING_REQUEST_NOT_CONFIRMED");

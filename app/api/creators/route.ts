@@ -1,3 +1,4 @@
+import { listingCurrency, formatOfferAmount } from "@/lib/currency";
 import { occupationFormFromCrew } from "@/lib/occupation-form";
 import { auth } from "@clerk/nextjs/server";
 import { profileAccessFor } from "@/lib/profile-privacy-server";
@@ -69,7 +70,7 @@ export async function GET(req: NextRequest) {
       image: (Array.isArray(p.portfolio_images) && p.portfolio_images.length > 0) ? p.portfolio_images[0] : (p.avatar_url ?? ""),
       avatar: p.avatar_url ?? "",
       rating: 0, reviews: 0,
-      dayRate: p.day_rate ? `${p.day_rate} €/Tag` : "Nach Vereinbarung",
+      dayRate: p.day_rate ? `${formatOfferAmount(p.day_rate,listingCurrency(p.crew),locale)}${tResponse("common.perDay")}` : tResponse("common.byArrangement"),
       available: p.available ?? true,
       credits: [], skills: p.skills ?? [],
       bio: p.bio ?? p.tagline ?? "",

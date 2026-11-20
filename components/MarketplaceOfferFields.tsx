@@ -1,5 +1,6 @@
 'use client';
 
+import CurrencySelect from '@/components/CurrencySelect';
 import { useId, useRef, useState } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
 import { localizedMarketplaceDepartments, marketplaceCategory } from '@/lib/marketplaceCategories';
@@ -52,7 +53,7 @@ export default function MarketplaceOfferFields({value,onChange,vehicleOnly=false
  return <div className="space-y-5" data-marketplace-offer>
   {category&&<MarketplaceCategoryPicker value={value.category} vehicleOnly={vehicleOnly} onChange={next=>onChange({...value,category:next})}/>}
   {prices&&<div className="space-y-3">
-   <label className="block text-sm text-text-secondary">{t('mode')}<select className={`${inputClass} mt-1`} value={v.mode} onChange={event=>set('mode',event.target.value)}>{(service?['service']:['rent','sale','both']).map(mode=><option value={mode} key={mode}>{t(mode)}</option>)}</select></label>
+   <CurrencySelect value={v.currency || 'EUR'} onChange={next=>set('currency',next)} /><label className="block text-sm text-text-secondary">{t('mode')}<select className={`${inputClass} mt-1`} value={v.mode} onChange={event=>set('mode',event.target.value)}>{(service?['service']:['rent','sale','both']).map(mode=><option value={mode} key={mode}>{t(mode)}</option>)}</select></label>
    <div className="grid gap-3 sm:grid-cols-2">{['rent','sale'].filter(kind=>v.mode===kind||v.mode==='both'||(service&&kind==='rent')).map(kind=><fieldset key={kind} className="min-w-0 space-y-2 rounded-xl border border-border p-3"><legend className="px-1 text-sm font-medium">{t(service?'servicePrice':`${kind}Price`)}</legend><select aria-label={t(service?'servicePrice':`${kind}Price`)} className={inputClass} value={v[`${kind}_mode`]} onChange={event=>set(`${kind}_mode`,event.target.value)}>{['fixed','negotiable','request'].map(mode=><option key={mode} value={mode}>{t(mode)}</option>)}</select>{v[`${kind}_mode`]!=='request'&&<input aria-label={t(service?'servicePrice':`${kind}Price`)} type="number" min="0" max="1000000" step="0.01" className={inputClass} value={v[`${kind}_price`]??''} onChange={event=>set(`${kind}_price`,event.target.value)}/>}</fieldset>)}</div>
    {v.mode!=='sale'&&<div className="grid gap-3 sm:grid-cols-2"><label className="text-sm text-text-secondary">{t(service?'serviceUnit':'unit')}<select className={`${inputClass} mt-1`} value={v.unit} onChange={event=>set('unit',event.target.value)}>{['hour','day','week','month','project'].map(unit=><option key={unit} value={unit}>{t(unit)}</option>)}</select></label></div>}
   </div>}

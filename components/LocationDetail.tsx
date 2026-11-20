@@ -1,4 +1,5 @@
 "use client";
+import { listingCurrency } from "@/lib/currency";
 
 import { TranslatedText } from "@/components/ContentTranslation";
 
@@ -372,7 +373,7 @@ export default function LocationDetail({ location }: { location: Location }) {
                 </div>
 
                 <AvailabilityCalendar
-                  dailyRate={location.price}
+                  dailyRate={location.price} currency={listingCurrency(location.metadata)}
                   onSelect={handleCalendarSelect}
                   onReset={() => {setBookingStart(null); setBookingEnd(null); setBookingDays(0);}}
                   blockedDates={location.blocked_dates}

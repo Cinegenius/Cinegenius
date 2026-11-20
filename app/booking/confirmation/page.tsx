@@ -1,4 +1,5 @@
 "use client";
+import { formatOfferAmount } from "@/lib/currency";
 
 import { Suspense, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
@@ -29,6 +30,7 @@ type Booking = {
   start_date: string;
   end_date: string;
   days: number;
+  currency: string;
   daily_rate: number;
   subtotal: number;
   platform_fee: number;
@@ -137,8 +139,8 @@ function ConfirmationContent() {
 
             {/* Kostenaufschlüsselung */}
             <div className="space-y-2 pt-4 border-t border-border">
-              <div className="flex justify-between text-sm">{uiText.rich("Ui.text_cbefb42b83905c", { value2: () => (booking.daily_rate.toLocaleString(uiLocale)), value3: () => (booking.days), count4: booking.days, part1: chunks => (<span className="text-text-muted">{chunks}</span>), value6: () => (booking.subtotal.toLocaleString(uiLocale)), part5: chunks => (<span className="text-text-primary">{chunks}</span>) })}</div>
-              <div className="flex justify-between font-bold text-base pt-2 border-t border-border">{uiText.rich("Ui.text_4d5abaa43e067c", { part1: chunks => (<span className="text-text-primary">{chunks}</span>), value3: () => (booking.total.toLocaleString(uiLocale)), part2: chunks => (<span className="text-gold font-display text-lg">{chunks}</span>) })}</div>
+              <div className="flex justify-between text-sm">{uiText.rich("Ui.text_cbefb42b83905c", { value2: () => (formatOfferAmount(booking.daily_rate,booking.currency,uiLocale)), value3: () => (booking.days), count4: booking.days, part1: chunks => (<span className="text-text-muted">{chunks}</span>), value6: () => (formatOfferAmount(booking.subtotal,booking.currency,uiLocale)), part5: chunks => (<span className="text-text-primary">{chunks}</span>) })}</div>
+              <div className="flex justify-between font-bold text-base pt-2 border-t border-border">{uiText.rich("Ui.text_4d5abaa43e067c", { part1: chunks => (<span className="text-text-primary">{chunks}</span>), value3: () => (formatOfferAmount(booking.total,booking.currency,uiLocale)), part2: chunks => (<span className="text-gold font-display text-lg">{chunks}</span>) })}</div>
             </div>
           </div>
         </div>

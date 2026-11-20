@@ -16,7 +16,7 @@ export async function GET(request: NextRequest) {
   const page = Math.max(1, Number.parseInt(params.get("page") ?? "1", 10) || 1);
   const pageSize = 30;
   let query = db.from("bookings")
-    .select("id, ref, user_id, listing_id, listing_title, listing_type, start_date, end_date, days, daily_rate, subtotal, platform_fee, total, status, created_at", { count: "exact" })
+    .select("currency, id, ref, user_id, listing_id, listing_title, listing_type, start_date, end_date, days, daily_rate, subtotal, platform_fee, total, status, created_at", { count: "exact" })
     .order("created_at", { ascending: false })
     .range((page - 1) * pageSize, page * pageSize - 1);
   if (rawStatus !== "all") query = query.eq("status", rawStatus);

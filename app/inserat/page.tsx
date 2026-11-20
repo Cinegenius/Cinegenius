@@ -1,4 +1,6 @@
 "use client";
+import CurrencySelect from "@/components/CurrencySelect";
+import { storedCurrency } from "@/lib/currency";
 
 import GenieWritingAssistant from "@/components/GenieWritingAssistant";
 
@@ -511,7 +513,7 @@ export default function InseratPage() {
   const [form, setForm] = useState({
     title: "",
     description: "",
-    price: "",
+    price: "", currency: "EUR",
     city: "", selected_place_city_id: "",
     // vehicle
     make: "",
@@ -597,7 +599,7 @@ export default function InseratPage() {
             setStep(2);
             setForm((current) => ({
               ...current,
-              title: text("title"), description: text("description"), city: text("city"), selected_place_city_id: text("selected_place_city_id"), price: text("price"),
+              title: text("title"), description: text("description"), city: text("city"), selected_place_city_id: text("selected_place_city_id"), price: text("price"), currency: storedCurrency(savedForm.currency),
               sqm: text("sqm"), ceiling_height: text("ceiling_height"), max_crew: text("max_crew"),
               indoor_outdoor: ["innen", "außen", "beides"].includes(String(savedForm.indoor_outdoor)) ? savedForm.indoor_outdoor as "innen" | "außen" | "beides" : "innen",
               power_available: savedForm.power_available === true, power_details: text("power_details"), parking_spots: text("parking_spots"),
@@ -750,7 +752,7 @@ export default function InseratPage() {
           access_notes: form.access_notes || null,
           shooting_hours: form.shooting_hours || null,
           availability_notes: form.availability_notes || null,
-          price_negotiable: priceNegotiable, price_on_request: locPriceOnRequest,
+          price_currency: form.currency, price_negotiable: priceNegotiable, price_on_request: locPriceOnRequest,
           amenities: locAmenities,
           rooms: locRooms,
           focal_point: focalPoint ?? null,
@@ -789,7 +791,7 @@ export default function InseratPage() {
         description: meta ? uiText("Ui.text_c53dfd5c59507b", { value1: String(meta), value2: String(form.description) }) : form.description,
         price: parseFloat(form.price) || 0,
         city: form.city,
-        metadata: { job: { employmentType: form.employment_type, startDate: form.shoot_start, endDate: form.shoot_end } },
+        metadata: { price_currency: form.currency, job: { employmentType: form.employment_type, startDate: form.shoot_start, endDate: form.shoot_end } },
       };
     }
 
@@ -824,7 +826,7 @@ export default function InseratPage() {
           form.experience && `Erfahrung: ${form.experience}`,
         ].filter(Boolean).join("\n") + (form.description ? uiText("Ui.text_8c3b5a4eb4be78", { value1: String(form.description) }) : ""),
         price: parseFloat(form.price) || 0,
-        city: form.city,
+        city: form.city, metadata:{price_currency:form.currency},
       };
     }
 
@@ -1747,7 +1749,7 @@ export default function InseratPage() {
                 {type === "prop" || type === "vehicle" ? null : isAnimal ? <p className="text-sm text-text-secondary">{animals("conditions")}</p> : isLocation ? (
                   <div className="space-y-2">
                     <label className="block text-xs font-semibold text-text-muted uppercase tracking-widest">{uiText("setup.copy41")}</label>
-                    <ListingPriceOptions onRequest={locPriceOnRequest} negotiable={priceNegotiable} onChange={value=>{setLocPriceOnRequest(value.priceOnRequest);setPriceNegotiable(value.priceNegotiable);}} />
+                    <CurrencySelect value={form.currency} onChange={value => f("currency", value)} /><ListingPriceOptions onRequest={locPriceOnRequest} negotiable={priceNegotiable} onChange={value=>{setLocPriceOnRequest(value.priceOnRequest);setPriceNegotiable(value.priceNegotiable);}} />
                     {!locPriceOnRequest && <label className="block text-xs text-text-muted">{uiText.rich("Ui.text_6c05ba4c8c98d3", { part1: () => (<input type="number" min="0" value={form.price} onChange={(e) => f("price", e.target.value)} placeholder="500" className="mt-1 w-full rounded-xl border border-border bg-bg-elevated px-4 py-3 text-sm text-text-primary placeholder:text-text-muted transition-colors focus:border-gold focus:outline-none" />) })}</label>}
                   </div>
                 ) : (
@@ -1755,6 +1757,7 @@ export default function InseratPage() {
                     <label className="block text-xs font-semibold text-text-muted uppercase tracking-widest mb-2">
                       {isJob ? uiText("Ui.text_2341277cc84ef9") : isCreator ? uiText("Ui.text_8e8ac54e84a7f9") : form.rental_type === "kauf" ? uiText("Ui.text_59aa29065dfccb") : uiText("Ui.text_118c05ad45086b")}
                     </label>
+                    <CurrencySelect value={form.currency} onChange={value => f("currency", value)} />
                     {!isJob && !isCreator && <label className="mb-2 flex min-h-11 items-center gap-2 text-sm text-text-secondary">{uiText.rich("Ui.text_403589b75437c6", { part1: () => (<input type="checkbox" checked={priceNegotiable} onChange={event=>{setPriceNegotiable(event.target.checked);if(event.target.checked)setLocPriceOnRequest(false);}} />) })}</label>}
                     <input type="number" min="0" value={form.price} onChange={(e) => f("price", e.target.value)} placeholder={isJob || isCreator ? "500" : form.rental_type === "kauf" ? "1200" : "800"} className="w-full rounded-xl border border-border bg-bg-elevated px-4 py-3 text-sm text-text-primary placeholder:text-text-muted transition-colors focus:border-gold focus:outline-none" />
                   </>
@@ -1935,7 +1938,7 @@ export default function InseratPage() {
               setPendingImageFile(null);
               setCreatedId(null);
               setCreatedIsDraft(false); setCreatedPublished(false);
-              setForm({ title: "", description: "", price: "", city: "", selected_place_city_id: "", make: "", model: "", year: "", fuel_type: "", license_class: "", condition: "", vehicle_subtype: "", sqm: "", ceiling_height: "", max_crew: "", indoor_outdoor: "innen", power_available: false, power_details: "", parking_spots: "", natural_light: false, blackout_possible: false, loading_access: false, access_notes: "", shooting_hours: "", availability_notes: "", company: "", projectType: "", employment_type: "", shoot_start: "", shoot_end: "", pay_type: "", role_label: "", urgent: false, content_nudity: false, content_violence: false, content_stunts: false, delivery: false, rental_type: "miete", dimensions: "", safety_note: "", skills: "", experience: "", animal_training: "", animal_handler: true, animal_count: "1", animal_skills: "" });
+              setForm({ title: "", description: "", price: "", currency: "EUR", city: "", selected_place_city_id: "", make: "", model: "", year: "", fuel_type: "", license_class: "", condition: "", vehicle_subtype: "", sqm: "", ceiling_height: "", max_crew: "", indoor_outdoor: "innen", power_available: false, power_details: "", parking_spots: "", natural_light: false, blackout_possible: false, loading_access: false, access_notes: "", shooting_hours: "", availability_notes: "", company: "", projectType: "", employment_type: "", shoot_start: "", shoot_end: "", pay_type: "", role_label: "", urgent: false, content_nudity: false, content_violence: false, content_stunts: false, delivery: false, rental_type: "miete", dimensions: "", safety_note: "", skills: "", experience: "", animal_training: "", animal_handler: true, animal_count: "1", animal_skills: "" });
               setLocAmenities([]); setLocBlockedDates([]); setLocExtraImages([]); setLocFloorPlanUrl(null); setLocFloorPlanPreview(null);
               setLocRooms([]); setLocPriceOnRequest(true); setPriceNegotiable(false); setSelectedCompanyId(""); setFocalPoint(null);
               setArticleImages([]); setLocationGalleryState({ uploading: false, failed: 0 }); setArticleGalleryState({ uploading: false, failed: 0 });

@@ -1,3 +1,4 @@
+import { listingCurrency } from "@/lib/currency";
 import { occupationFormFromCrew, type OccupationForm } from "@/lib/occupation-form";
 import { profileAccessFor, filterPublicListings } from "@/lib/profile-privacy-server";
 import { projectProfilePrivacy } from "@/lib/profile-privacy";
@@ -362,7 +363,7 @@ export default async function ProfilePage(
       // Prioritize same city, then fill with others, cap at 6
       const sameCity = city ? visibleRows.filter(r => placeReadFields(r.location??"",r,locale).place_city_id===city) : [];
       const others = visibleRows.filter(r => !city || placeReadFields(r.location??"",r,locale).place_city_id!==city);
-      return [...sameCity, ...others].slice(0, 6).map(({ crew, ...row }) => ({ ...row, occupationForm: occupationFormFromCrew(crew) }));
+      return [...sameCity, ...others].slice(0, 6).map(({ crew, ...row }) => ({ ...row, price_currency:listingCurrency(crew), occupationForm: occupationFormFromCrew(crew) }));
     })(),
     // Resolve the optional slot before the client decides whether details exist.
     // An element wrapping an async component is truthy even when it renders null.

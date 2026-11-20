@@ -32,3 +32,9 @@ Altimport-Ausblendungen ohne Rechte zur Veröffentlichung. Vertrag:
 Produktionsbuild bestanden. Migration, privater PostHog-Lesezugang und
 Produkt-Liveabnahme noch offen. NEWS-Runtime betreut Bilder/Ablauf/Lerngewichtung separat; deren bereits
 aktivierter Ablaufworker bedeutet keinen Galerie-/Lernfeed-Livegang.
+
+**Gemeinsamer Abschlussstand (21.11., nicht live):** Währungen/Feedback und News
+sind unter `codex/international-news-ready-20261120` zusammengeführt. 166 gezielte
+Tests, 17 Sprachen und Designprüfung bestanden. Umfang und offene Aktivierung in
+[Gemeinsamer Prüfstand](international-news-release.md); vollständiger Build und
+exakter Commit im zugehörigen Handoff. Native Übernahme bleibt separat offen.

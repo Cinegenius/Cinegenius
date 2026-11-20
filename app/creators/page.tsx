@@ -1,3 +1,4 @@
+import { listingCurrency, formatOfferAmount } from "@/lib/currency";
 import { occupationFormFromCrew } from "@/lib/occupation-form";
 import { profileAccessFor, filterPublicListings } from "@/lib/profile-privacy-server";
 import { projectProfilePrivacy } from "@/lib/profile-privacy";
@@ -61,6 +62,7 @@ type CreatorListingRow = {
   category: string | null;
   city: string | null;
   price: number | null;
+  price_currency?: string;
   image_url: string | null;
   description: string | null;
 };
@@ -70,7 +72,7 @@ const getCreatorDirectoryData = unstable_cache(
     const [listingResult, profileResult] = await Promise.all([
       db
         .from("listings")
-        .select("place_country_code,place_region_id,place_city_id,place_city_name,place_region_name,place_status,id, user_id, title, category, city, price, image_url, description")
+        .select("place_country_code,place_region_id,place_city_id,place_city_name,place_region_name,place_status,id, user_id, title, category, city, price, price_currency:metadata->>price_currency, image_url, description")
         .eq("published", true)
         .eq("type", "creator")
         .order("created_at", { ascending: false })
@@ -189,7 +191,7 @@ export default async function CreatorsPage({
       avatar: l.image_url ?? "",
       rating: 0,
       reviews: 0,
-      dayRate: (l.price ?? 0) > 0 ? uiText("Ui.text_4519fabedb2cbd", { value1: Number(l.price).toLocaleString(locale) }) : tCommon("byArrangement"), dayRateOnRequest: !((l.price ?? 0) > 0),
+      dayRate: (l.price ?? 0) > 0 ? `${formatOfferAmount(Number(l.price),listingCurrency(l),locale)}${tCommon("perDay")}` : tCommon("byArrangement"), dayRateOnRequest: !((l.price ?? 0) > 0),
       available: true,
       credits,
       skills,
@@ -239,7 +241,7 @@ export default async function CreatorsPage({
         avatar: p.avatar_url ?? "",
         rating: 0,
         reviews: 0,
-        dayRate: p.day_rate ? uiText("Ui.text_4519fabedb2cbd", { value1: Number(p.day_rate).toLocaleString(locale) }) : tCommon("byArrangement"), dayRateOnRequest: !(p.day_rate),
+        dayRate: p.day_rate ? `${formatOfferAmount(Number(p.day_rate),listingCurrency(p.crew),locale)}${tCommon("perDay")}` : tCommon("byArrangement"), dayRateOnRequest: !(p.day_rate),
         available: p.available ?? true,
         credits: [],
         skills: p.skills ?? [],

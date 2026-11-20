@@ -12,7 +12,7 @@ import { useAdminSupportUnread } from "@/lib/use-admin-support-unread";
 
 /** One compact home for account management; every row opens its canonical flow. */
 export default function PersonalAreaHome() {
-  const t = useTranslations("nav"), area = useTranslations("PersonalArea");
+  const t = useTranslations("nav"), area = useTranslations("PersonalArea"), feedback = useTranslations("Feedback");
   const { userId, isLoaded, isSignedIn } = useAuth();
   const serverAdminId = useContext(ServerAdminContext);
   const adminId = isLoaded && isSignedIn && userId && userId === serverAdminId ? userId : null;
@@ -44,5 +44,6 @@ export default function PersonalAreaHome() {
         <ChevronRight size={17} aria-hidden="true" className="shrink-0 text-text-muted" />
       </Link>}
     </div>
+    <Link href="/mitgestalten" prefetch={false} className="inline-flex min-h-11 items-center px-1 text-sm text-text-muted hover:text-gold focus-visible:outline-2 focus-visible:outline-gold">{feedback("link")}</Link>
   </div>;
 }
