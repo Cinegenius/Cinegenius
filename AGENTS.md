@@ -275,3 +275,22 @@ Die bisherige Ausnahme einer konstanten Personenzahl bei Crew-Anbieterfiltern is
 aufgehoben: Crew, Locations-Anbieter und Marktplatz-Anbieter zeigen oben die
 aktuell gefilterte Gesamtzahl. Karte, Kartenhinweise und „Alle anzeigen“ verwenden
 denselben berechtigten Ergebnissatz; Zoomen ändert nur den Kartenausschnitt.
+
+
+## Regional discovery (operator request, 20 November 2026)
+
+- Default discovery prioritizes the valid coarse Vercel request country, including
+  guests and travellers. The own profile city/region refines only the same country
+  and is the fallback when request geography is unavailable. Never infer location
+  from interface language or request GPS for this preference.
+- Explicit place/country/All choices and manual sort win. Retain actual Back and
+  account-scoped view state; discard stale preference responses after session changes.
+  Use `lib/browse-preference-server.ts` and `useBrowseGeography`; no shared visitor cache.
+- Apply regional ranking before pagination/rail limits and preserve all visible
+  foreign/unknown-place results. Hidden profile locations cannot influence rank.
+  Keep current publication/privacy checks; country preference grants no access.
+- Organizations and the board distinguish missing country (automatic) from
+  `country=all` (explicit global). News retain their editorial country filters.
+  Photo discovery has no reliable place projection and remains global.
+- See `docs/country-first-discovery.md` for Web/native contract, tests and limits.
+  A checked branch is not a release; preserve the current APP release hold.

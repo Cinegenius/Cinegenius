@@ -3,6 +3,8 @@ import { occupationFormFromCrew } from "@/lib/occupation-form";
 import { profileOccupationPreview } from "@/lib/crew-occupations";
 import { homeCrewProfiles } from "@/lib/home-crew";
 import { homeMarketplaceOffers } from "@/lib/home-marketplace";
+import { preferredBrowsePlace } from "@/lib/browse-preference-server";
+import { geographicTop } from "@/lib/browse-geography";
 import HomeOrganizations from "@/components/organizations/HomeOrganizations";
 import { listingPriceLabel } from "@/lib/listing-price";
 import { db } from "@/lib/db";
@@ -45,7 +47,6 @@ import AiDisclosureBadge from "@/components/AiDisclosureBadge";
 import { COMPANY_CATEGORIES } from "@/lib/companyCategories";
 import { HomePhotoDiscovery, type DiscoverPhoto } from "@/components/HomePhotoDiscovery";
 import { PROFILE_TYPE_LABELS, type ProfileType } from "@/lib/profile-types";
-import { getPrivateProfileIds } from "@/lib/trust";
 import { taxonomyLabel } from "@/lib/departments";
 import { getCommunityMedia } from "@/lib/community-media-server";
 import { getTranslations as getMetadataTranslations } from "next-intl/server";
@@ -79,12 +80,25 @@ async function getHomeData() {
     };
   }
 
+  const preferred = await preferredBrowsePlace().then(result => result.place).catch(() => null);
   const results = await Promise.all([
-    db.from("privacy_visible_listings").select("id,title,city,price,image_url,metadata,created_at").eq("type", "location").eq("published", true).order("created_at", { ascending: false }).limit(10),
-    db.from("privacy_visible_listings").select("id,title,city,price,created_at").eq("type", "job").eq("published", true).order("created_at", { ascending: false }).limit(4),
-    homeMarketplaceOffers(currentTime),
-    db.from("companies").select("id,slug,name,logo_url,city,categories").eq("published", true).order("created_at", { ascending: false }).limit(6),
-    homeCrewProfiles(currentTime),
+    geographicTop((clause, limit) => {
+      let query = db.from("privacy_visible_listings").select("id,title,city,price,image_url,metadata,created_at").eq("type", "location").eq("published", true);
+      if (clause) query = query.or(clause);
+      return query.order("created_at", { ascending: false }).order("id").limit(limit);
+    }, 10, preferred),
+    geographicTop((clause, limit) => {
+      let query = db.from("privacy_visible_listings").select("id,title,city,price,created_at").eq("type", "job").eq("published", true);
+      if (clause) query = query.or(clause);
+      return query.order("created_at", { ascending: false }).order("id").limit(limit);
+    }, 4, preferred),
+    homeMarketplaceOffers(currentTime, preferred),
+    geographicTop((clause, limit) => {
+      let query = db.from("companies").select("id,slug,name,logo_url,city,categories").eq("published", true);
+      if (clause) query = query.or(clause);
+      return query.order("created_at", { ascending: false }).order("id").limit(limit);
+    }, 6, preferred),
+    homeCrewProfiles(currentTime, preferred),
   ]);
   if (results.some(result => result.error)) throw new Error("Homepage recommendations unavailable");
   const [

@@ -99,7 +99,7 @@ function JobsInner({ serverJobs }: { serverJobs: Job[] }) {
     { label: t("filterProjectType"), value: activeType, onChange: setActiveType, options: types },
     { label: t("filterPay"), value: payTypeFilter, onChange: setPayTypeFilter, options: payTypes },
     { label: copy("employment"), value: jobTypeFilter === "alle" ? "" : jobTypeFilter, onChange: (value: string) => setJobTypeFilter(value || "alle"), options: employments.filter(option => allJobs.some(job => job.facts.jobType === option.value)) }];
-  const placeFields = <PlaceFilters rows={allJobs} value={{ country: countryFilter, region: regionFilter, city: cityFilter }} onChange={updatePlaceFilters} />;
+  const placeFields = <PlaceFilters rows={allJobs} value={{ country: countryFilter, region: regionFilter, city: cityFilter }} onChange={value => { geography.setEnabled(false); updatePlaceFilters(value); }} />;
   const urgentField = (urgentOnly || allJobs.some(job => job.facts.urgent)) && <label className="flex min-h-11 items-center gap-3 text-sm text-text-secondary"><input type="checkbox" className="size-4 accent-gold" checked={urgentOnly} onChange={event => setUrgentOnly(event.target.checked)} />{t("filterUrgentLabel")}</label>;
   const filterKey = `${url}:${geography.key}`, visibleCount = pagination.filterKey === filterKey ? pagination.visibleCount : PAGE_SIZE;
 

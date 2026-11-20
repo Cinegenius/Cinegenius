@@ -17,7 +17,7 @@ function rotationScore(id: string, epoch: number): number {
  * Permissions/people eligibility must be checked before cards are serialized.
  * No timer changes a rail already open in the browser.
  */
-export function orderHomeCrew<T extends Candidate>(profiles: readonly T[], now: number): T[] {
+export function orderHomeCrew<T extends Candidate>(profiles: readonly T[], now: number, preferred: BrowsePlace | null = null): T[] {
   const epoch = Math.floor(now / HOME_CREW_ROTATION_MS);
   const unique = new Map<string, T>();
   for (const profile of profiles) if (profile.user_id && !unique.has(profile.user_id)) unique.set(profile.user_id, profile);
@@ -26,9 +26,11 @@ export function orderHomeCrew<T extends Candidate>(profiles: readonly T[], now: 
     const age = now - created;
     return { profile, recent: Number.isFinite(age) && age >= 0 && age < HOME_CREW_NEW_WINDOW_MS, created, score: rotationScore(profile.user_id, epoch) };
   });
-  ranked.sort((a, b) => Number(b.recent) - Number(a.recent)
+  ranked.sort((a, b) => (preferred ? geographicRank(a.profile, preferred) - geographicRank(b.profile, preferred) : 0)
+    || Number(b.recent) - Number(a.recent)
     || (a.recent && b.recent ? b.created - a.created : 0)
     || a.score - b.score
     || (a.profile.user_id < b.profile.user_id ? -1 : a.profile.user_id > b.profile.user_id ? 1 : 0));
   return ranked.map(row => row.profile);
 }
+import { geographicRank, type BrowsePlace } from "./browse-geography";

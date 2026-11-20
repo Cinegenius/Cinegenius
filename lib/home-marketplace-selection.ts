@@ -1,8 +1,18 @@
+import { geographicRank, type BrowsePlace } from "./browse-geography";
+
 type Offer = { id: string; type?: string | null; category?: string | null };
 const ROTATION_INTERVAL = 15 * 60 * 1000;
 
 /** Stable during a visit, rotating between visits; interleave public offer types/categories. */
-export function selectHomeMarketplace<T extends Offer>(offers: readonly T[], now: number, count = 4): T[] {
+export function selectHomeMarketplace<T extends Offer>(offers: readonly T[], now: number, count = 4, preferred: BrowsePlace | null = null): T[] {
+  if (preferred) {
+    const selected: T[] = [];
+    for (const rank of [0, 1, 2, 3]) {
+      if (selected.length >= count) break;
+      selected.push(...selectHomeMarketplace(offers.filter(row => geographicRank(row, preferred) === rank), now, count - selected.length));
+    }
+    return selected;
+  }
   const epoch = Math.floor(now / ROTATION_INTERVAL);
   const groups = new Map<string, T[]>();
   for (const offer of offers) {

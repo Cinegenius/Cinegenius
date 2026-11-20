@@ -1,7 +1,7 @@
 import { legacyPlaceQuery } from "@/lib/places/core";
 import { jobSchedule } from "@/lib/job-metadata";
 import { geographicPage } from "@/lib/browse-geography";
-import { ownBrowsePlace } from "@/lib/browse-geography-server";
+import { preferredBrowsePlace } from "@/lib/browse-preference-server";
 import { publicMapPoint } from "@/lib/places/public-map-point";
 import { cityWriteFields, placeReadFields, placeSearchFilter } from "@/lib/places/catalog";
 import { placeCitySearchAliases } from "@/lib/places/core";
@@ -99,7 +99,7 @@ export async function GET(req: NextRequest) {
   const sort=req.nextUrl.searchParams.get("sort");
   let preferred = null;
   if (req.nextUrl.searchParams.get("nearby") === "1" && !["country","region","city","cityText"].some(key => req.nextUrl.searchParams.get(key)) && sort !== "price-asc" && sort !== "price-desc") {
-    try { preferred = (await ownBrowsePlace()).place; } catch { /* The ordinary directory remains available. */ }
+    try { preferred = (await preferredBrowsePlace()).place; } catch { /* The ordinary directory remains available. */ }
   }
   const {data,error,count} = await geographicPage<Record<string, unknown>>((clause, range) => {
   let query = db.from("privacy_visible_listings").select(LISTING_COLS_PUBLIC,{count:"exact", head: !range}).eq("published",true);

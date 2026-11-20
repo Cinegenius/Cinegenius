@@ -9,7 +9,7 @@ export function newsCountryChoice(value: unknown): string | undefined {
 export function resolvedNewsCountry(choice: string, profileCountry = '', requestCountry = '') {
   if (choice === 'all') return '';
   if (choice !== 'auto') return newsCountryChoice(choice) ?? '';
-  return countryCode(profileCountry) || countryCode(requestCountry);
+  return countryCode(requestCountry) || countryCode(profileCountry);
 }
 
 type NewsPlace = {place_country_code?: string | null; city?: string | null};

@@ -6,6 +6,7 @@ import { profileAccessFor } from "@/lib/profile-privacy-server";
 import { projectProfilePrivacy } from "@/lib/profile-privacy";
 import { isPeopleDirectoryProfile } from "@/lib/profile-provider-filters";
 import type { OccupationProfile } from "@/lib/crew-occupations";
+import type { BrowsePlace } from "@/lib/browse-geography";
 
 export type HomeCrewProfile = {
   user_id: string;
@@ -25,14 +26,32 @@ export type HomeCrewProfile = {
 const CARD_FIELDS = "user_id,slug,display_name,tagline,avatar_url,location,verified,role,positions,crew,profile_type,profile_types,created_at";
 const CARD_BATCH = 32;
 
-export async function homeCrewProfiles(now: number): Promise<{ data: HomeCrewProfile[]; error: null }> {
+export async function homeCrewProfiles(now: number, preferred: BrowsePlace | null = null): Promise<{ data: HomeCrewProfile[]; error: null }> {
   const signal = AbortSignal.timeout(8000);
   // Read only IDs and registration dates across the pool. A newest-300 cap would
   // permanently exclude older members even when the visible selection rotates.
-  const pool = await collectFacetRows<{ user_id: string; created_at: string | null }>((from, to) => db.from("profiles")
-    .select("user_id,created_at").not("display_name", "is", null).neq("display_name", "")
-    .order("user_id").range(from, to).abortSignal(signal), 500);
-  const candidates = orderHomeCrew(pool, now);
+  const pool = await collectFacetRows<{ user_id: string; created_at: string | null }>((from, to) => {
+    const table = db.from("profiles");
+    const query = preferred
+      ? table.select("user_id,created_at,place_country_code,place_region_id,place_city_id")
+      : table.select("user_id,created_at");
+    return query.not("display_name", "is", null).neq("display_name", "")
+      .order("user_id").range(from, to).abortSignal(signal);
+  }, 500);
+  const visiblePool: typeof pool = [];
+  if (preferred) {
+    // Hidden locations may not influence rank. Project permissions before sorting
+    // this thin index, then recheck the selected cards immediately before output.
+    for (let from = 0; from < pool.length; from += 200) {
+      const batch = pool.slice(from, from + 200);
+      const access = await profileAccessFor(batch.map(row => row.user_id), null, { signal, throwOnError: true });
+      for (const row of batch) {
+        const permission = access.get(row.user_id);
+        if (permission?.profile) visiblePool.push(projectProfilePrivacy(row, permission));
+      }
+    }
+  }
+  const candidates = orderHomeCrew(preferred ? visiblePool : pool, now, preferred);
   const selected: HomeCrewProfile[] = [];
   for (let from = 0; from < candidates.length && selected.length < 10; from += CARD_BATCH) {
     const ids = candidates.slice(from, from + CARD_BATCH).map(row => row.user_id);

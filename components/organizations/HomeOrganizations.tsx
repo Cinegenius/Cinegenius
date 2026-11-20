@@ -10,6 +10,7 @@ import {homeNewsTopic} from '@/lib/news-topic-server';
 import {isOrganizationTopic, type OrganizationTopic} from '@/lib/organization-taxonomy';
 import HomeNewsRegion from './HomeNewsRegion';
 import HomeCardRail from '@/components/HomeCardRail';
+import {countryCode} from '@/lib/places/core';
 
 export default async function HomeOrganizations() {
  const [t, entryT, newsT, locale, region] = await Promise.all([
@@ -22,7 +23,7 @@ export default async function HomeOrganizations() {
  let entries: Awaited<ReturnType<typeof latestOrganizationEntries>> = [], codes: string[] = [], failed = false;
  let topics: OrganizationTopic[] = [];
  try {
-  const results = await Promise.all([organizationDiscovery(1, 6), latestOrganizationEntries(region.country, selectedTopic, 12), homeNewsFacets(region.country, selectedTopic)]);
+  const results = await Promise.all([organizationDiscovery(1, 6, '', countryCode(region.country) ? {country:region.country,region:'',city:''} : null), latestOrganizationEntries(region.country, selectedTopic, 12), homeNewsFacets(region.country, selectedTopic)]);
   organizations = results[0].organizations;
   entries = results[1];
   codes = results[2].codes;

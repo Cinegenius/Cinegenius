@@ -505,7 +505,7 @@ function CreatorsInner({
         resetLabel={t("resetFilters")}
         showResultsLabel={t("showResults", { count: filtered.length })}
       >
-        <PlaceFilters rows={allCreators} value={{country:countryFilter,region:regionFilter,city:cityFilter}} onChange={changePlaceFilters} />
+        <PlaceFilters rows={allCreators} value={{country:countryFilter,region:regionFilter,city:cityFilter}} onChange={value => { geography.setEnabled(false); changePlaceFilters(value); }} />
         <MobileFilterField label={t("filterProfileType")}>
           <MobileFilterSelect value={profileTypeFilter} onChange={setProfileTypeFilter} placeholder={t("filterAll")} options={availableProfileTypes.map((value) => ({ value, label: PROFILE_TYPE_MAP[value] ?? value }))} />
         </MobileFilterField>

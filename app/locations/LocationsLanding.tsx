@@ -180,7 +180,7 @@ export default function LocationsLanding({ allLocations, totalCount, initialFilt
         resultCount={mapLocations.length} resultSummary={t("results", { count: mapLocations.length })} filterCount={chips.length + (filters.q ? 1 : 0)} chips={chips}
         onReset={resetFilters} resetLabel={t("resetFilters")} showResultsLabel={t("showResults", { count: mapLocations.length })}
       >
-        <PlaceFilters rows={allLocations} value={filters} onChange={changePlaces} />
+        <PlaceFilters rows={allLocations} value={filters} onChange={value => { geography.setEnabled(false); changePlaces(value); }} />
         <div className="grid grid-cols-2 gap-3">
           <MobileFilterField label={uiText("Ui.text_84381d6fa4d29d")}><input aria-label={uiText("Ui.text_84381d6fa4d29d")} type="number" inputMode="decimal" min="0" step="0.01" value={filters.min} onChange={event => updateFilters({ min: event.target.value })} placeholder={uiText("Ui.text_d0c50fd56cbce3")} /></MobileFilterField>
           <MobileFilterField label={uiText("Ui.text_f7abc502297a74")}><input aria-label={uiText("Ui.text_f7abc502297a74")} type="number" inputMode="decimal" min="0" step="0.01" value={filters.max} onChange={event => updateFilters({ max: event.target.value })} placeholder={uiText("Ui.text_d0c50fd56cbce3")} /></MobileFilterField>

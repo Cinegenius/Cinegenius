@@ -86,7 +86,7 @@ export default function CommunityBoard({ loggedIn = false, fullPage = false }: {
   const postRequest = useRef(0);
   const viewer = `${isLoaded ? "ready" : "loading"}:${user?.id ?? "guest"}`;
   const criteria = useMemo<BoardRead>(() => ({ search: fullPage ? query : "", kind: fullPage ? kind : "all",
-    country: nativeAppearance && fullPage ? country : "", viewer }), [fullPage, query, kind, nativeAppearance, country, viewer]);
+    country: nativeAppearance && fullPage ? country || (savedCountry === "all" ? "all" : "") : "", viewer }), [fullPage, query, kind, nativeAppearance, country, savedCountry, viewer]);
   const readScope = JSON.stringify(criteria);
   const activeRead = useRef({ scope: readScope, criteria });
   const posts = postSnapshot.scope === readScope ? postSnapshot.posts : [];
@@ -228,7 +228,7 @@ export default function CommunityBoard({ loggedIn = false, fullPage = false }: {
           </label>
           {nativeAppearance && <NativeCountrySelect value={country} onChange={value => {
             const next = browseCountryChoice(value);
-            if (next !== undefined) setCountry(next);
+            if (next !== undefined) setCountry(next || "all");
           }} />}
           <div className="flex flex-wrap gap-2">
             {(["all", ...KINDS] as const).map(value => <button key={value} type="button" onClick={() => setKind(value)} className={`shrink-0 rounded-full border px-3.5 py-2 text-xs font-semibold transition-colors ${kind === value ? "border-gold/50 bg-gold/10 text-gold" : "border-border bg-bg-secondary text-text-secondary hover:border-gold/30"}`}>{value === "all" ? t("boardAll") : t(`boardKind_${value}`)}</button>)}

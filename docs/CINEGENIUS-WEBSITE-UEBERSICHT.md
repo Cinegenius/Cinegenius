@@ -11,7 +11,7 @@ Dieses Verzeichnis hält die Bereiche, ihre Funktionen, den belegten Stand und o
 
 | Bereich | Was dazugehört | Aktueller Stand / nächste Arbeit |
 | --- | --- | --- |
-| **Startseite** | Suche, Entdecken, Die Crew, Aus der Branche, Organisationen, Marktplatz, Jobs, frische Einblicke, Branchenpartner, Locations und Schwarzes Brett | Vorhanden. Die länderweite Priorisierung neuer regionaler Inhalte ist ein neuer laufender Auftrag. Bestehende Gestaltung erhalten. |
+| **Startseite** | Suche, Entdecken, Die Crew, Aus der Branche, Organisationen, Marktplatz, Jobs, frische Einblicke, Branchenpartner, Locations und Schwarzes Brett | Vorhanden. Regionale Auswahl vor der Begrenzung für Crew, Marktplatz, Locations, Jobs und Firmen im geprüften Entwurf; noch nicht live. Gestaltung erhalten; Foto-Entdeckung bleibt mangels verlässlicher Ortsprojektion global. |
 | **Crew** | Personenprofile, Berufe, Haupt-/Nebentätigkeiten, Fähigkeiten, Orte, Anbieter-Wechsel, Suche, Filter, Kacheln/Liste/Karte | Vorhanden. Gemeinsamer Kartenfix veröffentlicht. Nachgemeldete Ausnahme im Crew-Anbieterfilter korrigiert: Die obere Zahl zählt jetzt im Entwurf dieselbe Auswahl wie Karte und Liste; noch nicht veröffentlicht. Keine privaten oder erfundenen Positionen. |
 | **Locations** | Drehorte, Studios, Kategorien, Ortsfilter, Detailseiten, Bilder, Kontakt/Anfragen und Ansichten | Vorhanden. Formular- und Suchqualität weiter prüfen; Karte ersetzt keine vollständige Liste. |
 | **Marktplatz** | Equipment, Requisiten, Fahrzeuge, Dienstleistungen, Kategorien, Anbieter, Preise, Angebote und Suche | Vorhanden. Mehrwährungen sind ein separater unveröffentlichter Entwurf. Gemeldete Smart-Fälle „Lampe“ und „bayerischer Hut“ bleiben als Suchqualitätsfälle erfasst. |
@@ -63,7 +63,7 @@ Dieses Verzeichnis hält die Bereiche, ihre Funktionen, den belegten Stand und o
 
 | Thema | Stand | Nächster Schritt |
 | --- | --- | --- |
-| **Regionale Inhalte zuerst** | Profilort wird in mehreren Bereichen bereits bevorzugt; News hat Länderwahl und Aufrufland-Fallback. Eine durchgängige Gast-/Startseiten-Regel fehlt. | Neuer Auftrag: beim Öffnen in Mexiko zuerst neue mexikanische Inhalte, ebenso für andere Länder. Bewusste Auswahl einschließlich „Alle“ respektieren; Profil/erkanntes Land verwenden, ohne Sprache mit Land gleichzusetzen. Vor Begrenzung/Nachladen sortieren. |
+| **Regionale Inhalte zuerst** | Geprüfter Entwurf: Aufrufland zuerst, eigener Profilort im selben Land zur Verfeinerung oder als Rückfall. Auch für Gäste. 162 Tests und 32 Browserfälle bestanden; noch nicht live. | [Gemeinsamer Vertrag](country-first-discovery.md). Manuelle Länder-/Ortswahl und „Alle“ bleiben maßgeblich; Auswahl vor Begrenzung/Nachladen. APP-Übernahme und echte Geräte-/Regionsprüfung offen. |
 | **Mehrsprachigkeit** | 17 Website-Kataloge: Deutsch, Englisch, Spanisch, Italienisch, Tschechisch, Ungarisch, Niederländisch, Belgisch-Niederländisch, Schwedisch, Französisch, Polnisch, Portugiesisch (Portugal), vereinfachtes Chinesisch, Japanisch, Koreanisch, Russisch, Ukrainisch | Katalogvollständigkeit beweist keine vollständige sprachliche Qualität. Mexikanische Bezeichnungen prüfen; Crew bleibt dort Crew, Equipment wird Equipo. Mitgliedertexte und Rechtsoriginale nicht ungefragt umschreiben. |
 | **Währungen / internationale Formulare** | EUR-Bestand; Auswahl zusätzlicher Währungen und internationale Anpassungen als separater Entwurf | Mexiko, Italien, Spanien, Frankreich, Schweiz, Österreich, Ungarn und bereits vertretene Länder prüfen. Anbieter wählen Währung; keine automatische Umrechnung. |
 | **Karten / Ergebniszahlen** | Fix `822c27c` am 20.11.2026 veröffentlicht; Vercel-Produktionsalias bestätigt | Gesamtbestand, Kartentreffer, außerhalb des Ausschnitts und ohne Kartenposition unterscheiden. Live-Browsernachprüfung separat protokollieren; App-Ergänzungen bleiben eigener Stand. |
@@ -90,7 +90,7 @@ Aktuelle Prioritäten und gesicherte Zwischenstände: [Auftragsreihenfolge](AKTU
 
 ## Aktuell offene Arbeit
 
-1. Durchgängige Länderpriorisierung für Startseite, Verzeichnisse und App-Vertrag umsetzen und prüfen.
+1. Geprüfte Länderpriorisierung mit APP übernehmen und nach Aufhebung des Release-Halts veröffentlichen; tatsächliche Aufrufländer und Geräte separat prüfen.
 2. Mitgestalten und Feedback-Koordination fertig prüfen; erst nach Freigabe veröffentlichen.
 3. Internationale Formulare/Währungen aus dem separaten Entwurf vervollständigen.
 4. App-Zählerergänzungen und laufenden App-Server-Release getrennt abgleichen.
@@ -118,3 +118,5 @@ Unterlagen: `/srv/cinegenius/handoffs/news-editorial-20261120/newsroom-consolida
 - Veröffentlichungsbeleg Karten: `/srv/cinegenius/handoffs/20261120-map-counts/receipt.json` und `deploy.log`. Die Feedback- und Währungsentwürfe sind nicht Bestandteil dieses Releases.
 
 **Homepage-Crew-Rotation:** 24 Stunden Vorrang für neue Profile, danach alle 15 Minuten wechselnde Mischung auch älterer Mitglieder; unveröffentlicht in `f6b45be5`, 48 gezielte Tests bestanden. Native Verzeichnis-Sortierung und Release-Halt unverändert.
+
+**Regionale Auswahl (20.11.):** Website-Entwurf und API-Vertrag in [Regionale Inhalte zuerst](country-first-discovery.md). Noch nicht veröffentlicht; keine Währungsaktivierung, keine Änderung redaktioneller Freigaben.

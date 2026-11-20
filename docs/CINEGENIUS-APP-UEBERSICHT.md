@@ -66,7 +66,7 @@ Diese Übersicht trennt die installierte App, ihre serverseitigen Ansichten, nat
 
 | Thema | Stand / Regel |
 | --- | --- |
-| **Länderpriorisierung** | Neuer Auftrag für alle Länder: lokale neue Inhalte zuerst, andere weiterhin erreichbar. WEB entwickelt gemeinsamen Vertrag; APP übernimmt ihn. Bewusste Auswahl einschließlich „Alle“, Kontoänderung, Nachladen und Sprachwechsel beachten. |
+| **Länderpriorisierung** | WEB-Entwurf geprüft: Aufrufland vor Profil-Land, Gäste eingeschlossen; manuelle Auswahl bleibt maßgeblich. [Vertrag](country-first-discovery.md), 162 Tests und 32 simulierte Browserfälle. APP dokumentiert den Vertrag in `63867e4`, Funktionsübernahme und echte Geräteprüfung offen. `country=all` bei Organisationen/Brett nicht entfernen. Noch nicht veröffentlicht. |
 | **Sprachen / Währungen** | 17 Web-Sprachkataloge vorhanden; native Texte separat vollständig halten. Währung und Sprache sind nicht automatisch das Land. Neue Währungsauswahl noch Entwurf. |
 | **Push** | Code/Verträge vorbereitet, **nicht aktiviert**. Apple-Konfiguration, Dienstbetrieb und echter Empfang/Antippen/Abmelden-Test fehlen als Aktivierungsbeleg. |
 | **Hintergrunddienste** | Kein laufender Dienst allein durch vorhandenen Worker-Code. Zeitplan, Rechte, Aktivierungsstatus und tatsächliche Verarbeitung gesondert belegen. |
@@ -89,3 +89,7 @@ Diese Übersicht trennt die installierte App, ihre serverseitigen Ansichten, nat
 **Belege:** [aktueller App-Vertrag](design/app-current-20261119.md), [App-Server](app-server-release-20261119.md), [native Smart-Ansicht](native-smart-discovery.md), [Freunde/Homies](native-friends-contract.md), [Push](native-push.md), [Shots](shots-ephemeral.md), [Hintergrunddienste](app-background-workers.md), [App-Produktvorgaben](app-product-flows.md). Ältere Navigations- und Smart-Freigaben in diesen Berichten sind durch neuere Betreiberentscheidungen ersetzt. Aktuelle Installations-/Release-Angaben stammen aus der APP-Abstimmung vom 20.11.2026; ein eigener Gerätezugriff dieses Website-Auftrags fand nicht statt.
 
 **Homepage-Crew-Rotation:** 24 Stunden Vorrang für neue Profile, danach alle 15 Minuten wechselnde Mischung auch älterer Mitglieder; unveröffentlicht in `f6b45be5`, 48 gezielte Tests bestanden. Native Verzeichnis-Sortierung und Release-Halt unverändert.
+
+**Kompakte Kartenvorschau:** WEB `acd306e3` geprüft. APP meldet Übernahme in `37f234a4`, gesicherter Prüfstand `ff3266c0`: 30 Chromium-/WebKit-Fälle plus zwei lange Listen, 68 Tests. Keine echte Geräteprüfung und keine Veröffentlichung. Release-Halt bleibt bestehen.
+
+**Crew-Zähler-Nachtrag:** APP meldet den gefilterten gemeinsamen Crew-Zähler in `a40a2bc6`, Prüfstand `80726452`: 29 gezielte Tests und zehn Browserfälle. Noch nicht veröffentlicht; kein echter Gerätetest durch WEB.
