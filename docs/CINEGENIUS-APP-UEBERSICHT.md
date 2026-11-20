@@ -80,6 +80,7 @@ Diese Übersicht trennt die installierte App, ihre serverseitigen Ansichten, nat
 3. Native Smart-/Organisationen-Kartenkorrekturen abschließen und ihren Veröffentlichungsstand dokumentieren.
 4. Länderpriorisierung und später Feedback-/Währungsfunktionen aus dem gemeinsamen Vertrag übernehmen.
 5. Work-Funktionsstand mit APP konkretisieren; unbelegte Teilfunktionen als offen führen.
+6. Gemeldete Zusammenführung eigener Newsrooms unter „CineGenius Redaktion“ mit der Website abstimmen: gemeinsame Eintrags-IDs, alte Links, Quellen-/Bildnachweise und Länder-/Themenmerkmale erhalten. Acht eigene Profile mit 17 öffentlichen Beiträgen sind inventarisiert; private Bestände, Migration und tatsächliche Web-/App-Abnahme stehen noch aus. Redaktionsrecherche und Änderungen an deren Zeitplänen sind kein App-Release. Details stehen im Abschnitt „Redaktionsabgleich“ der Website-Übersicht.
 
 **Pflege:** APP Entwicklung ergänzt bei jeder App-Änderung den betroffenen Bereich mit Datum, Build/Commit, Prüfbeleg, Aktivierung und offenen Grenzen. WEB CODEX hält gemeinsame Schnittstellen in beiden Übersichten gleich. Änderungen an einer App-Oberfläche gelten nicht automatisch für die Website. Keine automatische Hintergrundprüfung wird durch diese Dokumentation eingerichtet.
 

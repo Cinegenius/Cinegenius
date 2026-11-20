@@ -97,6 +97,18 @@ Dieses Verzeichnis hält die Bereiche, ihre Funktionen, den belegten Stand und o
 
 ## Pflege und Belege
 
+### Redaktionsabgleich · 20. November 2026
+
+Die Redaktion hat ein öffentliches Bestandsinventar für **acht eigene Redaktionsprofile mit 17 verlinkten Beiträgen** geliefert. Darin wurden keine gleichen Artikel-Slug-Endungen gefunden. Private, eingereichte und verborgene Beiträge sowie Eigentum, Bearbeitungshistorie und Medienrechte sind damit **noch nicht vollständig inventarisiert**. Die Nachricht aus Agent NEWS und die dazu gelesenen Unterlagen sind ein Planungs-/Übergabebeleg, kein Nachweis einer erfolgten Datenmigration.
+
+Ziel ist ein eigener Herausgeber **CineGenius Redaktion**, mit Land und Thema je Beitrag und gesondert benannter tatsächlicher Quelle. Reale Organisationen bleiben erhalten. Alte Artikel- und Profiladressen müssen weiter funktionieren; bisherige Freigaben und Medienzuordnungen dürfen sich durch die Zusammenführung nicht verändern. Erst nach diesen Prüfungen sollen alte eigene Redaktionskarten wiederherstellbar ausgeblendet werden.
+
+Für die Abnahme sind außerdem festgehalten: Beiträge als Haupteinstieg, passende rechtmäßig nutzbare Bilder mit Credits, kurze verständliche Titel, Quelle und Datum, belegte offene Fristen, erreichbare internationale Inhalte sowie funktionierende Länder-/Themen-/Sprachwahl auf Website und App. Nutzungsbasiertes Lernen braucht echte aggregierte Daten; die Übersicht behauptet keinen vorhandenen Datenfeed.
+
+**Betriebsstand laut Redaktionsübergabe:** sieben bestehende Automationen und die Recherchepolicy wurden um die Übergangsregel ergänzt. Neue Recherche bleibt privat, bis zentraler Herausgeber und regulärer Veröffentlichungsweg verifiziert sind. Der Plan für 14 Recherchegruppen steht ausdrücklich auf `applyNow=false`. IMCINE-Quellenarbeit ist kein Beleg für eine veröffentlichte Produktänderung. Diese Bestandsaufnahme hat keine Migration, Provideraktivierung oder Veröffentlichung ausgelöst.
+
+Unterlagen: `/srv/cinegenius/handoffs/news-editorial-20261120/newsroom-consolidation-inventory-20261120.json`, `newsroom-publisher-cutover-plan-20261120.json` und `newsroom-quality-acceptance-20261120.md` im selben Ordner.
+
 - Bei einer Änderung: Bereich, Status, Datum, zuständige Arbeit, Prüfung, Grenzen und nächste Schritte aktualisieren. Neue Bereiche ergänzen, abgelöste Funktionen kenntlich machen.
 - „Live“ erst nach bestätigtem Deployment; „App installiert“ und „auf echtem Gerät geprüft“ sind eigene Nachweise.
 - Gemeinsame Schnittstellen in der [App-Übersicht](CINEGENIUS-APP-UEBERSICHT.md) und bei APP Entwicklung nachführen. Keine Behauptung, dass diese Datei von selbst Hintergrundarbeit ausführt.
