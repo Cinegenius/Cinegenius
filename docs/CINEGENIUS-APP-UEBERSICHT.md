@@ -30,7 +30,7 @@ Diese Übersicht trennt die installierte App, ihre serverseitigen Ansichten, nat
 | **Organisationen / Branchenpartner** | Verzeichnisse, Profile und Beiträge | In `b1d767a` umgesetzt und mit künstlichen Daten geprüft: Gesamtzahl, geladene Seite und Kartenpunkte getrennt; während Filterwechsel keine bestätigte Zahl. Noch nicht veröffentlicht oder auf dem Gerät geprüft. |
 | **Projekte** | Öffentliche Projekte, Credits und eigene Mitwirkung | Gemeinsame Rechte und Daten. Öffentliche Projektprofile vom privaten Work-Projektarchiv unterscheiden. |
 | **Shots** | Vorgesehene kurze Posts, 24 Stunden sichtbar, eigene Originale anschließend privat | Oberfläche und geschützter Servercode vorbereitet; **Veröffentlichung nicht aktiviert**. Kein laufender echter Posting-Dienst allein durch sichtbaren Tab. |
-| **Karten** | Antippbare Einträge, Cluster, Karten-/Listenwechsel, fehlende Positionen erreichbar halten | Web-Zählerfix `822c27c` übernommen als `d7abae6` in separater App-Arbeit. Native Smart-/Organisationen-Ergänzungen `b1d767a` umgesetzt: 76 gezielte Tests und 36 Chromium-/WebKit-Fälle bestanden, 17 Sprachen. Noch nicht durch den Web-Livegang veröffentlicht; kein echter Geräte-/Kacheltest. |
+| **Karten** | Antippbare Einträge, Cluster, Karten-/Listenwechsel, fehlende Positionen erreichbar halten | Web-Zählerfix `822c27c` übernommen als `d7abae6` in separater App-Arbeit. Native Smart-/Organisationen-Ergänzungen `b1d767a` umgesetzt: 76 gezielte Tests und 36 Chromium-/WebKit-Fälle bestanden, 17 Sprachen. Neu: kompakte Smart-Vorschau aus WEB `acd306e3` als APP `37f234a4` übernommen; 30 Browserfälle, zwei zusätzliche Antipp-/Scrollfälle und 68 Regressionstests bestanden. [Prüfung und Grenzen](compact-map-preview.md). App-Ergänzungen nicht veröffentlicht; kein echter Geräte-/Kacheltest. |
 
 ## Konto, Kommunikation und Inhalte
 
@@ -77,7 +77,7 @@ Diese Übersicht trennt die installierte App, ihre serverseitigen Ansichten, nat
 
 1. Veröffentlichungsstopp erhalten: Lokale APP-Aufgabe diagnostiziert Smart-/Work-Hänger und Work → Community. Konkrete Korrektur, Geräteprüfung und neue Freigabe vor Livegang.
 2. Installierten Build 2026112007 mit dem tatsächlichen Serverstand auf dem Gerät prüfen; Server-/Browserbelege nicht als Geräteprüfung ausweisen.
-3. Native Zählerergänzungen einschließlich der nachgemeldeten Crew-Filterkorrektur separat mit dem lokalen App-Stand abstimmen; danach die separat gesicherte Homepage-Rotation übernehmen. [Gemeinsame Prioritäten](AKTUELLE-AUFTRAEGE.md) erhalten.
+3. Native Zählerergänzungen einschließlich der nachgemeldeten Crew-Filterkorrektur und der kompakten Kartenvorschau separat mit dem lokalen App-Stand abstimmen; danach die separat gesicherte Homepage-Rotation übernehmen. [Gemeinsame Prioritäten](AKTUELLE-AUFTRAEGE.md) erhalten.
 4. Länderpriorisierung und später Feedback-/Währungsfunktionen aus dem gemeinsamen Vertrag übernehmen.
 5. Work-Funktionsstand mit APP konkretisieren; unbelegte Teilfunktionen als offen führen.
 
