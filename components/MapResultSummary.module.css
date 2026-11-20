@@ -1,3 +1,6 @@
 :global(html[data-cg-native-community-appearance="app"]) .root {
-  color:var(--color-text-primary);
+  color:var(--cg-app-ink,var(--color-text-primary));
+}
+:global(html[data-cg-native-community-appearance="app"]) .root button {
+  color:var(--cg-app-accent,var(--color-gold));
 }
