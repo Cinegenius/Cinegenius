@@ -110,7 +110,7 @@ export default function CompanySetupPage() {
 
   const animals = useTranslations("FilmAnimals");
   const safetyMedical = useTranslations("SafetyMedical");
-  const categoryLabel = (id: string, fallback: string) => safetyMedicalCompanyCategoryLabel(id, animalCategoryLabel(id, fallback, animals), safetyMedical);
+  const categoryLabel = (id: string, fallback: string) => taxonomyLabel(safetyMedicalCompanyCategoryLabel(id, animalCategoryLabel(id, fallback, animals), safetyMedical), uiText);
   const optionalMedia = useTranslations("OptionalMedia");
   const { isLoaded, user } = useUser();
   const tDraft = useTranslations("FormDraft");
@@ -590,7 +590,7 @@ export default function CompanySetupPage() {
                       <div><p className="text-xs uppercase tracking-wide text-text-muted">{uiText("footer.col3")}</p><p className="mt-1 font-semibold text-text-primary">{name || uiText("Ui.text_5cd56993ff61cb")}</p><p className="text-sm text-text-secondary">{city || uiText("Ui.text_673dc93fe291d3")}</p></div>
                       {selectedCategories.length > 0 && <div><p className="text-xs uppercase tracking-wide text-text-muted">{uiText("home.boardKind_offer")}</p><p className="mt-1 text-sm text-text-primary">{selectedCategories.map((id) => { const item = COMPANY_CATEGORIES.find((candidate) => candidate.id === id); return item ? categoryLabel(item.id, item.label) : null; }).filter(Boolean).join(", ")}</p></div>}
                       {isAnimalCompany(selectedCategories) && <AnimalCompanySummary value={animalDetails} />}
-              {selectedCategories.includes(CATERING_COMPANY_CATEGORY.id) && (cateringDetails.serviceTypes.length > 0 || cateringDetails.capacity || cateringDetails.serviceAreas) && <div><p className="text-xs uppercase tracking-wide text-text-muted">{uiText("Ui.text_5007171689640d")}</p><p className="mt-1 text-sm text-text-primary">{[...cateringDetails.serviceTypes, cateringDetails.capacity ? uiText("Ui.text_dc4fe530f13846", { value1: String(cateringDetails.capacity) }) : "", cateringDetails.serviceAreas].filter(Boolean).join(" · ")}</p></div>}
+              {selectedCategories.includes(CATERING_COMPANY_CATEGORY.id) && (cateringDetails.serviceTypes.length > 0 || cateringDetails.capacity || cateringDetails.serviceAreas) && <div><p className="text-xs uppercase tracking-wide text-text-muted">{uiText("Ui.text_5007171689640d")}</p><p className="mt-1 text-sm text-text-primary">{[...cateringDetails.serviceTypes.map(item => taxonomyLabel(item, uiText)), cateringDetails.capacity ? uiText("Ui.text_dc4fe530f13846", { value1: String(cateringDetails.capacity) }) : "", cateringDetails.serviceAreas].filter(Boolean).join(" · ")}</p></div>}
                       {bioShort.trim() && <div><p className="text-xs uppercase tracking-wide text-text-muted">{uiText("Ui.text_0b8cacfbadd89b")}</p><p className="mt-1 text-sm text-text-secondary">{bioShort}</p></div>}
                     </div>
                     <p className="text-xs leading-relaxed text-text-muted">{uiText("Ui.text_1a7a20c4d9edc0")}</p>
@@ -727,7 +727,7 @@ export default function CompanySetupPage() {
                       >
                         <div>
                           <div className="font-semibold">{categoryLabel(cat.id, cat.label)}</div>
-                          <div className="text-[10px] opacity-70 mt-0.5">{isAnimalCompany([cat.id]) ? animals("description") : cat.examples}</div>
+                          <div className="text-[10px] opacity-70 mt-0.5">{isAnimalCompany([cat.id]) ? animals("description") : taxonomyLabel(cat.examples, uiText)}</div>
                         </div>
                         {isSelected && <CheckCircle size={13} className="shrink-0 ml-2" />}
                       </button>

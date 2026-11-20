@@ -7029,7 +7029,24 @@
       "x_d06f18dfc1af": "Autres services cinéma",
       "x_0ed32809d320": "Opérateur steadicam",
       "x_9a3970c57b61": "Décor / Direction artistique",
-      "x_61f2e2faadbe": "Planificateur / Ordonnanceur de production"
+      "x_61f2e2faadbe": "Planificateur / Ordonnanceur de production",
+      "x_d1e9e7538f83": "Restauration de tournage",
+      "x_bcc4eb4624ba": "Restauration événementielle",
+      "x_01b5463faa50": "Restauration mobile / food truck",
+      "x_d889a88bc1a3": "Craft service : collations et boissons",
+      "x_20565120ff08": "Camion-cuisine / cuisine mobile",
+      "x_471e3728ec64": "Végétarien",
+      "x_019fe57b1bed": "Végan",
+      "x_45c036b99a87": "Halal",
+      "x_2e60fd18c194": "Casher",
+      "x_a2f5d6031b84": "Sans gluten",
+      "x_5e2d9eda4e18": "Sans lactose",
+      "x_a0c0af7ece95": "Adapté aux allergies",
+      "x_a5b1f863750e": "Food truck",
+      "x_921b3fed8ffd": "Camion-cuisine",
+      "x_972b71d2de11": "Véhicule frigorifique",
+      "x_1a2e09542f64": "Point de service mobile",
+      "x_e4357a80b814": "Alimentation électrique autonome"
     },
     "roleForms": {
       "produktion": {
