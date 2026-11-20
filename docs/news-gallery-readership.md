@@ -3,8 +3,10 @@
 Stand: 21. November 2026. Der separate Website-Code `a58ee77d` ist veröffentlicht;
 Migration `20261120230314` angewandt. Bestehende Artikel blieben unverändert,
 keine Grants wurden aktiviert. Laufende NEWS-Runtime-Arbeit liegt separat unter
-`/srv/cinegenius/news-agent/runtime`. Der echte private Galerie-Upload und die
-Medienaktivierung stehen noch aus; Code-Veröffentlichung ist keine Medienabnahme.
+`/srv/cinegenius/news-agent/runtime`. Echter privater Galerie-Upload, bytegenauer
+Derivatvergleich und öffentliche Vorschau sind am ungarischen NFI-Artikel geprüft.
+NEWS hat die Bildauswahl aktiviert; der nächste reguläre Bildlauf ist noch nicht
+von WEB beobachtet. Der private Nutzungsfeed bleibt mangels Lesezugang deaktiviert.
 Releasebeleg: `/srv/cinegenius/handoffs/20261121-news-gallery-release/`.
 
 ## Bilder und Herkunft
@@ -169,5 +171,13 @@ Der erste echte private Mediencanary erkannte korrekt einen Digestunterschied:
 gegebenenfalls innerhalb von 2560 × 2560 und entfernt Metadaten. NEWS berechnet
 und prüft dieses erwartete Derivat unabhängig, bewahrt den Originalnachweis und
 vergleicht den tatsächlichen geschützten Readback strikt dagegen. Ein beliebiger
-Server-Rückgabehash reicht nicht. Bis diese echte Abnahme bestanden ist, keine
-vollständige Gallery-Aktivierung behaupten; keine Änderung am Upload-Guard.
+Server-Rückgabehash reicht nicht. Diese echte Abnahme ist inzwischen bestanden; keine Änderung am Upload-Guard.
+
+Nachweis: `gallery-acceptance.json` und `runtime-marker-observation.json` im
+News-Release-Handoff. Der tatsächliche öffentliche Galerieartikel wurde zusätzlich
+bei390px/es-MX in WebKit geprüft: geschütztes Bild geladen, unbeschnitten, Urheber,
+Lizenz, Archivjahr2010 und Änderungshinweis sichtbar, richtige Original-/Lizenz-
+Links, kein Überlauf und keine ungewollte Messung. Die automatische spanische
+Formulierung des Festivalnamens/Datums braucht redaktionellen Feinschliff;
+`spanish-news-language-followup.json` hält die konkreten Befunde fest. Keine
+vollständige sprachliche Freigabe aller dynamischen KI-Texte oder native Abnahme.

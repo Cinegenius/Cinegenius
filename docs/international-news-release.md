@@ -51,8 +51,8 @@ Der vollständige gemeinsame Produktionsbuild ist am 20. November 2026 um
    Chat-Verbindung ist kein dauerhaftes Server-Zugriffsrecht.
 4. Die neuen KI-Feedbackantworten und öffentlichen Bildübersetzungen mit dem echten
    Anbieter prüfen. Vorher nicht als vollständige sprachliche Abnahme darstellen.
-5. NEWS-Medien erst nach echtem privatem Upload, Hashleseweg, Bildrechtenachweis und
-   Artikelprüfung aktivieren. Die beiden bekannten Legacy-Imports hat NEWS bereits
+5. NEWS-Medien sind nach echtem privatem Upload, exakt geprüftem Derivat,
+   Bildrechtenachweis und öffentlicher Artikelprüfung aktiviert. Die beiden bekannten Legacy-Imports hat NEWS bereits
    regulär über die Adminoberfläche verborgen; keine neue Freigabe hierfür setzen.
 6. APP übernimmt gemeinsame Verträge und prüft echte Geräte. NEWS meldete einen
    am lokalen Simulator blockierten Prüfversuch; das ist keine native Abnahme und

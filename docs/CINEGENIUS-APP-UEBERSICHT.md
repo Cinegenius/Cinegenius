@@ -109,7 +109,8 @@ mit privatem, schwellenbegrenzt aggregiertem Feed. Altimport-Ausblendung nur nac
 einer Admin-Einzelfreigabe ohne allgemeinen Publikationsgrant. Vertrag und offene
 Aktivierungsschritte: [News-Galerie und Nutzung](news-gallery-readership.md).
 Website-Code `a58ee77d` und Migration sind veröffentlicht. Echter privater
-Galerie-Upload/Medienaktivierung und PostHog-Lesezugang fehlen noch. Native
+Galerie-Upload und öffentliche Bildvorschau sind geprüft, Bildautomatik aktiviert.
+Der PostHog-Lesezugang fehlt noch. Native
 Abnahme durch APP offen, Smart-/Work-Release-Halt bleibt bestehen.
 
 **Gemeinsamer Prüfstand (21.11.; News separat live):** Währungen/Feedback und News
@@ -121,9 +122,15 @@ exakter Commit im zugehörigen Handoff. Native Übernahme bleibt separat offen.
 **News-Livebeleg:** `/srv/cinegenius/handoffs/20261121-news-gallery-release/`.
 Der Server liefert Galerie-Felder; Gast-/Fremdzugriffe werden abgewiesen. Der
 Nutzungsfeed meldet ohne separaten PostHog-Lesezugang ehrlich `unavailable`.
-Bildautomatik und echte App-Abnahme sind damit noch nicht bestätigt.
+Bildautomatik ist inzwischen aktiviert; echte App-Abnahme bleibt offen.
 
 Vier öffentliche Browsergrößen samt drei Mexiko-Artikeln und bestehendem Bild
 live geprüft; Einwilligungsablehnung in drei zusätzlichen Fällen wirksam. Der
 neue private Bildcanary deckte den Unterschied zwischen Original und bereinigtem
-WebP auf; NEWS ergänzt den exakten Derivatnachweis vor Medienaktivierung.
+WebP auf; NEWS hat den exakten Derivatnachweis ergänzt und die Bildautomatik aktiviert.
+
+**Galerie-Abschluss:** Ein echter neuer Artikel mit lizenziertem Archivbild ist
+regulär veröffentlicht und mobil mit sichtbaren Bildnachweisen geprüft. Die
+Bildauswahl ist aktiviert, der nächste geplante Bildlauf noch nicht beobachtet.
+Leserzahlen-Lernen wartet weiter auf den privaten PostHog-Lesezugang. Einzelne
+spanische KI-Formulierungen sind als redaktionelle Nacharbeit dokumentiert.

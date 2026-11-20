@@ -82,7 +82,7 @@ Dieses Verzeichnis hält die Bereiche, ihre Funktionen, den belegten Stand und o
 | **Rechtliche Seiten** | Impressum, Datenschutz, AGB, Bildrechte, KI-Transparenz und Uploadhinweise | Vorhanden. Betreiberangaben und tatsächliche Verarbeitung aktuell halten; diese Inventur ist keine neue rechtliche Prüfung. |
 | **Newsletter** | Anmeldung, Bestätigung und Abmeldung | Vorhanden. Freiwillige ausdrückliche Einwilligung, keine stillschweigende Newsletter-Anmeldung. |
 | **Admin** | Konten, Angebote, Prüfungen, Orte, Aktualität, Support und Verwaltung | Vorhanden; serverseitige Rechte. Feedback-Koordination implementiert, noch nicht veröffentlicht. |
-| **Redaktionsbetrieb** | AG DOK / NEWS, Technikrecherche, Quellen, Rechte, Dubletten und Länderzuordnung | Bestehender stündlicher Recherchezeitplan mit separatem geprüften Publisher aktiviert. Höchstens ein Kandidat je Lauf, Quellenprüfung und private Zwischenschritte; unklare Inhalte bleiben unveröffentlicht. Eigene abgelaufene Maschinenartikel werden separat ausgeblendet; Galerie/Bildrechte, begrenzte Altimport-Ausblendung und Nutzungsfeed als Website-Code veröffentlicht; Bildautomatik und echter Nutzungsfeed noch nicht aktiviert. |
+| **Redaktionsbetrieb** | AG DOK / NEWS, Technikrecherche, Quellen, Rechte, Dubletten und Länderzuordnung | Bestehender stündlicher Recherchezeitplan mit separatem geprüften Publisher aktiviert. Höchstens ein Kandidat je Lauf, Quellenprüfung und private Zwischenschritte; unklare Inhalte bleiben unveröffentlicht. Eigene abgelaufene Maschinenartikel werden separat ausgeblendet; Galerie/Bildrechte, begrenzte Altimport-Ausblendung und Nutzungsfeed als Website-Code veröffentlicht; Bildautomatik inzwischen aktiviert; echter Nutzungsfeed noch nicht aktiviert. |
 | **Aktualität von Profilen/Angeboten** | Bestandsprüfung, Hinweise und geregeltes Ausblenden veralteter Inhalte | Dokumentiert; tatsächliche Zeitpläne/Aktivierung brauchen Betriebsbeleg, keine unbestätigte automatische Löschung zusagen. |
 | **Werbung** | Bestehender historischer Pfad `/werben` | Kein freigegebenes aktives Werbeinventar; keine Banner oder Buchungsplätze reaktivieren. |
 
@@ -138,7 +138,8 @@ mit privatem, schwellenbegrenzt aggregiertem Feed. Altimport-Ausblendung nur nac
 einer Admin-Einzelfreigabe ohne allgemeinen Publikationsgrant. Vertrag und offene
 Aktivierungsschritte: [News-Galerie und Nutzung](news-gallery-readership.md).
 Website-Code `a58ee77d` und Migration sind veröffentlicht. Echter privater
-Galerie-Upload/Medienaktivierung und PostHog-Lesezugang fehlen noch. Native
+Galerie-Upload und öffentliche Bildvorschau sind geprüft, Bildautomatik aktiviert.
+Der PostHog-Lesezugang fehlt noch. Native
 Abnahme durch APP offen, Smart-/Work-Release-Halt bleibt bestehen.
 
 **Gemeinsamer Prüfstand (21.11.; News separat live):** Währungen/Feedback und News
@@ -150,9 +151,15 @@ exakter Commit im zugehörigen Handoff. Native Übernahme bleibt separat offen.
 **News-Livebeleg:** `/srv/cinegenius/handoffs/20261121-news-gallery-release/`.
 Der Server liefert Galerie-Felder; Gast-/Fremdzugriffe werden abgewiesen. Der
 Nutzungsfeed meldet ohne separaten PostHog-Lesezugang ehrlich `unavailable`.
-Bildautomatik und echte App-Abnahme sind damit noch nicht bestätigt.
+Bildautomatik ist inzwischen aktiviert; echte App-Abnahme bleibt offen.
 
 Vier öffentliche Browsergrößen samt drei Mexiko-Artikeln und bestehendem Bild
 live geprüft; Einwilligungsablehnung in drei zusätzlichen Fällen wirksam. Der
 neue private Bildcanary deckte den Unterschied zwischen Original und bereinigtem
-WebP auf; NEWS ergänzt den exakten Derivatnachweis vor Medienaktivierung.
+WebP auf; NEWS hat den exakten Derivatnachweis ergänzt und die Bildautomatik aktiviert.
+
+**Galerie-Abschluss:** Ein echter neuer Artikel mit lizenziertem Archivbild ist
+regulär veröffentlicht und mobil mit sichtbaren Bildnachweisen geprüft. Die
+Bildauswahl ist aktiviert, der nächste geplante Bildlauf noch nicht beobachtet.
+Leserzahlen-Lernen wartet weiter auf den privaten PostHog-Lesezugang. Einzelne
+spanische KI-Formulierungen sind als redaktionelle Nacharbeit dokumentiert.
