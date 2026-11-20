@@ -1,9 +1,11 @@
 # News: Bildergalerie, aggregierte Nutzung und begrenzte Altimport-Ausblendung
 
-Stand: 21. November 2026. Implementiert im separaten Website-Entwurf
-`codex/news-gallery-readership-20261120`, noch nicht veröffentlicht. Laufende
-NEWS-Runtime-Arbeit liegt separat unter `/srv/cinegenius/news-agent/runtime`.
-Keine Produktionsdaten oder Freigaben wurden durch diesen Entwurf geändert.
+Stand: 21. November 2026. Der separate Website-Code `a58ee77d` ist veröffentlicht;
+Migration `20261120230314` angewandt. Bestehende Artikel blieben unverändert,
+keine Grants wurden aktiviert. Laufende NEWS-Runtime-Arbeit liegt separat unter
+`/srv/cinegenius/news-agent/runtime`. Der echte private Galerie-Upload und die
+Medienaktivierung stehen noch aus; Code-Veröffentlichung ist keine Medienabnahme.
+Releasebeleg: `/srv/cinegenius/handoffs/20261121-news-gallery-release/`.
 
 ## Bilder und Herkunft
 
@@ -141,3 +143,15 @@ authentifizierte Browserprüfung noch den echten App-Test; der lokale vollständ
 Seitenaufruf scheiterte am Authentifizierungsdienst. Neue KI-Bildübersetzungen und
 der echte private PostHog-Feed sind nicht abgenommen. Prüfbelege:
 `/srv/cinegenius/handoffs/20261120-news-extensions/`.
+
+## Tatsächlicher Live-Stand
+
+Produktionsdeployment `dpl_2jcKxqE546NduvMxAY4rHpeBxUsi` ist READY. Der
+authentifizierte Maschinenleser liefert die Galerie-Felder; Gäste erhalten 401,
+fremde Organisationen bzw. nicht freigegebene Einträge 403, jeweils ohne Cache.
+Der echte Readership-Aufruf liefert mangels Lesezugang erwartungsgemäß 503 mit
+`unavailable`; keine erfundenen Messwerte. Die Sicherheitsberater melden gegenüber
+dem Vorherstand keine neuen Warnungen. Die zwei bekannten AG-DOK-Altimporte
+wurden separat von NEWS über die reguläre Adminoberfläche verborgen; nicht erneut
+freigeben oder ausblenden. Native News-Abnahme und Smart/Work-Release-Halt bleiben
+separat offen. Internationalisierung/Feedback sind nicht Teil dieses Releases.

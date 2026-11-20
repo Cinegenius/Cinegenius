@@ -101,18 +101,24 @@ Diese Übersicht trennt die installierte App, ihre serverseitigen Ansichten, nat
 
 **Übergabe Internationalisierung (20.11.):** Website noch nicht veröffentlicht. Mehrwährungen und privates Mitgestalten sind vorbereitet; Vertrag `international-currency-feedback.md`, Belege `/srv/cinegenius/handoffs/20261120-international-feedback/`. Direkte Chat-Übergabe wegen Verbindungsfehler nicht zugestellt. Kein echter App-/KI-Test behauptet.
 
-## News-Erweiterung · 21. November 2026 (Entwurf)
+## News-Erweiterung · 21. November 2026 (Website-Code live)
 
 Galerie mit bis zu acht geschützten Bildern, sichtbaren Urheber-/Lizenz-/
 Archivnachweisen und Wiederholversuch; neue zustimmungsgebundene Artikelmessung
 mit privatem, schwellenbegrenzt aggregiertem Feed. Altimport-Ausblendung nur nach
 einer Admin-Einzelfreigabe ohne allgemeinen Publikationsgrant. Vertrag und offene
 Aktivierungsschritte: [News-Galerie und Nutzung](news-gallery-readership.md).
-Noch nicht veröffentlicht; Migration und echter PostHog-Lesezugang fehlen. Native
+Website-Code `a58ee77d` und Migration sind veröffentlicht. Echter privater
+Galerie-Upload/Medienaktivierung und PostHog-Lesezugang fehlen noch. Native
 Abnahme durch APP offen, Smart-/Work-Release-Halt bleibt bestehen.
 
-**Gemeinsamer Abschlussstand (21.11., nicht live):** Währungen/Feedback und News
+**Gemeinsamer Prüfstand (21.11.; News separat live):** Währungen/Feedback und News
 sind unter `codex/international-news-ready-20261120` zusammengeführt. 166 gezielte
 Tests, 17 Sprachen und Designprüfung bestanden. Umfang und offene Aktivierung in
 [Gemeinsamer Prüfstand](international-news-release.md); vollständiger Build und
 exakter Commit im zugehörigen Handoff. Native Übernahme bleibt separat offen.
+
+**News-Livebeleg:** `/srv/cinegenius/handoffs/20261121-news-gallery-release/`.
+Der Server liefert Galerie-Felder; Gast-/Fremdzugriffe werden abgewiesen. Der
+Nutzungsfeed meldet ohne separaten PostHog-Lesezugang ehrlich `unavailable`.
+Bildautomatik und echte App-Abnahme sind damit noch nicht bestätigt.

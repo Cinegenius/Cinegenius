@@ -1,7 +1,8 @@
 # Gemeinsamer Prüfstand: internationale Preise, Länderfeedback und News
 
 Stand: 21. November 2026. Branch `codex/international-news-ready-20261120`.
-Dies ist ein gesicherter Implementierungsstand, keine Produktionsveröffentlichung.
+Dies ist ein gemeinsamer Implementierungsstand. Nur der News-Anteil `a58ee77d`
+ist inzwischen separat veröffentlicht; Währungen/Feedback bleiben unveröffentlicht.
 Er vereint die getrennt geprüften Pakete `65651599` (Währungen/Feedback) und
 `a58ee77d` (News) auf der veröffentlichten Grundlage `3bd731f2`.
 
@@ -40,17 +41,19 @@ Der vollständige gemeinsame Produktionsbuild ist am 20. November 2026 um
 1. Betreiberfreigabe für genau dieses Websitepaket; danach Änderungen auf den
    aktuellen Hauptstand übernehmen und ausschließlich den bewachten Releaseweg
    mit sauberem `main == origin/main` verwenden.
-2. Geprüfte Migrationen vor abhängigen Schnittstellen anwenden und aktuell prüfen:
-   `20261120194027_booking_currency_snapshot.sql` und
-   `20261120230314_news_gallery_and_legacy_expiry.sql`. Keine automatischen Grants,
-   Artikeländerungen oder Runtime-Marker daraus ableiten.
+2. Die Buchungs-Währungsmigration `20261120194027_booking_currency_snapshot.sql`
+   vor ihren abhängigen Schnittstellen anwenden und aktuell prüfen. Die separate
+   News-Migration `20261120230314_news_gallery_and_legacy_expiry.sql` ist bereits
+   angewandt. Keine automatischen Grants, Artikeländerungen oder Runtime-Marker
+   daraus ableiten.
 3. Für `/api/editorial/readership` den privaten lesenden PostHog-Zugang einrichten
    und den echten Feed prüfen; derzeit fehlt `POSTHOG_NEWS_READ_KEY`. Die vorhandene
    Chat-Verbindung ist kein dauerhaftes Server-Zugriffsrecht.
 4. Die neuen KI-Feedbackantworten und öffentlichen Bildübersetzungen mit dem echten
    Anbieter prüfen. Vorher nicht als vollständige sprachliche Abnahme darstellen.
 5. NEWS-Medien erst nach echtem privatem Upload, Hashleseweg, Bildrechtenachweis und
-   Artikelprüfung aktivieren. Legacy-Hides brauchen tatsächliche Einzelfreigaben.
+   Artikelprüfung aktivieren. Die beiden bekannten Legacy-Imports hat NEWS bereits
+   regulär über die Adminoberfläche verborgen; keine neue Freigabe hierfür setzen.
 6. APP übernimmt gemeinsame Verträge und prüft echte Geräte. NEWS meldete einen
    am lokalen Simulator blockierten Prüfversuch; das ist keine native Abnahme und
    kein Nachweis eines Websitefehlers. Der bestehende native Smart/Work-Release-Halt
@@ -61,3 +64,5 @@ Belege und tatsächlicher Stand:
 Ein APP-Handoff ist gespeichert; die direkte Chat-Nachricht konnte wegen eines
 Verbindungsfehlers nicht zugestellt werden. Der tägliche Website-Prüfagent bleibt
 deaktiviert. Das bestehende Design bleibt erhalten.
+
+Separater News-Livebeleg: `/srv/cinegenius/handoffs/20261121-news-gallery-release/`.

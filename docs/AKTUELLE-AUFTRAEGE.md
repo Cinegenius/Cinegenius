@@ -12,7 +12,7 @@ Diese Liste ist eine Arbeitsübersicht, kein gestarteter Hintergrundagent.
 | 1 · APP separat | Hänger in Smart/Work und Wechsel Work → Community | APP diagnostiziert; Release bleibt angehalten. Unfertige native Änderungen nicht durch WEB veröffentlichen; das geprüfte Websitepaket ist separat freigegeben. |
 | 2 | Homepage „Die Crew“: neue Mitglieder einen Tag priorisieren, danach mischen | Website veröffentlicht; 24 Stunden Vorrang und danach wechselnde Auswahl. 48 Tests, ursprünglicher Entwurf `f6b45be5`. Kein neues Design. |
 | 3 | Mexiko und weitere Länder | Regionale Vorauswahl für Gäste, Reisende, Startseite und Verzeichnisse veröffentlicht: 162 Tests und 32 Browserfälle, 17 Sprachen, Designprüfung und vollständiger Build bestanden. Gastzugriff live zusätzlich geprüft. Vertrag in `country-first-discovery.md`, APP-Übernahme/Gerätetest offen. Mehrwährungen jetzt implementiert: 155 Währungen, Formulare, Preisfilter und Buchungs-Snapshots. Abschlussprüfung/Veröffentlichung getrennt; siehe `international-currency-feedback.md`. |
-| 4 · WEB / Redaktion | News-Zusammenführung und Technik-/Mexiko-News | Veröffentlicht und live geprüft: acht eigene Redaktionen zusammengeführt, 17 Bestandsartikel/25 alte Links erhalten, drei Mexiko-Artikel weiterhin auffindbar, ein neuer Artikel regulär veröffentlicht. 39 Produkt- und 11 Worker-Prüfungen; vier Live-Browserkonfigurationen bestanden. Stündlicher Dienst und Ausblenden eigener abgelaufener Maschinenartikel separat aktiviert. Galerie, Bildrechte-Anbindung, begrenzte Altimport-Ausblendung und Nutzungsfeed sind jetzt implementiert, noch nicht veröffentlicht/aktiviert. |
+| 4 · WEB / Redaktion | News-Zusammenführung und Technik-/Mexiko-News | Veröffentlicht und live geprüft: acht eigene Redaktionen zusammengeführt, 17 Bestandsartikel/25 alte Links erhalten, drei Mexiko-Artikel weiterhin auffindbar, ein neuer Artikel regulär veröffentlicht. 39 Produkt- und 11 Worker-Prüfungen; vier Live-Browserkonfigurationen bestanden. Stündlicher Dienst und Ausblenden eigener abgelaufener Maschinenartikel separat aktiviert. Galerie, Bildrechte-Anbindung, begrenzte Altimport-Ausblendung und Nutzungsfeed als Website-Code `a58ee77d` veröffentlicht. Medienabnahme/Aktivierung, echter PostHog-Lesezugang und native Prüfung offen. |
 | 5 | Mitgestalten / Ländervertreter-Feedback | Implementiert: private Gespräche, Länder-/Sprachlinks und Admin-Sammlung. Isolierte WebKit-Bedienprüfung bei 320/390/768/1366 px bestanden. Echter KI-Test und native Übernahme offen; direkte APP-Chat-Verbindung derzeit nicht erreichbar. Noch nicht veröffentlicht. |
 | 6 · APP | Hintergrundfarbe und weitere App-Gestaltung | Vier Vorschauen bei APP vorgesehen, noch keine Farbauswahl. Nach Funktionsfehlern weiterführen. |
 | fortlaufend | Gesamte Website-/App-Übersichten | `CINEGENIUS-WEBSITE-UEBERSICHT.md` und `CINEGENIUS-APP-UEBERSICHT.md` enthalten weitere Bereiche und offene Grenzen. Neue Aufträge dort und hier zuordnen; nichts als erledigt oder live markieren ohne Beleg. |
@@ -29,12 +29,15 @@ geschützte Artikelbilder mit sichtbaren Bildnachweisen, zustimmungsgebundene ec
 Impressionen/Aufrufe und privater aggregierter Lernfeed, einzelne widerrufbare
 Altimport-Ausblendungen ohne Rechte zur Veröffentlichung. Vertrag:
 `news-gallery-readership.md`. Datenbank/API, 17 Sprachen, isolierte WebKit-Bedienfälle und vollständiger
-Produktionsbuild bestanden. Migration, privater PostHog-Lesezugang und
-Produkt-Liveabnahme noch offen. NEWS-Runtime betreut Bilder/Ablauf/Lerngewichtung separat; deren bereits
+Produktionsbuild bestanden. Website-Code und Migration veröffentlicht; privater
+PostHog-Lesezugang und echte Galerie-Medienabnahme noch offen. NEWS-Runtime betreut Bilder/Ablauf/Lerngewichtung separat; deren bereits
 aktivierter Ablaufworker bedeutet keinen Galerie-/Lernfeed-Livegang.
 
-**Gemeinsamer Abschlussstand (21.11., nicht live):** Währungen/Feedback und News
+**Gemeinsamer Prüfstand (21.11.; nur News separat live):** Währungen/Feedback und News
 sind unter `codex/international-news-ready-20261120` zusammengeführt. 166 gezielte
 Tests, 17 Sprachen und Designprüfung bestanden. Umfang und offene Aktivierung in
 [Gemeinsamer Prüfstand](international-news-release.md); vollständiger Build und
 exakter Commit im zugehörigen Handoff. Native Übernahme bleibt separat offen.
+
+News-Veröffentlichung und Live-API-Prüfung: `/srv/cinegenius/handoffs/20261121-news-gallery-release/`.
+Währungen/Feedback verbleiben als geprüftes, unveröffentlichtes Paket.
