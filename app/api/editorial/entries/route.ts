@@ -3,7 +3,7 @@ import { db } from "@/lib/db";
 import { cityWriteFields } from "@/lib/places/catalog";
 import { countryCode } from "@/lib/places/core";
 import { editorialSourceUrl } from "@/lib/editorial-agent-policy";
-import { validateOrganizationMediaReference } from "@/lib/organization-media";
+import { validateOrganizationMediaReference, validateNewsGallery } from "@/lib/organization-media";
 import { isOrganizationEntryType, isOrganizationFormat, isOrganizationTopic, safeExternalUrl } from "@/lib/organization-taxonomy";
 import { editorialFailure, editorialHeaders, editorialOrganizationAllowed, requireEditorialAgent } from "@/lib/editorial-agent-server";
 
@@ -43,10 +43,13 @@ export async function POST(request: NextRequest) {
   if (country && place.place_country_code !== country) return NextResponse.json({error:'editorial_place'}, {status:400, headers:editorialHeaders});
   const image = await validateOrganizationMediaReference(body.imageUrl, actor.userId, "organization_entry", body.id);
   if (image.error) return NextResponse.json({ error: "editorial_media" }, { status: 400, headers: editorialHeaders });
+  const gallery = await validateNewsGallery(body.imageGallery, actor.userId, body.id, image.url ?? null);
+  if (gallery.error) return NextResponse.json({ error: "editorial_media" }, { status: 400, headers: editorialHeaders });
   const { data, error } = await db.rpc("save_editorial_entry", { p_id: body.id, p_organization: body.organizationId, p_expected: body.expectedUpdatedAt, p_submit: body.submit, p_document: {
     entry_type: body.entryType, title, summary: clean(body.summary, 500), description: clean(body.description, 12000), topic: body.topic, format: body.format,
     ...place, venue: clean(body.venue, 180), starts_at: startsAt, ends_at: endsAt,
     registration_url: registrationUrl, external_url: externalUrl, image_url: image.url,
+    ...(gallery.gallery !== undefined ? {image_gallery: gallery.gallery} : {}),
   } });
   if (error) return editorialFailure(error);
   return NextResponse.json({ entry: Array.isArray(data) ? data[0] : data }, { headers: editorialHeaders });

@@ -20,8 +20,8 @@ Diese Übersicht trennt die installierte App, ihre serverseitigen Ansichten, nat
 
 | Bereich | Funktionen | Stand / Grenzen |
 | --- | --- | --- |
-| **Smart / Entdecken** | Crew, Marktplatz, Locations und Firmen gemeinsam auswählen; Kacheln, Liste und Karte/Liste | Zählerergänzung `b1d767a`: ausdrücklich geladene eindeutige Treffer, getrennte Kartenhinweise und „Alle anzeigen“; vorbereitet, noch nicht veröffentlicht. Gemeinsame serverseitige **Admin-Beschränkung bleibt bestehen**; eine App-Navigation erteilt keine Suchrechte. WEB bereitet eine kompakte gemeinsame Kartenvorschau vor (keine gestreckten Leerflächen); Übernahme/Geräteprüfung durch APP, Release-Halt unverändert. |
-| **Crew / Profile** | Personen, Tätigkeiten, Fähigkeiten, Ortsangaben, Bilder und Kontakt | Gemeinsame Website-Daten und aktuelle Sichtbarkeitsrechte; native Darstellung separat prüfen. WEB korrigiert die bisher konstante Gesamtzahl bei Anbieterfiltern: künftig aktuelle gefilterte Auswahl, identisch zum Karten-Datensatz. Noch nicht veröffentlicht; App-Release bleibt angehalten. |
+| **Smart / Entdecken** | Crew, Marktplatz, Locations und Firmen gemeinsam auswählen; Kacheln, Liste und Karte/Liste | Zählerergänzung `b1d767a`: ausdrücklich geladene eindeutige Treffer, getrennte Kartenhinweise und „Alle anzeigen“; vorbereitet, noch nicht veröffentlicht. Gemeinsame serverseitige **Admin-Beschränkung bleibt bestehen**; eine App-Navigation erteilt keine Suchrechte. WEB hat die kompakte gemeinsame Kartenvorschau veröffentlicht (keine gestreckten Leerflächen); native Übernahme/Geräteprüfung durch APP, Release-Halt unverändert. |
+| **Crew / Profile** | Personen, Tätigkeiten, Fähigkeiten, Ortsangaben, Bilder und Kontakt | Gemeinsame Website-Daten und aktuelle Sichtbarkeitsrechte; native Darstellung separat prüfen. WEB hat die bisher konstante Gesamtzahl bei Anbieterfiltern korrigiert und veröffentlicht: aktuelle gefilterte Auswahl, identisch zum Karten-Datensatz. Native Veröffentlichung bleibt angehalten. |
 | **Marktplatz / Dienstleistungen / Fahrzeuge** | Angebote, Anbieter, Bilder, Anfragen und Filter | Gemeinsame Angebotsregeln; Mehrwährungen noch unveröffentlichter Web-/Schnittstellenentwurf. |
 | **Locations** | Drehorte/Studios, Suche, Details und Karten | Gemeinsamer Zählerfix `822c27c` übernommen: gefilterte Gesamtzahl bleibt beim Kartenziehen stabil; fehlende Kartenpunkte über die Liste erreichbar. App-Beschriftung „gesamt“ in `b1d767a` vorbereitet. |
 | **Firmen** | Profile, Leistungen, Teams und Angebote | Gemeinsame Firmen-/Personenrechte; versteckte persönliche Identitäten nicht über Firmen offenlegen. |
@@ -46,7 +46,7 @@ Diese Übersicht trennt die installierte App, ihre serverseitigen Ansichten, nat
 | **Inserieren / Verwalten** | Eigene Angebote, Firmen, Organisationen, Bearbeiten und Status | Dieselben Freigaben wie im Web; App-eigene Formulare/Wege pro Build prüfen. |
 | **Buchungen / Anfragen / Rechnungen** | Bestehende Vorgänge und Status | Gemeinsame Kontodaten; kein automatischer Zahlungsdienst als aktiv bestätigt. |
 | **Hilfe / Support / Recht** | FAQ, Kontakt, Meldungen, Impressum, Datenschutz, AGB und Bildrechte | Gemeinsame Inhalte erreichbar halten; Konto- und externe Link-Rückkehr prüfen. |
-| **Mitgestalten / Feedback** | Ländervertreter beantworten kurze Fragen und geben eigene Rückmeldungen; Markus bekommt gesammelte Ergebnisse | Web-Entwurf vorhanden, **noch nicht live**. Native Einbindung beauftragt/abzustimmen, nicht als fertige App-Funktion behaupten. Gleiche privaten Gespräche und Zusammenfassungen verwenden. |
+| **Mitgestalten / Feedback** | Ländervertreter beantworten kurze Fragen und geben eigene Rückmeldungen; Markus bekommt gesammelte Ergebnisse | Web-Implementierung und isolierte Bedienprüfung vorhanden, **noch nicht live**. Native Einbindung beauftragt/abzustimmen, nicht als fertige App-Funktion behaupten. Gleiche privaten Gespräche und Zusammenfassungen verwenden. |
 
 ## Work / privater Arbeitsplatz
 
@@ -67,7 +67,7 @@ Diese Übersicht trennt die installierte App, ihre serverseitigen Ansichten, nat
 | Thema | Stand / Regel |
 | --- | --- |
 | **Länderpriorisierung** | WEB veröffentlicht (`4d93523a`): Aufrufland vor Profil-Land, Gäste eingeschlossen; manuelle Auswahl bleibt maßgeblich. [Vertrag](country-first-discovery.md), 162 Tests und 32 simulierte Browserfälle. APP dokumentiert den Vertrag in `63867e4`, Funktionsübernahme und echte Geräteprüfung offen. `country=all` bei Organisationen/Brett nicht entfernen. Native Funktionsübernahme noch nicht veröffentlicht. |
-| **Sprachen / Währungen** | 17 Web-Sprachkataloge vorhanden; native Texte separat vollständig halten. Währung und Sprache sind nicht automatisch das Land. Neue Währungsauswahl noch Entwurf. |
+| **Sprachen / Währungen** | 17 Web-Sprachkataloge vorhanden; native Texte separat vollständig halten. Währung und Sprache sind nicht automatisch das Land. 155 Währungen in der Web-Implementierung; `metadata.price_currency`, `crew.price_currency` und Buchungs-Snapshot übernehmen. Keine Umrechnung; native Anzeigen/Editoren noch abzugleichen. |
 | **Push** | Code/Verträge vorbereitet, **nicht aktiviert**. Apple-Konfiguration, Dienstbetrieb und echter Empfang/Antippen/Abmelden-Test fehlen als Aktivierungsbeleg. |
 | **Hintergrunddienste** | Kein laufender Dienst allein durch vorhandenen Worker-Code. Zeitplan, Rechte, Aktivierungsstatus und tatsächliche Verarbeitung gesondert belegen. |
 | **Fotos / Dokumente / Datenschutz** | Aktuelle Rechte, kanonische Medienquelle, private Wiederherstellung, lokale Daten und Kontowechsel gemeinsam absichern. |
@@ -78,7 +78,7 @@ Diese Übersicht trennt die installierte App, ihre serverseitigen Ansichten, nat
 1. Release angehalten lassen: APP diagnostiziert Smart-/Work-Hänger und den fehlerhaften Wechsel Work → Community. Vor einem Livegang konkrete Korrektur, Prüfbeleg und neue Freigabe abwarten.
 2. Installierten Build 2026112007 mit dem tatsächlichen Serverstand auf dem Gerät prüfen, insbesondere Smart, Work und den Wechsel zur Community; Ergebnisse von Browserprüfungen unterscheiden. Vier Farbvorlagen in APP abstimmen, erst nach Auswahl umsetzen.
 3. Geprüfte native Zählerergänzungen `b1d767a` und `38d87bb` separat mit dem aktuellen App-Release abstimmen; Veröffentlichung und echte Geräteprüfung bleiben offen.
-4. Länderpriorisierung und später Feedback-/Währungsfunktionen aus dem gemeinsamen Vertrag übernehmen.
+4. Länderpriorisierung sowie Feedback-/Währungsfunktionen aus [dem gemeinsamen Vertrag](international-currency-feedback.md) übernehmen. Echte Geräteprüfung und Release-Halt beachten.
 5. Work-Funktionsstand mit APP konkretisieren; unbelegte Teilfunktionen als offen führen.
 6. Die veröffentlichte CineGenius Redaktion auf dem tatsächlichen App-Build prüfen: bisherige Eintrags-IDs/Bilder/Länder erhalten, alte Links funktionieren, zentrale Organisation und Quellenverweise prüfen. 17 Bestandsbeiträge plus ein echter maschinell geprüfter Artikel sind live. Native News-Verträge bleiben erhalten; kein neuer App-Release, keine Maschinenrechte im Client. Details und Grenzen im Redaktionsabgleich der Website-Übersicht.
 
@@ -98,3 +98,15 @@ Diese Übersicht trennt die installierte App, ihre serverseitigen Ansichten, nat
 **Website-Release (20.11.):** Länderpräferenz, gefilterte Zähler, kompakte Smart-Vorschau und 24-Stunden-Crew-Rotation sind als Websitepaket veröffentlicht. Der zusätzliche Randpin-Fokusfix ist Bestandteil der abschließenden Web-Abnahme. Keine Veröffentlichung der zurückgehaltenen nativen Smart/Work-Änderungen; Web-Browsertests sind keine Geräteprüfung. Beleg und APP-Handoff: `/srv/cinegenius/handoffs/20261120-country-first-release/`.
 
 **Redaktionsfreigabe (20.11.):** Website/API unter einem zentralen Herausgeber veröffentlicht; Länderfilter behalten drei Mexiko-Beiträge. Aktive stündliche Recherche mit separatem Publisher; ohne automatische Fotos oder Nutzungslernfeed. Browserprüfungen ersetzen keine native Prüfung. Handoff und tatsächlicher Übermittlungsstatus: `/srv/cinegenius/handoffs/20261120-newsroom-release/`.
+
+**Übergabe Internationalisierung (20.11.):** Website noch nicht veröffentlicht. Mehrwährungen und privates Mitgestalten sind vorbereitet; Vertrag `international-currency-feedback.md`, Belege `/srv/cinegenius/handoffs/20261120-international-feedback/`. Direkte Chat-Übergabe wegen Verbindungsfehler nicht zugestellt. Kein echter App-/KI-Test behauptet.
+
+## News-Erweiterung · 21. November 2026 (Entwurf)
+
+Galerie mit bis zu acht geschützten Bildern, sichtbaren Urheber-/Lizenz-/
+Archivnachweisen und Wiederholversuch; neue zustimmungsgebundene Artikelmessung
+mit privatem, schwellenbegrenzt aggregiertem Feed. Altimport-Ausblendung nur nach
+einer Admin-Einzelfreigabe ohne allgemeinen Publikationsgrant. Vertrag und offene
+Aktivierungsschritte: [News-Galerie und Nutzung](news-gallery-readership.md).
+Noch nicht veröffentlicht; Migration und echter PostHog-Lesezugang fehlen. Native
+Abnahme durch APP offen, Smart-/Work-Release-Halt bleibt bestehen.

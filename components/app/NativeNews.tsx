@@ -1,5 +1,6 @@
 "use client";
 
+import NewsObservation from "@/components/organizations/NewsObservation";
 import { TranslatedText } from "@/components/ContentTranslation";
 
 
@@ -51,9 +52,9 @@ export default function NativeNews({ controls, entries, page, previousHref, next
     lat: entry.lat, lng: entry.lng, titleContent: <TranslatedText kind="news" id={entry.id} field="title">{entry.title}</TranslatedText>,
   })), [entries]);
   const mapped = locations.filter(hasCoordinates).length;
-  const row = (entry: NativeNewsEntry, preview = false) => <Link href={entry.href} className={`${styles.card} ${preview ? styles.preview : ""}`} data-news-id={entry.id}>
+  const row = (entry: NativeNewsEntry, preview = false) => <Link href={entry.href} className={`${styles.card} ${preview ? styles.preview : ""}`} data-news-id={entry.id} data-news-observation>
     <div className={styles.image}>{entry.image ? <MediaImage src={entry.image} alt="" width={640} height={360} className={styles.photo} /> : <Newspaper size={24} aria-hidden="true" />}</div>
-    <div className={styles.copy}>
+    <NewsObservation id={entry.id} /><div className={styles.copy}>
       <p className={styles.type}>{[entry.typeLabel, entry.topicLabel].filter(Boolean).join(" · ")}</p>
       <h2><TranslatedText kind="news" id={entry.id} field="title">{entry.title}</TranslatedText></h2>
       <p className={styles.organization}>{[entry.organization, entry.city].filter(Boolean).join(" · ")}</p>

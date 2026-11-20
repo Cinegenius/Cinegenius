@@ -12578,14 +12578,14 @@
   },
   "AnalyticsPrivacy": {
     "settings": "Analyse-Einstellungen",
-    "banner": "Notwendige Funktionen sind immer aktiv. Mit deiner Zustimmung analysiert PostHog (EU) Aufrufe öffentlicher Übersichtsseiten. Keine Sitzungsaufzeichnungen. Du kannst deine Wahl jederzeit über die Analyse-Einstellungen ändern.",
+    "banner": "Mit deiner Zustimmung misst PostHog (EU) Aufrufe öffentlicher Übersichten sowie sichtbare News und geöffnete Artikel. Keine Aufzeichnungen. Jederzeit in den Analyse-Einstellungen änderbar.",
     "reject": "Nur notwendige Funktionen",
     "accept": "Analyse erlauben",
     "close": "Schließen",
     "privacy": "Datenschutz",
     "storageError": "Deine Auswahl konnte nicht gespeichert werden. Die Analyse bleibt ausgeschaltet.",
     "title": "Freiwillige Nutzungsanalyse mit PostHog",
-    "disclosure": "Nur nach deiner Einwilligung verwenden wir PostHog, Inc. mit dem EU-Cloud-Projekt zur Auswertung öffentlicher Übersichtsseiten. Wir senden die Seitenkategorie und eine zufällige Kennung, die nur im Arbeitsspeicher dieses Tabs besteht. Suchbegriffe, URL-Parameter, Seiteninhalte, Namen, E-Mail-Adressen, private Bereiche und Formulare werden nicht erfasst. Automatische Klickerfassung, Personenprofile und Sitzungsaufzeichnungen sind deaktiviert. Die IP-Adresse wird technisch zur Verbindung verarbeitet; die Speicherung als Analysemerkmal ist deaktiviert. Deine Auswahl speichern wir lokal im Browser, bis du sie änderst oder die Browserdaten löschst. Du kannst jederzeit ablehnen oder widerrufen; dann werden keine weiteren Analyseereignisse erfasst. Bereits übertragene Ereignisse werden dadurch nicht automatisch gelöscht.",
+    "disclosure": "Nur mit deiner Einwilligung messen wir über PostHog, Inc. (EU-Cloud) öffentliche Seitenkategorien, sichtbare News-Karten und Artikelaufrufe. Übertragen werden die Kategorie, eine öffentliche Artikel-ID und eine zufällige Kennung im Arbeitsspeicher des Tabs. Keine Suchtexte, URL-Parameter, Inhalte, Kontodaten oder privaten Bereiche; keine Personenprofile, automatische Klickerfassung oder Sitzungsaufzeichnungen. Die Verbindung verarbeitet technisch deine IP-Adresse, sie wird nicht als Analysemerkmal gespeichert. Die Redaktion erhält nur zusammengefasste Werte mit Mindestmengen, keine Personenlisten. Deine Auswahl bleibt lokal gespeichert, bis du sie änderst oder Browserdaten löschst. Widerruf stoppt neue Ereignisse; bereits übertragene Ereignisse werden nicht automatisch gelöscht.",
     "providerPrivacy": "Datenschutzhinweise von PostHog"
   },
   "locationMap": {
@@ -13595,5 +13595,23 @@
     "disable": "Redaktionsrecht entziehen",
     "confirmGrant": "CineGenius Redaktion erlauben, eigene geprüfte Beiträge dieser Organisation automatisch zu veröffentlichen und eigene Beiträge wiederherstellbar auszublenden? Persönliche Konten und der Support erhalten dadurch keine Adminrechte.",
     "name": "CineGenius Redaktion"
+  },
+  "NewsGallery": {
+    "title": "Bilder",
+    "position": "Bild {current} von {total}",
+    "creator": "Urheber",
+    "source": "Quelle",
+    "changes": "Änderungen",
+    "help": "Optional: bis zu 8 Bilder. Ergänze bei neuen Bildern Beschreibung und öffentliche Bildnachweise. Keine privaten Freigabedokumente.",
+    "addCredits": "Bildnachweise ergänzen",
+    "altText": "Bildbeschreibung",
+    "caption": "Bildunterschrift / Archivhinweis",
+    "imageTitle": "Originaltitel",
+    "sourceUrl": "Quellenlink",
+    "licenseName": "Lizenz / Nutzungsrecht",
+    "licenseUrl": "Lizenzlink (optional)",
+    "attribution": "Vorgeschriebene Namensnennung (optional)",
+    "credit": "Zusätzlicher Bildnachweis (optional)",
+    "makeCover": "Als Titelbild verwenden"
   }
 }

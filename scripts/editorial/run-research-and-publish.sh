@@ -10,7 +10,35 @@ if ! /usr/bin/flock -n 9; then
   exit 0
 fi
 started=$SECONDS
-/usr/bin/python3 "$runtime_root/bin/research.py" "$@"
+if [[ " $* " == *" --smoke "* ]]; then
+  /usr/bin/python3 "$runtime_root/bin/research.py" "$@"
+  exit 0
+fi
+if [[ -f "$runtime_root/feedback/enabled" ]]; then
+  /usr/bin/timeout --kill-after=5 40s /usr/bin/python3 "$runtime_root/bin/feedback.py" || feedback_status=$?
+  if [[ ${feedback_status:-0} -ne 0 ]]; then
+    echo '{"mode":"editorial_readership","status":"unavailable_balanced_selection_retained"}'
+  fi
+fi
+# Use the same overlap lock and the publisher's own mutation lock. The expiry
+# journal survives an interrupted response; hidden entries are never restored.
+if [[ -f "$runtime_root/expiry/enabled" ]]; then
+  /usr/bin/timeout --kill-after=5 125s /usr/bin/python3 "$runtime_root/bin/expiry.py" || expiry_status=$?
+  if [[ ${expiry_status:-0} -ne 0 ]]; then
+    echo '{"mode":"editorial_expiry","status":"interrupted_or_failed_check_private_receipt"}'
+  fi
+fi
+# Reserve room for maintenance and publication inside the existing 600s service.
+# A caller's smaller research timeout remains respected.
+research_budget=260
+previous_arg=''
+for current_arg in "$@"; do
+  if [[ "$previous_arg" == '--timeout' && "$current_arg" =~ ^[0-9]+$ ]] && ((10#$current_arg < research_budget)); then
+    research_budget=$((10#$current_arg))
+  fi
+  previous_arg=$current_arg
+done
+/usr/bin/timeout --kill-after=5 315s /usr/bin/python3 "$runtime_root/bin/research.py" "$@" --timeout "$research_budget"
 # Existing system service has a 600s wall limit. Leave 30s for shutdown; the
 # publisher's stable IDs recover a timeout after any acknowledged/unacknowledged save.
 remaining=$((570 - (SECONDS - started)))

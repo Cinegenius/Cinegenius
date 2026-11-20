@@ -1,3 +1,4 @@
+import NewsObservation from "@/components/organizations/NewsObservation";
 import { TranslatedText, ContentTranslationNotice } from "@/components/ContentTranslation";
 import Image from "@/components/MediaImage";
 import PageHeader from "@/components/PageHeader";
@@ -72,7 +73,7 @@ export default async function NewsPage({ searchParams }: { searchParams: Promise
         <Link href="/organization-dashboard" className="inline-flex min-h-11 items-center text-text-secondary hover:text-gold">{t("manageOrganization")} →</Link>
       </div>
       {filtered.length ? <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
-        {filtered.map((entry) => <article key={entry.id} className="browse-card overflow-hidden">
+        {filtered.map((entry) => <article key={entry.id} data-news-observation className="browse-card overflow-hidden"><NewsObservation id={entry.id} />
           {entry.image_url ? <div className="aspect-[16/9] overflow-hidden bg-bg-elevated"><Image src={entry.image_url} alt="" width={720} height={405} className="h-full w-full object-cover" /></div> : null}
           <div className="p-5">
             <div className="mb-3 flex flex-wrap gap-2 text-xs text-gold"><span>{t(`entryType.${entry.entry_type}`)}</span>{entry.topic && <><span>·</span><span>{t(`topic.${entry.topic}`)}</span></>}</div>

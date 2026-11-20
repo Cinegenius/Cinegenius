@@ -12578,14 +12578,14 @@
   },
   "AnalyticsPrivacy": {
     "settings": "Ajustes de análisis",
-    "banner": "Las funciones esenciales están siempre activas. Con tu consentimiento, PostHog (UE) analiza visitas a páginas públicas de directorios. Sin grabaciones de sesiones. Puedes cambiar tu elección en los ajustes de análisis.",
+    "banner": "Con tu consentimiento, PostHog (UE) mide visitas a directorios públicos, noticias visibles y aperturas de artículos. Sin grabaciones. Puedes cambiarlo en los ajustes de análisis.",
     "reject": "Solo funciones esenciales",
     "accept": "Permitir análisis",
     "close": "Cerrar",
     "privacy": "Privacidad",
     "storageError": "No se pudo guardar tu elección. El análisis sigue desactivado.",
     "title": "Análisis de uso opcional con PostHog",
-    "disclosure": "Solo con tu consentimiento usamos PostHog, Inc. y su proyecto EU Cloud para analizar páginas públicas de directorios. Enviamos la categoría de página y un identificador aleatorio guardado únicamente en la memoria de esta pestaña. Se excluyen búsquedas, parámetros URL, contenidos, nombres, correos, áreas privadas y formularios. La captura automática de clics, los perfiles personales y las grabaciones están desactivados. La dirección IP se procesa técnicamente para la conexión; su almacenamiento como dato analítico está desactivado. Tu elección se guarda localmente hasta que la cambies o borres los datos del navegador. Puedes rechazar o retirar el consentimiento en cualquier momento; no se capturarán más eventos. Esto no elimina automáticamente los eventos ya enviados.",
+    "disclosure": "Solo con tu consentimiento utilizamos PostHog, Inc. (nube de la UE) para medir categorías de páginas públicas, tarjetas de noticias visibles y aperturas de artículos. Enviamos la categoría, un identificador público del artículo y uno aleatorio en la memoria de la pestaña. No recopilamos búsquedas, parámetros de URL, contenido, datos de cuenta ni áreas privadas; tampoco perfiles personales, clics automáticos ni grabaciones de sesiones. La conexión procesa técnicamente tu IP, pero no se guarda como dato analítico. La redacción recibe únicamente datos agregados con umbrales mínimos, sin listas de personas. Tu elección se guarda localmente hasta que la cambies o borres los datos del navegador. Retirar el consentimiento detiene los eventos nuevos, pero no elimina automáticamente los ya enviados.",
     "providerPrivacy": "Privacidad de PostHog"
   },
   "locationMap": {
@@ -13595,5 +13595,23 @@
     "disable": "Revocar permiso editorial",
     "confirmGrant": "¿Permitir que CineGenius Redaktion publique automáticamente sus propias entradas verificadas de esta organización y oculte sus propias entradas de forma reversible? Las cuentas personales y de soporte no reciben permisos de administración.",
     "name": "CineGenius Redaktion"
+  },
+  "NewsGallery": {
+    "title": "Imágenes",
+    "position": "Imagen {current} de {total}",
+    "creator": "Autoría",
+    "source": "Fuente",
+    "changes": "Cambios",
+    "help": "Opcional: hasta 8 imágenes. Añade una descripción y créditos públicos a las imágenes nuevas. No incluyas documentos privados de autorización.",
+    "addCredits": "Añadir créditos",
+    "altText": "Descripción de la imagen",
+    "caption": "Pie de foto / contexto de archivo",
+    "imageTitle": "Título original",
+    "sourceUrl": "Enlace a la fuente",
+    "licenseName": "Licencia / derechos de uso",
+    "licenseUrl": "Enlace a la licencia (opcional)",
+    "attribution": "Atribución exigida (opcional)",
+    "credit": "Crédito adicional (opcional)",
+    "makeCover": "Usar como portada"
   }
 }

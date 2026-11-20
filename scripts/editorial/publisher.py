@@ -20,6 +20,26 @@ def atomic(path, value):
     path.parent.mkdir(mode=0o700,parents=True,exist_ok=True)
     temp=path.with_suffix('.tmp'); temp.write_text(json.dumps(value,ensure_ascii=False,indent=2)+'\n');temp.chmod(0o600);temp.replace(path)
 
+def wait_child(process,timeout):
+    """Stop the isolated reviewer too if the bounded controller is terminated."""
+    previous=signal.getsignal(signal.SIGTERM)
+    def terminated(signum,frame):raise SystemExit(128+signum)
+    signal.signal(signal.SIGTERM,terminated)
+    try:
+        try:return process.wait(timeout=timeout)
+        except subprocess.TimeoutExpired:raise ValueError('Independent review timed out; nothing changed') from None
+    finally:
+        try:
+            if process.poll() is None:
+                try:os.killpg(process.pid,signal.SIGTERM)
+                except ProcessLookupError:pass
+                try:process.wait(timeout=2)
+                except subprocess.TimeoutExpired:
+                    try:os.killpg(process.pid,signal.SIGKILL)
+                    except ProcessLookupError:pass
+                    process.wait(timeout=2)
+        finally:signal.signal(signal.SIGTERM,previous)
+
 def source_url(value, domains):
     if not isinstance(value,str) or len(value)>2048: raise ValueError('Invalid source')
     u=urllib.parse.urlsplit(value)
@@ -94,6 +114,34 @@ class API:
     def read(self,entry_id):
         rows=self.call('/api/editorial/entries?'+urllib.parse.urlencode({'organizationId':PUBLISHER_ID,'id':entry_id}))['entries']
         return rows[0] if rows else None
+    def upload(self,path,entry_id,expected_sha256,mime):
+        """Private upload with stable retry key; never passes credentials to AI."""
+        if path.is_symlink() or path.stat().st_size>10_000_000:raise ValueError('Invalid local media')
+        raw=path.read_bytes()
+        if hashlib.sha256(raw).hexdigest()!=expected_sha256:raise ValueError('Reviewed image bytes changed')
+        if mime not in ('image/jpeg','image/png'):raise ValueError('Unsupported upload type')
+        key=hashlib.sha256((entry_id+':'+expected_sha256).encode()).hexdigest()[:32]
+        boundary='CineGenius'+uuid.uuid4().hex
+        parts=[]
+        for name,value in [('organizationId',PUBLISHER_ID),('upload_id',key)]:
+            parts.append(('--'+boundary+'\r\nContent-Disposition: form-data; name="'+name+'"\r\n\r\n'+value+'\r\n').encode())
+        parts.extend([('--'+boundary+'\r\nContent-Disposition: form-data; name="file"; filename="editorial.'+('jpg' if mime=='image/jpeg' else 'png')+'"\r\nContent-Type: '+mime+'\r\n\r\n').encode(),raw,('\r\n--'+boundary+'--\r\n').encode()])
+        req=urllib.request.Request(BASE+'/api/editorial/upload',data=b''.join(parts),headers={'Authorization':'Bearer '+self.token,'Content-Type':'multipart/form-data; boundary='+boundary})
+        try:
+            with self.opener.open(req,timeout=40) as response:data=json.load(response)
+        except urllib.error.HTTPError as exc:raise ApiError(exc.code,'media_upload_failed') from None
+        url=data.get('url')
+        if not isinstance(url,str) or not re.fullmatch(r'/api/media/cinegenius-editorial/[a-f0-9]{32}\.(?:jpg|png|webp)',url):raise ValueError('Noncanonical protected media URL')
+        return url
+    def verify_media(self,entry_id,image_url,expected_sha256):
+        query=urllib.parse.urlencode({'organizationId':PUBLISHER_ID,'entryId':entry_id,'imageUrl':image_url})
+        req=urllib.request.Request(BASE+'/api/editorial/media?'+query,headers={'Authorization':'Bearer '+self.token})
+        try:
+            with self.opener.open(req,timeout=40) as response:
+                raw=response.read(10_000_001);digest=response.headers.get('X-Content-SHA256')
+        except urllib.error.HTTPError as exc:raise ApiError(exc.code,'media_readback_failed') from None
+        if len(raw)>10_000_000 or digest!=expected_sha256 or hashlib.sha256(raw).hexdigest()!=expected_sha256:
+            raise ValueError('Saved original media digest differs')
 
 def schema():
     props={k:{'type':'string'} for k in ['reason','title','summary','description','countryCode','city','registrationUrl','startsAt','endsAt']}
@@ -119,12 +167,7 @@ def verify(draft,group,run_dir):
     env.update(CODEX_HOME=str(ROOT/'codex-home'),CODEX_SQLITE_HOME=str(ROOT/'codex-state'),XDG_CACHE_HOME=str(ROOT/'cache'),TMPDIR=str(ROOT/'tmp'))
     with tempfile.TemporaryFile(dir=ROOT/'tmp') as log:
         process=subprocess.Popen(cmd,env=env,stdout=log,stderr=log,start_new_session=True)
-        try:code=process.wait(timeout=240)
-        except subprocess.TimeoutExpired:
-            os.killpg(process.pid,signal.SIGTERM)
-            try:process.wait(timeout=10)
-            except subprocess.TimeoutExpired:os.killpg(process.pid,signal.SIGKILL);process.wait()
-            raise ValueError('Review timed out; nothing published') from None
+        code=wait_child(process,240)
     if code or not output.exists() or output.stat().st_size>64000 or output.is_symlink():raise ValueError('Review failed')
     reviewed=json.loads(output.read_text()); reviewed['checkedAt']=now();return reviewed
 
@@ -153,24 +196,35 @@ def matches(row,doc):
         elif actual!=wanted:return False
     if doc.get('city') and (row.get('place_status')!='verified' or not row.get('place_city_id') or str(row.get('place_city_name','')).casefold()!=doc['city'].casefold()):return False
     if not doc.get('city') and (row.get('place_city_id') or row.get('city')):return False
-    return not row.get('image_url')
+    if (row.get('image_url') or None)!=(doc.get('imageUrl') or None):return False
+    return (row.get('image_gallery') or [])==(doc.get('imageGallery') or [])
 
-def publish(api,draft,review,domains,ledger):
+def publish(api,draft,review,domains,ledger,run_dir=None):
     doc=document(draft,review,domains)
     identity=source_url(draft['sourceUrl'],domains)+'\n'+(draft.get('editionOrVersion') or '')
     entry_id=str(uuid.uuid5(uuid.NAMESPACE_URL,'cinegenius-editorial:'+identity))
     atomic(ledger,{'state':'started','entryId':entry_id,'sourceUrl':doc['externalUrl'],'at':now()})
     row=api.read(entry_id)
     if row and row['moderation_status'] in ['approved','ended']:
-        atomic(ledger,{'state':'published','entryId':entry_id,'at':now(),'recovered':True});return row
+        if row.get('last_actor_user_id')!='cinegenius-editorial' or row.get('author_user_id')!='cinegenius-editorial' or row.get('external_url')!=doc['externalUrl']:
+            raise ValueError('Published entry changed by another actor; preserve without adoption')
+        atomic(ledger,{'state':'published','entryId':entry_id,'slug':row['slug'],'sourceUrl':doc['externalUrl'],'at':now(),'recovered':True})
+        return {**row,'_publicationRecovered':True}
     if row and (row['moderation_status'] not in ['draft','submitted'] or row['last_actor_user_id']!='cinegenius-editorial' or row.get('reviewed_by') or row.get('moderation_reason')):raise ValueError('Human restriction or change; preserve current entry')
+    media_records=[]
+    if (ROOT/'media/enabled').exists():
+        from media_bridge import prepare_for_entry
+        gallery,media_records=prepare_for_entry(api,entry_id,draft,review,run_dir,row)
+        if gallery:doc.update(imageUrl=gallery[0]['url'],imageGallery=gallery)
     if not row:
         # A lost response is recovered by reading this SAME stable ID next run.
         api.call('/api/editorial/entries',{**doc,'id':entry_id,'expectedUpdatedAt':None,'submit':False});row=api.read(entry_id)
     if not matches(row,doc):raise ValueError('Stored content differs; do not overwrite')
+    for item in media_records:api.verify_media(entry_id,item['protectedUrl'],item['sha256'])
     if row['moderation_status']=='draft':
         api.call('/api/editorial/entries',{**doc,'id':entry_id,'expectedUpdatedAt':row['updated_at'],'submit':True});row=api.read(entry_id)
     if not matches(row,doc):raise ValueError('Submitted readback differs')
+    for item in media_records:api.verify_media(entry_id,item['protectedUrl'],item['sha256'])
     document(draft,review,domains) # publication must still be inside freshness window
     api.call('/api/editorial/entries/moderation',{'id':entry_id,'expectedUpdatedAt':row['updated_at'],'action':'publish','sourceUrl':doc['externalUrl'],'checkedAt':review['checkedAt'],'verified':True,'reason':review['reason'][:500]})
     row=api.read(entry_id)
@@ -200,7 +254,7 @@ def main():
                 if review['decision']!='publish':
                     atomic(ledger,{'state':'held','reason':review['reason'][:500],'at':now()});receipt.update(state='held',reason=review['reason'][:500])
                 else:
-                    row=publish(API(),draft,review,group['allowedDomains'],ledger);receipt.update(state='published',entryId=row['id'],publications=1)
+                    row=publish(API(),draft,review,group['allowedDomains'],ledger,run_dir);receipt.update(state='published',entryId=row['id'],publications=0 if row.get('_publicationRecovered') else 1,recovered=bool(row.get('_publicationRecovered')))
             except ApiError as exc:
                 receipt.update(state='duplicate' if exc.status==409 and 'duplicate' in exc.code else 'retry',error=str(exc))
                 if receipt['state']=='duplicate':atomic(ledger,receipt)

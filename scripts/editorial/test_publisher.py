@@ -19,6 +19,8 @@ class FakeAPI:
 class PublisherTests(unittest.TestCase):
  def setUp(self):
   self.tmp=tempfile.TemporaryDirectory();self.path=Path(self.tmp.name)/'ledger.json'
+  self.root_patch=patch.object(p,'ROOT',Path(self.tmp.name));self.root_patch.start()
+  self.addCleanup(self.root_patch.stop)
   self.draft={'sourceUrl':'https://www.ffa.de/article?meldung=film','editionOrVersion':'2026'}
   self.review={k:'' for k in p.FIELDS};self.review.update(decision='publish',reason='Official details checked',title='Verified industry news',summary='Original short news summary.',description='An original account of the verified public announcement, with named factual source.',entryType='news',format='online',topic='industry',countryCode='DE',checkedAt=p.now())
  def tearDown(self):self.tmp.cleanup()

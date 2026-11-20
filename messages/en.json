@@ -12578,14 +12578,14 @@
   },
   "AnalyticsPrivacy": {
     "settings": "Analytics settings",
-    "banner": "Essential features are always active. With your consent, PostHog (EU) analyzes visits to public directory pages. No session recordings. You can change your choice at any time in analytics settings.",
+    "banner": "With your consent, PostHog (EU) measures public directory visits, visible news cards and article opens. No recordings. Change your choice anytime in analytics settings.",
     "reject": "Essential features only",
     "accept": "Allow analytics",
     "close": "Close",
     "privacy": "Privacy",
     "storageError": "Your choice could not be saved. Analytics remains off.",
     "title": "Optional usage analytics with PostHog",
-    "disclosure": "Only with your consent, we use PostHog, Inc. and its EU Cloud project to analyze public directory pages. We send the page category and a random identifier held only in this tab’s memory. Search terms, URL parameters, page content, names, email addresses, private areas and forms are excluded. Automatic click capture, person profiles and session recordings are disabled. The IP address is technically processed for the connection; storing it as an analytics property is disabled. Your choice is stored locally in your browser until you change it or clear browser data. You can decline or withdraw at any time; no further analytics events will then be captured. This does not automatically delete events already sent.",
+    "disclosure": "Only with your consent do we use PostHog, Inc. (EU Cloud) to measure public page categories, visible news cards and article opens. We send the category, a public article ID and a random identifier held in tab memory. No search text, URL parameters, content, account data or private areas; no person profiles, automatic click capture or session recordings. The connection technically processes your IP address; it is not stored as an analytics property. Editors receive only aggregated values with minimum sample thresholds, not lists of people. Your choice is stored locally until you change it or clear browser data. Withdrawal stops new events; previously sent events are not automatically deleted.",
     "providerPrivacy": "PostHog privacy notice"
   },
   "locationMap": {
@@ -13595,5 +13595,23 @@
     "disable": "Revoke editorial authority",
     "confirmGrant": "Allow CineGenius Redaktion to automatically publish its own checked entries for this organization and reversibly hide its own entries? Personal accounts and Support receive no admin permissions.",
     "name": "CineGenius Redaktion"
+  },
+  "NewsGallery": {
+    "title": "Images",
+    "position": "Image {current} of {total}",
+    "creator": "Creator",
+    "source": "Source",
+    "changes": "Changes",
+    "help": "Optional: up to 8 images. Add a description and public image credits for new images. Do not include private permission documents.",
+    "addCredits": "Add image credits",
+    "altText": "Image description",
+    "caption": "Caption / archive context",
+    "imageTitle": "Original title",
+    "sourceUrl": "Source link",
+    "licenseName": "License / usage rights",
+    "licenseUrl": "License link (optional)",
+    "attribution": "Required attribution (optional)",
+    "credit": "Additional credit (optional)",
+    "makeCover": "Use as cover"
   }
 }

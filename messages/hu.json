@@ -12578,14 +12578,14 @@
   },
   "AnalyticsPrivacy": {
     "settings": "Analitikai beállítások",
-    "banner": "Az alapvető funkciók mindig aktívak. Hozzájárulásoddal a PostHog (EU) elemzi a nyilvános áttekintőoldalak látogatását. Nincs munkamenetrögzítés. Döntésedet bármikor módosíthatod az analitikai beállításokban.",
+    "banner": "Hozzájárulásoddal a PostHog (EU) méri a nyilvános oldalak látogatását, a látható híreket és a megnyitott cikkeket. Felvétel nélkül. Az elemzési beállításokban bármikor módosítható.",
     "reject": "Csak alapvető funkciók",
     "accept": "Analitika engedélyezése",
     "close": "Bezárás",
     "privacy": "Adatvédelem",
     "storageError": "A választás nem menthető. Az analitika kikapcsolva marad.",
     "title": "Opcionális használatelemzés a PostHoggal",
-    "disclosure": "Csak hozzájárulásoddal használjuk a PostHog, Inc. EU Cloud projektjét a nyilvános áttekintőoldalak elemzésére. Az oldal kategóriáját és egy kizárólag e lap memóriájában tárolt véletlen azonosítót küldünk. Keresések, URL-paraméterek, tartalmak, nevek, e-mail-címek, privát részek és űrlapok nem kerülnek rögzítésre. Az automatikus kattintásgyűjtés, személyprofilok és munkamenetrögzítés ki vannak kapcsolva. Az IP-cím a kapcsolathoz technikailag feldolgozásra kerül; analitikai adatként nem tároljuk. Döntésedet helyben tároljuk, amíg meg nem változtatod vagy törlöd a böngészőadatokat. Bármikor elutasíthatod vagy visszavonhatod a hozzájárulást; további eseményeket nem rögzítünk. Ez a már elküldött eseményeket nem törli automatikusan.",
+    "disclosure": "Csak hozzájárulásoddal használjuk a PostHog, Inc. EU-felhőjét a nyilvános oldalkategóriák, látható hírkártyák és cikkmegnyitások mérésére. Az oldalkategóriát, a cikk nyilvános azonosítóját és a böngészőlap memóriájában tárolt véletlen azonosítót küldjük el. Keresések, URL-paraméterek, tartalmak, fiókadatok és privát területek nem kerülnek átadásra; nincs személyprofil, automatikus kattintáskövetés vagy munkamenet-felvétel. A kapcsolat technikailag feldolgozza az IP-címet, de nem tárolja elemzési adatként. A szerkesztőség csak minimumküszöbökhöz kötött összesített értékeket kap, személylistákat nem. Választásod helyben tárolódik a módosításig vagy a böngészőadatok törléséig. Visszavonás után új eseményeket nem küldünk, a korábbiak nem törlődnek automatikusan.",
     "providerPrivacy": "A PostHog adatvédelmi tájékoztatója"
   },
   "locationMap": {
@@ -13595,5 +13595,23 @@
     "disable": "Szerkesztői jogosultság visszavonása",
     "confirmGrant": "Engedélyezi a CineGenius Redaktion számára a szervezet saját, ellenőrzött bejegyzéseinek automatikus közzétételét és saját bejegyzéseinek visszaállítható elrejtését? A személyes és támogatási fiókok nem kapnak rendszergazdai jogosultságot.",
     "name": "CineGenius Redaktion"
+  },
+  "NewsGallery": {
+    "title": "Képek",
+    "position": "{current}. kép / {total}",
+    "creator": "Alkotó",
+    "source": "Forrás",
+    "changes": "Módosítások",
+    "help": "Nem kötelező: legfeljebb 8 kép. Az új képekhez adj leírást és nyilvános forrás- és jogi adatokat. Ne csatolj magánjellegű engedélyeket.",
+    "addCredits": "Képforrások megadása",
+    "altText": "Képleírás",
+    "caption": "Képaláírás / archív háttér",
+    "imageTitle": "Eredeti cím",
+    "sourceUrl": "Forráshivatkozás",
+    "licenseName": "Licenc / felhasználási jog",
+    "licenseUrl": "Licenchivatkozás (nem kötelező)",
+    "attribution": "Előírt névfeltüntetés (nem kötelező)",
+    "credit": "További forrásadat (nem kötelező)",
+    "makeCover": "Beállítás borítóképként"
   }
 }

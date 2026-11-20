@@ -12578,14 +12578,14 @@
   },
   "AnalyticsPrivacy": {
     "settings": "Analysinställningar",
-    "banner": "Nödvändiga funktioner är alltid aktiva. Med ditt samtycke analyserar PostHog (EU) besök på offentliga översiktssidor. Inga sessionsinspelningar. Du kan ändra ditt val när som helst i analysinställningarna.",
+    "banner": "Med ditt samtycke mäter PostHog (EU) besök på offentliga översikter, synliga nyheter och öppnade artiklar. Inga inspelningar. Ändra när som helst i analysinställningarna.",
     "reject": "Endast nödvändiga funktioner",
     "accept": "Tillåt analys",
     "close": "Stäng",
     "privacy": "Integritet",
     "storageError": "Ditt val kunde inte sparas. Analysen förblir avstängd.",
     "title": "Frivillig användningsanalys med PostHog",
-    "disclosure": "Endast med ditt samtycke använder vi PostHog, Inc. och dess EU Cloud-projekt för att analysera offentliga översiktssidor. Vi skickar sidkategorin och en slumpmässig identifierare som bara finns i flikens minne. Sökord, URL-parametrar, innehåll, namn, e-postadresser, privata områden och formulär utesluts. Automatisk klickregistrering, personprofiler och sessionsinspelningar är avstängda. IP-adressen behandlas tekniskt för anslutningen; lagring som analysuppgift är avstängd. Ditt val sparas lokalt tills du ändrar det eller raderar webbläsardata. Du kan alltid avvisa eller återkalla samtycket; inga fler händelser registreras då. Händelser som redan skickats raderas inte automatiskt.",
+    "disclosure": "Endast med ditt samtycke använder vi PostHog, Inc. (EU-molnet) för att mäta offentliga sidkategorier, synliga nyhetskort och artikelöppningar. Vi skickar kategorin, ett offentligt artikel-ID och en slumpmässig identifierare i flikens minne. Inga söktexter, URL-parametrar, innehåll, kontouppgifter eller privata områden; inga personprofiler, automatisk klickinsamling eller sessionsinspelningar. Anslutningen behandlar tekniskt IP-adressen men lagrar den inte som analysuppgift. Redaktionen får endast sammanställda värden med minimitrösklar, inga personlistor. Valet lagras lokalt tills du ändrar det eller raderar webbläsardata. Återkallande stoppar nya händelser; tidigare skickade raderas inte automatiskt.",
     "providerPrivacy": "PostHogs integritetspolicy"
   },
   "locationMap": {
@@ -13595,5 +13595,23 @@
     "disable": "Återkalla redaktionell behörighet",
     "confirmGrant": "Tillåta att CineGenius Redaktion automatiskt publicerar egna kontrollerade inlägg för organisationen och döljer egna inlägg så att de kan återställas? Personliga konton och Support får inga administratörsrättigheter.",
     "name": "CineGenius Redaktion"
+  },
+  "NewsGallery": {
+    "title": "Bilder",
+    "position": "Bild {current} av {total}",
+    "creator": "Upphovsperson",
+    "source": "Källa",
+    "changes": "Ändringar",
+    "help": "Valfritt: upp till 8 bilder. Lägg till beskrivning och offentliga bildkrediter för nya bilder. Bifoga inga privata tillståndsdokument.",
+    "addCredits": "Lägg till bildkrediter",
+    "altText": "Bildbeskrivning",
+    "caption": "Bildtext / arkivsammanhang",
+    "imageTitle": "Originaltitel",
+    "sourceUrl": "Källänk",
+    "licenseName": "Licens / användningsrätt",
+    "licenseUrl": "Licenslänk (valfritt)",
+    "attribution": "Krävd namnangivelse (valfritt)",
+    "credit": "Ytterligare bildkredit (valfritt)",
+    "makeCover": "Använd som omslag"
   }
 }

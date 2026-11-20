@@ -12578,14 +12578,14 @@
   },
   "AnalyticsPrivacy": {
     "settings": "Impostazioni di analisi",
-    "banner": "Le funzioni essenziali sono sempre attive. Con il tuo consenso, PostHog (UE) analizza le visite alle pagine pubbliche degli elenchi. Nessuna registrazione delle sessioni. Puoi cambiare scelta nelle impostazioni di analisi.",
+    "banner": "Con il tuo consenso, PostHog (UE) misura visite agli elenchi pubblici, notizie visibili e aperture degli articoli. Nessuna registrazione. Puoi cambiare scelta nelle impostazioni di analisi.",
     "reject": "Solo funzioni essenziali",
     "accept": "Consenti analisi",
     "close": "Chiudi",
     "privacy": "Privacy",
     "storageError": "Impossibile salvare la scelta. L’analisi resta disattivata.",
     "title": "Analisi facoltativa con PostHog",
-    "disclosure": "Solo con il tuo consenso utilizziamo PostHog, Inc. e il suo progetto EU Cloud per analizzare le pagine pubbliche degli elenchi. Inviamo la categoria della pagina e un identificatore casuale conservato solo nella memoria di questa scheda. Sono esclusi ricerche, parametri URL, contenuti, nomi, email, aree private e moduli. Acquisizione automatica dei clic, profili personali e registrazioni sono disattivati. L’indirizzo IP viene tecnicamente elaborato per la connessione; la sua memorizzazione come dato analitico è disattivata. La scelta è salvata localmente finché non la cambi o cancelli i dati del browser. Puoi rifiutare o revocare il consenso in qualsiasi momento; non saranno raccolti altri eventi. Gli eventi già inviati non vengono eliminati automaticamente.",
+    "disclosure": "Solo con il tuo consenso usiamo PostHog, Inc. (cloud UE) per misurare categorie di pagine pubbliche, schede delle notizie visibili e aperture degli articoli. Inviamo categoria, ID pubblico dell’articolo e identificatore casuale nella memoria della scheda. Nessuna ricerca, parametro URL, contenuto, dato dell’account o area privata; nessun profilo personale, rilevamento automatico dei clic o registrazione delle sessioni. La connessione elabora tecnicamente l’IP, senza salvarlo come dato di analisi. La redazione riceve solo valori aggregati con soglie minime, senza elenchi di persone. La scelta resta salvata localmente finché non la cambi o cancelli i dati del browser. La revoca blocca i nuovi eventi, senza eliminare automaticamente quelli già inviati.",
     "providerPrivacy": "Informativa privacy di PostHog"
   },
   "locationMap": {
@@ -13595,5 +13595,23 @@
     "disable": "Revoca autorizzazione editoriale",
     "confirmGrant": "Consentire a CineGenius Redaktion di pubblicare automaticamente i propri contributi verificati di questa organizzazione e nascondere i propri contributi in modo reversibile? Gli account personali e di supporto non ricevono permessi amministrativi.",
     "name": "CineGenius Redaktion"
+  },
+  "NewsGallery": {
+    "title": "Immagini",
+    "position": "Immagine {current} di {total}",
+    "creator": "Autore",
+    "source": "Fonte",
+    "changes": "Modifiche",
+    "help": "Facoltativo: fino a 8 immagini. Aggiungi descrizione e crediti pubblici alle nuove immagini. Non inserire documenti privati di autorizzazione.",
+    "addCredits": "Aggiungi crediti",
+    "altText": "Descrizione immagine",
+    "caption": "Didascalia / contesto di archivio",
+    "imageTitle": "Titolo originale",
+    "sourceUrl": "Link alla fonte",
+    "licenseName": "Licenza / diritti d’uso",
+    "licenseUrl": "Link alla licenza (facoltativo)",
+    "attribution": "Attribuzione richiesta (facoltativa)",
+    "credit": "Credito aggiuntivo (facoltativo)",
+    "makeCover": "Usa come copertina"
   }
 }

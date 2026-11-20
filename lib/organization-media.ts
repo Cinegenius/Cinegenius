@@ -1,6 +1,7 @@
 import "server-only";
 import { db } from "@/lib/db";
 import { protectedMediaKey, protectedMediaUrl } from "@/lib/protected-media";
+import { NEWS_GALLERY_LIMIT, parseNewsGallery } from "@/lib/news-gallery";
 
 export type OrganizationMediaSource = "organization" | "organization_entry";
 
@@ -28,4 +29,15 @@ export async function validateOrganizationMediaReference(
   const existingAssignment = data.source_type === sourceType && data.source_id === sourceId;
   if (!ownedUpload && !existingAssignment) return { error: "media" as const };
   return { url: referenceUrl };
+}
+
+export async function validateNewsGallery(value: unknown, ownerUserId: string, entryId: string, cover: string | null) {
+  if (value === undefined) return { gallery: undefined };
+  const gallery = parseNewsGallery(value);
+  if (!gallery || new Set([...(cover ? [cover] : []), ...gallery.map(image => image.url)]).size > NEWS_GALLERY_LIMIT) return { error: "media" as const };
+  for (const image of gallery) {
+    const checked = await validateOrganizationMediaReference(image.url, ownerUserId, "organization_entry", entryId);
+    if (checked.error) return { error: "media" as const };
+  }
+  return { gallery };
 }

@@ -14,7 +14,7 @@ export async function translationSource(ref: ContentReference, viewerId: string 
   let owner: string | null = null;
   let names: string[] = [];
   if (ref.kind === "news") {
-    const result = await db.from("organization_entries").select("title,summary,description,organization:organizations!inner(name,moderation_status)")
+    const result = await db.from("organization_entries").select("title,summary,description,image_gallery,organization:organizations!inner(name,moderation_status)")
       .eq("id", ref.id).in("moderation_status", ["approved", "ended"]).eq("organization.moderation_status", "approved").abortSignal(signal).maybeSingle();
     if (result.error) throw new Error("source_unavailable");
     row = result.data;

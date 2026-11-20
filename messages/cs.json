@@ -12578,14 +12578,14 @@
   },
   "AnalyticsPrivacy": {
     "settings": "Nastavení analytiky",
-    "banner": "Nezbytné funkce jsou vždy aktivní. S vaším souhlasem PostHog (EU) analyzuje návštěvy veřejných přehledových stránek. Bez záznamu relací. Volbu můžete kdykoli změnit v nastavení analytiky.",
+    "banner": "S tvým souhlasem PostHog (EU) měří návštěvy veřejných přehledů, viditelné zprávy a otevřené články. Bez nahrávání. Volbu lze změnit v nastavení analýzy.",
     "reject": "Jen nezbytné funkce",
     "accept": "Povolit analytiku",
     "close": "Zavřít",
     "privacy": "Ochrana soukromí",
     "storageError": "Volbu se nepodařilo uložit. Analytika zůstává vypnutá.",
     "title": "Volitelná analytika s PostHog",
-    "disclosure": "Pouze s vaším souhlasem používáme PostHog, Inc. a projekt EU Cloud k analýze veřejných přehledových stránek. Odesíláme kategorii stránky a náhodný identifikátor uložený jen v paměti této karty. Vyhledávání, parametry URL, obsah, jména, e-maily, soukromé části a formuláře jsou vyloučeny. Automatický sběr kliknutí, osobní profily a záznam relací jsou vypnuty. IP adresa se technicky zpracovává pro připojení; její ukládání jako analytického údaje je vypnuto. Volbu ukládáme místně, dokud ji nezměníte nebo nesmažete data prohlížeče. Souhlas můžete kdykoli odmítnout či odvolat; další události se nebudou zaznamenávat. Již odeslané události se tím automaticky nevymažou.",
+    "disclosure": "Pouze s tvým souhlasem používáme PostHog, Inc. (cloud EU) k měření kategorií veřejných stránek, viditelných karet zpráv a otevření článků. Odesíláme kategorii, veřejné ID článku a náhodný identifikátor v paměti karty. Bez hledaných textů, parametrů URL, obsahu, údajů účtu či soukromých oblastí; bez osobních profilů, automatického sledování kliknutí a záznamů relací. Spojení technicky zpracuje IP adresu, ale neukládá ji jako analytický údaj. Redakce dostává jen souhrnné hodnoty s minimálními prahy, nikoli seznamy osob. Volba je místně uložená, dokud ji nezměníš nebo nevymažeš data prohlížeče. Odvolání zastaví nové události; dříve odeslané automaticky nesmaže.",
     "providerPrivacy": "Ochrana soukromí PostHog"
   },
   "locationMap": {
@@ -13595,5 +13595,23 @@
     "disable": "Odebrat redakční oprávnění",
     "confirmGrant": "Povolit službě CineGenius Redaktion automaticky zveřejňovat vlastní ověřené příspěvky této organizace a vratně skrývat vlastní příspěvky? Osobní účty ani podpora nezískají oprávnění správce.",
     "name": "CineGenius Redaktion"
+  },
+  "NewsGallery": {
+    "title": "Obrázky",
+    "position": "Obrázek {current} z {total}",
+    "creator": "Autor",
+    "source": "Zdroj",
+    "changes": "Úpravy",
+    "help": "Volitelné: až 8 obrázků. K novým obrázkům doplň popis a veřejné údaje o původu a právech. Nevkládej soukromá povolení.",
+    "addCredits": "Doplnit údaje o obrázku",
+    "altText": "Popis obrázku",
+    "caption": "Popisek / archivní kontext",
+    "imageTitle": "Původní název",
+    "sourceUrl": "Odkaz na zdroj",
+    "licenseName": "Licence / práva k užití",
+    "licenseUrl": "Odkaz na licenci (volitelné)",
+    "attribution": "Požadované uvedení autorství (volitelné)",
+    "credit": "Další údaje o původu (volitelné)",
+    "makeCover": "Použít jako titulní obrázek"
   }
 }

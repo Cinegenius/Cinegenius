@@ -1,3 +1,4 @@
+import NewsObservation from "@/components/organizations/NewsObservation";
 import { TranslatedText } from "@/components/ContentTranslation";
 import Link from "next/link";
 import { db } from "@/lib/db";
@@ -50,7 +51,7 @@ export default async function OrganizationPage({ params }: { params: Promise<{ s
         </section>
       )}
       <h2 className="font-serif text-3xl text-text-primary">{t("organizationEntries")}</h2>
-      {entries.length ? <div className="mt-6 grid gap-4 md:grid-cols-2">{entries.map((entry) => <Link key={entry.id} href={`/news/${organization.slug}/${entry.slug}`} className="browse-card p-5"><span className="text-xs text-gold">{t(`entryType.${entry.entry_type}`)}</span><h3 className="mt-2 text-xl font-semibold text-text-primary"><TranslatedText kind="news" id={entry.id} field="title">{entry.title}</TranslatedText></h3>{entry.summary && <p className="mt-2 line-clamp-2 text-sm text-text-secondary"><TranslatedText kind="news" id={entry.id} field="summary">{entry.summary}</TranslatedText></p>}</Link>)}</div> : <p className="mt-4 text-text-muted">{t("emptyOrganization")}</p>}
+      {entries.length ? <div className="mt-6 grid gap-4 md:grid-cols-2">{entries.map((entry) => <Link key={entry.id} href={`/news/${organization.slug}/${entry.slug}`} className="browse-card p-5" data-news-observation><NewsObservation id={entry.id} /><span className="text-xs text-gold">{t(`entryType.${entry.entry_type}`)}</span><h3 className="mt-2 text-xl font-semibold text-text-primary"><TranslatedText kind="news" id={entry.id} field="title">{entry.title}</TranslatedText></h3>{entry.summary && <p className="mt-2 line-clamp-2 text-sm text-text-secondary"><TranslatedText kind="news" id={entry.id} field="summary">{entry.summary}</TranslatedText></p>}</Link>)}</div> : <p className="mt-4 text-text-muted">{t("emptyOrganization")}</p>}
     </section>
   </main>;
 }

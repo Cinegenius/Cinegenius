@@ -1,3 +1,4 @@
+import NewsObservation from "@/components/organizations/NewsObservation";
 import { TranslatedText } from "@/components/ContentTranslation";
 import Link from 'next/link';
 import Image from '@/components/MediaImage';
@@ -47,7 +48,8 @@ export default async function HomeOrganizations() {
     {entries.slice(page * 3, page * 3 + 3).map(entry => {
      const org = (Array.isArray(entry.organization) ? entry.organization[0] : entry.organization) as unknown as {slug:string;name:string;logo_url:string|null};
      const date = entry.entry_type === 'news' ? entry.created_at : entry.starts_at;
-     return <article key={entry.id} className="grid min-w-0 grid-cols-[minmax(0,1fr)_6rem] items-start gap-x-3 rounded-xl border border-border bg-bg-secondary px-3 py-1 sm:grid-cols-[minmax(0,1fr)_8rem] lg:grid-cols-[minmax(0,1fr)_9rem]">
+     return <article key={entry.id} data-news-observation className="grid min-w-0 grid-cols-[minmax(0,1fr)_6rem] items-start gap-x-3 rounded-xl border border-border bg-bg-secondary px-3 py-1 sm:grid-cols-[minmax(0,1fr)_8rem] lg:grid-cols-[minmax(0,1fr)_9rem]">
+      <NewsObservation id={entry.id} />
       <Link href={`/news/${org.slug}/${entry.slug}`} className="group flex min-h-11 min-w-0 items-start gap-3 py-1">
        {entry.image_url && <Image src={entry.image_url} alt="" width={80} height={56} sizes="80px" className="mt-0.5 hidden h-14 w-20 shrink-0 rounded-md object-cover sm:block"/>}
        <div className="min-w-0 flex-1">

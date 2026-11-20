@@ -12744,14 +12744,14 @@
   },
   "AnalyticsPrivacy": {
     "settings": "Paramètres d’analyse",
-    "banner": "Les fonctionnalités essentielles sont toujours actives. Avec votre consentement, PostHog (UE) analyse les visites des pages publiques du répertoire. Pas d’enregistrements de session. Vous pouvez modifier votre choix à tout moment dans les paramètres d’analyse.",
+    "banner": "Avec votre accord, PostHog (UE) mesure les visites des annuaires publics, les actualités visibles et les articles ouverts. Aucun enregistrement. Modifiable dans les réglages d’analyse.",
     "reject": "Fonctionnalités essentielles uniquement",
     "accept": "Autoriser l’analyse",
     "close": "Fermer",
     "privacy": "Confidentialité",
     "storageError": "Votre choix n’a pas pu être enregistré. L’analyse reste désactivée.",
     "title": "Analyse d’utilisation optionnelle avec PostHog",
-    "disclosure": "Uniquement avec votre consentement, nous utilisons PostHog, Inc. et son projet Cloud UE pour analyser les pages publiques du répertoire. Nous envoyons la catégorie de la page et un identifiant aléatoire conservé uniquement en mémoire dans cet onglet. Les termes de recherche, paramètres d’URL, contenu des pages, noms, adresses e-mail, zones privées et formulaires sont exclus. La capture automatique des clics, les profils personnels et les enregistrements de session sont désactivés. L’adresse IP est techniquement traitée pour la connexion ; son stockage comme propriété d’analyse est désactivé. Votre choix est stocké localement dans votre navigateur jusqu’à modification ou suppression des données. Vous pouvez refuser ou retirer votre consentement à tout moment ; aucun événement d’analyse supplémentaire ne sera alors capturé. Cela ne supprime pas automatiquement les événements déjà envoyés.",
+    "disclosure": "Uniquement avec votre consentement, nous utilisons PostHog, Inc. (cloud UE) pour mesurer les catégories de pages publiques, les cartes d’actualités visibles et les articles ouverts. Nous transmettons la catégorie, un identifiant public d’article et un identifiant aléatoire en mémoire dans l’onglet. Aucun texte de recherche, paramètre d’URL, contenu, donnée de compte ou espace privé ; aucun profil personnel, suivi automatique des clics ou enregistrement de session. La connexion traite techniquement votre adresse IP, sans la stocker comme propriété d’analyse. La rédaction reçoit uniquement des valeurs agrégées soumises à des seuils minimaux, sans liste de personnes. Votre choix reste enregistré localement jusqu’à sa modification ou l’effacement des données du navigateur. Le retrait arrête les nouveaux événements, sans supprimer automatiquement ceux déjà transmis.",
     "providerPrivacy": "Avis de confidentialité PostHog"
   },
   "locationMap": {
@@ -13595,5 +13595,23 @@
     "disable": "Retirer le droit éditorial",
     "confirmGrant": "Autoriser CineGenius Redaktion à publier automatiquement ses propres contributions vérifiées pour cette organisation et à masquer ses contributions de façon réversible ? Les comptes personnels et de support ne reçoivent aucun droit d’administration.",
     "name": "CineGenius Redaktion"
+  },
+  "NewsGallery": {
+    "title": "Images",
+    "position": "Image {current} sur {total}",
+    "creator": "Auteur",
+    "source": "Source",
+    "changes": "Modifications",
+    "help": "Facultatif : jusqu’à 8 images. Ajoutez une description et les crédits publics des nouvelles images. Aucun document privé d’autorisation.",
+    "addCredits": "Ajouter les crédits",
+    "altText": "Description de l’image",
+    "caption": "Légende / contexte d’archive",
+    "imageTitle": "Titre original",
+    "sourceUrl": "Lien vers la source",
+    "licenseName": "Licence / droits d’utilisation",
+    "licenseUrl": "Lien vers la licence (facultatif)",
+    "attribution": "Attribution exigée (facultatif)",
+    "credit": "Crédit supplémentaire (facultatif)",
+    "makeCover": "Utiliser en couverture"
   }
 }

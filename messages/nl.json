@@ -12578,14 +12578,14 @@
   },
   "AnalyticsPrivacy": {
     "settings": "Analyse-instellingen",
-    "banner": "Noodzakelijke functies zijn altijd actief. Met je toestemming analyseert PostHog (EU) bezoeken aan openbare overzichtspagina’s. Geen sessieopnamen. Je kunt je keuze altijd wijzigen via de analyse-instellingen.",
+    "banner": "Met je toestemming meet PostHog (EU) bezoeken aan openbare overzichten, zichtbare nieuwskaarten en geopende artikelen. Geen opnames. Altijd aanpasbaar via de analyse-instellingen.",
     "reject": "Alleen noodzakelijke functies",
     "accept": "Analyse toestaan",
     "close": "Sluiten",
     "privacy": "Privacy",
     "storageError": "Je keuze kon niet worden opgeslagen. Analyse blijft uitgeschakeld.",
     "title": "Vrijwillige gebruiksanalyse met PostHog",
-    "disclosure": "Alleen met je toestemming gebruiken we PostHog, Inc. en het EU Cloud-project om openbare overzichtspagina’s te analyseren. We verzenden de paginacategorie en een willekeurige identificatie die alleen in het geheugen van dit tabblad staat. Zoektermen, URL-parameters, inhoud, namen, e-mailadressen, privégebieden en formulieren zijn uitgesloten. Automatische klikregistratie, persoonsprofielen en sessieopnamen zijn uitgeschakeld. Het IP-adres wordt technisch verwerkt voor de verbinding; opslag als analysegegeven is uitgeschakeld. Je keuze wordt lokaal bewaard totdat je deze wijzigt of browsergegevens wist. Je kunt altijd weigeren of je toestemming intrekken; verdere gebeurtenissen worden dan niet geregistreerd. Eerder verzonden gebeurtenissen worden hierdoor niet automatisch verwijderd.",
+    "disclosure": "Alleen met je toestemming gebruiken we PostHog, Inc. (EU-cloud) voor openbare paginacategorieën, zichtbare nieuwskaarten en geopende artikelen. We versturen de categorie, een openbaar artikel-ID en een willekeurige code in het geheugen van het tabblad. Geen zoekteksten, URL-parameters, inhoud, accountgegevens of privépagina’s; geen persoonsprofielen, automatische klikregistratie of sessieopnames. De verbinding verwerkt technisch je IP-adres, maar slaat het niet op als analysekenmerk. De redactie ontvangt alleen totalen met minimumdrempels, geen personenlijsten. Je keuze blijft lokaal bewaard totdat je die wijzigt of browsergegevens wist. Intrekken stopt nieuwe gebeurtenissen; eerder verstuurde worden niet automatisch verwijderd.",
     "providerPrivacy": "Privacyverklaring van PostHog"
   },
   "locationMap": {
@@ -13595,5 +13595,23 @@
     "disable": "Redactionele bevoegdheid intrekken",
     "confirmGrant": "CineGenius Redaktion toestaan eigen gecontroleerde bijdragen van deze organisatie automatisch te publiceren en eigen bijdragen herstelbaar te verbergen? Persoonlijke accounts en Support krijgen geen beheerdersrechten.",
     "name": "CineGenius Redaktion"
+  },
+  "NewsGallery": {
+    "title": "Afbeeldingen",
+    "position": "Afbeelding {current} van {total}",
+    "creator": "Maker",
+    "source": "Bron",
+    "changes": "Wijzigingen",
+    "help": "Optioneel: maximaal 8 afbeeldingen. Voeg bij nieuwe afbeeldingen een beschrijving en openbare bronvermelding toe. Geen privétoestemmingsdocumenten.",
+    "addCredits": "Bronvermelding toevoegen",
+    "altText": "Afbeeldingsbeschrijving",
+    "caption": "Bijschrift / archiefcontext",
+    "imageTitle": "Oorspronkelijke titel",
+    "sourceUrl": "Bronlink",
+    "licenseName": "Licentie / gebruiksrechten",
+    "licenseUrl": "Licentielink (optioneel)",
+    "attribution": "Verplichte naamsvermelding (optioneel)",
+    "credit": "Extra vermelding (optioneel)",
+    "makeCover": "Als omslag gebruiken"
   }
 }

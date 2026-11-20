@@ -33,7 +33,7 @@ export async function GET(request: NextRequest) {
 
   let entriesQuery = db
     .from("organization_entries")
-    .select("id,organization_id,slug,entry_type,title,summary,description,topic,format,city,venue,starts_at,ends_at,registration_url,external_url,image_url,publication_authority,moderation_status,moderation_reason,submitted_at,published_at,created_at,updated_at")
+    .select("id,organization_id,slug,entry_type,title,summary,description,topic,format,city,venue,starts_at,ends_at,registration_url,external_url,image_url,image_gallery,publication_authority,moderation_status,moderation_reason,submitted_at,published_at,created_at,updated_at")
     .order("submitted_at", { ascending: false, nullsFirst: false })
     .order("created_at", { ascending: false })
     .limit(limit);

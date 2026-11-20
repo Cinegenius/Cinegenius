@@ -33,6 +33,8 @@ const EDITORIAL_ROUTES: Record<string, readonly string[]> = {
   "/api/editorial/entries/moderation": ["POST"],
   "/api/editorial/upload": ["POST"],
   "/api/editorial/media": ["GET"],
+  "/api/editorial/legacy-expiry": ["GET", "POST"],
+  "/api/editorial/readership": ["GET"],
 };
 export function editorialRouteAllowed(path: string, method: string) {
   return Object.hasOwn(EDITORIAL_ROUTES, path) && EDITORIAL_ROUTES[path].includes(method);

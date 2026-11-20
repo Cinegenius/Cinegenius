@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useLocale, useTranslations } from "next-intl";
 import { Building2, CalendarDays, ExternalLink, RefreshCw, Search } from "lucide-react";
+import NewsGallery from "@/components/organizations/NewsGallery";
 import MediaImage from "@/components/MediaImage";
 import { confirmDialog, promptDialog, dismissNativeDialog } from "@/lib/native-dialog";
 
@@ -47,6 +48,7 @@ type EntryItem = {
   registration_url: string | null;
   external_url: string | null;
   image_url: string | null;
+  image_gallery?: unknown;
   moderation_status: ModerationStatus;
   moderation_reason: string | null;
   submitted_at: string | null;
@@ -256,6 +258,7 @@ export function AdminOrganizations() {
               </div>
               <div>{entry.moderation_status === "approved" && entry.organization && <Link href={`/news/${entry.organization.slug}/${entry.slug}`} target="_blank" className="inline-flex items-center gap-1 text-xs text-gold">{t("openPublic")}<ExternalLink size={12} /></Link>}</div>
             </div>
+            {Array.isArray(entry.image_gallery) && entry.image_gallery.length > 0 && <details className="mt-3"><summary className="min-h-11 cursor-pointer text-sm text-text-primary">{organizationText("entryImage")}</summary><NewsGallery cover={entry.image_url} gallery={entry.image_gallery} review /></details>}
             <div className="mt-4">{actionButtons("entry", entry.id, entry.moderation_status)}</div>
           </article>
         ))}

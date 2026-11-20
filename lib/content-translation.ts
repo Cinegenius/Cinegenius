@@ -14,7 +14,7 @@ export type ContentTranslation = ContentReference & {
   status: "translated" | "original" | "pending" | "unavailable";
 };
 export const TRANSLATABLE_FIELDS: Record<TranslationKind, readonly string[]> = {
-  news: ["title", "summary", "description"], organization: ["description"],
+  news: ["title", "summary", "description", ...Array.from({length: 8}, (_, index) => [`image_${index}_caption`, `image_${index}_altText`]).flat()], organization: ["description"],
   listing: ["title", "description", "access_notes", "availability_notes", "special_skills"],
   company: ["description", "tagline", "bio_short", "usp"], profile: ["bio", "tagline"],
   project: ["description", "logline", "synopsis"], community: ["title", "body"], reply: ["body"],
@@ -38,6 +38,19 @@ export function translationRequest(value: unknown): { locale: AppLocale; items: 
 }
 export function publicTranslationFields(kind: TranslationKind, value: Record<string, unknown>): TranslationFields {
   const fields: TranslationFields = {};
+  // Only public descriptive image prose enters the existing translation cache.
+  // Original titles, creators, credits, URLs and license statements stay exact.
+  if (kind === "news") {
+    const gallery = Array.isArray(value.image_gallery) ? value.image_gallery.slice(0, 8) : [];
+    const prose: Record<string, unknown> = {};
+    gallery.forEach((image, index) => {
+      if (!image || typeof image !== "object") return;
+      for (const field of ["caption", "altText"] as const) {
+        if (typeof image[field] === "string" && image[field].length <= (field === "caption" ? 800 : 300)) prose[`image_${index}_${field}`] = image[field];
+      }
+    });
+    value = {...value, ...prose};
+  }
   let length = 0;
   for (const key of TRANSLATABLE_FIELDS[kind]) {
     const text = value[key];

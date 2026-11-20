@@ -8,6 +8,8 @@ import { FormEvent, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
 import { CalendarDays, ExternalLink, ImagePlus, Loader2, Newspaper, Plus, Save, Trash2 } from "lucide-react";
+import NewsGalleryEditor from "./NewsGalleryEditor";
+import type { NewsGalleryImage } from "@/lib/news-gallery";
 import MediaImage from "@/components/MediaImage";
 import ResponsiblePersonFields from "@/components/ResponsiblePersonFields";
 import OrganizationAccessPanel from "./OrganizationAccessPanel";
@@ -24,11 +26,11 @@ type Organization = {
 type Entry = {
   id: string; updated_at: string; organization_id: string; slug: string; entry_type: string; title: string; summary: string; description: string;
   topic: string; format: string; city: string; venue: string; starts_at: string | null; ends_at: string | null;
-  registration_url: string | null; external_url: string | null; image_url: string | null; moderation_status: string; moderation_reason: string;
+  registration_url: string | null; external_url: string | null; image_url: string | null; image_gallery?: NewsGalleryImage[]; moderation_status: string; moderation_reason: string;
 };
 type Workspace = { organizations: Organization[]; entries: Entry[] };
 type OrganizationForm = { selected_place_city_id?: string; id: string; expectedUpdatedAt: string; name: string; description: string; topics: string[]; city: string; region: string; websiteUrl: string; publicContactEmail: string; logoUrl: string; responsiblePerson: ResponsiblePerson };
-type EntryForm = { selected_place_city_id?: string; id: string; expectedUpdatedAt: string; organizationId: string; entryType: string; title: string; summary: string; description: string; topic: string; format: string; city: string; venue: string; startsAt: string; endsAt: string; registrationUrl: string; externalUrl: string; imageUrl: string };
+type EntryForm = { selected_place_city_id?: string; id: string; expectedUpdatedAt: string; organizationId: string; entryType: string; title: string; summary: string; description: string; topic: string; format: string; city: string; venue: string; startsAt: string; endsAt: string; registrationUrl: string; externalUrl: string; imageUrl: string; imageGallery?: NewsGalleryImage[] };
 
 const input = "min-h-11 w-full rounded-xl border border-border bg-bg-primary px-3 py-2 text-text-primary outline-none focus:border-gold";
 const emptyEntry = (organizationId = ""): EntryForm => ({ id: "", expectedUpdatedAt: "", organizationId, entryType: "news", title: "", summary: "", description: "", topic: "industry", format: "onsite", city: "", venue: "", startsAt: "", endsAt: "", registrationUrl: "", externalUrl: "", imageUrl: "" });
@@ -143,7 +145,7 @@ export default function OrganizationDashboardClient({ initialWorkspace, responsi
   };
   const editEntry = (item: Entry) => {
     if (mode === "entry" && entry.id === item.id) return;
-    setEntry({ id: item.id, expectedUpdatedAt: item.updated_at, organizationId: item.organization_id, entryType: item.entry_type, title: item.title, summary: item.summary || "", description: item.description || "", topic: item.topic, format: item.format, city: placeInputValue(item,item.city || ""), selected_place_city_id: (item as {place_city_id?: string}).place_city_id || "", venue: item.venue || "", startsAt: localDate(item.starts_at), endsAt: localDate(item.ends_at), registrationUrl: item.registration_url || "", externalUrl: item.external_url || "", imageUrl: item.image_url || "" });
+    setEntry({ id: item.id, expectedUpdatedAt: item.updated_at, organizationId: item.organization_id, entryType: item.entry_type, title: item.title, summary: item.summary || "", description: item.description || "", topic: item.topic, format: item.format, city: placeInputValue(item,item.city || ""), selected_place_city_id: (item as {place_city_id?: string}).place_city_id || "", venue: item.venue || "", startsAt: localDate(item.starts_at), endsAt: localDate(item.ends_at), registrationUrl: item.registration_url || "", externalUrl: item.external_url || "", imageUrl: item.image_url || "", imageGallery: item.image_gallery ?? [] });
     setMode("entry"); setMessage(null);
   };
 
@@ -190,25 +192,8 @@ export default function OrganizationDashboardClient({ initialWorkspace, responsi
         <label className="block text-sm text-text-primary">{t("organization")} *<select required disabled={!!entry.id} className={`${input} mt-1`} value={entry.organizationId} onChange={event => setEntry({ ...entry, organizationId: event.target.value })}><option value="">{t("choose")}</option>{workspace.organizations.map(item => <option key={item.id} value={item.id}>{item.name}</option>)}</select></label>
         <div className="grid gap-4 sm:grid-cols-2"><label className="text-sm text-text-primary">{t("type")} *<select className={`${input} mt-1`} value={entry.entryType} onChange={event => setEntry({ ...entry, entryType: event.target.value })}>{ORGANIZATION_ENTRY_TYPES.map(value => <option key={value} value={value}>{t(`entryType.${value}`)}</option>)}</select></label><label className="text-sm text-text-primary">{t("topicLabel")} *<select className={`${input} mt-1`} value={entry.topic} onChange={event => setEntry({ ...entry, topic: event.target.value })}>{ORGANIZATION_TOPICS.map(value => <option key={value} value={value}>{t(`topic.${value}`)}</option>)}</select></label></div>
         <label className="block text-sm text-text-primary">{t("title")} *<input required minLength={2} maxLength={180} className={`${input} mt-1`} value={entry.title} onChange={event => setEntry({ ...entry, title: event.target.value })} /></label>
-        <fieldset className="min-w-0 rounded-xl border border-border p-4">
-          <legend className="px-1 text-sm text-text-primary">{t("entryImage")}</legend>
-          <div className="grid gap-4 sm:grid-cols-[12rem_minmax(0,1fr)] sm:items-center">
-            <div className="relative aspect-[16/10] overflow-hidden rounded-xl border border-border bg-bg-primary">
-              {entry.imageUrl ? <MediaImage src={entry.imageUrl} alt={t("entryImageAlt")} fill sizes="192px" className="object-cover" /> : <ImagePlus className="absolute inset-0 m-auto text-text-muted" size={32} />}
-            </div>
-            <div className="space-y-3">
-              <p className="text-xs leading-5 text-text-muted">{t("imageHelp")}</p>
-              <div className="flex flex-wrap gap-2">
-                <label className="inline-flex min-h-11 cursor-pointer items-center gap-2 rounded-xl border border-border px-4 py-2 text-sm font-semibold text-text-primary">
-                  {uploading === "entry" ? <Loader2 className="animate-spin" size={17} /> : <ImagePlus size={17} />}
-                  {uploading === "entry" ? t("uploadingImage") : t(entry.imageUrl ? "replaceImage" : "uploadImage")}
-                  <input type="file" accept="image/jpeg,image/png,image/webp" className="sr-only" disabled={uploading !== null} onChange={event => { void uploadImage("entry", event.target.files?.[0] || null); event.currentTarget.value = ""; }} />
-                </label>
-                {entry.imageUrl && <button type="button" onClick={() => setEntry(current => ({ ...current, imageUrl: "" }))} className="inline-flex min-h-11 items-center gap-2 rounded-xl px-3 py-2 text-sm text-crimson-light"><Trash2 size={17} />{t("removeImage")}</button>}
-              </div>
-            </div>
-          </div>
-        </fieldset>
+        <NewsGalleryEditor value={entry} onChange={value => setEntry(current => ({...current, ...value}))} disabled={busy || uploading !== null}
+          onBusy={active => {if (active) entryDraft.resume(); setUploading(active ? "entry" : null);}} onError={() => setMessage({tone: "error", text: t("imageError")})} />
         <label className="block text-sm text-text-primary">{t("summary")}<textarea maxLength={500} className={`${input} mt-1 min-h-24`} value={entry.summary} onChange={event => setEntry({ ...entry, summary: event.target.value })} /></label>
         <label className="block text-sm text-text-primary">{t("description")}<textarea maxLength={12000} className={`${input} mt-1 min-h-40`} value={entry.description} onChange={event => setEntry({ ...entry, description: event.target.value })} /></label>
         <PlaceField value={entry.city} onChange={(value, cityId) => setEntry({ ...entry, city: value, selected_place_city_id: cityId || "" })} />
