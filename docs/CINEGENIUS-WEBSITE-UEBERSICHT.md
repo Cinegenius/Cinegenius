@@ -116,3 +116,5 @@ Unterlagen: `/srv/cinegenius/handoffs/news-editorial-20261120/newsroom-consolida
 - Gemeinsame Schnittstellen in der [App-Übersicht](CINEGENIUS-APP-UEBERSICHT.md) und bei APP Entwicklung nachführen. Keine Behauptung, dass diese Datei von selbst Hintergrundarbeit ausführt.
 - Quellen: aktueller Hauptstand `822c27c`, `app/**/page.tsx`, [Karten-Zähler](map-result-counts.md), [Smart-Zugriff](smart-development-preview.md), [Privatsphäre](profile-privacy.md), [persönlicher Bereich](personal-area.md), [News-Themen](home-news-topics.md), [Dienstleistungen](marketplace-services.md), [Projektabläufe](projects-workflow.md), [Artworks](profile-art-stock.md), [E-Mails](email-branding.md), [Statistik](posthog-analytics.md).
 - Veröffentlichungsbeleg Karten: `/srv/cinegenius/handoffs/20261120-map-counts/receipt.json` und `deploy.log`. Die Feedback- und Währungsentwürfe sind nicht Bestandteil dieses Releases.
+
+**Homepage-Crew-Rotation:** 24 Stunden Vorrang für neue Profile, danach alle 15 Minuten wechselnde Mischung auch älterer Mitglieder; unveröffentlicht in `f6b45be5`, 48 gezielte Tests bestanden. Native Verzeichnis-Sortierung und Release-Halt unverändert.
