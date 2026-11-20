@@ -6,6 +6,7 @@ import {
   CATERING_MOBILE_EQUIPMENT_OPTIONS,
   type CateringCompanyDetails,
 } from "@/lib/catering-taxonomy";
+import { taxonomyLabel } from "@/lib/departments";
 import { useTranslations } from "next-intl";
 
 
@@ -30,7 +31,7 @@ export default function CateringCompanyFields({
       <fieldset className="space-y-2">
         <legend className="text-sm font-medium text-text-primary">{uiText("Ui.text_83a4b1fc501a62")}</legend>
         <div className="flex flex-wrap gap-2">
-          {CATERING_COMPANY_SERVICES.map((service) => <Choice key={service.id} label={service.label} selected={value.serviceTypes.includes(service.label)} onClick={() => toggle("serviceTypes", service.label)} />)}
+          {CATERING_COMPANY_SERVICES.map((service) => <Choice key={service.id} label={taxonomyLabel(service.label, uiText)} selected={value.serviceTypes.includes(service.label)} onClick={() => toggle("serviceTypes", service.label)} />)}
         </div>
       </fieldset>
 
@@ -41,12 +42,12 @@ export default function CateringCompanyFields({
 
       <fieldset className="space-y-2">
         <legend className="text-sm font-medium text-text-primary">{uiText.rich("Ui.text_58b99ed1ae83b8", { part1: chunks => (<span className="font-normal text-text-muted">{chunks}</span>) })}</legend>
-        <div className="flex flex-wrap gap-2">{CATERING_DIETARY_OPTIONS.map((item) => <Choice key={item} label={item} selected={value.dietaryOptions.includes(item)} onClick={() => toggle("dietaryOptions", item)} />)}</div>
+        <div className="flex flex-wrap gap-2">{CATERING_DIETARY_OPTIONS.map((item) => <Choice key={item} label={taxonomyLabel(item, uiText)} selected={value.dietaryOptions.includes(item)} onClick={() => toggle("dietaryOptions", item)} />)}</div>
       </fieldset>
 
       <fieldset className="space-y-2">
         <legend className="text-sm font-medium text-text-primary">{uiText.rich("Ui.text_617f73cce94d7a", { part1: chunks => (<span className="font-normal text-text-muted">{chunks}</span>) })}</legend>
-        <div className="flex flex-wrap gap-2">{CATERING_MOBILE_EQUIPMENT_OPTIONS.map((item) => <Choice key={item} label={item} selected={value.mobileEquipment.includes(item)} onClick={() => toggle("mobileEquipment", item)} />)}</div>
+        <div className="flex flex-wrap gap-2">{CATERING_MOBILE_EQUIPMENT_OPTIONS.map((item) => <Choice key={item} label={taxonomyLabel(item, uiText)} selected={value.mobileEquipment.includes(item)} onClick={() => toggle("mobileEquipment", item)} />)}</div>
       </fieldset>
     </div>
   );

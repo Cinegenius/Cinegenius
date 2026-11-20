@@ -44,6 +44,18 @@ translation provider, retrain a model or activate additional API requests.
 Native-owned Spanish bundles require the same terminology through APP Entwicklung;
 shared web/native-web views receive the catalog correction on publication.
 
+The subsequent Spanish company-editor screenshot exposed a separate wiring bug:
+company setup and details used raw catalogue labels despite available translations.
+Setup, selection chips, detail views and the onboarding review now resolve these
+labels through the existing taxonomy translator. Category search includes translated
+examples while retaining canonical German aliases. Catering choices add seventeen
+previously missing catalogue labels across all seventeen locales; only displayed
+labels change, never saved selections, category IDs or member-written text.
+Regression coverage exercises the actual label resolvers in every locale and the
+rendered Spanish catering controls, including canonical values after selection.
+This is component/catalogue verification, not a real iPhone or linguistic review
+by native speakers in every language. Publication remains a separate step.
+
 APP Entwicklung must use the same optional fields, visibility contract, stable taxonomy IDs and locale tags. The original native preset deferral is superseded by the current scope in docs/profile-art.md. Existing native sources and device behavior are separate from this website change.
 
 Browser simulations cover phone/tablet/laptop widths. They do not certify an actual iPhone, Xcode build or native language switching. APP Entwicklung messaging transport was unavailable; record the final source/test/publication handoff locally and do not claim delivery until acknowledged.
