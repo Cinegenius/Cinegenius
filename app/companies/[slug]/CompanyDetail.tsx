@@ -1,4 +1,5 @@
 "use client";
+import { formatOfferAmount } from "@/lib/currency";
 
 import { TranslatedText } from "@/components/ContentTranslation";
 
@@ -77,7 +78,7 @@ type ServiceItem = {
 type EquipmentItem = {
   id: string; category: string; subcategory: string | null; name: string;
   brand: string | null; model: string | null; condition: string; available: boolean;
-  price_day: number | null; price_week: number | null; price_on_request: boolean;
+  currency?: string; price_day: number | null; price_week: number | null; price_on_request: boolean;
   pickup_available: boolean; delivery_available: boolean; insured: boolean; quantity: number;
 };
 
@@ -704,7 +705,7 @@ export default function CompanyDetail({
                         </div>
                         <div className="shrink-0 text-right">
                           {!item.price_on_request && item.price_day ? (
-                            <p className="text-sm font-semibold text-gold">{item.price_day} €<span className="text-text-muted font-normal text-xs">{uiText("common.perDay")}</span></p>
+                            <p className="text-sm font-semibold text-gold">{formatOfferAmount(item.price_day, item.currency ?? "EUR", marketLocale)}<span className="text-text-muted font-normal text-xs">{uiText("common.perDay")}</span></p>
                           ) : (
                             <p className="text-xs text-text-muted">{uiText("common.onRequest")}</p>
                           )}

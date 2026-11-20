@@ -53,7 +53,7 @@ export async function GET(req: NextRequest) {
     const offerIds = favorites.filter(row => row.listing_type !== "creator").map(row => row.listing_id);
     const profileIds = favorites.filter(row => row.listing_type === "creator").map(row => row.listing_id);
     const current = offerIds.length ? await db.from("privacy_visible_listings")
-      .select(`id,type,title,city,price,image_url,price_negotiable:metadata->price_negotiable,price_on_request:metadata->price_on_request,rental_type:metadata->>rental_type,marketplace:metadata->marketplace,${PLACE_COLUMNS}`)
+      .select(`id,type,title,city,price,image_url,price_currency:metadata->>price_currency, price_negotiable:metadata->price_negotiable,price_on_request:metadata->price_on_request,rental_type:metadata->>rental_type,marketplace:metadata->marketplace,${PLACE_COLUMNS}`)
       .in("id", offerIds).eq("published", true) : { data: [], error: null };
     if (current.error) return unavailable();
     const access = await profileAccessFor(profileIds, userId, { throwOnError: true });

@@ -14,7 +14,7 @@ Dieses Verzeichnis hält die Bereiche, ihre Funktionen, den belegten Stand und o
 | **Startseite** | Suche, Entdecken, Die Crew, Aus der Branche, Organisationen, Marktplatz, Jobs, frische Einblicke, Branchenpartner, Locations und Schwarzes Brett | Vorhanden. Regionale Auswahl vor der Begrenzung für Crew, Marktplatz, Locations, Jobs und Firmen veröffentlicht im Website-Stand `4d93523a`. Gestaltung erhalten; Foto-Entdeckung bleibt mangels verlässlicher Ortsprojektion global. |
 | **Crew** | Personenprofile, Berufe, Haupt-/Nebentätigkeiten, Fähigkeiten, Orte, Anbieter-Wechsel, Suche, Filter, Kacheln/Liste/Karte | Vorhanden. Gemeinsamer Kartenfix veröffentlicht. Nachgemeldete Ausnahme im Crew-Anbieterfilter korrigiert: Die obere Zahl zählt dieselbe Auswahl wie Karte und Liste; veröffentlicht und live geprüft. Keine privaten oder erfundenen Positionen. |
 | **Locations** | Drehorte, Studios, Kategorien, Ortsfilter, Detailseiten, Bilder, Kontakt/Anfragen und Ansichten | Vorhanden. Formular- und Suchqualität weiter prüfen; Karte ersetzt keine vollständige Liste. |
-| **Marktplatz** | Equipment, Requisiten, Fahrzeuge, Dienstleistungen, Kategorien, Anbieter, Preise, Angebote und Suche | Vorhanden. Mehrwährungen sind ein separater unveröffentlichter Entwurf. Gemeldete Smart-Fälle „Lampe“ und „bayerischer Hut“ bleiben als Suchqualitätsfälle erfasst. |
+| **Marktplatz** | Equipment, Requisiten, Fahrzeuge, Dienstleistungen, Kategorien, Anbieter, Preise, Angebote und Suche | Vorhanden. Mehrwährungen sind implementiert und noch nicht veröffentlicht. Gemeldete Smart-Fälle „Lampe“ und „bayerischer Hut“ bleiben als Suchqualitätsfälle erfasst. |
 | **Fahrzeuge** | Fahrzeuge als Angebotsart und eigene Detail-/Einstiegsseiten | Vorhanden; gemeinsames Angebots-, Bild- und Berechtigungsmodell verwenden. |
 | **Firmen** | Verzeichnis, Leistungen, Firmenprofil, Logo/Cover, Team, Zugehörigkeiten und Angebote | Vorhanden. Mehrfirmen-/Übertragungsabläufe jeweils anhand ihrer tatsächlichen Berechtigungen prüfen; nicht pauschal als komplett erledigt einstufen. |
 | **Jobs** | Stellen und Aufträge, Gewerke, Orte, Kategorien, Erstellen und Details | Vorhanden. Die spanische Gewerk-Auswahl ist im aktuellen Hauptstand korrigiert. |
@@ -56,8 +56,8 @@ Dieses Verzeichnis hält die Bereiche, ihre Funktionen, den belegten Stand und o
 | **Smart** | Mehrere Wünsche und Orte, Bereichsgruppen, Mengen/Anforderungen, Karte und nahe Alternativen | Implementiert, **weiterhin nur für berechtigte Admins**; Mitglieder sehen eine statische Vorschau. Freie Formulierungen sind keine garantiert fehlerfreien Ergebnisse. Kompakte Smart-Kartenvorschau veröffentlicht: inhaltsabhängige Höhe statt gestreckter Leerfläche. |
 | **Genie** | Plattformhilfe, Textunterstützung, Sprache und erlaubte Suche | Vorhanden. Smart-Rechte gelten auch über Genie; normale Hilfe bleibt davon getrennt. Kein automatisches Modelltraining durch Unterhaltungen. |
 | **Work-Einstieg** | Hinweis bzw. Übergang zu vorgesehenen Arbeitswerkzeugen | Öffentlicher Werkzeug-Hinweis und App-Einstieg vorhanden. Vollständiger nativer Workspace gehört in die App-Übersicht, nicht als fertige Web-Anwendung ausgeben. |
-| **Mitgestalten / Länder-Feedback** | Vertreter aus Mexiko, Ungarn und anderen Ländern prüfen CineGenius unabhängig voneinander; KI fragt z. B. „Ist Crew bei euch die richtige Bezeichnung?“ | **Programmierentwurf vorhanden, nicht live.** Login, private Gesprächsentwürfe, freie Eingabe, Länder-/Sprachbezug und ausdrückliches Absenden vorgesehen. |
-| **Feedback-Koordination** | Markus erhält Originalrückmeldungen und eine geordnete deutsche Zusammenfassung mit Verbesserungsvorschlägen | **Entwurf**, mit Admin-Zugriff und Belegstellen. Browserprüfung, echter KI-Test und ein offener Prüfpunkt fehlen; keine automatische Umsetzung fremder Vorschläge. Eigene Arbeit unter `codex/community-feedback-20261120`. |
+| **Mitgestalten / Länder-Feedback** | Vertreter aus Mexiko, Ungarn und anderen Ländern prüfen CineGenius unabhängig voneinander; KI fragt z. B. „Ist Crew bei euch die richtige Bezeichnung?“ | **Implementiert, nicht live.** Login, private Gesprächsentwürfe, freie Eingabe, Länder-/Sprachbezug und bestätigtes Absenden sind isoliert geprüft. |
+| **Feedback-Koordination** | Markus erhält Originalrückmeldungen und eine geordnete deutsche Zusammenfassung mit Verbesserungsvorschlägen | **Implementiert, nicht live**, mit Admin-Zugriff und Belegstellen. Browserprüfung inklusive Fehler/Wiederholung bestanden; echter KI-Test und native Übernahme offen. Keine automatische Umsetzung. Integriert unter `codex/international-feedback-finish-20261120`. |
 
 ## Länder, Sprache und gemeinsame Grundlagen
 
@@ -65,7 +65,7 @@ Dieses Verzeichnis hält die Bereiche, ihre Funktionen, den belegten Stand und o
 | --- | --- | --- |
 | **Regionale Inhalte zuerst** | Website veröffentlicht (`4d93523a`): Aufrufland zuerst, eigener Profilort im selben Land zur Verfeinerung oder als Rückfall. Auch für Gäste; Live-Gastabruf geprüft. 162 Tests und 32 Browserfälle bestanden. | [Gemeinsamer Vertrag](country-first-discovery.md). Manuelle Länder-/Ortswahl und „Alle“ bleiben maßgeblich; Auswahl vor Begrenzung/Nachladen. APP-Übernahme und echte Geräte-/Regionsprüfung offen. |
 | **Mehrsprachigkeit** | 17 Website-Kataloge: Deutsch, Englisch, Spanisch, Italienisch, Tschechisch, Ungarisch, Niederländisch, Belgisch-Niederländisch, Schwedisch, Französisch, Polnisch, Portugiesisch (Portugal), vereinfachtes Chinesisch, Japanisch, Koreanisch, Russisch, Ukrainisch | Katalogvollständigkeit beweist keine vollständige sprachliche Qualität. Mexikanische Bezeichnungen prüfen; Crew bleibt dort Crew, Equipment wird Equipo. Mitgliedertexte und Rechtsoriginale nicht ungefragt umschreiben. |
-| **Währungen / internationale Formulare** | EUR-Bestand; Auswahl zusätzlicher Währungen und internationale Anpassungen als separater Entwurf | Mexiko, Italien, Spanien, Frankreich, Schweiz, Österreich, Ungarn und bereits vertretene Länder prüfen. Anbieter wählen Währung; keine automatische Umrechnung. |
+| **Währungen / internationale Formulare** | 155 Währungen in den bestehenden Formularen, Anzeigen, Preisfiltern und Buchungsanfragen implementiert; noch nicht live | Mexiko, Italien, Spanien, Frankreich, Schweiz, Österreich, Ungarn und bereits vertretene Länder prüfen. Anbieter wählen Währung; keine automatische Umrechnung. |
 | **Karten / Ergebniszahlen** | Fix `822c27c` am 20.11.2026 veröffentlicht; Vercel-Produktionsalias bestätigt | Gesamtbestand, Kartentreffer, außerhalb des Ausschnitts und ohne Kartenposition unterscheiden. Live-Browsernachprüfung separat protokollieren; App-Ergänzungen bleiben eigener Stand. |
 | **Bilder und Dateien** | Gemeinsame geschützte Medienausgabe, optionale Fotos, robuste Vorschauen | Ursprung und aktuelle Rechte erhalten; alte öffentlich verteilte Dateien sind nicht allein durch versteckte Karten zurückgerufen. |
 | **Formularentwürfe** | Private kontogebundene Wiederherstellung und Navigationsschutz | Nicht mit Autospeichern öffentlicher Inhalte verwechseln. |
@@ -81,7 +81,7 @@ Dieses Verzeichnis hält die Bereiche, ihre Funktionen, den belegten Stand und o
 | **Über CineGenius / Kosten** | Community-Zweck, kostenlose Basis/Profile, mögliche künftige optionale Funktionen | Vorhandene Preis-/Support-Dokumentation und aktuelle Betreiberentscheidungen zusammen prüfen; keine alte Provisionsantwort wieder einführen. |
 | **Rechtliche Seiten** | Impressum, Datenschutz, AGB, Bildrechte, KI-Transparenz und Uploadhinweise | Vorhanden. Betreiberangaben und tatsächliche Verarbeitung aktuell halten; diese Inventur ist keine neue rechtliche Prüfung. |
 | **Newsletter** | Anmeldung, Bestätigung und Abmeldung | Vorhanden. Freiwillige ausdrückliche Einwilligung, keine stillschweigende Newsletter-Anmeldung. |
-| **Admin** | Konten, Angebote, Prüfungen, Orte, Aktualität, Support und Verwaltung | Vorhanden; serverseitige Rechte. Feedback-Koordination ist noch Entwurf. |
+| **Admin** | Konten, Angebote, Prüfungen, Orte, Aktualität, Support und Verwaltung | Vorhanden; serverseitige Rechte. Feedback-Koordination implementiert, noch nicht veröffentlicht. |
 | **Redaktionsbetrieb** | AG DOK / NEWS, Technikrecherche, Quellen, Rechte, Dubletten und Länderzuordnung | Bestehender stündlicher Recherchezeitplan mit separatem geprüften Publisher aktiviert. Höchstens ein Kandidat je Lauf, Quellenprüfung und private Zwischenschritte; unklare Inhalte bleiben unveröffentlicht. Automatische Bildauswahl, Ablauf-Ausblendung und Nutzungslernfeed noch offen. |
 | **Aktualität von Profilen/Angeboten** | Bestandsprüfung, Hinweise und geregeltes Ausblenden veralteter Inhalte | Dokumentiert; tatsächliche Zeitpläne/Aktivierung brauchen Betriebsbeleg, keine unbestätigte automatische Löschung zusagen. |
 | **Werbung** | Bestehender historischer Pfad `/werben` | Kein freigegebenes aktives Werbeinventar; keine Banner oder Buchungsplätze reaktivieren. |
@@ -91,11 +91,13 @@ Aktuelle Prioritäten und gesicherte Zwischenstände: [Auftragsreihenfolge](AKTU
 ## Aktuell offene Arbeit
 
 1. Länderpriorisierung mit APP übernehmen; die Website-Liveprüfung ist abgeschlossen. Tatsächliche Aufrufländer und native Geräte separat prüfen, App-Release-Halt beibehalten.
-2. Mitgestalten und Feedback-Koordination fertig prüfen; erst nach Freigabe veröffentlichen.
-3. Internationale Formulare/Währungen aus dem separaten Entwurf vervollständigen.
+2. Mitgestalten: echte KI-Antworten und native Übernahme prüfen; Veröffentlichung nach Freigabe. Private Abläufe und Fehlerversuche sind isoliert geprüft.
+3. Internationale Formulare/Währungen sind implementiert. Buchungs-Währungsmigration vor Veröffentlichung prüfen/anwenden; native Euro-Annahmen abgleichen.
 4. App-Zählerergänzungen und laufenden App-Server-Release getrennt abgleichen.
 5. Gemeldete freie Smart-Suchen und mehrsprachige Fachbegriffe mit echten Suchfällen prüfen; Zugriff bleibt eingeschränkt.
 6. Redaktionelle Qualität und tatsächliche stündliche Ergebnisse weiter prüfen; automatische Bildauswahl mit Nutzungsrechten, datumsgenaue Ereignisse/Ablauf-Ausblendung und ein belegbarer aggregierter Lernfeed bleiben eigene offene Schritte. Der zentrale Herausgeber und Veröffentlichungsweg sind aktiv.
+
+7. Historisches Sonderanfertigungsformular `/marketplace/commission` separat erneuern: bestätigt derzeit nur lokal eine Einreichung ohne Versand/Speicherung; enthält feste EUR-Budgetstufen. Nicht als funktionierenden internationalen Bestellweg oder als Teil der neuen Angebots-Währungsformulare ausgeben.
 
 ## Pflege und Belege
 
@@ -116,7 +118,7 @@ Maßgeblicher Release- und Aktivierungsbeleg: `/srv/cinegenius/handoffs/20261120
 - Bei einer Änderung: Bereich, Status, Datum, zuständige Arbeit, Prüfung, Grenzen und nächste Schritte aktualisieren. Neue Bereiche ergänzen, abgelöste Funktionen kenntlich machen.
 - „Live“ erst nach bestätigtem Deployment; „App installiert“ und „auf echtem Gerät geprüft“ sind eigene Nachweise.
 - Gemeinsame Schnittstellen in der [App-Übersicht](CINEGENIUS-APP-UEBERSICHT.md) und bei APP Entwicklung nachführen. Keine Behauptung, dass diese Datei von selbst Hintergrundarbeit ausführt.
-- Quellen: aktueller Hauptstand `822c27c`, `app/**/page.tsx`, [Karten-Zähler](map-result-counts.md), [Smart-Zugriff](smart-development-preview.md), [Privatsphäre](profile-privacy.md), [persönlicher Bereich](personal-area.md), [News-Themen](home-news-topics.md), [Dienstleistungen](marketplace-services.md), [Projektabläufe](projects-workflow.md), [Artworks](profile-art-stock.md), [E-Mails](email-branding.md), [Statistik](posthog-analytics.md).
+- Quellen: veröffentlichter Hauptstand `3bd731f`, aktueller Ausbau `codex/international-feedback-finish-20261120`, `app/**/page.tsx`, [Karten-Zähler](map-result-counts.md), [Smart-Zugriff](smart-development-preview.md), [Privatsphäre](profile-privacy.md), [persönlicher Bereich](personal-area.md), [News-Themen](home-news-topics.md), [Dienstleistungen](marketplace-services.md), [Projektabläufe](projects-workflow.md), [Artworks](profile-art-stock.md), [E-Mails](email-branding.md), [Statistik](posthog-analytics.md).
 - Veröffentlichungsbeleg Karten: `/srv/cinegenius/handoffs/20261120-map-counts/receipt.json` und `deploy.log`. Die Feedback- und Währungsentwürfe sind nicht Bestandteil dieses Releases.
 
 **Homepage-Crew-Rotation:** 24 Stunden Vorrang für neue Profile, danach alle 15 Minuten wechselnde Mischung auch älterer Mitglieder; Website veröffentlicht; ursprünglicher Entwurf `f6b45be5`, 48 gezielte Tests bestanden. Native Verzeichnis-Sortierung und Release-Halt unverändert.
@@ -125,3 +127,5 @@ Maßgeblicher Release- und Aktivierungsbeleg: `/srv/cinegenius/handoffs/20261120
 
 
 **Release-Beleg (20.11.):** `/srv/cinegenius/handoffs/20261120-country-first-release/receipt.json` enthält den tatsächlichen Quellstand, Deployment und Liveprüfungen. Randpin-Fokuskorrektur im selben freigegebenen Auftrag; keine neue native Veröffentlichung. Redaktion: anschließend veröffentlicht und aktiviert; aktueller Beleg unter `/srv/cinegenius/handoffs/20261120-newsroom-release/receipt.json`.
+
+**Internationaler Ausbau (20.11., noch nicht live):** [Währungen und Mitgestalten](international-currency-feedback.md) beschreibt die Preisfelder, 155 Währungen, getrennte Preisfilter, unveränderte EUR-Bestände und den privaten Ländervertreter-Ablauf. Kein automatischer Geldwechsel, keine Zahlungsaktivierung. Berichte benötigen Bestätigung. Browserabnahme auf 320/390/768/1366 px; reale KI-/native Prüfung getrennt offen.

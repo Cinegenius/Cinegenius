@@ -38,6 +38,6 @@ export function resolveLocale(saved: unknown, acceptLanguage = '', requestCountr
     .sort((a, b) => b.quality - a.quality || a.index - b.index);
   // A coarse country is only a last resort. Residence must never override an
   // explicit choice or a supported browser language (including multilingual countries).
-  const countryFallback: Record<string, AppLocale> = {DE:'de',AT:'de',IT:'it',ES:'es',CZ:'cs',HU:'hu',NL:'nl',SE:'sv',GB:'en',IE:'en',US:'en',AU:'en',NZ:'en',FR:'fr',PL:'pl',PT:'pt-PT',CN:'zh-Hans',JP:'ja',KR:'ko',RU:'ru',UA:'uk'};
+  const countryFallback: Record<string, AppLocale> = {DE:'de',AT:'de',CH:'de',IT:'it',ES:'es',MX:'es',CZ:'cs',HU:'hu',NL:'nl',SE:'sv',GB:'en',IE:'en',US:'en',AU:'en',NZ:'en',FR:'fr',PL:'pl',PT:'pt-PT',CN:'zh-Hans',JP:'ja',KR:'ko',RU:'ru',UA:'uk'};
   return preferred[0]?.locale ?? countryFallback[requestCountry.toUpperCase()] ?? DEFAULT_LOCALE;
 }

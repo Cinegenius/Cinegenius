@@ -1,4 +1,5 @@
 "use client";
+import { formatOfferAmount } from "@/lib/currency";
 
 import { useState, useMemo } from "react";
 import { useLocale, useTranslations } from "next-intl";
@@ -42,7 +43,7 @@ interface Props {
 
 // ─── Component ───────────────────────────────────────────────────────────────
 
-export default function AvailabilityCalendar({ dailyRate, currency = "€", onSelect, onReset, blockedDates }: Props) {
+export default function AvailabilityCalendar({ dailyRate, currency = "EUR", onSelect, onReset, blockedDates }: Props) {
   const locale = useLocale();
   const t = useTranslations("AvailabilityCalendar");
   const formatDate = (date: Date) => date.toLocaleDateString(locale, {day: "numeric", month: "short", year: "numeric"});
@@ -280,12 +281,12 @@ export default function AvailabilityCalendar({ dailyRate, currency = "€", onSe
             <span className="text-text-primary font-medium">{t("days", {count: selectedDays})}</span>
           </div>
           <div className="flex justify-between text-sm">
-            <span className="text-text-muted">{dailyRate.toLocaleString(locale)} {currency} × {t("days", {count: selectedDays})}</span>
-            <span className="text-text-primary">{subtotal.toLocaleString(locale)} {currency}</span>
+            <span className="text-text-muted">{formatOfferAmount(dailyRate, currency, locale)} × {t("days", {count: selectedDays})}</span>
+            <span className="text-text-primary">{formatOfferAmount(subtotal, currency, locale)}</span>
           </div>
           <div className="flex justify-between font-bold text-base pt-2 border-t border-border">
             <span className="text-text-primary">{t("total")}</span>
-            <span className="text-gold font-display">{subtotal.toLocaleString(locale)} {currency}</span>
+            <span className="text-gold font-display">{formatOfferAmount(subtotal, currency, locale)}</span>
           </div>
           <button
             type="button"

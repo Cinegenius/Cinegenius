@@ -1,4 +1,6 @@
 "use client";
+import CurrencySelect from "@/components/CurrencySelect";
+import { formatOfferAmount, listingCurrency, storedCurrency } from "@/lib/currency";
 
 import GenieWritingAssistant from "@/components/GenieWritingAssistant";
 
@@ -20,7 +22,7 @@ import { compressImage, compressAvatar, MAX_FUNCTION_UPLOAD_BYTES, safeObjectURL
 import {
   Camera, CheckCircle, User, Lock, Bell, Film,
   Plus, X, Save, Upload, ShieldCheck, Clock, AlertCircle, Loader2,
-  Globe, Plane, Video, Euro, Clapperboard, Link2, AtSign, PlayCircle, ExternalLink,
+  Globe, Plane, Video, Banknote, Clapperboard, Link2, AtSign, PlayCircle, ExternalLink,
   Users2, Eye, EyeOff, Pencil, Check, Search, ChevronDown, ChevronLeft,
 } from "lucide-react";
 import LicensePicker from "@/components/LicensePicker";
@@ -624,7 +626,7 @@ function ProfileEditorContent({ accountId }: { accountId: string }) {
 
   // My projects & listings
   type MyProject = { id: string; title: string; year: number | null; type: string | null; poster_url: string | null };
-  type MyListing = { id: string; title: string; type: string; price: number | null; city: string; image_url: string | null; category: string | null };
+  type MyListing = { metadata?: Record<string,unknown>; id: string; title: string; type: string; price: number | null; city: string; image_url: string | null; category: string | null };
   const [myProjects, setMyProjects] = useState<MyProject[]>([]);
   const [myListings, setMyListings] = useState<MyListing[]>([]);
   const [myProjectsLoading, setMyProjectsLoading] = useState(false);
@@ -699,6 +701,7 @@ function ProfileEditorContent({ accountId }: { accountId: string }) {
   const [youtubeUrl, setYoutubeUrl] = useState("");
   const [vimeoUrl, setVimeoUrl] = useState("");
   const [linkedinUrl, setLinkedinUrl] = useState("");
+  const [dayRateCurrency, setDayRateCurrency] = useState("EUR");
   const [dayRate, setDayRate] = useState("");
   const [filmography, setFilmography] = useState<FilmEntry[]>([]);
   const [videoLinks, setVideoLinks] = useState<string[]>([]);
@@ -872,6 +875,7 @@ function ProfileEditorContent({ accountId }: { accountId: string }) {
           setYoutubeUrl(profile.youtube_url ?? "");
           setVimeoUrl(profile.vimeo_url ?? "");
           setLinkedinUrl(profile.linkedin_url ?? "");
+          setDayRateCurrency(listingCurrency(profile.crew));
           setDayRate(profile.day_rate ? String(profile.day_rate) : "");
           setFilmography(profile.filmography ?? []);
           // Merge legacy reel_url / showreel_url into video_links so there's one list
@@ -1241,10 +1245,10 @@ function ProfileEditorContent({ accountId }: { accountId: string }) {
         imdb_url:       safeLink(form.imdbUrl) || null,
         phone:          form.phone.trim() || null,
         contact_email:  form.contactEmail.trim() || null,
-        day_rate:       dayRate ? parseInt(dayRate) : null,
+        day_rate:       dayRate ? Number(dayRate) : null,
         filmography,
         video_links:    videoLinks,
-        crew: { ...crewDataRef.current, occupationForm, additionalOccupation, occupations: selectedCrewOccupations(positions, occupationSelections, null, primaryOccupation), certificates: crewCertificates, primaryOccupation: occupationReference(primaryOccupationForPositions(primaryOccupation, positions)) },
+        crew: { ...crewDataRef.current, price_currency: dayRateCurrency, occupationForm, additionalOccupation, occupations: selectedCrewOccupations(positions, occupationSelections, null, primaryOccupation), certificates: crewCertificates, primaryOccupation: occupationReference(primaryOccupationForPositions(primaryOccupation, positions)) },
       };
 
       if (!isCurrentEditor()) return;
@@ -1448,7 +1452,7 @@ function ProfileEditorContent({ accountId }: { accountId: string }) {
     youtubeUrl,
     vimeoUrl,
     linkedinUrl,
-    dayRate,
+    dayRateCurrency, dayRate,
     filmography,
     videoLinks,
     crewCertificates,
@@ -1491,6 +1495,7 @@ function ProfileEditorContent({ accountId }: { accountId: string }) {
           if (typeof saved.youtubeUrl === "string") setYoutubeUrl(saved.youtubeUrl);
           if (typeof saved.vimeoUrl === "string") setVimeoUrl(saved.vimeoUrl);
           if (typeof saved.linkedinUrl === "string") setLinkedinUrl(saved.linkedinUrl);
+          if (typeof saved.dayRateCurrency === "string") setDayRateCurrency(storedCurrency(saved.dayRateCurrency));
           if (typeof saved.dayRate === "string") setDayRate(saved.dayRate);
           if (Array.isArray(saved.filmography)) setFilmography(saved.filmography);
           if (Array.isArray(saved.videoLinks)) setVideoLinks(saved.videoLinks.filter((item: unknown): item is string => typeof item === "string"));
@@ -2077,7 +2082,7 @@ function ProfileEditorContent({ accountId }: { accountId: string }) {
                     </div>
                     <div>
                       <label className="text-xs uppercase tracking-widest text-text-muted font-semibold block mb-1.5 flex items-center gap-1.5">
-                        <Euro size={11} /> {t("fieldDayRate")}
+                        <Banknote size={11} /> {uiText("Regional.pricePerDay")}
                       </label>
                       <input
                         type="number"
@@ -2087,7 +2092,7 @@ function ProfileEditorContent({ accountId }: { accountId: string }) {
                         placeholder="450"
                         className="w-full bg-bg-elevated border border-border rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-gold transition-colors"
                       />
-                      <p className="text-xs text-text-muted mt-1">{t("fieldDayRateHint")}</p>
+                      <CurrencySelect value={dayRateCurrency} onChange={setDayRateCurrency} />
                     </div>
                   </div>
 
@@ -2948,7 +2953,7 @@ function ProfileEditorContent({ accountId }: { accountId: string }) {
                                   {l.category && <span className="text-[10px] text-text-primary shrink-0 hidden sm:inline">{l.category}</span>}
                                   {l.city && <span className="text-[10px] text-text-primary shrink-0">{l.city}</span>}
                                   {l.price != null && l.price > 0 && (
-                                    <span className="text-[10px] text-gold font-semibold shrink-0">{l.price.toLocaleString(uiLocale)} €</span>
+                                    <span className="text-[10px] text-gold font-semibold shrink-0">{formatOfferAmount(l.price,listingCurrency(l.metadata),uiLocale)}</span>
                                   )}
                                 </div>
                               ))}

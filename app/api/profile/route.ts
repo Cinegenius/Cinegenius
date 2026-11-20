@@ -1,3 +1,4 @@
+import { isStoredCurrency } from "@/lib/currency";
 import { saveProfileWithArt } from "@/lib/profile-art-save-server";
 import { profileArtDatabaseFailure } from "@/lib/profile-art-reservations";
 import { hasInvalidOccupationForm, preserveOccupationForm } from "@/lib/occupation-form";
@@ -145,11 +146,13 @@ export async function POST(req: NextRequest) {
     day_rate, filmography, video_links, focal_point, physical, performance, model_measurements, casting,
   } = body;
 
+  if (day_rate !== undefined && day_rate !== null && (!Number.isSafeInteger(day_rate) || day_rate < 0)) return privateNoStoreJson({error:tResponse("System.priceMetadataInvalid")},400);
+
   if ((pronouns !== undefined && !validPronouns(pronouns)) || (show_pronouns !== undefined && typeof show_pronouns !== "boolean")) {
     return privateNoStoreJson({ error: tResponse("ProfileIdentity.invalidPronouns") }, 400);
   }
 
-  if (hasInvalidOccupationForm(crew)) {
+  if (hasInvalidOccupationForm(crew) || (crew && typeof crew === "object" && "price_currency" in crew && !isStoredCurrency((crew as Record<string,unknown>).price_currency))) {
     return privateNoStoreJson({ error: tResponse("System.requestFailed") }, 400);
   }
 
@@ -335,7 +338,8 @@ export async function PATCH(req: NextRequest) {
     if (("pronouns" in safe && !validPronouns(safe.pronouns)) || ("show_pronouns" in safe && typeof safe.show_pronouns !== "boolean")) {
       return privateNoStoreJson({ error: tResponse("ProfileIdentity.invalidPronouns") }, 400);
     }
-    if (hasInvalidOccupationForm(safe.crew)) {
+    if (safe.day_rate !== undefined && safe.day_rate !== null && (!Number.isSafeInteger(safe.day_rate) || Number(safe.day_rate) < 0)) return privateNoStoreJson({error:tResponse("System.priceMetadataInvalid")},400);
+    if (hasInvalidOccupationForm(safe.crew) || (safe.crew && typeof safe.crew === "object" && "price_currency" in safe.crew && !isStoredCurrency((safe.crew as Record<string,unknown>).price_currency))) {
       return privateNoStoreJson({ error: tResponse("System.requestFailed") }, 400);
     }
     if (typeof safe.pronouns === "string") safe.pronouns = safe.pronouns.trim() || null;

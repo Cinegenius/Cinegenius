@@ -17,7 +17,7 @@ async function getJob(slug: string, previewOwnerId?: string) {
 
   let query = db
     .from("listings")
-    .select("id, user_id, type, title, city, price, description, created_at, published, category, job:metadata->job")
+    .select("id, user_id, type, title, city, price, description, created_at, published, category, price_currency:metadata->>price_currency,job:metadata->job")
     .eq("id", slug)
     .eq("type", "job");
   query = previewOwnerId
@@ -99,7 +99,7 @@ export default async function JobDetailPage({
     } } : {}),
     ...(job.schedule?.employmentType ? { employmentType: ({ freelance: "CONTRACTOR", festanstellung: "OTHER", praktikum: "INTERN" })[job.schedule.employmentType] } : {}),
     ...(job.createdAt ? { datePosted: job.createdAt } : {}),
-    ...(job.price && (!jobFacts(job).payType || jobFacts(job).payType === "Paid" || jobFacts(job).payType === "Bezahlt") ? { baseSalary: { "@type": "MonetaryAmount", currency: "EUR", value: { "@type": "QuantitativeValue", value: job.price, unitText: "DAY" } } } : {}),
+    ...(job.price && (!jobFacts(job).payType || jobFacts(job).payType === "Paid" || jobFacts(job).payType === "Bezahlt") ? { baseSalary: { "@type": "MonetaryAmount", currency: job.currency ?? "EUR", value: { "@type": "QuantitativeValue", value: job.price, unitText: "DAY" } } } : {}),
     "directApply": true,
   };
 

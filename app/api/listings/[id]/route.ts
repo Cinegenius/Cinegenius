@@ -125,9 +125,15 @@ export async function PATCH(
       const animalData = (await import("@/lib/animal-taxonomy")).animalPortfolioMetadata(currentCategory.data?.category, { ...(current.metadata as Record<string,unknown> ?? {}), ...(metadata && typeof metadata === "object" && !Array.isArray(metadata) ? metadata : {}) });
       if (!animalData) return NextResponse.json({error:(await getTranslations("FilmAnimals"))("portfolioHelp")},{status:400});
       updates.metadata = {...(current.metadata as Record<string,unknown> ?? {}), ...animalData};
+    } else if (current.type === "creator" && metadata !== undefined) {
+      const pricingError = listingPriceMetadataError(metadata,tResponse);
+      if (pricingError || Object.keys(metadata).some(key=>key!=="price_currency")) return NextResponse.json({error:pricingError ?? tResponse("System.requestFailed")},{status:400});
+      updates.metadata = {...(current.metadata as Record<string,unknown> ?? {}),...metadata};
     } else if (current.type === "job" && metadata !== undefined) {
-      if (!metadata || typeof metadata !== "object" || Array.isArray(metadata) || Object.keys(metadata).some(key => key !== "job") || !jobSchedule((metadata as Record<string, unknown>).job)) return NextResponse.json({ error: tResponse("System.requestFailed") }, { status: 400 });
-      updates.metadata = { ...(current.metadata as Record<string, unknown> ?? {}), job: jobSchedule((metadata as Record<string, unknown>).job) };
+      if (!metadata || typeof metadata !== "object" || Array.isArray(metadata) || Object.keys(metadata).some(key => !["job", "price_currency"].includes(key)) || !jobSchedule((metadata as Record<string, unknown>).job)) return NextResponse.json({ error: tResponse("System.requestFailed") }, { status: 400 });
+      const pricingError = listingPriceMetadataError(metadata,tResponse);
+      if (pricingError) return NextResponse.json({error: pricingError}, {status:400});
+      updates.metadata = { ...(current.metadata as Record<string, unknown> ?? {}), ...("price_currency" in metadata ? {price_currency: metadata.price_currency} : {}), job: jobSchedule((metadata as Record<string, unknown>).job) };
     } else if (metadata !== undefined) {
       if (!["location", "prop", "vehicle"].includes(current.type)) return NextResponse.json({ error: tResponse('System.m_16aada756674') }, { status: 400 });
       const pricingError = listingPriceMetadataError(metadata,tResponse);
@@ -137,7 +143,8 @@ export async function PATCH(
       const merged = current.metadata && typeof current.metadata === "object" && !Array.isArray(current.metadata)
         ? { ...(current.metadata as Record<string, unknown>) }
         : {};
-      if (current.type !== "location" && Object.keys(incoming).some(key => !["price_negotiable", "price_on_request", "marketplace", "rental_type"].includes(key))) return NextResponse.json({ error: tResponse('System.m_edc5de5cf373') }, { status: 400 });
+      if (current.type !== "location" && Object.keys(incoming).some(key => !["price_negotiable", "price_on_request", "price_currency", "marketplace", "rental_type"].includes(key))) return NextResponse.json({ error: tResponse('System.m_edc5de5cf373') }, { status: 400 });
+      if ("price_currency" in incoming) merged.price_currency = incoming.price_currency;
       const numericFields: Record<string, number> = { sqm: 1000000, ceiling_height_m: 1000, max_crew: 100000, parking_spots: 100000 };
       for (const [key, maximum] of Object.entries(numericFields)) {
         if (!(key in incoming)) continue;

@@ -1,8 +1,9 @@
+import { isCurrencyCode, listingCurrency } from "./currency";
 import { matchesPlace, placeKey, placeSearchMatches } from "./places/core";
 
 export type LocationLandingFilters = {
   q: string; cityText: string; country: string; region: string; city: string;
-  type: string; min: string; max: string; sort: string;
+  type: string; currency?: string; min: string; max: string; sort: string;
   lage: string; power: string; instant: string; verified: string;
 };
 
@@ -10,7 +11,7 @@ export const DEFAULT_LOCATION_LANDING_FILTERS: LocationLandingFilters = Object.f
   q: "", cityText: "", country: "", region: "", city: "", type: "", min: "", max: "", sort: "featured", lage: "", power: "", instant: "", verified: "",
 });
 
-const PARAMS = ["q", "cityText", "country", "region", "city", "type", "min", "max", "sort", "lage", "power", "instant", "verified"] as const;
+const PARAMS = ["q", "cityText", "country", "region", "city", "type", "currency", "min", "max", "sort", "lage", "power", "instant", "verified"] as const;
 const SORTS = new Set(["featured", "price-asc", "price-desc", "rating"]);
 const KNOWN_TYPES = ["Wohnen", "Villa", "Büro", "Industrie", "Natur", "Gastronomie", "Studio", "Fotostudio", "Speziallocation"];
 const textKey = (value: string) => value.normalize("NFKC").toLowerCase();
@@ -39,7 +40,7 @@ function category(value: string | string[] | undefined): string {
 
 function price(value: string | string[] | undefined): string {
   const raw = first(value);
-  if (raw.length > 20 || !/^\d+(?:[.,]\d{1,2})?$/.test(raw)) return "";
+  if (raw.length > 20 || !/^\d+(?:[.,]\d{1,6})?$/.test(raw)) return "";
   const amount = Number(raw.replace(",", "."));
   return Number.isFinite(amount) && amount <= 1_000_000 ? String(amount) : "";
 }
@@ -49,6 +50,7 @@ export function readLocationLandingFilters(params: Record<string, string | strin
   return {
     q: text(params.q, 200), cityText: text(params.cityText, 120),
     country: identifier(params.country), region: identifier(params.region), city: identifier(params.city),
+    ...(isCurrencyCode(first(params.currency)) ? {currency:first(params.currency)} : {}),
     type: category(params.type), min: price(params.min), max: price(params.max),
     sort: SORTS.has(sort) ? sort : "featured",
     lage: ["Innen", "Außen", "Innen & Außen"].includes(first(params.lage)) ? first(params.lage) : "",
@@ -75,7 +77,9 @@ function locationMatches(row: FilterableLocation, query: string): boolean {
 
 export function filterLandingLocations<T extends FilterableLocation>(rows: T[], filters: LocationLandingFilters, categoryLabel: (value: string) => string): T[] {
   const f = readLocationLandingFilters(filters), query = textKey(f.q), categoryKey = textKey(f.type);
+  const currency = f.currency || (f.min || f.max || f.sort.startsWith("price-") ? "EUR" : "");
   const result = rows.filter(row => {
+    if (currency && listingCurrency(row.metadata) !== currency) return false;
     if (!matchesPlace(row, "country", f.country) || !matchesPlace(row, "region", f.region) || !matchesPlace(row, "city", f.city)) return false;
     const indoorOutdoor = row.metadata?.indoor_outdoor;
     if (f.lage && indoorOutdoor && !(indoorOutdoor === "beides" || (f.lage === "Innen" && indoorOutdoor === "innen") || (f.lage === "Außen" && indoorOutdoor === "außen"))) return false;
