@@ -38,7 +38,7 @@ export default function SmartSearchMap({ groups, bounds, onApplyBounds }: {
         labels={{ label: t("mapTitle"), results: mapText("mapped", { count: locations.length }), empty: mapText("empty"), unknownCoordinates: "", cluster: clusterLabel, error: mapText("error"), applyArea: t("discovery.applyMapArea"), nativeApplyArea: t("discovery.searchHere") }}
         renderPreview={selected => {
           const entry = entries.find(item => item.key === selected.id);
-          return entry ? <div className="p-3 pt-11"><p className="mb-2 text-xs font-medium" style={{ color: SMART_MAP_COLORS[entry.area] }}>{t(`areas.${entry.area}`)}</p><ResultCard result={entry.result} compact row /></div> : null;
+          return entry ? <div className="p-3"><p className="flex min-h-8 items-start pr-9 text-xs font-medium" style={{ color: SMART_MAP_COLORS[entry.area] }}>{t(`areas.${entry.area}`)}</p><ResultCard result={entry.result} compact row /></div> : null;
         }} />
     </div>
     <div className="smart-map-meta">
