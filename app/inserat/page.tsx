@@ -59,7 +59,7 @@ function getLocalizedGroups(translate: (key: string) => string): Group[] {
     items: [
       ...FILM_DEPARTMENTS.map((d) => ({
         id: `job_${d.id}`,
-        label: d.label,
+        label: taxonomyLabel(d.label, translate),
         icon: deptMeta[d.id]?.icon ?? Users,
         type: "job" as const,
         category: d.label,
@@ -1322,7 +1322,7 @@ export default function InseratPage() {
                     {(["innen", "außen", "beides"] as const).map((opt) => (
                       <button key={opt} type="button" onClick={() => f("indoor_outdoor", opt)}
                         className={`flex-1 py-2.5 text-sm font-medium transition-colors capitalize ${form.indoor_outdoor === opt ? "bg-gold text-bg-primary" : "bg-bg-elevated text-text-muted hover:text-text-primary"}`}>
-                        {opt.charAt(0).toUpperCase() + opt.slice(1)}
+                        {uiText(opt === "innen" ? "locations.filterInnen" : opt === "außen" ? "locations.filterAussen" : "locations.filterInnenAussen")}
                       </button>
                     ))}
                   </div>

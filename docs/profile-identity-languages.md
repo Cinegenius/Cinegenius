@@ -56,6 +56,15 @@ rendered Spanish catering controls, including canonical values after selection.
 This is component/catalogue verification, not a real iPhone or linguistic review
 by native speakers in every language. Publication remains a separate step.
 
+The additional Spanish screenshots of `/inserat?group=jobs` exposed the same
+raw-label path in the job department chooser. Its display labels now use the
+existing translations; its IDs and submitted categories remain canonical.
+Location indoor/outdoor buttons also reuse existing translated labels. The chooser
+regression covers all seventeen locales and preserves the category values for jobs,
+marketplace, animals and locations. This is not certification of every legacy form:
+the older vehicle subtype/fuel/licence selectors still contain raw option text and
+need a separate complete catalogue mapping before claiming full form coverage.
+
 APP Entwicklung must use the same optional fields, visibility contract, stable taxonomy IDs and locale tags. The original native preset deferral is superseded by the current scope in docs/profile-art.md. Existing native sources and device behavior are separate from this website change.
 
 Browser simulations cover phone/tablet/laptop widths. They do not certify an actual iPhone, Xcode build or native language switching. APP Entwicklung messaging transport was unavailable; record the final source/test/publication handoff locally and do not claim delivery until acknowledged.
