@@ -26,3 +26,30 @@ interface copy, native device test or production release is included.
 This changes the website homepage only. Native directory ordering and the app
 release hold remain unchanged. Country-first discovery is a separate pending
 change and is not implemented by this rotation.
+
+## App source integration — 20 November 2026
+
+WEB commit `f6b45be5557b65e741e8b0962e04b147558b90cd` is imported unchanged
+as `05c8b2f4` on `codex/app-home-crew-rotation-20261120`, based on the checked
+app map-count commit `38d87bb4`. This affects the shared `/` page if reached
+inside the app, not its native Smart landing or Crew directory ranking.
+The separate map-count branch and frozen UI follow-up remain unchanged.
+
+APP reran the 48 homepage checks and 13 native discovery checks: all 61 passed.
+The actual `HomeCrew` render function, rail component/styles, native cards,
+themes, discovery ordering, navigation and privacy helpers match the previous
+app source. All 17 language catalogs are byte-identical; no new interface
+copy, schema, endpoint, timer or native package is introduced. Shared design
+checks pass. Lint reports no errors and the existing unused homepage import.
+
+The full build passed with exit code 0 in 191.64 seconds, including TypeScript
+and the 17-catalog check. This isolated checkout has no production credentials;
+unavailable recommendations/project reads in the build log are not live-data
+verification. Build status, source hashes and logs are recorded at
+`/srv/cinegenius/handoffs/20261120-app-home-crew-rotation/receipt.json`.
+Tests use synthetic query data and rendered components. This integration adds
+no browser/device, real database, 15-minute device observation or production
+load benchmark. The 17-locale catalog check is distinct from the older
+homepage flow fixtures, some of which exercise nine locales. No release,
+installation, Push or Shots activation was performed; the app release hold
+remains in force.
