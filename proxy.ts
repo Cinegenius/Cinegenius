@@ -205,6 +205,7 @@ const isWebhookRoute = createRouteMatcher(["/api/webhooks/(.*)"]);
 // API routes where GET is public — mutations (POST/PATCH/PUT/DELETE) require auth.
 // This prevents a missed requireAuth() in a handler from opening write access.
 const isPublicApiGet = createRouteMatcher([
+  "/api/browse-preference",
   "/api/places",
   "/api/places/options",
   "/api/community-image",

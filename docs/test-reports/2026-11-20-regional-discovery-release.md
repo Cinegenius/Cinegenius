@@ -25,3 +25,12 @@ Der Livegang erfolgt ausschließlich über `npm run deploy:production` von saube
 `main` gleich `origin/main`. Tatsächliches Deployment und nachfolgende Liveprüfungen:
 `/srv/cinegenius/handoffs/20261120-country-first-release/receipt.json`.
 Ein Freigabeauftrag ist noch kein Nachweis einer erfolgreichen Veröffentlichung.
+
+## Korrektur aus der Live-Prüfung
+
+Die erste Veröffentlichung `5d4aadba` zeigte, dass der bestehende Proxy den
+neuen Gastabruf von `/api/browse-preference` noch mit 401 sperrte. Die genaue
+Route wird deshalb wie andere öffentliche Lese-APIs freigegeben. Mutationen,
+Unterpfade, private Kontoendpunkte und Herkunftsprüfung behalten ihre Schutzregeln.
+Ein neuer Regressionstest reproduzierte den Fehler vor der Korrektur; danach
+bestanden alle 25 zugehörigen Proxy-/Zugriffs-/Regionsprüfungen.
