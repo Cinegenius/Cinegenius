@@ -11,7 +11,7 @@ Dieses Verzeichnis hält die Bereiche, ihre Funktionen, den belegten Stand und o
 
 | Bereich | Was dazugehört | Aktueller Stand / nächste Arbeit |
 | --- | --- | --- |
-| **Startseite** | Suche, Entdecken, Die Crew, Aus der Branche, Organisationen, Marktplatz, Jobs, frische Einblicke, Branchenpartner, Locations und Schwarzes Brett | Vorhanden. Regionale Auswahl vor der Begrenzung für Crew, Marktplatz, Locations, Jobs und Firmen im geprüften Entwurf; noch nicht live. Gestaltung erhalten; Foto-Entdeckung bleibt mangels verlässlicher Ortsprojektion global. |
+| **Startseite** | Suche, Entdecken, Die Crew, Aus der Branche, Organisationen, Marktplatz, Jobs, frische Einblicke, Branchenpartner, Locations und Schwarzes Brett | Vorhanden. Regionale Auswahl vor der Begrenzung für Crew, Marktplatz, Locations, Jobs und Firmen veröffentlicht im Website-Stand `4d93523a`. Gestaltung erhalten; Foto-Entdeckung bleibt mangels verlässlicher Ortsprojektion global. |
 | **Crew** | Personenprofile, Berufe, Haupt-/Nebentätigkeiten, Fähigkeiten, Orte, Anbieter-Wechsel, Suche, Filter, Kacheln/Liste/Karte | Vorhanden. Gemeinsamer Kartenfix veröffentlicht. Nachgemeldete Ausnahme im Crew-Anbieterfilter korrigiert: Die obere Zahl zählt jetzt im Entwurf dieselbe Auswahl wie Karte und Liste; noch nicht veröffentlicht. Keine privaten oder erfundenen Positionen. |
 | **Locations** | Drehorte, Studios, Kategorien, Ortsfilter, Detailseiten, Bilder, Kontakt/Anfragen und Ansichten | Vorhanden. Formular- und Suchqualität weiter prüfen; Karte ersetzt keine vollständige Liste. |
 | **Marktplatz** | Equipment, Requisiten, Fahrzeuge, Dienstleistungen, Kategorien, Anbieter, Preise, Angebote und Suche | Vorhanden. Mehrwährungen sind ein separater unveröffentlichter Entwurf. Gemeldete Smart-Fälle „Lampe“ und „bayerischer Hut“ bleiben als Suchqualitätsfälle erfasst. |
@@ -53,7 +53,7 @@ Dieses Verzeichnis hält die Bereiche, ihre Funktionen, den belegten Stand und o
 | Werkzeug | Zweck | Stand / nächste Arbeit |
 | --- | --- | --- |
 | **Normale Suche** | Website-Suche sowie bereichseigene Suche und Filter | Vorhanden. Kategorie- und Ortsoptionen sollen tatsächlich vorhandene sichtbare Inhalte abbilden. |
-| **Smart** | Mehrere Wünsche und Orte, Bereichsgruppen, Mengen/Anforderungen, Karte und nahe Alternativen | Implementiert, **weiterhin nur für berechtigte Admins**; Mitglieder sehen eine statische Vorschau. Freie Formulierungen sind keine garantiert fehlerfreien Ergebnisse. Kartenvorschau kompakter vorbereitet: inhaltsabhängige Höhe statt leerer gestreckter Fläche; noch nicht live. |
+| **Smart** | Mehrere Wünsche und Orte, Bereichsgruppen, Mengen/Anforderungen, Karte und nahe Alternativen | Implementiert, **weiterhin nur für berechtigte Admins**; Mitglieder sehen eine statische Vorschau. Freie Formulierungen sind keine garantiert fehlerfreien Ergebnisse. Kompakte Smart-Kartenvorschau veröffentlicht: inhaltsabhängige Höhe statt gestreckter Leerfläche. |
 | **Genie** | Plattformhilfe, Textunterstützung, Sprache und erlaubte Suche | Vorhanden. Smart-Rechte gelten auch über Genie; normale Hilfe bleibt davon getrennt. Kein automatisches Modelltraining durch Unterhaltungen. |
 | **Work-Einstieg** | Hinweis bzw. Übergang zu vorgesehenen Arbeitswerkzeugen | Öffentlicher Werkzeug-Hinweis und App-Einstieg vorhanden. Vollständiger nativer Workspace gehört in die App-Übersicht, nicht als fertige Web-Anwendung ausgeben. |
 | **Mitgestalten / Länder-Feedback** | Vertreter aus Mexiko, Ungarn und anderen Ländern prüfen CineGenius unabhängig voneinander; KI fragt z. B. „Ist Crew bei euch die richtige Bezeichnung?“ | **Programmierentwurf vorhanden, nicht live.** Login, private Gesprächsentwürfe, freie Eingabe, Länder-/Sprachbezug und ausdrückliches Absenden vorgesehen. |
@@ -63,7 +63,7 @@ Dieses Verzeichnis hält die Bereiche, ihre Funktionen, den belegten Stand und o
 
 | Thema | Stand | Nächster Schritt |
 | --- | --- | --- |
-| **Regionale Inhalte zuerst** | Geprüfter Entwurf: Aufrufland zuerst, eigener Profilort im selben Land zur Verfeinerung oder als Rückfall. Auch für Gäste. 162 Tests und 32 Browserfälle bestanden; noch nicht live. | [Gemeinsamer Vertrag](country-first-discovery.md). Manuelle Länder-/Ortswahl und „Alle“ bleiben maßgeblich; Auswahl vor Begrenzung/Nachladen. APP-Übernahme und echte Geräte-/Regionsprüfung offen. |
+| **Regionale Inhalte zuerst** | Website veröffentlicht (`4d93523a`): Aufrufland zuerst, eigener Profilort im selben Land zur Verfeinerung oder als Rückfall. Auch für Gäste; Live-Gastabruf geprüft. 162 Tests und 32 Browserfälle bestanden. | [Gemeinsamer Vertrag](country-first-discovery.md). Manuelle Länder-/Ortswahl und „Alle“ bleiben maßgeblich; Auswahl vor Begrenzung/Nachladen. APP-Übernahme und echte Geräte-/Regionsprüfung offen. |
 | **Mehrsprachigkeit** | 17 Website-Kataloge: Deutsch, Englisch, Spanisch, Italienisch, Tschechisch, Ungarisch, Niederländisch, Belgisch-Niederländisch, Schwedisch, Französisch, Polnisch, Portugiesisch (Portugal), vereinfachtes Chinesisch, Japanisch, Koreanisch, Russisch, Ukrainisch | Katalogvollständigkeit beweist keine vollständige sprachliche Qualität. Mexikanische Bezeichnungen prüfen; Crew bleibt dort Crew, Equipment wird Equipo. Mitgliedertexte und Rechtsoriginale nicht ungefragt umschreiben. |
 | **Währungen / internationale Formulare** | EUR-Bestand; Auswahl zusätzlicher Währungen und internationale Anpassungen als separater Entwurf | Mexiko, Italien, Spanien, Frankreich, Schweiz, Österreich, Ungarn und bereits vertretene Länder prüfen. Anbieter wählen Währung; keine automatische Umrechnung. |
 | **Karten / Ergebniszahlen** | Fix `822c27c` am 20.11.2026 veröffentlicht; Vercel-Produktionsalias bestätigt | Gesamtbestand, Kartentreffer, außerhalb des Ausschnitts und ohne Kartenposition unterscheiden. Live-Browsernachprüfung separat protokollieren; App-Ergänzungen bleiben eigener Stand. |
@@ -86,16 +86,16 @@ Dieses Verzeichnis hält die Bereiche, ihre Funktionen, den belegten Stand und o
 | **Aktualität von Profilen/Angeboten** | Bestandsprüfung, Hinweise und geregeltes Ausblenden veralteter Inhalte | Dokumentiert; tatsächliche Zeitpläne/Aktivierung brauchen Betriebsbeleg, keine unbestätigte automatische Löschung zusagen. |
 | **Werbung** | Bestehender historischer Pfad `/werben` | Kein freigegebenes aktives Werbeinventar; keine Banner oder Buchungsplätze reaktivieren. |
 
-Aktuelle Prioritäten und gesicherte Zwischenstände: [Auftragsreihenfolge](AKTUELLE-AUFTRAEGE.md). Der nachgemeldete Crew-Zählerfehler hat Vorrang; Homepage-Crew-Rotation ist separat in `f6b45be5` geprüft, noch nicht veröffentlicht.
+Aktuelle Prioritäten und gesicherte Zwischenstände: [Auftragsreihenfolge](AKTUELLE-AUFTRAEGE.md). Crew-Zähler und Homepage-Crew-Rotation sind veröffentlicht. Der beim Live-Test gefundene Randpin-Fehler wird vor dem nächsten Redaktionsschritt abgeschlossen.
 
 ## Aktuell offene Arbeit
 
-1. Geprüfte Länderpriorisierung mit APP übernehmen und nach Aufhebung des Release-Halts veröffentlichen; tatsächliche Aufrufländer und Geräte separat prüfen.
+1. Veröffentlichtes Websitepaket abschließend live prüfen; Länderpriorisierung mit APP übernehmen. Tatsächliche Aufrufländer und native Geräte separat prüfen, App-Release-Halt beibehalten.
 2. Mitgestalten und Feedback-Koordination fertig prüfen; erst nach Freigabe veröffentlichen.
 3. Internationale Formulare/Währungen aus dem separaten Entwurf vervollständigen.
 4. App-Zählerergänzungen und laufenden App-Server-Release getrennt abgleichen.
 5. Gemeldete freie Smart-Suchen und mehrsprachige Fachbegriffe mit echten Suchfällen prüfen; Zugriff bleibt eingeschränkt.
-6. Redaktionelle Mexiko-/Technik-Erweiterungen mit AG DOK nach Quelle, Freigabe und tatsächlich veröffentlichtem Ergebnis unterscheiden. Neu aus der Redaktion gemeldet: eigene Länder-/Themen-Newsrooms unter „CineGenius Redaktion“ zusammenführen. Noch nicht umgesetzt oder live bestätigt; Beiträge, alte Links, Rechte und Herkunft erhalten, reale Quellorganisationen unverändert lassen.
+6. Redaktionelle Mexiko-/Technik-Erweiterungen mit AG DOK nach Quelle, Freigabe und tatsächlich veröffentlichtem Ergebnis unterscheiden. Neu aus der Redaktion gemeldet: eigene Länder-/Themen-Newsrooms unter „CineGenius Redaktion“ zusammenführen. Veröffentlichungsdienst als Entwurf mit 40 bestandenen Tests vorhanden; sichere Datenzusammenführung und Aktivierung noch offen. Beiträge, alte Links, Rechte und Herkunft erhalten, reale Quellorganisationen unverändert lassen.
 
 ## Pflege und Belege
 
@@ -117,6 +117,9 @@ Unterlagen: `/srv/cinegenius/handoffs/news-editorial-20261120/newsroom-consolida
 - Quellen: aktueller Hauptstand `822c27c`, `app/**/page.tsx`, [Karten-Zähler](map-result-counts.md), [Smart-Zugriff](smart-development-preview.md), [Privatsphäre](profile-privacy.md), [persönlicher Bereich](personal-area.md), [News-Themen](home-news-topics.md), [Dienstleistungen](marketplace-services.md), [Projektabläufe](projects-workflow.md), [Artworks](profile-art-stock.md), [E-Mails](email-branding.md), [Statistik](posthog-analytics.md).
 - Veröffentlichungsbeleg Karten: `/srv/cinegenius/handoffs/20261120-map-counts/receipt.json` und `deploy.log`. Die Feedback- und Währungsentwürfe sind nicht Bestandteil dieses Releases.
 
-**Homepage-Crew-Rotation:** 24 Stunden Vorrang für neue Profile, danach alle 15 Minuten wechselnde Mischung auch älterer Mitglieder; unveröffentlicht in `f6b45be5`, 48 gezielte Tests bestanden. Native Verzeichnis-Sortierung und Release-Halt unverändert.
+**Homepage-Crew-Rotation:** 24 Stunden Vorrang für neue Profile, danach alle 15 Minuten wechselnde Mischung auch älterer Mitglieder; Website veröffentlicht; ursprünglicher Entwurf `f6b45be5`, 48 gezielte Tests bestanden. Native Verzeichnis-Sortierung und Release-Halt unverändert.
 
-**Regionale Auswahl (20.11.):** Website-Entwurf und API-Vertrag in [Regionale Inhalte zuerst](country-first-discovery.md). Noch nicht veröffentlicht; keine Währungsaktivierung, keine Änderung redaktioneller Freigaben.
+**Regionale Auswahl (20.11.):** Veröffentlichte Website und API-Vertrag in [Regionale Inhalte zuerst](country-first-discovery.md). Stand `4d93523a`; keine Währungsaktivierung, keine Änderung redaktioneller Freigaben.
+
+
+**Release-Beleg (20.11.):** `/srv/cinegenius/handoffs/20261120-country-first-release/receipt.json` enthält den tatsächlichen Quellstand, Deployment und Liveprüfungen. Randpin-Fokuskorrektur im selben freigegebenen Auftrag; keine neue native Veröffentlichung. Redaktion: Dienstentwurf unter `/srv/cinegenius/handoffs/news-editorial-20261120/verification.json`, 40 Tests, noch keine Produktionsmigration oder Aktivierung.

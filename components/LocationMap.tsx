@@ -82,9 +82,11 @@ export default function LocationMap({ preserveViewport = false, readOnly = false
   if (selection.scope !== selectionKey) setSelection({ scope: selectionKey, id: null, cluster: [] });
   const hoverRef = useRef(onHover);
   const boundsChangeRef = useRef(onBoundsChange);
+  const locationsRef = useRef(locations);
   const automaticBounds = Boolean(onBoundsChange);
   const hasMapPoints = locations.some(hasCoordinates);
   useEffect(() => { boundsChangeRef.current = onBoundsChange; }, [onBoundsChange]);
+  useEffect(() => { locationsRef.current = locations; }, [locations]);
   const initialBounds = useRef(appliedBounds);
   useEffect(() => { initialBounds.current = appliedBounds; }, [appliedBounds]);
   useEffect(() => {
@@ -115,7 +117,14 @@ export default function LocationMap({ preserveViewport = false, readOnly = false
       if (key === previousBounds) return;
       previousBounds = key;
       boundsChangeRef.current?.(next);
-      setSelection(current => current.id || current.cluster.length ? {...current, id: null, cluster: []} : current);
+      setSelection(current => {
+        if (!current.id && !current.cluster.length) return current;
+        const point = locationsRef.current.find(location => location.id === current.id);
+        // Focusing a marker near an edge can pan Leaflet after the tap. Keep
+        // its preview while the point remains visible; cluster choices expire.
+        if (point && hasCoordinates(point) && inMapBounds(point, next)) return current;
+        return {...current, id: null, cluster: []};
+      });
       hoverRef.current(null);
     };
     map.on("moveend", updateBounds);
