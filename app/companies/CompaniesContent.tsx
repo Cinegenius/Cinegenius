@@ -159,13 +159,13 @@ export default function CompaniesContent({ initialCompanies }: { initialCompanie
         categories={COMPANY_CATEGORIES.filter(category => initialCompanies.some(company => company.categories.includes(category.id))).map((category) => ({ value: category.id, label: taxonomyLabel(companyCategoryLabel(category.id, category.label), uiText) }))}
         categoryValue={selectedCategory ?? ""}
         onCategoryChange={(value) => setSelectedCategory(value || null)}
-        resultCount={map.rows.length} resultSummary={`${map.rows.length} ${t("resultsCount")}`}
+        resultCount={filtered.length} resultSummary={`${filtered.length} ${t("resultsCount")}`}
         viewControls={<DirectoryViewControls value={viewMode} onChange={setViewMode} />}
         filterCount={mobileChips.length}
         chips={mobileChips}
         onReset={clearAll}
         resetLabel={t("resetFilters")}
-        showResultsLabel={uiText("Ui.text_4d89b095821660", { value1: String(map.rows.length) })}
+        showResultsLabel={uiText("Ui.text_4d89b095821660", { value1: String(filtered.length) })}
       >
         <PlaceFilters rows={initialCompanies} value={{country:countryFilter,region:regionFilter,city:cityFilter}} onChange={value => {setCountryFilter(value.country);setRegionFilter(value.region);setCityFilter(value.city);}} />
         {(verifiedOnly || initialCompanies.some(company => company.verified)) && <label className="flex min-h-11 items-center gap-3 text-sm text-text-secondary"><input type="checkbox" className="size-4 accent-gold" checked={verifiedOnly} onChange={(event) => setVerifiedOnly(event.target.checked)} />{t("filterVerified")}</label>}
@@ -181,7 +181,7 @@ export default function CompaniesContent({ initialCompanies }: { initialCompanie
           {/* Main content */}
           <div ref={resultsRef} className="flex-1 min-w-0 scroll-mt-24">
 
-            <DirectoryResults view={viewMode} map={<DirectoryMap compact kind="companies" items={mapItems} bounds={map.bounds} onBoundsChange={map.setBounds} />}>
+            <DirectoryResults view={viewMode} map={<DirectoryMap compact kind="companies" onShowAll={() => { map.setBounds(null); setViewMode("list"); }} items={mapItems} bounds={map.bounds} onBoundsChange={map.setBounds} />}>
             {paginated.length === 0 ? (
               <div className="py-16 text-center">
                 <div className="w-16 h-16 rounded-2xl bg-bg-secondary border border-border flex items-center justify-center mx-auto mb-5">

@@ -18,7 +18,8 @@ import PageHeader from "@/components/PageHeader";
 import DirectoryPage from "@/components/DirectoryPage";
 import PlaceFilters,{ EMPTY_PLACE_FILTERS,type PlaceFilterValue } from "@/components/PlaceFilters";
 import { locationCategoryLabel } from "@/lib/location-category-labels";
-import { hasCoordinates,inMapBounds,locationDistanceKm,type MapBounds } from "@/lib/location-map";
+import MapResultSummary from "@/components/MapResultSummary";
+import { hasCoordinates,inMapBounds,mapResultCounts,locationDistanceKm,type MapBounds } from "@/lib/location-map";
 import {
 DEFAULT_LOCATION_LANDING_FILTERS,filterLandingLocations,locationLandingCategoryOptions,
 locationLandingParams,readLocationLandingFilters,type LocationLandingFilters,
@@ -102,6 +103,7 @@ export default function LocationsLanding({ allLocations, totalCount, initialFilt
   const geography = useBrowseGeography(filters.sort === "featured" && !filters.country && !filters.region && !filters.city && !filters.cityText && !nearby.coordinates);
   const matching = useMemo(() => prioritizeGeographically(filterLandingLocations(allLocations, filters, value => locationCategoryLabel(value, categoryText)), geography.preferred), [allLocations, filters, categoryText, geography.preferred]);
   const mapLocations = useMemo(() => matching.filter(row => !nearby.coordinates || (hasCoordinates(row) && locationDistanceKm(nearby.coordinates, [row.lat, row.lng]) <= radiusKm)), [matching, nearby.coordinates, radiusKm]);
+  const mapCounts = useMemo(() => mapResultCounts(mapLocations, mapBounds), [mapLocations, mapBounds]);
   const filtered = useMemo(() => effectiveView === "map" && mapBounds ? mapLocations.filter(row => inMapBounds(row, mapBounds)) : mapLocations, [effectiveView, mapLocations, mapBounds]);
   const updateMapBounds = (next: MapBounds) => {
     if (mapBounds && mapBounds.south === next.south && mapBounds.north === next.north && mapBounds.west === next.west && mapBounds.east === next.east) return;
@@ -151,9 +153,9 @@ export default function LocationsLanding({ allLocations, totalCount, initialFilt
     {nearby.error && <p role="alert" className="text-sm text-text-secondary">{t(nearby.error)}</p>}
   </>;
 
-  const mapPanel = <aside aria-label={t("viewMap")} className="locations-discovery-map directory-map-frame">
-          <LocationMap locations={mapLocations} visibleCount={filtered.length} onBoundsChange={updateMapBounds} activeId={activeId} onHover={setActiveId} userLocation={nearby.coordinates} radiusKm={radiusKm} appliedBounds={mapBounds} onApplyBounds={setMapBounds} />
-        </aside>;
+  const mapPanel = <div className="min-w-0 space-y-3"><aside aria-label={t("viewMap")} className="locations-discovery-map directory-map-frame">
+          <LocationMap locations={mapLocations} visibleCount={mapCounts.visible} labels={{label: uiText("locationMap.label"), results: uiText("directoryMap.mapped", {count: mapCounts.visible}), empty: uiText("directoryMap.empty"), unknownCoordinates: ""}} onBoundsChange={updateMapBounds} activeId={activeId} onHover={setActiveId} userLocation={nearby.coordinates} radiusKm={radiusKm} appliedBounds={mapBounds} onApplyBounds={setMapBounds} />
+        </aside><MapResultSummary counts={mapCounts} onShowAll={() => { setMapBounds(null); setViewMode("list"); }} /></div>;
 
   return (
     <DirectoryPage area="locations">
@@ -175,8 +177,8 @@ export default function LocationsLanding({ allLocations, totalCount, initialFilt
         categoryLabel={t("categoryLabel")} allCategoryLabel={t("allLocations")} categories={categories}
         categoryValue={filters.type} onCategoryChange={value => updateFilters({ type: value })}
         viewControls={viewControls}
-        resultCount={filtered.length} resultSummary={t("results", { count: filtered.length })} filterCount={chips.length + (filters.q ? 1 : 0)} chips={chips}
-        onReset={resetFilters} resetLabel={t("resetFilters")} showResultsLabel={t("showResults", { count: filtered.length })}
+        resultCount={mapLocations.length} resultSummary={t("results", { count: mapLocations.length })} filterCount={chips.length + (filters.q ? 1 : 0)} chips={chips}
+        onReset={resetFilters} resetLabel={t("resetFilters")} showResultsLabel={t("showResults", { count: mapLocations.length })}
       >
         <PlaceFilters rows={allLocations} value={filters} onChange={changePlaces} />
         <div className="grid grid-cols-2 gap-3">

@@ -12835,7 +12835,9 @@
     "providerPurpose": "Интерактивные карты",
     "providerRegion": "Венгрия / CDN",
     "providerNotice": "При открытии карты ваш браузер загружает материалы с OpenFreeMap. Ваш IP-адрес и технические данные запроса передаются провайдеру карты. Имена, профили и сообщения не отправляются как данные карты. <provider>Информация о провайдере</provider>.",
-    "information": "Информация о карте"
+    "information": "Информация о карте",
+    "outside": "За пределами области: {count, number}",
+    "showAll": "Показать все ({count, number})"
   },
   "BrowseGeography": {
     "preferred": "Сначала рядом и {country}",

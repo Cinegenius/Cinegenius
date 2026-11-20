@@ -18,3 +18,16 @@ export function locationDistanceKm(a: [number, number], b: [number, number]): nu
   const value = Math.sin(dLat / 2) ** 2 + Math.cos(a[0] * radians) * Math.cos(b[0] * radians) * Math.sin(dLng / 2) ** 2;
   return 6371 * 2 * Math.asin(Math.sqrt(Math.min(1, Math.max(0, value))));
 }
+
+/** Counts only the permission-filtered results supplied by the caller.
+ * A missing/invalid coordinate is never a point outside the viewport. */
+export function mapResultCounts(items: readonly { lat?: number | null; lng?: number | null }[], bounds: MapBounds | null) {
+  let mapped = 0, visible = 0;
+  for (const item of items) {
+    const point = { lat: item.lat ?? null, lng: item.lng ?? null };
+    if (!hasCoordinates(point)) continue;
+    mapped++;
+    if (!bounds || inMapBounds(point, bounds)) visible++;
+  }
+  return { total: items.length, mapped, visible, outside: mapped - visible, unmapped: items.length - mapped };
+}
