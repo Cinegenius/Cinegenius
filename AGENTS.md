@@ -267,3 +267,10 @@ Crew result row correction, 14 November 2026: Keep the compact count, Crew, Loca
 ## Latest app interaction and Workspace contract – 19 November 2026
 
 Follow `docs/design/app-current-20261119.md` for the latest native-only navigation, shared measured header clearance, swipeable view controls, Workspace-style Genie and department About-glass contract. Workspace functions must reuse account-bound project/document IDs and respect revocable source context; Genie navigation context never grants access. Preserve actual implemented scope and distinguish local references from online team delivery.
+
+## Two maintained product inventories – operator request, 20 November 2026
+
+- Maintain `docs/CINEGENIUS-WEBSITE-UEBERSICHT.md` for the entire website, including public pages, personal/admin areas, feedback, editorial operations and shared foundations.
+- Maintain `docs/CINEGENIUS-APP-UEBERSICHT.md` separately for the entire native app, including Work and device-specific capabilities. Markus explicitly requests two inventories, not one combined list.
+- With each relevant change update the affected entries: scope, date, implementation status, publication/activation evidence, tests and remaining work. Cross-link shared contracts and coordinate with APP Entwicklung. Preserve unrelated updates; these documents create no new automation or release authorization.
+- Distinguish source present, tested, deployed, activated, installed and verified on a physical device. Never infer a live feature from a route, a draft, a successful build or another platform's test. Add new modules and mark superseded behavior; do not silently drop unfinished work.
