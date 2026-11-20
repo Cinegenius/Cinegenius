@@ -1,12 +1,14 @@
 ## App-Folgearbeit: Smart-Karten und News – 19. November 2026
 
-Der am 20. November 2026 abgeglichene veröffentlichte Hauptstand ist `e68bb8db43bc6d997e0f70525924ba5e53fa3da9`. Seine Headerkorrektur ohne zusätzliche dunkle Hintergrundfläche, stärkere Smart-Auswahlmarkierung, Header-/Genie-Korrekturen, Shots / News / Smart / Projekte / Work sowie Gast-Sprachwahl und Übersetzungs-/Länderänderungen erhalten. Die frühere Freigabe ist damit verbraucht; die hier vorbereitete App-Folgearbeit hat keine neue Veröffentlichungsfreigabe. Der erhaltene alte Mobile-Zweig und ältere Swift-Dateien dürfen diesen Hauptstand nicht ersetzen.
+Der am 20. November 2026 abgeglichene veröffentlichte Hauptstand ist `a9afd8e4057b932d1e15cd116deb123c25064586`. Die veröffentlichten spanischen Crew-Begriffe und Firmen-/Catering-/Inserat-Übersetzungen sowie seine Headerkorrektur ohne zusätzliche dunkle Hintergrundfläche, stärkere Smart-Auswahlmarkierung, Header-/Genie-Korrekturen, Shots / News / Smart / Projekte / Work sowie Gast-Sprachwahl und Übersetzungs-/Länderänderungen erhalten. Die frühere Freigabe ist damit verbraucht; die hier vorbereitete App-Folgearbeit hat keine neue Veröffentlichungsfreigabe. Der erhaltene alte Mobile-Zweig und ältere Swift-Dateien dürfen diesen Hauptstand nicht ersetzen.
 
 Für die genaue native App-Darstellung gilt jetzt: News ist der gemeinsame Einstieg zu Beiträge und Organisationen; Organisationen erscheinen nicht nochmals im App-Menü. Bestehende URLs bleiben erreichbar. Land/Stadt, Suche, Liste/Karte und Seitenauswahl dürfen keine berechtigten Organisationen wegen fehlender Kartenpunkte verlieren. Beide Ortsfilter müssen auch bei 320px erreichbar bleiben.
 
 Native Crew-Entdeckung wird ohne Eigentümerbonus über den vollständigen berechtigten Bestand gemischt; die Reihenfolge bleibt bei Nachladen, Zurück, Sprachwechsel und Wiederholen stabil. Berechtigungen werden weiter bei jeder Anfrage geprüft. Crew-Portraits vollständig darstellen, Originaldateien und gespeicherte Bildausschnitte erhalten. Die gemeinsame App-Farbzuordnung ist Crew Koralle, Marktplatz Gold, Smart Lime, Locations Blau, Firmen Violett. Sie gilt auch für Kategoriekennzeichen und Kartenpunkte. Die gewöhnliche Website bleibt gestalterisch unverändert. Diese begrenzte Folgearbeit nimmt die pausierte grundlegende Smart-/Spracharbeit nicht wieder auf.
 
 Quellen, Schnittstellen, Prüfungen und offene Geräte-/Leistungsgrenzen: `docs/app-news-crew-followup-20261119.md`.
+
+Die über WEB CODEX abgestimmte Länderarbeit priorisiert Mexiko und berücksichtigt Italien, Spanien, Frankreich, Schweiz, Österreich, Ungarn sowie die bereits vorhandenen Länder. Sprache, Suchland und Angebotswährung sind getrennte Angaben; vorhandene Preise werden nicht automatisch umgerechnet. Gemeinsame Länder-/Währungskorrekturen mit WEB abstimmen und geprüfte Änderungen in die App übernehmen. Der reine App-Bestandscheck unter `docs/app-regionalization-20261120.md` ist keine vollständige Länderfreigabe und keine native Geräteprüfung.
 
 ## App server release authorized by Markus – 19 November 2026
 

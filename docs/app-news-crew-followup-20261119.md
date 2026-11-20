@@ -1,5 +1,7 @@
 # App: faire Crew-Entdeckung, vollständige Fotos und News-Struktur
 
+Aktualisierung vom 20. November: Der veröffentlichte und hier abgeglichene Hauptstand ist jetzt `a9afd8e4057b932d1e15cd116deb123c25064586`. Die unten zunächst als vorbereitet beschriebenen drei WEB-Sprachkorrekturen sind inzwischen veröffentlicht. Unsere zusätzliche Crew-/Foto-/Farb-/News-Folgearbeit bleibt vorbereitet und ist dadurch nicht freigegeben. Der Abgleich der Git-Historie hat gegenüber `6fd33cc1a1d502a188249536f77e35a4c0b311a2` keine Produktdatei verändert. Der Länder-Bestandscheck und seine Grenzen stehen in `docs/app-regionalization-20261120.md`.
+
 Status: vorbereitet auf `codex/app-smart-colors-20261119`, keine Veröffentlichung dieser Folgearbeit. Die frühere Freigabe ist verbraucht. Die erste geprüfte Quellenbasis war `e18e666a1041d7170919e092c774c2eafbaf5dfc`. Am 20. November wurde die Folgearbeit mit dem inzwischen veröffentlichten `8302dcd57d919db740b8b942cd579cfe4ee118c5` abgeglichen (WEB CODEX bestätigt, Deployment `dpl_C4ZAEtv2AtBBGBSEUuDX3QX7ZqJK`). Die neue Navigation Shots / News / Smart / Projekte / Work, Header-/Genie-Korrekturen und Gast-Sprachwahl bleiben erhalten. Keine Migration, kein Provideraufruf, keine Aktivierung von Shots/Push und kein Produktionsschreibzugriff durch diese Folgearbeit.
 
 ## Verhalten und Ursachen
