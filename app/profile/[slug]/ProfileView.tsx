@@ -1,4 +1,5 @@
 "use client";
+import { listingCurrency, formatOfferAmount } from "@/lib/currency";
 
 import { TranslatedText, useTranslatedContent } from "@/components/ContentTranslation";
 
@@ -498,7 +499,7 @@ function ExternalProfilesDisplay({ profiles }: { profiles: ExternalProfileRow[] 
 // ═══════════════════════════════════════════════════════════════════════════════
 
 function ActorProfile({ organizationSection, profile, isOwner, projectCredits, companyMembership, externalProfiles, listings = [], blockStatus = null, collaborations = [], imageLikes = {}, myImageLikes = [] }: { organizationSection?: React.ReactNode; profile: UserProfile; isOwner: boolean; projectCredits: ProjectCredit[]; companyMembership: CompanyMemberships; externalProfiles: ExternalProfileRow[]; listings?: PublicListing[]; blockStatus?: { youBlocked: boolean; theyBlocked: boolean } | null; collaborations?: PublicCollab[]; imageLikes?: Record<string, number>; myImageLikes?: string[] }) {
-  const uiText = useTranslations();
+  const uiText = useTranslations(), priceLocale=useLocale();
 
   const tc = useTranslations("common");
   const profileText = useTranslations("profile");
@@ -669,7 +670,7 @@ function ActorProfile({ organizationSection, profile, isOwner, projectCredits, c
                   {languages.length > 0 && <StatPill label={uiText("profile.sectionLanguages")} value={languages.join(", ")} />}
                   {dialects.length > 0 && <StatPill label={uiText("Ui.text_c36026be4f20c4")} value={dialects.join(", ")} />}
                   {drivingLicenses.length > 0 && <StatPill label={uiText("Ui.text_b64c9c6e5a0fcd")} value={drivingLicenses.join(", ")} />}
-                  {profile.day_rate  && <StatPill label={uiText("Ui.text_e43c71342ddc3d")}  value={`${profile.day_rate} €`} />}
+                  {profile.day_rate  && <StatPill label={uiText("Ui.text_e43c71342ddc3d")}  value={formatOfferAmount(profile.day_rate, listingCurrency(profile.crew), priceLocale)} />}
                   {travel && <StatPill label={creatorText("filterTravel")} value={profileTraitLabel("travel", travel, profileText)} />}
                 </div>
               )}
@@ -1245,7 +1246,7 @@ function ModelProfile({ organizationSection, profile, isOwner, projectCredits = 
 // ═══════════════════════════════════════════════════════════════════════════════
 
 function GenericProfile({ organizationSection, profile, isOwner, projectCredits, companyMembership, externalProfiles, listings = [], blockStatus = null, collaborations = [], imageLikes = {}, myImageLikes = [] }: { organizationSection?: React.ReactNode; profile: UserProfile; isOwner: boolean; projectCredits: ProjectCredit[]; companyMembership: CompanyMemberships; externalProfiles: ExternalProfileRow[]; listings?: PublicListing[]; blockStatus?: { youBlocked: boolean; theyBlocked: boolean } | null; collaborations?: PublicCollab[]; imageLikes?: Record<string, number>; myImageLikes?: string[] }) {
-  const uiText = useTranslations();
+  const uiText = useTranslations(), priceLocale=useLocale();
 
   const profileText = useTranslations("profile");
   const creatorText = useTranslations("creators");
@@ -1379,7 +1380,7 @@ function GenericProfile({ organizationSection, profile, isOwner, projectCredits,
             {(languages.length > 0 || profile.day_rate || travel || profile.crew?.experience_years) && (
               <div className="grid grid-cols-1 min-[400px]:grid-cols-2 gap-x-6 gap-y-5">
                 {languages.length > 0 && <StatPill label={uiText("profile.sectionLanguages")} value={languages.join(", ")} />}
-                {profile.day_rate && <StatPill label={uiText("Ui.text_e43c71342ddc3d")} value={`${profile.day_rate} €`} />}
+                {profile.day_rate && <StatPill label={uiText("Ui.text_e43c71342ddc3d")} value={formatOfferAmount(profile.day_rate, listingCurrency(profile.crew), priceLocale)} />}
                 {travel && <StatPill label={creatorText("filterTravel")} value={profileTraitLabel("travel", travel, profileText)} />}
                 {profile.crew?.experience_years && <StatPill label={uiText("Ui.text_dfe794929179b3")} value={uiText("PageCopy.years", {count: profile.crew.experience_years})} />}
               </div>
@@ -1836,10 +1837,11 @@ type SimilarProfile = {
   tagline: string | null;
   verified: boolean;
   day_rate: number | null;
+  price_currency?: string;
 };
 
 function SimilarProfilesSection({ profiles }: { profiles: SimilarProfile[] }) {
-  const uiText = useTranslations();
+  const uiText = useTranslations(), priceLocale=useLocale();
 
   if (profiles.length === 0) return null;
   return (
@@ -1882,7 +1884,7 @@ function SimilarProfilesSection({ profiles }: { profiles: SimilarProfile[] }) {
                   </p>
                 )}
                 {p.day_rate && p.day_rate > 0 && (
-                  <p className="text-[10px] text-gold font-semibold mt-1">{uiText.rich("Ui.text_0da218ed73f2db", { value1: () => (p.day_rate) })}</p>
+                  <p className="text-[10px] text-gold font-semibold mt-1">{formatOfferAmount(p.day_rate, listingCurrency(p), priceLocale)}{uiText("common.perDay")}</p>
                 )}
               </Link>
             );

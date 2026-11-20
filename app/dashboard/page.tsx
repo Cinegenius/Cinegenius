@@ -1,4 +1,6 @@
 "use client";
+import CurrencySelect from "@/components/CurrencySelect";
+import { listingCurrency, formatOfferAmount } from "@/lib/currency";
 import PersonalSettings from "@/components/PersonalSettings";
 import PersonalAreaHome from "@/components/PersonalAreaHome";
 import { dashboardLegacyDestination } from "@/lib/personal-area-navigation";
@@ -60,6 +62,7 @@ type AnalyticsConversation = {
 };
 
 type Booking = {
+  currency: string;
   id: string;
   ref: string;
   listing_title: string;
@@ -211,7 +214,7 @@ function DashboardContent() {
   const [editMarketplace,setEditMarketplace]=useState(()=>marketplaceDraft());
   const marketText=useTranslations("MarketplaceOffer"),marketLocale=useLocale();
   const [editJob, setEditJob] = useState(() => jobEditValue(""));
-  const [editForm, setEditForm] = useState({ title: "", description: "", price: "", city: "", selected_place_city_id: "", image_url: "" });
+  const [editForm, setEditForm] = useState({ title: "", description: "", price: "", currency: "EUR", city: "", selected_place_city_id: "", image_url: "" });
   const [editGallery, setEditGallery] = useState<string[]>([]);
   const [editBlockedDates, setEditBlockedDates] = useState<string[]>([]);
   const [newBlockedDate, setNewBlockedDate] = useState("");
@@ -245,7 +248,7 @@ function DashboardContent() {
     setEditResponsible(responsiblePersonDraft(l.responsible_person));
     setEditResponsibleErrors({});
     setEditJob(jobEditValue(l.description ?? "", l.metadata));
-    setEditForm({ title: l.title, description: l.type === "job" ? parseJobDescription(l.description ?? "").description : l.description ?? "", price: String(l.price), city: placeInputValue(l, l.city), selected_place_city_id: (l as {place_city_id?: string}).place_city_id || "", image_url: l.image_url ?? "" });
+    setEditForm({ title: l.title, description: l.type === "job" ? parseJobDescription(l.description ?? "").description : l.description ?? "", price: String(l.price), currency: listingCurrency(l.metadata), city: placeInputValue(l, l.city), selected_place_city_id: (l as {place_city_id?: string}).place_city_id || "", image_url: l.image_url ?? "" });
     setEditGallery([l.image_url, ...(l.extra_images ?? [])].filter((url): url is string => typeof url === "string" && !!url));
     setEditBlockedDates(Array.isArray(l.blocked_dates) ? l.blocked_dates.filter((date): date is string => typeof date === "string") : []);
     setNewBlockedDate("");
@@ -357,10 +360,10 @@ function DashboardContent() {
             shooting_hours: editLocationMeta.shooting_hours,
             availability_notes: editLocationMeta.availability_notes,
             price_on_request: editLocationMeta.price_on_request,
-            price_negotiable: editLocationMeta.price_negotiable,
+            price_currency: editForm.currency, price_negotiable: editLocationMeta.price_negotiable,
             rooms: editLocationMeta.rooms,
             amenities: editLocationMeta.amenities,
-          } } : editingListing?.type === "job" ? { metadata: { job: { employmentType: editJob.employmentType, startDate: editJob.startDate, endDate: editJob.endDate } } } : editingListing?.type === "animal" ? {metadata:editAnimalMeta} : usesGallery ? (validateMarketplaceOffer(editMarketplace.category,editingListing?.type??"",serializeMarketplaceDraft(editMarketplace),editingListing?.published) ? {} : {category:editMarketplace.category,metadata:marketplaceMetadataPatch(editMarketplace)}) : {}),
+          } } : editingListing?.type === "creator" ? {metadata:{price_currency:editForm.currency}} : editingListing?.type === "job" ? { metadata: { price_currency: editForm.currency, job: { employmentType: editJob.employmentType, startDate: editJob.startDate, endDate: editJob.endDate } } } : editingListing?.type === "animal" ? {metadata:editAnimalMeta} : usesGallery ? (validateMarketplaceOffer(editMarketplace.category,editingListing?.type??"",serializeMarketplaceDraft(editMarketplace),editingListing?.published) ? {} : {category:editMarketplace.category,metadata:marketplaceMetadataPatch(editMarketplace)}) : {}),
         }),
       });
       const { error, publicationError, data: savedListing } = await res.json();
@@ -393,11 +396,11 @@ function DashboardContent() {
                 shooting_hours: editLocationMeta.shooting_hours,
                 availability_notes: editLocationMeta.availability_notes,
                 price_on_request: editLocationMeta.price_on_request,
-            price_negotiable: editLocationMeta.price_negotiable,
+            price_currency: editForm.currency, price_negotiable: editLocationMeta.price_negotiable,
                 rooms: editLocationMeta.rooms,
                 amenities: editLocationMeta.amenities,
               } } : l.type === "animal" ? { metadata: { ...l.metadata, ...editAnimalMeta } } : ["prop", "vehicle"].includes(l.type) ? {metadata:{...l.metadata,...marketplaceMetadataPatch(editMarketplace)}} : {}),
-              ...(["prop","vehicle"].includes(l.type) && savedListing ? {category:savedListing.category,price:savedListing.price,metadata:savedListing.metadata} : {}),
+              ...(savedListing ? {category:savedListing.category,price:savedListing.price,metadata:savedListing.metadata} : {}),
               ...(l.type === "location" ? { blocked_dates: editBlockedDates } : {}),
               ...(l.type === "prop" || l.type === "vehicle" || l.type === "animal" || l.type === "location" ? { image_url: editGallery[0] ?? null, extra_images: editGallery.slice(1) } : { image_url: editForm.image_url || null }),
             }
@@ -931,6 +934,7 @@ function DashboardContent() {
                     </div>
                     <div>
                       {["prop","vehicle"].includes(l.type) && <MarketplaceOfferFields value={editMarketplace} vehicleOnly={l.type === "vehicle"} onChange={setEditMarketplace} />}
+                      {["location", "job", "creator"].includes(l.type) && <CurrencySelect value={editForm.currency} onChange={currency => setEditForm(p => ({...p, currency}))} />}
                       {l.type === "location" && <ListingPriceOptions onRequest={editLocationMeta.price_on_request} negotiable={editLocationMeta.price_negotiable} onChange={value=>setEditLocationMeta(current=>({...current,price_on_request:value.priceOnRequest,price_negotiable:value.priceNegotiable}))} />}
                       {["prop","vehicle"].includes(l.type) ? null : l.type === "animal" ? <p className="text-xs text-text-muted">{animals("conditions")}</p> : !editLocationMeta.price_on_request || !["location", "prop", "vehicle"].includes(l.type) ? <>
                         <label className="text-xs uppercase tracking-widest text-text-muted font-semibold block mb-1">{l.type === "location" ? uiText("Ui.text_2d78239ac0e617") : uiText("Ui.text_177ce41dae81c2")}</label>
@@ -1009,7 +1013,7 @@ function DashboardContent() {
                           {b.notes && <p className="text-xs text-text-muted mt-1 italic line-clamp-1">„{b.notes}”</p>}
                         </div>
                         <div className="flex items-center gap-2 shrink-0">
-                          <p className="text-sm font-semibold text-text-primary mr-1">{b.total.toLocaleString(uiLocale)} €</p>
+                          <p className="text-sm font-semibold text-text-primary mr-1">{formatOfferAmount(b.total, b.currency, uiLocale)}</p>
                           {b.status === "pending" ? (
                             <>
                               <button
@@ -1066,7 +1070,7 @@ function DashboardContent() {
                         <p className="text-xs text-text-muted">{uiText.rich("Ui.text_0e057549877a43", { value1: () => (new Date(b.start_date).toLocaleDateString(uiLocale, { day: "numeric", month: "short" })), value2: () => (new Date(b.end_date).toLocaleDateString(uiLocale, { day: "numeric", month: "short", year: "numeric" })), value3: () => (b.days), count4: b.days })}</p>
                       </div>
                       <div className="text-right shrink-0 space-y-1">
-                        <p className="text-sm font-semibold text-text-primary">{b.total.toLocaleString(uiLocale)} €</p>
+                        <p className="text-sm font-semibold text-text-primary">{formatOfferAmount(b.total, b.currency, uiLocale)}</p>
                         <span className={`inline-block px-2 py-0.5 text-[10px] font-semibold rounded-full border ${
                           b.status === "confirmed" ? "border-success/30 bg-success/10 text-success" :
                           b.status === "rejected" ? "border-crimson/30 bg-crimson/10 text-crimson-light" :

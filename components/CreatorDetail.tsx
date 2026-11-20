@@ -1,4 +1,5 @@
 "use client";
+import { formatOfferAmount } from "@/lib/currency";
 
 import { useState, useEffect, useLayoutEffect, useRef } from "react";
 import { useTranslations , useLocale } from "next-intl";
@@ -43,6 +44,7 @@ type Creator = {
   reviews: number;
   dayRate: string;
   day_rate?: number | null;
+  price_currency?: string;
   available: boolean;
   available_from?: string | null;
   credits: string[];
@@ -295,7 +297,7 @@ export default function CreatorDetail({
               <span className="flex items-center gap-1"><MapPin size={13} />{creator.location}</span>
               {creator.day_rate && (
                 <span className="flex items-center gap-1 text-text-secondary font-medium">
-                  <DollarSign size={13} className="text-gold" />{creator.day_rate.toLocaleString(uiLocale)} €{tc("perDay")}
+                  <DollarSign size={13} className="text-gold" />{formatOfferAmount(creator.day_rate,creator.price_currency ?? "EUR",uiLocale)}{tc("perDay")}
                 </span>
               )}
               {creator.travel_ready && (

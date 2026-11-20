@@ -34,7 +34,7 @@ export function marketplaceCardData(row: Record<string, unknown>) {
   const metadata = row.metadata && typeof row.metadata === "object" && !Array.isArray(row.metadata)
     ? row.metadata as Record<string, unknown> : {};
   const meta: Record<string, unknown> = { ...metadata };
-  for (const key of ["marketplace", "rental_type", "price_on_request", "price_negotiable", "condition", "delivery", "focal_point"] as const) {
+  for (const key of ["marketplace", "price_currency", "rental_type", "price_on_request", "price_negotiable", "condition", "delivery", "focal_point"] as const) {
     if (row[key] !== undefined) meta[key] = row[key];
   }
   const offer = meta.marketplace && typeof meta.marketplace === "object" && !Array.isArray(meta.marketplace)

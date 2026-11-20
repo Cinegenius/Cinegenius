@@ -1,3 +1,5 @@
+import { listingCurrency, formatOfferAmount } from "@/lib/currency";
+import { getLocale } from "next-intl/server";
 import { publicListingIds, profileAccessFor } from "@/lib/profile-privacy-server";
 import { projectProfilePrivacy } from "@/lib/profile-privacy";
 import { taxonomyLabel } from "@/lib/departments";
@@ -28,11 +30,12 @@ function parseCreatorDescription(raw: string): { skills: string[]; credits: stri
 }
 
 async function _getCreator(slug: string) {
+  const locale=await getLocale(), common=await getTranslations("common");
   try {
     // Try listings first
     const { data: listing } = await db
       .from("listings")
-      .select("id, user_id, type, title, category, city, price, image_url, description, published")
+      .select("id, user_id, type, title, category, city, price, price_currency:metadata->>price_currency, image_url, description, published")
       .eq("id", slug)
       .eq("type", "creator")
       .eq("published", true)
@@ -59,7 +62,7 @@ async function _getCreator(slug: string) {
         avatar: listing.image_url ?? "",
         rating: 0,
         reviews: 0,
-        dayRate: (listing.price ?? 0) > 0 ? `${listing.price} €/Tag` : "Nach Vereinbarung",
+        dayRate: (listing.price ?? 0) > 0 ? `${formatOfferAmount(Number(listing.price),listingCurrency(listing),locale)}${common("perDay")}` : common("byArrangement"),
         available: true,
         credits,
         skills,

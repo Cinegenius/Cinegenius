@@ -1,3 +1,4 @@
+import { storedCurrency } from './currency';
 import { isOccupationForm, normalizeOccupationForm, type OccupationForm } from "./occupation-form";
 
 import { additionalCrewOccupation, profileOccupationFocusError, selectedCrewOccupations } from "./crew-occupations";
@@ -33,6 +34,7 @@ export type QuickStartIntentData = {
   description: string;
   imageUrl: string;
   price: string;
+  currency: string;
   priceOnRequest: boolean;
   priceNegotiable?: boolean;
   departmentIds: string[];
@@ -119,7 +121,7 @@ export function getQuickStartDepartments() {
 }
 
 export function createQuickStartIntentData(): QuickStartIntentData {
-  return { category: "", title: "", city: "", description: "", imageUrl: "", price: "", priceOnRequest: true, departmentIds: [], roles: [], categoryIds: [], contactEmail: "", contactPhone: "", website: "", services: [], animalDetails: normalizeAnimalCompanyDetails(null), cateringDetails: { serviceTypes: [], serviceAreas: "", capacity: null, dietaryOptions: [], mobileEquipment: [] } };
+  return { category: "", title: "", city: "", description: "", imageUrl: "", price: "", currency: "EUR", priceOnRequest: true, departmentIds: [], roles: [], categoryIds: [], contactEmail: "", contactPhone: "", website: "", services: [], animalDetails: normalizeAnimalCompanyDetails(null), cateringDetails: { serviceTypes: [], serviceAreas: "", capacity: null, dietaryOptions: [], mobileEquipment: [] } };
 }
 
 function normalizeIntentData(value: unknown): QuickStartIntentData {
@@ -164,6 +166,7 @@ function normalizeIntentData(value: unknown): QuickStartIntentData {
     description: typeof input.description === "string" ? input.description.slice(0, 3000) : "",
     imageUrl: typeof input.imageUrl === "string" ? input.imageUrl.slice(0, 1200) : "",
     price: typeof input.price === "string" ? input.price.slice(0, 20) : "",
+    currency: storedCurrency(input.currency),
     priceOnRequest: input.priceOnRequest !== false,
     priceNegotiable: input.priceNegotiable === true,
     departmentIds,

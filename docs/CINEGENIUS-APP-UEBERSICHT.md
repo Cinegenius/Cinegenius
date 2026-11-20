@@ -101,12 +101,58 @@ Diese Übersicht trennt die installierte App, ihre serverseitigen Ansichten, nat
 
 **Übergabe Internationalisierung (20.11.):** Website noch nicht veröffentlicht. Mehrwährungen und privates Mitgestalten sind vorbereitet; Vertrag `international-currency-feedback.md`, Belege `/srv/cinegenius/handoffs/20261120-international-feedback/`. Direkte Chat-Übergabe wegen Verbindungsfehler nicht zugestellt. Kein echter App-/KI-Test behauptet.
 
-## News-Erweiterung · 21. November 2026 (Entwurf)
+## News-Erweiterung · 21. November 2026
 
-Galerie mit bis zu acht geschützten Bildern, sichtbaren Urheber-/Lizenz-/
-Archivnachweisen und Wiederholversuch; neue zustimmungsgebundene Artikelmessung
-mit privatem, schwellenbegrenzt aggregiertem Feed. Altimport-Ausblendung nur nach
-einer Admin-Einzelfreigabe ohne allgemeinen Publikationsgrant. Vertrag und offene
-Aktivierungsschritte: [News-Galerie und Nutzung](news-gallery-readership.md).
-Noch nicht veröffentlicht; Migration und echter PostHog-Lesezugang fehlen. Native
-Abnahme durch APP offen, Smart-/Work-Release-Halt bleibt bestehen.
+**Live auf der Website:** Galerien mit bis zu acht geschützten Bildern, sichtbaren
+Urheber-/Lizenz-/Archivnachweisen und unveränderten Originalen. Die automatische
+Bildauswahl ist nach echtem privaten Upload, geprüftem Derivat und öffentlichem
+Artikeltest aktiviert. Der Ablaufdienst prüft eigene Veröffentlichungen; belegte
+Altimporte werden nur mit ihrer gesonderten Berechtigung ausgeblendet.
+
+**Datenschutz und Statistik:** Artikelbeobachtungen erfordern die erneuerte
+Einwilligung; bestehende Ablehnungen bleiben wirksam. Der private Lernfeed bleibt
+ohne PostHog-Lesezugang ausdrücklich unverfügbar. Keine künstlichen Leserzahlen
+und kein behauptetes Lernen ohne Daten.
+
+**Geprüft:** Öffentliche Website in vier Browsergrößen (320/390/768/1440 px),
+Deutsch/Spanisch und mit drei Mexiko-Artikeln. Echte mobile Bildansicht mit Quelle,
+Lizenz und Archivjahr; 17 Sprachen in den isolierten Galerie-/Editor-Prüfungen.
+Der zusätzliche Übersetzungsfix `a44cdec2` ist live: 92 Prüfungen, Scrolltest auf
+Handy und Laptop sowie echte deutsche/spanische Übersetzungen bestanden.
+Festivalname/Archivdatum stimmen, Titel, Kurzfassung, Caption und Volltext werden
+übersetzt; Scrollen benötigt nur eine Artikelanfrage. Originale bleiben unverändert.
+Das ist keine vollständige menschliche Sprachabnahme aller dynamischen KI-Texte.
+
+**Noch offen:** PostHog-Lesezugang, native Abnahme und Beobachtung des ersten
+regulären Bildlaufs. Der iPhone-Simulator erreichte noch keine bedienbare App;
+Browserprüfungen ersetzen diese Abnahme nicht. Smart-/Work-App-Halt bleibt erhalten.
+
+Währungen und Ländervertreter-Feedback sind separat implementiert und geprüft,
+aber weiterhin nicht veröffentlicht. Dazu steht eine Veröffentlichungsfreigabe aus.
+Der gemeinsame Stand bestand 166 gezielte Prüfungen und den vollständigen Build;
+der News-Übersetzungsfix anschließend ebenfalls. Keine Summierung wiederholter Tests.
+
+Verträge: [News-Galerie und Nutzung](news-gallery-readership.md),
+[Internationaler Ausbau](international-currency-feedback.md),
+[Gemeinsamer Prüfstand](international-news-release.md).
+Aktueller Livebeleg: `/srv/cinegenius/handoffs/20261121-news-gallery-release/`.
+
+**App-Stand:** Die genannten Veröffentlichungen betreffen Website und gemeinsame
+Schnittstellen. Die native Oberfläche, Installation und Geräteprüfung bleiben
+eigenständige APP-Arbeit. Das Handoff enthält geprüfte Commits und offene Grenzen;
+die direkte Chat-Zustellung war gestört.
+
+## Homepage-Newsfotos · Web-Vertrag vom 21. November 2026
+
+Website-Commit `1aa844cc7321218f7313e3a29adc95bc7edccff0` ist veröffentlicht und
+in vier öffentlichen Browserkonfigurationen geprüft. Artikelvorschauen verwenden
+das vorhandene Titelbild oder das erste gültige Galeriebild, ohne leere Bildfläche
+und ohne ein Herausgeberlogo als Ersatz. Bekannte Urheber/Lizenzen und vollständige
+Artikelverweise bleiben erhalten. Geschützte Bilder laufen weiterhin durch die
+vorhandene Rechteprüfung; keine neue Datenbankmigration oder zusätzliche API.
+
+APP übernimmt dieses Darstellungsprinzip in die eigene Oberfläche und prüft es
+auf dem tatsächlichen Gerät. Ein mobiler Website-Browsertest ist kein nativer
+App-Nachweis; der bestehende Smart-/Work-Veröffentlichungshalt bleibt erhalten.
+Geprüfter Stand und Livebelege:
+`/srv/cinegenius/handoffs/20261121-home-news-photos/`.

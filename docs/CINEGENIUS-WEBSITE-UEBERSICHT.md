@@ -1,6 +1,6 @@
 # CineGenius · Übersicht der gesamten Website
 
-Stand: **20. November 2026 (Europe/Berlin)**. Zuständig: **WEB CODEX**.
+Stand: **21. November 2026 (Europe/Berlin)**. Zuständig: **WEB CODEX**.
 Die getrennte [App-Übersicht](CINEGENIUS-APP-UEBERSICHT.md) beschreibt die native Anwendung.
 
 Dieses Verzeichnis hält die Bereiche, ihre Funktionen, den belegten Stand und offene Arbeit zusammen. Es ist eine interne Arbeitsübersicht, keine neue öffentliche Webseite und kein vollständiger Sicherheits- oder Funktionstest. Bei jeder weiteren Änderung wird der betreffende Eintrag aktualisiert.
@@ -82,7 +82,7 @@ Dieses Verzeichnis hält die Bereiche, ihre Funktionen, den belegten Stand und o
 | **Rechtliche Seiten** | Impressum, Datenschutz, AGB, Bildrechte, KI-Transparenz und Uploadhinweise | Vorhanden. Betreiberangaben und tatsächliche Verarbeitung aktuell halten; diese Inventur ist keine neue rechtliche Prüfung. |
 | **Newsletter** | Anmeldung, Bestätigung und Abmeldung | Vorhanden. Freiwillige ausdrückliche Einwilligung, keine stillschweigende Newsletter-Anmeldung. |
 | **Admin** | Konten, Angebote, Prüfungen, Orte, Aktualität, Support und Verwaltung | Vorhanden; serverseitige Rechte. Feedback-Koordination implementiert, noch nicht veröffentlicht. |
-| **Redaktionsbetrieb** | AG DOK / NEWS, Technikrecherche, Quellen, Rechte, Dubletten und Länderzuordnung | Bestehender stündlicher Recherchezeitplan mit separatem geprüften Publisher aktiviert. Höchstens ein Kandidat je Lauf, Quellenprüfung und private Zwischenschritte; unklare Inhalte bleiben unveröffentlicht. Eigene abgelaufene Maschinenartikel werden separat ausgeblendet; Galerie/Bildrechte, begrenzte Altimport-Ausblendung und Nutzungsfeed implementiert, noch nicht aktiviert. |
+| **Redaktionsbetrieb** | AG DOK / NEWS, Technikrecherche, Quellen, Rechte, Dubletten und Länderzuordnung | Bestehender stündlicher Recherchezeitplan mit separatem geprüften Publisher aktiviert. Höchstens ein Kandidat je Lauf, Quellenprüfung und private Zwischenschritte; unklare Inhalte bleiben unveröffentlicht. Eigene abgelaufene Maschinenartikel werden separat ausgeblendet; Galerie/Bildrechte, begrenzte Altimport-Ausblendung und Nutzungsfeed als Website-Code veröffentlicht; Bildautomatik inzwischen aktiviert; echter Nutzungsfeed noch nicht aktiviert. |
 | **Aktualität von Profilen/Angeboten** | Bestandsprüfung, Hinweise und geregeltes Ausblenden veralteter Inhalte | Dokumentiert; tatsächliche Zeitpläne/Aktivierung brauchen Betriebsbeleg, keine unbestätigte automatische Löschung zusagen. |
 | **Werbung** | Bestehender historischer Pfad `/werben` | Kein freigegebenes aktives Werbeinventar; keine Banner oder Buchungsplätze reaktivieren. |
 
@@ -130,12 +130,55 @@ Maßgeblicher Release- und Aktivierungsbeleg: `/srv/cinegenius/handoffs/20261120
 
 **Internationaler Ausbau (20.11., noch nicht live):** [Währungen und Mitgestalten](international-currency-feedback.md) beschreibt die Preisfelder, 155 Währungen, getrennte Preisfilter, unveränderte EUR-Bestände und den privaten Ländervertreter-Ablauf. Kein automatischer Geldwechsel, keine Zahlungsaktivierung. Berichte benötigen Bestätigung. Browserabnahme auf 320/390/768/1366 px; reale KI-/native Prüfung getrennt offen.
 
-## News-Erweiterung · 21. November 2026 (Entwurf)
+## News-Erweiterung · 21. November 2026
 
-Galerie mit bis zu acht geschützten Bildern, sichtbaren Urheber-/Lizenz-/
-Archivnachweisen und Wiederholversuch; neue zustimmungsgebundene Artikelmessung
-mit privatem, schwellenbegrenzt aggregiertem Feed. Altimport-Ausblendung nur nach
-einer Admin-Einzelfreigabe ohne allgemeinen Publikationsgrant. Vertrag und offene
-Aktivierungsschritte: [News-Galerie und Nutzung](news-gallery-readership.md).
-Noch nicht veröffentlicht; Migration und echter PostHog-Lesezugang fehlen. Native
-Abnahme durch APP offen, Smart-/Work-Release-Halt bleibt bestehen.
+**Live auf der Website:** Galerien mit bis zu acht geschützten Bildern, sichtbaren
+Urheber-/Lizenz-/Archivnachweisen und unveränderten Originalen. Die automatische
+Bildauswahl ist nach echtem privaten Upload, geprüftem Derivat und öffentlichem
+Artikeltest aktiviert. Der Ablaufdienst prüft eigene Veröffentlichungen; belegte
+Altimporte werden nur mit ihrer gesonderten Berechtigung ausgeblendet.
+
+**Datenschutz und Statistik:** Artikelbeobachtungen erfordern die erneuerte
+Einwilligung; bestehende Ablehnungen bleiben wirksam. Der private Lernfeed bleibt
+ohne PostHog-Lesezugang ausdrücklich unverfügbar. Keine künstlichen Leserzahlen
+und kein behauptetes Lernen ohne Daten.
+
+**Geprüft:** Öffentliche Website in vier Browsergrößen (320/390/768/1440 px),
+Deutsch/Spanisch und mit drei Mexiko-Artikeln. Echte mobile Bildansicht mit Quelle,
+Lizenz und Archivjahr; 17 Sprachen in den isolierten Galerie-/Editor-Prüfungen.
+Der zusätzliche Übersetzungsfix `a44cdec2` ist live: 92 Prüfungen, Scrolltest auf
+Handy und Laptop sowie echte deutsche/spanische Übersetzungen bestanden.
+Festivalname/Archivdatum stimmen, Titel, Kurzfassung, Caption und Volltext werden
+übersetzt; Scrollen benötigt nur eine Artikelanfrage. Originale bleiben unverändert.
+Das ist keine vollständige menschliche Sprachabnahme aller dynamischen KI-Texte.
+
+**Noch offen:** PostHog-Lesezugang, native Abnahme und Beobachtung des ersten
+regulären Bildlaufs. Der iPhone-Simulator erreichte noch keine bedienbare App;
+Browserprüfungen ersetzen diese Abnahme nicht. Smart-/Work-App-Halt bleibt erhalten.
+
+Währungen und Ländervertreter-Feedback sind separat implementiert und geprüft,
+aber weiterhin nicht veröffentlicht. Dazu steht eine Veröffentlichungsfreigabe aus.
+Der gemeinsame Stand bestand 166 gezielte Prüfungen und den vollständigen Build;
+der News-Übersetzungsfix anschließend ebenfalls. Keine Summierung wiederholter Tests.
+
+Verträge: [News-Galerie und Nutzung](news-gallery-readership.md),
+[Internationaler Ausbau](international-currency-feedback.md),
+[Gemeinsamer Prüfstand](international-news-release.md).
+Aktueller Livebeleg: `/srv/cinegenius/handoffs/20261121-news-gallery-release/`.
+
+## Kleine Newsfotos auf der Startseite · 21. November 2026
+
+**Live bestätigt:** `1aa844cc7321218f7313e3a29adc95bc7edccff0`, Veröffentlichung
+`dpl_2itDZo4PpfQnwhJUk5D7jMNdoqfY`. Artikelbilder erscheinen auf Handy, Tablet und
+Laptop als kompakte, vollständig sichtbare Vorschau. Ohne Titelbild wird das erste
+gültige Galeriebild verwendet; ohne Bild entsteht keine leere Fläche. Der Herausgeber
+steht dezent als Text, bekannte Bildnachweise bleiben sichtbar und vollständig am
+verlinkten Artikel erreichbar. Länder-/Themenwahl und Organisationenkarten bleiben erhalten.
+
+38 gezielte Prüfungen, 17 Sprachkataloge, Designprüfung, TypeScript, Lint und
+Produktionsbuild bestanden. Vier öffentliche Live-Browserprüfungen bei
+320/390/768/1366 CSS px (WebKit/Chromium, Spanisch/Deutsch/Französisch) bestätigen
+das echte geschützte NFI-Foto, Bildnachweise, Touch/Tastatur, Artikelöffnung und
+echtes Zurück. Keine native Geräteabnahme und keine pauschale sprachliche Abnahme
+automatisch übersetzter Artikel. Belege:
+`/srv/cinegenius/handoffs/20261121-home-news-photos/`.
