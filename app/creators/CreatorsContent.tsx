@@ -492,7 +492,7 @@ function CreatorsInner({
         ]}
         categoryValue={sidebarDept ?? ""}
         onCategoryChange={(value) => { setSelectedRoles(new Set()); chooseSidebarDept(value || null); }}
-        resultCount={hasMoreFromApi ? null : isProviderFilter(sidebarDept) ? allCreators.length : filtered.length} resultSummary={hasMoreFromApi ? (loadError ? t("resultsLoadFailed") : t("resultsLoading")) : t("results", { count: isProviderFilter(sidebarDept) ? allCreators.length : filtered.length })}
+        resultCount={hasMoreFromApi ? null : isProviderFilter(sidebarDept) ? allCreators.length : matching.length} resultSummary={hasMoreFromApi ? (loadError ? t("resultsLoadFailed") : t("resultsLoading")) : t("results", { count: isProviderFilter(sidebarDept) ? allCreators.length : matching.length })}
         resultActions={<ProviderQuickFilters value={sidebarDept}
           crew={filterProviderProfiles(allCreators, CREW_PROVIDER_FILTER).length > 0}
           locations={filterProviderProfiles(allCreators, LOCATION_PROVIDER_FILTER).length > 0}
@@ -580,7 +580,7 @@ function CreatorsInner({
             {/* Count */}
 
 
-            {viewMode === "map" && <DirectoryMap kind="crew" items={mapItems} bounds={map.bounds} onBoundsChange={map.setBounds} />}
+            {viewMode === "map" && <DirectoryMap kind="crew" onShowAll={() => { map.setBounds(null); setViewMode("list"); }} countNotice={hasMoreFromApi ? t(loadError ? "resultsLoadFailed" : "resultsLoading") : undefined} items={mapItems} bounds={map.bounds} onBoundsChange={map.setBounds} />}
 
             {/* Empty */}
             {filteredCrew.length === 0 && (

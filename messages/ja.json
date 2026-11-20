@@ -12835,7 +12835,9 @@
     "providerPurpose": "インタラクティブマップ",
     "providerRegion": "ハンガリー / CDN",
     "providerNotice": "地図を開くと、ブラウザはOpenFreeMapから地図素材を読み込みます。あなたのIPアドレスと技術的なリクエストデータは地図提供者に送信されます。名前、プロフィール、メッセージは地図データとして送信されません。<provider>提供者情報</provider>。",
-    "information": "地図について"
+    "information": "地図について",
+    "outside": "表示範囲外：{count, number}件",
+    "showAll": "全{count, number}件を表示"
   },
   "BrowseGeography": {
     "preferred": "近隣と{country}を優先",

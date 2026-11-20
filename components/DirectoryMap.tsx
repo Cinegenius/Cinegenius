@@ -9,8 +9,9 @@ import Link from "next/link";
 import { Building2, Info, MapPin, RotateCcw, UserRound } from "lucide-react";
 import { useTranslations } from "next-intl";
 import MediaImage from "./MediaImage";
+import MapResultSummary from "./MapResultSummary";
 import ListingImage from "./ListingImage";
-import { hasCoordinates, inMapBounds, type MapBounds } from "@/lib/location-map";
+import { mapResultCounts, type MapBounds } from "@/lib/location-map";
 
 function LoadingMap() {
   const t = useTranslations();
@@ -24,20 +25,18 @@ export type DirectoryMapItem = {
   lat?: number | null; lng?: number | null;
 };
 
-export default function DirectoryMap({ items, kind, bounds, onBoundsChange, compact = false }: {
+export default function DirectoryMap({ items, kind, bounds, onBoundsChange, compact = false, onShowAll, countNotice }: {
   items: DirectoryMapItem[]; kind: "crew" | "marketplace" | "companies";
   bounds: MapBounds | null; onBoundsChange: (bounds: MapBounds | null) => void;
-  compact?: boolean;
+  compact?: boolean; onShowAll?: () => void; countNotice?: string;
 }) {
   const t = useTranslations("directoryMap"), mapText = useTranslations("locationMap");
   const clusterLabel = useCallback((count: number) => t("cluster", { count }), [t]);
   const [activeId, setActiveId] = useState<string | null>(null);
   const PreviewImage = kind === "marketplace" ? ListingImage : MediaImage;
   const locations = useMemo(() => items.map(item => ({ ...item, titleContent: kind === "marketplace" ? <TranslatedText kind="listing" id={item.id} field="title">{item.title}</TranslatedText> : item.title, type: "", price: 0, lat: item.lat ?? null, lng: item.lng ?? null })), [items, kind]);
-  const known = locations.filter(hasCoordinates).length;
-  const visible = locations.filter(hasCoordinates).filter(item => !bounds || inMapBounds(item, bounds)).length;
+  const counts = useMemo(() => mapResultCounts(locations, bounds), [locations, bounds]);
   const source = <p className="directory-map-source text-xs text-text-muted">{t.rich("source", { provider: chunks => <a href="https://www.geonames.org/" target="_blank" rel="noreferrer" className="inline-flex min-h-11 items-center underline">{chunks}</a>, license: chunks => <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noreferrer" className="inline-flex min-h-11 items-center underline">{chunks}</a> })}</p>;
-  const unmapped = known < items.length && <p role="status" className="text-xs text-text-muted">{t("unmapped", { count: items.length - known })}</p>;
   return <section className={compact ? "directory-map-compact min-w-0" : "mb-6 min-w-0 space-y-3"} aria-label={t(kind)}>
     {!compact && <div className="flex min-w-0 flex-wrap items-center justify-between gap-2">
       <p className="directory-map-notice min-w-0 text-sm text-text-secondary">{t("cityNotice")}</p>
@@ -45,7 +44,7 @@ export default function DirectoryMap({ items, kind, bounds, onBoundsChange, comp
     </div>}
     <div className="directory-map-frame">
       <LocationMap locations={locations} activeId={activeId} onHover={setActiveId} userLocation={null} radiusKm={50} appliedBounds={bounds} onApplyBounds={onBoundsChange} onBoundsChange={onBoundsChange}
-        visibleCount={visible} labels={{ label: t(kind), results: t("mapped", { count: visible }), empty: t("empty"), unknownCoordinates: "", cluster: clusterLabel, error: t("error") }}
+        countPending={Boolean(countNotice)} visibleCount={counts.visible} labels={{ label: t(kind), results: countNotice ?? t("mapped", { count: counts.visible }), empty: t("empty"), unknownCoordinates: "", cluster: clusterLabel, error: t("error") }}
         renderPreview={selected => {
           const item = items.find(row => row.id === selected.id);
           if (!item) return null;
@@ -63,12 +62,13 @@ export default function DirectoryMap({ items, kind, bounds, onBoundsChange, comp
           </Link>;
         }} />
     </div>
+    <MapResultSummary counts={counts} onShowAll={onShowAll} notice={countNotice} />
     {compact ? <div className="directory-map-meta">
       {bounds && <button type="button" onClick={() => onBoundsChange(null)} aria-label={mapText("resetArea")} title={mapText("resetArea")} className="inline-flex min-h-11 min-w-11 items-center justify-center text-text-muted hover:text-gold"><RotateCcw size={16} aria-hidden="true" /></button>}
       <details className="directory-map-info">
         <summary aria-label={t("information")} title={t("information")} className="inline-flex min-h-11 min-w-11 cursor-pointer items-center justify-center text-text-muted"><Info size={16} aria-hidden="true" /></summary>
-        <div className="space-y-2 rounded-xl border border-border bg-bg-secondary p-3 text-xs text-text-muted"><p>{t("cityNotice")}</p>{unmapped}{source}</div>
+        <div className="space-y-2 rounded-xl border border-border bg-bg-secondary p-3 text-xs text-text-muted"><p>{t("cityNotice")}</p>{source}</div>
       </details>
-    </div> : <>{unmapped}{source}</>}
+    </div> : <>{source}</>}
   </section>;
 }

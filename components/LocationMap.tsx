@@ -38,6 +38,7 @@ type Props = {
   readOnly?: boolean;
   onBoundsChange?: (bounds: MapBounds) => void;
   visibleCount?: number;
+  countPending?: boolean;
   locations: Location[];
   activeId: string | null;
   onHover: (id: string | null) => void;
@@ -47,7 +48,7 @@ type Props = {
   onApplyBounds: (bounds: MapBounds | null) => void;
 };
 
-export default function LocationMap({ preserveViewport = false, readOnly = false, locations, activeId, onHover, userLocation, radiusKm, appliedBounds, onApplyBounds, onBoundsChange, visibleCount, labels, renderPreview }: Props) {
+export default function LocationMap({ preserveViewport = false, readOnly = false, locations, activeId, onHover, userLocation, radiusKm, appliedBounds, onApplyBounds, onBoundsChange, visibleCount, countPending = false, labels, renderPreview }: Props) {
   const clusterLabel = labels?.cluster;
   const t = useTranslations("locationMap");
   const mapUi = useTranslations("directoryMap"), commonUi = useTranslations("notifications");
@@ -277,8 +278,8 @@ export default function LocationMap({ preserveViewport = false, readOnly = false
     <div className="location-map relative isolate h-full min-h-0 w-full overflow-hidden rounded-xl border border-border bg-bg-secondary" aria-label={labels?.label ?? t("label")}>
       <div ref={containerRef} className="h-full w-full" />
       <div className="location-map-count pointer-events-none absolute left-3 top-3 z-[500] text-xs font-medium">
-        <BrowseResultCount count={!basemapReady && !failed ? null : visibleCount ?? locations.length}
-          label={!basemapReady && !failed ? mapUi("loading") : labels?.results ?? locationsText("results", { count: visibleCount ?? locations.length })} />
+        <BrowseResultCount count={countPending || (!basemapReady && !failed) ? null : visibleCount ?? locations.length}
+          label={countPending ? labels?.results ?? mapUi("loading") : !basemapReady && !failed ? mapUi("loading") : labels?.results ?? locationsText("results", { count: visibleCount ?? locations.length })} />
       </div>
       {!readOnly && !automaticBounds && <div className={`absolute left-3 top-16 z-[500] flex max-w-[calc(100%-5rem)] flex-wrap gap-2 ${labels?.nativeApplyArea ? styles.nativeActions : ""}`}>
         {moved && <button data-map-bounds-action="apply" type="button" onClick={() => { if (!map) return; const b = map.getBounds(); onApplyBounds({ south: b.getSouth(), north: b.getNorth(), west: b.getWest(), east: b.getEast() }); setMoved(false); }} className={`min-h-11 rounded-lg border border-border bg-bg-primary px-3 text-sm text-text-primary ${labels?.nativeApplyArea ? `${styles.applyButton} ${styles.nativeApplyButton}` : ""}`}>
@@ -290,7 +291,7 @@ export default function LocationMap({ preserveViewport = false, readOnly = false
       </div>}
       {(labels?.unknownCoordinates ?? true) && locations.some(location => !hasCoordinates(location)) && <p className="absolute bottom-8 left-3 z-[400] rounded bg-bg-primary px-2 py-1 text-xs text-text-muted">{labels?.unknownCoordinates ?? t("unknownCoordinates")}</p>}
       {failed && <div role="alert" className="absolute inset-x-3 top-16 z-[600] flex flex-wrap items-center gap-2 rounded-xl border border-border bg-bg-secondary p-3 text-sm text-text-secondary"><p className="min-w-0 flex-1">{labels?.error ?? t("error")}</p><button type="button" onClick={() => { setFailed(false); setBasemapReady(false); setMap(null); setAttempt(value => value + 1); }} className="min-h-11 rounded-lg border border-border px-3 text-gold">{commonUi("retry")}</button></div>}
-      {(visibleCount ?? locations.length) === 0 && <p role="status" className="absolute inset-x-3 top-3 z-[500] rounded-lg border border-border bg-bg-primary p-4 text-sm text-text-secondary">{labels?.empty ?? t("empty")}</p>}
+      {!countPending && (visibleCount ?? locations.length) === 0 && <p role="status" className="absolute inset-x-3 top-3 z-[500] rounded-lg border border-border bg-bg-primary p-4 text-sm text-text-secondary">{labels?.empty ?? t("empty")}</p>}
       {(selected || clusterLocations.length > 0) && (
         <div className="location-map-preview absolute inset-x-3 bottom-16 z-[1100] mx-auto max-h-[calc(100%-9rem)] max-w-sm overflow-y-auto rounded-xl border border-border bg-bg-secondary shadow-xl">
           <button type="button" aria-label={t("closePreview")} onClick={() => { select(null); }} className="absolute right-0 top-0 z-10 flex size-11 items-center justify-center rounded-full bg-bg-primary/90 text-text-primary"><X size={18} /></button>
