@@ -51,7 +51,7 @@ export default function NativeOrganizations({ data, children }: { data: Organiza
         <input aria-label={t("searchLabel")} placeholder={t("searchLabel")} value={text} maxLength={120} onChange={event => setSearch({ query: data.filters.q, text: event.target.value })} />
         <button type="submit" aria-label={ui("Organizations.search")}><Search size={19} aria-hidden="true" /></button>
       </form>
-      <NativeBrowseToolbar keepTwoFilters count={pending ? null : data.count} countLabel={ui("BrowseFilters.results", { count: data.count })}
+      <NativeBrowseToolbar keepTwoFilters countScope="total" count={pending ? null : data.count} countLabel={pending ? ui("common.loading") : ui("BrowseFilters.results", { count: data.count })}
         filters={[
           <NativeCountrySelect compact key="country" value={data.filters.country} onChange={value => { const country = browseCountryChoice(value); if (country !== undefined) change({ country, city: "" }); }} />,
           <NativeBrowseQuickFilter key="city" kind="place" label={places("city")} value={data.filters.city}
@@ -60,10 +60,10 @@ export default function NativeOrganizations({ data, children }: { data: Organiza
       {pending && <p role="status">{ui("common.loading")}</p>}
       {view === "map" && <section className={styles.map} aria-label={discovery("organizations")}>
         <div className={styles.mapFrame}><LocationMap locations={locations} activeId={activeId} onHover={setActiveId} userLocation={null} radiusKm={50}
-          appliedBounds={null} onApplyBounds={retainPage} onBoundsChange={retainPage} visibleCount={mapped}
-          labels={{ label: discovery("organizations"), results: t("mapScope", { mapped, loaded: locations.length }), empty: ui("directoryMap.empty"), unknownCoordinates: "", cluster, error: ui("directoryMap.error") }}
+          appliedBounds={null} onApplyBounds={retainPage} onBoundsChange={retainPage} visibleCount={mapped} countPending={pending}
+          labels={{ label: discovery("organizations"), results: pending ? ui("common.loading") : t("mapScope", { mapped, loaded: locations.length }), empty: ui("directoryMap.empty"), unknownCoordinates: "", cluster, error: ui("directoryMap.error") }}
           renderPreview={selected => { const org = data.organizations.find(item => item.id === selected.id); return org ? <div className={styles.preview}>{card(org)}</div> : null; }} /></div>
-        <p role="status">{t("mapScope", { mapped, loaded: locations.length })}</p><p>{ui("directoryMap.cityNotice")}</p>
+        {!pending && <p role="status">{t("mapScope", { mapped, loaded: locations.length })}</p>}<p>{ui("directoryMap.cityNotice")}</p>
       </section>}
       <div className={styles.results} data-organization-results>{data.organizations.length ? data.organizations.map(org => <article key={org.id}>{card(org)}</article>) : <p>{t("empty")}</p>}</div>
       {(data.filters.country || data.filters.city || data.filters.q) && <Link className={styles.reset} href={organizationDirectoryHref({ country: "", city: "", q: "", page: 1 })}>{ui("common.resetFilters")}</Link>}

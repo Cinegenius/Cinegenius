@@ -147,7 +147,7 @@ export default function CompaniesContent({ initialCompanies }: { initialCompanie
         setViewMode(viewMode === "map" ? "list" : "map");
         requestAnimationFrame(() => resultsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }));
       }} />
-      <MobileBrowseControls preference={<BrowseGeography geography={geography} />}
+      <MobileBrowseControls nativeCountScope="total" preference={<BrowseGeography geography={geography} />}
         query={search}
         onQueryChange={setSearch}
         searchPlaceholder={t("searchPlaceholder")}

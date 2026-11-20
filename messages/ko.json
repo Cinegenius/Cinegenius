@@ -13594,5 +13594,9 @@
     "pageScope": "{page}페이지 · 전체 {total}개 단체 중 {loaded}개 불러옴",
     "mapScope": "이 페이지의 {loaded}개 단체 중 {mapped}개가 지도에 표시됩니다. 나머지는 목록에 유지됩니다.",
     "empty": "조건에 맞는 단체를 찾지 못했습니다."
+  },
+  "NativeBrowseCounts": {
+    "total": "전체",
+    "loaded": "불러옴"
   }
 }

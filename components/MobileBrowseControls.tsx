@@ -34,6 +34,7 @@ type MobileBrowseControlsProps = {
   nativeViewControls?: ReactNode;
   nativeQuickFilters?: ReactNode[];
   nativeCategoryKind?: NativeBrowseQuickFilterKind;
+  nativeCountScope?: "total" | "loaded";
   filterCount: number;
   chips?: BrowseChip[];
   onReset: () => void;
@@ -48,7 +49,7 @@ type MobileBrowseControlsProps = {
 export default function MobileBrowseControls({
   query, onQueryChange, searchPlaceholder, sortValue, sortOptions, onSortChange,
   categoryLabel, allCategoryLabel, categories, categoryValue, onCategoryChange, categoryPlacement = "filters",
-  resultSummary, resultCount, resultActions, viewControls, nativeViewControls, nativeQuickFilters, nativeCategoryKind = "category", filterCount, chips = [], onReset, resetLabel, showResultsLabel, preference, onSearch, children,
+  resultSummary, resultCount, resultActions, viewControls, nativeViewControls, nativeQuickFilters, nativeCategoryKind = "category", nativeCountScope, filterCount, chips = [], onReset, resetLabel, showResultsLabel, preference, onSearch, children,
 }: MobileBrowseControlsProps) {
   const uiText = useTranslations();
   const nativeAppearance = useNativeAppAppearance();
@@ -133,7 +134,7 @@ export default function MobileBrowseControls({
         </label>}
 
         <div className="mobile-browse-summary">
-          {nativeAppearance ? <NativeBrowseToolbar count={resultCount} countLabel={resultSummary} viewControls={nativeViewControls ?? viewControls}
+          {nativeAppearance ? <NativeBrowseToolbar count={resultCount} countLabel={resultSummary} countScope={nativeCountScope} viewControls={nativeViewControls ?? viewControls}
             filters={nativeQuickFilters ?? [
               ...(categories.length || categoryValue ? [<NativeBrowseQuickFilter key="category" kind={nativeCategoryKind} label={categoryLabel} value={categoryValue} onChange={onCategoryChange} options={[{value:"",label:allCategoryLabel},...categories]} />] : []),
               <NativeBrowseQuickFilter key="sort" kind="sort" label={uiText("creators.sort")} value={sortValue} options={sortOptions} onChange={onSortChange} icon={<ArrowUpDown size={18} />} />,

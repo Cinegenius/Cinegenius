@@ -13594,5 +13594,9 @@
     "pageScope": "Strana {page} · načteno {loaded} z {total} organizací",
     "mapScope": "Na mapě je {mapped} z {loaded} organizací na této stránce. Ostatní zůstávají v seznamu.",
     "empty": "Nebyly nalezeny odpovídající organizace."
+  },
+  "NativeBrowseCounts": {
+    "total": "celkem",
+    "loaded": "načteno"
   }
 }

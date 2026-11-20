@@ -13594,5 +13594,9 @@
     "pageScope": "Page {page} · {loaded} of {total} organizations loaded",
     "mapScope": "{mapped} of {loaded} organizations on this page are on the map. The others remain in the list.",
     "empty": "No matching organizations found."
+  },
+  "NativeBrowseCounts": {
+    "total": "total",
+    "loaded": "loaded"
   }
 }

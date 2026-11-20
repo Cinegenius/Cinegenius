@@ -179,6 +179,12 @@ export default function SmartSearchExplorer({ plan, initialGroups, initialMapGro
   const available = useMemo(() => discoveryFacets(filterDiscoveryGroups(groups, { ...emptyDiscoveryFilters(), hiddenAreas: filters.hiddenAreas, hiddenWishes: filters.hiddenWishes })), [groups, filters.hiddenAreas, filters.hiddenWishes]);
   const visible = useMemo(() => sortDiscoveryGroups(filterDiscoveryGroups(groups, filters), plan), [groups, filters, plan]);
   const count = discoveryCount(visible);
+  // Native totals describe the loaded matching identities before the map viewport.
+  // This is deliberately not a claim about the full server-side result count.
+  const nativeMapGroups = useMemo(() => nativeAppearance
+    ? sortDiscoveryGroups(filterDiscoveryGroups(groups, { ...filters, bounds: null }), plan) : visible,
+  [nativeAppearance, groups, filters, plan, visible]);
+  const loadedCount = discoveryCount(nativeMapGroups);
   const hasMapPositions = groups.some(group => group.results.some(result => result.mapPoint));
   const filtered = !!(filters.hiddenAreas.length || filters.hiddenWishes.length || filters.departments.length || filters.marketplace.length || filters.bounds);
   const reset = () => setFilters(emptyDiscoveryFilters());
@@ -203,7 +209,7 @@ export default function SmartSearchExplorer({ plan, initialGroups, initialMapGro
 
   return <div className="smart-explorer" data-smart-explorer data-map-open={mapOpen}>
     {nativeAppearance && <NativeSmartAreas available={areas} hidden={filters.hiddenAreas} onChange={hiddenAreas => setFilters(value => ({ ...value, hiddenAreas }))} />}
-    {nativeAppearance ? <NativeBrowseToolbar count={count} countLabel={t("discovery.loaded", { count })} filters={nativeQuickFilters}
+    {nativeAppearance ? <NativeBrowseToolbar count={loadedCount} countScope="loaded" countLabel={t("discovery.loaded", { count: loadedCount })} filters={nativeQuickFilters}
       moreAction={moreAction} viewControls={<DirectoryViewControls value={view} onChange={setView} views={["grid", "list", "map"]} />} /> : <div className="smart-result-toolbar">
       <BrowseResultCount count={count} label={t("discovery.loaded", { count })} />
       <BrowseSelect label={t("allAreas")} value={areaValue} className="smart-area-select" triggerClassName="smart-area-trigger"
@@ -242,7 +248,8 @@ export default function SmartSearchExplorer({ plan, initialGroups, initialMapGro
       </div>}
     </section>
     {/* One map instance; switching views keeps zoom and current result filters. */}
-    <div className="smart-map-panel" hidden={!mapOpen}>{mapReady && hasMapPositions && <SmartSearchMap groups={visible} bounds={filters.bounds} onApplyBounds={bounds => setFilters(value => ({ ...value, bounds }))} />}
+    <div className="smart-map-panel" hidden={!mapOpen}>{mapReady && hasMapPositions && <SmartSearchMap groups={nativeMapGroups} bounds={filters.bounds} onApplyBounds={bounds => setFilters(value => ({ ...value, bounds }))}
+      onShowAll={nativeAppearance ? () => { setFilters(value => ({ ...value, bounds: null })); setView("list"); } : undefined} />}
       {mapReady && !hasMapPositions && count > 0 && <p className="text-xs text-text-muted">{t("discovery.unmapped", { count })}</p>}
     </div>
     <div className="smart-result-list">

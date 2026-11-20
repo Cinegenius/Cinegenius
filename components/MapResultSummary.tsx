@@ -2,6 +2,7 @@
 
 import { useTranslations } from "next-intl";
 import type { mapResultCounts } from "@/lib/location-map";
+import styles from "./MapResultSummary.module.css";
 
 type Counts = ReturnType<typeof mapResultCounts>;
 
@@ -10,7 +11,7 @@ export default function MapResultSummary({ counts, onShowAll, notice }: {
   counts: Counts; onShowAll?: () => void; notice?: string;
 }) {
   const t = useTranslations("directoryMap");
-  return <div className="min-w-0 space-y-1 text-xs text-text-muted">
+  return <div className={`${styles.root} min-w-0 space-y-1 text-xs text-text-muted`}>
     <div role="status" className="space-y-1 [overflow-wrap:anywhere]">
       {notice ? <p>{notice}</p> : <>
         <p>{t("mapped", { count: counts.visible })}{counts.outside > 0 && <> · {t("outside", { count: counts.outside })}</>}</p>

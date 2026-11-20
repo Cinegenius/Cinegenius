@@ -6,11 +6,13 @@ import BrowseResultCount from "@/components/BrowseResultCount";
 import BrowseSelect, { type BrowseSelectOption } from "@/components/BrowseSelect";
 import styles from "./NativeBrowseToolbar.module.css";
 import { useNativeAppAppearance } from "@/lib/use-native-app-appearance";
+import { useTranslations } from "next-intl";
 
 /** One layout for native directory controls; callers retain their real filters and views. */
-export default function NativeBrowseToolbar({ count, countLabel, filters = [], moreAction, viewControls, resultActions, keepTwoFilters = false }: {
+export default function NativeBrowseToolbar({ count, countLabel, countScope, filters = [], moreAction, viewControls, resultActions, keepTwoFilters = false }: {
   count: number | null;
   countLabel: ReactNode;
+  countScope?: "total" | "loaded";
   filters?: ReactNode[];
   moreAction?: ReactNode;
   viewControls?: ReactNode;
@@ -19,6 +21,7 @@ export default function NativeBrowseToolbar({ count, countLabel, filters = [], m
   keepTwoFilters?: boolean;
 }) {
   const native = useNativeAppAppearance();
+  const counts = useTranslations("NativeBrowseCounts");
   const anchor = useRef<HTMLDivElement>(null), rail = useRef<HTMLDivElement>(null), clearance = useRef<HTMLSpanElement>(null);
   useLayoutEffect(() => {
     if (!native) return;
@@ -53,7 +56,9 @@ export default function NativeBrowseToolbar({ count, countLabel, filters = [], m
   }, [native]);
   return <div ref={anchor} className={styles.anchor} data-native-browse-anchor><span ref={clearance} className={styles.clearance} aria-hidden="true" /><div ref={rail} className={styles.container} data-native-browse-toolbar="v1" data-keep-two-filters={keepTwoFilters || undefined}>
     <div className={styles.rail}>
-      <div className={styles.count}><BrowseResultCount count={count} label={countLabel} /></div>
+      <div className={styles.count}><BrowseResultCount count={count} label={countLabel} />
+        {countScope && <span className={styles.scope} data-count-scope={countScope}>{counts(countScope)}</span>}
+      </div>
       <div className={styles.filters}>{filters.map((filter, index) => <div className={styles.filter} key={index} data-quick-filter={index}>{filter}</div>)}</div>
       {moreAction && <div className={styles.more}>{moreAction}</div>}
       {viewControls && <div className={styles.views}>{viewControls}</div>}

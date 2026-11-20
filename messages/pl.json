@@ -13594,5 +13594,9 @@
     "pageScope": "Strona {page} · wczytano {loaded} z {total} organizacji",
     "mapScope": "Na mapie widać {mapped} z {loaded} organizacji na tej stronie. Pozostałe są nadal na liście.",
     "empty": "Nie znaleziono pasujących organizacji."
+  },
+  "NativeBrowseCounts": {
+    "total": "łącznie",
+    "loaded": "wczytano"
   }
 }

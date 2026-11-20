@@ -475,7 +475,7 @@ function CreatorsInner({
       {near && <p className="site-container text-xs text-text-muted py-2">{uiText("Genie.radiusHint")}</p>}
       <FloatingMapToggle mapActive={viewMode === "map"} onToggle={() => { setViewMode(viewMode === "map" ? "list" : "map"); requestAnimationFrame(() => resultsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" })); }} />
 
-      <MobileBrowseControls nativeCategoryKind="departments" preference={<BrowseGeography geography={geography} />}
+      <MobileBrowseControls nativeCountScope="total" nativeCategoryKind="departments" preference={<BrowseGeography geography={geography} />}
         query={query}
         onQueryChange={setQuery}
         searchPlaceholder={t("searchPlaceholder")}

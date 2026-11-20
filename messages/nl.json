@@ -13594,5 +13594,9 @@
     "pageScope": "Pagina {page} · {loaded} van {total} organisaties geladen",
     "mapScope": "{mapped} van de {loaded} organisaties op deze pagina staan op de kaart. De overige blijven in de lijst.",
     "empty": "Geen passende organisaties gevonden."
+  },
+  "NativeBrowseCounts": {
+    "total": "totaal",
+    "loaded": "geladen"
   }
 }

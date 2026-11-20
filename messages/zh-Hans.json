@@ -13594,5 +13594,9 @@
     "pageScope": "第 {page} 页 · 已加载 {total} 个组织中的 {loaded} 个",
     "mapScope": "本页 {loaded} 个组织中有 {mapped} 个显示在地图上，其余仍保留在列表中。",
     "empty": "未找到匹配的组织。"
+  },
+  "NativeBrowseCounts": {
+    "total": "总计",
+    "loaded": "已加载"
   }
 }

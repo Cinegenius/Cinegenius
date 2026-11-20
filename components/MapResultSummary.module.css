@@ -1,0 +1,3 @@
+:global(html[data-cg-native-community-appearance="app"]) .root {
+  color:var(--color-text-primary);
+}

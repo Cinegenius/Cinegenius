@@ -13594,5 +13594,9 @@
     "pageScope": "Página {page} · {loaded} de {total} organizações carregadas",
     "mapScope": "{mapped} das {loaded} organizações desta página aparecem no mapa. As restantes continuam na lista.",
     "empty": "Não foram encontradas organizações correspondentes."
+  },
+  "NativeBrowseCounts": {
+    "total": "total",
+    "loaded": "carregados"
   }
 }
