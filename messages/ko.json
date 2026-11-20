@@ -12835,7 +12835,9 @@
     "providerPurpose": "인터랙티브 지도",
     "providerRegion": "헝가리 / CDN",
     "providerNotice": "지도를 열면 브라우저가 OpenFreeMap에서 지도 자료를 불러옵니다. 귀하의 IP 주소와 기술적 요청 데이터가 지도 제공자에게 전송됩니다. 이름, 프로필, 메시지는 지도 데이터로 전송되지 않습니다. <provider>제공자 정보</provider>.",
-    "information": "지도 정보"
+    "information": "지도 정보",
+    "outside": "표시 영역 밖: {count, number}개",
+    "showAll": "전체 {count, number}개 보기"
   },
   "BrowseGeography": {
     "preferred": "근처 및 {country} 우선",

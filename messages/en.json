@@ -12835,7 +12835,9 @@
     "providerPurpose": "Interactive maps",
     "providerRegion": "Hungary / CDN",
     "providerNotice": "When you open a map, your browser loads map material from OpenFreeMap. Your IP address and technical request data are transmitted to the map provider. Names, profiles and messages are not sent as map data. <provider>Provider information</provider>.",
-    "information": "Map information"
+    "information": "Map information",
+    "outside": "{count, number} outside this area",
+    "showAll": "Show all {count, number}"
   },
   "BrowseGeography": {
     "preferred": "Nearby and {country} first",

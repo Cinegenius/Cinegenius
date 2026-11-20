@@ -12835,7 +12835,9 @@
     "providerPurpose": "Interaktivní mapy",
     "providerRegion": "Maďarsko / CDN",
     "providerNotice": "Při otevření mapy načte prohlížeč mapové podklady z OpenFreeMap. Poskytovateli mapy se předá vaše IP adresa a technické údaje požadavku. Jména, profily a zprávy se jako mapová data neodesílají. <provider>Informace o poskytovateli</provider>.",
-    "information": "Informace o mapě"
+    "information": "Informace o mapě",
+    "outside": "{count, number} mimo tuto oblast",
+    "showAll": "Zobrazit vše ({count, number})"
   },
   "BrowseGeography": {
     "preferred": "Nejprve okolí a {country}",
