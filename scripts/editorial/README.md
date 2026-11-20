@@ -35,5 +35,7 @@ must stop publication and trigger a reviewed recheck, not relax the comparison.
 Required visible change/archival/credit/license information remains attached.
 
 The real private Hungarian article canary matched the independently calculated
-stored bytes on 21 November 2026. Public article/marker activation remains a
-separate NEWS receipt. The mirrored suite now contains 64 passing cases.
+stored bytes on 21 November 2026. Public article and automatic media selection are now accepted in the separate
+NEWS receipt. Readership remains disabled without its runtime read credential.
+The mirrored suite contains 64 passing cases. The final review policy records
+the observed chronology correction: import day never becomes an opening date.
