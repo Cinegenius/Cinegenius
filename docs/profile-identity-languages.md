@@ -24,6 +24,47 @@ Listing freshness also needs `20261117000500_profile_language_expansion.sql`: ex
 
 ## App coordination and validation
 
+### Spanish film terminology — 20 November 2026
+
+Following operator-supplied feedback from a colleague in Mexico, the shared `es`
+catalog uses **Crew** for film personnel and the Crew directory, including search,
+Smart, onboarding, profiles, credits and generated welcome copy. **Equipo** refers
+to equipment in marketplace labels. Company/support teams may still be called
+`equipo`; do not globally replace that word. Preserve this distinction during
+future AI-assisted catalog preparation and editorial reviews. The shared Spanish
+catalog also serves visitors in Mexico; this is not a separate es-MX locale or
+a complete regional language review.
+
+Interface labels remain versioned catalogs, not per-visit AI translations. Public
+content translation is a separate, enabled feature documented in
+`docs/content-translations.md`, with a verified production release recorded in
+`/srv/cinegenius/handoffs/20261119-translation-country-release/receipt.json`.
+This terminology correction does not rewrite member content, change the runtime
+translation provider, retrain a model or activate additional API requests.
+Native-owned Spanish bundles require the same terminology through APP Entwicklung;
+shared web/native-web views receive the catalog correction on publication.
+
+The subsequent Spanish company-editor screenshot exposed a separate wiring bug:
+company setup and details used raw catalogue labels despite available translations.
+Setup, selection chips, detail views and the onboarding review now resolve these
+labels through the existing taxonomy translator. Category search includes translated
+examples while retaining canonical German aliases. Catering choices add seventeen
+previously missing catalogue labels across all seventeen locales; only displayed
+labels change, never saved selections, category IDs or member-written text.
+Regression coverage exercises the actual label resolvers in every locale and the
+rendered Spanish catering controls, including canonical values after selection.
+This is component/catalogue verification, not a real iPhone or linguistic review
+by native speakers in every language. Publication remains a separate step.
+
+The additional Spanish screenshots of `/inserat?group=jobs` exposed the same
+raw-label path in the job department chooser. Its display labels now use the
+existing translations; its IDs and submitted categories remain canonical.
+Location indoor/outdoor buttons also reuse existing translated labels. The chooser
+regression covers all seventeen locales and preserves the category values for jobs,
+marketplace, animals and locations. This is not certification of every legacy form:
+the older vehicle subtype/fuel/licence selectors still contain raw option text and
+need a separate complete catalogue mapping before claiming full form coverage.
+
 APP Entwicklung must use the same optional fields, visibility contract, stable taxonomy IDs and locale tags. The original native preset deferral is superseded by the current scope in docs/profile-art.md. Existing native sources and device behavior are separate from this website change.
 
 Browser simulations cover phone/tablet/laptop widths. They do not certify an actual iPhone, Xcode build or native language switching. APP Entwicklung messaging transport was unavailable; record the final source/test/publication handoff locally and do not claim delivery until acknowledged.

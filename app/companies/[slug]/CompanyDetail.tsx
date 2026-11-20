@@ -19,6 +19,7 @@ import {
   ChevronRight, ExternalLink, MoreHorizontal,
   Calendar, Scale, Globe2, Quote, MessageSquare,
 } from "lucide-react";
+import { taxonomyLabel } from "@/lib/departments";
 import { COMPANY_CATEGORY_BY_ID } from "@/lib/companyCategories";
 import { AnimalCompanySummary } from "@/components/AnimalCompanyFields";
 import { normalizeAnimalCompanyDetails, isAnimalCompany, animalCategoryLabel } from "@/lib/animal-taxonomy";
@@ -145,7 +146,7 @@ export default function CompanyDetail({
   const teamText = useTranslations("companyTeam");
   const animals = useTranslations("FilmAnimals");
   const safetyMedical = useTranslations("SafetyMedical");
-  const categoryLabel = (id: string, fallback: string) => safetyMedicalCompanyCategoryLabel(id, animalCategoryLabel(id, fallback, animals), safetyMedical);
+  const categoryLabel = (id: string, fallback: string) => taxonomyLabel(safetyMedicalCompanyCategoryLabel(id, animalCategoryLabel(id, fallback, animals), safetyMedical), uiText);
   const currentUserId = isLoaded ? user?.id ?? null : initialUserId;
   const searchParams = useSearchParams();
   const isWelcome = searchParams.get("welcome") === "1";
@@ -839,11 +840,11 @@ export default function CompanyDetail({
             {offersCatering && (cateringDetails.serviceTypes.length > 0 || cateringDetails.serviceAreas || cateringDetails.capacity || cateringDetails.dietaryOptions.length > 0 || cateringDetails.mobileEquipment.length > 0) && (
               <section className="space-y-3 rounded-2xl border border-green-300/20 bg-green-300/[0.04] p-4 sm:p-5">
                 <SectionLabel>{uiText("Ui.text_3bb69740c531c0")}</SectionLabel>
-                {cateringDetails.serviceTypes.length > 0 && <DetailLine label={uiText("AdminReview.fields.services")} value={cateringDetails.serviceTypes.join(", ")} />}
+                {cateringDetails.serviceTypes.length > 0 && <DetailLine label={uiText("AdminReview.fields.services")} value={cateringDetails.serviceTypes.map(item => taxonomyLabel(item, uiText)).join(", ")} />}
                 {cateringDetails.serviceAreas && <DetailLine label={uiText("Ui.text_e7c28b1fd0f674")} value={cateringDetails.serviceAreas} />}
                 {cateringDetails.capacity && <DetailLine label={uiText("MarketplaceOffer.fields.capacity")} value={`Bis zu ${cateringDetails.capacity} Personen`} />}
-                {cateringDetails.dietaryOptions.length > 0 && <DetailLine label={uiText("Ui.text_4028f79e2d232e")} value={cateringDetails.dietaryOptions.join(", ")} />}
-                {cateringDetails.mobileEquipment.length > 0 && <DetailLine label={uiText("Ui.text_6e6ed79b3d62e3")} value={cateringDetails.mobileEquipment.join(", ")} />}
+                {cateringDetails.dietaryOptions.length > 0 && <DetailLine label={uiText("Ui.text_4028f79e2d232e")} value={cateringDetails.dietaryOptions.map(item => taxonomyLabel(item, uiText)).join(", ")} />}
+                {cateringDetails.mobileEquipment.length > 0 && <DetailLine label={uiText("Ui.text_6e6ed79b3d62e3")} value={cateringDetails.mobileEquipment.map(item => taxonomyLabel(item, uiText)).join(", ")} />}
               </section>
             )}
 

@@ -1806,5 +1806,22 @@
   "Studio oder Produktionsfläche": "Ui.text_3d07274566dd50",
   "Studio für Foto- und Videoaufnahmen": "Ui.text_c33df18f459bc1",
   "Etwas anderes": "Ui.text_472b1cc732230e",
-  "Ein anderer passender Ort": "Ui.text_a38760b45e28b7"
+  "Ein anderer passender Ort": "Ui.text_a38760b45e28b7",
+  "Film- und Setcatering": "Taxonomy.extra.x_d1e9e7538f83",
+  "Eventcatering": "Taxonomy.extra.x_bcc4eb4624ba",
+  "Mobiles Catering / Foodtruck": "Taxonomy.extra.x_01b5463faa50",
+  "Craft Service: Snacks und Getränke": "Taxonomy.extra.x_d889a88bc1a3",
+  "Küchenmobil / mobile Küche": "Taxonomy.extra.x_20565120ff08",
+  "Vegetarisch": "Taxonomy.extra.x_471e3728ec64",
+  "Vegan": "Taxonomy.extra.x_019fe57b1bed",
+  "Halal": "Taxonomy.extra.x_45c036b99a87",
+  "Koscher": "Taxonomy.extra.x_2e60fd18c194",
+  "Glutenfrei": "Taxonomy.extra.x_a2f5d6031b84",
+  "Laktosefrei": "Taxonomy.extra.x_5e2d9eda4e18",
+  "Allergikerfreundlich": "Taxonomy.extra.x_a0c0af7ece95",
+  "Foodtruck": "Taxonomy.extra.x_a5b1f863750e",
+  "Küchenmobil": "Taxonomy.extra.x_921b3fed8ffd",
+  "Kühlfahrzeug": "Taxonomy.extra.x_972b71d2de11",
+  "Mobile Ausgabe": "Taxonomy.extra.x_1a2e09542f64",
+  "Autarke Stromversorgung": "Taxonomy.extra.x_e4357a80b814"
 }
