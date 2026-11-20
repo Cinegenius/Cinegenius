@@ -9,11 +9,11 @@ Diese Übersicht trennt die installierte App, ihre serverseitigen Ansichten, nat
 
 | Thema | Belegter Stand |
 | --- | --- |
-| **iPhone-App** | APP meldet am 20.11.2026 Build **2026112007** nach Datensicherung installiert; Geräteversion bestätigt, App zu diesem Meldezeitpunkt noch ungeöffnet. Kein vollständiger Funktionstest dieses Builds behauptet. |
-| **App-Server** | Gemeinsame aktuelle Server-/Oberflächenänderungen werden durch APP integriert und veröffentlicht. Abschlussbeleg steht zum Zeitpunkt dieser Übersicht aus. |
+| **iPhone-App** | APP meldet am 20.11.2026 Build **2026112007** nach Datensicherung installiert; Geräteversion bestätigt. Spätere Rückmeldung aus APP: starke Hänger in Smart/Work und Work → Community funktioniert nicht mit aktuellem Web-Stand `822c27c`. Diagnose läuft; keine eigene Geräte-Reproduktion durch WEB und kein abgeschlossener Funktionstest behauptet. |
+| **App-Server** | **Veröffentlichung angehalten.** Laut APP ist der gemeinsame Stand `407915184321628834171facb374c0592fe68811` einschließlich `822c27c` nur lokal, noch nicht gepusht oder veröffentlicht. Erst Fehlerdiagnose, Prüfung und neue Freigabe; kein paralleler Deploy. |
 | **Native Navigation** | Ziel gemäß aktuellem App-Vertrag: **Shots · News · Smart · Projekte · Work**. Die gewöhnliche Website behält ihre eigene Navigation. |
 | **Obere Aktionen** | Profil, Nachrichten, Suche und Menü; App-eigene Abstände und sichere Bedienung über Kopf-/Fußbereich. |
-| **Erscheinungsbild** | Gemeldete Auswahl Dunkel/Mauve und Hell/Heller Stein. Native Darstellung nicht pauschal in die Website übertragen. |
+| **Erscheinungsbild** | Mauve wurde von Markus als unpassend zurückgemeldet. APP bereitet **vier reine Farbvorlagen** vor; noch keine neue Farbe gewählt, keine Themeänderung und kein neuer Farb-Picker. Warmes Graphit, Schiefergrau und helles Steingrau sind lediglich WEB-Vorschläge. Keine parallele zweite Vorschauimplementierung. |
 | **Weitere Plattformen / Veröffentlichung** | Kein aktueller Beleg für eine veröffentlichte Android-App, einen App-Store-Release oder eine eigenständige Desktop-App in dieser Bestandsaufnahme. iPad-/Mac-Kompatibilität je konkretem Build prüfen. |
 
 ## Entdecken und Community
@@ -75,8 +75,8 @@ Diese Übersicht trennt die installierte App, ihre serverseitigen Ansichten, nat
 
 ## Nächste Schritte und Pflege
 
-1. Laufenden App-Server-Release mit aktuellem Website-Hauptstand einschließlich Kartenfix abgleichen; konkreten Livebeleg nachtragen.
-2. Installierten Build 2026112007 öffnen und beauftragte Abläufe auf dem tatsächlichen Gerät prüfen; Ergebnisse von Browserprüfungen unterscheiden.
+1. Release angehalten lassen: APP diagnostiziert Smart-/Work-Hänger und den fehlerhaften Wechsel Work → Community. Vor einem Livegang konkrete Korrektur, Prüfbeleg und neue Freigabe abwarten.
+2. Installierten Build 2026112007 mit dem tatsächlichen Serverstand auf dem Gerät prüfen, insbesondere Smart, Work und den Wechsel zur Community; Ergebnisse von Browserprüfungen unterscheiden. Vier Farbvorlagen in APP abstimmen, erst nach Auswahl umsetzen.
 3. Geprüfte native Zählerergänzungen `b1d767a` und `38d87bb` separat mit dem aktuellen App-Release abstimmen; Veröffentlichung und echte Geräteprüfung bleiben offen.
 4. Länderpriorisierung und später Feedback-/Währungsfunktionen aus dem gemeinsamen Vertrag übernehmen.
 5. Work-Funktionsstand mit APP konkretisieren; unbelegte Teilfunktionen als offen führen.
