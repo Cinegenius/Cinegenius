@@ -1,10 +1,12 @@
 # Aktueller App-Vertrag · 19. November 2026
 
-Die untere Reihenfolge lautet **Shots → News → Smart → Projekte → Work**. Smart bleibt mittig. Work öffnet den vollständigen nativen Workspace mit geschütztem Zurück-Verhalten. Die Bereichswahl zeigt Community/Workspace nebeneinander und gemeinsam mittig.
+Die untere Reihenfolge lautet **Shots → News → Smart → Projekte → Work**. Smart bleibt mittig. Work öffnet den vollständigen nativen Workspace mit geschütztem Zurück-Verhalten. Nach dem Einloggen zeigt die Bereichswahl Community über Workspace, beide zusammen mit der Überschrift mittig. Bei großer Schrift oder wenig Höhe bleibt die Auswahl scrollbar.
 
 Die oberen vier Aktionen bleiben Profil, Nachrichten, Suche, Menü. Such-/Menüflächen erlauben deren direkten Wechsel; echte Entscheidungen und ungesicherte Entwürfe bleiben geschützt. Die gemessene Kopfzeilen-Freihöhe steuert Inhalt, angeheftete Filter und Popups gemeinsam. Darunter keine zusätzliche undurchsichtige schwarze Kopffläche.
 
 Kacheln/Liste/Karte stehen stets in derselben Reihenfolge direkt über den Treffern, auch horizontal ziehbar und weiterhin antippbar. Unverfügbare Kartenpositionen werden nicht erfunden.
+
+Die fünf Smart-Bereiche verwenden kräftigeres Farbglas in ihren bestehenden Bereichsfarben. Ausgewählte Bereiche erhalten eine stärkere Füllung, Kontur und kurze Farbmarkierung; Mehrfachauswahl bleibt erhalten. Lesbarkeit sowie reduzierte Transparenz und Systemkontrast bleiben berücksichtigt.
 
 Genie im nativen Community-Look übernimmt die Workspace-Form: 56 Punkte, 16 Punkte Radius, 26 Punkte Zeichen, durchsichtiges Glas. Der Anschubser gleitet begrenzt aus. Kontext, Hintergrund, Fenster-/Tastaturänderung und reduzierte Bewegung stoppen ihn. Die gewöhnliche Website bleibt bei ihrer Darstellung.
 
