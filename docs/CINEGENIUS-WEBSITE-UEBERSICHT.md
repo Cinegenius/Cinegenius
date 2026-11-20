@@ -93,7 +93,7 @@ Dieses Verzeichnis hält die Bereiche, ihre Funktionen, den belegten Stand und o
 3. Internationale Formulare/Währungen aus dem separaten Entwurf vervollständigen.
 4. App-Zählerergänzungen und laufenden App-Server-Release getrennt abgleichen.
 5. Gemeldete freie Smart-Suchen und mehrsprachige Fachbegriffe mit echten Suchfällen prüfen; Zugriff bleibt eingeschränkt.
-6. Redaktionelle Mexiko-/Technik-Erweiterungen mit AG DOK nach Quelle, Freigabe und tatsächlich veröffentlichtem Ergebnis unterscheiden.
+6. Redaktionelle Mexiko-/Technik-Erweiterungen mit AG DOK nach Quelle, Freigabe und tatsächlich veröffentlichtem Ergebnis unterscheiden. Neu aus der Redaktion gemeldet: eigene Länder-/Themen-Newsrooms unter „CineGenius Redaktion“ zusammenführen. Noch nicht umgesetzt oder live bestätigt; Beiträge, alte Links, Rechte und Herkunft erhalten, reale Quellorganisationen unverändert lassen.
 
 ## Pflege und Belege
 
