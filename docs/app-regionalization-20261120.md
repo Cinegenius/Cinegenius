@@ -36,6 +36,40 @@ Der erste Auditlauf stoppte an diesem Befund. Der Folgelauf zeichnet negative F�
 
 `listingPriceLabel()` und `listingStructuredOffers()` geben derzeit unabhängig von den geprüften Landes-/Sprachvarianten Euro aus. MXN, CHF und HUF sind in diesen Verträgen noch nicht auswählbar. Die in WEB beauftragte Währungsauswahl benötigt ein gemeinsames, serverseitig geprüftes Angebotsfeld sowie übereinstimmende Eingabe, Detail-/Kartenanzeige, Filter und strukturierte Daten. Bestehende Beträge erhalten; keine automatische Umrechnung und keine Preiswährung aus der Anzeigesprache ableiten. Hier wurde weder ein paralleles Währungsfeld noch eine zweite Länderlogik eingeführt.
 
+## Angekündigter Länder-Vertrag aus WEB · 20. November
+
+WEB CODEX meldet die Umsetzung auf `codex/country-first-discovery-20261120`.
+Der Gesamtstand ist **noch ungeprüft, nicht übernommen und nicht veröffentlicht**.
+Die folgenden Regeln dokumentieren die vorgesehene gemeinsame Schnittstelle,
+keinen bereits bestandenen App-Ablauf:
+
+- `/api/browse-preference` soll auch Gästen
+  `{userId: null, place: {country, region: '', city: ''}}` liefern. Das grobe
+  aktuelle Land kommt aus der Vercel-Herkunftsangabe, nicht aus der Sprache,
+  GPS-Abfragen oder einer Speicherung der IP-Adresse.
+- Bei Reisenden hat das aktuelle Land Vorrang vor einem abweichenden Profilort.
+  Ein Profilort verfeinert dasselbe Land oder dient bei fehlender Netzregion als
+  Rückfall. Dadurch wird weder der gespeicherte Profilort geändert noch eine
+  Angebotswährung abgeleitet.
+- Eine ausdrückliche Länder-, „Alle“- oder Sortierwahl beendet die automatische
+  Priorisierung. Die Wahl bleibt im kontogebundenen echten Verlauf erhalten;
+  Nachladen oder Zurück dürfen sie nicht still zurücksetzen.
+- Verzeichnisse behalten alle passenden Treffer und ordnen die bevorzugte
+  Region zuerst. Auf der Homepage erfolgt diese Priorisierung vor Limits;
+  Crew-Vorrang für 24 Stunden, anschließende Rotation und Marktplatz-Kategorienmix
+  bleiben innerhalb der Region erhalten. Private Crew-Orte werden vor der
+  Sortierung ausgeblendet.
+- News erhält ausdrückliche Länderwahl und redaktionelle Zuordnungen. Nur die
+  automatische Auswahl folgt dem aktuellen Land.
+
+Vor dem App-Port benötigt APP den geprüften Commit, konkrete Schnittstellen und
+Prüfbelege. Danach gezielt Gäste, Reisen mit abweichendem Profilort, fehlende
+Netzregion, bewusste Auswahl einschließlich „Alle“ und Sortierung, Kontowechsel,
+Nachladen, Zurück und Sprachwechsel prüfen. Treffermengen, Privatsphäre und die
+separat gesicherte Crew-Rotation müssen erhalten bleiben. Browserprüfungen und
+echte Geräteprüfung bleiben getrennt. Der App-Release-Halt besteht unverändert;
+diese Dokumentation startet weder einen Port noch einen Hintergrundagenten.
+
 ## Prüfbelege und Grenzen
 
 Belege liegen unter `/srv/cinegenius/handoffs/20261120-app-regionalization-audit/`: `matrix.json`, reproduzierbares `audit.mjs`, ursprünglicher negativer Lauf, gezielte bestehende Regressionstests und abschließender `receipt.json`. Das Audit liest ausschließlich Quellen und den statischen Katalog. Testanfragen und Testdaten sind ausdrücklich künstlich; keine Produktionsdatensätze wurden geändert.

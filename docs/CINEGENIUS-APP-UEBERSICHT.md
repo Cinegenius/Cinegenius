@@ -66,7 +66,7 @@ Diese Übersicht trennt die installierte App, ihre serverseitigen Ansichten, nat
 
 | Thema | Stand / Regel |
 | --- | --- |
-| **Länderpriorisierung** | Neuer Auftrag für alle Länder: lokale neue Inhalte zuerst, andere weiterhin erreichbar. WEB entwickelt gemeinsamen Vertrag; APP übernimmt ihn. Bewusste Auswahl einschließlich „Alle“, Kontoänderung, Nachladen und Sprachwechsel beachten. |
+| **Länderpriorisierung** | WEB entwickelt `codex/country-first-discovery-20261120`: aktuelles Aufenthaltsland zuerst, Profilort nur passend dazu bzw. als Rückfall; eigene Länder-/Alle-/Sortierwahl hat Vorrang. Gastvertrag und weitere Regeln sind im [App-Länderbericht](app-regionalization-20261120.md) vorgemerkt. Gesamtstand noch ungeprüft, kein App-Port und kein Livegang. Übernahme erst mit geprüftem Commit und Nachweisen; Kontoänderung, Nachladen, Zurück und Sprachwechsel erhalten. |
 | **Sprachen / Währungen** | 17 Web-Sprachkataloge vorhanden; native Texte separat vollständig halten. Währung und Sprache sind nicht automatisch das Land. Neue Währungsauswahl noch Entwurf. |
 | **Push** | Code/Verträge vorbereitet, **nicht aktiviert**. Apple-Konfiguration, Dienstbetrieb und echter Empfang/Antippen/Abmelden-Test fehlen als Aktivierungsbeleg. |
 | **Hintergrunddienste** | Kein laufender Dienst allein durch vorhandenen Worker-Code. Zeitplan, Rechte, Aktivierungsstatus und tatsächliche Verarbeitung gesondert belegen. |
