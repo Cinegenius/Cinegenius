@@ -1,6 +1,6 @@
 ## App-Folgearbeit: Smart-Karten und News – 19. November 2026
 
-Der am 20. November 2026 abgeglichene veröffentlichte Hauptstand ist `5320a952b38d8cfd3e8d99b8bec3bb6940bf2529`. Seine stärkere Smart-Auswahlmarkierung, Header-/Genie-Korrekturen, Shots / News / Smart / Projekte / Work sowie Gast-Sprachwahl und Übersetzungs-/Länderänderungen erhalten. Die frühere Freigabe ist damit verbraucht; die hier vorbereitete App-Folgearbeit hat keine neue Veröffentlichungsfreigabe. Der erhaltene alte Mobile-Zweig und ältere Swift-Dateien dürfen diesen Hauptstand nicht ersetzen.
+Der am 20. November 2026 abgeglichene veröffentlichte Hauptstand ist `e68bb8db43bc6d997e0f70525924ba5e53fa3da9`. Seine Headerkorrektur ohne zusätzliche dunkle Hintergrundfläche, stärkere Smart-Auswahlmarkierung, Header-/Genie-Korrekturen, Shots / News / Smart / Projekte / Work sowie Gast-Sprachwahl und Übersetzungs-/Länderänderungen erhalten. Die frühere Freigabe ist damit verbraucht; die hier vorbereitete App-Folgearbeit hat keine neue Veröffentlichungsfreigabe. Der erhaltene alte Mobile-Zweig und ältere Swift-Dateien dürfen diesen Hauptstand nicht ersetzen.
 
 Für die genaue native App-Darstellung gilt jetzt: News ist der gemeinsame Einstieg zu Beiträge und Organisationen; Organisationen erscheinen nicht nochmals im App-Menü. Bestehende URLs bleiben erreichbar. Land/Stadt, Suche, Liste/Karte und Seitenauswahl dürfen keine berechtigten Organisationen wegen fehlender Kartenpunkte verlieren. Beide Ortsfilter müssen auch bei 320px erreichbar bleiben.
 
