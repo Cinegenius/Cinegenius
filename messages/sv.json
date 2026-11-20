@@ -13450,6 +13450,8 @@
   },
   "ProfileLayout": {},
   "NativeAppChrome": {
+    "lightMode": "Byt till ljust läge",
+    "darkMode": "Byt till mörkt läge",
     "work": "Work",
     "createEntry": "Skapa post",
     "navigation": "Appgenvägar",

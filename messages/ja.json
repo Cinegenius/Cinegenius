@@ -13450,6 +13450,8 @@
   },
   "ProfileLayout": {},
   "NativeAppChrome": {
+    "lightMode": "ライトモードに切り替える",
+    "darkMode": "ダークモードに切り替える",
     "work": "Work",
     "createEntry": "項目を作成",
     "navigation": "アプリのショートカット",

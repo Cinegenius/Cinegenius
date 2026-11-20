@@ -13450,6 +13450,8 @@
   },
   "ProfileLayout": {},
   "NativeAppChrome": {
+    "lightMode": "Váltás világos módra",
+    "darkMode": "Váltás sötét módra",
     "work": "Work",
     "createEntry": "Bejegyzés létrehozása",
     "navigation": "Alkalmazás-gyorselérés",

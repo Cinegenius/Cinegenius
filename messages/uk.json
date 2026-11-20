@@ -13450,6 +13450,8 @@
   },
   "ProfileLayout": {},
   "NativeAppChrome": {
+    "lightMode": "Увімкнути світлу тему",
+    "darkMode": "Увімкнути темну тему",
     "work": "Work",
     "createEntry": "Створити запис",
     "navigation": "Швидкий доступ у застосунку",

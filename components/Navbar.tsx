@@ -266,6 +266,7 @@ export default function Navbar({ initialIsSignedIn = false, initialAdminUserId =
     const settingsHref = ACCOUNT_NAV_ITEMS.find(item => item.id === "settings")!.href;
     return <NativeAppNavbar
       navigationLabel={uiText("NativeAppChrome.navigation")}
+      appearance={{ lightLabel:uiText("NativeAppChrome.lightMode"), darkLabel:uiText("NativeAppChrome.darkMode") }}
       accountButtonRef={accountButton} accountMenuRef={accountMenuRef}
       signInLabel={t("signIn")}
       account={{

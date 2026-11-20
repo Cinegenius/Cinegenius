@@ -2,9 +2,9 @@
 
 import dynamic from "next/dynamic";
 import { ContentTranslationNotice } from "@/components/ContentTranslation";
-import { useCallback, useEffect, useId, useLayoutEffect, useMemo, useRef, useState, type Dispatch, type SetStateAction } from "react";
+import { useCallback, useEffect, useId, useLayoutEffect, useMemo, useRef, useState, type CSSProperties, type Dispatch, type SetStateAction } from "react";
 import { useTranslations } from "next-intl";
-import { ChevronDown, RotateCcw, SlidersHorizontal, X } from "lucide-react";
+import { Briefcase, Building2, ChevronDown, Film, MapPin, Newspaper, PawPrint, RotateCcw, ShoppingBag, SlidersHorizontal, Users, X } from "lucide-react";
 import BrowseResultCount from "./BrowseResultCount";
 import BrowseSelect from "./BrowseSelect";
 import DirectoryViewControls, { type DirectoryView } from "./DirectoryViewControls";
@@ -16,6 +16,8 @@ import nativeStyles from "./app/NativeSmartAreas.module.css";
 import ResultCard from "./SearchResultCard";
 import { searchGroupKey, type SearchGroup, type SearchPlan } from "@/lib/unified-search";
 import { SMART_MAP_COLORS } from "@/lib/smart-search-map";
+import { NATIVE_SMART_MAP_COLORS, nativeSmartColorStyle } from "@/lib/native-smart-colors";
+import resultStyles from "./SmartSearchResults.module.css";
 import { searchQueryTitle } from "@/lib/unified-search-areas";
 import { discoveryAreas, discoveryResults, discoveryCount, discoveryFacets, emptyDiscoveryFilters, filterDiscoveryGroups, mergeDiscoveryPage, sortDiscoveryGroups, type DiscoveryFilters } from "@/lib/smart-discovery";
 
@@ -30,9 +32,13 @@ const activeChip = "border-gold/40 bg-gold/10 text-text-primary";
 const inactiveChip = "border-border bg-bg-secondary text-text-muted";
 export type SmartSearchControls = { scope: string; filters: DiscoveryFilters; mapOpen: boolean; view?: DirectoryView; limits: Record<string, number> };
 
-function ResultArea({ area, groups, pending, errors, more, grid = false, limit: controlledLimit, setLimit: changeLimit }: {
+const areaIcons = { crew:Users, marketplace:ShoppingBag, locations:MapPin, companies:Building2, jobs:Briefcase, projects:Film, animals:PawPrint, news:Newspaper, organizations:Building2 };
+
+function ResultArea({ area, groups, pending, errors, more, grid = false, limit: controlledLimit, setLimit: changeLimit, colors, native = false }: {
   area: SearchGroup["area"]; groups: SearchGroup[]; pending: string[]; errors: string[]; more: (group: SearchGroup) => void;
   grid?: boolean; limit?: number; setLimit?: (limit: number) => void;
+  colors: typeof SMART_MAP_COLORS;
+  native?: boolean;
 }) {
   const t = useTranslations("UnifiedSearch");
   const [localLimit, setLocalLimit] = useState(3);
@@ -42,9 +48,12 @@ function ResultArea({ area, groups, pending, errors, more, grid = false, limit: 
   const next = groups.find(group => errors.includes(searchGroupKey(group))) ?? groups.find(group => group.nextOffset !== null);
   const busy = pending.includes("initial") || groups.some(group => pending.includes(searchGroupKey(group)));
   const failed = groups.some(group => errors.includes(searchGroupKey(group)));
+  const AreaIcon = areaIcons[area];
   if (!results.length) return null;
-  return <section className="smart-result-area" aria-label={t(`areas.${area}`)}>
-    <h2 className="smart-area-heading"><span className="size-1.5 shrink-0 rounded-full" style={{ backgroundColor: SMART_MAP_COLORS[area] }} aria-hidden="true" />
+  return <section className={`smart-result-area${native ? ` ${resultStyles.block}` : ""}`} aria-label={t(`areas.${area}`)}
+    data-native-smart-result-area={native ? area : undefined} style={native ? nativeSmartColorStyle(area) as CSSProperties : undefined}>
+    <h2 className={`smart-area-heading${native ? ` ${resultStyles.heading}` : ""}`}>
+      {native ? <AreaIcon size={16} aria-hidden="true" /> : <span className="size-1.5 shrink-0 rounded-full" style={{ backgroundColor: colors[area] }} aria-hidden="true" />}
       <span className="min-w-0 flex-1">{t(`areas.${area}`)}</span><BrowseResultCount count={results.length} label={t("discovery.loaded", { count: results.length })} />
     </h2>
     {grid ? <div className={nativeStyles.grid}>{results.slice(0, limit).map(result => <ResultCard key={`${result.type}:${result.id}`} result={result} />)}</div>
@@ -65,6 +74,7 @@ export default function SmartSearchExplorer({ plan, initialGroups, initialMapGro
 }) {
   const t = useTranslations("UnifiedSearch"), taxonomy = useTranslations("Taxonomy"), marketplace = useTranslations("MarketplaceCatalog");
   const nativeAppearance = useNativeAppAppearance();
+  const colors = nativeAppearance ? NATIVE_SMART_MAP_COLORS : SMART_MAP_COLORS;
   const [groups, setGroups] = useState(initialMapGroups ?? initialGroups);
   const [webFilters, setWebFilters] = useState<DiscoveryFilters>(emptyDiscoveryFilters);
   const [webMapOpen, setWebMapOpen] = useState(true);
@@ -220,7 +230,7 @@ export default function SmartSearchExplorer({ plan, initialGroups, initialMapGro
       <div className="flex flex-wrap gap-2" role="group" aria-label={t("mapLegend")}>
         {areas.map(area => <button type="button" key={area} aria-pressed={!filters.hiddenAreas.includes(area)} className={`${chip} ${filters.hiddenAreas.includes(area) ? inactiveChip : activeChip}`}
           onClick={() => setFilters(value => ({ ...value, hiddenAreas: toggle(value.hiddenAreas, area) }))}>
-          <span className="size-2.5 shrink-0 rounded-full" style={{ backgroundColor: SMART_MAP_COLORS[area] }} aria-hidden="true" />{t(`areas.${area}`)}</button>)}
+          <span className="size-2.5 shrink-0 rounded-full" style={{ backgroundColor: colors[area] }} aria-hidden="true" />{t(`areas.${area}`)}</button>)}
       </div>
       {wishes.length > 1 && <details><summary className="flex min-h-11 cursor-pointer items-center gap-2 text-sm text-text-secondary"><ChevronDown size={16} aria-hidden="true" />{t("discovery.wishes")}</summary>
         <div className="flex flex-wrap gap-2 pb-2" role="group" aria-label={t("discovery.wishes")}>{wishes.map(index => <button key={index} type="button" aria-pressed={!filters.hiddenWishes.includes(index)}
@@ -248,7 +258,7 @@ export default function SmartSearchExplorer({ plan, initialGroups, initialMapGro
     {errors.includes("initial") && <div role="alert" className="text-sm text-text-secondary"><p>{t("error")}</p><button type="button" className="min-h-11 min-w-11 text-gold" onClick={() => void read()} disabled={pending.includes("initial")}>{t("retry")}</button></div>}
     {pending.includes("initial") && <p role="status" className="text-sm text-text-muted">{t("loading")}</p>}
     {!count && <div role="status" className="rounded-xl border border-border bg-bg-secondary p-4 text-sm text-text-secondary"><p>{t(filtered ? "discovery.emptyFilters" : "emptyGroup")}</p>{filtered && <button type="button" className="min-h-11 min-w-11 text-gold" onClick={reset}>{t("discovery.reset")}</button>}</div>}
-    {(nativeAppearance ? nativeSmartResultAreas(discoveryAreas(visible)) : discoveryAreas(visible)).map(area => <ResultArea key={area} area={area} groups={visible.filter(group => group.area === area)} pending={pending} errors={errors}
+    {(nativeAppearance ? nativeSmartResultAreas(discoveryAreas(visible)) : discoveryAreas(visible)).map(area => <ResultArea key={area} area={area} colors={colors} native={nativeAppearance} groups={visible.filter(group => group.area === area)} pending={pending} errors={errors}
       {...(nativeAppearance ? { grid: view === "grid", limit: controls.limits[area] ?? (view === "grid" ? 4 : 3), setLimit: (limit: number) => setLimit(area, limit) } : {})}
       more={group => void read(groups.find(item => searchGroupKey(item) === searchGroupKey(group))!)} />)}
     {groups.some(group => group.nextOffset !== null) && <p className="text-xs text-text-muted">{t("discovery.partial")}</p>}

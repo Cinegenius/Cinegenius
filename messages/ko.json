@@ -13450,6 +13450,8 @@
   },
   "ProfileLayout": {},
   "NativeAppChrome": {
+    "lightMode": "라이트 모드로 전환",
+    "darkMode": "다크 모드로 전환",
     "work": "Work",
     "createEntry": "항목 만들기",
     "navigation": "앱 바로가기",

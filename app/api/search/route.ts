@@ -155,15 +155,24 @@ export async function GET(req: NextRequest) {
   const profiles = profileRows
     .filter((profile) => !privateProfileIds.has(profile.user_id))
     .filter((p: Record<string, unknown>) => p.display_name)
-    .map((p: Record<string, unknown>) => ({
-      id: p.user_id as string,
-      title: p.display_name as string,
-      subtitle: [profileOccupationPreview(p)[0] ? taxonomyLabel(profileOccupationPreview(p)[0], uiText, occupationFormFromCrew(p.crew)) : null, placeDisplay(placeReadFields(String(p.location??""),p,locale),String(p.location??""),locale)].filter(Boolean).join(" · "),
-      type: "profile",
-      price: 0,
-      image: p.avatar_url as string | null,
-      available: p.available as boolean | null,
-    }));
+    .map((p: Record<string, unknown>) => {
+      const firstOccupation = profileOccupationPreview(p)[0];
+      const occupation = firstOccupation ? taxonomyLabel(firstOccupation, uiText, occupationFormFromCrew(p.crew)) : "";
+      const place = placeDisplay(placeReadFields(String(p.location??""),p,locale),String(p.location??""),locale);
+      return {
+        id: p.user_id as string,
+        title: p.display_name as string,
+        subtitle: [occupation, place].filter(Boolean).join(" · "),
+        crewPreview: {
+          occupation,
+          place: place.split(",").map(part => part.trim()).filter(Boolean).join(", "),
+        },
+        type: "profile",
+        price: 0,
+        image: p.avatar_url as string | null,
+        available: p.available as boolean | null,
+      };
+    });
 
   const companyById = new Map<string, Record<string, unknown>>();
   for (const company of [...(companiesRes.data ?? []), ...(animalCompaniesRes.data ?? []), ...(cateringCompaniesRes.data ?? []), ...(safetyMedicalCompaniesRes.data ?? [])] as Record<string, unknown>[]) {

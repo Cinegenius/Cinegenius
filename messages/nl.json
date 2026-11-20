@@ -13450,6 +13450,8 @@
   },
   "ProfileLayout": {},
   "NativeAppChrome": {
+    "lightMode": "Lichte modus inschakelen",
+    "darkMode": "Donkere modus inschakelen",
     "work": "Work",
     "createEntry": "Item maken",
     "navigation": "App-snelkoppelingen",

@@ -13450,6 +13450,8 @@
   },
   "ProfileLayout": {},
   "NativeAppChrome": {
+    "lightMode": "Mudar para o modo claro",
+    "darkMode": "Mudar para o modo escuro",
     "work": "Work",
     "createEntry": "Criar entrada",
     "navigation": "Atalhos da aplicação",

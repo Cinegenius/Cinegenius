@@ -3,10 +3,12 @@
 import { useEffect, useLayoutEffect, useRef } from "react";
 import type { MouseEvent, ReactNode, RefObject } from "react";
 import Link from "next/link";
-import { Bell, ChevronRight, Loader2, LogOut, Menu, MessageSquare, Search, User } from "lucide-react";
+import { Bell, ChevronRight, Loader2, LogOut, Menu, MessageSquare, Moon, Search, Sun, User } from "lucide-react";
 import NavigationIcon from "@/components/NavigationIcon";
 import type { SiteNavigationIcon } from "@/lib/site-navigation";
 import { announceNativeHeaderAction, useNativeHeaderUtilityKind } from "@/lib/native-header-utility";
+import { toggleNativeAppTheme, useNativeAppTheme } from "@/lib/native-app-theme";
+import { useNativeCapability } from "@/lib/use-native-capability";
 import styles from "./NativeAppNavbar.module.css";
 
 type ProfileLink = { id: string; href: string; label: string; icon: SiteNavigationIcon };
@@ -37,12 +39,16 @@ export type NativeAppNavbarProps = {
   search: { label: string; onClick: (event: MouseEvent<HTMLButtonElement>) => void };
   menu: { label: string; open: boolean; controls: string; onClick: (event: MouseEvent<HTMLButtonElement>) => void };
   signInLabel: string;
+  appearance: { lightLabel: string; darkLabel: string };
 };
 
 /** App presentation of the existing Navbar controller; no identity, request or preference store. */
-export default function NativeAppNavbar({ navigationLabel, accountButtonRef, accountMenuRef, account, messages, search, menu, signInLabel }: NativeAppNavbarProps) {
+export default function NativeAppNavbar({ navigationLabel, accountButtonRef, accountMenuRef, account, messages, search, menu, signInLabel, appearance }: NativeAppNavbarProps) {
   const { open, ready } = account;
   const utility = useNativeHeaderUtilityKind();
+  const theme = useNativeAppTheme();
+  const themeReady = useNativeCapability("appearance-toggle");
+  const themeLabel = theme === "pure" ? appearance.darkLabel : appearance.lightLabel;
   const header = useRef<HTMLElement>(null);
   useLayoutEffect(() => {
     const root = document.documentElement, element = header.current, bubble = element?.querySelector("nav");
@@ -109,6 +115,15 @@ export default function NativeAppNavbar({ navigationLabel, accountButtonRef, acc
       <button type="button" className={styles.action} data-native-app-action="menu" aria-label={menu.label} title={menu.label}
         aria-expanded={menu.open} aria-controls={menu.controls} aria-haspopup="dialog" onClick={menu.onClick}><Menu size={22} aria-hidden="true" /></button>
     </nav>
+    {themeReady && <button type="button" className={styles.themeToggle} data-native-app-theme-toggle="v1"
+      aria-label={themeLabel} title={themeLabel}
+      onClick={event => {
+        // Native capture consumes its trusted click first. This fallback only
+        // changes the presentation marker in an ordinary browser preview.
+        if (!event.defaultPrevented && event.nativeEvent.isTrusted) toggleNativeAppTheme();
+      }}>
+      {theme === "pure" ? <Moon size={20} aria-hidden="true" /> : <Sun size={20} aria-hidden="true" />}
+    </button>}
     {account.ready && account.open && <div ref={accountMenuRef} id="header-account-menu" className={styles.profileMenu}
       role="dialog" aria-labelledby="native-profile-menu-title"
       onBlur={event => {

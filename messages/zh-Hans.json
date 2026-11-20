@@ -13450,6 +13450,8 @@
   },
   "ProfileLayout": {},
   "NativeAppChrome": {
+    "lightMode": "切换为浅色模式",
+    "darkMode": "切换为深色模式",
     "work": "Work",
     "createEntry": "创建条目",
     "navigation": "应用快捷入口",

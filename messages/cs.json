@@ -13450,6 +13450,8 @@
   },
   "ProfileLayout": {},
   "NativeAppChrome": {
+    "lightMode": "Přepnout na světlý režim",
+    "darkMode": "Přepnout na tmavý režim",
     "work": "Work",
     "createEntry": "Vytvořit záznam",
     "navigation": "Rychlé volby aplikace",

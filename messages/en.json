@@ -13450,6 +13450,8 @@
   },
   "ProfileLayout": {},
   "NativeAppChrome": {
+    "lightMode": "Switch to light mode",
+    "darkMode": "Switch to dark mode",
     "work": "Work",
     "createEntry": "Create entry",
     "navigation": "App shortcuts",

@@ -13450,6 +13450,8 @@
   },
   "ProfileLayout": {},
   "NativeAppChrome": {
+    "lightMode": "Hell anzeigen",
+    "darkMode": "Dunkel anzeigen",
     "work": "Work",
     "createEntry": "Eintrag erstellen",
     "navigation": "App-Schnellzugriff",

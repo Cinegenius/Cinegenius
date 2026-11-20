@@ -127,7 +127,8 @@ async function readGroup(plan: SearchPlan, wishIndex: number, area: SearchArea, 
     if (area === "projects") row = publicProjectMedia(row);
     const place = placeDisplay(placeReadFields(String(row.location ?? row.city ?? ""), row, locale), String(row.location ?? row.city ?? ""), locale);
     const organization = Array.isArray(row.organization) ? row.organization[0] : row.organization;
-    const role = area === "crew" ? profileOccupationPreview(row as OccupationProfile).map(title => taxonomyLabel(title, ui, occupationFormFromCrew(row.crew))).join(" · ") : row.role;
+    const occupations = area === "crew" ? profileOccupationPreview(row as OccupationProfile).map(title => taxonomyLabel(title, ui, occupationFormFromCrew(row.crew))) : [];
+    const role = area === "crew" ? occupations.join(" · ") : row.role;
     const result: SearchResult = {
       id: String(area === "crew" ? row.user_id : area === "news" ? `${(organization as Row)?.slug}/${row.slug}` : row.slug || row.id),
       sourceId: String(area === "crew" ? row.user_id : row.id),
@@ -141,6 +142,9 @@ async function readGroup(plan: SearchPlan, wishIndex: number, area: SearchArea, 
     // Only public, canonical search facts leave the permission-projected row.
     if (area === "crew") {
       const profile = row as OccupationProfile;
+      // This row has already passed projectProfilePrivacy. Do not parse the
+      // joined subtitle: member-written occupations can contain separators.
+      result.crewPreview = { occupation: occupations[0] ?? "", place: place.split(",").map(part => part.trim()).filter(Boolean).join(", ") };
       result.facets = { departments: [...new Set(selectedCrewOccupations(profile.positions ?? [], profile.crew?.occupations, profile.role, profile.crew?.primaryOccupation).map(role => role.departmentId))] };
       if (terms.length && [row.role, ...(Array.isArray(row.positions) ? row.positions : [])]
         .some(role => typeof role === "string" && terms.some(term => searchKey(term) === searchKey(role)))) result.evidence = "role";
