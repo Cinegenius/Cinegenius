@@ -98,3 +98,7 @@ Offen bleiben die dokumentierten älteren Fahrzeug-Untertyp-/Treibstoff-/Führer
 ## Angekündigter privater Mitgestaltungsbereich
 
 WEB CODEX bereitet „CineGenius mitgestalten“ im persönlichen Bereich vor: spanisches Genie-Gespräch, erhaltene Originalrückmeldung und deutscher priorisierter Plan zur menschlichen Freigabe, ausdrücklich eingereicht über bestehende private Abläufe. Der geprüfte Vertrag steht noch aus. App-Prüfpunkte und Übergabegrenzen sind in `docs/app-co-design-handoff-20261120.md` festgehalten; dies implementiert oder veröffentlicht noch keine neue App-Funktion.
+
+## Karten- und Trefferzahlen: Bestandsprüfung
+
+Der Zwischenbefund von WEB wurde mit der gemeinsamen Verzeichnislogik, nativer Smart-Entdeckung und vorbereiteten Organisationen verglichen. Die Zahlen haben unterschiedliche Bedeutungen; Smart erhält Treffer ohne Position, Organisationen die geladene Seite, während die gewöhnlichen Kartenverzeichnisse Zeilen auf den Ausschnitt begrenzen. Quellen, künstliche Funktionsprüfung und offene Browser-/Gerätegrenzen stehen in `docs/app-map-count-audit-20261120.md`. Noch keine Zählerkorrektur oder Veröffentlichung.
