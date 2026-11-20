@@ -33,7 +33,7 @@ export async function GET(request: NextRequest) {
 
   let entriesQuery = db
     .from("organization_entries")
-    .select("id,organization_id,slug,entry_type,title,summary,description,topic,format,city,venue,starts_at,ends_at,registration_url,external_url,image_url,moderation_status,moderation_reason,submitted_at,published_at,created_at,updated_at")
+    .select("id,organization_id,slug,entry_type,title,summary,description,topic,format,city,venue,starts_at,ends_at,registration_url,external_url,image_url,publication_authority,moderation_status,moderation_reason,submitted_at,published_at,created_at,updated_at")
     .order("submitted_at", { ascending: false, nullsFirst: false })
     .order("created_at", { ascending: false })
     .limit(limit);
@@ -112,7 +112,7 @@ export async function PATCH(request: NextRequest) {
     last_actor_user_id: admin.userId,
     updated_at: now,
   };
-  if (status === "approved") update.published_at = now;
+  if (status === "approved") { update.published_at = now; if (kind === "entry") update.publication_authority = "admin"; }
   const { data: updated, error: updateError } = await db.from(table).update(update).eq("id", id).eq("updated_at", current.updated_at).select("id,moderation_status,updated_at").maybeSingle();
   if (updateError || !updated) {
     await finishAdminAudit(audit, "failed");

@@ -31,6 +31,7 @@ type OrganizationItem = {
 };
 
 type EntryItem = {
+  publication_authority?: "admin" | "editorial" | null;
   id: string;
   slug: string;
   title: string;
@@ -90,6 +91,9 @@ export function AdminOrganizations() {
 
   const t = useTranslations("AdminOrganizations");
   const locale = useLocale();
+  const editorial = useTranslations("EditorialAuthority");
+  const [grants, setGrants] = useState<Record<string, { enabled: boolean; updated_at: string }>>({});
+  const [grantsLoaded, setGrantsLoaded] = useState(false);
   const pendingLoad = useRef<AbortController | null>(null);
   const organizationText = useTranslations("Organizations");
   const ot = (key: string) => organizationText(key as Parameters<typeof organizationText>[0]);
@@ -110,6 +114,13 @@ export function AdminOrganizations() {
     try {
       const params = new URLSearchParams({ submittedOnly: String(submittedOnly) });
       if (search.trim()) params.set("search", search.trim());
+      setGrantsLoaded(false);
+      const grantResponse = await fetch("/api/admin/organizations/editorial-grants", { cache: "no-store", signal: controller.signal });
+      if (grantResponse.ok) {
+        const result = await grantResponse.json();
+        setGrants(Object.fromEntries(result.grants.map((grant: { organization_id: string; enabled: boolean; updated_at: string }) => [grant.organization_id, grant])));
+        setGrantsLoaded(true);
+      }
       setPayload(await loadJson<Payload>(`/api/admin/organizations?${params}`, { signal: controller.signal }));
     } catch {
       if (!controller.signal.aborted) setError(t("loadError"));
@@ -144,6 +155,21 @@ export function AdminOrganizations() {
     } finally {
       setActing(null);
     }
+  }
+
+  async function changeEditorialGrant(organizationId: string) {
+    if (acting || !grantsLoaded) return;
+    const grant = grants[organizationId];
+    const enabled = !grant?.enabled;
+    if (enabled && !await confirmDialog({ message: editorial("confirmGrant"), confirmLabel: editorial("enable"), cancelLabel: uiText("home.boardCancel") })) return;
+    const reason = await promptDialog({ message: t("reasonPrompt"), confirmLabel: uiText("profile.save"), cancelLabel: uiText("home.boardCancel"), minLength: 5, maxLength: 500, validationMessage: t("reasonShort") });
+    if (!reason) return;
+    setActing(`organization:${organizationId}`); setError(null); setMessage(null);
+    try {
+      await loadJson("/api/admin/organizations/editorial-grants", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ organizationId, enabled, expectedUpdatedAt: grant?.updated_at ?? null, reason }) });
+      setMessage(t("saved")); await load();
+    } catch (failure) { setError(failure instanceof Error && failure.message === "conflict" ? t("conflict") : t("saveError")); }
+    finally { setActing(null); }
   }
 
   const actionButtons = (kind: ItemKind, id: string, status: ModerationStatus) => {
@@ -201,7 +227,9 @@ export function AdminOrganizations() {
               </div>
               <div>{organization.moderation_status === "approved" && <Link href={`/organizations/${organization.slug}`} target="_blank" className="inline-flex items-center gap-1 text-xs text-gold">{t("openPublic")}<ExternalLink size={12} /></Link>}</div>
             </div>
-            <div className="mt-4">{actionButtons("organization", organization.id, organization.moderation_status)}</div>
+            <div className="mt-4">{actionButtons("organization", organization.id, organization.moderation_status)}
+              {grantsLoaded && (organization.moderation_status === "approved" || grants[organization.id]?.enabled) && <button type="button" disabled={!!acting} onClick={() => void changeEditorialGrant(organization.id)} className="mt-3 min-h-11 max-w-full break-words rounded-lg border border-border px-3 py-2 text-sm text-text-secondary disabled:opacity-50">{editorial(grants[organization.id]?.enabled ? "disable" : "enable")}</button>}
+            </div>
           </article>
         ))}
       </section>}
@@ -215,7 +243,7 @@ export function AdminOrganizations() {
                 {adminMediaUrl(entry.image_url) ? <MediaImage src={adminMediaUrl(entry.image_url)!} alt={t("imageAlt")} fill sizes="176px" className="object-cover" /> : <CalendarDays className="absolute inset-0 m-auto text-text-muted" size={30} />}
               </div>
               <div className="min-w-0">
-                <div className="flex flex-wrap items-center gap-2"><h3 className="font-semibold text-text-primary">{entry.title}</h3><span className={`rounded-full border px-2 py-1 text-[11px] ${statusTone(entry.moderation_status)}`}>{ot(`status.${entry.moderation_status}`)}</span></div>
+                <div className="flex flex-wrap items-center gap-2"><h3 className="font-semibold text-text-primary">{entry.title}</h3>{entry.publication_authority === "editorial" && <span className="text-xs text-text-muted">{editorial("name")}</span>}<span className={`rounded-full border px-2 py-1 text-[11px] ${statusTone(entry.moderation_status)}`}>{ot(`status.${entry.moderation_status}`)}</span></div>
                 <p className="mt-1 text-xs text-text-muted">{ot(`entryType.${entry.entry_type}`)} · {entry.organization?.name ?? t("missingOrganization")}{entry.topic ? uiText("Ui.text_f6b53f9c8ab3ef", { value1: String(ot(`topic.${entry.topic}`)) }) : ""} · {ot(`format.${entry.format}`)}</p>
                 {(entry.summary || entry.description) && <div className="mt-3"><p className="text-[11px] font-semibold uppercase tracking-wide text-text-muted">{t("descriptionLabel")}</p><p className="mt-1 whitespace-pre-wrap text-sm leading-6 text-text-secondary">{entry.summary || entry.description}</p>{entry.summary && entry.description && <p className="mt-2 whitespace-pre-wrap text-sm leading-6 text-text-secondary">{entry.description}</p>}</div>}
                 <dl className="mt-3 grid gap-x-5 gap-y-2 text-xs text-text-secondary sm:grid-cols-2">

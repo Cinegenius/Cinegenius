@@ -1,7 +1,7 @@
 import { TranslatedText } from "@/components/ContentTranslation";
 import Link from "next/link";
-import { notFound } from "next/navigation";
-import { getTranslations, getLocale } from "next-intl/server";
+import { notFound, permanentRedirect } from "next/navigation";
+import { getTranslations, getLocale, getNow } from "next-intl/server";
 import Image from "@/components/MediaImage";
 import PageHeader from "@/components/PageHeader";
 import { approvedEntryBySlugs } from "@/lib/organization-data";
@@ -13,13 +13,16 @@ export default async function EntryPage({ params }: { params: Promise<{ organiza
   const result = await approvedEntryBySlugs(organizationSlug, entrySlug);
   if (!result) notFound();
   const { entry, organization } = result;
+  if (organization.slug !== organizationSlug || entry.slug !== entrySlug) permanentRedirect(`/news/${encodeURIComponent(organization.slug)}/${encodeURIComponent(entry.slug)}`);
   const t = await getTranslations("Organizations");
   const locale = await getLocale();
   const dates = new Intl.DateTimeFormat(locale, { dateStyle: "long", timeStyle: "short", timeZone: "Europe/Berlin" });
-  const ended = entry.moderation_status === "ended" || (entry.ends_at && new Date(entry.ends_at).getTime() < Date.now());
+  const now = await getNow();
+  const ended = entry.moderation_status === "ended" || (entry.ends_at && new Date(entry.ends_at).getTime() < now.getTime());
   return <main className="min-h-screen bg-bg-primary">
     <PageHeader badge={t(`entryType.${entry.entry_type}`)} title={<TranslatedText kind="news" id={entry.id} field="title">{entry.title}</TranslatedText>} description={entry.summary ? <TranslatedText kind="news" id={entry.id} field="summary">{entry.summary}</TranslatedText> : t("entryFallbackDescription")} />
     <article className="site-container max-w-4xl py-8 sm:py-12">
+      {entry.publication_authority === "editorial" && <p className="mb-5 text-xs text-text-muted">{t("editorialNote")}</p>}
       {entry.image_url ? <div className="mb-8 aspect-[16/9] overflow-hidden rounded-2xl border border-border bg-bg-secondary"><Image src={entry.image_url} alt="" width={1200} height={675} className="h-full w-full object-cover" /></div> : null}
       <div className="mb-8 flex flex-wrap gap-3 text-sm text-text-secondary">
         {entry.topic && <span>{t(`topic.${entry.topic}`)}</span>}

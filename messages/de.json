@@ -2329,6 +2329,7 @@
     "privacyLink": "Datenschutzhinweise"
   },
   "Organizations": {
+    "editorialNote": "Mit KI-Unterstützung erstellt. Die Originalquelle ist verlinkt.",
     "eyebrow": "Aus der Branche",
     "newsTitle": "News, Workshops & Veranstaltungen",
     "newsTitleLead": "News,",
@@ -13588,5 +13589,11 @@
     "showOriginal": "Original anzeigen",
     "showTranslated": "Übersetzung anzeigen",
     "retry": "Erneut versuchen"
+  },
+  "EditorialAuthority": {
+    "enable": "Redaktionsrecht erteilen",
+    "disable": "Redaktionsrecht entziehen",
+    "confirmGrant": "CineGenius Redaktion erlauben, eigene geprüfte Beiträge dieser Organisation automatisch zu veröffentlichen und eigene Beiträge wiederherstellbar auszublenden? Persönliche Konten und der Support erhalten dadurch keine Adminrechte.",
+    "name": "CineGenius Redaktion"
   }
 }

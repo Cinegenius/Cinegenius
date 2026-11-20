@@ -2329,6 +2329,7 @@
     "privacyLink": "Privacy notice"
   },
   "Organizations": {
+    "editorialNote": "Created with AI assistance. The original source is linked.",
     "eyebrow": "From the industry",
     "newsTitle": "News, workshops & events",
     "newsTitleLead": "News,",
@@ -13588,5 +13589,11 @@
     "showOriginal": "Show original",
     "showTranslated": "Show translation",
     "retry": "Try again"
+  },
+  "EditorialAuthority": {
+    "enable": "Grant editorial authority",
+    "disable": "Revoke editorial authority",
+    "confirmGrant": "Allow CineGenius Redaktion to automatically publish its own checked entries for this organization and reversibly hide its own entries? Personal accounts and Support receive no admin permissions.",
+    "name": "CineGenius Redaktion"
   }
 }

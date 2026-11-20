@@ -2329,6 +2329,7 @@
     "privacyLink": "Informace o ochraně soukromí"
   },
   "Organizations": {
+    "editorialNote": "Vytvořeno s pomocí AI. Odkaz na původní zdroj je uveden.",
     "eyebrow": "Z oboru",
     "newsTitle": "Novinky, workshopy a události",
     "newsTitleLead": "Novinky,",
@@ -13588,5 +13589,11 @@
     "showOriginal": "Zobrazit originál",
     "showTranslated": "Zobrazit překlad",
     "retry": "Zkusit znovu"
+  },
+  "EditorialAuthority": {
+    "enable": "Udělit redakční oprávnění",
+    "disable": "Odebrat redakční oprávnění",
+    "confirmGrant": "Povolit službě CineGenius Redaktion automaticky zveřejňovat vlastní ověřené příspěvky této organizace a vratně skrývat vlastní příspěvky? Osobní účty ani podpora nezískají oprávnění správce.",
+    "name": "CineGenius Redaktion"
   }
 }

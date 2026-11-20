@@ -2329,6 +2329,7 @@
     "privacyLink": "Avis de confidentialité"
   },
   "Organizations": {
+    "editorialNote": "Créé avec l’aide de l’IA. Un lien vers la source originale est fourni.",
     "eyebrow": "De l’industrie",
     "newsTitle": "Actualités, ateliers & événements",
     "newsTitleLead": "Actualités,",
@@ -13588,5 +13589,11 @@
     "showOriginal": "Voir l’original",
     "showTranslated": "Voir la traduction",
     "retry": "Réessayer"
+  },
+  "EditorialAuthority": {
+    "enable": "Accorder le droit éditorial",
+    "disable": "Retirer le droit éditorial",
+    "confirmGrant": "Autoriser CineGenius Redaktion à publier automatiquement ses propres contributions vérifiées pour cette organisation et à masquer ses contributions de façon réversible ? Les comptes personnels et de support ne reçoivent aucun droit d’administration.",
+    "name": "CineGenius Redaktion"
   }
 }

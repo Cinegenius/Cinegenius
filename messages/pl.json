@@ -2271,6 +2271,7 @@
     "invalidRequest": "Wprowadź poprawny adres e-mail i potwierdź zapis."
   },
   "Organizations": {
+    "editorialNote": "Opracowano z pomocą AI. Podano link do oryginalnego źródła.",
     "eyebrow": "Z branży",
     "newsTitle": "Aktualności, warsztaty i wydarzenia",
     "newsTitleLead": "Aktualności,",
@@ -13588,5 +13589,11 @@
     "showOriginal": "Pokaż oryginał",
     "showTranslated": "Pokaż tłumaczenie",
     "retry": "Spróbuj ponownie"
+  },
+  "EditorialAuthority": {
+    "enable": "Nadaj uprawnienia redakcyjne",
+    "disable": "Odbierz uprawnienia redakcyjne",
+    "confirmGrant": "Zezwolić usłudze CineGenius Redaktion na automatyczne publikowanie własnych sprawdzonych wpisów tej organizacji oraz odwracalne ukrywanie własnych wpisów? Konta osobiste ani wsparcie nie otrzymają uprawnień administratora.",
+    "name": "CineGenius Redaktion"
   }
 }

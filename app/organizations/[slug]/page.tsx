@@ -1,7 +1,7 @@
 import { TranslatedText } from "@/components/ContentTranslation";
 import Link from "next/link";
 import { db } from "@/lib/db";
-import { notFound } from "next/navigation";
+import { notFound, permanentRedirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import Image from "@/components/MediaImage";
 import PageHeader from "@/components/PageHeader";
@@ -10,12 +10,11 @@ import { approvedOrganizationBySlug } from "@/lib/organization-data";
 export const dynamic = "force-dynamic";
 
 export default async function OrganizationPage({ params }: { params: Promise<{ slug: string }> }) {
-  const uiText = await getTranslations();
-
   const { slug } = await params;
   const result = await approvedOrganizationBySlug(slug);
   if (!result) notFound();
   const { organization, entries } = result;
+  if (organization.slug !== slug) permanentRedirect(`/organizations/${encodeURIComponent(organization.slug)}`);
   const t = await getTranslations("Organizations");
   const accessT = await getTranslations("OrganizationAccess");
   const linked = await db.from("organization_company_links")

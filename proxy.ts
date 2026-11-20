@@ -1,3 +1,4 @@
+import { editorialCredentialValid, editorialRouteAllowed } from "@/lib/editorial-agent-policy";
 import { createTranslator } from "next-intl";
 import { loadMessages } from "@/lib/i18n/messages";
 import { resolveLocale } from "@/lib/i18n/locales";
@@ -223,6 +224,15 @@ const isPublicApiGet = createRouteMatcher([
 ]);
 
 export default clerkMiddleware(async (auth, request) => {
+  // Dedicated machine requests never acquire a Clerk/member/admin session.
+  // Only exact editorial routes and a valid server credential bypass cookie CSRF.
+  if (request.nextUrl.pathname.startsWith("/api/editorial/")) {
+    const headers = { "Cache-Control": "private, no-store", "CDN-Cache-Control": "no-store", "Vercel-CDN-Cache-Control": "no-store" };
+    if (!editorialRouteAllowed(request.nextUrl.pathname, request.method)) return NextResponse.json({ error: "not_found" }, { status: 404, headers });
+    if (!editorialCredentialValid(request.headers.get("authorization"), process.env.CINEGENIUS_EDITORIAL_ENABLED, process.env.CINEGENIUS_EDITORIAL_TOKEN_SHA256)) return NextResponse.json({ error: "editorial_unauthorized" }, { status: 401, headers });
+    return NextResponse.next({ headers });
+  }
+
   // Auth-dependent images must never enter Next's shared optimizer cache.
   if (request.nextUrl.pathname === "/_next/image") {
     const blocked = await mediaOptimizerBlockStatus(request.nextUrl.searchParams.get("url") ?? "", request.url, process.env.NEXT_PUBLIC_SUPABASE_URL ?? "", process.env.SUPABASE_SERVICE_ROLE_KEY);

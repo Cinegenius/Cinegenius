@@ -2329,6 +2329,7 @@
     "privacyLink": "隐私声明"
   },
   "Organizations": {
+    "editorialNote": "在人工智能辅助下撰写，附有原始来源链接。",
     "eyebrow": "来自行业",
     "newsTitle": "新闻、研讨会与活动",
     "newsTitleLead": "新闻，",
@@ -13588,5 +13589,11 @@
     "showOriginal": "显示原文",
     "showTranslated": "显示译文",
     "retry": "重试"
+  },
+  "EditorialAuthority": {
+    "enable": "授予编辑权限",
+    "disable": "撤销编辑权限",
+    "confirmGrant": "是否允许 CineGenius Redaktion 自动发布本组织中由其创建并核实的内容，以及以可恢复的方式隐藏其内容？个人账户和支持账户不会获得管理员权限。",
+    "name": "CineGenius Redaktion"
   }
 }

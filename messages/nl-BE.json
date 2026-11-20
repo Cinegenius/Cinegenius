@@ -2329,6 +2329,7 @@
     "privacyLink": "Privacy-informatie"
   },
   "Organizations": {
+    "editorialNote": "Gemaakt met hulp van AI. De oorspronkelijke bron is gelinkt.",
     "eyebrow": "Uit de branche",
     "newsTitle": "Nieuws, workshops en evenementen",
     "newsTitleLead": "Nieuws,",
@@ -13588,5 +13589,11 @@
     "showOriginal": "Origineel tonen",
     "showTranslated": "Vertaling tonen",
     "retry": "Opnieuw proberen"
+  },
+  "EditorialAuthority": {
+    "enable": "Redactionele bevoegdheid verlenen",
+    "disable": "Redactionele bevoegdheid intrekken",
+    "confirmGrant": "CineGenius Redaktion toestaan eigen gecontroleerde bijdragen van deze organisatie automatisch te publiceren en eigen bijdragen herstelbaar te verbergen? Persoonlijke accounts en Support krijgen geen beheerdersrechten.",
+    "name": "CineGenius Redaktion"
   }
 }

@@ -2329,6 +2329,7 @@
     "privacyLink": "Adatvédelmi tájékoztató"
   },
   "Organizations": {
+    "editorialNote": "MI segítségével készült. Az eredeti forrás hivatkozása megtalálható.",
     "eyebrow": "Az iparágból",
     "newsTitle": "Hírek, workshopok és események",
     "newsTitleLead": "Hírek,",
@@ -13588,5 +13589,11 @@
     "showOriginal": "Eredeti megjelenítése",
     "showTranslated": "Fordítás megjelenítése",
     "retry": "Újrapróbálkozás"
+  },
+  "EditorialAuthority": {
+    "enable": "Szerkesztői jogosultság megadása",
+    "disable": "Szerkesztői jogosultság visszavonása",
+    "confirmGrant": "Engedélyezi a CineGenius Redaktion számára a szervezet saját, ellenőrzött bejegyzéseinek automatikus közzétételét és saját bejegyzéseinek visszaállítható elrejtését? A személyes és támogatási fiókok nem kapnak rendszergazdai jogosultságot.",
+    "name": "CineGenius Redaktion"
   }
 }

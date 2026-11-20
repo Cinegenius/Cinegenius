@@ -2271,6 +2271,7 @@
     "invalidRequest": "Introduza um endereço de email válido e confirme a sua inscrição."
   },
   "Organizations": {
+    "editorialNote": "Criado com apoio de IA. Inclui ligação à fonte original.",
     "eyebrow": "Da indústria",
     "newsTitle": "Notícias, workshops & eventos",
     "newsTitleLead": "Notícias,",
@@ -13588,5 +13589,11 @@
     "showOriginal": "Mostrar original",
     "showTranslated": "Mostrar tradução",
     "retry": "Tentar novamente"
+  },
+  "EditorialAuthority": {
+    "enable": "Conceder autorização editorial",
+    "disable": "Revogar autorização editorial",
+    "confirmGrant": "Permitir que CineGenius Redaktion publique automaticamente as suas próprias entradas verificadas desta organização e oculte as suas entradas de forma reversível? As contas pessoais e de suporte não recebem permissões de administração.",
+    "name": "CineGenius Redaktion"
   }
 }

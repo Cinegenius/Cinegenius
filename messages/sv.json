@@ -2329,6 +2329,7 @@
     "privacyLink": "Information om dataskydd"
   },
   "Organizations": {
+    "editorialNote": "Skapat med hjälp av AI. Originalkällan är länkad.",
     "eyebrow": "Från branschen",
     "newsTitle": "Nyheter, workshoppar och evenemang",
     "newsTitleLead": "Nyheter,",
@@ -13588,5 +13589,11 @@
     "showOriginal": "Visa original",
     "showTranslated": "Visa översättning",
     "retry": "Försök igen"
+  },
+  "EditorialAuthority": {
+    "enable": "Ge redaktionell behörighet",
+    "disable": "Återkalla redaktionell behörighet",
+    "confirmGrant": "Tillåta att CineGenius Redaktion automatiskt publicerar egna kontrollerade inlägg för organisationen och döljer egna inlägg så att de kan återställas? Personliga konton och Support får inga administratörsrättigheter.",
+    "name": "CineGenius Redaktion"
   }
 }

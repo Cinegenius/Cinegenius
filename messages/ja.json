@@ -2271,6 +2271,7 @@
     "invalidRequest": "有効なメールアドレスを入力し、登録を確認してください。"
   },
   "Organizations": {
+    "editorialNote": "AIの支援を受けて作成しています。原典へのリンクを掲載しています。",
     "eyebrow": "業界から",
     "newsTitle": "ニュース、ワークショップ＆イベント",
     "newsTitleLead": "ニュース、",
@@ -13588,5 +13589,11 @@
     "showOriginal": "原文を表示",
     "showTranslated": "翻訳を表示",
     "retry": "再試行"
+  },
+  "EditorialAuthority": {
+    "enable": "編集権限を付与",
+    "disable": "編集権限を取り消す",
+    "confirmGrant": "CineGenius Redaktion に、この組織の確認済みの自らの投稿の自動公開と、自らの投稿を復元可能な形で非表示にする権限を付与しますか？個人アカウントやサポートに管理者権限は付与されません。",
+    "name": "CineGenius Redaktion"
   }
 }

@@ -2329,6 +2329,7 @@
     "privacyLink": "Aviso de privacidad"
   },
   "Organizations": {
+    "editorialNote": "Elaborado con ayuda de IA. Se incluye el enlace a la fuente original.",
     "eyebrow": "Del sector",
     "newsTitle": "Noticias, talleres y eventos",
     "newsTitleLead": "Noticias,",
@@ -13588,5 +13589,11 @@
     "showOriginal": "Ver original",
     "showTranslated": "Ver traducción",
     "retry": "Reintentar"
+  },
+  "EditorialAuthority": {
+    "enable": "Conceder permiso editorial",
+    "disable": "Revocar permiso editorial",
+    "confirmGrant": "¿Permitir que CineGenius Redaktion publique automáticamente sus propias entradas verificadas de esta organización y oculte sus propias entradas de forma reversible? Las cuentas personales y de soporte no reciben permisos de administración.",
+    "name": "CineGenius Redaktion"
   }
 }

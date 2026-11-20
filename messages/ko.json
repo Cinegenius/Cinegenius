@@ -2329,6 +2329,7 @@
     "privacyLink": "개인정보 처리방침"
   },
   "Organizations": {
+    "editorialNote": "AI의 도움을 받아 작성되었습니다. 원문 출처 링크가 제공됩니다.",
     "eyebrow": "업계에서",
     "newsTitle": "뉴스, 워크숍 & 이벤트",
     "newsTitleLead": "뉴스,",
@@ -13588,5 +13589,11 @@
     "showOriginal": "원문 보기",
     "showTranslated": "번역 보기",
     "retry": "다시 시도"
+  },
+  "EditorialAuthority": {
+    "enable": "편집 권한 부여",
+    "disable": "편집 권한 취소",
+    "confirmGrant": "CineGenius Redaktion이 이 조직에서 직접 작성하고 확인한 게시물을 자동으로 공개하고 자신의 게시물을 복구 가능한 상태로 숨길 수 있도록 허용할까요? 개인 계정이나 지원 계정에는 관리자 권한이 부여되지 않습니다.",
+    "name": "CineGenius Redaktion"
   }
 }
