@@ -59,6 +59,7 @@ export default function ResultCard({ result, compact = false, showEvidence = fal
       data-native-crew-preview={nativeCrew ? "true" : undefined}
       data-native-smart-area={nativeArea ?? undefined}
       style={nativeArea ? nativeSmartColorStyle(nativeArea) as CSSProperties : undefined}
+      data-result-layout={compact ? "row" : "grid"}
       className={`${styles.card} ${row ? "smart-result-row" : ""} group flex min-w-0 bg-bg-secondary border border-border rounded-xl overflow-hidden hover:border-gold/40 transition-colors ${compact ? "items-center gap-2.5 p-2" : "flex-col hover:shadow-lg hover:shadow-black/20"}`}
     >
       {/* Image */}

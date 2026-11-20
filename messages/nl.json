@@ -13588,5 +13588,11 @@
     "showOriginal": "Origineel tonen",
     "showTranslated": "Vertaling tonen",
     "retry": "Opnieuw proberen"
+  },
+  "NativeOrganizations": {
+    "searchLabel": "Organisaties zoeken",
+    "pageScope": "Pagina {page} · {loaded} van {total} organisaties geladen",
+    "mapScope": "{mapped} van de {loaded} organisaties op deze pagina staan op de kaart. De overige blijven in de lijst.",
+    "empty": "Geen passende organisaties gevonden."
   }
 }

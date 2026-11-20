@@ -13588,5 +13588,11 @@
     "showOriginal": "Pokaż oryginał",
     "showTranslated": "Pokaż tłumaczenie",
     "retry": "Spróbuj ponownie"
+  },
+  "NativeOrganizations": {
+    "searchLabel": "Szukaj organizacji",
+    "pageScope": "Strona {page} · wczytano {loaded} z {total} organizacji",
+    "mapScope": "Na mapie widać {mapped} z {loaded} organizacji na tej stronie. Pozostałe są nadal na liście.",
+    "empty": "Nie znaleziono pasujących organizacji."
   }
 }

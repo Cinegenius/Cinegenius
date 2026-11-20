@@ -17,3 +17,5 @@
    A single checked image keeps its complete source inside the existing frame. */
 :global(html[data-cg-native-community-appearance="app"]) .card:global([data-search-result-card][data-native-smart-area]) :global([data-result-image="photo"]):has(img) { background:linear-gradient(145deg,#ffffff1f,#ffffff06),color-mix(in srgb,var(--cg-app-surface-raised,#24262d) 65%,transparent) !important; }
 :global(html[data-cg-native-community-appearance="app"]) .card:global([data-search-result-card][data-native-smart-area]) :global([data-result-image="photo"]) :global(img) { object-fit:contain !important; object-position:center !important; transform:none !important; padding:4px !important; box-sizing:border-box !important; }
+
+:global(html[data-cg-native-community-appearance="app"]) .card[data-result-layout="grid"]:is([data-search-result-card="profile"],[data-search-result-card="creator"]) > :global([data-result-image]) { aspect-ratio:1; }

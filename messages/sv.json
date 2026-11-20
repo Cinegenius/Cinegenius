@@ -13588,5 +13588,11 @@
     "showOriginal": "Visa original",
     "showTranslated": "Visa översättning",
     "retry": "Försök igen"
+  },
+  "NativeOrganizations": {
+    "searchLabel": "Sök organisationer",
+    "pageScope": "Sida {page} · {loaded} av {total} organisationer inlästa",
+    "mapScope": "{mapped} av {loaded} organisationer på denna sida visas på kartan. Övriga finns kvar i listan.",
+    "empty": "Inga matchande organisationer hittades."
   }
 }

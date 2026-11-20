@@ -13,6 +13,7 @@ import { useViewState } from "@/lib/use-view-state";
 import { useFormRouter } from "@/lib/use-form-router";
 import { NATIVE_DISCOVERY_CONTRACT, NATIVE_DISCOVERY_DIRECTORIES, readNativeDiscovery, type NativeDiscoveryMode, type NativeDiscoveryResponse } from "@/lib/native-smart-discovery";
 import styles from "./NativeSmartLanding.module.css";
+import { isDiscoverySeed } from "@/lib/discovery-seed";
 import { useNativeSegmentDrag } from "@/lib/use-native-segment-drag";
 import NativeCreateMenu from "./NativeCreateMenu";
 
@@ -33,12 +34,14 @@ function AccountNativeSmartLanding({ accountId, loaded, allowed, onUnavailable, 
   const locale = useLocale(), router = useFormRouter();
   const [input, setInput] = useState("");
   const [mode, setMode] = useViewState<NativeDiscoveryMode>("native.smart.focus", "profile");
+  const [seed, setSeed] = useViewState("native.smart.seed", "");
+  useEffect(() => { setSeed(previous => isDiscoverySeed(previous) ? previous : crypto.randomUUID().replaceAll("-", "")); }, [setSeed]);
   const [controls, setControls] = useViewState<SmartSearchControls>("smart.controls", { scope: "", filters: emptyDiscoveryFilters(), mapOpen: false, view: "grid", limits: {} });
   const [result, setResult] = useState<{ scope: string; data: NativeDiscoveryResponse; timingStart: number } | null>(null);
   const [error, setError] = useState(false);
   const [loading, setLoading] = useState(false);
   const [retry, setRetry] = useState(0);
-  const scope = JSON.stringify([accountId, loaded, allowed, locale, mode, retry]);
+  const scope = JSON.stringify([accountId, loaded, allowed, locale, mode, retry, seed]);
   const currentScope = useRef(scope);
   // Commit the identity before passive request effects; never render stale rows.
   useLayoutEffect(() => { currentScope.current = scope; }, [scope]);
@@ -81,7 +84,7 @@ function AccountNativeSmartLanding({ accountId, loaded, allowed, onUnavailable, 
   }, [result, scope]);
 
   useEffect(() => {
-    if (!allowed || !loaded || !accountId) return;
+    if (!allowed || !loaded || !accountId || !isDiscoverySeed(seed)) return;
     const controller = new AbortController(); request.current = controller;
     const scheduled = performance.now();
     const timer = window.setTimeout(async () => {
@@ -90,7 +93,7 @@ function AccountNativeSmartLanding({ accountId, loaded, allowed, onUnavailable, 
       performance.measure("cinegenius:smart:schedule", { start: scheduled, end: started });
       setLoading(true); setError(false);
       try {
-        const response = await fetch(`/api/native/v1/discovery?focus=${mode === "neutral" ? "neutral" : "profile"}`, {
+        const response = await fetch(`/api/native/v1/discovery?focus=${mode === "neutral" ? "neutral" : "profile"}&seed=${seed}`, {
           headers: { "X-CineGenius-Native-Discovery": NATIVE_DISCOVERY_CONTRACT, "X-Native-Account": accountId },
           credentials: "same-origin", cache: "no-store", referrerPolicy: "no-referrer",
           signal: AbortSignal.any([controller.signal, AbortSignal.timeout(25_000)]),
@@ -101,7 +104,7 @@ function AccountNativeSmartLanding({ accountId, loaded, allowed, onUnavailable, 
         if (response.status === 401 || response.status === 403) { onUnavailable(); return; }
         if (!response.ok) throw new Error("unavailable");
         const received = performance.now();
-        const data = readNativeDiscovery(await response.json(), accountId);
+        const data = readNativeDiscovery(await response.json(), accountId, seed);
         performance.clearMeasures("cinegenius:smart:decode");
         performance.measure("cinegenius:smart:decode", { start: received, end: performance.now() });
         if (!data) throw new Error("unavailable");
@@ -110,7 +113,7 @@ function AccountNativeSmartLanding({ accountId, loaded, allowed, onUnavailable, 
       finally { if (!controller.signal.aborted && currentScope.current === scope) setLoading(false); }
     }, 0);
     return () => { window.clearTimeout(timer); controller.abort(); };
-  }, [accountId, allowed, loaded, mode, onUnavailable, scope]);
+  }, [accountId, allowed, loaded, mode, onUnavailable, scope, seed]);
 
   const data = result?.scope === scope ? result.data : null;
   return <DirectoryPage area="crew"><main className={`smart-search-page ${styles.landing}`} data-native-smart-landing>
@@ -152,7 +155,7 @@ function AccountNativeSmartLanding({ accountId, loaded, allowed, onUnavailable, 
         </div>
         <div role="status" aria-live="polite" className={styles.status}>{loading && <><Loader2 size={17} className="animate-spin" aria-hidden="true" />{t("loading")}</>}</div>
         {error && !data && <div role="alert" className={styles.error}><p>{t("error")}</p><button type="button" onClick={refresh}>{t("retry")}</button></div>}
-        {data && <SmartSearchExplorer plan={data.plan} initialGroups={data.groups} onUnavailable={onUnavailable} stored={controls} setStored={setControls} />}
+        {data && <SmartSearchExplorer key={data.seed} discoverySeed={data.seed} plan={data.plan} initialGroups={data.groups} onUnavailable={onUnavailable} stored={controls} setStored={setControls} />}
       </>}
     </div>
   </main></DirectoryPage>;

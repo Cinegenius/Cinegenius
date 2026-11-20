@@ -31,4 +31,5 @@
 .views :global(.directory-view-label) { display:none !important; }
 .actions { display:flex; align-items:center; gap:4px; margin-top:4px; }
 @container (max-width:340px) { .filter:nth-child(n+2) { display:none; } .rail { padding-left:8px; gap:0; } }
+.container[data-keep-two-filters] .filter:nth-child(2) { display:block; }
 @media (prefers-reduced-transparency:reduce) { .rail { background:var(--color-bg-secondary); -webkit-backdrop-filter:none; backdrop-filter:none; } }

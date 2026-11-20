@@ -2,7 +2,7 @@ import type { SearchArea } from "./unified-search";
 
 /** Native Smart domain identity. Work's motive/base colours are a separate taxonomy. */
 export const NATIVE_SMART_DOMAIN_COLORS = {
-  crew: { cinema: "#8ed9b2", pure: "#3f6b57" },
+  crew: { cinema: "#ffab98", pure: "#9f3024" },
   marketplace: { cinema: "#e3b75c", pure: "#785e3b" },
   smart: { cinema: "#c2f135", pure: "#326e2d" },
   locations: { cinema: "#82c6ef", pure: "#486982" },
