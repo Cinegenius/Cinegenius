@@ -35,7 +35,7 @@ export function entrySource(url: string | null) {
 }
 /** Only the article's stored country. Publisher address, language and source domain
  * are not evidence of audience, eligibility or event geography. */
-export function entryCountry(entry: EntrySummary) {
+export function entryCountry(entry: Pick<EntrySummary, 'place_country_code'>) {
   const value = entry.place_country_code ?? '';
   return (COUNTRY_CODES as readonly string[]).includes(value) ? value : 'none';
 }

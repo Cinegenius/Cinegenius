@@ -58,7 +58,7 @@ export async function approvedEntries(filters: { type?: string; topic?: string; 
   return { entries: rows.slice(0, pageSize), hasMore: rows.length > pageSize, page, count: count ?? rows.length };
 }
 
-export async function approvedOrganizationBySlug(slug: string) {
+export async function approvedOrganizationBySlug(slug: string, includeEntries = true) {
   const {data: alias, error: aliasError} = await db.from('organization_route_aliases')
     .select('organization_id').eq('slug', slug).maybeSingle();
   if (aliasError) throw new Error('organization_alias_read_failed', {cause: aliasError.code});
@@ -67,6 +67,7 @@ export async function approvedOrganizationBySlug(slug: string) {
   const { data, error } = await organizationQuery.maybeSingle();
   if (error) throw new Error("organization_read_failed", { cause: error.code });
   if (!data) return null;
+  if (!includeEntries) return { organization: data, entries: [] };
   const { data: entries, error: entriesError } = await db.from("organization_entries").select(ORGANIZATION_ENTRY_SELECT)
     .eq("organization_id", data.id).in("moderation_status", ["approved", "ended"])
     .order("starts_at", { ascending: true, nullsFirst: false }).order("created_at", { ascending: false });
