@@ -10,7 +10,7 @@ Diese Übersicht trennt die installierte App, ihre serverseitigen Ansichten, nat
 | Thema | Belegter Stand |
 | --- | --- |
 | **iPhone-App** | Letzter hier belegter Gerätestand: lokale APP-Aufgabe meldete Build **2026112007** nach Datensicherung installiert. Eine neue Installation oder vollständige Smart-/Work-/Community-Geräteabnahme zum nun veröffentlichten Serverstand `68930dd9` ist in der aktuellen WEB-Übergabe nicht belegt. Keine eigene Geräteprüfung durch diese Server-Aufgabe. |
-| **App-Server** | **Veröffentlicht:** Release `91a508d5` seit 21.11., 13:10 Uhr Berlin enthält den vollständigen App-Quellstand `68930dd9` und den Firmenlink-Fix. Abstammung im Git-Verlauf geprüft; Deployment `dpl_CPk147S9NmEePK3DEgYhmP9MSzsx` laut WEB READY. Die erneute Freigabe des geprüften Community-/Work-Pakets ist in `68930dd9:AGENTS.md` dokumentiert und ersetzt dessen früheren Stopp. Installation und tatsächliche Gerätebedienung separat belegen. |
+| **App-Server** | **Veröffentlicht:** gemeinsamer Serverstand `34373818` seit 21.11., 14:15 Uhr Berlin, Deployment `dpl_B9Y7wAAxkENkDesYwf3nyZTSDNKa` laut WEB READY. Enthält den App-Stand `68930dd9` und den Firmenlink-Release `91a508d5`; Abstammung geprüft. Die erneute Freigabe des geprüften Community-/Work-Pakets bleibt auf dessen Umfang begrenzt. Diese öffentliche Website-Erweiterung enthält keine neue native Umsetzung oder Installation; Gerätebedienung separat belegen. |
 | **Native Navigation** | Ziel gemäß aktuellem App-Vertrag: **Shots · News · Smart · Projekte · Work**. Die gewöhnliche Website behält ihre eigene Navigation. |
 | **Obere Aktionen** | Profil, Nachrichten, Suche und Menü; App-eigene Abstände und sichere Bedienung über Kopf-/Fußbereich. |
 | **Erscheinungsbild** | Mauve wurde als unpassend zurückgemeldet; die lokale APP-Aufgabe bereitet vier Farbvorlagen vor. Noch keine neue Auswahl oder Themeänderung. Bestehende Farben werden in dieser Server-Folgearbeit nicht geändert. |
@@ -26,7 +26,7 @@ Diese Übersicht trennt die installierte App, ihre serverseitigen Ansichten, nat
 | **Locations** | Drehorte/Studios, Suche, Details und Karten | Gemeinsamer Zählerfix `822c27c` übernommen: gefilterte Gesamtzahl bleibt beim Kartenziehen stabil; fehlende Kartenpunkte über die Liste erreichbar. App-Beschriftung „gesamt“ in `b1d767a` vorbereitet. |
 | **Firmen** | Profile, Leistungen, Teams und Angebote | Gemeinsame Firmen-/Personenrechte; versteckte persönliche Identitäten nicht über Firmen offenlegen. Korrektur des Einrichtungs-Abschlusslinks aus `5103bffd` im gemeinsamen Release `91a508d5` veröffentlicht und öffentlich live geprüft. Firmen-ID für Wiederholung erhalten, zurückgegebenen Slug für Details verwenden. [App-Vertrag und Prüfgrenzen](company-onboarding-links.md); keine native Umsetzung/Installation aus dieser Übergabe. |
 | **Filmtiere / Jobs / Schwarzes Brett** | Weitere bestehende CineGenius-Bereiche | Website-Bestand vorhanden; vollständige native Erreichbarkeit und Bedienung pro App-Build verifizieren. Keine zusätzliche fertige native Spezialanwendung behauptet. |
-| **News** | Artikel, Themen, Technik, Länder, Veranstaltungen und Organisationen | Kleine Homepage-Artikelfotos sind in WEB `1aa844cc` live. App-Quellen gezielt abgeglichen: 80×64px unbeschnitten, Titelbild vor gültigem Galeriebild, kein leerer Bildplatz oder Herausgeberlogo als Ersatz, vorhandene Urheberangaben. [Abhängigkeiten und Prüfbeleg](app-home-news-photos-20261121.md). Keine neue Geräteinstallation/-abnahme oder App-Veröffentlichung; aktuelle Artikel-Nachweise aus dem veröffentlichten Hauptstand erhalten. Neue öffentliche Organisations-Beitragsfilter `34373818` separat geprüft und **noch nicht veröffentlicht**; [URL-Vertrag](public-newsroom-browser.md) für APP vorgemerkt. |
+| **News** | Artikel, Themen, Technik, Länder, Veranstaltungen und Organisationen | Kleine Homepage-Artikelfotos sind in WEB `1aa844cc` live. App-Quellen gezielt abgeglichen: 80×64px unbeschnitten, Titelbild vor gültigem Galeriebild, kein leerer Bildplatz oder Herausgeberlogo als Ersatz, vorhandene Urheberangaben. [Abhängigkeiten und Prüfbeleg](app-home-news-photos-20261121.md). Keine neue Geräteinstallation/-abnahme oder App-Veröffentlichung; aktuelle Artikel-Nachweise aus dem veröffentlichten Hauptstand erhalten. Öffentliche Organisations-Beitragsfilter `34373818` seit 21.11., 14:15 Uhr Berlin **auf der Website live und öffentlich geprüft**; [URL-Vertrag](public-newsroom-browser.md) für APP vorgemerkt. |
 | **Organisationen / Branchenpartner** | Verzeichnisse, Profile und Beiträge | In `b1d767a` umgesetzt und mit künstlichen Daten geprüft: Gesamtzahl, geladene Seite und Kartenpunkte getrennt; während Filterwechsel keine bestätigte Zahl. Noch nicht veröffentlicht oder auf dem Gerät geprüft. |
 | **Projekte** | Öffentliche Projekte, Credits und eigene Mitwirkung | Gemeinsame Rechte und Daten. Öffentliche Projektprofile vom privaten Work-Projektarchiv unterscheiden. |
 | **Shots** | Vorgesehene kurze Posts, 24 Stunden sichtbar, eigene Originale anschließend privat | Oberfläche und geschützter Servercode vorbereitet; **Veröffentlichung nicht aktiviert**. Kein laufender echter Posting-Dienst allein durch sichtbaren Tab. |
@@ -151,9 +151,9 @@ den einzelnen Vorab-Berichten sind historisch. Push, produktive Shots, ein neues
 E-Mail-Postfachsystem und allgemeine Online-Teams sind dadurch nicht aktiviert
 oder als fertig erklärt. Kein erneuter Deploy aus dieser alten App-Arbeitsbasis.
 
-**Öffentliche Redaktionsansicht, Vertragsvormerkung · 21.11.:** WEB-Entwurf
-`34373818c648427ba5726f993fa83245c1b72155` auf Basis `62cf7331`, nicht auf main
-und nicht veröffentlicht. Auf `/organizations/[slug]` bleiben `country`, `topic`,
+**Öffentliche Redaktionsansicht, Vertragsabgleich · 21.11.:** WEB-Stand
+`34373818c648427ba5726f993fa83245c1b72155` auf Basis `62cf7331`, seit 14:15 Uhr
+(Europe/Berlin) auf der Website veröffentlicht. Auf `/organizations/[slug]` bleiben `country`, `topic`,
 `type`, `source`, `search`, `sort` und `page` in echten URLs erhalten. Öffentliche
 Facettenzahlen und zwölf Beiträge pro Seite verwenden dieselben zulässigen Daten.
 Suche/Land sind mobil direkt erreichbar; weitere Filter ausklappbar. Vorhandene
@@ -170,7 +170,21 @@ Fehlern. Diese Server-App-Aufgabe hat Vertrag, Routeneinbindung, öffentlichen
 Leser und alle zehn Build-Eingabehashes nachgelesen und ausschließlich
 Dokumentation übernommen. App-Quellen und Sprachschlüssel unverändert.
 
-Dieser neue Entwurf hat keine Veröffentlichungs- oder Installationsfreigabe.
-Der bereits veröffentlichte gemeinsame App-/Web-Stand `91a508d5` bleibt erhalten.
+Die öffentliche Website-Erweiterung wurde separat freigegeben und veröffentlicht.
+Deployment `dpl_B9Y7wAAxkENkDesYwf3nyZTSDNKa` ist laut WEB READY; www-Alias und
+Quellenkennung geprüft. Git-Abstammung bestätigt den erhaltenen App-/Web-Stand
+`91a508d5` einschließlich App `68930dd9`. Kein neuer App-Live-/Installationsauftrag.
 Quelle: `/srv/cinegenius/handoffs/20261121-public-newsroom/receipt.json`;
 App-Empfang: `/srv/cinegenius/handoffs/20261121-app-public-newsroom-handoff/receipt.json`.
+
+**Öffentliche Live-Abnahme laut WEB:** 26 Beiträge auf drei Seiten, darunter drei
+Mexiko-Beiträge, mit dem lesend erfassten Bestand abgeglichen; ein privater Beitrag
+bleibt ausgeschlossen. Vier echte Browserkonfigurationen (Chromium 1366 DE;
+WebKit 390 DE, 320 ES, 768 HU), zwei vollständige Filter-/Such-/Seiten-/Artikel-
+Zurück-Abläufe. Diese Livefälle sind von den 21 kontrollierten Vorabfällen getrennt.
+Bei schnellem WebKit-Navigieren wurde eine abgebrochene Übersetzungsanfrage
+protokolliert; ruhender Folgeaufruf mit HTTP 200, sechs geladenen Technik-Bildern
+und ohne Laufzeit-/Netzwerkfehler. Keine pauschale Fehlerfreiheit oder Liveabnahme
+aller 17 Sprachen. Kein authentifizierter Account- oder nativer Gerätetest.
+Der Dokumentationsstand `56974c4d` wurde hier nachgeführt; keine erneute
+Veröffentlichung, Implementierung oder Installation durch diesen Abgleich.

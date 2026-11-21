@@ -1,9 +1,11 @@
 # Öffentliche Redaktion: Beiträge finden
 
-Geprüfter Website-Entwurf vom 21. November 2026 auf Basis `62cf7331`. Auftrag aus Agent NEWS:
+Veröffentlichter Website-Stand `34373818` vom 21. November 2026, 14:15 Uhr
+(Europe/Berlin), auf Basis `62cf7331`. Auftrag aus Agent NEWS:
 auch die öffentliche Redaktionsseite nach Land, Thema, Beitragsart und tatsächlicher
-Originalquelle erschließen. Noch nicht veröffentlicht; die vorherige Freigabe der
-internen Verwaltung gilt nicht für diese Erweiterung.
+Originalquelle erschließen. Markus gab diese öffentliche Erweiterung separat frei;
+veröffentlicht über den regulären sauberen Hauptstand. Vercel READY und der
+tatsächliche www-Alias bestätigen denselben Quellcommit.
 
 ## Bedienung
 
@@ -73,4 +75,23 @@ des Builds unverändert. Ein Produktionsbuild ist keine Veröffentlichung.
 
 Native Implementierung und Installation gehören separat zu APP Entwicklung.
 Dieses Paket aktiviert keine Dienste, ändert keine Inhalte/Organisationen und
-führt keine Migration durch. Veröffentlichung erst nach der Freigabe dieses Pakets.
+führt keine Migration durch. Native Umsetzung/Installation bleibt separat.
+
+## Tatsächlicher Live-Abgleich
+
+Nach Veröffentlichung wurden 26 öffentliche Beiträge über drei Seiten, darunter
+3 Mexiko-Beiträge, mit einem ausschließlich lesend erfassten Bestand verglichen.
+Ein vorhandener privater Beitrag bleibt in Ergebnissen, Facetten und ausgelieferten
+IDs ausgeschlossen. Vier Browserkonfigurationen (1366 DE, 390 DE, 320 ES, 768 HU)
+prüfen echte öffentliche Daten; zwei vollständige Bedienabläufe einschließlich
+Filterkombinationen, Suche/Leerzustand, Sortierung, allen Seiten und Artikel/Zurück.
+Kein seitlicher Überlauf, keine privaten Verwaltungsanfragen. Kein nativer Test.
+
+Beim schnellen WebKit-Seitenwechsel wurde eine Übersetzungs-Netzwerkdiagnose mit
+einer abgebrochenen Anfrage aufgezeichnet. Der zusätzliche ruhende Aufruf liefert
+Übersetzungen mit HTTP 200, alle sechs Technik-Bilder vollständig und keine
+Laufzeit-/Netzwerkfehler. Die Diagnose bleibt im Livebeleg dokumentiert. Der
+begrenzte Vercel-Runtime-Abruf für dieses Deployment lieferte null Fehlerdatensätze.
+
+Deployment: `dpl_B9Y7wAAxkENkDesYwf3nyZTSDNKa`. Prüfberichte und Grenzen in
+`live-after.json`, `live-settled.json` und `receipt.json` im obigen Belegordner.
