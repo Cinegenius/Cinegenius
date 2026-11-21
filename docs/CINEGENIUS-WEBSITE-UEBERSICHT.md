@@ -9,7 +9,7 @@ Dieses Verzeichnis hält die Bereiche, ihre Funktionen, den belegten Stand und o
 
 ## Öffentliche Bereiche
 
-**In Arbeit, noch nicht live (21.11.):** Der Startseitenbereich heißt künftig
+**Live bestätigt (21.11., 16:12 Uhr Berlin; `5cafc814`):** Der Startseitenbereich heißt
 „Crew“ und bevorzugt keine neuen Registrierungen mehr. Teilnahme lässt sich bei
 der Profileinrichtung und später unter Privatsphäre abschalten. Das betrifft die
 Crew-Auswahl, nicht die allgemeine Profilsichtbarkeit. Siehe
@@ -17,7 +17,7 @@ Crew-Auswahl, nicht die allgemeine Profilsichtbarkeit. Siehe
 
 | Bereich | Was dazugehört | Aktueller Stand / nächste Arbeit |
 | --- | --- | --- |
-| **Startseite** | Suche, Entdecken, Die Crew, Aus der Branche, Organisationen, Marktplatz, Jobs, frische Einblicke, Branchenpartner, Locations und Schwarzes Brett | Vorhanden. Regionale Auswahl vor der Begrenzung für Crew, Marktplatz, Locations, Jobs und Firmen veröffentlicht im Website-Stand `4d93523a`. Gestaltung erhalten; Foto-Entdeckung bleibt mangels verlässlicher Ortsprojektion global. |
+| **Startseite** | Suche, Entdecken, Crew, Aus der Branche, Organisationen, Marktplatz, Jobs, frische Einblicke, Branchenpartner, Locations und Schwarzes Brett | Vorhanden. Regionale Auswahl vor der Begrenzung für Crew, Marktplatz, Locations, Jobs und Firmen veröffentlicht im Website-Stand `4d93523a`. Gestaltung erhalten; Foto-Entdeckung bleibt mangels verlässlicher Ortsprojektion global. |
 | **Crew** | Personenprofile, Berufe, Haupt-/Nebentätigkeiten, Fähigkeiten, Orte, Anbieter-Wechsel, Suche, Filter, Kacheln/Liste/Karte | Vorhanden. Gemeinsamer Kartenfix veröffentlicht. Nachgemeldete Ausnahme im Crew-Anbieterfilter korrigiert: Die obere Zahl zählt dieselbe Auswahl wie Karte und Liste; veröffentlicht und live geprüft. Keine privaten oder erfundenen Positionen. |
 | **Locations** | Drehorte, Studios, Kategorien, Ortsfilter, Detailseiten, Bilder, Kontakt/Anfragen und Ansichten | Vorhanden. Formular- und Suchqualität weiter prüfen; Karte ersetzt keine vollständige Liste. |
 | **Marktplatz** | Equipment, Requisiten, Fahrzeuge, Dienstleistungen, Kategorien, Anbieter, Preise, Angebote und Suche | Vorhanden. 155 Währungen sind seit 21.11. veröffentlicht; keine automatische Umrechnung. Gemeldete Smart-Fälle „Lampe“ und „bayerischer Hut“ bleiben als Suchqualitätsfälle erfasst. |

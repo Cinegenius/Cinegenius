@@ -1,7 +1,9 @@
 # Homepage Crew · 21 November 2026
 
-Status: implemented on the website branch, not published. Migration and native
-adoption are not claimed as complete.
+Status: published on 21 November 2026 at 16:12 Europe/Berlin. Website/API commit
+`5cafc814b92f5ab9ab58c3c7936cfb7374c40535`; production deployment
+`dpl_7oepNowLC69PEfv3VwLotR9gzGu8` is READY and verified through the actual
+`www.cinegenius.co` alias. Native adoption/device testing remain separate.
 
 Markus replaces the former first-24-hours preference: the homepage title is
 exactly **Crew**. Eligible profiles rotate every 15 minutes on a new request,
@@ -33,11 +35,12 @@ on a timer. The thin candidate index no longer reads registration dates.
 
 ## Release and native contract
 
-Apply and verify `20261121145336_home_crew_visibility.sql` before publishing the
-dependent API/UI. It adds one column to the existing service-only settings table;
-it neither changes RLS/grants nor publishes records. Verify defaults, a false
-round-trip, and that general profile privacy remains unchanged. No schema change
-has been applied to production for this draft.
+Migration `20261121145336_home_crew_visibility.sql` was applied and verified before
+publishing the dependent API/UI. It adds one column to the existing service-only
+settings table; it neither changes RLS/grants nor publishes records. Defaults, a
+false round-trip and rejection of null were verified using a synthetic row that
+was rolled back. Existing settings fingerprints, counts, RLS and grants
+were unchanged. The production REST service recognizes the new field.
 
 Native clients should use the same API and account identity checks, preserve the
 pending choice through setup interruption, and stop profile publication if its
@@ -61,3 +64,17 @@ Two existing privacy-component hook lint errors and two existing setup-hook
 warnings were confirmed against the unchanged base; there are no new findings.
 Build logs, screenshots and the precise release status are recorded in
 `/srv/cinegenius/handoffs/20261121-home-crew-discretion/receipt.json`.
+
+## Production acceptance
+
+Four read-only production browser cases passed: WebKit at 390 px (German),
+320 px (Spanish), 768 px (Hungarian), and Chromium at 1366 px (German). All
+rendered the heading Crew and ten profile cards without registration badges or
+horizontal overflow. No page errors were reported. Signed-out settings returned
+401/no-store and profile setup redirected to same-host sign-in. Actual account
+save/recovery was tested with controlled services before release; no real member
+setting was changed for acceptance. The guarded release began from clean main
+exactly at origin/main and completed successfully.
+
+Two settled follow-up browser captures confirmed that the visible Crew images
+loaded successfully on phone and desktop, with no failing media responses.

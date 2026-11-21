@@ -21,7 +21,8 @@ App-Abgleich: `/srv/cinegenius/handoffs/20261121-app-company-onboarding-handoff/
 Neuregistrierungs-Vorrang; eigene Teilnahmeauswahl schon bei der Profileinrichtung
 und später unter Privatsphäre. Gemeinsames Feld `show_in_home_crew` in
 `/api/user-settings`; bestätigte Speicherung vor Profilveröffentlichung nötig.
-Migration, Veröffentlichung und native Geräteprüfung hierfür noch offen.
+Website/API und Migration sind seit 21.11., 16:12 Uhr Berlin, live (`5cafc814`).
+Native Übernahme und echte Geräteprüfung bleiben offen.
 Siehe [Vertrag und genaue Reichweite](home-crew-discretion.md).
 
 | Thema | Belegter Stand |
