@@ -84,15 +84,24 @@ Berechtigungen bleiben gleich; kein zusätzlicher Hintergrundabruf.
 WEB-Beleg: 173 Navigationstests, 40 kontrollierte Browserfälle über 17 Sprachen
 und 320–1717 CSS px sowie Lint, Design und Katalogprüfung bestanden. Das sind
 WEB-Prüfungen mit kontrollierten Konten und Ersatzschriften; keine echte
-angemeldete Sitzung oder native Geräteprüfung. Produktionsbuild und
-Veröffentlichungsfenster sind laut Übergabe noch offen.
+angemeldete Sitzung oder native Geräteprüfung. Der anschließende bewachte
+Produktionsbuild, TypeScript und vier Live-Zugriffsschutzprüfungen bestanden
+laut WEB-Beleg ebenfalls. Diese vier Fälle prüfen Gastweiterleitungen und
+den geschützten Admin-Zugang; sie ersetzen keine angemeldete Menüprüfung.
 
 Diese Server-App-Aufgabe hat Commit, Menüposition und den begrenzten Dateiumfang
 nachgelesen. Sie dokumentiert den Fix für den laufenden lokalen Abgleich auf
 `ab74924d`; keine zweite funktionale Portierung auf die ältere App-Basis.
 Die lokale Mac-Aufgabe ist bereits über WEB informiert. Kein paralleler
-main-Push, Deploy oder Eingriff in ihre nativen Quellen. Veröffentlichung des
-Menüfixes ist **noch nicht bestätigt**; bestehende App-Gates bleiben bestehen.
+main-Push, Deploy oder Eingriff in ihre nativen Quellen durch diese Aufgabe.
+
+**Statusnachtrag 21. November:** Markus hat die Freigabe ausdrücklich auf den
+Website-Menüfix begrenzt. `bb26a335` wurde über sauberes `main == origin/main`
+veröffentlicht; Deployment `dpl_BWXujHdNNMwaAHAowm2bGAv8EpVQ` ist READY,
+der www-Alias unabhängig durch WEB geprüft. Diese Aufgabe hat den
+Veröffentlichungsbeleg nachgelesen, keine eigene Live- oder Geräteprüfung
+durchgeführt. App-Änderungen und iPhone-Installation bleiben bis zu neuer
+ausdrücklicher Freigabe angehalten; sämtliche App-Gates bleiben bestehen.
 
 WEB-Quellbeleg: `/srv/cinegenius/handoffs/20261121-feedback-entry/receipt.json`.
 App-Empfang und Quellenprüfung:
