@@ -220,3 +220,10 @@ Prüf-/Veröffentlichungsstand: `/srv/cinegenius/handoffs/20261121-feedback-entr
 Website-Korrektur `bb26a335` veröffentlicht; Produktionsbuild und Zugriffsschutz
 geprüft. Markus hat den Veröffentlichungsstopp auf die App begrenzt. Die neu
 vorbereiteten App-Änderungen und eine neue iPhone-Installation bleiben angehalten.
+
+**Mitgestalten-Dialog (21.11.):** Kurze Frage, Antwort des Mitglieds, direkt die
+nächste Frage – ohne Dankesfloskeln, Bestätigung oder Zusammenfassung. Die
+serverseitige Vorgabe nutzt weiterhin die gewählte Sprache; alte private
+Verläufe und Entwürfe bleiben erhalten. Website-Nachweis/Veröffentlichungsstatus:
+`/srv/cinegenius/handoffs/20261121-feedback-brief/receipt.json`. App-Veröffentlichung
+bleibt angehalten; kein nativer Gerätenachweis.

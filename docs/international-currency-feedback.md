@@ -48,6 +48,13 @@ und `schema-live-verified.json` im genannten Release-Ordner.
 
 ## Mitgestalten
 
+Gesprächsstil (21.11.): Frage → Antwort → nächste Frage. Genies sichtbare Antwort
+ist nur eine kurze konkrete Frage, ohne Dank, Bestätigung oder Zusammenfassung.
+Der Bericht wird weiterhin getrennt aus tatsächlichen Aussagen abgeleitet und
+nur nach ausdrücklicher Bestätigung eingereicht. Die Regel gilt in jeder
+ausgewählten Sprache, auch bei Fortsetzung eines älteren ausführlichen Verlaufs.
+
+
 - Zugang in „Mein Bereich“ als reguläre Zeile **Mitgestalten** direkt vor
   **Einstellungen**, für alle angemeldeten Mitglieder, unabhängig vom Adminstatus.
   Ziel bleibt `/mitgestalten`; kein zusätzlicher Hintergrundabruf.

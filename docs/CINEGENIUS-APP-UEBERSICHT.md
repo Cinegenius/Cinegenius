@@ -216,3 +216,10 @@ Beleg: `/srv/cinegenius/handoffs/20261121-feedback-entry/receipt.json`.
 der Stopp nur die App betrifft. Die Website-Korrektur `bb26a335` ist freigegeben
 und veröffentlicht. Neu vorbereitete native Änderungen und eine neue
 iPhone-Installation warten weiterhin auf die nächste ausdrückliche Freigabe.
+
+**Mitgestalten-Dialog (21.11.):** Kurze Frage, Antwort des Mitglieds, direkt die
+nächste Frage – ohne Dankesfloskeln, Bestätigung oder Zusammenfassung. Die
+serverseitige Vorgabe nutzt weiterhin die gewählte Sprache; alte private
+Verläufe und Entwürfe bleiben erhalten. Website-Nachweis/Veröffentlichungsstatus:
+`/srv/cinegenius/handoffs/20261121-feedback-brief/receipt.json`. App-Veröffentlichung
+bleibt angehalten; kein nativer Gerätenachweis.
