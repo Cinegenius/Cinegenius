@@ -36,7 +36,7 @@ Diese Übersicht trennt die installierte App, ihre serverseitigen Ansichten, nat
 
 | Bereich | Umfang | Stand / nächste Prüfung |
 | --- | --- | --- |
-| **Anmeldung / Einrichtung** | Gemeinsames Konto, wiederaufnehmbares Setup und passende Profilschritte | Gemeinsame Anmeldung und Rückkehrwege; echte Geräteabläufe beim aktuellen Build prüfen. Web-Korrektur Firmen-Abschlusslink vom 21.11. noch unveröffentlicht: `data.slug` zur Navigation, `data.id` bleibt Abschlusskennung; optionale private Wiederherstellung `completed.companySlug`. Siehe `company-onboarding-links.md`; native Prüfung separat. |
+| **Anmeldung / Einrichtung** | Gemeinsames Konto, wiederaufnehmbares Setup und passende Profilschritte | Gemeinsame Anmeldung und Rückkehrwege; echte Geräteabläufe beim aktuellen Build prüfen. Web-/Serverkorrektur Firmen-Abschlusslink am 21.11. als `91a508d5` veröffentlicht: `data.slug` zur Navigation, `data.id` bleibt Abschlusskennung; optionale private Wiederherstellung `completed.companySlug`. Alter ID-Link live geprüft. Siehe `company-onboarding-links.md`; native Prüfung separat. |
 | **Profil / Einstellungen** | Identität, Haupt-/Nebentätigkeiten, Pronomen, Bilder, Sprache und Benachrichtigungen | Gemeinsame Verträge; native Felder und gespeicherte Werte synchron halten. |
 | **Avatare / Cover** | Frei wählbare Darstellung, eigene Fotos, exklusive Motive und Besitzregeln | Web-Vertrag vorhanden. Native Auswahl und Bildnachschub nicht ohne konkreten Test als aktiviert melden; Tauschen bleibt geplant. |
 | **Privatsphäre** | Öffentlich, Mitglieder, Freunde, Ghost und Orts-/Kartenrechte | Serverrechte gelten unverändert in der App. Geräte-/Zwischenspeicher dürfen frühere private Inhalte nicht wieder sichtbar machen. |

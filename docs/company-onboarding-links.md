@@ -1,6 +1,10 @@
 # Firmenlink nach der Einrichtung · 21. November 2026
 
-Status: Korrektur vorbereitet, noch nicht veröffentlicht. Kein Datenbank- oder
+Status: am 21. November 2026 um 13:10 Uhr (Europe/Berlin) veröffentlicht,
+Commit `91a508d53cdcad846c2ca43e90d0cdb28cade84e`, Deployment
+`dpl_CPk147S9NmEePK3DEgYhmP9MSzsx` READY auf `www.cinegenius.co`.
+Markus hat diesen Firmen-Fix ausdrücklich freigegeben. Der zuvor veröffentlichte
+App-Stand `68930dd9` bleibt vollständig enthalten. Kein Datenbank- oder
 Providerwechsel, keine Migration und keine Änderung an bestehenden Firmendaten.
 
 ## Befund
@@ -58,5 +62,19 @@ der Befund beruht deshalb auf der sichtbaren Browseransicht, nicht dem Statuscod
 Browser- und Buildnachweise werden außerhalb des Repositories unter
 `/srv/cinegenius/handoffs/20261121-company-onboarding-link/` geführt. Lokale
 Browserprüfungen mit kontrollierter Anmeldung/API sind keine echte Registrierung
-und kein nativer Gerätetest. Veröffentlichung erst nach eigener Betreiberfreigabe
-und Abstimmung mit dem parallelen App-Release.
+und kein nativer Gerätetest. Nach Abschluss des separaten App-Server-Releases
+wurde die Korrektur über den geprüften sauberen Hauptstand veröffentlicht.
+Die 58 Tests bestanden nach der Zusammenführung erneut; die Release-Prüfung
+bestätigte 17 Kataloge mit inzwischen 11.309 Schlüsseln.
+
+Live-Nachprüfung: alter ID-Link und direkter Slug öffnen das gespeicherte Profil
+bei 390/768/1366 px (WebKit/Chromium, Deutsch/Spanisch), ohne horizontalen Überlauf.
+Die kanonische Adresse verwendet den Slug. Unbekannte Firmen bleiben nicht
+auffindbar; ausgeloggte Aufrufe von `/profile-setup` und `/dashboard` gehen zur
+Anmeldung auf demselben Host. Es wurde kein neues Kundenkonto und keine Firma
+als Test angelegt. Browsermeldungen bei schnellem Weiternavigieren und der
+gesonderte stationäre WebKit-Test sind im Release-Beleg separat ausgewiesen.
+Bei direkten Firmen- und Anmeldeseiten traten stationär keine Browserfehler auf;
+Clerk lud vollständig und das Passwortfeld war erreichbar. Beim alten ID-Link
+wurden vor der Weiterleitung begonnene Requests abgebrochen (`Load request
+cancelled`); am richtigen Ziel war Clerk ebenfalls vollständig geladen.
