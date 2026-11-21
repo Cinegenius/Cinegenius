@@ -9,8 +9,8 @@ Diese Übersicht trennt die installierte App, ihre serverseitigen Ansichten, nat
 
 | Thema | Belegter Stand |
 | --- | --- |
-| **iPhone-App** | Lokale APP-Aufgabe meldet Build **2026112007** nach Datensicherung installiert. Später gemeldete Hänger in Smart/Work und beim Wechsel Work → Community werden dort diagnostiziert. Diese Server-Aufgabe hat das Gerät nicht geprüft. |
-| **App-Server** | **Veröffentlichung angehalten.** Nach WEB-/lokaler APP-Abstimmung ist `407915184321628834171facb374c0592fe68811` nur ein lokaler Integrationsstand. Markus hat den Stopp am 21.11. ausdrücklich auf App-Änderungen und iPhone-Updates begrenzt. Nur der separate Website-Menüfix ist freigegeben und veröffentlicht; App-Veröffentlichung und Installation brauchen weiterhin eine neue ausdrückliche Freigabe. |
+| **iPhone-App** | Letzter hier belegter Gerätestand: lokale APP-Aufgabe meldete Build **2026112007** nach Datensicherung installiert. Eine neue Installation oder vollständige Smart-/Work-/Community-Geräteabnahme zum nun veröffentlichten Serverstand `68930dd9` ist in der aktuellen WEB-Übergabe nicht belegt. Keine eigene Geräteprüfung durch diese Server-Aufgabe. |
+| **App-Server** | **Veröffentlicht:** Release `91a508d5` seit 21.11., 13:10 Uhr Berlin enthält den vollständigen App-Quellstand `68930dd9` und den Firmenlink-Fix. Abstammung im Git-Verlauf geprüft; Deployment `dpl_CPk147S9NmEePK3DEgYhmP9MSzsx` laut WEB READY. Die erneute Freigabe des geprüften Community-/Work-Pakets ist in `68930dd9:AGENTS.md` dokumentiert und ersetzt dessen früheren Stopp. Installation und tatsächliche Gerätebedienung separat belegen. |
 | **Native Navigation** | Ziel gemäß aktuellem App-Vertrag: **Shots · News · Smart · Projekte · Work**. Die gewöhnliche Website behält ihre eigene Navigation. |
 | **Obere Aktionen** | Profil, Nachrichten, Suche und Menü; App-eigene Abstände und sichere Bedienung über Kopf-/Fußbereich. |
 | **Erscheinungsbild** | Mauve wurde als unpassend zurückgemeldet; die lokale APP-Aufgabe bereitet vier Farbvorlagen vor. Noch keine neue Auswahl oder Themeänderung. Bestehende Farben werden in dieser Server-Folgearbeit nicht geändert. |
@@ -24,7 +24,7 @@ Diese Übersicht trennt die installierte App, ihre serverseitigen Ansichten, nat
 | **Crew / Profile** | Personen, Tätigkeiten, Fähigkeiten, Ortsangaben, Bilder und Kontakt | Neue Crew-Zähldifferenz aus WEB `5ba93dd7` als `a40a2bc6` übernommen: sichtbare und zugängliche Zahl folgt auch bei Anbieterfiltern der aktuellen Auswahl; 29 gezielte Tests und zehn App-Browserfälle bestanden; Details unter [Kartenzähler](map-result-counts.md). Die gemeinsame Website-Korrektur ist inzwischen in `31d3cce2` veröffentlicht; native Ergänzungen bleiben unveröffentlicht und ohne Geräteabnahme. Die Homepage-Rotation ist separat in `0c5e63fd` geprüft und gesichert: 24 Stunden Vorrang, danach serverseitige Mischung; 61 Tests und vollständiger Build bestanden. Native Crew-Reihenfolge unverändert. |
 | **Marktplatz / Dienstleistungen / Fahrzeuge** | Angebote, Anbieter, Bilder, Anfragen und Filter | Gemeinsame Website/API unterstützt seit 21.11. 155 Währungen (`ab74924d`); keine Umrechnung. Ältere App-Quellen enthalten noch feste EUR-Anzeigen. [Abgleich und offene native Prüfung](app-international-handoff-20261121.md); kein bestätigter Geräteablauf. |
 | **Locations** | Drehorte/Studios, Suche, Details und Karten | Gemeinsamer Zählerfix `822c27c` übernommen: gefilterte Gesamtzahl bleibt beim Kartenziehen stabil; fehlende Kartenpunkte über die Liste erreichbar. App-Beschriftung „gesamt“ in `b1d767a` vorbereitet. |
-| **Firmen** | Profile, Leistungen, Teams und Angebote | Gemeinsame Firmen-/Personenrechte; versteckte persönliche Identitäten nicht über Firmen offenlegen. Korrektur des Einrichtungs-Abschlusslinks in WEB `5103bffd` geprüft, noch nicht live. Firmen-ID für Wiederholung erhalten, zurückgegebenen Slug für Details verwenden. [App-Vertrag und Prüfgrenzen](company-onboarding-links.md); keine native Umsetzung/Installation aus dieser Übergabe. |
+| **Firmen** | Profile, Leistungen, Teams und Angebote | Gemeinsame Firmen-/Personenrechte; versteckte persönliche Identitäten nicht über Firmen offenlegen. Korrektur des Einrichtungs-Abschlusslinks aus `5103bffd` im gemeinsamen Release `91a508d5` veröffentlicht und öffentlich live geprüft. Firmen-ID für Wiederholung erhalten, zurückgegebenen Slug für Details verwenden. [App-Vertrag und Prüfgrenzen](company-onboarding-links.md); keine native Umsetzung/Installation aus dieser Übergabe. |
 | **Filmtiere / Jobs / Schwarzes Brett** | Weitere bestehende CineGenius-Bereiche | Website-Bestand vorhanden; vollständige native Erreichbarkeit und Bedienung pro App-Build verifizieren. Keine zusätzliche fertige native Spezialanwendung behauptet. |
 | **News** | Artikel, Themen, Technik, Länder, Veranstaltungen und Organisationen | Kleine Homepage-Artikelfotos sind in WEB `1aa844cc` live. App-Quellen gezielt abgeglichen: 80×64px unbeschnitten, Titelbild vor gültigem Galeriebild, kein leerer Bildplatz oder Herausgeberlogo als Ersatz, vorhandene Urheberangaben. [Abhängigkeiten und Prüfbeleg](app-home-news-photos-20261121.md). Keine neue Geräteinstallation/-abnahme oder App-Veröffentlichung; aktuelle Artikel-Nachweise aus dem veröffentlichten Hauptstand erhalten. |
 | **Organisationen / Branchenpartner** | Verzeichnisse, Profile und Beiträge | In `b1d767a` umgesetzt und mit künstlichen Daten geprüft: Gesamtzahl, geladene Seite und Kartenpunkte getrennt; während Filterwechsel keine bestätigte Zahl. Noch nicht veröffentlicht oder auf dem Gerät geprüft. |
@@ -46,7 +46,7 @@ Diese Übersicht trennt die installierte App, ihre serverseitigen Ansichten, nat
 | **Inserieren / Verwalten** | Eigene Angebote, Firmen, Organisationen, Bearbeiten und Status | Dieselben Freigaben wie im Web; App-eigene Formulare/Wege pro Build prüfen. Redaktionsverwaltung `69f4be8f` auf der Website seit 21.11., 11:48 Uhr Berlin veröffentlicht: Land/Thema/Originalquelle, Herausgeber, Suche/Status/Seitenauswahl. [Schnittstellen und Grenzen](organization-entry-browser.md); keine native Umsetzung oder Installation. |
 | **Buchungen / Anfragen / Rechnungen** | Bestehende Vorgänge und Status | Website/API speichert `bookings.currency` als Snapshot und prüft Preis-/Währungsabweichungen vor Bestätigung (409). Migration bereits produktiv angewandt und nachgelesen; nicht erneut ausführen. Native Anzeige, Bestätigung und Erhalt von Notizen/Terminen sind noch abzugleichen. Keine Zahlungsaktivierung. |
 | **Hilfe / Support / Recht** | FAQ, Kontakt, Meldungen, Impressum, Datenschutz, AGB und Bildrechte | Gemeinsame Inhalte erreichbar halten; Konto- und externe Link-Rückkehr prüfen. |
-| **Mitgestalten / Feedback** | Ländervertreter beantworten kurze Fragen und geben eigene Rückmeldungen; Markus bekommt gesammelte Ergebnisse | Website und gemeinsame Schnittstellen **seit 21.11. live** (`ab74924d`); isolierte Bedienprüfung bestanden. Native Einbindung beauftragt/abzustimmen, nicht als fertige App-Funktion behaupten. Gleiche privaten Gespräche und Zusammenfassungen verwenden. Menüfix `bb26a335`: Mitgestalten direkt vor Einstellungen für alle Mitglieder; auf der Website veröffentlicht und über den Release-Beleg bestätigt. Gesprächsvorgabe seit Website-Commit `42b7d1eb`: nur die nächste einzelne kurze Frage ohne Floskeln. Kein echter Modell-/Gerätenachweis; App-Stopp bleibt bestehen. [Abgleich](app-international-handoff-20261121.md). |
+| **Mitgestalten / Feedback** | Ländervertreter beantworten kurze Fragen und geben eigene Rückmeldungen; Markus bekommt gesammelte Ergebnisse | Website und gemeinsame Schnittstellen **seit 21.11. live** (`ab74924d`); isolierte Bedienprüfung bestanden. Native Einbindung beauftragt/abzustimmen, nicht als fertige App-Funktion behaupten. Gleiche privaten Gespräche und Zusammenfassungen verwenden. Menüfix `bb26a335`: Mitgestalten direkt vor Einstellungen für alle Mitglieder; auf der Website veröffentlicht und über den Release-Beleg bestätigt. Gesprächsvorgabe seit Website-Commit `42b7d1eb`: nur die nächste einzelne kurze Frage ohne Floskeln. Kein echter Modell-/Gerätenachweis; für den App-Server gilt der oben dokumentierte aktuelle Release. [Abgleich](app-international-handoff-20261121.md). |
 
 ## Work / privater Arbeitsplatz
 
@@ -75,7 +75,7 @@ Diese Übersicht trennt die installierte App, ihre serverseitigen Ansichten, nat
 
 ## Nächste Schritte und Pflege
 
-1. Veröffentlichungsstopp erhalten: Lokale APP-Aufgabe diagnostiziert Smart-/Work-Hänger und Work → Community. Konkrete Korrektur, Geräteprüfung und neue Freigabe vor Livegang.
+1. Den veröffentlichten gemeinsamen Serverstand `91a508d5` einschließlich App `68930dd9` erhalten. Die erneute Freigabe gilt für dieses geprüfte Paket; neue Installations-/Bediennachweise getrennt bei der lokalen APP-Aufgabe nachführen. Frühere Stopphinweise unten beschreiben ihren damaligen Stand.
 2. Installierten Build 2026112007 mit dem tatsächlichen Serverstand auf dem Gerät prüfen; Server-/Browserbelege nicht als Geräteprüfung ausweisen.
 3. Native Zählerergänzungen einschließlich der nachgemeldeten Crew-Filterkorrektur und der kompakten Kartenvorschau separat mit dem lokalen App-Stand abstimmen; danach die separat gesicherte Homepage-Rotation übernehmen. [Gemeinsame Prioritäten](AKTUELLE-AUFTRAEGE.md) erhalten.
 4. Die veröffentlichten Länder-/Feedback-/Währungsfunktionen auf Basis des aktuellen Hauptstands mit den nativen Quellen abgleichen. [Befunde, bereits übernommener Cache-Schutz und offene Geräteabnahme](app-international-handoff-20261121.md); die Buchungs-Währungsmigration ist bereits angewandt.
@@ -127,8 +127,26 @@ Kataloge und Build bestanden. Zwei vorhandene Hook-Warnungen; lokale statische
 Datenabrufe liefen mangels Supabase-Laufzeitvariablen mit bestehenden Fallbacks.
 Kein echter Signup-/Gerätetest. Diese Aufgabe hat Vertrag, drei Produktdatei-
 Änderungen und die sechs Build-Eingabehashes nachgelesen; nur Dokumentation
-übernommen. Die Korrektur ist noch nicht veröffentlicht und hat keine eigene
-Livefreigabe. Keine parallele Freigabe, native Änderung oder Installation durch
-diesen Abgleich; bestehende App-Arbeit bleibt gesondert.
+übernommen. Nach eigener ausdrücklicher Freigabe wurde der Firmen-Fix im
+gemeinsamen Release `91a508d5` veröffentlicht; der gesamte App-Stand `68930dd9`
+ist enthalten. Keine neue native Änderung oder Installation durch diesen
+Dokumentationsabgleich; Gerätearbeit bleibt gesondert.
 Beleg: `/srv/cinegenius/handoffs/20261121-company-onboarding-link/receipt.json`;
 App-Empfang: `/srv/cinegenius/handoffs/20261121-app-company-onboarding-handoff/receipt.json`.
+
+**Release-Abgleich 21.11., 13:10 Uhr Berlin:** Der aktualisierte WEB-Beleg bestätigt
+`91a508d5`, Deployment `dpl_CPk147S9NmEePK3DEgYhmP9MSzsx` READY und den www-Alias.
+58 Tests bestanden auf dem zusammengeführten Stand. Sechs öffentliche Live-
+Navigationsfälle bei 390/768/1366 px in WebKit/Chromium (Deutsch/Spanisch) prüfen
+alte ID-Links, kanonischen Slug, Unbekannt-Fall und Anmeldeweiterleitungen.
+Stationäre direkte Firmen-/Anmeldeseiten laden Clerk ohne Browserfehler; beim
+ID-Redirect wurden bereits gestartete Requests abgebrochen, am Ziel lud Clerk.
+Keine echte Registrierung und keine native Geräteprüfung im WEB-Beleg.
+
+Die erneute Freigabe in `68930dd9:AGENTS.md` hebt den damaligen Stopp für das
+geprüfte gemeinsame Community-/Work-Paket und dessen Serveransichten auf.
+Die Git-Abstammung beider Quellpakete im Release ist hier geprüft; das ersetzt
+keine neue Geräteinstallation oder Funktionsabnahme. Ältere Stoppaussagen in
+den einzelnen Vorab-Berichten sind historisch. Push, produktive Shots, ein neues
+E-Mail-Postfachsystem und allgemeine Online-Teams sind dadurch nicht aktiviert
+oder als fertig erklärt. Kein erneuter Deploy aus dieser alten App-Arbeitsbasis.
