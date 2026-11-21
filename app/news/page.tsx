@@ -8,8 +8,11 @@ import { approvedEntries,newsFacetRows } from "@/lib/organization-data";
 import { isOrganizationEntryType,isOrganizationTopic } from "@/lib/organization-taxonomy";
 import { getLocale,getNow,getTranslations } from "next-intl/server";
 import Link from "next/link";
-import NativeNews, { type NativeNewsEntry } from "@/components/app/NativeNews";
+import NativeNews, { NativeNewsOrganizationRail, type NativeNewsEntry } from "@/components/app/NativeNews";
 import { publicMapPoint } from "@/lib/places/public-map-point";
+import { organizationsCountryHref } from "@/lib/browse-country";
+import NativeNewsOrganizations from "@/components/app/NativeNewsOrganizations";
+import { Suspense } from "react";
 
 export const dynamic = "force-dynamic";
 
@@ -57,8 +60,9 @@ export default async function NewsPage({ searchParams }: { searchParams: Promise
 
   return <DirectoryPage area="news"><main className="min-h-screen">
     <PageHeader withBackdrop={false} badge={t("eyebrow")} title={t("newsTitleLead")} titleHighlight={t("newsTitleHighlight")} description={t("newsDescription")} />
-    <div className="site-container"><ContentTranslationNotice /></div>
     <NativeNews key={`${region.cookieName}:${filters.q}:${filters.type}:${filters.topic}:${filters.country}:${region.country}`}
+      notice={<div className="site-container"><ContentTranslationNotice /></div>}
+      organizationRail={<Suspense fallback={<NativeNewsOrganizationRail organizations={[]} href={organizationsCountryHref(region.country)} />}><NativeNewsOrganizations country={region.country} /></Suspense>}
       controls={{ filters, facets, count, region, topicCookieName: topic.cookieName }} entries={nativeEntries} page={page}
       previousHref={page > 1 ? href({ page: page - 1 }) : null} nextHref={hasMore ? href({ page: page + 1 }) : null}>
     <section className="site-container py-5 pb-28 sm:py-7 sm:pb-28 xl:pb-10">

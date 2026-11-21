@@ -10,16 +10,16 @@ import NativeProjectResults from "./NativeProjectResults";
 import { useNativeAppAppearance } from "@/lib/use-native-app-appearance";
 import DirectoryViewControls from "@/components/DirectoryViewControls";
 import { NativeBrowseQuickFilter } from "@/components/app/NativeBrowseToolbar";
-import { matchesPlace,browsePlaceOptions as placeOptions, UNASSIGNED_COUNTRY } from "@/lib/places/core";
+import { UNASSIGNED_COUNTRY } from "@/lib/places/core";
 import { PROJECT_CATEGORIES,projectCategoryForType,type ProjectCategoryId } from "@/lib/project-category-filter";
-import { normalizedCatalogueSearch,projectTypeLabel,projectTypeOptions } from "@/lib/project-type-labels";
-import { sortProjects,type BrowseProject,type ProjectSort } from "@/lib/projects-browse";
+import { projectTypeLabel } from "@/lib/project-type-labels";
+import { projectBrowseSelection,sortProjects,type BrowseProject,type ProjectSort } from "@/lib/projects-browse";
 import { useViewState } from "@/lib/use-view-state";
 import { Clapperboard,LayoutGrid,LayoutList } from "lucide-react";
 import { useLocale,useTranslations } from "next-intl";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useMemo } from "react";
+import { useEffect,useMemo } from "react";
 
 export default function ProjectsContent({ projects, category = null }: { projects: BrowseProject[]; category?: ProjectCategoryId | null }) {
   const nativeAppearance = useNativeAppAppearance();
@@ -37,9 +37,13 @@ export default function ProjectsContent({ projects, category = null }: { project
   const [view, setView] = useViewState<"list" | "grid">("projects.view", "list");
   const categories = PROJECT_CATEGORIES.filter(item => projects.some(project => projectCategoryForType(project.type) === item.id)).map(item => ({ value: item.id, label: t(item.labelKey) }));
   const categoryProjects = useMemo(() => category ? projects.filter(project => projectCategoryForType(project.type) === category) : projects, [projects, category]);
-  const types = projectTypeOptions(categoryProjects.flatMap(project => project.type ? [project.type] : []), ui, locale);
-  const years = [...new Set(categoryProjects.flatMap(project => project.year === null ? [] : [project.year]))].sort((a, b) => b - a).map(value => ({ value: String(value), label: String(value) }));
-  const directors = [...new Set(categoryProjects.flatMap(project => project.director ? [project.director] : []))].sort((a, b) => a.localeCompare(b, locale)).map(value => ({ value, label: value }));
+  const selection = useMemo(() => projectBrowseSelection(categoryProjects, {
+    query, country, type: typeFilter, year: yearFilter, director: directorFilter,
+  }, locale, ui), [categoryProjects, query, country, typeFilter, yearFilter, directorFilter, locale, ui]);
+  const { types, years, directors, countries, director: activeDirector } = selection;
+  useEffect(() => {
+    if (directorFilter !== activeDirector) setDirectorFilter(activeDirector);
+  }, [directorFilter, activeDirector, setDirectorFilter]);
   const sortOptions = [
     { value: "recent", label: t("sortRecent") },
     { value: "year_desc", label: geography.preferred ? ui("BrowseGeography.recommended") : t("sortNewest") },
@@ -47,15 +51,7 @@ export default function ProjectsContent({ projects, category = null }: { project
     { value: "title_asc", label: t("sortAlpha") },
     { value: "crew_desc", label: t("sortCrew") },
   ];
-  const filtered = useMemo(() => {
-    const needle = normalizedCatalogueSearch(query, locale);
-    return prioritizeGeographically(sortProjects(categoryProjects.filter(project =>
-      matchesPlace(project, "country", country) &&
-      (!needle || [project.title, project.director ?? "", project.type ?? "", projectTypeLabel(project.type ?? "", ui)].some(value => normalizedCatalogueSearch(value, locale).includes(needle)))
-      && (!typeFilter || project.type === typeFilter)
-      && (!yearFilter || String(project.year) === yearFilter)
-      && (!directorFilter || project.director === directorFilter)), sort, locale), geography.preferred);
-  }, [categoryProjects, query, typeFilter, yearFilter, directorFilter, sort, locale, ui, country, geography.preferred]);
+  const filtered = useMemo(() => prioritizeGeographically(sortProjects(selection.projects, sort, locale), geography.preferred), [selection.projects, sort, locale, geography.preferred]);
 
   const changeCategory = (value: string) => { setTypeFilter(""); setYearFilter(""); setDirectorFilter(""); router.push(value ? `/projects/${value}` : "/projects/alle", { scroll: false }); };
   const reset = () => { setQuery(""); setTypeFilter(""); setYearFilter(""); setDirectorFilter(""); setCountry(""); if (category) router.push("/projects/alle", { scroll: false }); };
@@ -64,13 +60,13 @@ export default function ProjectsContent({ projects, category = null }: { project
     ...(country ? [{ id: "country", label: country === UNASSIGNED_COUNTRY ? ui("Places.countryUnassigned") : (ui.has(`CountryNames.${country}`) ? ui(`CountryNames.${country}`) : country), onRemove: () => setCountry("") }] : []),
     ...(typeFilter ? [{ id: "type", label: projectTypeLabel(typeFilter, ui), onRemove: () => setTypeFilter("") }] : []),
     ...(yearFilter ? [{ id: "year", label: yearFilter, onRemove: () => setYearFilter("") }] : []),
-    ...(directorFilter ? [{ id: "director", label: directorFilter, onRemove: () => setDirectorFilter("") }] : []),
+    ...(activeDirector ? [{ id: "director", label: activeDirector, onRemove: () => setDirectorFilter("") }] : []),
   ];
   const hasFilters = Boolean(query || chips.length);
   const views = <div className="flex shrink-0 rounded-xl border border-border bg-bg-elevated p-1" role="group" aria-label={ui("locations.viewLabel")}>
     {([{ value: "list", icon: LayoutList, label: ui("locations.viewList") }, { value: "grid", icon: LayoutGrid, label: ui("Ui.text_2cc48b15f4ffeb") }] as const).map(({ value, icon: Icon, label }) => <button type="button" key={value} aria-label={label} title={label} aria-pressed={view === value} onClick={() => setView(value)} className={`flex h-11 w-11 items-center justify-center rounded-lg transition-colors ${view === value ? "bg-gold/10 text-gold" : "text-text-muted hover:text-text-primary"}`}><Icon size={18} aria-hidden="true" /></button>)}
   </div>;
-  const fields = [{ label: t("filterType"), value: typeFilter, options: types, onChange: setTypeFilter }, { label: t("filterYear"), value: yearFilter, options: years, onChange: setYearFilter }, { label: t("filterDirector"), value: directorFilter, options: directors, onChange: setDirectorFilter }];
+  const fields = [{ label: t("filterType"), value: typeFilter, options: types, onChange: setTypeFilter }, { label: t("filterYear"), value: yearFilter, options: years, onChange: setYearFilter }, { label: t("filterDirector"), value: activeDirector, options: directors, onChange: setDirectorFilter }];
 
   return <div className="mobile-bottom-nav-clear">
       <MobileBrowseControls nativeCategoryKind="projectType" preference={<BrowseGeography geography={geography} />} query={query} onQueryChange={setQuery} searchPlaceholder={t("searchPlaceholder")}
@@ -78,11 +74,11 @@ export default function ProjectsContent({ projects, category = null }: { project
       categoryLabel={ui("props.categoryBtn")} allCategoryLabel={ui("common.allProjects")} categories={categories} categoryValue={category ?? ""} onCategoryChange={changeCategory}
       nativeViewControls={<DirectoryViewControls value={view} onChange={value => { if (value !== "map") setView(value); }} unavailable={{map:ui("NativeBrowse.projectMapUnavailable")}} />}
       nativeQuickFilters={[
-        <NativeBrowseQuickFilter key="country" kind="country" label={ui("Places.country")} value={country} onChange={setCountry} options={[{value:"",label:ui("Places.allCountries")},...placeOptions(categoryProjects,"country",locale).map(option => ({value:option.value,label:option.value === UNASSIGNED_COUNTRY ? ui("Places.countryUnassigned") : ui.has(`CountryNames.${option.value}`) ? ui(`CountryNames.${option.value}`) : option.label}))]} />,
+        <NativeBrowseQuickFilter key="country" kind="country" label={ui("Places.country")} value={country} onChange={setCountry} options={[{value:"",label:ui("Places.allCountries")},...countries.map(option => ({value:option.value,label:option.value === UNASSIGNED_COUNTRY ? ui("Places.countryUnassigned") : ui.has(`CountryNames.${option.value}`) ? ui(`CountryNames.${option.value}`) : option.label}))]} />,
         <NativeBrowseQuickFilter key="type" kind="projectType" label={t("filterType")} value={typeFilter} onChange={setTypeFilter} options={[{value:"",label:ui("common.all")},...types]} />,
       ]}
       resultCount={filtered.length} resultSummary={t("resultsCount", { count: filtered.length })} viewControls={views} filterCount={chips.length} chips={chips} onReset={reset} resetLabel={t("resetFilters")} showResultsLabel={ui("Ui.text_52ca04e867ebdc", { value1: String(filtered.length) })}>
-      <CountrySelect popup value={country} onChange={setCountry} codes={placeOptions(categoryProjects, "country", locale).map(option => option.value)} />
+      <CountrySelect popup value={country} onChange={setCountry} codes={countries.map(option => option.value)} />
       {fields.map(field => <MobileFilterField key={field.label} label={field.label}><MobileFilterSelect value={field.value} onChange={field.onChange} options={field.options} placeholder={ui("common.all")} label={field.label} /></MobileFilterField>)}
     </MobileBrowseControls>
 

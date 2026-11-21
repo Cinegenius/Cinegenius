@@ -20,7 +20,7 @@ export async function publicOrganizationLinks(target: {userId:string}|{companyId
  if(result.error) throw new Error('organization_links_unavailable');
  return (result.data??[]).map(row=>(Array.isArray(row.organization)?row.organization[0]:row.organization) as unknown as PublicOrganization);
 }
-export async function organizationDiscovery(page=1,limit=24,country:unknown='') {
+export async function organizationDiscovery(page=1,limit=24,country:unknown='',signal?:AbortSignal) {
  const selectedCountry=browseCountryChoice(country);
  if(selectedCountry===undefined)throw new Error('organization_country_invalid');
  page=Number.isFinite(page)?Math.min(10000,Math.max(1,Math.floor(page))):1;
@@ -28,6 +28,7 @@ export async function organizationDiscovery(page=1,limit=24,country:unknown='') 
  let query=db.from('organizations').select(projection).eq('moderation_status','approved');
  if(selectedCountry===UNASSIGNED_COUNTRY)query=query.or('place_country_code.is.null,place_country_code.eq.""');
  else if(selectedCountry)query=query.eq('place_country_code',selectedCountry);
+ if(signal)query=query.abortSignal(signal);
  const result=await query.order('created_at',{ascending:false}).order('id').range((page-1)*limit,page*limit);
  if(result.error) throw new Error('organization_discovery_unavailable');
  return {organizations:(result.data??[]).slice(0,limit) as PublicOrganization[],hasMore:(result.data?.length??0)>limit,page};

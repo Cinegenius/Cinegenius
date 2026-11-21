@@ -1,6 +1,7 @@
 import { createHash } from "node:crypto";
 import { isDiscoverySeed, validDiscoveryCursor, type DiscoveryCursor } from "./discovery-seed";
 import { nativeDiscoveryPlan } from "./native-smart-discovery";
+import { createNativeDiscoveryProfileAccess } from "./native-discovery-profile-access";
 import { occupationFormFromCrew } from "@/lib/occupation-form";
 import "server-only";
 import { profileOccupationPreview, selectedCrewOccupations, type OccupationProfile } from "@/lib/crew-occupations";
@@ -96,7 +97,8 @@ function geographyRow(row: Row, area: SearchArea): Row {
 type ResultPage = SearchGroup & { listPage?: SearchGroup };
 type ProfilePage = { data: Row[]; error: null; privacy: Awaited<ReturnType<typeof profileAccessFor>> };
 type ReadProfilePage = (offset: number) => Promise<ProfilePage>;
-async function readGroup(plan: SearchPlan, wishIndex: number, area: SearchArea, offset: number, locale: string, viewerId: string | null, signal: AbortSignal, view: "list" | "map" | "combined", nearbyAfter?: NearbyCursor, segment?: string, rankAfter?: SearchRankCursor, readProfilePage?: ReadProfilePage, discoverySeed?: string, discoveryAfter?: DiscoveryCursor): Promise<ResultPage> {
+type ReadDiscoveryAccess = ReturnType<typeof createNativeDiscoveryProfileAccess>;
+async function readGroup(plan: SearchPlan, wishIndex: number, area: SearchArea, offset: number, locale: string, viewerId: string | null, signal: AbortSignal, view: "list" | "map" | "combined", nearbyAfter?: NearbyCursor, segment?: string, rankAfter?: SearchRankCursor, readProfilePage?: ReadProfilePage, discoverySeed?: string, discoveryAfter?: DiscoveryCursor, readDiscoveryAccess?: ReadDiscoveryAccess): Promise<ResultPage> {
   const wish = plan.searches[wishIndex];
   const taxonomy = await getTranslations({ locale, namespace: "Taxonomy" });
   const productionCrew = area === "crew" && !wish.department && isProductionCrewQuery(wish.query);
@@ -191,7 +193,9 @@ async function readGroup(plan: SearchPlan, wishIndex: number, area: SearchArea, 
     const { data, error } = shared ?? await queryFor(area, wish, productionCrew ? [] : terms, categories, view !== "list").range(offset, offset + PAGE - 1).abortSignal(signal);
     if (error) throw new Error("search_unavailable");
     const rows = (data ?? []) as unknown as Row[];
-    const privacy = area === "crew" ? shared?.privacy ?? await profileAccessFor(rows.map(row => String(row.user_id)), viewerId, { signal, throwOnError: true }) : null;
+    const privacy = area === "crew" ? shared?.privacy ?? await (shuffled && readDiscoveryAccess
+      ? readDiscoveryAccess(rows.map(row => String(row.user_id)))
+      : profileAccessFor(rows.map(row => String(row.user_id)), viewerId, { signal, throwOnError: true })) : null;
     for (let i = 0; i < rows.length; i++) {
       let row = rows[i];
       if (area === "crew") {
@@ -236,6 +240,21 @@ async function readGroup(plan: SearchPlan, wishIndex: number, area: SearchArea, 
     if (!ranked && !wish.places.length && pass >= 2) { group.nextOffset = offset; return group; }
   }
   if (ranked && localExists) {
+    if (shuffled) {
+      // Relationships were reused during the full scan. Recheck the bounded
+      // output pool so a block/friendship withdrawal mid-scan cannot be emitted.
+      // Retry changed membership rather than invent a shortened cursor page.
+      for (let start = 0; start < local.length; start += PAGE) {
+        const candidates = local.slice(start, start + PAGE);
+        const privacy = await profileAccessFor(candidates.map(candidate => candidate.id), viewerId, { signal, throwOnError: true });
+        signal.throwIfAborted();
+        for (const candidate of candidates) {
+          const access = privacy.get(candidate.id);
+          if (!access?.profile) throw new Error("search_unavailable");
+          candidate.row = projectProfilePrivacy(candidate.row, access);
+        }
+      }
+    }
     group.results = local.slice(0, limit).map(candidate => toResult(candidate.row));
     if (local.length > limit) {
       const { score, distanceKm, id } = local[limit - 1];
@@ -287,6 +306,9 @@ export function validSearchCursor(plan: SearchPlan, cursor: SearchCursor, discov
 }
 export async function executeUnifiedSearch(plan: SearchPlan, locale: string, viewerId: string | null, signal: AbortSignal, cursor?: SearchCursor, view: "list" | "map" | "combined" = "list", discoverySeed?: string) {
   if (discoverySeed !== undefined && (!isDiscoverySeed(discoverySeed) || JSON.stringify(plan) !== JSON.stringify(nativeDiscoveryPlan()))) throw new Error("invalid_request");
+  // The seeded full scan reuses only this viewer's relationships within this
+  // request; each profile page still reads its current settings before projection.
+  const readDiscoveryAccess = discoverySeed === undefined ? undefined : createNativeDiscoveryProfileAccess(viewerId, signal);
   const tasks: SearchCursor[] = cursor ? [cursor] : plan.searches.flatMap((wish, wishIndex) =>
     (wish.area === "all" ? SEARCH_AREAS : [wish.area]).flatMap(area => plan.version === 2 && area === "crew" && crewSearchSegments(wish).length
       ? crewSearchSegments(wish).map(segment => ({ wishIndex, area, offset: 0, segment })) : [{ wishIndex, area, offset: 0 }]));
@@ -315,7 +337,7 @@ export async function executeUnifiedSearch(plan: SearchPlan, locale: string, vie
   await Promise.all(Array.from({ length: Math.min(tasks.length, 4) }, async () => {
     while (next < tasks.length) {
       const index = next++, task = tasks[index];
-      pages[index] = await readGroup(plan, task.wishIndex, task.area, task.offset, locale, viewerId, signal, view, task.nearby, task.segment, task.rank, readProfilePage, discoverySeed, task.discovery);
+      pages[index] = await readGroup(plan, task.wishIndex, task.area, task.offset, locale, viewerId, signal, view, task.nearby, task.segment, task.rank, readProfilePage, discoverySeed, task.discovery, readDiscoveryAccess);
     }
   }));
   const groups = pages.map(({ listPage, ...group }) => view === "combined" && listPage ? listPage : group);
