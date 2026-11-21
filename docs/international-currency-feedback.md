@@ -62,8 +62,14 @@ und `schema-live-verified.json` im genannten Release-Ordner.
   z. B. für Mexiko oder Ungarn. Links vergeben **keine** Rechte, umgehen keine
   Anmeldung und versenden keine Einladungen automatisch. Die manuelle UI-Sprache
   bleibt vorrangig; die Gesprächssprache kann vor dem ersten Austausch gewählt werden.
-- Eine kurze Frage zum Einstieg (passt „Crew“?), freie Eingaben und weitere kurze
-  Rückfragen. Die bestehende Sprachaufnahme kann Text vor dem Senden einsetzen.
+- Gesprächsstil seit Website-Commit `42b7d1eb`: Frage → Antwort → nächste
+  einzelne kurze Frage, ohne Dank, Bestätigung, Wiederholung oder Zusammenfassung.
+  Die Vorgabe gilt in der gewählten Sprache und bei Fortsetzung älterer
+  ausführlicher Verläufe. Strukturierte Befunde bleiben getrennt; alte Antworten
+  und private Entwürfe werden nicht umgeschrieben. Länge und Stil sind
+  Modellvorgaben, keine neue Parsergarantie; ein echter Modelltest fehlt.
+  Die bestehende Sprachaufnahme kann Text vor dem Senden einsetzen.
+  Release-Beleg: `/srv/cinegenius/handoffs/20261121-feedback-brief/receipt.json`.
 - Originaltext bleibt erhalten. Maximal fünf Vorschläge pro Zusammenfassung,
   zusätzlich deutsche Fassung; jede Aussage verweist auf ein tatsächliches
   Nutzerzitat. Vorschläge sind ausdrücklich ungeprüft. Keine KI-Freigaben und keine

@@ -106,3 +106,27 @@ ausdrücklicher Freigabe angehalten; sämtliche App-Gates bleiben bestehen.
 WEB-Quellbeleg: `/srv/cinegenius/handoffs/20261121-feedback-entry/receipt.json`.
 App-Empfang und Quellenprüfung:
 `/srv/cinegenius/handoffs/20261121-app-feedback-entry-handoff/receipt.json`.
+
+## Nachtrag: kurze Mitgestalten-Fragen · 21. November
+
+Website-Commit `42b7d1ebd06218557be2a28306e56beef9e59275` ist veröffentlicht:
+Deployment `dpl_CQ2cwyAjNdeqrqNqeCYmxfmiZvgS` READY; www-Alias durch WEB bestätigt.
+Genies sichtbare Antwort soll nur die nächste einzelne kurze Frage enthalten,
+ohne Dank, Bestätigung, Wiederholung oder Zusammenfassung. Gewählte Sprache
+und ältere ausführliche Verläufe sind ausdrücklich berücksichtigt.
+
+Diese Aufgabe hat den Quellvergleich nachgelesen: nur der Systemprompt wurde
+im Produktcode geändert, außerdem eine simulierte Testantwort. Schema, Parser,
+API-Rechte, Kataloge, private Entwürfe und ausdrückliches Absenden bleiben gleich.
+Die Längen-/Stilvorgaben sind keine harte neue Ausgabegarantie; vorhandene
+Antworten werden nicht umgeschrieben. Der Live-Serververtrag ist für den App-
+Abgleich vorgemerkt, keine zweite Implementierung auf dem älteren App-Zweig.
+
+WEB-Belege: 14 bestehende Vertragstests mit simuliertem Anbieter, Lint, 17 Kataloge,
+Produktions-TypeScript/Build und vier Live-Zugriffsschutzprüfungen bestanden.
+Kein echter Modell-/Konten-/Gerätetest und keine neue Browserprüfung.
+Diese Aufgabe hat keine zusätzlichen Laufzeittests oder KI-Anfragen ausgeführt.
+App-Veröffentlichung und iPhone-Update bleiben ausdrücklich angehalten.
+
+Quelle: `/srv/cinegenius/handoffs/20261121-feedback-brief/receipt.json`.
+App-Quellenprüfung: `/srv/cinegenius/handoffs/20261121-app-feedback-brief-handoff/receipt.json`.
