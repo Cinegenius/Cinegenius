@@ -61,3 +61,11 @@ export function newsGalleryImages(cover: string | null | undefined, gallery: unk
   const creditedCover = images.find(image => image.url === cover);
   return [creditedCover ?? {url: cover}, ...images.filter(image => image.url !== cover)].slice(0, NEWS_GALLERY_LIMIT);
 }
+
+/** Compact discovery keeps existing covers and their credits, or the first
+ * valid gallery photo. This read projection never repairs or rewrites storage. */
+export function newsPreviewImage(cover: string | null | undefined, gallery: unknown): (Partial<NewsGalleryImage> & {url: string}) | null {
+  const images = Array.isArray(gallery)
+    ? gallery.slice(0, NEWS_GALLERY_LIMIT).flatMap(item => parseNewsGallery([item]) ?? []) : [];
+  return cover ? images.find(image => image.url === cover) ?? {url: cover} : images[0] ?? null;
+}

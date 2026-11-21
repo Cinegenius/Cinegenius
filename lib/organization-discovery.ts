@@ -44,7 +44,7 @@ export async function latestOrganizationEntries(country = '', topic: Organizatio
   .filter(row => !selectedTopic || row.topic === selectedTopic).slice(0, limit).map(row => row.id) : null;
  if (ids && !ids.length) return [];
  let query=db.from('organization_entries')
- .select('id,slug,title,summary,entry_type,topic,image_url,starts_at,ends_at,created_at,place_country_code,city,organization:organizations!inner(slug,name,logo_url,moderation_status,place_country_code,region)')
+ .select('id,slug,title,summary,entry_type,topic,image_url,image_gallery,starts_at,ends_at,created_at,place_country_code,city,organization:organizations!inner(slug,name,logo_url,moderation_status,place_country_code,region)')
  .eq('moderation_status','approved').eq('organization.moderation_status','approved')
  .or(`entry_type.eq.news,ends_at.gte.${new Date().toISOString()},and(ends_at.is.null,starts_at.gte.${new Date().toISOString()})`)
  .order('created_at',{ascending:false}).order('id').limit(limit);
