@@ -15,11 +15,15 @@ Sichtbarkeit bleiben vorrangig. `quickStart.showInHomeCrew` im privaten Entwurf
 erhalten und die Wahl vor Profilanlage/-änderung bestätigt speichern. Fehlende
 API-Felder oder ein Speicherfehler sind keine bestätigte Wahl.
 
-WEB meldet die gesondert freigegebene Veröffentlichung in Arbeit. Die additive
-Migration `20261121145336_home_crew_visibility.sql` ist im Quellstand nachgelesen;
-der abschließende Produktions-/Schema-Beleg steht noch aus. Diese App-Aufgabe
-übernimmt ausschließlich den Vertrag, keine Produktdateien, Migration oder
-Installation. Native Umsetzung und echte Geräteprüfung gesondert belegen.
+WEB hat `5cafc814` nach gesonderter Freigabe am 21.11. um 16:12 Uhr Berlin
+veröffentlicht; Deployment `dpl_7oepNowLC69PEfv3VwLotR9gzGu8` READY, www-Alias
+geprüft. Die additive Migration `20261121145336_home_crew_visibility.sql` wurde
+vorher angewandt und laut WEB einschließlich Standards, false-Speicherung,
+NOT NULL und unveränderten bisherigen Einstellungen/Rechten verifiziert. Nicht
+nochmals anwenden. Dokumentationsstand `a880a260` ist kein weiterer Deploy.
+Diese App-Aufgabe hat den Abschlussbeleg, Git-Abstammung und SQL-Prüfsumme
+abgeglichen; nur Dokumentation übernommen. Native Umsetzung, Installation und
+echte Geräteprüfung bleiben gesondert offen.
 Details: `docs/home-crew-discretion.md` und
 `docs/app-home-crew-visibility-contract-20261121.md`.
 

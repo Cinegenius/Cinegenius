@@ -4,13 +4,16 @@ Stand 21. November 2026: geprüfter WEB-Quellstand
 `5cafc814b92f5ab9ab58c3c7936cfb7374c40535` auf
 `codex/home-crew-discretion-20261121`, Basis
 `a3ff549af885721d437158742d117109c8974fdc`.
-WEB meldet inzwischen die gesondert freigegebene Veröffentlichung in Arbeit;
-**der abschließende Live-/Datenbankbeleg steht noch aus**.
-Diese App-Aufgabe übernimmt ausschließlich Dokumentation, keine native Umsetzung.
+**Website/API seit 21. November, 16:12 Uhr Europe/Berlin veröffentlicht.**
+Deployment `dpl_7oepNowLC69PEfv3VwLotR9gzGu8` ist laut WEB READY, der tatsächliche
+www-Alias geprüft. Diese App-Aufgabe übernimmt ausschließlich Dokumentation,
+keine native Umsetzung.
 
-Der [gemeinsame Vertrag](home-crew-discretion.md) ist unverändert aus diesem
-Quellstand übernommen. Seine Statusangabe beschreibt den geprüften Vorabstand;
-spätere Produktionsnachweise werden getrennt dokumentiert.
+Der [gemeinsame Vertrag](home-crew-discretion.md) ist unverändert aus dem
+WEB-Dokumentationsstand `a880a26099e11c72c425eb92050a2cbc92d72ed0` übernommen.
+Dieser Folgecommit ändert nur fünf Dokumentationsdateien und wurde nicht erneut
+veröffentlicht; der Produktionscode bleibt `5cafc814`. Git-Abstammung und der
+reine Dokumentationsunterschied sind hier geprüft.
 
 ## Auswahl und Reichweite
 
@@ -51,14 +54,17 @@ Fehler- und Wiederholungszustände in den 17 unterstützten Sprachen abgleichen.
 
 `20261121145336_home_crew_visibility.sql` ergänzt ausschließlich die boolesche
 Spalte mit `NOT NULL DEFAULT true` in der vorhandenen Einstellungs-Tabelle;
-keine Änderung an RLS, Zugriffsrechten oder Profilveröffentlichungen. Der SQL-
-Quelltext ist hier nachgelesen, die Produktionswirkung hier nicht ausgeführt
-oder bestätigt. WEB übernimmt Migration, Schema-Prüfung und Veröffentlichung;
-kein paralleler Produktionslauf aus der älteren App-Arbeitsbasis.
+keine Änderung an RLS, Zugriffsrechten oder Profilveröffentlichungen. WEB hat die
+Migration vor Veröffentlichung angewandt. `schema-applied.json` bestätigt
+Standards, NOT NULL, false-Speicherung mit Dienstrechten und unveränderte bisherige
+Einstellungen/Zugriffsrechte. Die synthetische Testzeile wurde zurückgerollt;
+`schema-after.json` bestätigt ihre Abwesenheit und den privaten Zugriff.
+`schema-rest.json` belegt, dass der REST-Dienst das neue Feld kennt.
 
-Vor funktionaler nativer Übernahme den endgültigen Live-Commit, Schema-Nachweis,
-Standardwerte und bestätigte false-Speicherung aus dem Abschlussbeleg abgleichen.
-App-Implementierung, Installation und echte Geräteprüfung bleiben gesondert.
+Diese App-Aufgabe hat die drei Belege gelesen und die SQL-Prüfsumme mit dem
+Produktcommit verglichen. Keine eigene Datenbankoperation, erneute Migration
+oder Veröffentlichung. Die Serverabhängigkeit ist belegt; App-Implementierung,
+Installation und echte Geräteprüfung bleiben gesondert offen.
 
 ## Prüfnachweise und Grenzen
 
@@ -82,6 +88,23 @@ Einrichtung/Entwurf, SQL und die drei betroffenen Textschlüssel in allen 17
 Quellkatalogen nachgelesen. Eigene Prüfung: identischer Vertragsinhalt,
 Dokumentationsverweise und sauberer Diff; keine neuen Laufzeit-/Gerätetests und
 keine Sprachqualitätsfreigabe aus der reinen Schlüsselkontrolle.
+
+## Öffentliche Live-Abnahme laut WEB
+
+Vier zusätzliche öffentliche Browserfälle nach dem Livegang bestanden: WebKit
+Deutsch 390px, Spanisch 320px, Ungarisch 768px und Chromium Deutsch 1366px.
+Sie zeigen „Crew“ und zehn Profile ohne Neu-Badges, horizontalen Überlauf oder
+Seitenfehler. Zwei spätere Bildprüfungen bestätigen die geladenen sichtbaren
+Crew-Fotos ohne fehlgeschlagene Medienantworten. Die abgemeldete Einstellungs-API
+antwortet mit 401/no-store; die Einrichtung leitet mit 307 zur Anmeldung auf
+demselben Host weiter.
+
+Diese Livefälle sind von den 21 kontrollierten Vorabfällen getrennt. Es wurden
+keine echten Nutzereinstellungen für die Abnahme geändert. Die angemeldete
+Einrichtung/Speicherung bleibt durch kontrollierte Dienste geprüft; weder eine
+echte Nutzeranmeldung noch eine native Geräteabnahme daraus ableiten. Die lokale
+App-Aufgabe muss Übernahme, Eingabeerhalt und Bedienung auf dem Gerät gesondert
+belegen.
 
 WEB-Beleg: `/srv/cinegenius/handoffs/20261121-home-crew-discretion/receipt.json`.
 App-Empfang: `/srv/cinegenius/handoffs/20261121-app-home-crew-discretion-contract/receipt.json`.
