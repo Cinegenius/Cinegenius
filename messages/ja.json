@@ -13598,5 +13598,8 @@
   "NativeBrowseCounts": {
     "total": "合計",
     "loaded": "読込済み"
+  },
+  "NewsGallery": {
+    "creator": "作者"
   }
 }

@@ -13598,5 +13598,8 @@
   "NativeBrowseCounts": {
     "total": "totalt",
     "loaded": "inlästa"
+  },
+  "NewsGallery": {
+    "creator": "Upphovsperson"
   }
 }

@@ -13598,5 +13598,8 @@
   "NativeBrowseCounts": {
     "total": "всего",
     "loaded": "загружено"
+  },
+  "NewsGallery": {
+    "creator": "Автор"
   }
 }

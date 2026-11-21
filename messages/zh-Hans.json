@@ -13598,5 +13598,8 @@
   "NativeBrowseCounts": {
     "total": "总计",
     "loaded": "已加载"
+  },
+  "NewsGallery": {
+    "creator": "创作者"
   }
 }

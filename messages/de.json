@@ -13598,5 +13598,8 @@
   "NativeBrowseCounts": {
     "total": "gesamt",
     "loaded": "geladen"
+  },
+  "NewsGallery": {
+    "creator": "Urheber"
   }
 }

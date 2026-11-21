@@ -13598,5 +13598,8 @@
   "NativeBrowseCounts": {
     "total": "összes",
     "loaded": "betöltve"
+  },
+  "NewsGallery": {
+    "creator": "Alkotó"
   }
 }
