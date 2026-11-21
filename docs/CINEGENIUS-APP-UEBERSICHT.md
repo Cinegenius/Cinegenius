@@ -101,36 +101,43 @@ Diese Übersicht trennt die installierte App, ihre serverseitigen Ansichten, nat
 
 **Übergabe Internationalisierung (20.11.):** Website noch nicht veröffentlicht. Mehrwährungen und privates Mitgestalten sind vorbereitet; Vertrag `international-currency-feedback.md`, Belege `/srv/cinegenius/handoffs/20261120-international-feedback/`. Direkte Chat-Übergabe wegen Verbindungsfehler nicht zugestellt. Kein echter App-/KI-Test behauptet.
 
-## News-Erweiterung · 21. November 2026 (Website-Code live)
+## News-Erweiterung · 21. November 2026
 
-Galerie mit bis zu acht geschützten Bildern, sichtbaren Urheber-/Lizenz-/
-Archivnachweisen und Wiederholversuch; neue zustimmungsgebundene Artikelmessung
-mit privatem, schwellenbegrenzt aggregiertem Feed. Altimport-Ausblendung nur nach
-einer Admin-Einzelfreigabe ohne allgemeinen Publikationsgrant. Vertrag und offene
-Aktivierungsschritte: [News-Galerie und Nutzung](news-gallery-readership.md).
-Website-Code `a58ee77d` und Migration sind veröffentlicht. Echter privater
-Galerie-Upload und öffentliche Bildvorschau sind geprüft, Bildautomatik aktiviert.
-Der PostHog-Lesezugang fehlt noch. Native
-Abnahme durch APP offen, Smart-/Work-Release-Halt bleibt bestehen.
+**Live auf der Website:** Galerien mit bis zu acht geschützten Bildern, sichtbaren
+Urheber-/Lizenz-/Archivnachweisen und unveränderten Originalen. Die automatische
+Bildauswahl ist nach echtem privaten Upload, geprüftem Derivat und öffentlichem
+Artikeltest aktiviert. Der Ablaufdienst prüft eigene Veröffentlichungen; belegte
+Altimporte werden nur mit ihrer gesonderten Berechtigung ausgeblendet.
 
-**Gemeinsamer Prüfstand (21.11.; News separat live):** Währungen/Feedback und News
-sind unter `codex/international-news-ready-20261120` zusammengeführt. 166 gezielte
-Tests, 17 Sprachen und Designprüfung bestanden. Umfang und offene Aktivierung in
-[Gemeinsamer Prüfstand](international-news-release.md); vollständiger Build und
-exakter Commit im zugehörigen Handoff. Native Übernahme bleibt separat offen.
+**Datenschutz und Statistik:** Artikelbeobachtungen erfordern die erneuerte
+Einwilligung; bestehende Ablehnungen bleiben wirksam. Der private Lernfeed bleibt
+ohne PostHog-Lesezugang ausdrücklich unverfügbar. Keine künstlichen Leserzahlen
+und kein behauptetes Lernen ohne Daten.
 
-**News-Livebeleg:** `/srv/cinegenius/handoffs/20261121-news-gallery-release/`.
-Der Server liefert Galerie-Felder; Gast-/Fremdzugriffe werden abgewiesen. Der
-Nutzungsfeed meldet ohne separaten PostHog-Lesezugang ehrlich `unavailable`.
-Bildautomatik ist inzwischen aktiviert; echte App-Abnahme bleibt offen.
+**Geprüft:** Öffentliche Website in vier Browsergrößen (320/390/768/1440 px),
+Deutsch/Spanisch und mit drei Mexiko-Artikeln. Echte mobile Bildansicht mit Quelle,
+Lizenz und Archivjahr; 17 Sprachen in den isolierten Galerie-/Editor-Prüfungen.
+Der zusätzliche Übersetzungsfix `a44cdec2` ist live: 92 Prüfungen, Scrolltest auf
+Handy und Laptop sowie echte deutsche/spanische Übersetzungen bestanden.
+Festivalname/Archivdatum stimmen, Titel, Kurzfassung, Caption und Volltext werden
+übersetzt; Scrollen benötigt nur eine Artikelanfrage. Originale bleiben unverändert.
+Das ist keine vollständige menschliche Sprachabnahme aller dynamischen KI-Texte.
 
-Vier öffentliche Browsergrößen samt drei Mexiko-Artikeln und bestehendem Bild
-live geprüft; Einwilligungsablehnung in drei zusätzlichen Fällen wirksam. Der
-neue private Bildcanary deckte den Unterschied zwischen Original und bereinigtem
-WebP auf; NEWS hat den exakten Derivatnachweis ergänzt und die Bildautomatik aktiviert.
+**Noch offen:** PostHog-Lesezugang, native Abnahme und Beobachtung des ersten
+regulären Bildlaufs. Der iPhone-Simulator erreichte noch keine bedienbare App;
+Browserprüfungen ersetzen diese Abnahme nicht. Smart-/Work-App-Halt bleibt erhalten.
 
-**Galerie-Abschluss:** Ein echter neuer Artikel mit lizenziertem Archivbild ist
-regulär veröffentlicht und mobil mit sichtbaren Bildnachweisen geprüft. Die
-Bildauswahl ist aktiviert, der nächste geplante Bildlauf noch nicht beobachtet.
-Leserzahlen-Lernen wartet weiter auf den privaten PostHog-Lesezugang. Einzelne
-spanische KI-Formulierungen sind als redaktionelle Nacharbeit dokumentiert.
+Währungen und Ländervertreter-Feedback sind separat implementiert und geprüft,
+aber weiterhin nicht veröffentlicht. Dazu steht eine Veröffentlichungsfreigabe aus.
+Der gemeinsame Stand bestand 166 gezielte Prüfungen und den vollständigen Build;
+der News-Übersetzungsfix anschließend ebenfalls. Keine Summierung wiederholter Tests.
+
+Verträge: [News-Galerie und Nutzung](news-gallery-readership.md),
+[Internationaler Ausbau](international-currency-feedback.md),
+[Gemeinsamer Prüfstand](international-news-release.md).
+Aktueller Livebeleg: `/srv/cinegenius/handoffs/20261121-news-gallery-release/`.
+
+**App-Stand:** Die genannten Veröffentlichungen betreffen Website und gemeinsame
+Schnittstellen. Die native Oberfläche, Installation und Geräteprüfung bleiben
+eigenständige APP-Arbeit. Das Handoff enthält geprüfte Commits und offene Grenzen;
+die direkte Chat-Zustellung war gestört.

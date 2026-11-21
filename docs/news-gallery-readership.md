@@ -181,3 +181,28 @@ Links, kein Überlauf und keine ungewollte Messung. Die automatische spanische
 Formulierung des Festivalnamens/Datums braucht redaktionellen Feinschliff;
 `spanish-news-language-followup.json` hält die konkreten Befunde fest. Keine
 vollständige sprachliche Freigabe aller dynamischen KI-Texte oder native Abnahme.
+
+## News-Übersetzung: Live-Nachprüfung 21. November
+
+Website-Stand `a44cdec2` wurde separat über den bewachten Produktionsweg veröffentlicht
+(`dpl_CNwbQMBoLfLjDZfxpsg9txSL5rFd`, READY). Der echte Test in WebKit/de/es bestätigt
+unveränderte Originale, den geschützten Festivalnamen, korrekt formatierte Archivdaten
+und vollständige Übersetzung von Titel, Summary, Caption und Beschreibung.
+Die vorher gemeldeten dauerhaft fehlenden Texte waren beim Sichtbarwerden nicht
+reproduzierbar; die Namen-/Datumsfehler waren real und sind korrigiert.
+
+`lib/news-translation.ts` führt verifizierte offizielle Veranstaltungsnamen als
+Glossar ohne Artikel-ID-Ausnahmen und formatiert eindeutig validierte englische
+Redaktionsdaten als ganze unveränderliche Fakten. Ungültige/mehrdeutige Daten
+werden nicht geraten. `news-v2` verändert nur News-Fingerprints; keine globale
+Cacheleerung, Originaländerung oder zusätzliche Migration. Die Shared-Komponente
+behält einmal sichtbare Texte innerhalb von Seite/Konto/Sprache bei. Tatsächlich
+eine Übersetzungsanfrage pro Artikel trotz Scrollen.
+
+92 gezielte Prüfungen, vollständiger Build und zwei Komponenten-Browserfälle
+bestanden. Echte Modellantworten anschließend in Deutsch und Spanisch geprüft.
+Automatische Formulierungen bleiben redaktionell prüfbar, beispielsweise die
+deutsche Ordinalform „46te“; keine pauschale sprachliche Abnahme aller Inhalte.
+Rechte-/Urhebertexte bleiben absichtlich im Original. Native Abnahme weiterhin offen.
+Belege: `translation-correction.json`, `translation-live-after.json` und
+`translation-browser/results.json` im aktuellen News-Release-Handoff.

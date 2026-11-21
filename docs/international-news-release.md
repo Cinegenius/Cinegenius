@@ -1,8 +1,8 @@
 # Gemeinsamer Prüfstand: internationale Preise, Länderfeedback und News
 
 Stand: 21. November 2026. Branch `codex/international-news-ready-20261120`.
-Dies ist ein gemeinsamer Implementierungsstand. Nur der News-Anteil `a58ee77d`
-ist inzwischen separat veröffentlicht; Währungen/Feedback bleiben unveröffentlicht.
+Dies ist ein gemeinsamer Implementierungsstand. Nur der News-Anteil `a58ee77d` und sein Übersetzungsfix `a44cdec2`
+sind inzwischen separat veröffentlicht; Währungen/Feedback bleiben unveröffentlicht.
 Er vereint die getrennt geprüften Pakete `65651599` (Währungen/Feedback) und
 `a58ee77d` (News) auf der veröffentlichten Grundlage `3bd731f2`.
 
@@ -49,8 +49,10 @@ Der vollständige gemeinsame Produktionsbuild ist am 20. November 2026 um
 3. Für `/api/editorial/readership` den privaten lesenden PostHog-Zugang einrichten
    und den echten Feed prüfen; derzeit fehlt `POSTHOG_NEWS_READ_KEY`. Die vorhandene
    Chat-Verbindung ist kein dauerhaftes Server-Zugriffsrecht.
-4. Die neuen KI-Feedbackantworten und öffentlichen Bildübersetzungen mit dem echten
-   Anbieter prüfen. Vorher nicht als vollständige sprachliche Abnahme darstellen.
+4. Die neuen KI-Feedbackantworten mit dem echten Anbieter prüfen. News-Titel,
+   Kurzfassung, Caption und Volltext sind nach Korrektur mit echten deutschen und
+   spanischen Modellantworten geprüft. Keine pauschale sprachliche Abnahme aller
+   dynamischen Inhalte oder Gleichsetzung mit der nativen App.
 5. NEWS-Medien sind nach echtem privatem Upload, exakt geprüftem Derivat,
    Bildrechtenachweis und öffentlicher Artikelprüfung aktiviert. Die beiden bekannten Legacy-Imports hat NEWS bereits
    regulär über die Adminoberfläche verborgen; keine neue Freigabe hierfür setzen.
@@ -66,3 +68,8 @@ Verbindungsfehlers nicht zugestellt werden. Der tägliche Website-Prüfagent ble
 deaktiviert. Das bestehende Design bleibt erhalten.
 
 Separater News-Livebeleg: `/srv/cinegenius/handoffs/20261121-news-gallery-release/`.
+
+Der News-Übersetzungsfix besteht zusätzlich 92 gezielte Prüfungen, den vollständigen
+Build, zwei Komponenten-Browserfälle und echte Modellprüfungen auf der Website.
+Offizielle Festivalnamen und klar erkennbare Daten werden vor der KI geschützt;
+die Quelltexte bleiben unverändert. Keine neue Datenbankmigration.

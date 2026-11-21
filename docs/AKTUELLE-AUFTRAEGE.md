@@ -41,3 +41,10 @@ exakter Commit im zugehörigen Handoff. Native Übernahme bleibt separat offen.
 
 News-Veröffentlichung und Live-API-Prüfung: `/srv/cinegenius/handoffs/20261121-news-gallery-release/`.
 Währungen/Feedback verbleiben als geprüftes, unveröffentlichtes Paket.
+
+**News-Nachbesserung live (21.11., `a44cdec2`):** Tatsächliche Fehler bei Festivalnamen
+und Archivdaten korrigiert. Vollständige Texte in Deutsch/Spanisch mit der echten
+KI geprüft; Scrollen lädt den Artikel nicht erneut zur Übersetzung. 92 gezielte
+Prüfungen und vollständiger Build bestanden. Redaktionelle Sprachfeinarbeit bleibt
+möglich; native Abnahme, PostHog-Lesezugang sowie die Freigabe des getrennten
+Währungs-/Feedbackpakets bleiben offen.
