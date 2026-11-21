@@ -38,6 +38,14 @@ Der erste Auditlauf stoppte an diesem Befund. Der Folgelauf zeichnet negative F�
 
 ## Angekündigter Länder-Vertrag aus WEB · 20. November
 
+**Nachtrag 21. November:** Die nachfolgende Ankündigung beschreibt den damaligen
+Arbeitsstand. WEB hat die Länderpriorisierung inzwischen veröffentlicht und
+live geprüft; Beleg `/srv/cinegenius/handoffs/20261120-country-first-release/receipt.json`.
+Der aktuelle [Vertrag](country-first-discovery.md) ist für APP übernommen;
+funktionaler nativer Abgleich und Geräteprüfung bleiben offen. Auch Währungen
+und Mitgestalten sind inzwischen auf der Website veröffentlicht, siehe
+[App-Abgleich](app-international-handoff-20261121.md).
+
 WEB CODEX meldet die Umsetzung auf `codex/country-first-discovery-20261120`.
 Der Gesamtstand ist **noch ungeprüft, nicht übernommen und nicht veröffentlicht**.
 Die folgenden Regeln dokumentieren die vorgesehene gemeinsame Schnittstelle,
