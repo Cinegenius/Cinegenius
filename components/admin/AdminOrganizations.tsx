@@ -2,8 +2,10 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
+import { useUser } from "@clerk/nextjs";
 import { useLocale, useTranslations } from "next-intl";
 import { Building2, CalendarDays, ExternalLink, RefreshCw, Search } from "lucide-react";
+import OrganizationEntryBrowser from "@/components/organizations/OrganizationEntryBrowser";
 import NewsGallery from "@/components/organizations/NewsGallery";
 import MediaImage from "@/components/MediaImage";
 import { confirmDialog, promptDialog, dismissNativeDialog } from "@/lib/native-dialog";
@@ -88,6 +90,10 @@ function responsibleName(value: Record<string, unknown> | null) {
 }
 
 export function AdminOrganizations() {
+  const { user, isLoaded } = useUser();
+  return isLoaded && user ? <AdminOrganizationWorkspace key={user.id} /> : null;
+}
+function AdminOrganizationWorkspace() {
   useEffect(() => () => dismissNativeDialog(), []);
   const uiText = useTranslations();
 
@@ -101,6 +107,25 @@ export function AdminOrganizations() {
   const ot = (key: string) => organizationText(key as Parameters<typeof organizationText>[0]);
   const [payload, setPayload] = useState<Payload>({ organizations: [], entries: [] });
   const [search, setSearch] = useState("");
+  const [sectionMode, setSectionMode] = useState<'entries' | 'organizations'>('entries');
+  const [browserRevision, setBrowserRevision] = useState(0);
+  const [opening, setOpening] = useState(false);
+  const detailRequest = useRef<AbortController | null>(null);
+  const detailRef = useRef<HTMLElement>(null);
+  useEffect(() => () => detailRequest.current?.abort(), []);
+  const openEntry = async (id: string) => {
+    detailRequest.current?.abort();
+    const controller = new AbortController(); detailRequest.current = controller;
+    setOpening(true); setError(null); setPayload(current => ({ ...current, entries: [] }));
+    try {
+      const result = await loadJson<{ entry: EntryItem }>(`/api/admin/organizations/entry-browser?id=${encodeURIComponent(id)}`, { signal: controller.signal });
+      if (!controller.signal.aborted) {
+        setPayload(current => ({ ...current, entries: [result.entry] }));
+        requestAnimationFrame(() => { detailRef.current?.scrollIntoView({ block: 'start' }); detailRef.current?.focus({ preventScroll: true }); });
+      }
+    } catch { if (!controller.signal.aborted) setError(t('loadError')); }
+    finally { if (!controller.signal.aborted) setOpening(false); }
+  };
   const [submittedOnly, setSubmittedOnly] = useState(true);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -114,16 +139,17 @@ export function AdminOrganizations() {
     setLoading(true);
     setError(null);
     try {
-      const params = new URLSearchParams({ submittedOnly: String(submittedOnly) });
+      const params = new URLSearchParams({ submittedOnly: String(submittedOnly), summary: "1" });
       if (search.trim()) params.set("search", search.trim());
       setGrantsLoaded(false);
       const grantResponse = await fetch("/api/admin/organizations/editorial-grants", { cache: "no-store", signal: controller.signal });
-      if (grantResponse.ok) {
+      if (grantResponse.ok && !controller.signal.aborted) {
         const result = await grantResponse.json();
         setGrants(Object.fromEntries(result.grants.map((grant: { organization_id: string; enabled: boolean; updated_at: string }) => [grant.organization_id, grant])));
         setGrantsLoaded(true);
       }
-      setPayload(await loadJson<Payload>(`/api/admin/organizations?${params}`, { signal: controller.signal }));
+      const result = await loadJson<Payload>(`/api/admin/organizations?${params}`, { signal: controller.signal });
+      if (!controller.signal.aborted) setPayload(current => ({ ...current, organizations: result.organizations }));
     } catch {
       if (!controller.signal.aborted) setError(t("loadError"));
     } finally {
@@ -132,9 +158,10 @@ export function AdminOrganizations() {
   }, [search, submittedOnly, t]);
 
   useEffect(() => {
+    if (sectionMode !== "organizations") return;
     const timer = window.setTimeout(load, 250);
     return () => { window.clearTimeout(timer); pendingLoad.current?.abort(); };
-  }, [load]);
+  }, [load, sectionMode]);
 
   async function changeStatus(kind: ItemKind, id: string, status: ModerationStatus) {
     const item = (kind === "organization" ? payload.organizations : payload.entries).find(item => item.id === id);
@@ -151,7 +178,9 @@ export function AdminOrganizations() {
         body: JSON.stringify({ kind, id, status, reason: reason.trim(), reviewed: status === "approved", expectedUpdatedAt: item.updated_at }),
       });
       setMessage(t("saved"));
-      await load();
+      if (kind === 'entry') setPayload(current => ({ ...current, entries: [] }));
+      setBrowserRevision(value => value + 1);
+      if (kind === "organization") await load();
     } catch (actionError) {
       setError(actionError instanceof Error && actionError.message === "conflict" ? t("conflict") : actionError instanceof Error && actionError.message === "parent_required" ? t("parentRequired") : t("saveError"));
     } finally {
@@ -192,7 +221,9 @@ export function AdminOrganizations() {
       <div className="rounded-xl border border-border bg-bg-elevated p-4 text-sm text-text-secondary">
         {t("description")}
       </div>
-      <div className="flex flex-wrap items-center gap-3">
+      <div className="flex flex-wrap gap-2">{(['entries', 'organizations'] as const).map(value => <button key={value} type="button" onClick={() => setSectionMode(value)} aria-pressed={sectionMode === value} className={`min-h-11 rounded-xl border px-4 text-sm ${sectionMode === value ? 'border-gold/40 bg-gold/10 text-gold' : 'border-border text-text-secondary'}`}>{t(value)}</button>)}</div>
+      {sectionMode === 'entries' && <OrganizationEntryBrowser admin revision={browserRevision} disabled={opening || !!acting} onSelect={id => void openEntry(id)} />}
+      {sectionMode === 'organizations' && <div className="flex flex-wrap items-center gap-3">
         <label className="relative min-w-0 flex-1 sm:max-w-md">
           <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-text-muted" />
           <input value={search} onChange={(event) => setSearch(event.target.value)} placeholder={t("search")} className="min-h-11 w-full rounded-xl border border-border bg-bg-secondary py-2.5 pl-9 pr-3 text-base sm:text-sm text-text-primary placeholder:text-text-muted" />
@@ -203,11 +234,13 @@ export function AdminOrganizations() {
         </label>
         <button onClick={load} className="inline-flex min-h-11 items-center gap-2 rounded-xl border border-border px-3 text-sm text-text-secondary"><RefreshCw size={14} />{t("refresh")}</button>
       </div>
+      }
+      {opening && <p role="status" className="text-sm text-text-muted">{t("loading")}</p>}
       {error && <div role="alert" className="rounded-xl border border-crimson/30 bg-crimson/10 px-4 py-3 text-sm text-crimson-light">{error}</div>}
       {message && <div role="status" className="rounded-xl border border-success/30 bg-success/10 px-4 py-3 text-sm text-success">{message}</div>}
-      {loading && <p className="py-8 text-center text-sm text-text-muted">{t("loading")}</p>}
+      {loading && sectionMode === 'organizations' && <p className="py-8 text-center text-sm text-text-muted">{t("loading")}</p>}
 
-      {!loading && <section className="space-y-3">
+      {!loading && sectionMode === "organizations" && <section className="space-y-3">
         <h2 className="flex items-center gap-2 font-semibold text-text-primary"><Building2 size={17} />{t("organizations")} <span className="text-sm font-normal text-text-muted">({payload.organizations.length})</span></h2>
         {!payload.organizations.length ? <p className="rounded-xl border border-dashed border-border p-8 text-center text-sm text-text-muted">{t("empty")}</p> : payload.organizations.map((organization) => (
           <article key={organization.id} className="rounded-xl border border-border bg-bg-secondary p-4">
@@ -236,8 +269,8 @@ export function AdminOrganizations() {
         ))}
       </section>}
 
-      {!loading && <section className="space-y-3">
-        <h2 className="flex items-center gap-2 font-semibold text-text-primary"><CalendarDays size={17} />{t("entries")} <span className="text-sm font-normal text-text-muted">({payload.entries.length})</span></h2>
+      {sectionMode === "entries" && payload.entries.length > 0 && <section ref={detailRef} tabIndex={-1} className="scroll-mt-28 space-y-3">
+        <h2 className="flex items-center gap-2 font-semibold text-text-primary"><CalendarDays size={17} />{t("entries")}</h2>
         {!payload.entries.length ? <p className="rounded-xl border border-dashed border-border p-8 text-center text-sm text-text-muted">{t("empty")}</p> : payload.entries.map((entry) => (
           <article key={entry.id} className="rounded-xl border border-border bg-bg-secondary p-4">
             <div className="grid gap-4 sm:grid-cols-[11rem_minmax(0,1fr)_auto] sm:items-start">

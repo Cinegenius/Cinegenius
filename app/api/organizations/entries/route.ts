@@ -59,7 +59,7 @@ export async function PATCH(request: NextRequest) {
   if (session instanceof NextResponse) return session;
   const body = await request.json().catch(() => null) as Record<string, unknown> | null;
   const id = clean(body?.id, 60);
-  const { data: existing, error: readError } = await db.from("organization_entries").select("organization_id,moderation_status,updated_at").eq("id", id).maybeSingle();
+  const { data: existing, error: readError } = await db.from("organization_entries").select("organization_id,moderation_status,updated_at,city,place_country_code,place_city_id").eq("id", id).maybeSingle();
   if (readError) return NextResponse.json({ error: "load" }, { status: 503 });
   if (!existing || !await canManageOrganization(existing.organization_id, session.userId)) return NextResponse.json({ error: "forbidden" }, { status: 403 });
   if (typeof body?.expectedUpdatedAt !== "string" || body.expectedUpdatedAt !== existing.updated_at) return NextResponse.json({ error: "conflict" }, { status: 409 });
@@ -76,9 +76,14 @@ export async function PATCH(request: NextRequest) {
   if (startsAt && endsAt && endsAt < startsAt) return NextResponse.json({ error: "date" }, { status: 400 });
   const submit = body.submit === true; const now = new Date().toISOString();
   const nextStatus = submit || ["approved", "ended"].includes(existing.moderation_status) ? "submitted" : existing.moderation_status;
+  // A country-only editorial article has no city to edit. Saving its text must
+  // not erase the separately recorded country when that empty place is unchanged.
+  const keepCountryOnly = !!existing.place_country_code && !existing.city && !existing.place_city_id
+    && !clean(body.city, 320) && !body.selected_place_city_id;
+
   const patch: Record<string, unknown> = {
     entry_type: body.entryType, title, summary: clean(body.summary, 500), description: clean(body.description, 12000),
-    topic: body.topic, format: body.format, ...cityWriteFields(clean(body.city, 320), body.selected_place_city_id), venue: body.entryType === "news" ? "" : clean(body.venue, 180),
+    topic: body.topic, format: body.format, ...(keepCountryOnly ? {} : cityWriteFields(clean(body.city, 320), body.selected_place_city_id)), venue: body.entryType === "news" ? "" : clean(body.venue, 180),
     starts_at: startsAt, ends_at: endsAt, registration_url: registrationUrl, external_url: externalUrl, image_url: image.url, ...(gallery.gallery !== undefined ? {image_gallery: gallery.gallery} : {}),
     moderation_status: nextStatus, last_actor_user_id: session.userId, updated_at: now,
   };

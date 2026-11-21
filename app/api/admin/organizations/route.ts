@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { requireAdmin } from "@/lib/auth";
 import { db } from "@/lib/db";
+import { readableOrganizations } from "@/lib/organization-entry-browser-server";
 import { finishAdminAudit, startAdminAudit, validateAdminReason } from "@/lib/admin-audit";
 
 const ORGANIZATION_STATUSES = ["approved", "changes_requested", "rejected", "hidden"] as const;
@@ -20,6 +21,18 @@ export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
   const search = cleanSearch(searchParams.get("search"));
   const submittedOnly = searchParams.get("submittedOnly") === "true";
+  // The new management UI loads article summaries separately and no longer
+  // truncates organizations at the legacy endpoint's first hundred rows.
+  if (searchParams.get('summary') === '1') {
+    try {
+      const all = await readableOrganizations({ admin: true });
+      const term = search.toLocaleLowerCase();
+      const organizations = all.filter(item => (!submittedOnly || item.moderation_status === 'submitted')
+        && (!term || [item.name, item.city, item.region].some(value => String(value ?? '').toLocaleLowerCase().includes(term))))
+        .sort((a, b) => b.created_at.localeCompare(a.created_at));
+      return NextResponse.json({ organizations, entries: [] }, { headers: { 'Cache-Control': 'private, no-store' } });
+    } catch { return NextResponse.json({ error: 'load' }, { status: 503, headers: { 'Cache-Control': 'private, no-store' } }); }
+  }
   const limit = 100;
 
   let organizationsQuery = db

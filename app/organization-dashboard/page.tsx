@@ -10,8 +10,8 @@ export default async function OrganizationDashboardPage() {
   const { userId } = await auth();
   if (!userId) redirect("/sign-in?redirect_url=%2Forganization-dashboard");
   const [workspace, responsiblePerson] = await Promise.all([
-    organizationWorkspace(userId),
+    organizationWorkspace(userId, false),
     accountResponsiblePerson(userId),
   ]);
-  return <OrganizationDashboardClient initialWorkspace={workspace} responsiblePerson={responsiblePerson} />;
+  return <OrganizationDashboardClient key={userId} accountId={userId} initialWorkspace={workspace} responsiblePerson={responsiblePerson} />;
 }

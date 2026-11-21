@@ -1,8 +1,8 @@
 # Internationale Preise und Ländervertreter-Feedback
 
 Stand: 21.11.2026. Markus hat die Veröffentlichung beider Website-Funktionen mit
-„dann stell live“ ausdrücklich freigegeben. Das Paket wird auf den aktuellen
-Hauptstand mit den veröffentlichten Newsfotos übernommen. Der tatsächliche
+„dann stell live“ ausdrücklich freigegeben. Das Paket ist auf dem aktuellen
+Hauptstand mit den veröffentlichten Newsfotos als `ab74924d` veröffentlicht. Der tatsächliche
 Veröffentlichungs- und Live-Prüfbeleg liegt unter
 `/srv/cinegenius/handoffs/20261121-international-release/receipt.json`.
 Die bereits veröffentlichte Länderpriorisierung und CineGenius Redaktion bleiben
@@ -48,7 +48,18 @@ und `schema-live-verified.json` im genannten Release-Ordner.
 
 ## Mitgestalten
 
-- Dezenter Zugang im persönlichen Bereich unter `/mitgestalten`.
+Gesprächsstil (21.11.): Frage → Antwort → nächste Frage. Genies sichtbare Antwort
+ist nur eine kurze konkrete Frage, ohne Dank, Bestätigung oder Zusammenfassung.
+Der Bericht wird weiterhin getrennt aus tatsächlichen Aussagen abgeleitet und
+nur nach ausdrücklicher Bestätigung eingereicht. Die Regel gilt in jeder
+ausgewählten Sprache, auch bei Fortsetzung eines älteren ausführlichen Verlaufs.
+
+
+- Zugang in „Mein Bereich“ als reguläre Zeile **Mitgestalten** direkt vor
+  **Einstellungen**, für alle angemeldeten Mitglieder, unabhängig vom Adminstatus.
+  Ziel bleibt `/mitgestalten`; kein zusätzlicher Hintergrundabruf.
+  Einstiegskorrektur `bb26a335` am 21.11.2026 auf der Website veröffentlicht;
+  die neu vorbereiteten App-Änderungen bleiben angehalten. Nachweis: `/srv/cinegenius/handoffs/20261121-feedback-entry/receipt.json`.
 - Jede Person meldet sich mit dem eigenen Konto an. Getrennte Gespräche und private
   Entwürfe über den bestehenden Recovery-Dienst; kein gemeinsamer Chatverlauf.
 - Admin erzeugt unter `/mitgestalten/koordination` Links mit `lang` und `country`,
@@ -95,7 +106,7 @@ Web-Ansicht ist kein Nachweis einer nativen Implementierung. Handoff und Prüfbe
 `/srv/cinegenius/handoffs/20261120-international-feedback/`.
 Die frühere Übergabe war wegen der Chat-Verbindung gestört. APP Entwicklung wurde
 am 21.11. über die neue ausdrückliche Freigabe und den laufenden Website-Livegang
-informiert; der abschließende Release-Beleg wird separat weitergegeben.
+informiert; der aktuelle Release-Beleg liegt im neuen Übergabeordner.
 
 ## Prüfstand
 

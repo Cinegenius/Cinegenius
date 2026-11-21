@@ -4,8 +4,10 @@ import { placeInputValue } from "@/lib/places/core";
 
 import PlaceField from "@/components/PlaceField";
 
-import { FormEvent, useMemo, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
+import { useUser } from "@clerk/nextjs";
+import OrganizationEntryBrowser from "./OrganizationEntryBrowser";
 import { useTranslations } from "next-intl";
 import { CalendarDays, ExternalLink, ImagePlus, Loader2, Newspaper, Plus, Save, Trash2 } from "lucide-react";
 import NewsGalleryEditor from "./NewsGalleryEditor";
@@ -43,7 +45,11 @@ function localDate(value: string | null) {
   return local.toISOString().slice(0, 16);
 }
 
-export default function OrganizationDashboardClient({ initialWorkspace, responsiblePerson }: { initialWorkspace: Workspace; responsiblePerson: ResponsiblePerson }) {
+export default function OrganizationDashboardClient(props: { accountId: string; initialWorkspace: Workspace; responsiblePerson: ResponsiblePerson }) {
+  const { user, isLoaded } = useUser();
+  return isLoaded && user?.id === props.accountId ? <OrganizationWorkspace key={user.id} {...props} /> : null;
+}
+function OrganizationWorkspace({ initialWorkspace, responsiblePerson }: { initialWorkspace: Workspace; responsiblePerson: ResponsiblePerson }) {
   const uiText = useTranslations();
 
   const t = useTranslations("Organizations");
@@ -59,7 +65,25 @@ export default function OrganizationDashboardClient({ initialWorkspace, responsi
 
   const organizationDraft = useFormDraft({ formKey: `organization:${organization.id || "new"}`, value: organization, restore: setOrganization, enabled: mode === "organization", busy: busy || uploading !== null });
   const entryDraft = useFormDraft({ formKey: `organization-entry:${entry.id || "new"}`, value: entry, restore: setEntry, enabled: mode === "entry", busy: busy || uploading !== null });
-  const entries = useMemo(() => workspace.entries.filter(item => !entry.organizationId || item.organization_id === entry.organizationId), [workspace.entries, entry.organizationId]);
+  const [editorOpen, setEditorOpen] = useState(false);
+  const [browserRevision, setBrowserRevision] = useState(0);
+  const [opening, setOpening] = useState(false);
+  const detailRequest = useRef<AbortController | null>(null);
+  const editorRef = useRef<HTMLDivElement>(null);
+  useEffect(() => () => detailRequest.current?.abort(), []);
+  const openEntry = async (id: string) => {
+    if (operationPending.current || busy || uploading) return;
+    detailRequest.current?.abort();
+    const controller = new AbortController(); detailRequest.current = controller;
+    setOpening(true); setMessage(null);
+    try {
+      const response = await fetch(`/api/organizations/entry-browser?id=${encodeURIComponent(id)}`, { cache: 'no-store', signal: controller.signal });
+      if (!response.ok) throw new Error('load');
+      const result = await response.json();
+      if (!controller.signal.aborted) await changeForm(() => { editEntry(result.entry); setEditorOpen(true); requestAnimationFrame(() => { editorRef.current?.scrollIntoView({ block: 'start' }); editorRef.current?.focus({ preventScroll: true }); }); });
+    } catch { if (!controller.signal.aborted) setMessage({ tone: 'error', text: uiText('OrganizationBrowser.loadError') }); }
+    finally { if (!controller.signal.aborted) setOpening(false); }
+  };
 
   const leaveOrganization = (organizationId: string) => {
     // Access has already been revoked server-side. Remove the stale workspace
@@ -76,6 +100,7 @@ export default function OrganizationDashboardClient({ initialWorkspace, responsi
       void organizationDraft.discard();
       setOrganization({ id: "", expectedUpdatedAt: "", name: "", description: "", topics: [], city: "", region: "", websiteUrl: "", publicContactEmail: "", logoUrl: "", responsiblePerson: responsiblePersonDraft(responsiblePerson) });
     }
+    setBrowserRevision(value => value + 1);
     setMode("organization");
   };
 
@@ -91,8 +116,9 @@ export default function OrganizationDashboardClient({ initialWorkspace, responsi
     } finally { operationPending.current = false; }
   };
   const refresh = async () => {
-    const response = await fetch("/api/organizations/workspace", { cache: "no-store" });
+    const response = await fetch("/api/organizations/workspace?summary=1", { cache: "no-store" });
     if (response.ok) setWorkspace((await response.json()).workspace);
+    setBrowserRevision(value => value + 1);
   };
   const save = async (kind: "organization" | "entry", submit: boolean) => {
     if (operationPending.current || uploading) return;
@@ -120,7 +146,6 @@ export default function OrganizationDashboardClient({ initialWorkspace, responsi
     } catch (error) { setMessage({ tone: "error", text: t(error instanceof Error && error.message === "conflict" ? "conflict" : "saveError") }); }
     finally { operationPending.current = false; setBusy(false); }
   };
-  const submit = (kind: "organization" | "entry", publish: boolean) => (event: FormEvent) => { event.preventDefault(); void save(kind, publish); };
 
   const uploadImage = async (kind: "organization" | "entry", file: File | null) => {
     if (!file || operationPending.current || uploading) return;
@@ -153,8 +178,13 @@ export default function OrganizationDashboardClient({ initialWorkspace, responsi
     <div className="mb-8 flex flex-wrap items-start justify-between gap-4"><div><p className="eyebrow">{t("dashboardEyebrow")}</p><h1 className="font-display text-4xl text-text-primary">{t("dashboardTitle")}</h1><p className="mt-2 max-w-2xl text-text-secondary">{t("dashboardDescription")}</p></div><Link href="/news" className="inline-flex min-h-11 items-center gap-2 rounded-xl border border-border px-4 py-2 text-text-primary">{t("publicNews")} <ExternalLink size={16} /></Link></div>
     <div className="mb-6 flex flex-wrap gap-2"><button type="button" onClick={() => void changeForm(() => setMode("organization"))} className={`min-h-11 rounded-xl px-4 py-2 font-semibold ${mode === "organization" ? "bg-gold text-black" : "border border-border text-text-secondary"}`}>{t("organizations")}</button><button type="button" onClick={() => void changeForm(() => setMode("entry"))} disabled={!workspace.organizations.length} className={`min-h-11 rounded-xl px-4 py-2 font-semibold disabled:opacity-40 ${mode === "entry" ? "bg-gold text-black" : "border border-border text-text-secondary"}`}>{t("entries")}</button></div>
     {message && <p role="status" className={`mb-5 rounded-xl border px-4 py-3 text-sm ${message.tone === "ok" ? "border-success/30 bg-success/10 text-success" : "border-crimson/30 bg-crimson/10 text-crimson-light"}`}>{message.text}</p>}
-    <div className="grid min-w-0 grid-cols-1 gap-6 lg:grid-cols-[minmax(0,1fr)_22rem]">
-      {mode === "organization" ? <form onInputCapture={organizationDraft.resume} onClickCapture={organizationDraft.resume} onSubmit={submit("organization", false)} className="min-w-0 space-y-5 rounded-2xl border border-border bg-bg-secondary p-5 sm:p-7">
+    {mode === "entry" && <div className="mb-6 space-y-4">
+      <div className="flex justify-end"><button type="button" disabled={opening || busy || uploading !== null} onClick={() => void changeForm(() => { setEntry(emptyEntry(workspace.organizations[0]?.id)); setEditorOpen(true); requestAnimationFrame(() => { editorRef.current?.scrollIntoView({ block: 'start' }); editorRef.current?.focus({ preventScroll: true }); }); })} className="inline-flex min-h-11 items-center gap-2 rounded-xl border border-border px-4 text-sm text-gold"><Plus size={16} />{t('createEntry')}</button></div>
+      <OrganizationEntryBrowser revision={browserRevision} disabled={opening || busy || uploading !== null} onSelect={id => void openEntry(id)} />
+      {opening && <p role="status" className="text-sm text-text-muted">{uiText('OrganizationBrowser.loading')}</p>}
+    </div>}
+    <div ref={editorRef} tabIndex={-1} className={`scroll-mt-28 ${mode === 'organization' ? 'grid min-w-0 grid-cols-1 gap-6 lg:grid-cols-[minmax(0,1fr)_22rem]' : editorOpen ? 'min-w-0' : 'hidden'}`}>
+      {mode === "organization" ? <form onInputCapture={organizationDraft.resume} onClickCapture={organizationDraft.resume} onSubmit={event => { event.preventDefault(); void save("organization", false); }} className="min-w-0 space-y-5 rounded-2xl border border-border bg-bg-secondary p-5 sm:p-7">
         <fieldset disabled={busy || uploading !== null} className="contents">
         <div className="flex items-center gap-2"><Newspaper className="text-gold" /><h2 className="text-xl font-semibold text-text-primary">{organization.id ? t("editOrganization") : t("createOrganization")}</h2></div>
         <label className="block text-sm text-text-primary">{t("name")} *<input className={`${input} mt-1`} required minLength={2} maxLength={140} value={organization.name} onChange={event => setOrganization({ ...organization, name: event.target.value })} /></label>
@@ -186,7 +216,7 @@ export default function OrganizationDashboardClient({ initialWorkspace, responsi
         <FormDraftStatus draft={organizationDraft} />
         <div className="flex flex-wrap gap-3"><button disabled={busy || uploading !== null} className="inline-flex min-h-11 items-center gap-2 rounded-xl border border-border px-4 py-2 font-semibold text-text-primary disabled:opacity-50"><Save size={17} />{t("saveDraft")}</button><button type="button" disabled={busy || uploading !== null} onClick={() => void save("organization", true)} className="min-h-11 rounded-xl bg-gold px-4 py-2 font-semibold text-black disabled:opacity-50">{t("submitReview")}</button></div>
         </fieldset>
-      </form> : <form onInputCapture={entryDraft.resume} onClickCapture={entryDraft.resume} onSubmit={submit("entry", false)} className="min-w-0 space-y-5 rounded-2xl border border-border bg-bg-secondary p-5 sm:p-7">
+      </form> : <form onInputCapture={entryDraft.resume} onClickCapture={entryDraft.resume} onSubmit={event => { event.preventDefault(); void save("entry", false); }} className="min-w-0 space-y-5 rounded-2xl border border-border bg-bg-secondary p-5 sm:p-7">
         <fieldset disabled={busy || uploading !== null} className="contents">
         <div className="flex items-center gap-2"><CalendarDays className="text-gold" /><h2 className="text-xl font-semibold text-text-primary">{entry.id ? t("editEntry") : t("createEntry")}</h2></div>
         <label className="block text-sm text-text-primary">{t("organization")} *<select required disabled={!!entry.id} className={`${input} mt-1`} value={entry.organizationId} onChange={event => setEntry({ ...entry, organizationId: event.target.value })}><option value="">{t("choose")}</option>{workspace.organizations.map(item => <option key={item.id} value={item.id}>{item.name}</option>)}</select></label>
@@ -209,16 +239,16 @@ export default function OrganizationDashboardClient({ initialWorkspace, responsi
         <div className="flex flex-wrap gap-3"><button disabled={busy || uploading !== null} className="inline-flex min-h-11 items-center gap-2 rounded-xl border border-border px-4 py-2 font-semibold text-text-primary disabled:opacity-50"><Save size={17} />{t("saveDraft")}</button><button type="button" disabled={busy || uploading !== null} onClick={() => void save("entry", true)} className="min-h-11 rounded-xl bg-gold px-4 py-2 font-semibold text-black disabled:opacity-50">{t("submitReview")}</button></div>
         </fieldset>
       </form>}
-      <aside className="min-w-0 space-y-4"><div className="flex items-center justify-between"><h2 className="font-semibold text-text-primary">{mode === "organization" ? t("yourOrganizations") : t("yourEntries")}</h2><button type="button" disabled={!(mode === "organization" ? organization.id : entry.id)} onClick={() => void changeForm(() => mode === "organization" ? setOrganization({ id: "", expectedUpdatedAt: "", name: "", description: "", topics: [], city: "", region: "", websiteUrl: "", publicContactEmail: "", logoUrl: "", responsiblePerson: responsiblePersonDraft(responsiblePerson) }) : setEntry(emptyEntry(workspace.organizations[0]?.id)))} className="inline-flex min-h-11 items-center gap-1 text-sm font-semibold text-gold"><Plus size={16} />{t("new")}</button></div>
-        {(mode === "organization" ? workspace.organizations : entries).map(item => {
-          const media = "name" in item ? item.logo_url : item.image_url;
-          return <button type="button" key={item.id} onClick={() => void changeForm(() => mode === "organization" ? editOrganization(item as Organization) : editEntry(item as Entry))} className="flex w-full gap-3 rounded-xl border border-border bg-bg-secondary p-3 text-left">
+      {mode === "organization" && <aside className="min-w-0 space-y-4"><div className="flex items-center justify-between"><h2 className="font-semibold text-text-primary">{mode === "organization" ? t("yourOrganizations") : t("yourEntries")}</h2><button type="button" disabled={!(mode === "organization" ? organization.id : entry.id)} onClick={() => void changeForm(() => mode === "organization" ? setOrganization({ id: "", expectedUpdatedAt: "", name: "", description: "", topics: [], city: "", region: "", websiteUrl: "", publicContactEmail: "", logoUrl: "", responsiblePerson: responsiblePersonDraft(responsiblePerson) }) : setEntry(emptyEntry(workspace.organizations[0]?.id)))} className="inline-flex min-h-11 items-center gap-1 text-sm font-semibold text-gold"><Plus size={16} />{t("new")}</button></div>
+        {workspace.organizations.map(item => {
+          const media = item.logo_url;
+          return <button type="button" key={item.id} onClick={() => void changeForm(() => editOrganization(item))} className="flex w-full gap-3 rounded-xl border border-border bg-bg-secondary p-3 text-left">
             <span className="relative h-14 w-14 shrink-0 overflow-hidden rounded-lg border border-border bg-bg-primary">{media ? <MediaImage src={media} alt="" fill sizes="56px" className={"name" in item ? "object-contain p-1" : "object-cover"} /> : <ImagePlus className="absolute inset-0 m-auto text-text-muted" size={20} />}</span>
-            <span className="min-w-0"><span className="block truncate font-semibold text-text-primary">{"name" in item ? item.name : item.title}</span><span className="mt-1 block text-xs text-text-muted">{t(`status.${item.moderation_status}`)}</span>{item.moderation_reason && <span className="mt-2 block text-xs text-gold">{item.moderation_reason}</span>}</span>
+            <span className="min-w-0"><span className="block truncate font-semibold text-text-primary">{item.name}</span><span className="mt-1 block text-xs text-text-muted">{t(`status.${item.moderation_status}`)}</span>{item.moderation_reason && <span className="mt-2 block text-xs text-gold">{item.moderation_reason}</span>}</span>
           </button>;
         })}
-        {!(mode === "organization" ? workspace.organizations : entries).length && <p className="rounded-xl border border-dashed border-border p-5 text-sm text-text-muted">{t("noneYet")}</p>}
-      </aside>
+        {!workspace.organizations.length && <p className="rounded-xl border border-dashed border-border p-5 text-sm text-text-muted">{t("noneYet")}</p>}
+      </aside>}
     </div>
     {(mode === "organization" ? organization.id : entry.organizationId) && <OrganizationAccessPanel key={mode === "organization" ? organization.id : entry.organizationId} organizationId={mode === "organization" ? organization.id : entry.organizationId} onLeave={leaveOrganization} />}
   </main>;
