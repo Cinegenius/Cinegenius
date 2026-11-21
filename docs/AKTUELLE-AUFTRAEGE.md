@@ -93,3 +93,14 @@ serverseitige Vorgabe nutzt weiterhin die gewählte Sprache; alte private
 Verläufe und Entwürfe bleiben erhalten. Website-Nachweis/Veröffentlichungsstatus:
 `/srv/cinegenius/handoffs/20261121-feedback-brief/receipt.json`. App-Veröffentlichung
 bleibt angehalten; kein nativer Gerätenachweis.
+
+## Redaktion übersichtlich verwalten · 21. November 2026
+
+Nach dem abgeschlossenen Feedback-Kurzdialog folgt der von Markus in Agent NEWS
+bestätigte Ausbau der bestehenden Verwaltung: Land → Thema → Originalquelle,
+Herausgeber, Statuszahlen, Suche und Datumssortierung. Kompakte Beitragsliste und
+gezieltes Öffnen statt vollständiger Artikelberge; Rechte und Freigaben erhalten.
+Website-Entwurf mit vollständigem Build, 34 API-/SQL-Tests und 21 kontrollierten
+Browserprüfungen bestanden; Commitstatus im Handoff. Keine Veröffentlichung beauftragt, native App bleibt
+angehalten. Europa/International ohne belastbare Metadaten nicht erfunden.
+[Vertrag und Grenzen](organization-entry-browser.md).

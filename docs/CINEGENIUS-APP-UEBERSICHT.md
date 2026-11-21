@@ -223,3 +223,12 @@ serverseitige Vorgabe nutzt weiterhin die gewählte Sprache; alte private
 Verläufe und Entwürfe bleiben erhalten. Website-Nachweis/Veröffentlichungsstatus:
 `/srv/cinegenius/handoffs/20261121-feedback-brief/receipt.json`. App-Veröffentlichung
 bleibt angehalten; kein nativer Gerätenachweis.
+
+## Redaktionsverwaltung · Web-Vertrag vom 21. November 2026
+
+Website-Entwurf mit gemeinsamem privaten Beitragsbrowser und zwei geprüften
+API-Einstiegen. Land/Thema/Originalquelle/Herausgeber/Status bleiben getrennt,
+Zahlen stammen aus derselben berechtigten Menge wie die Liste. 17 Web-Sprachen;
+keine Migration und keine neuen Rechte. Noch nicht veröffentlicht. Native
+Übernahme, Installation und Geräteabnahme sind nicht erfolgt; App-Stopp erhalten.
+[Web-Vertrag und Prüfgrenzen](organization-entry-browser.md).

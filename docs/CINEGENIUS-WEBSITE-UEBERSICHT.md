@@ -227,3 +227,13 @@ serverseitige Vorgabe nutzt weiterhin die gewählte Sprache; alte private
 Verläufe und Entwürfe bleiben erhalten. Website-Nachweis/Veröffentlichungsstatus:
 `/srv/cinegenius/handoffs/20261121-feedback-brief/receipt.json`. App-Veröffentlichung
 bleibt angehalten; kein nativer Gerätenachweis.
+
+## Redaktionsverwaltung · Entwurf vom 21. November 2026
+
+Bestehendes Organisationsdashboard und Adminprüfung erhalten einen gemeinsamen
+Beitragsbrowser: Land, Thema, Originalquelle, Herausgeber, Status, Suche, Datum und
+24er-Seiten. Vollständige berechtigte Zähler, kompakte Liste, einzelne Artikeltexte
+erst beim Öffnen; private Bearbeitung und Freigaben unverändert. 17 Sprachen und
+20 Browserkonfigurationen plus Editorprüfung, 34 API-/SQL-Tests mit bis zu 1.007
+Einträgen und vollständiger Build bestanden.
+Noch nicht veröffentlicht. [Vertrag, API und Grenzen](organization-entry-browser.md).

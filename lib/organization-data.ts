@@ -1,3 +1,4 @@
+import { readableOrganizations, readOrganizationEntries } from '@/lib/organization-entry-browser-server';
 import { UNASSIGNED_COUNTRY } from "@/lib/places/core";
 import { newsDiscoveryIndex, regionalNews } from '@/lib/news-discovery';
 import { newsEntryCountry } from '@/lib/news-region';
@@ -99,20 +100,12 @@ export async function approvedEntryBySlugs(organizationSlug: string, entrySlug: 
   return entry ? { organization, entry } : null;
 }
 
-export async function organizationWorkspace(userId: string) {
-  const [{ data: owned, error: ownedError }, { data: memberships, error: membershipsError }] = await Promise.all([
-    db.from("organizations").select("*").eq("owner_user_id", userId).order("created_at", { ascending: false }),
-    db.from("organization_members").select("organization_id").eq("user_id", userId).eq("status", "active").in("role", ["owner", "admin"]),
-  ]);
-  if (ownedError || membershipsError) throw new Error("organization_workspace_read_failed");
-  const ids = [...new Set([...(owned ?? []).map((row) => row.id), ...(memberships ?? []).map((row) => row.organization_id)])];
-  if (!ids.length) return { organizations: [], entries: [] };
-  const { data: organizations, error: organizationsError } = await db.from("organizations").select("*")
-    .in("id", ids).order("created_at", { ascending: false });
-  if (organizationsError) throw new Error("organization_workspace_read_failed");
-  const { data: entries, error: entriesError } = await db.from("organization_entries").select("*").in("organization_id", ids).order("created_at", { ascending: false });
-  if (entriesError) throw new Error("organization_workspace_read_failed");
-  return { organizations: organizations ?? [], entries: entries ?? [] };
+export async function organizationWorkspace(userId: string, includeEntries = true) {
+  const organizations = await readableOrganizations({ userId });
+  organizations.sort((a, b) => b.created_at.localeCompare(a.created_at));
+  const entries = includeEntries ? await readOrganizationEntries(organizations.map(item => item.id)) : [];
+  entries.sort((a, b) => b.created_at.localeCompare(a.created_at) || b.id.localeCompare(a.id));
+  return { organizations, entries };
 }
 
 export type OrganizationNewsEntry = { id: string; slug: string; entry_type: string; title: string; summary: string | null; topic: string | null; city: string | null; starts_at: string | null; ends_at: string | null; image_url: string | null; moderation_status: string; organization: { name: string; slug: string } | { name: string; slug: string }[] };
