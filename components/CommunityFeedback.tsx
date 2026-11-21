@@ -31,10 +31,10 @@ export default function CommunityFeedback({accountId,initialCountry='',initialLa
   const [openingError,setOpeningError] = useState(false), [openingAttempt,setOpeningAttempt] = useState(0);
   useEffect(()=>{
     if(!sameAccount || opening.language === value.language) return;
-    const controller=new AbortController();setOpeningError(false);
+    const controller=new AbortController();
     void fetch('/api/feedback?lang='+encodeURIComponent(value.language),{cache:'no-store',signal:AbortSignal.any([controller.signal,AbortSignal.timeout(10000)])})
       .then(async response=>{const result=await response.json();if(!response.ok || result.locale!==value.language || typeof result.opening!=='string')throw Error();return result.opening;})
-      .then(text=>{if(!controller.signal.aborted && account.current===accountId)setOpening({language:value.language,text});})
+      .then(text=>{if(!controller.signal.aborted && account.current===accountId){setOpening({language:value.language,text});setOpeningError(false);}})
       .catch(()=>{if(!controller.signal.aborted && account.current===accountId)setOpeningError(true);});
     return ()=>controller.abort();
   },[sameAccount,accountId,opening.language,value.language,openingAttempt]);
@@ -55,7 +55,7 @@ export default function CommunityFeedback({accountId,initialCountry='',initialLa
       }
     }
     next.pendingSubmission = readFeedbackSubmission(saved.pendingSubmission);
-    setValue(next); setConfirmed(!!next.pendingSubmission);
+    setValue(next); setConfirmed(!!next.pendingSubmission); setOpeningError(false);
   },[locale]);
   const draft = useFormDraft({formKey:FEEDBACK_DRAFT_KEY,value,restore,enabled:sameAccount,busy:phase === 'submit' || phase === 'discuss'});
   const busy = phase !== 'idle', frozen = !!value.pendingSubmission;
@@ -64,7 +64,7 @@ export default function CommunityFeedback({accountId,initialCountry='',initialLa
     return [{value:'',label:t('countryNone')},...COUNTRY_CODES.map(value => ({value,label:names.of(value) || value})).sort((a,b)=>a.label.localeCompare(b.label,locale))];
   },[locale,t]);
 
-  function change(patch: Partial<Draft>) { if (locked.current || frozen) return; draft.resume(); setValue(v=>({...v,...patch})); setError(''); }
+  function change(patch: Partial<Draft>) { if (locked.current || frozen) return; draft.resume(); setValue(v=>({...v,...patch})); setError(''); if(patch.language)setOpeningError(false); }
   function errorText(code?: string) {
     if (code === 'unauthorized' || code === 'account_changed') return s('accountChanged');
     if (code === 'rate_limited') return g('errorRateLimited');
@@ -142,7 +142,7 @@ export default function CommunityFeedback({accountId,initialCountry='',initialLa
           <p className="mb-1 text-xs text-text-muted">{g(message.role === 'user' ? 'you' : 'assistant')}</p><p className="whitespace-pre-wrap break-words text-sm leading-6">{message.content}</p>
         </article>)}
       </div>
-      {openingError && <div role="alert" className="text-sm text-text-secondary">{s('sendError')}<button type="button" className={button} onClick={()=>setOpeningAttempt(n=>n+1)}>{t('refresh')}</button></div>}
+      {openingError && <div role="alert" className="text-sm text-text-secondary">{s('sendError')}<button type="button" className={button} onClick={()=>{setOpeningError(false);setOpeningAttempt(n=>n+1);}}>{t('refresh')}</button></div>}
       {!frozen && <form onSubmit={event=>void discuss(event)} className="space-y-3">
         <label htmlFor="feedback-input" className="text-sm">{g('inputLabel')}</label>
         <textarea id="feedback-input" rows={3} maxLength={2000} value={value.text} disabled={busy || !draft.loaded} aria-describedby="feedback-privacy-voice"

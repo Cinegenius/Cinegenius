@@ -1,6 +1,10 @@
 # Internationale Preise und Ländervertreter-Feedback
 
-Stand: 20.11.2026. Website-Implementierung vorbereitet; **noch nicht veröffentlicht**.
+Stand: 21.11.2026. Markus hat die Veröffentlichung beider Website-Funktionen mit
+„dann stell live“ ausdrücklich freigegeben. Das Paket wird auf den aktuellen
+Hauptstand mit den veröffentlichten Newsfotos übernommen. Der tatsächliche
+Veröffentlichungs- und Live-Prüfbeleg liegt unter
+`/srv/cinegenius/handoffs/20261121-international-release/receipt.json`.
 Die bereits veröffentlichte Länderpriorisierung und CineGenius Redaktion bleiben
 unverändert. Native Smart-/Work-Freigabe bleibt zurückgehalten.
 
@@ -33,11 +37,14 @@ unverändert. Native Smart-/Work-Freigabe bleibt zurückgehalten.
 - Profil-Gagen verwenden die bestehende Ganzzahlspalte. Keine stillschweigende
   Kürzung von Dezimalbeträgen; nicht passende Eingaben werden zurückgewiesen.
 
-**Vor Veröffentlichung notwendig:**
-`20261120194027_booking_currency_snapshot.sql` anwenden und prüfen. Die Migration
+**Produktionsmigration am 21.11.2026 angewandt und unabhängig nachgelesen:**
+`20261120194027_booking_currency_snapshot.sql`. Die Migration
 fügt nur die Währung mit EUR als historischem Standard hinzu; Beträge, Zugriffsrechte
-und bestehende Datensätze bleiben erhalten. Sie wurde in einer isolierten Datenbank
-geprüft, noch nicht auf Produktion angewandt.
+und bestehende Datensätze bleiben erhalten. Zusätzlich zur isolierten Datenbankprüfung
+wurde der Produktionslauf zunächst zurückgerollt geprüft; vor dem Commit wurden
+die bisherigen Buchungen, RLS und Zugriffsrechte innerhalb derselben Transaktion
+auf Unverändertheit geprüft. Belege: `schema-preflight.json`, `schema-applied.json`
+und `schema-live-verified.json` im genannten Release-Ordner.
 
 ## Mitgestalten
 
@@ -86,8 +93,9 @@ Native Anzeige muss Währungen erhalten und darf Beträge nicht pauschal als Eur
 anzeigen. Gemeinsame Metadatenfelder und Wiederherstellungsregeln benutzen. Die
 Web-Ansicht ist kein Nachweis einer nativen Implementierung. Handoff und Prüfbelege:
 `/srv/cinegenius/handoffs/20261120-international-feedback/`.
-Die direkte Übergabe an APP Entwicklung schlug wegen nicht erreichbarer
-Chat-Verbindung fehl; die Datei bleibt zur Übernahme bereit.
+Die frühere Übergabe war wegen der Chat-Verbindung gestört. APP Entwicklung wurde
+am 21.11. über die neue ausdrückliche Freigabe und den laufenden Website-Livegang
+informiert; der abschließende Release-Beleg wird separat weitergegeben.
 
 ## Prüfstand
 

@@ -38,11 +38,13 @@ Der vollständige gemeinsame Produktionsbuild ist am 20. November 2026 um
 
 ## Vor Freischaltung offen
 
-1. Betreiberfreigabe für genau dieses Websitepaket; danach Änderungen auf den
-   aktuellen Hauptstand übernehmen und ausschließlich den bewachten Releaseweg
-   mit sauberem `main == origin/main` verwenden.
+1. Betreiberfreigabe für Währungen und Feedback am 21.11.2026 mit „dann stell live“
+   erteilt. Die Übernahme erfolgt separat auf den aktuellen Hauptstand mit den
+   Newsfotos und anschließend über den bewachten Releaseweg mit sauberem
+   `main == origin/main`. Tatsächlicher Stand: `/srv/cinegenius/handoffs/20261121-international-release/receipt.json`.
 2. Die Buchungs-Währungsmigration `20261120194027_booking_currency_snapshot.sql`
-   vor ihren abhängigen Schnittstellen anwenden und aktuell prüfen. Die separate
+   ist am 21.11. angewandt und unabhängig geprüft; alte Buchungen und Rechte sind
+   unverändert. Die separate
    News-Migration `20261120230314_news_gallery_and_legacy_expiry.sql` ist bereits
    angewandt. Keine automatischen Grants, Artikeländerungen oder Runtime-Marker
    daraus ableiten.

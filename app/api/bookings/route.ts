@@ -21,7 +21,6 @@ import { localizedNotification } from "@/lib/i18n/notification-copy";
 // );
 // CREATE INDEX bookings_user_id_idx ON bookings(user_id, created_at DESC);
 
-import {getTranslations} from "next-intl/server";
 import {resolveLocale} from "@/lib/i18n/locales";
 import {bookingDays} from "@/lib/booking-request";
 import { db } from "@/lib/db";
