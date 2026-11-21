@@ -24,7 +24,7 @@ Diese Übersicht trennt die installierte App, ihre serverseitigen Ansichten, nat
 | **Crew / Profile** | Personen, Tätigkeiten, Fähigkeiten, Ortsangaben, Bilder und Kontakt | Neue Crew-Zähldifferenz aus WEB `5ba93dd7` als `a40a2bc6` übernommen: sichtbare und zugängliche Zahl folgt auch bei Anbieterfiltern der aktuellen Auswahl; 29 gezielte Tests und zehn App-Browserfälle bestanden; Details unter [Kartenzähler](map-result-counts.md). Die gemeinsame Website-Korrektur ist inzwischen in `31d3cce2` veröffentlicht; native Ergänzungen bleiben unveröffentlicht und ohne Geräteabnahme. Die Homepage-Rotation ist separat in `0c5e63fd` geprüft und gesichert: 24 Stunden Vorrang, danach serverseitige Mischung; 61 Tests und vollständiger Build bestanden. Native Crew-Reihenfolge unverändert. |
 | **Marktplatz / Dienstleistungen / Fahrzeuge** | Angebote, Anbieter, Bilder, Anfragen und Filter | Gemeinsame Website/API unterstützt seit 21.11. 155 Währungen (`ab74924d`); keine Umrechnung. Ältere App-Quellen enthalten noch feste EUR-Anzeigen. [Abgleich und offene native Prüfung](app-international-handoff-20261121.md); kein bestätigter Geräteablauf. |
 | **Locations** | Drehorte/Studios, Suche, Details und Karten | Gemeinsamer Zählerfix `822c27c` übernommen: gefilterte Gesamtzahl bleibt beim Kartenziehen stabil; fehlende Kartenpunkte über die Liste erreichbar. App-Beschriftung „gesamt“ in `b1d767a` vorbereitet. |
-| **Firmen** | Profile, Leistungen, Teams und Angebote | Gemeinsame Firmen-/Personenrechte; versteckte persönliche Identitäten nicht über Firmen offenlegen. |
+| **Firmen** | Profile, Leistungen, Teams und Angebote | Gemeinsame Firmen-/Personenrechte; versteckte persönliche Identitäten nicht über Firmen offenlegen. Korrektur des Einrichtungs-Abschlusslinks in WEB `5103bffd` geprüft, noch nicht live. Firmen-ID für Wiederholung erhalten, zurückgegebenen Slug für Details verwenden. [App-Vertrag und Prüfgrenzen](company-onboarding-links.md); keine native Umsetzung/Installation aus dieser Übergabe. |
 | **Filmtiere / Jobs / Schwarzes Brett** | Weitere bestehende CineGenius-Bereiche | Website-Bestand vorhanden; vollständige native Erreichbarkeit und Bedienung pro App-Build verifizieren. Keine zusätzliche fertige native Spezialanwendung behauptet. |
 | **News** | Artikel, Themen, Technik, Länder, Veranstaltungen und Organisationen | Kleine Homepage-Artikelfotos sind in WEB `1aa844cc` live. App-Quellen gezielt abgeglichen: 80×64px unbeschnitten, Titelbild vor gültigem Galeriebild, kein leerer Bildplatz oder Herausgeberlogo als Ersatz, vorhandene Urheberangaben. [Abhängigkeiten und Prüfbeleg](app-home-news-photos-20261121.md). Keine neue Geräteinstallation/-abnahme oder App-Veröffentlichung; aktuelle Artikel-Nachweise aus dem veröffentlichten Hauptstand erhalten. |
 | **Organisationen / Branchenpartner** | Verzeichnisse, Profile und Beiträge | In `b1d767a` umgesetzt und mit künstlichen Daten geprüft: Gesamtzahl, geladene Seite und Kartenpunkte getrennt; während Filterwechsel keine bestätigte Zahl. Noch nicht veröffentlicht oder auf dem Gerät geprüft. |
@@ -113,3 +113,22 @@ Anmeldeweiterleitungen und private/no-store API-Ablehnungen. Keine echte
 angemeldete Sitzung oder native Geräteabnahme. Der reine WEB-Dokumentationsstand
 `9830263b` ist nachgeführt; diese App-Aufgabe hat nur Belege und Dokumentation
 aktualisiert. Keine neue App-Arbeit, Veröffentlichung oder Installation.
+
+**Firmen-Einrichtung, Dokumentationsabgleich · 21.11.:** WEB `5103bffd`
+auf Basis `9830263b` korrigiert den Abschlusslink zur bereits gespeicherten Firma.
+`quickStart.completed.company` bleibt die ID; optionales `companySlug` erhält
+die zurückgegebene Seitenadresse in Navigation und privater Wiederherstellung.
+Alte Entwürfe bleiben gültig. Der Browser löst alte ID-Links erst nach der
+Firmen-Sichtbarkeitsprüfung auf; native/API-Details verwenden weiterhin Slugs.
+Keine Datenmigration, Änderung gespeicherter Firmen oder Rechteausweitung.
+
+WEB-Belege: 58 Tests, 20 kontrollierte WebKit-Fälle in 17 Sprachen, Design,
+Kataloge und Build bestanden. Zwei vorhandene Hook-Warnungen; lokale statische
+Datenabrufe liefen mangels Supabase-Laufzeitvariablen mit bestehenden Fallbacks.
+Kein echter Signup-/Gerätetest. Diese Aufgabe hat Vertrag, drei Produktdatei-
+Änderungen und die sechs Build-Eingabehashes nachgelesen; nur Dokumentation
+übernommen. Die Korrektur ist noch nicht veröffentlicht und hat keine eigene
+Livefreigabe. Keine parallele Freigabe, native Änderung oder Installation durch
+diesen Abgleich; bestehende App-Arbeit bleibt gesondert.
+Beleg: `/srv/cinegenius/handoffs/20261121-company-onboarding-link/receipt.json`;
+App-Empfang: `/srv/cinegenius/handoffs/20261121-app-company-onboarding-handoff/receipt.json`.
