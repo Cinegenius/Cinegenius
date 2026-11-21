@@ -13,11 +13,11 @@ async function localizedProxyError(request: NextRequest, key: string, init: Resp
   const system = messages.System as Record<string, string>;
   const copy = createTranslator({locale, messages: {System: system}, namespace: "System"});
   const headers = new Headers(init.headers);
-  if (request.nextUrl.pathname.startsWith('/api/native/v1/') || request.headers.has('X-CineGenius-Native-Contract')) {
-    headers.set('Cache-Control', 'private, no-store, max-age=0');
-    headers.set('CDN-Cache-Control', 'no-store');
-    headers.set('Vercel-CDN-Cache-Control', 'no-store');
-  }
+  // Authentication, origin and quota failures belong to the current request,
+  // including failures returned before a private route handler can set headers.
+  headers.set('Cache-Control', 'private, no-store, max-age=0');
+  headers.set('CDN-Cache-Control', 'no-store');
+  headers.set('Vercel-CDN-Cache-Control', 'no-store');
   return NextResponse.json({error: copy(key)}, {...init, headers});
 }
 
