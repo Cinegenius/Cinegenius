@@ -183,3 +183,25 @@ Herkunftsprüfung und Kontingent sind nun ebenfalls ausdrücklich privat und
 nicht zwischenspeicherbar. 52 gezielte Folgeprüfungen und erneuter Produktionsbuild
 bestanden; Berechtigungen unverändert. Die ursprüngliche abgewiesene Gastantwort
 enthielt nur den Fehlertext, keine privaten Feedbackdaten.
+
+## Internationaler APP-Abgleich bestätigt · 21. November 2026
+
+APP hat den veröffentlichten Web-Vertrag `ab74924d` abgeglichen und den Stand
+`b0c1ea5dbe8d55ba12e703847f0c3c05f335820e` sauber auf
+`codex/app-international-handoff-20261121` gesichert. Der einzelne Proxy-Fix
+`67cc599d` übernimmt die privaten, nicht speicherbaren frühen Fehlerantworten.
+37 gezielte Prüfungen über 17 Sprachen sowie Lint bestanden. Native Quellen und
+Sprachkataloge unverändert; kein neuer Gesamtbuild, Browser- oder Gerätetest.
+
+Die ältere App-Basis enthält weiterhin feste EUR-Anzeigen und noch keine neuen
+Buchungs-Snapshots oder Mitgestalten-Handler. Bei der Integration aktuellen
+`main` als gemeinsame Funktionsbasis verwenden und nur geprüfte native Deltas
+erhalten. Keine ältere vollständige Proxy- oder Swift-Datei darüberkopieren.
+Die Buchungs-Währungsmigration ist bereits angewandt; keine erneute Ausführung.
+
+Offen: native Preisfelder und Editor-Entwürfe, Filter und Währungsanzeige,
+409-Neubestätigung mit erhaltenen Terminen/Notizen, private Feedbackwege,
+Kontowechsel und echtes Zurück-Navigieren. Angemeldeter KI-/Versandtest und
+iPhone-/Mac-Abnahme bleiben separat. Kein App-Livegang und keine Installation;
+Smart-/Work-Halt sowie Push-/Shots- und Prüfagent-Status unverändert.
+Beleg: `/srv/cinegenius/handoffs/20261121-app-international-handoff/receipt.json`.

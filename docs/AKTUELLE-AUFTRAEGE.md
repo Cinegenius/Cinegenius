@@ -68,3 +68,10 @@ Herkunftsprüfung und Kontingent sind nun ebenfalls ausdrücklich privat und
 nicht zwischenspeicherbar. 52 gezielte Folgeprüfungen und erneuter Produktionsbuild
 bestanden; Berechtigungen unverändert. Die ursprüngliche abgewiesene Gastantwort
 enthielt nur den Fehlertext, keine privaten Feedbackdaten.
+
+**APP-Rückmeldung zum internationalen Paket (21.11.):** Abgleich und kleiner
+Proxy-Fix unter `b0c1ea5d` gesichert; 37 gezielte Prüfungen über 17 Sprachen bestanden.
+Die ältere App-Basis hat weiterhin EUR-Annahmen und keine neuen Feedback-Handler.
+Native Übernahme auf aktuellem `main`, Buchungs-Neubestätigung, private Abläufe
+und Geräteabnahme bleiben offen. Keine App-Veröffentlichung oder Installation.
+Details und Beleg in der [App-Übersicht](CINEGENIUS-APP-UEBERSICHT.md).
