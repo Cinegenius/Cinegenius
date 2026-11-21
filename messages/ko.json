@@ -13470,6 +13470,8 @@
   },
   "ProfileLayout": {},
   "NativeAppChrome": {
+    "lightMode": "라이트 모드로 전환",
+    "darkMode": "다크 모드로 전환",
     "work": "Work",
     "createEntry": "항목 만들기",
     "navigation": "앱 바로가기",
@@ -13589,6 +13591,12 @@
     "showOriginal": "원문 보기",
     "showTranslated": "번역 보기",
     "retry": "다시 시도"
+  },
+  "NativeOrganizations": {
+    "searchLabel": "단체 검색",
+    "pageScope": "{page}페이지 · 전체 {total}개 단체 중 {loaded}개 불러옴",
+    "mapScope": "이 페이지의 {loaded}개 단체 중 {mapped}개가 지도에 표시됩니다. 나머지는 목록에 유지됩니다.",
+    "empty": "조건에 맞는 단체를 찾지 못했습니다."
   },
   "EditorialAuthority": {
     "enable": "편집 권한 부여",

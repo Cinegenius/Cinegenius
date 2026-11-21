@@ -12,6 +12,8 @@ import {
 import { timeAgo, notificationMeta, type NotificationType } from "@/lib/notifications";
 import { uiErrorMessage } from "@/lib/ui-error-message";
 import { useTranslations , useLocale } from "next-intl";
+import { useNativeAppAppearance } from "@/lib/use-native-app-appearance";
+import styles from "./NativeInboxSurface.module.css";
 
 
 // ─── Types ─────────────────────────────────────────────────────────────────────
@@ -134,8 +136,9 @@ function NotifRow({ notif, onRead }: {
 
 type FriendRequest = { friendship_id: string; user_id: string; display_name: string };
 
-export default function InboxNotices() {
+export default function InboxNotices({ searchValue = "" }: { searchValue?: string } = {}) {
   const uiText = useTranslations();
+  const native = useNativeAppAppearance();
   const FILTER_TABS = getLocalizedFILTER_TABS(uiText);
 
 
@@ -293,8 +296,11 @@ export default function InboxNotices() {
   const markAsRead = (id: string) => acknowledge(id);
   const markAllRead = () => acknowledge();
 
-  const showRequests = (activeFilter === "all" || activeFilter === "social") && friendRequests.length > 0;
+  const query = searchValue.trim().toLocaleLowerCase(locale);
+  const visibleRequests = friendRequests.filter(request => request.display_name.toLocaleLowerCase(locale).includes(query));
+  const showRequests = (activeFilter === "all" || activeFilter === "social") && visibleRequests.length > 0;
   const filtered = notifications.filter((n) => matchesFilter(n.type, activeFilter)
+    && `${n.title} ${n.body}`.toLocaleLowerCase(locale).includes(query)
     && !(n.type === "friend_request" && friendRequests.some(request => n.body.startsWith(request.display_name))));
   const unreadCount = notifications.filter((n) => !n.read).length;
   const unreadFiltered = filtered.filter((n) => !n.read).length;
@@ -314,15 +320,15 @@ export default function InboxNotices() {
   }
 
   return (
-    <div className="min-h-0 min-w-0 flex-1 overflow-y-auto overscroll-contain">
-      <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+    <div className={`min-h-0 min-w-0 flex-1 overflow-y-auto overscroll-contain ${native ? styles.notices : ""}`}>
+      <div className={`max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-4 ${styles.content}`}>
         {unreadCount > 0 && <div className="mb-3 flex min-h-11 flex-wrap items-center justify-between gap-3">
           <span className="rounded-full border border-gold/30 bg-gold/15 px-2 py-0.5 text-xs font-bold text-gold">{uiText.rich("Ui.text_488b93937e6625", { value1: () => (unreadCount) })}</span>
           <button onClick={markAllRead} disabled={markingAll} className="flex min-h-11 items-center gap-1.5 rounded-lg border border-border px-3 py-2 text-xs text-text-muted hover:text-gold">{uiText.rich("Ui.text_110bf3daa72f97", { part1: () => (<CheckCheck size={13} />) })}</button>
         </div>}
 
         {/* ── Filter Tabs ── */}
-        <div className="mt-4 flex flex-wrap gap-1 pb-1 mb-6">
+        <div className={`mt-4 flex flex-wrap gap-1 pb-1 mb-6 ${styles.filters}`} data-native-notice-filters={native ? "v1" : undefined}>
           {FILTER_TABS.map(({ id, label }) => {
             const count = id === "all"
               ? notifications.filter((n) => !n.read).length
@@ -331,6 +337,8 @@ export default function InboxNotices() {
             return (
               <button
                 key={id}
+                type="button"
+                aria-pressed={isActive}
                 onClick={() => setActiveFilter(id)}
                 className={`flex min-h-11 items-center gap-1.5 px-3.5 py-2 text-xs font-medium rounded-lg whitespace-nowrap transition-all ${
                   isActive
@@ -349,9 +357,9 @@ export default function InboxNotices() {
           })}
         </div>
 
-        {showRequests && <section aria-label={uiText("Messaging.requests", { count: friendRequests.length })} className="mb-4 space-y-3">
-          <h2 className="text-sm font-semibold text-text-primary">{uiText("Messaging.requests", { count: friendRequests.length })}</h2>
-          {friendRequests.map(request => <article key={request.friendship_id} className="rounded-xl border border-border bg-bg-secondary p-4">
+        {showRequests && <section aria-label={uiText("Messaging.requests", { count: visibleRequests.length })} className="mb-4 space-y-3">
+          <h2 className="text-sm font-semibold text-text-primary">{uiText("Messaging.requests", { count: visibleRequests.length })}</h2>
+          {visibleRequests.map(request => <article key={request.friendship_id} className="rounded-xl border border-border bg-bg-secondary p-4">
             <Link href={`/profile/${encodeURIComponent(request.user_id)}`} className="flex min-h-11 items-center gap-2 text-sm font-semibold text-text-primary [overflow-wrap:anywhere]"><UserPlus size={18} className="shrink-0 text-gold" />{request.display_name}</Link>
             <div className="mt-2 flex flex-wrap gap-2">
               <button type="button" disabled={processingIds.has(request.friendship_id)} onClick={() => handleFriendRequest(request.friendship_id, "accepted")} className="min-h-11 rounded-xl border border-gold/30 bg-gold/10 px-3 text-sm font-semibold text-gold disabled:opacity-40">{uiText("Contacts.accept")}</button>
@@ -364,9 +372,9 @@ export default function InboxNotices() {
         </div>}
         {noticeError?.scope === requestScope && noticeError.kind === "read" && <p role="alert" className="mb-3 text-sm text-text-muted">{uiText("InboxNavigation.readError")}</p>}
         {/* ── List ── */}
-        {(loading || noticeError || filtered.length > 0 || !showRequests) && <div className="bg-bg-secondary border border-border rounded-2xl overflow-hidden">
+        {(loading || noticeError || filtered.length > 0 || !showRequests) && <div className={`bg-bg-secondary border border-border rounded-2xl overflow-hidden ${styles.list}`}>
           {loading ? (
-            <div className="py-16 flex items-center justify-center">
+            <div className={`py-16 flex items-center justify-center ${styles.state}`}>
               <div className="flex flex-col items-center gap-3">
                 <div className="w-8 h-8 border-2 border-gold/20 border-t-gold rounded-full animate-spin" />
                 <p className="text-xs text-text-muted">{uiText("Ui.text_ba8a3775a261b9")}</p>
@@ -375,7 +383,7 @@ export default function InboxNotices() {
           ) : noticeError?.scope === requestScope && noticeError.kind === "load" ? (
             <div role="alert" className="p-5 text-sm text-text-muted"><p>{uiText("notifications.loadError")}</p><button type="button" onClick={() => void fetchNotifications()} className="min-h-11 text-gold">{uiText("notifications.retry")}</button></div>
           ) : filtered.length === 0 ? (
-            <div className="py-16 flex flex-col items-center justify-center gap-3 text-center px-6">
+            <div className={`py-16 flex flex-col items-center justify-center gap-3 text-center px-6 ${styles.state}`}>
               <div className="w-14 h-14 rounded-2xl bg-bg-elevated border border-border flex items-center justify-center">
                 <Inbox size={22} className="text-text-muted" />
               </div>

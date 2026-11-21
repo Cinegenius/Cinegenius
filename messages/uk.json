@@ -13470,6 +13470,8 @@
   },
   "ProfileLayout": {},
   "NativeAppChrome": {
+    "lightMode": "Увімкнути світлу тему",
+    "darkMode": "Увімкнути темну тему",
     "work": "Work",
     "createEntry": "Створити запис",
     "navigation": "Швидкий доступ у застосунку",
@@ -13589,6 +13591,12 @@
     "showOriginal": "Показати оригінал",
     "showTranslated": "Показати переклад",
     "retry": "Спробувати знову"
+  },
+  "NativeOrganizations": {
+    "searchLabel": "Пошук організацій",
+    "pageScope": "Сторінка {page} · завантажено {loaded} з {total} організацій",
+    "mapScope": "На карті показано {mapped} із {loaded} організацій на цій сторінці. Решта залишаються у списку.",
+    "empty": "Відповідних організацій не знайдено."
   },
   "EditorialAuthority": {
     "enable": "Надати редакційні права",

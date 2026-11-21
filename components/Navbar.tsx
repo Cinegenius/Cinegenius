@@ -266,6 +266,7 @@ export default function Navbar({ initialIsSignedIn = false, initialAdminUserId =
     const settingsHref = ACCOUNT_NAV_ITEMS.find(item => item.id === "settings")!.href;
     return <NativeAppNavbar
       navigationLabel={uiText("NativeAppChrome.navigation")}
+      appearance={{ lightLabel:uiText("NativeAppChrome.lightMode"), darkLabel:uiText("NativeAppChrome.darkMode") }}
       accountButtonRef={accountButton} accountMenuRef={accountMenuRef}
       signInLabel={t("signIn")}
       account={{
@@ -283,7 +284,7 @@ export default function Navbar({ initialIsSignedIn = false, initialAdminUserId =
           { id: "settings", href: settingsHref, label: uiText("PersonalArea.settings"), icon: "settings" },
         ],
       }}
-      messages={{ label: hasSignedInSession ? `${messageLabel}; ${noticeLabel}` : t("messages"), count: unreadMessages, noticeCount: unreadNotices, failed: inboxFailed, active: activeId === "messages" }}
+      messages={{ label: hasSignedInSession ? `${messageLabel}; ${noticeLabel}` : t("messages"), count: unreadMessages, noticeCount: unreadNotices, failed: inboxFailed, active: activeId === "messages", scopeKey: hasSignedInSession ? JSON.stringify([activeUserId, authenticatedSessionId]) : "" }}
       search={{ label: uiText("Ui.text_9f6d74e0a12b67"), onClick: event => { setUserMenuOpen(false); event.currentTarget.focus({ preventScroll: true }); document.dispatchEvent(new CustomEvent("cg:opensearch", { detail:{toggle:true} })); } }}
       menu={{ label: t("openMenu"), open: menuOpen, controls: SITE_NAV_MENU_ID, onClick: event => { if (!announceNativeHeaderAction(menuOpen ? "close" : "menu")) return; setUserMenuOpen(false); event.currentTarget.focus({ preventScroll: true }); if (menuOpen) closeMenu(); else openMenu(); } }}
     />;

@@ -1,7 +1,7 @@
 "use client";
 import { useCallback, useSyncExternalStore } from "react";
 
-const attributes = { workspace: "data-cg-native-workspace-ready", "push-settings": "data-cg-native-push-settings-ready" } as const;
+const attributes = { workspace: "data-cg-native-workspace-ready", "push-settings": "data-cg-native-push-settings-ready", "appearance-toggle": "data-cg-native-theme-ready" } as const;
 type Capability = keyof typeof attributes;
 const serverSnapshot = () => false;
 

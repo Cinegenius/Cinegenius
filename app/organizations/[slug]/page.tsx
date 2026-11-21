@@ -5,6 +5,7 @@ import { db } from "@/lib/db";
 import { notFound, permanentRedirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import Image from "@/components/MediaImage";
+import NativeNewsSections from "@/components/app/NativeNewsSections";
 import PageHeader from "@/components/PageHeader";
 import { approvedOrganizationBySlug } from "@/lib/organization-data";
 
@@ -24,6 +25,7 @@ export default async function OrganizationPage({ params }: { params: Promise<{ s
   if (linked.error) throw new Error("organization_company_link_load_failed");
   const company = linked.data?.company as unknown as {name:string;slug:string}|null;
   return <main className="min-h-screen bg-bg-primary">
+    <NativeNewsSections section="organizations" country={organization.place_country_code ?? ""} />
     <PageHeader
       badge={t("organization")}
       title={organization.name}

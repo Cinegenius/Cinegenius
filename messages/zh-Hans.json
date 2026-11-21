@@ -13470,6 +13470,8 @@
   },
   "ProfileLayout": {},
   "NativeAppChrome": {
+    "lightMode": "切换为浅色模式",
+    "darkMode": "切换为深色模式",
     "work": "Work",
     "createEntry": "创建条目",
     "navigation": "应用快捷入口",
@@ -13589,6 +13591,12 @@
     "showOriginal": "显示原文",
     "showTranslated": "显示译文",
     "retry": "重试"
+  },
+  "NativeOrganizations": {
+    "searchLabel": "搜索组织",
+    "pageScope": "第 {page} 页 · 已加载 {total} 个组织中的 {loaded} 个",
+    "mapScope": "本页 {loaded} 个组织中有 {mapped} 个显示在地图上，其余仍保留在列表中。",
+    "empty": "未找到匹配的组织。"
   },
   "EditorialAuthority": {
     "enable": "授予编辑权限",

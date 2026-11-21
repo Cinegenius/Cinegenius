@@ -13470,6 +13470,8 @@
   },
   "ProfileLayout": {},
   "NativeAppChrome": {
+    "lightMode": "Váltás világos módra",
+    "darkMode": "Váltás sötét módra",
     "work": "Work",
     "createEntry": "Bejegyzés létrehozása",
     "navigation": "Alkalmazás-gyorselérés",
@@ -13589,6 +13591,12 @@
     "showOriginal": "Eredeti megjelenítése",
     "showTranslated": "Fordítás megjelenítése",
     "retry": "Újrapróbálkozás"
+  },
+  "NativeOrganizations": {
+    "searchLabel": "Szervezetek keresése",
+    "pageScope": "{page}. oldal · {loaded} szervezet betöltve, összesen {total}",
+    "mapScope": "Az oldalon lévő {loaded} szervezet közül {mapped} látható a térképen. A többi a listában marad.",
+    "empty": "Nem található megfelelő szervezet."
   },
   "EditorialAuthority": {
     "enable": "Szerkesztői jogosultság megadása",

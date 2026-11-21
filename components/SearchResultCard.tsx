@@ -8,6 +8,9 @@ import { ChevronRight, Briefcase, Building2, Car, MapPin, Package, PawPrint, Use
 import { useLocale, useTranslations } from "next-intl";
 import Link from "next/link";
 import type { SearchResult as Result } from "@/lib/unified-search";
+import type { CSSProperties } from "react";
+import { useNativeAppAppearance } from "@/lib/use-native-app-appearance";
+import { nativeSmartAreaForType, nativeSmartColorStyle } from "@/lib/native-smart-colors";
 import styles from "./SearchResultCard.module.css";
 
 export function getLocalizedTypeConfig(translate: (key: string) => string): Record<string, {
@@ -40,16 +43,23 @@ export default function ResultCard({ result, compact = false, showEvidence = fal
   const uiLocale = useLocale();
 
   const animals = useTranslations("FilmAnimals");
+  const nativeAppearance = useNativeAppAppearance();
   const cfg = typeConfig[result.type];
   if (!cfg) return null;
   const Icon = cfg.icon;
   const isProfile = result.type === "profile" || result.type === "creator";
+  const nativeCrew = nativeAppearance && isProfile;
+  const nativeArea = nativeAppearance ? nativeSmartAreaForType(result.type) : null;
   const PreviewImage = ["location", "vehicle", "prop", "animal"].includes(result.type) ? ListingImage : MediaImage;
 
   return (
     <Link
       href={cfg.href(result.id)}
       data-search-result-card={result.type}
+      data-native-crew-preview={nativeCrew ? "true" : undefined}
+      data-native-smart-area={nativeArea ?? undefined}
+      style={nativeArea ? nativeSmartColorStyle(nativeArea) as CSSProperties : undefined}
+      data-result-layout={compact ? "row" : "grid"}
       className={`${styles.card} ${row ? "smart-result-row" : ""} group flex min-w-0 bg-bg-secondary border border-border rounded-xl overflow-hidden hover:border-gold/40 transition-colors ${compact ? "items-center gap-2.5 p-2" : "flex-col hover:shadow-lg hover:shadow-black/20"}`}
     >
       {/* Image */}
@@ -63,17 +73,17 @@ export default function ResultCard({ result, compact = false, showEvidence = fal
             className="w-full h-full object-contain object-center"
           />
         ) : (
-          <div className={`w-full h-full flex items-center justify-center border ${cfg.bgColor}`}>
+          <div data-result-placeholder className={`w-full h-full flex items-center justify-center border ${cfg.bgColor}`}>
             <Icon size={compact ? 22 : 32} className={`${cfg.color} opacity-40`} />
           </div>
         )}
         {/* Type badge */}
-        {!compact && <div className={`absolute top-2.5 left-2.5 flex items-center gap-1.5 px-2 py-1 rounded-full text-[10px] font-semibold border backdrop-blur-sm ${cfg.bgColor}`}>
+        {!compact && !nativeAppearance && <div data-result-type-badge className={`absolute top-2.5 left-2.5 flex items-center gap-1.5 px-2 py-1 rounded-full text-[10px] font-semibold border backdrop-blur-sm ${cfg.bgColor}`}>
           <Icon size={10} className={cfg.color} />
           <span className={cfg.color}>{result.type === "animal" ? animals("portfolio") : cfg.label}</span>
         </div>}
         {/* Availability dot for profiles */}
-        {!compact && isProfile && result.available !== null && (
+        {!nativeCrew && !compact && isProfile && result.available !== null && (
           <div className={`absolute top-2.5 right-2.5 w-2.5 h-2.5 rounded-full border-2 border-bg-secondary ${result.available ? "bg-success" : "bg-text-muted"}`}
             title={result.available ? uiText("common.available") : uiText("common.booked")} />
         )}
@@ -81,25 +91,32 @@ export default function ResultCard({ result, compact = false, showEvidence = fal
 
       {/* Content */}
       <div className={`min-w-0 flex-1 flex flex-col ${compact ? "" : "p-4"}`}>
+        {!compact && nativeAppearance && !isProfile && <div data-result-type-badge className={`mb-2 inline-flex self-start items-center gap-1.5 rounded-full border px-2 py-1 text-[10px] font-semibold ${cfg.bgColor}`}>
+          <Icon size={10} className={cfg.color} aria-hidden="true" />
+          <span className={cfg.color}>{result.type === "animal" ? animals("portfolio") : cfg.label}</span>
+        </div>}
         <h3 data-result-title title={result.title} className={`font-semibold text-sm text-text-primary leading-tight group-hover:text-gold transition-colors ${compact ? "truncate" : "mb-1 line-clamp-2"}`}>
           <SearchResultTitle result={result} />
         </h3>
-        <p data-result-subtitle title={result.subtitle} className="text-xs text-text-muted line-clamp-1 flex-1">{result.subtitle}</p>
-        {showEvidence && result.evidence && <p className="mt-1 text-xs text-text-secondary">{uiText(`UnifiedSearch.discovery.evidence.${result.evidence}`)}</p>}
-        {result.nearby && <p className="text-xs text-text-muted">{uiText("UnifiedSearch.nearbyDistance", { distance: result.nearby.distanceKm.toLocaleString(uiLocale), place: result.nearby.origin })}</p>}
+        {nativeCrew && result.crewPreview ? <>
+          {result.crewPreview.occupation && <p data-result-occupation className="text-xs text-text-muted">{result.crewPreview.occupation}</p>}
+          {result.crewPreview.place && <p data-result-place className="text-xs text-text-muted">{result.crewPreview.place}</p>}
+        </> : <p data-result-subtitle title={result.subtitle} className="text-xs text-text-muted line-clamp-1 flex-1">{result.subtitle}</p>}
+        {!nativeCrew && showEvidence && result.evidence && <p className="mt-1 text-xs text-text-secondary">{uiText(`UnifiedSearch.discovery.evidence.${result.evidence}`)}</p>}
+        {!nativeCrew && result.nearby && <p className="text-xs text-text-muted">{uiText("UnifiedSearch.nearbyDistance", { distance: result.nearby.distanceKm.toLocaleString(uiLocale), place: result.nearby.origin })}</p>}
         {!isProfile && result.type !== "animal" && (result.priceLabel || result.price > 0) && (
           <p data-result-price className={`${compact ? "text-xs" : "mt-2 text-sm"} font-semibold font-mono text-gold`}>
             {result.priceLabel ?? uiText("Ui.text_4519fabedb2cbd", { value1: String(result.price.toLocaleString(uiLocale)) })}
           </p>
         )}
-        {!compact && isProfile && result.available !== null && (
+        {!nativeCrew && !compact && isProfile && result.available !== null && (
           <div className={`${compact ? "mt-1" : "mt-2"} flex items-center gap-1`}>
             <span className={`w-1.5 h-1.5 rounded-full ${result.available ? "bg-success" : "bg-text-muted"}`} />
             <span className="text-xs text-text-muted">{result.available ? uiText("common.available") : uiText("creators.currentlyBooked")}</span>
           </div>
         )}
       </div>
-      {compact && !row && isProfile && result.available !== null && <span role="img"
+      {!nativeCrew && compact && !row && isProfile && result.available !== null && <span role="img"
         aria-label={result.available ? uiText("common.available") : uiText("common.booked")}
         title={result.available ? uiText("common.available") : uiText("common.booked")}
         className={`h-1.5 w-1.5 shrink-0 rounded-full ${result.available ? "bg-success" : "bg-text-muted"}`} />}

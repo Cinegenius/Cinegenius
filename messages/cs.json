@@ -13470,6 +13470,8 @@
   },
   "ProfileLayout": {},
   "NativeAppChrome": {
+    "lightMode": "Přepnout na světlý režim",
+    "darkMode": "Přepnout na tmavý režim",
     "work": "Work",
     "createEntry": "Vytvořit záznam",
     "navigation": "Rychlé volby aplikace",
@@ -13589,6 +13591,12 @@
     "showOriginal": "Zobrazit originál",
     "showTranslated": "Zobrazit překlad",
     "retry": "Zkusit znovu"
+  },
+  "NativeOrganizations": {
+    "searchLabel": "Hledat organizace",
+    "pageScope": "Strana {page} · načteno {loaded} z {total} organizací",
+    "mapScope": "Na mapě je {mapped} z {loaded} organizací na této stránce. Ostatní zůstávají v seznamu.",
+    "empty": "Nebyly nalezeny odpovídající organizace."
   },
   "EditorialAuthority": {
     "enable": "Udělit redakční oprávnění",

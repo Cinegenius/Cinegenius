@@ -26,8 +26,9 @@
   border: 0 !important;
 }
 .surface :global(.directory-page > .site-page-hero > .site-container) { padding-block: 4px; }
-.surface :global([data-result-image="photo"] img) { object-fit: cover; }
+.surface :global([data-result-image="photo"] img) { object-fit: contain; }
 .surface :global([data-result-image="logo"] img) { object-fit: contain; }
+:global(html[data-cg-native-community-appearance="app"][data-cg-app-theme="pure"]) .surface :global(.smart-map .location-map-marker__cluster) { color:var(--cg-app-ink,#1d2a20); }
 
 .paused {
   display: flex;

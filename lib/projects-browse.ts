@@ -1,3 +1,6 @@
+import { browsePlaceOptions, matchesPlace } from "./places/core";
+import { normalizedCatalogueSearch, projectTypeLabel, projectTypeOptions } from "./project-type-labels";
+
 export type BrowseProject = {
   place_country_code?: string | null;
   id: string;
@@ -12,6 +15,45 @@ export type BrowseProject = {
 };
 
 export type ProjectSort = "recent" | "year_desc" | "year_asc" | "title_asc" | "crew_desc";
+
+type ProjectBrowseFilters = {
+  query: string;
+  country: string;
+  type: string;
+  year: string;
+  director: string;
+};
+
+/** Shared by the website and native view: each facet honors all other filters. */
+export function projectBrowseSelection(
+  projects: readonly BrowseProject[], filters: ProjectBrowseFilters, locale: string, translate: (key: string) => string,
+) {
+  const needle = normalizedCatalogueSearch(filters.query, locale);
+  const searched = projects.filter(project => !needle || [project.title, project.director ?? "", project.type ?? "", projectTypeLabel(project.type ?? "", translate)]
+    .some(value => normalizedCatalogueSearch(value, locale).includes(needle)));
+  const matches = (project: BrowseProject, selected: ProjectBrowseFilters, except?: keyof ProjectBrowseFilters) =>
+    (except === "country" || matchesPlace(project, "country", selected.country)) &&
+    (except === "type" || !selected.type || project.type === selected.type) &&
+    (except === "year" || !selected.year || String(project.year) === selected.year) &&
+    (except === "director" || !selected.director || project.director === selected.director);
+  // Resolve against the other filters first. An obsolete director must not
+  // suppress all results or hide valid options after another filter changes.
+  const directors = [...new Set(searched.filter(project => matches(project, filters, "director"))
+    .flatMap(project => project.director?.trim() ? [project.director] : []))]
+    .sort((a, b) => a.localeCompare(b, locale)).map(value => ({ value, label: value }));
+  const director = directors.some(option => option.value === filters.director) ? filters.director : "";
+  const selected = { ...filters, director };
+  const forFacet = (facet: keyof ProjectBrowseFilters) => searched.filter(project => matches(project, selected, facet));
+  return {
+    director,
+    directors,
+    types: projectTypeOptions(forFacet("type").flatMap(project => project.type?.trim() ? [project.type] : []), translate, locale),
+    years: [...new Set(forFacet("year").flatMap(project => project.year === null ? [] : [project.year]))]
+      .sort((a, b) => b - a).map(value => ({ value: String(value), label: String(value) })),
+    countries: browsePlaceOptions(forFacet("country"), "country", locale),
+    projects: searched.filter(project => matches(project, selected)),
+  };
+}
 
 export function sortProjects(projects: readonly BrowseProject[], sort: ProjectSort, locale: string): BrowseProject[] {
   const collator = new Intl.Collator(locale, { sensitivity: "base", numeric: true });

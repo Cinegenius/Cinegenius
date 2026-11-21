@@ -1,13 +1,16 @@
 "use client";
 
-import { useEffect, useLayoutEffect, useRef } from "react";
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import type { MouseEvent, ReactNode, RefObject } from "react";
 import Link from "next/link";
-import { Bell, ChevronRight, Loader2, LogOut, Menu, MessageSquare, Search, User } from "lucide-react";
+import { Bell, ChevronRight, Loader2, LogOut, Menu, MessageSquare, Moon, Search, Sun, User } from "lucide-react";
 import NavigationIcon from "@/components/NavigationIcon";
 import type { SiteNavigationIcon } from "@/lib/site-navigation";
 import { announceNativeHeaderAction, useNativeHeaderUtilityKind } from "@/lib/native-header-utility";
+import { toggleNativeAppTheme, useNativeAppTheme } from "@/lib/native-app-theme";
+import { useNativeCapability } from "@/lib/use-native-capability";
 import styles from "./NativeAppNavbar.module.css";
+import NativeInboxPanel from "./NativeInboxPanel";
 
 type ProfileLink = { id: string; href: string; label: string; icon: SiteNavigationIcon };
 
@@ -33,17 +36,25 @@ export type NativeAppNavbarProps = {
     signingOut: boolean;
     signOutLabel: string;
   };
-  messages: { label: string; count: number; noticeCount: number; failed: boolean; active: boolean };
+  messages: { label: string; count: number; noticeCount: number; failed: boolean; active: boolean; scopeKey?: string };
   search: { label: string; onClick: (event: MouseEvent<HTMLButtonElement>) => void };
   menu: { label: string; open: boolean; controls: string; onClick: (event: MouseEvent<HTMLButtonElement>) => void };
   signInLabel: string;
+  appearance: { lightLabel: string; darkLabel: string };
 };
 
 /** App presentation of the existing Navbar controller; no identity, request or preference store. */
-export default function NativeAppNavbar({ navigationLabel, accountButtonRef, accountMenuRef, account, messages, search, menu, signInLabel }: NativeAppNavbarProps) {
+export default function NativeAppNavbar({ navigationLabel, accountButtonRef, accountMenuRef, account, messages, search, menu, signInLabel, appearance }: NativeAppNavbarProps) {
   const { open, ready } = account;
   const utility = useNativeHeaderUtilityKind();
+  const theme = useNativeAppTheme();
+  const themeReady = useNativeCapability("appearance-toggle");
+  const themeLabel = theme === "pure" ? appearance.darkLabel : appearance.lightLabel;
   const header = useRef<HTMLElement>(null);
+  const [messagePanel, setMessagePanel] = useState({ scope: "", open: false });
+  const messageScope = messages.scopeKey ?? account.email;
+  const messagesOpen = account.signedIn && account.ready && messagePanel.scope === messageScope && messagePanel.open;
+  const closeMessages = useCallback(() => setMessagePanel(current => current.open ? { ...current, open: false } : current), []);
   useLayoutEffect(() => {
     const root = document.documentElement, element = header.current, bubble = element?.querySelector("nav");
     if (!element || !bubble) return;
@@ -99,7 +110,14 @@ export default function NativeAppNavbar({ navigationLabel, accountButtonRef, acc
       ><span className={styles.avatar}>{account.avatar}</span>{account.supportBadge && <span className={styles.support}>{account.supportBadge}</span>}</button>
         : <Link href="/sign-in" prefetch={false} className={styles.action} data-native-app-action="profile" aria-label={signInLabel} title={signInLabel}><User size={22} aria-hidden="true" /></Link>}
       <Link href="/messages" prefetch={false} className={styles.action} data-native-app-action="messages"
-        aria-label={messages.label} title={messages.label} aria-current={messages.active ? "page" : undefined} onClick={event => { if (!announceNativeHeaderAction("messages")) { event.preventDefault(); return; } account.onClose(); }}>
+        aria-label={messages.label} title={messages.label} aria-current={messages.active ? "page" : undefined} aria-expanded={account.signedIn && account.ready ? messagesOpen : undefined} aria-haspopup={account.signedIn && account.ready ? "dialog" : undefined} aria-controls={messagesOpen ? "native-inbox-panel" : undefined}
+        onClick={event => {
+          if (event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.altKey || event.shiftKey) return;
+          if (!announceNativeHeaderAction(messagesOpen ? "close" : "messages")) { event.preventDefault(); return; }
+          account.onClose();
+          if (!account.signedIn || !account.ready) return;
+          event.preventDefault(); setMessagePanel({ scope: messageScope, open: !messagesOpen });
+        }}>
         <MessageSquare size={22} aria-hidden="true" />
         {messages.failed && <span aria-hidden="true" className={styles.failed} />}
         {messages.count > 0 && <span aria-hidden="true" data-native-unread="messages" className={styles.messageBadge}>{messages.count > 9 ? "9+" : messages.count}</span>}
@@ -109,6 +127,16 @@ export default function NativeAppNavbar({ navigationLabel, accountButtonRef, acc
       <button type="button" className={styles.action} data-native-app-action="menu" aria-label={menu.label} title={menu.label}
         aria-expanded={menu.open} aria-controls={menu.controls} aria-haspopup="dialog" onClick={menu.onClick}><Menu size={22} aria-hidden="true" /></button>
     </nav>
+    {messagesOpen && <NativeInboxPanel onClose={closeMessages} />}
+    {themeReady && <button type="button" className={styles.themeToggle} data-native-app-theme-toggle="v1"
+      aria-label={themeLabel} title={themeLabel}
+      onClick={event => {
+        // Native capture consumes its trusted click first. This fallback only
+        // changes the presentation marker in an ordinary browser preview.
+        if (!event.defaultPrevented && event.nativeEvent.isTrusted) toggleNativeAppTheme();
+      }}>
+      {theme === "pure" ? <Moon size={20} aria-hidden="true" /> : <Sun size={20} aria-hidden="true" />}
+    </button>}
     {account.ready && account.open && <div ref={accountMenuRef} id="header-account-menu" className={styles.profileMenu}
       role="dialog" aria-labelledby="native-profile-menu-title"
       onBlur={event => {

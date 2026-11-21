@@ -45,18 +45,20 @@ export default function NativeProjectResults({ projects, view }: { projects: Bro
         style={{ "--project-hue": hue, "--project-saturation": tone === "neutral" ? "0%" : "50%" } as CSSProperties}>
         <Link href={`/projects/${project.id}`} className={styles.card} data-native-project-id={project.id}>
           <span className={styles.poster} data-project-poster={project.poster_url ? "image" : "fallback"} aria-hidden="true">
-            {project.poster_url ? <MediaImage src={project.poster_url} alt="" fill sizes={view === "grid" ? "(max-width: 639px) 50vw, 33vw" : "44px"} className={styles.posterImage} />
+            {project.poster_url ? <MediaImage src={project.poster_url} alt="" fill sizes={view === "grid" ? "(max-width: 639px) 50vw, 33vw" : "36px"} className={styles.posterImage} />
               : <span className={styles.fallback}><Icon size={20} aria-hidden="true" />{initials && <span>{initials}</span>}</span>}
           </span>
           <div className={styles.body}>
-            {project.type && <span className={styles.type}><Icon size={14} aria-hidden="true" /><span>{projectTypeLabel(project.type, ui)}</span></span>}
             <h2 className={styles.title}>{project.title}</h2>
+            <div className={styles.metadata}>
+            {project.type && <span className={styles.type}><Icon size={14} aria-hidden="true" /><span>{projectTypeLabel(project.type, ui)}</span></span>}
             {(project.year !== null || country) && <span className={styles.facts}>
               {project.year !== null && <span><span className={styles.srOnly}>{t("colYear")}: </span>{project.year}</span>}
               {country && <span>{ui.has(`CountryNames.${country}`) ? ui(`CountryNames.${country}`) : country}</span>}
             </span>}
             {project.director && <span className={styles.director}><span className={styles.label}>{t("colDirector")}: </span>{project.director}</span>}
             {project.crew_count > 0 && <span className={styles.credits} title={t("creditsCountHint")}>{t("creditCount", { count: project.crew_count })}</span>}
+            </div>
           </div>
         </Link>
       </li>;

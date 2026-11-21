@@ -13470,6 +13470,8 @@
   },
   "ProfileLayout": {},
   "NativeAppChrome": {
+    "lightMode": "Switch to light mode",
+    "darkMode": "Switch to dark mode",
     "work": "Work",
     "createEntry": "Create entry",
     "navigation": "App shortcuts",
@@ -13589,6 +13591,12 @@
     "showOriginal": "Show original",
     "showTranslated": "Show translation",
     "retry": "Try again"
+  },
+  "NativeOrganizations": {
+    "searchLabel": "Search organizations",
+    "pageScope": "Page {page} · {loaded} of {total} organizations loaded",
+    "mapScope": "{mapped} of {loaded} organizations on this page are on the map. The others remain in the list.",
+    "empty": "No matching organizations found."
   },
   "EditorialAuthority": {
     "enable": "Grant editorial authority",

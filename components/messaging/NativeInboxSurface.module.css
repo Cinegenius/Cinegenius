@@ -1,0 +1,12 @@
+.shell.shell{background:transparent}
+.shell>aside,.shell>section,.shell>section>header{background:transparent!important}
+.shell :global([data-native-inbox-header]){background:transparent;border-bottom-color:var(--cg-app-border,#ffffff21)}
+.shell :global([data-native-inbox-contacts]){max-width:none}
+.notices{background:transparent}
+.notices .content{max-width:none;padding:8px 12px}
+.notices .filters{display:flex;flex-wrap:nowrap;gap:6px;overflow-x:auto;overscroll-behavior-inline:contain;scrollbar-width:none;margin:4px 0 10px;padding-bottom:4px;white-space:nowrap}
+.notices .filters::-webkit-scrollbar{display:none}
+.notices .filters>button{flex:0 0 auto;min-width:44px;min-height:44px;white-space:nowrap}
+.notices .list{background:color-mix(in srgb,var(--cg-app-surface,#1b1d23) 76%,transparent);border-color:var(--cg-app-border,#ffffff21)}
+.notices .state{padding-top:18px;padding-bottom:18px}
+@media(prefers-reduced-transparency:reduce){.notices .list{background:var(--cg-app-surface,#1b1d23)}}

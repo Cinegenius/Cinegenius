@@ -1,5 +1,6 @@
 @import "tailwindcss";
 
+
 /* Native browse controls own their compact rail; the ordinary site is unchanged. */
 html[data-cg-native-community-appearance="app"] .native-browse-filter-dot { position:absolute; top:8px; right:8px; width:5px; height:5px; border-radius:50%; background:currentColor; }
 html[data-cg-native-community-appearance="app"] .mobile-filter-dialog[data-native-browse-dialog="v1"] .mobile-filter-panel {

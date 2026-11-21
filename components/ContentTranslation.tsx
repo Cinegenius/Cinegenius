@@ -4,12 +4,14 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useRef, use
 import { useLocale, useTranslations } from "next-intl";
 import { useAuth } from "@clerk/nextjs";
 import { usePathname } from "next/navigation";
+import { Languages, RotateCw } from "lucide-react";
 import { createContentTranslationClient } from "@/lib/content-translation-client";
 import { isAppLocale } from "@/lib/i18n/locales";
-import type { ContentReference } from "@/lib/content-translation";
+import type { ContentReference, ContentTranslation } from "@/lib/content-translation";
 
 type Client = ReturnType<typeof createContentTranslationClient>;
 type TranslationContext = {client: Client | null; original: boolean; setOriginal: (value: boolean) => void; enabled: boolean};
+export type ContentTranslationObservation = ContentReference & {field: string; instance: object};
 const Context = createContext<TranslationContext>({client: null, original: false, setOriginal: () => {}, enabled: false});
 const noSubscribe = () => () => {};
 const noSnapshot = () => undefined;
@@ -60,14 +62,15 @@ export function useTranslatedContent({kind, id, field, source, active = true}: C
   const snapshot = useCallback(() => active && client ? client.get({kind, id}) : undefined, [client, active, kind, id]);
   const result = useSyncExternalStore(subscribe, snapshot, noSnapshot);
   const text = result?.status === "translated" && result.originals[field] === source && typeof result.fields[field] === "string" ? result.fields[field] : source;
-  return {text, translated: text !== source, locale: result?.locale};
+  return {text, translated: text !== source, locale: result?.locale, status: result?.status};
 }
 
 /** Explicit public display fields only. Never wrap editors, private messages or legal documents. */
-export function TranslatedText({kind, id, field, children, className}: ContentReference & {field: string; children: string | null | undefined; className?: string}) {
+export function TranslatedText({kind, id, field, children, className, onStatusChange}: ContentReference & {field: string; children: string | null | undefined; className?: string; onStatusChange?: (reference: ContentTranslationObservation, status: ContentTranslation["status"] | undefined) => void}) {
   const {client} = useContext(Context);
   const t = useTranslations("contentTranslation");
   const element = useRef<HTMLSpanElement>(null);
+  const instance = useRef<object>({});
   const [visible, setVisible] = useState(false);
   useEffect(() => {
     if (!client || !element.current) return;
@@ -83,10 +86,31 @@ export function TranslatedText({kind, id, field, children, className}: ContentRe
     observer.observe(element.current); return () => observer.disconnect();
   }, [client]);
   const result = useTranslatedContent({kind, id, field, source: children, active: visible});
+  useEffect(() => {
+    if (!onStatusChange) return;
+    const reference = {kind, id, field, instance: instance.current};
+    onStatusChange(reference, result.status);
+    return () => onStatusChange(reference, undefined);
+  }, [onStatusChange, kind, id, field, result.status]);
   return <span ref={element} className={className} data-content-kind={kind} data-content-field={field}
     data-machine-translated={result.translated ? "true" : undefined} lang={result.translated ? result.locale : undefined} title={result.translated ? t("machineLabel") : undefined}>
     {result.text}
   </span>;
+}
+
+/** Compact native control using the same preference and only already-visible translation errors. */
+export function ContentTranslationActions({unavailable = false, className}: {unavailable?: boolean; className?: string}) {
+  const {enabled, original, setOriginal, client} = useContext(Context);
+  const t = useTranslations("contentTranslation"), common = useTranslations("common");
+  if (!enabled) return null;
+  return <div className={className} data-content-translation-actions>
+    <button type="button" aria-label={t(original ? "showTranslated" : "showOriginal")} aria-pressed={original}
+      title={t(original ? "originalMode" : "notice")} onClick={() => setOriginal(!original)}><Languages size={18} aria-hidden="true" /></button>
+    {!original && client && unavailable && <>
+      <span className="sr-only" role="alert">{common("translationUnavailable")}</span>
+      <button type="button" aria-label={t("retry")} title={t("retry")} onClick={() => client?.refresh()}><RotateCw size={18} aria-hidden="true" /></button>
+    </>}
+  </div>;
 }
 
 /** Shared website/app preference. Functional cookie only; never a new translation system. */

@@ -13470,6 +13470,8 @@
   },
   "ProfileLayout": {},
   "NativeAppChrome": {
+    "lightMode": "ライトモードに切り替える",
+    "darkMode": "ダークモードに切り替える",
     "work": "Work",
     "createEntry": "項目を作成",
     "navigation": "アプリのショートカット",
@@ -13589,6 +13591,12 @@
     "showOriginal": "原文を表示",
     "showTranslated": "翻訳を表示",
     "retry": "再試行"
+  },
+  "NativeOrganizations": {
+    "searchLabel": "団体を検索",
+    "pageScope": "{page} ページ · 全 {total} 団体中 {loaded} 団体を読み込み済み",
+    "mapScope": "このページの {loaded} 団体中 {mapped} 団体を地図に表示しています。その他の団体は一覧に残ります。",
+    "empty": "条件に合う団体が見つかりませんでした。"
   },
   "EditorialAuthority": {
     "enable": "編集権限を付与",

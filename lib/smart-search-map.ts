@@ -5,6 +5,9 @@ export const SMART_MAP_COLORS: Record<SearchArea, string> = {
   jobs: "#e6c675", animals: "#70cdb0", projects: "#e99eb2", news: "#a9bdcd", organizations: "#a5a4df",
 };
 
+/** One native palette shared by pills, badges, result groups and map markers. */
+export { NATIVE_SMART_MAP_COLORS } from "./native-smart-colors";
+
 export function smartMapEntries(groups: SearchGroup[]) {
   const entries = new Map<string, { key: string; area: SearchArea; result: SearchResult }>();
   for (const group of groups) for (const result of group.results) {

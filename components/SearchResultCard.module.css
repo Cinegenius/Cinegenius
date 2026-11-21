@@ -4,3 +4,18 @@
 :global(html[data-cg-native-community-appearance="app"]) .card :global([data-result-price]) { display:block; max-height:none; overflow:visible; -webkit-line-clamp:unset; line-clamp:unset; white-space:normal; text-overflow:clip; overflow-wrap:anywhere; word-break:normal; }
 :global(html[data-cg-native-community-appearance="app"]) .card :global([data-result-title]) { line-height:1.35; }
 :global(html[data-cg-native-community-appearance="app"]) .card :global([data-result-subtitle]) { line-height:1.5; }
+:global(html[data-cg-native-community-appearance="app"]) .card :global([data-result-occupation]),
+:global(html[data-cg-native-community-appearance="app"]) .card :global([data-result-place]) { margin-top:3px; line-height:1.4; overflow-wrap:anywhere; }
+:global(html[data-cg-native-community-appearance="app"]) .card:global([data-native-smart-area]) { --native-domain:var(--native-domain-cinema); --native-domain-ink:var(--native-domain); }
+:global(html[data-cg-native-community-appearance="app"][data-cg-app-theme="pure"]) .card:global([data-native-smart-area]) { --native-domain:var(--native-domain-pure); --native-domain-ink:color-mix(in srgb,var(--native-domain-pure) 80%,#000); }
+:global(html[data-cg-native-community-appearance="app"]) .card:global([data-native-smart-area]) :global([data-result-type-badge]),
+:global(html[data-cg-native-community-appearance="app"]) .card:global([data-native-smart-area]) :global([data-result-placeholder]) { border-color:color-mix(in srgb,var(--native-domain) 58%,transparent); background:color-mix(in srgb,var(--native-domain) 18%,var(--cg-app-surface,#1b1d23)); color:var(--native-domain-ink); }
+:global(html[data-cg-native-community-appearance="app"]) .card:global([data-native-smart-area]) :global([data-result-type-badge]) :global(svg),
+:global(html[data-cg-native-community-appearance="app"]) .card:global([data-native-smart-area]) :global([data-result-type-badge]) :global(span),
+:global(html[data-cg-native-community-appearance="app"]) .card:global([data-native-smart-area]) :global([data-result-placeholder]) :global(svg) { color:inherit; }
+/* Beat older bundled appearance rules as well as directory/grid cover rules.
+   A single checked image keeps its complete source inside the existing frame. */
+:global(html[data-cg-native-community-appearance="app"]) .card:global([data-search-result-card][data-native-smart-area]) :global([data-result-image="photo"]):has(img) { background:linear-gradient(145deg,#ffffff1f,#ffffff06),color-mix(in srgb,var(--cg-app-surface-raised,#24262d) 65%,transparent) !important; }
+:global(html[data-cg-native-community-appearance="app"]) .card:global([data-search-result-card][data-native-smart-area]) :global([data-result-image="photo"]) :global(img) { object-fit:contain !important; object-position:center !important; transform:none !important; padding:4px !important; box-sizing:border-box !important; }
+
+:global(html[data-cg-native-community-appearance="app"]) .card[data-result-layout="grid"]:is([data-search-result-card="profile"],[data-search-result-card="creator"]) > :global([data-result-image]) { aspect-ratio:1; }

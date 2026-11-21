@@ -1,4 +1,5 @@
 import { COUNTRY_CODES } from "./places/countries";
+import type { DiscoveryCursor } from "./discovery-seed";
 
 export const SEARCH_AREAS = ["crew", "marketplace", "locations", "companies", "jobs", "animals", "projects", "news", "organizations"] as const;
 export type SearchArea = typeof SEARCH_AREAS[number];
@@ -70,6 +71,8 @@ export function searchPlanFromHref(href: string): SearchPlan | null {
 }
 
 export type SearchResult = { id: string; sourceId?: string; title: string; subtitle: string; type: string; price: number; priceLabel?: string; image: string | null; available: boolean | null;
+  /** Already localized public facts; separate from the website's longer subtitle. */
+  crewPreview?: { occupation: string; place: string };
   facets?: { departments?: string[]; marketplace?: string };
   evidence?: "role" | "title" | "requirements";
   nearby?: { distanceKm: number; origin: string };
@@ -77,6 +80,7 @@ export type SearchResult = { id: string; sourceId?: string; title: string; subti
 export type NearbyCursor = { distanceKm: number; id: string };
 export type SearchRankCursor = { score: number; distanceKm: number; id: string };
 export type SearchGroup = { area: SearchArea; wishIndex: number; label: string; results: SearchResult[]; nextOffset: number | null;
+  discoveryCursor?: DiscoveryCursor;
   segment?: string; rankCursor?: SearchRankCursor; nearby?: true; nearbyCursor?: NearbyCursor };
 
 export const searchGroupKey = (group: Pick<SearchGroup, "area" | "wishIndex" | "segment">) => `${group.area}:${group.wishIndex}:${group.segment ?? ""}`;

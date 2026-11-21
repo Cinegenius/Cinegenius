@@ -17,7 +17,7 @@ type Contact = { friendship_id: string; user_id: string; display_name: string; a
 const FRIENDSHIPS_CONTRACT = "cinegenius.friendships.v1";
 
 /** Only accepted connections belong here; incoming requests live in Mitteilungen. */
-export default function InboxFriends({ searchValue, hideSearch = false, hideTabs = false }: { searchValue?: string; hideSearch?: boolean; hideTabs?: boolean } = {}) {
+export default function InboxFriends({ searchValue, hideSearch = false, hideTabs = false, homiesOnly, onOpenMessage }: { searchValue?: string; hideSearch?: boolean; hideTabs?: boolean; homiesOnly?: boolean; onOpenMessage?: (recipientId: string) => void } = {}) {
   const t = useTranslations("Contacts");
   const messaging = useTranslations("Messaging");
   const locale = useLocale();
@@ -28,6 +28,7 @@ export default function InboxFriends({ searchValue, hideSearch = false, hideTabs
   const scope = JSON.stringify([userId, sessionId]);
   const currentScope = useRef(scope);
   const generation = useRef(0);
+  const reading = useRef<AbortController | null>(null);
   const operations = useRef(new Set<string>());
   const region = useRef<HTMLDivElement>(null);
   const [snapshot, setSnapshot] = useState<{ scope: string; contacts: Contact[]; favoritesRead?: boolean; favoritesWrite?: boolean }>({ scope: "", contacts: [] });
@@ -36,7 +37,7 @@ export default function InboxFriends({ searchValue, hideSearch = false, hideTabs
   const [pending, setPending] = useState(new Set<string>());
   const [searchState, setSearch] = useState({ scope, value: "" });
   const search = searchValue ?? (searchState.scope === scope ? searchState.value : "");
-  const onlyHomies = inboxHomies(searchParams);
+  const onlyHomies = homiesOnly ?? inboxHomies(searchParams);
   const nativeContract = nativeAppearance || onlyHomies;
   const contacts = snapshot.scope === scope ? snapshot.contacts : [];
   const ready = snapshot.scope === scope;
@@ -47,7 +48,7 @@ export default function InboxFriends({ searchValue, hideSearch = false, hideTabs
 
   useLayoutEffect(() => {
     currentScope.current = scope;
-    return () => { currentScope.current = ""; generation.current += 1; };
+    return () => { currentScope.current = ""; generation.current += 1; reading.current?.abort(); reading.current = null; };
   }, [scope]);
 
   useEffect(() => {
@@ -59,10 +60,12 @@ export default function InboxFriends({ searchValue, hideSearch = false, hideTabs
   const load = useCallback(async () => {
     if (!userId) return;
     const version = ++generation.current;
-    const isCurrent = () => currentScope.current === scope && version === generation.current;
+    reading.current?.abort();
+    const controller = new AbortController(); reading.current = controller;
+    const isCurrent = () => !controller.signal.aborted && currentScope.current === scope && version === generation.current;
     setLoading(true);
     try {
-      const response = await fetch("/api/friendships", { cache: "no-store", headers: nativeContract ? { "X-CineGenius-Native-Contract": FRIENDSHIPS_CONTRACT, "X-Contact-Account": userId } : undefined, signal: AbortSignal.timeout(15_000) });
+      const response = await fetch("/api/friendships", { cache: "no-store", headers: nativeContract ? { "X-CineGenius-Native-Contract": FRIENDSHIPS_CONTRACT, "X-Contact-Account": userId } : undefined, signal: AbortSignal.any([controller.signal, AbortSignal.timeout(15_000)]) });
       const data = await response.json();
       if (!isCurrent()) return;
       if (!response.ok || !Array.isArray(data.friends) || (nativeContract && (data.contract !== FRIENDSHIPS_CONTRACT || data.accountId !== userId))) throw new Error();
@@ -82,7 +85,7 @@ export default function InboxFriends({ searchValue, hideSearch = false, hideTabs
     queueMicrotask(() => { if (active) void load(); });
     const refresh = () => { void load(); };
     window.addEventListener("focus", refresh);
-    return () => { active = false; window.removeEventListener("focus", refresh); };
+    return () => { active = false; reading.current?.abort(); window.removeEventListener("focus", refresh); };
   }, [load]);
 
   async function remove(id: string) {
@@ -163,7 +166,7 @@ export default function InboxFriends({ searchValue, hideSearch = false, hideTabs
         key={`${scope}:${contact.friendship_id}`} compact={nativeAppearance} contact={contact} pending={pending.has(`${scope}:${contact.friendship_id}`)} error={error} onRemove={remove}
         favorite={favoritesRead ? contact.is_favorite : undefined} favoriteDisabled={!favoritesWrite} onFavorite={() => void favorite(contact)}
         messageHref={`/messages?to=${encodeURIComponent(contact.user_id)}`}
-        onMessage={() => { if (userId) leave(() => navigateMessageView(window, userId, { recipientId: contact.user_id })); }}
+        onMessage={() => { if (onOpenMessage) onOpenMessage(contact.user_id); else if (userId) leave(() => navigateMessageView(window, userId, { recipientId: contact.user_id })); }}
       />)}
     </div>
   </div>;

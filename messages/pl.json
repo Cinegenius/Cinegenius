@@ -13470,6 +13470,8 @@
   },
   "ProfileLayout": {},
   "NativeAppChrome": {
+    "lightMode": "Włącz tryb jasny",
+    "darkMode": "Włącz tryb ciemny",
     "work": "Work",
     "createEntry": "Utwórz wpis",
     "navigation": "Skróty aplikacji",
@@ -13589,6 +13591,12 @@
     "showOriginal": "Pokaż oryginał",
     "showTranslated": "Pokaż tłumaczenie",
     "retry": "Spróbuj ponownie"
+  },
+  "NativeOrganizations": {
+    "searchLabel": "Szukaj organizacji",
+    "pageScope": "Strona {page} · wczytano {loaded} z {total} organizacji",
+    "mapScope": "Na mapie widać {mapped} z {loaded} organizacji na tej stronie. Pozostałe są nadal na liście.",
+    "empty": "Nie znaleziono pasujących organizacji."
   },
   "EditorialAuthority": {
     "enable": "Nadaj uprawnienia redakcyjne",
