@@ -37,6 +37,7 @@ import { mergeVisibleMessagePage } from "@/lib/message-actions";
 import { backFromMessageView, navigateMessageView, navigateInboxView, inboxView } from "@/lib/message-navigation";
 import { uiErrorMessage } from "@/lib/ui-error-message";
 import { useNativeAppAppearance } from "@/lib/use-native-app-appearance";
+import nativeInboxStyles from "@/components/messaging/NativeInboxSurface.module.css";
 
 type Message = {
   attachments?: MessageAttachment[];
@@ -489,7 +490,7 @@ function MessagesContent() {
   const people = [...contacts].sort((a,b) => a.display_name.localeCompare(b.display_name,uiLocale)).map(contact => ({id:contact.user_id, name:contact.display_name, avatar:contact.avatar_url, role:contact.role, occupationForm:contact.occupationForm}));
   const filteredConversations = conversations.filter(conversation => (view !== "groups" || conversation.kind === "group") && `${conversation.otherName ?? ""} ${conversation.group_name ?? ""}`.toLocaleLowerCase(uiLocale).includes(search.trim().toLocaleLowerCase(uiLocale)));
 
-  return <div className={`inbox-shell ${utilityView ? "flex-col" : "flex-col sm:flex-row"} ${showChat ? "bottom-0" : "bottom-[var(--mobile-nav-clearance)]"} lg:bottom-0`}
+  return <div className={`inbox-shell ${nativeAppearance ? nativeInboxStyles.shell : ""} ${utilityView ? "flex-col" : "flex-col sm:flex-row"} ${showChat ? "bottom-0" : "bottom-[var(--mobile-nav-clearance)]"} lg:bottom-0`}
     style={{"--messages-viewport-offset":`${visualViewportTop}px`,...(keyboardInset>0?{bottom:`${keyboardInset}px`}:{})} as CSSProperties}>
     <aside className={`${showChat?"hidden sm:flex":"flex"} min-h-0 min-w-0 w-full flex-col border-border bg-bg-primary ${utilityView ? "shrink-0" : "border-r sm:w-80 flex-1 sm:flex-none"}`}>
       <InboxPaneHeader active={view} action={<button type="button" onClick={()=>setNewMessageOpen(true)} aria-label={t("newMessage")} title={t("newMessage")} className="flex size-11 shrink-0 items-center justify-center rounded-xl text-gold hover:bg-bg-elevated"><SquarePen size={22}/></button>}>

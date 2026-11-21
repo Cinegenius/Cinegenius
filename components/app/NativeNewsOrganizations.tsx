@@ -7,7 +7,7 @@ export default async function NativeNewsOrganizations({ country }: { country: st
   const href = organizationsCountryHref(country);
   let organizations: PublicOrganization[] = [], unavailable = false;
   try {
-    organizations = (await organizationDiscovery(1, 12, country, AbortSignal.timeout(8000))).organizations;
+    organizations = (await organizationDiscovery(1, 12, country, null, AbortSignal.timeout(8000))).organizations;
   } catch {
     unavailable = true;
   }

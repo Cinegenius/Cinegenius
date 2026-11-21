@@ -53,7 +53,7 @@ export default function NativeOrganizations({ data, children }: { data: Organiza
       </form>
       <NativeBrowseToolbar keepTwoFilters count={pending ? null : data.count} countLabel={ui("BrowseFilters.results", { count: data.count })}
         filters={[
-          <NativeCountrySelect compact key="country" value={data.filters.country} onChange={value => { const country = browseCountryChoice(value); if (country !== undefined) change({ country, city: "" }); }} />,
+          <NativeCountrySelect compact key="country" value={data.filters.country} onChange={value => { const country = browseCountryChoice(value); if (country !== undefined) change({ country, city: "", automatic: false }); }} />,
           <NativeBrowseQuickFilter key="city" kind="place" label={places("city")} value={data.filters.city}
             options={[{ value: "", label: places("allCities") }, ...data.cities.map(city => ({ ...city, label: city.label || places("city") }))]} onChange={city => change({ city })} />,
         ]} viewControls={<DirectoryViewControls views={["list", "map"]} value={view === "map" ? "map" : "list"} onChange={setView} />} />

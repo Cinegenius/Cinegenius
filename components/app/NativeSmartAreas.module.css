@@ -30,3 +30,10 @@
 @media(min-width:700px) { .grid { grid-template-columns: repeat(3,minmax(0,1fr)); } }
 
 @media(forced-colors:active) { :global(html[data-cg-native-community-appearance="app"]) .areas > button { border-color:ButtonText; } :global(html[data-cg-native-community-appearance="app"]) .areas > button[aria-pressed="true"] { background:Highlight; color:HighlightText; } :global(html[data-cg-native-community-appearance="app"]) .areas > button[aria-pressed="true"]::after { background:HighlightText; } }
+
+/* Three compact Crew cards per row in the native app; other areas keep their grid. */
+:global(html[data-cg-native-community-appearance="app"]) :global([data-native-smart-result-area="crew"]) .grid { grid-template-columns:repeat(3,minmax(0,1fr)); gap:6px; }
+:global(html[data-cg-native-community-appearance="app"]) :global([data-native-smart-result-area="crew"]) .grid :global([data-native-crew-preview="true"]) > div:last-child { padding:7px 6px; }
+:global(html[data-cg-native-community-appearance="app"]) :global([data-native-smart-result-area="crew"]) .grid :global([data-result-title]) { font-size:13px; line-height:1.3; }
+:global(html[data-cg-native-community-appearance="app"]) :global([data-native-smart-result-area="crew"]) .grid :global([data-result-occupation]),
+:global(html[data-cg-native-community-appearance="app"]) :global([data-native-smart-result-area="crew"]) .grid :global([data-result-place]) { font-size:11.5px; line-height:1.4; }

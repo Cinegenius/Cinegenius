@@ -41,3 +41,8 @@
   :global(html[data-cg-native-community-appearance="app"][data-cg-app-theme="pure"]) .block .heading { color:CanvasText; }
   :global(html[data-cg-native-community-appearance="app"]) .block :global(.smart-result-row) { border-bottom-color:CanvasText; }
 }
+
+/* The real button remains reachable by keyboard and acts as the native scroll sentinel. */
+:global(html[data-cg-native-community-appearance="app"]) .autoMore { display:block; width:100%; height:1px; min-height:1px; margin:0; padding:0; border:0; overflow:hidden; color:transparent; background:transparent; font-size:0; }
+:global(html[data-cg-native-community-appearance="app"]) .autoMore:focus-visible { min-height:44px; height:auto; color:var(--cg-app-accent,#c2f135); font-size:13px; outline:2px solid currentColor; outline-offset:2px; }
+@supports not (display:grid) { :global(html[data-cg-native-community-appearance="app"]) .autoMore { min-height:44px; color:var(--cg-app-accent,#c2f135); font-size:13px; } }

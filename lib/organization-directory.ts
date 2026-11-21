@@ -4,6 +4,7 @@ import { browseCountryChoice } from "@/lib/browse-country";
 import { publicMapPoint } from "@/lib/places/public-map-point";
 import { UNASSIGNED_COUNTRY, cityName, countryName } from "@/lib/places/core";
 import { organizationCityFilter, type OrganizationDirectoryFilters } from "./organization-directory-filters";
+import { geographicPage, type BrowsePlace } from "./browse-geography";
 
 export type OrganizationDirectoryEntry = { id: string; slug: string; name: string; logo_url: string | null; city: string; country: string; lat: number | null; lng: number | null };
 export type OrganizationDirectoryData = { organizations: OrganizationDirectoryEntry[]; cities: { value: string; label: string }[]; count: number; hasMore: boolean; filters: OrganizationDirectoryFilters };
@@ -12,12 +13,14 @@ const fields = "id,slug,name,logo_url,city,place_city_id,place_city_name,place_c
 const PAGE_SIZE = 24;
 
 /** Only public seat information. Never treat an organization's service region as its city. */
-export async function organizationDirectory(filters: OrganizationDirectoryFilters, locale: string, signal: AbortSignal): Promise<OrganizationDirectoryData> {
+export async function organizationDirectory(filters: OrganizationDirectoryFilters, locale: string, signal: AbortSignal, preferred: BrowsePlace | null = null): Promise<OrganizationDirectoryData> {
   const country = browseCountryChoice(filters.country);
   if (country === undefined || !Number.isInteger(filters.page) || filters.page < 1 || filters.page > 10000
-    || filters.q.length > 120 || filters.city.length > 220 || /[\u0000-\u001f]/.test(filters.q + filters.city)) throw new Error("organization_filters_invalid");
-  const base = (projection: string, count = false) => {
-    let query = db.from("organizations").select(projection, count ? { count: "exact" } : undefined).eq("moderation_status", "approved");
+    || filters.q.length > 120 || filters.city.length > 220 || /[\u0000-\u001f]/.test(filters.q + filters.city)
+    || (filters.automatic !== undefined && typeof filters.automatic !== "boolean")) throw new Error("organization_filters_invalid");
+  signal.throwIfAborted();
+  const base = (projection: string, count = false, head = false) => {
+    let query = db.from("organizations").select(projection, count ? { count: "exact", head } : undefined).eq("moderation_status", "approved");
     if (country === UNASSIGNED_COUNTRY) query = query.or('place_country_code.is.null,place_country_code.eq.""');
     else if (country) query = query.eq("place_country_code", country);
     return query;
@@ -44,15 +47,24 @@ export async function organizationDirectory(filters: OrganizationDirectoryFilter
     }
     return [...cities].map(([value, label]) => ({ value, label })).sort((a, b) => a.label.localeCompare(b.label, locale));
   };
-  let query = base(fields, true);
-  if (city && "id" in city) query = query.eq("place_city_id", city.id).eq("place_status", "verified");
-  else if (city) {
-    query = query.eq("city", city.text);
-    query = city.country === UNASSIGNED_COUNTRY ? query.or('place_country_code.is.null,place_country_code.eq.""') : query.eq("place_country_code", city.country);
-  }
-  if (filters.q.trim()) query = query.ilike("name", `%${filters.q.trim().replace(/[\\%_]/g, " ")}%`);
-  const [cities, { data, error, count }] = await Promise.all([readCities(), query.order("created_at", { ascending: false }).order("id")
-    .range((filters.page - 1) * PAGE_SIZE, filters.page * PAGE_SIZE - 1).abortSignal(signal)]);
+  const readPage = () => geographicPage(async (clause, range) => {
+    signal.throwIfAborted();
+    let query = base(fields, true, range === null);
+    if (city && "id" in city) query = query.eq("place_city_id", city.id).eq("place_status", "verified");
+    else if (city) {
+      query = query.eq("city", city.text);
+      query = city.country === UNASSIGNED_COUNTRY ? query.or('place_country_code.is.null,place_country_code.eq.""') : query.eq("place_country_code", city.country);
+    }
+    if (filters.q.trim()) query = query.ilike("name", `%${filters.q.trim().replace(/[\\%_]/g, " ")}%`);
+    if (clause) query = query.or(clause);
+    query = query.order("created_at", { ascending: false }).order("id");
+    if (range) query = query.range(range.from, range.to);
+    const result = await query.abortSignal(signal);
+    signal.throwIfAborted();
+    // A missing exact count is not an empty geographic bucket.
+    return result.count === null && !result.error ? { ...result, error: { message: "organization_count_unavailable" } } : result;
+  }, (filters.page - 1) * PAGE_SIZE, filters.page * PAGE_SIZE - 1, !country && filters.automatic ? preferred : null);
+  const [cities, { data, error, count }] = await Promise.all([readCities(), readPage()]);
   if (error || count === null) throw new Error("organization_directory_unavailable");
   const organizations = ((data ?? []) as unknown as Row[]).map(row => ({ id: row.id, slug: row.slug, name: row.name, logo_url: row.logo_url,
     city: row.place_city_name ? cityName(row.place_city_id ?? "", row.place_city_name, locale) : row.city ?? "", country: row.place_country_code ?? "", ...publicMapPoint(row) }));

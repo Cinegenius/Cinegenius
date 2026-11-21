@@ -1,3 +1,5 @@
+.websiteNotice{min-width:0}
+:global(html[data-cg-native-community-appearance="app"]) .websiteNotice{display:none}
 .root{padding-top:8px;padding-bottom:calc(110px + env(safe-area-inset-bottom,0px));min-width:0}
 .context{display:flex;align-items:center;gap:8px;min-width:0;margin-bottom:10px}
 .organizationSlot{min-width:0;flex:1}

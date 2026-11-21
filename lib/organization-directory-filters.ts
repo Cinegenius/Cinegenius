@@ -1,14 +1,17 @@
 import { browseCountryChoice } from "./browse-country";
 import { UNASSIGNED_COUNTRY } from "./places/core";
 
-export type OrganizationDirectoryFilters = { country: string; city: string; q: string; page: number };
+export type OrganizationDirectoryFilters = { country: string; city: string; q: string; page: number; automatic?: boolean };
 
 export function organizationDirectoryHref(filters: OrganizationDirectoryFilters) {
-  const query = new URLSearchParams({ country: filters.country || "all" });
+  const query = new URLSearchParams();
+  // An absent country retains the current request's regional priority. An
+  // explicit All countries choice must stay global on every following page.
+  if (filters.country || !filters.automatic) query.set("country", filters.country || "all");
   if (filters.city) query.set("city", filters.city);
   if (filters.q) query.set("q", filters.q);
   if (filters.page > 1) query.set("page", String(filters.page));
-  return `/organizations?${query}`;
+  return `/organizations${query.size ? `?${query}` : ""}`;
 }
 
 /** An unverified city label is qualified by its actual saved country, not geocoded. */

@@ -6,7 +6,7 @@ import { BEFORE_FORM_NAVIGATION_EVENT } from "./form-navigation-events";
 export type NativeHeaderAction = "profile" | "messages" | "search" | "menu" | "close";
 const EVENT = "cinegenius:native-header-action";
 const listeners = new Set<() => void>();
-type Lease = { kind: "search" | "menu"; dismiss: (restoreFocus?: boolean) => void };
+type Lease = { kind: "search" | "menu" | "messages"; dismiss: (restoreFocus?: boolean) => void };
 let active: Lease | null = null;
 const publish = () => { for (const listener of listeners) listener(); };
 
@@ -36,7 +36,7 @@ export function useNativeHeaderUtilityKind() {
 }
 
 /** One native utility owns its lock. The real four actions remain outside its nonmodal surface. */
-export function useNativeHeaderUtility(ref: RefObject<HTMLDialogElement | null>, enabled: boolean, kind: "search" | "menu", onClose: () => void) {
+export function useNativeHeaderUtility(ref: RefObject<HTMLDialogElement | null>, enabled: boolean, kind: "search" | "menu" | "messages", onClose: () => void) {
   const close = useRef(onClose);
   useLayoutEffect(() => { close.current = onClose; });
   useLayoutEffect(() => {
@@ -71,7 +71,7 @@ export function useNativeHeaderUtility(ref: RefObject<HTMLDialogElement | null>,
     const controls = () => Array.from(document.querySelectorAll<HTMLElement>('[data-native-app-navbar] a[href],[data-native-app-navbar] button'))
       .concat(Array.from(element.querySelectorAll<HTMLElement>('a[href],button,input,textarea,select,[tabindex="0"]')))
       .filter(node => !node.matches(':disabled,[aria-disabled="true"]') && !node.closest('[inert]') && node.getClientRects().length > 0);
-    const focusSurface = () => (element.querySelector<HTMLElement>('input,textarea,button:not(:disabled),a[href]') ?? element).focus({ preventScroll:true });
+    const focusSurface = () => (element.querySelector<HTMLElement>('[data-native-header-initial-focus]') ?? element.querySelector<HTMLElement>('input,textarea,button:not(:disabled),a[href]') ?? element).focus({ preventScroll:true });
     const release = (restore = true) => {
       if (released) return;
       released = true; cancelAnimationFrame(frame);
