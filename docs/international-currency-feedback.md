@@ -48,7 +48,12 @@ und `schema-live-verified.json` im genannten Release-Ordner.
 
 ## Mitgestalten
 
-- Dezenter Zugang im persönlichen Bereich unter `/mitgestalten`.
+- Zugang im persönlichen Bereich unter `/mitgestalten`. Nachtrag 21.11.:
+  geprüfter Menüfix `bb26a335b66272f2dfece23977d0d09550fcc97f` macht daraus eine
+  reguläre Zeile direkt vor „Einstellungen“, unabhängig vom Adminstatus.
+  Bestehende Texte, Ziel, Rechte und API bleiben gleich; keine zusätzliche
+  Vorab-Abfrage. Der Menüfix ist noch nicht veröffentlicht.
+  Beleg: `/srv/cinegenius/handoffs/20261121-feedback-entry/receipt.json`.
 - Jede Person meldet sich mit dem eigenen Konto an. Getrennte Gespräche und private
   Entwürfe über den bestehenden Recovery-Dienst; kein gemeinsamer Chatverlauf.
 - Admin erzeugt unter `/mitgestalten/koordination` Links mit `lang` und `country`,

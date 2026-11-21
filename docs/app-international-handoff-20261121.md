@@ -72,3 +72,28 @@ App-Prüfbeleg, geprüfte Commit-IDs und Erhaltungsnachweis:
 Die laufende Abstimmung erfolgt über WEB CODEX zur lokalen App-Arbeit.
 **Kein App-Livegang, keine Installation; Smart-/Work-Halt bleibt bestehen.**
 Push, Shots-Aktivierung und täglicher Website-Prüfagent bleiben unverändert aus.
+
+## Nachtrag: sichtbarer Mitgestalten-Einstieg · 21. November
+
+WEB hat `bb26a335b66272f2dfece23977d0d09550fcc97f` auf
+`codex/feedback-entry-20261121` geprüft. In `PersonalAreaHome` steht
+„Mitgestalten“ als reguläre Menüzeile direkt vor „Einstellungen“, unabhängig
+vom Adminstatus. Ziel `/mitgestalten`, vorhandene 17 Übersetzungen, APIs und
+Berechtigungen bleiben gleich; kein zusätzlicher Hintergrundabruf.
+
+WEB-Beleg: 173 Navigationstests, 40 kontrollierte Browserfälle über 17 Sprachen
+und 320–1717 CSS px sowie Lint, Design und Katalogprüfung bestanden. Das sind
+WEB-Prüfungen mit kontrollierten Konten und Ersatzschriften; keine echte
+angemeldete Sitzung oder native Geräteprüfung. Produktionsbuild und
+Veröffentlichungsfenster sind laut Übergabe noch offen.
+
+Diese Server-App-Aufgabe hat Commit, Menüposition und den begrenzten Dateiumfang
+nachgelesen. Sie dokumentiert den Fix für den laufenden lokalen Abgleich auf
+`ab74924d`; keine zweite funktionale Portierung auf die ältere App-Basis.
+Die lokale Mac-Aufgabe ist bereits über WEB informiert. Kein paralleler
+main-Push, Deploy oder Eingriff in ihre nativen Quellen. Veröffentlichung des
+Menüfixes ist **noch nicht bestätigt**; bestehende App-Gates bleiben bestehen.
+
+WEB-Quellbeleg: `/srv/cinegenius/handoffs/20261121-feedback-entry/receipt.json`.
+App-Empfang und Quellenprüfung:
+`/srv/cinegenius/handoffs/20261121-app-feedback-entry-handoff/receipt.json`.
