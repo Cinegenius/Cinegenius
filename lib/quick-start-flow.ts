@@ -62,6 +62,7 @@ export type QuickStartDraft = {
   providerImageUrl?: string;
   profileAvatarUrl?: string;
   profileCoverUrl?: string;
+  showInHomeCrew?: boolean;
   occupationForm?: OccupationForm;
   primaryOccupation?: PrimaryOccupation | null;
   additionalOccupation?: PrimaryOccupation | null;
@@ -277,6 +278,7 @@ export function normalizeQuickStartDraft(value: unknown): QuickStartDraft {
     providerImageUrl: typeof input.providerImageUrl === "string" ? input.providerImageUrl.slice(0, 1200) : "",
     ...(typeof input.profileAvatarUrl === "string" ? { profileAvatarUrl: input.profileAvatarUrl.slice(0, 1200) } : {}),
     ...(typeof input.profileCoverUrl === "string" ? { profileCoverUrl: input.profileCoverUrl.slice(0, 1200) } : {}),
+    ...(typeof input.showInHomeCrew === "boolean" ? { showInHomeCrew: input.showInHomeCrew } : {}),
     ...(isOccupationForm(input.occupationForm) ? { occupationForm: input.occupationForm } : {}),
     talentIntro: typeof input.talentIntro === "string" ? input.talentIntro.slice(0, 1200) : "",
     sections,

@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { PRIVACY_AUDIENCES, type PrivacySettings as Settings } from "@/lib/profile-privacy";
+import HomeCrewPreference from "@/components/HomeCrewPreference";
 
 export default function PrivacySettings({ accountId, showEmailPreference = true, embedded = false }: { accountId: string | null; showEmailPreference?: boolean; embedded?: boolean }) {
   const t = useTranslations("PrivacySettings");
@@ -22,7 +23,7 @@ export default function PrivacySettings({ accountId, showEmailPreference = true,
     if (!accountId) return;
     const controller = new AbortController(); request.current = controller; setBusy(true);
     fetch("/api/user-settings", { cache: "no-store", signal: controller.signal })
-      .then(async response => { const body = await response.json(); if (!response.ok || !body.settings || typeof body.settings.ghost_mode !== "boolean") throw new Error(); return body.settings as Settings; })
+      .then(async response => { const body = await response.json(); if (!response.ok || !body.settings || typeof body.settings.ghost_mode !== "boolean" || typeof body.settings.show_in_home_crew !== "boolean") throw new Error(); return body.settings as Settings; })
       .then(value => { if (!controller.signal.aborted && account.current === accountId) setLoaded({ account: accountId, settings: value }); })
       .catch(() => { if (!controller.signal.aborted && account.current === accountId) setError(true); })
       .finally(() => { if (request.current === controller) { request.current = null; setBusy(false); } });
@@ -37,7 +38,7 @@ export default function PrivacySettings({ accountId, showEmailPreference = true,
       const response = await fetch("/api/user-settings", { method: "PATCH", headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ accountId: actor, [key]: value }), signal: controller.signal });
       const body = await response.json();
-      if (!response.ok || !body.success || typeof body.settings?.ghost_mode !== "boolean") throw new Error();
+      if (!response.ok || !body.success || typeof body.settings?.ghost_mode !== "boolean" || typeof body.settings?.show_in_home_crew !== "boolean") throw new Error();
       if (controller.signal.aborted || account.current !== actor) return;
       setLoaded({ account: actor, settings: body.settings }); setSaved(true);
       window.dispatchEvent(new Event("cinegenius:privacy-changed")); router.refresh();
@@ -69,6 +70,7 @@ export default function PrivacySettings({ accountId, showEmailPreference = true,
         </label>)}
       </fieldset>
       <p className="mt-3 text-xs leading-relaxed text-text-muted">{t("locationHelp")}</p>
+      <div className="mt-5 border-t border-border pt-4"><HomeCrewPreference checked={settings.show_in_home_crew} disabled={busy} onChange={value => void change("show_in_home_crew", value)} /></div>
       <div className="mt-5 border-t border-border pt-4 space-y-4">
         <label className="block text-xs text-text-muted"><span className="mb-1.5 block">{t("messages")}</span><select className={control} value={settings.message_permission} disabled={busy} onChange={event => void change("message_permission",event.target.value)}><option value="everyone">{t("audience.members")}</option><option value="friends_only">{t("audience.friends")}</option></select></label>
         {showEmailPreference && <label className="flex min-h-11 items-center justify-between gap-4 text-sm text-text-secondary"><span>{t("email")}</span><span className="flex h-11 w-11 shrink-0 items-center justify-center"><input type="checkbox" className="h-5 w-5 accent-gold" checked={settings.email_new_message} disabled={busy} onChange={event => void change("email_new_message",event.target.checked)} /></span></label>}

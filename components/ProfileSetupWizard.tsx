@@ -1,5 +1,7 @@
 "use client";
 import CurrencySelect from "@/components/CurrencySelect";
+import HomeCrewPreference from "@/components/HomeCrewPreference";
+import { saveHomeCrewPreference } from "@/lib/home-crew-preference";
 
 import GenieWritingAssistant from "@/components/GenieWritingAssistant";
 
@@ -235,6 +237,7 @@ function ProfileSetupContent() {
       fetch("/api/user-settings", { cache: "no-store" }).then(response => response.ok ? response.json() : null).catch(() => null),
     ]).then(([saved, profile, settings]) => {
       if (!active) return;
+      if (typeof settings?.settings?.show_in_home_crew !== "boolean") throw new Error(uiText("PrivacySettings.error"));
       setProfileIsPrivate(["private", "members"].includes(settings?.settings?.profile_visibility) || settings?.settings?.ghost_mode === true);
       setProfileExists(profile?.exists === true);
       setSavedProfile(profile?.profile ?? null);
@@ -262,6 +265,7 @@ function ProfileSetupContent() {
       }
       nextDraft = initializeSetupProfileArt(nextDraft, user.id, profile?.exists ? profile.profile : null);
       nextDraft = initializeSetupOccupationForm(nextDraft, profile?.exists ? profile.profile : null);
+      nextDraft = { ...nextDraft, showInHomeCrew: nextDraft.showInHomeCrew ?? settings.settings.show_in_home_crew };
       setDraft(nextDraft);
 
       setReady(true);
@@ -535,6 +539,12 @@ function ProfileSetupContent() {
     try {
       let progress: QuickStartDraft = { ...draft, step: "review", completed: { ...draft.completed, listings: { ...draft.completed.listings } } };
       if (!isQuickStartContentSaved(progress) && !(await persist(progress))) return;
+
+      if (needsPublicSetupProfile(progress.intents)) {
+        if (!user?.id || typeof progress.showInHomeCrew !== "boolean") throw new Error(uiText("PrivacySettings.error"));
+        try { await saveHomeCrewPreference(user.id, progress.showInHomeCrew); }
+        catch { throw new Error(uiText("PrivacySettings.error")); }
+      }
 
       if (needsPublicSetupProfile(progress.intents) && !progress.completed.profile) {
         const profilePayload = setupProfilePayload(progress, profileExists ? savedProfile : null, selectedRoles);
@@ -833,9 +843,11 @@ function ProfileSetupContent() {
         {draft.step === "intro" && <div>
           {introIntents.length > 1 && <div className="mb-4 flex flex-wrap items-center justify-between gap-2 rounded-xl border border-border bg-bg-primary px-3 py-2"><span className="text-xs text-text-muted">{t("additionCounter", {current:activeIntroIndex+1,total:introIntents.length})}</span><span className="text-xs font-medium text-text-primary">{activeIntent === "crew" && draft.intents.includes("talent") ? t("copy85") : t(`${activeIntent}Intent`)}</span></div>}
           {renderOptionalDetails()}
+          {needsProfile && <div className="mt-5 border-t border-border pt-4"><HomeCrewPreference checked={draft.showInHomeCrew === true} disabled={saving} onChange={value => update("showInHomeCrew", value)} /></div>}
         </div>}
 
         {draft.step === "review" && <div className="space-y-4">
+          {needsProfile && <HomeCrewPreference checked={draft.showInHomeCrew === true} disabled={saving} onChange={value => update("showInHomeCrew", value)} />}
           <ReviewSection title={t("copy66")} onEdit={() => editReview("name")}><ReviewRow label={t("name")} value={draft.name} /></ReviewSection>
           <ReviewSection title={t("copy83")} onEdit={() => editReview("location")}><ReviewRow label={t("place")} value={[draft.personCity, draft.personCountry].filter(Boolean).join(", ")} /></ReviewSection>
           <ReviewSection title={t("copy84")} onEdit={() => editReview("goals")}><p className="break-words text-sm text-text-primary">{selectedIntentTitles.join(" · ") || "—"}</p></ReviewSection>

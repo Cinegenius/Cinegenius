@@ -138,6 +138,16 @@ Crew result row correction, 14 November 2026: Keep the compact count, Crew, Loca
 
 ## Personal privacy and Ghost mode (operator decision, 14 November 2026)
 
+Homepage Crew discretion (operator update, 21 November 2026): label the homepage
+rail exactly „Crew“ and rotate eligible profiles without registration-date
+priority, superseding the earlier 24-hour rule. Preserve region-first ranking and
+the existing card design. `user_settings.show_in_home_crew` independently controls
+participation in this rail, selectable during profile setup and later in privacy
+settings. Confirm this choice before publishing a setup profile. Never override
+Ghost or narrower audiences; do not interpret the switch as hiding the entire
+profile, offers or the separate photo-discovery section. Apply the matching
+migration before releasing dependent code; see `docs/home-crew-discretion.md`.
+
 - Ghost hides a member's personal profile, structured location/activity and all personal public offers, including from accepted friends. Preserve content, stored publication states and saved audience choices; company visibility remains independent. Never use a public company or project mirror to reveal a hidden linked person.
 - Reuse `lib/profile-privacy.ts`, `lib/profile-privacy-server.ts` and `visibleLinkedProfileIds` for current request-scoped permissions. Project protected fields before serialization/geocoding/filtering. Public offer reads use `privacy_visible_listings` before counts and pagination; cached content/direct links require a fresh visibility check. Never share authorization decisions between requests.
 - Apply and verify `20261114180242_profile_privacy_controls.sql` before dependent Web/native releases. Settings are own-account only through `/api/user-settings`; errors or missing capability fields must not look like saved privacy choices. Native settings use the same contract in `docs/profile-privacy.md`.

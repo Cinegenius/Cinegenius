@@ -21,20 +21,19 @@ export type HomeCrewProfile = {
   crew?: OccupationProfile["crew"];
   profile_type: string | null;
   profile_types: string[] | null;
-  created_at?: string | null;
 };
-const CARD_FIELDS = "user_id,slug,display_name,tagline,avatar_url,location,verified,role,positions,crew,profile_type,profile_types,created_at";
+const CARD_FIELDS = "user_id,slug,display_name,tagline,avatar_url,location,verified,role,positions,crew,profile_type,profile_types";
 const CARD_BATCH = 32;
 
 export async function homeCrewProfiles(now: number, preferred: BrowsePlace | null = null): Promise<{ data: HomeCrewProfile[]; error: null }> {
   const signal = AbortSignal.timeout(8000);
-  // Read only IDs and registration dates across the pool. A newest-300 cap would
+  // Read a thin index across the pool. A newest-300 cap would
   // permanently exclude older members even when the visible selection rotates.
-  const pool = await collectFacetRows<{ user_id: string; created_at: string | null }>((from, to) => {
+  const pool = await collectFacetRows<{ user_id: string }>((from, to) => {
     const table = db.from("profiles");
     const query = preferred
-      ? table.select("user_id,created_at,place_country_code,place_region_id,place_city_id")
-      : table.select("user_id,created_at");
+      ? table.select("user_id,place_country_code,place_region_id,place_city_id")
+      : table.select("user_id");
     return query.not("display_name", "is", null).neq("display_name", "")
       .order("user_id").range(from, to).abortSignal(signal);
   }, 500);
@@ -59,11 +58,17 @@ export async function homeCrewProfiles(now: number, preferred: BrowsePlace | nul
       .not("display_name", "is", null).neq("display_name", "").abortSignal(signal);
     if (result.error) throw new Error("Homepage people unavailable", { cause: result.error });
     const rows = (result.data ?? []) as HomeCrewProfile[];
-    const privacy = await profileAccessFor(rows.map(row => row.user_id), null, { signal, throwOnError: true });
+    const [privacy, preferences] = await Promise.all([
+      profileAccessFor(rows.map(row => row.user_id), null, { signal, throwOnError: true }),
+      db.from("user_settings").select("user_id,show_in_home_crew").in("user_id", ids).abortSignal(signal),
+    ]);
+    if (preferences.error) throw new Error("Homepage crew preferences unavailable", { cause: preferences.error });
+    // No settings row is the existing default. Unknown saved values fail closed.
+    const excluded = new Set((preferences.data ?? []).filter(row => row.show_in_home_crew !== true).map(row => row.user_id));
     const byId = new Map(rows.map(row => [row.user_id, row]));
     for (const id of ids) {
       const row = byId.get(id), access = privacy.get(id);
-      if (!row || !row.display_name?.trim() || !access?.profile) continue;
+      if (!row || !row.display_name?.trim() || !access?.profile || excluded.has(id)) continue;
       const projected = projectProfilePrivacy(row, access);
       if (!isPeopleDirectoryProfile(projected)) continue;
       selected.push(projected);

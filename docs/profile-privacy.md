@@ -4,6 +4,12 @@ Operator decisions: add a strict Ghost mode and independently selectable profile
 
 ## Account API and native contract
 
+Homepage Crew extension (21 November, published website/API `5cafc814`):
+`show_in_home_crew` controls only the rotating homepage Crew rail. It is available
+in initial profile setup and later privacy settings, and cannot override Ghost or
+profile audiences. `20261121145336_home_crew_visibility.sql` was applied and
+verified before the dependent settings API; native adoption is separate. See [scope, recovery and native contract](home-crew-discretion.md).
+
 Authenticated `GET /api/user-settings` returns `settings`. `PATCH` accepts only known fields, optionally `accountId` matching the authenticated account. Never authorize from that supplied ID. Responses are private/no-store; unknown schema or write errors are not successful acknowledgements.
 
 | Field | Values | Default |

@@ -17,6 +17,14 @@ App-Abgleich: `/srv/cinegenius/handoffs/20261121-app-company-onboarding-handoff/
 
 ## Installation und aktueller Rahmen
 
+**Neue Website-Abstimmung, native Übernahme offen (21.11.):** Homepage „Crew“ ohne
+Neuregistrierungs-Vorrang; eigene Teilnahmeauswahl schon bei der Profileinrichtung
+und später unter Privatsphäre. Gemeinsames Feld `show_in_home_crew` in
+`/api/user-settings`; bestätigte Speicherung vor Profilveröffentlichung nötig.
+Website/API und Migration sind seit 21.11., 16:12 Uhr Berlin, live (`5cafc814`).
+Native Übernahme und echte Geräteprüfung bleiben offen.
+Siehe [Vertrag und genaue Reichweite](home-crew-discretion.md).
+
 | Thema | Belegter Stand |
 | --- | --- |
 | **iPhone-App** | Zuletzt nachgewiesen installiert: **2026112007**. Das neue gemeinsame Paket wird nach ausdrücklichem Geräteauftrag vorbereitet. Work-Fußnavigation, Einbettung und Dispo-Bezeichnung sind korrigiert und gebaut; die sieben Hintergrundfarben werden in Community und Work ergänzt. Neue Installation und vollständige echte Smart-/Work-/Community-Geräteabnahme separat nachweisen. WEB hat keine eigene Geräteprüfung durchgeführt. |

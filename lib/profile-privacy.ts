@@ -10,13 +10,16 @@ export type PrivacySettings = {
   contact_email_visibility: PrivacyAudience;
   message_permission: "everyone" | "friends_only";
   email_new_message: boolean;
+  show_in_home_crew: boolean;
 };
 export const DEFAULT_PRIVACY: PrivacySettings = {
   ghost_mode: false, profile_visibility: "public", location_visibility: "public",
   map_visibility: "public", activity_visibility: "public", phone_visibility: "hidden",
-  contact_email_visibility: "hidden", message_permission: "everyone", email_new_message: true,
+  contact_email_visibility: "hidden", message_permission: "everyone", email_new_message: true, show_in_home_crew: true,
 };
 export const PRIVACY_COLUMNS = "ghost_mode,profile_visibility,location_visibility,map_visibility,activity_visibility,phone_visibility,contact_email_visibility,message_permission,email_new_message" as const;
+// The Crew showcase preference does not change general profile access.
+export const USER_SETTINGS_COLUMNS = `${PRIVACY_COLUMNS},show_in_home_crew` as const;
 export type ProfileAccess = { profile: boolean; location: boolean; map: boolean; activity: boolean; phone: boolean; email: boolean };
 export const HIDDEN_PROFILE_ACCESS: ProfileAccess = { profile: false, location: false, map: false, activity: false, phone: false, email: false };
 

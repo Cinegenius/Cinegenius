@@ -273,7 +273,7 @@
     "findCompaniesTitle": "Bedrijven",
     "findProjectsLink": "Projecten bekijken",
     "offerLocationAction": "Locatie aanbieden",
-    "newCrewTitle": "Nieuwe crewleden",
+    "newCrewTitle": "Crew",
     "crewScrollHint": "Veeg opzij om meer leden te ontdekken",
     "locationScrollHint": "Veeg opzij om meer locaties te ontdekken",
     "railPrevious": "Terugbladeren",
@@ -13187,7 +13187,9 @@
       "members": "Ingelogde leden",
       "friends": "Alleen bevestigde vrienden",
       "hidden": "Alleen ik"
-    }
+    },
+    "homeCrew": "Tonen bij Crew op de startpagina",
+    "homeCrewHelp": "Alleen openbare profielen verschijnen in deze selectie. Later te wijzigen via Instellingen → Privacy."
   },
   "UnifiedSearch": {
     "productionCompanies": "Filmproductie",
