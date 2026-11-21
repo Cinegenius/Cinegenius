@@ -13482,7 +13482,17 @@
     "workspace": "Workspace",
     "smart": "Smart",
     "openWorkspace": "Otevřít Workspace",
-    "workspaceNativeOnly": "Otevři Workspace v aplikaci CineGenius."
+    "workspaceNativeOnly": "Otevři Workspace v aplikaci CineGenius.",
+    "background": "Tmavé pozadí",
+    "backgrounds": {
+      "graphite": "Grafitová",
+      "midnight": "Noční modř",
+      "sage": "Kouřově zelená",
+      "rose": "Růžová",
+      "sand": "Teplý písek",
+      "terracotta": "Terakota",
+      "black": "Čistě černá"
+    }
   },
   "AppShots": {
     "lifetime": "Fotky na 30 hodin. Poté už nejsou dostupné.",

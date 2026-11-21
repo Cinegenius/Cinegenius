@@ -13482,7 +13482,17 @@
     "workspace": "Workspace",
     "smart": "Smart",
     "openWorkspace": "Öppna Workspace",
-    "workspaceNativeOnly": "Öppna Workspace i CineGenius-appen."
+    "workspaceNativeOnly": "Öppna Workspace i CineGenius-appen.",
+    "background": "Mörk bakgrund",
+    "backgrounds": {
+      "graphite": "Grafit",
+      "midnight": "Nattblå",
+      "sage": "Rökgrön",
+      "rose": "Rosé",
+      "sand": "Varm sand",
+      "terracotta": "Terrakotta",
+      "black": "Helt svart"
+    }
   },
   "AppShots": {
     "lifetime": "Foton i 30 timmar. Därefter inte tillgängliga.",

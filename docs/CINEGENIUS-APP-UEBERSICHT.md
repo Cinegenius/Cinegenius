@@ -9,11 +9,11 @@ Diese Übersicht trennt die installierte App, ihre serverseitigen Ansichten, nat
 
 | Thema | Belegter Stand |
 | --- | --- |
-| **iPhone-App** | APP meldet am 20.11.2026 Build **2026112007** nach Datensicherung installiert; Geräteversion bestätigt. Spätere Rückmeldung aus APP: starke Hänger in Smart/Work und Work → Community funktioniert nicht mit aktuellem Web-Stand `822c27c`. Diagnose läuft; keine eigene Geräte-Reproduktion durch WEB und kein abgeschlossener Funktionstest behauptet. |
-| **App-Server** | **Veröffentlichung angehalten.** Laut APP ist der gemeinsame Stand `407915184321628834171facb374c0592fe68811` einschließlich `822c27c` nur lokal, noch nicht gepusht oder veröffentlicht. Erst Fehlerdiagnose, Prüfung und neue Freigabe; kein paralleler Deploy. |
+| **iPhone-App** | Zuletzt nachgewiesen installiert: **2026112007**. Der neue gemeinsame Stand wird am 21.11.2026 nach ausdrücklichem Geräteauftrag vorbereitet. Work-Fußnavigation, Einbettung und Dispo-Bezeichnung sind korrigiert und gebaut; vollständige echte Bedienungs-/Leistungsprüfung und Installation des Folgepakets gesondert nachweisen. Die neue Hintergrundauswahl ist nicht automatisch bereits auf dem iPhone. |
+| **App-Server** | Markus hat den Hold am 21.11.2026 ausdrücklich aufgehoben. Gemeinsamer App-Stand `68930dd9` mit 572 gezielten Tests, i18n/Design/ESLint sowie vollständigem Produktions-/TypeScript-Build geprüft und veröffentlicht (`dpl_8unN6uj7tczEJ6dkAJSdeAVnTwdN`). Anschließender Website-Firmenlinkfix `91a508d5` enthält diesen Stand vollständig. Die spätere native Palette-Fähigkeit und Geräteprüfung bleiben separat. |
 | **Native Navigation** | Ziel gemäß aktuellem App-Vertrag: **Shots · News · Smart · Projekte · Work**. Die gewöhnliche Website behält ihre eigene Navigation. |
 | **Obere Aktionen** | Profil, Nachrichten, Suche und Menü; App-eigene Abstände und sichere Bedienung über Kopf-/Fußbereich. |
-| **Erscheinungsbild** | Mauve wurde von Markus als unpassend zurückgemeldet. APP bereitet **vier reine Farbvorlagen** vor; noch keine neue Farbe gewählt, keine Themeänderung und kein neuer Farb-Picker. Warmes Graphit, Schiefergrau und helles Steingrau sind lediglich WEB-Vorschläge. Keine parallele zweite Vorschauimplementierung. |
+| **Erscheinungsbild** | Gewählt sind sieben dunkle Optionen: Graphit, Nachtblau, Rauchgrün, Rosé, Warmer Sand, Terrakotta, Reinschwarz. Gemeinsamer Picker für Community/Work wird im Folgepaket geprüft; ältere Apps blenden ihn aus. Heller Stein und schneller Hell-/Dunkelwechsel bleiben erhalten. Ohne ausdrückliche Farbwahl bleibt der bisherige Mauve-Hintergrund bestehen. |
 | **Weitere Plattformen / Veröffentlichung** | Kein aktueller Beleg für eine veröffentlichte Android-App, einen App-Store-Release oder eine eigenständige Desktop-App in dieser Bestandsaufnahme. iPad-/Mac-Kompatibilität je konkretem Build prüfen. |
 
 ## Entdecken und Community

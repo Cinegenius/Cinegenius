@@ -13482,7 +13482,17 @@
     "workspace": "Workspace",
     "smart": "Smart",
     "openWorkspace": "Apri Workspace",
-    "workspaceNativeOnly": "Apri Workspace nell’app CineGenius."
+    "workspaceNativeOnly": "Apri Workspace nell’app CineGenius.",
+    "background": "Sfondo scuro",
+    "backgrounds": {
+      "graphite": "Grafite",
+      "midnight": "Blu notte",
+      "sage": "Verde fumé",
+      "rose": "Rosa",
+      "sand": "Sabbia calda",
+      "terracotta": "Terracotta",
+      "black": "Nero puro"
+    }
   },
   "AppShots": {
     "lifetime": "Foto per 30 ore. Poi non sono più disponibili.",

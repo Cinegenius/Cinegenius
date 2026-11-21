@@ -13482,7 +13482,17 @@
     "workspace": "Workspace",
     "smart": "Умный",
     "openWorkspace": "Открыть Workspace",
-    "workspaceNativeOnly": "Откройте Workspace в приложении CineGenius."
+    "workspaceNativeOnly": "Откройте Workspace в приложении CineGenius.",
+    "background": "Тёмный фон",
+    "backgrounds": {
+      "graphite": "Графит",
+      "midnight": "Ночной синий",
+      "sage": "Дымчато-зелёный",
+      "rose": "Розовый",
+      "sand": "Тёплый песок",
+      "terracotta": "Терракота",
+      "black": "Чистый чёрный"
+    }
   },
   "AppShots": {
     "lifetime": "Фото на 30 часов. После этого доступ закрыт.",

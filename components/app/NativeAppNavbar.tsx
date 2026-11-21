@@ -11,6 +11,7 @@ import { toggleNativeAppTheme, useNativeAppTheme } from "@/lib/native-app-theme"
 import { useNativeCapability } from "@/lib/use-native-capability";
 import styles from "./NativeAppNavbar.module.css";
 import NativeInboxPanel from "./NativeInboxPanel";
+import NativeAppBackgroundPicker from "./NativeAppBackgroundPicker";
 
 type ProfileLink = { id: string; href: string; label: string; icon: SiteNavigationIcon };
 
@@ -153,6 +154,7 @@ export default function NativeAppNavbar({ navigationLabel, accountButtonRef, acc
         data-native-profile-link={link.id} className={styles.profileLink} onClick={account.onClose}>
         <NavigationIcon name={link.icon} size={18} /><span>{link.label}</span><ChevronRight size={15} aria-hidden="true" />
       </Link>)}</div>
+      <NativeAppBackgroundPicker />
       <div className={styles.signOut}><button type="button" className={styles.profileLink} onClick={account.onSignOut} disabled={account.signingOut} aria-busy={account.signingOut}>
         {account.signingOut ? <Loader2 size={18} className={styles.spinner} aria-hidden="true" /> : <LogOut size={18} aria-hidden="true" />}<span>{account.signOutLabel}</span>
       </button></div>

@@ -13482,7 +13482,17 @@
     "workspace": "Workspace",
     "smart": "Smart",
     "openWorkspace": "Workspace megnyitása",
-    "workspaceNativeOnly": "Nyisd meg a Workspace-t a CineGenius alkalmazásban."
+    "workspaceNativeOnly": "Nyisd meg a Workspace-t a CineGenius alkalmazásban.",
+    "background": "Sötét háttér",
+    "backgrounds": {
+      "graphite": "Grafitszürke",
+      "midnight": "Éjkék",
+      "sage": "Füstös zöld",
+      "rose": "Rózsaszín",
+      "sand": "Meleg homok",
+      "terracotta": "Terrakotta",
+      "black": "Tiszta fekete"
+    }
   },
   "AppShots": {
     "lifetime": "Fotók 30 órára. Utána nem érhetők el.",

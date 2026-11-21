@@ -13482,7 +13482,17 @@
     "workspace": "Workspace",
     "smart": "智能",
     "openWorkspace": "打开Workspace",
-    "workspaceNativeOnly": "请在CineGenius应用中打开Workspace。"
+    "workspaceNativeOnly": "请在CineGenius应用中打开Workspace。",
+    "background": "深色背景",
+    "backgrounds": {
+      "graphite": "石墨灰",
+      "midnight": "午夜蓝",
+      "sage": "烟灰绿",
+      "rose": "玫瑰粉",
+      "sand": "暖沙色",
+      "terracotta": "陶土色",
+      "black": "纯黑"
+    }
   },
   "AppShots": {
     "lifetime": "照片保留30小时，之后无法访问。",

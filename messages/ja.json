@@ -13482,7 +13482,17 @@
     "workspace": "Workspace",
     "smart": "スマート",
     "openWorkspace": "Workspaceを開く",
-    "workspaceNativeOnly": "CineGeniusアプリでWorkspaceを開いてください。"
+    "workspaceNativeOnly": "CineGeniusアプリでWorkspaceを開いてください。",
+    "background": "ダークモードの背景",
+    "backgrounds": {
+      "graphite": "グラファイト",
+      "midnight": "ミッドナイトブルー",
+      "sage": "スモーキーグリーン",
+      "rose": "ローズ",
+      "sand": "ウォームサンド",
+      "terracotta": "テラコッタ",
+      "black": "ピュアブラック"
+    }
   },
   "AppShots": {
     "lifetime": "写真は30時間で閲覧できなくなります。",
