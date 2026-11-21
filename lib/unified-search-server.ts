@@ -55,7 +55,7 @@ function queryFor(area: SearchArea, wish: SearchWish, terms: string[], categorie
     const filters = patterns(["title", "description", "category", ...(area === "marketplace"
       ? ["metadata->>vehicle_subtype", "metadata->>make", "metadata->>model", "metadata->marketplace->>brand", "metadata->marketplace->>model"] : area === "animals" ? ["metadata->>special_skills"] : [])]);
     if (area === "marketplace" && categories.length) filters.push(`category.in.(${categories.map(filterLiteral).join(",")})`);
-    return filtered(db.from("privacy_visible_listings").select(`${PLACE_COLUMNS},id,user_id,title,city,type,category,price,image_url,price_negotiable:metadata->price_negotiable,price_on_request:metadata->price_on_request,rental_type:metadata->>rental_type,marketplace:metadata->marketplace${evidence ? `,description${facts}` : ""}${map && area === "locations" ? ",location_area:metadata->location_area" : ""}`)
+    return filtered(db.from("privacy_visible_listings").select(`${PLACE_COLUMNS},id,user_id,title,city,type,category,price,image_url,price_currency:metadata->>price_currency, price_negotiable:metadata->price_negotiable,price_on_request:metadata->price_on_request,rental_type:metadata->>rental_type,marketplace:metadata->marketplace${evidence ? `,description${facts}` : ""}${map && area === "locations" ? ",location_area:metadata->location_area" : ""}`)
       .eq("published", true).in("type", kinds), filters).order("id");
   }
   if (area === "crew") {

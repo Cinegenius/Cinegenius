@@ -1,9 +1,10 @@
 import { TranslatedText } from "@/components/ContentTranslation";
 import { occupationFormFromCrew } from "@/lib/occupation-form";
-import { profileOccupationPreview, type OccupationProfile } from "@/lib/crew-occupations";
-import { profileAccessFor } from "@/lib/profile-privacy-server";
-import { projectProfilePrivacy } from "@/lib/profile-privacy";
+import { profileOccupationPreview } from "@/lib/crew-occupations";
+import { homeCrewProfiles } from "@/lib/home-crew";
 import { homeMarketplaceOffers } from "@/lib/home-marketplace";
+import { preferredBrowsePlace } from "@/lib/browse-preference-server";
+import { geographicTop } from "@/lib/browse-geography";
 import HomeOrganizations from "@/components/organizations/HomeOrganizations";
 import { listingPriceLabel } from "@/lib/listing-price";
 import { db } from "@/lib/db";
@@ -46,27 +47,9 @@ import AiDisclosureBadge from "@/components/AiDisclosureBadge";
 import { COMPANY_CATEGORIES } from "@/lib/companyCategories";
 import { HomePhotoDiscovery, type DiscoverPhoto } from "@/components/HomePhotoDiscovery";
 import { PROFILE_TYPE_LABELS, type ProfileType } from "@/lib/profile-types";
-import { isPeopleDirectoryProfile } from "@/lib/profile-provider-filters";
-import { getPrivateProfileIds } from "@/lib/trust";
 import { taxonomyLabel } from "@/lib/departments";
 import { getCommunityMedia } from "@/lib/community-media-server";
 import { getTranslations as getMetadataTranslations } from "next-intl/server";
-
-type HomeProfileRow = {
-  user_id: string;
-  slug: string | null;
-  display_name: string | null;
-  tagline: string | null;
-  avatar_url: string | null;
-  location: string | null;
-  verified: boolean | null;
-  role: string | null;
-  positions: string[] | null;
-  crew?: OccupationProfile["crew"];
-  profile_type: string | null;
-  profile_types: string[] | null;
-  created_at?: string | null;
-};
 
 function getLocalizedProfileTypeLabels(translate: (key: string) => string): typeof PROFILE_TYPE_LABELS { return { actor: translate("menu.crewActors"), model: translate("MarketplaceOffer.fields.model"), extra: translate("Ui.text_359b6b495d37ee"), host: translate("Ui.text_0a95f0e5c8dfe9"), dancer: translate("Ui.text_edbf4c8ebb46d7"), stunt: translate("Ui.text_b84275027d70dc"), voiceover: translate("Ui.text_ecd65813175a41"), creator: translate("Ui.text_d952b2e69292db"), camera: translate("menu.crewCamera"), lighting: translate("Ui.text_df58636dc4a76c"), sound: translate("menu.crewSound"), director_of_photography: translate("Ui.text_e0e64895eb6431"), director: translate("menu.crewDirection"), production: translate("menu.crewProduction"), makeup: translate("Ui.text_93c744e1d17b9a"), costume: translate("Ui.text_a21ae87ef519df"), postproduction: translate("Ui.text_212f3b80ce86c2"), vfx: translate("Ui.text_23d20474305ac3"), sfx: translate("menu.marketSfx"), art_department: translate("Ui.text_a92fc587a90c16"), broadcast: translate("Ui.text_17bc9178343601"), filmmaker: translate("Ui.text_93ecd734fdc054"), writer: translate("Ui.text_fec099ea8a39bd"), photographer: translate("menu.crewPhotographer"), editor: translate("Ui.text_0e4eb4156e02e7"), motion_designer: translate("Ui.text_8213a51cdbc986"), art_director: translate("Ui.text_2d3b48143ed2b9"), location: translate("locations.vendorSection"), equipment: translate("props.vendorSection"), vehicle: translate("Ui.text_758a6eefc6f22f"), studio: translate("Ui.text_3e35f07c14a89e"), props: translate("Ui.text_54d1cc854cc30d") }; }
 
@@ -97,12 +80,25 @@ async function getHomeData() {
     };
   }
 
+  const preferred = await preferredBrowsePlace().then(result => result.place).catch(() => null);
   const results = await Promise.all([
-    db.from("privacy_visible_listings").select("id,title,city,price,image_url,metadata,created_at").eq("type", "location").eq("published", true).order("created_at", { ascending: false }).limit(10),
-    db.from("privacy_visible_listings").select("id,title,city,price,created_at").eq("type", "job").eq("published", true).order("created_at", { ascending: false }).limit(4),
-    homeMarketplaceOffers(currentTime),
-    db.from("companies").select("id,slug,name,logo_url,city,categories").eq("published", true).order("created_at", { ascending: false }).limit(6),
-    db.from("profiles").select("user_id,slug,display_name,tagline,avatar_url,location,verified,role,positions,crew,profile_type,profile_types,created_at").not("display_name", "is", null).neq("display_name", "").order("created_at", { ascending: false }).limit(300),
+    geographicTop((clause, limit) => {
+      let query = db.from("privacy_visible_listings").select("id,title,city,price,image_url,metadata,created_at").eq("type", "location").eq("published", true);
+      if (clause) query = query.or(clause);
+      return query.order("created_at", { ascending: false }).order("id").limit(limit);
+    }, 10, preferred),
+    geographicTop((clause, limit) => {
+      let query = db.from("privacy_visible_listings").select("id,title,city,price,created_at").eq("type", "job").eq("published", true);
+      if (clause) query = query.or(clause);
+      return query.order("created_at", { ascending: false }).order("id").limit(limit);
+    }, 4, preferred),
+    homeMarketplaceOffers(currentTime, preferred),
+    geographicTop((clause, limit) => {
+      let query = db.from("companies").select("id,slug,name,logo_url,city,categories").eq("published", true);
+      if (clause) query = query.or(clause);
+      return query.order("created_at", { ascending: false }).order("id").limit(limit);
+    }, 6, preferred),
+    homeCrewProfiles(currentTime, preferred),
   ]);
   if (results.some(result => result.error)) throw new Error("Homepage recommendations unavailable");
   const [
@@ -113,20 +109,10 @@ async function getHomeData() {
     { data: profilesRaw },
   ] = results;
 
-  const profileRows = (profilesRaw ?? []) as HomeProfileRow[];
-  // Independent permission-aware lookups run together; private profiles are
-  // still excluded before any card is constructed. Never cache these results.
-  const [privacy, propProviders] = await Promise.all([
-    profileAccessFor(profileRows.map(profile => profile.user_id)),
-    getListingProviders((recentProps ?? []).map((p) => ({ user_id: p.user_id, company_id: p.company_id, responsible_person: p.responsible_person }))),
-  ]);
-  const publicProfiles = profileRows.filter(profile => privacy.get(profile.user_id)?.profile).map(profile => projectProfilePrivacy(profile, privacy.get(profile.user_id)));
-
-  // Use the same eligibility rule as the people directory. Location and
-  // marketplace providers are people too, even when they do not also choose
-  // an invented crew occupation.
-  const peopleProfiles = publicProfiles.filter(isPeopleDirectoryProfile);
-  const peopleSummaries = peopleProfiles.map((profile) => {
+  const propProviders = await getListingProviders((recentProps ?? []).map((p) => ({ user_id: p.user_id, company_id: p.company_id, responsible_person: p.responsible_person })));
+  // Selection already has fresh public-profile and field permissions applied.
+  // Keep its new-for-one-day / rotating order through serialization.
+  const newCrew = (profilesRaw ?? []).map((profile) => {
     const positions = profileOccupationPreview(profile);
     if (positions.length === 0) {
       const profileTypes = [...new Set([profile.profile_type, ...(profile.profile_types ?? [])].filter((type): type is string => Boolean(type)))];
@@ -147,12 +133,6 @@ async function getHomeData() {
       createdAt: profile.created_at ?? "",
     };
   });
-  // Keep this homepage selection strictly chronological: the latest eligible
-  // public people profiles always occupy the first positions.
-  const newCrew = peopleSummaries
-    .sort((a, b) => b.createdAt.localeCompare(a.createdAt) || a.name.localeCompare(b.name, marketLocale))
-    .slice(0, 10);
-
   const liveLocations = (recentLocations ?? []).map((l) => ({
     id: l.id as string,
     title: l.title as string,

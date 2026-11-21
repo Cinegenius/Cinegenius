@@ -167,7 +167,7 @@ export default function CompaniesContent({ initialCompanies }: { initialCompanie
         resetLabel={t("resetFilters")}
         showResultsLabel={uiText("Ui.text_4d89b095821660", { value1: String(filtered.length) })}
       >
-        <PlaceFilters rows={initialCompanies} value={{country:countryFilter,region:regionFilter,city:cityFilter}} onChange={value => {setCountryFilter(value.country);setRegionFilter(value.region);setCityFilter(value.city);}} />
+        <PlaceFilters rows={initialCompanies} value={{country:countryFilter,region:regionFilter,city:cityFilter}} onChange={value => {geography.setEnabled(false);setCountryFilter(value.country);setRegionFilter(value.region);setCityFilter(value.city);}} />
         {(verifiedOnly || initialCompanies.some(company => company.verified)) && <label className="flex min-h-11 items-center gap-3 text-sm text-text-secondary"><input type="checkbox" className="size-4 accent-gold" checked={verifiedOnly} onChange={(event) => setVerifiedOnly(event.target.checked)} />{t("filterVerified")}</label>}
       </MobileBrowseControls>
 

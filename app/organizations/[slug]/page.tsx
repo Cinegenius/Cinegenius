@@ -1,7 +1,8 @@
+import NewsObservation from "@/components/organizations/NewsObservation";
 import { TranslatedText } from "@/components/ContentTranslation";
 import Link from "next/link";
 import { db } from "@/lib/db";
-import { notFound } from "next/navigation";
+import { notFound, permanentRedirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import Image from "@/components/MediaImage";
 import NativeNewsSections from "@/components/app/NativeNewsSections";
@@ -11,12 +12,11 @@ import { approvedOrganizationBySlug } from "@/lib/organization-data";
 export const dynamic = "force-dynamic";
 
 export default async function OrganizationPage({ params }: { params: Promise<{ slug: string }> }) {
-  const uiText = await getTranslations();
-
   const { slug } = await params;
   const result = await approvedOrganizationBySlug(slug);
   if (!result) notFound();
   const { organization, entries } = result;
+  if (organization.slug !== slug) permanentRedirect(`/organizations/${encodeURIComponent(organization.slug)}`);
   const t = await getTranslations("Organizations");
   const accessT = await getTranslations("OrganizationAccess");
   const linked = await db.from("organization_company_links")
@@ -53,7 +53,7 @@ export default async function OrganizationPage({ params }: { params: Promise<{ s
         </section>
       )}
       <h2 className="font-serif text-3xl text-text-primary">{t("organizationEntries")}</h2>
-      {entries.length ? <div className="mt-6 grid gap-4 md:grid-cols-2">{entries.map((entry) => <Link key={entry.id} href={`/news/${organization.slug}/${entry.slug}`} className="browse-card p-5"><span className="text-xs text-gold">{t(`entryType.${entry.entry_type}`)}</span><h3 className="mt-2 text-xl font-semibold text-text-primary"><TranslatedText kind="news" id={entry.id} field="title">{entry.title}</TranslatedText></h3>{entry.summary && <p className="mt-2 line-clamp-2 text-sm text-text-secondary"><TranslatedText kind="news" id={entry.id} field="summary">{entry.summary}</TranslatedText></p>}</Link>)}</div> : <p className="mt-4 text-text-muted">{t("emptyOrganization")}</p>}
+      {entries.length ? <div className="mt-6 grid gap-4 md:grid-cols-2">{entries.map((entry) => <Link key={entry.id} href={`/news/${organization.slug}/${entry.slug}`} className="browse-card p-5" data-news-observation><NewsObservation id={entry.id} /><span className="text-xs text-gold">{t(`entryType.${entry.entry_type}`)}</span><h3 className="mt-2 text-xl font-semibold text-text-primary"><TranslatedText kind="news" id={entry.id} field="title">{entry.title}</TranslatedText></h3>{entry.summary && <p className="mt-2 line-clamp-2 text-sm text-text-secondary"><TranslatedText kind="news" id={entry.id} field="summary">{entry.summary}</TranslatedText></p>}</Link>)}</div> : <p className="mt-4 text-text-muted">{t("emptyOrganization")}</p>}
     </section>
   </main>;
 }

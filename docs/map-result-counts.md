@@ -5,8 +5,10 @@ full set matching the active search/filters from points in the map viewport.
 
 - The toolbar count is the full filtered result count; moving/zooming the map
   must not replace it with a smaller viewport count.
-- The existing Crew provider shortcut exception still displays the full person
-  count as requested by the operator.
+- The Crew, Locations-provider and Marketplace-provider shortcuts count the
+  current filtered selection, exactly like the map source. Markus superseded
+  the older constant-person-count exception on 20 November after reporting
+  221 in the toolbar versus 177 mapped + 25 unmapped (202 total).
 - The map badge counts only valid public points inside the current bounds.
 - The shared `MapResultSummary` visibly explains mapped-in-view, mapped-outside
   and unmapped results. These partitions add up to the supplied result total.
@@ -49,3 +51,27 @@ errors. The full touched-page lint run retains three pre-existing Crew errors
 hook warnings; the Crew errors were reproduced from the untouched base commit.
 No authentication, database, stored coordinates or publication changes are part
 of this patch. No production build or native-device validation is claimed here.
+
+
+## Follow-up: provider shortcut totals
+
+20 November: the reported Crew screenshot had 221 in the toolbar and 202 in
+the filtered map set (177 points + 25 unlocated). The old provider shortcut
+exception caused this: it intentionally used allCreators.length while the map
+used matching. The new operator decision removes that exception for all three
+shortcuts; both visible and accessible toolbar counts now use matching.length.
+No profiles, coordinates, filters or layout are changed.
+
+The actual Crew page, filter controls and map summary were exercised against a
+synthetic 221-person fixture: 202 Crew, 10 Location-only providers and 9
+Marketplace-only providers. All selection/search/empty/reset and map-boundary
+transitions passed in 10 Chromium/WebKit cases at 320, 390, 834 and 1366 pixels,
+in German, Spanish and Hungarian. Map viewport events were simulated; there
+was no actual native-device or production-account test. Browser plugin was
+unavailable, so existing Playwright was used. Other directory source paths
+were compared: Companies and Locations already use their filtered map source;
+Marketplace keeps its checked remote total and pending/incomplete-map notice.
+
+10 targeted unit cases, TypeScript, 17-catalog localization and shared design
+checks passed. Evidence: `/srv/cinegenius/handoffs/20261120-crew-filter-count/`.
+This follow-up remains unpublished, independent of the earlier live map fix.

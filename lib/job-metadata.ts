@@ -1,3 +1,4 @@
+import { listingCurrency, formatOfferAmount } from "./currency";
 /** Read the application's existing metadata header without rewriting the member's description. */
 export function parseJobDescription(raw: string): {
   roleLabel?: string; company?: string; projectType?: string; shootDates?: string;
@@ -63,7 +64,7 @@ export type BrowseJob = {
   price?: number | null; createdAt?: string | null; schedule?: JobSchedule | null;
   company?: string; projectType?: string; shootDates?: string; urgent?: boolean; payType?: string;
   roleLabel?: string; jobType?: JobEmployment; ownerId?: string; ownerName?: string;
-  rate?: string; tags?: string[]; posted?: string; isReal?: boolean;
+  currency?: string; rate?: string; tags?: string[]; posted?: string; isReal?: boolean;
 };
 
 export function jobFacts(job: BrowseJob) {
@@ -77,7 +78,7 @@ export function jobFacts(job: BrowseJob) {
 export function jobRateLabel(job: BrowseJob, translate: (key: string) => string, locale: string): string {
   const pay = canonicalJobPayType(jobFacts(job).payType);
   if (pay && pay !== "Paid") return jobPayLabel(pay, translate);
-  if (typeof job.price === "number" && Number.isFinite(job.price) && job.price > 0) return `${new Intl.NumberFormat(locale, { style: "currency", currency: "EUR", maximumFractionDigits: 0 }).format(job.price)}${translate("common.perDay")}`;
+  if (typeof job.price === "number" && Number.isFinite(job.price) && job.price > 0) return `${formatOfferAmount(job.price, job.currency ?? "EUR", locale)}${translate("common.perDay")}`;
   return pay === "Paid" ? `${jobPayLabel(pay, translate)} · ${translate("common.byArrangement")}` : translate("common.byArrangement");
 }
 
@@ -93,5 +94,5 @@ export function jobRecord(row: Record<string, unknown>): BrowseJob {
   return { id: String(row.id), title: String(row.title ?? ""), location: String(row.city ?? ""),
     description: String(row.description ?? ""), category: String(row.category ?? ""),
     price: typeof row.price === "number" ? row.price : null, createdAt: typeof row.created_at === "string" ? row.created_at : null,
-    schedule: jobSchedule(row.job), ownerId: typeof row.user_id === "string" ? row.user_id : undefined, isReal: true };
+    currency: listingCurrency(row.metadata ?? row), schedule: jobSchedule(row.job), ownerId: typeof row.user_id === "string" ? row.user_id : undefined, isReal: true };
 }

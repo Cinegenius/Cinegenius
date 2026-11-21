@@ -1,4 +1,5 @@
 "use client";
+import { currencyOptions } from "@/lib/currency";
 
 import { TranslatedText } from "@/components/ContentTranslation";
 
@@ -120,8 +121,10 @@ export default function LocationsLanding({ allLocations, totalCount, initialFilt
     { value: "featured", label: geography.preferred ? uiText("BrowseGeography.recommended") : t("sortFeatured") }, { value: "price-asc", label: t("sortPriceAsc") },
     { value: "price-desc", label: t("sortPriceDesc") }, { value: "rating", label: t("sortRating") },
   ];
+  const activeCurrency = filters.currency || (filters.min || filters.max || filters.sort.startsWith("price-") ? "EUR" : "");
   const chips: BrowseChip[] = [
     ...(nearby.coordinates ? [{id: "nearby", label: `${t("locateActive")} · ${t("inRadius", {radius: radiusKm})}`, onRemove: () => clearLocation()}] : []),
+    ...(activeCurrency ? [{id:"currency", label:activeCurrency, onRemove:()=>updateFilters({currency:"",min:"",max:"",sort:"featured"})}] : []),
     ...(filters.lage ? [{id: "lage", label: t(filters.lage === "Innen" ? "filterInnen" : filters.lage === "Außen" ? "filterAussen" : "filterInnenAussen"), onRemove: () => updateFilters({lage: ""})}] : []),
     ...([['power', 'filterPower'], ['instant', 'filterInstant'], ['verified', 'filterVerified']] as const).flatMap(([key,label]) => filters[key] ? [{id: key, label: t(label), onRemove: () => updateFilters({[key]: ""})}] : []),
     ...(effectiveView === "map" && mapBounds ? [{ id: "map-area", label: uiText("locationMap.areaActive"), onRemove: () => setMapBounds(null) }] : []),
@@ -131,8 +134,8 @@ export default function LocationsLanding({ allLocations, totalCount, initialFilt
       onRemove: () => updateFilters(kind === "country" ? EMPTY_PLACE_FILTERS : kind === "region" ? { region: "", city: "" } : { city: "" }),
     }] : []),
     ...(filters.cityText ? [{ id: "city-text", label: `${uiText("Places.city")}: ${filters.cityText}`, onRemove: () => updateFilters({ cityText: "" }) }] : []),
-    ...(filters.min ? [{ id: "min", label: uiText("Ui.text_c6e3466f40cb9d", { value1: filters.min }), onRemove: () => updateFilters({ min: "" }) }] : []),
-    ...(filters.max ? [{ id: "max", label: uiText("Ui.text_f47e415aff7a38", { value1: filters.max }), onRemove: () => updateFilters({ max: "" }) }] : []),
+    ...(filters.min ? [{ id: "min", label: `${uiText("Ui.text_c6e3466f40cb9d", { value1: filters.min })} ${activeCurrency}`, onRemove: () => updateFilters({ min: "" }) }] : []),
+    ...(filters.max ? [{ id: "max", label: `${uiText("Ui.text_f47e415aff7a38", { value1: filters.max })} ${activeCurrency}`, onRemove: () => updateFilters({ max: "" }) }] : []),
   ];
 
   const chooseView = (mode: DirectoryView) => setViewMode(mode);
@@ -180,7 +183,8 @@ export default function LocationsLanding({ allLocations, totalCount, initialFilt
         resultCount={mapLocations.length} resultSummary={t("results", { count: mapLocations.length })} filterCount={chips.length + (filters.q ? 1 : 0)} chips={chips}
         onReset={resetFilters} resetLabel={t("resetFilters")} showResultsLabel={t("showResults", { count: mapLocations.length })}
       >
-        <PlaceFilters rows={allLocations} value={filters} onChange={changePlaces} />
+        <MobileFilterField label={uiText("Regional.currency")}><MobileFilterSelect value={activeCurrency} onChange={currency => updateFilters(currency ? {currency} : {currency:"",min:"",max:"",sort:"featured"})} placeholder={uiText("Regional.allCurrencies")} options={currencyOptions(locale)} /></MobileFilterField>
+        <PlaceFilters rows={allLocations} value={filters} onChange={value => { geography.setEnabled(false); changePlaces(value); }} />
         <div className="grid grid-cols-2 gap-3">
           <MobileFilterField label={uiText("Ui.text_84381d6fa4d29d")}><input aria-label={uiText("Ui.text_84381d6fa4d29d")} type="number" inputMode="decimal" min="0" step="0.01" value={filters.min} onChange={event => updateFilters({ min: event.target.value })} placeholder={uiText("Ui.text_d0c50fd56cbce3")} /></MobileFilterField>
           <MobileFilterField label={uiText("Ui.text_f7abc502297a74")}><input aria-label={uiText("Ui.text_f7abc502297a74")} type="number" inputMode="decimal" min="0" step="0.01" value={filters.max} onChange={event => updateFilters({ max: event.target.value })} placeholder={uiText("Ui.text_d0c50fd56cbce3")} /></MobileFilterField>

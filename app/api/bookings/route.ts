@@ -1,3 +1,4 @@
+import { listingCurrency } from "@/lib/currency";
 import { localizedNotification } from "@/lib/i18n/notification-copy";
 // Required Supabase table:
 // CREATE TABLE IF NOT EXISTS bookings (
@@ -20,7 +21,6 @@ import { localizedNotification } from "@/lib/i18n/notification-copy";
 // );
 // CREATE INDEX bookings_user_id_idx ON bookings(user_id, created_at DESC);
 
-import {getTranslations} from "next-intl/server";
 import {resolveLocale} from "@/lib/i18n/locales";
 import {bookingDays} from "@/lib/booking-request";
 import { db } from "@/lib/db";
@@ -51,7 +51,7 @@ export async function POST(req: NextRequest) {
   // SECURITY: read price and title server-side from DB — never trust client
   const { data: listing } = await db
     .from("privacy_visible_listings")
-    .select("id, title, type, price, user_id, published")
+    .select("id, title, type, price, metadata, user_id, published")
     .eq("id", listingId)
     .eq("published", true)
     .maybeSingle();
@@ -68,6 +68,8 @@ export async function POST(req: NextRequest) {
   const days         = bookingDays(startDate, endDate);
   const listingTitle = listing.title;
   const dailyRate    = Number(listing.price) || 0;
+  const currency = listingCurrency(listing.metadata);
+  if ((body.expectedCurrency !== undefined && body.expectedCurrency !== currency) || (body.expectedPrice !== undefined && body.expectedPrice !== dailyRate)) return NextResponse.json({error:tResponse("System.requestFailed")},{status:409});
   const subtotal  = dailyRate * days;
   const platformFee = 0;
   const total     = subtotal;
@@ -85,6 +87,7 @@ export async function POST(req: NextRequest) {
       end_date: endDate,
       days,
       daily_rate: dailyRate,
+      currency,
       subtotal,
       platform_fee: platformFee,
       total,
@@ -156,13 +159,21 @@ export async function GET(req: NextRequest) {
   const { userId } = user;
 
   const searchParams = new URL(req.url).searchParams;
+  const listingId = searchParams.get("listingId");
+  if (listingId) {
+    const {data: listing, error} = await db.from("privacy_visible_listings")
+      .select("id,title,type,price,metadata,user_id").eq("id",listingId).eq("published",true).maybeSingle();
+    if (error) return NextResponse.json({error:tResponse("System.requestFailed")},{status:503});
+    if (!listing || listing.user_id === userId) return NextResponse.json({error:tResponse("System.requestFailed")},{status:404});
+    return NextResponse.json({quote:{id:listing.id,title:listing.title,type:listing.type,price:Number(listing.price)||0,currency:listingCurrency(listing.metadata)}},{headers:{"Cache-Control":"private, no-store"}});
+  }
   const ref      = searchParams.get("ref");
   const incoming = searchParams.get("incoming") === "true";
 
   if (ref) {
     const { data } = await db
       .from("bookings")
-      .select("id, ref, listing_id, listing_title, listing_type, start_date, end_date, days, daily_rate, subtotal, platform_fee, total, notes, status, created_at")
+      .select("currency, id, ref, listing_id, listing_title, listing_type, start_date, end_date, days, daily_rate, subtotal, platform_fee, total, notes, status, created_at")
       .eq("user_id", userId)
       .eq("ref", ref)
       .maybeSingle();
@@ -182,7 +193,7 @@ export async function GET(req: NextRequest) {
 
     const { data } = await db
       .from("bookings")
-      .select("id, ref, user_id, listing_id, listing_title, listing_type, start_date, end_date, days, daily_rate, total, notes, status, created_at")
+      .select("currency, id, ref, user_id, listing_id, listing_title, listing_type, start_date, end_date, days, daily_rate, total, notes, status, created_at")
       .in("listing_id", ownedIds)
       .order("created_at", { ascending: false })
       .limit(100);
@@ -204,7 +215,7 @@ export async function GET(req: NextRequest) {
 
   const { data } = await db
     .from("bookings")
-    .select("id, ref, listing_title, listing_type, start_date, end_date, days, total, status, created_at")
+    .select("currency, id, ref, listing_title, listing_type, start_date, end_date, days, total, status, created_at")
     .eq("user_id", userId)
     .order("created_at", { ascending: false })
     .limit(50);

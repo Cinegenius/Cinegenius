@@ -1,3 +1,4 @@
+import { editorialCredentialValid, editorialRouteAllowed } from "@/lib/editorial-agent-policy";
 import { createTranslator } from "next-intl";
 import { loadMessages } from "@/lib/i18n/messages";
 import { resolveLocale } from "@/lib/i18n/locales";
@@ -13,11 +14,11 @@ async function localizedProxyError(request: NextRequest, key: string, init: Resp
   const system = messages.System as Record<string, string>;
   const copy = createTranslator({locale, messages: {System: system}, namespace: "System"});
   const headers = new Headers(init.headers);
-  if (request.nextUrl.pathname.startsWith('/api/native/v1/') || request.headers.has('X-CineGenius-Native-Contract')) {
-    headers.set('Cache-Control', 'private, no-store, max-age=0');
-    headers.set('CDN-Cache-Control', 'no-store');
-    headers.set('Vercel-CDN-Cache-Control', 'no-store');
-  }
+  // Authentication, origin and quota failures belong to the current request,
+  // including failures returned before a private route handler can set headers.
+  headers.set('Cache-Control', 'private, no-store, max-age=0');
+  headers.set('CDN-Cache-Control', 'no-store');
+  headers.set('Vercel-CDN-Cache-Control', 'no-store');
   return NextResponse.json({error: copy(key)}, {...init, headers});
 }
 
@@ -205,6 +206,7 @@ const isWebhookRoute = createRouteMatcher(["/api/webhooks/(.*)"]);
 // API routes where GET is public — mutations (POST/PATCH/PUT/DELETE) require auth.
 // This prevents a missed requireAuth() in a handler from opening write access.
 const isPublicApiGet = createRouteMatcher([
+  "/api/browse-preference",
   "/api/places",
   "/api/places/options",
   "/api/community-image",
@@ -222,6 +224,15 @@ const isPublicApiGet = createRouteMatcher([
 ]);
 
 export default clerkMiddleware(async (auth, request) => {
+  // Dedicated machine requests never acquire a Clerk/member/admin session.
+  // Only exact editorial routes and a valid server credential bypass cookie CSRF.
+  if (request.nextUrl.pathname.startsWith("/api/editorial/")) {
+    const headers = { "Cache-Control": "private, no-store", "CDN-Cache-Control": "no-store", "Vercel-CDN-Cache-Control": "no-store" };
+    if (!editorialRouteAllowed(request.nextUrl.pathname, request.method)) return NextResponse.json({ error: "not_found" }, { status: 404, headers });
+    if (!editorialCredentialValid(request.headers.get("authorization"), process.env.CINEGENIUS_EDITORIAL_ENABLED, process.env.CINEGENIUS_EDITORIAL_TOKEN_SHA256)) return NextResponse.json({ error: "editorial_unauthorized" }, { status: 401, headers });
+    return NextResponse.next({ headers });
+  }
+
   // Auth-dependent images must never enter Next's shared optimizer cache.
   if (request.nextUrl.pathname === "/_next/image") {
     const blocked = await mediaOptimizerBlockStatus(request.nextUrl.searchParams.get("url") ?? "", request.url, process.env.NEXT_PUBLIC_SUPABASE_URL ?? "", process.env.SUPABASE_SERVICE_ROLE_KEY);

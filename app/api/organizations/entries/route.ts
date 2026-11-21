@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { requireAuth } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { canManageOrganization } from "@/lib/organization-access";
-import { validateOrganizationMediaReference } from "@/lib/organization-media";
+import { validateOrganizationMediaReference, validateNewsGallery } from "@/lib/organization-media";
 import { isOrganizationEntryType, isOrganizationFormat, isOrganizationTopic, organizationSlug, safeExternalUrl } from "@/lib/organization-taxonomy";
 
 const clean = (value: unknown, max: number) => typeof value === "string" ? value.trim().slice(0, max) : "";
@@ -40,12 +40,14 @@ export async function POST(request: NextRequest) {
   const id = crypto.randomUUID();
   const image = await validateOrganizationMediaReference(body.imageUrl, session.userId, "organization_entry", id);
   if (image.error) return NextResponse.json({ error: "media" }, { status: 400 });
+  const gallery = await validateNewsGallery(body.imageGallery, session.userId, id, image.url ?? null);
+  if (gallery.error) return NextResponse.json({ error: "media" }, { status: 400 });
   const { data, error } = await db.from("organization_entries").insert({
     id, organization_id: organizationId, author_user_id: session.userId, last_actor_user_id: session.userId,
     slug: await uniqueEntrySlug(organizationId, title), entry_type: body.entryType, title,
     summary: clean(body.summary, 500), description: clean(body.description, 12000), topic: body.topic,
     format: body.format, ...cityWriteFields(clean(body.city, 320), body.selected_place_city_id), venue: body.entryType === "news" ? "" : clean(body.venue, 180),
-    starts_at: startsAt, ends_at: endsAt, registration_url: registrationUrl, external_url: externalUrl, image_url: image.url,
+    starts_at: startsAt, ends_at: endsAt, registration_url: registrationUrl, external_url: externalUrl, image_url: image.url, ...(gallery.gallery !== undefined ? {image_gallery: gallery.gallery} : {}),
     moderation_status: submit ? "submitted" : "draft", submitted_at: submit ? now : null, updated_at: now,
   }).select("id,slug,moderation_status,updated_at").single();
   if (error || !data) return NextResponse.json({ error: "save" }, { status: 503 });
@@ -67,6 +69,8 @@ export async function PATCH(request: NextRequest) {
   if ((body.entryType !== "news" && body.registrationUrl && !registrationUrl) || (body.externalUrl && !externalUrl)) return NextResponse.json({ error: "url" }, { status: 400 });
   const image = await validateOrganizationMediaReference(body.imageUrl, session.userId, "organization_entry", id);
   if (image.error) return NextResponse.json({ error: "media" }, { status: 400 });
+  const gallery = await validateNewsGallery(body.imageGallery, session.userId, id, image.url ?? null);
+  if (gallery.error) return NextResponse.json({ error: "media" }, { status: 400 });
   const startsAt = body.entryType === "news" ? null : date(body.startsAt); const endsAt = body.entryType === "news" ? null : date(body.endsAt);
   if (body.entryType !== "news" && ((body.startsAt && !startsAt) || (body.endsAt && !endsAt))) return NextResponse.json({ error: "date" }, { status: 400 });
   if (startsAt && endsAt && endsAt < startsAt) return NextResponse.json({ error: "date" }, { status: 400 });
@@ -75,7 +79,7 @@ export async function PATCH(request: NextRequest) {
   const patch: Record<string, unknown> = {
     entry_type: body.entryType, title, summary: clean(body.summary, 500), description: clean(body.description, 12000),
     topic: body.topic, format: body.format, ...cityWriteFields(clean(body.city, 320), body.selected_place_city_id), venue: body.entryType === "news" ? "" : clean(body.venue, 180),
-    starts_at: startsAt, ends_at: endsAt, registration_url: registrationUrl, external_url: externalUrl, image_url: image.url,
+    starts_at: startsAt, ends_at: endsAt, registration_url: registrationUrl, external_url: externalUrl, image_url: image.url, ...(gallery.gallery !== undefined ? {image_gallery: gallery.gallery} : {}),
     moderation_status: nextStatus, last_actor_user_id: session.userId, updated_at: now,
   };
   if (nextStatus === "submitted") {

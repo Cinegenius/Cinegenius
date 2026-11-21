@@ -1,3 +1,4 @@
+import { listingCurrency, storedCurrency } from './currency';
 import { DEPARTMENTS, marketplaceCategory } from './marketplaceCategories';
 
 export const MARKETPLACE_SERVICE_FIELDS = ['included','excluded','availability','service_equipment'] as const;
@@ -31,7 +32,7 @@ export function marketplaceDraft(category='',price=0,metadata:unknown={}):Market
   const value=meta.marketplace && typeof meta.marketplace==='object' ? meta.marketplace as Record<string,unknown> : {};
   const mode=isMarketplaceService(category)?'service':meta.rental_type==='kauf'?'sale':meta.rental_type==='beides'?'both':'rent';
   const priceMode=meta.price_negotiable?'negotiable':meta.price_on_request||price<=0?'request':'fixed';
-  const values:Record<string,string>={mode,rent_mode:priceMode,sale_mode:priceMode,rent_price:mode==='sale'?'':String(price||''),sale_price:mode==='sale'?String(price||''):'',unit:'day',bundle:'single',fulfilment:'pickup'};
+  const values:Record<string,string>={currency:listingCurrency(meta),mode,rent_mode:priceMode,sale_mode:priceMode,rent_price:mode==='sale'?'':String(price||''),sale_price:mode==='sale'?String(price||''):'',unit:'day',bundle:'single',fulfilment:'pickup'};
   for(const [key,item]of Object.entries(value))if(typeof item==='string'||typeof item==='number')values[key]=String(item);
   if(Array.isArray(value.fulfilment))values.fulfilment=value.fulfilment.join(',');
   for(const key of MARKETPLACE_COMMON_FIELDS)if(!(key in values)&&typeof meta[key]==='string')values[key]=String(meta[key]);
@@ -53,7 +54,7 @@ export function serializeMarketplaceDraft(draft:MarketplaceDraft):MarketplaceOff
 export function marketplaceMetadataPatch(draft:MarketplaceDraft) {
   const marketplace=serializeMarketplaceDraft(draft);
   const mode=marketplace.mode==='sale'?marketplace.sale_mode:marketplace.rent_mode;
-  return {marketplace,rental_type:marketplace.mode==='service'?'dienstleistung':marketplace.mode==='sale'?'kauf':marketplace.mode==='both'?'beides':'miete',price_negotiable:mode==='negotiable',price_on_request:mode==='request'};
+  return {marketplace,price_currency:storedCurrency(draft.values.currency),rental_type:marketplace.mode==='service'?'dienstleistung':marketplace.mode==='sale'?'kauf':marketplace.mode==='both'?'beides':'miete',price_negotiable:mode==='negotiable',price_on_request:mode==='request'};
 }
 export function marketplaceBasePrice(draft:MarketplaceDraft):number {const offer=serializeMarketplaceDraft(draft);return (offer.mode==='sale'?offer.sale_mode==='request'?0:offer.sale_price:offer.rent_mode==='request'?0:offer.rent_price)??0;}
 /** Validate only the new envelope. Existing legacy metadata is preserved, never bulk-converted. */

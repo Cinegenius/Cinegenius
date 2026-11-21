@@ -34,7 +34,7 @@ async function getCompany(slug: string) {
 async function getCompanyPublicData(companyId: string, ownerUserId: string, viewerId: string | null = null) {
     const [listingsRes, rawMembersRes, servicesRes, equipmentRes] = await Promise.all([
       db.from("listings")
-        .select("place_country_code,place_region_id,place_city_id,place_city_name,place_region_name,place_status,id, title, type, category, price, city, image_url, created_at, price_negotiable:metadata->price_negotiable, price_on_request:metadata->price_on_request, rental_type:metadata->>rental_type, marketplace:metadata->marketplace")
+        .select("place_country_code,place_region_id,place_city_id,place_city_name,place_region_name,place_status,id, title, type, category, price, city, image_url, created_at, price_currency:metadata->>price_currency, price_negotiable:metadata->price_negotiable, price_on_request:metadata->price_on_request, rental_type:metadata->>rental_type, marketplace:metadata->marketplace")
         .eq("company_id", companyId)
         .eq("published", true)
         .order("created_at", { ascending: false }),
@@ -48,7 +48,7 @@ async function getCompanyPublicData(companyId: string, ownerUserId: string, view
         .eq("company_id", companyId)
         .order("order", { ascending: true }),
       db.from("company_equipment")
-        .select("id, category, subcategory, name, brand, model, condition, available, price_day, price_week, price_on_request, pickup_available, delivery_available, insured, quantity")
+        .select("id, category, subcategory, name, brand, model, condition, available, currency, price_day, price_week, price_on_request, pickup_available, delivery_available, insured, quantity")
         .eq("company_id", companyId)
         .eq("published", true)
         .order("created_at", { ascending: false }),

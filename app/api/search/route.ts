@@ -76,7 +76,7 @@ export async function GET(req: NextRequest) {
   const [listingsRes, profilesRes, companiesRes, cateringProfileResults, cateringCompaniesRes, animalProfilesRes, animalRoleProfilesRes, animalCompaniesRes, safetyMedicalProfilesRes, safetyMedicalRoleProfilesRes, safetyMedicalCompaniesRes] = await Promise.all([
     wantListings
       ? Promise.all(["location", "vehicle", "prop", "job", "creator", "animal"].map(kind => db.from("privacy_visible_listings")
-          .select("place_country_code,place_region_id,place_city_id,place_city_name,place_region_name,place_status,user_id,id,title,city,type,category,price,image_url,price_negotiable:metadata->price_negotiable,price_on_request:metadata->price_on_request,rental_type:metadata->>rental_type,marketplace:metadata->marketplace")
+          .select("place_country_code,place_region_id,place_city_id,place_city_name,place_region_name,place_status,user_id,id,title,city,type,category,price,image_url,price_currency:metadata->>price_currency, price_negotiable:metadata->price_negotiable,price_on_request:metadata->price_on_request,rental_type:metadata->>rental_type,marketplace:metadata->marketplace")
           .eq("published", true).eq("type", kind)
           .or(`title.ilike.${like},city.ilike.${like},category.ilike.${like},description.ilike.${like}${categoryCandidates?`,and(type.in.(prop,vehicle),category.in.(${categoryCandidates}))`:""}${geoFilter?`,${geoFilter}`:""}`)
           .order("created_at", { ascending: false }).order("id").limit(type === kind || (type === "profile" && kind === "creator") ? 24 : 6)))

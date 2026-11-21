@@ -78,7 +78,11 @@ export function TranslatedText({kind, id, field, children, className, onStatusCh
       const frame = requestAnimationFrame(() => setVisible(true));
       return () => cancelAnimationFrame(frame);
     }
-    const observer = new IntersectionObserver(([entry]) => setVisible(entry.isIntersecting), {rootMargin: "100px"});
+    // A viewed field stays subscribed for this page/account/language. Scrolling
+    // away must not restore its original or request the same article again.
+    const observer = new IntersectionObserver(([entry]) => {
+      if (entry.isIntersecting) { setVisible(true); observer.disconnect(); }
+    }, {rootMargin: "100px"});
     observer.observe(element.current); return () => observer.disconnect();
   }, [client]);
   const result = useTranslatedContent({kind, id, field, source: children, active: visible});

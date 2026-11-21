@@ -14,7 +14,7 @@ export async function newsFacetRows() {
 }
 
 export const ORGANIZATION_SELECT = "place_country_code,place_region_id,place_city_id,place_city_name,place_region_name,place_status,id,slug,name,description,logo_url,topics,city,region,website_url,public_contact_email,moderation_status,created_at,updated_at";
-export const ORGANIZATION_ENTRY_SELECT = "place_country_code,place_region_id,place_city_id,place_city_name,place_region_name,place_status,id,organization_id,slug,entry_type,title,summary,description,topic,format,city,venue,starts_at,ends_at,registration_url,external_url,image_url,moderation_status,created_at,updated_at";
+export const ORGANIZATION_ENTRY_SELECT = "place_country_code,place_region_id,place_city_id,place_city_name,place_region_name,place_status,id,organization_id,slug,entry_type,title,summary,description,topic,format,city,venue,starts_at,ends_at,registration_url,external_url,image_url,image_gallery,moderation_status,publication_authority,created_at,updated_at";
 
 export async function approvedOrganizations() {
   const { data, error } = await db.from("organizations").select(ORGANIZATION_SELECT)
@@ -58,8 +58,12 @@ export async function approvedEntries(filters: { type?: string; topic?: string; 
 }
 
 export async function approvedOrganizationBySlug(slug: string) {
-  const { data, error } = await db.from("organizations").select(ORGANIZATION_SELECT)
-    .eq("slug", slug).eq("moderation_status", "approved").maybeSingle();
+  const {data: alias, error: aliasError} = await db.from('organization_route_aliases')
+    .select('organization_id').eq('slug', slug).maybeSingle();
+  if (aliasError) throw new Error('organization_alias_read_failed', {cause: aliasError.code});
+  let organizationQuery = db.from("organizations").select(ORGANIZATION_SELECT).eq("moderation_status", "approved");
+  organizationQuery = alias ? organizationQuery.eq('id', alias.organization_id) : organizationQuery.eq('slug', slug);
+  const { data, error } = await organizationQuery.maybeSingle();
   if (error) throw new Error("organization_read_failed", { cause: error.code });
   if (!data) return null;
   const { data: entries, error: entriesError } = await db.from("organization_entries").select(ORGANIZATION_ENTRY_SELECT)
@@ -70,6 +74,21 @@ export async function approvedOrganizationBySlug(slug: string) {
 }
 
 export async function approvedEntryBySlugs(organizationSlug: string, entrySlug: string) {
+  // Historical links grant no access: recheck both current approvals before
+  // returning content or its canonical destination. No cross-request cache.
+  const {data: alias, error: aliasError} = await db.from('organization_entry_route_aliases')
+    .select('entry_id').eq('organization_slug', organizationSlug).eq('entry_slug', entrySlug).maybeSingle();
+  if (aliasError) throw new Error('organization_alias_read_failed', {cause: aliasError.code});
+  if (alias) {
+    const {data: entry, error} = await db.from('organization_entries').select(ORGANIZATION_ENTRY_SELECT)
+      .eq('id', alias.entry_id).in('moderation_status', ['approved', 'ended']).maybeSingle();
+    if (error) throw new Error('organization_entries_read_failed', {cause: error.code});
+    if (!entry) return null;
+    const {data: organization, error: parentError} = await db.from('organizations').select(ORGANIZATION_SELECT)
+      .eq('id', entry.organization_id).eq('moderation_status', 'approved').maybeSingle();
+    if (parentError) throw new Error('organization_read_failed', {cause: parentError.code});
+    return organization ? {organization, entry} : null;
+  }
   const { data: organization, error: organizationError } = await db.from("organizations").select(ORGANIZATION_SELECT)
     .eq("slug", organizationSlug).eq("moderation_status", "approved").maybeSingle();
   if (organizationError) throw new Error("organization_read_failed", { cause: organizationError.code });

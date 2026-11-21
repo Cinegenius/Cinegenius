@@ -1,5 +1,6 @@
 "use client";
 
+import NewsObservation from "@/components/organizations/NewsObservation";
 import { ContentTranslationActions, TranslatedText, type ContentTranslationObservation } from "@/components/ContentTranslation";
 
 
@@ -71,9 +72,9 @@ export default function NativeNews({ controls, entries, page, previousHref, next
     lat: entry.lat, lng: entry.lng, titleContent: <TranslatedText kind="news" id={entry.id} field="title" onStatusChange={reportTranslation}>{entry.title}</TranslatedText>,
   })), [entries, reportTranslation]);
   const mapped = locations.filter(hasCoordinates).length;
-  const row = (entry: NativeNewsEntry, preview = false) => <Link href={entry.href} className={`${styles.card} ${preview ? styles.preview : ""}`} data-news-id={entry.id} data-has-image={entry.image ? "true" : "false"}>
+  const row = (entry: NativeNewsEntry, preview = false) => <Link href={entry.href} className={`${styles.card} ${preview ? styles.preview : ""}`} data-news-id={entry.id} data-news-observation data-has-image={entry.image ? "true" : "false"}>
     {entry.image && <div className={styles.image}><MediaImage src={entry.image} alt="" width={640} height={360} className={styles.photo} /></div>}
-    <div className={styles.copy}>
+    <NewsObservation id={entry.id} /><div className={styles.copy}>
       <p className={styles.type}>{[entry.typeLabel, entry.topicLabel].filter(Boolean).join(" · ")}</p>
     <h2><TranslatedText kind="news" id={entry.id} field="title" onStatusChange={reportTranslation}>{entry.title}</TranslatedText></h2>
       <p className={styles.organization}>{[entry.organization, entry.city].filter(Boolean).join(" · ")}</p>
@@ -84,7 +85,7 @@ export default function NativeNews({ controls, entries, page, previousHref, next
     <ChevronRight size={17} aria-hidden="true" className={styles.chevron} />
   </Link>;
   return <>
-    {!native && notice}
+    {!native && <div className={styles.websiteNotice} data-native-news-website-notice>{notice}</div>}
     <NativeNewsSections section="entries" country={controls.region.country} />
     <NewsBrowseControls {...controls} nativeViewControls={native ? <DirectoryViewControls value={view} onChange={setView} /> : undefined} />
     {native ? <section className={`site-container ${styles.root}`} data-native-news="v1" data-view={view} aria-label={t("newsTitle")}>

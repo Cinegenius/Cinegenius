@@ -1186,7 +1186,7 @@ input:-webkit-autofill:active {
 .smart-map-info > summary { list-style: none; }
 .smart-map-info > summary::-webkit-details-marker { display: none; }
 .smart-map-info > div { position: absolute; z-index: 30; inset-inline-end: 0; width: min(280px, calc(100vw - 32px)); }
-.smart-map .location-map-preview { inset: 8px 8px 44px; max-height: none; }
+.smart-map .location-map-preview { inset: auto 8px 44px; height: auto; max-height: calc(100% - 56px); }
 @media (min-width: 768px) and (max-width: 1023px) { .smart-map-frame { height: 280px; } }
 @media (min-width: 1024px) {
   .smart-explorer { grid-template-columns: minmax(310px, 1fr) minmax(0, 1.8fr); column-gap: 24px; }

@@ -60,3 +60,20 @@ export async function geographicPage<T>(
   const error = pages.find(result => result.error)?.error ?? null;
   return { data: error ? null : pages.flatMap(result => result.data ?? []), count: offset, error };
 }
+
+/** Small homepage rails: choose within each disjoint bucket BEFORE the limit.
+ * No global catalogue count is needed, and other countries fill unused slots. */
+export async function geographicTop<T>(
+  read: (clause: string | null, limit: number) => PromiseLike<{ data: T[] | null; error: unknown }>,
+  limit: number, preferred: BrowsePlace | null,
+): Promise<{ data: T[]; error: unknown }> {
+  const data: T[] = [];
+  const buckets = preferred ? geographicBuckets(preferred) : [];
+  for (const clause of buckets.length ? buckets : [null]) {
+    if (data.length >= limit) break;
+    const result = await read(clause, limit - data.length);
+    if (result.error) return { data: [], error: result.error };
+    data.push(...result.data ?? []);
+  }
+  return { data, error: null };
+}

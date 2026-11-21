@@ -74,11 +74,11 @@ export default function ProjectsContent({ projects, category = null }: { project
       categoryLabel={ui("props.categoryBtn")} allCategoryLabel={ui("common.allProjects")} categories={categories} categoryValue={category ?? ""} onCategoryChange={changeCategory}
       nativeViewControls={<DirectoryViewControls value={view} onChange={value => { if (value !== "map") setView(value); }} unavailable={{map:ui("NativeBrowse.projectMapUnavailable")}} />}
       nativeQuickFilters={[
-        <NativeBrowseQuickFilter key="country" kind="country" label={ui("Places.country")} value={country} onChange={setCountry} options={[{value:"",label:ui("Places.allCountries")},...countries.map(option => ({value:option.value,label:option.value === UNASSIGNED_COUNTRY ? ui("Places.countryUnassigned") : ui.has(`CountryNames.${option.value}`) ? ui(`CountryNames.${option.value}`) : option.label}))]} />,
+        <NativeBrowseQuickFilter key="country" kind="country" label={ui("Places.country")} value={country} onChange={value => { geography.setEnabled(false); setCountry(value); }} options={[{value:"",label:ui("Places.allCountries")},...countries.map(option => ({value:option.value,label:option.value === UNASSIGNED_COUNTRY ? ui("Places.countryUnassigned") : ui.has(`CountryNames.${option.value}`) ? ui(`CountryNames.${option.value}`) : option.label}))]} />,
         <NativeBrowseQuickFilter key="type" kind="projectType" label={t("filterType")} value={typeFilter} onChange={setTypeFilter} options={[{value:"",label:ui("common.all")},...types]} />,
       ]}
       resultCount={filtered.length} resultSummary={t("resultsCount", { count: filtered.length })} viewControls={views} filterCount={chips.length} chips={chips} onReset={reset} resetLabel={t("resetFilters")} showResultsLabel={ui("Ui.text_52ca04e867ebdc", { value1: String(filtered.length) })}>
-      <CountrySelect popup value={country} onChange={setCountry} codes={countries.map(option => option.value)} />
+      <CountrySelect popup value={country} onChange={value => { geography.setEnabled(false); setCountry(value); }} codes={countries.map(option => option.value)} />
       {fields.map(field => <MobileFilterField key={field.label} label={field.label}><MobileFilterSelect value={field.value} onChange={field.onChange} options={field.options} placeholder={ui("common.all")} label={field.label} /></MobileFilterField>)}
     </MobileBrowseControls>
 

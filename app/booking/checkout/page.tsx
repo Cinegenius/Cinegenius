@@ -1,6 +1,7 @@
 "use client";
+import { formatOfferAmount } from "@/lib/currency";
 
-import { useState, useRef, Suspense } from "react";
+import { useState, useEffect, useRef, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import {useLocale, useTranslations} from "next-intl";
@@ -19,9 +20,22 @@ function CheckoutContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
 
-  const listingTitle = searchParams.get("title") ?? "";
-  const listingPrice = Number(searchParams.get("price") ?? 0);
-  const listingType = searchParams.get("type") ?? "location";
+  const ui = useTranslations();
+  const listingId = searchParams.get("id");
+  const [quote,setQuote] = useState<{id:string;title:string;type:string;price:number;currency:string}|null>(null);
+  const [quoteError,setQuoteError] = useState(false), [quoteAttempt,setQuoteAttempt] = useState(0);
+  useEffect(()=>{
+    const controller = new AbortController(); setQuote(null); setQuoteError(false);
+    void fetch(`/api/bookings?listingId=${encodeURIComponent(listingId ?? "")}`,{cache:"no-store",signal:AbortSignal.any([controller.signal,AbortSignal.timeout(15000)])})
+      .then(async response=>{const data=await response.json();if(!response.ok||data.quote?.id!==listingId||!Number.isFinite(data.quote?.price))throw Error();return data.quote;})
+      .then(value=>{if(!controller.signal.aborted)setQuote(value);})
+      .catch(()=>{if(!controller.signal.aborted)setQuoteError(true);});
+    return ()=>controller.abort();
+  },[listingId,quoteAttempt]);
+  const listingTitle = quote?.title ?? "";
+  const listingPrice = quote?.price ?? 0;
+  const listingType = quote?.type ?? "location";
+  const currency = quote?.currency ?? "EUR";
 
   const urlStart = searchParams.get("startDate") ?? "";
   const urlEnd   = searchParams.get("endDate") ?? "";
@@ -46,7 +60,7 @@ function CheckoutContent() {
   const subtotal = listingPrice * days;
   const total = subtotal;
 
-  const canProceedStep1 = startDate >= today && endDate >= startDate && days >= 1;
+  const canProceedStep1 = !!quote && quote.id === listingId && startDate >= today && endDate >= startDate && days >= 1;
   const canProceedStep2 = agreeTerms;
 
   const handleSubmit = async () => {
@@ -56,7 +70,7 @@ function CheckoutContent() {
     setSubmitError(false);
     try {
       const ref = await submitBookingRequest({
-        listingId: searchParams.get("id"), startDate, endDate, notes,
+        listingId, startDate, endDate, notes, expectedPrice: listingPrice, expectedCurrency: currency,
       });
       const params = new URLSearchParams({
         ref,
@@ -68,7 +82,10 @@ function CheckoutContent() {
         price: String(listingPrice),
       });
       router.push(`/booking/confirmation?${params.toString()}`);
-    } catch {
+    } catch (error) {
+      if (error instanceof Error && error.message === "BOOKING_QUOTE_CHANGED") {
+        setQuoteAttempt(n=>n+1); setStep(1); setAgreeTerms(false);
+      }
       setSubmitError(true);
       pending.current = false;
       setLoading(false);
@@ -82,6 +99,7 @@ function CheckoutContent() {
     creator: t("typeCreator"),
   };
 
+  if (!quote) return <main className="site-container min-h-screen pt-28"><p role={quoteError?"alert":"status"}>{ui(quoteError?"System.requestFailed":"common.loading")}</p>{quoteError&&<button type="button" onClick={()=>setQuoteAttempt(n=>n+1)} className="mt-4 min-h-11 rounded-xl border border-border px-4 text-gold">{ui("MarketplaceNavigation.retry")}</button>}</main>;
   return (
     <div className="pt-16 min-h-screen">
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
@@ -157,7 +175,7 @@ function CheckoutContent() {
                   </div>
                   {startDate && endDate && (
                     <p className="text-xs text-text-muted">
-                      <span className="text-gold font-semibold">{t("days", {count: days})}</span> · {(listingPrice * days).toLocaleString(locale)} €
+                      <span className="text-gold font-semibold">{t("days", {count: days})}</span> · {formatOfferAmount(listingPrice * days,currency,locale)}
                     </p>
                   )}
                 </div>
@@ -220,7 +238,7 @@ function CheckoutContent() {
                     </div>
                     <div className="flex justify-between py-2">
                       <span className="text-text-muted font-semibold">{t("estimatedTotal")}</span>
-                      <span className="text-gold font-bold font-display">{total.toLocaleString(locale)} €</span>
+                      <span className="text-gold font-bold font-display">{formatOfferAmount(total,currency,locale)}</span>
                     </div>
                   </div>
                 </div>
@@ -313,12 +331,12 @@ function CheckoutContent() {
                 {/* Preisaufschlüsselung */}
                 <div className="space-y-2.5 mb-5">
                   <div className="flex justify-between text-sm">
-                    <span className="text-text-muted">{listingPrice.toLocaleString(locale)} € × {t("days", {count: days})}</span>
-                    <span className="text-text-primary">{subtotal.toLocaleString(locale)} €</span>
+                    <span className="text-text-muted">{formatOfferAmount(listingPrice,currency,locale)} × {t("days", {count: days})}</span>
+                    <span className="text-text-primary">{formatOfferAmount(subtotal,currency,locale)}</span>
                   </div>
                   <div className="flex justify-between text-sm font-bold text-text-primary pt-3 border-t border-border">
                     <span>{t("estimatedTotal")}</span>
-                    <span className="text-gold font-display text-lg">{total.toLocaleString(locale)} €</span>
+                    <span className="text-gold font-display text-lg">{formatOfferAmount(total,currency,locale)}</span>
                   </div>
                 </div>
 

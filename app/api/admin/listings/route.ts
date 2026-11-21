@@ -31,7 +31,7 @@ export async function GET(req: NextRequest) {
   }
 
   let query = db.from("listings")
-    .select("id, responsible_person, user_id, company_id, type, category, title, city, price, published, created_at, price_negotiable:metadata->price_negotiable, price_on_request:metadata->price_on_request, rental_type:metadata->>rental_type,marketplace:metadata->marketplace,moderation_status,content_revision,reviewed_revision,submitted_at,reviewed_at,moderation_reason", { count: "exact" })
+    .select("id, responsible_person, user_id, company_id, type, category, title, city, price, published, created_at, price_currency:metadata->>price_currency, price_negotiable:metadata->price_negotiable, price_on_request:metadata->price_on_request, rental_type:metadata->>rental_type,marketplace:metadata->marketplace,moderation_status,content_revision,reviewed_revision,submitted_at,reviewed_at,moderation_reason", { count: "exact" })
     .order("created_at", { ascending: false })
     .range((page - 1) * pageSize, page * pageSize - 1);
   const department=params.get("dept"),subcategory=params.get("sub");

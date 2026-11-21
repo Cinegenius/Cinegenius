@@ -230,6 +230,7 @@ export interface CrewData {
   certificates?: string[];
   own_equipment?: boolean;
   day_rate?: number;
+  price_currency?: string;
   day_rate_on_request?: boolean;
   team_size?: number;            // Assistenten möglich
 }
@@ -445,6 +446,7 @@ export interface UserProfile {
 
   // Konditionen
   day_rate: number | null;
+  price_currency?: string;
   day_rate_on_request?: boolean;
   languages: string[] | null;
   travel_ready: boolean | null;

@@ -65,7 +65,7 @@ application and CDN layers.
 | `person` | UUID of an unclaimed public person; bio only, never name. |
 | `company` | Published company UUID; description, tagline, short bio, USP. |
 | `service` | Service UUID with currently published parent company; title, description, price note. |
-| `news` | Approved/ended entry UUID with approved organization; title, summary, description. |
+| `news` | Approved/ended entry UUID with approved organization; title, summary, description, and up to eight gallery captions/alt descriptions (`image_N_caption`, `image_N_altText`, original gallery index). Source titles, creators, rights/credits and links stay unchanged. |
 | `organization` | Approved organization UUID; description. |
 | `project` | Public project UUID, never `project_drafts`; description/logline/synopsis, not work title. |
 | `community` / `reply` | Public unexpired board post/reply UUID; title/body, with current parent, author Ghost and block checks. |

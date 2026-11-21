@@ -1,7 +1,8 @@
+import { isCurrencyCode } from "@/lib/currency";
 import { legacyPlaceQuery } from "@/lib/places/core";
 import { jobSchedule } from "@/lib/job-metadata";
 import { geographicPage } from "@/lib/browse-geography";
-import { ownBrowsePlace } from "@/lib/browse-geography-server";
+import { preferredBrowsePlace } from "@/lib/browse-preference-server";
 import { publicMapPoint } from "@/lib/places/public-map-point";
 import { cityWriteFields, placeReadFields, placeSearchFilter } from "@/lib/places/catalog";
 import { placeCitySearchAliases } from "@/lib/places/core";
@@ -33,7 +34,7 @@ const LISTING_COLS =
 // internal ownership IDs, arbitrary metadata and private availability data on
 // authenticated owner endpoints.
 const LISTING_COLS_PUBLIC =
-  "place_country_code,place_region_id,place_city_id,place_city_name,place_region_name,place_status,id, type, category, title, description, price, city, image_url, published, extra_images, created_at, price_negotiable:metadata->price_negotiable, price_on_request:metadata->price_on_request, rental_type:metadata->>rental_type, marketplace:metadata->marketplace, condition:metadata->>condition, delivery:metadata->delivery, focal_point:metadata->focal_point";
+  "place_country_code,place_region_id,place_city_id,place_city_name,place_region_name,place_status,id, type, category, title, description, price, city, image_url, published, extra_images, created_at, price_currency:metadata->>price_currency, price_negotiable:metadata->price_negotiable, price_on_request:metadata->price_on_request, rental_type:metadata->>rental_type, marketplace:metadata->marketplace, condition:metadata->>condition, delivery:metadata->delivery, focal_point:metadata->focal_point";
 
 function privateNoStoreJson(body: unknown, status = 200) {
   const response = NextResponse.json(body, { status });
@@ -43,6 +44,9 @@ function privateNoStoreJson(body: unknown, status = 200) {
 
 export async function GET(req: NextRequest) {
   const tResponse = await getResponseTranslations();
+  const currencyInput = req.nextUrl.searchParams.get("currency");
+  if (currencyInput && !isCurrencyCode(currencyInput)) return NextResponse.json({error:tResponse("Regional.invalidCurrency")},{status:400});
+  const currency = currencyInput || (["price-asc", "price-desc"].includes(req.nextUrl.searchParams.get("sort") ?? "") ? "EUR" : "");
   const type  = req.nextUrl.searchParams.get("type");
   const mine  = req.nextUrl.searchParams.get("mine") === "true";
   const page  = Math.max(1, (parseInt(req.nextUrl.searchParams.get("page")  ?? "1",  10)||1));
@@ -99,10 +103,11 @@ export async function GET(req: NextRequest) {
   const sort=req.nextUrl.searchParams.get("sort");
   let preferred = null;
   if (req.nextUrl.searchParams.get("nearby") === "1" && !["country","region","city","cityText"].some(key => req.nextUrl.searchParams.get(key)) && sort !== "price-asc" && sort !== "price-desc") {
-    try { preferred = (await ownBrowsePlace()).place; } catch { /* The ordinary directory remains available. */ }
+    try { preferred = (await preferredBrowsePlace()).place; } catch { /* The ordinary directory remains available. */ }
   }
   const {data,error,count} = await geographicPage<Record<string, unknown>>((clause, range) => {
   let query = db.from("privacy_visible_listings").select(LISTING_COLS_PUBLIC,{count:"exact", head: !range}).eq("published",true);
+  if(currency)query=currency==="EUR"?query.or("metadata->>price_currency.eq.EUR,metadata->>price_currency.is.null"):query.eq("metadata->>price_currency",currency);
   if(marketplaceOnly)query=query.in("type",["prop","vehicle"]);
   else if(type)query=query.eq("type",type);
   if(marketplaceOnly){

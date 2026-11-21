@@ -492,7 +492,7 @@ function CreatorsInner({
         ]}
         categoryValue={sidebarDept ?? ""}
         onCategoryChange={(value) => { setSelectedRoles(new Set()); chooseSidebarDept(value || null); }}
-        resultCount={hasMoreFromApi ? null : isProviderFilter(sidebarDept) ? allCreators.length : matching.length} resultSummary={hasMoreFromApi ? (loadError ? t("resultsLoadFailed") : t("resultsLoading")) : t("results", { count: isProviderFilter(sidebarDept) ? allCreators.length : matching.length })}
+        resultCount={hasMoreFromApi ? null : matching.length} resultSummary={hasMoreFromApi ? (loadError ? t("resultsLoadFailed") : t("resultsLoading")) : t("results", { count: matching.length })}
         resultActions={<ProviderQuickFilters value={sidebarDept}
           crew={filterProviderProfiles(allCreators, CREW_PROVIDER_FILTER).length > 0}
           locations={filterProviderProfiles(allCreators, LOCATION_PROVIDER_FILTER).length > 0}
@@ -505,7 +505,7 @@ function CreatorsInner({
         resetLabel={t("resetFilters")}
         showResultsLabel={t("showResults", { count: filtered.length })}
       >
-        <PlaceFilters rows={allCreators} value={{country:countryFilter,region:regionFilter,city:cityFilter}} onChange={changePlaceFilters} />
+        <PlaceFilters rows={allCreators} value={{country:countryFilter,region:regionFilter,city:cityFilter}} onChange={value => { geography.setEnabled(false); changePlaceFilters(value); }} />
         <MobileFilterField label={t("filterProfileType")}>
           <MobileFilterSelect value={profileTypeFilter} onChange={setProfileTypeFilter} placeholder={t("filterAll")} options={availableProfileTypes.map((value) => ({ value, label: PROFILE_TYPE_MAP[value] ?? value }))} />
         </MobileFilterField>

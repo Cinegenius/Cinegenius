@@ -1,3 +1,4 @@
+import { listingCurrency } from "@/lib/currency";
 import { publicListingIds } from "@/lib/profile-privacy-server";
 import { readPublicLocationArea } from "@/lib/location-privacy";
 import { getTranslations as getPageTranslations } from "next-intl/server";
@@ -146,11 +147,11 @@ export default async function LocationPage({
     ...(location.price > 0 && !location.metadata.price_negotiable && !location.metadata.price_on_request ? { "offers": {
       "@type": "Offer",
       "price": location.price,
-      "priceCurrency": "EUR",
+      "priceCurrency": listingCurrency(location.metadata),
       "priceSpecification": {
         "@type": "UnitPriceSpecification",
         "price": location.price,
-        "priceCurrency": "EUR",
+        "priceCurrency": listingCurrency(location.metadata),
         "unitText": "DAY",
       },
     } } : {}),

@@ -265,3 +265,73 @@ Crew result row correction, 14 November 2026: Keep the compact count, Crew, Loca
 ## Latest app interaction and Workspace contract – 19 November 2026
 
 Follow `docs/design/app-current-20261119.md` for the latest native-only navigation, shared measured header clearance, swipeable view controls, Workspace-style Genie and department About-glass contract. Workspace functions must reuse account-bound project/document IDs and respect revocable source context; Genie navigation context never grants access. Preserve actual implemented scope and distinguish local references from online team delivery.
+
+## Two maintained product inventories – operator request, 20 November 2026
+
+- Maintain `docs/CINEGENIUS-WEBSITE-UEBERSICHT.md` for the entire website, including public pages, personal/admin areas, feedback, editorial operations and shared foundations.
+- Maintain `docs/CINEGENIUS-APP-UEBERSICHT.md` separately for the entire native app, including Work and device-specific capabilities. Markus explicitly requests two inventories, not one combined list.
+- With each relevant change update the affected entries: scope, date, implementation status, publication/activation evidence, tests and remaining work. Cross-link shared contracts and coordinate with APP Entwicklung. Preserve unrelated updates; these documents create no new automation or release authorization.
+- Distinguish source present, tested, deployed, activated, installed and verified on a physical device. Never infer a live feature from a route, a draft, a successful build or another platform's test. Add new modules and mark superseded behavior; do not silently drop unfinished work.
+
+
+## Auftragseinteilung und Crew-Zähler (20. November 2026)
+
+Markus verlangt eine nachvollziehbare Reihenfolge neuer und bestehender Aufträge.
+Pflege `docs/AKTUELLE-AUFTRAEGE.md`: akute Datenschutz-/Datenverlustprobleme zuerst,
+danach gemeldete Funktionsfehler, dann abhängige angefangene Arbeiten und neue
+Erweiterungen. Nicht jeden neuen Wunsch ungeprüft vorziehen; ältere Aufträge und
+ihren tatsächlichen Status erhalten, Prioritätswechsel kurz erklären. Getrennte
+APP-/Redaktionsarbeit abstimmen und bestehende Veröffentlichungsstopps beachten.
+
+Die bisherige Ausnahme einer konstanten Personenzahl bei Crew-Anbieterfiltern ist
+aufgehoben: Crew, Locations-Anbieter und Marktplatz-Anbieter zeigen oben die
+aktuell gefilterte Gesamtzahl. Karte, Kartenhinweise und „Alle anzeigen“ verwenden
+denselben berechtigten Ergebnissatz; Zoomen ändert nur den Kartenausschnitt.
+
+
+## Regional discovery (operator request, 20 November 2026)
+
+- Default discovery prioritizes the valid coarse Vercel request country, including
+  guests and travellers. The own profile city/region refines only the same country
+  and is the fallback when request geography is unavailable. Never infer location
+  from interface language or request GPS for this preference.
+- Explicit place/country/All choices and manual sort win. Retain actual Back and
+  account-scoped view state; discard stale preference responses after session changes.
+  Use `lib/browse-preference-server.ts` and `useBrowseGeography`; no shared visitor cache.
+- Apply regional ranking before pagination/rail limits and preserve all visible
+  foreign/unknown-place results. Hidden profile locations cannot influence rank.
+  Keep current publication/privacy checks; country preference grants no access.
+- Organizations and the board distinguish missing country (automatic) from
+  `country=all` (explicit global). News retain their editorial country filters.
+  Photo discovery has no reliable place projection and remains global.
+- See `docs/country-first-discovery.md` for Web/native contract, tests and limits.
+  A checked branch is not a release; preserve the current APP release hold.
+
+
+## Website release request, 20 November 2026
+
+Markus explicitly requested “stell live” for the checked website package
+`f490b47c`: filtered Crew counts, compact map previews, one-day new-Crew priority
+and rotation, and country-first discovery. This supersedes the earlier WEB hold
+for this exact package. The separate native Smart/Work release hold remains;
+do not port or publish unrelated app branches, enable Push/Shots, or change flags.
+Use clean main at origin/main and the guarded production script. Actual release
+and live verification are recorded in
+`/srv/cinegenius/handoffs/20261120-country-first-release/receipt.json`.
+
+## International price and private feedback contract (20 November 2026)
+
+- Reuse `lib/currency.ts` and `CurrencySelect` for prices. Preserve explicit currency
+  alongside amounts: listing `metadata.price_currency`, Crew `crew.price_currency`,
+  company equipment `currency`, booking `currency` snapshot. Missing legacy codes
+  remain EUR; never reinterpret or convert a price from language or geography.
+  Price bounds/sorting must apply inside one explicit currency before counts and
+  pagination. Native implementations must preserve these fields as well.
+- Apply and verify `20261120194027_booking_currency_snapshot.sql` before releasing
+  dependent booking code. Existing amounts and privacy rules remain unchanged.
+- `/mitgestalten` uses authenticated private drafts and explicit confirmed support
+  submissions. Local representatives never share private history. AI suggestions
+  are unreviewed proposals with actual user evidence, not permission to change or
+  publish. Coordination is admin-only; shared invitation links convey no rights.
+- See `docs/international-currency-feedback.md` for endpoints, limits and release
+  status. A prepared file is not a delivered APP message or a native device test.

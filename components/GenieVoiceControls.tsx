@@ -7,8 +7,8 @@ import { createGenieRecorder, type RecordingState, type VoiceError } from "@/lib
 import { nativeGenieVoice, selectGenieSpeechVoice, genieSpokenText, GENIE_SPEECH_RATE, GENIE_SPEECH_VOLUME, GENIE_SPEECH_LOCALES } from "@/lib/genie-voice";
 import styles from "./Genie.module.css";
 
-export default function GenieVoiceControls({ active, pending, locale, resetKey, onText, onUnauthorized, reply }: {
-  active: boolean; pending: boolean; locale: string; resetKey: number;
+export default function GenieVoiceControls({ active, pending, locale, resetKey, onText, onUnauthorized, reply, noticeId = "genie-voice-notice" }: {
+  noticeId?: string; active: boolean; pending: boolean; locale: string; resetKey: number;
   onText: (text: string) => void; onUnauthorized: () => void;
   reply: { id: number; text: string; locale: string; spoken: boolean } | null;
 }) {
@@ -82,7 +82,7 @@ export default function GenieVoiceControls({ active, pending, locale, resetKey, 
     <div className={styles.voiceActions}>
       <button type="button" className={styles.iconButton} disabled={pending || !active || state === "requesting" || state === "transcribing"}
         aria-label={t(state === "recording" ? "stop" : "start")} title={t(state === "recording" ? "stop" : "start")}
-        aria-pressed={state === "recording"} aria-describedby="genie-voice-notice"
+        aria-pressed={state === "recording"} aria-describedby={noticeId}
         onClick={() => { setVoiceErrorCode(null); if (state === "recording") recorder.current?.stop(); else { stopSpeech(); void recorder.current?.start(locale); } }}>
         {state === "recording" ? <Square size={18} aria-hidden="true" /> : <Mic size={18} aria-hidden="true" />}
       </button>

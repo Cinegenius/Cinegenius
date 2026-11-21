@@ -2,7 +2,7 @@
 
 import { useEffect, useSyncExternalStore } from "react";
 import { usePathname } from "next/navigation";
-import { analyticsPage, analyticsProperties } from "@/lib/analytics-policy";
+import { analyticsPage, analyticsProperties, newsAnalyticsSurface, newsAnalyticsProperties, type NewsAnalyticsEvent } from "@/lib/analytics-policy";
 import { readAnalyticsConsent, subscribeAnalyticsConsent } from "@/lib/analytics-consent";
 import type { PostHog } from "posthog-js";
 
@@ -10,12 +10,13 @@ let client: PostHog | null = null;
 let loading: Promise<PostHog> | null = null;
 let lastPage: string | null = null;
 const token = process.env.NEXT_PUBLIC_POSTHOG_PROJECT_TOKEN;
+const newsSeen = new Map<string, number>();
 
-async function getClient() {
+async function getClient(forNews = false) {
   if (client) return client;
-  loading ??= import("posthog-js").then(({ default: posthog }) => posthog);
+  loading ??= import("posthog-js").then(({ default: posthog }) => posthog).catch(error => { loading = null; throw error; });
   const posthog = await loading;
-  if (!client && readAnalyticsConsent() === "accepted" && analyticsPage(window.location.pathname) && token) {
+  if (!client && readAnalyticsConsent() === "accepted" && (analyticsPage(window.location.pathname) || (forNews && newsAnalyticsSurface(window.location.pathname))) && token) {
     posthog.init(token, {
       api_host: "https://eu.i.posthog.com",
       ui_host: "https://eu.posthog.com",
@@ -44,14 +45,36 @@ async function getClient() {
       before_send(event) {
         if (!event || readAnalyticsConsent() !== "accepted") return null;
         const page = analyticsPage(window.location.pathname);
-        if (!page || event.event !== "$pageview") return null;
+        const properties = event.event === "$pageview" && page ? analyticsProperties(page)
+          : newsAnalyticsProperties(event.event, event.properties ?? {}, window.location.pathname);
+        if (!properties) return null;
         // Replace SDK-enriched properties to exclude titles, referrers, queries and IDs.
-        return { event: event.event, uuid: event.uuid, timestamp: event.timestamp, properties: { ...analyticsProperties(page), token, distinct_id: posthog.get_distinct_id(), $process_person_profile: false } };
+        return { event: event.event, uuid: event.uuid, timestamp: event.timestamp, properties: { ...properties, token, distinct_id: posthog.get_distinct_id(), $process_person_profile: false } };
       },
     });
     client = posthog;
   }
   return client;
+}
+
+/** Called only by rendered public article/card observers, never from private editors. */
+export async function captureNews(event: NewsAnalyticsEvent, articleId: string, stillVisible: () => boolean = () => true) {
+  if (!token || readAnalyticsConsent() !== "accepted") return false;
+  const path = window.location.pathname;
+  const properties = newsAnalyticsProperties(event, {article_id: articleId, surface: newsAnalyticsSurface(path)}, path);
+  if (!properties || !stillVisible()) return false;
+  const key = `${event}:${articleId}:${properties.surface}`, now = Date.now();
+  if (now - (newsSeen.get(key) ?? 0) < 30 * 60_000) return true;
+  try {
+    const instance = await getClient(true);
+    if (!instance || readAnalyticsConsent() !== "accepted" || window.location.pathname !== path || !stillVisible()) return false;
+    if (now - (newsSeen.get(key) ?? 0) < 30 * 60_000) return true;
+    if (instance.has_opted_out_capturing()) instance.opt_in_capturing({captureEventName: false});
+    newsSeen.set(key, now);
+    for (const [seen, at] of newsSeen) if (now - at >= 30 * 60_000 || newsSeen.size > 500) newsSeen.delete(seen);
+    instance.capture(event, properties);
+    return true;
+  } catch { return false; }
 }
 
 export default function ProductAnalytics() {
@@ -63,6 +86,7 @@ export default function ProductAnalytics() {
     if (consent !== "accepted") {
       client?.opt_out_capturing();
       lastPage = null;
+      newsSeen.clear();
       return;
     }
     if (!token || !page) { lastPage = null; return; }

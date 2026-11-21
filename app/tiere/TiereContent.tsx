@@ -186,7 +186,7 @@ export default function TiereContent({ serverListings }: { serverListings: Anima
       categoryLabel={animals("speciesField")} allCategoryLabel={animals("allSpecies")} categoryValue={species === "Alle" ? "" : species} onCategoryChange={value => setSpecies(value || "Alle")}
       categories={[...new Set(serverListings.map(row => animalSpecies(row.category)?.id ?? row.category))].map(value => ({ value, label: speciesLabel(value) }))}
       resultCount={filtered.length} resultSummary={uiText("BrowseFilters.results", { count: filtered.length })} filterCount={chips.length} chips={chips} onReset={reset} resetLabel={uiText("projects.resetFilters")} showResultsLabel={uiText("Ui.text_52ca04e867ebdc", { value1: String(filtered.length) })}>
-      <PlaceFilters rows={serverListings} value={place} onChange={setPlace} />
+      <PlaceFilters rows={serverListings} value={place} onChange={value => { geography.setEnabled(false); setPlace(value); }} />
       <MobileFilterField label={animals("training")}><MobileFilterSelect value={training === "Alle" ? "" : training} onChange={value => setTraining(value || "Alle")} placeholder={uiText("common.all")} options={[...new Set(serverListings.flatMap(row => row.trainingLevel ? [row.trainingLevel] : []))].map(value => ({ value, label: trainingLabel(value) }))} /></MobileFilterField>
       {(deliveryOnly || serverListings.some(row => row.delivery)) && <label className="flex min-h-11 items-center gap-3 text-sm"><input type="checkbox" checked={deliveryOnly} onChange={event => setDeliveryOnly(event.target.checked)} />{animals("delivery")}</label>}
     </MobileBrowseControls>

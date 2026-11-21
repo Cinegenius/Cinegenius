@@ -1,3 +1,4 @@
+import { listingCurrency, formatOfferAmount } from "@/lib/currency";
 import { db } from "@/lib/db";
 import Image from "@/components/MediaImage";
 import Link from "next/link";
@@ -31,6 +32,7 @@ interface CreatorCard {
   tiktokUrl?: string;
   websiteUrl?: string;
   dayRate?: number;
+  currency?: string;
   available: boolean;
 }
 
@@ -55,7 +57,7 @@ export default async function SocialMediaPage() {
 
   const { data: profiles } = await db
     .from("profiles")
-    .select("user_id, display_name, tagline, location, avatar_url, profile_type, profile_types, instagram_url, youtube_url, tiktok_url, website_url, day_rate, available, verified")
+    .select("user_id, display_name, tagline, location, avatar_url, profile_type, profile_types, instagram_url, youtube_url, tiktok_url, website_url, price_currency:crew->>price_currency, day_rate, available, verified")
     .not("display_name", "is", null)
     .neq("display_name", "")
     .order("updated_at", { ascending: false })
@@ -76,7 +78,7 @@ export default async function SocialMediaPage() {
       youtubeUrl: p.youtube_url,
       tiktokUrl: p.tiktok_url,
       websiteUrl: p.website_url,
-      dayRate: p.day_rate,
+      dayRate: p.day_rate, currency:listingCurrency(p),
       available: p.available ?? false,
     }));
 
@@ -185,7 +187,7 @@ export default async function SocialMediaPage() {
                     <p className="text-xs text-text-secondary leading-relaxed line-clamp-2 flex-1">{c.tagline}</p>
                   )}
                   {c.dayRate && (
-                    <p className="text-xs font-semibold text-gold mt-3">{uiText.rich("Ui.text_af296a89acf4b8", { value1: () => (c.dayRate?.toLocaleString(uiLocale) ?? ""), part2: chunks => (<span className="text-text-muted font-normal">{chunks}</span>) })}</p>
+                    <p className="text-xs font-semibold text-gold mt-3">{formatOfferAmount(c.dayRate, c.currency ?? "EUR", uiLocale)}{uiText("common.perDay")}</p>
                   )}
                 </div>
               </Link>

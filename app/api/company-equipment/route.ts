@@ -1,3 +1,4 @@
+import { isCurrencyCode, isStoredCurrency } from "@/lib/currency";
 import { attemptedApproval } from "@/lib/offer-moderation";
 import { getTranslations } from "next-intl/server";
 import { revalidatePath } from "next/cache";
@@ -38,6 +39,7 @@ export async function POST(req: NextRequest) {
   const { userId } = authResult;
 
   const body = await req.json();
+  if (body.currency !== undefined && !isCurrencyCode(body.currency)) return NextResponse.json({error:tResponse("Regional.invalidCurrency")},{status:400});
   if (attemptedApproval(body)) return NextResponse.json({ error: (await getTranslations("OfferModeration"))("adminOnly") }, { status: 403 });
   const { company_id, category, name } = body;
 
@@ -67,7 +69,7 @@ export async function POST(req: NextRequest) {
       price_day:           body.price_day            ?? null,
       price_week:          body.price_week           ?? null,
       price_on_request:    body.price_on_request     ?? true,
-      currency:            "EUR",
+      currency:            body.currency ?? "EUR",
       pickup_available:    body.pickup_available     ?? false,
       delivery_available:  body.delivery_available   ?? false,
       delivery_radius_km:  body.delivery_radius_km   ?? null,
@@ -95,6 +97,7 @@ export async function PATCH(req: NextRequest) {
   const { userId } = authResult;
 
   const body = await req.json().catch(() => ({}));
+  if (body.currency !== undefined && !isStoredCurrency(body.currency)) return NextResponse.json({error: tResponse("Regional.invalidCurrency")}, {status:400});
   if (attemptedApproval(body)) return NextResponse.json({ error: (await getTranslations("OfferModeration"))("adminOnly") }, { status: 403 });
   const { id } = body;
   if (!id) return NextResponse.json({ error: tResponse('System.m_4b8591045313') }, { status: 400 });

@@ -6,13 +6,17 @@ import {organizationDirectory} from '@/lib/organization-directory';
 import {browseCountryChoice} from '@/lib/browse-country';
 import {organizationDirectoryHref} from '@/lib/organization-directory-filters';
 import NativeOrganizations from '@/components/app/NativeOrganizations';
+import {preferredBrowsePlace} from '@/lib/browse-preference-server';
 export const dynamic='force-dynamic';
 export default async function OrganizationsPage({searchParams}:{searchParams:Promise<{page?:string;country?:string|string[];city?:string;q?:string}>}) {
  const [params,t,locale]=await Promise.all([searchParams,getTranslations('OrganizationDiscovery'),getLocale()]);
- // Invalid legacy URLs use the visibly selected All countries fallback.
+ // Invalid legacy URLs use the visibly selected All countries fallback. Only
+ // an omitted country retains regional ordering; explicit choices stay global.
  const country=browseCountryChoice(params.country)??'';
+ const automatic=params.country===undefined;
+ const preferred=automatic?await preferredBrowsePlace().then(result=>result.place).catch(()=>null):null;
  const page=Math.min(10000,Math.max(1,Math.floor(Number(params.page)||1)));
- const data=await organizationDirectory({country,page,city:typeof params.city==='string'?params.city.slice(0,220):'',q:typeof params.q==='string'?params.q.trim().slice(0,120):''},locale,AbortSignal.timeout(20_000));
+ const data=await organizationDirectory({country,page,city:typeof params.city==='string'?params.city.slice(0,220):'',q:typeof params.q==='string'?params.q.trim().slice(0,120):'',...(automatic?{automatic:true}:{})},locale,AbortSignal.timeout(20_000),preferred);
  const {organizations,hasMore}=data;
  const newsHref=country?`/news?${new URLSearchParams({country})}`:'/news';
  return <NativeOrganizations data={data}><main className="min-h-screen bg-bg-primary"><PageHeader badge={t("eyebrow")} title={t('organizations')} description={t('description')}/><section className="site-container py-8"><Link href={newsHref} className="mb-6 inline-block py-3 text-gold">{t('allEntries')} →</Link>

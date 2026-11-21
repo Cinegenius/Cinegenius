@@ -1,4 +1,6 @@
 "use client";
+import CurrencySelect from "@/components/CurrencySelect";
+import { storedCurrency, formatOfferAmount } from "@/lib/currency";
 import { useTranslations , useLocale } from "next-intl";
 import OfferModerationStatus from "@/components/OfferModerationStatus";
 
@@ -550,13 +552,14 @@ function ServicesTab({ companyId, canEdit }: { companyId: string; canEdit: boole
 const BLANK_EQUIPMENT = {
   category: "kamera", subcategory: "", name: "", brand: "", model: "",
   description: "", condition: "gut", available: true,
-  price_day: "", price_week: "", price_on_request: true,
+  price_day: "", price_week: "", currency: "EUR", price_on_request: true,
   pickup_available: false, delivery_available: false, delivery_radius_km: "",
   shipping_available: false, insured: false, deposit_required: false, deposit_amount: "",
   quantity: "1",
 };
 
 function EquipmentTab({ companyId, canEdit }: { companyId: string; canEdit: boolean }) {
+  const uiLocale=useLocale();
   const uiText = useTranslations();
 
   const moderation = useTranslations("OfferModeration");
@@ -591,7 +594,7 @@ function EquipmentTab({ companyId, canEdit }: { companyId: string; canEdit: bool
       category: item.category, subcategory: item.subcategory ?? "",
       name: item.name, brand: item.brand ?? "", model: item.model ?? "",
       description: item.description ?? "", condition: item.condition,
-      available: item.available, price_day: item.price_day?.toString() ?? "",
+      available: item.available, currency: storedCurrency(item.currency), price_day: item.price_day?.toString() ?? "",
       price_week: item.price_week?.toString() ?? "", price_on_request: item.price_on_request,
       pickup_available: item.pickup_available, delivery_available: item.delivery_available,
       delivery_radius_km: item.delivery_radius_km?.toString() ?? "",
@@ -619,6 +622,7 @@ function EquipmentTab({ companyId, canEdit }: { companyId: string; canEdit: bool
         price_day: form.price_day ? Number(form.price_day) : null,
         price_week: form.price_week ? Number(form.price_week) : null,
         price_on_request: form.price_on_request,
+        currency: form.currency,
         pickup_available: form.pickup_available,
         delivery_available: form.delivery_available,
         delivery_radius_km: form.delivery_radius_km ? Number(form.delivery_radius_km) : null,
@@ -736,7 +740,7 @@ function EquipmentTab({ companyId, canEdit }: { companyId: string; canEdit: bool
             <span className="text-sm text-text-secondary">{uiText("AdminReview.fields.price_on_request")}</span>
           </div>
           {!form.price_on_request && (
-            <div className="grid grid-cols-2 gap-4">
+            <><CurrencySelect value={form.currency} onChange={currency => set("currency", currency)} /><div className="grid grid-cols-2 gap-4">
               <FormField label={uiText("Ui.text_4c6fd2ca5500b1")}>
                 <input type="number" value={form.price_day} onChange={e => set("price_day", e.target.value)} placeholder="0"
                   className="w-full bg-bg-secondary border border-border rounded-xl px-3.5 py-3 text-sm focus:outline-none focus:border-gold transition-colors" />
@@ -745,7 +749,7 @@ function EquipmentTab({ companyId, canEdit }: { companyId: string; canEdit: bool
                 <input type="number" value={form.price_week} onChange={e => set("price_week", e.target.value)} placeholder="0"
                   className="w-full bg-bg-secondary border border-border rounded-xl px-3.5 py-3 text-sm focus:outline-none focus:border-gold transition-colors" />
               </FormField>
-            </div>
+            </div></>
           )}
         </div>
 
@@ -873,7 +877,7 @@ function EquipmentTab({ companyId, canEdit }: { companyId: string; canEdit: bool
                   <div className="flex items-center gap-3 mt-0.5 text-[11px] text-text-muted">
                     {cat && <span>{cat.label}</span>}
                     {item.subcategory && <span>· {item.subcategory}</span>}
-                    {!item.price_on_request && item.price_day && <span className="text-gold">{uiText.rich("Ui.text_af6cf9f70e0433", { value1: () => (item.price_day) })}</span>}
+                    {!item.price_on_request && item.price_day && <span className="text-gold">{formatOfferAmount(item.price_day, item.currency, uiLocale)}{uiText("common.perDay")}</span>}
                     {item.delivery_available && <span className="flex items-center gap-0.5">{uiText.rich("Ui.text_b1074837744a9d", { part1: () => (<Truck size={9} />) })}</span>}
                     {item.insured && <span className="flex items-center gap-0.5">{uiText.rich("Ui.text_f321771ee0c0bb", { part1: () => (<Shield size={9} />) })}</span>}
                   </div>

@@ -1,4 +1,6 @@
-export const ANALYTICS_CONSENT_KEY = "cg_analytics_consent_v1";
+// Article measurement expands the prior directory-only purpose. Ask again;
+// neither an older opt-in nor the old notice dismissal enables the new events.
+export const ANALYTICS_CONSENT_KEY = "cg_analytics_consent_v2";
 export const ANALYTICS_CONSENT_EVENT = "cg-analytics-consent-change";
 export const ANALYTICS_SETTINGS_EVENT = "cg-analytics-settings";
 export type AnalyticsConsent = "accepted" | "rejected" | null;
@@ -7,7 +9,9 @@ export function readAnalyticsConsent(): AnalyticsConsent {
   if (typeof window === "undefined") return null;
   try {
     const value = window.localStorage.getItem(ANALYTICS_CONSENT_KEY);
-    return value === "accepted" || value === "rejected" ? value : null;
+    if (value === "accepted" || value === "rejected") return value;
+    // A previous refusal remains a refusal; only an expanded opt-in needs renewal.
+    return window.localStorage.getItem("cg_analytics_consent_v1") === "rejected" ? "rejected" : null;
   } catch { return null; }
 }
 
