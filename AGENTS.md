@@ -1,3 +1,20 @@
+## Homepage-Crew: Betreiberkorrektur vom 21. November 2026
+
+Über WEB CODEX bestätigte aktuelle Vorgabe: Die Startseitenüberschrift lautet
+exakt „Crew“. Neue Registrierungen erhalten keinerlei Vorrang; das ersetzt die
+frühere 24-Stunden-Bevorzugung. Wechselnde Auswahl und bestehende Länderpriorisierung
+erhalten. Die alte Rotation aus `f6b45be5` / `0c5e63fd` nicht unverändert als
+aktuelle Auswahlregel übernehmen.
+
+WEB kündigt `user_settings.show_in_home_crew` über den gemeinsamen privaten
+GET/PATCH-Weg `/api/user-settings` an: freiwillige Wahl in Einrichtung und
+Privatsphäre-Einstellungen, Standard true für bestehende Konten, false aus
+dieser Auswahl ausschließen. Ghost und eingeschränkte Sichtbarkeit bleiben
+vorrangig. Einrichtung speichert die Wahl bestätigt vor Profilveröffentlichung.
+Der Vertrag und die additive Migration sind noch ungeprüft/in Arbeit; keine
+vorhandene Livefunktion, Geräteprüfung oder neue Freigabe behaupten. Details:
+`docs/app-home-crew-visibility-contract-20261121.md`.
+
 ## App-Folgearbeit: Smart-Karten und News – 19. November 2026
 
 Der am 20. November 2026 abgeglichene veröffentlichte Hauptstand ist `a9afd8e4057b932d1e15cd116deb123c25064586`. Die veröffentlichten spanischen Crew-Begriffe und Firmen-/Catering-/Inserat-Übersetzungen sowie seine Headerkorrektur ohne zusätzliche dunkle Hintergrundfläche, stärkere Smart-Auswahlmarkierung, Header-/Genie-Korrekturen, Shots / News / Smart / Projekte / Work sowie Gast-Sprachwahl und Übersetzungs-/Länderänderungen erhalten. Die frühere Freigabe ist damit verbraucht; die hier vorbereitete App-Folgearbeit hat keine neue Veröffentlichungsfreigabe. Der erhaltene alte Mobile-Zweig und ältere Swift-Dateien dürfen diesen Hauptstand nicht ersetzen.
