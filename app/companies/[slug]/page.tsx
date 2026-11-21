@@ -4,7 +4,7 @@ import {placeDisplay} from "@/lib/places/core";
 import PublicOrganizationLinks from "@/components/organizations/PublicOrganizationLinks";
 import { publicResponsiblePerson, responsibleForCompany } from "@/lib/responsible-person-server";
 import { visibleLinkedProfileIds } from "@/lib/linked-profile-access";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { db } from "@/lib/db";
 import { auth } from "@clerk/nextjs/server";
 import type { Metadata } from "next";
@@ -12,9 +12,19 @@ import CompanyDetail from "./CompanyDetail";
 import { isPublicCompanyMembership } from "@/lib/company-membership-requests";
 
 async function getCompany(slug: string) {
-  const { data } = await db.from("companies")
+  const read = (column: "slug" | "id") => db.from("companies")
     .select("place_country_code,place_region_id,place_city_id,place_city_name,place_region_name,place_status,id, slug, owner_user_id, responsible_person, name, logo_url, cover_url, description, city, website, email_public, phone_public, categories, services, portfolio_images, tagline, bio_short, usp, founded_year, legal_form, hq_address_public, countries, industry_focus, social_links, catering_details, animal_details, published, verified, created_at")
-    .eq("slug", slug).maybeSingle();
+    .eq(column, slug).maybeSingle();
+  const bySlug = await read("slug");
+  if (bySlug.error) throw new Error("company_read_failed");
+  let data = bySlug.data;
+  // Previously issued onboarding links contained the ID. Keep exact slugs first,
+  // including UUID-shaped slugs, and resolve only valid IDs as a fallback.
+  if (!data && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(slug)) {
+    const result = await read("id");
+    if (result.error) throw new Error("company_read_failed");
+    data = result.data;
+  }
   if (!data) return null;
 
   // Contact consent can change at any time; keep it out of shared cached data.
@@ -103,7 +113,7 @@ export async function generateMetadata({
     : `${company.name}${company.city ? ` in ${company.city}` : ""}${cats ? ` — ${cats}` : ""} auf CineGenius.`;
 
   return {
-    alternates: { canonical: `https://www.cinegenius.co/companies/${encodeURIComponent(slug)}` },
+    alternates: { canonical: `https://www.cinegenius.co/companies/${encodeURIComponent(company.slug)}` },
     title: company.name,
     description,
     openGraph: {
@@ -125,6 +135,8 @@ export default async function CompanyPage({
   const company = await getCompany(slug);
 
   if (!company || (company.published !== true && userId !== company.owner_user_id)) notFound();
+  // Never disclose a private company's canonical URL before the visibility check.
+  if (slug !== company.slug) redirect(`/companies/${encodeURIComponent(company.slug)}`);
 
   const locale=await getLocale();
   company.city=placeDisplay(placeReadFields(company.city??"",company,locale),company.city??"",locale);

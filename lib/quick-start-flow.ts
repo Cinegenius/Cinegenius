@@ -66,7 +66,7 @@ export type QuickStartDraft = {
   primaryOccupation?: PrimaryOccupation | null;
   additionalOccupation?: PrimaryOccupation | null;
   sections: Partial<Record<QuickStartIntent, QuickStartIntentData>>;
-  completed: { profile: boolean; listings: Partial<Record<"location" | "equipment", string>>; company?: string };
+  completed: { profile: boolean; listings: Partial<Record<"location" | "equipment", string>>; company?: string; companySlug?: string };
   requestKeys: Partial<Record<"location" | "equipment" | "company", string>>;
 };
 
@@ -84,6 +84,13 @@ export const START_QUICK_START_DRAFT: QuickStartDraft = {
   completed: { profile: false, listings: {} },
   requestKeys: {},
 };
+
+/** The company ID remains the completion/idempotency key. Navigation uses the
+ * returned slug; older saved completions can use the permission-checked ID alias. */
+export function completedCompanyHref(completed: QuickStartDraft["completed"]): string | null {
+  if (!completed.company) return null;
+  return `/companies/${encodeURIComponent(completed.companySlug?.trim() || completed.company)}`;
+}
 
 export const QUICK_START_INTENT_LABELS: Record<QuickStartIntent, string> = {
   crew: "Als Crewmitglied arbeiten",
@@ -282,6 +289,8 @@ export function normalizeQuickStartDraft(value: unknown): QuickStartDraft {
         ...(typeof listingInput.equipment === "string" ? { equipment: listingInput.equipment.slice(0, 80) } : {}),
       },
       ...(typeof completedInput.company === "string" ? { company: completedInput.company.slice(0, 80) } : {}),
+      ...(typeof completedInput.company === "string" && typeof completedInput.companySlug === "string"
+        ? { companySlug: completedInput.companySlug.trim().slice(0, 200) } : {}),
     },
     requestKeys,
   };
