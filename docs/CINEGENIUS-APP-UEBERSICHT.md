@@ -9,7 +9,7 @@ Diese Übersicht trennt die installierte App, ihre serverseitigen Ansichten, nat
 
 | Thema | Belegter Stand |
 | --- | --- |
-| **iPhone-App** | Lokale APP meldet Build **2103** nach Sicherung in Installation. Kein Abschluss- oder neuer Geräteprüfbeleg in dieser Übergabe; keine TestFlight-Veröffentlichung bestätigt. Älterer bestätigter Stand dieser Dokumentation: `2026112007`. Diese Server-Aufgabe hat weder installiert noch das Gerät geprüft. |
+| **iPhone-App** | Lokale APP meldet **2026112105 installiert und gestartet**, nach frischer Sicherung. **Work-Einstieg fehlgeschlagen:** Markus meldet einen Absturz beim Antippen; laut lokaler APP bestätigen zwei echte Crashberichte vom 21.11., 19:19 Uhr Berlin einen SIGABRT. Begrenzter Fix für **2026112106 in Arbeit**, noch keine bestätigte neue Installation oder Gegenprobe. TestFlight offen. Diese Server-Aufgabe hat weder installiert noch die lokalen Originalbelege/das Gerät selbst geprüft. |
 | **App-Server** | **Veröffentlicht:** gemeinsamer Stand `5cafc814` seit 21.11., 16:12 Uhr Berlin; Deployment `dpl_7oepNowLC69PEfv3VwLotR9gzGu8` laut WEB READY mit echtem www-Alias. Der bisherige gemeinsame Stand `a3ff549a` ist als Basis erhalten. Homepage-Crew und die zugehörige Schemaänderung sind laut WEB live geprüft; [Abschluss und Grenzen](app-home-crew-visibility-contract-20261121.md). Folgecommit `a880a260` ändert nur Dokumentation. Native Installation und Bedienabnahme separat belegen. |
 | **Native Navigation** | Ziel gemäß aktuellem App-Vertrag: **Shots · News · Smart · Projekte · Work**. Die gewöhnliche Website behält ihre eigene Navigation. |
 | **Obere Aktionen** | Profil, Nachrichten, Suche und Menü; App-eigene Abstände und sichere Bedienung über Kopf-/Fußbereich. |
@@ -52,7 +52,7 @@ Diese Übersicht trennt die installierte App, ihre serverseitigen Ansichten, nat
 
 | Werkzeug | Ziel und vorhandene Grundlage | Stand / offene Grenze |
 | --- | --- | --- |
-| **Workspace** | Bestehende native Werkzeuge und private Projektarchive öffnen | Vorhandener nativer Bereich wird reaktiviert; Kontobindung und geschützte Rückkehr erhalten. |
+| **Workspace** | Bestehende native Werkzeuge und private Projektarchive öffnen | **Work lässt Build 2026112105 auf dem echten iPhone abstürzen**, laut lokaler APP an der UIKit-Einbindung des Übergangs zu Work. Fix 2106 lokal in Arbeit; Speicher-/Kontoregeln unverändert erhalten. Erfolgreiches Öffnen und Rückkehr erst nach der erneuten Geräteprüfung bestätigen. |
 | **Projekt-/Dokumentenarchiv** | Originale, Versionen und Zuordnungen über stabile IDs | Lokales Archiv ist **kein bestätigter Online-Teamdienst**. Keine alten Vorschauarchive still einem echten Konto zuordnen. |
 | **Dispo-/PDF-Analyse** | Dokumente auswerten, Analysemodus auswählen/ändern und Quellenbezug erhalten | Ausbau im App-Auftrag. Aktueller Vertrag beschreibt Fragen zu bestätigten Zeiten/Orten einer ausgewählten analysierten Dispo. Vollständige Qualitätsprüfung und alle Modi nicht in dieser Übersicht neu bestätigt. |
 | **Genie im Workspace** | Fragen im erlaubten Projekt-/Dokument-/Tageskontext, Sprache und Navigation | Quellenfragen bleiben flüchtig und ungeprüft; verändern oder verteilen nichts. Allgemeiner Chat über sämtliche Teams/Grundrisse noch nicht fertig. |
@@ -76,7 +76,7 @@ Diese Übersicht trennt die installierte App, ihre serverseitigen Ansichten, nat
 ## Nächste Schritte und Pflege
 
 1. Den veröffentlichten gemeinsamen Serverstand `5cafc814` einschließlich Basis `a3ff549a`, App `68930dd9` und späterer geprüfter Web-/App-Ergänzungen erhalten. Die erneute Freigabe gilt für dieses geprüfte Paket; neue Installations-/Bediennachweise getrennt bei der lokalen APP-Aufgabe nachführen. Frühere Stopphinweise unten beschreiben ihren damaligen Stand.
-2. Den Abschluss der gemeldeten Installation von Build 2103 und dessen Geräteabnahme nachführen. Build 2026112007 ist nur der ältere bestätigte Installationsstand; Server-/Browserbelege nicht als Geräteprüfung ausweisen.
+2. Den Work-Absturz in installiertem Build 2026112105 vorrangig bei der lokalen APP-Aufgabe beheben lassen. Sie übernimmt Build 2106, frische Sicherung, Installation und Markus’ Gegenprobe. Erfolgreichen Work-Einstieg, Rückkehr und flüssige Bedienung erst anhand des Ergebnisses nachführen; derzeit keine erfolgreiche Geräteabnahme oder TestFlight-Veröffentlichung.
 3. Native Zählerergänzungen einschließlich Crew-Filterkorrektur und kompakter Kartenvorschau mit dem lokalen App-Stand abstimmen. Die frühere Homepage-Rotation mit 24-Stunden-Vorrang ist abgelöst; der geprüfte Vertrag aus `5cafc814` ist dokumentiert. Der WEB-Live-/Schema-Beleg liegt vor; funktionale native Übernahme und Geräteabnahme bleiben separat zu prüfen. [Gemeinsame Prioritäten](AKTUELLE-AUFTRAEGE.md) erhalten.
 4. Die veröffentlichten Länder-/Feedback-/Währungsfunktionen auf Basis des aktuellen Hauptstands mit den nativen Quellen abgleichen. [Befunde, bereits übernommener Cache-Schutz und offene Geräteabnahme](app-international-handoff-20261121.md); die Buchungs-Währungsmigration ist bereits angewandt.
 5. Work-Funktionsstand mit APP konkretisieren; unbelegte Teilfunktionen als offen führen.
@@ -202,3 +202,33 @@ Keine Produktänderung, neue Installation oder erneute Veröffentlichung durch
 diesen Dokumentationsabgleich. Aktueller Beleg:
 `/srv/cinegenius/handoffs/20261121-public-newsroom/after-app-palette-check.json`.
 Eigene Quellenprüfung: `/srv/cinegenius/handoffs/20261121-app-public-newsroom-handoff/after-palette-check.json`.
+
+
+**Physischer Nachbefund · 21.11., 19:19 Uhr Berlin (lokale APP-Meldung):**
+Build `2026112105` wurde nach frischer Sicherung von sieben Ordnern auf Markus’
+iPhone installiert und gestartet. Die lokale APP meldet vor dem Start 118
+bytegleich erhaltene Dateien aus Documents/ApplicationSupport sowie 79 bestandene
+Archivprüfungen, vollständigen Build und unabhängige Quellprüfung. Diese Belege
+bestätigen keinen funktionierenden Work-Einstieg: Markus meldete anschließend
+den Absturz, zwei echte Geräteberichte zeigen laut lokaler APP SIGABRT.
+
+Die Symbolikation gegen die eingefrorene 2105-Binärdatei führt laut lokaler APP zu
+`WorkplaceEntry.swift:69`, `CineGeniusWorkHandoff.install()`: Ein als Child
+registrierter UIHostingController hatte seine View außerhalb von `owner.view`
+in einem UIWindow-Cover. UIKit verwirft diese Hierarchie. Der gemeldete Stack
+weist nicht auf den Ordnerspeicher als Auslöser. Der begrenzte 2106-Fix ersetzt
+die dekorative Fläche durch eine UIView ohne Hosting-Controller; Authentifizierung,
+Suspendierung, Herkunfts- und Zeitüberschreitungsprüfungen bleiben erhalten.
+**Fix, Build, frische Sicherung, erneute Installation und Nutzer-Gegenprobe liegen
+bei der lokalen APP-Aufgabe; Abschluss und flüssige Bedienung sind noch offen.**
+
+Quelle: Koordinationsmeldungen der lokalen Aufgabe
+`01a1d38d-d672-7941-8033-30d87821d882`. Dort gemeldete Belege relativ zum lokalen
+Setup-Arbeitsordner: `work/native-ui-followup-20261121/native-candidate-2026112105.safe.json`,
+`work/native-ui-followup-20261121/ui-install.safe.json`,
+`work/native-ui-followup-20261121/CHECKPOINT.safe.json` und
+`work/native-work-crash-20261121/crash-summary.safe.json`. Diese Server-Aufgabe
+hat die lokalen Dateien nicht unabhängig geöffnet oder einen Gerätetest
+wiederholt. Hier nur Status-/Prioritätskorrektur; kein paralleler nativer Fix,
+keine Installation und keine TestFlight-Freigabe. Ältere Meldungen zu Build 2103
+weiter oben beschreiben ihren damaligen Stand.
