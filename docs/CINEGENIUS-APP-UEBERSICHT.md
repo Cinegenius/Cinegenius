@@ -205,3 +205,9 @@ Kontowechsel und echtes Zurück-Navigieren. Angemeldeter KI-/Versandtest und
 iPhone-/Mac-Abnahme bleiben separat. Kein App-Livegang und keine Installation;
 Smart-/Work-Halt sowie Push-/Shots- und Prüfagent-Status unverändert.
 Beleg: `/srv/cinegenius/handoffs/20261121-app-international-handoff/receipt.json`.
+
+**Web-Einstieg Mitgestalten (21.11.):** Im persönlichen Website-Bereich wird
+„Mitgestalten“ zur gleichwertigen Menüzeile vor „Einstellungen“. Bestehendes Ziel
+und API-/Privatsphäre-Verträge unverändert. Native Übernahme und Geräteabnahme
+bleiben APP-Aufgabe; die Website-Menüprüfung ist kein nativer Nachweis.
+Beleg: `/srv/cinegenius/handoffs/20261121-feedback-entry/receipt.json`.

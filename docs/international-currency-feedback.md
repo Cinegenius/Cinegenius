@@ -48,7 +48,10 @@ und `schema-live-verified.json` im genannten Release-Ordner.
 
 ## Mitgestalten
 
-- Dezenter Zugang im persönlichen Bereich unter `/mitgestalten`.
+- Zugang in „Mein Bereich“ als reguläre Zeile **Mitgestalten** direkt vor
+  **Einstellungen**, für alle angemeldeten Mitglieder, unabhängig vom Adminstatus.
+  Ziel bleibt `/mitgestalten`; kein zusätzlicher Hintergrundabruf.
+  Nachweis der Einstiegskorrektur: `/srv/cinegenius/handoffs/20261121-feedback-entry/receipt.json`.
 - Jede Person meldet sich mit dem eigenen Konto an. Getrennte Gespräche und private
   Entwürfe über den bestehenden Recovery-Dienst; kein gemeinsamer Chatverlauf.
 - Admin erzeugt unter `/mitgestalten/koordination` Links mit `lang` und `country`,

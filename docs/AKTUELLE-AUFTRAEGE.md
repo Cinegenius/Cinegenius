@@ -75,3 +75,10 @@ Die ältere App-Basis hat weiterhin EUR-Annahmen und keine neuen Feedback-Handle
 Native Übernahme auf aktuellem `main`, Buchungs-Neubestätigung, private Abläufe
 und Geräteabnahme bleiben offen. Keine App-Veröffentlichung oder Installation.
 Details und Beleg in der [App-Übersicht](CINEGENIUS-APP-UEBERSICHT.md).
+
+**Mitgestalten-Einstieg (21.11.):** Der zuvor freistehende kleine Link wird zur
+normalen Menüzeile direkt vor „Einstellungen“ in „Mein Bereich“. Gleiche Gestaltung
+wie die übrigen Zeilen, mindestens 44 px Bedienfläche, für normale Mitglieder und
+Admins gleichermaßen. Nutzerbericht zur fehlenden Zeile in der bereits geöffneten
+Ansicht ist nicht in der echten Sitzung reproduziert; keine Cache-Ursache behauptet.
+Prüf-/Veröffentlichungsstand: `/srv/cinegenius/handoffs/20261121-feedback-entry/receipt.json`.
