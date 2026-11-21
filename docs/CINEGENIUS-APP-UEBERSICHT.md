@@ -141,3 +141,18 @@ Aktueller Livebeleg: `/srv/cinegenius/handoffs/20261121-news-gallery-release/`.
 Schnittstellen. Die native Oberfläche, Installation und Geräteprüfung bleiben
 eigenständige APP-Arbeit. Das Handoff enthält geprüfte Commits und offene Grenzen;
 die direkte Chat-Zustellung war gestört.
+
+## Homepage-Newsfotos · Web-Vertrag vom 21. November 2026
+
+Website-Commit `1aa844cc7321218f7313e3a29adc95bc7edccff0` ist veröffentlicht und
+in vier öffentlichen Browserkonfigurationen geprüft. Artikelvorschauen verwenden
+das vorhandene Titelbild oder das erste gültige Galeriebild, ohne leere Bildfläche
+und ohne ein Herausgeberlogo als Ersatz. Bekannte Urheber/Lizenzen und vollständige
+Artikelverweise bleiben erhalten. Geschützte Bilder laufen weiterhin durch die
+vorhandene Rechteprüfung; keine neue Datenbankmigration oder zusätzliche API.
+
+APP übernimmt dieses Darstellungsprinzip in die eigene Oberfläche und prüft es
+auf dem tatsächlichen Gerät. Ein mobiler Website-Browsertest ist kein nativer
+App-Nachweis; der bestehende Smart-/Work-Veröffentlichungshalt bleibt erhalten.
+Geprüfter Stand und Livebelege:
+`/srv/cinegenius/handoffs/20261121-home-news-photos/`.

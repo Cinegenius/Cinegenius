@@ -1,6 +1,6 @@
 # CineGenius · Übersicht der gesamten Website
 
-Stand: **20. November 2026 (Europe/Berlin)**. Zuständig: **WEB CODEX**.
+Stand: **21. November 2026 (Europe/Berlin)**. Zuständig: **WEB CODEX**.
 Die getrennte [App-Übersicht](CINEGENIUS-APP-UEBERSICHT.md) beschreibt die native Anwendung.
 
 Dieses Verzeichnis hält die Bereiche, ihre Funktionen, den belegten Stand und offene Arbeit zusammen. Es ist eine interne Arbeitsübersicht, keine neue öffentliche Webseite und kein vollständiger Sicherheits- oder Funktionstest. Bei jeder weiteren Änderung wird der betreffende Eintrag aktualisiert.
@@ -165,3 +165,20 @@ Verträge: [News-Galerie und Nutzung](news-gallery-readership.md),
 [Internationaler Ausbau](international-currency-feedback.md),
 [Gemeinsamer Prüfstand](international-news-release.md).
 Aktueller Livebeleg: `/srv/cinegenius/handoffs/20261121-news-gallery-release/`.
+
+## Kleine Newsfotos auf der Startseite · 21. November 2026
+
+**Live bestätigt:** `1aa844cc7321218f7313e3a29adc95bc7edccff0`, Veröffentlichung
+`dpl_2itDZo4PpfQnwhJUk5D7jMNdoqfY`. Artikelbilder erscheinen auf Handy, Tablet und
+Laptop als kompakte, vollständig sichtbare Vorschau. Ohne Titelbild wird das erste
+gültige Galeriebild verwendet; ohne Bild entsteht keine leere Fläche. Der Herausgeber
+steht dezent als Text, bekannte Bildnachweise bleiben sichtbar und vollständig am
+verlinkten Artikel erreichbar. Länder-/Themenwahl und Organisationenkarten bleiben erhalten.
+
+38 gezielte Prüfungen, 17 Sprachkataloge, Designprüfung, TypeScript, Lint und
+Produktionsbuild bestanden. Vier öffentliche Live-Browserprüfungen bei
+320/390/768/1366 CSS px (WebKit/Chromium, Spanisch/Deutsch/Französisch) bestätigen
+das echte geschützte NFI-Foto, Bildnachweise, Touch/Tastatur, Artikelöffnung und
+echtes Zurück. Keine native Geräteabnahme und keine pauschale sprachliche Abnahme
+automatisch übersetzter Artikel. Belege:
+`/srv/cinegenius/handoffs/20261121-home-news-photos/`.
