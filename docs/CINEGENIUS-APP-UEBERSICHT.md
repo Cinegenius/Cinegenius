@@ -206,8 +206,13 @@ iPhone-/Mac-Abnahme bleiben separat. Kein App-Livegang und keine Installation;
 Smart-/Work-Halt sowie Push-/Shots- und Prüfagent-Status unverändert.
 Beleg: `/srv/cinegenius/handoffs/20261121-app-international-handoff/receipt.json`.
 
-**Web-Einstieg Mitgestalten (21.11.):** Im persönlichen Website-Bereich wird
-„Mitgestalten“ zur gleichwertigen Menüzeile vor „Einstellungen“. Bestehendes Ziel
+**Web-Einstieg Mitgestalten (21.11., Website live):** Im persönlichen Website-Bereich ist
+„Mitgestalten“ jetzt eine gleichwertige Menüzeile vor „Einstellungen“. Bestehendes Ziel
 und API-/Privatsphäre-Verträge unverändert. Native Übernahme und Geräteabnahme
 bleiben APP-Aufgabe; die Website-Menüprüfung ist kein nativer Nachweis.
 Beleg: `/srv/cinegenius/handoffs/20261121-feedback-entry/receipt.json`.
+
+**App-Veröffentlichung angehalten:** Markus hat ausdrücklich klargestellt, dass
+der Stopp nur die App betrifft. Die Website-Korrektur `bb26a335` ist freigegeben
+und veröffentlicht. Neu vorbereitete native Änderungen und eine neue
+iPhone-Installation warten weiterhin auf die nächste ausdrückliche Freigabe.

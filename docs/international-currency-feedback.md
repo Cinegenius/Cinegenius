@@ -51,7 +51,8 @@ und `schema-live-verified.json` im genannten Release-Ordner.
 - Zugang in „Mein Bereich“ als reguläre Zeile **Mitgestalten** direkt vor
   **Einstellungen**, für alle angemeldeten Mitglieder, unabhängig vom Adminstatus.
   Ziel bleibt `/mitgestalten`; kein zusätzlicher Hintergrundabruf.
-  Nachweis der Einstiegskorrektur: `/srv/cinegenius/handoffs/20261121-feedback-entry/receipt.json`.
+  Einstiegskorrektur `bb26a335` am 21.11.2026 auf der Website veröffentlicht;
+  die neu vorbereiteten App-Änderungen bleiben angehalten. Nachweis: `/srv/cinegenius/handoffs/20261121-feedback-entry/receipt.json`.
 - Jede Person meldet sich mit dem eigenen Konto an. Getrennte Gespräche und private
   Entwürfe über den bestehenden Recovery-Dienst; kein gemeinsamer Chatverlauf.
 - Admin erzeugt unter `/mitgestalten/koordination` Links mit `lang` und `country`,
