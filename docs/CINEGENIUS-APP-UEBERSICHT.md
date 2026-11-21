@@ -5,12 +5,22 @@ Die getrennte [Website-Übersicht](CINEGENIUS-WEBSITE-UEBERSICHT.md) enthält di
 
 Diese Übersicht trennt die installierte App, ihre serverseitigen Ansichten, native Werkzeuge und geplante Funktionen. Eine Website-Prüfung bestätigt keinen iPhone-Ablauf. „Vorhanden“ bezeichnet belegten Code oder einen gemeldeten Entwicklungsstand; tatsächliche Aktivierung und Geräteprüfung werden separat genannt.
 
+**Aktueller Release-Abgleich (21. November, 13:10 Uhr Berlin):** Der gemeinsame
+Serverstand `91a508d5` ist live und enthält das vollständige freigegebene App-Paket
+`68930dd9` sowie die Korrektur der Firmen-Abschlusslinks. Die erneute Freigabe in
+`68930dd9:AGENTS.md` ersetzt den früheren Stopp für dieses konkrete Paket.
+Die neue iPhone-Installation und die tatsächliche Geräteabnahme bleiben offen.
+Frühere Stopphinweise in den datierten Berichten unten beschreiben den damaligen
+Stand. Push und produktive Shots sind dadurch weiterhin nicht aktiviert.
+Release-Beleg: `/srv/cinegenius/handoffs/20261121-company-onboarding-link/receipt.json`;
+App-Abgleich: `/srv/cinegenius/handoffs/20261121-app-company-onboarding-handoff/receipt.json`.
+
 ## Installation und aktueller Rahmen
 
 | Thema | Belegter Stand |
 | --- | --- |
-| **iPhone-App** | APP meldet am 20.11.2026 Build **2026112007** nach Datensicherung installiert; Geräteversion bestätigt. Spätere Rückmeldung aus APP: starke Hänger in Smart/Work und Work → Community funktioniert nicht mit aktuellem Web-Stand `822c27c`. Diagnose läuft; keine eigene Geräte-Reproduktion durch WEB und kein abgeschlossener Funktionstest behauptet. |
-| **App-Server** | **Veröffentlichung angehalten.** Laut APP ist der gemeinsame Stand `407915184321628834171facb374c0592fe68811` einschließlich `822c27c` nur lokal, noch nicht gepusht oder veröffentlicht. Erst Fehlerdiagnose, Prüfung und neue Freigabe; kein paralleler Deploy. |
+| **iPhone-App** | Letzter hier belegter installierter Build **2026112007** vom 20.11.2026, nach Datensicherung. Neue Installation und vollständige Smart-/Work-/Community-Geräteabnahme zum veröffentlichten Serverpaket bleiben offen. WEB hat keine eigene Geräteprüfung durchgeführt. |
+| **App-Server** | **Veröffentlicht:** `91a508d5` seit 21.11., 13:10 Uhr Berlin, einschließlich App `68930dd9` und Firmenlink-Fix. Git-Abstammung geprüft; Deployment `dpl_CPk147S9NmEePK3DEgYhmP9MSzsx` READY und den Produktionsdomains zugeordnet. Der frühere lokale Integrationsstand `40791518` ist kein aktueller Veröffentlichungsstatus. |
 | **Native Navigation** | Ziel gemäß aktuellem App-Vertrag: **Shots · News · Smart · Projekte · Work**. Die gewöhnliche Website behält ihre eigene Navigation. |
 | **Obere Aktionen** | Profil, Nachrichten, Suche und Menü; App-eigene Abstände und sichere Bedienung über Kopf-/Fußbereich. |
 | **Erscheinungsbild** | Mauve wurde von Markus als unpassend zurückgemeldet. APP bereitet **vier reine Farbvorlagen** vor; noch keine neue Farbe gewählt, keine Themeänderung und kein neuer Farb-Picker. Warmes Graphit, Schiefergrau und helles Steingrau sind lediglich WEB-Vorschläge. Keine parallele zweite Vorschauimplementierung. |
@@ -20,9 +30,9 @@ Diese Übersicht trennt die installierte App, ihre serverseitigen Ansichten, nat
 
 | Bereich | Funktionen | Stand / Grenzen |
 | --- | --- | --- |
-| **Smart / Entdecken** | Crew, Marktplatz, Locations und Firmen gemeinsam auswählen; Kacheln, Liste und Karte/Liste | Zählerergänzung `b1d767a`: ausdrücklich geladene eindeutige Treffer, getrennte Kartenhinweise und „Alle anzeigen“; vorbereitet, noch nicht veröffentlicht. Gemeinsame serverseitige **Admin-Beschränkung bleibt bestehen**; eine App-Navigation erteilt keine Suchrechte. WEB hat die kompakte gemeinsame Kartenvorschau veröffentlicht (keine gestreckten Leerflächen); native Übernahme/Geräteprüfung durch APP, Release-Halt unverändert. |
-| **Crew / Profile** | Personen, Tätigkeiten, Fähigkeiten, Ortsangaben, Bilder und Kontakt | Gemeinsame Website-Daten und aktuelle Sichtbarkeitsrechte; native Darstellung separat prüfen. WEB hat die bisher konstante Gesamtzahl bei Anbieterfiltern korrigiert und veröffentlicht: aktuelle gefilterte Auswahl, identisch zum Karten-Datensatz. Native Veröffentlichung bleibt angehalten. |
-| **Marktplatz / Dienstleistungen / Fahrzeuge** | Angebote, Anbieter, Bilder, Anfragen und Filter | Gemeinsame Angebotsregeln; Mehrwährungen noch unveröffentlichter Web-/Schnittstellenentwurf. |
+| **Smart / Entdecken** | Crew, Marktplatz, Locations und Firmen gemeinsam auswählen; Kacheln, Liste und Karte/Liste | Zählerergänzung `b1d767a`: ausdrücklich geladene eindeutige Treffer, getrennte Kartenhinweise und „Alle anzeigen“. Aktueller App-Serverstand siehe Release-Abgleich oben; native Installation und Geräteprüfung separat belegen. Gemeinsame serverseitige **Admin-Beschränkung bleibt bestehen**; eine App-Navigation erteilt keine Suchrechte. WEB hat die kompakte gemeinsame Kartenvorschau veröffentlicht (keine gestreckten Leerflächen). |
+| **Crew / Profile** | Personen, Tätigkeiten, Fähigkeiten, Ortsangaben, Bilder und Kontakt | Gemeinsame Website-Daten und aktuelle Sichtbarkeitsrechte; native Darstellung separat prüfen. WEB hat die bisher konstante Gesamtzahl bei Anbieterfiltern korrigiert und veröffentlicht: aktuelle gefilterte Auswahl, identisch zum Karten-Datensatz. Neue native Installation und Geräteabnahme bleiben offen. |
+| **Marktplatz / Dienstleistungen / Fahrzeuge** | Angebote, Anbieter, Bilder, Anfragen und Filter | Gemeinsame Angebotsregeln; Website/API unterstützt seit 21.11. 155 Währungen (`ab74924d`), ohne Umrechnung. Native Anzeigen und Editoren separat abgleichen und auf dem Gerät prüfen. |
 | **Locations** | Drehorte/Studios, Suche, Details und Karten | Gemeinsamer Zählerfix `822c27c` übernommen: gefilterte Gesamtzahl bleibt beim Kartenziehen stabil; fehlende Kartenpunkte über die Liste erreichbar. App-Beschriftung „gesamt“ in `b1d767a` vorbereitet. |
 | **Firmen** | Profile, Leistungen, Teams und Angebote | Gemeinsame Firmen-/Personenrechte; versteckte persönliche Identitäten nicht über Firmen offenlegen. |
 | **Filmtiere / Jobs / Schwarzes Brett** | Weitere bestehende CineGenius-Bereiche | Website-Bestand vorhanden; vollständige native Erreichbarkeit und Bedienung pro App-Build verifizieren. Keine zusätzliche fertige native Spezialanwendung behauptet. |
@@ -75,10 +85,10 @@ Diese Übersicht trennt die installierte App, ihre serverseitigen Ansichten, nat
 
 ## Nächste Schritte und Pflege
 
-1. Release angehalten lassen: APP diagnostiziert Smart-/Work-Hänger und den fehlerhaften Wechsel Work → Community. Vor einem Livegang konkrete Korrektur, Prüfbeleg und neue Freigabe abwarten.
+1. Den veröffentlichten gemeinsamen Serverstand `91a508d5` einschließlich App `68930dd9` erhalten. Die erneute Freigabe gilt für dieses geprüfte Paket; Installation und echte Bedienungsnachweise separat mit APP nachführen.
 2. Installierten Build 2026112007 mit dem tatsächlichen Serverstand auf dem Gerät prüfen, insbesondere Smart, Work und den Wechsel zur Community; Ergebnisse von Browserprüfungen unterscheiden. Vier Farbvorlagen in APP abstimmen, erst nach Auswahl umsetzen.
 3. Geprüfte native Zählerergänzungen `b1d767a` und `38d87bb` separat mit dem aktuellen App-Release abstimmen; Veröffentlichung und echte Geräteprüfung bleiben offen.
-4. Länderpriorisierung sowie Feedback-/Währungsfunktionen aus [dem gemeinsamen Vertrag](international-currency-feedback.md) übernehmen. Echte Geräteprüfung und Release-Halt beachten.
+4. Länderpriorisierung sowie Feedback-/Währungsfunktionen aus [dem gemeinsamen Vertrag](international-currency-feedback.md) mit dem aktuellen App-Stand abgleichen. Echte Geräteprüfung bleibt offen.
 5. Work-Funktionsstand mit APP konkretisieren; unbelegte Teilfunktionen als offen führen.
 6. Die veröffentlichte CineGenius Redaktion auf dem tatsächlichen App-Build prüfen: bisherige Eintrags-IDs/Bilder/Länder erhalten, alte Links funktionieren, zentrale Organisation und Quellenverweise prüfen. 17 Bestandsbeiträge plus ein echter maschinell geprüfter Artikel sind live. Native News-Verträge bleiben erhalten; kein neuer App-Release, keine Maschinenrechte im Client. Details und Grenzen im Redaktionsabgleich der Website-Übersicht.
 
