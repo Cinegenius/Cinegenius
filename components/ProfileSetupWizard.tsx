@@ -42,7 +42,7 @@ import { safeAuthRedirect } from "@/lib/auth-redirect";
 import { hasCompletedNonPersonalSetup, hasProfileBasics, shouldSkipProfileSetup } from "@/lib/profile-setup-flow";
 import { createOnboardingSaveQueue, isQuickStartContentSaved } from "@/lib/onboarding-save";
 import {
-  buildQuickStartScreens, createQuickStartIntentData, findQuickStartRoles, getQuickStartDepartments, getQuickStartIntroIntents,
+  buildQuickStartScreens, completedCompanyHref, createQuickStartIntentData, findQuickStartRoles, getQuickStartDepartments, getQuickStartIntroIntents,
   normalizeQuickStartDraft, selectQuickStartIntent, selectQuickStartOccupationForm, QUICK_START_CATEGORIES,
   START_QUICK_START_DRAFT,
   validateQuickStartDraft, validateQuickStartScreen, validateQuickStartIntentDetails,
@@ -609,7 +609,8 @@ function ProfileSetupContent() {
         });
         const result = await response.json().catch(() => ({}));
         if (!response.ok || !result.data?.id) throw new Error(result.error ?? uiText("Ui.text_18bcc117d9aba1"));
-        progress = { ...progress, completed: { ...progress.completed, company: String(result.data.id) } };
+        progress = { ...progress, completed: { ...progress.completed, company: String(result.data.id),
+          companySlug: typeof result.data.slug === "string" ? result.data.slug : undefined } };
         setDraft(progress);
         if (!isQuickStartContentSaved(progress) && !(await persist(progress))) throw new Error(uiText("Ui.text_ccc2418f8b9a6f"));
       }
@@ -794,7 +795,7 @@ function ProfileSetupContent() {
       {finished.completed.profile && finished.intents.some(intent => intent === "location" || intent === "equipment") && <Link href="/inserat" className="flex min-h-12 items-center justify-center gap-2 rounded-xl bg-gold px-5 text-sm font-semibold text-bg-primary">{providerText("addOffer")}<ArrowRight size={16} /></Link>}
 
       {finished.completed.profile && user?.id && <a href={`/profile/${encodeURIComponent(user.id)}`} className="flex min-h-12 items-center justify-center gap-2 rounded-xl border border-border px-5 text-sm font-semibold text-text-primary">{profilePublic ? uiText("nav.publicProfile") : uiText("profile.viewProfile")}<ArrowRight size={16} /></a>}
-      {finished.completed.company && <a href={`/companies/${encodeURIComponent(finished.completed.company)}`} className="flex min-h-12 items-center justify-center gap-2 rounded-xl border border-gold/30 px-5 text-sm font-semibold text-gold">{t("copy52")}<ArrowRight size={16} /></a>}
+      {finished.completed.company && <a href={completedCompanyHref(finished.completed)!} className="flex min-h-12 items-center justify-center gap-2 rounded-xl border border-gold/30 px-5 text-sm font-semibold text-gold">{t("copy52")}<ArrowRight size={16} /></a>}
       <Link href="/" className={`flex min-h-12 items-center justify-center gap-2 rounded-xl px-5 text-sm font-semibold ${finishedOffers.length ? "border border-border text-text-secondary" : "bg-gold text-bg-primary"}`}>{t("copy51")}<ArrowRight size={16} /></Link>
       {redirectTo && redirectTo !== "/dashboard" && <button type="button" onClick={() => router.replace(redirectTo)} className="flex min-h-12 w-full items-center justify-center rounded-xl border border-border px-4 text-sm text-text-primary">{t("copy54")}</button>}
     </div>

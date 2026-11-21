@@ -32,7 +32,7 @@ Dieses Verzeichnis hält die Bereiche, ihre Funktionen, den belegten Stand und o
 | Bereich | Was dazugehört | Stand / Grenzen |
 | --- | --- | --- |
 | **Anmelden / Registrieren** | E-Mail/Passwort, gewählte Code-Anmeldung, echte zusätzliche Sicherheitsprüfungen, Rückkehrziel | Vorhanden. Keine zusätzliche Profilauswahl vor der eigentlichen Registrierung. |
-| **Profil einrichten** | Wiederaufnehmbarer Assistent, Startziel, passende Angaben, Vorschau und Bearbeitung | Vorhanden; persönliche Daten und Angebotsentwürfe bleiben getrennt. |
+| **Profil einrichten** | Wiederaufnehmbarer Assistent, Startziel, passende Angaben, Vorschau und Bearbeitung | Vorhanden; persönliche Daten und Angebotsentwürfe bleiben getrennt. Firmen-Abschlusslink am 21.11. korrigiert und mit 58 Tests geprüft; noch nicht veröffentlicht. Gespeicherte Firma bleibt erhalten, alte ID-Links werden nach Sichtbarkeitsprüfung aufgelöst. Siehe `company-onboarding-links.md`. |
 | **Mein Bereich** | Eigene Profile, Angebote, Firmen, Buchungen, Merkliste, Analysen und Einstellungen | Vorhanden. Aktuelle persönliche Navigation wiederverwenden, alte Direktlinks erhalten. |
 | **Mein Profil / öffentliches Profil** | Tätigkeiten, Pronomen, Ort, Bilder, Cover, Beschreibung, Verknüpfungen und Sichtbarkeit | Vorhanden. Haupttätigkeit + zwei Nebentätigkeiten auf Karten; maximal eine weitere Tätigkeit in Details/Suche. |
 | **Avatare und Cover** | Eigene Fotos, gemischte Auswahl, feminin/maskulin/neutral, exklusive Bildzuordnung und Reserve | Vorhandene Auswahl und Regeln. Tatsächlich laufenden Nachschub nur mit Aktivierungs-/Bestandsbeleg bestätigen. Persönliche Foto-Avatare sind separate private Vorschauen. Tauschen/Verschenken bleibt geplant. |
