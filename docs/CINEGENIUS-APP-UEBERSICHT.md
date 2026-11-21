@@ -43,7 +43,7 @@ Diese Übersicht trennt die installierte App, ihre serverseitigen Ansichten, nat
 | **Nachrichten** | Einzel-/Gruppenchats, Bilder/Dokumente, Verlauf und Lesestatus | Gemeinsamer Nachrichtendienst; Gerätescrollen, Tastatur, große Anhänge und Rückkehr separat testen. |
 | **Mitteilungen / Freunde / Homies** | Hinweise, Anfragen, bestätigte Kontakte und markierte Lieblingskontakte | Bestehender Kontaktvertrag; Homies sind Lieblingskontakte, keine zweite allgemeine Merkliste. |
 | **Merkliste** | Gespeicherte Angebote und Profile | Gemeinsame aktuelle Berechtigungen; keine privaten Altvorschauen. |
-| **Inserieren / Verwalten** | Eigene Angebote, Firmen, Organisationen, Bearbeiten und Status | Dieselben Freigaben wie im Web; App-eigene Formulare/Wege pro Build prüfen. Redaktionsverwaltung `69f4be8f` als geprüfter, unveröffentlichter Website-Entwurf dokumentiert: Land/Thema/Originalquelle, Herausgeber, Suche/Status/Seitenauswahl. [Schnittstellen und Grenzen](organization-entry-browser.md); keine native Umsetzung oder Installation. |
+| **Inserieren / Verwalten** | Eigene Angebote, Firmen, Organisationen, Bearbeiten und Status | Dieselben Freigaben wie im Web; App-eigene Formulare/Wege pro Build prüfen. Redaktionsverwaltung `69f4be8f` auf der Website seit 21.11., 11:48 Uhr Berlin veröffentlicht: Land/Thema/Originalquelle, Herausgeber, Suche/Status/Seitenauswahl. [Schnittstellen und Grenzen](organization-entry-browser.md); keine native Umsetzung oder Installation. |
 | **Buchungen / Anfragen / Rechnungen** | Bestehende Vorgänge und Status | Website/API speichert `bookings.currency` als Snapshot und prüft Preis-/Währungsabweichungen vor Bestätigung (409). Migration bereits produktiv angewandt und nachgelesen; nicht erneut ausführen. Native Anzeige, Bestätigung und Erhalt von Notizen/Terminen sind noch abzugleichen. Keine Zahlungsaktivierung. |
 | **Hilfe / Support / Recht** | FAQ, Kontakt, Meldungen, Impressum, Datenschutz, AGB und Bildrechte | Gemeinsame Inhalte erreichbar halten; Konto- und externe Link-Rückkehr prüfen. |
 | **Mitgestalten / Feedback** | Ländervertreter beantworten kurze Fragen und geben eigene Rückmeldungen; Markus bekommt gesammelte Ergebnisse | Website und gemeinsame Schnittstellen **seit 21.11. live** (`ab74924d`); isolierte Bedienprüfung bestanden. Native Einbindung beauftragt/abzustimmen, nicht als fertige App-Funktion behaupten. Gleiche privaten Gespräche und Zusammenfassungen verwenden. Menüfix `bb26a335`: Mitgestalten direkt vor Einstellungen für alle Mitglieder; auf der Website veröffentlicht und über den Release-Beleg bestätigt. Gesprächsvorgabe seit Website-Commit `42b7d1eb`: nur die nächste einzelne kurze Frage ohne Floskeln. Kein echter Modell-/Gerätenachweis; App-Stopp bleibt bestehen. [Abgleich](app-international-handoff-20261121.md). |
@@ -104,3 +104,12 @@ nachgelesen und nur Dokumentation ergänzt. Keine App-Produktportierung,
 Veröffentlichung, Installation oder neue Freigabe; App-Stopp bleibt bestehen.
 Prüfbelege: `/srv/cinegenius/handoffs/20261121-newsroom-browser/receipt.json`;
 App-Empfang: `/srv/cinegenius/handoffs/20261121-app-newsroom-browser-handoff/receipt.json`.
+
+**Website-Veröffentlichung bestätigt:** Laut aktualisiertem Release-Beleg ist
+`69f4be8f` seit 21.11., 11:48 Uhr (Europe/Berlin) live; Deployment
+`dpl_EJYCUziu36TTDu89DYBKUEYS3GRb` READY und www-Alias mit Quellenkennung geprüft.
+13 Live-HTTP-Prüfungen ohne Anmeldung bestätigen öffentliche Seiten, eigene
+Anmeldeweiterleitungen und private/no-store API-Ablehnungen. Keine echte
+angemeldete Sitzung oder native Geräteabnahme. Der reine WEB-Dokumentationsstand
+`9830263b` ist nachgeführt; diese App-Aufgabe hat nur Belege und Dokumentation
+aktualisiert. Keine neue App-Arbeit, Veröffentlichung oder Installation.
