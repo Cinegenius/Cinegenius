@@ -9,6 +9,12 @@ Dieses Verzeichnis hält die Bereiche, ihre Funktionen, den belegten Stand und o
 
 ## Öffentliche Bereiche
 
+**In Arbeit, noch nicht live (21.11.):** Der Startseitenbereich heißt künftig
+„Crew“ und bevorzugt keine neuen Registrierungen mehr. Teilnahme lässt sich bei
+der Profileinrichtung und später unter Privatsphäre abschalten. Das betrifft die
+Crew-Auswahl, nicht die allgemeine Profilsichtbarkeit. Siehe
+[Homepage Crew](home-crew-discretion.md).
+
 | Bereich | Was dazugehört | Aktueller Stand / nächste Arbeit |
 | --- | --- | --- |
 | **Startseite** | Suche, Entdecken, Die Crew, Aus der Branche, Organisationen, Marktplatz, Jobs, frische Einblicke, Branchenpartner, Locations und Schwarzes Brett | Vorhanden. Regionale Auswahl vor der Begrenzung für Crew, Marktplatz, Locations, Jobs und Firmen veröffentlicht im Website-Stand `4d93523a`. Gestaltung erhalten; Foto-Entdeckung bleibt mangels verlässlicher Ortsprojektion global. |

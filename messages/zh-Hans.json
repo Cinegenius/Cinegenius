@@ -291,7 +291,7 @@
     "findCompaniesTitle": "公司",
     "findProjectsLink": "浏览项目",
     "offerLocationAction": "提供场地",
-    "newCrewTitle": "新成员",
+    "newCrewTitle": "Crew",
     "crewScrollHint": "横向滑动查看更多成员",
     "locationScrollHint": "横向滑动查看更多场地",
     "railPrevious": "向前滚动",
@@ -13187,7 +13187,9 @@
       "members": "登录会员",
       "friends": "仅限已接受的朋友",
       "hidden": "仅自己可见"
-    }
+    },
+    "homeCrew": "在首页 Crew 栏目中展示",
+    "homeCrewHelp": "此处仅展示公开个人资料。之后可在“设置 → 隐私”中更改。"
   },
   "UnifiedSearch": {
     "productionCompanies": "电影制片",

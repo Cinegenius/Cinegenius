@@ -273,7 +273,7 @@
     "findCompaniesTitle": "Companies",
     "findProjectsLink": "Browse projects",
     "offerLocationAction": "Offer a location",
-    "newCrewTitle": "New crew members",
+    "newCrewTitle": "Crew",
     "crewScrollHint": "Swipe sideways to discover more members",
     "locationScrollHint": "Swipe sideways to discover more locations",
     "railPrevious": "Scroll back",
@@ -13187,7 +13187,9 @@
       "members": "Signed-in members",
       "friends": "Accepted friends only",
       "hidden": "Only me"
-    }
+    },
+    "homeCrew": "Show in Crew on the homepage",
+    "homeCrewHelp": "Only public profiles appear in this selection. You can change this later under Settings → Privacy."
   },
   "UnifiedSearch": {
     "productionCompanies": "Film production",

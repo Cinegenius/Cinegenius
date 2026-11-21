@@ -111,7 +111,7 @@ async function getHomeData() {
 
   const propProviders = await getListingProviders((recentProps ?? []).map((p) => ({ user_id: p.user_id, company_id: p.company_id, responsible_person: p.responsible_person })));
   // Selection already has fresh public-profile and field permissions applied.
-  // Keep its new-for-one-day / rotating order through serialization.
+  // Keep its rotating, registration-independent order through serialization.
   const newCrew = (profilesRaw ?? []).map((profile) => {
     const positions = profileOccupationPreview(profile);
     if (positions.length === 0) {
@@ -130,7 +130,6 @@ async function getHomeData() {
       verified: profile.verified ?? false,
       positions,
       occupationForm: occupationFormFromCrew(profile.crew),
-      createdAt: profile.created_at ?? "",
     };
   });
   const liveLocations = (recentLocations ?? []).map((l) => ({

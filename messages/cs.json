@@ -273,7 +273,7 @@
     "findCompaniesTitle": "Firmy",
     "findProjectsLink": "Prohlédnout projekty",
     "offerLocationAction": "Nabídnout lokaci",
-    "newCrewTitle": "Noví členové štábu",
+    "newCrewTitle": "Crew",
     "crewScrollHint": "Další členy objevíš přejetím do strany",
     "locationScrollHint": "Další lokace objevíš přejetím do strany",
     "railPrevious": "Posunout zpět",
@@ -13187,7 +13187,9 @@
       "members": "Přihlášení členové",
       "friends": "Pouze potvrzení přátelé",
       "hidden": "Pouze já"
-    }
+    },
+    "homeCrew": "Zobrazovat v sekci Crew na úvodní stránce",
+    "homeCrewHelp": "V tomto výběru se zobrazují jen veřejné profily. Později lze změnit v Nastavení → Soukromí."
   },
   "UnifiedSearch": {
     "productionCompanies": "Filmová produkce",

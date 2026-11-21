@@ -1,4 +1,4 @@
-import { DEFAULT_PRIVACY, PRIVACY_AUDIENCES, PRIVACY_COLUMNS } from "@/lib/profile-privacy";
+import { DEFAULT_PRIVACY, PRIVACY_AUDIENCES, USER_SETTINGS_COLUMNS } from "@/lib/profile-privacy";
 import { revalidatePath, revalidateTag } from "next/cache";
 import { db } from "@/lib/db";
 import { requireAuth } from "@/lib/auth";
@@ -14,7 +14,7 @@ export async function GET() {
 
   const { data, error } = await db
     .from("user_settings")
-    .select(PRIVACY_COLUMNS)
+    .select(USER_SETTINGS_COLUMNS)
     .eq("user_id", userId)
     .abortSignal(AbortSignal.timeout(8000))
     .maybeSingle();
@@ -53,7 +53,7 @@ export async function PATCH(req: NextRequest) {
     }
     update.message_permission = body.message_permission;
   }
-  for (const key of ["ghost_mode", "email_new_message"] as const) {
+  for (const key of ["ghost_mode", "email_new_message", "show_in_home_crew"] as const) {
   if (body[key] !== undefined) {
     if (typeof body[key] !== "boolean") {
       return NextResponse.json({ error: tResponse('System.m_813f3fe986af') }, { status: 400 });
@@ -76,7 +76,7 @@ export async function PATCH(req: NextRequest) {
   const { data: saved, error } = await db
     .from("user_settings")
     .upsert(update, { onConflict: "user_id" })
-    .select(PRIVACY_COLUMNS)
+    .select(USER_SETTINGS_COLUMNS)
     .abortSignal(AbortSignal.any([req.signal, AbortSignal.timeout(8000)]))
     .single();
 
@@ -84,5 +84,6 @@ export async function PATCH(req: NextRequest) {
   // Privacy withdrawal must expire, never stale-while-revalidate, every public projection.
   for (const tag of ["profiles", "creator-directory", "companies", "projects", "listings", "community-media"]) revalidateTag(tag, { expire: 0 });
   revalidatePath("/sitemap.xml");
+  revalidatePath("/");
   return NextResponse.json({ success: true, settings: saved }, { headers: { "Cache-Control": "private, no-store, max-age=0" } });
 }

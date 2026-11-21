@@ -273,7 +273,7 @@
     "findCompaniesTitle": "Cégek",
     "findProjectsLink": "Projektek böngészése",
     "offerLocationAction": "Helyszín felajánlása",
-    "newCrewTitle": "Új stábtagok",
+    "newCrewTitle": "Crew",
     "crewScrollHint": "Húzd oldalra a további tagokért",
     "locationScrollHint": "Húzd oldalra a további helyszínekért",
     "railPrevious": "Lapozás vissza",
@@ -13187,7 +13187,9 @@
       "members": "Bejelentkezett tagok",
       "friends": "Csak visszaigazolt ismerősök",
       "hidden": "Csak én"
-    }
+    },
+    "homeCrew": "Megjelenés a kezdőlap Crew részében",
+    "homeCrewHelp": "Ebben a válogatásban csak nyilvános profilok jelennek meg. Később módosítható: Beállítások → Adatvédelem."
   },
   "UnifiedSearch": {
     "productionCompanies": "Filmgyártás",

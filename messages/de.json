@@ -273,7 +273,7 @@
     "findCompaniesTitle": "Firmen",
     "findProjectsLink": "Projekte ansehen",
     "offerLocationAction": "Location anbieten",
-    "newCrewTitle": "Neue Crew Mitglieder",
+    "newCrewTitle": "Crew",
     "crewScrollHint": "Weitere Mitglieder entdecken – seitlich wischen",
     "locationScrollHint": "Weitere Locations entdecken – seitlich wischen",
     "railPrevious": "Zurückblättern",
@@ -13187,7 +13187,9 @@
       "members": "Angemeldete Mitglieder",
       "friends": "Nur bestätigte Freunde",
       "hidden": "Nur ich"
-    }
+    },
+    "homeCrew": "In der Crew auf der Startseite anzeigen",
+    "homeCrewHelp": "Nur öffentliche Profile erscheinen in dieser Auswahl. Später unter Einstellungen → Privatsphäre änderbar."
   },
   "UnifiedSearch": {
     "productionCompanies": "Filmproduktion",

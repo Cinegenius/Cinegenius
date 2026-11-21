@@ -273,7 +273,7 @@
     "findCompaniesTitle": "Företag",
     "findProjectsLink": "Visa projekt",
     "offerLocationAction": "Erbjud en inspelningsplats",
-    "newCrewTitle": "Nya medlemmar i filmteamet",
+    "newCrewTitle": "Crew",
     "crewScrollHint": "Svep åt sidan för att upptäcka fler medlemmar",
     "locationScrollHint": "Svep åt sidan för att upptäcka fler inspelningsplatser",
     "railPrevious": "Bläddra bakåt",
@@ -13187,7 +13187,9 @@
       "members": "Inloggade medlemmar",
       "friends": "Bara bekräftade vänner",
       "hidden": "Bara jag"
-    }
+    },
+    "homeCrew": "Visa i Crew på startsidan",
+    "homeCrewHelp": "Endast offentliga profiler visas i detta urval. Du kan ändra detta senare under Inställningar → Integritet."
   },
   "UnifiedSearch": {
     "productionCompanies": "Filmproduktion",

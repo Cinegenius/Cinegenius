@@ -291,7 +291,7 @@
     "findCompaniesTitle": "企業",
     "findProjectsLink": "プロジェクトを閲覧",
     "offerLocationAction": "ロケ地を提供する",
-    "newCrewTitle": "新しいクルーメンバー",
+    "newCrewTitle": "Crew",
     "crewScrollHint": "横にスワイプして他のメンバーを探す",
     "locationScrollHint": "横にスワイプして他のロケ地を探す",
     "railPrevious": "前へスクロール",
@@ -13187,7 +13187,9 @@
       "members": "ログインメンバー",
       "friends": "承認済みの友達のみ",
       "hidden": "自分のみ"
-    }
+    },
+    "homeCrew": "ホームページのCrewに表示する",
+    "homeCrewHelp": "この一覧には公開プロフィールのみが表示されます。後から「設定 → プライバシー」で変更できます。"
   },
   "UnifiedSearch": {
     "productionCompanies": "映画制作会社",
