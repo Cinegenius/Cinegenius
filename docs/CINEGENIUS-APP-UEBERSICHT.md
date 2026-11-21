@@ -26,7 +26,7 @@ Diese Übersicht trennt die installierte App, ihre serverseitigen Ansichten, nat
 | **Locations** | Drehorte/Studios, Suche, Details und Karten | Gemeinsamer Zählerfix `822c27c` übernommen: gefilterte Gesamtzahl bleibt beim Kartenziehen stabil; fehlende Kartenpunkte über die Liste erreichbar. App-Beschriftung „gesamt“ in `b1d767a` vorbereitet. |
 | **Firmen** | Profile, Leistungen, Teams und Angebote | Gemeinsame Firmen-/Personenrechte; versteckte persönliche Identitäten nicht über Firmen offenlegen. Korrektur des Einrichtungs-Abschlusslinks aus `5103bffd` im gemeinsamen Release `91a508d5` veröffentlicht und öffentlich live geprüft. Firmen-ID für Wiederholung erhalten, zurückgegebenen Slug für Details verwenden. [App-Vertrag und Prüfgrenzen](company-onboarding-links.md); keine native Umsetzung/Installation aus dieser Übergabe. |
 | **Filmtiere / Jobs / Schwarzes Brett** | Weitere bestehende CineGenius-Bereiche | Website-Bestand vorhanden; vollständige native Erreichbarkeit und Bedienung pro App-Build verifizieren. Keine zusätzliche fertige native Spezialanwendung behauptet. |
-| **News** | Artikel, Themen, Technik, Länder, Veranstaltungen und Organisationen | Kleine Homepage-Artikelfotos sind in WEB `1aa844cc` live. App-Quellen gezielt abgeglichen: 80×64px unbeschnitten, Titelbild vor gültigem Galeriebild, kein leerer Bildplatz oder Herausgeberlogo als Ersatz, vorhandene Urheberangaben. [Abhängigkeiten und Prüfbeleg](app-home-news-photos-20261121.md). Keine neue Geräteinstallation/-abnahme oder App-Veröffentlichung; aktuelle Artikel-Nachweise aus dem veröffentlichten Hauptstand erhalten. |
+| **News** | Artikel, Themen, Technik, Länder, Veranstaltungen und Organisationen | Kleine Homepage-Artikelfotos sind in WEB `1aa844cc` live. App-Quellen gezielt abgeglichen: 80×64px unbeschnitten, Titelbild vor gültigem Galeriebild, kein leerer Bildplatz oder Herausgeberlogo als Ersatz, vorhandene Urheberangaben. [Abhängigkeiten und Prüfbeleg](app-home-news-photos-20261121.md). Keine neue Geräteinstallation/-abnahme oder App-Veröffentlichung; aktuelle Artikel-Nachweise aus dem veröffentlichten Hauptstand erhalten. Neue öffentliche Organisations-Beitragsfilter `34373818` separat geprüft und **noch nicht veröffentlicht**; [URL-Vertrag](public-newsroom-browser.md) für APP vorgemerkt. |
 | **Organisationen / Branchenpartner** | Verzeichnisse, Profile und Beiträge | In `b1d767a` umgesetzt und mit künstlichen Daten geprüft: Gesamtzahl, geladene Seite und Kartenpunkte getrennt; während Filterwechsel keine bestätigte Zahl. Noch nicht veröffentlicht oder auf dem Gerät geprüft. |
 | **Projekte** | Öffentliche Projekte, Credits und eigene Mitwirkung | Gemeinsame Rechte und Daten. Öffentliche Projektprofile vom privaten Work-Projektarchiv unterscheiden. |
 | **Shots** | Vorgesehene kurze Posts, 24 Stunden sichtbar, eigene Originale anschließend privat | Oberfläche und geschützter Servercode vorbereitet; **Veröffentlichung nicht aktiviert**. Kein laufender echter Posting-Dienst allein durch sichtbaren Tab. |
@@ -150,3 +150,27 @@ keine neue Geräteinstallation oder Funktionsabnahme. Ältere Stoppaussagen in
 den einzelnen Vorab-Berichten sind historisch. Push, produktive Shots, ein neues
 E-Mail-Postfachsystem und allgemeine Online-Teams sind dadurch nicht aktiviert
 oder als fertig erklärt. Kein erneuter Deploy aus dieser alten App-Arbeitsbasis.
+
+**Öffentliche Redaktionsansicht, Vertragsvormerkung · 21.11.:** WEB-Entwurf
+`34373818c648427ba5726f993fa83245c1b72155` auf Basis `62cf7331`, nicht auf main
+und nicht veröffentlicht. Auf `/organizations/[slug]` bleiben `country`, `topic`,
+`type`, `source`, `search`, `sort` und `page` in echten URLs erhalten. Öffentliche
+Facettenzahlen und zwölf Beiträge pro Seite verwenden dieselben zulässigen Daten.
+Suche/Land sind mobil direkt erreichbar; weitere Filter ausklappbar. Vorhandene
+Fotos werden kompakt und vollständig dargestellt. Native News-Navigation erhalten;
+keine neue API, Migration, native Sprachänderung oder Dienstaktivierung.
+
+WEB-Belege: 34 gezielte Daten-/Rechteprüfungen, 21 kontrollierte Browser-
+konfigurationen über 17 Sprachen mit fünf vollständigen Abläufen, Design, i18n
+und vollständiger Build bestanden. Die echten UI-Komponenten verwenden
+kontrollierte Daten, Router und Bilder; kein Live- oder nativer Gerätenachweis.
+Datenabrufe sind kein atomarer Schnappschuss; aktuelle Freigaben werden erneut
+geprüft und ausgewählte zwischenzeitliche Änderungen führen zu wiederholbaren
+Fehlern. Diese Server-App-Aufgabe hat Vertrag, Routeneinbindung, öffentlichen
+Leser und alle zehn Build-Eingabehashes nachgelesen und ausschließlich
+Dokumentation übernommen. App-Quellen und Sprachschlüssel unverändert.
+
+Dieser neue Entwurf hat keine Veröffentlichungs- oder Installationsfreigabe.
+Der bereits veröffentlichte gemeinsame App-/Web-Stand `91a508d5` bleibt erhalten.
+Quelle: `/srv/cinegenius/handoffs/20261121-public-newsroom/receipt.json`;
+App-Empfang: `/srv/cinegenius/handoffs/20261121-app-public-newsroom-handoff/receipt.json`.
