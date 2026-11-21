@@ -3,6 +3,7 @@ import { db } from "@/lib/db";
 import { profileAccessFor } from "@/lib/profile-privacy-server";
 import { projectRecordWithDetails } from "@/lib/project-record";
 import { publicTranslationFields, type ContentReference, type TranslationSource } from "@/lib/content-translation";
+import { newsTranslationNames } from "@/lib/news-translation";
 
 /** Read current public source before every cache lookup and again before serialization.
  * Owner/friend access does not grant permission to send a private text to external AI.
@@ -84,7 +85,8 @@ export async function translationSource(ref: ContentReference, viewerId: string 
     if (company) { names = [company.name]; owner = company.owner_user_id; }
   }
   if (!row || (owner && await blocked(owner, viewerId, signal))) return null;
-  return {fields: publicTranslationFields(ref.kind, row), names};
+  const fields = publicTranslationFields(ref.kind, row);
+  return ref.kind === "news" ? {fields, names: [...names, ...newsTranslationNames(fields)], policy: "news-v2"} : {fields, names};
 }
 async function blocked(owner: string, viewer: string | null, signal: AbortSignal) {
   if (!viewer || owner === viewer) return false;

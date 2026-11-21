@@ -1,10 +1,11 @@
 import { isAppLocale, type AppLocale } from "@/lib/i18n/locales";
+import { maskNewsDates } from "@/lib/news-translation";
 
 export const TRANSLATION_KINDS = ["news", "organization", "listing", "company", "profile", "project", "community", "reply", "service", "person"] as const;
 export type TranslationKind = typeof TRANSLATION_KINDS[number];
 export type ContentReference = { kind: TranslationKind; id: string };
 export type TranslationFields = Record<string, string>;
-export type TranslationSource = { fields: TranslationFields; names: string[] };
+export type TranslationSource = { fields: TranslationFields; names: string[]; policy?: "news-v2" };
 export type ContentTranslation = ContentReference & {
   locale: AppLocale;
   fingerprint: string;
@@ -64,7 +65,7 @@ export function publicTranslationFields(kind: TranslationKind, value: Record<str
 const LOCKS = /\[\[CG_LOCK_[^\]]+\]\]/g;
 const FACTS = /https?:\/\/[^\s<>"']+|[\w.+-]+@[\w.-]+\.[a-z]{2,}|(?:\+?\d[\d ()/-]{6,}\d)|\d+(?:[.,:/–—-]\d+)*(?:\s*(?:%|€|EUR|USD|CHF|Uhr))?/giu;
 /** Structured names, links and numeric/contact facts never go to the provider unmasked. */
-export function protectTranslationFields(fields: TranslationFields, namespace: string, names: readonly string[] = []) {
+export function protectTranslationFields(fields: TranslationFields, namespace: string, names: readonly string[] = [], newsLocale?: AppLocale) {
   const tokens = new Map<string, string>();
   const escapedNames = [...new Set(names.filter(name => name.trim().length >= 2))].sort((a,b) => b.length-a.length)
     .map(name => name.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"));
@@ -73,7 +74,8 @@ export function protectTranslationFields(fields: TranslationFields, namespace: s
   const protectedFields = Object.fromEntries(Object.entries(fields).map(([key, value]) => {
     // Process original segments only: do not mask the numeric suffixes of our own tokens.
     const text = namesPattern ? value.replace(namesPattern, mask) : value;
-    return [key, text.split(/(\[\[CG_LOCK_[^\]]+\]\])/g).map(part => part.startsWith("[[CG_LOCK_") ? part : part.replace(FACTS, mask)).join("")];
+    const dated = newsLocale ? text.split(/(\[\[CG_LOCK_[^\]]+\]\])/g).map(part => part.startsWith("[[CG_LOCK_") ? part : maskNewsDates(part, newsLocale, mask)).join("") : text;
+    return [key, dated.split(/(\[\[CG_LOCK_[^\]]+\]\])/g).map(part => part.startsWith("[[CG_LOCK_") ? part : part.replace(FACTS, mask)).join("")];
   }));
   return {fields: protectedFields, tokens};
 }
