@@ -39,9 +39,9 @@ Der vollständige gemeinsame Produktionsbuild ist am 20. November 2026 um
 ## Vor Freischaltung offen
 
 1. Betreiberfreigabe für Währungen und Feedback am 21.11.2026 mit „dann stell live“
-   erteilt. Die Übernahme erfolgt separat auf den aktuellen Hauptstand mit den
-   Newsfotos und anschließend über den bewachten Releaseweg mit sauberem
-   `main == origin/main`. Tatsächlicher Stand: `/srv/cinegenius/handoffs/20261121-international-release/receipt.json`.
+   erteilt. Die Übernahme wurde separat auf dem aktuellen Hauptstand mit den
+   Newsfotos als `ab74924d` über den bewachten Releaseweg mit sauberem
+   `main == origin/main` veröffentlicht. Tatsächlicher Stand: `/srv/cinegenius/handoffs/20261121-international-release/receipt.json`.
 2. Die Buchungs-Währungsmigration `20261120194027_booking_currency_snapshot.sql`
    ist am 21.11. angewandt und unabhängig geprüft; alte Buchungen und Rechte sind
    unverändert. Die separate

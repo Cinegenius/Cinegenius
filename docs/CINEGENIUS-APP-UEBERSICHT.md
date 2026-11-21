@@ -1,6 +1,6 @@
 # CineGenius · Übersicht der gesamten App
 
-Stand: **20. November 2026 (Europe/Berlin)**. Zuständig: **APP Entwicklung / Xcode**, gemeinsame Schnittstellen in Abstimmung mit **WEB CODEX**.
+Stand: **21. November 2026 (Europe/Berlin)**. Zuständig: **APP Entwicklung / Xcode**, gemeinsame Schnittstellen in Abstimmung mit **WEB CODEX**.
 Die getrennte [Website-Übersicht](CINEGENIUS-WEBSITE-UEBERSICHT.md) enthält die öffentliche Website und deren Unterseiten.
 
 Diese Übersicht trennt die installierte App, ihre serverseitigen Ansichten, native Werkzeuge und geplante Funktionen. Eine Website-Prüfung bestätigt keinen iPhone-Ablauf. „Vorhanden“ bezeichnet belegten Code oder einen gemeldeten Entwicklungsstand; tatsächliche Aktivierung und Geräteprüfung werden separat genannt.
@@ -46,7 +46,7 @@ Diese Übersicht trennt die installierte App, ihre serverseitigen Ansichten, nat
 | **Inserieren / Verwalten** | Eigene Angebote, Firmen, Organisationen, Bearbeiten und Status | Dieselben Freigaben wie im Web; App-eigene Formulare/Wege pro Build prüfen. |
 | **Buchungen / Anfragen / Rechnungen** | Bestehende Vorgänge und Status | Gemeinsame Kontodaten; kein automatischer Zahlungsdienst als aktiv bestätigt. |
 | **Hilfe / Support / Recht** | FAQ, Kontakt, Meldungen, Impressum, Datenschutz, AGB und Bildrechte | Gemeinsame Inhalte erreichbar halten; Konto- und externe Link-Rückkehr prüfen. |
-| **Mitgestalten / Feedback** | Ländervertreter beantworten kurze Fragen und geben eigene Rückmeldungen; Markus bekommt gesammelte Ergebnisse | Web-Implementierung und isolierte Bedienprüfung vorhanden, **noch nicht live**. Native Einbindung beauftragt/abzustimmen, nicht als fertige App-Funktion behaupten. Gleiche privaten Gespräche und Zusammenfassungen verwenden. |
+| **Mitgestalten / Feedback** | Ländervertreter beantworten kurze Fragen und geben eigene Rückmeldungen; Markus bekommt gesammelte Ergebnisse | Website und gemeinsame Schnittstellen **seit 21.11. live** (`ab74924d`); isolierte Bedienprüfung bestanden. Native Einbindung beauftragt/abzustimmen, nicht als fertige App-Funktion behaupten. Gleiche privaten Gespräche und Zusammenfassungen verwenden. |
 
 ## Work / privater Arbeitsplatz
 
@@ -67,7 +67,7 @@ Diese Übersicht trennt die installierte App, ihre serverseitigen Ansichten, nat
 | Thema | Stand / Regel |
 | --- | --- |
 | **Länderpriorisierung** | WEB veröffentlicht (`4d93523a`): Aufrufland vor Profil-Land, Gäste eingeschlossen; manuelle Auswahl bleibt maßgeblich. [Vertrag](country-first-discovery.md), 162 Tests und 32 simulierte Browserfälle. APP dokumentiert den Vertrag in `63867e4`, Funktionsübernahme und echte Geräteprüfung offen. `country=all` bei Organisationen/Brett nicht entfernen. Native Funktionsübernahme noch nicht veröffentlicht. |
-| **Sprachen / Währungen** | 17 Web-Sprachkataloge vorhanden; native Texte separat vollständig halten. Währung und Sprache sind nicht automatisch das Land. 155 Währungen in der Web-Implementierung; `metadata.price_currency`, `crew.price_currency` und Buchungs-Snapshot übernehmen. Keine Umrechnung; native Anzeigen/Editoren noch abzugleichen. |
+| **Sprachen / Währungen** | 17 Web-Sprachkataloge vorhanden; native Texte separat vollständig halten. Währung und Sprache sind nicht automatisch das Land. 155 Währungen auf der veröffentlichten Website; `metadata.price_currency`, `crew.price_currency` und Buchungs-Snapshot übernehmen. Keine Umrechnung; native Anzeigen/Editoren noch abzugleichen. |
 | **Push** | Code/Verträge vorbereitet, **nicht aktiviert**. Apple-Konfiguration, Dienstbetrieb und echter Empfang/Antippen/Abmelden-Test fehlen als Aktivierungsbeleg. |
 | **Hintergrunddienste** | Kein laufender Dienst allein durch vorhandenen Worker-Code. Zeitplan, Rechte, Aktivierungsstatus und tatsächliche Verarbeitung gesondert belegen. |
 | **Fotos / Dokumente / Datenschutz** | Aktuelle Rechte, kanonische Medienquelle, private Wiederherstellung, lokale Daten und Kontowechsel gemeinsam absichern. |
@@ -99,7 +99,7 @@ Diese Übersicht trennt die installierte App, ihre serverseitigen Ansichten, nat
 
 **Redaktionsfreigabe (20.11.):** Website/API unter einem zentralen Herausgeber veröffentlicht; Länderfilter behalten drei Mexiko-Beiträge. Aktive stündliche Recherche mit separatem Publisher; ohne automatische Fotos oder Nutzungslernfeed. Browserprüfungen ersetzen keine native Prüfung. Handoff und tatsächlicher Übermittlungsstatus: `/srv/cinegenius/handoffs/20261120-newsroom-release/`.
 
-**Übergabe Internationalisierung (20.11.):** Website noch nicht veröffentlicht. Mehrwährungen und privates Mitgestalten sind vorbereitet; Vertrag `international-currency-feedback.md`, Belege `/srv/cinegenius/handoffs/20261120-international-feedback/`. Direkte Chat-Übergabe wegen Verbindungsfehler nicht zugestellt. Kein echter App-/KI-Test behauptet.
+**Übergabe Internationalisierung (21.11.):** Website und gemeinsame Schnittstellen veröffentlicht (`ab74924d`), Buchungs-Währungsmigration angewandt und geprüft. Vertrag `international-currency-feedback.md`, aktueller Release-Beleg `/srv/cinegenius/handoffs/20261121-international-release/`. APP Entwicklung wurde über den funktionierenden Chat erreicht. Kein echter App-/KI-Test behauptet.
 
 ## News-Erweiterung · 21. November 2026
 
@@ -127,8 +127,8 @@ Das ist keine vollständige menschliche Sprachabnahme aller dynamischen KI-Texte
 regulären Bildlaufs. Der iPhone-Simulator erreichte noch keine bedienbare App;
 Browserprüfungen ersetzen diese Abnahme nicht. Smart-/Work-App-Halt bleibt erhalten.
 
-Währungen und Ländervertreter-Feedback sind separat implementiert und geprüft,
-aber weiterhin nicht veröffentlicht. Dazu steht eine Veröffentlichungsfreigabe aus.
+Währungen und Ländervertreter-Feedback sind seit 21.11. auf der Website
+veröffentlicht (`ab74924d`). Die native Übernahme bleibt getrennt offen.
 Der gemeinsame Stand bestand 166 gezielte Prüfungen und den vollständigen Build;
 der News-Übersetzungsfix anschließend ebenfalls. Keine Summierung wiederholter Tests.
 
@@ -140,7 +140,7 @@ Aktueller Livebeleg: `/srv/cinegenius/handoffs/20261121-news-gallery-release/`.
 **App-Stand:** Die genannten Veröffentlichungen betreffen Website und gemeinsame
 Schnittstellen. Die native Oberfläche, Installation und Geräteprüfung bleiben
 eigenständige APP-Arbeit. Das Handoff enthält geprüfte Commits und offene Grenzen;
-die direkte Chat-Zustellung war gestört.
+die frühere Chat-Störung ist behoben, die aktuelle Übergabe erfolgt an APP Entwicklung.
 
 ## Homepage-Newsfotos · Web-Vertrag vom 21. November 2026
 
@@ -156,3 +156,30 @@ auf dem tatsächlichen Gerät. Ein mobiler Website-Browsertest ist kein nativer
 App-Nachweis; der bestehende Smart-/Work-Veröffentlichungshalt bleibt erhalten.
 Geprüfter Stand und Livebelege:
 `/srv/cinegenius/handoffs/20261121-home-news-photos/`.
+
+## Währungen und Mitgestalten veröffentlicht · 21. November 2026
+
+Website-Quellstand `ab74924dd659454d1d0746c535c514c70251e62a` ist über den bewachten
+Releaseweg veröffentlicht. Produktionsalias `www.cinegenius.co` zeigt auf
+`dpl_BuCRJ3WyFFrfnKjSYfoKP9t1MBz3` (READY). 176 gezielte Tests, TypeScript, Lint,
+17 Sprachkataloge und vier kontrollierte WebKit-Bedienkonfigurationen bestanden.
+155 Währungen ohne Umrechnung; private, bestätigte Ländervertreter-Berichte unter
+`/mitgestalten`, Admin-Sammlung unter `/mitgestalten/koordination`.
+Die Buchungs-Währungsmigration ist mit unveränderten Altbeträgen und Rechten geprüft.
+Aktueller Abschluss-/Livebeleg: `/srv/cinegenius/handoffs/20261121-international-release/receipt.json`.
+Echter angemeldeter KI-/Versandtest und native Umsetzung/Geräteabnahme bleiben offen.
+Kein weiterer News-Runtime- oder nativer Smart-/Work-Livegang ist darin enthalten.
+
+**APP-Newsfotos-Abgleich (Rückmeldung APP, 21.11.):** Produktstand `144059cb`,
+mit Abschlussdokumentation `77ed339a` gesichert und gepusht. 50 gezielte Tests,
+33 Browserfälle, vier Bildfehlerfälle und vollständiger Build bestanden.
+Dies ist ein separater geprüfter App-Quellstand, keine neue Installation oder
+Veröffentlichung. Aktuelle Website enthält das Homepage-Verhalten bereits seit
+`1aa844cc`; ältere App-Dateien/Kataloge nicht darüberkopieren. Echte Geräteprüfung
+bleibt separat. Beleg: `/srv/cinegenius/handoffs/20261121-app-home-news-photos/receipt.json`.
+
+**Live-Nachbesserung:** Frühe lokalisierte Ablehnungen bei Anmeldung, Adminrechten,
+Herkunftsprüfung und Kontingent sind nun ebenfalls ausdrücklich privat und
+nicht zwischenspeicherbar. 52 gezielte Folgeprüfungen und erneuter Produktionsbuild
+bestanden; Berechtigungen unverändert. Die ursprüngliche abgewiesene Gastantwort
+enthielt nur den Fehlertext, keine privaten Feedbackdaten.

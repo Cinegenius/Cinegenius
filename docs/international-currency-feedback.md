@@ -1,8 +1,8 @@
 # Internationale Preise und Ländervertreter-Feedback
 
 Stand: 21.11.2026. Markus hat die Veröffentlichung beider Website-Funktionen mit
-„dann stell live“ ausdrücklich freigegeben. Das Paket wird auf den aktuellen
-Hauptstand mit den veröffentlichten Newsfotos übernommen. Der tatsächliche
+„dann stell live“ ausdrücklich freigegeben. Das Paket ist auf dem aktuellen
+Hauptstand mit den veröffentlichten Newsfotos als `ab74924d` veröffentlicht. Der tatsächliche
 Veröffentlichungs- und Live-Prüfbeleg liegt unter
 `/srv/cinegenius/handoffs/20261121-international-release/receipt.json`.
 Die bereits veröffentlichte Länderpriorisierung und CineGenius Redaktion bleiben
@@ -95,7 +95,7 @@ Web-Ansicht ist kein Nachweis einer nativen Implementierung. Handoff und Prüfbe
 `/srv/cinegenius/handoffs/20261120-international-feedback/`.
 Die frühere Übergabe war wegen der Chat-Verbindung gestört. APP Entwicklung wurde
 am 21.11. über die neue ausdrückliche Freigabe und den laufenden Website-Livegang
-informiert; der abschließende Release-Beleg wird separat weitergegeben.
+informiert; der aktuelle Release-Beleg liegt im neuen Übergabeordner.
 
 ## Prüfstand
 
