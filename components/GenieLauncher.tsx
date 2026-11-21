@@ -39,9 +39,9 @@ export default function GenieLauncher({ children, position, visible, onHide, onM
     const left = Math.max(area.left, (viewport?.offsetLeft ?? 0) + 8);
     const right = Math.min(area.right, (viewport?.offsetLeft ?? 0) + (viewport?.width ?? window.innerWidth) - 8);
     const bottom = Math.min(area.bottom, (viewport?.offsetTop ?? 0) + (viewport?.height ?? window.innerHeight) - 8);
-    const top = Math.min(Math.max(area.top, (viewport?.offsetTop ?? 0) + 40), bottom - size.height);
+    const top = Math.min(Math.max(area.top, (viewport?.offsetTop ?? 0) + (native ? 8 : 40)), bottom - size.height);
     return { left, right: Math.max(left, right - size.width), top, bottom: Math.max(top, bottom - size.height) };
-  }, []);
+  }, [native]);
 
   const place = useCallback((point: GeniePosition) => {
     const area = readBounds();
@@ -50,9 +50,14 @@ export default function GenieLauncher({ children, position, visible, onHide, onM
       x: Math.max(area.left, Math.min(point.x, area.right)),
       y: Math.max(area.top, Math.min(point.y, area.bottom)),
     };
+    // Keep the 44px close target reachable at the upper safe edge. A very
+    // short keyboard viewport uses the icon's own bounds as the last fallback.
+    const hidePlacement = native && next.y - 40 < area.top ? next.y + 40 <= area.bottom ? "below" : "inside" : null;
+    if (hidePlacement) dock.current.setAttribute("data-hide-placement", hidePlacement);
+    else dock.current.removeAttribute("data-hide-placement");
     onPositionChange(next);
     Object.assign(dock.current.style, { left: `${next.x}px`, top: `${next.y}px`, right: "auto", bottom: "auto" });
-  }, [readBounds, onPositionChange]);
+  }, [readBounds, onPositionChange, native]);
 
   const stopMotion = useCallback(() => {
     if (frame.current !== null) cancelAnimationFrame(frame.current);

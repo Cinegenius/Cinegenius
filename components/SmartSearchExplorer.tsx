@@ -19,6 +19,7 @@ import { SMART_MAP_COLORS } from "@/lib/smart-search-map";
 import { NATIVE_SMART_MAP_COLORS, nativeSmartColorStyle } from "@/lib/native-smart-colors";
 import resultStyles from "./SmartSearchResults.module.css";
 import { preserveDiscoveryMapOrder } from "@/lib/discovery-map-order";
+import { nativeSmartViewportGroups } from "@/lib/native-smart-viewport";
 import { searchQueryTitle } from "@/lib/unified-search-areas";
 import { discoveryAreas, discoveryResults, discoveryCount, discoveryFacets, emptyDiscoveryFilters, filterDiscoveryGroups, mergeDiscoveryPage, sortDiscoveryGroups, type DiscoveryFilters } from "@/lib/smart-discovery";
 
@@ -218,7 +219,15 @@ export default function SmartSearchExplorer({ plan, initialGroups, initialMapGro
   const areaValue = selectedAreas.length === areas.length ? "all" : selectedAreas.length === 1 ? selectedAreas[0] : "selection";
   const wishes = plan.searches.flatMap((_, index) => groups.some(group => group.wishIndex === index && group.results.length) ? [index] : []);
   const available = useMemo(() => discoveryFacets(filterDiscoveryGroups(groups, { ...emptyDiscoveryFilters(), hiddenAreas: filters.hiddenAreas, hiddenWishes: filters.hiddenWishes })), [groups, filters.hiddenAreas, filters.hiddenWishes]);
-  const visible = useMemo(() => sortDiscoveryGroups(filterDiscoveryGroups(groups, filters), plan), [groups, filters, plan]);
+  // Never feed a clipped viewport back into its own map. The pool stays stable
+  // through pan/zoom, so widening the viewport can restore previously hidden rows.
+  const mapPool = useMemo(() => sortDiscoveryGroups(filterDiscoveryGroups(groups, { hiddenAreas: filters.hiddenAreas, hiddenWishes: filters.hiddenWishes,
+    departments: filters.departments, marketplace: filters.marketplace, bounds: null }), plan),
+    [groups, filters.hiddenAreas, filters.hiddenWishes, filters.departments, filters.marketplace, plan]);
+  const viewport = useMemo(() => nativeAppearance && mapOpen ? nativeSmartViewportGroups(mapPool, filters.bounds) : null,
+    [nativeAppearance, mapOpen, mapPool, filters.bounds]);
+  const visible = useMemo(() => viewport?.visible ?? sortDiscoveryGroups(filterDiscoveryGroups(groups, filters), plan), [viewport, groups, filters, plan]);
+  const unmappedCount = viewport ? discoveryCount(viewport.unmapped) : 0;
   const count = discoveryCount(visible);
   const hasMapPositions = groups.some(group => group.results.some(result => result.mapPoint));
   const filtered = !!(filters.hiddenAreas.length || filters.hiddenWishes.length || filters.departments.length || filters.marketplace.length || filters.bounds);
@@ -283,7 +292,7 @@ export default function SmartSearchExplorer({ plan, initialGroups, initialMapGro
       </div>}
     </section>
     {/* One map instance; switching views keeps zoom and current result filters. */}
-    <div className="smart-map-panel" hidden={!mapOpen}>{mapReady && hasMapPositions && <SmartSearchMap groups={visible} bounds={filters.bounds} onApplyBounds={bounds => setFilters(value => ({ ...value, bounds }))} />}
+    <div className="smart-map-panel" hidden={!mapOpen}>{mapReady && hasMapPositions && <SmartSearchMap groups={nativeAppearance ? mapPool : visible} active={mapOpen} bounds={filters.bounds} onApplyBounds={bounds => setFilters(value => ({ ...value, bounds }))} />}
       {mapReady && !hasMapPositions && count > 0 && <p className="text-xs text-text-muted">{t("discovery.unmapped", { count })}</p>}
     </div>
     <div className="smart-result-list">
@@ -291,9 +300,15 @@ export default function SmartSearchExplorer({ plan, initialGroups, initialMapGro
     {errors.includes("initial") && <div role="alert" className="text-sm text-text-secondary"><p>{t("error")}</p><button type="button" className="min-h-11 min-w-11 text-gold" onClick={() => void read()} disabled={pending.includes("initial")}>{t("retry")}</button></div>}
     {pending.includes("initial") && <p role="status" className="text-sm text-text-muted">{t("loading")}</p>}
     {!count && <div role="status" className="rounded-xl border border-border bg-bg-secondary p-4 text-sm text-text-secondary"><p>{t(filtered ? "discovery.emptyFilters" : "emptyGroup")}</p>{filtered && <button type="button" className="min-h-11 min-w-11 text-gold" onClick={reset}>{t("discovery.reset")}</button>}</div>}
-    {(nativeAppearance ? nativeSmartResultAreas(discoveryAreas(visible)) : discoveryAreas(visible)).map(area => <ResultArea key={area} area={area} colors={colors} native={nativeAppearance} autoLoad={nativeAppearance && discoveryAreas(visible).length === 1} groups={visible.filter(group => group.area === area)} pending={pending} errors={errors}
+    {(nativeAppearance ? nativeSmartResultAreas(discoveryAreas(visible)) : discoveryAreas(visible)).map(area => <ResultArea key={area} area={area} colors={colors} native={nativeAppearance} autoLoad={nativeAppearance && discoveryAreas(mapPool).length === 1} groups={visible.filter(group => group.area === area)} pending={pending} errors={errors}
       {...(nativeAppearance ? { grid: view === "grid", limit: controls.limits[area] ?? (view === "grid" ? 6 : 3), setLimit: (limit: number) => setLimit(area, limit) } : {})}
       more={group => void read(groups.find(item => searchGroupKey(item) === searchGroupKey(group))!)} />)}
+    {viewport && unmappedCount > 0 && <details className="smart-unmapped-results">
+      <summary className="flex min-h-11 cursor-pointer items-center gap-2 text-sm text-text-muted"><ChevronDown size={16} aria-hidden="true" />{t("discovery.unmapped", { count: unmappedCount })}</summary>
+      {nativeSmartResultAreas(discoveryAreas(viewport.unmapped)).map(area => <ResultArea key={`unmapped:${area}`} area={area} colors={colors} native groups={viewport.unmapped.filter(group => group.area === area)} pending={pending} errors={errors}
+        limit={controls.limits[`unmapped:${area}`] ?? 3} setLimit={(limit: number) => setLimit(`unmapped:${area}`, limit)}
+        more={group => void read(groups.find(item => searchGroupKey(item) === searchGroupKey(group))!)} />)}
+    </details>}
     {!nativeAppearance && groups.some(group => group.nextOffset !== null) && <p className="text-xs text-text-muted">{t("discovery.partial")}</p>}
     {/* A cursor with no currently matching rows remains reachable without an empty area card. */}
     {visible.some(group => group.nextOffset !== null && !visible.some(item => item.area === group.area && item.results.length)) && <button type="button" disabled={pending.length > 0} className="min-h-11 text-sm text-gold" onClick={() => {

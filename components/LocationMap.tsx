@@ -33,6 +33,8 @@ type Location = {
 };
 type Props = {
   preserveViewport?: boolean;
+  /** Native Smart keeps the map mounted while hidden; pause zero-size work. */
+  viewportActive?: boolean;
   labels?: { label: string; results: string; empty: string; unknownCoordinates: string; cluster?: (count: number) => string; error?: string; applyArea?: string; nativeApplyArea?: string };
   renderPreview?: (location: Location) => ReactNode;
   readOnly?: boolean;
@@ -48,7 +50,12 @@ type Props = {
   onApplyBounds: (bounds: MapBounds | null) => void;
 };
 
-export default function LocationMap({ preserveViewport = false, readOnly = false, locations, activeId, onHover, userLocation, radiusKm, appliedBounds, onApplyBounds, onBoundsChange, visibleCount, countPending = false, labels, renderPreview }: Props) {
+function viewportReady(active: boolean | undefined, container: HTMLDivElement | null) {
+  return active === undefined || !!active && !!container && container.clientWidth > 0 && container.clientHeight > 0;
+}
+
+export default function LocationMap({ preserveViewport = false, viewportActive, readOnly = false, locations, activeId, onHover, userLocation, radiusKm, appliedBounds, onApplyBounds, onBoundsChange, visibleCount, countPending = false, labels, renderPreview }: Props) {
+  const managesViewport = viewportActive !== undefined;
   const clusterLabel = labels?.cluster;
   const t = useTranslations("locationMap");
   const mapUi = useTranslations("directoryMap"), commonUi = useTranslations("notifications");
@@ -63,7 +70,21 @@ export default function LocationMap({ preserveViewport = false, readOnly = false
   const mapRef = useRef<Leaflet.Map | null>(null);
   const fittedMap = useRef<Leaflet.Map | null>(null);
   const previousAppliedBounds = useRef<MapBounds | null>(appliedBounds);
+  const pendingResetFit = useRef(false);
+  const pendingInitialBounds = useRef<MapBounds | null>(null);
+  const viewportActivity = useRef(viewportActive);
   const [map, setMap] = useState<Leaflet.Map | null>(null);
+  useEffect(() => {
+    viewportActivity.current = viewportActive;
+    if (viewportActive !== undefined && map && mapRef.current === map && viewportReady(viewportActive, containerRef.current)) {
+      map.invalidateSize();
+      const restore = pendingInitialBounds.current;
+      if (restore && !pendingResetFit.current) {
+        pendingInitialBounds.current = null;
+        map.fitBounds([[restore.south, restore.west], [restore.north, restore.east]], { animate: false });
+      }
+    }
+  }, [viewportActive, map]);
   const [moved, setMoved] = useState(false);
   const [basemapReady, setBasemapReady] = useState(false);
   const initialLocale = useRef(locale);
@@ -108,6 +129,7 @@ export default function LocationMap({ preserveViewport = false, readOnly = false
     if (!map) return;
     let previousBounds = "";
     const updateBounds = () => {
+      if (mapRef.current !== map || !viewportReady(viewportActivity.current, containerRef.current) || pendingResetFit.current || pendingInitialBounds.current) return;
       if (!automaticBounds) { setMoved(true); return; }
       // Do not lock an empty initial map before asynchronously loaded results can fit.
       if (!hasMapPoints) return;
@@ -134,22 +156,31 @@ export default function LocationMap({ preserveViewport = false, readOnly = false
       updateBounds();
     }
     return () => { map.off("moveend", updateBounds); map.off("zoomend", updateBounds); map.off("resize", updateBounds); };
-  }, [map, automaticBounds, hasMapPoints]);
+  }, [map, automaticBounds, hasMapPoints, viewportActive]);
 
   useEffect(() => {
     let cancelled = false;
     let instance: Leaflet.Map | null = null;
-    const observer = new ResizeObserver(() => instance?.invalidateSize());
+    const observer = new ResizeObserver(() => {
+      if (viewportReady(viewportActivity.current, containerRef.current)) instance?.invalidateSize();
+    });
     async function initialize() {
       try {
         const [leaflet, { createBasemap }] = await Promise.all([import("leaflet"), import("@/lib/map-basemap")]);
         const L = leaflet.default;
         if (cancelled || !containerRef.current) return;
         const animate = !(typeof matchMedia === "function" && matchMedia("(prefers-reduced-motion: reduce)").matches);
-        instance = L.map(containerRef.current, { center: [51, 10], zoom: 6, minZoom: 2, maxZoom: 19, maxBounds: [[-85, -Infinity], [85, Infinity]], maxBoundsViscosity: 1, zoomControl: false, zoomAnimation: animate, fadeAnimation: animate });
+        instance = L.map(containerRef.current, { center: [51, 10], zoom: 6, minZoom: 2, maxZoom: 19, maxBounds: [[-85, -Infinity], [85, Infinity]], maxBoundsViscosity: 1, zoomControl: false, zoomAnimation: animate, fadeAnimation: animate,
+          // Native Smart's observer owns resize while its mounted map is hidden.
+          // Leaflet's independent window handler would otherwise measure 0px.
+          trackResize: !managesViewport });
         mapRef.current = instance;
         const bounds = initialBounds.current;
-        if (bounds) instance.fitBounds([[bounds.south, bounds.west], [bounds.north, bounds.east]], { animate: false });
+        pendingInitialBounds.current = null;
+        if (bounds) {
+          if (viewportReady(viewportActivity.current, containerRef.current)) instance.fitBounds([[bounds.south, bounds.west], [bounds.north, bounds.east]], { animate: false });
+          else pendingInitialBounds.current = bounds;
+        }
         instance.attributionControl.setPrefix(false);
         const basemap = createBasemap(initialLocale.current).addTo(instance);
         vectorMap.current = basemap.getMaplibreMap();
@@ -176,7 +207,7 @@ export default function LocationMap({ preserveViewport = false, readOnly = false
       vectorMap.current = null;
       zoom.current = null;
     };
-  }, [attempt]);
+  }, [attempt, managesViewport]);
 
   // Hover only changes marker styling; it never destroys an open touch preview.
   useEffect(() => {
@@ -185,10 +216,11 @@ export default function LocationMap({ preserveViewport = false, readOnly = false
     let group: Leaflet.LayerGroup | undefined;
     async function initializeMarkers() {
       const L = (await import("leaflet")).default;
-      if (cancelled) return;
+      if (cancelled || mapRef.current !== map) return;
       group = L.layerGroup().addTo(map!);
       let renderedViewport = "";
       const render = () => {
+        if (mapRef.current !== map) return;
         const bounds = map!.getBounds();
         const viewport = {south: bounds.getSouth(), north: bounds.getNorth(), west: bounds.getWest(), east: bounds.getEast()};
         const key = JSON.stringify([map!.getZoom(), viewport]);
@@ -245,7 +277,7 @@ export default function LocationMap({ preserveViewport = false, readOnly = false
   }, [map, locations, t, readOnly, automaticBounds, clusterLabel]);
 
   useEffect(() => {
-    if (!map) return;
+    if (!map || mapRef.current !== map) return;
     // Marker titles and DOM text are never interpreted as HTML.
     map.eachLayer(layer => {
       if (!("getElement" in layer)) return;
@@ -259,14 +291,19 @@ export default function LocationMap({ preserveViewport = false, readOnly = false
   useEffect(() => {
     const reset = previousAppliedBounds.current !== null && appliedBounds === null;
     previousAppliedBounds.current = appliedBounds;
-    if (!map || appliedBounds || (preserveViewport && fittedMap.current === map && !reset)) return;
+    if (reset && viewportActive !== undefined) { pendingResetFit.current = true; pendingInitialBounds.current = null; }
+    if (!map || appliedBounds || !viewportReady(viewportActivity.current, containerRef.current)
+      || (preserveViewport && fittedMap.current === map && !reset && !pendingResetFit.current)) return;
     const coords = locations.filter(hasCoordinates).map(location => [location.lat, location.lng] as [number, number]);
     if (coords.length) {
       void import("leaflet").then(({ default: L }) => {
-        if (mapRef.current === map && !userLocation) { fittedMap.current = map; map.fitBounds(L.latLngBounds(coords), { padding: [48, 48], maxZoom: 13, animate: false }); setMoved(false); }
+        if (mapRef.current === map && !userLocation && viewportReady(viewportActivity.current, containerRef.current)) {
+          fittedMap.current = map; pendingResetFit.current = false;
+          map.fitBounds(L.latLngBounds(coords), { padding: [48, 48], maxZoom: 13, animate: false }); setMoved(false);
+        }
       });
     }
-  }, [map, locations, userLocation, appliedBounds, preserveViewport]);
+  }, [map, locations, userLocation, appliedBounds, preserveViewport, viewportActive]);
 
   useEffect(() => {
     if (!map || !userLocation) return;

@@ -126,3 +126,31 @@ No API, migration, model, quota or locale-key change is required. All labels reu
 the existing 17 catalogs. Native implementation must retain actual safe areas,
 input/keyboard state, current-account access and real Back navigation. Browser
 layout checks do not establish native/Xcode device behavior.
+
+
+## Native viewport synchronization — 21 November 2026
+
+Only the installed native appearance now synchronizes the map/list selection after
+Leaflet move/zoom completion. The map retains the full currently loaded,
+permission-projected pool after area/wish/department/category filters. Bounds
+filter the list separately, so panning or widening an empty viewport restores
+previously offscreen results without rebuilding or repeatedly fitting the map.
+Unpositioned or invalid-position entries stay available in a separate disclosure
+using the existing translated notice; they never count as viewport matches.
+
+The ordinary website keeps explicit Apply/reset. Source facts, public-coordinate
+privacy, permission checks, stable pagination/deduplication, request aborts and
+late-response rejection remain unchanged. An empty native viewport does not
+automatically scan inventory pages. The map and API remain bounded to loaded
+results; no database migration, paid search interpretation or new access is added.
+
+Local verification: 87 targeted regressions and 57 actual component/Leaflet
+Chromium/WebKit checks with synthetic rows, including zoom in/out after zero
+matches, pan completion, missing positions, department change, map reentry and
+ordinary website Apply. ESLint passed. Full-project TypeScript hit the local
+default 2GB Node heap limit; the combined controlled release build must complete
+its typecheck. Browser checks use an inert basemap boundary and prove neither
+real map tiles nor a new physical iPhone installation or production release.
+Evidence: local app workspace `work/native-smart-viewport-fix-20261121/`.
+
+Native viewport review follow-up,21November2026: identical result identities use the same first canonical position as map markers before viewport partitioning. Hidden/zero-size native maps do not invalidate or publish bounds; a requested reset fit is deferred until visible size is available. Late native-marker hydration switches the managed resize mode and stale map-instance callbacks are rejected.90 targeted tests and80 real Chromium/WebKit checks passed; full TypeScript/build validation is pending the guarded release. Ordinary website callers leave the optional activity contract undefined and retain explicit Apply.

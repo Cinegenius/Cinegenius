@@ -109,3 +109,13 @@ verifiziert; Nachweise im Handoff. Native App bleibt angehalten, keine echte
 angemeldete Sitzung oder native Geräteabnahme behauptet. Europa/International
 ohne belastbare Metadaten nicht erfunden.
 [Vertrag und Grenzen](organization-entry-browser.md).
+
+
+## APP-Nachprüfung — 21. November 2026, laufender Stand
+
+Gemeldete Funktionsfehler haben Vorrang: native Kartenliste mit Zoom/Pan synchronisieren, ruckelnden Work-Wechsel/fehlendes Projekte-Symbol korrigieren, überlagerte Navigation und falsche helle Modals im dunklen Modus prüfen. Build2104 ist installiert; Markus bestätigt funktionierende Rücknavigation, aber ruckelnden Übergang. Die Folgekorrekturen sind noch kein neuer Gerätebeleg.
+
+Bestätigte Gestaltung: ruhige neutrale Smart-Flächen; Teamseite mit Mitgliedern und Planung/Ordnerliste direkt, eigene Unterordner. Die Teams-Struktur wird lokal umgesetzt und ist keine Online-Mitgliedschafts-/Freigabefunktion. Private Genie-Testzeit15:59Berlin abgelaufen; kein stilles Zurücksetzen des Kontingents. TestFlight folgt erst nach der akuten App-Nachprüfung; bestehende Release-/Signiergrenzen bleiben offen.
+
+
+Ergänzung des APP-Auftrags: Markus verlangt die frei gestaltbare Ordnerstruktur in Teams und im eigenen Arbeitsplatz; auch Vorgabeordner müssen entfernbar sein und Unterordner aufnehmen. Lokale Umsetzung ist für2105 vorbereitet und geht durch integrierten Build und unabhängigen Speicherreview. Der installierte Stand bleibt bis zur nachgewiesenen Installation2104. Die frühere separate Team/Planung-Kachelauswahl wird durch eine gemeinsame kompakte Teamseite ersetzt.

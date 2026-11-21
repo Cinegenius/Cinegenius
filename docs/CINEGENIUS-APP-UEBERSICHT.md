@@ -243,3 +243,31 @@ keine Migration und keine neuen Rechte. Web-Schnittstellen aus `69f4be8f` sind s
 21. November veröffentlicht. Native Übernahme, Installation und Geräteabnahme
 sind nicht erfolgt; App-Stopp erhalten. Kein echter angemeldeter Live-Gerätetest.
 [Web-Vertrag und Prüfgrenzen](organization-entry-browser.md).
+
+
+### Lokale native Smart-Kartenkorrektur — 21.11.2026
+
+Karte/Liste synchronisiert den Ausschnitt nun nach abgeschlossenem Zoomen und
+Verschieben. Ungeclippten berechtigten Kartenpool erhalten, Liste getrennt filtern;
+Herauszoomen aus einem leeren Ausschnitt stellt die geladenen Treffer wieder her.
+Fehlende/ungültige Kartenpositionen bleiben separat aufklappbar und zählen nicht
+als Ausschnittstreffer. Website behält explizites Anwenden. 87 gezielte Tests,
+57 isolierte Chromium-/WebKit-Interaktionschecks und ESLint bestanden; große
+TypeScriptprüfung nach lokalem Heap-Abbruch im gemeinsamen Releasebuild offen.
+Lokaler Quellstand, noch kein zusätzlicher Live-/Installationsnachweis.
+Siehe [Smart-Vertrag](smart-discovery.md#native-viewport-synchronization--21-november-2026)
+und App-Arbeitsordner `work/native-smart-viewport-fix-20261121/`.
+
+
+### Folgekorrekturen aus dem iPhone-Durchlauf — 21. November 2026
+
+- Markus hat die ruhigeren Smart-Bereichsflächen aus der Vorschau bestätigt: neutrale Ränder/Flächen/Titel, kleine Kategoriezeichen farbig; Auswahlbuttons und Kartenfarben bleiben erhalten. Lokal zehn Browserfälle (sieben dunkle Paletten, Heller Stein, gewöhnliche Website) geprüft. Release-Nachweis folgt nach Quellenabgleich.
+- Native Work-Folgefassung: gleichmäßigerer Übergang, gültiges Projekte-Symbol, gemeinsame Hell-/Dunkeldarstellung der Modals und X zum Schließen, tatsächliches gewähltes Gewerk in der Arbeitsbeginn-Zeile sowie erweiterte Genie-Bewegungsfläche. Quellprüfung ist kein Gerätebeleg; Build2104 ist weiterhin der zuletzt installierte Stand.
+- Die Teams-Vorschau wurde ausdrücklich bestätigt: Team öffnen → Mitglieder, Planung und eigene Ordner auf einer Seite; Planung als Liste. Lokale Umsetzung läuft, bestehende Team-/Dokumentdaten bleiben erhalten. Das ist keine aktivierte Online-Zusammenarbeit.
+- Die begrenzte private Genie-Teststrecke ist am 21. November um15:59Berlin abgelaufen (fünf verbuchte Anfragen, kein neues Kontingent/keine automatische Verlängerung). Drei echte Phone-Requests dauerten innerhalb der Testverbindung9,834–10,789Sekunden; native Import-/Anzeigezeiten sind darin nicht enthalten. Kein Beleg für eine bestimmte Modellzeit.
+
+- Native Community-Genie kann jetzt im ganzen sicheren Bildschirmbereich bewegt werden; das X wandert am oberen Rand nach unten. Header und untere Navigation bleiben außerhalb des kleinen Symbols bedienbar. Lokal21 Geometrie-/Flug-/Lifecycle-Tests und26 echte Chromium/WebKit-Prüfungen bestanden. Gewöhnliche Website-Abstände bleiben unverändert; iPhone-Nachweis und gemeinsame Buildprüfung folgen.
+
+- Nach Markus’ Konkretisierung lokal umgesetzt: Systemordner und eigene Ordner umbenennen/sortieren, eigene Unterordner auch in Systemordnern, Teilbäume verschieben, Papierkorb und Wiederherstellung. Persönliche Ablage unter „Meins → Meine Dateien“ hat einen getrennten Kontobereich; bestehende Team-v1-Daten und Projektoriginale bleiben erhalten. Persönliche Dateizuordnung umfasst vorhandene projektbezogene Dispos/Pläne; die separate Grundrisssammlung bleibt erreichbar.73 echte Archivprüfungen,9 gezielte Node-Tests, isolierter SDK-Typcheck und PBX-Prüfung bestanden. Der vollständige2105-Build läuft; unabhängiger Review und physische Abnahme sind noch ausstehend. Keine Online-Teamfreigabe oder allgemeiner Dateiupload behauptet.
+
+- Abschließender Karten-Review: kanonische Position gleicher Trefferidentitäten vor dem Ausschnittsfilter; keine Größenmessung/Bounds-Publikation der verborgenen Karte; Reset-Fit erst bei sichtbarer positiver Größe. Ein später Wechsel zur nativen Darstellung tauscht nur die nötige Resize-Instanz, normale Listenwechsel erhalten die Karte. Alte Instanzcallbacks werden verworfen.90 gezielte Tests und80 echte Chromium/WebKit-Prüfungen bestanden. Die gemeinsame vollständige TypeScript-Prüfung erfolgt im kontrollierten Releasebuild.
