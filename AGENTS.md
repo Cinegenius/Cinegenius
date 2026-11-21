@@ -1,4 +1,8 @@
-## Direkter App-Veröffentlichungsstopp – 21. November 2026
+## Erneute Freigabe des vollständigen iPhone-Stands – 21. November 2026
+
+Markus hat nach dem erneuten Anschließen des iPhones ausdrücklich beauftragt: „ok dann stell es drauf“, „mach beides drauf“, „ich will alle Änderungen auf dem Handy haben“. Das hebt den nachfolgenden Stopp für das geprüfte gemeinsame Community-/Work-Paket und seine erforderlichen App-Serveransichten auf. Aktuellen Website-Hauptstand erhalten, zusammenführen und prüfen; danach die bestehende Freigabe-/Sicherungsstrecke verwenden. Die private Genie-Testverbindung bleibt kurzlebig und begrenzt; Push, produktive Shots-Aktivierung, ein neues E-Mail-Postfachsystem und allgemeine Team-Onlinefunktionen sind dadurch nicht als fertig oder aktiviert freigegeben. Geräteinstallation und echte Bedienungsprüfung getrennt nachweisen.
+
+## Vorheriger App-Veröffentlichungsstopp – 21. November 2026
 
 Markus hat weitere App-Änderungen angekündigt und ausdrücklich angewiesen: „also nicht alles gleich live stellen“. Das vorbereitete App-Paket und neue native Geräteinstallationen bleiben bis zu seiner erneuten Freigabe zurückgehalten. Lokale Implementierung, Vorschauen, Prüfungen und Quellzusammenführung sind erlaubt. Die frühere App-Veröffentlichungsfreigabe unten ist für dieses Paket damit ausgesetzt. Separat in WEB CODEX ausdrücklich freigegebene reine Website-Korrekturen sind davon nicht betroffen; deren neueren Hauptstand beim nächsten Abgleich erhalten.
 
