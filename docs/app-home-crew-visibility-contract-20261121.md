@@ -1,61 +1,87 @@
-# Homepage-Crew: neue Auswahl- und Sichtbarkeitsvorgabe
+# Homepage-Crew: geprüfter Vertrag für die App
 
-Stand 21. November 2026: von WEB CODEX übermittelter Betreiberauftrag,
-**angekündigter Vertrag, noch kein geprüfter Produktcommit und nicht live**.
-WEB arbeitet auf `codex/home-crew-discretion-20261121`, angekündigte Basis
-`a3ff549a`; Tests laufen. Der Abschlussbeleg wird gesondert geliefert.
-Diese App-Vormerkung ist ausschließlich Dokumentation.
+Stand 21. November 2026: geprüfter WEB-Quellstand
+`5cafc814b92f5ab9ab58c3c7936cfb7374c40535` auf
+`codex/home-crew-discretion-20261121`, Basis
+`a3ff549af885721d437158742d117109c8974fdc`.
+WEB meldet inzwischen die gesondert freigegebene Veröffentlichung in Arbeit;
+**der abschließende Live-/Datenbankbeleg steht noch aus**.
+Diese App-Aufgabe übernimmt ausschließlich Dokumentation, keine native Umsetzung.
 
-## Auswahl auf der Startseite
+Der [gemeinsame Vertrag](home-crew-discretion.md) ist unverändert aus diesem
+Quellstand übernommen. Seine Statusangabe beschreibt den geprüften Vorabstand;
+spätere Produktionsnachweise werden getrennt dokumentiert.
 
-- Die Überschrift lautet exakt **Crew**.
-- Neue Registrierungen erhalten keinerlei Vorrang, auch nicht für 24 Stunden.
-  Die Auswahl wechselt mit der bestehenden Länderpriorisierung.
-- Die frühere Regel aus WEB `f6b45be5` / App `0c5e63fd` ist durch diesen Auftrag
-  ersetzt. Ihre damaligen Testergebnisse bleiben historische Belege; die
-  Bevorzugung darf beim nächsten Abgleich nicht wieder eingeführt werden.
-- Der neue Auftrag betrifft die Startseiten-Auswahl. Native News-/Crew-Navigation
-  und die bestehenden Regeln der allgemeinen Crew-Entdeckung bleiben bestehen.
+## Auswahl und Reichweite
 
-## Angekündigter gemeinsamer Datenvertrag
+- Die Überschrift lautet exakt **Crew** in allen 17 Web-Katalogen.
+- Neue Registrierungen erhalten keinerlei Vorrang. Registrierungsdaten werden
+  weder für die Reihenfolge verwendet noch mit den Crew-Karten ausgeliefert.
+- Die Auswahl rotiert im bestehenden 15-Minuten-Takt bei einer neuen Anfrage;
+  eine bereits geöffnete Bildreihe springt nicht durch einen Timer um.
+  Länderpriorisierung, Bildreihe und Kartengestaltung bleiben erhalten.
+- Die frühere Regel aus WEB `f6b45be5` / App `0c5e63fd` ist ersetzt. Der alte
+  Zweig und seine damaligen Testergebnisse bleiben als historische Belege erhalten.
+- Die neue Sichtbarkeitswahl betrifft ausschließlich die Homepage-Crew.
+  Allgemeines Verzeichnis/Profil, persönliche Angebote und separate Foto-Entdeckung
+  behalten ihre eigenen Sichtbarkeitsregeln. Native News-/Crew-Navigation erhalten.
 
-| Feld / Weg | Vorgesehene Bedeutung |
+## Gemeinsamer Datenvertrag
+
+| Feld / Weg | Bedeutung für die App |
 | --- | --- |
-| `user_settings.show_in_home_crew` | Kontogebundener boolescher Wert; nach bereitgestelltem Schema Standard `true` für bestehende Konten. `false` schließt das Profil aus dieser Startseiten-Auswahl aus. |
-| `GET /api/user-settings` | Bestehenden privaten Einstellungsweg um das Feld ergänzen; keine parallele native Datenhaltung einführen. |
-| `PATCH /api/user-settings` | Nur das eigene angemeldete Konto, erfolgreiche Speicherung bestätigen; vorhandene Konto-/Fehlerregeln erhalten. |
-| Profileinrichtung | Freiwillige Wahl anbieten und bestätigt speichern, bevor das Profil veröffentlicht wird. Wiederholen darf weder die Wahl verlieren noch das Profil doppelt anlegen. |
-| Einstellungen → Privatsphäre | Die gleiche gespeicherte Wahl später bearbeiten. |
+| `user_settings.show_in_home_crew` | Boolescher Wert, nach bereitgestelltem Schema Standard `true`; `false` schließt das Profil aus der Homepage-Crew aus. Fehlende Einstellungszeile nutzt den Standard, fehlendes API-Feld gilt als nicht verfügbar. |
+| `GET /api/user-settings` | Bestehender privater, kontogebundener Einstellungsweg; keine parallele native Datenhaltung. |
+| `PATCH /api/user-settings` | Nur eigenes angemeldetes Konto, echte boolesche Eingabe, Prüfung der mitgesendeten `accountId`, bestätigte Rückgabe der gespeicherten Wahl. |
+| `quickStart.showInHomeCrew` | Im vorhandenen privaten Einrichtungsvorgang erhalten; nur tatsächliche boolesche Werte übernehmen. |
+| Profileinrichtung | Freiwillige Wahl bei optionalen Angaben und Prüfung; vor Profilanlage/-änderung bestätigt speichern. Fehler stoppt den Abschluss und erhält die Eingaben für Wiederholen. |
+| Einstellungen → Privatsphäre | Dieselbe gespeicherte Wahl später bearbeiten; Kontowechsel und veraltete Antworten absichern. |
 
-Ghost, Mitglieder-/Freundes-Sichtbarkeit und bestehende öffentliche Rechte haben
-Vorrang. `true` macht kein ansonsten verborgenes Profil sichtbar. `false` ist ein
-Ausschluss aus dieser Auswahl, keine Löschung und keine Änderung der allgemeinen
-Profilveröffentlichung. Ausschluss und aktuelle Rechte müssen vor Auswahl und
-Begrenzung wirken; das ist mit dem abschließenden WEB-Stand zu prüfen.
+Ghost, Mitglieder-/Freundes-Sichtbarkeit und bestehende Rechte haben Vorrang.
+`true` macht kein verborgenes Profil öffentlich. Kandidaten werden vor der
+Auslieferung erneut geprüft; ausgeschlossene Profile werden durch weitere
+berechtigte Kandidaten ersetzt. Bei fehlgeschlagener Einstellungsabfrage wird
+keine Crew-Auswahl ausgeliefert.
 
-Der Standard für bestehende Datensätze ist nicht mit einem fehlenden Feld in
-einer alten API-Antwort gleichzusetzen. Native Einrichtung/Einstellungen dürfen
-eine nicht bestätigte Wahl nicht als gespeichert anzeigen. Veraltete Antworten
-bei Kontowechsel verwerfen, Eingabe bei Fehlern behalten und Wiederholen anbieten.
-Alle sichtbaren und zugänglichen Texte in den 17 unterstützten Sprachen abgleichen.
+Die Wahl erst als gespeichert anzeigen, wenn die Antwort sie bestätigt. Native
+Einrichtung darf bei unbestätigter Wahl kein Profil veröffentlichen. Alle Texte,
+Fehler- und Wiederholungszustände in den 17 unterstützten Sprachen abgleichen.
 
-## Abhängigkeit und noch offene Prüfung
+## Schema und Veröffentlichungsgrenze
 
-WEB nennt die additive Migration
-`20261121145336_home_crew_visibility.sql`. Sie ist hier nur als Abhängigkeit
-erfasst; weder SQL noch Datenbankwirkung sind in dieser Vormerkung geprüft oder
-angewandt. Vor funktionaler App-Übernahme den endgültigen Commit, API-Antwort,
-Speicherreihenfolge, Migrations-/Schema-Nachweis und die Sprach-/Testergebnisse
-aus der abschließenden WEB-Übergabe prüfen. Kein Produktionsauftrag aus dieser
-Ankündigung ableiten.
+`20261121145336_home_crew_visibility.sql` ergänzt ausschließlich die boolesche
+Spalte mit `NOT NULL DEFAULT true` in der vorhandenen Einstellungs-Tabelle;
+keine Änderung an RLS, Zugriffsrechten oder Profilveröffentlichungen. Der SQL-
+Quelltext ist hier nachgelesen, die Produktionswirkung hier nicht ausgeführt
+oder bestätigt. WEB übernimmt Migration, Schema-Prüfung und Veröffentlichung;
+kein paralleler Produktionslauf aus der älteren App-Arbeitsbasis.
 
-Zu belegen bleiben insbesondere: keine Bevorzugung junger Konten, Länderwahl,
-Ausschluss vor Limits, Altbestandsstandard, Ghost/Mitglieder/Freunde, Kontowechsel,
-fehlendes Schema/Feld, fehlgeschlagenes Speichern vor Veröffentlichung und
-Wiederaufnahme alter Einrichtungsvorgänge. Native Geräteprüfung gesondert.
+Vor funktionaler nativer Übernahme den endgültigen Live-Commit, Schema-Nachweis,
+Standardwerte und bestätigte false-Speicherung aus dem Abschlussbeleg abgleichen.
+App-Implementierung, Installation und echte Geräteprüfung bleiben gesondert.
 
-In dieser Aufgabe: keine Produktdateien/Sprachkataloge geändert, keine neuen
-Laufzeittests, keine Migration, Veröffentlichung oder Installation.
-Die bestehende Crew-Rotationsarbeit bleibt als unveränderter historischer Zweig
-erhalten. Empfangsbeleg:
-`/srv/cinegenius/handoffs/20261121-app-home-crew-discretion-contract/receipt.json`.
+## Prüfnachweise und Grenzen
+
+WEB dokumentiert 93 unterschiedliche gezielte Testfälle: zunächst 91 bestanden,
+zwei veraltete Erwartungen korrigiert; der anschließende Streaming-Lauf besteht
+17/17, die abschließende Avatar-/Serialisierungsprüfung 25/25. Diese Wiederholungen
+werden nicht zu den 93 Fällen addiert. Hinzu kommen 21 kontrollierte Browserfälle:
+17 Sprachen bei 320px sowie 390/768/1366px, Speichern/Neuladen, Fehler/Wiederholen,
+Kontowechsel und Einrichtungs-Wiederaufnahme ohne Profilanlage nach Speicherfehler.
+
+Kataloge (17 Sprachen, 11.319 Schlüssel), Design und vollständiger Build samt
+Typen bestanden laut WEB. Zwei vorhandene Hook-Lintfehler und zwei vorhandene
+Warnungen wurden gegen die unveränderte Basis bestätigt; kein sauberer Gesamtlint
+behauptet. Authentifizierung, Transport und Medien waren kontrolliert. Im lokalen
+Build fehlten Supabase-Laufzeitberechtigungen; bestehende Daten-Fallbacks wurden
+protokolliert. Keine echte Anmeldung, Live-Datenbank- oder iPhone-Abnahme aus
+diesen Vorabtests ableiten.
+
+Diese App-Aufgabe hat Vertrag, Auswahl/Serialisierung, API, Einstellungen,
+Einrichtung/Entwurf, SQL und die drei betroffenen Textschlüssel in allen 17
+Quellkatalogen nachgelesen. Eigene Prüfung: identischer Vertragsinhalt,
+Dokumentationsverweise und sauberer Diff; keine neuen Laufzeit-/Gerätetests und
+keine Sprachqualitätsfreigabe aus der reinen Schlüsselkontrolle.
+
+WEB-Beleg: `/srv/cinegenius/handoffs/20261121-home-crew-discretion/receipt.json`.
+App-Empfang: `/srv/cinegenius/handoffs/20261121-app-home-crew-discretion-contract/receipt.json`.

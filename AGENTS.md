@@ -6,13 +6,21 @@ frühere 24-Stunden-Bevorzugung. Wechselnde Auswahl und bestehende Länderpriori
 erhalten. Die alte Rotation aus `f6b45be5` / `0c5e63fd` nicht unverändert als
 aktuelle Auswahlregel übernehmen.
 
-WEB kündigt `user_settings.show_in_home_crew` über den gemeinsamen privaten
-GET/PATCH-Weg `/api/user-settings` an: freiwillige Wahl in Einrichtung und
-Privatsphäre-Einstellungen, Standard true für bestehende Konten, false aus
-dieser Auswahl ausschließen. Ghost und eingeschränkte Sichtbarkeit bleiben
-vorrangig. Einrichtung speichert die Wahl bestätigt vor Profilveröffentlichung.
-Der Vertrag und die additive Migration sind noch ungeprüft/in Arbeit; keine
-vorhandene Livefunktion, Geräteprüfung oder neue Freigabe behaupten. Details:
+Geprüfter WEB-Quellstand `5cafc814b92f5ab9ab58c3c7936cfb7374c40535` auf Basis
+`a3ff549a`: `user_settings.show_in_home_crew` über den privaten GET/PATCH-Weg
+`/api/user-settings`, freiwillige Wahl in Einrichtung und Privatsphäre-Einstellungen.
+Standard true, false nur aus der Homepage-Crew ausschließen; Verzeichnis, Angebote
+und Foto-Entdeckung behalten ihre eigenen Rechte. Ghost und eingeschränkte
+Sichtbarkeit bleiben vorrangig. `quickStart.showInHomeCrew` im privaten Entwurf
+erhalten und die Wahl vor Profilanlage/-änderung bestätigt speichern. Fehlende
+API-Felder oder ein Speicherfehler sind keine bestätigte Wahl.
+
+WEB meldet die gesondert freigegebene Veröffentlichung in Arbeit. Die additive
+Migration `20261121145336_home_crew_visibility.sql` ist im Quellstand nachgelesen;
+der abschließende Produktions-/Schema-Beleg steht noch aus. Diese App-Aufgabe
+übernimmt ausschließlich den Vertrag, keine Produktdateien, Migration oder
+Installation. Native Umsetzung und echte Geräteprüfung gesondert belegen.
+Details: `docs/home-crew-discretion.md` und
 `docs/app-home-crew-visibility-contract-20261121.md`.
 
 ## App-Folgearbeit: Smart-Karten und News – 19. November 2026
