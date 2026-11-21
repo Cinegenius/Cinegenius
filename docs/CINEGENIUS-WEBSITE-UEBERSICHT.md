@@ -1,6 +1,6 @@
 # CineGenius · Übersicht der gesamten Website
 
-Stand: **20. November 2026 (Europe/Berlin)**. Zuständig: **WEB CODEX**.
+Stand: **21. November 2026 (Europe/Berlin), Newsfoto-Übergabe; übrige Prüfstände je Eintrag**. Zuständig: **WEB CODEX**.
 Die getrennte [App-Übersicht](CINEGENIUS-APP-UEBERSICHT.md) beschreibt die native Anwendung.
 
 Dieses Verzeichnis hält die Bereiche, ihre Funktionen, den belegten Stand und offene Arbeit zusammen. Es ist eine interne Arbeitsübersicht, keine neue öffentliche Webseite und kein vollständiger Sicherheits- oder Funktionstest. Bei jeder weiteren Änderung wird der betreffende Eintrag aktualisiert.
@@ -20,7 +20,7 @@ Dieses Verzeichnis hält die Bereiche, ihre Funktionen, den belegten Stand und o
 | **Jobs** | Stellen und Aufträge, Gewerke, Orte, Kategorien, Erstellen und Details | Vorhanden. Die spanische Gewerk-Auswahl ist im aktuellen Hauptstand korrigiert. |
 | **Filmtiere** | Tierprofile, Trainer/Anbieter, Suche, Bilder und Anfragen | Vorhanden. Verbindung zur passenden Registrierung und Smart-Tiersuche als durchgehenden Ablauf weiter prüfen. |
 | **Projekte** | Film, Foto, Werbung, Social Media, Musikvideo, Dokumentation, Corporate und Events; Credits/Mitwirkungen | Vorhanden. Private Entwürfe und ausdrückliche Veröffentlichung getrennt; Verifizierung bleibt Admin-Aufgabe. |
-| **News / Aus der Branche** | Nachrichten, Technik, Kamera/Licht/Ton, Workshops, Veranstaltungen, Länder/Themen, Artikel und Quellen | Vorhanden. Redaktion: Agent AG DOK / Agent NEWS; Technik-Recherche gehört dazu. IMCINE-/Mexiko-Erweiterung gemeldet, vollständige automatische Veröffentlichung nicht bestätigt. |
+| **News / Aus der Branche** | Nachrichten, Technik, Kamera/Licht/Ton, Workshops, Veranstaltungen, Länder/Themen, Artikel und Quellen | Homepage-Fotos in `1aa844cc` live: kompakt 80×64px auch mobil, unbeschnitten, Titelbild/Galeriefallback, ohne leere Bildfläche; Herausgeber als Text und vorhandene Nachweise. WEB bestätigt vier öffentliche Browserfälle und READY-Deployment; Beleg `/srv/cinegenius/handoffs/20261121-home-news-photos/receipt.json`. [Getrennter App-Abgleich](app-home-news-photos-20261121.md), Geräteprüfung offen. Redaktion/Runtime bleiben eigene Arbeitsstränge. |
 | **Organisationen** | Verzeichnis, Detailseiten, Beiträge, Verwaltung und Einladungen | Vorhanden. Von Firmen und redaktionellen Automationen unterscheiden. |
 | **Branchenpartner** | Firmen-/Studio-Präsentation auf der Startseite und weiterführende Profile | Vorhanden. Keine zusätzliche Werbeinventar-Freigabe. |
 | **Schwarzes Brett** | Beiträge suchen, erstellen und verwalten | Vorhanden unter `/community`; Änderungen in gemeinsamer Gestaltung halten. |
