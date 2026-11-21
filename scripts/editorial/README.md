@@ -37,5 +37,29 @@ Required visible change/archival/credit/license information remains attached.
 The real private Hungarian article canary matched the independently calculated
 stored bytes on 21 November 2026. Public article and automatic media selection are now accepted in the separate
 NEWS receipt. Readership remains disabled without its runtime read credential.
-The mirrored suite contains 64 passing cases. The final review policy records
+The mirrored suite contains 75 passing cases. The final review policy records
 the observed chronology correction: import day never becomes an opening date.
+
+## Source conflicts (21 November 2026)
+
+`source_conflicts.py` is a required sibling of both research and publisher. The
+research controller extends its per-run output schema with `sourceConflicts`;
+the configured source catalogue and schema remain untouched. Researchers must
+record unresolved contradictions even when their prose omits the disputed fact.
+The reviewer receives all bounded, domain-validated confirmation URLs, fresh
+source evidence and the complete rights/research note. It also declares conflicts.
+Either nonempty declaration blocks before product reads, uploads, saves or
+publication. Missing/malformed declarations fail closed too. Review-only tests
+never instantiate product credentials.
+
+Older private drafts are preserved but cannot be automatically published without
+a fresh source check under this contract. Do not backfill `[]`, remove warnings,
+reset held ledgers, or recreate a hidden article. NEWS must deliberately recheck
+eligible pending sources; stable IDs, duplicates and human restrictions remain
+effective. A legacy draft having no declared conflict is not evidence of agreement.
+
+Install all changed controllers, the new sibling module and the review policy
+together under the existing research and publisher locks, after comparing the
+recorded baseline hashes. Preserve markers, credentials, drafts, source config
+and ledgers. This repository change alone does not install the runtime.
+Evidence and the existing human revision route: `docs/news-source-conflicts.md`.

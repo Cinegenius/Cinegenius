@@ -21,8 +21,8 @@ class PublisherTests(unittest.TestCase):
   self.tmp=tempfile.TemporaryDirectory();self.path=Path(self.tmp.name)/'ledger.json'
   self.root_patch=patch.object(p,'ROOT',Path(self.tmp.name));self.root_patch.start()
   self.addCleanup(self.root_patch.stop)
-  self.draft={'sourceUrl':'https://www.ffa.de/article?meldung=film','editionOrVersion':'2026'}
-  self.review={k:'' for k in p.FIELDS};self.review.update(decision='publish',reason='Official details checked',title='Verified industry news',summary='Original short news summary.',description='An original account of the verified public announcement, with named factual source.',entryType='news',format='online',topic='industry',countryCode='DE',checkedAt=p.now())
+  self.draft={'sourceUrl':'https://www.ffa.de/article?meldung=film','editionOrVersion':'2026','rightsNote':'Original writing; no source media reused.','confirmationUrls':[],'sourceConflicts':[]}
+  self.review={k:'' for k in p.FIELDS};self.review.update(decision='publish',reason='Official details checked',title='Verified industry news',summary='Original short news summary.',description='An original account of the verified public announcement, with named factual source.',entryType='news',format='online',topic='industry',countryCode='DE',checkedAt=p.now(),sourceConflicts=[])
  def tearDown(self):self.tmp.cleanup()
  def test_source_parameters_and_domain_boundary(self):
   self.assertEqual(p.source_url(self.draft['sourceUrl']+'&utm_medium=email',['ffa.de']),self.draft['sourceUrl'])

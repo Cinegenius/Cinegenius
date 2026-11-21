@@ -4,6 +4,7 @@ import argparse, datetime as dt, hashlib, ipaddress, json, os, re, signal
 import subprocess, sys, tempfile, time, unicodedata, resource, math
 from pathlib import Path
 from urllib.parse import urlsplit, urlunsplit, parse_qsl, urlencode
+from source_conflicts import CONFLICT_SCHEMA, RESEARCH_CONFLICT_POLICY, conflicts
 
 ROOT = Path(__file__).resolve().parents[1]
 UTC = dt.timezone.utc
@@ -90,6 +91,7 @@ def validate(data, groups):
                 if c['groupId']==d['groupId']:c['status']='error';c['note']='Unapproved draft source quarantined. '+c['note'][:900]
             continue
         try:
+            conflicts(d)
             if not (2<=len(d['title'])<=180 and 10<=len(d['summary'])<=500 and 40<=len(d['description'])<=10000): raise ValueError('Invalid text bounds')
             d['confirmationUrls']=[canonical(u) for u in d['confirmationUrls']]
             if len(d['countryCodes'])>12 or any(not re.fullmatch('[A-Z]{2}',c) for c in d['countryCodes']): raise ValueError('Invalid countries')
@@ -131,7 +133,15 @@ def run(args):
     state=json.loads(statefile.read_text()) if statefile.exists() else {'schemaVersion':1,'mode':'research_only','groups':{},'knownDrafts':[],'runs':[]}
     stamp=dt.datetime.now(UTC).strftime('%Y%m%dT%H%M%SZ')
     rundir=ROOT/'runs'/stamp; rundir.mkdir(parents=True,exist_ok=False)
-    schema=ROOT/'config/output-schema.json'
+    # Version the conflict declaration in code, without rewriting the configured
+    # source catalogue/schema or backfilling unreviewed legacy drafts.
+    schema=rundir/'output-schema.json'
+    output_schema=json.loads((ROOT/'config/output-schema.json').read_text())
+    draft_schema=output_schema['properties']['drafts']['items']
+    draft_schema['properties']['sourceConflicts']=CONFLICT_SCHEMA
+    if 'sourceConflicts' not in draft_schema['required']:
+        draft_schema['required'].append('sourceConflicts')
+    atomic(schema,output_schema)
     source_window=[]
     for g in groups:
         last=state.get('sources',{}).get(canonical(g['urls'][0]),{}).get('lastSuccessfulAt')
@@ -146,7 +156,7 @@ def run(args):
     if args.smoke:
         prompt='Smoke test only. Do not use tools or network sources. Return exactly the required JSON structure: checks=[], drafts=[], expiryCandidates=[], notes=["CLI/schema smoke test only; no source check performed"]. Do not read any files.'
     else:
-        prompt=(ROOT/'config/policy.md').read_text()+'\n\nContext JSON:\n'+json.dumps(context,ensure_ascii=False)+'\n\nReturn only the schema-conforming JSON. Do not write files or use shell/tools except live web search/open for public original sources. Do not read filesystem paths. Do not access the CineGenius product, Gmail or credentials.'
+        prompt=(ROOT/'config/policy.md').read_text()+RESEARCH_CONFLICT_POLICY+'\n\nContext JSON:\n'+json.dumps(context,ensure_ascii=False)+'\n\nReturn only the schema-conforming JSON. Do not write files or use shell/tools except live web search/open for public original sources. Do not read filesystem paths. Do not access the CineGenius product, Gmail or credentials.'
     command=['/home/cinegenius/.local/bin/codex','--search','--disable','shell_tool','--disable','unified_exec','-a','never','exec','--ignore-user-config','--sandbox','workspace-write','--skip-git-repo-check','--ephemeral','--output-schema',str(schema),'--output-last-message',str(rundir/'result.raw.json'),'-C',str(rundir),prompt]
     env={k:v for k,v in os.environ.items() if k in ('PATH','HOME','USER','LOGNAME','LANG','LC_ALL','SSL_CERT_FILE','SSL_CERT_DIR')}
     env.update(CODEX_HOME=str(ROOT/'codex-home'),CODEX_SQLITE_HOME=str(ROOT/'codex-state'),XDG_CACHE_HOME=str(ROOT/'cache'),TMPDIR=str(ROOT/'tmp'))
