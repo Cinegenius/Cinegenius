@@ -100,7 +100,10 @@ Nach dem abgeschlossenen Feedback-Kurzdialog folgt der von Markus in Agent NEWS
 bestätigte Ausbau der bestehenden Verwaltung: Land → Thema → Originalquelle,
 Herausgeber, Statuszahlen, Suche und Datumssortierung. Kompakte Beitragsliste und
 gezieltes Öffnen statt vollständiger Artikelberge; Rechte und Freigaben erhalten.
-Website-Entwurf mit vollständigem Build, 34 API-/SQL-Tests und 21 kontrollierten
-Browserprüfungen bestanden; Commitstatus im Handoff. Keine Veröffentlichung beauftragt, native App bleibt
-angehalten. Europa/International ohne belastbare Metadaten nicht erfunden.
+Website-Paket `69f4be8f` nach ausdrücklichem „ok dann live“ in Agent NEWS am
+21. November veröffentlicht: vollständiger Build, 34 API-/SQL-Tests, 21 kontrollierte
+Browserprüfungen und 13 Live-HTTP-Zugriffsprüfungen bestanden. READY und www-Alias
+verifiziert; Nachweise im Handoff. Native App bleibt angehalten, keine echte
+angemeldete Sitzung oder native Geräteabnahme behauptet. Europa/International
+ohne belastbare Metadaten nicht erfunden.
 [Vertrag und Grenzen](organization-entry-browser.md).

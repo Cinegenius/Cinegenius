@@ -1,8 +1,8 @@
 # Organisations- und Redaktionsverwaltung · 21. November 2026
 
-Geprüfter Website-Entwurf auf Basis `42b7d1eb`. Noch nicht veröffentlicht.
-Markus hat die Gliederung in Agent NEWS bestätigt; keine neue Veröffentlichung
-oder native Installation aus einer Chat-Übergabe ableiten.
+Website-Paket `69f4be8f` auf Basis `42b7d1eb` ist am 21. November 2026 veröffentlicht.
+Markus hat den gesonderten Livegang in Agent NEWS ausdrücklich mit „ok dann live“
+freigegeben. Native Umsetzung und Installation bleiben vom Auftrag ausgenommen.
 
 ## Bedienung
 
@@ -84,8 +84,15 @@ kontrollierte Prüfadapter, keine echte angemeldete Sitzung und kein natives Ger
 
 Der vollständige Produktionsbuild, ESLint, die gemeinsamen Designregeln und
 `check:i18n` mit 17 Katalogen/11.303 Schlüsseln sind bestanden. Die abschließende
-API-Suite prüft auch die bisherige Reihenfolge der Workspace-Antwort. Das ist ein
-Buildnachweis, keine Veröffentlichung.
+API-Suite prüft auch die bisherige Reihenfolge der Workspace-Antwort.
+
+Der geschützte Produktionsablauf veröffentlichte genau `69f4be8f` aus sauberem
+`main == origin/main`. Vercel meldet READY; `www.cinegenius.co` zeigt auf dieses
+Deployment. 13 echte Live-HTTP-Prüfungen bestätigen die öffentlichen Seiten,
+Anmeldeweiterleitungen mit erhaltenen Filtern und private, nicht cachebare
+API-Ablehnungen ohne Anmeldung. Keine echte angemeldete Live-Sitzung und kein
+natives Gerät geprüft. Deployment-ID, Quellenkennung und Antworten stehen im
+folgenden externen Nachweis; es gab keine Migration oder Aktivierung.
 
 Prüfbelege und endgültiger Build-/Commitstatus:
 `/srv/cinegenius/handoffs/20261121-newsroom-browser/`.

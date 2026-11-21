@@ -228,7 +228,7 @@ Verläufe und Entwürfe bleiben erhalten. Website-Nachweis/Veröffentlichungssta
 `/srv/cinegenius/handoffs/20261121-feedback-brief/receipt.json`. App-Veröffentlichung
 bleibt angehalten; kein nativer Gerätenachweis.
 
-## Redaktionsverwaltung · Entwurf vom 21. November 2026
+## Redaktionsverwaltung · veröffentlicht am 21. November 2026
 
 Bestehendes Organisationsdashboard und Adminprüfung erhalten einen gemeinsamen
 Beitragsbrowser: Land, Thema, Originalquelle, Herausgeber, Status, Suche, Datum und
@@ -236,4 +236,6 @@ Beitragsbrowser: Land, Thema, Originalquelle, Herausgeber, Status, Suche, Datum 
 erst beim Öffnen; private Bearbeitung und Freigaben unverändert. 17 Sprachen und
 20 Browserkonfigurationen plus Editorprüfung, 34 API-/SQL-Tests mit bis zu 1.007
 Einträgen und vollständiger Build bestanden.
-Noch nicht veröffentlicht. [Vertrag, API und Grenzen](organization-entry-browser.md).
+Website-Paket `69f4be8f` ist live; READY, www-Alias und 13 Live-HTTP-Prüfungen
+bestätigt. Echte angemeldete Sitzung und native Geräte nicht geprüft.
+[Vertrag, API und Grenzen](organization-entry-browser.md).

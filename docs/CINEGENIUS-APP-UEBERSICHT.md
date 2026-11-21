@@ -229,6 +229,7 @@ bleibt angehalten; kein nativer Gerätenachweis.
 Website-Entwurf mit gemeinsamem privaten Beitragsbrowser und zwei geprüften
 API-Einstiegen. Land/Thema/Originalquelle/Herausgeber/Status bleiben getrennt,
 Zahlen stammen aus derselben berechtigten Menge wie die Liste. 17 Web-Sprachen;
-keine Migration und keine neuen Rechte. Noch nicht veröffentlicht. Native
-Übernahme, Installation und Geräteabnahme sind nicht erfolgt; App-Stopp erhalten.
+keine Migration und keine neuen Rechte. Web-Schnittstellen aus `69f4be8f` sind seit
+21. November veröffentlicht. Native Übernahme, Installation und Geräteabnahme
+sind nicht erfolgt; App-Stopp erhalten. Kein echter angemeldeter Live-Gerätetest.
 [Web-Vertrag und Prüfgrenzen](organization-entry-browser.md).
