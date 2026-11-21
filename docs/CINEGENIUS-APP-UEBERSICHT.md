@@ -9,11 +9,11 @@ Diese Übersicht trennt die installierte App, ihre serverseitigen Ansichten, nat
 
 | Thema | Belegter Stand |
 | --- | --- |
-| **iPhone-App** | Letzter hier belegter Gerätestand: lokale APP-Aufgabe meldete Build **2026112007** nach Datensicherung installiert. Eine neue Installation oder vollständige Smart-/Work-/Community-Geräteabnahme zum nun veröffentlichten Serverstand `68930dd9` ist in der aktuellen WEB-Übergabe nicht belegt. Keine eigene Geräteprüfung durch diese Server-Aufgabe. |
-| **App-Server** | **Veröffentlicht:** gemeinsamer Serverstand `34373818` seit 21.11., 14:15 Uhr Berlin, Deployment `dpl_B9Y7wAAxkENkDesYwf3nyZTSDNKa` laut WEB READY. Enthält den App-Stand `68930dd9` und den Firmenlink-Release `91a508d5`; Abstammung geprüft. Die erneute Freigabe des geprüften Community-/Work-Pakets bleibt auf dessen Umfang begrenzt. Diese öffentliche Website-Erweiterung enthält keine neue native Umsetzung oder Installation; Gerätebedienung separat belegen. |
+| **iPhone-App** | Lokale APP meldet Build **2103** nach Sicherung in Installation. Kein Abschluss- oder neuer Geräteprüfbeleg in dieser Übergabe; keine TestFlight-Veröffentlichung bestätigt. Älterer bestätigter Stand dieser Dokumentation: `2026112007`. Diese Server-Aufgabe hat weder installiert noch das Gerät geprüft. |
+| **App-Server** | **Veröffentlicht:** gemeinsamer Stand `a3ff549a`, Deployment `dpl_3ykwFVsaoxKgnqVMw3L6YQuGinkE` laut WEB READY mit echtem www-Alias. Die Abstammung von `34373818`/`56974c4d` und unveränderte öffentliche Redaktionsdateien sind geprüft. Die Website-Nachprüfung bestätigt HTTP 200, Filter und zwölf erste Beiträge. Native Installation und Bedienabnahme separat belegen. |
 | **Native Navigation** | Ziel gemäß aktuellem App-Vertrag: **Shots · News · Smart · Projekte · Work**. Die gewöhnliche Website behält ihre eigene Navigation. |
 | **Obere Aktionen** | Profil, Nachrichten, Suche und Menü; App-eigene Abstände und sichere Bedienung über Kopf-/Fußbereich. |
-| **Erscheinungsbild** | Mauve wurde als unpassend zurückgemeldet; die lokale APP-Aufgabe bereitet vier Farbvorlagen vor. Noch keine neue Auswahl oder Themeänderung. Bestehende Farben werden in dieser Server-Folgearbeit nicht geändert. |
+| **Erscheinungsbild** | Sieben gewählte dunkle Optionen sind serverseitig in `a3ff549a` enthalten: Graphit, Nachtblau, Rauchgrün, Rosé, Warmer Sand, Terrakotta, Reinschwarz. Der Picker erscheint nur bei gemeldeter nativer Hintergrundfähigkeit; Community und Work verwenden dieselbe Wahl. Heller Stein und schneller Hell-/Dunkelwechsel bleiben erhalten. Ohne erste Farbwahl bleibt Mauve als bisherige Darstellung, kein achter Auswahlknopf. Gerätewirkung noch separat prüfen. |
 | **Weitere Plattformen / Veröffentlichung** | Kein aktueller Beleg für eine veröffentlichte Android-App, einen App-Store-Release oder eine eigenständige Desktop-App in dieser Bestandsaufnahme. iPad-/Mac-Kompatibilität je konkretem Build prüfen. |
 
 ## Entdecken und Community
@@ -188,3 +188,17 @@ und ohne Laufzeit-/Netzwerkfehler. Keine pauschale Fehlerfreiheit oder Liveabnah
 aller 17 Sprachen. Kein authentifizierter Account- oder nativer Gerätetest.
 Der Dokumentationsstand `56974c4d` wurde hier nachgeführt; keine erneute
 Veröffentlichung, Implementierung oder Installation durch diesen Abgleich.
+
+**Abgleich nach App-Palettenrelease · 21.11.:** `a3ff549a` ist laut WEB-Livebeleg
+mit `dpl_3ykwFVsaoxKgnqVMw3L6YQuGinkE` auf dem www-Alias READY. Diese Aufgabe
+hat die Git-Abstammung von `34373818`/`56974c4d` und die unveränderten zehn
+öffentlichen Redaktions-Programm-/Prüfdateien zusätzlich nachgelesen. WEB meldet
+öffentliche Filterseite HTTP 200 und zwölf erste Beiträge. Das ist keine neue
+vollständige Browserabnahme der sieben Paletten oder native Geräteprüfung.
+
+Build 2103 ist ausschließlich als „nach Sicherung in Installation gemeldet“
+vermerkt; Abschluss, echte Bedienung und TestFlight sind damit nicht bestätigt.
+Keine Produktänderung, neue Installation oder erneute Veröffentlichung durch
+diesen Dokumentationsabgleich. Aktueller Beleg:
+`/srv/cinegenius/handoffs/20261121-public-newsroom/after-app-palette-check.json`.
+Eigene Quellenprüfung: `/srv/cinegenius/handoffs/20261121-app-public-newsroom-handoff/after-palette-check.json`.
