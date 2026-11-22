@@ -26,8 +26,10 @@
 .focusPopover { position:absolute; z-index:30; top:calc(100% + 4px); right:0; width:min(288px,calc(100vw - 36px)); padding:12px; border:1px solid var(--cg-app-border,#ffffff21); border-radius:18px; background:var(--cg-app-surface,#1b1d23); box-shadow:0 8px 28px #0003; }
 .edit { width:100%; color:var(--cg-app-accent,#c2f135); }
 .focusSummary,.note { margin: 3px 0 8px; font-size: 12px; line-height: 17px; overflow-wrap: anywhere; color: var(--cg-app-muted,#b8b9be); }
-.status { display: flex; align-items: center; gap: 7px; font-size: 13px; color: var(--cg-app-muted,#b8b9be); }
-.status:not(:empty) { min-height: 44px; margin: 7px 0; }
+.status { display: flex; align-items: center; gap: 7px; min-height: 24px; margin: 0; font-size: 13px; line-height: 18px; color: var(--cg-app-muted,#b8b9be); }
+.results { display: flow-root; min-width: 0; }
+.placeholder { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); align-content: start; gap: 8px; overflow: hidden; pointer-events: none; }
+.placeholder > span { height: 124px; border-radius: 14px; background: color-mix(in srgb,var(--cg-app-muted,#b8b9be) 8%,transparent); }
 .error,.development { margin: 8px 0; font-size: 13px; color: var(--cg-app-muted,#b8b9be); }
 .error button { color: var(--cg-app-accent,#c2f135); }
 .landing a:focus-visible,.landing button:focus-visible { outline: 2px solid var(--cg-app-accent,#c2f135); outline-offset: -2px; }

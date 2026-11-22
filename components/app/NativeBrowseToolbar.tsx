@@ -41,13 +41,13 @@ export default function NativeBrowseToolbar({ count, countLabel, filters = [], m
     };
     const schedule = () => { if (!frame) frame = requestAnimationFrame(update); };
     const observer = new ResizeObserver(schedule); observer.observe(host); observer.observe(control);
-    window.addEventListener("scroll", schedule, { passive: true }); window.addEventListener("resize", schedule);
+    window.addEventListener("scroll", schedule, { passive: true, capture: true }); window.addEventListener("resize", schedule);
     window.visualViewport?.addEventListener("resize", schedule); window.visualViewport?.addEventListener("scroll", schedule);
     update();
     return () => {
       cancelAnimationFrame(frame); observer.disconnect(); host.style.removeProperty("height"); control.removeAttribute("data-native-rail-stuck");
       document.documentElement.style.removeProperty("--cg-app-active-rail-height");
-      window.removeEventListener("scroll", schedule); window.removeEventListener("resize", schedule);
+      window.removeEventListener("scroll", schedule, true); window.removeEventListener("resize", schedule);
       window.visualViewport?.removeEventListener("resize", schedule); window.visualViewport?.removeEventListener("scroll", schedule);
     };
   }, [native]);

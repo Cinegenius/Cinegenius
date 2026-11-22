@@ -1,37 +1,114 @@
-:global(html[data-cg-native-community-appearance="app"]) .card { scroll-margin-block:calc(var(--cg-app-chrome-clearance,88px) + var(--cg-app-active-rail-height,0px) + 12px) calc(var(--mobile-nav-clearance,96px) + var(--cg-app-genie-clearance,0px) + 12px); }
-:global(html[data-cg-native-community-appearance="app"]) .card :global([data-result-title]),
-:global(html[data-cg-native-community-appearance="app"]) .card :global([data-result-subtitle]),
-:global(html[data-cg-native-community-appearance="app"]) .card :global([data-result-price]) { display:block; max-height:none; overflow:visible; -webkit-line-clamp:unset; line-clamp:unset; white-space:normal; text-overflow:clip; overflow-wrap:anywhere; word-break:normal; }
-:global(html[data-cg-native-community-appearance="app"]) .card :global([data-result-title]) { line-height:1.35; }
-:global(html[data-cg-native-community-appearance="app"]) .card :global([data-result-subtitle]) { line-height:1.5; }
-:global(html[data-cg-native-community-appearance="app"]) .card :global([data-result-occupation]),
-:global(html[data-cg-native-community-appearance="app"]) .card :global([data-result-place]) { margin-top:3px; line-height:1.4; overflow-wrap:anywhere; }
-:global(html[data-cg-native-community-appearance="app"]) .card:global([data-native-smart-area]) { --native-domain:var(--native-domain-cinema); --native-domain-ink:var(--native-domain); }
-:global(html[data-cg-native-community-appearance="app"][data-cg-app-theme="pure"]) .card:global([data-native-smart-area]) { --native-domain:var(--native-domain-pure); --native-domain-ink:color-mix(in srgb,var(--native-domain-pure) 80%,#000); }
-:global(html[data-cg-native-community-appearance="app"]) .card:global([data-native-smart-area]) :global([data-result-type-badge]),
-:global(html[data-cg-native-community-appearance="app"]) .card:global([data-native-smart-area]) :global([data-result-placeholder]) { border-color:color-mix(in srgb,var(--native-domain) 58%,transparent); background:color-mix(in srgb,var(--native-domain) 18%,var(--cg-app-surface,#1b1d23)); color:var(--native-domain-ink); }
-:global(html[data-cg-native-community-appearance="app"]) .card:global([data-native-smart-area]) :global([data-result-type-badge]) :global(svg),
-:global(html[data-cg-native-community-appearance="app"]) .card:global([data-native-smart-area]) :global([data-result-type-badge]) :global(span),
-:global(html[data-cg-native-community-appearance="app"]) .card:global([data-native-smart-area]) :global([data-result-placeholder]) :global(svg) { color:inherit; }
-/* Beat older bundled appearance rules as well as directory/grid cover rules.
-   A single checked image keeps its complete source inside the existing frame. */
-:global(html[data-cg-native-community-appearance="app"]) .card:global([data-search-result-card][data-native-smart-area]) :global([data-result-image="photo"]):has(img) { background:linear-gradient(145deg,#ffffff1f,#ffffff06),color-mix(in srgb,var(--cg-app-surface-raised,#24262d) 65%,transparent) !important; }
-:global(html[data-cg-native-community-appearance="app"]) .card:global([data-search-result-card][data-native-smart-area]) :global([data-result-image="photo"]) :global(img) { object-fit:contain !important; object-position:center !important; transform:none !important; padding:4px !important; box-sizing:border-box !important; }
+/* Smart reuses the ordinary directory's opaque card palette and geometry.
+   These local tokens deliberately stay stable over every app background. */
+:global(html[data-cg-native-community-appearance="app"]) .card {
+  --smart-card-bg:#161a23; --smart-card-border:#2a3248;
+  --color-bg-primary:#0e1016; --color-bg-secondary:#161a23; --color-bg-elevated:#1e2330;
+  --color-border:#2a3248; --color-text-primary:#f0f2f5; --color-text-muted:#8995a8; --color-gold:#c2f135;
+  min-width:0; color:var(--color-text-primary); background:var(--smart-card-bg) !important;
+  border-color:var(--smart-card-border) !important; opacity:1;
+  -webkit-backdrop-filter:none !important; backdrop-filter:none !important;
+  scroll-margin-block:calc(var(--cg-app-active-rail-height,0px) + 12px) 12px;
+}
+:global(html[data-cg-native-community-appearance="app"][data-cg-app-theme="pure"]) .card {
+  --smart-card-bg:#fdfbf5; --smart-card-border:#ded8ce;
+  --color-bg-primary:#f7f3ea; --color-bg-secondary:#fdfbf5; --color-bg-elevated:#fffefa;
+  --color-border:#ded8ce; --color-text-primary:#0c1008; --color-text-muted:#78756e; --color-gold:#5b7a18;
+}
+:global(html[data-cg-native-community-appearance="app"]) .card.crewBrowseCard[data-result-layout="grid"] {
+  display:flex; flex-direction:row; align-items:center; align-self:stretch;
+  gap:6px; min-height:108px; height:100%; padding:8px; border-radius:16px !important;
+}
+:global(html[data-cg-native-community-appearance="app"]) .card.crewBrowseCard[data-result-layout="grid"] > div:last-child { padding:2px 0; }
+:global(html[data-cg-native-community-appearance="app"]) .crewBrowseCard .crewPhoto {
+  position:relative; flex:0 0 48px; width:48px; height:48px; overflow:hidden; border-radius:8px;
+}
+:global(html[data-cg-native-community-appearance="app"]) .crewBrowseCard .crewPhoto :global(img) { object-fit:cover !important; padding:0 !important; }
+:global(html[data-cg-native-community-appearance="app"]) .card.crewBrowseCard[data-result-layout="grid"] :global([data-result-title]) {
+  color:var(--color-text-primary); font-size:13px; line-height:1.375; font-weight:600;
+  white-space:normal; overflow-wrap:anywhere;
+}
+:global(html[data-cg-native-community-appearance="app"]) .card.crewBrowseCard[data-result-layout="grid"] :global([data-result-occupation]) {
+  display:-webkit-box; -webkit-box-orient:vertical; -webkit-line-clamp:2; line-clamp:2;
+  overflow:hidden; color:var(--color-gold); font-size:11px; line-height:1.375; font-weight:500;
+}
+:global(html[data-cg-native-community-appearance="app"]) .card.crewBrowseCard[data-result-layout="grid"] :global([data-result-place]) {
+  display:flex; align-items:center; gap:4px; margin-top:6px; min-width:0;
+  color:var(--color-text-muted); font-size:10px; line-height:1.5;
+}
+:global(html[data-cg-native-community-appearance="app"]) .card.offerBrowseCard[data-result-layout="grid"] {
+  display:flex; flex-direction:column; align-self:stretch; height:100%; padding:0;
+  overflow:hidden; border-radius:12px !important;
+}
+:global(html[data-cg-native-community-appearance="app"]) .offerBrowseCard > :global(.directory-entry-photo) {
+  position:relative; flex-shrink:0; width:100%; height:auto; aspect-ratio:3 / 2;
+  overflow:hidden; background:var(--color-bg-elevated);
+}
+:global(html[data-cg-native-community-appearance="app"]) .offerBrowseCard :global(.directory-entry-photo img) { object-fit:cover !important; object-position:50% 66%; padding:0 !important; }
+:global(html[data-cg-native-community-appearance="app"]) .offerBrowseCard :global([data-result-image="logo"] img) { object-fit:contain !important; object-position:center; }
+:global(html[data-cg-native-community-appearance="app"]) .offerBrowseCard > :global(.directory-entry-body) {
+  display:flex; flex:1; flex-direction:column; gap:4px; min-width:0; padding:10px;
+  background:var(--smart-card-bg);
+}
+:global(html[data-cg-native-community-appearance="app"]) .offerBrowseCard :global([data-result-title]) {
+  display:-webkit-box; -webkit-box-orient:vertical; -webkit-line-clamp:2; line-clamp:2;
+  min-height:2.8em; margin-bottom:2px; overflow:hidden; overflow-wrap:anywhere;
+  color:var(--color-text-primary); font-size:13px; line-height:1.4; font-weight:600;
+}
+:global(html[data-cg-native-community-appearance="app"]) .offerBrowseCard :global([data-result-subtitle]) {
+  display:flex; align-items:center; gap:4px; min-width:0; margin-top:auto;
+  color:var(--color-text-muted); font-size:11px; line-height:1.5;
+}
+:global(html[data-cg-native-community-appearance="app"]) .offerBrowseCard :global([data-result-subtitle] svg) { flex-shrink:0; }
+:global(html[data-cg-native-community-appearance="app"]) .offerBrowseCard :global([data-result-subtitle] span) { overflow:hidden; white-space:nowrap; text-overflow:ellipsis; }
+:global(html[data-cg-native-community-appearance="app"]) .offerBrowseCard :global([data-result-price]) { color:var(--color-gold); font-size:11px; line-height:1.5; font-weight:600; overflow-wrap:anywhere; }
+:global(html[data-cg-native-community-appearance="app"]) .card:focus-visible { outline:2px solid var(--color-gold); outline-offset:-3px; }
+@media(min-width:375px) {
+  :global(html[data-cg-native-community-appearance="app"]) .crewBrowseCard .crewPhoto { flex-basis:56px; width:56px; height:56px; }
+}
+@media(min-width:640px) {
+  :global(html[data-cg-native-community-appearance="app"]) .card.crewBrowseCard[data-result-layout="grid"] { gap:12px; padding:12px; }
+  :global(html[data-cg-native-community-appearance="app"]) .crewBrowseCard .crewPhoto { flex-basis:88px; width:88px; height:88px; }
+  :global(html[data-cg-native-community-appearance="app"]) .card.crewBrowseCard[data-result-layout="grid"] :global([data-result-title]) { font-size:14px; }
+  :global(html[data-cg-native-community-appearance="app"]) .card.crewBrowseCard[data-result-layout="grid"] :global([data-result-occupation]),
+  :global(html[data-cg-native-community-appearance="app"]) .card.crewBrowseCard[data-result-layout="grid"] :global([data-result-place]) { font-size:12px; }
+}
+@media(min-width:1024px) { :global(html[data-cg-native-community-appearance="app"]) .crewBrowseCard .crewPhoto { flex-basis:96px; width:96px; height:96px; } }
+@media(prefers-contrast:more) {
+  :global(html[data-cg-native-community-appearance="app"]) .card { --smart-card-border:var(--color-text-primary); --color-border:var(--color-text-primary); }
+  :global(html[data-cg-native-community-appearance="app"]) .card.crewBrowseCard[data-result-layout="grid"] { border-color:var(--color-text-primary) !important; }
+}
+@media(forced-colors:active) {
+  :global(html[data-cg-native-community-appearance="app"]) .card { --smart-card-bg:Canvas; --smart-card-border:CanvasText; --color-bg-primary:Canvas; --color-bg-elevated:Canvas; --color-border:CanvasText; --color-text-primary:CanvasText; --color-text-muted:CanvasText; --color-gold:LinkText; }
+}
 
-:global(html[data-cg-native-community-appearance="app"]) .card[data-result-layout="grid"]:is([data-search-result-card="profile"],[data-search-result-card="creator"]) > :global([data-result-image]) { aspect-ratio:1; }
-
-/* Native grid photos use their loaded source ratio: full card width without
-   letterbox padding or a cover crop. Checked media/recovery stay unchanged. */
-:global(html[data-cg-native-community-appearance="app"]) .card:global([data-search-result-card][data-native-smart-area]) > :global([data-result-image="photo"][data-result-image-mode="natural"]) {
-  display:block; width:100%; height:auto !important; min-height:0; aspect-ratio:auto !important;
-  padding:0 !important; background:transparent !important;
+/* Approved directory identities are shared by Smart's real company and list results. */
+:global(html[data-cg-native-community-appearance="app"]) .card.companyBrowseCard[data-result-layout="grid"] {
+  display:flex; flex-direction:column; gap:10px; align-self:stretch;
+  min-height:154px; height:100%; padding:12px; border-radius:12px !important;
 }
-:global(html[data-cg-native-community-appearance="app"]) .card:global([data-search-result-card][data-native-smart-area]) > :global([data-result-image="photo"][data-result-image-mode="natural"]) :global(img) {
-  display:block; position:static !important; inset:auto !important;
-  width:100% !important; height:auto !important; max-height:none !important;
-  aspect-ratio:auto !important; object-fit:contain !important; object-position:center !important;
-  padding:0 !important; margin:0; transform:none !important;
-}
-:global(html[data-cg-native-community-appearance="app"]) .card:global([data-search-result-card][data-native-smart-area]) > :global([data-result-image="photo"][data-result-image-mode="natural"]) > :global([role="img"]) {
-  width:100% !important; height:auto !important; min-height:64px;
-}
+:global(html[data-cg-native-community-appearance="app"]) .companyBrowseCard > :global([data-result-image="logo"]) { flex:0 0 44px; width:120px; max-width:100%; height:44px; }
+:global(html[data-cg-native-community-appearance="app"]) .companyBrowseCard :global([data-result-image="logo"] img) { width:100%; height:100%; object-fit:contain !important; object-position:left center; padding:0 !important; }
+:global(html[data-cg-native-community-appearance="app"]) .companyBrowseCard > :global(.directory-entry-body) { display:flex; flex:1; flex-direction:column; gap:5px; min-width:0; padding:0 !important; }
+:global(html[data-cg-native-community-appearance="app"]) .companyBrowseCard :global([data-result-title]) { color:var(--color-text-primary); font-size:13px; line-height:1.4; font-weight:600; overflow-wrap:anywhere; }
+:global(html[data-cg-native-community-appearance="app"]) .companyBrowseCard :global([data-result-subtitle]) { display:flex; align-items:center; gap:4px; min-width:0; color:var(--color-text-muted); font-size:11px; line-height:1.5; }
+:global(html[data-cg-native-community-appearance="app"]) .companyBrowseCard :global([data-result-subtitle] svg) { flex-shrink:0; }
+:global(html[data-cg-native-community-appearance="app"]) .companyBrowseCard :global([data-result-subtitle] span) { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+:global(html[data-cg-native-community-appearance="app"]) .card.rowCard[data-result-layout="row"] { display:flex; align-items:center; align-self:stretch; gap:12px; height:auto; min-height:86px; margin:0; padding:10px 12px; border:1px solid var(--smart-card-border); border-radius:12px; overflow:hidden; }
+:global(html[data-cg-native-community-appearance="app"]) .rowCard .rowPhoto { position:relative; flex:0 0 64px; width:64px; height:64px; overflow:hidden; border-radius:8px; }
+:global(html[data-cg-native-community-appearance="app"]) .rowCard .rowPhoto :global(img) { object-fit:cover !important; padding:0 !important; }
+:global(html[data-cg-native-community-appearance="app"]) .rowCard > :global(.directory-entry-body) { display:flex; flex:1; flex-direction:column; gap:3px; min-width:0; padding:0; }
+:global(html[data-cg-native-community-appearance="app"]) .rowCard :global([data-result-title]) { display:-webkit-box; -webkit-box-orient:vertical; -webkit-line-clamp:2; line-clamp:2; overflow:hidden; overflow-wrap:anywhere; color:var(--color-text-primary); font-size:13px; line-height:1.4; font-weight:600; }
+:global(html[data-cg-native-community-appearance="app"]) .rowCard :global([data-result-subtitle]) { display:flex; align-items:center; gap:4px; min-width:0; color:var(--color-text-muted); font-size:11px; line-height:1.5; }
+:global(html[data-cg-native-community-appearance="app"]) .rowCard :global([data-result-subtitle] svg) { flex-shrink:0; }
+:global(html[data-cg-native-community-appearance="app"]) .rowCard :global([data-result-subtitle] span) { overflow:hidden; white-space:nowrap; text-overflow:ellipsis; }
+:global(html[data-cg-native-community-appearance="app"]) .rowCard :global([data-result-price]) { color:var(--color-gold); font-size:11px; line-height:1.5; font-weight:600; overflow-wrap:anywhere; }
+:global(html[data-cg-native-community-appearance="app"]) .card.crewRowCard[data-result-layout="row"] { min-height:58px; padding:10px 16px; }
+:global(html[data-cg-native-community-appearance="app"]) .crewRowCard .rowPhoto { flex-basis:36px; width:36px; height:36px; border-radius:50%; }
+:global(html[data-cg-native-community-appearance="app"]) .crewRowCard :global([data-result-title]) { display:block; color:var(--color-text-primary); font-size:14px; line-height:20px; white-space:nowrap; text-overflow:ellipsis; }
+:global(html[data-cg-native-community-appearance="app"]) .crewRowCard :global([data-result-occupation]) { color:var(--color-text-muted); font-size:11px; line-height:16px; white-space:normal; overflow-wrap:anywhere; hyphens:auto; }
+:global(html[data-cg-native-community-appearance="app"]) .crewRowCard .crewRowPlace { display:none; }
+:global(html[data-cg-native-community-appearance="app"]) .card.companyRowCard[data-result-layout="row"] { min-height:76px; }
+:global(html[data-cg-native-community-appearance="app"]) .companyRowCard .rowPhoto { height:46px; }
+:global(html[data-cg-native-community-appearance="app"]) .companyRowCard .rowPhoto :global(img) { object-fit:contain !important; }
+:global(html[data-cg-native-community-appearance="app"]) .card.crewBrowseCard[data-result-layout="grid"] :global([data-result-occupation]) { display:block; max-height:none; overflow:visible; -webkit-line-clamp:unset; line-clamp:unset; overflow-wrap:anywhere; word-break:normal; hyphens:auto; }
+@media(min-width:640px) { :global(html[data-cg-native-community-appearance="app"]) .crewRowCard .crewRowPlace { display:flex; flex:0 0 128px; align-items:center; gap:4px; color:var(--color-text-muted); font-size:12px; } :global(html[data-cg-native-community-appearance="app"]) .crewRowCard .crewRowPlace span { overflow:hidden; white-space:nowrap; text-overflow:ellipsis; } }

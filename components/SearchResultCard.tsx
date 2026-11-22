@@ -4,6 +4,8 @@ import { TranslatedText } from "@/components/ContentTranslation";
 
 import MediaImage from "@/components/MediaImage";
 import ListingImage from "@/components/ListingImage";
+import ProfileCardPhoto from "@/components/ProfileCardPhoto";
+import CompanyLogo from "@/components/CompanyLogo";
 import { ChevronRight, Briefcase, Building2, Car, MapPin, Package, PawPrint, User, Users, Film, Newspaper } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import Link from "next/link";
@@ -49,9 +51,97 @@ export default function ResultCard({ result, compact = false, showEvidence = fal
   const Icon = cfg.icon;
   const isProfile = result.type === "profile" || result.type === "creator";
   const nativeCrew = nativeAppearance && isProfile;
+  const isCompany = result.type === "company" || result.type === "organization";
   const nativeArea = nativeAppearance ? nativeSmartAreaForType(result.type) : null;
-  const naturalPhoto = nativeAppearance && !compact && !!result.image && !["company", "organization"].includes(result.type);
   const PreviewImage = ["location", "vehicle", "prop", "animal"].includes(result.type) ? ListingImage : MediaImage;
+
+  if (nativeAppearance && compact && row) {
+    const occupation = nativeCrew ? result.crewPreview?.occupation : undefined;
+    const place = nativeCrew ? result.crewPreview?.place : result.subtitle;
+    return <Link href={cfg.href(result.id)} data-search-result-card={result.type}
+      data-native-crew-preview={nativeCrew ? "true" : undefined} data-native-browse-row="true"
+      data-native-smart-area={nativeArea ?? undefined} data-result-layout="row"
+      style={nativeArea ? nativeSmartColorStyle(nativeArea) as CSSProperties : undefined}
+      aria-label={[result.title, occupation, place, result.priceLabel].filter(Boolean).join(", ")}
+      className={`${styles.card} ${styles.rowCard} ${nativeCrew ? styles.crewRowCard : ""} ${isCompany ? styles.companyRowCard : ""} directory-entry group`}>
+      <div data-result-image={isCompany ? "logo" : "photo"} className={styles.rowPhoto}>
+        {nativeCrew ? <ProfileCardPhoto src={result.image ?? ""} name={result.title} className="h-full w-full rounded-full border border-border/60" sizes="36px" />
+          : isCompany ? <CompanyLogo src={result.image} name={result.title} className="h-full w-full" />
+          : result.image ? <PreviewImage src={result.image} alt={result.title} fill mediaSize="thumbnail" sizes="64px" className="object-cover" />
+          : <div data-result-placeholder className="flex h-full items-center justify-center text-text-muted"><Icon size={24} aria-hidden="true" /></div>}
+      </div>
+      <div className="directory-entry-body">
+        <h3 data-result-title title={result.title} className="directory-entry-title"><SearchResultTitle result={result} /></h3>
+        {nativeCrew && occupation && <p data-result-occupation title={occupation}>{occupation}</p>}
+        {!nativeCrew && place && <p data-result-subtitle className="directory-entry-place"><MapPin size={11} aria-hidden="true" /><span title={place}>{place}</span></p>}
+        {!nativeCrew && showEvidence && result.evidence && <p className="text-xs text-text-muted">{uiText(`UnifiedSearch.discovery.evidence.${result.evidence}`)}</p>}
+        {!nativeCrew && result.nearby && <p className="text-xs text-text-muted">{uiText("UnifiedSearch.nearbyDistance", { distance: result.nearby.distanceKm.toLocaleString(uiLocale), place: result.nearby.origin })}</p>}
+        {!isProfile && !isCompany && result.type !== "animal" && (result.priceLabel || result.price > 0) && <p data-result-price className="directory-entry-price">
+          {result.priceLabel ?? uiText("Ui.text_4519fabedb2cbd", { value1: String(result.price.toLocaleString(uiLocale)) })}
+        </p>}
+      </div>
+      {nativeCrew && place && <p data-result-place className={styles.crewRowPlace}><MapPin size={10} aria-hidden="true" /><span title={place}>{place}</span></p>}
+    </Link>;
+  }
+
+  // The app uses the same compact Crew identity and fixed offer-photo geometry
+  // as the public directory, while retaining Smart's permission-checked results.
+  if (nativeCrew && !compact) {
+    const occupation = result.crewPreview?.occupation;
+    const place = result.crewPreview?.place;
+    return <Link href={cfg.href(result.id)} data-search-result-card={result.type}
+      data-native-crew-preview="true" data-native-smart-area={nativeArea ?? undefined} data-result-layout="grid"
+      style={nativeArea ? nativeSmartColorStyle(nativeArea) as CSSProperties : undefined}
+      aria-label={[result.title, occupation, place].filter(Boolean).join(", ")}
+      className={`${styles.card} ${styles.crewBrowseCard} browse-card card-hover group flex min-w-0 items-center gap-1.5 p-2 sm:gap-3 sm:p-3`}>
+      <div data-result-image="photo" className={styles.crewPhoto}>
+        <ProfileCardPhoto src={result.image ?? ""} name={result.title}
+          className="h-full w-full rounded-lg border border-border/60"
+          sizes="(min-width: 1024px) 96px, (min-width: 640px) 88px, (min-width: 375px) 56px, 48px" />
+      </div>
+      <div className="min-w-0 flex-1 py-0.5">
+        <div className="flex items-start justify-between gap-1 mb-0.5">
+          <h3 data-result-title title={result.title} className="min-w-0 break-words [overflow-wrap:anywhere] font-semibold text-text-primary text-[13px] leading-snug sm:text-sm">{result.title}</h3>
+        </div>
+        {occupation && <p data-result-occupation title={occupation} className="line-clamp-2 text-[11px] leading-snug text-gold font-medium sm:text-xs">{occupation}</p>}
+        {place && <p data-result-place className="mt-1.5 flex min-w-0 items-center gap-1 text-[10px] text-text-muted sm:text-xs">
+          <MapPin size={11} className="shrink-0" aria-hidden="true" /><span title={place} className="truncate">{place}</span>
+        </p>}
+      </div>
+    </Link>;
+  }
+  if (nativeAppearance && !compact && isCompany) {
+    return <Link href={cfg.href(result.id)} data-search-result-card={result.type}
+      data-native-smart-area={nativeArea ?? undefined} data-result-layout="grid"
+      style={nativeArea ? nativeSmartColorStyle(nativeArea) as CSSProperties : undefined}
+      className={`${styles.card} ${styles.companyBrowseCard} browse-card directory-entry directory-company group`}>
+      <div data-result-image="logo"><CompanyLogo src={result.image} name={result.title} className="h-full w-full" /></div>
+      <div className="directory-entry-body">
+        <h3 data-result-title className="directory-entry-title" title={result.title}><SearchResultTitle result={result} /></h3>
+        {result.subtitle && <p data-result-subtitle className="directory-entry-place"><MapPin size={11} aria-hidden="true" /><span title={result.subtitle}>{result.subtitle}</span></p>}
+      </div>
+    </Link>;
+  }
+  if (nativeAppearance && !compact) {
+    return <Link href={cfg.href(result.id)} data-search-result-card={result.type}
+      data-native-smart-area={nativeArea ?? undefined} data-result-layout="grid"
+      style={nativeArea ? nativeSmartColorStyle(nativeArea) as CSSProperties : undefined}
+      className={`${styles.card} ${styles.offerBrowseCard} directory-entry browse-card group`}>
+      <div data-result-image={result.type === "company" || result.type === "organization" ? "logo" : "photo"} className="directory-entry-photo">
+        {result.image ? <PreviewImage src={result.image} alt={result.title} fill mediaSize="thumbnail"
+          sizes="(min-width: 1024px) 25vw, (min-width: 768px) 33vw, 50vw"
+          className={result.type === "company" || result.type === "organization" ? "object-contain" : "object-cover"} />
+          : <div data-result-placeholder className="flex h-full items-center justify-center text-text-muted"><Icon size={24} aria-hidden="true" /></div>}
+      </div>
+      <div className="directory-entry-body">
+        <h3 data-result-title className="directory-entry-title" title={result.title}><SearchResultTitle result={result} /></h3>
+        <p data-result-subtitle className="directory-entry-place"><MapPin size={11} aria-hidden="true" /><span title={result.subtitle}>{result.subtitle}</span></p>
+        {result.type !== "animal" && (result.priceLabel || result.price > 0) && <p data-result-price className="directory-entry-price font-bold">
+          {result.priceLabel ?? uiText("Ui.text_4519fabedb2cbd", { value1: String(result.price.toLocaleString(uiLocale)) })}
+        </p>}
+      </div>
+    </Link>;
+  }
 
   return (
     <Link
@@ -64,10 +154,10 @@ export default function ResultCard({ result, compact = false, showEvidence = fal
       className={`${styles.card} ${row ? "smart-result-row" : ""} group flex min-w-0 bg-bg-secondary border border-border rounded-xl overflow-hidden hover:border-gold/40 transition-colors ${compact ? "items-center gap-2.5 p-2" : "flex-col hover:shadow-lg hover:shadow-black/20"}`}
     >
       {/* Image */}
-      <div data-result-image={result.type === "company" || result.type === "organization" ? "logo" : "photo"} data-result-image-mode={naturalPhoto ? "natural" : undefined} className={`${row && isProfile ? "smart-result-portrait" : ""} relative bg-bg-elevated overflow-hidden ${compact ? "flex h-12 w-12 shrink-0 items-center justify-center rounded-md" : "aspect-video"}`}>
+      <div data-result-image={result.type === "company" || result.type === "organization" ? "logo" : "photo"} className={`${row && isProfile ? "smart-result-portrait" : ""} relative bg-bg-elevated overflow-hidden ${compact ? "flex h-12 w-12 shrink-0 items-center justify-center rounded-md" : "aspect-video"}`}>
         {result.image ? (
           <PreviewImage
-            {...(compact ? { width: 48, height: 48 } : naturalPhoto ? { width: 640, height: 640 } : { fill: true })}
+            {...(compact ? { width: 48, height: 48 } : { fill: true })}
             sizes={compact ? "48px" : "(max-width: 639px) 50vw, (max-width: 1023px) 33vw, (max-width: 1279px) 25vw, 240px"} mediaSize="thumbnail"
             src={result.image}
             alt={result.title}

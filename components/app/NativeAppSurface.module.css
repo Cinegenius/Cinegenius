@@ -1,10 +1,4 @@
 /* Presentation only. The same server pages, forms and permissions remain active. */
-:global(html[data-cg-native-community-appearance="app"]) > :global(body) > main.surface:global(.site-main[data-native-app-surface="v1"]) {
-  min-width: 0;
-  min-height: 100dvh;
-  padding-top: var(--site-header-height) !important;
-  padding-bottom: calc(var(--mobile-nav-clearance) + var(--cg-app-genie-clearance)) !important;
-}
 :global(html[data-cg-native-community-appearance="app"]) .surface :global(.smart-result-list) { padding:0; border:0; border-radius:0; background:transparent; }
 
 /* One viewport canvas also continues behind detail pages and their header. */
@@ -105,3 +99,205 @@
 }
 
 :global(html[data-cg-native-community-appearance="app"]) .surface :global([data-native-inbox-contacts]) { padding-bottom:calc(12px + var(--cg-app-genie-clearance,0px)); }
+
+/* Approved directory cards keep the website's opaque surface over every app
+   canvas. Scope both the native shell and its existing result structures so
+   public website cards and detail galleries retain their own presentation. */
+:global(html[data-cg-native-community-appearance="app"]) .surface[data-native-app-surface="v1"] {
+  --native-directory-card-bg:#161a23; --native-directory-card-border:#2a3248;
+  --native-directory-card-photo:#1e2330; --native-directory-card-primary:#0e1016;
+  --native-directory-card-title:#f0f2f5; --native-directory-card-muted:#8995a8;
+  --native-directory-card-accent:#c2f135;
+}
+:global(html[data-cg-native-community-appearance="app"][data-cg-app-theme="pure"]) .surface[data-native-app-surface="v1"] {
+  --native-directory-card-bg:#fdfbf5; --native-directory-card-border:#ded8ce;
+  --native-directory-card-photo:#fffefa; --native-directory-card-primary:#f7f3ea;
+  --native-directory-card-title:#0c1008; --native-directory-card-muted:#78756e;
+  --native-directory-card-accent:#5b7a18;
+}
+:global(html[data-cg-native-community-appearance="app"]) .surface[data-native-app-surface="v1"] :global(:is(.directory-cards,.directory-list,div:has(> [data-native-crew-directory-card]))) {
+  --color-bg-primary:var(--native-directory-card-primary);
+  --color-bg-secondary:var(--native-directory-card-bg);
+  --color-bg-elevated:var(--native-directory-card-photo);
+  --color-border:var(--native-directory-card-border);
+  --color-text-primary:var(--native-directory-card-title);
+  --color-text-muted:var(--native-directory-card-muted);
+  --color-gold:var(--native-directory-card-accent);
+  min-width:0;
+}
+:global(html[data-cg-native-community-appearance="app"]) .surface[data-native-app-surface="v1"] :global(:is(.directory-cards,div:has(> [data-native-crew-directory-card="grid"]))) {
+  display:grid; grid-template-columns:repeat(2,minmax(0,1fr)) !important;
+  gap:10px !important; align-items:stretch;
+}
+:global(html[data-cg-native-community-appearance="app"]) .surface[data-native-app-surface="v1"] :global(:is(.directory-cards > .directory-entry,.directory-list > .directory-entry,[data-native-crew-directory-card])) {
+  min-width:0; color:var(--native-directory-card-title);
+  background:var(--native-directory-card-bg) !important;
+  border-color:var(--native-directory-card-border) !important;
+  opacity:1; box-shadow:none;
+  -webkit-backdrop-filter:none !important; backdrop-filter:none !important;
+}
+:global(html[data-cg-native-community-appearance="app"]) .surface[data-native-app-surface="v1"] :global(.directory-cards > .directory-entry) {
+  display:flex; flex-direction:column; align-self:stretch; height:100%;
+  overflow:hidden; border:1px solid var(--native-directory-card-border);
+  border-radius:12px !important;
+}
+:global(html[data-cg-native-community-appearance="app"]) .surface[data-native-app-surface="v1"] :global(.directory-cards .directory-entry-link) {
+  display:flex; flex:1; flex-direction:column; min-width:0; height:auto;
+}
+:global(html[data-cg-native-community-appearance="app"]) .surface[data-native-app-surface="v1"] :global(.directory-cards .directory-entry-photo) {
+  position:relative; flex-shrink:0; width:100%; height:auto; aspect-ratio:3 / 2;
+  overflow:hidden; background:var(--native-directory-card-photo);
+}
+:global(html[data-cg-native-community-appearance="app"]) .surface[data-native-app-surface="v1"] :global(:is(.directory-cards,.directory-list) .directory-entry-photo img) {
+  object-fit:cover !important; padding:0 !important;
+}
+:global(html[data-cg-native-community-appearance="app"]) .surface[data-native-app-surface="v1"] :global(.directory-cards .directory-entry-body) {
+  display:flex; flex:1; flex-direction:column; gap:4px; min-width:0;
+  padding:10px; background:var(--native-directory-card-bg);
+}
+:global(html[data-cg-native-community-appearance="app"]) .surface[data-native-app-surface="v1"] :global(:is(.directory-cards,.directory-list) .directory-entry-title) {
+  display:-webkit-box; -webkit-box-orient:vertical; -webkit-line-clamp:2; line-clamp:2;
+  max-height:none; overflow:hidden; white-space:normal; text-overflow:clip;
+  overflow-wrap:anywhere; color:var(--native-directory-card-title);
+  font-size:13px; line-height:1.4; font-weight:600;
+}
+:global(html[data-cg-native-community-appearance="app"]) .surface[data-native-app-surface="v1"] :global(.directory-cards .directory-entry-title) { min-height:2.8em; margin-bottom:2px; }
+:global(html[data-cg-native-community-appearance="app"]) .surface[data-native-app-surface="v1"] :global(:is(.directory-cards,.directory-list) .directory-entry-place) {
+  display:flex; align-items:center; gap:4px; min-width:0;
+  color:var(--native-directory-card-muted); font-size:11px; line-height:1.5;
+}
+:global(html[data-cg-native-community-appearance="app"]) .surface[data-native-app-surface="v1"] :global(.directory-cards .directory-entry-place) { margin-top:auto; }
+:global(html[data-cg-native-community-appearance="app"]) .surface[data-native-app-surface="v1"] :global(:is(.directory-cards,.directory-list) .directory-entry-place span) {
+  display:block; min-width:0; overflow:hidden; white-space:nowrap; text-overflow:ellipsis;
+}
+:global(html[data-cg-native-community-appearance="app"]) .surface[data-native-app-surface="v1"] :global(:is(.directory-cards,.directory-list) .directory-entry-price) {
+  color:var(--native-directory-card-accent); font-size:11px; line-height:1.5;
+  font-weight:600; overflow-wrap:anywhere;
+}
+
+/* The dedicated Crew markers are present before the legacy native recognizer
+   runs. Higher specificity also defeats its vertical 60px portrait treatment. */
+:global(html[data-cg-native-community-appearance="app"]) .surface[data-native-app-surface="v1"] :global([data-native-crew-directory-card="grid"]) {
+  display:flex; flex-direction:row; align-items:center; align-self:stretch;
+  gap:6px !important; min-height:108px; height:100%; padding:8px !important;
+  overflow:hidden; border:1px solid var(--native-directory-card-border);
+  border-radius:16px !important;
+}
+:global(html[data-cg-native-community-appearance="app"]) .surface[data-native-app-surface="v1"] :global([data-native-crew-directory-card="grid"] > [data-crew-photo]) {
+  flex:0 0 48px; width:48px !important; height:48px !important;
+  border:1px solid var(--native-directory-card-border) !important;
+  border-radius:8px !important;
+}
+:global(html[data-cg-native-community-appearance="app"]) .surface[data-native-app-surface="v1"] :global([data-native-crew-directory-card] > [data-crew-photo] img) {
+  width:100% !important; height:100% !important; object-fit:cover !important;
+  object-position:var(--native-crew-photo-position,50% 33%) !important;
+  transform-origin:var(--native-crew-photo-transform-origin,50% 33%) !important;
+  transform:var(--native-crew-photo-transform,scale(1)) !important;
+  padding:0 !important;
+}
+:global(html[data-cg-native-community-appearance="app"]) .surface[data-native-app-surface="v1"] :global([data-native-crew-directory-card="grid"] > div:last-child) {
+  flex:1; min-width:0; padding:2px 0 !important;
+}
+:global(html[data-cg-native-community-appearance="app"]) .surface[data-native-app-surface="v1"] :global([data-native-crew-directory-card="grid"] h3) {
+  margin:0; color:var(--native-directory-card-title);
+  font-size:13px !important; line-height:1.375 !important; font-weight:600;
+  letter-spacing:normal; white-space:normal; overflow-wrap:anywhere;
+}
+:global(html[data-cg-native-community-appearance="app"]) .surface[data-native-app-surface="v1"] :global([data-native-crew-directory-card="grid"] [data-native-crew-directory-role]) {
+  display:block; -webkit-line-clamp:unset; line-clamp:unset;
+  max-height:none; overflow:visible; white-space:normal; text-overflow:clip;
+  overflow-wrap:anywhere; word-break:normal; hyphens:auto;
+  margin-top:0; color:var(--native-directory-card-accent);
+  font-size:11px !important; line-height:1.375 !important; font-weight:500;
+}
+:global(html[data-cg-native-community-appearance="app"]) .surface[data-native-app-surface="v1"] :global([data-native-crew-directory-card="grid"] [data-native-crew-directory-place]) {
+  display:flex; align-items:center; gap:4px; min-width:0; margin-top:6px;
+  color:var(--native-directory-card-muted); font-size:10px !important; line-height:1.5;
+}
+:global(html[data-cg-native-community-appearance="app"]) .surface[data-native-app-surface="v1"] :global([data-native-crew-directory-card="grid"] [data-native-crew-directory-place] span) {
+  display:block; min-width:0; overflow:hidden; white-space:nowrap; text-overflow:ellipsis;
+}
+
+/* Website list geometry keeps the entire row linked. Buttons retain their
+   existing separate permission checks and touch targets. */
+:global(html[data-cg-native-community-appearance="app"]) .surface[data-native-app-surface="v1"] :global(:is(.directory-list,div:has(> [data-native-crew-directory-card="row"]))) {
+  min-width:0; overflow:hidden; border:1px solid var(--native-directory-card-border);
+  border-radius:12px !important; background:var(--native-directory-card-bg) !important;
+}
+:global(html[data-cg-native-community-appearance="app"]) .surface[data-native-app-surface="v1"] :global(.directory-list > .directory-entry) {
+  display:flex; align-items:center; gap:4px; padding:10px 12px;
+  border-bottom:1px solid var(--native-directory-card-border);
+}
+:global(html[data-cg-native-community-appearance="app"]) .surface[data-native-app-surface="v1"] :global(.directory-list > .directory-entry:last-child) { border-bottom:0; }
+:global(html[data-cg-native-community-appearance="app"]) .surface[data-native-app-surface="v1"] :global(.directory-list .directory-entry-link) {
+  display:flex; flex:1; align-items:center; gap:12px; min-width:0; min-height:64px;
+}
+:global(html[data-cg-native-community-appearance="app"]) .surface[data-native-app-surface="v1"] :global(.directory-list .directory-entry-photo) {
+  position:relative; flex:0 0 64px; width:64px; height:64px;
+  overflow:hidden; border-radius:8px; background:var(--native-directory-card-photo);
+}
+:global(html[data-cg-native-community-appearance="app"]) .surface[data-native-app-surface="v1"] :global(.directory-list .directory-entry-body) {
+  display:flex; flex:1; flex-direction:column; gap:3px; min-width:0;
+  padding:0; background:var(--native-directory-card-bg);
+}
+:global(html[data-cg-native-community-appearance="app"]) .surface[data-native-app-surface="v1"] :global([data-native-crew-directory-card="row"]) {
+  display:flex; align-items:center; gap:12px; min-height:58px;
+  padding:10px 16px !important; border:0; border-radius:0 !important;
+}
+:global(html[data-cg-native-community-appearance="app"]) .surface[data-native-app-surface="v1"] :global([data-native-crew-directory-card="row"] + [data-native-crew-directory-card="row"]) { border-top:1px solid var(--native-directory-card-border); }
+:global(html[data-cg-native-community-appearance="app"]) .surface[data-native-app-surface="v1"] :global([data-native-crew-directory-card="row"] > [data-crew-photo]) {
+  flex:0 0 36px; width:36px !important; height:36px !important; border-radius:50% !important;
+}
+:global(html[data-cg-native-community-appearance="app"]) .surface[data-native-app-surface="v1"] :global([data-native-crew-directory-card="row"] > div:nth-child(2)) { flex:1; min-width:0; }
+:global(html[data-cg-native-community-appearance="app"]) .surface[data-native-app-surface="v1"] :global([data-native-crew-directory-card="row"] > div:nth-child(2) > div > span:first-child) {
+  overflow:hidden; white-space:nowrap; text-overflow:ellipsis;
+  color:var(--native-directory-card-title); font-size:14px; line-height:20px; font-weight:600;
+}
+:global(html[data-cg-native-community-appearance="app"]) .surface[data-native-app-surface="v1"] :global([data-native-crew-directory-card="row"] [data-native-crew-directory-role]) {
+  margin:0; overflow:visible; white-space:normal; overflow-wrap:anywhere; word-break:normal; hyphens:auto;
+  color:var(--native-directory-card-muted); font-size:11px; line-height:16px;
+}
+
+/* Logos remain complete and use their existing CompanyLogo recovery state. */
+:global(html[data-cg-native-community-appearance="app"]) .surface[data-native-app-surface="v1"] :global(.directory-cards > .directory-company) { min-height:154px; padding:12px; }
+:global(html[data-cg-native-community-appearance="app"]) .surface[data-native-app-surface="v1"] :global(.directory-cards .directory-company > .directory-entry-link) { gap:10px; }
+:global(html[data-cg-native-community-appearance="app"]) .surface[data-native-app-surface="v1"] :global(.directory-cards .directory-company-logo) { flex-shrink:0; width:120px; max-width:100%; height:44px; }
+:global(html[data-cg-native-community-appearance="app"]) .surface[data-native-app-surface="v1"] :global(.directory-company-logo img) { object-fit:contain !important; object-position:left center; padding:0 !important; }
+:global(html[data-cg-native-community-appearance="app"]) .surface[data-native-app-surface="v1"] :global(.directory-cards .directory-company .directory-entry-body) { gap:5px; padding:0; }
+:global(html[data-cg-native-community-appearance="app"]) .surface[data-native-app-surface="v1"] :global(.directory-cards .directory-company .directory-entry-place) { margin-top:0; }
+:global(html[data-cg-native-community-appearance="app"]) .surface[data-native-app-surface="v1"] :global(.directory-list > .directory-company) { min-height:76px; }
+:global(html[data-cg-native-community-appearance="app"]) .surface[data-native-app-surface="v1"] :global(.directory-list .directory-company-logo) { flex:0 0 64px; width:64px; height:46px; }
+:global(html[data-cg-native-community-appearance="app"]) .surface[data-native-app-surface="v1"] :global(.directory-list .directory-company > .directory-entry-link) { gap:14px; min-height:54px; }
+
+@media(min-width:375px) {
+  :global(html[data-cg-native-community-appearance="app"]) .surface[data-native-app-surface="v1"] :global([data-native-crew-directory-card="grid"] > [data-crew-photo]) { flex-basis:56px; width:56px !important; height:56px !important; }
+}
+@media(max-width:359px) {
+  :global(html[data-cg-native-community-appearance="app"]) .surface[data-native-app-surface="v1"] :global([data-native-crew-directory-card="grid"] [data-native-crew-directory-role]) { -webkit-line-clamp:unset; line-clamp:unset; }
+}
+@media(prefers-contrast:more) {
+  :global(html[data-cg-native-community-appearance="app"]) .surface[data-native-app-surface="v1"] { --native-directory-card-border:var(--native-directory-card-title) !important; }
+}
+@media(forced-colors:active) {
+  :global(html[data-cg-native-community-appearance="app"]) .surface[data-native-app-surface="v1"] {
+    --native-directory-card-bg:Canvas !important; --native-directory-card-border:CanvasText !important;
+    --native-directory-card-photo:Canvas !important; --native-directory-card-primary:Canvas !important;
+    --native-directory-card-title:CanvasText !important; --native-directory-card-muted:CanvasText !important;
+    --native-directory-card-accent:LinkText !important;
+  }
+}
+
+/* One measured app viewport leaves the fixed header, default Genie row and dock
+   outside content. Native-only fallbacks reserve the same rows before effects. */
+:global(html[data-cg-native-community-appearance="app"]):has(main.surface:global([data-native-app-surface="v1"])),
+:global(html[data-cg-native-community-appearance="app"]) > :global(body):has(main.surface:global([data-native-app-surface="v1"])) { height:100%; overflow:hidden; }
+:global(html[data-cg-native-community-appearance="app"]) main.surface:global(.site-main[data-native-app-surface="v1"]) {
+  position:fixed; left:0; right:0; bottom:auto;
+  top:var(--cg-app-content-top,calc(var(--cg-app-safe-top,env(safe-area-inset-top,0px)) + 80px));
+  height:var(--cg-app-content-height,max(0px,calc(100dvh - var(--cg-app-safe-top,env(safe-area-inset-top,0px)) - var(--mobile-safe-area-height,var(--cg-app-safe-bottom,env(safe-area-inset-bottom,0px))) - 240px)));
+  min-height:0 !important; max-height:none; min-width:0;
+  padding-top:12px !important; padding-bottom:12px !important;
+  overflow-y:auto; overflow-x:hidden; overscroll-behavior-y:contain;
+  scroll-padding-top:calc(var(--cg-app-active-rail-height,0px) + 12px); scroll-padding-bottom:12px;
+  -webkit-overflow-scrolling:touch;
+}

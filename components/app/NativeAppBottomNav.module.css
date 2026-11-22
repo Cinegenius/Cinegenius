@@ -27,7 +27,7 @@
 .track { position: relative; display: grid; grid-template-columns: repeat(5, minmax(44px, 1fr)); isolation: isolate; min-height: 52px; }
 .indicator { position: absolute; z-index: -1; top: 0; bottom: 0; left: 0; width: 20%; border: 1px solid var(--native-nav-border); border-radius: 25px; background: var(--native-nav-raised); background: color-mix(in srgb, var(--native-nav-ink) 9%, transparent); transform: translateX(calc(var(--native-nav-index) * 100%)); transition: opacity 120ms, background-color 160ms, box-shadow 160ms; pointer-events: none; }
 .item { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; min-width: 44px; min-height: 52px; padding: 5px 2px; border-radius: 25px; color: var(--native-nav-muted); text-align: center; text-decoration: none; touch-action: pan-y; -webkit-tap-highlight-color: transparent; transition: color 150ms ease, background-color 150ms ease, transform 150ms ease; }
-.item svg { flex-shrink: 0; stroke-width: 1.7; }
+.item svg { flex-shrink: 0; stroke-width: 2; }
 .label { display: block; max-width: 100%; font-size: 9px; line-height: 12px; font-weight: 600; overflow-wrap: anywhere; hyphens: auto; }
 .item.smart, .item[aria-current="page"] { color: var(--native-nav-accent); }
 .item:hover { background: color-mix(in srgb, var(--native-nav-ink) 5%, transparent); }

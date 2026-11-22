@@ -27,13 +27,14 @@ import { filterProviderProfiles,isProviderFilter,CREW_PROVIDER_FILTER,LOCATION_P
 import EmptyState from "@/components/EmptyState";
 import MobileBrowseControls,{ BrowseRoleFilter,MobileFilterField,MobileFilterSelect,type BrowseChip } from "@/components/MobileBrowseControls";
 import ProfileCardPhoto from "@/components/ProfileCardPhoto";
+import { useNativeAppAppearance } from "@/lib/use-native-app-appearance";
 import ProviderQuickFilters from "@/components/ProviderQuickFilters";
 import { compareCreatorNames } from "@/lib/creator-directory-order";
 import { departments,getDepartmentRoleLabel,getDepartmentRoleFormLabels,getDeptLabel,getOccupationSearchTerms,taxonomyLabel } from "@/lib/departments";
 import { gripSearchTerms,isGripDepartmentSearch,isGripOccupation,normalizeOccupation } from "@/lib/gripTaxonomy";
 import { occupationById,occupationCatalogue,type PrimaryOccupation } from "@/lib/primary-occupation";
 import type { ProfileFocalPoint } from "@/lib/profile-cover";
-import { crewPhotoInput } from "@/lib/profile-photo";
+import { crewPhotoInput, profilePhotoStyle } from "@/lib/profile-photo";
 import { subscribeToProfileUpdated } from "@/lib/profile-update-events";
 import { rankByRatingConfidence } from "@/lib/rating-ranking";
 import {
@@ -44,7 +45,7 @@ Users
 } from "lucide-react";
 import { useLocale,useTranslations } from "next-intl";
 import Link from "next/link";
-import { useCallback,useEffect,useMemo,useRef,useState } from "react";
+import { type CSSProperties,useCallback,useEffect,useMemo,useRef,useState } from "react";
 
 const PAGE_SIZE = 24;
 type CrewInitialFilters = { query: string; city: string; sort: string; cityText?: string; country?: string; region?: string; view?: string; genie?: boolean; department?: string; role?: string; near?: CrewNear | null };
@@ -110,6 +111,11 @@ function hasProfileType(c: ServerCreator, ...types: string[]): boolean {
 
 // ─── Main ────────────────────────────────────────────────────────────────────
 
+function nativeCrewPhotoVariables(focalPoint: unknown): CSSProperties {
+  const crop = profilePhotoStyle(focalPoint);
+  return { "--native-crew-photo-position": crop.objectPosition, "--native-crew-photo-transform-origin": crop.transformOrigin, "--native-crew-photo-transform": crop.transform } as CSSProperties;
+}
+
 function CreatorsInner({
   serverCreators,
   hasMoreProfiles = false,
@@ -119,6 +125,7 @@ function CreatorsInner({
   hasMoreProfiles?: boolean;
   initialFilters: CrewInitialFilters;
 }) {
+  const nativeAppearance = useNativeAppAppearance();
   const taxonomyText = useTranslations("Taxonomy");
 
   const uiText = useTranslations();
@@ -606,6 +613,8 @@ function CreatorsInner({
                     const href = c.id.startsWith("listing_") ? `/creators/${c.id.replace("listing_", "")}` : `/profile/${c.id}`;
                     return (
                       <Link key={c.id} href={href} suppressHydrationWarning
+                        data-native-crew-directory-card={nativeAppearance ? "row" : undefined}
+                        style={nativeAppearance ? nativeCrewPhotoVariables(c.focal_point) : undefined}
                         className="group flex items-center gap-3 px-4 py-2.5 hover:bg-bg-elevated transition-colors">
                         {/* Avatar */}
                         <ProfileCardPhoto src={c.avatar} name={c.name} focalPoint={c.focal_point} className="h-9 w-9 rounded-full border border-border/60" sizes="36px" />
@@ -616,11 +625,11 @@ function CreatorsInner({
                             {c.verified && <CheckCircle size={11} className="text-gold/60 shrink-0" />}
                             {c.available && c.last_seen_at && (Date.now() - new Date(c.last_seen_at).getTime() < 14 * 24 * 60 * 60 * 1000) && <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 shrink-0" title={tc("available")} />}
                           </div>
-                          <p className="text-[11px] text-text-muted truncate">{displayPositions.slice(0, 2).join(" · ")}</p>
+                          <p data-native-crew-directory-role={nativeAppearance || undefined} className="text-[11px] text-text-muted truncate">{displayPositions.slice(0, nativeAppearance ? 1 : 2).join(" · ")}</p>
                         </div>
                         {/* City */}
                         {c.location && (
-                          <p className="hidden sm:flex items-center gap-1 text-xs text-text-muted shrink-0 w-32 truncate">
+                          <p data-native-crew-directory-place={nativeAppearance || undefined} className="hidden sm:flex items-center gap-1 text-xs text-text-muted shrink-0 w-32 truncate">
                             <MapPin size={10} className="shrink-0" />{c.location.split(",")[0]}
                           </p>
                         )}
@@ -646,6 +655,8 @@ function CreatorsInner({
                   const photo = crewPhotoInput(c);
                   return (
                     <Link key={c.id} href={href} suppressHydrationWarning
+                      data-native-crew-directory-card={nativeAppearance ? "grid" : undefined}
+                      style={nativeAppearance ? nativeCrewPhotoVariables(photo.focalPoint) : undefined}
                       className="browse-card card-hover group flex min-w-0 items-center gap-1.5 p-2 sm:gap-3 sm:p-3">
                       <ProfileCardPhoto {...photo} name={c.name} className="h-12 w-12 rounded-lg border border-border/60 min-[375px]:h-14 min-[375px]:w-14 sm:h-[88px] sm:w-[88px] lg:h-24 lg:w-24" sizes="(min-width: 1024px) 96px, (min-width: 640px) 88px, (min-width: 375px) 56px, 48px" />
                       <div className="min-w-0 flex-1 py-0.5">
@@ -653,9 +664,9 @@ function CreatorsInner({
                           <h3 className="min-w-0 break-words [overflow-wrap:anywhere] font-semibold text-text-primary text-[13px] leading-snug sm:text-sm">{c.name}</h3>
                           {c.verified && <CheckCircle size={12} className="text-gold/60 shrink-0 mt-0.5" />}
                         </div>
-                        <p data-native-card-copy className="line-clamp-2 text-[11px] leading-snug text-gold font-medium sm:text-xs">{displayPositions.slice(0, 2).join(" · ")}</p>
+                        <p data-native-card-copy data-native-crew-directory-role={nativeAppearance || undefined} className="line-clamp-2 text-[11px] leading-snug text-gold font-medium sm:text-xs">{displayPositions.slice(0, nativeAppearance ? 1 : 2).join(" · ")}</p>
                         {c.location && (
-                          <p className="mt-1.5 flex min-w-0 items-center gap-1 text-[10px] text-text-muted sm:text-xs">
+                          <p data-native-crew-directory-place={nativeAppearance || undefined} className="mt-1.5 flex min-w-0 items-center gap-1 text-[10px] text-text-muted sm:text-xs">
                             <MapPin size={11} className="shrink-0" />
                             <span data-native-card-copy className="truncate">{c.location.split(",")[0]}</span>
                           </p>

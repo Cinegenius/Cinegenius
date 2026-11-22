@@ -50,11 +50,10 @@ export default function GenieLauncher({ children, position, visible, onHide, onM
       x: Math.max(area.left, Math.min(point.x, area.right)),
       y: Math.max(area.top, Math.min(point.y, area.bottom)),
     };
-    // Keep the 44px close target reachable at the upper safe edge. A very
-    // short keyboard viewport uses the icon's own bounds as the last fallback.
-    const hidePlacement = native && next.y - 40 < area.top ? next.y + 40 <= area.bottom ? "below" : "inside" : null;
-    if (hidePlacement) dock.current.setAttribute("data-hide-placement", hidePlacement);
-    else dock.current.removeAttribute("data-hide-placement");
+    if (native) {
+      dock.current.setAttribute("data-native-genie-normalized-x", String(area.right > area.left ? (next.x - area.left) / (area.right - area.left) : 0));
+      dock.current.setAttribute("data-native-genie-normalized-y", String(area.bottom > area.top ? (next.y - area.top) / (area.bottom - area.top) : 0));
+    }
     onPositionChange(next);
     Object.assign(dock.current.style, { left: `${next.x}px`, top: `${next.y}px`, right: "auto", bottom: "auto" });
   }, [readBounds, onPositionChange, native]);
@@ -95,6 +94,27 @@ export default function GenieLauncher({ children, position, visible, onHide, onM
       if (position.current) schedule(position.current);
     };
     if (position.current) place(position.current);
+    // Presentation-only handoff with Work. The stored values are normalized
+    // safe-area coordinates, never account data or a navigation instruction.
+    const publishPosition = () => {
+      if (!native || !dock.current) return;
+      const area = readBounds();
+      if (!area) return;
+      const rect = dock.current.getBoundingClientRect();
+      const fraction = (value: number, low: number, high: number) => high > low ? Math.max(0, Math.min(1, (value - low) / (high - low))) : 0;
+      dock.current.setAttribute("data-native-genie-normalized-x", String(fraction(rect.left, area.left, area.right)));
+      dock.current.setAttribute("data-native-genie-normalized-y", String(fraction(rect.top, area.top, area.bottom)));
+    };
+    const restoreNativePosition = (event: Event) => {
+      if (!native || window.top !== window.self || !(event instanceof CustomEvent)) return;
+      const value = event.detail;
+      if (!value || typeof value !== "object" || typeof value.x !== "number" || typeof value.y !== "number" || !Number.isFinite(value.x) || !Number.isFinite(value.y) || value.x < 0 || value.x > 1 || value.y < 0 || value.y > 1) return;
+      const area = readBounds();
+      if (!area) return;
+      cancelGesture();
+      place({ x: area.left + value.x * (area.right - area.left), y: area.top + value.y * (area.bottom - area.top) });
+    };
+    const initialFrame = requestAnimationFrame(publishPosition);
     const observer = new ResizeObserver(constrain);
     if (dock.current) observer.observe(dock.current);
     if (bounds.current) observer.observe(bounds.current);
@@ -111,6 +131,7 @@ export default function GenieLauncher({ children, position, visible, onHide, onM
     window.visualViewport?.addEventListener("resize", constrain);
     window.visualViewport?.addEventListener("scroll", constrain);
     if (native) {
+      window.addEventListener("cinegenius:native-genie-position", restoreNativePosition);
       motion.addEventListener("change", motionChanged);
       document.addEventListener("visibilitychange", background);
       window.addEventListener("pagehide", cancelGesture);
@@ -118,6 +139,8 @@ export default function GenieLauncher({ children, position, visible, onHide, onM
       window.addEventListener("pointerdown", otherPointer, true);
     }
     return () => {
+      cancelAnimationFrame(initialFrame);
+      window.removeEventListener("cinegenius:native-genie-position", restoreNativePosition);
       observer.disconnect(); inertObserver.disconnect();
       window.removeEventListener("resize", constrain);
       window.visualViewport?.removeEventListener("resize", constrain);
@@ -129,7 +152,7 @@ export default function GenieLauncher({ children, position, visible, onHide, onM
       window.removeEventListener("pointerdown", otherPointer, true);
       cancelGesture();
     };
-  }, [visible, native, position, place, schedule, cancelGesture]);
+  }, [visible, native, position, place, schedule, cancelGesture, readBounds]);
 
   const sample = (gesture: Drag, event: PointerEvent<HTMLDivElement>) => {
     const at = event.timeStamp;
@@ -181,7 +204,7 @@ export default function GenieLauncher({ children, position, visible, onHide, onM
 
   return <>
     <div ref={bounds} className={styles.launcherBounds} aria-hidden="true" />
-    <div ref={dock} hidden={!visible} className={styles.launcherDock}
+    <div ref={dock} hidden={!visible} className={styles.launcherDock} data-native-genie-launcher={native ? "v1" : undefined}
       onPointerDown={event => {
         const target = (event.target as HTMLElement).closest<HTMLButtonElement>("[data-genie-open]");
         if (!event.isPrimary || event.button !== 0 || !target) return;
@@ -210,9 +233,9 @@ export default function GenieLauncher({ children, position, visible, onHide, onM
         place({ x: rect.left + delta.x, y: rect.top + delta.y });
       }}>
       {children}
-      <button type="button" className={styles.hideLauncher} aria-label={t("hideLauncher")} title={t("hideLauncher")} onClick={() => { cancelGesture(); onHide(); }}>
+      {!native && <button type="button" className={styles.hideLauncher} aria-label={t("hideLauncher")} title={t("hideLauncher")} onClick={() => { cancelGesture(); onHide(); }}>
         <X size={14} aria-hidden="true" />
-      </button>
+      </button>}
     </div>
   </>;
 }

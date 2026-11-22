@@ -26,10 +26,10 @@ export default function NativeSmartLanding(props: LandingProps) {
   const verified = auth.isLoaded && isLoaded && auth.isSignedIn && !!auth.sessionId && auth.userId === props.accountId
     && session?.status === "active" && session.id === auth.sessionId && session.user.id === props.accountId;
   return <AccountNativeSmartLanding key={`${props.accountId ?? "guest"}:${auth.sessionId ?? "none"}`}
-    {...props} loaded={props.loaded && !!auth.isLoaded && isLoaded} allowed={props.allowed && !!verified} authenticated={!!verified} />;
+    {...props} sessionId={auth.sessionId ?? null} loaded={props.loaded && !!auth.isLoaded && isLoaded} allowed={props.allowed && !!verified} authenticated={!!verified} />;
 }
 
-function AccountNativeSmartLanding({ accountId, loaded, allowed, onUnavailable, authenticated }: LandingProps & { authenticated: boolean }) {
+function AccountNativeSmartLanding({ accountId, sessionId, loaded, allowed, onUnavailable, authenticated }: LandingProps & { sessionId: string | null; authenticated: boolean }) {
   const t = useTranslations("NativeSmartDiscovery"), search = useTranslations("UnifiedSearch"), taxonomy = useTranslations("Taxonomy");
   const locale = useLocale(), router = useFormRouter();
   const [input, setInput] = useState("");
@@ -37,32 +37,76 @@ function AccountNativeSmartLanding({ accountId, loaded, allowed, onUnavailable, 
   const [seed, setSeed] = useViewState("native.smart.seed", "");
   useEffect(() => { setSeed(previous => isDiscoverySeed(previous) ? previous : crypto.randomUUID().replaceAll("-", "")); }, [setSeed]);
   const [controls, setControls] = useViewState<SmartSearchControls>("smart.controls", { scope: "", filters: emptyDiscoveryFilters(), mapOpen: false, view: "grid", limits: {} });
-  const [result, setResult] = useState<{ scope: string; data: NativeDiscoveryResponse; timingStart: number } | null>(null);
+  const [result, setResult] = useState<{ scope: string; revision: number; data: NativeDiscoveryResponse; timingStart: number } | null>(null);
   const [error, setError] = useState(false);
   const [loading, setLoading] = useState(false);
   const [retry, setRetry] = useState(0);
-  const scope = JSON.stringify([accountId, loaded, allowed, locale, mode, retry, seed]);
+  const [reservedHeight, setReservedHeight] = useState(0);
+  const resultFrame = useRef<HTMLDivElement>(null);
+  // A refresh revalidates this same view; it must not discard its current rows.
+  // Identity, access and discovery choices still invalidate them before paint.
+  const scope = JSON.stringify([accountId, sessionId, loaded, allowed, authenticated, locale, mode, seed]);
+  const [previousScope, setPreviousScope] = useState(scope);
+  if (previousScope !== scope) {
+    setPreviousScope(scope);
+    setResult(null); setError(false); setLoading(false); setReservedHeight(0);
+  }
+  const layoutScope = JSON.stringify([scope, controls]);
+  const [previousLayoutScope, setPreviousLayoutScope] = useState(layoutScope);
+  if (previousLayoutScope !== layoutScope) {
+    setPreviousLayoutScope(layoutScope); setReservedHeight(0);
+  }
   const currentScope = useRef(scope);
-  // Commit the identity before passive request effects; never render stale rows.
   useLayoutEffect(() => { currentScope.current = scope; }, [scope]);
   const request = useRef<AbortController | null>(null);
+  const requestRevision = useRef(0);
+  const denyAccess = useCallback(() => {
+    request.current?.abort();
+    request.current = null;
+    setResult(null); setError(false); setLoading(false); setReservedHeight(0);
+    onUnavailable();
+  }, [onUnavailable]);
   const retryRef = useRef(0);
   const focusDetails = useRef<HTMLDetailsElement>(null);
   const focusDrag = useNativeSegmentDrag(mode, index => setMode(index === 0 ? "profile" : "neutral"));
   const refresh = useCallback(() => {
     if (document.visibilityState === "hidden" || Date.now() - retryRef.current < 500) return;
+    // One foreground return can emit focus, pageshow and native resume apart.
+    // Keep its current rights check instead of cancelling and restarting it.
+    if (request.current && !request.current.signal.aborted) return;
     retryRef.current = Date.now();
-    request.current?.abort();
     setRetry(value => value + 1);
+  }, []);
+  const suspend = useCallback(() => {
+    const frame = resultFrame.current;
+    if (frame?.isConnected && frame.getAttribute("data-native-smart-result-current") === "v1") {
+      const height = frame.getBoundingClientRect().height;
+      // Preserve only an anonymous, bounded layout number, never the old rows
+      // or a screenshot. It prevents the inner scrollport clamping on return.
+      setReservedHeight(Number.isFinite(height) && height > 0 ? Math.min(100_000, Math.ceil(height)) : 0);
+    }
+    request.current?.abort();
+    request.current = null;
+    retryRef.current = 0;
+    // Retention is limited to the same foreground visit. Returning from Work
+    // or the background must reauthorize before any private rows are shown.
+    setResult(null); setError(false); setLoading(false);
   }, []);
 
   useEffect(() => {
-    if (!allowed || !loaded || !accountId) return;
+    if (!allowed || !loaded || !authenticated || !accountId || !sessionId) return;
     const events = ["focus", "pageshow", "cinegenius:app-resume"];
     events.forEach(event => window.addEventListener(event, refresh));
-    document.addEventListener("visibilitychange", refresh);
-    return () => { events.forEach(event => window.removeEventListener(event, refresh)); document.removeEventListener("visibilitychange", refresh); };
-  }, [accountId, allowed, loaded, refresh]);
+    const suspendedEvents = ["blur", "pagehide", "cinegenius:native-workspace-presented"];
+    suspendedEvents.forEach(event => window.addEventListener(event, suspend));
+    const visibility = () => document.visibilityState === "hidden" ? suspend() : refresh();
+    document.addEventListener("visibilitychange", visibility);
+    return () => {
+      events.forEach(event => window.removeEventListener(event, refresh));
+      suspendedEvents.forEach(event => window.removeEventListener(event, suspend));
+      document.removeEventListener("visibilitychange", visibility);
+    };
+  }, [accountId, sessionId, allowed, loaded, authenticated, refresh, suspend]);
 
   useEffect(() => {
     const close = (event: PointerEvent) => { if (focusDetails.current && !focusDetails.current.contains(event.target as Node)) focusDetails.current.open = false; };
@@ -84,10 +128,13 @@ function AccountNativeSmartLanding({ accountId, loaded, allowed, onUnavailable, 
   }, [result, scope]);
 
   useEffect(() => {
-    if (!allowed || !loaded || !accountId || !isDiscoverySeed(seed)) return;
+    if (!allowed || !loaded || !authenticated || !accountId || !sessionId || !isDiscoverySeed(seed)) return;
     const controller = new AbortController(); request.current = controller;
+    const revision = ++requestRevision.current;
+    const current = () => !controller.signal.aborted && request.current === controller && currentScope.current === scope;
     const scheduled = performance.now();
     const timer = window.setTimeout(async () => {
+      if (!current()) return;
       const started = performance.now();
       performance.clearMeasures("cinegenius:smart:schedule");
       performance.measure("cinegenius:smart:schedule", { start: scheduled, end: started });
@@ -100,23 +147,30 @@ function AccountNativeSmartLanding({ accountId, loaded, allowed, onUnavailable, 
         });
         performance.clearMeasures("cinegenius:smart:api");
         performance.measure("cinegenius:smart:api", { start: started, end: performance.now() });
-        if (controller.signal.aborted || currentScope.current !== scope) return;
-        if (response.status === 401 || response.status === 403) { onUnavailable(); return; }
+        if (!current()) return;
+        if ([401, 403, 409].includes(response.status)) { denyAccess(); return; }
         if (!response.ok) throw new Error("unavailable");
         const received = performance.now();
         const data = readNativeDiscovery(await response.json(), accountId, seed);
         performance.clearMeasures("cinegenius:smart:decode");
         performance.measure("cinegenius:smart:decode", { start: received, end: performance.now() });
         if (!data) throw new Error("unavailable");
-        if (!controller.signal.aborted && currentScope.current === scope) setResult({ scope, data, timingStart: performance.now() });
-      } catch { if (!controller.signal.aborted && currentScope.current === scope) setError(true); }
-      finally { if (!controller.signal.aborted && currentScope.current === scope) setLoading(false); }
+        if (current()) { setReservedHeight(0); setResult({ scope, revision, data, timingStart: performance.now() }); }
+      } catch { if (current()) { setReservedHeight(0); setError(true); } }
+      finally {
+        if (current()) setLoading(false);
+        if (request.current === controller) request.current = null;
+      }
     }, 0);
-    return () => { window.clearTimeout(timer); controller.abort(); };
-  }, [accountId, allowed, loaded, mode, onUnavailable, scope, seed]);
+    return () => {
+      window.clearTimeout(timer); controller.abort();
+      if (request.current === controller) request.current = null;
+    };
+  }, [accountId, sessionId, allowed, loaded, authenticated, mode, denyAccess, retry, scope, seed]);
 
-  const data = result?.scope === scope ? result.data : null;
-  return <DirectoryPage area="crew"><main className={`smart-search-page ${styles.landing}`} data-native-smart-landing>
+  const data = loaded && allowed && authenticated && result?.scope === scope ? result.data : null;
+  const routeReady = loaded && (!allowed || authenticated && (!!data || error && !loading));
+  return <DirectoryPage area="crew"><main className={`smart-search-page ${styles.landing}`} data-native-smart-landing data-native-route-ready={routeReady ? "v1" : undefined}>
     <div className="site-container">
       <h1 className="sr-only">{search("tab")}</h1>
       <div className={styles.searchRow}><form className={`smart-search-input native-browse-search ${styles.search}`} onSubmit={event => {
@@ -154,8 +208,13 @@ function AccountNativeSmartLanding({ accountId, loaded, allowed, onUnavailable, 
           </details>
         </div>
         <div role="status" aria-live="polite" className={styles.status}>{loading && <><Loader2 size={17} className="animate-spin" aria-hidden="true" />{t("loading")}</>}</div>
-        {error && !data && <div role="alert" className={styles.error}><p>{t("error")}</p><button type="button" onClick={refresh}>{t("retry")}</button></div>}
-        {data && <SmartSearchExplorer key={data.seed} discoverySeed={data.seed} plan={data.plan} initialGroups={data.groups} onUnavailable={onUnavailable} stored={controls} setStored={setControls} />}
+        {error && <div role="alert" className={styles.error}><p>{t("error")}</p><button type="button" onClick={refresh}>{t("retry")}</button></div>}
+        {/* The explorer owns its rows after mount. Replace it atomically only
+            when a freshly authorized response is ready, including removals. */}
+        <div ref={resultFrame} className={styles.results} data-native-smart-result-frame="v1" data-native-smart-result-current={data ? "v1" : undefined}>
+          {data ? <SmartSearchExplorer key={`${scope}:${result?.revision}`} discoverySeed={data.seed} plan={data.plan} initialGroups={data.groups} onUnavailable={denyAccess} stored={controls} setStored={setControls} />
+            : reservedHeight > 0 && <div className={styles.placeholder} data-native-smart-placeholder="v1" aria-hidden="true" style={{ height: reservedHeight }}><span /><span /></div>}
+        </div>
       </>}
     </div>
   </main></DirectoryPage>;

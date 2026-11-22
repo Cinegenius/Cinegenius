@@ -1,5 +1,5 @@
 export const VIEW_STATE_KEY = "cinegeniusView";
-export type ViewRecord = { path: string; owner: string; fields: Record<string, unknown>; y?: number; from?: string };
+export type ViewRecord = { path: string; owner: string; fields: Record<string, unknown>; y?: number; from?: string; nativeScroll?: { session: string | null; y: number } };
 
 export function sameViewValue(first: unknown, second: unknown): boolean {
   if (Object.is(first, second)) return true;
@@ -30,4 +30,10 @@ export function writeViewRecord(path: string, owner: string, patch: Partial<View
   if (window.location.pathname !== path) return;
   try { window.history.replaceState(mergeViewRecord(window.history.state, path, owner, patch), ""); }
   catch { /* Navigation and local controls still work when history storage is unavailable. */ }
+}
+
+/** Call only after viewRecord has checked the route and current account. */
+export function nativeViewScroll(record: ViewRecord, session: string | null): number | null {
+  const saved = record.nativeScroll;
+  return saved?.session === session && typeof saved.y === "number" && Number.isFinite(saved.y) && saved.y >= 0 ? saved.y : null;
 }

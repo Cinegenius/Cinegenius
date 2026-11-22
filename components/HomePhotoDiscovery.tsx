@@ -10,6 +10,8 @@ import { getPhotoBandFillerCount, selectHomeDiscoveryPhotos, repeatForSeamlessLo
 import { communityPreviewUrl } from "@/lib/community-preview";
 import { useTranslations } from "next-intl";
 import { uiErrorMessage } from "@/lib/ui-error-message";
+import { useNativeAppAppearance } from "@/lib/use-native-app-appearance";
+import { useNativeAppModalLock } from "@/lib/use-native-app-content-region";
 
 
 export type DiscoverPhoto = {
@@ -42,6 +44,9 @@ function Stars({ rating }: { rating: number }) {
 
 export function PhotoDialog({ photo, onClose, resumeLike = false }: { photo: DiscoverPhoto; onClose: () => void; resumeLike?: boolean }) {
   const uiText = useTranslations();
+  const nativeAppearance = useNativeAppAppearance();
+  const dialog = useRef<HTMLElement>(null);
+  useNativeAppModalLock(nativeAppearance, dialog, onClose);
 
   const [summary, setSummary] = useState<{ avg: number; count: number; myRating: number | null; eligible: boolean } | null>(null);
   const [selected, setSelected] = useState<number | null>(null);
@@ -95,7 +100,7 @@ export function PhotoDialog({ photo, onClose, resumeLike = false }: { photo: Dis
 
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/85 p-3 sm:p-6" role="presentation" onMouseDown={(event) => { if (event.target === event.currentTarget) onClose(); }}>
-      <section className="relative flex max-h-[94dvh] w-full max-w-5xl flex-col overflow-hidden rounded-2xl border border-border bg-bg-secondary shadow-2xl" role="dialog" aria-modal="true" aria-label={uiText("Ui.text_504589ed9cc129", { value1: String(photo.author) })}>
+      <section ref={dialog} className="relative flex max-h-[94dvh] w-full max-w-5xl flex-col overflow-hidden rounded-2xl border border-border bg-bg-secondary shadow-2xl" role="dialog" aria-modal="true" aria-label={uiText("Ui.text_504589ed9cc129", { value1: String(photo.author) })}>
         <button type="button" onClick={onClose} aria-label={uiText("Ui.text_2f68da69f1dc81")} className="absolute right-3 top-3 z-10 flex h-11 w-11 items-center justify-center rounded-full border border-white/20 bg-black/70 text-white hover:border-gold"><X size={20} /></button>
         <div className="relative flex h-[62dvh] min-h-0 shrink items-center justify-center bg-black px-2 pb-2 pt-14 sm:px-4 sm:pb-4">
           <ResilientPublicImage src={communityPreviewUrl(photo.imageUrl, "detail")} alt={photo.caption || uiText("Ui.text_79664359f15de1", { value1: String(photo.imageKind || uiText("Ui.text_494e0843d958b9")), value2: String(photo.author) })} imageClassName="h-full w-full object-contain" loading="eager" />

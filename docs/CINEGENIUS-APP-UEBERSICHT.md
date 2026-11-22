@@ -1,13 +1,29 @@
 # CineGenius · Übersicht der gesamten App
 
-Stand: **21. November 2026 (Europe/Berlin)**. Zuständig: **APP Entwicklung / Xcode**, gemeinsame Schnittstellen in Abstimmung mit **WEB CODEX**.
+**Prüfcheckpoint 22. November:** Die freigegebene gemeinsame App-Hülle und Karten-/Listenfassung ist lokal umgesetzt. Vollständiger signierter Gerätebuild **2026112203 bestanden**, 177 gezielte Webtests und 113 mobile Tests sowie gezielte Prüfungen nach den Compilerkorrekturen bestanden. Echte Browserfälle prüfen zwei Spalten, deckende Flächen, direktes body→main und Wrapper, Zurück, Tastatur und Dialogsperren; die frühere CSS-Spezifitätslücke ist mit Negativkontrolle belegt. **2203 ist noch nicht veröffentlicht/installiert oder auf dem iPhone bedient. Installiert bleibt2202; dessen UX-Abnahme ist fehlgeschlagen.** Für den nächsten Projektabgleich ist das GitHub-Desktop-Fenster aktuell nicht zugänglich; keine Terminal-Git-Umgehung. Neueren veröffentlichten Website-Hauptstand57d7658 beim Abgleich erhalten. Editor-v2-Collagen einschließlich Import/Maßstab/Nord/Sonnenstand sind getrennte Planung. Der Mac wird auf ausdrücklichen Wunsch während der Arbeit durch caffeinate wach gehalten; Bildschirmsperre unverändert.
+
+Stand: **22. November 2026 (Europe/Berlin)**. Zuständig: **APP Entwicklung / Xcode**, gemeinsame Schnittstellen in Abstimmung mit **WEB CODEX**.
 Die getrennte [Website-Übersicht](CINEGENIUS-WEBSITE-UEBERSICHT.md) enthält die öffentliche Website und deren Unterseiten.
 
 Diese Übersicht trennt die installierte App, ihre serverseitigen Ansichten, native Werkzeuge und geplante Funktionen. Eine Website-Prüfung bestätigt keinen iPhone-Ablauf. „Vorhanden“ bezeichnet belegten Code oder einen gemeldeten Entwicklungsstand; tatsächliche Aktivierung und Geräteprüfung werden separat genannt.
 
-**Neuester Betreibercheckpoint · 22. November 2026:** Einzelne Smart-Karten sind gemäß ausdrücklicher Korrektur **deckend**, mit ruhiger solider Palettentönung aus **92 % Hintergrundfarbe und 8 % Textfarbe**. Die große umgebende Bereichsfläche bleibt transparent. Randlose Bilder in natürlicher Proportion ohne Beschnitt, drei Crewspalten und vollständiger Textumbruch bleiben erhalten. Lokal sind 19 Browserfälle bestanden: alle acht Themes bei 320/393 px sowie unveränderte gewöhnliche Website. Geprüfter CSS-Checkpoint: SHA-256 `e29f3fa01fb50d695eb792a9064c734884ad4335195516b34c7ee6b9642e3c16`. [Neue Collage](/Users/markusmueller/Documents/Codex/2026-11-13/cinegenius-mac-app-setup/outputs/app-pruefstand-20261122/smart-karten-deckend/pistachio-mauve-cement.png), SHA-256 `7716bd2920d7c142ff8aefe418db94fb8d8f65dd2f273a2311a1b5d12c9fd424`. Installiert bleibt **2026112106**; **2026112202 ist als signierter Kandidat bereit**. Die Kartenkorrektur ist nicht als veröffentlicht, installiert oder physisch geprüft belegt.
+**Neueste Betreiberkorrektur und App-Halt · 22. November 2026, nach der 2202-Geräteprüfung:** **Vor dem nächsten App-Build, App-Deploy oder Installieren zuerst eine Collage aller betroffenen Bereiche zeigen und Markus’ Freigabe abwarten.** Ausdrücklicher Auftrag: „passe die alle an zeig mir vorher eine collage ... von smart,firmen,crew,location usw bevor wir es bauen“. Die frühere Installationsfreigabe ist für die nächste Fassung damit ausgesetzt; 2202 bleibt der belegte installierte Stand.
 
-**Aktueller APP-Stand (21. November 2026):** Build **2026112106 ist nach
+**2202-UX-Abnahme nicht bestanden:** Leichte Sprünge bleiben, das Work-Symbol wechselt, Community zeigt den alten Genie-Stil mit äußerem X, Work einen anderen Stil; Profil-, Nachrichten-, Such- und Menüleiste verschwinden in Work. Gewünscht ist eine durchgehende App mit demselben dauerhaft sichtbaren Kopfbereich, gleichbleibendem unteren Symbol und demselben Genie in allen Bereichen, ohne Hängen oder Sprünge. Echte KI-Ergebnisprüfungen bleiben offen.
+
+**Neue Kartenvorgabe für die Collage:** Die tatsächlich gezeigten 2202-Karten mit Palettentönung, Masonry und unterschiedlich hohen natürlichen Bildern sind verworfen. Maßgeblich sind die Screenshots der gewöhnlichen Website: **zwei Spalten**, kompakte Crew-Karten mit kleinem Bild links und limefarbener Tätigkeitszeile, konsistente Marktplatzkarten mit **3:2-Bildformat** und feste deckende navyfarbene Kartenflächen. Smart, Crew, Marktplatz, Locations und Firmen einschließlich Listen gemeinsam anpassen und vorab in der Collage zeigen. Diese Vorgabe ersetzt die früheren drei Crewspalten, natürlichen ungleichen Kartenhöhen und die 92/8-Palettentönung. Unveröffentlichte Quellentwürfe für erhaltene Webansichten, Smart-Aktualisierung und Zweispaltenkarten sind keine neue gebaute oder veröffentlichte App.
+
+**Team-Präzisierung, weiterhin nur isolierter Plan:** Teamgespräche erhalten einen eigenen Verlauf unabhängig von Community. Nur mit privater ausdrücklicher Zustimmung dürfen sie zusätzlich im gewöhnlichen oberen Nachrichteneingang erscheinen. Mehrere administrierte Teamkanäle (Alle/Technik usw.), getrennte Sicht-/Beitritts-/Schreibrechte und eigener Beitritt/Austritt bleiben beauftragt. Der Serverplan liegt isoliert in APP Entwicklung; Online-Teammitgliedschaft und diese Gesprächsfunktionen sind nicht aktiv und kein Bestandteil von 2202.
+
+**Belegter 2202-Release und Installation · 22. November 2026:** Veröffentlichter Produktstand `d8b72d7` verbindet WEB `67d1` mit APP `1cfbbc1`. Ein geschützter Produktionsbuild ist als `dpl_HSMSouURUvGXw6JW8d7aEqHro8o9` READY; `www.cinegenius.co` ist zugeordnet und geprüft. Vollständiger Next-Build und TypeScript bestanden. **Build 2026112202 ist nach frischer Sieben-Ordner-Sicherung installiert und gestartet; die Buildnummer ist bestätigt.** Vor dem ersten Start waren **132 Dateien aus Documents/Application Support bytegleich, 0 abweichend**. Die anschließende physische UX-Abnahme von 2202 ist wegen der oben genannten Sprünge und uneinheitlichen App-Bereiche nicht bestanden; echte KI-Ergebnisprüfungen bleiben offen. Der Datenerhalts- und Installationsbeleg bleibt gültig.
+
+**2202-Kartenstand, inzwischen vom Nutzer verworfen:** Einzelne Karten sind deckend mit ruhiger solider Tönung aus **92 % Hintergrundfarbe und 8 % Textfarbe**; die große Bereichsfläche bleibt transparent. Randlose Bilder behalten ihre natürliche Proportion ohne Beschnitt, drei Crewspalten und vollständiger Textumbruch bleiben erhalten. 19 Browserfälle bestanden, alle acht Themes bei 320/393 px und gewöhnliche Website geprüft; die veröffentlichte CSS bestätigt 92/8. [Frühere Collage](/Users/markusmueller/Documents/Codex/2026-11-13/cinegenius-mac-app-setup/outputs/app-pruefstand-20261122/smart-karten-deckend/pistachio-mauve-cement.png).
+
+**In 2202 ausgeliefert, UX nicht abgenommen:** Überarbeiteter Work-Übergang und Inhaltsabstand, aufklappbare Nachrichten mit wischbaren Bereichen und erhaltenem Composer/Gruppenanlage, gemeinsame Glasgestaltung und Palette, deckende Smart-Karten mit natürlichen randlosen Fotos, Jobs im App-Menü und Projekte in der Inseratauswahl, Länderfehlerkorrektur bei Organisationen sowie sechs Planeditor-Kategorien mit allen 34 Bauteilarten. Das beschreibt den ausgelieferten Umfang; die anschließende UX-Gegenprobe ist gemäß neuestem Checkpoint oben nicht bestanden.
+
+**Persönliche KI und offene Erweiterungen:** Die Produktionsfreigabe ist für das bestehende Einzelkonto und den bestehenden Provider aktiv, ohne monatliches App-Limit und ohne Testablauf. Der veröffentlichte Pfad läuft mit Node 24 und 600 Sekunden; anonyme Anfragen werden mit 401, fremde Origins mit 403 abgewiesen. Bei diesen Prüfungen gab es **0 Provideranfragen**; echte KI-Ergebnisse auf dem Gerät bleiben offen. Eine vom Runtime-Build erzeugte `supportsCancellation`-Markierung ist nicht als Bedienfunktion verfügbar und weiterhin unbewiesen. Teamgespräche sind als eigener, von Community getrennter Verlauf beauftragt; eine Aufnahme in den gewöhnlichen oberen Eingang ist nur privat und ausdrücklich wählbar. Mehrere administrierte Teamkanäle, Sicht-/Beitritts-/Schreibrechte sowie eigener Beitritt/Austritt gehören zum isolierten Backendplan in APP Entwicklung. Bestehende native Teams bleiben lokal; Online-Teammitgliedschaft und neue Gesprächsfunktionen sind nicht aktiv und kein Bestandteil von 2202. E-Mail-Anbindung/Weiterleitung ist weiterhin nicht implementiert.
+
+**Historischer APP-Stand (21. November 2026, durch 2202 oben abgelöst):** Build **2026112106 ist nach
 frischer verifizierter Sicherung installiert und gestartet**, die installierte
 Buildnummer bestätigt. **118 persistente Dateien sind bytegleich erhalten,
 0 abweichend.** Der zuvor installierte Build 2105 ist beim physischen
@@ -41,11 +57,11 @@ Siehe [Vertrag und genaue Reichweite](home-crew-discretion.md).
 
 | Thema | Belegter Stand |
 | --- | --- |
-| **iPhone-App** | **2026112106 installiert und gestartet**, Buildnummer bestätigt; frische Sicherung verifiziert, 118 persistente Dateien bytegleich/0 abweichend. **2105: physischer Work-Einstieg fehlgeschlagen (App-Absturz).** 2106 enthält den gezielten UIView-Fix; Work öffnen und Smart-Rückkehr sind vom Nutzer bestätigt; flüssiger Übergang und weitere Bedienprüfungen bleiben offen. |
+| **iPhone-App** | **2026112202 installiert und gestartet**, Buildnummer bestätigt; frische Sieben-Ordner-Sicherung, 132 Dateien vor Erststart bytegleich/0 abweichend. 2105-Absturz und 2106-Gegenprobe bleiben historisch belegt. Physische UX-Abnahme von 2202 wegen Sprüngen und uneinheitlichem App-Rahmen nicht bestanden. Weitere App-Builds/Deploys/Installation bis Collagefreigabe angehalten; echte KI-Ergebnisse offen. |
 | **App-Server** | **Veröffentlicht:** Folgepaket `f50875ac` mit Produktcommit `1d64033`; bestehende Website-Korrekturen erhalten. Deployment `dpl_5jrZxoEcYbHTWV3Wyz2t6EtMLWVV` READY einschließlich `www.cinegenius.co`; vollständiger Produktions-/TypeScript-Build bestanden, 17 Kataloge mit je 11319 Schlüsseln geprüft. Der Serverbeleg ist von nativer Installation und physischer Bedienprüfung getrennt. |
 | **Native Navigation** | Ziel gemäß aktuellem App-Vertrag: **Shots · News · Smart · Projekte · Work**. Die gewöhnliche Website behält ihre eigene Navigation. |
 | **Obere Aktionen** | Profil, Nachrichten, Suche und Menü; App-eigene Abstände und sichere Bedienung über Kopf-/Fußbereich. |
-| **Erscheinungsbild** | Gewählt sind sieben dunkle Optionen: Graphit, Nachtblau, Rauchgrün, Rosé, Warmer Sand, Terrakotta, Reinschwarz. Gemeinsamer Picker für Community/Work wurde mit 2026112105 eingeführt und ist auch im installierten Build 2026112106 enthalten; ältere Apps blenden ihn aus. Die physische Auswahlprüfung bleibt offen. Heller Stein und schneller Hell-/Dunkelwechsel bleiben erhalten. Ohne ausdrückliche Farbwahl bleibt der bisherige Mauve-Hintergrund bestehen. |
+| **Erscheinungsbild** | Palette in 2202: Cement, Dark Sky, Pistachio, Cherry, Sand, Mauve, Black; Heller Stein erhalten. Tatsächliche 92/8-Karten, Masonry und ungleiche Bildhöhen vom Nutzer verworfen. Neue Zweispalten-Collage nach gewöhnlicher Website: feste Navyflächen, Crew kompakt mit Bild links/limefarbener Tätigkeit, Marktplatz 3:2, alle Smart-Bereiche und Listen. Erst Freigabe, dann nächster App-Build/Deploy/Installation. |
 | **Weitere Plattformen / Veröffentlichung** | Kein aktueller Beleg für eine veröffentlichte Android-App, einen App-Store-Release oder eine eigenständige Desktop-App in dieser Bestandsaufnahme. iPad-/Mac-Kompatibilität je konkretem Build prüfen. |
 
 ## Entdecken und Community
@@ -91,7 +107,7 @@ Siehe [Vertrag und genaue Reichweite](home-crew-discretion.md).
 | **Sprachaktionen / Dispo ändern** | Etwa Mittagspause verschieben und Änderungen für Berechtigte bereitstellen | Gewünschter Ausbau. Eine tatsächlich an alle verteilte Änderung braucht Rechte, Bestätigung, Versionierung und einen echten Online-Teamdienst; hier nicht als aktiv belegt. |
 | **Raumscanner / Grundrisse** | Native Erfassung mit passenden Gerätesensoren, private Projektzuordnung | App-eigener Ausbau; tatsächlicher Funktionsumfang und Geräteunterstützung bei APP prüfen. Kein Web-Scanner-Ersatz oder bestätigtes Messergebnis ohne Gerätetest. |
 | **Sonnenplanung** | Location, Datum, Uhrzeit, Zeitzone und Sonnenverlauf | Bestätigte Produktvorgabe; aktueller Implementierungs-/Gerätestand noch zu verifizieren. |
-| **Online-Teams / Zusammenarbeit** | Gemeinsame Projektstände und kontrollierte Änderungen | Separater Ausbauschritt, nicht durch lokale Archive oder Teamreferenzen erledigt. |
+| **Online-Teams / Zusammenarbeit** | Eigener Teamgesprächsverlauf, administrierte Kanäle, Sicht-/Beitritts-/Schreibrechte und eigener Beitritt/Austritt; gewöhnlicher oberer Eingang nur nach privater ausdrücklicher Wahl | Von Community getrennter Verlauf beauftragt. Backendplan in APP Entwicklung isoliert; bestehende native Teams bleiben lokal. Neue Mitgliedschafts-/Gesprächsfunktionen nicht aktiv und kein Bestandteil von 2202. |
 | **Lernen aus Dokumenten** | Rückmeldungen zur Analysequalität nutzen | Kein pauschales Training mit privaten Dispos/E-Mails freigegeben oder nachgewiesen. Datenverwendung, Einwilligung und Löschung gesondert festlegen. |
 
 ## Gemeinsame Grundlagen und deaktivierte Dienste
@@ -336,7 +352,7 @@ Der Geräte-Installer veröffentlicht keinen Servercode; das zuvor belegte
 App-Serverpaket bleibt live. Diese Ergänzung ändert ausschließlich Dokumentation.
 
 
-### Aktueller APP-Stand — 2026112106, Work-Gegenprobe offen
+### Historischer APP-Stand — 2026112106, damalige Work-Gegenprobe offen
 
 **2105-Fehler belegt:** Zwei echte IPS-Absturzberichte wurden mit dem passenden
 2105-Binary und `atos` symbolisiert. Beide zeigen `SIGABRT` in
@@ -371,7 +387,9 @@ Belege im App-Arbeitsauftrag:
 Checkpoint: `NATIVE2106_PHYSICAL_WORK_ENTRY_RETURN_PASSED_SMOOTHNESS_OPEN`;
 Installation: `UI_FOLLOWUP_INSTALLED_AND_LAUNCHED_DATA_VERIFIED`.
 
-## App-Folgefassung – 22. November 2026, noch nicht veröffentlicht/installiert
+## Historische Vorbereitung der App-Folgefassung – 22. November 2026
+
+Die folgende Liste erhält den damaligen Vorbereitungsstand. Veröffentlichung und Installation sind durch den aktuellen 2202-Checkpoint oben abgelöst; die dort genannten offenen Bedienprüfungen und Erweiterungsgrenzen bleiben maßgeblich.
 
 - Work-Übergang: UIKit-eigene Einblendung, direkte Rückkehr zur unveränderten Seite, echte Zielnavigation wartet auf den stabilen App-Rahmen. Untere Leiste erhält zusätzlichen Inhaltsabstand; oben rechts nur Hell/Dunkel. Lokale SDK-/Vertragstests bestanden; neue physische Prüfung offen.
 - Nachrichten: Gespräche im aufgeklappten Bereich, Homies/Kollegen/Gruppen/Mitteilungen per Tippen und Wischen, vorhandener Composer und Gruppenanlage erhalten. Entwurfsschutz und gemeinsame Scrollsperren geprüft. 158 gezielte Tests, kleine echte Touch-/Keyboard-Browserfixture bestanden; gewöhnliche Websitepfade erhalten. Team-Kurzeinstieg zeigt die existierende allgemeine Gruppenliste, kein automatischer Teamchat.

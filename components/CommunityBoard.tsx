@@ -19,6 +19,7 @@ import { MapPin, MessageCircle, Pin, Plus, Search, Send, Trash2, X } from "lucid
 import { useUser } from "@clerk/nextjs";
 import { uiErrorMessage } from "@/lib/ui-error-message";
 import { useNativeAppAppearance } from "@/lib/use-native-app-appearance";
+import { useNativeAppModalLock } from "@/lib/use-native-app-content-region";
 import { browseCountryChoice } from "@/lib/browse-country";
 import NativeCountrySelect from "@/components/app/NativeCountrySelect";
 import styles from "./CommunityBoard.module.css";
@@ -78,6 +79,8 @@ export default function CommunityBoard({ loggedIn = false, fullPage = false }: {
   const [deleting, setDeleting] = useState<string | null>(null);
   const [error, setError] = useState("");
   const { leave: leaveComposer } = useFormNavigation();
+  const composer = useRef<HTMLDivElement>(null);
+  useNativeAppModalLock(nativeAppearance && fullPage && composerOpen, composer, () => leaveComposer(() => setComposerOpen(false)));
   const boardDraft = useFormDraft({ formKey: "board:compose", enabled: !!user,
     value: { form, replies: replyDrafts, composerOpen }, busy,
     restore: draft => { setForm(draft.form); setReplyDrafts(draft.replies); setComposerOpen(draft.composerOpen); },
@@ -271,7 +274,7 @@ export default function CommunityBoard({ loggedIn = false, fullPage = false }: {
       </div>
 
       {composerOpen && fullPage && <div className="fixed inset-0 z-[100] flex items-end justify-center bg-black/70 p-0 backdrop-blur-sm sm:items-center sm:p-4" onMouseDown={event => { if (event.target === event.currentTarget) leaveComposer(() => setComposerOpen(false)); }}>
-        <div role="dialog" aria-modal="true" aria-labelledby="board-compose-title" className="max-h-[92dvh] w-full max-w-xl overflow-y-auto rounded-t-3xl border border-border bg-bg-secondary p-5 shadow-2xl sm:rounded-2xl sm:p-6">
+        <div ref={composer} role="dialog" aria-modal="true" aria-labelledby="board-compose-title" className="max-h-[92dvh] w-full max-w-xl overflow-y-auto rounded-t-3xl border border-border bg-bg-secondary p-5 shadow-2xl sm:rounded-2xl sm:p-6">
           <div className="mb-5 flex items-start justify-between gap-3"><div><p className="text-xs font-semibold uppercase tracking-widest text-gold">{t("boardLabel")}</p><h2 id="board-compose-title" className="mt-1 font-display text-xl font-bold text-text-primary">{t("boardComposeTitle")}</h2></div><button type="button" onClick={() => leaveComposer(() => setComposerOpen(false))} aria-label={t("boardCancel")} className="rounded-lg p-2 text-text-muted hover:bg-bg-elevated"><X size={18} /></button></div>
           {composerContent}
         </div>

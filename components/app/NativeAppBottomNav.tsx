@@ -4,12 +4,12 @@ import { useEffect, useLayoutEffect, useRef, type CSSProperties, type PointerEve
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useLocale } from "next-intl";
-import { Clapperboard, Images, Newspaper, PanelsTopLeft, Sparkles } from "lucide-react";
+import { Clapperboard, Images, LayoutGrid, Newspaper, Sparkles } from "lucide-react";
 import { useFormNavigation } from "@/contexts/FormDraftContext";
 import { NATIVE_APP_NAV_ITEMS, nativeAppActiveArea, type NativeAppArea } from "@/lib/native-app-navigation";
 import styles from "./NativeAppBottomNav.module.css";
 
-const icons = { shots: Images, workspace: PanelsTopLeft, smart: Sparkles, news: Newspaper, projects: Clapperboard };
+const icons = { shots: Images, workspace: LayoutGrid, smart: Sparkles, news: Newspaper, projects: Clapperboard };
 const PREVIEW_EVENT = "cinegenius:native-navigation-preview";
 // Event/lifecycle clock only; no time-dependent value is read during render.
 const navigationTime = () => performance.now();

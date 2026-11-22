@@ -65,33 +65,7 @@ export default function NativeAppNavbar({ navigationLabel, accountButtonRef, acc
       if (root.style.getPropertyValue("--cg-app-header-height") !== height) root.style.setProperty("--cg-app-header-height", height);
     };
     const observer = new ResizeObserver(measure); observer.observe(bubble); measure();
-    const revealFocus = (event: FocusEvent) => {
-      const target = event.target;
-      if (!(target instanceof HTMLElement) || !target.closest('[data-native-app-surface="v1"]') || target.closest('dialog,[role="dialog"],[data-native-browse-toolbar]')) return;
-      requestAnimationFrame(() => {
-        if (!target.isConnected || document.activeElement !== target) return;
-        const top = element.getBoundingClientRect().bottom + 20;
-        const toolbar = document.querySelector<HTMLElement>('[data-native-rail-stuck="true"]');
-        let safeTop = (toolbar?.getBoundingClientRect().bottom ?? top) + 8;
-        let scrollport: HTMLElement | null = target.parentElement;
-        while (scrollport && scrollport !== document.body && !(scrollport.scrollHeight > scrollport.clientHeight && /^(auto|scroll)$/.test(getComputedStyle(scrollport).overflowY))) scrollport = scrollport.parentElement;
-        if (scrollport === document.body) scrollport = null;
-        let safeBottom = document.querySelector('[data-native-app-bottom-nav]')?.getBoundingClientRect().top ?? window.innerHeight;
-        const genie = document.querySelector('[data-genie-open]');
-        if (genie) for (const control of genie.parentElement?.querySelectorAll('button') ?? []) safeBottom = Math.min(safeBottom, control.getBoundingClientRect().top);
-        if (scrollport) {
-          const clip = scrollport.getBoundingClientRect();
-          safeTop = Math.max(safeTop, clip.top + 8);
-          safeBottom = Math.min(safeBottom, clip.bottom);
-        }
-        safeBottom -= 8;
-        const box = target.getBoundingClientRect();
-        if (box.top < safeTop) (scrollport ?? window).scrollBy({ top: box.top - safeTop, behavior: "instant" });
-        else if (box.bottom > safeBottom && box.height < safeBottom - safeTop) (scrollport ?? window).scrollBy({ top: box.bottom - safeBottom, behavior: "instant" });
-      });
-    };
-    document.addEventListener("focusin", revealFocus);
-    return () => { observer.disconnect(); document.removeEventListener("focusin", revealFocus); if (previous) root.style.setProperty("--cg-app-header-height", previous); else root.style.removeProperty("--cg-app-header-height"); };
+    return () => { observer.disconnect(); if (previous) root.style.setProperty("--cg-app-header-height", previous); else root.style.removeProperty("--cg-app-header-height"); };
   }, []);
   useEffect(() => {
     if (!open || !ready) return;
@@ -111,6 +85,7 @@ export default function NativeAppNavbar({ navigationLabel, accountButtonRef, acc
       ><span className={styles.avatar}>{account.avatar}</span>{account.supportBadge && <span className={styles.support}>{account.supportBadge}</span>}</button>
         : <Link href="/sign-in" prefetch={false} className={styles.action} data-native-app-action="profile" aria-label={signInLabel} title={signInLabel}><User size={22} aria-hidden="true" /></Link>}
       <Link href="/messages" prefetch={false} className={styles.action} data-native-app-action="messages"
+        data-native-app-unread-count={account.signedIn && account.ready ? Math.min(9999, Math.max(0, Math.floor(messages.count))) : 0}
         aria-label={messages.label} title={messages.label} aria-current={messages.active ? "page" : undefined} aria-expanded={account.signedIn && account.ready ? messagesOpen : undefined} aria-haspopup={account.signedIn && account.ready ? "dialog" : undefined} aria-controls={messagesOpen ? "native-inbox-panel" : undefined}
         onClick={event => {
           if (event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.altKey || event.shiftKey) return;

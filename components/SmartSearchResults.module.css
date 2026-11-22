@@ -1,5 +1,5 @@
-/* The chosen canvas continues through each area. Only individual cards carry an
-   opaque palette tint; no large plates or per-card backdrop filters. */
+/* The chosen canvas continues through each area. Individual cards reuse the
+   main website's opaque directory surfaces; no large plates or card blur. */
 :global(html[data-cg-native-community-appearance="app"]) .block {
   --block-domain:var(--native-domain-cinema);
   min-width:0;
@@ -14,36 +14,26 @@
   backdrop-filter:none;
 }
 :global(html[data-cg-native-community-appearance="app"][data-cg-app-theme="pure"]) .block { --block-domain:var(--native-domain-pure); }
+/* The reference directory uses two orderly columns, with equal card heights
+   within every row. The surrounding area remains on the shared app canvas. */
+:global(html[data-cg-native-community-appearance="app"]) .block > :global(div):has(> :global([data-result-layout="grid"])) {
+  display:grid; grid-template-columns:repeat(2,minmax(0,1fr)) !important; gap:10px;
+  align-items:stretch;
+}
 :global(html[data-cg-native-community-appearance="app"]) .block :global([data-search-result-card]) {
-  min-width:0; height:auto; max-height:none;
-  background:color-mix(in srgb,var(--cg-app-bg,#24232d) 92%,var(--cg-app-ink,#f4f4f6) 8%) !important;
-  border-color:var(--cg-app-border,#ffffff21);
+  min-width:0; align-self:stretch;
+  background:var(--smart-card-bg,#161a23) !important;
+  border-color:var(--smart-card-border,#2a3248);
   box-shadow:none; -webkit-backdrop-filter:none !important; backdrop-filter:none !important;
-}
-:global(html[data-cg-native-community-appearance="app"]) .block :global([data-result-layout="grid"]) { align-self:start; }
-:global(html[data-cg-native-community-appearance="app"]) .block :global([data-result-title]),
-:global(html[data-cg-native-community-appearance="app"]) .block :global([data-result-subtitle]),
-:global(html[data-cg-native-community-appearance="app"]) .block :global([data-result-occupation]),
-:global(html[data-cg-native-community-appearance="app"]) .block :global([data-result-place]),
-:global(html[data-cg-native-community-appearance="app"]) .block :global([data-result-price]) {
-  display:block; height:auto; max-height:none; overflow:visible;
-  -webkit-line-clamp:unset; line-clamp:unset; white-space:normal; text-overflow:clip;
-  overflow-wrap:anywhere; word-break:normal;
-}
-:global(html[data-cg-native-community-appearance="app"]) .block :global([data-result-subtitle]),
-:global(html[data-cg-native-community-appearance="app"]) .block :global([data-result-occupation]),
-:global(html[data-cg-native-community-appearance="app"]) .block :global([data-result-place]) {
-  color:color-mix(in srgb,var(--cg-app-ink,#f4f4f6) 86%,var(--cg-app-bg,#24232d));
 }
 :global(html[data-cg-native-community-appearance="app"]) .block .heading { min-height:28px; gap:7px; padding-top:0; color:var(--cg-app-ink,#f4f4f6); }
 :global(html[data-cg-native-community-appearance="app"]) .heading > svg { flex-shrink:0; color:var(--block-domain); }
-:global(html[data-cg-native-community-appearance="app"]) .block :global(.smart-result-row) { margin-block:5px; padding:8px; border:1px solid var(--cg-app-border,#ffffff21); border-radius:14px; }
-:global(html[data-cg-native-community-appearance="app"]) .block :global(.smart-result-row) > div:nth-of-type(2) { display:block; }
-:global(html[data-cg-native-community-appearance="app"]) .block :global(.smart-result-row [data-result-occupation]),
-:global(html[data-cg-native-community-appearance="app"]) .block :global(.smart-result-row [data-result-place]) { display:inline; margin:0; line-height:1.4; }
-:global(html[data-cg-native-community-appearance="app"]) .block :global(.smart-result-row) > div:has([data-result-occupation]) :global([data-result-place])::before { content:" · "; }
+:global(html[data-cg-native-community-appearance="app"]) .block.block > :global([data-native-browse-row="true"]) { border-radius:0; border-bottom:0; }
+:global(html[data-cg-native-community-appearance="app"]) .block.block > :global([data-native-browse-row="true"]):first-of-type { border-radius:12px 12px 0 0; }
+:global(html[data-cg-native-community-appearance="app"]) .block.block > :global([data-native-browse-row="true"]):last-of-type { border-bottom:1px solid var(--smart-card-border); border-radius:0 0 12px 12px; }
+:global(html[data-cg-native-community-appearance="app"]) .block.block > :global([data-native-browse-row="true"]):only-of-type { border-radius:12px; }
 @media (prefers-reduced-transparency:reduce), (prefers-contrast:more) {
-  :global(html[data-cg-native-community-appearance="app"]) .block :global([data-search-result-card]) { background:var(--cg-app-bg,#24232d) !important; }
+  :global(html[data-cg-native-community-appearance="app"]) .block :global([data-search-result-card]) { background:var(--smart-card-bg,#161a23) !important; }
 }
 @media (prefers-contrast:more) {
   :global(html[data-cg-native-community-appearance="app"]) .block :global([data-search-result-card]) { border-color:var(--cg-app-ink,#f4f4f6); }
