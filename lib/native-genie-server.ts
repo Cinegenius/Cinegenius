@@ -37,14 +37,22 @@ export async function nativeGenieRoute(request:Request,kind:string):Promise<Resp
  const started=Date.now();
  let phase="access";
  let actor:string|null=null,releaseClaim:(()=>void)|undefined;
- const json=(body:unknown,status=200)=>{
+ const json=(body:unknown,status=200,diagnostic?:{rejectionStage?:unknown;rejectionReason?:unknown;rejectionArea?:unknown})=>{
   if(status>=500){
    // Only closed diagnostics: never log source, model output, identity, headers,
    // provider messages or exception stacks. Observation cannot affect response.
    const allowed=["unavailable","invalid_configuration","invalid_schema","invalid_evidence","provider_incomplete","provider_failed","provider_invalid_response","provider_empty_response","provider_unavailable","provider_timeout","too_large"];
    const candidate=object(body)?body.error:null;
    const code=typeof candidate==="string"&&allowed.includes(candidate)?candidate:"unclassified";
-   try{console.error(JSON.stringify({event:"native_genie_failure",kind:["personal-dispo","work-task","analyze"].includes(kind)?kind:"unknown",phase,code,status,elapsedMs:Math.max(0,Date.now()-started)}));}catch{}
+   let rejectionStage='unknown',rejectionReason='other',rejectionArea='unknown';
+   try{
+    const rawStage=diagnostic?.rejectionStage,rawReason=diagnostic?.rejectionReason,rawArea=diagnostic?.rejectionArea;
+    const stage=typeof rawStage==="string"&&["compact_wire","canonical_validation","recovery","provider","unknown"].includes(rawStage)?rawStage:"unknown";
+    const reason=typeof rawReason==="string"&&["duplicate_key","wire_schema_mismatch","invalid_union","wire_configuration","canonical_schema","recovery_schema","other"].includes(rawReason)?rawReason:"other";
+    const area=typeof rawArea==="string"&&["root","day","people","times","locations","notes","contacts","unknown"].includes(rawArea)?rawArea:"unknown";
+    rejectionStage=stage;rejectionReason=reason;rejectionArea=area;
+   }catch{/* Diagnostic access must not change the HTTP response. */}
+   try{console.error(JSON.stringify({rejectionStage,rejectionReason,rejectionArea,event:"native_genie_failure",kind:["personal-dispo","work-task","analyze"].includes(kind)?kind:"unknown",phase,code,status,elapsedMs:Math.max(0,Date.now()-started)}));}catch{}
   }
   return Response.json(body,{status,headers:{...headers,...(status===200&&actor?{"X-CineGenius-Genie-Account":actor}:{}),...(status===429?{"Retry-After":"60"}:{})}});
  };
@@ -110,7 +118,7 @@ export async function nativeGenieRoute(request:Request,kind:string):Promise<Resp
   if(request.signal.aborted)return json({error:"cancelled"},499);
   if(error instanceof NativeGenieError)return json({error:error.code},error.status);
   const engineError=nativeGenieEngineError(error);
-  if(engineError&&/^[a-z_]{1,80}$/.test(engineError.code)&&Number.isInteger(engineError.status)&&engineError.status>=400&&engineError.status<=599)return json({error:engineError.code},engineError.status);
+  if(engineError&&/^[a-z_]{1,80}$/.test(engineError.code)&&Number.isInteger(engineError.status)&&engineError.status>=400&&engineError.status<=599)return json({error:engineError.code},engineError.status,engineError);
   // The common quota/configuration errors contain only a closed code/status.
   if(object(error)&&["rate_limited","unavailable"].includes(String(error.code))&&[429,503].includes(Number(error.status)))return json({error:error.code},Number(error.status));
   return json({error:"unavailable"},503);

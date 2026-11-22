@@ -1,5 +1,16 @@
 # Aktuelle Aufträge · 22. November 2026
 
+## Neuester Auftragstand · Analysefehler und Smart-Innenabstand
+
+1. **Persönliche Dispoanalyse ursächlich klären:** Tatsächlicher `invalid_schema`/502 vom22.11.19:04:42.746UTC, Server8742ms/Gerät12,62s. Geschlossene Stufen-/Grund-/Bereichsdiagnose vorbereiten; kein Dokument-/Antwortlogging und kein stiller Anbieterretry. Widersprüchliche technische Formatgrenzen separat vereinfachen; kein belegter rechtlicher Block und noch kein bewiesenes fehlerhaftes Feld. Quellen-/Kontoschutz erhalten.
+2. **Smart-Karte→Liste verdichten:** Neuer Web-App-Kandidat mit gemeinsamer Info-/Übersetzungs-/Wiederholenzeile geprüft:66–70 statt136px,34 Browserfälle in17 Sprachen,73 fokussierte Prüfungen,14 verpflichtende Designprüfungen. Gewöhnliche Website gleich. Veröffentlichung und physische Gegenprobe gesondert; native Quellen unverändert.
+3. **Bereits abgeschlossene Randkorrektur erhalten:** Web `e23dbb1733725236613ff90e710cd738b4204099` / `dpl_823inwJ1f49MzcYacPpmB7tBcjU1` geprüft;2205 nach frischer Sicherung tatsächlich installiert und gestartet,144 bytegleiche Arbeitsdateien vor Erststart/0 Unterschiede. Markus bestätigt: „Kante weg, Genie und Leiste passen“. Das ist keine pauschale Geräte-/KI-/Team-/Mail-Abnahme.
+4. **Begonnene Gmail-Einrichtung fortsetzen:** Vier Serverwerte geschützt gespeichert; vorhandenen Verschlüsselungsschlüssel erhalten. Google-API/Scope/Testnutzer-Einrichtung und tatsächliche Postfachfreigabe offen, Aktivierungsflag aus. Weiterleitung weiterhin ohne Empfangsadresse. Bestehende Team-/Mail-SQL ist angewandt, echte angemeldete Abläufe getrennt prüfen. [Belege und übriger Umfang](app-followup-20261122.md).
+
+5. **Neuer separater nativer Scanner-Einstieg:** Ohne Face ID direkt Scannen / Selbst zeichnen / Hochladen (Foto/Screenshot/PDF); vorhandene Konto-/Projektberechtigung und separaten Meins-Archivschutz erhalten. Noch laufende native Implementierung, kein Bestandteil dieses Web-Kandidaten oder der installierten2205-Fassung.
+
+Dieser Checkpoint ersetzt die widersprechenden älteren Installations-/Releaseangaben unten. Frühere Aufträge und Belege bleiben erhalten.
+
 ## Neuester Auftragstand · 22. November 2026 · Randfix vor Installation
 
 1. **Unteren App-Rand korrigieren und veröffentlichen:** Kausal reproduzierter Schnitt des festen Scrollbereichs194 CSS-Pixel vor dem sichtbaren unteren Rand im geprüften Fall; auch ausgeblendete Bedienelemente ändern ihn nicht. Die enge Drei-Dateien-Korrektur im Web-App-Modus nutzt volle sichtbare Scrollhöhe, nachlaufenden Bedienabstand und getrennte Fokusgrenze.32 fokussierte,4 Komponenten-Browser- und44 Fallback-/Kleinsthöhenfälle bestanden. Veröffentlichung und echte Gerätegegenprobe noch offen.2204 bleibt installiert; signierter2205-Kandidat bis dahin zurückgehalten,377 native Eingaben unverändert.

@@ -1,5 +1,11 @@
 # CineGenius · Übersicht der gesamten Website
 
+## Neuester Prüfstand · 22. November 2026 · e23 und Folgekorrekturen
+
+Produktive Web-Basis `e23dbb1733725236613ff90e710cd738b4204099` / `dpl_823inwJ1f49MzcYacPpmB7tBcjU1` ist geprüft; native2205 tatsächlich installiert (144 bytegleiche Arbeitsdateien vor Erststart). Markus bestätigt: „Kante weg, Genie und Leiste passen“. Die neue kompakte Smart-Bedienzeile ist ein gesondert geprüfter Kandidat nur für die App-Darstellung; gewöhnliches Website-Markup bleibt gleich.34 Browserfälle über17 Sprachen,73 fokussierte Tests und14 verpflichtende Designprüfungen bestanden; neue Veröffentlichung/physische Abnahme separat belegen.
+
+Ein enger Serverdiagnosekandidat unterscheidet ausschließlich geschlossene Analyse-Stufen/-Gründe/-Bereiche. Er speichert keine Dokumentinhalte, Identitäten, Rohpfade oder Anbieterantworten und verändert weder öffentliche Fehlerantwort noch Modell/Quellen-/Recovery-Regeln. Der echte `invalid_schema`/502 vom22.11.19:04UTC bleibt ursächlich ungeklärt; widersprüchliche Producer-/Validatorgrenzen sind belegt, aber kein bestätigter Auslöser. Gmail-Serverwerte vorhanden, Aktivierungsflag weiterhin aus; keine echte Mailboxverbindung oder Weiterleitung. [Belege und Abgrenzung](app-followup-20261122.md). Ältere gegenteilige Zwischenstände unten bleiben Historie.
+
 ## Aktueller Releasecheckpoint · 22. November 2026
 
 Das gemeinsame Web-Paket `3fa9685aebfbb220e1825ded91943c119f629101` ist produktiv READY (`dpl_8HQ4mwGcJEg7Wovtz7aJdfX9ihzc`); beide geprüften Team-/Mail-Migrationen sind angewandt und mit47 API-Prüfungen verifiziert. Serverbeleg und Grenzen: [App-Folgefassung](app-followup-20261122.md). Echte angemeldete Team-/Mail-Abläufe und Anbieter-Mailzustellung sind dadurch nicht abgenommen. Google-Cloud-Projekt/Branding sind nach menschlicher Annahme der rechtlichen Bedingungen angelegt; vertraulicher Webclient/Serverwerte sind nur für das eigene Google-Testkonto freigegeben. Aktive Verbindung und Weiterleitung bleiben unbelegt.

@@ -1,5 +1,13 @@
 # Gemeinsame App-Folgefassung – 22. November 2026
 
+## Neuester Prüfstand · Geräteabnahme und gezielte Folgekorrekturen
+
+Web `e23dbb1733725236613ff90e710cd738b4204099` ist als `dpl_823inwJ1f49MzcYacPpmB7tBcjU1` produktiv geprüft. **2205 ist tatsächlich installiert und gestartet**, nach frischer Sicherung mit144 vor Erststart bytegleichen Arbeitsdateien und0 Unterschieden. Markus bestätigt: „Kante weg, Genie und Leiste passen“. Andere Geräteabläufe sind damit nicht pauschal abgenommen. Belege im lokalen App-Auftrag: `work/app-startup-logo-20261122/ui-install.safe.json` und `production-release.safe.json`.
+
+Der zusätzliche Smart-Innenabstand Karte→Liste ist als136px reproduziert. Neuer Kandidat: eine gemeinsame Info-/Übersetzungs-/Wiederholenzeile,66–70px in34 Komponenten-Browserfällen über17 Sprachen und320/393px, mindestens44px Bedienelemente;73 fokussierte Prüfungen und14 verpflichtende Designprüfungen bestanden. Die gewöhnliche Website behält ihr geprüftes Markup. Neue Veröffentlichung und physische Gegenprobe bleiben getrennt zu belegen; kein weiterer nativer Build nötig.
+
+Die echte persönliche Analyse vom22.11.19:04:42.746UTC brach mit `invalid_schema`/502 ab (Server8742ms, Gerät12,62s). Die genaue Ablehnungsregel ist bisher nicht belegt. Der Diagnosekandidat erhält geschlossene Stufe/Grund/Bereich bis zur bestehenden Servermeldung, ohne Rohtexte, Feldwerte, Pfade, Identitäten oder Stacks. Öffentliche Antwort und strikte Prüfung bleiben unverändert; kein Anbieterretry durch diese Prüfung. Belegte widersprüchliche Formatgrenzen sind ein eigener Vereinfachungsauftrag, kein nachgewiesener Fix dieses Fehlers. Gmail-Zugang vorbereitet, Aktivierungsflag aus; keine verbundene Mailbox/Weiterleitung. Dieser Stand ersetzt abweichende ältere Zwischenstände unten.
+
 ## Aktueller Release- und Randkorrekturstand · 22. November 2026
 
 **Tatsächlich veröffentlicht:** `3fa9685aebfbb220e1825ded91943c119f629101`, Produktion READY auf `dpl_8HQ4mwGcJEg7Wovtz7aJdfX9ihzc`. Beide geprüften SQL-Migrationen für Teams und Mail sind inzwischen angewandt und mit47 API-Prüfungen verifiziert. Maßgeblicher Serverbeleg: `/srv/cinegenius/handoffs/20261122-app-team-mail-access-readonly/production-3fa9685a/receipt.json`. Diese Release-/Zugriffsprüfungen sind kein echter angemeldeter Teamablauf, keine Mailzustellung und keine OAuth-Verbindung. Der bestätigte OOM-Befund und die getrennten Typprüfungen unten bleiben gültige Historie; der anschließende vollständige Produktionsbuild ist bestanden.

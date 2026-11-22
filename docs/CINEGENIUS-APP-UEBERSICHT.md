@@ -1,5 +1,13 @@
 # CineGenius · Übersicht der gesamten App
 
+## Neuester Gerätestand · 22. November 2026 · 2205 installiert
+
+**2205 ist nach frischer Sicherung installiert und gestartet;144 Arbeitsdateien waren vor Erststart bytegleich,0 Unterschiede.** Veröffentlichte Web-Basis ist `e23dbb1733725236613ff90e710cd738b4204099` / `dpl_823inwJ1f49MzcYacPpmB7tBcjU1`. Markus bestätigt: „Kante weg, Genie und Leiste passen“. Das ersetzt den früheren Installationshalt, jedoch keine umfassende Geräte-, Team-, Mail- oder KI-Abnahme. [Aktuelle Belege, neue Smart-Abstandskorrektur und Grenzen](app-followup-20261122.md).
+
+Smart-Karte→Liste ist im nächsten geprüften Web-Kandidaten kompakter (66–70 statt136px;34 Browserfälle,17 Sprachen,73 fokussierte Tests,14 verpflichtende Designprüfungen). Veröffentlichung/physische Abnahme gesondert. Die echte persönliche Dispoanalyse liefert weiterhin `invalid_schema`/502; neue geschlossene Diagnose und separate Prüfung widersprüchlicher Formatgrenzen sind keine behauptete Fehlerbehebung. Kein Hinweis auf eine rechtliche Sperre. Gmail bleibt deaktiviert, ohne verbundene Mailbox oder Empfangsadresse. Ältere widersprechende Statusabschnitte unten sind Historie.
+
+**Neu beauftragter Scanner-Einstieg, getrennt und noch nicht ausgeliefert:** Ohne Face ID direkt Scannen / Selbst zeichnen / Hochladen (Foto, Screenshot, PDF). Bestehende Konto-/Projektberechtigung und der Meins-Archivschutz bleiben erhalten. Laufende native Implementierung ist nicht Teil dieses Web-Kandidaten oder der installierten2205-Fassung.
+
 ## Aktueller Gerätestand und untere Inhaltskante · 22. November 2026
 
 **Installiert bleibt2204;2205 ist signiert und bis zum geprüften Randfix-Release zurückgehalten.** Seine377 nativen Eingaben sind unverändert. Das gemeinsame Serverpaket `3fa9685aebfbb220e1825ded91943c119f629101` ist produktiv READY (`dpl_8HQ4mwGcJEg7Wovtz7aJdfX9ihzc`); Team-/Mail-SQL ist angewandt und mit47 API-Prüfungen verifiziert. Das ersetzt keine echte angemeldete Bedienung oder Geräteabnahme. [Releasebeleg und Grenzen](app-followup-20261122.md).

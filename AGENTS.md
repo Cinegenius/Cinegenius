@@ -1,4 +1,14 @@
-## Neuester Betreiberstand – 22. November 2026 · unterer App-Rand
+## Neuester Betreiberstand – 22. November 2026 · Geräteabnahme und Analysefehler
+
+**Tatsächlich ausgeliefert und installiert:** Web-Hauptstand `e23dbb1733725236613ff90e710cd738b4204099`, Produktion `dpl_823inwJ1f49MzcYacPpmB7tBcjU1`, www-Zuordnung geprüft. Gerätebuild **2026112205** ist nach frischer Sicherung installiert und gestartet; vor Erststart waren144 persistente Arbeitsdateien bytegleich,0 Unterschiede. Markus bestätigt: „Kante weg, Genie und Leiste passen“. Das ist die Abnahme dieser drei UI-Punkte, keine pauschale Geräte-/KI-/Team-/Mail-Abnahme. Der vorherige Installationshalt ist damit für2205 erledigt; ältere Aussagen unten bleiben Historie.
+
+**Aktuelle enge Korrekturen:** Smart-Karte→Liste hatte intern136 CSS-Pixel Abstand. Der geprüfte neue Web-App-Kandidat bündelt Info/Übersetzung/Wiederholen in einer Zeile;34 tatsächliche Komponenten-Browserfälle über17 Sprachen bei320/393px ergeben66–70px bei mindestens44px Bedienzielen,73 fokussierte Tests und14 verpflichtende Designprüfungen bestanden. Gewöhnliche Website-Markup-Gleichheit separat geprüft. Veröffentlichung und physische Abnahme dieses neuen Kandidaten sind gesondert zu belegen; native Quellen unverändert.
+
+Die echte persönliche Dispoanalyse vom22.11.19:04:42.746UTC scheiterte serverseitig mit `invalid_schema`/502 nach8742ms, am Gerät12,62s. Kein belegter Timeout oder rechtlicher Block und kein bekanntes fehlerhaftes Feld. Ein enger Diagnosekandidat ergänzt ausschließlich geschlossene Stufen-/Grund-/Bereichswerte, ohne Dokumente, Identitäten, Rohpfade, Anbieterantworten oder Stacks zu protokollieren. Öffentliches Fehlerverhalten, Modell, Prompt und sämtliche Validierungs-/Recovery-Regeln bleiben erhalten. Technisch widersprüchliche Formatgrenzen sind belegt, ihre Kausalität für diesen Versuch nicht. Kein blinder Neuaufbau oder Lockerung von Quellen-/Kontoschutz; Vertragsvereinfachung bleibt ein gesonderter Prüfauftrag. Gmail weiterhin deaktiviert und ohne verbundene Mailbox; vorhandenen Verschlüsselungsschlüssel erhalten.
+
+**Separater neuer nativer Auftrag:** Floor Scanner ohne Face-ID-/Gerätecodeabfrage direkt mit den drei Einstiegen Scannen, Selbst zeichnen und Hochladen (Foto/Screenshot/PDF) öffnen. Bestehende Konto-/Projektberechtigung und den getrennten Meins-Archivschutz erhalten. Das ist noch laufende native Arbeit und kein Bestandteil dieses Web-Kandidaten oder der installierten2205-Fassung.
+
+## Historischer Betreiberstand – 22. November 2026 · unterer App-Rand
 
 **Veröffentlicht:** `3fa9685aebfbb220e1825ded91943c119f629101` ist produktiv READY (`dpl_8HQ4mwGcJEg7Wovtz7aJdfX9ihzc`). Beide geprüften Team-/Mail-Migrationen sind angewandt und mit47 API-Prüfungen verifiziert; Serverbeleg: `/srv/cinegenius/handoffs/20261122-app-team-mail-access-readonly/production-3fa9685a/receipt.json`. Das bestätigt keine echten angemeldeten Team-/Mail-Abläufe oder Anbieteranmeldung. Installiert bleibt2204. Der signierte Kandidat2205 bleibt bis zur Veröffentlichung und Prüfung der unteren Inhaltskante zurückgehalten; seine377 nativen Eingaben sind unverändert.
 

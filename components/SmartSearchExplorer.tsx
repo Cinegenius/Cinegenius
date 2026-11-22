@@ -18,6 +18,7 @@ import { searchGroupKey, type SearchGroup, type SearchPlan } from "@/lib/unified
 import { SMART_MAP_COLORS } from "@/lib/smart-search-map";
 import { NATIVE_SMART_MAP_COLORS, nativeSmartColorStyle } from "@/lib/native-smart-colors";
 import resultStyles from "./SmartSearchResults.module.css";
+import SmartSearchMapInfo from "./SmartSearchMapInfo";
 import { preserveDiscoveryMapOrder } from "@/lib/discovery-map-order";
 import { nativeSmartViewportGroups } from "@/lib/native-smart-viewport";
 import { searchQueryTitle } from "@/lib/unified-search-areas";
@@ -251,7 +252,7 @@ export default function SmartSearchExplorer({ plan, initialGroups, initialMapGro
         ...[...new Set([...available[kind], ...filters[kind]])].map(id => ({ value: id, label: facetName(kind, id), disabled: !available[kind].includes(id) }))]}
       onChange={value => { if (value !== "__selection") setFilters(current => ({ ...current, [kind]: value ? [value] : [] })); }} />) : [];
 
-  return <div className="smart-explorer" data-smart-explorer data-map-open={mapOpen}>
+  return <div className={`smart-explorer${nativeAppearance ? ` ${resultStyles.explorer}` : ""}`} data-smart-explorer data-map-open={mapOpen}>
     {nativeAppearance && <NativeSmartAreas available={areas} hidden={filters.hiddenAreas} onChange={hiddenAreas => setFilters(value => ({ ...value, hiddenAreas }))} />}
     {nativeAppearance ? <NativeBrowseToolbar count={count} countLabel={t("discovery.loaded", { count })} filters={nativeQuickFilters}
       moreAction={moreAction} viewControls={<DirectoryViewControls value={view} onChange={setView} views={["grid", "list", "map"]} />} /> : <div className="smart-result-toolbar">
@@ -296,7 +297,10 @@ export default function SmartSearchExplorer({ plan, initialGroups, initialMapGro
       {mapReady && !hasMapPositions && count > 0 && <p className="text-xs text-text-muted">{t("discovery.unmapped", { count })}</p>}
     </div>
     <div className="smart-result-list">
-    <ContentTranslationNotice />
+    {nativeAppearance ? <div className={resultStyles.utilityRow} data-native-smart-utility="v1">
+      <ContentTranslationNotice />
+      {mapOpen && mapReady && hasMapPositions && <SmartSearchMapInfo native />}
+    </div> : <ContentTranslationNotice />}
     {errors.includes("initial") && <div role="alert" className="text-sm text-text-secondary"><p>{t("error")}</p><button type="button" className="min-h-11 min-w-11 text-gold" onClick={() => void read()} disabled={pending.includes("initial")}>{t("retry")}</button></div>}
     {pending.includes("initial") && <p role="status" className="text-sm text-text-muted">{t("loading")}</p>}
     {!count && <div role="status" className="rounded-xl border border-border bg-bg-secondary p-4 text-sm text-text-secondary"><p>{t(filtered ? "discovery.emptyFilters" : "emptyGroup")}</p>{filtered && <button type="button" className="min-h-11 min-w-11 text-gold" onClick={reset}>{t("discovery.reset")}</button>}</div>}
