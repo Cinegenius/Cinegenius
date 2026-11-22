@@ -3,8 +3,8 @@
 Prepared against d8b72d7375aedbc581ac807011bc0969d77a765e on 22 November 2026.
 Not deployed, not installed and not a claim that the iPhone transition is fixed.
 The earlier collage hold was subsequently checked against the local APP user
-message: the shared design is approved. Actual integration, release and device
-verification still require their respective evidence; see coordination below.
+message: the shared design is approved. Local APP now reports the combined source integration complete; release and
+device verification remain outstanding. See the latest checkpoint below.
 
 ## Reproduced cause in the server-delivered app component
 
@@ -47,12 +47,11 @@ No new interface copy or translation keys.
   backup, with 132 persistent files compared and zero differences. This server
   task inspected that report; it did not repeat the device operation.
 
-Still required: merge this small lifecycle change with the local task's pending
-Smart layout/revalidation changes, verify the final combined component, and
-measure Work return on the installed candidate after approval. Inspect native
-WebView reuse, presentation/dismissal, layout restoration and real foreground
-events. Current result replacement can still create a visible empty interval;
-this patch prevents repeated network restarts, not every source of delay.
+The local APP checkpoint now reports the source fix merged with its own refresh,
+24px status region and numeric height placeholder. Do not reapply this older
+standalone two-file patch over the frozen combined source. Publication and
+physical Work-return measurement remain outstanding; the isolated server patch
+alone never established a complete native performance fix.
 
 The persistent header/dock/Genie shell and the operator's newer two-column
 website-style cards are covered by the approved collage. This diagnosis does
@@ -92,3 +91,39 @@ APP checked the receipt, fetched origin/main and inspected the six changed files
 No Smart-return, UI or team-channel source is part of that release. Preserve the
 new Genie prompt selection on the next merge; do not overwrite it with this
 branch's older engine files. The return fix remains prepared, not published.
+
+
+## Local combined candidate 2026112203 — reported, not installed
+
+Source: local APP task `01a1d38d-d672-7941-8033-30d87821d882` and its visible
+candidate/checkpoint command outputs. The server read those outputs; it did not
+copy or independently verify the candidate binary or private native sources.
+
+- Native build and signing pass after two real-module compiler fixes. Reported
+  frozen inputs: 376; public resources: 45; native catalogs: 9 × 1876 keys.
+- Our return patch is merged with local refresh/layout preservation; 35 focused
+  tests pass. Same-foreground events share one request; real interruption does
+  not preserve unchecked private rows. Numeric height preservation protects
+  scroll position without retaining private cards for display.
+- The native same-Smart destination sends one app-resume before its bounded
+  readiness probe; it waits for the actual native Smart ready marker plus two
+  animation frames. No reported 2.5s readiness deadlock in the prepared flow.
+- Shared header, Work icon and Genie are locally consistent across Work and
+  Community. The body/main-versus-wrapper CSS defect was reproduced with a
+  negative control; local report gives 12/12 padding after removing the old rule.
+- Reported checks: 177 web, 113 mobile plus focused follow-ups; browser suites
+  28 Smart / 40 directories / 8 ordinary website / 4 actual DOM structure cases.
+  These suites may overlap. They are not physical iPhone acceptance tests.
+
+Local source-control checkpoint: 29 web files frozen on d8b72d73, no new commit,
+push or UI production build. GitHub Desktop twice returned cgWindowNotFound
+while Markus was away. Preserve the required Mac workflow; do not replace it
+with terminal Git or overwrite the local frozen files from this server branch.
+On the next reconciliation retain published 57d7658f and its focused/medium
+Genie selection. Then record the combined commit/release, fresh phone backup,
+2203 installation and real device verification separately.
+
+Installed device remains 2202; its 132-file preservation proof does not turn its
+failed UX acceptance into a pass. Team-channel SQL was not adopted or applied;
+name/team Dispo selection is not implemented. Editor/import/solar-position
+extensions are still separate previews, not native editor code.
