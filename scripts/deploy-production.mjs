@@ -70,7 +70,14 @@ execFileSync("npm", ["run", "check:i18n"], { stdio: "inherit" });
 // Build on Vercel so production secrets stay in the project environment. `vercel pull`
 // redacts sensitive values in local files; a prebuilt upload would then compile with
 // placeholders instead of the real production configuration.
-const deployArgs = ["vercel", "deploy", "--prod", "--yes", "--logs"];
+// Keep the checker and other build-only Node subprocesses below the standard
+// 8 GiB container limit. The full strict checker passed within this heap bound;
+// an unbounded staged build was killed by the container's OOM guard. These are
+// build overrides only: runtime settings, type checks and project limits stay
+// unchanged, and stage and production use the same checking configuration.
+const deployArgs = ["vercel", "deploy", "--prod", "--yes", "--logs",
+  "--build-env", "NODE_OPTIONS=--max-old-space-size=3072",
+  "--build-env", "VERCEL_BUILD_SYSTEM_REPORT=1"];
 if (stage) deployArgs.push("--skip-domain", "--env", "LISTING_FRESHNESS_ENABLED=false", "--env", "PROFILE_ART_WORKER_ENABLED=false");
 if (prepareLocales) deployArgs.push("--build-env", "CG_PREPARE_LOCALES=1");
 execFileSync("npx", deployArgs, { stdio: "inherit" });
