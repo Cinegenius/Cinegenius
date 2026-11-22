@@ -82,3 +82,13 @@ integration or installation. The independent team migration remains explicitly
 not applicable; no whole-branch merge into main. Source fix is `2d6985c4`;
 the transferable two-file patch and checks are under
 `/srv/cinegenius/handoffs/20261122-app-team-contract-smart-return/`.
+
+
+## Later production baseline
+
+WEB completed its separate authorized Dispo-only release at
+`57d7658ff50bf3115f47e7b254c3210ac3c3a717`, descended from the d8b72d73 base.
+APP checked the receipt, fetched origin/main and inspected the six changed files.
+No Smart-return, UI or team-channel source is part of that release. Preserve the
+new Genie prompt selection on the next merge; do not overwrite it with this
+branch's older engine files. The return fix remains prepared, not published.

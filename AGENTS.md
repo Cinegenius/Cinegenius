@@ -1,3 +1,7 @@
+## Neuer geprüfter WEB-Hauptstand – 22. November 2026
+
+`57d7658ff50bf3115f47e7b254c3210ac3c3a717` ist laut abgeglichenem Releasebeleg der veröffentlichte Hauptstand nach `d8b72d73`: fokussierter persönlicher Dispo-Prompt, bisheriges Modell/medium/Tier und geschlossener Datenvertrag erhalten. Beleg: `/srv/cinegenius/audits/20261122-dispo-release/receipt.json`. Beim nächsten App-Abgleich erhalten; dieser isolierte App-Zweig hat nur die Übergabe dokumentiert, keine Produktdateien daraus kopiert. Keine nachgewiesene Modellbeschleunigung, Namensauswahl, Geräteinstallation, Smart-Rückkehrveröffentlichung oder Teamkanal-Aktivierung aus diesem Release ableiten.
+
 ## App-Abgleich vom 22. November 2026 nach Installation 2202
 
 Die lokale APP-Aufgabe meldet Build **2026112202 tatsächlich installiert und gestartet** nach frischer Sieben-Ordner-Sicherung; **132 persistente Dateien bytegleich, 0 Abweichungen**. Der Server hat diesen Beleg im lokalen Auftrag gelesen, keine eigene Geräteprüfung wiederholt. Die frühere Angabe „2202 nur Kandidat / 2106 installiert“ ist historisch.
