@@ -2,8 +2,9 @@
 
 Prepared against d8b72d7375aedbc581ac807011bc0969d77a765e on 22 November 2026.
 Not deployed, not installed and not a claim that the iPhone transition is fixed.
-The operator's requested collage review remains required before the next native
-build, release or installation.
+The earlier collage hold was subsequently checked against the local APP user
+message: the shared design is approved. Actual integration, release and device
+verification still require their respective evidence; see coordination below.
 
 ## Reproduced cause in the server-delivered app component
 
@@ -53,6 +54,31 @@ WebView reuse, presentation/dismissal, layout restoration and real foreground
 events. Current result replacement can still create a visible empty interval;
 this patch prevents repeated network restarts, not every source of delay.
 
-The proposed persistent header/dock/Genie shell and the operator's newer
-two-column website-style cards belong to the collage review. No new build or
-production publication is authorized by this diagnosis.
+The persistent header/dock/Genie shell and the operator's newer two-column
+website-style cards are covered by the approved collage. This diagnosis does
+not independently authorize a server deployment or the team-channel migration.
+
+
+## Coordination on 22 November 2026
+
+Markus expressly requested coordination here: “ja stimme dich mit app usw ab”.
+The patch, exact commit, test evidence and remaining limitations were sent to:
+
+- Local APP / Xcode: `01a1d38d-d672-7941-8033-30d87821d882` on host `local`.
+  Owns merging the two-file fix into its pending Smart/layout and native shell
+  changes, combined verification and the authorized device workflow.
+- WEB CODEX: `01a1d43f-7699-7452-b2f3-3691699f6613` on the server.
+  Retains the ordinary website and coordinates shared server source/release
+  changes; do not introduce a competing Work-return implementation.
+
+Direct approval evidence inspected in local APP: user message
+`01a2030e-81d7-7832-88d9-ac50144ce002`, “die collage ist gut so”. This fulfills
+that design-review condition; additional floor-plan editor requests and the
+unfinished team-chat server contract keep their own scope. The old blanket
+collage hold in the initial handoff receipt is historical.
+
+Both messages were successfully delivered. Delivery alone does not prove source
+integration or installation. The independent team migration remains explicitly
+not applicable; no whole-branch merge into main. Source fix is `2d6985c4`;
+the transferable two-file patch and checks are under
+`/srv/cinegenius/handoffs/20261122-app-team-contract-smart-return/`.
