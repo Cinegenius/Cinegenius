@@ -93,7 +93,7 @@ new Genie prompt selection on the next merge; do not overwrite it with this
 branch's older engine files. The return fix remains prepared, not published.
 
 
-## Local combined candidate 2026112203 — reported, not installed
+## Historical candidate 2026112203 — not installed, superseded by startup scope
 
 Source: local APP task `01a1d38d-d672-7941-8033-30d87821d882` and its visible
 candidate/checkpoint command outputs. The server read those outputs; it did not
@@ -121,9 +121,31 @@ while Markus was away. Preserve the required Mac workflow; do not replace it
 with terminal Git or overwrite the local frozen files from this server branch.
 On the next reconciliation retain published 57d7658f and its focused/medium
 Genie selection. Then record the combined commit/release, fresh phone backup,
-2203 installation and real device verification separately.
+installation of the final matching candidate and real device verification separately.
 
 Installed device remains 2202; its 132-file preservation proof does not turn its
 failed UX acceptance into a pass. Team-channel SQL was not adopted or applied;
 name/team Dispo selection is not implemented. Editor/import/solar-position
 extensions are still separate previews, not native editor code.
+
+
+## Desktop access restored; expanded startup scope targets 2204
+
+Local APP confirms GitHub Desktop available after Markus reported “git hub ist da”.
+It reports UI commit2225503 merged with published57d7658f as ed334e8. These are
+local source-control reports, not commits independently fetched here; no push
+or new production publication is confirmed at this checkpoint.
+
+Markus subsequently requested a sustainable startup correction and explicitly
+selected restoring the last used area after authentication. Local APP reports
+25 checked/frozen startup web files: a minimal session API, actual Clerk/layout/
+Smart/Shots readiness, no native reveal delays, and no data fetching by the cold
+Dashboard intermediary. Native tests/SDK checks are being finalized for a single
+startup cover without a fixed wait or chooser, account-scoped areas, fail-closed
+retry and respected deep links.
+
+The next complete native candidate is2204. Do not install the older2203 for this
+expanded scope. Installed build remains2202. Local APP continues the authorized
+complete build, Desktop push, guarded release, fresh backup and installation.
+No new2204 build pass, release, installation or physical latency measurement is
+claimed here. Team/editor work remains outside this release scope.

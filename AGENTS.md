@@ -1,4 +1,12 @@
-## Lokaler APP-Abschlusscheckpoint – 22. November 2026
+## Lokaler APP-Startabgleich – Ziel 2204, 22. November 2026
+
+Die lokale APP bestätigt **GitHub Desktop wieder erreichbar**. Das UI-Paket wurde dort als `2225503` committed und mit dem veröffentlichten `57d7658f` zu `ed334e8` zusammengeführt; diese lokalen Commitangaben sind hier übergeben, noch nicht als remote veröffentlicht geprüft. Laut Checkpoint noch kein Push oder neuer Livegang. Den neueren Hauptstand und die laufenden lokalen Änderungen erhalten; kein paralleles Überschreiben oder Veröffentlichen aus diesem Chat.
+
+Markus hat anschließend die nachhaltige Startkorrektur beauftragt und ausdrücklich **zuletzt verwendeten Bereich nach der Anmeldeprüfung wieder öffnen** gewählt. APP meldet 25 geprüfte/eingefrorene Web-Startup-Dateien: minimale Sitzungsabfrage, tatsächliche Clerk-/Layout-/Smart-/Shots-Bereitschaft, keine nativen Einblendverzögerungen und keine eigenen Datenabfragen im kalten Dashboard-Zwischenschritt. Native Tests/SDK-Prüfung werden finalisiert; Einzel-Startabdeckung ohne feste Wartezeit/Chooser, kontogebundene Bereiche, sicher geschlossener Wiederholungsweg und DeepLinks gehören zum aktuellen Umfang. Diese Punkte sind gemeldeter lokaler Quellstand, kein neuer Live- oder Gerätenachweis.
+
+**Nächster vollständiger Gerätebuild ist 2204; 2203 nicht installieren.** Installiert bleibt 2202. Die lokale APP führt den bereits beauftragten Abschluss einschließlich passendem geprüftem Build, GitHub-Desktop-Push, guarded Veröffentlichung, frischer Sicherung, Installation und echtem Start-/Rückkehrtest fort. Keine weitere pauschale Freigaberunde für denselben Auftrag. Teamkanal-/Editorerweiterungen bleiben getrennt; 2204-Build, Veröffentlichung, Installation und gemessene Latenz sind noch nicht bestätigt.
+
+## Historischer lokaler APP-Checkpoint 2203 – durch Startauftrag erweitert
 
 Die lokale APP-Aufgabe meldet **2203 vollständig gebaut/signiert, noch nicht installiert und kein neuer UI-Livegang**. Kandidatenbeleg und Abschlussausgaben wurden hier über den lokalen Chat gelesen; die Binärdatei und lokalen Quellarchive wurden nicht eigenständig geprüft oder kopiert. Gemeldet: 376 eingefrorene Buildinputs, 45 öffentliche Ressourcen, 9 native Kataloge mit je 1876 Schlüsseln. Installiert bleibt **2202**; 132 Dateien waren bei dessen Installation bytegleich erhalten, seine anschließende UX-Abnahme ist jedoch fehlgeschlagen.
 
