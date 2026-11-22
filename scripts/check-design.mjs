@@ -1,4 +1,6 @@
 import { existsSync, readdirSync, readFileSync } from "node:fs";
+import { spawnSync } from "node:child_process";
+import { fileURLToPath } from "node:url";
 
 const failures = [];
 const read = (path) => readFileSync(path, "utf8");
@@ -177,6 +179,24 @@ for (const entry of readdirSync("messages", { withFileTypes: true })) {
 if (failures.length) {
   console.error("Shared design checks failed:");
   for (const failure of failures) console.error(`- ${failure}`);
+  process.exit(1);
+}
+
+// Keep the native scroll-canvas regression in the same fail-closed gate used
+// by normal and staged releases. No browser, network or full build is needed.
+const contentLayoutTests = spawnSync(process.execPath, [
+  "--experimental-strip-types",
+  "--import", fileURLToPath(new URL("./register-test-aliases.mjs", import.meta.url)),
+  "--test",
+  fileURLToPath(new URL("../lib/native-app-content-region.test.mjs", import.meta.url)),
+  fileURLToPath(new URL("../lib/native-app-content-layout.test.mjs", import.meta.url)),
+], {
+  cwd: fileURLToPath(new URL("../", import.meta.url)),
+  stdio: ["ignore", "inherit", "inherit"],
+  timeout: 30_000,
+});
+if (contentLayoutTests.error || contentLayoutTests.signal || contentLayoutTests.status !== 0) {
+  console.error("Native app content layout regression checks failed; release stopped.");
   process.exit(1);
 }
 
