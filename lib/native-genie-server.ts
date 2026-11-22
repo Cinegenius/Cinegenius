@@ -34,8 +34,20 @@ async function readInput(request:Request):Promise<unknown>{
 }
 
 export async function nativeGenieRoute(request:Request,kind:string):Promise<Response>{
+ const started=Date.now();
+ let phase="access";
  let actor:string|null=null,releaseClaim:(()=>void)|undefined;
- const json=(body:unknown,status=200)=>Response.json(body,{status,headers:{...headers,...(status===200&&actor?{"X-CineGenius-Genie-Account":actor}:{}),...(status===429?{"Retry-After":"60"}:{})}});
+ const json=(body:unknown,status=200)=>{
+  if(status>=500){
+   // Only closed diagnostics: never log source, model output, identity, headers,
+   // provider messages or exception stacks. Observation cannot affect response.
+   const allowed=["unavailable","invalid_configuration","invalid_schema","invalid_evidence","provider_incomplete","provider_failed","provider_invalid_response","provider_empty_response","provider_unavailable","provider_timeout","too_large"];
+   const candidate=object(body)?body.error:null;
+   const code=typeof candidate==="string"&&allowed.includes(candidate)?candidate:"unclassified";
+   try{console.error(JSON.stringify({event:"native_genie_failure",kind:["personal-dispo","work-task","analyze"].includes(kind)?kind:"unknown",phase,code,status,elapsedMs:Math.max(0,Date.now()-started)}));}catch{}
+  }
+  return Response.json(body,{status,headers:{...headers,...(status===200&&actor?{"X-CineGenius-Genie-Account":actor}:{}),...(status===429?{"Retry-After":"60"}:{})}});
+ };
  try{
   const url=new URL(request.url);
   if(!["analyze","personal-dispo","work-task"].includes(kind)||url.pathname!=="/api/native/v1/genie/"+kind||url.search)fail("not_found",404);
@@ -70,6 +82,7 @@ export async function nativeGenieRoute(request:Request,kind:string):Promise<Resp
   releaseClaim=release;inFlight.set(claimedActor,claim);
   request.signal.addEventListener("abort",release,{once:true});
   if(request.signal.aborted){release();request.signal.throwIfAborted();}
+  phase="input";
   const input=await readInput(request);
   validateNativeGenieInput(kind,input);
   const signal=AbortSignal.any([request.signal,AbortSignal.timeout(540_000)]);
@@ -77,6 +90,7 @@ export async function nativeGenieRoute(request:Request,kind:string):Promise<Resp
   if(providerEngine?.digest!==digest)providerEngine={digest,engine:createNativeGenieEngine(config.apiKey)};
   const engine=providerEngine.engine;
   let reserved=false;
+  phase="analysis";
   const result=await engine(kind,input,{signal,beforeProvider:async()=>{
    signal.throwIfAborted();
    // Reserve before generation. Failed/aborted calls do not refund usage. The
@@ -87,7 +101,8 @@ export async function nativeGenieRoute(request:Request,kind:string):Promise<Resp
    await reserveGenieUsage(request,actor,config);
    signal.throwIfAborted();
   }});
-  signal.throwIfAborted();await verify();
+  phase="recheck";signal.throwIfAborted();await verify();
+  phase="response";
   const output=JSON.stringify(result);
   if(!object(result)||Buffer.byteLength(output)>MAX_BYTES)fail("too_large",502);
   return json(result);
