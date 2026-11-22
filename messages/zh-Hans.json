@@ -13487,13 +13487,13 @@
     "workspaceNativeOnly": "请在CineGenius应用中打开Workspace。",
     "background": "深色背景",
     "backgrounds": {
-      "graphite": "石墨灰",
-      "midnight": "午夜蓝",
-      "sage": "烟灰绿",
-      "rose": "玫瑰粉",
-      "sand": "暖沙色",
-      "terracotta": "陶土色",
-      "black": "纯黑"
+      "graphite": "Cement",
+      "midnight": "Dark Sky",
+      "sage": "Pistachio",
+      "rose": "Cherry",
+      "sand": "Sand",
+      "mauve": "Mauve",
+      "black": "Black"
     }
   },
   "AppShots": {

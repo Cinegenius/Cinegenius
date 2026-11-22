@@ -3,10 +3,13 @@ import {useEffect, useId, useLayoutEffect, useRef, useState, type ReactNode} fro
 import {useTranslations} from "next-intl";
 import {X} from "lucide-react";
 import {dismissNativeHeaderUtility, useNativeHeaderUtility} from "@/lib/native-header-utility";
+import {useNativeInboxSurface} from "./NativeInboxSurfaceContext";
 import {useSwipeDismiss} from "@/lib/use-swipe-dismiss";
+import {lockBodyScroll} from "@/lib/body-scroll-lock";
 
 export default function MessagingDialog({open, title, onClose, busy = false, compact = false, surface = "default", children, footer, className = "", nativeHeaderUtility = false}: {open: boolean; title: string; onClose: () => void; busy?: boolean; compact?: boolean; surface?: "default" | "browse"; children: ReactNode; footer?: ReactNode; className?: string; nativeHeaderUtility?: boolean}) {
   const t = useTranslations("Messaging");
+  const withinInbox = useNativeInboxSurface();
   const titleId = useId();
   const dialog = useRef<HTMLDialogElement>(null);
   useNativeHeaderUtility(dialog, open && nativeHeaderUtility, "search", onClose);
@@ -17,11 +20,10 @@ export default function MessagingDialog({open, title, onClose, busy = false, com
   const [viewport, setViewport] = useState<{height: number; top: number} | null>(null);
   useEffect(() => {
     if (!open || !dialog.current || nativeHeaderUtility) return;
-    dismissNativeHeaderUtility();
+    if (!withinInbox) dismissNativeHeaderUtility();
     const element = dialog.current;
     const previousFocus = document.activeElement;
-    const overflow = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
+    const unlockBody = lockBodyScroll();
     element.showModal(); close.current?.focus({preventScroll: true});
     const visible = window.visualViewport;
     const update = () => setViewport({height: visible?.height ?? window.innerHeight, top: visible?.offsetTop ?? 0});
@@ -31,11 +33,11 @@ export default function MessagingDialog({open, title, onClose, busy = false, com
     return () => {
       window.removeEventListener("popstate", back);
       if (element.open) element.close();
-      document.body.style.overflow = overflow;
+      unlockBody();
       visible?.removeEventListener("resize", update); visible?.removeEventListener("scroll", update); window.removeEventListener("resize", update);
       if (previousFocus instanceof HTMLElement && previousFocus.isConnected) previousFocus.focus({preventScroll: true});
     };
-  }, [open, nativeHeaderUtility]);
+  }, [open, nativeHeaderUtility, withinInbox]);
   if (!open) return null;
   return <dialog ref={dialog} aria-modal={nativeHeaderUtility ? undefined : true} aria-labelledby={titleId} onCancel={event => {event.preventDefault(); if (!busy) onClose();}}
     style={!nativeHeaderUtility && viewport ? {top: `calc(${viewport.top + 12}px + env(safe-area-inset-top, 0px))`, ...(compact ? {maxHeight:`calc(${Math.max(0, viewport.height - 24)}px - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px))`} : {height: `min(44rem, calc(${Math.max(0, viewport.height - 24)}px - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px)))`})} : undefined}

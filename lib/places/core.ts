@@ -4,7 +4,12 @@ export type Place = { countryCode: string; regionId: string | null; cityId: stri
 export const PLACE_COLUMNS = 'place_country_code,place_region_id,place_city_id,place_city_name,place_region_name,place_status';
 export function placeKey(value: string) { return value.normalize('NFKD').replace(/\p{M}/gu,'').toLowerCase().replace(/ß/g,'ss').replace(/[^\p{L}\p{N}]/gu,''); }
 const countryLabelers = new Map<string, Intl.DisplayNames>(SUPPORTED_LOCALES.map(locale => [locale, new Intl.DisplayNames([locale], {type:'region'})]));
-export function countryName(code: string, locale = 'de') { return (countryLabelers.get(locale) ?? new Intl.DisplayNames([locale], {type:'region'})).of(code) ?? code; }
+export function countryName(code: string, locale = 'de') {
+ // Older public records may have no country or a free-text legacy label.
+ // Intl.DisplayNames throws for those values; rendering must retain the row.
+ if (!code || !/^(?:[a-z]{2}|[0-9]{3})$/i.test(code)) return code;
+ return (countryLabelers.get(locale) ?? new Intl.DisplayNames([locale], {type:'region'})).of(code) ?? code;
+}
 const countryAliases = new Map<string,string>();
 for (const code of COUNTRY_CODES) { countryAliases.set(placeKey(code),code); for (const locale of SUPPORTED_LOCALES) countryAliases.set(placeKey(countryName(code,locale)),code); }
 export function countryCode(value: string) { return countryAliases.get(placeKey(value)) ?? ''; }

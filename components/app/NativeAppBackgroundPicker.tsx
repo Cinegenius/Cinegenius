@@ -9,7 +9,7 @@ import { useNativeAppAppearance } from "@/lib/use-native-app-appearance";
 import styles from "./NativeAppBackgroundPicker.module.css";
 
 // Swatches match the seven approved studies; the app paints the actual canvas.
-const swatches: Record<NativeAppBackground, string> = { graphite: "#343b43", midnight: "#294361", sage: "#395747", rose: "#74434d", sand: "#78664a", terracotta: "#805039", black: "#000000" };
+const swatches: Record<NativeAppBackground, string> = { graphite: "#343b43", midnight: "#294361", sage: "#395747", rose: "#74434d", sand: "#78664a", mauve: "#51434f", black: "#000000" };
 
 /** A presentation choice inside the existing native profile menu, never a website preference. */
 export default function NativeAppBackgroundPicker() {

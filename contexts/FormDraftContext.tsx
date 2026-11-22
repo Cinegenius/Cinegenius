@@ -6,9 +6,11 @@ import { useTranslations } from "next-intl";
 import { createPortal } from "react-dom";
 import { Loader2 } from "lucide-react";
 import { announceFormNavigation } from "@/lib/form-navigation-events";
+import { lockBodyScroll } from "@/lib/body-scroll-lock";
 
 export type FormProtection = { unsafe: () => boolean; flush?: () => Promise<boolean>; discard?: () => Promise<void> };
-const Context = createContext<{ register: (id: symbol, protection: FormProtection) => () => void; leave: (action: () => void) => void; notify: () => void } | null>(null);
+type LeaveOptions = { withinSurface?: boolean; onStay?: () => void };
+const Context = createContext<{ register: (id: symbol, protection: FormProtection) => () => void; leave: (action: () => void, options?: LeaveOptions) => void; notify: () => void } | null>(null);
 const HISTORY_KEY = "cgDraftNavigation";
 type HistoryPosition = { session: string; index: number };
 const position = (state: unknown) => (state as Record<string, HistoryPosition> | null)?.[HISTORY_KEY];
@@ -19,6 +21,7 @@ export default function FormDraftProvider({ children }: { children: ReactNode })
   const t = useTranslations("FormDraft");
   const entries = useRef(new Map<symbol, FormProtection>());
   const pending = useRef<(() => void) | null>(null);
+  const pendingStay = useRef<(() => void) | null>(null);
   const [dialog, setDialog] = useState(false);
   const [saving, setSaving] = useState(false);
   const [failed, setFailed] = useState(false);
@@ -39,12 +42,13 @@ export default function FormDraftProvider({ children }: { children: ReactNode })
     try { return (await Promise.all(changed.map(entry => entry.flush!()))).every(Boolean) && !unsafe().length; }
     catch { return false; }
   }, [unsafe]);
-  const leave = useCallback((action: () => void) => {
+  const leave = useCallback((action: () => void, options?: LeaveOptions) => {
     if (pending.current || working.current) return;
-    announceFormNavigation();
+    if (!options?.withinSurface) announceFormNavigation();
     if (!unsafe().length) { action(); return; }
     const version = ++attempt.current;
     pending.current = action;
+    pendingStay.current = options?.onStay ?? null;
     setCanSave(unsafe().every(entry => !!entry.flush));
     working.current = true;
     setSaving(true); setFailed(false); setDialog(true);
@@ -52,7 +56,7 @@ export default function FormDraftProvider({ children }: { children: ReactNode })
       if (version !== attempt.current) return;
       working.current = false; setSaving(false);
       if (!pending.current) return;
-      if (saved) { const go = pending.current; pending.current = null; setDialog(false); go(); }
+      if (saved) { const go = pending.current; pending.current = null; pendingStay.current = null; setDialog(false); go(); }
       else setFailed(true);
     });
   }, [flush, unsafe]);
@@ -123,13 +127,12 @@ export default function FormDraftProvider({ children }: { children: ReactNode })
     };
   }, [leave, unsafe]);
 
-  const stay = useCallback(() => { attempt.current++; pending.current = null; working.current = false; setSaving(false); setDialog(false); setFailed(false); }, []);
+  const stay = useCallback(() => { const resume = pendingStay.current; attempt.current++; pending.current = null; pendingStay.current = null; working.current = false; setSaving(false); setDialog(false); setFailed(false); if (resume) window.setTimeout(resume, 0); }, []);
   const panel = useRef<HTMLElement>(null);
   useEffect(() => {
     if (!dialog) return;
     const active = document.activeElement instanceof HTMLElement ? document.activeElement : null;
-    const oldOverflow = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
+    const unlockBody = lockBodyScroll();
     panel.current?.querySelector<HTMLButtonElement>("[data-stay]")?.focus({ preventScroll: true });
     const keydown = (event: KeyboardEvent) => {
       if (event.key === "Escape") { event.preventDefault(); stay(); }
@@ -140,7 +143,7 @@ export default function FormDraftProvider({ children }: { children: ReactNode })
       if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first?.focus(); }
     };
     document.addEventListener("keydown", keydown);
-    return () => { document.body.style.overflow = oldOverflow; document.removeEventListener("keydown", keydown); active?.focus({ preventScroll: true }); };
+    return () => { unlockBody(); document.removeEventListener("keydown", keydown); active?.focus({ preventScroll: true }); };
   }, [dialog, stay]);
 
   const context = useMemo(() => ({ register, leave, notify }), [register, leave, notify]);
@@ -156,13 +159,14 @@ export default function FormDraftProvider({ children }: { children: ReactNode })
             if (working.current) return;
             const version = ++attempt.current;
             working.current = true; setSaving(true);
-            void flush().then(ok => { if (version !== attempt.current) return; working.current = false; setSaving(false); if (ok && pending.current) { const go = pending.current; pending.current = null; setDialog(false); go(); } else setFailed(true); });
+            void flush().then(ok => { if (version !== attempt.current) return; working.current = false; setSaving(false); if (ok && pending.current) { const go = pending.current; pending.current = null; pendingStay.current = null; setDialog(false); go(); } else setFailed(true); });
           }} className="flex min-h-11 items-center justify-center gap-2 rounded-xl bg-gold px-4 py-2 font-semibold text-bg-primary disabled:opacity-60">{saving && <Loader2 size={16} className="animate-spin" />}{t("saveLeave")}</button>}
           <button type="button" disabled={saving} onClick={() => {
             const go = pending.current;
             if (!go) return;
             const version = ++attempt.current;
             pending.current = null;
+            pendingStay.current = null;
             void Promise.all(unsafe().map(entry => entry.discard?.())).finally(() => { if (version === attempt.current) { setDialog(false); go(); } });
           }} className="min-h-11 rounded-xl px-4 py-2 text-text-muted disabled:opacity-60">{t("discard")}</button>
         </div>
@@ -174,4 +178,12 @@ export function useFormNavigation() {
   const context = useContext(Context);
   if (!context) throw new Error("FormDraftProvider missing");
   return context;
+}
+
+/** A local reader switch keeps its surface mounted while the same draft guard decides. */
+export function FormDraftSurface({ children }: { children: ReactNode }) {
+  const parent = useFormNavigation();
+  const leave = useCallback((action: () => void, options?: LeaveOptions) => parent.leave(action, { ...options, withinSurface: true }), [parent]);
+  const value = useMemo(() => ({ ...parent, leave }), [parent, leave]);
+  return <Context.Provider value={value}>{children}</Context.Provider>;
 }

@@ -8,13 +8,16 @@
 .content{display:flex;flex-direction:column;min-width:0;min-height:0;overflow:hidden;flex:1;max-height:min(52dvh,470px)}
 .content>div{min-height:0}
 .content :global([data-native-inbox-contacts]){max-width:none;padding:4px 0}
-.full{display:flex;align-items:center;justify-content:space-between;min-height:44px;flex-shrink:0;gap:8px;padding:0 10px;border-top:1px solid var(--cg-app-border,#ffffff21);color:var(--cg-app-accent,#c2f135);font-size:13px;text-decoration:none}
 .groups{min-height:0;overflow-y:auto;overscroll-behavior:contain;padding:4px 0}
-.groups>a{display:flex;align-items:center;gap:12px;min-height:64px;padding:8px 12px;border-bottom:1px solid var(--cg-app-border,#ffffff21);color:inherit;text-decoration:none}
-.groups>a>span{display:flex;flex:1;min-width:0;flex-direction:column;gap:3px;overflow-wrap:anywhere}
+.groups>button{display:flex;align-items:center;gap:12px;min-height:64px;padding:8px 12px;border-bottom:1px solid var(--cg-app-border,#ffffff21);color:inherit;text-decoration:none;width:100%;background:transparent;text-align:left}
+.groups>button>span{display:flex;flex:1;min-width:0;flex-direction:column;gap:3px;overflow-wrap:anywhere}
 .groups strong{font-size:14px}.groups small,.groups p{font-size:12px;color:var(--cg-app-muted,#b8b9be)}
-.groups p{margin:0;padding:12px}.groups button{min-width:44px;min-height:44px;padding:0 12px;color:var(--cg-app-accent,#c2f135)}
+.groups p{margin:0;padding:12px}.groups [role=alert] button{min-width:44px;min-height:44px;padding:0 12px;color:var(--cg-app-accent,#c2f135)}
 .panel button:focus-visible,.panel a:focus-visible,.search:focus-within{outline:2px solid var(--cg-app-accent,#c2f135);outline-offset:-2px}
 .srOnly{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
 @media(prefers-reduced-transparency:reduce){.panel{background:var(--cg-app-surface,#1b1d23);-webkit-backdrop-filter:none;backdrop-filter:none}}
 @media(forced-colors:active){.panel,.search{background:Canvas;color:CanvasText;border-color:CanvasText}.panel a,.panel button,.search input{color:CanvasText}}
+
+.thread{height:min(58dvh,530px);max-height:none}
+.status{flex-shrink:0;padding:8px 12px;font-size:12px;color:var(--cg-app-muted,#b8b9be)}
+.status button{min-width:44px;min-height:44px;color:var(--cg-app-accent,#c2f135)}

@@ -14,6 +14,7 @@ import { uiErrorMessage } from "@/lib/ui-error-message";
 import { useTranslations , useLocale } from "next-intl";
 import { useNativeAppAppearance } from "@/lib/use-native-app-appearance";
 import styles from "./NativeInboxSurface.module.css";
+import { validConversationId, type MessageDestination } from "@/lib/messaging-ui";
 
 
 // ─── Types ─────────────────────────────────────────────────────────────────────
@@ -70,14 +71,26 @@ function matchesFilter(type: NotificationType, filter: FilterId): boolean {
 
 // ─── Notification Row ──────────────────────────────────────────────────────────
 
-function NotifRow({ notif, onRead }: {
+/** Only relative, existing inbox targets may become an in-surface message action. */
+function noticeMessageDestination(href: string): MessageDestination | null {
+  if (!href.startsWith("/messages?")) return null;
+  const url = new URL(href, "https://inbox.invalid");
+  if (url.origin !== "https://inbox.invalid" || url.pathname !== "/messages") return null;
+  const conversationId=url.searchParams.get("conv"),recipientId=url.searchParams.get("to");
+  if (validConversationId(conversationId)) return {conversationId};
+  return recipientId && /^[A-Za-z0-9_-]{1,128}$/.test(recipientId) ? {recipientId}:null;
+}
+
+function NotifRow({ notif, onRead, onOpenMessage }: {
   notif: Notification;
   onRead: (id: string) => void;
+  onOpenMessage?: (destination: MessageDestination) => void;
 }) {
   const uiPriceLocale = useLocale();
 
   const uiText = useTranslations();
 
+  const messageTarget=onOpenMessage ? noticeMessageDestination(notif.href):null;
   const Icon = typeIcons[notif.type] ?? Bell;
   const meta = notificationMeta[notif.type];
 
@@ -115,7 +128,7 @@ function NotifRow({ notif, onRead }: {
 
         {/* Actions */}
         <div className="flex flex-wrap items-center gap-3 mt-2.5">
-          {notif.href && notif.href !== "/dashboard" && <Link
+          {messageTarget ? <button type="button" onClick={() => { if (!notif.read) onRead(notif.id); onOpenMessage?.(messageTarget); }} className="flex min-h-11 items-center gap-1 text-xs font-medium text-gold">{uiText.rich("Ui.text_1ee06198abe18c", { part1: () => (<MessageSquare size={10} />) })}</button> : notif.href && notif.href !== "/dashboard" && <Link
             href={notif.href}
             onClick={() => { if (!notif.read) onRead(notif.id); }}
             className="flex min-h-11 items-center gap-1 text-xs text-gold hover:text-gold-light font-medium transition-colors"
@@ -136,7 +149,7 @@ function NotifRow({ notif, onRead }: {
 
 type FriendRequest = { friendship_id: string; user_id: string; display_name: string };
 
-export default function InboxNotices({ searchValue = "" }: { searchValue?: string } = {}) {
+export default function InboxNotices({ searchValue = "", onOpenMessage }: { searchValue?: string; onOpenMessage?: (destination: MessageDestination) => void } = {}) {
   const uiText = useTranslations();
   const native = useNativeAppAppearance();
   const FILTER_TABS = getLocalizedFILTER_TABS(uiText);
@@ -406,7 +419,7 @@ export default function InboxNotices({ searchValue = "" }: { searchValue?: strin
                   </div>
                   {filtered.filter((n) => !n.read).map((n) => {
                     return (
-                      <NotifRow
+                      <NotifRow onOpenMessage={onOpenMessage}
                         key={n.id}
                         notif={n}
                         onRead={markAsRead}
@@ -424,7 +437,7 @@ export default function InboxNotices({ searchValue = "" }: { searchValue?: strin
                   </div>
                   {filtered.filter((n) => n.read).map((n) => {
                     return (
-                      <NotifRow
+                      <NotifRow onOpenMessage={onOpenMessage}
                         key={n.id}
                         notif={n}
                         onRead={markAsRead}

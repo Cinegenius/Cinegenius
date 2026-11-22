@@ -50,6 +50,7 @@ export default function ResultCard({ result, compact = false, showEvidence = fal
   const isProfile = result.type === "profile" || result.type === "creator";
   const nativeCrew = nativeAppearance && isProfile;
   const nativeArea = nativeAppearance ? nativeSmartAreaForType(result.type) : null;
+  const naturalPhoto = nativeAppearance && !compact && !!result.image && !["company", "organization"].includes(result.type);
   const PreviewImage = ["location", "vehicle", "prop", "animal"].includes(result.type) ? ListingImage : MediaImage;
 
   return (
@@ -63,10 +64,10 @@ export default function ResultCard({ result, compact = false, showEvidence = fal
       className={`${styles.card} ${row ? "smart-result-row" : ""} group flex min-w-0 bg-bg-secondary border border-border rounded-xl overflow-hidden hover:border-gold/40 transition-colors ${compact ? "items-center gap-2.5 p-2" : "flex-col hover:shadow-lg hover:shadow-black/20"}`}
     >
       {/* Image */}
-      <div data-result-image={result.type === "company" || result.type === "organization" ? "logo" : "photo"} className={`${row && isProfile ? "smart-result-portrait" : ""} relative bg-bg-elevated overflow-hidden ${compact ? "flex h-12 w-12 shrink-0 items-center justify-center rounded-md" : "aspect-video"}`}>
+      <div data-result-image={result.type === "company" || result.type === "organization" ? "logo" : "photo"} data-result-image-mode={naturalPhoto ? "natural" : undefined} className={`${row && isProfile ? "smart-result-portrait" : ""} relative bg-bg-elevated overflow-hidden ${compact ? "flex h-12 w-12 shrink-0 items-center justify-center rounded-md" : "aspect-video"}`}>
         {result.image ? (
           <PreviewImage
-            {...(compact ? { width: 48, height: 48 } : { fill: true })}
+            {...(compact ? { width: 48, height: 48 } : naturalPhoto ? { width: 640, height: 640 } : { fill: true })}
             sizes={compact ? "48px" : "(max-width: 639px) 50vw, (max-width: 1023px) 33vw, (max-width: 1279px) 25vw, 240px"} mediaSize="thumbnail"
             src={result.image}
             alt={result.title}

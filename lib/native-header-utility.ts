@@ -2,11 +2,12 @@
 
 import { useEffect, useLayoutEffect, useRef, useSyncExternalStore, type RefObject } from "react";
 import { BEFORE_FORM_NAVIGATION_EVENT } from "./form-navigation-events";
+import { lockBodyScroll } from "./body-scroll-lock";
 
 export type NativeHeaderAction = "profile" | "messages" | "search" | "menu" | "close";
 const EVENT = "cinegenius:native-header-action";
 const listeners = new Set<() => void>();
-type Lease = { kind: "search" | "menu" | "messages"; dismiss: (restoreFocus?: boolean) => void };
+type Lease = { kind: "search" | "menu" | "messages"; guarded: boolean; dismiss: (restoreFocus?: boolean, afterDismiss?: () => void) => void };
 let active: Lease | null = null;
 const publish = () => { for (const listener of listeners) listener(); };
 
@@ -15,9 +16,15 @@ export function nativeHeaderBlocked() {
   return Array.from(document.querySelectorAll<HTMLElement>('dialog[open],[aria-modal="true"]')).some(node =>
     !node.hasAttribute("data-native-header-utility") && node.getClientRects().length > 0);
 }
-export function announceNativeHeaderAction(action: NativeHeaderAction) {
+export function announceNativeHeaderAction(action: NativeHeaderAction, afterDismiss?: () => void) {
   if (nativeHeaderBlocked()) return false;
-  if (active && active.kind !== action) active.dismiss(false);
+  if (active && active.kind !== action) {
+    if (active.guarded) {
+      active.dismiss(false, () => { document.dispatchEvent(new CustomEvent(EVENT, { detail: action })); afterDismiss?.(); });
+      return false;
+    }
+    active.dismiss(false);
+  }
   document.dispatchEvent(new CustomEvent(EVENT, { detail: action }));
   return true;
 }
@@ -36,8 +43,10 @@ export function useNativeHeaderUtilityKind() {
 }
 
 /** One native utility owns its lock. The real four actions remain outside its nonmodal surface. */
-export function useNativeHeaderUtility(ref: RefObject<HTMLDialogElement | null>, enabled: boolean, kind: "search" | "menu" | "messages", onClose: () => void) {
+export function useNativeHeaderUtility(ref: RefObject<HTMLDialogElement | null>, enabled: boolean, kind: "search" | "menu" | "messages", onClose: () => void, options?: { guardDismiss?: (commit: () => void) => void; keepOnFormNavigation?: boolean }) {
   const close = useRef(onClose);
+  const latestOptions = useRef(options);
+  useLayoutEffect(() => { latestOptions.current = options; });
   useLayoutEffect(() => { close.current = onClose; });
   useLayoutEffect(() => {
     if (!enabled || !ref.current) return;
@@ -45,7 +54,7 @@ export function useNativeHeaderUtility(ref: RefObject<HTMLDialogElement | null>,
     if (nativeHeaderBlocked()) { queueMicrotask(() => close.current()); return; }
     active?.dismiss(false);
     const previousFocus = document.activeElement;
-    const overflow = document.body.style.overflow;
+    const unlockBody = lockBodyScroll();
     const originalStyle = element.getAttribute("style");
     const inert = new Map<HTMLElement, boolean>();
     const targets = document.querySelectorAll<HTMLElement>('[data-native-app-surface], [data-native-app-bottom-nav]');
@@ -59,7 +68,6 @@ export function useNativeHeaderUtility(ref: RefObject<HTMLDialogElement | null>,
     Object.assign(scrim.style, { position:"fixed", zIndex:"70", left:"0", right:"0", bottom:"0", background:"rgb(0 0 0 / .28)", touchAction:"none" });
     Object.assign(probe.style, { position:"fixed", top:"var(--cg-app-chrome-clearance,88px)", width:"0", height:"0", visibility:"hidden", pointerEvents:"none" });
     document.body.append(scrim, probe);
-    document.body.style.overflow = "hidden";
     let frame = 0, released = false;
     const viewport = window.visualViewport;
     const position = () => {
@@ -78,20 +86,23 @@ export function useNativeHeaderUtility(ref: RefObject<HTMLDialogElement | null>,
       if (element.open) element.close();
       scrim.remove(); probe.remove();
       for (const [target, wasInert] of inert) target.inert = wasInert;
-      document.body.style.overflow = overflow;
+      unlockBody();
       if (originalStyle === null) element.removeAttribute("style"); else element.setAttribute("style", originalStyle);
       if (active === lease) { active = null; publish(); }
       if (restore && previousFocus instanceof HTMLElement) requestAnimationFrame(() => {
         if (!active && !nativeHeaderBlocked() && previousFocus.isConnected) previousFocus.focus({ preventScroll:true });
       });
     };
-    const dismiss = (restore = true) => { release(restore); close.current(); };
-    const lease: Lease = { kind, dismiss };
+    const dismiss = (restore = true, afterDismiss?: () => void) => {
+      const commit = () => { if (released) return; release(restore); close.current(); afterDismiss?.(); };
+      if (latestOptions.current?.guardDismiss) latestOptions.current.guardDismiss(commit); else commit();
+    };
+    const lease: Lease = { kind, dismiss, guarded: !!latestOptions.current?.guardDismiss };
     active = lease;
     element.setAttribute("data-native-header-utility", kind);
     element.show(); position(); publish();
     frame = requestAnimationFrame(() => { if (!released) focusSurface(); });
-    const beforeNavigation = () => dismiss(false);
+    const beforeNavigation = () => { if (!latestOptions.current?.keepOnFormNavigation) dismiss(false); };
     const scrimDown = (event: PointerEvent) => { event.preventDefault(); event.stopPropagation(); dismiss(); };
     const key = (event: KeyboardEvent) => {
       if (released || nativeHeaderBlocked()) return;

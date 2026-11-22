@@ -605,7 +605,7 @@ function DashboardContent() {
       {/* Hauptinhalt */}
       <div className="min-w-0 flex-1">
         {/* Top-Leiste */}
-        <div className="sticky top-[var(--site-header-height)] z-30 bg-bg-primary/80 backdrop-blur-nav border-b border-border px-4 sm:px-6 py-3 flex items-center justify-between gap-3">
+        <div data-personal-area-heading="v1" className="sticky top-[var(--site-header-height)] z-30 bg-bg-primary/80 backdrop-blur-nav border-b border-border px-4 sm:px-6 py-3 flex items-center justify-between gap-3">
           <div className="flex min-w-0 items-center gap-2">
             {activeTab !== "overview" && <Link href="/dashboard" aria-label={uiText("nav.personalArea")} className="flex min-h-11 min-w-11 items-center justify-center rounded-xl text-text-muted hover:bg-bg-elevated"><ArrowLeft size={19} aria-hidden="true" /></Link>}
             <h1 className="min-w-0 break-words text-base font-semibold text-text-primary">{tabTitle()}</h1>

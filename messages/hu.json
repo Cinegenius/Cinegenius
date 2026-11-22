@@ -13487,13 +13487,13 @@
     "workspaceNativeOnly": "Nyisd meg a Workspace-t a CineGenius alkalmazásban.",
     "background": "Sötét háttér",
     "backgrounds": {
-      "graphite": "Grafitszürke",
-      "midnight": "Éjkék",
-      "sage": "Füstös zöld",
-      "rose": "Rózsaszín",
-      "sand": "Meleg homok",
-      "terracotta": "Terrakotta",
-      "black": "Tiszta fekete"
+      "graphite": "Cement",
+      "midnight": "Dark Sky",
+      "sage": "Pistachio",
+      "rose": "Cherry",
+      "sand": "Sand",
+      "mauve": "Mauve",
+      "black": "Black"
     }
   },
   "AppShots": {

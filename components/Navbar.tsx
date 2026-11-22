@@ -273,7 +273,7 @@ export default function Navbar({ initialIsSignedIn = false, initialAdminUserId =
         signedIn: hasSignedInSession, ready: hasSignedInSession && !!activeUserId, open: userMenuOpen,
         label: uiText("NativeAppChrome.profileMenu"), title: uiText("NativeAppChrome.profileMenuTitle"), loadingLabel: uiText("Contacts.loading"),
         displayName, email, avatar: accountAvatar("h-11 w-11 min-h-11 min-w-11 shrink-0", 18), supportBadge,
-        onToggle: event => { if (!announceNativeHeaderAction("profile")) return; activeAccountButton.current = event.currentTarget; closeMenu(); setUserMenuOpen(value => !value); },
+        onToggle: event => { const button=event.currentTarget; const commit=()=>{ activeAccountButton.current=button; closeMenu(); setUserMenuOpen(value=>!value); }; if (announceNativeHeaderAction("profile",commit)) commit(); },
         onClose: () => setUserMenuOpen(false), onSignOut: () => requestSignOut.current(), signingOut,
         signOutLabel: signingOut ? t("signingOut") : t("signOut"),
         links: [
@@ -286,7 +286,7 @@ export default function Navbar({ initialIsSignedIn = false, initialAdminUserId =
       }}
       messages={{ label: hasSignedInSession ? `${messageLabel}; ${noticeLabel}` : t("messages"), count: unreadMessages, noticeCount: unreadNotices, failed: inboxFailed, active: activeId === "messages", scopeKey: hasSignedInSession ? JSON.stringify([activeUserId, authenticatedSessionId]) : "" }}
       search={{ label: uiText("Ui.text_9f6d74e0a12b67"), onClick: event => { setUserMenuOpen(false); event.currentTarget.focus({ preventScroll: true }); document.dispatchEvent(new CustomEvent("cg:opensearch", { detail:{toggle:true} })); } }}
-      menu={{ label: t("openMenu"), open: menuOpen, controls: SITE_NAV_MENU_ID, onClick: event => { if (!announceNativeHeaderAction(menuOpen ? "close" : "menu")) return; setUserMenuOpen(false); event.currentTarget.focus({ preventScroll: true }); if (menuOpen) closeMenu(); else openMenu(); } }}
+      menu={{ label: t("openMenu"), open: menuOpen, controls: SITE_NAV_MENU_ID, onClick: event => { const button=event.currentTarget; const commit=()=>{ setUserMenuOpen(false); button.focus({preventScroll:true}); if(menuOpen) closeMenu(); else openMenu(); }; if(announceNativeHeaderAction(menuOpen ? "close":"menu",commit)) commit(); } }}
     />;
   }
 

@@ -32,7 +32,7 @@ export function useNativeSegmentDrag<T extends HTMLElement = HTMLDivElement>(sel
   function eligible() {
     const rail = ref.current;
     return enabled && !!rail?.isConnected && !document.hidden && !rail.closest("[inert],[hidden]")
-      && !Array.from(document.querySelectorAll<HTMLElement>('[aria-modal="true"],dialog[open]')).some(node => node.getClientRects().length > 0);
+      && !Array.from(document.querySelectorAll<HTMLElement>('[aria-modal="true"],dialog[open]:not([data-native-header-utility])')).some(node => node.getClientRects().length > 0);
   }
   function hit(x: number, y: number) {
     return buttons().find(button => { const box = button.getBoundingClientRect(); return !button.matches(':disabled,[aria-disabled="true"]') && x >= box.left && x <= box.right && y >= box.top && y <= box.bottom; });

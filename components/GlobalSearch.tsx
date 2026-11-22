@@ -95,10 +95,14 @@ export default function GlobalSearch() {
     const openFromEvent = (event?: Event) => {
       if (nativeAppearance && nativeHeaderBlocked()) return;
       if (nativeAppearance && (event as CustomEvent<{toggle?:boolean}> | undefined)?.detail?.toggle && open) { closeSearch(); return; }
-      if (nativeAppearance && !announceNativeHeaderAction("search")) return;
-      sequence.current++; request.current?.abort();
-      setQuery(""); setResults([]); setSelectedIdx(-1);
-      setFailed(false); setLoading(false); clearRecentSearches(); setPanelScope(scope);
+      const commit = () => {
+        if (currentScope.current !== scope) return;
+        sequence.current++; request.current?.abort();
+        setQuery(""); setResults([]); setSelectedIdx(-1);
+        setFailed(false); setLoading(false); clearRecentSearches(); setPanelScope(scope);
+      };
+      if (nativeAppearance && !announceNativeHeaderAction("search", commit)) return;
+      commit();
     };
     const handler = (e: KeyboardEvent) => {
       if ((e.metaKey || e.ctrlKey) && e.key === "k") { e.preventDefault(); openFromEvent(); }

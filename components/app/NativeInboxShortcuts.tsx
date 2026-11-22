@@ -28,11 +28,11 @@ export default function NativeInboxShortcuts({ active, selectedHomies, onSelect 
   const drag = useNativeSegmentDrag<HTMLElement>(`${active}:${homies}`, choose);
   return <nav {...drag} className={styles.shortcuts} aria-label={t("chats")} data-native-inbox-shortcuts="v1">
     <span className={styles.indicator} aria-hidden="true" />
-    {items.map(item => <Link data-native-segment="true" data-native-header-initial-focus={onSelect && item.selected ? "true" : undefined} key={item.id} href={item.href} prefetch={false} scroll={false} aria-label={item.label} aria-current={item.selected ? "page" : undefined}
+    {items.map(item => onSelect ? <button type="button" data-native-segment="true" data-native-header-initial-focus={item.selected ? "true" : undefined} key={item.id} aria-label={item.label} aria-pressed={item.selected}
+      onClick={() => choose(items.indexOf(item))}><item.icon size={17} aria-hidden="true" />{item.id !== "notices" && <span>{item.label}</span>}</button> : <Link data-native-segment="true" key={item.id} href={item.href} prefetch={false} scroll={false} aria-label={item.label} aria-current={item.selected ? "page" : undefined}
       onClick={event => {
-        if (event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey || (!onSelect && window.location.pathname !== "/messages")) return;
-        event.preventDefault();
-        choose(items.indexOf(item));
+        if (event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey || window.location.pathname !== "/messages") return;
+        event.preventDefault(); choose(items.indexOf(item));
       }}><item.icon size={17} aria-hidden="true" />{item.id !== "notices" && <span>{item.label}</span>}</Link>)}
   </nav>;
 }

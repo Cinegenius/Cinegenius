@@ -19,3 +19,19 @@
 :global(html[data-cg-native-community-appearance="app"]) .card:global([data-search-result-card][data-native-smart-area]) :global([data-result-image="photo"]) :global(img) { object-fit:contain !important; object-position:center !important; transform:none !important; padding:4px !important; box-sizing:border-box !important; }
 
 :global(html[data-cg-native-community-appearance="app"]) .card[data-result-layout="grid"]:is([data-search-result-card="profile"],[data-search-result-card="creator"]) > :global([data-result-image]) { aspect-ratio:1; }
+
+/* Native grid photos use their loaded source ratio: full card width without
+   letterbox padding or a cover crop. Checked media/recovery stay unchanged. */
+:global(html[data-cg-native-community-appearance="app"]) .card:global([data-search-result-card][data-native-smart-area]) > :global([data-result-image="photo"][data-result-image-mode="natural"]) {
+  display:block; width:100%; height:auto !important; min-height:0; aspect-ratio:auto !important;
+  padding:0 !important; background:transparent !important;
+}
+:global(html[data-cg-native-community-appearance="app"]) .card:global([data-search-result-card][data-native-smart-area]) > :global([data-result-image="photo"][data-result-image-mode="natural"]) :global(img) {
+  display:block; position:static !important; inset:auto !important;
+  width:100% !important; height:auto !important; max-height:none !important;
+  aspect-ratio:auto !important; object-fit:contain !important; object-position:center !important;
+  padding:0 !important; margin:0; transform:none !important;
+}
+:global(html[data-cg-native-community-appearance="app"]) .card:global([data-search-result-card][data-native-smart-area]) > :global([data-result-image="photo"][data-result-image-mode="natural"]) > :global([role="img"]) {
+  width:100% !important; height:auto !important; min-height:64px;
+}

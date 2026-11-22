@@ -6,7 +6,7 @@ type NativeAppTheme = "pure" | "cinema";
 const themeAttribute = "data-cg-app-theme";
 const backgroundAttribute = "data-cg-app-background";
 const backgroundCapability = "data-cg-native-background-ready";
-export const NATIVE_APP_BACKGROUNDS = ["graphite", "midnight", "sage", "rose", "sand", "terracotta", "black"] as const;
+export const NATIVE_APP_BACKGROUNDS = ["graphite", "midnight", "sage", "rose", "sand", "mauve", "black"] as const;
 export type NativeAppBackground = typeof NATIVE_APP_BACKGROUNDS[number];
 
 export function nativeAppThemeSnapshot(): NativeAppTheme {
@@ -38,7 +38,7 @@ export function toggleNativeAppTheme(): void {
 
 function backgroundRoot(): HTMLElement | null {
   if (typeof document === "undefined" || document.documentElement?.getAttribute("data-cg-native-community-appearance") !== "app"
-      || document.documentElement.getAttribute(backgroundCapability) !== "v1") return null;
+      || document.documentElement.getAttribute(backgroundCapability) !== "v2") return null;
   return document.documentElement;
 }
 

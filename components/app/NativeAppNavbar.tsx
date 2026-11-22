@@ -114,10 +114,10 @@ export default function NativeAppNavbar({ navigationLabel, accountButtonRef, acc
         aria-label={messages.label} title={messages.label} aria-current={messages.active ? "page" : undefined} aria-expanded={account.signedIn && account.ready ? messagesOpen : undefined} aria-haspopup={account.signedIn && account.ready ? "dialog" : undefined} aria-controls={messagesOpen ? "native-inbox-panel" : undefined}
         onClick={event => {
           if (event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.altKey || event.shiftKey) return;
-          if (!announceNativeHeaderAction(messagesOpen ? "close" : "messages")) { event.preventDefault(); return; }
-          account.onClose();
-          if (!account.signedIn || !account.ready) return;
-          event.preventDefault(); setMessagePanel({ scope: messageScope, open: !messagesOpen });
+          const commit = () => { account.onClose(); if (account.signedIn && account.ready) setMessagePanel({ scope: messageScope, open: !messagesOpen }); };
+          if (!announceNativeHeaderAction(messagesOpen ? "close" : "messages", commit)) { event.preventDefault(); return; }
+          if (account.signedIn && account.ready) event.preventDefault();
+          commit();
         }}>
         <MessageSquare size={22} aria-hidden="true" />
         {messages.failed && <span aria-hidden="true" className={styles.failed} />}

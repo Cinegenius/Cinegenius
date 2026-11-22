@@ -10,3 +10,9 @@
 .notices .list{background:color-mix(in srgb,var(--cg-app-surface,#1b1d23) 76%,transparent);border-color:var(--cg-app-border,#ffffff21)}
 .notices .state{padding-top:18px;padding-bottom:18px}
 @media(prefers-reduced-transparency:reduce){.notices .list{background:var(--cg-app-surface,#1b1d23)}}
+
+.embedded{position:relative;display:flex;flex:1;flex-direction:column;min-width:0;min-height:0;overflow:hidden}
+.embedded>section{min-height:0;min-width:0;flex:1}
+.embedded>section>div:global(.overflow-y-auto){padding-block:0}
+.embedded form{padding-block:4px;max-height:calc(100% - 52px)}
+.embedded>section>header{padding:4px 0}

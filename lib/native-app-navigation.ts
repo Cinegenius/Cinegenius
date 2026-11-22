@@ -13,6 +13,7 @@ export const NATIVE_APP_NAV_ITEMS = [
 ] as const;
 
 export const NATIVE_APP_MENU_ITEMS: readonly { id: string; href: string; labelKey: string; icon: SiteNavigationIcon }[] = [
+  { id: "jobs", href: "/jobs", labelKey: "nav.jobs", icon: "jobs" },
   { id: "board", href: "/community", labelKey: "footer.links_board", icon: "news" },
   { id: "help", href: "/help", labelKey: "nav.help", icon: "help" },
   { id: "support", href: "/support", labelKey: "nav.support", icon: "support" },

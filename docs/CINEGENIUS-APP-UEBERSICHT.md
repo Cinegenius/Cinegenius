@@ -5,7 +5,21 @@ Die getrennte [Website-Übersicht](CINEGENIUS-WEBSITE-UEBERSICHT.md) enthält di
 
 Diese Übersicht trennt die installierte App, ihre serverseitigen Ansichten, native Werkzeuge und geplante Funktionen. Eine Website-Prüfung bestätigt keinen iPhone-Ablauf. „Vorhanden“ bezeichnet belegten Code oder einen gemeldeten Entwicklungsstand; tatsächliche Aktivierung und Geräteprüfung werden separat genannt.
 
-**Aktueller Release-Abgleich (21. November, 13:10 Uhr Berlin):** Der gemeinsame
+**Neuester Betreibercheckpoint · 22. November 2026:** Einzelne Smart-Karten sind gemäß ausdrücklicher Korrektur **deckend**, mit ruhiger solider Palettentönung aus **92 % Hintergrundfarbe und 8 % Textfarbe**. Die große umgebende Bereichsfläche bleibt transparent. Randlose Bilder in natürlicher Proportion ohne Beschnitt, drei Crewspalten und vollständiger Textumbruch bleiben erhalten. Lokal sind 19 Browserfälle bestanden: alle acht Themes bei 320/393 px sowie unveränderte gewöhnliche Website. Geprüfter CSS-Checkpoint: SHA-256 `e29f3fa01fb50d695eb792a9064c734884ad4335195516b34c7ee6b9642e3c16`. [Neue Collage](/Users/markusmueller/Documents/Codex/2026-11-13/cinegenius-mac-app-setup/outputs/app-pruefstand-20261122/smart-karten-deckend/pistachio-mauve-cement.png), SHA-256 `7716bd2920d7c142ff8aefe418db94fb8d8f65dd2f273a2311a1b5d12c9fd424`. Installiert bleibt **2026112106**; **2026112202 ist als signierter Kandidat bereit**. Die Kartenkorrektur ist nicht als veröffentlicht, installiert oder physisch geprüft belegt.
+
+**Aktueller APP-Stand (21. November 2026):** Build **2026112106 ist nach
+frischer verifizierter Sicherung installiert und gestartet**, die installierte
+Buildnummer bestätigt. **118 persistente Dateien sind bytegleich erhalten,
+0 abweichend.** Der zuvor installierte Build 2105 ist beim physischen
+Work-Einstieg abgestürzt; dieser Funktionstest ist ausdrücklich fehlgeschlagen.
+Zwei echte Absturzberichte belegen einen Fehler der View-Hierarchie im
+Fenstercover. Der enge UIView-Fix in 2106 ist gebaut und geprüft; die erneute
+physische Gegenprobe **Work öffnen → zurück zu Smart ist vom Nutzer bestanden**;
+der Übergang springt in beiden Richtungen und bleibt als Folgefehler offen. Installation
+und Start sind kein Nachweis einer behobenen Work-Bedienung. Das gemeinsame
+App-Serverpaket `f50875ac` bleibt READY auf `www.cinegenius.co`.
+
+**Früherer Release-Abgleich (21. November, 13:10 Uhr Berlin; durch den aktuellen APP-Stand oben abgelöst):** Der gemeinsame
 Serverstand `91a508d5` ist live und enthält das vollständige freigegebene App-Paket
 `68930dd9` sowie die Korrektur der Firmen-Abschlusslinks. Die erneute Freigabe in
 `68930dd9:AGENTS.md` ersetzt den früheren Stopp für dieses konkrete Paket.
@@ -27,11 +41,11 @@ Siehe [Vertrag und genaue Reichweite](home-crew-discretion.md).
 
 | Thema | Belegter Stand |
 | --- | --- |
-| **iPhone-App** | Zuletzt nachgewiesen installiert: **2026112007**. Das neue gemeinsame Paket wird nach ausdrücklichem Geräteauftrag vorbereitet. Work-Fußnavigation, Einbettung und Dispo-Bezeichnung sind korrigiert und gebaut; die sieben Hintergrundfarben werden in Community und Work ergänzt. Neue Installation und vollständige echte Smart-/Work-/Community-Geräteabnahme separat nachweisen. WEB hat keine eigene Geräteprüfung durchgeführt. |
-| **App-Server** | **Veröffentlicht:** `91a508d5` seit 21.11., 13:10 Uhr Berlin, einschließlich App `68930dd9` und Firmenlink-Fix. Git-Abstammung geprüft; Deployment `dpl_CPk147S9NmEePK3DEgYhmP9MSzsx` READY mit Produktionsdomains. Das App-Paket bestand 572 gezielte Tests, i18n/Design/ESLint und vollständigen Produktions-/TypeScript-Build. Die neue native Palette-Fähigkeit und Geräteprüfung bleiben separat. |
+| **iPhone-App** | **2026112106 installiert und gestartet**, Buildnummer bestätigt; frische Sicherung verifiziert, 118 persistente Dateien bytegleich/0 abweichend. **2105: physischer Work-Einstieg fehlgeschlagen (App-Absturz).** 2106 enthält den gezielten UIView-Fix; Work öffnen und Smart-Rückkehr sind vom Nutzer bestätigt; flüssiger Übergang und weitere Bedienprüfungen bleiben offen. |
+| **App-Server** | **Veröffentlicht:** Folgepaket `f50875ac` mit Produktcommit `1d64033`; bestehende Website-Korrekturen erhalten. Deployment `dpl_5jrZxoEcYbHTWV3Wyz2t6EtMLWVV` READY einschließlich `www.cinegenius.co`; vollständiger Produktions-/TypeScript-Build bestanden, 17 Kataloge mit je 11319 Schlüsseln geprüft. Der Serverbeleg ist von nativer Installation und physischer Bedienprüfung getrennt. |
 | **Native Navigation** | Ziel gemäß aktuellem App-Vertrag: **Shots · News · Smart · Projekte · Work**. Die gewöhnliche Website behält ihre eigene Navigation. |
 | **Obere Aktionen** | Profil, Nachrichten, Suche und Menü; App-eigene Abstände und sichere Bedienung über Kopf-/Fußbereich. |
-| **Erscheinungsbild** | Gewählt sind sieben dunkle Optionen: Graphit, Nachtblau, Rauchgrün, Rosé, Warmer Sand, Terrakotta, Reinschwarz. Gemeinsamer Picker für Community/Work wird im Folgepaket geprüft; ältere Apps blenden ihn aus. Heller Stein und schneller Hell-/Dunkelwechsel bleiben erhalten. Ohne ausdrückliche Farbwahl bleibt der bisherige Mauve-Hintergrund bestehen. |
+| **Erscheinungsbild** | Gewählt sind sieben dunkle Optionen: Graphit, Nachtblau, Rauchgrün, Rosé, Warmer Sand, Terrakotta, Reinschwarz. Gemeinsamer Picker für Community/Work wurde mit 2026112105 eingeführt und ist auch im installierten Build 2026112106 enthalten; ältere Apps blenden ihn aus. Die physische Auswahlprüfung bleibt offen. Heller Stein und schneller Hell-/Dunkelwechsel bleiben erhalten. Ohne ausdrückliche Farbwahl bleibt der bisherige Mauve-Hintergrund bestehen. |
 | **Weitere Plattformen / Veröffentlichung** | Kein aktueller Beleg für eine veröffentlichte Android-App, einen App-Store-Release oder eine eigenständige Desktop-App in dieser Bestandsaufnahme. iPad-/Mac-Kompatibilität je konkretem Build prüfen. |
 
 ## Entdecken und Community
@@ -269,6 +283,8 @@ und App-Arbeitsordner `work/native-smart-viewport-fix-20261121/`.
 
 ### Folgekorrekturen aus dem iPhone-Durchlauf — 21. November 2026
 
+Die folgenden Meldungen erhalten die schrittweisen früheren Zwischenstände. Aussagen zu laufendem Build, ausstehendem Review oder installiertem 2104/2105 werden durch den aktuellen APP-Stand 2106 am Ende dieses Dokuments ersetzt. Der nachträglich physisch festgestellte Work-Absturz in 2105 bleibt als fehlgeschlagene Prüfung dokumentiert; Work öffnen und Smart-Rückkehr mit 2106 sind inzwischen vom Nutzer bestätigt; Flüssigkeit bleibt offen.
+
 - Markus hat die ruhigeren Smart-Bereichsflächen aus der Vorschau bestätigt: neutrale Ränder/Flächen/Titel, kleine Kategoriezeichen farbig; Auswahlbuttons und Kartenfarben bleiben erhalten. Lokal zehn Browserfälle (sieben dunkle Paletten, Heller Stein, gewöhnliche Website) geprüft. Release-Nachweis folgt nach Quellenabgleich.
 - Native Work-Folgefassung: gleichmäßigerer Übergang, gültiges Projekte-Symbol, gemeinsame Hell-/Dunkeldarstellung der Modals und X zum Schließen, tatsächliches gewähltes Gewerk in der Arbeitsbeginn-Zeile sowie erweiterte Genie-Bewegungsfläche. Quellprüfung ist kein Gerätebeleg; Build2104 ist weiterhin der zuletzt installierte Stand.
 - Die Teams-Vorschau wurde ausdrücklich bestätigt: Team öffnen → Mitglieder, Planung und eigene Ordner auf einer Seite; Planung als Liste. Lokale Umsetzung läuft, bestehende Team-/Dokumentdaten bleiben erhalten. Das ist keine aktivierte Online-Zusammenarbeit.
@@ -279,3 +295,91 @@ und App-Arbeitsordner `work/native-smart-viewport-fix-20261121/`.
 - Nach Markus’ Konkretisierung lokal umgesetzt: Systemordner und eigene Ordner umbenennen/sortieren, eigene Unterordner auch in Systemordnern, Teilbäume verschieben, Papierkorb und Wiederherstellung. Persönliche Ablage unter „Meins → Meine Dateien“ hat einen getrennten Kontobereich; bestehende Team-v1-Daten und Projektoriginale bleiben erhalten. Persönliche Dateizuordnung umfasst vorhandene projektbezogene Dispos/Pläne; die separate Grundrisssammlung bleibt erreichbar.73 echte Archivprüfungen,9 gezielte Node-Tests, isolierter SDK-Typcheck und PBX-Prüfung bestanden. Der vollständige2105-Build läuft; unabhängiger Review und physische Abnahme sind noch ausstehend. Keine Online-Teamfreigabe oder allgemeiner Dateiupload behauptet.
 
 - Abschließender Karten-Review: kanonische Position gleicher Trefferidentitäten vor dem Ausschnittsfilter; keine Größenmessung/Bounds-Publikation der verborgenen Karte; Reset-Fit erst bei sichtbarer positiver Größe. Ein später Wechsel zur nativen Darstellung tauscht nur die nötige Resize-Instanz, normale Listenwechsel erhalten die Karte. Alte Instanzcallbacks werden verworfen.90 gezielte Tests und80 echte Chromium/WebKit-Prüfungen bestanden. Die gemeinsame vollständige TypeScript-Prüfung erfolgt im kontrollierten Releasebuild.
+
+
+### Veröffentlichungs- und Buildnachweis — 21. November 2026, Folgepaket
+
+Server-/App-Webansichten veröffentlicht aus `f50875acb348ca6d4b1b1a3bb9f33b9717704277` (Produktcommit `1d64033`, bestehende Website-Korrekturen `5cafc814`/`a880a260` erhalten). Guarded Production-Deploy erfolgreich; vollständiger Next-Build und TypeScript-Prüfung bestanden. Deployment `dpl_5jrZxoEcYbHTWV3Wyz2t6EtMLWVV` ist READY und den bestehenden sechs Aliasen einschließlich `www.cinegenius.co` zugewiesen.17 Kataloge/11319 Schlüssel geprüft. Die Kartenliste folgt jetzt im nativen Modus Zoom/Pan; gewöhnliche Website weiter mit expliziter Ausschnittsübernahme. Ruhige Bereichsflächen und frei beweglicher Community-Genie sind Teil dieses Serverpakets.
+
+Native Work-Fassung `2026112105` vollständig gebaut, signiert und als unveränderte Kopie gesichert:346 Buildinputs,44 öffentliche Ressourcen und9 native Kataloge mit1876 Schlüsseln verifiziert. Sie enthält die Modaldarstellung/X-Korrekturen, den Übergang, das Projekte-Symbol, tatsächliches Gewerk in der Zeitleiste, die erweiterte Work-Genie-Fläche sowie Team-/persönliche Ordner.79 tatsächliche Archivprüfungen einschließlich Move-Zielfilter und unabhängiger Speicher-/Quellreview bestanden. Lokale PDF-Wiederimporte sparen eine erneute Textextraktion; die gemessene eigentliche Analyseverbindung wurde dadurch nicht als beschleunigt nachgewiesen.
+
+Früherer Installationszwischenstand vor dem nachfolgenden Erfolgsbeleg: `2026112104` war installiert, das iPhone meldete eine Sperre; frische Sicherung und Übertragung von 2105 waren noch ausstehend. Dieser Zwischenstand ist durch den Installationsnachweis unten abgelöst. Die physische Bedienprüfung bleibt offen. Es wurde kein neues KI-Testkontingent und kein TestFlight-Build veröffentlicht. Die vorherige begrenzte KI-Testverbindung ist abgelaufen. Team-/persönliche Ordner sind weiterhin lokale Ablagen mit vorhandenen Projekt-Dispo-/Planreferenzen; Online-Mitglieder und allgemeiner Dateiupload sind nicht aktiviert.
+
+Prüfbelege im App-Arbeitsauftrag: `work/native-ui-followup-20261121/{production-release.safe.json,native-candidate-2026112105.safe.json,CHECKPOINT.safe.json}`, zusätzlich die referenzierten Karten-/Genie-/Modal-/Ordnerprüfungen. Dieser spätere Dokumentationsstand ändert den bereitgestellten Produktcode nicht.
+
+
+### Installationsnachweis 2026112105 — historischer Stand mit fehlgeschlagenem Work-Einstieg
+
+Nach erneuter Entsperrbestätigung wurde die frische Sicherung verifiziert und
+**Build `2026112105` installiert und gestartet**. Der Erfolgsbeleg bestätigt die
+installierte Buildnummer sowie **118 geprüfte persistente Dateien, bytegleich
+erhalten; 0 abweichende Dateien**. Originaldaten wurden nicht zurückgesetzt.
+Der signierte Build- und Inventarbeleg umfasst **346 Buildinputs, 44 öffentliche
+Ressourcen und 9 native Kataloge mit jeweils 1876 Schlüsseln**. Die frühere
+Warteposition auf eine iPhone-Entsperrung und der Gerätestand 2104 sind abgelöst.
+
+Nachgewiesen waren Installation, Start und Datenerhalt. **Die anschließende
+physische Prüfung des Work-Einstiegs ist fehlgeschlagen:** Markus meldete, dass
+die App beim Öffnen von Work beendet wird. Zwei echte IPS-Berichte aus Build
+2105 bestätigen den Absturz. Damit ist 2105 trotz erfolgreicher Installation
+nicht als funktional abgenommen zu bewerten. Weitere Bedienprüfungen bleiben
+offen; Ursache, Korrektur und Stand 2106 folgen unten.
+Der begrenzte KI-Testzugang bleibt abgelaufen; kein neues Kontingent, kein
+TestFlight-Upload und keine neuen Online-Teamfunktionen sind dadurch aktiviert.
+
+Erfolgsbeleg im App-Arbeitsauftrag:
+`work/native-ui-followup-20261121/ui-install.safe.json`
+(`UI_FOLLOWUP_INSTALLED_AND_LAUNCHED_DATA_VERIFIED`). Signatur und Buildinventar:
+`work/native-ui-followup-20261121/native-candidate-2026112105.safe.json`;
+Serverstand: `work/native-ui-followup-20261121/production-release.safe.json`.
+Der Geräte-Installer veröffentlicht keinen Servercode; das zuvor belegte
+App-Serverpaket bleibt live. Diese Ergänzung ändert ausschließlich Dokumentation.
+
+
+### Aktueller APP-Stand — 2026112106, Work-Gegenprobe offen
+
+**2105-Fehler belegt:** Zwei echte IPS-Absturzberichte wurden mit dem passenden
+2105-Binary und `atos` symbolisiert. Beide zeigen `SIGABRT` in
+`CineGeniusWorkHandoff.install()`, `WorkplaceEntry.swift:69`. Ein
+`UIHostingController` war als Child des Owners eingebunden, seine View jedoch
+über das Fenstercover außerhalb von `owner.view` in das `UIWindow` eingefügt.
+Die UIKit-Hierarchieprüfung löste eine Exception aus. Der physische
+Work-Einstieg in 2105 bleibt ausdrücklich als fehlgeschlagen dokumentiert.
+
+**Enger Fix und geprüfter Build:** In nur einer Buildquelle,
+`WorkplaceEntry.swift`, wurde dieser Hosting-Controller-Zweig durch eine reine
+`UIView`-Basisfläche im kurzen Fensterübergang ersetzt. Bestehende Schutz- und
+Datenfunktionen blieben erhalten. SDK-Typprüfung, 81 mobile Tests, unabhängiger
+Review und vollständiger nativer Build bestanden. Das Inventar bestätigt
+44 öffentliche Ressourcen und 9 native Kataloge mit je 1876 Schlüsseln.
+
+**2106 installiert:** Nach frischer verifizierter Sicherung der sieben
+bestehenden Datenordner wurde Build `2026112106` installiert und gestartet;
+die installierte Buildnummer ist bestätigt. Erneut sind **118 persistente
+Dateien bytegleich erhalten, 0 abweichend**. Dieser Installationsbeleg ersetzt
+2105 als aktuellen Gerätestand, bestätigt jedoch noch keinen erfolgreichen
+Work-Einstieg auf dem iPhone.
+
+**Offen:** Markus’ erneute physische Gegenprobe „Work öffnen → zurück zu Smart“
+sowie die weitere Prüfung von Wechselqualität, Modals und Meins-/Teamordnern.
+Markus hat inzwischen „Work öffnet sich, zurück zu Smart klappt“ bestätigt. Ein flüssiger Übergang in beiden Richtungen bleibt offen. Der begrenzte
+KI-Testzugang bleibt abgelaufen; kein Provideraufruf, Kontingent-Reset,
+TestFlight-Upload oder neuer Produktdeploy gehört zu dieser Dokumentationsrunde.
+
+Belege im App-Arbeitsauftrag:
+`work/native-work-crash-20261121/{ui-install.safe.json,CHECKPOINT.safe.json}`.
+Checkpoint: `NATIVE2106_PHYSICAL_WORK_ENTRY_RETURN_PASSED_SMOOTHNESS_OPEN`;
+Installation: `UI_FOLLOWUP_INSTALLED_AND_LAUNCHED_DATA_VERIFIED`.
+
+## App-Folgefassung – 22. November 2026, noch nicht veröffentlicht/installiert
+
+- Work-Übergang: UIKit-eigene Einblendung, direkte Rückkehr zur unveränderten Seite, echte Zielnavigation wartet auf den stabilen App-Rahmen. Untere Leiste erhält zusätzlichen Inhaltsabstand; oben rechts nur Hell/Dunkel. Lokale SDK-/Vertragstests bestanden; neue physische Prüfung offen.
+- Nachrichten: Gespräche im aufgeklappten Bereich, Homies/Kollegen/Gruppen/Mitteilungen per Tippen und Wischen, vorhandener Composer und Gruppenanlage erhalten. Entwurfsschutz und gemeinsame Scrollsperren geprüft. 158 gezielte Tests, kleine echte Touch-/Keyboard-Browserfixture bestanden; gewöhnliche Websitepfade erhalten. Team-Kurzeinstieg zeigt die existierende allgemeine Gruppenliste, kein automatischer Teamchat.
+- Darstellung: durchgehende App-Hintergründe, News-Lichtkontrast, gerundetes Menü unten, gemeinsame Glasflächen/Genie, transparenter Einstellungsbalken und Angebotsknopf, Jobs im App-Menü und Projekte in der Inseratauswahl. Neueste ausdrückliche Korrektur: einzelne Smart-Karten deckend mit 92 % Hintergrund-/8 % Textfarbe; große Bereichsfläche transparent. Randlose Fotos in natürlicher Proportion ohne Beschnitt, drei Crewspalten und vollständiger Textumbruch erhalten. 19 Browserfälle und neue Collage bestanden/erstellt; lokaler Checkpoint und unveränderte Website siehe oben. Veröffentlichung und Geräteabnahme offen.
+- Palette: ausschließlich sichtbare Namen in Englisch: **Cement, Dark Sky, Pistachio, Cherry, Sand, Mauve, Black**. Terracotta entfällt; originales Mauve wird ausdrücklich auswählbar. Stable IDs bleiben bis auf den ersetzten Terracotta-Slot erhalten. Quellen und Kataloge geändert, noch kein neuer Gerätebeleg.
+- Organisationen: echter nativer Clientabsturz reproduziert (`Intl.DisplayNames.of` bei leerem Land), öffentliche Zeilen mit unbekanntem Land bleiben nach Korrektur erhalten. Lokaler Browserabschluss noch offen.
+- Planeditor: sechs direkt erreichbare Kategorien, ein alphabetisches Dropdown mit allen 34 vorhandenen Bauteilarten; Quellkatalog, Originale, Undo und Speicherung erhalten. SDK und gezielte Tests bestanden.
+- Persönliche KI: Nutzer hat bisherigen Zugang, dauerhafte Testumgebung und **kein monatliches App-Limit** ausdrücklich beauftragt. Neuer streng einzelkonto-/sitzungsgebundener Serverpfad ohne Testablauf/Gesamtzähler implementiert; Schlüssel bleibt serverseitig, kein LAN-/Mac-Zwang. Keine Aktivierung, kein echter Provider-Smoke, kein neuer Gerätebeleg. Bestehende Providergrenzen bleiben. Alter Drehbuch-Analyze-Endpunkt ist ausdrücklich unavailable; siehe `native-personal-genie-test.md`.
+- E-Mail: Postfachverbindung und Weiterleitungsadresse sind Fragen/Vorschlag, **noch nicht implementiert oder aktiviert**. TestFlight bleibt eigener offener Auftrag.
+
+Nachweise liegen im lokalen App-Auftrag unter `work/app-unified-followup-20261121`, `native-inbox-panel-20261121`, `native-work-smooth-handoff-20261121`, `native-plan-editor-catalog-20261121`, `native-palette-mauve-20261121` und `persistent-personal-genie-20261121`. Erst gemeinsame Quelle einfrieren, vollständig bauen, via GitHub Desktop veröffentlichen und anschließend frisch gesichert installieren; niemals Zwischenstand als bereits auf dem iPhone behaupten.

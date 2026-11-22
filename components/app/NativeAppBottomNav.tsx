@@ -100,7 +100,17 @@ export default function NativeAppBottomNav({ pathname, label, labels }: {
       if (item.id === "workspace" && document.documentElement.getAttribute("data-cg-native-workspace-ready") === "v1" && window.top === window.self && location.protocol === "https:") {
         const bridge = (window as Window & { webkit?: { messageHandlers?: { cinegeniusWorkplace?: { postMessage: (value: { action: string; locale: string }) => void } } } }).webkit?.messageHandlers?.cinegeniusWorkplace;
         if (typeof bridge?.postMessage === "function") {
-          try { bridge.postMessage({ action: "openWorkplace", locale }); settle(baseRef.current); return; }
+          try {
+            bridge.postMessage({ action: "openWorkplace", locale });
+            // Continue toward Work while UIKit brings it in. Resetting to the
+            // source cell here made the indicator visibly bounce backwards.
+            settle(index, velocity);
+            motion.current.rollback = setTimeout(() => {
+              motion.current.rollback = undefined;
+              if (location.pathname + location.search === from) cancel();
+            }, 6000);
+            return;
+          }
           catch { /* The real route remains usable when the native bridge disappears. */ }
         }
       }
@@ -177,11 +187,13 @@ export default function NativeAppBottomNav({ pathname, label, labels }: {
     const preference = () => { reduced.current = media.matches; reset(); };
     document.addEventListener("visibilitychange", visibility);
     window.addEventListener("blur", reset); window.addEventListener("pagehide", reset); window.addEventListener("resize", reset);
+    window.addEventListener("cinegenius:native-workspace-presented", reset);
     media.addEventListener("change", preference);
     return () => {
       clearGesture(); stop(); preview(null); element?.removeAttribute("data-native-app-gesture-ready");
       document.removeEventListener("visibilitychange", visibility);
       window.removeEventListener("blur", reset); window.removeEventListener("pagehide", reset); window.removeEventListener("resize", reset);
+      window.removeEventListener("cinegenius:native-workspace-presented", reset);
       media.removeEventListener("change", preference);
     };
     // Functions intentionally read the active route of this listener generation.

@@ -13487,13 +13487,13 @@
     "workspaceNativeOnly": "CineGenius 앱에서 Workspace를 여세요.",
     "background": "다크 모드 배경",
     "backgrounds": {
-      "graphite": "그래파이트",
-      "midnight": "미드나이트 블루",
-      "sage": "스모키 그린",
-      "rose": "로즈",
-      "sand": "웜 샌드",
-      "terracotta": "테라코타",
-      "black": "퓨어 블랙"
+      "graphite": "Cement",
+      "midnight": "Dark Sky",
+      "sage": "Pistachio",
+      "rose": "Cherry",
+      "sand": "Sand",
+      "mauve": "Mauve",
+      "black": "Black"
     }
   },
   "AppShots": {

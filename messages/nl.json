@@ -13487,13 +13487,13 @@
     "workspaceNativeOnly": "Open Workspace in de CineGenius-app.",
     "background": "Donkere achtergrond",
     "backgrounds": {
-      "graphite": "Grafiet",
-      "midnight": "Nachtblauw",
-      "sage": "Rookgroen",
-      "rose": "Rosé",
-      "sand": "Warm zand",
-      "terracotta": "Terracotta",
-      "black": "Puur zwart"
+      "graphite": "Cement",
+      "midnight": "Dark Sky",
+      "sage": "Pistachio",
+      "rose": "Cherry",
+      "sand": "Sand",
+      "mauve": "Mauve",
+      "black": "Black"
     }
   },
   "AppShots": {

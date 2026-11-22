@@ -7,6 +7,50 @@
 }
 :global(html[data-cg-native-community-appearance="app"]) .surface :global(.smart-result-list) { padding:0; border:0; border-radius:0; background:transparent; }
 
+/* One viewport canvas also continues behind detail pages and their header. */
+:global(html[data-cg-native-community-appearance="app"]) .surface,
+:global(html[data-cg-native-community-appearance="app"]) .surface > :global(main),
+:global(html[data-cg-native-community-appearance="app"]) .surface > :global(div.bg-bg-primary),
+:global(html[data-cg-native-community-appearance="app"]) .surface :global([data-news-entry="v1"]) {
+  background: transparent !important;
+}
+:global(html[data-cg-native-community-appearance="app"]) .surface > :global(.pt-16) { padding-top:0; }
+:global(html[data-cg-native-community-appearance="app"]) .surface :global([data-personal-area-heading="v1"]) {
+  background:transparent;
+  border:0;
+  -webkit-backdrop-filter:none;
+  backdrop-filter:none;
+}
+:global(html[data-cg-native-community-appearance="app"]) .surface :global([data-personal-area-heading="v1"] a[href="/inserat"]) {
+  background:transparent;
+  color:var(--cg-app-accent);
+  border:1px solid var(--cg-app-border);
+  border-radius:22px;
+}
+:global(html[data-cg-native-community-appearance="app"]) .surface :global(.mobile-browse-controls) { border-bottom:0; }
+
+/* The article's own gallery remains content. The generic website hero artwork
+   must not paint a second canvas or force white text in the light appearance. */
+:global(html[data-cg-native-community-appearance="app"]) .surface :global([data-news-entry="v1"] .site-page-hero) {
+  padding-top: 8px !important;
+  border: 0;
+  background: transparent;
+}
+:global(html[data-cg-native-community-appearance="app"]) .surface :global([data-news-entry="v1"] .site-page-hero > [aria-hidden="true"]) { display:none; }
+:global(html[data-cg-native-community-appearance="app"]) .surface :global([data-news-entry="v1"] [data-page-header="title"]) { color:var(--cg-app-ink); }
+:global(html[data-cg-native-community-appearance="app"]) .surface :global([data-news-entry="v1"] [data-page-header="description"]),
+:global(html[data-cg-native-community-appearance="app"]) .surface :global([data-news-entry="v1"] > article > :is(.text-text-secondary,.text-text-muted)) { color:var(--cg-app-ink); }
+/* Bright native palettes need full white for small text. Gallery credits and
+   article links keep their own colors; only direct article copy is adjusted. */
+:global(html[data-cg-native-community-appearance="app"]:not([data-cg-app-theme="pure"])) .surface :global([data-news-entry="v1"] [data-page-header="description"]),
+:global(html[data-cg-native-community-appearance="app"]:not([data-cg-app-theme="pure"])) .surface :global([data-news-entry="v1"] > article > :is(.text-text-secondary,.text-text-muted)) { color:#fff; }
+:global(html[data-cg-native-community-appearance="app"]) .surface :global([data-news-entry="v1"] [data-page-header="badge"]) {
+  border-color:var(--cg-app-border);
+  background:var(--cg-app-glass-fill);
+  color:var(--cg-app-muted);
+}
+:global(html[data-cg-native-community-appearance="app"]) .surface :global([data-news-entry="v1"] [data-page-header="badge"] span) { color:inherit; }
+
 /* The bottom navigation already names these areas. Keep semantic headings and CTAs. */
 .surface :global(.directory-page > .site-page-hero) {
   padding-top: 0 !important;

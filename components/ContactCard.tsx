@@ -21,8 +21,9 @@ type Contact = {
   profile_visible?: boolean;
 };
 
-export default function ContactCard({ contact, pending, error, onRemove, messageHref, onMessage, favorite, favoriteDisabled = false, onFavorite, compact = false }: {
+export default function ContactCard({ contact, pending, error, onRemove, messageHref, onMessage, favorite, favoriteDisabled = false, onFavorite, compact = false, inlineMessage = false }: {
   compact?: boolean;
+  inlineMessage?: boolean;
   contact: Contact;
   pending: boolean;
   error: string;
@@ -88,14 +89,17 @@ export default function ContactCard({ contact, pending, error, onRemove, message
       </div>
       <div data-contact-actions className="flex max-w-full flex-wrap items-center gap-x-3 gap-y-1 sm:justify-end">
         {typeof favorite === "boolean" && onFavorite && <button type="button" aria-pressed={favorite} aria-label={t(favorite ? "removeHomie" : "addHomie", { name: contact.display_name })} title={t(favorite ? "removeHomie" : "addHomie", { name: contact.display_name })} disabled={busy || favoriteDisabled} onClick={onFavorite} className={`flex size-11 shrink-0 items-center justify-center rounded-lg border disabled:opacity-40 ${favorite ? "border-gold/30 bg-gold/10 text-gold" : "border-border text-text-muted"} ${focusStyle}`}><Star size={18} aria-hidden="true" className={favorite ? "fill-current" : ""} /></button>}
-        <Link href={messageHref ?? `/messages?to=${encodeURIComponent(contact.user_id)}`} aria-label={t("messageLabel", { name: contact.display_name })}
+        {inlineMessage ? <button type="button" onClick={onMessage} aria-label={t("messageLabel", { name: contact.display_name })}
+          className={`inline-flex min-h-11 max-w-full items-center justify-center gap-2 rounded-lg border border-gold/30 bg-gold/10 px-3 py-2 text-sm font-semibold text-gold transition-colors hover:bg-gold/20 ${focusStyle}`}>
+          <MessageSquare size={16} className="shrink-0" aria-hidden="true" /><span data-contact-action-label className="min-w-0 [overflow-wrap:anywhere]">{t("message")}</span>
+        </button> : <Link href={messageHref ?? `/messages?to=${encodeURIComponent(contact.user_id)}`} aria-label={t("messageLabel", { name: contact.display_name })}
           onClick={event => {
             if (!onMessage || event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
             event.preventDefault(); onMessage();
           }}
           className={`inline-flex min-h-11 max-w-full items-center justify-center gap-2 rounded-lg border border-gold/30 bg-gold/10 px-3 py-2 text-sm font-semibold text-gold transition-colors hover:bg-gold/20 ${focusStyle}`}>
           <MessageSquare size={16} className="shrink-0" aria-hidden="true" /><span data-contact-action-label className="min-w-0 [overflow-wrap:anywhere]">{t("message")}</span>
-        </Link>
+        </Link>}
         {contact.profile_visible !== false && <Link href={`/profile/${encodeURIComponent(contact.user_id)}`} aria-label={profile("tabProfile")} title={profile("tabProfile")} className={`inline-flex min-h-11 min-w-11 items-center justify-center rounded-lg px-1 py-2 text-xs text-text-secondary hover:text-gold ${focusStyle}`}>{compact && <UserRound size={18} aria-hidden="true" />}<span data-contact-action-label>{profile("tabProfile")}</span></Link>}
         <button type="button" disabled={busy} onClick={() => { setFailed(false); setConfirm(true); }} aria-label={t("removeLabel", { name: contact.display_name })}
           className={`inline-flex min-h-11 min-w-11 items-center justify-center rounded px-1 py-2 text-[11px] text-text-muted underline decoration-text-muted/40 underline-offset-4 hover:text-red-400 disabled:opacity-40 ${focusStyle}`}>{compact && <UserRoundMinus size={18} aria-hidden="true" />}<span data-contact-action-label>{t("removeShort")}</span></button>

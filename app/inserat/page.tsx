@@ -1035,6 +1035,16 @@ export default function InseratPage() {
   // Main category tiles
   const mainTiles = [
     {
+      id: "projects",
+      label: uiText("projects.addProject"),
+      sub: uiText("projects.subtitle"),
+      icon: Clapperboard,
+      color: "text-gold",
+      border: "border-gold/20 hover:border-gold/60",
+      bg: "bg-gold/5",
+      activeBorder: "border-gold",
+    },
+    {
       id: "jobs",
       label: uiText("footer.links_postJob"),
       sub: uiText("Ui.text_8971f390b9cb71"),
@@ -1120,6 +1130,7 @@ export default function InseratPage() {
                 <button
                   key={tile.id}
                   onClick={() => {
+                    if (tile.id === "projects") { router.push("/projects/neu"); return; }
                     if (tile.id === "firma") { router.push("/dashboard?tab=firma"); return; }
                     setActiveGroup(tile.id);
                   }}

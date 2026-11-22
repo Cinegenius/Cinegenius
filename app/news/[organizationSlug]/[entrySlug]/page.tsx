@@ -20,7 +20,7 @@ export default async function EntryPage({ params }: { params: Promise<{ organiza
   const dates = new Intl.DateTimeFormat(locale, { dateStyle: "long", timeStyle: "short", timeZone: "Europe/Berlin" });
   const now = await getNow();
   const ended = entry.moderation_status === "ended" || (entry.ends_at && new Date(entry.ends_at).getTime() < now.getTime());
-  return <main className="min-h-screen bg-bg-primary">
+  return <main data-news-entry="v1" className="min-h-screen bg-bg-primary">
     <div data-news-observation><NewsObservation id={entry.id} event="news_view" /><PageHeader badge={t(`entryType.${entry.entry_type}`)} title={<TranslatedText kind="news" id={entry.id} field="title">{entry.title}</TranslatedText>} description={entry.summary ? <TranslatedText kind="news" id={entry.id} field="summary">{entry.summary}</TranslatedText> : t("entryFallbackDescription")} /></div>
     <article className="site-container max-w-4xl py-8 sm:py-12">
       {entry.publication_authority === "editorial" && <p className="mb-5 text-xs text-text-muted">{t("editorialNote")}</p>}
