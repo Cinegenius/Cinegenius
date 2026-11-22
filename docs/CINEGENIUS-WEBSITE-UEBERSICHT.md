@@ -1,5 +1,11 @@
 # CineGenius · Übersicht der gesamten Website
 
+## Neuester Folgeauftrag · Zeitformat und obere App-Kante
+
+Web `72e2a5bf3efad9f960b3c1a588dbc923814665bc` / `dpl_2emUcX9FAZmK3xCDKXAEf9Snmkgo` ist produktiv geprüft. Nach erneutem echtem `invalid_schema`/502 im Zeitbereich ist ein enger Kandidat geprüft: gemeinsame bestehende Audience-Formregel, fünf disjunkte Producerformen, äquivalente geteilte API-Evidence-Definition, geschlossene Regelcodes und eindeutige globale ID-Vorgabe. 40 Tests/78 Alt-Neu-Rohfälle, unveränderte kanonische Annahme und gültige Ergebnisse; tatsächlicher neuer Analyseerfolg noch nicht belegt. Neuer oberer App-Schnitt wird getrennt korrigiert; verpflichtender Schutz gegen beide Schnittkanten beauftragt. Gewöhnliche Website und Quellen-/Kontorechte erhalten.
+
+Native 2206 mit Scanner-Einstiegen, eigenem Iconset und bewusstem Sonnenstandort ist vollständig signiert, noch nicht installiert; neue 30 NativeRoomScanner-Texte in allen 17 kanonischen Katalogen, andere Namespaces erhalten. Der obere Kantenkandidat ist inzwischen mit 17 verpflichtenden Designprüfungen und vier Browserpaaren geprüft, noch nicht veröffentlicht/physisch abgenommen. Gmail unverändert deaktiviert. [Aktuelle Belege und genaue Grenzen](app-followup-20261122.md). Ältere abweichende Zwischenstände bleiben Historie.
+
 ## Neuester Prüfstand · 22. November 2026 · e23 und Folgekorrekturen
 
 Produktive Web-Basis `e23dbb1733725236613ff90e710cd738b4204099` / `dpl_823inwJ1f49MzcYacPpmB7tBcjU1` ist geprüft; native2205 tatsächlich installiert (144 bytegleiche Arbeitsdateien vor Erststart). Markus bestätigt: „Kante weg, Genie und Leiste passen“. Die neue kompakte Smart-Bedienzeile ist ein gesondert geprüfter Kandidat nur für die App-Darstellung; gewöhnliches Website-Markup bleibt gleich.34 Browserfälle über17 Sprachen,73 fokussierte Tests und14 verpflichtende Designprüfungen bestanden; neue Veröffentlichung/physische Abnahme separat belegen.

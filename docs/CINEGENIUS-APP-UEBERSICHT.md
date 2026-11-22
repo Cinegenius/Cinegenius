@@ -1,5 +1,9 @@
 # CineGenius · Übersicht der gesamten App
 
+## Neuester Folgestand · 2206 signiert, neue obere Kante offen
+
+Installiert bleibt **2205**; **2206 ist vollständig gebaut und signiert, noch nicht installiert**. Neuer Scanner mit drei direkten Einstiegen ohne zusätzliche Gerätesperre, eigenem 20er-Iconset/56 Arten bei unveränderten 44 bisherigen IDs und einmaligem bewusstem Standortknopf für den Sonnenstand. 94 Core-/149 mobile Prüfungen und Vektor-/PDF-Belege; neue OS-Ortsfreigabe in 17 Sprachen, voller historischer nativer UI-Bestand weiterhin 9 Sprachen. Web `72e2a5b` ist veröffentlicht; echte Analyse scheitert weiterhin im Zeitbereich. Ein eng geprüfter Ausgabeform-Kandidat und die obere Kantenkorrektur (17 verpflichtende Designprüfungen, vier Browserpaare mit unveränderten Initialbildern und Scrollmaxima) sind noch gesondert zu veröffentlichen/physisch zu prüfen. [Belege und Grenzen](app-followup-20261122.md). Gmail deaktiviert; Außen-/Tier-Icons getrennte Vorschau. Ältere Zwischenstände unten bleiben Historie.
+
 ## Neuester Gerätestand · 22. November 2026 · 2205 installiert
 
 **2205 ist nach frischer Sicherung installiert und gestartet;144 Arbeitsdateien waren vor Erststart bytegleich,0 Unterschiede.** Veröffentlichte Web-Basis ist `e23dbb1733725236613ff90e710cd738b4204099` / `dpl_823inwJ1f49MzcYacPpmB7tBcjU1`. Markus bestätigt: „Kante weg, Genie und Leiste passen“. Das ersetzt den früheren Installationshalt, jedoch keine umfassende Geräte-, Team-, Mail- oder KI-Abnahme. [Aktuelle Belege, neue Smart-Abstandskorrektur und Grenzen](app-followup-20261122.md).

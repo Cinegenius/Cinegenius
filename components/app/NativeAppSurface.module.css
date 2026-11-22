@@ -287,15 +287,16 @@
   }
 }
 
-/* Content continues behind floating controls. Trailing padding keeps the last
-   item/focused field clear, without clipping a whole row above the Genie. */
+/* Content paints behind both header and floating controls. Leading/trailing
+   padding keeps initial content and focused fields clear without hard cuts. */
 :global(html[data-cg-native-community-appearance="app"]):has(main.surface:global([data-native-app-surface="v1"])),
 :global(html[data-cg-native-community-appearance="app"]) > :global(body):has(main.surface:global([data-native-app-surface="v1"])) { height:100%; overflow:hidden; }
 :global(html[data-cg-native-community-appearance="app"]) :global(body) main.surface:global(.site-main[data-native-app-surface="v1"]) {
-  --native-content-top:var(--cg-app-content-top,calc(var(--cg-app-safe-top,env(safe-area-inset-top,0px)) + 80px));
-  --native-content-height:var(--cg-app-content-height,max(0px,calc(100dvh - var(--native-content-top))));
+  --native-content-top:var(--cg-app-content-top,0px);
+  --native-content-height:var(--cg-app-content-height,max(0px,100dvh));
+  --native-controls-top:var(--cg-app-content-controls-top,min(calc(var(--native-content-top) + var(--cg-app-safe-top,env(safe-area-inset-top,0px)) + 80px),calc(var(--native-content-top) + var(--native-content-height))));
   --native-content-clearance:min(var(--cg-app-content-clearance,calc(var(--mobile-safe-area-height,var(--cg-app-safe-bottom,env(safe-area-inset-bottom,0px))) + 160px)),max(0px,calc(var(--native-content-height) - 24px)));
-  --native-content-padding-top:min(12px,var(--native-content-height));
+  --native-content-padding-top:min(calc(max(0px,calc(var(--native-controls-top) - var(--native-content-top))) + 12px),var(--native-content-height));
   --native-content-padding-bottom:min(calc(12px + var(--native-content-clearance)),max(0px,calc(var(--native-content-height) - var(--native-content-padding-top))));
   position:fixed; left:0; right:0; bottom:auto;
   top:var(--native-content-top); height:var(--native-content-height);
@@ -303,7 +304,7 @@
   min-height:0 !important; max-height:none; min-width:0;
   padding-top:var(--native-content-padding-top) !important; padding-bottom:var(--native-content-padding-bottom) !important;
   overflow-y:auto; overflow-x:hidden; overscroll-behavior-y:contain;
-  scroll-padding-top:calc(var(--cg-app-active-rail-height,0px) + 12px); scroll-padding-bottom:var(--native-content-padding-bottom);
+  scroll-padding-top:min(calc(var(--native-content-padding-top) + 12px + var(--cg-app-active-rail-height,0px)),max(0px,calc(var(--native-content-height) - var(--native-content-padding-bottom)))); scroll-padding-bottom:var(--native-content-padding-bottom);
   -webkit-overflow-scrolling:touch;
 }
 

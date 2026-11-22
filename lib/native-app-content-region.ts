@@ -1,18 +1,18 @@
 import { lockBodyScroll } from "./body-scroll-lock";
 
 export type NativeContentViewport = { top: number; height: number };
-export type NativeContentRegion = { top: number; bottom: number; height: number; clearance: number };
+export type NativeContentRegion = { top: number; controlsTop: number; bottom: number; height: number; clearance: number };
 
 const bounded = (value: number, fallback = 0) => Number.isFinite(value) ? Math.max(0, value) : fallback;
 
-/** Paint/scroll through the visible viewport. Control clearance belongs to the
- * trailing content padding, independently of the launcher's draggable position. */
+/** Paint/scroll through the entire visible viewport. Header/control clearance
+ * belongs to content padding, independently of the visual scroll boundaries. */
 export function nativeAppContentRegion(viewport: NativeContentViewport, headerBottom: number | null, safeTop: number, safeBottom: number): NativeContentRegion {
   const visibleTop = bounded(viewport.top);
   const visibleBottom = visibleTop + bounded(viewport.height);
   const header = headerBottom !== null && Number.isFinite(headerBottom) ? headerBottom + 12 : visibleTop + bounded(safeTop) + 80;
-  const top = Math.min(visibleBottom, Math.max(visibleTop + 12, header));
-  return { top, bottom: visibleBottom, height: visibleBottom - top, clearance: bounded(safeBottom) + 160 };
+  const controlsTop = Math.min(visibleBottom, Math.max(visibleTop + 12, header));
+  return { top: visibleTop, controlsTop, bottom: visibleBottom, height: visibleBottom - visibleTop, clearance: bounded(safeBottom) + 160 };
 }
 
 /** Computed scroll padding describes the unobscured part of the larger canvas.
@@ -32,7 +32,7 @@ export function nativeContentFocusDelta(field: { top: number; bottom: number }, 
 /** Geometry only: no navigation, account data, storage, or launcher positioning. */
 export function installNativeAppContentRegion(content: HTMLElement): () => void {
   const html = document.documentElement;
-  const properties = ["--cg-app-content-top", "--cg-app-content-height", "--cg-app-content-bottom", "--cg-app-content-clearance"] as const;
+  const properties = ["--cg-app-content-top", "--cg-app-content-controls-top", "--cg-app-content-height", "--cg-app-content-bottom", "--cg-app-content-clearance"] as const;
   const previous = properties.map(name => ({ value: html.style.getPropertyValue(name), priority: html.style.getPropertyPriority(name) }));
   const written = new Map<string, string>();
   const insets = document.createElement("div");
@@ -105,7 +105,12 @@ export function installNativeAppContentRegion(content: HTMLElement): () => void 
     const paddingBottom = Math.max(8, Number.parseFloat(style.scrollPaddingBottom) || Number.parseFloat(style.paddingBottom) || 0);
     const anchor = content.querySelector<HTMLElement>("[data-native-browse-anchor]");
     const rail = anchor?.querySelector<HTMLElement>("[data-native-browse-toolbar]");
-    if (anchor && rail && anchor.getBoundingClientRect().top < area.top) padding = Math.max(padding, rail.getBoundingClientRect().height + 12);
+    const controlsTop = Number.parseFloat(html.style.getPropertyValue("--cg-app-content-controls-top")) || area.top;
+    if (anchor && rail && anchor.getBoundingClientRect().top < controlsTop) {
+      const leading = Math.max(0, Number.parseFloat(style.paddingTop) || 0);
+      padding = Math.max(padding, leading + rail.getBoundingClientRect().height + 12);
+    }
+    padding = Math.min(padding, Math.max(0, area.height - paddingBottom));
     const unobscured = nativeContentUnobscuredRegion(area, padding, paddingBottom);
     const delta = nativeContentFocusDelta(field.getBoundingClientRect(), unobscured, 0);
     if (delta) content.scrollTop += delta;
@@ -123,7 +128,7 @@ export function installNativeAppContentRegion(content: HTMLElement): () => void 
     const safe = readInsets(), viewport = window.visualViewport;
     const box = header?.getBoundingClientRect();
     const region = nativeAppContentRegion({ top: viewport?.offsetTop ?? 0, height: viewport?.height ?? window.innerHeight }, box && box.height > 0 ? box.bottom : null, safe.top, safe.bottom);
-    const values = [region.top, region.height, region.bottom, region.clearance];
+    const values = [region.top, region.controlsTop, region.height, region.bottom, region.clearance];
     let geometryChanged = false;
     properties.forEach((name, index) => {
       const value = `${Math.round(values[index] * 100) / 100}px`;

@@ -1,5 +1,14 @@
 # Aktuelle Aufträge · 22. November 2026
 
+## Aktuelle Reihenfolge · Zeiten, obere Kante, geprüfte Gerätefassung
+
+1. **Analyseformat zuverlässig machen:** Echter zweiter Fehler auf 72e am 22.11.2026 um 20:03:45.099 UTC: `invalid_schema`/502, 8238 ms, kanonischer Zeitbereich. Gemeinsame Audience-Formdefinition/äquivalente Evidence-API-Projektion und präzise geschlossene Regelcodes als enger Kandidat geprüft (40 Tests, 78 Alt/Neu-Rohfälle). Veröffentlichung und echter neuer Analyseerfolg noch offen; keine bloße Diagnose als behobenen Incident ausgeben.
+2. **Obere Kante veröffentlichen und beide Kanten dauerhaft prüfen:** Geprüfter Kandidat mit voller visueller Fläche, separatem Kopf-/Fuß-Bedienabstand und Toolbargrenze. 17 verpflichtende Designprüfungen inklusive negativer alter Top-/Bottomgrenzen und vier Browserpaare bestanden, Initialbilder/Anfangspositionen/Scrollmaxima gleich. Veröffentlichung und physische Gegenprobe bleiben offen.
+3. **Scanner-Folgefassung 2206 abschließen:** Vollständiger signierter Build bestanden; drei Einstiege ohne zusätzliche Gerätesperre, 20 eigene Motivpaare/56 Arten bei unveränderten 44 bisherigen IDs, bewusster Standortknopf statt Pflichtkoordinaten. 94 Core-/149 mobile Prüfungen, Vektor-/PDF- und lokalisierte OS-Freigabe-Belege. Noch nicht installiert; vor Geräteupdate frisch sichern und Daten vor Erststart abgleichen. Aktuell bleibt 2205 installiert. [Nachweise und Grenzen](app-followup-20261122.md).
+4. **Gmail und offene echte Abläufe:** Einrichtung vorbereitet, Flag aus, kein verbundenes Postfach und keine Weiterleitung. Geheimnisse/Verschlüsselung erhalten; aktuelle Fehlermeldungen vor weiterer Aktivierung bearbeiten. Außen-/Tier-Icons sind gesonderte Vorschau, nicht Teil des freigegebenen 20er-Einbaus. Ältere offene Aufgaben bleiben erhalten.
+
+Dieser Stand ersetzt widersprechende frühere Zwischenstände; erfolgreiche Veröffentlichung, Installation und physische Bedienung getrennt nachweisen.
+
 ## Neuester Auftragstand · Analysefehler und Smart-Innenabstand
 
 1. **Persönliche Dispoanalyse ursächlich klären:** Tatsächlicher `invalid_schema`/502 vom22.11.19:04:42.746UTC, Server8742ms/Gerät12,62s. Geschlossene Stufen-/Grund-/Bereichsdiagnose vorbereiten; kein Dokument-/Antwortlogging und kein stiller Anbieterretry. Widersprüchliche technische Formatgrenzen separat vereinfachen; kein belegter rechtlicher Block und noch kein bewiesenes fehlerhaftes Feld. Quellen-/Kontoschutz erhalten.

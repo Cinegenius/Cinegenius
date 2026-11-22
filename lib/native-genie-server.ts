@@ -37,22 +37,23 @@ export async function nativeGenieRoute(request:Request,kind:string):Promise<Resp
  const started=Date.now();
  let phase="access";
  let actor:string|null=null,releaseClaim:(()=>void)|undefined;
- const json=(body:unknown,status=200,diagnostic?:{rejectionStage?:unknown;rejectionReason?:unknown;rejectionArea?:unknown})=>{
+ const json=(body:unknown,status=200,diagnostic?:{rejectionStage?:unknown;rejectionReason?:unknown;rejectionArea?:unknown;rejectionRule?:unknown})=>{
   if(status>=500){
    // Only closed diagnostics: never log source, model output, identity, headers,
    // provider messages or exception stacks. Observation cannot affect response.
    const allowed=["unavailable","invalid_configuration","invalid_schema","invalid_evidence","provider_incomplete","provider_failed","provider_invalid_response","provider_empty_response","provider_unavailable","provider_timeout","too_large"];
    const candidate=object(body)?body.error:null;
    const code=typeof candidate==="string"&&allowed.includes(candidate)?candidate:"unclassified";
-   let rejectionStage='unknown',rejectionReason='other',rejectionArea='unknown';
+   let rejectionStage='unknown',rejectionReason='other',rejectionArea='unknown',rejectionRule='unknown';
    try{
-    const rawStage=diagnostic?.rejectionStage,rawReason=diagnostic?.rejectionReason,rawArea=diagnostic?.rejectionArea;
+    const rawStage=diagnostic?.rejectionStage,rawReason=diagnostic?.rejectionReason,rawArea=diagnostic?.rejectionArea,rawRule=diagnostic?.rejectionRule;
     const stage=typeof rawStage==="string"&&["compact_wire","canonical_validation","recovery","provider","unknown"].includes(rawStage)?rawStage:"unknown";
     const reason=typeof rawReason==="string"&&["duplicate_key","wire_schema_mismatch","invalid_union","wire_configuration","canonical_schema","recovery_schema","other"].includes(rawReason)?rawReason:"other";
     const area=typeof rawArea==="string"&&["root","day","people","times","locations","notes","contacts","unknown"].includes(rawArea)?rawArea:"unknown";
-    rejectionStage=stage;rejectionReason=reason;rejectionArea=area;
+    const rule=stage==='canonical_validation'&&code==='invalid_schema'&&typeof rawRule==='string'&&['record_id_invalid','record_id_duplicate','audience_form','audience_duplicate_reference','unknown'].includes(rawRule)?rawRule:'unknown';
+    rejectionStage=stage;rejectionReason=reason;rejectionArea=area;rejectionRule=rule;
    }catch{/* Diagnostic access must not change the HTTP response. */}
-   try{console.error(JSON.stringify({rejectionStage,rejectionReason,rejectionArea,event:"native_genie_failure",kind:["personal-dispo","work-task","analyze"].includes(kind)?kind:"unknown",phase,code,status,elapsedMs:Math.max(0,Date.now()-started)}));}catch{}
+   try{console.error(JSON.stringify({rejectionStage,rejectionReason,rejectionArea,rejectionRule,event:"native_genie_failure",kind:["personal-dispo","work-task","analyze"].includes(kind)?kind:"unknown",phase,code,status,elapsedMs:Math.max(0,Date.now()-started)}));}catch{}
   }
   return Response.json(body,{status,headers:{...headers,...(status===200&&actor?{"X-CineGenius-Genie-Account":actor}:{}),...(status===429?{"Retry-After":"60"}:{})}});
  };
