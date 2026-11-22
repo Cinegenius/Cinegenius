@@ -1,10 +1,10 @@
 # Work → Community/Smart: repeated request diagnosis
 
 Prepared against d8b72d7375aedbc581ac807011bc0969d77a765e on 22 November 2026.
-Not deployed, not installed and not a claim that the iPhone transition is fixed.
-The earlier collage hold was subsequently checked against the local APP user
-message: the shared design is approved. Local APP now reports the combined source integration complete; release and
-device verification remain outstanding. See the latest checkpoint below.
+The combined correction is now published in a0d872320e7bb94dedf64b105d549a4c948e66cb
+and installed with native 2204. Physical start/transition acceptance remains open.
+The earlier source-only, Desktop-blocked and uninstalled checkpoints below are
+historical; see the actual completion evidence at the end.
 
 ## Reproduced cause in the server-delivered app component
 
@@ -90,7 +90,7 @@ WEB completed its separate authorized Dispo-only release at
 APP checked the receipt, fetched origin/main and inspected the six changed files.
 No Smart-return, UI or team-channel source is part of that release. Preserve the
 new Genie prompt selection on the next merge; do not overwrite it with this
-branch's older engine files. The return fix remains prepared, not published.
+branch's older engine files. That Dispo-only release did not publish the return fix; it was subsequently included in a0d87232.
 
 
 ## Historical candidate 2026112203 — not installed, superseded by startup scope
@@ -167,3 +167,33 @@ No new Git write, push, deployment, fresh backup or installation followed this
 failure. A paired connected iPhone read alone does not establish any of them.
 Continue from local work/app-startup-20261122/CHECKPOINT.safe.json after the
 window becomes available. No parallel release or2203 installation.
+
+
+## Actual release and installation completed — physical UX pending
+
+The local APP completed Desktop commit/push and one guarded deployment of
+**a0d872320e7bb94dedf64b105d549a4c948e66cb**. This server fetched origin/main,
+verified ancestry from 57d7658f and inspected the visible local release/installer
+outputs. UI commit 2225503b, merge ed334e83 and final startup a0d87232 retain the
+published focused/medium Dispo selection. The team prototype migration and its
+test file are absent from the deployed commit.
+
+Release output: dpl_HUh4tANfSQZ7VFi6V1MkMKSeHnSi READY, exact canonical
+www.cinegenius.co alias, 0 provider calls. Local production-release.safe.json SHA256
+reported by its read command: 82522aa8382e6838776dbb563185b86717f8efca82bd3d2150d88e9ec8a2558f.
+Full Next/TypeScript build, 4 live access checks and 39 assets passed per local APP.
+No independent second deployment or live-provider comparison was run here.
+
+After confirmed device unlock, all 7 persistent folders were freshly backed up
+(169 files). Build 2026112204 was installed and launched; actual installed build
+number verified. 139 Documents/Application Support files were byte-identical
+before first launch, 0 differences. This comparison covers 139 working files, not
+all 169 backup files. No reset, uninstall or temporary Genie config. The server
+read the successful installer output; it did not repeat the physical operation.
+
+Source of the real evidence is local work/app-startup-20261122/
+production-release.safe.json, ui-install.safe.json and CHECKPOINT.safe.json.
+The user is already asked in local APP to cold-restart after Work/Smart and test
+restored area, Work/Smart/Projects, header, Genie and jumps. That result is still
+pending. Installation/data preservation does not establish no jank or measured
+physical latency. Do not ask the same question again from this server chat.
