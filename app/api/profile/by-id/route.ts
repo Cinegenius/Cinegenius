@@ -12,7 +12,9 @@ export async function GET(req: NextRequest) {
   }
 
   const { userId } = await auth();
-  if (!(await canViewProfile(id, userId))) {
+  // The freshly authenticated owner already has access to their own profile.
+  // Other viewers retain the current privacy, block and friendship checks.
+  if (id !== userId && !(await canViewProfile(id, userId))) {
     return NextResponse.json({ profile: null }, { headers: { "Cache-Control": "private, no-store, max-age=0" } });
   }
 

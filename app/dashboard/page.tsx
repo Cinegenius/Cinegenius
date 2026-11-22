@@ -52,6 +52,7 @@ import { MAX_LOCATION_IMAGES, MAX_LISTING_IMAGES } from "@/lib/listing-image-gal
 import { subscribeToProfileUpdated } from "@/lib/profile-update-events";
 import { uiErrorMessage } from "@/lib/ui-error-message";
 import { useAuthenticatedInbox } from "@/lib/use-authenticated-inbox";
+import { useNativeDashboardBootstrap } from "@/lib/use-native-dashboard-bootstrap";
 
 type AnalyticsConversation = {
   id: string;
@@ -89,7 +90,9 @@ const VALID_TABS = ["overview", "listings", "jobs", "bookings", "settings", "ana
 export default function DashboardPage() {
   const { user, isLoaded } = useUser();
   const uiText = useTranslations();
+  const nativeBootstrap = useNativeDashboardBootstrap(useSearchParams().toString());
   if (!isLoaded || !user) return <div className="site-container py-24" role="status">{uiText("common.loading")}</div>;
+  if (nativeBootstrap) return <div className="site-container py-24" role="status" data-native-dashboard-bootstrap="v1"><h1 className="sr-only">{uiText("common.loading")}</h1></div>;
   return <DashboardContent key={user.id} />;
 }
 

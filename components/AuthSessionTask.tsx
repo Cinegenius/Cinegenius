@@ -44,11 +44,10 @@ export default function AuthSessionTask({ task, destination }: { task: AuthSessi
   if (session?.currentTask && session.currentTask.key !== task) return <><RedirectToTasks /><AuthFormLoading /></>;
   if (session?.currentTask?.key === task) {
     const props = { redirectUrlComplete: destination, appearance };
-    if (task === "reset-password") return <TaskResetPassword {...props} />;
-    if (task === "setup-mfa") return <TaskSetupMFA {...props} />;
-    return <TaskChooseOrganization {...props} />;
+    return <div data-native-auth-ready="v1">{task === "reset-password" ? <TaskResetPassword {...props} />
+      : task === "setup-mfa" ? <TaskSetupMFA {...props} /> : <TaskChooseOrganization {...props} />}</div>;
   }
-  return <div className="space-y-4">
+  return <div data-native-auth-ready="v1" data-native-auth-recovery="v1" className="space-y-4">
     <p role="status" className="text-sm leading-relaxed text-text-secondary">{t("sessionTaskUnavailable")}</p>
     <Link href={getAuthSwitchDestination("sign-in", destination)} className="inline-flex min-h-12 w-full items-center justify-center rounded-xl bg-gold px-5 text-base font-bold text-bg-primary hover:bg-gold-light">{t("backSignIn")}</Link>
   </div>;

@@ -1,9 +1,14 @@
 "use client";
 
 import { useEffect } from "react";
+import { nativeAppAppearanceSnapshot, useNativeAppAppearance } from "@/lib/use-native-app-appearance";
 
 export default function GlobalEffects() {
+  const nativeAppearance = useNativeAppAppearance();
   useEffect(() => {
+    // App cards are already laid out in their final viewport. The website's
+    // delayed reveal would hide/blur them again after the first native paint.
+    if (nativeAppearance || nativeAppAppearanceSnapshot()) return;
     // Enable reveal animations only after hydration — avoids SSR mismatch
     document.documentElement.classList.add("js-ready");
 
@@ -97,7 +102,7 @@ export default function GlobalEffects() {
       io.disconnect();
       mo.disconnect();
     };
-  }, []);
+  }, [nativeAppearance]);
 
   return null;
 }

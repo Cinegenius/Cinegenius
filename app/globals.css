@@ -443,7 +443,7 @@ body {
     box-shadow   0.22s ease;
 }
 /* Reveal animation — only active after JS hydration (.js-ready on <html>) */
-.js-ready .card-hover:not([data-visible]) {
+.js-ready:not([data-cg-native-community-appearance="app"]) .card-hover:not([data-visible]) {
   opacity: 0;
   filter: blur(6px);
   translate: 0 12px;

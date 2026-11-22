@@ -504,7 +504,7 @@ function SignInForm({ destination, signUpDestination }: { destination: string; s
   };
 
   return (
-    <div className="w-full">
+    <div className="w-full" data-native-auth-ready={isLoaded && !isSignedIn && !!signIn && !busy ? "v1" : undefined}>
       {step === "credentials" && (
         <form onSubmit={submitPassword} className="space-y-5" noValidate>
           <label className="block text-sm font-medium text-text-primary">
@@ -763,7 +763,7 @@ function SignUpForm({ destination, signInDestination }: { destination: string; s
   };
 
   return (
-    <div className="w-full">
+    <div className="w-full" data-native-auth-ready={isLoaded && !isSignedIn && !!signUp && !busy ? "v1" : undefined}>
       {step === "credentials" ? (
         <form onSubmit={submitSignUp} className="space-y-5" noValidate>
           <label className="block text-sm font-medium text-text-primary">{t("email")}<input autoComplete="email" autoCapitalize="none" autoCorrect="off" type="email" inputMode="email" required value={email} onChange={(event) => setEmail(event.target.value)} className={inputClass} placeholder={uiText("Ui.text_990cce75c691b0")} />

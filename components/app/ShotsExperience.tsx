@@ -65,12 +65,17 @@ function useShotPairMotion(root: RefObject<HTMLElement | null>, items: ClientSho
   return enabled ? turn : null;
 }
 
+function ShotsSignInRequired() {
+  const t = useTranslations("AppShots");
+  return <section className={styles.status} data-native-shots-ready="v1" data-native-shots-public="v1"><h1 className={styles.srOnly}>{t("title")}</h1><p>{t("signInRequired")}</p><Link href="/sign-in?redirect_url=%2Fapp%2Fshots">{t("signIn")}</Link></section>;
+}
+
 export default function ShotsExperience() {
-  const auth = useAuth(), { session, isLoaded } = useSession(), t = useTranslations("AppShots"), common = useTranslations("Messaging");
+  const auth = useAuth(), { session, isLoaded } = useSession(), common = useTranslations("Messaging");
   const verified = auth.isLoaded && isLoaded && auth.isSignedIn && !!auth.userId && !!auth.sessionId
     && session?.status === "active" && session.id === auth.sessionId && session.user.id === auth.userId;
   if (!auth.isLoaded || !isLoaded) return <p role="status" className={styles.status}>{common("loading")}</p>;
-  if (!verified || !auth.userId) return <section className={styles.status}><p>{t("signInRequired")}</p><Link href="/sign-in?redirect_url=%2Fapp%2Fshots">{t("signIn")}</Link></section>;
+  if (!verified || !auth.userId) return <ShotsSignInRequired />;
   return <AccountShots key={`${auth.userId}:${auth.sessionId}`} accountId={auth.userId} />;
 }
 
@@ -259,10 +264,11 @@ function AccountShots({ accountId }: { accountId: string }) {
     finally { operations.current.delete(controller); if (alive.current) { busy.current = false; setWorking(false); } }
   }
 
-  if (blocked) return <section className={styles.status}><p>{t("signInRequired")}</p><Link href="/sign-in?redirect_url=%2Fapp%2Fshots">{t("signIn")}</Link></section>;
+  if (blocked) return <ShotsSignInRequired />;
 
   const expires = (value: string) => new Intl.DateTimeFormat(locale, { dateStyle: "short", timeStyle: "short" }).format(new Date(value));
-  return <section ref={root} data-shots-root="v1" className={styles.root} aria-labelledby="real-shots-title">
+  const feedReady = snapshot.audience === audience && !snapshot.loading && (!!data || !!snapshot.error);
+  return <section ref={root} data-shots-root="v1" data-native-shots-ready={feedReady ? "v1" : undefined} className={styles.root} aria-labelledby="real-shots-title">
     <h1 id="real-shots-title" className={styles.srOnly}>{t("title")}</h1>
     <div className={styles.toolbar}><ShotsAudienceControl value={audience} onChange={setAudience} />
       <button type="button" className={styles.camera} aria-label={t("newShot")} disabled={!data?.capabilities.publish || snapshot.loading} onClick={event => { returnFocus.current = event.currentTarget; setNotice(null); setMode("source"); }}><Camera aria-hidden="true" size={21} /></button></div>

@@ -21,7 +21,7 @@ export default function LocationsError({
   const canRetry = attempts < MAX_RETRIES;
 
   return (
-    <main className="pt-20 min-h-[70vh] flex items-center justify-center px-4">
+    <main data-native-route-error="v1" className="pt-20 min-h-[70vh] flex items-center justify-center px-4">
       <div className="text-center max-w-md">
         <div className="w-16 h-16 bg-crimson/10 border border-crimson/20 rounded-2xl flex items-center justify-center mx-auto mb-5">
           <AlertTriangle size={30} className="text-crimson-light" />

@@ -20,7 +20,7 @@ export default function Error({
   }, [error]);
 
   return (
-    <div className="pt-16 min-h-screen flex items-center justify-center px-4">
+    <div data-native-route-error="v1" className="pt-16 min-h-screen flex items-center justify-center px-4">
       <div className="text-center max-w-md">
         <div className="w-20 h-20 bg-crimson/10 border border-crimson/20 rounded-2xl flex items-center justify-center mx-auto mb-6">
           <AlertTriangle size={36} className="text-crimson-light" />
