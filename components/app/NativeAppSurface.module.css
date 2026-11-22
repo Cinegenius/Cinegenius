@@ -287,18 +287,23 @@
   }
 }
 
-/* One measured app viewport leaves the fixed header, default Genie row and dock
-   outside content. Native-only fallbacks reserve the same rows before effects. */
+/* Content continues behind floating controls. Trailing padding keeps the last
+   item/focused field clear, without clipping a whole row above the Genie. */
 :global(html[data-cg-native-community-appearance="app"]):has(main.surface:global([data-native-app-surface="v1"])),
 :global(html[data-cg-native-community-appearance="app"]) > :global(body):has(main.surface:global([data-native-app-surface="v1"])) { height:100%; overflow:hidden; }
 :global(html[data-cg-native-community-appearance="app"]) :global(body) main.surface:global(.site-main[data-native-app-surface="v1"]) {
+  --native-content-top:var(--cg-app-content-top,calc(var(--cg-app-safe-top,env(safe-area-inset-top,0px)) + 80px));
+  --native-content-height:var(--cg-app-content-height,max(0px,calc(100dvh - var(--native-content-top))));
+  --native-content-clearance:min(var(--cg-app-content-clearance,calc(var(--mobile-safe-area-height,var(--cg-app-safe-bottom,env(safe-area-inset-bottom,0px))) + 160px)),max(0px,calc(var(--native-content-height) - 24px)));
+  --native-content-padding-top:min(12px,var(--native-content-height));
+  --native-content-padding-bottom:min(calc(12px + var(--native-content-clearance)),max(0px,calc(var(--native-content-height) - var(--native-content-padding-top))));
   position:fixed; left:0; right:0; bottom:auto;
-  top:var(--cg-app-content-top,calc(var(--cg-app-safe-top,env(safe-area-inset-top,0px)) + 80px));
-  height:var(--cg-app-content-height,max(0px,calc(100dvh - var(--cg-app-safe-top,env(safe-area-inset-top,0px)) - var(--mobile-safe-area-height,var(--cg-app-safe-bottom,env(safe-area-inset-bottom,0px))) - 240px)));
+  top:var(--native-content-top); height:var(--native-content-height);
+  box-sizing:border-box;
   min-height:0 !important; max-height:none; min-width:0;
-  padding-top:12px !important; padding-bottom:12px !important;
+  padding-top:var(--native-content-padding-top) !important; padding-bottom:var(--native-content-padding-bottom) !important;
   overflow-y:auto; overflow-x:hidden; overscroll-behavior-y:contain;
-  scroll-padding-top:calc(var(--cg-app-active-rail-height,0px) + 12px); scroll-padding-bottom:12px;
+  scroll-padding-top:calc(var(--cg-app-active-rail-height,0px) + 12px); scroll-padding-bottom:var(--native-content-padding-bottom);
   -webkit-overflow-scrolling:touch;
 }
 

@@ -1,5 +1,11 @@
 # CineGenius · Übersicht der gesamten Website
 
+## Aktueller Releasecheckpoint · 22. November 2026
+
+Das gemeinsame Web-Paket `3fa9685aebfbb220e1825ded91943c119f629101` ist produktiv READY (`dpl_8HQ4mwGcJEg7Wovtz7aJdfX9ihzc`); beide geprüften Team-/Mail-Migrationen sind angewandt und mit47 API-Prüfungen verifiziert. Serverbeleg und Grenzen: [App-Folgefassung](app-followup-20261122.md). Echte angemeldete Team-/Mail-Abläufe und Anbieter-Mailzustellung sind dadurch nicht abgenommen. Google-Cloud-Projekt/Branding sind nach menschlicher Annahme der rechtlichen Bedingungen angelegt; vertraulicher Webclient/Serverwerte sind nur für das eigene Google-Testkonto freigegeben. Aktive Verbindung und Weiterleitung bleiben unbelegt.
+
+Die jüngste Drei-Dateien-Korrektur betrifft ausschließlich die native App-Darstellung der Web-Inhalte: volle sichtbare Scrollhöhe statt des im Beispielfall194 CSS-Pixel zu frühen Schnitts, nachlaufender Bedienabstand und getrennte Fokusregion.32 fokussierte,4 Komponenten-Browser- und44 Fallback-Prüfungen bestanden; diese Korrektur ist noch nicht veröffentlicht. Die gewöhnliche Website bleibt unverändert. Gerät weiterhin2204, signierter2205-Kandidat bis zum geprüften Randfix zurückgehalten; Geräteabnahme und tatsächliche KI-Ergebnisse offen. Die Ursache des KI-502 bleibt ungeklärt. Dieser Checkpoint ersetzt widersprechende ältere Statusangaben unten; diese bleiben Historie.
+
 ## Ergänzung · 22. November 2026 · geprüfter Quellkandidat
 
 Die gemeinsamen Web-Quellen für den einzelnen nativen Genie, passende Inhaltsabstände und echte Gesprächslisten sowie die neuen Work-Bereiche Teams und Mail sind lokal geprüft. Der kombinierte Lauf mit 108 gezielten Tests, 32 Browserfällen und zusätzlichen Nachrichtenprüfungen ist bestanden. Umfang und Prüfgrenzen: [App-Folgefassung](app-followup-20261122.md). Dieser Eintrag ergänzt die Bestandsübersicht; ältere Standangaben bleiben Historie.

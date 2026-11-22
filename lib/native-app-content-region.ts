@@ -1,18 +1,26 @@
 import { lockBodyScroll } from "./body-scroll-lock";
 
 export type NativeContentViewport = { top: number; height: number };
-export type NativeContentRegion = { top: number; bottom: number; height: number };
+export type NativeContentRegion = { top: number; bottom: number; height: number; clearance: number };
 
 const bounded = (value: number, fallback = 0) => Number.isFinite(value) ? Math.max(0, value) : fallback;
 
-/** Reserve the launcher's default row, independently of its draggable position. */
+/** Paint/scroll through the visible viewport. Control clearance belongs to the
+ * trailing content padding, independently of the launcher's draggable position. */
 export function nativeAppContentRegion(viewport: NativeContentViewport, headerBottom: number | null, safeTop: number, safeBottom: number): NativeContentRegion {
   const visibleTop = bounded(viewport.top);
   const visibleBottom = visibleTop + bounded(viewport.height);
   const header = headerBottom !== null && Number.isFinite(headerBottom) ? headerBottom + 12 : visibleTop + bounded(safeTop) + 80;
   const top = Math.min(visibleBottom, Math.max(visibleTop + 12, header));
-  const bottom = Math.max(top, visibleBottom - bounded(safeBottom) - 160);
-  return { top, bottom, height: bottom - top };
+  return { top, bottom: visibleBottom, height: visibleBottom - top, clearance: bounded(safeBottom) + 160 };
+}
+
+/** Computed scroll padding describes the unobscured part of the larger canvas.
+ * Clamp very short keyboard/rotation viewports instead of inventing space. */
+export function nativeContentUnobscuredRegion(area: { top: number; bottom: number }, paddingTop: number, paddingBottom: number) {
+  const bottom = Math.max(area.top, area.bottom);
+  const top = Math.min(bottom, area.top + bounded(paddingTop));
+  return { top, bottom: Math.max(top, bottom - bounded(paddingBottom)) };
 }
 
 export function nativeContentFocusDelta(field: { top: number; bottom: number }, region: { top: number; bottom: number }, gap = 8): number {
@@ -24,7 +32,7 @@ export function nativeContentFocusDelta(field: { top: number; bottom: number }, 
 /** Geometry only: no navigation, account data, storage, or launcher positioning. */
 export function installNativeAppContentRegion(content: HTMLElement): () => void {
   const html = document.documentElement;
-  const properties = ["--cg-app-content-top", "--cg-app-content-height", "--cg-app-content-bottom"] as const;
+  const properties = ["--cg-app-content-top", "--cg-app-content-height", "--cg-app-content-bottom", "--cg-app-content-clearance"] as const;
   const previous = properties.map(name => ({ value: html.style.getPropertyValue(name), priority: html.style.getPropertyPriority(name) }));
   const written = new Map<string, string>();
   const insets = document.createElement("div");
@@ -92,11 +100,14 @@ export function installNativeAppContentRegion(content: HTMLElement): () => void 
     if (scrollLocked || !(field instanceof HTMLElement) || !content.contains(field) || field.closest('dialog[open],[aria-modal="true"],[data-native-browse-toolbar]')) return;
     const area = content.getBoundingClientRect();
     if (area.height <= 16) return;
-    let padding = Math.max(8, Number.parseFloat(getComputedStyle(content).scrollPaddingTop) || 0);
+    const style = getComputedStyle(content);
+    let padding = Math.max(8, Number.parseFloat(style.scrollPaddingTop) || Number.parseFloat(style.paddingTop) || 0);
+    const paddingBottom = Math.max(8, Number.parseFloat(style.scrollPaddingBottom) || Number.parseFloat(style.paddingBottom) || 0);
     const anchor = content.querySelector<HTMLElement>("[data-native-browse-anchor]");
     const rail = anchor?.querySelector<HTMLElement>("[data-native-browse-toolbar]");
     if (anchor && rail && anchor.getBoundingClientRect().top < area.top) padding = Math.max(padding, rail.getBoundingClientRect().height + 12);
-    const delta = nativeContentFocusDelta(field.getBoundingClientRect(), { top: area.top + padding - 8, bottom: area.bottom });
+    const unobscured = nativeContentUnobscuredRegion(area, padding, paddingBottom);
+    const delta = nativeContentFocusDelta(field.getBoundingClientRect(), unobscured, 0);
     if (delta) content.scrollTop += delta;
   };
   const update = () => {
@@ -112,7 +123,7 @@ export function installNativeAppContentRegion(content: HTMLElement): () => void 
     const safe = readInsets(), viewport = window.visualViewport;
     const box = header?.getBoundingClientRect();
     const region = nativeAppContentRegion({ top: viewport?.offsetTop ?? 0, height: viewport?.height ?? window.innerHeight }, box && box.height > 0 ? box.bottom : null, safe.top, safe.bottom);
-    const values = [region.top, region.height, region.bottom];
+    const values = [region.top, region.height, region.bottom, region.clearance];
     let geometryChanged = false;
     properties.forEach((name, index) => {
       const value = `${Math.round(values[index] * 100) / 100}px`;

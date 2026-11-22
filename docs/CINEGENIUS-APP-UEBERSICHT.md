@@ -1,5 +1,13 @@
 # CineGenius · Übersicht der gesamten App
 
+## Aktueller Gerätestand und untere Inhaltskante · 22. November 2026
+
+**Installiert bleibt2204;2205 ist signiert und bis zum geprüften Randfix-Release zurückgehalten.** Seine377 nativen Eingaben sind unverändert. Das gemeinsame Serverpaket `3fa9685aebfbb220e1825ded91943c119f629101` ist produktiv READY (`dpl_8HQ4mwGcJEg7Wovtz7aJdfX9ihzc`); Team-/Mail-SQL ist angewandt und mit47 API-Prüfungen verifiziert. Das ersetzt keine echte angemeldete Bedienung oder Geräteabnahme. [Releasebeleg und Grenzen](app-followup-20261122.md).
+
+Der aktuelle Web-Fix für den App-Modus behebt den kausal reproduzierten vorzeitigen Schnitt des Scrollbereichs: im geprüften Fall194 CSS-Pixel vor dem sichtbaren unteren Rand, auch ohne schwebende Bedienelemente. Volle sichtbare Scrollhöhe, nachlaufender Innen-/Scrollabstand und getrennte Fokusgrenze sind in genau drei Dateien lokal korrigiert;32 fokussierte,4 Komponenten-Browser- und44 Fallback-/Kleinsthöhenfälle bestanden. Veröffentlichung und physische Gegenprobe stehen noch aus; kein neuer nativer Build oder verändertes Archiv wird daraus behauptet.
+
+Google-Projekt/Branding sind nach menschlicher Annahme der rechtlichen Bedingungen angelegt. Der vertrauliche Webclient und Servergeheimnisse sind nur für das eigene Google-Testkonto freigegeben; keine aktive Verbindung, Weiterleitung oder automatische KI-/Projektverteilung. Editorumfang und Maßstabs-/Sonnenstandsgrenzen bleiben wie beschrieben. Tatsächliche UI-/KI-Geräteabnahme und Ursache des KI-502 offen. Ältere abweichende Release-/SQL-Angaben unten sind Historie.
+
 ## Aktueller Ergänzungsstand · 22. November 2026 · Kandidat 2205
 
 Die freigegebenen Korrekturen und der anschließende ausdrückliche Bauauftrag für Planeditor, Teamkanäle und Mail sind als geprüfter Quellkandidat umgesetzt. Ein einzelner nativer Genie, Logoanimation während tatsächlichen Ladens, reservierter Work-Kopf, dauerhafte Analysefehlerkarte sowie korrigierte Abstände und Gesprächslisten sind enthalten. [Umfang, Tests und Grenzen](app-followup-20261122.md). Dieser aktuelle Stand ersetzt widersprechende Planungs-/Buildangaben unten; die bisherigen Nachweise bleiben als Historie erhalten.

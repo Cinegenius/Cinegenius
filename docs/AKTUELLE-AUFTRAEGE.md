@@ -1,5 +1,13 @@
 # Aktuelle Aufträge · 22. November 2026
 
+## Neuester Auftragstand · 22. November 2026 · Randfix vor Installation
+
+1. **Unteren App-Rand korrigieren und veröffentlichen:** Kausal reproduzierter Schnitt des festen Scrollbereichs194 CSS-Pixel vor dem sichtbaren unteren Rand im geprüften Fall; auch ausgeblendete Bedienelemente ändern ihn nicht. Die enge Drei-Dateien-Korrektur im Web-App-Modus nutzt volle sichtbare Scrollhöhe, nachlaufenden Bedienabstand und getrennte Fokusgrenze.32 fokussierte,4 Komponenten-Browser- und44 Fallback-/Kleinsthöhenfälle bestanden. Veröffentlichung und echte Gerätegegenprobe noch offen.2204 bleibt installiert; signierter2205-Kandidat bis dahin zurückgehalten,377 native Eingaben unverändert.
+2. **Bereits veröffentlichten Stand erhalten:** `3fa9685aebfbb220e1825ded91943c119f629101` ist produktiv READY (`dpl_8HQ4mwGcJEg7Wovtz7aJdfX9ihzc`). Team- und Mail-Migrationen sind angewandt und mit47 API-Prüfungen verifiziert. Serverbeleg und Abgrenzung: [App-Folgefassung](app-followup-20261122.md). Echte angemeldete Team-/Mail-Arbeitsabläufe, Mailprovider und UI-Abnahme sind dadurch nicht bewiesen. Frische Sicherung, Installation und physische Abnahme getrennt belegen.
+3. **Gmail nur im freigegebenen Testumfang einrichten:** Google-Projekt und Branding nach ausdrücklicher menschlicher Annahme der rechtlichen Bedingungen angelegt; vertraulicher Webclient und Servergeheimnisse ausschließlich für das eigene Google-Testkonto freigegeben. Noch keine aktive Verbindung/Weiterleitung und kein allgemeiner Rollout. Ursachenklärung des beobachteten KI-502 sowie echte KI-Ergebnisse bleiben offen. Der vorhandene Editor behält seine Maßstabs-/Sonnenstandsgrenzen.
+
+Dieser aktuelle Checkpoint ersetzt widersprechende frühere Aussagen zu Veröffentlichung, SQL-Aktivierung oder Installationsbereitschaft unten; offene Aufgaben und historische Belege bleiben erhalten.
+
 ## Aktueller Auftragstand · 22. November 2026 · geprüfte Folgefassung
 
 Die freigegebene gemeinsame Gestaltung und der ausdrückliche Bauauftrag für Planeditor, Teams und beide Mail-Wege sind als Quellkandidat umgesetzt und lokal geprüft. Details einschließlich 108 kombinierter Tests, 32 Browserfällen und weiterer Modulprüfungen: [App-Folgefassung](app-followup-20261122.md). Dieser Zusatz ersetzt widersprechende ältere Planungs-/Standangaben unten; vorhandene Aufträge und Nachweise bleiben erhalten.
