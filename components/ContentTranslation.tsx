@@ -4,6 +4,7 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useRef, use
 import { useLocale, useTranslations } from "next-intl";
 import { useAuth } from "@clerk/nextjs";
 import { usePathname } from "next/navigation";
+import { useNativeAppAppearance } from "@/lib/use-native-app-appearance";
 import { Languages, RotateCw } from "lucide-react";
 import { createContentTranslationClient } from "@/lib/content-translation-client";
 import { isAppLocale } from "@/lib/i18n/locales";
@@ -130,7 +131,13 @@ export function ContentTranslationChoice() {
 export function ContentTranslationNotice() {
   const {enabled, original, setOriginal, client} = useContext(Context);
   const t = useTranslations("contentTranslation");
+  const native = useNativeAppAppearance();
   if (!enabled) return null;
+  if (native) return <div className="content-translation-notice native-translation-notice">
+    <span>{t(original ? "originalMode" : "notice")}</span>
+    <button type="button" aria-label={t(original ? "showTranslated" : "showOriginal")} title={t(original ? "showTranslated" : "showOriginal")} onClick={() => setOriginal(!original)}><Languages size={18} aria-hidden="true" /></button>
+    {!original && <button type="button" aria-label={t("retry")} title={t("retry")} onClick={() => client?.refresh()}><RotateCw size={18} aria-hidden="true" /></button>}
+  </div>;
   return <div className="content-translation-notice flex min-w-0 flex-wrap items-center gap-x-3 gap-y-1 text-xs text-text-muted">
     <span className="min-w-0 break-words">{t(original ? "originalMode" : "notice")}</span>
     <button type="button" className="min-h-11 underline underline-offset-4 text-text-secondary" onClick={() => setOriginal(!original)}>{t(original ? "showTranslated" : "showOriginal")}</button>

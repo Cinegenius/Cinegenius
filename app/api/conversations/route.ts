@@ -10,7 +10,7 @@ import { sendNewMessageEmail } from "@/lib/email";
 import { applyParticipantReadReceipts } from "@/lib/message-read-state";
 import { getUnreadMessageCounts } from "@/lib/unread-message-counts";
 import { getTranslations as getResponseTranslations } from "next-intl/server";
-import { MESSAGING_HEADERS, messagingAccountId, messagingRequestKey, messagingUuid, messagingRpcFailure } from "@/lib/messaging-backend";
+import { MESSAGING_HEADERS, isMessageCursorTimestamp, teamMessageContext, messagingAccountId, messagingRequestKey, messagingUuid, messagingRpcFailure } from "@/lib/messaging-backend";
 import { MESSAGE_OPEN_V1, nativeJson, nativeReadGuard, privateNativeResponse } from '@/lib/native-contact-contract';
 
 
@@ -52,9 +52,18 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: tResponse('System.m_38658963a719') }, { status: 500 });
   }
 
+  let teamContext: Awaited<ReturnType<typeof teamMessageContext>>;
+  try { teamContext = await teamMessageContext(db, userId); }
+  catch { return NextResponse.json({error: tResponse('MessagingBackend.unavailable')}, {status:503, headers:MESSAGING_HEADERS}); }
+  const before = request.nextUrl.searchParams.get('before');
+  const beforeId = request.nextUrl.searchParams.get('before_id');
+  if ((before !== null || beforeId !== null) && (!before || !beforeId || !isMessageCursorTimestamp(before) || !messagingUuid(beforeId) || beforeId.length !== 36)) {
+    return NextResponse.json({error:tResponse('MessagingBackend.invalid')}, {status:400, headers:MESSAGING_HEADERS});
+  }
+  // Filter Team channels before the inbox page limit. No preference grants rights.
   // Filter active membership and sort activity before limiting the inbox.
   // A recently active old chat must not be excluded by its join date.
-  const { data: conversations, error } = await db
+  let inboxQuery = db
     .from("conversations")
     .select(`
       id, kind, group_name, listing_id, listing_title, listing_type,
@@ -66,9 +75,14 @@ export async function GET(request: NextRequest) {
     .is("conversation_members.left_at", null)
     .or(`sender_id.neq.${userId},hidden_for_sender_at.is.null`, { referencedTable: "messages" })
     .order("updated_at", { ascending: false })
+    .order("id", {ascending:false})
     .order("created_at", { ascending: false, referencedTable: "messages" })
-    .limit(1, { referencedTable: "messages" })
-    .limit(50);
+    .limit(1, { referencedTable: "messages" });
+  if (teamContext.available && !teamContext.showInInbox) inboxQuery = inboxQuery.is('workspace_team_id', null);
+  if (before && beforeId) inboxQuery = inboxQuery.or(`updated_at.lt.${before},and(updated_at.eq.${before},id.lt.${beforeId})`);
+  const { data: rawConversations, error } = await inboxQuery.limit(51);
+  const hasMore = (rawConversations?.length ?? 0) > 50;
+  const conversations = rawConversations?.slice(0,50);
   if (error) return NextResponse.json({ error: tResponse('System.m_907ee849b3ff') }, { status: 500 });
   if ((conversations ?? []).some((conversation) =>
     !Array.isArray(conversation.conversation_members)
@@ -137,6 +151,7 @@ export async function GET(request: NextRequest) {
       }));
       return {
         ...conversation,
+        ...(teamContext.channels.find(channel => channel.conversationId === conversation.id) ? {teamChannel:teamContext.channels.find(channel => channel.conversationId === conversation.id)} : {}),
         messages: enrichedMessages,
         unread_count: unreadCount,
         otherName: conversation.group_name ?? tResponse("Messaging.groupFallback"),
@@ -178,7 +193,9 @@ export async function GET(request: NextRequest) {
     };
   });
 
-  return NextResponse.json({ data: enriched, unreadCount: unreadCounts.count }, {
+  return NextResponse.json({ data: enriched, unreadCount: unreadCounts.count,
+    nextCursor:hasMore&&conversations?.length ? {before:conversations.at(-1)!.updated_at,before_id:conversations.at(-1)!.id}:null,
+  }, {
     headers: { "Cache-Control": "no-store, max-age=0" },
   });
 }

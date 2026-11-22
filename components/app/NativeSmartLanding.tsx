@@ -198,6 +198,7 @@ function AccountNativeSmartLanding({ accountId, sessionId, loaded, allowed, onUn
             <button type="button" data-native-segment="profile" aria-pressed={mode !== "neutral"} onClick={() => setMode("profile")}><UserRound size={15} aria-hidden="true" />{t("profileFocus")}</button>
             <button type="button" data-native-segment="neutral" aria-pressed={mode === "neutral"} aria-label={t("neutral")} onClick={() => setMode("neutral")}><Globe size={15} aria-hidden="true" />{search("discovery.all")}</button>
           </div>
+          <div role="status" aria-live="polite" className={styles.status}>{loading && <><Loader2 size={17} className="animate-spin" aria-hidden="true" />{t("loading")}</>}</div>
           <details ref={focusDetails} className={styles.focusDetails} onKeyDown={event => { if (event.key === "Escape") { event.preventDefault(); event.currentTarget.open = false; event.currentTarget.querySelector("summary")?.focus(); } }}>
             <summary aria-label={t("focus")}><Info size={18} aria-hidden="true" /></summary>
             <div className={styles.focusPopover}>
@@ -207,7 +208,6 @@ function AccountNativeSmartLanding({ accountId, sessionId, loaded, allowed, onUn
             </div>
           </details>
         </div>
-        <div role="status" aria-live="polite" className={styles.status}>{loading && <><Loader2 size={17} className="animate-spin" aria-hidden="true" />{t("loading")}</>}</div>
         {error && <div role="alert" className={styles.error}><p>{t("error")}</p><button type="button" onClick={refresh}>{t("retry")}</button></div>}
         {/* The explorer owns its rows after mount. Replace it atomically only
             when a freshly authorized response is ready, including removals. */}

@@ -6,6 +6,13 @@ import { hasCompanyCapability } from "@/lib/company-access";
 
 /** Recheck current edit rights before exposing a recovery copy of existing content. */
 export async function canUseFormDraft(userId: string, key: string) {
+  if (key.startsWith("workspace-team:") || key.startsWith("workspace-channel:")) {
+    const [kind, id] = key.split(":");
+    if (kind === "workspace-team" && id === "new") return true;
+    const result = await db.rpc("workspace_team_draft_access", {p_actor:userId,p_kind:kind,p_id:id});
+    if (result.error) throw new Error("draft_access_unavailable");
+    return result.data === true;
+  }
   if (key.startsWith("booking:") || key.startsWith("inquiry:")) {
     const recipient = key.startsWith("booking:") ? key.split(":")[1] : key.split(":")[2];
     const result = await db.rpc("messaging_recipient_available", { p_sender: userId, p_recipient: recipient });

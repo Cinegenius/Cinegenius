@@ -22,7 +22,7 @@ export const NATIVE_APP_MENU_ITEMS: readonly { id: string; href: string; labelKe
 /** Keep public details in their area without marking unrelated private utilities as Smart. */
 export function nativeAppActiveArea(pathname: string): NativeAppArea | null {
   if (routeMatches(pathname, "/app/shots")) return "shots";
-  if (routeMatches(pathname, "/app/workspace")) return "workspace";
+  if (routeMatches(pathname, "/app/workspace") || ["/work/teams", "/work/mail"].some(route => routeMatches(pathname, route))) return "workspace";
   if (routeMatches(pathname, "/news") || routeMatches(pathname, "/organizations")) return "news";
   if (pathname === "/projects/neu") return null;
   if (routeMatches(pathname, "/projects")) return "projects";

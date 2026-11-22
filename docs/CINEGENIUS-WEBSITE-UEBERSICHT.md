@@ -1,5 +1,13 @@
 # CineGenius · Übersicht der gesamten Website
 
+## Ergänzung · 22. November 2026 · geprüfter Quellkandidat
+
+Die gemeinsamen Web-Quellen für den einzelnen nativen Genie, passende Inhaltsabstände und echte Gesprächslisten sowie die neuen Work-Bereiche Teams und Mail sind lokal geprüft. Der kombinierte Lauf mit 108 gezielten Tests, 32 Browserfällen und zusätzlichen Nachrichtenprüfungen ist bestanden. Umfang und Prüfgrenzen: [App-Folgefassung](app-followup-20261122.md). Dieser Eintrag ergänzt die Bestandsübersicht; ältere Standangaben bleiben Historie.
+
+Veröffentlicht ist die separate Genie-Serverdiagnose `3af94e44`; das hier beschriebene neue Gesamtpaket ist noch nicht veröffentlicht. Den veröffentlichten Diagnosecommit beim Hauptstandsabgleich erhalten. Die Ursache des beobachteten KI-Fehlers HTTP 502 ist weiterhin offen. Die dauerhafte Fehleranzeige und zusätzliche Diagnose belegen keine behobene Providerursache.
+
+Teamkanäle und private Mail-Weiterleitung mit ausdrücklich ausgewähltem Gmail-/Microsoft-Import sind geprüfte Quellkandidaten. Beide SQL-Kandidaten wurden als Migration erzeugt, **noch nicht angewandt**. Empfangsdomain, Webhook, OAuth-Anwendungen und Serverschlüssel sind noch einzurichten; kein produktiver Empfang und keine echte Postfachverbindung behauptet. Keine automatische KI-Auswertung oder Projektverteilung. Aktivierung erfordert den gezielten Abgleich des tatsächlichen Datenbankkatalogs. Native Folgefassung 2205 ist signiert und bereit, aber noch nicht installiert; aktuell belegt bleibt 2204. Gerätebedienung und UI-Abnahme bleiben offen. Der erweiterte native Planeditor ist im Kandidaten vorhanden, mit bestätigtem Maßstab und geometrischem Sonnenstand; ohne Wetter- oder Schattennachweis.
+
 Stand: **21. November 2026 (Europe/Berlin)**. Zuständig: **WEB CODEX**.
 Die getrennte [App-Übersicht](CINEGENIUS-APP-UEBERSICHT.md) beschreibt die native Anwendung.
 

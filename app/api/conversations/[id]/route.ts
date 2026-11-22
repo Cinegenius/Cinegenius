@@ -10,7 +10,7 @@ import { sendNewMessageEmail } from "@/lib/email";
 import { rateLimit } from "@/lib/rateLimit";
 import { applyParticipantReadReceipts } from "@/lib/message-read-state";
 import { getTranslations as getResponseTranslations } from "next-intl/server";
-import { MESSAGING_HEADERS, messagingRequestKey, messagingUuid, messagingRpcFailure } from "@/lib/messaging-backend";
+import { MESSAGING_HEADERS, isMessageCursorTimestamp, teamMessageContext, messagingRequestKey, messagingUuid, messagingRpcFailure } from "@/lib/messaging-backend";
 
 const PAGE_SIZE = 200;
 
@@ -42,6 +42,10 @@ export async function GET(
   if (membershipError) return NextResponse.json({ error: tResponse('System.m_599c867e2758') }, { status: 500 });
   if (!membership) return NextResponse.json({ error: tResponse('System.m_621ca4c037d3') }, { status: 404 });
 
+  let teamContext: Awaited<ReturnType<typeof teamMessageContext>>;
+  try { teamContext = await teamMessageContext(db, userId); }
+  catch { return NextResponse.json({error:tResponse('MessagingBackend.unavailable')}, {status:503, headers:MESSAGING_HEADERS}); }
+  const teamChannel = teamContext.channels.find(channel => channel.conversationId === id);
   const { data: activeMembers, error: membersError } = await db
     .from("conversation_members")
     .select("user_id, role, joined_at")
@@ -55,8 +59,8 @@ export async function GET(
 
   const before = request.nextUrl.searchParams.get("before");
   const beforeId = request.nextUrl.searchParams.get("before_id");
-  if (before || beforeId) {
-    if (!before || !beforeId || Number.isNaN(Date.parse(before)) || beforeId.length > 80) {
+  if (before !== null || beforeId !== null) {
+    if (!before || !beforeId || !isMessageCursorTimestamp(before) || !messagingUuid(beforeId) || beforeId.length !== 36) {
       return NextResponse.json({ error: tResponse('System.m_b9644bfee79d') }, { status: 400 });
     }
   }
@@ -126,6 +130,8 @@ export async function GET(
   return NextResponse.json({
     conversation: {
       ...conversation,
+      ...(teamChannel ? {teamChannel} : {}),
+      ...(conversation.kind === 'group' ? {otherName:conversation.group_name ?? tResponse('Messaging.groupFallback')} : {}),
       ...(conversation.kind === "direct" ? {
         otherName: members.find(member => member.user_id !== userId)?.display_name ?? tResponse("Messaging.unknown"),
         otherAvatar: members.find(member => member.user_id !== userId)?.avatar_url ?? null,

@@ -291,7 +291,7 @@
    outside content. Native-only fallbacks reserve the same rows before effects. */
 :global(html[data-cg-native-community-appearance="app"]):has(main.surface:global([data-native-app-surface="v1"])),
 :global(html[data-cg-native-community-appearance="app"]) > :global(body):has(main.surface:global([data-native-app-surface="v1"])) { height:100%; overflow:hidden; }
-:global(html[data-cg-native-community-appearance="app"]) main.surface:global(.site-main[data-native-app-surface="v1"]) {
+:global(html[data-cg-native-community-appearance="app"]) :global(body) main.surface:global(.site-main[data-native-app-surface="v1"]) {
   position:fixed; left:0; right:0; bottom:auto;
   top:var(--cg-app-content-top,calc(var(--cg-app-safe-top,env(safe-area-inset-top,0px)) + 80px));
   height:var(--cg-app-content-height,max(0px,calc(100dvh - var(--cg-app-safe-top,env(safe-area-inset-top,0px)) - var(--mobile-safe-area-height,var(--cg-app-safe-bottom,env(safe-area-inset-bottom,0px))) - 240px)));
@@ -301,3 +301,9 @@
   scroll-padding-top:calc(var(--cg-app-active-rail-height,0px) + 12px); scroll-padding-bottom:12px;
   -webkit-overflow-scrolling:touch;
 }
+
+/* Keep the explanatory line and both existing actions in one compact row. */
+:global(html[data-cg-native-community-appearance="app"]) .surface :global(.native-translation-notice) { display:flex; align-items:center; gap:4px; min-width:0; margin-block:4px; color:var(--cg-app-muted); font-size:11px; line-height:16px; }
+:global(html[data-cg-native-community-appearance="app"]) .surface :global(.native-translation-notice > span) { flex:1; min-width:0; overflow-wrap:anywhere; }
+:global(html[data-cg-native-community-appearance="app"]) .surface :global(.native-translation-notice > button) { display:flex; align-items:center; justify-content:center; flex:0 0 44px; width:44px; min-height:44px; padding:0; border:0; border-radius:50%; background:transparent; color:var(--cg-app-muted); }
+:global(html[data-cg-native-community-appearance="app"]) .surface :global(.native-translation-notice > button:focus-visible) { outline:2px solid var(--cg-app-accent); outline-offset:-2px; }

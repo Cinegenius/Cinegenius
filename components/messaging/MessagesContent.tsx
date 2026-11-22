@@ -54,6 +54,7 @@ type Message = {
 
 type Conversation = {
   id: string;
+  teamChannel?: {teamId:string; channelId:string; conversationId:string; canWrite:boolean};
   kind?: "direct" | "group" | "support";
   group_name?: string | null;
   sender_id: string;
@@ -139,6 +140,8 @@ export default function MessagesContent({ embedded }: { embedded?: EmbeddedInbox
   const [newMessagesAvailable, setNewMessagesAvailable] = useState(false);
   const [loading, setLoading] = useState(true);
   const [conversationLoadFailed, setConversationLoadFailed] = useState(false);
+  const [conversationCursor,setConversationCursor]=useState<{before:string;before_id:string}|null>(null);
+  const [moreConversationsLoading,setMoreConversationsLoading]=useState(false);
   const [loadingMessages, setLoadingMessages] = useState(false);
   const [messageLoadFailure, setMessageLoadFailure] = useState<{ conversationId: string; before?: { before: string; before_id: string } } | null>(null);
   const [newConvRecipient, setNewConvRecipient] = useState<string | null>(toParam);
@@ -228,22 +231,24 @@ export default function MessagesContent({ embedded }: { embedded?: EmbeddedInbox
     };
   }, [showChat, embedded]);
 
-  const loadConversations = useCallback(async () => {
+  const loadConversations = useCallback(async (cursor?: {before:string;before_id:string}) => {
     const owner = currentUserRef.current;
     if (!owner) return;
     const sequence = ++conversationRequestSequence.current;
     try {
-      const res = await fetch("/api/conversations", { cache: "no-store", signal: AbortSignal.timeout(15_000) });
+      const res = await fetch("/api/conversations"+(cursor?"?"+new URLSearchParams(cursor):""), { cache: "no-store", signal: AbortSignal.timeout(15_000) });
       if (!res.ok) throw new Error();
-      const { data } = await res.json();
+      const { data,nextCursor } = await res.json();
       if (currentUserRef.current !== owner || sequence !== conversationRequestSequence.current) return;
       if (!Array.isArray(data)) throw new Error();
-      setConversations(data as Conversation[]);
+      setConversations(current => cursor ? [...new Map([...current,...data as Conversation[]].map(item=>[item.id,item])).values()] : data as Conversation[]);
+      setConversationCursor(nextCursor??null);
       setConversationLoadFailed(false);
     } catch {
       if (currentUserRef.current === owner && sequence === conversationRequestSequence.current) setConversationLoadFailed(true);
     } finally {
       if (currentUserRef.current === owner && sequence === conversationRequestSequence.current) setLoading(false);
+      if (currentUserRef.current === owner && sequence === conversationRequestSequence.current) setMoreConversationsLoading(false);
     }
   }, []);
 
@@ -276,7 +281,7 @@ export default function MessagesContent({ embedded }: { embedded?: EmbeddedInbox
   useEffect(() => {
     // Clear private data immediately when the external authentication account changes.
     // eslint-disable-next-line react-hooks/set-state-in-effect
-    setConversations([]); setContacts([]); setMessages([]);
+    setConversations([]); setConversationCursor(null); setMoreConversationsLoading(false); setContacts([]); setMessages([]);
     setActiveId(null); activeIdRef.current = null; messagesRef.current = [];
     setNewConvRecipient(null); setRecipientName(""); setLoadingRecipient(false);
     hiddenMessageIds.current.clear(); setMessageNotice(""); setNewMessagesAvailable(false);
@@ -353,7 +358,7 @@ export default function MessagesContent({ embedded }: { embedded?: EmbeddedInbox
       const hasNewVisibleMessage = snapshot.some((message) => !currentIds.has(message.id));
       if (olderViewport) olderScrollRestoreRef.current = { owner, conversationId: convId, height: previousScrollHeight, top: previousScrollTop };
       setMessages((current) => mergeVisibleMessagePage(current, snapshot, hiddenMessageIds.current, !options.before));
-      if (conversation?.id === convId) setConversations(current => current.some(c => c.id === convId) ? current : [{ ...conversation, messages: snapshot, updated_at: snapshot.at(-1)?.created_at ?? "" }, ...current]);
+      if (conversation?.id === convId) setConversations(current => current.some(c => c.id === convId) ? current.map(c=>c.id===convId?{...c,...conversation}:c) : [{ ...conversation, messages: snapshot, updated_at: snapshot.at(-1)?.created_at ?? "" }, ...current]);
       const messageIds = incomingUnreadMessageIds(snapshot, owner);
       if (messageIds.length > 0) {
         // A slow receipt must not hold history loading, pagination or scrolling open.
@@ -530,6 +535,7 @@ export default function MessagesContent({ embedded }: { embedded?: EmbeddedInbox
             <span className="min-w-0 flex-1"><span className="flex min-w-0 items-center justify-between gap-2"><strong className="min-w-0 truncate text-sm text-text-primary">{conversation.otherName}</strong>{latest&&<span className="shrink-0 text-[10px] text-text-muted">{formatTime(uiLocale,latest.created_at)}</span>}</span><span className="mt-1 block truncate text-xs text-text-muted">{latest ? (latest.content||t("attachmentPreview")) : t("startChat")}</span></span>{(conversation.unread_count??0)>0&&<span className="shrink-0 rounded-full bg-gold px-1.5 py-0.5 text-[10px] font-semibold text-bg-primary">{conversation.unread_count}</span>}
           </button>;
         })}
+        {conversationCursor&&<button type="button" disabled={moreConversationsLoading} className="min-h-11 w-full px-4 py-3 text-sm text-gold" onClick={()=>{setMoreConversationsLoading(true);void loadConversations(conversationCursor);}}>{t(moreConversationsLoading?'loading':'loadMoreConversations')}</button>}
         <Link href="/support" className="flex min-h-11 items-center gap-2 px-4 py-3 text-sm text-text-secondary hover:text-gold"><MessageSquare size={16}/>{uiText("SupportContact.link")}</Link>
       </div>}
     </aside>}
@@ -539,7 +545,7 @@ export default function MessagesContent({ embedded }: { embedded?: EmbeddedInbox
       {showChat?<>
         <header className="flex min-w-0 shrink-0 items-center gap-2 border-b border-border px-3 py-2">
           <button type="button" onClick={closeChat} aria-label={messageNavigationText("back")} className="flex min-h-11 min-w-11 shrink-0 items-center justify-center rounded-xl text-text-muted"><ArrowLeft size={21}/></button>
-          {activeConv?.kind==="group"?<button type="button" onClick={()=>setGroupInfoOpen(true)} aria-label={t("openGroupInfo")} className="flex min-h-11 min-w-0 flex-1 items-center gap-3 text-left"><span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-bg-elevated"><Users size={18} className="text-gold"/></span><span className="min-w-0"><strong className="block truncate text-sm text-text-primary">{activeConv.otherName}</strong><span className="text-xs text-text-muted">{t("members",{count:activeConv.memberCount??0})}</span></span></button>:<div className="flex min-h-11 min-w-0 flex-1 items-center gap-3"><span className="flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-full bg-bg-elevated">{activeConv?.kind==="support"?<UnoptimizedImage src={SUPPORT_AVATAR_URL} alt="" className="h-full w-full object-contain p-1"/>:activeConv?.otherAvatar?<UnoptimizedImage src={activeConv.otherAvatar} alt="" className="h-full w-full object-cover"/>:<User size={17} className="text-text-muted"/>}</span><span className="min-w-0"><strong className="block truncate text-sm text-text-primary">{isNewConv?(loadingRecipient?t("loading"):recipientName):(activeConv?.otherName??t("conversation"))}</strong>{activeConv?.kind==="support"&&<span className="text-xs text-gold">{SUPPORT_NAME}</span>}</span></div>}
+          {activeConv?.kind==="group"&&!activeConv.teamChannel?<button type="button" onClick={()=>setGroupInfoOpen(true)} aria-label={t("openGroupInfo")} className="flex min-h-11 min-w-0 flex-1 items-center gap-3 text-left"><span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-bg-elevated"><Users size={18} className="text-gold"/></span><span className="min-w-0"><strong className="block truncate text-sm text-text-primary">{activeConv.otherName}</strong><span className="text-xs text-text-muted">{t("members",{count:activeConv.memberCount??0})}</span></span></button>:<div className="flex min-h-11 min-w-0 flex-1 items-center gap-3"><span className="flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-full bg-bg-elevated">{activeConv?.kind==="support"?<UnoptimizedImage src={SUPPORT_AVATAR_URL} alt="" className="h-full w-full object-contain p-1"/>:activeConv?.otherAvatar?<UnoptimizedImage src={activeConv.otherAvatar} alt="" className="h-full w-full object-cover"/>:<User size={17} className="text-text-muted"/>}</span><span className="min-w-0"><strong className="block truncate text-sm text-text-primary">{isNewConv?(loadingRecipient?t("loading"):recipientName):(activeConv?.otherName??t("conversation"))}</strong>{activeConv?.kind==="support"&&<span className="text-xs text-gold">{SUPPORT_NAME}</span>}</span></div>}
           {embedded && <button type="button" onClick={embedded.onClose} aria-label={t("close")} className="flex min-h-11 min-w-11 shrink-0 items-center justify-center rounded-xl text-text-muted"><X size={20}/></button>}
           {!embedded && peerProfileHref&&<Link href={peerProfileHref} className="inline-flex min-h-11 shrink-0 items-center px-2 text-xs text-gold">{uiText("profile.tabProfile")}</Link>}
         </header>
@@ -658,11 +664,11 @@ export default function MessagesContent({ embedded }: { embedded?: EmbeddedInbox
 
 
         {(sendError||messageNotice)&&<div className="shrink-0 px-3 py-2 text-xs">{sendError&&<p role="alert" className="text-red-400 [[data-theme=light]_&]:text-red-700">{sendError}</p>}{messageNotice&&<p role="status" className="text-gold">{messageNotice}</p>}</div>}
-        {user?.id&&(activeId||newConvRecipient)&&<MessageComposer key={`${user.id}:${activeId?`conversation:${activeId}`:`recipient:${newConvRecipient}`}`} accountId={user.id} destination={{conversationId:activeId,recipientId:newConvRecipient}} onSent={messageSent}/>}
+        {user?.id&&(activeId||newConvRecipient)&&activeConv?.teamChannel?.canWrite!==false&&<MessageComposer key={`${user.id}:${activeId?`conversation:${activeId}`:`recipient:${newConvRecipient}`}`} accountId={user.id} destination={{conversationId:activeId,recipientId:newConvRecipient}} onSent={messageSent}/>}
       </>:<div className="m-auto max-w-sm p-8 text-center"><MessageSquare size={40} className="mx-auto mb-4 text-text-muted"/><h2 className="font-display text-xl text-text-primary">{t("startChat")}</h2><p className="mt-2 text-sm text-text-muted">{t("choosePeople")}</p><button type="button" onClick={()=>setNewMessageOpen(true)} className="mt-5 min-h-11 rounded-xl bg-gold px-4 text-sm font-semibold text-bg-primary">{t("newMessage")}</button></div>}
     </section>}
     {user?.id&&<NewMessageDialog key={user.id} open={newMessageOpen} forceGroup={embedded?.initialCompose === "group" ? true : undefined} accountId={user.id} contacts={people} contactsError={contactsError} onRetryContacts={()=>void loadContacts()} onContacts={embedded ? undefined : ()=>leave(()=>{setNewMessageOpen(false);navigateInboxView(window,"friends");})} onClose={closeNewMessage} onOpen={openDestination}/>}
-    {user?.id&&activeConv?.kind==="group"&&<GroupInfoDialog key={`${user.id}:${activeConv.id}`} open={groupInfoOpen} accountId={user.id} group={activeConv} contacts={people} onClose={()=>setGroupInfoOpen(false)} onRefresh={async()=>{await loadConversations();if(activeIdRef.current===activeConv.id)await loadMessages(activeConv.id);}} onResume={()=>setGroupInfoOpen(true)} onLeave={()=>{setGroupInfoOpen(false);if(embedded)embedded.onBack();else if(user?.id)navigateMessageView(window,user.id,{},true);void loadConversations();}}/>}
+    {user?.id&&activeConv?.kind==="group"&&!activeConv.teamChannel&&<GroupInfoDialog key={`${user.id}:${activeConv.id}`} open={groupInfoOpen} accountId={user.id} group={activeConv} contacts={people} onClose={()=>setGroupInfoOpen(false)} onRefresh={async()=>{await loadConversations();if(activeIdRef.current===activeConv.id)await loadMessages(activeConv.id);}} onResume={()=>setGroupInfoOpen(true)} onLeave={()=>{setGroupInfoOpen(false);if(embedded)embedded.onBack();else if(user?.id)navigateMessageView(window,user.id,{},true);void loadConversations();}}/>}
     <MessagingDialog compact open={!!selectedMessage} title={t("messageOptions")} onClose={()=>setSelectedMessage(null)} busy={!!deletingMessage} footer={<button type="button" disabled={!!deletingMessage} onClick={()=>{if(selectedMessage)void hideOwnMessage(selectedMessage);}} className="min-h-11 w-full rounded-xl border border-crimson/30 px-4 text-sm text-red-400 [[data-theme=light]_&]:text-red-700 disabled:opacity-40">{t("hideForMe")}</button>}><p className="break-words whitespace-pre-wrap rounded-xl border border-border bg-bg-secondary p-3 text-sm [overflow-wrap:anywhere]">{selectedMessage?.content}</p><MessageAttachments attachments={selectedMessage?.attachments}/><p className="text-sm text-text-muted">{t("hideHelp")}</p>{sendError&&<p role="alert" className="text-sm text-red-400 [[data-theme=light]_&]:text-red-700">{sendError}</p>}</MessagingDialog>
   </div>;
 }

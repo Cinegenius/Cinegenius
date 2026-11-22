@@ -5,7 +5,7 @@
 .search input{flex:1;min-width:0;min-height:44px;border:0;outline:none;background:transparent;color:var(--cg-app-ink,#f4f4f6);font:inherit;font-size:16px}
 .search input::placeholder{color:var(--cg-app-muted,#b8b9be);opacity:1}
 .top>button{display:flex;align-items:center;justify-content:center;flex-shrink:0;width:44px;height:44px;border:0;border-radius:50%;background:transparent;color:var(--cg-app-muted,#b8b9be);cursor:pointer}
-.content{display:flex;flex-direction:column;min-width:0;min-height:0;overflow:hidden;flex:1;max-height:min(52dvh,470px)}
+.content{display:flex;flex-direction:column;min-width:0;min-height:0;overflow:hidden;flex:0 1 auto;max-height:min(52dvh,470px)}
 .content>div{min-height:0}
 .content :global([data-native-inbox-contacts]){max-width:none;padding:4px 0}
 .groups{min-height:0;overflow-y:auto;overscroll-behavior:contain;padding:4px 0}
@@ -21,3 +21,6 @@
 .thread{height:min(58dvh,530px);max-height:none}
 .status{flex-shrink:0;padding:8px 12px;font-size:12px;color:var(--cg-app-muted,#b8b9be)}
 .status button{min-width:44px;min-height:44px;color:var(--cg-app-accent,#c2f135)}
+
+.groups>button>span.unread{flex:0 0 auto;display:inline-flex;min-width:20px;align-items:center;justify-content:center;padding:2px 5px;border-radius:99px;background:var(--cg-app-accent,#c2f135);color:var(--cg-app-accent-ink,#111);font-size:11px}
+.thread{flex:1 1 auto}

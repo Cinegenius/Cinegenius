@@ -10,6 +10,7 @@ import { clearConversation, GENIE_IDLE_MS, GENIE_MEMORY_ACTIVITY, readConversati
 import GenieWelcome from "./GenieWelcome";
 import GenieLauncher, { type GeniePosition } from "./GenieLauncher";
 import styles from "./Genie.module.css";
+import { useNativeSharedGenie, useNativeSharedGenieOwner, useNativeEmbeddedGenie } from "@/lib/use-native-shared-genie";
 
 function GenieMark() {
   return (
@@ -57,7 +58,7 @@ function messageChatOpen() {
   return document.body.dataset.messagesChatOpen === "true";
 }
 
-function AvailableGenie({ memoryScope, mode, dismissed, position, onHide, onPositionChange }: { memoryScope: string | null; mode: "floating" | "tool"; dismissed: boolean; position: RefObject<GeniePosition | null>; onHide: () => void; onPositionChange: (point: GeniePosition) => void }) {
+function AvailableGenie({ memoryScope, mode, dismissed, position, onHide, onPositionChange, nativeOwned, nativeEmbedded }: { memoryScope: string | null; mode: "floating" | "tool"; dismissed: boolean; position: RefObject<GeniePosition | null>; onHide: () => void; onPositionChange: (point: GeniePosition) => void; nativeOwned: boolean | null; nativeEmbedded: boolean | null }) {
   const t = useTranslations("Genie");
   const tools = useTranslations("AiTools");
   const pathname = usePathname();
@@ -71,6 +72,10 @@ function AvailableGenie({ memoryScope, mode, dismissed, position, onHide, onPosi
   const request = useRef<AbortController | null>(null);
   const id = useId();
   const launcherVisible = !open && !hideLauncher && (mode === "tool" || !dismissed);
+  const showWebFloating = nativeOwned === false && nativeEmbedded === false;
+  const openPanel = useCallback(() => { setHasOpened(true); setOpen(true); }, []);
+  useNativeSharedGenie({ enabled: mode === "floating", owned: nativeOwned,
+    eligible: !hideLauncher && !dismissed, open, label: t("open"), onOpen: openPanel });
 
   const close = useCallback((restoreFocus = true) => {
     request.current?.abort();
@@ -160,15 +165,15 @@ function AvailableGenie({ memoryScope, mode, dismissed, position, onHide, onPosi
 
   return (
     <>
-      <GenieWelcome
+      {showWebFloating && <GenieWelcome
         key={pathname}
         memoryScope={memoryScope}
         enabled={!open && !hasOpened && !hasMoved && !hideLauncher && !dismissed}
         onOpen={() => { setHasOpened(true); setOpen(true); }}
         onDismiss={() => launcher.current?.focus({ preventScroll: true })}
-      />
-      {mode === "floating" && <span id={`${id}-move-hint`} className={styles.inputLabel}>{t("moveLauncher")}</span>}
-      <GenieLauncher position={position} visible={mode === "floating" && launcherVisible} onHide={onHide} onMoveStart={() => setHasMoved(true)} onPositionChange={onPositionChange}>
+      />}
+      {mode === "floating" && showWebFloating && <span id={`${id}-move-hint`} className={styles.inputLabel}>{t("moveLauncher")}</span>}
+      {showWebFloating && <GenieLauncher position={position} visible={mode === "floating" && launcherVisible} onHide={onHide} onMoveStart={() => setHasMoved(true)} onPositionChange={onPositionChange}>
       {mode === "floating" && launcherVisible && (
         <button
           ref={launcher}
@@ -189,7 +194,7 @@ function AvailableGenie({ memoryScope, mode, dismissed, position, onHide, onPosi
           </span>
         </button>
       )}
-      </GenieLauncher>
+      </GenieLauncher>}
       {mode === "tool" && launcherVisible && <button ref={launcher} type="button" className={styles.toolLauncher} aria-label={t("open")} aria-haspopup="dialog" aria-expanded={false} aria-controls={hasOpened ? `${id}-panel` : undefined} onClick={() => { setHasOpened(true); setOpen(true); }}>
         <GenieMark /><span className={styles.toolCopy}><strong>{t("name")}</strong><span>{tools("genieDescription")}</span></span>
       </button>}
@@ -199,6 +204,7 @@ function AvailableGenie({ memoryScope, mode, dismissed, position, onHide, onPosi
           id={`${id}-panel`}
           className={styles.panel}
           hidden={!open}
+          data-genie-panel-open={open ? "true" : "false"}
           role="dialog"
           aria-modal="false"
           aria-labelledby={`${id}-title`}
@@ -227,6 +233,8 @@ export default function Genie({ mode = "floating" }: { mode?: "floating" | "tool
   const tools = useTranslations("AiTools");
   const { isLoaded, session } = useSession();
   const memoryScope = session?.id ?? null;
+  const nativeOwned = useNativeSharedGenieOwner();
+  const nativeEmbedded = useNativeEmbeddedGenie();
   const [dismissed, setDismissed] = useState(false);
   const position = useRef<GeniePosition | null>(null);
   const rememberPosition = useCallback((point: GeniePosition) => { position.current = point; }, []);
@@ -269,5 +277,5 @@ export default function Genie({ mode = "floating" }: { mode?: "floating" | "tool
     <GenieMark />
     <div className={styles.toolCopy}><strong>{t("name")}</strong><span>{tools("genieDescription")}</span><span role="status">{isLoaded ? tools("noticeFirst") : t("loading")}</span></div>
   </div>;
-  return !isLoaded || cookieVisible || replacedByTool ? null : <AvailableGenie key={memoryScope ?? "guest"} memoryScope={memoryScope} mode={mode} dismissed={dismissed} position={position} onHide={() => setDismissed(true)} onPositionChange={rememberPosition} />;
+  return !isLoaded || cookieVisible || replacedByTool ? null : <AvailableGenie key={memoryScope ?? "guest"} memoryScope={memoryScope} mode={mode} dismissed={dismissed} position={position} onHide={() => setDismissed(true)} onPositionChange={rememberPosition} nativeOwned={nativeOwned} nativeEmbedded={nativeEmbedded} />;
 }
