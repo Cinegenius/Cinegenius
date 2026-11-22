@@ -140,12 +140,30 @@ Markus subsequently requested a sustainable startup correction and explicitly
 selected restoring the last used area after authentication. Local APP reports
 25 checked/frozen startup web files: a minimal session API, actual Clerk/layout/
 Smart/Shots readiness, no native reveal delays, and no data fetching by the cold
-Dashboard intermediary. Native tests/SDK checks are being finalized for a single
-startup cover without a fixed wait or chooser, account-scoped areas, fail-closed
-retry and respected deep links.
+Dashboard intermediary. The final native build now reports success for a single startup cover without
+a fixed wait or chooser, account-scoped areas, fail-closed retry and respected
+deep links.
 
-The next complete native candidate is2204. Do not install the older2203 for this
-expanded scope. Installed build remains2202. Local APP continues the authorized
+The complete native candidate2204 is now reported built, signed and frozen.
+Do not install the older2203 for this expanded scope. Installed build remains2202. Local APP continues the authorized
 complete build, Desktop push, guarded release, fresh backup and installation.
-No new2204 build pass, release, installation or physical latency measurement is
+No new production release, installation or physical latency measurement is
 claimed here. Team/editor work remains outside this release scope.
+
+
+## Signed 2204 checkpoint; Desktop window disappeared again
+
+The local APP reports a complete successful signed device build and immutable
+package, followed by an independent local audit: exact25 web files plus13
+protected files,27 expected Git changes,10 native sources,376 build inputs and
+80 package files; code signing passed. Reported passing suites:126 mobile,
+114 startup,7 Dashboard,350 auth checks and8 browser boot cases. Suites may
+overlap. These reports are not a new physical iPhone test and were not rerun here.
+
+During the subsequent Desktop commit the previously visible window disappeared
+again (cgWindowNotFound). Local APP has already asked Markus to unlock the Mac
+and show GitHub Desktop; do not duplicate that request from this server chat.
+No new Git write, push, deployment, fresh backup or installation followed this
+failure. A paired connected iPhone read alone does not establish any of them.
+Continue from local work/app-startup-20261122/CHECKPOINT.safe.json after the
+window becomes available. No parallel release or2203 installation.
