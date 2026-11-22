@@ -51,18 +51,34 @@ function AccountNativeSmartLanding({ accountId, loaded, allowed, onUnavailable, 
   const focusDrag = useNativeSegmentDrag(mode, index => setMode(index === 0 ? "profile" : "neutral"));
   const refresh = useCallback(() => {
     if (document.visibilityState === "hidden" || Date.now() - retryRef.current < 500) return;
+    // focus, pageshow and native resume can arrive separately during the same
+    // return. Let its current rights check finish instead of restarting it.
+    if (request.current && !request.current.signal.aborted) return;
     retryRef.current = Date.now();
-    request.current?.abort();
     setRetry(value => value + 1);
+  }, []);
+  const suspend = useCallback(() => {
+    // A genuinely new foreground visit must not reuse a check started before
+    // Work/backgrounding. This also covers UIKit overlays without pagehide.
+    request.current?.abort();
+    request.current = null;
+    retryRef.current = 0;
   }, []);
 
   useEffect(() => {
     if (!allowed || !loaded || !accountId) return;
     const events = ["focus", "pageshow", "cinegenius:app-resume"];
     events.forEach(event => window.addEventListener(event, refresh));
-    document.addEventListener("visibilitychange", refresh);
-    return () => { events.forEach(event => window.removeEventListener(event, refresh)); document.removeEventListener("visibilitychange", refresh); };
-  }, [accountId, allowed, loaded, refresh]);
+    const suspendedEvents = ["blur", "pagehide", "cinegenius:native-workspace-presented"];
+    suspendedEvents.forEach(event => window.addEventListener(event, suspend));
+    const visibility = () => document.visibilityState === "hidden" ? suspend() : refresh();
+    document.addEventListener("visibilitychange", visibility);
+    return () => {
+      events.forEach(event => window.removeEventListener(event, refresh));
+      suspendedEvents.forEach(event => window.removeEventListener(event, suspend));
+      document.removeEventListener("visibilitychange", visibility);
+    };
+  }, [accountId, allowed, loaded, refresh, suspend]);
 
   useEffect(() => {
     const close = (event: PointerEvent) => { if (focusDetails.current && !focusDetails.current.contains(event.target as Node)) focusDetails.current.open = false; };
@@ -88,6 +104,7 @@ function AccountNativeSmartLanding({ accountId, loaded, allowed, onUnavailable, 
     const controller = new AbortController(); request.current = controller;
     const scheduled = performance.now();
     const timer = window.setTimeout(async () => {
+      if (controller.signal.aborted || currentScope.current !== scope) return;
       const started = performance.now();
       performance.clearMeasures("cinegenius:smart:schedule");
       performance.measure("cinegenius:smart:schedule", { start: scheduled, end: started });
@@ -110,9 +127,15 @@ function AccountNativeSmartLanding({ accountId, loaded, allowed, onUnavailable, 
         if (!data) throw new Error("unavailable");
         if (!controller.signal.aborted && currentScope.current === scope) setResult({ scope, data, timingStart: performance.now() });
       } catch { if (!controller.signal.aborted && currentScope.current === scope) setError(true); }
-      finally { if (!controller.signal.aborted && currentScope.current === scope) setLoading(false); }
+      finally {
+        if (request.current === controller) request.current = null;
+        if (!controller.signal.aborted && currentScope.current === scope) setLoading(false);
+      }
     }, 0);
-    return () => { window.clearTimeout(timer); controller.abort(); };
+    return () => {
+      window.clearTimeout(timer); controller.abort();
+      if (request.current === controller) request.current = null;
+    };
   }, [accountId, allowed, loaded, mode, onUnavailable, scope, seed]);
 
   const data = result?.scope === scope ? result.data : null;

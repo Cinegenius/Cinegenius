@@ -1,13 +1,19 @@
 # CineGenius · Übersicht der gesamten App
 
-Stand: **21. November 2026 (Europe/Berlin)**. Zuständig: **APP Entwicklung / Xcode**, gemeinsame Schnittstellen in Abstimmung mit **WEB CODEX**.
+Stand: **22. November 2026 (Europe/Berlin)**. Zuständig: **APP Entwicklung / Xcode**, gemeinsame Schnittstellen in Abstimmung mit **WEB CODEX**.
 Die getrennte [Website-Übersicht](CINEGENIUS-WEBSITE-UEBERSICHT.md) enthält die öffentliche Website und deren Unterseiten.
 
 Diese Übersicht trennt die installierte App, ihre serverseitigen Ansichten, native Werkzeuge und geplante Funktionen. Eine Website-Prüfung bestätigt keinen iPhone-Ablauf. „Vorhanden“ bezeichnet belegten Code oder einen gemeldeten Entwicklungsstand; tatsächliche Aktivierung und Geräteprüfung werden separat genannt.
 
-**Neuester Betreibercheckpoint · 22. November 2026:** Einzelne Smart-Karten sind gemäß ausdrücklicher Korrektur **deckend**, mit ruhiger solider Palettentönung aus **92 % Hintergrundfarbe und 8 % Textfarbe**. Die große umgebende Bereichsfläche bleibt transparent. Randlose Bilder in natürlicher Proportion ohne Beschnitt, drei Crewspalten und vollständiger Textumbruch bleiben erhalten. Lokal sind 19 Browserfälle bestanden: alle acht Themes bei 320/393 px sowie unveränderte gewöhnliche Website. Geprüfter CSS-Checkpoint: SHA-256 `e29f3fa01fb50d695eb792a9064c734884ad4335195516b34c7ee6b9642e3c16`. [Neue Collage](/Users/markusmueller/Documents/Codex/2026-11-13/cinegenius-mac-app-setup/outputs/app-pruefstand-20261122/smart-karten-deckend/pistachio-mauve-cement.png), SHA-256 `7716bd2920d7c142ff8aefe418db94fb8d8f65dd2f273a2311a1b5d12c9fd424`. Installiert bleibt **2026112106**; **2026112202 ist als signierter Kandidat bereit**. Die Kartenkorrektur ist nicht als veröffentlicht, installiert oder physisch geprüft belegt.
+**Aktueller Abgleich · 22. November 2026:** Laut geprüftem Bericht der lokalen APP-Aufgabe ist **2202 installiert/gestartet**, nach frischer Sieben-Ordner-Sicherung mit **132 bytegleichen persistenten Dateien / 0 Abweichungen**. Dies ist kein hier wiederholter Gerätetest. Markus verlangt eine Collage vor dem nächsten Build: gemeinsame persistente Kopfzeile/Dock/Genie auch in Work, Website-Stil mit zwei Crewspalten und deckenden Navykarten. **Keine weitere App-Veröffentlichung oder Installation bis Vorschauabnahme.**
 
-**Aktueller APP-Stand (21. November 2026):** Build **2026112106 ist nach
+**Rückkehr Work → Community/Smart:** erneute Wartezeit gemeldet. Wiederholte Anfrageabbrüche bei getrennten Rückkehrsignalen im aktuellen Code reproduziert; kleine Korrektur vorbereitet, 54 zugehörige Tests bestanden. Nativer Wechsel, verbleibende Ladepause und Zusammenführung mit den lokalen Entwürfen noch offen. [Befund und Nachweise](app-work-return-20261122.md).
+
+**Teamkanäle:** eigener Verlauf unabhängig von Community; zusätzliche normale Inbox-Anzeige nur freiwillig und kontogebunden, ohne Rechteänderung. [Vorbereiteter Vertrag](workspace-team-channels.md), sieben isolierte Datenbankfälle bestanden; HTTP-/App-Einbindung und vollständiger Rechte-Review fehlen. Nicht live, Prototypmigration nicht anwenden.
+
+**Historischer Checkpoint vor Installation 2202 · 22. November 2026:** Einzelne Smart-Karten sind gemäß ausdrücklicher Korrektur **deckend**, mit ruhiger solider Palettentönung aus **92 % Hintergrundfarbe und 8 % Textfarbe**. Die große umgebende Bereichsfläche bleibt transparent. Randlose Bilder in natürlicher Proportion ohne Beschnitt, drei Crewspalten und vollständiger Textumbruch bleiben erhalten. Lokal sind 19 Browserfälle bestanden: alle acht Themes bei 320/393 px sowie unveränderte gewöhnliche Website. Geprüfter CSS-Checkpoint: SHA-256 `e29f3fa01fb50d695eb792a9064c734884ad4335195516b34c7ee6b9642e3c16`. [Neue Collage](/Users/markusmueller/Documents/Codex/2026-11-13/cinegenius-mac-app-setup/outputs/app-pruefstand-20261122/smart-karten-deckend/pistachio-mauve-cement.png), SHA-256 `7716bd2920d7c142ff8aefe418db94fb8d8f65dd2f273a2311a1b5d12c9fd424`. Installiert bleibt **2026112106**; **2026112202 ist als signierter Kandidat bereit**. Die Kartenkorrektur ist nicht als veröffentlicht, installiert oder physisch geprüft belegt.
+
+**Historischer APP-Stand (21. November 2026):** Build **2026112106 ist nach
 frischer verifizierter Sicherung installiert und gestartet**, die installierte
 Buildnummer bestätigt. **118 persistente Dateien sind bytegleich erhalten,
 0 abweichend.** Der zuvor installierte Build 2105 ist beim physischen

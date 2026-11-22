@@ -1,3 +1,13 @@
+## App-Abgleich vom 22. November 2026 nach Installation 2202
+
+Die lokale APP-Aufgabe meldet Build **2026112202 tatsächlich installiert und gestartet** nach frischer Sieben-Ordner-Sicherung; **132 persistente Dateien bytegleich, 0 Abweichungen**. Der Server hat diesen Beleg im lokalen Auftrag gelesen, keine eigene Geräteprüfung wiederholt. Die frühere Angabe „2202 nur Kandidat / 2106 installiert“ ist historisch.
+
+Markus verlangt zuerst eine Collage vor weiterem Bauen. Nächsten nativen Build, Veröffentlichung und Installation **bis zur Vorschauabnahme zurückhalten**. Neues Vorschauziel: eine gemeinsame persistente Apphülle mit gleicher Profil-/Nachrichten-/Suche-/Menüzeile auch in Work, gleichem Dock/Worksymbol und einheitlichem Genie. Wieder Website-Stil: zwei Crewspalten mit linker Vorschau und Lime-Tätigkeit, geordnete 3:2-Marktplatz-/Locationkarten, feste deckende Navyflächen. Frühere drei Spalten, Masonry und unterschiedlich hohe Bildkarten sind für dieses neue Ziel überholt; unveröffentlichte lokale Entwürfe nicht als umgesetzt oder freigegeben melden.
+
+Teamgespräche brauchen einen eigenen Verlauf unabhängig von Community. Die zusätzliche Anzeige im normalen Nachrichteneingang ist eine private freiwillige Anzeigeoption, kein Beitritt und keine Freigabe. Standard-aus ist der vorbereitete Vorschlag. Serververtragsentwurf und sieben isolierte Datenbankfälle: `docs/workspace-team-channels.md`. **Keine fertige Online-Teamfunktion**; die Prototypmigration nicht anwenden, solange HTTP-/Native-Einbindung und vollständiger Rechte-Review fehlen.
+
+Markus meldet hier erneut eine lange Rückkehr von Work. Ein Teilfehler ist in NativeSmartLanding reproduziert: getrennte Rückkehrsignale starten eine laufende Anfrage mehrfach neu. Kleine vorbereitete Korrektur mit 54 bestandenen zugehörigen Tests; kein Geräte-/Livebeleg und keine vollständige Latenzlösung. Details und Abgleich mit lokalen Entwürfen: `docs/app-work-return-20261122.md`.
+
 ## Betreiberkorrekturen vom 22. November 2026
 
 Die App-Palette heißt einheitlich Englisch: Cement, Dark Sky, Pistachio, Cherry, Sand, Mauve, Black. Die bisherigen IDs graphite/midnight/sage/rose/sand/black bleiben; mauve ersetzt terracotta. Ursprüngliches Mauve wiederverwenden, Terracotta aus der Auswahl entfernen. Ältere v1-Picker-Apps dürfen die neue ID nicht angeboten bekommen; neue Hintergrundfähigkeit v2. Heller Stein bleibt heller Modus.
