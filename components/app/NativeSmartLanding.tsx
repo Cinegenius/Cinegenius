@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { useAuth, useSession } from "@clerk/nextjs";
 import { useLocale, useTranslations } from "next-intl";
 import Link from "next/link";
@@ -11,11 +11,15 @@ import SmartSearchExplorer, { type SmartSearchControls } from "@/components/Smar
 import { emptyDiscoveryFilters } from "@/lib/smart-discovery";
 import { useViewState } from "@/lib/use-view-state";
 import { useFormRouter } from "@/lib/use-form-router";
-import { NATIVE_DISCOVERY_CONTRACT, NATIVE_DISCOVERY_DIRECTORIES, readNativeDiscovery, type NativeDiscoveryMode, type NativeDiscoveryResponse } from "@/lib/native-smart-discovery";
+import { NATIVE_DISCOVERY_CONTRACT, NATIVE_DISCOVERY_DIRECTORIES, nativeDiscoveryPlan, readNativeDiscovery, type NativeDiscoveryMode, type NativeDiscoveryResponse } from "@/lib/native-smart-discovery";
 import styles from "./NativeSmartLanding.module.css";
 import { isDiscoverySeed } from "@/lib/discovery-seed";
 import { useNativeSegmentDrag } from "@/lib/use-native-segment-drag";
 import NativeCreateMenu from "./NativeCreateMenu";
+import {browseFilterControls,hasBrowseFilterControls} from "@/lib/browse-filter-controls";
+import {nativeSmartView} from "@/lib/native-smart-controls";
+import {NATIVE_DISCOVERY_FILTER_HEADER,encodeNativeDiscoveryFilters} from "@/lib/native-smart-discovery-request";
+const nativePlanScope=JSON.stringify(nativeDiscoveryPlan());
 
 const icons = { crew: Users, marketplace: ShoppingBag, locations: MapPin, companies: Building2 };
 
@@ -37,7 +41,14 @@ function AccountNativeSmartLanding({ accountId, sessionId, loaded, allowed, onUn
   const [seed, setSeed] = useViewState("native.smart.seed", "");
   useEffect(() => { setSeed(previous => isDiscoverySeed(previous) ? previous : crypto.randomUUID().replaceAll("-", "")); }, [setSeed]);
   const [controls, setControls] = useViewState<SmartSearchControls>("smart.controls", { scope: "", filters: emptyDiscoveryFilters(), mapOpen: false, view: "grid", limits: {} });
-  const [result, setResult] = useState<{ scope: string; revision: number; data: NativeDiscoveryResponse; timingStart: number } | null>(null);
+  const [result, setResult] = useState<{ scope: string; revision: number; data: NativeDiscoveryResponse; timingStart: number; browseKey:string } | null>(null);
+  const choices=useMemo(()=>{
+    const filters=controls.scope === nativePlanScope ? controls.filters : emptyDiscoveryFilters();
+    const browse=browseFilterControls({...filters.browse,version:1,departments:filters.browse?.departments ?? filters.departments,marketplace:filters.browse?.marketplace ?? filters.marketplace});
+    return {view:controls.scope === nativePlanScope && nativeSmartView(controls.mapOpen,controls.view) === "map" ? "map" as const : "list" as const,browse,browseKey:JSON.stringify(browse)};
+  },[controls]);
+  const choicesRef=useRef(choices),hasResult=useRef(false);
+  useLayoutEffect(()=>{choicesRef.current=choices;hasResult.current=!!result;},[choices,result]);
   const [error, setError] = useState(false);
   const [loading, setLoading] = useState(false);
   const [retry, setRetry] = useState(0);
@@ -132,6 +143,7 @@ function AccountNativeSmartLanding({ accountId, sessionId, loaded, allowed, onUn
     const controller = new AbortController(); request.current = controller;
     const revision = ++requestRevision.current;
     const current = () => !controller.signal.aborted && request.current === controller && currentScope.current === scope;
+    const requested=choicesRef.current;
     const scheduled = performance.now();
     const timer = window.setTimeout(async () => {
       if (!current()) return;
@@ -140,10 +152,19 @@ function AccountNativeSmartLanding({ accountId, sessionId, loaded, allowed, onUn
       performance.measure("cinegenius:smart:schedule", { start: scheduled, end: started });
       setLoading(true); setError(false);
       try {
-        const response = await fetch(`/api/native/v1/discovery?focus=${mode === "neutral" ? "neutral" : "profile"}&seed=${seed}`, {
-          headers: { "X-CineGenius-Native-Discovery": NATIVE_DISCOVERY_CONTRACT, "X-Native-Account": accountId },
+        let encodedFilters:string|null,requestView=requested.view,servedBrowseKey=requested.browseKey;
+        try {encodedFilters=encodeNativeDiscoveryFilters(requested.browse);}
+        catch (error) {
+          if (!(error instanceof Error) || error.message !== "invalid_request") throw error;
+          // Large legitimate selections use the existing validated body POST.
+          // Mark this smaller bootstrap honestly so Explorer hides its rows
+          // until that exact full filter scope has returned; keep UI choices.
+          encodedFilters=null;requestView="list";servedBrowseKey=JSON.stringify({version:1});
+        }
+        const response = await fetch(`/api/native/v1/discovery?focus=${mode === "neutral" ? "neutral" : "profile"}&seed=${seed}${requestView === "map" ? "&view=map" : ""}`, {
+          headers: { "X-CineGenius-Native-Discovery": NATIVE_DISCOVERY_CONTRACT, "X-Native-Account": accountId,...(encodedFilters ? {[NATIVE_DISCOVERY_FILTER_HEADER]:encodedFilters} : {}) },
           credentials: "same-origin", cache: "no-store", referrerPolicy: "no-referrer",
-          signal: AbortSignal.any([controller.signal, AbortSignal.timeout(25_000)]),
+          signal: AbortSignal.any([controller.signal, AbortSignal.timeout(requestView === "map" ? 35_000 : 25_000)]),
         });
         performance.clearMeasures("cinegenius:smart:api");
         performance.measure("cinegenius:smart:api", { start: started, end: performance.now() });
@@ -151,11 +172,12 @@ function AccountNativeSmartLanding({ accountId, sessionId, loaded, allowed, onUn
         if ([401, 403, 409].includes(response.status)) { denyAccess(); return; }
         if (!response.ok) throw new Error("unavailable");
         const received = performance.now();
-        const data = readNativeDiscovery(await response.json(), accountId, seed);
+        const data = readNativeDiscovery(await response.json(), accountId, seed,requestView);
         performance.clearMeasures("cinegenius:smart:decode");
         performance.measure("cinegenius:smart:decode", { start: received, end: performance.now() });
         if (!data) throw new Error("unavailable");
-        if (current()) { setReservedHeight(0); setResult({ scope, revision, data, timingStart: performance.now() }); }
+        if (requested.browseKey !== choicesRef.current.browseKey) {if (current() && !hasResult.current) setRetry(value=>value+1);return;}
+        if (current()) { setReservedHeight(0); setResult({ scope, revision, data, timingStart: performance.now(),browseKey:servedBrowseKey }); }
       } catch { if (current()) { setReservedHeight(0); setError(true); } }
       finally {
         if (current()) setLoading(false);
@@ -208,11 +230,11 @@ function AccountNativeSmartLanding({ accountId, sessionId, loaded, allowed, onUn
             </div>
           </details>
         </div>
-        {error && <div role="alert" className={styles.error}><p>{t("error")}</p><button type="button" onClick={refresh}>{t("retry")}</button></div>}
+        {error && <div role="alert" className={styles.error}><p>{t("error")}</p><button type="button" onClick={refresh}>{t("retry")}</button>{hasBrowseFilterControls(choices.browse) && <button type="button" className="min-h-11" onClick={()=>{setControls(previous=>({...previous,filters:emptyDiscoveryFilters()}));setRetry(value=>value+1);}}>{search("discovery.reset")}</button>}</div>}
         {/* The explorer owns its rows after mount. Replace it atomically only
             when a freshly authorized response is ready, including removals. */}
         <div ref={resultFrame} className={styles.results} data-native-smart-result-frame="v1" data-native-smart-result-current={data ? "v1" : undefined}>
-          {data ? <SmartSearchExplorer key={`${scope}:${result?.revision}`} discoverySeed={data.seed} plan={data.plan} initialGroups={data.groups} onUnavailable={denyAccess} stored={controls} setStored={setControls} />
+          {data ? <SmartSearchExplorer key={`${scope}:${result?.revision}`} discoverySeed={data.seed} plan={data.plan} initialGroups={data.groups} initialMapGroups={data.view === "map" ? data.groups : undefined} initialBrowseKey={result?.browseKey} onUnavailable={denyAccess} stored={controls} setStored={setControls} />
             : reservedHeight > 0 && <div className={styles.placeholder} data-native-smart-placeholder="v1" aria-hidden="true" style={{ height: reservedHeight }}><span /><span /></div>}
         </div>
       </>}

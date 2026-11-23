@@ -1,10 +1,16 @@
 ## Adminübersicht · 23. November 2026 · noch nicht live
 
-Ergänzter Auftrag: nicht fertiggestellte Profile gezielt filtern; Supportvorlagen und zugehörige E-Mails auf Englisch. Abgeschlossene Anbieter ohne Personenprofil bleiben abgeschlossen. Vorlagenmigration noch nicht angewandt; keine Nachrichten versendet. Weiterhin keine Veröffentlichungsfreigabe.
+Ergänzter Auftrag: nicht fertiggestellte Profile gezielt filtern; Supportvorlagen und zugehörige E-Mails auf Englisch. Abgeschlossene Anbieter ohne Personenprofil bleiben abgeschlossen. Vorlagenmigration noch nicht angewandt; keine Nachrichten versendet. Gesamtes ergänztes Paket durch Markus freigegeben; Veröffentlichung nach Abschluss des laufenden App-Livegangs.
 
 Neue gegliederte Adminnavigation und vollständige Kontenfilter nach Crew, Marktplatz, Locations, Firmen, Sucherbestand und unzugeordneten Konten. Einrichtungsstatus separat; mehrfache Bereiche möglich. Details erst beim Öffnen, Länder-Feedback direkt erreichbar. Bestehende Entscheidungen und Rechte erhalten. [Umfang und Grenzen](admin-clarity-20261123.md).
 
 # CineGenius · Übersicht der gesamten Website
+
+## App-Serverkandidat2212 · 23. November 2026
+
+Die freigegebenen App-Deltas erhalten den aktuellen Website-Hauptstand einschließlich `32ce5b9f`/`d69ccd73`: vorhandener Router statt erneutem Laden beim Verlassen von Work, pausierte verdeckte Nachrichtenleser und passender erster Smart-Kartenabruf einschließlich großer Filterauswahlen. Kontorechte, Entwurfsschutz, Cursor und normale Websitegestaltung bleiben erhalten. Dazu34 neue NativeRoomScanner-Texte in allen17 Katalogen für den getrennten nativen Plan-/Sonneneditor.71 gezielte Webfälle und20 Designprüfungen bestanden; vollständiger globaler Sprach-/TypeScript-/Next-Build sowie frischer Produktionsnachweis dieses Kandidaten stehen noch aus. [Belege und Grenzen](app-floor-editor-navigation-20261123.md).
+
+Gmail ist nicht aktiviert oder verbunden. Die ausdrücklich autorisierte neue Dispo-Automatik wird separat entwickelt; dieser Kandidat startet keine Mailauswertung und ändert keine Providerrechte oder Datenbankstruktur. Ältere Zwischenstände unten bleiben Historie.
 
 ## Suchendes Mitglied · Auftrag vom 23. November 2026
 

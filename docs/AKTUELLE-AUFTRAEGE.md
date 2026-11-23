@@ -1,3 +1,12 @@
+## App-Folgeauftrag · 23. November 2026 · geprüfter Kandidat2212
+
+1. **2212 veröffentlichen und getrennt am Gerät prüfen:** Ein vollständiger signierter Build und unabhängige Prüfung sind bestanden. Installiert/eng physisch akzeptiert bleibt2211; neuer neutraler/leerer Work-Zustand sowie neuer Editor sind noch nicht am Gerät akzeptiert. Vor Installation frische Sicherung und Datenerhaltsvergleich. Keine weitere pauschale Rückfrage zur bereits autorisierten Umsetzung ableiten.
+2. **Frischer Webrelease:** Kumulative13 Web- und17 Katalogdeltas plus reine Testadapter über normalen Desktop-Abgleich/Serverrelease. Globales i18n/TypeScript/Next remote abschließen; lokales384MiB-OOM bleibt als unvollständig dokumentiert. Neue Commit-/Deployment-/Asset-/Zugriffsschutzbelege und aktuelle Leistenprüfung erforderlich.
+3. **Physische Folgeprüfung:** aktueller Work-Kaltstart/Unterbrechung/erneute Anmeldung, Work↔Community, offene Nachrichtendialoge, Smart-Karte/Liste/Filter, Zeichnen/Abbrechen/Undo, Räume/Garten, Sonnenzeit/Nacht/Nord/Lichtpunkt/Skalierung und kleine/große Schrift gezielt prüfen. Frühere2210-Heute-/Kontakt- und2211-Kontofrageabnahmen gelten nur in ihrem jeweiligen Umfang.
+4. **Gmail-Dispoautomatik separat:** neuer autorisierter Folgekandidat, nicht Bestandteil von2212. Verbindung/Import/Automatik nicht aktiv; kein Postfach verbunden. Erst getrennte Implementierung und klare, bewusste Nutzerwahl. Bestehende Schlüssel und Autorisierung erhalten.
+
+[Umfang und Inventar](app-floor-editor-navigation-20261123.md). Bestehende andere WEB-Aufträge und ältere historische Belege bleiben erhalten.
+
 ## Aktuelle WEB-Priorität · 23. November 2026
 
 1. **Profilabschluss:** Zusatztätigkeit freiwillig, verständliche/fokussierte Pflichtfeldfehler. 43 Tests, TypeScript, 17 Sprachen und Produktionsbuild bestanden; **live bestätigt auf 11d96803**. Betroffene Nutzer müssen den Abschluss noch erneut durchspielen.
@@ -7,7 +16,7 @@
 
 5. **Suchendes Mitglied — live:** Auswahl für neue Konten entfernen; bestehende Sucher-Konten und gespeicherte Sucher-Auswahlen unverändert erhalten. Auf `32ce5b9f` veröffentlicht: 99 gezielte Tests, 17 Sprachen, 12 kontrollierte Browserfälle sowie Produktionsbuild bestanden; www READY, 15 HTTP- und zwei öffentliche Browserprüfungen bestätigt. [Umfang](search-membership-retirement-20261123.md).
 
-6. **Admin übersichtlicher — lokal vorbereitet:** Nach den veröffentlichten Registrierungs-/Anbieterkorrekturen jetzt Mitglieder/Anbieter nach Bereich und Einrichtung filtern, kompakte aufklappbare Zeilen, gegliederte Navigation und direkter Länder-Feedback-Link. Ergänzt: eigener Filter für nicht fertiggestellte Profile sowie englische Supportvorlagen, automatische Ergänzungen und Support-E-Mails. Vorlagenmigration vorbereitet, noch nicht angewandt. Neue Veröffentlichungsfreigabe steht aus; noch nicht live. [Umfang und Prüfgrenzen](admin-clarity-20261123.md). Die zuletzt angefragte Kontenprüfung wurde vorher nur lesend abgeschlossen; daraus ist kein neuer technischer Fehler belegt.
+6. **Admin übersichtlicher — Veröffentlichung freigegeben:** Nach den veröffentlichten Registrierungs-/Anbieterkorrekturen jetzt Mitglieder/Anbieter nach Bereich und Einrichtung filtern, kompakte aufklappbare Zeilen, gegliederte Navigation und direkter Länder-Feedback-Link. Ergänzt: eigener Filter für nicht fertiggestellte Profile sowie englische Supportvorlagen, automatische Ergänzungen und Support-E-Mails. Vorlagenmigration vorbereitet, noch nicht angewandt. Markus hat das gesamte ergänzte Paket freigegeben; aktueller App-Hauptstand übernommen und geprüft. Veröffentlichung nach dem laufenden App-Livegang; noch kein neuer Live-Nachweis. [Umfang und Prüfgrenzen](admin-clarity-20261123.md). Die zuletzt angefragte Kontenprüfung wurde vorher nur lesend abgeschlossen; daraus ist kein neuer technischer Fehler belegt.
 
 # Aktuelle Aufträge · 22. November 2026
 

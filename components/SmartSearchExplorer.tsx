@@ -92,9 +92,9 @@ function ResultArea({ area, groups, pending, errors, more, grid = false, limit: 
 
 /** Account/plan-scoped by the parent key; ephemeral filters never enter history
  * or storage. Combined responses serve both surfaces without duplicate reads. */
-export default function SmartSearchExplorer({ plan, initialGroups, initialMapGroups, onUnavailable, stored, setStored, discoverySeed }: {
+export default function SmartSearchExplorer({ plan, initialGroups, initialMapGroups, onUnavailable, stored, setStored, discoverySeed,initialBrowseKey }: {
   plan: SearchPlan; initialGroups: SearchGroup[]; initialMapGroups?: SearchGroup[]; onUnavailable: () => void;
-  discoverySeed?: string;
+  discoverySeed?: string; initialBrowseKey?: string;
   stored?: SmartSearchControls; setStored?: Dispatch<SetStateAction<SmartSearchControls>>;
 }) {
   const t = useTranslations("UnifiedSearch"), taxonomy = useTranslations("Taxonomy"), marketplace = useTranslations("MarketplaceCatalog");
@@ -117,8 +117,8 @@ export default function SmartSearchExplorer({ plan, initialGroups, initialMapGro
     marketplace:browseRaw?.marketplace ?? controls.filters.marketplace,
   } : undefined), [browseRaw, nativeAppearance, controls.filters.departments, controls.filters.marketplace]);
   const browseKey = JSON.stringify(browseFilters);
-  const [loadedBrowseKey,setLoadedBrowseKey] = useState(JSON.stringify({version:1}));
-  const requestedBrowseKey = useRef(JSON.stringify({version:1}));
+  const [loadedBrowseKey,setLoadedBrowseKey] = useState(initialBrowseKey ?? JSON.stringify({version:1}));
+  const requestedBrowseKey = useRef(initialBrowseKey ?? JSON.stringify({version:1}));
   const filteredGroups = useMemo(() => nativeAppearance && loadedBrowseKey !== browseKey ? [] : groups, [nativeAppearance, loadedBrowseKey, browseKey, groups]);
   const view = nativeSmartView(mapOpen, controls.view);
   const setFilters = (action: SetStateAction<DiscoveryFilters>) => {

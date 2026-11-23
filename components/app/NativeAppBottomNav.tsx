@@ -8,6 +8,7 @@ import { Clapperboard, Images, LayoutGrid, Newspaper, Sparkles } from "lucide-re
 import { useFormNavigation } from "@/contexts/FormDraftContext";
 import { NATIVE_APP_NAV_ITEMS, nativeAppActiveArea, type NativeAppArea } from "@/lib/native-app-navigation";
 import styles from "./NativeAppBottomNav.module.css";
+import { installNativeCommunityNavigation, type NativeCommunityArea } from "@/lib/native-community-navigation";
 
 const icons = { shots: Images, workspace: LayoutGrid, smart: Sparkles, news: Newspaper, projects: Clapperboard };
 const PREVIEW_EVENT = "cinegenius:native-navigation-preview";
@@ -124,6 +125,15 @@ export default function NativeAppBottomNav({ pathname, label, labels }: {
     });
     if (!committed) settle(baseRef.current);
   }
+  const nativeChoose = useRef<(area: NativeCommunityArea) => void>(() => {});
+  useLayoutEffect(() => {
+    nativeChoose.current = area => choose(NATIVE_APP_NAV_ITEMS.findIndex(item => item.id === area), 0, true);
+  });
+  useEffect(() => {
+    if (!nav.current) return;
+    return installNativeCommunityNavigation(nav.current, area => nativeChoose.current(area));
+  }, []);
+
   function pointerDown(event: ReactPointerEvent<HTMLElement>) {
     if (!event.isPrimary) { cancel(); return; }
     if (event.button !== 0 || event.ctrlKey || event.metaKey || event.altKey || event.shiftKey || !eligible()) return;

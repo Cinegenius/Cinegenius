@@ -1,10 +1,18 @@
 ## Gemeinsamer Adminbereich · 23. November 2026 · Webkandidat
 
-Ergänzter Auftrag: nicht fertiggestellte Profile gezielt filtern; Supportvorlagen und zugehörige E-Mails auf Englisch. Abgeschlossene Anbieter ohne Personenprofil bleiben abgeschlossen. Vorlagenmigration noch nicht angewandt; keine Nachrichten versendet. Weiterhin keine Veröffentlichungsfreigabe.
+Ergänzter Auftrag: nicht fertiggestellte Profile gezielt filtern; Supportvorlagen und zugehörige E-Mails auf Englisch. Abgeschlossene Anbieter ohne Personenprofil bleiben abgeschlossen. Vorlagenmigration noch nicht angewandt; keine Nachrichten versendet. Gesamtes ergänztes Paket durch Markus freigegeben; Veröffentlichung nach Abschluss des laufenden App-Livegangs.
 
-Die über die Website erreichbare Verwaltung erhält gegliederte Navigation und kompakte Kontenfilter nach Bereich und Einrichtung. Das mobile Layout ist im Browser geprüft; keine native Oberfläche, kein Gerätebuild und kein Installations-/Gerätenachweis dieses Auftrags. Veröffentlichungsfreigabe steht aus. [Umfang und Grenzen](admin-clarity-20261123.md).
+Die über die Website erreichbare Verwaltung erhält gegliederte Navigation und kompakte Kontenfilter nach Bereich und Einrichtung. Das mobile Layout ist im Browser geprüft; keine native Oberfläche, kein Gerätebuild und kein Installations-/Gerätenachweis dieses Auftrags. Veröffentlichungsfreigabe liegt vor; noch kein neuer Live-Nachweis. [Umfang und Grenzen](admin-clarity-20261123.md).
 
 # CineGenius · Übersicht der gesamten App
+
+## Aktueller App-Stand · 23. November 2026 · Kandidat2212
+
+Installiert bleibt **2026112211**, mit151 vor Erststart bytegleichen Arbeitsdateien. Markus bestätigt den kompakten Heute-Bereich mit erreichbaren Kontakten und die Wiederaufnahme eines gespeicherten Plans ohne zusätzliche Kontosperrfrage. Der später gemeldete leere Work-Zustand ist ein eigener, noch nicht physisch abgenommener Fall.
+
+Der neue **2212-Kandidat ist vollständig gebaut, signiert und unabhängig geprüft**, noch nicht installiert: übersichtlicher Planeditor mit freiwilliger Innen-/Außenwahl, Zeichnen ohne Pflichtmaße, Punktkonturen, Sonnenbahn und verschiebbarer Uhrzeit; begrenzte Work-Wiederaufnahme sowie weniger doppelte Ladevorgänge in Navigation, Smart und Nachrichten. 398 Originaleingaben,88 Appdateien und45 Ressourcen geprüft;17 neue Katalogabschnitte,153 Core-/22 Editorfälle,71 Webfälle und20 Designprüfungen dokumentiert. Globaler i18n-/TypeScript-/Next-Releasecheck und echte Geräteübergänge folgen separat. [Umfang und Prüfgrenzen](app-floor-editor-navigation-20261123.md).
+
+Gmail bleibt unverbunden und deaktiviert. Die neu ausdrücklich beauftragte Dispo-Mail-Automatik ist ein separater Folgekandidat. TestFlight-Appdatensatz und Verteilungszertifikat sind eingerichtet; ein erster Build ist noch nicht hochgeladen und Mathias noch nicht eingeladen. Ältere Zwischenstände unten bleiben Historie.
 
 ## Suchendes Mitglied · Auftrag vom 23. November 2026
 

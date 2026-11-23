@@ -5,6 +5,8 @@ import { rateLimit } from "@/lib/rateLimit";
 import { nativeDiscoveryForAccount } from "@/lib/native-smart-discovery-server";
 import { NATIVE_DISCOVERY_CONTRACT } from "@/lib/native-smart-discovery";
 import { isDiscoverySeed } from "@/lib/discovery-seed";
+import {readSearchBrowseFilters} from "@/lib/browse-filters";
+import {NATIVE_DISCOVERY_FILTER_HEADER,decodeNativeDiscoveryFilters} from "@/lib/native-smart-discovery-request";
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 export const maxDuration = 30;
@@ -20,10 +22,17 @@ export async function GET(request: Request) {
     if (request.headers.get("X-Native-Account") !== user.userId) return json({ error: "account_changed" }, 409);
     const params = new URL(request.url).searchParams;
     const seed = params.get("seed") ?? undefined;
-    if ([...params.keys()].some(key => !["focus", "seed"].includes(key)) || params.getAll("focus").length > 1 || params.getAll("seed").length > 1
+    if ([...params.keys()].some(key => !["focus", "seed", "view"].includes(key)) || params.getAll("focus").length > 1 || params.getAll("seed").length > 1
+      || params.getAll("view").length > 1 || params.has("view") && !["list","map"].includes(params.get("view")!)
       || (seed !== undefined && !isDiscoverySeed(seed)) || (params.has("focus") && !["profile", "neutral"].includes(params.get("focus")!))) return json({ error: "invalid_request" }, 400);
+    let browseFilters: ReturnType<typeof readSearchBrowseFilters> | undefined;
+    const rawFilters=request.headers.get(NATIVE_DISCOVERY_FILTER_HEADER);
+    if (rawFilters !== null) {
+      try {browseFilters=readSearchBrowseFilters(decodeNativeDiscoveryFilters(rawFilters));} catch {return json({error:"invalid_request"},400);}
+      if (!browseFilters) return json({error:"invalid_request"},400);
+    }
     if (!(await rateLimit(`unified-search:${user.userId}`, 40, 60)).allowed) return json({ error: "rate_limited" }, 429);
     const signal = AbortSignal.any([request.signal, AbortSignal.timeout(20_000)]);
-    return json(await nativeDiscoveryForAccount(user.userId, await getLocale(), params.get("focus") === "neutral" ? "neutral" : "profile", signal, seed));
+    return json(await nativeDiscoveryForAccount(user.userId, await getLocale(), params.get("focus") === "neutral" ? "neutral" : "profile", signal, seed, {view:params.get("view") === "map" ? "map" : "list",...(browseFilters ? {browseFilters} : {})}));
   } catch { return json({ error: "unavailable" }, 503); }
 }
