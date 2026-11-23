@@ -1,5 +1,11 @@
 # CineGenius · Übersicht der gesamten App
 
+## Gemeinsame Serverkorrekturen · 23. November 2026
+
+`036920b1ed86dd7a981aa354dd05a8921686fe25` ist mit `dpl_AatmCrVeFfjskKn5RbPH7PJTJQVV` READY auf www: freiwillige Zusatztätigkeit, durchgängige Verifizierungsanzeige und 24 ausgewählte Avatarstile mit Batch-Erzeugung. Gezielte Datenbankmigration geprüft; bestehende Bilder/Zuordnungen erhalten. Nicolais Haken öffentlich bei 393/1440px geprüft; erster regulärer Batch angenommen, neue Bildfertigstellung und tatsächliche Kosten noch nicht gemessen. Keine neue native Installation oder vollständige Geräte-/Registrierungsabnahme. Belege: `/srv/cinegenius/handoffs/20261123-avatar-batch-release/release-receipt.json`.
+
+Neuer Auftrag: Einrichtung für Firmen, Marktplatz, Locations und weitere Anbieter auf blockierende Pflichtfelder, Verbindungsfehler, Speichern und Wiederaufnahme prüfen. Diese Folgearbeit ist noch lokal.
+
 ## Mehrraum-Grundriss und Kontowiederaufnahme · Prüfcheckpoint vor 2208
 
 Installiert bleibt **2026112207**, mit147 vor Erststart bytegleichen Arbeitsdateien; Markus bestätigt keine zusätzliche Face-ID-Abfrage mehr. Kanten/Leisten sind physisch akzeptiert. Die persönliche Dispoanalyse unter produktivem Web `edfe8479ac2d8848846042353d0c059efa32269b` / `dpl_5QZW39f6jVwQsLL2acT3rwE61wVs` ist durch Nutzerergebnis und HTTP200 belegt. Historische gegenteilige Angaben unten sind frühere Prüfstände.
