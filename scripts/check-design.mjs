@@ -190,6 +190,7 @@ const contentLayoutTests = spawnSync(process.execPath, [
   "--test",
   fileURLToPath(new URL("../lib/native-app-content-region.test.mjs", import.meta.url)),
   fileURLToPath(new URL("../lib/native-app-content-layout.test.mjs", import.meta.url)),
+  fileURLToPath(new URL("../lib/native-browse-filters-layout.test.mjs", import.meta.url)),
 ], {
   cwd: fileURLToPath(new URL("../", import.meta.url)),
   stdio: ["ignore", "inherit", "inherit"],

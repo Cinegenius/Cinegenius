@@ -13121,7 +13121,25 @@
     "trainingExperienced": "Zkušený",
     "trainingBasic": "Základní poslušnost",
     "trainingNone": "Nevycvičený",
-    "results": "{count} výsledků"
+    "results": "{count} výsledků",
+    "place": "Místo/okruh",
+    "smart": "Oblasti",
+    "crew": "Profese",
+    "marketplace": "Kategorie",
+    "locations": "Typ lokace",
+    "companies": "Služba",
+    "jobs": "Typ práce",
+    "projects": "Typ projektu",
+    "areaMin": "Minimální plocha",
+    "heightMin": "Minimální výška stropu",
+    "parkingMin": "Minimální počet parkovacích míst",
+    "equipment": "Vybavení",
+    "cityOnly": "Pouze toto místo",
+    "radiusHint": "Okruh využívá veřejné přibližné údaje o místech. Záznamy bez polohy na mapě nejsou zahrnuty do hledání v okruhu.",
+    "chooseCity": "Pro nastavení okruhu vyber místo s polohou na mapě.",
+    "jobsMap": "Práce na mapě",
+    "projectPlaceUnavailable": "Projekty lze zatím filtrovat pouze podle země; pro hledání v okruhu chybí spolehlivé údaje o místech.",
+    "equipmentCategory": "Technika"
   },
   "MobilePreview": {
     "unavailableTitle": "CineGenius je momentálně nedostupný",
@@ -13651,7 +13669,10 @@
     "planSunChooseNorth": "Šipkou vyber, kde je na půdorysu sever.",
     "wpTeamMessagesLinkHelp": "Vyber online tým a klepni na „Propojit“. Propojí se pouze zprávy; tvoje soubory zůstanou na tomto zařízení.",
     "wpTeamMessagesChangeLink": "Propojit jiný tým",
-    "wpTeamMessagesLeaveFailed": "Stránka nereaguje na „Zpět“. Tvůj text zůstává zachován. Zkus to znovu."
+    "wpTeamMessagesLeaveFailed": "Stránka nereaguje na „Zpět“. Tvůj text zůstává zachován. Zkus to znovu.",
+    "wpSmallTodayProjectContacts": "Kontakty projektu",
+    "wpSmallTodayHintsCount": "Poznámky a kontroly · {count}",
+    "wpDispoWeatherPastDateCompact": "Minulý natáčecí den · bez předpovědi"
   },
   "AccountActivity": {
     "states": {},

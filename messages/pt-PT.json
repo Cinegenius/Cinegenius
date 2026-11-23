@@ -13121,7 +13121,25 @@
     "trainingExperienced": "Experiente",
     "trainingBasic": "Obediência básica",
     "trainingNone": "Sem treino",
-    "results": "{count} resultados"
+    "results": "{count} resultados",
+    "place": "Local/raio",
+    "smart": "Áreas",
+    "crew": "Especialidade",
+    "marketplace": "Categoria",
+    "locations": "Tipo de local de filmagem",
+    "companies": "Serviço",
+    "jobs": "Tipo de trabalho",
+    "projects": "Tipo de projeto",
+    "areaMin": "Área mínima",
+    "heightMin": "Pé-direito mínimo",
+    "parkingMin": "Número mínimo de lugares de estacionamento",
+    "equipment": "Equipamento",
+    "cityOnly": "Apenas esta localidade",
+    "radiusHint": "O raio utiliza dados públicos aproximados das localidades. As entradas sem posição no mapa ficam excluídas da pesquisa por raio.",
+    "chooseCity": "Escolhe uma localidade com posição no mapa para definir um raio.",
+    "jobsMap": "Empregos no mapa",
+    "projectPlaceUnavailable": "De momento, os projetos só podem ser filtrados por país; faltam dados fiáveis das localidades para a pesquisa por raio.",
+    "equipmentCategory": "Equipamento"
   },
   "MobilePreview": {
     "unavailableTitle": "CineGenius indisponível",
@@ -13651,7 +13669,10 @@
     "planSunChooseNorth": "Usa a seta para indicar onde fica o norte na planta.",
     "wpTeamMessagesLinkHelp": "Escolhe uma equipa online e toca em «Associar». Só as mensagens são associadas; os teus ficheiros ficam neste dispositivo.",
     "wpTeamMessagesChangeLink": "Associar outra equipa",
-    "wpTeamMessagesLeaveFailed": "A página não responde a «Voltar». O teu texto continua aqui. Tenta novamente."
+    "wpTeamMessagesLeaveFailed": "A página não responde a «Voltar». O teu texto continua aqui. Tenta novamente.",
+    "wpSmallTodayProjectContacts": "Contactos do projeto",
+    "wpSmallTodayHintsCount": "Notas e verificações · {count}",
+    "wpDispoWeatherPastDateCompact": "Dia de rodagem passado · sem previsão"
   },
   "AccountActivity": {
     "states": {},

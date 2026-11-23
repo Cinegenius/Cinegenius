@@ -11,6 +11,7 @@ import { unifiedSearchAccess } from "@/lib/unified-search-access";
 import { SEARCH_AREAS } from "@/lib/unified-search";
 import { validNearbyCursor } from "@/lib/unified-search-nearby";
 import { rateLimit } from "@/lib/rateLimit";
+import { readSearchBrowseFilters } from "@/lib/browse-filters";
 
 export const dynamic = "force-dynamic";
 export const maxDuration = 30;
@@ -26,19 +27,21 @@ export async function POST(request: NextRequest) {
     if (!unifiedSearchAccess(userId, process.env.ADMIN_USER_IDS).canReadResults) return json({ error: "in_development" }, 403);
     if (!(await rateLimit(`unified-search:${userId}`, 40, 60)).allowed) return json({ error: "rate_limited" }, 429);
     const body = await readGenieBody(request);
-    if (!body || typeof body !== "object" || Array.isArray(body) || Object.keys(body).some(key => !["plan", "cursor", "view", "discoverySeed"].includes(key))) return json({ error: "invalid_request" }, 400);
-    const { plan: rawPlan, cursor, view, discoverySeed } = body as { plan: unknown; cursor?: SearchCursor; view?: unknown; discoverySeed?: unknown };
+    if (!body || typeof body !== "object" || Array.isArray(body) || Object.keys(body).some(key => !["plan", "cursor", "view", "discoverySeed", "browseFilters"].includes(key))) return json({ error: "invalid_request" }, 400);
+    const { plan: rawPlan, cursor, view, discoverySeed, browseFilters: rawFilters } = body as { plan: unknown; cursor?: SearchCursor; view?: unknown; discoverySeed?: unknown; browseFilters?: unknown };
+    const browseFilters = rawFilters === undefined ? undefined : readSearchBrowseFilters(rawFilters);
+    if (browseFilters === null) return json({ error: "invalid_request" }, 400);
     if (view !== undefined && view !== "list" && view !== "map" && view !== "combined") return json({ error: "invalid_request" }, 400);
     const plan = validateResolvedSearchPlan(rawPlan);
     if (discoverySeed !== undefined && (!isDiscoverySeed(discoverySeed) || JSON.stringify(plan) !== JSON.stringify(nativeDiscoveryPlan()))) return json({ error: "invalid_request" }, 400);
     if (view === "combined" && (plan.version !== 2 || cursor !== undefined)) return json({ error: "invalid_request" }, 400);
-    if (cursor !== undefined && (!cursor || typeof cursor !== "object" || Array.isArray(cursor) || Object.keys(cursor).some(key => !["wishIndex", "area", "offset", "nearby", "segment", "rank", "discovery"].includes(key))
+    if (cursor !== undefined && (!cursor || typeof cursor !== "object" || Array.isArray(cursor) || Object.keys(cursor).some(key => !["wishIndex", "area", "offset", "nearby", "segment", "rank", "discovery", "browseKey"].includes(key))
       || !Number.isInteger(cursor.wishIndex) || cursor.wishIndex < 0 || cursor.wishIndex >= plan.searches.length
       || !Number.isInteger(cursor.offset) || cursor.offset < 0 || cursor.offset > 1_000_000
       || !validNearbyCursor(cursor.nearby)
-      || !SEARCH_AREAS.includes(cursor.area) || !["all", cursor.area].includes(plan.searches[cursor.wishIndex].area) || !validSearchCursor(plan, cursor, discoverySeed as string | undefined))) return json({ error: "invalid_request" }, 400);
+      || !SEARCH_AREAS.includes(cursor.area) || !["all", cursor.area].includes(plan.searches[cursor.wishIndex].area) || !validSearchCursor(plan, cursor, discoverySeed as string | undefined, browseFilters))) return json({ error: "invalid_request" }, 400);
     const signal = AbortSignal.any([request.signal, AbortSignal.timeout(20_000)]);
-    return json(await executeUnifiedSearch(plan, await getLocale(), userId, signal, cursor, view === "combined" ? "combined" : view === "map" ? "map" : "list", discoverySeed as string | undefined));
+    return json(await executeUnifiedSearch(plan, await getLocale(), userId, signal, cursor, view === "combined" ? "combined" : view === "map" ? "map" : "list", discoverySeed as string | undefined, browseFilters));
   } catch (error) {
     return json({ error: error instanceof GenieError ? error.code : "unavailable" }, error instanceof GenieError ? error.status : 503);
   }

@@ -13121,7 +13121,25 @@
     "trainingExperienced": "Experienced",
     "trainingBasic": "Basic obedience",
     "trainingNone": "Untrained",
-    "results": "{count} results"
+    "results": "{count} results",
+    "place": "Place/radius",
+    "smart": "Areas",
+    "crew": "Department",
+    "marketplace": "Category",
+    "locations": "Location type",
+    "companies": "Service",
+    "jobs": "Job type",
+    "projects": "Project type",
+    "areaMin": "Minimum area",
+    "heightMin": "Minimum ceiling height",
+    "parkingMin": "Minimum parking spaces",
+    "equipment": "Facilities",
+    "cityOnly": "Only this place",
+    "radiusHint": "The radius uses approximate public place information. Entries without a map position are excluded from radius searches.",
+    "chooseCity": "Choose a place with a map position to set a radius.",
+    "jobsMap": "Jobs on the map",
+    "projectPlaceUnavailable": "Projects can currently only be filtered by country; reliable place information is missing for radius searches.",
+    "equipmentCategory": "Equipment"
   },
   "MobilePreview": {
     "unavailableTitle": "CineGenius is currently unavailable",
@@ -13651,7 +13669,10 @@
     "planSunChooseNorth": "Use the north arrow to choose where north lies on your plan.",
     "wpTeamMessagesLinkHelp": "Choose an online team and tap “Link”. Only messages are linked; your files stay on this device.",
     "wpTeamMessagesChangeLink": "Link another team",
-    "wpTeamMessagesLeaveFailed": "The page is not responding to “Back”. Your entry is still here. Please try again."
+    "wpTeamMessagesLeaveFailed": "The page is not responding to “Back”. Your entry is still here. Please try again.",
+    "wpSmallTodayProjectContacts": "Project contacts",
+    "wpSmallTodayHintsCount": "Notes and checks · {count}",
+    "wpDispoWeatherPastDateCompact": "Past shooting day · no forecast"
   },
   "AccountActivity": {
     "states": {},

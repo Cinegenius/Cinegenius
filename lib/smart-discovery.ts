@@ -1,5 +1,6 @@
 import { inMapBounds, type MapBounds } from "./location-map";
 import { SEARCH_AREAS, searchGroupKey, type SearchArea, type SearchGroup, type SearchPlan, type SearchResult } from "./unified-search";
+import type { SearchBrowseFilters } from "./browse-filters";
 
 export type DiscoveryFilters = {
   hiddenAreas: SearchArea[];
@@ -7,6 +8,9 @@ export type DiscoveryFilters = {
   departments: string[];
   marketplace: string[];
   bounds: MapBounds | null;
+  browse?: SearchBrowseFilters;
+  /** Ephemeral canonical place picker text; never used as a search identity. */
+  placeLabel?: string;
 };
 export const emptyDiscoveryFilters = (): DiscoveryFilters => ({ hiddenAreas: [], hiddenWishes: [], departments: [], marketplace: [], bounds: null });
 

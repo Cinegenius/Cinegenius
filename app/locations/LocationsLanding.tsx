@@ -1,4 +1,9 @@
 "use client";
+import NativeLocationDetailFilters from "@/components/app/NativeLocationDetailFilters";
+import NativeBrowsePlaceFilters from "@/components/app/NativeBrowsePlaceFilters";
+import { useNativeBrowseRadius } from "@/lib/use-native-browse-radius";
+import { LOCATION_DETAIL_PARAMS } from "@/lib/location-browse-details";
+import { useNativeAppAppearance } from "@/lib/use-native-app-appearance";
 import { currencyOptions } from "@/lib/currency";
 
 import { TranslatedText } from "@/components/ContentTranslation";
@@ -40,7 +45,7 @@ export type LocationCard = {
   id: string; title: string; type: string; city: string; price: number;
   priceOnRequest: boolean; priceLabel: string;
   instantBook?: boolean; verified?: boolean;
-  lat: number | null; lng: number | null; metadata?: Record<string, unknown>;
+  cityCenter?: {lat:number|null;lng:number|null}; lat: number | null; lng: number | null; metadata?: Record<string, unknown>;
   image: string; rating: number; reviews: number;
   focalPoint?: { x: number; y: number } | null;
   place_country_code?: string | null; place_region_id?: string | null; place_city_id?: string | null;
@@ -53,12 +58,14 @@ function MapLoading() {
 }
 const LocationMap = dynamic(() => import("@/components/LocationMap"), { ssr: false, loading: MapLoading });
 export default function LocationsLanding({ allLocations, totalCount, initialFilters = DEFAULT_LOCATION_LANDING_FILTERS }: { allLocations: LocationCard[]; totalCount: number; initialFilters?: LocationLandingFilters }) {
+  const nativeAppearance = useNativeAppAppearance();
   const uiText = useTranslations();
 
   const locale = useLocale();
   const t = useTranslations("locations");
   const categoryText = useTranslations("menu");
   const [filters, setFilters] = useViewState("locations.landing.filters", () => ({ ...initialFilters }));
+  const [placeRadius, setPlaceRadius] = useNativeBrowseRadius("locations", filters.city);
   const [pagination, setPagination] = useViewState("locations.landing.pagination", { filterKey: "", visibleCount: 24 });
   const [viewMode, setViewMode] = useViewState<DirectoryView | "split">("locations.landing.view", "grid");
   // Preserve saved legacy split views as the shared map/list mode.
@@ -97,12 +104,12 @@ export default function LocationsLanding({ allLocations, totalCount, initialFilt
   };
   const resultsRef = useRef<HTMLDivElement>(null);
   const updateFilters = (patch: Partial<LocationLandingFilters>) => setFilters(current => ({ ...current, ...patch }));
-  const resetFilters = () => { setFilters({ ...DEFAULT_LOCATION_LANDING_FILTERS }); setMapBounds(null); clearLocation(); };
+  const resetFilters = () => { setPlaceRadius(null); setFilters({ ...DEFAULT_LOCATION_LANDING_FILTERS }); setMapBounds(null); clearLocation(); };
   const changePlaces = (next: PlaceFilterValue) => updateFilters({ ...next, ...(next.city ? { cityText: "" } : {}) });
   const categoryLabel = (value: string) => locationCategoryLabel(value, categoryText);
   const categories = locationLandingCategoryOptions(allLocations, categoryLabel, locale);
   const geography = useBrowseGeography(filters.sort === "featured" && !filters.country && !filters.region && !filters.city && !filters.cityText && !nearby.coordinates);
-  const matching = useMemo(() => prioritizeGeographically(filterLandingLocations(allLocations, filters, value => locationCategoryLabel(value, categoryText)), geography.preferred), [allLocations, filters, categoryText, geography.preferred]);
+  const matching = useMemo(() => prioritizeGeographically(filterLandingLocations(allLocations, filters, value => locationCategoryLabel(value, categoryText), placeRadius,{requireFacts:nativeAppearance}), geography.preferred), [allLocations, filters, categoryText, geography.preferred, placeRadius,nativeAppearance]);
   const mapLocations = useMemo(() => matching.filter(row => !nearby.coordinates || (hasCoordinates(row) && locationDistanceKm(nearby.coordinates, [row.lat, row.lng]) <= radiusKm)), [matching, nearby.coordinates, radiusKm]);
   const mapCounts = useMemo(() => mapResultCounts(mapLocations, mapBounds), [mapLocations, mapBounds]);
   const filtered = useMemo(() => effectiveView === "map" && mapBounds ? mapLocations.filter(row => inMapBounds(row, mapBounds)) : mapLocations, [effectiveView, mapLocations, mapBounds]);
@@ -113,7 +120,7 @@ export default function LocationsLanding({ allLocations, totalCount, initialFilt
   };
   const params = locationLandingParams(filters);
   const urlParams = params.toString();
-  const filterKey = JSON.stringify([urlParams, effectiveView === "map" ? nearby.coordinates ? nearbyViewportRevision : mapBounds : null, nearby.coordinates ? nearby.session : null, radiusKm, geography.key]);
+  const filterKey = JSON.stringify([urlParams, effectiveView === "map" ? nearby.coordinates ? nearbyViewportRevision : mapBounds : null, nearby.coordinates ? nearby.session : null, radiusKm, geography.key, placeRadius]);
   const visibleCount = pagination.filterKey === filterKey ? pagination.visibleCount : 24;
   const locations = filtered.slice(0, visibleCount);
   useViewUrl(urlParams ? `/locations?${urlParams}` : "/locations");
@@ -134,6 +141,7 @@ export default function LocationsLanding({ allLocations, totalCount, initialFilt
       onRemove: () => updateFilters(kind === "country" ? EMPTY_PLACE_FILTERS : kind === "region" ? { region: "", city: "" } : { city: "" }),
     }] : []),
     ...(filters.cityText ? [{ id: "city-text", label: `${uiText("Places.city")}: ${filters.cityText}`, onRemove: () => updateFilters({ cityText: "" }) }] : []),
+    ...LOCATION_DETAIL_PARAMS.flatMap(key => filters[key] ? [{ id:key, label: `${uiText(({sqm:"AdminReview.fields.sqm",ceiling:"AdminReview.fields.ceiling_height_m",parking:"AdminReview.fields.parking_spots",loading:"AdminReview.fields.loading_access",blackout:"AdminReview.fields.blackout_possible",natural:"AdminReview.fields.natural_light"})[key])}${["sqm","ceiling","parking"].includes(key) ? `: ${filters[key]}` : ""}`, onRemove:() => updateFilters({[key]:""}) }] : []),
     ...(filters.min ? [{ id: "min", label: `${uiText("Ui.text_c6e3466f40cb9d", { value1: filters.min })} ${activeCurrency}`, onRemove: () => updateFilters({ min: "" }) }] : []),
     ...(filters.max ? [{ id: "max", label: `${uiText("Ui.text_f47e415aff7a38", { value1: filters.max })} ${activeCurrency}`, onRemove: () => updateFilters({ max: "" }) }] : []),
   ];
@@ -174,7 +182,7 @@ export default function LocationsLanding({ allLocations, totalCount, initialFilt
 
       </PageHeader>
 
-      <MobileBrowseControls nativeCategoryKind="place" preference={<BrowseGeography geography={geography} />}
+      <MobileBrowseControls nativePlaceFilters={<><NativeBrowsePlaceFilters rows={allLocations} value={filters} onChange={value => {geography.setEnabled(false);clearLocation();changePlaces(value);}} radius={placeRadius} onRadiusChange={value => {if(value)clearLocation();setPlaceRadius(value);}} /><div className="flex flex-wrap gap-2"><button type="button" className="min-h-11 rounded-xl border border-border px-3 text-sm" disabled={nearby.locating} onClick={nearby.coordinates ? clearLocation : () => {setPlaceRadius(null);changePlaces(EMPTY_PLACE_FILTERS);locateMe();}}>{t(nearby.locating?"locating":nearby.coordinates?"locateActive":"locateMe")}</button><button type="button" onClick={shareSearch} className="min-h-11 rounded-xl border border-border px-3 text-sm">{t(copied?"copied":"shareBtn")}</button></div>{nearby.coordinates && <BrowseSelect label={t("radiusLabel")} value={String(radiusKm)} onChange={value => setRadiusKm(Number(value))} triggerClassName="browse-filter-select" options={[10,25,50,100,200,500].map(km => ({value:String(km),label:t("inRadius",{radius:km})}))} />}{nearby.error && <p role="alert" className="text-sm text-text-secondary">{t(nearby.error)}</p>}</>} nativeAdditionalFilters={<><MobileFilterField label={uiText("Regional.currency")}><MobileFilterSelect value={activeCurrency} onChange={currency => updateFilters(currency ? {currency} : {currency:"",min:"",max:"",sort:"featured"})} placeholder={uiText("Regional.allCurrencies")} options={currencyOptions(locale)} /></MobileFilterField><div className="grid grid-cols-2 gap-3">{(["min","max"] as const).map(key => <MobileFilterField key={key} label={uiText(key === "min" ? "Ui.text_84381d6fa4d29d" : "Ui.text_f7abc502297a74")}><input type="number" inputMode="decimal" min="0" value={filters[key]} onChange={event => updateFilters({[key]:event.target.value})} /></MobileFilterField>)}</div><MobileFilterField label={uiText("Ui.text_295029201d603e")}><MobileFilterSelect value={filters.lage} onChange={lage => updateFilters({lage})} placeholder={t("filterAll")} options={[{value:"Innen",label:t("filterInnen")},{value:"Außen",label:t("filterAussen")},{value:"Innen & Außen",label:t("filterInnenAussen")}]} /></MobileFilterField>{([['instant','filterInstant'],['verified','filterVerified']] as const).map(([key,label]) => <label key={key} className="flex min-h-11 items-center gap-3 text-sm text-text-secondary"><input type="checkbox" checked={filters[key] === "1"} onChange={event => updateFilters({[key]:event.target.checked?"1":""})} />{t(label)}</label>)}<NativeLocationDetailFilters value={filters} onChange={updateFilters} power={filters.power === "1"} onPowerChange={power => updateFilters({power:power?"1":""})} /></>} nativeFilterArea="locations" nativeCategoryKind="place" preference={<BrowseGeography geography={geography} />}
         query={filters.q} onQueryChange={value => updateFilters({ q: value })} searchPlaceholder={t("searchPlaceholder")}
         sortValue={filters.sort} sortOptions={sortOptions} onSortChange={value => { geography.setEnabled(false); updateFilters({ sort: value }); }}
         categoryLabel={t("categoryLabel")} allCategoryLabel={t("allLocations")} categories={categories}
@@ -184,6 +192,7 @@ export default function LocationsLanding({ allLocations, totalCount, initialFilt
         onReset={resetFilters} resetLabel={t("resetFilters")} showResultsLabel={t("showResults", { count: mapLocations.length })}
       >
         <MobileFilterField label={uiText("Regional.currency")}><MobileFilterSelect value={activeCurrency} onChange={currency => updateFilters(currency ? {currency} : {currency:"",min:"",max:"",sort:"featured"})} placeholder={uiText("Regional.allCurrencies")} options={currencyOptions(locale)} /></MobileFilterField>
+
         <PlaceFilters rows={allLocations} value={filters} onChange={value => { geography.setEnabled(false); changePlaces(value); }} />
         <div className="grid grid-cols-2 gap-3">
           <MobileFilterField label={uiText("Ui.text_84381d6fa4d29d")}><input aria-label={uiText("Ui.text_84381d6fa4d29d")} type="number" inputMode="decimal" min="0" step="0.01" value={filters.min} onChange={event => updateFilters({ min: event.target.value })} placeholder={uiText("Ui.text_d0c50fd56cbce3")} /></MobileFilterField>

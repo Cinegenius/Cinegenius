@@ -1,3 +1,4 @@
+import { publicMapPoint } from "@/lib/places/public-map-point";
 import { geocodeLocationCities } from "@/lib/location-map-geocoding";
 import { readPublicLocationArea, publicLocationBrowseMetadata, publicLocationFocalPoint } from "@/lib/location-privacy";
 import {getLocale, getTranslations} from "next-intl/server";
@@ -79,7 +80,7 @@ export default async function LocationsPage({ searchParams }: { searchParams: Pr
       type: l.category ?? "",
       city: placeDisplay(place, l.city ?? "", locale),
       price: l.price,
-      lat: coordinates.lat, lng: coordinates.lng,
+      lat: coordinates.lat, lng: coordinates.lng, cityCenter:publicMapPoint(l),
       // Project only public map/pricing fields, never arbitrary or private metadata.
       metadata: publicMetadata,
       priceLabel: listingPriceLabel(l.price, publicMetadata, "/Tag", locale, priceText),

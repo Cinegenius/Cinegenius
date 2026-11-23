@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowUpDown,Search,SlidersHorizontal,X } from "lucide-react";
+import { ArrowUpDown,Briefcase,Building2,Clapperboard,Home,MapPin,Search,SlidersHorizontal,Tag,UsersRound,X } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { cloneElement,isValidElement,useEffect,useRef,useState,type ReactNode } from "react";
 import BrowseSelect from "@/components/BrowseSelect";
@@ -9,6 +9,7 @@ import NativeBrowseToolbar, { NativeBrowseQuickFilter, type NativeBrowseQuickFil
 import { useNativeAppAppearance } from "@/lib/use-native-app-appearance";
 import { useSwipeDismiss } from "@/lib/use-swipe-dismiss";
 import { normalizeOccupation } from "@/lib/gripTaxonomy";
+import NativeBrowseFilterPanel, { NativeFilterChoices, NativeFilterTrigger } from "./app/NativeBrowseFilterPanel";
 
 
 export type BrowseOption = { value: string; label: string; searchTerms?: readonly string[] };
@@ -34,6 +35,14 @@ type MobileBrowseControlsProps = {
   nativeViewControls?: ReactNode;
   nativeQuickFilters?: ReactNode[];
   nativeCategoryKind?: NativeBrowseQuickFilterKind;
+  /** Same real place fields in a separate dropdown in native appearance. */
+  placeFilters?: ReactNode;
+  nativePlaceFilters?: ReactNode;
+  nativeAdditionalFilters?: ReactNode;
+  nativeFilterArea?: "crew" | "marketplace" | "locations" | "companies" | "jobs" | "projects";
+  nativeCategory?: { label: string; value: string; options: BrowseOption[]; onChange: (value: string) => void };
+  nativeCategoryPanel?: ReactNode;
+  nativeMoreCategory?: boolean;
   filterCount: number;
   chips?: BrowseChip[];
   onReset: () => void;
@@ -48,12 +57,19 @@ type MobileBrowseControlsProps = {
 export default function MobileBrowseControls({
   query, onQueryChange, searchPlaceholder, sortValue, sortOptions, onSortChange,
   categoryLabel, allCategoryLabel, categories, categoryValue, onCategoryChange, categoryPlacement = "filters",
-  resultSummary, resultCount, resultActions, viewControls, nativeViewControls, nativeQuickFilters, nativeCategoryKind = "category", filterCount, chips = [], onReset, resetLabel, showResultsLabel, preference, onSearch, children,
+  resultSummary, resultCount, resultActions, viewControls, nativeViewControls, nativeQuickFilters, nativeCategoryKind = "category", placeFilters, nativePlaceFilters, nativeAdditionalFilters, nativeFilterArea, nativeCategory, nativeCategoryPanel, nativeMoreCategory, filterCount, chips = [], onReset, resetLabel, showResultsLabel, preference, onSearch, children,
 }: MobileBrowseControlsProps) {
   const uiText = useTranslations();
   const nativeAppearance = useNativeAppAppearance();
 
   const [open, setOpen] = useState(false);
+  const [nativePanel, setNativePanel] = useState<"place" | "category" | "more" | null>(null);
+  const placeTrigger = useRef<HTMLButtonElement>(null), categoryTrigger = useRef<HTMLButtonElement>(null);
+  const nativeCategoryValue = nativeCategory?.value ?? categoryValue;
+  const nativeCategoryOptions = nativeCategory?.options ?? categories;
+  const nativeCategoryChange = nativeCategory?.onChange ?? onCategoryChange;
+  const nativeTitle = nativeCategory?.label ?? (nativeFilterArea ? uiText(`BrowseFilters.${nativeFilterArea}`) : categoryLabel);
+  const CategoryIcon = nativeFilterArea === "crew" ? UsersRound : nativeFilterArea === "locations" ? Home : nativeFilterArea === "companies" ? Building2 : nativeFilterArea === "jobs" ? Briefcase : nativeFilterArea === "projects" ? Clapperboard : Tag;
   const dialog = useRef<HTMLDialogElement>(null);
   const panel = useRef<HTMLElement>(null);
   const filterTrigger = useRef<HTMLButtonElement>(null);
@@ -134,11 +150,15 @@ export default function MobileBrowseControls({
 
         <div className="mobile-browse-summary">
           {nativeAppearance ? <NativeBrowseToolbar count={resultCount} countLabel={resultSummary} viewControls={nativeViewControls ?? viewControls}
-            filters={nativeQuickFilters ?? [
+            keepTwoFilters={!!nativeFilterArea}
+            filters={nativeFilterArea ? [
+              <NativeFilterTrigger key="place" triggerRef={placeTrigger} label={uiText("BrowseFilters.place")} icon={<MapPin aria-hidden="true" />} open={nativePanel === "place"} onClick={() => setNativePanel("place")} />,
+              <NativeFilterTrigger key="category" triggerRef={categoryTrigger} label={nativeTitle} icon={<CategoryIcon aria-hidden="true" />} active={!!nativeCategoryValue} open={nativePanel === "category"} onClick={() => setNativePanel("category")} />,
+            ] : nativeQuickFilters ?? [
               ...(categories.length || categoryValue ? [<NativeBrowseQuickFilter key="category" kind={nativeCategoryKind} label={categoryLabel} value={categoryValue} onChange={onCategoryChange} options={[{value:"",label:allCategoryLabel},...categories]} />] : []),
               <NativeBrowseQuickFilter key="sort" kind="sort" label={uiText("creators.sort")} value={sortValue} options={sortOptions} onChange={onSortChange} icon={<ArrowUpDown size={18} />} />,
             ]}
-            moreAction={<button ref={filterTrigger} type="button" onClick={() => setOpen(true)} aria-label={uiText("locations.filterBtn")} aria-haspopup="dialog" aria-expanded={open}><SlidersHorizontal size={17} aria-hidden="true" />{filterCount > 0 && <span className="native-browse-filter-dot" aria-hidden="true" />}</button>} />
+            moreAction={<button ref={filterTrigger} type="button" onClick={() => nativeFilterArea ? setNativePanel("more") : setOpen(true)} aria-label={uiText("locations.filterBtn")} aria-haspopup="dialog" aria-expanded={nativePanel === "more" || open}><SlidersHorizontal size={17} aria-hidden="true" />{filterCount > 0 && <span className="native-browse-filter-dot" aria-hidden="true" />}</button>} />
             : viewControls ? <div className="mobile-browse-summary-row">{resultActions ? <div className="mobile-browse-summary-with-actions"><BrowseResultCount count={resultCount} label={resultSummary} /><div className="mobile-browse-result-actions">{resultActions}</div></div> : <BrowseResultCount count={resultCount} label={resultSummary} />}{viewControls}</div> : <BrowseResultCount count={resultCount} label={resultSummary} />}
           {chips.length > 0 && (
             <div className="mobile-browse-chips" aria-label={uiText("Ui.text_75e581194056a5")}>
@@ -166,6 +186,19 @@ export default function MobileBrowseControls({
           )}
         </div>
       </div>
+
+      {nativeAppearance && nativePanel && <NativeBrowseFilterPanel
+        title={nativePanel === "place" ? uiText("BrowseFilters.place") : nativePanel === "category" ? nativeTitle : uiText("locations.filterBtn")}
+        trigger={nativePanel === "place" ? placeTrigger : nativePanel === "category" ? categoryTrigger : filterTrigger}
+        onClose={() => setNativePanel(null)} onReset={nativePanel === "category" ? () => nativeCategoryChange("") : onReset}>
+        {nativePanel === "place" ? nativePlaceFilters ?? placeFilters : nativePanel === "category" ? nativeCategoryPanel ?? <NativeFilterChoices label={nativeTitle}
+          selected={[nativeCategoryValue]} options={[{ value: "", label: allCategoryLabel }, ...nativeCategoryOptions]}
+          onChange={value => nativeCategoryChange(value === nativeCategoryValue ? "" : value)} /> : <div className="space-y-3">
+          {sortOptions.length > 1 && <MobileFilterField label={uiText("creators.sort")}><MobileFilterSelect label={uiText("creators.sort")} value={sortValue} options={sortOptions} onChange={onSortChange} placeholder={uiText("creators.sort")} /></MobileFilterField>}
+          {nativeMoreCategory && <MobileFilterField label={categoryLabel}><MobileFilterSelect label={categoryLabel} value={categoryValue} options={categories} onChange={onCategoryChange} placeholder={allCategoryLabel} /></MobileFilterField>}
+          {preference}{resultActions}{nativeAdditionalFilters ?? children}
+        </div>}
+      </NativeBrowseFilterPanel>}
 
       {open && (
         <dialog ref={dialog} className="mobile-filter-dialog" data-native-browse-dialog={nativeAppearance ? "v1" : undefined} aria-modal="true" aria-label={uiText("locations.filterBtn")} onCancel={event => { event.preventDefault(); setOpen(false); }}
@@ -198,6 +231,7 @@ export default function MobileBrowseControls({
                 <span>{categoryLabel}</span>
                 <MobileFilterSelect label={categoryLabel} value={categoryValue} onChange={onCategoryChange} options={categories} placeholder={allCategoryLabel} />
               </label>}
+              {placeFilters}
               {children}
             </div>
             <footer className="mobile-filter-panel__footer">

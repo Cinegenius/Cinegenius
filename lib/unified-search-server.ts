@@ -13,7 +13,8 @@ import { projectProfilePrivacy } from "@/lib/profile-privacy";
 import { getDeptLabel, departments, taxonomyLabel } from "@/lib/departments";
 import { placeReadFields } from "@/lib/places/catalog";
 import { publicMapPoint } from "@/lib/places/public-map-point";
-import { readPublicLocationArea } from "@/lib/location-privacy";
+import { readPublicLocationArea, publicLocationBrowseMetadata } from "@/lib/location-privacy";
+import { hasSearchBrowseFilters, matchesBrowseFilters, publicBrowseFacets, readSearchBrowseFilters, type SearchBrowseFilters } from "@/lib/browse-filters";
 import { countryCode, PLACE_COLUMNS, placeDisplay } from "@/lib/places/core";
 import { publicProjectMedia } from "@/lib/project-media-rights";
 import { listingPriceLabel } from "@/lib/listing-price";
@@ -45,7 +46,7 @@ export async function searchWishLabel(wish: SearchWish, locale: string) {
   return [title, places.join(" / ")].filter(Boolean).join(" · ");
 }
 
-function queryFor(area: SearchArea, wish: SearchWish, terms: string[], categories: string[], map = false) {
+function queryFor(area: SearchArea, wish: SearchWish, terms: string[], categories: string[], map = false, browse = false) {
   const evidence = !!(wish.requirements?.length || wish.exclude?.length);
   const patterns = (columns: string[]) => terms.flatMap(term => columns.map(column => `${column}.ilike.${containsLiteral(term)}`));
   const kinds = LISTING_AREAS[area];
@@ -55,7 +56,8 @@ function queryFor(area: SearchArea, wish: SearchWish, terms: string[], categorie
     const filters = patterns(["title", "description", "category", ...(area === "marketplace"
       ? ["metadata->>vehicle_subtype", "metadata->>make", "metadata->>model", "metadata->marketplace->>brand", "metadata->marketplace->>model"] : area === "animals" ? ["metadata->>special_skills"] : [])]);
     if (area === "marketplace" && categories.length) filters.push(`category.in.(${categories.map(filterLiteral).join(",")})`);
-    return filtered(db.from("privacy_visible_listings").select(`${PLACE_COLUMNS},id,user_id,title,city,type,category,price,image_url,price_currency:metadata->>price_currency, price_negotiable:metadata->price_negotiable,price_on_request:metadata->price_on_request,rental_type:metadata->>rental_type,marketplace:metadata->marketplace${evidence ? `,description${facts}` : ""}${map && area === "locations" ? ",location_area:metadata->location_area" : ""}`)
+    const details = browse && area === "locations" ? ",indoor_outdoor:metadata->>indoor_outdoor,power_available:metadata->power_available,natural_light:metadata->natural_light,blackout_possible:metadata->blackout_possible,loading_access:metadata->loading_access,sqm:metadata->sqm,ceiling_height_m:metadata->ceiling_height_m,parking_spots:metadata->parking_spots" : "";
+    return filtered(db.from("privacy_visible_listings").select(`${PLACE_COLUMNS},id,user_id,title,city,type,category,price,image_url,price_currency:metadata->>price_currency, price_negotiable:metadata->price_negotiable,price_on_request:metadata->price_on_request,rental_type:metadata->>rental_type,marketplace:metadata->marketplace${evidence || browse && area === "locations" ? `,description${facts}` : ""}${(map || browse) && area === "locations" ? ",location_area:metadata->location_area" : ""}${details}${browse && area === "jobs" ? ",job:metadata->job" : ""}`)
       .eq("published", true).in("type", kinds), filters).order("id");
   }
   if (area === "crew") {
@@ -70,11 +72,11 @@ function queryFor(area: SearchArea, wish: SearchWish, terms: string[], categorie
     const filters = patterns(["name", "description"]);
     if (categories.length) filters.push(`categories.ov.{${categories.map(filterLiteral).join(",")}}`);
     if (terms.length) filters.push(`services.ov.{${terms.map(filterLiteral).join(",")}}`);
-    return filtered(db.from("companies").select(`${PLACE_COLUMNS},id,slug,name,city,logo_url${evidence || cateringSearch(wish.query) ? ",description,categories,services" : ""}${cateringSearch(wish.query) ? ",catering_details" : ""}`)
+    return filtered(db.from("companies").select(`${PLACE_COLUMNS},id,slug,name,city,logo_url${evidence || cateringSearch(wish.query) || browse ? ",description,categories,services" : ""}${cateringSearch(wish.query) ? ",catering_details" : ""}`)
       .eq("published", true), filters).order("id");
   }
   // Published projects and private working copies are separate tables.
-  if (area === "projects") return filtered(db.from("projects").select(`${PLACE_COLUMNS},id,title,description,poster_url,metadata,created_by`), patterns(["title", "description", "director"])).order("id");
+  if (area === "projects") return filtered(db.from("projects").select(`${PLACE_COLUMNS},id,title,description,poster_url,metadata,created_by${browse ? ",type" : ""}`), patterns(["title", "description", "director"])).order("id");
   if (area === "organizations") return filtered(db.from("organizations").select(`${PLACE_COLUMNS},id,slug,name,city,logo_url${evidence ? ",description" : ""}`)
     .eq("moderation_status", "approved"), patterns(["name", "description"])).order("id");
   return filtered(db.from("organization_entries").select(`${PLACE_COLUMNS},id,slug,title,city,image_url,organization:organizations!inner(slug,moderation_status)${evidence ? ",summary,description" : ""}`)
@@ -98,7 +100,7 @@ type ResultPage = SearchGroup & { listPage?: SearchGroup };
 type ProfilePage = { data: Row[]; error: null; privacy: Awaited<ReturnType<typeof profileAccessFor>> };
 type ReadProfilePage = (offset: number) => Promise<ProfilePage>;
 type ReadDiscoveryAccess = ReturnType<typeof createNativeDiscoveryProfileAccess>;
-async function readGroup(plan: SearchPlan, wishIndex: number, area: SearchArea, offset: number, locale: string, viewerId: string | null, signal: AbortSignal, view: "list" | "map" | "combined", nearbyAfter?: NearbyCursor, segment?: string, rankAfter?: SearchRankCursor, readProfilePage?: ReadProfilePage, discoverySeed?: string, discoveryAfter?: DiscoveryCursor, readDiscoveryAccess?: ReadDiscoveryAccess): Promise<ResultPage> {
+async function readGroup(plan: SearchPlan, wishIndex: number, area: SearchArea, offset: number, locale: string, viewerId: string | null, signal: AbortSignal, view: "list" | "map" | "combined", nearbyAfter?: NearbyCursor, segment?: string, rankAfter?: SearchRankCursor, readProfilePage?: ReadProfilePage, discoverySeed?: string, discoveryAfter?: DiscoveryCursor, readDiscoveryAccess?: ReadDiscoveryAccess, browseFilters?: SearchBrowseFilters): Promise<ResultPage> {
   const wish = plan.searches[wishIndex];
   const taxonomy = await getTranslations({ locale, namespace: "Taxonomy" });
   const productionCrew = area === "crew" && !wish.department && isProductionCrewQuery(wish.query);
@@ -109,6 +111,9 @@ async function readGroup(plan: SearchPlan, wishIndex: number, area: SearchArea, 
   const categories = area === "marketplace" ? wishMarketplaceCategories(wish.query, catalog) : area === "companies"
     ? COMPANY_CATEGORIES.filter(category => [category.id, category.label, taxonomyLabel(category.label, ui)].some(label => terms.some(term => searchKey(label).includes(searchKey(term))))).map(category => category.id) : [];
   const group: ResultPage = { area, wishIndex, label: await searchWishLabel(wish, locale), results: [], nextOffset: null };
+  const browseActive = hasSearchBrowseFilters(browseFilters, area);
+  if (hasSearchBrowseFilters(browseFilters)) group.browseKey = browseFiltersKey(browseFilters!);
+  if (browseActive) group.totalCount = 0;
   if (segment) {
     group.segment = segment;
     const dept = departments.find(item => item.id === segment)!;
@@ -119,17 +124,18 @@ async function readGroup(plan: SearchPlan, wishIndex: number, area: SearchArea, 
   const limit = view !== "list" ? PAGE * 3 : VISIBLE;
   const origins = nearbyOrigins(wish);
   const shuffled = Boolean(discoverySeed && area === "crew");
-  const ranked = plan.version === 2 || shuffled;
-  const allowNearby = origins.length > 0 && !wish.places.some(place => place.radiusKm > 0) && (offset === 0 || !!nearbyAfter || ranked);
+  const ranked = plan.version === 2 || shuffled || browseActive;
+  const allowNearby = !browseFilters?.country && !browseFilters?.region && !browseFilters?.city && origins.length > 0 && !wish.places.some(place => place.radiusKm > 0) && (offset === 0 || !!nearbyAfter || ranked);
   const requestedOffset = offset;
   if (nearbyAfter || ranked) offset = 0;
   type Candidate = NearbyCursor & { row: Row; origin: string };
   const nearest: Candidate[] = [];
   const local: (Candidate & SearchRankCursor & { discoveryKey?: string })[] = [];
   let localExists = false;
+  let nearbyTotal = 0;
   const compareRank = (a: SearchRankCursor & { discoveryKey?: string }, b: SearchRankCursor & { discoveryKey?: string }) => shuffled
     ? (a.discoveryKey! < b.discoveryKey! ? -1 : a.discoveryKey! > b.discoveryKey! ? 1 : a.id.localeCompare(b.id))
-    : b.score - a.score || compareNearby(a, b);
+    : plan.version === 1 && browseActive ? a.id.localeCompare(b.id) : b.score - a.score || compareNearby(a, b);
   const afterRank = shuffled ? discoveryAfter ? { score: 0, distanceKm: 20050, id: discoveryAfter.id, discoveryKey: discoveryAfter.key } : undefined : rankAfter;
   const toResult = (input: Row): SearchResult => {
     let row = input;
@@ -161,6 +167,7 @@ async function readGroup(plan: SearchPlan, wishIndex: number, area: SearchArea, 
       const category = marketplaceCategory(row.category, result.type);
       if (category) result.facets = { marketplace: category.department };
     }
+    if (browseFilters !== undefined) result.facets = { ...result.facets, ...publicBrowseFacets(area, row) };
     if (!result.evidence && terms.some(term => [row.title, row.name].some(title => typeof title === "string" && searchKey(title).includes(searchKey(term))))) result.evidence = "title";
     if (wish.requirements?.length || catering) result.evidence = "requirements";
     if (["prop", "vehicle", "location"].includes(result.type)) result.priceLabel = listingPriceLabel(result.price, row, "/Tag", locale, market);
@@ -190,7 +197,7 @@ async function readGroup(plan: SearchPlan, wishIndex: number, area: SearchArea, 
   for (let pass = 0; ; pass++) {
     signal.throwIfAborted();
     const shared = productionCrew && readProfilePage ? await readProfilePage(offset) : null;
-    const { data, error } = shared ?? await queryFor(area, wish, productionCrew ? [] : terms, categories, view !== "list").range(offset, offset + PAGE - 1).abortSignal(signal);
+    const { data, error } = shared ?? await queryFor(area, wish, productionCrew ? [] : terms, categories, view !== "list", browseFilters !== undefined).range(offset, offset + PAGE - 1).abortSignal(signal);
     if (error) throw new Error("search_unavailable");
     const rows = (data ?? []) as unknown as Row[];
     const privacy = area === "crew" ? shared?.privacy ?? await (shuffled && readDiscoveryAccess
@@ -208,7 +215,11 @@ async function readGroup(plan: SearchPlan, wishIndex: number, area: SearchArea, 
       if (catering && !matchesCateringSearch(row, catering)) continue;
       if (!matchesSearchRequirements(row, wish)) continue;
       row = geographyRow(row, area);
+      if (browseFilters !== undefined) row = { ...row, ...placeReadFields(String(row.location ?? row.city ?? ""), row, locale) };
+      if (area === "locations" && browseFilters !== undefined) row = { ...row, ...publicLocationBrowseMetadata(row, String(row.description ?? "")) };
+      if (browseActive && !matchesBrowseFilters(area, row, browseFilters!)) continue;
       if (matchesWishPlaces(row, wish)) {
+        if (browseActive) group.totalCount! += 1;
         localExists = true;
         // Local matches always win, even if records changed between nearby pages.
         nearest.length = 0;
@@ -229,7 +240,7 @@ async function readGroup(plan: SearchPlan, wishIndex: number, area: SearchArea, 
         }
       } else if (allowNearby && !localExists) {
         const distance = nearbyDistance(row, origins);
-        if (distance) keepNearest({ ...distance, id: String(row.user_id && area === "crew" ? row.user_id : row.id), row });
+        if (distance) { nearbyTotal++; keepNearest({ ...distance, id: String(row.user_id && area === "crew" ? row.user_id : row.id), row }); }
       }
     }
     offset += rows.length;
@@ -252,6 +263,7 @@ async function readGroup(plan: SearchPlan, wishIndex: number, area: SearchArea, 
           const access = privacy.get(candidate.id);
           if (!access?.profile) throw new Error("search_unavailable");
           candidate.row = projectProfilePrivacy(candidate.row, access);
+          if (browseActive && !matchesBrowseFilters(area, candidate.row, browseFilters!)) throw new Error("search_unavailable");
         }
       }
     }
@@ -270,6 +282,7 @@ async function readGroup(plan: SearchPlan, wishIndex: number, area: SearchArea, 
     return group;
   }
   if (!group.results.length && allowNearby) {
+    if (browseActive) group.totalCount = nearbyTotal;
     group.nearby = true;
     group.results = nearest.slice(0, limit).map(candidate => ({ ...toResult(candidate.row), nearby: {
       distanceKm: Math.round(candidate.distanceKm), origin: candidate.origin,
@@ -288,10 +301,20 @@ async function readGroup(plan: SearchPlan, wishIndex: number, area: SearchArea, 
   return group;
 }
 
-export type SearchCursor = { wishIndex: number; area: SearchArea; offset: number; segment?: string; rank?: SearchRankCursor; nearby?: NearbyCursor; discovery?: DiscoveryCursor };
-export function validSearchCursor(plan: SearchPlan, cursor: SearchCursor, discoverySeed?: string) {
+export type SearchCursor = { wishIndex: number; area: SearchArea; offset: number; segment?: string; rank?: SearchRankCursor; nearby?: NearbyCursor; discovery?: DiscoveryCursor; browseKey?: string };
+export function browseFiltersKey(filters: SearchBrowseFilters) {
+  // Inferred parent IDs/default currency must not make an otherwise identical
+  // request cursor depend on object-property insertion order.
+  const canonical = (value: unknown): unknown => Array.isArray(value) ? value.map(canonical) : value && typeof value === "object"
+    ? Object.fromEntries(Object.entries(value).sort(([a], [b]) => a.localeCompare(b)).map(([key, item]) => [key, canonical(item)])) : value;
+  return createHash("sha256").update(JSON.stringify(canonical(filters))).digest("hex");
+}
+export function validSearchCursor(plan: SearchPlan, cursor: SearchCursor, discoverySeed?: string, browseFilters?: SearchBrowseFilters) {
   const wish = plan.searches[cursor.wishIndex];
   const shuffled = Boolean(discoverySeed && cursor.area === "crew");
+  const browseActive = hasSearchBrowseFilters(browseFilters, cursor.area);
+  const key = hasSearchBrowseFilters(browseFilters) ? browseFiltersKey(browseFilters!) : undefined;
+  if (cursor.browseKey !== undefined && cursor.browseKey !== key || key && cursor.offset > 0 && cursor.browseKey !== key) return false;
   if (cursor.discovery !== undefined && (!shuffled || cursor.rank || cursor.nearby || !validDiscoveryCursor(cursor.discovery))) return false;
   if (shuffled && cursor.offset > 0 && !cursor.discovery) return false;
   const segments = crewSearchSegments(wish);
@@ -299,12 +322,13 @@ export function validSearchCursor(plan: SearchPlan, cursor: SearchCursor, discov
   if (plan.version === 2 && cursor.area === "crew" && segments.length && !cursor.segment) return false;
   if (cursor.rank !== undefined) {
     const rank = cursor.rank;
-    if (plan.version !== 2 || cursor.nearby || !rank || typeof rank !== "object" || Array.isArray(rank) || Object.keys(rank).some(key => !["score", "distanceKm", "id"].includes(key))
+    if (plan.version !== 2 && !browseActive || cursor.nearby || !rank || typeof rank !== "object" || Array.isArray(rank) || Object.keys(rank).some(key => !["score", "distanceKm", "id"].includes(key))
       || !Number.isInteger(rank.score) || rank.score < 0 || rank.score > 3 || !Number.isFinite(rank.distanceKm) || rank.distanceKm < 0 || rank.distanceKm > 20050 || typeof rank.id !== "string" || !rank.id || rank.id.length > 200) return false;
   }
-  return plan.version !== 2 || cursor.offset === 0 || !!cursor.nearby || !!cursor.rank;
+  return plan.version !== 2 && !browseActive || cursor.offset === 0 || !!cursor.nearby || !!cursor.rank || shuffled && !!cursor.discovery;
 }
-export async function executeUnifiedSearch(plan: SearchPlan, locale: string, viewerId: string | null, signal: AbortSignal, cursor?: SearchCursor, view: "list" | "map" | "combined" = "list", discoverySeed?: string) {
+export async function executeUnifiedSearch(plan: SearchPlan, locale: string, viewerId: string | null, signal: AbortSignal, cursor?: SearchCursor, view: "list" | "map" | "combined" = "list", discoverySeed?: string, browseFilters?: SearchBrowseFilters) {
+  if (browseFilters !== undefined) { const validated = readSearchBrowseFilters(browseFilters); if (!validated) throw new Error("invalid_request"); browseFilters = validated; }
   if (discoverySeed !== undefined && (!isDiscoverySeed(discoverySeed) || JSON.stringify(plan) !== JSON.stringify(nativeDiscoveryPlan()))) throw new Error("invalid_request");
   // The seeded full scan reuses only this viewer's relationships within this
   // request; each profile page still reads its current settings before projection.
@@ -337,7 +361,7 @@ export async function executeUnifiedSearch(plan: SearchPlan, locale: string, vie
   await Promise.all(Array.from({ length: Math.min(tasks.length, 4) }, async () => {
     while (next < tasks.length) {
       const index = next++, task = tasks[index];
-      pages[index] = await readGroup(plan, task.wishIndex, task.area, task.offset, locale, viewerId, signal, view, task.nearby, task.segment, task.rank, readProfilePage, discoverySeed, task.discovery, readDiscoveryAccess);
+      pages[index] = await readGroup(plan, task.wishIndex, task.area, task.offset, locale, viewerId, signal, view, task.nearby, task.segment, task.rank, readProfilePage, discoverySeed, task.discovery, readDiscoveryAccess, browseFilters);
     }
   }));
   const groups = pages.map(({ listPage, ...group }) => view === "combined" && listPage ? listPage : group);

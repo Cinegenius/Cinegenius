@@ -1,4 +1,8 @@
 "use client";
+import NativeMarketplaceFilterChoices from "@/components/app/NativeMarketplaceFilterChoices";
+import NativeBrowsePlaceFilters from "@/components/app/NativeBrowsePlaceFilters";
+import { inBrowseRadius, matchesBrowsePlace } from "@/lib/browse-radius";
+import { useNativeBrowseRadius } from "@/lib/use-native-browse-radius";
 import { currencyOptions, isCurrencyCode, listingCurrency } from "@/lib/currency";
 
 import { TranslatedText } from "@/components/ContentTranslation";
@@ -16,7 +20,7 @@ import FloatingMapToggle from "@/components/FloatingMapToggle";
 import { useDirectoryMap } from "@/lib/use-directory-map";
 
 import PlaceFilters,{ EMPTY_PLACE_FILTERS } from "@/components/PlaceFilters";
-import { matchesPlace,browsePlaceOptions as placeOptions, UNASSIGNED_COUNTRY,placeSearchMatches } from "@/lib/places/core";
+import { browsePlaceOptions as placeOptions, UNASSIGNED_COUNTRY,placeSearchMatches } from "@/lib/places/core";
 
 import { listingPriceLabel } from "@/lib/listing-price";
 import { marketplaceCategoryLabel } from "@/lib/marketplace-offer";
@@ -109,6 +113,7 @@ function PropsInner({ serverListings, serverError = false, facetRows, initialDep
   if (!initialParameters.get("dept") && !initialParameters.get("sub") && initialDepartment) initialParameters.set("dept", initialDepartment);
   const initial = readMarketplaceBrowseState(initialParameters);
   const [placeFilters, setPlaceFilters] = useViewState("props.placeFilters", () => ({ country: searchParams.get("country") ?? "", region: searchParams.get("region") ?? "", city: searchParams.get("city") ?? "" }));
+  const [radius, setRadius] = useNativeBrowseRadius("props", placeFilters.city);
   const [cityText, setCityText] = useViewState("props.cityText", () => searchParams.get("cityText")?.trim() ?? "");
   const [query, setQuery] = useViewState("marketplace.query", initial.query);
   const [department, setDepartment] = useViewState<string | null>("marketplace.selectedDept", initial.department);
@@ -137,7 +142,7 @@ function PropsInner({ serverListings, serverError = false, facetRows, initialDep
   const activeDepartment = departments.find(row => row.id === selectedDept);
   const activeSubcategory = activeDepartment?.groups.find(row => row.id === selectedSub);
   const sortOptions = [{ value: "featured", label: geography.preferred ? uiText("BrowseGeography.recommended") : navigation("newest") }, { value: "price-asc", label: t("sortPriceAsc") }, { value: "price-desc", label: t("sortPriceDesc") }];
-  const filterKey = JSON.stringify([placeFilters.country, placeFilters.region, placeFilters.city, cityText.trim(), selectedDept, selectedSub, query.trim(), rentalTypeFilter, sortKey, activeCurrency, geography.key]);
+  const filterKey = JSON.stringify([placeFilters.country, placeFilters.region, placeFilters.city, cityText.trim(), selectedDept, selectedSub, query.trim(), rentalTypeFilter, sortKey, activeCurrency, geography.key, radius]);
   const requestKey = JSON.stringify([filterKey, locale]);
   const visibleCount = pagination.filterKey === filterKey ? pagination.visibleCount : MARKETPLACE_PAGE_SIZE;
   const currentPage = Math.max(1, Math.ceil(visibleCount / MARKETPLACE_PAGE_SIZE));
@@ -160,8 +165,8 @@ function PropsInner({ serverListings, serverError = false, facetRows, initialDep
     const rows = serverListings.filter(row => {
       if (activeCurrency && listingCurrency(row.meta) !== activeCurrency) return false;
       if ((selectedDept || selectedSub) && !marketplaceMatches(row.category, selectedDept, selectedSub || null, row.type)) return false;
-      if (!["country", "region", "city"].every(kind => matchesPlace(row, kind as "country" | "region" | "city", placeFilters[kind as keyof typeof placeFilters]))) return false;
-      if (cityText && !placeSearchMatches(row, cityText) && !row.location.toLocaleLowerCase(locale).includes(cityText.toLocaleLowerCase(locale))) return false;
+      if (!matchesBrowsePlace(row,placeFilters,radius)) return false;
+      if (cityText && !radius && !placeSearchMatches(row, cityText) && !row.location.toLocaleLowerCase(locale).includes(cityText.toLocaleLowerCase(locale))) return false;
       if (rentalTypeFilter !== "alle" && (row.rentalType ?? "miete") !== rentalTypeFilter && !(row.rentalType === "beides" && rentalTypeFilter !== "dienstleistung")) return false;
       if (!search) return true;
       return [row.title, row.location, row.description ?? "", marketplaceSearchTerms(row.category)].some(value => value.toLocaleLowerCase(locale).includes(search))
@@ -172,7 +177,7 @@ function PropsInner({ serverListings, serverError = false, facetRows, initialDep
     if (sortKey === "price-asc") rows.sort((a, b) => a.dailyRate - b.dailyRate);
     if (sortKey === "price-desc") rows.sort((a, b) => b.dailyRate - a.dailyRate);
     return prioritizeGeographically(rows, geography.preferred);
-  }, [serverListings, query, locale, catalog, departments, selectedDept, selectedSub, placeFilters, cityText, rentalTypeFilter, sortKey, activeCurrency, geography.preferred]);
+  }, [serverListings, query, locale, catalog, departments, selectedDept, selectedSub, placeFilters, cityText, rentalTypeFilter, sortKey, activeCurrency, geography.preferred, radius]);
   const [remote, setRemote] = useState<{ key: string; rows: Prop[]; count: number; pages: number; complete?: boolean } | null>(null);
   const remoteRef = useRef(remote);
   useEffect(() => { remoteRef.current = remote; }, [remote]);
@@ -188,27 +193,30 @@ function PropsInner({ serverListings, serverError = false, facetRows, initialDep
       const base = new URLSearchParams({ marketplace: "1", limit: String(MARKETPLACE_PAGE_SIZE), sort: sortKey });
       if(activeCurrency)base.set("currency",activeCurrency);
       if (geography.preferred) base.set("nearby", "1");
-      for (const kind of ["country", "region", "city"] as const) if (placeFilters[kind]) base.set(kind, placeFilters[kind]);
-      if (cityText) base.set("cityText", cityText);
+      for (const kind of ["country", "region", "city"] as const) if (placeFilters[kind] && !radius) base.set(kind, placeFilters[kind]);
+      if (cityText && !radius) base.set("cityText", cityText);
       if (selectedDept) base.set("dept", selectedDept);
       if (selectedSub) base.set("sub", selectedSub);
       if (query.trim()) base.set("q", query.trim());
       if (rentalTypeFilter !== "alle") base.set("offer", rentalTypeFilter);
-      if (viewMode === "map") {
+      if (viewMode === "map" || radius) {
         if (previous?.key === requestKey && previous.complete) return;
         base.set("limit", "100");
+        const fullPoolSignal = AbortSignal.any([controller.signal,AbortSignal.timeout(35_000)]);
         void (async () => {
           const rows: Prop[] = [];
           for (let page = 1; ; page++) {
+            fullPoolSignal.throwIfAborted();
             const params = new URLSearchParams(base); params.set("page", String(page));
-            const response = await fetch(`/api/listings?${params}`, { signal: controller.signal });
+            const response = await fetch(`/api/listings?${params}`, { signal: fullPoolSignal });
             if (!response.ok) throw new Error("listing_request_failed");
             const result = await response.json();
             if (!Array.isArray(result.data) || !Number.isSafeInteger(result.count) || result.count < 0) throw new Error("invalid_listing_response");
             if (controller.signal.aborted || serial !== requestSerial.current) return;
             rows.push(...result.data.map((row: Record<string, unknown>) => ({ ...marketplaceCardData(row), vendor: privateVendor })));
             const complete = result.data.length < 100 || page * 100 >= result.count;
-            setRemote({ key: requestKey, rows: [...new Map(rows.map(row => [row.id, row])).values()], count: result.count, pages: Math.ceil(rows.length / MARKETPLACE_PAGE_SIZE), complete });
+            const eligible = rows.filter(row => inBrowseRadius(row, radius));
+            setRemote({ key: requestKey, rows: [...new Map(eligible.map(row => [row.id, row])).values()], count: radius ? eligible.length : result.count, pages: Math.ceil(rows.length / MARKETPLACE_PAGE_SIZE), complete });
             if (complete) break;
           }
         })().catch(() => { if (!controller.signal.aborted && serial === requestSerial.current) setBrowseError(requestKey); });
@@ -229,10 +237,10 @@ function PropsInner({ serverListings, serverError = false, facetRows, initialDep
       }).catch(() => { if (!controller.signal.aborted && serial === requestSerial.current) setBrowseError(requestKey); });
     }, 250);
     return () => { window.clearTimeout(timer); controller.abort(); };
-  }, [requestKey, currentPage, retry, sortKey, placeFilters, cityText, selectedDept, selectedSub, query, rentalTypeFilter, privateVendor, viewMode, geography.preferred]);
+  }, [requestKey, currentPage, retry, sortKey, placeFilters, cityText, selectedDept, selectedSub, query, rentalTypeFilter, privateVendor, viewMode, geography.preferred, radius]);
   const hasRemote = remote?.key === requestKey;
   const failed = browseError === requestKey;
-  const browseLoading = !failed && (!hasRemote || (viewMode === "map" ? !remote.complete : remote.pages < currentPage));
+  const browseLoading = !failed && (!hasRemote || (viewMode === "map" || radius ? !remote.complete : remote.pages < currentPage));
   const resultRows = hasRemote ? remote.rows : filtered;
   const map = useDirectoryMap("marketplace", filterKey, resultRows, viewMode === "map");
   useEffect(() => {
@@ -249,7 +257,7 @@ function PropsInner({ serverListings, serverError = false, facetRows, initialDep
     setPagination({ filterKey: "", visibleCount: MARKETPLACE_PAGE_SIZE });
   }, [genieLaunch, map.setBounds, setQuery, setDepartment, setSubcategory, setOffer, setSort, setView, setCurrency, setCityText, setPlaceFilters, setPagination]);
   const resultCount = hasRemote ? remote.count : filtered.length;
-  const countNotice = !hasRemote || (viewMode === "map" && !remote.complete)
+  const countNotice = !hasRemote || ((viewMode === "map" || radius) && !remote.complete)
     ? navigation(failed ? "filterError" : "loading") : undefined;
   const listCount = viewMode === "map" ? map.rows.length : resultCount;
   const visibleRows = map.rows.slice(0, visibleCount);
@@ -353,7 +361,7 @@ function PropsInner({ serverListings, serverError = false, facetRows, initialDep
     } finally { pendingRatings.current.delete(key); }
   };
   const clearAll = () => {
-    setPlaceFilters(EMPTY_PLACE_FILTERS); setCityText(""); changeCategory(null); setQuery(""); setCurrency(""); setSort("featured"); setOffer("alle");
+    setRadius(null); setPlaceFilters(EMPTY_PLACE_FILTERS); setCityText(""); changeCategory(null); setQuery(""); setCurrency(""); setSort("featured"); setOffer("alle");
   };
   const chips: BrowseChip[] = [
     ...(activeCurrency ? [{id:"currency",label:activeCurrency,onRemove:()=>{setCurrency("");setSort("featured");}}] : []),
@@ -363,14 +371,14 @@ function PropsInner({ serverListings, serverError = false, facetRows, initialDep
     ...(["country", "region", "city"] as const).flatMap(kind => placeFilters[kind] ? [{ id: `place-${kind}`, label: placeFilters[kind] === UNASSIGNED_COUNTRY ? uiText("Places.countryUnassigned") : placeOptions(facetRows, kind, locale).find(option => option.value === placeFilters[kind])?.label ?? placeFilters[kind], onRemove: () => updatePlaceFilters(kind === "country" ? EMPTY_PLACE_FILTERS : kind === "region" ? { ...placeFilters, region: "", city: "" } : { ...placeFilters, city: "" }) }] : []),
     ...(rentalTypeFilter !== "alle" ? [{ id: "offer", label: navigation(rentalTypeFilter === "dienstleistung" ? "service" : rentalTypeFilter === "miete" ? "rent" : "buy"), onRemove: () => setOffer("alle") }] : []),
   ];
+  const currencyField = <MobileFilterField label={uiText("Regional.currency")}><MobileFilterSelect value={activeCurrency} onChange={value => {setCurrency(value);if(!value)setSort("featured");}} placeholder={uiText("Regional.allCurrencies")} options={currencyOptions(locale)} /></MobileFilterField>;
+  const categoryDetailField = activeDepartment && <MobileFilterField label={navigation("subcategory")}><MobileFilterSelect value={selectedSub} onChange={value => changeCategory(selectedDept, value)} placeholder={navigation("allInCategory", { category: activeDepartment.label })} options={activeDepartment.groups.map(row => ({ value: row.id, label: row.label }))} /></MobileFilterField>;
+  const offerField = <MobileFilterField label={navigation("offerType")}><MobileFilterSelect value={rentalTypeFilter === "alle" ? "" : rentalTypeFilter} onChange={value => setOffer(value === "miete" || value === "kauf" || value === "dienstleistung" ? value : "alle")} placeholder={uiText("common.all")} options={[{ value: "miete", label: navigation("rent") }, { value: "kauf", label: navigation("buy") }, { value: "dienstleistung", label: navigation("service") }].filter(option => facetRows.some(row => row.rentalType === option.value || (row.rentalType === "beides" && option.value !== "dienstleistung")))} /></MobileFilterField>;
   const viewControls = <DirectoryViewControls value={viewMode} onChange={setView} />;
   return <div className="min-h-screen mobile-bottom-nav-clear">
     <FloatingMapToggle mapActive={viewMode === "map"} onToggle={() => { setView(viewMode === "map" ? "list" : "map"); requestAnimationFrame(() => resultsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" })); }} />
-      <MobileBrowseControls preference={<BrowseGeography geography={geography} />} query={query} onQueryChange={setQuery} searchPlaceholder={t("searchPlaceholder")} sortValue={sortKey} sortOptions={sortOptions} onSortChange={value => { geography.setEnabled(false); setSort(value as MarketplaceSort); }} categoryLabel={navigation("category")} allCategoryLabel={navigation("allCategories")} categories={departments.map(row => ({ value: row.id, label: row.label }))} categoryValue={selectedDept ?? ""} onCategoryChange={value => changeCategory(value || null)} categoryPlacement="filters" resultCount={!hasRemote || browseLoading ? null : resultCount} resultSummary={countNotice ?? (browseLoading ? navigation("loading") : t("results", { count: resultCount }))} viewControls={viewControls} filterCount={chips.length} chips={chips} onReset={clearAll} resetLabel={t("clearAllFilters")} showResultsLabel={t("results", { count: resultCount })}>
-      <MobileFilterField label={uiText("Regional.currency")}><MobileFilterSelect value={activeCurrency} onChange={value => {setCurrency(value);if(!value)setSort("featured");}} placeholder={uiText("Regional.allCurrencies")} options={currencyOptions(locale)} /></MobileFilterField>
-      <PlaceFilters rows={facetRows} value={placeFilters} onChange={value => { geography.setEnabled(false); updatePlaceFilters(value); }} />
-      {activeDepartment && <MobileFilterField label={navigation("subcategory")}><MobileFilterSelect value={selectedSub} onChange={value => changeCategory(selectedDept, value)} placeholder={navigation("allInCategory", { category: activeDepartment.label })} options={activeDepartment.groups.map(row => ({ value: row.id, label: row.label }))} /></MobileFilterField>}
-      <MobileFilterField label={navigation("offerType")}><MobileFilterSelect value={rentalTypeFilter === "alle" ? "" : rentalTypeFilter} onChange={value => setOffer(value === "miete" || value === "kauf" || value === "dienstleistung" ? value : "alle")} placeholder={uiText("common.all")} options={[{ value: "miete", label: navigation("rent") }, { value: "kauf", label: navigation("buy") }, { value: "dienstleistung", label: navigation("service") }].filter(option => facetRows.some(row => row.rentalType === option.value || (row.rentalType === "beides" && option.value !== "dienstleistung")))} /></MobileFilterField>
+      <MobileBrowseControls nativeCategoryPanel={<NativeMarketplaceFilterChoices options={departments.map(row => ({value:row.id,label:row.label}))} selected={selectedDept?[selectedDept]:[]} onChange={value => changeCategory(value===selectedDept?null:value)}>{categoryDetailField}</NativeMarketplaceFilterChoices>} nativeAdditionalFilters={<>{currencyField}{offerField}</>} nativePlaceFilters={<NativeBrowsePlaceFilters rows={facetRows} value={placeFilters} onChange={value => {geography.setEnabled(false);updatePlaceFilters(value);}} radius={radius} onRadiusChange={setRadius} />} nativeFilterArea="marketplace" preference={<BrowseGeography geography={geography} />} query={query} onQueryChange={setQuery} searchPlaceholder={t("searchPlaceholder")} sortValue={sortKey} sortOptions={sortOptions} onSortChange={value => { geography.setEnabled(false); setSort(value as MarketplaceSort); }} categoryLabel={navigation("category")} allCategoryLabel={navigation("allCategories")} categories={departments.map(row => ({ value: row.id, label: row.label }))} categoryValue={selectedDept ?? ""} onCategoryChange={value => changeCategory(value || null)} categoryPlacement="filters" resultCount={!hasRemote || browseLoading || ((viewMode === "map" || radius) && !remote?.complete) ? null : resultCount} resultSummary={countNotice ?? (browseLoading ? navigation("loading") : t("results", { count: resultCount }))} viewControls={viewControls} filterCount={chips.length} chips={chips} onReset={clearAll} resetLabel={t("clearAllFilters")} showResultsLabel={t("results", { count: resultCount })}>
+      {currencyField}<PlaceFilters rows={facetRows} value={placeFilters} onChange={value => { geography.setEnabled(false); updatePlaceFilters(value); }} />{categoryDetailField}{offerField}
     </MobileBrowseControls>
 
     <div ref={resultsRef} className="site-container scroll-mt-24 py-4 sm:py-6">

@@ -13121,7 +13121,25 @@
     "trainingExperienced": "Tapasztalt",
     "trainingBasic": "Alapengedelmesség",
     "trainingNone": "Képzetlen",
-    "results": "{count} találat"
+    "results": "{count} találat",
+    "place": "Hely/körzet",
+    "smart": "Területek",
+    "crew": "Szakterület",
+    "marketplace": "Kategória",
+    "locations": "Helyszíntípus",
+    "companies": "Szolgáltatás",
+    "jobs": "Munkatípus",
+    "projects": "Projekttípus",
+    "areaMin": "Minimális alapterület",
+    "heightMin": "Minimális belmagasság",
+    "parkingMin": "Parkolóhelyek minimális száma",
+    "equipment": "Felszereltség",
+    "cityOnly": "Csak ez a hely",
+    "radiusHint": "A körzet nyilvános, hozzávetőleges helyadatokat használ. A térképes helyzet nélküli bejegyzések nem szerepelnek a körzeten belüli keresésben.",
+    "chooseCity": "A körzet beállításához válassz egy térképes helyzettel rendelkező helyet.",
+    "jobsMap": "Állások a térképen",
+    "projectPlaceUnavailable": "A projektek jelenleg csak ország szerint szűrhetők; a körzeten belüli kereséshez hiányoznak a megbízható helyadatok.",
+    "equipmentCategory": "Felszerelés"
   },
   "MobilePreview": {
     "unavailableTitle": "A CineGenius jelenleg nem érhető el",
@@ -13651,7 +13669,10 @@
     "planSunChooseNorth": "A nyíllal jelöld meg, merre van észak az alaprajzon.",
     "wpTeamMessagesLinkHelp": "Válassz egy online csapatot, majd koppints az „Összekapcsolás” gombra. Csak az üzenetek kapcsolódnak össze; a fájljaid ezen az eszközön maradnak.",
     "wpTeamMessagesChangeLink": "Másik csapat összekapcsolása",
-    "wpTeamMessagesLeaveFailed": "Az oldal nem reagál a „Vissza” gombra. A beírt szöveg megmarad. Próbáld újra."
+    "wpTeamMessagesLeaveFailed": "Az oldal nem reagál a „Vissza” gombra. A beírt szöveg megmarad. Próbáld újra.",
+    "wpSmallTodayProjectContacts": "Projektkapcsolatok",
+    "wpSmallTodayHintsCount": "Megjegyzések és ellenőrzések · {count}",
+    "wpDispoWeatherPastDateCompact": "Elmúlt forgatási nap · nincs előrejelzés"
   },
   "AccountActivity": {
     "states": {},

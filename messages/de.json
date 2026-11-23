@@ -13121,7 +13121,25 @@
     "trainingExperienced": "Erfahren",
     "trainingBasic": "Grundgehorsam",
     "trainingNone": "Ungeübt",
-    "results": "{count} Ergebnisse"
+    "results": "{count} Ergebnisse",
+    "place": "Ort/Umkreis",
+    "smart": "Bereiche",
+    "crew": "Gewerk",
+    "marketplace": "Kategorie",
+    "locations": "Motivtyp",
+    "companies": "Leistung",
+    "jobs": "Jobart",
+    "projects": "Projektart",
+    "areaMin": "Fläche ab",
+    "heightMin": "Deckenhöhe ab",
+    "parkingMin": "Parkplätze ab",
+    "equipment": "Ausstattung",
+    "cityOnly": "Nur dieser Ort",
+    "radiusHint": "Der Umkreis nutzt öffentliche ungefähre Ortsangaben. Einträge ohne Kartenposition passen nicht zum Umkreis.",
+    "chooseCity": "Wähle einen Ort mit Kartenposition, um einen Umkreis einzustellen.",
+    "jobsMap": "Jobs auf der Karte",
+    "projectPlaceUnavailable": "Projekte sind derzeit nur nach Land filterbar; für den Umkreis fehlen verlässliche Ortsangaben.",
+    "equipmentCategory": "Equipment"
   },
   "MobilePreview": {
     "unavailableTitle": "CineGenius ist gerade nicht erreichbar",
@@ -13651,7 +13669,10 @@
     "planSunChooseNorth": "Wähle mit dem Nordpfeil, wo Norden auf deinem Plan liegt.",
     "wpTeamMessagesLinkHelp": "Wähle ein Online-Team und tippe auf „Verbinden“. Nur Nachrichten werden verknüpft; deine Dateien bleiben auf diesem Gerät.",
     "wpTeamMessagesChangeLink": "Anderes Team verbinden",
-    "wpTeamMessagesLeaveFailed": "Die Seite reagiert gerade nicht auf „Zurück“. Deine Eingabe bleibt erhalten. Versuche es erneut."
+    "wpTeamMessagesLeaveFailed": "Die Seite reagiert gerade nicht auf „Zurück“. Deine Eingabe bleibt erhalten. Versuche es erneut.",
+    "wpSmallTodayProjectContacts": "Projektkontakte",
+    "wpSmallTodayHintsCount": "Hinweise und Prüfungen · {count}",
+    "wpDispoWeatherPastDateCompact": "Vergangener Drehtag · keine Vorhersage"
   },
   "AccountActivity": {
     "states": {},

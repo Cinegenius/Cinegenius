@@ -10,8 +10,8 @@ import BrowseSelect from "./BrowseSelect";
 import DirectoryViewControls, { type DirectoryView } from "./DirectoryViewControls";
 import { useNativeAppAppearance } from "@/lib/use-native-app-appearance";
 import { nativeSmartResultAreas, nativeSmartView } from "@/lib/native-smart-controls";
-import NativeSmartAreas from "./app/NativeSmartAreas";
-import NativeBrowseToolbar, { NativeBrowseQuickFilter } from "./app/NativeBrowseToolbar";
+import NativeSmartFilters from "./app/NativeSmartFilters";
+import { browseFilterControls, hasBrowseFilterControls } from "@/lib/browse-filter-controls";
 import nativeStyles from "./app/NativeSmartAreas.module.css";
 import ResultCard from "./SearchResultCard";
 import { searchGroupKey, type SearchGroup, type SearchPlan } from "@/lib/unified-search";
@@ -110,6 +110,16 @@ export default function SmartSearchExplorer({ plan, initialGroups, initialMapGro
   const writeControls = setStored ?? setLocalControls;
   const filters = nativeAppearance ? controls.filters : webFilters;
   const mapOpen = nativeAppearance ? controls.mapOpen : webMapOpen;
+  const browseRaw = nativeAppearance ? controls.filters.browse : undefined;
+  const browseFilters = useMemo(() => browseFilterControls(nativeAppearance ? {
+    ...(browseRaw ?? {version:1 as const}),
+    departments:browseRaw?.departments ?? controls.filters.departments,
+    marketplace:browseRaw?.marketplace ?? controls.filters.marketplace,
+  } : undefined), [browseRaw, nativeAppearance, controls.filters.departments, controls.filters.marketplace]);
+  const browseKey = JSON.stringify(browseFilters);
+  const [loadedBrowseKey,setLoadedBrowseKey] = useState(JSON.stringify({version:1}));
+  const requestedBrowseKey = useRef(JSON.stringify({version:1}));
+  const filteredGroups = useMemo(() => nativeAppearance && loadedBrowseKey !== browseKey ? [] : groups, [nativeAppearance, loadedBrowseKey, browseKey, groups]);
   const view = nativeSmartView(mapOpen, controls.view);
   const setFilters = (action: SetStateAction<DiscoveryFilters>) => {
     if (!nativeAppearance) { setWebFilters(action); return; }
@@ -178,8 +188,8 @@ export default function SmartSearchExplorer({ plan, initialGroups, initialMapGro
     try {
       const response = await fetch("/api/search/unified", { method: "POST", headers: { "Content-Type": "application/json" }, credentials: "same-origin",
         cache: "no-store", referrerPolicy: "no-referrer", signal: AbortSignal.any([controller.signal, AbortSignal.timeout(35_000)]),
-        body: JSON.stringify({ plan, view: requestView, ...(discoverySeed ? { discoverySeed } : {}), ...(group ? { cursor: { area: group.area, wishIndex: group.wishIndex, offset: group.nextOffset,
-          ...(group.discoveryCursor ? { discovery: group.discoveryCursor } : {}), ...(group.segment ? { segment: group.segment } : {}), ...(group.rankCursor ? { rank: group.rankCursor } : {}), ...(group.nearbyCursor ? { nearby: group.nearbyCursor } : {}) } } : {}) }) });
+        body: JSON.stringify({ plan, view: requestView, ...(nativeAppearance ? {browseFilters} : {}), ...(discoverySeed ? { discoverySeed } : {}), ...(group ? { cursor: { area: group.area, wishIndex: group.wishIndex, offset: group.nextOffset,
+          ...(group.browseKey ? {browseKey:group.browseKey} : {}), ...(group.discoveryCursor ? { discovery: group.discoveryCursor } : {}), ...(group.segment ? { segment: group.segment } : {}), ...(group.rankCursor ? { rank: group.rankCursor } : {}), ...(group.nearbyCursor ? { nearby: group.nearbyCursor } : {}) } } : {}) }) });
       if (!current()) return;
       if (response.status === 401 || response.status === 403) { denied.current(); return; }
       if (!response.ok) throw new Error("unavailable");
@@ -199,7 +209,7 @@ export default function SmartSearchExplorer({ plan, initialGroups, initialMapGro
       }
       setGroups(groups => !current() ? groups : group ? mergeDiscoveryPage(groups, data.groups.find((page: SearchGroup) => searchGroupKey(page) === key))
         : nativeAppearance && discoverySeed && requestView === "map" ? preserveDiscoveryMapOrder(groups, data.groups) : data.groups);
-      if (!group) { mapReceived.current = performance.now(); setMapReady(true); }
+      if (!group) { mapReceived.current = performance.now(); setMapReady(true); setLoadedBrowseKey(browseKey); }
     } catch { if (current()) setErrors(values => [...new Set([...values, key])]); }
     finally {
       if (requests.current.get(key) === controller) {
@@ -207,7 +217,18 @@ export default function SmartSearchExplorer({ plan, initialGroups, initialMapGro
         setPending(values => values.filter(value => value !== key));
       }
     }
-  }, [plan, mapOpen, mapReady, nativeAppearance, discoverySeed]);
+  }, [plan, mapOpen, mapReady, nativeAppearance, discoverySeed, browseKey, browseFilters]);
+
+  useEffect(() => {
+    if (!nativeAppearance || requestedBrowseKey.current === browseKey) return;
+    requestedBrowseKey.current = browseKey;
+    // New filter scope invalidates every prior page and transport before reading.
+    poolGeneration.current += 1;
+    visitedPages.current.clear();
+    for (const request of requests.current.values()) request.abort();
+    requests.current.clear();
+    void read();
+  }, [browseKey, nativeAppearance, read]);
 
   useEffect(() => {
     if (initialMapGroups || !mapOpen || mapReady) return;
@@ -222,16 +243,16 @@ export default function SmartSearchExplorer({ plan, initialGroups, initialMapGro
   const available = useMemo(() => discoveryFacets(filterDiscoveryGroups(groups, { ...emptyDiscoveryFilters(), hiddenAreas: filters.hiddenAreas, hiddenWishes: filters.hiddenWishes })), [groups, filters.hiddenAreas, filters.hiddenWishes]);
   // Never feed a clipped viewport back into its own map. The pool stays stable
   // through pan/zoom, so widening the viewport can restore previously hidden rows.
-  const mapPool = useMemo(() => sortDiscoveryGroups(filterDiscoveryGroups(groups, { hiddenAreas: filters.hiddenAreas, hiddenWishes: filters.hiddenWishes,
+  const mapPool = useMemo(() => sortDiscoveryGroups(filterDiscoveryGroups(filteredGroups, { hiddenAreas: filters.hiddenAreas, hiddenWishes: filters.hiddenWishes,
     departments: filters.departments, marketplace: filters.marketplace, bounds: null }), plan),
-    [groups, filters.hiddenAreas, filters.hiddenWishes, filters.departments, filters.marketplace, plan]);
+    [filteredGroups, filters.hiddenAreas, filters.hiddenWishes, filters.departments, filters.marketplace, plan]);
   const viewport = useMemo(() => nativeAppearance && mapOpen ? nativeSmartViewportGroups(mapPool, filters.bounds) : null,
     [nativeAppearance, mapOpen, mapPool, filters.bounds]);
-  const visible = useMemo(() => viewport?.visible ?? sortDiscoveryGroups(filterDiscoveryGroups(groups, filters), plan), [viewport, groups, filters, plan]);
+  const visible = useMemo(() => viewport?.visible ?? sortDiscoveryGroups(filterDiscoveryGroups(filteredGroups, filters), plan), [viewport, filteredGroups, filters, plan]);
   const unmappedCount = viewport ? discoveryCount(viewport.unmapped) : 0;
   const count = discoveryCount(visible);
   const hasMapPositions = groups.some(group => group.results.some(result => result.mapPoint));
-  const filtered = !!(filters.hiddenAreas.length || filters.hiddenWishes.length || filters.departments.length || filters.marketplace.length || filters.bounds);
+  const filtered = !!(filters.hiddenAreas.length || filters.hiddenWishes.length || filters.departments.length || filters.marketplace.length || filters.bounds || hasBrowseFilterControls(browseFilters));
   const reset = () => setFilters(emptyDiscoveryFilters());
   const labelWish = (index: number) => {
     const wish = plan.searches[index];
@@ -243,19 +264,10 @@ export default function SmartSearchExplorer({ plan, initialGroups, initialMapGro
   const moreAction = <button ref={filterTrigger} type="button" className="smart-filter-trigger" aria-label={t("discovery.filterTitle")} aria-expanded={filtersOpen} aria-controls={filterId} onClick={() => setFiltersOpen(value => !value)}>
     <SlidersHorizontal size={18} aria-hidden="true" />{filtered && <span className="smart-filter-dot" aria-hidden="true" />}
   </button>;
-  const nativeQuickFilters = nativeAppearance ? (["departments", "marketplace"] as const)
-    .filter(kind => available[kind].length > 0 || filters[kind].length > 0)
-    .map(kind => <NativeBrowseQuickFilter key={kind} kind={kind === "departments" ? "departments" : "category"} label={ui(kind === "departments" ? "creators.deptFilter" : "MarketplaceNavigation.category")}
-      value={filters[kind].length > 1 ? "__selection" : filters[kind][0] ?? ""}
-      options={[{ value: "", label: t("discovery.all") },
-        ...(filters[kind].length > 1 ? [{ value: "__selection", label: t("discovery.activeFilters"), disabled: true }] : []),
-        ...[...new Set([...available[kind], ...filters[kind]])].map(id => ({ value: id, label: facetName(kind, id), disabled: !available[kind].includes(id) }))]}
-      onChange={value => { if (value !== "__selection") setFilters(current => ({ ...current, [kind]: value ? [value] : [] })); }} />) : [];
 
   return <div className={`smart-explorer${nativeAppearance ? ` ${resultStyles.explorer}` : ""}`} data-smart-explorer data-map-open={mapOpen}>
-    {nativeAppearance && <NativeSmartAreas available={areas} hidden={filters.hiddenAreas} onChange={hiddenAreas => setFilters(value => ({ ...value, hiddenAreas }))} />}
-    {nativeAppearance ? <NativeBrowseToolbar count={count} countLabel={t("discovery.loaded", { count })} filters={nativeQuickFilters}
-      moreAction={moreAction} viewControls={<DirectoryViewControls value={view} onChange={setView} views={["grid", "list", "map"]} />} /> : <div className="smart-result-toolbar">
+    {nativeAppearance ? <NativeSmartFilters groups={groups} count={count} busy={loadedBrowseKey !== browseKey || pending.includes("initial")} failed={errors.includes("initial")} filters={{...filters,browse:browseFilters}}
+      onChange={value => setFilters({...value,departments:[],marketplace:[]})} views={<DirectoryViewControls value={view} onChange={setView} views={["grid", "list", "map"]} />} /> : <div className="smart-result-toolbar">
       <BrowseResultCount count={count} label={t("discovery.loaded", { count })} />
       <BrowseSelect label={t("allAreas")} value={areaValue} className="smart-area-select" triggerClassName="smart-area-trigger"
         options={[{ value: "all", label: t("allAreas") }, ...areas.map(area => ({ value: area, label: t(`areas.${area}`) })), ...(areaValue === "selection" ? [{ value: "selection", label: t("discovery.activeFilters"), disabled: true }] : [])]}
@@ -263,7 +275,7 @@ export default function SmartSearchExplorer({ plan, initialGroups, initialMapGro
       {moreAction}
       <DirectoryViewControls value={mapOpen ? "map" : "list"} onChange={setView} views={["list", "map"]} />
     </div>}
-    <section id={filterId} hidden={!filtersOpen} onKeyDown={event => { if (event.key === "Escape") { event.stopPropagation(); closeFilters(); } }} className="smart-filter-panel space-y-3 rounded-xl border border-border bg-bg-secondary p-3 sm:p-4" aria-label={t("discovery.filterTitle")}>
+    {!nativeAppearance && <section id={filterId} hidden={!filtersOpen} onKeyDown={event => { if (event.key === "Escape") { event.stopPropagation(); closeFilters(); } }} className="smart-filter-panel space-y-3 rounded-xl border border-border bg-bg-secondary p-3 sm:p-4" aria-label={t("discovery.filterTitle")}>
 
       <div className="flex flex-wrap items-center gap-2">
         <h2 className="flex-1 text-base font-semibold text-text-primary">{t("discovery.filterTitle")}</h2>
@@ -291,7 +303,7 @@ export default function SmartSearchExplorer({ plan, initialGroups, initialMapGro
         {(["departments", "marketplace"] as const).flatMap(kind => filters[kind].map(id => <button type="button" key={`${kind}:${id}`} className={`${chip} ${activeChip}`} aria-label={t("discovery.removeFilter", { name: facetName(kind, id) })} onClick={() => setFilters(value => ({ ...value, [kind]: toggle(value[kind], id) }))}>{facetName(kind, id)}<X size={14} aria-hidden="true" /></button>))}
         {filters.bounds && <button type="button" className={`${chip} ${activeChip}`} onClick={() => setFilters(value => ({ ...value, bounds: null }))}>{t("discovery.mapArea")}<X size={14} aria-hidden="true" /></button>}
       </div>}
-    </section>
+    </section>}
     {/* One map instance; switching views keeps zoom and current result filters. */}
     <div className="smart-map-panel" hidden={!mapOpen}>{mapReady && hasMapPositions && <SmartSearchMap groups={nativeAppearance ? mapPool : visible} active={mapOpen} bounds={filters.bounds} onApplyBounds={bounds => setFilters(value => ({ ...value, bounds }))} />}
       {mapReady && !hasMapPositions && count > 0 && <p className="text-xs text-text-muted">{t("discovery.unmapped", { count })}</p>}
@@ -303,7 +315,7 @@ export default function SmartSearchExplorer({ plan, initialGroups, initialMapGro
     </div> : <ContentTranslationNotice />}
     {errors.includes("initial") && <div role="alert" className="text-sm text-text-secondary"><p>{t("error")}</p><button type="button" className="min-h-11 min-w-11 text-gold" onClick={() => void read()} disabled={pending.includes("initial")}>{t("retry")}</button></div>}
     {pending.includes("initial") && <p role="status" className="text-sm text-text-muted">{t("loading")}</p>}
-    {!count && <div role="status" className="rounded-xl border border-border bg-bg-secondary p-4 text-sm text-text-secondary"><p>{t(filtered ? "discovery.emptyFilters" : "emptyGroup")}</p>{filtered && <button type="button" className="min-h-11 min-w-11 text-gold" onClick={reset}>{t("discovery.reset")}</button>}</div>}
+    {!count && loadedBrowseKey === browseKey && !pending.includes("initial") && <div role="status" className="rounded-xl border border-border bg-bg-secondary p-4 text-sm text-text-secondary"><p>{t(filtered ? "discovery.emptyFilters" : "emptyGroup")}</p>{filtered && <button type="button" className="min-h-11 min-w-11 text-gold" onClick={reset}>{t("discovery.reset")}</button>}</div>}
     {(nativeAppearance ? nativeSmartResultAreas(discoveryAreas(visible)) : discoveryAreas(visible)).map(area => <ResultArea key={area} area={area} colors={colors} native={nativeAppearance} autoLoad={nativeAppearance && discoveryAreas(mapPool).length === 1} groups={visible.filter(group => group.area === area)} pending={pending} errors={errors}
       {...(nativeAppearance ? { grid: view === "grid", limit: controls.limits[area] ?? (view === "grid" ? 6 : 3), setLimit: (limit: number) => setLimit(area, limit) } : {})}
       more={group => void read(groups.find(item => searchGroupKey(item) === searchGroupKey(group))!)} />)}

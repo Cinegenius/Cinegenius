@@ -1,4 +1,8 @@
 "use client";
+import NativeBrowsePlaceFilters from "@/components/app/NativeBrowsePlaceFilters";
+import { matchesBrowsePlace } from "@/lib/browse-radius";
+import { useNativeBrowseRadius } from "@/lib/use-native-browse-radius";
+import { companyMatchesService } from "@/lib/company-service-filter";
 import BrowseGeography from "@/components/BrowseGeography";
 import { prioritizeGeographically } from "@/lib/browse-geography";
 import { useBrowseGeography } from "@/lib/use-browse-geography";
@@ -13,7 +17,7 @@ import type { DirectoryCompany as Company } from "@/lib/company-directory";
 import { useDirectoryMap } from "@/lib/use-directory-map";
 
 import { animalCategoryLabel,animalCompanySearchText,isAnimalCompany } from "@/lib/animal-taxonomy";
-import { canonicalFilterValue,matchesPlace,placeDisplay,browsePlaceOptions as placeOptions, UNASSIGNED_COUNTRY,placeSearchMatches } from "@/lib/places/core";
+import { canonicalFilterValue,placeDisplay,browsePlaceOptions as placeOptions, UNASSIGNED_COUNTRY,placeSearchMatches } from "@/lib/places/core";
 
 import { useViewState } from "@/lib/use-view-state";
 
@@ -65,6 +69,7 @@ export default function CompaniesContent({ initialCompanies }: { initialCompanie
   const [cityFilter, setCityFilter] = useViewState("companies.cityFilter", "");
   const [countryFilter, setCountryFilter] = useViewState("companies.countryFilter", "");
   const [regionFilter, setRegionFilter] = useViewState("companies.regionFilter", "");
+  const [radius, setRadius] = useNativeBrowseRadius("companies", cityFilter);
   const [verifiedOnly, setVerifiedOnly] = useViewState("companies.verifiedOnly", false);
   const [sortKey, setSortKey] = useViewState("companies.sortKey", "newest");
   const geography = useBrowseGeography(sortKey === "newest" && !countryFilter && !regionFilter && !cityFilter);
@@ -97,17 +102,15 @@ export default function CompaniesContent({ initialCompanies }: { initialCompanie
         cateringSearchText(c).includes(q) || (isAnimalCompany(c.categories) && animalCompanySearchText(c.animal_details, c.categories).toLowerCase().includes(q))
       );
     }
-    if (selectedCategory) result = result.filter((c) => c.categories.includes(selectedCategory));
-    if (cityFilter) result = result.filter((c) => matchesPlace(c, "city", cityFilter));
-    if (regionFilter) result = result.filter(row => matchesPlace(row, "region", regionFilter));
-    if (countryFilter) result = result.filter(c => matchesPlace(c, "country", countryFilter));
+    if (selectedCategory) result = result.filter((c) => companyMatchesService(c,selectedCategory));
+    result = result.filter(c => matchesBrowsePlace(c,{country:countryFilter,region:regionFilter,city:cityFilter},radius));
     if (verifiedOnly) result = result.filter((c) => c.verified);
     if (sortKey === "newest") result = [...result].sort((a, b) => b.created_at.localeCompare(a.created_at));
     if (sortKey === "name") result = [...result].sort((a, b) => a.name.localeCompare(b.name, locale));
     return prioritizeGeographically(result, geography.preferred);
-  }, [initialCompanies, search, selectedCategory, cityFilter, countryFilter, regionFilter, verifiedOnly, sortKey, locale, geography.preferred]);
+  }, [initialCompanies, search, selectedCategory, cityFilter, countryFilter, regionFilter, verifiedOnly, sortKey, locale, geography.preferred, radius]);
 
-  const filterKey = JSON.stringify([search, selectedCategory, cityFilter, countryFilter, regionFilter, verifiedOnly, sortKey, geography.key]);
+  const filterKey = JSON.stringify([search, selectedCategory, cityFilter, countryFilter, regionFilter, verifiedOnly, sortKey, geography.key, radius]);
   const map = useDirectoryMap("companies", filterKey, filtered, viewMode === "map");
   const resultsRef = useRef<HTMLDivElement>(null);
   const mapItems = useMemo(() => filtered.map(company => ({
@@ -125,7 +128,7 @@ export default function CompaniesContent({ initialCompanies }: { initialCompanie
   const hasMore = paginated.length < map.rows.length;
 
   const clearAll = () => {
-    setSearch(""); setSelectedCategory(null); setCityFilter("");
+    setRadius(null); setSearch(""); setSelectedCategory(null); setCityFilter("");
     setCountryFilter(""); setRegionFilter(""); setVerifiedOnly(false); setSortKey("newest"); map.setBounds(null); resetPage();
   };
 
@@ -147,7 +150,7 @@ export default function CompaniesContent({ initialCompanies }: { initialCompanie
         setViewMode(viewMode === "map" ? "list" : "map");
         requestAnimationFrame(() => resultsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }));
       }} />
-      <MobileBrowseControls preference={<BrowseGeography geography={geography} />}
+      <MobileBrowseControls nativePlaceFilters={<NativeBrowsePlaceFilters rows={initialCompanies} value={{country:countryFilter,region:regionFilter,city:cityFilter}} onChange={value => {geography.setEnabled(false);setCountryFilter(value.country);setRegionFilter(value.region);setCityFilter(value.city);}} radius={radius} onRadiusChange={setRadius} />} nativeFilterArea="companies" placeFilters={<PlaceFilters rows={initialCompanies} value={{country:countryFilter,region:regionFilter,city:cityFilter}} onChange={value => {geography.setEnabled(false);setCountryFilter(value.country);setRegionFilter(value.region);setCityFilter(value.city);}} />} preference={<BrowseGeography geography={geography} />}
         query={search}
         onQueryChange={setSearch}
         searchPlaceholder={t("searchPlaceholder")}
@@ -156,7 +159,7 @@ export default function CompaniesContent({ initialCompanies }: { initialCompanie
         onSortChange={value => { geography.setEnabled(false); setSortKey(value); }}
         categoryLabel={t("filterCategory")}
         allCategoryLabel={uiText("Ui.text_aecf68fa0908cc")}
-        categories={COMPANY_CATEGORIES.filter(category => initialCompanies.some(company => company.categories.includes(category.id))).map((category) => ({ value: category.id, label: taxonomyLabel(companyCategoryLabel(category.id, category.label), uiText) }))}
+        categories={COMPANY_CATEGORIES.filter(category => initialCompanies.some(company => companyMatchesService(company,category.id))).map((category) => ({ value: category.id, label: taxonomyLabel(companyCategoryLabel(category.id, category.label), uiText) }))}
         categoryValue={selectedCategory ?? ""}
         onCategoryChange={(value) => setSelectedCategory(value || null)}
         resultCount={filtered.length} resultSummary={`${filtered.length} ${t("resultsCount")}`}
@@ -167,7 +170,7 @@ export default function CompaniesContent({ initialCompanies }: { initialCompanie
         resetLabel={t("resetFilters")}
         showResultsLabel={uiText("Ui.text_4d89b095821660", { value1: String(filtered.length) })}
       >
-        <PlaceFilters rows={initialCompanies} value={{country:countryFilter,region:regionFilter,city:cityFilter}} onChange={value => {geography.setEnabled(false);setCountryFilter(value.country);setRegionFilter(value.region);setCityFilter(value.city);}} />
+
         {(verifiedOnly || initialCompanies.some(company => company.verified)) && <label className="flex min-h-11 items-center gap-3 text-sm text-text-secondary"><input type="checkbox" className="size-4 accent-gold" checked={verifiedOnly} onChange={(event) => setVerifiedOnly(event.target.checked)} />{t("filterVerified")}</label>}
       </MobileBrowseControls>
 

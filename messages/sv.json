@@ -13121,7 +13121,25 @@
     "trainingExperienced": "Erfaren",
     "trainingBasic": "Grundläggande lydnad",
     "trainingNone": "Otränad",
-    "results": "{count} resultat"
+    "results": "{count} resultat",
+    "place": "Ort/radie",
+    "smart": "Områden",
+    "crew": "Yrkesområde",
+    "marketplace": "Kategori",
+    "locations": "Typ av inspelningsplats",
+    "companies": "Tjänst",
+    "jobs": "Jobbtyp",
+    "projects": "Projekttyp",
+    "areaMin": "Minsta yta",
+    "heightMin": "Minsta takhöjd",
+    "parkingMin": "Minsta antal parkeringsplatser",
+    "equipment": "Utrustning",
+    "cityOnly": "Endast denna ort",
+    "radiusHint": "Radien använder offentliga, ungefärliga ortsuppgifter. Poster utan kartposition ingår inte i sökning inom en radie.",
+    "chooseCity": "Välj en ort med kartposition för att ställa in en radie.",
+    "jobsMap": "Jobb på kartan",
+    "projectPlaceUnavailable": "Projekt kan för närvarande bara filtreras efter land; tillförlitliga ortsuppgifter saknas för sökning inom en radie.",
+    "equipmentCategory": "Utrustning"
   },
   "MobilePreview": {
     "unavailableTitle": "CineGenius är inte tillgängligt just nu",
@@ -13651,7 +13669,10 @@
     "planSunChooseNorth": "Använd nordpilen för att ange var norr ligger på ritningen.",
     "wpTeamMessagesLinkHelp": "Välj ett onlineteam och tryck på ”Länka”. Endast meddelanden länkas; dina filer finns kvar på den här enheten.",
     "wpTeamMessagesChangeLink": "Länka ett annat team",
-    "wpTeamMessagesLeaveFailed": "Sidan svarar inte på ”Tillbaka”. Din text finns kvar. Försök igen."
+    "wpTeamMessagesLeaveFailed": "Sidan svarar inte på ”Tillbaka”. Din text finns kvar. Försök igen.",
+    "wpSmallTodayProjectContacts": "Projektkontakter",
+    "wpSmallTodayHintsCount": "Anteckningar och kontroller · {count}",
+    "wpDispoWeatherPastDateCompact": "Tidigare inspelningsdag · ingen prognos"
   },
   "AccountActivity": {
     "states": {},

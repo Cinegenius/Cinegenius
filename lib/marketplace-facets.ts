@@ -1,3 +1,4 @@
+import { publicMapPoint } from "@/lib/places/public-map-point";
 import "server-only";
 import { db } from "@/lib/db";
 import { collectFacetRows } from "@/lib/browse-facets";
@@ -10,7 +11,7 @@ export async function listingFacetRows(locale: string, types: readonly string[])
     .eq("published", true).in("type", [...types]).order("id").range(from, to));
   const unique = new Map<string, ReturnType<typeof placeReadFields> & { category: string; type: string; rentalType: string }>();
   for (const row of rows) {
-    const facet = { ...placeReadFields(String(row.city ?? ""), row, locale), category: String(row.category ?? ""), type: String(row.type), rentalType: String(row.rental_type ?? "miete") };
+    const facet = { ...publicMapPoint(row), ...placeReadFields(String(row.city ?? ""), row, locale), category: String(row.category ?? ""), type: String(row.type), rentalType: String(row.rental_type ?? "miete") };
     unique.set(JSON.stringify(facet), facet);
   }
   return [...unique.values()];

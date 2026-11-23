@@ -13121,7 +13121,25 @@
     "trainingExperienced": "有经验",
     "trainingBasic": "基础服从",
     "trainingNone": "无训练",
-    "results": "{count} 条结果"
+    "results": "{count} 条结果",
+    "place": "地点/半径",
+    "smart": "板块",
+    "crew": "工种",
+    "marketplace": "类别",
+    "locations": "场景类型",
+    "companies": "服务",
+    "jobs": "工作类型",
+    "projects": "项目类型",
+    "areaMin": "最小面积",
+    "heightMin": "最低天花板高度",
+    "parkingMin": "最少停车位",
+    "equipment": "设施",
+    "cityOnly": "仅此地点",
+    "radiusHint": "半径搜索使用公开的近似地点信息。地图上没有位置的条目不会包含在半径搜索结果中。",
+    "chooseCity": "请选择地图上有位置的地点，以设置搜索半径。",
+    "jobsMap": "地图上的工作机会",
+    "projectPlaceUnavailable": "目前只能按国家或地区筛选项目；由于缺少可靠的地点信息，暂不支持按半径筛选。",
+    "equipmentCategory": "器材"
   },
   "MobilePreview": {
     "unavailableTitle": "CineGenius 当前不可用",
@@ -13651,7 +13669,10 @@
     "planSunChooseNorth": "用指北箭头选择平面图上的北方。",
     "wpTeamMessagesLinkHelp": "选择一个在线团队，然后轻点“关联”。仅关联消息；文件仍保留在此设备上。",
     "wpTeamMessagesChangeLink": "关联其他团队",
-    "wpTeamMessagesLeaveFailed": "页面暂时没有响应“返回”。输入的内容仍会保留，请重试。"
+    "wpTeamMessagesLeaveFailed": "页面暂时没有响应“返回”。输入的内容仍会保留，请重试。",
+    "wpSmallTodayProjectContacts": "项目联系人",
+    "wpSmallTodayHintsCount": "备注和检查 · {count}",
+    "wpDispoWeatherPastDateCompact": "已过去的拍摄日 · 无天气预报"
   },
   "AccountActivity": {
     "states": {},

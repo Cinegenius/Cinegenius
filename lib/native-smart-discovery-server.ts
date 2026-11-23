@@ -40,7 +40,7 @@ export async function nativeDiscoveryForAccount(accountId: string, locale: strin
     // all current visibility checks inside executeUnifiedSearch unchanged.
     const [{ focus, origin }, { groups }] = await Promise.all([
       discoveryFocus(accountId, locale, mode, activeSignal),
-      executeUnifiedSearch(plan, locale, accountId, activeSignal, undefined, "list", seed),
+      executeUnifiedSearch(plan, locale, accountId, activeSignal, undefined, "list", seed, { version: 1 }),
     ]);
     if (activeSignal.aborted) throw new Error("unavailable");
     return { contract: NATIVE_DISCOVERY_CONTRACT, accountId, serverNow: new Date().toISOString(), focus,

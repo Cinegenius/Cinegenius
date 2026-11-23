@@ -26,25 +26,25 @@ export type DirectoryMapItem = {
 };
 
 export default function DirectoryMap({ items, kind, bounds, onBoundsChange, compact = false, onShowAll, countNotice }: {
-  items: DirectoryMapItem[]; kind: "crew" | "marketplace" | "companies";
+  items: DirectoryMapItem[]; kind: "crew" | "marketplace" | "companies" | "jobs";
   bounds: MapBounds | null; onBoundsChange: (bounds: MapBounds | null) => void;
   compact?: boolean; onShowAll?: () => void; countNotice?: string;
 }) {
-  const t = useTranslations("directoryMap"), mapText = useTranslations("locationMap");
+  const ui = useTranslations(), t = useTranslations("directoryMap"), mapText = useTranslations("locationMap");
   const clusterLabel = useCallback((count: number) => t("cluster", { count }), [t]);
   const [activeId, setActiveId] = useState<string | null>(null);
   const PreviewImage = kind === "marketplace" ? ListingImage : MediaImage;
   const locations = useMemo(() => items.map(item => ({ ...item, titleContent: kind === "marketplace" ? <TranslatedText kind="listing" id={item.id} field="title">{item.title}</TranslatedText> : item.title, type: "", price: 0, lat: item.lat ?? null, lng: item.lng ?? null })), [items, kind]);
   const counts = useMemo(() => mapResultCounts(locations, bounds), [locations, bounds]);
   const source = <p className="directory-map-source text-xs text-text-muted">{t.rich("source", { provider: chunks => <a href="https://www.geonames.org/" target="_blank" rel="noreferrer" className="inline-flex min-h-11 items-center underline">{chunks}</a>, license: chunks => <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noreferrer" className="inline-flex min-h-11 items-center underline">{chunks}</a> })}</p>;
-  return <section className={compact ? "directory-map-compact min-w-0" : "mb-6 min-w-0 space-y-3"} aria-label={t(kind)}>
+  return <section className={compact ? "directory-map-compact min-w-0" : "mb-6 min-w-0 space-y-3"} aria-label={(kind === "jobs" ? ui("BrowseFilters.jobsMap") : t(kind))}>
     {!compact && <div className="flex min-w-0 flex-wrap items-center justify-between gap-2">
       <p className="directory-map-notice min-w-0 text-sm text-text-secondary">{t("cityNotice")}</p>
       {bounds && <button type="button" onClick={() => onBoundsChange(null)} className="min-h-11 rounded-lg border border-border px-3 text-sm text-gold">{mapText("resetArea")}</button>}
     </div>}
     <div className="directory-map-frame">
       <LocationMap locations={locations} activeId={activeId} onHover={setActiveId} userLocation={null} radiusKm={50} appliedBounds={bounds} onApplyBounds={onBoundsChange} onBoundsChange={onBoundsChange}
-        countPending={Boolean(countNotice)} visibleCount={counts.visible} labels={{ label: t(kind), results: countNotice ?? t("mapped", { count: counts.visible }), empty: t("empty"), unknownCoordinates: "", cluster: clusterLabel, error: t("error") }}
+        countPending={Boolean(countNotice)} visibleCount={counts.visible} labels={{ label: (kind === "jobs" ? ui("BrowseFilters.jobsMap") : t(kind)), results: countNotice ?? t("mapped", { count: counts.visible }), empty: t("empty"), unknownCoordinates: "", cluster: clusterLabel, error: t("error") }}
         renderPreview={selected => {
           const item = items.find(row => row.id === selected.id);
           if (!item) return null;

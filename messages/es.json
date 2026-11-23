@@ -13121,7 +13121,25 @@
     "trainingExperienced": "Con experiencia",
     "trainingBasic": "Obediencia básica",
     "trainingNone": "Sin entrenamiento",
-    "results": "{count} resultados"
+    "results": "{count} resultados",
+    "place": "Lugar/radio",
+    "smart": "Áreas",
+    "crew": "Especialidad",
+    "marketplace": "Categoría",
+    "locations": "Tipo de localización",
+    "companies": "Servicio",
+    "jobs": "Tipo de empleo",
+    "projects": "Tipo de proyecto",
+    "areaMin": "Superficie mínima",
+    "heightMin": "Altura mínima del techo",
+    "parkingMin": "Plazas de aparcamiento mínimas",
+    "equipment": "Equipamiento",
+    "cityOnly": "Solo esta localidad",
+    "radiusHint": "El radio utiliza datos públicos aproximados de las localidades. Las entradas sin posición en el mapa quedan fuera de la búsqueda por radio.",
+    "chooseCity": "Elige una localidad con posición en el mapa para establecer un radio.",
+    "jobsMap": "Empleos en el mapa",
+    "projectPlaceUnavailable": "Por ahora, los proyectos solo se pueden filtrar por país; faltan datos fiables de las localidades para buscar por radio.",
+    "equipmentCategory": "Equipamiento"
   },
   "MobilePreview": {
     "unavailableTitle": "CineGenius no está disponible en este momento",
@@ -13651,7 +13669,10 @@
     "planSunChooseNorth": "Usa la flecha para indicar dónde está el norte en el plano.",
     "wpTeamMessagesLinkHelp": "Elige un equipo en línea y pulsa «Vincular». Solo se vinculan los mensajes; tus archivos permanecen en este dispositivo.",
     "wpTeamMessagesChangeLink": "Vincular otro equipo",
-    "wpTeamMessagesLeaveFailed": "La página no responde a «Atrás». Tu texto sigue aquí. Inténtalo de nuevo."
+    "wpTeamMessagesLeaveFailed": "La página no responde a «Atrás». Tu texto sigue aquí. Inténtalo de nuevo.",
+    "wpSmallTodayProjectContacts": "Contactos del proyecto",
+    "wpSmallTodayHintsCount": "Notas y revisiones · {count}",
+    "wpDispoWeatherPastDateCompact": "Día de rodaje pasado · sin previsión"
   },
   "AccountActivity": {
     "states": {},

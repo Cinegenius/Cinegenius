@@ -13121,7 +13121,25 @@
     "trainingExperienced": "Doświadczony",
     "trainingBasic": "Podstawowe posłuszeństwo",
     "trainingNone": "Bez szkolenia",
-    "results": "{count} wyników"
+    "results": "{count} wyników",
+    "place": "Miejsce/promień",
+    "smart": "Obszary",
+    "crew": "Specjalizacja",
+    "marketplace": "Kategoria",
+    "locations": "Typ lokacji",
+    "companies": "Usługa",
+    "jobs": "Rodzaj pracy",
+    "projects": "Rodzaj projektu",
+    "areaMin": "Minimalna powierzchnia",
+    "heightMin": "Minimalna wysokość sufitu",
+    "parkingMin": "Minimalna liczba miejsc parkingowych",
+    "equipment": "Wyposażenie",
+    "cityOnly": "Tylko to miejsce",
+    "radiusHint": "Promień wykorzystuje publiczne, przybliżone dane o miejscach. Wpisy bez pozycji na mapie nie są uwzględniane w wyszukiwaniu w promieniu.",
+    "chooseCity": "Wybierz miejsce z pozycją na mapie, aby ustawić promień.",
+    "jobsMap": "Oferty pracy na mapie",
+    "projectPlaceUnavailable": "Projekty można obecnie filtrować tylko według kraju; do wyszukiwania w promieniu brakuje wiarygodnych danych o miejscach.",
+    "equipmentCategory": "Sprzęt"
   },
   "MobilePreview": {
     "unavailableTitle": "CineGenius jest obecnie niedostępny",
@@ -13651,7 +13669,10 @@
     "planSunChooseNorth": "Strzałką wskaż, gdzie na rzucie jest północ.",
     "wpTeamMessagesLinkHelp": "Wybierz zespół online i dotknij „Połącz”. Łączone są tylko wiadomości; Twoje pliki pozostają na tym urządzeniu.",
     "wpTeamMessagesChangeLink": "Połącz inny zespół",
-    "wpTeamMessagesLeaveFailed": "Strona nie reaguje na „Wstecz”. Twój tekst pozostaje zachowany. Spróbuj ponownie."
+    "wpTeamMessagesLeaveFailed": "Strona nie reaguje na „Wstecz”. Twój tekst pozostaje zachowany. Spróbuj ponownie.",
+    "wpSmallTodayProjectContacts": "Kontakty projektu",
+    "wpSmallTodayHintsCount": "Uwagi i sprawdzenia · {count}",
+    "wpDispoWeatherPastDateCompact": "Miniony dzień zdjęciowy · brak prognozy"
   },
   "AccountActivity": {
     "states": {},

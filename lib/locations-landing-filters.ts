@@ -1,7 +1,9 @@
 import { isCurrencyCode, listingCurrency } from "./currency";
-import { matchesPlace, placeKey, placeSearchMatches } from "./places/core";
+import { placeKey, placeSearchMatches } from "./places/core";
+import { LOCATION_DETAIL_PARAMS, matchesLocationDetails, readLocationDetailFilters, type LocationDetailFilters } from "./location-browse-details";
+import { matchesBrowsePlace, type BrowseRadius } from "./browse-radius";
 
-export type LocationLandingFilters = {
+export type LocationLandingFilters = LocationDetailFilters & {
   q: string; cityText: string; country: string; region: string; city: string;
   type: string; currency?: string; min: string; max: string; sort: string;
   lage: string; power: string; instant: string; verified: string;
@@ -11,7 +13,7 @@ export const DEFAULT_LOCATION_LANDING_FILTERS: LocationLandingFilters = Object.f
   q: "", cityText: "", country: "", region: "", city: "", type: "", min: "", max: "", sort: "featured", lage: "", power: "", instant: "", verified: "",
 });
 
-const PARAMS = ["q", "cityText", "country", "region", "city", "type", "currency", "min", "max", "sort", "lage", "power", "instant", "verified"] as const;
+const PARAMS = ["q", "cityText", "country", "region", "city", "type", "currency", "min", "max", "sort", "lage", "power", "instant", "verified", ...LOCATION_DETAIL_PARAMS] as const;
 const SORTS = new Set(["featured", "price-asc", "price-desc", "rating"]);
 const KNOWN_TYPES = ["Wohnen", "Villa", "Büro", "Industrie", "Natur", "Gastronomie", "Studio", "Fotostudio", "Speziallocation"];
 const textKey = (value: string) => value.normalize("NFKC").toLowerCase();
@@ -48,6 +50,7 @@ function price(value: string | string[] | undefined): string {
 export function readLocationLandingFilters(params: Record<string, string | string[] | undefined>): LocationLandingFilters {
   const sort = first(params.sort);
   return {
+    ...readLocationDetailFilters(params),
     q: text(params.q, 200), cityText: text(params.cityText, 120),
     country: identifier(params.country), region: identifier(params.region), city: identifier(params.city),
     ...(isCurrencyCode(first(params.currency)) ? {currency:first(params.currency)} : {}),
@@ -75,19 +78,21 @@ function locationMatches(row: FilterableLocation, query: string): boolean {
   return textKey(row.city).includes(textKey(query)) || Boolean(placeKey(query) && placeSearchMatches(row, query));
 }
 
-export function filterLandingLocations<T extends FilterableLocation>(rows: T[], filters: LocationLandingFilters, categoryLabel: (value: string) => string): T[] {
+export function filterLandingLocations<T extends FilterableLocation>(rows: T[], filters: LocationLandingFilters, categoryLabel: (value: string) => string, radius: BrowseRadius | null = null, options: { requireFacts?: boolean } = {}): T[] {
   const f = readLocationLandingFilters(filters), query = textKey(f.q), categoryKey = textKey(f.type);
   const currency = f.currency || (f.min || f.max || f.sort.startsWith("price-") ? "EUR" : "");
   const result = rows.filter(row => {
+    if (!matchesLocationDetails(row.metadata, f)) return false;
     if (currency && listingCurrency(row.metadata) !== currency) return false;
-    if (!matchesPlace(row, "country", f.country) || !matchesPlace(row, "region", f.region) || !matchesPlace(row, "city", f.city)) return false;
+    if (!matchesBrowsePlace(row, f, radius)) return false;
     const indoorOutdoor = row.metadata?.indoor_outdoor;
+    if (options.requireFacts && f.lage && !["innen","außen","beides"].includes(String(indoorOutdoor))) return false;
     if (f.lage && indoorOutdoor && !(indoorOutdoor === "beides" || (f.lage === "Innen" && indoorOutdoor === "innen") || (f.lage === "Außen" && indoorOutdoor === "außen"))) return false;
     if (f.lage === "Innen & Außen" && indoorOutdoor && indoorOutdoor !== "beides") return false;
     if (f.power && row.metadata?.power_available !== true) return false;
     if (f.instant && !row.instantBook) return false;
     if (f.verified && !row.verified) return false;
-    if (f.cityText && !locationMatches(row, f.cityText)) return false;
+    if (f.cityText && !radius && !locationMatches(row, f.cityText)) return false;
     if (categoryKey && textKey(category(row.type)) !== categoryKey) return false;
     if (f.min || f.max) {
       if (!hasKnownPrice(row)) return false;

@@ -16,11 +16,14 @@ type PlaceFieldProps = {
   required?: boolean;
   selectedCityId?: string;
   onSelection?: (cityId: string) => void;
+  /** Read-only filtering can consume resolved catalogue identities directly.
+   * Manual labels never become verified region/city IDs. Existing writers keep onChange. */
+  onFilterChange?: (place: {country:string;region:string;city:string}, label: string) => void;
 };
 
 /** The legacy text is a compatibility field. Selection IDs are explicit and
  * remain server-validated; typing a place never silently creates an identity. */
-export default function PlaceField({ value, onChange, id, required = false, selectedCityId, onSelection }: PlaceFieldProps) {
+export default function PlaceField({ value, onChange, id, required = false, selectedCityId, onSelection, onFilterChange }: PlaceFieldProps) {
   const generated = useId(), base = id ?? generated;
   const t = useTranslations('Places'), locale = useLocale(), countryText = useTranslations('CountryNames');
   const parts = value.split(',').map(part => part.trim()), code = countryCode(parts.at(-1) ?? '');
@@ -51,7 +54,10 @@ export default function PlaceField({ value, onChange, id, required = false, sele
   function emit(country: string, nextRegion: string, nextCity: string) {
     setPicked(null);
     setActiveIndex(-1);
-    onChange([nextCity, nextRegion, country].join(', '));
+    const raw = [nextCity, nextRegion, country].join(', ');
+    onChange(raw);
+    const region = country === code ? regions.find(option => [option.name, ...option.aliases].some(name => placeKey(name) === placeKey(nextRegion))) : undefined;
+    onFilterChange?.({country,region:region?.id ?? '',city:''},raw);
   }
 
   function choose(option: CityOption) {
@@ -61,6 +67,7 @@ export default function PlaceField({ value, onChange, id, required = false, sele
     setActiveIndex(-1);
     onChange(raw, option.id);
     onSelection?.(option.id);
+    onFilterChange?.({country:code,region:option.regionId,city:option.id},raw);
   }
 
   function handleCityKey(event: KeyboardEvent<HTMLInputElement>) {

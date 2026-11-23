@@ -13121,7 +13121,25 @@
     "trainingExperienced": "Expérimenté",
     "trainingBasic": "Obéissance de base",
     "trainingNone": "Non formé",
-    "results": "{count} résultats"
+    "results": "{count} résultats",
+    "place": "Lieu/rayon",
+    "smart": "Rubriques",
+    "crew": "Métier",
+    "marketplace": "Catégorie",
+    "locations": "Type de décor",
+    "companies": "Prestation",
+    "jobs": "Type d’emploi",
+    "projects": "Type de projet",
+    "areaMin": "Surface minimale",
+    "heightMin": "Hauteur sous plafond minimale",
+    "parkingMin": "Nombre minimal de places de parking",
+    "equipment": "Équipements",
+    "cityOnly": "Ce lieu uniquement",
+    "radiusHint": "Le rayon utilise des indications publiques approximatives sur les lieux. Les annonces sans position sur la carte sont exclues de la recherche par rayon.",
+    "chooseCity": "Choisis un lieu avec une position sur la carte pour définir un rayon.",
+    "jobsMap": "Emplois sur la carte",
+    "projectPlaceUnavailable": "Les projets ne peuvent actuellement être filtrés que par pays ; des indications fiables sur les lieux manquent pour la recherche par rayon.",
+    "equipmentCategory": "Matériel"
   },
   "MobilePreview": {
     "unavailableTitle": "CineGenius est actuellement indisponible",
@@ -13651,7 +13669,10 @@
     "planSunChooseNorth": "Indique avec la flèche où se trouve le nord sur ton plan.",
     "wpTeamMessagesLinkHelp": "Choisis une équipe en ligne, puis touche « Lier ». Seuls les messages sont liés ; tes fichiers restent sur cet appareil.",
     "wpTeamMessagesChangeLink": "Lier une autre équipe",
-    "wpTeamMessagesLeaveFailed": "La page ne répond pas à « Retour ». Ton texte est conservé. Réessaie."
+    "wpTeamMessagesLeaveFailed": "La page ne répond pas à « Retour ». Ton texte est conservé. Réessaie.",
+    "wpSmallTodayProjectContacts": "Contacts du projet",
+    "wpSmallTodayHintsCount": "Notes et vérifications · {count}",
+    "wpDispoWeatherPastDateCompact": "Jour de tournage passé · aucune prévision"
   },
   "AccountActivity": {
     "states": {},

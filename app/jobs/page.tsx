@@ -1,3 +1,4 @@
+import { publicMapPoint } from "@/lib/places/public-map-point";
 import { jobRecord } from "@/lib/job-metadata";
 import { placeReadFields } from "@/lib/places/catalog";
 import { db } from "@/lib/db";
@@ -32,7 +33,7 @@ export default async function JobsPage() {
       .eq("published", true).eq("type", "job").order("created_at", { ascending: false }).order("id")
       .range(offset, offset + 249);
     if (error) throw new Error("jobs_read_failed");
-    serverJobs.push(...(data ?? []).map(row => ({ ...jobRecord(row), ...placeReadFields(row.city ?? "", row, locale) })));
+    serverJobs.push(...(data ?? []).map(row => ({ ...jobRecord(row), ...publicMapPoint(row), ...placeReadFields(row.city ?? "", row, locale) })));
     if (!data || data.length < 250) break;
   }
 

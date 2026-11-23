@@ -13121,7 +13121,25 @@
     "trainingExperienced": "Esperto",
     "trainingBasic": "Obbedienza di base",
     "trainingNone": "Non addestrato",
-    "results": "{count} risultati"
+    "results": "{count} risultati",
+    "place": "Località/raggio",
+    "smart": "Aree",
+    "crew": "Reparto",
+    "marketplace": "Categoria",
+    "locations": "Tipo di location",
+    "companies": "Servizio",
+    "jobs": "Tipo di lavoro",
+    "projects": "Tipo di progetto",
+    "areaMin": "Superficie minima",
+    "heightMin": "Altezza minima del soffitto",
+    "parkingMin": "Posti auto minimi",
+    "equipment": "Dotazioni",
+    "cityOnly": "Solo questa località",
+    "radiusHint": "Il raggio usa informazioni pubbliche approssimative sulle località. Le voci senza posizione sulla mappa sono escluse dalla ricerca per raggio.",
+    "chooseCity": "Scegli una località con una posizione sulla mappa per impostare un raggio.",
+    "jobsMap": "Lavori sulla mappa",
+    "projectPlaceUnavailable": "Al momento i progetti si possono filtrare solo per paese; mancano informazioni affidabili sulle località per la ricerca per raggio.",
+    "equipmentCategory": "Attrezzatura"
   },
   "MobilePreview": {
     "unavailableTitle": "CineGenius non è al momento raggiungibile",
@@ -13651,7 +13669,10 @@
     "planSunChooseNorth": "Usa la freccia per indicare dove si trova il nord nella pianta.",
     "wpTeamMessagesLinkHelp": "Scegli un team online e tocca «Collega». Vengono collegati solo i messaggi; i tuoi file restano su questo dispositivo.",
     "wpTeamMessagesChangeLink": "Collega un altro team",
-    "wpTeamMessagesLeaveFailed": "La pagina non risponde a «Indietro». Il tuo testo resta qui. Riprova."
+    "wpTeamMessagesLeaveFailed": "La pagina non risponde a «Indietro». Il tuo testo resta qui. Riprova.",
+    "wpSmallTodayProjectContacts": "Contatti del progetto",
+    "wpSmallTodayHintsCount": "Note e verifiche · {count}",
+    "wpDispoWeatherPastDateCompact": "Giorno di riprese passato · nessuna previsione"
   },
   "AccountActivity": {
     "states": {},

@@ -13121,7 +13121,25 @@
     "trainingExperienced": "경험자",
     "trainingBasic": "기본 복종 훈련",
     "trainingNone": "훈련 안 됨",
-    "results": "{count}개 결과"
+    "results": "{count}개 결과",
+    "place": "장소/반경",
+    "smart": "분야",
+    "crew": "직종",
+    "marketplace": "카테고리",
+    "locations": "촬영 장소 유형",
+    "companies": "서비스",
+    "jobs": "일자리 유형",
+    "projects": "프로젝트 유형",
+    "areaMin": "최소 면적",
+    "heightMin": "최소 천장 높이",
+    "parkingMin": "최소 주차 대수",
+    "equipment": "시설",
+    "cityOnly": "이 장소만",
+    "radiusHint": "반경 검색에는 공개된 대략적인 장소 정보를 사용합니다. 지도상 위치가 없는 항목은 반경 검색에 포함되지 않습니다.",
+    "chooseCity": "반경을 설정하려면 지도상 위치가 있는 장소를 선택하세요.",
+    "jobsMap": "지도에서 보는 일자리",
+    "projectPlaceUnavailable": "현재 프로젝트는 국가별로만 필터링할 수 있습니다. 신뢰할 수 있는 장소 정보가 없어 반경 검색은 지원되지 않습니다.",
+    "equipmentCategory": "장비"
   },
   "MobilePreview": {
     "unavailableTitle": "CineGenius를 현재 사용할 수 없습니다",
@@ -13651,7 +13669,10 @@
     "planSunChooseNorth": "화살표로 평면도의 북쪽 방향을 선택하세요.",
     "wpTeamMessagesLinkHelp": "온라인 팀을 선택하고 ‘연결’을 누르세요. 메시지만 연결되며 파일은 이 기기에 남습니다.",
     "wpTeamMessagesChangeLink": "다른 팀 연결",
-    "wpTeamMessagesLeaveFailed": "페이지가 ‘뒤로’에 응답하지 않습니다. 입력한 내용은 유지됩니다. 다시 시도해 주세요."
+    "wpTeamMessagesLeaveFailed": "페이지가 ‘뒤로’에 응답하지 않습니다. 입력한 내용은 유지됩니다. 다시 시도해 주세요.",
+    "wpSmallTodayProjectContacts": "프로젝트 연락처",
+    "wpSmallTodayHintsCount": "메모 및 확인 사항 · {count}",
+    "wpDispoWeatherPastDateCompact": "지난 촬영일 · 예보 없음"
   },
   "AccountActivity": {
     "states": {},

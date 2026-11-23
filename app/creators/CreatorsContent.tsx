@@ -1,7 +1,9 @@
 "use client";
+import { matchesBrowsePlace } from "@/lib/browse-radius";
+import NativeBrowsePlaceFilters from "@/components/app/NativeBrowsePlaceFilters";
 
 import type { OccupationForm } from "@/lib/occupation-form";
-import { withinCrewRadius, type CrewNear } from "@/lib/genie-search";
+import { type CrewNear } from "@/lib/genie-search";
 import BrowseGeography from "@/components/BrowseGeography";
 import { prioritizeGeographically } from "@/lib/browse-geography";
 import { useBrowseGeography } from "@/lib/use-browse-geography";
@@ -14,7 +16,7 @@ import { useDirectoryMap } from "@/lib/use-directory-map";
 
 import PlaceFilters from "@/components/PlaceFilters";
 
-import { canonicalFilterValue,matchesPlace,browsePlaceOptions as placeOptions, UNASSIGNED_COUNTRY,placeSearchMatches } from "@/lib/places/core";
+import { canonicalFilterValue,browsePlaceOptions as placeOptions, UNASSIGNED_COUNTRY,placeSearchMatches } from "@/lib/places/core";
 
 import { crewLanguageLabel,matchesCrewLanguage,normalizeCrewLanguages } from "@/lib/crew-languages";
 import { profileTraitLabel,profileTraitOptions } from "@/lib/profile-trait-labels";
@@ -360,15 +362,8 @@ function CreatorsInner({
     if (vendorOnly) result = result.filter((c) => c.isVendor === true);
     if (availableOnly) result = result.filter((c) => c.available);
 
-    if (near) result = result.filter(creator => withinCrewRadius(creator, near));
-    if (cityText) result = result.filter(c => placeSearchMatches(c, cityText) || c.location.toLowerCase().includes(cityText.toLowerCase()));
-    if (cityFilter) {
-      result = result.filter((c) => matchesPlace(c, "city", cityFilter));
-    }
-    if (regionFilter) result = result.filter(row => matchesPlace(row, "region", regionFilter));
-    if (countryFilter) {
-      result = result.filter((c) => matchesPlace(c, "country", countryFilter));
-    }
+    result = result.filter(creator => matchesBrowsePlace(creator,{country:countryFilter,region:regionFilter,city:cityFilter},near?{city:near.id,km:near.radius,lat:near.lat,lng:near.lng}:null));
+    if (cityText && !near) result = result.filter(c => placeSearchMatches(c, cityText) || c.location.toLowerCase().includes(cityText.toLowerCase()));
     if (languageFilter) {
       result = result.filter((c) => matchesCrewLanguage(c.languages, languageFilter));
     }
@@ -482,7 +477,7 @@ function CreatorsInner({
       {near && <p className="site-container text-xs text-text-muted py-2">{uiText("Genie.radiusHint")}</p>}
       <FloatingMapToggle mapActive={viewMode === "map"} onToggle={() => { setViewMode(viewMode === "map" ? "list" : "map"); requestAnimationFrame(() => resultsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" })); }} />
 
-      <MobileBrowseControls nativeCategoryKind="departments" preference={<BrowseGeography geography={geography} />}
+      <MobileBrowseControls nativeCategory={{label:uiText("BrowseFilters.crew"),value:isProviderFilter(sidebarDept)?"":sidebarDept??"",options:activeDepts.map(dept => ({value:dept.id,label:getDeptLabel(dept,locale,animals,taxonomyText)})),onChange:value => {setSelectedRoles(new Set());chooseSidebarDept(value||null);}}} nativePlaceFilters={<NativeBrowsePlaceFilters rows={allCreators} value={{country:countryFilter,region:regionFilter,city:cityFilter || near?.id || ""}} onChange={value => {geography.setEnabled(false);changePlaceFilters(value);setNear(null);}} radius={near ? {...near,city:near.id,km:near.radius} : null} onRadiusChange={value => {setNear(value ? {id:value.city,name:cityOptions.find(row => row.value === value.city)?.label ?? value.city,lat:value.lat,lng:value.lng,radius:value.km} : null); if(value)setCityFilter("");else if(near?.id)setCityFilter(near.id);}} />} nativeFilterArea="crew" placeFilters={<PlaceFilters rows={allCreators} value={{country:countryFilter,region:regionFilter,city:cityFilter}} onChange={value => { geography.setEnabled(false); changePlaceFilters(value); }} />} nativeCategoryKind="departments" preference={<BrowseGeography geography={geography} />}
         query={query}
         onQueryChange={setQuery}
         searchPlaceholder={t("searchPlaceholder")}
@@ -512,7 +507,7 @@ function CreatorsInner({
         resetLabel={t("resetFilters")}
         showResultsLabel={t("showResults", { count: filtered.length })}
       >
-        <PlaceFilters rows={allCreators} value={{country:countryFilter,region:regionFilter,city:cityFilter}} onChange={value => { geography.setEnabled(false); changePlaceFilters(value); }} />
+
         <MobileFilterField label={t("filterProfileType")}>
           <MobileFilterSelect value={profileTypeFilter} onChange={setProfileTypeFilter} placeholder={t("filterAll")} options={availableProfileTypes.map((value) => ({ value, label: PROFILE_TYPE_MAP[value] ?? value }))} />
         </MobileFilterField>

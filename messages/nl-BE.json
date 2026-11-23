@@ -13121,7 +13121,25 @@
     "trainingExperienced": "Ervaren",
     "trainingBasic": "Basisgehoorzaamheid",
     "trainingNone": "Ongetraind",
-    "results": "{count} resultaten"
+    "results": "{count} resultaten",
+    "place": "Plaats/straal",
+    "smart": "Onderdelen",
+    "crew": "Vakgebied",
+    "marketplace": "Categorie",
+    "locations": "Locatietype",
+    "companies": "Dienst",
+    "jobs": "Soort werk",
+    "projects": "Projecttype",
+    "areaMin": "Minimale oppervlakte",
+    "heightMin": "Minimale plafondhoogte",
+    "parkingMin": "Minimaal aantal parkeerplaatsen",
+    "equipment": "Voorzieningen",
+    "cityOnly": "Alleen deze plaats",
+    "radiusHint": "De straal gebruikt openbare, benaderende plaatsgegevens. Vermeldingen zonder kaartpositie vallen buiten het zoeken binnen een straal.",
+    "chooseCity": "Kies een plaats met een kaartpositie om een straal in te stellen.",
+    "jobsMap": "Jobs op de kaart",
+    "projectPlaceUnavailable": "Projecten kunnen momenteel alleen op land worden gefilterd; voor zoeken binnen een straal ontbreken betrouwbare plaatsgegevens.",
+    "equipmentCategory": "Apparatuur"
   },
   "MobilePreview": {
     "unavailableTitle": "CineGenius is momenteel niet bereikbaar",
@@ -13651,7 +13669,10 @@
     "planSunChooseNorth": "Geef met de noordpijl aan waar het noorden op je grondplan ligt.",
     "wpTeamMessagesLinkHelp": "Kies een online team en tik op ‘Koppelen’. Alleen berichten worden gekoppeld; je bestanden blijven op dit toestel.",
     "wpTeamMessagesChangeLink": "Ander team koppelen",
-    "wpTeamMessagesLeaveFailed": "De pagina reageert niet op ‘Terug’. Je invoer blijft behouden. Probeer het opnieuw."
+    "wpTeamMessagesLeaveFailed": "De pagina reageert niet op ‘Terug’. Je invoer blijft behouden. Probeer het opnieuw.",
+    "wpSmallTodayProjectContacts": "Projectcontacten",
+    "wpSmallTodayHintsCount": "Opmerkingen en controles · {count}",
+    "wpDispoWeatherPastDateCompact": "Verstreken draaidag · geen weersverwachting"
   },
   "AccountActivity": {
     "states": {},

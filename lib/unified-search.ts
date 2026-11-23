@@ -1,5 +1,6 @@
 import { COUNTRY_CODES } from "./places/countries";
 import type { DiscoveryCursor } from "./discovery-seed";
+import type { PublicBrowseFacets } from "./browse-filters";
 
 export const SEARCH_AREAS = ["crew", "marketplace", "locations", "companies", "jobs", "animals", "projects", "news", "organizations"] as const;
 export type SearchArea = typeof SEARCH_AREAS[number];
@@ -73,13 +74,15 @@ export function searchPlanFromHref(href: string): SearchPlan | null {
 export type SearchResult = { id: string; sourceId?: string; title: string; subtitle: string; type: string; price: number; priceLabel?: string; image: string | null; available: boolean | null;
   /** Already localized public facts; separate from the website's longer subtitle. */
   crewPreview?: { occupation: string; place: string };
-  facets?: { departments?: string[]; marketplace?: string };
+  facets?: PublicBrowseFacets;
   evidence?: "role" | "title" | "requirements";
   nearby?: { distanceKm: number; origin: string };
   mapPoint?: { lat: number; lng: number; radiusMeters?: 500 } | null };
 export type NearbyCursor = { distanceKm: number; id: string };
 export type SearchRankCursor = { score: number; distanceKm: number; id: string };
 export type SearchGroup = { area: SearchArea; wishIndex: number; label: string; results: SearchResult[]; nextOffset: number | null;
+  /** Complete permission-projected match count for this one wish/area only. */
+  totalCount?: number; browseKey?: string;
   discoveryCursor?: DiscoveryCursor;
   segment?: string; rankCursor?: SearchRankCursor; nearby?: true; nearbyCursor?: NearbyCursor };
 

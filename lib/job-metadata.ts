@@ -60,6 +60,7 @@ export function jobSchedule(value: unknown): JobSchedule | null {
 }
 
 export type BrowseJob = {
+  lat?: number | null; lng?: number | null;
   id: string; title: string; location: string; description?: string; category?: string;
   price?: number | null; createdAt?: string | null; schedule?: JobSchedule | null;
   company?: string; projectType?: string; shootDates?: string; urgent?: boolean; payType?: string;

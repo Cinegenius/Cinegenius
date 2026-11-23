@@ -13121,7 +13121,25 @@
     "trainingExperienced": "経験者",
     "trainingBasic": "基本訓練済み",
     "trainingNone": "未訓練",
-    "results": "{count} 件の結果"
+    "results": "{count} 件の結果",
+    "place": "場所/半径",
+    "smart": "分野",
+    "crew": "職種",
+    "marketplace": "カテゴリー",
+    "locations": "ロケ地の種類",
+    "companies": "サービス",
+    "jobs": "仕事の種類",
+    "projects": "プロジェクトの種類",
+    "areaMin": "最小面積",
+    "heightMin": "最低天井高",
+    "parkingMin": "最小駐車台数",
+    "equipment": "設備",
+    "cityOnly": "この場所のみ",
+    "radiusHint": "半径検索には、公開されているおおよその場所の情報を使います。地図上の位置がない項目は半径検索の対象外です。",
+    "chooseCity": "半径を設定するには、地図上の位置がある場所を選んでください。",
+    "jobsMap": "地図上の求人",
+    "projectPlaceUnavailable": "現在、プロジェクトは国でのみ絞り込めます。信頼できる場所の情報がないため、半径では絞り込めません。",
+    "equipmentCategory": "機材"
   },
   "MobilePreview": {
     "unavailableTitle": "CineGeniusは現在利用できません",
@@ -13651,7 +13669,10 @@
     "planSunChooseNorth": "矢印を使って図の北の方向を選んでください。",
     "wpTeamMessagesLinkHelp": "オンラインのチームを選び、「連携」をタップしてください。メッセージだけが連携され、ファイルはこの端末に残ります。",
     "wpTeamMessagesChangeLink": "別のチームと連携",
-    "wpTeamMessagesLeaveFailed": "ページが「戻る」に応答していません。入力内容は保持されています。もう一度お試しください。"
+    "wpTeamMessagesLeaveFailed": "ページが「戻る」に応答していません。入力内容は保持されています。もう一度お試しください。",
+    "wpSmallTodayProjectContacts": "プロジェクトの連絡先",
+    "wpSmallTodayHintsCount": "注意事項と確認項目 · {count}",
+    "wpDispoWeatherPastDateCompact": "過去の撮影日 · 予報なし"
   },
   "AccountActivity": {
     "states": {},

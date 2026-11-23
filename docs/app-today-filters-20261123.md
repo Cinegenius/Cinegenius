@@ -1,0 +1,31 @@
+# Kompaktes Heute und passende Appfilter · 23. November 2026
+
+Markus hat die Filtercollage ausdrücklich zur Umsetzung freigegeben und den kompakten Heute-Entwurf mit „So umsetzen“ bestätigt. Tatsächlich installiert ist beim Quellencheckpoint noch2026112209; Teamnachrichten bleiben laut Geräteabnahme in Work. Die untere Leiste überdeckt weiterhin den Heute-Einstieg zu CineGenius-Kontakten. Die folgende gemeinsame Nacharbeit wird für2026112210 geprüft. Dieser Quellenstand ist kein neuer Installations- oder physischer Abnahmenachweis.
+
+## Heute und gemeinsame Leiste
+
+Heute bündelt Zurück, Titel/Drehtag, kleine Hinweisglocke und Projektmenü in einer flexiblen Zeile. Die Glocke öffnet die vorhandenen Hinweise samt Originalbelegen, ohne Lesen oder Klärung zu bestätigen. Die bisherige Deduplizierung von Prüfhinweisen bleibt erhalten. Zeiten stehen über die volle Breite; persönliche/Abteilungszeiten, Originalangaben und die Unterscheidung zwischen Bereitschaft und Drehbeginn bleiben unverändert.
+
+Wetter und Karte verwenden denselben vorhandenen, quellengebundenen Controller und dessen einzelnen Lebenszyklus. Fehlende Vorhersagen reservieren nur eine kompakte Zeile. Tatsächliche Stundenwerte, Quellen, Aktualisierung, Ortsliste, Farblegende und Adresskorrektur bleiben in den Details erreichbar. Vergangene Tage erhalten keine erfundene Vorhersage. Die normale Kartenansicht anderer Aufrufer bleibt der Standard.
+
+Dispo, Drehplan, Projektkontakte und CineGenius-Kontakte stehen in einem Zweierspaltenraster. Große Bedienungshilfenschrift verwendet eine Spalte. Lange Texte dürfen wachsen und scrollen, anstatt feste Kartenhöhen oder kleinere Schrift zu erzwingen. Das genehmigte Standardbeispiel passt bei393×852pt über die Hauptleiste; andere Inhalte und Schriftgrößen dürfen mehr Höhe benötigen.
+
+Die zwei separaten festen SwiftUI-Hosts für Kopf und Hauptleiste übernehmen ab iOS16.4 keine Safe-Area-Regionen ihres Elternhosts mehr. Nur diese beiden Kontrollflächen sind betroffen. Die80pt-Reservierung des Inhalts, Frames, Navigation, Genie, Teamkonto und die normale System-/Tastaturbehandlung des Inhalts bleiben erhalten. Der zuvor beobachtete32pt-Versatz passt zur doppelten Safe-Area-Anwendung; tatsächliche UIKit-/SwiftUI-Rechtecke wurden bisher nicht am Gerät gemessen. Diese Ursacheneinordnung ist keine vorweggenommene physische Abnahme.
+
+## Filter und vorhandene Daten
+
+Smart, Crew, Marktplatz, Locations, Firmen, Jobs und Projekte teilen im erkannten App-Modus eine Zeile: geladener/sichtbarer Trefferbestand, Ort/Umkreis, bereichsspezifische Auswahl, weitere Filter und Raster/Liste/Karte. Dialoge verwenden die bestehende Toplayer mit Fokus-/Zurückverhalten. Kein zweiter generischer Suchwunsch-/Gewerke-Block. Sechs Aktionen bleiben mindestens44px groß; auf320px nutzt die Zeile12px Außenrand. Die Zahl darf dort visuell gekürzt sein, ihre zugängliche Beschriftung enthält den tatsächlichen Bestand.
+
+Locations verwenden vorhandene Motivtypen, Innen/Außen, Preiswährung/-grenzen, Fläche, Höhe, Parkplätze und bestätigte Ausstattungsfelder. Strom steht ausschließlich unter Ausstattung. Firmen verwenden gespeicherte Kategorien und Leistungen als vorhandene Katalog-ID oder exaktes Kataloglabel; Freitextleistungen bleiben über die Textsuche erreichbar. Marktplatz zeigt Requisite/Equipment/Fahrzeug über den vorhandenen15 Department-IDs; Equipment öffnet Details im selben Menü. Jobs verwenden bestehende Beschäftigungsarten und öffentliche Ortsmitten. Projekte besitzen im Verzeichnis verlässlich nur ein Land: Umkreis/Karte werden dort nicht als verfügbare Fähigkeit vorgetäuscht.
+
+Umkreis verwendet nur bereits öffentliche ungefähre Ortsmitten beziehungsweise bestehende500m-Locationbereiche und darf Landesgrenzen überschreiten. Keine neue GPS-/Geocodingabfrage. Eine freie Ortsänderung verwirft alte Stadt-ID und Radius. Fehlende Standort-/Maß-/Ausstattungswerte gelten nicht als bestätigte Treffer. Vorhandene öffentliche eigene Motiv-/Projektarten bleiben ihre ursprünglichen Werte.
+
+Der streng begrenzte browseFilters-Parameter ist vom Provider-Suchplan getrennt. Aktuelle Konto-/Smart-Adminfreigabe, Origin, Limits und private No-Store-Antworten bleiben erhalten. Der Server projiziert aktuelle Rechte vor Filtern und Seitenbildung, bindet Folgeseiten an den Filter und übernimmt keine alte Antwort in einen neuen Filterzustand. Der Smart-Zähler bleibt ein deduplizierter geladener/sichtbarer Bestand; pro Gruppe gelieferte Counts werden nicht als scheinbare Gesamtsumme addiert. Zahleneingaben lösen erst beim Feldabschluss eine neue Smart-Anfrage aus, ohne künstliche Mindestzeit.
+
+Aktive Filter können den berechtigten öffentlichen Bestand durchsuchen; vorhandene20s-Abbruchgrenzen bleiben. Marktplatz verwendet nur bei bewusst gewähltem Radius den vollständigen bestehenden öffentlichen Kartenpool mit35s-Gesamtgrenze. Teilfehler liefern keinen falschen vollständigen Count. Keine neuen Datenbankschemata, Provider, Zugangsdaten oder Gmail-Aktivierung.
+
+## Nachweise und verbleibende Grenzen
+
+Gebundene Quellen und Prüflogs liegen im lokalen App-Auftrag unter work/app-install-2210-20261123, work/smart-filter-implementation-20261123 und work/today-compact-implementation-20261123. Tatsächliche gemeinsame React-Komponenten wurden in238 Fällen über17 Sprachen und320/393px geprüft, zusätzlich konkrete Such-/Verzeichnisfunktionen mit synthetischen öffentlichen Daten, Ländergrenzen, Folgeseiten und späten Antworten. Pflichtdesignprüfungen bewahren beide vollständigen Inhaltskanten. Die17 Webkataloge sind additiv ergänzt; der historische vollständige native Katalog bleibt9 Sprachen mit18 Ressourcen.
+
+SwiftUI-Komponenten wurden auf macOS mit kurzen und langen Originalwerten vermessen. Das ersetzt keine iPhone-Schriftmetrik, physische Touch-/Tastaturprüfung oder vollständige reale Seitennavigation. Ein lokaler vollständiger TypeScript-Versuch und ein begrenzter weiterer Typversuch erreichten ihre Speichergrenze; sie zählen nicht als erfolgreiche Typprüfung. Die vollständige Appübersetzung, der normale Serverbuild, Livezuordnung, frische Gerätesicherung und tatsächliche Installation sind gesondert zu belegen. Gmail bleibt deaktiviert und unverbunden. Keine reale Nachricht, Einladung oder Mail wurde für diese Prüfungen versandt.

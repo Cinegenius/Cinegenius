@@ -1,4 +1,12 @@
 "use client";
+import NativeBrowsePlaceFilters from "@/components/app/NativeBrowsePlaceFilters";
+import DirectoryMap from "@/components/DirectoryMap";
+import DirectoryResults from "@/components/DirectoryResults";
+import DirectoryViewControls, {type DirectoryView} from "@/components/DirectoryViewControls";
+import {useNativeAppAppearance} from "@/lib/use-native-app-appearance";
+import {useDirectoryMap} from "@/lib/use-directory-map";
+import {matchesBrowsePlace} from "@/lib/browse-radius";
+import {useNativeBrowseRadius} from "@/lib/use-native-browse-radius";
 
 import { TranslatedText } from "@/components/ContentTranslation";
 
@@ -13,7 +21,7 @@ import { FILM_DEPARTMENTS } from "@/lib/filmRoles";
 import { normalizeGripDepartmentId,normalizeGripRoleId } from "@/lib/gripTaxonomy";
 import { canonicalJobPayType,jobDateLabel,jobFacts,jobPayLabel,jobRateLabel,type BrowseJob as Job } from "@/lib/job-metadata";
 import { jobOccupation } from "@/lib/job-occupation";
-import { matchesPlace,placeDisplay,browsePlaceOptions as placeOptions, UNASSIGNED_COUNTRY,placeSearchMatches } from "@/lib/places/core";
+import { placeDisplay,browsePlaceOptions as placeOptions, UNASSIGNED_COUNTRY,placeSearchMatches } from "@/lib/places/core";
 import { normalizedCatalogueSearch,projectTypeLabel } from "@/lib/project-type-labels";
 import { useBrowseGeography } from "@/lib/use-browse-geography";
 import { useViewState } from "@/lib/use-view-state";
@@ -30,6 +38,8 @@ const PAGE_SIZE = 24;
 function JobsInner({ serverJobs }: { serverJobs: Job[] }) {
   const ui = useTranslations(), t = useTranslations("jobs"), copy = useTranslations("JobsRefresh"), locale = useLocale();
   const params = useSearchParams();
+  const nativeAppearance = useNativeAppAppearance();
+  const [nativeView,setNativeView] = useViewState<DirectoryView>("jobs.nativeView","list");
   const [query, setQuery] = useViewState("jobs.query", () => params.get("q") ?? "");
   const [selectedDeptId, setSelectedDeptId] = useViewState<string | null>("jobs.selectedDeptId", () => normalizeGripDepartmentId(params.get("dept")));
   const [selectedRoleId, setSelectedRoleId] = useViewState<string | null>("jobs.selectedRoleId", () => normalizeGripRoleId(params.get("role")));
@@ -39,6 +49,7 @@ function JobsInner({ serverJobs }: { serverJobs: Job[] }) {
   const payTypeFilter = String(canonicalJobPayType(storedPay));
   const [jobTypeFilter, setJobTypeFilter] = useViewState("jobs.jobTypeFilter", () => params.get("employment") ?? "alle");
   const [cityFilter, setCityFilter] = useViewState("jobs.cityFilter", () => params.get("city") ?? "");
+  const [radius,setRadius] = useNativeBrowseRadius("jobs",cityFilter);
   const [cityText, setCityText] = useViewState("jobs.cityText", () => params.get("cityText") ?? "");
   const [countryFilter, setCountryFilter] = useViewState("jobs.countryFilter", () => params.get("country") ?? "");
   const [regionFilter, setRegionFilter] = useViewState("jobs.regionFilter", () => params.get("region") ?? "");
@@ -69,8 +80,8 @@ function JobsInner({ serverJobs }: { serverJobs: Job[] }) {
       if (urgentOnly && !facts.urgent) return false;
       if (payTypeFilter && canonicalJobPayType(facts.payType) !== payTypeFilter) return false;
       if (jobTypeFilter !== "alle" && facts.jobType !== jobTypeFilter) return false;
-      if (!matchesPlace(job, "country", countryFilter) || !matchesPlace(job, "region", regionFilter) || !matchesPlace(job, "city", cityFilter)) return false;
-      if (cityText && !placeSearchMatches(job, cityText) && !normalizedCatalogueSearch(job.location, locale).includes(normalizedCatalogueSearch(cityText, locale))) return false;
+      if (!matchesBrowsePlace(job,{country:countryFilter,region:regionFilter,city:cityFilter},radius)) return false;
+      if (cityText && !radius && !placeSearchMatches(job, cityText) && !normalizedCatalogueSearch(job.location, locale).includes(normalizedCatalogueSearch(cityText, locale))) return false;
       return !needle || [job.title, facts.company, facts.roleLabel, taxonomyLabel(facts.roleLabel, ui), facts.projectType, projectTypeLabel(facts.projectType, ui), facts.description, job.location].some(value => normalizedCatalogueSearch(value, locale).includes(needle)) || placeSearchMatches(job, query);
     });
     rows.sort((a, b) => {
@@ -83,8 +94,8 @@ function JobsInner({ serverJobs }: { serverJobs: Job[] }) {
       return time;
     });
     return prioritizeGeographically(rows, preferred);
-  }, [allJobs, query, locale, selectedDeptId, selectedDepartmentLabel, selectedRoleId, activeType, urgentOnly, payTypeFilter, jobTypeFilter, countryFilter, regionFilter, cityFilter, cityText, sortKey, ui, preferred]);
-  const clearAll = () => { setQuery(""); setSelectedDeptId(null); setSelectedRoleId(null); setActiveType(""); setUrgentOnly(false); setPayTypeFilter(""); setJobTypeFilter("alle"); setCityText(""); updatePlaceFilters({ country: "", region: "", city: "" }); };
+  }, [allJobs, query, locale, selectedDeptId, selectedDepartmentLabel, selectedRoleId, activeType, urgentOnly, payTypeFilter, jobTypeFilter, countryFilter, regionFilter, cityFilter, cityText, sortKey, ui, preferred, radius]);
+  const clearAll = () => { setRadius(null); setQuery(""); setSelectedDeptId(null); setSelectedRoleId(null); setActiveType(""); setUrgentOnly(false); setPayTypeFilter(""); setJobTypeFilter("alle"); setCityText(""); updatePlaceFilters({ country: "", region: "", city: "" }); };
   const chips: BrowseChip[] = [
     ...(selectedDeptId ? [{ id: "department", label: departments.find(row => row.value === selectedDeptId)?.label ?? selectedDeptId, onRemove: () => changeDepartment("") }] : []),
     ...(selectedRoleId ? [{ id: "role", label: roles.find(row => row.value === selectedRoleId)?.label ?? selectedRoleId, onRemove: () => setSelectedRoleId(null) }] : []),
@@ -101,22 +112,17 @@ function JobsInner({ serverJobs }: { serverJobs: Job[] }) {
     { label: copy("employment"), value: jobTypeFilter === "alle" ? "" : jobTypeFilter, onChange: (value: string) => setJobTypeFilter(value || "alle"), options: employments.filter(option => allJobs.some(job => job.facts.jobType === option.value)) }];
   const placeFields = <PlaceFilters rows={allJobs} value={{ country: countryFilter, region: regionFilter, city: cityFilter }} onChange={value => { geography.setEnabled(false); updatePlaceFilters(value); }} />;
   const urgentField = (urgentOnly || allJobs.some(job => job.facts.urgent)) && <label className="flex min-h-11 items-center gap-3 text-sm text-text-secondary"><input type="checkbox" className="size-4 accent-gold" checked={urgentOnly} onChange={event => setUrgentOnly(event.target.checked)} />{t("filterUrgentLabel")}</label>;
-  const filterKey = `${url}:${geography.key}`, visibleCount = pagination.filterKey === filterKey ? pagination.visibleCount : PAGE_SIZE;
+  const filterKey = `${url}:${geography.key}:${JSON.stringify(radius)}`, visibleCount = pagination.filterKey === filterKey ? pagination.visibleCount : PAGE_SIZE;
 
-  return <main className="min-h-screen mobile-bottom-nav-clear">
-    <PageHeader withBackdrop={false} badge={t("heroBadge")} title={t("heroTitle")} titleHighlight={t("heroTitleHighlight")} description={copy("intro")} cta={{ label: t("postJobBtn"), href: "/inserat?group=jobs" }} />
-    <MobileBrowseControls nativeCategoryKind="departments" preference={<BrowseGeography geography={geography} />} query={query} onQueryChange={setQuery} searchPlaceholder={t("searchPlaceholder")} sortValue={sortKey} sortOptions={sorts} onSortChange={value => { geography.setEnabled(false); setSortKey(value); }}
-      categoryLabel={t("filterDeptRole")} allCategoryLabel={ui("Ui.text_bc0b501bb3186b")} categories={departments} categoryValue={selectedDeptId ?? ""} onCategoryChange={changeDepartment}
-      resultCount={filtered.length} resultSummary={t("results", { count: filtered.length })} filterCount={chips.length} chips={chips} onReset={clearAll} resetLabel={t("emptyReset")} showResultsLabel={t("results", { count: filtered.length })}>
-      {placeFields}
-      {fields.map(field => <MobileFilterField key={field.label} label={field.label}><MobileFilterSelect {...field} placeholder={ui("common.all")} /></MobileFilterField>)}
-      {urgentField}
-    </MobileBrowseControls>
-    <section className="site-container py-4 sm:py-6">
+  const map = useDirectoryMap("jobs",filterKey,filtered,nativeAppearance && nativeView === "map");
+  const jobs = nativeAppearance ? map.rows : filtered;
+  const mapItems = filtered.map(job => ({id:job.id,title:job.title,city:placeDisplay(job,job.location,locale),subtitle:job.facts.company,href:`/jobs/${job.id}`,image:"",lat:job.lat,lng:job.lng}));
+
+  const cards = <>
 
 
-      {filtered.length === 0 ? <div className="browse-card p-6 text-center sm:p-10"><Briefcase size={28} className="mx-auto mb-3 text-text-muted" aria-hidden="true" /><h2 className="text-lg font-semibold">{allJobs.length ? t("emptyTitleFiltered") : t("emptyTitle")}</h2><p className="mt-2 text-sm text-text-secondary">{allJobs.length ? t("emptyDescFiltered") : t("emptyDesc")}</p><div className="mt-5 flex flex-wrap justify-center gap-3">{(chips.length > 0 || query) && <button className="min-h-11 rounded-xl border border-border px-4 text-sm" onClick={clearAll}>{t("emptyReset")}</button>}<Link className="inline-flex min-h-11 items-center rounded-xl bg-gold px-4 text-sm font-semibold text-bg-primary" href="/inserat?group=jobs">{t("postJobBtn")}</Link></div></div> : <div className="space-y-3">
-        {filtered.slice(0, visibleCount).map(job => {
+      {filtered.length === 0 ? <div className="browse-card p-6 text-center sm:p-10"><Briefcase size={28} className="mx-auto mb-3 text-text-muted" aria-hidden="true" /><h2 className="text-lg font-semibold">{allJobs.length ? t("emptyTitleFiltered") : t("emptyTitle")}</h2><p className="mt-2 text-sm text-text-secondary">{allJobs.length ? t("emptyDescFiltered") : t("emptyDesc")}</p><div className="mt-5 flex flex-wrap justify-center gap-3">{(chips.length > 0 || query) && <button className="min-h-11 rounded-xl border border-border px-4 text-sm" onClick={clearAll}>{t("emptyReset")}</button>}<Link className="inline-flex min-h-11 items-center rounded-xl bg-gold px-4 text-sm font-semibold text-bg-primary" href="/inserat?group=jobs">{t("postJobBtn")}</Link></div></div> : <div className={nativeAppearance && nativeView === "grid" ? "directory-cards" : "space-y-3"}>
+        {jobs.slice(0, visibleCount).map(job => {
           const facts = job.facts, dates = jobDateLabel(job, locale);
           return <article key={job.id} className="browse-card group"><Link href={`/jobs/${job.id}`} className="block p-4 sm:p-5">
             <div className="flex items-start gap-3"><div className="hidden size-11 shrink-0 items-center justify-center rounded-xl border border-border bg-bg-elevated sm:flex"><Briefcase size={18} className="text-text-muted" aria-hidden="true" /></div><div className="min-w-0 flex-1">
@@ -129,6 +135,20 @@ function JobsInner({ serverJobs }: { serverJobs: Job[] }) {
         })}
       </div>}
       {visibleCount < filtered.length && <div className="mt-6 text-center"><button type="button" className="min-h-11 rounded-xl border border-border px-5 text-sm text-text-secondary" onClick={() => setPagination({ filterKey, visibleCount: visibleCount + PAGE_SIZE })}>{t("loadMore", { count: filtered.length - visibleCount })}</button></div>}
+</>;
+
+  return <main className="min-h-screen mobile-bottom-nav-clear">
+    <PageHeader withBackdrop={false} badge={t("heroBadge")} title={t("heroTitle")} titleHighlight={t("heroTitleHighlight")} description={copy("intro")} cta={{ label: t("postJobBtn"), href: "/inserat?group=jobs" }} />
+    <MobileBrowseControls nativeMoreCategory nativeViewControls={<DirectoryViewControls value={nativeView} onChange={setNativeView} />} nativePlaceFilters={<NativeBrowsePlaceFilters rows={allJobs} value={{country:countryFilter,region:regionFilter,city:cityFilter}} onChange={value => {geography.setEnabled(false);updatePlaceFilters(value);}} radius={radius} onRadiusChange={setRadius} />} nativeFilterArea="jobs" placeFilters={placeFields} nativeCategory={{label:ui("BrowseFilters.jobs"),value:jobTypeFilter === "alle" ? "" : jobTypeFilter,options:employments,onChange:value => setJobTypeFilter(value || "alle")}} nativeCategoryKind="departments" preference={<BrowseGeography geography={geography} />} query={query} onQueryChange={setQuery} searchPlaceholder={t("searchPlaceholder")} sortValue={sortKey} sortOptions={sorts} onSortChange={value => { geography.setEnabled(false); setSortKey(value); }}
+      categoryLabel={t("filterDeptRole")} allCategoryLabel={ui("Ui.text_bc0b501bb3186b")} categories={departments} categoryValue={selectedDeptId ?? ""} onCategoryChange={changeDepartment}
+      resultCount={filtered.length} resultSummary={t("results", { count: filtered.length })} filterCount={chips.length} chips={chips} onReset={clearAll} resetLabel={t("emptyReset")} showResultsLabel={t("results", { count: filtered.length })}>
+
+      {fields.map(field => <MobileFilterField key={field.label} label={field.label}><MobileFilterSelect {...field} placeholder={ui("common.all")} /></MobileFilterField>)}
+      {urgentField}
+    </MobileBrowseControls>
+    <section className="site-container py-4 sm:py-6">
+      {nativeAppearance ? <DirectoryResults view={nativeView} map={<DirectoryMap compact kind="jobs" items={mapItems} bounds={map.bounds} onBoundsChange={map.setBounds} onShowAll={() => map.setBounds(null)} />}>{cards}</DirectoryResults> : cards}
+
     </section>
   </main>;
 }

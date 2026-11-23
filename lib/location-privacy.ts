@@ -33,7 +33,8 @@ export function publicLocationBrowseMetadata(value: unknown, description = ""): 
   const source = value && typeof value === 'object' && !Array.isArray(value) ? value as Record<string, unknown> : {};
   const result: Record<string, unknown> = {};
   if (isStoredCurrency(source.price_currency)) result.price_currency = source.price_currency;
-  for (const key of ['price_on_request', 'price_negotiable', 'power_available']) if (typeof source[key] === 'boolean') result[key] = source[key];
+  for (const key of ['price_on_request', 'price_negotiable', 'power_available', 'natural_light', 'blackout_possible', 'loading_access']) if (typeof source[key] === 'boolean') result[key] = source[key];
+  for (const key of ['sqm', 'ceiling_height_m', 'parking_spots']) if (typeof source[key] === 'number' && Number.isFinite(source[key]) && source[key] >= 0 && source[key] <= 1_000_000) result[key] = source[key];
   if (['miete', 'kauf', 'beides'].includes(String(source.rental_type))) result.rental_type = source.rental_type;
   if (['innen', 'außen', 'beides'].includes(String(source.indoor_outdoor))) result.indoor_outdoor = source.indoor_outdoor;
   // Older public descriptions used these exact labels before structured fields.
