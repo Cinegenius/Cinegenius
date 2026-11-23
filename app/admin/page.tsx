@@ -104,16 +104,17 @@ function Panel({ children, className = "" }: { children: React.ReactNode; classN
   return <section className={`rounded-xl border border-border bg-bg-secondary ${className}`}>{children}</section>;
 }
 
-function VerificationDecision({ title, optional, saving, onSave, onCancel }: { title: string; optional: boolean; saving: boolean; onSave: (reason: string) => void; onCancel: () => void }) {
+function VerificationDecision({ title, optional, saving, error, onSave, onCancel }: { error?: string; title: string; optional: boolean; saving: boolean; onSave: (reason: string) => void; onCancel: () => void }) {
   const t = useTranslations("VerificationReview");
   const [reason, setReason] = useState("");
   const validReason = reason.trim().length >= 5 || optional && reason.trim().length === 0;
   const fieldId = "verification-decision-reason";
-  return <form onSubmit={event => { event.preventDefault(); onSave(reason.trim()); }} className="mt-4 w-full min-w-0 rounded-xl border border-gold/30 bg-bg-primary p-4">
+  return <form onSubmit={event => { event.preventDefault(); if (!saving && validReason) onSave(reason.trim()); }} className="mt-4 w-full min-w-0 rounded-xl border border-gold/30 bg-bg-primary p-4">
     <h3 className="break-words text-sm font-semibold text-text-primary [overflow-wrap:anywhere]">{title}</h3>
     <label htmlFor={fieldId} className="mt-3 block text-sm text-text-secondary">{t(optional ? "reasonOptional" : "reason")}</label>
     <p id="verification-reason-notice" className="mt-1 text-xs leading-5 text-text-muted">{t("reasonVisible")}</p>
     <textarea id={fieldId} aria-describedby="verification-reason-notice" autoFocus value={reason} onChange={event => setReason(event.target.value)} required={!optional} minLength={5} maxLength={500} rows={3} disabled={saving} className="mt-2 w-full rounded-lg border border-border bg-bg-secondary p-3 text-base text-text-primary" />
+    {error && <p role="alert" className="mt-3 break-words text-sm text-crimson-light">{error}</p>}
     <div className="mt-3 flex flex-wrap gap-2"><button type="submit" disabled={saving || !validReason} className="inline-flex min-h-11 items-center rounded-lg bg-gold px-4 py-2 text-sm font-semibold text-bg-primary disabled:opacity-40">{t(saving ? "saving" : "save")}</button><button type="button" disabled={saving} onClick={onCancel} className="min-h-11 rounded-lg border border-border px-4 py-2 text-sm text-text-secondary">{t("cancel")}</button></div>
   </form>;
 }
@@ -300,6 +301,7 @@ function AdminContent() {
   const [verificationActing, setVerificationActing] = useState<string | null>(null);
   const [verificationsStatus, setVerificationsStatus] = useViewState("admin.verificationsStatus", "pending");
   const [verificationDecision, setVerificationDecision] = useState<{ kind: "request"; request: Verification; action: "approve" | "reject" } | { kind: "profile"; profile: AdminProfile; verified: boolean } | null>(null);
+  const [verificationDecisionError, setVerificationDecisionError] = useState("");
   const verificationLock = useRef(false);
   const verificationText = useTranslations("VerificationReview");
 
@@ -530,15 +532,16 @@ function AdminContent() {
   }
 
   function changeVerification(request: Verification, action: "approve" | "reject") {
-    if (!verificationLock.current) setVerificationDecision({ kind: "request", request, action });
+    if (!verificationLock.current) { setVerificationDecisionError(""); setVerificationDecision({ kind: "request", request, action }); }
   }
   function toggleProfile(profile: AdminProfile) {
-    if (!verificationLock.current) setVerificationDecision({ kind: "profile", profile, verified: !profile.verified });
+    if (!verificationLock.current) { setVerificationDecisionError(""); setVerificationDecision({ kind: "profile", profile, verified: !profile.verified }); }
   }
   async function saveVerificationDecision(reason: string) {
     const decision = verificationDecision;
     if (!decision || verificationLock.current) return;
     verificationLock.current = true;
+    setVerificationDecisionError("");
     const targetId = decision.kind === "request" ? decision.request.id : decision.profile.user_id;
     if (decision.kind === "request") setVerificationActing(targetId); else setProfileActing(targetId);
     try {
@@ -550,7 +553,11 @@ function AdminContent() {
       setVerificationDecision(null);
       setActionMessage({ text: verificationText("saved") });
       setRefreshKey(key => key + 1);
-    } catch (error) { setActionMessage({ text: uiErrorMessage(error, verificationText("saveError")), error: true }); }
+    } catch (error) {
+      const text = uiErrorMessage(error, verificationText("saveError"));
+      setVerificationDecisionError(text);
+      setActionMessage({ text, error: true });
+    }
     finally { verificationLock.current = false; setVerificationActing(null); setProfileActing(null); }
   }
 
@@ -689,7 +696,7 @@ function AdminContent() {
               {request.notes && <p className="mt-3 whitespace-pre-wrap break-words text-sm text-text-secondary [overflow-wrap:anywhere]">{request.notes}</p>}
               {request.has_document ? <a href={`/api/verification-requests/${encodeURIComponent(request.id)}/document?version=${request.review_version}`} target="_blank" rel="noreferrer" className="mt-3 inline-flex min-h-11 items-center break-words text-sm text-gold">{verificationText("document")}</a> : request.status === "pending" && <p className="mt-3 text-sm text-text-muted">{verificationText("evidenceMissing")}</p>}
               {request.review_reason && <p className="mt-3 whitespace-pre-wrap break-words text-sm text-text-secondary [overflow-wrap:anywhere]">{request.review_reason}</p>}
-              {verificationDecision?.kind === "request" && verificationDecision.request.id === request.id && <VerificationDecision key={`${request.id}-${verificationDecision.action}`} title={verificationText(verificationDecision.action === "approve" ? "decisionApprove" : "decisionReject", { name: request.display_name ?? request.user_id })} optional={verificationDecision.action === "approve"} saving={verificationActing === request.id} onSave={reason => void saveVerificationDecision(reason)} onCancel={() => setVerificationDecision(null)} />}
+              {verificationDecision?.kind === "request" && verificationDecision.request.id === request.id && <VerificationDecision error={verificationDecisionError} key={`${request.id}-${verificationDecision.action}`} title={verificationText(verificationDecision.action === "approve" ? "decisionApprove" : "decisionReject", { name: request.display_name ?? request.user_id })} optional={verificationDecision.action === "approve"} saving={verificationActing === request.id} onSave={reason => void saveVerificationDecision(reason)} onCancel={() => setVerificationDecision(null)} />}
             </Panel>)}</div>}
             <Pager page={verificationsPage} total={verificationsTotal} pageSize={50} onPage={setVerificationsPage} />
           </div>}
@@ -700,7 +707,7 @@ function AdminContent() {
             <div className="rounded-xl border border-border bg-bg-elevated p-4 text-sm text-text-secondary">{uiText("Ui.text_3823abad969698")}</div>
             <div className="flex flex-wrap items-center gap-3"><div className="relative w-full max-w-md"><Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-text-muted" /><input value={profilesSearch} onChange={(e) => { setProfilesSearch(e.target.value); setProfilesPage(1); }} placeholder={uiText("Ui.text_013e9a01e583be")} className="w-full rounded-xl border border-border bg-bg-secondary py-2.5 pl-9 pr-3 text-sm text-text-primary placeholder:text-text-muted" /></div><span className="text-sm text-text-muted">{uiText.rich("Ui.text_25b5b77e727a77", { value1: () => (profilesTotal) })}</span></div>
             {profilesError && <ErrorBox text={profilesError} onRetry={() => setRefreshKey((key) => key + 1)} />}
-            {profilesLoading && !profiles.length ? <p className="py-10 text-center text-sm text-text-muted">{uiText("Ui.text_8ba3fe49fe080d")}</p> : !profiles.length ? <Empty title={uiText("creators.emptyTitleFiltered")} /> : <div className="space-y-2">{profiles.map((profile) => <Panel key={profile.user_id} className="flex flex-wrap items-center gap-3 p-4">{profile.avatar_url ? <Image src={profile.avatar_url} alt="" width={40} height={40} unoptimized className="h-10 w-10 shrink-0 rounded-full border border-border object-cover" /> : <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-bg-elevated"><Users size={15} className="text-text-muted" /></div>}<div className="min-w-0 flex-1"><div className="flex flex-wrap items-center gap-2"><p className="truncate text-sm font-medium text-text-primary">{profile.display_name ?? uiText("Ui.text_396469a46c076c")}</p>{profile.verified && <BadgeCheck size={14} className="text-gold" />}</div><p className="truncate text-xs text-text-muted">{profile.location ?? uiText("AdminOrganizations.noLocation")}{profile.profile_types?.length ? uiText("Ui.text_f6b53f9c8ab3ef", { value1: String(profile.profile_types.join(", ")) }) : ""}</p><p className="truncate font-mono text-[10px] text-text-muted">{uiText.rich("Ui.text_2a612a18e465f9", { value1: () => (profile.user_id) })}</p></div><a href={`/profile/${profile.slug ?? profile.user_id}`} target="_blank" rel="noreferrer" className="rounded-lg border border-border px-3 py-2 text-xs text-text-secondary hover:border-gold hover:text-gold">{uiText.rich("Ui.text_16acd53b1dcdf2", { part1: () => (<Eye className="mr-1 inline" size={12} />) })}</a><AdminReviewLink kind="profile" id={profile.user_id} /><SupportMessageAction targetType="profile" targetId={profile.user_id} /><button disabled={profileActing === profile.user_id} onClick={() => toggleProfile(profile)} className={`min-h-11 rounded-lg border px-3 py-2 text-xs font-medium disabled:opacity-50 ${profile.verified ? "border-gold/30 text-gold" : "border-border text-text-muted hover:border-gold hover:text-gold"}`}>{profileActing === profile.user_id ? uiText("Ui.text_4f696a99f9c9e4") : profile.verified ? uiText("Ui.text_c9bc0de967fe95") : uiText("Ui.text_33347561b7ed6b")}</button>{verificationDecision?.kind === "profile" && verificationDecision.profile.user_id === profile.user_id && <VerificationDecision key={profile.user_id} title={verificationText(verificationDecision.verified ? "decisionApprove" : "decisionRevoke", { name: profile.display_name ?? profile.user_id })} optional={verificationDecision.verified} saving={profileActing === profile.user_id} onSave={reason => void saveVerificationDecision(reason)} onCancel={() => setVerificationDecision(null)} />}</Panel>)}</div>}
+            {profilesLoading && !profiles.length ? <p className="py-10 text-center text-sm text-text-muted">{uiText("Ui.text_8ba3fe49fe080d")}</p> : !profiles.length ? <Empty title={uiText("creators.emptyTitleFiltered")} /> : <div className="space-y-2">{profiles.map((profile) => <Panel key={profile.user_id} className="flex flex-wrap items-center gap-3 p-4">{profile.avatar_url ? <Image src={profile.avatar_url} alt="" width={40} height={40} unoptimized className="h-10 w-10 shrink-0 rounded-full border border-border object-cover" /> : <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-bg-elevated"><Users size={15} className="text-text-muted" /></div>}<div className="min-w-0 flex-1"><div className="flex flex-wrap items-center gap-2"><p className="truncate text-sm font-medium text-text-primary">{profile.display_name ?? uiText("Ui.text_396469a46c076c")}</p>{profile.verified && <BadgeCheck size={14} className="text-gold" />}</div><p className="truncate text-xs text-text-muted">{profile.location ?? uiText("AdminOrganizations.noLocation")}{profile.profile_types?.length ? uiText("Ui.text_f6b53f9c8ab3ef", { value1: String(profile.profile_types.join(", ")) }) : ""}</p><p className="truncate font-mono text-[10px] text-text-muted">{uiText.rich("Ui.text_2a612a18e465f9", { value1: () => (profile.user_id) })}</p></div><a href={`/profile/${profile.slug ?? profile.user_id}`} target="_blank" rel="noreferrer" className="rounded-lg border border-border px-3 py-2 text-xs text-text-secondary hover:border-gold hover:text-gold">{uiText.rich("Ui.text_16acd53b1dcdf2", { part1: () => (<Eye className="mr-1 inline" size={12} />) })}</a><AdminReviewLink kind="profile" id={profile.user_id} /><SupportMessageAction targetType="profile" targetId={profile.user_id} /><button disabled={profileActing === profile.user_id} onClick={() => toggleProfile(profile)} className={`min-h-11 rounded-lg border px-3 py-2 text-xs font-medium disabled:opacity-50 ${profile.verified ? "border-gold/30 text-gold" : "border-border text-text-muted hover:border-gold hover:text-gold"}`}>{profileActing === profile.user_id ? uiText("Ui.text_4f696a99f9c9e4") : profile.verified ? uiText("Ui.text_c9bc0de967fe95") : uiText("Ui.text_33347561b7ed6b")}</button>{verificationDecision?.kind === "profile" && verificationDecision.profile.user_id === profile.user_id && <VerificationDecision error={verificationDecisionError} key={profile.user_id} title={verificationText(verificationDecision.verified ? "decisionApprove" : "decisionRevoke", { name: profile.display_name ?? profile.user_id })} optional={verificationDecision.verified} saving={profileActing === profile.user_id} onSave={reason => void saveVerificationDecision(reason)} onCancel={() => setVerificationDecision(null)} />}</Panel>)}</div>}
             <Pager page={profilesPage} total={profilesTotal} pageSize={50} onPage={setProfilesPage} />
           </div>}
 

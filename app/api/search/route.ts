@@ -86,7 +86,7 @@ export async function GET(req: NextRequest) {
     wantProfiles
       ? publicProfileMatches(userId, (from, to) => db
           .from("profiles")
-          .select("place_country_code,place_region_id,place_city_id,place_city_name,place_region_name,place_status,user_id, display_name, location, bio, role, positions, crew, avatar_url, available")
+          .select("place_country_code,place_region_id,place_city_id,place_city_name,place_region_name,place_status,user_id, display_name, location, bio, role, positions, crew, avatar_url, available, verified")
           .or(`display_name.ilike.${like},role.ilike.${like},location.ilike.${like},bio.ilike.${like}${occupationFilter}${geoFilter?`,${geoFilter}`:""}`)
           .not("display_name", "is", null)
           .neq("display_name", "").order("user_id").range(from, to), q, occupationValues)
@@ -104,7 +104,7 @@ export async function GET(req: NextRequest) {
     cateringProfileValues.length
       ? Promise.all(cateringProfileValues.map((position) => publicProfileMatches(userId, (from, to) => db
           .from("profiles")
-          .select("place_country_code,place_region_id,place_city_id,place_city_name,place_region_name,place_status,user_id, display_name, location, bio, role, positions, crew, avatar_url, available")
+          .select("place_country_code,place_region_id,place_city_id,place_city_name,place_region_name,place_status,user_id, display_name, location, bio, role, positions, crew, avatar_url, available, verified")
           .contains("positions", [position])
           .not("display_name", "is", null)
           .neq("display_name", "").order("user_id").range(from, to))))
@@ -117,11 +117,11 @@ export async function GET(req: NextRequest) {
           .contains("categories", [CATERING_COMPANY_CATEGORY.id])
           .limit(type === "all" ? 8 : 24)
       : Promise.resolve({ data: [] }),
-    animalValues.length ? publicProfileMatches(userId, (from, to) => db.from("profiles").select("place_country_code,place_region_id,place_city_id,place_city_name,place_region_name,place_status,user_id, display_name, location, bio, role, positions, crew, avatar_url, available").overlaps("positions", animalValues).order("user_id").range(from, to)) : Promise.resolve({data: []}),
-    animalValues.length ? publicProfileMatches(userId, (from, to) => db.from("profiles").select("place_country_code,place_region_id,place_city_id,place_city_name,place_region_name,place_status,user_id, display_name, location, bio, role, positions, crew, avatar_url, available").in("role", animalValues).order("user_id").range(from, to)) : Promise.resolve({data: []}),
+    animalValues.length ? publicProfileMatches(userId, (from, to) => db.from("profiles").select("place_country_code,place_region_id,place_city_id,place_city_name,place_region_name,place_status,user_id, display_name, location, bio, role, positions, crew, avatar_url, available, verified").overlaps("positions", animalValues).order("user_id").range(from, to)) : Promise.resolve({data: []}),
+    animalValues.length ? publicProfileMatches(userId, (from, to) => db.from("profiles").select("place_country_code,place_region_id,place_city_id,place_city_name,place_region_name,place_status,user_id, display_name, location, bio, role, positions, crew, avatar_url, available, verified").in("role", animalValues).order("user_id").range(from, to)) : Promise.resolve({data: []}),
     wantCompanies && animalCompanySearchFilter(raw) ? db.from("companies").select("place_country_code,place_region_id,place_city_id,place_city_name,place_region_name,place_status,id, slug, name, city, logo_url, categories").eq("published",true).or(animalCompanySearchFilter(raw)).limit(24) : Promise.resolve({data: []}),
-    safetyMedicalValues.length ? publicProfileMatches(userId, (from, to) => db.from("profiles").select("place_country_code,place_region_id,place_city_id,place_city_name,place_region_name,place_status,user_id, display_name, location, bio, role, positions, crew, avatar_url, available").overlaps("positions", safetyMedicalValues).order("user_id").range(from, to)) : Promise.resolve({data: []}),
-    safetyMedicalValues.length ? publicProfileMatches(userId, (from, to) => db.from("profiles").select("place_country_code,place_region_id,place_city_id,place_city_name,place_region_name,place_status,user_id, display_name, location, bio, role, positions, crew, avatar_url, available").in("role", safetyMedicalValues).order("user_id").range(from, to)) : Promise.resolve({data: []}),
+    safetyMedicalValues.length ? publicProfileMatches(userId, (from, to) => db.from("profiles").select("place_country_code,place_region_id,place_city_id,place_city_name,place_region_name,place_status,user_id, display_name, location, bio, role, positions, crew, avatar_url, available, verified").overlaps("positions", safetyMedicalValues).order("user_id").range(from, to)) : Promise.resolve({data: []}),
+    safetyMedicalValues.length ? publicProfileMatches(userId, (from, to) => db.from("profiles").select("place_country_code,place_region_id,place_city_id,place_city_name,place_region_name,place_status,user_id, display_name, location, bio, role, positions, crew, avatar_url, available, verified").in("role", safetyMedicalValues).order("user_id").range(from, to)) : Promise.resolve({data: []}),
     searchSafetyMedicalCompanies ? db.from("companies").select("place_country_code,place_region_id,place_city_id,place_city_name,place_region_name,place_status,id, slug, name, city, logo_url, categories").eq("published", true).contains("categories", [SAFETY_MEDICAL_COMPANY_CATEGORY_ID]).limit(24) : Promise.resolve({data: []}),
   ]);
 
@@ -145,7 +145,7 @@ export async function GET(req: NextRequest) {
     available: null as boolean | null,
   }));
 
-  type ProfileSearchRow = { user_id: string; display_name: string | null; location: string | null; role: string | null; positions: string[] | null; avatar_url: string | null; available: boolean | null };
+  type ProfileSearchRow = { user_id: string; display_name: string | null; location: string | null; role: string | null; positions: string[] | null; avatar_url: string | null; available: boolean | null; verified: boolean | null };
   const profileById = new Map<string, ProfileSearchRow>();
   for (const profile of [...(profilesRes.data ?? []), ...(animalProfilesRes.data ?? []), ...(animalRoleProfilesRes.data ?? []), ...(safetyMedicalProfilesRes.data ?? []), ...(safetyMedicalRoleProfilesRes.data ?? []), ...cateringProfileResults.flatMap((result) => result.data ?? [])] as ProfileSearchRow[]) {
     if (profile?.user_id) profileById.set(profile.user_id, profile);
@@ -168,6 +168,7 @@ export async function GET(req: NextRequest) {
           place: place.split(",").map(part => part.trim()).filter(Boolean).join(", "),
         },
         type: "profile",
+        verified: p.verified === true,
         price: 0,
         image: p.avatar_url as string | null,
         available: p.available as boolean | null,

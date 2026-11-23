@@ -63,7 +63,7 @@ function queryFor(area: SearchArea, wish: SearchWish, terms: string[], categorie
       ? terms.map(term => `role.ilike.${exactLiteral(term)}`)
       : patterns(["display_name", "role", "bio"]);
     if (terms.length) filters.push(`positions.ov.{${terms.map(filterLiteral).join(",")}}`);
-    return filtered(db.from("profiles").select(`${PLACE_COLUMNS},user_id,display_name,role,positions,crew,bio,location,avatar_url,available`)
+    return filtered(db.from("profiles").select(`${PLACE_COLUMNS},user_id,display_name,role,positions,crew,bio,location,avatar_url,available,verified`)
       .not("display_name", "is", null).neq("display_name", ""), filters).order("user_id");
   }
   if (area === "companies") {
@@ -150,6 +150,7 @@ async function readGroup(plan: SearchPlan, wishIndex: number, area: SearchArea, 
     };
     // Only public, canonical search facts leave the permission-projected row.
     if (area === "crew") {
+      result.verified = row.verified === true;
       const profile = row as OccupationProfile;
       // This row has already passed projectProfilePrivacy. Do not parse the
       // joined subtitle: member-written occupations can contain separators.

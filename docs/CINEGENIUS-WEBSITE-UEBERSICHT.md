@@ -286,3 +286,12 @@ Foto/Cover/Vorstellungstext freiwillig, private Entwürfe und alle Berufe bleibe
 43 gezielte Prüfungen, TypeScript und 17 Sprachkataloge bestanden. Quellstand, noch
 nicht veröffentlicht; echte native Geräteabnahme separat. Vertrag:
 [Berufsauswahl](profile-occupation-focus.md).
+
+## Verifizierungsanzeige · 23. November 2026 · Quellkandidat
+
+Aktueller bestätigter Status auf allen drei Profilansichten, Crew-Liste/Karten und
+Suche sichtbar; Adminfehler bleiben im offenen Entscheidungsformular. Bestehende
+atomare Rechte-/Statusregeln erhalten. 68 API-/Datenbank-/Suchprüfungen, 10 weitere
+Regressionen, 18 Profil- und drei Admin-Browserfälle bestanden. Keine realen
+Mitglieder geändert. Noch nicht veröffentlicht; native Geräteabnahme offen.
+[Details und Grenzen](verification-display-20261123.md).

@@ -2,6 +2,7 @@
 
 import { TranslatedText } from "@/components/ContentTranslation";
 
+import VerifiedBadge from "@/components/VerifiedBadge";
 import MediaImage from "@/components/MediaImage";
 import ListingImage from "@/components/ListingImage";
 import ProfileCardPhoto from "@/components/ProfileCardPhoto";
@@ -62,7 +63,7 @@ export default function ResultCard({ result, compact = false, showEvidence = fal
       data-native-crew-preview={nativeCrew ? "true" : undefined} data-native-browse-row="true"
       data-native-smart-area={nativeArea ?? undefined} data-result-layout="row"
       style={nativeArea ? nativeSmartColorStyle(nativeArea) as CSSProperties : undefined}
-      aria-label={[result.title, occupation, place, result.priceLabel].filter(Boolean).join(", ")}
+      aria-label={[result.title, isProfile && result.verified === true ? uiText("common.verified") : null, occupation, place, result.priceLabel].filter(Boolean).join(", ")}
       className={`${styles.card} ${styles.rowCard} ${nativeCrew ? styles.crewRowCard : ""} ${isCompany ? styles.companyRowCard : ""} directory-entry group`}>
       <div data-result-image={isCompany ? "logo" : "photo"} className={styles.rowPhoto}>
         {nativeCrew ? <ProfileCardPhoto src={result.image ?? ""} name={result.title} className="h-full w-full rounded-full border border-border/60" sizes="36px" />
@@ -92,7 +93,7 @@ export default function ResultCard({ result, compact = false, showEvidence = fal
     return <Link href={cfg.href(result.id)} data-search-result-card={result.type}
       data-native-crew-preview="true" data-native-smart-area={nativeArea ?? undefined} data-result-layout="grid"
       style={nativeArea ? nativeSmartColorStyle(nativeArea) as CSSProperties : undefined}
-      aria-label={[result.title, occupation, place].filter(Boolean).join(", ")}
+      aria-label={[result.title, isProfile && result.verified === true ? uiText("common.verified") : null, occupation, place].filter(Boolean).join(", ")}
       className={`${styles.card} ${styles.crewBrowseCard} browse-card card-hover group flex min-w-0 items-center gap-1.5 p-2 sm:gap-3 sm:p-3`}>
       <div data-result-image="photo" className={styles.crewPhoto}>
         <ProfileCardPhoto src={result.image ?? ""} name={result.title}
@@ -101,7 +102,7 @@ export default function ResultCard({ result, compact = false, showEvidence = fal
       </div>
       <div className="min-w-0 flex-1 py-0.5">
         <div className="flex items-start justify-between gap-1 mb-0.5">
-          <h3 data-result-title title={result.title} className="min-w-0 break-words [overflow-wrap:anywhere] font-semibold text-text-primary text-[13px] leading-snug sm:text-sm">{result.title}</h3>
+          <h3 data-result-title title={result.title} className="min-w-0 break-words [overflow-wrap:anywhere] font-semibold text-text-primary text-[13px] leading-snug sm:text-sm"><SearchResultTitle result={result} /></h3>
         </div>
         {occupation && <p data-result-occupation title={occupation} className="line-clamp-2 text-[11px] leading-snug text-gold font-medium sm:text-xs">{occupation}</p>}
         {place && <p data-result-place className="mt-1.5 flex min-w-0 items-center gap-1 text-[10px] text-text-muted sm:text-xs">
@@ -218,8 +219,9 @@ export default function ResultCard({ result, compact = false, showEvidence = fal
 
 
 export function SearchResultTitle({result}: {result: Result}) {
+  const t = useTranslations("common");
   const id = result.sourceId ?? result.id;
   if (["location", "vehicle", "prop", "job"].includes(result.type)) return <TranslatedText kind="listing" id={id} field="title">{result.title}</TranslatedText>;
   if (result.type === "news") return <TranslatedText kind="news" id={id} field="title">{result.title}</TranslatedText>;
-  return <>{result.title}</>;
+  return <>{result.title}{(result.type === "profile" || result.type === "creator") && <VerifiedBadge verified={result.verified} label={t("verified")} />}</>;
 }
