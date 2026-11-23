@@ -1,8 +1,8 @@
 ## Aktuelle WEB-Priorität · 23. November 2026
 
-1. **Profilabschluss:** Zusatztätigkeit freiwillig, verständliche/fokussierte Pflichtfeldfehler. 43 Tests, TypeScript, 17 Sprachen bestanden; Veröffentlichung offen.
+1. **Profilabschluss:** Zusatztätigkeit freiwillig, verständliche/fokussierte Pflichtfeldfehler. 43 Tests, TypeScript, 17 Sprachen und Produktionsbuild bestanden; **live bestätigt auf 11d96803**. Betroffene Nutzer müssen den Abschluss noch erneut durchspielen.
 2. **Verifizierung:** bestätigten Status durchgängig anzeigen; Korrektur geprüft, noch nicht veröffentlicht.
-3. **Avatar-Reserve:** ausgewählte 24 Stilrichtungen vorbereitet; günstigere Batch-Erzeugung ausdrücklich beauftragt, Implementierung und Prüfungen laufen. Bestehende Profilbilder erhalten.
+3. **Avatar-Reserve:** ausgewählte 24 Stilrichtungen vorbereitet; günstigere Batch-Erzeugung ausdrücklich beauftragt, Quellkandidat implementiert, zehn neue Batch-/Datenbankprüfungen bestanden. Migration, Veröffentlichung und echte Kostenmessung offen. Bestehende Profilbilder erhalten.
 
 # Aktuelle Aufträge · 22. November 2026
 

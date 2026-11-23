@@ -38,7 +38,7 @@ export function parseProfileArtPublicPath(value: unknown): {kind: PlatformArtKin
   if (!match || !isArtUUID(match[2])) return null;
   return { kind: match[1] as PlatformArtKind, mediaKey: match[2] };
 }
-export type ArtJob = { id: string; kind: PlatformArtKind; presentation?: ArtPresentation | null; mediaKey: string; token: string; expiresAt: string };
+export type ArtJob = { id: string; kind: PlatformArtKind; presentation?: ArtPresentation | null; mediaKey: string; token: string; expiresAt: string; outputFileId?: string; generationSHA?: string };
 export type ArtReadDescriptor = { kind: PlatformArtKind; mediaKey: string; sha256: string; byteLength: number; revision: number };
 export function validArtReadDescriptor(value: unknown): value is ArtReadDescriptor {
   const v = value as ArtReadDescriptor | null;

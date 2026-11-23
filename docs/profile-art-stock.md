@@ -75,3 +75,40 @@ loading the entire historical catalogue. The next reviewed package contains 21
 avatars and 21 covers, including one previously unselected original pair.
 See `design/profile-art/2026-11-18-mixed/README.md` for duplicate checks and release
 requirements. Personal likeness requests never go into the automatic stock pipeline.
+
+## Selected human and animal directions — 23 November 2026 (prepared)
+
+The operator selected human #11,13,15,17,19,31,32,36,37,38,39 and animal
+#1,2,4,5,6,8,10,11,14,15,17,19,20 from the three numbered collages. Human #11 was
+mentioned twice and is one direction, not extra weighting. The reference manifest
+with source hashes is `design/profile-art-selected-20261123/selection.json`;
+`lib/profile-art-selected-styles.ts` is the actual prompt catalogue.
+
+New avatar jobs select among the approved directions using their random UUID, with
+independent stable hashes for style, palette, pose and hair. Producer and reviewer
+therefore see the same brief, even after a lease change. Feminine and masculine
+reserves draw from the eleven human styles. Neutral draws from all 24: neutral human
+portraits plus the thirteen animals. All remain freely selectable by everyone.
+Visible grain, misregistered ink, rough cuts, watercolor edges, pastel and doodles
+are intentional; the independent reviewer no longer rejects these or requested
+animals under the old human-only/smooth-illustration criteria.
+
+The SQL protocol ID `cg-silhouette-nature-v1` remains for wire compatibility only.
+New avatar review JSON additionally records `styleVersion: cg-selected-avatars-20261123`
+and the exact `styleId`; a real SQL fixture verifies they persist through release.
+No migration or expanded access is needed. Existing covers use their unchanged
+nature prompts. Ownership, deletion tombstones, duplicate checks, stock levels,
+models, one-attempt behavior, generation quality and all source limits are retained.
+Existing artwork is not replaced; the new mix enters as real refills are needed.
+
+41 focused producer/reviewer/refill/stock checks passed without paid model calls.
+Generated-image fidelity for this new mix has not yet been tested against the live
+provider. These prompt changes are prepared, not proof of publication or new stock.
+
+## Günstigere Reserve · 23. November 2026
+
+Batch-Umstellung für Avatare und Cover beauftragt und als Quellkandidat gebaut.
+Gleiches Modell/Qualität; 50 % Rabatt auf Erzeugung, separate Bildprüfung bleibt.
+Bis zu 24 Stunden im Hintergrund, kein Warten beim Profilabschluss. Gezielte
+Migration vor Veröffentlichung erforderlich; noch nicht live.
+[Ablauf, Kostenbasis und Grenzen](profile-art-batch.md).

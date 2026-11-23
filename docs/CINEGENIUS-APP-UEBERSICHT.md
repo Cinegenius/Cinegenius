@@ -443,8 +443,12 @@ Nachweise liegen im lokalen App-Auftrag unter `work/app-unified-followup-2026112
 Zusatztätigkeit auch bei vier Berufen freiwillig; keine automatische Zuordnung.
 Fehlende Haupttätigkeit wird beim Abschluss übersetzt erklärt und direkt fokussiert.
 Foto/Cover/Vorstellungstext freiwillig, private Entwürfe und alle Berufe bleiben erhalten.
-43 gezielte Prüfungen, TypeScript und 17 Sprachkataloge bestanden. Quellstand, noch
-nicht veröffentlicht; echte native Geräteabnahme separat. Vertrag:
+43 gezielte Prüfungen, TypeScript, 17 Sprachkataloge und Produktionsbuild bestanden.
+Live bestätigt: `11d96803f588d97730ce2b56e9c7d610f8183b2d`, Deployment
+`dpl_ELjNZCnqDr49igrf8tY9nSvWjih7`, `www.cinegenius.co` am 23.11.2026.
+Kein erneuter Abschluss mit einem betroffenen Mitgliedskonto und keine physische
+App-Abnahme behauptet. Beleg:
+`/srv/cinegenius/handoffs/20261123-verification-check/profile-release-receipt.json`. Vertrag:
 [Berufsauswahl](profile-occupation-focus.md).
 
 ## Verifizierungsanzeige · 23. November 2026 · Quellkandidat
@@ -455,3 +459,13 @@ atomare Rechte-/Statusregeln erhalten. 68 API-/Datenbank-/Suchprüfungen, 10 wei
 Regressionen, 18 Profil- und drei Admin-Browserfälle bestanden. Keine realen
 Mitglieder geändert. Noch nicht veröffentlicht; native Geräteabnahme offen.
 [Details und Grenzen](verification-display-20261123.md).
+
+## Bildreserve · 23. November 2026 · Quellkandidat
+
+24 gewählte Menschen-/Tierstilrichtungen und günstigere Batch-Erzeugung vorbereitet.
+Vorhandene Profilbilder bleiben erhalten; Auswahl weiterhin freiwillig und frei
+gemischt. Bis zu 24 Stunden Verarbeitung im Hintergrund, ohne den Profilabschluss
+aufzuhalten. Modell und unabhängige Prüfung bleiben. Neue private Migration vor
+Livegang nötig; noch nicht aktiviert. Zehn neue lokale Batch-/Datenbankprüfungen
+bestanden; echte Erzeugung und Kostenmessung offen.
+[Bestand/Stile](profile-art-stock.md) · [Batch-Vertrag](profile-art-batch.md).

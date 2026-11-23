@@ -446,3 +446,19 @@ and live verification are recorded in
   publish. Coordination is admin-only; shared invitation links convey no rights.
 - See `docs/international-currency-feedback.md` for endpoints, limits and release
   status. A prepared file is not a delivered APP message or a native device test.
+
+## Freigegebene Avatarstile und Kostenkorrektur · 23. November 2026
+
+Markus wählt die 11 verschiedenen Menschenrichtungen 32/31/37/38/39/36/11/15/19/13/17
+und 13 Tierrichtungen 1/2/4/8/10/5/6/11/14/15/19/17/20 aus den gezeigten Collagen.
+Diese Auswahl ersetzt für neue Avatare die ältere reine Sechserpalette und glatte
+Formvorgabe; erkennbare Textur und spielerische Details sind gewünscht. Quellen
+und Hashes: design/profile-art-selected-20261123/selection.json. Bestehende Bilder,
+Eigentum, freie Präsentationswahl und Duplikatschutz erhalten; Cover bleiben in
+ihrer eigenen bisherigen Naturpalette.
+
+Die günstigere Hintergrund-Erzeugung über Batch ist ausdrücklich beauftragt.
+Modell/Qualität und separate Bildprüfung bleiben erhalten; keine kostenpflichtige
+Erzeugungswiederholung bei unklarem Ausgang. Profilabschluss darf nie auf neue
+Bildreserve warten. Geprüften Quellstand, Migration und tatsächliche Aktivierung
+getrennt nachweisen; siehe docs/profile-art-batch.md.

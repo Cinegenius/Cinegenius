@@ -1,0 +1,200 @@
+{
+  "selectionDate": "2026-11-23",
+  "humanCount": 11,
+  "animalCount": 13,
+  "repeatedHuman11Deduplicated": true,
+  "references": [
+    {
+      "kind": "human",
+      "number": 11,
+      "title": "Duoton",
+      "description": "Lime + Navy",
+      "source": "/home/cinegenius/.codex/visualizations/2026/11/23/avatar-zwanzig-weitere/assets/original-08.png",
+      "sourceSHA256": "f15077bb54be440b276b74277503b92d26faa0b0b088e1b19c98b2f8a21f4abe"
+    },
+    {
+      "kind": "human",
+      "number": 13,
+      "title": "Gravur",
+      "description": "Feine Struktur",
+      "source": "/home/cinegenius/.codex/visualizations/2026/11/23/avatar-zwanzig-weitere/assets/original-17.png",
+      "sourceSHA256": "1db140180a395f01655175025c0d01266cbd869528ad66421e39c3a08d9997bc"
+    },
+    {
+      "kind": "human",
+      "number": 15,
+      "title": "Retro",
+      "description": "Warm + plakativ",
+      "source": "/home/cinegenius/.codex/visualizations/2026/11/23/avatar-zwanzig-weitere/assets/original-19.png",
+      "sourceSHA256": "102b4748f80c3e4c85d1dfe99a5a1af624214b08bd24338f71ecece211ac36cb"
+    },
+    {
+      "kind": "human",
+      "number": 17,
+      "title": "Pop mit Brille",
+      "description": "Lime + Koralle",
+      "source": "/home/cinegenius/.codex/visualizations/2026/11/13/01a1d43f-7699-7452-b2f3-3691699f6613/profile-art-new-directions-20261118/2C-neutral.png",
+      "sourceSHA256": "ca36af08562af56dc64e047e28fcbfcab3f5f9b5df189b86dfa8398e1d1e73a9"
+    },
+    {
+      "kind": "human",
+      "number": 19,
+      "title": "Prisma",
+      "description": "Schillernde Flächen",
+      "source": "/home/cinegenius/.codex/visualizations/2026/11/13/01a1d43f-7699-7452-b2f3-3691699f6613/profile-art-new-directions-20261118/5A-maennlich.png",
+      "sourceSHA256": "80e40e27fdde79bf4a2e24759696a7fa30788fd597cbc4d69e407169bd3d14b6"
+    },
+    {
+      "kind": "human",
+      "number": 31,
+      "title": "Riso",
+      "description": "Druckversatz & Körnung",
+      "source": "/home/cinegenius/.codex/visualizations/2026/11/23/avatar-20-neue-richtungen/svg/31.svg",
+      "sourceSHA256": "e70d19761695b898351c090f3a27f2f1dae27a0f5e13bf09179574a15a8bc251"
+    },
+    {
+      "kind": "human",
+      "number": 32,
+      "title": "Holzschnitt",
+      "description": "Grobe Schnitte & Kontrast",
+      "source": "/home/cinegenius/.codex/visualizations/2026/11/23/avatar-20-neue-richtungen/svg/32.svg",
+      "sourceSHA256": "1fe47a25b6b4303a4c7f82c441490de9debd8a5ea30766c6c8c471225e41e16e"
+    },
+    {
+      "kind": "human",
+      "number": 36,
+      "title": "Aquarell",
+      "description": "Farbwolken & offene Kanten",
+      "source": "/home/cinegenius/.codex/visualizations/2026/11/23/avatar-20-neue-richtungen/svg/36.svg",
+      "sourceSHA256": "07bc712a8685855757872a6bb82e7b613bea080150754fda60058b25f50c07bf"
+    },
+    {
+      "kind": "human",
+      "number": 37,
+      "title": "Ölkreide",
+      "description": "Wilde Striche & satte Farbe",
+      "source": "/home/cinegenius/.codex/visualizations/2026/11/23/avatar-20-neue-richtungen/svg/37.svg",
+      "sourceSHA256": "2e634705586d3b5f188bff99093468b288891675291108d545b3a9ef6f554329"
+    },
+    {
+      "kind": "human",
+      "number": 38,
+      "title": "Comic-Noir",
+      "description": "Tiefes Schwarz & Raster",
+      "source": "/home/cinegenius/.codex/visualizations/2026/11/23/avatar-20-neue-richtungen/svg/38.svg",
+      "sourceSHA256": "cbe49a928023083fdf3ae4f3de27d70fcec92d9cef6d8dee196e27f16a4a8c03"
+    },
+    {
+      "kind": "human",
+      "number": 39,
+      "title": "Doodle",
+      "description": "Locker, schräg & frech",
+      "source": "/home/cinegenius/.codex/visualizations/2026/11/23/avatar-20-neue-richtungen/svg/39.svg",
+      "sourceSHA256": "49d073ba9c1eb3e655806ffb310c3c462b6f43c1e246aac1b57bb088ad3ca0a3"
+    },
+    {
+      "kind": "animal",
+      "number": 1,
+      "title": "Fuchs",
+      "description": "Riso · warm & frech",
+      "source": "/home/cinegenius/.codex/visualizations/2026/11/23/avatar-20-tiere/svg/01.svg",
+      "sourceSHA256": "5ee24e9ff3d937a84ba6d58a858977681f8bffbf9dea6b8b5e06acb6c2197e4d"
+    },
+    {
+      "kind": "animal",
+      "number": 2,
+      "title": "Katze",
+      "description": "Tusche · dunkel & eigensinnig",
+      "source": "/home/cinegenius/.codex/visualizations/2026/11/23/avatar-20-tiere/svg/02.svg",
+      "sourceSHA256": "bc8bbc569af0fb53b030b8cd60c6b66316f61455716f8d37509729477aa71acd"
+    },
+    {
+      "kind": "animal",
+      "number": 4,
+      "title": "Wolf",
+      "description": "Holzschnitt · wild & markant",
+      "source": "/home/cinegenius/.codex/visualizations/2026/11/23/avatar-20-tiere/svg/04.svg",
+      "sourceSHA256": "1b5a9ef7a71abffa7f518a6cc9f874ca16a28c98752985cf63ffe49e533d3947"
+    },
+    {
+      "kind": "animal",
+      "number": 5,
+      "title": "Löwe",
+      "description": "Siebdruck · mutig & warm",
+      "source": "/home/cinegenius/.codex/visualizations/2026/11/23/avatar-20-tiere/svg/05.svg",
+      "sourceSHA256": "7594f29d50271c880924ead53a7cb7d9ce0c8cb3bb5fc530e2017ddc022aece2"
+    },
+    {
+      "kind": "animal",
+      "number": 6,
+      "title": "Tiger",
+      "description": "Retro · starke Streifen",
+      "source": "/home/cinegenius/.codex/visualizations/2026/11/23/avatar-20-tiere/svg/06.svg",
+      "sourceSHA256": "8b587bc24d95d9ed0f8334ab6fc327b97aaab8e7ca9dd744518e1cc4419eee92"
+    },
+    {
+      "kind": "animal",
+      "number": 8,
+      "title": "Panda",
+      "description": "Minimal · Schwarz & Creme",
+      "source": "/home/cinegenius/.codex/visualizations/2026/11/23/avatar-20-tiere/svg/08.svg",
+      "sourceSHA256": "dc1f1cc7fde11eadd9650089f22c477cc42555acbeb701f346e688ea6bdd4e6c"
+    },
+    {
+      "kind": "animal",
+      "number": 10,
+      "title": "Waschbär",
+      "description": "Sticker · frech & kontrastreich",
+      "source": "/home/cinegenius/.codex/visualizations/2026/11/23/avatar-20-tiere/svg/10.svg",
+      "sourceSHA256": "f6eb10d0d4b9be9c7ee06cfc2fb32ebd17b0ee33be836e8e5d85a0a5917e914c"
+    },
+    {
+      "kind": "animal",
+      "number": 11,
+      "title": "Eule",
+      "description": "Nachtlicht · wach & geheimnisvoll",
+      "source": "/home/cinegenius/.codex/visualizations/2026/11/23/avatar-20-tiere/svg/11.svg",
+      "sourceSHA256": "2df6fbcb340753dffcc9c2fc4ceed771f144712e7d9eb8946ea9aad34a8129ee"
+    },
+    {
+      "kind": "animal",
+      "number": 14,
+      "title": "Pinguin",
+      "description": "Bauhaus · reduziert & klar",
+      "source": "/home/cinegenius/.codex/visualizations/2026/11/23/avatar-20-tiere/svg/14.svg",
+      "sourceSHA256": "74320921c0912360213c773a225967e9c52b0ed2520e26babeed3434ee417316"
+    },
+    {
+      "kind": "animal",
+      "number": 15,
+      "title": "Flamingo",
+      "description": "Linienkunst · lang & elegant",
+      "source": "/home/cinegenius/.codex/visualizations/2026/11/23/avatar-20-tiere/svg/15.svg",
+      "sourceSHA256": "195ce596f5767d928f80edbb6a9116228c90362f1e4bb5f08f1a4aa26c422b97"
+    },
+    {
+      "kind": "animal",
+      "number": 17,
+      "title": "Hirsch",
+      "description": "Mosaik · fein & charaktervoll",
+      "source": "/home/cinegenius/.codex/visualizations/2026/11/23/avatar-20-tiere/svg/17.svg",
+      "sourceSHA256": "00991a7f762f2b4280ff11544112d0e26582ccfb2ea36bc0a8eff68f90d698be"
+    },
+    {
+      "kind": "animal",
+      "number": 19,
+      "title": "Chamäleon",
+      "description": "Surreal · Farbe & Bewegung",
+      "source": "/home/cinegenius/.codex/visualizations/2026/11/23/avatar-20-tiere/svg/19.svg",
+      "sourceSHA256": "73417757a46d81c912ca423b1755fc93d532ba249609c4da3858516c4f70d87c"
+    },
+    {
+      "kind": "animal",
+      "number": 20,
+      "title": "Frosch",
+      "description": "Doodle · locker & witzig",
+      "source": "/home/cinegenius/.codex/visualizations/2026/11/23/avatar-20-tiere/svg/20.svg",
+      "sourceSHA256": "737165447f34ef7fecb52ae6bbe6b990df12226a23ffaeeee24e1f6cf5364fb6"
+    }
+  ]
+}
