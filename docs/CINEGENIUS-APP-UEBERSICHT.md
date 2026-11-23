@@ -2,7 +2,7 @@
 
 ## Suchendes Mitglied · Auftrag vom 23. November 2026
 
-Für neue Registrierungen entfällt der reine Sucheinstieg. Bestehende Sucher-Konten und gespeicherte Sucher-Auswahlen bleiben erhalten. Gemeinsame Web-Einrichtung und Speicherweg lokal angepasst und geprüft: 99 gezielte Tests, 17 Sprachen, 12 Browserfälle, TypeScript und Designprüfung bestanden. Noch kein Livegang oder neuer nativer Build. [Umfang und Prüfgrenzen](search-membership-retirement-20261123.md).
+Für neue Registrierungen entfällt der reine Sucheinstieg. Bestehende Sucher-Konten und gespeicherte Sucher-Auswahlen bleiben erhalten. Gemeinsame Web-Einrichtung und Speicherweg auf `32ce5b9f` veröffentlicht (dpl_EBjCGgcW7LsNFbYSZv5jYv3dPgSw, READY/www). 99 gezielte Tests, 17 Sprachen, 12 kontrollierte Browserfälle und Produktionsbuild bestanden; 15 HTTP- und zwei öffentliche Live-Browserprüfungen bestätigt. Keine Kundendatenänderung, kein neuer nativer Build und keine physische Geräteabnahme. [Umfang und Prüfgrenzen](search-membership-retirement-20261123.md).
 
 ## Gemeinsame Serverkorrekturen · 23. November 2026
 

@@ -14,7 +14,7 @@ Präzisierung: „jeder der als suchender drin ist bleibt so aber das soll nicht
 
 ## Prüfstand
 
-Kandidat auf dem Hauptstand `f1b6c32c7f126e5f51527af6fcb36e9d7bc1a21a`, noch nicht veröffentlicht.
+Veröffentlicht als `32ce5b9f258738630e3ff373aaba83d57f70b64e` auf Basis `f1b6c32c`. Produktion `dpl_EBjCGgcW7LsNFbYSZv5jYv3dPgSw` READY; www-Zuordnung und Liveprüfungen am 23.11.2026, 21:40 Uhr Berlin bestätigt.
 
 99 gezielte Tests bestanden: reale Handler/Komponenten mit kontrollierten Kontodaten,
 Speichern vor der Auswahl, fünf aktive Wege, Ablehnung neuer Sucher und gemischter
@@ -33,9 +33,16 @@ Belege: `/srv/cinegenius/handoffs/20261123-retire-search-member/`.
 
 ## Veröffentlichung und App
 
-Es fehlt die gesonderte Produktionsfreigabe für diesen neuen Auftrag. Der geschützte
-Releaseweg baut den freigegebenen sauberen Hauptstand vor Veröffentlichung erneut.
+Markus hat für diesen konkreten Auftrag ausdrücklich „Ja, jetzt live stellen“ bestätigt.
+Der geschützte Releaseweg hat den sauberen Hauptstand gleich origin/main und die
+Projektidentität geprüft. Produktionsbuild einschließlich TypeScript, Sprachen und
+Designprüfung bestanden. 15 öffentliche HTTP-Prüfungen einschließlich anonymer
+Schreibablehnung und zwei echte Browserprüfungen der Registrierung (de393/es1440)
+bestanden. Keine Kundendatenänderung oder Migration. Die erste kurze Laufzeitprüfung
+meldet keine Fehler/Fatal-Ereignisse; das ist kein Langzeitnachweis.
+
 Gemeinsame Web-Einrichtung gilt auch für die eingebettete App; keine Swift-Änderung,
 kein neuer Gerätebuild und keine physische Geräteabnahme in diesem Auftrag.
-Die frühere Freigabe der Anbieter-Fehlerkorrektur wird nicht als Freigabe dieser
-neuen Produktänderung behandelt.
+Der angemeldete neue Auswahlweg und bestehende Sucher sind in kontrollierten
+Komponenten-/Handler-/Browserfällen geprüft; keine echte neue Kundenregistrierung
+für den Livecheck. Freigabe und Livebelege: `/srv/cinegenius/handoffs/20261123-retire-search-member/release-receipt.json`.
