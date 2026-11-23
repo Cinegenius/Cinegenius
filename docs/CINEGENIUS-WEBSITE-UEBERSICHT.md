@@ -277,3 +277,12 @@ Einträgen und vollständiger Build bestanden.
 Website-Paket `69f4be8f` ist live; READY, www-Alias und 13 Live-HTTP-Prüfungen
 bestätigt. Echte angemeldete Sitzung und native Geräte nicht geprüft.
 [Vertrag, API und Grenzen](organization-entry-browser.md).
+
+## Profileinrichtung · 23. November 2026 · geprüfte Korrektur
+
+Zusatztätigkeit auch bei vier Berufen freiwillig; keine automatische Zuordnung.
+Fehlende Haupttätigkeit wird beim Abschluss übersetzt erklärt und direkt fokussiert.
+Foto/Cover/Vorstellungstext freiwillig, private Entwürfe und alle Berufe bleiben erhalten.
+43 gezielte Prüfungen, TypeScript und 17 Sprachkataloge bestanden. Quellstand, noch
+nicht veröffentlicht; echte native Geräteabnahme separat. Vertrag:
+[Berufsauswahl](profile-occupation-focus.md).

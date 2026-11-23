@@ -111,7 +111,7 @@ export function profileOccupationsUnchanged(profile: OccupationProfile, previous
 
 /** Existing oversized selections survive unrelated edits. Changing the selection
  * requires a deliberate reduction; reads and draft recovery never truncate it. */
-export function profileOccupationFocusError(profile: OccupationProfile, previous?: OccupationProfile | null): 'limit' | 'mainRequired' | 'additionalRequired' | 'invalidAdditional' | 'invalidSelection' | null {
+export function profileOccupationFocusError(profile: OccupationProfile, previous?: OccupationProfile | null): 'limit' | 'mainRequired' | 'invalidAdditional' | 'invalidSelection' | null {
   if (profile.positions != null && (!Array.isArray(profile.positions) || profile.positions.some(value => typeof value !== 'string' || !value.trim()))) return 'invalidSelection';
   const unchanged = profileOccupationsUnchanged(profile, previous);
   const count = profileOccupationCount(profile);
@@ -120,6 +120,7 @@ export function profileOccupationFocusError(profile: OccupationProfile, previous
   if (profile.crew?.additionalOccupation != null && !additionalCrewOccupation(profile)) return 'invalidAdditional';
   if (unchanged) return null;
   if (count && !main) return 'mainRequired';
-  if (count > MAX_VISIBLE_PROFILE_OCCUPATIONS && !additionalCrewOccupation(profile)) return 'additionalRequired';
+  // Choosing a fourth occupation does not make the additional slot mandatory.
+  // Preserve every selected occupation; the card preview remains capped at three.
   return null;
 }

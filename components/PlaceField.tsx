@@ -154,7 +154,7 @@ export default function PlaceField({ value, onChange, id, required = false, sele
     {code && <>
       {(regions.length > 0 || region || failed) && <div>
         <label className="mb-1 block text-sm text-text-secondary" htmlFor={`${base}-region`}>{t(code === 'CH' ? 'canton' : ['DE', 'AT'].includes(code) ? 'state' : 'region')}</label>
-        <input id={`${base}-region`} autoComplete="address-level1" maxLength={100} list={`${base}-regions`} value={selectedRegion?.name ?? region} onChange={event => { setOpen(false); emit(code, event.target.value, ''); }} className={input} />
+        <input id={`${base}-region`} autoComplete="address-level1" maxLength={100} list={`${base}-regions`} value={selectedRegion?.name ?? region} onChange={event => { setOpen(false); emit(code, event.target.value, city); }} className={input} />
         <datalist id={`${base}-regions`}>{regions.map(option => <option key={option.id} value={option.name} />)}</datalist>
         <p className="mt-1 text-xs text-text-muted">{t('regionOptional')}</p>
       </div>}

@@ -437,3 +437,12 @@ Die folgende Liste erhält den damaligen Vorbereitungsstand. Veröffentlichung u
 - E-Mail: Postfachverbindung und Weiterleitungsadresse sind Fragen/Vorschlag, **noch nicht implementiert oder aktiviert**. TestFlight bleibt eigener offener Auftrag.
 
 Nachweise liegen im lokalen App-Auftrag unter `work/app-unified-followup-20261121`, `native-inbox-panel-20261121`, `native-work-smooth-handoff-20261121`, `native-plan-editor-catalog-20261121`, `native-palette-mauve-20261121` und `persistent-personal-genie-20261121`. Erst gemeinsame Quelle einfrieren, vollständig bauen, via GitHub Desktop veröffentlichen und anschließend frisch gesichert installieren; niemals Zwischenstand als bereits auf dem iPhone behaupten.
+
+## Profileinrichtung · 23. November 2026 · geprüfte Korrektur
+
+Zusatztätigkeit auch bei vier Berufen freiwillig; keine automatische Zuordnung.
+Fehlende Haupttätigkeit wird beim Abschluss übersetzt erklärt und direkt fokussiert.
+Foto/Cover/Vorstellungstext freiwillig, private Entwürfe und alle Berufe bleiben erhalten.
+43 gezielte Prüfungen, TypeScript und 17 Sprachkataloge bestanden. Quellstand, noch
+nicht veröffentlicht; echte native Geräteabnahme separat. Vertrag:
+[Berufsauswahl](profile-occupation-focus.md).
