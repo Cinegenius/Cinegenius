@@ -1,6 +1,6 @@
 ## Aktueller WEB-Folgeauftrag · 24. November 2026
 
-Die veröffentlichte Adminübersicht ist abgeschlossen. Nächster beauftragter Ausbau: freiwillige Profildarstellung schon in der Erstellung und später änderbar. Vier Optionen, bestehende Profile automatisch, keine zusätzlichen Pflichtbilder. Umsetzung einschließlich Erstellung, Speicherung und Browseransichten geprüft:193 gezielte Tests,88 kontrollierte Browserfälle,17 Sprachkataloge,20 Designprüfungen und TypeScript bestanden. Bereit für die konkrete Veröffentlichungsfreigabe. App-/Mail-Aufträge bleiben getrennt. [Vertrag und Belege](profile-presentation-choice-20261124.md).
+Die freiwillige Profildarstellung ist nach Markus’ Freigabe auf `9706bfc3` / `dpl_9Efrm4yUNkGDeHrF8538GGJiXLnN` veröffentlicht und auf www geprüft. Schon in der Erstellung und später änderbar: vier Optionen, bestehende Profile automatisch, keine zusätzlichen Pflichtbilder. 193 gezielte Tests,88 kontrollierte Browserfälle,17 Sprachkataloge,20 Designprüfungen, TypeScript und Produktionsbuild bestanden; sechs HTTP- und sechs öffentliche Browserfälle sowie ausgelieferte Darstellungsbausteine live bestätigt. Aktueller App2212-Hauptstand erhalten, keine Migration oder native Installation. App-/Mail-Aufträge bleiben getrennt. [Vertrag und Belege](profile-presentation-choice-20261124.md).
 
 ## App-Folgeauftrag · 23. November 2026 · geprüfter Kandidat2212
 
