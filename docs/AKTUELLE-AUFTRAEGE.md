@@ -1,3 +1,7 @@
+## Aktueller WEB-Folgeauftrag · 24. November 2026
+
+Die veröffentlichte Adminübersicht ist abgeschlossen. Nächster beauftragter Ausbau: freiwillige Profildarstellung schon in der Erstellung und später änderbar. Vier Optionen, bestehende Profile automatisch, keine zusätzlichen Pflichtbilder. Umsetzung einschließlich Erstellung, Speicherung und Browseransichten geprüft:193 gezielte Tests,88 kontrollierte Browserfälle,17 Sprachkataloge,20 Designprüfungen und TypeScript bestanden. Bereit für die konkrete Veröffentlichungsfreigabe. App-/Mail-Aufträge bleiben getrennt. [Vertrag und Belege](profile-presentation-choice-20261124.md).
+
 ## App-Folgeauftrag · 23. November 2026 · geprüfter Kandidat2212
 
 1. **2212 veröffentlichen und getrennt am Gerät prüfen:** Ein vollständiger signierter Build und unabhängige Prüfung sind bestanden. Installiert/eng physisch akzeptiert bleibt2211; neuer neutraler/leerer Work-Zustand sowie neuer Editor sind noch nicht am Gerät akzeptiert. Vor Installation frische Sicherung und Datenerhaltsvergleich. Keine weitere pauschale Rückfrage zur bereits autorisierten Umsetzung ableiten.

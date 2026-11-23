@@ -1,3 +1,4 @@
+import { isProfilePresentation, normalizeProfilePresentation, type ProfilePresentation } from "./profile-presentation";
 import { storedCurrency } from './currency';
 import { isOccupationForm, normalizeOccupationForm, type OccupationForm } from "./occupation-form";
 
@@ -65,6 +66,7 @@ export type QuickStartDraft = {
   providerImageUrl?: string;
   profileAvatarUrl?: string;
   profileCoverUrl?: string;
+  profilePresentation?: ProfilePresentation;
   showInHomeCrew?: boolean;
   occupationForm?: OccupationForm;
   primaryOccupation?: PrimaryOccupation | null;
@@ -295,6 +297,7 @@ export function normalizeQuickStartDraft(value: unknown): QuickStartDraft {
     ...(typeof input.profileAvatarUrl === "string" ? { profileAvatarUrl: input.profileAvatarUrl.slice(0, 1200) } : {}),
     ...(typeof input.profileCoverUrl === "string" ? { profileCoverUrl: input.profileCoverUrl.slice(0, 1200) } : {}),
     ...(typeof input.showInHomeCrew === "boolean" ? { showInHomeCrew: input.showInHomeCrew } : {}),
+    ...(isProfilePresentation(input.profilePresentation) ? { profilePresentation: input.profilePresentation } : {}),
     ...(isOccupationForm(input.occupationForm) ? { occupationForm: input.occupationForm } : {}),
     talentIntro: typeof input.talentIntro === "string" ? input.talentIntro.slice(0, 1200) : "",
     sections,
@@ -474,4 +477,10 @@ export function selectQuickStartIntent(draft: QuickStartDraft, intent: QuickStar
 export function selectQuickStartOccupationForm(draft: QuickStartDraft, value: unknown): QuickStartDraft {
   if (!isOccupationForm(value) || value === normalizeOccupationForm(draft.occupationForm)) return draft;
   return { ...draft, occupationForm: value, completed: { ...draft.completed, profile: false } };
+}
+
+/** A photo layout change must be saved even after an earlier setup save. */
+export function selectQuickStartPresentation(draft: QuickStartDraft, value: unknown): QuickStartDraft {
+  if (!isProfilePresentation(value) || value === normalizeProfilePresentation(draft.profilePresentation)) return draft;
+  return { ...draft, profilePresentation: value, completed: { ...draft.completed, profile: false } };
 }

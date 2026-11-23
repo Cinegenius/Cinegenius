@@ -14138,5 +14138,13 @@
     "untitled": "Untitled listing",
     "account": "Account",
     "profile": "Profile"
+  },
+  "ProfilePresentation": {
+    "question": "How should your profile look?",
+    "hint": "Optional · Automatic follows your profile type. Change it later under Edit profile. Your photos stay saved.",
+    "auto": "Automatic",
+    "compact": "Small profile photo",
+    "portrait": "Large portrait",
+    "cover": "Cover + profile photo"
   }
 }

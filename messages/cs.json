@@ -14138,5 +14138,13 @@
     "untitled": "Nabídka bez názvu",
     "account": "Účet",
     "profile": "Profil"
+  },
+  "ProfilePresentation": {
+    "question": "Jak má tvůj profil vypadat?",
+    "hint": "Volitelné · Automaticky podle typu profilu. Později můžeš nastavení změnit v Úpravě profilu. Fotky zůstanou uložené.",
+    "auto": "Automaticky",
+    "compact": "Malá profilová fotka",
+    "portrait": "Velký portrét",
+    "cover": "Úvodní + profilová fotka"
   }
 }

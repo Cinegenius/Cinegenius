@@ -14138,5 +14138,13 @@
     "untitled": "未命名的供求信息",
     "account": "账户",
     "profile": "资料"
+  },
+  "ProfilePresentation": {
+    "question": "你希望个人主页如何显示？",
+    "hint": "可选 · 自动模式根据个人主页类型显示。之后可在“编辑个人主页”中随时更改，照片仍会保留。",
+    "auto": "自动",
+    "compact": "小头像",
+    "portrait": "大幅肖像",
+    "cover": "封面 + 头像"
   }
 }

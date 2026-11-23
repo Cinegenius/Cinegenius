@@ -1,6 +1,7 @@
 import { isStoredCurrency } from "@/lib/currency";
 import { saveProfileWithArt } from "@/lib/profile-art-save-server";
 import { profileArtDatabaseFailure } from "@/lib/profile-art-reservations";
+import { hasInvalidProfilePresentation, preserveProfilePresentation } from "@/lib/profile-presentation";
 import { hasInvalidOccupationForm, preserveOccupationForm } from "@/lib/occupation-form";
 import { validPronouns } from "@/lib/profile-identity";
 import { placeWriteFields } from "@/lib/places/catalog";
@@ -152,7 +153,7 @@ export async function POST(req: NextRequest) {
     return privateNoStoreJson({ error: tResponse("ProfileIdentity.invalidPronouns") }, 400);
   }
 
-  if (hasInvalidOccupationForm(crew) || (crew && typeof crew === "object" && "price_currency" in crew && !isStoredCurrency((crew as Record<string,unknown>).price_currency))) {
+  if (hasInvalidProfilePresentation(crew) || hasInvalidOccupationForm(crew) || (crew && typeof crew === "object" && "price_currency" in crew && !isStoredCurrency((crew as Record<string,unknown>).price_currency))) {
     return privateNoStoreJson({ error: tResponse("System.requestFailed") }, 400);
   }
 
@@ -236,7 +237,7 @@ export async function POST(req: NextRequest) {
     performance: performance ?? null,
     model_measurements: model_measurements ?? null,
     casting: casting ?? null,
-    crew: preserveOccupationForm(previous.data?.crew, crew ?? null),
+    crew: preserveProfilePresentation(previous.data?.crew, preserveOccupationForm(previous.data?.crew, crew ?? null)),
     cover_image_url: cover_image_url ?? null,
     instagram_url: instagram_url ?? null,
     tiktok_url: tiktok_url ?? null,
@@ -339,7 +340,7 @@ export async function PATCH(req: NextRequest) {
       return privateNoStoreJson({ error: tResponse("ProfileIdentity.invalidPronouns") }, 400);
     }
     if (safe.day_rate !== undefined && safe.day_rate !== null && (!Number.isSafeInteger(safe.day_rate) || Number(safe.day_rate) < 0)) return privateNoStoreJson({error:tResponse("System.priceMetadataInvalid")},400);
-    if (hasInvalidOccupationForm(safe.crew) || (safe.crew && typeof safe.crew === "object" && "price_currency" in safe.crew && !isStoredCurrency((safe.crew as Record<string,unknown>).price_currency))) {
+    if (hasInvalidProfilePresentation(safe.crew) || hasInvalidOccupationForm(safe.crew) || (safe.crew && typeof safe.crew === "object" && "price_currency" in safe.crew && !isStoredCurrency((safe.crew as Record<string,unknown>).price_currency))) {
       return privateNoStoreJson({ error: tResponse("System.requestFailed") }, 400);
     }
     if (typeof safe.pronouns === "string") safe.pronouns = safe.pronouns.trim() || null;
@@ -378,7 +379,7 @@ export async function PATCH(req: NextRequest) {
       previousActivity = current.data;
       // Omitted occupation fields survive older clients and partial crew edits.
       if (safe.crew && typeof safe.crew === "object" && !Array.isArray(safe.crew)) safe.crew = { ...current.data?.crew, ...safe.crew };
-      if (Object.hasOwn(safe, "crew")) safe.crew = preserveOccupationForm(current.data?.crew, safe.crew);
+      if (Object.hasOwn(safe, "crew")) safe.crew = preserveProfilePresentation(current.data?.crew, preserveOccupationForm(current.data?.crew, safe.crew));
       const optional = await selectOptionalProfileColumns<Record<string, unknown>>(
         ["profile_types"],
         async (projection) => {

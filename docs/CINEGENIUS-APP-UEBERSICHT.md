@@ -1,3 +1,7 @@
+## Freie Profildarstellung · 24. November 2026 · noch nicht veröffentlicht
+
+Markus wünscht die freiwillige Frage schon beim Anlegen eines Profils: Automatisch, kleines Profilbild, großes Porträt oder Cover + Profilbild. Dieselbe Wahl ist später im Fotoschritt der Bearbeitung verfügbar, unabhängig von Crew/Talent/Anbieter. Bestehende Profile bleiben automatisch; Tätigkeiten, Talentangaben, Medien und Sichtbarkeit bleiben erhalten. Keine neue Pflichtangabe oder Migration. Gemeinsamer Webkandidat lokal umgesetzt und mit193 gezielten Tests,88 kontrollierten Browserfällen,17 Sprachkatalogen,20 Designprüfungen und TypeScript geprüft. Veröffentlichung separat offen; keine native Installation oder physische Geräteabnahme. [Umfang, Speicherung und Prüfstand](profile-presentation-choice-20261124.md).
+
 ## Gemeinsamer Adminbereich · 23. November 2026 · veröffentlicht
 
 Ergänzter Auftrag: nicht fertiggestellte Profile gezielt filtern; Supportvorlagen und zugehörige E-Mails auf Englisch. Abgeschlossene Anbieter ohne Personenprofil bleiben abgeschlossen. Sieben Standardvorlagen sind übersetzt; keine Nachrichten versendet. Gesamtes ergänztes Paket auf `a6d7a34a` / `dpl_6u5AnGBUk4gFsPw3vEaw3MvavY4d` veröffentlicht, www-Zuordnung und Zugriffsschutz geprüft. Aktueller App2212-Hauptstand bleibt erhalten.

@@ -1,3 +1,4 @@
+import { isProfilePresentation, type ProfilePresentation } from "./profile-presentation";
 import { isOccupationForm, type OccupationForm } from "./occupation-form";
 import { occupationReference, primaryOccupationForPositions, type PrimaryOccupation } from "./primary-occupation";
 import { additionalCrewOccupation } from "./crew-occupations";
@@ -18,6 +19,7 @@ export type GuidedProfileDraft = {
   additionalOccupation?: PrimaryOccupation | null;
   bio: string;
   occupationForm?: OccupationForm;
+  profilePresentation?: ProfilePresentation;
 };
 
 export const START_GUIDED_PROFILE_DRAFT: GuidedProfileDraft = {
@@ -34,7 +36,7 @@ const oldWizardTalentPosition: Record<string, string> = {
 };
 
 export function normalizeGuidedProfileDraft(value: Partial<GuidedProfileDraft> & { gripPositions?: string[]; types?: string[] }): GuidedProfileDraft {
-  const { gripPositions: _legacyGripPositions, occupationForm, ...currentValues } = value;
+  const { gripPositions: _legacyGripPositions, occupationForm, profilePresentation, ...currentValues } = value;
   void _legacyGripPositions;
   const rawTypes = Array.isArray(value.types) ? value.types : [];
   const departmentIds = new Set(Array.isArray(value.departmentIds) ? value.departmentIds : []);
@@ -68,6 +70,7 @@ export function normalizeGuidedProfileDraft(value: Partial<GuidedProfileDraft> &
   return {
     ...START_GUIDED_PROFILE_DRAFT,
     ...currentValues,
+    ...(isProfilePresentation(profilePresentation) ? { profilePresentation } : {}),
     ...(isOccupationForm(occupationForm) ? { occupationForm } : {}),
     selected_place_city_id: selectedPlaceId(value.selected_place_city_id),
     step: Math.max(1, Math.min(4, Number(value.step) || 1)),

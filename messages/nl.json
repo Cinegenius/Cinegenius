@@ -14138,5 +14138,13 @@
     "untitled": "Advertentie zonder titel",
     "account": "Account",
     "profile": "Profiel"
+  },
+  "ProfilePresentation": {
+    "question": "Hoe wil je je profiel tonen?",
+    "hint": "Optioneel · Automatisch past zich aan je profieltype aan. Later te wijzigen via Profiel bewerken. Je foto’s blijven bewaard.",
+    "auto": "Automatisch",
+    "compact": "Kleine profielfoto",
+    "portrait": "Groot portret",
+    "cover": "Omslag + profielfoto"
   }
 }

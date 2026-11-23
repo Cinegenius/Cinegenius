@@ -1,4 +1,6 @@
 "use client";
+import { profilePresentationFromCrew, presentationPortrait } from "@/lib/profile-presentation";
+import { PresentationPhoto, PresentationCover } from "@/components/ProfilePresentationMedia";
 import { listingCurrency, formatOfferAmount } from "@/lib/currency";
 
 import { TranslatedText, useTranslatedContent } from "@/components/ContentTranslation";
@@ -506,6 +508,8 @@ function ActorProfile({ organizationSection, profile, isOwner, projectCredits, c
   const profileText = useTranslations("profile");
   const creatorText = useTranslations("creators");
   const travel = profileTravelValue(profile);
+  const presentation = profilePresentationFromCrew(profile.crew);
+  const largePresentation = presentation === "portrait" && !!presentationPortrait(profile);
   const canContact = !blockStatus?.youBlocked && !blockStatus?.theyBlocked;
   const [lightbox, setLightbox] = useState<string | null>(null);
   const [showAllFilms, setShowAllFilms] = useState(false);
@@ -570,11 +574,12 @@ function ActorProfile({ organizationSection, profile, isOwner, projectCredits, c
       {/* ── HERO ─────────────────────────────────────────────────────────── */}
       <section className="pt-16 bg-bg-primary">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10 lg:py-14">
-          <div className="grid grid-cols-1 lg:grid-cols-5 gap-6 lg:gap-10 items-start">
+          {presentation === "cover" && <PresentationCover profile={profile} />}
+          <div data-profile-presentation={presentation} className={presentation === "auto" ? "grid grid-cols-1 lg:grid-cols-5 gap-6 lg:gap-10 items-start" : largePresentation ? "grid min-w-0 grid-cols-1 gap-6 sm:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)]" : "grid min-w-0 grid-cols-1 gap-4 sm:grid-cols-[96px_minmax(0,1fr)]"}>
 
             {/* ── Main headshot (= avatar) ── */}
-            <div className="lg:col-span-2">
-              {mainShot ? (
+            <div className={presentation === "auto" ? "lg:col-span-2" : "min-w-0"}>
+              {presentation !== "auto" ? <PresentationPhoto profile={profile} mode={presentation} onOpen={setLightbox} /> : mainShot ? (
                 <div
                   className="relative w-full aspect-[3/4] rounded-xl overflow-hidden cursor-pointer group bg-bg-elevated"
                   onClick={() => setLightbox(mainShot)}
@@ -596,7 +601,7 @@ function ActorProfile({ organizationSection, profile, isOwner, projectCredits, c
             </div>
 
             {/* ── Info panel ── */}
-            <div className="lg:col-span-3 flex flex-col gap-5 lg:pt-1">
+            <div className={`${presentation === "auto" ? "lg:col-span-3 " : ""}min-w-0 flex flex-col gap-5 lg:pt-1`}>
 
               {/* Top bar: availability + name + CTAs */}
               <div className="flex flex-col sm:flex-row items-start gap-3">
@@ -969,6 +974,8 @@ function ModelProfile({ organizationSection, profile, isOwner, projectCredits = 
   const uiText = useTranslations();
 
   const profileText = useTranslations("profile");
+  const presentation = profilePresentationFromCrew(profile.crew);
+  const largePresentation = presentation === "portrait" && !!presentationPortrait(profile);
   const canContact = !blockStatus?.youBlocked && !blockStatus?.theyBlocked;
   const [lightbox, setLightbox] = useState<string | null>(null);
 
@@ -1018,8 +1025,10 @@ function ModelProfile({ organizationSection, profile, isOwner, projectCredits = 
 
       <section className="border-b border-border bg-bg-primary pt-16 sm:pt-20">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-10">
-          <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] gap-5 sm:gap-8 lg:gap-12 items-start">
-            <div className="relative mx-auto w-full max-w-[520px] lg:max-w-none">
+          {presentation === "cover" && <PresentationCover profile={profile} />}
+          <div data-profile-presentation={presentation} className={presentation === "auto" ? "grid grid-cols-1 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] gap-5 sm:gap-8 lg:gap-12 items-start" : largePresentation ? "grid min-w-0 grid-cols-1 gap-6 sm:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)]" : "grid min-w-0 grid-cols-1 gap-4 sm:grid-cols-[96px_minmax(0,1fr)]"}>
+            <div className={presentation === "auto" ? "relative mx-auto w-full max-w-[520px] lg:max-w-none" : "min-w-0"}>
+              {presentation !== "auto" ? <PresentationPhoto profile={profile} mode={presentation} onOpen={setLightbox} /> : (
               <button type="button" onClick={() => resolvedMainPhotoUrl && setLightbox(resolvedMainPhotoUrl)} disabled={!resolvedMainPhotoUrl}
                 aria-label={resolvedMainPhotoUrl ? uiText("Ui.text_7418b51c63879f") : undefined}
                 className="relative block w-full aspect-[4/3] sm:aspect-[16/10] lg:aspect-[4/3] max-h-[420px] overflow-hidden rounded-2xl border border-border bg-bg-secondary disabled:cursor-default">
@@ -1034,7 +1043,7 @@ function ModelProfile({ organizationSection, profile, isOwner, projectCredits = 
                   />
                 ) : <span className="flex h-full items-center justify-center font-display text-5xl font-bold text-text-muted/30">{(profile.display_name ?? "?")[0]}</span>}
                 {profile.verified && <span className="absolute left-3 top-3 inline-flex items-center gap-1.5 rounded-full border border-white/20 bg-black/60 px-2.5 py-1 text-[10px] font-semibold text-white"><Check size={10} aria-hidden="true" /> {uiText("common.verified")}</span>}
-              </button>
+              </button>)}
             </div>
 
             <div className="min-w-0 space-y-4">
@@ -1253,6 +1262,8 @@ function GenericProfile({ organizationSection, profile, isOwner, projectCredits,
   const creatorText = useTranslations("creators");
   const travel = profileTravelValue(profile);
   const tHeader = useTranslations("profileHeader");
+  const presentation = profilePresentationFromCrew(profile.crew);
+  const largePresentation = presentation === "portrait" && !!presentationPortrait(profile);
   const canContact = !blockStatus?.youBlocked && !blockStatus?.theyBlocked;
   const [lightbox, setLightbox] = useState<string | null>(null);
   const [expandedFilm, setExpandedFilm] = useState<number | null>(null);
@@ -1266,7 +1277,7 @@ function GenericProfile({ organizationSection, profile, isOwner, projectCredits,
   const languages = profile.languages ?? [];
   const certificates: string[] = profile.crew?.certificates ?? [];
   const software: string[] = profile.crew?.software ?? [];
-  const bgImage = profile.cover_image_url ?? (images.find((i) => i.featured)?.url);
+  const bgImage = presentation === "auto" ? profile.cover_image_url ?? (images.find((i) => i.featured)?.url) : presentation === "cover" ? profile.cover_image_url : null;
   const roleLabels = displayPositions(profile, getLocalizedProfileTypeLabels(uiText)).map(label => taxonomyLabel(label, uiText, occupationFormFromCrew(profile.crew)));
 
   // Filmografie shows only manual entries — linked project credits appear as visual cards in "Projekte"
@@ -1291,7 +1302,7 @@ function GenericProfile({ organizationSection, profile, isOwner, projectCredits,
       {lightbox && <Lightbox src={lightbox} onClose={() => setLightbox(null)} />}
 
       {/* Hero */}
-      <section data-profile-header={bgImage ? "banner" : "compact"} className={`relative isolate flex items-end ${bgImage ? "min-h-[300px] sm:min-h-[340px]" : "profile-hero--compact"}`}>
+      <section data-profile-presentation={presentation} data-profile-header={bgImage ? "banner" : largePresentation ? "portrait" : "compact"} className={`relative isolate flex items-end ${bgImage ? "min-h-[300px] sm:min-h-[340px]" : "profile-hero--compact"}`}>
         {bgImage ? (
           <>
             <ResilientPublicImage src={bgImage} alt="" className="absolute inset-0" imageClassName="h-full w-full object-cover" imageStyle={profileCoverStyle(profile.focal_point)} loading="eager" />
@@ -1300,8 +1311,8 @@ function GenericProfile({ organizationSection, profile, isOwner, projectCredits,
         ) : null}
 
         <div className={`relative z-10 mx-auto w-full min-w-0 max-w-5xl px-4 sm:px-6 lg:px-8 pb-5 sm:pb-6 ${bgImage ? "pt-40 sm:pt-44" : "pt-6 sm:pt-8"}`}>
-          <div className={bgImage ? "flex w-fit min-w-0 max-w-[min(100%,36rem)] items-center gap-3 rounded-2xl bg-bg-primary/95 p-3 sm:gap-4 sm:p-4" : "profile-identity--compact flex w-full min-w-0 items-center gap-4 rounded-2xl p-4 sm:gap-5 sm:p-6"}>
-            {profile.avatar_url ? (
+          <div className={bgImage ? "flex w-fit min-w-0 max-w-[min(100%,36rem)] items-center gap-3 rounded-2xl bg-bg-primary/95 p-3 sm:gap-4 sm:p-4" : largePresentation ? "grid min-w-0 grid-cols-1 items-center gap-5 sm:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)]" : "profile-identity--compact flex w-full min-w-0 items-center gap-4 rounded-2xl p-4 sm:gap-5 sm:p-6"}>
+            {presentation !== "auto" ? <PresentationPhoto profile={profile} mode={presentation} onOpen={setLightbox} /> : profile.avatar_url ? (
               <button type="button" onClick={() => setLightbox(profile.avatar_url!)} aria-label={tHeader("openPhoto")}
                 className="shrink-0 rounded-xl focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-gold">
                 <ProfileCardPhoto src={profile.avatar_url ?? ""} name={profile.display_name ?? ""} focalPoint={profile.focal_point} className={bgImage ? "h-16 w-16 rounded-xl sm:h-20 sm:w-20" : "h-20 w-20 rounded-xl sm:h-24 sm:w-24"} sizes={bgImage ? "(max-width: 640px) 64px, 80px" : "(max-width: 640px) 80px, 96px"} />

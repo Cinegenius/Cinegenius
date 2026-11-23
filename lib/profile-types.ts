@@ -1,3 +1,4 @@
+import type { ProfilePresentation } from "./profile-presentation";
 import type { OccupationForm } from "./occupation-form";
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -218,6 +219,7 @@ export type TargetFormat =
 export interface CrewData {
   /** Self-selected professional wording; absent keeps the compact standard. */
   occupationForm?: OccupationForm;
+  profilePresentation?: ProfilePresentation;
   primaryOccupation?: {departmentId: string; roleId: string} | null;
   occupations?: {departmentId: string; roleId: string}[];
   additionalOccupation?: {departmentId: string; roleId: string} | null;

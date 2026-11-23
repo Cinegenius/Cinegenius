@@ -14138,5 +14138,13 @@
     "untitled": "Annuncio senza titolo",
     "account": "Account",
     "profile": "Profilo"
+  },
+  "ProfilePresentation": {
+    "question": "Come vuoi mostrare il tuo profilo?",
+    "hint": "Facoltativo · Automatico segue il tipo di profilo. Puoi cambiarlo in seguito in Modifica profilo. Le foto restano salvate.",
+    "auto": "Automatico",
+    "compact": "Foto profilo piccola",
+    "portrait": "Ritratto grande",
+    "cover": "Copertina + foto profilo"
   }
 }

@@ -31,6 +31,8 @@ import { useToast } from "@/contexts/ToastContext";
 import FocalPointPicker, { type FocalPoint } from "@/components/FocalPointPicker";
 import PrimaryOccupationPicker from "@/components/PrimaryOccupationPicker";
 import OccupationFormSelect from "@/components/OccupationFormSelect";
+import ProfilePresentationPicker from "@/components/ProfilePresentationPicker";
+import { normalizeProfilePresentation, profilePresentationFromCrew, wantsProfileCover, type ProfilePresentation } from "@/lib/profile-presentation";
 import { normalizeOccupationForm, occupationFormFromCrew, type OccupationForm } from "@/lib/occupation-form";
 import { selectedCrewOccupations, additionalCrewOccupation, profileOccupationFocusError, profileOccupationCount, MAX_PROFILE_OCCUPATIONS, type OccupationProfile } from "@/lib/crew-occupations";
 import { removeProfilePosition, toggleProfileOccupation, type ProfileOccupationEdit } from "@/lib/profile-occupation-editor";
@@ -663,6 +665,7 @@ function ProfileEditorContent({ accountId }: { accountId: string }) {
     pronouns: "",
     showPronouns: false,
     occupationForm: "standard" as OccupationForm,
+    profilePresentation: "auto" as ProfilePresentation,
   });
   const occupationForm = normalizeOccupationForm(form.occupationForm);
   const [skills, setSkills] = useState<string[]>([]);
@@ -828,6 +831,7 @@ function ProfileEditorContent({ accountId }: { accountId: string }) {
             pronouns: profile.pronouns ?? "",
             showPronouns: profile.show_pronouns === true,
             occupationForm: occupationFormFromCrew(profile.crew),
+            profilePresentation: profilePresentationFromCrew(profile.crew),
             name:          profile.display_name        ?? "",
             city:          placeInputValue(profile, profile.location ?? ""),
             country:       "",
@@ -1248,7 +1252,7 @@ function ProfileEditorContent({ accountId }: { accountId: string }) {
         day_rate:       dayRate ? Number(dayRate) : null,
         filmography,
         video_links:    videoLinks,
-        crew: { ...crewDataRef.current, price_currency: dayRateCurrency, occupationForm, additionalOccupation, occupations: selectedCrewOccupations(positions, occupationSelections, null, primaryOccupation), certificates: crewCertificates, primaryOccupation: occupationReference(primaryOccupationForPositions(primaryOccupation, positions)) },
+        crew: { ...crewDataRef.current, price_currency: dayRateCurrency, occupationForm, profilePresentation: normalizeProfilePresentation(form.profilePresentation), additionalOccupation, occupations: selectedCrewOccupations(positions, occupationSelections, null, primaryOccupation), certificates: crewCertificates, primaryOccupation: occupationReference(primaryOccupationForPositions(primaryOccupation, positions)) },
       };
 
       if (!isCurrentEditor()) return;
@@ -1808,6 +1812,7 @@ function ProfileEditorContent({ accountId }: { accountId: string }) {
                 )}
 
                 {editorStep === 4 && !draftLoading && !draftLoadError && <div className="space-y-6">
+                <div className="rounded-xl border border-border bg-bg-secondary p-4 sm:p-6"><ProfilePresentationPicker value={normalizeProfilePresentation(form.profilePresentation)} onChange={value => { markEditorChanged(); setForm(current => ({ ...current, profilePresentation: value })); }} disabled={saving} /></div>
                 <ContentUsageNotice context="profile" visibility="configured" />
                 <div className="rounded-xl border border-border bg-bg-secondary p-4 sm:p-6">
                   <div className="mb-2 flex items-center justify-between gap-3"><label htmlFor="profile-bio" className="text-sm font-semibold text-text-primary">{t("fieldBio")}</label><span className="text-xs text-text-muted">{uiText("setup.copy38")}</span></div>
@@ -1956,8 +1961,8 @@ function ProfileEditorContent({ accountId }: { accountId: string }) {
                   )}
                 </div>
 
-                {/* Crew/creative/vendor cover; talent keeps its existing profile-photo hero. */}
-                {!showTalentSections && <div className="p-4 sm:p-6 bg-bg-secondary border border-border rounded-xl">
+                {/* Hidden cover choices retain their saved image and crop. */}
+                {wantsProfileCover(form.profilePresentation, showTalentSections) && <div className="p-4 sm:p-6 bg-bg-secondary border border-border rounded-xl">
                   <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                     <div>
                       <h2 className="font-semibold text-text-primary mb-0.5">{t("sectionCover")} <span className="text-xs font-normal text-text-muted">({optionalMedia("optional")})</span></h2>
