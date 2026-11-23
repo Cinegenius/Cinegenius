@@ -37,6 +37,7 @@ import { backFromMessageView, navigateMessageView, navigateInboxView, inboxView 
 import { uiErrorMessage } from "@/lib/ui-error-message";
 import { useNativeAppAppearance } from "@/lib/use-native-app-appearance";
 import { useNativeHeaderUtilityKind } from "@/lib/native-header-utility";
+import { useNativeMessageVisibility,nativeMessageVisibleSnapshot } from "@/lib/native-message-visibility";
 import nativeInboxStyles from "@/components/messaging/NativeInboxSurface.module.css";
 
 type Message = {
@@ -110,29 +111,33 @@ export default function MessagesContent({ embedded }: { embedded?: EmbeddedInbox
   const convParam = embedded ? embedded.destination.conversationId ?? null : searchParams.get("conv");
   const nativeAppearance = useNativeAppAppearance();
   const utility = useNativeHeaderUtilityKind();
-  const readerEnabled = !nativeAppearance || !!embedded || utility !== "messages";
+  const webVisible = useNativeMessageVisibility(nativeAppearance);
+  const readerEnabled = webVisible && (!nativeAppearance || !!embedded || utility !== "messages");
   const readerEnabledRef = useRef(readerEnabled);
   useLayoutEffect(() => { readerEnabledRef.current=readerEnabled; return () => { readerEnabledRef.current=false; }; }, [readerEnabled]);
+  const nativeReaderRef=useRef(nativeAppearance);
+  useLayoutEffect(()=>{nativeReaderRef.current=nativeAppearance;},[nativeAppearance]);
+  const canRead=useCallback(()=>readerEnabledRef.current && (!nativeReaderRef.current || nativeMessageVisibleSnapshot()),[]);
   const view = embedded ? "chats" : inboxView(searchParams, nativeAppearance);
   const friendsOnly = view === "friends";
   const noticesOnly = view === "notices";
   const utilityView = friendsOnly || noticesOnly;
   const requestedCompanySlug = toParam ? (embedded ? embedded.destination.companySlug?.slice(0, 200) : searchParams.get("company_slug")?.slice(0, 200)) : null;
-  const [companyContact, setCompanyContact] = useState<{ name: string; slug: string; recipient: string } | null>(null);
-  const verifiedCompany = companyContact?.recipient === toParam && companyContact?.slug === requestedCompanySlug ? companyContact : null;
+  const [companyContact, setCompanyContact] = useState<{ name: string; slug: string; recipient: string; ownerId:string } | null>(null);
+  const verifiedCompany = companyContact?.ownerId === user?.id && companyContact?.recipient === toParam && companyContact?.slug === requestedCompanySlug ? companyContact : null;
   const companyLabel = verifiedCompany?.name;
   const companySlug = verifiedCompany?.slug;
 
   useEffect(() => {
-    if (!toParam || !requestedCompanySlug || !user?.id) return;
+    if (!readerEnabled || !toParam || !requestedCompanySlug || !user?.id) return;
     const controller = new AbortController();
     const query = new URLSearchParams({ slug: requestedCompanySlug, recipient: toParam });
     fetch(`/api/companies/contact-context?${query}`, { signal: controller.signal, cache: "no-store" })
       .then(async response => response.ok ? response.json() : { company: null })
-      .then(({ company }) => { if (!controller.signal.aborted) setCompanyContact(company ? { ...company, recipient: toParam } : null); })
+      .then(({ company }) => { if (!controller.signal.aborted) setCompanyContact(company ? { ...company, recipient: toParam,ownerId:user.id } : null); })
       .catch(() => { if (!controller.signal.aborted) setCompanyContact(null); });
     return () => controller.abort();
-  }, [toParam, requestedCompanySlug, user?.id]);
+  }, [toParam, requestedCompanySlug, user?.id,readerEnabled]);
 
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [activeId, setActiveId] = useState<string | null>(null);
@@ -179,10 +184,37 @@ export default function MessagesContent({ embedded }: { embedded?: EmbeddedInbox
   const conversationRequestSequence = useRef(0);
   const contactRequestSequence = useRef(0);
   const currentUserRef = useRef(user?.id);
+  const [renderOwner,setRenderOwner] = useState(user?.id);
+  const readEpoch = useRef(0);
+  const reads = useRef(new Map<string,AbortController>());
+  const beginRead = useCallback((key:string) => {
+    if (!canRead() || !currentUserRef.current || reads.current.has(key)) return null;
+    const controller=new AbortController();reads.current.set(key,controller);
+    return {key,controller,epoch:readEpoch.current,signal:AbortSignal.any([controller.signal,AbortSignal.timeout(15_000)])};
+  }, [canRead]);
+  const endRead = useCallback((read:{key:string;controller:AbortController}) => {
+    if (reads.current.get(read.key) === read.controller) reads.current.delete(read.key);
+  }, []);
+  const stopReads = useCallback(() => {
+    readEpoch.current += 1;
+    for (const controller of reads.current.values()) controller.abort();
+    reads.current.clear();
+  }, []);
   useLayoutEffect(() => {
     currentUserRef.current = user?.id;
-    return () => { currentUserRef.current = undefined; activeIdRef.current = null; messageRequestSequence.current += 1; conversationRequestSequence.current += 1; contactRequestSequence.current += 1; };
-  }, [user?.id]);
+    return () => { currentUserRef.current = undefined; activeIdRef.current = null; messageRequestSequence.current += 1; conversationRequestSequence.current += 1; contactRequestSequence.current += 1; stopReads(); };
+  }, [user?.id,stopReads]);
+  useLayoutEffect(() => {
+    if (readerEnabled) return;
+    stopReads();messageRequestSequence.current += 1;conversationRequestSequence.current += 1;contactRequestSequence.current += 1;
+    // Keep the mounted composer, selected IDs and account-bound draft; discard
+    // only server rows before a hidden surface can be shown again.
+    // Clear private server rows before this retained surface can become visible.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setConversations([]);setConversationCursor(null);setContacts([]);setMessages([]);messagesRef.current=[];
+    setHasOlderMessages(false);setMoreConversationsLoading(false);setNewMessagesAvailable(false);
+    setSelectedMessage(null);setLoading(true);setLoadingMessages(Boolean(activeIdRef.current));setOlderLoading(false);
+  }, [readerEnabled,stopReads]);
 
   // Restore only after React has committed the prepended history to the viewport.
   useLayoutEffect(() => {
@@ -234,26 +266,30 @@ export default function MessagesContent({ embedded }: { embedded?: EmbeddedInbox
   const loadConversations = useCallback(async (cursor?: {before:string;before_id:string}) => {
     const owner = currentUserRef.current;
     if (!owner) return;
+    const read=beginRead("conversations:"+JSON.stringify(cursor ?? null));if (!read) return;
+    const current=()=>canRead() && currentUserRef.current === owner && read.epoch === readEpoch.current && !read.controller.signal.aborted;
     const sequence = ++conversationRequestSequence.current;
     try {
-      const res = await fetch("/api/conversations"+(cursor?"?"+new URLSearchParams(cursor):""), { cache: "no-store", signal: AbortSignal.timeout(15_000) });
+      const res = await fetch("/api/conversations"+(cursor?"?"+new URLSearchParams(cursor):""), { cache: "no-store", signal: read.signal });
       if (!res.ok) throw new Error();
       const { data,nextCursor } = await res.json();
-      if (currentUserRef.current !== owner || sequence !== conversationRequestSequence.current) return;
+      if (read.signal.aborted) throw new Error("request_timeout");
+      if (!current() || sequence !== conversationRequestSequence.current) return;
       if (!Array.isArray(data)) throw new Error();
       setConversations(current => cursor ? [...new Map([...current,...data as Conversation[]].map(item=>[item.id,item])).values()] : data as Conversation[]);
       setConversationCursor(nextCursor??null);
       setConversationLoadFailed(false);
     } catch {
-      if (currentUserRef.current === owner && sequence === conversationRequestSequence.current) setConversationLoadFailed(true);
+      if (current() && sequence === conversationRequestSequence.current) setConversationLoadFailed(true);
     } finally {
-      if (currentUserRef.current === owner && sequence === conversationRequestSequence.current) setLoading(false);
-      if (currentUserRef.current === owner && sequence === conversationRequestSequence.current) setMoreConversationsLoading(false);
+      endRead(read);
+      if (current() && sequence === conversationRequestSequence.current) setLoading(false);
+      if (current() && sequence === conversationRequestSequence.current) setMoreConversationsLoading(false);
     }
-  }, []);
+  }, [beginRead,endRead,canRead]);
 
   useEffect(() => {
-    if (!user?.id) return;
+    if (!user?.id || !readerEnabled) return;
     const unsubscribe = subscribeToMessageReads(user.id, () => { void loadConversations(); });
     const interval = window.setInterval(() => {
       if (document.visibilityState === "visible") void loadConversations();
@@ -262,26 +298,30 @@ export default function MessagesContent({ embedded }: { embedded?: EmbeddedInbox
       unsubscribe();
       window.clearInterval(interval);
     };
-  }, [user?.id, loadConversations]);
+  }, [user?.id, readerEnabled,loadConversations]);
 
   const loadContacts = useCallback(async () => {
     const owner = currentUserRef.current;
     if (!owner) return;
+    const read=beginRead("contacts");if (!read) return;
+    const current=()=>canRead() && currentUserRef.current === owner && read.epoch === readEpoch.current && !read.controller.signal.aborted;
     const sequence = ++contactRequestSequence.current;
     setContactsError(false);
     try {
-      const res = await fetch("/api/friendships", { cache: "no-store", headers:{"X-Contact-Account":owner}, signal: AbortSignal.timeout(15_000) });
+      const res = await fetch("/api/friendships", { cache: "no-store", headers:{"X-Contact-Account":owner}, signal: read.signal });
       if (!res.ok) throw new Error();
       const { friends } = await res.json();
-      if (currentUserRef.current !== owner || sequence !== contactRequestSequence.current) return;
+      if (read.signal.aborted) throw new Error("request_timeout");
+      if (!current() || sequence !== contactRequestSequence.current) return;
       setContacts(Array.isArray(friends) ? [...new Map((friends as FriendRequest[]).filter(f => f.user_id !== owner).map(f => [f.user_id, f])).values()] : []);
-    } catch { if (currentUserRef.current === owner && sequence === contactRequestSequence.current) setContactsError(true); }
-  }, []);
+    } catch { if (current() && sequence === contactRequestSequence.current) setContactsError(true); }
+    finally {endRead(read);}
+  }, [beginRead,endRead,canRead]);
 
   useEffect(() => {
     // Clear private data immediately when the external authentication account changes.
     // eslint-disable-next-line react-hooks/set-state-in-effect
-    setConversations([]); setConversationCursor(null); setMoreConversationsLoading(false); setContacts([]); setMessages([]);
+    setConversations([]); setConversationCursor(null); setMoreConversationsLoading(false); setContacts([]); setMessages([]); setCompanyContact(null);
     setActiveId(null); activeIdRef.current = null; messagesRef.current = [];
     setNewConvRecipient(null); setRecipientName(""); setLoadingRecipient(false);
     hiddenMessageIds.current.clear(); setMessageNotice(""); setNewMessagesAvailable(false);
@@ -290,9 +330,14 @@ export default function MessagesContent({ embedded }: { embedded?: EmbeddedInbox
     setConversationLoadFailed(false); setMessageLoadFailure(null); setLoadingMessages(false); setOlderLoading(false);
     setLoading(true); setContactsError(false);
     contactRequestSequence.current += 1;
-    if (!user?.id) return;
-    loadConversations();
-  }, [user?.id, loadConversations]);
+    setRenderOwner(user?.id);
+  }, [user?.id]);
+
+  useEffect(() => {
+    // The enabled edge subscribes to current server state; beginRead coalesces overlapping focus.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    if (readerEnabled && user?.id) void loadConversations();
+  }, [readerEnabled,user?.id,loadConversations]);
 
   // The URL is the selection, including browser Back/Forward and native swipe.
   // Changing a chat must not clear the account's contacts or unsent text drafts.
@@ -312,7 +357,7 @@ export default function MessagesContent({ embedded }: { embedded?: EmbeddedInbox
   }, [convParam, toParam, user?.id]);
 
   useEffect(() => {
-    if (!toParam) return;
+    if (!readerEnabled || !toParam) return;
     const controller = new AbortController();
     fetch(`/api/profile/by-id?id=${encodeURIComponent(toParam)}`, { signal: controller.signal, cache: "no-store" })
       .then(r => r.json())
@@ -323,7 +368,7 @@ export default function MessagesContent({ embedded }: { embedded?: EmbeddedInbox
       })
       .catch(() => { if (!controller.signal.aborted) setLoadingRecipient(false); });
     return () => controller.abort();
-  }, [toParam, user?.id, companyLabel, t]);
+  }, [toParam, user?.id, companyLabel, t,readerEnabled]);
 
 
   const loadMessages = useCallback(async (
@@ -331,9 +376,11 @@ export default function MessagesContent({ embedded }: { embedded?: EmbeddedInbox
     options: { scroll?: boolean; before?: { before: string; before_id: string } } = {},
   ) => {
     const owner = currentUserRef.current;
-    if (!owner || !readerEnabledRef.current) return;
+    if (!owner || !canRead()) return;
+    const read=beginRead("history:"+convId+":"+JSON.stringify(options.before ?? null));if (!read) return;
     const requestSequence = options.before ? null : ++messageRequestSequence.current;
-    const isCurrentRequest = () => readerEnabledRef.current && currentUserRef.current === owner && activeIdRef.current === convId
+    const isCurrentRequest = () => canRead() && currentUserRef.current === owner && activeIdRef.current === convId
+      && read.epoch === readEpoch.current && !read.controller.signal.aborted
       && (requestSequence === null || requestSequence === messageRequestSequence.current);
     const olderViewport = options.before ? messagesViewportRef.current : null;
     const previousScrollHeight = olderViewport?.scrollHeight ?? 0;
@@ -342,9 +389,10 @@ export default function MessagesContent({ embedded }: { embedded?: EmbeddedInbox
       const query = options.before
         ? `?before=${encodeURIComponent(options.before.before)}&before_id=${encodeURIComponent(options.before.before_id)}`
         : "";
-      const res = await fetch(`/api/conversations/${convId}${query}`, { cache: "no-store", signal: AbortSignal.timeout(15_000) });
+      const res = await fetch(`/api/conversations/${convId}${query}`, { cache: "no-store", signal: read.signal });
       if (!res.ok) throw new Error();
       const { messages: msgs, hasOlder, conversation } = await res.json();
+      if (read.signal.aborted) throw new Error("request_timeout");
       if (!Array.isArray(msgs)) throw new Error();
       const snapshot = msgs as Message[];
       if (!isCurrentRequest()) return;
@@ -399,9 +447,10 @@ export default function MessagesContent({ embedded }: { embedded?: EmbeddedInbox
     } catch {
       if (isCurrentRequest()) setMessageLoadFailure({ conversationId: convId, before: options.before });
     } finally {
+      endRead(read);
       if (requestSequence !== null && isCurrentRequest()) setLoadingMessages(false);
     }
-  }, []);
+  }, [beginRead,endRead,canRead]);
 
   // Message data is delivered only through membership-checked server routes.
   // A modest fallback refresh avoids exposing raw message rows to anonymous
@@ -409,12 +458,16 @@ export default function MessagesContent({ embedded }: { embedded?: EmbeddedInbox
   useEffect(() => {
     if (!activeId || !readerEnabled) return;
     void loadMessages(activeId, { scroll: messagesRef.current.length === 0 });
+    const activeReads = reads.current;
     const interval = window.setInterval(() => {
       if (document.visibilityState === "visible") void loadMessages(activeId);
     }, ACTIVE_CONVERSATION_FALLBACK_REFRESH_MS);
     const onFocus = () => { if (document.visibilityState === "visible") void loadMessages(activeId); };
     window.addEventListener("focus", onFocus);
-    return () => { window.clearInterval(interval); window.removeEventListener("focus", onFocus); };
+    return () => {
+      window.clearInterval(interval);window.removeEventListener("focus",onFocus);
+      for (const [key,controller] of activeReads) if (key.startsWith("history:"+activeId+":")) {controller.abort();activeReads.delete(key);}
+    };
   }, [activeId, loadMessages, readerEnabled]);
 
   // Refresh beim Window-Focus (Tab-Wechsel)
@@ -426,9 +479,9 @@ export default function MessagesContent({ embedded }: { embedded?: EmbeddedInbox
 
   useEffect(() => {
     let active = true;
-    if (newMessageOpen || groupInfoOpen) queueMicrotask(() => { if (active) void loadContacts(); });
+    if (readerEnabled && (newMessageOpen || groupInfoOpen)) queueMicrotask(() => { if (active) void loadContacts(); });
     return () => { active = false; };
-  }, [newMessageOpen, groupInfoOpen, loadContacts]);
+  }, [newMessageOpen, groupInfoOpen, loadContacts, readerEnabled]);
 
   function openConversation(conv: Conversation) {
     if (user?.id) leave(() => { if (embedded) embedded.onDestination({conversationId:conv.id}); else navigateMessageView(window, user.id, {conversationId:conv.id}); });
@@ -519,7 +572,8 @@ export default function MessagesContent({ embedded }: { embedded?: EmbeddedInbox
   const filteredConversations = conversations.filter(conversation => (view !== "groups" || conversation.kind === "group") && `${conversation.otherName ?? ""} ${conversation.group_name ?? ""}`.toLocaleLowerCase(uiLocale).includes(search.trim().toLocaleLowerCase(uiLocale)));
 
   return <div data-native-inbox-thread={embedded ? "v1" : undefined} className={`${embedded ? nativeInboxStyles.embedded : "inbox-shell"} ${nativeAppearance ? nativeInboxStyles.shell : ""} ${utilityView ? "flex-col" : "flex-col sm:flex-row"} ${showChat ? "bottom-0" : "bottom-[var(--mobile-nav-clearance)]"} lg:bottom-0`}
-    style={embedded ? undefined : {"--messages-viewport-offset":`${visualViewportTop}px`,...(keyboardInset>0?{bottom:`${keyboardInset}px`}:{})} as CSSProperties}>
+    aria-hidden={!readerEnabled || renderOwner !== user?.id || undefined}
+    style={{...(embedded ? {} : {"--messages-viewport-offset":`${visualViewportTop}px`,...(keyboardInset>0?{bottom:`${keyboardInset}px`}:{})}),...(!readerEnabled || renderOwner !== user?.id ? {display:"none"} : {})} as CSSProperties}>
     {!embedded && <aside className={`${showChat?"hidden sm:flex":"flex"} min-h-0 min-w-0 w-full flex-col border-border bg-bg-primary ${utilityView ? "shrink-0" : "border-r sm:w-80 flex-1 sm:flex-none"}`}>
       <InboxPaneHeader active={view} action={<button type="button" onClick={()=>setNewMessageOpen(true)} aria-label={t("newMessage")} title={t("newMessage")} className="flex size-11 shrink-0 items-center justify-center rounded-xl text-gold hover:bg-bg-elevated"><SquarePen size={22}/></button>}>
         {!friendsOnly && !noticesOnly && <label className="mt-2 flex min-h-11 items-center gap-2 rounded-xl border border-border bg-bg-secondary px-3"><Search size={17} className="shrink-0 text-text-muted"/><input type="search" value={search} onChange={event=>setSearch(event.target.value)} placeholder={t("searchChats")} aria-label={t("searchChats")} className="min-h-11 min-w-0 flex-1 bg-transparent text-base text-text-primary outline-none"/></label>}

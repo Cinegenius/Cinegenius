@@ -1,3 +1,12 @@
+## App-Folgeauftrag · 23. November 2026 · geprüfter Kandidat2212
+
+1. **2212 veröffentlichen und getrennt am Gerät prüfen:** Ein vollständiger signierter Build und unabhängige Prüfung sind bestanden. Installiert/eng physisch akzeptiert bleibt2211; neuer neutraler/leerer Work-Zustand sowie neuer Editor sind noch nicht am Gerät akzeptiert. Vor Installation frische Sicherung und Datenerhaltsvergleich. Keine weitere pauschale Rückfrage zur bereits autorisierten Umsetzung ableiten.
+2. **Frischer Webrelease:** Kumulative13 Web- und17 Katalogdeltas plus reine Testadapter über normalen Desktop-Abgleich/Serverrelease. Globales i18n/TypeScript/Next remote abschließen; lokales384MiB-OOM bleibt als unvollständig dokumentiert. Neue Commit-/Deployment-/Asset-/Zugriffsschutzbelege und aktuelle Leistenprüfung erforderlich.
+3. **Physische Folgeprüfung:** aktueller Work-Kaltstart/Unterbrechung/erneute Anmeldung, Work↔Community, offene Nachrichtendialoge, Smart-Karte/Liste/Filter, Zeichnen/Abbrechen/Undo, Räume/Garten, Sonnenzeit/Nacht/Nord/Lichtpunkt/Skalierung und kleine/große Schrift gezielt prüfen. Frühere2210-Heute-/Kontakt- und2211-Kontofrageabnahmen gelten nur in ihrem jeweiligen Umfang.
+4. **Gmail-Dispoautomatik separat:** neuer autorisierter Folgekandidat, nicht Bestandteil von2212. Verbindung/Import/Automatik nicht aktiv; kein Postfach verbunden. Erst getrennte Implementierung und klare, bewusste Nutzerwahl. Bestehende Schlüssel und Autorisierung erhalten.
+
+[Umfang und Inventar](app-floor-editor-navigation-20261123.md). Bestehende andere WEB-Aufträge und ältere historische Belege bleiben erhalten.
+
 ## Aktuelle WEB-Priorität · 23. November 2026
 
 1. **Profilabschluss:** Zusatztätigkeit freiwillig, verständliche/fokussierte Pflichtfeldfehler. 43 Tests, TypeScript, 17 Sprachen und Produktionsbuild bestanden; **live bestätigt auf 11d96803**. Betroffene Nutzer müssen den Abschluss noch erneut durchspielen.

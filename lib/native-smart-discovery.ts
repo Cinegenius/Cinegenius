@@ -14,7 +14,7 @@ export type NativeDiscoveryFocus = { mode: NativeDiscoveryMode; departments: str
 export type NativeDiscoveryResponse = {
   contract: typeof NATIVE_DISCOVERY_CONTRACT; accountId: string; serverNow: string;
   focus: NativeDiscoveryFocus; plan: SearchPlan; groups: SearchGroup[];
-  seed?: string;
+  seed?: string; view?: "list" | "map";
 };
 
 /** Six wishes are the existing plan-v1 ceiling. No invented tenth result domain. */
@@ -38,7 +38,7 @@ export function rankNativeDiscoveryGroups(groups: SearchGroup[], focus: NativeDi
 }
 
 /** Validate the account/plan envelope; public rows keep the shared SearchGroup contract. */
-export function readNativeDiscovery(value: unknown, accountId: string, expectedSeed?: string): NativeDiscoveryResponse | null {
+export function readNativeDiscovery(value: unknown, accountId: string, expectedSeed?: string, expectedView?: "list" | "map"): NativeDiscoveryResponse | null {
   if (!value || typeof value !== "object" || Array.isArray(value)) return null;
   const data = value as Record<string, unknown>;
   if (data.seed !== undefined && !isDiscoverySeed(data.seed)) return null;
@@ -49,9 +49,11 @@ export function readNativeDiscovery(value: unknown, accountId: string, expectedS
   const focus = data.focus as NativeDiscoveryFocus | undefined;
   if (!focus || !["profile", "neutral"].includes(focus.mode) || !Array.isArray(focus.departments) || focus.departments.length > 100
     || focus.departments.some(id => typeof id !== "string" || id.length > 60) || (focus.city !== null && (typeof focus.city !== "string" || focus.city.length > 200))) return null;
-  if (data.groups.some((group, index) => !group || typeof group !== "object" || group.area !== plan.searches[index].area || group.wishIndex !== index
+  if (data.view !== undefined && !["list","map"].includes(data.view as string) || expectedView !== undefined && (data.view ?? "list") !== expectedView) return null;
+  const validGroups = (groups: unknown) => Array.isArray(groups) && groups.length === plan.searches.length && !groups.some((group, index) => !group || typeof group !== "object" || group.area !== plan.searches[index].area || group.wishIndex !== index
     || !Array.isArray(group.results) || group.results.length > 180 || (group.nextOffset !== null && (!Number.isInteger(group.nextOffset) || group.nextOffset < 0))
     || (group.discoveryCursor !== undefined && (!data.seed || group.area !== "crew" || !validDiscoveryCursor(group.discoveryCursor)))
-    || (data.seed && group.area === "crew" && group.nextOffset !== null && !validDiscoveryCursor(group.discoveryCursor)))) return null;
+    || (data.seed && group.area === "crew" && group.nextOffset !== null && !validDiscoveryCursor(group.discoveryCursor)));
+  if (!validGroups(data.groups)) return null;
   return data as unknown as NativeDiscoveryResponse;
 }
