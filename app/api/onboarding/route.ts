@@ -2,14 +2,14 @@ import { clerkClient } from "@clerk/nextjs/server";
 import { requireAuth } from "@/lib/auth";
 import { NextRequest, NextResponse } from "next/server";
 import { compressProfileEditorDraft, expandProfileEditorDraft } from "@/lib/profile-editor-private-draft";
-import { normalizeQuickStartDraft, QUICK_START_INTENTS, validateQuickStartDraft } from "@/lib/quick-start-flow";
+import { hasSavedSearchSetup, normalizeQuickStartDraft, QUICK_START_INTENTS, validateQuickStartDraft } from "@/lib/quick-start-flow";
 import { clerkRateLimitSeconds } from "@/lib/onboarding-save";
 import { getTranslations as getResponseTranslations } from "next-intl/server";
 
 export const runtime = "nodejs";
 
 const KEY = "cinegeniusOnboarding";
-const INTENTS = new Set(["crew", "location", "equipment", "talent", "search", "company"]);
+const INTENTS = new Set<string>(QUICK_START_INTENTS);
 const MAX_BYTES = 7000;
 
 function rateLimitResponse(error: unknown, translate: Awaited<ReturnType<typeof getResponseTranslations>>) {
@@ -66,7 +66,10 @@ export async function PUT(request: NextRequest) {
   const record = payload && typeof payload === "object" ? payload as Record<string, unknown> : null;
   const isProfileEditorDraft = Boolean(record && Object.hasOwn(record, "profileEditorDraft"));
   const isLocationFormDraft = Boolean(record && Object.hasOwn(record, "locationFormDraft"));
-  if (!record || (!isProfileEditorDraft && !isLocationFormDraft && !INTENTS.has(String(record.intent)))) {
+  const unselectedDraft = record?.intent === null && record.setupComplete !== true
+    && record.quickStart && typeof record.quickStart === "object" && !Array.isArray(record.quickStart)
+    && normalizeQuickStartDraft(record.quickStart).intents.length === 0;
+  if (!record || (!isProfileEditorDraft && !isLocationFormDraft && !unselectedDraft && !INTENTS.has(String(record.intent)))) {
     return json({ error: tResponse('System.m_e502c4224771') }, 400);
   }
   if (Object.hasOwn(record, "quickStart") && record.quickStart !== null) {
@@ -109,6 +112,11 @@ export async function PUT(request: NextRequest) {
       ? user.privateMetadata[KEY] as Record<string, unknown>
       : {};
     const next = { ...current, ...record } as Record<string, unknown>;
+    if ((record.intent === "search" || normalizeQuickStartDraft(record.quickStart).intents.includes("search")
+      || (next.intent === "search" && next.setupComplete === true))
+      && !hasSavedSearchSetup(current)) {
+      return json({ error: tResponse('System.m_e502c4224771') }, 400);
+    }
     if (isLocationFormDraft) next.locationFormDraftUpdatedAt = new Date().toISOString();
     if (isProfileEditorDraft) {
       const editorDraft = record.profileEditorDraft;
@@ -167,6 +175,11 @@ export async function DELETE(request: NextRequest) {
     const clerk = await clerkClient();
     const requestedType = request.nextUrl.searchParams.get("type");
     if (requestedType === "quick-start") {
+      const user = await clerk.users.getUser(authResult.userId);
+      const current = user.privateMetadata?.[KEY] as Record<string, unknown> | undefined;
+      if (current?.intent === "search" && !hasSavedSearchSetup(current)) {
+        return json({ error: tResponse('System.m_e502c4224771') }, 400);
+      }
       // Clerk deep-merges metadata. Omission does not delete a nested key;
       // null does. One atomic patch also preserves unrelated private drafts.
       await clerk.users.updateUserMetadata(authResult.userId, {
