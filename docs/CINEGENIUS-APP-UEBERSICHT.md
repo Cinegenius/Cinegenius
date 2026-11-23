@@ -4,7 +4,7 @@
 
 `036920b1ed86dd7a981aa354dd05a8921686fe25` ist mit `dpl_AatmCrVeFfjskKn5RbPH7PJTJQVV` READY auf www: freiwillige Zusatztätigkeit, durchgängige Verifizierungsanzeige und 24 ausgewählte Avatarstile mit Batch-Erzeugung. Gezielte Datenbankmigration geprüft; bestehende Bilder/Zuordnungen erhalten. Nicolais Haken öffentlich bei 393/1440px geprüft; erster regulärer Batch angenommen, neue Bildfertigstellung und tatsächliche Kosten noch nicht gemessen. Keine neue native Installation oder vollständige Geräte-/Registrierungsabnahme. Belege: `/srv/cinegenius/handoffs/20261123-avatar-batch-release/release-receipt.json`.
 
-Neuer Auftrag: Einrichtung für Firmen, Marktplatz, Locations und weitere Anbieter auf blockierende Pflichtfelder, Verbindungsfehler, Speichern und Wiederaufnahme prüfen. Diese Folgearbeit ist noch lokal.
+Gemeinsame Web-Einrichtung für Firmen, Marktplatz und Locations auf `3fba2f96` live (`dpl_552yw4ges7E1xMRMAmkWq98ym1cL`, www geprüft): sichtbare Fehler und Wiederholung, erhaltene Eingaben, Firmenübersicht ohne vorzeitiges Anlegen. Derselbe Account kann Anbieterbereiche und Crew-Tätigkeiten verbinden; Firmenverantwortliche benötigen kein Pflicht-Crewprofil. 210 gezielte Tests, 36 kontrollierte Browserfälle, Gesamtbuild und öffentliche Liveprüfungen bestanden; [Prüfbericht](provider-onboarding-recovery-20261123.md). Kein neuer nativer Build oder physischer iPhone-Nachweis durch diesen Web-Release.
 
 ## Mehrraum-Grundriss und Kontowiederaufnahme · Prüfcheckpoint vor 2208
 

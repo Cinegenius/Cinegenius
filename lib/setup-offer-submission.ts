@@ -1,3 +1,4 @@
+import { fetchSetup } from "./setup-fetch";
 import { isOfferStatus, offerStatus } from "./offer-moderation";
 
 export type SetupOfferState = "loading" | "draft" | "pending" | "published" | "changes_requested" | "rejected" | "hidden" | "unavailable";
@@ -14,7 +15,7 @@ export function setupOfferState(value: unknown): SetupOfferState {
 /** Use only the existing authenticated, revision-checked publication endpoint.
  * A failed/ambiguous response is never treated as public or submitted. */
 export async function submitSetupOffer(id: string, errorMessage: string, request: typeof fetch = fetch): Promise<"pending" | "published"> {
-  const response = await request(`/api/listings/${encodeURIComponent(id)}/publish`, { method: "POST" });
+  const response = await fetchSetup(`/api/listings/${encodeURIComponent(id)}/publish`, { method: "POST" }, request);
   const body = await response.json().catch(() => null);
   if (!response.ok || body?.success !== true) throw new Error(typeof body?.error === "string" ? body.error : errorMessage);
   if (body.published === true) return "published";

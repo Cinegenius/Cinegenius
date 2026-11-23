@@ -1,4 +1,5 @@
 "use client";
+import { fetchSetup } from "@/lib/setup-fetch";
 import { storedCurrency } from "@/lib/currency";
 import CurrencySelect from "@/components/CurrencySelect";
 
@@ -189,9 +190,9 @@ export default function GuidedListingWizard() {
 
   useEffect(() => {
     let active = true;
-    fetch("/api/onboarding", { cache: "no-store" }).then(async (response) => {
-      const data = await response.json().catch(() => ({}));
-      if (!response.ok) throw new Error(data.error ?? uiTextRef.current("Ui.text_26d738d49085c7"));
+    fetchSetup("/api/onboarding", { cache: "no-store" }).then(async (response) => {
+      const data = await response.json();
+      if (!response.ok || !data || !Object.hasOwn(data, "draft")) throw new Error(data?.error ?? uiTextRef.current("Ui.text_26d738d49085c7"));
       return data.draft?.listingDrafts?.[kind] ?? (data.draft?.listingDraft?.type === kind ? data.draft.listingDraft : null);
     }).then((saved) => {
       if (!active) return;
@@ -211,9 +212,9 @@ export default function GuidedListingWizard() {
       // The existing private onboarding store has a 7,000-byte request ceiling.
       // Refuse an oversized snapshot without truncating it or replacing recovery.
       if (new TextEncoder().encode(body).byteLength > 7000) throw new Error(uiTextRef.current("System.m_699cf9afdb02"));
-      const response = await fetch("/api/onboarding", { method: "PUT", headers: { "Content-Type": "application/json" }, body });
+      const response = await fetchSetup("/api/onboarding", { method: "PUT", headers: { "Content-Type": "application/json" }, body });
       const data = await response.json().catch(() => ({}));
-      if (!response.ok) throw new Error(data.error ?? uiTextRef.current("Ui.text_dfb7e42ffb81ab"));
+      if (!response.ok || data.saved !== true) throw new Error(data.error ?? uiTextRef.current("Ui.text_dfb7e42ffb81ab"));
       setSaveState("saved");
       return true;
     } catch (cause) {
@@ -286,7 +287,7 @@ export default function GuidedListingWizard() {
       // Persist the stable key before creation so a lost response can be retried.
       if (!saveQueue.matches(snapshot) && !await persist(snapshot)) return;
       const vehicle = kind === "equipment" && marketplaceCategory(marketplace.category)?.department === "fahrzeuge";
-      const response = await fetch("/api/listings", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({
+      const response = await fetchSetup("/api/listings", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({
         type: vehicle ? "vehicle" : kind === "location" ? "location" : "prop", category: kind === "equipment" ? marketplace.category : form.category,
         title: form.title.trim(), city: form.city.trim(), selected_place_city_id: form.selected_place_city_id || undefined, description: form.description.trim(),
         price: kind === "equipment" ? marketplaceBasePrice(marketplace) : form.priceOnRequest ? 0 : Number(form.price) || 0, image_url: form.imageUrls[0] || null,
@@ -318,7 +319,7 @@ export default function GuidedListingWizard() {
       if (data.data.published === true) { setPublished(true); setPublicNow(true); }
       else if (data.data.moderation_status === "pending") setPublished(true);
       try {
-        const cleared = await fetch(`/api/onboarding?type=${kind}`, { method: "DELETE" });
+        const cleared = await fetchSetup(`/api/onboarding?type=${kind}`, { method: "DELETE" });
         if (!cleared.ok) throw new Error("draft_cleanup_failed");
       } catch {
         setSaveState("error"); setCleanupFailed(true);
@@ -333,11 +334,11 @@ export default function GuidedListingWizard() {
     operationInFlight.current = true;
     setSavingListing(true); setError("");
     try {
-      const saved = await fetch(`/api/listings/${createdId}`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ responsible_person: form.responsible }) });
+      const saved = await fetchSetup(`/api/listings/${createdId}`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ responsible_person: form.responsible }) });
       if (!saved.ok) { const result = await saved.json(); throw new Error(result.error); }
-      const response = await fetch(`/api/listings/${createdId}/publish`, { method: "POST" });
+      const response = await fetchSetup(`/api/listings/${createdId}/publish`, { method: "POST" });
       const data = await response.json().catch(() => ({}));
-      if (!response.ok) throw new Error(data.error ?? uiText("Ui.text_b8a82d14926aed"));
+      if (!response.ok || data.success !== true || !(data.published === true || data.submitted === true || data.moderation_status === "pending")) throw new Error(data.error ?? uiText("Ui.text_b8a82d14926aed"));
       setPublished(true); setPublicNow(data.published === true);
     } catch (cause) { setError(uiErrorMessage(cause, uiText("Ui.text_b8a82d14926aed"))); }
     finally { operationInFlight.current = false; setSavingListing(false); }
