@@ -29,14 +29,13 @@ export default function PrimaryOccupationPicker({positions,value,onChange,additi
     {onAdditionalChange && otherOptions.length > 0 && <>
       <label htmlFor={`${id}-additional`} className="block pt-3 text-sm font-semibold text-text-primary">{t("additional")}</label>
       <select id={`${id}-additional`} value={additionalValue?.roleId ?? ''} onChange={event=>onAdditionalChange(occupationReference(otherOptions.find(option=>option.roleId===event.target.value)??null))} className="min-h-11 w-full min-w-0 rounded-xl border border-border bg-bg-primary px-3 py-3 text-base text-text-primary">
-        <option value="">{count > 3 ? t("chooseAdditional") : t("noAdditional")}</option>
+        <option value="">{t("noAdditional")}</option>
         {otherOptions.map(option=><option key={option.roleId} value={option.roleId}>{label(option)}</option>)}
       </select>
       <p className="text-xs leading-5 text-text-muted">{t("additionalHint")}</p>
     </>}
     {selected && secondary.length > 0 && secondary.length <= 2 && <p className="text-sm leading-6 text-text-secondary"><span className="font-semibold">{t("secondary")}:</span> {secondary.map(label).join(' · ')}</p>}
     {count > MAX_PROFILE_OCCUPATIONS && <p role="status" className="text-sm leading-6 text-text-muted">{t("legacyFocus")}</p>}
-    {count === MAX_PROFILE_OCCUPATIONS && !additionalValue && <p role="status" className="text-sm leading-6 text-text-muted">{t("additionalRequired")}</p>}
     {!selected && options.length > 1 && <p className="text-xs leading-5 text-text-muted">{t("legacy")}</p>}
     {!options.length && <p className="text-xs text-text-muted">{t("empty")}</p>}
   </div>;

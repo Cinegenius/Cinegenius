@@ -253,6 +253,9 @@ migration before releasing dependent code; see `docs/home-crew-discretion.md`.
 
 ## Occupation focus and email presentation (operator decisions, 16 November 2026)
 
+- Operator clarification, 23 November 2026: an additional occupation is optional,
+  including a four-occupation selection. Never block setup/save on a missing
+  additional slot or silently assign it. Preserve all selected occupations.
 - A personal profile selects one main occupation, up to two secondary occupations
   and at most one additional occupation. Only the first three belong on cards;
   the additional occupation remains in profile details and search. Reuse

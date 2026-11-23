@@ -375,6 +375,7 @@ function ProfileSetupContent() {
       const fieldIds: Record<string, string> = {
         personCity: "quick-start-person-city",
         personCountry: "quick-start-person-city-country",
+        primaryOccupation: "quick-start-primary-occupation",
         "crew-roles": "quick-start-crew-role-search",
         "talent-roles": "quick-start-talent-role-search",
       };
@@ -535,7 +536,7 @@ function ProfileSetupContent() {
       setResponsibleErrors(responsiblePersonErrors(draft.sections.company?.responsible, true));
       requestAnimationFrame(focusResponsiblePerson); return;
     }
-    const validation = validateQuickStartDraft(draft);
+    const validation = validateQuickStartDraft(draft, { translate: uiText });
     if (validation) {
       const firstBadScreen = validation.field === "primaryOccupation" ? "review" : screenForField(validation.field);
       setError(validation.message);

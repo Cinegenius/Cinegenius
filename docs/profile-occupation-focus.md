@@ -12,8 +12,9 @@ die weitere Tätigkeit steht auf dem vollständigen Profil und bleibt suchbar.
 - `crew.primaryOccupation`: die Haupttätigkeit, weiterhin der bestehende Vertrag.
 - `crew.additionalOccupation`: neue optionale Referenz oder `null`. Muss zur Auswahl
   gehören und darf nicht gleichzeitig Haupttätigkeit sein.
-- Nebentätigkeiten sind die übrigen ausgewählten Berufe. Bei vier Berufen muss die
-  weitere Tätigkeit ausdrücklich benannt werden; keine automatische Wahl des vierten.
+- Nebentätigkeiten sind die übrigen ausgewählten Berufe. Die weitere Tätigkeit bleibt
+  auch bei vier Berufen freiwillig (Betreiberkorrektur 23. November 2026). Keine
+  Pflichtzuordnung und keine automatische Wahl des vierten; alle Berufe bleiben suchbar.
 - `profileOccupationPreview` liefert maximal drei sichtbare Berufe, Haupttätigkeit
   zuerst. Such- und Gewerkefilter verwenden weiterhin die vollständige Auswahl.
 - Crew-Antworten ergänzen `displayPositions`; Freunde ergänzen `display_positions`
@@ -50,3 +51,17 @@ einschließlich etablierter Sternchen-/Schrägstrichformen. Optional speichert
 Form. Das ersetzt die zwischenzeitliche Pflicht zur ausgeschriebenen Beidnennung.
 Siehe [Web-/App-Vertrag](occupation-form-preference.md); Berufs-IDs, Suchbarkeit und
 ältere gespeicherte Angaben bleiben erhalten.
+
+## Korrektur der Abschlusshürde · 23. November 2026
+
+Eine fehlende Zusatztätigkeit blockiert weder Einrichtung noch Profilbearbeitung.
+Die Haupttätigkeit bleibt bei mehreren Berufen bewusst wählbar; fehlt sie beim
+Abschluss, erklärt der Assistent die notwendige Auswahl in der gewählten Sprache
+und fokussiert das tatsächlich vorhandene Auswahlfeld. Foto, Cover und
+Vorstellungstext bleiben freiwillig. Bestehende private Entwürfe und alle
+ausgewählten Berufe bleiben erhalten. Kein automatisches Veröffentlichen fremder
+Profile und keine Änderung bestehender Konten.
+
+43 gezielte Berufs-/Einrichtungs-/Speicherprüfungen bestanden, einschließlich
+Schritt 5 → Übersicht, fehlender Stadt/Land, Suchprofil und Firmenstandort.
+Lokaler Quellstand; Veröffentlichung und physische App-Abnahme separat offen.
