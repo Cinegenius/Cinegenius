@@ -1,4 +1,5 @@
 "use client";
+import { fetchSetup } from "@/lib/setup-fetch";
 import CurrencySelect from "@/components/CurrencySelect";
 import HomeCrewPreference from "@/components/HomeCrewPreference";
 import { saveHomeCrewPreference } from "@/lib/home-crew-preference";
@@ -195,13 +196,13 @@ function ProfileSetupContent() {
     if (!mounted.current) return false;
     setSaveState("saving");
     try {
-      const response = await fetch("/api/onboarding", {
+      const response = await fetchSetup("/api/onboarding", {
         method: "PUT", headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ intent: primaryIntent(value), setupComplete: false, quickStart: value, updatedAt: new Date().toISOString() }),
       });
       const result = await response.json().catch(() => ({}));
       if (response.status === 429) setRetrySeconds(Number(response.headers.get("Retry-After")) || result.retryAfter || 10);
-      if (!response.ok) throw new Error(result.error ?? uiText("Ui.text_1a732f2b583c89"));
+      if (!response.ok || result.saved !== true) throw new Error(result.error ?? uiText("Ui.text_1a732f2b583c89"));
       setSaveState("saved");
       return true;
     } catch (cause) {
@@ -224,17 +225,17 @@ function ProfileSetupContent() {
     if (!user?.id) return;
     let active = true;
     Promise.all([
-      fetch("/api/onboarding", { cache: "no-store" }).then(async (response) => {
-        const result = await response.json().catch(() => ({}));
-        if (!response.ok) throw new Error(result.error ?? uiText("Ui.text_1476ffcfaae23e"));
+      fetchSetup("/api/onboarding", { cache: "no-store" }).then(async (response) => {
+        const result = await response.json();
+        if (!response.ok || !result || !Object.hasOwn(result, "draft")) throw new Error(result?.error ?? uiText("Ui.text_1476ffcfaae23e"));
         return result.draft;
       }),
-      fetch("/api/profile", { cache: "no-store" }).then(async (response) => {
-        const result = await response.json().catch(() => ({}));
-        if (!response.ok) throw new Error(result.error ?? uiText("Ui.text_2518c7ecf5f492"));
+      fetchSetup("/api/profile", { cache: "no-store" }).then(async (response) => {
+        const result = await response.json();
+        if (!response.ok || typeof result?.exists !== "boolean") throw new Error(result?.error ?? uiText("Ui.text_2518c7ecf5f492"));
         return result;
       }),
-      fetch("/api/user-settings", { cache: "no-store" }).then(response => response.ok ? response.json() : null).catch(() => null),
+      fetchSetup("/api/user-settings", { cache: "no-store" }).then(response => response.ok ? response.json() : null).catch(() => null),
     ]).then(([saved, profile, settings]) => {
       if (!active) return;
       if (typeof settings?.settings?.show_in_home_crew !== "boolean") throw new Error(uiText("PrivacySettings.error"));
@@ -403,7 +404,7 @@ function ProfileSetupContent() {
       if (draft.step === "name" && step !== "name" && draft.accountPerson) {
         const name = responsibleAccountName(draft.accountPerson);
         if (!name) { setResponsibleErrors(responsiblePersonErrors(draft.accountPerson)); focusResponsiblePerson(); return; }
-        const response = await fetch("/api/responsible-person", { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ ...name, userId: user?.id }) });
+        const response = await fetchSetup("/api/responsible-person", { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ ...name, userId: user?.id }) });
         const result = await response.json().catch(() => ({}));
         if (!response.ok || result.saved !== true) { setError(result.error || contact("accountSaveError")); return; }
       }
@@ -412,6 +413,8 @@ function ProfileSetupContent() {
         setDraft(next);
         window.scrollTo({ top: 0, behavior: "smooth" });
       }
+    } catch (cause) {
+      setError(uiErrorMessage(cause, uiText("setup.requestError")));
     } finally {
       setSaving(false);
     }
@@ -491,7 +494,7 @@ function ProfileSetupContent() {
       const form = new FormData();
       form.append("file", compressed);
       if (!mounted.current) return;
-      const response = await fetch("/api/upload", { method: "POST", body: form });
+      const response = await fetchSetup("/api/upload", { method: "POST", body: form }, fetch, 90_000);
       const result = await response.json().catch(() => ({}));
       if (!response.ok || !result.url) throw new Error(result.error ?? uiText("Ui.text_c3b9328b1f25e4"));
       if (!mounted.current) return;
@@ -510,7 +513,7 @@ function ProfileSetupContent() {
   async function clearAndContinue(completedDraft: QuickStartDraft) {
     setCompletionPending(true);
     await saveQueue.settle();
-    const response = await fetch("/api/onboarding?type=quick-start", { method: "DELETE" }).catch(() => {
+    const response = await fetchSetup("/api/onboarding?type=quick-start", { method: "DELETE" }).catch(() => {
       throw new Error(uiText("Ui.text_f01354be8698c6"));
     });
     const body = await response.json().catch(() => ({}));
@@ -518,7 +521,7 @@ function ProfileSetupContent() {
     if (!response.ok || body.completed !== true) throw new Error(uiText("Ui.text_24c7cf656ceb5c", { value1: String(body.error ?? uiText("Ui.text_6e4f4a5d9cceb9")) }));
     if (completedDraft.completed.profile) {
       try {
-        const settingsResponse = await fetch("/api/user-settings", { cache: "no-store" });
+        const settingsResponse = await fetchSetup("/api/user-settings", { cache: "no-store" });
         const settingsBody = await settingsResponse.json().catch(() => ({}));
         setProfilePublic(settingsResponse.ok && settingsBody.settings?.profile_visibility === "public" && !settingsBody.settings?.ghost_mode);
       } catch { setProfilePublic(false); }
@@ -561,7 +564,7 @@ function ProfileSetupContent() {
 
       if (needsPublicSetupProfile(progress.intents) && !progress.completed.profile) {
         const profilePayload = setupProfilePayload(progress, profileExists ? savedProfile : null, selectedRoles);
-        const response = await fetch("/api/profile", {
+        const response = await fetchSetup("/api/profile", {
           method: profileExists ? "PATCH" : "POST", headers: { "Content-Type": "application/json" },
           body: JSON.stringify(prepareArtSave(profilePayload, savedProfile?.updated_at ?? null, [await avatarArt.claim(), await coverArt.claim()], [avatarArt.deletion(), coverArt.deletion()])),
         });
@@ -590,7 +593,7 @@ function ProfileSetupContent() {
         }
         const section = progress.sections[intent] ?? createQuickStartIntentData();
         const vehicle = intent === "equipment" && marketplaceCategory(section.category)?.department === "fahrzeuge";
-        const response = await fetch("/api/listings", {
+        const response = await fetchSetup("/api/listings", {
           method: "POST", headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             type: vehicle ? "vehicle" : intent === "location" ? "location" : "prop",
@@ -616,7 +619,7 @@ function ProfileSetupContent() {
           if (!(await persist(progress))) throw new Error(uiText("Ui.text_280402be2b89e5"));
         }
         const section = progress.sections.company ?? createQuickStartIntentData();
-        const response = await fetch("/api/companies", {
+        const response = await fetchSetup("/api/companies", {
           method: "POST", headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             name: section.title.trim(), city: section.city.trim(), selected_place_city_id: section.selected_place_city_id || undefined, description: section.description.trim(),

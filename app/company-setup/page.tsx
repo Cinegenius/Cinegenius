@@ -1,4 +1,5 @@
 "use client";
+import { fetchSetup } from "@/lib/setup-fetch";
 
 import GenieWritingAssistant from "@/components/GenieWritingAssistant";
 
@@ -165,6 +166,11 @@ export default function CompanySetupPage() {
   // Editing existing company
   const [existingId, setExistingId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState("");
+  const [loadAttempt, setLoadAttempt] = useState(0);
+  const [creationKey, setCreationKey] = useState("");
+  const [preparing, setPreparing] = useState(false);
+  const operationInFlight = useRef(false);
 
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
@@ -198,12 +204,16 @@ export default function CompanySetupPage() {
 
   useEffect(() => {
     const isGuided = new URLSearchParams(window.location.search).get("onboarding") === "1";
-    setGuidedSetup(isGuided);
     // Editors open their assigned company explicitly; owners keep the legacy shortcut.
     const requestedCompany = new URLSearchParams(window.location.search).get("company_id");
-    fetch(requestedCompany ? `/api/companies?company_id=${encodeURIComponent(requestedCompany)}` : "/api/companies?mine=true")
-      .then((r) => r.json())
+    fetchSetup(requestedCompany ? `/api/companies?company_id=${encodeURIComponent(requestedCompany)}` : "/api/companies?mine=true")
+      .then(async (r) => {
+        const result = await r.json();
+        if (!r.ok || !Array.isArray(result.data)) throw new Error(uiText("Ui.text_20679d4c9cd89c"));
+        return result;
+      })
       .then(({ data, permissionRole }) => {
+        setGuidedSetup(isGuided);
         if (data && data.length > 0) {
           const c = data[0];
           setCompanyAccessRole(permissionRole ?? (c.owner_user_id ? "owner" : null));
@@ -241,7 +251,7 @@ export default function CompanySetupPage() {
 
           // Load team members (includes owner's own entry)
           setTeamLoading(true);
-          fetch(`/api/company-members?company_id=${c.id}`)
+          fetchSetup(`/api/company-members?company_id=${c.id}`)
             .then((r) => r.json())
             .then(({ data: members }) => {
               if (members) {
@@ -253,19 +263,20 @@ export default function CompanySetupPage() {
                 if (ownerEntry) setOwnerTitle((ownerEntry.public_titles?.length ? ownerEntry.public_titles : ownerEntry.title ? [ownerEntry.title] : []).join(", "));
               }
             })
+            .catch((cause) => setError(uiErrorMessage(cause, uiText("Ui.text_20679d4c9cd89c"))))
             .finally(() => setTeamLoading(false));
         }
         setLoading(false);
       })
-      .catch((cause) => { setError(uiErrorMessage(cause, uiText("Ui.text_20679d4c9cd89c"))); setLoading(false); });
-  }, []);
+      .catch((cause) => { setLoadError(uiErrorMessage(cause, uiText("Ui.text_20679d4c9cd89c"))); setLoading(false); });
+  }, [loadAttempt]);
 
   useEffect(() => {
-    if (!guidedSetup || loading || existingId) return;
+    if (!guidedSetup || loading || loadError || existingId) return;
     let active = true;
-    fetch("/api/onboarding", { cache: "no-store" }).then(async (response) => {
-      const result = await response.json().catch(() => ({}));
-      if (!response.ok) throw new Error(result.error ?? uiText("Ui.text_af400ced276aa7"));
+    fetchSetup("/api/onboarding", { cache: "no-store" }).then(async (response) => {
+      const result = await response.json();
+      if (!response.ok || !result || !Object.hasOwn(result, "draft")) throw new Error(result?.error ?? uiText("Ui.text_af400ced276aa7"));
       return result.draft?.companyDraft;
     }).then((draft) => {
       if (!active) return;
@@ -287,17 +298,18 @@ export default function CompanySetupPage() {
       }
       setCompanyDraftLoaded(true);
     }).catch((cause) => {
-      if (active) { setError(uiErrorMessage(cause, uiText("Ui.text_af400ced276aa7"))); setCompanyDraftLoaded(true); }
+      if (active) { setLoadError(uiErrorMessage(cause, uiText("Ui.text_af400ced276aa7"))); }
     });
     return () => { active = false; };
-  }, [guidedSetup, loading, existingId]);
+  }, [guidedSetup, loading, existingId, loadError, loadAttempt]);
 
   const companyDraft = useFormDraft({
     formKey: `company:${existingId ?? "new"}`,
-    value: { responsible, name, city, selectedPlaceCityId, description, website, email, phone, emailPublic, phonePublic, hqAddressPublic, logoUrl, coverUrl, portfolioImages, selectedCategories, services, cateringDetails, animalDetails, tagline, bioShort, usp, foundedYear, legalForm, hqAddress, countries, industryFocus, socialLinks, ownerTitle, step: companyStep },
-    ready: !loading && (!guidedSetup || !!existingId || companyDraftLoaded),
+    value: { creationKey, responsible, name, city, selectedPlaceCityId, description, website, email, phone, emailPublic, phonePublic, hqAddressPublic, logoUrl, coverUrl, portfolioImages, selectedCategories, services, cateringDetails, animalDetails, tagline, bioShort, usp, foundedYear, legalForm, hqAddress, countries, industryFocus, socialLinks, ownerTitle, step: companyStep },
+    ready: !loading && !loadError && (!guidedSetup || !!existingId || companyDraftLoaded),
     busy: uploadingLogo || uploadingCover || uploadingPortfolio || portfolioUploads.some(entry => entry.status === "failed") || saving,
     restore: (draft) => {
+        setCreationKey(typeof draft.creationKey === "string" ? draft.creationKey : "");
         setResponsible(responsiblePersonDraft(draft.responsible));
         setName(draft.name ?? ""); setCity(draft.city ?? ""); setSelectedPlaceCityId(draft.selectedPlaceCityId ?? ""); setDescription(draft.description ?? "");
         setWebsite(draft.website ?? ""); setEmail(draft.email ?? ""); setPhone(draft.phone ?? "");
@@ -314,6 +326,26 @@ export default function CompanySetupPage() {
         setCompanyStep(Math.min(3, Math.max(1, Number(draft.step) || 1)));
     },
   });
+
+  useEffect(() => {
+    if (!companyDraft.loaded || existingId || creationKey) return;
+    // Include the key in the private recovery snapshot before the first create.
+    let active = true;
+    queueMicrotask(() => { if (active) setCreationKey(crypto.randomUUID()); });
+    return () => { active = false; };
+  }, [companyDraft.loaded, existingId, creationKey]);
+
+  function validateCompanyBasics() {
+    const field = !name.trim() ? "company-name" : !city.trim() ? "company-city" : null;
+    if (!field) return true;
+    setError(uiText(field === "company-name" ? "Ui.text_de165364dc1179" : "Ui.text_ebeef92d3375fa"));
+    if (guidedSetup) setCompanyStep(1);
+    requestAnimationFrame(() => {
+      const target = document.getElementById(field);
+      target?.scrollIntoView({ block: "center" }); target?.focus();
+    });
+    return false;
+  }
 
   const handleSingleImageUpload = async (file: File | undefined, kind: "logo" | "cover") => {
     if (!file) return;
@@ -448,20 +480,26 @@ export default function CompanySetupPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (operationInFlight.current || !companyDraft.loaded || loadError || (!existingId && !creationKey)) return;
     setError("");
     const personErrors = responsiblePersonErrors(responsible, true);
     setResponsibleErrors(personErrors);
     if (Object.keys(personErrors).length) { focusResponsiblePerson(); return; }
-    if (!name.trim()) { setError(uiText("Ui.text_de165364dc1179")); return; }
-    if (!city.trim()) { setError(uiText("Ui.text_ebeef92d3375fa")); return; }
+    if (!validateCompanyBasics()) return;
 
-    setSaving(true);
+    operationInFlight.current = true;
+    setPreparing(true);
     try {
-      const res = await fetch("/api/companies", {
+      // Keep the confirmed snapshot/key on the server before any create. The
+      // form is frozen while flushing, without marking its own writer as busy.
+      if (!await companyDraft.flush()) { setError(uiText("Ui.text_a60ca96232682b")); return; }
+      setSaving(true);
+      const res = await fetchSetup("/api/companies", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           id: existingId,
+          ...(!existingId && { onboarding_request_key: creationKey }),
           responsible_person: responsible,
           name, city, selected_place_city_id: selectedPlaceCityId || undefined, description, website, email, phone,
           email_public: emailPublic, phone_public: phonePublic, hq_address_public: hqAddressPublic,
@@ -488,13 +526,15 @@ export default function CompanySetupPage() {
         }),
       });
       const { data, error: apiError } = await res.json();
-      if (apiError) throw new Error(apiError);
+      if (!res.ok || apiError || !data?.id || typeof data.slug !== "string" || !data.slug) throw new Error(apiError || uiText("Ui.text_a60ca96232682b"));
       await companyDraft.complete();
-      if (guidedSetup) await fetch("/api/onboarding?type=company", { method: "DELETE" });
+      // A confirmed company save stays successful even if draft cleanup fails.
+      if (guidedSetup) void fetchSetup("/api/onboarding?type=company", { method: "DELETE" }).catch(() => undefined);
       router.replace(`/companies/${data.slug}?welcome=1`);
     } catch (err: unknown) {
       setError(uiErrorMessage(err, uiText("Ui.text_a60ca96232682b")));
-      setSaving(false);
+    } finally {
+      operationInFlight.current = false; setPreparing(false); setSaving(false);
     }
   };
 
@@ -505,6 +545,11 @@ export default function CompanySetupPage() {
       </div>
     );
   }
+
+  if (loadError) return <div className="pt-24 min-h-screen bg-bg-primary"><div className="mx-auto max-w-2xl space-y-4 px-4 py-12">
+    <p role="alert" className="text-crimson-light">{loadError}</p>
+    <button type="button" className="min-h-12 rounded-xl bg-gold px-5 text-bg-primary" onClick={() => { setLoading(true); setLoadError(""); setLoadAttempt(value => value + 1); }}>{uiText("notifications.retry")}</button>
+  </div></div>;
 
   return (
       <div className="pt-16 min-h-screen bg-bg-primary">
@@ -527,7 +572,7 @@ export default function CompanySetupPage() {
 
           <FormDraftStatus draft={companyDraft} />
           <form onSubmit={handleSubmit} className="space-y-8">
-          <fieldset disabled={!companyDraft.loaded || saving} className="contents">
+          <fieldset disabled={!companyDraft.loaded || saving || preparing || (!existingId && !creationKey)} className="contents">
             <datalist id="company-title-suggestions">
               {COMPANY_PUBLIC_TITLE_SUGGESTIONS.map((title) => <option key={title} value={title} />)}
             </datalist>
@@ -543,10 +588,10 @@ export default function CompanySetupPage() {
 <ResponsiblePersonFields company value={responsible} onChange={setResponsible} errors={responsibleErrors} accountPrefill={!existingId || responsibleAccountId === user?.id} disabled={Boolean(existingId && responsibleAccountId && responsibleAccountId !== user?.id && !isCompanyOwner)} />
                     <div><h2 id="company-step-one" className="font-display text-2xl text-text-primary">{uiText("Ui.text_e482b996ec9439")}</h2><p className="mt-1 text-sm text-text-secondary">{uiText("Ui.text_cdbad11b22b7cc")}</p></div>
                     <Field label={uiText("Ui.text_58118a9ef716e5")} required>
-                      <input autoComplete="organization" value={name} onChange={(e) => setName(e.target.value)} placeholder={uiText("Ui.text_8a17fdf51500a7")} required className="w-full rounded-xl border border-border bg-bg-secondary px-4 py-3 text-sm focus:border-gold focus:outline-none" />
+                      <input id="company-name" autoComplete="organization" value={name} onChange={(e) => setName(e.target.value)} placeholder={uiText("Ui.text_8a17fdf51500a7")} required className="w-full rounded-xl border border-border bg-bg-secondary px-4 py-3 text-sm focus:border-gold focus:outline-none" />
                     </Field>
                     <Field label={uiText("setup.copy12")} required>
-                      <PlaceField value={city} onChange={(value, cityId) => { setCity(value); setSelectedPlaceCityId(cityId || ""); }} required />
+                      <PlaceField id="company-city" value={city} onChange={(value, cityId) => { setCity(value); setSelectedPlaceCityId(cityId || ""); }} required />
                     </Field>
                     <fieldset className="space-y-3">
                       <legend className="text-sm font-medium text-text-primary">{uiText.rich("Ui.text_48ee398d531da5", { part1: chunks => (<span className="text-text-muted">{chunks}</span>) })}</legend>
@@ -601,9 +646,9 @@ export default function CompanySetupPage() {
                 <div className="flex gap-3 pt-2">
                   {companyStep > 1 && <button type="button" onClick={() => { setError(""); setCompanyStep((step) => step - 1); }} className="min-h-12 flex-1 rounded-xl border border-border px-4 text-sm font-medium text-text-secondary hover:text-text-primary">{uiText("setup.copy99")}</button>}
                   {companyStep < 3 ? (
-                    <button type="button" onClick={() => { if (companyStep === 1) { const errors = responsiblePersonErrors(responsible, true); setResponsibleErrors(errors); if (Object.keys(errors).length) { focusResponsiblePerson(); return; } } if (companyStep === 1 && (!name.trim() || !city.trim())) { setError(uiText("Ui.text_42619ae0768a6f")); return; } setError(""); setCompanyStep((step) => step + 1); }} className="min-h-12 flex-1 rounded-xl bg-gold px-4 text-sm font-bold text-bg-primary hover:bg-gold-light">{uiText.rich("Ui.text_71f09a8b7c811b", { part1: () => (<ArrowRight size={15} className="ml-1 inline" />) })}</button>
+                    <button key="continue" type="button" onClick={(event) => { event.preventDefault(); if (companyStep === 1) { const errors = responsiblePersonErrors(responsible, true); setResponsibleErrors(errors); if (Object.keys(errors).length) { focusResponsiblePerson(); return; } } if (companyStep === 1 && !validateCompanyBasics()) return; setError(""); setCompanyStep((step) => step + 1); }} className="min-h-12 flex-1 rounded-xl bg-gold px-4 text-sm font-bold text-bg-primary hover:bg-gold-light">{uiText.rich("Ui.text_71f09a8b7c811b", { part1: () => (<ArrowRight size={15} className="ml-1 inline" />) })}</button>
                   ) : (
-                    <button type="submit" disabled={saving || !name.trim() || !city.trim()} className="min-h-12 flex-1 rounded-xl bg-gold px-4 text-sm font-bold text-bg-primary hover:bg-gold-light disabled:opacity-50">{saving ? <>{uiText.rich("Ui.text_1dbff9d2077d74", { part1: () => (<Loader2 size={15} className="mr-2 inline animate-spin" />) })}</> : <>{uiText.rich("Ui.text_1367de07b6634d", { part1: () => (<ArrowRight size={15} className="ml-1 inline" />) })}</>}</button>
+                    <button key="save" type="submit" disabled={saving || preparing} className="min-h-12 flex-1 rounded-xl bg-gold px-4 text-sm font-bold text-bg-primary hover:bg-gold-light disabled:opacity-50">{saving ? <>{uiText.rich("Ui.text_1dbff9d2077d74", { part1: () => (<Loader2 size={15} className="mr-2 inline animate-spin" />) })}</> : <>{uiText.rich("Ui.text_1367de07b6634d", { part1: () => (<ArrowRight size={15} className="ml-1 inline" />) })}</>}</button>
                   )}
                 </div>
                 <FormDraftStatus draft={companyDraft} />
@@ -661,6 +706,7 @@ export default function CompanySetupPage() {
                 <div className="flex items-center gap-2 bg-bg-secondary border border-border rounded-xl px-3.5 focus-within:border-gold transition-colors">
                   <Building2 size={15} className="text-text-muted shrink-0" />
                   <input
+                    id="company-name"
                     list="company-title-suggestions"
                     type="text"
                     value={name}
@@ -676,7 +722,7 @@ export default function CompanySetupPage() {
               <Field label={uiText("Ui.text_7cc93b7395130c")} required>
                 <div className="flex items-center gap-2 bg-bg-secondary border border-border rounded-xl px-3.5 focus-within:border-gold transition-colors">
                   <MapPin size={15} className="text-text-muted shrink-0" />
-                  <PlaceField value={city} onChange={(value, cityId) => { setCity(value); setSelectedPlaceCityId(cityId || ""); }} required />
+                  <PlaceField id="company-city" value={city} onChange={(value, cityId) => { setCity(value); setSelectedPlaceCityId(cityId || ""); }} required />
                   {city && <CheckCircle size={15} className="text-success shrink-0" />}
                 </div>
               </Field>
@@ -1132,7 +1178,7 @@ export default function CompanySetupPage() {
             </div>
 
             {error && (
-              <div className="p-3 bg-crimson/10 border border-crimson/20 rounded-xl text-sm text-crimson-light">{error}</div>
+              <div role="alert" className="p-3 bg-crimson/10 border border-crimson/20 rounded-xl text-sm text-crimson-light">{error}</div>
             )}
 
             <p className="rounded-xl border border-gold/20 bg-gold/5 px-4 py-3 text-sm leading-6 text-text-secondary">
@@ -1141,7 +1187,7 @@ export default function CompanySetupPage() {
 
             <button
               type="submit"
-              disabled={saving || uploadingLogo || uploadingCover || uploadingPortfolio || !name.trim() || !city.trim()}
+              disabled={saving || preparing || uploadingLogo || uploadingCover || uploadingPortfolio}
               className="w-full py-4 bg-gold text-bg-primary font-bold rounded-xl hover:bg-gold-light transition-colors flex items-center justify-center gap-2 text-sm disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {saving ? (

@@ -1,4 +1,5 @@
 "use client";
+import { fetchSetup } from "@/lib/setup-fetch";
 import CurrencySelect from "@/components/CurrencySelect";
 import { storedCurrency } from "@/lib/currency";
 
@@ -464,6 +465,9 @@ export default function InseratPage() {
   const [createdIsDraft, setCreatedIsDraft] = useState(false);
   const [marketReview,setMarketReview]=useState(false);
   const [savingPrivate,setSavingPrivate]=useState(false);
+  const createInFlight = useRef(false);
+  const publishInFlight = useRef(false);
+  const [recoveryAttempt, setRecoveryAttempt] = useState(0);
   const [publishingDraft, setPublishingDraft] = useState(false);
   const [selected, setSelected] = useState<CategoryItem | null>(null);
   const [activeGroup, setActiveGroup] = useState<string | null>(null); // null = main view
@@ -578,10 +582,10 @@ export default function InseratPage() {
     let active = true;
     setLocationDraftReady(false);
     setLocationDraftStatus("loading");
-    fetch("/api/onboarding", { cache: "no-store" })
+    fetchSetup("/api/onboarding", { cache: "no-store" })
       .then(async (response) => {
-        const data = await response.json().catch(() => ({}));
-        if (!response.ok) throw new Error(data.error ?? uiText("Ui.text_2e68c52246cd14"));
+        const data = await response.json();
+        if (!response.ok || !data || !Object.hasOwn(data, "draft")) throw new Error(data?.error ?? uiText("Ui.text_2e68c52246cd14"));
         return data.draft?.locationFormDraft as Record<string, unknown> | undefined;
       })
       .then((saved) => {
@@ -624,15 +628,16 @@ export default function InseratPage() {
             setLocationDraftStatus("saved");
           }
         }
+        if (!saved) setLocationDraftStatus("idle");
         setLocationDraftReady(true);
       })
       .catch(() => {
         if (!active) return;
-        setLocationDraftReady(true);
+        setLocationDraftReady(false);
         setLocationDraftStatus("error");
       });
     return () => { active = false; };
-  }, [isLoaded, userId]);
+  }, [isLoaded, userId, recoveryAttempt]);
 
   const listingDraft = useFormDraft({
     formKey: "listing:new",
@@ -658,7 +663,7 @@ export default function InseratPage() {
 
   useEffect(() => {
     if (!userId) return;
-    fetch("/api/companies?mine=true&limit=50")
+    fetchSetup("/api/companies?mine=true&limit=50")
       .then((r) => r.json())
       .then((d) => setMyCompanies(d.data ?? d.companies ?? []))
       .catch(() => {});
@@ -870,7 +875,7 @@ export default function InseratPage() {
       const compressed = await compressImage(file, { maxWidth: 1920, quality: 0.85, maxBytes: MAX_FUNCTION_UPLOAD_BYTES , translate: uiText });
       const fd = new FormData();
       fd.append("file", compressed);
-      const res = await fetch("/api/upload", { method: "POST", body: fd });
+      const res = await fetchSetup("/api/upload", { method: "POST", body: fd }, fetch, 90_000);
       const json = await res.json().catch(() => ({}));
       if (!res.ok || !json.url) {
         throw new Error(res.status === 413
@@ -896,6 +901,7 @@ export default function InseratPage() {
   }
 
   async function handleSubmit(privateDraft = false) {
+    if (createInFlight.current || createdId) return;
     if (!userId) {
       const destination = `${window.location.pathname}${window.location.search}`;
       router.push(`/sign-in?redirect_url=${encodeURIComponent(destination)}`);
@@ -920,6 +926,8 @@ export default function InseratPage() {
       if(issue){setError(marketText(issue));return;}
     }
     if((selected?.type === "prop" || selected?.type === "vehicle") && !privateDraft && !marketReview){setMarketReview(true);window.scrollTo({top:0,behavior:'instant'});return;}
+    createInFlight.current = true;
+    try {
     setSavingPrivate(privateDraft);
     setLoading(true);
     setError("");
@@ -928,7 +936,7 @@ export default function InseratPage() {
 
     let json: { error?: string; publicationError?: string; data?: { id?: string; published?: boolean; moderation_status?: string } } = {};
     try {
-      const res = await fetch("/api/listings", {
+      const res = await fetchSetup("/api/listings", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -946,7 +954,7 @@ export default function InseratPage() {
         }),
       });
       json = await res.json().catch(() => ({}));
-      if (!res.ok) {
+      if (!res.ok || !json.data?.id) {
         setError(json.error ?? uiText("profile.savingError"));
         setLoading(false);
         return;
@@ -962,39 +970,44 @@ export default function InseratPage() {
     setCreatedIsDraft(json.data?.moderation_status === "draft" || selected?.type === "job" || selected?.type === "location");
     setCreatedPublished(json.data?.published === true);
     if (json.publicationError) setError(json.publicationError);
-    if (selected?.type === "location") {
-      const cleared = await fetch("/api/onboarding?type=location-form", { method: "DELETE" }).catch(() => null);
-      if (!cleared?.ok) setError(uiText("Ui.text_5e80d82f007207"));
-    }
     setStep(3);
+    if (selected?.type === "location") {
+      // Show the confirmed save immediately; cleanup is not another publication.
+      void fetchSetup("/api/onboarding?type=location-form", { method: "DELETE" }).then(cleared => {
+        if (!cleared.ok) setError(uiText("Ui.text_5e80d82f007207"));
+      }).catch(() => setError(uiText("Ui.text_5e80d82f007207")));
+    }
+    } finally { createInFlight.current = false; setLoading(false); setSavingPrivate(false); }
   }
 
   async function handlePublishDraft() {
-    if (!createdId || !createdIsDraft) return;
+    if (!createdId || !createdIsDraft || publishInFlight.current) return;
     const errors = (selected?.type === "prop" || selected?.type === "vehicle") ? marketplaceResponsibleErrors(responsible) : responsiblePersonErrors(responsible); setResponsibleErrors(errors);
     if (Object.keys(errors).length) { focusResponsiblePerson(); return; }
+    publishInFlight.current = true;
     setPublishingDraft(true);
     setError("");
     try {
-      const responsibleSave = await fetch(`/api/listings/${createdId}`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ responsible_person: responsible }) });
+      const responsibleSave = await fetchSetup(`/api/listings/${createdId}`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ responsible_person: responsible }) });
       if (!responsibleSave.ok) { const failure = await responsibleSave.json(); throw new Error(failure.error); }
       let response: Response;
       if (pendingImageFile) {
         const compressed = await compressImage(pendingImageFile, { maxWidth: 1920, quality: 0.85, maxBytes: MAX_FUNCTION_UPLOAD_BYTES , translate: uiText });
         const formData = new FormData();
         formData.append("file", compressed);
-        response = await fetch(`/api/listings/${createdId}/publish`, { method: "POST", body: formData });
+        response = await fetchSetup(`/api/listings/${createdId}/publish`, { method: "POST", body: formData }, fetch, 90_000);
       } else {
-        response = await fetch(`/api/listings/${createdId}/publish`, { method: "POST" });
+        response = await fetchSetup(`/api/listings/${createdId}/publish`, { method: "POST" });
       }
       const result = await response.json().catch(() => ({}));
-      if (!response.ok) throw new Error(result.error ?? moderation("saveError"));
+      if (!response.ok || result.success !== true) throw new Error(result.error ?? moderation("saveError"));
       setCreatedIsDraft(false);
       setCreatedPublished(result.published === true);
       setPendingImageFile(null);
     } catch (cause) {
       setError(uiErrorMessage(cause, moderation("saveError")));
     } finally {
+      publishInFlight.current = false;
       setPublishingDraft(false);
     }
   }
@@ -1097,6 +1110,11 @@ export default function InseratPage() {
   ];
 
   const currentGroup = activeGroup ? groups.find((g) => g.id === activeGroup) ?? null : null;
+
+  if (locationDraftStatus === "error") return <div className="pt-24 min-h-screen bg-bg-primary"><div className="mx-auto max-w-2xl space-y-4 px-4 py-12">
+    <p role="alert" className="text-crimson-light">{uiText("Ui.text_2e68c52246cd14")}</p>
+    <button type="button" className="min-h-12 rounded-xl bg-gold px-5 text-bg-primary" onClick={() => { setLocationDraftStatus("loading"); setRecoveryAttempt(value => value + 1); }}>{uiText("notifications.retry")}</button>
+  </div></div>;
 
   if (step === 1) {
     return (
@@ -1450,11 +1468,16 @@ export default function InseratPage() {
                         const file = e.target.files?.[0]; if (!file) return;
                         const _fp = safeObjectURL(file); if (_fp) setLocFloorPlanPreview(_fp);
                         setLocFloorUploading(true);
-                        const fd = new FormData(); fd.append("file", file);
-                        const res = await fetch("/api/upload", { method: "POST", body: fd });
-                        const json = await res.json();
-                        setLocFloorUploading(false);
-                        if (json.url) setLocFloorPlanUrl(json.url);
+                        try {
+                          const fd = new FormData(); fd.append("file", file);
+                          const res = await fetchSetup("/api/upload", { method: "POST", body: fd }, fetch, 90_000);
+                          const json = await res.json();
+                          if (!res.ok || !json.url) throw new Error(json.error || uiText("profile.savingError"));
+                          setLocFloorPlanUrl(json.url);
+                        } catch (cause) {
+                          setLocFloorPlanPreview(null);
+                          setError(uiErrorMessage(cause, uiText("profile.savingError")));
+                        } finally { setLocFloorUploading(false); }
                       }} />) })}</label>
                   )}
                 </div>
