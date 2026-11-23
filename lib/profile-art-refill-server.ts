@@ -2,7 +2,7 @@ import "server-only";
 import { db } from "@/lib/db";
 import { PROFILE_ART_REFILL_ENABLED, PROFILE_ART_READER_ENABLED, isArtUUID, isPlatformArtKind, type PlatformArtKind } from "@/lib/profile-art-refill-contract";
 import { ArtPipelineError, withArtDeadline } from "@/lib/profile-art-io";
-import { createProfileArtProducer } from "@/lib/profile-art-producer";
+import { createProfileArtBatch } from "@/lib/profile-art-batch";
 import { createProfileArtStorage } from "@/lib/profile-art-storage";
 import { runProfileArtRefill, type ArtQueue, type ArtCatalogSnapshot } from "@/lib/profile-art-refill";
 import { readProfileArtResponse } from "@/lib/profile-art-reader";
@@ -19,7 +19,7 @@ async function rpc(name: string, args: Record<string, unknown>, parent?: AbortSi
   }, parent, 5000);
 }
 const queue: ArtQueue = {
-  claim: signal => rpc("profile_art_claim_refill_v2", {}, signal),
+  claim: signal => rpc("profile_art_claim_refill_v3", {}, signal),
   snapshot: async signal => await rpc("profile_art_catalog_snapshot", {}, signal) as ArtCatalogSnapshot,
   stage: (job, revision, candidate, signal) => rpc("profile_art_stage_candidate", {p_job: job.id, p_token: job.token, p_revision: revision, p_candidate: candidate}, signal),
   fail: async (job, code) => { await rpc("profile_art_fail_refill", {p_job: job.id, p_token: job.token, p_code: code}); },
@@ -29,7 +29,8 @@ const queue: ArtQueue = {
 export async function runServerProfileArtRefill(signal?: AbortSignal) {
   if (!PROFILE_ART_REFILL_ENABLED) return {status: "disabled" as const, inventoryReady: false as const};
   const storage = createProfileArtStorage(db.storage);
-  return runProfileArtRefill({queue, produce: createProfileArtProducer({enabled: true, apiKey: process.env.OPENAI_API_KEY}), putVerified: storage.putVerified,
+  const batch = createProfileArtBatch({apiKey: process.env.OPENAI_API_KEY});
+  const result = await runProfileArtRefill({queue, produce: batch.produce, putVerified: storage.putVerified,
     review: createProfileArtReviewer({apiKey: process.env.OPENAI_API_KEY}),
     release: async (job, review, hash, bounded) => {
       // Re-read the actual private object just before public release.
@@ -38,6 +39,7 @@ export async function runServerProfileArtRefill(signal?: AbortSignal) {
       return rpc("profile_art_complete_review", {p_job: job.id, p_review: review, p_verified_sha: hash}, bounded);
     },
   }, {enabled: true, signal});
+  return result.status === "idle" ? batch.advance(rpc, signal) : result;
 }
 export async function enqueueServerProfileArtRefill(kind: PlatformArtKind, requestKey: string) {
   if (!PROFILE_ART_REFILL_ENABLED) return {status: "disabled" as const};

@@ -1,8 +1,9 @@
 ## Aktuelle WEB-Priorität · 23. November 2026
 
-1. **Profilabschluss:** Zusatztätigkeit freiwillig, verständliche/fokussierte Pflichtfeldfehler. 43 Tests, TypeScript, 17 Sprachen bestanden; Veröffentlichung offen.
-2. **Verifizierung:** bestätigten Status durchgängig anzeigen; Korrektur geprüft, noch nicht veröffentlicht.
-3. **Avatar-Reserve:** ausgewählte 24 Stilrichtungen vorbereitet; günstigere Batch-Erzeugung ausdrücklich beauftragt, Implementierung und Prüfungen laufen. Bestehende Profilbilder erhalten.
+1. **Profilabschluss:** Zusatztätigkeit freiwillig, verständliche/fokussierte Pflichtfeldfehler. 43 Tests, TypeScript, 17 Sprachen und Produktionsbuild bestanden; **live bestätigt auf 11d96803**. Betroffene Nutzer müssen den Abschluss noch erneut durchspielen.
+2. **Verifizierung:** auf `036920b1` veröffentlicht; Nicolais Haken bei 393/1440px sichtbar und nicht verdeckt. Keine echten Adminentscheidungen im Livetest verändert.
+3. **Avatar-Reserve:** 24 ausgewählte Stile und günstigere Batch-Erzeugung auf `036920b1` live (`dpl_AatmCrVeFfjskKn5RbPH7PJTJQVV`, www geprüft). Gezielte Migration angewandt; 118 Bilder und alle vorbestehenden Zuordnungen unverändert. Ein regulärer Nachfüllauftrag vom Anbieter angenommen, Ergebnis/Prüfung und echte Kostenmessung noch offen.
+4. **Nächste Priorität — Anbieter-Einrichtung:** Markus verlangt jetzt Firmen, Marktplatz, Locations und weitere Registrierungswege ohne Hängenbleiben. Baseline: 140/141 Tests bestanden; ein veralteter Quelltextvergleich zur Profilabfrage scheitert. Unbegrenzte Netzwerkwarten und fehlende Fehlerbehandlung beim Namensschritt gefunden; Korrektur und weitere Ablaufprüfungen laufen. Dieser neue Auftrag ist noch nicht veröffentlicht.
 
 # Aktuelle Aufträge · 22. November 2026
 

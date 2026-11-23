@@ -64,4 +64,9 @@ Profile und keine Änderung bestehender Konten.
 
 43 gezielte Berufs-/Einrichtungs-/Speicherprüfungen bestanden, einschließlich
 Schritt 5 → Übersicht, fehlender Stadt/Land, Suchprofil und Firmenstandort.
-Lokaler Quellstand; Veröffentlichung und physische App-Abnahme separat offen.
+Live bestätigt am 23.11.2026: `11d96803f588d97730ce2b56e9c7d610f8183b2d`,
+Deployment `dpl_ELjNZCnqDr49igrf8tY9nSvWjih7` auf `www.cinegenius.co`.
+Produktionsbuild, Hauptstands-/Identitätsprüfung und öffentliche Erreichbarkeit
+bestanden. Kein erneuter Abschluss mit einem betroffenen Mitgliedskonto und keine
+physische App-Abnahme behauptet. Beleg:
+`/srv/cinegenius/handoffs/20261123-verification-check/profile-release-receipt.json`.

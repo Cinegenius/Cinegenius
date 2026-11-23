@@ -1,6 +1,7 @@
 "use client";
 import { matchesBrowsePlace } from "@/lib/browse-radius";
 import NativeBrowsePlaceFilters from "@/components/app/NativeBrowsePlaceFilters";
+import VerifiedBadge from "@/components/VerifiedBadge";
 
 import type { OccupationForm } from "@/lib/occupation-form";
 import { type CrewNear } from "@/lib/genie-search";
@@ -40,7 +41,7 @@ import { crewPhotoInput, profilePhotoStyle } from "@/lib/profile-photo";
 import { subscribeToProfileUpdated } from "@/lib/profile-update-events";
 import { rankByRatingConfidence } from "@/lib/rating-ranking";
 import {
-CheckCircle,
+
 MapPin,
 Star,
 Users
@@ -411,7 +412,7 @@ function CreatorsInner({
     id: creator.id, title: creator.name, city: creator.location,
     subtitle: getDisplayPositions(creator).map(label => taxonomyLabel(label, uiText, creator.occupationForm)).join(" · "),
     href: creator.id.startsWith("listing_") ? `/creators/${encodeURIComponent(creator.id.slice(8))}` : `/profile/${encodeURIComponent(creator.id)}`,
-    image: creator.image, focalPoint: creator.focal_point, lat: creator.lat, lng: creator.lng,
+    image: creator.image, verified: creator.verified, focalPoint: creator.focal_point, lat: creator.lat, lng: creator.lng,
   })), [matching, uiText]);
   const resultKey = JSON.stringify([filterKey, viewMode === "map" ? map.bounds : null]);
   const visibleCount = pagination.filterKey === resultKey ? pagination.visibleCount : PAGE_SIZE;
@@ -617,7 +618,7 @@ function CreatorsInner({
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-1.5">
                             <span className="text-sm font-semibold text-text-primary group-hover:text-gold transition-colors truncate">{c.name}</span>
-                            {c.verified && <CheckCircle size={11} className="text-gold/60 shrink-0" />}
+                            <VerifiedBadge verified={c.verified} label={uiText("common.verified")} />
                             {c.available && c.last_seen_at && (Date.now() - new Date(c.last_seen_at).getTime() < 14 * 24 * 60 * 60 * 1000) && <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 shrink-0" title={tc("available")} />}
                           </div>
                           <p data-native-crew-directory-role={nativeAppearance || undefined} className="text-[11px] text-text-muted truncate">{displayPositions.slice(0, nativeAppearance ? 1 : 2).join(" · ")}</p>
@@ -657,7 +658,7 @@ function CreatorsInner({
                       <div className="min-w-0 flex-1 py-0.5">
                         <div className="flex items-start justify-between gap-1 mb-0.5">
                           <h3 className="min-w-0 break-words [overflow-wrap:anywhere] font-semibold text-text-primary text-[13px] leading-snug sm:text-sm">{c.name}</h3>
-                          {c.verified && <CheckCircle size={12} className="text-gold/60 shrink-0 mt-0.5" />}
+                          <VerifiedBadge verified={c.verified} label={uiText("common.verified")} />
                         </div>
                         <p data-native-card-copy data-native-crew-directory-role={nativeAppearance || undefined} className="line-clamp-2 text-[11px] leading-snug text-gold font-medium sm:text-xs">{displayPositions.slice(0, nativeAppearance ? 1 : 2).join(" · ")}</p>
                         {c.location && (

@@ -8,6 +8,7 @@ import dynamic from "next/dynamic";
 import Link from "next/link";
 import { Building2, Info, MapPin, RotateCcw, UserRound } from "lucide-react";
 import { useTranslations } from "next-intl";
+import VerifiedBadge from "./VerifiedBadge";
 import MediaImage from "./MediaImage";
 import MapResultSummary from "./MapResultSummary";
 import ListingImage from "./ListingImage";
@@ -21,7 +22,7 @@ const LocationMap = dynamic(() => import("./LocationMap"), { ssr: false, loading
 
 export type DirectoryMapItem = {
   id: string; title: string; city: string; subtitle: string; href: string; image: string;
-  priceLabel?: string; focalPoint?: { x: number; y: number } | null;
+  verified?: boolean; priceLabel?: string; focalPoint?: { x: number; y: number } | null;
   lat?: number | null; lng?: number | null;
 };
 
@@ -30,11 +31,12 @@ export default function DirectoryMap({ items, kind, bounds, onBoundsChange, comp
   bounds: MapBounds | null; onBoundsChange: (bounds: MapBounds | null) => void;
   compact?: boolean; onShowAll?: () => void; countNotice?: string;
 }) {
+  const common = useTranslations("common");
   const ui = useTranslations(), t = useTranslations("directoryMap"), mapText = useTranslations("locationMap");
   const clusterLabel = useCallback((count: number) => t("cluster", { count }), [t]);
   const [activeId, setActiveId] = useState<string | null>(null);
   const PreviewImage = kind === "marketplace" ? ListingImage : MediaImage;
-  const locations = useMemo(() => items.map(item => ({ ...item, titleContent: kind === "marketplace" ? <TranslatedText kind="listing" id={item.id} field="title">{item.title}</TranslatedText> : item.title, type: "", price: 0, lat: item.lat ?? null, lng: item.lng ?? null })), [items, kind]);
+  const locations = useMemo(() => items.map(item => ({ ...item, titleContent: kind === "marketplace" ? <TranslatedText kind="listing" id={item.id} field="title">{item.title}</TranslatedText> : <>{item.title}{kind === "crew" && <VerifiedBadge verified={item.verified} label={common("verified")} />}</>, type: "", price: 0, lat: item.lat ?? null, lng: item.lng ?? null })), [items, kind, common]);
   const counts = useMemo(() => mapResultCounts(locations, bounds), [locations, bounds]);
   const source = <p className="directory-map-source text-xs text-text-muted">{t.rich("source", { provider: chunks => <a href="https://www.geonames.org/" target="_blank" rel="noreferrer" className="inline-flex min-h-11 items-center underline">{chunks}</a>, license: chunks => <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noreferrer" className="inline-flex min-h-11 items-center underline">{chunks}</a> })}</p>;
   return <section className={compact ? "directory-map-compact min-w-0" : "mb-6 min-w-0 space-y-3"} aria-label={(kind === "jobs" ? ui("BrowseFilters.jobsMap") : t(kind))}>
@@ -52,7 +54,7 @@ export default function DirectoryMap({ items, kind, bounds, onBoundsChange, comp
             <div className="flex min-w-0 items-start gap-3">
               <div className="relative size-12 shrink-0 overflow-hidden rounded-lg bg-bg-elevated">{item.image ? <PreviewImage src={item.image} alt="" fill mediaSize="thumbnail" sizes="48px" className={kind === "companies" ? "object-contain p-1" : "object-cover"} style={{ objectPosition: item.focalPoint ? `${item.focalPoint.x}% ${item.focalPoint.y}%` : "50% 50%" }} /> : <div className="flex h-full items-center justify-center text-text-muted">{kind === "crew" ? <UserRound size={22} aria-hidden="true" /> : kind === "companies" ? <Building2 size={22} aria-hidden="true" /> : <MapPin size={22} aria-hidden="true" />}</div>}</div>
               <div className="min-w-0 flex-1 space-y-1 [overflow-wrap:anywhere]">
-                <h3 className="line-clamp-2 pr-8 text-sm font-semibold text-text-primary" title={item.title}>{kind === "marketplace" ? <TranslatedText kind="listing" id={item.id} field="title">{item.title}</TranslatedText> : item.title}</h3>
+                <h3 className="line-clamp-2 pr-8 text-sm font-semibold text-text-primary" title={item.title}>{kind === "marketplace" ? <TranslatedText kind="listing" id={item.id} field="title">{item.title}</TranslatedText> : item.title}{kind === "crew" && <VerifiedBadge verified={item.verified} label={common("verified")} />}</h3>
                 <p className="line-clamp-2 text-xs text-text-muted" title={item.subtitle}>{item.subtitle}</p>
                 <p className="truncate text-xs text-text-secondary" title={item.city}>{item.city}</p>
               </div>

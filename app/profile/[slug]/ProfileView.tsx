@@ -6,6 +6,7 @@ import { TranslatedText, useTranslatedContent } from "@/components/ContentTransl
 
 import { occupationFormFromCrew, type OccupationForm } from "@/lib/occupation-form";
 
+import VerifiedBadge from "@/components/VerifiedBadge";
 import ProfilePronouns from "@/components/ProfilePronouns";
 import { profileTraitLabel, profileTravelValue } from "@/lib/profile-trait-labels";
 import { listingPriceLabel } from "@/lib/listing-price";
@@ -582,7 +583,7 @@ function ActorProfile({ organizationSection, profile, isOwner, projectCredits, c
                   <ResilientPublicImage src={mainShot} alt="" className="absolute inset-0 scale-110 blur-2xl opacity-55" imageClassName="h-full w-full object-cover" />
                   <ResilientPublicImage src={mainShot} alt={profile.display_name ?? ""} className="relative z-10" imageClassName="h-full w-full object-contain object-center" loading="eager" />
                   {profile.verified && (
-                    <div className="absolute top-2.5 left-2.5 flex items-center gap-1 bg-black/60 backdrop-blur-sm text-white text-[10px] font-semibold px-2 py-1 rounded-full">{uiText.rich("Ui.text_df2917b02bd42a", { part1: () => (<Check size={9} />) })}</div>
+                    <div className="absolute z-20 top-2.5 left-2.5 flex items-center gap-1 bg-black/60 backdrop-blur-sm text-white text-[10px] font-semibold px-2 py-1 rounded-full"><Check size={9} aria-hidden="true" /> {uiText("common.verified")}</div>
                   )}
                 </div>
               ) : (
@@ -625,7 +626,7 @@ function ActorProfile({ organizationSection, profile, isOwner, projectCredits, c
                     })()}
                   </div>
                   <h1 className="min-w-0 max-w-full break-words font-display text-4xl sm:text-5xl font-bold text-text-primary leading-tight tracking-tight [overflow-wrap:anywhere]">
-                    {profile.display_name ?? uiText("Ui.text_276ffa1fb4f970")}
+                    {profile.display_name ?? uiText("Ui.text_276ffa1fb4f970")}<VerifiedBadge verified={profile.verified} label={uiText("common.verified")} />
                   </h1>
                   <ProfilePronouns profile={profile} />
                   <ProfileRoles positions={roleLabels} /><AdditionalProfileOccupations profile={profile} />
@@ -1032,7 +1033,7 @@ function ModelProfile({ organizationSection, profile, isOwner, projectCredits = 
                     style={{ objectPosition: profile.focal_point ? `${profile.focal_point.x}% ${profile.focal_point.y}%` : "50% 38%" }}
                   />
                 ) : <span className="flex h-full items-center justify-center font-display text-5xl font-bold text-text-muted/30">{(profile.display_name ?? "?")[0]}</span>}
-                {profile.verified && <span className="absolute left-3 top-3 inline-flex items-center gap-1.5 rounded-full border border-white/20 bg-black/60 px-2.5 py-1 text-[10px] font-semibold text-white">{uiText.rich("Ui.text_712de43869af36", { part1: () => (<Check size={10} />) })}</span>}
+                {profile.verified && <span className="absolute left-3 top-3 inline-flex items-center gap-1.5 rounded-full border border-white/20 bg-black/60 px-2.5 py-1 text-[10px] font-semibold text-white"><Check size={10} aria-hidden="true" /> {uiText("common.verified")}</span>}
               </button>
             </div>
 
@@ -1046,7 +1047,7 @@ function ModelProfile({ organizationSection, profile, isOwner, projectCredits = 
                 {isOwner && <Link href="/profile" className="ml-auto inline-flex min-h-11 items-center gap-1.5 rounded-lg border border-border px-3 text-xs text-text-secondary hover:border-gold/40 hover:text-gold">{uiText.rich("Ui.text_603ead2ae843f0", { part1: () => (<Pencil size={12} />) })}</Link>}
               </div>
               <div>
-                <h1 className="font-display text-3xl sm:text-4xl font-bold tracking-tight text-text-primary">{profile.display_name ?? uiText("Ui.text_276ffa1fb4f970")}</h1>
+                <h1 className="font-display text-3xl sm:text-4xl font-bold tracking-tight text-text-primary">{profile.display_name ?? uiText("Ui.text_276ffa1fb4f970")}<VerifiedBadge verified={profile.verified} label={uiText("common.verified")} /></h1>
                 <ProfilePronouns profile={profile} />
                 <ProfileRoles positions={roleLabels} /><AdditionalProfileOccupations profile={profile} />
                 {profile.location && <p className="mt-3 flex items-center gap-1.5 text-sm text-text-muted"><MapPin size={13} /> {profile.location}</p>}
@@ -1310,7 +1311,7 @@ function GenericProfile({ organizationSection, profile, isOwner, projectCredits,
             )}
             <div className="flex-1 min-w-0 w-full max-w-full [overflow-wrap:anywhere]">
               <h1 className="min-w-0 max-w-full break-words font-display text-xl sm:text-3xl font-bold tracking-tight text-white leading-tight [overflow-wrap:anywhere]" style={bgImage ? { textShadow: "0 2px 4px #000, 0 0 22px rgba(0,0,0,0.7)" } : undefined}>
-                {profile.display_name ?? uiText("Ui.text_276ffa1fb4f970")}
+                {profile.display_name ?? uiText("Ui.text_276ffa1fb4f970")}<VerifiedBadge verified={profile.verified} label={uiText("common.verified")} />
                 <span className="block h-0.5 w-12 bg-gold mt-2 rounded-full" />
               </h1>
               <ProfilePronouns profile={profile} />

@@ -73,6 +73,7 @@ export function searchPlanFromHref(href: string): SearchPlan | null {
 
 export type SearchResult = { id: string; sourceId?: string; title: string; subtitle: string; type: string; price: number; priceLabel?: string; image: string | null; available: boolean | null;
   /** Already localized public facts; separate from the website's longer subtitle. */
+  verified?: boolean;
   crewPreview?: { occupation: string; place: string };
   facets?: PublicBrowseFacets;
   evidence?: "role" | "title" | "requirements";

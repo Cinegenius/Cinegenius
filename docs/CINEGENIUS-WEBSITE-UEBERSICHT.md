@@ -1,5 +1,11 @@
 # CineGenius · Übersicht der gesamten Website
 
+## Gemeinsame Serverkorrekturen · 23. November 2026
+
+`036920b1ed86dd7a981aa354dd05a8921686fe25` ist mit `dpl_AatmCrVeFfjskKn5RbPH7PJTJQVV` READY auf www: freiwillige Zusatztätigkeit, durchgängige Verifizierungsanzeige und 24 ausgewählte Avatarstile mit Batch-Erzeugung. Gezielte Datenbankmigration geprüft; bestehende Bilder/Zuordnungen erhalten. Nicolais Haken öffentlich bei 393/1440px geprüft; erster regulärer Batch angenommen, neue Bildfertigstellung und tatsächliche Kosten noch nicht gemessen. Keine neue native Installation oder vollständige Geräte-/Registrierungsabnahme. Belege: `/srv/cinegenius/handoffs/20261123-avatar-batch-release/release-receipt.json`.
+
+Neuer Auftrag: Einrichtung für Firmen, Marktplatz, Locations und weitere Anbieter auf blockierende Pflichtfelder, Verbindungsfehler, Speichern und Wiederaufnahme prüfen. Diese Folgearbeit ist noch lokal.
+
 ## Native Planerweiterung · Prüfcheckpoint vor 2208
 
 Produktive Basis bleibt `edfe8479ac2d8848846042353d0c059efa32269b` / `dpl_5QZW39f6jVwQsLL2acT3rwE61wVs`, mit akzeptierten App-Kanten und einer vom Nutzer bestätigten erfolgreichen Dispoanalyse (HTTP200). Der neue Website-Quellkandidat ergänzt ausschließlich62 Schlüssel im NativeRoomScanner-Namespace aller17 kanonischen Sprachkataloge sowie interne Bestandsdokumentation. Alle bisherigen Werte und die Bytes außerhalb dieses Namespace bleiben erhalten; gewöhnliche Website-Ansichten, Serveranalyse, Rechte, SQL und deaktiviertes Gmail ändern sich nicht.
@@ -283,6 +289,29 @@ bestätigt. Echte angemeldete Sitzung und native Geräte nicht geprüft.
 Zusatztätigkeit auch bei vier Berufen freiwillig; keine automatische Zuordnung.
 Fehlende Haupttätigkeit wird beim Abschluss übersetzt erklärt und direkt fokussiert.
 Foto/Cover/Vorstellungstext freiwillig, private Entwürfe und alle Berufe bleiben erhalten.
-43 gezielte Prüfungen, TypeScript und 17 Sprachkataloge bestanden. Quellstand, noch
-nicht veröffentlicht; echte native Geräteabnahme separat. Vertrag:
+43 gezielte Prüfungen, TypeScript, 17 Sprachkataloge und Produktionsbuild bestanden.
+Live bestätigt: `11d96803f588d97730ce2b56e9c7d610f8183b2d`, Deployment
+`dpl_ELjNZCnqDr49igrf8tY9nSvWjih7`, `www.cinegenius.co` am 23.11.2026.
+Kein erneuter Abschluss mit einem betroffenen Mitgliedskonto und keine physische
+App-Abnahme behauptet. Beleg:
+`/srv/cinegenius/handoffs/20261123-verification-check/profile-release-receipt.json`. Vertrag:
 [Berufsauswahl](profile-occupation-focus.md).
+
+## Verifizierungsanzeige · 23. November 2026 · Quellkandidat
+
+Aktueller bestätigter Status auf allen drei Profilansichten, Crew-Liste/Karten und
+Suche sichtbar; Adminfehler bleiben im offenen Entscheidungsformular. Bestehende
+atomare Rechte-/Statusregeln erhalten. 68 API-/Datenbank-/Suchprüfungen, 10 weitere
+Regressionen, 18 Profil- und drei Admin-Browserfälle bestanden. Keine realen
+Mitglieder geändert. Noch nicht veröffentlicht; native Geräteabnahme offen.
+[Details und Grenzen](verification-display-20261123.md).
+
+## Bildreserve · 23. November 2026 · Quellkandidat
+
+24 gewählte Menschen-/Tierstilrichtungen und günstigere Batch-Erzeugung vorbereitet.
+Vorhandene Profilbilder bleiben erhalten; Auswahl weiterhin freiwillig und frei
+gemischt. Bis zu 24 Stunden Verarbeitung im Hintergrund, ohne den Profilabschluss
+aufzuhalten. Modell und unabhängige Prüfung bleiben. Neue private Migration vor
+Livegang nötig; noch nicht aktiviert. Zehn neue lokale Batch-/Datenbankprüfungen
+bestanden; echte Erzeugung und Kostenmessung offen.
+[Bestand/Stile](profile-art-stock.md) · [Batch-Vertrag](profile-art-batch.md).
