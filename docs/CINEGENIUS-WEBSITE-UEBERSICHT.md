@@ -1,5 +1,11 @@
 # CineGenius · Übersicht der gesamten Website
 
+## App-Serverkandidat2212 · 23. November 2026
+
+Die freigegebenen App-Deltas erhalten den aktuellen Website-Hauptstand einschließlich `32ce5b9f`/`d69ccd73`: vorhandener Router statt erneutem Laden beim Verlassen von Work, pausierte verdeckte Nachrichtenleser und passender erster Smart-Kartenabruf einschließlich großer Filterauswahlen. Kontorechte, Entwurfsschutz, Cursor und normale Websitegestaltung bleiben erhalten. Dazu34 neue NativeRoomScanner-Texte in allen17 Katalogen für den getrennten nativen Plan-/Sonneneditor.71 gezielte Webfälle und20 Designprüfungen bestanden; vollständiger globaler Sprach-/TypeScript-/Next-Build sowie frischer Produktionsnachweis dieses Kandidaten stehen noch aus. [Belege und Grenzen](app-floor-editor-navigation-20261123.md).
+
+Gmail ist nicht aktiviert oder verbunden. Die ausdrücklich autorisierte neue Dispo-Automatik wird separat entwickelt; dieser Kandidat startet keine Mailauswertung und ändert keine Providerrechte oder Datenbankstruktur. Ältere Zwischenstände unten bleiben Historie.
+
 ## Suchendes Mitglied · Auftrag vom 23. November 2026
 
 Für neue Registrierungen entfällt der reine Sucheinstieg. Bestehende Sucher-Konten und gespeicherte Sucher-Auswahlen bleiben erhalten. Gemeinsame Web-Einrichtung und Speicherweg auf `32ce5b9f` veröffentlicht (dpl_EBjCGgcW7LsNFbYSZv5jYv3dPgSw, READY/www). 99 gezielte Tests, 17 Sprachen, 12 kontrollierte Browserfälle und Produktionsbuild bestanden; 15 HTTP- und zwei öffentliche Live-Browserprüfungen bestätigt. Keine Kundendatenänderung, kein neuer nativer Build und keine physische Geräteabnahme. [Umfang und Prüfgrenzen](search-membership-retirement-20261123.md).

@@ -1,5 +1,13 @@
 # CineGenius · Übersicht der gesamten App
 
+## Aktueller App-Stand · 23. November 2026 · Kandidat2212
+
+Installiert bleibt **2026112211**, mit151 vor Erststart bytegleichen Arbeitsdateien. Markus bestätigt den kompakten Heute-Bereich mit erreichbaren Kontakten und die Wiederaufnahme eines gespeicherten Plans ohne zusätzliche Kontosperrfrage. Der später gemeldete leere Work-Zustand ist ein eigener, noch nicht physisch abgenommener Fall.
+
+Der neue **2212-Kandidat ist vollständig gebaut, signiert und unabhängig geprüft**, noch nicht installiert: übersichtlicher Planeditor mit freiwilliger Innen-/Außenwahl, Zeichnen ohne Pflichtmaße, Punktkonturen, Sonnenbahn und verschiebbarer Uhrzeit; begrenzte Work-Wiederaufnahme sowie weniger doppelte Ladevorgänge in Navigation, Smart und Nachrichten. 398 Originaleingaben,88 Appdateien und45 Ressourcen geprüft;17 neue Katalogabschnitte,153 Core-/22 Editorfälle,71 Webfälle und20 Designprüfungen dokumentiert. Globaler i18n-/TypeScript-/Next-Releasecheck und echte Geräteübergänge folgen separat. [Umfang und Prüfgrenzen](app-floor-editor-navigation-20261123.md).
+
+Gmail bleibt unverbunden und deaktiviert. Die neu ausdrücklich beauftragte Dispo-Mail-Automatik ist ein separater Folgekandidat. TestFlight-Appdatensatz und Verteilungszertifikat sind eingerichtet; ein erster Build ist noch nicht hochgeladen und Mathias noch nicht eingeladen. Ältere Zwischenstände unten bleiben Historie.
+
 ## Suchendes Mitglied · Auftrag vom 23. November 2026
 
 Für neue Registrierungen entfällt der reine Sucheinstieg. Bestehende Sucher-Konten und gespeicherte Sucher-Auswahlen bleiben erhalten. Gemeinsame Web-Einrichtung und Speicherweg auf `32ce5b9f` veröffentlicht (dpl_EBjCGgcW7LsNFbYSZv5jYv3dPgSw, READY/www). 99 gezielte Tests, 17 Sprachen, 12 kontrollierte Browserfälle und Produktionsbuild bestanden; 15 HTTP- und zwei öffentliche Live-Browserprüfungen bestätigt. Keine Kundendatenänderung, kein neuer nativer Build und keine physische Geräteabnahme. [Umfang und Prüfgrenzen](search-membership-retirement-20261123.md).
