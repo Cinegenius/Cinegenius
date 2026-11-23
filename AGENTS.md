@@ -1,3 +1,7 @@
+## Aktive Nacharbeit · 23. November 2026 · nach bestätigter 2208-Fassung
+
+Markus bestätigt Work-Kaltstart sowie mehrere Räume mit Garten. Anschließend beauftragt: ohne Pflichtmaße zeichnen, Sonnenstand ohne Grad-Eingabe, Überschneidungen der Work-Leiste über alle Unterseiten beheben und echte Teamnachrichten im eigenen Team statt im Community-Eingang öffnen. Die vollständige signierte Fassung2209 ist gebaut und lokal geprüft; Veröffentlichung, frische Gerätesicherung, Installation und physische Abnahme folgen separat. [Umfang, Einheiten-/Dateivertrag und Team-/Entwurfsgrenzen](docs/app-work-integration-20261123.md). Die neue Smartfilter-Collage bleibt ausschließlich Vorschau; Gmail bleibt deaktiviert/unverbunden. Ältere Checkpoints unten behalten ihren historischen Zeitpunkt.
+
 ## Mehrere Räume und Work-Wiederaufnahme · Prüfcheckpoint vor 2208
 
 Installiert und vom Nutzer geprüft ist **2026112207**: keine zusätzliche Face-ID-Abfrage mehr,147 Arbeitsdateien vor Erststart bytegleich. Beide Inhaltskanten/Leisten sind physisch akzeptiert; die persönliche Dispoanalyse lieferte unter Web `edfe8479ac2d8848846042353d0c059efa32269b` / `dpl_5QZW39f6jVwQsLL2acT3rwE61wVs` ein vom Nutzer bestätigtes Ergebnis und HTTP200. Das ist keine pauschale Abnahme aller Module.

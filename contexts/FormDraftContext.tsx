@@ -10,7 +10,7 @@ import { lockBodyScroll } from "@/lib/body-scroll-lock";
 
 export type FormProtection = { unsafe: () => boolean; flush?: () => Promise<boolean>; discard?: () => Promise<void> };
 type LeaveOptions = { withinSurface?: boolean; onStay?: () => void };
-const Context = createContext<{ register: (id: symbol, protection: FormProtection) => () => void; leave: (action: () => void, options?: LeaveOptions) => void; notify: () => void } | null>(null);
+const Context = createContext<{ register: (id: symbol, protection: FormProtection) => () => void; leave: (action: () => void, options?: LeaveOptions) => boolean; notify: () => void } | null>(null);
 const HISTORY_KEY = "cgDraftNavigation";
 type HistoryPosition = { session: string; index: number };
 const position = (state: unknown) => (state as Record<string, HistoryPosition> | null)?.[HISTORY_KEY];
@@ -43,9 +43,9 @@ export default function FormDraftProvider({ children }: { children: ReactNode })
     catch { return false; }
   }, [unsafe]);
   const leave = useCallback((action: () => void, options?: LeaveOptions) => {
-    if (pending.current || working.current) return;
+    if (pending.current || working.current) return false;
     if (!options?.withinSurface) announceFormNavigation();
-    if (!unsafe().length) { action(); return; }
+    if (!unsafe().length) { action(); return true; }
     const version = ++attempt.current;
     pending.current = action;
     pendingStay.current = options?.onStay ?? null;
@@ -59,6 +59,7 @@ export default function FormDraftProvider({ children }: { children: ReactNode })
       if (saved) { const go = pending.current; pending.current = null; pendingStay.current = null; setDialog(false); go(); }
       else setFailed(true);
     });
+    return true;
   }, [flush, unsafe]);
 
   useEffect(() => {

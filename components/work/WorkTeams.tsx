@@ -1,5 +1,5 @@
 'use client';
-import {useCallback,useEffect,useLayoutEffect,useRef,useState,type ReactNode} from 'react';
+import {useCallback,useEffect,useLayoutEffect,useRef,useState,useSyncExternalStore,type ReactNode} from 'react';
 import {flushSync} from 'react-dom';
 import {useUser} from '@clerk/nextjs';
 import {useRouter,useSearchParams} from 'next/navigation';
@@ -10,6 +10,7 @@ import FormDraftStatus from '@/components/FormDraftStatus';
 import PeoplePicker from '@/components/messaging/PeoplePicker';
 import {type MessagePerson} from '@/lib/messaging-ui';
 import MessagesContent from '@/components/messaging/MessagesContent';
+import {nativeWorkTeamContainer,nativeWorkTeamContainerAvailable,nativeWorkTeamContainerServer,nativeWorkTeamContainerSubscribe,nativeWorkTeamLeaveRequest,nativeWorkTeamLease,postNativeWorkTeamContainer} from '@/lib/native-work-team-container';
 
 type Member={userId:string;name:string;role:'admin'|'member';status:'active'|'invited'};
 type Access={userId:string;canSee:boolean|null;canJoin:boolean|null;canWrite:boolean|null;denied:boolean};
@@ -66,29 +67,43 @@ function RecoveryForm({accountId,formKey,initial,operation,onSaved,submit,childr
 
 export default function WorkTeams({accountId,accountMatches}:{accountId:string;accountMatches:boolean}) {
  const t=useTranslations('WorkTeams'),router=useRouter(),params=useSearchParams();const {leave}=useFormNavigation();const {user,isLoaded}=useUser();
- const selected=params.get('team'),conversation=params.get('channel');const owner=useRef(user?.id),sequence=useRef(0);useLayoutEffect(()=>{owner.current=user?.id;},[user?.id]);
+ const nativeAvailable=useSyncExternalStore(nativeWorkTeamContainerSubscribe,nativeWorkTeamContainerAvailable,nativeWorkTeamContainerServer);
+ const native=nativeAvailable?nativeWorkTeamContainer():null;
+ const selected=params.get('team'),conversation=params.get('channel');const owner=useRef(user?.id),sequence=useRef(0),verifiedRead=useRef<{request:number;account:string;team:string|null}|null>(null),nativeResumeRead=useRef<Promise<void>|null>(null);useLayoutEffect(()=>{owner.current=user?.id;},[user?.id]);
  const [state,setState]=useState<{owner:string;teams:Team[];showInInbox:boolean;team:Team|null}|null>(null),[error,setError]=useState(''),[loading,setLoading]=useState(true);
  const same=accountMatches&&isLoaded&&user?.id===accountId;
- const load=useCallback(async()=>{
+ const load=useCallback(async(forceNativeResume=false)=>{
+  if(native&&nativeResumeRead.current&&!forceNativeResume){await nativeResumeRead.current;return;}
   if(owner.current!==accountId||!accountMatches)return;
   const request=++sequence.current;
   try{
    const [list,team]=await Promise.all([api(accountId),selected?api(accountId,undefined,selected):Promise.resolve(null)]);
    if(owner.current!==accountId||request!==sequence.current)return;
-   if(list.accountId!==accountId||team&&team.accountId!==accountId)throw new Error(t('accountChanged'));
-   setState({owner:accountId,teams:list.teams,showInInbox:list.showInInbox,team});setError('');
-  }catch(cause){if(owner.current===accountId&&request===sequence.current){setState(null);setError(cause instanceof Error&&cause.message?cause.message:t('unavailable'));}}
+   if(list.accountId!==accountId||team&&team.accountId!==accountId)throw Object.assign(new Error(t('accountChanged')),{status:403});
+   verifiedRead.current={request,account:accountId,team:selected};setState({owner:accountId,teams:list.teams,showInInbox:list.showInInbox,team});setError('');
+  }catch(cause){if(owner.current===accountId&&request===sequence.current){verifiedRead.current=null;const status=(cause as {status?:number}).status;if(native&&[401,403,404].includes(status??0)){setState(null);postNativeWorkTeamContainer(native,'cover');}else if(!native)setState(null);setError(cause instanceof Error&&cause.message?cause.message:t('unavailable'));}}
   finally{if(owner.current===accountId&&request===sequence.current)setLoading(false);}
- },[accountId,accountMatches,selected,t]);
- useEffect(()=>{let active=true;queueMicrotask(()=>{if(active){setState(null);setLoading(true);void load();}});return()=>{active=false;sequence.current+=1;};},[load,same]);
+ },[accountId,accountMatches,selected,t,native]);
+ useEffect(()=>{let active=true;if(native&&!isLoaded)return()=>{active=false;sequence.current+=1;};queueMicrotask(()=>{if(active){if(!native)setState(null);setLoading(true);void load();}});return()=>{active=false;sequence.current+=1;};},[load,same,native,isLoaded]);
  useEffect(()=>{if(!same)return;const refreshed=()=>{if(document.visibilityState==='visible')void load();};window.addEventListener('focus',refreshed);document.addEventListener('visibilitychange',refreshed);return()=>{window.removeEventListener('focus',refreshed);document.removeEventListener('visibilitychange',refreshed);};},[same,load]);
  const action=useOperation(accountId,load);
  const visible=same&&state?.owner===accountId?state:null;
- function go(team?:string,channel?:string){leave(()=>{const query=new URLSearchParams();query.set('account',accountId);if(team)query.set('team',team);if(channel)query.set('channel',channel);router.push('/work/teams?'+query);});}
+ useEffect(()=>{
+  if(!native||!isLoaded)return;
+  if(!same||native.accountId!==accountId){postNativeWorkTeamContainer(native,'cover');return;}
+  const request=(event:Event)=>{const requestId=nativeWorkTeamLeaveRequest(event,native);if(!requestId)return;const leaseId=nativeWorkTeamLease(native);const accepted=leave(()=>postNativeWorkTeamContainer(native,'leaveGranted',{requestId,leaseId}),{onStay:()=>postNativeWorkTeamContainer(native,'leaveStayed',{requestId,leaseId})});if(!accepted)postNativeWorkTeamContainer(native,'leaveStayed',{requestId});};
+  const resume=(event:Event)=>{const requestId=nativeWorkTeamLeaveRequest(event,native);if(!requestId)return;const before=sequence.current,leaseId=nativeWorkTeamLease(native),job=load(true);nativeResumeRead.current=job;void job.then(()=>{const proof=verifiedRead.current;if(owner.current===accountId&&proof&&proof.account===accountId&&proof.team===selected&&proof.request>before&&proof.request===sequence.current)postNativeWorkTeamContainer(native,'ready',{requestId,leaseId});else postNativeWorkTeamContainer(native,'resumeFailed',{requestId,leaseId});}).finally(()=>{if(nativeResumeRead.current===job)nativeResumeRead.current=null;});};
+  window.addEventListener('cinegenius:work-team-leave-request',request);window.addEventListener('cinegenius:work-team-resume-request',resume);
+  return()=>{window.removeEventListener('cinegenius:work-team-leave-request',request);window.removeEventListener('cinegenius:work-team-resume-request',resume);};
+ },[native,same,isLoaded,accountId,selected,load,leave]);
+ useEffect(()=>{if(native&&same&&native.accountId===accountId&&!loading&&(visible||error)&&document.querySelector('[data-native-work-team-container="v1"]'))postNativeWorkTeamContainer(native,'ready');},[native,same,accountId,loading,visible,error]);
+ const closeNative=()=>{if(native){const leaseId=nativeWorkTeamLease(native);leave(()=>postNativeWorkTeamContainer(native,'close',{leaseId}));}};
+ const nativeHeader=native?<div className="flex shrink-0 flex-wrap items-center gap-3 border-b border-border px-4 py-2"><button type="button" className={control} onClick={closeNative}>{t('back')}</button><span className="min-w-0 flex-1 break-words text-sm font-semibold">{t('title')}</span>{native.linking&&visible?.team&&<button type="button" className={control} onClick={()=>{const leaseId=nativeWorkTeamLease(native),teamId=visible.team!.id;leave(()=>postNativeWorkTeamContainer(native,'link',{teamId,leaseId}));}}>{t('linkLocalTeam')}</button>}</div>:null;
+ function go(team?:string,channel?:string){if(native?.teamId&&team!==native.teamId){closeNative();return;}leave(()=>{const query=new URLSearchParams();query.set('account',accountId);if(team)query.set('team',team);if(channel)query.set('channel',channel);router.push('/work/teams?'+query);});}
  if(!same)return <main className="site-container py-8"><p role="alert">{t('accountChanged')}</p></main>;
  const currentChannel=visible?.team?.channels.find(c=>c.conversationId===conversation&&c.joined&&c.canSee);
- if(currentChannel&&visible?.team)return <main className="site-container flex min-h-[70dvh] min-w-0 flex-col py-3"><p className="mb-2 text-sm text-text-muted">{visible.team.name} · {currentChannel.name}</p><MessagesContent key={accountId+currentChannel.id} embedded={{destination:{conversationId:currentChannel.conversationId},onDestination:()=>{},onBack:()=>go(visible.team!.id),onClose:()=>go(visible.team!.id)}}/></main>;
- return <main className="site-container max-w-3xl space-y-5 py-6 pb-[calc(var(--mobile-nav-clearance,80px)+24px)]">
+ if(currentChannel&&visible?.team)return <>{nativeHeader}<main className={native?'flex min-h-0 min-w-0 flex-1 flex-col px-3 py-2':'site-container flex min-h-[70dvh] min-w-0 flex-col py-3'}><p className="mb-2 text-sm text-text-muted">{visible.team.name} · {currentChannel.name}</p><MessagesContent key={accountId+currentChannel.id} embedded={{destination:{conversationId:currentChannel.conversationId},onDestination:()=>{},onBack:()=>go(visible.team!.id),onClose:()=>go(visible.team!.id)}}/></main></>;
+ return <>{nativeHeader}<main className={native?'min-h-0 min-w-0 flex-1 space-y-5 overflow-y-auto px-4 py-4':'site-container max-w-3xl space-y-5 py-6 pb-[calc(var(--mobile-nav-clearance,80px)+24px)]'}>
   <header className="space-y-2">{selected&&<button className={control} onClick={()=>go()}>{t('back')}</button>}<h1 className="font-display text-2xl font-bold">{visible?.team?.name??t('title')}</h1><p className="text-sm text-text-muted">{t('separate')}</p></header>
   {loading&&<p role="status">{t('loading')}</p>}
   {error&&<div role="alert" className="space-y-3 rounded-2xl border border-border bg-bg-primary p-4"><p>{error}</p><button className={control} onClick={()=>void load()}>{t('retry')}</button></div>}
@@ -100,7 +115,7 @@ export default function WorkTeams({accountId,accountMatches}:{accountId:string;a
   </>}
   {visible?.team&&<TeamPanel key={accountId+visible.team.id+visible.team.revision} accountId={accountId} team={visible.team} onSaved={load} openChannel={id=>go(visible.team!.id,id)} leaveTeam={async()=>{await load();go();}}/>}
   {action.node}
- </main>;
+ </main></>;
 }
 function TeamPanel({accountId,team,onSaved,openChannel,leaveTeam}:{accountId:string;team:Team;onSaved:()=>Promise<void>;openChannel:(id:string)=>void;leaveTeam:()=>Promise<void>}) {
  const t=useTranslations('WorkTeams');const action=useOperation(accountId,onSaved);const isAdmin=team.role==='admin';const base={teamId:team.id,revision:team.revision};

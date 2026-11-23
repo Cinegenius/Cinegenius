@@ -10,6 +10,7 @@ import { clearConversation, GENIE_IDLE_MS, GENIE_MEMORY_ACTIVITY, readConversati
 import GenieWelcome from "./GenieWelcome";
 import GenieLauncher, { type GeniePosition } from "./GenieLauncher";
 import styles from "./Genie.module.css";
+import {nativeWorkTeamContainerAvailable,nativeWorkTeamContainerServer,nativeWorkTeamContainerSubscribe} from "@/lib/native-work-team-container";
 import { useNativeSharedGenie, useNativeSharedGenieOwner, useNativeEmbeddedGenie } from "@/lib/use-native-shared-genie";
 
 function GenieMark() {
@@ -235,6 +236,7 @@ export default function Genie({ mode = "floating" }: { mode?: "floating" | "tool
   const memoryScope = session?.id ?? null;
   const nativeOwned = useNativeSharedGenieOwner();
   const nativeEmbedded = useNativeEmbeddedGenie();
+  const teamContainer=useSyncExternalStore(nativeWorkTeamContainerSubscribe,nativeWorkTeamContainerAvailable,nativeWorkTeamContainerServer);
   const [dismissed, setDismissed] = useState(false);
   const position = useRef<GeniePosition | null>(null);
   const rememberPosition = useCallback((point: GeniePosition) => { position.current = point; }, []);
@@ -277,5 +279,5 @@ export default function Genie({ mode = "floating" }: { mode?: "floating" | "tool
     <GenieMark />
     <div className={styles.toolCopy}><strong>{t("name")}</strong><span>{tools("genieDescription")}</span><span role="status">{isLoaded ? tools("noticeFirst") : t("loading")}</span></div>
   </div>;
-  return !isLoaded || cookieVisible || replacedByTool ? null : <AvailableGenie key={memoryScope ?? "guest"} memoryScope={memoryScope} mode={mode} dismissed={dismissed} position={position} onHide={() => setDismissed(true)} onPositionChange={rememberPosition} nativeOwned={nativeOwned} nativeEmbedded={nativeEmbedded} />;
+  return !isLoaded || cookieVisible || replacedByTool || teamContainer ? null : <AvailableGenie key={memoryScope ?? "guest"} memoryScope={memoryScope} mode={mode} dismissed={dismissed} position={position} onHide={() => setDismissed(true)} onPositionChange={rememberPosition} nativeOwned={nativeOwned} nativeEmbedded={nativeEmbedded} />;
 }
