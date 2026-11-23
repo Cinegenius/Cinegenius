@@ -259,6 +259,9 @@ function ProfileSetupContent() {
       if (providerEntry && !hasInProgressDraft) nextDraft = { ...nextDraft, welcomeAcknowledged: true, intents: [providerEntry], activeIntent: providerEntry, sections: { [providerEntry]: { ...createQuickStartIntentData(), offerLater: true } } };
       if (hasInProgressDraft) saveQueue.acknowledge(normalizeQuickStartDraft(saved.quickStart));
       if (!profileComplete && nextDraft.completed.profile) nextDraft = { ...nextDraft, completed: { ...nextDraft.completed, profile: false } };
+      // Older drafts could reach location before choosing a goal. Keep their
+      // entered data, but establish the path before validating its requirements.
+      if (!nextDraft.intents.length && nextDraft.step !== "name" && nextDraft.step !== "goals") nextDraft = { ...nextDraft, step: "goals", activeIntent: null };
       if (resumeIncomplete && hasInProgressDraft) {
         const missing = validateQuickStartDraft(nextDraft);
         if (missing) nextDraft = { ...nextDraft, step: missing.field === "primaryOccupation" ? "review" : screenForField(missing.field), activeIntent: intentForField(missing.field) ?? nextDraft.activeIntent };
@@ -371,7 +374,7 @@ function ProfileSetupContent() {
     requestAnimationFrame(() => {
       const fieldIds: Record<string, string> = {
         personCity: "quick-start-person-city",
-        personCountry: "quick-start-person-country",
+        personCountry: "quick-start-person-city-country",
         "crew-roles": "quick-start-crew-role-search",
         "talent-roles": "quick-start-talent-role-search",
       };
@@ -383,6 +386,15 @@ function ProfileSetupContent() {
 
   async function transition(step: QuickStartScreen, intent = activeIntent) {
     if (saving) return;
+    if (step === "review") {
+      const validation = validateQuickStartDraft(draft, { requirePrimary: false, translate: uiText });
+      if (validation) {
+        setError(validation.message);
+        setDraft(current => ({ ...current, step: screenForField(validation.field), activeIntent: intentForField(validation.field) ?? intent }));
+        focusValidation(validation.field);
+        return;
+      }
+    }
     setError("");
     const next = { ...draft, step, activeIntent: intent };
     setSaving(true);
@@ -831,7 +843,7 @@ function ProfileSetupContent() {
       <section className="min-w-0 rounded-2xl border border-border bg-bg-secondary p-4 sm:p-7">
         {draft.step === "name" && (draft.name && !draft.accountPerson ? <div><label htmlFor="quick-start-name" className="mb-2 block text-sm font-medium text-text-primary">{t("copy65")}<span className="text-gold">*</span></label><input id="quick-start-name" autoComplete="name" maxLength={120} value={draft.name} onChange={(event) => update("name", event.target.value)} placeholder={t("copy66")} className={inputClass} aria-describedby="quick-start-name-help" /><p id="quick-start-name-help" className="mt-2 text-xs leading-5 text-text-muted">{t("copy67")}</p></div> : <ResponsiblePersonFields identityOnly accountPrefill value={draft.accountPerson ?? NEW_RESPONSIBLE_PERSON} errors={responsibleErrors} onChange={person => { setResponsibleErrors({}); setDraft(current => ({ ...current, accountPerson: person, name: `${person.firstName} ${person.lastName}`.trim() })); }} />)}
 
-        {draft.step === "location" && <PlaceField id="quick-start-person-city" selectedCityId={draft.personPlaceCityId} value={[draft.personCity, draft.personCountry].filter(Boolean).join(", ")} onChange={(value, cityId) => { const parts = value.split(","); setDraft(current => ({ ...current, personCity: parts.slice(0,-1).join(",").trim(), personCountry: parts.at(-1)?.trim() ?? "", personPlaceCityId: cityId || "", completed: { ...current.completed, profile: false } })); }} required={needsProfile} />}
+        {draft.step === "location" && <PlaceField id="quick-start-person-city" selectedCityId={draft.personPlaceCityId} value={[draft.personCity, draft.personCountry].filter(Boolean).join(", ")} onChange={(value, cityId) => { const parts = value.split(","); setDraft(current => ({ ...current, personCity: parts.slice(0,-1).join(",").trim(), personCountry: parts.at(-1)?.trim() ?? "", personPlaceCityId: cityId || "", completed: { ...current.completed, profile: false } })); setError(""); }} required={needsProfile} />}
 
         {draft.step === "goals" && <div id="quick-start-goals" tabIndex={-1} role="radiogroup" aria-label={uiText("setup.goalsTitle")} className="grid gap-3 sm:grid-cols-2">{paths.map(({ id, detail, Icon }) => { const selected = draft.intents.length === 1 && draft.intents[0] === id; return <label key={id} className={`flex min-h-24 min-w-0 cursor-pointer focus-within:ring-2 focus-within:ring-gold items-start gap-3 rounded-xl border p-4 text-left transition-colors ${selected ? "border-gold bg-gold/10" : "border-border bg-bg-primary hover:border-gold/50"}`}><input type="radio" name="quick-start-intent" value={id} checked={selected} onChange={() => toggleIntent(id)} className="sr-only" /><span className={`mt-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-lg ${selected ? "bg-gold/15 text-gold" : "bg-bg-elevated text-text-muted"}`}><Icon size={19} /></span><span className="min-w-0 flex-1"><span className="block break-words text-sm font-semibold text-text-primary">{t(`${id}Intent`)}</span><span className="mt-1 block break-words text-xs leading-5 text-text-muted">{localizeSetupMessage(detail, t)}</span></span><span aria-hidden="true" className={`mt-1 flex h-5 w-5 shrink-0 items-center justify-center rounded-full border text-xs ${selected ? "border-gold bg-gold text-bg-primary" : "border-border text-transparent"}`}>✓</span></label>; })}</div>}
 

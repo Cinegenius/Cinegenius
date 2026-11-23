@@ -20,7 +20,8 @@ export type QuickStartProviderIntent = Exclude<QuickStartIntent, "search">;
 
 /** The registration wizard always has the same six named steps. Intent-specific
  * detail panels are subviews within steps 4 and 5, not extra progress steps. */
-export const QUICK_START_SCREENS = ["name", "location", "goals", "details", "intro", "review"] as const;
+// Choose the starting goal before checking its location requirements.
+export const QUICK_START_SCREENS = ["name", "goals", "location", "details", "intro", "review"] as const;
 export type QuickStartScreen = typeof QUICK_START_SCREENS[number];
 
 export type QuickStartRoleSelection = { departmentId: string; role: string };
