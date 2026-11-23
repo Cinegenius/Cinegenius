@@ -1,3 +1,9 @@
+## Mehrere Räume und Work-Wiederaufnahme · Prüfcheckpoint vor 2208
+
+Installiert und vom Nutzer geprüft ist **2026112207**: keine zusätzliche Face-ID-Abfrage mehr,147 Arbeitsdateien vor Erststart bytegleich. Beide Inhaltskanten/Leisten sind physisch akzeptiert; die persönliche Dispoanalyse lieferte unter Web `edfe8479ac2d8848846042353d0c059efa32269b` / `dpl_5QZW39f6jVwQsLL2acT3rwE61wVs` ein vom Nutzer bestätigtes Ergebnis und HTTP200. Das ist keine pauschale Abnahme aller Module.
+
+Markus hat anschließend mehrere Räume einer Wohnung einschließlich Garten auf **derselben Zeichenfläche**, Rechteck/L/U/T/Freiform und die neuen Außenbauteile beauftragt. Der additive native Quellkandidat2208 enthält diese Konturen und23 eigene Außensymbole innerhalb der bisherigen vier Dropdowns. Eine weitere Korrektur trennt laufende Kontoprüfung von echten Fehlern und bündelt die erneute Work-Autorisierung nach Lebenszyklus-/Dokumentwechseln. Keine zusätzliche Geräteauthentifizierung, keine gelockerte Konto-/Projektprüfung und kein automatischer Providerzugriff. [Umfang, Prüfgrenzen und Versionsschutz](docs/app-floor-plan-work-recovery-20261122.md). Vollständiger neuer Gerätebuild, Veröffentlichung der62 Sprachtexte und Installation sind in diesem Prüfcheckpoint noch separat offen. Frühere widersprechende Statusblöcke unten bleiben Historie.
+
 ## Aktueller enger Folgeauftrag – 22. November 2026 · Zeiten, Scanner und obere Kante
 
 **Veröffentlichte Basis:** `72e2a5bf3efad9f960b3c1a588dbc923814665bc` / `dpl_2emUcX9FAZmK3xCDKXAEf9Snmkgo` ist READY und über www geprüft: kompakte Smart-Bedienzeile und geschlossene Fehlerdiagnose. Der erneute echte Nutzerversuch vom 20:03:45.099 UTC scheiterte nach 8238 ms mit `invalid_schema`/502, jetzt eingegrenzt auf `canonical_validation` / `times`. Die konkrete Regel bleibt unbekannt; kein Erfolg oder Timeout behauptet.

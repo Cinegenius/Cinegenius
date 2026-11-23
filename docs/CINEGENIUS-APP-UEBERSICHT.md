@@ -1,5 +1,11 @@
 # CineGenius · Übersicht der gesamten App
 
+## Mehrraum-Grundriss und Kontowiederaufnahme · Prüfcheckpoint vor 2208
+
+Installiert bleibt **2026112207**, mit147 vor Erststart bytegleichen Arbeitsdateien; Markus bestätigt keine zusätzliche Face-ID-Abfrage mehr. Kanten/Leisten sind physisch akzeptiert. Die persönliche Dispoanalyse unter produktivem Web `edfe8479ac2d8848846042353d0c059efa32269b` / `dpl_5QZW39f6jVwQsLL2acT3rwE61wVs` ist durch Nutzerergebnis und HTTP200 belegt. Historische gegenteilige Angaben unten sind frühere Prüfstände.
+
+Der neue native2208-Quellkandidat verbindet Rechteck/L/U/T/Freiform, mehrere benannte Räume, Garten/Außenflächen, gemeinsame Wanddarstellung und23 eigene Außensymbole. Die Kontowiederaufnahme zeigt während echter Prüfung einen Ladezustand und bietet bei Fehlern einen echten erneuten Prüfweg. Vier bestehende Hauptmenüs, Ursprungsdateien, Kontorechte und bisherige56 Objektarten bleiben erhalten. [Details, Prüfungen und Grenzen](app-floor-plan-work-recovery-20261122.md). Gesamtbuild/Installation und physische Mehrraum-/Kaltstartabnahme sind noch gesondert zu belegen. Gmail bleibt deaktiviert.
+
 ## Neuester Folgestand · 2206 signiert, neue obere Kante offen
 
 Installiert bleibt **2205**; **2206 ist vollständig gebaut und signiert, noch nicht installiert**. Neuer Scanner mit drei direkten Einstiegen ohne zusätzliche Gerätesperre, eigenem 20er-Iconset/56 Arten bei unveränderten 44 bisherigen IDs und einmaligem bewusstem Standortknopf für den Sonnenstand. 94 Core-/149 mobile Prüfungen und Vektor-/PDF-Belege; neue OS-Ortsfreigabe in 17 Sprachen, voller historischer nativer UI-Bestand weiterhin 9 Sprachen. Web `72e2a5b` ist veröffentlicht; echte Analyse scheitert weiterhin im Zeitbereich. Ein eng geprüfter Ausgabeform-Kandidat und die obere Kantenkorrektur (17 verpflichtende Designprüfungen, vier Browserpaare mit unveränderten Initialbildern und Scrollmaxima) sind noch gesondert zu veröffentlichen/physisch zu prüfen. [Belege und Grenzen](app-followup-20261122.md). Gmail deaktiviert; Außen-/Tier-Icons getrennte Vorschau. Ältere Zwischenstände unten bleiben Historie.

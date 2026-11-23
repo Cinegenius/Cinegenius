@@ -1,5 +1,11 @@
 # CineGenius · Übersicht der gesamten Website
 
+## Native Planerweiterung · Prüfcheckpoint vor 2208
+
+Produktive Basis bleibt `edfe8479ac2d8848846042353d0c059efa32269b` / `dpl_5QZW39f6jVwQsLL2acT3rwE61wVs`, mit akzeptierten App-Kanten und einer vom Nutzer bestätigten erfolgreichen Dispoanalyse (HTTP200). Der neue Website-Quellkandidat ergänzt ausschließlich62 Schlüssel im NativeRoomScanner-Namespace aller17 kanonischen Sprachkataloge sowie interne Bestandsdokumentation. Alle bisherigen Werte und die Bytes außerhalb dieses Namespace bleiben erhalten; gewöhnliche Website-Ansichten, Serveranalyse, Rechte, SQL und deaktiviertes Gmail ändern sich nicht.
+
+Die nativen Mehrraum-/Außenwerkzeuge und Work-Kontowiederaufnahme sind ein eigenständiger App-Kandidat. [Quellumfang und Nachweisgrenzen](app-floor-plan-work-recovery-20261122.md); aus der Veröffentlichung von Sprachtexten folgt kein Geräteupdate. Installiert ist2207,2208-Build/Installation/Bedienabnahme sind in diesem Prüfcheckpoint noch offen. Ältere gegenteilige Statusblöcke unten bleiben Historie.
+
 ## Neuester Folgeauftrag · Zeitformat und obere App-Kante
 
 Web `72e2a5bf3efad9f960b3c1a588dbc923814665bc` / `dpl_2emUcX9FAZmK3xCDKXAEf9Snmkgo` ist produktiv geprüft. Nach erneutem echtem `invalid_schema`/502 im Zeitbereich ist ein enger Kandidat geprüft: gemeinsame bestehende Audience-Formregel, fünf disjunkte Producerformen, äquivalente geteilte API-Evidence-Definition, geschlossene Regelcodes und eindeutige globale ID-Vorgabe. 40 Tests/78 Alt-Neu-Rohfälle, unveränderte kanonische Annahme und gültige Ergebnisse; tatsächlicher neuer Analyseerfolg noch nicht belegt. Neuer oberer App-Schnitt wird getrennt korrigiert; verpflichtender Schutz gegen beide Schnittkanten beauftragt. Gewöhnliche Website und Quellen-/Kontorechte erhalten.
