@@ -1,10 +1,11 @@
 # Anbieter-Einrichtung: Wiederaufnahme und klare Abschlüsse
 
-Stand: 23. November 2026. Lokaler Korrekturkandidat auf `39a70a15`, noch nicht
-veröffentlicht. Markus verlangt die Prüfung der Firmen-, Marktplatz-, Location-
-und weiteren Einrichtungswege. Diese neue Veröffentlichung benötigt eine eigene
-Freigabe. Die bereits veröffentlichte Profil-/Verifizierungs-/Avatar-Korrektur
-bleibt davon unabhängig.
+Stand: 23. November 2026, **veröffentlicht und um 15:29 Uhr Berlin geprüft**.
+Markus hat „Ja, Anbieter-Korrekturen live stellen“ ausdrücklich bestätigt.
+`3fba2f9693fd827769b0469d648d51988f3b11ec` wurde von sauberem `main == origin/main`
+über den geschützten Releaseweg veröffentlicht; `dpl_552yw4ges7E1xMRMAmkWq98ym1cL`
+ist READY und `www.cinegenius.co` zeigt genau diese Fassung. Die vorherige
+Profil-/Verifizierungs-/Avatar-Korrektur bleibt enthalten.
 
 ## Bestehende Konten und Profile
 
@@ -57,14 +58,19 @@ bleiben bestehen. Keine SQL-Migration, Anbieteraktivierung oder Nutzerdatenkorre
   Wiederholen, Stadtfokus, Übersicht ohne POST und erfolgreicher Abschluss nach
   einem fehlgeschlagenen Speicherversuch. Die genauen Sprach-/Breitenfälle
   stehen im Browserbeleg.
-- Kein echter Kundenabschluss und kein physischer iPhone-Test. Der produktive
-  Gesamtbuild und Liveprüfung erfolgen erst im freigegebenen Releaseweg.
+- Produktiver Gesamtbuild einschließlich TypeScript, Sprach- und Designprüfungen
+  bestanden. 13 öffentliche/abgemeldete HTTP-Prüfungen und zwei Live-Browserfälle
+  (Deutsch 393px, Spanisch 1440px) bestanden: Anmeldeformulare laden, geschützte
+  Einstiege führen zur Anmeldung auf demselben Host, private APIs liefern 401.
+  Im ersten kurzen Logfenster der neuen Fassung keine Fehler-/Fatal-Einträge.
+- Kein echter Kundenabschluss und kein physischer iPhone-Test; keine Migration,
+  Kundendatenänderung oder neue native Installation.
 - ESLint hat im unveränderten Grundbestand des allgemeinen Inseratformulars drei
   `react-hooks/set-state-in-effect`-Fehler. Diese sind vor und nach dem Paket
   vorhanden; kein pauschaler grüner Lint behauptet.
 
 Belege: `/srv/cinegenius/handoffs/20261123-provider-onboarding-check/`, insbesondere
-`verified-suite.log`, `upload-tests.log`, `browser-report.json`, die
+`release-receipt.json`, `live-check.json`, `verified-suite.log`, `upload-tests.log`, `browser-report.json`, die
 TypeScript-/i18n-Ergebnisdateien und der ESLint-Basisvergleich. Frühere
 fehlgeschlagene Prüfläufe sind dort erhalten, darunter veraltete Testfixtures
 und ein Aufruf ohne den erforderlichen Testimport-Resolver.
