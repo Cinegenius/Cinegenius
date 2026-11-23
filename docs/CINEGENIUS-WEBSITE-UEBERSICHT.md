@@ -1,6 +1,6 @@
-## Adminübersicht · 23. November 2026 · noch nicht live
+## Adminübersicht · 23. November 2026 · veröffentlicht
 
-Ergänzter Auftrag: nicht fertiggestellte Profile gezielt filtern; Supportvorlagen und zugehörige E-Mails auf Englisch. Abgeschlossene Anbieter ohne Personenprofil bleiben abgeschlossen. Vorlagenmigration noch nicht angewandt; keine Nachrichten versendet. Gesamtes ergänztes Paket durch Markus freigegeben; Veröffentlichung nach Abschluss des laufenden App-Livegangs.
+Ergänzter Auftrag: nicht fertiggestellte Profile gezielt filtern; Supportvorlagen und zugehörige E-Mails auf Englisch. Abgeschlossene Anbieter ohne Personenprofil bleiben abgeschlossen. Sieben Standardvorlagen sind übersetzt; keine Nachrichten versendet. Gesamtes ergänztes Paket auf `a6d7a34a` / `dpl_6u5AnGBUk4gFsPw3vEaw3MvavY4d` veröffentlicht, www-Zuordnung und Zugriffsschutz geprüft. Aktueller App2212-Hauptstand bleibt erhalten.
 
 Neue gegliederte Adminnavigation und vollständige Kontenfilter nach Crew, Marktplatz, Locations, Firmen, Sucherbestand und unzugeordneten Konten. Einrichtungsstatus separat; mehrfache Bereiche möglich. Details erst beim Öffnen, Länder-Feedback direkt erreichbar. Bestehende Entscheidungen und Rechte erhalten. [Umfang und Grenzen](admin-clarity-20261123.md).
 

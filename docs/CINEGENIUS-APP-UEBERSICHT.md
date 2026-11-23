@@ -1,8 +1,8 @@
-## Gemeinsamer Adminbereich · 23. November 2026 · Webkandidat
+## Gemeinsamer Adminbereich · 23. November 2026 · veröffentlicht
 
-Ergänzter Auftrag: nicht fertiggestellte Profile gezielt filtern; Supportvorlagen und zugehörige E-Mails auf Englisch. Abgeschlossene Anbieter ohne Personenprofil bleiben abgeschlossen. Vorlagenmigration noch nicht angewandt; keine Nachrichten versendet. Gesamtes ergänztes Paket durch Markus freigegeben; Veröffentlichung nach Abschluss des laufenden App-Livegangs.
+Ergänzter Auftrag: nicht fertiggestellte Profile gezielt filtern; Supportvorlagen und zugehörige E-Mails auf Englisch. Abgeschlossene Anbieter ohne Personenprofil bleiben abgeschlossen. Sieben Standardvorlagen sind übersetzt; keine Nachrichten versendet. Gesamtes ergänztes Paket auf `a6d7a34a` / `dpl_6u5AnGBUk4gFsPw3vEaw3MvavY4d` veröffentlicht, www-Zuordnung und Zugriffsschutz geprüft. Aktueller App2212-Hauptstand bleibt erhalten.
 
-Die über die Website erreichbare Verwaltung erhält gegliederte Navigation und kompakte Kontenfilter nach Bereich und Einrichtung. Das mobile Layout ist im Browser geprüft; keine native Oberfläche, kein Gerätebuild und kein Installations-/Gerätenachweis dieses Auftrags. Veröffentlichungsfreigabe liegt vor; noch kein neuer Live-Nachweis. [Umfang und Grenzen](admin-clarity-20261123.md).
+Die über die Website erreichbare Verwaltung erhält gegliederte Navigation und kompakte Kontenfilter nach Bereich und Einrichtung. Das mobile Layout ist im Browser geprüft; keine native Oberfläche, kein Gerätebuild und kein Installations-/Gerätenachweis dieses Auftrags. Gemeinsamer Webbereich ist veröffentlicht; damit wird keine native Geräteabnahme behauptet. [Umfang und Grenzen](admin-clarity-20261123.md).
 
 # CineGenius · Übersicht der gesamten App
 

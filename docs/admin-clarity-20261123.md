@@ -2,7 +2,7 @@
 
 ## Auftrag und Stand
 
-Markus möchte den Adminbereich verständlicher gliedern und Konten/Profile nach Crew, Marktplatz, Locations und Firmen finden. Auf `codex/admin-clarity` lokal umgesetzt; **noch nicht veröffentlicht**. Bestehende Sucher bleiben als Bestand auffindbar. Dieser Auftrag ändert keine Registrierungs-, Veröffentlichungs- oder Verifizierungsrechte.
+Markus möchte den Adminbereich verständlicher gliedern und Konten/Profile nach Crew, Marktplatz, Locations und Firmen finden. Auf Produktcommit `a6d7a34abb394a9d36150727eb43c87defc0a045` **veröffentlicht und live geprüft** (`dpl_6u5AnGBUk4gFsPw3vEaw3MvavY4d`, www-Zuordnung bestätigt). Bestehende Sucher bleiben als Bestand auffindbar. Dieser Auftrag ändert keine Registrierungs-, Veröffentlichungs- oder Verifizierungsrechte.
 
 ## Bedienung
 
@@ -15,7 +15,7 @@ Markus möchte den Adminbereich verständlicher gliedern und Konten/Profile nach
 
 ## Ergänzung: unfertige Profile und englischer Support
 
-Markus hat nach den Ergänzungen das gesamte Paket ausdrücklich mit „Ja, alles live stellen“ freigegeben. Der aktuelle Hauptstand einschließlich App2212 ist konfliktfrei übernommen; Veröffentlichung erfolgt nach Abschluss des laufenden App-Livegangs. Noch kein neuer Live-Nachweis.
+Markus hat nach den Ergänzungen das gesamte Paket ausdrücklich mit „Ja, alles live stellen“ freigegeben. Der aktuelle Hauptstand einschließlich App2212 ist konfliktfrei übernommen; APP hat sein Releasefenster nach dem eigenen finalen Nachweis ausdrücklich freigegeben. Das gesamte Adminpaket ist anschließend über den geschützten Releaseweg veröffentlicht.
 
 - Eigener Statusfilter **Nicht fertiggestellte Profile**: offene Kontoeinrichtung oder ein gespeichertes Profil ohne die bestehenden Pflichtgrundlagen. Die Zeilen unterscheiden „Noch kein Profil gespeichert“ und „Profil noch nicht vollständig“. Abgeschlossene Firmen-/Anbieterkonten und bestehende Sucher benötigen kein persönliches Profil. Bilder, Biografie und zusätzliche Tätigkeiten sind kein Vollständigkeitskriterium. „Einrichtung offen“ bleibt zusätzlich als engerer Filter erhalten; „Abgeschlossen“ schließt tatsächlich unvollständige gespeicherte Profile aus. Eine offene Einrichtung beweist keinen technischen Fehler.
 - Sieben unveränderte gespeicherte Standardvorlagen werden mit der gezielten Migration `20261123210028_english_admin_support_templates.sql` ins Englische übersetzt. Die beiden ergänzenden Vorlagen für Kontoeinrichtung und begonnene Angebote werden explizit aus dem englischen Katalog geladen, unabhängig von der Sprache des Administrators. Eingesetzte Pflichtfeldbezeichnungen und ersatzweise Angebotstitel sind ebenfalls Englisch; eigene Namen und Angebotstitel bleiben original.
@@ -26,7 +26,9 @@ Markus hat nach den Ergänzungen das gesamte Paket ausdrücklich mit „Ja, alle
 
 Die lesende Bestandsprüfung am 23. November fand genau die sieben ursprünglichen deutschen Standardvorlagen und keine gespeicherten Überschreibungen der beiden zusätzlichen Vorlagen. Die Migration übersetzt nur exakt diese Ausgangstexte, erhält Beschriftungen und Aktivierung und stoppt atomar bei zwischenzeitlich geändertem Text. Eigene zusätzliche Vorlagen und gelöschte Standardvorlagen bleiben erhalten; bereits englische Zieltexte sind idempotent. Es werden weder Konten noch Gesprächsverläufe, Berechtigungen oder Versanddaten geändert.
 
-**Freigegeben, noch nicht auf Produktion angewandt.** Die frische Katalogprüfung bestätigt wie beim vorherigen Team-/Mail-Release: Es existiert kein Anwendungs-Migrationsregister (nur die internen auth/realtime/storage-Register). Kein neues Register und keine historischen Migrationen anlegen. Die sieben Zeilen vorab sichern, nur diese geprüfte Migration gezielt atomar anwenden und mit Quellhash, Vorher-/Nachhervergleich und Betreiberbeleg dokumentieren; kein pauschales `db push`. Anschließend die englischen Vorlagen samt aktivierten Zuständen lesen und den geprüften Appcode über sauberes `main == origin/main` veröffentlichen. Das laufende App-Releasefenster bleibt davon getrennt. Rücknahme nur anhand des gesicherten Bestands mit Vergleich der aktuellen Zieltexte, keine zwischenzeitlichen Adminänderungen überschreiben.
+**Am 23. November auf Produktion angewandt und zurückgelesen.** Genau sieben englische Vorlagen; Beschriftungen, Aktivierung, RLS und Clientrechte unverändert. Vorher-/Nachhersicherung und SHA-Beleg unter `/srv/cinegenius/handoffs/20261123-admin-clarity/production/receipt.json`.
+
+Vorgehen und Rücknahmevertrag: Die frische Katalogprüfung bestätigt wie beim vorherigen Team-/Mail-Release: Es existiert kein Anwendungs-Migrationsregister (nur die internen auth/realtime/storage-Register). Kein neues Register und keine historischen Migrationen anlegen. Die sieben Zeilen vorab sichern, nur diese geprüfte Migration gezielt atomar anwenden und mit Quellhash, Vorher-/Nachhervergleich und Betreiberbeleg dokumentieren; kein pauschales `db push`. Anschließend die englischen Vorlagen samt aktivierten Zuständen lesen und den geprüften Appcode über sauberes `main == origin/main` veröffentlichen. Das laufende App-Releasefenster bleibt davon getrennt. Rücknahme nur anhand des gesicherten Bestands mit Vergleich der aktuellen Zieltexte, keine zwischenzeitlichen Adminänderungen überschreiben.
 
 ## Daten- und Kostenvertrag
 
@@ -46,4 +48,10 @@ Folgeauftrag unfertige Profile/englischer Support: 88 gezielte Tests bestanden, 
 - TypeScript bestanden; 17 Sprachkataloge vollständig; 20 verpflichtende Designprüfungen bestanden.
 - 21 bestandene kontrollierte Komponenten-Browserfälle über 17 Sprachen, Deutsch/Spanisch bei 320/393/1440 Pixeln: reale `AdminAccounts`/`AdminNavigation`, tatsächliche Navigationsdefinition und gemeinsame CSS; synthetische Konten und ersetzter Netzwerk-/Anmeldezugang. Filter ohne neue Anfragen, Detailabruf erst bei Bedarf, Fehler/Wiederholen, mobile Navigation und Sortierung. Prüfbelege: `/srv/cinegenius/handoffs/20261123-admin-clarity/`.
 - Neue/überarbeitete eigenständige Module ohne ESLint-Fehler. Die bestehende große Adminseite hat unverändert zwei ältere Hook-Regelfehler und zwölf Warnungen; vor/nach dem Patch abgeglichen. Der alte Admin-Ladetest erhielt die zuvor fehlende echte Währungsabhängigkeit sowie die neue Navigationskomponente.
-- Keine echten Supportnachrichten, Verifizierungen oder Veröffentlichungen ausgelöst. Kein Produktionsbuild/Livegang und keine native Geräteinstallation oder physische App-Abnahme in diesem Auftrag.
+- Die vorstehenden Komponentenprüfungen versendeten keine echten Supportnachrichten und änderten keine Verifizierungen oder Kundeneinträge.
+
+## Veröffentlichungsnachweis
+
+Normaler geschützter Produktionsbuild von sauberem `main == origin/main` mit Exit 0: `a6d7a34a` → `dpl_6u5AnGBUk4gFsPw3vEaw3MvavY4d`, READY und www-Alias sowie Projekt-/Quellidentität geprüft. Next-Build, TypeScript, 17 Sprachkataloge/11.720 Schlüssel und 20 Designprüfungen bestanden. Sieben lesende HTTP-Prüfungen bestätigen vier anonyme Admin-API-Ablehnungen und drei erreichbare öffentliche Seiten. Zwei echte Gast-Browserfälle bei 393/1440 Pixeln bestätigen die Weiterleitung vom Adminbereich, keine Inhaltsüberbreite und keine Browserfehler.
+
+Keine angemeldete Admin-Sitzung stand hier für einen echten Live-Durchlauf zur Verfügung; die Verwaltungsansichten und Supportdialoge wurden zuvor mit kontrollierten Testdaten geprüft. Kein echter Nachrichtenversand, keine Provider-/Flagänderung und kein nativer Build oder Geräteinstallationsnachweis dieses Auftrags. Betreiberbeleg: `/srv/cinegenius/handoffs/20261123-admin-clarity/production/receipt.json`.
