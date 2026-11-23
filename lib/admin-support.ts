@@ -26,6 +26,8 @@ export async function resolveAdminSupportTarget(
   type: AdminSupportTargetType, id: string, adminUserId: string,
 ): Promise<AdminSupportTarget> {
   const responseText = await getTranslations();
+  const supportText = await getTranslations({ locale: "en", namespace: "SupportMessageCopy" });
+  const supportKind = await getTranslations({ locale: "en", namespace: "AdminStartedOffers" });
   if (type === "started_offer") {
     const t = await getTranslations("AdminStartedOffers");
     const parsed = parseStartedOfferId(id);
@@ -36,10 +38,10 @@ export async function resolveAdminSupportTarget(
     const offer = (await loadStartedOffers([member])).find(candidate => candidate.id === id);
     if (!offer) throw new SupportTargetError(t("unavailable"), 409);
     const name = offer.accountName || [member.firstName, member.lastName].filter(Boolean).join(" ").trim();
-    const label = offer.title || t("untitled");
+    const label = offer.title || supportText("untitled");
     const target = finishTarget({
       targetType: ["company", "location", "marketplace"].includes(offer.kind) ? offer.kind as "company" | "location" | "marketplace" : "profile",
-      targetId: id, targetLabel: `${label} · ${t("kinds." + offer.kind)}`, editUrl: offer.editUrl,
+      targetId: id, targetLabel: `${label} · ${supportKind("kinds." + offer.kind)}`, editUrl: offer.editUrl,
       recipientUserId: member.id, profileName: name || t("unnamedAccount"), profileSlug: null, avatarUrl: null,
       companyName: offer.kind === "company" ? label : null, listingTitle: label, missingFields: [], isDraft: true,
     }, adminUserId, responseText);
@@ -72,7 +74,7 @@ export async function resolveAdminSupportTarget(
       const name = profile?.display_name?.trim() || [member.firstName, member.lastName].filter(Boolean).join(" ").trim();
       return {
         ...finishTarget({
-          targetType: "profile", targetId: member.id, targetLabel: t("accountTarget"),
+          targetType: "profile", targetId: member.id, targetLabel: supportText("account"),
           editUrl: destination ?? "/dashboard", recipientUserId: member.id,
           profileName: name || t("unnamed"), profileSlug: null, avatarUrl: profile?.avatar_url ?? null,
           missingFields: [], isDraft: destination !== null,
@@ -83,13 +85,13 @@ export async function resolveAdminSupportTarget(
     }
     if (!profile) throw new SupportTargetError((await getTranslations())("ServerCopy.s_21480dc3761d"));
     recipientUserId = profile.user_id;
-    targetLabel = profile.display_name?.trim() || "Profil";
+    targetLabel = profile.display_name?.trim() || supportText("profile");
     missingFields = [
-      !profile.display_name?.trim() ? "Name" : "",
-      !profile.location?.trim() ? "Standort" : "",
+      !profile.display_name?.trim() ? supportText("fields.name") : "",
+      !profile.location?.trim() ? supportText("fields.location") : "",
       !(Array.isArray(profile.positions) && profile.positions.some((value: unknown) => typeof value === "string" && value.trim()))
         && !(Array.isArray(profile.profile_types) && profile.profile_types.length > 0)
-        && !profile.profile_type ? "Tätigkeit" : "",
+        && !profile.profile_type && !profile.role?.trim() ? supportText("fields.occupation") : "",
     ].filter(Boolean);
     return finishTarget({
       targetType, targetId, targetLabel, editUrl, recipientUserId, profileName: profile.display_name,
@@ -109,7 +111,7 @@ export async function resolveAdminSupportTarget(
     companyName = company.name;
     editUrl = "/company-setup?company_id=" + encodeURIComponent(company.id);
     isDraft = company.published !== true;
-    if (!Array.isArray(company.categories) || company.categories.length === 0) missingFields.push("Branche");
+    if (!Array.isArray(company.categories) || company.categories.length === 0) missingFields.push(supportText("fields.industry"));
     const { data: owner, error: ownerError } = await db.from("profiles")
       .select("user_id, display_name, slug, avatar_url")
       .eq("user_id", recipientUserId).maybeSingle();
@@ -130,12 +132,12 @@ export async function resolveAdminSupportTarget(
   if (!listing) throw new SupportTargetError((await getTranslations())("ServerCopy.s_8f7a319d27b8"));
   targetType = listing.type === "location" ? "location" : "marketplace";
   targetId = listing.id;
-  listingTitle = listing.title?.trim() || "Angebot";
-  targetLabel = listingTitle + (targetType === "location" ? " · Location" : " · Marktplatz");
+  listingTitle = listing.title?.trim() || supportText("untitled");
+  targetLabel = listingTitle + " · " + supportKind("kinds." + targetType);
   isDraft = listing.published !== true;
   editUrl = "/dashboard?tab=listings&editListing=" + encodeURIComponent(listing.id);
-  if (!listing.title?.trim()) missingFields.push("Titel");
-  if (!listing.city?.trim()) missingFields.push("Standort");
+  if (!listing.title?.trim()) missingFields.push(supportText("fields.title"));
+  if (!listing.city?.trim()) missingFields.push(supportText("fields.location"));
 
   if (listing.company_id) {
     const { data: company, error } = await db.from("companies")

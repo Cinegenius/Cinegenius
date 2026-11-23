@@ -12623,7 +12623,8 @@
     "conversation": "Konverzace s podporou",
     "loading": "Načítání konverzace…",
     "reply": "Odpověď za CineGenius Support",
-    "templateReason": "Důvod změny šablony (alespoň 5 znaků)"
+    "templateReason": "Důvod změny šablony (alespoň 5 znaků)",
+    "englishHint": "Zprávy podpory pište prosím anglicky."
   },
   "SupportContact": {
     "badge": "Podpora",
@@ -14077,7 +14078,8 @@
     "statuses": {
       "all": "Vše",
       "open": "Nastavení nedokončeno",
-      "complete": "Dokončeno"
+      "complete": "Dokončeno",
+      "unfinished": "Nedokončené profily"
     },
     "sorting": {
       "newest": "Nejnovější první",
@@ -14087,6 +14089,20 @@
     },
     "reset": "Zrušit filtry",
     "lastActive": "Poslední přihlášení",
-    "verified": "Profil ověřen"
+    "verified": "Profil ověřen",
+    "profileIncomplete": "Neúplný profil",
+    "profileNotSaved": "Profil dosud nebyl uložen"
+  },
+  "SupportMessageCopy": {
+    "fields": {
+      "name": "jméno",
+      "location": "místo",
+      "occupation": "profese",
+      "industry": "odvětví",
+      "title": "název"
+    },
+    "untitled": "Nabídka bez názvu",
+    "account": "Účet",
+    "profile": "Profil"
   }
 }

@@ -18,10 +18,10 @@ export async function GET() {
   if (error) return NextResponse.json({ error: tResponse('System.m_2b2ee587f27e') }, { status: 503 });
   const templates = data ?? [];
   if (!templates.some(template => template.template_key === SETUP_TEMPLATE_KEY)) {
-    templates.push({ ...setupSupportTemplate(await getTranslations("AdminAccounts")), updated_at: null });
+    templates.push({ ...setupSupportTemplate(await getTranslations({ locale: "en", namespace: "AdminAccounts" })), updated_at: null });
   }
   if (!templates.some(template => template.template_key === STARTED_OFFER_TEMPLATE_KEY)) {
-    templates.push({ ...startedOfferTemplate(await getTranslations("AdminStartedOffers")), updated_at: null });
+    templates.push({ ...startedOfferTemplate(await getTranslations({ locale: "en", namespace: "AdminStartedOffers" })), updated_at: null });
   }
   return NextResponse.json({ templates }, { headers: { "Cache-Control": "private, no-store" } });
 }

@@ -12790,7 +12790,8 @@
     "conversation": "지원 대화",
     "loading": "대화 불러오는 중…",
     "reply": "CineGenius 지원으로 답변",
-    "templateReason": "템플릿 변경 사유 (최소 5자)"
+    "templateReason": "템플릿 변경 사유 (최소 5자)",
+    "englishHint": "지원 메시지는 영어로 작성해 주세요."
   },
   "SupportContact": {
     "badge": "지원",
@@ -14077,7 +14078,8 @@
     "statuses": {
       "all": "전체",
       "open": "설정 미완료",
-      "complete": "완료"
+      "complete": "완료",
+      "unfinished": "미완성 프로필"
     },
     "sorting": {
       "newest": "최신 가입순",
@@ -14087,6 +14089,20 @@
     },
     "reset": "필터 초기화",
     "lastActive": "최근 로그인",
-    "verified": "인증된 프로필"
+    "verified": "인증된 프로필",
+    "profileIncomplete": "프로필 미완성",
+    "profileNotSaved": "아직 저장된 프로필이 없습니다"
+  },
+  "SupportMessageCopy": {
+    "fields": {
+      "name": "이름",
+      "location": "위치",
+      "occupation": "직업",
+      "industry": "업종",
+      "title": "제목"
+    },
+    "untitled": "제목 없는 등록글",
+    "account": "계정",
+    "profile": "프로필"
   }
 }

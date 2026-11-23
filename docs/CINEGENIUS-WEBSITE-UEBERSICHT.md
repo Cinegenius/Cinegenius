@@ -1,5 +1,7 @@
 ## Adminübersicht · 23. November 2026 · noch nicht live
 
+Ergänzter Auftrag: nicht fertiggestellte Profile gezielt filtern; Supportvorlagen und zugehörige E-Mails auf Englisch. Abgeschlossene Anbieter ohne Personenprofil bleiben abgeschlossen. Vorlagenmigration noch nicht angewandt; keine Nachrichten versendet. Weiterhin keine Veröffentlichungsfreigabe.
+
 Neue gegliederte Adminnavigation und vollständige Kontenfilter nach Crew, Marktplatz, Locations, Firmen, Sucherbestand und unzugeordneten Konten. Einrichtungsstatus separat; mehrfache Bereiche möglich. Details erst beim Öffnen, Länder-Feedback direkt erreichbar. Bestehende Entscheidungen und Rechte erhalten. [Umfang und Grenzen](admin-clarity-20261123.md).
 
 # CineGenius · Übersicht der gesamten Website

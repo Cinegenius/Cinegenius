@@ -7,7 +7,7 @@
 
 5. **Suchendes Mitglied — live:** Auswahl für neue Konten entfernen; bestehende Sucher-Konten und gespeicherte Sucher-Auswahlen unverändert erhalten. Auf `32ce5b9f` veröffentlicht: 99 gezielte Tests, 17 Sprachen, 12 kontrollierte Browserfälle sowie Produktionsbuild bestanden; www READY, 15 HTTP- und zwei öffentliche Browserprüfungen bestätigt. [Umfang](search-membership-retirement-20261123.md).
 
-6. **Admin übersichtlicher — lokal vorbereitet:** Nach den veröffentlichten Registrierungs-/Anbieterkorrekturen jetzt Mitglieder/Anbieter nach Bereich und Einrichtung filtern, kompakte aufklappbare Zeilen, gegliederte Navigation und direkter Länder-Feedback-Link. Noch nicht live. [Umfang und Prüfgrenzen](admin-clarity-20261123.md). Die zuletzt angefragte Kontenprüfung wurde vorher nur lesend abgeschlossen; daraus ist kein neuer technischer Fehler belegt.
+6. **Admin übersichtlicher — lokal vorbereitet:** Nach den veröffentlichten Registrierungs-/Anbieterkorrekturen jetzt Mitglieder/Anbieter nach Bereich und Einrichtung filtern, kompakte aufklappbare Zeilen, gegliederte Navigation und direkter Länder-Feedback-Link. Ergänzt: eigener Filter für nicht fertiggestellte Profile sowie englische Supportvorlagen, automatische Ergänzungen und Support-E-Mails. Vorlagenmigration vorbereitet, noch nicht angewandt. Neue Veröffentlichungsfreigabe steht aus; noch nicht live. [Umfang und Prüfgrenzen](admin-clarity-20261123.md). Die zuletzt angefragte Kontenprüfung wurde vorher nur lesend abgeschlossen; daraus ist kein neuer technischer Fehler belegt.
 
 # Aktuelle Aufträge · 22. November 2026
 

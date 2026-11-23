@@ -100,7 +100,7 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
         const client = await clerkClient();
         const member = await client.users.getUser(thread.support_user_id);
         const email = member.emailAddresses[0]?.emailAddress;
-        if (email) await sendNewMessageEmail(email, SUPPORT_NAME, content, id);
+        if (email) await sendNewMessageEmail(email, SUPPORT_NAME, content, id, "en");
       }
     } catch { /* stored in-app response remains authoritative */ }
   }

@@ -12623,7 +12623,8 @@
     "conversation": "Supportkonversation",
     "loading": "Läser in konversationen…",
     "reply": "Svara som CineGenius Support",
-    "templateReason": "Anledning till ändringen av mallen (minst 5 tecken)"
+    "templateReason": "Anledning till ändringen av mallen (minst 5 tecken)",
+    "englishHint": "Skriv supportmeddelanden på engelska."
   },
   "SupportContact": {
     "badge": "Support",
@@ -14077,7 +14078,8 @@
     "statuses": {
       "all": "Alla",
       "open": "Inställningar ofullständiga",
-      "complete": "Slutfört"
+      "complete": "Slutfört",
+      "unfinished": "Ofärdiga profiler"
     },
     "sorting": {
       "newest": "Nyaste först",
@@ -14087,6 +14089,20 @@
     },
     "reset": "Återställ filter",
     "lastActive": "Senaste inloggning",
-    "verified": "Verifierad profil"
+    "verified": "Verifierad profil",
+    "profileIncomplete": "Ofullständig profil",
+    "profileNotSaved": "Ingen profil har sparats ännu"
+  },
+  "SupportMessageCopy": {
+    "fields": {
+      "name": "namn",
+      "location": "plats",
+      "occupation": "yrke",
+      "industry": "bransch",
+      "title": "titel"
+    },
+    "untitled": "Annons utan titel",
+    "account": "Konto",
+    "profile": "Profil"
   }
 }

@@ -12623,7 +12623,8 @@
     "conversation": "Támogatási beszélgetés",
     "loading": "Beszélgetés betöltése…",
     "reply": "Válasz a CineGenius Support nevében",
-    "templateReason": "A sablon módosításának oka (legalább 5 karakter)"
+    "templateReason": "A sablon módosításának oka (legalább 5 karakter)",
+    "englishHint": "Az ügyfélszolgálati üzeneteket angolul írd meg."
   },
   "SupportContact": {
     "badge": "Ügyfélszolgálat",
@@ -14077,7 +14078,8 @@
     "statuses": {
       "all": "Mind",
       "open": "Beállítás befejezetlen",
-      "complete": "Befejezve"
+      "complete": "Befejezve",
+      "unfinished": "Befejezetlen profilok"
     },
     "sorting": {
       "newest": "Legújabb elöl",
@@ -14087,6 +14089,20 @@
     },
     "reset": "Szűrők törlése",
     "lastActive": "Utolsó bejelentkezés",
-    "verified": "Ellenőrzött profil"
+    "verified": "Ellenőrzött profil",
+    "profileIncomplete": "Hiányos profil",
+    "profileNotSaved": "Még nincs mentett profil"
+  },
+  "SupportMessageCopy": {
+    "fields": {
+      "name": "név",
+      "location": "helyszín",
+      "occupation": "foglalkozás",
+      "industry": "ágazat",
+      "title": "cím"
+    },
+    "untitled": "Névtelen hirdetés",
+    "account": "Fiók",
+    "profile": "Profil"
   }
 }

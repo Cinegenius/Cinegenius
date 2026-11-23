@@ -81,8 +81,8 @@ export async function POST(request: NextRequest) {
   const { data: savedTemplate, error: templateError } = await db.from("support_message_templates")
     .select("template_key, body, enabled").eq("template_key", templateKey).maybeSingle();
   if (templateError) return NextResponse.json({ error: tResponse('System.m_6a6d03717659') }, { status: 503 });
-  const template = savedTemplate ?? (templateKey === SETUP_TEMPLATE_KEY ? setupSupportTemplate(await getTranslations("AdminAccounts"))
-    : templateKey === STARTED_OFFER_TEMPLATE_KEY ? startedOfferTemplate(await getTranslations("AdminStartedOffers")) : null);
+  const template = savedTemplate ?? (templateKey === SETUP_TEMPLATE_KEY ? setupSupportTemplate(await getTranslations({ locale: "en", namespace: "AdminAccounts" }))
+    : templateKey === STARTED_OFFER_TEMPLATE_KEY ? startedOfferTemplate(await getTranslations({ locale: "en", namespace: "AdminStartedOffers" })) : null);
   if (!template?.enabled) return NextResponse.json({ error: tResponse('System.m_6ca43ca7ff72') }, { status: 400 });
   if (/\{\{[^}]+\}\}/.test(content)) return NextResponse.json({ error: tResponse('System.m_7a1d20a89ba5') }, { status: 400 });
 
@@ -128,7 +128,7 @@ export async function POST(request: NextRequest) {
         const client = await clerkClient();
         const member = await client.users.getUser(target.recipientUserId);
         const email = member.emailAddresses[0]?.emailAddress;
-        if (email) await sendNewMessageEmail(email, SUPPORT_NAME, content, result.conversation_id);
+        if (email) await sendNewMessageEmail(email, SUPPORT_NAME, content, result.conversation_id, "en");
       }
     } catch { /* in-app message remains the durable source; email is optional */ }
   }

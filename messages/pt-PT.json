@@ -12623,7 +12623,8 @@
     "conversation": "Conversa de suporte",
     "loading": "A carregar conversa…",
     "reply": "Responder como Suporte CineGenius",
-    "templateReason": "Motivo para alterar o modelo (mínimo 5 caracteres)"
+    "templateReason": "Motivo para alterar o modelo (mínimo 5 caracteres)",
+    "englishHint": "Escreva as mensagens de apoio em inglês."
   },
   "SupportContact": {
     "badge": "Suporte",
@@ -14077,7 +14078,8 @@
     "statuses": {
       "all": "Todos",
       "open": "Configuração incompleta",
-      "complete": "Concluída"
+      "complete": "Concluída",
+      "unfinished": "Perfis por concluir"
     },
     "sorting": {
       "newest": "Mais recentes primeiro",
@@ -14087,6 +14089,20 @@
     },
     "reset": "Repor filtros",
     "lastActive": "Último início de sessão",
-    "verified": "Perfil verificado"
+    "verified": "Perfil verificado",
+    "profileIncomplete": "Perfil incompleto",
+    "profileNotSaved": "Ainda não foi guardado um perfil"
+  },
+  "SupportMessageCopy": {
+    "fields": {
+      "name": "nome",
+      "location": "localização",
+      "occupation": "profissão",
+      "industry": "setor",
+      "title": "título"
+    },
+    "untitled": "Anúncio sem título",
+    "account": "Conta",
+    "profile": "Perfil"
   }
 }

@@ -1,5 +1,7 @@
 ## Gemeinsamer Adminbereich · 23. November 2026 · Webkandidat
 
+Ergänzter Auftrag: nicht fertiggestellte Profile gezielt filtern; Supportvorlagen und zugehörige E-Mails auf Englisch. Abgeschlossene Anbieter ohne Personenprofil bleiben abgeschlossen. Vorlagenmigration noch nicht angewandt; keine Nachrichten versendet. Weiterhin keine Veröffentlichungsfreigabe.
+
 Die über die Website erreichbare Verwaltung erhält gegliederte Navigation und kompakte Kontenfilter nach Bereich und Einrichtung. Das mobile Layout ist im Browser geprüft; keine native Oberfläche, kein Gerätebuild und kein Installations-/Gerätenachweis dieses Auftrags. Veröffentlichungsfreigabe steht aus. [Umfang und Grenzen](admin-clarity-20261123.md).
 
 # CineGenius · Übersicht der gesamten App

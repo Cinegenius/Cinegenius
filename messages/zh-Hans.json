@@ -12623,7 +12623,8 @@
     "conversation": "支持对话",
     "loading": "加载对话中…",
     "reply": "以 CineGenius 支持身份回复",
-    "templateReason": "更改模板原因（至少5个字符）"
+    "templateReason": "更改模板原因（至少5个字符）",
+    "englishHint": "请用英语撰写客服消息。"
   },
   "SupportContact": {
     "badge": "支持",
@@ -14077,7 +14078,8 @@
     "statuses": {
       "all": "全部",
       "open": "设置未完成",
-      "complete": "已完成"
+      "complete": "已完成",
+      "unfinished": "未完成的资料"
     },
     "sorting": {
       "newest": "最新注册优先",
@@ -14087,6 +14089,20 @@
     },
     "reset": "重置筛选",
     "lastActive": "最近登录",
-    "verified": "资料已验证"
+    "verified": "资料已验证",
+    "profileIncomplete": "资料不完整",
+    "profileNotSaved": "尚未保存资料"
+  },
+  "SupportMessageCopy": {
+    "fields": {
+      "name": "姓名",
+      "location": "地点",
+      "occupation": "职业",
+      "industry": "行业",
+      "title": "标题"
+    },
+    "untitled": "未命名的供求信息",
+    "account": "账户",
+    "profile": "资料"
   }
 }

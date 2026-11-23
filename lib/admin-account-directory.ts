@@ -3,7 +3,7 @@ import { filterProviderProfiles, CREW_PROVIDER_FILTER, LOCATION_PROVIDER_FILTER,
 
 export const ACCOUNT_AREAS = ['crew', 'marketplace', 'locations', 'companies', 'search', 'unassigned'] as const;
 export type AccountArea = typeof ACCOUNT_AREAS[number];
-export type AccountSetupFilter = 'all' | 'open' | 'complete';
+export type AccountSetupFilter = 'all' | 'unfinished' | 'open' | 'complete';
 export type AccountSort = 'newest' | 'oldest' | 'name' | 'active';
 
 /** Areas may overlap. A setup goal is not proof of a finished or public profile. */
@@ -20,11 +20,20 @@ export function accountDirectoryRow(user: AdminAccountUser, profile: (AdminAccou
 }
 export type DirectoryAccount = ReturnType<typeof accountDirectoryRow>;
 
+// Completed provider/search accounts do not require a personal profile. A saved
+// profile is incomplete only when its existing mandatory basics are missing.
+export function hasUnfinishedProfile(account: DirectoryAccount) {
+  return account.needsSetup || account.profileStatus === 'incomplete';
+}
+
 export function selectDirectoryAccounts(accounts: readonly DirectoryAccount[], filters: { search: string; area: string; setup: string; sort: string; locale: string }) {
   const search = filters.search.trim().normalize('NFKC').toLocaleLowerCase(filters.locale);
   const matches = accounts.filter(account =>
     (filters.area === 'all' || account.areas.includes(filters.area as AccountArea))
-    && (filters.setup === 'all' || account.needsSetup === (filters.setup === 'open'))
+    && (filters.setup === 'all'
+      || (filters.setup === 'unfinished' && hasUnfinishedProfile(account))
+      || (filters.setup === 'open' && account.needsSetup)
+      || (filters.setup === 'complete' && !hasUnfinishedProfile(account)))
     && (!search || [account.name, account.email, account.userId].some(value => value?.normalize('NFKC').toLocaleLowerCase(filters.locale).includes(search)))
   );
   const collator = new Intl.Collator(filters.locale, { sensitivity: 'base', numeric: true });

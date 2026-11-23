@@ -13,6 +13,21 @@ Markus möchte den Adminbereich verständlicher gliedern und Konten/Profile nach
 - Kompakte Mitgliederzeilen zeigen Name, E-Mail, Bereiche, Einrichtung und einen tatsächlich vorhandenen Profil-Verifizierungshaken. Gespeicherte Namen aus der Einrichtung sind auch ohne fertiges Profil sichtbar. „Einrichtung offen“ behauptet keinen technischen Fehler und kein Hängenbleiben.
 - Erst beim Aufklappen werden Firmen, Inserate, Entwürfe, Profilaktionen, letzte Anmeldung und Support geladen. Status „Einrichtung abgeschlossen“ ist keine Veröffentlichungs- oder Verifizierungsfreigabe. Gespeicherte Firmen-/Inseratstatus und verantwortliche Anbieter bleiben getrennt.
 
+## Ergänzung: unfertige Profile und englischer Support
+
+Markus hat auf die Veröffentlichungsfrage weitere Änderungen statt einer Freigabe verlangt. Der gesamte Admin-Kandidat bleibt unveröffentlicht.
+
+- Eigener Statusfilter **Nicht fertiggestellte Profile**: offene Kontoeinrichtung oder ein gespeichertes Profil ohne die bestehenden Pflichtgrundlagen. Die Zeilen unterscheiden „Noch kein Profil gespeichert“ und „Profil noch nicht vollständig“. Abgeschlossene Firmen-/Anbieterkonten und bestehende Sucher benötigen kein persönliches Profil. Bilder, Biografie und zusätzliche Tätigkeiten sind kein Vollständigkeitskriterium. „Einrichtung offen“ bleibt zusätzlich als engerer Filter erhalten; „Abgeschlossen“ schließt tatsächlich unvollständige gespeicherte Profile aus. Eine offene Einrichtung beweist keinen technischen Fehler.
+- Sieben unveränderte gespeicherte Standardvorlagen werden mit der gezielten Migration `20261123210028_english_admin_support_templates.sql` ins Englische übersetzt. Die beiden ergänzenden Vorlagen für Kontoeinrichtung und begonnene Angebote werden explizit aus dem englischen Katalog geladen, unabhängig von der Sprache des Administrators. Eingesetzte Pflichtfeldbezeichnungen und ersatzweise Angebotstitel sind ebenfalls Englisch; eigene Namen und Angebotstitel bleiben original.
+- Die E-Mail-Benachrichtigungen für neue administrative Supportnachrichten und Antworten verwenden ebenfalls Englisch. Zustellpräferenzen, dauerhafte Speicherung und Wiederholschutz bleiben bestehen. Persönliche Mitgliederchats behalten ihre bisherige Sprachwahl.
+- Die drei Schreibflächen für neue Nachrichten, Antworten und Vorlagen kennzeichnen Englisch als Zielsprache. Freie Texte bleiben vom Administrator editierbar; keine versteckte KI-Übersetzung oder zusätzliche API-Kosten. Bestehende Nachrichten werden nicht nachträglich übersetzt und es wird keine Nachricht automatisch gesendet.
+
+### Migration und Veröffentlichung
+
+Die lesende Bestandsprüfung am 23. November fand genau die sieben ursprünglichen deutschen Standardvorlagen und keine gespeicherten Überschreibungen der beiden zusätzlichen Vorlagen. Die Migration übersetzt nur exakt diese Ausgangstexte, erhält Beschriftungen und Aktivierung und stoppt atomar bei zwischenzeitlich geändertem Text. Eigene zusätzliche Vorlagen und gelöschte Standardvorlagen bleiben erhalten; bereits englische Zieltexte sind idempotent. Es werden weder Konten noch Gesprächsverläufe, Berechtigungen oder Versanddaten geändert.
+
+**Noch nicht auf Produktion angewandt.** Vor einer freigegebenen Veröffentlichung das aktuelle Migrationsregister und den Vorlagenbestand prüfen, die sieben Zeilen sichern und nur diese geprüfte Migration anwenden/registrieren; kein pauschales `db push`. Anschließend die englischen Vorlagen samt aktivierten Zuständen lesen und den geprüften Appcode über sauberes `main == origin/main` veröffentlichen. Das laufende App-Releasefenster bleibt davon getrennt. Rücknahme nur anhand des gesicherten Bestands mit Vergleich der aktuellen Zieltexte, keine zwischenzeitlichen Adminänderungen überschreiben.
+
 ## Daten- und Kostenvertrag
 
 `GET /api/admin/account-directory?page=…` prüft `requireAdmin` vor Clerk/DB und liefert ausschließlich die kleine Adminprojektion: je 100 Konten, deren Profilstatus und Firmeneigentum. Private Metadaten, Dokumente und Entwurfsinhalte werden nicht an diese Übersicht ausgeliefert. Alle Antworten sind privat/no-store; keine gemeinsam genutzten Kundendaten-Caches und keine Schreibzugriffe.
@@ -22,6 +37,8 @@ Die Oberfläche liest alle Indexseiten einmal beim Öffnen/Aktualisieren, bevor 
 Veränderte Gesamtzahlen während des Lesens, doppelte IDs, vorzeitig endende Seiten oder Fehler werden nicht als vollständige Liste ausgegeben. Aktualisieren lädt erneut. Die Übersicht hat eine explizite Schutzgrenze von 10.000 Konten und liest Firmeneigentum über die Datenbankseitengrenze hinaus; oberhalb ihrer Schutzgrenze meldet sie einen Fehler statt einer falschen Gesamtzahl. Für deutlich größere Bestände ist ein persistenter serverseitiger Suchindex eine separate Erweiterung. Dies ist eine geladene Momentaufnahme, kein Echtzeitmonitor.
 
 ## Prüfungen und Grenzen
+
+Folgeauftrag unfertige Profile/englischer Support: 88 gezielte Tests bestanden, einschließlich real ausgeführter lokaler PostgreSQL-Migration mit atomarem Abbruch und Wiederholung. Nach der abschließenden Sprachkorrektur weitere 13 Versand-/Supportprüfungen und 26 gezielte Sprach-/E-Mail-Prüfungen bestanden (teilweise überlappend, nicht addiert). 21 aktualisierte Verzeichnis-Browserfälle über 17 Sprachen sowie 9 zusätzliche Supportdialog-Fälle bei 320/393/1440 Pixeln bestanden. Support-Empfänger, Vorlagen und Transport sind im Browser kontrollierte Testdaten; dabei kein Versand. TypeScript, 17 Kataloge mit 11.686 Schlüsseln und 20 Designprüfungen bestanden. Fünf bestehende ESLint-Warnungen in den beiden Supportkomponenten unverändert, keine neuen Fehler. Belege des Folgeauftrags: `/srv/cinegenius/handoffs/20261123-admin-clarity/followup/`. Die ursprünglichen Prüfungen des Adminpakets folgen als eigener Checkpoint:
 
 - 81 gezielte Tests: Bereichs-/Statusüberschneidungen, Sucherbestand, fehlende Profile, Datengrenzen und Seiten >100, Fehler statt falscher Nullzahlen, Adminschutz/no-store, alle Navigationsziele, bestehende Konten-/Support- und Verifizierungsverträge.
 - TypeScript bestanden; 17 Sprachkataloge vollständig; 20 verpflichtende Designprüfungen bestanden.

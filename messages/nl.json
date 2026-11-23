@@ -12623,7 +12623,8 @@
     "conversation": "Supportgesprek",
     "loading": "Gesprek laden…",
     "reply": "Antwoorden als CineGenius Support",
-    "templateReason": "Reden voor het wijzigen van de sjabloon (minimaal 5 tekens)"
+    "templateReason": "Reden voor het wijzigen van de sjabloon (minimaal 5 tekens)",
+    "englishHint": "Schrijf supportberichten in het Engels."
   },
   "SupportContact": {
     "badge": "Support",
@@ -14077,7 +14078,8 @@
     "statuses": {
       "all": "Alle",
       "open": "Instellingen onvoltooid",
-      "complete": "Voltooid"
+      "complete": "Voltooid",
+      "unfinished": "Onvoltooide profielen"
     },
     "sorting": {
       "newest": "Nieuwste eerst",
@@ -14087,6 +14089,20 @@
     },
     "reset": "Filters wissen",
     "lastActive": "Laatste aanmelding",
-    "verified": "Profiel geverifieerd"
+    "verified": "Profiel geverifieerd",
+    "profileIncomplete": "Profiel onvolledig",
+    "profileNotSaved": "Nog geen profiel opgeslagen"
+  },
+  "SupportMessageCopy": {
+    "fields": {
+      "name": "naam",
+      "location": "locatie",
+      "occupation": "beroep",
+      "industry": "branche",
+      "title": "titel"
+    },
+    "untitled": "Advertentie zonder titel",
+    "account": "Account",
+    "profile": "Profiel"
   }
 }

@@ -12623,7 +12623,8 @@
     "conversation": "サポート会話",
     "loading": "会話を読み込み中…",
     "reply": "CineGeniusサポートとして返信",
-    "templateReason": "テンプレート変更の理由（5文字以上）"
+    "templateReason": "テンプレート変更の理由（5文字以上）",
+    "englishHint": "サポートメッセージは英語で入力してください。"
   },
   "SupportContact": {
     "badge": "サポート",
@@ -14077,7 +14078,8 @@
     "statuses": {
       "all": "すべて",
       "open": "設定未完了",
-      "complete": "完了"
+      "complete": "完了",
+      "unfinished": "未完成のプロフィール"
     },
     "sorting": {
       "newest": "新しい順",
@@ -14087,6 +14089,20 @@
     },
     "reset": "絞り込みをリセット",
     "lastActive": "最終ログイン",
-    "verified": "認証済みプロフィール"
+    "verified": "認証済みプロフィール",
+    "profileIncomplete": "プロフィールが未完成",
+    "profileNotSaved": "プロフィールはまだ保存されていません"
+  },
+  "SupportMessageCopy": {
+    "fields": {
+      "name": "名前",
+      "location": "所在地",
+      "occupation": "職種",
+      "industry": "業種",
+      "title": "タイトル"
+    },
+    "untitled": "無題の掲載情報",
+    "account": "アカウント",
+    "profile": "プロフィール"
   }
 }

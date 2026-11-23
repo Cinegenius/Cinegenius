@@ -154,6 +154,8 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 
 ## Mandatory localization for all changes
 
+- Operator update, 23 November 2026: outgoing admin support templates, automatic template field descriptions and their message-notification emails use English, independently of the admin interface language. Keep the administration UI localized. Preserve manually edited text, member names, original listing/company names and existing message history; never send a reminder automatically.
+
 - Use the existing next-intl catalogs in `messages/{de,en,es,it,cs,hu,nl,nl-BE,sv,fr,pl,pt-PT,zh-Hans,ja,ko,ru,uk}.json` for all new or changed interface and system copy: pages, buttons, accessible labels, validation, errors, statuses, categories, notifications, and application-generated email. Update every supported language in the same change. Never add a parallel translation system or hard-coded German UI copy.
 - A feature is not complete until its strings, interpolation placeholders, and layout have been checked in all supported locales. Run `npm run check:i18n` before release; it also runs during production builds and deployment. Do not expand `scripts/i18n-legacy-texts.json` to admit new hard-coded text. That file is a frozen inventory of existing localization debt; remove entries as those surfaces are translated.
 - Preserve stable department, occupation, category, and offer IDs. Translate display labels only and reuse the same taxonomy in setup, editing, filters, and public views. Never translate or overwrite personal messages, member-written descriptions, names, or company names automatically.
