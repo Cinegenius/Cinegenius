@@ -14,6 +14,8 @@
 3. **Avatar-Reserve:** 24 ausgewählte Stile und günstigere Batch-Erzeugung auf `036920b1` live (`dpl_AatmCrVeFfjskKn5RbPH7PJTJQVV`, www geprüft). Gezielte Migration angewandt; 118 Bilder und alle vorbestehenden Zuordnungen unverändert. Ein regulärer Nachfüllauftrag vom Anbieter angenommen, Ergebnis/Prüfung und echte Kostenmessung noch offen.
 4. **Anbieter-Einrichtung — live:** `3fba2f96` / `dpl_552yw4ges7E1xMRMAmkWq98ym1cL` am 23.11. um 15:29 Uhr Berlin auf www geprüft. Fehler beim Namensschritt sichtbar, begrenzte Wartezeiten, sichere Wiederaufnahme, Firmenübersicht ohne vorzeitigen Schreibzugriff und wiederholbarer Abschluss. 210 gezielte Tests, 36 kontrollierte Browserfälle in 17 Sprachen, Gesamtbuild sowie 13 HTTP- und zwei öffentliche Live-Browserfälle bestanden. Derselbe Account kann später ein Crewprofil anlegen oder erweitern. Echte Nutzer-/Geräteabnahme offen; bestehende ESLint-Altfehler im [Prüfbericht](provider-onboarding-recovery-20261123.md) dokumentiert.
 
+5. **Suchendes Mitglied — live:** Auswahl für neue Konten entfernen; bestehende Sucher-Konten und gespeicherte Sucher-Auswahlen unverändert erhalten. Auf `32ce5b9f` veröffentlicht: 99 gezielte Tests, 17 Sprachen, 12 kontrollierte Browserfälle sowie Produktionsbuild bestanden; www READY, 15 HTTP- und zwei öffentliche Browserprüfungen bestätigt. [Umfang](search-membership-retirement-20261123.md).
+
 # Aktuelle Aufträge · 22. November 2026
 
 ## Aktuelle Reihenfolge · Zeiten, obere Kante, geprüfte Gerätefassung

@@ -46,7 +46,7 @@ import { hasCompletedNonPersonalSetup, hasProfileBasics, shouldSkipProfileSetup 
 import { createOnboardingSaveQueue, isQuickStartContentSaved } from "@/lib/onboarding-save";
 import {
   buildQuickStartScreens, completedCompanyHref, createQuickStartIntentData, findQuickStartRoles, getQuickStartDepartments, getQuickStartIntroIntents,
-  normalizeQuickStartDraft, selectQuickStartIntent, selectQuickStartOccupationForm, QUICK_START_CATEGORIES,
+  normalizeQuickStartDraft, selectQuickStartIntent, selectQuickStartOccupationForm, QUICK_START_CATEGORIES, hasSavedSearchSetup,
   START_QUICK_START_DRAFT,
   validateQuickStartDraft, validateQuickStartScreen, validateQuickStartIntentDetails,
   type QuickStartDraft, type QuickStartIntent, type QuickStartIntentData,
@@ -94,8 +94,8 @@ function getLocalizedStepContent(translate: (key: string) => string): Record<Qui
 });
 }
 
-function primaryIntent(draft: QuickStartDraft): QuickStartIntent {
-  return draft.intents.find((intent) => intent !== "search") ?? "search";
+function primaryIntent(draft: QuickStartDraft): QuickStartIntent | null {
+  return draft.intents.find((intent) => intent !== "search") ?? draft.intents[0] ?? null;
 }
 
 function intentForField(field: string): QuickStartIntent | null {
@@ -129,7 +129,8 @@ function ProfileSetupContent() {
   const taxonomyText = useTranslations("Taxonomy");
 
   const uiText = useTranslations();
-  const paths = getLocalizedPaths(uiText);
+  const [legacySearchSetup, setLegacySearchSetup] = useState(false);
+  const paths = getLocalizedPaths(uiText).filter(path => path.id !== "search" || legacySearchSetup);
   const stepContent = getLocalizedStepContent(uiText);
 
 
@@ -244,6 +245,7 @@ function ProfileSetupContent() {
       setSavedProfile(profile?.profile ?? null);
       const profileComplete = hasProfileBasics(profile?.profile);
       const hasInProgressDraft = !!saved?.quickStart && saved.setupComplete !== true;
+      setLegacySearchSetup(hasSavedSearchSetup(saved));
       setSuggestNewAvatar(!hasInProgressDraft && profile?.exists !== true);
       if (!providerEntry && saved?.setupComplete && (profileComplete || hasCompletedNonPersonalSetup(saved))) {
         router.replace(saved.intent === "search" ? (redirectTo || "/search") : (redirectTo || "/dashboard"));

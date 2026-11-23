@@ -1,5 +1,9 @@
 # CineGenius · Übersicht der gesamten Website
 
+## Suchendes Mitglied · Auftrag vom 23. November 2026
+
+Für neue Registrierungen entfällt der reine Sucheinstieg. Bestehende Sucher-Konten und gespeicherte Sucher-Auswahlen bleiben erhalten. Gemeinsame Web-Einrichtung und Speicherweg auf `32ce5b9f` veröffentlicht (dpl_EBjCGgcW7LsNFbYSZv5jYv3dPgSw, READY/www). 99 gezielte Tests, 17 Sprachen, 12 kontrollierte Browserfälle und Produktionsbuild bestanden; 15 HTTP- und zwei öffentliche Live-Browserprüfungen bestätigt. Keine Kundendatenänderung, kein neuer nativer Build und keine physische Geräteabnahme. [Umfang und Prüfgrenzen](search-membership-retirement-20261123.md).
+
 ## Gemeinsame Serverkorrekturen · 23. November 2026
 
 `036920b1ed86dd7a981aa354dd05a8921686fe25` ist mit `dpl_AatmCrVeFfjskKn5RbPH7PJTJQVV` READY auf www: freiwillige Zusatztätigkeit, durchgängige Verifizierungsanzeige und 24 ausgewählte Avatarstile mit Batch-Erzeugung. Gezielte Datenbankmigration geprüft; bestehende Bilder/Zuordnungen erhalten. Nicolais Haken öffentlich bei 393/1440px geprüft; erster regulärer Batch angenommen, neue Bildfertigstellung und tatsächliche Kosten noch nicht gemessen. Keine neue native Installation oder vollständige Geräte-/Registrierungsabnahme. Belege: `/srv/cinegenius/handoffs/20261123-avatar-batch-release/release-receipt.json`.

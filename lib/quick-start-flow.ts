@@ -14,7 +14,9 @@ import type { ProfileType } from "@/lib/profile-types";
 import { COMPANY_CATEGORIES } from "@/lib/companyCategories";
 import { CATERING_COMPANY_CATEGORY, normalizeCateringCompanyDetails, type CateringCompanyDetails } from "@/lib/catering-taxonomy";
 
-export const QUICK_START_INTENTS = ["crew", "talent", "location", "equipment", "company", "search"] as const;
+export const QUICK_START_NEW_INTENTS = ["crew", "talent", "location", "equipment", "company"] as const;
+// Keep the retired identifier readable for existing members and saved drafts.
+export const QUICK_START_INTENTS = [...QUICK_START_NEW_INTENTS, "search"] as const;
 export type QuickStartIntent = typeof QUICK_START_INTENTS[number];
 export type QuickStartProviderIntent = Exclude<QuickStartIntent, "search">;
 
@@ -198,6 +200,19 @@ function normalizeIntentData(value: unknown): QuickStartIntentData {
 
 function isQuickStartIntent(value: unknown): value is QuickStartIntent {
   return typeof value === "string" && validIntentSet.has(value);
+}
+
+/** Use persisted account progress, never the incoming selection, for legacy access.
+ * Older clients also wrote intent=search before any goal was selected; that
+ * placeholder alone does not make an unfinished account a search member. */
+export function hasSavedSearchSetup(value: unknown): boolean {
+  if (!value || typeof value !== "object" || Array.isArray(value)) return false;
+  const saved = value as Record<string, unknown>;
+  if (saved.setupComplete === true && saved.intent === "search") return true;
+  if (saved.quickStart && typeof saved.quickStart === "object") {
+    return normalizeQuickStartDraft(saved.quickStart).intents.includes("search");
+  }
+  return saved.intent === "search";
 }
 
 export function normalizeQuickStartDraft(value: unknown): QuickStartDraft {
