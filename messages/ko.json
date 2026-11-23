@@ -1301,7 +1301,7 @@
   "AdminAccounts": {
     "title": "계정",
     "explanation": "개인 프로필이 없는 계정을 포함한 모든 등록 계정입니다. 계정, 프로필, 목록은 별개입니다. 검색 전용 사용자와 회사 제공자는 크루 프로필이 필요하지 않습니다. 지원 메시지는 확인 후 개별 발송되며 자동 게시나 검증은 없습니다.",
-    "search": "이름, 계정 이메일 또는 정확한 Clerk ID 검색…",
+    "search": "이름, 이메일 또는 계정 ID",
     "count": "{count}개 계정",
     "refresh": "새로 고침",
     "loading": "계정 및 설정 상태 불러오는 중…",
@@ -14048,5 +14048,45 @@
     "providerMicrosoft": "Microsoft Outlook",
     "browserConnectionHelp": "메일함을 연결하려면 이 페이지를 브라우저에서 열고 같은 CineGenius 계정으로 로그인하세요. 완료한 뒤 여기로 돌아와 새로고침하세요.",
     "openInBrowser": "브라우저에서 열기"
+  },
+  "AdminClarity": {
+    "navigation": "섹션 선택",
+    "groups": {
+      "people": "회원 및 기업",
+      "review": "검토 및 지원",
+      "content": "콘텐츠 및 운영",
+      "system": "관리",
+      "start": "개요"
+    },
+    "accountsTitle": "회원 및 제공자",
+    "profilesTitle": "프로필 관리",
+    "countryFeedback": "국가별 피드백",
+    "accountIntro": "분야와 설정 상태로 모든 계정을 필터링합니다. 회원은 여러 분야에 속할 수 있습니다.",
+    "area": "분야",
+    "areas": {
+      "search": "기존 검색 회원",
+      "unassigned": "미분류",
+      "all": "모든 영역",
+      "crew": "스태프",
+      "marketplace": "마켓플레이스",
+      "locations": "촬영지",
+      "companies": "회사"
+    },
+    "setup": "설정",
+    "sort": "정렬",
+    "statuses": {
+      "all": "전체",
+      "open": "설정 미완료",
+      "complete": "완료"
+    },
+    "sorting": {
+      "newest": "최신 가입순",
+      "oldest": "오래된 가입순",
+      "name": "이름순",
+      "active": "최근 로그인순"
+    },
+    "reset": "필터 초기화",
+    "lastActive": "최근 로그인",
+    "verified": "인증된 프로필"
   }
 }

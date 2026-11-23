@@ -1301,7 +1301,7 @@
   "AdminAccounts": {
     "title": "Konta",
     "explanation": "Wszystkie zarejestrowane konta, w tym te bez osobistego profilu. Konta, profile i ogłoszenia są oddzielne. Użytkownicy tylko do wyszukiwania i dostawcy firm nie potrzebują profilu ekipy. Wiadomości wsparcia są wysyłane indywidualnie po Twoim potwierdzeniu; nic nie jest automatycznie publikowane ani weryfikowane tutaj.",
-    "search": "Szukaj po nazwie, e-mailu konta lub dokładnym ID Clerk…",
+    "search": "Nazwa, e-mail lub ID konta",
     "count": "{count} kont",
     "refresh": "Odśwież",
     "loading": "Ładowanie kont i statusu konfiguracji…",
@@ -14048,5 +14048,45 @@
     "providerMicrosoft": "Microsoft Outlook",
     "browserConnectionHelp": "Aby połączyć skrzynkę, otwórz tę stronę w przeglądarce i zaloguj się na to samo konto CineGenius. Potem wróć tutaj i odśwież.",
     "openInBrowser": "Otwórz w przeglądarce"
+  },
+  "AdminClarity": {
+    "navigation": "Wybierz sekcję",
+    "groups": {
+      "people": "Członkowie i firmy",
+      "review": "Weryfikacja i pomoc",
+      "content": "Treści i obsługa",
+      "system": "Administracja",
+      "start": "Przegląd"
+    },
+    "accountsTitle": "Członkowie i dostawcy",
+    "profilesTitle": "Zarządzaj profilami",
+    "countryFeedback": "Opinie według krajów",
+    "accountIntro": "Filtruj wszystkie konta według obszaru i stanu konfiguracji. Członek może należeć do kilku obszarów.",
+    "area": "Obszar",
+    "areas": {
+      "search": "Dotychczasowi poszukujący członkowie",
+      "unassigned": "Nieprzypisane",
+      "all": "Wszystkie obszary",
+      "crew": "Ekipa",
+      "marketplace": "Rynek",
+      "locations": "Lokacje",
+      "companies": "Firmy"
+    },
+    "setup": "Konfiguracja",
+    "sort": "Sortuj",
+    "statuses": {
+      "all": "Wszystkie",
+      "open": "Konfiguracja niedokończona",
+      "complete": "Zakończona"
+    },
+    "sorting": {
+      "newest": "Najnowsze najpierw",
+      "oldest": "Najstarsze najpierw",
+      "name": "Nazwa A–Z",
+      "active": "Ostatnie logowanie"
+    },
+    "reset": "Wyczyść filtry",
+    "lastActive": "Ostatnie logowanie",
+    "verified": "Profil zweryfikowany"
   }
 }

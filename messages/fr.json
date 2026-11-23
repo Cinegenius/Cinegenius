@@ -1301,7 +1301,7 @@
   "AdminAccounts": {
     "title": "Comptes",
     "explanation": "Tous les comptes enregistrés, y compris ceux sans profil personnel. Comptes, profils et annonces sont séparés. Les utilisateurs en recherche seule et les fournisseurs d’entreprise n’ont pas besoin d’un profil d’équipe. Les messages de support sont envoyés individuellement uniquement après votre confirmation ; rien n’est publié ou vérifié automatiquement ici.",
-    "search": "Rechercher nom, email du compte ou ID Clerk exact…",
+    "search": "Nom, e-mail ou identifiant",
     "count": "{count} comptes",
     "refresh": "Actualiser",
     "loading": "Chargement des comptes et du statut de configuration…",
@@ -14048,5 +14048,45 @@
     "providerMicrosoft": "Microsoft Outlook",
     "browserConnectionHelp": "Pour connecter une messagerie, ouvrez cette page dans votre navigateur et connectez-vous avec le même compte CineGenius. Revenez ensuite ici et actualisez.",
     "openInBrowser": "Ouvrir dans le navigateur"
+  },
+  "AdminClarity": {
+    "navigation": "Choisir une rubrique",
+    "groups": {
+      "people": "Membres et entreprises",
+      "review": "Vérification et assistance",
+      "content": "Contenu et gestion",
+      "system": "Administration",
+      "start": "Vue d’ensemble"
+    },
+    "accountsTitle": "Membres et prestataires",
+    "profilesTitle": "Gérer les profils",
+    "countryFeedback": "Retours par pays",
+    "accountIntro": "Filtrez tous les comptes par domaine et état de configuration. Un membre peut appartenir à plusieurs domaines.",
+    "area": "Domaine",
+    "areas": {
+      "search": "Membres en recherche existants",
+      "unassigned": "Non classé",
+      "all": "Tous les domaines",
+      "crew": "Équipe",
+      "marketplace": "Marché",
+      "locations": "Lieux",
+      "companies": "Entreprises"
+    },
+    "setup": "Configuration",
+    "sort": "Trier",
+    "statuses": {
+      "all": "Tous",
+      "open": "Configuration inachevée",
+      "complete": "Terminée"
+    },
+    "sorting": {
+      "newest": "Plus récents d’abord",
+      "oldest": "Plus anciens d’abord",
+      "name": "Nom A–Z",
+      "active": "Dernière connexion"
+    },
+    "reset": "Réinitialiser les filtres",
+    "lastActive": "Dernière connexion",
+    "verified": "Profil vérifié"
   }
 }

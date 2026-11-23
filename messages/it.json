@@ -1283,7 +1283,7 @@
   "AdminAccounts": {
     "title": "Account",
     "explanation": "Tutti gli account registrati, anche senza profilo personale. Account, profili e annunci sono distinti. Chi cerca soltanto e i fornitori aziendali non hanno bisogno di un profilo crew. I messaggi di assistenza vengono inviati singolarmente solo dopo la tua conferma; qui nulla viene pubblicato o verificato automaticamente.",
-    "search": "Cerca nome, email dell’account o ID Clerk esatto…",
+    "search": "Nome, email o ID account",
     "count": "{count} account",
     "refresh": "Aggiorna",
     "loading": "Caricamento degli account e dello stato della configurazione…",
@@ -14048,5 +14048,45 @@
     "providerMicrosoft": "Microsoft Outlook",
     "browserConnectionHelp": "Per collegare una casella, apri questa pagina nel browser e accedi con lo stesso account CineGenius. Poi torna qui e aggiorna.",
     "openInBrowser": "Apri nel browser"
+  },
+  "AdminClarity": {
+    "navigation": "Scegli sezione",
+    "groups": {
+      "people": "Membri e aziende",
+      "review": "Revisione e assistenza",
+      "content": "Contenuti e gestione",
+      "system": "Amministrazione",
+      "start": "Panoramica"
+    },
+    "accountsTitle": "Membri e fornitori",
+    "profilesTitle": "Gestisci profili",
+    "countryFeedback": "Feedback per paese",
+    "accountIntro": "Filtra tutti gli account per area e stato di configurazione. Un membro può appartenere a più aree.",
+    "area": "Area",
+    "areas": {
+      "search": "Membri di ricerca esistenti",
+      "unassigned": "Non assegnato",
+      "all": "Tutte le sezioni",
+      "crew": "Crew",
+      "marketplace": "Mercato",
+      "locations": "Location",
+      "companies": "Aziende"
+    },
+    "setup": "Configurazione",
+    "sort": "Ordina",
+    "statuses": {
+      "all": "Tutti",
+      "open": "Configurazione incompleta",
+      "complete": "Completata"
+    },
+    "sorting": {
+      "newest": "Più recenti prima",
+      "oldest": "Meno recenti prima",
+      "name": "Nome A–Z",
+      "active": "Ultimo accesso"
+    },
+    "reset": "Reimposta filtri",
+    "lastActive": "Ultimo accesso",
+    "verified": "Profilo verificato"
   }
 }

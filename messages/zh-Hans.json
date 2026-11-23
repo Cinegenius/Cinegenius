@@ -1301,7 +1301,7 @@
   "AdminAccounts": {
     "title": "账户",
     "explanation": "所有注册账户，包括无个人资料的账户。账户、资料和列表是分开的。仅搜索用户和公司提供者无需工作人员资料。支持消息仅在您确认后单独发送；此处无自动发布或验证。",
-    "search": "搜索姓名、账户邮箱或精确 Clerk ID…",
+    "search": "姓名、邮箱或账户 ID",
     "count": "{count} 个账户",
     "refresh": "刷新",
     "loading": "正在加载账户和设置状态…",
@@ -14048,5 +14048,45 @@
     "providerMicrosoft": "Microsoft Outlook",
     "browserConnectionHelp": "要连接邮箱，请在浏览器中打开此页，并使用同一个 CineGenius 账户登录。完成后请返回此处并刷新。",
     "openInBrowser": "在浏览器中打开"
+  },
+  "AdminClarity": {
+    "navigation": "选择版块",
+    "groups": {
+      "people": "会员与公司",
+      "review": "审核与支持",
+      "content": "内容与运营",
+      "system": "管理",
+      "start": "概览"
+    },
+    "accountsTitle": "会员与供应商",
+    "profilesTitle": "管理资料",
+    "countryFeedback": "各国反馈",
+    "accountIntro": "按领域和设置状态筛选所有账户。会员可以属于多个领域。",
+    "area": "领域",
+    "areas": {
+      "search": "现有搜索会员",
+      "unassigned": "未分类",
+      "all": "所有区域",
+      "crew": "剧组",
+      "marketplace": "市场",
+      "locations": "场地",
+      "companies": "公司"
+    },
+    "setup": "设置",
+    "sort": "排序",
+    "statuses": {
+      "all": "全部",
+      "open": "设置未完成",
+      "complete": "已完成"
+    },
+    "sorting": {
+      "newest": "最新注册优先",
+      "oldest": "最早注册优先",
+      "name": "按姓名排序",
+      "active": "最近登录优先"
+    },
+    "reset": "重置筛选",
+    "lastActive": "最近登录",
+    "verified": "资料已验证"
   }
 }

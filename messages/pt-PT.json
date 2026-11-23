@@ -1274,7 +1274,7 @@
     },
     "title": "Contas",
     "explanation": "Todas as contas registadas, incluindo as sem perfil pessoal. Contas, perfis e listagens são separados. Utilizadores só para pesquisa e fornecedores de empresas não precisam de perfil de equipa. Mensagens de suporte são enviadas individualmente apenas após a sua confirmação; nada é publicado ou verificado automaticamente aqui.",
-    "search": "Pesquisar nome, email da conta ou ID Clerk exato…",
+    "search": "Nome, email ou ID da conta",
     "count": "{count} contas",
     "refresh": "Atualizar",
     "loading": "A carregar contas e estado de configuração…",
@@ -14048,5 +14048,45 @@
     "providerMicrosoft": "Microsoft Outlook",
     "browserConnectionHelp": "Para ligar uma caixa de correio, abra esta página no navegador e inicie sessão com a mesma conta CineGenius. Depois regresse aqui e atualize.",
     "openInBrowser": "Abrir no navegador"
+  },
+  "AdminClarity": {
+    "navigation": "Escolher secção",
+    "groups": {
+      "people": "Membros e empresas",
+      "review": "Revisão e apoio",
+      "content": "Conteúdo e gestão",
+      "system": "Administração",
+      "start": "Resumo"
+    },
+    "accountsTitle": "Membros e fornecedores",
+    "profilesTitle": "Gerir perfis",
+    "countryFeedback": "Comentários por país",
+    "accountIntro": "Filtre todas as contas por área e estado de configuração. Um membro pode pertencer a várias áreas.",
+    "area": "Área",
+    "areas": {
+      "search": "Membros de pesquisa existentes",
+      "unassigned": "Sem atribuição",
+      "all": "Todas as áreas",
+      "crew": "Equipa",
+      "marketplace": "Mercado",
+      "locations": "Locais",
+      "companies": "Empresas"
+    },
+    "setup": "Configuração",
+    "sort": "Ordenar",
+    "statuses": {
+      "all": "Todos",
+      "open": "Configuração incompleta",
+      "complete": "Concluída"
+    },
+    "sorting": {
+      "newest": "Mais recentes primeiro",
+      "oldest": "Mais antigos primeiro",
+      "name": "Nome A–Z",
+      "active": "Último início de sessão"
+    },
+    "reset": "Repor filtros",
+    "lastActive": "Último início de sessão",
+    "verified": "Perfil verificado"
   }
 }

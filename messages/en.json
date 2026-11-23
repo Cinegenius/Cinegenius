@@ -1283,7 +1283,7 @@
   "AdminAccounts": {
     "title": "Accounts",
     "explanation": "All registered accounts, including those without a personal profile. Accounts, profiles and listings are separate. Search-only users and company providers do not need a crew profile. Support messages are sent individually only after your confirmation; nothing is automatically published or verified here.",
-    "search": "Search name, account email or exact Clerk ID…",
+    "search": "Name, email or account ID",
     "count": "{count} accounts",
     "refresh": "Refresh",
     "loading": "Loading accounts and setup status…",
@@ -14048,5 +14048,45 @@
     "providerMicrosoft": "Microsoft Outlook",
     "browserConnectionHelp": "To connect a mailbox, open this page in your browser and sign in with the same CineGenius account. Return here and refresh afterward.",
     "openInBrowser": "Open in browser"
+  },
+  "AdminClarity": {
+    "navigation": "Choose section",
+    "groups": {
+      "people": "Members & companies",
+      "review": "Review & support",
+      "content": "Content & operations",
+      "system": "Administration",
+      "start": "Overview"
+    },
+    "accountsTitle": "Members & providers",
+    "profilesTitle": "Manage profiles",
+    "countryFeedback": "Country feedback",
+    "accountIntro": "Filter all accounts by area and setup status. Members can belong to several areas.",
+    "area": "Area",
+    "areas": {
+      "search": "Existing search members",
+      "unassigned": "Unassigned",
+      "all": "All areas",
+      "crew": "Crew",
+      "marketplace": "Marketplace",
+      "locations": "Locations",
+      "companies": "Companies"
+    },
+    "setup": "Setup",
+    "sort": "Sort",
+    "statuses": {
+      "all": "All",
+      "open": "Setup incomplete",
+      "complete": "Completed"
+    },
+    "sorting": {
+      "newest": "Newest first",
+      "oldest": "Oldest first",
+      "name": "Name A–Z",
+      "active": "Last signed in"
+    },
+    "reset": "Reset filters",
+    "lastActive": "Last sign-in",
+    "verified": "Profile verified"
   }
 }

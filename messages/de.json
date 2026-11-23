@@ -1283,7 +1283,7 @@
   "AdminAccounts": {
     "title": "Konten",
     "explanation": "Alle registrierten Konten, auch ohne Personenprofil. Ein Konto, ein Profil und ein Inserat sind getrennte Dinge. Reine Suchende und Firmenanbieter benötigen kein Crewprofil. Supportnachrichten werden nur einzeln nach deiner Bestätigung gesendet; hier wird nichts automatisch veröffentlicht oder verifiziert.",
-    "search": "Name, Konto-E-Mail oder exakte Clerk-ID suchen…",
+    "search": "Name, E-Mail oder Konto-ID",
     "count": "{count} Konten",
     "refresh": "Aktualisieren",
     "loading": "Konten und Einrichtungsstatus werden geladen…",
@@ -14048,5 +14048,45 @@
     "providerMicrosoft": "Microsoft Outlook",
     "browserConnectionHelp": "Öffne diese Seite zum Verbinden eines Postfachs im Browser und melde dich mit demselben CineGenius-Konto an. Kehre danach hierher zurück und aktualisiere.",
     "openInBrowser": "Im Browser öffnen"
+  },
+  "AdminClarity": {
+    "navigation": "Bereich wählen",
+    "groups": {
+      "people": "Mitglieder & Firmen",
+      "review": "Prüfen & helfen",
+      "content": "Inhalte & Betrieb",
+      "system": "Verwaltung",
+      "start": "Übersicht"
+    },
+    "accountsTitle": "Mitglieder & Anbieter",
+    "profilesTitle": "Profile verwalten",
+    "countryFeedback": "Länder-Feedback",
+    "accountIntro": "Alle Konten nach Bereich und Einrichtung filtern. Mitglieder können mehreren Bereichen angehören.",
+    "area": "Bereich",
+    "areas": {
+      "search": "Suchende (Bestand)",
+      "unassigned": "Ohne Zuordnung",
+      "all": "Alle Bereiche",
+      "crew": "Crew",
+      "marketplace": "Marktplatz",
+      "locations": "Locations",
+      "companies": "Firmen"
+    },
+    "setup": "Einrichtung",
+    "sort": "Sortieren",
+    "statuses": {
+      "all": "Alle",
+      "open": "Einrichtung offen",
+      "complete": "Abgeschlossen"
+    },
+    "sorting": {
+      "newest": "Neueste zuerst",
+      "oldest": "Älteste zuerst",
+      "name": "Name A–Z",
+      "active": "Zuletzt angemeldet"
+    },
+    "reset": "Filter zurücksetzen",
+    "lastActive": "Letzte Anmeldung",
+    "verified": "Profil verifiziert"
   }
 }

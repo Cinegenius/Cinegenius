@@ -1283,7 +1283,7 @@
   "AdminAccounts": {
     "title": "Accounts",
     "explanation": "Alle geregistreerde accounts, ook zonder persoonlijk profiel. Een account, een profiel en een advertentie zijn verschillende dingen. Wie alleen zoekt of een bedrijf vertegenwoordigt, heeft geen crewprofiel nodig. Supportberichten worden alleen afzonderlijk na jouw bevestiging verstuurd; hier wordt niets automatisch gepubliceerd of geverifieerd.",
-    "search": "Zoeken op naam, account-e-mailadres of exacte Clerk-ID…",
+    "search": "Naam, e-mail of account-ID",
     "count": "{count} accounts",
     "refresh": "Vernieuwen",
     "loading": "Accounts en instelstatus worden geladen…",
@@ -14048,5 +14048,45 @@
     "providerMicrosoft": "Microsoft Outlook",
     "browserConnectionHelp": "Open deze pagina in je browser en meld je aan met hetzelfde CineGenius-account om een postvak te verbinden. Keer daarna hier terug en vernieuw.",
     "openInBrowser": "Openen in browser"
+  },
+  "AdminClarity": {
+    "navigation": "Onderdeel kiezen",
+    "groups": {
+      "people": "Leden en bedrijven",
+      "review": "Controleren en helpen",
+      "content": "Inhoud en beheer",
+      "system": "Administratie",
+      "start": "Overzicht"
+    },
+    "accountsTitle": "Leden en aanbieders",
+    "profilesTitle": "Profielen beheren",
+    "countryFeedback": "Feedback per land",
+    "accountIntro": "Filter alle accounts op onderdeel en instellingsstatus. Leden kunnen bij meerdere onderdelen horen.",
+    "area": "Onderdeel",
+    "areas": {
+      "search": "Bestaande zoekende leden",
+      "unassigned": "Niet ingedeeld",
+      "all": "Alle onderdelen",
+      "crew": "Crew",
+      "marketplace": "Marktplaats",
+      "locations": "Locaties",
+      "companies": "Bedrijven"
+    },
+    "setup": "Instellingen",
+    "sort": "Sorteren",
+    "statuses": {
+      "all": "Alle",
+      "open": "Instellingen onvoltooid",
+      "complete": "Voltooid"
+    },
+    "sorting": {
+      "newest": "Nieuwste eerst",
+      "oldest": "Oudste eerst",
+      "name": "Naam A–Z",
+      "active": "Laatst aangemeld"
+    },
+    "reset": "Filters wissen",
+    "lastActive": "Laatste aanmelding",
+    "verified": "Profiel geverifieerd"
   }
 }

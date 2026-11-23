@@ -24,6 +24,7 @@ import {
   ChevronRight, CircleAlert, ClipboardList, Clapperboard, CreditCard, Eye, FileImage,
   LayoutDashboard, List, MessageSquareText, Search, Shield, ShieldCheck, Users, X,
 } from "lucide-react";
+import { AdminNavigation, type AdminNavItem } from "@/components/admin/AdminNavigation";
 import { SupportMessageAction } from "@/components/admin/SupportMessageAction";
 import { uiErrorMessage } from "@/lib/ui-error-message";
 import { confirmDialog, promptDialog, dismissNativeDialog } from "@/lib/native-dialog";
@@ -233,6 +234,7 @@ function AdminContent() {
 
 
   const navItems = getLocalizedNavItems(uiText);
+  const clarity = useTranslations("AdminClarity");
 
   const uiLocale = useLocale();
 
@@ -247,7 +249,6 @@ function AdminContent() {
   const [listingSubcategory,setListingSubcategory]=useState("");
   const reviewT = useTranslations("AdminReview");
   const moderation = useTranslations("OfferModeration");
-  const accountsText = useTranslations("AdminAccounts");
   const startedText = useTranslations("AdminStartedOffers");
   const organizationAdminText = useTranslations("AdminOrganizations");
   const [activeTab, setActiveTab] = useViewState<TabId>("admin.activeTab", "overview");
@@ -625,38 +626,40 @@ function AdminContent() {
   const newsletterText = useTranslations("AdminNewsletter");
   const placeText = useTranslations("Places");
   const freshnessText = useTranslations("AdminListingFreshness");
-  const labels = activeTab === "reviews" ? reviewT("queueTitle") : activeTab === "accounts" ? accountsText("title") : activeTab === "started-offers" ? startedText("title") : activeTab === "organizations" ? organizationAdminText("title") : activeTab === "newsletter" ? newsletterText("title") : (activeTab === "overview" ? uiText("nav.accountOverview") : navItems.find((item) => item.id === activeTab)?.label) ?? uiText("Ui.text_c1c224b03cd9bc");
+  const labelForTab = (id: TabId) => id === "accounts" ? clarity("accountsTitle") : id === "users" ? clarity("profilesTitle") : id === "reviews" ? reviewT("queueTitle") : id === "started-offers" ? startedText("title") : id === "organizations" ? organizationAdminText("title") : id === "newsletter" ? newsletterText("title") : navItems.find(item => item.id === id)?.label ?? uiText("nav.adminArea");
+  const labels = labelForTab(activeTab);
   const pendingReports = overview?.counts.pendingReports ?? 0;
   const pendingVerifications = overview?.counts.pendingVerifications ?? 0;
   const companyClarificationsCount = overview?.counts.companyClarifications ?? 0;
+
+  const groupedItems: AdminNavItem[] = navItems.map(item => ({
+    ...item, label: labelForTab(item.id),
+    badge: item.id === "support" ? supportUnread.count ?? 0 : item.id === "reports" ? pendingReports : item.id === "verifications" ? pendingVerifications : item.id === "companies" ? companyClarificationsCount : 0,
+    badgeLabel: item.id === "support" && supportUnread.count ? supportText("unreadLabel", { count: supportUnread.count }) : undefined,
+    errorLabel: item.id === "support" && supportUnread.status === "error" ? supportText("unreadError") : undefined,
+  }));
+  const navLinks = [
+    { href: "/admin/places", label: placeText("reviewTitle"), group: "review" as const },
+    { href: "/admin/listing-freshness", label: freshnessText("title"), group: "content" as const },
+    { href: "/mitgestalten/koordination", label: clarity("countryFeedback"), group: "review" as const },
+  ];
 
   return (
     <div className="min-h-screen pt-16 lg:flex">
       <aside className="fixed bottom-0 left-0 top-16 z-40 hidden w-56 flex-col border-r border-border bg-bg-secondary lg:flex">
         <div className="border-b border-border p-4"><div className="flex items-center gap-2"><div className="flex h-8 w-8 items-center justify-center rounded-lg border border-crimson/30 bg-crimson/20"><Shield size={16} className="text-crimson-light" /></div><div><p className="text-sm font-semibold text-text-primary">{uiText("nav.adminArea")}</p><p className="text-xs text-text-muted">{uiText("AdminNewsletter.brandName")}</p></div></div></div>
-        <nav className="flex-1 space-y-1 overflow-y-auto p-3">
-          <a href="/admin/places" className="flex min-h-11 items-center rounded-lg px-3 py-2.5 text-sm text-text-secondary hover:bg-bg-elevated">{placeText("reviewTitle")}</a>
-          <a href="/admin/listing-freshness" className="flex min-h-11 items-center rounded-lg px-3 py-2.5 text-sm text-text-secondary hover:bg-bg-elevated">{freshnessText("title")}</a>
-          {navItems.map(({ icon: Icon, label: originalLabel, id }) => {
-            const label = id === "reviews" ? reviewT("queueTitle") : id === "accounts" ? accountsText("title") : id === "started-offers" ? startedText("title") : id === "organizations" ? organizationAdminText("title") : id === "newsletter" ? newsletterText("title") : originalLabel;
-            const badge = id === "support" ? supportUnread.count ?? 0 : id === "reports" ? pendingReports : id === "verifications" ? pendingVerifications : id === "companies" ? companyClarificationsCount : 0;
-            return <button key={id} onClick={() => selectAdminTab(id)} className={`flex min-h-11 w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors ${activeTab === id ? "border-l-2 border-crimson bg-crimson/10 pl-2.5 text-crimson-light" : "text-text-secondary hover:bg-bg-elevated hover:text-text-primary"}`}><Icon size={15} /><span className="flex-1 text-left">{label}</span>{badge > 0 && <span aria-label={id === "support" ? supportText("unreadLabel", { count: badge }) : undefined} className="flex h-5 min-w-5 items-center justify-center rounded-full bg-gold px-1 text-[10px] font-bold text-bg-primary">{badge}</span>}{id === "support" && supportUnread.status === "error" && <CircleAlert size={15} aria-label={supportText("unreadError")} />}</button>;
-          })}
-        </nav>
+        <AdminNavigation items={groupedItems} links={navLinks} activeTab={activeTab} onSelect={id => selectAdminTab(id as TabId)} />
         <div className="border-t border-border p-3"><p className="px-3 text-xs text-text-muted">{uiText("Ui.text_ecbb4568b854da")}</p></div>
       </aside>
 
       <main className="min-w-0 flex-1 lg:ml-56">
         <header className="sticky top-16 z-30 border-b border-border bg-bg-primary/90 px-4 py-3 backdrop-blur-nav sm:px-6"><h1 className="font-display text-lg font-bold text-text-primary">{labels}</h1></header>
-        <nav className="flex gap-2 overflow-x-auto border-b border-border bg-bg-primary px-4 py-2 lg:hidden">
-          <a href="/admin/places" className="inline-flex min-h-11 shrink-0 items-center rounded-lg border border-border px-3 py-2 text-xs">{placeText("reviewTitle")}</a>
-          <a href="/admin/listing-freshness" className="flex min-h-11 shrink-0 items-center rounded-lg border border-border px-3 py-2 text-xs">{freshnessText("title")}</a>
-          {navItems.map(({ label, id }) => <button key={id} onClick={() => selectAdminTab(id)} className={`inline-flex min-h-11 shrink-0 items-center gap-2 rounded-lg border px-3 py-2 text-xs font-medium ${activeTab === id ? "border-crimson/40 bg-crimson/10 text-crimson-light" : "border-border text-text-secondary"}`}>{id === "reviews" ? reviewT("queueTitle") : id === "accounts" ? accountsText("title") : id === "started-offers" ? startedText("title") : id === "organizations" ? organizationAdminText("title") : id === "newsletter" ? newsletterText("title") : label}{id === "support" && (supportUnread.count ?? 0) > 0 && <span aria-label={supportText("unreadLabel", { count: supportUnread.count! })} className="rounded-full bg-gold px-1.5 py-0.5 text-[10px] font-bold text-bg-primary">{supportUnread.count}</span>}{id === "support" && supportUnread.status === "error" && <CircleAlert size={14} aria-label={supportText("unreadError")} />}</button>)}
-        </nav>
+        <AdminNavigation mobile items={groupedItems} links={navLinks} activeTab={activeTab} onSelect={id => selectAdminTab(id as TabId)} />
         <div className="min-w-0 space-y-5 p-4 pb-[calc(7rem+env(safe-area-inset-bottom))] sm:p-6 sm:pb-28 lg:pb-6">
           {actionMessage && <div role={actionMessage.error ? "alert" : "status"} className={`flex items-start justify-between gap-3 rounded-xl border px-4 py-3 text-sm ${actionMessage.error ? "border-gold/30 bg-gold/10 text-gold" : "border-success/30 bg-success/10 text-success"}`}><span className="min-w-0 break-words [overflow-wrap:anywhere]">{actionMessage.text}</span><button className="flex min-h-11 min-w-11 shrink-0 items-center justify-center" aria-label={uiText("Ui.text_91b884fe922674")} onClick={() => setActionMessage(null)}><X size={15} /></button></div>}
 
           {activeTab === "overview" && <div className="space-y-5">
+            <button type="button" onClick={() => selectAdminTab("accounts")} className="flex min-h-11 w-full items-center gap-3 rounded-xl border border-border bg-bg-secondary p-4 text-left hover:border-gold"><Users size={20} className="shrink-0 text-gold" /><span className="min-w-0 flex-1"><span className="block font-semibold text-text-primary">{clarity("accountsTitle")}</span><span className="mt-1 block text-sm text-text-muted">{clarity("accountIntro")}</span></span><ChevronRight size={18} className="shrink-0 text-text-muted" /></button>
             {overviewError && <ErrorBox text={overviewError} onRetry={() => setRefreshKey((key) => key + 1)} />}
             <div className="grid grid-cols-2 gap-3 xl:grid-cols-4">
               {[

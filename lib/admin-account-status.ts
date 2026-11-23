@@ -1,5 +1,6 @@
 import { ACCOUNT_RESPONSIBLE_PERSON_KEY, responsibleAccountName } from "./responsible-person";
 import { hasProfileBasics, requiredSetupDestination, type SetupProgress } from "./profile-setup-flow";
+import { hasSavedSearchSetup } from "./quick-start-flow";
 
 export type AdminAccountUser = {
   id: string; firstName: string | null; lastName: string | null;
@@ -23,15 +24,16 @@ export function adminAccountRow(user: AdminAccountUser, profile: AdminAccountPro
   const quickStart = source.quickStart && typeof source.quickStart === "object" ? source.quickStart as Record<string, unknown> : {};
   const knownPurposes = ["crew", "talent", "company", "location", "equipment", "search"] as const;
   const selected = Array.isArray(quickStart.intents) && quickStart.intents.some(intent => knownPurposes.includes(intent as typeof knownPurposes[number])) ? quickStart.intents : [source.intent];
-  const purposes = knownPurposes.filter(purpose => selected.includes(purpose));
+  const purposes = knownPurposes.filter(purpose => selected.includes(purpose) && (purpose !== "search" || hasSavedSearchSetup(raw)));
   const accountKind = purposes.some(purpose => ["company", "location", "equipment"].includes(purpose)) ? "provider"
     : purposes.includes("search") && !purposes.some(purpose => purpose === "crew" || purpose === "talent") ? "search" : "personal";
   const identity = responsibleAccountName(user.privateMetadata[ACCOUNT_RESPONSIBLE_PERSON_KEY]) ?? responsibleAccountName(user);
   const accountName = identity ? `${identity.firstName} ${identity.lastName}` : "";
+  const savedName = typeof quickStart.name === "string" ? quickStart.name.trim().slice(0, 160) : "";
   const profileStatus = !profile ? "missing" : !hasProfileBasics(profile) ? "incomplete" : visibility === "private" ? "private" : "available";
   return {
     userId: user.id,
-    name: profile?.display_name?.trim() || accountName || null,
+    name: profile?.display_name?.trim() || accountName || savedName || null,
     email: user.emailAddresses.find(email => email.id === user.primaryEmailAddressId)?.emailAddress ?? null,
     avatarUrl: profile?.avatar_url ?? null,
     profileUrl: profile && profileStatus === "available" ? "/profile/" + encodeURIComponent(profile.slug || user.id) : null,

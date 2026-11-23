@@ -1283,7 +1283,7 @@
   "AdminAccounts": {
     "title": "Cuentas",
     "explanation": "Todas las cuentas registradas, incluso sin perfil personal. La cuenta, el perfil y los anuncios son independientes. Quienes solo buscan y los proveedores de empresas no necesitan un perfil de Crew. Los mensajes de soporte se envían individualmente tras tu confirmación; aquí no se publica ni verifica nada automáticamente.",
-    "search": "Buscar nombre, correo de la cuenta o ID exacto de Clerk…",
+    "search": "Nombre, correo o ID de cuenta",
     "count": "{count} cuentas",
     "refresh": "Actualizar",
     "loading": "Cargando cuentas y estado de configuración…",
@@ -14048,5 +14048,45 @@
     "providerMicrosoft": "Microsoft Outlook",
     "browserConnectionHelp": "Para conectar un buzón, abre esta página en el navegador e inicia sesión con la misma cuenta de CineGenius. Después vuelve aquí y actualiza.",
     "openInBrowser": "Abrir en el navegador"
+  },
+  "AdminClarity": {
+    "navigation": "Elegir sección",
+    "groups": {
+      "people": "Miembros y empresas",
+      "review": "Revisión y ayuda",
+      "content": "Contenido y gestión",
+      "system": "Administración",
+      "start": "Resumen"
+    },
+    "accountsTitle": "Miembros y proveedores",
+    "profilesTitle": "Gestionar perfiles",
+    "countryFeedback": "Comentarios por país",
+    "accountIntro": "Filtra todas las cuentas por área y estado de configuración. Un miembro puede pertenecer a varias áreas.",
+    "area": "Área",
+    "areas": {
+      "search": "Miembros de búsqueda existentes",
+      "unassigned": "Sin asignar",
+      "all": "Todas las áreas",
+      "crew": "Crew",
+      "marketplace": "Mercado",
+      "locations": "Locaciones",
+      "companies": "Empresas"
+    },
+    "setup": "Configuración",
+    "sort": "Ordenar",
+    "statuses": {
+      "all": "Todos",
+      "open": "Configuración pendiente",
+      "complete": "Completada"
+    },
+    "sorting": {
+      "newest": "Más recientes primero",
+      "oldest": "Más antiguos primero",
+      "name": "Nombre A–Z",
+      "active": "Último inicio de sesión"
+    },
+    "reset": "Restablecer filtros",
+    "lastActive": "Último inicio de sesión",
+    "verified": "Perfil verificado"
   }
 }

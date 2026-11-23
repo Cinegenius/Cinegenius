@@ -1283,7 +1283,7 @@
   "AdminAccounts": {
     "title": "Konton",
     "explanation": "Alla registrerade konton, även de utan personprofil. Ett konto, en profil och en annons är olika saker. De som bara söker och företagsleverantörer behöver ingen filmteamsprofil. Supportmeddelanden skickas bara ett i taget efter din bekräftelse; inget publiceras eller verifieras automatiskt här.",
-    "search": "Sök efter namn, kontots e-postadress eller exakt Clerk-ID …",
+    "search": "Namn, e-post eller konto-ID",
     "count": "{count} konton",
     "refresh": "Uppdatera",
     "loading": "Laddar konton och konfigurationsstatus …",
@@ -14048,5 +14048,45 @@
     "providerMicrosoft": "Microsoft Outlook",
     "browserConnectionHelp": "Öppna sidan i webbläsaren och logga in med samma CineGenius-konto för att ansluta en brevlåda. Återvänd sedan hit och uppdatera.",
     "openInBrowser": "Öppna i webbläsare"
+  },
+  "AdminClarity": {
+    "navigation": "Välj avsnitt",
+    "groups": {
+      "people": "Medlemmar och företag",
+      "review": "Granska och hjälpa",
+      "content": "Innehåll och drift",
+      "system": "Administration",
+      "start": "Översikt"
+    },
+    "accountsTitle": "Medlemmar och leverantörer",
+    "profilesTitle": "Hantera profiler",
+    "countryFeedback": "Feedback per land",
+    "accountIntro": "Filtrera alla konton efter område och inställningsstatus. Medlemmar kan tillhöra flera områden.",
+    "area": "Område",
+    "areas": {
+      "search": "Befintliga sökande medlemmar",
+      "unassigned": "Ej tilldelad",
+      "all": "Alla områden",
+      "crew": "Filmteam",
+      "marketplace": "Marknadsplats",
+      "locations": "Inspelningsplatser",
+      "companies": "Företag"
+    },
+    "setup": "Inställningar",
+    "sort": "Sortera",
+    "statuses": {
+      "all": "Alla",
+      "open": "Inställningar ofullständiga",
+      "complete": "Slutfört"
+    },
+    "sorting": {
+      "newest": "Nyaste först",
+      "oldest": "Äldsta först",
+      "name": "Namn A–Ö",
+      "active": "Senaste inloggning"
+    },
+    "reset": "Återställ filter",
+    "lastActive": "Senaste inloggning",
+    "verified": "Verifierad profil"
   }
 }

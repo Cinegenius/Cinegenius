@@ -1283,7 +1283,7 @@
   "AdminAccounts": {
     "title": "Fiókok",
     "explanation": "Minden regisztrált fiók, személyes profil nélkül is. A fiók, a profil és a hirdetés különálló. A csak kereső felhasználóknak és a céges szolgáltatóknak nincs szükségük stábprofilra. A támogatási üzeneteket csak egyenként, a jóváhagyásod után küldjük el; itt semmi sem kerül automatikusan közzétételre vagy hitelesítésre.",
-    "search": "Keresés név, fiókhoz tartozó e-mail vagy pontos Clerk-azonosító alapján…",
+    "search": "Név, e-mail vagy fiókazonosító",
     "count": "{count} fiók",
     "refresh": "Frissítés",
     "loading": "Fiókok és beállítási állapot betöltése…",
@@ -14048,5 +14048,45 @@
     "providerMicrosoft": "Microsoft Outlook",
     "browserConnectionHelp": "A postafiók csatlakoztatásához nyisd meg ezt az oldalt a böngészőben, és jelentkezz be ugyanazzal a CineGenius-fiókkal. Ezután térj vissza ide, és frissíts.",
     "openInBrowser": "Megnyitás böngészőben"
+  },
+  "AdminClarity": {
+    "navigation": "Szakasz kiválasztása",
+    "groups": {
+      "people": "Tagok és cégek",
+      "review": "Ellenőrzés és segítség",
+      "content": "Tartalom és működés",
+      "system": "Adminisztráció",
+      "start": "Áttekintés"
+    },
+    "accountsTitle": "Tagok és szolgáltatók",
+    "profilesTitle": "Profilok kezelése",
+    "countryFeedback": "Országonkénti visszajelzés",
+    "accountIntro": "Az összes fiók szűrése terület és beállítási állapot szerint. Egy tag több területhez is tartozhat.",
+    "area": "Terület",
+    "areas": {
+      "search": "Meglévő kereső tagok",
+      "unassigned": "Nincs besorolva",
+      "all": "Minden terület",
+      "crew": "Stáb",
+      "marketplace": "Piac",
+      "locations": "Helyszínek",
+      "companies": "Cégek"
+    },
+    "setup": "Beállítás",
+    "sort": "Rendezés",
+    "statuses": {
+      "all": "Mind",
+      "open": "Beállítás befejezetlen",
+      "complete": "Befejezve"
+    },
+    "sorting": {
+      "newest": "Legújabb elöl",
+      "oldest": "Legrégebbi elöl",
+      "name": "Név A–Z",
+      "active": "Legutóbbi bejelentkezés"
+    },
+    "reset": "Szűrők törlése",
+    "lastActive": "Utolsó bejelentkezés",
+    "verified": "Ellenőrzött profil"
   }
 }

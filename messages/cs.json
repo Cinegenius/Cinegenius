@@ -1283,7 +1283,7 @@
   "AdminAccounts": {
     "title": "Účty",
     "explanation": "Všechny registrované účty, i bez osobního profilu. Účet, profil a inzerát jsou oddělené. Lidé, kteří pouze hledají, ani firemní poskytovatelé nepotřebují profil člena štábu. Zprávy podpory se odesílají jednotlivě až po tvém potvrzení; nic se zde automaticky nezveřejňuje ani neověřuje.",
-    "search": "Hledat jméno, e-mail účtu nebo přesné Clerk ID…",
+    "search": "Jméno, e-mail nebo ID účtu",
     "count": "{count} účtů",
     "refresh": "Obnovit",
     "loading": "Načítání účtů a stavu nastavení…",
@@ -14048,5 +14048,45 @@
     "providerMicrosoft": "Microsoft Outlook",
     "browserConnectionHelp": "Chcete-li připojit schránku, otevřete tuto stránku v prohlížeči a přihlaste se stejným účtem CineGenius. Pak se sem vraťte a obnovte stránku.",
     "openInBrowser": "Otevřít v prohlížeči"
+  },
+  "AdminClarity": {
+    "navigation": "Vybrat sekci",
+    "groups": {
+      "people": "Členové a firmy",
+      "review": "Kontrola a podpora",
+      "content": "Obsah a provoz",
+      "system": "Správa",
+      "start": "Přehled"
+    },
+    "accountsTitle": "Členové a poskytovatelé",
+    "profilesTitle": "Správa profilů",
+    "countryFeedback": "Zpětná vazba podle zemí",
+    "accountIntro": "Filtrujte všechny účty podle oblasti a stavu nastavení. Člen může patřit do více oblastí.",
+    "area": "Oblast",
+    "areas": {
+      "search": "Stávající hledající členové",
+      "unassigned": "Nezařazeno",
+      "all": "Všechny oblasti",
+      "crew": "Štáb",
+      "marketplace": "Tržiště",
+      "locations": "Lokace",
+      "companies": "Firmy"
+    },
+    "setup": "Nastavení",
+    "sort": "Řazení",
+    "statuses": {
+      "all": "Vše",
+      "open": "Nastavení nedokončeno",
+      "complete": "Dokončeno"
+    },
+    "sorting": {
+      "newest": "Nejnovější první",
+      "oldest": "Nejstarší první",
+      "name": "Jméno A–Z",
+      "active": "Poslední přihlášení"
+    },
+    "reset": "Zrušit filtry",
+    "lastActive": "Poslední přihlášení",
+    "verified": "Profil ověřen"
   }
 }

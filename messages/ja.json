@@ -1301,7 +1301,7 @@
   "AdminAccounts": {
     "title": "アカウント",
     "explanation": "個人プロフィールを持たないアカウントも含むすべての登録アカウント。アカウント、プロフィール、掲載は別物です。検索専用ユーザーや会社提供者はクループロフィールを必要としません。サポートメッセージは確認後に個別送信され、自動公開や検証は行われません。",
-    "search": "名前、アカウントメール、または正確なClerk IDで検索…",
+    "search": "名前、メール、アカウントID",
     "count": "{count}件のアカウント",
     "refresh": "更新",
     "loading": "アカウントと設定状況を読み込み中…",
@@ -14048,5 +14048,45 @@
     "providerMicrosoft": "Microsoft Outlook",
     "browserConnectionHelp": "メールボックスを接続するには、このページをブラウザで開き、同じCineGeniusアカウントでログインしてください。その後ここに戻って更新してください。",
     "openInBrowser": "ブラウザで開く"
+  },
+  "AdminClarity": {
+    "navigation": "セクションを選択",
+    "groups": {
+      "people": "メンバーと企業",
+      "review": "審査とサポート",
+      "content": "コンテンツと運営",
+      "system": "管理",
+      "start": "概要"
+    },
+    "accountsTitle": "メンバーと提供者",
+    "profilesTitle": "プロフィール管理",
+    "countryFeedback": "国別フィードバック",
+    "accountIntro": "分野と設定状況で全アカウントを絞り込めます。メンバーは複数の分野に所属できます。",
+    "area": "分野",
+    "areas": {
+      "search": "既存の検索メンバー",
+      "unassigned": "未分類",
+      "all": "すべてのエリア",
+      "crew": "クルー",
+      "marketplace": "マーケットプレイス",
+      "locations": "ロケ地",
+      "companies": "企業"
+    },
+    "setup": "設定",
+    "sort": "並び順",
+    "statuses": {
+      "all": "すべて",
+      "open": "設定未完了",
+      "complete": "完了"
+    },
+    "sorting": {
+      "newest": "新しい順",
+      "oldest": "古い順",
+      "name": "名前順",
+      "active": "最終ログイン順"
+    },
+    "reset": "絞り込みをリセット",
+    "lastActive": "最終ログイン",
+    "verified": "認証済みプロフィール"
   }
 }
