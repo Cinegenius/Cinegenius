@@ -3,12 +3,10 @@
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import type { MouseEvent, ReactNode, RefObject } from "react";
 import Link from "next/link";
-import { Bell, ChevronRight, Loader2, LogOut, Menu, MessageSquare, Moon, Search, Sun, User } from "lucide-react";
+import { Bell, ChevronRight, Loader2, LogOut, Menu, MessageSquare, Search, User } from "lucide-react";
 import NavigationIcon from "@/components/NavigationIcon";
 import type { SiteNavigationIcon } from "@/lib/site-navigation";
 import { announceNativeHeaderAction, useNativeHeaderUtilityKind } from "@/lib/native-header-utility";
-import { toggleNativeAppTheme, useNativeAppTheme } from "@/lib/native-app-theme";
-import { useNativeCapability } from "@/lib/use-native-capability";
 import styles from "./NativeAppNavbar.module.css";
 import NativeInboxPanel from "./NativeInboxPanel";
 import NativeAppBackgroundPicker from "./NativeAppBackgroundPicker";
@@ -45,12 +43,9 @@ export type NativeAppNavbarProps = {
 };
 
 /** App presentation of the existing Navbar controller; no identity, request or preference store. */
-export default function NativeAppNavbar({ navigationLabel, accountButtonRef, accountMenuRef, account, messages, search, menu, signInLabel, appearance }: NativeAppNavbarProps) {
+export default function NativeAppNavbar({ navigationLabel, accountButtonRef, accountMenuRef, account, messages, search, menu, signInLabel }: NativeAppNavbarProps) {
   const { open, ready } = account;
   const utility = useNativeHeaderUtilityKind();
-  const theme = useNativeAppTheme();
-  const themeReady = useNativeCapability("appearance-toggle");
-  const themeLabel = theme === "pure" ? appearance.darkLabel : appearance.lightLabel;
   const header = useRef<HTMLElement>(null);
   const [messagePanel, setMessagePanel] = useState({ scope: "", open: false });
   const messageScope = messages.scopeKey ?? account.email;
@@ -104,15 +99,6 @@ export default function NativeAppNavbar({ navigationLabel, accountButtonRef, acc
         aria-expanded={menu.open} aria-controls={menu.controls} aria-haspopup="dialog" onClick={menu.onClick}><Menu size={22} aria-hidden="true" /></button>
     </nav>
     {messagesOpen && <NativeInboxPanel onClose={closeMessages} />}
-    {themeReady && <button type="button" className={styles.themeToggle} data-native-app-theme-toggle="v1"
-      aria-label={themeLabel} title={themeLabel}
-      onClick={event => {
-        // Native capture consumes its trusted click first. This fallback only
-        // changes the presentation marker in an ordinary browser preview.
-        if (!event.defaultPrevented && event.nativeEvent.isTrusted) toggleNativeAppTheme();
-      }}>
-      {theme === "pure" ? <Moon size={20} aria-hidden="true" /> : <Sun size={20} aria-hidden="true" />}
-    </button>}
     {account.ready && account.open && <div ref={accountMenuRef} id="header-account-menu" className={styles.profileMenu}
       role="dialog" aria-labelledby="native-profile-menu-title"
       onBlur={event => {

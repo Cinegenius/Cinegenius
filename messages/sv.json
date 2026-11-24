@@ -12502,7 +12502,20 @@
       "privacy": "Integritet"
     },
     "errorSearch": "Platsen eller yrket är otydligt. Ange yrket, staden och vid behov landet mer exakt.",
-    "errorInDevelopment": "Smart är fortfarande under utveckling."
+    "errorInDevelopment": "Smart är fortfarande under utveckling.",
+    "appGuide": {
+      "title": "Upptäck appen",
+      "step": "{current} av {total}",
+      "smart": "Under Smart längst ned hittar du filmteam, företag, inspelningsplatser och marknadsplatsen. Sök och filtrera för att hitta rätt.",
+      "projects": "Under Projekt längst ned hittar du filmprojekt och kan skapa egna.",
+      "work": "I Work finns Analys och Floor Scanner för att analysera dagsbesked och planera inspelningsplatser. Du startar varje verktyg själv.",
+      "messages": "Pratbubblan högst upp öppnar meddelanden, kollegor, HOMIES och grupper.",
+      "skip": "Hoppa över",
+      "back": "Tillbaka",
+      "next": "Nästa",
+      "done": "Börja",
+      "reopen": "Rundtur i appen"
+    }
   },
   "GenieWriting": {
     "open": "Skriv med Genie",

@@ -12502,7 +12502,20 @@
       "privacy": "Privacy"
     },
     "errorSearch": "The place or occupation is unclear. Please specify the occupation, city and, if needed, country.",
-    "errorInDevelopment": "Smart is still in development."
+    "errorInDevelopment": "Smart is still in development.",
+    "appGuide": {
+      "title": "Explore the app",
+      "step": "{current} of {total}",
+      "smart": "Tap Smart at the bottom to find crew, companies, locations and the marketplace. Use search and filters to narrow your results.",
+      "projects": "Tap Projects at the bottom to explore film projects and create your own.",
+      "work": "Work contains Analysis and Floor Scanner: review call sheets and plan locations. You choose when to start each tool.",
+      "messages": "Use the speech bubble at the top to open your messages, colleagues, HOMIES and groups.",
+      "skip": "Skip",
+      "back": "Back",
+      "next": "Next",
+      "done": "Let’s go",
+      "reopen": "App tour"
+    }
   },
   "GenieWriting": {
     "open": "Write with Genie",

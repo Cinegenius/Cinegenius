@@ -12502,7 +12502,20 @@
       "privacy": "Datenschutz"
     },
     "errorSearch": "Ort oder Beruf sind nicht eindeutig. Bitte nenne den Beruf, die Stadt und gegebenenfalls das Land genauer.",
-    "errorInDevelopment": "Smart ist noch in Entwicklung."
+    "errorInDevelopment": "Smart ist noch in Entwicklung.",
+    "appGuide": {
+      "title": "App entdecken",
+      "step": "{current} von {total}",
+      "smart": "Unten bei Smart findest du Crew, Firmen, Locations und den Marktplatz. Suche und Filter helfen dir bei der Auswahl.",
+      "projects": "Unten bei Projekte findest du Filmprojekte und kannst eigene anlegen.",
+      "work": "In Work findest du Analyse und Floor Scanner: Dispos auswerten und Drehorte planen. Du startest jedes Werkzeug selbst.",
+      "messages": "Über die Sprechblase oben öffnest du deine Nachrichten, Kollegen, HOMIES und Gruppen.",
+      "skip": "Überspringen",
+      "back": "Zurück",
+      "next": "Weiter",
+      "done": "Los geht’s",
+      "reopen": "App-Rundgang"
+    }
   },
   "GenieWriting": {
     "open": "Mit Genie formulieren",

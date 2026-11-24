@@ -12502,7 +12502,20 @@
       "privacy": "Adatvédelem"
     },
     "errorSearch": "A hely vagy a foglalkozás nem egyértelmű. Add meg pontosabban a foglalkozást, a várost és szükség esetén az országot.",
-    "errorInDevelopment": "A Smart még fejlesztés alatt áll."
+    "errorInDevelopment": "A Smart még fejlesztés alatt áll.",
+    "appGuide": {
+      "title": "Fedezd fel az appot",
+      "step": "{current} / {total}",
+      "smart": "Alul a Smart alatt stábot, cégeket, helyszíneket és piacteret találsz. A keresés és a szűrők segítenek a választásban.",
+      "projects": "Alul a Projektek alatt filmes projekteket találsz, és sajátokat is létrehozhatsz.",
+      "work": "A Work alatt az Elemzés és a Floor Scanner segít a napi diszpók feldolgozásában és a helyszínek tervezésében. Minden eszközt te indítasz el.",
+      "messages": "A felső beszédbuborékkal nyithatod meg az üzeneteket, kollégákat, HOMIES-kapcsolatokat és csoportokat.",
+      "skip": "Kihagyás",
+      "back": "Vissza",
+      "next": "Tovább",
+      "done": "Kezdjük",
+      "reopen": "Appbemutató"
+    }
   },
   "GenieWriting": {
     "open": "Fogalmazás Genie-vel",

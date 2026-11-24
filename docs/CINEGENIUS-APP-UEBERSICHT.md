@@ -1,3 +1,7 @@
+## Genie-App-Rundgang · 24. November 2026 · Quellkandidat
+
+Vier kurze Schritte im vorhandenen Genie, überspringbar und erneut aufrufbar; Anleitung ohne KI-/Datenanfrage. App-Hell/Dunkel-Knopfleiste ausgeblendet, aktuelle Darstellung erhalten. Beginn erst nach Anmeldung auf einer sichtbaren bereiten Community-Seite; direkter nativer Work-Kaltstart benötigt noch getrennte Integration. 104 gezielte Tests,64 kontrollierte Browserfälle,20 Designfälle,17 Sprachkataloge,ESLint und vollständiges TypeScript bestanden; Details im [Vertrag und Prüfbeleg](app-genie-guide-20261124.md). Noch nicht veröffentlicht/installiert. Native Menüarbeit und Teamgruppen bleiben abgestimmt separat.
+
 ## App-Startvertrag · 24. November 2026 · veröffentlicht
 
 Kompatibler Serververtrag auf `2e5ce070` / `dpl_94Eh94YmSfPn9B7BSs4jvRgaX5rA` READY und www geprüft: ein flüchtiger neutraler Authkontext bleibt beim Verdecken der Webseite stabil und rotiert bei SDK-/Kontokontextwechseln. Bisheriger Bootmarker, Serverrechte und alte Apps bleiben erhalten.22 fokussierte,87 angrenzende,34 kontrollierte Chromiumfälle,20 Designfälle,17 Kataloge sowie vollständiger Next-/TypeScript-Build bestanden. Fünf Live-HTTP- und zwei öffentliche Gast-Browserabläufe bestätigt, kein echter Login oder Gerätetest. Native2218-Übernahme und physischer Work-Kaltstart bleiben getrennt; ältere native Apps sind dadurch allein noch nicht behoben. [Vertrag und Prüfgrenzen](app-auth-context-20261124.md).

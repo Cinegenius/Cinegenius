@@ -12502,7 +12502,20 @@
       "privacy": "Soukromí"
     },
     "errorSearch": "Místo nebo profese nejsou jednoznačné. Upřesni profesi, město a případně zemi.",
-    "errorInDevelopment": "Smart je zatím ve vývoji."
+    "errorInDevelopment": "Smart je zatím ve vývoji.",
+    "appGuide": {
+      "title": "Objevte aplikaci",
+      "step": "{current} z {total}",
+      "smart": "Dole v části Smart najdete štáb, firmy, lokace a tržiště. S výběrem pomůže vyhledávání a filtry.",
+      "projects": "Dole v části Projekty najdete filmové projekty a můžete vytvářet vlastní.",
+      "work": "V části Work najdete Analýzu a Floor Scanner pro rozbory denních dispozic a plánování lokací. Každý nástroj spouštíte sami.",
+      "messages": "Bublina nahoře otevře zprávy, kolegy, HOMIES a skupiny.",
+      "skip": "Přeskočit",
+      "back": "Zpět",
+      "next": "Další",
+      "done": "Začít",
+      "reopen": "Průvodce aplikací"
+    }
   },
   "GenieWriting": {
     "open": "Napsat s Genie",

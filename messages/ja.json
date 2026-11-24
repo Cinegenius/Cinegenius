@@ -12502,7 +12502,20 @@
       "privacy": "プライバシー"
     },
     "errorSearch": "場所または職種が不明確です。職種、都市、必要に応じて国を指定してください。",
-    "errorInDevelopment": "スマート機能はまだ開発中です。"
+    "errorInDevelopment": "スマート機能はまだ開発中です。",
+    "appGuide": {
+      "title": "アプリを見てみよう",
+      "step": "{current} / {total}",
+      "smart": "下部の Smart から、クルー、会社、ロケ地、マーケットプレイスを探せます。検索と絞り込みを使ってみましょう。",
+      "projects": "下部のプロジェクトから映画プロジェクトを探したり、自分のプロジェクトを作成したりできます。",
+      "work": "Work の分析と Floor Scanner で、香盤表の分析やロケ地の計画ができます。各ツールは自分で開始します。",
+      "messages": "上部の吹き出しから、メッセージ、同僚、HOMIES、グループを開けます。",
+      "skip": "スキップ",
+      "back": "戻る",
+      "next": "次へ",
+      "done": "始める",
+      "reopen": "アプリガイド"
+    }
   },
   "GenieWriting": {
     "open": "Genieで作成",

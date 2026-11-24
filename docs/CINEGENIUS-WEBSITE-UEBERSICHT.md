@@ -1,3 +1,7 @@
+## Genie-App-Rundgang · 24. November 2026 · Quellkandidat
+
+Vier kurze Schritte im vorhandenen Genie, überspringbar und erneut aufrufbar; Anleitung ohne KI-/Datenanfrage. App-Hell/Dunkel-Knopfleiste ausgeblendet, aktuelle Darstellung erhalten. Beginn erst nach Anmeldung auf einer sichtbaren bereiten Community-Seite; direkter nativer Work-Kaltstart benötigt noch getrennte Integration. 104 gezielte Tests,64 kontrollierte Browserfälle,20 Designfälle,17 Sprachkataloge,ESLint und vollständiges TypeScript bestanden; Details im [Vertrag und Prüfbeleg](app-genie-guide-20261124.md). Noch nicht veröffentlicht/installiert. Native Menüarbeit und Teamgruppen bleiben abgestimmt separat.
+
 ## Native App-Brücke · 24. November 2026 · veröffentlicht
 
 Die enge additive App-Brücke ist auf `2e5ce070` / `dpl_94Eh94YmSfPn9B7BSs4jvRgaX5rA` READY und www geprüft. Normale Websitegestaltung, Anmeldung, Berechtigungen, APIs und17 Sprachkataloge bleiben erhalten. Der flüchtige Marker gewährt keinen Zugriff und unterstützt nur den getrennten nativen Work-Startfix.22 fokussierte,87 angrenzende,34 kontrollierte Chromiumfälle sowie Design/Sprachen und vollständiger Produktionsbuild bestanden; fünf Live-HTTP- und zwei Gast-Browserabläufe bestätigt. Keine neue DB-/Mail-/Provideränderung, kein echter Login oder Gerätebeleg. [Vertrag und Grenzen](app-auth-context-20261124.md).
