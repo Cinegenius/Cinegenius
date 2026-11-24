@@ -13317,6 +13317,7 @@
       "unmapped": "{count} ohne Kartenposition bleiben in der Liste.",
       "partial": "Weitere Treffer kannst du im jeweiligen Abschnitt laden. Die Filter gelten für die geladene Auswahl.",
       "emptyFilters": "Hier passt gerade nichts zu deinen Filtern.",
+      "chooseSources": "Wähle oben mindestens einen Bereich aus.",
       "examplesLabel": "Zum Ausprobieren",
       "understood": "Deine Suche ansehen & anpassen",
       "examples": {
@@ -13805,7 +13806,7 @@
   "NativeSmartDiscovery": {
     "compactAreas": {
       "crew": "Crew",
-      "marketplace": "Marktplatz",
+      "marketplace": "Markt",
       "locations": "Locations"
     },
     "directories": "Bereiche öffnen",

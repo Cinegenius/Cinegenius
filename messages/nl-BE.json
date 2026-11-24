@@ -13317,6 +13317,7 @@
       "unmapped": "{count} zonder kaartpositie blijven in de lijst.",
       "partial": "Laad meer resultaten per onderdeel. Filters gelden voor de geladen selectie.",
       "emptyFilters": "Niets past bij je huidige filters.",
+      "chooseSources": "Selecteer hierboven minstens één categorie.",
       "examplesLabel": "Probeer een voorbeeld",
       "understood": "Je zoekopdracht bekijken en aanpassen",
       "examples": {

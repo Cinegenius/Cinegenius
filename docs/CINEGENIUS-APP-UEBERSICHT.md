@@ -1,3 +1,7 @@
+## Native Smart: freigegebene Fünferauswahl · 24. November 2026 · isolierter Quellkandidat
+
+Original A wurde ausdrücklich gewählt und auf Crew/Markt/Locations/Firmen/Jobs ohne oberen Smart-Schalter präzisiert. Fünf unabhängige Mehrfachschalter über der Filterleiste; auch keine Auswahl bleibt stabil. Alte Projektfilter bleiben privat erhalten, sind in Smart aber wirkungslos. Untere Smart-/Projekte-Ziele, vorhandene Filter, Karten und öffentliche Website erhalten. Auf94a9 vorbereitet, Kosten9dc getrennt; kein main-Update, Deploy oder Gerätebuild. [Umfang, Prüfstand und Grenzen](app-smart-sources-20261124.md). Die ältere Aussage „Schnellwahl nur Vorschau“ ist für diesen freigegebenen Umfang ersetzt.
+
 ## Persönlicher App-Bereich und Smart · 24. November 2026 · isolierter Quellkandidat
 
 Die persönliche Überschrift scrollt im App-Modus mit dem Inhalt; doppelter oberer Abstand entfällt auch in verschachtelten Ansichten, große Schrift kann die Aktion auf eine zweite Zeile verschieben. Nur Smart blendet den automatischen Übersetzungshinweis aus; Umschalten, Originalstatus, Wiederholen und Karteninfo bleiben. Auf6c19 vorbereitet, Kosten9dc getrennt.115 gezielte Fälle,32 kontrollierte Browserfälle,22 Designfälle,17 Kataloge und vollständiges TypeScript bestanden; ESLint hat ausschließlich die belegten7 Fehler/1 Warnung des bisherigen Dashboards. Browsermatrix und Grenzen im [Prüfbericht](app-settings-smart-20261124.md). Noch nicht veröffentlicht oder physisch abgenommen. Schnellwahl bleibt ausschließlich Bestandsprüfung für Roots Vorschau.

@@ -9,7 +9,7 @@ import BrowseResultCount from "./BrowseResultCount";
 import BrowseSelect from "./BrowseSelect";
 import DirectoryViewControls, { type DirectoryView } from "./DirectoryViewControls";
 import { useNativeAppAppearance } from "@/lib/use-native-app-appearance";
-import { nativeSmartResultAreas, nativeSmartView } from "@/lib/native-smart-controls";
+import { NATIVE_SMART_PRIMARY, nativeSmartBrowseFilters, nativeSmartHiddenAreas, nativeSmartResultAreas, nativeSmartView } from "@/lib/native-smart-controls";
 import NativeSmartFilters from "./app/NativeSmartFilters";
 import { browseFilterControls, hasBrowseFilterControls } from "@/lib/browse-filter-controls";
 import nativeStyles from "./app/NativeSmartAreas.module.css";
@@ -108,24 +108,28 @@ export default function SmartSearchExplorer({ plan, initialGroups, initialMapGro
   const saved = stored ?? localControls;
   const controls = saved.scope === scope ? saved : { ...saved, scope, filters: emptyDiscoveryFilters(), limits: {} };
   const writeControls = setStored ?? setLocalControls;
-  const filters = nativeAppearance ? controls.filters : webFilters;
+  const filters = useMemo(() => nativeAppearance ? { ...controls.filters, hiddenAreas: nativeSmartHiddenAreas(controls.filters.hiddenAreas) } : webFilters, [nativeAppearance, controls.filters, webFilters]);
+  const noNativeSources = nativeAppearance && filters.hiddenAreas.length === NATIVE_SMART_PRIMARY.length;
   const mapOpen = nativeAppearance ? controls.mapOpen : webMapOpen;
   const browseRaw = nativeAppearance ? controls.filters.browse : undefined;
-  const browseFilters = useMemo(() => browseFilterControls(nativeAppearance ? {
+  const browseFilters = useMemo(() => nativeAppearance ? nativeSmartBrowseFilters({
     ...(browseRaw ?? {version:1 as const}),
     departments:browseRaw?.departments ?? controls.filters.departments,
     marketplace:browseRaw?.marketplace ?? controls.filters.marketplace,
-  } : undefined), [browseRaw, nativeAppearance, controls.filters.departments, controls.filters.marketplace]);
+  }) : browseFilterControls(), [browseRaw, nativeAppearance, controls.filters.departments, controls.filters.marketplace]);
   const browseKey = JSON.stringify(browseFilters);
   const [loadedBrowseKey,setLoadedBrowseKey] = useState(initialBrowseKey ?? JSON.stringify({version:1}));
   const requestedBrowseKey = useRef(initialBrowseKey ?? JSON.stringify({version:1}));
-  const filteredGroups = useMemo(() => nativeAppearance && loadedBrowseKey !== browseKey ? [] : groups, [nativeAppearance, loadedBrowseKey, browseKey, groups]);
+  const filteredGroups = useMemo(() => nativeAppearance ? loadedBrowseKey !== browseKey ? [] : groups.filter(group => nativeSmartResultAreas([group.area]).length > 0) : groups, [nativeAppearance, loadedBrowseKey, browseKey, groups]);
   const view = nativeSmartView(mapOpen, controls.view);
   const setFilters = (action: SetStateAction<DiscoveryFilters>) => {
     if (!nativeAppearance) { setWebFilters(action); return; }
     writeControls(old => {
       const current = old.scope === scope ? old : { ...old, scope, filters: emptyDiscoveryFilters(), limits: {} };
-      return { ...current, filters: typeof action === "function" ? action(current.filters) : action };
+      const updated = typeof action === "function" ? action({ ...current.filters, hiddenAreas: nativeSmartHiddenAreas(current.filters.hiddenAreas) }) : action;
+      return { ...current, filters: { ...updated, hiddenAreas: nativeSmartHiddenAreas(updated.hiddenAreas),
+        ...(current.filters.browse?.projectTypes ? { browse: { ...updated.browse, version: 1, projectTypes: current.filters.browse.projectTypes } } : {}),
+      } };
     });
   };
   const setView = (value: DirectoryView) => {
@@ -170,6 +174,7 @@ export default function SmartSearchExplorer({ plan, initialGroups, initialMapGro
   }, [mapReady, groups, nativeAppearance]);
 
   const read = useCallback(async (group?: SearchGroup) => {
+    if (noNativeSources) return;
     const key = group ? searchGroupKey(group) : "initial";
     if (requests.current.has(key) || group && requests.current.has("initial")) return;
     if (!group) {
@@ -217,10 +222,10 @@ export default function SmartSearchExplorer({ plan, initialGroups, initialMapGro
         setPending(values => values.filter(value => value !== key));
       }
     }
-  }, [plan, mapOpen, mapReady, nativeAppearance, discoverySeed, browseKey, browseFilters]);
+  }, [plan, mapOpen, mapReady, nativeAppearance, discoverySeed, browseKey, browseFilters, noNativeSources]);
 
   useEffect(() => {
-    if (!nativeAppearance || requestedBrowseKey.current === browseKey) return;
+    if (!nativeAppearance || noNativeSources || requestedBrowseKey.current === browseKey) return;
     requestedBrowseKey.current = browseKey;
     // New filter scope invalidates every prior page and transport before reading.
     poolGeneration.current += 1;
@@ -228,7 +233,7 @@ export default function SmartSearchExplorer({ plan, initialGroups, initialMapGro
     for (const request of requests.current.values()) request.abort();
     requests.current.clear();
     void read();
-  }, [browseKey, nativeAppearance, read]);
+  }, [browseKey, nativeAppearance, noNativeSources, read]);
 
   useEffect(() => {
     if (initialMapGroups || !mapOpen || mapReady) return;
@@ -251,8 +256,9 @@ export default function SmartSearchExplorer({ plan, initialGroups, initialMapGro
   const visible = useMemo(() => viewport?.visible ?? sortDiscoveryGroups(filterDiscoveryGroups(filteredGroups, filters), plan), [viewport, filteredGroups, filters, plan]);
   const unmappedCount = viewport ? discoveryCount(viewport.unmapped) : 0;
   const count = discoveryCount(visible);
-  const hasMapPositions = groups.some(group => group.results.some(result => result.mapPoint));
-  const filtered = !!(filters.hiddenAreas.length || filters.hiddenWishes.length || filters.departments.length || filters.marketplace.length || filters.bounds || hasBrowseFilterControls(browseFilters));
+  const hasMapPositions = filteredGroups.some(group => group.results.some(result => result.mapPoint));
+  const visibleHiddenWishes = nativeAppearance ? filters.hiddenWishes.some(index => { const area = plan.searches[index]?.area; return area === "all" || NATIVE_SMART_PRIMARY.some(source => source === area); }) : filters.hiddenWishes.length > 0;
+  const filtered = !!(filters.hiddenAreas.length || visibleHiddenWishes || filters.departments.length || filters.marketplace.length || filters.bounds || hasBrowseFilterControls(browseFilters));
   const reset = () => setFilters(emptyDiscoveryFilters());
   const labelWish = (index: number) => {
     const wish = plan.searches[index];
@@ -266,7 +272,7 @@ export default function SmartSearchExplorer({ plan, initialGroups, initialMapGro
   </button>;
 
   return <div className={`smart-explorer${nativeAppearance ? ` ${resultStyles.explorer}` : ""}`} data-smart-explorer data-map-open={mapOpen}>
-    {nativeAppearance ? <NativeSmartFilters groups={groups} count={count} busy={loadedBrowseKey !== browseKey || pending.includes("initial")} failed={errors.includes("initial")} filters={{...filters,browse:browseFilters}}
+    {nativeAppearance ? <NativeSmartFilters groups={filteredGroups} count={count} busy={!noNativeSources && (loadedBrowseKey !== browseKey || pending.includes("initial"))} failed={!noNativeSources && errors.includes("initial")} filters={{...filters,browse:browseFilters}}
       onChange={value => setFilters({...value,departments:[],marketplace:[]})} views={<DirectoryViewControls value={view} onChange={setView} views={["grid", "list", "map"]} />} /> : <div className="smart-result-toolbar">
       <BrowseResultCount count={count} label={t("discovery.loaded", { count })} />
       <BrowseSelect label={t("allAreas")} value={areaValue} className="smart-area-select" triggerClassName="smart-area-trigger"
@@ -305,17 +311,18 @@ export default function SmartSearchExplorer({ plan, initialGroups, initialMapGro
       </div>}
     </section>}
     {/* One map instance; switching views keeps zoom and current result filters. */}
-    <div className="smart-map-panel" hidden={!mapOpen}>{mapReady && hasMapPositions && <SmartSearchMap groups={nativeAppearance ? mapPool : visible} active={mapOpen} bounds={filters.bounds} onApplyBounds={bounds => setFilters(value => ({ ...value, bounds }))} />}
+    <div className="smart-map-panel" hidden={!mapOpen || noNativeSources}>{mapReady && hasMapPositions && <SmartSearchMap groups={nativeAppearance ? mapPool : visible} active={mapOpen && !noNativeSources} bounds={filters.bounds} onApplyBounds={bounds => setFilters(value => ({ ...value, bounds }))} />}
       {mapReady && !hasMapPositions && count > 0 && <p className="text-xs text-text-muted">{t("discovery.unmapped", { count })}</p>}
     </div>
     <div className="smart-result-list">
     {nativeAppearance ? <div className={resultStyles.utilityRow} data-native-smart-utility="v1">
       <ContentTranslationNotice hideAutomaticNotice />
-      {mapOpen && mapReady && hasMapPositions && <SmartSearchMapInfo native />}
+      {!noNativeSources && mapOpen && mapReady && hasMapPositions && <SmartSearchMapInfo native />}
     </div> : <ContentTranslationNotice />}
-    {errors.includes("initial") && <div role="alert" className="text-sm text-text-secondary"><p>{t("error")}</p><button type="button" className="min-h-11 min-w-11 text-gold" onClick={() => void read()} disabled={pending.includes("initial")}>{t("retry")}</button></div>}
-    {pending.includes("initial") && <p role="status" className="text-sm text-text-muted">{t("loading")}</p>}
-    {!count && loadedBrowseKey === browseKey && !pending.includes("initial") && <div role="status" className="rounded-xl border border-border bg-bg-secondary p-4 text-sm text-text-secondary"><p>{t(filtered ? "discovery.emptyFilters" : "emptyGroup")}</p>{filtered && <button type="button" className="min-h-11 min-w-11 text-gold" onClick={reset}>{t("discovery.reset")}</button>}</div>}
+    {!noNativeSources && errors.includes("initial") && <div role="alert" className="text-sm text-text-secondary"><p>{t("error")}</p><button type="button" className="min-h-11 min-w-11 text-gold" onClick={() => void read()} disabled={pending.includes("initial")}>{t("retry")}</button></div>}
+    {!noNativeSources && pending.includes("initial") && <p role="status" className="text-sm text-text-muted">{t("loading")}</p>}
+    {noNativeSources && <p role="status" className={resultStyles.emptySelection}>{t("discovery.chooseSources")}</p>}
+    {!noNativeSources && !count && loadedBrowseKey === browseKey && !pending.includes("initial") && <div role="status" className="rounded-xl border border-border bg-bg-secondary p-4 text-sm text-text-secondary"><p>{t(filtered ? "discovery.emptyFilters" : "emptyGroup")}</p>{filtered && <button type="button" className="min-h-11 min-w-11 text-gold" onClick={reset}>{t("discovery.reset")}</button>}</div>}
     {(nativeAppearance ? nativeSmartResultAreas(discoveryAreas(visible)) : discoveryAreas(visible)).map(area => <ResultArea key={area} area={area} colors={colors} native={nativeAppearance} autoLoad={nativeAppearance && discoveryAreas(mapPool).length === 1} groups={visible.filter(group => group.area === area)} pending={pending} errors={errors}
       {...(nativeAppearance ? { grid: view === "grid", limit: controls.limits[area] ?? (view === "grid" ? 6 : 3), setLimit: (limit: number) => setLimit(area, limit) } : {})}
       more={group => void read(groups.find(item => searchGroupKey(item) === searchGroupKey(group))!)} />)}

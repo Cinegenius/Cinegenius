@@ -1,3 +1,7 @@
+## Native Smart: freigegebene Fünferauswahl · 24. November 2026 · isolierter Quellkandidat
+
+Original A wurde ausdrücklich gewählt und auf Crew/Markt/Locations/Firmen/Jobs ohne oberen Smart-Schalter präzisiert. Fünf unabhängige Mehrfachschalter über der Filterleiste; auch keine Auswahl bleibt stabil. Alte Projektfilter bleiben privat erhalten, sind in Smart aber wirkungslos. Untere Smart-/Projekte-Ziele, vorhandene Filter, Karten und öffentliche Website erhalten. Auf94a9 vorbereitet, Kosten9dc getrennt; kein main-Update, Deploy oder Gerätebuild. [Umfang, Prüfstand und Grenzen](app-smart-sources-20261124.md). Die ältere Aussage „Schnellwahl nur Vorschau“ ist für diesen freigegebenen Umfang ersetzt.
+
 ## Enger App-Folgeauftrag · 24. November 2026 · vor Zusammenführung
 
 Settings-Abstand/überdeckende Kopfzeile und ausschließlich den automatischen Hinweis in Smart auf6c19 korrigieren und unabhängig prüfen. Kosten9dc bleibt getrennt; kein Deploy oder main-Änderung durch diesen Auftrag. Danach kann Root den Kandidaten in die gemeinsame Freigabe aufnehmen. Schnellwahl Crew/Locations/Smart/Firmen/Jobs nur lesend analysiert: sichtbaren Marktplatzzugang, Projekte und private Filter erhalten; erst Vorschau und Nutzerentscheidung, dann Umsetzung. [Umfang, Prüfstand und Grenzen](app-settings-smart-20261124.md).

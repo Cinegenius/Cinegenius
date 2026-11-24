@@ -13317,6 +13317,7 @@
       "unmapped": "{count} utan kartposition finns kvar i listan.",
       "partial": "Ladda fler träffar i varje avsnitt. Filtren gäller det inlästa urvalet.",
       "emptyFilters": "Inget matchar dina nuvarande filter.",
+      "chooseSources": "Välj minst ett område ovan.",
       "examplesLabel": "Prova ett exempel",
       "understood": "Granska och justera din sökning",
       "examples": {

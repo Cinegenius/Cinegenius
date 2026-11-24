@@ -13317,6 +13317,7 @@
       "unmapped": "Položky bez polohy na mapě zůstávají v seznamu: {count}.",
       "partial": "Další výsledky načteš v jednotlivých sekcích. Filtry platí pro načtený výběr.",
       "emptyFilters": "Aktuálním filtrům nic neodpovídá.",
+      "chooseSources": "Vyber nahoře alespoň jednu oblast.",
       "examplesLabel": "Vyzkoušej příklad",
       "understood": "Zkontrolovat a upravit hledání",
       "examples": {

@@ -13317,6 +13317,7 @@
       "unmapped": "{count} 条没有地图位置的结果仍保留在列表中。",
       "partial": "可在各部分加载更多结果。筛选适用于已加载的结果。",
       "emptyFilters": "当前筛选条件下暂无匹配结果。",
+      "chooseSources": "请在上方至少选择一个类别。",
       "examplesLabel": "试试这些示例",
       "understood": "查看并调整搜索",
       "examples": {

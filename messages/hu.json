@@ -13317,6 +13317,7 @@
       "unmapped": "{count} térképpozíció nélküli találat a listában marad.",
       "partial": "Az egyes részeknél további találatokat tölthetsz be. A szűrők a betöltött találatokra vonatkoznak.",
       "emptyFilters": "A jelenlegi szűrőkhöz nincs találat.",
+      "chooseSources": "Válassz ki fent legalább egy területet.",
       "examplesLabel": "Próbálj ki egy példát",
       "understood": "Keresés áttekintése és módosítása",
       "examples": {

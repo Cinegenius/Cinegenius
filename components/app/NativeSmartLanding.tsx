@@ -16,8 +16,8 @@ import styles from "./NativeSmartLanding.module.css";
 import { isDiscoverySeed } from "@/lib/discovery-seed";
 import { useNativeSegmentDrag } from "@/lib/use-native-segment-drag";
 import NativeCreateMenu from "./NativeCreateMenu";
-import {browseFilterControls,hasBrowseFilterControls} from "@/lib/browse-filter-controls";
-import {nativeSmartView} from "@/lib/native-smart-controls";
+import {hasBrowseFilterControls} from "@/lib/browse-filter-controls";
+import {nativeSmartBrowseFilters,nativeSmartView} from "@/lib/native-smart-controls";
 import {NATIVE_DISCOVERY_FILTER_HEADER,encodeNativeDiscoveryFilters} from "@/lib/native-smart-discovery-request";
 const nativePlanScope=JSON.stringify(nativeDiscoveryPlan());
 
@@ -44,7 +44,7 @@ function AccountNativeSmartLanding({ accountId, sessionId, loaded, allowed, onUn
   const [result, setResult] = useState<{ scope: string; revision: number; data: NativeDiscoveryResponse; timingStart: number; browseKey:string } | null>(null);
   const choices=useMemo(()=>{
     const filters=controls.scope === nativePlanScope ? controls.filters : emptyDiscoveryFilters();
-    const browse=browseFilterControls({...filters.browse,version:1,departments:filters.browse?.departments ?? filters.departments,marketplace:filters.browse?.marketplace ?? filters.marketplace});
+    const browse=nativeSmartBrowseFilters({...filters.browse,version:1,departments:filters.browse?.departments ?? filters.departments,marketplace:filters.browse?.marketplace ?? filters.marketplace});
     return {view:controls.scope === nativePlanScope && nativeSmartView(controls.mapOpen,controls.view) === "map" ? "map" as const : "list" as const,browse,browseKey:JSON.stringify(browse)};
   },[controls]);
   const choicesRef=useRef(choices),hasResult=useRef(false);

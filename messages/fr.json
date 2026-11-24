@@ -13317,6 +13317,7 @@
       "unmapped": "{count} sans position sur la carte restent dans la liste.",
       "partial": "Charge davantage de résultats dans chaque rubrique. Les filtres concernent la sélection chargée.",
       "emptyFilters": "Aucun résultat ne correspond aux filtres actuels.",
+      "chooseSources": "Sélectionnez au moins une catégorie ci-dessus.",
       "examplesLabel": "Essaie un exemple",
       "understood": "Vérifier et ajuster ta recherche",
       "examples": {
