@@ -2,7 +2,7 @@
 import {useCallback,useEffect,useLayoutEffect,useRef,useState,useMemo} from 'react';
 import {useUser} from '@clerk/nextjs';
 import {useTranslations,useLocale} from 'next-intl';
-import {useRouter} from 'next/navigation';
+import {useRouter,useSearchParams} from 'next/navigation';
 import {useNativeAppAppearance} from '@/lib/use-native-app-appearance';
 
 type Provider='gmail'|'microsoft';
@@ -14,16 +14,17 @@ type State={accountId:string;capabilities:{archive:boolean;forwarding:boolean;gm
 const control='min-h-11 min-w-11 rounded-xl border border-border bg-bg-secondary px-3 py-2 text-sm disabled:opacity-40';
 const MAIL_ERROR={unavailable:'unavailable',saveFailed:'saveFailed'} as const;
 const card='rounded-2xl border border-border bg-bg-primary p-4';
+const ANALYSIS_LOCALES=['de','en','es','it','cs','hu','nl','nl-BE','sv'];
 
 export default function WorkMail({accountId}:{accountId:string}){
- const t=useTranslations('WorkMail'),router=useRouter(),{user,isLoaded}=useUser(),nativeAppearance=useNativeAppAppearance(),locale=useLocale();
- const owner=useRef<string|undefined>(user?.id),epoch=useRef(0),pending=useRef(false),controllers=useRef(new Set<AbortController>());
+ const t=useTranslations('WorkMail'),router=useRouter(),searchParams=useSearchParams(),{user,isLoaded}=useUser(),nativeAppearance=useNativeAppAppearance(),locale=useLocale();
+ const owner=useRef<string|undefined>(user?.id),epoch=useRef(0),pending=useRef(false),autoImportDone=useRef(false),controllers=useRef(new Set<AbortController>());
  const [prepared,setPrepared]=useState<{bytes:ArrayBuffer;name:string}|null>(null);
  const preparedCanShare=useMemo(()=>{if(!prepared)return false;try{return !!navigator.canShare?.({files:[new window.File([prepared.bytes],prepared.name,{type:'application/octet-stream'})]});}catch{return false;}},[prepared]);
- const [state,setState]=useState<State|null>(null),[error,setError]=useState(''),[busy,setBusy]=useState(false),[notice,setNotice]=useState(''),[selected,setSelected]=useState<Item|null>(null);
+ const [state,setState]=useState<State|null>(null),[error,setError]=useState(''),[busy,setBusy]=useState(false),[notice,setNotice]=useState(''),[selected,setSelected]=useState<Item|null>(null),[analysis,setAnalysis]=useState<unknown>(null);
  const [mailbox,setMailbox]=useState<{connection:Connection;messages:Summary[];cursor:string|null}|null>(null),[loading,setLoading]=useState(true);
  const cancelRequests=useCallback(()=>{epoch.current++;const active=controllers.current;for(const c of active)c.abort();active.clear();},[]);
- useLayoutEffect(()=>{owner.current=user?.id;cancelRequests();const current=epoch.current;queueMicrotask(()=>{if(current===epoch.current){setState(null);setSelected(null);setMailbox(null);setPrepared(null);setError('');setNotice('');}});return()=>{owner.current=undefined;cancelRequests();};},[user?.id,cancelRequests]);
+ useLayoutEffect(()=>{owner.current=user?.id;cancelRequests();const current=epoch.current;queueMicrotask(()=>{if(current===epoch.current){setState(null);setSelected(null);setMailbox(null);setPrepared(null);setAnalysis(null);setError('');setNotice('');}});return()=>{owner.current=undefined;cancelRequests();};},[user?.id,cancelRequests]);
  const same=isLoaded&&user?.id===accountId;
  const api=useCallback(async(path='',body?:Record<string,unknown>)=>{
   if(owner.current!==accountId)throw new Error('accountChanged');const controller=new AbortController();controllers.current.add(controller);const timer=setTimeout(()=>controller.abort(),45000),current=epoch.current;
@@ -38,10 +39,36 @@ export default function WorkMail({accountId}:{accountId:string}){
   finally{if(owner.current===accountId)setLoading(false);}
  },[accountId,api]);
  useEffect(()=>{let disposed=false;queueMicrotask(()=>{if(same&&!disposed)void load();});return()=>{disposed=true;};},[same,load]);
- useEffect(()=>{const hide=()=>{if(document.visibilityState!=='visible'){epoch.current++;for(const c of controllers.current)c.abort();setState(null);setSelected(null);setMailbox(null);setPrepared(null);}else if(owner.current===accountId)void load();};document.addEventListener('visibilitychange',hide);return()=>document.removeEventListener('visibilitychange',hide);},[accountId,load]);
+ useEffect(()=>{const hide=()=>{if(document.visibilityState!=='visible'){epoch.current++;for(const c of controllers.current)c.abort();setState(null);setSelected(null);setMailbox(null);setPrepared(null);setAnalysis(null);}else if(owner.current===accountId)void load();};document.addEventListener('visibilitychange',hide);return()=>document.removeEventListener('visibilitychange',hide);},[accountId,load]);
  async function run(action:(current:()=>boolean)=>Promise<void>){if(pending.current||owner.current!==accountId)return;pending.current=true;setBusy(true);setError('');setNotice('');const currentEpoch=epoch.current,current=()=>owner.current===accountId&&epoch.current===currentEpoch;try{await action(current);}catch(cause){if(owner.current===accountId)setError(cause instanceof Error?cause.message:MAIL_ERROR.unavailable);}finally{pending.current=false;if(owner.current===accountId)setBusy(false);}}
  async function openItem(id:string){await run(async current=>{const value=await api('?item='+encodeURIComponent(id));if(current())setSelected(value);});}
  async function browse(connection:Connection,cursor?:string){await run(async current=>{const value=await api('?connection='+connection.id+(cursor?'&cursor='+encodeURIComponent(cursor):''));if(!current())return;setMailbox({connection,messages:value.messages,cursor:value.cursor});setSelected(null);});}
+ async function autoImportCurrentDispo(connection:Connection){
+  await run(async current=>{
+   setAnalysis(null);setNotice(t('autoImportStarting'));
+   const result=await api('',{action:'import_current_dispo',connectionId:connection.id});
+   await load();
+   const value=await api('?item='+result.id);
+   if(!current())return;
+   setSelected(value);setMailbox(null);setNotice(t('imported'));
+   await startAnalysis(value,current);
+  });
+ }
+ useEffect(()=>{if(!state||autoImportDone.current||searchParams.get('connected')!=='1')return;const connection=state.connections.find(c=>state.capabilities[c.provider]);if(!connection)return;autoImportDone.current=true;void autoImportCurrentDispo(connection);},[state,searchParams]);
+ async function startAnalysis(item:Item,current:()=>boolean){
+  const validLocale=ANALYSIS_LOCALES.includes(locale)?locale:'de';
+  setAnalysis(null);setNotice(t('analysisStarting'));
+  const prepared=await api('',{action:'analysis_document',itemId:item.id});
+  if(!current())return;
+  const controller=new AbortController();controllers.current.add(controller);const timer=setTimeout(()=>controller.abort(),570000);
+  try{
+   const response=await fetch('/api/native/v1/genie/personal-dispo',{method:'POST',cache:'no-store',signal:controller.signal,headers:{'Content-Type':'application/json','X-CineGenius-Genie-Account':accountId,'X-CineGenius-Genie-Contract':'personal-test.v1'},body:JSON.stringify({schemaVersion:1,document:prepared.document,locale:validLocale})});
+   const value=await response.json().catch(()=>({error:'unavailable'}));
+   if(!current())return;
+   if(!response.ok)throw new Error(typeof value.error==='string'&&['analysis_busy','rate_limited','unauthorized','unavailable','too_large','invalid_request'].includes(value.error)?value.error:'analysisFailed');
+   setAnalysis(value);setNotice(t('analysisComplete'));
+  }finally{clearTimeout(timer);controllers.current.delete(controller);}
+ }
  async function download(file:File){await run(async()=>{
   if(!/^\/api\/work\/mail\/items\/[0-9a-f-]{36}\/file(?:\?attachment=[a-f0-9]{64})?$/.test(file.downloadPath))throw new Error('invalid');
   const current=epoch.current,controller=new AbortController();controllers.current.add(controller);const timer=setTimeout(()=>controller.abort(),45000);
@@ -60,13 +87,14 @@ export default function WorkMail({accountId}:{accountId:string}){
    else{const url=URL.createObjectURL(file),link=document.createElement('a');link.href=url;link.download=prepared.name;link.hidden=true;document.body.appendChild(link);link.click();link.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);}}
   catch(cause){if(owner.current===accountId&&!(cause instanceof DOMException&&cause.name==='AbortError'))setError(MAIL_ERROR.saveFailed);}
  }
- function displayError(value:string){return ['unavailable','invalid','notAllowed','accountChanged','tooLarge','quota','busy','notFound','saveFailed','providerUnavailable','connectionRequired','oauthFailed'].includes(value)?t(value):t('unavailable');}
+ function displayError(value:string){return ['unavailable','invalid','notAllowed','accountChanged','tooLarge','quota','busy','notFound','saveFailed','providerUnavailable','connectionRequired','oauthFailed','analysisUnsupported','analysisFailed','analysis_busy','rate_limited','unauthorized','too_large','invalid_request','dispoNotFound'].includes(value)?t(value):t('unavailable');}
  if(!same)return <section className="site-container py-6"><p role="status">{t(isLoaded?'accountChanged':'loading')}</p></section>;
  return <section className="site-container space-y-4 py-5 pb-28" aria-busy={busy||loading}>
   <div className="flex flex-wrap items-center justify-between gap-3"><h1 className="font-display text-2xl font-bold">{t('title')}</h1><button className={control} onClick={()=>router.back()}>{t('back')}</button></div>
   <p className="text-sm text-text-secondary">{t('intro')}</p>
   {error&&<p role="alert" className="text-sm text-red-400">{displayError(error)}</p>}{notice&&<p role="status" className="text-sm text-text-secondary">{notice}</p>}
   <button className={control} onClick={()=>void load()} disabled={busy}>{t('refresh')}</button>
+  {analysis!==null&&<div className={card}><h2 className="mb-2 text-lg font-semibold">{t('analysisComplete')}</h2><pre className="max-h-[60vh] overflow-auto whitespace-pre-wrap break-words rounded-xl bg-bg-secondary p-3 text-xs">{JSON.stringify(analysis,null,2)}</pre></div>}
   {prepared&&<div className={card}><p className="mb-2 break-all text-sm">{prepared.name}</p><div className="flex flex-wrap gap-2">{nativeAppearance&&!preparedCanShare?<a className={control+' inline-flex items-center'} href="/work/mail" target="_blank" rel="noopener noreferrer">{t('openInBrowser')}</a>:<button className={control} onClick={()=>void savePrepared()}>{t('savePrepared')}</button>}<button className={control} onClick={()=>setPrepared(null)}>{t('cancel')}</button></div></div>}
   {loading&&!state&&<p role="status">{t('loading')}</p>}
   {state&&<>
@@ -83,13 +111,13 @@ export default function WorkMail({accountId}:{accountId:string}){
      {(['gmail','microsoft'] as const).map(provider=>{const connection=state.connections.find(c=>c.provider===provider);return <div key={provider} className="mt-3 space-y-2 border-t border-border pt-3"><p className="font-medium">{t(provider==='gmail'?'providerGmail':'providerMicrosoft')}</p>
       {!state.capabilities[provider]&&<p className="text-sm text-text-secondary">{t('setupRequired')}</p>}
       <div className="flex flex-wrap gap-2">{nativeAppearance&&state.capabilities[provider]&&!busy?<a className={control+" inline-flex items-center"} href="/work/mail" target="_blank" rel="noopener noreferrer">{t('openInBrowser')}</a>:<button className={control} disabled={busy||!state.capabilities[provider]||nativeAppearance} onClick={()=>void run(async current=>{const value=await api('',{action:'connect',provider});if(!current())return;const url=new URL(value.url);if(!['https://accounts.google.com','https://login.microsoftonline.com'].includes(url.origin))throw new Error('invalid');window.location.assign(url.href);})}>{t(connection?'reconnect':'connect')}</button>}
-       {connection&&<><button className={control} disabled={busy||!state.capabilities[provider]} onClick={()=>void browse(connection)}>{t('chooseMessages')}</button><button className={control} disabled={busy} onClick={()=>void run(async current=>{const result=await api('',{action:'disconnect',connectionId:connection.id});if(!current())return;setMailbox(null);setNotice(t(result.remoteRevoked?'disconnected':'disconnectedManual'));await load();})}>{t('disconnect')}</button></>}
+       {connection&&<><button className={control} disabled={busy||!state.capabilities[provider]} onClick={()=>void autoImportCurrentDispo(connection)}>{t('autoImportDispo')}</button><button className={control} disabled={busy||!state.capabilities[provider]} onClick={()=>void browse(connection)}>{t('chooseMessages')}</button><button className={control} disabled={busy} onClick={()=>void run(async current=>{const result=await api('',{action:'disconnect',connectionId:connection.id});if(!current())return;setMailbox(null);setNotice(t(result.remoteRevoked?'disconnected':'disconnectedManual'));await load();})}>{t('disconnect')}</button></>}
       </div>{connection&&<p className="text-xs text-text-secondary">{t(provider==='gmail'?'googleRevokeHelp':'microsoftRevokeHelp')}</p>}
      </div>;})}
     </section>
    </div>
    {mailbox&&<section className={card}><div className="flex flex-wrap items-center justify-between gap-2"><h2 className="text-lg font-semibold">{t('chooseMessages')}</h2><button className={control} onClick={()=>setMailbox(null)}>{t('close')}</button></div><p className="my-2 text-sm text-text-secondary">{t('selectionHelp')}</p>
-    <ul className="divide-y divide-border">{mailbox.messages.map(message=><li key={message.id} className="flex min-w-0 flex-wrap items-start gap-3 py-3"><div className="min-w-0 flex-1 basis-full break-words sm:basis-0"><p className="font-medium">{message.subject||t('noSubject')}</p><p className="break-all text-sm text-text-secondary">{message.from}</p>{message.receivedAt&&<time className="text-xs text-text-secondary">{new Date(message.receivedAt).toLocaleString(locale)}</time>}</div><button className={control} disabled={busy} onClick={()=>void run(async current=>{const result=await api('',{action:'import_provider',connectionId:mailbox.connection.id,messageId:message.id});await load();const value=await api('?item='+result.id);if(!current())return;setSelected(value);setNotice(t('imported'));})}>{t('importSelected')}</button></li>)}</ul>
+    <ul className="divide-y divide-border">{mailbox.messages.map(message=><li key={message.id} className="flex min-w-0 flex-wrap items-start gap-3 py-3"><div className="min-w-0 flex-1 basis-full break-words sm:basis-0"><p className="font-medium">{message.subject||t('noSubject')}</p><p className="break-all text-sm text-text-secondary">{message.from}</p>{message.receivedAt&&<time className="text-xs text-text-secondary">{new Date(message.receivedAt).toLocaleString(locale)}</time>}</div><button className={control} disabled={busy} onClick={()=>void run(async current=>{const result=await api('',{action:'import_provider',connectionId:mailbox.connection.id,messageId:message.id});await load();const value=await api('?item='+result.id);if(!current())return;setSelected(value);setNotice(t('imported'));await startAnalysis(value,current);})}>{t('importSelected')}</button></li>)}</ul>
     {!mailbox.messages.length&&<p className="py-3 text-sm">{t('emptyMailbox')}</p>}{mailbox.cursor&&<button className={control} disabled={busy} onClick={()=>void browse(mailbox.connection,mailbox.cursor??undefined)}>{t('nextMessages')}</button>}
    </section>}
    <section className={card}><h2 className="text-lg font-semibold">{t('privateArchive')}</h2><p className="my-2 text-sm text-text-secondary">{t('archiveHelp')}</p>
@@ -101,7 +129,8 @@ export default function WorkMail({accountId}:{accountId:string}){
   </>}
   {selected&&<section className={card} aria-label={t('messageDetails')}><div className="flex flex-wrap items-start justify-between gap-2"><h2 className="min-w-0 break-words text-lg font-semibold">{selected.subject||t('noSubject')}</h2><button className={control} onClick={()=>setSelected(null)}>{t('close')}</button></div><p className="my-2 break-all text-sm text-text-secondary">{selected.from}</p><p className="text-xs text-text-secondary">{t('externalSource')}</p>
    {selected.text?<pre className="my-4 whitespace-pre-wrap break-words font-sans text-sm">{selected.text}</pre>:<p className="my-4 text-sm text-text-secondary">{t('noPlainText')}</p>}
-   {!selected.imported&&<button className={control} disabled={busy} onClick={()=>void run(async current=>{await api('',{action:'import_inbound',itemId:selected.id});if(!current())return;setSelected({...selected,imported:true});setNotice(t('imported'));await load();})}>{t('importSelected')}</button>}
+   {!selected.imported&&<button className={control} disabled={busy} onClick={()=>void run(async current=>{await api('',{action:'import_inbound',itemId:selected.id});if(!current())return;const value={...selected,imported:true};setSelected(value);setNotice(t('imported'));await load();await startAnalysis(value,current);})}>{t('importSelected')}</button>}
+   {selected.imported&&<button className={control} disabled={busy} onClick={()=>void run(current=>startAnalysis(selected,current))}>{t('startAnalysis')}</button>}
    <p className="my-3 text-sm text-text-secondary">{t('downloadHelp')}</p><button className={control} disabled={busy} onClick={()=>void download(selected.original)}>{t('downloadOriginal')}</button>
    {!!selected.attachments.length&&<><h3 className="mt-4 font-semibold">{t('attachments')}</h3><ul className="divide-y divide-border">{selected.attachments.map(file=><li key={file.id} className="flex min-w-0 flex-wrap items-center gap-2 py-3"><span className="min-w-0 flex-1 basis-full break-all text-sm sm:basis-0">{file.name} · {Math.ceil(file.size/1024)} KB</span><button className={control} disabled={busy} onClick={()=>void download(file)}>{t('downloadSelected')}</button></li>)}</ul></>}
   </section>}

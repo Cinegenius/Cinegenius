@@ -3,7 +3,7 @@ import {rateLimit} from '@/lib/rateLimit';
 import {WorkMailError,workMailAlias,workMailDomain,workMailHash,workMailRequestJSON,workMailUuid} from '@/lib/work-mail';
 import {workMailCaller,workMailFailure,workMailJSON} from '@/lib/work-mail-route';
 import {workMailRPC} from '@/lib/work-mail-store';
-import {workMailCapabilities,workMailDisconnect,workMailImportProvider,workMailItem,workMailListProvider} from '@/lib/work-mail-service';
+import {workMailAnalysisDocument,workMailCapabilities,workMailDisconnect,workMailImportCurrentDispo,workMailImportProvider,workMailItem,workMailListProvider} from '@/lib/work-mail-service';
 import {createWorkMailAuthorization} from '@/lib/work-mail-oauth';
 
 export const runtime='nodejs';
@@ -52,8 +52,15 @@ export async function POST(request:NextRequest) {
    if(!workMailUuid(body.connectionId)||typeof body.messageId!=='string'||body.messageId.length<1||body.messageId.length>2048||/[\u0000-\u001f]/.test(body.messageId))throw new WorkMailError('invalid',400);
    return workMailJSON(await workMailImportProvider(actor.userId,body.connectionId,body.messageId));
   }
+  if(body.action==='import_current_dispo'){
+   if(!workMailUuid(body.connectionId))throw new WorkMailError('invalid',400);
+   return workMailJSON(await workMailImportCurrentDispo(actor.userId,body.connectionId));
+  }
   if(body.action==='import_inbound'){
    if(!workMailUuid(body.itemId))throw new WorkMailError('invalid',400);return workMailJSON(await workMailRPC(actor.userId,'item_import',{itemId:body.itemId}));
+  }
+  if(body.action==='analysis_document'){
+   if(!workMailUuid(body.itemId))throw new WorkMailError('invalid',400);return workMailJSON(await workMailAnalysisDocument(actor.userId,body.itemId));
   }
   throw new WorkMailError('invalid',400);
  }catch(cause){return workMailFailure(cause);}
