@@ -1,0 +1,27 @@
+# Genie: weniger unnötige Modellaufrufe · 24. November 2026
+
+Status: geprüfter Quellkandidat auf Hauptstand `3a766008`; Veröffentlichung und echte Verbrauchsmessung stehen separat aus. Kein Teil des eingefrorenen App-Rundgangs `a152170b`. Keine neue Modellinstallation, API-Zugangseinrichtung oder native Dispoänderung.
+
+## Umgesetzter Umfang
+
+Acht klar abgegrenzte Hilfethemen nutzen die bereits gepflegten Fragen und Antworten der Hilfeseite in allen 17 Sprachkatalogen: Crew-Profil, Firma, Firmenzugehörigkeit, Fotolimits, Anbieterkontakt, Locationbesichtigung, Lieferung und Plattformkosten. Kostenantworten bleiben die zentrale freigegebene Kurzfassung aus `SupportMediation`. Nur exakte eigenständige bekannte Fragen sowie wenige eindeutige deutsche/englische Varianten werden erkannt. Zusätzliche Anforderungen, Verneinungen, Folgegespräche, Suchkontext und Beschreibungserstellung laufen weiter durch die bisherigen getrennten Pfade. Keine breiten Stichworttreffer, keine erfundenen URLs, keine gemeinsam gespeicherten privaten Antworten.
+
+Der Länder-Check verarbeitet eine vollständig erkannte Folge kurzer Ja-/Nein-/Überspringen-Antworten ohne Modell: Crew → Ausrüstung → Registrierung → Angebot → Kontakt. Bei Nein folgt eine kurze Klärungsfrage. Freitext, nicht eindeutige Antworten, alte KI-Verläufe und Sprachabweichungen behalten den vollständigen Verlauf im bestehenden KI-Pfad. Einfache positive/negative Rückmeldungen enthalten weiterhin den Originalbeleg samt Nachrichtenindex und eine deutsche Fassung. Überspringen erzeugt keinen positiven Befund. Maximal fünf Punkte, keine automatische Einreichung; die bestehende ausdrückliche Bestätigung bleibt erforderlich. Rückmeldungen sind keine unabhängige Prüfung oder Veröffentlichungsfreigabe.
+
+Beim persönlichen Web-Genie-Zugang verwenden explizite Beschreibungshilfen und kurze erste Anfragen ohne Suchkontext bis320Zeichen das bereits für reguläre Konten verwendete `gpt-4.1-mini`. Lange erste Anfragen, weitere Gesprächsrunden und vorhandener Suchkontext behalten die bisherige persönliche Modellkonfiguration. Die Längengrenze ist eine einfache Weiterleitungsregel, kein Beweis für die Schwierigkeit einer Frage. Kein zweiter Klassifizierungsaufruf und kein automatischer teurer Wiederholungsversuch. Die persönliche Ausnahme vom Tageslimit bleibt erhalten. Native Analysemodell-/Denk-/Tier-Einstellungen bleiben unverändert.
+
+## Grenzen und Schutz
+
+Anmeldung, Herkunftsprüfung, Eingabe-/Geheimnisprüfung, Kontozuordnung, Smart-Berechtigung, bestehende Raten-/Tagesgrenzen, Antwortvalidierung und Abbruch bleiben erhalten. Auch feste Antworten laufen hinter den bestehenden API-Prüfungen und benötigen momentan die aktivierte Genie-Konfiguration. Sie sind keine vollständig offline nutzbare Browser-KI und umgehen keine Quoten.
+
+Die Änderungen sparen Modellaufrufe bzw. verwenden das kleinere bereits eingebundene Modell; sie beseitigen nicht die Website-API-Aufrufe. Keine belegte Halbierung der Vercel- oder KI-Rechnung. Produktivverbrauch nach Funktionsbereich und Modell sowie Sprachqualität freier kleiner-Modell-Antworten müssen nach Freigabe separat beobachtet werden. Für lokale KI wurde nichts installiert oder freigeschaltet. Gmail bleibt aus; die unveröffentlichte Mail-Basis darf nicht ungeprüft mit veröffentlicht werden.
+
+## Prüfungen
+
+Die fokussierten Tests prüfen die echten Serverhelfer und die API-Grenzen mit kontrollierter statt bezahlter Providerantwort. Alle17Sprachen: bekannte Hilfefragen sowie fünf feste positive Rückmeldungen, Nein und Überspringen. Zusätzlich Freitext-/Kontextbeibehaltung, Konto-/Origin-/Quota-/Abbruch-/Geheimnisschutz, Originalbelege, Bestätigung und Modellauswahl einschließlich320/321Grenze. Ein neuer Test erwartete zunächst den falschen Status für einen schon vor der Reservierung abgebrochenen Request; an das bestehende geschlossene503Verhalten angepasst, Abbruch innerhalb der Generierung bleibt separat504geprüft. Keine Änderung des produktiven Abbruchverhaltens.
+
+Browserprüfung nutzt die tatsächliche `CommunityFeedback`-Komponente und vorhandenes kompiliertes CSS bei320/1024px in17Sprachen. Authentifizierung, Entwurfsspeicher, Eingabevalidatoren und API-Antworten sind dort kontrollierte Fixtures; echte Validatoren/Generatoren werden getrennt in den Servertests geprüft. Fragefolgen, kein Überlauf, bewusste Bestätigung und Einreichen werden bedient. Das ist kein echter Login, keine reale Supportnachricht oder Geräteabnahme. Ein erster Fixturelauf verwendete einen nicht sicheren HTTP-Host ohne `crypto.randomUUID`; die Fixture wurde auf den sicheren localhost-Kontext korrigiert, die Produktquelle blieb unverändert.
+
+Prüflogs, Browserbilder und abschließende Zahlen: `/srv/cinegenius/handoffs/20261124-genie-costs/`. Vollständiger Produktionsbuild und Liveprüfung gehören zur gesondert freigegebenen, koordinierten Veröffentlichung.
+
+Abgeschlossene fachliche Prüfungen: **143 Tests**, **34 Komponenten-Browserfälle** (17 Sprachen ×320/1024px), **17 Kataloge/11752 Schlüssel**, **20 Designprüfungen** sowie gezieltes ESLint und vollständige TypeScript-Prüfung bestanden. Beide erzeugten Browserbilder visuell nachgeprüft. Der Browserprozess meldete beim Beenden Status143; sämtliche34 Fallmeldungen, Fehlerfreiheit und Ergebnisdatei waren zuvor vollständig geschrieben. Kein behaupteter fehlerfreier Prozessabschluss; die dokumentierten Assertions sind vollständig.

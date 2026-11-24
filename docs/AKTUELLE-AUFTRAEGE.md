@@ -1,3 +1,7 @@
+## Genie: unnötige Modellaufrufe reduzieren · 24. November 2026
+
+Nach Nutzerbestätigung umgesetzt: feste Hilfe, feste kurze Länder-Fragen und kleines Modell für kurze erste Webfragen/Beschreibungen. 143 fokussierte Tests sowie 34 Browserfälle in 17 Sprachen bestanden; Veröffentlichung separat. App-Guide und Teamgruppen bleiben unabhängig eingefroren für APP-Integration. Lokale KI erst nach separatem Leistungstest; kein neuer Release oder Gmail-Aktivierung. [Umfang und Grenzen](genie-costs-20261124.md).
+
 ## PostHog-Folgeauftrag · 24. November 2026 · Reihenfolge bestätigt
 
 1. **Einrichtungsabbrüche beobachtbar machen:** Registrierung und gemeinsamer Profilassistent erhalten minimale, zustimmungsgebundene Schritte/Versuche/Fehler/Abschlüsse für alle fünf aktiven Startbereiche. Auf `13445c23` / `dpl_Fpaw5aQyEbJZyavSVPrmr63ucbnV` live; drei zustimmungsgebundene synthetische Testereignisse in PostHog bestätigt. Diese Testfälle aus späteren Nutzerkennzahlen ausschließen. Keine Formularinhalte, Kontokennungen oder Sitzungsaufzeichnungen. [Vertrag und Prüfstand](posthog-setup-20261124.md).

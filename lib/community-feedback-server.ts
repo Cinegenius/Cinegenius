@@ -2,6 +2,7 @@ import 'server-only';
 import { createHash } from 'node:crypto';
 import { readFeedbackAdvice, feedbackParts, type FeedbackInput, type FeedbackSubmission, type FeedbackReportLabels } from '@/lib/community-feedback';
 import { readBoundedJson, GenieError, type GenieConfiguration } from '@/lib/genie-server';
+import { fixedFeedback } from '@/lib/feedback-fixed-server';
 
 export const FEEDBACK_INSTRUCTIONS = `You are Genie, the CineGenius product-feedback facilitator, not a search or coding agent.
 The member is the operator's local CineGenius contact, checking whether the actual product works in their country. Treat them as a collaborator, not a survey respondent. One very short, everyday question at a time. They can type any topic or skip questions.
@@ -29,6 +30,10 @@ export const FEEDBACK_SCHEMA = {
 export async function generateFeedback(request: Request, input: FeedbackInput, config: GenieConfiguration) {
   const signal = AbortSignal.any([request.signal, AbortSignal.timeout(25_000)]);
   try {
+    signal.throwIfAborted();
+    const fixed = await fixedFeedback(input);
+    signal.throwIfAborted();
+    if (fixed) return fixed;
     const response = await fetch('https://api.openai.com/v1/responses', {
       method:'POST', cache:'no-store', redirect:'error', signal,
       headers:{Authorization:`Bearer ${config.apiKey}`,'Content-Type':'application/json'},

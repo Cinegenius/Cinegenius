@@ -1,3 +1,7 @@
+## Getrennter gemeinsamer Genie-Kostenkandidat · 24. November 2026
+
+Web-Genie-Hilfe und Länder-Feedback erhalten feste Antworten; normale persönliche kurze Chatfragen und Beschreibungen nutzen das kleinere bestehende Modell. Native Dispoanalyse unverändert. Getrennt von App-Guide a152; noch nicht veröffentlicht oder auf dem Gerät geprüft. [Umfang und Grenzen](genie-costs-20261124.md).
+
 ## App-Startvertrag · 24. November 2026 · veröffentlicht
 
 Kompatibler Serververtrag auf `2e5ce070` / `dpl_94Eh94YmSfPn9B7BSs4jvRgaX5rA` READY und www geprüft: ein flüchtiger neutraler Authkontext bleibt beim Verdecken der Webseite stabil und rotiert bei SDK-/Kontokontextwechseln. Bisheriger Bootmarker, Serverrechte und alte Apps bleiben erhalten.22 fokussierte,87 angrenzende,34 kontrollierte Chromiumfälle,20 Designfälle,17 Kataloge sowie vollständiger Next-/TypeScript-Build bestanden. Fünf Live-HTTP- und zwei öffentliche Gast-Browserabläufe bestätigt, kein echter Login oder Gerätetest. Native2218-Übernahme und physischer Work-Kaltstart bleiben getrennt; ältere native Apps sind dadurch allein noch nicht behoben. [Vertrag und Prüfgrenzen](app-auth-context-20261124.md).
