@@ -92,9 +92,9 @@ function ResultArea({ area, groups, pending, errors, more, grid = false, limit: 
 
 /** Account/plan-scoped by the parent key; ephemeral filters never enter history
  * or storage. Combined responses serve both surfaces without duplicate reads. */
-export default function SmartSearchExplorer({ plan, initialGroups, initialMapGroups, onUnavailable, stored, setStored, discoverySeed,initialBrowseKey }: {
+export default function SmartSearchExplorer({ plan, initialGroups, initialMapGroups, onUnavailable, stored, setStored, discoverySeed,initialBrowseKey, translationInHeader = false }: {
   plan: SearchPlan; initialGroups: SearchGroup[]; initialMapGroups?: SearchGroup[]; onUnavailable: () => void;
-  discoverySeed?: string; initialBrowseKey?: string;
+  discoverySeed?: string; initialBrowseKey?: string; translationInHeader?: boolean;
   stored?: SmartSearchControls; setStored?: Dispatch<SetStateAction<SmartSearchControls>>;
 }) {
   const t = useTranslations("UnifiedSearch"), taxonomy = useTranslations("Taxonomy"), marketplace = useTranslations("MarketplaceCatalog");
@@ -311,14 +311,15 @@ export default function SmartSearchExplorer({ plan, initialGroups, initialMapGro
       </div>}
     </section>}
     {/* One map instance; switching views keeps zoom and current result filters. */}
-    <div className="smart-map-panel" hidden={!mapOpen || noNativeSources}>{mapReady && hasMapPositions && <SmartSearchMap groups={nativeAppearance ? mapPool : visible} active={mapOpen && !noNativeSources} bounds={filters.bounds} onApplyBounds={bounds => setFilters(value => ({ ...value, bounds }))} />}
+    <div className={`smart-map-panel${nativeAppearance && translationInHeader ? ` ${resultStyles.headerMap}` : ""}`} hidden={!mapOpen || noNativeSources}>{mapReady && hasMapPositions && <SmartSearchMap groups={nativeAppearance ? mapPool : visible} active={mapOpen && !noNativeSources} bounds={filters.bounds} onApplyBounds={bounds => setFilters(value => ({ ...value, bounds }))} />}
       {mapReady && !hasMapPositions && count > 0 && <p className="text-xs text-text-muted">{t("discovery.unmapped", { count })}</p>}
+      {nativeAppearance && translationInHeader && !noNativeSources && mapOpen && mapReady && hasMapPositions && <div className={resultStyles.mapInfo}><SmartSearchMapInfo native /></div>}
     </div>
     <div className="smart-result-list">
-    {nativeAppearance ? <div className={resultStyles.utilityRow} data-native-smart-utility="v1">
-      <ContentTranslationNotice hideAutomaticNotice />
+    {nativeAppearance ? (!translationInHeader && <div className={resultStyles.utilityRow} data-native-smart-utility="v1">
+      <ContentTranslationNotice hideStatusText />
       {!noNativeSources && mapOpen && mapReady && hasMapPositions && <SmartSearchMapInfo native />}
-    </div> : <ContentTranslationNotice />}
+    </div>) : <ContentTranslationNotice />}
     {!noNativeSources && errors.includes("initial") && <div role="alert" className="text-sm text-text-secondary"><p>{t("error")}</p><button type="button" className="min-h-11 min-w-11 text-gold" onClick={() => void read()} disabled={pending.includes("initial")}>{t("retry")}</button></div>}
     {!noNativeSources && pending.includes("initial") && <p role="status" className="text-sm text-text-muted">{t("loading")}</p>}
     {noNativeSources && <p role="status" className={resultStyles.emptySelection}>{t("discovery.chooseSources")}</p>}

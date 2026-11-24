@@ -5,6 +5,7 @@ import { useAuth, useSession } from "@clerk/nextjs";
 import { useLocale, useTranslations } from "next-intl";
 import Link from "next/link";
 import { ArrowUp, Building2, Globe, Info, Loader2, MapPin, ShoppingBag, UserRound, Users } from "lucide-react";
+import { ContentTranslationNotice } from "@/components/ContentTranslation";
 import DirectoryPage from "@/components/DirectoryPage";
 import SmartSearchPreview from "@/components/SmartSearchPreview";
 import SmartSearchExplorer, { type SmartSearchControls } from "@/components/SmartSearchExplorer";
@@ -215,12 +216,13 @@ function AccountNativeSmartLanding({ accountId, sessionId, loaded, allowed, onUn
         {accountId && <SmartSearchPreview />}
       </div>}
       {loaded && allowed && <>
-        <div className={styles.focus}>
+        <div className={styles.focus} data-native-smart-focus="v1">
           <div {...focusDrag} className={styles.focusChoices} role="group" aria-label={t("focus")}>
-            <button type="button" data-native-segment="profile" aria-pressed={mode !== "neutral"} onClick={() => setMode("profile")}><UserRound size={15} aria-hidden="true" />{t("profileFocus")}</button>
-            <button type="button" data-native-segment="neutral" aria-pressed={mode === "neutral"} aria-label={t("neutral")} onClick={() => setMode("neutral")}><Globe size={15} aria-hidden="true" />{search("discovery.all")}</button>
+            <button type="button" data-native-segment="profile" aria-pressed={mode !== "neutral"} aria-label={t("profileFocus")} title={t("profileFocus")} onClick={() => setMode("profile")}><UserRound size={15} aria-hidden="true" /><span>{t("profileFocus")}</span></button>
+            <button type="button" data-native-segment="neutral" aria-pressed={mode === "neutral"} aria-label={t("neutral")} title={t("neutral")} onClick={() => setMode("neutral")}><Globe size={15} aria-hidden="true" /><span>{search("discovery.all")}</span></button>
           </div>
-          <div role="status" aria-live="polite" className={styles.status}>{loading && <><Loader2 size={17} className="animate-spin" aria-hidden="true" />{t("loading")}</>}</div>
+          <div role="status" aria-live="polite" className={styles.focusProgress}>{loading && <><Loader2 size={17} className="animate-spin" aria-hidden="true" /><span className="sr-only">{t("loading")}</span></>}</div>
+          <ContentTranslationNotice hideStatusText />
           <details ref={focusDetails} className={styles.focusDetails} onKeyDown={event => { if (event.key === "Escape") { event.preventDefault(); event.currentTarget.open = false; event.currentTarget.querySelector("summary")?.focus(); } }}>
             <summary aria-label={t("focus")}><Info size={18} aria-hidden="true" /></summary>
             <div className={styles.focusPopover}>
@@ -234,7 +236,7 @@ function AccountNativeSmartLanding({ accountId, sessionId, loaded, allowed, onUn
         {/* The explorer owns its rows after mount. Replace it atomically only
             when a freshly authorized response is ready, including removals. */}
         <div ref={resultFrame} className={styles.results} data-native-smart-result-frame="v1" data-native-smart-result-current={data ? "v1" : undefined}>
-          {data ? <SmartSearchExplorer key={`${scope}:${result?.revision}`} discoverySeed={data.seed} plan={data.plan} initialGroups={data.groups} initialMapGroups={data.view === "map" ? data.groups : undefined} initialBrowseKey={result?.browseKey} onUnavailable={denyAccess} stored={controls} setStored={setControls} />
+          {data ? <SmartSearchExplorer translationInHeader key={`${scope}:${result?.revision}`} discoverySeed={data.seed} plan={data.plan} initialGroups={data.groups} initialMapGroups={data.view === "map" ? data.groups : undefined} initialBrowseKey={result?.browseKey} onUnavailable={denyAccess} stored={controls} setStored={setControls} />
             : reservedHeight > 0 && <div className={styles.placeholder} data-native-smart-placeholder="v1" aria-hidden="true" style={{ height: reservedHeight }}><span /><span /></div>}
         </div>
       </>}

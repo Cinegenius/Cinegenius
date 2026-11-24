@@ -1244,3 +1244,10 @@ html[data-cg-native-community-appearance="app"] [data-native-header-utility] {
     backdrop-filter:none;
   }
 }
+
+/* Native Work covers the retained web view: keep geometry and state, but paint
+   and expose only the native chrome until its existing coverage marker clears. */
+html[data-cg-native-community-appearance="app"][data-native-workspace-covered] :is([data-native-app-navbar], [data-native-app-bottom-nav]) {
+  visibility:hidden;
+  pointer-events:none;
+}

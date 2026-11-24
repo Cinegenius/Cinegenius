@@ -12,13 +12,13 @@
 .directories { display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); gap: 3px; margin: 8px 0; }
 .directories a { display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 4px; min-height: 44px; min-width: 0; padding: 4px 3px; color: var(--cg-app-accent,#c2f135); font-size: 11px; line-height: 15px; overflow-wrap: anywhere; text-align: center; }
 .directories svg { flex-shrink: 0; }
-.focus { display: flex; flex-wrap: wrap; align-items: center; gap: 4px; padding: 0; border: 0; margin: 4px 0; }
+.focus { display: flex; flex-wrap: nowrap; min-width:0; align-items: center; gap: 4px; padding: 0; border: 0; margin: 4px 0; }
 .focus button,.edit,.error button { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; min-width: 44px; padding: 6px 10px; border: 1px solid transparent; border-radius: 20px; background: transparent; color: var(--cg-app-muted,#b8b9be); font-size: 12px; cursor: pointer; }
 .focus button[aria-pressed="true"] { color: var(--cg-app-accent,#c2f135); background: color-mix(in srgb,var(--cg-app-accent,#c2f135) 10%,transparent); border-color: color-mix(in srgb,var(--cg-app-accent,#c2f135) 24%,transparent); }
-.focusChoices { display:flex; gap:3px; min-width:0; touch-action:pan-y; }
-.focusChoices button { display:flex; align-items:center; gap:5px; font-size:13px; touch-action:pan-y; user-select:none; -webkit-user-select:none; }
+.focusChoices { display:flex; flex:1; gap:3px; min-width:0; touch-action:pan-y; }
+.focusChoices button { display:flex; flex:1 1 0; padding-inline:5px; align-items:center; gap:5px; font-size:13px; touch-action:pan-y; user-select:none; -webkit-user-select:none; }
 .focusChoices button[data-native-segment-preview] { color:var(--cg-app-accent,#c2f135); background:color-mix(in srgb,var(--cg-app-accent,#c2f135) 10%,transparent); }
-.focusDetails { position:relative; margin-left:auto; }
+.focusDetails { position:relative; flex:0 0 44px; }
 .focusDetails summary { display:flex; align-items:center; justify-content:center; min-width:44px; min-height:44px; border-radius:22px; color:var(--cg-app-muted,#b8b9be); cursor:pointer; list-style:none; }
 .focusDetails summary::-webkit-details-marker { display:none; }
 .focusDetails summary:focus-visible { outline:2px solid var(--cg-app-accent,#c2f135); outline-offset:-2px; }
@@ -34,3 +34,12 @@
 .error button { color: var(--cg-app-accent,#c2f135); }
 .landing a:focus-visible,.landing button:focus-visible { outline: 2px solid var(--cg-app-accent,#c2f135); outline-offset: -2px; }
 @media(prefers-reduced-motion:reduce) { .status svg { animation: none; } }
+
+/* Keep the two focus choices and translation controls together, including long locales. */
+.focusChoices button > svg { flex:0 0 15px; }
+.focusChoices button > span { min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+:global(html[data-cg-native-community-appearance="app"]) .landing .focus > :global(.native-translation-notice) { display:flex; flex:0 0 auto; flex-wrap:nowrap; gap:0; margin-block:0; }
+:global(html[data-cg-native-community-appearance="app"]) .landing .focus > :global(.native-translation-notice) > button { flex:0 0 44px; width:44px; height:44px; padding:0; }
+
+.focusProgress { display:flex; flex:0 0 18px; width:18px; color:var(--cg-app-muted,#b8b9be); }
+.focusProgress:empty { display:none; }

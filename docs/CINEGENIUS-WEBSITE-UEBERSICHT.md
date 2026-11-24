@@ -1,3 +1,7 @@
+## App-Kopf und Smart-Bedienzeile · 24. November 2026 · neuer Kandidat auf e996
+
+Der bisherige Smart-/Settings-Stand e996 ist inzwischen veröffentlicht; der nach2220 gemeldete Kopf-/Dock-Fall folgt separat. Web-Kopf ohne alte54px-Sonnenreservierung mittig und vollbreit, verdeckte Web-Leisten unter nativem Work nur visuell ausgeblendet. Übersetzen/Aktualisieren in Für-dich/Alle-Zeile; keine zusätzlichen Original-/Übersetzt-Statustexte, Fehler/Retry und Karteninfo erhalten. Native Avatar-Reautorisierung ist Roots gesonderte2221-Arbeit. Kandidat zunächst unabhängig prüfen, kein paralleler Livegang. [Umfang, Prüfstand und Grenzen](app-header-smart-compact-20261124.md).
+
 ## Native Smart: freigegebene Fünferauswahl · 24. November 2026 · isolierter Quellkandidat
 
 Original A wurde ausdrücklich gewählt und auf Crew/Markt/Locations/Firmen/Jobs ohne oberen Smart-Schalter präzisiert. Fünf unabhängige Mehrfachschalter über der Filterleiste; auch keine Auswahl bleibt stabil. Alte Projektfilter bleiben privat erhalten, sind in Smart aber wirkungslos. Untere Smart-/Projekte-Ziele, vorhandene Filter, Karten und öffentliche Website erhalten. Auf94a9 vorbereitet, Kosten9dc getrennt; kein main-Update, Deploy oder Gerätebuild. [Umfang, Prüfstand und Grenzen](app-smart-sources-20261124.md). Die ältere Aussage „Schnellwahl nur Vorschau“ ist für diesen freigegebenen Umfang ersetzt.

@@ -80,3 +80,9 @@
   :global(html[data-cg-native-community-appearance="app"]) .explorer :global([data-native-browse-toolbar="v1"] > div:first-child),
   :global(html[data-cg-native-community-appearance="app"]) .explorer .emptySelection { background:Canvas; color:CanvasText; border-color:CanvasText; }
 }
+
+:global(html[data-cg-native-community-appearance="app"]) .explorer .headerMap { position:relative; }
+/* Keep the existing top-right zoom controls and top-left count reachable. */
+:global(html[data-cg-native-community-appearance="app"]) .explorer .mapInfo { position:absolute; top:8px; right:68px; z-index:10; border-radius:22px; background:var(--cg-app-surface,#1b1d23); }
+:global(html[data-cg-native-community-appearance="app"]) .explorer .mapInfo :global(summary) { min-width:44px; min-height:44px; }
+:global(html[data-cg-native-community-appearance="app"]) .explorer .mapInfo :global(.smart-map-info > div) { inset-inline-end:auto; right:-60px; top:calc(100% + 4px); max-height:min(320px,calc(100dvh - 180px)); overflow-y:auto; }

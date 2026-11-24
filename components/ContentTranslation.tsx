@@ -128,14 +128,14 @@ export function ContentTranslationChoice() {
   </div>;
 }
 
-export function ContentTranslationNotice({ hideAutomaticNotice = false }: { hideAutomaticNotice?: boolean } = {}) {
+export function ContentTranslationNotice({ hideAutomaticNotice = false, hideStatusText = false }: { hideAutomaticNotice?: boolean; hideStatusText?: boolean } = {}) {
   const {enabled, original, setOriginal, client} = useContext(Context);
   const t = useTranslations("contentTranslation");
   const native = useNativeAppAppearance();
   if (!enabled) return null;
   if (native) return <div className="content-translation-notice native-translation-notice">
-    {(!hideAutomaticNotice || original) && <span>{t(original ? "originalMode" : "notice")}</span>}
-    <button type="button" aria-label={t(original ? "showTranslated" : "showOriginal")} title={t(original ? "showTranslated" : "showOriginal")} onClick={() => setOriginal(!original)}><Languages size={18} aria-hidden="true" /></button>
+    {!hideStatusText && (!hideAutomaticNotice || original) && <span>{t(original ? "originalMode" : "notice")}</span>}
+    <button type="button" aria-label={t(original ? "showTranslated" : "showOriginal")} title={t(original ? "showTranslated" : "showOriginal")} aria-pressed={original} onClick={() => setOriginal(!original)}><Languages size={18} aria-hidden="true" /></button>
     {!original && <button type="button" aria-label={t("retry")} title={t("retry")} onClick={() => client?.refresh()}><RotateCw size={18} aria-hidden="true" /></button>}
   </div>;
   return <div className="content-translation-notice flex min-w-0 flex-wrap items-center gap-x-3 gap-y-1 text-xs text-text-muted">

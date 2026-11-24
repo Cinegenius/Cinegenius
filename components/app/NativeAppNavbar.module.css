@@ -12,7 +12,7 @@
   left: max(14px, env(safe-area-inset-left, 0px));
   right: max(14px, env(safe-area-inset-right, 0px));
   display: flex;
-  justify-content: flex-start;
+  justify-content: center;
   color: var(--native-ink);
   pointer-events: none;
 }
@@ -21,7 +21,8 @@
   align-items: center;
   justify-content: space-around;
   box-sizing: border-box;
-  flex: 0 0 calc(100% - 54px);
+  flex: 1 1 100%;
+  min-width: 0;
   height: 56px;
   gap: 0;
   padding: 5px;
@@ -34,34 +35,6 @@
   backdrop-filter: blur(20px);
   pointer-events: auto;
 }
-.themeToggle {
-  position: absolute;
-  right: 0;
-  align-self: center;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 44px;
-  height: 44px;
-  min-width: 44px;
-  min-height: 44px;
-  padding: 0;
-  border: 1px solid var(--native-border);
-  border-radius: 50%;
-  background: var(--native-surface);
-  background: color-mix(in srgb, var(--native-surface) 88%, transparent);
-  color: var(--native-ink);
-  box-shadow: 0 6px 24px rgb(0 0 0 / 15%), inset 0 1px rgb(255 255 255 / 7%);
-  -webkit-backdrop-filter: blur(20px);
-  backdrop-filter: blur(20px);
-  cursor: pointer;
-  pointer-events: auto;
-  touch-action: manipulation;
-  -webkit-tap-highlight-color: transparent;
-}
-.themeToggle:hover { color: var(--native-accent); }
-.themeToggle:focus-visible { outline: 2px solid var(--native-accent); outline-offset: 2px; }
-
 .action {
   position: relative;
   display: inline-flex;
@@ -133,5 +106,5 @@
 .spinner { animation: native-navbar-spin 1s linear infinite; }
 @keyframes native-navbar-spin { to { transform: rotate(360deg); } }
 @media (prefers-reduced-motion: reduce) { .spinner { animation: none; } }
-@media (prefers-reduced-transparency: reduce) { .bubble, .themeToggle { background: var(--native-surface); -webkit-backdrop-filter: none; backdrop-filter: none; } }
-@media (prefers-contrast: more) { .bubble, .themeToggle, .profileMenu { border-color: var(--native-ink); } }
+@media (prefers-reduced-transparency: reduce) { .bubble { background: var(--native-surface); -webkit-backdrop-filter: none; backdrop-filter: none; } }
+@media (prefers-contrast: more) { .bubble, .profileMenu { border-color: var(--native-ink); } }
