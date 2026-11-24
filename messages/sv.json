@@ -12578,14 +12578,14 @@
   },
   "AnalyticsPrivacy": {
     "settings": "Analysinställningar",
-    "banner": "Med ditt samtycke mäter PostHog (EU) besök på offentliga översikter, synliga nyheter och öppnade artiklar. Inga inspelningar. Ändra när som helst i analysinställningarna.",
+    "banner": "Med ditt samtycke mäter PostHog (EU) offentliga sidor, nyheter samt steg, slutföranden och fel vid registrering och profilskapande. Inga formuläruppgifter eller inspelningar. Ändra i analysinställningarna.",
     "reject": "Endast nödvändiga funktioner",
     "accept": "Tillåt analys",
     "close": "Stäng",
     "privacy": "Integritet",
     "storageError": "Ditt val kunde inte sparas. Analysen förblir avstängd.",
     "title": "Frivillig användningsanalys med PostHog",
-    "disclosure": "Endast med ditt samtycke använder vi PostHog, Inc. (EU-molnet) för att mäta offentliga sidkategorier, synliga nyhetskort och artikelöppningar. Vi skickar kategorin, ett offentligt artikel-ID och en slumpmässig identifierare i flikens minne. Inga söktexter, URL-parametrar, innehåll, kontouppgifter eller privata områden; inga personprofiler, automatisk klickinsamling eller sessionsinspelningar. Anslutningen behandlar tekniskt IP-adressen men lagrar den inte som analysuppgift. Redaktionen får endast sammanställda värden med minimitrösklar, inga personlistor. Valet lagras lokalt tills du ändrar det eller raderar webbläsardata. Återkallande stoppar nya händelser; tidigare skickade raderas inte automatiskt.",
+    "disclosure": "Endast med ditt samtycke använder vi PostHog, Inc. (EU-molnet) för att mäta offentliga sidkategorier, synliga nyhetskort och artikelöppningar. Vi skickar kategorin, ett offentligt artikel-ID och en slumpmässig identifierare i flikens minne. Inga söktexter, URL-parametrar, innehåll, kontouppgifter eller andra privata områden; inga personprofiler, automatisk klickinsamling eller sessionsinspelningar. Anslutningen behandlar tekniskt IP-adressen men lagrar den inte som analysuppgift. Redaktionen får endast sammanställda värden med minimitrösklar, inga personlistor. Valet lagras lokalt tills du ändrar det eller raderar webbläsardata. Återkallande stoppar nya händelser; tidigare skickade raderas inte automatiskt. Vid registrering och profilskapande mäter vi även nådda steg, åtgärder för att fortsätta eller spara, bekräftade slutföranden och fördefinierade felkategorier. Det valda området (t.ex. Crew eller företag) ingår, aldrig inmatade uppgifter, lösenord eller kontoidentifierare.",
     "providerPrivacy": "PostHogs integritetspolicy"
   },
   "locationMap": {

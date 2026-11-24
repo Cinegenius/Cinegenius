@@ -12578,14 +12578,14 @@
   },
   "AnalyticsPrivacy": {
     "settings": "Definições de análise",
-    "banner": "Com o teu consentimento, o PostHog (UE) mede visitas a diretórios públicos, notícias visíveis e artigos abertos. Sem gravações. Podes alterar a escolha nas definições de análise.",
+    "banner": "Com o teu consentimento, o PostHog (UE) mede páginas públicas, notícias e passos, conclusões e erros do registo e da criação do perfil. Sem dados dos formulários nem gravações. Altera a escolha nas definições de análise.",
     "reject": "Apenas funcionalidades essenciais",
     "accept": "Permitir análise",
     "close": "Fechar",
     "privacy": "Privacidade",
     "storageError": "A sua escolha não pôde ser guardada. A análise permanece desligada.",
     "title": "Análise de uso opcional com PostHog",
-    "disclosure": "Só com o teu consentimento usamos o PostHog, Inc. (nuvem UE) para medir categorias de páginas públicas, cartões de notícias visíveis e artigos abertos. Enviamos a categoria, um identificador público do artigo e um identificador aleatório na memória do separador. Sem pesquisas, parâmetros de URL, conteúdos, dados de conta ou áreas privadas; sem perfis pessoais, captura automática de cliques ou gravações de sessões. A ligação processa tecnicamente o IP, mas não o guarda como propriedade analítica. A redação recebe apenas valores agregados com limites mínimos, sem listas de pessoas. A escolha fica guardada localmente até a alterares ou apagares os dados do navegador. Retirar o consentimento impede novos eventos, mas não apaga automaticamente os anteriores.",
+    "disclosure": "Só com o teu consentimento usamos o PostHog, Inc. (nuvem UE) para medir categorias de páginas públicas, cartões de notícias visíveis e artigos abertos. Enviamos a categoria, um identificador público do artigo e um identificador aleatório na memória do separador. Sem pesquisas, parâmetros de URL, conteúdos, dados de conta ou outras áreas privadas; sem perfis pessoais, captura automática de cliques ou gravações de sessões. A ligação processa tecnicamente o IP, mas não o guarda como propriedade analítica. A redação recebe apenas valores agregados com limites mínimos, sem listas de pessoas. A escolha fica guardada localmente até a alterares ou apagares os dados do navegador. Retirar o consentimento impede novos eventos, mas não apaga automaticamente os anteriores. No registo e na criação do perfil, também medimos passos alcançados, ações de continuar ou guardar, conclusões confirmadas e categorias de erro predefinidas. Incluímos a área escolhida (por exemplo, Crew ou empresa), nunca dados introduzidos, palavras-passe ou identificadores da conta.",
     "providerPrivacy": "Aviso de privacidade do PostHog"
   },
   "locationMap": {

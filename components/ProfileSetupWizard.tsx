@@ -3,6 +3,8 @@ import ProfilePresentationPicker from "@/components/ProfilePresentationPicker";
 import { normalizeProfilePresentation, wantsProfileCover } from "@/lib/profile-presentation";
 import { selectQuickStartPresentation } from "@/lib/quick-start-flow";
 import { fetchSetup } from "@/lib/setup-fetch";
+import { useSetupAnalytics } from "@/lib/use-setup-analytics";
+import { setupAnalyticsArea } from "@/lib/setup-analytics";
 import CurrencySelect from "@/components/CurrencySelect";
 import HomeCrewPreference from "@/components/HomeCrewPreference";
 import { saveHomeCrewPreference } from "@/lib/home-crew-preference";
@@ -173,6 +175,10 @@ function ProfileSetupContent() {
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState("");
+  const captureSetup = useSetupAnalytics({flow: "profile_setup", area: setupAnalyticsArea(draft.intents),
+    step: !ready || loadError ? "loading" : draft.welcomeAcknowledged === false ? "welcome" : draft.step,
+    ready: !!user?.id && !finished,
+    errorCode: loadError ? "load_failed" : retrySeconds > 0 ? "rate_limited" : Object.keys(responsibleErrors).length ? "required_fields" : error ? "validation_or_request" : null});
   const [roleSearch, setRoleSearch] = useState("");
   const [departmentSearch, setDepartmentSearch] = useState("");
   const [companyCategorySearch, setCompanyCategorySearch] = useState("");
@@ -428,6 +434,7 @@ function ProfileSetupContent() {
   }
 
   async function next() {
+    captureSetup("setup_submitted");
     setError("");
     if (draft.step === "goals" && draft.intents.length !== 1) {
       setError(uiText("setup.goalRequired"));
@@ -526,6 +533,7 @@ function ProfileSetupContent() {
     const body = await response.json().catch(() => ({}));
     if (response.status === 429) setRetrySeconds(Number(response.headers.get("Retry-After")) || body.retryAfter || 10);
     if (!response.ok || body.completed !== true) throw new Error(uiText("Ui.text_24c7cf656ceb5c", { value1: String(body.error ?? uiText("Ui.text_6e4f4a5d9cceb9")) }));
+    captureSetup("setup_completed");
     if (completedDraft.completed.profile) {
       try {
         const settingsResponse = await fetchSetup("/api/user-settings", { cache: "no-store" });
@@ -541,6 +549,7 @@ function ProfileSetupContent() {
 
   async function finish() {
     if (saving || retrySeconds > 0) return;
+    captureSetup("setup_submitted");
     if (draft.intents.includes("company") && Object.keys(responsiblePersonErrors(draft.sections.company?.responsible, true)).length) {
       setDraft(current => ({ ...current, step: "details", activeIntent: "company" }));
       setResponsibleErrors(responsiblePersonErrors(draft.sections.company?.responsible, true));

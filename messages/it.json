@@ -12578,14 +12578,14 @@
   },
   "AnalyticsPrivacy": {
     "settings": "Impostazioni di analisi",
-    "banner": "Con il tuo consenso, PostHog (UE) misura visite agli elenchi pubblici, notizie visibili e aperture degli articoli. Nessuna registrazione. Puoi cambiare scelta nelle impostazioni di analisi.",
+    "banner": "Con il tuo consenso, PostHog (UE) misura pagine pubbliche, notizie, passaggi, completamenti ed errori di registrazione e creazione del profilo. Nessun dato dei moduli o registrazione. Scelta modificabile nelle impostazioni di analisi.",
     "reject": "Solo funzioni essenziali",
     "accept": "Consenti analisi",
     "close": "Chiudi",
     "privacy": "Privacy",
     "storageError": "Impossibile salvare la scelta. L’analisi resta disattivata.",
     "title": "Analisi facoltativa con PostHog",
-    "disclosure": "Solo con il tuo consenso usiamo PostHog, Inc. (cloud UE) per misurare categorie di pagine pubbliche, schede delle notizie visibili e aperture degli articoli. Inviamo categoria, ID pubblico dell’articolo e identificatore casuale nella memoria della scheda. Nessuna ricerca, parametro URL, contenuto, dato dell’account o area privata; nessun profilo personale, rilevamento automatico dei clic o registrazione delle sessioni. La connessione elabora tecnicamente l’IP, senza salvarlo come dato di analisi. La redazione riceve solo valori aggregati con soglie minime, senza elenchi di persone. La scelta resta salvata localmente finché non la cambi o cancelli i dati del browser. La revoca blocca i nuovi eventi, senza eliminare automaticamente quelli già inviati.",
+    "disclosure": "Solo con il tuo consenso usiamo PostHog, Inc. (cloud UE) per misurare categorie di pagine pubbliche, schede delle notizie visibili e aperture degli articoli. Inviamo categoria, ID pubblico dell’articolo e identificatore casuale nella memoria della scheda. Nessuna ricerca, parametro URL, contenuto, dato dell’account o altra area privata; nessun profilo personale, rilevamento automatico dei clic o registrazione delle sessioni. La connessione elabora tecnicamente l’IP, senza salvarlo come dato di analisi. La redazione riceve solo valori aggregati con soglie minime, senza elenchi di persone. La scelta resta salvata localmente finché non la cambi o cancelli i dati del browser. La revoca blocca i nuovi eventi, senza eliminare automaticamente quelli già inviati. Misuriamo anche i passaggi raggiunti, le azioni per proseguire o salvare, il completamento confermato e categorie di errore predefinite durante la registrazione e la creazione del profilo. È inclusa l’area scelta (ad esempio Crew o azienda), mai dati inseriti, password o identificativi dell’account.",
     "providerPrivacy": "Informativa privacy di PostHog"
   },
   "locationMap": {

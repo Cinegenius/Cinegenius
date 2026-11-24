@@ -12578,14 +12578,14 @@
   },
   "AnalyticsPrivacy": {
     "settings": "Analyse-Einstellungen",
-    "banner": "Mit deiner Zustimmung misst PostHog (EU) Aufrufe öffentlicher Übersichten sowie sichtbare News und geöffnete Artikel. Keine Aufzeichnungen. Jederzeit in den Analyse-Einstellungen änderbar.",
+    "banner": "Mit deiner Zustimmung misst PostHog (EU) öffentliche Seiten, News sowie Schritte, Abschlüsse und Fehler bei Registrierung und Profileinrichtung. Keine Formulareingaben oder Aufzeichnungen. Jederzeit in den Analyse-Einstellungen änderbar.",
     "reject": "Nur notwendige Funktionen",
     "accept": "Analyse erlauben",
     "close": "Schließen",
     "privacy": "Datenschutz",
     "storageError": "Deine Auswahl konnte nicht gespeichert werden. Die Analyse bleibt ausgeschaltet.",
     "title": "Freiwillige Nutzungsanalyse mit PostHog",
-    "disclosure": "Nur mit deiner Einwilligung messen wir über PostHog, Inc. (EU-Cloud) öffentliche Seitenkategorien, sichtbare News-Karten und Artikelaufrufe. Übertragen werden die Kategorie, eine öffentliche Artikel-ID und eine zufällige Kennung im Arbeitsspeicher des Tabs. Keine Suchtexte, URL-Parameter, Inhalte, Kontodaten oder privaten Bereiche; keine Personenprofile, automatische Klickerfassung oder Sitzungsaufzeichnungen. Die Verbindung verarbeitet technisch deine IP-Adresse, sie wird nicht als Analysemerkmal gespeichert. Die Redaktion erhält nur zusammengefasste Werte mit Mindestmengen, keine Personenlisten. Deine Auswahl bleibt lokal gespeichert, bis du sie änderst oder Browserdaten löschst. Widerruf stoppt neue Ereignisse; bereits übertragene Ereignisse werden nicht automatisch gelöscht.",
+    "disclosure": "Nur mit deiner Einwilligung messen wir über PostHog, Inc. (EU-Cloud) öffentliche Seitenkategorien, sichtbare News-Karten und Artikelaufrufe. Übertragen werden die Kategorie, eine öffentliche Artikel-ID und eine zufällige Kennung im Arbeitsspeicher des Tabs. Keine Suchtexte, URL-Parameter, Inhalte, Kontodaten oder sonstigen privaten Bereiche; keine Personenprofile, automatische Klickerfassung oder Sitzungsaufzeichnungen. Die Verbindung verarbeitet technisch deine IP-Adresse, sie wird nicht als Analysemerkmal gespeichert. Die Redaktion erhält nur zusammengefasste Werte mit Mindestmengen, keine Personenlisten. Deine Auswahl bleibt lokal gespeichert, bis du sie änderst oder Browserdaten löschst. Widerruf stoppt neue Ereignisse; bereits übertragene Ereignisse werden nicht automatisch gelöscht. Zusätzlich messen wir bei Registrierung und Profileinrichtung erreichte Schritte, Weiter-/Speicheraktionen, bestätigte Abschlüsse und festgelegte Fehlerkategorien. Der gewählte Bereich (z. B. Crew oder Firma) wird mitgesendet, niemals Eingaben, Passwörter oder Kontokennungen.",
     "providerPrivacy": "Datenschutzhinweise von PostHog"
   },
   "locationMap": {

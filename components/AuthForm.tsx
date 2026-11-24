@@ -10,6 +10,7 @@ import { Eye, EyeOff } from "lucide-react";
 import { finalizeThenNavigate, getMfaResendChannel, getPasswordSignInAction, resolveAuthNavigationUrl, selectSecondFactor, shouldRedirectForActiveSession } from "@/lib/sign-in-flow";
 import { classifyPasswordResetError, getPasswordResetRequestErrorMessage, PASSWORD_RESET_NEUTRAL_MESSAGE, PASSWORD_RESET_RESEND_COOLDOWN_SECONDS, validateNewPassword } from "@/lib/password-reset-flow";
 import { readableAuthError, type AuthErrorContext } from "@/lib/auth-error-message";
+import { useSetupAnalytics } from "@/lib/use-setup-analytics";
 
 type AuthMode = "sign-in" | "sign-up";
 type SignInStep = "credentials" | "email-code" | "mfa" | "reset-code" | "new-password";
@@ -619,6 +620,8 @@ function SignUpForm({ destination, signInDestination }: { destination: string; s
   const [lastName, setLastName] = useState("");
   const [legalAccepted, setLegalAccepted] = useState(false);
   const signUpAttemptStarted = useRef(false);
+  const captureSetup = useSetupAnalytics({flow: "registration", step, area: "unselected", ready: isLoaded && !isSignedIn,
+    errorCode: error || errors.global ? "validation_or_request" : null});
   const [submitting, setSubmitting] = useState(false);
   const submissionInFlight = useRef(false);
   const busy = fetchStatus === "fetching" || submitting;
@@ -646,7 +649,11 @@ function SignUpForm({ destination, signInDestination }: { destination: string; s
       () => finalizeThenNavigate(
         (params) => signUp.finalize(params),
         destination,
-        (url) => finishNavigation(url, destination, (target) => clerk.navigate(target, { replace: true })),
+        (url) => {
+          // Clerk calls this only after committing a session without pending tasks.
+          captureSetup("setup_completed");
+          return finishNavigation(url, destination, (target) => clerk.navigate(target, { replace: true }));
+        },
       ),
       setError,
       uiText("Ui.text_dadb5ea5e4bbac"),
@@ -660,6 +667,7 @@ function SignUpForm({ destination, signInDestination }: { destination: string; s
   const submitSignUp = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (!beginSubmission()) return;
+    captureSetup("setup_submitted");
     try {
       setError("");
       setMessage("");
@@ -710,6 +718,7 @@ function SignUpForm({ destination, signInDestination }: { destination: string; s
   const verifySignUp = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (!beginSubmission()) return;
+    captureSetup("setup_submitted");
     try {
       setError("");
       setMessage("");

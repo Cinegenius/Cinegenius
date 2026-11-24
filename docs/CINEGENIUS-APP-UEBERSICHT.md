@@ -1,3 +1,7 @@
+## Gemeinsame Einrichtungsanalyse · 24. November 2026 · Webkandidat
+
+Registrierung und gemeinsamer Web-Profilassistent erhalten vier minimale PostHog-Ereignisse nach erneuter freiwilliger Zustimmung. Keine Formularinhalte, Kontoidentitäten, Aufzeichnungen oder native Work-/Dokumentenmessung. Alle 17 Websprachen angepasst. **Nicht veröffentlicht; keine native Installation oder Geräteabnahme.** App2212-Quellen und Mail-Folgeauftrag bleiben erhalten. [Vertrag und Prüfgrenzen](posthog-setup-20261124.md).
+
 ## Freie Profildarstellung · 24. November 2026 · gemeinsamer Webbereich veröffentlicht
 
 Beim Anlegen eines Profils steht die freiwillige Frage: Automatisch, kleines Profilbild, großes Porträt oder Cover + Profilbild. Dieselbe Wahl ist später im Fotoschritt der Bearbeitung verfügbar, unabhängig von Crew/Talent/Anbieter. Bestehende Profile bleiben automatisch; Tätigkeiten, Talentangaben, Medien und Sichtbarkeit bleiben erhalten. Keine neue Pflichtangabe oder Migration. Gemeinsamer Webbereich nach Freigabe auf `9706bfc3` / `dpl_9Efrm4yUNkGDeHrF8538GGJiXLnN` veröffentlicht, www geprüft, aktueller App2212-Hauptstand erhalten. 193 gezielte Tests,88 kontrollierte Browserfälle,17 Sprachkataloge,20 Designprüfungen, TypeScript und Produktionsbuild bestanden; sechs HTTP- und sechs öffentliche Browserfälle bestanden. Keine native Installation oder physische Geräteabnahme durch diesen Auftrag. [Umfang, Speicherung und Prüfstand](profile-presentation-choice-20261124.md).

@@ -12578,14 +12578,14 @@
   },
   "AnalyticsPrivacy": {
     "settings": "Analyse-instellingen",
-    "banner": "Met je toestemming meet PostHog (EU) bezoeken aan openbare overzichten, zichtbare nieuwskaarten en geopende artikelen. Geen opnames. Altijd aanpasbaar via de analyse-instellingen.",
+    "banner": "Met je toestemming meet PostHog (EU) openbare pagina’s, nieuws en stappen, voltooiingen en fouten bij registratie en profielaanmaak. Geen formuliergegevens of opnames. Aanpasbaar via de analyse-instellingen.",
     "reject": "Alleen noodzakelijke functies",
     "accept": "Analyse toestaan",
     "close": "Sluiten",
     "privacy": "Privacy",
     "storageError": "Je keuze kon niet worden opgeslagen. Analyse blijft uitgeschakeld.",
     "title": "Vrijwillige gebruiksanalyse met PostHog",
-    "disclosure": "Alleen met je toestemming gebruiken we PostHog, Inc. (EU-cloud) voor openbare paginacategorieën, zichtbare nieuwskaarten en geopende artikelen. We versturen de categorie, een openbaar artikel-ID en een willekeurige code in het geheugen van het tabblad. Geen zoekteksten, URL-parameters, inhoud, accountgegevens of privépagina’s; geen persoonsprofielen, automatische klikregistratie of sessieopnames. De verbinding verwerkt technisch je IP-adres, maar slaat het niet op als analysekenmerk. De redactie ontvangt alleen totalen met minimumdrempels, geen personenlijsten. Je keuze blijft lokaal bewaard totdat je die wijzigt of browsergegevens wist. Intrekken stopt nieuwe gebeurtenissen; eerder verstuurde worden niet automatisch verwijderd.",
+    "disclosure": "Alleen met je toestemming gebruiken we PostHog, Inc. (EU-cloud) voor openbare paginacategorieën, zichtbare nieuwskaarten en geopende artikelen. We versturen de categorie, een openbaar artikel-ID en een willekeurige code in het geheugen van het tabblad. Geen zoekteksten, URL-parameters, inhoud, accountgegevens of andere privépagina’s; geen persoonsprofielen, automatische klikregistratie of sessieopnames. De verbinding verwerkt technisch je IP-adres, maar slaat het niet op als analysekenmerk. De redactie ontvangt alleen totalen met minimumdrempels, geen personenlijsten. Je keuze blijft lokaal bewaard totdat je die wijzigt of browsergegevens wist. Intrekken stopt nieuwe gebeurtenissen; eerder verstuurde worden niet automatisch verwijderd. Bij registratie en profielaanmaak meten we ook bereikte stappen, doorgaan-/opslaanacties, bevestigde voltooiing en vooraf bepaalde foutcategorieën. Het gekozen onderdeel (bijvoorbeeld Crew of bedrijf) wordt meegestuurd, nooit ingevulde gegevens, wachtwoorden of account-ID’s.",
     "providerPrivacy": "Privacyverklaring van PostHog"
   },
   "locationMap": {

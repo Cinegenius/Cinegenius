@@ -12578,14 +12578,14 @@
   },
   "AnalyticsPrivacy": {
     "settings": "Ustawienia analityki",
-    "banner": "Za Twoją zgodą PostHog (UE) mierzy wizyty w publicznych katalogach, widoczne wiadomości i otwarcia artykułów. Bez nagrywania. Zmień wybór w ustawieniach analityki.",
+    "banner": "Za Twoją zgodą PostHog (UE) mierzy publiczne strony, aktualności oraz kroki, ukończenia i błędy rejestracji i tworzenia profilu. Bez danych z formularzy i nagrań. Wybór zmienisz w ustawieniach analityki.",
     "reject": "Tylko funkcje podstawowe",
     "accept": "Zezwól na analitykę",
     "close": "Zamknij",
     "privacy": "Prywatność",
     "storageError": "Nie udało się zapisać wyboru. Analityka pozostaje wyłączona.",
     "title": "Opcjonalna analityka użytkowania z PostHog",
-    "disclosure": "Tylko za Twoją zgodą używamy PostHog, Inc. (chmura UE) do pomiaru kategorii publicznych stron, widocznych kart wiadomości i otwarć artykułów. Przesyłamy kategorię, publiczny identyfikator artykułu i losowy identyfikator w pamięci karty. Bez wyszukiwań, parametrów URL, treści, danych konta i obszarów prywatnych; bez profili osób, automatycznego rejestrowania kliknięć i nagrań sesji. Połączenie technicznie przetwarza IP, ale nie zapisuje go jako danych analitycznych. Redakcja otrzymuje tylko wartości zbiorcze z minimalnymi progami, bez list osób. Wybór jest zapisany lokalnie do zmiany lub wyczyszczenia danych przeglądarki. Wycofanie zgody zatrzymuje nowe zdarzenia, ale nie usuwa automatycznie wcześniejszych.",
+    "disclosure": "Tylko za Twoją zgodą używamy PostHog, Inc. (chmura UE) do pomiaru kategorii publicznych stron, widocznych kart wiadomości i otwarć artykułów. Przesyłamy kategorię, publiczny identyfikator artykułu i losowy identyfikator w pamięci karty. Bez wyszukiwań, parametrów URL, treści, danych konta i innych obszarów prywatnych; bez profili osób, automatycznego rejestrowania kliknięć i nagrań sesji. Połączenie technicznie przetwarza IP, ale nie zapisuje go jako danych analitycznych. Redakcja otrzymuje tylko wartości zbiorcze z minimalnymi progami, bez list osób. Wybór jest zapisany lokalnie do zmiany lub wyczyszczenia danych przeglądarki. Wycofanie zgody zatrzymuje nowe zdarzenia, ale nie usuwa automatycznie wcześniejszych. Podczas rejestracji i tworzenia profilu mierzymy też osiągnięte kroki, działania kontynuacji i zapisu, potwierdzone ukończenia i zdefiniowane kategorie błędów. Uwzględniamy wybrany obszar (np. Crew lub firma), nigdy wpisane dane, hasła ani identyfikatory konta.",
     "providerPrivacy": "Informacje o prywatności PostHog"
   },
   "locationMap": {

@@ -12745,14 +12745,14 @@
   },
   "AnalyticsPrivacy": {
     "settings": "Paramètres d’analyse",
-    "banner": "Avec votre accord, PostHog (UE) mesure les visites des annuaires publics, les actualités visibles et les articles ouverts. Aucun enregistrement. Modifiable dans les réglages d’analyse.",
+    "banner": "Avec votre accord, PostHog (UE) mesure les pages publiques, les actualités et les étapes, finalisations et erreurs d’inscription et de création du profil. Aucune saisie ni aucun enregistrement. Choix modifiable dans les paramètres d’analyse.",
     "reject": "Fonctionnalités essentielles uniquement",
     "accept": "Autoriser l’analyse",
     "close": "Fermer",
     "privacy": "Confidentialité",
     "storageError": "Votre choix n’a pas pu être enregistré. L’analyse reste désactivée.",
     "title": "Analyse d’utilisation optionnelle avec PostHog",
-    "disclosure": "Uniquement avec votre consentement, nous utilisons PostHog, Inc. (cloud UE) pour mesurer les catégories de pages publiques, les cartes d’actualités visibles et les articles ouverts. Nous transmettons la catégorie, un identifiant public d’article et un identifiant aléatoire en mémoire dans l’onglet. Aucun texte de recherche, paramètre d’URL, contenu, donnée de compte ou espace privé ; aucun profil personnel, suivi automatique des clics ou enregistrement de session. La connexion traite techniquement votre adresse IP, sans la stocker comme propriété d’analyse. La rédaction reçoit uniquement des valeurs agrégées soumises à des seuils minimaux, sans liste de personnes. Votre choix reste enregistré localement jusqu’à sa modification ou l’effacement des données du navigateur. Le retrait arrête les nouveaux événements, sans supprimer automatiquement ceux déjà transmis.",
+    "disclosure": "Uniquement avec votre consentement, nous utilisons PostHog, Inc. (cloud UE) pour mesurer les catégories de pages publiques, les cartes d’actualités visibles et les articles ouverts. Nous transmettons la catégorie, un identifiant public d’article et un identifiant aléatoire en mémoire dans l’onglet. Aucun texte de recherche, paramètre d’URL, contenu, donnée de compte ou autre espace privé ; aucun profil personnel, suivi automatique des clics ou enregistrement de session. La connexion traite techniquement votre adresse IP, sans la stocker comme propriété d’analyse. La rédaction reçoit uniquement des valeurs agrégées soumises à des seuils minimaux, sans liste de personnes. Votre choix reste enregistré localement jusqu’à sa modification ou l’effacement des données du navigateur. Le retrait arrête les nouveaux événements, sans supprimer automatiquement ceux déjà transmis. Nous mesurons aussi les étapes atteintes, les actions pour continuer ou enregistrer, les finalisations confirmées et des catégories d’erreur prédéfinies lors de l’inscription et de la création du profil. Le domaine choisi (par exemple Crew ou entreprise) est inclus, jamais les saisies, mots de passe ou identifiants de compte.",
     "providerPrivacy": "Avis de confidentialité PostHog"
   },
   "locationMap": {

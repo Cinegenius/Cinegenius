@@ -1,3 +1,11 @@
+## PostHog-Folgeauftrag · 24. November 2026 · Reihenfolge bestätigt
+
+1. **Einrichtungsabbrüche beobachtbar machen:** Registrierung und gemeinsamer Profilassistent erhalten minimale, zustimmungsgebundene Schritte/Versuche/Fehler/Abschlüsse für alle fünf aktiven Startbereiche. Vorbereitet; Veröffentlichung und echte Ereignisankunft separat. Keine Formularinhalte, Kontokennungen oder Sitzungsaufzeichnungen. [Vertrag und Prüfstand](posthog-setup-20261124.md).
+2. **Danach Herkunft und Zählung:** Länderstatistik und stabilere anonyme Zählung gesondert vorbereiten. Bestehende PostHog-Werte sind keine verifizierten Personenzahlen. Kein GPS, keine rückwirkend erfundenen Herkunftsdaten.
+3. **Danach News:** Sichtbarkeit und Öffnungen anhand belastbarer Messung verbessern. Geringe Aufrufzahlen allein sind kein belegter UI-Fehler.
+
+Diese Arbeit folgt auf die veröffentlichten Einrichtungs-/Admin-/Profilkorrekturen. Laufende App-, Mail- und Redaktionsaufträge bleiben getrennt erhalten; kein neuer täglicher Agent.
+
 ## Aktueller WEB-Folgeauftrag · 24. November 2026
 
 Die freiwillige Profildarstellung ist nach Markus’ Freigabe auf `9706bfc3` / `dpl_9Efrm4yUNkGDeHrF8538GGJiXLnN` veröffentlicht und auf www geprüft. Schon in der Erstellung und später änderbar: vier Optionen, bestehende Profile automatisch, keine zusätzlichen Pflichtbilder. 193 gezielte Tests,88 kontrollierte Browserfälle,17 Sprachkataloge,20 Designprüfungen, TypeScript und Produktionsbuild bestanden; sechs HTTP- und sechs öffentliche Browserfälle sowie ausgelieferte Darstellungsbausteine live bestätigt. Aktueller App2212-Hauptstand erhalten, keine Migration oder native Installation. App-/Mail-Aufträge bleiben getrennt. [Vertrag und Belege](profile-presentation-choice-20261124.md).

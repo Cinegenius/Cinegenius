@@ -12578,14 +12578,14 @@
   },
   "AnalyticsPrivacy": {
     "settings": "Analitikai beállítások",
-    "banner": "Hozzájárulásoddal a PostHog (EU) méri a nyilvános oldalak látogatását, a látható híreket és a megnyitott cikkeket. Felvétel nélkül. Az elemzési beállításokban bármikor módosítható.",
+    "banner": "Hozzájárulásoddal a PostHog (EU) méri a nyilvános oldalakat, híreket, valamint a regisztráció és profilkészítés lépéseit, befejezését és hibáit. Űrlapadatok és felvételek nélkül. Az analitikai beállításokban módosítható.",
     "reject": "Csak alapvető funkciók",
     "accept": "Analitika engedélyezése",
     "close": "Bezárás",
     "privacy": "Adatvédelem",
     "storageError": "A választás nem menthető. Az analitika kikapcsolva marad.",
     "title": "Opcionális használatelemzés a PostHoggal",
-    "disclosure": "Csak hozzájárulásoddal használjuk a PostHog, Inc. EU-felhőjét a nyilvános oldalkategóriák, látható hírkártyák és cikkmegnyitások mérésére. Az oldalkategóriát, a cikk nyilvános azonosítóját és a böngészőlap memóriájában tárolt véletlen azonosítót küldjük el. Keresések, URL-paraméterek, tartalmak, fiókadatok és privát területek nem kerülnek átadásra; nincs személyprofil, automatikus kattintáskövetés vagy munkamenet-felvétel. A kapcsolat technikailag feldolgozza az IP-címet, de nem tárolja elemzési adatként. A szerkesztőség csak minimumküszöbökhöz kötött összesített értékeket kap, személylistákat nem. Választásod helyben tárolódik a módosításig vagy a böngészőadatok törléséig. Visszavonás után új eseményeket nem küldünk, a korábbiak nem törlődnek automatikusan.",
+    "disclosure": "Csak hozzájárulásoddal használjuk a PostHog, Inc. EU-felhőjét a nyilvános oldalkategóriák, látható hírkártyák és cikkmegnyitások mérésére. Az oldalkategóriát, a cikk nyilvános azonosítóját és a böngészőlap memóriájában tárolt véletlen azonosítót küldjük el. Keresések, URL-paraméterek, tartalmak, fiókadatok és egyéb privát területek nem kerülnek átadásra; nincs személyprofil, automatikus kattintáskövetés vagy munkamenet-felvétel. A kapcsolat technikailag feldolgozza az IP-címet, de nem tárolja elemzési adatként. A szerkesztőség csak minimumküszöbökhöz kötött összesített értékeket kap, személylistákat nem. Választásod helyben tárolódik a módosításig vagy a böngészőadatok törléséig. Visszavonás után új eseményeket nem küldünk, a korábbiak nem törlődnek automatikusan. A regisztráció és profilkészítés során az elért lépéseket, a továbblépési és mentési műveleteket, a visszaigazolt befejezést és előre meghatározott hibakategóriákat is mérjük. A választott területet (például Crew vagy cég) elküldjük, a megadott adatokat, jelszavakat és fiókazonosítókat soha.",
     "providerPrivacy": "A PostHog adatvédelmi tájékoztatója"
   },
   "locationMap": {
