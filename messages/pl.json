@@ -12502,7 +12502,20 @@
       "privacy": "Prywatność"
     },
     "errorSearch": "Miejsce lub zawód są niejasne. Proszę określić zawód, miasto oraz, jeśli potrzeba, kraj.",
-    "errorInDevelopment": "Funkcja Smart jest wciąż w fazie rozwoju."
+    "errorInDevelopment": "Funkcja Smart jest wciąż w fazie rozwoju.",
+    "appGuide": {
+      "title": "Poznaj aplikację",
+      "step": "{current} z {total}",
+      "smart": "Na dole w Smart znajdziesz ekipę, firmy, lokacje i giełdę. Wyszukiwarka i filtry pomogą w wyborze.",
+      "projects": "Na dole w Projektach znajdziesz projekty filmowe i możesz tworzyć własne.",
+      "work": "W Work znajdziesz Analizę i Floor Scanner do analizowania planów dnia zdjęciowego i planowania lokacji. Każde narzędzie uruchamiasz samodzielnie.",
+      "messages": "Dymek u góry otwiera wiadomości, współpracowników, HOMIES i grupy.",
+      "skip": "Pomiń",
+      "back": "Wstecz",
+      "next": "Dalej",
+      "done": "Zaczynamy",
+      "reopen": "Przewodnik po aplikacji"
+    }
   },
   "GenieWriting": {
     "open": "Pisz z Genie",

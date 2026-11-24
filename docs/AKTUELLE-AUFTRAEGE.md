@@ -1,3 +1,7 @@
+## Gemeinsame App-Übernahme · 24. November 2026 · vor Veröffentlichung
+
+Team601 und Guidea152 auf3a konkret zusammenführen und prüfen. Kein Deploy bis APP-Root den nativen Guide-/Assetsabgleich bestätigt. Neue Kostenarbeit bleibt getrennt; Mailflag/Geheimnisse und Datenbank unverändert. Exakten zusätzlichen3a-Mailumfang gegenüber Live2e5 ausdrücklich mitführen, da der Archiv-Analyseweg nicht global durch den Mailflag abgeschaltet ist. [Umfang und Prüfung](app-team-guide-integration-20261124.md).
+
 ## App-Folgeauftrag · Team-Nachrichtengruppen · 24. November 2026
 
 Die direkt beauftragte senkrechte Gruppenliste mit Admin-Plus wird auf dem aktuellen Hauptstand3a766008 vorbereitet. 24 Rechte-/API-/Bridgefälle,29 angrenzende Fälle,33 kontrollierte Browserfälle,17 Sprachen,20 Designprüfungen sowie ESLint/TypeScript bestanden. Geprüften Commit und tatsächlichen Veröffentlichungsstatus mit APP/WEB abstimmen; vollständiger Next-Build und physische Gruppenbedienung bleiben separat. Bereits veröffentlichte Authkontextkorrektur, native2218-Fassung und paralleler Filmplaneditor erhalten. Neue Ordner-/Teilfunktionen sind getrennte Planung; Gmail/TestFlight bleiben unaktiviert. [Umfang und Prüfgrenzen](work-team-groups-20261124.md).

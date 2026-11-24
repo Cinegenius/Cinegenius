@@ -12433,7 +12433,20 @@
       "privacy": "Privacidade"
     },
     "errorSearch": "O local ou profissão não está claro. Por favor, especifique a profissão, cidade e, se necessário, país.",
-    "errorInDevelopment": "O Smart ainda está em desenvolvimento."
+    "errorInDevelopment": "O Smart ainda está em desenvolvimento.",
+    "appGuide": {
+      "title": "Descobre a app",
+      "step": "{current} de {total}",
+      "smart": "Em Smart, em baixo, encontras profissionais, empresas, locais e o mercado. Usa a pesquisa e os filtros para escolher.",
+      "projects": "Em Projetos, em baixo, podes explorar projetos de cinema e criar os teus.",
+      "work": "Em Work encontras Análise e Floor Scanner para analisar folhas de serviço e planear locais de rodagem. És tu que inicias cada ferramenta.",
+      "messages": "O balão no topo abre as mensagens, colegas, HOMIES e grupos.",
+      "skip": "Saltar",
+      "back": "Voltar",
+      "next": "Seguinte",
+      "done": "Começar",
+      "reopen": "Visita guiada à app"
+    }
   },
   "ListingFreshness": {
     "notEnrolled": "As verificações de atualidade ainda não começaram para esta listagem.",

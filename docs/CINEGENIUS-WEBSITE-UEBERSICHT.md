@@ -1,6 +1,14 @@
+## Gemeinsame geschützte Team-/Genie-Quelle · 24. November 2026 · Veröffentlichung zurückgehalten
+
+Team601 und Guidea152 werden auf3a zusammengeführt, ohne zusätzliche Kostenoptimierung.185 gezielte Fälle,17 Kataloge/11760 Schlüssel,20 Designfälle, ESLint, vollständiges TypeScript und4 gemeinsame Komponenten-Browserfälle bestanden. Native Guide-/Assetsbestätigung und normaler Release bleiben separat; kein Deploy, keine Gmail-Aktivierung. Gegenüber Live2e5 enthält3a zusätzlich28 Dateien zur Mailanalyse und Auth-Dokumentation. Der Mailflag sperrt Providerzugriff, nicht die Vorbereitung eigener Archivdokumente. [Exakter Umfang und Grenzen](app-team-guide-integration-20261124.md).
+
 ## Gemeinsame Work-Gruppenseite · 24. November 2026 · Quellkandidat
 
 Die geschützte gemeinsame Teamseite wird als Gruppenliste mit Admin-Plus vereinfacht. Serverseitige Mitgliedschaft und getrennte Gruppenrechte bleiben maßgeblich; private Eingaben bleiben nach Fehlern erhalten. Keine neue API oder Migration.24 lokale SQL-/HTTP-/Bridge-Fälle,29 angrenzende Tests,33 kontrollierte Chromiumfälle,17 Sprachkataloge,20 Designfälle, ESLint und vollständiges TypeScript bestanden. Frisch geprüftes www bleibt auf dem Authkontext-Release2e5; die neue Gruppenoberfläche ist noch nicht veröffentlicht. Native Editor-/Ordnerarbeit läuft getrennt. [Vertrag und Prüfgrenzen](work-team-groups-20261124.md).
+
+## Genie-App-Rundgang · 24. November 2026 · Quellkandidat
+
+Vier kurze Schritte im vorhandenen Genie, überspringbar und erneut aufrufbar; Anleitung ohne KI-/Datenanfrage. App-Hell/Dunkel-Knopfleiste ausgeblendet, aktuelle Darstellung erhalten. Beginn erst nach Anmeldung auf einer sichtbaren bereiten Community-Seite; direkter nativer Work-Kaltstart benötigt noch getrennte Integration. 104 gezielte Tests,64 kontrollierte Browserfälle,20 Designfälle,17 Sprachkataloge,ESLint und vollständiges TypeScript bestanden; Details im [Vertrag und Prüfbeleg](app-genie-guide-20261124.md). Noch nicht veröffentlicht/installiert. Native Menüarbeit und Teamgruppen bleiben abgestimmt separat.
 
 ## Native App-Brücke · 24. November 2026 · veröffentlicht
 

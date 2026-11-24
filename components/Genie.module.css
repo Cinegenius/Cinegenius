@@ -187,3 +187,23 @@
   :global(body:has(.locations-discovery-map)) .launcher { width: 48px; padding: 0; }
   :global(body:has(.locations-discovery-map)) .launcher > span { display: none; }
 }
+
+.chatPanel { display:contents; }
+.chatPanel[hidden] { display:none; }
+
+/* The app tour shares Genie's existing panel and never covers a second assistant. */
+.guide { min-height:0; overflow-y:auto; overscroll-behavior:contain; padding:4px 16px 16px; }
+.guideTop { display:flex; align-items:center; justify-content:space-between; gap:8px; font-size:13px; }
+.guideTop button, .guideActions button, .guideReplay { min-height:44px; padding:8px 12px; border:1px solid var(--color-border); border-radius:12px; color:inherit; background:transparent; font-size:14px; overflow-wrap:anywhere; }
+.guideTop button { border:0; color:var(--color-text-secondary); }
+.guideProgress { margin:8px 0 12px; font-size:12px; color:var(--color-text-secondary); }
+.guideIcon { color:var(--color-gold); margin-bottom:10px; }
+.guide h3 { margin:0; font-size:21px; font-weight:600; overflow-wrap:anywhere; }
+.guide h3:focus { outline:none; }
+.guideBody { margin:10px 0 18px; font-size:15px; line-height:1.55; overflow-wrap:anywhere; }
+.guideActions { display:flex; justify-content:space-between; gap:10px; }
+.guideActions button { min-width:0; flex:1; }
+.guideActions button:disabled { opacity:.4; }
+.guideActions .guideNext { background:var(--color-gold); color:var(--color-bg-primary); font-weight:600; }
+.guideReplay { flex-shrink:0; margin:4px 14px; text-align:left; color:var(--color-gold); }
+.guide button:focus-visible, .guideReplay:focus-visible { outline:2px solid var(--color-gold); outline-offset:2px; }

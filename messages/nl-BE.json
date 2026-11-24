@@ -12502,7 +12502,20 @@
       "privacy": "Privacy"
     },
     "errorSearch": "De plaats of het beroep is niet duidelijk. Geef het beroep, de stad en zo nodig het land preciezer aan.",
-    "errorInDevelopment": "Smart is nog in ontwikkeling."
+    "errorInDevelopment": "Smart is nog in ontwikkeling.",
+    "appGuide": {
+      "title": "Ontdek de app",
+      "step": "{current} van {total}",
+      "smart": "Onderaan bij Smart vind je crew, bedrijven, locaties en de marktplaats. Gebruik zoeken en filters om je keuze te maken.",
+      "projects": "Onderaan bij Projecten vind je filmprojecten en kun je eigen projecten aanmaken.",
+      "work": "In Work vind je Analyse en Floor Scanner om callsheets te analyseren en locaties te plannen. Je start elk hulpmiddel zelf.",
+      "messages": "Via het tekstballonnetje bovenaan open je berichten, collega’s, HOMIES en groepen.",
+      "skip": "Overslaan",
+      "back": "Terug",
+      "next": "Volgende",
+      "done": "Aan de slag",
+      "reopen": "Rondleiding door de app"
+    }
   },
   "GenieWriting": {
     "open": "Schrijven met Genie",
