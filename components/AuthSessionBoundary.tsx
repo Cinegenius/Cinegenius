@@ -5,9 +5,16 @@ import { Loader2 } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { Fragment, useEffect, useRef } from "react";
 import { clearConversation } from "@/lib/genie-conversation";
+import { useNativeAppAppearance } from "@/lib/use-native-app-appearance";
+import { useNativeCapability } from "@/lib/use-native-capability";
 
 function SessionTransition() {
   const t = useTranslations("SessionTransition");
+  const nav = useTranslations("nav");
+  const nativeAppearance = useNativeAppAppearance();
+  const installedBridge = useNativeCapability("workspace");
+  // AppChrome may remove its appearance marker while this transition is shown.
+  const nativeContext = nativeAppearance || installedBridge;
   return (
     <div className="flex min-h-screen flex-col items-center justify-center gap-4 px-4 text-center">
       <p role="status" className="flex items-center gap-2 text-text-secondary">
@@ -16,8 +23,8 @@ function SessionTransition() {
       </p>
       {/* A recovery click must fetch a new server tree even if Clerk navigation failed. */}
       {/* eslint-disable-next-line @next/next/no-html-link-for-pages */}
-      <a href="/" className="inline-flex min-h-11 items-center text-sm text-gold hover:underline">
-        {t("home")}
+      <a href={nativeContext ? "/sign-in" : "/"} className="inline-flex min-h-11 items-center text-sm text-gold hover:underline">
+        {nativeContext ? nav("signIn") : t("home")}
       </a>
     </div>
   );
