@@ -1,6 +1,6 @@
-## Native App-Brücke · 24. November 2026 · geprüfter Serverkandidat
+## Native App-Brücke · 24. November 2026 · veröffentlicht
 
-Nur für vorhandene native Appmerkmale ergänzt der bestehende Anmelde-/Starthook einen zufälligen flüchtigen Kontextmarker. Normale Websitegestaltung, Anmeldung, Berechtigungen, APIs und17 Sprachkataloge bleiben unverändert. Der Marker ist keine Zugriffsfreigabe; er unterstützt den getrennten nativen Work-Startfix.22 fokussierte und34 kontrollierte Chromiumfälle, Design/Sprachcheck und fokussiertes TypeScript bestanden; vollständiger Produktionsbuild, Veröffentlichung und echte Geräteprüfung bleiben separat. [Vertrag und Grenzen](app-auth-context-20261124.md).
+Die enge additive App-Brücke ist auf `2e5ce070` / `dpl_94Eh94YmSfPn9B7BSs4jvRgaX5rA` READY und www geprüft. Normale Websitegestaltung, Anmeldung, Berechtigungen, APIs und17 Sprachkataloge bleiben erhalten. Der flüchtige Marker gewährt keinen Zugriff und unterstützt nur den getrennten nativen Work-Startfix.22 fokussierte,87 angrenzende,34 kontrollierte Chromiumfälle sowie Design/Sprachen und vollständiger Produktionsbuild bestanden; fünf Live-HTTP- und zwei Gast-Browserabläufe bestätigt. Keine neue DB-/Mail-/Provideränderung, kein echter Login oder Gerätebeleg. [Vertrag und Grenzen](app-auth-context-20261124.md).
 
 ## PostHog-Einrichtungsanalyse · 24. November 2026 · veröffentlicht
 

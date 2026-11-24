@@ -1,6 +1,6 @@
-## App-Startvertrag · 24. November 2026 · geprüfter Serverkandidat
+## App-Startvertrag · 24. November 2026 · veröffentlicht
 
-Ein zusätzlicher flüchtiger Authkontext trennt aufgelösten SDK-Scope von bloßer Sichtbarkeit. Das ist die kompatible Webvoraussetzung für die Korrektur des auf iPad2217 reproduzierten Work-Kaltstartfehlers. Bestehender Bootmarker, Serverrechte und alte Apps bleiben erhalten; native2218-Übernahme, Veröffentlichung und Geräteabnahme sind noch gesondert offen.22 fokussierte Fälle und34 kontrollierte Chromiumfälle erfolgreich, kein echter Login; WebKit hier mangels Systembibliotheken nicht gestartet. [Vertrag und Prüfgrenzen](app-auth-context-20261124.md).
+Kompatibler Serververtrag auf `2e5ce070` / `dpl_94Eh94YmSfPn9B7BSs4jvRgaX5rA` READY und www geprüft: ein flüchtiger neutraler Authkontext bleibt beim Verdecken der Webseite stabil und rotiert bei SDK-/Kontokontextwechseln. Bisheriger Bootmarker, Serverrechte und alte Apps bleiben erhalten.22 fokussierte,87 angrenzende,34 kontrollierte Chromiumfälle,20 Designfälle,17 Kataloge sowie vollständiger Next-/TypeScript-Build bestanden. Fünf Live-HTTP- und zwei öffentliche Gast-Browserabläufe bestätigt, kein echter Login oder Gerätetest. Native2218-Übernahme und physischer Work-Kaltstart bleiben getrennt; ältere native Apps sind dadurch allein noch nicht behoben. [Vertrag und Prüfgrenzen](app-auth-context-20261124.md).
 
 ## Gemeinsame Einrichtungsanalyse · 24. November 2026 · Webbereich veröffentlicht
 
