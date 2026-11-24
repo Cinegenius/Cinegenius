@@ -1,6 +1,6 @@
 # PostHog · Registrierung und Einrichtung · 24. November 2026
 
-Nach dem lesenden Seitencheck hat Markus die vorgeschlagene Reihenfolge bestätigt: zuerst erkennen, wo Nutzer bei Registrierung und Einrichtung hängen bleiben; danach Länder/Zählung und News verbessern. Dieses erste Paket ergänzt die vorhandene Messung, ohne Eingaben, Authentifizierung, Pflichtfelder, Speichern oder Veröffentlichung zu verändern. **Vorbereitet und geprüft, noch nicht live.**
+Nach dem lesenden Seitencheck hat Markus die vorgeschlagene Reihenfolge bestätigt: zuerst erkennen, wo Nutzer bei Registrierung und Einrichtung hängen bleiben; danach Länder/Zählung und News verbessern. Dieses erste Paket ergänzt die vorhandene Messung, ohne Eingaben, Authentifizierung, Pflichtfelder, Speichern oder Veröffentlichung zu verändern. **Nach ausdrücklicher Freigabe veröffentlicht und live geprüft.**
 
 ## Umfang
 
@@ -25,3 +25,14 @@ Belege: `/srv/cinegenius/handoffs/20261124-setup-analytics/`. Kontrollierte Prü
 - 20 verpflichtende Designprüfungen bestanden. React-Prüfung: Analytics bleibt nach Zustimmung dynamisch geladen, keine zusätzliche Wartezeit im Speicher-/Navigationsablauf, keine Anfragen pro Tastendruck.
 - Sprachprüfung: 17 Kataloge mit 11.726 Schlüsseln und keine offenen Quelltext-Literale. Separate vollständige TypeScript-Prüfung ohne Diagnosen abgeschlossen.
 - Vollständiger Produktionsbuild einschließlich erneuter TypeScript-Prüfung und 177 statischer Seiten bestanden. Keine Veröffentlichung ausgelöst.
+
+
+## Livegang · 24. November 2026
+
+Produktcommit `13445c23ec45fe120488d402fd7a439cf358ca0b`, Deployment `dpl_Fpaw5aQyEbJZyavSVPrmr63ucbnV`: normaler geschützter Release aus sauberem `main == origin/main`, Projektidentität und www-Zuordnung bestätigt, READY. Unveränderter geprüfter Kandidat per Fast-forward veröffentlicht. 20 Designprüfungen, 17 Kataloge, vollständiger Produktionsbuild und TypeScript bestanden; festes Basic-Buildprofil mit zwei Kernen/8 GB erhalten. Keine Migration, native Installation oder Änderung an Worker-/Anbietereinstellungen.
+
+Acht öffentliche HTTP-/Zugangstests und zwei echte Browserfälle bei 320/393px bestanden. Alter Opt-in verlangt erneute Zustimmung, alte Ablehnung bleibt erhalten; Einstellungen, Ablehnen und Widerruf funktionieren. Die echte Registrierung wurde ausschließlich durch leeres Absenden bis zur lokalen Validierung geprüft: keine Konto-/Profil-Schreibanfrage und kein erfundener Abschluss. Nach ausdrücklicher Zustimmung drei echte Testereignisse in EU-Projekt346367 per UUID wiedergefunden: `setup_step_viewed`, `setup_submitted`, `setup_error`. Keine Formularwerte, private URL oder Personenprofilverarbeitung im Ereignispayload. Nach Widerruf keine weiteren Ereignisse. **Diese drei synthetischen Testereignisse aus späteren Nutzerkennzahlen ausschließen**; UUIDs und vollständige Nachweise stehen unter `production/live-check.json` und `production/posthog-arrival.json` im Belegordner.
+
+Der zunächst verwendete automatisierte Browser wurde nachweislich vom PostHog-Botfilter verworfen. Gegenprüfung mit regulärem isoliertem Chrome über lokale Browsersteuerung bestanden; kein Produktionscode oder Botfilter dafür geändert. Die abgeschlossene Übertragungsprüfung beweist nicht den angemeldeten kompletten Einrichtungsabschluss auf einem echten Nutzergerät; diese Schreibpfade bleiben durch die vorherigen kontrollierten Prüfungen belegt. Im anschließenden begrenzten Deployment-Logfenster wurden keine Runtime-Fehler zurückgegeben. Physische App-Abnahme bleibt separat.
+
+Veröffentlichungsbeleg: `/srv/cinegenius/handoffs/20261124-setup-analytics/production/receipt.json`. Länder/Zählung und News bleiben die nächsten gesonderten Aufgaben; der Connectorzugang aktiviert keinen Redaktions-Lernfeed.

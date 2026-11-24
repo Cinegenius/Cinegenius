@@ -1,6 +1,6 @@
 ## PostHog-Folgeauftrag · 24. November 2026 · Reihenfolge bestätigt
 
-1. **Einrichtungsabbrüche beobachtbar machen:** Registrierung und gemeinsamer Profilassistent erhalten minimale, zustimmungsgebundene Schritte/Versuche/Fehler/Abschlüsse für alle fünf aktiven Startbereiche. Vorbereitet; Veröffentlichung und echte Ereignisankunft separat. Keine Formularinhalte, Kontokennungen oder Sitzungsaufzeichnungen. [Vertrag und Prüfstand](posthog-setup-20261124.md).
+1. **Einrichtungsabbrüche beobachtbar machen:** Registrierung und gemeinsamer Profilassistent erhalten minimale, zustimmungsgebundene Schritte/Versuche/Fehler/Abschlüsse für alle fünf aktiven Startbereiche. Auf `13445c23` / `dpl_Fpaw5aQyEbJZyavSVPrmr63ucbnV` live; drei zustimmungsgebundene synthetische Testereignisse in PostHog bestätigt. Diese Testfälle aus späteren Nutzerkennzahlen ausschließen. Keine Formularinhalte, Kontokennungen oder Sitzungsaufzeichnungen. [Vertrag und Prüfstand](posthog-setup-20261124.md).
 2. **Danach Herkunft und Zählung:** Länderstatistik und stabilere anonyme Zählung gesondert vorbereiten. Bestehende PostHog-Werte sind keine verifizierten Personenzahlen. Kein GPS, keine rückwirkend erfundenen Herkunftsdaten.
 3. **Danach News:** Sichtbarkeit und Öffnungen anhand belastbarer Messung verbessern. Geringe Aufrufzahlen allein sind kein belegter UI-Fehler.
 

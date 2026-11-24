@@ -1,6 +1,6 @@
-## PostHog-Einrichtungsanalyse · 24. November 2026 · vorbereitet
+## PostHog-Einrichtungsanalyse · 24. November 2026 · veröffentlicht
 
-Lesezugang zum EU-Projekt geprüft; Herkunft und Einrichtungsabläufe fehlen im bisherigen Livebestand. Als erstes Folgepaket minimale, neu zustimmungsgebundene Beobachtungen für Registrierung und gemeinsamen Profilassistenten eingebaut: Schritte, Versuche, feste Fehlerkategorien und bestätigter Abschluss, ohne Eingaben oder Kontoidentitäten. Alle fünf Startbereiche und 17 Sprachen abgedeckt. **Noch nicht veröffentlicht**, echte Ereignisankunft separat. Länder/Zählung und News folgen danach. Der Connector-Lesezugang aktiviert nicht den serverseitigen Redaktions-Lernfeed. [Umfang und Prüfgrenzen](posthog-setup-20261124.md).
+Lesezugang zum EU-Projekt geprüft; Herkunft und frühere Einrichtungsabläufe wurden bislang nicht erfasst. Als erstes Folgepaket minimale, neu zustimmungsgebundene Beobachtungen für Registrierung und gemeinsamen Profilassistenten eingebaut: Schritte, Versuche, feste Fehlerkategorien und bestätigter Abschluss, ohne Eingaben oder Kontoidentitäten. Alle fünf Startbereiche und 17 Sprachen abgedeckt. **Auf `13445c23` / `dpl_Fpaw5aQyEbJZyavSVPrmr63ucbnV` veröffentlicht**; www, Zustimmung/Widerruf und drei synthetische Ereignisse in EU-Projekt346367 bestätigt. Acht HTTP- und zwei Browserfälle bestanden. Testereignisse von späteren Nutzerkennzahlen ausnehmen. Länder/Zählung und News folgen danach. Der Connector-Lesezugang aktiviert nicht den serverseitigen Redaktions-Lernfeed. [Umfang und Prüfgrenzen](posthog-setup-20261124.md).
 
 ## Freie Profildarstellung · 24. November 2026 · veröffentlicht
 
