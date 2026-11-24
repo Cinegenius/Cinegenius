@@ -1,3 +1,7 @@
+## Gemeinsame Work-Gruppenseite · 24. November 2026 · Quellkandidat
+
+Die geschützte gemeinsame Teamseite wird als Gruppenliste mit Admin-Plus vereinfacht. Serverseitige Mitgliedschaft und getrennte Gruppenrechte bleiben maßgeblich; private Eingaben bleiben nach Fehlern erhalten. Keine neue API oder Migration.24 lokale SQL-/HTTP-/Bridge-Fälle,29 angrenzende Tests,33 kontrollierte Chromiumfälle,17 Sprachkataloge,20 Designfälle, ESLint und vollständiges TypeScript bestanden. Frisch geprüftes www bleibt auf dem Authkontext-Release2e5; die neue Gruppenoberfläche ist noch nicht veröffentlicht. Native Editor-/Ordnerarbeit läuft getrennt. [Vertrag und Prüfgrenzen](work-team-groups-20261124.md).
+
 ## Native App-Brücke · 24. November 2026 · veröffentlicht
 
 Die enge additive App-Brücke ist auf `2e5ce070` / `dpl_94Eh94YmSfPn9B7BSs4jvRgaX5rA` READY und www geprüft. Normale Websitegestaltung, Anmeldung, Berechtigungen, APIs und17 Sprachkataloge bleiben erhalten. Der flüchtige Marker gewährt keinen Zugriff und unterstützt nur den getrennten nativen Work-Startfix.22 fokussierte,87 angrenzende,34 kontrollierte Chromiumfälle sowie Design/Sprachen und vollständiger Produktionsbuild bestanden; fünf Live-HTTP- und zwei Gast-Browserabläufe bestätigt. Keine neue DB-/Mail-/Provideränderung, kein echter Login oder Gerätebeleg. [Vertrag und Grenzen](app-auth-context-20261124.md).

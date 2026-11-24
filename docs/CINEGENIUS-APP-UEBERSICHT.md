@@ -1,3 +1,7 @@
+## Team-Nachrichtengruppen · 24. November 2026 · Quellkandidat
+
+Work → Team → Nachrichten erhält eine senkrechte Gruppenliste, einen Plusknopf für aktuelle Online-Team-Admins und direkten Beitritt/Öffnen für berechtigte Mitglieder. Lokale Teams werden nur ausdrücklich und nach frischer aktiver Mitgliedschaft verbunden; Kontowechsel und alte Container-Leases schließen die Verknüpfung aus. Keine Swift-/SQL-Vertragsänderung oder neue Migration.24 lokale SQL-/HTTP-/Bridge-Fälle,29 angrenzende Tests,33 kontrollierte Chromiumfälle,17 Sprachkataloge,20 Designfälle, ESLint und vollständiges TypeScript bestanden. Noch nicht veröffentlicht oder physisch geprüft. [Vertrag und Grenzen](work-team-groups-20261124.md).
+
 ## App-Startvertrag · 24. November 2026 · veröffentlicht
 
 Kompatibler Serververtrag auf `2e5ce070` / `dpl_94Eh94YmSfPn9B7BSs4jvRgaX5rA` READY und www geprüft: ein flüchtiger neutraler Authkontext bleibt beim Verdecken der Webseite stabil und rotiert bei SDK-/Kontokontextwechseln. Bisheriger Bootmarker, Serverrechte und alte Apps bleiben erhalten.22 fokussierte,87 angrenzende,34 kontrollierte Chromiumfälle,20 Designfälle,17 Kataloge sowie vollständiger Next-/TypeScript-Build bestanden. Fünf Live-HTTP- und zwei öffentliche Gast-Browserabläufe bestätigt, kein echter Login oder Gerätetest. Native2218-Übernahme und physischer Work-Kaltstart bleiben getrennt; ältere native Apps sind dadurch allein noch nicht behoben. [Vertrag und Prüfgrenzen](app-auth-context-20261124.md).

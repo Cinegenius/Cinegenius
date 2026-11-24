@@ -1,3 +1,7 @@
+## App-Folgeauftrag · Team-Nachrichtengruppen · 24. November 2026
+
+Die direkt beauftragte senkrechte Gruppenliste mit Admin-Plus wird auf dem aktuellen Hauptstand3a766008 vorbereitet. 24 Rechte-/API-/Bridgefälle,29 angrenzende Fälle,33 kontrollierte Browserfälle,17 Sprachen,20 Designprüfungen sowie ESLint/TypeScript bestanden. Geprüften Commit und tatsächlichen Veröffentlichungsstatus mit APP/WEB abstimmen; vollständiger Next-Build und physische Gruppenbedienung bleiben separat. Bereits veröffentlichte Authkontextkorrektur, native2218-Fassung und paralleler Filmplaneditor erhalten. Neue Ordner-/Teilfunktionen sind getrennte Planung; Gmail/TestFlight bleiben unaktiviert. [Umfang und Prüfgrenzen](work-team-groups-20261124.md).
+
 ## PostHog-Folgeauftrag · 24. November 2026 · Reihenfolge bestätigt
 
 1. **Einrichtungsabbrüche beobachtbar machen:** Registrierung und gemeinsamer Profilassistent erhalten minimale, zustimmungsgebundene Schritte/Versuche/Fehler/Abschlüsse für alle fünf aktiven Startbereiche. Auf `13445c23` / `dpl_Fpaw5aQyEbJZyavSVPrmr63ucbnV` live; drei zustimmungsgebundene synthetische Testereignisse in PostHog bestätigt. Diese Testfälle aus späteren Nutzerkennzahlen ausschließen. Keine Formularinhalte, Kontokennungen oder Sitzungsaufzeichnungen. [Vertrag und Prüfstand](posthog-setup-20261124.md).
