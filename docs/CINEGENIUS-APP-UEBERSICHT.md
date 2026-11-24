@@ -1,3 +1,7 @@
+## App-Startvertrag · 24. November 2026 · geprüfter Serverkandidat
+
+Ein zusätzlicher flüchtiger Authkontext trennt aufgelösten SDK-Scope von bloßer Sichtbarkeit. Das ist die kompatible Webvoraussetzung für die Korrektur des auf iPad2217 reproduzierten Work-Kaltstartfehlers. Bestehender Bootmarker, Serverrechte und alte Apps bleiben erhalten; native2218-Übernahme, Veröffentlichung und Geräteabnahme sind noch gesondert offen.22 fokussierte Fälle und34 kontrollierte Chromiumfälle erfolgreich, kein echter Login; WebKit hier mangels Systembibliotheken nicht gestartet. [Vertrag und Prüfgrenzen](app-auth-context-20261124.md).
+
 ## Gemeinsame Einrichtungsanalyse · 24. November 2026 · Webbereich veröffentlicht
 
 Registrierung und gemeinsamer Web-Profilassistent erhalten vier minimale PostHog-Ereignisse nach erneuter freiwilliger Zustimmung. Keine Formularinhalte, Kontoidentitäten, Aufzeichnungen oder native Work-/Dokumentenmessung. Alle 17 Websprachen angepasst. **Gemeinsamer Webbereich auf `13445c23` veröffentlicht und im Browser geprüft, Datenankunft bestätigt; keine native Installation oder Geräteabnahme.** App2212-Quellen und Mail-Folgeauftrag bleiben erhalten. [Vertrag und Prüfgrenzen](posthog-setup-20261124.md).
