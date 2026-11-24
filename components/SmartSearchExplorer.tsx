@@ -310,7 +310,7 @@ export default function SmartSearchExplorer({ plan, initialGroups, initialMapGro
     </div>
     <div className="smart-result-list">
     {nativeAppearance ? <div className={resultStyles.utilityRow} data-native-smart-utility="v1">
-      <ContentTranslationNotice />
+      <ContentTranslationNotice hideAutomaticNotice />
       {mapOpen && mapReady && hasMapPositions && <SmartSearchMapInfo native />}
     </div> : <ContentTranslationNotice />}
     {errors.includes("initial") && <div role="alert" className="text-sm text-text-secondary"><p>{t("error")}</p><button type="button" className="min-h-11 min-w-11 text-gold" onClick={() => void read()} disabled={pending.includes("initial")}>{t("retry")}</button></div>}

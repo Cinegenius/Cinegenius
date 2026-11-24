@@ -1,3 +1,7 @@
+## Persönlicher App-Bereich und Smart · 24. November 2026 · isolierter Quellkandidat
+
+Die persönliche Überschrift scrollt im App-Modus mit dem Inhalt; doppelter oberer Abstand entfällt auch in verschachtelten Ansichten, große Schrift kann die Aktion auf eine zweite Zeile verschieben. Nur Smart blendet den automatischen Übersetzungshinweis aus; Umschalten, Originalstatus, Wiederholen und Karteninfo bleiben. Auf6c19 vorbereitet, Kosten9dc getrennt.115 gezielte Fälle,32 kontrollierte Browserfälle,22 Designfälle,17 Kataloge und vollständiges TypeScript bestanden; ESLint hat ausschließlich die belegten7 Fehler/1 Warnung des bisherigen Dashboards. Browsermatrix und Grenzen im [Prüfbericht](app-settings-smart-20261124.md). Noch nicht veröffentlicht oder physisch abgenommen. Schnellwahl bleibt ausschließlich Bestandsprüfung für Roots Vorschau.
+
 ## Gemeinsame geschützte Team-/Genie-Quelle · 24. November 2026 · Veröffentlichung zurückgehalten
 
 Team601 und Guidea152 werden auf3a zusammengeführt, ohne zusätzliche Kostenoptimierung.185 gezielte Fälle,17 Kataloge/11760 Schlüssel,20 Designfälle, ESLint, vollständiges TypeScript und4 gemeinsame Komponenten-Browserfälle bestanden. Native Guide-/Assetsbestätigung und normaler Release bleiben separat; kein Deploy, keine Gmail-Aktivierung. Gegenüber Live2e5 enthält3a zusätzlich28 Dateien zur Mailanalyse und Auth-Dokumentation. Der Mailflag sperrt Providerzugriff, nicht die Vorbereitung eigener Archivdokumente. [Exakter Umfang und Grenzen](app-team-guide-integration-20261124.md).

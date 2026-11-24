@@ -9,12 +9,24 @@
   background: transparent !important;
 }
 :global(html[data-cg-native-community-appearance="app"]) .surface > :global(.pt-16) { padding-top:0; }
+/* Native main already reserves the measured chrome height. Keep the personal
+   heading in content flow, including when Next wraps the dashboard on return. */
+:global(html[data-cg-native-community-appearance="app"]) .surface :global([data-personal-area="v1"]) { padding-top:0; }
 :global(html[data-cg-native-community-appearance="app"]) .surface :global([data-personal-area-heading="v1"]) {
+  position:relative;
+  top:auto;
+  z-index:auto;
+  flex-wrap:wrap;
   background:transparent;
   border:0;
   -webkit-backdrop-filter:none;
   backdrop-filter:none;
 }
+:global(html[data-cg-native-community-appearance="app"]) .surface :global([data-personal-area-heading="v1"] > div:first-child) {
+  flex:1 1 auto;
+  max-width:100%;
+}
+:global(html[data-cg-native-community-appearance="app"]) .surface :global([data-personal-area-heading="v1"] > div:last-child) { margin-left:auto; }
 :global(html[data-cg-native-community-appearance="app"]) .surface :global([data-personal-area-heading="v1"] a[href="/inserat"]) {
   background:transparent;
   color:var(--cg-app-accent);

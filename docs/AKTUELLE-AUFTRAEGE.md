@@ -1,3 +1,7 @@
+## Enger App-Folgeauftrag · 24. November 2026 · vor Zusammenführung
+
+Settings-Abstand/überdeckende Kopfzeile und ausschließlich den automatischen Hinweis in Smart auf6c19 korrigieren und unabhängig prüfen. Kosten9dc bleibt getrennt; kein Deploy oder main-Änderung durch diesen Auftrag. Danach kann Root den Kandidaten in die gemeinsame Freigabe aufnehmen. Schnellwahl Crew/Locations/Smart/Firmen/Jobs nur lesend analysiert: sichtbaren Marktplatzzugang, Projekte und private Filter erhalten; erst Vorschau und Nutzerentscheidung, dann Umsetzung. [Umfang, Prüfstand und Grenzen](app-settings-smart-20261124.md).
+
 ## Gemeinsame App-Übernahme · 24. November 2026 · vor Veröffentlichung
 
 Team601 und Guidea152 auf3a konkret zusammenführen und prüfen. Kein Deploy bis APP-Root den nativen Guide-/Assetsabgleich bestätigt. Neue Kostenarbeit bleibt getrennt; Mailflag/Geheimnisse und Datenbank unverändert. Exakten zusätzlichen3a-Mailumfang gegenüber Live2e5 ausdrücklich mitführen, da der Archiv-Analyseweg nicht global durch den Mailflag abgeschaltet ist. [Umfang und Prüfung](app-team-guide-integration-20261124.md).

@@ -604,7 +604,7 @@ function DashboardContent() {
   if (legacyDestination) return <div className="site-container py-24" role="status">{uiText("common.loading")}</div>;
 
   return (
-    <div className="min-h-screen w-full min-w-0 pt-16">
+    <div data-personal-area="v1" className="min-h-screen w-full min-w-0 pt-16">
       {/* Hauptinhalt */}
       <div className="min-w-0 flex-1">
         {/* Top-Leiste */}
