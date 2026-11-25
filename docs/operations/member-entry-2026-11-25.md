@@ -1,5 +1,7 @@
 # Member entry — 25 November 2026
 
+**Superseded by the later operator request on 25 November:** restore the original public homepage and access model. The member-only entry and its notice are removed; the sections below document the earlier temporary state.
+
 Operator request: replace the pause with working sign-in/registration, publish it, and retain the existing homepage and features after sign-in. The existing Clerk forms, password default, verification/MFA, password recovery and resumable setup are reused. Normal login returns to `/`; direct protected links retain their destination. No account migration or extra registration fields.
 
 The homepage checks the session before requesting recommendation data. Guest navigation has only the entry, language selector and legal/contact links. All directory/profile pages and content APIs require a session at Proxy, including RSC requests and file-like slugs; existing handler-level ownership/visibility checks remain. API guests receive non-cacheable 401 JSON. Member responses are private/no-store. The sitemap no longer reads or lists member records; robots and response headers request no indexing. Existing provider-signed webhooks, scoped editorial/worker authorization and newsletter confirmation/unsubscribe paths are retained. Locale and the public reporting endpoint retain origin checks.
@@ -14,3 +16,13 @@ The actual local browser passed 34 entry/registration cases across all 17 locale
 ## Approved notice update, 25 November 2026
 
 Markus approved replacing the entry notice with preparation for the next step, renewal of the public website and development of the CineGenius app. Both strings are updated in all 17 catalogs; the entry forms, access restrictions and post-login homepage remain unchanged. This copy update introduces no new data processing, provider, cost, consent, legal entity, release date or app availability claim. The existing legal supplement still describes actual access behavior; no legal-document amendment is required for this notice-only change.
+
+## Restoration of public access, 25 November 2026
+
+Markus requests the homepage as it was before the private entry. Restore the published application files from `0838414c`, the immediate source before this chat’s maintenance/member-entry changes, in a new forward commit. Keep the historical operator report and the editorial-policy test-fixture repair. No history rewrite or unrelated workspace changes.
+
+The homepage and prior public directories/data reads again serve guests. The original header, footer, sign-in/sign-up pages, metadata, sitemap and robots policy return. Authenticated account areas, private APIs, Ghost/audience controls, owner/editor checks, approved-content rules and protected-media origin checks retain the original enforcement. Stored content, audiences and publication states are not changed.
+
+Remove the temporary members-only legal supplement and entry copy from all 17 locales, restoring the existing legal text to the access behavior it describes. No new provider, processing purpose, account data, cost, image rights, AI behavior or legal entity is introduced. No database/storage migration or native source change. The earlier primary-source review and per-record privacy controls remain applicable. Publication and verification are recorded under `/srv/cinegenius/handoffs/20261125-public-home-restored/`.
+
+During the restored homepage browser check, the existing Portuguese hero-topic line extended the document to 362px at a 320px viewport. A single `flex-wrap` addition keeps that line inside the available width while preserving its existing typography, colors and contents. This responsive adjustment is the sole application-code difference from the pre-pause source.

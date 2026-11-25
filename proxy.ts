@@ -6,6 +6,8 @@ import { trustedMutationOrigin } from "@/lib/request-origin";
 import { mediaOptimizerBlockStatus } from "@/lib/media-optimizer-guard";
 import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from "next/server";
+import { isProtectedCreatePath, isPublicProfilePath } from "@/lib/public-access";
+
 async function localizedProxyError(request: NextRequest, key: string, init: ResponseInit): Promise<NextResponse> {
   const locale = resolveLocale(request.cookies.get("cg_locale")?.value, request.headers.get("accept-language") ?? "", request.headers.get('x-vercel-ip-country') ?? '');
   const messages = await loadMessages(locale);
@@ -158,19 +160,68 @@ const isAdminRoute = createRouteMatcher(["/admin(.*)", "/api/admin(.*)"]);
 
 // Public page routes — no session required.
 const isPublicRoute = createRouteMatcher([
-  "/", /^\/sign-in(?:\/.*)?$/, /^\/sign-up(?:\/.*)?$/,
-  "/impressum", "/datenschutz", "/agb", "/bildrechte", "/ki-transparenz",
-  "/trust", "/melden", "/newsletter/confirm", "/newsletter/unsubscribe",
-  "/manifest.webmanifest", "/robots.txt", "/sitemap.xml",
-  "/favicon.ico", "/icon", "/icon.svg", "/apple-icon",
-  "/apple-touch-icon.png", "/apple-touch-icon-precomposed.png",
-  "/cinegenius-logo.svg", "/cinegenius-logo-dark.svg",
-  "/hero-bg.jpg", "/hero-bg-v2.jpg",
+  "/",
+  "/manifest.webmanifest",
+  "/sign-in(.*)",
+  "/sign-up(.*)",
+  "/companies(.*)",
+  "/news",
+  "/tools",
+  "/organizations",
+  /^\/news\/[^/]+\/[^/]+$/,
+  /^\/organizations\/[^/]+$/,
+  "/projects(.*)",
+  "/locations(.*)",
+  "/jobs(.*)",
+  "/creators(.*)",
+  "/props(.*)",
+  "/vehicles(.*)",
+  "/tiere(.*)",
+  "/crew(.*)",
+  "/search(.*)",
+  "/photo(.*)",
+  "/bts(.*)",
+  "/social-media(.*)",
+  "/impressum(.*)",
+  "/datenschutz(.*)",
+  "/agb(.*)",
+  "/about(.*)",
+  "/pricing(.*)",
+  "/help(.*)",
+  "/trust",
+  "/melden",
+  "/ki-transparenz",
+  "/bildrechte",
+  "/marketplace(.*)",
+  "/newsletter/confirm",
+  "/newsletter/unsubscribe",
 ]);
 
+// A single profile slug is public. The profile editor at /profile and any
+// nested management routes must require a session.
 // Webhook routes — completely bypass Clerk auth; each handler must verify
 // the provider signature (Stripe, Clerk, etc.) independently.
 const isWebhookRoute = createRouteMatcher(["/api/webhooks/(.*)"]);
+
+// API routes where GET is public — mutations (POST/PATCH/PUT/DELETE) require auth.
+// This prevents a missed requireAuth() in a handler from opening write access.
+const isPublicApiGet = createRouteMatcher([
+  "/api/browse-preference",
+  "/api/places",
+  "/api/places/options",
+  "/api/community-image",
+  "/api/media/(.*)",
+  "/api/listings(.*)",
+  "/api/listing-ratings",
+  "/api/reviews(.*)",
+  "/api/search(.*)",
+  "/api/external-profiles(.*)",
+  "/api/projects(.*)",
+  "/api/companies",
+  "/api/companies/(.*)",
+  "/api/community-posts(.*)",
+  "/api/creators(.*)",
+]);
 
 export default clerkMiddleware(async (auth, request) => {
   // Dedicated machine requests never acquire a Clerk/member/admin session.
@@ -192,6 +243,7 @@ export default clerkMiddleware(async (auth, request) => {
   if (request.nextUrl.pathname.startsWith("/api/webhooks/")) {
     return NextResponse.next();
   }
+
   const isGeniePost = request.method === "POST" && ["/api/genie", "/api/genie/transcribe"].includes(request.nextUrl.pathname);
   if (isGeniePost) {
     // Guests may see Genie, but cannot consume even its early IP allowance.
@@ -225,7 +277,7 @@ export default clerkMiddleware(async (auth, request) => {
   ].includes(request.nextUrl.pathname);
   const isSmartSearchRead = request.method === "POST" && request.nextUrl.pathname === "/api/search/unified";
   const isPublicReportPost = request.method === "POST" && request.nextUrl.pathname === "/api/public-reports";
-  const isLocaleUpdate = request.method === "POST" && request.nextUrl.pathname === "/api/locale";
+  const isPublicTranslationRead = request.method === "POST" && request.nextUrl.pathname === "/api/content-translations";
 
   // 2. Admin route guard — enforces both session + admin role
   //    This runs BEFORE the generic auth.protect() so non-admin authenticated
@@ -266,8 +318,9 @@ export default clerkMiddleware(async (auth, request) => {
   } else if (isPublicReportPost) {
     // Public reports do not require a member account. Origin protection above
     // and the handler's validation/durable limits still apply to this exact POST.
-  } else if (isLocaleUpdate) {
-    // Language selection remains available before registration; CSRF still applies.
+  } else if (isPublicTranslationRead) {
+    // Public display only: the handler re-reads canonical public sources, never
+    // client text. Exact POST, origin/flood checks and generation budgets remain.
   } else if (isSmartSearchRead) {
     // Smart search is members-only, including saved/shared result plans.
     try {
@@ -278,16 +331,20 @@ export default clerkMiddleware(async (auth, request) => {
       return genieAuthFailure(503);
     }
     // The handler rechecks membership before quotas, body parsing and database work.
-  } else if (isApi) {
+  } else if (isApi && !isPublicApiGet(request)) {
     // Private fetch endpoints must not follow Clerk's hosted sign-in redirect
     // after logout/session expiry. Keep the existing authenticated-session
     // protection, and return a non-cacheable JSON failure for signed-out calls.
     const { userId } = await auth();
     if (!userId) return NextResponse.json({ code: "account" }, { status: 401, headers: { "Cache-Control": "private, no-store", "CDN-Cache-Control": "no-store", "Vercel-CDN-Cache-Control": "no-store" } });
     await auth.protect();
-  } else if (!isPublicRoute(request)) {
+  } else if (isPublicApiGet(request)) {
+    // 3b. Public-GET API — only protect mutations so a missed handler check
+    //     doesn't silently open write access to unauthenticated callers.
+    if (!["GET", "HEAD"].includes(request.method)) await auth.protect();
+  } else if (isProtectedCreatePath(request.nextUrl.pathname) || (!isPublicRoute(request) && !isPublicProfilePath(request.nextUrl.pathname))) {
     // 3c. Session-only protection for all other non-public routes
-    if (["GET", "HEAD"].includes(request.method) && !isApi) {
+    if (request.method === "GET" && !isApi) {
       // Keep unauthenticated browser navigation on the app's own host. The
       // Clerk instance can otherwise send users to accounts.cinegenius.co,
       // which is not a Vercel deployment domain and currently returns 404.
@@ -328,11 +385,12 @@ export default clerkMiddleware(async (auth, request) => {
   requestHeaders.set("X-CineGenius-Return-Path", `${returnUrl.pathname}${returnUrl.search}`);
 
   const res = NextResponse.next({ request: { headers: requestHeaders } });
-  // Never share member documents or API responses between sessions.
-  res.headers.set("Cache-Control", "private, no-store, max-age=0");
-  res.headers.set("CDN-Cache-Control", "no-store");
-  res.headers.set("Vercel-CDN-Cache-Control", "no-store");
-  res.headers.set("X-Robots-Tag", "noindex, nofollow, noarchive");
+  if (request.nextUrl.pathname.startsWith("/admin/review/") || request.nextUrl.pathname.startsWith("/api/admin/reviews/")) {
+    res.headers.set("Cache-Control", "private, no-store, max-age=0");
+    res.headers.set("CDN-Cache-Control", "no-store");
+    res.headers.set("Vercel-CDN-Cache-Control", "no-store");
+    res.headers.set("X-Robots-Tag", "noindex, nofollow, noarchive");
+  }
   res.headers.set("X-Content-Type-Options", "nosniff");
   res.headers.set("X-Frame-Options", "DENY");
   res.headers.set("Referrer-Policy", "strict-origin-when-cross-origin");
@@ -342,6 +400,9 @@ export default clerkMiddleware(async (auth, request) => {
 });
 
 export const config = {
-  // File-like profile slugs and API/media paths must also pass authentication.
-  matcher: ["/((?!_next/static/|api/webhooks/).*)"],
+  matcher: [
+    "/api/media/:path*",
+    "/_next/image",
+    "/((?!_next/static|_next/image|favicon.ico|sitemap.xml|robots.txt|api/webhooks|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
+  ],
 };

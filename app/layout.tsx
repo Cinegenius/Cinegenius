@@ -53,7 +53,6 @@ export const viewport = {
 export async function generateMetadata(): Promise<import("next").Metadata> {
   const tMetadata = await getMetadataTranslations("Metadata");
   const locale = await getLocale();
-
   return {
   metadataBase: new URL("https://www.cinegenius.co"),
   title: {
@@ -90,9 +89,9 @@ export async function generateMetadata(): Promise<import("next").Metadata> {
     apple: "/icon",
   },
   robots: {
-    index: false,
-    follow: false,
-    googleBot: { index: false, follow: false, "max-image-preview": "large" },
+    index: true,
+    follow: true,
+    googleBot: { index: true, follow: true, "max-image-preview": "large" },
   },
 };
 }
@@ -129,7 +128,7 @@ export default async function RootLayout({
       localization={clerkLocalization}
       taskUrls={AUTH_TASK_URLS}
       signUpForceRedirectUrl="/profile-setup?welcome=1"
-      signInFallbackRedirectUrl="/"
+      signInFallbackRedirectUrl="/dashboard"
       afterMultiSessionSingleSignOutUrl="/"
     >
       <html

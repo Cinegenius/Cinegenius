@@ -2,8 +2,6 @@
 
 import { useRef, useSyncExternalStore, useLayoutEffect, type ReactNode } from "react";
 import { usePathname } from "next/navigation";
-import { useAuth } from "@clerk/nextjs";
-import GuestChrome from "@/components/GuestChrome";
 import LegalLanguageNotice from "@/components/LegalLanguageNotice";
 import NavigationRestoration from "@/components/NavigationRestoration";
 import Navbar from "@/components/Navbar";
@@ -20,7 +18,6 @@ import {nativeWorkTeamContainerAvailable,nativeWorkTeamContainerServer,nativeWor
 
 export default function AppChrome({ children, initialIsSignedIn, initialAdminUserId = null }: { children: ReactNode; initialIsSignedIn: boolean; initialAdminUserId?: string | null }) {
   const pathname = usePathname();
-  const { isLoaded, isSignedIn } = useAuth();
   const nativeAppearance = useNativeAppAppearance();
   const guidedSetup = pathname.startsWith("/profile-setup");
   const teamContainer=useSyncExternalStore(nativeWorkTeamContainerSubscribe,nativeWorkTeamContainerAvailable,nativeWorkTeamContainerServer)&&pathname==="/work/teams";
@@ -35,8 +32,6 @@ export default function AppChrome({ children, initialIsSignedIn, initialAdminUse
   const content = useRef<HTMLElement>(null);
   useNativeAppContentRegion(nativeAppearance && !guidedSetup, content);
   useNativeAppBootReadiness(nativeAppearance, pathname);
-
-  if (!(isLoaded ? isSignedIn : initialIsSignedIn)) return <GuestChrome>{children}</GuestChrome>;
 
   if(teamContainer)return <ServerAdminContext.Provider value={initialAdminUserId}><SiteNavigationProvider><NavigationRestoration/><main data-native-work-team-container="v1" className="flex h-dvh max-h-dvh min-h-0 min-w-0 flex-col overflow-hidden bg-transparent">{children}</main></SiteNavigationProvider></ServerAdminContext.Provider>;
 

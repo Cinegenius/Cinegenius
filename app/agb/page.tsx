@@ -27,11 +27,6 @@ export default async function AgbPage() {
         </div>
 
         <div className="space-y-8 text-text-secondary">
-          <section lang="de" className="rounded-xl border border-border bg-bg-secondary p-4">
-            <h2 className="mb-3 text-base font-semibold text-text-primary">{t("memberAccessTitle")}</h2>
-            <p className="text-sm leading-relaxed">{t("memberAccess")}</p>
-          </section>
-
 
           <section>
             <h2 className="text-base font-semibold text-text-primary mb-2">{uiText("Ui.text_75cfed8707d5a4")}</h2>

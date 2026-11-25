@@ -1,4 +1,3 @@
-import MemberEntry from "@/components/MemberEntry";
 import { TranslatedText } from "@/components/ContentTranslation";
 import { occupationFormFromCrew } from "@/lib/occupation-form";
 import { profileOccupationPreview } from "@/lib/crew-occupations";
@@ -360,14 +359,12 @@ async function HomePhotoRecommendations({ viewerId }: { viewerId: string | null 
 }
 
 export default async function HomePage() {
-  const { userId } = await auth();
-  if (!userId) return <MemberEntry mode="sign-in" destination="/" switchDestination="/sign-up?redirect_url=%2F" />;
   // Public recommendation data is shared only within this page request.
   const dataPromise: HomeDataPromise = getHomeData().catch(() => {
     console.error("[homepage] Recommendations unavailable");
     return null;
   });
-  const t = await getTranslations("home");
+  const [{ userId }, t] = await Promise.all([auth(), getTranslations("home")]);
   const isLoggedIn = !!userId;
   const findCards = [
     { title: t("findLocationsTitle"), description: t("findLocationsDescription"), href: "/locations", icon: MapPin },
@@ -382,7 +379,7 @@ export default async function HomePage() {
     <section className="relative isolate pt-16">
       <div className="site-container grid items-start gap-5 py-6 sm:py-8 lg:gap-9">
         <div className="min-w-0">
-          <p className="mb-2 flex w-full items-center justify-between gap-1 text-xs font-semibold uppercase tracking-widest text-gold">
+          <p className="mb-2 flex w-full flex-wrap items-center justify-between gap-1 text-xs font-semibold uppercase tracking-widest text-gold">
             {t("badgeHero").split(" · ").map((topic, index) => <Fragment key={topic}>
               {index > 0 && <span aria-hidden="true">·</span>}
               <span>{topic}</span>

@@ -304,5 +304,5 @@ export default function Genie({ mode = "floating" }: { mode?: "floating" | "tool
     <GenieMark />
     <div className={styles.toolCopy}><strong>{t("name")}</strong><span>{tools("genieDescription")}</span><span role="status">{isLoaded ? tools("noticeFirst") : t("loading")}</span></div>
   </div>;
-  return !auth.isSignedIn || !isLoaded || cookieVisible || replacedByTool || teamContainer ? null : <AvailableGenie key={`${memoryScope ?? "guest"}:${appGuideEnabled}`} memoryScope={memoryScope} mode={mode} dismissed={dismissed} position={position} onHide={() => setDismissed(true)} onPositionChange={rememberPosition} nativeOwned={nativeOwned} nativeEmbedded={nativeEmbedded} appGuideEnabled={appGuideEnabled} />;
+  return !isLoaded || cookieVisible || replacedByTool || teamContainer ? null : <AvailableGenie key={`${memoryScope ?? "guest"}:${appGuideEnabled}`} memoryScope={memoryScope} mode={mode} dismissed={dismissed} position={position} onHide={() => setDismissed(true)} onPositionChange={rememberPosition} nativeOwned={nativeOwned} nativeEmbedded={nativeEmbedded} appGuideEnabled={appGuideEnabled} />;
 }
