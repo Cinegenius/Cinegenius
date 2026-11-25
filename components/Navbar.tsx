@@ -152,7 +152,7 @@ export default function Navbar({ initialIsSignedIn = false, initialAdminUserId =
     try {
       // No sessionId means sign out every CineGenius session active in this
       // browser, so switching between profiles cannot leave an account active.
-      await signOut({ redirectUrl: "/" });
+      await signOut({ redirectUrl: nativeAppearance ? "/sign-in" : "/" });
     } catch {
       window.clearTimeout(slowNoticeTimer);
       signingOutRef.current = false;
