@@ -1,3 +1,7 @@
+## 25. November 2026: beauftragter separater AGB-Livegang
+
+Die pauschale 30-Tage-Zusage wird durch den beauftragten deutschen Originaltext zur unverzüglichen Löschung ersetzt; bestehende vertragliche Ansprüche bleiben erhalten. AGB-Stand: 25. November 2026. Die neue Löschautomatik aus `0fa6f23a` und ihr HTTP-202-Vertrag bleiben unveröffentlicht. Keine API-/App-, Datenbank- oder Ablaufänderung in diesem Release. Veröffentlichungsbeleg: `/srv/cinegenius/audits/20261125-agb-release/`. [Umfang und Wortlaut](legal-review/2026-11-25/agb-loeschung-veroeffentlichung.md).
+
 ## App-Kopf und Smart-Bedienzeile · 24. November 2026 · neuer Kandidat auf e996
 
 Der bisherige Smart-/Settings-Stand e996 ist inzwischen veröffentlicht; der nach2220 gemeldete Kopf-/Dock-Fall folgt separat. Web-Kopf ohne alte54px-Sonnenreservierung mittig und vollbreit, verdeckte Web-Leisten unter nativem Work nur visuell ausgeblendet. Übersetzen/Aktualisieren in Für-dich/Alle-Zeile; keine zusätzlichen Original-/Übersetzt-Statustexte, Fehler/Retry und Karteninfo erhalten. Native Avatar-Reautorisierung ist Roots gesonderte2221-Arbeit. Kandidat zunächst unabhängig prüfen, kein paralleler Livegang. [Umfang, Prüfstand und Grenzen](app-header-smart-compact-20261124.md).

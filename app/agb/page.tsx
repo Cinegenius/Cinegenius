@@ -141,7 +141,7 @@ export default async function AgbPage() {
 
           <section>
             <h2 className="text-base font-semibold text-text-primary mb-2">{uiText("Ui.text_49442663ee1e7b")}</h2>
-            <p className="text-sm leading-relaxed">{uiText.rich("Ui.text_b96e50a60df1cc", { part1: chunks => (<a href="mailto:hello@cinegenius.co" className="text-gold hover:underline">{chunks}</a>) })}</p>
+            <p lang="de" className="text-sm leading-relaxed">{t.rich("accountDeletion", { contact: chunks => (<a href="mailto:hello@cinegenius.co" className="text-gold hover:underline">{chunks}</a>), privacy: chunks => (<Link href="/datenschutz" className="text-gold hover:underline">{chunks}</Link>) })}</p>
             <p className="text-sm leading-relaxed mt-3">{uiText("Ui.text_ca14a695232c3b")}</p>
             <p className="text-sm leading-relaxed mt-3">{uiText("Ui.text_f97f494f842b6b")}</p>
           </section>
