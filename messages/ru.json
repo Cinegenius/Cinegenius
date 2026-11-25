@@ -30,7 +30,10 @@
     "supabaseProcessingReview": "Profildaten, Inserate, Beschreibungen und Bilder werden in Datenbank und Dateispeicher bei Supabase verarbeitet. Rechtsgrundlage für die zur Nutzung erforderliche Verarbeitung ist die Vertragserfüllung (Art. 6 Abs. 1 lit. b DSGVO). Veröffentlichte Inhalte sind entsprechend ihrer Sichtbarkeit einsehbar. Private Entwürfe und persönliche Kontaktdaten unterliegen gesonderten Zugriffsregeln. Persönliche Kontaktdaten werden nicht automatisch zu öffentlichen Firmenkontakten. Der Sitz des Anbieters ist nicht gleichbedeutend mit dem Standort jeder Verarbeitung.",
     "internationalProcessingReview": "Bei den eingesetzten Diensten kann eine Verarbeitung außerhalb des Europäischen Wirtschaftsraums stattfinden, auch bei OpenAI und den Anbietern von Anmeldung, Hosting, E-Mail und Nutzungsanalyse. Dafür ist eine anwendbare Grundlage nach Art. 44 ff. DSGVO erforderlich. Maßgeblich sind der konkrete Vertragspartner, die vereinbarten Bedingungen, Unterauftragsverarbeiter und die tatsächliche Konfiguration. Eine gewählte EU-Speicherregion schließt andere internationale Verarbeitung nicht automatisch aus.",
     "workProcessingTitle": "Zusätzliche Work-Funktionen und persönliche Dokumentanalyse",
-    "workProcessingReview": "In freigeschalteten Work-Funktionen werden Teamzugehörigkeiten, Nachrichten und ausdrücklich importierte E-Mails mit Anhängen kontobezogen verarbeitet. Eine externe Postfachverbindung erfordert einen gesonderten Verbindungsablauf; gespeicherte Zugangsberechtigungen werden verschlüsselt abgelegt. Das Trennen der Verbindung löscht nicht automatisch bereits importierte Dateien. Bei einer ausdrücklich gestarteten, freigeschalteten KI-Analyse werden die ausgewählten Dokumenttexte und erforderlichen Arbeitsangaben an OpenAI übermittelt. Solche Dokumente können auch personenbezogene Angaben anderer Beteiligter enthalten. Die Gesprächsspeicherung ist bei diesen KI-Anfragen deaktiviert; dies ist keine Zusage, dass beim Anbieter keinerlei Sicherheitsprotokolle entstehen. Die persönliche native Analyse ist derzeit auf ein gesondert freigegebenes Testkonto begrenzt. Eine im Quellcode vorbereitete Funktion ist damit nicht allgemein für alle Konten aktiviert."
+    "workProcessingReview": "In freigeschalteten Work-Funktionen werden Teamzugehörigkeiten, Nachrichten und ausdrücklich importierte E-Mails mit Anhängen kontobezogen verarbeitet. Eine externe Postfachverbindung erfordert einen gesonderten Verbindungsablauf; gespeicherte Zugangsberechtigungen werden verschlüsselt abgelegt. Das Trennen der Verbindung löscht nicht automatisch bereits importierte Dateien. Bei einer ausdrücklich gestarteten, freigeschalteten KI-Analyse werden die ausgewählten Dokumenttexte und erforderlichen Arbeitsangaben an OpenAI übermittelt. Solche Dokumente können auch personenbezogene Angaben anderer Beteiligter enthalten. Die Gesprächsspeicherung ist bei diesen KI-Anfragen deaktiviert; dies ist keine Zusage, dass beim Anbieter keinerlei Sicherheitsprotokolle entstehen. Die persönliche native Analyse ist derzeit auf ein gesondert freigegebenes Testkonto begrenzt. Eine im Quellcode vorbereitete Funktion ist damit nicht allgemein für alle Konten aktiviert.",
+    "accountErasure": "Löschanfragen aus dem angemeldeten Konto werden mit einer Vorgangsnummer dokumentiert. Die Annahme eines Auftrags bestätigt noch keine vollständige Löschung. Das persönliche Profil wird ausgeblendet. Die Bearbeitung umfasst die Prüfung zugehöriger Kontodaten, Dateien und Dienste. Gemeinsame Inhalte, Ansprüche anderer Personen und konkret begründete Aufbewahrungspflichten werden gesondert geprüft; sie rechtfertigen keine pauschale Aufbewahrung des gesamten Kontos. Erforderliche Sicherungen und Dienstleister-Restbestände werden nach den tatsächlich geprüften Lösch- und Überschreibungsregeln behandelt. Eine Wiederherstellung darf bereits gelöschte Daten nicht erneut in die gewöhnliche Verarbeitung übernehmen. Für die Bearbeitung und Rückmeldung speichern wir vorübergehend eine Vorgangskennung, die notwendige Kontozuordnung, Zeitpunkte und knappe Bearbeitungsnachweise; für Statusnachrichten gegebenenfalls die bestätigte E-Mail-Adresse. Die Bearbeitung erfolgt zur Erfüllung der Pflichten aus Art. 12 und 17 DSGVO auf Grundlage von Art. 6 Abs. 1 Buchst. c DSGVO. Über Maßnahmen oder begründete weitere Schritte informieren wir ohne unangemessene Verzögerung, grundsätzlich spätestens innerhalb eines Monats. Ein bloßer Eingangsbeleg ersetzt diese Antwort nicht. Für Anfragen und konkrete Informationen zu verbleibenden Daten: hello@cinegenius.co.",
+    "accountErasureTerms": "Ein Eingangsbeleg für eine Löschanfrage bestätigt zunächst deren Annahme. Er ersetzt weder die erforderliche Bearbeitung noch die Rückmeldung über die getroffenen Maßnahmen. Gesetzliche Löschansprüche und bestehende vertragliche Rechte bleiben unberührt; eine technische Warteschlange begründet keine zusätzliche Wartefrist.",
+    "accountDeletion": "Du kannst dein Konto jederzeit ohne Angabe von Gründen über die Kontoeinstellungen oder durch eine Anfrage an <contact>hello@cinegenius.co</contact> löschen lassen. Nach Beendigung deines Kontos löschen wir die nicht mehr erforderlichen personenbezogenen Daten unverzüglich. Gesetzliche Aufbewahrungspflichten und die erforderliche Geltendmachung, Ausübung oder Verteidigung von Rechtsansprüchen können der Löschung einzelner Daten entgegenstehen. Diese Daten werden nur im erforderlichen Umfang und nur so lange für den jeweiligen Zweck gespeichert, wie der konkrete Grund besteht. Für Sicherungskopien und Daten bei Dienstleistern sind die tatsächlichen Löschabläufe zu berücksichtigen; weitere Informationen findest du in den <privacy>Datenschutzhinweisen</privacy>. Gesetzliche Löschungsrechte und bereits bestehende vertragliche Ansprüche bleiben unberührt."
   },
   "SiteContacts": {
     "markusName": "Маркус Мюллер",
@@ -3243,7 +3246,6 @@
     "text_f5315cb707d7cd": "Эти ограничения не применяются к умышленному вреду жизни, здоровью, требованиям по Закону о продукции Германии или мошенничеству.",
     "text_5c5e16ac6fa0f5": "Оператор не гарантирует непрерывную доступность платформы. Плановые технические работы анонсируются заранее, если возможно.",
     "text_49442663ee1e7b": "§ 12 Прекращение и удаление",
-    "text_b96e50a60df1cc": "Вы можете удалить аккаунт в любое время без объяснения причин. Удаление доступно в настройках аккаунта или по письменному запросу на <part1>hello@cinegenius.co</part1>. После удаления аккаунта ваши персональные данные будут удалены в течение 30 дней, если только законные обязательства по хранению не препятствуют этому (например, налоговые обязательства по § 147 AO до 10 лет).",
     "text_ca14a695232c3b": "Оператор может приостанавливать или удалять аккаунты без уведомления при серьёзных или повторных нарушениях условий. При приостановке аккаунта права и обязанности по договорам между пользователями сохраняются.",
     "text_f97f494f842b6b": "Оператор может прекратить работу платформы с уведомлением за 30 дней. Права по существующим договорам между пользователями сохраняются.",
     "text_d1e5e968645eeb": "§ 13 Приостановка и модерация",
@@ -14202,5 +14204,54 @@
   "PrivacyReview": {
     "claimReview": "Привязка этого человека и его участия в фильмах требует предварительной проверки. Напишите на hello@cinegenius.co. Автоматическая привязка сейчас недоступна.",
     "claimContact": "Запросить проверку"
+  },
+  "AccountErasure": {
+    "title": "Удалить аккаунт",
+    "intro": "Запрос на удаление сохраняется. Личный профиль скрывается. Однозначно связанные данные удаляются по проверенным правилам; общие материалы и обоснованные исключения рассматриваются отдельно.",
+    "confirm": "Запросить удаление аккаунта? Последующее удаление необратимо.",
+    "accepted": "Запрос сохранён. Это ещё не подтверждение полного удаления.",
+    "receipt": "Номер обращения: {id}",
+    "delete": "Запросить удаление",
+    "sending": "Отправка…",
+    "error": "Не удалось подтвердить действие. Обновите статус или повторите. Вопросы: hello@cinegenius.co.",
+    "refresh": "Обновить статус",
+    "loading": "Загрузка статуса…",
+    "adminTitle": "Запросы на удаление",
+    "adminIntro": "Автоматическая обработка и открытые исключения. Повтор не обходит проверки. На обращения нужно отвечать вовремя; эта страница не отправляет обоснованные уведомления о продлении срока.",
+    "back": "Вернуться к управлению",
+    "policyTitle": "Начальные правила работы",
+    "policyIntro": "Включайте только после проверки объёма удаления, поставщиков, резервных копий, защиты при восстановлении и хранения доказательств. Значения должны отражать подтверждённые настройки, а не предполагаемые законные сроки. Не вводите пароли или тексты договоров.",
+    "evidence": "Ссылки на доказательства и объём проверки",
+    "backup_days": "Резервные копии: дни",
+    "provider_days": "Поставщики: дни",
+    "receipt_days": "Доказательство удаления: дни",
+    "validUntil": "Повторная проверка до (UTC)",
+    "enabled": "Автоматизация включена",
+    "disabled": "Автоматизация выключена",
+    "save": "Сохранить правила",
+    "policyConfirm": "Сохранить подтверждённые правила? Включённая автоматизация выполняет необратимое удаление.",
+    "empty": "Нет запросов.",
+    "deadline": "Ответить до {date}",
+    "inspect": "Показать оставшиеся данные",
+    "retry": "Запросить повторную проверку",
+    "more": "Другие запросы",
+    "mailSubject": "Удаление аккаунта CineGenius",
+    "mailActive": "Ваши активные данные и вход в аккаунт удалены. Резервные копии и остаточные данные поставщиков обрабатываются по проверенным срокам. Затем вы получите ещё одно сообщение. Для вопросов используйте номер обращения.",
+    "mailComplete": "Процесс удаления завершён в соответствии с записанными проверками и сроками. Ограниченные доказательства обработки и необходимые записи доставки сохраняются для соответствующих целей. По вопросам обращайтесь по адресу ниже.",
+    "states": {
+      "pending": "Ожидает обработки.",
+      "running": "Удаление выполняется.",
+      "needs_review": "Нужна отдельная проверка.",
+      "waiting": "Активные данные удалены; завершение и уведомление ожидаются.",
+      "completed": "Процесс удаления завершён."
+    },
+    "reasons": {
+      "worker_unavailable": "Ошибка на одном из этапов.",
+      "account_data_remaining": "Нужна проверка других, возможно общих данных.",
+      "legacy_media": "Нужна проверка старых или общих медиа.",
+      "schema_changed": "Структура данных изменилась; проверьте правила.",
+      "provider_review": "Проверьте данные поставщиков или контактный адрес."
+    },
+    "alert": "Запрос требует проверки. Откройте защищённый обзор и проверьте срок ответа. Автоматическая обработка этого случая не завершена."
   }
 }

@@ -2208,7 +2208,10 @@
     "supabaseProcessingReview": "Profildaten, Inserate, Beschreibungen und Bilder werden in Datenbank und Dateispeicher bei Supabase verarbeitet. Rechtsgrundlage für die zur Nutzung erforderliche Verarbeitung ist die Vertragserfüllung (Art. 6 Abs. 1 lit. b DSGVO). Veröffentlichte Inhalte sind entsprechend ihrer Sichtbarkeit einsehbar. Private Entwürfe und persönliche Kontaktdaten unterliegen gesonderten Zugriffsregeln. Persönliche Kontaktdaten werden nicht automatisch zu öffentlichen Firmenkontakten. Der Sitz des Anbieters ist nicht gleichbedeutend mit dem Standort jeder Verarbeitung.",
     "internationalProcessingReview": "Bei den eingesetzten Diensten kann eine Verarbeitung außerhalb des Europäischen Wirtschaftsraums stattfinden, auch bei OpenAI und den Anbietern von Anmeldung, Hosting, E-Mail und Nutzungsanalyse. Dafür ist eine anwendbare Grundlage nach Art. 44 ff. DSGVO erforderlich. Maßgeblich sind der konkrete Vertragspartner, die vereinbarten Bedingungen, Unterauftragsverarbeiter und die tatsächliche Konfiguration. Eine gewählte EU-Speicherregion schließt andere internationale Verarbeitung nicht automatisch aus.",
     "workProcessingTitle": "Zusätzliche Work-Funktionen und persönliche Dokumentanalyse",
-    "workProcessingReview": "In freigeschalteten Work-Funktionen werden Teamzugehörigkeiten, Nachrichten und ausdrücklich importierte E-Mails mit Anhängen kontobezogen verarbeitet. Eine externe Postfachverbindung erfordert einen gesonderten Verbindungsablauf; gespeicherte Zugangsberechtigungen werden verschlüsselt abgelegt. Das Trennen der Verbindung löscht nicht automatisch bereits importierte Dateien. Bei einer ausdrücklich gestarteten, freigeschalteten KI-Analyse werden die ausgewählten Dokumenttexte und erforderlichen Arbeitsangaben an OpenAI übermittelt. Solche Dokumente können auch personenbezogene Angaben anderer Beteiligter enthalten. Die Gesprächsspeicherung ist bei diesen KI-Anfragen deaktiviert; dies ist keine Zusage, dass beim Anbieter keinerlei Sicherheitsprotokolle entstehen. Die persönliche native Analyse ist derzeit auf ein gesondert freigegebenes Testkonto begrenzt. Eine im Quellcode vorbereitete Funktion ist damit nicht allgemein für alle Konten aktiviert."
+    "workProcessingReview": "In freigeschalteten Work-Funktionen werden Teamzugehörigkeiten, Nachrichten und ausdrücklich importierte E-Mails mit Anhängen kontobezogen verarbeitet. Eine externe Postfachverbindung erfordert einen gesonderten Verbindungsablauf; gespeicherte Zugangsberechtigungen werden verschlüsselt abgelegt. Das Trennen der Verbindung löscht nicht automatisch bereits importierte Dateien. Bei einer ausdrücklich gestarteten, freigeschalteten KI-Analyse werden die ausgewählten Dokumenttexte und erforderlichen Arbeitsangaben an OpenAI übermittelt. Solche Dokumente können auch personenbezogene Angaben anderer Beteiligter enthalten. Die Gesprächsspeicherung ist bei diesen KI-Anfragen deaktiviert; dies ist keine Zusage, dass beim Anbieter keinerlei Sicherheitsprotokolle entstehen. Die persönliche native Analyse ist derzeit auf ein gesondert freigegebenes Testkonto begrenzt. Eine im Quellcode vorbereitete Funktion ist damit nicht allgemein für alle Konten aktiviert.",
+    "accountErasure": "Löschanfragen aus dem angemeldeten Konto werden mit einer Vorgangsnummer dokumentiert. Die Annahme eines Auftrags bestätigt noch keine vollständige Löschung. Das persönliche Profil wird ausgeblendet. Die Bearbeitung umfasst die Prüfung zugehöriger Kontodaten, Dateien und Dienste. Gemeinsame Inhalte, Ansprüche anderer Personen und konkret begründete Aufbewahrungspflichten werden gesondert geprüft; sie rechtfertigen keine pauschale Aufbewahrung des gesamten Kontos. Erforderliche Sicherungen und Dienstleister-Restbestände werden nach den tatsächlich geprüften Lösch- und Überschreibungsregeln behandelt. Eine Wiederherstellung darf bereits gelöschte Daten nicht erneut in die gewöhnliche Verarbeitung übernehmen. Für die Bearbeitung und Rückmeldung speichern wir vorübergehend eine Vorgangskennung, die notwendige Kontozuordnung, Zeitpunkte und knappe Bearbeitungsnachweise; für Statusnachrichten gegebenenfalls die bestätigte E-Mail-Adresse. Die Bearbeitung erfolgt zur Erfüllung der Pflichten aus Art. 12 und 17 DSGVO auf Grundlage von Art. 6 Abs. 1 Buchst. c DSGVO. Über Maßnahmen oder begründete weitere Schritte informieren wir ohne unangemessene Verzögerung, grundsätzlich spätestens innerhalb eines Monats. Ein bloßer Eingangsbeleg ersetzt diese Antwort nicht. Für Anfragen und konkrete Informationen zu verbleibenden Daten: hello@cinegenius.co.",
+    "accountErasureTerms": "Ein Eingangsbeleg für eine Löschanfrage bestätigt zunächst deren Annahme. Er ersetzt weder die erforderliche Bearbeitung noch die Rückmeldung über die getroffenen Maßnahmen. Gesetzliche Löschansprüche und bestehende vertragliche Rechte bleiben unberührt; eine technische Warteschlange begründet keine zusätzliche Wartefrist.",
+    "accountDeletion": "Du kannst dein Konto jederzeit ohne Angabe von Gründen über die Kontoeinstellungen oder durch eine Anfrage an <contact>hello@cinegenius.co</contact> löschen lassen. Nach Beendigung deines Kontos löschen wir die nicht mehr erforderlichen personenbezogenen Daten unverzüglich. Gesetzliche Aufbewahrungspflichten und die erforderliche Geltendmachung, Ausübung oder Verteidigung von Rechtsansprüchen können der Löschung einzelner Daten entgegenstehen. Diese Daten werden nur im erforderlichen Umfang und nur so lange für den jeweiligen Zweck gespeichert, wie der konkrete Grund besteht. Für Sicherungskopien und Daten bei Dienstleistern sind die tatsächlichen Löschabläufe zu berücksichtigen; weitere Informationen findest du in den <privacy>Datenschutzhinweisen</privacy>. Gesetzliche Löschungsrechte und bereits bestehende vertragliche Ansprüche bleiben unberührt."
   },
   "SetupOffers": {
     "accountReady": "Ditt leverantörskonto är färdigt.",
@@ -3243,7 +3246,6 @@
     "text_f5315cb707d7cd": "Ovanstående ansvarsbegränsningar gäller inte vid vållande av dödsfall eller skada på kropp eller hälsa, vid anspråk enligt den tyska produktansvarslagen eller vid svikligt förledande.",
     "text_5c5e16ac6fa0f5": "Operatören garanterar inte att plattformen alltid är tillgänglig. Planerat underhåll meddelas i förväg i den mån det är möjligt.",
     "text_49442663ee1e7b": "§ 12 Uppsägning och radering",
-    "text_b96e50a60df1cc": "Du kan när som helst radera ditt konto utan att ange skäl. Radering sker via kontoinställningarna eller genom en skriftlig begäran till <part1>hello@cinegenius.co</part1>. Efter raderingen tas dina personuppgifter bort inom 30 dagar, om inte lagstadgade lagringsskyldigheter hindrar detta (till exempel skatterättsliga lagringsskyldigheter enligt § 147 AO i upp till 10 år).",
     "text_ca14a695232c3b": "Operatören får omedelbart spärra eller permanent radera konton vid allvarliga eller upprepade överträdelser av dessa villkor. Vid en spärr påverkas inte rättigheter och skyldigheter enligt avtal mellan användare.",
     "text_f97f494f842b6b": "Operatören får lägga ned plattformen med 30 dagars varsel. Rättigheter enligt redan ingångna avtal mellan användare påverkas inte.",
     "text_d1e5e968645eeb": "§ 13 Spärrning och moderering",
@@ -14202,5 +14204,54 @@
   "PrivacyReview": {
     "claimReview": "Kopplingen av denna person och personens filmmeriter måste verifieras först. Kontakta hello@cinegenius.co. Automatisk koppling är inte tillgänglig just nu.",
     "claimContact": "Begär verifiering"
+  },
+  "AccountErasure": {
+    "title": "Radera konto",
+    "intro": "Din begäran registreras. Din personliga profil döljs. Tydligt kopplade uppgifter raderas enligt granskade regler; delat innehåll och motiverade undantag granskas separat.",
+    "confirm": "Begära kontoradering? Den efterföljande raderingen kan inte ångras.",
+    "accepted": "Din begäran har registrerats. Detta bekräftar ännu inte fullständig radering.",
+    "receipt": "Referens: {id}",
+    "delete": "Begär radering",
+    "sending": "Skickar…",
+    "error": "Åtgärden kunde inte bekräftas. Uppdatera eller försök igen. Frågor: hello@cinegenius.co.",
+    "refresh": "Uppdatera status",
+    "loading": "Läser in status…",
+    "adminTitle": "Raderingsbegäranden",
+    "adminIntro": "Automatisk hantering och öppna undantag. Ett nytt försök kringgår inga kontroller. Öppna ärenden kräver svar i tid; denna vy skickar ingen motiverad tidsförlängning.",
+    "back": "Till administrationen",
+    "policyTitle": "Inledande driftregler",
+    "policyIntro": "Aktivera först efter granskning av omfattning, leverantörer, säkerhetskopior, återställningsskydd och bevislagring. Värdena ska motsvara dokumenterade inställningar, inte antagna lagstadgade tider. Ange inte lösenord eller avtal.",
+    "evidence": "Bevisreferenser och omfattning",
+    "backup_days": "Säkerhetskopior: dagar",
+    "provider_days": "Leverantörer: dagar",
+    "receipt_days": "Raderingsbevis: dagar",
+    "validUntil": "Granska igen senast (UTC)",
+    "enabled": "Automatik aktiverad",
+    "disabled": "Automatik inte aktiverad",
+    "save": "Spara regler",
+    "policyConfirm": "Spara dessa dokumenterade regler? Aktiverad automatik utför oåterkalleliga raderingar.",
+    "empty": "Inga begäranden.",
+    "deadline": "Svar senast {date}",
+    "inspect": "Visa kvarstående uppgifter",
+    "retry": "Begär ny granskning",
+    "more": "Fler begäranden",
+    "mailSubject": "Radering av ditt CineGenius-konto",
+    "mailActive": "Dina aktiva kontouppgifter och din inloggning har raderats. Säkerhetskopior och kvarvarande leverantörsdata hanteras enligt granskade tider. Du får ett nytt meddelande efteråt. Ange referensen vid frågor.",
+    "mailComplete": "Raderingsprocessen är avslutad enligt registrerade kontroller och tider. Begränsade behandlingsbevis och nödvändiga leveransuppgifter behålls för sina respektive ändamål. Kontakta oss på adressen nedan vid frågor.",
+    "states": {
+      "pending": "Väntar på hantering.",
+      "running": "Radering pågår.",
+      "needs_review": "Separat granskning krävs.",
+      "waiting": "Aktiva uppgifter raderade; avslut och meddelande återstår.",
+      "completed": "Raderingsprocessen är avslutad."
+    },
+    "reasons": {
+      "worker_unavailable": "Ett steg misslyckades.",
+      "account_data_remaining": "Andra, möjligen delade uppgifter behöver granskas.",
+      "legacy_media": "Äldre eller delade medier behöver granskas.",
+      "schema_changed": "Datastrukturen ändrades; granska reglerna.",
+      "provider_review": "Granska leverantörsdata eller kontaktadress."
+    },
+    "alert": "En begäran behöver granskas. Öppna den skyddade översikten och kontrollera svarstiden. Automatiken har inte slutfört ärendet."
   }
 }

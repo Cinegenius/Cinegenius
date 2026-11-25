@@ -639,6 +639,7 @@ function AdminContent() {
     errorLabel: item.id === "support" && supportUnread.status === "error" ? supportText("unreadError") : undefined,
   }));
   const navLinks = [
+    { href: "/admin/privacy-requests", label: uiText("AccountErasure.adminTitle"), group: "review" as const },
     { href: "/admin/places", label: placeText("reviewTitle"), group: "review" as const },
     { href: "/admin/listing-freshness", label: freshnessText("title"), group: "content" as const },
     { href: "/mitgestalten/koordination", label: clarity("countryFeedback"), group: "review" as const },

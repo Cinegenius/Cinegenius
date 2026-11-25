@@ -302,8 +302,14 @@ export default clerkMiddleware(async (auth, request) => {
     // Verified admin — fall through to security headers
   } else if (isWebhookRoute(request)) {
     // 3a. Webhook routes — skip Clerk auth entirely; signature verified per-handler
-  } else if (request.method === "GET" && request.nextUrl.pathname === "/api/cron/listing-freshness") {
-    // This exact scheduler route checks CRON_SECRET itself before any work.
+  } else if (request.method === "GET" && [
+    "/api/cron/listing-freshness",
+    "/api/cron/account-erasure",
+    "/api/cron/shots-cleanup",
+    "/api/cron/native-push",
+  ].includes(request.nextUrl.pathname)) {
+    // These exact scheduler GETs check CRON_SECRET before any work in their
+    // handlers. A browser session cannot replace that machine credential.
     // Other cron paths and methods retain the normal session protection.
   } else if (["GET", "POST", "HEAD"].includes(request.method) && request.nextUrl.pathname === "/api/cron/profile-art") {
     // Exact fixed-input artwork worker; the handler verifies a scoped machine secret.

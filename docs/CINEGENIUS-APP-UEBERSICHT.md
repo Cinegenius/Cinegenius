@@ -1,3 +1,7 @@
+## Kontolöschung: neuer Web-Vertrag · 25. November 2026 · native Übernahme offen
+
+Der unveröffentlichte Web-Entwurf nimmt Löschanfragen dauerhaft an: `DELETE /api/account` verlangt die bestätigte Konto-ID in `X-Account-Id` und liefert HTTP 202 mit `{accepted:true,accountId,request}`; dies bedeutet keine vollständige Löschung. `GET /api/account` zeigt nur den eigenen Vorgang. Native Aufrufer dürfen nicht mehr `{success:true}` oder sofortige vollständige Löschung voraussetzen. Die zustandsgebundene UI verwirft verspätete Antworten nach Kontowechsel; Status-/Fehlertexte liegen in allen 17 gemeinsamen Katalogen vor. Migrationen, Betriebsregeln und Aktivierung stehen aus. Keine Swift-/Xcode-Quelle, App-Installation oder physische Abnahme durch diesen Web-Änderungssatz. [Getrennter Umfang und Prüfnachweis](privacy/account-erasure.md).
+
 ## Datenschutzprüfung und Web-/App-Abgleich · 25. November 2026 · Web-Kandidat
 
 Die Websiteprüfung bereitet Schutz bei Kontolöschung und alten Personenverweisen sowie den Stopp ungeprüfter Credit-Übernahmen vor. Neue Hinweise stehen in 17 Katalogen; API-Fehler bleiben lokalisiert. APP muss Löschung, private Dateien, Mail-/Dokumentanalyse und Kontodienst-Löschwege mit dem später freigegebenen Web-Vertrag abgleichen. Keine native Quelle, Gerätekonfiguration, Installation oder Push-/Mail-Aktivierung geändert. Kandidat noch nicht veröffentlicht; keine native Abnahme behauptet. [Vollständiger Prüfbericht](legal-review/2026-11-25/README.md).

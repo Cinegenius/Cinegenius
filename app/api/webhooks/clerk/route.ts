@@ -13,6 +13,7 @@ function validOtp(value: unknown): string | null {
 import { Webhook } from "svix";
 import { headers } from "next/headers";
 import { Resend } from "resend";
+import { requestErasure } from "@/lib/account-erasure-server";
 
 const resend = process.env.RESEND_API_KEY
   ? new Resend(process.env.RESEND_API_KEY)
@@ -45,6 +46,17 @@ export async function POST(req: Request) {
     }) as typeof event;
   } catch {
     return new Response("Invalid signature", { status: 400 });
+  }
+
+  // A provider-side deletion must be persisted before acknowledging its webhook.
+  // Duplicate deliveries reuse the same request; no unsigned event can reach it.
+  if (event.type === "user.deleted") {
+    if (!event.data || typeof event.data !== "object" || typeof event.data.id !== "string" || !/^[A-Za-z0-9_-]{3,128}$/.test(event.data.id)) {
+      return new Response(null, {status: 400, headers: {"Cache-Control":"no-store"}});
+    }
+    try { await requestErasure(event.data.id, "deleted_webhook"); }
+    catch { return new Response(null, {status: 503, headers: {"Cache-Control":"no-store"}}); }
+    return new Response("OK", {status: 200, headers: {"Cache-Control":"no-store"}});
   }
 
   // Clerk verification/invitation emails — fired when "Delivered by Clerk" is OFF

@@ -55,6 +55,7 @@ export default async function DatenschutzPage() {
           <p className="text-xs uppercase tracking-widest text-text-muted font-semibold mb-3">{uiText("Ui.text_0da5374b4c42ae")}</p>
           <h1 className="font-display text-3xl font-bold text-text-primary mb-2">{uiText("cookie.link")}</h1>
           <p className="text-text-muted text-sm">{t("privacyDate")}</p>
+          <p lang="de" className="mt-4 text-sm leading-relaxed text-text-secondary">{t("accountErasure")}</p>
         </div>
 
         <div className="space-y-10 text-text-secondary text-sm leading-relaxed">

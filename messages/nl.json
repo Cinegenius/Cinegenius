@@ -2208,7 +2208,10 @@
     "supabaseProcessingReview": "Profildaten, Inserate, Beschreibungen und Bilder werden in Datenbank und Dateispeicher bei Supabase verarbeitet. Rechtsgrundlage für die zur Nutzung erforderliche Verarbeitung ist die Vertragserfüllung (Art. 6 Abs. 1 lit. b DSGVO). Veröffentlichte Inhalte sind entsprechend ihrer Sichtbarkeit einsehbar. Private Entwürfe und persönliche Kontaktdaten unterliegen gesonderten Zugriffsregeln. Persönliche Kontaktdaten werden nicht automatisch zu öffentlichen Firmenkontakten. Der Sitz des Anbieters ist nicht gleichbedeutend mit dem Standort jeder Verarbeitung.",
     "internationalProcessingReview": "Bei den eingesetzten Diensten kann eine Verarbeitung außerhalb des Europäischen Wirtschaftsraums stattfinden, auch bei OpenAI und den Anbietern von Anmeldung, Hosting, E-Mail und Nutzungsanalyse. Dafür ist eine anwendbare Grundlage nach Art. 44 ff. DSGVO erforderlich. Maßgeblich sind der konkrete Vertragspartner, die vereinbarten Bedingungen, Unterauftragsverarbeiter und die tatsächliche Konfiguration. Eine gewählte EU-Speicherregion schließt andere internationale Verarbeitung nicht automatisch aus.",
     "workProcessingTitle": "Zusätzliche Work-Funktionen und persönliche Dokumentanalyse",
-    "workProcessingReview": "In freigeschalteten Work-Funktionen werden Teamzugehörigkeiten, Nachrichten und ausdrücklich importierte E-Mails mit Anhängen kontobezogen verarbeitet. Eine externe Postfachverbindung erfordert einen gesonderten Verbindungsablauf; gespeicherte Zugangsberechtigungen werden verschlüsselt abgelegt. Das Trennen der Verbindung löscht nicht automatisch bereits importierte Dateien. Bei einer ausdrücklich gestarteten, freigeschalteten KI-Analyse werden die ausgewählten Dokumenttexte und erforderlichen Arbeitsangaben an OpenAI übermittelt. Solche Dokumente können auch personenbezogene Angaben anderer Beteiligter enthalten. Die Gesprächsspeicherung ist bei diesen KI-Anfragen deaktiviert; dies ist keine Zusage, dass beim Anbieter keinerlei Sicherheitsprotokolle entstehen. Die persönliche native Analyse ist derzeit auf ein gesondert freigegebenes Testkonto begrenzt. Eine im Quellcode vorbereitete Funktion ist damit nicht allgemein für alle Konten aktiviert."
+    "workProcessingReview": "In freigeschalteten Work-Funktionen werden Teamzugehörigkeiten, Nachrichten und ausdrücklich importierte E-Mails mit Anhängen kontobezogen verarbeitet. Eine externe Postfachverbindung erfordert einen gesonderten Verbindungsablauf; gespeicherte Zugangsberechtigungen werden verschlüsselt abgelegt. Das Trennen der Verbindung löscht nicht automatisch bereits importierte Dateien. Bei einer ausdrücklich gestarteten, freigeschalteten KI-Analyse werden die ausgewählten Dokumenttexte und erforderlichen Arbeitsangaben an OpenAI übermittelt. Solche Dokumente können auch personenbezogene Angaben anderer Beteiligter enthalten. Die Gesprächsspeicherung ist bei diesen KI-Anfragen deaktiviert; dies ist keine Zusage, dass beim Anbieter keinerlei Sicherheitsprotokolle entstehen. Die persönliche native Analyse ist derzeit auf ein gesondert freigegebenes Testkonto begrenzt. Eine im Quellcode vorbereitete Funktion ist damit nicht allgemein für alle Konten aktiviert.",
+    "accountErasure": "Löschanfragen aus dem angemeldeten Konto werden mit einer Vorgangsnummer dokumentiert. Die Annahme eines Auftrags bestätigt noch keine vollständige Löschung. Das persönliche Profil wird ausgeblendet. Die Bearbeitung umfasst die Prüfung zugehöriger Kontodaten, Dateien und Dienste. Gemeinsame Inhalte, Ansprüche anderer Personen und konkret begründete Aufbewahrungspflichten werden gesondert geprüft; sie rechtfertigen keine pauschale Aufbewahrung des gesamten Kontos. Erforderliche Sicherungen und Dienstleister-Restbestände werden nach den tatsächlich geprüften Lösch- und Überschreibungsregeln behandelt. Eine Wiederherstellung darf bereits gelöschte Daten nicht erneut in die gewöhnliche Verarbeitung übernehmen. Für die Bearbeitung und Rückmeldung speichern wir vorübergehend eine Vorgangskennung, die notwendige Kontozuordnung, Zeitpunkte und knappe Bearbeitungsnachweise; für Statusnachrichten gegebenenfalls die bestätigte E-Mail-Adresse. Die Bearbeitung erfolgt zur Erfüllung der Pflichten aus Art. 12 und 17 DSGVO auf Grundlage von Art. 6 Abs. 1 Buchst. c DSGVO. Über Maßnahmen oder begründete weitere Schritte informieren wir ohne unangemessene Verzögerung, grundsätzlich spätestens innerhalb eines Monats. Ein bloßer Eingangsbeleg ersetzt diese Antwort nicht. Für Anfragen und konkrete Informationen zu verbleibenden Daten: hello@cinegenius.co.",
+    "accountErasureTerms": "Ein Eingangsbeleg für eine Löschanfrage bestätigt zunächst deren Annahme. Er ersetzt weder die erforderliche Bearbeitung noch die Rückmeldung über die getroffenen Maßnahmen. Gesetzliche Löschansprüche und bestehende vertragliche Rechte bleiben unberührt; eine technische Warteschlange begründet keine zusätzliche Wartefrist.",
+    "accountDeletion": "Du kannst dein Konto jederzeit ohne Angabe von Gründen über die Kontoeinstellungen oder durch eine Anfrage an <contact>hello@cinegenius.co</contact> löschen lassen. Nach Beendigung deines Kontos löschen wir die nicht mehr erforderlichen personenbezogenen Daten unverzüglich. Gesetzliche Aufbewahrungspflichten und die erforderliche Geltendmachung, Ausübung oder Verteidigung von Rechtsansprüchen können der Löschung einzelner Daten entgegenstehen. Diese Daten werden nur im erforderlichen Umfang und nur so lange für den jeweiligen Zweck gespeichert, wie der konkrete Grund besteht. Für Sicherungskopien und Daten bei Dienstleistern sind die tatsächlichen Löschabläufe zu berücksichtigen; weitere Informationen findest du in den <privacy>Datenschutzhinweisen</privacy>. Gesetzliche Löschungsrechte und bereits bestehende vertragliche Ansprüche bleiben unberührt."
   },
   "SetupOffers": {
     "accountReady": "Je aanbiedersaccount is ingesteld.",
@@ -3243,7 +3246,6 @@
     "text_f5315cb707d7cd": "De bovenstaande aansprakelijkheidsbeperkingen gelden niet bij verwijtbare aantasting van leven, lichaam of gezondheid, bij aanspraken volgens de Duitse wet inzake productaansprakelijkheid of bij bedrieglijke misleiding.",
     "text_5c5e16ac6fa0f5": "De beheerder garandeert niet dat het platform altijd bereikbaar is. Gepland onderhoud wordt, voor zover mogelijk, vooraf aangekondigd.",
     "text_49442663ee1e7b": "§ 12 Opzegging en verwijdering",
-    "text_b96e50a60df1cc": "Je kunt je account op elk moment zonder opgave van redenen verwijderen. Dit kan via de accountinstellingen of met een schriftelijk verzoek aan <part1>hello@cinegenius.co</part1>. Na verwijdering worden je persoonsgegevens binnen 30 dagen verwijderd, tenzij wettelijke bewaarplichten zich daartegen verzetten (bijv. fiscale bewaarplichten volgens § 147 AO van maximaal 10 jaar).",
     "text_ca14a695232c3b": "De beheerder mag accounts bij ernstige of herhaalde schending van deze voorwaarden met onmiddellijke ingang blokkeren of definitief verwijderen. Bij blokkering blijven de rechten en verplichtingen uit afspraken tussen gebruikers onverminderd gelden.",
     "text_f97f494f842b6b": "De beheerder kan het platform beëindigen met een aankondigingstermijn van 30 dagen. Rechten uit reeds gesloten overeenkomsten tussen gebruikers blijven hierdoor onaangetast.",
     "text_d1e5e968645eeb": "§ 13 Blokkering en moderatie",
@@ -14202,5 +14204,54 @@
   "PrivacyReview": {
     "claimReview": "De koppeling van deze persoon en diens filmcredits moet vooraf worden gecontroleerd. Neem contact op met hello@cinegenius.co. Automatisch overnemen is momenteel niet mogelijk.",
     "claimContact": "Controle aanvragen"
+  },
+  "AccountErasure": {
+    "title": "Account verwijderen",
+    "intro": "Je verwijderingsverzoek wordt vastgelegd. Je persoonlijke profiel wordt verborgen. Duidelijk gekoppelde gegevens worden volgens gecontroleerde regels verwijderd; gedeelde inhoud en gemotiveerde uitzonderingen worden apart beoordeeld.",
+    "confirm": "Accountverwijdering aanvragen? De daaropvolgende verwijdering is onomkeerbaar.",
+    "accepted": "Je verzoek is vastgelegd. Dit bevestigt nog geen volledige verwijdering.",
+    "receipt": "Referentie: {id}",
+    "delete": "Verwijdering aanvragen",
+    "sending": "Verzenden…",
+    "error": "De actie kon niet worden bevestigd. Vernieuw of probeer opnieuw. Vragen: hello@cinegenius.co.",
+    "refresh": "Status vernieuwen",
+    "loading": "Status laden…",
+    "adminTitle": "Verwijderingsverzoeken",
+    "adminIntro": "Automatische verwerking en openstaande uitzonderingen. Opnieuw proberen omzeilt geen controles. Open verzoeken vereisen tijdige antwoorden; dit overzicht verstuurt geen gemotiveerde termijnverlenging.",
+    "back": "Terug naar beheer",
+    "policyTitle": "Eenmalige bedrijfsregels",
+    "policyIntro": "Pas activeren na controle van de reikwijdte, leveranciers, back-ups, herstelbeveiliging en bewaartermijnen voor bewijs. Waarden moeten de gedocumenteerde instellingen weergeven, geen veronderstelde wettelijke termijnen. Voer geen wachtwoorden of contracten in.",
+    "evidence": "Bewijsverwijzingen en reikwijdte",
+    "backup_days": "Back-ups: dagen",
+    "provider_days": "Leveranciers: dagen",
+    "receipt_days": "Verwijderingsbewijs: dagen",
+    "validUntil": "Opnieuw controleren vóór (UTC)",
+    "enabled": "Automatisering ingeschakeld",
+    "disabled": "Automatisering uitgeschakeld",
+    "save": "Regels opslaan",
+    "policyConfirm": "Deze onderbouwde regels opslaan? Actieve automatisering voert onomkeerbare verwijderingen uit.",
+    "empty": "Geen verzoeken.",
+    "deadline": "Antwoord uiterlijk op {date}",
+    "inspect": "Openstaande gegevens bekijken",
+    "retry": "Opnieuw laten controleren",
+    "more": "Meer verzoeken",
+    "mailSubject": "Verwijdering van je CineGenius-account",
+    "mailActive": "Je actieve accountgegevens en toegang zijn verwijderd. Back-ups en resterende gegevens bij leveranciers worden volgens gecontroleerde termijnen afgehandeld. Daarna ontvang je nog een bericht. Gebruik de referentie bij vragen.",
+    "mailComplete": "Je verwijderingsproces is afgerond volgens de vastgelegde controles en termijnen. Beperkt verwerkingsbewijs en noodzakelijke aflevergegevens blijven voor hun eigen doelen bewaard. Neem bij vragen contact op via het onderstaande adres.",
+    "states": {
+      "pending": "In de wachtrij.",
+      "running": "Verwijdering wordt verwerkt.",
+      "needs_review": "Een aparte beoordeling is nodig.",
+      "waiting": "Actieve gegevens verwijderd; afronding en bericht volgen.",
+      "completed": "Het verwijderingsproces is afgerond."
+    },
+    "reasons": {
+      "worker_unavailable": "Een stap is mislukt.",
+      "account_data_remaining": "Andere, mogelijk gedeelde gegevens vereisen controle.",
+      "legacy_media": "Oudere of gedeelde media vereisen controle.",
+      "schema_changed": "De gegevensstructuur is gewijzigd; controleer de regels.",
+      "provider_review": "Controleer leveranciersgegevens of het contactadres."
+    },
+    "alert": "Een verwijderingsverzoek vereist beoordeling. Open het beveiligde overzicht en controleer de antwoordtermijn. De automatische verwerking heeft deze zaak niet afgerond."
   }
 }

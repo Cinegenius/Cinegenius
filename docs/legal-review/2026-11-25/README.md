@@ -123,3 +123,21 @@ Abgerufen am 25.11.2026. Die folgenden Quellen unterstützen die Prüfung; sie s
 4. Restliche Testfehler auflösen, private Konten gegeneinander testen, gesamte Legacy-Datei-/Cache-Menge prüfen und echte native Informations-/Bedienabläufe abnehmen.
 
 Alle offenen Punkte bleiben ausdrücklich offen. Dieser Bericht gibt weder einen Livegang noch eine vollständige rechtliche oder technische Entwarnung vor.
+
+## Fortsetzung: Kontolöschautomatik und AGB-Entwurf
+
+Auf Markus' Folgeauftrag ist eine erste, standardmäßig deaktivierte Kontolöschautomatik vorbereitet. Dieser Abschnitt beschreibt den neuen Quellstand; frühere Prüfstände und fehlgeschlagene Läufe oben bleiben als Historie erhalten. Die Änderungen sind **nicht live**, beide neuen Migrationen **nicht angewandt**, keine Produktionsdaten gelöscht und keine E-Mails versendet.
+
+Der bisherige unmittelbare Löschaufruf wird durch einen dauerhaften, kontogebundenen Vorgang ersetzt. HTTP 202 ist ausdrücklich ein Eingangsbeleg. Der Worker bestätigt Dateientfernung, behandelt Anbieter- und Versandfehler mit Wiederholungen und beendet Fälle erst nach den dafür belegten Regeln. Bekannte gemeinsame Inhalte, alte öffentliche Dateien, verbleibende Daten, Administrationszugänge und Regelarchivverweise verhindern einen falschen Abschluss. Veränderte Spalten, Fremdschlüssel oder Trigger stoppen die geprüfte automatische Bearbeitung. Die neue interne Übersicht zeigt offene Fälle und Antwortfristen; Sonderfälle können eine Nachricht an den bestehenden Kontakt erhalten.
+
+Die exakten Scheduler-GETs für diesen Worker sowie die vorhandenen Listing-/Shots-/Push-Routen erreichen jetzt ihre eigene Schlüsselprüfung. Nachbarpfade und andere Methoden bleiben sitzungsgeschützt. Fehlende/falsche Schlüssel führen weiterhin zu 401, fehlende Aktivierung zu keiner Arbeit. Dieser Quellfix setzt keine Produktionsvariable und aktiviert keinen Dienst oder täglichen Website-Agenten.
+
+Eine tatsächlich ausgeführte, ausschließlich lesende Supabase-Advisor-Abfrage ergab fünf Warnungen zu veränderlichen Funktionssuchpfaden, keine Advisor-Fehler. Eine zweite Migration fixiert bei genau diesen fünf Hilfsfunktionen den Suchpfad auf `pg_catalog`; Körper, Signaturen, Rechte und Sichtbarkeitslogik bleiben erhalten. Ein nachgewiesener Angriff wird damit nicht behauptet.
+
+Die Live-Backup-Metadaten zeigten am 25.11.2026 um 17:37 UTC sieben abgeschlossene tägliche physische Datenbanksicherungen, Region `eu-central-1`, PITR deaktiviert. Das belegt weder eine vollständige Sicherungsinventur noch einen erfolgreichen Restore oder die maximale Restaufbewahrung aller Dienste.
+
+Markus hat ausdrücklich die Entfernung der pauschalen 30-Tage-Zusage beauftragt. Der unveröffentlichte Entwurf verlangt stattdessen unverzügliche Löschung nicht mehr erforderlicher Daten und erläutert konkrete Ausnahmen. Bestehende vertragliche Ansprüche bleiben erhalten; eine Webseitenänderung allein beseitigt sie nicht. Die grundsätzlich einmonatige Antwortfrist aus Art. 12 Abs. 3 DSGVO wird nicht mit einer allgemeinen Löschwartefrist gleichgesetzt. [Alter Wortlaut, neuer Entwurf und primäre Rechtsquellen](agb-loeschung-entwurf.md).
+
+Der technische/organisatorische Aktivierungsstopp bleibt erforderlich: Betreiber und tatsächlich geltende Verträge/Fristen sind nicht vollständig belegt. Ein normal genutztes Konto mit gemeinsamen Nachrichten ist noch kein vollständig automatischer Fall. Insbesondere fehlt ein unabhängig vom zurückgesetzten Datenbankstand verfügbarer Lösch-/Sperrnachweis mit erprobter Wiederanwendung bei Restore. Auch echte Zwei-Konten-, Clerk-Ereignis- und native App-Abläufe sind noch nicht abgenommen. Dies ist keine vollständige Datenschutzfreigabe.
+
+[Ablauf, API-Vertrag, Prüfungen und konkrete offene Grenzen](../../privacy/account-erasure.md). Nachweise dieser Phase: `/srv/cinegenius/audits/20261125-account-erasure/`. Die abschließenden Laufresultate stehen im [Prüfbeleg](account-erasure-verification.md); ein erfolgreicher Teiltest wird nicht als grüner Gesamtlauf ausgegeben.

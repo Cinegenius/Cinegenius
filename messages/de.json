@@ -2208,7 +2208,10 @@
     "supabaseProcessingReview": "Profildaten, Inserate, Beschreibungen und Bilder werden in Datenbank und Dateispeicher bei Supabase verarbeitet. Rechtsgrundlage für die zur Nutzung erforderliche Verarbeitung ist die Vertragserfüllung (Art. 6 Abs. 1 lit. b DSGVO). Veröffentlichte Inhalte sind entsprechend ihrer Sichtbarkeit einsehbar. Private Entwürfe und persönliche Kontaktdaten unterliegen gesonderten Zugriffsregeln. Persönliche Kontaktdaten werden nicht automatisch zu öffentlichen Firmenkontakten. Der Sitz des Anbieters ist nicht gleichbedeutend mit dem Standort jeder Verarbeitung.",
     "internationalProcessingReview": "Bei den eingesetzten Diensten kann eine Verarbeitung außerhalb des Europäischen Wirtschaftsraums stattfinden, auch bei OpenAI und den Anbietern von Anmeldung, Hosting, E-Mail und Nutzungsanalyse. Dafür ist eine anwendbare Grundlage nach Art. 44 ff. DSGVO erforderlich. Maßgeblich sind der konkrete Vertragspartner, die vereinbarten Bedingungen, Unterauftragsverarbeiter und die tatsächliche Konfiguration. Eine gewählte EU-Speicherregion schließt andere internationale Verarbeitung nicht automatisch aus.",
     "workProcessingTitle": "Zusätzliche Work-Funktionen und persönliche Dokumentanalyse",
-    "workProcessingReview": "In freigeschalteten Work-Funktionen werden Teamzugehörigkeiten, Nachrichten und ausdrücklich importierte E-Mails mit Anhängen kontobezogen verarbeitet. Eine externe Postfachverbindung erfordert einen gesonderten Verbindungsablauf; gespeicherte Zugangsberechtigungen werden verschlüsselt abgelegt. Das Trennen der Verbindung löscht nicht automatisch bereits importierte Dateien. Bei einer ausdrücklich gestarteten, freigeschalteten KI-Analyse werden die ausgewählten Dokumenttexte und erforderlichen Arbeitsangaben an OpenAI übermittelt. Solche Dokumente können auch personenbezogene Angaben anderer Beteiligter enthalten. Die Gesprächsspeicherung ist bei diesen KI-Anfragen deaktiviert; dies ist keine Zusage, dass beim Anbieter keinerlei Sicherheitsprotokolle entstehen. Die persönliche native Analyse ist derzeit auf ein gesondert freigegebenes Testkonto begrenzt. Eine im Quellcode vorbereitete Funktion ist damit nicht allgemein für alle Konten aktiviert."
+    "workProcessingReview": "In freigeschalteten Work-Funktionen werden Teamzugehörigkeiten, Nachrichten und ausdrücklich importierte E-Mails mit Anhängen kontobezogen verarbeitet. Eine externe Postfachverbindung erfordert einen gesonderten Verbindungsablauf; gespeicherte Zugangsberechtigungen werden verschlüsselt abgelegt. Das Trennen der Verbindung löscht nicht automatisch bereits importierte Dateien. Bei einer ausdrücklich gestarteten, freigeschalteten KI-Analyse werden die ausgewählten Dokumenttexte und erforderlichen Arbeitsangaben an OpenAI übermittelt. Solche Dokumente können auch personenbezogene Angaben anderer Beteiligter enthalten. Die Gesprächsspeicherung ist bei diesen KI-Anfragen deaktiviert; dies ist keine Zusage, dass beim Anbieter keinerlei Sicherheitsprotokolle entstehen. Die persönliche native Analyse ist derzeit auf ein gesondert freigegebenes Testkonto begrenzt. Eine im Quellcode vorbereitete Funktion ist damit nicht allgemein für alle Konten aktiviert.",
+    "accountErasure": "Löschanfragen aus dem angemeldeten Konto werden mit einer Vorgangsnummer dokumentiert. Die Annahme eines Auftrags bestätigt noch keine vollständige Löschung. Das persönliche Profil wird ausgeblendet. Die Bearbeitung umfasst die Prüfung zugehöriger Kontodaten, Dateien und Dienste. Gemeinsame Inhalte, Ansprüche anderer Personen und konkret begründete Aufbewahrungspflichten werden gesondert geprüft; sie rechtfertigen keine pauschale Aufbewahrung des gesamten Kontos. Erforderliche Sicherungen und Dienstleister-Restbestände werden nach den tatsächlich geprüften Lösch- und Überschreibungsregeln behandelt. Eine Wiederherstellung darf bereits gelöschte Daten nicht erneut in die gewöhnliche Verarbeitung übernehmen. Für die Bearbeitung und Rückmeldung speichern wir vorübergehend eine Vorgangskennung, die notwendige Kontozuordnung, Zeitpunkte und knappe Bearbeitungsnachweise; für Statusnachrichten gegebenenfalls die bestätigte E-Mail-Adresse. Die Bearbeitung erfolgt zur Erfüllung der Pflichten aus Art. 12 und 17 DSGVO auf Grundlage von Art. 6 Abs. 1 Buchst. c DSGVO. Über Maßnahmen oder begründete weitere Schritte informieren wir ohne unangemessene Verzögerung, grundsätzlich spätestens innerhalb eines Monats. Ein bloßer Eingangsbeleg ersetzt diese Antwort nicht. Für Anfragen und konkrete Informationen zu verbleibenden Daten: hello@cinegenius.co.",
+    "accountErasureTerms": "Ein Eingangsbeleg für eine Löschanfrage bestätigt zunächst deren Annahme. Er ersetzt weder die erforderliche Bearbeitung noch die Rückmeldung über die getroffenen Maßnahmen. Gesetzliche Löschansprüche und bestehende vertragliche Rechte bleiben unberührt; eine technische Warteschlange begründet keine zusätzliche Wartefrist.",
+    "accountDeletion": "Du kannst dein Konto jederzeit ohne Angabe von Gründen über die Kontoeinstellungen oder durch eine Anfrage an <contact>hello@cinegenius.co</contact> löschen lassen. Nach Beendigung deines Kontos löschen wir die nicht mehr erforderlichen personenbezogenen Daten unverzüglich. Gesetzliche Aufbewahrungspflichten und die erforderliche Geltendmachung, Ausübung oder Verteidigung von Rechtsansprüchen können der Löschung einzelner Daten entgegenstehen. Diese Daten werden nur im erforderlichen Umfang und nur so lange für den jeweiligen Zweck gespeichert, wie der konkrete Grund besteht. Für Sicherungskopien und Daten bei Dienstleistern sind die tatsächlichen Löschabläufe zu berücksichtigen; weitere Informationen findest du in den <privacy>Datenschutzhinweisen</privacy>. Gesetzliche Löschungsrechte und bereits bestehende vertragliche Ansprüche bleiben unberührt."
   },
   "SetupOffers": {
     "accountReady": "Dein Anbieterkonto ist eingerichtet.",
@@ -3243,7 +3246,6 @@
     "text_f5315cb707d7cd": "Die vorstehenden Haftungsbeschränkungen gelten nicht bei schuldhafter Verletzung des Lebens, des Körpers oder der Gesundheit, bei Ansprüchen nach dem Produkthaftungsgesetz sowie bei arglistiger Täuschung.",
     "text_5c5e16ac6fa0f5": "Der Betreiber übernimmt keine Gewähr für die jederzeitige Erreichbarkeit der Plattform. Geplante Wartungsarbeiten werden, soweit möglich, vorab angekündigt.",
     "text_49442663ee1e7b": "§ 12 Kündigung & Löschung",
-    "text_b96e50a60df1cc": "Du kannst deinen Account jederzeit ohne Angabe von Gründen löschen. Die Löschung erfolgt über die Accounteinstellungen oder per schriftlicher Anfrage an <part1>hello@cinegenius.co</part1>. Nach der Löschung werden deine personenbezogenen Daten innerhalb von 30 Tagen gelöscht, sofern keine gesetzlichen Aufbewahrungspflichten entgegenstehen (z. B. steuerrechtliche Aufbewahrungspflichten nach § 147 AO von bis zu 10 Jahren).",
     "text_ca14a695232c3b": "Der Betreiber ist berechtigt, Accounts bei schwerwiegenden oder wiederholten Verstößen gegen diese AGB fristlos zu sperren oder dauerhaft zu löschen. Im Fall einer Sperrung bleiben die Rechte und Pflichten aus Vereinbarungen zwischen Nutzern unberührt.",
     "text_f97f494f842b6b": "Der Betreiber kann die Plattform mit einer Ankündigungsfrist von 30 Tagen einstellen. Die Rechte aus bereits geschlossenen Verträgen zwischen Nutzern bleiben hiervon unberührt.",
     "text_d1e5e968645eeb": "§ 13 Sperrung & Moderation",
@@ -14202,5 +14204,54 @@
   "PrivacyReview": {
     "claimReview": "Die Zuordnung dieser Person und ihrer Film-Credits muss vorab geprüft werden. Bitte kontaktiere hello@cinegenius.co. Eine automatische Übernahme ist derzeit nicht möglich.",
     "claimContact": "Zuordnung prüfen lassen"
+  },
+  "AccountErasure": {
+    "title": "Konto löschen",
+    "intro": "Die Löschung wird als Auftrag gespeichert. Dein persönliches Profil wird verborgen. Eindeutig zugeordnete Daten werden nach geprüften Regeln gelöscht; gemeinsame Inhalte und begründete Ausnahmen werden gesondert geprüft.",
+    "confirm": "Kontolöschung verbindlich anfordern? Die anschließende Löschung kann nicht rückgängig gemacht werden.",
+    "accepted": "Deine Löschanfrage wurde gespeichert. Das ist noch keine Bestätigung einer vollständigen Löschung.",
+    "receipt": "Vorgangsnummer: {id}",
+    "delete": "Kontolöschung anfordern",
+    "sending": "Wird übermittelt …",
+    "error": "Der Vorgang konnte nicht bestätigt werden. Bitte aktualisieren oder erneut versuchen. Bei Fragen: hello@cinegenius.co.",
+    "refresh": "Status aktualisieren",
+    "loading": "Status wird geladen …",
+    "adminTitle": "Löschanfragen",
+    "adminIntro": "Automatische Bearbeitung und offene Ausnahmen. Eine Wiederholung hebt keine Schutzprüfung auf. Offene Fälle müssen rechtzeitig beantwortet werden; diese Übersicht versendet keine begründete Fristverlängerung.",
+    "back": "Zur Verwaltung",
+    "policyTitle": "Einmalige Betriebsregeln",
+    "policyIntro": "Erst aktivieren, wenn Löschumfang, Dienstleister, Sicherungen, Wiederherstellungsschutz und Nachweisfristen tatsächlich geprüft sind. Werte beziehen sich auf eure belegte Konfiguration, nicht auf pauschale gesetzliche Fristen. Keine Passwörter oder Vertragsinhalte eintragen.",
+    "evidence": "Nachweisreferenzen und Prüfumfang",
+    "backup_days": "Sicherungen: Tage",
+    "provider_days": "Dienstleister: Tage",
+    "receipt_days": "Löschnachweis: Tage",
+    "validUntil": "Erneute Prüfung spätestens am (UTC)",
+    "enabled": "Automatik freigegeben",
+    "disabled": "Automatik nicht freigegeben",
+    "save": "Regeln speichern",
+    "policyConfirm": "Diese belegten Regeln speichern? Eine aktivierte Automatik führt unwiderrufliche Löschungen aus.",
+    "empty": "Keine Löschanfragen vorhanden.",
+    "deadline": "Antwort spätestens bis {date}",
+    "inspect": "Offene Daten anzeigen",
+    "retry": "Erneut prüfen lassen",
+    "more": "Weitere Anfragen",
+    "mailSubject": "Deine Kontolöschung bei CineGenius",
+    "mailActive": "Deine aktiven Kontodaten und dein Login wurden gelöscht. Sicherungen und Restbestände bei Diensten werden nach den geprüften Fristen abgewickelt. Du erhältst anschließend eine weitere Nachricht. Bei Rückfragen nutze bitte die Vorgangsnummer.",
+    "mailComplete": "Dein Löschvorgang ist nach den hinterlegten Prüfungen und Fristen abgeschlossen. Ein begrenzter Nachweis über die Bearbeitung sowie erforderliche Zustellnachweise bleiben für ihre jeweiligen Zwecke erhalten. Bei Rückfragen erreichst du uns unter der untenstehenden Adresse.",
+    "states": {
+      "pending": "Zur Bearbeitung vorgemerkt.",
+      "running": "Die Löschung wird bearbeitet.",
+      "needs_review": "Eine gesonderte Prüfung ist erforderlich.",
+      "waiting": "Aktive Daten gelöscht; Abschluss und Nachricht stehen noch aus.",
+      "completed": "Der Löschvorgang ist abgeschlossen."
+    },
+    "reasons": {
+      "worker_unavailable": "Ein Arbeitsschritt ist fehlgeschlagen.",
+      "account_data_remaining": "Weitere, möglicherweise gemeinsame Daten benötigen Prüfung.",
+      "legacy_media": "Ältere oder gemeinsam verwendete Medien benötigen Prüfung.",
+      "schema_changed": "Die Datenstruktur hat sich geändert; Regeln prüfen.",
+      "provider_review": "Dienstleisterdaten oder die Zuordnung der Kontaktadresse benötigen Prüfung."
+    },
+    "alert": "Eine Löschanfrage benötigt deine Prüfung. Bitte öffne die geschützte Übersicht und beachte die Antwortfrist. Die automatische Bearbeitung hat diesen Fall nicht vollständig abgeschlossen."
   }
 }

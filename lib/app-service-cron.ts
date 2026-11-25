@@ -1,6 +1,6 @@
 import { authorizedListingFreshnessCron } from "./listing-freshness-cron-auth";
 const headers = { "Cache-Control": "private, no-store", "CDN-Cache-Control": "no-store", "Vercel-CDN-Cache-Control": "no-store" };
-type Feature = "SHOTS_CLEANUP_CRON_ENABLED" | "NATIVE_PUSH_CRON_ENABLED";
+type Feature = "ACCOUNT_ERASURE_CRON_ENABLED" | "SHOTS_CLEANUP_CRON_ENABLED" | "NATIVE_PUSH_CRON_ENABLED";
 
 /** Explicit scheduler GET only; new schedules stay inert until separately enabled. */
 export function createAppServiceCron(feature: Feature, run: () => Promise<unknown>, environment: Record<string, string | undefined> = process.env) {

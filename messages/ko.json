@@ -30,7 +30,10 @@
     "supabaseProcessingReview": "Profildaten, Inserate, Beschreibungen und Bilder werden in Datenbank und Dateispeicher bei Supabase verarbeitet. Rechtsgrundlage für die zur Nutzung erforderliche Verarbeitung ist die Vertragserfüllung (Art. 6 Abs. 1 lit. b DSGVO). Veröffentlichte Inhalte sind entsprechend ihrer Sichtbarkeit einsehbar. Private Entwürfe und persönliche Kontaktdaten unterliegen gesonderten Zugriffsregeln. Persönliche Kontaktdaten werden nicht automatisch zu öffentlichen Firmenkontakten. Der Sitz des Anbieters ist nicht gleichbedeutend mit dem Standort jeder Verarbeitung.",
     "internationalProcessingReview": "Bei den eingesetzten Diensten kann eine Verarbeitung außerhalb des Europäischen Wirtschaftsraums stattfinden, auch bei OpenAI und den Anbietern von Anmeldung, Hosting, E-Mail und Nutzungsanalyse. Dafür ist eine anwendbare Grundlage nach Art. 44 ff. DSGVO erforderlich. Maßgeblich sind der konkrete Vertragspartner, die vereinbarten Bedingungen, Unterauftragsverarbeiter und die tatsächliche Konfiguration. Eine gewählte EU-Speicherregion schließt andere internationale Verarbeitung nicht automatisch aus.",
     "workProcessingTitle": "Zusätzliche Work-Funktionen und persönliche Dokumentanalyse",
-    "workProcessingReview": "In freigeschalteten Work-Funktionen werden Teamzugehörigkeiten, Nachrichten und ausdrücklich importierte E-Mails mit Anhängen kontobezogen verarbeitet. Eine externe Postfachverbindung erfordert einen gesonderten Verbindungsablauf; gespeicherte Zugangsberechtigungen werden verschlüsselt abgelegt. Das Trennen der Verbindung löscht nicht automatisch bereits importierte Dateien. Bei einer ausdrücklich gestarteten, freigeschalteten KI-Analyse werden die ausgewählten Dokumenttexte und erforderlichen Arbeitsangaben an OpenAI übermittelt. Solche Dokumente können auch personenbezogene Angaben anderer Beteiligter enthalten. Die Gesprächsspeicherung ist bei diesen KI-Anfragen deaktiviert; dies ist keine Zusage, dass beim Anbieter keinerlei Sicherheitsprotokolle entstehen. Die persönliche native Analyse ist derzeit auf ein gesondert freigegebenes Testkonto begrenzt. Eine im Quellcode vorbereitete Funktion ist damit nicht allgemein für alle Konten aktiviert."
+    "workProcessingReview": "In freigeschalteten Work-Funktionen werden Teamzugehörigkeiten, Nachrichten und ausdrücklich importierte E-Mails mit Anhängen kontobezogen verarbeitet. Eine externe Postfachverbindung erfordert einen gesonderten Verbindungsablauf; gespeicherte Zugangsberechtigungen werden verschlüsselt abgelegt. Das Trennen der Verbindung löscht nicht automatisch bereits importierte Dateien. Bei einer ausdrücklich gestarteten, freigeschalteten KI-Analyse werden die ausgewählten Dokumenttexte und erforderlichen Arbeitsangaben an OpenAI übermittelt. Solche Dokumente können auch personenbezogene Angaben anderer Beteiligter enthalten. Die Gesprächsspeicherung ist bei diesen KI-Anfragen deaktiviert; dies ist keine Zusage, dass beim Anbieter keinerlei Sicherheitsprotokolle entstehen. Die persönliche native Analyse ist derzeit auf ein gesondert freigegebenes Testkonto begrenzt. Eine im Quellcode vorbereitete Funktion ist damit nicht allgemein für alle Konten aktiviert.",
+    "accountErasure": "Löschanfragen aus dem angemeldeten Konto werden mit einer Vorgangsnummer dokumentiert. Die Annahme eines Auftrags bestätigt noch keine vollständige Löschung. Das persönliche Profil wird ausgeblendet. Die Bearbeitung umfasst die Prüfung zugehöriger Kontodaten, Dateien und Dienste. Gemeinsame Inhalte, Ansprüche anderer Personen und konkret begründete Aufbewahrungspflichten werden gesondert geprüft; sie rechtfertigen keine pauschale Aufbewahrung des gesamten Kontos. Erforderliche Sicherungen und Dienstleister-Restbestände werden nach den tatsächlich geprüften Lösch- und Überschreibungsregeln behandelt. Eine Wiederherstellung darf bereits gelöschte Daten nicht erneut in die gewöhnliche Verarbeitung übernehmen. Für die Bearbeitung und Rückmeldung speichern wir vorübergehend eine Vorgangskennung, die notwendige Kontozuordnung, Zeitpunkte und knappe Bearbeitungsnachweise; für Statusnachrichten gegebenenfalls die bestätigte E-Mail-Adresse. Die Bearbeitung erfolgt zur Erfüllung der Pflichten aus Art. 12 und 17 DSGVO auf Grundlage von Art. 6 Abs. 1 Buchst. c DSGVO. Über Maßnahmen oder begründete weitere Schritte informieren wir ohne unangemessene Verzögerung, grundsätzlich spätestens innerhalb eines Monats. Ein bloßer Eingangsbeleg ersetzt diese Antwort nicht. Für Anfragen und konkrete Informationen zu verbleibenden Daten: hello@cinegenius.co.",
+    "accountErasureTerms": "Ein Eingangsbeleg für eine Löschanfrage bestätigt zunächst deren Annahme. Er ersetzt weder die erforderliche Bearbeitung noch die Rückmeldung über die getroffenen Maßnahmen. Gesetzliche Löschansprüche und bestehende vertragliche Rechte bleiben unberührt; eine technische Warteschlange begründet keine zusätzliche Wartefrist.",
+    "accountDeletion": "Du kannst dein Konto jederzeit ohne Angabe von Gründen über die Kontoeinstellungen oder durch eine Anfrage an <contact>hello@cinegenius.co</contact> löschen lassen. Nach Beendigung deines Kontos löschen wir die nicht mehr erforderlichen personenbezogenen Daten unverzüglich. Gesetzliche Aufbewahrungspflichten und die erforderliche Geltendmachung, Ausübung oder Verteidigung von Rechtsansprüchen können der Löschung einzelner Daten entgegenstehen. Diese Daten werden nur im erforderlichen Umfang und nur so lange für den jeweiligen Zweck gespeichert, wie der konkrete Grund besteht. Für Sicherungskopien und Daten bei Dienstleistern sind die tatsächlichen Löschabläufe zu berücksichtigen; weitere Informationen findest du in den <privacy>Datenschutzhinweisen</privacy>. Gesetzliche Löschungsrechte und bereits bestehende vertragliche Ansprüche bleiben unberührt."
   },
   "SiteContacts": {
     "markusName": "마르쿠스 뮐러",
@@ -3318,7 +3321,6 @@
     "text_f5315cb707d7cd": "이 제한은 생명, 신체 또는 건강에 대한 과실 책임, 독일 제품 책임법 청구 또는 사기적 기망에는 적용되지 않습니다.",
     "text_5c5e16ac6fa0f5": "운영자는 플랫폼의 중단 없는 가용성을 보장하지 않으며, 예정된 유지보수는 가능한 사전 공지합니다.",
     "text_49442663ee1e7b": "§ 12 해지 및 삭제",
-    "text_b96e50a60df1cc": "언제든지 이유 없이 계정을 삭제할 수 있으며, 계정 설정 또는 <part1>hello@cinegenius.co</part1>로 서면 요청을 통해 가능합니다. 계정 삭제 후 개인 데이터는 법적 보존 의무가 없는 한 30일 이내에 삭제됩니다(예: 세무 보존 의무 § 147 AO 최대 10년).",
     "text_ca14a695232c3b": "운영자는 약관 중대 또는 반복 위반 시 사전 통보 없이 계정을 정지하거나 영구 삭제할 수 있습니다. 계정 정지 시 사용자 간 계약상의 권리와 의무는 영향을 받지 않습니다.",
     "text_f97f494f842b6b": "운영자는 30일 사전 통지 후 플랫폼 운영을 중단할 수 있으며, 사용자 간 기존 계약상의 권리는 유지됩니다.",
     "text_d1e5e968645eeb": "§ 13 정지 및 중재",
@@ -14202,5 +14204,54 @@
   "PrivacyReview": {
     "claimReview": "이 인물과 영화 크레딧을 연결하려면 먼저 확인이 필요합니다. hello@cinegenius.co로 문의해 주세요. 현재 자동 연결은 이용할 수 없습니다.",
     "claimContact": "확인 요청"
+  },
+  "AccountErasure": {
+    "title": "계정 삭제",
+    "intro": "삭제 요청을 기록하고 개인 프로필을 숨깁니다. 소유자가 명확한 데이터는 검토된 규칙에 따라 삭제하며, 공유 콘텐츠와 정당한 예외는 별도로 검토합니다.",
+    "confirm": "계정 삭제를 요청하시겠습니까? 이후 삭제는 되돌릴 수 없습니다.",
+    "accepted": "삭제 요청이 기록되었습니다. 아직 전체 삭제가 완료되었다는 확인은 아닙니다.",
+    "receipt": "요청 번호: {id}",
+    "delete": "계정 삭제 요청",
+    "sending": "전송 중…",
+    "error": "작업을 확인할 수 없습니다. 새로고침하거나 다시 시도하세요. 문의: hello@cinegenius.co.",
+    "refresh": "상태 새로고침",
+    "loading": "상태 불러오는 중…",
+    "adminTitle": "삭제 요청",
+    "adminIntro": "자동 처리 및 미해결 예외입니다. 재시도해도 검사를 건너뛰지 않습니다. 요청에는 기한 내 답변이 필요하며 이 화면은 사유가 포함된 기한 연장 안내를 보내지 않습니다.",
+    "back": "관리로 돌아가기",
+    "policyTitle": "초기 운영 규칙",
+    "policyIntro": "삭제 범위, 제공업체, 백업, 복원 보호 및 증빙 보관 기간을 검토한 후 활성화하세요. 값은 추정 법정 기간이 아닌 입증된 설정을 반영해야 합니다. 비밀번호나 계약 내용을 입력하지 마세요.",
+    "evidence": "증빙 참조 및 검토 범위",
+    "backup_days": "백업: 일수",
+    "provider_days": "제공업체: 일수",
+    "receipt_days": "삭제 증빙: 일수",
+    "validUntil": "재검토 기한 (UTC)",
+    "enabled": "자동 처리 활성화됨",
+    "disabled": "자동 처리 비활성화됨",
+    "save": "규칙 저장",
+    "policyConfirm": "입증된 규칙을 저장하시겠습니까? 활성화된 자동 처리는 되돌릴 수 없는 삭제를 수행합니다.",
+    "empty": "삭제 요청이 없습니다.",
+    "deadline": "답변 기한: {date}",
+    "inspect": "남은 데이터 보기",
+    "retry": "재검토 요청",
+    "more": "요청 더 보기",
+    "mailSubject": "CineGenius 계정 삭제 안내",
+    "mailActive": "활성 계정 데이터와 로그인 정보가 삭제되었습니다. 백업 및 제공업체에 남은 데이터는 검토된 기간에 따라 처리됩니다. 이후 안내를 다시 보내드립니다. 문의 시 요청 번호를 알려주세요.",
+    "mailComplete": "기록된 검토와 기간에 따라 삭제 절차가 완료되었습니다. 제한된 처리 증빙 및 필요한 전송 기록은 각 목적에 따라 보관됩니다. 문의 사항은 아래 주소로 연락해 주세요.",
+    "states": {
+      "pending": "처리 대기 중입니다.",
+      "running": "삭제 처리 중입니다.",
+      "needs_review": "별도 검토가 필요합니다.",
+      "waiting": "활성 데이터 삭제 완료. 절차 종료 및 안내 대기 중입니다.",
+      "completed": "삭제 절차가 완료되었습니다."
+    },
+    "reasons": {
+      "worker_unavailable": "처리 단계가 실패했습니다.",
+      "account_data_remaining": "공유되었을 수 있는 다른 데이터의 검토가 필요합니다.",
+      "legacy_media": "이전 또는 공유 미디어의 검토가 필요합니다.",
+      "schema_changed": "데이터 구조가 변경되었습니다. 규칙을 검토하세요.",
+      "provider_review": "제공업체 데이터 또는 연락처 주소 확인이 필요합니다."
+    },
+    "alert": "삭제 요청에 검토가 필요합니다. 보호된 관리 화면을 열고 답변 기한을 확인하세요. 자동 처리가 이 요청을 완료하지 못했습니다."
   }
 }
