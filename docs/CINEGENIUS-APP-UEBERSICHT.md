@@ -1,3 +1,7 @@
+## Datenschutzprüfung und Web-/App-Abgleich · 25. November 2026 · Web-Kandidat
+
+Die Websiteprüfung bereitet Schutz bei Kontolöschung und alten Personenverweisen sowie den Stopp ungeprüfter Credit-Übernahmen vor. Neue Hinweise stehen in 17 Katalogen; API-Fehler bleiben lokalisiert. APP muss Löschung, private Dateien, Mail-/Dokumentanalyse und Kontodienst-Löschwege mit dem später freigegebenen Web-Vertrag abgleichen. Keine native Quelle, Gerätekonfiguration, Installation oder Push-/Mail-Aktivierung geändert. Kandidat noch nicht veröffentlicht; keine native Abnahme behauptet. [Vollständiger Prüfbericht](legal-review/2026-11-25/README.md).
+
 ## App-Kopf und Smart-Bedienzeile · 24. November 2026 · neuer Kandidat auf e996
 
 Der bisherige Smart-/Settings-Stand e996 ist inzwischen veröffentlicht; der nach2220 gemeldete Kopf-/Dock-Fall folgt separat. Web-Kopf ohne alte54px-Sonnenreservierung mittig und vollbreit, verdeckte Web-Leisten unter nativem Work nur visuell ausgeblendet. Übersetzen/Aktualisieren in Für-dich/Alle-Zeile; keine zusätzlichen Original-/Übersetzt-Statustexte, Fehler/Retry und Karteninfo erhalten. Native Avatar-Reautorisierung ist Roots gesonderte2221-Arbeit. Kandidat zunächst unabhängig prüfen, kein paralleler Livegang. [Umfang, Prüfstand und Grenzen](app-header-smart-compact-20261124.md).

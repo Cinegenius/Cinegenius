@@ -73,17 +73,19 @@ export default async function DatenschutzPage() {
                   <tr className="border-b border-border">
                     <th className="text-left py-2 pr-4 text-text-primary font-semibold">{uiText("Ui.text_ecc4f77cf21313")}</th>
                     <th className="text-left py-2 pr-4 text-text-primary font-semibold">{uiText("Ui.text_5c123d4febae37")}</th>
-                    <th className="text-left py-2 text-text-primary font-semibold">{uiText("Ui.text_48652c16f7639c")}</th>
+                    <th className="text-left py-2 text-text-primary font-semibold">{t("providerSeatReview")}</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-border">
                   {[
                     ["Clerk", "Authentifizierung / Login", "USA"],
-                    ["Supabase", "Datenbank & Dateispeicher", "EU (Frankfurt)"],
+                    ["Supabase", "Datenbank & Dateispeicher", t("supabaseSeatReview")],
                     ["Vercel", "Hosting & CDN", "USA"],
                     ["Stripe", "Zahlungsabwicklung", "USA"],
                     ["Sentry", t("sentryPurpose"), "USA"],
                     ["Resend", "E-Mail-Versand", "USA"],
+                    ["OpenAI", t("openaiPurposeReview"), t("openaiTransferReview")],
+                    ["PostHog", t("posthogPurposeReview"), t("posthogRegionReview")],
                     ["OpenStreetMap Nominatim", "Geocoding von Städtenamen", "UK / EU"],
                     ["OpenFreeMap", uiText("directoryMap.providerPurpose"), uiText("directoryMap.providerRegion")],
                   ].map(([d, z, s]) => (
@@ -103,12 +105,12 @@ export default async function DatenschutzPage() {
           <section>
             <h2 className="text-base font-semibold text-text-primary mb-3">{uiText("Ui.text_fa04380c470bab")}</h2>
             <p>{uiText.rich("Ui.text_0ecf904775ac39", { part1: chunks => (<strong className="text-text-primary">{chunks}</strong>) })}</p>
-            <p className="mt-2">{uiText.rich("Ui.text_d495c49dd5837a", { part1: () => (<br />), part2: chunks => (<a href="https://clerk.com/privacy" target="_blank" rel="noopener noreferrer" className="text-gold hover:underline">{chunks}</a>) })}</p>
+            <p className="mt-2" lang="de">{t.rich("clerkTransferReview", { part1: () => (<br />), part2: chunks => (<a href="https://clerk.com/privacy" target="_blank" rel="noopener noreferrer" className="text-gold hover:underline">{chunks}</a>) })}</p>
           </section>
 
           <section>
             <h2 className="text-base font-semibold text-text-primary mb-3">{uiText("Ui.text_611ed3fea6bc0b")}</h2>
-            <p>{uiText.rich("Ui.text_0977c086c9faae", { part1: chunks => (<strong className="text-text-primary">{chunks}</strong>) })}</p>
+            <p lang="de">{t("supabaseProcessingReview")}</p>
             <p className="mt-2">{uiText.rich("Ui.text_3fb2cb0d3f1da2", { part1: chunks => (<a href="https://supabase.com/privacy" target="_blank" rel="noopener noreferrer" className="text-gold hover:underline">{chunks}</a>) })}</p>
           </section>
 
@@ -179,7 +181,7 @@ export default async function DatenschutzPage() {
 
           <section>
             <h2 className="text-base font-semibold text-text-primary mb-3">{uiText("Ui.text_37ef196041cca2")}</h2>
-            <p>{uiText.rich("Ui.text_83bd02c2e09311", { part1: chunks => (<strong className="text-text-primary">{chunks}</strong>), part2: () => (<br />), part3: chunks => (<a href="https://osmfoundation.org/wiki/Privacy_Policy" target="_blank" rel="noopener noreferrer" className="text-gold hover:underline">{chunks}</a>) })}</p>
+            <p lang="de">{t.rich("mapProcessingReview", { part1: chunks => (<strong className="text-text-primary">{chunks}</strong>), part2: () => (<br />), part3: chunks => (<a href="https://osmfoundation.org/wiki/Privacy_Policy" target="_blank" rel="noopener noreferrer" className="text-gold hover:underline">{chunks}</a>) })}</p>
           </section>
 
           <section>
@@ -190,7 +192,7 @@ export default async function DatenschutzPage() {
               <p>{t(process.env.CONTENT_TRANSLATION_ENABLED === "true" ? "newsRegionTranslationDisclosure" : "newsRegionDisclosure")}</p>
               <p>{uiText.rich("Ui.text_041e3e28efd4a6", { part1: chunks => (<strong className="text-text-primary">{chunks}</strong>) })}</p>
               <ul className="list-disc list-inside space-y-1 pl-2">
-                <li>{uiText.rich("Ui.text_02353b549012bf", { part1: chunks => (<code className="bg-bg-elevated px-1 rounded text-xs">{chunks}</code>) })}</li>
+                <li lang="de">{t.rich("localSearchStorageReview", { part1: chunks => (<code className="bg-bg-elevated px-1 rounded text-xs">{chunks}</code>) })}</li>
                 <li>{uiText.rich("Ui.text_4bdd5c52423155", { part1: chunks => (<code className="bg-bg-elevated px-1 rounded text-xs">{chunks}</code>) })}</li>
               </ul>
               <p>{uiText.rich("Ui.text_a5da57f09fb33f", { part1: chunks => (<strong className="text-text-primary">{chunks}</strong>) })}</p>
@@ -208,9 +210,14 @@ export default async function DatenschutzPage() {
             <p>{t("genieVoiceDisclosure")}</p>
           </section>
 
+          <section lang="de">
+            <h2 className="text-base font-semibold text-text-primary mb-3">{t("workProcessingTitle")}</h2>
+            <p>{t("workProcessingReview")}</p>
+          </section>
+
           <section>
             <h2 className="text-base font-semibold text-text-primary mb-3">{uiText("Ui.text_cc51bf12053029")}</h2>
-            <p>{uiText("Ui.text_04763d66b1ef33")}</p>
+            <p lang="de">{t("internationalProcessingReview")}</p>
           </section>
 
           <section>
@@ -233,7 +240,7 @@ export default async function DatenschutzPage() {
 
           <section>
             <h2 className="text-base font-semibold text-text-primary mb-3">{uiText("Ui.text_188abb11361064")}</h2>
-            <p>{uiText("Ui.text_5e6d173d294b4f")}</p>
+            <p lang="de">{t("securityControlsReview")}</p>
           </section>
 
           <section>
@@ -248,7 +255,7 @@ export default async function DatenschutzPage() {
               <li>{uiText.rich("Ui.text_fc5b657f756222", { part1: chunks => (<strong className="text-text-primary">{chunks}</strong>) })}</li>
               <li>{uiText.rich("Ui.text_351e16f55e9108", { part1: chunks => (<strong className="text-text-primary">{chunks}</strong>) })}</li>
             </ul>
-            <p className="mt-3">{uiText.rich("Ui.text_11ecf3b1603bc3", { part1: chunks => (<strong className="text-text-primary">{chunks}</strong>), part2: () => (<br />), part3: chunks => (<a href="mailto:hello@cinegenius.co" className="text-gold hover:underline">{chunks}</a>) })}</p>
+            <p className="mt-3" lang="de">{t.rich("erasureContactReview", { part1: chunks => (<strong className="text-text-primary">{chunks}</strong>), part2: () => (<br />), part3: chunks => (<a href="mailto:hello@cinegenius.co" className="text-gold hover:underline">{chunks}</a>) })}</p>
             <p className="mt-3">{uiText.rich("Ui.text_dec738ce27179f", { part1: () => (<br />), part2: chunks => (<strong className="text-text-primary">{chunks}</strong>), part3: () => (<br />), part4: chunks => (<a href="https://www.lda.bayern.de" target="_blank" rel="noopener noreferrer" className="text-gold hover:underline">{chunks}</a>) })}</p>
           </section>
 

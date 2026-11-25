@@ -58,7 +58,7 @@ export async function POST(req: NextRequest) {
     .eq("user_id", userId)
     .maybeSingle();
   if (currentError) {
-    console.error("[profile avatar] current profile lookup failed:", currentError.message);
+    console.error("[profile avatar] current profile lookup failed:");
     return json({ error: tResponse('System.m_a290798a8156') }, 500);
   }
   if (!current) return json({ error: tResponse('System.m_fd423dc75d17') }, 409);
@@ -80,7 +80,7 @@ export async function POST(req: NextRequest) {
       let update = db.from("profiles").update({ avatar_url: savedUrl, updated_at: new Date().toISOString() }).eq("user_id", userId);
       update = current.avatar_url == null ? update.is("avatar_url", null) : update.eq("avatar_url", current.avatar_url);
       const { data, error } = await update.select("user_id, avatar_url, updated_at").maybeSingle();
-      if (error) console.error("[profile avatar] association failed:", error.message);
+      if (error) console.error("[profile avatar] association failed:");
       if (data?.updated_at) savedUpdatedAt = data.updated_at;
       return { updated: !!data, error };
     },

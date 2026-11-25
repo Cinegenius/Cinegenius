@@ -2,6 +2,7 @@ import { getTranslations as getPageTranslations } from "next-intl/server";
 import { publicProjectCredits } from "@/lib/project-media-rights";
 import { notFound, redirect } from "next/navigation";
 import { db } from "@/lib/db";
+import { visibleLinkedProfileIds } from "@/lib/linked-profile-access";
 import { auth } from "@clerk/nextjs/server";
 import type { Metadata } from "next";
 import PersonView from "./PersonView";
@@ -33,6 +34,10 @@ async function getData(slug: string) {
     .maybeSingle();
 
   if (!profile) return null;
+  if (profile.claimed_by) {
+    const { userId } = await auth();
+    if (!(await visibleLinkedProfileIds([profile.claimed_by], userId)).has(profile.claimed_by)) return null;
+  }
 
   const { data: credits } = await db
     .from("project_credits")

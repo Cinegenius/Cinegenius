@@ -201,7 +201,7 @@ export async function PATCH(
   }
 
   if (error) {
-    console.error("[listings PATCH]", error);
+    console.error("[listings PATCH]");
     return NextResponse.json({ error: tResponse('System.requestFailed') }, { status: 500 });
   }
   if (!data) return NextResponse.json({ error: tResponse('System.m_6031a8e7b450') }, { status: 404 });
@@ -253,7 +253,7 @@ export async function DELETE(
     .eq("id", id);
 
   if (error) {
-    console.error("[listings DELETE]", error);
+    console.error("[listings DELETE]");
     return NextResponse.json({ error: tResponse('System.requestFailed') }, { status: 500 });
   }
 

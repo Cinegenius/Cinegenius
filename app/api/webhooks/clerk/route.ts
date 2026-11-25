@@ -94,10 +94,12 @@ export async function POST(req: Request) {
           html,
         });
         if (result.error) {
-          return new Response(`Resend error: ${JSON.stringify(result.error)}`, { status: 500 });
+          const failure = await getTranslations({locale, namespace: "System"});
+          return new Response(failure("requestFailed"), { status: 500, headers: {"Cache-Control": "no-store"} });
         }
-      } catch (err) {
-        return new Response(`Resend exception: ${String(err)}`, { status: 500 });
+      } catch {
+        const failure = await getTranslations({locale, namespace: "System"});
+        return new Response(failure("requestFailed"), { status: 500, headers: {"Cache-Control": "no-store"} });
       }
     }
     return new Response("OK", { status: 200 });

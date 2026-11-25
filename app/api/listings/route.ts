@@ -87,8 +87,8 @@ export async function GET(req: NextRequest) {
       const freshnessById = new Map((freshnessResult.data ?? []).map(row => [row.listing_id, row]));
       const account = data.some(row => !row.responsible_person && !row.company_id && row.user_id === userId) ? await accountResponsiblePerson(userId) : null;
       return privateNoStoreJson({ data: data.map(row => ({ ...row, freshness: freshnessById.get(row.id) ?? null, responsible_person: row.responsible_person || (!row.company_id && row.user_id === userId ? bindResponsiblePerson(account, userId) : null) })) });
-    } catch (error) {
-      console.error("[listings GET mine]", error);
+    } catch {
+      console.error("[listings GET mine]");
       return privateNoStoreJson({ error: tResponse("System.requestFailed") }, 500);
     }
   }
@@ -137,7 +137,7 @@ export async function GET(req: NextRequest) {
   if (clause) query = query.or(clause);
   return range ? query.range(range.from, range.to) : query;
   }, from, to, preferred);
-  if(error){console.error("[listings GET]",error);return NextResponse.json({error:(await getTranslations("OfferModeration"))("saveError")},{status:503});}
+  if(error){console.error("[listings GET]");return NextResponse.json({error:(await getTranslations("OfferModeration"))("saveError")},{status:503});}
   const priceText=await getTranslations("MarketplaceOffer"),locale=await getLocale();
   return NextResponse.json({data:(data??[]).map((listing:Record<string,unknown>)=>({...listing,...placeReadFields(String(listing.city??""),listing,locale),...publicMapPoint(listing),priceLabel:listingPriceLabel(Number(listing.price),listing,'/Tag',locale,priceText)})),page,limit,count:count??0},{headers:{"Cache-Control":"private, no-store, max-age=0"}});
 
@@ -229,7 +229,7 @@ export async function POST(req: Request) {
       .contains("metadata", { onboarding_request_key })
       .maybeSingle();
     if (lookupError) {
-      console.error("[listings POST] onboarding retry lookup failed", lookupError);
+      console.error("[listings POST] onboarding retry lookup failed");
       return NextResponse.json({ error: tResponse('System.m_347f3fe490a1') }, { status: 500 });
     }
     if (existing) return privateNoStoreJson({ data: existing });
@@ -263,7 +263,7 @@ export async function POST(req: Request) {
     .single();
 
   if (error) {
-    console.error("[listings POST]", error);
+    console.error("[listings POST]");
     return NextResponse.json({ error: tResponse('System.requestFailed') }, { status: 500 });
   }
 
@@ -313,7 +313,7 @@ export async function DELETE(req: NextRequest) {
     .eq("user_id", userId);
 
   if (error) {
-    console.error("[listings DELETE]", error);
+    console.error("[listings DELETE]");
     return NextResponse.json({ error: tResponse('System.requestFailed') }, { status: 500 });
   }
   revalidatePath("/", "layout");

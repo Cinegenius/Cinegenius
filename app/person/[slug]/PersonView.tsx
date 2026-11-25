@@ -3,11 +3,9 @@
 import { TranslatedText } from "@/components/ContentTranslation";
 
 
-import { useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import {
-  Clapperboard, UserRound, Loader2, Check, ArrowLeft, ShieldAlert, Film,
+  Clapperboard, UserRound, ArrowLeft, ShieldAlert, Film,
 } from "lucide-react";
 import { useTranslations } from "next-intl";
 import ProfileAboutCard from "@/components/ProfileAboutCard";
@@ -60,64 +58,29 @@ export default function PersonView({
 }) {
   const uiText = useTranslations();
 
-  const router = useRouter();
-  const [claiming, setClaiming] = useState(false);
-  const [claimError, setClaimError] = useState("");
-  const [claimed, setClaimed] = useState(false);
-
-  async function handleClaim() {
-    setClaiming(true);
-    setClaimError("");
-    try {
-      const res = await fetch(`/api/unclaimed-profiles/${profile.slug}/claim`, { method: "POST" });
-      const json = await res.json();
-      if (!res.ok) { setClaimError(json.error ?? uiText("Ui.text_f84c843b1893d2")); return; }
-      setClaimed(true);
-      setTimeout(() => router.push("/dashboard"), 1500);
-    } finally {
-      setClaiming(false);
-    }
-  }
-
   return (
     <div className="pt-16 min-h-screen bg-bg-primary">
       <div className="max-w-3xl mx-auto px-4 sm:px-6 py-10">
 
         <Link href="/projects" className="inline-flex items-center gap-1.5 text-sm text-text-muted hover:text-gold transition-colors mb-8">{uiText.rich("Ui.text_45f48c2ceb22a9", { part1: () => (<ArrowLeft size={14} />) })}</Link>
 
-        {/* Claim banner */}
-        {isSignedIn && !claimed && (
+        {/* Identity claims require a separate verification. No automatic transfer. */}
+        {isSignedIn && (
           <div className="mb-8 flex flex-col sm:flex-row sm:items-center gap-4 p-5 rounded-2xl border border-gold/30 bg-gold/5">
             <div className="flex-1 min-w-0">
               <p className="font-semibold text-text-primary mb-0.5">{uiText("Ui.text_d6f21a5bbf2ba7")}</p>
-              <p className="text-sm text-text-muted">{uiText.rich("Ui.text_fe7a112045b017", { value1: () => (profile.name) })}</p>
-              {claimError && <p className="text-xs text-red-400 mt-2">{claimError}</p>}
+              <p className="text-sm text-text-muted break-words">{uiText("PrivacyReview.claimReview")}</p>
             </div>
-            <button
-              onClick={handleClaim}
-              disabled={claiming}
-              className="shrink-0 inline-flex items-center gap-2 px-5 py-2.5 bg-gold text-bg-primary font-semibold rounded-xl hover:bg-gold-light transition-colors disabled:opacity-50 text-sm"
-            >
-              {claiming ? <Loader2 size={14} className="animate-spin" /> : <Check size={14} />}
-              {claiming ? uiText("Ui.text_b76aa89b84f5a4") : uiText("Ui.text_43be13e6fd9ab2")}
-            </button>
-          </div>
-        )}
-
-        {claimed && (
-          <div className="mb-8 flex items-center gap-3 p-5 rounded-2xl border border-emerald-500/30 bg-emerald-500/5">
-            <Check size={18} className="text-emerald-400 shrink-0" />
-            <div>
-              <p className="font-semibold text-text-primary">{uiText("Ui.text_3851b00993a6db")}</p>
-              <p className="text-sm text-text-muted">{uiText("Ui.text_f976c85a155a01")}</p>
-            </div>
+            <a href="mailto:hello@cinegenius.co" className="min-h-11 shrink-0 inline-flex items-center justify-center px-5 py-2.5 bg-gold text-bg-primary font-semibold rounded-xl hover:bg-gold-light text-sm">
+              {uiText("PrivacyReview.claimContact")}
+            </a>
           </div>
         )}
 
         {!isSignedIn && (
           <div className="mb-8 flex items-center gap-3 p-4 rounded-2xl border border-border bg-bg-secondary">
             <ShieldAlert size={16} className="text-text-muted shrink-0" />
-            <p className="text-sm text-text-muted">{uiText.rich("Ui.text_f9c788da5540e2", { part1: chunks => (<Link href="/sign-in" className="text-gold hover:underline">{chunks}</Link>), value2: () => (profile.name) })}</p>
+            <p className="text-sm text-text-muted break-words">{uiText("PrivacyReview.claimReview")} <a href="mailto:hello@cinegenius.co" className="inline-flex min-h-11 items-center text-gold underline">{uiText("PrivacyReview.claimContact")}</a></p>
           </div>
         )}
 

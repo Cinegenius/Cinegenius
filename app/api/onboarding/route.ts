@@ -51,7 +51,7 @@ export async function GET(request: NextRequest) {
   } catch (error) {
     const limited = rateLimitResponse(error, tResponse);
     if (limited) return limited;
-    console.error("[onboarding GET] private progress could not be loaded", error);
+    console.error("[onboarding GET] private progress could not be loaded");
     return json({ error: tResponse('System.m_4e3178839fad') }, 503);
   }
 }
@@ -160,7 +160,7 @@ export async function PUT(request: NextRequest) {
   } catch (error) {
     const limited = rateLimitResponse(error, tResponse);
     if (limited) return limited;
-    console.error("[onboarding PUT] private progress could not be saved", error);
+    console.error("[onboarding PUT] private progress could not be saved");
     return json({ error: tResponse('System.m_8a3ed5b44d39') }, 503);
   }
 }
@@ -245,7 +245,7 @@ export async function DELETE(request: NextRequest) {
   } catch (error) {
     const limited = rateLimitResponse(error, tResponse);
     if (limited) return limited;
-    console.error("[onboarding DELETE] private progress could not be cleared", error);
+    console.error("[onboarding DELETE] private progress could not be cleared");
     return json({ error: tResponse('System.m_699eac87dce6') }, 503);
   }
 }

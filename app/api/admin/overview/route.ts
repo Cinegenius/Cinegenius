@@ -82,8 +82,8 @@ export async function GET(request: Request) {
       },
       recentListings: recentListings ?? [],
     }, { headers: { "Cache-Control": "private, no-store", "Server-Timing": `auth;dur=${(authorizedAt - startedAt).toFixed(1)}, database;dur=${(performance.now() - authorizedAt).toFixed(1)}` } });
-  } catch (error) {
-    console.error("[admin] overview failed", error);
+  } catch {
+    console.error("[admin] overview failed");
     return NextResponse.json({ error: tResponse('System.m_10b8cf9a5b3f') }, { status: 503 });
   }
 }

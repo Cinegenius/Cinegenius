@@ -1,3 +1,7 @@
+## Datenschutzprüfung · 25. November 2026 · Schutzpaket vorbereitet, nicht veröffentlicht
+
+Markus verlangt eine vollständige Prüfung. Konkrete Probleme bei unvollständiger Kontolöschung/Privatsphärenverlust, ungeprüfter Personenübernahme, alten Personenverweisen und Rohfehlern wurden gefunden; gezielte Schutzkorrekturen und zutreffende Hinweise in 17 Sprachen sind vorbereitet. Vollständige Löschung und organisatorische Nachweise bleiben offen. 88 direkte anonyme Tabellen-/Ansichtszugriffe abgewiesen; Einwilligung mit positiver Gegenprobe geprüft. Keine Migration, Datenlöschung, Mail, Funktionsaktivierung oder native Installation. Die öffentliche Startseite bleibt wie veröffentlicht. [Befunde, Belege, Testgrenzen und nächste Schritte](legal-review/2026-11-25/README.md).
+
 ## App-Kopf und Smart-Bedienzeile · 24. November 2026 · neuer Kandidat auf e996
 
 Der bisherige Smart-/Settings-Stand e996 ist inzwischen veröffentlicht; der nach2220 gemeldete Kopf-/Dock-Fall folgt separat. Web-Kopf ohne alte54px-Sonnenreservierung mittig und vollbreit, verdeckte Web-Leisten unter nativem Work nur visuell ausgeblendet. Übersetzen/Aktualisieren in Für-dich/Alle-Zeile; keine zusätzlichen Original-/Übersetzt-Statustexte, Fehler/Retry und Karteninfo erhalten. Native Avatar-Reautorisierung ist Roots gesonderte2221-Arbeit. Kandidat zunächst unabhängig prüfen, kein paralleler Livegang. [Umfang, Prüfstand und Grenzen](app-header-smart-compact-20261124.md).

@@ -82,7 +82,7 @@ export async function POST(req: NextRequest) {
     }, { onConflict: "job_id,applicant_id" });
 
   if (error) {
-    console.error("Application insert error:", error);
+    console.error("Application insert error:");
     return NextResponse.json({ error: tResponse('System.m_554087dca297') }, { status: 500 });
   }
 

@@ -17,7 +17,7 @@ export async function getProfileContactVisibility(
 
   if (error) {
     // Fail closed if settings or the new columns are unavailable during rollout.
-    console.error("[profile contact visibility] settings lookup failed:", error.message);
+    console.error("[profile contact visibility] settings lookup failed:");
     return HIDDEN_CONTACTS;
   }
 
@@ -79,7 +79,7 @@ export async function getPrivateProfileIds(userIds: string[], viewerId: string |
 
 
   if (error) {
-    console.error("[profile visibility] discovery lookup failed:", error.message);
+    console.error("[profile visibility] discovery lookup failed:");
     return new Set(uniqueIds);
   }
 

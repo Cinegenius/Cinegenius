@@ -140,6 +140,8 @@ function DashboardContent() {
   // Real listings from Supabase
   const [myListings, setMyListings] = useState<{ id: string; type: string; category?: string; title: string; city: string; price: number; published: boolean; moderation_status?: string; moderation_reason?: string | null; freshness?: ListingFreshnessPreview | null; responsible_person?: ResponsiblePerson & { userId: string }; created_at: string; image_url: string | null; extra_images?: string[] | null; blocked_dates?: string[] | null; description: string; metadata?: Record<string, unknown> | null }[]>([]);
   const [listingsLoading, setListingsLoading] = useState(false);
+  const [deletingAccount, setDeletingAccount] = useState(false);
+  const accountDeleteLock = useRef(false);
   const [listingsError, setListingsError] = useState("");
 
   const [profileDisplayName, setProfileDisplayName] = useState("");
@@ -1297,18 +1299,29 @@ function DashboardContent() {
                 <p className="text-xs text-text-muted mb-4 leading-relaxed">{uiText("Ui.text_2d70493dc36394")}</p>
                 <button
                   onClick={async () => {
+                    if (accountDeleteLock.current || !user?.id) return;
+                    const accountId = user.id;
                     const confirmed = window.confirm(
                       uiText("Ui.text_da4afae146f61c")
                     );
                     if (!confirmed) return;
-                    const res = await fetch("/api/account", { method: "DELETE" });
-                    if (res.ok) {
+                    accountDeleteLock.current = true;
+                    setDeletingAccount(true);
+                    try {
+                      const res = await fetch("/api/account", { method: "DELETE", headers: { "X-Account-Id": accountId } });
+                      const result = await res.json();
+                      if (!res.ok || result?.success !== true) throw new Error("Account removal not confirmed");
                       window.location.href = "/";
-                    } else {
+                    } catch {
                       alert(uiText("Ui.text_4049adacc8fd2f"));
+                    } finally {
+                      accountDeleteLock.current = false;
+                      setDeletingAccount(false);
                     }
                   }}
-                  className="px-4 py-2 text-xs font-semibold border border-red-500/40 text-red-400 hover:bg-red-500/15 rounded-lg transition-colors"
+                  disabled={deletingAccount}
+                  aria-busy={deletingAccount}
+                  className="min-h-11 px-4 py-2 text-xs font-semibold border border-red-500/40 text-red-400 hover:bg-red-500/15 rounded-lg transition-colors disabled:opacity-50"
                 >{uiText("Ui.text_73fc53cbf7c175")}</button>
               </div>
               )}
