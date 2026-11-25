@@ -14183,5 +14183,11 @@
     "compact": "Kis profilkép",
     "portrait": "Nagy portré",
     "cover": "Borítókép + profilkép"
+  },
+  "maintenance": {
+    "badge": "Platform szünetel",
+    "title": "Felkészítjük a CineGeniust a következő lépésre.",
+    "body": "A platform átmenetileg szünetel, amíg gondosan frissítjük a technikai, szervezeti és jogi alapokat. Hamarosan visszatérünk.",
+    "contactPrefix": "Kérdés esetén írj nekünk ide:"
   }
 }

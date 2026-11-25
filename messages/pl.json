@@ -14183,5 +14183,11 @@
     "compact": "Małe zdjęcie profilowe",
     "portrait": "Duży portret",
     "cover": "Okładka + zdjęcie profilowe"
+  },
+  "maintenance": {
+    "badge": "Platforma wstrzymana",
+    "title": "Przygotowujemy CineGenius na kolejny krok.",
+    "body": "Platforma jest tymczasowo wstrzymana, gdy starannie aktualizujemy podstawy techniczne, organizacyjne i prawne. Wkrótce wrócimy.",
+    "contactPrefix": "W razie pytań napisz do nas na"
   }
 }

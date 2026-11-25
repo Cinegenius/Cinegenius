@@ -14183,5 +14183,11 @@
     "compact": "Foto de perfil pequeña",
     "portrait": "Retrato grande",
     "cover": "Portada + foto de perfil"
+  },
+  "maintenance": {
+    "badge": "Plataforma pausada",
+    "title": "Estamos preparando CineGenius para el siguiente paso.",
+    "body": "La plataforma está pausada temporalmente mientras actualizamos con cuidado las bases técnicas, organizativas y legales. Volveremos pronto.",
+    "contactPrefix": "Si tienes preguntas, escríbenos a"
   }
 }

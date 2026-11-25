@@ -14183,5 +14183,11 @@
     "compact": "Liten profilbild",
     "portrait": "Stort porträtt",
     "cover": "Omslag + profilbild"
+  },
+  "maintenance": {
+    "badge": "Plattform pausad",
+    "title": "Vi gör CineGenius redo för nästa steg.",
+    "body": "Plattformen är tillfälligt pausad medan vi uppdaterar de tekniska, organisatoriska och juridiska grunderna noggrant. Vi är snart tillbaka.",
+    "contactPrefix": "Vid frågor når du oss på"
   }
 }

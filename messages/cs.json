@@ -14183,5 +14183,11 @@
     "compact": "Malá profilová fotka",
     "portrait": "Velký portrét",
     "cover": "Úvodní + profilová fotka"
+  },
+  "maintenance": {
+    "badge": "Platforma pozastavena",
+    "title": "Připravujeme CineGenius na další krok.",
+    "body": "Platforma je dočasně pozastavena, zatímco pečlivě aktualizujeme technické, organizační a právní základy. Brzy budeme zpět.",
+    "contactPrefix": "V případě dotazů nás kontaktujte na"
   }
 }

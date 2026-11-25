@@ -14183,5 +14183,11 @@
     "compact": "小头像",
     "portrait": "大幅肖像",
     "cover": "封面 + 头像"
+  },
+  "maintenance": {
+    "badge": "平台暂停",
+    "title": "我们正在为 CineGenius 的下一步做准备。",
+    "body": "平台暂时暂停服务，我们正在认真更新技术、组织和法律基础。我们很快回来。",
+    "contactPrefix": "如有问题，请通过此邮箱联系我们："
   }
 }

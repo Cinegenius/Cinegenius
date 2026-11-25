@@ -5,8 +5,34 @@ import { resolveLocale } from "@/lib/i18n/locales";
 import { trustedMutationOrigin } from "@/lib/request-origin";
 import { mediaOptimizerBlockStatus } from "@/lib/media-optimizer-guard";
 import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
-import { NextRequest, NextResponse } from "next/server";
+import { NextFetchEvent, NextRequest, NextResponse } from "next/server";
 import { isProtectedCreatePath, isPublicProfilePath } from "@/lib/public-access";
+import { CINEGENIUS_MAINTENANCE_MODE } from "@/lib/maintenance-mode";
+
+const MAINTENANCE_HEADERS = {
+  "Cache-Control": "private, no-store, max-age=0",
+  "CDN-Cache-Control": "no-store",
+  "Vercel-CDN-Cache-Control": "no-store",
+  "X-Robots-Tag": "noindex, nofollow, noarchive",
+  "X-Content-Type-Options": "nosniff",
+};
+
+function maintenanceResponse(request: NextRequest): NextResponse | null {
+  if (!CINEGENIUS_MAINTENANCE_MODE) return null;
+  if (request.nextUrl.pathname.startsWith("/api/webhooks/")) {
+    return NextResponse.next();
+  }
+  if (request.nextUrl.pathname.startsWith("/api/")) {
+    return NextResponse.json(
+      { code: "maintenance" },
+      { status: 503, headers: MAINTENANCE_HEADERS },
+    );
+  }
+  if (request.nextUrl.pathname === "/maintenance") {
+    return NextResponse.next({ headers: MAINTENANCE_HEADERS });
+  }
+  return NextResponse.rewrite(new URL("/maintenance", request.url), { headers: MAINTENANCE_HEADERS });
+}
 
 async function localizedProxyError(request: NextRequest, key: string, init: ResponseInit): Promise<NextResponse> {
   const locale = resolveLocale(request.cookies.get("cg_locale")?.value, request.headers.get("accept-language") ?? "", request.headers.get('x-vercel-ip-country') ?? '');
@@ -223,7 +249,7 @@ const isPublicApiGet = createRouteMatcher([
   "/api/creators(.*)",
 ]);
 
-export default clerkMiddleware(async (auth, request) => {
+const cinegeniusProxy = clerkMiddleware(async (auth, request) => {
   // Dedicated machine requests never acquire a Clerk/member/admin session.
   // Only exact editorial routes and a valid server credential bypass cookie CSRF.
   if (request.nextUrl.pathname.startsWith("/api/editorial/")) {
@@ -243,7 +269,6 @@ export default clerkMiddleware(async (auth, request) => {
   if (request.nextUrl.pathname.startsWith("/api/webhooks/")) {
     return NextResponse.next();
   }
-
   const isGeniePost = request.method === "POST" && ["/api/genie", "/api/genie/transcribe"].includes(request.nextUrl.pathname);
   if (isGeniePost) {
     // Guests may see Genie, but cannot consume even its early IP allowance.
@@ -398,6 +423,12 @@ export default clerkMiddleware(async (auth, request) => {
   res.headers.set("Content-Security-Policy", contentSecurityPolicy);
   return res;
 });
+
+export default function proxy(request: NextRequest, event: NextFetchEvent) {
+  const maintenance = maintenanceResponse(request);
+  if (maintenance) return maintenance;
+  return cinegeniusProxy(request, event);
+}
 
 export const config = {
   matcher: [
