@@ -1,8 +1,6 @@
-import { getTranslations } from "next-intl/server";
 import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
-import AuthForm from "@/components/AuthForm";
-import { AuthSessionTaskGate } from "@/components/AuthSessionTask";
+import MemberEntry from "@/components/MemberEntry";
 import { getAuthSwitchDestination, getSignUpSetupDestination, safeAuthRedirect } from "@/lib/auth-redirect";
 
 type SearchParams = Promise<{
@@ -12,28 +10,10 @@ type SearchParams = Promise<{
 
 export default async function SignUpPage({ searchParams }: { searchParams: SearchParams }) {
   const [{ userId }, query] = await Promise.all([auth(), searchParams]);
-  const destination = safeAuthRedirect(query.redirect_url ?? query.redirect, "/dashboard", ["/sign-in", "/sign-up"]);
+  const destination = safeAuthRedirect(query.redirect_url ?? query.redirect, "/", ["/sign-in", "/sign-up"]);
   if (userId) redirect(destination);
 
   const afterSignUp = getSignUpSetupDestination(destination);
 
-  const t = await getTranslations("auth");
-
-  return (
-    <div className="pt-16 min-h-screen flex items-center justify-center bg-bg-primary px-4">
-      <div className="w-full max-w-md">
-        <div className="text-center mb-8">
-          <p className="text-xs uppercase tracking-widest text-gold font-semibold mb-2">{t("startFree")}</p>
-          <h1 className="font-display text-3xl font-bold text-text-primary">{t("createAccount")}</h1>
-        </div>
-        <AuthSessionTaskGate>
-        <AuthForm
-          mode="sign-up"
-          destination={afterSignUp}
-          signInDestination={getAuthSwitchDestination("sign-in", destination)}
-        />
-        </AuthSessionTaskGate>
-      </div>
-    </div>
-  );
+  return <MemberEntry mode="sign-up" destination={afterSignUp} switchDestination={getAuthSwitchDestination("sign-in", destination)} />;
 }

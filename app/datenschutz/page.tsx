@@ -58,6 +58,11 @@ export default async function DatenschutzPage() {
         </div>
 
         <div className="space-y-10 text-text-secondary text-sm leading-relaxed">
+          <section lang="de" className="rounded-xl border border-border bg-bg-secondary p-4">
+            <h2 className="mb-3 text-base font-semibold text-text-primary">{t("memberAccessTitle")}</h2>
+            <p className="text-sm leading-relaxed">{t("memberAccess")}</p>
+          </section>
+
 
           <section>
             <h2 className="text-base font-semibold text-text-primary mb-3">{uiText("Ui.text_ebb2bcce0d2b33")}</h2>

@@ -5,35 +5,7 @@ import { resolveLocale } from "@/lib/i18n/locales";
 import { trustedMutationOrigin } from "@/lib/request-origin";
 import { mediaOptimizerBlockStatus } from "@/lib/media-optimizer-guard";
 import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
-import { NextFetchEvent, NextRequest, NextResponse } from "next/server";
-import { isProtectedCreatePath, isPublicProfilePath } from "@/lib/public-access";
-import { CINEGENIUS_MAINTENANCE_MODE } from "@/lib/maintenance-mode";
-
-const MAINTENANCE_HEADERS = {
-  "Cache-Control": "private, no-store, max-age=0",
-  "CDN-Cache-Control": "no-store",
-  "Vercel-CDN-Cache-Control": "no-store",
-  "X-Robots-Tag": "noindex, nofollow, noarchive",
-  "X-Content-Type-Options": "nosniff",
-};
-
-function maintenanceResponse(request: NextRequest): NextResponse | null {
-  if (!CINEGENIUS_MAINTENANCE_MODE) return null;
-  if (request.nextUrl.pathname.startsWith("/api/webhooks/")) {
-    return NextResponse.next();
-  }
-  if (request.nextUrl.pathname.startsWith("/api/")) {
-    return NextResponse.json(
-      { code: "maintenance" },
-      { status: 503, headers: MAINTENANCE_HEADERS },
-    );
-  }
-  if (request.nextUrl.pathname === "/maintenance") {
-    return NextResponse.next({ headers: MAINTENANCE_HEADERS });
-  }
-  return NextResponse.rewrite(new URL("/maintenance", request.url), { headers: MAINTENANCE_HEADERS });
-}
-
+import { NextRequest, NextResponse } from "next/server";
 async function localizedProxyError(request: NextRequest, key: string, init: ResponseInit): Promise<NextResponse> {
   const locale = resolveLocale(request.cookies.get("cg_locale")?.value, request.headers.get("accept-language") ?? "", request.headers.get('x-vercel-ip-country') ?? '');
   const messages = await loadMessages(locale);
@@ -186,70 +158,21 @@ const isAdminRoute = createRouteMatcher(["/admin(.*)", "/api/admin(.*)"]);
 
 // Public page routes — no session required.
 const isPublicRoute = createRouteMatcher([
-  "/",
-  "/manifest.webmanifest",
-  "/sign-in(.*)",
-  "/sign-up(.*)",
-  "/companies(.*)",
-  "/news",
-  "/tools",
-  "/organizations",
-  /^\/news\/[^/]+\/[^/]+$/,
-  /^\/organizations\/[^/]+$/,
-  "/projects(.*)",
-  "/locations(.*)",
-  "/jobs(.*)",
-  "/creators(.*)",
-  "/props(.*)",
-  "/vehicles(.*)",
-  "/tiere(.*)",
-  "/crew(.*)",
-  "/search(.*)",
-  "/photo(.*)",
-  "/bts(.*)",
-  "/social-media(.*)",
-  "/impressum(.*)",
-  "/datenschutz(.*)",
-  "/agb(.*)",
-  "/about(.*)",
-  "/pricing(.*)",
-  "/help(.*)",
-  "/trust",
-  "/melden",
-  "/ki-transparenz",
-  "/bildrechte",
-  "/marketplace(.*)",
-  "/newsletter/confirm",
-  "/newsletter/unsubscribe",
+  "/", /^\/sign-in(?:\/.*)?$/, /^\/sign-up(?:\/.*)?$/,
+  "/impressum", "/datenschutz", "/agb", "/bildrechte", "/ki-transparenz",
+  "/trust", "/melden", "/newsletter/confirm", "/newsletter/unsubscribe",
+  "/manifest.webmanifest", "/robots.txt", "/sitemap.xml",
+  "/favicon.ico", "/icon", "/icon.svg", "/apple-icon",
+  "/apple-touch-icon.png", "/apple-touch-icon-precomposed.png",
+  "/cinegenius-logo.svg", "/cinegenius-logo-dark.svg",
+  "/hero-bg.jpg", "/hero-bg-v2.jpg",
 ]);
 
-// A single profile slug is public. The profile editor at /profile and any
-// nested management routes must require a session.
 // Webhook routes — completely bypass Clerk auth; each handler must verify
 // the provider signature (Stripe, Clerk, etc.) independently.
 const isWebhookRoute = createRouteMatcher(["/api/webhooks/(.*)"]);
 
-// API routes where GET is public — mutations (POST/PATCH/PUT/DELETE) require auth.
-// This prevents a missed requireAuth() in a handler from opening write access.
-const isPublicApiGet = createRouteMatcher([
-  "/api/browse-preference",
-  "/api/places",
-  "/api/places/options",
-  "/api/community-image",
-  "/api/media/(.*)",
-  "/api/listings(.*)",
-  "/api/listing-ratings",
-  "/api/reviews(.*)",
-  "/api/search(.*)",
-  "/api/external-profiles(.*)",
-  "/api/projects(.*)",
-  "/api/companies",
-  "/api/companies/(.*)",
-  "/api/community-posts(.*)",
-  "/api/creators(.*)",
-]);
-
-const cinegeniusProxy = clerkMiddleware(async (auth, request) => {
+export default clerkMiddleware(async (auth, request) => {
   // Dedicated machine requests never acquire a Clerk/member/admin session.
   // Only exact editorial routes and a valid server credential bypass cookie CSRF.
   if (request.nextUrl.pathname.startsWith("/api/editorial/")) {
@@ -302,7 +225,7 @@ const cinegeniusProxy = clerkMiddleware(async (auth, request) => {
   ].includes(request.nextUrl.pathname);
   const isSmartSearchRead = request.method === "POST" && request.nextUrl.pathname === "/api/search/unified";
   const isPublicReportPost = request.method === "POST" && request.nextUrl.pathname === "/api/public-reports";
-  const isPublicTranslationRead = request.method === "POST" && request.nextUrl.pathname === "/api/content-translations";
+  const isLocaleUpdate = request.method === "POST" && request.nextUrl.pathname === "/api/locale";
 
   // 2. Admin route guard — enforces both session + admin role
   //    This runs BEFORE the generic auth.protect() so non-admin authenticated
@@ -343,9 +266,8 @@ const cinegeniusProxy = clerkMiddleware(async (auth, request) => {
   } else if (isPublicReportPost) {
     // Public reports do not require a member account. Origin protection above
     // and the handler's validation/durable limits still apply to this exact POST.
-  } else if (isPublicTranslationRead) {
-    // Public display only: the handler re-reads canonical public sources, never
-    // client text. Exact POST, origin/flood checks and generation budgets remain.
+  } else if (isLocaleUpdate) {
+    // Language selection remains available before registration; CSRF still applies.
   } else if (isSmartSearchRead) {
     // Smart search is members-only, including saved/shared result plans.
     try {
@@ -356,20 +278,16 @@ const cinegeniusProxy = clerkMiddleware(async (auth, request) => {
       return genieAuthFailure(503);
     }
     // The handler rechecks membership before quotas, body parsing and database work.
-  } else if (isApi && !isPublicApiGet(request)) {
+  } else if (isApi) {
     // Private fetch endpoints must not follow Clerk's hosted sign-in redirect
     // after logout/session expiry. Keep the existing authenticated-session
     // protection, and return a non-cacheable JSON failure for signed-out calls.
     const { userId } = await auth();
     if (!userId) return NextResponse.json({ code: "account" }, { status: 401, headers: { "Cache-Control": "private, no-store", "CDN-Cache-Control": "no-store", "Vercel-CDN-Cache-Control": "no-store" } });
     await auth.protect();
-  } else if (isPublicApiGet(request)) {
-    // 3b. Public-GET API — only protect mutations so a missed handler check
-    //     doesn't silently open write access to unauthenticated callers.
-    if (!["GET", "HEAD"].includes(request.method)) await auth.protect();
-  } else if (isProtectedCreatePath(request.nextUrl.pathname) || (!isPublicRoute(request) && !isPublicProfilePath(request.nextUrl.pathname))) {
+  } else if (!isPublicRoute(request)) {
     // 3c. Session-only protection for all other non-public routes
-    if (request.method === "GET" && !isApi) {
+    if (["GET", "HEAD"].includes(request.method) && !isApi) {
       // Keep unauthenticated browser navigation on the app's own host. The
       // Clerk instance can otherwise send users to accounts.cinegenius.co,
       // which is not a Vercel deployment domain and currently returns 404.
@@ -410,12 +328,11 @@ const cinegeniusProxy = clerkMiddleware(async (auth, request) => {
   requestHeaders.set("X-CineGenius-Return-Path", `${returnUrl.pathname}${returnUrl.search}`);
 
   const res = NextResponse.next({ request: { headers: requestHeaders } });
-  if (request.nextUrl.pathname.startsWith("/admin/review/") || request.nextUrl.pathname.startsWith("/api/admin/reviews/")) {
-    res.headers.set("Cache-Control", "private, no-store, max-age=0");
-    res.headers.set("CDN-Cache-Control", "no-store");
-    res.headers.set("Vercel-CDN-Cache-Control", "no-store");
-    res.headers.set("X-Robots-Tag", "noindex, nofollow, noarchive");
-  }
+  // Never share member documents or API responses between sessions.
+  res.headers.set("Cache-Control", "private, no-store, max-age=0");
+  res.headers.set("CDN-Cache-Control", "no-store");
+  res.headers.set("Vercel-CDN-Cache-Control", "no-store");
+  res.headers.set("X-Robots-Tag", "noindex, nofollow, noarchive");
   res.headers.set("X-Content-Type-Options", "nosniff");
   res.headers.set("X-Frame-Options", "DENY");
   res.headers.set("Referrer-Policy", "strict-origin-when-cross-origin");
@@ -424,16 +341,7 @@ const cinegeniusProxy = clerkMiddleware(async (auth, request) => {
   return res;
 });
 
-export default function proxy(request: NextRequest, event: NextFetchEvent) {
-  const maintenance = maintenanceResponse(request);
-  if (maintenance) return maintenance;
-  return cinegeniusProxy(request, event);
-}
-
 export const config = {
-  matcher: [
-    "/api/media/:path*",
-    "/_next/image",
-    "/((?!_next/static|_next/image|favicon.ico|sitemap.xml|robots.txt|api/webhooks|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
-  ],
+  // File-like profile slugs and API/media paths must also pass authentication.
+  matcher: ["/((?!_next/static/|api/webhooks/).*)"],
 };

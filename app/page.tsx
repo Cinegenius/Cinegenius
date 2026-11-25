@@ -1,3 +1,4 @@
+import MemberEntry from "@/components/MemberEntry";
 import { TranslatedText } from "@/components/ContentTranslation";
 import { occupationFormFromCrew } from "@/lib/occupation-form";
 import { profileOccupationPreview } from "@/lib/crew-occupations";
@@ -359,12 +360,14 @@ async function HomePhotoRecommendations({ viewerId }: { viewerId: string | null 
 }
 
 export default async function HomePage() {
+  const { userId } = await auth();
+  if (!userId) return <MemberEntry mode="sign-in" destination="/" switchDestination="/sign-up?redirect_url=%2F" />;
   // Public recommendation data is shared only within this page request.
   const dataPromise: HomeDataPromise = getHomeData().catch(() => {
     console.error("[homepage] Recommendations unavailable");
     return null;
   });
-  const [{ userId }, t] = await Promise.all([auth(), getTranslations("home")]);
+  const t = await getTranslations("home");
   const isLoggedIn = !!userId;
   const findCards = [
     { title: t("findLocationsTitle"), description: t("findLocationsDescription"), href: "/locations", icon: MapPin },
