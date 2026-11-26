@@ -1,3 +1,9 @@
+## App-Geräteprüfung und enge Webnacharbeit · 26. November 2026
+
+Die schmale gemeinsame Kopfleiste ist auf2769dc3 veröffentlicht und auf Smart→Polaris, Projekte, Profilbereich und Einstellungen physisch sichtbar; der alte Fahrzeug-Webkopf bleibt aus. Native8 ist installiert,164 persistente Dateien einschließlich neun Grundrissarchiven vor Erststart unverändert. Doppelte Projektpicker-Glasfläche behoben; Meins-Suche ebenfalls oben. Weitere echte Teilprüfungen und offene Grenzen sind in [Geräteprüfung und Nacharbeit](app-device-qa-20261126.md) beschrieben.
+
+Vorbereitet sind der anhand echter Gerätebeobachtung korrigierte Galerie-Dialog und der unabhängig geprüfte Location-Bildnormalisierungs-/Upload-Lebenszeitschutz. Noch keine Live- oder Gerätefreigabe dieser beiden Deltas. Erfolgreiche Uploads, Work-Profilbild und erster Projekt-/Scannerübergang bleiben offen. Die Fernsteuerung in Device Hub fällt aus, obwohl die App nach Markus' direktem Tippen reagiert. Teamcloud, Mail und Löschautomatik bleiben unaktiviert; keine neue native Installation oder TestFlight-Verteilung aus der Webnacharbeit.
+
 ## App-Geräteprüfung · 26. November 2026 · Fassung 1.0 (8) installiert
 
 Fassung8 ist nach frischer Sicherung installiert:164 persistente Dokument-/Supportdateien und neun Grundrissarchive vor Erststart bytegleich. Der tatsächlich reproduzierte doppelte Glasboden in Work→Werkzeuge→Floor Scanner→Projektauswahl ist durch die feste obere Suchplatzierung physisch behoben; drei native Hauptlisten verwenden denselben Vertrag. Native7-Editorgruppen, zusammenhängende Kabel und freie Sicherheitskontur waren eng am iPhone bedienbar. Dies ist keine pauschale Abnahme sämtlicher Appseiten.

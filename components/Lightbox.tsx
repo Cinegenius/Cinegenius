@@ -1,10 +1,18 @@
 "use client";
 
 import { useTranslations } from "next-intl";
-import { useEffect, useCallback, useRef, useState } from "react";
+import { useEffect, useCallback, useRef, useState, useSyncExternalStore } from "react";
+import { createPortal } from "react-dom";
 import type { TouchEvent as ReactTouchEvent } from "react";
 import Image from "@/components/MediaImage";
 import { X, ChevronLeft, ChevronRight, ImageOff } from "lucide-react";
+import { useNativeAppAppearance } from "@/lib/use-native-app-appearance";
+import { useNativeAppModalLock } from "@/lib/use-native-app-content-region";
+import styles from "./Lightbox.module.css";
+
+const subscribePortalReadiness = () => () => {};
+const portalClientSnapshot = () => true;
+const portalServerSnapshot = () => false;
 
 interface LightboxProps {
   images: string[];
@@ -31,9 +39,14 @@ export default function Lightbox({
   const didSwipe = useRef(false);
   const safeIndex = Math.min(Math.max(activeIndex, 0), Math.max(0, images.length - 1));
   const currentImage = images[safeIndex];
+  const nativeAppearance = useNativeAppAppearance();
+  const dialog = useRef<HTMLDivElement>(null);
+  const portalReady = useSyncExternalStore(subscribePortalReadiness, portalClientSnapshot, portalServerSnapshot);
+  useNativeAppModalLock(nativeAppearance && portalReady && !!currentImage, dialog, onClose);
   const handleKey = useCallback(
     (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose();
+      if (e.defaultPrevented) return;
+      if (e.key === "Escape") { e.preventDefault(); onClose(); }
       if (e.key === "ArrowLeft" && images.length > 1) onPrev();
       if (e.key === "ArrowRight" && images.length > 1) onNext();
     },
@@ -46,12 +59,13 @@ export default function Lightbox({
   }, [handleKey]);
 
   useEffect(() => {
+    if (nativeAppearance) return;
     const previousOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
     return () => {
       document.body.style.overflow = previousOverflow;
     };
-  }, []);
+  }, [nativeAppearance]);
 
   const handleTouchStart = (event: ReactTouchEvent) => {
     touchStartX.current = event.touches[0]?.clientX ?? null;
@@ -77,14 +91,13 @@ export default function Lightbox({
     }
   };
 
-  if (!currentImage) return null;
+  if (!currentImage || !portalReady || typeof document === "undefined") return null;
 
-  return (
+  // Escape the fixed app content stacking context without moving its DOM or chrome.
+  return createPortal(
     <div
       className="fixed inset-0 z-[300] flex items-center justify-center bg-black/95 animate-fade-in"
-      role="dialog"
-      aria-modal="true"
-      aria-label={t("gallery")}
+      data-listing-lightbox-overlay="v1"
       style={{ touchAction: "pan-y" }}
       onTouchStart={handleTouchStart}
       onTouchEnd={handleTouchEnd}
@@ -98,18 +111,25 @@ export default function Lightbox({
         onClose();
       }}
     >
+      <div
+        ref={dialog}
+        role="dialog"
+        aria-modal="true"
+        aria-label={t("gallery")}
+        className={`relative flex h-full w-full items-center justify-center ${nativeAppearance ? styles.nativeDialog : ""}`}
+      >
       {/* Close */}
       <button
         type="button"
-        onClick={onClose}
+        onClick={(event) => { event.stopPropagation(); onClose(); }}
         aria-label={t("close")}
-        className="absolute top-4 right-4 w-10 h-10 bg-bg-elevated border border-border rounded-full flex items-center justify-center text-text-secondary hover:text-gold hover:border-gold transition-all z-10"
+        className={`absolute top-4 right-4 h-11 w-11 bg-bg-elevated border border-border rounded-full flex items-center justify-center text-text-secondary hover:text-gold hover:border-gold transition-all z-10 ${nativeAppearance ? styles.nativeClose : ""}`}
       >
         <X size={18} />
       </button>
 
       {/* Counter */}
-      <div className="absolute top-4 left-1/2 -translate-x-1/2 px-3 py-1 bg-bg-elevated border border-border rounded-full text-xs text-text-muted">
+      <div className={`absolute top-4 left-1/2 -translate-x-1/2 px-3 py-1 bg-bg-elevated border border-border rounded-full text-xs text-text-muted ${nativeAppearance ? styles.nativeCounter : ""}`}>
         {safeIndex + 1} / {images.length}
       </div>
 
@@ -119,7 +139,7 @@ export default function Lightbox({
           type="button"
           onClick={(e) => { e.stopPropagation(); onPrev(); }}
           aria-label={t("previous")}
-          className="absolute left-4 w-12 h-12 bg-bg-elevated border border-border rounded-full flex items-center justify-center text-text-secondary hover:text-gold hover:border-gold transition-all"
+          className={`absolute left-4 w-12 h-12 bg-bg-elevated border border-border rounded-full flex items-center justify-center text-text-secondary hover:text-gold hover:border-gold transition-all ${nativeAppearance ? styles.nativePrevious : ""}`}
         >
           <ChevronLeft size={22} />
         </button>
@@ -127,7 +147,7 @@ export default function Lightbox({
 
       {/* Image */}
       <div
-        className="flex max-h-[72vh] max-w-5xl items-center justify-center px-14 sm:px-20"
+        className={`flex max-h-[72vh] max-w-5xl items-center justify-center px-14 sm:px-20 ${nativeAppearance ? styles.nativeImage : ""}`}
         onClick={(e) => e.stopPropagation()}
       >
         {failedImages.has(currentImage) ? (
@@ -156,7 +176,7 @@ export default function Lightbox({
           type="button"
           onClick={(e) => { e.stopPropagation(); onNext(); }}
           aria-label={t("next")}
-          className="absolute right-4 w-12 h-12 bg-bg-elevated border border-border rounded-full flex items-center justify-center text-text-secondary hover:text-gold hover:border-gold transition-all"
+          className={`absolute right-4 w-12 h-12 bg-bg-elevated border border-border rounded-full flex items-center justify-center text-text-secondary hover:text-gold hover:border-gold transition-all ${nativeAppearance ? styles.nativeNext : ""}`}
         >
           <ChevronRight size={22} />
         </button>
@@ -165,7 +185,7 @@ export default function Lightbox({
       {/* Thumbnails */}
       {images.length > 1 && (
         <div
-          className="absolute bottom-6 left-4 right-4 flex justify-center gap-2 overflow-x-auto px-1 pb-1 sm:left-1/2 sm:right-auto sm:-translate-x-1/2"
+          className={`absolute bottom-6 left-4 right-4 flex justify-center gap-2 overflow-x-auto px-1 pb-1 sm:left-1/2 sm:right-auto sm:-translate-x-1/2 ${nativeAppearance ? styles.nativeThumbnails : ""}`}
           onClick={(e) => e.stopPropagation()}
         >
           {images.map((img, i) => (
@@ -184,6 +204,8 @@ export default function Lightbox({
           ))}
         </div>
       )}
-    </div>
+      </div>
+    </div>,
+    document.body
   );
 }

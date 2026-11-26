@@ -21,7 +21,7 @@ import UnoptimizedImage from "@/components/UnoptimizedImage";
 
 import { useFormDraft } from "@/lib/use-form-draft";
 import FormDraftStatus from "@/components/FormDraftStatus";
-import React, { useMemo, useState, useRef, useEffect } from "react";
+import React, { useMemo, useState, useRef, useEffect, useLayoutEffect } from "react";
 import { compressImage, MAX_FUNCTION_UPLOAD_BYTES, safeObjectURL } from "@/lib/compressImage";
 
 import { useAuth } from "@clerk/nextjs";
@@ -47,6 +47,7 @@ import { MAX_LOCATION_IMAGES } from "@/lib/listing-image-gallery";
 import { ProductionCreditsEditor } from "@/components/ProductionCredits";
 import { serializeProductionCredits, type ProductionCreditDraft } from "@/lib/production-credits";
 import { uiErrorMessage } from "@/lib/ui-error-message";
+import { PROFILE_MEDIA_ACCEPT } from "@/lib/profile-media";
 
 // ─── FormSelect ──────────────────────────────────────────────────────────────
 
@@ -455,7 +456,7 @@ export default function InseratPage() {
   const animals = useTranslations("FilmAnimals");
   const [createdPublished, setCreatedPublished] = useState(false);
   const router = useRouter();
-  const { userId, isLoaded } = useAuth();
+  const { userId, sessionId, isLoaded, isSignedIn } = useAuth();
   const [responsible, setResponsible] = useState<ResponsiblePerson>(NEW_RESPONSIBLE_PERSON);
   const [responsibleErrors, setResponsibleErrors] = useState<Record<string, string>>({});
 
@@ -507,6 +508,41 @@ export default function InseratPage() {
   const [locFloorPlanUrl, setLocFloorPlanUrl] = useState<string | null>(null);
   const [locFloorPlanPreview, setLocFloorPlanPreview] = useState<string | null>(null);
   const [locFloorUploading, setLocFloorUploading] = useState(false);
+  const locFloorUploadScope = useRef<{
+    active: boolean; accountId: string | null; sessionId: string | null; generation: number;
+    operation: { generation: number; controller: AbortController; preview: string | null } | null;
+  } | null>(null);
+  useLayoutEffect(function bindLocationFloorUploadSource() {
+    const previous = locFloorUploadScope.current;
+    const source: NonNullable<typeof locFloorUploadScope.current> = {
+      active: Boolean(isLoaded && isSignedIn && userId && sessionId),
+      accountId: userId ?? null, sessionId: sessionId ?? null, generation: 0, operation: null,
+    };
+    locFloorUploadScope.current = source;
+    if (previous?.operation) {
+      setLocFloorUploading(false);
+      setLocFloorPlanPreview(current => current?.startsWith("blob:") ? null : current);
+    }
+    return () => {
+      source.active = false;
+      source.generation += 1;
+      const operation = source.operation;
+      operation?.controller.abort();
+      if (operation?.preview) { URL.revokeObjectURL(operation.preview); operation.preview = null; }
+    };
+  }, [isLoaded, isSignedIn, userId, sessionId]);
+  function removeLocationFloorPlan() {
+    const source = locFloorUploadScope.current;
+    if (!source?.active || source.accountId !== userId || source.sessionId !== sessionId) return;
+    source.generation += 1;
+    const operation = source.operation;
+    source.operation = null;
+    operation?.controller.abort();
+    if (operation?.preview) { URL.revokeObjectURL(operation.preview); operation.preview = null; }
+    setLocFloorUploading(false);
+    setLocFloorPlanUrl(null);
+    setLocFloorPlanPreview(null);
+  }
   const [productionCredits, setProductionCredits] = useState<ProductionCreditDraft[]>([]);
   const [locationDraftReady, setLocationDraftReady] = useState(false);
   const [locationDraftStatus, setLocationDraftStatus] = useState<"loading" | "idle" | "saving" | "saved" | "error">("loading");
@@ -901,7 +937,7 @@ export default function InseratPage() {
   }
 
   async function handleSubmit(privateDraft = false) {
-    if (createInFlight.current || createdId) return;
+    if (createInFlight.current || createdId || locFloorUploading || locFloorUploadScope.current?.operation) return;
     if (!userId) {
       const destination = `${window.location.pathname}${window.location.search}`;
       router.push(`/sign-in?redirect_url=${encodeURIComponent(destination)}`);
@@ -1460,24 +1496,61 @@ export default function InseratPage() {
                     <div className="relative w-full max-w-sm">
                       {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img src={locFloorPlanPreview} alt={uiText("Ui.text_514d54b3eb66dc")} className="w-full rounded-xl border border-border object-contain max-h-48" />
-                      <button type="button" onClick={() => { setLocFloorPlanUrl(null); setLocFloorPlanPreview(null); }}
+                      <button type="button" onClick={removeLocationFloorPlan}
                         className="absolute top-2 right-2 w-6 h-6 bg-bg-primary/80 rounded-full flex items-center justify-center text-text-muted hover:text-crimson-light text-xs">✕</button>
                     </div>
                   ) : (
-                    <label className={`flex items-center gap-2 px-4 py-3 bg-bg-elevated border border-dashed border-border rounded-xl cursor-pointer hover:border-gold transition-colors text-sm text-text-muted w-fit ${locFloorUploading ? "opacity-60 pointer-events-none" : ""}`}>{uiText.rich("Ui.text_071ec9fe302b36", { value1: () => (locFloorUploading ? <span className="animate-spin text-gold">⟳</span> : <span>+</span>), part2: () => (<input type="file" accept="image/*,.pdf" className="hidden" onChange={async (e) => {
-                        const file = e.target.files?.[0]; if (!file) return;
-                        const _fp = safeObjectURL(file); if (_fp) setLocFloorPlanPreview(_fp);
+                    <label className={`flex items-center gap-2 px-4 py-3 bg-bg-elevated border border-dashed border-border rounded-xl cursor-pointer hover:border-gold transition-colors text-sm text-text-muted w-fit ${locFloorUploading ? "opacity-60 pointer-events-none" : ""}`}>{uiText.rich("Ui.text_071ec9fe302b36", { value1: () => (locFloorUploading ? <span className="animate-spin text-gold">⟳</span> : <span>+</span>), part2: () => (<input type="file" accept={PROFILE_MEDIA_ACCEPT} className="hidden" onChange={async (e) => {
+                        const input = e.currentTarget;
+                        const file = input.files?.[0];
+                        input.value = "";
+                        if (!file) return;
+                        const source = locFloorUploadScope.current;
+                        if (!source?.active || !isLoaded || !isSignedIn || !userId || !sessionId || source.accountId !== userId || source.sessionId !== sessionId) return;
+                        const previous = source.operation;
+                        source.operation = null;
+                        previous?.controller.abort();
+                        if (previous?.preview) { URL.revokeObjectURL(previous.preview); previous.preview = null; }
+                        const operation = { generation: ++source.generation, controller: new AbortController(), preview: null as string | null };
+                        source.operation = operation;
+                        const current = () => locFloorUploadScope.current === source && source.active && source.accountId === userId && source.sessionId === sessionId && source.generation === operation.generation && source.operation === operation && !operation.controller.signal.aborted;
+                        setLocFloorPlanUrl(null);
+                        setLocFloorPlanPreview(null);
+                        setError("");
                         setLocFloorUploading(true);
                         try {
-                          const fd = new FormData(); fd.append("file", file);
-                          const res = await fetchSetup("/api/upload", { method: "POST", body: fd }, fetch, 90_000);
+                          if (file.size === 0) throw new Error(uiText("mediaSecurity.empty"));
+                          // The picker is only a hint. Exclude PDFs/non-images before normalization;
+                          // the existing server decoder remains authoritative for image validity.
+                          const header = new Uint8Array(await file.slice(0, 32).arrayBuffer());
+                          if (!current()) return;
+                          const jpeg = header.length >= 3 && header[0] === 0xff && header[1] === 0xd8 && header[2] === 0xff;
+                          const png = header.length >= 8 && [0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a].every((byte, index) => header[index] === byte);
+                          const webp = header.length >= 12 && [0x52, 0x49, 0x46, 0x46].every((byte, index) => header[index] === byte) && [0x57, 0x45, 0x42, 0x50].every((byte, index) => header[index + 8] === byte);
+                          const heif = header.length >= 12 && [0x66, 0x74, 0x79, 0x70].every((byte, index) => header[index + 4] === byte) && [8, 16, 20, 24, 28].some(offset => ["heic", "heix", "hevc", "hevx", "mif1", "msf1"].includes(String.fromCharCode(...header.slice(offset, offset + 4))));
+                          if (!jpeg && !png && !webp && !heif) throw new Error(uiText("mediaSecurity.invalid"));
+                          const compressed = await compressImage(file, { maxWidth: 1920, quality: 0.85, maxBytes: MAX_FUNCTION_UPLOAD_BYTES, translate: uiText });
+                          if (!current()) return;
+                          if (compressed.size > MAX_FUNCTION_UPLOAD_BYTES) throw new Error(uiText("mediaSecurity.tooLarge"));
+                          operation.preview = safeObjectURL(compressed); if (operation.preview) setLocFloorPlanPreview(operation.preview);
+                          const fd = new FormData(); fd.append("file", compressed);
+                          if (!current()) return;
+                          const res = await fetchSetup("/api/upload", { method: "POST", body: fd, signal: operation.controller.signal }, fetch, 90_000);
+                          if (!current()) return;
                           const json = await res.json();
+                          if (!current()) return;
                           if (!res.ok || !json.url) throw new Error(json.error || uiText("profile.savingError"));
                           setLocFloorPlanUrl(json.url);
+                          setLocFloorPlanPreview(json.url);
                         } catch (cause) {
-                          setLocFloorPlanPreview(null);
-                          setError(uiErrorMessage(cause, uiText("profile.savingError")));
-                        } finally { setLocFloorUploading(false); }
+                          if (current()) {
+                            setLocFloorPlanPreview(null);
+                            setError(uiErrorMessage(cause, uiText("profile.savingError")));
+                          }
+                        } finally {
+                          if (operation.preview) { URL.revokeObjectURL(operation.preview); operation.preview = null; }
+                          if (current()) { source.operation = null; setLocFloorUploading(false); }
+                        }
                       }} />) })}</label>
                   )}
                 </div>
@@ -1922,7 +1995,7 @@ export default function InseratPage() {
             {/* ── SUBMIT ── */}
             <button
               onClick={() => handleSubmit()}
-              disabled={!listingDraft.loaded || !canSubmit() || loading || uploading || ((selected?.type === "prop" || selected?.type === "vehicle" || selected?.type === "animal") && (articleGalleryState.uploading || articleGalleryState.failed > 0)) || (selected?.type === "location" && (locationGalleryState.uploading || locationGalleryState.failed > 0))}
+              disabled={!listingDraft.loaded || !canSubmit() || loading || uploading || locFloorUploading || ((selected?.type === "prop" || selected?.type === "vehicle" || selected?.type === "animal") && (articleGalleryState.uploading || articleGalleryState.failed > 0)) || (selected?.type === "location" && (locationGalleryState.uploading || locationGalleryState.failed > 0))}
               className="w-full py-4 bg-gold text-bg-primary font-semibold rounded-xl hover:bg-gold-light transition-colors disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-2 text-base"
             >
               {loading ? (
