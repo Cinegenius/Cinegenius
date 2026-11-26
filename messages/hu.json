@@ -4783,7 +4783,7 @@
     "text_bbd0c5ecf20e22": "<part1></part1> Vissza a helyszínekhez",
     "text_e6ba89e6f89b71": "Helyszíngaléria",
     "text_46e748668f5e7a": "Fotók erről: {value1}",
-    "text_97a14078c43165": "<part1></part1> <value2></value2> &middot; <value3></value3>",
+    "text_97a14078c43165": "<part1></part1> <value2></value2> · <value3></value3>",
     "text_0e87ce8126b5d8": "Jelentkezz be az értékeléshez",
     "text_f05767e24ef119": "Saját helyszín",
     "text_c05dd8c953b77c": "Előbb érdeklődj, utána értékelj",

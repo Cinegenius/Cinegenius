@@ -9,7 +9,9 @@ import { listingPriceLabel } from "@/lib/listing-price";
 import { locationRoomLabel } from "@/lib/location-rooms";
 
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useLayoutEffect, useRef } from "react";
+import { useNativeAppAppearance } from "@/lib/use-native-app-appearance";
+import styles from "./LocationDetail.module.css";
 import Link from "next/link";
 import { useTranslations , useLocale } from "next-intl";
 import { bookingDateKey } from "@/lib/booking-request";
@@ -89,6 +91,49 @@ function getLocalizedAMENITY_LABELS(translate: (key: string) => string): Record<
 }); }
 
 export default function LocationDetail({ location }: { location: Location }) {
+  const nativeAppearance = useNativeAppAppearance();
+  const mobileActions = useRef<HTMLDivElement>(null);
+  useLayoutEffect(function bindLocationMobileActions() {
+    const actions = mobileActions.current;
+    if (!nativeAppearance || !actions) return;
+    const property = "--native-location-action-bottom";
+    const previous = { value: actions.style.getPropertyValue(property), priority: actions.style.getPropertyPriority(property) };
+    let dock: HTMLElement | null = null, frame = 0, closed = false, written: string | null = null;
+    const restore = () => {
+      if (written !== null && actions.style.getPropertyValue(property) === written) {
+        if (previous.value) actions.style.setProperty(property, previous.value, previous.priority);
+        else actions.style.removeProperty(property);
+      }
+      written = null;
+    };
+    const update = () => {
+      frame = 0;
+      if (closed || !actions.isConnected) return;
+      const next = document.querySelector<HTMLElement>('nav[data-native-app-bottom-nav="v1"]');
+      if (next !== dock) {
+        if (dock) resize.unobserve(dock);
+        dock = next;
+        if (dock) resize.observe(dock);
+      }
+      const top = dock?.getClientRects().length ? dock.getBoundingClientRect().top : NaN;
+      if (!Number.isFinite(top) || top <= 0) { restore(); return; }
+      written = `${Math.round(Math.max(0, window.innerHeight - top + 8) * 100) / 100}px`;
+      if (actions.style.getPropertyValue(property) !== written) actions.style.setProperty(property, written);
+    };
+    const schedule = () => { if (!closed && !frame) frame = requestAnimationFrame(update); };
+    const resize = new ResizeObserver(schedule);
+    const changes = new MutationObserver(schedule);
+    changes.observe(document.body, { childList: true, subtree: true });
+    changes.observe(document.documentElement, { attributes: true, attributeFilter: ["style"] });
+    window.addEventListener("resize", schedule); window.addEventListener("orientationchange", schedule);
+    window.visualViewport?.addEventListener("resize", schedule); window.visualViewport?.addEventListener("scroll", schedule);
+    update();
+    return () => {
+      closed = true; cancelAnimationFrame(frame); resize.disconnect(); changes.disconnect(); restore();
+      window.removeEventListener("resize", schedule); window.removeEventListener("orientationchange", schedule);
+      window.visualViewport?.removeEventListener("resize", schedule); window.visualViewport?.removeEventListener("scroll", schedule);
+    };
+  }, [nativeAppearance]);
   const uiPriceLocale = useLocale();
   const uiPriceText = useTranslations("MarketplaceOffer");
 
@@ -399,7 +444,7 @@ export default function LocationDetail({ location }: { location: Location }) {
       </div>
 
       {/* Mobile sticky CTA */}
-      <div className="lg:hidden fixed bottom-0 inset-x-0 z-40 bg-bg-primary/95 backdrop-blur-sm border-t border-border px-4 py-3 flex items-center gap-3">
+      <div ref={mobileActions} data-location-mobile-actions="v1" className={`${styles.mobileActionBar} lg:hidden fixed bottom-0 inset-x-0 z-40 bg-bg-primary/95 backdrop-blur-sm border-t border-border px-4 py-3 flex items-center gap-3`}>
         <div className="flex-1">
           <div className="text-lg font-bold font-display text-text-primary">
             {listingPriceLabel(location.price,location.metadata, undefined, uiPriceLocale, uiPriceText)}

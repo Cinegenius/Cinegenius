@@ -4783,7 +4783,7 @@
     "text_bbd0c5ecf20e22": "<part1></part1> Вернуться к локациям",
     "text_e6ba89e6f89b71": "Галерея локации",
     "text_46e748668f5e7a": "Фото {value1}",
-    "text_97a14078c43165": "<part1></part1> <value2></value2> &middot; <value3></value3>",
+    "text_97a14078c43165": "<part1></part1> <value2></value2> · <value3></value3>",
     "text_0e87ce8126b5d8": "Войдите, чтобы оставить отзыв",
     "text_f05767e24ef119": "Ваша локация",
     "text_c05dd8c953b77c": "Сначала запрос, затем отзыв",
