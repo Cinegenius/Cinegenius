@@ -1,6 +1,9 @@
 # Firmenkonto: Profillink und Foto-Bearbeitung · 26. November 2026
 
-Status: Korrekturkandidat auf `5cdc08a6`, noch nicht veröffentlicht. Die Meldung
+Status: Nach ausdrücklicher Freigabe am 26. November 2026 veröffentlicht:
+`65f160cdacded7b5e8cf2e85ef80a21538d68595`, Deployment
+`dpl_5sBZjTTFJhD6Uvb9wCyoCSzJpnFZ` ist READY und sowohl
+`www.cinegenius.co` als auch `cinegenius.co` sind diesem Stand zugeordnet. Die Meldung
 betrifft eine 404-Seite bereits beim Öffnen der Foto-/Bearbeitungsansicht.
 Die genaue Fehleradresse und der ursprüngliche Klickverlauf liegen nicht vor.
 
@@ -78,5 +81,27 @@ ursprüngliche 404 benötigt ihre Fehleradresse oder einen erneuten Versuch.
 
 Die Korrektur liegt in den gemeinsam genutzten Webrouten. Native Quellen,
 TestFlight, Geräteinstallationen und andere laufende App-Kandidaten bleiben
-separat. Produktion erst nach Freigabe für dieses Paket und den normalen
-geschützten Releaseprüfungen. Kein paralleler App-Livegang.
+separat. Markus hat „Ja, Korrekturen live stellen“ bestätigt. Veröffentlichung
+über `npm run deploy:production` von sauberem `main` identisch mit `origin/main`
+und bestätigter Projektidentität; vollständiger Vercel-Build einschließlich
+TypeScript, gemeinsamer Designprüfung und 17 Sprachkatalogen bestanden.
+
+Acht Live-HTTP-Prüfungen bestätigen Firmenansicht, alte Firmen-ID, geschützte
+Bearbeitungs-/Verwaltungs-/Kontowege, anonymen API-Schutz und weiterhin fehlende
+unbekannte Personenprofile. Die mobile Chromium-Prüfung bestätigt zusätzlich
+die gerenderte Firmenansicht, die Weiterleitung der alten ID zum Firmenslug und
+den Bearbeitungslink zur Anmeldung ohne JavaScript-Seitenfehler. In WebKit
+bestehen der direkte Firmenaufruf und der getrennte direkte Bearbeitungsaufruf
+bis zu den sichtbaren Anmeldefeldern ebenfalls ohne Seitenfehler.
+
+Prüfgrenze: Beim schnellen Wechsel bzw. dem alten ID-Weiterleitungspfad meldet
+WebKit abgebrochene Abrufe, darunter eine Clerk-Anfrage; die Zielseiten wurden
+trotzdem erreicht. Der kombinierte WebKit-Lauf gilt deshalb nicht als fehlerfrei.
+Dieser Nebenbefund bleibt separat offen und ist weder als Ursache des gemeldeten
+404 noch als behoben nachgewiesen. Die erste TLS-Laufzeitkonfiguration und ein
+zu allgemeiner E-Mail-Feldselektor betrafen ausschließlich das Prüfwerkzeug und
+sind in getrennten Belegen erhalten. Kundensitzung, echter Upload und physische
+iPhone-Bedienung wurden nicht geprüft.
+Produktionsbelege: `/srv/cinegenius/handoffs/20261126-company-photo-entry/receipt.json`
+und `live-checks.json`. Kein nativer Build, keine Geräteinstallation, keine
+Migration, keine Änderungen an Kundendaten oder Anbietern.

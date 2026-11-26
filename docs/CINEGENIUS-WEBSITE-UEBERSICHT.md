@@ -1,6 +1,6 @@
-## Firmenkonto und Foto-Bearbeitung · 26. November 2026 · noch nicht veröffentlicht
+## Firmenkonto und Foto-Bearbeitung · 26. November 2026 · Webkorrektur live
 
-Eigener Profillink ohne Crewprofil führt im geprüften Quellkandidaten zu „Mein Bereich“; Firmen-Foto-/Bearbeitungslinks behalten die gewählte Firma. Reine Lesemitglieder sehen keine unzulässigen Bearbeitungsaktionen. Die gemeldete Firma ist vorhanden; der genaue ursprüngliche 404-Link ist noch unbekannt. Keine Änderung an Kundendaten, Upload oder Medienrechten. [Befund, Korrektur und Prüfgrenzen](company-account-entry-20261126.md).
+Freigegeben und veröffentlicht: `65f160cd`, Deployment `dpl_5sBZjTTFJhD6Uvb9wCyoCSzJpnFZ` READY, www und Hauptdomain geprüft. Eigener Profillink ohne Crewprofil führt zu „Mein Bereich“; Firmen-Foto-/Bearbeitungslinks behalten die gewählte Firma. Reine Lesemitglieder sehen keine unzulässigen Bearbeitungsaktionen. Firmenansicht und ausgeloggte Weiterleitung zur Anmeldung sind live geprüft; Kundensitzung/Upload und der genaue ursprüngliche 404-Link bleiben unbestätigt. Keine Änderung an Kundendaten oder Medienrechten, kein nativer Build. [Befund, Korrektur und Prüfgrenzen](company-account-entry-20261126.md).
 
 ## 25. November 2026: beauftragter separater AGB-Livegang
 
