@@ -1,6 +1,6 @@
 import 'server-only';
 import {randomUUID} from 'node:crypto';
-import {PDFParse} from 'pdf-parse';
+import type {PDFParse} from 'pdf-parse';
 import {WORK_MAIL_LIMITS,WorkMailError,workMailDomain,workMailHash,workMailAttachmentId,workMailAttachmentList,workMailText,type WorkMailProvider,type WorkMailSource} from './work-mail';
 import {workMailRPC,workMailStoreBytes,workMailStoragePath,workMailLoadBytes,type WorkMailConnection,type WorkMailRecord} from './work-mail-store';
 import {workMailProviderConfig,sealWorkMailToken,unsealWorkMailToken,refreshWorkMailToken,listWorkMailMessages,getWorkMailRaw,getWorkMailAttachment,revokeWorkMailToken} from './work-mail-oauth';
@@ -101,15 +101,17 @@ function workMailAnalysisPages(text:string) {
 }
 async function workMailPDFPages(bytes:Buffer) {
  if(bytes.length<5||bytes.subarray(0,5).toString('latin1')!=='%PDF-')throw new WorkMailError('analysisUnsupported',422);
- const parser=new PDFParse({data:new Uint8Array(bytes)});
+ let parser:PDFParse|undefined;
  try{
+  const {PDFParse:Parser}=await import('pdf-parse');
+  parser=new Parser({data:new Uint8Array(bytes)});
   const result=await parser.getText({first:DISPO_PAGE_LIMIT,lineEnforce:true});
   const pages=result.pages.slice(0,DISPO_PAGE_LIMIT).map((page,index)=>({number:index+1,text:page.text.normalize('NFC').replace(/\u0000/g,'').slice(0,100_000)}));
   if(!pages.some(page=>page.text.trim()))throw new WorkMailError('analysisUnsupported',422);
   let total=0;
   return pages.map(page=>{const remaining=Math.max(0,DISPO_TEXT_LIMIT-total),text=page.text.slice(0,remaining);total+=text.length;return {...page,text};}).filter(page=>page.text.length||page.number===1);
  }catch(cause){if(cause instanceof WorkMailError)throw cause;throw new WorkMailError('analysisUnsupported',422);}
- finally{await parser.destroy().catch(()=>{});}
+ finally{await parser?.destroy().catch(()=>{});}
 }
 function workMailCurrentDispoPDF(attachments:WorkMailRecord['attachments']) {
  const pdfs=attachments.filter(a=>a.type.toLowerCase().includes('pdf')||/\.pdf$/iu.test(a.name));

@@ -1,5 +1,15 @@
 # Geräteprüfung, Galerie und Location-Grundrissupload · 26. November 2026
 
+## Geräte- und Mailnachtrag · 26. November 2026 · vor dem engen Mailstatus-Release
+
+Galerie und Location-Bildverarbeitung sind auf `a6d8048945b10f2fd8224996310f9d0567811cbf` veröffentlicht (`dpl_9KiU5RWmGjk9rbhwXHSugGcWRUzo` READY). 92 integrierte Fälle, Design22,17 Kataloge sowie der vollständige Hosted-Next-/TypeScript-Build bestanden. Unabhängig67 öffentliche Assets geprüft; die private Inserat-Bundleabnahme wurde nicht behauptet. Native8 bleibt installiert. Am iPhone funktionieren jetzt Polaris-Galeriebildwechsel und erreichbares X über der Appnavigation. Ein eigener synthetischer PNG-Grundriss wurde im Location-Entwurf ausgewählt und angezeigt; genau ein korrespondierender iPhone-POST `/api/upload` um20:24:03.036UTC erhielt200. Anschließend nur das eigene Testbild aus dem vorher leeren Feld entfernt und zu Work zurückgekehrt; keine Veröffentlichung oder manuelle Formularspeicherung. Kein Beleg für Originalbytes, große/HEIC-Dateien, andere Uploader oder Teamdateisynchronisierung.
+
+Der tatsächlich geöffnete native E-Mail-Eingang unter Work→Meins→Einstellungen bleibt in der Apphülle, scheitert aber bei beiden Statusabrufen mit HTTP500. Korrelierte Produktionsfehler belegen `DOMMatrix is not defined` beim vorzeitigen PDF-Paketimport. Der enge geprüfte Servicefix lädt die PDF-Engine erst innerhalb der vorhandenen PDF-Fehlergrenze: Status und Textarchiv benötigen sie nicht mehr; fehlende PDF-Laufzeit liefert kontrolliert422 statt eines unkontrollierten Startfehlers. 36 integrierte Mail-/OAuthfälle und unabhängig34 Fälle bestanden. Dies ist noch kein veröffentlichter Mailfix und keine Reparatur der fehlenden produktiven Canvas-Paketierung. Konto-/Session-/Origin-/Dateischutz, Providerkonfiguration und17 Kataloge unverändert. Keine OAuth-Verbindung, Mail-/Team-/Erasureflag-Aktivierung oder Migration; tägliche Dispo→Heute-Automatik bleibt separat unintegriert. Lokale Einzelbelege: `work/app-full-device-qa-20261126/independent-upload-gallery-live-review.safe.json`, `location-qa-upload-http-20261126.safe.json`, `mail-runtime-500-readonly-20261126.safe.json` und `mail-pdf-status-candidate/independent-source-review/independent-review.safe.json`.
+
+Dieser zeitgebundene Nachtrag ersetzt die nachfolgenden älteren Zwischenstände nur in den genannten Punkten. Work-Profilbild, erster Projekt-/Scannerübergang und übrige nicht ausgeführte Gerätefälle bleiben offen; keine pauschale App-Abnahme.
+
+## Älterer Prüfcheckpoint vor Galerie-/Uploadveröffentlichung
+
 ## Bestätigter aktueller Stand
 
 Native 1.0 (8) ist nach frischer Sicherung installiert. Vor Erststart sind 164 persistente Dateien einschließlich neun Grundrissarchiven bytegleich. Die feste obere Suche beseitigt die am iPhone reproduzierte doppelte untere Glasfläche in der Projektauswahl; dieselbe Platzierung ist auch in Meins→Grundrisse sichtbar. Dies ist keine Abnahme aller Seiten.
