@@ -1,3 +1,7 @@
+## Firmenkonto und Foto-Bearbeitung · 26. November 2026 · noch nicht veröffentlicht
+
+Eigener Profillink ohne Crewprofil führt im geprüften Quellkandidaten zu „Mein Bereich“; Firmen-Foto-/Bearbeitungslinks behalten die gewählte Firma. Reine Lesemitglieder sehen keine unzulässigen Bearbeitungsaktionen. Die gemeldete Firma ist vorhanden; der genaue ursprüngliche 404-Link ist noch unbekannt. Keine Änderung an Kundendaten, Upload oder Medienrechten. [Befund, Korrektur und Prüfgrenzen](company-account-entry-20261126.md).
+
 ## 25. November 2026: beauftragter separater AGB-Livegang
 
 Die pauschale 30-Tage-Zusage wird durch den beauftragten deutschen Originaltext zur unverzüglichen Löschung ersetzt; bestehende vertragliche Ansprüche bleiben erhalten. AGB-Stand: 25. November 2026. Die neue Löschautomatik aus `0fa6f23a` und ihr HTTP-202-Vertrag bleiben unveröffentlicht. Keine API-/App-, Datenbank- oder Ablaufänderung in diesem Release. Veröffentlichungsbeleg: `/srv/cinegenius/audits/20261125-agb-release/`. [Umfang und Wortlaut](legal-review/2026-11-25/agb-loeschung-veroeffentlichung.md).

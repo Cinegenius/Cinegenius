@@ -11,7 +11,7 @@ import {placeDisplay} from "@/lib/places/core";
 import PublicOrganizationLinks from "@/components/organizations/PublicOrganizationLinks";
 import { publicProjectCredits } from "@/lib/project-media-rights";
 import { visibleLinkedProfileIds } from "@/lib/linked-profile-access";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { db } from "@/lib/db";
 import { recordProfileView } from "@/lib/profile-views";
 import { unstable_cache } from "next/cache";
@@ -281,7 +281,13 @@ export default async function ProfilePage(
     auth(),
   ]);
 
-  if (!rawProfile) notFound();
+  if (!rawProfile) {
+    // Company/provider accounts need not have a public personal profile. Keep
+    // their own account-menu and saved links connected to account management.
+    // A visitor must never learn anything about another missing profile.
+    if (userId && slug === userId) redirect("/dashboard");
+    notFound();
+  }
   const privacy = (await profileAccessFor([rawProfile.user_id],userId)).get(rawProfile.user_id);
   if (!privacy?.profile) notFound();
   // Display consent is request-scoped: hiding pronouns must take effect even

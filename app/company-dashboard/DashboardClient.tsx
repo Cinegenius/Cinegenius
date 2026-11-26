@@ -156,7 +156,7 @@ export default function DashboardClient({ company, permissionRole, companyOption
         </div>
 
         <div className="p-6 lg:p-8 max-w-3xl">
-          {tab === "overview"  && <OverviewTab company={company} setTab={setTab} canDelete={isOwner} />}
+          {tab === "overview"  && <OverviewTab company={company} setTab={setTab} canDelete={isOwner} canEdit={canEditCompany} />}
           {tab === "services"  && <ServicesTab companyId={company.id} canEdit={canEditCompany} />}
           {tab === "equipment" && <EquipmentTab companyId={company.id} canEdit={canEditCompany} />}
           {tab === "team"      && <TeamTab companyId={company.id} permissionRole={permissionRole} canManageTeam={canManageTeam} />}
@@ -168,7 +168,7 @@ export default function DashboardClient({ company, permissionRole, companyOption
 
 // ─── Overview Tab ──────────────────────────────────────────────────────────────
 
-function OverviewTab({ company, setTab, canDelete }: { company: Company; setTab: (t: Tab) => void; canDelete: boolean }) {
+function OverviewTab({ company, setTab, canDelete, canEdit }: { company: Company; setTab: (t: Tab) => void; canDelete: boolean; canEdit: boolean }) {
   const uiText = useTranslations();
 
   const [stats, setStats] = useState({ services: 0, equipment: 0, members: 0 });
@@ -243,8 +243,8 @@ function OverviewTab({ company, setTab, canDelete }: { company: Company; setTab:
                 : <AlertCircle size={14} className="text-text-muted shrink-0" />
               }
               <span className={done ? "text-text-secondary" : "text-text-muted"}>{label}</span>
-              {!done && (
-                <Link href="/company-setup" className="ml-auto text-xs text-gold hover:underline">{uiText("profile.addPhoto")}</Link>
+              {!done && canEdit && (
+                <Link href={`/company-setup?company_id=${encodeURIComponent(company.id)}`} className="ml-auto text-xs text-gold hover:underline">{uiText("profile.addPhoto")}</Link>
               )}
             </div>
           ))}
@@ -257,8 +257,8 @@ function OverviewTab({ company, setTab, canDelete }: { company: Company; setTab:
           className="flex items-center gap-2 p-3 bg-bg-secondary border border-border rounded-xl text-sm text-text-secondary hover:border-gold/40 hover:text-gold transition-colors">{uiText.rich("Ui.text_4bde6f698a95a9", { part1: () => (<Plus size={14} />) })}</button>
         <button onClick={() => setTab("equipment")}
           className="flex items-center gap-2 p-3 bg-bg-secondary border border-border rounded-xl text-sm text-text-secondary hover:border-gold/40 hover:text-gold transition-colors">{uiText.rich("Ui.text_d7e793e349865b", { part1: () => (<Plus size={14} />) })}</button>
-        <Link href="/company-setup"
-          className="flex items-center gap-2 p-3 bg-bg-secondary border border-border rounded-xl text-sm text-text-secondary hover:border-gold/40 hover:text-gold transition-colors">{uiText.rich("Ui.text_7bd40503e9c1f8", { part1: () => (<Settings size={14} />) })}</Link>
+        {canEdit && <Link href={`/company-setup?company_id=${encodeURIComponent(company.id)}`}
+          className="flex items-center gap-2 p-3 bg-bg-secondary border border-border rounded-xl text-sm text-text-secondary hover:border-gold/40 hover:text-gold transition-colors">{uiText.rich("Ui.text_7bd40503e9c1f8", { part1: () => (<Settings size={14} />) })}</Link>}
         <Link href={`/companies/${company.slug}`}
           className="flex items-center gap-2 p-3 bg-bg-secondary border border-border rounded-xl text-sm text-text-secondary hover:border-gold/40 hover:text-gold transition-colors">{uiText.rich("Ui.text_59119c264e61b8", { part1: () => (<ExternalLink size={14} />) })}</Link>
       </div>
