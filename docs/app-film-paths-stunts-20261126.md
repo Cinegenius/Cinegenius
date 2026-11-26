@@ -1,0 +1,25 @@
+# Filmplaneditor: Objektgruppen, Kabel und Sicherheitsflächen · 26. November 2026
+
+> Aktualisierung nach Geräteprüfung am 26. November 2026: Installiert ist inzwischen 1.0 (8). Frische Sicherung und Vergleich bestätigten 164 unveränderte persistente Dateien einschließlich neun Grundrissarchiven vor dem ersten Start. Die doppelte untere Glasfläche in der Projektauswahl ist am iPhone mit fester oberer Suche behoben. News-Suche und native Projekteingabe öffnen die Bildschirmtastatur; das eigene lokale Projekt „Qa test“ wurde angelegt. Der erste Übergang zeigte einen durch einmaliges Wiederholen aufgelösten Ladefehler und bleibt getrennt in Prüfung. Die globale schmale Web-Kopfleiste ist lokal mit 86 gezielten Prüfungen abgesichert, aber noch nicht veröffentlicht. Erfolgreicher Dateiimport/-upload und der vollständige Seitendurchlauf sind noch offen. Die folgenden älteren Build- und Prüfstände bleiben zeitgebundene Historie; Teamcloud, Mail und Löschautomatik bleiben unaktiviert.
+
+Markus hat die fünf Objektgruppen bestätigt und zusammenhängende Kabelwege mit gemeinsamen Kabeldaten, freie Sicherheitsflächen zusätzlich zum Kreis sowie schematische Stunt-/SFX-Marker beauftragt.
+
+## Verhalten im neuen Kandidaten
+
+Der bisherige Ausstattungsbereich heißt Objekte und enthält 25 vorhandene Typen in Möbel (5), Geräte (7), Sanitär (4), Natur (3) und Tiere (6). Die Suche erreicht alle Gruppen; Gruppen und Ergebnisse bleiben bei knapper Höhe erreichbar. Felsen gehören ausschließlich zu Natur. Fehlende zusätzliche Pflanzen-/Podest-/Hintergrundtypen werden dadurch nicht als implementiert ausgegeben. Szenenbild behält Kulissenbausteine, Kasten und Molton.
+
+Ein Kabelweg wird durch aufeinanderfolgendes Tippen als ein einziges offenes Objekt mit 2–64 Punkten gezeichnet, mit einem bestehenden Verlauf und einem Undo-Schritt. Kabelart, Anschluss, optionale Stromstärke/Spannung gelten für den ganzen Zug. Vorhandene Power-/Signal-/Daten-/Freitextarten, Schuko/CEE/Powerlock und die bisherigen 16/32/63/125 A sowie 230/400 V werden wiederverwendet. Punkte bleiben nachträglich bearbeitbar; gekreuzte Wege bleiben erlaubt. Es gibt keine neue Kabel-Geometrieversion oder automatische elektrische Auslegung.
+
+Sicherheit bietet Kreis oder eine freie geschlossene Fläche aus 3–64 Eckpunkten. Radius und gekoppelte Größenänderung gehören nur zum Kreis. Freie Flächen nutzen vorhandene Polygon-/Vertexfunktionen; ohne bestätigten Maßstab zeigen Details und Export keine erfundenen Meter-/Quadratmeterwerte. Die Produktion gliedert Setbetrieb, Stunt, SFX und Sicherheit. Sieben neue schematische Marker ergänzen Crash, Landematte, Explosion, Feuer, Rauch, Regen und Sammelpunkt; vorhandene Wind-, Bewegungs-/Fluchtwege und Flächen werden wiederverwendet. Keine Effektbedienung oder automatische Sicherheitsabstandsberechnung.
+
+## Dateivertrag und Prüfstand
+
+Alle 95 bisherigen Objekt-IDs bleiben erhalten, sieben Marker sind additiv. Die bisherigen Kabelgeometrie-/Metadatenversionen bleiben bytegleich. Neue Marker und das Sicherheitspolygon verlangen das exakte Pflichtfeature film-stunt-planning-v1; ein tatsächlicher unveränderter älterer Leser weist diese Daten geschlossen ab und verändert die Quelldateien nicht. Das alte Kreisformat und unterstützte Kabel-/Altarchive bleiben erhalten.
+
+Core: 52 tatsächlich ausgeführte Fälle einschließlich Altleser und alter Suite. Gruppierung: 340 Foundation-Aussagen. UI nach zwei konkret belegten Korrekturen: 245 extrahierte Methoden-/Core-Aussagen, vier Syntaxparser, 30 unabhängige tatsächliche Gegenfälle. Der zunächst falsche unskalierte Export sowie Navigation aus dem laufenden Kabelzeichnen sind als Vorherbelege gesichert und in der Nachprüfung geschlossen. Diese Zahlen ersetzen keine echte SwiftUI-/Touch-/Tastatur- oder PDF-Bildabnahme.
+
+Der vollständige optimierte Xcode-Archivbuild **1.0 (7)** ist Exit 0 und signaturgeprüft. Eingefroren sind 443 Quelldateien mit 46 erklärten Änderungen gegenüber dem unveränderten Native6: Gruppierung, zwei Coredateien, vier App-UI-Dateien, Sprachressourcen, angepasste Coretests und nur die Versionsmetadaten 6→7. 17 Quellkataloge enthalten die neuen Texte; die neun vollständig vorhandenen nativen Bildschirmsprachen bleiben unverändert die aktivierten Sprachen. Das ist keine neue pauschale 17-Sprachen-Nativefreigabe.
+
+Keine Verteilung, Veröffentlichung, Geräteinstallation oder Datenrücksetzung aus diesem Build ableiten. Die schmale gemeinsame Web-Kopfleiste ist weiterhin ein getrennter unveröffentlichter CSS-Delta. Die neue Cloud-Teamablage und ihre Kontolöschkopplung bleiben getrennte Kandidaten; lokale Meins-/Planinhalte werden nicht automatisch hochgeladen oder gelöscht.
+
+Belege im Appauftrag: native7-source-preparation.safe.json, archive-7.safe.json, film-paths-safety-core-candidate/source-freeze.safe.json, film-editor-paths-ui-candidate/source-manifest.json und film-editor-paths-ui-independent-review/v2/independent-repair-review.safe.json. Vor frischer Geräteinstallation aktuelle Daten sichern; Mac-/iPhone-Rückgabe und echte Bedienprüfung bleiben offen.

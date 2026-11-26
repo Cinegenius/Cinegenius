@@ -1,6 +1,24 @@
+## App-Geräteprüfung · 26. November 2026 · Fassung 1.0 (8) installiert
+
+Fassung8 ist nach frischer Sicherung installiert:164 persistente Dokument-/Supportdateien und neun Grundrissarchive vor Erststart bytegleich. Der tatsächlich reproduzierte doppelte Glasboden in Work→Werkzeuge→Floor Scanner→Projektauswahl ist durch die feste obere Suchplatzierung physisch behoben; drei native Hauptlisten verwenden denselben Vertrag. Native7-Editorgruppen, zusammenhängende Kabel und freie Sicherheitskontur waren eng am iPhone bedienbar. Dies ist keine pauschale Abnahme sämtlicher Appseiten.
+
+Markus verlangt jetzt einen systematischen Bedien-/Tastatur-/Uploaddurchlauf. News-Suche sowie native Projekteingabe öffnen die Bildschirmtastatur. Das lokale Testprojekt „Qa test“ wurde angelegt; beim ersten Grundrissaufruf erschien ein durch einmaliges Wiederholen aufgelöster Ladefehler. Der Präsentationsübergang wird getrennt untersucht. Der gemeinsame schmale Appkopf ist mit320px/82vw und44px-Zielen vorbereitet, in diesem Checkpoint noch nicht veröffentlicht. Location-Grundriss-PDF-/Bildnormalisierung und Lebenszyklusgrenzen bleiben separate ungeprüfte Releasekandidaten. Neue Teamcloud, Mail und Kontolöschautomatik bleiben unaktiviert. Ältere Checkpoints unten sind zeitgebundene Historie.
+
 ## Firmenkonto und Foto-Bearbeitung · 26. November 2026 · Webkorrektur live
 
 Gemeinsam genutzte Webrouten freigegeben und veröffentlicht: `65f160cd`, Deployment `dpl_5sBZjTTFJhD6Uvb9wCyoCSzJpnFZ` READY, www und Hauptdomain geprüft. Eigener Profillink ohne Crewprofil führt zu „Mein Bereich“; Firmen-Foto-/Bearbeitungslinks behalten die gewählte Firma. Reine Lesemitglieder sehen keine unzulässigen Bearbeitungsaktionen. Firmenansicht und ausgeloggte Weiterleitung zur Anmeldung sind live geprüft; Kundensitzung/Upload und der genaue ursprüngliche 404-Link bleiben unbestätigt. Keine Änderung an Kundendaten oder Medienrechten. Native App, TestFlight und Geräteinstallation bleiben separat; keine physische Geräteabnahme. [Befund, Korrektur und Prüfgrenzen](company-account-entry-20261126.md).
+
+## Filmplaneditor und Teamdatei-Löschkopplung · 26. November 2026 · App7 gebaut
+
+**Neuer voller Appkandidat 1.0 (7) gebaut und signaturgeprüft:** bestätigte Objektgruppen, zusammenhängende Kabelzüge mit einem Kabeldatensatz, Kreis/freie Sicherheitsfläche und sieben Stunt-/SFX-Planmarker. Ältere Archive/IDs erhalten, neue Formen mit geschlossenem Pflichtfeature. Zwei unabhängig belegte UI-Kanten korrigiert und nachgeprüft. 443 Eingaben, 46 erklärte Änderungen gegenüber6; noch kein Export/Upload/Installieren oder physischer Bedienbeleg. [Umfang und Prüfgrenzen](app-film-paths-stunts-20261126.md).
+
+**Teamdatei-Löschentscheidung umgesetzt als getrennte Kandidaten:** Markus verlangt eigene Uploads entfernen, fremde Versionen behalten. Derselbe unveröffentlichte Accountauftrag0fa6 erhält eine interne, wiederaufnehmbare Teamphase und gemeinsamen Writer-Schutz; kein zweiter Accountworkflow. SQL26+8 unabhängige Fälle, Worker55+7 tatsächliche Kopplungen und UI47+8 lokal geprüft. Ganze Accountautomatik/Provider-/Restorebedingungen bleiben gesondert offen; keine produktive Migration, Aktivierung oder echte Kontolöschung. Ältere 5cdc-Integrationsbelege nicht auf den inzwischen vom WEB-Peer gemeldeten Hauptstand4cedebe8 übertragen; neue Firmen-/Fotoänderungen beim nächsten Desktopabgleich erhalten.
+
+## App-Folgeauftrag · 26. November 2026 · Seitenkonsistenz und Teamdateien
+
+**Akuter Darstellungsfehler zuerst:** Fahrzeugdetails und weitere echte Ziele fehlen in nativen Darstellungslisten; deshalb zeigt die App teilweise Websiteleisten. Quellinventur aller 93 Seiteneinstiege, eingegrenzte Korrektur und kompakter mittiger Kopf sind als vollständiger signierter Kandidat 1.0 (5) gebaut und unabhängig geprüft. Die Community-CSS ist lokal vorbereitet. Veröffentlichung und reale Sicht-/Geräteprüfung sind noch offen, Mac-Fenster/iPhone aktuell nicht erreichbar. TF4-Einreichung dadurch nicht geändert. [Umfang und Prüfgrenzen](app-page-consistency-20261126.md).
+
+**Gemeinsame Teamordner ausdrücklich beauftragt:** echte Online-Dateien statt ausschließlich lokaler Verweise; Dateien/Chats getrennt, Meins bleibt privat. Isolierte Backend-/UI-/native Kandidaten sind gebaut und unabhängig geprüft; die gemeinsame Webprojektion besteht 167 Tests, TypeScript und Next-Compile. Nativer Folgecandidate 1.0 (6) archiviert, noch nicht installiert. Keine Migration, produktive Aktivierung oder automatischer Upload privater Dateien. Vor der Dateifunktion-Aktivierung ist der konkret noch fehlende Kontolösch-/Aufbewahrungsweg für neue gemeinsame Speicherobjekte zu ergänzen; kein ungeprüftes Löschen fremder Teamdaten. Dieser neue Auftrag ersetzt die frühere rein lokale Ausbaugrenze für den genannten Teamdateiumfang. Ältere Arbeitsstände unten bleiben zeitgebundene Historie.
 
 ## 25. November 2026: beauftragter separater AGB-Livegang
 
