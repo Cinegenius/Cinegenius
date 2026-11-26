@@ -1,8 +1,12 @@
 /* Only this detail CTA moves; ordinary website positioning stays unchanged. */
 :global(html[data-cg-native-community-appearance="app"]) .mobileActionBar {
-  bottom: var(--native-location-action-bottom, calc(var(--mobile-nav-clearance, 96px) + 8px));
+  bottom: calc(var(--native-location-action-bottom, calc(var(--mobile-nav-clearance, 96px) + 8px)) + var(--cg-app-genie-clearance, 0px));
   padding-left: max(16px, env(safe-area-inset-left, 0px));
   padding-right: max(16px, env(safe-area-inset-right, 0px));
 }
 :global(html[data-cg-native-community-appearance="app"]) .mobileActionBar > div { min-width: 0; }
 :global(html[data-cg-native-community-appearance="app"]) .mobileActionBar > button { min-height: 44px; }
+/* UIKit owns the launcher in the app, so no [data-genie-open] web button exists. */
+:global(html[data-cg-native-community-appearance="app"][data-native-genie-owner-ready="uikit-v1"][data-native-genie-availability="available"]) .mobileActionBar {
+  --cg-app-genie-clearance: 104px;
+}
