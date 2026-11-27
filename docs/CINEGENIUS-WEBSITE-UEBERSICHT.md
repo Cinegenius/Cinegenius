@@ -1,3 +1,7 @@
+## Wintermotive in der normalen Avatarauswahl · 27. November 2026
+
+Vorbereitet, noch nicht veröffentlicht: höchstens 3 saisonale unter 12 Auswahlmotiven. Winter bis einschließlich 31.12.2026, weltweit genau 1 Nikolaus + 3 Rentiere + 3 Helfer vom 4.–6.12.2026 (Europe/Berlin). Bestehende Bilder/Eigentum bleiben erhalten. Neutrale Winterreserve kann im bisherigen begrenzten Batchweg nachgefüllt werden; die sieben Nikolaus-Motive bleiben einmalig. Bestehender Web-/App-API-Vertrag, keine native Quelldatei und keine neue Pflichtangabe. Migration, privater Import mit frischem Katalogvergleich, Veröffentlichung und physische Prüfung separat offen. [Umfang und Einführung](profile-art-seasonal.md).
+
 ## Homies gemeinsam in Website und App · 27. November 2026 · veröffentlicht und geprüft
 
 Markus beauftragt den vollständigen Website-Einstieg und ausdrücklich dieselbe Auswahl in Website und App. Unter **Profilbild → Mein Bereich → Homies** liegt der direkte Einstieg. Die normale Kontaktansicht zeigt private Sterne und den Kontakte-/Homies-Wechsel mit demselben vorhandenen kontogebundenen Vertrag wie die App. Bestätigtes Speichern/Entfernen, Fähigkeitenprüfung, verborgene Profile, Fehlerhinweise, Wiederholung und Schutz vor verspäteten Antworten nach Kontowechsel bleiben erhalten. Keine zweite Kontaktablage, keine neue Migration oder automatische Kontaktannahme.

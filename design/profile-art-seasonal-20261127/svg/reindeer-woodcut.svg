@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="800" viewBox="0 0 512 512"><title>Rentier – Holzschnitt</title><rect width="512" height="512" fill="#284449"/>
+<path d="M178 214L153 162 132 112 137 66M156 158L99 139 80 106M137 119L105 86M242 211L263 155 279 99 273 60M263 155L315 123 337 82M279 100L315 70" fill="none" stroke="#e6d8af" stroke-width="12" stroke-linecap="square"/>
+<path d="M177 263L111 215 101 181 157 190 208 231M237 232L296 186 331 186 308 229 266 255" fill="#b68b61"/>
+<path d="M182 212L259 213 284 248 280 285 351 310 374 345 324 377 276 374 290 463 336 512 123 512 159 437 169 342 153 291Z" fill="#ceac76"/>
+<path d="M182 212L213 244 192 322 177 354 153 291Z" fill="#a87350"/>
+<path d="M278 309L327 321 351 350 314 365 275 355Z" fill="#efdfbe"/>
+<path d="M348 318L379 326 374 345 354 351 338 332Z" fill="#192d31"/>
+<path d="M232 270L255 268M197 243L184 273M205 306L195 327M227 344L217 369M224 381L214 408M173 457L158 479" stroke="#284449" stroke-width="7" fill="none"/>
+<circle cx="246" cy="285" r="6" fill="#192d31"/><path d="M290 349L307 354" stroke="#192d31" stroke-width="4"/>
+<path d="M162 408L286 398 297 431 162 442Z" fill="#d17f68"/><path d="M240 429L272 424 279 503 249 507Z" fill="#d17f68"/>
+<path d="M184 415L191 435M209 412L216 431M251 449L272 446M253 468L273 465" stroke="#edc5a2" stroke-width="5"/>
+<path d="M78 292l9 -8M391 219l7 12M341 428l11 -3M104 367l6 6" stroke="#e8dab4" stroke-width="3"/>
+</svg>

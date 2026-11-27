@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="800" viewBox="0 0 512 512"><title>Rentier – Doodle</title><rect width="512" height="512" fill="#eedfc1"/>
+<g transform="rotate(-12 256 285)" stroke="#403142" stroke-linecap="round" stroke-linejoin="round">
+<path d="M203 228Q189 145 166 81M181 135Q139 128 125 96M190 165Q148 170 130 146M301 225Q331 139 322 75M329 133Q363 120 369 88M322 169Q370 165 385 139" stroke-width="9" fill="none"/>
+<path d="M211 243Q163 188 122 221Q132 272 199 272M296 249Q353 211 388 242Q359 283 309 278" fill="#c59276" stroke-width="5"/>
+<path d="M198 234Q249 207 302 244Q331 296 299 357L319 444 342 512H168L199 436 212 368Q166 326 178 282Z" fill="#cfb3a5" stroke-width="5"/>
+<path d="M201 317Q254 292 292 331Q302 374 256 386Q206 382 201 347Z" fill="#f6e9cd" stroke-width="4"/>
+<path d="M222 286Q229 274 241 284M267 282Q279 271 288 286" stroke-width="5" fill="none"/>
+<path d="M236 322Q251 315 266 325L253 341Z" fill="#403142" stroke-width="3"/>
+<path d="M253 341L251 352Q232 365 224 353M251 352Q269 363 279 350" stroke-width="3" fill="none"/>
+<path d="M208 388Q257 404 306 385L313 416Q251 434 202 418Z" fill="#a3ba7e" stroke-width="4"/>
+<path d="M216 416L249 424 235 496 202 486Z" fill="#a3ba7e" stroke-width="4"/>
+<path d="M220 398l-2 16m24-12l-1 16m24-15l1 16m23-20l3 16" stroke-width="3" fill="none"/>
+<path d="M190 309l12-5m-9 14l10-5m88-11l10 5m-11 4l11 6" stroke="#a66c73" stroke-width="3"/>
+</g><path d="M94 322l-8 14m4-8l-13-3M397 334l8 13m-9-4l16-5" stroke="#ad987e" stroke-width="3"/>
+</svg>

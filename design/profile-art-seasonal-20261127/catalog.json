@@ -1,0 +1,227 @@
+{
+  "version": "cg-seasonal-2026-v1",
+  "status": "prepared_not_published",
+  "comparisonScope": "ten_new_assets_only; full_live_catalog_check_required",
+  "entries": [
+    {
+      "name": "nikolaus",
+      "artworkId": "8639d55e-7208-4594-84ef-d44106bb0fdf",
+      "mediaKey": "32150744-c99b-4bee-87f4-40ba080434d3",
+      "edition": "nikolaus-2026",
+      "slot": 1,
+      "presentation": "neutral",
+      "source": "svg/nikolaus.svg",
+      "file": "approved/nikolaus.webp",
+      "sourceSHA256": "4be836ebe679ac244a0b709fac3d2122e0e0d22f243df55f2bb30e947447221c",
+      "byteSHA256": "ea5592476bc6bf86a0360484c2c3e3078c6c3df3043d3c995933200ea993a970",
+      "byteLength": 7460,
+      "fingerprint": {
+        "version": "cg-art-dct32-gradient-v1",
+        "canonicalPixelSHA256": "5ed766dcdc3f289bbf695fe1f26c9c54a3ae931fe0d5da698295ca3b948c4cee",
+        "pixelSHA256": "475cb9edad7ef04264a147068f2952d9d03b4fdf84f8d24cccaaf3f16918f97d",
+        "pHash": "4f26301ce761cdc3",
+        "dHash": "003a7040503070801c3a3c1c1c20427f",
+        "edgeHash": "003e7c7c7c3c7cc21e3e3c3c3c3c5e7f"
+      },
+      "family": "ee98c8dbfda3884ccff212baad077eec0ee9ba00b977a25cf8d4d28e4b5c3097"
+    },
+    {
+      "name": "reindeer-mosaic",
+      "artworkId": "3415140d-a01c-4769-9d43-8c67ffafa6c2",
+      "mediaKey": "8a48cace-35da-4811-88e4-b77421cf296e",
+      "edition": "nikolaus-2026",
+      "slot": 2,
+      "presentation": "neutral",
+      "source": "svg/reindeer-mosaic.svg",
+      "file": "approved/reindeer-mosaic.webp",
+      "sourceSHA256": "2645aa7dde25f685657c640015222167985f6b0dc10178e76fdead330ab8f5ba",
+      "byteSHA256": "886c579c7620534b05ecfeb4ad5f946742c22844ec03678ae58b72140e3e7b5a",
+      "byteLength": 7796,
+      "fingerprint": {
+        "version": "cg-art-dct32-gradient-v1",
+        "canonicalPixelSHA256": "57382ab369470c344ad2f3009cd8cae639822d1a6521a1fe61e12e6dd74ffa41",
+        "pixelSHA256": "2c9221c6497b87e3fd75c54a2e2c9760ee18d73f9fab70ef3a093ce71b980216",
+        "pHash": "2c99c69bc6339866",
+        "dHash": "00442a1637170e0c22002a1c6555261c",
+        "edgeHash": "00666e7efff77e3c223e3e5d7d5d3e1c"
+      },
+      "family": "39ee2fe3645870dc599fed0670127447c3d5281225b4c980b859b2fd7cd82f70"
+    },
+    {
+      "name": "reindeer-woodcut",
+      "artworkId": "4b56e0d9-9f77-4e72-a356-dc387aba8110",
+      "mediaKey": "92cdd995-fb08-4ba2-8793-87b17337d17b",
+      "edition": "nikolaus-2026",
+      "slot": 3,
+      "presentation": "neutral",
+      "source": "svg/reindeer-woodcut.svg",
+      "file": "approved/reindeer-woodcut.webp",
+      "sourceSHA256": "d15f2fc7a451d889a920213c59d1fc5f41c1e8291b34762317c368e9349c75e1",
+      "byteSHA256": "d5e92c408a807d1a27e996eb2a8dded714d7fce709fa0e6a1264c40469513ce7",
+      "byteLength": 6618,
+      "fingerprint": {
+        "version": "cg-art-dct32-gradient-v1",
+        "canonicalPixelSHA256": "a93045d60b5a9a240b5eeca20459292d8d7941ee3ab5db3a70edd76fde054c3c",
+        "pixelSHA256": "685554fe09f5f32265913d024145b6f106a39be124c846074b89baef6d0b5a60",
+        "pHash": "4931671e4e66936c",
+        "dHash": "00585058303820202c08441804180034",
+        "edgeHash": "007cfc7c3c3c2c782c6c7c3c0c1c3c34"
+      },
+      "family": "e57bb5943b4fbb3aa4da6f70b2f4b3b62005a5f04d935137566173901cd4312e"
+    },
+    {
+      "name": "reindeer-doodle",
+      "artworkId": "1a68f937-b7e4-4c1f-b43d-0305be139b22",
+      "mediaKey": "0c7b94de-0c8b-4783-b70a-5355ca968675",
+      "edition": "nikolaus-2026",
+      "slot": 4,
+      "presentation": "neutral",
+      "source": "svg/reindeer-doodle.svg",
+      "file": "approved/reindeer-doodle.webp",
+      "sourceSHA256": "1c741a3b1ba81afef9f3c55fbcc8e2a7692f6db7685d68419c470989300bec64",
+      "byteSHA256": "af22e747cde69f8f42e1959d2779c10a151e97c388c2bfbd5bb822fcd1909c41",
+      "byteLength": 7560,
+      "fingerprint": {
+        "version": "cg-art-dct32-gradient-v1",
+        "canonicalPixelSHA256": "806ea0ce45cd332d6e1ac86e382a919de66f708da44531ed0632502685487dc8",
+        "pixelSHA256": "c8c2ccc48611ea9102656be3d3d0d967845f854bdfd31659dcd1ea4831f119c3",
+        "pHash": "249cc79339c99b16",
+        "dHash": "0004b8382404240c004c380024180610",
+        "edgeHash": "0014fc7c7c343c1e0c6c783c2c1c1e1e"
+      },
+      "family": "36b4f74a2d2f09b5f22a0d9a861db4c7cc3bdaf6faa5c5f7e563e85437eae3f8"
+    },
+    {
+      "name": "helper-riso",
+      "artworkId": "c180ebd7-037f-452f-9e3f-9fd919ab31a3",
+      "mediaKey": "1061e024-33cd-4efb-ae0e-76131f2afd82",
+      "edition": "nikolaus-2026",
+      "slot": 5,
+      "presentation": "neutral",
+      "source": "svg/helper-riso.svg",
+      "file": "approved/helper-riso.webp",
+      "sourceSHA256": "bfa05143677371cb66730c94d487de8b109ae28f4a8fd21df012ffb2777ae628",
+      "byteSHA256": "f222e80ad94380aea03305ed4d428895ff64f71ab29d5ef1bebbc6ccbd57c5aa",
+      "byteLength": 10458,
+      "fingerprint": {
+        "version": "cg-art-dct32-gradient-v1",
+        "canonicalPixelSHA256": "54c427c06bce6d457ba5fd103e38005bc75a7ec32f8396d18757762fe7d1b537",
+        "pixelSHA256": "097d87d63cfb24dc6c8ceb2432aebfae00eb6889d83e82f18da0ef69bf14b12d",
+        "pHash": "6ce45384948fcf91",
+        "dHash": "00453bb32a0c511920017d1732084510",
+        "edgeHash": "00677fff7e5effbd3f3b7d7f3a7f7d5d"
+      },
+      "family": "ea56fd63ebcddbdb8ab9bc0f7a80bba986196023a095d45a0e49064dfc5fd3f2"
+    },
+    {
+      "name": "helper-pastel",
+      "artworkId": "6939c1ca-6e55-47f6-8559-0b289b3f51e1",
+      "mediaKey": "6d392379-ec2c-4ecb-8cf1-838e573cb096",
+      "edition": "nikolaus-2026",
+      "slot": 6,
+      "presentation": "neutral",
+      "source": "svg/helper-pastel.svg",
+      "file": "approved/helper-pastel.webp",
+      "sourceSHA256": "35bef54270ea8a6eaf3f8c88b984ece680fb5374982f7167ecb701baa81f0e29",
+      "byteSHA256": "9eb7a4ba38245ac8fc5e52d7d8dabc529c03d7fe3d7b44c4589e976dabdfd70c",
+      "byteLength": 7660,
+      "fingerprint": {
+        "version": "cg-art-dct32-gradient-v1",
+        "canonicalPixelSHA256": "2a2371b7548f0805a3c911c36b48d74029ee06ca6c1704a8728cf95d2766993d",
+        "pixelSHA256": "3597a55f0dd6258d8a72f0b035227c709d280a9db581f8014b4aef2ca1b05d2e",
+        "pHash": "4d68343ab29a69c7",
+        "dHash": "0010202a3a285475081c1c2e222a1661",
+        "edgeHash": "00383c7e7e3c7e7f181c3e3e2e3e377f"
+      },
+      "family": "041352c71dd96dd41e2a3020bd78abf4aeeefd86c09141b291e1fdc24ba31175"
+    },
+    {
+      "name": "helper-doodle",
+      "artworkId": "dd11d433-4f68-4307-aa42-6df6431b1cab",
+      "mediaKey": "fa1f610c-a722-42ef-9c61-21305f1fd1cb",
+      "edition": "nikolaus-2026",
+      "slot": 7,
+      "presentation": "neutral",
+      "source": "svg/helper-doodle.svg",
+      "file": "approved/helper-doodle.webp",
+      "sourceSHA256": "abee647217c151b500b9de8d3fb2cb5f76d449195508a6045c9659fb9c101e0b",
+      "byteSHA256": "ee40f954148a18d5c137af643b2ea65a8cc58346c404712de0bbd9d20b58b209",
+      "byteLength": 10984,
+      "fingerprint": {
+        "version": "cg-art-dct32-gradient-v1",
+        "canonicalPixelSHA256": "d6217fdff8a8ed2f85751d355432997d8e9b0f820c767e52bef7343df27a633f",
+        "pixelSHA256": "8a618ec76636951ac292d107679bcef2facd1e3f520e8d01e935b01ca8ca828d",
+        "pHash": "39d37386cc8ccc1c",
+        "dHash": "00140ab78cda1432020458373c001c22",
+        "edgeHash": "00367effefff3c7e1e3e7f3f7e7d3e3a"
+      },
+      "family": "d742e041b1f0bb91ea9ef03db1f1774123f48cb3112dfd32cdac2e3ec2e0e9b2"
+    },
+    {
+      "name": "winter-chalk",
+      "artworkId": "bc9779f4-bcf8-4e5a-b675-1940c7ca5d93",
+      "mediaKey": "eb64be2a-c1ee-49e1-915c-7bcdebbd66cd",
+      "edition": "winter-2026",
+      "slot": null,
+      "presentation": "neutral",
+      "source": "svg/winter-chalk.svg",
+      "file": "approved/winter-chalk.webp",
+      "sourceSHA256": "e7550c8e96d547e5537f9483b4d44926b721968b6457a2e7b8eabd7918ff5be2",
+      "byteSHA256": "2167f505e19ea5e72ce6f180c73a570a82a04c60b3961e19b9009f3384d2ab31",
+      "byteLength": 5962,
+      "fingerprint": {
+        "version": "cg-art-dct32-gradient-v1",
+        "canonicalPixelSHA256": "4c2e00e82e79ab8277f5b2ecd76a28bb6ba9cd6dbd88f058691f787225c34cee",
+        "pixelSHA256": "8f923b3a0ad1d11c5909acff9b82480816387f5cb886e6dc0319ffabee1c3e56",
+        "pHash": "5b66316c6367268a",
+        "dHash": "0010207020701078081e22142c003e02",
+        "edgeHash": "0038667e647c387e1c1e3e363c1c3e5f"
+      },
+      "family": "a2178ac3602d27b1e8046a0acf09509ea427d0ed9557d0f6d8cc09a641d50dfd"
+    },
+    {
+      "name": "winter-penguin",
+      "artworkId": "88e8bbad-7e6e-4bb9-a060-227d3768b904",
+      "mediaKey": "f9270121-dd12-49cc-bd7b-5479a75539b0",
+      "edition": "winter-2026",
+      "slot": null,
+      "presentation": "neutral",
+      "source": "svg/winter-penguin.svg",
+      "file": "approved/winter-penguin.webp",
+      "sourceSHA256": "f8064d0450e26b8213e160b846a9d8d2a15e41bdc4e96c83fc20e2f7178e87f3",
+      "byteSHA256": "3212afcbf2428afff751be8d4c353a569cc400be10599eedc2a9988531df49ea",
+      "byteLength": 5466,
+      "fingerprint": {
+        "version": "cg-art-dct32-gradient-v1",
+        "canonicalPixelSHA256": "1d97fc54c86ef647fd848de8a0065f97a68202029d4a1550d729143af894767c",
+        "pixelSHA256": "0f8d22a28988f5768ff31e8a79281a50ddf122572079cfe68f38b1a59dafef98",
+        "pHash": "2cb393ccd1696631",
+        "dHash": "00040c2a2a2a233302011c1c003e2e22",
+        "edgeHash": "00063d7e7e7effff021d3f3e3e7f7f3e"
+      },
+      "family": "8a4f482373269babd220696275c77aaa73d2bfd1ef80eb9a220215a01dccb8e5"
+    },
+    {
+      "name": "winter-owl",
+      "artworkId": "ce999b7e-3382-4a76-982b-ea05b1b396b4",
+      "mediaKey": "6b539d2a-10c0-4703-83b7-29699582c89b",
+      "edition": "winter-2026",
+      "slot": null,
+      "presentation": "neutral",
+      "source": "svg/winter-owl.svg",
+      "file": "approved/winter-owl.webp",
+      "sourceSHA256": "16be509f934ea7ffe3aa75ff7ae8f61757d1361ff75fcab325137efb10965240",
+      "byteSHA256": "1460848513ee582dfc52e181f9ec9b1207ddd076c348caa783624d0dfcff8d66",
+      "byteLength": 7080,
+      "fingerprint": {
+        "version": "cg-art-dct32-gradient-v1",
+        "canonicalPixelSHA256": "bdc14d695eb8576ebb558d2348538f23e29796f444f35516b55c6c45a99dabd0",
+        "pixelSHA256": "e15cd8a963863147fe210fafdb6f14af3504522f436c9ae28bc319d93813650b",
+        "pHash": "1e7065699e1e2363",
+        "dHash": "008e5468d4606860632a1c4814222200",
+        "edgeHash": "00ef767efe666e666b7f3e7c7e3e261c"
+      },
+      "family": "e4febf119c084bdfaf8026cee06e7bcc1ce82f0bc0a1dbb29811b51e814a0cd6"
+    }
+  ]
+}
