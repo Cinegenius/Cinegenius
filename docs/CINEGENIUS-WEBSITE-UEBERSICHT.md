@@ -1,3 +1,7 @@
+## Crew-Kopftext · 27. November 2026 · vorbereitet, noch nicht veröffentlicht
+
+Auf Markus’ Auftrag den Zusatz „ohne Agentur“ ausschließlich aus `creators.heroDesc` in allen 17 Sprachkatalogen entfernt. Der deutsche Kopftext lautet jetzt „Profis für Kamera, Regie, Schauspiel, Maske und Content — direkt buchbar.“ Gemeinsamer Crew-Seitenkopf; keine Komponenten-, Layout-, Zugriffs- oder native Änderung. Andere Agenturtexte bleiben erhalten. Sprachprüfung: 17 Kataloge, 11.776 Schlüssel bestanden; pro Katalog ausschließlich dieser eine Text geändert. Neue Veröffentlichung separat freigeben und mit dem laufenden App-Releasefenster abstimmen.
+
 ## Teams/Chats und gemeinsamer App-Look · 27. November 2026 · laufender Kandidat
 
 Markus verlangt anhand des lokalen Teams „Team Cool“ die direkte Kontaktauswahl beim Erstellen sowie klare Einzelchat-/Gruppenwahl am Nachrichten-Plus. Der neue Haupteinstieg öffnet die vorhandene kontogebundene gemeinsame Teamansicht. Ältere lokale Teamarchive bleiben unter „Auf diesem Gerät“ erreichbar; keine automatische Übertragung oder Löschung.
