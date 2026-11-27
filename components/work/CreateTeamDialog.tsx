@@ -68,6 +68,6 @@ export default function CreateTeamDialog({accountId, onClose, onCreated, api}: {
     </>}
     <FormDraftStatus draft={draft}/>
     {error && <p role="alert" className="break-words text-sm text-red-400">{error}</p>}
-    {!busy && value.teamId && <button type="button" onClick={() => onCreated(value.teamId!)} className="min-h-11 rounded-xl border border-border px-3 text-sm">{t('openCreatedTeam')}</button>}
+    {!busy && value.teamId && <button type="button" onClick={() => {if(pending.current||!current())return;pending.current=true;void draft.complete().then(()=>{if(current())onCreated(value.teamId!);}).finally(()=>{pending.current=false;});}} className="min-h-11 rounded-xl border border-border px-3 text-sm">{t('openCreatedTeam')}</button>}
   </MessagingDialog>;
 }
