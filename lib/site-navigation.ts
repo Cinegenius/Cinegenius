@@ -1,7 +1,7 @@
 export const SITE_NAV_MENU_ID = "site-navigation-menu";
 export const SITE_NAV_SIGN_OUT_EVENT = "cinegenius:request-sign-out";
 
-export type SiteNavigationIcon = "crew" | "locations" | "messages" | "account" | "more" | "home" | "marketplace" | "jobs" | "companies" | "projects" | "news" | "ai" | "organizations" | "profile" | "offers" | "saved" | "contacts" | "bookings" | "notifications" | "payments" | "settings" | "analytics" | "security" | "help" | "support";
+export type SiteNavigationIcon = "crew" | "locations" | "messages" | "account" | "more" | "home" | "marketplace" | "jobs" | "companies" | "projects" | "news" | "ai" | "organizations" | "profile" | "offers" | "saved" | "contacts" | "homies" | "bookings" | "notifications" | "payments" | "settings" | "analytics" | "security" | "help" | "support";
 export type PrimaryNavigationId = "crew" | "locations" | "marketplace" | "jobs" | "companies" | "messages" | "news" | "account" | "more";
 type NavigationLink = { readonly id: string; readonly href: string; readonly key: string; readonly icon: SiteNavigationIcon };
 type PrimaryNavigationItem = { readonly id: PrimaryNavigationId; readonly key: string; readonly icon: SiteNavigationIcon } & ({ readonly kind: "link"; readonly href: string } | { readonly kind: "menu"; readonly href?: never });
@@ -63,6 +63,7 @@ export const PERSONAL_CONTENT_ITEMS: readonly NavigationLink[] = [
 export const PERSONAL_ACTIVITY_ITEMS: readonly NavigationLink[] = [
   { id: "messages", href: "/messages", key: "messages", icon: "messages" },
   { id: "contacts", href: "/messages?view=friends", key: "contacts", icon: "contacts" },
+  { id: "homies", href: "/messages?view=friends&homies=1", key: "homies", icon: "homies" },
   { id: "saved", href: "/favorites", key: "savedItems", icon: "saved" },
 ];
 

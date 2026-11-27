@@ -1,4 +1,4 @@
-import { Bell, Bookmark, BriefcaseBusiness, Building2, CalendarDays, ChartNoAxesCombined, CircleHelp, Film, House, Landmark, LifeBuoy, MapPin, Menu, MessageSquare, Newspaper, Settings, ShieldCheck, ShoppingBag, UserRound, Users, Wallet } from "lucide-react";
+import { Bell, Bookmark, BriefcaseBusiness, Building2, CalendarDays, ChartNoAxesCombined, CircleHelp, Film, House, Landmark, LifeBuoy, MapPin, Menu, MessageSquare, Newspaper, Settings, ShieldCheck, ShoppingBag, Star, UserRound, Users, Wallet } from "lucide-react";
 import type { SVGProps } from "react";
 import type { SiteNavigationIcon } from "@/lib/site-navigation";
 
@@ -10,7 +10,7 @@ function WorkIcon({ size = 20, strokeWidth = 1.8, ...props }: SVGProps<SVGSVGEle
   </svg>;
 }
 
-const icons = { crew: Users, locations: MapPin, messages: MessageSquare, account: UserRound, more: Menu, home: House, marketplace: ShoppingBag, jobs: BriefcaseBusiness, companies: Building2, projects: Film, news: Newspaper, ai: WorkIcon, organizations: Landmark, profile: UserRound, offers: BriefcaseBusiness, saved: Bookmark, contacts: Users, bookings: CalendarDays, notifications: Bell, payments: Wallet, settings: Settings, analytics: ChartNoAxesCombined, security: ShieldCheck, help: CircleHelp, support: LifeBuoy };
+const icons = { crew: Users, locations: MapPin, messages: MessageSquare, account: UserRound, more: Menu, home: House, marketplace: ShoppingBag, jobs: BriefcaseBusiness, companies: Building2, projects: Film, news: Newspaper, ai: WorkIcon, organizations: Landmark, profile: UserRound, offers: BriefcaseBusiness, saved: Bookmark, contacts: Users, homies: Star, bookings: CalendarDays, notifications: Bell, payments: Wallet, settings: Settings, analytics: ChartNoAxesCombined, security: ShieldCheck, help: CircleHelp, support: LifeBuoy };
 
 export default function NavigationIcon({ name, className, size = 20 }: { name: SiteNavigationIcon; className?: string; size?: number }) {
   const Icon = icons[name];

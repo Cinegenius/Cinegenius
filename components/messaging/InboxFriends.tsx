@@ -10,6 +10,7 @@ import { Search, Star, Users } from "lucide-react";
 import ContactCard from "@/components/ContactCard";
 import { useFormNavigation } from "@/contexts/FormDraftContext";
 import { inboxHomies, navigateInboxView, navigateMessageView } from "@/lib/message-navigation";
+import { watchContactRefresh } from "@/lib/contact-refresh";
 import { uiErrorMessage } from "@/lib/ui-error-message";
 import { useNativeAppAppearance } from "@/lib/use-native-app-appearance";
 
@@ -38,10 +39,9 @@ export default function InboxFriends({ searchValue, hideSearch = false, hideTabs
   const [searchState, setSearch] = useState({ scope, value: "" });
   const search = searchValue ?? (searchState.scope === scope ? searchState.value : "");
   const onlyHomies = homiesOnly ?? inboxHomies(searchParams);
-  const nativeContract = nativeAppearance || onlyHomies;
   const contacts = snapshot.scope === scope ? snapshot.contacts : [];
   const ready = snapshot.scope === scope;
-  const favoritesRead = nativeContract && snapshot.favoritesRead === true;
+  const favoritesRead = snapshot.favoritesRead === true;
   const favoritesWrite = favoritesRead && snapshot.favoritesWrite === true;
   const favoritesUnavailable = ready && onlyHomies && !favoritesRead;
   const error = failure?.scope === scope ? failure.kind === "load" ? t("loadError") : failure.locale === locale ? failure.text || t("error") : t("error") : "";
@@ -65,11 +65,11 @@ export default function InboxFriends({ searchValue, hideSearch = false, hideTabs
     const isCurrent = () => !controller.signal.aborted && currentScope.current === scope && version === generation.current;
     setLoading(true);
     try {
-      const response = await fetch("/api/friendships", { cache: "no-store", headers: nativeContract ? { "X-CineGenius-Native-Contract": FRIENDSHIPS_CONTRACT, "X-Contact-Account": userId } : undefined, signal: AbortSignal.any([controller.signal, AbortSignal.timeout(15_000)]) });
+      const response = await fetch("/api/friendships", { cache: "no-store", headers: { "X-CineGenius-Native-Contract": FRIENDSHIPS_CONTRACT, "X-Contact-Account": userId }, signal: AbortSignal.any([controller.signal, AbortSignal.timeout(15_000)]) });
       const data = await response.json();
       if (!isCurrent()) return;
-      if (!response.ok || !Array.isArray(data.friends) || (nativeContract && (data.contract !== FRIENDSHIPS_CONTRACT || data.accountId !== userId))) throw new Error();
-      const favoritesRead = nativeContract && data.capabilities?.favoriteFriendsRead === true;
+      if (!response.ok || !Array.isArray(data.friends) || (data.contract !== FRIENDSHIPS_CONTRACT || data.accountId !== userId)) throw new Error();
+      const favoritesRead = data.capabilities?.favoriteFriendsRead === true;
       if (favoritesRead && data.friends.some((contact: Contact) => typeof contact.is_favorite !== "boolean")) throw new Error();
       setSnapshot({ scope, contacts: data.friends, favoritesRead, favoritesWrite: favoritesRead && data.capabilities?.favoriteFriendsWrite === true });
       setFailure(null);
@@ -78,14 +78,13 @@ export default function InboxFriends({ searchValue, hideSearch = false, hideTabs
     } finally {
       if (isCurrent()) setLoading(false);
     }
-  }, [userId, scope, nativeContract]);
+  }, [userId, scope]);
 
   useEffect(() => {
     let active = true;
     queueMicrotask(() => { if (active) void load(); });
-    const refresh = () => { void load(); };
-    window.addEventListener("focus", refresh);
-    return () => { active = false; reading.current?.abort(); window.removeEventListener("focus", refresh); };
+    const stopRefresh = watchContactRefresh(window, () => { void load(); });
+    return () => { active = false; reading.current?.abort(); stopRefresh(); };
   }, [load]);
 
   async function remove(id: string) {

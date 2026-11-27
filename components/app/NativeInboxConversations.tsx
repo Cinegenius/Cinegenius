@@ -5,6 +5,7 @@ import { useAuth } from "@clerk/nextjs";
 import { useLocale, useTranslations } from "next-intl";
 import { ChevronRight, MessageSquare, Users } from "lucide-react";
 import { nativeInboxConversations, nativeInboxCursor, nativeInboxPageURL, nativeInboxPreview, type NativeInboxCursor, type NativeInboxCategory, type NativeInboxConversation, type NativeInboxFriend } from "@/lib/native-inbox-conversations";
+import { watchContactRefresh } from "@/lib/contact-refresh";
 import styles from "./NativeInboxPanel.module.css";
 
 type Snapshot = { scope: string; rows: NativeInboxConversation[]; friends: NativeInboxFriend[]; cursor: NativeInboxCursor | null };
@@ -38,6 +39,10 @@ export default function NativeInboxConversations({ category, query, onOpen }: { 
     }).catch(() => { if (!controller.signal.aborted && current.current === scope) setState({ requestKey, error: true }); });
     return () => controller.abort();
   }, [userId, sessionId, scope, category, request, requestKey]);
+  useEffect(() => {
+    if (!userId || !sessionId) return;
+    return watchContactRefresh(window, () => setRequest(previous => ({ cursor: null, attempt: previous.attempt + 1 })));
+  }, [userId, sessionId]);
   const ready = snapshot.scope === scope;
   const rows = ready ? nativeInboxConversations(snapshot.rows, snapshot.friends, userId ?? "", category, query, locale) : [];
   const loading = state.requestKey !== requestKey, error = state.requestKey === requestKey && state.error;

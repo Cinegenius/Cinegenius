@@ -1,6 +1,8 @@
 # Native Freunde, private Favoriten und Textnachrichten – v1
 
-Status: vorbereiteter Serververtrag, **nicht veröffentlicht**, Migration **nicht auf Produktion angewandt**. Die Website-Oberfläche bleibt unverändert. Native Ansichten und Geräteprüfungen gehören zu APP Entwicklung. Das ist keine Freigabe für einen Livegang.
+Statuskorrektur · 27. November 2026: Der Serververtrag und die gezielte Favoritenmigration wurden bereits am **16. November 2026 veröffentlicht**. Beleg: `/srv/cinegenius/handoffs/20261116-native-friends-contract/APP-LIVE.md` und `release/service-probe.json` (service-only, leere synthetische Abfrage mit `writable: true`). Das ersetzt den ursprünglichen Vorbereitungsstatus dieses Dokuments; es ist kein neuer aktueller Datenbank- oder Geräteprobe-Nachweis.
+
+Der neue Website-Kandidat vom 27. November verwendet denselben Vertrag auch für normale Kontakte, ergänzt den persönlichen Homies-Einstieg und aktualisiert Kontakte/App-Gesprächsfilter bei Rückkehr. Keine neue Speicherung oder Migration. Diese neue Oberfläche ist **noch nicht veröffentlicht**; Livefreigabe und echte Geräteprüfung bleiben getrennt.
 
 Ausgangspunkt: `origin/main` bei `9009d66edf80eb42992da5308899606d604a64cf`. Separate Smart-, News- und E-Mail-Entwürfe sind nicht Bestandteil dieser Änderung.
 
