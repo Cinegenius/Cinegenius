@@ -1,6 +1,6 @@
 # Saisonale Avatare · 27. November 2026
 
-Quellkandidat, nicht veröffentlicht. Betreiberentscheidungen: Winter bis Jahresende;
+Am 27.11.2026 veröffentlicht und aktiviert. Betreiberentscheidungen: Winter bis Jahresende;
 Nikolaus weltweit schon ab 4. Dezember; genau ein Nikolaus, drei Rentiere und drei
 Helfer; normale Avatare bleiben die Hauptauswahl. Die jüngste Ergänzung verlängert
 nur den noch ungewählten Nikolaus bis Jahresende.
@@ -90,6 +90,37 @@ Import-SQL samt Wiederholung und Ablehnung eines veralteten Katalogstands.
 300 normale Promptfälle bleiben bytegleich zur Basis.
 
 Vollständiges lokales TypeScript, abschließendes ESLint, 22 Designprüfungen und
-17 Sprachkataloge mit 11.779 Schlüsseln bestanden. Kein Provideraufruf und keine
-Produktivmutation. Geschützter Produktionsbuild, echter angemeldeter Ablauf und
-physische Geräteabnahme bleiben dem gesonderten Release vorbehalten.
+17 Sprachkataloge mit 11.779 Schlüsseln bestanden. Bei diesen Vorprüfungen kein Provideraufruf und keine
+Produktivmutation. Der anschließende Produktionsnachweis folgt unten; ein echter
+angemeldeter Browserablauf und die physische Geräteabnahme bleiben gesondert.
+
+## Tatsächliche Veröffentlichung am 27. November
+
+Markus hat „stell live“ und anschließend die Verlängerung des ungewählten
+Nikolaus bis Jahresende beauftragt. Release `8e34f0bd85d5b5ce3fff710c50123c1559b5c22f`,
+Deployment `dpl_BYJBTofnx8z5a7owNLMcRuiKJ9Ag`, READY; cinegenius.co und
+www.cinegenius.co zeigen auf diesen Stand. Der geschützte normale Release lief
+von sauberem main gleich origin/main mit geprüfter Projektidentität.
+
+Migration mit Rückroll-Vorprüfung angewandt; bestehende sieben Funktionsdefinitionen
+vor Änderung verglichen, vorhandene Zeilen in derselben Transaktion unverändert
+geprüft. Kein Migrationsregister neu angelegt und keine anderen Migrationen angewandt.
+Nach Veröffentlichung und Ablauf alter 150-Sekunden-Anfragen: zehn privat gespeicherte
+und zurückgelesene Motive atomar über den bestehenden Freigabe-/Duplikatpfad importiert,
+danach Winter-Nachfüllung aktiviert. 132 alte Bilder und 28 Vergaben erhalten.
+
+Vier tatsächliche servicegebundene API-Leseproben bestätigen zwölf Angebote,
+davon neun normale und drei Wintermotive an Position4/8/12; Cover bleiben unverändert.
+14 HTTP-Proben bestätigen beide Zugriffssperren, den geschützten Worker und
+alle zehn Bildbytes über die ausgelieferte Medienroute. Die Datumsrechnung bestätigt
+Nikolaus am4.12. und31.12., keine neue Auswahl am1.1. sowie Helferende am6.12.
+Eine echte Reservierungsprüfung in einer anschließend zurückgerollten Transaktion
+bestätigt Fremdausschluss, Ablehnung des frühen Nikolaus und Erhalt der alten
+Reservierung bei Ablehnung. Anschließend null dauerhafte Prüfzeilen.
+
+Der eingeschränkte Management-Leser darf die privaten neuen Hilfsfunktionen
+korrekt nicht ausführen; die Datumsprüfung wurde deshalb ohne Rechteänderung in
+einer READ ONLY-Transaktion mit bestehender service_role ausgeführt.
+Kein Mitgliedsprofil verändert, kein kostenpflichtiger Bildaufruf durch die Prüfungen.
+Physische Appbedienung und echter angemeldeter Browserablauf bleiben unbehauptet.
+Belegsammlung: `/srv/cinegenius/handoffs/20261127-seasonal-avatars/`.
