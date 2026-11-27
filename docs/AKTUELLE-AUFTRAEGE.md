@@ -1,3 +1,9 @@
+## Homepage-Jobs wie Schwarzes Brett · 27. November 2026 · geprüft und zur Veröffentlichung freigegeben
+
+Markus verlangt anhand der transparenten Jobkarten eine Hervorhebung wie beim Schwarzen Brett. Der lokale Kandidat ergänzt dessen limefarbenen Rahmen, abgerundete hervorgehobene Fläche, größeren Titel und klaren „Alle anzeigen“-Knopf. Deckende Jobkarten mit Akzentkante, vollständigem Titel-/Ortsumbruch und anpassbarer Desktop-Spaltenzahl vermeiden durchscheinende Fotos und leere Rasterplätze. Bestehende Jobdaten, Reihenfolge, Links, Übersetzung und Preise bleiben erhalten; keine zusätzlichen Anfragen, Bibliotheken oder nativen Quellen.
+
+Geprüft: ESLint der betroffenen Seite, 17 bestehende Homepage-Prüfungen, Design22, i18n17/11.776 und 38 isolierte Komponenten-Browserfälle (17 Sprachen, hell/dunkel, 320/393/1280px, lange Titel, Tastatur-/Klick-Linkziele). Tatsächliche Homepage-JSX und globale Styles mit künstlichen Jobdaten; keine echten Konto-/Datenbankaktionen, keine Geräteabnahme oder vollständige Next-Navigation. Vorschau und Beleg: `/srv/cinegenius/handoffs/20261127-home-jobs-highlight/`. Markus hat die Vorschau mit „perfekt“ akzeptiert und mit „stell live“ ausdrücklich freigegeben. Veröffentlichung folgt nach Abschluss des aktuell von APP gehaltenen Fensters. Bereits veröffentlichte Crew-Textkorrektur bleibt erhalten.
+
 ## Teams/Glasstil veröffentlicht; kompakte Listen als Nacharbeit · 27. November 2026
 
 Der geschützte Produktionslauf von `0e77e8d6f1a024187815cc76e8e79c6bf6f0353f` ist mit vollständigem Hosted-Next/TypeScript, Design22 und17 Katalogen abgeschlossen: `dpl_HrsVWESHHpTdmEZsh8KoxUNr2U2L` READY, alle sechs Aliasnamen einschließlich cinegenius.co und www.cinegenius.co per Plattformabfrage bestätigt. Tatsächliche Geräteabläufe bleiben separat. Dieser Stand enthält ausdrücklich auch den zuvor vorbereiteten persönlichen Analyseprompt `e3dfb157`; er aktiviert kein Postfach und keine Mailautomatik.

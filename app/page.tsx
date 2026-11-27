@@ -317,13 +317,22 @@ async function HomeRecommendations({ dataPromise }: { dataPromise: HomeDataPromi
       </div>
     </section>}
     {liveJobs.length > 0 && <section className="home-section-divider home-section-divider--border min-w-0 border-t border-transparent pt-4" aria-labelledby="home-jobs-title">
-      <div className="mb-2 flex flex-wrap items-center justify-between gap-x-3"><h2 id="home-jobs-title" className="font-display text-lg font-bold text-text-primary">{t("jobsTitle")}</h2><Link href="/jobs" className="inline-flex min-h-11 items-center gap-1 text-xs font-medium text-gold hover:text-gold-light">{tc("viewAll")} <ArrowRight size={12} /></Link></div>
-      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-        {liveJobs.map(job => <Link key={job.id} href={`/jobs/${job.id}`} className="group flex min-h-11 min-w-0 items-start gap-2 rounded-xl border border-border/70 px-3 py-3 transition-colors hover:bg-bg-secondary/60">
-          <Briefcase size={15} className="mt-0.5 shrink-0 text-gold" />
-          <div className="min-w-0 flex-1"><h3 className="truncate text-sm font-semibold text-text-primary group-hover:text-gold"><TranslatedText kind="listing" id={job.id} field="title">{job.title}</TranslatedText></h3><p className="mt-0.5 truncate text-xs text-text-muted">{job.location}</p><p className="mt-1 flex items-center gap-1 text-[10px] text-text-muted"><Clock size={9} />{formatDate(job.created_at)}</p></div>
-          <span className="shrink-0 text-right text-xs font-semibold text-gold">{job.rawPrice ? uiText("Ui.text_8ae8849cdb3aaa", { value1: String(job.rawPrice.toLocaleString(uiLocale)), value2: String(tc("perDay")) }) : tc("onRequest")}</span>
-        </Link>)}
+      <div className="relative isolate overflow-hidden rounded-3xl border border-gold/40 bg-bg-primary bg-gradient-to-br from-gold/[0.12] via-bg-secondary/95 to-cyan-400/[0.08] p-4 shadow-[0_22px_60px_rgba(0,0,0,0.3)] sm:p-6 lg:p-7 before:pointer-events-none before:absolute before:-right-12 before:-top-24 before:h-72 before:w-72 before:rounded-full before:bg-gold/[0.14] before:blur-3xl">
+        <div className="relative mb-4 flex flex-wrap items-center justify-between gap-3 sm:mb-5"><h2 id="home-jobs-title" className="font-display text-2xl font-bold text-text-primary sm:text-3xl">{t("jobsTitle")}</h2><Link href="/jobs" className="inline-flex min-h-11 items-center gap-2 rounded-xl bg-gold px-3 text-xs font-bold text-bg-primary transition-colors hover:bg-gold-light sm:text-sm">{tc("viewAll")} <ArrowRight size={14} aria-hidden="true" /></Link></div>
+        <div className="relative grid gap-3 sm:grid-cols-2 lg:grid-cols-[repeat(auto-fit,minmax(15rem,1fr))]">
+          {liveJobs.map(job => <Link key={job.id} href={`/jobs/${job.id}`} className="group relative flex min-h-11 min-w-0 items-start gap-3 overflow-hidden rounded-2xl border border-gold/25 bg-bg-secondary p-4 shadow-[0_12px_30px_rgba(0,0,0,0.26)] transition-colors hover:border-gold/60 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold">
+            <span aria-hidden="true" className="absolute inset-y-0 left-0 w-1 bg-gradient-to-b from-gold via-gold/80 to-cyan-400/70" />
+            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-gold/10 text-gold"><Briefcase size={18} aria-hidden="true" /></span>
+            <div className="min-w-0 flex-1">
+              <h3 className="break-words text-sm font-semibold leading-snug text-text-primary [overflow-wrap:anywhere] group-hover:text-gold"><TranslatedText kind="listing" id={job.id} field="title">{job.title}</TranslatedText></h3>
+              <p className="mt-1 break-words text-xs text-text-secondary [overflow-wrap:anywhere]">{job.location}</p>
+              <div className="mt-3 flex flex-wrap items-center justify-between gap-x-3 gap-y-2">
+                <p className="flex items-center gap-1 text-[10px] text-text-muted"><Clock size={11} className="shrink-0" aria-hidden="true" />{formatDate(job.created_at)}</p>
+                <span className="min-w-0 text-xs font-semibold text-gold [overflow-wrap:anywhere]">{job.rawPrice ? uiText("Ui.text_8ae8849cdb3aaa", { value1: String(job.rawPrice.toLocaleString(uiLocale)), value2: String(tc("perDay")) }) : tc("onRequest")}</span>
+              </div>
+            </div>
+          </Link>)}
+        </div>
       </div>
     </section>}
   </div>;
