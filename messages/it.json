@@ -14057,7 +14057,9 @@
     "teamNavigation": "Sezioni del team",
     "chats": "Chat",
     "files": "File",
-    "filesPending": "Lo spazio file condiviso non è ancora attivo. I file sul dispositivo restano conservati."
+    "filesPending": "Lo spazio file condiviso non è ancora attivo. I file sul dispositivo restano conservati.",
+    "invitations": "Inviti",
+    "showMore": "Mostra altri"
   },
   "WorkMail": {
     "title": "Email in Work",

@@ -14057,7 +14057,9 @@
     "teamNavigation": "Rubriques de l’équipe",
     "chats": "Discussions",
     "files": "Fichiers",
-    "filesPending": "Le stockage partagé n’est pas encore activé. Les fichiers de ton appareil sont conservés."
+    "filesPending": "Le stockage partagé n’est pas encore activé. Les fichiers de ton appareil sont conservés.",
+    "invitations": "Invitations",
+    "showMore": "Afficher plus"
   },
   "WorkMail": {
     "title": "E-mail dans Work",

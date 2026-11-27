@@ -1,3 +1,7 @@
+## Kompakte Teams · Betreiberkorrektur 27. November 2026
+
+Oben ein kompakter Bereichstitel mit kleinem Plus; direkt darunter Chats/Dateien/Mitglieder. Keine doppelte Überschrift oder zweites Plus. Kleine sichtbare Symbole bei weiterhin mindestens44px Bedienfläche. Mitglieder alphabetisch nach aktueller Sprache sortieren, alle geladenen Namen durchsuchen und je Statusgruppe zunächst30 anzeigen; Einladungen getrennt sichtbar halten. Die Darstellung wird mit langen synthetischen Listen geprüft, das bestehende Serverlimit50 wird dadurch nicht erweitert. Keine echten Einladungen aus UI-Prüfungen und keine Aktivierung der gemeinsamen Dateiablage.
+
 ## Betreiberkorrektur · 27. November 2026 · gleicher App-Look
 
 Markus verlangt ausdrücklich dieselbe CineGenius-Flächengestaltung überall in der App, einschließlich der vier Work-Startkacheln. Die zuvor freigegebenen schwarzen/deckenden Appkarten werden durch den gemeinsamen dezenten Glasstil mit lesbarer Tönung, feinen Konturen und Lime-Akzenten ersetzt. Gewählten Hintergrund und Inhalte erhalten; barrierearmen deckenden Ersatz erhalten. Diese neue Vorgabe gilt für Appflächen; die gewöhnliche Website bleibt erhalten. Team-/Nachrichten-Einstieg: Kontakte zuerst, dann Teamname; Plus für Einzelchat oder Gruppe. Lokale Altarchive erhalten, keine automatische Cloudmigration oder Einladung beim bloßen Öffnen.

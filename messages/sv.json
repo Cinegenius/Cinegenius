@@ -14057,7 +14057,9 @@
     "teamNavigation": "Teamavsnitt",
     "chats": "Chattar",
     "files": "Filer",
-    "filesPending": "Delad fillagring är inte aktiverad ännu. Filer på din enhet finns kvar."
+    "filesPending": "Delad fillagring är inte aktiverad ännu. Filer på din enhet finns kvar.",
+    "invitations": "Inbjudningar",
+    "showMore": "Visa fler"
   },
   "WorkMail": {
     "title": "E-post i Work",

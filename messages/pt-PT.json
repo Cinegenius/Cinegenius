@@ -14057,7 +14057,9 @@
     "teamNavigation": "Secções da equipa",
     "chats": "Conversas",
     "files": "Ficheiros",
-    "filesPending": "O armazenamento partilhado ainda não está ativo. Os ficheiros no teu dispositivo são preservados."
+    "filesPending": "O armazenamento partilhado ainda não está ativo. Os ficheiros no teu dispositivo são preservados.",
+    "invitations": "Convites",
+    "showMore": "Mostrar mais"
   },
   "WorkMail": {
     "title": "Correio no Work",

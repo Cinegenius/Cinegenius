@@ -14057,7 +14057,9 @@
     "teamNavigation": "Teambereiche",
     "chats": "Chats",
     "files": "Dateien",
-    "filesPending": "Die gemeinsame Dateiablage ist noch nicht freigeschaltet. Dateien auf deinem Gerät bleiben erhalten."
+    "filesPending": "Die gemeinsame Dateiablage ist noch nicht freigeschaltet. Dateien auf deinem Gerät bleiben erhalten.",
+    "invitations": "Einladungen",
+    "showMore": "Weitere anzeigen"
   },
   "WorkMail": {
     "title": "E-Mail in Work",

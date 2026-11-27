@@ -1,10 +1,11 @@
 'use client';
 import {useCallback,useEffect,useLayoutEffect,useRef,useState,useSyncExternalStore,type ReactNode} from 'react';
 import {flushSync} from 'react-dom';
-import {Plus,MoreHorizontal,MessageCircle,Users,Folder,ChevronRight} from 'lucide-react';
+import {Plus,MoreHorizontal,MessageCircle,Users,ChevronRight,ChevronLeft,Search} from 'lucide-react';
 import {useUser} from '@clerk/nextjs';
 import {useRouter,useSearchParams} from 'next/navigation';
-import {useTranslations} from 'next-intl';
+import {useLocale,useTranslations} from 'next-intl';
+import {teamMemberDirectory,TEAM_MEMBER_PAGE_SIZE} from '@/lib/team-member-directory';
 import {useFormDraft} from '@/lib/use-form-draft';
 import {useFormNavigation} from '@/contexts/FormDraftContext';
 import FormDraftStatus from '@/components/FormDraftStatus';
@@ -122,77 +123,90 @@ export default function WorkTeams({accountId,accountMatches}:{accountId:string;a
   }catch(cause){if(owner.current===accountId)setError(cause instanceof Error&&cause.message?cause.message:t('unavailable'));}
   finally{linkingRequest.current=false;if(owner.current===accountId)setLinkingTeam(null);}
  }
- const nativeHeader=native?<div className="flex shrink-0 flex-wrap items-center gap-3 border-b border-border px-4 py-2"><button type="button" className={control} onClick={()=>conversation||filesIntent&&selected?go(selected??undefined):selected&&!native.teamId?go():closeNative()}>{t('back')}</button><span className="min-w-0 flex-1 break-words text-sm font-semibold">{visible?.team?.name??t(filesIntent?'files':'teamsLabel')}</span>{!selected&&!filesIntent&&<button ref={createTrigger} type="button" className={control+' shrink-0 text-gold'} onClick={()=>setCreatingTeam(true)} aria-label={t('createTeam')}><Plus size={22} aria-hidden="true"/></button>}{native.linking&&visible?.team&&<button type="button" className={control} disabled={!!linkingTeam} onClick={()=>leave(()=>void connectTeam(visible.team!.id))}>{t('linkLocalTeam')}</button>}</div>:null;
+ const nativeHeader=native&&(!selected||conversation||!visible?.team)?<div className="flex shrink-0 flex-wrap items-center gap-3 border-b border-border px-4 py-2"><button type="button" className={control} onClick={()=>conversation||filesIntent&&selected?go(selected??undefined):selected&&!native.teamId?go():closeNative()}>{t('back')}</button><span className="min-w-0 flex-1 break-words text-sm font-semibold">{visible?.team?.name??t(filesIntent?'files':'teamsLabel')}</span>{!selected&&!filesIntent&&<button ref={createTrigger} type="button" className="flex size-11 shrink-0 items-center justify-center text-gold" onClick={()=>setCreatingTeam(true)} aria-label={t('createTeam')}><Plus size={18} aria-hidden="true"/></button>}{native.linking&&visible?.team&&<button type="button" className={control} disabled={!!linkingTeam} onClick={()=>leave(()=>void connectTeam(visible.team!.id))}>{t('linkLocalTeam')}</button>}</div>:null;
  function go(team?:string,channel?:string,files=false,commit?:()=>void){if(native?.teamId&&team!==native.teamId){closeNative();return;}leave(()=>{commit?.();const query=new URLSearchParams();query.set('account',accountId);if(team)query.set('team',team);if(channel)query.set('channel',channel);if(files)query.set('view','files');router.push('/work/teams?'+query);});}
  if(!same)return <main className="site-container py-8"><p role="alert">{t('accountChanged')}</p></main>;
  const currentChannel=visible?.team?.channels.find(c=>c.conversationId===conversation&&c.joined&&c.canSee);
  if(currentChannel&&visible?.team)return <>{nativeHeader}<main className={native?'flex min-h-0 min-w-0 flex-1 flex-col px-3 py-2':'site-container flex min-h-[70dvh] min-w-0 flex-col py-3'}><p className="mb-2 text-sm text-text-muted">{visible.team.name} · {currentChannel.name}</p><MessagesContent key={accountId+currentChannel.id} embedded={{destination:{conversationId:currentChannel.conversationId},onDestination:()=>{},onBack:()=>go(visible.team!.id),onClose:()=>go(visible.team!.id)}}/></main></>;
- return <>{nativeHeader}<main className={native?'min-h-0 min-w-0 flex-1 space-y-5 overflow-y-auto px-4 py-4':'site-container max-w-3xl space-y-5 py-6 pb-[calc(var(--mobile-nav-clearance,80px)+24px)]'}>
-  {(!native||native.linking&&!selected)&&<header className="space-y-2">{(selected||filesIntent)&&!native&&<button className={control} onClick={()=>filesIntent?leave(()=>router.back()):go()}>{t('back')}</button>}{!native&&<div className="flex items-center gap-3"><h1 className="min-w-0 flex-1 break-words text-2xl font-semibold">{visible?.team?.name??t(filesIntent?'files':'teamsLabel')}</h1>{!selected&&!filesIntent&&<button ref={createTrigger} type="button" onClick={()=>setCreatingTeam(true)} className={control+' shrink-0 text-gold'} aria-label={t('createTeam')}><Plus size={22} aria-hidden="true"/></button>}</div>}{!selected&&native?.linking&&<p className="text-sm text-text-muted">{t('linkHelp')}</p>}</header>}
+ return <>{nativeHeader}<main className={native?'min-h-0 min-w-0 flex-1 space-y-3 overflow-y-auto px-3 py-2':'site-container max-w-3xl space-y-5 py-6 pb-[calc(var(--mobile-nav-clearance,80px)+24px)]'}>
+  {(!native&&(!selected||!visible?.team)||native?.linking&&!selected)&&<header className="space-y-2">{(selected||filesIntent)&&!native&&<button className={control} onClick={()=>filesIntent?leave(()=>router.back()):go()}>{t('back')}</button>}{!native&&<div className="flex items-center gap-3"><h1 className="min-w-0 flex-1 break-words text-2xl font-semibold">{visible?.team?.name??t(filesIntent?'files':'teamsLabel')}</h1>{!selected&&!filesIntent&&<button ref={createTrigger} type="button" onClick={()=>setCreatingTeam(true)} className="flex size-11 shrink-0 items-center justify-center text-gold" aria-label={t('createTeam')}><Plus size={18} aria-hidden="true"/></button>}</div>}{!selected&&native?.linking&&<p className="text-sm text-text-muted">{t('linkHelp')}</p>}</header>}
   {loading&&<p role="status">{t('loading')}</p>}
   {error&&<div role="alert" className="space-y-3 rounded-2xl border border-border bg-bg-primary p-4"><p>{error}</p><button className={control} onClick={()=>void load()}>{t('retry')}</button></div>}
   {visible&&!selected&&filesIntent&&<p role="status" className="rounded-2xl border border-border bg-bg-primary p-4 text-sm text-text-muted">{t('filesPending')}</p>}
   {visible&&!selected&&!filesIntent&&<>
-   <ul className="divide-y divide-border rounded-2xl border border-border bg-bg-primary">{visible.teams.map(team=><li key={team.id}>{team.status==='invited'?<div className="flex min-w-0 flex-wrap items-center gap-3 p-4"><Users size={24} className="shrink-0 text-gold" aria-hidden="true"/><span className="min-w-0 flex-1 break-words font-medium">{team.name}<span className="block text-xs text-text-muted">{t('invited')}</span></span><button className={control} disabled={action.busy} onClick={()=>void action.run('accept',{teamId:team.id,revision:team.revision})}>{t('accept')}</button><button className={control} disabled={action.busy} onClick={()=>void action.run('decline',{teamId:team.id,revision:team.revision})}>{t('decline')}</button></div>:<button type="button" className="flex min-h-16 w-full min-w-0 items-center gap-3 p-4 text-left disabled:opacity-40" disabled={!!linkingTeam} onClick={()=>native?.linking?leave(()=>void connectTeam(team.id)):go(team.id)}><Users size={24} className="shrink-0 text-gold" aria-hidden="true"/><span className="min-w-0 flex-1 break-words font-medium">{team.name}</span>{native?.linking?<span className="text-sm text-text-muted">{t(linkingTeam===team.id?'connecting':'linkAction')}</span>:<ChevronRight size={20} className="shrink-0 text-text-muted" aria-hidden="true"/>}</button>}</li>)}</ul>
+   <ul className="divide-y divide-border rounded-2xl border border-border bg-bg-primary">{visible.teams.map(team=><li key={team.id}>{team.status==='invited'?<div className="flex min-w-0 flex-wrap items-center gap-3 p-4"><Users size={24} className="shrink-0 text-gold" aria-hidden="true"/><span className="min-w-0 flex-1 break-words font-medium">{team.name}<span className="block text-xs text-text-muted">{t('invited')}</span></span><button className={control} disabled={action.busy} onClick={()=>void action.run('accept',{teamId:team.id,revision:team.revision})}>{t('accept')}</button><button className={control} disabled={action.busy} onClick={()=>void action.run('decline',{teamId:team.id,revision:team.revision})}>{t('decline')}</button></div>:<button type="button" className="flex min-h-14 w-full min-w-0 items-center gap-3 px-3 py-2 text-left disabled:opacity-40" disabled={!!linkingTeam} onClick={()=>native?.linking?leave(()=>void connectTeam(team.id)):go(team.id)}><Users size={24} className="shrink-0 text-gold" aria-hidden="true"/><span className="min-w-0 flex-1 break-words font-medium">{team.name}</span>{native?.linking?<span className="text-sm text-text-muted">{t(linkingTeam===team.id?'connecting':'linkAction')}</span>:<ChevronRight size={20} className="shrink-0 text-text-muted" aria-hidden="true"/>}</button>}</li>)}</ul>
    {!visible.teams.length&&<p className="text-sm text-text-muted">{t('empty')}</p>}
 
    {!native?.linking&&<details><summary className="min-h-11 cursor-pointer py-3">{t('teamSettings')}</summary><label className="flex min-h-11 items-start gap-3 rounded-2xl border border-border bg-bg-primary p-4"><input type="checkbox" checked={visible.showInInbox} disabled={action.busy} onChange={event=>void action.run('preference',{showInInbox:event.target.checked})} className="mt-1 size-5 shrink-0"/><span><strong className="block text-sm">{t('inbox')}</strong><span className="text-xs text-text-muted">{t('inboxHelp')}</span></span></label></details>}
   </>}
-  {visible?.team&&<TeamPanel key={accountId+visible.team.id} accountId={accountId} team={visible.team} onSaved={load} openChannel={id=>go(visible.team!.id,id)} leaveTeam={async()=>{await load();go();}} files={params.get('view')==='files'&&!conversation} showFiles={()=>go(visible.team!.id,undefined,true)} showChats={()=>go(visible.team!.id)}/>}
+  {visible?.team&&<TeamPanel key={accountId+visible.team.id} accountId={accountId} team={visible.team} onSaved={load} openChannel={id=>go(visible.team!.id,id)} leaveTeam={async()=>{await load();go();}} files={params.get('view')==='files'&&!conversation} showFiles={()=>go(visible.team!.id,undefined,true)} showChats={()=>go(visible.team!.id)} onBack={()=>native?.teamId?closeNative():go()} linkAction={native?.linking?<button type="button" className={control} disabled={!!linkingTeam} onClick={()=>leave(()=>void connectTeam(visible.team!.id))}>{t('linkLocalTeam')}</button>:undefined}/>}
   {action.node}
   {creatingTeam&&<CreateTeamDialog key={accountId} accountId={accountId} api={api} onClose={closeCreateTeam} onCreated={teamId=>go(teamId,undefined,false,()=>setCreatingTeam(false))}/>}
  </main></>;
 }
-function TeamPanel({accountId,team,onSaved,openChannel,leaveTeam,files,showFiles,showChats}:{accountId:string;team:Team;onSaved:()=>Promise<void>;openChannel:(id:string)=>void;leaveTeam:()=>Promise<void>;files:boolean;showFiles:()=>void;showChats:()=>void}) {
- const t=useTranslations('WorkTeams');const {leave}=useFormNavigation();
+function TeamPanel({accountId,team,onSaved,openChannel,leaveTeam,files,showFiles,showChats,onBack,linkAction}:{accountId:string;team:Team;onSaved:()=>Promise<void>;openChannel:(id:string)=>void;leaveTeam:()=>Promise<void>;files:boolean;showFiles:()=>void;showChats:()=>void;onBack:()=>void;linkAction?:ReactNode}) {
+ const t=useTranslations('WorkTeams'),messages=useTranslations('Messaging'),locale=useLocale();const {leave}=useFormNavigation();
  const action=useOperation(accountId,onSaved),isAdmin=team.role==='admin',base={teamId:team.id,revision:team.revision};
  const [creating,setCreating]=useState(false),[optionsId,setOptionsId]=useState<string|null>(null),[tab,setTab]=useState<'chats'|'members'>('chats'),[inviting,setInviting]=useState(false);
+ const [memberQuery,setMemberQuery]=useState(''),[chatQuery,setChatQuery]=useState(''),[memberLimit,setMemberLimit]=useState(TEAM_MEMBER_PAGE_SIZE);
  const plus=useRef<HTMLButtonElement>(null);
  const options=team.channels.find(channel=>channel.id===optionsId);
+ const activeTab=files?'files':tab;
  const closeCreate=()=>leave(()=>{setCreating(false);plus.current?.focus();});
- return <section className="min-w-0 space-y-4" aria-label={t('teamNavigation')}>
-  <nav aria-label={t('teamNavigation')} className="grid grid-cols-3 gap-1 rounded-2xl border border-border bg-bg-primary p-1">
-   {([{id:'chats',label:t('chats'),Icon:MessageCircle},{id:'files',label:t('files'),Icon:Folder},{id:'members',label:t('members'),Icon:Users}] as const).map(({id,label,Icon})=><button key={id} type="button" aria-current={(files?id==='files':tab===id)?'page':undefined} onClick={()=>{if(id==='files'){showFiles();return;}leave(()=>{setTab(id);setCreating(false);setOptionsId(null);if(files)showChats();});}} className={'flex min-h-14 min-w-0 flex-col items-center justify-center gap-1 rounded-xl px-1 py-2 text-xs '+((files?id==='files':tab===id)?'bg-gold/10 text-gold':'text-text-muted')}><Icon size={20} aria-hidden="true"/><span className="break-words">{label}</span></button>)}
+ const closeInvite=()=>leave(()=>{setInviting(false);plus.current?.focus();});
+ const directory=teamMemberDirectory(team.members,memberQuery,locale,memberLimit);
+ const count=(value:number)=>new Intl.NumberFormat(locale).format(value);
+ const channelQuery=chatQuery.trim().toLocaleLowerCase(locale);
+ const channels=team.channels.filter(channel=>channel.name.toLocaleLowerCase(locale).includes(channelQuery));
+ const memberRow=(member:Member)=><li key={member.userId} className="flex min-h-14 min-w-0 items-start gap-2 px-3 py-1.5">
+  <span className="mt-1.5 flex size-8 shrink-0 items-center justify-center rounded-full bg-bg-elevated text-xs font-medium text-text-muted" aria-hidden="true">{Array.from(member.name.trim())[0]?.toLocaleUpperCase(locale)}</span>
+  <span className="min-w-0 flex-1 self-center break-words text-sm [overflow-wrap:anywhere]">{member.name}<span className="block text-xs text-text-muted">{t(member.status==='invited'?'invited':member.role)}</span></span>
+  {isAdmin&&member.userId!==accountId&&<details className="min-w-0 max-w-[55%]"><summary className="flex min-h-11 min-w-11 cursor-pointer items-center justify-center rounded-xl text-sm" aria-label={t('memberRights')+' · '+member.name}><MoreHorizontal size={18} aria-hidden="true"/></summary><div className="flex min-w-0 flex-col gap-1 pb-2">{member.status==='active'&&member.role!=='admin'&&<button className={control} disabled={action.busy} onClick={()=>void action.run('promote',{...base,userId:member.userId})}>{t('promote')}</button>}<button className={control} disabled={action.busy} onClick={()=>void action.run('remove_member',{...base,userId:member.userId})}>{t('remove')}</button></div></details>}
+ </li>;
+ return <section className="min-w-0 space-y-3" aria-label={t('teamNavigation')}>
+  <header className="flex min-h-11 min-w-0 items-center gap-2">
+   <button type="button" onClick={onBack} className="flex size-11 shrink-0 items-center justify-center rounded-full text-text-muted" aria-label={t('back')}><ChevronLeft size={20} aria-hidden="true"/></button>
+   <div className="min-w-0 flex-1 text-center"><h1 className="break-words text-base font-semibold">{t(activeTab)}</h1><p className="break-words text-xs text-text-muted [overflow-wrap:anywhere]">{team.name}</p></div>
+   {isAdmin&&activeTab!=='files'?<button ref={plus} type="button" onClick={()=>activeTab==='members'?setInviting(true):setCreating(true)} className="flex size-11 shrink-0 items-center justify-center text-gold" aria-label={t(activeTab==='members'?'invite':'newGroup')}><span className="flex size-8 items-center justify-center rounded-full border border-border bg-bg-secondary"><Plus size={18} aria-hidden="true"/></span></button>:<span className="size-11 shrink-0" aria-hidden="true"/>}
+  </header>
+  <nav aria-label={t('teamNavigation')} className="grid grid-cols-3 gap-1 rounded-2xl border border-border bg-bg-primary px-1">
+   {([{id:'chats',label:t('chats')},{id:'files',label:t('files')},{id:'members',label:t('members')}] as const).map(({id,label})=><button key={id} type="button" aria-current={activeTab===id?'page':undefined} onClick={()=>{if(id==='files'){showFiles();return;}leave(()=>{setTab(id);setOptionsId(null);if(files)showChats();});}} className={'relative flex min-h-11 min-w-0 items-center justify-center px-1 py-2 text-xs '+(activeTab===id?'font-semibold text-gold after:absolute after:inset-x-4 after:bottom-0 after:h-0.5 after:rounded-full after:bg-gold':'text-text-muted')}><span className="break-words">{label}</span></button>)}
   </nav>
-  {files?<p role="status" className="rounded-2xl border border-border bg-bg-primary p-4 text-sm text-text-muted">{t('filesPending')}</p>:tab==='members'?<div className="space-y-4">
-   <div className="flex min-w-0 items-center gap-3"><h2 className="min-w-0 flex-1 text-lg font-semibold">{t('members')}</h2>{isAdmin&&<button type="button" onClick={()=>setInviting(true)} className={control+' text-gold'} aria-label={t('invite')}><Plus size={22} aria-hidden="true"/></button>}</div>
-   {isAdmin&&inviting&&<MessagingDialog open title={t('invite')} onClose={()=>leave(()=>setInviting(false))}><InviteTeam accountId={accountId} team={team} onSaved={onSaved}/></MessagingDialog>}
-   <ul className="divide-y divide-border rounded-2xl border border-border bg-bg-primary px-4">{team.members.map(member=><li key={member.userId} className="flex min-w-0 flex-wrap items-center gap-2 py-3"><Users size={20} className="shrink-0 text-text-muted" aria-hidden="true"/><span className="min-w-0 flex-1 break-words">{member.name}<span className="block text-xs text-text-muted">{t(member.status==='invited'?'invited':member.role)}</span></span>{isAdmin&&member.userId!==accountId&&<details><summary className="flex min-h-11 min-w-11 cursor-pointer items-center justify-center rounded-xl px-3 text-sm" aria-label={t('memberRights')+' · '+member.name}><MoreHorizontal size={20} aria-hidden="true"/></summary><div className="flex flex-wrap gap-2">{member.status==='active'&&member.role!=='admin'&&<button className={control} disabled={action.busy} onClick={()=>void action.run('promote',{...base,userId:member.userId})}>{t('promote')}</button>}<button className={control} disabled={action.busy} onClick={()=>void action.run('remove_member',{...base,userId:member.userId})}>{t('remove')}</button></div></details>}</li>)}</ul>
+  {linkAction}
+  {files?<p role="status" className="rounded-2xl border border-border bg-bg-primary p-3 text-sm text-text-muted">{t('filesPending')}</p>:tab==='members'?<div className="space-y-3">
+   <label className="flex min-h-11 items-center gap-2 rounded-xl border border-border bg-bg-primary px-3 focus-within:border-gold"><Search size={17} className="shrink-0 text-text-muted" aria-hidden="true"/><input type="search" value={memberQuery} onChange={event=>{setMemberQuery(event.target.value);setMemberLimit(TEAM_MEMBER_PAGE_SIZE);}} placeholder={messages('searchPeople')} aria-label={messages('searchPeople')} className="min-h-11 min-w-0 flex-1 bg-transparent text-base outline-none"/></label>
+   {directory.invited.total>0&&<details className="rounded-2xl border border-border bg-bg-primary"><summary className="flex min-h-11 cursor-pointer items-center justify-between gap-2 px-3 text-xs text-text-muted"><span>{t('invitations')}</span><span>{count(directory.invited.total)}</span></summary><ul className="divide-y divide-border border-t border-border">{directory.invited.visible.map(memberRow)}</ul></details>}
+   {directory.active.total>0&&<section aria-label={t('members')} className="space-y-1"><h2 className="flex items-center justify-between gap-2 px-2 text-xs font-medium text-text-muted"><span>{t('members')}</span><span>{count(directory.active.total)}</span></h2><ul className="divide-y divide-border rounded-2xl border border-border bg-bg-primary">{directory.active.visible.map(memberRow)}</ul></section>}
+   {!directory.active.total&&!directory.invited.total&&<p role="status" className="px-2 py-3 text-sm text-text-muted">{messages('noPeople')}</p>}
+   {directory.hasMore&&<button type="button" className="min-h-11 w-full rounded-xl text-sm text-gold" onClick={()=>setMemberLimit(value=>value+TEAM_MEMBER_PAGE_SIZE)}>{t('showMore')}</button>}
   </div>:<>
-  <div className="flex min-w-0 items-center gap-3">
-   <h2 id="work-team-groups-title" className="min-w-0 flex-1 break-words text-lg font-semibold">{t('chats')}</h2>
-   {isAdmin&&<button ref={plus} type="button" className={control+' shrink-0'} aria-label={t('newGroup')} aria-expanded={creating} aria-controls="work-team-new-group" onClick={()=>creating?closeCreate():setCreating(true)}><Plus size={22} aria-hidden="true"/></button>}
-  </div>
-  {isAdmin&&creating&&<div id="work-team-new-group" className="space-y-2">
+   {team.channels.length>5&&<label className="flex min-h-11 items-center gap-2 rounded-xl border border-border bg-bg-primary px-3 focus-within:border-gold"><Search size={17} className="shrink-0 text-text-muted" aria-hidden="true"/><input type="search" value={chatQuery} onChange={event=>setChatQuery(event.target.value)} placeholder={messages('searchChats')} aria-label={messages('searchChats')} className="min-h-11 min-w-0 flex-1 bg-transparent text-base outline-none"/></label>}
+   <ul className="min-w-0 divide-y divide-border rounded-2xl border border-border bg-bg-primary">
+    {channels.map(channel=><li key={channel.id} className="flex min-w-0 items-center gap-1 px-2 py-1">
+     <button type="button" className="flex min-h-11 min-w-0 flex-1 items-center gap-2 rounded-xl px-1 py-2 text-left disabled:opacity-50" disabled={action.busy||!channel.canSee||!channel.joined&&!channel.canJoin} onClick={()=>{if(channel.joined){openChannel(channel.conversationId);return;}void action.run('join',{...base,channelId:channel.id}).then(saved=>{if(saved)openChannel(channel.conversationId);});}}>
+      <MessageCircle size={19} className="shrink-0 text-text-muted" aria-hidden="true"/>
+      <span className="min-w-0 flex-1 break-words text-sm font-medium [overflow-wrap:anywhere]">{channel.name}{channel.joined&&!channel.canWrite&&<span className="block text-xs font-normal text-text-muted">{t('readOnly')}</span>}{!channel.joined&&!channel.canJoin&&<span className="block text-xs font-normal text-text-muted">{t('joinRestricted')}</span>}</span>
+      {(channel.joined||channel.canJoin)&&<span className="min-w-0 max-w-[38%] shrink-0 break-words text-right text-xs text-text-muted">{t(channel.joined?'open':'join')}</span>}
+     </button>
+     {(isAdmin||channel.joined)&&<button type="button" className="flex size-11 shrink-0 items-center justify-center rounded-xl text-text-muted" aria-label={t('groupOptions',{name:channel.name})} aria-expanded={optionsId===channel.id} onClick={()=>leave(()=>setOptionsId(optionsId===channel.id?null:channel.id))}><MoreHorizontal size={18} aria-hidden="true"/></button>}
+    </li>)}
+   </ul>
+   {!channels.length&&<p className="px-2 text-sm text-text-muted">{t('noChannels')}</p>}
+   <p className="px-2 text-xs text-text-muted">{t('historyHelp')}</p>
+  </>}
+  {!options&&action.node}
+  {isAdmin&&inviting&&<MessagingDialog open title={t('invite')} onClose={closeInvite}><InviteTeam accountId={accountId} team={team} onSaved={onSaved}/></MessagingDialog>}
+  {isAdmin&&creating&&<MessagingDialog open compact title={t('newGroup')} onClose={closeCreate}>
    <RecoveryForm accountId={accountId} formKey={'workspace-team:'+team.id} initial={{name:'',visibility:'team'}} operation={value=>({action:'create_channel',p:{...base,name:value.name,visibility:value.visibility}})} onSaved={onSaved} onCommitted={()=>{setCreating(false);plus.current?.focus();}} submit={t('newGroup')}>
-    {(value,edit)=><><label className="block text-sm">{t('name')}<input autoFocus required maxLength={80} value={String(value.name)} onChange={event=>edit({name:event.target.value})} className={field}/></label>
-     <details><summary className="min-h-11 cursor-pointer py-3 text-sm">{t('visibility')}</summary><label className="block text-sm">{t('visibility')}<select value={String(value.visibility)} onChange={event=>edit({visibility:event.target.value})} className={field}><option value="team">{t('teamAccess')}</option><option value="selected">{t('selectedAccess')}</option></select></label></details></>}
+    {(value,edit)=><><label className="block text-sm">{t('name')}<input autoFocus required maxLength={80} value={String(value.name)} onChange={event=>edit({name:event.target.value})} className={field}/></label><details><summary className="min-h-11 cursor-pointer py-3 text-sm">{t('visibility')}</summary><label className="block text-sm">{t('visibility')}<select value={String(value.visibility)} onChange={event=>edit({visibility:event.target.value})} className={field}><option value="team">{t('teamAccess')}</option><option value="selected">{t('selectedAccess')}</option></select></label></details></>}
    </RecoveryForm>
-   <button type="button" className={control} onClick={closeCreate}>{t('cancel')}</button>
-  </div>}
-  <ul className="min-w-0 divide-y divide-border rounded-2xl border border-border bg-bg-primary">
-   {team.channels.map(channel=><li key={channel.id} className="flex min-w-0 items-center gap-2 p-2">
-    <button type="button" className="flex min-h-11 min-w-0 flex-1 items-center gap-3 rounded-xl p-2 text-left disabled:opacity-50" disabled={action.busy||!channel.canSee||!channel.joined&&!channel.canJoin} onClick={()=>{if(channel.joined){openChannel(channel.conversationId);return;}void action.run('join',{...base,channelId:channel.id}).then(saved=>{if(saved)openChannel(channel.conversationId);});}}>
-     <MessageCircle size={22} className="shrink-0 text-text-muted" aria-hidden="true"/>
-     <span className="min-w-0 flex-1 break-words font-medium">{channel.name}{channel.joined&&!channel.canWrite&&<span className="block text-xs font-normal text-text-muted">{t('readOnly')}</span>}{!channel.joined&&!channel.canJoin&&<span className="block text-xs font-normal text-text-muted">{t('joinRestricted')}</span>}</span>
-     {(channel.joined||channel.canJoin)&&<span className="min-w-0 max-w-[42%] shrink-0 break-words text-right text-sm text-text-muted">{t(channel.joined?'open':'join')}</span>}
-    </button>
-    {(isAdmin||channel.joined)&&<button type="button" className={control+' shrink-0'} aria-label={t('groupOptions',{name:channel.name})} aria-expanded={optionsId===channel.id} onClick={()=>leave(()=>setOptionsId(optionsId===channel.id?null:channel.id))}><MoreHorizontal size={20} aria-hidden="true"/></button>}
-   </li>)}
-  </ul>
-  {!team.channels.length&&<p className="text-sm text-text-muted">{t('noChannels')}</p>}
-  {action.node}
-  {options&&<section aria-label={t('groupOptions',{name:options.name})} className="space-y-3 rounded-2xl border border-border bg-bg-primary p-4">
-   <h3 className="break-words font-semibold">{options.name}</h3>
+  </MessagingDialog>}
+  {options&&<MessagingDialog open compact title={options.name} onClose={()=>leave(()=>setOptionsId(null))}>
+   {action.node}
    {isAdmin&&<ChannelAdmin key={options.id} accountId={accountId} team={team} channel={options} onSaved={onSaved}/>}
    {options.joined&&<button className={control} disabled={action.busy} onClick={()=>void action.run('leave',{...base,channelId:options.id}).then(saved=>{if(saved)setOptionsId(null);})}>{t('leaveChannel')}</button>}
-   <button type="button" className={control} onClick={()=>leave(()=>setOptionsId(null))}>{t('cancel')}</button>
-  </section>}
-  <p className="text-xs text-text-muted">{t('historyHelp')}</p>
-  </>}
-  <details><summary className="min-h-11 cursor-pointer py-3">{t('teamSettings')}</summary><div className="space-y-4">
-   <details><summary className="min-h-11 cursor-pointer py-3">{t('leaveTeam')}</summary><p className="mb-3 text-sm text-text-muted">{t('leaveTeamHelp')}</p><LeaveTeamButton accountId={accountId} team={team} onSaved={leaveTeam}/></details>
-  </div></details>
+  </MessagingDialog>}
+  <details><summary className="min-h-11 cursor-pointer px-2 py-3 text-xs text-text-muted">{t('teamSettings')}</summary><div className="space-y-3"><details><summary className="min-h-11 cursor-pointer py-3 text-sm">{t('leaveTeam')}</summary><p className="mb-3 text-sm text-text-muted">{t('leaveTeamHelp')}</p><LeaveTeamButton accountId={accountId} team={team} onSaved={leaveTeam}/></details></div></details>
  </section>;
 }
 function LeaveTeamButton({accountId,team,onSaved}:{accountId:string;team:Team;onSaved:()=>Promise<void>}) {const t=useTranslations('WorkTeams');const action=useOperation(accountId,onSaved);return <><button className={control} disabled={action.busy} onClick={()=>void action.run('leave_team',{teamId:team.id,revision:team.revision})}>{t('leaveTeam')}</button>{action.node}</>;}

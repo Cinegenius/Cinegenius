@@ -14057,7 +14057,9 @@
     "teamNavigation": "Sekce týmu",
     "chats": "Chaty",
     "files": "Soubory",
-    "filesPending": "Sdílené úložiště souborů zatím není aktivní. Soubory v zařízení zůstanou zachovány."
+    "filesPending": "Sdílené úložiště souborů zatím není aktivní. Soubory v zařízení zůstanou zachovány.",
+    "invitations": "Pozvánky",
+    "showMore": "Zobrazit další"
   },
   "WorkMail": {
     "title": "E-mail ve Work",

@@ -14057,7 +14057,9 @@
     "teamNavigation": "チームの項目",
     "chats": "チャット",
     "files": "ファイル",
-    "filesPending": "共有ファイルストレージはまだ有効になっていません。端末上のファイルは保持されます。"
+    "filesPending": "共有ファイルストレージはまだ有効になっていません。端末上のファイルは保持されます。",
+    "invitations": "招待",
+    "showMore": "さらに表示"
   },
   "WorkMail": {
     "title": "Workのメール",

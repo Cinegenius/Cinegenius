@@ -14057,7 +14057,9 @@
     "teamNavigation": "Csapatrészek",
     "chats": "Csevegések",
     "files": "Fájlok",
-    "filesPending": "A közös fájltár még nem aktív. Az eszközödön lévő fájlok megmaradnak."
+    "filesPending": "A közös fájltár még nem aktív. Az eszközödön lévő fájlok megmaradnak.",
+    "invitations": "Meghívások",
+    "showMore": "Továbbiak megjelenítése"
   },
   "WorkMail": {
     "title": "E-mail a Workben",

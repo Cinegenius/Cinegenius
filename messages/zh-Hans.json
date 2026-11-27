@@ -14057,7 +14057,9 @@
     "teamNavigation": "团队栏目",
     "chats": "聊天",
     "files": "文件",
-    "filesPending": "共享文件存储尚未启用。设备上的文件将保留。"
+    "filesPending": "共享文件存储尚未启用。设备上的文件将保留。",
+    "invitations": "邀请",
+    "showMore": "显示更多"
   },
   "WorkMail": {
     "title": "Work 邮件",

@@ -14057,7 +14057,9 @@
     "teamNavigation": "Teamonderdelen",
     "chats": "Chats",
     "files": "Bestanden",
-    "filesPending": "Gedeelde bestandsopslag is nog niet ingeschakeld. Bestanden op je apparaat blijven behouden."
+    "filesPending": "Gedeelde bestandsopslag is nog niet ingeschakeld. Bestanden op je apparaat blijven behouden.",
+    "invitations": "Uitnodigingen",
+    "showMore": "Meer tonen"
   },
   "WorkMail": {
     "title": "E-mail in Work",

@@ -14057,7 +14057,9 @@
     "teamNavigation": "Sekcje zespołu",
     "chats": "Czaty",
     "files": "Pliki",
-    "filesPending": "Wspólne przechowywanie plików nie jest jeszcze włączone. Pliki na urządzeniu pozostają zachowane."
+    "filesPending": "Wspólne przechowywanie plików nie jest jeszcze włączone. Pliki na urządzeniu pozostają zachowane.",
+    "invitations": "Zaproszenia",
+    "showMore": "Pokaż więcej"
   },
   "WorkMail": {
     "title": "Poczta w Work",

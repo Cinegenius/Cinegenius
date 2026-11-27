@@ -14057,7 +14057,9 @@
     "teamNavigation": "Secciones del equipo",
     "chats": "Chats",
     "files": "Archivos",
-    "filesPending": "El almacenamiento compartido aún no está habilitado. Los archivos de tu dispositivo se conservan."
+    "filesPending": "El almacenamiento compartido aún no está habilitado. Los archivos de tu dispositivo se conservan.",
+    "invitations": "Invitaciones",
+    "showMore": "Mostrar más"
   },
   "WorkMail": {
     "title": "Correo en Work",

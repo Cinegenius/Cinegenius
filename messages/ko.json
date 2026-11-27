@@ -14057,7 +14057,9 @@
     "teamNavigation": "팀 메뉴",
     "chats": "채팅",
     "files": "파일",
-    "filesPending": "공유 파일 저장소는 아직 활성화되지 않았습니다. 기기의 파일은 유지됩니다."
+    "filesPending": "공유 파일 저장소는 아직 활성화되지 않았습니다. 기기의 파일은 유지됩니다.",
+    "invitations": "초대",
+    "showMore": "더 보기"
   },
   "WorkMail": {
     "title": "Work 메일",

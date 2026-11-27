@@ -14057,7 +14057,9 @@
     "teamNavigation": "Team sections",
     "chats": "Chats",
     "files": "Files",
-    "filesPending": "Shared file storage is not enabled yet. Files on your device are preserved."
+    "filesPending": "Shared file storage is not enabled yet. Files on your device are preserved.",
+    "invitations": "Invitations",
+    "showMore": "Show more"
   },
   "WorkMail": {
     "title": "Mail in Work",
