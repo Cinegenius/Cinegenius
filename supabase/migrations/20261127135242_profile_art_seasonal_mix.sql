@@ -4,11 +4,14 @@ create table profile_art_private.seasonal_editions (
  id text primary key check(id in ('winter-2026','nikolaus-2026')),
  available_from timestamptz not null,
  refill_enabled boolean not null default false,
- available_until timestamptz not null check(available_until>available_from)
+ available_until timestamptz not null check(available_until>available_from),
+ lead_available_until timestamptz check(lead_available_until is null or (id='nikolaus-2026' and lead_available_until>=available_until))
 );
 insert into profile_art_private.seasonal_editions(id,available_from,available_until) values
  ('winter-2026','2026-11-27 00:00:00 Europe/Berlin','2027-01-01 00:00:00 Europe/Berlin'),
  ('nikolaus-2026','2026-12-04 00:00:00 Europe/Berlin','2026-12-07 00:00:00 Europe/Berlin');
+-- Only the single unclaimed Nikolaus remains selectable through New Year's Eve.
+update profile_art_private.seasonal_editions set lead_available_until='2027-01-01 00:00:00 Europe/Berlin' where id='nikolaus-2026';
 alter table profile_art_private.seasonal_editions enable row level security;
 revoke all on profile_art_private.seasonal_editions from public,anon,authenticated,service_role;
 grant select on profile_art_private.seasonal_editions to service_role;
@@ -35,6 +38,19 @@ $$;
 revoke all on function profile_art_private.season_active(text,timestamptz) from public,anon,authenticated,service_role;
 grant execute on function profile_art_private.season_active(text,timestamptz) to service_role;
 
+create function profile_art_private.art_season_deadline(p_edition text,p_slot smallint) returns timestamptz
+ language sql stable security invoker set search_path=pg_catalog,profile_art_private as $$
+ select case when p_edition='nikolaus-2026' and p_slot=1 then coalesce(lead_available_until,available_until) else available_until end
+ from profile_art_private.seasonal_editions where id=p_edition
+$$;
+create function profile_art_private.art_season_active(p_edition text,p_slot smallint,p_at timestamptz) returns boolean
+ language sql stable security invoker set search_path=pg_catalog,profile_art_private as $$
+ select p_edition is null or exists(select 1 from profile_art_private.seasonal_editions
+ where id=p_edition and p_at>=available_from and p_at<profile_art_private.art_season_deadline(p_edition,p_slot))
+$$;
+revoke all on function profile_art_private.art_season_deadline(text,smallint),profile_art_private.art_season_active(text,smallint,timestamptz) from public,anon,authenticated,service_role;
+grant execute on function profile_art_private.art_season_deadline(text,smallint),profile_art_private.art_season_active(text,smallint,timestamptz) to service_role;
+
 -- Persist the generation brief on acceptance. No dependence on the worker clock.
 create function profile_art_private.seasonal_art_identity() returns trigger language plpgsql security invoker
  set search_path=pg_catalog,profile_art_private as $$ begin
@@ -53,11 +69,11 @@ create trigger profile_art_seasonal_identity before insert or update on profile_
 -- Protect every existing lease/save client, including old versions and direct RPCs.
 -- Owned art remains usable after the edition, subject to the existing deletion rules.
 create function profile_art_private.guard_seasonal_use() returns trigger language plpgsql security invoker
- set search_path=pg_catalog,profile_art_private as $$ declare edition text; deadline timestamptz;begin
- select a.seasonal_edition,e.available_until into edition,deadline
- from profile_art_private.artworks a left join profile_art_private.seasonal_editions e on e.id=a.seasonal_edition where a.id=new.artwork_id;
+ set search_path=pg_catalog,profile_art_private as $$ declare edition text; slot smallint; deadline timestamptz;begin
+ select a.seasonal_edition,a.seasonal_slot,profile_art_private.art_season_deadline(a.seasonal_edition,a.seasonal_slot) into edition,slot,deadline
+ from profile_art_private.artworks a where a.id=new.artwork_id;
  if edition is not null and not exists(select 1 from profile_art_private.claims where artwork_id=new.artwork_id and user_id=new.user_id) then
-  if not profile_art_private.season_active(edition,clock_timestamp()) then
+  if not profile_art_private.art_season_active(edition,slot,clock_timestamp()) then
    raise exception using errcode='PT409',message='ART_UNAVAILABLE';
   end if;
   if tg_table_name='leases' then new.expires_at:=least(new.expires_at,deadline);end if;
@@ -77,7 +93,7 @@ set search_path=pg_catalog,profile_art_private as $$ declare result jsonb; stamp
  with eligible as (
   select a.* from profile_art_private.artworks a where a.kind=p_kind and a.state='ready'
    and (p_kind='cover' or a.presentation is not null)
-   and profile_art_private.season_active(a.seasonal_edition,stamp)
+   and profile_art_private.art_season_active(a.seasonal_edition,a.seasonal_slot,stamp)
    and not exists(select 1 from profile_art_private.claims c where c.artwork_id=a.id)
    and not exists(select 1 from profile_art_private.leases l where l.artwork_id=a.id and l.expires_at>stamp)
  ), regular_ranked as (

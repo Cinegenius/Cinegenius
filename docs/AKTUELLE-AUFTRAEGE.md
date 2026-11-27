@@ -1,6 +1,6 @@
 ## Saisonale Avatare · Quellkandidat · 27. November 2026
 
-Vorbereitet, noch nicht veröffentlicht: höchstens 3 saisonale unter 12 Auswahlmotiven. Winter bis einschließlich 31.12.2026, weltweit genau 1 Nikolaus + 3 Rentiere + 3 Helfer vom 4.–6.12.2026 (Europe/Berlin). Bestehende Bilder/Eigentum bleiben erhalten. Neutrale Winterreserve kann im bisherigen begrenzten Batchweg nachgefüllt werden; die sieben Nikolaus-Motive bleiben einmalig. Bestehender Web-/App-API-Vertrag, keine native Quelldatei und keine neue Pflichtangabe. Migration, privater Import mit frischem Katalogvergleich, Veröffentlichung und physische Prüfung separat offen. [Umfang und Einführung](profile-art-seasonal.md).
+Vorbereitet, noch nicht veröffentlicht: höchstens 3 saisonale unter 12 Auswahlmotiven. Winter bis einschließlich 31.12.2026, weltweit genau 1 Nikolaus + 3 Rentiere + 3 Helfer ab 4.12.2026: Rentiere/Helfer bis 6.12., der ungewählte Nikolaus bis 31.12. (Europe/Berlin). Bestehende Bilder/Eigentum bleiben erhalten. Neutrale Winterreserve kann im bisherigen begrenzten Batchweg nachgefüllt werden; die sieben Nikolaus-Motive bleiben einmalig. Bestehender Web-/App-API-Vertrag, keine native Quelldatei und keine neue Pflichtangabe. Migration, privater Import mit frischem Katalogvergleich, Veröffentlichung und physische Prüfung separat offen. [Umfang und Einführung](profile-art-seasonal.md).
 
 ## Homies gemeinsam in Website und App · 27. November 2026 · veröffentlicht und geprüft
 

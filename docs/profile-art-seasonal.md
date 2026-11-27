@@ -2,12 +2,14 @@
 
 Quellkandidat, nicht veröffentlicht. Betreiberentscheidungen: Winter bis Jahresende;
 Nikolaus weltweit schon ab 4. Dezember; genau ein Nikolaus, drei Rentiere und drei
-Helfer; normale Avatare bleiben die Hauptauswahl.
+Helfer; normale Avatare bleiben die Hauptauswahl. Die jüngste Ergänzung verlängert
+nur den noch ungewählten Nikolaus bis Jahresende.
 
 ## Auswahl und Termine
 
 - Winter: 27.11.2026 bis einschließlich 31.12.2026.
-- Nikolaus: 04.12.2026 bis einschließlich 06.12.2026.
+- Nikolaus: 04.12.2026 bis einschließlich 31.12.2026, solange nicht vergeben.
+- Die drei Rentiere und drei Helfer: 04.12.2026 bis einschließlich 06.12.2026.
 - Gemeinsame verbindliche Uhr: Europe/Berlin, jeweils 00:00; Ende exklusiv.
   Keine jährliche Wiederholung und keine Länder- oder Religionsableitung.
 - Von zwölf freien Angeboten höchstens drei saisonal, eingestreut an vierter,
@@ -79,8 +81,8 @@ Katalogübernahme.
 ## Prüfstand
 
 87 gezielte Bestands-/Batch-/Reservierungs-/Speicher-/Reviewerfälle bestanden.
-Nach der letzten Änderung auf den 4. Dezember und der getrennten Aktivierung:
-18 abschließende Prüfungen, darunter 13 tatsächliche SQL-Fälle in PGlite mit allen
+Nach der Verlängerung des einzelnen ungewählten Nikolaus bis Jahresende:
+19 abschließende Prüfungen, darunter 14 tatsächliche SQL-Fälle in PGlite mit allen
 Artworkmigrationen. Geprüft sind Datumsgrenzen, Mischquote bei Bestandsmangel,
 fremde Reservierungen, genau sieben Slots, Bestandseigentum nach Saisonende,
 Nachfülllimits, verspätete Batchausgaben, Rollenrechte und das tatsächlich gerenderte

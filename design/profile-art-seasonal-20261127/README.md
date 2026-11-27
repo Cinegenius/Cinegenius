@@ -1,6 +1,7 @@
 # Winter und Nikolaus 2026
 
-Vorbereitet, nicht veröffentlicht. Genau ein Nikolaus, drei unterschiedliche
+Vorbereitet, nicht veröffentlicht. Nikolaus ab 4.12. bis Jahresende, solange frei;
+Rentiere/Helfer vom 4.–6.12., Winter bis 31.12.2026. Genau ein Nikolaus, drei unterschiedliche
 Rentiere, drei Helfer sowie drei neutrale Winter-Startmotive. Lokale Weiterentwicklung
 der eigenen SVG-Zeichenbibliothek und der am27.11. gezeigten Vorschauen; keine
 kostenpflichtige Bilderzeugung. Alle sind frei wählbare neutrale Präsentationen.
