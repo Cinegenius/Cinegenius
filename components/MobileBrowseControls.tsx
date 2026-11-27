@@ -2,7 +2,7 @@
 
 import { ArrowUpDown,Briefcase,Building2,Clapperboard,Home,MapPin,Search,SlidersHorizontal,Tag,UsersRound,X } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { cloneElement,isValidElement,useEffect,useRef,useState,type ReactNode } from "react";
+import { Fragment,cloneElement,isValidElement,useEffect,useRef,useState,type ReactNode } from "react";
 import BrowseSelect from "@/components/BrowseSelect";
 import BrowseResultCount from "@/components/BrowseResultCount";
 import NativeBrowseToolbar, { NativeBrowseQuickFilter, type NativeBrowseQuickFilterKind } from "@/components/app/NativeBrowseToolbar";
@@ -63,6 +63,7 @@ export default function MobileBrowseControls({
   const nativeAppearance = useNativeAppAppearance();
 
   const [open, setOpen] = useState(false);
+  const [placeResetEpoch,setPlaceResetEpoch]=useState(0);
   const [nativePanel, setNativePanel] = useState<"place" | "category" | "more" | null>(null);
   const placeTrigger = useRef<HTMLButtonElement>(null), categoryTrigger = useRef<HTMLButtonElement>(null);
   const nativeCategoryValue = nativeCategory?.value ?? categoryValue;
@@ -190,8 +191,8 @@ export default function MobileBrowseControls({
       {nativeAppearance && nativePanel && <NativeBrowseFilterPanel
         title={nativePanel === "place" ? uiText("BrowseFilters.place") : nativePanel === "category" ? nativeTitle : uiText("locations.filterBtn")}
         trigger={nativePanel === "place" ? placeTrigger : nativePanel === "category" ? categoryTrigger : filterTrigger}
-        onClose={() => setNativePanel(null)} onReset={nativePanel === "category" ? () => nativeCategoryChange("") : onReset}>
-        {nativePanel === "place" ? nativePlaceFilters ?? placeFilters : nativePanel === "category" ? nativeCategoryPanel ?? <NativeFilterChoices label={nativeTitle}
+        onClose={() => setNativePanel(null)} onReset={nativePanel === "category" ? () => nativeCategoryChange("") : nativePanel === "place" ? () => {setPlaceResetEpoch(epoch=>epoch+1);onReset();} : onReset}>
+        {nativePanel === "place" ? <Fragment key={placeResetEpoch}>{nativePlaceFilters ?? placeFilters}</Fragment> : nativePanel === "category" ? nativeCategoryPanel ?? <NativeFilterChoices label={nativeTitle}
           selected={[nativeCategoryValue]} options={[{ value: "", label: allCategoryLabel }, ...nativeCategoryOptions]}
           onChange={value => nativeCategoryChange(value === nativeCategoryValue ? "" : value)} /> : <div className="space-y-3">
           {sortOptions.length > 1 && <MobileFilterField label={uiText("creators.sort")}><MobileFilterSelect label={uiText("creators.sort")} value={sortValue} options={sortOptions} onChange={onSortChange} placeholder={uiText("creators.sort")} /></MobileFilterField>}

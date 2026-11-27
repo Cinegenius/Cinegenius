@@ -14201,5 +14201,20 @@
     "compact": "Kis profilkép",
     "portrait": "Nagy portré",
     "cover": "Borítókép + profilkép"
+  },
+  "PlaceSearch": {
+    "cityOrPlace": "Város vagy hely",
+    "placeholder": "Hely keresése",
+    "countryOptional": "Ország (nem kötelező)",
+    "radiusOptional": "Körzet (nem kötelező)",
+    "clear": "Helyválasztás törlése",
+    "loadingSelection": "Mentett hely betöltése…",
+    "selectionUnavailable": "A mentett hely nem érhető el. Válaszd ki újra, vagy töröld a kiválasztást.",
+    "unavailable": "A helykeresés jelenleg nem érhető el.",
+    "countryUnavailable": "Az országválasztás jelenleg nem érhető el. A helykeresés továbbra is működik.",
+    "countrySelected": "Aktív országszűrő: {country}",
+    "selectSuggestion": "Válassz helyet a javaslatok közül.",
+    "noMatches": "Nincs megfelelő hely.",
+    "radiusUnavailable": "Ehhez a helyhez nem érhető el körzet."
   }
 }

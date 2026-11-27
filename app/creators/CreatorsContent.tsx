@@ -1,4 +1,5 @@
 "use client";
+import { useDiscoveryPlaceLabels } from "@/lib/use-discovery-place-labels";
 import { matchesBrowsePlace } from "@/lib/browse-radius";
 import NativeBrowsePlaceFilters from "@/components/app/NativeBrowsePlaceFilters";
 import VerifiedBadge from "@/components/VerifiedBadge";
@@ -222,9 +223,10 @@ function CreatorsInner({
   const countryOptions = useMemo(() => placeOptions(allCreators, "country", locale), [allCreators, locale]);
   const regionOptions = useMemo(() => placeOptions(allCreators, "region", locale), [allCreators, locale]);
   const availableLanguages = useMemo(() => [...new Set(allCreators.flatMap(c => normalizeCrewLanguages(c.languages)))].sort((a,b) => crewLanguageLabel(a,locale).localeCompare(crewLanguageLabel(b,locale),locale)), [allCreators,locale]);
-  const cityLabel = (value: string) => cityOptions.find(o => o.value === value)?.label ?? value;
-  const countryLabel = (value: string) => value === UNASSIGNED_COUNTRY ? uiText("Places.countryUnassigned") : countryOptions.find(o => o.value === value)?.label ?? value;
-  const regionLabel = (value: string) => regionOptions.find(option => option.value === value)?.label ?? value;
+  const placeLabels = useDiscoveryPlaceLabels(cityFilter || near?.id || "");
+  const cityLabel = (value: string) => placeLabels("city", value, cityOptions.find(o => o.value === value)?.label ?? value);
+  const countryLabel = (value: string) => value === UNASSIGNED_COUNTRY ? uiText("Places.countryUnassigned") : placeLabels("country", value, countryOptions.find(o => o.value === value)?.label ?? value);
+  const regionLabel = (value: string) => placeLabels("region", value, regionOptions.find(option => option.value === value)?.label ?? value);
   const [sortKey, setSortKey] = useViewState("crew.sortKey", () => ["rating", "reviews"].includes(initialFilters.sort) ? initialFilters.sort : "featured");
   const geography = useBrowseGeography(sortKey === "featured" && !countryFilter && !regionFilter && !cityFilter && !cityText && !near);
   const [viewMode, setViewMode] = useViewState<DirectoryView>("crew.viewMode", () => initialFilters.view === "map" ? "map" : initialFilters.view === "list" ? "list" : "grid");
@@ -441,7 +443,7 @@ function CreatorsInner({
   ].filter(Boolean).length + selectedRoles.size;
 
   const mobileChips: BrowseChip[] = [
-    ...(near ? [{ id: "near", label: uiText("Genie.searchNear", { city: near.name, radius: near.radius }), onRemove: () => setNear(null) }] : []),
+    ...(near ? [{ id: "near", label: uiText("Genie.searchNear", { city: placeLabels("city", near.id, near.name), radius: near.radius }), onRemove: () => setNear(null) }] : []),
     ...(cityText ? [{ id: "city-text", label: `${uiText("Places.city")}: ${cityText}`, onRemove: () => setCityText("") }] : []),
     ...(sidebarDept ? [{ id: "area", label: sidebarDept === CREW_PROVIDER_FILTER ? uiText("nav.crew") : sidebarDept === "__locations" ? uiText("nav.locations") : sidebarDept === "__marktplatz" ? uiText("nav.marketplace") : getDeptLabel(departments.find((department) => department.id === sidebarDept) ?? departments[0], locale, animals, taxonomyText), onRemove: () => chooseSidebarDept(null) }] : []),
     ...[...selectedRoles].map((role) => ({ id: `role-${role}`, label: taxonomyLabel(occupationById(role)?.label ?? role, uiText), onRemove: () => removeRole(role) })),
@@ -478,7 +480,7 @@ function CreatorsInner({
       {near && <p className="site-container text-xs text-text-muted py-2">{uiText("Genie.radiusHint")}</p>}
       <FloatingMapToggle mapActive={viewMode === "map"} onToggle={() => { setViewMode(viewMode === "map" ? "list" : "map"); requestAnimationFrame(() => resultsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" })); }} />
 
-      <MobileBrowseControls nativeCategory={{label:uiText("BrowseFilters.crew"),value:isProviderFilter(sidebarDept)?"":sidebarDept??"",options:activeDepts.map(dept => ({value:dept.id,label:getDeptLabel(dept,locale,animals,taxonomyText)})),onChange:value => {setSelectedRoles(new Set());chooseSidebarDept(value||null);}}} nativePlaceFilters={<NativeBrowsePlaceFilters rows={allCreators} value={{country:countryFilter,region:regionFilter,city:cityFilter || near?.id || ""}} onChange={value => {geography.setEnabled(false);changePlaceFilters(value);setNear(null);}} radius={near ? {...near,city:near.id,km:near.radius} : null} onRadiusChange={value => {setNear(value ? {id:value.city,name:cityOptions.find(row => row.value === value.city)?.label ?? value.city,lat:value.lat,lng:value.lng,radius:value.km} : null); if(value)setCityFilter("");else if(near?.id)setCityFilter(near.id);}} />} nativeFilterArea="crew" placeFilters={<PlaceFilters rows={allCreators} value={{country:countryFilter,region:regionFilter,city:cityFilter}} onChange={value => { geography.setEnabled(false); changePlaceFilters(value); }} />} nativeCategoryKind="departments" preference={<BrowseGeography geography={geography} />}
+      <MobileBrowseControls nativeCategory={{label:uiText("BrowseFilters.crew"),value:isProviderFilter(sidebarDept)?"":sidebarDept??"",options:activeDepts.map(dept => ({value:dept.id,label:getDeptLabel(dept,locale,animals,taxonomyText)})),onChange:value => {setSelectedRoles(new Set());chooseSidebarDept(value||null);}}} nativePlaceFilters={<NativeBrowsePlaceFilters area="crew" rows={allCreators} value={{country:countryFilter,region:regionFilter,city:cityFilter || near?.id || ""}} onChange={value => {geography.setEnabled(false);changePlaceFilters(value);setNear(null);}} radius={near ? {...near,city:near.id,km:near.radius} : null} onRadiusChange={value => {setNear(value ? {id:value.city,name:cityLabel(value.city),lat:value.lat,lng:value.lng,radius:value.km} : null); if(value)setCityFilter("");else if(near?.id)setCityFilter(near.id);}} />} nativeFilterArea="crew" placeFilters={<PlaceFilters rows={allCreators} value={{country:countryFilter,region:regionFilter,city:cityFilter}} onChange={value => { geography.setEnabled(false); changePlaceFilters(value); }} />} nativeCategoryKind="departments" preference={<BrowseGeography geography={geography} />}
         query={query}
         onQueryChange={setQuery}
         searchPlaceholder={t("searchPlaceholder")}

@@ -14201,5 +14201,20 @@
     "compact": "Liten profilbild",
     "portrait": "Stort porträtt",
     "cover": "Omslag + profilbild"
+  },
+  "PlaceSearch": {
+    "cityOrPlace": "Stad eller plats",
+    "placeholder": "Sök efter en plats",
+    "countryOptional": "Land (valfritt)",
+    "radiusOptional": "Radie (valfritt)",
+    "clear": "Rensa platsval",
+    "loadingSelection": "Läser in sparad plats…",
+    "selectionUnavailable": "Den sparade platsen är inte tillgänglig. Välj platsen igen eller rensa valet.",
+    "unavailable": "Platssökning är inte tillgänglig just nu.",
+    "countryUnavailable": "Landval är inte tillgängliga just nu. Platssökningen fungerar fortfarande.",
+    "countrySelected": "Aktivt landfilter: {country}",
+    "selectSuggestion": "Välj en plats bland förslagen.",
+    "noMatches": "Inga matchande platser hittades.",
+    "radiusUnavailable": "Radie är inte tillgänglig för den här platsen."
   }
 }

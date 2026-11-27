@@ -14201,5 +14201,20 @@
     "compact": "Kleine profielfoto",
     "portrait": "Groot portret",
     "cover": "Omslag + profielfoto"
+  },
+  "PlaceSearch": {
+    "cityOrPlace": "Stad of plaats",
+    "placeholder": "Plaats zoeken",
+    "countryOptional": "Land (optioneel)",
+    "radiusOptional": "Straal (optioneel)",
+    "clear": "Plaatsselectie wissen",
+    "loadingSelection": "Opgeslagen plaats laden…",
+    "selectionUnavailable": "Opgeslagen plaats niet beschikbaar. Selecteer de plaats opnieuw of wis de selectie.",
+    "unavailable": "Plaatsen zoeken is momenteel niet beschikbaar.",
+    "countryUnavailable": "Landkeuzes zijn momenteel niet beschikbaar. Plaatsen zoeken werkt nog steeds.",
+    "countrySelected": "Actief landfilter: {country}",
+    "selectSuggestion": "Selecteer een plaats uit de suggesties.",
+    "noMatches": "Geen overeenkomende plaatsen gevonden.",
+    "radiusUnavailable": "Voor deze plaats is geen straal beschikbaar."
   }
 }

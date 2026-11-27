@@ -14201,5 +14201,20 @@
     "compact": "小头像",
     "portrait": "大幅肖像",
     "cover": "封面 + 头像"
+  },
+  "PlaceSearch": {
+    "cityOrPlace": "城市或地点",
+    "placeholder": "搜索地点",
+    "countryOptional": "国家（可选）",
+    "radiusOptional": "半径（可选）",
+    "clear": "清除地点选择",
+    "loadingSelection": "正在加载已保存的地点…",
+    "selectionUnavailable": "已保存的地点不可用。请重新选择地点或清除选择。",
+    "unavailable": "地点搜索暂时不可用。",
+    "countryUnavailable": "国家选项暂时不可用，地点搜索仍可使用。",
+    "countrySelected": "当前国家筛选：{country}",
+    "selectSuggestion": "请从建议中选择地点。",
+    "noMatches": "未找到匹配的地点。",
+    "radiusUnavailable": "此地点不支持半径筛选。"
   }
 }

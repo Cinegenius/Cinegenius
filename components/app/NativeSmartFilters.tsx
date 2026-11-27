@@ -8,7 +8,7 @@ import NativeBrowseFilterPanel, { NativeFilterChoices, NativeFilterTrigger } fro
 import NativeLocationDetailFilters from "./NativeLocationDetailFilters";
 import NativeMarketplaceFilterChoices from "./NativeMarketplaceFilterChoices";
 import NativeFilterNumber from "./NativeFilterNumber";
-import PlaceField from "@/components/PlaceField";
+import CityPlaceFilter from "@/components/CityPlaceFilter";
 import { currencyOptions } from "@/lib/currency";
 import BrowseSelect from "@/components/BrowseSelect";
 import { departments, getDeptLabel, taxonomyLabel } from "@/lib/departments";
@@ -31,19 +31,15 @@ export default function NativeSmartFilters({ groups, count, busy, failed = false
   const [resetEpoch,setResetEpoch]=useState(0);
   const place = useRef<HTMLButtonElement>(null), more = useRef<HTMLButtonElement>(null);
   const browse: SearchBrowseFilters = filters.browse ?? { version: 1 };
-  const [placeInput, setPlaceInput] = useState<{scope:string;raw:string} | null>(null);
   const update = (patch: Partial<SearchBrowseFilters>) => onChange({ ...filters, browse: { ...browse, ...patch } });
   const location = browse.location ?? {};
   const updateLocation = (patch: NonNullable<SearchBrowseFilters["location"]>) => update({ location: { ...location, ...patch } });
-  const reset = () => { setResetEpoch(value=>value+1);setPlaceInput(null); onChange({ ...filters, hiddenAreas: [], hiddenWishes: [], departments: [], marketplace: [], bounds: null, placeLabel:"", browse: { version: 1 } }); };
+  const reset = () => { setResetEpoch(value=>value+1); onChange({ ...filters, hiddenAreas: [], hiddenWishes: [], departments: [], marketplace: [], bounds: null, placeLabel:"", browse: { version: 1 } }); };
   const choices = (field: "departments" | "marketplace" | "locationTypes" | "companyCategories" | "jobTypes", label: string, options: {value:string;label:string}[]) => <fieldset className="min-w-0"><legend className="sr-only">{label}</legend><NativeFilterChoices label={label} options={options} selected={browse[field] ?? []} onChange={value => update({ [field]: flip(browse[field], value) })} /></fieldset>;
   const locationTypes = [...new Set(["Wohnen","Villa","Studio","Fotostudio","Büro","Industrie","Gastronomie","Natur","Speziallocation",...groups.flatMap(group => group.results.flatMap(result => result.facets?.locationType ? [result.facets.locationType] : [])),...(browse.locationTypes ?? [])])];
   const active = AREAS.filter(area => !filters.hiddenAreas.includes(area));
   const section = (area:typeof AREAS[number],label:string,children:React.ReactNode,filtered:boolean) => <details data-smart-filter-area={area} open={active.length===1||filtered} className="border-b border-border pb-2"><summary className="flex min-h-11 cursor-pointer items-center gap-2 text-sm font-semibold"><span className="min-w-0 flex-1">{t(`areas.${area}`)} · {label}</span><ChevronDown size={16} aria-hidden="true"/></summary>{children}</details>;
   const currentPlace = { country: browse.country ?? "", region: browse.region ?? "", city: browse.city ?? "" };
-  const placeScope = JSON.stringify(currentPlace);
-  const matchedPlace = currentPlace.city ? groups.flatMap(group => group.results).find(result => result.facets?.place?.city === currentPlace.city)?.facets?.place : undefined;
-  const placeValue = placeInput?.scope === placeScope ? placeInput.raw : filters.placeLabel ?? [matchedPlace?.cityName ?? "",matchedPlace?.regionName ?? "",currentPlace.country].join(", ");
   return <>
     <NativeSmartAreas hidden={filters.hiddenAreas} onChange={hiddenAreas => onChange({ ...filters, hiddenAreas })} />
     <NativeBrowseToolbar count={busy || failed ? null : count} countLabel={failed ? t("error") : busy ? t("loading") : t("discovery.loaded", { count })}
@@ -51,10 +47,9 @@ export default function NativeSmartFilters({ groups, count, busy, failed = false
         <NativeFilterTrigger key="place" triggerRef={place} label={ui("BrowseFilters.place")} icon={<MapPin aria-hidden="true" />} active={!!(browse.country || browse.region || browse.city)} open={panel === "place"} onClick={() => setPanel("place")} />,
       ]} moreAction={<button ref={more} type="button" aria-label={t("discovery.filterTitle")} aria-haspopup="dialog" aria-expanded={panel === "more"} onClick={() => setPanel("more")}><SlidersHorizontal size={19} aria-hidden="true" /></button>} viewControls={views} />
     {panel && <NativeBrowseFilterPanel title={panel === "place" ? ui("BrowseFilters.place") : t("discovery.filterTitle")} trigger={panel === "place" ? place : more} onClose={() => setPanel(null)} onReset={reset}>
-      {panel === "place" ? <div className="space-y-3"><PlaceField value={placeValue} selectedCityId={browse.city} onChange={raw => setPlaceInput({scope:placeScope,raw})}
-          onFilterChange={(value,label) => { setPlaceInput({scope:JSON.stringify(value),raw:label});onChange({...filters,placeLabel:label,browse:{...browse,...value,radiusKm:undefined}}); }} />
-          <div className="mobile-filter-field"><label>{ui("locations.radiusLabel")}</label><BrowseSelect label={ui("locations.radiusLabel")} value={browse.radiusKm ? String(browse.radiusKm) : ""} triggerClassName="browse-filter-select" options={[{value:"",label:ui("BrowseFilters.cityOnly")},...[10,25,50,100,200].map(km => ({value:String(km),label:ui("locations.inRadius",{radius:km}),disabled:!browse.city}))]} onChange={value => update({radiusKm:value ? Number(value) : undefined})} /></div><p className="text-xs leading-relaxed text-text-muted">{ui(browse.city ? "BrowseFilters.radiusHint" : "BrowseFilters.chooseCity")}</p>
-        </div> : <div className="space-y-4">
+      {panel === "place" ? <CityPlaceFilter surface="smart" key={resetEpoch} areas={active} value={currentPlace} label={filters.placeLabel ?? ""} radiusKm={browse.radiusKm ?? null}
+        onChange={(value,label) => onChange({...filters,bounds:null,placeLabel:label,browse:{...browse,...value,radiusKm:undefined}})}
+        onRadiusChange={km => onChange({...filters,bounds:null,browse:{...browse,radiusKm:km??undefined}})} /> : <div className="space-y-4">
           {active.includes("crew") && section("crew",ui("BrowseFilters.crew"),choices("departments",ui("BrowseFilters.crew"),departments.map(dept => ({value:dept.id,label:getDeptLabel(dept,locale,undefined,taxonomy)}))),!!browse.departments?.length)}
           {active.includes("marketplace") && section("marketplace",ui("BrowseFilters.marketplace"),<fieldset><legend className="sr-only">{ui("BrowseFilters.marketplace")}</legend><NativeMarketplaceFilterChoices
             options={DEPARTMENTS.map(dept => ({value:dept.id,label:ui.has(`MarketplaceCatalog.categories.${dept.id}`)?ui(`MarketplaceCatalog.categories.${dept.id}`):taxonomyLabel(dept.label,ui)}))}

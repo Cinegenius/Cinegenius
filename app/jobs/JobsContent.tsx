@@ -1,4 +1,5 @@
 "use client";
+import { useDiscoveryPlaceLabels } from "@/lib/use-discovery-place-labels";
 import NativeBrowsePlaceFilters from "@/components/app/NativeBrowsePlaceFilters";
 import DirectoryMap from "@/components/DirectoryMap";
 import DirectoryResults from "@/components/DirectoryResults";
@@ -53,6 +54,7 @@ function JobsInner({ serverJobs }: { serverJobs: Job[] }) {
   const [cityText, setCityText] = useViewState("jobs.cityText", () => params.get("cityText") ?? "");
   const [countryFilter, setCountryFilter] = useViewState("jobs.countryFilter", () => params.get("country") ?? "");
   const [regionFilter, setRegionFilter] = useViewState("jobs.regionFilter", () => params.get("region") ?? "");
+  const placeLabels = useDiscoveryPlaceLabels(cityFilter);
   const [sortKey, setSortKey] = useViewState("jobs.sortKey", () => params.get("sort") ?? "newest");
   const [pagination, setPagination] = useViewState("jobs.pagination", { filterKey: "", visibleCount: PAGE_SIZE });
   const geography = useBrowseGeography(sortKey === "newest" && !countryFilter && !regionFilter && !cityFilter && !cityText);
@@ -104,7 +106,7 @@ function JobsInner({ serverJobs }: { serverJobs: Job[] }) {
     ...(jobTypeFilter !== "alle" ? [{ id: "employment", label: employments.find(row => row.value === jobTypeFilter)?.label ?? jobTypeFilter, onRemove: () => setJobTypeFilter("alle") }] : []),
     ...(urgentOnly ? [{ id: "urgent", label: t("filterUrgentLabel"), onRemove: () => setUrgentOnly(false) }] : []),
     ...(cityText ? [{ id: "cityText", label: cityText, onRemove: () => setCityText("") }] : []),
-    ...(["country", "region", "city"] as const).flatMap(kind => { const value = { country: countryFilter, region: regionFilter, city: cityFilter }[kind]; return value ? [{ id: kind, label: value === UNASSIGNED_COUNTRY ? ui("Places.countryUnassigned") : kind === "country" ? (ui.has(`CountryNames.${value}`) ? ui(`CountryNames.${value}`) : value) : placeOptions(allJobs, kind, locale).find(row => row.value === value)?.label ?? value, onRemove: () => kind === "country" ? updatePlaceFilters({ country: "", region: "", city: "" }) : kind === "region" ? updatePlaceFilters({ country: countryFilter, region: "", city: "" }) : setCityFilter("") }] : []; }),
+    ...(["country", "region", "city"] as const).flatMap(kind => { const value = { country: countryFilter, region: regionFilter, city: cityFilter }[kind]; return value ? [{ id: kind, label: value === UNASSIGNED_COUNTRY ? ui("Places.countryUnassigned") : placeLabels(kind, value, kind === "country" ? (ui.has(`CountryNames.${value}`) ? ui(`CountryNames.${value}`) : value) : placeOptions(allJobs, kind, locale).find(row => row.value === value)?.label ?? value), onRemove: () => kind === "country" ? updatePlaceFilters({ country: "", region: "", city: "" }) : kind === "region" ? updatePlaceFilters({ country: countryFilter, region: "", city: "" }) : setCityFilter("") }] : []; }),
   ];
   const fields = [{ label: copy("role"), value: selectedRoleId ?? "", onChange: (value: string) => setSelectedRoleId(value || null), options: roles },
     { label: t("filterProjectType"), value: activeType, onChange: setActiveType, options: types },
@@ -139,7 +141,7 @@ function JobsInner({ serverJobs }: { serverJobs: Job[] }) {
 
   return <main className="min-h-screen mobile-bottom-nav-clear">
     <PageHeader withBackdrop={false} badge={t("heroBadge")} title={t("heroTitle")} titleHighlight={t("heroTitleHighlight")} description={copy("intro")} cta={{ label: t("postJobBtn"), href: "/inserat?group=jobs" }} />
-    <MobileBrowseControls nativeMoreCategory nativeViewControls={<DirectoryViewControls value={nativeView} onChange={setNativeView} />} nativePlaceFilters={<NativeBrowsePlaceFilters rows={allJobs} value={{country:countryFilter,region:regionFilter,city:cityFilter}} onChange={value => {geography.setEnabled(false);updatePlaceFilters(value);}} radius={radius} onRadiusChange={setRadius} />} nativeFilterArea="jobs" placeFilters={placeFields} nativeCategory={{label:ui("BrowseFilters.jobs"),value:jobTypeFilter === "alle" ? "" : jobTypeFilter,options:employments,onChange:value => setJobTypeFilter(value || "alle")}} nativeCategoryKind="departments" preference={<BrowseGeography geography={geography} />} query={query} onQueryChange={setQuery} searchPlaceholder={t("searchPlaceholder")} sortValue={sortKey} sortOptions={sorts} onSortChange={value => { geography.setEnabled(false); setSortKey(value); }}
+    <MobileBrowseControls nativeMoreCategory nativeViewControls={<DirectoryViewControls value={nativeView} onChange={setNativeView} />} nativePlaceFilters={<NativeBrowsePlaceFilters area="jobs" rows={allJobs} value={{country:countryFilter,region:regionFilter,city:cityFilter}} onChange={value => {geography.setEnabled(false);updatePlaceFilters(value);}} radius={radius} onRadiusChange={setRadius} />} nativeFilterArea="jobs" placeFilters={placeFields} nativeCategory={{label:ui("BrowseFilters.jobs"),value:jobTypeFilter === "alle" ? "" : jobTypeFilter,options:employments,onChange:value => setJobTypeFilter(value || "alle")}} nativeCategoryKind="departments" preference={<BrowseGeography geography={geography} />} query={query} onQueryChange={setQuery} searchPlaceholder={t("searchPlaceholder")} sortValue={sortKey} sortOptions={sorts} onSortChange={value => { geography.setEnabled(false); setSortKey(value); }}
       categoryLabel={t("filterDeptRole")} allCategoryLabel={ui("Ui.text_bc0b501bb3186b")} categories={departments} categoryValue={selectedDeptId ?? ""} onCategoryChange={changeDepartment}
       resultCount={filtered.length} resultSummary={t("results", { count: filtered.length })} filterCount={chips.length} chips={chips} onReset={clearAll} resetLabel={t("emptyReset")} showResultsLabel={t("results", { count: filtered.length })}>
 

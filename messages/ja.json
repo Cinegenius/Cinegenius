@@ -14201,5 +14201,20 @@
     "compact": "小さなプロフィール写真",
     "portrait": "大きなポートレート",
     "cover": "カバー＋プロフィール写真"
+  },
+  "PlaceSearch": {
+    "cityOrPlace": "都市または場所",
+    "placeholder": "場所を検索",
+    "countryOptional": "国（任意）",
+    "radiusOptional": "半径（任意）",
+    "clear": "場所の選択を解除",
+    "loadingSelection": "保存した場所を読み込み中…",
+    "selectionUnavailable": "保存した場所を利用できません。もう一度選択するか、選択を解除してください。",
+    "unavailable": "現在、場所を検索できません。",
+    "countryUnavailable": "現在、国を選択できません。場所の検索は引き続き利用できます。",
+    "countrySelected": "現在の国フィルター：{country}",
+    "selectSuggestion": "候補から場所を選択してください。",
+    "noMatches": "一致する場所が見つかりませんでした。",
+    "radiusUnavailable": "この場所では半径を指定できません。"
   }
 }

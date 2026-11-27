@@ -14201,5 +14201,20 @@
     "compact": "Small profile photo",
     "portrait": "Large portrait",
     "cover": "Cover + profile photo"
+  },
+  "PlaceSearch": {
+    "cityOrPlace": "City or place",
+    "placeholder": "Search for a place",
+    "countryOptional": "Country (optional)",
+    "radiusOptional": "Radius (optional)",
+    "clear": "Clear place selection",
+    "loadingSelection": "Loading saved place…",
+    "selectionUnavailable": "Saved place unavailable. Select the place again or clear the selection.",
+    "unavailable": "Place search is currently unavailable.",
+    "countryUnavailable": "Country choices are currently unavailable. Place search still works.",
+    "countrySelected": "Active country filter: {country}",
+    "selectSuggestion": "Select a place from the suggestions.",
+    "noMatches": "No matching places found.",
+    "radiusUnavailable": "Radius is unavailable for this place."
   }
 }

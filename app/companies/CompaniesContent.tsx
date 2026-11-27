@@ -1,4 +1,5 @@
 "use client";
+import { useDiscoveryPlaceLabels } from "@/lib/use-discovery-place-labels";
 import NativeBrowsePlaceFilters from "@/components/app/NativeBrowsePlaceFilters";
 import { matchesBrowsePlace } from "@/lib/browse-radius";
 import { useNativeBrowseRadius } from "@/lib/use-native-browse-radius";
@@ -85,9 +86,10 @@ export default function CompaniesContent({ initialCompanies }: { initialCompanie
   const regionOptions = useMemo(() => placeOptions(initialCompanies, "region", locale), [initialCompanies,locale]);
 
 
-  const cityLabel = (value: string) => cityOptions.find(o => o.value === value)?.label ?? value;
-  const countryLabel = (value: string) => value === UNASSIGNED_COUNTRY ? uiText("Places.countryUnassigned") : countryOptions.find(o => o.value === value)?.label ?? value;
-  const regionLabel = (value: string) => regionOptions.find(option => option.value === value)?.label ?? value;
+  const placeLabels = useDiscoveryPlaceLabels(cityFilter);
+  const cityLabel = (value: string) => placeLabels("city", value, cityOptions.find(o => o.value === value)?.label ?? value);
+  const countryLabel = (value: string) => value === UNASSIGNED_COUNTRY ? uiText("Places.countryUnassigned") : placeLabels("country", value, countryOptions.find(o => o.value === value)?.label ?? value);
+  const regionLabel = (value: string) => placeLabels("region", value, regionOptions.find(option => option.value === value)?.label ?? value);
 
   const filtered = useMemo(() => {
     let result = initialCompanies;
@@ -150,7 +152,7 @@ export default function CompaniesContent({ initialCompanies }: { initialCompanie
         setViewMode(viewMode === "map" ? "list" : "map");
         requestAnimationFrame(() => resultsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }));
       }} />
-      <MobileBrowseControls nativePlaceFilters={<NativeBrowsePlaceFilters rows={initialCompanies} value={{country:countryFilter,region:regionFilter,city:cityFilter}} onChange={value => {geography.setEnabled(false);setCountryFilter(value.country);setRegionFilter(value.region);setCityFilter(value.city);}} radius={radius} onRadiusChange={setRadius} />} nativeFilterArea="companies" placeFilters={<PlaceFilters rows={initialCompanies} value={{country:countryFilter,region:regionFilter,city:cityFilter}} onChange={value => {geography.setEnabled(false);setCountryFilter(value.country);setRegionFilter(value.region);setCityFilter(value.city);}} />} preference={<BrowseGeography geography={geography} />}
+      <MobileBrowseControls nativePlaceFilters={<NativeBrowsePlaceFilters area="companies" rows={initialCompanies} value={{country:countryFilter,region:regionFilter,city:cityFilter}} onChange={value => {geography.setEnabled(false);setCountryFilter(value.country);setRegionFilter(value.region);setCityFilter(value.city);}} radius={radius} onRadiusChange={setRadius} />} nativeFilterArea="companies" placeFilters={<PlaceFilters rows={initialCompanies} value={{country:countryFilter,region:regionFilter,city:cityFilter}} onChange={value => {geography.setEnabled(false);setCountryFilter(value.country);setRegionFilter(value.region);setCityFilter(value.city);}} />} preference={<BrowseGeography geography={geography} />}
         query={search}
         onQueryChange={setSearch}
         searchPlaceholder={t("searchPlaceholder")}

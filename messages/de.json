@@ -14201,5 +14201,20 @@
     "compact": "Kleines Profilbild",
     "portrait": "Großes Porträt",
     "cover": "Cover + Profilbild"
+  },
+  "PlaceSearch": {
+    "cityOrPlace": "Stadt oder Ort",
+    "placeholder": "Ort suchen",
+    "countryOptional": "Land (optional)",
+    "radiusOptional": "Umkreis (optional)",
+    "clear": "Ortsauswahl löschen",
+    "loadingSelection": "Gespeicherten Ort laden …",
+    "selectionUnavailable": "Gespeicherte Ortsauswahl nicht verfügbar. Wähle den Ort erneut oder lösche die Auswahl.",
+    "unavailable": "Ortssuche gerade nicht verfügbar.",
+    "countryUnavailable": "Länderauswahl gerade nicht verfügbar. Die Ortssuche funktioniert weiterhin.",
+    "countrySelected": "Aktiver Länderfilter: {country}",
+    "selectSuggestion": "Wähle einen Ort aus den Vorschlägen.",
+    "noMatches": "Keine passenden Orte gefunden.",
+    "radiusUnavailable": "Für diesen Ort ist kein Umkreis verfügbar."
   }
 }

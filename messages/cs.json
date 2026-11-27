@@ -14201,5 +14201,20 @@
     "compact": "Malá profilová fotka",
     "portrait": "Velký portrét",
     "cover": "Úvodní + profilová fotka"
+  },
+  "PlaceSearch": {
+    "cityOrPlace": "Město nebo místo",
+    "placeholder": "Hledat místo",
+    "countryOptional": "Země (volitelné)",
+    "radiusOptional": "Okruh (volitelné)",
+    "clear": "Vymazat výběr místa",
+    "loadingSelection": "Načítání uloženého místa…",
+    "selectionUnavailable": "Uložené místo není dostupné. Vyberte je znovu nebo výběr vymažte.",
+    "unavailable": "Vyhledávání míst nyní není dostupné.",
+    "countryUnavailable": "Výběr zemí nyní není dostupný. Vyhledávání míst nadále funguje.",
+    "countrySelected": "Aktivní filtr země: {country}",
+    "selectSuggestion": "Vyberte místo z návrhů.",
+    "noMatches": "Žádná odpovídající místa nebyla nalezena.",
+    "radiusUnavailable": "Pro toto místo není okruh dostupný."
   }
 }

@@ -14201,5 +14201,20 @@
     "compact": "Foto de perfil pequena",
     "portrait": "Retrato grande",
     "cover": "Capa + foto de perfil"
+  },
+  "PlaceSearch": {
+    "cityOrPlace": "Cidade ou local",
+    "placeholder": "Procurar um local",
+    "countryOptional": "País (opcional)",
+    "radiusOptional": "Raio (opcional)",
+    "clear": "Limpar seleção do local",
+    "loadingSelection": "A carregar o local guardado…",
+    "selectionUnavailable": "O local guardado não está disponível. Selecione-o novamente ou limpe a seleção.",
+    "unavailable": "A pesquisa de locais está indisponível de momento.",
+    "countryUnavailable": "A seleção de países está indisponível de momento. A pesquisa de locais continua a funcionar.",
+    "countrySelected": "Filtro de país ativo: {country}",
+    "selectSuggestion": "Selecione um local nas sugestões.",
+    "noMatches": "Não foram encontrados locais correspondentes.",
+    "radiusUnavailable": "O raio não está disponível para este local."
   }
 }
