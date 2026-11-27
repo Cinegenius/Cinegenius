@@ -112,18 +112,17 @@
 
 :global(html[data-cg-native-community-appearance="app"]) .surface :global([data-native-inbox-contacts]) { padding-bottom:calc(12px + var(--cg-app-genie-clearance,0px)); }
 
-/* Approved directory cards keep the website's opaque surface over every app
-   canvas. Scope both the native shell and its existing result structures so
-   public website cards and detail galleries retain their own presentation. */
+/* App cards share Work's material. Ordinary website cards, photos and detail
+   galleries retain their presentation; reduced transparency uses a solid tint. */
 :global(html[data-cg-native-community-appearance="app"]) .surface[data-native-app-surface="v1"] {
-  --native-directory-card-bg:#161a23; --native-directory-card-border:#2a3248;
-  --native-directory-card-photo:#1e2330; --native-directory-card-primary:#0e1016;
-  --native-directory-card-title:#f0f2f5; --native-directory-card-muted:#8995a8;
+  --native-directory-card-bg:var(--cg-app-material-fill,#485365); --native-directory-card-border:var(--cg-app-border,rgb(255 255 255 / 20%));
+  --native-directory-card-photo:var(--cg-app-surface-raised,#566176); --native-directory-card-primary:var(--cg-app-material-fill,#485365);
+  --native-directory-card-title:#f0f2f5; --native-directory-card-muted:var(--cg-app-muted,#d3d8e1);
   --native-directory-card-accent:#c2f135;
 }
 :global(html[data-cg-native-community-appearance="app"][data-cg-app-theme="pure"]) .surface[data-native-app-surface="v1"] {
-  --native-directory-card-bg:#fdfbf5; --native-directory-card-border:#ded8ce;
-  --native-directory-card-photo:#fffefa; --native-directory-card-primary:#f7f3ea;
+  --native-directory-card-bg:var(--cg-app-material-fill,#f3f5f1); --native-directory-card-border:var(--cg-app-border,#ded8ce);
+  --native-directory-card-photo:var(--cg-app-surface-raised,#fff); --native-directory-card-primary:var(--cg-app-material-fill,#f3f5f1);
   --native-directory-card-title:#0c1008; --native-directory-card-muted:#78756e;
   --native-directory-card-accent:#5b7a18;
 }
@@ -143,10 +142,9 @@
 }
 :global(html[data-cg-native-community-appearance="app"]) .surface[data-native-app-surface="v1"] :global(:is(.directory-cards > .directory-entry,.directory-list > .directory-entry,[data-native-crew-directory-card])) {
   min-width:0; color:var(--native-directory-card-title);
-  background:var(--native-directory-card-bg) !important;
+  background:var(--cg-app-material-highlight),var(--native-directory-card-bg) !important;
   border-color:var(--native-directory-card-border) !important;
-  opacity:1; box-shadow:none;
-  -webkit-backdrop-filter:none !important; backdrop-filter:none !important;
+  opacity:1; box-shadow:var(--cg-app-material-shadow);
 }
 :global(html[data-cg-native-community-appearance="app"]) .surface[data-native-app-surface="v1"] :global(.directory-cards > .directory-entry) {
   display:flex; flex-direction:column; align-self:stretch; height:100%;
@@ -165,7 +163,7 @@
 }
 :global(html[data-cg-native-community-appearance="app"]) .surface[data-native-app-surface="v1"] :global(.directory-cards .directory-entry-body) {
   display:flex; flex:1; flex-direction:column; gap:4px; min-width:0;
-  padding:10px; background:var(--native-directory-card-bg);
+  padding:10px; background:transparent;
 }
 :global(html[data-cg-native-community-appearance="app"]) .surface[data-native-app-surface="v1"] :global(:is(.directory-cards,.directory-list) .directory-entry-title) {
   display:-webkit-box; -webkit-box-orient:vertical; -webkit-line-clamp:2; line-clamp:2;
@@ -234,7 +232,7 @@
    existing separate permission checks and touch targets. */
 :global(html[data-cg-native-community-appearance="app"]) .surface[data-native-app-surface="v1"] :global(:is(.directory-list,div:has(> [data-native-crew-directory-card="row"]))) {
   min-width:0; overflow:hidden; border:1px solid var(--native-directory-card-border);
-  border-radius:12px !important; background:var(--native-directory-card-bg) !important;
+  border-radius:12px !important; background:var(--cg-app-material-highlight),var(--native-directory-card-bg) !important;
 }
 :global(html[data-cg-native-community-appearance="app"]) .surface[data-native-app-surface="v1"] :global(.directory-list > .directory-entry) {
   display:flex; align-items:center; gap:4px; padding:10px 12px;

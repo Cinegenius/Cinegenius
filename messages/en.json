@@ -12829,7 +12829,10 @@
     "removeAttachment": "Remove {name}",
     "openAttachment": "Open {name}",
     "attachmentPreview": "Attachment",
-    "loadMoreConversations": "Load more"
+    "loadMoreConversations": "Load more",
+    "newChat": "New chat",
+    "next": "Next",
+    "back": "Back"
   },
   "directoryMap": {
     "crew": "Crew on the map",
@@ -14042,7 +14045,19 @@
     "linkHelp": "Choose a team you already belong to. It is linked to this local team only when you select “Connect”.",
     "linkAction": "Connect",
     "connecting": "Connecting …",
-    "joinRestricted": "Joining is not allowed"
+    "joinRestricted": "Joining is not allowed",
+    "teamsLabel": "Teams",
+    "chooseContacts": "Choose contacts",
+    "chooseContactsHelp": "Choose whom to invite to your team.",
+    "teamDetails": "Name your team",
+    "next": "Next",
+    "invitationNote": "Selected people receive a team invitation and choose whether to join.",
+    "teamCreatedContinue": "Your team is created. You can continue any remaining invitations here.",
+    "openCreatedTeam": "Open team, continue later",
+    "teamNavigation": "Team sections",
+    "chats": "Chats",
+    "files": "Files",
+    "filesPending": "Shared file storage is not enabled yet. Files on your device are preserved."
   },
   "WorkMail": {
     "title": "Mail in Work",

@@ -12829,7 +12829,10 @@
     "removeAttachment": "Удалить {name}",
     "openAttachment": "Открыть {name}",
     "attachmentPreview": "Вложение",
-    "loadMoreConversations": "Загрузить ещё"
+    "loadMoreConversations": "Загрузить ещё",
+    "newChat": "Новый чат",
+    "next": "Далее",
+    "back": "Назад"
   },
   "directoryMap": {
     "crew": "Команда на карте",
@@ -14042,7 +14045,19 @@
     "linkHelp": "Выбери команду, в которой уже состоишь. Она будет связана с этой локальной командой только после нажатия «Связать».",
     "linkAction": "Связать",
     "connecting": "Связывание …",
-    "joinRestricted": "Вступление не разрешено"
+    "joinRestricted": "Вступление не разрешено",
+    "teamsLabel": "Команды",
+    "chooseContacts": "Выбрать контакты",
+    "chooseContactsHelp": "Выбери, кого пригласить в команду.",
+    "teamDetails": "Название команды",
+    "next": "Далее",
+    "invitationNote": "Выбранные люди получат приглашение и сами решат, вступать ли в команду.",
+    "teamCreatedContinue": "Команда создана. Здесь можно продолжить отправку оставшихся приглашений.",
+    "openCreatedTeam": "Открыть команду, продолжить позже",
+    "teamNavigation": "Разделы команды",
+    "chats": "Чаты",
+    "files": "Файлы",
+    "filesPending": "Общее хранилище файлов пока не включено. Файлы на устройстве сохраняются."
   },
   "WorkMail": {
     "title": "Почта в Work",

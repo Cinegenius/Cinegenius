@@ -12829,7 +12829,10 @@
     "removeAttachment": "{name} verwijderen",
     "openAttachment": "{name} openen",
     "attachmentPreview": "Bijlage",
-    "loadMoreConversations": "Meer laden"
+    "loadMoreConversations": "Meer laden",
+    "newChat": "Nieuwe chat",
+    "next": "Volgende",
+    "back": "Terug"
   },
   "directoryMap": {
     "crew": "Crew op de kaart",
@@ -14042,7 +14045,19 @@
     "linkHelp": "Kies een team waarvan je al lid bent. Het wordt pas aan dit lokale team gekoppeld als je ‘Verbinden’ kiest.",
     "linkAction": "Verbinden",
     "connecting": "Verbinden …",
-    "joinRestricted": "Deelnemen is niet toegestaan"
+    "joinRestricted": "Deelnemen is niet toegestaan",
+    "teamsLabel": "Teams",
+    "chooseContacts": "Contacten kiezen",
+    "chooseContactsHelp": "Kies wie je voor je team wilt uitnodigen.",
+    "teamDetails": "Geef je team een naam",
+    "next": "Volgende",
+    "invitationNote": "De gekozen personen krijgen een teamuitnodiging en bepalen zelf of ze deelnemen.",
+    "teamCreatedContinue": "Je team is aangemaakt. Je kunt hier doorgaan met de resterende uitnodigingen.",
+    "openCreatedTeam": "Team openen, later doorgaan",
+    "teamNavigation": "Teamonderdelen",
+    "chats": "Chats",
+    "files": "Bestanden",
+    "filesPending": "Gedeelde bestandsopslag is nog niet ingeschakeld. Bestanden op je apparaat blijven behouden."
   },
   "WorkMail": {
     "title": "E-mail in Work",

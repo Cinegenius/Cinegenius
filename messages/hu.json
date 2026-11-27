@@ -12829,7 +12829,10 @@
     "removeAttachment": "{name} eltávolítása",
     "openAttachment": "{name} megnyitása",
     "attachmentPreview": "Melléklet",
-    "loadMoreConversations": "Továbbiak betöltése"
+    "loadMoreConversations": "Továbbiak betöltése",
+    "newChat": "Új csevegés",
+    "next": "Tovább",
+    "back": "Vissza"
   },
   "directoryMap": {
     "crew": "Stáb a térképen",
@@ -14042,7 +14045,19 @@
     "linkHelp": "Válassz egy csapatot, amelynek már tagja vagy. Csak az „Összekapcsolás” választásával kapcsolódik ehhez a helyi csapathoz.",
     "linkAction": "Összekapcsolás",
     "connecting": "Összekapcsolás …",
-    "joinRestricted": "A csatlakozás nem engedélyezett"
+    "joinRestricted": "A csatlakozás nem engedélyezett",
+    "teamsLabel": "Csapatok",
+    "chooseContacts": "Kapcsolatok kiválasztása",
+    "chooseContactsHelp": "Válaszd ki, kit szeretnél meghívni a csapatba.",
+    "teamDetails": "Csapat elnevezése",
+    "next": "Tovább",
+    "invitationNote": "A kiválasztott személyek csapatmeghívót kapnak, és maguk döntenek a csatlakozásról.",
+    "teamCreatedContinue": "A csapatod létrejött. A fennmaradó meghívások küldését itt folytathatod.",
+    "openCreatedTeam": "Csapat megnyitása, folytatás később",
+    "teamNavigation": "Csapatrészek",
+    "chats": "Csevegések",
+    "files": "Fájlok",
+    "filesPending": "A közös fájltár még nem aktív. Az eszközödön lévő fájlok megmaradnak."
   },
   "WorkMail": {
     "title": "E-mail a Workben",

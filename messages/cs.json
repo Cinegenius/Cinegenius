@@ -12829,7 +12829,10 @@
     "removeAttachment": "Odebrat {name}",
     "openAttachment": "Otevřít {name}",
     "attachmentPreview": "Příloha",
-    "loadMoreConversations": "Načíst další"
+    "loadMoreConversations": "Načíst další",
+    "newChat": "Nový chat",
+    "next": "Další",
+    "back": "Zpět"
   },
   "directoryMap": {
     "crew": "Štáb na mapě",
@@ -14042,7 +14045,19 @@
     "linkHelp": "Vyber tým, jehož členem již jsi. S tímto místním týmem se propojí až po volbě „Propojit“.",
     "linkAction": "Propojit",
     "connecting": "Propojování …",
-    "joinRestricted": "Připojení není povoleno"
+    "joinRestricted": "Připojení není povoleno",
+    "teamsLabel": "Týmy",
+    "chooseContacts": "Vybrat kontakty",
+    "chooseContactsHelp": "Vyber, koho chceš pozvat do týmu.",
+    "teamDetails": "Pojmenovat tým",
+    "next": "Další",
+    "invitationNote": "Vybraní lidé dostanou pozvánku do týmu a sami se rozhodnou, zda se připojí.",
+    "teamCreatedContinue": "Tvůj tým je vytvořen. Zde můžeš pokračovat v odesílání zbývajících pozvánek.",
+    "openCreatedTeam": "Otevřít tým, pokračovat později",
+    "teamNavigation": "Sekce týmu",
+    "chats": "Chaty",
+    "files": "Soubory",
+    "filesPending": "Sdílené úložiště souborů zatím není aktivní. Soubory v zařízení zůstanou zachovány."
   },
   "WorkMail": {
     "title": "E-mail ve Work",

@@ -12829,7 +12829,10 @@
     "removeAttachment": "Usuń {name}",
     "openAttachment": "Otwórz {name}",
     "attachmentPreview": "Załącznik",
-    "loadMoreConversations": "Wczytaj więcej"
+    "loadMoreConversations": "Wczytaj więcej",
+    "newChat": "Nowy czat",
+    "next": "Dalej",
+    "back": "Wstecz"
   },
   "directoryMap": {
     "crew": "Ekipa na mapie",
@@ -14042,7 +14045,19 @@
     "linkHelp": "Wybierz zespół, do którego już należysz. Zostanie powiązany z tym lokalnym zespołem dopiero po wybraniu „Połącz”.",
     "linkAction": "Połącz",
     "connecting": "Łączenie …",
-    "joinRestricted": "Dołączenie jest niedozwolone"
+    "joinRestricted": "Dołączenie jest niedozwolone",
+    "teamsLabel": "Zespoły",
+    "chooseContacts": "Wybierz kontakty",
+    "chooseContactsHelp": "Wybierz osoby, które chcesz zaprosić do zespołu.",
+    "teamDetails": "Nazwij zespół",
+    "next": "Dalej",
+    "invitationNote": "Wybrane osoby otrzymają zaproszenie i same zdecydują, czy dołączyć do zespołu.",
+    "teamCreatedContinue": "Twój zespół został utworzony. Tutaj możesz kontynuować wysyłanie pozostałych zaproszeń.",
+    "openCreatedTeam": "Otwórz zespół, kontynuuj później",
+    "teamNavigation": "Sekcje zespołu",
+    "chats": "Czaty",
+    "files": "Pliki",
+    "filesPending": "Wspólne przechowywanie plików nie jest jeszcze włączone. Pliki na urządzeniu pozostają zachowane."
   },
   "WorkMail": {
     "title": "Poczta w Work",

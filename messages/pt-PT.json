@@ -12829,7 +12829,10 @@
     "removeAttachment": "Remover {name}",
     "openAttachment": "Abrir {name}",
     "attachmentPreview": "Anexo",
-    "loadMoreConversations": "Carregar mais"
+    "loadMoreConversations": "Carregar mais",
+    "newChat": "Nova conversa",
+    "next": "Seguinte",
+    "back": "Voltar"
   },
   "directoryMap": {
     "crew": "Equipa no mapa",
@@ -14042,7 +14045,19 @@
     "linkHelp": "Escolhe uma equipa à qual já pertences. Só será associada a esta equipa local quando selecionares «Associar».",
     "linkAction": "Associar",
     "connecting": "A associar …",
-    "joinRestricted": "Adesão não permitida"
+    "joinRestricted": "Adesão não permitida",
+    "teamsLabel": "Equipas",
+    "chooseContacts": "Escolher contactos",
+    "chooseContactsHelp": "Escolhe quem queres convidar para a equipa.",
+    "teamDetails": "Dar um nome à equipa",
+    "next": "Seguinte",
+    "invitationNote": "As pessoas selecionadas recebem um convite e decidem se querem aderir à equipa.",
+    "teamCreatedContinue": "A tua equipa foi criada. Podes continuar aqui o envio dos convites restantes.",
+    "openCreatedTeam": "Abrir equipa, continuar depois",
+    "teamNavigation": "Secções da equipa",
+    "chats": "Conversas",
+    "files": "Ficheiros",
+    "filesPending": "O armazenamento partilhado ainda não está ativo. Os ficheiros no teu dispositivo são preservados."
   },
   "WorkMail": {
     "title": "Correio no Work",

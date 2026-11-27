@@ -12829,7 +12829,10 @@
     "removeAttachment": "{name}を削除",
     "openAttachment": "{name}を開く",
     "attachmentPreview": "添付ファイル",
-    "loadMoreConversations": "さらに読み込む"
+    "loadMoreConversations": "さらに読み込む",
+    "newChat": "新しいチャット",
+    "next": "次へ",
+    "back": "戻る"
   },
   "directoryMap": {
     "crew": "マップ上のクルー",
@@ -14042,7 +14045,19 @@
     "linkHelp": "すでに参加しているチームを選んでください。「連携」を選択した場合のみ、このローカルチームに関連付けられます。",
     "linkAction": "連携",
     "connecting": "連携中…",
-    "joinRestricted": "参加は許可されていません"
+    "joinRestricted": "参加は許可されていません",
+    "teamsLabel": "チーム",
+    "chooseContacts": "連絡先を選択",
+    "chooseContactsHelp": "チームに招待する相手を選んでください。",
+    "teamDetails": "チーム名を設定",
+    "next": "次へ",
+    "invitationNote": "選択した相手に招待が届き、参加するかどうかを本人が決めます。",
+    "teamCreatedContinue": "チームを作成しました。残りの招待はここで続けられます。",
+    "openCreatedTeam": "チームを開いて後で続ける",
+    "teamNavigation": "チームの項目",
+    "chats": "チャット",
+    "files": "ファイル",
+    "filesPending": "共有ファイルストレージはまだ有効になっていません。端末上のファイルは保持されます。"
   },
   "WorkMail": {
     "title": "Workのメール",

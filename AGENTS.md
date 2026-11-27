@@ -1,3 +1,7 @@
+## Betreiberkorrektur · 27. November 2026 · gleicher App-Look
+
+Markus verlangt ausdrücklich dieselbe CineGenius-Flächengestaltung überall in der App, einschließlich der vier Work-Startkacheln. Die zuvor freigegebenen schwarzen/deckenden Appkarten werden durch den gemeinsamen dezenten Glasstil mit lesbarer Tönung, feinen Konturen und Lime-Akzenten ersetzt. Gewählten Hintergrund und Inhalte erhalten; barrierearmen deckenden Ersatz erhalten. Diese neue Vorgabe gilt für Appflächen; die gewöhnliche Website bleibt erhalten. Team-/Nachrichten-Einstieg: Kontakte zuerst, dann Teamname; Plus für Einzelchat oder Gruppe. Lokale Altarchive erhalten, keine automatische Cloudmigration oder Einladung beim bloßen Öffnen.
+
 ## Aktueller App-Checkpoint · 23. November 2026 · 2212 gebaut, noch nicht installiert
 
 Installiert und im engen Umfang der bisherigen zusätzlichen Kontosperrfrage physisch akzeptiert bleibt **2026112211**. Der danach gemeldete neutrale/leere Work-Zustand ist ein eigener Fall. Seine begrenzte Wiederaufnahme, der freigegebene Grundriss-/Sonneneditor und die Navigation-/Ladekorrekturen liegen im vollständigen signierten **2212-Kandidaten** vor; sie sind damit noch nicht physisch abgenommen oder auf dem iPhone installiert.

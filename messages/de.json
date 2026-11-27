@@ -12829,7 +12829,10 @@
     "removeAttachment": "{name} entfernen",
     "openAttachment": "{name} öffnen",
     "attachmentPreview": "Dateianhang",
-    "loadMoreConversations": "Mehr laden"
+    "loadMoreConversations": "Mehr laden",
+    "newChat": "Neuer Chat",
+    "next": "Weiter",
+    "back": "Zurück"
   },
   "directoryMap": {
     "crew": "Crew auf der Karte",
@@ -14042,7 +14045,19 @@
     "linkHelp": "Wähle ein Team, dem du bereits angehörst. Erst mit „Verbinden“ wird es diesem lokalen Team zugeordnet.",
     "linkAction": "Verbinden",
     "connecting": "Wird verbunden …",
-    "joinRestricted": "Beitritt nicht freigegeben"
+    "joinRestricted": "Beitritt nicht freigegeben",
+    "teamsLabel": "Teams",
+    "chooseContacts": "Kontakte auswählen",
+    "chooseContactsHelp": "Wähle, wen du ins Team einladen möchtest.",
+    "teamDetails": "Team benennen",
+    "next": "Weiter",
+    "invitationNote": "Die ausgewählten Personen erhalten eine Teameinladung und entscheiden selbst über den Beitritt.",
+    "teamCreatedContinue": "Dein Team ist erstellt. Noch offene Einladungen kannst du hier fortsetzen.",
+    "openCreatedTeam": "Team öffnen, später fortsetzen",
+    "teamNavigation": "Teambereiche",
+    "chats": "Chats",
+    "files": "Dateien",
+    "filesPending": "Die gemeinsame Dateiablage ist noch nicht freigeschaltet. Dateien auf deinem Gerät bleiben erhalten."
   },
   "WorkMail": {
     "title": "E-Mail in Work",

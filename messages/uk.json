@@ -12754,7 +12754,10 @@
     "removeAttachment": "Видалити {name}",
     "openAttachment": "Відкрити {name}",
     "attachmentPreview": "Вкладення",
-    "loadMoreConversations": "Завантажити ще"
+    "loadMoreConversations": "Завантажити ще",
+    "newChat": "Новий чат",
+    "next": "Далі",
+    "back": "Назад"
   },
   "AnalyticsPrivacy": {
     "settings": "Налаштування аналітики",
@@ -14042,7 +14045,19 @@
     "linkHelp": "Вибери команду, до якої вже належиш. Її буде пов’язано з цією локальною командою лише після натискання «Пов’язати».",
     "linkAction": "Пов’язати",
     "connecting": "Пов’язування …",
-    "joinRestricted": "Приєднання не дозволено"
+    "joinRestricted": "Приєднання не дозволено",
+    "teamsLabel": "Команди",
+    "chooseContacts": "Вибрати контакти",
+    "chooseContactsHelp": "Вибери, кого запросити до команди.",
+    "teamDetails": "Назва команди",
+    "next": "Далі",
+    "invitationNote": "Вибрані люди отримають запрошення й самі вирішать, чи приєднуватися до команди.",
+    "teamCreatedContinue": "Команду створено. Тут можна продовжити надсилання решти запрошень.",
+    "openCreatedTeam": "Відкрити команду, продовжити пізніше",
+    "teamNavigation": "Розділи команди",
+    "chats": "Чати",
+    "files": "Файли",
+    "filesPending": "Спільне сховище файлів ще не ввімкнено. Файли на пристрої зберігаються."
   },
   "WorkMail": {
     "title": "Пошта у Work",

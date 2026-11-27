@@ -12829,7 +12829,10 @@
     "removeAttachment": "Rimuovi {name}",
     "openAttachment": "Apri {name}",
     "attachmentPreview": "Allegato",
-    "loadMoreConversations": "Carica altri"
+    "loadMoreConversations": "Carica altri",
+    "newChat": "Nuova chat",
+    "next": "Avanti",
+    "back": "Indietro"
   },
   "directoryMap": {
     "crew": "Crew sulla mappa",
@@ -14042,7 +14045,19 @@
     "linkHelp": "Scegli un team di cui fai già parte. Verrà associato a questo team locale solo quando selezioni «Collega».",
     "linkAction": "Collega",
     "connecting": "Collegamento …",
-    "joinRestricted": "Ingresso non consentito"
+    "joinRestricted": "Ingresso non consentito",
+    "teamsLabel": "Team",
+    "chooseContacts": "Scegli i contatti",
+    "chooseContactsHelp": "Scegli chi invitare nel team.",
+    "teamDetails": "Dai un nome al team",
+    "next": "Avanti",
+    "invitationNote": "Le persone selezionate riceveranno un invito e decideranno se unirsi al team.",
+    "teamCreatedContinue": "Il team è stato creato. Puoi continuare qui con gli inviti ancora da inviare.",
+    "openCreatedTeam": "Apri il team, continua dopo",
+    "teamNavigation": "Sezioni del team",
+    "chats": "Chat",
+    "files": "File",
+    "filesPending": "Lo spazio file condiviso non è ancora attivo. I file sul dispositivo restano conservati."
   },
   "WorkMail": {
     "title": "Email in Work",

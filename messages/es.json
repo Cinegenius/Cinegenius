@@ -12829,7 +12829,10 @@
     "removeAttachment": "Quitar {name}",
     "openAttachment": "Abrir {name}",
     "attachmentPreview": "Archivo adjunto",
-    "loadMoreConversations": "Cargar más"
+    "loadMoreConversations": "Cargar más",
+    "newChat": "Nuevo chat",
+    "next": "Siguiente",
+    "back": "Atrás"
   },
   "directoryMap": {
     "crew": "Crew en el mapa",
@@ -14042,7 +14045,19 @@
     "linkHelp": "Elige un equipo al que ya pertenezcas. Solo se vinculará a este equipo local cuando pulses «Vincular».",
     "linkAction": "Vincular",
     "connecting": "Vinculando …",
-    "joinRestricted": "No se permite unirse"
+    "joinRestricted": "No se permite unirse",
+    "teamsLabel": "Equipos",
+    "chooseContacts": "Elegir contactos",
+    "chooseContactsHelp": "Elige a quién quieres invitar al equipo.",
+    "teamDetails": "Nombre del equipo",
+    "next": "Siguiente",
+    "invitationNote": "Las personas seleccionadas recibirán una invitación y decidirán si se unen.",
+    "teamCreatedContinue": "Tu equipo está creado. Puedes continuar aquí con las invitaciones pendientes.",
+    "openCreatedTeam": "Abrir equipo y continuar después",
+    "teamNavigation": "Secciones del equipo",
+    "chats": "Chats",
+    "files": "Archivos",
+    "filesPending": "El almacenamiento compartido aún no está habilitado. Los archivos de tu dispositivo se conservan."
   },
   "WorkMail": {
     "title": "Correo en Work",

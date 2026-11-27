@@ -12754,7 +12754,10 @@
     "removeAttachment": "Supprimer {name}",
     "openAttachment": "Ouvrir {name}",
     "attachmentPreview": "Pièce jointe",
-    "loadMoreConversations": "Charger plus"
+    "loadMoreConversations": "Charger plus",
+    "newChat": "Nouvelle discussion",
+    "next": "Suivant",
+    "back": "Retour"
   },
   "AnalyticsPrivacy": {
     "settings": "Paramètres d’analyse",
@@ -14042,7 +14045,19 @@
     "linkHelp": "Choisis une équipe dont tu fais déjà partie. Elle ne sera associée à cette équipe locale que lorsque tu choisiras « Associer ».",
     "linkAction": "Associer",
     "connecting": "Association en cours …",
-    "joinRestricted": "Adhésion non autorisée"
+    "joinRestricted": "Adhésion non autorisée",
+    "teamsLabel": "Équipes",
+    "chooseContacts": "Choisir des contacts",
+    "chooseContactsHelp": "Choisis les personnes à inviter dans ton équipe.",
+    "teamDetails": "Nommer ton équipe",
+    "next": "Suivant",
+    "invitationNote": "Les personnes sélectionnées reçoivent une invitation et décident de rejoindre ou non l’équipe.",
+    "teamCreatedContinue": "Ton équipe est créée. Tu peux poursuivre ici l’envoi des invitations restantes.",
+    "openCreatedTeam": "Ouvrir l’équipe, continuer plus tard",
+    "teamNavigation": "Rubriques de l’équipe",
+    "chats": "Discussions",
+    "files": "Fichiers",
+    "filesPending": "Le stockage partagé n’est pas encore activé. Les fichiers de ton appareil sont conservés."
   },
   "WorkMail": {
     "title": "E-mail dans Work",

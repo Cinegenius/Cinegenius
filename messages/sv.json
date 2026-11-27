@@ -12829,7 +12829,10 @@
     "removeAttachment": "Ta bort {name}",
     "openAttachment": "Öppna {name}",
     "attachmentPreview": "Bilaga",
-    "loadMoreConversations": "Läs in fler"
+    "loadMoreConversations": "Läs in fler",
+    "newChat": "Ny chatt",
+    "next": "Nästa",
+    "back": "Tillbaka"
   },
   "directoryMap": {
     "crew": "Filmteam på kartan",
@@ -14042,7 +14045,19 @@
     "linkHelp": "Välj ett team som du redan tillhör. Det kopplas till detta lokala team först när du väljer ”Anslut”.",
     "linkAction": "Anslut",
     "connecting": "Ansluter …",
-    "joinRestricted": "Det går inte att gå med"
+    "joinRestricted": "Det går inte att gå med",
+    "teamsLabel": "Team",
+    "chooseContacts": "Välj kontakter",
+    "chooseContactsHelp": "Välj vilka du vill bjuda in till teamet.",
+    "teamDetails": "Namnge teamet",
+    "next": "Nästa",
+    "invitationNote": "De valda personerna får en teaminbjudan och väljer själva om de vill gå med.",
+    "teamCreatedContinue": "Ditt team har skapats. Du kan fortsätta med återstående inbjudningar här.",
+    "openCreatedTeam": "Öppna teamet, fortsätt senare",
+    "teamNavigation": "Teamavsnitt",
+    "chats": "Chattar",
+    "files": "Filer",
+    "filesPending": "Delad fillagring är inte aktiverad ännu. Filer på din enhet finns kvar."
   },
   "WorkMail": {
     "title": "E-post i Work",

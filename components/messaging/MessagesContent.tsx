@@ -15,7 +15,7 @@ import Link from "next/link";
 import InboxPaneHeader from "@/components/InboxPaneHeader";
 import InboxFriends from "@/components/messaging/InboxFriends";
 import InboxNotices from "@/components/messaging/InboxNotices";
-import { ArrowLeft, MessageSquare, Loader2, User, Check, Users, Search, SquarePen, X } from "lucide-react";
+import { ArrowLeft, MessageSquare, Loader2, User, Check, Users, Search, Plus, X } from "lucide-react";
 import { Activity } from "react";
 import MessageComposer from "@/components/messaging/MessageComposer";
 import NewMessageDialog from "@/components/messaging/NewMessageDialog";
@@ -575,7 +575,7 @@ export default function MessagesContent({ embedded }: { embedded?: EmbeddedInbox
     aria-hidden={!readerEnabled || renderOwner !== user?.id || undefined}
     style={{...(embedded ? {} : {"--messages-viewport-offset":`${visualViewportTop}px`,...(keyboardInset>0?{bottom:`${keyboardInset}px`}:{})}),...(!readerEnabled || renderOwner !== user?.id ? {display:"none"} : {})} as CSSProperties}>
     {!embedded && <aside className={`${showChat?"hidden sm:flex":"flex"} min-h-0 min-w-0 w-full flex-col border-border bg-bg-primary ${utilityView ? "shrink-0" : "border-r sm:w-80 flex-1 sm:flex-none"}`}>
-      <InboxPaneHeader active={view} action={<button type="button" onClick={()=>setNewMessageOpen(true)} aria-label={t("newMessage")} title={t("newMessage")} className="flex size-11 shrink-0 items-center justify-center rounded-xl text-gold hover:bg-bg-elevated"><SquarePen size={22}/></button>}>
+      <InboxPaneHeader active={view} action={<button type="button" onClick={()=>setNewMessageOpen(true)} aria-label={t("newMessage")} title={t("newMessage")} className="flex size-11 shrink-0 items-center justify-center rounded-xl text-gold hover:bg-bg-elevated"><Plus size={22}/></button>}>
         {!friendsOnly && !noticesOnly && <label className="mt-2 flex min-h-11 items-center gap-2 rounded-xl border border-border bg-bg-secondary px-3"><Search size={17} className="shrink-0 text-text-muted"/><input type="search" value={search} onChange={event=>setSearch(event.target.value)} placeholder={t("searchChats")} aria-label={t("searchChats")} className="min-h-11 min-w-0 flex-1 bg-transparent text-base text-text-primary outline-none"/></label>}
         {nativeAppearance && friendsOnly && <label className="flex min-h-11 items-center gap-2 rounded-xl border border-border bg-bg-secondary px-3"><Search size={17} aria-hidden="true" className="shrink-0 text-text-muted"/><input type="search" value={contactQuery} onChange={event=>setContactSearch({ owner: user?.id, value: event.target.value })} placeholder={contactsText("search")} aria-label={contactsText("search")} className="min-h-11 min-w-0 flex-1 bg-transparent text-base text-text-primary outline-none"/></label>}
       </InboxPaneHeader>
