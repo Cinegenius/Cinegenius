@@ -1,6 +1,6 @@
-## Crew-Kopftext · 27. November 2026 · vorbereitet, noch nicht veröffentlicht
+## Crew-Kopftext · 27. November 2026 · veröffentlicht und geprüft
 
-Auf Markus’ Auftrag den Zusatz „ohne Agentur“ ausschließlich aus `creators.heroDesc` in allen 17 Sprachkatalogen entfernt. Der deutsche Kopftext lautet jetzt „Profis für Kamera, Regie, Schauspiel, Maske und Content — direkt buchbar.“ Gemeinsamer Crew-Seitenkopf; keine Komponenten-, Layout-, Zugriffs- oder native Änderung. Andere Agenturtexte bleiben erhalten. Sprachprüfung: 17 Kataloge, 11.776 Schlüssel bestanden; pro Katalog ausschließlich dieser eine Text geändert. Neue Veröffentlichung separat freigeben und mit dem laufenden App-Releasefenster abstimmen.
+Auf Markus’ ausdrücklichen Veröffentlichungsauftrag ist `cb4d01629625f59b32d3f260b041cd987a1dda79` über den geschützten Produktionsweg als `dpl_DJvNJjQXYujd5Qb5QLXXLZ6DdBux` READY. Hauptadresse und www sind bestätigt; der sichtbare Crew-Kopftext ist in allen 17 Sprachen geprüft. Deutsch: „Profis für Kamera, Regie, Schauspiel, Maske und Content — direkt buchbar.“ Ausschließlich `creators.heroDesc` geändert; andere Agenturtexte, Komponenten, Layouts, Zugriffe und native Quellen bleiben erhalten. Design22, i18n17/11.776 sowie vollständiger Hosted-Next-/TypeScript-Build bestanden. Basis `0e77e8d6` vollständig erhalten. Die APP-Übergabenachricht konnte wegen gestörter Chat-Verbindung nicht zugestellt werden; Beleg: `/srv/cinegenius/handoffs/20261127-crew-description/receipt.json`. Kein neuer Gerätebuild oder physischer App-Test.
 
 ## Teams/Chats und gemeinsamer App-Look · 27. November 2026 · laufender Kandidat
 
