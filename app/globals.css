@@ -1315,6 +1315,44 @@ html[data-cg-native-work-team-container="v1"][data-cg-app-theme="pure"] {
   }
 }
 
+/* A short keyboard viewport must scroll the complete form. A fixed header and
+   footer must not squeeze its only editable field into a clipped middle strip. */
+dialog[data-messaging-dialog][data-constrained-viewport] {
+  overflow-y:auto;
+  overscroll-behavior:contain;
+  scroll-padding-block:12px;
+}
+dialog[data-messaging-dialog][data-constrained-viewport] > [data-messaging-dialog-body] {
+  flex:0 0 auto;
+  min-height:auto;
+  overflow:visible;
+}
+dialog[data-messaging-dialog][data-constrained-viewport] > header { padding:6px 12px; }
+dialog[data-messaging-dialog][data-constrained-viewport] > footer { padding:8px 12px; }
+.messaging-field:focus-visible,.messaging-field:focus-within {
+  outline:2px solid var(--color-gold);
+  outline-offset:2px;
+}
+:is(html[data-cg-native-community-appearance="app"],html[data-cg-native-work-team-container="v1"]) [data-messaging-dialog] .messaging-field {
+  background:color-mix(in srgb,var(--cg-app-material-solid) 75%,#18283f) !important;
+  border-color:rgb(218 229 245 / 50%);
+  box-shadow:inset 0 1px 3px rgb(12 20 33 / 12%);
+}
+:is(html[data-cg-native-community-appearance="app"],html[data-cg-native-work-team-container="v1"])[data-cg-app-theme="pure"] [data-messaging-dialog] .messaging-field {
+  background:rgb(255 255 255 / 90%) !important;
+  border-color:rgb(39 48 57 / 45%);
+}
+@media (forced-colors:active) {
+  :is(html[data-cg-native-community-appearance="app"],html[data-cg-native-work-team-container="v1"]):is(:root,[data-cg-app-theme]) [data-messaging-dialog] .messaging-field {
+    background:Canvas !important;
+    --color-text-primary:CanvasText;
+    color:CanvasText;
+    border-color:ButtonText;
+    outline-color:Highlight;
+    box-shadow:none;
+  }
+}
+
 :is(html[data-cg-native-community-appearance="app"],html[data-cg-native-work-team-container="v1"]) .text-red-400 { color:#ffc1c7; }
 :is(html[data-cg-native-community-appearance="app"],html[data-cg-native-work-team-container="v1"])[data-cg-app-theme="pure"] .text-red-400 { color:#9d2333; }
 @media (forced-colors:active) {

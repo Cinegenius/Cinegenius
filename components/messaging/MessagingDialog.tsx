@@ -18,6 +18,17 @@ export default function MessagingDialog({open, title, onClose, busy = false, com
   const latestClose = useRef(onClose);
   useLayoutEffect(() => {latestClose.current = onClose;});
   const [viewport, setViewport] = useState<{height: number; top: number} | null>(null);
+  const constrained = !nativeHeaderUtility && surface === "default" && viewport !== null && viewport.height < 420;
+  useLayoutEffect(() => {
+    const active = document.activeElement, element = dialog.current;
+    if (constrained && active instanceof HTMLElement && element?.contains(active)
+        && active.matches('input, textarea, select, [contenteditable="true"]')) {
+      const field = active.getBoundingClientRect(), bounds = element.getBoundingClientRect();
+      const top = bounds.top + element.clientTop + 12, bottom = bounds.top + element.clientTop + element.clientHeight - 12;
+      if (field.top < top) element.scrollTop += field.top - top;
+      else if (field.bottom > bottom) element.scrollTop += field.bottom - bottom;
+    }
+  }, [constrained, viewport?.height]);
   useEffect(() => {
     if (!open || !dialog.current || nativeHeaderUtility) return;
     if (!withinInbox) dismissNativeHeaderUtility();
@@ -39,11 +50,11 @@ export default function MessagingDialog({open, title, onClose, busy = false, com
     };
   }, [open, nativeHeaderUtility, withinInbox]);
   if (!open) return null;
-  return <dialog ref={dialog} aria-modal={nativeHeaderUtility ? undefined : true} aria-labelledby={titleId} onCancel={event => {event.preventDefault(); if (!busy) onClose();}}
+  return <dialog ref={dialog} data-messaging-dialog data-constrained-viewport={constrained || undefined} aria-modal={nativeHeaderUtility ? undefined : true} aria-labelledby={titleId} onCancel={event => {event.preventDefault(); if (!busy) onClose();}}
     style={!nativeHeaderUtility && viewport ? {top: `calc(${viewport.top + 12}px + env(safe-area-inset-top, 0px))`, ...(compact ? {maxHeight:`calc(${Math.max(0, viewport.height - 24)}px - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px))`} : {height: `min(44rem, calc(${Math.max(0, viewport.height - 24)}px - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px)))`})} : undefined}
     className={`${className} ${surface === "browse" ? "browse-popup-surface" : "border-border bg-bg-primary shadow-2xl"} ${compact ? "" : "h-[min(44rem,calc(100dvh_-_1.5rem))]"} fixed inset-x-0 bottom-auto top-3 z-[90] mx-auto my-0 flex max-h-[calc(100dvh_-_1.5rem)] w-[calc(100%_-_1.5rem)] max-w-lg flex-col overflow-hidden rounded-2xl border p-0 text-text-primary backdrop:bg-black/75`}>
     <header data-swipe-dismiss-handle className="flex shrink-0 items-center justify-between gap-3 border-b border-border p-3 sm:p-4"><h2 id={titleId} className="min-w-0 break-words text-lg font-semibold [overflow-wrap:anywhere]">{title}</h2><button ref={close} type="button" disabled={busy} onClick={onClose} aria-label={t("close")} className="flex min-h-11 min-w-11 shrink-0 items-center justify-center rounded-xl text-text-muted hover:bg-bg-elevated disabled:opacity-40"><X size={20}/></button></header>
-    <div className={`${compact ? "" : "flex-1"} min-h-0 space-y-4 overflow-y-auto overscroll-contain p-3 sm:p-4`}>{children}</div>
+    <div data-messaging-dialog-body className={`${compact ? "" : "flex-1"} min-h-0 space-y-4 overflow-y-auto overscroll-contain p-3 sm:p-4`}>{children}</div>
     {footer && <footer className="flex shrink-0 flex-wrap items-center justify-end gap-2 border-t border-border p-3 sm:p-4">{footer}</footer>}
   </dialog>;
 }
