@@ -13,13 +13,16 @@ type Page={data:unknown[]|null;error:unknown};
 const PAGE_SIZE=200,MAX_PAGES=500;
 /** Read through an empty keyset page. No short-page or partial-list success. */
 async function eachPage(read:(after:string|null)=>PromiseLike<Page>,idKey:string,consume:(rows:Row[])=>Promise<void>,signal:AbortSignal){
- let after:string|null=null;
+ let after:string|null=null;const seen=new Set<string>();
  for(let n=0;n<MAX_PAGES;n++){
   signal.throwIfAborted();const result=await read(after);signal.throwIfAborted();
   if(result.error||!Array.isArray(result.data)||result.data.length>PAGE_SIZE)throw Error('place_inventory_unavailable');
   if(!result.data.length)return;
   const rows=result.data as Row[];let last:string|null=after;
-  for(const row of rows){const id=row?.[idKey];if(typeof id!=='string'||!id||last!==null&&id<=last)throw Error('place_inventory_unavailable');last=id;}
+  // Keep the database's ordering/cursor unchanged: its collation need not match
+  // JavaScript codepoints. Replays/cycles are bounded by this source-local set.
+  for(const row of rows){const id=row?.[idKey];if(typeof id!=='string'||!id||seen.has(id))throw Error('place_inventory_unavailable');seen.add(id);last=id;}
+  if(last===after)throw Error('place_inventory_unavailable');
   await consume(rows);after=last;
  }
  throw Error('place_inventory_incomplete');

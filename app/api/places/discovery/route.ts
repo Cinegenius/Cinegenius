@@ -17,7 +17,7 @@ export async function GET(request:NextRequest){
   return respond({version:1,mode:'cities',cities:discoveryCityOptions(query,locale,country,city)});
  }
  const surface=params.get('surface');if(!DISCOVERY_PLACE_SURFACES.includes(surface as DiscoveryPlaceSurface))return respond({version:1,code:'invalid'},400);
- const raw=params.get('areas');if(raw===null||raw.length>100)return respond({version:1,code:'invalid'},400);
+ const raw=params.get('areas')??'';if(raw.length>100)return respond({version:1,code:'invalid'},400);
  const items=raw===''?[]:raw.split(',');if(items.some(area=>!DISCOVERY_PLACE_AREAS.includes(area as DiscoveryPlaceArea))||new Set(items).size!==items.length)return respond({version:1,code:'invalid'},400);
  const areas=DISCOVERY_PLACE_AREAS.filter(area=>items.includes(area));
  try{const{userId}=await auth();const{discoveryInventoryCountries}=await import('@/lib/discovery-place-options-server');const countries=await discoveryInventoryCountries(areas,locale,userId,request.signal,surface as DiscoveryPlaceSurface);return respond({version:1,mode:'countries',surface,accountId:userId,areas,countries});}
