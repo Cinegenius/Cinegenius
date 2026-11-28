@@ -1,6 +1,6 @@
 # City-first discovery filters
 
-Status, 27 November 2026: implemented and checked on `codex/app-city-search-20261127`, based on `fcc8bf9071aac5a92e7b82f5b32b5ebda37008e3`. Not published or physically accepted on an iPhone. The later FCC8 seasonal documentation is retained. Shared Team files and permanent Work deletion remain a separate unpublished package.
+Status, 28 November 2026: published runtime `cd3a9a08b871fe3d8cce63fa51fc49ef489a7dbb` on production deployment `dpl_5ZAPjxqGMJgWhz5U7j89vLoGFnWy`, READY and separately confirmed for both .co aliases. The original candidate2c48 and its initial country503 are preserved in the release evidence. No physical iPhone or authenticated two-account acceptance is claimed. Shared Team files and permanent Work deletion remain a separate unpublished package.
 
 ## Interaction and scope
 
@@ -18,7 +18,7 @@ Optional `country=<ISO code>` restricts suggestions. Optional `city=geonames:<id
 
 `GET /api/places/discovery?mode=countries&surface=smart&locale=de&areas=crew,marketplace,locations,companies,jobs`
 
-Required surface is `smart` or `directory`. Response is `{version:1,mode:'countries',surface,accountId,areas,countries:[{id,name}]}`. It exposes no source IDs, member names, contact data, country counts or coordinates. The client binds account, session, locale, surface and selected areas and discards aborted or stale responses. Empty `areas=` returns no countries or data reads. Invalid/duplicate selectors return 400; incomplete or failed inventory returns 503, never a misleading partial or empty success. All responses are private/no-store. The proxy adds only the exact existing public-read-path literal; mutation/origin and adjacent-path protections remain.
+Required surface is `smart` or `directory`. Response is `{version:1,mode:'countries',surface,accountId,areas,countries:[{id,name}]}`. It exposes no source IDs, member names, contact data, country counts or coordinates. The client binds account, session, locale, surface and selected areas and discards aborted or stale responses. Missing or empty `areas` means zero selected areas and returns no countries or data reads; this also preserves the empty union when transport normalizes away an empty query value. Invalid/duplicate selectors return 400; incomplete or failed inventory returns 503, never a misleading partial or empty success. All responses are private/no-store. The proxy adds only the exact existing public-read-path literal; mutation/origin and adjacent-path protections remain.
 
 ## Inventory rules
 
@@ -26,11 +26,11 @@ Smart Crew uses its existing named-profile source without a people predicate or 
 
 Other offers retain `privacy_visible_listings`; companies retain independent published company geography. Jobs retain the existing published/type rule, without inventing an expiry rule. Profile/field privacy, Ghost, blocks, accepted friends and current viewer checks occur before country geography is included.
 
-Complete keyset reads continue through an empty page even after a short nonempty backend page. Pages are bounded to 200 rows, at most 500 pages per source and an outer eight-second abort signal. Failure is explicit. Existing directory SSR caching and equal-created-at tie behavior remain: these are request-local eligible reads, not an atomic snapshot or a guarantee about later availability.
+Complete keyset reads follow the database ordering and its matching greater-than cursor, continuing through an empty page even after a short nonempty backend page. A source-local set rejects repeated identities across pages and cycles; no JavaScript codepoint or locale order is imposed on database IDs. Pages are bounded to 200 rows, at most 500 pages per source and an outer eight-second abort signal. Failure is explicit. Existing directory SSR caching and equal-created-at tie behavior remain: these are request-local eligible reads, not an atomic snapshot or a guarantee about later availability.
 
 ## Verification and remaining evidence
 
-- 63 integrated controlled cases passed, covering actual modules, all 17 locale renders, privacy/source eligibility, global city choice, independent failures, stale scope/response handling, IME selection, radius and parent handlers.
+- 75 integrated controlled cases passed, covering actual modules, all 17 locale renders, privacy/source eligibility, global city choice, independent failures, stale scope/response handling, IME selection, radius and parent handlers.
 - Full TypeScript, 22 design checks, 17-catalogue i18n and targeted ESLint passed. The normal Next 16.4.6 webpack release build passed. Static baseline pages used documented fallback behavior without service configuration; this is not a customer-data or live-inventory test.
 - Independent source review checked the exact 37-path product/test delta, all 1,819 source inputs, the isolated type annotation, native-only presentation boundaries and retention of FCC8 documentation. No new actionable issue was found in that reviewed scope.
 - Actual local Safari interaction with synthetic data at 393×700 and 320×400 covered Marakesch→Marrakesch, keyboard selection, Berlin→Wien, optional radius, Crew-only countries, country-503 independence and a global city absent from the available country list. It is not physical iPhone keyboard, authenticated account or hosted inventory acceptance.
@@ -38,3 +38,7 @@ Complete keyset reads continue through an empty page even after a short nonempty
 One initial bulk typing action yielded `erlin`; subsequent first-letter, continued typing and rapid replacement checks passed. No product or tool cause is established. GeoNames/CC-BY attribution remains accessible. The existing Clerk matcher deprecation and baseline parent-component lint debt are unchanged.
 
 Detailed source hashes, predecessor/failure evidence, independent review and local-preview observations are retained in `work/place-search-20261127/` in the Mac app task workspace. No publication, Cloud activation, real user deletion or native installation is implied by these checks.
+
+## Production acceptance, 28 November
+
+The protected production command passed with full Next/TypeScript, design and localization checks. Sixteen anonymous www HTTP cases passed: direct cities/ID restoration, invalid surface, private adjacent path, both Crew country surfaces, missing/empty unions, the complete Smart five-area union and each remaining directory area. Both .co aliases resolve to the same READY deployment; the bare domain separately performs its expected canonical redirect. See [the release ledger](app-city-search-release-20261128.md). The initial database-order incident, old-fail/new-pass regressions and real read-only service evidence remain retained; no source failure was relabeled as a success.

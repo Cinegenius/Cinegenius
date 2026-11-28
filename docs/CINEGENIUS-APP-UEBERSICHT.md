@@ -1,3 +1,11 @@
+## Ortssuche veröffentlicht · 28. November 2026
+
+Die ausdrücklich freigegebene Ortssuche ist veröffentlicht: Runtime `cd3a9a08b871fe3d8cce63fa51fc49ef489a7dbb`, Vercel `dpl_5ZAPjxqGMJgWhz5U7j89vLoGFnWy` READY; www.cinegenius.co und cinegenius.co separat auf dieses Deployment geprüft. Stadt direkt eingeben; Land und anschließender Umkreis bleiben freiwillig. Die Länderwahl folgt den verfügbaren, berechtigten Einträgen der ausgewählten Bereiche. Gewöhnliche Desktop-Ortsfilter und Profil-/Inserat-Schreibverträge bleiben erhalten.
+
+75 integrierte Fälle, der reguläre Produktionsbuild mit TypeScript, 22 Designprüfungen, i18n in 17 Katalogen sowie 16 anonyme Live-HTTP-Fälle auf www bestanden. Die Länderabfragen sind für Smart, Crew-Verzeichnis, Markt, Locations, Firmen und Jobs geprüft; der Apex liefert separat den erwarteten kanonischen 308. Eine beim ersten Livegang entdeckte falsche JS-Sortierannahme wurde kausal nachgewiesen und eng korrigiert; die anfänglichen 503-Belege bleiben erhalten. [Release, Umfang und Prüfgrenzen](app-city-search-release-20261128.md).
+
+Dies ist keine echte iPhone- oder angemeldete Zwei-Konten-Abnahme. Keine neue native Installation, Migration oder Aktivierungsflagge. Gemeinsame Teamdateien und dauerhaftes Work-Löschen bleiben getrennt unveröffentlicht/unaktiviert; deren gespeicherte offenen Anforderungen bleiben bestehen. Ältere Kandidatenabschnitte unten behalten ihren damaligen Zeitpunkt.
+
 ## Stadt zuerst filtern · 27. November 2026 · geprüfter Quellkandidat
 
 In App-Smart und den nativen Verzeichnisfiltern für Crew, Marktplatz, Locations, Firmen und Jobs beginnt die Ortswahl mit **„Stadt oder Ort“**. Ein Land ist keine Voraussetzung. Vorschläge stammen aus dem bestehenden weltweiten Ortskatalog, einschließlich vorhandener Sprachvarianten; erst die ausdrückliche Auswahl setzt die kanonische Orts-ID. Land und Umkreis sind freiwillige Verfeinerungen. Der Umkreis wird erst nach einer gewählten Stadt mit vorhandenem öffentlichen Stadtmittelpunkt angeboten. Kein neuer GPS-, KI- oder externer Anbieterdienst.

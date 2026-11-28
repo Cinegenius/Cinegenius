@@ -1,3 +1,11 @@
+## Ortssuche veröffentlicht · 28. November 2026
+
+Die ausdrücklich freigegebene Ortssuche ist veröffentlicht: Runtime `cd3a9a08b871fe3d8cce63fa51fc49ef489a7dbb`, Vercel `dpl_5ZAPjxqGMJgWhz5U7j89vLoGFnWy` READY; www.cinegenius.co und cinegenius.co separat auf dieses Deployment geprüft. Stadt direkt eingeben; Land und anschließender Umkreis bleiben freiwillig. Die Länderwahl folgt den verfügbaren, berechtigten Einträgen der ausgewählten Bereiche. Gewöhnliche Desktop-Ortsfilter und Profil-/Inserat-Schreibverträge bleiben erhalten.
+
+75 integrierte Fälle, der reguläre Produktionsbuild mit TypeScript, 22 Designprüfungen, i18n in 17 Katalogen sowie 16 anonyme Live-HTTP-Fälle auf www bestanden. Die Länderabfragen sind für Smart, Crew-Verzeichnis, Markt, Locations, Firmen und Jobs geprüft; der Apex liefert separat den erwarteten kanonischen 308. Eine beim ersten Livegang entdeckte falsche JS-Sortierannahme wurde kausal nachgewiesen und eng korrigiert; die anfänglichen 503-Belege bleiben erhalten. [Release, Umfang und Prüfgrenzen](app-city-search-release-20261128.md).
+
+Dies ist keine echte iPhone- oder angemeldete Zwei-Konten-Abnahme. Keine neue native Installation, Migration oder Aktivierungsflagge. Gemeinsame Teamdateien und dauerhaftes Work-Löschen bleiben getrennt unveröffentlicht/unaktiviert; deren gespeicherte offenen Anforderungen bleiben bestehen. Ältere Kandidatenabschnitte unten behalten ihren damaligen Zeitpunkt.
+
 ## App-Ortssuche ohne Länderpflicht · 27. November 2026 · geprüfter Kandidat
 
 Markus verlangt die direkte Suche nach Städten wie Marrakesch, Berlin oder Wien und eine Länderwahl nur aus tatsächlichen Angeboten der gewählten Bereiche. Der Kandidat setzt dies in App-Smart und den fünf nativen Verzeichnisfiltern um: weltweite vorhandene Katalogvorschläge ohne Länderpflicht, ausdrücklich ausgewählte Orts-ID, freiwilliger Länderfilter und anschließender Umkreis. Länder stammen aus dem vollständigen aktuell berechtigten Bestand; Smart und Einzelverzeichnisse behalten getrennte Quellen-/Sichtbarkeitskontexte. Keine Ableitung aus lediglich geladenen Ergebniszeilen und keine erfundenen Angebote.
